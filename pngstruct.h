@@ -69,13 +69,13 @@ struct png_struct_def
    int zlib_window_bits;      /* holds zlib compression window bits */
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
-/* Added at libpng 1.5.2 */
+/* Added at libpng 1.5.3 */
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
    int zlib_text_window_bits;      /* holds zlib compression window bits */
    int zlib_text_mem_level;        /* holds zlib compression memory level */
    int zlib_text_strategy;         /* holds zlib compression strategy */
-/* End of material added at libpng 1.5.2 */
+/* End of material added at libpng 1.5.3 */
 
    png_uint_32 width;         /* width of image in pixels */
    png_uint_32 height;        /* height of image in pixels */

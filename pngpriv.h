@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.2 [March 31, 2011]
+ * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -346,7 +346,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
                                   /*      0x400000L  unused */
 #define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000L  /* Added to libpng-1.4.0 */
 #define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000L  /* 5 lines added */
-#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000L  /* to libpng-1.5.2 */
+#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000L  /* to libpng-1.5.3 */
 #define PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL   0x4000000L
 #define PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS 0x8000000L
 #define PNG_FLAG_ZTXT_CUSTOM_METHOD      0x10000000L
