@@ -670,22 +670,22 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
 
    if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_LEVEL))
-      png_ptr->zlib_text_level = Z_DEFAULT_COMPRESSION;
+      png_ptr->zlib_text_level = png_ptr->zlib_level;
 
    if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL))
-      png_ptr->zlib_text_mem_level = 8;
+      png_ptr->zlib_text_mem_level = png_ptr->zlib_mem_level;
 
    if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS))
-      png_ptr->zlib_text_window_bits = 15;
+      png_ptr->zlib_text_window_bits = png_ptr->zlib_window_bits;
 
    if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_METHOD))
-      png_ptr->zlib_text_method = 8;
+      png_ptr->zlib_text_method = png_ptr->zlib_method;
 #else
    png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
-   png_ptr->zlib_text_level = Z_DEFAULT_COMPRESSION;
-   png_ptr->zlib_text_mem_level = 8;
-   png_ptr->zlib_text_window_bits = 15;
-   png_ptr->zlib_text_method = 8;
+   png_ptr->zlib_text_level = png_ptr->zlib_level;
+   png_ptr->zlib_text_mem_level = png_ptr->zlib_mem_level;
+   png_ptr->zlib_text_window_bits = png_ptr->zlib_window_bits;
+   png_ptr->zlib_text_method = png_ptr->zlib_method;
 #endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 #endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
 
