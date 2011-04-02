@@ -231,4 +231,4 @@ EXPORTS
  png_set_text_compression_mem_level @223
  png_set_text_compression_strategy @224
  png_set_text_compression_window_bits @225
- png_set_text_compression_level @226
+ png_set_text_compression_method @226
