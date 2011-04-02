@@ -839,13 +839,23 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
          if (length >= 2 &&
              png_ptr->height < 16384 && png_ptr->width < 16384)
          {
-            /* Compute the maximum possible length of the datastream
-             *
-             * To do: verify that this works with interlaced files
+            /* Compute the maximum possible length of the datastream */
+
+            /* Number of pixels, plus for each row a filter byte and possible
+             * padding byte
              */
             png_uint_32 uncompressed_idat_size = png_ptr->height *
                 ((png_ptr->width *
                 png_ptr->channels * png_ptr->bit_depth + 15) >> 3);
+
+            /* If it's interlaced, each block of 8 rows is sent as up to
+             * 14 rows, i.e., 6 additional rows, each with a filter byte
+             * and possibly a padding byte
+             */
+            if (png_ptr->interlaced)
+               uncompressed_idat_size += ((png_ptr->height + 7)/8) *
+                   (png_ptr->bit_depth < 8 ? 12 : 6);
+
             unsigned int z_cinfo = z_cmf >> 4;
             unsigned int half_z_window_size = 1 << (z_cinfo + 7);
             while (uncompressed_idat_size <= half_z_window_size &&

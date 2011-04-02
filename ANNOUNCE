@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta02 - April 1, 2011
+Libpng 1.5.3beta02 - April 2, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -31,10 +31,11 @@ Version 1.5.3beta01 [April 1, 2011]
   Added API functions to set parameters for zlib compression of non-IDAT
     chunks.
 
-Version 1.5.3beta02 [April 1, 2011]
+Version 1.5.3beta02 [April 2, 2011]
   Updated scripts/symbols.def with new API functions.
   Only compile the new zlib re-initializing code when text or iCCP is
     supported, using PNG_WRITE_COMPRESSED_TEXT_SUPPORTED macro.
+  Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
