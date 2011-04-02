@@ -844,6 +844,8 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
             /* Number of pixels, plus for each row a filter byte and possible
              * padding byte
              */
+            unsigned int z_cinfo;
+            unsigned int half_z_window_size;
             png_uint_32 uncompressed_idat_size = png_ptr->height *
                 ((png_ptr->width *
                 png_ptr->channels * png_ptr->bit_depth + 15) >> 3);
@@ -856,8 +858,9 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
                uncompressed_idat_size += ((png_ptr->height + 7)/8) *
                    (png_ptr->bit_depth < 8 ? 12 : 6);
 
-            unsigned int z_cinfo = z_cmf >> 4;
-            unsigned int half_z_window_size = 1 << (z_cinfo + 7);
+            z_cinfo = z_cmf >> 4;
+            half_z_window_size = 1 << (z_cinfo + 7);
+
             while (uncompressed_idat_size <= half_z_window_size &&
                 half_z_window_size >= 256)
             {
