@@ -220,13 +220,12 @@ png_text_compress(png_structp png_ptr,
    comp->max_output_ptr = 0;
    comp->output_ptr = NULL;
    comp->input = NULL;
-   comp->input_len = 0;
+   comp->input_len = text_len;
 
    /* We may just want to pass the text right through */
    if (compression == PNG_TEXT_COMPRESSION_NONE)
    {
       comp->input = (png_const_bytep)text;
-      comp->input_len = text_len;
       return((int)text_len);
    }
 
@@ -288,7 +287,6 @@ png_text_compress(png_structp png_ptr,
    }
 
    /* Set up the compression buffers */
-
    /* TODO: the following cast hides a potential overflow problem. */
    png_ptr->zstream.avail_in = (uInt)text_len;
 
@@ -450,6 +448,69 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
 
       return;
    }
+
+#if 1 /* For testing */
+
+   if (comp->input_len >= 2 && comp->input_len < 16384)
+   {
+      unsigned int z_cmf;  /* zlib compression method and flags */
+
+      /* Optimize the CMF field in the zlib stream.  This hack of the zlib
+       * stream is compliant to the stream specification.
+       */
+
+      if (comp->num_output_ptr)
+        z_cmf = comp->output_ptr[0][0];
+      else
+        z_cmf = png_ptr->zbuf[0];
+
+      if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
+      {
+         unsigned int z_cinfo;
+         unsigned int half_z_window_size;
+         png_uint_32 uncompressed_idat_size = comp->input_len;
+
+         z_cinfo = z_cmf >> 4;
+         half_z_window_size = 1 << (z_cinfo + 7);
+
+         while (uncompressed_idat_size <= half_z_window_size &&
+             half_z_window_size >= 256)
+         {
+            z_cinfo--;
+            half_z_window_size >>= 1;
+         }
+
+         z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
+
+         if (comp->num_output_ptr)
+         {
+
+           if (comp->output_ptr[0][0] != z_cmf)
+           {
+              int tmp;
+
+              comp->output_ptr[0][0] = (png_byte)z_cmf;
+              tmp = comp->output_ptr[0][1] & 0xe0;
+              tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
+              comp->output_ptr[0][1] = (png_byte)tmp;
+           }
+         }
+         else
+         {
+            int tmp;
+
+            png_ptr->zbuf[0] = (png_byte)z_cmf;
+            tmp = png_ptr->zbuf[1] & 0xe0;
+            tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
+            png_ptr->zbuf[1] = (png_byte)tmp;
+         }
+      }
+
+      else
+         png_error(png_ptr,
+             "Invalid zlib compression method or flags in non-IDAT chunk");
+   }
+#endif
 
    /* Write saved output buffers, if any */
    for (i = 0; i < comp->num_output_ptr; i++)
@@ -842,7 +903,8 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
             /* Compute the maximum possible length of the datastream */
 
             /* Number of pixels, plus for each row a filter byte and possible
-             * padding byte
+             * and possibly a padding byte, so increase the maximum
+             * size to account for these.
              */
             unsigned int z_cinfo;
             unsigned int half_z_window_size;
@@ -1013,7 +1075,10 @@ png_write_iCCP(png_structp png_ptr, png_const_charp name, int compression_type,
        (png_size_t)(name_len + 2));
 
    if (profile_len)
+   {
+      comp.input_len = profile_len;
       png_write_compressed_data_out(png_ptr, &comp);
+   }
 
    png_write_chunk_end(png_ptr);
    png_free(png_ptr, new_name);
@@ -1594,6 +1659,7 @@ png_write_zTXt(png_structp png_ptr, png_const_charp key, png_const_charp text,
    png_write_chunk_data(png_ptr, &buf, (png_size_t)1);
 
    /* Write the compressed data */
+   comp.input_len = text_len;
    png_write_compressed_data_out(png_ptr, &comp);
 
    /* Close the chunk */
