@@ -1,5 +1,5 @@
 
-Libpng 1.4.6rc01 - March 31, 2011
+Libpng 1.4.6rc02 - April 3, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.6rc01.tar.xz (LZMA-compressed, recommended)
-   1.4.6rc01.tar.gz
-   1.4.6rc01.tar.bz2
+   1.4.6rc02.tar.xz (LZMA-compressed, recommended)
+   1.4.6rc02.tar.gz
+   1.4.6rc02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp146r01.7z (LZMA-compressed, recommended)
-   lp146r01.zip
+   lp146r02.7z (LZMA-compressed, recommended)
+   lp146r02.zip
 
 Other information:
 
-   1.4.6rc01-README.txt
-   1.4.6rc01-LICENSE.txt
+   1.4.6rc02-README.txt
+   1.4.6rc02-LICENSE.txt
 
 Changes since the last public release (1.4.5):
 
@@ -67,7 +67,7 @@ version 1.4.6beta07 [March 22, 2011]
   Fixed a bug (present since libpng-1.0.7) that makes png_handle_sPLT() fail
     to compile when PNG_NO_POINTER_INDEXING is defined (Chubanov Kirill)
 
-version 1.4.6rc01 [March 31, 2011]
+version 1.4.6rc01 [April 3, 2011]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
