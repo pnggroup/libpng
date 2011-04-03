@@ -3292,7 +3292,7 @@ Version 1.5.3beta01 [April 1, 2011]
   Added API functions to set parameters for zlib compression of non-IDAT
     chunks.
 
-Version 1.5.3beta02 [April 2, 2011]
+Version 1.5.3beta02 [April 3, 2011]
   Updated scripts/symbols.def with new API functions.
   Only compile the new zlib re-initializing code when text or iCCP is
     supported, using PNG_WRITE_COMPRESSED_TEXT_SUPPORTED macro.
