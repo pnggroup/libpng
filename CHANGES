@@ -3299,6 +3299,8 @@ Version 1.5.3beta02 [April 3, 2011]
   Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
   Optimize the zlib CMF byte in non-IDAT compressed chunks
 
+Version 1.5.3beta03 [April 3, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
