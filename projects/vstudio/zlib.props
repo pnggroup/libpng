@@ -2,9 +2,9 @@
 <!--
  * zlib.props - location of zlib source
  *
- * libpng version 1.5.3beta03 - April 3, 2011
+ * libpng version %VER% - %DATE%
  *
- * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
