@@ -2,9 +2,9 @@
 <!--
  * zlib.props - location of zlib source and build
  *
- * libpng version 1.4.6rc02 - April 3, 2011
+ * libpng version 1.4.6rc02 - April 4, 2011
  *
- * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -29,7 +29,7 @@
             zlib.h    # The header file
             zconf.h   # Another header file included by zlib.h
      -->
-    <ZLib1Dir>..\..\..\..\zlib124-dll\zlib-1.2.4</ZLib1Dir>
+    <ZLib1Dir>..\..\..\..\zlib125-dll\zlib-1.2.5</ZLib1Dir>
 
     <!-- Place the name of the directory containing the source of
          zlib used for debugging in this property.
@@ -38,6 +38,6 @@
          '.h' files in the source match those from the 'official'
          build above.
      -->
-    <ZLibSrcDir>..\..\..\..\zlib-1.2.4</ZLibSrcDir>
+    <ZLibSrcDir>..\..\..\..\zlib-1.2.5</ZLibSrcDir>
   </PropertyGroup>
 </Project>
