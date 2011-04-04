@@ -449,8 +449,6 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       return;
    }
 
-#if 1 /* For testing */
-
    if (comp->input_len >= 2 && comp->input_len < 16384)
    {
       unsigned int z_cmf;  /* zlib compression method and flags */
@@ -510,7 +508,6 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
          png_error(png_ptr,
              "Invalid zlib compression method or flags in non-IDAT chunk");
    }
-#endif
 
    /* Write saved output buffers, if any */
    for (i = 0; i < comp->num_output_ptr; i++)
