@@ -2779,7 +2779,11 @@ version 1.4.6beta07 [March 22, 2011]
   Fixed a bug (present since libpng-1.0.7) that makes png_handle_sPLT() fail
     to compile when PNG_NO_POINTER_INDEXING is defined (Chubanov Kirill)
 
-version 1.4.6rc01 [April 3, 2011]
+version 1.4.6rc01 [March 31, 2011]
+  No changes.
+
+version 1.4.6rc02 [April 6, 2011]
+  Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
