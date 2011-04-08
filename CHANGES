@@ -2785,6 +2785,9 @@ version 1.4.6rc01 [March 31, 2011]
 version 1.4.6rc02 [April 6, 2011]
   Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
 
+version 1.4.6 [April 8, 2011]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
