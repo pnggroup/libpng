@@ -1,58 +1,33 @@
 
-Libpng 1.4.6 - April 8, 2011
+Libpng 1.4.7rc01 - April 9, 2011
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.4.6.tar.xz (LZMA-compressed, recommended)
-   libpng-1.4.6.tar.gz
-   libpng-1.4.6.tar.bz2
+   1.4.7rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.7rc01.tar.gz
+   1.4.7rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng146.7z (LZMA-compressed, recommended)
-   lpng146.zip
+   lp147r01.7z (LZMA-compressed, recommended)
+   lp147r01.zip
 
 Other information:
 
-   libpng-1.4.6-README.txt
-   libpng-1.4.6-LICENSE.txt
+   1.4.7rc01-README.txt
+   1.4.7rc01-LICENSE.txt
 
-Changes since the last public release (1.4.5):
+Changes since the last public release (1.4.6):
 
-  Fixed bug in background transformation handling in pngrtran.c (it was
-    looking for the flag in png_ptr->transformations instead of in
-    png_ptr->flags) (David Raymond).
-  Fixed misspelled macros in contrib/pngminim (Cosmin)
-  Updated CMakeLists.txt (Clifford Yapp)
-  Fixed some typecasts in png_debug statements (Cosmin).
-  Updated documentation of png_set|get_tRNS() (Thomas Klausner).
-  Added png_const_structp and png_const_infop types, and used them in
-    prototypes for most png_get_*() functions.
-  In the manual, describe the png_get_IHDR() arguments in the correct order.
-  Updated the synopses in the manual to reflect recent changes.
-  Fixed a typo in the *.def files and deleted entries that are now
-    declared in pngpriv.h
-  Updated contrib/pngsuite/README to add the word "modify".
-  Added the private PNG_UNUSED() macro definition in pngconf.h.
-  ifdef out mask arrays in pngread.c when interlacing is not supported.
-  Added attribute definition (warnings) for MSC_VER >= 1300 in pngconf.h
-  Added -D_CRT_SECURE_NO_DEPRECATE to CFLAGS in makefile.vcwin32
-  Fixed mistake in the descriptions of user read_transform and write_transform
-    function prototypes in the manual.  The row_info struct is png_row_infop.
-  Added a request in the manual that applications do not use "png_" or
-    "PNG_" to begin any of their own symbols.
-  Fixed incorrect examples of callback prototypes in the manual, that were
-    introduced in libpng-1.0.0.
-  Removed "strip" from contrib/pngminim/*/makefile.
-  Fixed a bug (present since libpng-1.0.7) that makes png_handle_sPLT() fail
-    to compile when PNG_NO_POINTER_INDEXING is defined (Chubanov Kirill)
-  Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
+version 1.4.7rc01 [April 9, 2011]
+  Relocated misplaced new declarations in pngwutil.c.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
