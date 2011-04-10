@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.7rc01 - April 9, 2011
+ * libpng version 1.4.7 - April 10, 2011
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1413,37 +1413,6 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #      endif
 #    endif /* PNG_PRIVATE */
 #  endif /* __GNUC__ */
-
-#  if defined(_MSC_VER)  && (_MSC_VER >= 1300)
-#    ifndef PNG_USE_RESULT
-#      define PNG_USE_RESULT /* not supported */
-#    endif
-#    ifndef PNG_NORETURN
-#      define PNG_NORETURN   __declspec(noreturn)
-#    endif
-#    ifndef PNG_PTR_NORETURN
-#      define PNG_PTR_NORETURN /* not supported */
-#    endif
-#    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED __declspec(restrict)
-#    endif
-
-    /* This specifically protects structure members that should only be
-     * accessed from within the library, therefore should be empty during
-     * a library build.
-     */
-#    ifndef PNGLIB_BUILD
-#      ifndef PNG_DEPRECATED
-#        define PNG_DEPRECATED __declspec(deprecated)
-#      endif
-#      ifndef PNG_DEPSTRUCT
-#        define PNG_DEPSTRUCT  __declspec(deprecated)
-#      endif
-#      ifndef PNG_PRIVATE
-#        define PNG_PRIVATE __declspec(deprecated)
-#      endif
-#    endif /* PNGLIB_BUILD */
-#  endif /* _MSC_VER */
 #endif /* PNG_PEDANTIC_WARNINGS */
 
 #ifndef PNG_DEPRECATED
