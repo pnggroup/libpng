@@ -353,23 +353,6 @@
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __attribute__((__noreturn__))
 #    endif
-#    ifndef PNG_PTR_NORETURN
-       /* It's not enough to have the compiler be the correct compiler at
-        * this point - it's necessary for the library (which defines
-        * the type of the library longjmp) to also be the GNU library.
-        * This is because many systems use the GNU compiler with a
-        * non-GNU libc implementation.  Min/GW headers are also compatible
-        * with GCC as well as uclibc, so it seems best to exclude known
-        * problem libcs here rather than just including known libcs.
-        *
-        * NOTE: this relies on the only use of PNG_PTR_NORETURN being with
-        * the system longjmp.  If the same type is used elsewhere then this
-        * will need to be changed.
-        */
-#      if !defined(__CYGWIN__)
-#         define PNG_PTR_NORETURN   __attribute__((__noreturn__))
-#      endif
-#    endif
 #    ifndef PNG_ALLOCATED
 #      define PNG_ALLOCATED  __attribute__((__malloc__))
 #    endif
@@ -404,9 +387,6 @@
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __declspec(noreturn)
 #    endif
-#    ifndef PNG_PTR_NORETURN
-#      define PNG_PTR_NORETURN /* not supported */
-#    endif
 #    ifndef PNG_ALLOCATED
 #      define PNG_ALLOCATED __declspec(restrict)
 #    endif
@@ -437,9 +417,6 @@
 #endif
 #ifndef PNG_NORETURN
 #  define PNG_NORETURN    /* This function does not return */
-#endif
-#ifndef PNG_PTR_NORETURN
-#  define PNG_PTR_NORETURN /* This function does not return */
 #endif
 #ifndef PNG_ALLOCATED
 #  define PNG_ALLOCATED   /* The result of the function is new memory */

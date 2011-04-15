@@ -846,25 +846,18 @@ typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp));
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-/* This must match the function definition in <setjmp.h>, and the
- * application must include this before png.h to obtain the definition
- * of jmp_buf.  The function is required to be PNG_NORETURN.  (Note that
- * PNG_PTR_NORETURN is used here because current versions of the Microsoft
- * C compiler do not support the PNG_NORETURN attribute on a pointer.)
+/* This must match the function definition in <setjmp.h>, and the application
+ * must include this before png.h to obtain the definition of jmp_buf.  The
+ * function is required to be PNG_NORETURN, but this is not checked.  If the
+ * function does return the application will crash via an abort() or similar
+ * system level call.
  *
- * If you get a type warning from the compiler when linking against this line
- * then your compiler has 'longjmp' that does not match the requirements of the
- * compiler that built libpng.  You will have to write a wrapper function for
- * your compiler's longjmp and call png_set_longjmp_fn directly (not via the
- * png_jmpbuf macro.)
- *
- * If you get a warning here while building the library you will need to make
+ * If you get a warning here while building the library you may need to make
  * changes to ensure that pnglibconf.h records the calling convention used by
  * your compiler.  This may be very difficult - try using a different compiler
  * to build the library!
  */
-typedef PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)),
-   PNG_PTR_NORETURN);
+PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)), typedef);
 #endif
 
 /* Transform masks for the high-level interface */
