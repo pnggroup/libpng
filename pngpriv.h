@@ -232,7 +232,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #endif
 /* End of memory model/platform independent support */
 
-#ifndef PNG_NO_SNPRINTF
+#if !defined(PNG_NO_SNPRINTF) && !defined(__STRICT_ANSI__)
 #  ifdef _MSC_VER
 #    define png_snprintf _snprintf   /* Added to v 1.2.19 */
 #    define png_snprintf2 _snprintf
