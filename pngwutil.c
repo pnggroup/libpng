@@ -466,7 +466,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       {
          unsigned int z_cinfo;
          unsigned int half_z_window_size;
-         png_uint_32 uncompressed_idat_size = comp->input_len;
+         png_size_t uncompressed_idat_size = comp->input_len;
 
          z_cinfo = z_cmf >> 4;
          half_z_window_size = 1 << (z_cinfo + 7);
