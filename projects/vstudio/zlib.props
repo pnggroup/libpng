@@ -24,7 +24,11 @@
 	 If you use a relative directory name (as below) then it must be
 	 relative to the project directories; these are one level deepers than
 	 the directories containing this file.
+	 If the version of zlib you use does not match that used when the
+	 distribution was built you will get warnings from pngtest that the zlib
+	 versions do not match.  The zlib version used in this build is recorded
+	 below:
      -->
-    <ZLibSrcDir>..\..\..\..\zlib-1.2.4</ZLibSrcDir>
+    <ZLibSrcDir>..\..\..\..\zlib-1.2.5</ZLibSrcDir>
   </PropertyGroup>
 </Project>
