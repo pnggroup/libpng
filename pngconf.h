@@ -365,9 +365,6 @@
 #      ifndef PNG_DEPRECATED
 #        define PNG_DEPRECATED __attribute__((__deprecated__))
 #      endif
-#      ifndef PNG_DEPSTRUCT
-#        define PNG_DEPSTRUCT  __attribute__((__deprecated__))
-#      endif
 #      ifndef PNG_PRIVATE
 #        if 0 /* Doesn't work so we use deprecated instead*/
 #          define PNG_PRIVATE \
@@ -399,9 +396,6 @@
 #      ifndef PNG_DEPRECATED
 #        define PNG_DEPRECATED __declspec(deprecated)
 #      endif
-#      ifndef PNG_DEPSTRUCT
-#        define PNG_DEPSTRUCT  __declspec(deprecated)
-#      endif
 #      ifndef PNG_PRIVATE
 #        define PNG_PRIVATE __declspec(deprecated)
 #      endif
@@ -420,9 +414,6 @@
 #endif
 #ifndef PNG_ALLOCATED
 #  define PNG_ALLOCATED   /* The result of the function is new memory */
-#endif
-#ifndef PNG_DEPSTRUCT
-#  define PNG_DEPSTRUCT   /* Access to this struct member is deprecated */
 #endif
 #ifndef PNG_PRIVATE
 #  define PNG_PRIVATE     /* This is a private libpng function */
