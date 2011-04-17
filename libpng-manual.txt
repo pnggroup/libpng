@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.3beta03 - April 3, 2011
+ libpng version 1.5.3beta03 - April 17, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.3beta03 - April 3, 2011
+ libpng versions 0.97, January 1998, through 1.5.3beta03 - April 17, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -3743,7 +3743,8 @@ The png_zalloc() function no longer zeroes out the memory that it
 allocates.
 
 Support for dithering was disabled by default in libpng-1.4.0, because
-been well tested and doesn't actually "dither".  The code was not
+it has not been well tested and doesn't actually "dither".
+The code was not
 removed, however, and could be enabled by building libpng with
 PNG_READ_DITHER_SUPPORTED defined.  In libpng-1.4.2, this support
 was reenabled, but the function was renamed png_set_quantize() to
@@ -4173,7 +4174,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-April 3, 2011
+April 17, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
