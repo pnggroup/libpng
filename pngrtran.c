@@ -1491,7 +1491,7 @@ png_do_read_transformations(png_structp png_ptr)
       (png_ptr->row_info.color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
       png_ptr->row_info.color_type == PNG_COLOR_TYPE_GRAY_ALPHA))
       png_do_strip_channel(&(png_ptr->row_info), png_ptr->row_buf + 1,
-         0/*!at_start, because SWAP_ALPHA happens later*/);
+         0 /* at_start == false, because SWAP_ALPHA happens later */);
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
