@@ -457,7 +457,11 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
           "Ignoring extra png_read_update_info() call;"
           " row buffer not reallocated");
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
    png_read_transform_info(png_ptr, info_ptr);
+#else
+   PNG_UNUSED(info_ptr)
+#endif
 }
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
@@ -704,8 +708,10 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 #endif
 
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
    if (png_ptr->transformations)
       png_do_read_transformations(png_ptr);
+#endif
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Blow up interlaced rows to full size */

@@ -805,9 +805,11 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
    }
 #endif
 
+#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
    /* Handle other transformations */
    if (png_ptr->transformations)
       png_do_write_transformations(png_ptr);
+#endif
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
    /* Write filter_method 64 (intrapixel differencing) only if

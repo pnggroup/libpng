@@ -3397,7 +3397,9 @@ png_read_start_row(png_structp png_ptr)
 
    png_debug(1, "in png_read_start_row");
    png_ptr->zstream.avail_in = 0;
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
    png_init_read_transformations(png_ptr);
+#endif
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced)
    {

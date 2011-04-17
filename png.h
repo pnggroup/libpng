@@ -1100,8 +1100,10 @@ PNG_EXPORT(34, png_byte, png_get_rgb_to_gray_status, (png_const_structp
     png_ptr));
 #endif
 
+#ifdef PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED
 PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
     png_colorp palette));
+#endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 PNG_EXPORT(36, void, png_set_strip_alpha, (png_structp png_ptr));

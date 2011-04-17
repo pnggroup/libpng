@@ -743,9 +743,12 @@ PNG_EXTERN void png_read_finish_row PNGARG((png_structp png_ptr));
 
 /* Initialize the row buffers, etc. */
 PNG_EXTERN void png_read_start_row PNGARG((png_structp png_ptr));
+
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 /* Optional call to update the users info structure */
 PNG_EXTERN void png_read_transform_info PNGARG((png_structp png_ptr,
     png_infop info_ptr));
+#endif
 
 /* These are the functions that do the transformations */
 #ifdef PNG_READ_FILLER_SUPPORTED
@@ -849,25 +852,13 @@ PNG_EXTERN void png_do_shift PNGARG((png_row_infop row_info,
 #endif
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
-#  ifdef PNG_READ_GAMMA_SUPPORTED
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info,
-    png_bytep row, png_const_color_16p trans_color,
-    png_const_color_16p background, png_const_color_16p background_1,
-    png_const_bytep gamma_table, png_const_bytep gamma_from_1,
-    png_const_bytep gamma_to_1, png_const_uint_16pp gamma_16,
-    png_const_uint_16pp gamma_16_from_1, png_const_uint_16pp gamma_16_to_1,
-    int gamma_shift));
-#  else
-PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info,
-    png_bytep row, png_const_color_16p trans_color,
-    png_const_color_16p background));
-#  endif
+    png_bytep row, png_structp png_ptr));
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
 PNG_EXTERN void png_do_gamma PNGARG((png_row_infop row_info,
-    png_bytep row, png_const_bytep gamma_table,
-    png_const_uint_16pp gamma_16_table, int gamma_shift));
+    png_bytep row, png_structp png_ptr));
 #endif
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
@@ -987,10 +978,16 @@ PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
     png_const_bytep chunk_name));
 
 /* Handle the transformations for reading and writing */
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 PNG_EXTERN void png_do_read_transformations PNGARG((png_structp png_ptr));
+#endif
+#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
 PNG_EXTERN void png_do_write_transformations PNGARG((png_structp png_ptr));
+#endif
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 PNG_EXTERN void png_init_read_transformations PNGARG((png_structp png_ptr));
+#endif
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 PNG_EXTERN void png_push_read_chunk PNGARG((png_structp png_ptr,

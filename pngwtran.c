@@ -15,6 +15,7 @@
 
 #ifdef PNG_WRITE_SUPPORTED
 
+#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
 /* Transform the data according to the user's wishes.  The order of
  * transformations is significant.
  */
@@ -563,6 +564,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
    }
 }
 #endif
+#endif /* PNG_WRITE_TRANSFORMS_SUPPORTED */
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
 /* Undoes intrapixel differencing  */

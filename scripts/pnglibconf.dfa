@@ -340,6 +340,10 @@ option READ_COMPOSITE_NODIV requires READ
 option INCH_CONVERSIONS
 = INCH_CONVERSIONS INCH_CONVERSIONS
 
+# API to build a grayscale palette
+
+option BUILD_GRAYSCALE_PALETTE
+
 # IN DEVELOPMENT
 # These are currently experimental features, define them if you want
 

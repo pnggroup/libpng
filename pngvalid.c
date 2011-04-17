@@ -108,6 +108,7 @@ static size_t safecatn(char *buffer, size_t bufsize, size_t pos, int n)
    return safecat(buffer, bufsize, pos, number);
 }
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 static size_t safecatd(char *buffer, size_t bufsize, size_t pos, double d,
     int precision)
 {
@@ -115,6 +116,7 @@ static size_t safecatd(char *buffer, size_t bufsize, size_t pos, double d,
    sprintf(number, "%.*f", precision, d);
    return safecat(buffer, bufsize, pos, number);
 }
+#endif
 
 static PNG_CONST char invalid[] = "invalid";
 static PNG_CONST char sep[] = ": ";
@@ -225,6 +227,7 @@ standard_name_from_id(char *buffer, size_t bufsize, size_t pos, png_uint_32 id)
 #  define READ_BDHI 3
 #endif
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 static int
 next_format(png_bytep colour_type, png_bytep bit_depth)
 {
@@ -308,6 +311,7 @@ sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
    bit_index &= 7;
    return (result >> (8-bit_index-bit_depth)) & ((1U<<bit_depth)-1);
 }
+#endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 /* Copy a single pixel, of a given size, from one buffer to another -
  * while this is basically bit addressed there is an implicit assumption
@@ -489,6 +493,7 @@ store_pool_mark(png_byte *mark)
    }
 }
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 /* Use this for random 32 bit values, this function makes sure the result is
  * non-zero.
  */
@@ -508,6 +513,7 @@ random_32(void)
          return result;
    }
 }
+#endif
 
 static void
 store_pool_init(png_store *ps, store_pool *pool)
@@ -789,6 +795,7 @@ store_read_buffer_size(png_store *ps)
    return ps->current->datacount;
 }
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 /* Return total bytes available for read. */
 static size_t
 store_read_buffer_avail(png_store *ps)
@@ -813,6 +820,7 @@ store_read_buffer_avail(png_store *ps)
 
    return 0;
 }
+#endif
 
 static int
 store_read_buffer_next(png_store *ps)
@@ -1358,35 +1366,6 @@ typedef struct png_modifier
    png_byte                 buffer[1024];
 } png_modifier;
 
-static double abserr(png_modifier *pm, png_byte bit_depth)
-{
-   return bit_depth == 16 ? pm->maxabs16 : pm->maxabs8;
-}
-
-static double pcerr(png_modifier *pm, png_byte bit_depth)
-{
-   return (bit_depth == 16 ? pm->maxpc16 : pm->maxpc8) * .01;
-}
-
-static double outerr(png_modifier *pm, png_byte bit_depth)
-{
-   /* There is a serious error in the 2 and 4 bit grayscale transform because
-    * the gamma table value (8 bits) is simply shifted, not rounded, so the
-    * error in 4 bit greyscale gamma is up to the value below.  This is a hack
-    * to allow pngvalid to succeed:
-    */
-   if (bit_depth == 2)
-      return .73182-.5;
-
-   if (bit_depth == 4)
-      return .90644-.5;
-
-   if (bit_depth == 16)
-     return pm->maxout16;
-
-   return pm->maxout8;
-}
-
 /* This returns true if the test should be stopped now because it has already
  * failed and it is running silently.
  */
@@ -1422,6 +1401,36 @@ modifier_init(png_modifier *pm)
    pm->log = 0;
 
    /* Rely on the memset for all the other fields - there are no pointers */
+}
+
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
+static double abserr(png_modifier *pm, png_byte bit_depth)
+{
+   return bit_depth == 16 ? pm->maxabs16 : pm->maxabs8;
+}
+
+static double pcerr(png_modifier *pm, png_byte bit_depth)
+{
+   return (bit_depth == 16 ? pm->maxpc16 : pm->maxpc8) * .01;
+}
+
+static double outerr(png_modifier *pm, png_byte bit_depth)
+{
+   /* There is a serious error in the 2 and 4 bit grayscale transform because
+    * the gamma table value (8 bits) is simply shifted, not rounded, so the
+    * error in 4 bit greyscale gamma is up to the value below.  This is a hack
+    * to allow pngvalid to succeed:
+    */
+   if (bit_depth == 2)
+      return .73182-.5;
+
+   if (bit_depth == 4)
+      return .90644-.5;
+
+   if (bit_depth == 16)
+     return pm->maxout16;
+
+   return pm->maxout8;
 }
 
 /* One modification structure must be provided for each chunk to be modified (in
@@ -1813,6 +1822,7 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
 
    return set_store_for_read(&pm->this, ppi, id, name);
 }
+#endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 /***************************** STANDARD PNG FILES *****************************/
 /* Standard files - write and save standard files. */
@@ -2748,7 +2758,7 @@ standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
    dp->ps = ps;
    dp->colour_type = COL_FROM_ID(id);
    dp->bit_depth = DEPTH_FROM_ID(id);
-   dp->alpha_sBIT = dp->blue_sBIT = dp->green_sBIT = dp->alpha_sBIT =
+   dp->red_sBIT = dp->blue_sBIT = dp->green_sBIT = dp->alpha_sBIT =
       dp->bit_depth;
    dp->interlace_type = INTERLACE_FROM_ID(id);
    dp->id = id;
@@ -2765,7 +2775,6 @@ standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
    memset(&dp->transparent, 0, sizeof dp->transparent);
    /* Preset the palette to full intensity/opaque througout: */
    memset(dp->palette, 0xff, sizeof dp->palette);
-
 }
 
 /* Call this only if the colour type is 3 - PNG_COLOR_TYPE_PALETTE - otherwise
@@ -3073,12 +3082,14 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
        */
       if (dp->do_interlace && dp->interlace_type == PNG_INTERLACE_ADAM7)
       {
+#ifdef PNG_USER_TRANSFORM_INFO_SUPPORTED
          /* Use this opportunity to validate the png 'current' APIs: */
          if (y != png_get_current_row_number(pp))
             png_error(pp, "png_get_current_row_number is broken");
 
          if (pass != png_get_current_pass_number(pp))
             png_error(pp, "png_get_current_pass_number is broken");
+#endif
 
          y = PNG_ROW_FROM_PASS_ROW(y, pass);
       }
@@ -3471,6 +3482,7 @@ perform_size_test(png_modifier *pm)
 
 
 /******************************* TRANSFORM TESTS ******************************/
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
 /* A set of tests to validate libpng image transforms.  The possibilities here
  * are legion because the transforms can be combined in a combinatorial
  * fashion.  To deal with this some measure of restraint is required, otherwise
@@ -4010,12 +4022,13 @@ transform_range_check(png_structp pp, unsigned int r, unsigned int g,
    /* Compare the scaled, digitzed, values of our local calculation (in+-err)
     * with the digitized values libpng produced;  'sample_depth' is the actual
     * digitization depth of the libpng output colors (the bit depth except for
-    * palette images where it is always 8.)
+    * palette images where it is always 8.)  The check on 'err' is to detect
+    * internal errors in pngvalid itself (the threshold is about 1/255.)
     */
    unsigned int max = (1U<<sample_depth)-1;
    double in_min = ceil((in-err)*max - .5);
    double in_max = floor((in+err)*max + .5);
-   if (!(out >= in_min && out <= in_max))
+   if (err > 4E-3 || !(out >= in_min && out <= in_max))
    {
       char message[256];
       size_t pos;
@@ -4228,12 +4241,12 @@ transform_test(png_modifier *pmIn, PNG_CONST png_uint_32 idIn,
 
 /* The transforms: */
 #define ITSTRUCT(name) image_transform_##name
-#define IT(name,prev)\
+#define IT(name)\
 static image_transform ITSTRUCT(name) =\
 {\
    #name,\
    1, /*enable*/\
-   &ITSTRUCT(prev), /*list*/\
+   &PT, /*list*/\
    0, /*global_use*/\
    0, /*local_use*/\
    0, /*next*/\
@@ -4241,6 +4254,7 @@ static image_transform ITSTRUCT(name) =\
    image_transform_png_set_##name##_mod,\
    image_transform_png_set_##name##_add\
 }
+#define PT ITSTRUCT(end) /* stores the previous transform */
 
 /* To save code: */
 static int
@@ -4256,6 +4270,7 @@ image_transform_default_add(image_transform *this,
    return 1;
 }
 
+#ifdef PNG_READ_EXPAND_SUPPORTED
 /* png_set_palette_to_rgb */
 static void
 image_transform_png_set_palette_to_rgb_set(PNG_CONST image_transform *this,
@@ -4287,9 +4302,12 @@ image_transform_png_set_palette_to_rgb_add(image_transform *this,
    return colour_type == PNG_COLOR_TYPE_PALETTE;
 }
 
-IT(palette_to_rgb, end);
+IT(palette_to_rgb);
+#undef PT
+#define PT ITSTRUCT(palette_to_rgb)
+#endif /* PNG_READ_EXPAND_SUPPORTED */
 
-
+#ifdef PNG_READ_EXPAND_SUPPORTED
 /* png_set_tRNS_to_alpha */
 static void
 image_transform_png_set_tRNS_to_alpha_set(PNG_CONST image_transform *this,
@@ -4341,8 +4359,12 @@ image_transform_png_set_tRNS_to_alpha_add(image_transform *this,
    return (colour_type & PNG_COLOR_MASK_ALPHA) == 0;
 }
 
-IT(tRNS_to_alpha,palette_to_rgb);
+IT(tRNS_to_alpha);
+#undef PT
+#define PT ITSTRUCT(tRNS_to_alpha)
+#endif /* PNG_READ_EXPAND_SUPPORTED */
 
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
 /* png_set_gray_to_rgb */
 static void
 image_transform_png_set_gray_to_rgb_set(PNG_CONST image_transform *this,
@@ -4395,8 +4417,12 @@ image_transform_png_set_gray_to_rgb_add(image_transform *this,
    return (colour_type & PNG_COLOR_MASK_COLOR) == 0;
 }
 
-IT(gray_to_rgb,tRNS_to_alpha);
+IT(gray_to_rgb);
+#undef PT
+#define PT ITSTRUCT(gray_to_rgb)
+#endif /* PNG_READ_GRAY_TO_RGB_SUPPORTED */
 
+#ifdef PNG_READ_EXPAND_SUPPORTED
 /* png_set_expand */
 static void
 image_transform_png_set_expand_set(PNG_CONST image_transform *this,
@@ -4437,8 +4463,12 @@ image_transform_png_set_expand_add(image_transform *this,
    return (colour_type & PNG_COLOR_MASK_ALPHA) == 0;
 }
 
-IT(expand,gray_to_rgb);
+IT(expand);
+#undef PT
+#define PT ITSTRUCT(expand)
+#endif /* PNG_READ_EXPAND_SUPPORTED */
 
+#ifdef PNG_READ_EXPAND_SUPPORTED
 /* png_set_expand_gray_1_2_4_to_8
  * LIBPNG BUG: this just does an 'expand'
  */
@@ -4467,7 +4497,12 @@ image_transform_png_set_expand_gray_1_2_4_to_8_add(image_transform *this,
       bit_depth);
 }
 
-IT(expand_gray_1_2_4_to_8, expand);
+IT(expand_gray_1_2_4_to_8);
+#undef PT
+#define PT ITSTRUCT(expand_gray_1_2_4_to_8)
+#endif /* PNG_READ_EXPAND_SUPPORTED */
+
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
 /* png_set_expand_16 */
 static void
 image_transform_png_set_expand_16_set(PNG_CONST image_transform *this,
@@ -4509,8 +4544,12 @@ image_transform_png_set_expand_16_add(image_transform *this,
    return bit_depth < 16;
 }
 
-IT(expand_16, expand_gray_1_2_4_to_8);
+IT(expand_16);
+#undef PT
+#define PT ITSTRUCT(expand_16)
+#endif /* PNG_READ_EXPAND_16_SUPPORTED */
 
+#ifdef PNG_READ_16_TO_8_SUPPORTED
 /* png_set_strip_16 */
 static void
 image_transform_png_set_strip_16_set(PNG_CONST image_transform *this,
@@ -4561,8 +4600,12 @@ image_transform_png_set_strip_16_add(image_transform *this,
    return bit_depth > 8;
 }
 
-IT(strip_16, expand_16);
+IT(strip_16);
+#undef PT
+#define PT ITSTRUCT(strip_16)
+#endif /* PNG_READ_16_TO_8_SUPPORTED */
 
+#ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 /* png_set_strip_alpha */
 static void
 image_transform_png_set_strip_alpha_set(PNG_CONST image_transform *this,
@@ -4600,8 +4643,12 @@ image_transform_png_set_strip_alpha_add(image_transform *this,
    return (colour_type & PNG_COLOR_MASK_ALPHA) != 0;
 }
 
-IT(strip_alpha,strip_16);
+IT(strip_alpha);
+#undef PT
+#define PT ITSTRUCT(strip_alpha)
+#endif /* PNG_READ_STRIP_ALPHA_SUPPORTED */
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 /* png_set_rgb_to_gray(png_structp, int err_action, double red, double green)
  * png_set_rgb_to_gray_fixed(png_structp, int err_action, png_fixed_point red,
  *    png_fixed_point green)
@@ -4677,8 +4724,12 @@ image_transform_png_set_rgb_to_gray_add(image_transform *this,
    return (colour_type & PNG_COLOR_MASK_COLOR) != 0;
 }
 
-IT(rgb_to_gray,strip_alpha);
+IT(rgb_to_gray);
+#undef PT
+#define PT ITSTRUCT(rgb_to_gray)
+#endif /* PNG_READ_RGB_TO_GRAY_SUPPORTED */
 
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
 /* png_set_background(png_structp, png_const_color_16p background_color,
  *    int background_gamma_code, int need_expand, double background_gamma)
  * png_set_background_fixed(png_structp, png_const_color_16p background_color,
@@ -4760,9 +4811,13 @@ image_transform_png_set_background_mod(PNG_CONST image_transform *this,
 
 #define image_transform_png_set_background_add image_transform_default_add
 
-IT(background,rgb_to_gray);
+IT(background);
+#undef PT
+#define PT ITSTRUCT(background)
+#endif /* PNG_READ_BACKGROUND_SUPPORTED */
 
-static image_transform *PNG_CONST image_transform_first = &ITSTRUCT(background);
+/* This may just be 'end' if all the transforms are disabled! */
+static image_transform *PNG_CONST image_transform_first = &PT;
 
 static void
 transform_enable(PNG_CONST char *name)
@@ -5071,9 +5126,11 @@ perform_transform_test(png_modifier *pm)
    if (!test_transform(pm, 6, 3, READ_BDHI, 1))
       return;
 }
+#endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 
 /********************************* GAMMA TESTS ********************************/
+#ifdef PNG_READ_GAMMA_SUPPORTED
 /* Gamma test images. */
 typedef struct gamma_modification
 {
@@ -6016,6 +6073,7 @@ perform_gamma_test(png_modifier *pm, int speed, int summary)
    }
 #endif
 }
+#endif /* PNG_READ_GAMMA_SUPPORTED */
 
 /* INTERLACE MACRO VALIDATION */
 /* This is copied verbatim from the specification, it is simply the pass
@@ -6467,6 +6525,7 @@ int main(int argc, PNG_CONST char **argv)
       else if (strcmp(*argv, "--notransform") == 0)
          pm.test_transform = 0;
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
       else if (strncmp(*argv, "--transform-disable=",
          sizeof "--transform-disable") == 0)
          {
@@ -6480,6 +6539,7 @@ int main(int argc, PNG_CONST char **argv)
          pm.test_transform = 1;
          transform_enable(*argv + sizeof "--transform-enable");
          }
+#endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
       else if (strcmp(*argv, "--gamma") == 0)
          {
@@ -6620,13 +6680,17 @@ int main(int argc, PNG_CONST char **argv)
          perform_size_test(&pm);
       }
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
       /* Combinatorial transforms: */
       if (pm.test_transform)
          perform_transform_test(&pm);
+#endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
+#ifdef PNG_READ_GAMMA_SUPPORTED
       if (pm.ngammas > 0)
          perform_gamma_test(&pm, pm.this.speed != 0,
             summary && !pm.this.speed);
+#endif
    }
 
    Catch(fault)
