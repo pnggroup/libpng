@@ -3299,7 +3299,7 @@ Version 1.5.3beta02 [April 3, 2011]
   Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
   Optimize the zlib CMF byte in non-IDAT compressed chunks
 
-Version 1.5.3beta03 [April 17, 2011]
+Version 1.5.3beta03 [April 16, 2011]
   Fixed gcc -ansi -pedantic compile. A strict ANSI system does not have
     snprintf, and the "__STRICT_ANSI__" detects that condition more reliably
     than __STDC__ (John Bowler).
@@ -3314,6 +3314,8 @@ Version 1.5.3beta03 [April 17, 2011]
     pngwutil.c (John Bowler).
   Fixed bug with stripping the filler or alpha channel when writing, that
     was introduced in libpng-1.5.2beta01.
+
+Version 1.5.3beta04 [April 17, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

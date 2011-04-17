@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta03 - April 17, 2011
+Libpng 1.5.3beta04 - April 17, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3beta03.tar.xz (LZMA-compressed, recommended)
-   1.5.3beta03.tar.gz
-   1.5.3beta03.tar.bz2
+   1.5.3beta04.tar.xz (LZMA-compressed, recommended)
+   1.5.3beta04.tar.gz
+   1.5.3beta04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153b03.7z  (LZMA-compressed, recommended)
-   lp153b03.zip
+   lp153b04.7z  (LZMA-compressed, recommended)
+   lp153b04.zip
 
 Other information:
 
-   1.5.3beta03-README.txt
-   1.5.3beta03-LICENSE.txt
+   1.5.3beta04-README.txt
+   1.5.3beta04-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -38,7 +38,7 @@ Version 1.5.3beta02 [April 3, 2011]
   Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
   Optimize the zlib CMF byte in non-IDAT compressed chunks
 
-Version 1.5.3beta03 [April 17, 2011]
+Version 1.5.3beta03 [April 16, 2011]
   Fixed gcc -ansi -pedantic compile. A strict ANSI system does not have
     snprintf, and the "__STRICT_ANSI__" detects that condition more reliably
     than __STDC__ (John Bowler).
@@ -53,6 +53,8 @@ Version 1.5.3beta03 [April 17, 2011]
     pngwutil.c (John Bowler).
   Fixed bug with stripping the filler or alpha channel when writing, that
     was introduced in libpng-1.5.2beta01.
+
+Version 1.5.3beta04 [April 17, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
