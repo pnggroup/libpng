@@ -3299,7 +3299,21 @@ Version 1.5.3beta02 [April 3, 2011]
   Improved the optimization of the zlib CMF byte (see libpng-1.2.6beta03).
   Optimize the zlib CMF byte in non-IDAT compressed chunks
 
-Version 1.5.3beta03 [April 3, 2011]
+Version 1.5.3beta03 [April 17, 2011]
+  Fixed gcc -ansi -pedantic compile. A strict ANSI system does not have
+    snprintf, and the "__STRICT_ANSI__" detects that condition more reliably
+    than __STDC__ (John Bowler).
+  Removed the PNG_PTR_NORETURN attribute because it too dangerous. It tells
+    the compiler that a user supplied callback (the error handler) does not
+    return, yet there is no guarantee in practice that the application code
+    will correctly implement the error handler because the compiler only
+    issues a warning if there is a mistake (John Bowler).
+  Removed the no-longer-used PNG_DEPSTRUCT macro.
+  Updated the zlib version to 1.2.5 in the VStudio project.
+  Fixed 64-bit builds where png_uint_32 is smaller than png_size_t in
+    pngwutil.c (John Bowler).
+  Fixed bug with stripping the filler or alpha channel when writing, that
+    was introduced in libpng-1.5.2beta01.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
