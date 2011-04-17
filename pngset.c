@@ -341,11 +341,11 @@ png_set_sCAL_s(png_structp png_ptr, png_infop info_ptr,
       png_error(png_ptr, "Invalid sCAL unit");
 
    if (swidth == NULL || (lengthw = png_strlen(swidth)) <= 0 ||
-       swidth[0] == 45 /*'-'*/ || !png_check_fp_string(swidth, lengthw))
+       swidth[0] == 45 /* '-' */ || !png_check_fp_string(swidth, lengthw))
       png_error(png_ptr, "Invalid sCAL width");
 
    if (sheight == NULL || (lengthh = png_strlen(sheight)) <= 0 ||
-       sheight[0] == 45 /*'-'*/ || !png_check_fp_string(sheight, lengthh))
+       sheight[0] == 45 /* '-' */ || !png_check_fp_string(sheight, lengthh))
       png_error(png_ptr, "Invalid sCAL height");
 
    info_ptr->scal_unit = (png_byte)unit;

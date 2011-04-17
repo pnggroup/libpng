@@ -1288,7 +1288,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
       {
          PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
          png_error(png_ptr, "Out of place tEXt");
-         /*NOT REACHED*/
+         /* NOT REACHED */
       }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1385,7 +1385,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    {
       PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
       png_error(png_ptr, "Out of place zTXt");
-      /*NOT REACHED*/
+      /* NOT REACHED */
    }
 
 #ifdef PNG_MAX_MALLOC_64K
@@ -1589,7 +1589,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
    {
       PNG_UNUSED(info_ptr) /* To quiet some compiler warnings */
       png_error(png_ptr, "Out of place iTXt");
-      /*NOT REACHED*/
+      /* NOT REACHED */
    }
 
 #ifdef PNG_MAX_MALLOC_64K

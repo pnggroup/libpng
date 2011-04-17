@@ -555,13 +555,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.3beta03 - April 3, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.3beta03 - April 17, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.3beta03 - April 3, 2011\
+      return "libpng version 1.5.3beta03 - April 17, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1102,7 +1102,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
       if (fp < 0)
       {
          fp = -fp;
-         *ascii++ = 45; /* '-'  PLUS 1 TOTAL 1*/
+         *ascii++ = 45; /* '-'  PLUS 1 TOTAL 1 */
          --size;
       }
 
@@ -1329,7 +1329,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
              */
             size -= cdigits;
 
-            *ascii++ = 69, --size;    /* 'E': PLUS 1 TOTAL 2+precision*/
+            *ascii++ = 69, --size;    /* 'E': PLUS 1 TOTAL 2+precision */
             if (exp_b10 < 0)
             {
                *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
@@ -1401,7 +1401,7 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
 
       if (num <= 0x80000000U) /* else overflowed */
       {
-         unsigned int ndigits = 0, first = 16/*flag value*/;
+         unsigned int ndigits = 0, first = 16 /* flag value */;
          char digits[10];
 
          while (num)

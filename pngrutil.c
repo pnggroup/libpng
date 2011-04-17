@@ -437,8 +437,8 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       png_size_t expanded_size = png_inflate(png_ptr,
           (png_bytep)(png_ptr->chunkdata + prefix_size),
           chunklength - prefix_size,
-          0,            /*output*/
-          0);           /*output size*/
+          0,            /* output */
+          0);           /* output size */
 
       /* Now check the limits on this chunk - if the limit fails the
        * compressed data will be removed, the prefix will remain.
