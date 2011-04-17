@@ -3316,6 +3316,24 @@ Version 1.5.3beta03 [April 16, 2011]
     was introduced in libpng-1.5.2beta01.
 
 Version 1.5.3beta04 [April 17, 2011]
+  Updated pngtest.png with the new zlib CMF optimization.
+  Cleaned up conditional compilation code and of background/gamma handling
+    Internal changes only except a new option to avoid compiling the
+    png_build_grayscale_palette API (which is not used at all internally.)
+    The main change is to move the transform tests (READ_TRANSFORMS,
+    WRITE_TRANSFORMS) up one level to the caller of the APIs.  This avoids
+    calls to spurious functions if all transforms are disabled and slightly
+    simplifies those functions.  Pngvalid modified to handle this.
+    A minor change is to stop the strip_16 and expand_16 interfaces from
+    disabling each other; this allows the future alpha premultiplication
+    code to use 16-bit intermediate values while still producing 8-bit output.
+    png_do_background and png_do_gamma have been simplified to take a single
+    pointer to the png_struct rather than pointers to every item required
+    from the png_struct. This makes no practical difference to the internal
+    code.
+  A serious bug in the pngvalid internal routine 'standard_display_init' has
+    been fixed - this failed to initialize the red channel and accidentally
+    initialized the alpha channel twice.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
