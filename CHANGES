@@ -3313,9 +3313,9 @@ Version 1.5.3beta03 [April 16, 2011]
   Fixed 64-bit builds where png_uint_32 is smaller than png_size_t in
     pngwutil.c (John Bowler).
   Fixed bug with stripping the filler or alpha channel when writing, that
-    was introduced in libpng-1.5.2beta01.
+    was introduced in libpng-1.5.2beta01 (bug report by Andrew Church).
 
-Version 1.5.3beta04 [April 17, 2011]
+Version 1.5.3beta04 [April 18, 2011]
   Updated pngtest.png with the new zlib CMF optimization.
   Cleaned up conditional compilation code and of background/gamma handling
     Internal changes only except a new option to avoid compiling the
