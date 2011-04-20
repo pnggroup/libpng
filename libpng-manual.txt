@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.3beta04 - April 17, 2011
+ libpng version 1.5.3beta04 - April 20, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.3beta04 - April 17, 2011
+ libpng versions 0.97, January 1998, through 1.5.3beta04 - April 20, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1824,9 +1824,15 @@ low-level interface, you can finish reading the file.  If you are
 interested in comments or time, which may be stored either before or
 after the image data, you should pass the separate png_info struct if
 you want to keep the comments from before and after the image
-separate.  If you are not interested, you can pass NULL.
+separate.  If you are not interested, you should still call png_read_end()
+but you can pass NULL, avoiding the need to create an end_info structure.
 
    png_read_end(png_ptr, end_info);
+
+If you don't call png_read_end(), then your file pointer will be
+left pointing to the first chunk after the last IDAT, which is probably
+not what you want if you expect to read something beyond the end of
+the PNG datastream.
 
 When you are done, you can free all memory allocated by libpng like this:
 
@@ -4174,7 +4180,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-April 17, 2011
+April 20, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
