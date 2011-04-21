@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.3beta04 - April 20, 2011
+ libpng version 1.5.3beta04 - April 21, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.3beta04 - April 20, 2011
+ libpng versions 0.97, January 1998, through 1.5.3beta04 - April 21, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -348,21 +348,12 @@ create the structure, so your application should check for that.
        return (ERROR);
     }
 
-    png_infop end_info = png_create_info_struct(png_ptr);
-
-    if (!end_info)
-    {
-       png_destroy_read_struct(&png_ptr, &info_ptr,
-          (png_infopp)NULL);
-       return (ERROR);
-    }
-
 If you want to use your own memory allocation routines,
 use a libpng that was built with PNG_USER_MEM_SUPPORTED defined, and use
 png_create_read_struct_2() instead of png_create_read_struct():
 
     png_structp png_ptr = png_create_read_struct_2
-       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn, (png_voidp)
         user_mem_ptr, user_malloc_fn, user_free_fn);
 
@@ -391,6 +382,9 @@ free any memory.
        fclose(fp);
        return (ERROR);
     }
+
+Pass (png_infopp)NULL instead of &end_info if you didn't create
+an end_info structure.
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
 you can compile libpng with PNG_NO_SETJMP, in which case
@@ -1824,10 +1818,23 @@ low-level interface, you can finish reading the file.  If you are
 interested in comments or time, which may be stored either before or
 after the image data, you should pass the separate png_info struct if
 you want to keep the comments from before and after the image
-separate.  If you are not interested, you should still call png_read_end()
-but you can pass NULL, avoiding the need to create an end_info structure.
+separate.
+
+    png_infop end_info = png_create_info_struct(png_ptr);
+
+    if (!end_info)
+    {
+       png_destroy_read_struct(&png_ptr, &info_ptr,
+           (png_infopp)NULL);
+       return (ERROR);
+    }
 
    png_read_end(png_ptr, end_info);
+
+If you are not interested, you should still call png_read_end()
+but you can pass NULL, avoiding the need to create an end_info structure.
+
+   png_read_end(png_ptr, (png_infop)NULL);
 
 If you don't call png_read_end(), then your file pointer will be
 left pointing to the first chunk after the last IDAT, which is probably
@@ -1838,6 +1845,11 @@ When you are done, you can free all memory allocated by libpng like this:
 
    png_destroy_read_struct(&png_ptr, &info_ptr,
        &end_info);
+
+or, if you didn't create an end_info structure,
+
+   png_destroy_read_struct(&png_ptr, &info_ptr,
+       (png_infopp)NULL);
 
 It is also possible to individually free the info_ptr members that
 point to libpng-allocated storage with the following function:
@@ -4180,7 +4192,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-April 20, 2011
+April 21, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
