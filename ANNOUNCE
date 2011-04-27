@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta04 - April 18, 2011
+Libpng 1.5.3beta04 - April 27, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -54,7 +54,7 @@ Version 1.5.3beta03 [April 16, 2011]
   Fixed bug with stripping the filler or alpha channel when writing, that
     was introduced in libpng-1.5.2beta01 (bug report by Andrew Church).
 
-Version 1.5.3beta04 [April 18, 2011]
+Version 1.5.3beta04 [April 27, 2011]
   Updated pngtest.png with the new zlib CMF optimization.
   Cleaned up conditional compilation code and of background/gamma handling
     Internal changes only except a new option to avoid compiling the
@@ -73,7 +73,8 @@ Version 1.5.3beta04 [April 18, 2011]
   A serious bug in the pngvalid internal routine 'standard_display_init' has
     been fixed - this failed to initialize the red channel and accidentally
     initialized the alpha channel twice.
-
+  Changed png_struct jmp_buf member name from png_jmpbuf to tmp_jmpbuf to
+    avoid a clash with the png_jmpbuf macro on some platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
