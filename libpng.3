@@ -1308,7 +1308,7 @@ handling and memory alloc/free functions.
 When libpng encounters an error, it expects to longjmp back
 to your routine.  Therefore, you will need to call setjmp and pass
 your png_jmpbuf(png_ptr).  If you read the file from different
-routines, you will need to update the jmpbuf field every time you enter
+routines, you will need to update the longjmp buffer every time you enter
 a new routine that will call a png_*() function.
 
 See your documentation of setjmp/longjmp for your compiler for more
@@ -4765,7 +4765,7 @@ absolutely necessary) interlace an image.
 
 libpng 1.5.0 adds an API png_longjmp(png_ptr, value).  This API calls
 the application-provided png_longjmp_ptr on the internal, but application
-initialized, jmpbuf.  It is provided as a convenience to avoid the need
+initialized, longjmp buffer.  It is provided as a convenience to avoid the need
 to use the png_jmpbuf macro, which had the unnecessary side effect of
 resetting the internal png_longjmp_ptr value.
 

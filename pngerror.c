@@ -272,7 +272,7 @@ png_set_longjmp_fn(png_structp png_ptr, png_longjmp_ptr longjmp_fn,
       return NULL;
 
    png_ptr->longjmp_fn = longjmp_fn;
-   return &png_ptr->png_jmpbuf;
+   return &png_ptr->longjmp_buffer;
 }
 #endif
 
@@ -335,13 +335,13 @@ png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN)
    {
 #  ifdef USE_FAR_KEYWORD
       {
-         jmp_buf png_jmpbuf;
-         png_memcpy(png_jmpbuf, png_ptr->png_jmpbuf, png_sizeof(jmp_buf));
-         png_ptr->longjmp_fn(png_jmpbuf, val);
+         jmp_buf tmp_jmpbuf;
+         png_memcpy(tmp_jmpbuf, png_ptr->longjmp_buffer, png_sizeof(jmp_buf));
+         png_ptr->longjmp_fn(tmp_jmpbuf, val);
       }
 
 #  else
-   png_ptr->longjmp_fn(png_ptr->png_jmpbuf, val);
+   png_ptr->longjmp_fn(png_ptr->longjmp_buffer, val);
 #  endif
    }
 #endif
@@ -403,7 +403,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 /* This function is called when the application wants to use another method
  * of handling errors and warnings.  Note that the error function MUST NOT
  * return to the calling routine or serious problems will occur.  The return
- * method used in the default routine calls longjmp(png_ptr->png_jmpbuf, 1)
+ * method used in the default routine calls longjmp(png_ptr->longjmp_buffer, 1)
  */
 void PNGAPI
 png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,

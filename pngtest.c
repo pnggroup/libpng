@@ -779,7 +779,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
-   jmp_buf png_jmpbuf;
+   jmp_buf tmp_jmpbuf;
 #endif
 #endif
 
@@ -848,7 +848,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_SETJMP_SUPPORTED
    pngtest_debug("Setting jmpbuf for read struct");
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(png_jmpbuf))
+   if (setjmp(tmp_jmpbuf))
 #else
    if (setjmp(png_jmpbuf(read_ptr)))
 #endif
@@ -866,14 +866,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(read_ptr), png_jmpbuf, png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(read_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
    pngtest_debug("Setting jmpbuf for write struct");
 #ifdef USE_FAR_KEYWORD
 
-   if (setjmp(png_jmpbuf))
+   if (setjmp(tmp_jmpbuf))
 #else
    if (setjmp(png_jmpbuf(write_ptr)))
 #endif
@@ -890,7 +890,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(write_ptr), png_jmpbuf, png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(write_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
 #endif
 #endif
 #endif

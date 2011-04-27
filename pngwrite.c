@@ -462,7 +462,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    png_structp png_ptr;
 #ifdef PNG_SETJMP_SUPPORTED
 #ifdef USE_FAR_KEYWORD
-   jmp_buf png_jmpbuf;
+   jmp_buf tmp_jmpbuf;
 #endif
 #endif
    int i;
@@ -489,12 +489,12 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    encounter a png_error() will longjmp here.  Since the jmpbuf is
    then meaningless we abort instead of returning. */
 #ifdef USE_FAR_KEYWORD
-   if (setjmp(png_jmpbuf))
+   if (setjmp(tmp_jmpbuf))
 #else
    if (setjmp(png_jmpbuf(png_ptr))) /* sets longjmp to match setjmp */
 #endif
 #ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(png_ptr), png_jmpbuf, png_sizeof(jmp_buf));
+   png_memcpy(png_jmpbuf(png_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
 #endif
       PNG_ABORT();
 #endif
@@ -1020,7 +1020,7 @@ png_write_destroy(png_structp png_ptr)
 
 #ifdef PNG_SETJMP_SUPPORTED
    /* Reset structure */
-   png_memcpy(tmp_jmp, png_ptr->png_jmpbuf, png_sizeof(jmp_buf));
+   png_memcpy(tmp_jmp, png_ptr->longjmp_buffer, png_sizeof(jmp_buf));
 #endif
 
    error_fn = png_ptr->error_fn;
@@ -1040,7 +1040,7 @@ png_write_destroy(png_structp png_ptr)
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
-   png_memcpy(png_ptr->png_jmpbuf, tmp_jmp, png_sizeof(jmp_buf));
+   png_memcpy(png_ptr->longjmp_buffer, tmp_jmp, png_sizeof(jmp_buf));
 #endif
 }
 
