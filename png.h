@@ -150,7 +150,7 @@
  *    1.5.2beta01-03          15    10502  15.so.15.2[.0]
  *    1.5.2rc01-03            15    10502  15.so.15.2[.0]
  *    1.5.2                   15    10502  15.so.15.2[.0]
- *    1.5.3beta01-05          15    10503  15.so.15.3[.0]
+ *    1.5.3beta01-04          15    10503  15.so.15.3[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -672,6 +672,10 @@ typedef PNG_CONST png_unknown_chunk FAR * png_const_unknown_chunkp;
 typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 #endif
 
+/* The complete definition of png_info has, as of libpng-1.5.0,
+ * been moved into a separate header file that is not accessible to
+ * applications.  Read libpng-manual.txt or libpng.3 for more info.
+ */
 typedef struct png_info_def png_info;
 typedef png_info FAR * png_infop;
 typedef PNG_CONST png_info FAR * png_const_infop;
@@ -793,6 +797,14 @@ typedef struct png_row_info_struct
 typedef png_row_info FAR * png_row_infop;
 typedef png_row_info FAR * FAR * png_row_infopp;
 
+/* The complete definition of png_struct has, as of libpng-1.5.0,
+ * been moved into a separate header file that is not accessible to
+ * applications.  Read libpng-manual.txt or libpng.3 for more info.
+ */
+typedef struct png_struct_def png_struct;
+typedef PNG_CONST png_struct FAR * png_const_structp;
+typedef png_struct FAR * png_structp;
+
 /* These are the function types for the I/O functions and for the functions
  * that allow the user to override the default I/O functions with his or her
  * own.  The png_error_ptr type should match that of user-supplied warning
@@ -801,10 +813,6 @@ typedef png_row_info FAR * FAR * png_row_infopp;
  * modify the buffer it is passed. The 'read' function, on the other hand, is
  * expected to return the read data in the buffer.
  */
-typedef struct png_struct_def png_struct;
-typedef PNG_CONST png_struct FAR * png_const_structp;
-typedef png_struct FAR * png_structp;
-
 typedef PNG_CALLBACK(void, *png_error_ptr, (png_structp, png_const_charp));
 typedef PNG_CALLBACK(void, *png_rw_ptr, (png_structp, png_bytep, png_size_t));
 typedef PNG_CALLBACK(void, *png_flush_ptr, (png_structp));
