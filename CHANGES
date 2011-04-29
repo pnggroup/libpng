@@ -3335,7 +3335,9 @@ Version 1.5.3beta04 [April 27, 2011]
     been fixed - this failed to initialize the red channel and accidentally
     initialized the alpha channel twice.
   Changed png_struct jmp_buf member name from png_jmpbuf to tmp_jmpbuf to
-    avoid a clash with the png_jmpbuf macro on some platforms.
+    avoid a possible clash with the png_jmpbuf macro on some platforms.
+
+Version 1.5.3beta05 [April 29, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
