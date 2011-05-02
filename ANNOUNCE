@@ -28,6 +28,8 @@ Changes since the last public release (1.4.7):
 
 version 1.4.8beta01 [May 2, 2011]
   Undef "_ALL_SOURCE" for AIX, to prevent "jmpbuf" from being redefined.
+  Copied png_debug macros from pngpriv.h into pngtest.c and removed
+    "#include pngpriv.h" from pngtest.c, to avoid setting a bad example.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
