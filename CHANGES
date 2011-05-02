@@ -2791,9 +2791,11 @@ version 1.4.6 [April 8, 2011]
 version 1.4.7rc01 [April 9, 2011]
   Relocated misplaced new declarations in pngwutil.c.
 
-version 1.4.7 [May 2, 2011]
+version 1.4.7 [April 9, 2011]
   Disabled PNG_PEDANTIC_WARNINGS for all MSC versions as in libpng-1.4.5.
 
+version 1.4.8beta01 [May 2, 2011]
+  Undef "_ALL_SOURCE" for AIX, to prevent "jmpbuf" from being redefined.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

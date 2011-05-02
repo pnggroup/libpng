@@ -26,6 +26,15 @@
 
 #ifndef PNG_VERSION_INFO_ONLY
 
+#if defined(_AIX) && defined(_ALL_SOURCE)
+   /* On AIX if _ALL_SOURCE is defined standard header files (including
+    * stdlib.h) define identifiers that are not permitted by the ANSI and
+    * POSIX standards.  In particular 'jmpbuf' is #defined and this will
+    * prevent compilation of libpng.  The following prevents this:
+    */
+#  undef _ALL_SOURCE
+#endif
+
 #include <stdlib.h>
 
 #ifndef PNG_EXTERN

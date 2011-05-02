@@ -24,13 +24,10 @@ Other information:
    1.4.8beta01-README.txt
    1.4.8beta01-LICENSE.txt
 
-Changes since the last public release (1.4.6):
+Changes since the last public release (1.4.7):
 
-version 1.4.7rc01 [April 9, 2010]
-  Relocated misplaced new declarations in pngwutil.c.
-`
-version 1.4.7 [May 2, 2011]
-  Disabled PNG_PEDANTIC_WARNINGS for all MSC versions as in libpng-1.4.5.
+version 1.4.8beta01 [May 2, 2011]
+  Undef "_ALL_SOURCE" for AIX, to prevent "jmpbuf" from being redefined.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
