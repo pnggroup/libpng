@@ -31,6 +31,8 @@
  * of files at once by typing "pngtest -m file1.png file2.png ..."
  */
 
+#define _POSIX_SOURCE 1
+
 #include "zlib.h"
 #include "png.h"
 /* Copied from pngpriv.h but only used in error messages below. */

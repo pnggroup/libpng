@@ -25,6 +25,21 @@
 #ifndef PNGPRIV_H
 #define PNGPRIV_H
 
+/* Feature Test Macros.  The following are defined here to ensure that correctly
+ * implemented libraries reveal the APIs libpng needs to build and hide those
+ * that are not needed and potentially damaging to the compilation.
+ *
+ * Feature Test Macros must be defined before any system header is included (see
+ * POSIX 1003.1 2.8.2 "POSIX Symbols."
+ *
+ * These macros only have an effect if the operating system supports either
+ * POSIX 1003.1 or C99, or both.  On other operating systems (particularly
+ * Windows/Visual Studio) there is no effect; the OS specific tests below are
+ * still required (as of 2011-05-02.)
+ */
+#define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
+#define _ISOC99_SOURCE 1 /* for snprintf */
+
 /* This is required for the definition of abort(), used as a last ditch
  * error handler when all else fails.
  */

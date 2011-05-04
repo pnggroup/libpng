@@ -19,6 +19,8 @@
  *   transformations performed by libpng.
  */
 
+#define _POSIX_SOURCE 1
+
 #include "png.h"
 #if PNG_LIBPNG_VER < 10500
 /* This delibarately lacks the PNG_CONST. */

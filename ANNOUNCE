@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta05 - April 29, 2011
+Libpng 1.5.3beta05 - May 4, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -76,7 +76,12 @@ Version 1.5.3beta04 [April 27, 2011]
   Changed png_struct jmp_buf member name from png_jmpbuf to tmp_jmpbuf to
     avoid a clash with the png_jmpbuf macro on some platforms.
 
-Version 1.5.3beta05 [April 29, 2011]
+Version 1.5.3beta05 [May 4, 2011]
+  Added appropriate feature test macros to ensure libpng sees the correct API
+   _POSIX_SOURCE is defined in pngpriv.h, pngtest.c and pngvalid.c to ensure
+    that POSIX conformant systems disable non-POSIX APIs.  _ISOC99_SOURCE is
+    defined in pngpriv.h to obtain the ISO C99 snprintf definition, when
+    available.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
