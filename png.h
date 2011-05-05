@@ -1394,6 +1394,7 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
 #define PNG_FILTER_HEURISTIC_WEIGHTED   2  /* Experimental feature */
 #define PNG_FILTER_HEURISTIC_LAST       3  /* Not a valid value */
 
+#ifdef PNG_WRITE_SUPPORTED
 /* Set the library compression level.  Currently, valid values range from
  * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
  * (0 - no compression, 9 - "maximal" compression).  Note that tests have
@@ -1415,6 +1416,7 @@ PNG_EXPORT(72, void, png_set_compression_window_bits, (png_structp png_ptr,
 
 PNG_EXPORT(73, void, png_set_compression_method, (png_structp png_ptr,
     int method));
+#endif
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
 /* Also set zlib parameters for compressing non-IDAT chunks */

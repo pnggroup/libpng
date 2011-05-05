@@ -844,8 +844,6 @@ png_write_flush(png_structp png_ptr)
       {
          /* Write the IDAT and reset the zlib output buffer */
          png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
-         png_ptr->zstream.next_out = png_ptr->zbuf;
-         png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
          wrote_IDAT = 1;
       }
    } while (wrote_IDAT == 1);
@@ -856,8 +854,6 @@ png_write_flush(png_structp png_ptr)
       /* Write the IDAT and reset the zlib output buffer */
       png_write_IDAT(png_ptr, png_ptr->zbuf,
           png_ptr->zbuf_size - png_ptr->zstream.avail_out);
-      png_ptr->zstream.next_out = png_ptr->zbuf;
-      png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
    }
    png_ptr->flush_rows = 0;
    png_flush(png_ptr);
@@ -954,7 +950,8 @@ png_write_destroy(png_structp png_ptr)
    png_debug(1, "in png_write_destroy");
 
    /* Free any memory zlib uses */
-   deflateEnd(&png_ptr->zstream);
+   if (png_ptr->zlib_state != PNG_ZLIB_UNINITIALIZED)
+      deflateEnd(&png_ptr->zstream);
 
    /* Free our memory.  png_free checks NULL for us. */
    png_free(png_ptr, png_ptr->zbuf);

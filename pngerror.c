@@ -102,7 +102,6 @@ png_err,(png_structp png_ptr),PNG_NORETURN)
 }
 #endif /* PNG_ERROR_TEXT_SUPPORTED */
 
-#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
 /* Utility to safely appends strings to a buffer.  This never errors out so
  * error checking is not required in the caller.
  */
@@ -112,8 +111,9 @@ png_safecat(png_charp buffer, size_t bufsize, size_t pos,
 {
    if (buffer != NULL && pos < bufsize)
    {
-      if (string != NULL) while (*string != '\0' && pos < bufsize-1)
-         buffer[pos++] = *string++;
+      if (string != NULL)
+         while (*string != '\0' && pos < bufsize-1)
+           buffer[pos++] = *string++;
 
       buffer[pos] = '\0';
    }
@@ -121,6 +121,7 @@ png_safecat(png_charp buffer, size_t bufsize, size_t pos,
    return pos;
 }
 
+#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
 /* Utility to dump an unsigned value into a buffer, given a start pointer and
  * and end pointer (which should point just *beyond* the end of the buffer!)
  * Returns the pointer to the start of the formatted string.

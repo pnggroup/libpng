@@ -66,11 +66,26 @@ struct png_struct_def
    z_stream zstream;          /* pointer to decompression structure (below) */
    png_bytep zbuf;            /* buffer for zlib */
    uInt zbuf_size;            /* size of zbuf (typically 65536) */
+#ifdef PNG_WRITE_SUPPORTED
+
+/* Added in 1.5.3: state to keep track of whether the zstream has been
+ * initialized and if so whether it is for IDAT or some other chunk.
+ */
+#define PNG_ZLIB_UNINITIALIZED 0
+#define PNG_ZLIB_FOR_IDAT      1
+#define PNG_ZLIB_FOR_TEXT      2 /* anything other than IDAT */
+#define PNG_ZLIB_USE_MASK      3 /* bottom two bits */
+#define PNG_ZLIB_IN_USE        4 /* a flag value */
+
+   png_uint_32 zlib_state;       /* State of zlib initialization */
+/* End of material added at libpng 1.5.3 */
+
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
    int zlib_window_bits;      /* holds zlib compression window bits */
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
+#endif
 /* Added at libpng 1.5.3 */
 #if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
     defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION)

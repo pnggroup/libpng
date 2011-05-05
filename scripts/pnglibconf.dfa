@@ -553,6 +553,7 @@ option SAVE_INT_32 requires WRITE
 # added at libpng-1.5.3
 option WRITE_OPTIMIZE_CMF requires WRITE
 
+option READ_COMPRESSED_TEXT disabled
 option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
@@ -561,6 +562,7 @@ option READ_COMPRESSED_TEXT enables READ_TEXT
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
 
+option WRITE_COMPRESSED_TEXT disabled
 option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
 option WRITE_iTXt enables WRITE_COMPRESSED_TEXT
 option WRITE_zTXt enables WRITE_COMPRESSED_TEXT

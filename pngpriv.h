@@ -276,7 +276,6 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_BACKGROUND_IS_GRAY     0x800
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
-#define PNG_ZLIB_READY_FOR_ZTXT   0x4000 /* 1: ready for ZTXT; 0: for IDAT */
 
 /* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001
@@ -740,9 +739,6 @@ PNG_EXTERN void png_read_filter_row PNGARG((png_structp png_ptr,
 PNG_EXTERN void png_write_find_filter PNGARG((png_structp png_ptr,
     png_row_infop row_info));
 
-/* Write out the filtered row. */
-PNG_EXTERN void png_write_filtered_row PNGARG((png_structp png_ptr,
-    png_bytep filtered_row));
 /* Finish a row while reading, dealing with interlacing passes, etc. */
 PNG_EXTERN void png_read_finish_row PNGARG((png_structp png_ptr));
 
@@ -1089,10 +1085,6 @@ PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,
    png_const_charp name),PNG_NORETURN);
 #endif
 
-/* Various internal functions to handle formatted warning messages, currently
- * only implemented for warnings.
- */
-#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
 /* Puts 'string' into 'buffer' at buffer[pos], taking care never to overwrite
  * the end.  Always leaves the buffer nul terminated.  Never errors out (and
  * there is no error code.)
@@ -1100,6 +1092,10 @@ PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,
 PNG_EXTERN size_t png_safecat(png_charp buffer, size_t bufsize, size_t pos,
     png_const_charp string);
 
+/* Various internal functions to handle formatted warning messages, currently
+ * only implemented for warnings.
+ */
+#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
 /* Utility to dump an unsigned value into a buffer, given a start pointer and
  * and end pointer (which should point just *beyond* the end of the buffer!)
  * Returns the pointer to the start of the formatted string.  This utility only

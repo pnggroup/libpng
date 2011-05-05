@@ -3348,6 +3348,12 @@ Version 1.5.3beta05 [May 5, 2011]
     PNG_NO_WARNINGS does actually work now.
   Added PNG_WRITE_OPTIMIZE_CMF_SUPPORTED macro to make the zlib "CMF" byte
     optimization configureable.
+  IDAT compression failed if preceded by a compressed text chunk
+    This was because the attempt to reset the zlib stream in png_write_IDAT
+    happened after the first IDAT chunk had been deflated - much too late.
+    In this change internal functions are added to claim/release the z_stream
+    and, hopefully, make the code more robust.  Also deflateEnd checking is
+    added - previously libpng would ignore an error at the end of the stream.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
