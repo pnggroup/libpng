@@ -369,41 +369,31 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
        * and the error message is dumped into the uncompressed
        * buffer if available.
        */
+#     ifdef PNG_WARNINGS_SUPPORTED
       {
-         PNG_CONST char *msg;
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-         char umsg[52];
-#endif
+         png_const_charp msg;
+
          if (png_ptr->zstream.msg != 0)
             msg = png_ptr->zstream.msg;
 
-         else
+         else switch (ret)
          {
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-            switch (ret)
-            {
-               case Z_BUF_ERROR:
-                  msg = "Buffer error in compressed datastream in %s chunk";
-                  break;
+            case Z_BUF_ERROR:
+               msg = "Buffer error in compressed datastream";
+               break;
 
-               case Z_DATA_ERROR:
-                  msg = "Data error in compressed datastream in %s chunk";
-                  break;
+            case Z_DATA_ERROR:
+               msg = "Data error in compressed datastream";
+               break;
 
-               default:
-                  msg = "Incomplete compressed datastream in %s chunk";
-                  break;
-            }
-
-            png_snprintf(umsg, sizeof umsg, msg, png_ptr->chunk_name);
-            msg = umsg;
-#else
-            msg = "Damaged compressed datastream in chunk other than IDAT";
-#endif
+            default:
+               msg = "Incomplete compressed datastream";
+               break;
          }
 
-         png_warning(png_ptr, msg);
+         png_chunk_warning(png_ptr, msg);
       }
+#     endif
 
       /* 0 means an error - notice that this code simply ignores
        * zero length compressed chunks as a result.
@@ -499,15 +489,9 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
 
    else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
    {
-#ifdef PNG_STDIO_SUPPORTED
-      char umsg[50];
-
-      png_snprintf(umsg, sizeof umsg,
-          "Unknown zTXt compression type %d", comp_type);
-      png_warning(png_ptr, umsg);
-#else
-      png_warning(png_ptr, "Unknown zTXt compression type");
-#endif
+      PNG_WARNING_PARAMETERS(p)
+      png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_d, comp_type);
+      png_formatted_warning(png_ptr, p, "Unknown zTXt compression type @1");
 
       /* The recovery is to simply drop the data. */
    }
@@ -845,12 +829,10 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
       {
-         png_warning(png_ptr,
-             "Ignoring incorrect gAMA value when sRGB is also present");
-
-#    ifdef PNG_CONSOLE_IO_SUPPORTED
-         fprintf(stderr, "gamma = (%d/100000)", (int)igamma);
-#    endif
+         PNG_WARNING_PARAMETERS(p)
+         png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_fixed, igamma);
+         png_formatted_warning(png_ptr, p,
+             "Ignoring incorrect gAMA value @1 when sRGB is also present");
          return;
       }
    }
@@ -1019,16 +1001,20 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
           PNG_OUT_OF_RANGE(x_blue,  15000,  1000) ||
           PNG_OUT_OF_RANGE(y_blue,   6000,  1000))
       {
-         png_warning(png_ptr,
-             "Ignoring incorrect cHRM value when sRGB is also present");
+         PNG_WARNING_PARAMETERS(p)
 
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-         fprintf(stderr, "wx=%d, wy=%d, rx=%d, ry=%d\n",
-             x_white, y_white, x_red, y_red);
+         png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_fixed, x_white);
+         png_warning_parameter_signed(p, 2, PNG_NUMBER_FORMAT_fixed, y_white);
+         png_warning_parameter_signed(p, 3, PNG_NUMBER_FORMAT_fixed, x_red);
+         png_warning_parameter_signed(p, 4, PNG_NUMBER_FORMAT_fixed, y_red);
+         png_warning_parameter_signed(p, 5, PNG_NUMBER_FORMAT_fixed, x_green);
+         png_warning_parameter_signed(p, 6, PNG_NUMBER_FORMAT_fixed, y_green);
+         png_warning_parameter_signed(p, 7, PNG_NUMBER_FORMAT_fixed, x_blue);
+         png_warning_parameter_signed(p, 8, PNG_NUMBER_FORMAT_fixed, y_blue);
 
-         fprintf(stderr, "gx=%d, gy=%d, bx=%d, by=%d\n",
-             x_green, y_green, x_blue, y_blue);
-#endif /* PNG_CONSOLE_IO_SUPPORTED */
+         png_formatted_warning(png_ptr, p,
+             "Ignoring incorrect cHRM white(@1,@2) r(@3,@4)g(@5,@6)b(@7,@8) "
+             "when sRGB is also present");
       }
       return;
    }
@@ -1095,11 +1081,13 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       if (PNG_OUT_OF_RANGE(info_ptr->gamma, 45500L, 500))
       {
-         png_warning(png_ptr,
-             "Ignoring incorrect gAMA value when sRGB is also present");
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-         fprintf(stderr, "incorrect gamma=(%d/100000)\n", info_ptr->gamma);
-#endif
+         PNG_WARNING_PARAMETERS(p)
+
+         png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_fixed,
+            info_ptr->gamma);
+
+         png_formatted_warning(png_ptr, p,
+             "Ignoring incorrect gAMA value @1 when sRGB is also present");
       }
    }
 #endif /* PNG_READ_gAMA_SUPPORTED */
@@ -1239,23 +1227,15 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* And the following guarantees that profile_size == profile_length. */
    if (profile_size > profile_length)
    {
+      PNG_WARNING_PARAMETERS(p)
+
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
-#ifdef PNG_STDIO_SUPPORTED
-      {
-         char umsg[80];
 
-         png_snprintf2(umsg, 80,
-             "Ignoring iCCP chunk with declared size = %u "
-              "and actual length = %u",
-              (unsigned int) profile_size,
-              (unsigned int) profile_length);
-         png_warning(png_ptr, umsg);
-      }
-#else
-      png_warning(png_ptr,
-         "Ignoring iCCP chunk with uncompressed size mismatch");
-#endif
+      png_warning_parameter_unsigned(p, 1, PNG_NUMBER_FORMAT_u, profile_size);
+      png_warning_parameter_unsigned(p, 2, PNG_NUMBER_FORMAT_u, profile_length);
+      png_formatted_warning(png_ptr, p,
+         "Ignoring iCCP chunk with declared size = @1 and actual length = @2");
       return;
    }
 

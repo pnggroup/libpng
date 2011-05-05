@@ -303,16 +303,15 @@
  *    upward through 1.5.3beta05 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
- *    Libpng only has three year fields.  One is a 2-byte unsigned integer
- *    that will hold years up to 65535.  The other two hold the date in text
+ *    Libpng only has two year fields.  One is a 2-byte unsigned integer
+ *    that will hold years up to 65535.  The other holds the date in text
  *    format, and will hold years up to 9999.
  *
  *    The integer is
  *        "png_uint_16 year" in png_time_struct.
  *
- *    The strings are
- *        "png_charp time_buffer" in png_struct and
- *        "near_time_buffer", which is a local character string in png.c.
+ *    The string is
+ *        "png_char time_buffer" in png_struct
  *
  *    There are seven time-related functions:
  *        png.c: png_convert_to_rfc_1123() in png.c
@@ -1645,6 +1644,7 @@ PNG_EXPORTA(103, void, png_chunk_error, (png_structp png_ptr,
 PNG_EXPORTA(104, void, png_err, (png_structp png_ptr), PNG_NORETURN);
 #endif
 
+#ifdef PNG_WARNINGS_SUPPORTED
 /* Non-fatal error in libpng.  Can continue, but may have a problem. */
 PNG_EXPORT(105, void, png_warning, (png_structp png_ptr,
     png_const_charp warning_message));
@@ -1652,6 +1652,7 @@ PNG_EXPORT(105, void, png_warning, (png_structp png_ptr,
 /* Non-fatal error in libpng, chunk name is prepended to message. */
 PNG_EXPORT(106, void, png_chunk_warning, (png_structp png_ptr,
     png_const_charp warning_message));
+#endif
 
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 /* Benign error in libpng.  Can continue, but may have a problem.

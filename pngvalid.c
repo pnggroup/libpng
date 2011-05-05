@@ -2492,6 +2492,7 @@ standard_row(png_structp pp, png_byte std[STANDARD_ROWMAX], png_uint_32 id,
  * to ensure that they get detected - it should not be possible to write an
  * invalid image with libpng!
  */
+#ifdef PNG_WARNINGS_SUPPORTED
 static void
 sBIT0_error_fn(png_structp pp, png_infop pi)
 {
@@ -2526,6 +2527,7 @@ static PNG_CONST struct
    unsigned int    warning :1; /* the error is a warning... */
 } error_test[] =
     {
+       /* no warnings makes these errors undetectable. */
        { sBIT0_error_fn, "sBIT(0): failed to detect error", 1 },
        { sBIT_error_fn, "sBIT(too big): failed to detect error", 1 },
     };
@@ -2669,10 +2671,12 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
 
    return 1; /* keep going */
 }
+#endif
 
 static void
 perform_error_test(png_modifier *pm)
 {
+#ifdef PNG_WARNINGS_SUPPORTED /* else there are no cases that work! */
    /* Need to do this here because we just write in this test. */
    safecat(pm->this.test, sizeof pm->this.test, 0, "error test");
 
@@ -2690,6 +2694,73 @@ perform_error_test(png_modifier *pm)
 
    if (!make_errors(pm, 6, 3, WRITE_BDHI))
       return;
+#else
+   UNUSED(pm)
+#endif
+}
+
+/* This is just to validate the internal PNG formatting code - if this fails
+ * then the warning messages the library outputs will probably be garbage.
+ */
+static void
+perform_formatting_test(png_store *volatile ps)
+{
+#ifdef PNG_TIME_RFC1123_SUPPORTED
+   /* The handle into the formatting code is the RFC1123 support; this test does
+    * nothing if that is compiled out.
+    */
+   context(ps, fault);
+
+   Try
+   {
+      png_const_charp correct = "29 Aug 2079 13:53:60 +0000";
+      png_const_charp result;
+      png_structp pp;
+      png_time pt;
+
+      pp = set_store_for_write(ps, NULL, "libpng formatting test");
+
+      if (pp == NULL)
+         Throw ps;
+
+
+      /* Arbitrary settings: */
+      pt.year = 2079;
+      pt.month = 8;
+      pt.day = 29;
+      pt.hour = 13;
+      pt.minute = 53;
+      pt.second = 60; /* a leap second */
+
+      result = png_convert_to_rfc1123(pp, &pt);
+
+      if (result == NULL)
+         png_error(pp, "png_convert_to_rfc1123 failed");
+
+      if (strcmp(result, correct) != 0)
+      {
+         size_t pos = 0;
+         char msg[128];
+
+         pos = safecat(msg, sizeof msg, pos, "png_convert_to_rfc1123(");
+         pos = safecat(msg, sizeof msg, pos, correct);
+         pos = safecat(msg, sizeof msg, pos, ") returned: '");
+         pos = safecat(msg, sizeof msg, pos, result);
+         pos = safecat(msg, sizeof msg, pos, "'");
+
+         png_error(pp, msg);
+      }
+
+      store_write_reset(ps);
+   }
+
+   Catch(fault)
+   {
+      store_write_reset(fault);
+   }
+#else
+   UNUSED(ps)
+#endif
 }
 
 /* Because we want to use the same code in both the progressive reader and the
@@ -5596,8 +5667,13 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
                      od-encoded_sample, id, sbit, isbit, od,
                      encoded_sample, is_lo, is_hi);
 
-                  png_warning(pp, msg);
+#                 ifdef PNG_WARNINGS_SUPPORTED
+                     png_warning(pp, msg);
+#                 else
+                     store_warning(pp, msg);
+#                 endif
                }
+
             }
          }
       }
@@ -6671,6 +6747,7 @@ int main(int argc, PNG_CONST char **argv)
       if (pm.test_standard)
       {
          perform_interlace_macro_validation();
+         perform_formatting_test(&pm.this);
          perform_standard_test(&pm);
          perform_error_test(&pm);
       }

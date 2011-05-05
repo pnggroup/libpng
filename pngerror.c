@@ -89,14 +89,118 @@ png_error,(png_structp png_ptr, png_const_charp error_message),PNG_NORETURN)
 PNG_FUNCTION(void,PNGAPI
 png_err,(png_structp png_ptr),PNG_NORETURN)
 {
+   /* Prior to 1.5.2 the error_fn received a NULL pointer, expressed erroneouly
+    * as '\0'.  This was apparently an error, and png_default_error will crash
+    * in this case.
+    */
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
-      (*(png_ptr->error_fn))(png_ptr, '\0');
+      (*(png_ptr->error_fn))(png_ptr, "");
 
    /* If the custom handler doesn't exist, or if it returns,
       use the default handler, which will not return. */
-   png_default_error(png_ptr, '\0');
+   png_default_error(png_ptr, "");
 }
 #endif /* PNG_ERROR_TEXT_SUPPORTED */
+
+#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
+/* Utility to safely appends strings to a buffer.  This never errors out so
+ * error checking is not required in the caller.
+ */
+size_t
+png_safecat(png_charp buffer, size_t bufsize, size_t pos,
+   png_const_charp string)
+{
+   if (buffer != NULL && pos < bufsize)
+   {
+      if (string != NULL) while (*string != '\0' && pos < bufsize-1)
+         buffer[pos++] = *string++;
+
+      buffer[pos] = '\0';
+   }
+
+   return pos;
+}
+
+/* Utility to dump an unsigned value into a buffer, given a start pointer and
+ * and end pointer (which should point just *beyond* the end of the buffer!)
+ * Returns the pointer to the start of the formatted string.
+ */
+png_charp
+png_format_number(png_const_charp start, png_charp end, int format,
+   png_alloc_size_t number)
+{
+   int count = 0;    /* number of digits output */
+   int mincount = 1; /* minimum number required */
+   int output = 0;   /* digit output (for the fixed point format) */
+
+   *--end = '\0';
+
+   /* This is written so that the loop always runs at least once, even with
+    * number zero.
+    */
+   while (end > start && (number != 0 || count < mincount))
+   {
+
+      static const char digits[] = "0123456789ABCDEF";
+
+      switch (format)
+      {
+         case PNG_NUMBER_FORMAT_fixed:
+            /* Needs five digits (the fraction) */
+            mincount = 5;
+            if (output || number % 10 != 0)
+            {
+               *--end = digits[number % 10];
+               output = 1;
+            }
+            number /= 10;
+            break;
+
+         case PNG_NUMBER_FORMAT_02u:
+            /* Expects at least 2 digits. */
+            mincount = 2;
+            /* fall through */
+
+         case PNG_NUMBER_FORMAT_u:
+            *--end = digits[number % 10];
+            number /= 10;
+            break;
+
+         case PNG_NUMBER_FORMAT_02x:
+            /* This format expects at least two digits */
+            mincount = 2;
+            /* fall through */
+
+         case PNG_NUMBER_FORMAT_x:
+            *--end = digits[number & 0xf];
+            number >>= 4;
+            break;
+
+         default: /* an error */
+            number = 0;
+            break;
+      }
+
+      /* Keep track of the number of digits added */
+      ++count;
+
+      /* Float a fixed number here: */
+      if (format == PNG_NUMBER_FORMAT_fixed) if (count == 5) if (end > start)
+      {
+         /* End of the fraction, but maybe nothing was output?  In that case
+          * drop the decimal point.  If the number is a true zero handle that
+          * here.
+          */
+         if (output)
+            *--end = '.';
+         else if (number == 0) /* and !output */
+            *--end = '0';
+      }
+   }
+
+   return end;
+}
+#endif
 
 #ifdef PNG_WARNINGS_SUPPORTED
 /* This function is called whenever there is a non-fatal error.  This function
@@ -127,6 +231,115 @@ png_warning(png_structp png_ptr, png_const_charp warning_message)
       (*(png_ptr->warning_fn))(png_ptr, warning_message + offset);
    else
       png_default_warning(png_ptr, warning_message + offset);
+}
+
+/* These functions support 'formatted' warning messages with up to
+ * PNG_WARNING_PARAMETER_COUNT parameters.  In the format string the parameter
+ * is introduced by @<number>, where 'number' starts at 1.  This follows the
+ * standard established by X/Open for internationalizable error messages.
+ */
+void
+png_warning_parameter(png_warning_parameters p, int number,
+   png_const_charp string)
+{
+   if (number > 0 && number <= PNG_WARNING_PARAMETER_COUNT)
+      (void)png_safecat(p[number-1], (sizeof p[number-1]), 0, string);
+}
+
+void
+png_warning_parameter_unsigned(png_warning_parameters p, int number, int format,
+   png_alloc_size_t value)
+{
+   char buffer[PNG_NUMBER_BUFFER_SIZE];
+   png_warning_parameter(p, number, PNG_FORMAT_NUMBER(buffer, format, value));
+}
+
+void
+png_warning_parameter_signed(png_warning_parameters p, int number, int format,
+   png_int_32 value)
+{
+   png_alloc_size_t u;
+   png_charp str;
+   char buffer[PNG_NUMBER_BUFFER_SIZE];
+
+   /* Avoid overflow by doing the negate in a png_alloc_size_t: */
+   u = (png_alloc_size_t)value;
+   if (value < 0)
+      u = ~u + 1;
+
+   str = PNG_FORMAT_NUMBER(buffer, format, u);
+
+   if (value < 0 && str > buffer)
+      *--str = '-';
+
+   png_warning_parameter(p, number, str);
+}
+
+void
+png_formatted_warning(png_structp png_ptr, png_warning_parameters p,
+   png_const_charp message)
+{
+   /* The internal buffer is just 128 bytes - enough for all our messages,
+    * overflow doesn't happen because this code checks!
+    */
+   size_t i;
+   char msg[128];
+
+   for (i=0; i<(sizeof msg)-1 && *message != '\0'; ++i)
+   {
+      if (*message == '@')
+      {
+         int parameter = -1;
+         switch (*++message)
+         {
+            case '1':
+               parameter = 0;
+               break;
+
+            case '2':
+               parameter = 1;
+               break;
+
+            case '\0':
+               continue; /* To break out of the for loop above. */
+
+            default:
+               break;
+         }
+
+         if (parameter >= 0 && parameter < PNG_WARNING_PARAMETER_COUNT)
+         {
+            /* Append this parameter */
+            png_const_charp parm = p[parameter];
+            png_const_charp pend = p[parameter] + (sizeof p[parameter]);
+
+            /* No need to copy the trailing '\0' here, but there is no guarantee
+             * that parm[] has been initialized, so there is no guarantee of a
+             * trailing '\0':
+             */
+            for (; i<(sizeof msg)-1 && parm != '\0' && parm < pend; ++i)
+               msg[i] = *parm++;
+
+            ++message;
+            continue;
+         }
+
+         /* else not a parameter and there is a character after the @ sign; just
+          * copy that.
+          */
+      }
+
+      /* At this point *message can't be '\0', even in the bad parameter case
+       * above where there is a lone '@' at the end of the message string.
+       */
+      msg[i] = *message++;
+   }
+
+   /* i is always less than (sizeof msg), so: */
+   msg[i] = '\0';
+
+   /* And this is the formatted message: */
+   png_warning(png_ptr, msg);
 }
 #endif /* PNG_WARNINGS_SUPPORTED */
 
@@ -287,7 +500,8 @@ png_default_error,(png_structp png_ptr, png_const_charp error_message),
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   if (*error_message == PNG_LITERAL_SHARP)
+   /* Check on NULL only added in 1.5.3 */
+   if (error_message != NULL && *error_message == PNG_LITERAL_SHARP)
    {
       /* Strip "#nnnn " from beginning of error message. */
       int offset;
@@ -317,11 +531,11 @@ png_default_error,(png_structp png_ptr, png_const_charp error_message),
    else
 #endif
    {
-      fprintf(stderr, "libpng error: %s", error_message);
+      fprintf(stderr, "libpng error: %s", error_message ? error_message :
+         "undefined");
       fprintf(stderr, PNG_STRING_NEWLINE);
    }
-#endif
-#ifndef PNG_CONSOLE_IO_SUPPORTED
+#else
    PNG_UNUSED(error_message) /* Make compiler happy */
 #endif
    png_longjmp(png_ptr, 1);
@@ -414,7 +628,11 @@ png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,
 
    png_ptr->error_ptr = error_ptr;
    png_ptr->error_fn = error_fn;
+#ifdef PNG_WARNINGS_SUPPORTED
    png_ptr->warning_fn = warning_fn;
+#else
+   PNG_UNUSED(warning_fn)
+#endif
 }
 
 

@@ -465,7 +465,6 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    jmp_buf tmp_jmpbuf;
 #endif
 #endif
-   int i;
 
    png_debug(1, "in png_create_write_struct");
 
@@ -504,49 +503,8 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 #endif /* PNG_USER_MEM_SUPPORTED */
    png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
 
-   if (user_png_ver)
-   {
-      i = 0;
-      do
-      {
-         if (user_png_ver[i] != png_libpng_ver[i])
-            png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-      } while (png_libpng_ver[i++]);
-   }
-
-   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
-   {
-     /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
-      * we must recompile any applications that use any older library version.
-      * For versions after libpng 1.0, we will be compatible, so we need
-      * only check the first digit.
-      */
-     if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
-         (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
-         (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
-     {
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-        char msg[80];
-
-        if (user_png_ver)
-        {
-            png_snprintf2(msg, 80,
-                "Application built with libpng-%.20s"
-                " but running with %.20s",
-                user_png_ver,
-                png_libpng_ver);
-            png_warning(png_ptr, msg);
-         }
-#else
-         png_warning(png_ptr,
-             "Incompatible libpng version in application and library");
-#endif
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-        png_ptr->flags = 0;
-#endif
-        png_cleanup_needed = 1;
-     }
-   }
+   if (!png_user_version_check(png_ptr, user_png_ver))
+      png_cleanup_needed = 1;
 
    /* Initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
@@ -985,7 +943,9 @@ png_write_destroy(png_structp png_ptr)
    jmp_buf tmp_jmp; /* Save jump buffer */
 #endif
    png_error_ptr error_fn;
+#ifdef PNG_WARNINGS_SUPPORTED
    png_error_ptr warning_fn;
+#endif
    png_voidp error_ptr;
 #ifdef PNG_USER_MEM_SUPPORTED
    png_free_ptr free_fn;
@@ -1007,10 +967,6 @@ png_write_destroy(png_structp png_ptr)
    png_free(png_ptr, png_ptr->paeth_row);
 #endif
 
-#ifdef PNG_TIME_RFC1123_SUPPORTED
-   png_free(png_ptr, png_ptr->time_buffer);
-#endif
-
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    /* Use this to save a little code space, it doesn't free the filter_costs */
    png_reset_filter_heuristics(png_ptr);
@@ -1024,7 +980,9 @@ png_write_destroy(png_structp png_ptr)
 #endif
 
    error_fn = png_ptr->error_fn;
+#ifdef PNG_WARNINGS_SUPPORTED
    warning_fn = png_ptr->warning_fn;
+#endif
    error_ptr = png_ptr->error_ptr;
 #ifdef PNG_USER_MEM_SUPPORTED
    free_fn = png_ptr->free_fn;
@@ -1033,7 +991,9 @@ png_write_destroy(png_structp png_ptr)
    png_memset(png_ptr, 0, png_sizeof(png_struct));
 
    png_ptr->error_fn = error_fn;
+#ifdef PNG_WARNINGS_SUPPORTED
    png_ptr->warning_fn = warning_fn;
+#endif
    png_ptr->error_ptr = error_ptr;
 #ifdef PNG_USER_MEM_SUPPORTED
    png_ptr->free_fn = free_fn;

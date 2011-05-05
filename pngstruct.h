@@ -33,7 +33,9 @@ struct png_struct_def
    png_longjmp_ptr longjmp_fn;/* setjmp non-local goto function. */
 #endif
    png_error_ptr error_fn;    /* function for printing errors and aborting */
+#ifdef PNG_WARNINGS_SUPPORTED
    png_error_ptr warning_fn;  /* function for printing warnings */
+#endif
    png_voidp error_ptr;       /* user supplied struct for error functions */
    png_rw_ptr write_data_fn;  /* function for writing output data */
    png_rw_ptr read_data_fn;   /* function for reading input data */
@@ -219,7 +221,7 @@ struct png_struct_def
 #endif
 
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-   png_charp time_buffer; /* String to hold RFC 1123 time text */
+   char time_buffer[29]; /* String to hold RFC 1123 time text */
 #endif
 
 /* New members added in libpng-1.0.6 */

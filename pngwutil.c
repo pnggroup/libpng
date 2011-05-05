@@ -231,13 +231,11 @@ png_text_compress(png_structp png_ptr,
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
    {
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-      char msg[50];
-      png_snprintf(msg, 50, "Unknown compression type %d", compression);
-      png_warning(png_ptr, msg);
-#else
-      png_warning(png_ptr, "Unknown compression type");
-#endif
+      PNG_WARNING_PARAMETERS(p)
+
+      png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_d,
+         compression);
+      png_formatted_warning(png_ptr, p, "Unknown compression type @1");
    }
 
    /* We can't write the chunk until we find out how much data we have,
@@ -1470,15 +1468,11 @@ png_check_keyword(png_structp png_ptr, png_const_charp key, png_charpp new_key)
       if ((png_byte)*ikp < 0x20 ||
          ((png_byte)*ikp > 0x7E && (png_byte)*ikp < 0xA1))
       {
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-         char msg[40];
+         PNG_WARNING_PARAMETERS(p)
 
-         png_snprintf(msg, 40,
-             "invalid keyword character 0x%02X", (png_byte)*ikp);
-         png_warning(png_ptr, msg);
-#else
-         png_warning(png_ptr, "invalid character in keyword");
-#endif
+         png_warning_parameter_unsigned(p, 1, PNG_NUMBER_FORMAT_02x,
+            *ikp);
+         png_formatted_warning(png_ptr, p, "invalid keyword character 0x@1");
          *dp = ' ';
       }
 

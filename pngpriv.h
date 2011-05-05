@@ -38,7 +38,6 @@
  * still required (as of 2011-05-02.)
  */
 #define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
-#define _ISOC99_SOURCE 1 /* for snprintf */
 
 /* This is required for the definition of abort(), used as a last ditch
  * error handler when all else fails.
@@ -116,12 +115,20 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define PNG_ZBUF_SIZE 65536L
 #endif
 
-/* If warnings or errors are turned off the code is disabled
- * or redirected here.
+/* If warnings or errors are turned off the code is disabled or redirected here.
+ * From 1.5.3 functions have been added to allow very limited formatting of
+ * error and warning messages - this code will also be disabled here.
  */
-#ifndef PNG_WARNINGS_SUPPORTED
-#  define png_warning(s1,s2) ((void)0)
-#  define png_chunk_warning(s1,s2) ((void)0)
+#ifdef PNG_WARNINGS_SUPPORTED
+#  define PNG_WARNING_PARAMETERS(p) png_warning_parameters p;
+#else
+#  define png_warning(s1,s2) ((void)(s1))
+#  define png_chunk_warning(s1,s2) ((void)(s1))
+#  define png_warning_parameter(p,number,string) ((void)0)
+#  define png_warning_parameter_unsigned(p,number,format,value) ((void)0)
+#  define png_warning_parameter_signed(p,number,format,value) ((void)0)
+#  define png_formatted_warning(pp,p,message) ((void)(pp))
+#  define PNG_WARNING_PARAMETERS(p) 
 #endif
 #ifndef PNG_ERROR_TEXT_SUPPORTED
 #  define png_error(s1,s2) png_err(s1)
@@ -246,29 +253,6 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  endif
 #endif
 /* End of memory model/platform independent support */
-
-#if !defined(PNG_NO_SNPRINTF) && !defined(__STRICT_ANSI__)
-#  ifdef _MSC_VER
-#    define png_snprintf _snprintf   /* Added to v 1.2.19 */
-#    define png_snprintf2 _snprintf
-#    define png_snprintf6 _snprintf
-#  else
-#    define png_snprintf snprintf   /* Added to v 1.2.19 */
-#    define png_snprintf2 snprintf
-#    define png_snprintf6 snprintf
-#  endif
-#else
-  /* You don't have or don't want to use snprintf().  Caution: Using
-   * sprintf instead of snprintf exposes your application to accidental
-   * or malevolent buffer overflows.  If you don't have snprintf()
-   * as a general rule you should provide one (you can get one from
-   * Portable OpenSSH).
-   */
-#  define png_snprintf(s1,n,fmt,x1) png_sprintf(s1,fmt,x1)
-#  define png_snprintf2(s1,n,fmt,x1,x2) png_sprintf(s1,fmt,x1,x2)
-#  define png_snprintf6(s1,n,fmt,x1,x2,x3,x4,x5,x6) \
-      png_sprintf(s1,fmt,x1,x2,x3,x4,x5,x6)
-#endif
 /* End of 1.5.0beta36 move from pngconf.h */
 
 /* CONSTANTS and UTILITY MACROS
@@ -487,6 +471,12 @@ extern "C" {
  * functionality in libpng.  More information about most functions can
  * be found in the files where the functions are located.
  */
+
+/* Check the user version string for compatibility, returns false if the version
+ * numbers aren't compatible.
+ */
+PNG_EXTERN int png_user_version_check(png_structp png_ptr,
+   png_const_charp user_png_ver);
 
 /* Allocate memory for an internal libpng struct */
 PNG_EXTERN PNG_FUNCTION(png_voidp,png_create_struct,PNGARG((int type)),
@@ -1097,6 +1087,76 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr, png_voidp ptr,
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,
    png_const_charp name),PNG_NORETURN);
+#endif
+
+/* Various internal functions to handle formatted warning messages, currently
+ * only implemented for warnings.
+ */
+#if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_TIME_RFC1123_SUPPORTED)
+/* Puts 'string' into 'buffer' at buffer[pos], taking care never to overwrite
+ * the end.  Always leaves the buffer nul terminated.  Never errors out (and
+ * there is no error code.)
+ */
+PNG_EXTERN size_t png_safecat(png_charp buffer, size_t bufsize, size_t pos,
+    png_const_charp string);
+
+/* Utility to dump an unsigned value into a buffer, given a start pointer and
+ * and end pointer (which should point just *beyond* the end of the buffer!)
+ * Returns the pointer to the start of the formatted string.  This utility only
+ * does unsigned values.
+ */
+PNG_EXTERN png_charp png_format_number(png_const_charp start, png_charp end,
+   int format, png_alloc_size_t number);
+
+/* Convenience macro that takes an array: */
+#define PNG_FORMAT_NUMBER(buffer,format,number) \
+   png_format_number(buffer, buffer + (sizeof buffer), format, number)
+
+/* Suggested size for a number buffer (enough for 64 bits and a sign!) */
+#define PNG_NUMBER_BUFFER_SIZE 24
+
+/* These are the integer formats currently supported, the name is formed from
+ * the standard printf(3) format string.
+ */
+#define PNG_NUMBER_FORMAT_u     1 /* chose unsigned API! */
+#define PNG_NUMBER_FORMAT_02u   2
+#define PNG_NUMBER_FORMAT_d     1 /* chose signed API! */
+#define PNG_NUMBER_FORMAT_02d   2
+#define PNG_NUMBER_FORMAT_x     3
+#define PNG_NUMBER_FORMAT_02x   4
+#define PNG_NUMBER_FORMAT_fixed 5 /* choose the signed API */
+#endif
+
+#ifdef PNG_WARNINGS_SUPPORTED
+/* New defines and members adding in libpng-1.5.3 */
+#  define PNG_WARNING_PARAMETER_SIZE 32
+#  define PNG_WARNING_PARAMETER_COUNT 8
+
+/* An l-value of this type has to be passed to the APIs below to cache the
+ * values of the parameters to a formatted warning message.
+ */
+typedef char png_warning_parameters[PNG_WARNING_PARAMETER_COUNT][
+   PNG_WARNING_PARAMETER_SIZE];
+
+PNG_EXTERN void png_warning_parameter(png_warning_parameters p, int number,
+    png_const_charp string);
+    /* Parameters are limited in size to PNG_WARNING_PARAMETER_SIZE characters,
+     * including the trailing '\0'.
+     */
+PNG_EXTERN void png_warning_parameter_unsigned(png_warning_parameters p,
+    int number, int format, png_alloc_size_t value);
+    /* Use png_alloc_size_t because it is an unsigned type as big as any we
+     * need to output.  Use the following for a signed value.
+     */
+PNG_EXTERN void png_warning_parameter_signed(png_warning_parameters p,
+    int number, int format, png_int_32 value);
+
+PNG_EXTERN void png_formatted_warning(png_structp png_ptr,
+    png_warning_parameters p, png_const_charp message);
+    /* 'message' follows the X/Open approach of using @1, @2 to insert
+     * parameters previously supplied using the above functions.  Errors in
+     * specifying the paramters will simple result in garbage substitutions.
+     */
 #endif
 
 /* ASCII to FP interfaces, currently only implemented if sCAL

@@ -1433,16 +1433,11 @@ png_do_read_transformations(png_structp png_ptr)
 
    if (png_ptr->row_buf == NULL)
    {
-#ifdef PNG_CONSOLE_IO_SUPPORTED
-      char msg[50];
-
-      png_snprintf2(msg, 50,
-          "NULL row buffer for row %ld, pass %d", (long)png_ptr->row_number,
-          png_ptr->pass);
-      png_error(png_ptr, msg);
-#else
+      /* Prior to 1.5.3 this output row/pass where the NULL pointer is, but this
+       * error is incredibly rare and incredibly easy to debug without this
+       * information.
+       */
       png_error(png_ptr, "NULL row buffer");
-#endif
    }
 #ifdef PNG_WARN_UNINITIALIZED_ROW
    if (!(png_ptr->flags & PNG_FLAG_ROW_INIT))

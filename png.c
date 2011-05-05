@@ -137,6 +137,61 @@ png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
       png_ptr->crc = crc32(png_ptr->crc, ptr, (uInt)length);
 }
 
+/* Check a user supplied version number, called from both read and write
+ * functions that create a png_struct
+ */
+int
+png_user_version_check(png_structp png_ptr, png_const_charp user_png_ver)
+{
+   if (user_png_ver)
+   {
+      int i = 0;
+
+      do
+      {
+         if (user_png_ver[i] != png_libpng_ver[i])
+            png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+      } while (png_libpng_ver[i++]);
+   }
+
+   else
+      png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+
+   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
+   {
+     /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
+      * we must recompile any applications that use any older library version.
+      * For versions after libpng 1.0, we will be compatible, so we need
+      * only check the first digit.
+      */
+      if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
+          (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
+          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
+      {
+#ifdef PNG_WARNINGS_SUPPORTED
+         size_t pos = 0;
+         char m[128];
+
+         pos = png_safecat(m, sizeof m, pos, "Application built with libpng-");
+         pos = png_safecat(m, sizeof m, pos, user_png_ver);
+         pos = png_safecat(m, sizeof m, pos, " but running with ");
+         pos = png_safecat(m, sizeof m, pos, png_libpng_ver);
+
+         png_warning(png_ptr, m);
+#endif
+
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+         png_ptr->flags = 0;
+#endif
+
+         return 0;
+      }
+   }
+
+   /* Success return. */
+   return 1;
+}
+
 /* Allocate the memory for an info_struct for the application.  We don't
  * really need the png_ptr, but it could potentially be useful in the
  * future.  This should be used in favour of malloc(png_sizeof(png_info))
@@ -518,28 +573,37 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
    if (png_ptr == NULL)
       return (NULL);
 
-   if (png_ptr->time_buffer == NULL)
    {
-      png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, (png_uint_32)(29*
-         png_sizeof(char)));
+      size_t pos = 0;
+      char number_buf[5]; /* enough for a four digit year */
+
+#     define APPEND_STRING(string)\
+         pos = png_safecat(png_ptr->time_buffer, sizeof png_ptr->time_buffer,\
+            pos, (string))
+#     define APPEND_NUMBER(format, value)\
+         APPEND_STRING(PNG_FORMAT_NUMBER(number_buf, format, (value)))
+#     define APPEND(ch)\
+         if (pos < (sizeof png_ptr->time_buffer)-1)\
+            png_ptr->time_buffer[pos++] = (ch)
+         
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_u, ptime->day % 32);
+      APPEND(' ');
+      APPEND_STRING(short_months[(ptime->month - 1) % 12]);
+      APPEND(' ');
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_u, ptime->year);
+      APPEND(' ');
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, ptime->hour % 24);
+      APPEND(':');
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, ptime->minute % 60);
+      APPEND(':');
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, ptime->second % 61);
+      APPEND_STRING(" +0000"); /* This reliably terminates the buffer */
+
+#     undef APPEND
+#     undef APPEND_NUMBER
+#     undef APPEND_STRING
    }
 
-#    ifdef USE_FAR_KEYWORD
-   {
-      char near_time_buf[29];
-      png_snprintf6(near_time_buf, 29, "%d %s %d %02d:%02d:%02d +0000",
-          ptime->day % 32, short_months[(ptime->month - 1) % 12],
-          ptime->year, ptime->hour % 24, ptime->minute % 60,
-          ptime->second % 61);
-      png_memcpy(png_ptr->time_buffer, near_time_buf,
-          29*png_sizeof(char));
-   }
-#    else
-   png_snprintf6(png_ptr->time_buffer, 29, "%d %s %d %02d:%02d:%02d +0000",
-       ptime->day % 32, short_months[(ptime->month - 1) % 12],
-       ptime->year, ptime->hour % 24, ptime->minute % 60,
-       ptime->second % 61);
-#    endif
    return png_ptr->time_buffer;
 }
 #  endif /* PNG_TIME_RFC1123_SUPPORTED */
