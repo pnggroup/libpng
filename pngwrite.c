@@ -1599,7 +1599,7 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_WRITE_FILLER_SUPPORTED
-   /* Pack XRGB/RGBX/ARGB/RGBA into * RGB (4 channels -> 3 channels) */
+   /* Pack XRGB/RGBX/ARGB/RGBA into RGB (4 channels -> 3 channels) */
    if (transforms & PNG_TRANSFORM_STRIP_FILLER_AFTER)
       png_set_filler(png_ptr, 0, PNG_FILLER_AFTER);
 

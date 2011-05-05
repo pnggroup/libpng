@@ -3337,12 +3337,15 @@ Version 1.5.3beta04 [April 27, 2011]
   Changed png_struct jmp_buf member name from png_jmpbuf to tmp_jmpbuf to
     avoid a possible clash with the png_jmpbuf macro on some platforms.
 
-Version 1.5.3beta05 [May 4, 2011]
-  Added appropriate feature test macros to ensure libpng sees the correct API
-   _POSIX_SOURCE is defined in pngpriv.h, pngtest.c and pngvalid.c to ensure
-    that POSIX conformant systems disable non-POSIX APIs.  _ISOC99_SOURCE is
-    defined in pngpriv.h to obtain the ISO C99 snprintf definition, when
-    available.
+Version 1.5.3beta05 [May 5, 2011]
+  Added the "_POSIX_SOURCE" feature test macro to ensure libpng sees the
+    correct API. _POSIX_SOURCE is defined in pngpriv.h, pngtest.c and
+    pngvalid.c to ensure that POSIX conformant systems disable non-POSIX APIs.
+  Removed png_snprintf and added formatted warning messages.  This change adds
+    internal APIs to allow png_warning messages to have parameters without
+    requiring the host OS to implement snprintf.  As a side effect the
+    dependency of the tIME-supporting RFC1132 code on stdio is removed and
+    PNG_NO_WARNINGS does actually work now.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
