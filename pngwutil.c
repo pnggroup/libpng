@@ -447,6 +447,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       return;
    }
 
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
    if (comp->input_len >= 2 && comp->input_len < 16384)
    {
       unsigned int z_cmf;  /* zlib compression method and flags */
@@ -464,12 +465,12 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
       {
          unsigned int z_cinfo;
          unsigned int half_z_window_size;
-         png_size_t uncompressed_idat_size = comp->input_len;
+         png_size_t uncompressed_text_size = comp->input_len;
 
          z_cinfo = z_cmf >> 4;
          half_z_window_size = 1 << (z_cinfo + 7);
 
-         while (uncompressed_idat_size <= half_z_window_size &&
+         while (uncompressed_text_size <= half_z_window_size &&
              half_z_window_size >= 256)
          {
             z_cinfo--;
@@ -506,6 +507,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
          png_error(png_ptr,
              "Invalid zlib compression method or flags in non-IDAT chunk");
    }
+#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
 
    /* Write saved output buffers, if any */
    for (i = 0; i < comp->num_output_ptr; i++)
@@ -838,7 +840,9 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
    if (!(png_ptr->mode & PNG_HAVE_IDAT) &&
        png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
    {
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
       unsigned int z_cmf;  /* zlib compression method and flags */
+#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
 
 #ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
       int ret;
@@ -880,6 +884,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
        */
       png_ptr->zstream.data_type = Z_BINARY;
 
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
       /* Optimize the CMF field in the zlib stream.  This hack of the zlib
        * stream is compliant to the stream specification.
        */
@@ -941,6 +946,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
       else
          png_error(png_ptr,
              "Invalid zlib compression method or flags in IDAT");
+#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
    }
 
    png_write_chunk(png_ptr, png_IDAT, data, length);

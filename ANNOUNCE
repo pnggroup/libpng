@@ -87,6 +87,8 @@ Version 1.5.3beta05 [May 5, 2011]
     requiring the host OS to implement snprintf.  As a side effect the
     dependency of the tIME-supporting RFC1132 code on stdio is removed and
     PNG_NO_WARNINGS does actually work now.
+  Added PNG_WRITE_OPTIMIZE_CMF_SUPPORTED macro to make the zlib "CMF" byte
+    optimization configureable.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
