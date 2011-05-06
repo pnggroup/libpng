@@ -3356,6 +3356,8 @@ Version 1.5.3beta05 [May 6, 2011]
     the code more robust.  Also deflateEnd checking is added - previously
     libpng would ignore an error at the end of the stream.
 
+Version 1.5.3beta06 [May 6, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

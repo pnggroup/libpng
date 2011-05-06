@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta05 - May 6, 2011
+Libpng 1.5.3beta06 - May 6, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.3beta05.tar.gz
-   1.5.3beta05.tar.bz2
+   1.5.3beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.3beta06.tar.gz
+   1.5.3beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153b05.7z  (LZMA-compressed, recommended)
-   lp153b05.zip
+   lp153b06.7z  (LZMA-compressed, recommended)
+   lp153b06.zip
 
 Other information:
 
-   1.5.3beta05-README.txt
-   1.5.3beta05-LICENSE.txt
+   1.5.3beta06-README.txt
+   1.5.3beta06-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -97,6 +97,7 @@ Version 1.5.3beta05 [May 6, 2011]
     the code more robust.  Also deflateEnd checking is added - previously
     libpng would ignore an error at the end of the stream.
 
+Version 1.5.3beta06 [May 6, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
