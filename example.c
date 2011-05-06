@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.5.2 [March 31, 2011]
+ * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2011 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
@@ -21,6 +21,10 @@
  * working PNG reader/writer, see pngtest.c, included in this distribution;
  * see also the programs in the contrib directory.
  */
+
+#define _POSIX_SOURCE 1  /* libpng and zlib are POSIX-compliant.  You may
+                          * change this if your application uses non-POSIX
+                          * extensions. */
 
 #include "png.h"
 
