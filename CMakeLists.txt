@@ -147,10 +147,6 @@ set(pngtest_sources
 
 add_definitions(-DPNG_CONFIGURE_LIBPNG)
 
-if(_AIX)
-  add_definitions(-D_ALL_SOURCE)
-endif(_AIX)
-
 if(MSVC)
   add_definitions(-DPNG_NO_MODULEDEF -D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)
