@@ -48,7 +48,7 @@ BEGIN{
    deb=0                        # debug - set on command line
    everything=""                # do not override defaults
    logunsupported=0             # write unsupported options too
-   
+
    # Precreate arrays
    option[""] = ""    # list of all options: default enabled/disabled
    done[""] = 1       # marks option as having been output
@@ -301,7 +301,7 @@ pre != 0 && $1 == "chunk" && NF >= 2{
 #   macro is not defined.  The default value will be re-tokenised.
 #   (BTW: this is somewhat restrictive, it mainly exists for the
 #   support of non-standard configurations and numeric parameters,
-#   see the uses in scripts/options.dat 
+#   see the uses in scripts/options.dat
 
 $1 == "setting" && (NF == 2 || NF >= 3 && ($3 == "requires" || $3 == "default")){
    reqs = ""

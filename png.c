@@ -585,7 +585,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
 #     define APPEND(ch)\
          if (pos < (sizeof png_ptr->time_buffer)-1)\
             png_ptr->time_buffer[pos++] = (ch)
-         
+
       APPEND_NUMBER(PNG_NUMBER_FORMAT_u, ptime->day % 32);
       APPEND(' ');
       APPEND_STRING(short_months[(ptime->month - 1) % 12]);
@@ -619,13 +619,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.3beta06 - May 6, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.3beta06 - May 7, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.3beta06 - May 6, 2011\
+      return "libpng version 1.5.3beta06 - May 7, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";

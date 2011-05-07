@@ -17,7 +17,7 @@
 /* pnglibconf.dfa with respect to the dependencies between the following */
 /* symbols.  It is much better to generate a new file using */
 /* scripts/libpngconf.mak */
-  
+
 #ifndef PNGLCONF_H
 #define PNGLCONF_H
 /* settings */

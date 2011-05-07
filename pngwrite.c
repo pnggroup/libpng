@@ -1410,6 +1410,9 @@ png_set_compression_strategy(png_structp png_ptr, int strategy)
    png_ptr->zlib_strategy = strategy;
 }
 
+/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
+ * smaller value of window_bits if it can do so safely.
+ */
 void PNGAPI
 png_set_compression_window_bits(png_structp png_ptr, int window_bits)
 {
@@ -1488,6 +1491,9 @@ png_set_text_compression_strategy(png_structp png_ptr, int strategy)
    png_ptr->zlib_text_strategy = strategy;
 }
 
+/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
+ * smaller value of window_bits if it can do so safely.
+ */
 void PNGAPI
 png_set_text_compression_window_bits(png_structp png_ptr, int window_bits)
 {

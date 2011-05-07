@@ -128,7 +128,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define png_warning_parameter_unsigned(p,number,format,value) ((void)0)
 #  define png_warning_parameter_signed(p,number,format,value) ((void)0)
 #  define png_formatted_warning(pp,p,message) ((void)(pp))
-#  define PNG_WARNING_PARAMETERS(p) 
+#  define PNG_WARNING_PARAMETERS(p)
 #endif
 #ifndef PNG_ERROR_TEXT_SUPPORTED
 #  define png_error(s1,s2) png_err(s1)

@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 # pnglibconf.mak - standard make lines for pnglibconf.h
-# 
+#
 # These lines are copied from Makefile.am, they illustrate
 # how to automate the build of pnglibconf.h from scripts/pnglibconf.dfa
 # given 'awk' and 'sed'

@@ -43,7 +43,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 
 # The following setting, option and chunk values can all be changed
 # while building libpng:
-# 
+#
 # setting: change 'setting' lines to fine tune library performance,
 #   changes to the settings don't affect the libpng API functionally
 #
@@ -62,7 +62,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # don't want in that file in that file.  You can also turn on options
 # using PNG_<option>_SUPPORTED.  When you have finished rerun
 # configure and rebuild pnglibconf.h file with -DPNG_USER_CONFIG:
-# 
+#
 #  make clean
 #  CPPFLAGS='-DPNG_USER_CONFIG' ./configure
 #  make pnglibconf.h
@@ -73,7 +73,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #
 # 2) Add definitions of the settings you want to change to
 # CPPFLAGS; for example:
-# 
+#
 #   -DPNG_DEFAULT_READ_MACROS=0
 #
 # (This would change the default to *not* use read macros.)  Be
@@ -193,11 +193,11 @@ option FLOATING_ARITHMETIC
 option FLOATING_POINT enables ok_math
 option FIXED_POINT enables ok_math
 
-# Added at libpng version 1.4.0 
+# Added at libpng version 1.4.0
 
 option ERROR_TEXT
 
-# The following is always on (defined empty) 
+# The following is always on (defined empty)
 
 setting CALLOC_SUPPORTED default
 
