@@ -194,7 +194,10 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
     * values are reasonable this may have to be changed.
     */
    else if (output_gamma < 70000 || output_gamma > 300000)
-      png_error(png_ptr, "output gamma out of expected range");
+      {
+         png_warning(png_ptr, "ignoring output gamma out of expected range");
+         return;
+      }
 
    /* The default file gamma is the inverse of the output gamma; the output
     * gamma may be changed below so get the file value first:
@@ -731,10 +734,16 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
     * undocumented API feature) it will only be made in 1.6.
     */
    if (file_gamma <= 0)
-      png_error("invalid file gamma to png_set_gamma");
+   {
+      png_warning(png_ptr, "invalid file gamma to png_set_gamma");
+      return;
+   }
 
    if (scrn_gamma <= 0)
-      png_error("invalid screen gamma to png_set_gamma");
+   {
+      png_warning(png_ptr, "invalid screen gamma to png_set_gamma");
+      return;
+   }
 #endif
 
    /* Set the gamma values unconditionally - this overrides the value in the PNG
@@ -891,8 +900,8 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
          break;
 
       default:
-         png_error(png_ptr, "invalid error action to rgb_to_gray");
-         break;
+         png_warning(png_ptr, "invalid error action to rgb_to_gray");
+         return;
    }
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #ifdef PNG_READ_EXPAND_SUPPORTED
@@ -1572,7 +1581,8 @@ png_init_read_transformations(png_structp png_ptr)
                   break;
 
                default:
-                  png_error(png_ptr, "invalid background gamma type");
+                  png_warning (png_ptr, "invalid background gamma type");
+                  return;
             }
 
             png_ptr->background_1.gray = png_gamma_correct(png_ptr,
