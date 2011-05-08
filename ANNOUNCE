@@ -99,7 +99,7 @@ Version 1.5.3beta05 [May 6, 2011]
 
 Version 1.5.3beta06 [May 8, 2011]
   Removed the -D_ALL_SOURCE from definitions for AIX in CMakeLists.txt
-  Implementated premultiplied alpha support: png_set_alpha_mode API
+  Implemented premultiplied alpha support: png_set_alpha_mode API
 
 Version 1.5.3beta07 [May 8, 2011]
 
