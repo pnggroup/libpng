@@ -232,3 +232,5 @@ EXPORTS
  png_set_text_compression_strategy @224
  png_set_text_compression_window_bits @225
  png_set_text_compression_method @226
+ png_set_alpha_mode @227
+ png_set_alpha_mode_fixed @228

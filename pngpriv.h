@@ -285,7 +285,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_SWAP_BYTES          0x0010
 #define PNG_INVERT_MONO         0x0020
 #define PNG_QUANTIZE            0x0040
-#define PNG_BACKGROUND          0x0080
+#define PNG_COMPOSE             0x0080     /* Was PNG_BACKGROUND */
 #define PNG_BACKGROUND_EXPAND   0x0100
 #define PNG_EXPAND_16           0x0200     /* Added to libpng 1.5.2 */
 #define PNG_16_TO_8             0x0400
@@ -302,7 +302,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_RGB_TO_GRAY_ERR   0x200000L
 #define PNG_RGB_TO_GRAY_WARN  0x400000L
 #define PNG_RGB_TO_GRAY       0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
-                       /*     0x800000L     Unused */
+#define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.3 */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
                        /*   0x4000000L  unused */
@@ -332,9 +332,9 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-                                /*        0x1000  unused */
-                                /*        0x2000  unused */
-                                /*        0x4000  unused */
+#define PNG_FLAG_ASSUME_sRGB              0x1000  /* Added to libpng-1.5.3 */
+#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000  /* Added to libpng-1.5.3 */
+#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000  /* Added to libpng-1.5.3 */
 #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
 #define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000L
 #define PNG_FLAG_LIBRARY_MISMATCH         0x20000L
@@ -852,14 +852,20 @@ PNG_EXTERN void png_do_shift PNGARG((png_row_infop row_info,
     png_bytep row, png_const_color_8p bit_depth));
 #endif
 
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
-PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info,
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+    defined(PNG_READ_ALPHA_MODE_SUPPORTED)
+PNG_EXTERN void png_do_compose PNGARG((png_row_infop row_info,
     png_bytep row, png_structp png_ptr));
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
 PNG_EXTERN void png_do_gamma PNGARG((png_row_infop row_info,
     png_bytep row, png_structp png_ptr));
+#endif
+
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
+PNG_EXTERN void png_do_encode_alpha PNGARG((png_row_infop row_info,
+   png_bytep row, png_structp png_ptr));
 #endif
 
 #ifdef PNG_READ_EXPAND_SUPPORTED

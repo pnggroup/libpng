@@ -586,17 +586,17 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
          if (pos < (sizeof png_ptr->time_buffer)-1)\
             png_ptr->time_buffer[pos++] = (ch)
 
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_u, ptime->day % 32);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_u, (unsigned)ptime->day % 32);
       APPEND(' ');
       APPEND_STRING(short_months[(ptime->month - 1) % 12]);
       APPEND(' ');
       APPEND_NUMBER(PNG_NUMBER_FORMAT_u, ptime->year);
       APPEND(' ');
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, ptime->hour % 24);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->hour % 24);
       APPEND(':');
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, ptime->minute % 60);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->minute % 60);
       APPEND(':');
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, ptime->second % 61);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->second % 61);
       APPEND_STRING(" +0000"); /* This reliably terminates the buffer */
 
 #     undef APPEND
@@ -2322,8 +2322,9 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
          png_ptr->screen_gamma) : PNG_FP_1);
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-     if (png_ptr->transformations & ((PNG_BACKGROUND) | PNG_RGB_TO_GRAY))
+     if (png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY))
      {
         png_build_8bit_table(png_ptr, &png_ptr->gamma_to_1,
             png_reciprocal(png_ptr->gamma));
@@ -2332,7 +2333,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
             png_ptr->screen_gamma > 0 ?  png_reciprocal(png_ptr->screen_gamma) :
             png_ptr->gamma/* Probably doing rgb_to_gray */);
      }
-#endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
+#endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
   }
   else
   {
@@ -2391,7 +2392,12 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
      png_ptr->gamma_shift = shift;
 
 #ifdef PNG_16BIT_SUPPORTED
-     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_BACKGROUND))
+     /* NOTE: prior to 1.5.3 this test used to include PNG_BACKGROUND (now
+      * PNG_COMPOSE).  This effectively smashed the background calculation for
+      * 16 bit output because the 8 bit table assumes the result will be reduced
+      * to 8 bits.
+      */
+     if (png_ptr->transformations & PNG_16_TO_8)
 #endif
          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,
@@ -2405,8 +2411,9 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
 #endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-     if (png_ptr->transformations & (PNG_BACKGROUND | PNG_RGB_TO_GRAY))
+     if (png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY))
      {
         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
             png_reciprocal(png_ptr->gamma));
@@ -2419,7 +2426,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
             png_ptr->screen_gamma > 0 ? png_reciprocal(png_ptr->screen_gamma) :
             png_ptr->gamma/* Probably doing rgb_to_gray */);
      }
-#endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_RGB_TO_GRAY_SUPPORTED */
+#endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
   }
 }
 #endif /* READ_GAMMA */

@@ -135,7 +135,8 @@ struct png_struct_def
    png_uint_16 filler;           /* filler bytes for pixel expansion */
 #endif
 
-#ifdef PNG_bKGD_SUPPORTED
+#if defined(PNG_bKGD_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    png_byte background_gamma_type;
    png_fixed_point background_gamma;
    png_color_16 background;   /* background color in screen gamma space */

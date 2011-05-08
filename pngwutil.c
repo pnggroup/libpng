@@ -315,7 +315,7 @@ png_zlib_release(png_structp png_ptr)
                break;
          }
 
-         png_warning_parameter_unsigned(p, 1, PNG_NUMBER_FORMAT_d, ret);
+         png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_d, ret);
          png_warning_parameter(p, 2, err);
 
          if (png_ptr->zstream.msg)
@@ -1549,7 +1549,7 @@ png_check_keyword(png_structp png_ptr, png_const_charp key, png_charpp new_key)
          PNG_WARNING_PARAMETERS(p)
 
          png_warning_parameter_unsigned(p, 1, PNG_NUMBER_FORMAT_02x,
-            *ikp);
+            (png_byte)*ikp);
          png_formatted_warning(png_ptr, p, "invalid keyword character 0x@1");
          *dp = ' ';
       }

@@ -1472,6 +1472,11 @@ on gamma in the PNG specification for an excellent description of what
 gamma is, and why all applications should support it.  It is strongly
 recommended that PNG viewers support gamma correction.
 
+This API unconditionally sets the screen and file gamma values, so it will
+override the value in the PNG file unless it is called before the PNG file
+reading starts.  For this reason you must always call it with the PNG file
+value when you call it in this position:
+
    if (png_get_gAMA(png_ptr, info_ptr, &file_gamma))
       png_set_gamma(png_ptr, screen_gamma, file_gamma);
 

@@ -690,6 +690,8 @@ typedef png_info FAR * FAR * png_infopp;
  */
 #define PNG_FP_1    100000
 #define PNG_FP_HALF  50000
+#define PNG_FP_MAX  ((png_fixed_point)0x7fffffffL)
+#define PNG_FP_MIN  (-PNG_FP_MAX)
 
 /* These describe the color_type field in png_info. */
 /* color type masks */
@@ -1112,6 +1114,202 @@ PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
     png_colorp palette));
 #endif
 
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
+/* How the alpha channel is interpreted - this affects how the color channels of
+ * a PNG file are output when an alpha channel, or tRNS chunk is a palette file,
+ * is present.
+ *
+ * The default is to output data according to the PNG specification: the alpha
+ * channel is a linear measure of the contribution of the pixel to the
+ * corresponding output pixel.  The gamma encoded color channels must be scaled
+ * according to the contribution and to do this it is necessary to undo the
+ * encoding, scale the color values, perform the composition and reencode the
+ * values.  This is the 'PNG' format.
+ *
+ * The alternative is to 'associate' the alpha with the color information by
+ * storing color channel values that have been scaled by the alpha.  The
+ * advantage is that the color channels can be resampled (the image can be
+ * scaled) in this form.  The disadvantage is that normal practice is to store
+ * linear, not (gamma) encoded, values and this requires 16 bit channels for
+ * still images rather than the 8 bit channels that are just about sufficient if
+ * gamma encoding is used.  In addition all non-transparent pixel values,
+ * including completely opaque ones, must be gamma encoded to produce the final
+ * image.  This is the 'STANDARD', 'ASSOCIATED' or 'PREMULTIPLIED' format (the
+ * latter being the two common names for associated alpha color channels.)
+ *
+ * Since it is not necessary to perform arithmetic on opaque color values so
+ * long as they are not to be resampled and are in the final color space it is
+ * possible to optimize the handling of alpha by storing the opaque pixels in
+ * the PNG format (adjusted for the output color space) while storing partially
+ * opaque pixels in the standard, linear, format.  The accuracy required for
+ * standard alpha composition is relatively low, because the pixels are
+ * isolated, therefore typically the accuracy loss in storing 8 bit linear
+ * values is acceptable.  (This is not true if the alpha channel is used to
+ * simiulate transparency over large areas - use 16 bits or the PNG format in
+ * this case!)  This is the 'OPTIMIZED' format.  For this format a pixel is
+ * treated as opaque only if the alpha value is equal to the maximum value.
+ *
+ * The final choice is to gamma encode the alpha channel as well.  This is
+ * broken because, in practice, no implementation that uses this choice
+ * correctly undoes the encoding before handling alpha composition.  Use this
+ * choice only if other serious errors in the software or hardware you use
+ * mandate it; the typical serious error is for dark halos to appear around
+ * opaque areas of the composited PNG image because of arithmetic overflow.
+ *
+ * The API function png_set_alpha_mode specifies which of these choices to use
+ * with a enumerated 'mode' value and the gamma of the required output:
+ */
+#define PNG_ALPHA_PNG           0 /* according to the PNG standard */
+#define PNG_ALPHA_STANDARD      1 /* according to Porter/Duff */
+#define PNG_ALPHA_ASSOCIATED    1 /* as above; this is the normal practice */
+#define PNG_ALPHA_PREMULTIPLIED 1 /* as above */
+#define PNG_ALPHA_OPTIMIZED     2 /* 'PNG' for opaque pixels, else 'STANDARD' */
+#define PNG_ALPHA_BROKEN        3 /* the alpha channel is gamma encoded */
+
+PNG_FP_EXPORT(227, void, png_set_alpha_mode, (png_structp png_ptr, int mode,
+    double output_gamma));
+PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
+    int mode, png_fixed_point output_gamma));
+
+/* The output_gamma value is a screen gamma in libpng terminology: it expresses
+ * how to decode the output values, not how they are encoded.  The values used
+ * correspond to the normal numbers used to describe the overall gamma of a
+ * computer display system; for example 2.2 for an sRGB conformant system.  The
+ * values are scaled by 100000 in the _fixed version of the API (so 220000 for
+ * sRGB.)
+ *
+ * The inverse of the value is always used to provide a default for the PNG file
+ * encoding if it has no gAMA chunk and if png_set_gamma() has not been called
+ * to override the PNG gamma information.
+ *
+ * When the ALPHA_OPTIMIZED mode is selected the output gamma is used to encode
+ * opaque pixels however pixels with lower alpha values are not encoded,
+ * regardless of the output gamma setting.
+ *
+ * When the standard Porter Duff handling is requested with mode 1 the output
+ * encoding is set to be linear and the output_gamma value is only relevant
+ * as a default for input data that has no gamma information.  The linear output
+ * encoding will be overridden if png_set_gamma() is called - the results may be
+ * highly unexpected!
+ *
+ * The following numbers are derived from the sRGB standard and the research
+ * behind it.  sRGB is defined to be approximated by a PNG gAMA chunk value of
+ * 0.45455 (1/2.2) for PNG.  The value implicitly includes any viewing
+ * correction required to take account of any differences in the color
+ * environment of the original scene and the intended display environment; the
+ * value expresses how to *decode* the image for display, not how the original
+ * data was *encoded*.
+ *
+ * sRGB provides a peg for the PNG standard by defining a viewing environment.
+ * sRGB itself, and earlier TV standards, actually use a more complex transform
+ * (a linear portion then a gamma 2.4 power law) than PNG can express.  (PNG is
+ * limited to simple power laws.)  By saying that an image for direct display on
+ * an sRGB conformant system should be stored with a gAMA chunk value of 45455
+ * (11.3.3.2 and 11.3.3.5 of the ISO PNG specification) the PNG specification
+ * makes it possible to derive values for other display systems and
+ * environments.
+ *
+ * The Mac value is deduced from the sRGB based on an assumption that the actual
+ * extra viewing correction used in early Mac display systems was implemented as
+ * a power 1.45 lookup table.
+ *
+ * Any system where a programmable lookup table is used or where the behavior of
+ * the final display device characteristics can be changed requires system
+ * specific code to obtain the current characteristic.  However this can be
+ * difficult and most PNG gamma correction only requires an approximate value.
+ *
+ * By default, if png_set_alpha_mode() is not called, libpng assumes that all
+ * values are unencoded, linear, values and that the output device also has a
+ * linear characteristic.  This is only very rarely correct - it is invariably
+ * better to call png_set_alpha_mode() with PNG_DEFAULT_sRGB than rely on the
+ * default if you don't know what the right answer is!
+ *
+ * NOTE: the following values can be passed to either the fixed or floating
+ * point APIs, but the floating point API will also accept floating point
+ * values.
+ */
+#define PNG_DEFAULT_sRGB 0        /* sRGB gamma and color space */
+#define PNG_GAMMA_sRGB   220000   /* Television standards - matchs sRGB gamma */
+#define PNG_GAMMA_MAC    151724   /* Television with a 1.45 correction table */
+#define PNG_GAMMA_LINEAR PNG_FP_1 /* Linear */
+
+/* The following are examples of calls to png_set_alpha_mode to achieve the
+ * required overall gamma correction and, where necessary, alpha
+ * premultiplication.
+ *
+ * png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_DEFAULT_sRGB);
+ *    This is the default libpng handling of the alpha channel - it is not
+ *    pre-multiplied into the color components.  In addition the call states
+ *    that the output is for a sRGB system and causes all PNG files without gAMA
+ *    chunks to be assumed to be encoded using sRGB.
+ *
+ * png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_GAMMA_MAC);
+ *    In this case the output is assumed to be something like an sRGB conformant
+ *    display preceeded by a power-law lookup table of power 1.45.  This is how
+ *    early Mac systems behaved.
+ *
+ * png_set_alpha_mode(pp, PNG_ALPHA_STANDRAD, PNG_GAMMA_LINEAR);
+ *    This is the classic Jim Blinn approach and will work in academic
+ *    environments where everything is done by the book.  It has the shortcoming
+ *    of assuming that input PNG data with no gamma information is linear - this
+ *    is unlikely to be correct unless the PNG files where generated locally.
+ *    Most of the time the output precision will be so low as to show
+ *    significant banding in dark areas of the image.
+ *
+ * png_set_expand_16(pp);
+ * png_set_alpha_mode(pp, PNG_ALPHA_STANDARD, PNG_DEFAULT_sRGB);
+ *    This is a somewhat more realistic Jim Blinn inspired approach.  PNG files
+ *    are assumed to have the sRGB encoding if not marked with a gamma value and
+ *    the output is always 16 bits per component.  This permits accurate scaling
+ *    and processing of the data.  If you know that your input PNG files were
+ *    generated locally you might need to replace PNG_DEFAULT_sRGB with the
+ *    correct value for your system.
+ *
+ * png_set_alpha_mode(pp, PNG_ALPHA_OPTIMIZED, PNG_DEFAULT_sRGB);
+ *    If you just need to composite the PNG image onto an existing background
+ *    and if you control the code that does this you can use the optimization
+ *    setting.  In this case you just copy completely opaque pixels to the
+ *    output.  For pixels that are not completely transparent (you just skip
+ *    those) you do the composition math using png_composite or png_composite_16
+ *    below then encode the resultant 8 or 16 bit values to match the output
+ *    encoding.
+ *
+ * Other cases
+ *    If neither the PNG nor the standard linear encoding work for you because
+ *    of the software or hardware you use then you have a big problem.  The PNG
+ *    case will probably result in halos around the image.  The linear encoding
+ *    will probably result in a washed out, too bright, image (it's actually too
+ *    contrasty.)  Try the ALPHA_OPTIMIZED mode above - this will probably
+ *    substantially reduce the halos.  Alternatively try:
+ *
+ * png_set_alpha_mode(pp, PNG_ALPHA_BROKEN, PNG_DEFAULT_sRGB);
+ *    This option will also reduce the halos, but there will be slight dark
+ *    halos round the opaque parts of the image where the background is light.
+ *    In the OPTIMIZED mode the halos will be light halos where the background
+ *    is dark.  Take your pick - the halos are unavoidable unless you can get
+ *    your hardware/software fixed!  (The OPTIMIZED approach is slightly
+ *    faster.)
+ *
+ * When the default gamma of PNG files doesn't match the output gamma.
+ *    If you have PNG files with no gamma information png_set_alpha_mode allows
+ *    you to provide a default gamma, but it also sets the ouput gamma to the
+ *    matching value.  If you know your PNG files have a gamma that doesn't
+ *    match the output you can take advantage of the fact that
+ *    png_set_alpha_mode always sets the output gamma but only sets the PNG
+ *    default if it is not already set:
+ *
+ * png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_DEFAULT_sRGB);
+ * png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_GAMMA_MAC);
+ *    The first call sets both the default and the output gamma values, the
+ *    second call overrides the output gamma without changing the default.  This
+ *    is easier than achieving the same effect with png_set_gamma.  You must use
+ *    PNG_ALPHA_PNG for the first call - internal checking in png_set_alpha will
+ *    fire if more than one call to png_set_alpha_mode and png_set_background is
+ *    made in the same read operation, however multiple calls with PNG_ALPHA_PNG
+ *    are ignored.
+ */
+#endif
+
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 PNG_EXPORT(36, void, png_set_strip_alpha, (png_structp png_ptr));
 #endif
@@ -1214,12 +1412,16 @@ PNG_EXPORT(49, void, png_set_quantize,
  */
 #define PNG_GAMMA_THRESHOLD (PNG_GAMMA_THRESHOLD_FIXED*.00001)
 
-/* Handle gamma correction. Screen_gamma=(display_exponent) */
+/* Handle gamma correction. Screen_gamma=(display_exponent).
+ * NOTE: this API simply sets the screen and file gamma values, it will
+ * therefore override the value for gamma in a PNG file if it is called after
+ * the file header has been read - use with care!
+ */
 PNG_FP_EXPORT(50, void, png_set_gamma,
     (png_structp png_ptr, double screen_gamma,
-    double default_file_gamma));
+    double override_file_gamma));
 PNG_FIXED_EXPORT(208, void, png_set_gamma_fixed, (png_structp png_ptr,
-    png_fixed_point screen_gamma, png_fixed_point default_file_gamma));
+    png_fixed_point screen_gamma, png_fixed_point override_file_gamma));
 #endif
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
@@ -2328,7 +2530,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(226);
+  PNG_EXPORT_LAST_ORDINAL(228);
 #endif
 
 #ifdef __cplusplus
