@@ -18,13 +18,13 @@ pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngvalid_SOURCES = pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
-TESTS_ENVIRONMENT= srcdir=$(srcdir) 
+TESTS_ENVIRONMENT= srcdir=$(srcdir)
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
 
 # generate the -config scripts if required
-binconfigs= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config 
+binconfigs= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 EXTRA_SCRIPTS= libpng-config libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 bin_SCRIPTS= @binconfigs@
 
@@ -159,7 +159,7 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 # be empty - no non-standard defines
 scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
 	rm -f $@ dfn?.out
-	test -z "$(CPPFLAGS)" 
+	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out\
 	    logunsupported=3 - ${srcdir}/scripts/pnglibconf.dfa 1>&2

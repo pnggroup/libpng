@@ -252,7 +252,7 @@ am__tar = @am__tar@
 am__untar = @am__untar@
 
 # generate the -config scripts if required
-binconfigs = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config 
+binconfigs = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -310,7 +310,7 @@ pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngvalid_SOURCES = pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
-TESTS_ENVIRONMENT = srcdir=$(srcdir) 
+TESTS_ENVIRONMENT = srcdir=$(srcdir)
 
 # man pages
 dist_man_MANS = libpng.3 libpngpf.3 png.5
@@ -413,7 +413,7 @@ config.h: stamp-h1
 stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
+$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
 	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
 	rm -f stamp-h1
 	touch $@
@@ -455,7 +455,7 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la: $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES) 
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la: $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES)
 	$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LINK) -rpath $(libdir) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LIBADD) $(LIBS)
 
 clean-checkPROGRAMS:
@@ -466,10 +466,10 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-pngtest$(EXEEXT): $(pngtest_OBJECTS) $(pngtest_DEPENDENCIES) 
+pngtest$(EXEEXT): $(pngtest_OBJECTS) $(pngtest_DEPENDENCIES)
 	@rm -f pngtest$(EXEEXT)
 	$(LINK) $(pngtest_OBJECTS) $(pngtest_LDADD) $(LIBS)
-pngvalid$(EXEEXT): $(pngvalid_OBJECTS) $(pngvalid_DEPENDENCIES) 
+pngvalid$(EXEEXT): $(pngvalid_OBJECTS) $(pngvalid_DEPENDENCIES)
 	@rm -f pngvalid$(EXEEXT)
 	$(LINK) $(pngvalid_OBJECTS) $(pngvalid_LDADD) $(LIBS)
 install-binSCRIPTS: $(bin_SCRIPTS)
@@ -1319,7 +1319,7 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 # be empty - no non-standard defines
 scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
 	rm -f $@ dfn?.out
-	test -z "$(CPPFLAGS)" 
+	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out\
 	    logunsupported=1 - ${srcdir}/scripts/pnglibconf.dfa 1>&2
