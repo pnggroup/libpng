@@ -294,7 +294,7 @@ png_zlib_release(png_structp png_ptr)
       if (ret != Z_OK)
       {
          png_const_charp err;
-         png_warning_parameters p;
+         PNG_WARNING_PARAMETERS(p)
 
          switch (ret)
          {
