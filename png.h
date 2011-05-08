@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.3beta06 - May 7, 2011
+ * libpng version 1.5.3beta06 - May 8, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.3beta06 - May 7, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.3beta06 - May 8, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -182,7 +182,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.3beta06, May 7, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.3beta06, May 8, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -294,7 +294,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    May 7, 2011
+ *    May 8, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -357,7 +357,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.3beta06"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.3beta06 - May 7, 2011\n"
+     " libpng version 1.5.3beta06 - May 8, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1145,7 +1145,7 @@ PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
  * standard alpha composition is relatively low, because the pixels are
  * isolated, therefore typically the accuracy loss in storing 8 bit linear
  * values is acceptable.  (This is not true if the alpha channel is used to
- * simiulate transparency over large areas - use 16 bits or the PNG format in
+ * simulate transparency over large areas - use 16 bits or the PNG format in
  * this case!)  This is the 'OPTIMIZED' format.  For this format a pixel is
  * treated as opaque only if the alpha value is equal to the maximum value.
  *
@@ -1229,7 +1229,7 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
  * values.
  */
 #define PNG_DEFAULT_sRGB 0        /* sRGB gamma and color space */
-#define PNG_GAMMA_sRGB   220000   /* Television standards - matchs sRGB gamma */
+#define PNG_GAMMA_sRGB   220000   /* Television standards--matches sRGB gamma */
 #define PNG_GAMMA_MAC    151724   /* Television with a 1.45 correction table */
 #define PNG_GAMMA_LINEAR PNG_FP_1 /* Linear */
 
@@ -1248,7 +1248,7 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
  *    display preceeded by a power-law lookup table of power 1.45.  This is how
  *    early Mac systems behaved.
  *
- * png_set_alpha_mode(pp, PNG_ALPHA_STANDRAD, PNG_GAMMA_LINEAR);
+ * png_set_alpha_mode(pp, PNG_ALPHA_STANDARD, PNG_GAMMA_LINEAR);
  *    This is the classic Jim Blinn approach and will work in academic
  *    environments where everything is done by the book.  It has the shortcoming
  *    of assuming that input PNG data with no gamma information is linear - this
@@ -1413,7 +1413,7 @@ PNG_EXPORT(49, void, png_set_quantize,
 #define PNG_GAMMA_THRESHOLD (PNG_GAMMA_THRESHOLD_FIXED*.00001)
 
 /* Handle gamma correction. Screen_gamma=(display_exponent).
- * NOTE: this API simply sets the screen and file gamma values, it will
+ * NOTE: this API simply sets the screen and file gamma values. It will
  * therefore override the value for gamma in a PNG file if it is called after
  * the file header has been read - use with care!
  */

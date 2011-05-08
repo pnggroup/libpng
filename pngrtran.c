@@ -196,7 +196,7 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
    else if (output_gamma < 70000 || output_gamma > 300000)
       png_error(png_ptr, "output gamma out of expected range");
 
-   /* The default file gamma is the inverse of the output gamma, the output
+   /* The default file gamma is the inverse of the output gamma; the output
     * gamma may be changed below so get the file value first:
     */
    file_gamma = png_reciprocal(output_gamma);
@@ -260,7 +260,7 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
    /* But always set the output gamma: */
    png_ptr->screen_gamma = output_gamma;
 
-   /* Finally, if pre-multiplying, set the background fields to achive the
+   /* Finally, if pre-multiplying, set the background fields to achieve the
     * desired result.
     */
    if (compose)
@@ -1540,7 +1540,7 @@ png_init_read_transformations(png_structp png_ptr)
 
             /* Prevent the transformations being done again.
              *
-             * NOTE: this is highly dubious, it zaps the transformations in
+             * NOTE: this is highly dubious; it zaps the transformations in
              * place.  This seems inconsistent with the general treatment of the
              * transformations elsewhere.
              */
@@ -1893,7 +1893,7 @@ png_do_read_transformations(png_structp png_ptr)
       png_error(png_ptr, "NULL row buffer");
    }
 
-   /* The following is debugging, prior to 1.5.3 the code was never compiled in,
+   /* The following is debugging; prior to 1.5.3 the code was never compiled in;
     * in 1.5.3 PNG_FLAG_DETECT_UNINITIALIZED was added and the macro
     * PNG_WARN_UNINITIALIZED_ROW removed.  In 1.5 the new flag is set only for
     * selected new APIs to ensure that there is no API change.
