@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta07 - May 8, 2011
+Libpng 1.5.3beta07 - May 9, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -101,7 +101,8 @@ Version 1.5.3beta06 [May 8, 2011]
   Removed the -D_ALL_SOURCE from definitions for AIX in CMakeLists.txt
   Implemented premultiplied alpha support: png_set_alpha_mode API
 
-Version 1.5.3beta07 [May 8, 2011]
+Version 1.5.3beta07 [May 9, 2011]
+  Added expand_16 suppport to the high level interface.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
