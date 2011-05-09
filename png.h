@@ -1084,7 +1084,7 @@ PNG_EXPORT(29, void, png_set_tRNS_to_alpha, (png_structp png_ptr));
 #endif
 
 #ifdef PNG_READ_EXPAND_16_SUPPORTED
-/* Expand to 16 bit channels, forces conversion of palette to RGB and expansion
+/* Expand to 16-bit channels, forces conversion of palette to RGB and expansion
  * of a tRNS chunk if present.
  */
 PNG_EXPORT(221, void, png_set_expand_16, (png_structp png_ptr));
@@ -1136,11 +1136,11 @@ PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
  * storing color channel values that have been scaled by the alpha.  The
  * advantage is that the color channels can be resampled (the image can be
  * scaled) in this form.  The disadvantage is that normal practice is to store
- * linear, not (gamma) encoded, values and this requires 16 bit channels for
- * still images rather than the 8 bit channels that are just about sufficient if
+ * linear, not (gamma) encoded, values and this requires 16-bit channels for
+ * still images rather than the 8-bit channels that are just about sufficient if
  * gamma encoding is used.  In addition all non-transparent pixel values,
  * including completely opaque ones, must be gamma encoded to produce the final
- * image.  This is the 'STANDARD', 'ASSOCIATED' or 'PREMULTIPLIED' format (the
+ * image.  This is the 'STANDARD', 'ASSOCIATED' or 'PREMULTIPLIED' mode (the
  * latter being the two common names for associated alpha color channels.)
  *
  * Since it is not necessary to perform arithmetic on opaque color values so
@@ -1149,10 +1149,10 @@ PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
  * the PNG format (adjusted for the output color space) while storing partially
  * opaque pixels in the standard, linear, format.  The accuracy required for
  * standard alpha composition is relatively low, because the pixels are
- * isolated, therefore typically the accuracy loss in storing 8 bit linear
+ * isolated, therefore typically the accuracy loss in storing 8-bit linear
  * values is acceptable.  (This is not true if the alpha channel is used to
- * simulate transparency over large areas - use 16 bits or the PNG format in
- * this case!)  This is the 'OPTIMIZED' format.  For this format a pixel is
+ * simulate transparency over large areas - use 16 bits or the PNG mode in
+ * this case!)  This is the 'OPTIMIZED' mode.  For this mode a pixel is
  * treated as opaque only if the alpha value is equal to the maximum value.
  *
  * The final choice is to gamma encode the alpha channel as well.  This is
@@ -1163,7 +1163,7 @@ PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
  * opaque areas of the composited PNG image because of arithmetic overflow.
  *
  * The API function png_set_alpha_mode specifies which of these choices to use
- * with a enumerated 'mode' value and the gamma of the required output:
+ * with an enumerated 'mode' value and the gamma of the required output:
  */
 #define PNG_ALPHA_PNG           0 /* according to the PNG standard */
 #define PNG_ALPHA_STANDARD      1 /* according to Porter/Duff */
@@ -1277,7 +1277,7 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
  *    setting.  In this case you just copy completely opaque pixels to the
  *    output.  For pixels that are not completely transparent (you just skip
  *    those) you do the composition math using png_composite or png_composite_16
- *    below then encode the resultant 8 or 16 bit values to match the output
+ *    below then encode the resultant 8-bit or 16-bit values to match the output
  *    encoding.
  *
  * Other cases
