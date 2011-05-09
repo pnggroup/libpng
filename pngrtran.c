@@ -194,10 +194,7 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
     * values are reasonable this may have to be changed.
     */
    else if (output_gamma < 70000 || output_gamma > 300000)
-      {
-         png_warning(png_ptr, "ignoring output gamma out of expected range");
-         return;
-      }
+      png_error(png_ptr, "output gamma out of expected range");
 
    /* The default file gamma is the inverse of the output gamma; the output
     * gamma may be changed below so get the file value first:
@@ -727,23 +724,17 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
     * premultiplied alpha support; this actually hides an undocumented feature
     * of the previous implementation which allowed gamma processing to be
     * disabled in background handling.  There is no evidence (so far) that this
-    * was being used, however png_set_background itself accepted and must still
+    * was being used; however, png_set_background itself accepted and must still
     * accept '0' for the gamma value it takes, because it isn't always used.
     *
     * Since this is an API change (albeit a very minor one that removes an
-    * undocumented API feature) it will only be made in 1.6.
+    * undocumented API feature) it will not be made until libpng-1.6.0.
     */
    if (file_gamma <= 0)
-   {
-      png_warning(png_ptr, "invalid file gamma to png_set_gamma");
-      return;
-   }
+      png_error(png_ptr, "invalid file gamma in png_set_gamma");
 
    if (scrn_gamma <= 0)
-   {
-      png_warning(png_ptr, "invalid screen gamma to png_set_gamma");
-      return;
-   }
+      png_error(png_ptr, "invalid screen gamma in png_set_gamma");
 #endif
 
    /* Set the gamma values unconditionally - this overrides the value in the PNG
@@ -900,8 +891,8 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
          break;
 
       default:
-         png_warning(png_ptr, "invalid error action to rgb_to_gray");
-         return;
+         png_error(png_ptr, "invalid error action to rgb_to_gray");
+         break;
    }
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #ifdef PNG_READ_EXPAND_SUPPORTED
@@ -1581,8 +1572,7 @@ png_init_read_transformations(png_structp png_ptr)
                   break;
 
                default:
-                  png_warning (png_ptr, "invalid background gamma type");
-                  return;
+                  png_error(png_ptr, "invalid background gamma type");
             }
 
             png_ptr->background_1.gray = png_gamma_correct(png_ptr,
