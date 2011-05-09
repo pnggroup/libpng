@@ -1118,15 +1118,19 @@ PNG_EXPORT(35, void, png_build_grayscale_palette, (int bit_depth,
 
 #ifdef PNG_READ_ALPHA_MODE_SUPPORTED
 /* How the alpha channel is interpreted - this affects how the color channels of
- * a PNG file are output when an alpha channel, or tRNS chunk is a palette file,
- * is present.
+ * a PNG file are returned when an alpha channel, or tRNS chunk in a palette
+ * file, is present.
  *
- * The default is to output data according to the PNG specification: the alpha
+ * This has no effect on the way pixels are written into a PNG output
+ * datastream. The color samples in a PNG datastream are never premultiplied
+ * with the alpha samples.
+ *
+ * The default is to return data according to the PNG specification: the alpha
  * channel is a linear measure of the contribution of the pixel to the
- * corresponding output pixel.  The gamma encoded color channels must be scaled
- * according to the contribution and to do this it is necessary to undo the
- * encoding, scale the color values, perform the composition and reencode the
- * values.  This is the 'PNG' format.
+ * corresponding composited pixel.  The gamma encoded color channels must be
+ * scaled according to the contribution and to do this it is necessary to undo
+ * the encoding, scale the color values, perform the composition and reencode
+ * the values.  This is the 'PNG' mode.
  *
  * The alternative is to 'associate' the alpha with the color information by
  * storing color channel values that have been scaled by the alpha.  The
