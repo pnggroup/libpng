@@ -1387,6 +1387,12 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       png_set_gray_to_rgb(png_ptr);
 #endif
 
+/* Added at libpng-1.5.3 */
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+   if (transforms & PNG_TRANSFORM_EXPAND_16)
+      png_set_expand_16(png_ptr);
+#endif
+
    /* We don't handle adding filler bytes */
 
    /* We use png_read_image and rely on that for interlace handling, but we also

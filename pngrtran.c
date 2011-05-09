@@ -187,7 +187,7 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
       output_gamma = PNG_GAMMA_sRGB;
    }
 
-   /* Else validate the value to ensure it is in a reasonable range, the value
+   /* Else validate the value to ensure it is in a reasonable range. The value
     * is expected to be 1 or greater, but this range test allows for some
     * viewing correction values.  The intent is to weed out users of this API
     * who use the inverse of the gamma value accidentally!  Since some of these
