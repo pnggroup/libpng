@@ -260,12 +260,14 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
  */
 
 /* Various modes of operation.  Note that after an init, mode is set to
- * zero automatically when the structure is created.
+ * zero automatically when the structure is created.  Three of these
+ * are defined in png.h because they need to be visible to applications
+ * that call png_set_unknown_chunk().
  */
-#define PNG_HAVE_IHDR               0x01
-#define PNG_HAVE_PLTE               0x02
+/* #define PNG_HAVE_IHDR            0x01 (defined in png.h) */
+/* #define PNG_HAVE_PLTE            0x02 (defined in png.h) */
 #define PNG_HAVE_IDAT               0x04
-#define PNG_AFTER_IDAT              0x08 /* Have complete zlib datastream */
+/* #define PNG_AFTER_IDAT           0x08 (defined in png.h) */
 #define PNG_HAVE_IEND               0x10
 #define PNG_HAVE_gAMA               0x20
 #define PNG_HAVE_cHRM               0x40

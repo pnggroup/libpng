@@ -106,6 +106,9 @@ Version 1.5.3beta07 [May 11, 2011]
   Added named value and 'flag' gamma support to png_set_gamma.  Made a minor
     change from the previous (unreleased) ABI/API to hide the exact value used
     for Macs - it's not a good idea to embed this in the ABI!
+  Moved macro definitions for PNG_HAVE_IHDR, PNG_HAVE_PLTE, and PNG_AFTER_IDAT
+    from pngpriv.h to png.h because they must be visible to applications
+    that call png_set_unknown_chunks().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

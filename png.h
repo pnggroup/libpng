@@ -665,11 +665,20 @@ typedef struct png_unknown_chunk_t
     /* libpng-using applications should NOT directly modify this byte. */
     png_byte location; /* mode of operation at read time */
 }
+
+/* Values for the unknown chunk location byte */
+
+#define PNG_HAVE_IHDR  0x01
+#define PNG_HAVE_PLTE  0x02
+#define PNG_AFTER_IDAT 0x08
+
 png_unknown_chunk;
 typedef png_unknown_chunk FAR * png_unknown_chunkp;
 typedef PNG_CONST png_unknown_chunk FAR * png_const_unknown_chunkp;
 typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
 #endif
+
+
 
 /* The complete definition of png_info has, as of libpng-1.5.0,
  * been moved into a separate header file that is not accessible to
