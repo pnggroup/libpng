@@ -3368,6 +3368,8 @@ Version 1.5.3beta07 [May 11, 2011]
   Moved macro definitions for PNG_HAVE_IHDR, PNG_HAVE_PLTE, and PNG_AFTER_IDAT
     from pngpriv.h to png.h because they must be visible to applications
     that call png_set_unknown_chunks().
+  Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
+    before IDAT.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

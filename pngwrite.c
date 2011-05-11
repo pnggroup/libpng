@@ -99,8 +99,10 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
          int keep = png_handle_as_unknown(png_ptr, up->name);
 
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location && !(up->location & PNG_HAVE_PLTE) &&
+             up->location &&
+             !(up->location & PNG_HAVE_PLTE) &&
              !(up->location & PNG_HAVE_IDAT) &&
+             !(up->location & PNG_AFTER_IDAT) &&
              ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
              (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
@@ -273,8 +275,10 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
       {
          int keep = png_handle_as_unknown(png_ptr, up->name);
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location && (up->location & PNG_HAVE_PLTE) &&
+             up->location &&
+             (up->location & PNG_HAVE_PLTE) &&
              !(up->location & PNG_HAVE_IDAT) &&
+             !(up->location & PNG_AFTER_IDAT) &&
              ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
              (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
@@ -380,7 +384,8 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
       {
          int keep = png_handle_as_unknown(png_ptr, up->name);
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location && (up->location & PNG_AFTER_IDAT) &&
+             up->location &&
+             (up->location & PNG_AFTER_IDAT) &&
              ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
              (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
