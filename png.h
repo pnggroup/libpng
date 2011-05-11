@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.3beta07 - May 9, 2011
+ * libpng version 1.5.3beta07 - May 11, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.3beta07 - May 9, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.3beta07 - May 11, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -182,7 +182,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.3beta07, May 9, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.3beta07, May 11, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -294,7 +294,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    May 9, 2011
+ *    May 11, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -357,7 +357,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.3beta07"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.3beta07 - May 9, 2011\n"
+     " libpng version 1.5.3beta07 - May 11, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1176,7 +1176,9 @@ PNG_FP_EXPORT(227, void, png_set_alpha_mode, (png_structp png_ptr, int mode,
     double output_gamma));
 PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
     int mode, png_fixed_point output_gamma));
+#endif
 
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_ALPHA_MODE_SUPPORTED)
 /* The output_gamma value is a screen gamma in libpng terminology: it expresses
  * how to decode the output values, not how they are encoded.  The values used
  * correspond to the normal numbers used to describe the overall gamma of a
@@ -1230,14 +1232,22 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
  * better to call png_set_alpha_mode() with PNG_DEFAULT_sRGB than rely on the
  * default if you don't know what the right answer is!
  *
+ * The special value PNG_GAMMA_MAC_18 indicates an older Mac system (pre Mac OS
+ * 10.6) which used a correction table to implement a somewhat lower gamma on an
+ * otherwise sRGB system.
+ *
+ * Both these values are reserved (not simple gamma values) in order to allow
+ * more precise correction internally in the future.
+ *
  * NOTE: the following values can be passed to either the fixed or floating
  * point APIs, but the floating point API will also accept floating point
  * values.
  */
-#define PNG_DEFAULT_sRGB 0        /* sRGB gamma and color space */
+#define PNG_DEFAULT_sRGB -1       /* sRGB gamma and color space */
+#define PNG_GAMMA_MAC_18 -2       /* Old Mac '1.8' gamma and color space */
 #define PNG_GAMMA_sRGB   220000   /* Television standards--matches sRGB gamma */
-#define PNG_GAMMA_MAC    151724   /* Television with a 1.45 correction table */
 #define PNG_GAMMA_LINEAR PNG_FP_1 /* Linear */
+#endif
 
 /* The following are examples of calls to png_set_alpha_mode to achieve the
  * required overall gamma correction and, where necessary, alpha
@@ -1314,7 +1324,6 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structp png_ptr,
  *    made in the same read operation, however multiple calls with PNG_ALPHA_PNG
  *    are ignored.
  */
-#endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 PNG_EXPORT(36, void, png_set_strip_alpha, (png_structp png_ptr));
@@ -1421,7 +1430,13 @@ PNG_EXPORT(49, void, png_set_quantize,
 /* Handle gamma correction. Screen_gamma=(display_exponent).
  * NOTE: this API simply sets the screen and file gamma values. It will
  * therefore override the value for gamma in a PNG file if it is called after
- * the file header has been read - use with care!
+ * the file header has been read - use with care  - call before reading the PNG
+ * file for best results!
+ *
+ * These routines accept the same gamma values as png_set_alpha_mode (described
+ * above).  The PNG_GAMMA_ defines and PNG_DEFAULT_sRGB can be passed to either
+ * API (floating point or fixed.)  Notice, however, that the 'file_gamma' value
+ * is the inverse of a 'screen gamma' value.
  */
 PNG_FP_EXPORT(50, void, png_set_gamma,
     (png_structp png_ptr, double screen_gamma,

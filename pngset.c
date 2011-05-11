@@ -545,7 +545,7 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
    png_set_sRGB(png_ptr, info_ptr, srgb_intent);
 
 #  ifdef PNG_gAMA_SUPPORTED
-   png_set_gAMA_fixed(png_ptr, info_ptr, 45455L);
+   png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_sRGB_INVERSE);
 #  endif
 
 #  ifdef PNG_cHRM_SUPPORTED

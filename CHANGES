@@ -3360,8 +3360,11 @@ Version 1.5.3beta06 [May 8, 2011]
   Removed the -D_ALL_SOURCE from definitions for AIX in CMakeLists.txt
   Implemented premultiplied alpha support: png_set_alpha_mode API
 
-Version 1.5.3beta07 [May 9, 2011]
+Version 1.5.3beta07 [May 11, 2011]
   Added expand_16 support to the high level interface.
+  Added named value and 'flag' gamma support to png_set_gamma.  Made a minor
+    change from the previous (unreleased) ABI/API to hide the exact value used
+    for Macs - it's not a good idea to embed this in the ABI!
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

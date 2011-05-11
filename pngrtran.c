@@ -159,6 +159,68 @@ png_set_strip_alpha(png_structp png_ptr)
 }
 #endif
 
+#if defined(PNG_READ_ALPHA_MODE_SUPPORTED) || defined(PNG_READ_GAMMA_SUPPORTED)
+static png_fixed_point
+translate_gamma_flags(png_structp png_ptr, png_fixed_point output_gamma,
+   int is_screen)
+{
+   /* Check for flag values.  The main reason for having the old Mac value as a
+    * flag is that it is pretty near impossible to work out what the correct
+    * value is from Apple documentation - a working Mac system is needed to
+    * discover the value!
+    */
+   if (output_gamma == PNG_DEFAULT_sRGB ||
+      output_gamma == PNG_FP_1 / PNG_DEFAULT_sRGB)
+   {
+      /* If there is no sRGB support this just sets the gamma to the standard
+       * sRGB value.  (This is a side effect of using this function!)
+       */
+#     ifdef PNG_READ_sRGB_SUPPORTED
+         png_ptr->flags |= PNG_FLAG_ASSUME_sRGB;
+#     endif
+      if (is_screen)
+         output_gamma = PNG_GAMMA_sRGB;
+      else
+         output_gamma = PNG_GAMMA_sRGB_INVERSE;
+   }
+
+   else if (output_gamma == PNG_GAMMA_MAC_18 ||
+      output_gamma == PNG_FP_1 / PNG_GAMMA_MAC_18)
+   {
+      if (is_screen)
+         output_gamma = PNG_GAMMA_MAC_OLD;
+      else
+         output_gamma = PNG_GAMMA_MAC_INVERSE;
+   }
+
+   return output_gamma;
+}
+
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
+static png_fixed_point
+convert_gamma_value(png_structp png_ptr, double output_gamma)
+{
+   /* The following silently ignores cases where fixed point (times 100,000)
+    * gamma values are passed to the floating point API.  This is safe and it
+    * means the fixed point constants work just fine with the floating point
+    * API.  The alternative would just lead to undetected errors and spurious
+    * bug reports.  Negative values fail inside the _fixed API unless they
+    * correspond to the flag values.
+    */
+   if (output_gamma > 0 && output_gamma < 128)
+      output_gamma *= PNG_FP_1;
+
+   /* This preserves -1 and -2 exactly: */
+   output_gamma = floor(output_gamma + .5);
+
+   if (output_gamma > PNG_FP_MAX || output_gamma < PNG_FP_MIN)
+      png_fixed_error(png_ptr, "gamma value");
+
+   return (png_fixed_point)output_gamma;
+}
+#  endif
+#endif /* READ_ALPHA_MODE || READ_GAMMA */
+
 #ifdef PNG_READ_ALPHA_MODE_SUPPORTED
 void PNGFAPI
 png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
@@ -172,28 +234,15 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
    if (png_ptr == NULL)
       return;
 
-   /* If the default_gamma value is 0 then switch on the whole sRGB
-    * edifice by this flag (note: this is a flag to the later code,
-    * not a transformation!)
-    */
-   if (output_gamma == PNG_DEFAULT_sRGB)
-   {
-      /* If there is no sRGB support this just sets the gamma to the standard
-       * sRGB value.
-       */
-#     ifdef PNG_READ_sRGB_SUPPORTED
-         png_ptr->flags |= PNG_FLAG_ASSUME_sRGB;
-#     endif
-      output_gamma = PNG_GAMMA_sRGB;
-   }
+   output_gamma = translate_gamma_flags(png_ptr, output_gamma, 1/*screen*/);
 
-   /* Else validate the value to ensure it is in a reasonable range. The value
+   /* Validate the value to ensure it is in a reasonable range. The value
     * is expected to be 1 or greater, but this range test allows for some
     * viewing correction values.  The intent is to weed out users of this API
     * who use the inverse of the gamma value accidentally!  Since some of these
     * values are reasonable this may have to be changed.
     */
-   else if (output_gamma < 70000 || output_gamma > 300000)
+   if (output_gamma < 70000 || output_gamma > 300000)
       png_error(png_ptr, "output gamma out of expected range");
 
    /* The default file gamma is the inverse of the output gamma; the output
@@ -286,19 +335,8 @@ png_set_alpha_mode_fixed(png_structp png_ptr, int mode,
 void PNGAPI
 png_set_alpha_mode(png_structp png_ptr, int mode, double output_gamma)
 {
-   /* The following silently ignores cases where fixed point (times 100,000)
-    * gamma values are passed to the floating point API.  This is safe and it
-    * means the fixed point constants work just fine with the floating point
-    * API.  The alternative would just lead to undetected errors and spurious
-    * bug reports.  Negative values fail inside the _fixed API.
-    */
-   if (output_gamma > -128 && output_gamma < 128)
-      output_gamma *= PNG_FP_1;
-
-   if (output_gamma <= PNG_FP_MAX && output_gamma >= PNG_FP_MIN)
-      png_set_alpha_mode_fixed(png_ptr, mode, (png_fixed_point)output_gamma);
-   else
-      png_fixed_error(png_ptr, "png_set_alpha_mode gamma");
+   png_set_alpha_mode_fixed(png_ptr, mode, convert_gamma_value(png_ptr,
+      output_gamma));
 }
 #  endif
 #endif
@@ -719,6 +757,10 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
    if (png_ptr == NULL)
       return;
 
+   /* New in libpng-1.5.3 - reserve particular negative values as flags. */
+   scrn_gamma = translate_gamma_flags(png_ptr, scrn_gamma, 1/*screen*/);
+   file_gamma = translate_gamma_flags(png_ptr, file_gamma, 0/*file*/);
+
 #if PNG_LIBPNG_VER >= 10600
    /* Checking the gamma values for being >0 was added in 1.5.3 along with the
     * premultiplied alpha support; this actually hides an undocumented feature
@@ -749,9 +791,8 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
 void PNGAPI
 png_set_gamma(png_structp png_ptr, double scrn_gamma, double file_gamma)
 {
-   png_set_gamma_fixed(png_ptr,
-      png_fixed(png_ptr, scrn_gamma, "png_set_gamma screen gamma"),
-      png_fixed(png_ptr, file_gamma, "png_set_gamma file gamma"));
+   png_set_gamma_fixed(png_ptr, convert_gamma_value(png_ptr, scrn_gamma),
+      convert_gamma_value(png_ptr, file_gamma));
 }
 #  endif /* FLOATING_POINT_SUPPORTED */
 #endif /* READ_GAMMA */

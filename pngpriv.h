@@ -459,6 +459,11 @@ PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
 #define PNG_tRNS PNG_CONST png_byte png_tRNS[5] = {116,  82,  78,  83, '\0'}
 #define PNG_zTXt PNG_CONST png_byte png_zTXt[5] = {122,  84,  88, 116, '\0'}
 
+/* Gamma values (new at libpng-1.5.3): */
+#define PNG_GAMMA_MAC_OLD 151724  /* Assume '1.8' is really 2.2/1.45! */
+#define PNG_GAMMA_MAC_INVERSE 65909
+#define PNG_GAMMA_sRGB_INVERSE 45455
+
 
 /* Inhibit C++ name-mangling for libpng functions but not for system calls. */
 #ifdef __cplusplus
