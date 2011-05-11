@@ -3371,6 +3371,8 @@ Version 1.5.3beta07 [May 11, 2011]
   Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
     before IDAT.
 
+Version 1.5.3beta08 [May 11, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

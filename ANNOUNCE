@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta07 - May 11, 2011
+Libpng 1.5.3beta08 - May 11, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3beta07.tar.xz (LZMA-compressed, recommended)
-   1.5.3beta07.tar.gz
-   1.5.3beta07.tar.bz2
+   1.5.3beta08.tar.xz (LZMA-compressed, recommended)
+   1.5.3beta08.tar.gz
+   1.5.3beta08.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153b07.7z  (LZMA-compressed, recommended)
-   lp153b07.zip
+   lp153b08.7z  (LZMA-compressed, recommended)
+   lp153b08.zip
 
 Other information:
 
-   1.5.3beta07-README.txt
-   1.5.3beta07-LICENSE.txt
+   1.5.3beta08-README.txt
+   1.5.3beta08-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -111,6 +111,8 @@ Version 1.5.3beta07 [May 11, 2011]
     that call png_set_unknown_chunks().
   Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
     before IDAT.
+
+Version 1.5.3beta08 [May 11, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
