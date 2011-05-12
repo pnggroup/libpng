@@ -6110,7 +6110,6 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
     png_const_bytep pRow)
 {
    /* Get some constants derived from the input and output file formats: */
-   PNG_CONST int speed = dp->speed;
    PNG_CONST png_byte in_ct = dp->this.colour_type;
    PNG_CONST png_byte in_bd = dp->this.bit_depth;
    PNG_CONST png_uint_32 w = dp->this.w;
@@ -6165,9 +6164,8 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
 
    init_validate_info(&vi, dp, pp, out_bd);
 
-   processing = (vi.gamma_correction > 0 && !dp->threshold_test
-      && !speed && in_ct != 3) || in_bd != out_bd || in_ct != out_ct ||
-      vi.do_background;
+   processing = (vi.gamma_correction > 0 && !dp->threshold_test && in_ct != 3)
+      || in_bd != out_bd || in_ct != out_ct || vi.do_background;
 
    for (y=0; y<h; ++y, pRow += cbRow)
    {
@@ -6229,7 +6227,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi,
          }
       }
 
-      else if (!speed && memcmp(std, pRow, cbRow) != 0)
+      else if (memcmp(std, pRow, cbRow) != 0)
       {
          char msg[64];
 
@@ -6248,7 +6246,8 @@ gamma_end(png_structp pp, png_infop pi)
 {
    gamma_display *dp = png_get_progressive_ptr(pp);
 
-   gamma_image_validate(dp, pp, pi, dp->this.ps->image);
+   if (!dp->speed)
+      gamma_image_validate(dp, pp, pi, dp->this.ps->image);
 }
 
 /* A single test run checking a gamma transformation.
@@ -6319,7 +6318,8 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
 
          sequential_row(&d.this, pp, pi, NULL, d.this.ps->image);
 
-         gamma_image_validate(&d, pp, pi, d.this.ps->image);
+         if (!d.speed)
+            gamma_image_validate(&d, pp, pi, d.this.ps->image);
       }
 
       modifier_reset(d.pm);

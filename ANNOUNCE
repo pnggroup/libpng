@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta08 - May 11, 2011
+Libpng 1.5.3beta08 - May 12, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -112,7 +112,8 @@ Version 1.5.3beta07 [May 11, 2011]
   Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
     before IDAT.
 
-Version 1.5.3beta08 [May 11, 2011]
+Version 1.5.3beta08 [May 12, 2011]
+  Improve "pngvalid --speed" to exclude more of pngvalid from the time.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
