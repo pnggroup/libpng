@@ -1020,6 +1020,33 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    }
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+   /* Store the _white values as default coefficients for the rgb to gray
+    * operation if it is supported.
+    */
+   if ((png_ptr->transformations & PNG_RGB_TO_GRAY) == 0)
+   {
+      /* png_set_background has not been called, the coefficients must be in
+       * range for the following to work without overflow.
+       */
+      if (y_red <= (1<<17) && y_green <= (1<<17) && y_blue <= (1<<17))
+      {
+         /* The y values are chromaticities: Y/X+Y+Z, the weights for the gray
+          * transformation are simply the normalized Y values for red, green and
+          * blue scaled by 32768.
+          */
+         png_uint_32 w = y_red + y_green + y_blue;
+
+         png_ptr->rgb_to_gray_red_coeff   = (png_uint_16)(((png_uint_32)y_red *
+            32768)/w);
+         png_ptr->rgb_to_gray_green_coeff = (png_uint_16)(((png_uint_32)y_green
+            * 32768)/w);
+         png_ptr->rgb_to_gray_blue_coeff  = (png_uint_16)(((png_uint_32)y_blue *
+            32768)/w);
+      }
+   }
+#endif
+
    png_set_cHRM_fixed(png_ptr, info_ptr, x_white, y_white, x_red, y_red,
       x_green, y_green, x_blue, y_blue);
 }
@@ -1544,6 +1571,7 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_size_t truelen;
    png_byte buf[6];
+   png_color_16 background;
 
    png_debug(1, "in png_handle_bKGD");
 
@@ -1600,7 +1628,7 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
     */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
-      png_ptr->background.index = buf[0];
+      background.index = buf[0];
 
       if (info_ptr && info_ptr->num_palette)
       {
@@ -1610,33 +1638,36 @@ png_handle_bKGD(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
             return;
          }
 
-         png_ptr->background.red =
-             (png_uint_16)png_ptr->palette[buf[0]].red;
-
-         png_ptr->background.green =
-             (png_uint_16)png_ptr->palette[buf[0]].green;
-
-         png_ptr->background.blue =
-             (png_uint_16)png_ptr->palette[buf[0]].blue;
+         background.red = (png_uint_16)png_ptr->palette[buf[0]].red;
+         background.green = (png_uint_16)png_ptr->palette[buf[0]].green;
+         background.blue = (png_uint_16)png_ptr->palette[buf[0]].blue;
       }
+
+      else
+         background.red = background.green = background.blue = 0;
+
+      background.gray = 0;
    }
 
    else if (!(png_ptr->color_type & PNG_COLOR_MASK_COLOR)) /* GRAY */
    {
-      png_ptr->background.red =
-      png_ptr->background.green =
-      png_ptr->background.blue =
-      png_ptr->background.gray = png_get_uint_16(buf);
+      background.index = 0;
+      background.red =
+      background.green =
+      background.blue =
+      background.gray = png_get_uint_16(buf);
    }
 
    else
    {
-      png_ptr->background.red = png_get_uint_16(buf);
-      png_ptr->background.green = png_get_uint_16(buf + 2);
-      png_ptr->background.blue = png_get_uint_16(buf + 4);
+      background.index = 0;
+      background.red = png_get_uint_16(buf);
+      background.green = png_get_uint_16(buf + 2);
+      background.blue = png_get_uint_16(buf + 4);
+      background.gray = 0;
    }
 
-   png_set_bKGD(png_ptr, info_ptr, &(png_ptr->background));
+   png_set_bKGD(png_ptr, info_ptr, &background);
 }
 #endif
 

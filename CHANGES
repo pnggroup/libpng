@@ -3371,8 +3371,16 @@ Version 1.5.3beta07 [May 11, 2011]
   Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
     before IDAT.
 
-Version 1.5.3beta08 [May 12, 2011]
-  Improve "pngvalid --speed" to exclude more of pngvalid from the time.
+Version 1.5.3beta08 [May 13, 2011]
+  Improved "pngvalid --speed" to exclude more of pngvalid from the time.
+  Documented png_set_alpha_mode(), other changes in libpng.3/libpng-manual.txt
+  The cHRM chunk now sets the defaults for png_set_rgb_to_gray() (when negative
+    parameters are supplied by the caller), while in the absence of cHRM
+    sRGB/Rec 709 values are still used.
+  The bKGD chunk no longer overwrites the background value set by
+    png_set_background(), allowing the latter to be used before the file
+    header is read. It never performed any useful function to override
+    the default anyway.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

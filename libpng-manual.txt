@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.3beta08 - May 11, 2011
+ libpng version 1.5.3beta08 - May 13, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.3beta08 - May 11, 2011
+ libpng versions 0.97, January 1998, through 1.5.3beta08 - May 13, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -637,6 +637,223 @@ and you can retrieve the limit with
 Any chunks that would cause either of these limits to be exceeded will
 be ignored.
 
+Information about your system
+
+If you intend to display the PNG or to incorporate it in other image data you
+need to tell libpng information about your display or drawing surface so that
+libpng can convert the values in the image to match the display.
+
+From libpng-1.5.3 this information can be set before reading the PNG file
+header.  In earlier versions png_set_gamma() existed but behaved incorrectly if
+called before the PNG file header had been read and png_set_alpha_mode() did not
+exist.
+
+If you need to support versions prior to libpng-1.5.3 test the version number
+and follow the procedures described in the appropriate manual page.
+
+You give libpng the encoding expected by your system expressed as a 'gamma'
+value.  You can also specify a default encoding for the PNG file in
+case the required information is missing from the file.  By default libpng
+assumes that the PNG data matches your system, to keep this default call:
+
+   png_set_gamma(png_ptr, screen_gamma, 1/screen_gamma/*file gamma*/);
+
+or you can use the fixed point equivalent:
+
+   png_set_gamma_fixed(png_ptr, PNG_FP_1*screen_gamma, PNG_FP_1/screen_gamma);
+
+If you don't know the gamma for you system it is probably 2.2 - a good
+approximation to the IEC standard for display systems (sRGB).  If images are
+too contrasty or washed out you got the value wrong - check your system
+documentation!
+
+Many systems permit the system gamma to be changed via a lookup table in the
+display driver, a few systems, including older Macs, change the response by
+default.  As of 1.5.3 three special values are available to handle common
+situations:
+
+   PNG_DEFAULT_sRGB: Indicates that the system conforms to the IEC 61966-2-1
+                     standard.  This matches almost all systems.
+   PNG_GAMMA_MAC_18: Indicates that the system is an older (pre Mac OS 10.6)
+                     Apple Macintosh system with the default settings.
+   PNG_GAMMA_LINEAR: Just the fixed point value for 1.0 - indicates that the
+                     system expects data with no gamma encoding.
+
+You would use the linear (unencoded) value if you need to process the pixel
+values further because this avoids the need to decode and reencode each
+component value whenever arithmetic is performed.  A lot of graphics software
+uses linear values for this reason, often with higher precision component values
+to preserve overall accuracy.
+
+The second thing you may need to tell libpng about is how your system handles
+alpha channel information.  Some, but not all, PNG files contain an alpha
+channel.  To display these files correctly you need to compose the data onto a
+suitable background, as described in the PNG specification.
+
+Libpng only supports composing onto a single color (using png_set_background;
+see below.)  Otherwise you must do the composition yourself and, in this case,
+you may need to call png_set_alpha_mode:
+
+   png_set_alpha_mode(png_ptr, mode, screen_gamma);
+
+The screen_gamma value is the same as the argument to png_set_gamma, however how
+it effects the output depends on the mode.  png_set_alpha_mode sets the file
+gamma default to 1/screen_gamma, so normally you don't need to call
+png_set_gamma.  If you need different defaults call png_set_gamma before
+png_set_alpha_mode - if you call it after it will override the settings made by
+png_set_alpha_mode.
+
+The mode is as follows:
+
+   PNG_ALPHA_PNG: The data is encoded according to the PNG specification.  Red,
+                  green and blue, or gray, components are gamma encoded color
+                  values and are not premultiplied by the alpha value.  The
+                  alpha value is a linear measure of the contribution of the
+                  pixel to the corresponding final output pixel.
+
+                  You should normally use this format if you intend to perform
+                  color correction on the color values; most, maybe all, color
+                  correction software has no handling for the alpha channel and,
+                  anyway, the math to handle pre-multiplied component values is
+                  unnecessarily complex.
+
+                  Before you do any arithmetic on the component values you need
+                  to remove the gamma encoding and multiply out the alpha
+                  channel.  See the PNG specification for more detail.  It is
+                  important to note that when an image with an alpha channel is
+                  scaled linear encoded, pre-multiplied, component values must
+                  be used!
+
+The remaining modes assume you don't need to do any further color correction or
+that if you do your color correction software knows all about alpha (it
+probably doesn't!)
+
+   PNG_ALPHA_STANDARD:  The data libpng produces is encoded in the standard way
+                        assumed by most correctly written graphics software.
+                        The gamma encodiing will be removed by libpng and the
+                        linear component values will be pre-multiplied by the
+                        alpha channel.
+
+                        With this format the final image must be re-encoded to
+                        match the display gamma before the image is displayed.
+                        If your system doesn't do that, yet still seems to
+                        perform arithmetic on the pixels without decoding them,
+                        it is broken - check out the modes below.
+
+                        With PNG_ALPHA_STANDARD libpng always produces linear
+                        component values, whatever screen_gamma you supply.  The
+                        screen_gamma value is, however, used as a default for
+                        the file gamma if the PNG file has no gamma information.
+
+                        If you call png_set_gamma after png_set_alpha_mode you
+                        will override the linear encoding.  Instead the
+                        pre-multiplied pixel values will be gamma encoded but
+                        the alpha channel will still be linear.  This may
+                        actually match the requirements of some broken software,
+                        but it is unlikely.
+
+                        While linear 8 bit data is often used it has
+                        insufficient precision for any image with a reasonable
+                        dynamic range.  To avoid problems, and if your software
+                        supports it, use png_set_expand_16() to force all
+                        components to 16 bits.
+
+   PNG_ALPHA_OPTIMIZED: This mode is the same as PNG_ALPHA_STANDARD except that
+                        completely opaque pixels are gamma encoded according to
+                        the screen_gamma value.  Pixels with alpha less than 1.0
+                        will still have linear components.
+
+                        Use this format if you have control over your
+                        compositing software and do don't do other arithmetic
+                        (such as scaling) on the data you get from libpng.  Your
+                        compositing software can simply copy opaque pixels to
+                        the output but still has linear values for the
+                        non-opaque pixels.
+
+                        In normal compositing, where the alpha channel encodes
+                        partial pixel coverage (as opposed to broad area
+                        translucency), the inaccuracies of the 8 bit
+                        representation of non-opaque pixels are irrelevant.
+
+                        You can also try this format if your software is broken;
+                        it might look better.
+
+   PNG_ALPHA_BROKEN     This is PNG_ALPHA_STANDARD however all component values,
+                        including the alpha channel are gamma encoded.  This is
+                        an appropriate format to try if your software, or more
+                        likely hardware, is totally broken: if it performs
+                        linear arithmetic directly on gamma encoded values.
+
+In most cases of broken software or hardware the bug in the final display
+manifests as a subtle halo around composited parts of the image.  You may not
+even perceive this as a halo; the composited part of the image may simply appear
+separate from the background, as though it had been cut out of paper and pasted
+on afterward.
+
+If you don't have to deal with bugs in software or hardware, or if you can fix
+them, there are three recommended ways of using png_set_alpha_mode:
+
+   png_set_alpha_mode(png_ptr, PNG_ALPHA_PNG, screen_gamma);
+      You can do color correction on the result (libpng does not currently
+      support color correction internally.)  When you handle the alpha channel
+      you need to undo the gamma encoding and multipy out the alpha.
+
+   png_set_alpha_mode(png_ptr, PNG_ALPHA_STANDARD, screen_gamma);
+   png_set_expand_16(png_ptr);
+      If you are using the high level interface don't call png_set_expand_16,
+      instead pass PNG_TRANSFORM_EXPAND_16 to the interface.
+
+      With this mode you can't do color corrrection, but you can do arithmetic,
+      including composition and scaling, on the data without further processing.
+
+   png_set_alpha_mode(png_ptr, PNG_ALPHA_OPTIMZED, screen_gamma);
+      You can avoid the expansion to 16 bit components with this mode, but you
+      lose the ability to scale the image or perform other linear arithmetic.
+      All you can do is compose the result onto a matching output.  Since this
+      mode is libpng specific you also need to write your own composition
+      software.
+
+If you don't need, or can't handle, the alpha channel you can call
+png_set_background to remove it by compositing against a fixed color.  Don't
+call png_set_strip_alpha to do this - it will leave spurious pixel values in
+transparent parts of this image.
+
+   png_set_background(png_ptr, &background_color, PNG_BACKGROUND_GAMMA_SCREEN,
+      0, 1);
+
+The background_color is an RGB or grayscale value according to the data format
+libpng will produce for you.  Because you don't yet know the format of the PNG
+file if you call png_set_background at this point you must arrange for the
+format produced by libpng to always have 8-bit or 16-bit components and then
+store the color as an 8-bit or 16-bit color as appropriate.  The color contains
+separate gray and RGB component values, so you can let libpng produce gray or
+RGB output according to the input format, but low bit depth grayscale images
+must always be converted to at least 8-bit format.  (Even low low bit depth
+grayscale images can't have an alpha channel they can have a transparent
+color!)
+
+You set the transforms you need later, either as flags to the high level
+interface or libpng API calls for the low level interface.  For reference the
+settings required are:
+
+8-bit values:
+   PNG_TRANSFORM_STRIP_16 | PNG_EXPAND
+   png_set_expand(png_ptr); png_set_strip_16(png_ptr);
+
+16-bit values:
+   PNG_TRANSFORM_EXPAND_16
+   png_set_expand_16(png_ptr);
+
+In either case palette image data will be expanded to RGB.  If you just want
+color data you can add PNG_TRANSFORM_GRAY_TO_RGB or png_set_gray_to_rgb(png_ptr)
+to the list.
+
+Calling png_set_background before the PNG file header is read will not work
+prior to libpng-1.5.3.  Because the failure may result in unexpected warnings or
+errors it is therefore much safer to call png_set_background after the head has
+been read.  Unfortunately this means that prior to libpng-1.5.3 it cannot be
+used with the high level interface.
+
 The high-level read interface
 
 At this point there are two ways to proceed; through the high-level
@@ -734,6 +951,22 @@ call to png_read_info().
     png_read_info(png_ptr, info_ptr);
 
 This will process all chunks up to but not including the image data.
+
+This also copies some of the data from the PNG file into the decode structure
+for use in later transformations.  Important information copied in is:
+
+1) The PNG file gamma from the gAMA chunk.  This overwrites the default value
+provided by an earlier call to png_set_gamma or png_set_alpha_mode.
+
+2) Prior to libpng-1.5.3 the background color from a bKGd chunk.  This
+damages the information provided by an earlier call to png_set_background
+resulting in expected behavior.  Libpng-1.5.3 no longer does this.
+
+3) The number of significant bits in each component value.  Libpng uses this to
+optimize gamma handling by reducing the internal lookup table sizes.
+
+4) The transparent color information from a tRNS chunk.  This can be modified by
+a later call to png_set_tRNS.
 
 Querying the info structure
 
@@ -1098,7 +1331,7 @@ forms:
        converted to microns and back without some loss
        of precision.
 
-For more information, see the png_info definition in png.h and the
+For more information, see the
 PNG specification for chunk contents.  Be careful with trusting
 rowbytes, as some of the transformations could increase the space
 needed to hold a row (expand, filler, gray_to_rgb, etc.).
@@ -1133,17 +1366,20 @@ to handle any special transformations of the image data.  The various
 ways to transform the data will be described in the order that they
 should occur.  This is important, as some of these change the color
 type and/or bit depth of the data, and some others only work on
-certain color types and bit depths.  Even though each transformation
-checks to see if it has data that it can do something with, you should
-make sure to only enable a transformation if it will be valid for the
-data.  For example, don't swap red and blue on grayscale data.
+certain color types and bit depths.
 
-The colors used for the background and transparency values should be
-supplied in the same format/depth as the current image data.  They
-are stored in the same format/depth as the image data in a bKGD or tRNS
-chunk, so this is what libpng expects for this data.  The colors are
-transformed to keep in sync with the image data when an application
-calls the png_read_update_info() routine (see below).
+Transformations you request are ignored if they don't have any meaning for a
+particular input data format.  However some transformations can have an effect
+as a result of a previous transformation.  If you specify a contradictory set of
+transformations, for example both adding and removing the alpha channel, you
+cannot predict the final result.
+
+The color used for the transparency values should be supplied in the same
+format/depth as the current image data.  It is stored in the same format/depth
+as the image data in a tRNS chunk, so this is what libpng expects for this data.
+
+The color used for the background value depends on the need_expand argument as
+described below.
 
 Data will be decoded into the supplied row buffers packed into bytes
 unless the library has been told to transform it into another format.
@@ -1197,18 +1433,16 @@ PNG can have files with 16 bits per channel.  If you only can handle
     if (bit_depth == 16)
        png_set_strip_16(png_ptr);
 
-If, for some reason, you don't need the alpha channel on an image,
-and you want to remove it rather than combining it with the background
-(but the image author certainly had in mind that you *would* combine
-it with the background, so that's what you should probably do):
+If you need to process the alpha channel on the image separately from the image
+data (for example if you convert it to a bitmap mask) it is possible to have
+libpng strip the channel leaving just RGB or gray data:
 
     if (color_type & PNG_COLOR_MASK_ALPHA)
        png_set_strip_alpha(png_ptr);
 
-See below for png_set_background(), which does the correct composition on a
-single opaque color.  This is probably what you should do in all cases rather
-than use png_set_strip_alpha() - unless you know for sure that it is the wrong
-thing to do.
+If you strip the alpha channel you need to find some other way of dealing with
+the information.  If, instead, you want to convert the image to an opaque
+version with no alpha channel use png_set_background; see below.
 
 As of libpng version 1.5.2, almost all useful expansions are supported, the
 major ommissions are convertion of grayscale to indexed images (which can be
@@ -1342,8 +1576,8 @@ with alpha.
 
     if (color_type == PNG_COLOR_TYPE_RGB ||
         color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-       png_set_rgb_to_gray_fixed(png_ptr, error_action,
-           int red_weight, int green_weight);
+       png_set_rgb_to_gray(png_ptr, error_action, double red_weight,
+          double green_weight);
 
     error_action = 1: silently do the conversion
 
@@ -1356,122 +1590,83 @@ with alpha.
                       image has any pixel where
                       red != green or red != blue
 
-    red_weight:       weight of red component times 100000
+    red_weight:       weight of red component
 
-    green_weight:     weight of green component times 100000
+    green_weight:     weight of green component
                       If either weight is negative, default
-                      weights (21268, 71514) are used.
+                      weights are used.
+
+In the corresponding fixed point API the red_weight and green_weight values are
+simply scaled by 100,000:
+
+    png_set_rgb_to_gray(png_ptr, error_action, png_fixed_point red_weight,
+       png_fixed_point green_weight);
 
 If you have set error_action = 1 or 2, you can
 later check whether the image really was gray, after processing
 the image rows, with the png_get_rgb_to_gray_status(png_ptr) function.
 It will return a png_byte that is zero if the image was gray or
-1 if there were any non-gray pixels.  bKGD and sBIT data
+1 if there were any non-gray pixels.  Background and sBIT data
 will be silently converted to grayscale, using the green channel
-data, regardless of the error_action setting.
+data for sBIT, regardless of the error_action setting.
 
-With red_weight+green_weight<=100000,
-the normalized graylevel is computed:
+The default values come from the PNG file cHRM chunk if present, otherwise the
+defaults correspond to the ITU-R recommendation 709, and also the sRGB color
+space, as recommended in the Charles Poynton's Colour FAQ,
+<http://www.poynton.com/>, in section 9:
 
-    int rw = red_weight * 65536;
-    int gw = green_weight * 65536;
-    int bw = 65536 - (rw + gw);
-    gray = (rw*red + gw*green + bw*blue)/65536;
-
-The default values approximate those recommended in the Charles
-Poynton's Color FAQ, <http://www.inforamp.net/~poynton/>
-Copyright (c) 1998-01-04 Charles Poynton <poynton at inforamp.net>
+   <http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC9>
 
     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
-
-Libpng approximates this with integers scaled by 32768:
-
-    Y = (6968 * R + 23434 * G + 2366 * B)/32768
 
 The calculation is done in a linear colorspace, if the image gamma
 can be determined.
 
-If you have a grayscale and you are using png_set_expand_gray_1_2_4_to_8(),
-png_set_expand(), or png_set_gray_to_rgb to change to truecolor or to
-a higher bit-depth, you must either supply the background color as a gray
-value at the original file bit-depth (need_expand = 1) or else supply the
-background color as an RGB triplet at the final, expanded bit depth
-(need_expand = 0).  Similarly, if you are reading a paletted image, you
-must either supply the background color as a palette index (need_expand = 1)
-or as an RGB triplet that may or may not be in the palette (need_expand = 0).
+The png_set_background() function has been described already, it tells libpng to
+composite images with alpha or simple transparency against the supplied
+background color.  For compatibility with versions of libpng earlier than
+libpng-1.5.3 it is recommended that you call the function after reading the file
+header, even if you don't want to use the color in a bKGD chunk, if one exists.
+
+If the PNG file contains a bKGD chunk (PNG_INFO_bKGD valid),
+you may use this color, or supply another color more suitable for
+the current display (e.g., the background color from a web page).  You
+need to tell libpng how the color is represented, both the format of the
+component values in the color (the number of bits) and the gamme encoding of the
+color.  The function takes two arguments, background_gamma_mode and need_expand
+to convey this information, however only two combinations are like to be useful:
 
     png_color_16 my_background;
     png_color_16p image_background;
 
     if (png_get_bKGD(png_ptr, info_ptr, &image_background))
        png_set_background(png_ptr, image_background,
-           PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
+           PNG_BACKGROUND_GAMMA_FILE, 1/*needs to be expanded*/, 1);
     else
        png_set_background(png_ptr, &my_background,
-           PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+           PNG_BACKGROUND_GAMMA_SCREEN, 0/*do not expand*/, 1);
 
-The png_set_background() function tells libpng to composite images
-with alpha or simple transparency against the supplied background
-color.  If the PNG file contains a bKGD chunk (PNG_INFO_bKGD valid),
-you may use this color, or supply another color more suitable for
-the current display (e.g., the background color from a web page).  You
-need to tell libpng whether the color is in the gamma space of the
-display (PNG_BACKGROUND_GAMMA_SCREEN for colors you supply), the file
-(PNG_BACKGROUND_GAMMA_FILE for colors from the bKGD chunk), or one
-that is neither of these gammas (PNG_BACKGROUND_GAMMA_UNIQUE - I don't
-know why anyone would use this, but it's here).
 
-To properly display PNG images on any kind of system, the application needs
-to know what the display gamma is.  Ideally, the user will know this, and
-the application will allow them to set it.  One method of allowing the user
-to set the display gamma separately for each system is to check for a
-SCREEN_GAMMA or DISPLAY_GAMMA environment variable, which will hopefully be
-correctly set.
+The second call was described above - my_background is in the format of the
+final, display, output produced by libpng.  Because you now know the format of
+the PNG it is possible to avoid the need to choose either 8 or 16 bit output and
+to retain palette images (the palette colors will be modified appropriately and
+the tRNS chunk removed.)  However, if you are doing this, take great care not to
+ask for transformations without checking first that they apply!
 
-Note that display_gamma is the overall gamma correction required to produce
-pleasing results, which depends on the lighting conditions in the surrounding
-environment.  In a dim or brightly lit room, no compensation other than
-the physical gamma exponent of the monitor is needed, while in a dark room
-a slightly smaller exponent is better.
+In the first call the background color has the original bit depth and color type
+of the PNG file.  So, for palette images the color is supplied as a palette
+index and for low bit greyscale images the color is a reduced bit value in
+image_background->gray.
 
-   double gamma, screen_gamma;
+If you didn't call png_set_gamma() before reading the file header, for example
+if you need your code to remain compatible with older versions of libpng prior
+to libpng-1.5.3, this is the place to call it.
 
-   if (/* We have a user-defined screen
-       gamma value */)
-   {
-      screen_gamma = user_defined_screen_gamma;
-   }
-
-   /* One way that applications can share the same
-      screen gamma value */
-   else if ((gamma_str = getenv("SCREEN_GAMMA"))
-      != NULL)
-   {
-      screen_gamma = (double)atof(gamma_str);
-   }
-
-   /* If we don't have another value */
-   else
-   {
-      screen_gamma = 2.2; /* A good guess for a
-           PC monitor in a bright office or a dim room */
-
-      screen_gamma = 2.0; /* A good guess for a
-           PC monitor in a dark room */
-
-      screen_gamma = 1.7 or 1.0;  /* A good
-           guess for Mac systems */
-   }
-
-The functions png_set_gamma() and its fixed point equivalent
-png_set_gamma_fixed() handle gamma transformations of the data.
-Pass both the file gamma and the current screen_gamma.  If the file does
-not have a gamma value, you can pass one anyway if you have an idea what
-it is (usually 0.45455 is a good guess for GIF images on PCs).  Note
-that file gammas are inverted from screen gammas.  See the discussions
-on gamma in the PNG specification for an excellent description of what
-gamma is, and why all applications should support it.  It is strongly
-recommended that PNG viewers support gamma correction.
+Do not call it if you called png_set_alpha_mode(); doing so will damage the
+settings put in place by png_set_alpha_mode().  (If png_set_alpha_mode() is
+supported then you can certainly do png_set_gamma() before reading the PNG
+header.)
 
 This API unconditionally sets the screen and file gamma values, so it will
 override the value in the PNG file unless it is called before the PNG file
@@ -4199,7 +4394,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-May 11, 2011
+May 13, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
