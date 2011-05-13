@@ -1648,92 +1648,92 @@ you may need to call png_set_alpha_mode:
    png_set_alpha_mode(png_ptr, mode, screen_gamma);
 
 The screen_gamma value is the same as the argument to png_set_gamma, however how
-it effects the output depends on the mode.  png_set_alpha_mode sets the file
+it affects the output depends on the mode.  png_set_alpha_mode() sets the file
 gamma default to 1/screen_gamma, so normally you don't need to call
-png_set_gamma.  If you need different defaults call png_set_gamma before
-png_set_alpha_mode - if you call it after it will override the settings made by
-png_set_alpha_mode.
+png_set_gamma.  If you need different defaults call png_set_gamma() before
+png_set_alpha_mode() - if you call it after it will override the settings made
+by png_set_alpha_mode().
 
 The mode is as follows:
 
-   PNG_ALPHA_PNG: The data is encoded according to the PNG specification.  Red,
-                  green and blue, or gray, components are gamma encoded color
-                  values and are not premultiplied by the alpha value.  The
-                  alpha value is a linear measure of the contribution of the
-                  pixel to the corresponding final output pixel.
+    PNG_ALPHA_PNG: The data is encoded according to the PNG specification.  Red,
+green and blue, or gray, components are gamma encoded color
+values and are not premultiplied by the alpha value.  The
+alpha value is a linear measure of the contribution of the
+pixel to the corresponding final output pixel.
 
-                  You should normally use this format if you intend to perform
-                  color correction on the color values; most, maybe all, color
-                  correction software has no handling for the alpha channel and,
-                  anyway, the math to handle pre-multiplied component values is
-                  unnecessarily complex.
+You should normally use this format if you intend to perform
+color correction on the color values; most, maybe all, color
+correction software has no handling for the alpha channel and,
+anyway, the math to handle pre-multiplied component values is
+unnecessarily complex.
 
-                  Before you do any arithmetic on the component values you need
-                  to remove the gamma encoding and multiply out the alpha
-                  channel.  See the PNG specification for more detail.  It is
-                  important to note that when an image with an alpha channel is
-                  scaled linear encoded, pre-multiplied, component values must
-                  be used!
+Before you do any arithmetic on the component values you need
+to remove the gamma encoding and multiply out the alpha
+channel.  See the PNG specification for more detail.  It is
+important to note that when an image with an alpha channel is
+scaled, linear encoded, pre-multiplied component values must
+be used!
 
 The remaining modes assume you don't need to do any further color correction or
 that if you do your color correction software knows all about alpha (it
 probably doesn't!)
 
-   PNG_ALPHA_STANDARD:  The data libpng produces is encoded in the standard way
-                        assumed by most correctly written graphics software.
-                        The gamma encodiing will be removed by libpng and the
-                        linear component values will be pre-multiplied by the
-                        alpha channel.
+    PNG_ALPHA_STANDARD:  The data libpng produces is encoded in the standard way
+assumed by most correctly written graphics software.
+The gamma encoding will be removed by libpng and the
+linear component values will be pre-multiplied by the
+alpha channel.
 
-                        With this format the final image must be re-encoded to
-                        match the display gamma before the image is displayed.
-                        If your system doesn't do that, yet still seems to
-                        perform arithmetic on the pixels without decoding them,
-                        it is broken - check out the modes below.
+With this format the final image must be re-encoded to
+match the display gamma before the image is displayed.
+If your system doesn't do that, yet still seems to
+perform arithmetic on the pixels without decoding them,
+it is broken - check out the modes below.
 
-                        With PNG_ALPHA_STANDARD libpng always produces linear
-                        component values, whatever screen_gamma you supply.  The
-                        screen_gamma value is, however, used as a default for
-                        the file gamma if the PNG file has no gamma information.
+With PNG_ALPHA_STANDARD libpng always produces linear
+component values, whatever screen_gamma you supply.  The
+screen_gamma value is, however, used as a default for
+the file gamma if the PNG file has no gamma information.
 
-                        If you call png_set_gamma after png_set_alpha_mode you
-                        will override the linear encoding.  Instead the
-                        pre-multiplied pixel values will be gamma encoded but
-                        the alpha channel will still be linear.  This may
-                        actually match the requirements of some broken software,
-                        but it is unlikely.
+If you call png_set_gamma() after png_set_alpha_mode() you
+will override the linear encoding.  Instead the
+pre-multiplied pixel values will be gamma encoded but
+the alpha channel will still be linear.  This may
+actually match the requirements of some broken software,
+but it is unlikely.
 
-                        While linear 8 bit data is often used it has
-                        insufficient precision for any image with a reasonable
-                        dynamic range.  To avoid problems, and if your software
-                        supports it, use png_set_expand_16() to force all
-                        components to 16 bits.
+While linear 8-bit data is often used it has
+insufficient precision for any image with a reasonable
+dynamic range.  To avoid problems, and if your software
+supports it, use png_set_expand_16() to force all
+components to 16 bits.
 
-   PNG_ALPHA_OPTIMIZED: This mode is the same as PNG_ALPHA_STANDARD except that
-                        completely opaque pixels are gamma encoded according to
-                        the screen_gamma value.  Pixels with alpha less than 1.0
-                        will still have linear components.
+    PNG_ALPHA_OPTIMIZED: This mode is the same as PNG_ALPHA_STANDARD except that
+completely opaque pixels are gamma encoded according to
+the screen_gamma value.  Pixels with alpha less than 1.0
+will still have linear components.
 
-                        Use this format if you have control over your
-                        compositing software and do don't do other arithmetic
-                        (such as scaling) on the data you get from libpng.  Your
-                        compositing software can simply copy opaque pixels to
-                        the output but still has linear values for the
-                        non-opaque pixels.
+Use this format if you have control over your
+compositing software and do don't do other arithmetic
+(such as scaling) on the data you get from libpng.  Your
+compositing software can simply copy opaque pixels to
+the output but still has linear values for the
+non-opaque pixels.
 
-                        In normal compositing, where the alpha channel encodes
-                        partial pixel coverage (as opposed to broad area
-                        translucency), the inaccuracies of the 8 bit
-                        representation of non-opaque pixels are irrelevant.
+In normal compositing, where the alpha channel encodes
+partial pixel coverage (as opposed to broad area
+translucency), the inaccuracies of the 8-bit
+representation of non-opaque pixels are irrelevant.
 
-                        You can also try this format if your software is broken;
-                        it might look better.
+You can also try this format if your software is broken;
+it might look better.
 
-   PNG_ALPHA_BROKEN     This is PNG_ALPHA_STANDARD however all component values,
-                        including the alpha channel are gamma encoded.  This is
-                        an appropriate format to try if your software, or more
-                        likely hardware, is totally broken: if it performs
-                        linear arithmetic directly on gamma encoded values.
+    PNG_ALPHA_BROKEN: This is PNG_ALPHA_STANDARD however all component values,
+including the alpha channel are gamma encoded.  This is
+an appropriate format to try if your software, or more
+likely hardware, is totally broken: if it performs
+linear arithmetic directly on gamma encoded values.
 
 In most cases of broken software or hardware the bug in the final display
 manifests as a subtle halo around composited parts of the image.  You may not
@@ -1742,35 +1742,41 @@ separate from the background, as though it had been cut out of paper and pasted
 on afterward.
 
 If you don't have to deal with bugs in software or hardware, or if you can fix
-them, there are three recommended ways of using png_set_alpha_mode:
+them, there are three recommended ways of using png_set_alpha_mode():
 
-   png_set_alpha_mode(png_ptr, PNG_ALPHA_PNG, screen_gamma);
-      You can do color correction on the result (libpng does not currently
-      support color correction internally.)  When you handle the alpha channel
-      you need to undo the gamma encoding and multipy out the alpha.
+   png_set_alpha_mode(png_ptr, PNG_ALPHA_PNG,
+       screen_gamma);
 
-   png_set_alpha_mode(png_ptr, PNG_ALPHA_STANDARD, screen_gamma);
+You can do color correction on the result (libpng does not currently
+support color correction internally.)  When you handle the alpha channel
+you need to undo the gamma encoding and multiply out the alpha.
+
+   png_set_alpha_mode(png_ptr, PNG_ALPHA_STANDARD,
+       screen_gamma);
    png_set_expand_16(png_ptr);
-      If you are using the high level interface don't call png_set_expand_16,
-      instead pass PNG_TRANSFORM_EXPAND_16 to the interface.
 
-      With this mode you can't do color corrrection, but you can do arithmetic,
-      including composition and scaling, on the data without further processing.
+If you are using the high level interface don't call png_set_expand_16();
+instead pass PNG_TRANSFORM_EXPAND_16 to the interface.
 
-   png_set_alpha_mode(png_ptr, PNG_ALPHA_OPTIMZED, screen_gamma);
-      You can avoid the expansion to 16 bit components with this mode, but you
-      lose the ability to scale the image or perform other linear arithmetic.
-      All you can do is compose the result onto a matching output.  Since this
-      mode is libpng specific you also need to write your own composition
-      software.
+With this mode you can't do color correction, but you can do arithmetic,
+including composition and scaling, on the data without further processing.
+
+   png_set_alpha_mode(png_ptr, PNG_ALPHA_OPTIMIZED,
+       screen_gamma);
+
+You can avoid the expansion to 16-bit components with this mode, but you
+lose the ability to scale the image or perform other linear arithmetic.
+All you can do is compose the result onto a matching output.  Since this
+mode is libpng specific you also need to write your own composition
+software.
 
 If you don't need, or can't handle, the alpha channel you can call
-png_set_background to remove it by compositing against a fixed color.  Don't
-call png_set_strip_alpha to do this - it will leave spurious pixel values in
+png_set_background() to remove it by compositing against a fixed color.  Don't
+call png_set_strip_alpha() to do this - it will leave spurious pixel values in
 transparent parts of this image.
 
-   png_set_background(png_ptr, &background_color, PNG_BACKGROUND_GAMMA_SCREEN,
-      0, 1);
+   png_set_background(png_ptr, &background_color,
+       PNG_BACKGROUND_GAMMA_SCREEN, 0, 1);
 
 The background_color is an RGB or grayscale value according to the data format
 libpng will produce for you.  Because you don't yet know the format of the PNG
@@ -1815,7 +1821,7 @@ you want to do are limited to the following set:
 
     PNG_TRANSFORM_IDENTITY      No transformation
     PNG_TRANSFORM_STRIP_16      Strip 16-bit samples to
-                                8 bits
+                                8-bit
     PNG_TRANSFORM_STRIP_ALPHA   Discard the alpha channel
     PNG_TRANSFORM_PACKING       Expand 1, 2 and 4-bit
                                 samples to bytes
@@ -2379,7 +2385,7 @@ severe accuracy loss.
       png_set_expand_16(png_ptr);
 
 PNG can have files with 16 bits per channel.  If you only can handle
-8 bits per channel, this will strip the pixels down to 8 bit.
+8 bits per channel, this will strip the pixels down to 8-bit.
 
     if (bit_depth == 16)
        png_set_strip_16(png_ptr);
@@ -2600,10 +2606,11 @@ to convey this information, however only two combinations are like to be useful:
 
 The second call was described above - my_background is in the format of the
 final, display, output produced by libpng.  Because you now know the format of
-the PNG it is possible to avoid the need to choose either 8 or 16 bit output and
-to retain palette images (the palette colors will be modified appropriately and
-the tRNS chunk removed.)  However, if you are doing this, take great care not to
-ask for transformations without checking first that they apply!
+the PNG it is possible to avoid the need to choose either 8-bit or 16-bit
+output and to retain palette images (the palette colors will be modified
+appropriately and the tRNS chunk removed.)  However, if you are doing this,
+take great care not to ask for transformations without checking first that
+they apply!
 
 In the first call the background color has the original bit depth and color type
 of the PNG file.  So, for palette images the color is supplied as a palette
@@ -2678,7 +2685,7 @@ This function can also be used to invert grayscale and gray-alpha images:
        color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
       png_set_invert_mono(png_ptr);
 
-PNG files store 16 bit pixels in network byte order (big-endian,
+PNG files store 16-bit pixels in network byte order (big-endian,
 ie. most significant bits first).  This code changes the storage to the
 other way (little-endian, i.e. least significant bits first, the
 way PCs store them):
@@ -3991,7 +3998,7 @@ is required by PNG.
 
     png_set_shift(png_ptr, &sig_bit);
 
-PNG files store 16 bit pixels in network byte order (big-endian,
+PNG files store 16-bit pixels in network byte order (big-endian,
 ie. most significant bits first).  This code would be used if they are
 supplied the other way (little-endian, i.e. least significant bits
 first, the way PCs store them):
@@ -4407,7 +4414,7 @@ the simpler ones to get an idea of how they work.  Try to find a similar
 transformation to the one you want to add and copy off of it.  More details
 can be found in the comments inside the code itself.
 
-.SS Configuring for 16 bit platforms
+.SS Configuring for 16-bit platforms
 
 You will want to look into zconf.h to tell zlib (and thus libpng) that
 it cannot allocate more then 64K at a time.  Even if you can, the memory
