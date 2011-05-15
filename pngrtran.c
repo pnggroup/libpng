@@ -1106,6 +1106,10 @@ png_init_palette_transformations(png_structp png_ptr)
        (png_ptr->transformations & PNG_EXPAND))
    {
       {
+         /* TODO: THIS MUST BE WRONG, because in png_init_read_transformations
+          * below the background red,green,blue values are used directly in the
+          * palette case (allowing an out-of-palette background color!)
+          */
          png_ptr->background.red   =
              png_ptr->palette[png_ptr->background.index].red;
          png_ptr->background.green =
@@ -1375,7 +1379,7 @@ png_init_read_transformations(png_structp png_ptr)
     * PNG_BACKGROUND_IS_GRAY only to decide when to do the
     * png_do_gray_to_rgb() transformation.
     *
-    * NOTE: this code needs to be revised to avoid the complexity and
+    * TODO: this code needs to be revised to avoid the complexity and
     * interdependencies.  The color type of the background should be recorded in
     * png_set_background, along with the bit depth, then the code has a record
     * of exactly what color space the background is currently in.
@@ -1776,8 +1780,11 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    {
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         if (png_ptr->num_trans &&
-             (png_ptr->transformations & PNG_EXPAND_tRNS))
+         /* This check must match what actually happens in
+          * png_do_expand_palette; if it every checks the tRNS chunk to see if
+          * it is all opaque we must do the same (at present it does not.)
+          */
+         if (png_ptr->num_trans > 0)
             info_ptr->color_type = PNG_COLOR_TYPE_RGB_ALPHA;
 
          else
@@ -1917,6 +1924,14 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
        info_ptr->bit_depth);
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
+
+   /* Adding in 1.5.3: cache the above value in png_struct so that we can later
+    * check in png_rowbytes that the user buffer won't get overwritten.  Note
+    * that the field is not always set - if png_read_update_info isn't called
+    * the application has to either not do any transforms or get the calculation
+    * right itself.
+    */
+   png_ptr->info_rowbytes = info_ptr->rowbytes;
 
 #ifndef PNG_READ_EXPAND_SUPPORTED
    if (png_ptr)

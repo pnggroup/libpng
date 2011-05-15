@@ -2670,6 +2670,14 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1, "in png_combine_row");
 
+   /* Added in 1.5.3: the row_info should match the information returned by any
+    * call to png_read_update_info at this point.  Do not continue if we got
+    * this wrong.
+    */
+   if (png_ptr->info_rowbytes != 0 && png_ptr->info_rowbytes !=
+          PNG_ROWBYTES(png_ptr->row_info.pixel_depth, png_ptr->width))
+      png_error(png_ptr, "internal row size calculation error");
+
    if (mask == 0xff)
    {
       png_memcpy(row, png_ptr->row_buf + 1,
