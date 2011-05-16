@@ -111,7 +111,7 @@ struct png_struct_def
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
    png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
    png_row_info row_info;     /* used for transformation routines */
-   png_size_t info_rowbytes;  /* Adding in 1.5.3: cache of updated row bytes */
+   png_size_t info_rowbytes;  /* Added in 1.5.3: cache of updated row bytes */
 
    png_uint_32 idat_size;     /* current IDAT size for read */
    png_uint_32 crc;           /* current chunk CRC value */

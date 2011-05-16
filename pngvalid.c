@@ -534,7 +534,7 @@ store_pool_mark(png_bytep mark)
    make_four_random_bytes(store_seed, mark);
 }
 
-/* Use this for random 32 bit values, this function makes sure the result is
+/* Use this for random 32 bit values; this function makes sure the result is
  * non-zero.
  */
 static png_uint_32
@@ -2277,7 +2277,7 @@ bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
 #define TRANSFORM_ROWMAX (TRANSFORM_WIDTH*8U)
 #define SIZE_ROWMAX (16*8U) /* 16 pixels, max 8 bytes each - 128 bytes */
 #define STANDARD_ROWMAX TRANSFORM_ROWMAX /* The larger of the two */
-#define SIZE_HEIGHTMAX 16 /* Maxium range of size images */
+#define SIZE_HEIGHTMAX 16 /* Maximum range of size images */
 
 static size_t
 transform_rowsize(png_structp pp, png_byte colour_type, png_byte bit_depth)
@@ -2674,7 +2674,7 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
    }
 }
 
-/* Build a single row for the 'size' test images, this fills in only the
+/* Build a single row for the 'size' test images; this fills in only the
  * first bit_width bits of the sample row.
  */
 static void
@@ -2777,7 +2777,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
                png_byte tempRow[SIZE_ROWMAX];
 
                /* If do_interlace *and* the image is interlaced we
-                * need a reduced interlace row, this may be reduced
+                * need a reduced interlace row; this may be reduced
                 * to empty.
                 */
                if (do_interlace && interlace_type == PNG_INTERLACE_ADAM7)
@@ -2951,7 +2951,7 @@ make_error(png_store* volatile ps, png_byte PNG_CONST colour_type,
       if (colour_type == 3) /* palette */
          init_standard_palette(ps, pp, pi, 1U << bit_depth, 0/*do tRNS*/);
 
-      /* Time for a few errors, these are in various optional chunks, the
+      /* Time for a few errors; these are in various optional chunks, the
        * standard tests test the standard chunks pretty well.
        */
 #     define exception__prev exception_prev_1
@@ -3172,7 +3172,7 @@ perform_formatting_test(png_store *volatile ps)
  * requirement that the pointer to the first member of a structure must be the
  * same as the pointer to the structure.  This allows us to reuse standard_
  * functions in the gamma test code; something that could not be done with
- * nested funtions!
+ * nested functions!
  */
 typedef struct standard_display
 {
@@ -4171,7 +4171,7 @@ image_pixel_convert_PLTE(image_pixel *this)
    }
 }
 
-/* Add an alpha channel, this will glom in the tRNS information because tRNS is
+/* Add an alpha channel; this will import the tRNS information because tRNS is
  * not valid in an alpha image.  The bit depth will invariably be set to at
  * least 8.  Palette images will be converted to alpha (using the above API).
  */
@@ -5679,7 +5679,7 @@ perform_transform_test(png_modifier *pm)
          size_t pos = base_pos;
          PNG_CONST image_transform *list = 0;
 
-         /* 'max' is currently hardwired to '1', this should be settable on the
+         /* 'max' is currently hardwired to '1'; this should be settable on the
           * command line.
           */
          counter = image_transform_add(&list, 1/*max*/, counter,
