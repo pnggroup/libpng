@@ -3386,6 +3386,8 @@ Version 1.5.3beta08 [May 16, 2011]
     code has a special palette path in most cases this was a severe weakness.
   Minor cleanup and some extra checking in pngrutil.c and pngrtran.c
 
+Version 1.5.3rc01 [May 16, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
