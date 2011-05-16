@@ -854,8 +854,8 @@ store_ensure_image(png_store *ps, png_structp pp, int nImages, png_size_t cbRow,
       ps->cb_image = cb;
    }
 
-   /* We have an adequate sized image, lay out the rows.  There are 2 bytes at
-    * the start and three at the end of each (this ensures tha the row alignment
+   /* We have an adequate sized image; lay out the rows.  There are 2 bytes at
+    * the start and three at the end of each (this ensures that the row alignment
     * starts out odd - 2+1 and changes for larger images on each row.)
     */
    ps->cb_row = cbRow;
@@ -867,7 +867,7 @@ store_ensure_image(png_store *ps, png_structp pp, int nImages, png_size_t cbRow,
     */
    memset(ps->image, 0xff, cb);
 
-   /* Then put the marks go in. */
+   /* Then put in the marks. */
    while (--nImages >= 0)
    {
       png_uint_32 y;
@@ -2086,7 +2086,7 @@ set_modifier_for_read(png_modifier *pm, png_infopp ppi, png_uint_32 id,
  * time for the same test - it depends on what previous tests have been run -
  * but a given set of arguments to pngvalid will always produce the same palette
  * at the same test!  This is why pseudo-random number generators are useful for
- * testing.
+ * testing.)
  *
  * The store must be open for write when this is called, otherwise an internal
  * error will occur.  This routine contains its own magic number seed, so the
@@ -2235,7 +2235,7 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
    }
 }
 
-/* The number of passes is related to the interlace type. There wass no libpng
+/* The number of passes is related to the interlace type. There was no libpng
  * API to determine this prior to 1.5, so we need an inquiry function:
  */
 static int
@@ -4872,7 +4872,7 @@ image_transform_png_set_tRNS_to_alpha_mod(PNG_CONST image_transform *this,
       image_pixel_convert_PLTE(that);
 
    /* This effectively does an 'expand' only if there is some transparency to
-    * covert to an alpha channel.
+    * convert to an alpha channel.
     */
    if (that->have_tRNS)
       image_pixel_add_alpha(that, &display->this);
@@ -5329,7 +5329,7 @@ image_transform_png_set_background_set(PNG_CONST image_transform *this,
 
    else
       back.gray = (png_uint_16)that->background_colour.red;
-      
+
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
       png_set_background(pp, &back, PNG_BACKGROUND_GAMMA_FILE, 1/*need expand*/,
          0);

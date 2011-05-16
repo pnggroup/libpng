@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta08 - May 13, 2011
+Libpng 1.5.3beta08 - May 16, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -112,7 +112,7 @@ Version 1.5.3beta07 [May 11, 2011]
   Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
     before IDAT.
 
-Version 1.5.3beta08 [May 13, 2011]
+Version 1.5.3beta08 [May 16, 2011]
   Improved "pngvalid --speed" to exclude more of pngvalid from the time.
   Documented png_set_alpha_mode(), other changes in libpng.3/libpng-manual.txt
   The cHRM chunk now sets the defaults for png_set_rgb_to_gray() (when negative
@@ -122,6 +122,10 @@ Version 1.5.3beta08 [May 13, 2011]
     png_set_background(), allowing the latter to be used before the file
     header is read. It never performed any useful function to override
     the default anyway.
+  Added memory overwrite and palette image checks to pngvalid.c
+    Previously palette image code was poorly checked, since the transformation code
+    has a special palette path in most cases this was a severe weakness.
+  Minor cleanup and some extra checking in pngrutil.c and pngrtran.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -1781,7 +1781,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          /* This check must match what actually happens in
-          * png_do_expand_palette; if it every checks the tRNS chunk to see if
+          * png_do_expand_palette; if it ever checks the tRNS chunk to see if
           * it is all opaque we must do the same (at present it does not.)
           */
          if (png_ptr->num_trans > 0)
