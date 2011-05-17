@@ -1559,7 +1559,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          r /= divisor;
          r = floor(r+.5);
 
-         /* A png_fixed_point is a 32 bit integer. */
+         /* A png_fixed_point is a 32-bit integer. */
          if (r <= 2147483647. && r >= -2147483648.)
          {
             *res = (png_fixed_point)r;
@@ -1604,7 +1604,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 
          if (s32 < D) /* else overflow */
          {
-            /* s32.s00 is now the 64 bit product, do a standard
+            /* s32.s00 is now the 64-bit product, do a standard
              * division, we know that s32 < D, so the maximum
              * required shift is 31.
              */
@@ -1747,7 +1747,7 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
  * 2010: moved from pngset.c) */
 /*
  *    Multiply two 32-bit numbers, V1 and V2, using 32-bit
- *    arithmetic, to produce a 64 bit result in the HI/LO words.
+ *    arithmetic, to produce a 64-bit result in the HI/LO words.
  *
  *                  A B
  *                x C D
@@ -1801,7 +1801,7 @@ png_64bit_product (long v1, long v2, unsigned long *hi_product,
  * 8-bit log table
  *   This is a table of -log(value/255)/log(2) for 'value' in the range 128 to
  *   255, so it's the base 2 logarithm of a normalized 8-bit floating point
- *   mantissa.  The numbers are 32 bit fractions.
+ *   mantissa.  The numbers are 32-bit fractions.
  */
 static png_uint_32
 png_8bit_l2[128] =
@@ -1832,10 +1832,10 @@ png_8bit_l2[128] =
    172473545U, 147538590U, 122703574U, 97967701U, 73330182U, 48790236U,
    24347096U, 0U
 #if 0
-   /* The following are the values for 16-bit tables - these work fine for the 8
-    * bit conversions but produce very slightly larger errors in the 16-bit log
-    * (about 1.2 as opposed to 0.7 absolute error in the final value).  To use
-    * these all the shifts below must be adjusted appropriately.
+   /* The following are the values for 16-bit tables - these work fine for the
+    * 8-bit conversions but produce very slightly larger errors in the 16-bit
+    * log (about 1.2 as opposed to 0.7 absolute error in the final value).  To
+    * use these all the shifts below must be adjusted appropriately.
     */
    65166, 64430, 63700, 62976, 62257, 61543, 60835, 60132, 59434, 58741, 58054,
    57371, 56693, 56020, 55352, 54689, 54030, 53375, 52726, 52080, 51439, 50803,
@@ -1929,7 +1929,7 @@ png_log16bit(png_uint_32 x)
    if ((x & 0x8000) == 0)
       lg2 += 1, x <<= 1;
 
-   /* Calculate the base logarithm from the top 8 bits as a 28 bit fractional
+   /* Calculate the base logarithm from the top 8 bits as a 28-bit fractional
     * value.
     */
    lg2 <<= 28;
@@ -1959,7 +1959,7 @@ png_log16bit(png_uint_32 x)
    return (png_int_32)((lg2 + 2048) >> 12);
 }
 
-/* The 'exp()' case must invert the above, taking a 20 bit fixed point
+/* The 'exp()' case must invert the above, taking a 20-bit fixed point
  * logarithmic value and returning a 16 or 8-bit number as appropriate.  In
  * each case only the low 16 bits are relevant - the fraction - since the
  * integer bits (the top 4) simply determine a shift.
@@ -1970,7 +1970,7 @@ png_log16bit(png_uint_32 x)
  * of getting this accuracy in practice.
  *
  * To deal with this the following exp() function works out the exponent of the
- * frational part of the logarithm by using an accurate 32 bit value from the
+ * frational part of the logarithm by using an accurate 32-bit value from the
  * top four fractional bits then multiplying in the remaining bits.
  */
 static png_uint_32
@@ -1979,7 +1979,7 @@ png_32bit_exp[16] =
 #  if PNG_DO_BC
       for (i=0;i<16;++i) { .5 + e(-i/16*l(2))*2^32; }
 #  endif
-   /* NOTE: the first entry is deliberately set to the maximum 32 bit value. */
+   /* NOTE: the first entry is deliberately set to the maximum 32-bit value. */
    4294967295U, 4112874773U, 3938502376U, 3771522796U, 3611622603U, 3458501653U,
    3311872529U, 3171459999U, 3037000500U, 2908241642U, 2784941738U, 2666869345U,
    2553802834U, 2445529972U, 2341847524U, 2242560872U
@@ -2007,7 +2007,7 @@ png_exp(png_fixed_point x)
 {
    if (x > 0 && x <= 0xfffff) /* Else overflow or zero (underflow) */
    {
-      /* Obtain a 4 bit approximation */
+      /* Obtain a 4-bit approximation */
       png_uint_32 e = png_32bit_exp[(x >> 12) & 0xf];
 
       /* Incorporate the low 12 bits - these decrease the returned value by
@@ -2053,10 +2053,10 @@ png_exp(png_fixed_point x)
 static png_byte
 png_exp8bit(png_fixed_point lg2)
 {
-   /* Get a 32 bit value: */
+   /* Get a 32-bit value: */
    png_uint_32 x = png_exp(lg2);
 
-   /* Convert the 32 bit value to 0..255 by multiplying by 256-1, note that the
+   /* Convert the 32-bit value to 0..255 by multiplying by 256-1, note that the
     * second, rounding, step can't overflow because of the first, subtraction,
     * step.
     */
@@ -2067,10 +2067,10 @@ png_exp8bit(png_fixed_point lg2)
 static png_uint_16
 png_exp16bit(png_fixed_point lg2)
 {
-   /* Get a 32 bit value: */
+   /* Get a 32-bit value: */
    png_uint_32 x = png_exp(lg2);
 
-   /* Convert the 32 bit value to 0..65535 by multiplying by 65536-1: */
+   /* Convert the 32-bit value to 0..65535 by multiplying by 65536-1: */
    x -= x >> 16;
    return (png_uint_16)((x + 32767U) >> 16);
 }
@@ -2247,14 +2247,14 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
    /* 'gamma_val' is set to the reciprocal of the value calculated above, so
     * pow(out,g) is an *input* value.  'last' is the last input value set.
     *
-    * In the loop 'i' is used to find output values.  Since the output is 8
-    * bit there are only 256 possible values.  The tables are set up to
+    * In the loop 'i' is used to find output values.  Since the output is
+    * 8-bit there are only 256 possible values.  The tables are set up to
     * select the closest possible output value for each input by finding
     * the input value at the boundary between each pair of output values
     * and filling the table up to that boundary with the lower output
     * value.
     *
-    * The boundary values are 0.5,1.5..253.5,254.5.  Since these are 9 bit
+    * The boundary values are 0.5,1.5..253.5,254.5.  Since these are 9-bit
     * values the code below uses a 16-bit value in i; the values start at
     * 128.5 (for 0.5) and step by 257, for a total of 254 values (the last
     * entries are filled with 255).  Start i at 128 and fill all 'last'
