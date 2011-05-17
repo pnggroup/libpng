@@ -3346,6 +3346,8 @@ Version 1.5.3beta05 [May 6, 2011]
     requiring the host OS to implement snprintf.  As a side effect the
     dependency of the tIME-supporting RFC1132 code on stdio is removed and
     PNG_NO_WARNINGS does actually work now.
+  Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
+    was introduced in libpng-1.2.20beta01.
   Added PNG_WRITE_OPTIMIZE_CMF_SUPPORTED macro to make the zlib "CMF" byte
     optimization configureable.
   IDAT compression failed if preceded by a compressed text chunk (bug
@@ -3382,11 +3384,11 @@ Version 1.5.3beta08 [May 16, 2011]
     header is read. It never performed any useful function to override
     the default anyway.
   Added memory overwrite and palette image checks to pngvalid.c
-    Previously palette image code was poorly checked, since the transformation
+    Previously palette image code was poorly checked. Since the transformation
     code has a special palette path in most cases this was a severe weakness.
   Minor cleanup and some extra checking in pngrutil.c and pngrtran.c
 
-Version 1.5.3rc01 [May 16, 2011]
+Version 1.5.3beta09 [May 17, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

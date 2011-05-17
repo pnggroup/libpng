@@ -89,9 +89,10 @@ png_error,(png_structp png_ptr, png_const_charp error_message),PNG_NORETURN)
 PNG_FUNCTION(void,PNGAPI
 png_err,(png_structp png_ptr),PNG_NORETURN)
 {
-   /* Prior to 1.5.2 the error_fn received a NULL pointer, expressed erroneouly
-    * as '\0'.  This was apparently an error, and png_default_error will crash
-    * in this case.
+   /* Prior to 1.5.2 the error_fn received a NULL pointer, expressed
+    * erroneously as '\0', instead of the empty string "".  This was
+    * apparently an error, introduced in libpng-1.2.20, and png_default_error
+    * will crash in this case.
     */
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
       (*(png_ptr->error_fn))(png_ptr, "");
