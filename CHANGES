@@ -3395,6 +3395,8 @@ Version 1.5.3beta09 [May 17, 2011]
    do any gamma correction.  Moving the tests back leaves the old, inaccurate,
    8-bit gamma calculations, but these are clearly better than none!
 
+Version 1.5.3beta10 [May 17, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
