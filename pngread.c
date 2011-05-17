@@ -1287,7 +1287,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* -------------- image transformations start here ------------------- */
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
-   /* Tell libpng to strip 16 bit/color files down to 8 bits per color.
+   /* Tell libpng to strip 16-bit/color files down to 8 bits per color.
     */
    if (transforms & PNG_TRANSFORM_STRIP_16)
       png_set_strip_16(png_ptr);
@@ -1368,7 +1368,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_READ_SWAP_SUPPORTED
-   /* Swap bytes of 16 bit files to least significant byte first */
+   /* Swap bytes of 16-bit files to least significant byte first */
    if (transforms & PNG_TRANSFORM_SWAP_ENDIAN)
       png_set_swap(png_ptr);
 #endif

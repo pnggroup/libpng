@@ -133,7 +133,7 @@ png_set_background(png_structp png_ptr,
 #endif /* READ_BACKGROUND */
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
-/* Strip 16 bit depth files to 8 bit depth */
+/* Strip 16-bit depth files to 8-bit depth */
 void PNGAPI
 png_set_strip_16(png_structp png_ptr)
 {
@@ -342,7 +342,7 @@ png_set_alpha_mode(png_structp png_ptr, int mode, double output_gamma)
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
-/* Dither file to 8 bit.  Supply a palette, the current number
+/* Dither file to 8-bit.  Supply a palette, the current number
  * of elements in the palette, the maximum number of elements
  * allowed, and a histogram if possible.  If the current number
  * of colors is greater then the maximum number, the palette will be
@@ -872,7 +872,7 @@ png_set_tRNS_to_alpha(png_structp png_ptr)
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
 #ifdef PNG_READ_EXPAND_16_SUPPORTED
-/* Expand to 16 bit channels, expand the tRNS chunk too (because otherwise
+/* Expand to 16-bit channels, expand the tRNS chunk too (because otherwise
  * it may not work correctly.)
  */
 void PNGAPI

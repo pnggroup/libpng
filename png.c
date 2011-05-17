@@ -1791,16 +1791,16 @@ png_64bit_product (long v1, long v2, unsigned long *hi_product,
 /* Fixed point gamma.
  *
  * To calculate gamma this code implements fast log() and exp() calls using only
- * fixed point arithmetic.  This code has sufficient precision for either 8 or
- * 16 bit sample values.
+ * fixed point arithmetic.  This code has sufficient precision for either 8-bit
+ * or 16-bit sample values.
  *
  * The tables used here were calculated using simple 'bc' programs, but C double
  * precision floating point arithmetic would work fine.  The programs are given
  * at the head of each table.
  *
- * 8 bit log table
+ * 8-bit log table
  *   This is a table of -log(value/255)/log(2) for 'value' in the range 128 to
- *   255, so it's the base 2 logarithm of a normalized 8 bit floating point
+ *   255, so it's the base 2 logarithm of a normalized 8-bit floating point
  *   mantissa.  The numbers are 32 bit fractions.
  */
 static png_uint_32
@@ -1832,8 +1832,8 @@ png_8bit_l2[128] =
    172473545U, 147538590U, 122703574U, 97967701U, 73330182U, 48790236U,
    24347096U, 0U
 #if 0
-   /* The following are the values for 16 bit tables - these work fine for the 8
-    * bit conversions but produce very slightly larger errors in the 16 bit log
+   /* The following are the values for 16-bit tables - these work fine for the 8
+    * bit conversions but produce very slightly larger errors in the 16-bit log
     * (about 1.2 as opposed to 0.7 absolute error in the final value).  To use
     * these all the shifts below must be adjusted appropriately.
     */
@@ -1878,11 +1878,11 @@ png_log8bit(unsigned int x)
    return (png_int_32)((lg2 << 16) + ((png_8bit_l2[x-128]+32768)>>16));
 }
 
-/* The above gives exact (to 16 binary places) log2 values for 8 bit images,
- * for 16 bit images we use the most significant 8 bits of the 16 bit value to
+/* The above gives exact (to 16 binary places) log2 values for 8-bit images,
+ * for 16-bit images we use the most significant 8 bits of the 16-bit value to
  * get an approximation then multiply the approximation by a correction factor
  * determined by the remaining up to 8 bits.  This requires an additional step
- * in the 16 bit case.
+ * in the 16-bit case.
  *
  * We want log2(value/65535), we have log2(v'/255), where:
  *
@@ -1891,8 +1891,8 @@ png_log8bit(unsigned int x)
  *
  * So f is value/v', which is equal to (256+v''/v') since v' is in the range 128
  * to 255 and v'' is in the range 0 to 255 f will be in the range 256 to less
- * than 258.  The final factor also needs to correct for the fact that our 8 bit
- * value is scaled by 255, whereas the 16 bit values must be scaled by 65535.
+ * than 258.  The final factor also needs to correct for the fact that our 8-bit
+ * value is scaled by 255, whereas the 16-bit values must be scaled by 65535.
  *
  * This gives a final formula using a calculated value 'x' which is value/v' and
  * scaling by 65536 to match the above table:
@@ -1902,7 +1902,7 @@ png_log8bit(unsigned int x)
  * Since these numbers are so close to '1' we can use simple linear
  * interpolation between the two end values 256/257 (result -368.61) and 258/257
  * (result 367.179).  The values used below are scaled by a further 64 to give
- * 16 bit precision in the interpolation:
+ * 16-bit precision in the interpolation:
  *
  * Start (256): -23591
  * Zero  (257):      0
@@ -1960,11 +1960,11 @@ png_log16bit(png_uint_32 x)
 }
 
 /* The 'exp()' case must invert the above, taking a 20 bit fixed point
- * logarithmic value and returning a 16 or 8 bit number as appropriate.  In
+ * logarithmic value and returning a 16 or 8-bit number as appropriate.  In
  * each case only the low 16 bits are relevant - the fraction - since the
  * integer bits (the top 4) simply determine a shift.
  *
- * The worst case is the 16 bit distinction between 65535 and 65534, this
+ * The worst case is the 16-bit distinction between 65535 and 65534, this
  * requires perhaps spurious accuracty in the decoding of the logarithm to
  * distinguish log2(65535/65534.5) - 10^-5 or 17 bits.  There is little chance
  * of getting this accuracy in practice.
@@ -2123,9 +2123,9 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
 }
 
 /* This does the right thing based on the bit_depth field of the
- * png_struct, interpreting values as 8 or 16 bit.  While the result
- * is nominally a 16 bit value if bit depth is 8 then the result is
- * 8 bit (as are the arguments.)
+ * png_struct, interpreting values as 8-bit or 16-bit.  While the result
+ * is nominally a 16-bit value if bit depth is 8 then the result is
+ * 8-bit (as are the arguments.)
  */
 png_uint_16 /* PRIVATE */
 png_gamma_correct(png_structp png_ptr, unsigned int value,
@@ -2148,7 +2148,7 @@ png_gamma_significant(png_fixed_point gamma_val)
        gamma_val > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED;
 }
 
-/* Internal function to build a single 16 bit table - the table consists of
+/* Internal function to build a single 16-bit table - the table consists of
  * 'num' 256 entry subtables, where 'num' is determined by 'shift' - the amount
  * to shift the input values right (or 16-number_of_signifiant_bits).
  *
@@ -2175,7 +2175,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
           (png_uint_16p)png_malloc(png_ptr, 256 * png_sizeof(png_uint_16));
 
       /* The 'threshold' test is repeated here because it can arise for one of
-       * the 16 bit tables even if the others don't hit it.
+       * the 16-bit tables even if the others don't hit it.
        */
       if (png_gamma_significant(gamma_val))
       {
@@ -2237,7 +2237,7 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
        (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
 
    /* 'num' is the number of tables and also the number of low bits of low
-    * bits of the input 16 bit value used to select a table.  Each table is
+    * bits of the input 16-bit value used to select a table.  Each table is
     * itself index by the high 8 bits of the value.
     */
    for (i = 0; i < num; i++)
@@ -2255,16 +2255,16 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
     * value.
     *
     * The boundary values are 0.5,1.5..253.5,254.5.  Since these are 9 bit
-    * values the code below uses a 16 bit value in i; the values start at
+    * values the code below uses a 16-bit value in i; the values start at
     * 128.5 (for 0.5) and step by 257, for a total of 254 values (the last
     * entries are filled with 255).  Start i at 128 and fill all 'last'
     * table entries <= 'max'
     */
    last = 0;
-   for (i = 0; i < 255; ++i) /* 8 bit output value */
+   for (i = 0; i < 255; ++i) /* 8-bit output value */
    {
       /* Find the corresponding maximum input value */
-      png_uint_16 out = (png_uint_16)(i * 257U); /* 16 bit output value */
+      png_uint_16 out = (png_uint_16)(i * 257U); /* 16-bit output value */
 
       /* Find the boundary value in 16 bits: */
       png_uint_32 bound = png_gamma_16bit_correct(out+128U, gamma_val);
@@ -2287,7 +2287,7 @@ png_build_16to8_table(png_structp png_ptr, png_uint_16pp *ptable,
    }
 }
 
-/* Build a single 8 bit table: same as the 16 bit case but much simpler (and
+/* Build a single 8-bit table: same as the 16-bit case but much simpler (and
  * typically much faster).  Note that libpng currently does no sBIT processing
  * (apparently contrary to the spec) so a 256 entry table is always generated.
  */
@@ -2352,7 +2352,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
      else
         sig_bit = png_ptr->sig_bit.gray;
 
-     /* 16 bit gamma code uses this equation:
+     /* 16-bit gamma code uses this equation:
       *
       *   ov = table[(iv & 0xff) >> gamma_shift][iv >> 8]
       *
@@ -2367,7 +2367,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
       *
       * So the table 'n' corresponds to all those 'iv' of:
       *
-      *   <all high 8 bit values><n << gamma_shift>..<(n+1 << gamma_shift)-1>
+      *   <all high 8-bit values><n << gamma_shift>..<(n+1 << gamma_shift)-1>
       *
       */
      if (sig_bit > 0 && sig_bit < 16U)
@@ -2394,7 +2394,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
 #ifdef PNG_16BIT_SUPPORTED
      /* NOTE: prior to 1.5.3 this test used to include PNG_BACKGROUND (now
       * PNG_COMPOSE).  This effectively smashed the background calculation for
-      * 16 bit output because the 8 bit table assumes the result will be reduced
+      * 16-bit output because the 8-bit table assumes the result will be reduced
       * to 8 bits.
       */
      if (png_ptr->transformations & PNG_16_TO_8)
