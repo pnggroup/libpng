@@ -1318,7 +1318,7 @@ png_init_read_transformations(png_structp png_ptr)
     *  8) PNG_ENCODE_ALPHA
     *  9) PNG_16_TO_8 (strip16)
     * 10) PNG_QUANTIZE (converts to palette)
-    * 11) PNG_EXPAND_16 [NOTE: temporarily moved to (3) for accuracy!]
+    * 11) PNG_EXPAND_16
     * 12) PNG_GRAY_TO_RGB iff PNG_BACKGROUND_IS_GRAY
     * 13) PNG_INVERT_MONO
     * 14) PNG_SHIFT
@@ -1808,14 +1808,6 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    }
 #endif
 
-#ifdef PNG_READ_EXPAND_16_SUPPORTED
-   if (png_ptr->transformations & PNG_EXPAND_16 && info_ptr->bit_depth == 8 &&
-      info_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
-   {
-      info_ptr->bit_depth = 16;
-   }
-#endif
-
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
    defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    /* The following is almost certainly wrong unless the background value is in
@@ -1867,6 +1859,14 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
       {
          info_ptr->color_type = PNG_COLOR_TYPE_PALETTE;
       }
+   }
+#endif
+
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+   if (png_ptr->transformations & PNG_EXPAND_16 && info_ptr->bit_depth == 8 &&
+      info_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
+   {
+      info_ptr->bit_depth = 16;
    }
 #endif
 
@@ -1995,19 +1995,6 @@ png_do_read_transformations(png_structp png_ptr)
    }
 #endif
 
-   /* TODO: Delay the 'expand 16' step until later for efficiency, so that the
-    * intermediate steps work with 8 bit data.
-    */
-#ifdef PNG_READ_EXPAND_16_SUPPORTED
-   /* Do the expansion now, after all the arithmetic has been done.  Notice
-    * that previous transformations can handle the PNG_EXPAND_16 flag if this
-    * is efficient (particularly true in the case of gamma correction, where
-    * better accuracy results faster!)
-    */
-   if (png_ptr->transformations & PNG_EXPAND_16)
-      png_do_expand_16(&png_ptr->row_info, png_ptr->row_buf + 1);
-#endif
-
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
    if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
       !(png_ptr->transformations & PNG_COMPOSE) &&
@@ -2127,11 +2114,6 @@ png_do_read_transformations(png_structp png_ptr)
    }
 #endif /* PNG_READ_QUANTIZE_SUPPORTED */
 
-#if 0
-   /* This is where this code *should* be for efficiency, but that requires all
-    * the inaccurate calculations above to output 16 bit values if expand_16 is
-    * set!
-    */
 #ifdef PNG_READ_EXPAND_16_SUPPORTED
    /* Do the expansion now, after all the arithmetic has been done.  Notice
     * that previous transformations can handle the PNG_EXPAND_16 flag if this
@@ -2141,7 +2123,6 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_EXPAND_16)
       png_do_expand_16(&png_ptr->row_info, png_ptr->row_buf + 1);
 #endif
-#endif /*commented out*/
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
    /*NOTE: moved here in 1.5.3 (from much later in this list.) */

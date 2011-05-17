@@ -1528,6 +1528,7 @@ typedef struct png_modifier
    double                   error_gray_16;
    double                   error_color_8;
    double                   error_color_16;
+   double                   error_indexed;
 
    /* Flags: */
    /* Whether or not to interlace. */
@@ -1593,6 +1594,7 @@ modifier_init(png_modifier *pm)
    pm->maxout16 = pm->maxpc16 = pm->maxabs16 = pm->maxcalc16 = 0;
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = 0;
    pm->error_gray_16 = pm->error_color_8 = pm->error_color_16 = 0;
+   pm->error_indexed = 0;
    pm->interlace_type = PNG_INTERLACE_NONE;
    pm->test_standard = 0;
    pm->test_size = 0;
@@ -6814,6 +6816,12 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
             png_error(pp, "bad bit depth (internal: 2)");
          }
       }
+
+      else if (d.this.colour_type == 3)
+      {
+         if (d.maxerrout > d.pm->error_indexed)
+            d.pm->error_indexed = d.maxerrout;
+      }
    }
 
    Catch(fault)
@@ -7184,8 +7192,9 @@ perform_gamma_composition_tests(png_modifier *pm, int do_background,
 static void
 init_gamma_errors(png_modifier *pm)
 {
-   pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = pm->error_color_8 =
-      0;
+   pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = 0;
+   pm->error_color_8 = 0;
+   pm->error_indexed = 0;
    pm->error_gray_16 = pm->error_color_16 = 0;
 }
 
@@ -7201,6 +7210,7 @@ summarize_gamma_errors(png_modifier *pm, png_const_charp who, int low_bit_depth)
       printf("  4 bit gray:  %.5f\n", pm->error_gray_4);
       printf("  8 bit gray:  %.5f\n", pm->error_gray_8);
       printf("  8 bit color: %.5f\n", pm->error_color_8);
+      printf("  indexed:     %.5f\n", pm->error_indexed);
    }
 
 #ifdef DO_16BIT
@@ -7655,6 +7665,7 @@ perform_interlace_macro_validation(void)
 int main(int argc, PNG_CONST char **argv)
 {
    volatile int summary = 1;  /* Print the error summary at the end */
+   volatile int memstats = 0; /* Print memory statistics at the end */
 
    /* Create the given output file on success: */
    PNG_CONST char *volatile touch = NULL;
@@ -7667,6 +7678,10 @@ int main(int argc, PNG_CONST char **argv)
    static double
       gammas[]={2.2, 1.0, 2.2/1.45, 1.8, 1.5, 2.4, 2.5, 2.62, 2.9};
 
+   /* This records the command and arguments: */
+   size_t cp = 0;
+   char command[1024];
+
    png_modifier pm;
    context(&pm.this, fault);
 
@@ -7678,6 +7693,9 @@ int main(int argc, PNG_CONST char **argv)
     * overwrite checking.
     */
    store_ensure_image(&pm.this, NULL, 2, TRANSFORM_ROWMAX, TRANSFORM_HEIGHTMAX);
+
+   /* Don't give argv[0], it's normally some horrible libtool string: */
+   cp = safecat(command, sizeof command, cp, "pngvalid");
 
    /* Default to error on warning: */
    pm.this.treat_warnings_as_errors = 1;
@@ -7716,7 +7734,11 @@ int main(int argc, PNG_CONST char **argv)
    /* Now parse the command line options. */
    while (--argc >= 1)
    {
-      if (strcmp(*++argv, "-v") == 0)
+      /* Record each argument for posterity: */
+      cp = safecat(command, sizeof command, cp, " ");
+      cp = safecat(command, sizeof command, cp, *++argv);
+
+      if (strcmp(*argv, "-v") == 0)
          pm.this.verbose = 1;
 
       else if (strcmp(*argv, "-l") == 0)
@@ -7730,7 +7752,10 @@ int main(int argc, PNG_CONST char **argv)
 
       else if (strcmp(*argv, "--speed") == 0)
          pm.this.speed = 1, pm.ngammas = (sizeof gammas)/(sizeof gammas[0]),
-            pm.test_standard = 0;
+            pm.test_standard = 0, summary = 0;
+
+      else if (strcmp(*argv, "--memory") == 0)
+         memstats = 1;
 
       else if (strcmp(*argv, "--size") == 0)
          pm.test_size = 1;
@@ -7962,7 +7987,7 @@ int main(int argc, PNG_CONST char **argv)
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
       if (pm.ngammas > 0)
-         perform_gamma_test(&pm, summary && !pm.this.speed);
+         perform_gamma_test(&pm, summary);
 #endif
    }
 
@@ -7979,18 +8004,22 @@ int main(int argc, PNG_CONST char **argv)
       exit(1);
    }
 
-   if (summary && !pm.this.speed)
+   if (summary)
    {
-      printf("Results using %s point arithmetic %s\n",
+      printf("%s: %s: %s point arithmetic, %d errors, %d warnings\n",
+         (pm.this.nerrors || (pm.this.treat_warnings_as_errors &&
+            pm.this.nwarnings)) ? "FAIL" : "PASS",
+         command,
 #if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) || PNG_LIBPNG_VER < 10500
          "floating",
 #else
          "fixed",
 #endif
-         (pm.this.nerrors || (pm.this.treat_warnings_as_errors &&
-            pm.this.nwarnings)) ? "(errors)" : (pm.this.nwarnings ?
-               "(warnings)" : "(no errors or warnings)")
-      );
+         pm.this.nerrors, pm.this.nwarnings);
+   }
+
+   if (memstats)
+   {
       printf("Allocated memory statistics (in bytes):\n"
          "\tread  %lu maximum single, %lu peak, %lu total\n"
          "\twrite %lu maximum single, %lu peak, %lu total\n",
