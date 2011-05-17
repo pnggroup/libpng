@@ -3396,7 +3396,7 @@ Version 1.5.3beta09 [May 17, 2011]
     the tests back leaves the old, inaccurate, 8-bit gamma calculations, but
     these are clearly better than none!
 
-Version 1.5.3beta10 [May 19, 2011]
+Version 1.5.3beta10 [May 20, 2011]
 
   png_set_background() and png_expand_16() did not work together correctly.
     This problem is present in 1.5.2; if png_set_background is called with
