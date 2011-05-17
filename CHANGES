@@ -15,7 +15,7 @@ Version 0.3
   fixed some bugs in writer
   interfaced with zlib 0.5
   added K&R support
-  added check for 64 KB blocks for 16 bit machines
+  added check for 64 KB blocks for 16-bit machines
 
 Version 0.4
   cleaned up code and commented code
@@ -74,7 +74,7 @@ Version 0.82 [September, 1995]
 Version 0.85 [December, 1995]
   added more medium model code (almost everything's a far)
   added i/o, error, and memory callback functions
-  fixed some bugs (16 bit, 4 bit interlaced, etc.)
+  fixed some bugs (16-bit, 4-bit interlaced, etc.)
   added first run progressive reader (barely tested)
 
 Version 0.86 [January, 1996]
@@ -2935,7 +2935,7 @@ Version 1.5.0beta36 [July 29, 2010]
     PNG_INTERLACE transform and to get the number of rows in the current
     pass.
   A new test program, pngvalid.c, validates the gamma code.
-  Errors in the 16 bit gamma correction (overflows) have been corrected.
+  Errors in the 16-bit gamma correction (overflows) have been corrected.
   cHRM chunk testing is done consistently (previously the floating point
     API bypassed it, because the test really didn't work on FP, now the test
     is performed on the actual values to be stored in the PNG file so it
@@ -3227,7 +3227,7 @@ Version 1.5.1beta10 [January 27, 2010]
 Version 1.5.1beta11 [January 28, 2011]
   Changed PNG_UNUSED from "param=param;" to "{if(param){}}".
   Corrected local variable type in new API png_process_data_skip()
-    The type was self-evidently incorrect but only causes problems on 64 bit
+    The type was self-evidently incorrect but only causes problems on 64-bit
     architectures.
   Added transform tests to pngvalid and simplified the arguments.
 
@@ -3390,10 +3390,10 @@ Version 1.5.3beta08 [May 16, 2011]
 
 Version 1.5.3beta09 [May 17, 2011]
  Reversed earlier 1.5.3 change of transformation order; move png_expand_16 back.
-   The change doesn't work because it requires 16 bit gamma tables when the code
-   only generates 8 bit ones.  This fails silently; the libpng code just doesn't
-   do any gamma correction.  Moving the tests back leaves the old, inaccurate, 8
-   bit gamma calculations, but these are clearly better than none!
+   The change doesn't work because it requires 16-bit gamma tables when the code
+   only generates 8-bit ones.  This fails silently; the libpng code just doesn't
+   do any gamma correction.  Moving the tests back leaves the old, inaccurate,
+   8-bit gamma calculations, but these are clearly better than none!
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

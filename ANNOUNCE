@@ -129,10 +129,10 @@ Version 1.5.3beta08 [May 16, 2011]
 
 Version 1.5.3beta09 [May 17, 2011]
  Reversed earlier 1.5.3 change of transformation order; move png_expand_16 back.
-   The change doesn't work because it requires 16 bit gamma tables when the code
-   only generates 8 bit ones.  This fails silently; the libpng code just doesn't
-   do any gamma correction.  Moving the tests back leaves the old, inaccurate, 8
-   bit gamma calculations, but these are clearly better than none!
+   The change doesn't work because it requires 16-bit gamma tables when the code
+   only generates 8-bit ones.  This fails silently; the libpng code just doesn't
+   do any gamma correction.  Moving the tests back leaves the old, inaccurate,
+   8-bit gamma calculations, but these are clearly better than none!
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
