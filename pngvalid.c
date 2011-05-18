@@ -1548,8 +1548,15 @@ typedef struct png_modifier
    unsigned int             use_input_precision_sbit :1;
    unsigned int             use_input_precision_16to8 :1;
 
-   /* Whether to allow for low bit depth composition errors: */
-   unsigned int             use_linear_precision :1;
+   /* If set assume that the calculation bit depth is set by the input
+    * precision, not the output precision.
+    */
+   unsigned int             calculations_use_input_precision :1;
+
+   /* If set assume that the calculations are done in 16 bits even if both input
+    * and output are 8 bit or less.
+    */
+   unsigned int             assume_16_bit_calculations :1;
 
    /* Which gamma tests to run: */
    unsigned int             test_gamma_threshold :1;
@@ -1602,7 +1609,7 @@ modifier_init(png_modifier *pm)
    pm->use_input_precision = 0;
    pm->use_input_precision_sbit = 0;
    pm->use_input_precision_16to8 = 0;
-   pm->use_linear_precision = 0;
+   pm->calculations_use_input_precision = 0;
    pm->test_gamma_threshold = 0;
    pm->test_gamma_transform = 0;
    pm->test_gamma_sbit = 0;
@@ -1616,45 +1623,102 @@ modifier_init(png_modifier *pm)
 }
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
-static double abserr(png_modifier *pm, png_byte bit_depth)
+/* If pm->calculations_use_input_precision is set then operations will happen
+ * with only 8 bit precision unless both the input and output bit depth are 16.
+ *
+ * If pm->assume_16_bit_calculations is set then even 8 bit calculations use 16
+ * bit precision.  This only affects those of the following limits that pertain
+ * to a calculation - not a digitization operation!
+ */
+static double abserr(png_modifier *pm, int in_depth, int out_depth)
 {
-   return bit_depth == 16 ? pm->maxabs16 : pm->maxabs8;
-}
-
-static double calcerr(png_modifier *pm, png_byte bit_depth)
-{
-   /* This exists because libpng uses linear transformations in the original bit
-    * depth when performing background composition.  This introduces significant
-    * errors for low values:
+   /* Absolute error permitted in linear values - affected by the bit depth of
+    * the calculations.
     */
-   if (pm->use_linear_precision)
-      return bit_depth == 16 ? pm->maxcalc16 : pm->maxcalc8;
+   if (pm->assume_16_bit_calculations || (out_depth == 16 && (in_depth == 16 ||
+      !pm->calculations_use_input_precision)))
+      return pm->maxabs16;
    else
-      return bit_depth == 16 ? pm->maxabs16 : pm->maxabs8;
+      return pm->maxabs8;
 }
 
-static double pcerr(png_modifier *pm, png_byte bit_depth)
+static double calcerr(png_modifier *pm, int in_depth, int out_depth)
 {
-   return (bit_depth == 16 ? pm->maxpc16 : pm->maxpc8) * .01;
+   /* Error in the linear composition arithmetic - only relevant when
+    * composition actually happens (0 < alpha < 1).
+    */
+   if (pm->assume_16_bit_calculations || (out_depth == 16 && (in_depth == 16 ||
+      !pm->calculations_use_input_precision)))
+      return pm->maxcalc16;
+   else
+      return pm->maxcalc8;
 }
 
-static double outerr(png_modifier *pm, png_byte bit_depth)
+static double pcerr(png_modifier *pm, int in_depth, int out_depth)
+{
+   /* Percentage error permitted in the linear values.  Note that the specified
+    * value is a percentage but this routine returns a simple number.
+    */
+   if (pm->assume_16_bit_calculations || (out_depth == 16 && (in_depth == 16 ||
+      !pm->calculations_use_input_precision)))
+      return pm->maxpc16 * .01;
+   else
+      return pm->maxpc8 * .01;
+}
+
+/* Output error - the error in the encoded value.  This is determined by the
+ * digitization of the output so can be +/-0.5 in the actual output value.  In
+ * the expand_16 case with the current code in libpng the expand happens after
+ * all the calculations are done in 8 bit arithmetic, so even though the output
+ * depth is 16 the output error is determined by the 8 bit calculation.
+ *
+ * This limit is not determined by the bit depth of internal calculations.
+ *
+ * The specified parameter does *not* include the base .5 digitization error but
+ * it is added here.
+ */
+static double outerr(png_modifier *pm, int in_depth, int out_depth)
 {
    /* There is a serious error in the 2 and 4 bit grayscale transform because
     * the gamma table value (8 bits) is simply shifted, not rounded, so the
     * error in 4 bit greyscale gamma is up to the value below.  This is a hack
     * to allow pngvalid to succeed:
+    *
+    * TODO: fix this in libpng
     */
-   if (bit_depth == 2)
+   if (out_depth == 2)
       return .73182-.5;
 
-   if (bit_depth == 4)
+   if (out_depth == 4)
       return .90644-.5;
 
-   if (bit_depth == 16)
-     return pm->maxout16;
+   if (out_depth == 16 && (in_depth == 16 ||
+      !pm->calculations_use_input_precision))
+      return pm->maxout16;
 
-   return pm->maxout8;
+   /* This is the case where the value was calculated at 8-bit precision then
+    * scaled to 16 bits.
+    */
+   else if (out_depth == 16)
+      return pm->maxout8 * 257;
+
+   else
+      return pm->maxout8;
+}
+
+/* This complements the above by providing the appropriate quantization for the
+ * final value.  Normally this would just be quantization to an integral value,
+ * but in the 8 bit calculation case it's actually quantization to a multiple of
+ * 257!
+ */
+static int output_quantization_factor(png_modifier *pm, int in_depth,
+   int out_depth)
+{
+   if (out_depth == 16 && in_depth != 16
+      && pm->calculations_use_input_precision)
+      return 257;
+   else
+      return 1;
 }
 
 /* One modification structure must be provided for each chunk to be modified (in
@@ -4551,7 +4615,8 @@ transform_info(png_structp pp, png_infop pi)
 static void
 transform_range_check(png_structp pp, unsigned int r, unsigned int g,
    unsigned int b, unsigned int a, unsigned int in_digitized, double in,
-   unsigned int out, png_byte sample_depth, double err, PNG_CONST char *name)
+   unsigned int out, png_byte sample_depth, double err, PNG_CONST char *name,
+   double digitization_error)
 {
    /* Compare the scaled, digitzed, values of our local calculation (in+-err)
     * with the digitized values libpng produced;  'sample_depth' is the actual
@@ -4560,8 +4625,8 @@ transform_range_check(png_structp pp, unsigned int r, unsigned int g,
     * internal errors in pngvalid itself (the threshold is about 1/255.)
     */
    unsigned int max = (1U<<sample_depth)-1;
-   double in_min = ceil((in-err)*max - .5);
-   double in_max = floor((in+err)*max + .5);
+   double in_min = ceil((in-err)*max - digitization_error);
+   double in_max = floor((in+err)*max + digitization_error);
    if (err > 4E-3 || !(out >= in_min && out <= in_max))
    {
       char message[256];
@@ -4608,6 +4673,7 @@ transform_image_validate(transform_display *dp, png_structp pp, png_infop pi)
    PNG_CONST png_byte blue_sBIT = dp->this.blue_sBIT;
    PNG_CONST png_byte alpha_sBIT = dp->this.alpha_sBIT;
    PNG_CONST int have_tRNS = dp->this.is_transparent;
+   double digitization_error;
 
    store_palette out_palette;
    png_uint_32 y;
@@ -4630,9 +4696,36 @@ transform_image_validate(transform_display *dp, png_structp pp, png_infop pi)
       (void)read_palette(out_palette, &npalette, pp, pi);
       if (npalette != dp->this.npalette)
          png_error(pp, "unexpected change in palette size");
+
+      digitization_error = .5;
    }
    else
+   {
+      png_byte in_sample_depth;
+
       memset(out_palette, 0x5e, sizeof out_palette);
+
+      /* assume-8-bit-calculations means assume that if the input has 8 bit
+       * (or less) samples and the output has 16 bit samples the calculations
+       * will be done with 8 bit precision, not 16.
+       *
+       * TODO: fix this in libpng; png_set_expand_16 should cause 16 bit
+       * calculations to be used throughout.
+       */
+      if (in_ct == PNG_COLOR_TYPE_PALETTE || in_bd < 16)
+         in_sample_depth = 8;
+      else
+         in_sample_depth = in_bd;
+
+      if (sample_depth != 16 || in_sample_depth > 8 ||
+         !dp->pm->calculations_use_input_precision)
+         digitization_error = .5;
+
+      /* Else errors are at 8 bit precision, scale .5 in 8 bits to the 16 bits:
+       */
+      else
+         digitization_error = .5 * 257;
+   }
 
    for (y=0; y<h; ++y)
    {
@@ -4689,24 +4782,26 @@ transform_image_validate(transform_display *dp, png_structp pp, png_infop pi)
           */
          if (in_pixel.red != out_pixel.red)
             transform_range_check(pp, r, g, b, a, in_pixel.red, in_pixel.redf,
-               out_pixel.red, sample_depth, in_pixel.rede, "red/gray");
+               out_pixel.red, sample_depth, in_pixel.rede, "red/gray",
+               digitization_error);
 
          if ((out_ct & PNG_COLOR_MASK_COLOR) != 0 &&
             in_pixel.green != out_pixel.green)
             transform_range_check(pp, r, g, b, a, in_pixel.green,
                in_pixel.greenf, out_pixel.green, sample_depth, in_pixel.greene,
-               "green");
+               "green", digitization_error);
 
          if ((out_ct & PNG_COLOR_MASK_COLOR) != 0 &&
             in_pixel.blue != out_pixel.blue)
             transform_range_check(pp, r, g, b, a, in_pixel.blue, in_pixel.bluef,
-               out_pixel.blue, sample_depth, in_pixel.bluee, "blue");
+               out_pixel.blue, sample_depth, in_pixel.bluee, "blue",
+               digitization_error);
 
          if ((out_ct & PNG_COLOR_MASK_ALPHA) != 0 &&
             in_pixel.alpha != out_pixel.alpha)
             transform_range_check(pp, r, g, b, a, in_pixel.alpha,
                in_pixel.alphaf, out_pixel.alpha, sample_depth, in_pixel.alphae,
-               "alpha");
+               "alpha", digitization_error);
       } /* pixel (x) loop */
    } /* row (y) loop */
 
@@ -5174,7 +5269,6 @@ image_transform_png_set_strip_alpha_mod(PNG_CONST image_transform *this,
 
    that->have_tRNS = 0;
    that->alphaf = 1;
-   that->alphae = 0;
 
    this->next->mod(this->next, that, pp, display);
 }
@@ -5701,7 +5795,6 @@ perform_transform_test(png_modifier *pm)
 }
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
-
 /********************************* GAMMA TESTS ********************************/
 #ifdef PNG_READ_GAMMA_SUPPORTED
 /* Gamma test images. */
@@ -6043,23 +6136,36 @@ typedef struct validate_info
    double background_blue;
 
    double maxabs;
+   double maxpc;
    double maxcalc;
    double maxout;
-   double maxpc;
+   double maxout_total;     /* Total including quantization error */
+   int    outquant;
 }
 validate_info;
 
 static void
 init_validate_info(validate_info *vi, gamma_display *dp, png_struct *pp,
-    PNG_CONST png_byte out_bd)
+    int in_depth, int out_depth)
 {
-   PNG_CONST unsigned int outmax = (1U<<out_bd)-1;
+   PNG_CONST unsigned int outmax = (1U<<out_depth)-1;
 
    vi->pp = pp;
    vi->dp = dp;
-   vi->sbit = dp->sbit;
-   vi->sbit_max = (1U << dp->sbit)-1;
-   vi->isbit_shift = (dp->this.bit_depth - dp->sbit);
+
+   if (dp->sbit > 0 && dp->sbit < in_depth)
+   {
+      vi->sbit = dp->sbit;
+      vi->isbit_shift = in_depth - dp->sbit;
+   }
+
+   else
+   {
+      vi->sbit = (png_byte)in_depth;
+      vi->isbit_shift = 0;
+   }
+
+   vi->sbit_max = (1U << vi->sbit)-1;
 
    /* This mimics the libpng threshold test, '0' is used to prevent gamma
     * correction in the validation test.
@@ -6072,12 +6178,15 @@ init_validate_info(validate_info *vi, gamma_display *dp, png_struct *pp,
 
    vi->use_input_precision = dp->use_input_precision;
    vi->outmax = outmax;
-   vi->maxabs = abserr(dp->pm, out_bd);
-   vi->maxcalc = calcerr(dp->pm, out_bd);
-   vi->maxout = outerr(dp->pm, out_bd);
-   vi->maxpc = pcerr(dp->pm, out_bd);
+   vi->maxabs = abserr(dp->pm, in_depth, out_depth);
+   vi->maxpc = pcerr(dp->pm, in_depth, out_depth);
+   vi->maxcalc = calcerr(dp->pm, in_depth, out_depth);
+   vi->maxout = outerr(dp->pm, in_depth, out_depth);
+   vi->outquant = output_quantization_factor(dp->pm, in_depth, out_depth);
+   vi->maxout_total = vi->maxout + vi->outquant * .5;
 
-   if ((dp->this.colour_type & PNG_COLOR_MASK_ALPHA) != 0)
+   if ((dp->this.colour_type & PNG_COLOR_MASK_ALPHA) != 0 ||
+      (dp->this.colour_type == 3 && dp->this.is_transparent))
    {
       vi->do_background = dp->do_background;
 
@@ -6124,6 +6233,72 @@ init_validate_info(validate_info *vi, gamma_display *dp, png_struct *pp,
    vi->strip16 = dp->strip16;
 }
 
+/* This function handles composition of a single non-alpha component.  The
+ * argument is the input sample value, in the range 0..1, and the alpha value.
+ * The result is the composed, linear, input sample.  If alpha is less than zero
+ * this is the alpha component and the function should not be called!
+ */
+static double
+gamma_component_compose(int do_background, double input_sample, double alpha,
+   double background, int *compose)
+{
+   switch (do_background)
+   {
+      case PNG_BACKGROUND_GAMMA_SCREEN:
+      case PNG_BACKGROUND_GAMMA_FILE:
+      case PNG_BACKGROUND_GAMMA_UNIQUE:
+         /* Standard PNG background processing. */
+         if (alpha < 1)
+         {
+            if (alpha > 0)
+            {
+               input_sample = input_sample * alpha + background * (1-alpha);
+               if (compose != NULL)
+                  *compose = 1;
+            }
+
+            else
+               input_sample = background;
+         }
+         break;
+
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
+      case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
+      case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
+         /* The components are premultiplied in either case and the output is
+          * gamma encoded (to get standard Porter-Duff we expect the output
+          * gamma to be set to 1.0!)
+          */
+      case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:
+         /* The optimization is that the partial-alpha entries are linear
+          * while the opaque pixels are gamma encoded, but this only affects the
+          * output encoding.
+          */
+         if (alpha < 1)
+         {
+            if (alpha > 0)
+            {
+               input_sample *= alpha;
+               if (compose != NULL)
+                  *compose = 1;
+            }
+
+            else
+               input_sample = 0;
+         }
+         break;
+#endif
+
+      default:
+         /* Standard cases where no compositing is done (so the component
+          * value is already correct.)
+          */
+         break;
+   }
+
+   return input_sample;
+}
+
 /* This API returns the encoded *input* component, in the range 0..1 */
 static double
 gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
@@ -6141,9 +6316,6 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
    /* First check on the 'perfect' result obtained from the digitized input
     * value, id, and compare this against the actual digitized result, 'od'.
     * 'i' is the input result in the range 0..1:
-    *
-    * NOTE: sBIT should be taken into account here but isn't, as described
-    * below (next function).
     */
    i = isbit; i /= sbit_max;
 
@@ -6180,7 +6352,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
       if (encoded_error > vi->dp->maxerrout)
          vi->dp->maxerrout = encoded_error;
 
-      if (encoded_error < .5+vi->maxout)
+      if (encoded_error < vi->maxout_total)
          return i;
    }
 
@@ -6196,141 +6368,61 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
       double input_sample = i; /* In range 0..1 */
       double output, error, encoded_sample;
       double es_lo, es_hi;
-      int compose = 0; /* Set to one if composition done */
-      int output_is_encoded = 0; /* Set if encoded to screen gamma */
+      int compose = 0;           /* Set to one if composition done */
+      int output_is_encoded;     /* Set if encoded to screen gamma */
       int log_max_error = 1;     /* Check maximum error values */
 
       /* Convert to linear light (with the above caveat.)  The alpha channel is
        * already linear.
        */
-      if (alpha >= 0 && vi->file_inverse > 0)
-         input_sample = pow(input_sample, vi->file_inverse);
+      if (alpha >= 0)
+      {
+         int tcompose;
+
+         if (vi->file_inverse > 0 && input_sample > 0 && input_sample < 1)
+            input_sample = pow(input_sample, vi->file_inverse);
+
+         /* Handle the compose processing: */
+         tcompose = 0;
+         input_sample = gamma_component_compose(do_background, input_sample,
+            alpha, background, &tcompose);
+
+         if (tcompose)
+            compose = 1;
+      }
 
       /* And similarly for the output value, but we need to check the background
-       * handling to linearize it correctly, so do that in the switch below.
+       * handling to linearize it correctly.
        */
       output = od;
       output /= outmax;
 
-      /* If necessary handle the background processing - note that this does
-       * not need to do anything to the alpha channel, which starts out linear.
-       * First the alpha channel case.
-       */
-      if (alpha < 0) switch (do_background)
-      {
-#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-         case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
-            /* output alpha is gamma encoded */
-            if (vi->screen_gamma > 0)
-            {
-               output = pow(output, vi->screen_gamma);
-               output_is_encoded = 1;
-            }
-            break;
-#endif
+      output_is_encoded = vi->screen_gamma > 0;
 
-         default:
+      if (alpha < 0) /* The alpha channel */
+      {
+         if (do_background != ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN)
+         {
             /* In all other cases the output alpha channel is linear already,
              * don't log errors here, they are much larger in linear data.
              */
+            output_is_encoded = 0;
             log_max_error = 0;
-            break;
+         }
       }
 
-      /* Then the components. */
-      else switch (do_background)
+      else /* A component */
       {
-         case PNG_BACKGROUND_GAMMA_SCREEN:
-         case PNG_BACKGROUND_GAMMA_FILE:
-         case PNG_BACKGROUND_GAMMA_UNIQUE:
-            /* Standard PNG background processing. */
-            if (alpha < 1)
-            {
-               if (alpha > 0)
-               {
-                  input_sample = input_sample * alpha + background * (1-alpha);
-                  compose = 1;
-               }
-
-               else
-                  input_sample = background;
-            }
-
-            /* Output is gamma encoded. */
-            if (vi->screen_gamma > 0)
-            {
-               output = pow(output, vi->screen_gamma);
-               output_is_encoded = 1;
-            }
-            break;
-
-#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-         case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
-         case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
-            /* The components are premultiplied in either case and the output is
-             * gamma encoded (to get standard Porter-Duff we expect the output
-             * gamma to be set to 1.0!)
-             */
-            if (alpha < 1)
-            {
-               if (alpha > 0)
-               {
-                  input_sample *= alpha;
-                  compose = 1;
-               }
-
-               else
-                  input_sample = 0;
-            }
-
-            if (vi->screen_gamma > 0)
-            {
-               output = pow(output, vi->screen_gamma);
-               output_is_encoded = 1;
-            }
-            break;
-
-         case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:
-            /* The optimization is that the partial-alpha entries are linear
-             * while the opaque pixels are gamma encoded.
-             */
-            if (alpha < 1)
-            {
-               if (alpha > 0)
-               {
-                  input_sample *= alpha;
-                  compose = 1;
-                  /* Even though the screen may be non-linear the current
-                   * component value remains linear, don't log errors in this
-                   * case, they are irrelevant to overall perception:
-                   */
-                  log_max_error = 0;
-               }
-
-               else
-                  input_sample = 0;
-            }
-
-            /* Opaque pixel, so gamma encode it: */
-            else if (vi->screen_gamma > 0)
-            {
-               output = pow(output, vi->screen_gamma);
-               output_is_encoded = 1;
-            }
-            break;
-#endif
-
-         default:
-            /* Standard cases where no compositing is done (so the component
-             * value is already correct.)  The output is still gamma encoded.
-             */
-            if (vi->screen_gamma > 0)
-            {
-               output = pow(output, vi->screen_gamma);
-               output_is_encoded = 1;
-            }
-            break;
+         if (do_background == ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED &&
+            alpha < 1) /* the optimized case - linear output */
+         {
+            if (alpha > 0) log_max_error = 0;
+            output_is_encoded = 0;
+         }
       }
+
+      if (output_is_encoded)
+         output = pow(output, vi->screen_gamma);
 
       /* Calculate (or recalculate) the encoded_sample value and repeat the
        * check above (unnecessary if we took the fast route, but harmless.)
@@ -6349,9 +6441,20 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
          if (log_max_error && encoded_error > vi->dp->maxerrout)
             vi->dp->maxerrout = encoded_error;
 
-         if (encoded_error < .5+vi->maxout)
+         if (encoded_error < vi->maxout_total)
             return i;
       }
+
+      /* i: the original input value in the range 0..1
+       *
+       * pngvalid calculations:
+       *  input_sample: linear result; i linearized and composed, range 0..1
+       *  encoded_sample: encoded result; input_sample scaled to ouput bit depth
+       *
+       * libpng calculations:
+       *  output: linear result; od scaled to 0..1 and linearized
+       *  od: encoded result from libpng
+       */
 
       /* Now we have the numbers for real errors, both absolute values as as a
        * percentage of the correct value (output):
@@ -6362,9 +6465,9 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
          vi->dp->maxerrabs = error;
 
       /* The following is an attempt to ignore the tendency of quantization to
-       * dominate the percentage errors for low output sample values:
+       * dominate the percentage errors for lower result values:
        */
-      if (log_max_error && input_sample*vi->maxpc > .5+vi->maxabs)
+      if (log_max_error && input_sample > .5)
       {
          double percentage_error = error/input_sample;
          if (percentage_error > vi->dp->maxerrpc)
@@ -6380,9 +6483,17 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
       {
          double tmp = input_sample * vi->maxpc;
          if (tmp < vi->maxabs) tmp = vi->maxabs;
+         /* If 'compose' is true the composition was done in linear space using
+          * integer arithmetic.  This introduces an extra error of +/- 0.5 (at
+          * least) in the integer space used.  'maxcalc' records this, taking
+          * into account the possibility that even for 16 bit output 8 bit space
+          * may have been used.
+          */
          if (compose && tmp < vi->maxcalc) tmp = vi->maxcalc;
 
-         /* Low bound - the minimum of the four: */
+         /* The 'maxout' value refers to the encoded result, to compare with
+          * this encode input_sample adjusted by the maximum error (tmp) above.
+          */
          es_lo = encoded_sample - vi->maxout;
 
          if (es_lo > 0 && input_sample-tmp > 0)
@@ -6392,6 +6503,9 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
                low_value = pow(low_value, vi->screen_inverse);
             low_value *= outmax;
             if (low_value < es_lo) es_lo = low_value;
+
+            /* Quantize this appropriately: */
+            es_lo = ceil(es_lo / vi->outquant - .5) * vi->outquant;
          }
 
          else
@@ -6406,6 +6520,8 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
                high_value = pow(high_value, vi->screen_inverse);
             high_value *= outmax;
             if (high_value > es_hi) es_hi = high_value;
+
+            es_hi = floor(es_hi / vi->outquant + .5) * vi->outquant;
          }
 
          else
@@ -6414,52 +6530,59 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
 
       /* The primary test is that the final encoded value returned by the
        * library should be between the two limits (inclusive) that were
-       * calculated above.  At this point quantization of the output must be
-       * taken into account.
+       * calculated above.
        */
-      if (od+.5 < es_lo || od-.5 > es_hi)
+      if (od < es_lo || od > es_hi)
       {
          /* There has been an error in processing. */
          double is_lo, is_hi;
 
-         /* NOTE: 'use_input_precision' is never set in background and alpha
-          * mode tests, if it ever is the following will be wrong because it
-          * doesn't do any of the compose handling!
-          */
          if (vi->use_input_precision)
          {
             /* Ok, something is wrong - this actually happens in current libpng
-             * sbit processing.  Assume that the input value (id, adjusted for
-             * sbit) can be anywhere between value-.5 and value+.5 - quite a
+             * 16-to-8 processing.  Assume that the input value (id, adjusted
+             * for sbit) can be anywhere between value-.5 and value+.5 - quite a
              * large range if sbit is low.
              */
             double tmp = (isbit - .5)/sbit_max;
 
-            if (tmp > 0)
-            {
-               if (alpha >= 0 && vi->gamma_correction > 0)
-                  tmp = pow(tmp, vi->gamma_correction);
-               is_lo = outmax * tmp - vi->maxout;
-               if (is_lo < 0) is_lo = 0;
-            }
+            if (tmp <= 0)
+               tmp = 0;
 
-            else
+            else if (alpha >= 0 && vi->file_inverse > 0 && tmp < 1)
+               tmp = pow(tmp, vi->file_inverse);
+
+            tmp = gamma_component_compose(do_background, tmp, alpha, background,
+               NULL);
+
+            if (output_is_encoded && tmp > 0 && tmp < 1)
+               tmp = pow(tmp, vi->screen_inverse);
+
+            is_lo = ceil(outmax * tmp - vi->maxout_total);
+
+            if (is_lo < 0)
                is_lo = 0;
 
             tmp = (isbit + .5)/sbit_max;
 
-            if (tmp < 1)
-            {
-               if (alpha >= 0 && vi->gamma_correction > 0)
-                  tmp = pow(tmp, vi->gamma_correction);
-               is_hi = outmax * tmp + vi->maxout;
-               if (is_hi > outmax) is_hi = outmax;
-            }
+            if (tmp <= 0)
+               tmp = 0;
 
-            else
+            else if (alpha >= 0 && vi->file_inverse > 0 && tmp < 1)
+               tmp = pow(tmp, vi->file_inverse);
+
+            tmp = gamma_component_compose(do_background, tmp, alpha, background,
+               NULL);
+
+            if (output_is_encoded && tmp > 0 && tmp < 1)
+               tmp = pow(tmp, vi->screen_inverse);
+
+            is_hi = floor(outmax * tmp + vi->maxout_total);
+
+            if (is_hi > outmax)
                is_hi = outmax;
 
-            if (!(od+.5 < is_lo || od-.5 > is_hi))
+            if (!(od < is_lo || od > is_hi))
                return i;
 
             /* One last chance.  If this is an alpha channel and the 16to8
@@ -6481,7 +6604,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
 
                   if (tmp > 0)
                   {
-                     is_lo = outmax * tmp - vi->maxout;
+                     is_lo = ceil(outmax * tmp - vi->maxout_total);
                      if (is_lo < 0) is_lo = 0;
                   }
 
@@ -6492,14 +6615,14 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
 
                   if (tmp < 1)
                   {
-                     is_hi = outmax * tmp + vi->maxout;
+                     is_hi = floor(outmax * tmp + vi->maxout_total);
                      if (is_hi > outmax) is_hi = outmax;
                   }
 
                   else
                      is_hi = outmax;
 
-                  if (!(od+.5 < is_lo || od-.5 > is_hi))
+                  if (!(od < is_lo || od > is_hi))
                      return i;
                }
 #           endif
@@ -6581,15 +6704,36 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi)
    PNG_CONST unsigned int samples_per_pixel = (out_ct & 2U) ? 3U : 1U;
    int processing;
    png_uint_32 y;
+   PNG_CONST store_palette_entry *in_palette = dp->this.palette;
+   PNG_CONST int in_is_transparent = dp->this.is_transparent;
+   int out_npalette = -1;
+   int out_is_transparent = 0; /* Just refers to the palette case */
+   store_palette out_palette;
    validate_info vi;
 
    /* Check for row overwrite errors */
    store_image_check(dp->this.ps, pp, 0);
 
-   init_validate_info(&vi, dp, pp, out_bd);
+   /* Supply the input and output sample depths here - 8 for an indexed image,
+    * otherwise the bit depth.
+    */
+   init_validate_info(&vi, dp, pp, in_ct==3?8:in_bd, out_ct==3?8:out_bd);
 
-   processing = (vi.gamma_correction > 0 && !dp->threshold_test && in_ct != 3)
+   processing = (vi.gamma_correction > 0 && !dp->threshold_test)
       || in_bd != out_bd || in_ct != out_ct || vi.do_background;
+
+   /* TODO: FIX THIS: MAJOR BUG!  If the transformations all happen inside
+    * the palette there is no way of finding out, because libpng fails to
+    * update the palette on png_read_update_info.  Indeed, libpng doesn't
+    * even do the required work until much later, when it doesn't have any
+    * info pointer.  Oops.  For the moment 'processing' is turned off if
+    * out_ct is palette.
+    */
+   if (in_ct == 3 && out_ct == 3)
+      processing = 0;
+
+   if (processing && out_ct == 3)
+      out_is_transparent = read_palette(out_palette, &out_npalette, pp, pi);
 
    for (y=0; y<h; ++y)
    {
@@ -6606,21 +6750,43 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi)
          {
             double alpha = 1; /* serves as a flag value */
 
+            /* Record the palette index for index images. */
+            PNG_CONST unsigned int in_index =
+               in_ct == 3 ? sample(std, 3, in_bd, x, 0) : 256;
+            PNG_CONST unsigned int out_index =
+               out_ct == 3 ? sample(std, 3, out_bd, x, 0) : 256;
+
             /* Handle input alpha - png_set_background will cause the output
              * alpha to disappear so there is nothing to check.
              */
-            if ((in_ct & PNG_COLOR_MASK_ALPHA) != 0)
+            if ((in_ct & PNG_COLOR_MASK_ALPHA) != 0 || (in_ct == 3 &&
+               in_is_transparent))
             {
-               PNG_CONST unsigned int input_alpha =
+               PNG_CONST unsigned int input_alpha = in_ct == 3 ?
+                  dp->this.palette[in_index].alpha :
                   sample(std, in_ct, in_bd, x, samples_per_pixel);
 
-               if ((out_ct & PNG_COLOR_MASK_ALPHA) != 0)
-                  alpha = gamma_component_validate("alpha", &vi, input_alpha,
-                     sample(pRow, out_ct, out_bd, x, samples_per_pixel),
-                     -1/*alpha*/, 0/*background*/);
-               else
+               unsigned int output_alpha = 65536 /* as a flag value */;
+               
+               if (out_ct == 3)
                {
-                  /* This is a copy of the calculation of 'i' above. */
+                  if (out_is_transparent)
+                     output_alpha = out_palette[out_index].alpha;
+               }
+
+               else if ((out_ct & PNG_COLOR_MASK_ALPHA) != 0)
+                  output_alpha = sample(pRow, out_ct, out_bd, x,
+                     samples_per_pixel);
+
+               if (output_alpha != 65536)
+                  alpha = gamma_component_validate("alpha", &vi, input_alpha,
+                     output_alpha, -1/*alpha*/, 0/*background*/);
+
+               else /* no alpha in output */
+               {
+                  /* This is a copy of the calculation of 'i' above in order to
+                   * have the alpha value to use in the background calculation.
+                   */
                   alpha = input_alpha >> vi.isbit_shift;
                   alpha /= vi.sbit_max;
                }
@@ -6632,22 +6798,28 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi)
                   sample(std, in_ct, in_bd, x, 0),
                   sample(pRow, out_ct, out_bd, x, 0), alpha/*component*/,
                   vi.background_red);
-            else
+            else /* RGB or palette */
             {
                (void)gamma_component_validate("red", &vi,
-                  sample(std, in_ct, in_bd, x, 0),
-                  sample(pRow, out_ct, out_bd, x, 0), alpha/*component*/,
-                  vi.background_red);
+                  in_ct == 3 ? in_palette[in_index].red :
+                     sample(std, in_ct, in_bd, x, 0),
+                  out_ct == 3 ? out_palette[out_index].red :
+                     sample(pRow, out_ct, out_bd, x, 0),
+                  alpha/*component*/, vi.background_red);
 
                (void)gamma_component_validate("green", &vi,
-                  sample(std, in_ct, in_bd, x, 1),
-                  sample(pRow, out_ct, out_bd, x, 1), alpha/*component*/,
-                  vi.background_green);
+                  in_ct == 3 ? in_palette[in_index].green :
+                     sample(std, in_ct, in_bd, x, 1),
+                  out_ct == 3 ? out_palette[out_index].green :
+                     sample(pRow, out_ct, out_bd, x, 1),
+                  alpha/*component*/, vi.background_green);
 
                (void)gamma_component_validate("blue", &vi,
-                  sample(std, in_ct, in_bd, x, 2),
-                  sample(pRow, out_ct, out_bd, x, 2), alpha/*component*/,
-                  vi.background_blue);
+                  in_ct == 3 ? in_palette[in_index].blue :
+                     sample(std, in_ct, in_bd, x, 2),
+                  out_ct == 3 ? out_palette[out_index].blue :
+                     sample(pRow, out_ct, out_bd, x, 2),
+                  alpha/*component*/, vi.background_blue);
             }
          }
       }
@@ -6715,7 +6887,8 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
       d.pm->modifications = NULL;
       gamma_modification_init(&gamma_mod, d.pm, d.file_gamma);
       srgb_modification_init(&srgb_mod, d.pm, 127 /*delete*/);
-      sbit_modification_init(&sbit_mod, d.pm, d.sbit);
+      if (d.sbit > 0)
+         sbit_modification_init(&sbit_mod, d.pm, d.sbit);
 
       modification_reset(d.pm->modifications);
 
@@ -6840,7 +7013,7 @@ static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
    pos = safecatd(name, sizeof name, pos, screen_gamma, 3);
 
    (void)gamma_test(pm, colour_type, bit_depth, 0/*palette*/, interlace_type,
-      file_gamma, screen_gamma, bit_depth, 1, name,
+      file_gamma, screen_gamma, 0/*sBIT*/, 1/*threshold test*/, name,
       0 /*no input precision*/,
       0 /*no strip16*/, 0 /*no expand16*/, 0 /*no background*/, 0 /*hence*/,
       0 /*no background gamma*/);
@@ -6890,7 +7063,7 @@ static void gamma_transform_test(png_modifier *pm,
    size_t pos = 0;
    char name[64];
 
-   if (sbit != bit_depth)
+   if (sbit != bit_depth && sbit != 0)
    {
       pos = safecat(name, sizeof name, pos, "sbit(");
       pos = safecatn(name, sizeof name, pos, sbit);
@@ -6925,7 +7098,7 @@ static void perform_gamma_transform_tests(png_modifier *pm)
       for (i=0; i<pm->ngammas; ++i) for (j=0; j<pm->ngammas; ++j) if (i != j)
       {
          gamma_transform_test(pm, colour_type, bit_depth, palette_number,
-            pm->interlace_type, 1/pm->gammas[i], pm->gammas[j], bit_depth,
+            pm->interlace_type, 1/pm->gammas[i], pm->gammas[j], 0/*sBIT*/,
             pm->use_input_precision, 0 /*do not strip16*/);
 
          if (fail(pm))
@@ -7138,6 +7311,7 @@ static void gamma_composition_test(png_modifier *pm,
       {
          pos = safecatn(name, sizeof name, pos, background.red);
          pos = safecat(name, sizeof name, pos, ",");
+         pos = safecatn(name, sizeof name, pos, background.green);
          pos = safecat(name, sizeof name, pos, ",");
          pos = safecatn(name, sizeof name, pos, background.blue);
       }
@@ -7150,7 +7324,7 @@ static void gamma_composition_test(png_modifier *pm,
    pos = safecatd(name, sizeof name, pos, screen_gamma, 3);
 
    gamma_test(pm, colour_type, bit_depth, palette_number, interlace_type,
-      file_gamma, screen_gamma, bit_depth, 0, name, use_input_precision,
+      file_gamma, screen_gamma, 0/*sBIT*/, 0, name, use_input_precision,
       0/*strip 16*/, expand_16, do_background, &background, bg);
 }
 
@@ -7180,7 +7354,7 @@ perform_gamma_composition_tests(png_modifier *pm, int do_background,
           */
          gamma_composition_test(pm, colour_type, bit_depth, palette_number,
             pm->interlace_type, 1/pm->gammas[i], pm->gammas[j],
-            0/*use_input_precision*/, do_background, expand_16);
+            pm->use_input_precision, do_background, expand_16);
 
          if (fail(pm))
             return;
@@ -7222,6 +7396,12 @@ summarize_gamma_errors(png_modifier *pm, png_const_charp who, int low_bit_depth)
 static void
 perform_gamma_test(png_modifier *pm, int summary)
 {
+   /*TODO: remove this*/
+   /* Save certain values for the temporary overrides below. */
+   unsigned int calculations_use_input_precision =
+      pm->calculations_use_input_precision;
+   double maxout8 = pm->maxout8;
+
    /* First some arbitrary no-transform tests: */
    if (!pm->this.speed && pm->test_gamma_threshold)
    {
@@ -7235,7 +7415,14 @@ perform_gamma_test(png_modifier *pm, int summary)
    if (pm->test_gamma_transform)
    {
       init_gamma_errors(pm);
+      /*TODO: remove this.  Necessary because the currently libpng
+       * implementation works in 8 bits:
+       */
+      if (pm->test_gamma_expand16)
+         pm->calculations_use_input_precision = 1;
       perform_gamma_transform_tests(pm);
+      if (!calculations_use_input_precision)
+         pm->calculations_use_input_precision = 0;
 
       if (summary)
       {
@@ -7287,8 +7474,19 @@ perform_gamma_test(png_modifier *pm, int summary)
    {
       init_gamma_errors(pm);
 
+      /*TODO: remove this.  Necessary because the currently libpng
+       * implementation works in 8 bits:
+       */
+      if (pm->test_gamma_expand16)
+      {
+         pm->calculations_use_input_precision = 1;
+         pm->maxout8 = .499; /* because the 16 bit background is smashed */
+      }
       perform_gamma_composition_tests(pm, PNG_BACKGROUND_GAMMA_UNIQUE,
          pm->test_gamma_expand16);
+      if (!calculations_use_input_precision)
+         pm->calculations_use_input_precision = 0;
+      pm->maxout8 = maxout8;
 
       if (summary)
          summarize_gamma_errors(pm, "background", 1);
@@ -7302,11 +7500,18 @@ perform_gamma_test(png_modifier *pm, int summary)
 
       init_gamma_errors(pm);
 
+      /*TODO: remove this.  Necessary because the currently libpng
+       * implementation works in 8 bits:
+       */
+      if (pm->test_gamma_expand16)
+         pm->calculations_use_input_precision = 1;
       for (do_background = ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD;
          do_background <= ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN && !fail(pm);
          ++do_background)
          perform_gamma_composition_tests(pm, do_background,
             pm->test_gamma_expand16);
+      if (!calculations_use_input_precision)
+         pm->calculations_use_input_precision = 0;
 
       if (summary)
          summarize_gamma_errors(pm, "alpha mode", 1);
@@ -7704,7 +7909,13 @@ int main(int argc, PNG_CONST char **argv)
    pm.gammas = gammas;
    pm.ngammas = 0; /* default to off */
    pm.sbitlow = 8U; /* because libpng doesn't do sBIT below 8! */
-   pm.use_input_precision_16to8 = 1U; /* Because of the way libpng does it */
+   /* The following allows results to pass if they correspond to anything in the
+    * transformed range [input-.5,input+.5]; this is is required because of the
+    * way libpng treates the 16_TO_8 flag when building the gamma tables.
+    *
+    * TODO: review this
+    */
+   pm.use_input_precision_16to8 = 1U;
 
    /* Some default values (set the behavior for 'make check' here).
     * These values simply control the maximum error permitted in the gamma
@@ -7715,11 +7926,11 @@ int main(int argc, PNG_CONST char **argv)
     */
    pm.maxout8 = .1;     /* Arithmetic error in *encoded* value */
    pm.maxabs8 = .00005; /* 1/20000 */
-   pm.maxcalc8 = .004;  /* 1/250: +/-1 in 8 bits for compose errors */
+   pm.maxcalc8 = .004;  /* +/-1 in 8 bits for compose errors */
    pm.maxpc8 = .499;    /* I.e., .499% fractional error */
    pm.maxout16 = .499;  /* Error in *encoded* value */
    pm.maxabs16 = .00005;/* 1/20000 */
-   pm.maxcalc16 =.00005;/* 1/20000: for compose errors */
+   pm.maxcalc16 =.000015;/* +/-1 in 16 bits for compose errors */
 
    /* NOTE: this is a reasonable perceptual limit. We assume that humans can
     * perceive light level differences of 1% over a 100:1 range, so we need to
@@ -7734,6 +7945,8 @@ int main(int argc, PNG_CONST char **argv)
    /* Now parse the command line options. */
    while (--argc >= 1)
    {
+      int catmore = 0; /* Set if the argument has an argument. */
+
       /* Record each argument for posterity: */
       cp = safecat(command, sizeof command, cp, " ");
       cp = safecat(command, sizeof command, cp, *++argv);
@@ -7863,16 +8076,23 @@ int main(int argc, PNG_CONST char **argv)
       else if (strcmp(*argv, "--use-input-precision") == 0)
          pm.use_input_precision = 1;
 
-      else if (strcmp(*argv, "--use-linear-precision") == 0)
-         pm.use_linear_precision = 1;
+      else if (strcmp(*argv, "--calculations-use-input-precision") == 0)
+         pm.calculations_use_input_precision = 1;
 
-      else if (argc >= 1 && strcmp(*argv, "--sbitlow") == 0)
-         --argc, pm.sbitlow = (png_byte)atoi(*++argv);
+      else if (strcmp(*argv, "--assume-16-bit-calculations") == 0)
+         pm.assume_16_bit_calculations = 1;
 
-      else if (argc >= 1 && strcmp(*argv, "--touch") == 0)
-         --argc, touch = *++argv;
+      else if (strcmp(*argv, "--calculations-follow-bit-depth") == 0)
+         pm.calculations_use_input_precision =
+            pm.assume_16_bit_calculations = 0;
 
-      else if (argc >= 1 && strncmp(*argv, "--max", 5) == 0)
+      else if (argc > 1 && strcmp(*argv, "--sbitlow") == 0)
+         --argc, pm.sbitlow = (png_byte)atoi(*++argv), catmore = 1;
+
+      else if (argc > 1 && strcmp(*argv, "--touch") == 0)
+         --argc, touch = *++argv, catmore = 1;
+
+      else if (argc > 1 && strncmp(*argv, "--max", 5) == 0)
       {
          --argc;
 
@@ -7905,12 +8125,20 @@ int main(int argc, PNG_CONST char **argv)
             fprintf(stderr, "pngvalid: %s: unknown 'max' option\n", *argv);
             exit(1);
          }
+
+         catmore = 1;
       }
 
       else
       {
          fprintf(stderr, "pngvalid: %s: unknown argument\n", *argv);
          exit(1);
+      }
+
+      if (catmore) /* consumed an extra *argv */
+      {
+         cp = safecat(command, sizeof command, cp, " ");
+         cp = safecat(command, sizeof command, cp, *argv);
       }
    }
 
@@ -7942,9 +8170,6 @@ int main(int argc, PNG_CONST char **argv)
       pm.test_gamma_strip16 = 1;
       pm.test_gamma_background = 1;
       pm.test_gamma_alpha_mode = 1;
-      /* For the moment the inaccuarcy of the libpng composition requires this:
-       */
-      pm.use_linear_precision = 1;
    }
 
    else if (pm.ngammas == 0)
@@ -8006,16 +8231,16 @@ int main(int argc, PNG_CONST char **argv)
 
    if (summary)
    {
-      printf("%s: %s: %s point arithmetic, %d errors, %d warnings\n",
+      printf("%s: %s (%s point arithmetic)\n",
          (pm.this.nerrors || (pm.this.treat_warnings_as_errors &&
             pm.this.nwarnings)) ? "FAIL" : "PASS",
          command,
 #if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) || PNG_LIBPNG_VER < 10500
-         "floating",
+         "floating"
 #else
-         "fixed",
+         "fixed"
 #endif
-         pm.this.nerrors, pm.this.nwarnings);
+         );
    }
 
    if (memstats)
