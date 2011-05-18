@@ -1106,10 +1106,6 @@ png_init_palette_transformations(png_structp png_ptr)
        (png_ptr->transformations & PNG_EXPAND))
    {
       {
-         /* TODO: THIS MUST BE WRONG, because in png_init_read_transformations
-          * below the background red,green,blue values are used directly in the
-          * palette case (allowing an out-of-palette background color!)
-          */
          png_ptr->background.red   =
              png_ptr->palette[png_ptr->background.index].red;
          png_ptr->background.green =
@@ -1428,6 +1424,29 @@ png_init_read_transformations(png_structp png_ptr)
 
    else
       png_init_rgb_transformations(png_ptr);
+
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) && \
+   defined(PNG_READ_EXPAND_16_SUPPORTED)
+   if ((png_ptr->transformations & PNG_EXPAND_16) &&
+      (png_ptr->transformations & PNG_COMPOSE) &&
+      !(png_ptr->transformations & PNG_BACKGROUND_EXPAND) &&
+      png_ptr->bit_depth != 16)
+   {
+      /* TODO: fix this.  Because the expand_16 operation is after the compose
+       * handling the background color must be 8, not 16, bits deep, but the
+       * application will supply a 16 bit value so reduce it here.
+       *
+       * The PNG_BACKGROUND_EXPAND code above does not expand to 16 bits at
+       * present, so that case is ok (until do_expand_16 is moved.)
+       */
+#     define CHOP(x) ((png_uint_16)((2*(png_uint_32)(x) + 257)/514))
+      png_ptr->background.red = CHOP(png_ptr->background.red);
+      png_ptr->background.green = CHOP(png_ptr->background.green);
+      png_ptr->background.blue = CHOP(png_ptr->background.blue);
+      png_ptr->background.gray = CHOP(png_ptr->background.gray);
+#     undef CHOP
+   }
+#endif
 
    /* NOTE: below 'PNG_READ_ALPHA_MODE_SUPPORTED' is presumed to also enable the
     * background support (see the comments in scripts/pnglibconf.dfa), this
