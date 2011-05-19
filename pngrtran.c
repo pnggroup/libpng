@@ -1434,7 +1434,7 @@ png_init_read_transformations(png_structp png_ptr)
    {
       /* TODO: fix this.  Because the expand_16 operation is after the compose
        * handling the background color must be 8, not 16, bits deep, but the
-       * application will supply a 16 bit value so reduce it here.
+       * application will supply a 16-bit value so reduce it here.
        *
        * The PNG_BACKGROUND_EXPAND code above does not expand to 16 bits at
        * present, so that case is ok (until do_expand_16 is moved.)

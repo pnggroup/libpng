@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta10 - May 17, 2011
+Libpng 1.5.3beta10 - May 19, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -134,7 +134,16 @@ Version 1.5.3beta09 [May 17, 2011]
    do any gamma correction.  Moving the tests back leaves the old, inaccurate,
    8-bit gamma calculations, but these are clearly better than none!
 
-Version 1.5.3beta10 [May 17, 2011]
+Version 1.5.3beta10 [May 19, 2011]
+  png_set_background() and png_expand_16() did not work together correctly.
+    This problem is present in 1.5.2; if png_set_background is called with
+    need_expand false and the matching 16 bit color libpng erroneously just
+    treats it as an 8-bit color because of where png_do_expand_16 is in the
+    transform list.  This simple fix reduces the supplied colour to 8-bits,
+    so it gets smashed, but this is better than the current behavior.
+  Added tests for expand16, more fixes for palette image tests to pngvalid.
+    Corrects the code for palette image tests and disables attempts to
+    validate palette colors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
