@@ -3408,6 +3408,8 @@ Version 1.5.3beta10 [May 20, 2011]
     Corrects the code for palette image tests and disables attempts to
     validate palette colors.
 
+Version 1.5.3beta11 [May 20, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

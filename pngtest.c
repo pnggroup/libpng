@@ -1794,4 +1794,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_3beta10 Your_png_h_is_not_version_1_5_3beta10;
+typedef png_libpng_version_1_5_3beta11 Your_png_h_is_not_version_1_5_3beta11;
