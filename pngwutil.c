@@ -687,7 +687,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
 
             /* Compute the maximum possible length of the datastream */
 
-            /* Number of pixels, plus for each row a filter byte and possible
+            /* Number of pixels, plus for each row a filter byte
              * and possibly a padding byte, so increase the maximum
              * size to account for these.
              */
