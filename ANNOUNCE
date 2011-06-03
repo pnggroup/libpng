@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta11 - May 20, 2011
+Libpng 1.5.3rc01 - June 3, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3beta11.tar.xz (LZMA-compressed, recommended)
-   1.5.3beta11.tar.gz
-   1.5.3beta11.tar.bz2
+   1.5.3rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.3rc01.tar.gz
+   1.5.3rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153b11.7z  (LZMA-compressed, recommended)
-   lp153b11.zip
+   lp153r01.7z  (LZMA-compressed, recommended)
+   lp153r01.zip
 
 Other information:
 
-   1.5.3beta11-README.txt
-   1.5.3beta11-LICENSE.txt
+   1.5.3rc01-README.txt
+   1.5.3rc01-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -145,7 +145,8 @@ Version 1.5.3beta10 [May 20, 2011]
     Corrects the code for palette image tests and disables attempts to
     validate palette colors.
 
-Version 1.5.3beta11 [May 20, 2011]
+Version 1.5.3rc01 [June 3, 2011]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
