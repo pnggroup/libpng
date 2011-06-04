@@ -32,6 +32,8 @@ version 1.4.8beta01 [June 4, 2011]
     "#include pngpriv.h" from pngtest.c, to avoid setting a bad example.
   Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
     was introduced in libpng-1.2.20beta01.
+  Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
+    before IDAT.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

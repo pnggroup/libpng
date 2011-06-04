@@ -295,6 +295,7 @@ png_write_info(png_structp png_ptr, png_infop info_ptr)
          if (keep != PNG_HANDLE_CHUNK_NEVER &&
             up->location && (up->location & PNG_HAVE_PLTE) &&
             !(up->location & PNG_HAVE_IDAT) &&
+            !(up->location & PNG_AFTER_IDAT) &&
             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
          {
@@ -1411,7 +1412,7 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
 #endif
 
 #ifdef PNG_WRITE_FILLER_SUPPORTED
-   /* Pack XRGB/RGBX/ARGB/RGBA into * RGB (4 channels -> 3 channels) */
+   /* Pack XRGB/RGBX/ARGB/RGBA into RGB (4 channels -> 3 channels) */
    if (transforms & PNG_TRANSFORM_STRIP_FILLER_AFTER)
       png_set_filler(png_ptr, 0, PNG_FILLER_AFTER);
    else if (transforms & PNG_TRANSFORM_STRIP_FILLER_BEFORE)
