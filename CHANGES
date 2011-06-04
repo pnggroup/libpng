@@ -2805,6 +2805,8 @@ version 1.4.8beta01 [June 4, 2011]
   Port change to pngrtran.c from 1.5.3: when expanding a paletted image,
     always expand to RGBA if transparency is present.
 
+version 1.4.8beta02 [June 4, 2011]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

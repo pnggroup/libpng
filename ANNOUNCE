@@ -1,5 +1,5 @@
 
-Libpng 1.4.8beta01 - June 4, 2011
+Libpng 1.4.8rc01 - June 4, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.8beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.8beta01.tar.gz
-   1.4.8beta01.tar.bz2
+   1.4.8rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.8rc01.tar.gz
+   1.4.8rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp148b01.7z (LZMA-compressed, recommended)
-   lp148b01.zip
+   lp148r01.7z (LZMA-compressed, recommended)
+   lp148r01.zip
 
 Other information:
 
-   1.4.8beta01-README.txt
-   1.4.8beta01-LICENSE.txt
+   1.4.8rc01-README.txt
+   1.4.8rc01-LICENSE.txt
 
 Changes since the last public release (1.4.7):
 
@@ -36,6 +36,8 @@ version 1.4.8beta01 [June 4, 2011]
     before IDAT.
   Port change to pngrtran.c from 1.5.3: when expanding a paletted image,
     always expand to RGBA if transparency is present.
+
+version 1.4.8beta02 [June 4, 2011]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
