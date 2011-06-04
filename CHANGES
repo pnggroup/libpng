@@ -2794,10 +2794,12 @@ version 1.4.7rc01 [April 9, 2011]
 version 1.4.7 [April 9, 2011]
   Disabled PNG_PEDANTIC_WARNINGS for all MSC versions as in libpng-1.4.5.
 
-version 1.4.8beta01 [May 2, 2011]
+version 1.4.8beta01 [June 4, 2011]
   Undef "_ALL_SOURCE" for AIX, to prevent "jmpbuf" from being redefined.
   Copied png_debug macros from pngpriv.h into pngtest.c and removed
     "#include pngpriv.h" from pngtest.c, to avoid setting a bad example.
+  Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
+    was introduced in libpng-1.2.20beta01.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
