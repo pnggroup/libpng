@@ -1,5 +1,5 @@
 
-Libpng 1.4.8beta02 - June 6, 2011
+Libpng 1.4.8beta03 - June 6, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.8beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.8beta02.tar.gz
-   1.4.8beta02.tar.bz2
+   1.4.8beta03.tar.xz (LZMA-compressed, recommended)
+   1.4.8beta03.tar.gz
+   1.4.8beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp148b02.7z (LZMA-compressed, recommended)
-   lp148b02.zip
+   lp148b03.7z (LZMA-compressed, recommended)
+   lp148b03.zip
 
 Other information:
 
-   1.4.8beta02-README.txt
-   1.4.8beta02-LICENSE.txt
+   1.4.8beta03-README.txt
+   1.4.8beta03-LICENSE.txt
 
 Changes since the last public release (1.4.7):
 
