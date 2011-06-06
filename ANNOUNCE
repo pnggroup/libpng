@@ -1,5 +1,5 @@
 
-Libpng 1.4.8beta02 - June 5, 2011
+Libpng 1.4.8beta02 - June 6, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -40,6 +40,9 @@ version 1.4.8beta01 [June 4, 2011]
 version 1.4.8beta02 [June 5, 2011]
   Ported bugfix in pngrtran.c from 1.5.3: Ensure coefficients are OK for
     png_rgb_to_gray_fixed().
+
+version 1.4.8beta03 [June 6, 2011]
+  Check for integer overflow in png_set_rgb_to_gray().
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
