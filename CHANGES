@@ -2812,6 +2812,8 @@ version 1.4.8beta02 [June 5, 2011]
 version 1.4.8beta03 [June 6, 2011]
   Check for integer overflow in png_set_rgb_to_gray().
 
+version 1.4.8beta04 [June 6, 2011]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
