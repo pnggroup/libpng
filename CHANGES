@@ -2709,6 +2709,8 @@ version 1.2.45beta01 [June 7, 2011]
     report by Frank Busse, related to CVE-2004-0421).
   Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
     was introduced in libpng-1.2.20beta01.
+  Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
+    before IDAT.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
