@@ -1478,7 +1478,7 @@ version 1.2.9beta5 [March 4, 2006]
   Removed trailing blanks from source files.
   Put version and date of latest change in each source file, and changed
     copyright year accordingly.
-  More cleanup of configure.ac, Makefile.ac, and associated scripts.
+  More cleanup of configure.ac, Makefile.am, and associated scripts.
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
@@ -2703,6 +2703,12 @@ version 1.2.44rc03 [June 23, 2010]
 
 version 1.2.44 [June 26, 2010]
   Updated some of the "last changed" dates.
+
+version 1.2.45beta01 [June 7, 2011]
+  Fixed 1-byte uninitialized memory reference in png_format_buffer() (Bug
+    report by Frank Busse, related to CVE-2004-0421).
+  Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
+    was introduced in libpng-1.2.20beta01.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
