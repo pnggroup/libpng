@@ -2714,6 +2714,9 @@ version 1.2.45beta01 [June 7, 2011]
   Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
     always expand to RGBA if transparency is present.
 
+version 1.2.45beta02 [June 7, 2011]
+  Check for integer overflow in png_set_rgb_to_gray().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
