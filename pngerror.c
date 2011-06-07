@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.4.8 [June 6, 2011]
+ * Last changed in libpng 1.4.8 [June 7, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -186,8 +186,13 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
    {
       buffer[iout++] = ':';
       buffer[iout++] = ' ';
-      png_memcpy(buffer + iout, error_message, PNG_MAX_ERROR_TEXT);
-      buffer[iout + PNG_MAX_ERROR_TEXT - 1] = '\0';
+
+      iin = 0;
+      while (iin < PNG_MAX_ERROR_TEXT-1 && error_message[iin] != '\0')
+         buffer[iout++] = error_message[iin++];
+
+      /* iin < PNG_MAX_ERROR_TEXT, so the following is safe: */
+      buffer[iout] = '\0';
    }
 }
 
