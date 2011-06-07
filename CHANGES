@@ -3386,7 +3386,9 @@ Version 1.5.3beta08 [May 16, 2011]
   Added memory overwrite and palette image checks to pngvalid.c
     Previously palette image code was poorly checked. Since the transformation
     code has a special palette path in most cases this was a severe weakness.
-  Minor cleanup and some extra checking in pngrutil.c and pngrtran.c
+  Minor cleanup and some extra checking in pngrutil.c and pngrtran.c. When
+    expanding an indexed image, always expand to RGBA if transparency is
+    present.
 
 Version 1.5.3beta09 [May 17, 2011]
   Reversed earlier 1.5.3 change of transformation order; move png_expand_16
@@ -3410,6 +3412,10 @@ Version 1.5.3beta10 [May 20, 2011]
 
 Version 1.5.3rc01 [June 3, 2011]
   No changes.
+
+Version 1.5.3rc02 [June 7, 2011]
+  Fixed 1-byte uninitialized memory reference in png_format_buffer() (Bug
+    report by Frank Busse, related to CVE-2004-0421).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

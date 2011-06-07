@@ -400,8 +400,13 @@ png_format_buffer(png_structp png_ptr, png_charp buffer, png_const_charp
    {
       buffer[iout++] = ':';
       buffer[iout++] = ' ';
-      png_memcpy(buffer + iout, error_message, PNG_MAX_ERROR_TEXT);
-      buffer[iout + PNG_MAX_ERROR_TEXT - 1] = '\0';
+
+      iin = 0;
+      while (iin < PNG_MAX_ERROR_TEXT-1 && error_message[iin] != '\0')
+         buffer[iout++] = error_message[iin++];
+
+      /* iin < PNG_MAX_ERROR_TEXT, so the following is safe: */
+      buffer[iout] = '\0';
    }
 }
 #endif /* PNG_WARNINGS_SUPPORTED || PNG_ERROR_TEXT_SUPPORTED */
