@@ -2711,6 +2711,8 @@ version 1.2.45beta01 [June 7, 2011]
     was introduced in libpng-1.2.20beta01.
   Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
     before IDAT.
+  Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
+    always expand to RGBA if transparency is present.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
