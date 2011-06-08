@@ -2705,7 +2705,7 @@ version 1.2.44 [June 26, 2010]
   Updated some of the "last changed" dates.
 
 version 1.2.45beta01 [June 7, 2011]
-  Fixed 1-byte uninitialized memory reference in png_format_buffer() (Bug
+  Fixed uninitialized memory read in png_format_buffer() (Bug
     report by Frank Busse, related to CVE-2004-0421).
   Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
     was introduced in libpng-1.2.20beta01.
@@ -2714,7 +2714,7 @@ version 1.2.45beta01 [June 7, 2011]
   Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
     always expand to RGBA if transparency is present.
 
-version 1.2.45beta02 [June 7, 2011]
+version 1.2.45beta02 [June 8, 2011]
   Check for integer overflow in png_set_rgb_to_gray().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
