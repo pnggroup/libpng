@@ -1992,6 +1992,14 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
+   /* Need unit type, width, \0, height: minimum 4 bytes */
+   else if (length < 4)
+   {
+      png_warning(png_ptr, "sCAL chunk too short");
+      png_crc_finish(png_ptr, length);
+      return;
+   }
+
    png_debug1(2, "Allocating and reading sCAL chunk data (%u bytes)",
       length + 1);
 
@@ -2027,7 +2035,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* Validate the ASCII numbers, need two ASCII numbers separated by
     * a '\0' and they need to fit exactly in the chunk data.
     */
-   i = 0;
+   i = 1;
    state = 0;
 
    if (png_ptr->chunkdata[1] == 45 /* negative width */ ||
@@ -2039,6 +2047,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       png_size_t heighti = i;
 
+      state = 0;
       if (png_ptr->chunkdata[i] == 45 /* negative height */ ||
           !png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
           i != slength)

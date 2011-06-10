@@ -3417,6 +3417,9 @@ Version 1.5.3rc02 [June 8, 2011]
   Fixed uninitialized memory read in png_format_buffer() (Bug report by
     Frank Busse, related to CVE-2004-0421).
 
+Version 1.5.3rc03 [June 10, 2011]
+  Fixed png_handle_sCAL which is broken in 1.5; added sCAL to pngtest.png
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
