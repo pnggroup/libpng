@@ -175,6 +175,8 @@ Version 1.5.3beta11 [June 11, 2011]
   Revised pngvalid.c to test PNG_ALPHA_MODE_SUPPORTED correctly. This allows
     pngvalid to build when ALPHA_MODE is not supported, which is required if
     it is to build on libpng 1.4.
+  Removed string/memory macros that are no longer used and are not
+    necessarily fully supportable, particularly png_strncpy and png_snprintf.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

@@ -222,34 +222,25 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define NOCHECK 0
 #  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
 #  define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
-#  define png_strcpy  _fstrcpy
-#  define png_strncpy _fstrncpy   /* Added to v 1.2.6 */
 #  define png_strlen  _fstrlen
 #  define png_memcmp  _fmemcmp    /* SJT: added */
 #  define png_memcpy  _fmemcpy
 #  define png_memset  _fmemset
-#  define png_sprintf sprintf
 #else
 #  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
 #    define CVT_PTR(ptr)         (ptr)
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_strcpy  lstrcpyA
-#    define png_strncpy lstrcpynA
 #    define png_strlen  lstrlenA
 #    define png_memcmp  memcmp
 #    define png_memcpy  CopyMemory
 #    define png_memset  memset
-#    define png_sprintf wsprintfA
 #  else
 #    define CVT_PTR(ptr)         (ptr)
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_strcpy  strcpy
-#    define png_strncpy strncpy     /* Added to v 1.2.6 */
 #    define png_strlen  strlen
 #    define png_memcmp  memcmp      /* SJT: added */
 #    define png_memcpy  memcpy
 #    define png_memset  memset
-#    define png_sprintf sprintf
 #  endif
 #endif
 /* End of memory model/platform independent support */
