@@ -6401,7 +6401,9 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
 
       if (alpha < 0) /* The alpha channel */
       {
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
          if (do_background != ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN)
+#endif
          {
             /* In all other cases the output alpha channel is linear already,
              * don't log errors here, they are much larger in linear data.
@@ -6411,6 +6413,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
          }
       }
 
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
       else /* A component */
       {
          if (do_background == ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED &&
@@ -6420,6 +6423,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
             output_is_encoded = 0;
          }
       }
+#endif
 
       if (output_is_encoded)
          output = pow(output, vi->screen_gamma);

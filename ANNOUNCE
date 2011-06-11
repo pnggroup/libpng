@@ -169,7 +169,12 @@ Version 1.5.3beta11 [June 11, 2011]
     IDE autogenerates appropriate makefiles (libpng.mk) for batch processing.
     The project is configurable, unlike the Visual Studio project, so long
     as the developer has an awk.
-  Improved gamma range checks and other things OpenWatcom warns about.
+  Changed png_set_gAMA to limit the gamma value range so that the inverse
+    of the stored value cannot overflow the fixed point representation,
+    and changed other things OpenWatcom warns about.
+  Revised pngvalid.c to test PNG_ALPHA_MODE_SUPPORTED correctly. This allows
+    pngvalid to build when ALPHA_MODE is not supported, which is required if
+    it is to build on libpng 1.4.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
