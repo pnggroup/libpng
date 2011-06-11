@@ -820,7 +820,7 @@ png_check_IHDR(png_structp png_ptr,
    }
 
 #  ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (width > png_ptr->user_width_max || width > PNG_USER_WIDTH_MAX)
+   if (width > png_ptr->user_width_max)
 
 #  else
    if (width > PNG_USER_WIDTH_MAX)
@@ -831,7 +831,7 @@ png_check_IHDR(png_structp png_ptr,
    }
 
 #  ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (height > png_ptr->user_height_max || height > PNG_USER_HEIGHT_MAX)
+   if (height > png_ptr->user_height_max)
 #  else
    if (height > PNG_USER_HEIGHT_MAX)
 #  endif
