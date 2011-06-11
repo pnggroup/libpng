@@ -12,10 +12,10 @@ WRect
 MProject
 3
 MCommand
-340
+322
 # Locations of zlib and (if required) awk (change as required:)
 set zlib=..\..\..\zlib
-set awk=..\..\..\bin\awk95
+set awk=
 #
 @if not exist pngconfig.dfa $(MAKE) $(__MAKEOPTS__) -f pngconfig.mak defaults
 @if exist config.inf type config.inf
