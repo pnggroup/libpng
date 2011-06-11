@@ -1,5 +1,5 @@
 
-Libpng 1.5.3rc03 - June 10, 2011
+Libpng 1.5.3beta11 - June 11, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3rc03.tar.xz (LZMA-compressed, recommended)
-   1.5.3rc03.tar.gz
-   1.5.3rc03.tar.bz2
+   1.5.3beta11.tar.xz (LZMA-compressed, recommended)
+   1.5.3beta11.tar.gz
+   1.5.3beta11.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153r03.7z  (LZMA-compressed, recommended)
-   lp153r03.zip
+   lp153b11.7z  (LZMA-compressed, recommended)
+   lp153b11.zip
 
 Other information:
 
-   1.5.3rc03-README.txt
-   1.5.3rc03-LICENSE.txt
+   1.5.3beta11-README.txt
+   1.5.3beta11-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -154,7 +154,7 @@ Version 1.5.3rc02 [June 8, 2011]
   Fixed uninitialized memory read in png_format_buffer() (Bug report by
     Frank Busse, related to CVE-2004-0421).
 
-Version 1.5.3rc03 [June 10, 2011]
+Version 1.5.3beta11 [June 11, 2011]
   Fixed png_handle_sCAL which is broken in 1.5; added sCAL to pngtest.png
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
