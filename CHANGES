@@ -3419,6 +3419,9 @@ Version 1.5.3rc02 [June 8, 2011]
 
 Version 1.5.3beta11 [June 11, 2011]
   Fixed png_handle_sCAL which is broken in 1.5; added sCAL to pngtest.png
+  Revised documentation about png_set_user_limits() to say that it can
+    only be used to reduce the defined limit, and that it also affects
+    png writing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

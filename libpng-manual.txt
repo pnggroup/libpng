@@ -597,7 +597,7 @@ large as 2^31-1 (0x7fffffff), or about 2.147 billion rows and columns.
 Since very few applications really need to process such large images,
 we have imposed an arbitrary 1-million limit on rows and columns.
 Larger images will be rejected immediately with a png_error() call. If
-you wish to override this limit, you can use
+you wish to reduce this limit, you can use
 
    png_set_user_limits(png_ptr, width_max, height_max);
 
@@ -607,6 +607,10 @@ anyway because of potential buffer overflow conditions).
 
 You should put this statement after you create the PNG structure and
 before calling png_read_info(), png_read_png(), or png_process_data().
+
+When writing a PNG datastream, put this statement before calling
+png_write_info() or png_write_png().
+
 If you need to retrieve the limits that are being applied, use
 
    width_max = png_get_user_width_max(png_ptr);
