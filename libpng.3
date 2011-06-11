@@ -1548,7 +1548,7 @@ large as 2^31-1 (0x7fffffff), or about 2.147 billion rows and columns.
 Since very few applications really need to process such large images,
 we have imposed an arbitrary 1-million limit on rows and columns.
 Larger images will be rejected immediately with a png_error() call. If
-you wish to reduce this limit, you can use
+you wish to change this limit, you can use
 
    png_set_user_limits(png_ptr, width_max, height_max);
 
@@ -5051,7 +5051,14 @@ Prior to libpng-1.5.3, the PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 option was off by default, and slightly inaccurate scaling occurred.
 This option can no longer be turned off, and 16-to-8 scaling is always
 accurate.  This change will result in some different results while
-reading 16-bit images, with some of the pixels no longer being off-by-one.
+reading 16-bit images, with none of the pixels being off-by-one any
+longer (see Clause 13.12 of the PNG specification).
+
+Prior to libpng-1.5.3, the png_set_user_limits() function could only be
+used to reduce the width and height limits from the value of
+PNG_USER_WIDTH_MAX and PNG_USER_HEIGHT_MAX, although this document said
+that it could be used to override them.  Now this function will reduce or
+increase the limits.
 
 B. Changes to the build and configuration of libpng
 
