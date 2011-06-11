@@ -3432,6 +3432,7 @@ Version 1.5.3beta11 [June 11, 2011]
     IDE autogenerates appropriate makefiles (libpng.mk) for batch processing.
     The project is configurable, unlike the Visual Studio project, so long
     as the developer has an awk.
+  Improved gamma range checks and other things OpenWatcom warns about.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

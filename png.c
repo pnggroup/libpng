@@ -743,6 +743,13 @@ png_check_cHRM_fixed(png_structp png_ptr,
    if (png_ptr == NULL)
       return 0;
 
+   /* (x,y,z) values are first limited to 0..100000 (PNG_FP_1), the white
+    * y must also be greater than 0.  To test for the upper limit calculate
+    * (PNG_FP_1-y) - x must be <= to this for z to be >= 0 (and the expression
+    * cannot overflow.)  At this point we know x and y are >= 0 and (x+y) is
+    * <= PNG_FP_1.  The previous test on PNG_MAX_UINT_31 is removed because it
+    * pointless (and it produces compiler warnings!)
+    */
    if (white_x < 0 || white_y <= 0 ||
          red_x < 0 ||   red_y <  0 ||
        green_x < 0 || green_y <  0 ||
@@ -752,38 +759,26 @@ png_check_cHRM_fixed(png_structp png_ptr,
         "Ignoring attempt to set negative chromaticity value");
       ret = 0;
    }
-   if (white_x > (png_fixed_point)PNG_UINT_31_MAX ||
-       white_y > (png_fixed_point)PNG_UINT_31_MAX ||
-         red_x > (png_fixed_point)PNG_UINT_31_MAX ||
-         red_y > (png_fixed_point)PNG_UINT_31_MAX ||
-       green_x > (png_fixed_point)PNG_UINT_31_MAX ||
-       green_y > (png_fixed_point)PNG_UINT_31_MAX ||
-        blue_x > (png_fixed_point)PNG_UINT_31_MAX ||
-        blue_y > (png_fixed_point)PNG_UINT_31_MAX )
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set chromaticity value exceeding 21474.83");
-      ret = 0;
-   }
-   if (white_x > 100000L - white_y)
+   /* And (x+y) must be <= PNG_FP_1 (so z is >= 0) */
+   if (white_x > PNG_FP_1 - white_y)
    {
       png_warning(png_ptr, "Invalid cHRM white point");
       ret = 0;
    }
 
-   if (red_x > 100000L - red_y)
+   if (red_x > PNG_FP_1 - red_y)
    {
       png_warning(png_ptr, "Invalid cHRM red point");
       ret = 0;
    }
 
-   if (green_x > 100000L - green_y)
+   if (green_x > PNG_FP_1 - green_y)
    {
       png_warning(png_ptr, "Invalid cHRM green point");
       ret = 0;
    }
 
-   if (blue_x > 100000L - blue_y)
+   if (blue_x > PNG_FP_1 - blue_y)
    {
       png_warning(png_ptr, "Invalid cHRM blue point");
       ret = 0;

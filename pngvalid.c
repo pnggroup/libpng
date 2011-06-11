@@ -1883,7 +1883,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
                store_read_imp(&pm->this, pb, cb);
                pb += cb;
                st -= cb;
-               if (st <= 0) return;
+               if (st == 0) return;
             }
 
             /* No more bytes to flush, read a header, or handle a pending
@@ -2325,6 +2325,8 @@ bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
 {
    switch (colour_type)
    {
+      default: png_error(pp, "invalid color type");
+
       case 0:  return bit_depth;
 
       case 2:  return 3*bit_depth;
@@ -2334,8 +2336,6 @@ bit_size(png_structp pp, png_byte colour_type, png_byte bit_depth)
       case 4:  return 2*bit_depth;
 
       case 6:  return 4*bit_depth;
-
-      default: png_error(pp, "invalid color type");
    }
 }
 
