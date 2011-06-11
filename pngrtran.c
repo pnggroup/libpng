@@ -1439,11 +1439,11 @@ png_init_read_transformations(png_structp png_ptr)
        * The PNG_BACKGROUND_EXPAND code above does not expand to 16 bits at
        * present, so that case is ok (until do_expand_16 is moved.)
        */
-#     define CHOP(x) ((png_uint_16)((2*(png_uint_32)(x) + 257)/514))
-      png_ptr->background.red = CHOP(png_ptr->background.red);
-      png_ptr->background.green = CHOP(png_ptr->background.green);
-      png_ptr->background.blue = CHOP(png_ptr->background.blue);
-      png_ptr->background.gray = CHOP(png_ptr->background.gray);
+#     define CHOP(x) (x)=((png_uint_16)(((png_uint_32)(x)*255+32895) >> 16))
+      CHOP(png_ptr->background.red);
+      CHOP(png_ptr->background.green);
+      CHOP(png_ptr->background.blue);
+      CHOP(png_ptr->background.gray);
 #     undef CHOP
    }
 #endif
@@ -2457,45 +2457,48 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 
    if (row_info->bit_depth == 16)
    {
-      png_bytep sp = row;
-      png_bytep dp = row;
-      png_uint_32 i;
-      png_uint_32 istop = row_info->width * row_info->channels;
+      png_bytep sp = row; /* source */
+      png_bytep dp = row; /* destinaton */
+      png_bytep ep = sp + row_info->rowbytes; /* end+1 */
 
-      for (i = 0; i<istop; i++, sp += 2, dp++)
+      while (sp < ep)
       {
-#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-      /* This does a more accurate scaling of the 16-bit color
-       * value, rather than a simple low-byte truncation.
-       *
-       * What the ideal calculation should be:
-       *   *dp = (((((png_uint_32)(*sp) << 8) |
-       *          (png_uint_32)(*(sp + 1))) * 255 + 127)
-       *          / (png_uint_32)65535L;
-       *
-       * GRR: no, I think this is what it really should be:
-       *   *dp = (((((png_uint_32)(*sp) << 8) |
-       *           (png_uint_32)(*(sp + 1))) + 128L)
-       *           / (png_uint_32)257L;
-       *
-       * GRR: here's the exact calculation with shifts:
-       *   temp = (((png_uint_32)(*sp) << 8) |
-       *           (png_uint_32)(*(sp + 1))) + 128L;
-       *   *dp = (temp - (temp >> 8)) >> 8;
-       *
-       * Approximate calculation with shift/add instead of multiply/divide:
-       *   *dp = ((((png_uint_32)(*sp) << 8) |
-       *          (png_uint_32)((int)(*(sp + 1)) - *sp)) + 128) >> 8;
-       *
-       * What we actually do to avoid extra shifting and conversion:
-       */
-
-         *dp = *sp + ((((int)(*(sp + 1)) - *sp) > 128) ? 1 : 0);
-#else
-       /* Simply discard the low order byte */
-         *dp = *sp;
-#endif
+         /* The input is an array of 16 bit components, these must be scaled to
+          * 8 bits each.  For a 16 bit value V the required value (from the PNG
+          * specification) is:
+          *
+          *    (V * 255) / 65535
+          *
+          * This reduces to round(V / 257), or floor((V + 128.5)/257)
+          *
+          * Represent V as the two byte value vhi.vlo.  Make a guess that the
+          * result is the top byte of V, vhi, then the correction to this value
+          * is:
+          *
+          *    error = floor(((V-vhi.vhi) + 128.5) / 257)
+          *          = floor(((vlo-vhi) + 128.5) / 257)
+          *
+          * This can be approximated using integer arithmetic (and a signed
+          * shift):
+          *
+          *    error = (vlo-vhi+128) >> 8;
+          *
+          * The approximate differs from the exact answer only when (vlo-vhi) is
+          * 128; it then gives a correction of +1 when the exact correction is
+          * 0.  This gives 128 errors.  The exact answer (correct for all 16 bit
+          * input values) is:
+          *
+          *    error = (vlo-vhi+128)*65535 >> 24;
+          *
+          * An alternative arithmetic calculation which also gives no errors is:
+          *
+          *    (V * 255 + 32895) >> 16
+          */
+         png_int_32 tmp = *sp++; /* must be signed! */
+         tmp += (((int)*sp++ - tmp + 128) * 65535) >> 24;
+         *dp++ = (png_byte)tmp;
       }
+
       row_info->bit_depth = 8;
       row_info->pixel_depth = (png_byte)(8 * row_info->channels);
       row_info->rowbytes = row_info->width * row_info->channels;

@@ -1659,7 +1659,7 @@ PNG_EXPORT(73, void, png_set_compression_method, (png_structp png_ptr,
     int method));
 #endif
 
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
 /* Also set zlib parameters for compressing non-IDAT chunks */
 PNG_EXPORT(222, void, png_set_text_compression_level,
     (png_structp png_ptr, int level));
@@ -1678,7 +1678,7 @@ PNG_EXPORT(225, void, png_set_text_compression_window_bits, (png_structp
 
 PNG_EXPORT(226, void, png_set_text_compression_method, (png_structp png_ptr,
     int method));
-#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
 
 /* These next functions are called for input/output, memory, and error
  * handling.  They are in the file pngrio.c, pngwio.c, and pngerror.c,

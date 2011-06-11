@@ -1459,7 +1459,7 @@ png_set_compression_method(png_structp png_ptr, int method)
 }
 
 /* The following were added to libpng-1.5.3 */
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
 void PNGAPI
 png_set_text_compression_level(png_structp png_ptr, int level)
 {
@@ -1538,7 +1538,7 @@ png_set_text_compression_method(png_structp png_ptr, int method)
    png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_METHOD;
    png_ptr->zlib_text_method = method;
 }
-#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
 /* end of API added to libpng-1.5.3 */
 
 void PNGAPI

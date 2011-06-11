@@ -915,7 +915,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #  endif
 #endif
 
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
    /* Normally one would use Z_DEFAULT_STRATEGY for text compression.
     * This is here just to make pngtest replicate the results from libpng
     * versions prior to 1.5.3, and to test this new API.

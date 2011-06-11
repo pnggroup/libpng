@@ -834,7 +834,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
       png_ptr->zlib_method = 8;
 
 #ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
    if (!(png_ptr->flags & PNG_FLAG_ZTXT_CUSTOM_STRATEGY))
       png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
 
@@ -855,7 +855,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->zlib_text_mem_level = png_ptr->zlib_mem_level;
    png_ptr->zlib_text_window_bits = png_ptr->zlib_window_bits;
    png_ptr->zlib_text_method = png_ptr->zlib_method;
-#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
 #endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
 
    /* Record that the compressor has not yet been initialized. */

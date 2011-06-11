@@ -88,7 +88,7 @@ struct png_struct_def
 #endif
 /* Added at libpng 1.5.3 */
 #if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
-    defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION)
+    defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
    int zlib_text_window_bits;      /* holds zlib compression window bits */

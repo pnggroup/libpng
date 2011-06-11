@@ -5047,6 +5047,12 @@ In libpng-1.5.3 we reinitialized the zlib stream for each type of data.
 We added five png_set_text_*() functions for setting the parameters to
 use with textual data.
 
+Prior to libpng-1.5.3, the PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+option was off by default, and slightly inaccurate scaling occurred.
+This option can no longer be turned off, and 16-to-8 scaling is always
+accurate.  This change will result in some different results while
+reading 16-bit images, with some of the pixels no longer being off-by-one.
+
 B. Changes to the build and configuration of libpng
 
 Details of internal changes to the library code can be found in the CHANGES
