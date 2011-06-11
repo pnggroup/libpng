@@ -346,12 +346,10 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    /* Free any sCAL entry */
    if ((mask & PNG_FREE_SCAL) & info_ptr->free_me)
    {
-#if defined(PNG_FIXED_POINT_SUPPORTED) && !defined(PNG_FLOATING_POINT_SUPPORTED)
       png_free(png_ptr, info_ptr->scal_s_width);
       png_free(png_ptr, info_ptr->scal_s_height);
       info_ptr->scal_s_width = NULL;
       info_ptr->scal_s_height = NULL;
-#endif
       info_ptr->valid &= ~PNG_INFO_sCAL;
    }
 #endif
@@ -619,13 +617,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.3rc03 - June 8, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.3rc03 - June 11, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.3rc03 - June 8, 2011\
+      return "libpng version 1.5.3rc03 - June 11, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
