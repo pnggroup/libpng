@@ -47,7 +47,6 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
  makefile.tc3      =>  Turbo C 3.0 makefile
  makefile.vcwin32  =>  makefile for Microsoft Visual C++ 4.0 and later
- makefile.watcom   =>  Watcom 10a+ Makefile, 32-bit flat memory model
  makevms.com       =>  VMS build script
  smakefile.ppc     =>  AMIGA smakefile for SAS C V6.58/7.00 PPC compiler
                        (Requires SCOPTIONS, copied from scripts/SCOPTIONS.ppc)
