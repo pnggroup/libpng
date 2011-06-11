@@ -3426,6 +3426,7 @@ Version 1.5.3beta11 [June 11, 2011]
     wrong (high by one) 25% of the time. Dividing by 257 with rounding is
     wrong in 128 out of 65536 cases. Getting the right answer all the time
     without division is easy.
+  Added "_SUPPORTED" to the PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION macro.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
