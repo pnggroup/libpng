@@ -184,6 +184,9 @@ Version 1.5.3beta11 [June 11, 2011]
 Version 1.5.3beta12 [June 13, 2011]
   Made it possible to undefine PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
     to get the same (inaccurate) output as libpng-1.5.2 and earlier.
+  Moved definitions of PNG_HAVE_IHDR, PNG_AFTER_IDAT, and PNG_HAVE_PLTE
+    outside of an unknown-chunk block in png.h because they are also
+    needed for other uses.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
