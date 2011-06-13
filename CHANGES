@@ -3443,6 +3443,10 @@ Version 1.5.3beta11 [June 11, 2011]
   Removed string/memory macros that are no longer used and are not
     necessarily fully supportable, particularly png_strncpy and png_snprintf.
   Added log option to pngvalid.c and attempted to improve gamma messages.
+  
+Version 1.5.3beta12 [June 13, 2011]
+  Made it possible to undefine PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+    to get the same (inaccurate) output as libpng-1.5.2 and earlier.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

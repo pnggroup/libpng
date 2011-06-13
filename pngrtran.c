@@ -1439,7 +1439,11 @@ png_init_read_transformations(png_structp png_ptr)
        * The PNG_BACKGROUND_EXPAND code above does not expand to 16 bits at
        * present, so that case is ok (until do_expand_16 is moved.)
        */
+#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 #     define CHOP(x) (x)=((png_uint_16)(((png_uint_32)(x)*255+32895) >> 16))
+#else
+#     define CHOP(x) ((png_uint_16)((2*(png_uint_32)(x) + 257)/514))
+#endif
       CHOP(png_ptr->background.red);
       CHOP(png_ptr->background.green);
       CHOP(png_ptr->background.blue);
@@ -2494,9 +2498,18 @@ png_do_chop(png_row_infop row_info, png_bytep row)
           *
           *    (V * 255 + 32895) >> 16
           */
+
+#ifdef PNG_LEGACY_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+         *dp = *sp + ((((int)(*(sp + 1)) - *sp) > 128) ? 1 : 0);
+#else
          png_int_32 tmp = *sp++; /* must be signed! */
+#  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
          tmp += (((int)*sp++ - tmp + 128) * 65535) >> 24;
+#  else
+         sp++;
+#  endif
          *dp++ = (png_byte)tmp;
+#endif
       }
 
       row_info->bit_depth = 8;

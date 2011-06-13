@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta11 - June 11, 2011
+Libpng 1.5.3beta12 - June 13, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3beta11.tar.xz (LZMA-compressed, recommended)
-   1.5.3beta11.tar.gz
-   1.5.3beta11.tar.bz2
+   1.5.3beta12.tar.xz (LZMA-compressed, recommended)
+   1.5.3beta12.tar.gz
+   1.5.3beta12.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153b11.7z  (LZMA-compressed, recommended)
-   lp153b11.zip
+   lp153b12.7z  (LZMA-compressed, recommended)
+   lp153b12.zip
 
 Other information:
 
-   1.5.3beta11-README.txt
-   1.5.3beta11-LICENSE.txt
+   1.5.3beta12-README.txt
+   1.5.3beta12-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -180,6 +180,10 @@ Version 1.5.3beta11 [June 11, 2011]
   Removed string/memory macros that are no longer used and are not
     necessarily fully supportable, particularly png_strncpy and png_snprintf.
   Added log option to pngvalid.c and attempted to improve gamma messages.
+
+Version 1.5.3beta12 [June 13, 2011]
+  Made it possible to undefine PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+    to get the same (inaccurate) output as libpng-1.5.2 and earlier.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
