@@ -3458,7 +3458,9 @@ Version 1.5.4beta01 [June 14, 2011]
 
 Version 1.5.4beta02 [June 14, 2011]
   Fixed and clarified LEGACY 16-to-8 scaling code.
-  Added png_set_chop_16() API.
+  Added png_set_chop_16() API, to match inaccurate results from previous
+    libpng versions.
+  Removed the ACCURATE and LEGACY options (they are no longer useable)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

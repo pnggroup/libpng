@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.4 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -298,7 +298,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.3 */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
-                       /*   0x4000000L  unused */
+#define PNG_CHOP_16_TO_8      0x4000000L
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -820,7 +820,12 @@ PNG_EXTERN void png_do_invert PNGARG((png_row_infop row_info,
 #endif
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
+PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
+    png_bytep row));
+
 PNG_EXTERN void png_do_chop PNGARG((png_row_infop row_info,
+    png_bytep row));
+PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
 

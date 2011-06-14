@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.4 [(PENDING RELEASE)]
  * This file has been placed in the public domain by the authors.
  * Maintained 1998-2011 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)

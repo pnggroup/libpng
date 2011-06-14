@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.4 [(PENDING RELEASE)]
  * Copyright (c) 2011 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -5265,6 +5265,8 @@ image_transform_png_set_strip_16_mod(PNG_CONST image_transform *this,
 #     ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
          /* The strip 16 algorithm drops the low 8 bits rather than calculating
           * 1/257, so we need to adjust the permitted errors appropriately:
+          * Notice that this is only relevant prior to the addition of the
+          * png_set_chop_16 API in 1.5.4 (but 1.5.4+ always defines the above!)
           */
          {
             PNG_CONST double d = (255-128.5)/65535;
@@ -5294,6 +5296,60 @@ image_transform_png_set_strip_16_add(image_transform *this,
 IT(strip_16);
 #undef PT
 #define PT ITSTRUCT(strip_16)
+
+#if PNG_LIBPNG_VER >= 10504 /* API added in 1.5.4 */
+/* png_set_chop_16 */
+static void
+image_transform_png_set_chop_16_set(PNG_CONST image_transform *this,
+    transform_display *that, png_structp pp, png_infop pi)
+{
+   png_set_chop_16(pp);
+   this->next->set(this->next, that, pp, pi);
+}
+
+static void
+image_transform_png_set_chop_16_mod(PNG_CONST image_transform *this,
+    image_pixel *that, png_structp pp, PNG_CONST transform_display *display)
+{
+   if (that->bit_depth == 16)
+   {
+      that->sample_depth = that->bit_depth = 8;
+      if (that->red_sBIT > 8) that->red_sBIT = 8;
+      if (that->green_sBIT > 8) that->green_sBIT = 8;
+      if (that->blue_sBIT > 8) that->blue_sBIT = 8;
+      if (that->alpha_sBIT > 8) that->alpha_sBIT = 8;
+
+      /* From 1.5.4 there is a separate API to do the low byte drop; see the
+       * comments above for why this requires the following:
+       */
+      {
+         PNG_CONST double d = (255-128.5)/65535;
+         that->rede += d;
+         that->greene += d;
+         that->bluee += d;
+         that->alphae += d;
+      }
+   }
+
+   this->next->mod(this->next, that, pp, display);
+}
+
+static int
+image_transform_png_set_chop_16_add(image_transform *this,
+    PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
+{
+   UNUSED(colour_type)
+
+   this->next = *that;
+   *that = this;
+
+   return bit_depth > 8;
+}
+
+IT(chop_16);
+#undef PT
+#define PT ITSTRUCT(chop_16)
+#endif /* From libpng 1.5.4 */
 #endif /* PNG_READ_16_TO_8_SUPPORTED */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED

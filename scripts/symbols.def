@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.5.4beta01
+;Version 1.5.4beta02
  png_access_version_number @1
  png_set_sig_bytes @2
  png_sig_cmp @3
@@ -234,3 +234,4 @@ EXPORTS
  png_set_text_compression_method @226
  png_set_alpha_mode @227
  png_set_alpha_mode_fixed @228
+ png_set_chop_16 @229
