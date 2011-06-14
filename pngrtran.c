@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.4 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2499,17 +2499,17 @@ png_do_chop(png_row_infop row_info, png_bytep row)
           *    (V * 255 + 32895) >> 16
           */
 
-#ifdef PNG_LEGACY_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-         *dp = *sp + ((((int)(*(sp + 1)) - *sp) > 128) ? 1 : 0);
-#else
          png_int_32 tmp = *sp++; /* must be signed! */
+#ifdef PNG_LEGACY_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+         tmp += (((int)*sp++ - tmp) > 128) ? 1 : 0;
+#else
 #  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
          tmp += (((int)*sp++ - tmp + 128) * 65535) >> 24;
 #  else
          sp++;
 #  endif
-         *dp++ = (png_byte)tmp;
 #endif
+         *dp++ = (png_byte)tmp;
       }
 
       row_info->bit_depth = 8;
