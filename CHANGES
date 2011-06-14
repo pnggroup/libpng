@@ -3465,6 +3465,8 @@ Version 1.5.4beta02 [June 14, 2011]
     called.
   Made png_set_chop_16() API removeable by disabling PNG_CHOP_16_TO_8_SUPPORTED
 
+Version 1.5.4beta03 [June 14, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

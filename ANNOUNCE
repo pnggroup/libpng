@@ -1,5 +1,5 @@
 
-Libpng 1.5.4beta02 - June 14, 2011
+Libpng 1.5.4beta03 - June 14, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.4beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.4beta02.tar.gz
-   1.5.4beta02.tar.bz2
+   1.5.4beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.4beta03.tar.gz
+   1.5.4beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp154b02.7z  (LZMA-compressed, recommended)
-   lp154b02.zip
+   lp154b03.7z  (LZMA-compressed, recommended)
+   lp154b03.zip
 
 Other information:
 
-   1.5.4beta02-README.txt
-   1.5.4beta02-LICENSE.txt
+   1.5.4beta03-README.txt
+   1.5.4beta03-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -202,6 +202,7 @@ Version 1.5.4beta02 [June 14, 2011]
     called.
   Made png_set_chop_16() API removeable by disabling PNG_CHOP_16_TO_8_SUPPORTED
 
+Version 1.5.4beta03 [June 14, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
