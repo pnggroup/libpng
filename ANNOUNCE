@@ -198,6 +198,8 @@ Version 1.5.4beta02 [June 14, 2011]
   Added png_set_chop_16() API, to match inaccurate results from previous
     libpng versions.
   Removed the ACCURATE and LEGACY options (they are no longer useable)
+  Use the old scaling method for background if png_set_chop_16() was
+    called.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
