@@ -293,8 +293,8 @@ option READ enables READ_INTERLACING
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
-# processing after that has happened.  You need to be sure to enable READ_16_TO_8
-# when you disable READ_16BIT for this to work properly.
+# processing after that has happened.  You need to be sure to enable
+# READ_16_TO_8 when you disable READ_16BIT for this to work properly.
 
 option READ_16BIT requires READ enables 16BIT
 
@@ -345,8 +345,6 @@ option INCH_CONVERSIONS
 # API to build a grayscale palette
 
 option BUILD_GRAYSCALE_PALETTE
-
-option READ_16_TO_8_ACCURATE_SCALE requires READ
 
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want
@@ -552,7 +550,10 @@ option SAVE_INT_32 requires WRITE
 
 # png_save_int_32 is required by the ancillary chunks oFFs and pCAL
 
-# added at libpng-1.5.3
+# added at libpng-1.5.4
+
+option READ_CHOP_16_TO_8 requires READ_16_TO_8
+
 option WRITE_OPTIMIZE_CMF requires WRITE
 
 option READ_COMPRESSED_TEXT disabled
@@ -569,7 +570,6 @@ option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
 option WRITE_iTXt enables WRITE_COMPRESSED_TEXT
 option WRITE_zTXt enables WRITE_COMPRESSED_TEXT
 option WRITE_COMPRESSED_TEXT enables WRITE_TEXT
-
 
 # Turn this off to disable png_read_png() and png_write_png() and
 # leave the row_pointers member out of the info structure.

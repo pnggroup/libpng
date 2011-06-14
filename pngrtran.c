@@ -143,9 +143,12 @@ png_set_strip_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
+#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
    png_ptr->transformations &= ~PNG_CHOP_16_TO_8;
+#endif
 }
 
+#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
 /* Chop 16-bit depth files to 8-bit depth */
 void PNGAPI
 png_set_chop_16(png_structp png_ptr)
@@ -159,6 +162,7 @@ png_set_chop_16(png_structp png_ptr)
    png_ptr->transformations &= ~PNG_16_TO_8;
 }
 #endif
+#endif /* PNG_READ_16_TO_8_SUPPORTED */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 void PNGAPI
@@ -1454,7 +1458,7 @@ png_init_read_transformations(png_structp png_ptr)
        * present, so that case is ok (until do_expand_16 is moved.)
        */
 
-      if (png_ptr->transformations & PNG_CHOP_16_TO_8)
+      if (png_ptr->transformations & PNG_16_TO_8)
       {
 #     define CHOP(x) (x)=((png_uint_16)(((png_uint_32)(x)*255+32895) >> 16))
       CHOP(png_ptr->background.red);
@@ -1463,17 +1467,19 @@ png_init_read_transformations(png_structp png_ptr)
       CHOP(png_ptr->background.gray);
 #     undef CHOP
       }
+#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
       else /* Use pre-libpng-1.5.4 inaccurate "ACCURATE" scaling */
       {
-#     define CHOP(x) ((png_uint_16)((2*(png_uint_32)(x) + 257)/514))
+#     define CHOP(x) (x)=((png_uint_16)((2*(png_uint_32)(x) + 257)/514))
       CHOP(png_ptr->background.red);
       CHOP(png_ptr->background.green);
       CHOP(png_ptr->background.blue);
       CHOP(png_ptr->background.gray);
 #     undef CHOP
       }
+#endif /* PNG_READ_CHOP_16_TO_8_SUPPORTED */
    }
-#endif
+#endif /* PNG_READ_BACKGROUND_SUPPORTED && PNG_READ_EXPAND_16_SUPPORTED */
 
    /* NOTE: below 'PNG_READ_ALPHA_MODE_SUPPORTED' is presumed to also enable the
     * background support (see the comments in scripts/pnglibconf.dfa), this
@@ -2149,8 +2155,10 @@ png_do_read_transformations(png_structp png_ptr)
 #ifdef PNG_READ_16_TO_8_SUPPORTED
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_scale_16_to_8(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
    else if (png_ptr->transformations & PNG_CHOP_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
+#  endif
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED

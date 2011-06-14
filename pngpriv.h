@@ -823,8 +823,10 @@ PNG_EXTERN void png_do_invert PNGARG((png_row_infop row_info,
 PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
     png_bytep row));
 
+#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
 PNG_EXTERN void png_do_chop PNGARG((png_row_infop row_info,
     png_bytep row));
+#endif
 PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
