@@ -5297,7 +5297,7 @@ IT(strip_16);
 #undef PT
 #define PT ITSTRUCT(strip_16)
 
-#if PNG_LIBPNG_VER >= 10504 /* API added in 1.5.4 */
+#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED  /* API added in 1.5.4 */
 /* png_set_chop_16 */
 static void
 image_transform_png_set_chop_16_set(PNG_CONST image_transform *this,
@@ -5349,7 +5349,7 @@ image_transform_png_set_chop_16_add(image_transform *this,
 IT(chop_16);
 #undef PT
 #define PT ITSTRUCT(chop_16)
-#endif /* From libpng 1.5.4 */
+#endif /* PNG_READ_CHOP_16_TO_8_SUPPORTED, from libpng 1.5.4 */
 #endif /* PNG_READ_16_TO_8_SUPPORTED */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
