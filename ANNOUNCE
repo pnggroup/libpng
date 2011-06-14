@@ -1,5 +1,5 @@
 
-Libpng 1.5.3beta12 - June 13, 2011
+Libpng 1.5.4beta01 - June 14, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.3beta12.tar.xz (LZMA-compressed, recommended)
-   1.5.3beta12.tar.gz
-   1.5.3beta12.tar.bz2
+   1.5.4beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.4beta01.tar.gz
+   1.5.4beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp153b12.7z  (LZMA-compressed, recommended)
-   lp153b12.zip
+   lp154b01.7z  (LZMA-compressed, recommended)
+   lp154b01.zip
 
 Other information:
 
-   1.5.3beta12-README.txt
-   1.5.3beta12-LICENSE.txt
+   1.5.4beta01-README.txt
+   1.5.4beta01-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -181,7 +181,12 @@ Version 1.5.3beta11 [June 11, 2011]
     necessarily fully supportable, particularly png_strncpy and png_snprintf.
   Added log option to pngvalid.c and attempted to improve gamma messages.
 
-Version 1.5.3beta12 [June 13, 2011]
+Version 1.5.3 [omitted]
+  People found the presence of a beta release following an rc release
+    to be confusing; therefore we bump the version to libpng-1.5.4beta01
+    and there will be no libpng-1.5.3 release.
+
+Version 1.5.4beta01 [June 14, 2011]
   Made it possible to undefine PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
     to get the same (inaccurate) output as libpng-1.5.2 and earlier.
   Moved definitions of PNG_HAVE_IHDR, PNG_AFTER_IDAT, and PNG_HAVE_PLTE

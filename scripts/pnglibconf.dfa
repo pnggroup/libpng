@@ -346,10 +346,8 @@ option INCH_CONVERSIONS
 
 option BUILD_GRAYSCALE_PALETTE
 
-# This is no longer used - the scaling is always accurate - but the definition
-# is left in for older applications (including pngvalid) that check it.  Do not
-# turn it off!
 option READ_16_TO_8_ACCURATE_SCALE requires READ
+option LEGACY_READ_16_TO_8_ACCURATE_SCALE disabled
 
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want

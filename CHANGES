@@ -3444,7 +3444,12 @@ Version 1.5.3beta11 [June 11, 2011]
     necessarily fully supportable, particularly png_strncpy and png_snprintf.
   Added log option to pngvalid.c and attempted to improve gamma messages.
   
-Version 1.5.3beta12 [June 13, 2011]
+Version 1.5.3 [omitted]
+  People found the presence of a beta release following an rc release
+    to be confusing; therefore we bump the version to libpng-1.5.4beta01
+    and there will be no libpng-1.5.3 release.
+
+Version 1.5.4beta01 [June 14, 2011]
   Made it possible to undefine PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
     to get the same (inaccurate) output as libpng-1.5.2 and earlier.
   Moved definitions of PNG_HAVE_IHDR, PNG_AFTER_IDAT, and PNG_HAVE_PLTE

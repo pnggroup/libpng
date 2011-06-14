@@ -5263,7 +5263,7 @@ image_transform_png_set_strip_16_mod(PNG_CONST image_transform *this,
       if (that->alpha_sBIT > 8) that->alpha_sBIT = 8;
 
 #     ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-         /* The strip 16 algoirithm drops the low 8 bits rather than calculating
+         /* The strip 16 algorithm drops the low 8 bits rather than calculating
           * 1/257, so we need to adjust the permitted errors appropriately:
           */
          {
