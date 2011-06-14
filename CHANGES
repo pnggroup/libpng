@@ -3456,6 +3456,10 @@ Version 1.5.4beta01 [June 14, 2011]
     outside of an unknown-chunk block in png.h because they are also
     needed for other uses.
 
+Version 1.5.4beta02 [June 14, 2011]
+  Fixed and clarified LEGACY 16-to-8 scaling code.
+  Added png_set_chop_16() API.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

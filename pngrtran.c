@@ -133,7 +133,7 @@ png_set_background(png_structp png_ptr,
 #endif /* READ_BACKGROUND */
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
-/* Strip 16-bit depth files to 8-bit depth */
+/* Scale 16-bit depth files to 8-bit depth */
 void PNGAPI
 png_set_strip_16(png_structp png_ptr)
 {
@@ -143,6 +143,20 @@ png_set_strip_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
+   png_ptr->transformations &= ~PNG_CHOP_16_TO_8;
+}
+
+/* Chop 16-bit depth files to 8-bit depth */
+void PNGAPI
+png_set_chop_16(png_structp png_ptr)
+{
+   png_debug(1, "in png_set_chop_16");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->transformations |= PNG_CHOP_16_TO_8;
+   png_ptr->transformations &= ~PNG_16_TO_8;
 }
 #endif
 
@@ -1312,7 +1326,7 @@ png_init_read_transformations(png_structp png_ptr)
     *  6) PNG_GAMMA
     *  7) PNG_STRIP_ALPHA (if compose)
     *  8) PNG_ENCODE_ALPHA
-    *  9) PNG_16_TO_8 (strip16)
+    *  9) PNG_16_TO_8 or PNG_CHOP_16_TO_8 (strip16/chop16)
     * 10) PNG_QUANTIZE (converts to palette)
     * 11) PNG_EXPAND_16
     * 12) PNG_GRAY_TO_RGB iff PNG_BACKGROUND_IS_GRAY
@@ -1851,13 +1865,15 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 #ifdef PNG_READ_16BIT_SUPPORTED
-   if ((png_ptr->transformations & PNG_16_TO_8) && (info_ptr->bit_depth == 16))
+   if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_CHOP_16_TO_8)) &&
+       (info_ptr->bit_depth == 16))
       info_ptr->bit_depth = 8;
 #else
    /* Force chopping 16-bit input down to 8 */
    if (info_ptr->bit_depth == 16)
    {
-      png_ptr->transformations |=PNG_16_TO_8;
+      if (!(png_ptr->transformations & PNG_CHOP_16_TO_8))
+        png_ptr->transformations |=PNG_16_TO_8;
       info_ptr->bit_depth = 8;
    }
 #endif
@@ -2123,6 +2139,8 @@ png_do_read_transformations(png_structp png_ptr)
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
    if (png_ptr->transformations & PNG_16_TO_8)
+      png_do_scale_16_to_8(&(png_ptr->row_info), png_ptr->row_buf + 1);
+   else if (png_ptr->transformations & PNG_CHOP_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 
@@ -2453,11 +2471,11 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 #endif
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
-/* Chop rows of bit depth 16 down to 8 */
+/* Scale rows of bit depth 16 down to 8 accurately */
 void /* PRIVATE */
-png_do_chop(png_row_infop row_info, png_bytep row)
+png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
 {
-   png_debug(1, "in png_do_chop");
+   png_debug(1, "in png_do_scale_16_to_8");
 
    if (row_info->bit_depth == 16)
    {
@@ -2500,15 +2518,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
           */
 
          png_int_32 tmp = *sp++; /* must be signed! */
-#ifdef PNG_LEGACY_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-         tmp += (((int)*sp++ - tmp) > 128) ? 1 : 0;
-#else
-#  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
          tmp += (((int)*sp++ - tmp + 128) * 65535) >> 24;
-#  else
-         sp++;
-#  endif
-#endif
          *dp++ = (png_byte)tmp;
       }
 
@@ -2517,7 +2527,33 @@ png_do_chop(png_row_infop row_info, png_bytep row)
       row_info->rowbytes = row_info->width * row_info->channels;
    }
 }
-#endif
+
+void /* PRIVATE */
+/* Simply discard the low byte.  This was the default behavior prior
+ * to libpng-1.5.4.
+ */
+png_do_chop(png_row_infop row_info, png_bytep row)
+{
+   png_debug(1, "in png_do_chop");
+
+   if (row_info->bit_depth == 16)
+   {
+      png_bytep sp = row; /* source */
+      png_bytep dp = row; /* destinaton */
+      png_bytep ep = sp + row_info->rowbytes; /* end+1 */
+
+      while (sp < ep)
+      {
+         *dp++ = *sp++;
+         sp++;
+      }
+
+      row_info->bit_depth = 8;
+      row_info->pixel_depth = (png_byte)(8 * row_info->channels);
+      row_info->rowbytes = row_info->width * row_info->channels;
+   }
+}
+#endif /* PNG_READ_16_TO_8_SUPPORTED */
 
 #ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
 void /* PRIVATE */

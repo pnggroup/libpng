@@ -1,5 +1,5 @@
 
-Libpng 1.5.4beta01 - June 14, 2011
+Libpng 1.5.4beta02 - June 14, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.4beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.4beta01.tar.gz
-   1.5.4beta01.tar.bz2
+   1.5.4beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.4beta02.tar.gz
+   1.5.4beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp154b01.7z  (LZMA-compressed, recommended)
-   lp154b01.zip
+   lp154b02.7z  (LZMA-compressed, recommended)
+   lp154b02.zip
 
 Other information:
 
-   1.5.4beta01-README.txt
-   1.5.4beta01-LICENSE.txt
+   1.5.4beta02-README.txt
+   1.5.4beta02-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -192,6 +192,10 @@ Version 1.5.4beta01 [June 14, 2011]
   Moved definitions of PNG_HAVE_IHDR, PNG_AFTER_IDAT, and PNG_HAVE_PLTE
     outside of an unknown-chunk block in png.h because they are also
     needed for other uses.
+
+Version 1.5.4beta02 [June 14, 2011]
+  Fixed and clarified LEGACY 16-to-8 scaling code.
+  Added png_set_chop_16() API.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

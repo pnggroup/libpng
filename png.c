@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.3 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.4 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_4beta01 Your_png_h_is_not_version_1_5_4beta01;
+typedef png_libpng_version_1_5_4beta02 Your_png_h_is_not_version_1_5_4beta02;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -617,13 +617,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.4beta01 - June 14, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.4beta02 - June 14, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.4beta01 - June 14, 2011\
+      return "libpng version 1.5.4beta02 - June 14, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2369,7 +2369,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
      else
         shift = 0; /* keep all 16 bits */
 
-     if (png_ptr->transformations & PNG_16_TO_8)
+     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_CHOP_16_TO_8))
      {
         /* PNG_MAX_GAMMA_8 is the number of bits to keep - effectively
          * the significant bits in the *input* when the output will
@@ -2390,7 +2390,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
       * 16-bit output because the 8-bit table assumes the result will be reduced
       * to 8 bits.
       */
-     if (png_ptr->transformations & PNG_16_TO_8)
+     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_CHOP_16_TO_8))
 #endif
          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,

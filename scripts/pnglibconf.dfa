@@ -347,7 +347,6 @@ option INCH_CONVERSIONS
 option BUILD_GRAYSCALE_PALETTE
 
 option READ_16_TO_8_ACCURATE_SCALE requires READ
-option LEGACY_READ_16_TO_8_ACCURATE_SCALE disabled
 
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want
