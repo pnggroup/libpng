@@ -1503,9 +1503,11 @@ png_init_read_transformations(png_structp png_ptr)
       || ((png_ptr->transformations & PNG_COMPOSE)
          && (png_gamma_significant(png_ptr->gamma)
             || png_gamma_significant(png_ptr->screen_gamma)
+#  ifdef PNG_READ_BACKGROUND_SUPPORTED
             || (png_ptr->background_gamma_type == PNG_BACKGROUND_GAMMA_UNIQUE
-               && png_gamma_significant(png_ptr->background_gamma))))
-      || ((png_ptr->transformations & PNG_ENCODE_ALPHA)
+               && png_gamma_significant(png_ptr->background_gamma))
+#  endif
+      )) || ((png_ptr->transformations & PNG_ENCODE_ALPHA)
          && png_gamma_significant(png_ptr->screen_gamma))
       )
    {

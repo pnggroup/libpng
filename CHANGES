@@ -3476,6 +3476,9 @@ Version 1.5.4beta03 [June 15, 2011]
   Correction to the expand_16 code; removed extra instance of
     png_set_scale_16_to_8 from pngpriv.h
 
+Version 1.5.4beta04 [June 15, 2011]
+  Added a missing "#ifdef PNG_READ_BACKGROUND_SUPPORTED/#endif" in pngrtran.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
