@@ -215,6 +215,7 @@ Version 1.5.4beta03 [June 15, 2011]
 
 Version 1.5.4beta04 [June 15, 2011]
   Added a missing "#ifdef PNG_READ_BACKGROUND_SUPPORTED/#endif" in pngrtran.c
+  Added PNG_TRANSFORM_CHOP_16 to the high-level read transforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

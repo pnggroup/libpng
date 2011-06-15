@@ -1291,6 +1291,11 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
     */
    if (transforms & PNG_TRANSFORM_STRIP_16)
       png_set_strip_16(png_ptr);
+#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+   else
+     if (transforms & PNG_TRANSFORM_CHOP_16)
+        png_set_chop_16(png_ptr);
+#endif
 #endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
