@@ -4464,7 +4464,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
       if (row_info->bit_depth == 8)
       {
          {
-            if (trans_alpha != NULL)
+            if (num_trans > 0)
             {
                sp = row + (png_size_t)row_width - 1;
                dp = row + (png_size_t)(row_width << 2) - 1;
@@ -4518,7 +4518,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
  */
 void /* PRIVATE */
 png_do_expand(png_row_infop row_info, png_bytep row,
-    png_const_color_16p trans_value)
+    png_const_color_16p trans_color)
 {
    int shift, value;
    png_bytep sp, dp;
@@ -4530,7 +4530,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
    {
       if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
       {
-         png_uint_16 gray = (png_uint_16)(trans_value ? trans_value->gray : 0);
+         png_uint_16 gray = (png_uint_16)(trans_color ? trans_color->gray : 0);
 
          if (row_info->bit_depth < 8)
          {
@@ -4622,7 +4622,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
             row_info->rowbytes = row_width;
          }
 
-         if (trans_value != NULL)
+         if (trans_color != NULL)
          {
             if (row_info->bit_depth == 8)
             {
@@ -4674,13 +4674,13 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                row_width);
          }
       }
-      else if (row_info->color_type == PNG_COLOR_TYPE_RGB && trans_value)
+      else if (row_info->color_type == PNG_COLOR_TYPE_RGB && trans_color)
       {
          if (row_info->bit_depth == 8)
          {
-            png_byte red = (png_byte)(trans_value->red & 0xff);
-            png_byte green = (png_byte)(trans_value->green & 0xff);
-            png_byte blue = (png_byte)(trans_value->blue & 0xff);
+            png_byte red = (png_byte)(trans_color->red & 0xff);
+            png_byte green = (png_byte)(trans_color->green & 0xff);
+            png_byte blue = (png_byte)(trans_color->blue & 0xff);
             sp = row + (png_size_t)row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_width << 2) - 1;
             for (i = 0; i < row_width; i++)
@@ -4698,12 +4698,12 @@ png_do_expand(png_row_infop row_info, png_bytep row,
          }
          else if (row_info->bit_depth == 16)
          {
-            png_byte red_high = (png_byte)((trans_value->red >> 8) & 0xff);
-            png_byte green_high = (png_byte)((trans_value->green >> 8) & 0xff);
-            png_byte blue_high = (png_byte)((trans_value->blue >> 8) & 0xff);
-            png_byte red_low = (png_byte)(trans_value->red & 0xff);
-            png_byte green_low = (png_byte)(trans_value->green & 0xff);
-            png_byte blue_low = (png_byte)(trans_value->blue & 0xff);
+            png_byte red_high = (png_byte)((trans_color->red >> 8) & 0xff);
+            png_byte green_high = (png_byte)((trans_color->green >> 8) & 0xff);
+            png_byte blue_high = (png_byte)((trans_color->blue >> 8) & 0xff);
+            png_byte red_low = (png_byte)(trans_color->red & 0xff);
+            png_byte green_low = (png_byte)(trans_color->green & 0xff);
+            png_byte blue_low = (png_byte)(trans_color->blue & 0xff);
             sp = row + row_info->rowbytes - 1;
             dp = row + (png_size_t)(row_width << 3) - 1;
             for (i = 0; i < row_width; i++)
