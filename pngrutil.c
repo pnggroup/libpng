@@ -2679,7 +2679,7 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
 {
    png_debug(1, "in png_combine_row");
 
-   /* Added in 1.5.3: the row_info should match the information returned by any
+   /* Added in 1.5.4: the row_info should match the information returned by any
     * call to png_read_update_info at this point.  Do not continue if we got
     * this wrong.
     */

@@ -116,7 +116,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #endif
 
 /* If warnings or errors are turned off the code is disabled or redirected here.
- * From 1.5.3 functions have been added to allow very limited formatting of
+ * From 1.5.4 functions have been added to allow very limited formatting of
  * error and warning messages - this code will also be disabled here.
  */
 #ifdef PNG_WARNINGS_SUPPORTED
@@ -295,7 +295,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_RGB_TO_GRAY_ERR   0x200000L
 #define PNG_RGB_TO_GRAY_WARN  0x400000L
 #define PNG_RGB_TO_GRAY       0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
-#define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.3 */
+#define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.4 */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
 #define PNG_CHOP_16_TO_8      0x4000000L
@@ -325,9 +325,9 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-#define PNG_FLAG_ASSUME_sRGB              0x1000  /* Added to libpng-1.5.3 */
-#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000  /* Added to libpng-1.5.3 */
-#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000  /* Added to libpng-1.5.3 */
+#define PNG_FLAG_ASSUME_sRGB              0x1000  /* Added to libpng-1.5.4 */
+#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000  /* Added to libpng-1.5.4 */
+#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000  /* Added to libpng-1.5.4 */
 #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
 #define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000L
 #define PNG_FLAG_LIBRARY_MISMATCH         0x20000L
@@ -338,7 +338,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
                                   /*      0x400000L  unused */
 #define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000L  /* Added to libpng-1.4.0 */
 #define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000L  /* 5 lines added */
-#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000L  /* to libpng-1.5.3 */
+#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000L  /* to libpng-1.5.4 */
 #define PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL   0x4000000L
 #define PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS 0x8000000L
 #define PNG_FLAG_ZTXT_CUSTOM_METHOD      0x10000000L
@@ -452,7 +452,7 @@ PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
 #define PNG_tRNS PNG_CONST png_byte png_tRNS[5] = {116,  82,  78,  83, '\0'}
 #define PNG_zTXt PNG_CONST png_byte png_zTXt[5] = {122,  84,  88, 116, '\0'}
 
-/* Gamma values (new at libpng-1.5.3): */
+/* Gamma values (new at libpng-1.5.4): */
 #define PNG_GAMMA_MAC_OLD 151724  /* Assume '1.8' is really 2.2/1.45! */
 #define PNG_GAMMA_MAC_INVERSE 65909
 #define PNG_GAMMA_sRGB_INVERSE 45455
@@ -1133,7 +1133,7 @@ PNG_EXTERN png_charp png_format_number(png_const_charp start, png_charp end,
 #endif
 
 #ifdef PNG_WARNINGS_SUPPORTED
-/* New defines and members adding in libpng-1.5.3 */
+/* New defines and members adding in libpng-1.5.4 */
 #  define PNG_WARNING_PARAMETER_SIZE 32
 #  define PNG_WARNING_PARAMETER_COUNT 8
 

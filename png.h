@@ -900,8 +900,9 @@ PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)), typedef);
 #define PNG_TRANSFORM_STRIP_FILLER_AFTER 0x1000 /* write only */
 /* Added to libpng-1.4.0 */
 #define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
-/* Added to libpng-1.5.3 */
+/* Added to libpng-1.5.4 */
 #define PNG_TRANSFORM_EXPAND_16     0x4000      /* read only */
+#define PNG_TRANSFORM_CHOP_16       0x8000      /* read only */
 
 /* Flags for MNG supported features */
 #define PNG_FLAG_MNG_EMPTY_PLTE     0x01
@@ -1404,7 +1405,7 @@ PNG_EXPORT(46, void, png_set_invert_mono, (png_structp png_ptr));
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
 /* Handle alpha and tRNS by replacing with a background color.  Prior to
- * libpng-1.5.3 this API must not be called before the PNG file header has been
+ * libpng-1.5.4 this API must not be called before the PNG file header has been
  * read.  Doing so will result in unexpected behavior and possible warnings or
  * errors if the PNG file contains a bKGD chunk.
  */

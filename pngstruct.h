@@ -68,7 +68,7 @@ struct png_struct_def
    uInt zbuf_size;            /* size of zbuf (typically 65536) */
 #ifdef PNG_WRITE_SUPPORTED
 
-/* Added in 1.5.3: state to keep track of whether the zstream has been
+/* Added in 1.5.4: state to keep track of whether the zstream has been
  * initialized and if so whether it is for IDAT or some other chunk.
  */
 #define PNG_ZLIB_UNINITIALIZED 0
@@ -78,7 +78,7 @@ struct png_struct_def
 #define PNG_ZLIB_IN_USE        4 /* a flag value */
 
    png_uint_32 zlib_state;       /* State of zlib initialization */
-/* End of material added at libpng 1.5.3 */
+/* End of material added at libpng 1.5.4 */
 
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
@@ -86,7 +86,7 @@ struct png_struct_def
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
 #endif
-/* Added at libpng 1.5.3 */
+/* Added at libpng 1.5.4 */
 #if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
     defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
    int zlib_text_level;            /* holds zlib compression level */
@@ -95,7 +95,7 @@ struct png_struct_def
    int zlib_text_mem_level;        /* holds zlib compression memory level */
    int zlib_text_strategy;         /* holds zlib compression strategy */
 #endif
-/* End of material added at libpng 1.5.3 */
+/* End of material added at libpng 1.5.4 */
 
    png_uint_32 width;         /* width of image in pixels */
    png_uint_32 height;        /* height of image in pixels */
@@ -111,7 +111,7 @@ struct png_struct_def
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
    png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
    png_row_info row_info;     /* used for transformation routines */
-   png_size_t info_rowbytes;  /* Added in 1.5.3: cache of updated row bytes */
+   png_size_t info_rowbytes;  /* Added in 1.5.4: cache of updated row bytes */
 
    png_uint_32 idat_size;     /* current IDAT size for read */
    png_uint_32 crc;           /* current chunk CRC value */

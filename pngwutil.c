@@ -1017,7 +1017,7 @@ png_write_IDAT(png_structp png_ptr, png_bytep data, png_size_t length)
    png_write_chunk(png_ptr, png_IDAT, data, length);
    png_ptr->mode |= PNG_HAVE_IDAT;
 
-   /* Prior to 1.5.3 this code was replicated in every caller (except at the
+   /* Prior to 1.5.4 this code was replicated in every caller (except at the
     * end, where it isn't technically necessary).  Since this function has
     * flushed the data we can safely reset the zlib output buffer here.
     */

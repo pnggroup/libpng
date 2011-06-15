@@ -3429,7 +3429,7 @@ read_palette(store_palette palette, int *npalette, png_structp pp, png_infop pi)
    if ((png_get_tRNS(pp, pi, &trans_alpha, &num, 0) & PNG_INFO_tRNS) != 0 &&
       (trans_alpha != NULL || num != 1/*returns 1 for a transparent color*/) &&
       /* Oops, if a palette tRNS gets expanded png_read_update_info (at least so
-       * far as 1.5.3) does not zap the trans_alpha pointer, only num_trans, so
+       * far as 1.5.4) does not zap the trans_alpha pointer, only num_trans, so
        * in the above call we get a success, we get a pointer (who knows what
        * to) and we get num_trans == 0:
        */

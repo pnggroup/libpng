@@ -507,7 +507,7 @@ png_default_error,(png_structp png_ptr, png_const_charp error_message),
 {
 #ifdef PNG_CONSOLE_IO_SUPPORTED
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-   /* Check on NULL only added in 1.5.3 */
+   /* Check on NULL only added in 1.5.4 */
    if (error_message != NULL && *error_message == PNG_LITERAL_SHARP)
    {
       /* Strip "#nnnn " from beginning of error message. */

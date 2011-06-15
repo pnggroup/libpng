@@ -2385,7 +2385,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
      png_ptr->gamma_shift = shift;
 
 #ifdef PNG_16BIT_SUPPORTED
-     /* NOTE: prior to 1.5.3 this test used to include PNG_BACKGROUND (now
+     /* NOTE: prior to 1.5.4 this test used to include PNG_BACKGROUND (now
       * PNG_COMPOSE).  This effectively smashed the background calculation for
       * 16-bit output because the 8-bit table assumes the result will be reduced
       * to 8 bits.

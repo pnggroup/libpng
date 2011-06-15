@@ -775,12 +775,12 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
    if (png_ptr == NULL)
       return;
 
-   /* New in libpng-1.5.3 - reserve particular negative values as flags. */
+   /* New in libpng-1.5.4 - reserve particular negative values as flags. */
    scrn_gamma = translate_gamma_flags(png_ptr, scrn_gamma, 1/*screen*/);
    file_gamma = translate_gamma_flags(png_ptr, file_gamma, 0/*file*/);
 
 #if PNG_LIBPNG_VER >= 10600
-   /* Checking the gamma values for being >0 was added in 1.5.3 along with the
+   /* Checking the gamma values for being >0 was added in 1.5.4 along with the
     * premultiplied alpha support; this actually hides an undocumented feature
     * of the previous implementation which allowed gamma processing to be
     * disabled in background handling.  There is no evidence (so far) that this
@@ -1155,7 +1155,7 @@ png_init_palette_transformations(png_structp png_ptr)
 static void /* PRIVATE */
 png_init_rgb_transformations(png_structp png_ptr)
 {
-   /* Added to libpng-1.5.3: check the color type to determine whether there
+   /* Added to libpng-1.5.4: check the color type to determine whether there
     * is any alpha or transparency in the image and simply cancel the
     * background and alpha mode stuff if there isn't.
     */
@@ -1260,9 +1260,9 @@ png_init_read_transformations(png_structp png_ptr)
     */
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-   /* Prior to 1.5.3 these tests were performed from png_set_gamma, 1.5.3 adds
+   /* Prior to 1.5.4 these tests were performed from png_set_gamma, 1.5.4 adds
     * png_set_alpha_mode and this is another source for a default file gamma so
-    * the test needs to be performed later - here.  In addition prior to 1.5.3
+    * the test needs to be performed later - here.  In addition prior to 1.5.4
     * the tests were repeated for the PALETTE color type here - this is no
     * longer necessary (and doesn't seem to have been necessary before.)
     */
@@ -1287,7 +1287,7 @@ png_init_read_transformations(png_structp png_ptr)
 
       else if (png_ptr->screen_gamma != 0)
          /* The converse - assume the file matches the screen, note that this
-          * perhaps undesireable default can (from 1.5.3) be changed by calling
+          * perhaps undesireable default can (from 1.5.4) be changed by calling
           * png_set_alpha_mode (even if the alpha handling mode isn't required
           * or isn't changed from the default.)
           */
@@ -1297,7 +1297,7 @@ png_init_read_transformations(png_structp png_ptr)
          /* Just in case the following prevents any processing - file and screen
           * are both assumed to be linear and there is no way to introduce a
           * third gamma value other than png_set_background with 'UNIQUE', and,
-          * prior to 1.5.3
+          * prior to 1.5.4
           */
          png_ptr->screen_gamma = png_ptr->gamma = PNG_FP_1;
 
@@ -1358,12 +1358,12 @@ png_init_read_transformations(png_structp png_ptr)
          PNG_EXPAND_tRNS);
       png_ptr->flags &= ~PNG_FLAG_OPTIMIZE_ALPHA;
 
-      /* Kill the tRNS chunk itself too.  Prior to 1.5.3 this did not happen
+      /* Kill the tRNS chunk itself too.  Prior to 1.5.4 this did not happen
        * so transparency information would remain just so long as it wasn't
        * expanded.  This produces unexpected API changes if the set of things
        * that do PNG_EXPAND_tRNS changes (perfectly possible given the
        * documentation - which says ask for what you want, accept what you
-       * get.)  This makes the behavior consistent from 1.5.3:
+       * get.)  This makes the behavior consistent from 1.5.4:
        */
       png_ptr->num_trans = 0;
    }
@@ -1473,7 +1473,7 @@ png_init_read_transformations(png_structp png_ptr)
     * background support (see the comments in scripts/pnglibconf.dfa), this
     * allows pre-multiplication of the alpha channel to be implemented as
     * compositing on black.  This is probably sub-optimal and has been done in
-    * 1.5.3 betas simply to enable external critique and testing (i.e. to
+    * 1.5.4 betas simply to enable external critique and testing (i.e. to
     * implement the new API quickly, without lots of internal changes.)
     */
 
@@ -1492,7 +1492,7 @@ png_init_read_transformations(png_structp png_ptr)
     * the gamma tables will not be built even if composition is required on a
     * gamma encoded value.
     *
-    * In 1.5.3 this is addressed below by an additional check on the individual
+    * In 1.5.4 this is addressed below by an additional check on the individual
     * file gamma - if it is not 1.0 both RGB_TO_GRAY and COMPOSE need the
     * tables.
     */
@@ -1860,7 +1860,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-   /* The following used to be conditional on PNG_GAMMA (prior to 1.5.3),
+   /* The following used to be conditional on PNG_GAMMA (prior to 1.5.4),
     * however it seems that the code in png_init_read_transformations, which has
     * been called before this from png_read_update_info->png_read_start_row
     * sometimes does the gamma transform and cancels the flag.
@@ -1969,7 +1969,7 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
 
-   /* Adding in 1.5.3: cache the above value in png_struct so that we can later
+   /* Adding in 1.5.4: cache the above value in png_struct so that we can later
     * check in png_rowbytes that the user buffer won't get overwritten.  Note
     * that the field is not always set - if png_read_update_info isn't called
     * the application has to either not do any transforms or get the calculation
@@ -1994,15 +1994,15 @@ png_do_read_transformations(png_structp png_ptr)
 
    if (png_ptr->row_buf == NULL)
    {
-      /* Prior to 1.5.3 this output row/pass where the NULL pointer is, but this
+      /* Prior to 1.5.4 this output row/pass where the NULL pointer is, but this
        * error is incredibly rare and incredibly easy to debug without this
        * information.
        */
       png_error(png_ptr, "NULL row buffer");
    }
 
-   /* The following is debugging; prior to 1.5.3 the code was never compiled in;
-    * in 1.5.3 PNG_FLAG_DETECT_UNINITIALIZED was added and the macro
+   /* The following is debugging; prior to 1.5.4 the code was never compiled in;
+    * in 1.5.4 PNG_FLAG_DETECT_UNINITIALIZED was added and the macro
     * PNG_WARN_UNINITIALIZED_ROW removed.  In 1.5 the new flag is set only for
     * selected new APIs to ensure that there is no API change.
     */
@@ -2011,7 +2011,7 @@ png_do_read_transformations(png_structp png_ptr)
    {
       /* Application has failed to call either png_read_start_image() or
        * png_read_update_info() after setting transforms that expand pixels.
-       * This check added to libpng-1.2.19 (but not enabled until 1.5.3).
+       * This check added to libpng-1.2.19 (but not enabled until 1.5.4).
        */
       png_error(png_ptr, "Uninitialized row");
    }
@@ -2173,7 +2173,7 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-   /*NOTE: moved here in 1.5.3 (from much later in this list.) */
+   /*NOTE: moved here in 1.5.4 (from much later in this list.) */
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
        (png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
       png_do_gray_to_rgb(&(png_ptr->row_info), png_ptr->row_buf + 1);
