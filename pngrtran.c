@@ -1456,28 +1456,16 @@ png_init_read_transformations(png_structp png_ptr)
        *
        * The PNG_BACKGROUND_EXPAND code above does not expand to 16 bits at
        * present, so that case is ok (until do_expand_16 is moved.)
+       *
+       * NOTE: this discards the low 16 bits of the user supplied background
+       * color, but until expand_16 works properly there is no choice!
        */
-
-      if (png_ptr->transformations & PNG_16_TO_8)
-      {
 #     define CHOP(x) (x)=((png_uint_16)(((png_uint_32)(x)*255+32895) >> 16))
       CHOP(png_ptr->background.red);
       CHOP(png_ptr->background.green);
       CHOP(png_ptr->background.blue);
       CHOP(png_ptr->background.gray);
 #     undef CHOP
-      }
-#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
-      else /* Use pre-libpng-1.5.4 inaccurate "ACCURATE" scaling */
-      {
-#     define CHOP(x) (x)=((png_uint_16)((2*(png_uint_32)(x) + 257)/514))
-      CHOP(png_ptr->background.red);
-      CHOP(png_ptr->background.green);
-      CHOP(png_ptr->background.blue);
-      CHOP(png_ptr->background.gray);
-#     undef CHOP
-      }
-#endif /* PNG_READ_CHOP_16_TO_8_SUPPORTED */
    }
 #endif /* PNG_READ_BACKGROUND_SUPPORTED && PNG_READ_EXPAND_16_SUPPORTED */
 

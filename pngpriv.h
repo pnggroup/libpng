@@ -827,8 +827,6 @@ PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
 PNG_EXTERN void png_do_chop PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
-PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
-    png_bytep row));
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED

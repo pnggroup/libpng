@@ -3473,6 +3473,8 @@ Version 1.5.4beta03 [June 15, 2011]
     form if tRNS was present but alpha was marked to be stripped; this exposed
     a check for tRNS in png_do_expand_palette() which is inconsistent with the
     code elsewhere in libpng.
+  Correction to the expand_16 code; removed extra instance of
+    png_set_scale_16_to_8 from pngpriv.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
