@@ -1602,12 +1602,12 @@ If you intend to display the PNG or to incorporate it in other image data you
 need to tell libpng information about your display or drawing surface so that
 libpng can convert the values in the image to match the display.
 
-From libpng-1.5.3 this information can be set before reading the PNG file
+From libpng-1.5.4 this information can be set before reading the PNG file
 header.  In earlier versions png_set_gamma() existed but behaved incorrectly if
 called before the PNG file header had been read and png_set_alpha_mode() did not
 exist.
 
-If you need to support versions prior to libpng-1.5.3 test the version number
+If you need to support versions prior to libpng-1.5.4 test the version number
 and follow the procedures described in the appropriate manual page.
 
 You give libpng the encoding expected by your system expressed as a 'gamma'
@@ -1628,7 +1628,7 @@ documentation!
 
 Many systems permit the system gamma to be changed via a lookup table in the
 display driver, a few systems, including older Macs, change the response by
-default.  As of 1.5.3 three special values are available to handle common
+default.  As of 1.5.4 three special values are available to handle common
 situations:
 
    PNG_DEFAULT_sRGB: Indicates that the system conforms to the IEC 61966-2-1
@@ -1799,11 +1799,16 @@ color!)
 
 You set the transforms you need later, either as flags to the high level
 interface or libpng API calls for the low level interface.  For reference the
-settings required are:
+settings and API calls required are:
 
 8-bit values:
    PNG_TRANSFORM_STRIP_16 | PNG_EXPAND
    png_set_expand(png_ptr); png_set_strip_16(png_ptr);
+
+   If you must get exactly the same inaccurate results
+   produced by default in versions prior to libpng-1.5.4,
+   use PNG_TRANSFORM_CHOP_16 and png_set_chop_16(png_ptr)
+   instead.
 
 16-bit values:
    PNG_TRANSFORM_EXPAND_16
@@ -1814,9 +1819,9 @@ color data you can add PNG_TRANSFORM_GRAY_TO_RGB or png_set_gray_to_rgb(png_ptr)
 to the list.
 
 Calling png_set_background before the PNG file header is read will not work
-prior to libpng-1.5.3.  Because the failure may result in unexpected warnings or
+prior to libpng-1.5.4.  Because the failure may result in unexpected warnings or
 errors it is therefore much safer to call png_set_background after the head has
-been read.  Unfortunately this means that prior to libpng-1.5.3 it cannot be
+been read.  Unfortunately this means that prior to libpng-1.5.4 it cannot be
 used with the high level interface.
 
 .SS The high-level read interface
@@ -1923,9 +1928,9 @@ for use in later transformations.  Important information copied in is:
 1) The PNG file gamma from the gAMA chunk.  This overwrites the default value
 provided by an earlier call to png_set_gamma or png_set_alpha_mode.
 
-2) Prior to libpng-1.5.3 the background color from a bKGd chunk.  This
+2) Prior to libpng-1.5.4 the background color from a bKGd chunk.  This
 damages the information provided by an earlier call to png_set_background
-resulting in expected behavior.  Libpng-1.5.3 no longer does this.
+resulting in expected behavior.  Libpng-1.5.4 no longer does this.
 
 3) The number of significant bits in each component value.  Libpng uses this to
 optimize gamma handling by reducing the internal lookup table sizes.
@@ -2589,7 +2594,7 @@ can be determined.
 The png_set_background() function has been described already, it tells libpng to
 composite images with alpha or simple transparency against the supplied
 background color.  For compatibility with versions of libpng earlier than
-libpng-1.5.3 it is recommended that you call the function after reading the file
+libpng-1.5.4 it is recommended that you call the function after reading the file
 header, even if you don't want to use the color in a bKGD chunk, if one exists.
 
 If the PNG file contains a bKGD chunk (PNG_INFO_bKGD valid),
@@ -2626,7 +2631,7 @@ image_background->gray.
 
 If you didn't call png_set_gamma() before reading the file header, for example
 if you need your code to remain compatible with older versions of libpng prior
-to libpng-1.5.3, this is the place to call it.
+to libpng-1.5.4, this is the place to call it.
 
 Do not call it if you called png_set_alpha_mode(); doing so will damage the
 settings put in place by png_set_alpha_mode().  (If png_set_alpha_mode() is
@@ -5045,20 +5050,23 @@ PNG_NO_USE_READ_MACROS before including png.h.  Notice that this is
 only supported from 1.5.0 -defining PNG_NO_USE_READ_MACROS prior to 1.5.0
  will lead to a link failure.
 
-Prior to libpng-1.5.3, the zlib compressor used the same set of parameters
+Prior to libpng-1.5.4, the zlib compressor used the same set of parameters
 when compressing the IDAT data and textual data such as zTXt and iCCP.
-In libpng-1.5.3 we reinitialized the zlib stream for each type of data.
+In libpng-1.5.4 we reinitialized the zlib stream for each type of data.
 We added five png_set_text_*() functions for setting the parameters to
 use with textual data.
 
-Prior to libpng-1.5.3, the PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+Prior to libpng-1.5.4, the PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 option was off by default, and slightly inaccurate scaling occurred.
 This option can no longer be turned off, and 16-to-8 scaling is always
 accurate.  This change will result in some different results while
 reading 16-bit images, with none of the pixels being off-by-one any
-longer (see Clause 13.12 of the PNG specification).
+longer (see Clause 13.12 of the PNG specification).  If you must
+have exactly the same inaccurate results that libpng produced by
+default previously, then you can use the png_set_chop_16() API instead
+of png_set_strip_16().
 
-Prior to libpng-1.5.3, the png_set_user_limits() function could only be
+Prior to libpng-1.5.4, the png_set_user_limits() function could only be
 used to reduce the width and height limits from the value of
 PNG_USER_WIDTH_MAX and PNG_USER_HEIGHT_MAX, although this document said
 that it could be used to override them.  Now this function will reduce or
