@@ -598,7 +598,7 @@ typedef png_sPLT_t FAR * FAR * png_sPLT_tpp;
  * and whether that contents is compressed or not.  The "key" field
  * points to a regular zero-terminated C string.  The "text", "lang", and
  * "lang_key" fields can be regular C strings, empty strings, or NULL pointers.
- * However, the * structure returned by png_get_text() will always contain
+ * However, the structure returned by png_get_text() will always contain
  * regular zero-terminated C strings (possibly empty), never NULL pointers,
  * so they can be safely used in printf() and other string-handling functions.
  */
