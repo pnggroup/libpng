@@ -187,8 +187,15 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
     * are mutually exclusive.
     */
 
-   /* Tell libpng to strip 16 bit/color files down to 8 bits/color */
-   png_set_strip_16(png_ptr);
+   /* Tell libpng to strip 16 bit/color files down to 8 bits/color.
+    * Use accurate scaling if it's available, otherwise just chop off the
+    * low byte.
+    */
+#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+    png_set_strip_16(png_ptr);
+#else
+   png_set_chop_16(png_ptr);
+#endif
 
    /* Strip alpha bytes from the input data without combining with the
     * background (not recommended).
