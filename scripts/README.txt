@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.5.4beta04 - June 15, 2011
+Makefiles for  libpng version 1.5.4beta04 - June 16, 2011
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
@@ -57,7 +57,7 @@ Other supporting scripts:
  libpng-config-body.in => used by several makefiles to create libpng-config
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
- pngwin.rc         =>  Used by the visualc6 and visualc71 projects.
+ pngwin.rc         =>  Used by the visualc71 project.
  pngwin.def        =>  Used by makefile.os2
  pngwin.dfn        =>  Used to maintain pngwin.def
  SCOPTIONS.ppc     =>  Used with smakefile.ppc

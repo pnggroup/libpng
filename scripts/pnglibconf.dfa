@@ -550,6 +550,10 @@ option SAVE_INT_32 requires WRITE
 
 # png_save_int_32 is required by the ancillary chunks oFFs and pCAL
 
+# enabled at libpng-1.5.4, was present but disabled by default
+
+option READ_16_TO_8_ACCURATE_SCALE requires READ_16_TO_8
+
 # added at libpng-1.5.4
 
 option READ_CHOP_16_TO_8 requires READ_16_TO_8

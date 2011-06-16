@@ -134,6 +134,7 @@ png_set_background(png_structp png_ptr,
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 /* Scale 16-bit depth files to 8-bit depth */
+#  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 void PNGAPI
 png_set_strip_16(png_structp png_ptr)
 {
@@ -143,12 +144,13 @@ png_set_strip_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
-#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+#    ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
    png_ptr->transformations &= ~PNG_CHOP_16_TO_8;
-#endif
+#    endif
 }
+#  endif
 
-#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
 /* Chop 16-bit depth files to 8-bit depth */
 void PNGAPI
 png_set_chop_16(png_structp png_ptr)
@@ -159,9 +161,11 @@ png_set_chop_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_CHOP_16_TO_8;
+#    ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
    png_ptr->transformations &= ~PNG_16_TO_8;
+#    endif
 }
-#endif
+#  endif
 #endif /* PNG_READ_16_TO_8_SUPPORTED */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
@@ -2142,7 +2146,7 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_encode_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1, png_ptr);
 #endif
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
+#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_scale_16_to_8(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED

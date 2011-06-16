@@ -819,14 +819,14 @@ PNG_EXTERN void png_do_invert PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
+#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
     png_bytep row));
+#endif
 
 #ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
 PNG_EXTERN void png_do_chop PNGARG((png_row_infop row_info,
     png_bytep row));
-#endif
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED

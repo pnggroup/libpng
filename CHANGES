@@ -3468,7 +3468,7 @@ Version 1.5.4beta02 [June 14, 2011]
 Version 1.5.4beta03 [June 15, 2011]
   Fixed a problem in png_do_expand_palette() exposed by optimization in
     1.5.3beta06
-  Also removed a spurious (totally unused and confusing) member from png_info.
+  Also removed a spurious and confusing "trans" member ("trans") from png_info.
   The palette expand optimization prevented expansion to an intermediate RGBA
     form if tRNS was present but alpha was marked to be stripped; this exposed
     a check for tRNS in png_do_expand_palette() which is inconsistent with the
@@ -3476,9 +3476,11 @@ Version 1.5.4beta03 [June 15, 2011]
   Correction to the expand_16 code; removed extra instance of
     png_set_scale_16_to_8 from pngpriv.h
 
-Version 1.5.4beta04 [June 15, 2011]
+Version 1.5.4beta04 [June 16, 2011]
   Added a missing "#ifdef PNG_READ_BACKGROUND_SUPPORTED/#endif" in pngrtran.c
   Added PNG_TRANSFORM_CHOP_16 to the high-level read transforms.
+  Made PNG_READ_16_TO_8_ACCURATE_SCALE configurable again.  If this is
+    not enabled, png_set_strip_16() and png_do_scale_16_to_8 aren't built.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
