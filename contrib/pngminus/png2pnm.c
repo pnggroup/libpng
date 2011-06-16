@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   if (png2pnm (fp_rd, fp_wr, fp_al, raw, alpha) == FALSE)
   {
     fprintf (stderr, "PNG2PNM\n");
-    fprintf (stderr, "Error:  unsuccessful convertion of PNG-image\n");
+    fprintf (stderr, "Error:  unsuccessful conversion of PNG-image\n");
     exit(1);
   }
 

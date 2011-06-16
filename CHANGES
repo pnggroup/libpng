@@ -3480,7 +3480,8 @@ Version 1.5.4beta04 [June 16, 2011]
   Added a missing "#ifdef PNG_READ_BACKGROUND_SUPPORTED/#endif" in pngrtran.c
   Added PNG_TRANSFORM_CHOP_16 to the high-level read transforms.
   Made PNG_READ_16_TO_8_ACCURATE_SCALE configurable again.  If this is
-    not enabled, png_set_strip_16() and png_do_scale_16_to_8 aren't built.
+    not enabled, png_set_strip_16() and png_do_scale_16_to_8() aren't built.
+  Revised contrib/visupng, gregbook, and pngminim to demonstrate chop_16_to_8
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

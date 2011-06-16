@@ -175,8 +175,14 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
         // expand images of all color-type and bit-depth to 3x8 bit RGB images
         // let the library process things like alpha, transparency, background
 
-        if (iBitDepth == 16)
-            png_set_strip_16(png_ptr);
+#ifdef PNG_READ_16_TO_8_SUPPORTED
+    if (iBitDepth == 16)
+#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+        png_set_chop_16(png_ptr);
+#  else
+        png_set_strip_16(png_ptr);
+#  endif
+#endif
         if (iColorType == PNG_COLOR_TYPE_PALETTE)
             png_set_expand(png_ptr);
         if (iBitDepth < 8)
