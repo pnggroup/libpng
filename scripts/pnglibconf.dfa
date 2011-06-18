@@ -552,12 +552,11 @@ option SAVE_INT_32 requires WRITE
 
 # enabled at libpng-1.5.4, was present but disabled by default
 
-option READ_16_TO_8_ACCURATE_SCALE requires READ_16_TO_8
+option READ_16_TO_8_ACCURATE_SCALE requires READ_SCALE_16_TO_8
 
 # added at libpng-1.5.4
 
 option READ_SCALE_16_TO_8 requires READ_16_TO_8
-option READ_STRIP_16_TO_8 requires READ_16_TO_8
 
 option WRITE_OPTIMIZE_CMF requires WRITE
 
@@ -566,6 +565,7 @@ option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
 option READ_COMPRESSED_TEXT enables READ_TEXT
+option READ_STRIP_16_TO_8 requires READ_16_TO_8
 
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
