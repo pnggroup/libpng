@@ -2146,13 +2146,13 @@ png_do_read_transformations(png_structp png_ptr)
       png_do_encode_alpha(&(png_ptr->row_info), png_ptr->row_buf + 1, png_ptr);
 #endif
 
-#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_scale_16_to_8(&(png_ptr->row_info), png_ptr->row_buf + 1);
-#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
-   else if (png_ptr->transformations & PNG_CHOP_16_TO_8)
+#endif
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+   if (png_ptr->transformations & PNG_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
-#  endif
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
@@ -2481,7 +2481,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 }
 #endif
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 /* Scale rows of bit depth 16 down to 8 accurately */
 void /* PRIVATE */
 png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
@@ -2538,7 +2538,9 @@ png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
       row_info->rowbytes = row_info->width * row_info->channels;
    }
 }
+#endif
 
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
 void /* PRIVATE */
 /* Simply discard the low byte.  This was the default behavior prior
  * to libpng-1.5.4.
@@ -2564,7 +2566,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
       row_info->rowbytes = row_info->width * row_info->channels;
    }
 }
-#endif /* PNG_READ_16_TO_8_SUPPORTED */
+#endif
 
 #ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
 void /* PRIVATE */

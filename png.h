@@ -1424,7 +1424,7 @@ PNG_FIXED_EXPORT(215, void, png_set_background_fixed, (png_structp png_ptr,
 #endif
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
-#  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#  ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 /* Scale a 16-bit depth file down to 8-bit, accurately. */
 PNG_EXPORT(48, void, png_set_scale_16, (png_structp png_ptr));
 #  endif
