@@ -1808,9 +1808,9 @@ png_do_chop(png_row_infop row_info, png_bytep row)
           * later you will need to use the new png_set_scale_16_to_8()
           * API to obtain accurate 16-to-8 scaling.
           */
-         png_int_32 tmp = *sp++; /* must be signed! */
-         tmp += (((int)*sp++ - tmp + 128) * 65535) >> 24;
-         *dp++ = (png_byte)tmp;
+         png_int_32 tmp = *sp; /* must be signed! */
+         tmp += (((int)sp[1] - tmp + 128) * 65535) >> 24;
+         *dp = (png_byte)tmp;
 #else
        /* Simply discard the low order byte */
          *dp = *sp;
