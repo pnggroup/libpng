@@ -1882,7 +1882,11 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    if (info_ptr->bit_depth == 16)
    {
       if (!(png_ptr->transformations & PNG_SCALE_16_TO_8))
+#if PNG_READ_STRIP_16_TO_8_SUPPORTED
         png_ptr->transformations |=PNG_16_TO_8;
+#else
+        png_ptr->transformations |=PNG_SCALE_16_TO_8;
+#endif
       info_ptr->bit_depth = 8;
    }
 #endif
