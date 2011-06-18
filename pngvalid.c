@@ -6099,7 +6099,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
     * PNG_MAX_GAMMA_8 when doing the following.
     */
    if (dp->scale16)
-#     ifdef PNG_READ_16_TO_8_SUPPORTED
+#     ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
          png_set_scale_16(pp);
 #     else
          png_error(pp, "scale16 (16 to 8 bit conversion) not supported");
