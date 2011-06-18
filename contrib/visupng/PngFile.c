@@ -177,8 +177,8 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
     if (iBitDepth == 16)
-#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
-        png_set_chop_16(png_ptr);
+#  ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+        png_set_scale_16(png_ptr);
 #  else
         png_set_strip_16(png_ptr);
 #  endif

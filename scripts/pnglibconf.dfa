@@ -556,7 +556,8 @@ option READ_16_TO_8_ACCURATE_SCALE requires READ_16_TO_8
 
 # added at libpng-1.5.4
 
-option READ_CHOP_16_TO_8 requires READ_16_TO_8
+option READ_SCALE_16_TO_8 requires READ_16_TO_8
+option READ_STRIP_16_TO_8 requires READ_16_TO_8
 
 option WRITE_OPTIMIZE_CMF requires WRITE
 

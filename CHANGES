@@ -3483,6 +3483,11 @@ Version 1.5.4beta04 [June 16, 2011]
     not enabled, png_set_strip_16() and png_do_scale_16_to_8() aren't built.
   Revised contrib/visupng, gregbook, and pngminim to demonstrate chop_16_to_8
 
+Version 1.5.4beta05 [June 18, 2011]
+  Renamed png_set_strip_16() to png_set_scale_16() and renamed
+    png_set_chop_16() to png_set_strip(16) in an attempt to minimize the
+    behavior changes between libpng14 and libpng15.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

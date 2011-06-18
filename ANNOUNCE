@@ -1,5 +1,5 @@
 
-Libpng 1.5.4beta04 - June 16, 2011
+Libpng 1.5.4beta05 - June 18, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.4beta04.tar.xz (LZMA-compressed, recommended)
-   1.5.4beta04.tar.gz
-   1.5.4beta04.tar.bz2
+   1.5.4beta05.tar.xz (LZMA-compressed, recommended)
+   1.5.4beta05.tar.gz
+   1.5.4beta05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp154b04.7z  (LZMA-compressed, recommended)
-   lp154b04.zip
+   lp154b05.7z  (LZMA-compressed, recommended)
+   lp154b05.zip
 
 Other information:
 
-   1.5.4beta04-README.txt
-   1.5.4beta04-LICENSE.txt
+   1.5.4beta05-README.txt
+   1.5.4beta05-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -219,6 +219,11 @@ Version 1.5.4beta04 [June 16, 2011]
   Made PNG_READ_16_TO_8_ACCURATE_SCALE configurable again.  If this is
     not enabled, png_set_strip_16() and png_do_scale_16_to_8() aren't built.
   Revised contrib/visupng, gregbook, and pngminim to demonstrate chop_16_to_8
+
+Version 1.5.4beta05 [June 18, 2011]
+  Renamed png_set_strip_16() to png_set_scale_16() and renamed
+    png_set_chop_16() to png_set_strip(16) in an attempt to minimize the
+    behavior changes between libpng14 and libpng15.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
