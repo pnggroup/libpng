@@ -902,7 +902,7 @@ PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)), typedef);
 #define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
 /* Added to libpng-1.5.4 */
 #define PNG_TRANSFORM_EXPAND_16     0x4000      /* read only */
-#define PNG_TRANSFORM_CHOP_16       0x8000      /* read only */
+#define PNG_TRANSFORM_SCALE_16      0x8000      /* read only */
 
 /* Flags for MNG supported features */
 #define PNG_FLAG_MNG_EMPTY_PLTE     0x01
@@ -1428,9 +1428,10 @@ PNG_FIXED_EXPORT(215, void, png_set_background_fixed, (png_structp png_ptr,
 /* Scale a 16-bit depth file down to 8-bit, accurately. */
 PNG_EXPORT(48, void, png_set_scale_16, (png_structp png_ptr));
 #  endif
-#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+
+#  ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
 /* Strip the second byte of information from a 16-bit depth file. */
-PNG_EXPORT(229, void, png_set_chop_16, (png_structp png_ptr));
+PNG_EXPORT(229, void, png_set_strip_16, (png_structp png_ptr));
 #  endif
 #endif
 

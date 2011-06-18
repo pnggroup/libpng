@@ -134,7 +134,7 @@ png_set_background(png_structp png_ptr,
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 /* Scale 16-bit depth files to 8-bit depth */
-#  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#  ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 void PNGAPI
 png_set_scale_16(png_structp png_ptr)
 {
@@ -143,26 +143,26 @@ png_set_scale_16(png_structp png_ptr)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->transformations |= PNG_16_TO_8;
-#    ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
-   png_ptr->transformations &= ~PNG_CHOP_16_TO_8;
+   png_ptr->transformations |= PNG_SCALE_16_TO_8;
+#    ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+   png_ptr->transformations &= ~PNG_16_TO_8;
 #    endif
 }
 #  endif
 
-#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+#  ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
 /* Chop 16-bit depth files to 8-bit depth */
 void PNGAPI
-png_set_chop_16(png_structp png_ptr)
+png_set_strip_16(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_chop_16");
+   png_debug(1, "in png_set_strip_16");
 
    if (png_ptr == NULL)
       return;
 
-   png_ptr->transformations |= PNG_CHOP_16_TO_8;
-#    ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-   png_ptr->transformations &= ~PNG_16_TO_8;
+   png_ptr->transformations |= PNG_16_TO_8;
+#    ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+   png_ptr->transformations &= ~PNG_SCALE_16_TO_8;
 #    endif
 }
 #  endif
@@ -1334,7 +1334,7 @@ png_init_read_transformations(png_structp png_ptr)
     *  6) PNG_GAMMA
     *  7) PNG_STRIP_ALPHA (if compose)
     *  8) PNG_ENCODE_ALPHA
-    *  9) PNG_16_TO_8 or PNG_CHOP_16_TO_8 (strip16/chop16)
+    *  9) PNG_16_TO_8 or PNG_SCALE_16_TO_8 (strip16/scale16)
     * 10) PNG_QUANTIZE (converts to palette)
     * 11) PNG_EXPAND_16
     * 12) PNG_GRAY_TO_RGB iff PNG_BACKGROUND_IS_GRAY
@@ -1874,14 +1874,14 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 #ifdef PNG_READ_16BIT_SUPPORTED
-   if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_CHOP_16_TO_8)) &&
+   if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) &&
        (info_ptr->bit_depth == 16))
       info_ptr->bit_depth = 8;
 #else
    /* Force chopping 16-bit input down to 8 */
    if (info_ptr->bit_depth == 16)
    {
-      if (!(png_ptr->transformations & PNG_CHOP_16_TO_8))
+      if (!(png_ptr->transformations & PNG_SCALE_16_TO_8))
         png_ptr->transformations |=PNG_16_TO_8;
       info_ptr->bit_depth = 8;
    }

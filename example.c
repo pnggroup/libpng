@@ -192,9 +192,9 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
     * low byte.
     */
 #ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-    png_set_strip_16(png_ptr);
+    png_set_scale_16(png_ptr);
 #else
-   png_set_chop_16(png_ptr);
+   png_set_strip_16(png_ptr);
 #endif
 
    /* Strip alpha bytes from the input data without combining with the

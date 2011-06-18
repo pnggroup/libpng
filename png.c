@@ -617,13 +617,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.4beta05 - June 16, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.4beta05 - June 18, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.4beta05 - June 16, 2011\
+      return "libpng version 1.5.4beta05 - June 18, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2369,7 +2369,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
      else
         shift = 0; /* keep all 16 bits */
 
-     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_CHOP_16_TO_8))
+     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8))
      {
         /* PNG_MAX_GAMMA_8 is the number of bits to keep - effectively
          * the significant bits in the *input* when the output will
@@ -2390,7 +2390,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
       * 16-bit output because the 8-bit table assumes the result will be reduced
       * to 8 bits.
       */
-     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_CHOP_16_TO_8))
+     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8))
 #endif
          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_product2(png_ptr->gamma,

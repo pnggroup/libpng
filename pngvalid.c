@@ -5240,9 +5240,7 @@ IT(expand_16);
 #define PT ITSTRUCT(expand_16)
 #endif /* PNG_READ_EXPAND_16_SUPPORTED */
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-#  if !defined(PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED) && \
-   !defined(PNG_READ_CHOP_16_TO_8_SUPPORTED) /* the default before 1.5.4 */
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED  /* API added in 1.5.4 */
 /* png_set_scale_16 */
 static void
 image_transform_png_set_scale_16_set(PNG_CONST image_transform *this,
@@ -5263,21 +5261,6 @@ image_transform_png_set_scale_16_mod(PNG_CONST image_transform *this,
       if (that->green_sBIT > 8) that->green_sBIT = 8;
       if (that->blue_sBIT > 8) that->blue_sBIT = 8;
       if (that->alpha_sBIT > 8) that->alpha_sBIT = 8;
-
-#     ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-         /* The strip 16 algorithm drops the low 8 bits rather than calculating
-          * 1/257, so we need to adjust the permitted errors appropriately:
-          * Notice that this is only relevant prior to the addition of the
-          * png_set_chop_16 API in 1.5.4 (but 1.5.4+ always defines the above!)
-          */
-         {
-            PNG_CONST double d = (255-128.5)/65535;
-            that->rede += d;
-            that->greene += d;
-            that->bluee += d;
-            that->alphae += d;
-         }
-#     endif
    }
 
    this->next->mod(this->next, that, pp, display);
@@ -5300,18 +5283,18 @@ IT(scale_16);
 #define PT ITSTRUCT(scale_16)
 #endif
 
-#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED  /* API added in 1.5.4 */
-/* png_set_chop_16 */
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED /* the default before 1.5.4 */
+/* png_set_strip_16 */
 static void
-image_transform_png_set_chop_16_set(PNG_CONST image_transform *this,
+image_transform_png_set_strip_16(PNG_CONST image_transform *this,
     transform_display *that, png_structp pp, png_infop pi)
 {
-   png_set_chop_16(pp);
+   png_set_strip_16(pp);
    this->next->set(this->next, that, pp, pi);
 }
 
 static void
-image_transform_png_set_chop_16_mod(PNG_CONST image_transform *this,
+image_transform_png_set_strip_16(PNG_CONST image_transform *this,
     image_pixel *that, png_structp pp, PNG_CONST transform_display *display)
 {
    if (that->bit_depth == 16)
@@ -5322,23 +5305,27 @@ image_transform_png_set_chop_16_mod(PNG_CONST image_transform *this,
       if (that->blue_sBIT > 8) that->blue_sBIT = 8;
       if (that->alpha_sBIT > 8) that->alpha_sBIT = 8;
 
-      /* From 1.5.4 there is a separate API to do the low byte drop; see the
-       * comments above for why this requires the following:
-       */
-      {
-         PNG_CONST double d = (255-128.5)/65535;
-         that->rede += d;
-         that->greene += d;
-         that->bluee += d;
-         that->alphae += d;
-      }
+#     ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+         /* The strip 16 algorithm drops the low 8 bits rather than calculating
+          * 1/257, so we need to adjust the permitted errors appropriately:
+          * Notice that this is only relevant prior to the addition of the
+          * png_set_scale_16 API in 1.5.4 (but 1.5.4+ always defines the above!)
+          */
+         {
+            PNG_CONST double d = (255-128.5)/65535;
+            that->rede += d;
+            that->greene += d;
+            that->bluee += d;
+            that->alphae += d;
+         }
+#     endif
    }
 
    this->next->mod(this->next, that, pp, display);
 }
 
 static int
-image_transform_png_set_chop_16_add(image_transform *this,
+image_transform_png_set_strip_16(image_transform *this,
     PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
 {
    UNUSED(colour_type)
@@ -5349,11 +5336,10 @@ image_transform_png_set_chop_16_add(image_transform *this,
    return bit_depth > 8;
 }
 
-IT(chop_16);
+IT(strip_16);
 #undef PT
-#define PT ITSTRUCT(chop_16)
-#endif /* PNG_READ_CHOP_16_TO_8_SUPPORTED, from libpng 1.5.4 */
-#endif /* PNG_READ_16_TO_8_SUPPORTED */
+#define PT ITSTRUCT(strip_16)
+#endif /* PNG_READ_STRIP_16_TO_8_SUPPORTED, from libpng 1.5.4 */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 /* png_set_strip_alpha */

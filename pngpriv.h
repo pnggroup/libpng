@@ -298,7 +298,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.4 */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
-#define PNG_CHOP_16_TO_8      0x4000000L
+#define PNG_SCALE_16_TO_8     0x4000000L
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -824,7 +824,7 @@ PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
 
-#ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
 PNG_EXTERN void png_do_chop PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif

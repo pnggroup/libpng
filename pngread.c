@@ -1290,16 +1290,16 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    /* Tell libpng to strip 16-bit/color files down to 8 bits per color.
     */
 #  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
-   if (transforms & PNG_TRANSFORM_STRIP_16)
+   if (transforms & PNG_TRANSFORM_SCALE_16)
       png_set_scale_16(png_ptr);
 #  endif
-#  ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED
+#  ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
   /* Added at libpng-1.5.4. "strip_16" produces the same result that it
    * did in earlier versions, while "scale_16" is now more accurate.
    */
    else
-     if (transforms & PNG_TRANSFORM_CHOP_16)
-        png_set_chop_16(png_ptr);
+     if (transforms & PNG_TRANSFORM_STRIP_16)
+        png_set_strip_16(png_ptr);
 #endif
 #endif
 
