@@ -2817,7 +2817,8 @@ version 1.4.8beta04 [June 7, 2011]
     Frank Busse, related to CVE-2004-0421).
 
 version 1.4.8beta05 [June 18, 2011]
-  Fixed error in "ACCURATE" 16-to-8 scaling.
+  Fixed error in "ACCURATE" 16-to-8 scaling (John Bowler).
+  Check for sCAL chunk too short.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
