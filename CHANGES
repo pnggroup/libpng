@@ -2812,9 +2812,12 @@ version 1.4.8beta02 [June 5, 2011]
 version 1.4.8beta03 [June 6, 2011]
   Check for integer overflow in png_set_rgb_to_gray().
 
-version 1.4.8beta04 [June 8, 2011]
+version 1.4.8beta04 [June 7, 2011]
   Fixed uninitialized memory read in png_format_buffer() (Bug report by
     Frank Busse, related to CVE-2004-0421).
+
+version 1.4.8beta05 [June 18, 2011]
+  Fixed error in "ACCURATE" 16-to-8 scaling.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
