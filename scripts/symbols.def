@@ -234,4 +234,4 @@ EXPORTS
  png_set_text_compression_method @226
  png_set_alpha_mode @227
  png_set_alpha_mode_fixed @228
- png_set_chop_16 @229
+ png_set_scale_16 @229
