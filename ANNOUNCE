@@ -226,6 +226,7 @@ Version 1.5.4beta05 [June 16, 2011]
     behavior changes between libpng14 and libpng15.
 
 Version 1.5.4beta06 [June 18, 2011]
+  Fixed new bug that was causing both strip_16 and scale_16 to be applied.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
