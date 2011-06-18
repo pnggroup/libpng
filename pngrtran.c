@@ -1873,23 +1873,24 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 #endif
 
 #ifdef PNG_READ_16_TO_8_SUPPORTED
-#ifdef PNG_READ_16BIT_SUPPORTED
+#  ifdef PNG_READ_16BIT_SUPPORTED
    if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) &&
        (info_ptr->bit_depth == 16))
       info_ptr->bit_depth = 8;
-#else
+#  else
+
    /* Force chopping 16-bit input down to 8 */
    if (info_ptr->bit_depth == 16)
    {
-      if (!(png_ptr->transformations & PNG_SCALE_16_TO_8))
-#if PNG_READ_STRIP_16_TO_8_SUPPORTED
+      if (!(png_ptr->transformations & PNG_16_TO_8))
+#    if PNG_READ_STRIP_16_TO_8_SUPPORTED
         png_ptr->transformations |=PNG_16_TO_8;
-#else
+#    else
         png_ptr->transformations |=PNG_SCALE_16_TO_8;
-#endif
+#    endif
       info_ptr->bit_depth = 8;
    }
-#endif
+#  endif
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
@@ -2151,7 +2152,7 @@ png_do_read_transformations(png_structp png_ptr)
 #endif
 
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
-   if (png_ptr->transformations & PNG_16_TO_8)
+   if (png_ptr->transformations & PNG_SCALE_16_TO_8)
       png_do_scale_16_to_8(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
 #ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
