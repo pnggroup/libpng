@@ -1571,7 +1571,7 @@ typedef struct png_modifier
    unsigned int             test_gamma_threshold :1;
    unsigned int             test_gamma_transform :1; /* main tests */
    unsigned int             test_gamma_sbit :1;
-   unsigned int             test_gamma_strip16 :1;
+   unsigned int             test_gamma_scale16 :1;
    unsigned int             test_gamma_background :1;
    unsigned int             test_gamma_alpha_mode :1;
    unsigned int             test_gamma_expand16 :1;
@@ -1623,7 +1623,7 @@ modifier_init(png_modifier *pm)
    pm->test_gamma_threshold = 0;
    pm->test_gamma_transform = 0;
    pm->test_gamma_sbit = 0;
-   pm->test_gamma_strip16 = 0;
+   pm->test_gamma_scale16 = 0;
    pm->test_gamma_background = 0;
    pm->test_gamma_alpha_mode = 0;
    pm->test_gamma_expand16 = 0;
@@ -5243,17 +5243,17 @@ IT(expand_16);
 #ifdef PNG_READ_16_TO_8_SUPPORTED
 #  if !defined(PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED) && \
    !defined(PNG_READ_CHOP_16_TO_8_SUPPORTED) /* the default before 1.5.4 */
-/* png_set_strip_16 */
+/* png_set_scale_16 */
 static void
-image_transform_png_set_strip_16_set(PNG_CONST image_transform *this,
+image_transform_png_set_scale_16_set(PNG_CONST image_transform *this,
     transform_display *that, png_structp pp, png_infop pi)
 {
-   png_set_strip_16(pp);
+   png_set_scale_16(pp);
    this->next->set(this->next, that, pp, pi);
 }
 
 static void
-image_transform_png_set_strip_16_mod(PNG_CONST image_transform *this,
+image_transform_png_set_scale_16_mod(PNG_CONST image_transform *this,
     image_pixel *that, png_structp pp, PNG_CONST transform_display *display)
 {
    if (that->bit_depth == 16)
@@ -5284,7 +5284,7 @@ image_transform_png_set_strip_16_mod(PNG_CONST image_transform *this,
 }
 
 static int
-image_transform_png_set_strip_16_add(image_transform *this,
+image_transform_png_set_scale_16_add(image_transform *this,
     PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
 {
    UNUSED(colour_type)
@@ -5295,9 +5295,9 @@ image_transform_png_set_strip_16_add(image_transform *this,
    return bit_depth > 8;
 }
 
-IT(strip_16);
+IT(scale_16);
 #undef PT
-#define PT ITSTRUCT(strip_16)
+#define PT ITSTRUCT(scale_16)
 #endif
 
 #ifdef PNG_READ_CHOP_16_TO_8_SUPPORTED  /* API added in 1.5.4 */
@@ -6060,7 +6060,7 @@ typedef struct gamma_display
    png_byte         sbit;
    int              threshold_test;
    int              use_input_precision;
-   int              strip16;
+   int              scale16;
    int              expand16;
    int              do_background;
    png_color_16     background_color;
@@ -6076,7 +6076,7 @@ typedef struct gamma_display
 static void
 gamma_display_init(gamma_display *dp, png_modifier *pm, png_uint_32 id,
     double file_gamma, double screen_gamma, png_byte sbit, int threshold_test,
-    int use_input_precision, int strip16, int expand16,
+    int use_input_precision, int scale16, int expand16,
     int do_background, PNG_CONST png_color_16 *pointer_to_the_background_color,
     double background_gamma)
 {
@@ -6091,7 +6091,7 @@ gamma_display_init(gamma_display *dp, png_modifier *pm, png_uint_32 id,
    dp->sbit = sbit;
    dp->threshold_test = threshold_test;
    dp->use_input_precision = use_input_precision;
-   dp->strip16 = strip16;
+   dp->scale16 = scale16;
    dp->expand16 = expand16;
    dp->do_background = do_background;
    if (do_background && pointer_to_the_background_color != 0)
@@ -6114,11 +6114,11 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
     * are interactions with sBIT but, internally, libpng makes sbit at most
     * PNG_MAX_GAMMA_8 when doing the following.
     */
-   if (dp->strip16)
+   if (dp->scale16)
 #     ifdef PNG_READ_16_TO_8_SUPPORTED
-         png_set_strip_16(pp);
+         png_set_scale_16(pp);
 #     else
-         png_error(pp, "strip16 (16 to 8 bit conversion) not supported");
+         png_error(pp, "scale16 (16 to 8 bit conversion) not supported");
 #     endif
 
    if (dp->expand16)
@@ -6228,7 +6228,7 @@ typedef struct validate_info
    png_byte sbit;
    int use_input_precision;
    int do_background;
-   int strip16;
+   int scale16;
    unsigned int sbit_max;
    unsigned int isbit_shift;
    unsigned int outmax;
@@ -6339,7 +6339,7 @@ init_validate_info(validate_info *vi, gamma_display *dp, png_struct *pp,
    if (fabs(vi->file_inverse-1) < PNG_GAMMA_THRESHOLD)
       vi->file_inverse = 0;
 
-   vi->strip16 = dp->strip16;
+   vi->scale16 = dp->scale16;
 }
 
 /* This function handles composition of a single non-alpha component.  The
@@ -6737,7 +6737,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
                 * understand why, but since it's better this way I care not to
                 * ask, JB 20110419.)
                 */
-               if (pass == 0 && alpha < 0 && vi->strip16 && vi->sbit > 8 &&
+               if (pass == 0 && alpha < 0 && vi->scale16 && vi->sbit > 8 &&
                   vi->sbit + vi->isbit_shift == 16)
                {
                   tmp = ((id >> 8) - .5)/255;
@@ -7171,7 +7171,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
     PNG_CONST double file_gammaIn, PNG_CONST double screen_gammaIn,
     PNG_CONST png_byte sbitIn, PNG_CONST int threshold_testIn,
     PNG_CONST char *name,
-    PNG_CONST int use_input_precisionIn, PNG_CONST int strip16In,
+    PNG_CONST int use_input_precisionIn, PNG_CONST int scale16In,
     PNG_CONST int expand16In, PNG_CONST int do_backgroundIn,
     PNG_CONST png_color_16 *bkgd_colorIn, double bkgd_gammaIn)
 {
@@ -7181,7 +7181,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
    gamma_display_init(&d, pmIn, FILEID(colour_typeIn, bit_depthIn,
       palette_numberIn, interlace_typeIn, 0, 0, 0),
       file_gammaIn, screen_gammaIn, sbitIn,
-      threshold_testIn, use_input_precisionIn, strip16In,
+      threshold_testIn, use_input_precisionIn, scale16In,
       expand16In, do_backgroundIn, bkgd_colorIn, bkgd_gammaIn);
 
    Try
@@ -7326,7 +7326,7 @@ static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
    (void)gamma_test(pm, colour_type, bit_depth, 0/*palette*/, interlace_type,
       file_gamma, screen_gamma, 0/*sBIT*/, 1/*threshold test*/, name,
       0 /*no input precision*/,
-      0 /*no strip16*/, 0 /*no expand16*/, 0 /*no background*/, 0 /*hence*/,
+      0 /*no scale16*/, 0 /*no expand16*/, 0 /*no background*/, 0 /*hence*/,
       0 /*no background gamma*/);
 }
 
@@ -7369,7 +7369,7 @@ static void gamma_transform_test(png_modifier *pm,
    PNG_CONST int palette_number,
    PNG_CONST int interlace_type, PNG_CONST double file_gamma,
    PNG_CONST double screen_gamma, PNG_CONST png_byte sbit,
-   PNG_CONST int use_input_precision, PNG_CONST int strip16)
+   PNG_CONST int use_input_precision, PNG_CONST int scale16)
 {
    size_t pos = 0;
    char name[64];
@@ -7384,7 +7384,7 @@ static void gamma_transform_test(png_modifier *pm,
    else
       pos = safecat(name, sizeof name, pos, "gamma ");
 
-   if (strip16)
+   if (scale16)
       pos = safecat(name, sizeof name, pos, "16to8 ");
 
    pos = safecatd(name, sizeof name, pos, file_gamma, 3);
@@ -7393,7 +7393,7 @@ static void gamma_transform_test(png_modifier *pm,
 
    gamma_test(pm, colour_type, bit_depth, palette_number, interlace_type,
       file_gamma, screen_gamma, sbit, 0, name, use_input_precision,
-      strip16, pm->test_gamma_expand16, 0 , 0, 0);
+      scale16, pm->test_gamma_expand16, 0 , 0, 0);
 }
 
 static void perform_gamma_transform_tests(png_modifier *pm)
@@ -7410,7 +7410,7 @@ static void perform_gamma_transform_tests(png_modifier *pm)
       {
          gamma_transform_test(pm, colour_type, bit_depth, palette_number,
             pm->interlace_type, 1/pm->gammas[i], pm->gammas[j], 0/*sBIT*/,
-            pm->use_input_precision, 0 /*do not strip16*/);
+            pm->use_input_precision, 0 /*do not scale16*/);
 
          if (fail(pm))
             return;
@@ -7449,7 +7449,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm)
             {
                gamma_transform_test(pm, colour_type, bit_depth, npalette,
                   pm->interlace_type, 1/pm->gammas[i], pm->gammas[j],
-                  sbit, pm->use_input_precision_sbit, 0 /*strip16*/);
+                  sbit, pm->use_input_precision_sbit, 0 /*scale16*/);
 
                if (fail(pm))
                   return;
@@ -7464,7 +7464,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm)
  * generated if DO_16BIT is defined.
  */
 #ifdef DO_16BIT
-static void perform_gamma_strip16_tests(png_modifier *pm)
+static void perform_gamma_scale16_tests(png_modifier *pm)
 {
 #  ifndef PNG_MAX_GAMMA_8
 #     define PNG_MAX_GAMMA_8 11
@@ -7487,28 +7487,28 @@ static void perform_gamma_strip16_tests(png_modifier *pm)
          {
             gamma_transform_test(pm, 0, 16, 0, pm->interlace_type,
                1/pm->gammas[i], pm->gammas[j], PNG_MAX_GAMMA_8,
-               pm->use_input_precision_16to8, 1 /*strip16*/);
+               pm->use_input_precision_16to8, 1 /*scale16*/);
 
             if (fail(pm))
                return;
 
             gamma_transform_test(pm, 2, 16, 0, pm->interlace_type,
                1/pm->gammas[i], pm->gammas[j], PNG_MAX_GAMMA_8,
-               pm->use_input_precision_16to8, 1 /*strip16*/);
+               pm->use_input_precision_16to8, 1 /*scale16*/);
 
             if (fail(pm))
                return;
 
             gamma_transform_test(pm, 4, 16, 0, pm->interlace_type,
                1/pm->gammas[i], pm->gammas[j], PNG_MAX_GAMMA_8,
-               pm->use_input_precision_16to8, 1 /*strip16*/);
+               pm->use_input_precision_16to8, 1 /*scale16*/);
 
             if (fail(pm))
                return;
 
             gamma_transform_test(pm, 6, 16, 0, pm->interlace_type,
                1/pm->gammas[i], pm->gammas[j], PNG_MAX_GAMMA_8,
-               pm->use_input_precision_16to8, 1 /*strip16*/);
+               pm->use_input_precision_16to8, 1 /*scale16*/);
 
             if (fail(pm))
                return;
@@ -7763,11 +7763,11 @@ perform_gamma_test(png_modifier *pm, int summary)
    }
 
 #ifdef DO_16BIT /* Should be READ_16BIT_SUPPORTED */
-   if (pm->test_gamma_strip16)
+   if (pm->test_gamma_scale16)
    {
       /* The 16 to 8 bit strip operations: */
       init_gamma_errors(pm);
-      perform_gamma_strip16_tests(pm);
+      perform_gamma_scale16_tests(pm);
 
       if (summary)
       {
@@ -8320,7 +8320,7 @@ int main(int argc, PNG_CONST char **argv)
          pm.test_gamma_threshold = 1;
          pm.test_gamma_transform = 1;
          pm.test_gamma_sbit = 1;
-         pm.test_gamma_strip16 = 1;
+         pm.test_gamma_scale16 = 1;
          pm.test_gamma_background = 1;
          pm.test_gamma_alpha_mode = 1;
          }
@@ -8347,10 +8347,10 @@ int main(int argc, PNG_CONST char **argv)
          pm.test_gamma_sbit = 0;
 
       else if (strcmp(*argv, "--gamma-16-to-8") == 0)
-         pm.ngammas = 2U, pm.test_gamma_strip16 = 1;
+         pm.ngammas = 2U, pm.test_gamma_scale16 = 1;
 
       else if (strcmp(*argv, "--nogamma-16-to-8") == 0)
-         pm.test_gamma_strip16 = 0;
+         pm.test_gamma_scale16 = 0;
 
       else if (strcmp(*argv, "--gamma-background") == 0)
          pm.ngammas = 2U, pm.test_gamma_background = 1;
@@ -8476,13 +8476,13 @@ int main(int argc, PNG_CONST char **argv)
 
    if (pm.ngammas > 0 &&
       pm.test_gamma_threshold == 0 && pm.test_gamma_transform == 0 &&
-      pm.test_gamma_sbit == 0 && pm.test_gamma_strip16 == 0 &&
+      pm.test_gamma_sbit == 0 && pm.test_gamma_scale16 == 0 &&
       pm.test_gamma_background == 0 && pm.test_gamma_alpha_mode == 0)
    {
       pm.test_gamma_threshold = 1;
       pm.test_gamma_transform = 1;
       pm.test_gamma_sbit = 1;
-      pm.test_gamma_strip16 = 1;
+      pm.test_gamma_scale16 = 1;
       pm.test_gamma_background = 1;
       pm.test_gamma_alpha_mode = 1;
    }
@@ -8493,7 +8493,7 @@ int main(int argc, PNG_CONST char **argv)
       pm.test_gamma_threshold = 0;
       pm.test_gamma_transform = 0;
       pm.test_gamma_sbit = 0;
-      pm.test_gamma_strip16 = 0;
+      pm.test_gamma_scale16 = 0;
       pm.test_gamma_background = 0;
       pm.test_gamma_alpha_mode = 0;
    }

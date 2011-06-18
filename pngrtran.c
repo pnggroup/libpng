@@ -136,9 +136,9 @@ png_set_background(png_structp png_ptr,
 /* Scale 16-bit depth files to 8-bit depth */
 #  ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
 void PNGAPI
-png_set_strip_16(png_structp png_ptr)
+png_set_scale_16(png_structp png_ptr)
 {
-   png_debug(1, "in png_set_strip_16");
+   png_debug(1, "in png_set_scale_16");
 
    if (png_ptr == NULL)
       return;

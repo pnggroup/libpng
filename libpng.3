@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "June 16, 2011"
+.TH LIBPNG 3 "June 18, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.4beta05
 .SH SYNOPSIS
@@ -955,7 +955,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.4beta05 - June 16, 2011
+ libpng version 1.5.4beta05 - June 18, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -966,7 +966,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.4beta05 - June 16, 2011
+ libpng versions 0.97, January 1998, through 1.5.4beta05 - June 18, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1802,8 +1802,8 @@ interface or libpng API calls for the low level interface.  For reference the
 settings and API calls required are:
 
 8-bit values:
-   PNG_TRANSFORM_STRIP_16 | PNG_EXPAND
-   png_set_expand(png_ptr); png_set_strip_16(png_ptr);
+   PNG_TRANSFORM_SCALE_16 | PNG_EXPAND
+   png_set_expand(png_ptr); png_set_scale_16(png_ptr);
 
    If you must get exactly the same inaccurate results
    produced by default in versions prior to libpng-1.5.4,
@@ -1833,7 +1833,7 @@ the entire image into memory, and (b) the input transformations
 you want to do are limited to the following set:
 
     PNG_TRANSFORM_IDENTITY      No transformation
-    PNG_TRANSFORM_STRIP_16      Strip 16-bit samples to
+    PNG_TRANSFORM_SCALE_16      Strip 16-bit samples to
                                 8-bit
     PNG_TRANSFORM_STRIP_ALPHA   Discard the alpha channel
     PNG_TRANSFORM_PACKING       Expand 1, 2 and 4-bit
@@ -2359,12 +2359,12 @@ byte, unless png_set_packing() is called.  8-bit RGB data will be stored
 in RGB RGB RGB format unless png_set_filler() or png_set_add_alpha()
 is called to insert filler bytes, either before or after each RGB triplet.
 16-bit RGB data will be returned RRGGBB RRGGBB, with the most significant
-byte of the color value first, unless png_set_strip_16() is called to
+byte of the color value first, unless png_set_scale_16() is called to
 transform it to regular RGB RGB triplets, or png_set_filler() or
 png_set_add alpha() is called to insert filler bytes, either before or
 after each RRGGBB triplet.  Similarly, 8-bit or 16-bit grayscale data can
 be modified with
-png_set_filler(), png_set_add_alpha(), or png_set_strip_16().
+png_set_filler(), png_set_add_alpha(), or png_set_scale_16().
 
 The following code transforms grayscale images of less than 8 to 8 bits,
 changes paletted images to RGB, and adds a full alpha channel if there is
@@ -2401,7 +2401,7 @@ PNG can have files with 16 bits per channel.  If you only can handle
 8 bits per channel, this will strip the pixels down to 8-bit.
 
     if (bit_depth == 16)
-       png_set_strip_16(png_ptr);
+       png_set_scale_16(png_ptr);
 
 If you need to process the alpha channel on the image separately from the image
 data (for example if you convert it to a bitmap mask) it is possible to have
@@ -5064,7 +5064,7 @@ reading 16-bit images, with none of the pixels being off-by-one any
 longer (see Clause 13.12 of the PNG specification).  If you must
 have exactly the same inaccurate results that libpng produced by
 default previously, then you can use the png_set_chop_16() API instead
-of png_set_strip_16().
+of png_set_scale_16().
 
 Prior to libpng-1.5.4, the png_set_user_limits() function could only be
 used to reduce the width and height limits from the value of
@@ -5380,7 +5380,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIV. Y2K Compliance in libpng
 
-June 16, 2011
+June 18, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5636,7 +5636,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.4beta05 - June 16, 2011:
+Libpng version 1.5.4beta05 - June 18, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5659,7 +5659,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.4beta05, June 16, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.4beta05, June 18, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -5758,7 +5758,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-June 16, 2011
+June 18, 2011
 
 .\" end of man page
 
