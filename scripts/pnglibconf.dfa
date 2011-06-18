@@ -294,7 +294,9 @@ option READ enables READ_INTERLACING
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
 # processing after that has happened.  You need to be sure to enable
-# READ_16_TO_8 when you disable READ_16BIT for this to work properly.
+# READ_SCALE_16_TO_8 or READ_STRIP_16_TO_8 when you disable READ_16BIT for
+# this to work properly.  You should disable the other option if you need to
+# ensure a particular convertion (otherwise the app can chose.)
 
 option READ_16BIT requires READ enables 16BIT
 
@@ -312,7 +314,8 @@ option READ_SWAP requires READ_TRANSFORMS READ_16BIT
 option READ_PACKSWAP requires READ_TRANSFORMS
 option READ_INVERT requires READ_TRANSFORMS
 option READ_BACKGROUND requires READ_TRANSFORMS enables READ_STRIP_ALPHA
-option READ_16_TO_8 requires READ_TRANSFORMS
+option READ_STRIP_16_TO_8 requires READ_TRANSFORMS
+option READ_SCALE_16_TO_8 requires READ_TRANSFORMS
 option READ_FILLER requires READ_TRANSFORMS
 option READ_GAMMA requires READ_TRANSFORMS enables READ_gAMA
 option READ_GRAY_TO_RGB requires READ_TRANSFORMS
@@ -550,13 +553,7 @@ option SAVE_INT_32 requires WRITE
 
 # png_save_int_32 is required by the ancillary chunks oFFs and pCAL
 
-# enabled at libpng-1.5.4, was present but disabled by default
-
-option READ_16_TO_8_ACCURATE_SCALE requires READ_SCALE_16_TO_8
-
 # added at libpng-1.5.4
-
-option READ_SCALE_16_TO_8 requires READ_16_TO_8
 
 option WRITE_OPTIMIZE_CMF requires WRITE
 
@@ -565,7 +562,6 @@ option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
 option READ_COMPRESSED_TEXT enables READ_TEXT
-option READ_STRIP_16_TO_8 requires READ_16_TO_8
 
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32

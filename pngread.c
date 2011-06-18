@@ -1296,16 +1296,15 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
       */
       png_set_scale_16(png_ptr);
    }
-
-#  ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
-   else
-#  endif
-
 #endif
 
 #ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
-     if (transforms & PNG_TRANSFORM_STRIP_16)
-        png_set_strip_16(png_ptr);
+   /* If both SCALE and STRIP are required pngrtran will effectively cancel the
+    * latter by doing SCALE first.  This is ok and allows apps not to check for
+    * which is supported to get the right answer.
+    */
+   if (transforms & PNG_TRANSFORM_STRIP_16)
+      png_set_strip_16(png_ptr);
 #endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED

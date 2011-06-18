@@ -132,9 +132,11 @@ png_set_background(png_structp png_ptr,
 #  endif  /* FLOATING_POINT */
 #endif /* READ_BACKGROUND */
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-/* Scale 16-bit depth files to 8-bit depth */
-#  ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+/* Scale 16-bit depth files to 8-bit depth.  If both of these are set then the
+ * one that pngrtran does first (scale) happens.  This is necessary to allow the
+ * TRANSFORM and API behavior to be somewhat consistent, and it's simpler.
+ */
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 void PNGAPI
 png_set_scale_16(png_structp png_ptr)
 {
@@ -144,13 +146,10 @@ png_set_scale_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_SCALE_16_TO_8;
-#    ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
-   png_ptr->transformations &= ~PNG_16_TO_8;
-#    endif
 }
-#  endif
+#endif
 
-#  ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
 /* Chop 16-bit depth files to 8-bit depth */
 void PNGAPI
 png_set_strip_16(png_structp png_ptr)
@@ -161,12 +160,8 @@ png_set_strip_16(png_structp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
-#    ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
-   png_ptr->transformations &= ~PNG_SCALE_16_TO_8;
-#    endif
 }
-#  endif
-#endif /* PNG_READ_16_TO_8_SUPPORTED */
+#endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 void PNGAPI
@@ -1334,20 +1329,21 @@ png_init_read_transformations(png_structp png_ptr)
     *  6) PNG_GAMMA
     *  7) PNG_STRIP_ALPHA (if compose)
     *  8) PNG_ENCODE_ALPHA
-    *  9) PNG_16_TO_8 or PNG_SCALE_16_TO_8 (strip16/scale16)
-    * 10) PNG_QUANTIZE (converts to palette)
-    * 11) PNG_EXPAND_16
-    * 12) PNG_GRAY_TO_RGB iff PNG_BACKGROUND_IS_GRAY
-    * 13) PNG_INVERT_MONO
-    * 14) PNG_SHIFT
-    * 15) PNG_PACK
-    * 16) PNG_BGR
-    * 17) PNG_PACKSWAP
-    * 18) PNG_FILLER (includes PNG_ADD_ALPHA)
-    * 19) PNG_INVERT_ALPHA
-    * 20) PNG_SWAP_ALPHA
-    * 21) PNG_SWAP_BYTES
-    * 22) PNG_USER_TRANSFORM [must be last]
+    *  9) PNG_SCALE_16_TO_8
+    * 10) PNG_16_TO_8
+    * 11) PNG_QUANTIZE (converts to palette)
+    * 12) PNG_EXPAND_16
+    * 13) PNG_GRAY_TO_RGB iff PNG_BACKGROUND_IS_GRAY
+    * 14) PNG_INVERT_MONO
+    * 15) PNG_SHIFT
+    * 16) PNG_PACK
+    * 17) PNG_BGR
+    * 18) PNG_PACKSWAP
+    * 19) PNG_FILLER (includes PNG_ADD_ALPHA)
+    * 20) PNG_INVERT_ALPHA
+    * 21) PNG_SWAP_ALPHA
+    * 22) PNG_SWAP_BYTES
+    * 23) PNG_USER_TRANSFORM [must be last]
     */
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
    if ((png_ptr->transformations & PNG_STRIP_ALPHA) &&
@@ -1872,26 +1868,43 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
    info_ptr->gamma = png_ptr->gamma;
 #endif
 
-#ifdef PNG_READ_16_TO_8_SUPPORTED
-#  ifdef PNG_READ_16BIT_SUPPORTED
-   if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) &&
-       (info_ptr->bit_depth == 16))
-      info_ptr->bit_depth = 8;
-#  else
-
-   /* Force chopping 16-bit input down to 8 */
    if (info_ptr->bit_depth == 16)
    {
-      if (!(png_ptr->transformations & PNG_16_TO_8))
-#    if PNG_READ_STRIP_16_TO_8_SUPPORTED
-        png_ptr->transformations |=PNG_16_TO_8;
-#    else
-        png_ptr->transformations |=PNG_SCALE_16_TO_8;
+#  ifdef PNG_READ_16BIT_SUPPORTED
+#     ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+         if (png_ptr->transformations & PNG_SCALE_16_TO_8)
+            info_ptr->bit_depth = 8;
+#     endif
+
+#     ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+         if (png_ptr->transformations & PNG_16_TO_8)
+            info_ptr->bit_depth = 8;
+#     endif
+
+#  else
+      /* No 16 bit support: force chopping 16-bit input down to 8, in this case
+       * the app program can chose if both APIs are available by setting the
+       * correct scaling to use.
+       */
+#     ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+         /* For compatibility with previous versions use the strip method by
+          * default.  This code works because if PNG_SCALE_16_TO_8 is already
+          * set the code below will do that in preference to the chop.
+          */
+         png_ptr->transformations |= PNG_16_TO_8;
+         info_ptr->bit_depth = 8;
+#     else
+
+#        if PNG_READ_SCALE_16_TO_8_SUPPORTED
+            png_ptr->transformations |= PNG_SCALE_16_TO_8;
+            info_ptr->bit_depth = 8;
+#        else
+
+            CONFIGURATION ERROR: you must enable at least one 16 to 8 method
+#        endif
 #    endif
-      info_ptr->bit_depth = 8;
+#endif /* !READ_16BIT_SUPPORTED */
    }
-#  endif
-#endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
    if (png_ptr->transformations & PNG_GRAY_TO_RGB)
@@ -2155,7 +2168,12 @@ png_do_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_SCALE_16_TO_8)
       png_do_scale_16_to_8(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
+
 #ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+   /* There is no harm in doing both of these because only one has any effect,
+    * by putting the 'scale' option first if the app asks for scale (either by
+    * calling the API or in a TRANSFORM flag) this is what happens.
+    */
    if (png_ptr->transformations & PNG_16_TO_8)
       png_do_chop(&(png_ptr->row_info), png_ptr->row_buf + 1);
 #endif
@@ -2562,8 +2580,8 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 
       while (sp < ep)
       {
-         *dp++ = *sp++;
-         sp++;
+         *dp++ = *sp;
+         sp += 2; /* skip low byte */
       }
 
       row_info->bit_depth = 8;

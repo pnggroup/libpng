@@ -191,7 +191,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
     * Use accurate scaling if it's available, otherwise just chop off the
     * low byte.
     */
-#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
     png_set_scale_16(png_ptr);
 #else
    png_set_strip_16(png_ptr);

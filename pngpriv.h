@@ -115,6 +115,13 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define PNG_ZBUF_SIZE 65536L
 #endif
 
+/* PNG_STATIC is used to mark internal file scope functions if they need to be
+ * accessed for implementation tests (see the code in tests/?*).
+ */
+#ifndef PNG_STATIC
+#   define PNG_STATIC static
+#endif
+
 /* If warnings or errors are turned off the code is disabled or redirected here.
  * From 1.5.4 functions have been added to allow very limited formatting of
  * error and warning messages - this code will also be disabled here.
@@ -281,7 +288,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_COMPOSE             0x0080     /* Was PNG_BACKGROUND */
 #define PNG_BACKGROUND_EXPAND   0x0100
 #define PNG_EXPAND_16           0x0200     /* Added to libpng 1.5.2 */
-#define PNG_16_TO_8             0x0400
+#define PNG_16_TO_8             0x0400     /* Becomes 'chop' in 1.5.4 */
 #define PNG_RGBA                0x0800
 #define PNG_EXPAND              0x1000
 #define PNG_GAMMA               0x2000
@@ -298,7 +305,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.4 */
 #define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
 #define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
-#define PNG_SCALE_16_TO_8     0x4000000L
+#define PNG_SCALE_16_TO_8     0x4000000L  /* Added to libpng-1.5.4 */
                        /*   0x8000000L  unused */
                        /*  0x10000000L  unused */
                        /*  0x20000000L  unused */
@@ -819,7 +826,7 @@ PNG_EXTERN void png_do_invert PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
 
-#ifdef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 PNG_EXTERN void png_do_scale_16_to_8 PNGARG((png_row_infop row_info,
     png_bytep row));
 #endif
@@ -1226,8 +1233,18 @@ PNG_EXTERN void png_ascii_from_fixed PNGARG((png_structp png_ptr,
 #define PNG_FP_SAW_DOT   16  /* Saw a dot in current state */
 #define PNG_FP_SAW_E     32  /* Saw an E (or e) in current state */
 #define PNG_FP_SAW_ANY   60  /* Saw any of the above 4 */
+
+/* These three values don't affect the parser.  They are set but not used.
+ */
 #define PNG_FP_WAS_VALID 64  /* Preceding substring is a valid fp number */
-#define PNG_FP_INVALID  128  /* Available for callers as a distinct value */
+#define PNG_FP_NEGATIVE 128  /* A negative number, including "-0" */
+#define PNG_FP_NONZERO  256  /* A non-zero value */
+#define PNG_FP_STICKY   448  /* The above three flags */
+
+/* This is available for the caller to store in 'state' if required.  Do not
+ * call the parser after setting it (the parser sometimes clears it.)
+ */
+#define PNG_FP_INVALID  512  /* Available for callers as a distinct value */
 
 /* Result codes for the parser (boolean - true meants ok, false means
  * not ok yet.)
@@ -1235,6 +1252,20 @@ PNG_EXTERN void png_ascii_from_fixed PNGARG((png_structp png_ptr,
 #define PNG_FP_MAYBE      0  /* The number may be valid in the future */
 #define PNG_FP_OK         1  /* The number is valid */
 
+/* Tests on the sticky non-zero and negative flags.  To pass these checks
+ * the state must also indicate that the whole number is valid - this is
+ * achieved by testing PNG_FP_SAW_DIGIT (see the implementation for why this
+ * is equivalent to PNG_FP_OK above.)
+ */
+#define PNG_FP_NZ_MASK (PNG_FP_SAW_DIGIT | PNG_FP_NEGATIVE | PNG_FP_NONZERO)
+   /* NZ_MASK: the string is valid and a non-zero negative value */
+#define PNG_FP_Z_MASK (PNG_FP_SAW_DIGIT | PNG_FP_NONZERO)
+   /* Z MASK: the string is valid and a non-zero value. */
+   /* PNG_FP_SAW_DIGIT: the string is valid. */
+#define PNG_FP_IS_ZERO(state) (((state) & PNG_FP_Z_MASK) == PNG_FP_SAW_DIGIT)
+#define PNG_FP_IS_POSITIVE(state) (((state) & PNG_FP_NZ_MASK) == PNG_FP_Z_MASK)
+#define PNG_FP_IS_NEGATIVE(state) (((state) & PNG_FP_NZ_MASK) == PNG_FP_NZ_MASK)
+ 
 /* The actual parser.  This can be called repeatedly, it updates
  * the index into the string and the state variable (which must
  * be initialzed to 0).  It returns a result code, as above.  There
@@ -1254,7 +1285,10 @@ PNG_EXTERN int png_check_fp_number PNGARG((png_const_charp string,
     png_size_t size, int *statep, png_size_tp whereami));
 
 /* This is the same but it checks a complete string and returns true
- * only if it just contains a floating point number.
+ * only if it just contains a floating point number.  As of 1.5.4 this
+ * function also returns the state at the end of parsing the number if
+ * it was valid (otherwise it returns 0.)  This can be used for testing
+ * for negative or zero values using the sticky flag.
  */
 PNG_EXTERN int png_check_fp_string PNGARG((png_const_charp string,
     png_size_t size));

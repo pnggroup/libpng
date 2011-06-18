@@ -5281,9 +5281,9 @@ image_transform_png_set_scale_16_add(image_transform *this,
 IT(scale_16);
 #undef PT
 #define PT ITSTRUCT(scale_16)
-#endif
+#endif /* PNG_READ_SCALE_16_TO_8_SUPPORTED (1.5.4 on) */
 
-#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED /* the default before 1.5.4 */
+#ifdef PNG_READ_16_TO_8_SUPPORTED /* the default before 1.5.4 */
 /* png_set_strip_16 */
 static void
 image_transform_png_set_strip_16_set(PNG_CONST image_transform *this,
@@ -5305,18 +5305,28 @@ image_transform_png_set_strip_16_mod(PNG_CONST image_transform *this,
       if (that->blue_sBIT > 8) that->blue_sBIT = 8;
       if (that->alpha_sBIT > 8) that->alpha_sBIT = 8;
 
-      /* The strip 16 algorithm drops the low 8 bits rather than calculating
-       * 1/257, so we need to adjust the permitted errors appropriately:
-       * Notice that this is only relevant prior to the addition of the
-       * png_set_scale_16 API in 1.5.4 (but 1.5.4+ always defines the above!)
+      /* Prior to 1.5.4 png_set_strip_16 would use an 'accurate' method if this
+       * configuration option is set.  From 1.5.4 the flag is never set and the
+       * 'scale' API (above) must be used.
        */
-      {
-         PNG_CONST double d = (255-128.5)/65535;
-         that->rede += d;
-         that->greene += d;
-         that->bluee += d;
-         that->alphae += d;
-      }
+#     ifdef PNG_READ_ACCURATE_SCALE_SUPPORTED
+#        if PNG_LIBPNG_VER >= 10504
+#           error PNG_READ_ACCURATE_SCALE should not be set
+#        endif
+
+         /* The strip 16 algorithm drops the low 8 bits rather than calculating
+          * 1/257, so we need to adjust the permitted errors appropriately:
+          * Notice that this is only relevant prior to the addition of the
+          * png_set_scale_16 API in 1.5.4 (but 1.5.4+ always defines the above!)
+          */
+         {
+            PNG_CONST double d = (255-128.5)/65535;
+            that->rede += d;
+            that->greene += d;
+            that->bluee += d;
+            that->alphae += d;
+         }
+#     endif
    }
 
    this->next->mod(this->next, that, pp, display);
@@ -5337,7 +5347,7 @@ image_transform_png_set_strip_16_add(image_transform *this,
 IT(strip_16);
 #undef PT
 #define PT ITSTRUCT(strip_16)
-#endif /* PNG_READ_STRIP_16_TO_8_SUPPORTED, from libpng 1.5.4 */
+#endif /* PNG_READ_16_TO_8_SUPPORTED */
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
 /* png_set_strip_alpha */
@@ -6102,7 +6112,12 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
 #     ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
          png_set_scale_16(pp);
 #     else
-         png_error(pp, "scale16 (16 to 8 bit conversion) not supported");
+         /* The following works both in 1.5.4 and earlier versions: */
+#        ifdef PNG_READ_16_TO_8_SUPPORTED
+            png_set_strip_16(pp);
+#        else
+            png_error(pp, "scale16 (16 to 8 bit conversion) not supported");
+#        endif
 #     endif
 
    if (dp->expand16)
@@ -6713,8 +6728,12 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
              * option has been used and 'inaccurate' scaling is used then the
              * bit reduction is obtained by simply using the top 8 bits of the
              * value.
+             *
+             * This is only done for older libpng versions when the 'inaccurate'
+             * (chop) method of scaling was used.
              */
-#           if 0 /*WAS: #ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED */
+#           if !PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED && \
+               PNG_LIBPNG_VER < 10504
                /* This may be required for other components in the future, but
                 * at present the presence of gamma correction effectively
                 * prevents the errors in the component scaling (I don't quite

@@ -2038,20 +2038,25 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    i = 1;
    state = 0;
 
-   if (png_ptr->chunkdata[1] == 45 /* negative width */ ||
-       !png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
+   if (!png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
        i >= slength || png_ptr->chunkdata[i++] != 0)
       png_warning(png_ptr, "Invalid sCAL chunk ignored: bad width format");
+
+   else if (!PNG_FP_IS_POSITIVE(state))
+      png_warning(png_ptr, "Invalid sCAL chunk ignored: non-positive width");
 
    else
    {
       png_size_t heighti = i;
 
       state = 0;
-      if (png_ptr->chunkdata[i] == 45 /* negative height */ ||
-          !png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
+      if (!png_check_fp_number(png_ptr->chunkdata, slength, &state, &i) ||
           i != slength)
          png_warning(png_ptr, "Invalid sCAL chunk ignored: bad height format");
+
+      else if (!PNG_FP_IS_POSITIVE(state))
+         png_warning(png_ptr,
+            "Invalid sCAL chunk ignored: non-positive height");
 
       else
          /* This is the (only) success case. */

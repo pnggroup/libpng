@@ -946,16 +946,9 @@ png_check_IHDR(png_structp png_ptr,
 /* Check an ASCII formated floating point value, see the more detailed
  * comments in pngpriv.h
  */
-/* The following is used internally to preserve the 'valid' flag */
+/* The following is used internally to preserve the sticky flags */
 #define png_fp_add(state, flags) ((state) |= (flags))
-#define png_fp_set(state, value)\
-   ((state) = (value) | ((state) & PNG_FP_WAS_VALID))
-
-/* Internal type codes: bits above the base state! */
-#define PNG_FP_SIGN   0  /* [+-] */
-#define PNG_FP_DOT    4  /* . */
-#define PNG_FP_DIGIT  8  /* [0123456789] */
-#define PNG_FP_E     12  /* [Ee] */
+#define png_fp_set(state, value) ((state) = (value) | ((state) & PNG_FP_STICKY))
 
 int /* PRIVATE */
 png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
@@ -968,55 +961,55 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
    {
       int type;
       /* First find the type of the next character */
+      switch (string[i])
       {
-         char ch = string[i];
-
-         if (ch >= 48 && ch <= 57)
-            type = PNG_FP_DIGIT;
-
-         else switch (ch)
-         {
-         case 43: case 45:  type = PNG_FP_SIGN;  break;
-         case 46:           type = PNG_FP_DOT;   break;
-         case 69: case 101: type = PNG_FP_E;     break;
-         default:           goto PNG_FP_End;
-         }
+      case 43:  type = PNG_FP_SAW_SIGN;                   break;
+      case 45:  type = PNG_FP_SAW_SIGN + PNG_FP_NEGATIVE; break;
+      case 46:  type = PNG_FP_SAW_DOT;                    break;
+      case 48:  type = PNG_FP_SAW_DIGIT;                  break;
+      case 49: case 50: case 51: case 52:
+      case 53: case 54: case 55: case 56:
+      case 57:  type = PNG_FP_SAW_DIGIT + PNG_FP_NONZERO; break;
+      case 69:
+      case 101: type = PNG_FP_SAW_E;                      break;
+      default:  goto PNG_FP_End;
       }
 
       /* Now deal with this type according to the current
        * state, the type is arranged to not overlap the
        * bits of the PNG_FP_STATE.
        */
-      switch ((state & PNG_FP_STATE) + type)
+      switch ((state & PNG_FP_STATE) + (type & PNG_FP_SAW_ANY))
       {
-      case PNG_FP_INTEGER + PNG_FP_SIGN:
+      case PNG_FP_INTEGER + PNG_FP_SAW_SIGN:
          if (state & PNG_FP_SAW_ANY)
             goto PNG_FP_End; /* not a part of the number */
 
-         png_fp_add(state, PNG_FP_SAW_SIGN);
+         png_fp_add(state, type);
          break;
 
-      case PNG_FP_INTEGER + PNG_FP_DOT:
+      case PNG_FP_INTEGER + PNG_FP_SAW_DOT:
          /* Ok as trailer, ok as lead of fraction. */
          if (state & PNG_FP_SAW_DOT) /* two dots */
             goto PNG_FP_End;
 
          else if (state & PNG_FP_SAW_DIGIT) /* trailing dot? */
-            png_fp_add(state, PNG_FP_SAW_DOT);
+            png_fp_add(state, type);
 
          else
-            png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
+            png_fp_set(state, PNG_FP_FRACTION | type);
 
          break;
 
-      case PNG_FP_INTEGER + PNG_FP_DIGIT:
+      case PNG_FP_INTEGER + PNG_FP_SAW_DIGIT:
          if (state & PNG_FP_SAW_DOT) /* delayed fraction */
             png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
 
-         png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+         png_fp_add(state, type | PNG_FP_WAS_VALID);
 
          break;
-      case PNG_FP_INTEGER + PNG_FP_E:
+
+      case PNG_FP_INTEGER + PNG_FP_SAW_E:
          if ((state & PNG_FP_SAW_DIGIT) == 0)
             goto PNG_FP_End;
 
@@ -1024,17 +1017,17 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
 
          break;
 
-   /* case PNG_FP_FRACTION + PNG_FP_SIGN:
-         goto PNG_FP_End; ** no sign in exponent */
+   /* case PNG_FP_FRACTION + PNG_FP_SAW_SIGN:
+         goto PNG_FP_End; ** no sign in fraction */
 
-   /* case PNG_FP_FRACTION + PNG_FP_DOT:
+   /* case PNG_FP_FRACTION + PNG_FP_SAW_DOT:
          goto PNG_FP_End; ** Because SAW_DOT is always set */
 
-      case PNG_FP_FRACTION + PNG_FP_DIGIT:
-         png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+      case PNG_FP_FRACTION + PNG_FP_SAW_DIGIT:
+         png_fp_add(state, type | PNG_FP_WAS_VALID);
          break;
 
-      case PNG_FP_FRACTION + PNG_FP_E:
+      case PNG_FP_FRACTION + PNG_FP_SAW_E:
          /* This is correct because the trailing '.' on an
           * integer is handled above - so we can only get here
           * with the sequence ".E" (with no preceding digits).
@@ -1046,7 +1039,7 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
 
          break;
 
-      case PNG_FP_EXPONENT + PNG_FP_SIGN:
+      case PNG_FP_EXPONENT + PNG_FP_SAW_SIGN:
          if (state & PNG_FP_SAW_ANY)
             goto PNG_FP_End; /* not a part of the number */
 
@@ -1054,15 +1047,15 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
 
          break;
 
-   /* case PNG_FP_EXPONENT + PNG_FP_DOT:
+   /* case PNG_FP_EXPONENT + PNG_FP_SAW_DOT:
          goto PNG_FP_End; */
 
-      case PNG_FP_EXPONENT + PNG_FP_DIGIT:
-         png_fp_add(state, PNG_FP_SAW_DIGIT + PNG_FP_WAS_VALID);
+      case PNG_FP_EXPONENT + PNG_FP_SAW_DIGIT:
+         png_fp_add(state, PNG_FP_SAW_DIGIT | PNG_FP_WAS_VALID);
 
          break;
 
-   /* case PNG_FP_EXPONEXT + PNG_FP_E:
+   /* case PNG_FP_EXPONEXT + PNG_FP_SAW_E:
          goto PNG_FP_End; */
 
       default: goto PNG_FP_End; /* I.e. break 2 */
@@ -1090,8 +1083,11 @@ png_check_fp_string(png_const_charp string, png_size_t size)
    int        state=0;
    png_size_t char_index=0;
 
-   return png_check_fp_number(string, size, &state, &char_index) &&
-      (char_index == size || string[char_index] == 0);
+   if (png_check_fp_number(string, size, &state, &char_index) &&
+      (char_index == size || string[char_index] == 0))
+      return state /* must be non-zero - see above */;
+
+   return 0; /* i.e. fail */
 }
 #endif /* pCAL or sCAL */
 
@@ -1845,7 +1841,7 @@ png_8bit_l2[128] =
 #endif
 };
 
-static png_int_32
+PNG_STATIC png_int_32
 png_log8bit(unsigned int x)
 {
    unsigned int lg2 = 0;
@@ -1901,7 +1897,7 @@ png_log8bit(unsigned int x)
  * Zero  (257):      0
  * End   (258):  23499
  */
-static png_int_32
+PNG_STATIC png_int_32
 png_log16bit(png_uint_32 x)
 {
    unsigned int lg2 = 0;
@@ -1995,7 +1991,7 @@ for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
     0 45425.85339951654943850496
 #endif
 
-static png_uint_32
+PNG_STATIC png_uint_32
 png_exp(png_fixed_point x)
 {
    if (x > 0 && x <= 0xfffff) /* Else overflow or zero (underflow) */
@@ -2043,7 +2039,7 @@ png_exp(png_fixed_point x)
    return 0;
 }
 
-static png_byte
+PNG_STATIC png_byte
 png_exp8bit(png_fixed_point lg2)
 {
    /* Get a 32-bit value: */
@@ -2057,7 +2053,7 @@ png_exp8bit(png_fixed_point lg2)
    return (png_byte)((x + 0x7fffffU) >> 24);
 }
 
-static png_uint_16
+PNG_STATIC png_uint_16
 png_exp16bit(png_fixed_point lg2)
 {
    /* Get a 32-bit value: */

@@ -229,6 +229,13 @@ Version 1.5.4beta06 [June 18, 2011]
   Fixed new bug that was causing both strip_16 and scale_16 to be applied.
 
 Version 1.5.4beta07 [June 18, 2011]
+  Fixed pngvalid, simplified macros, added checking for 0 in sCAL.
+    The ACCURATE scale macro is no longer defined in 1.5 - call the
+    png_scale_16_to_8 API.  Made sure that PNG_READ_16_TO_8 is still defined
+    if the png_strip_16_to_8 API is present.  png_check_fp_number now
+    maintains some state so that positive, negative and zero values are
+    identified.  sCAL uses these to be strictly spec conformant.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
