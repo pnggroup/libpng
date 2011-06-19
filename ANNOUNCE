@@ -1,5 +1,5 @@
 
-Libpng 1.2.45beta03 - June 18, 2011
+Libpng 1.2.45beta03 - June 19, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -113,7 +113,7 @@ version 1.2.45beta01 [June 7, 2011]
   Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
     always expand to RGBA if transparency is present.
 
-version 1.2.45beta02 [June 18, 2011]
+version 1.2.45beta02 [June 19, 2011]
   Check for integer overflow in png_set_rgb_to_gray().
   Check for sCAL chunk too short.
 
