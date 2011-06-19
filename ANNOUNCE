@@ -1,5 +1,5 @@
 
-Libpng 1.5.4beta07 - June 18, 2011
+Libpng 1.5.4beta07 - June 19, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -228,7 +228,7 @@ Version 1.5.4beta05 [June 16, 2011]
 Version 1.5.4beta06 [June 18, 2011]
   Fixed new bug that was causing both strip_16 and scale_16 to be applied.
 
-Version 1.5.4beta07 [June 18, 2011]
+Version 1.5.4beta07 [June 19, 2011]
   Fixed pngvalid, simplified macros, added checking for 0 in sCAL.
     The ACCURATE scale macro is no longer defined in 1.5 - call the
     png_scale_16_to_8 API.  Made sure that PNG_READ_16_TO_8 is still defined
