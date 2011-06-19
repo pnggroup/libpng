@@ -2816,7 +2816,7 @@ version 1.4.8beta04 [June 7, 2011]
   Fixed uninitialized memory read in png_format_buffer() (Bug report by
     Frank Busse, related to CVE-2004-0421).
 
-version 1.4.8beta05 [June 18, 2011]
+version 1.4.8beta05 [June 19, 2011]
   Fixed error in "ACCURATE" 16-to-8 scaling (John Bowler).
   Check for sCAL chunk too short.
 
