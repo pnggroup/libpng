@@ -1,5 +1,5 @@
 
-Libpng 1.5.4beta07 - June 19, 2011
+Libpng 1.5.4beta08 - June 23, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.4beta07.tar.xz (LZMA-compressed, recommended)
-   1.5.4beta07.tar.gz
-   1.5.4beta07.tar.bz2
+   1.5.4beta08.tar.xz (LZMA-compressed, recommended)
+   1.5.4beta08.tar.gz
+   1.5.4beta08.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp154b07.7z  (LZMA-compressed, recommended)
-   lp154b07.zip
+   lp154b08.7z  (LZMA-compressed, recommended)
+   lp154b08.zip
 
 Other information:
 
-   1.5.4beta07-README.txt
-   1.5.4beta07-LICENSE.txt
+   1.5.4beta08-README.txt
+   1.5.4beta08-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -236,6 +236,9 @@ Version 1.5.4beta07 [June 19, 2011]
     maintains some state so that positive, negative and zero values are
     identified.  sCAL uses these to be strictly spec conformant.
 
+Version 1.5.4beta08 [June 23, 2011]
+  Fixed pngvalid if ACCURATE_SCALE is defined.
+  Updated scripts/pnglibconf.h.prebuilt.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

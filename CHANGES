@@ -3499,6 +3499,10 @@ Version 1.5.4beta07 [June 19, 2011]
     maintains some state so that positive, negative and zero values are
     identified.  sCAL uses these to be strictly spec conformant.
 
+Version 1.5.4beta08 [June 23, 2011]
+  Fixed pngvalid if ACCURATE_SCALE is defined.
+  Updated scripts/pnglibconf.h.prebuilt.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

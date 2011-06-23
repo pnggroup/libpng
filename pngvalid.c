@@ -6732,47 +6732,48 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
              * This is only done for older libpng versions when the 'inaccurate'
              * (chop) method of scaling was used.
              */
-#           if !PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED && \
-               PNG_LIBPNG_VER < 10504
-               /* This may be required for other components in the future, but
-                * at present the presence of gamma correction effectively
-                * prevents the errors in the component scaling (I don't quite
-                * understand why, but since it's better this way I care not to
-                * ask, JB 20110419.)
-                */
-               if (pass == 0 && alpha < 0 && vi->scale16 && vi->sbit > 8 &&
-                  vi->sbit + vi->isbit_shift == 16)
-               {
-                  tmp = ((id >> 8) - .5)/255;
-
-                  if (tmp > 0)
+#           ifndef PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+#              if PNG_LIBPNG_VER < 10504
+                  /* This may be required for other components in the future,
+                   * but at present the presence of gamma correction effectively
+                   * prevents the errors in the component scaling (I don't quite
+                   * understand why, but since it's better this way I care not
+                   * to ask, JB 20110419.)
+                   */
+                  if (pass == 0 && alpha < 0 && vi->scale16 && vi->sbit > 8 &&
+                     vi->sbit + vi->isbit_shift == 16)
                   {
-                     is_lo = ceil(outmax * tmp - vi->maxout_total);
-                     if (is_lo < 0) is_lo = 0;
+                     tmp = ((id >> 8) - .5)/255;
+
+                     if (tmp > 0)
+                     {
+                        is_lo = ceil(outmax * tmp - vi->maxout_total);
+                        if (is_lo < 0) is_lo = 0;
+                     }
+
+                     else
+                        is_lo = 0;
+
+                     tmp = ((id >> 8) + .5)/255;
+
+                     if (tmp < 1)
+                     {
+                        is_hi = floor(outmax * tmp + vi->maxout_total);
+                        if (is_hi > outmax) is_hi = outmax;
+                     }
+
+                     else
+                        is_hi = outmax;
+
+                     if (!(od < is_lo || od > is_hi))
+                     {
+                        if (encoded_error < vi->outlog)
+                           return i;
+
+                        pass = "within 8 bit limits:\n";
+                     }
                   }
-
-                  else
-                     is_lo = 0;
-
-                  tmp = ((id >> 8) + .5)/255;
-
-                  if (tmp < 1)
-                  {
-                     is_hi = floor(outmax * tmp + vi->maxout_total);
-                     if (is_hi > outmax) is_hi = outmax;
-                  }
-
-                  else
-                     is_hi = outmax;
-
-                  if (!(od < is_lo || od > is_hi))
-                  {
-                     if (encoded_error < vi->outlog)
-                        return i;
-
-                     pass = "within 8 bit limits:\n";
-                  }
-               }
+#              endif
 #           endif
          }
          else /* !use_input_precision */
