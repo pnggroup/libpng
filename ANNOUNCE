@@ -1,5 +1,5 @@
 
-Libpng 1.5.4beta08 - June 23, 2011
+Libpng 1.5.4rc01 - June 27, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.4beta08.tar.xz (LZMA-compressed, recommended)
-   1.5.4beta08.tar.gz
-   1.5.4beta08.tar.bz2
+   1.5.4rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.4rc01.tar.gz
+   1.5.4rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp154b08.7z  (LZMA-compressed, recommended)
-   lp154b08.zip
+   lp154r01.7z  (LZMA-compressed, recommended)
+   lp154r01.zip
 
 Other information:
 
-   1.5.4beta08-README.txt
-   1.5.4beta08-LICENSE.txt
+   1.5.4rc01-README.txt
+   1.5.4rc01-LICENSE.txt
 
 Changes since the last public release (1.5.2):
 
@@ -239,6 +239,9 @@ Version 1.5.4beta07 [June 19, 2011]
 Version 1.5.4beta08 [June 23, 2011]
   Fixed pngvalid if ACCURATE_SCALE is defined.
   Updated scripts/pnglibconf.h.prebuilt.
+
+Version 1.5.4rc01 [June 27, 2011]
+  Define PNG_ALLOCATED to "restrict" only if MSC_VER >= 1400.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

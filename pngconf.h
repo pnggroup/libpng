@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.4beta08 - June 23, 2011
+ * libpng version 1.5.4rc01 - June 27, 2011
  *
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -385,7 +385,9 @@
 #      define PNG_NORETURN   __declspec(noreturn)
 #    endif
 #    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED __declspec(restrict)
+#      if (_MSC_VER >= 1400)
+#        define PNG_ALLOCATED __declspec(restrict)
+#      endif
 #    endif
 
     /* This specifically protects structure members that should only be
