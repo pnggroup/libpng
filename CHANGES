@@ -3208,9 +3208,9 @@ Version 1.5.1beta09 [January 24, 2011]
     pngvalid contains tests of transforms, which tests are currently disabled
     because they are incompletely tested.  gray_to_rgb was failing to expand
     the bit depth for smaller bit depth images; this seems to be a long
-    standing error and resulted, apparently, in invalid output.  The
-    documentation did not accurately describe what libpng really does when
-    converting RGB to gray.
+    standing error and resulted, apparently, in invalid output
+    (CVE-2011-0408, CERT VU#643140).  The documentation did not accurately
+    describe what libpng really does when converting RGB to gray.
 
 Version 1.5.1beta10 [January 27, 2010]
   Fixed incorrect examples of callback prototypes in the manual, that were
@@ -3415,7 +3415,7 @@ Version 1.5.3rc01 [June 3, 2011]
 
 Version 1.5.3rc02 [June 8, 2011]
   Fixed uninitialized memory read in png_format_buffer() (Bug report by
-    Frank Busse, related to CVE-2004-0421).
+    Frank Busse, CVE-2011-2501, related to CVE-2004-0421).
 
 Version 1.5.3beta11 [June 11, 2011]
   Fixed png_handle_sCAL which is broken in 1.5; added sCAL to pngtest.png
