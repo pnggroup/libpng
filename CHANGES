@@ -1467,7 +1467,7 @@ version 1.2.9beta5 [March 4, 2006]
   Removed trailing blanks from source files.
   Put version and date of latest change in each source file, and changed
     copyright year accordingly.
-  More cleanup of configure.ac, Makefile.ac, and associated scripts.
+  More cleanup of configure.ac, Makefile.am, and associated scripts.
   Restored scripts/makefile.elf which was inadvertently deleted.
 
 version 1.2.9beta6 [March 6, 2006]
@@ -2692,6 +2692,25 @@ version 1.2.44rc03 [June 23, 2010]
 
 version 1.2.44 [June 26, 2010]
   Updated some of the "last changed" dates.
+
+version 1.2.45beta01 [June 7, 2011]
+  Fixed uninitialized memory read in png_format_buffer() (Bug
+    report by Frank Busse, related to CVE-2004-0421).
+  Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
+    was introduced in libpng-1.2.20beta01.
+  Check for up->location !PNG_AFTER_IDAT when writing unknown chunks
+    before IDAT.
+  Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
+    always expand to RGBA if transparency is present.
+
+version 1.2.45beta02 [June 8, 2011]
+  Check for integer overflow in png_set_rgb_to_gray().
+
+version 1.2.45beta03 [June 19, 2011]
+  Check for sCAL chunk too short.
+
+version 1.2.45rc01 and 1.0.55rc01 [June 30, 2011]
+  Updated "last changed" dates and copyright year.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
