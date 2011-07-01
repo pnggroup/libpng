@@ -1,5 +1,5 @@
 
-Libpng 1.4.8beta05 - June 19, 2011
+Libpng 1.4.8rc01 - June 30, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.8beta05.tar.xz (LZMA-compressed, recommended)
-   1.4.8beta05.tar.gz
-   1.4.8beta05.tar.bz2
+   1.4.8rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.8rc01.tar.gz
+   1.4.8rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp148b05.7z (LZMA-compressed, recommended)
-   lp148b05.zip
+   lp148r01.7z (LZMA-compressed, recommended)
+   lp148r01.zip
 
 Other information:
 
-   1.4.8beta05-README.txt
-   1.4.8beta05-LICENSE.txt
+   1.4.8rc01-README.txt
+   1.4.8rc01-LICENSE.txt
 
 Changes since the last public release (1.4.7):
 
@@ -51,6 +51,9 @@ version 1.4.8beta04 [June 7, 2011]
 version 1.4.8beta05 [June 19, 2011]
   Fixed error in "ACCURATE" 16-to-8 scaling (John Bowler).
   Check for sCAL chunk too short.
+
+version 1.4.8rc01 [June 30, 2011]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

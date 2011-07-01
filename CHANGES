@@ -2820,6 +2820,9 @@ version 1.4.8beta05 [June 19, 2011]
   Fixed error in "ACCURATE" 16-to-8 scaling (John Bowler).
   Check for sCAL chunk too short.
 
+version 1.4.8rc01 [June 30, 2011]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
