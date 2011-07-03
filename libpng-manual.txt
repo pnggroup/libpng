@@ -198,9 +198,9 @@ reconfiguration of pnglibconf.h.  To reconfigure pnglibconf.h it must either be
 rebuilt from scripts/pnglibconf.dfa using awk or it must be edited by hand.
 
 Hand editing is achieved by copying scripts/pnglibconf.h.prebuilt and changing
-the lines defining the supported features, paying very close attention to the
-'option' information in scripts/pnglibconf.dfa that describes those features and
-their requirements.  This is easy to get wrong.
+the lines defining the supported features, paying very close attention to
+the 'option' information in scripts/pnglibconf.dfa that describes those
+features and their requirements.  This is easy to get wrong.
 
 B. Configuration using DFA_XTRA
 
