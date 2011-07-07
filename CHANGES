@@ -3506,6 +3506,8 @@ Version 1.5.4beta08 [June 23, 2011]
 Version 1.5.4rc01 [June 30, 2011]
   Define PNG_ALLOCATED to "restrict" only if MSC_VER >= 1400.
 
+Version 1.5.4 [July 7, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
