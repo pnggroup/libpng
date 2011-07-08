@@ -64,6 +64,7 @@ EXTRA_DIST= \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
+	${srcdir}/projects/vstudio/* \
 	${srcdir}/projects/xcode/* \
 	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \

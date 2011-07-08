@@ -319,8 +319,9 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
 #extra source distribution files.
 EXTRA_DIST = \
-	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
+	ANNOUNCE CHANGES INSTALL LICENSE README TODO CMakeLists.txt \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
+	${srcdir}/projects/vstudio/* \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
 	${srcdir}/projects/xcode/* \
