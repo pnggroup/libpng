@@ -2729,6 +2729,10 @@ version 1.2.45 and 1.0.55 [July 7, 2011]
 version 1.2.46rc01 and 1.0.56rc01 [July 8, 2011]
   Reverted changes to Makefile.am and Makefile.in to libpng-1.2.44 versions.
 
+version 1.2.46rc02 and 1.0.56rc02 [July 8, 2011]
+  Added CMakeLists.txt, projects/xcode, and pnggccrd.c to EXTRA_DIST in
+    Makefile.am and Makefile.in
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
