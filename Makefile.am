@@ -74,19 +74,22 @@ pkgconfig_DATA = libpng10.pc
 EXTRA_DIST= \
 	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
+        CMakeLists.txt \
 	${srcdir}/projects/cbuilder5/* \
 	${srcdir}/projects/beos/* \
 	${srcdir}/projects/visualc6/* \
 	${srcdir}/projects/visualc71/* \
 	${srcdir}/projects/wince.txt \
 	${srcdir}/projects/netware.txt \
+	${srcdir}/projects/xcode/* \
 	${srcdir}/scripts/* \
 	${srcdir}/contrib/gregbook/* \
+	${srcdir}/contrib/pngminim/* \
 	${srcdir}/contrib/pngminus/* \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.0.56rc01.txt pngvcrd.c
+	example.c libpng-1.0.56.txt pnggccrd.c pngvcrd.c
 
 CLEANFILES= pngout.png libpng10.pc libpng10-config libpng.vers \
 libpng.sym
