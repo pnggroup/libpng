@@ -1,109 +1,48 @@
 
-Libpng 1.2.46rc02 - July 8, 2011
+Libpng 1.2.46 - July 9, 2011
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.46rc02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.46rc02.tar.gz
-   libpng-1.2.46rc02.tar.bz2
+   libpng-1.2.46.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.46.tar.gz
+   libpng-1.2.46.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.46rc02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.46rc02-no-config.tar.gz
-   libpng-1.2.46rc02-no-config.tar.bz2
+   libpng-1.2.46-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.46-no-config.tar.gz
+   libpng-1.2.46-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1246r02.zip
-   lp1246r02.7z
-   lp1246r02.tar.bz2
+   lpng1246.zip
+   lpng1246.7z
+   lpng1246.tar.bz2
 
 Project files
 
-   libpng-1.2.46rc02-project-netware.zip
-   libpng-1.2.46rc02-project-wince.zip
+   libpng-1.2.46-project-netware.zip
+   libpng-1.2.46-project-wince.zip
 
 Other information:
 
-   libpng-1.2.46rc02-README.txt
-   libpng-1.2.46rc02-KNOWNBUGS.txt
-   libpng-1.2.46rc02-LICENSE.txt
-   libpng-1.2.46rc02-Y2K-compliance.txt
-   libpng-1.2.46rc02-[previous version]-diff.txt
+   libpng-1.2.46-README.txt
+   libpng-1.2.46-KNOWNBUGS.txt
+   libpng-1.2.46-LICENSE.txt
+   libpng-1.2.46-Y2K-compliance.txt
+   libpng-1.2.46-[previous version]-diff.txt
 
-Changes since the last public release (1.2.42):
+Changes since the last public release (1.2.43):
 
-version 1.2.43beta01 [January 27, 2010]
-  Updated CMakeLists.txt for consistent indentation and to avoid an
-    unclosed if-statement warning (Philip Lowman).
-  Removed "#ifdef PNG_1_0_X / #endif" surrounding
-    PNG_READ_16_TO_8_SUPPORTED and PNG_READ_GRAY_TO_RGB_SUPPORTED
-    in pngconf.h.  These were added in libpng-1.2.41beta08 and libpng-1.0.51,
-    which introduced a binary incompatibility with libpng-1.0.50.
-  Backported new png_decompress_chunk() algorithm from libpng-1.4.1
+version 1.2.45 [July 9, 2011]
 
-version 1.2.43beta02 [February 1, 2010]
-  Backported two-pass png_decompress_chunk() algorithm from libpng-1.4.1
-
-version 1.2.43beta03 [February 6, 2010]
-  Backported fast png_push_save_buffer() algorithm from libpng-1.4.1
-
-version 1.2.43beta04 [February 8, 2010]
-  Reverted recent changes to png_push_save-buffer().
-  Removed PNGAPI declaration of png_calloc() and png_write_sig() in
-    1ibpng-1.2.X, introduced by mistake in libpng-1.2.41.
-  Return allocated "old_buffer" in png_push_save_buffer() before png_error(),
-    to avoid a potential memory leak.
-
-version 1.2.43beta05 [February 8, 2010]
-  Ported rewritten png_decompress_chunk() by John Bowler from libpng-1.4.1.
-
-version 1.0.53rc01 and 1.2.43rc01 [February 18, 2010]
-  No changes.
-
-version 1.0.53rc02 and 1.2.43rc02 [February 19, 2010]
-  Define _ALL_SOURCE in configure.ac, makefile.aix, and CMakeLists.txt
-    when using AIX compiler.
-
-version 1.0.53 and 1.2.43 [February 25, 2010]
-  Removed unused gzio.c from contrib/pngminim gather and makefile scripts
-
-version 1.2.44beta01 [June 18, 2010]
-  In pngpread.c: png_push_have_row() add check for new_row > height
-  Removed the now-redundant check for out-of-bounds new_row from example.c
-
-version 1.2.44beta02 [June 19, 2010]
-  In pngpread.c: png_push_process_row() add check for too many rows.
-  Removed the now-redundant check for new_row > height in png_push_have_row().
-
-version 1.2.44beta03 [June 20, 2010]
-  Rewrote png_process_IDAT_data to consistently treat extra data as warnings
-    and handle end conditions more cleanly.
-  Removed the new (beta02) check in png_push_process_row().
-
-version 1.2.44rc01 [June 21, 2010]
-  Revised some comments in png_process_IDAT_data().
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-
-version 1.2.44rc02 [June 22, 2010]
-  Stop memory leak when reading a malformed sCAL chunk.
-
-version 1.2.44rc03 [June 23, 2010]
-  Revised pngpread.c patch of beta05 to avoid an endless loop.
-
-version 1.2.44 [June 26, 2010]
-  Updated some of the "last changed" dates.
-
-version 1.2.45beta01 [June 7, 2011]
   Fixed uninitialized memory read in png_format_buffer() (Bug
     report by Frank Busse, related to CVE-2004-0421).
   Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
@@ -112,26 +51,13 @@ version 1.2.45beta01 [June 7, 2011]
     before IDAT.
   Ported bugfix in pngrtran.c from 1.5.3: when expanding a paletted image,
     always expand to RGBA if transparency is present.
-
-version 1.2.45beta02 [June 8, 2011]
   Check for integer overflow in png_set_rgb_to_gray().
-
-version 1.2.45beta03 [June 19, 2011]
   Check for sCAL chunk too short.
-
-version 1.2.45rc01 and 1.0.55rc01 [June 30, 2011]
-  Updated "last changed" dates and copyright year.
-
-version 1.2.45 and 1.0.55 [July 7, 2011]
-  No changes.
-
-version 1.2.46rc01 and 1.0.56rc01 [July 8, 2011]
-  Reverted changes to Makefile.am and Makefile.in to libpng-1.2.44 versions.
-
-version 1.2.46rc02 and 1.0.56rc02 [July 8, 2011]
   Added CMakeLists.txt, projects/xcode, and pnggccrd.c to EXTRA_DIST in
     Makefile.am and Makefile.in
+  Udated copyright year to 2011.
 
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
