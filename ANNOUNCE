@@ -1,5 +1,5 @@
 
-Libpng 1.2.46 - July 9, 2011
+Libpng 1.2.46 - July 10, 2011
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -39,9 +39,7 @@ Other information:
    libpng-1.2.46-Y2K-compliance.txt
    libpng-1.2.46-[previous version]-diff.txt
 
-Changes since the last public release (1.2.43):
-
-version 1.2.45 [July 9, 2011]
+Changes since the last public release (1.2.44):
 
   Fixed uninitialized memory read in png_format_buffer() (Bug
     report by Frank Busse, related to CVE-2004-0421).
@@ -53,9 +51,8 @@ version 1.2.45 [July 9, 2011]
     always expand to RGBA if transparency is present.
   Check for integer overflow in png_set_rgb_to_gray().
   Check for sCAL chunk too short.
-  Added CMakeLists.txt, projects/xcode, and pnggccrd.c to EXTRA_DIST in
-    Makefile.am and Makefile.in
-  Udated copyright year to 2011.
+  Updated "last changed" dates and copyright year.
+  Reverted changes to Makefile.am and Makefile.in to libpng-1.2.44 versions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
