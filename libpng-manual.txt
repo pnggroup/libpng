@@ -1654,13 +1654,14 @@ color.  The function takes two arguments, background_gamma_mode and need_expand
 to convey this information, however only two combinations are likely to be
 useful:
 
-    png_color_16p image_background, my_background;
+    png_color_16 my_background;
+    png_color_16p image_background;
 
     if (png_get_bKGD(png_ptr, info_ptr, &image_background))
        png_set_background(png_ptr, image_background,
            PNG_BACKGROUND_GAMMA_FILE, 1/*needs to be expanded*/, 1);
     else
-       png_set_background(png_ptr, my_background,
+       png_set_background(png_ptr, &my_background,
            PNG_BACKGROUND_GAMMA_SCREEN, 0/*do not expand*/, 1);
 
 The second call was described above - my_background is in the format of the
