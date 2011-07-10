@@ -1660,7 +1660,7 @@ useful:
        png_set_background(png_ptr, image_background,
            PNG_BACKGROUND_GAMMA_FILE, 1/*needs to be expanded*/, 1);
     else
-       png_set_background(png_ptr, info_ptr, my_background,
+       png_set_background(png_ptr, my_background,
            PNG_BACKGROUND_GAMMA_SCREEN, 0/*do not expand*/, 1);
 
 The second call was described above - my_background is in the format of the
