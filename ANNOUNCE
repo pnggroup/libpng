@@ -1,5 +1,5 @@
 
-Libpng 1.2.47beta01 - July 10, 2011
+Libpng 1.2.47beta01 - July 11, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,7 +42,8 @@ Other information:
 
 Changes since the last public release (1.2.46):
 
-version 1.2.47beta01 [July 10, 2011]
+version 1.2.47beta01 [July 11, 2011]
+  Updated contrib/pngminus/makefile.std
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

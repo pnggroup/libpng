@@ -2736,7 +2736,8 @@ version 1.2.46rc02 and 1.0.56rc02 [July 8, 2011]
 version 1.2.46 and 1.0.56 [July 9, 2011]
   Udated copyright year to 2011.
 
-version 1.2.47beta01 [July 10, 2011]
+version 1.2.47beta01 [July 11, 2011]
+  Updated contrib/pngminus/makefile.std
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
