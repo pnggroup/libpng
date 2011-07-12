@@ -5169,10 +5169,10 @@ if the feature is supported or:
 /*#undef PNG_feature_SUPPORTED*/
 
 if it is not.  Library code consistently checks for the 'SUPPORTED' macro.
-It does not, and should not, check for the 'NO' macro which will not
-normally be defined even if the feature is not supported.  The 'NO' macros
-are only used internally for setting the corresponding 'SUPPORTED' macros
-or not.
+It does not, and libpng applications should not, check for the 'NO' macro
+which will not normally be defined even if the feature is not supported.
+The 'NO' macros are only used internally for setting or not setting the
+corresponding 'SUPPORTED' macros.
 
 Compatibility with the old names is provided as follows:
 
