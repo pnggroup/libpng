@@ -27,7 +27,7 @@ Other information:
 Changes since the last public release (1.5.4):
 
 Version 1.5.5beta01 [July 12, 2011]
-  Fixed some typos in the manual.
+  Fixed some typos and made other minor changes in the manual.
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
