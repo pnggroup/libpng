@@ -1,9 +1,9 @@
 # Makefile for PngMinus (png2pnm and pnm2png)
 # Linux / Unix
 
-#CC?=cc
-CC?=gcc
-LD?=$(CC)
+#CC=cc
+CC=gcc
+LD=$(CC)
 
 RM=rm -f
 
@@ -23,7 +23,7 @@ ZINC = -I../../../zlib
 ZLIB = -L../../../zlib -lz
 ZLIBS = ../../../zlib/libz.a
 
-CFLAGS+=$(PNGINC) $(ZINC)
+CFLAGS=$(PNGINC) $(ZINC)
 LDLIBS=$(PNGLIB) $(ZLIB)
 LDLIBSS=$(PNGLIBS) $(ZLIBS)
 C=.c

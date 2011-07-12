@@ -2826,9 +2826,9 @@ version 1.4.8rc01 [June 30, 2011]
 version 1.4.8 [July 7, 2011]
   No changes.
 
-version 1.4.9beta01 [July 11, 2011]
+version 1.4.9beta01 [July 12, 2011]
   Added vstudio/* and CMakeLists to EXTRA_DIST in Makefile.in and Makefile.am
-  Updated contrib/pngminus/makefile.std
+  Updated contrib/pngminus/makefile.std (Samuli Souminen)
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
