@@ -3509,7 +3509,7 @@ Version 1.5.4rc01 [June 30, 2011]
 Version 1.5.4 [July 7, 2011]
   No changes.
 
-Version 1.5.5beta01 [July 12, 2011]
+Version 1.5.5beta01 [July 13, 2011]
   Fixed some typos and made other minor changes in the manual.
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
 

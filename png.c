@@ -542,8 +542,8 @@ png_get_io_ptr(png_structp png_ptr)
 /* Initialize the default input/output functions for the PNG file.  If you
  * use your own read or write routines, you can call either png_set_read_fn()
  * or png_set_write_fn() instead of png_init_io().  If you have defined
- * PNG_NO_STDIO, you must use a function of your own because "FILE *" isn't
- * necessarily available.
+ * PNG_NO_STDIO or otherwise disabled PNG_STDIO_SUPPORTED, you must use a
+ * function of your own because "FILE *" isn't necessarily available.
  */
 void PNGAPI
 png_init_io(png_structp png_ptr, png_FILE_p fp)
@@ -617,13 +617,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.5beta01 - July 8, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.5beta01 - July 13, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.5beta01 - July 8, 2011\
+      return "libpng version 1.5.5beta01 - July 13, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";

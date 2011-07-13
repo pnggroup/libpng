@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta01 - July 12, 2011
+Libpng 1.5.5beta01 - July 13, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.5.4):
 
-Version 1.5.5beta01 [July 12, 2011]
+Version 1.5.5beta01 [July 13, 2011]
   Fixed some typos and made other minor changes in the manual.
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
 
