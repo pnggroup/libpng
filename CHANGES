@@ -3512,8 +3512,10 @@ Version 1.5.4 [July 7, 2011]
 Version 1.5.5beta01 [July 13, 2011]
   Fixed some typos and made other minor changes in the manual.
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
-`
-Version 1.5.5beta02 [July 13, 2011]
+
+Version 1.5.5beta02 [July 14, 2011]
+  Revised Makefile.am and Makefile.in to look in the right directory for
+    pnglibconf.h.prebuilt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

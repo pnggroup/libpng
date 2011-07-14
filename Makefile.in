@@ -1265,7 +1265,7 @@ $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
 scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
-scripts/symbols.out: png.h pngconf.h scripts/pnglibconf.h.prebuilt
+scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
 
 libpng.sym: scripts/sym.out
 	rm -f $@
@@ -1276,7 +1276,8 @@ libpng.vers: scripts/vers.out
 pnglibconf.h: pnglibconf.out
 	rm -f $@
 	cp $? $@
-scripts/pnglibconf.h.prebuilt:
+$(srcdir)/scripts/pnglibconf.h.prebuilt:
+	@echo "Attempting to build $@" >&2
 	@echo "This is a machine generated file, but if you want to make" >&2
 	@echo "a new one simply make 'scripts/pnglibconf.out' and copy that" >&2
 	@exit 1
