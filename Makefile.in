@@ -160,7 +160,7 @@ distuninstallcheck_listfiles = find . -type f -print
 distcleancheck_listfiles = find . -type f -print
 
 #distribute headers in /usr/include/libpng/*
-pkgincludedir = $(DESTDIR)$(includedir)/$(PNGLIB_BASENAME)
+pkgincludedir = $(includedir)/$(PNGLIB_BASENAME)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AR = @AR@
