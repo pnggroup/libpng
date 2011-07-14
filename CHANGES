@@ -3149,8 +3149,8 @@ version 1.5.1beta01 [January 8, 2011]
     in version 1.5.0beta36 but is not noted in the CHANGES.  Similarly,
     it was changed from png_charpp to png_const_bytepp in png_set_iCCP().
   Ensure that png_rgb_to_gray ignores palette mapped images, if libpng
-    internally happens to call it with one.
-  Fixed a failure to handle palette mapped images correctly.
+    internally happens to call it with one, and fixed a failure to handle
+    palette mapped images correctly.  This fixes CVE-2690.
 
 Version 1.5.1beta02 [January 14, 2011]
   Fixed a bug in handling of interlaced images (bero at arklinux.org).
@@ -3347,7 +3347,7 @@ Version 1.5.3beta05 [May 6, 2011]
     dependency of the tIME-supporting RFC1132 code on stdio is removed and
     PNG_NO_WARNINGS does actually work now.
   Pass "" instead of '\0' to png_default_error() in png_err().  This mistake
-    was introduced in libpng-1.2.20beta01.
+    was introduced in libpng-1.2.20beta01.  This fixes CVE-2011-2691.
   Added PNG_WRITE_OPTIMIZE_CMF_SUPPORTED macro to make the zlib "CMF" byte
     optimization configureable.
   IDAT compression failed if preceded by a compressed text chunk (bug
@@ -3418,7 +3418,8 @@ Version 1.5.3rc02 [June 8, 2011]
     Frank Busse, CVE-2011-2501, related to CVE-2004-0421).
 
 Version 1.5.3beta11 [June 11, 2011]
-  Fixed png_handle_sCAL which is broken in 1.5; added sCAL to pngtest.png
+  Fixed png_handle_sCAL which is broken in 1.5. This fixes CVE 2011-2692.
+  Added sCAL to pngtest.png
   Revised documentation about png_set_user_limits() to say that it also affects
     png writing.
   Revised handling of png_set_user_limits() so that it can increase the
