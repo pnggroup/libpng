@@ -77,6 +77,15 @@ typedef png_byte *png_const_bytep;
 
 /***************************** EXCEPTION HANDLING *****************************/
 #include "contrib/visupng/cexcept.h"
+
+#ifdef __cplusplus
+#  define this not_the_cpp_this
+#  define new not_the_cpp_new
+#  define voidcast(type, value) static_cast<type>(value)
+#else
+#  define voidcast(type, value) (value)
+#endif /* __cplusplus */
+
 struct png_store;
 define_exception_type(struct png_store*);
 
@@ -143,7 +152,7 @@ static void
 make_random_bytes(png_uint_32* seed, void* pv, size_t size)
 {
    png_uint_32 u0 = seed[0], u1 = seed[1];
-   png_bytep bytes = /*no cast required*/pv;
+   png_bytep bytes = voidcast(png_bytep, pv);
 
    /* There are thirty three bits, the next bit in the sequence is bit-33 XOR
     * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
@@ -631,7 +640,7 @@ store_storenew(png_store *ps)
    if (ps->writepos != STORE_BUFFER_SIZE)
       png_error(ps->pwrite, "invalid store call");
 
-   pb = malloc(sizeof *pb);
+   pb = voidcast(png_store_buffer*, malloc(sizeof *pb));
 
    if (pb == NULL)
       png_error(ps->pwrite, "store new: OOM");
@@ -667,7 +676,7 @@ store_freefile(png_store_file **ppf)
 static void
 store_storefile(png_store *ps, png_uint_32 id)
 {
-   png_store_file *pf = malloc(sizeof *pf);
+   png_store_file *pf = voidcast(png_store_file*, malloc(sizeof *pf));
    if (pf == NULL)
       png_error(ps->pwrite, "storefile: OOM");
    safecat(pf->name, sizeof pf->name, 0, ps->wname);
@@ -761,7 +770,7 @@ store_log(png_store* ps, png_structp pp, png_const_charp message, int is_error)
 static void
 store_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
 {
-   png_store *ps = png_get_error_ptr(pp);
+   png_store *ps = voidcast(png_store*, png_get_error_ptr(pp));
 
    if (!ps->expect_error)
       store_log(ps, pp, message, 1 /* error */);
@@ -776,7 +785,7 @@ store_error(png_structp pp, png_const_charp message) /* PNG_NORETURN */
 static void
 store_warning(png_structp pp, png_const_charp message)
 {
-   png_store *ps = png_get_error_ptr(pp);
+   png_store *ps = voidcast(png_store*, png_get_error_ptr(pp));
 
    if (!ps->expect_warning)
       store_log(ps, pp, message, 0 /* warning */);
@@ -838,7 +847,7 @@ store_ensure_image(png_store *ps, png_structp pp, int nImages, png_size_t cbRow,
       store_image_free(ps, pp);
 
       /* The buffer is deliberately mis-aligned. */
-      image = malloc(cb+2);
+      image = voidcast(png_bytep, malloc(cb+2));
       if (image == NULL)
       {
          /* Called from the startup - ignore the error for the moment. */
@@ -922,7 +931,7 @@ store_image_check(PNG_CONST png_store* ps, png_structp pp, int iImage)
 static void
 store_write(png_structp pp, png_bytep pb, png_size_t st)
 {
-   png_store *ps = png_get_io_ptr(pp);
+   png_store *ps = voidcast(png_store*, png_get_io_ptr(pp));
 
    if (ps->pwrite != pp)
       png_error(pp, "store state damaged");
@@ -1042,7 +1051,7 @@ store_read_imp(png_store *ps, png_bytep pb, png_size_t st)
 static void
 store_read(png_structp pp, png_bytep pb, png_size_t st)
 {
-   png_store *ps = png_get_io_ptr(pp);
+   png_store *ps = voidcast(png_store*, png_get_io_ptr(pp));
 
    if (ps == NULL || ps->pread != pp)
       png_error(pp, "bad store read call");
@@ -1082,7 +1091,8 @@ store_write_palette(png_store *ps, int npalette)
    /* This function can only return NULL if called with '0'! */
    if (npalette > 0)
    {
-      ps->palette = malloc(npalette * sizeof *ps->palette);
+      ps->palette = voidcast(store_palette_entry*, malloc(npalette *
+         sizeof *ps->palette));
 
       if (ps->palette == NULL)
          png_error(ps->pwrite, "store new palette: OOM");
@@ -1229,8 +1239,9 @@ store_pool_delete(png_store *ps, store_pool *pool)
 static png_voidp
 store_malloc(png_structp pp, png_alloc_size_t cb)
 {
-   store_pool *pool = png_get_mem_ptr(pp);
-   store_memory *new = malloc(cb + (sizeof *new) + (sizeof pool->mark));
+   store_pool *pool = voidcast(store_pool*, png_get_mem_ptr(pp));
+   store_memory *new = voidcast(store_memory*, malloc(cb + (sizeof *new) +
+      (sizeof pool->mark)));
 
    if (new != NULL)
    {
@@ -1262,8 +1273,8 @@ store_malloc(png_structp pp, png_alloc_size_t cb)
 static void
 store_free(png_structp pp, png_voidp memory)
 {
-   store_pool *pool = png_get_mem_ptr(pp);
-   store_memory *this = memory, **test;
+   store_pool *pool = voidcast(store_pool*, png_get_mem_ptr(pp));
+   store_memory *this = voidcast(store_memory*, memory), **test;
 
    /* First check that this 'memory' really is valid memory - it must be in the
     * pool list.  If it is, use the shared memory_free function to free it.
@@ -1483,17 +1494,19 @@ store_delete(png_store *ps)
  * png_store.  There is a special read function, set_modifier_for_read, which
  * replaces set_store_for_read.
  */
+typedef enum modifier_state
+{
+   modifier_start,                        /* Initial value */
+   modifier_signature,                    /* Have a signature */
+   modifier_IHDR                          /* Have an IHDR */
+} modifier_state;
+
 typedef struct png_modifier
 {
    png_store               this;             /* I am a png_store */
    struct png_modification *modifications;   /* Changes to make */
 
-   enum modifier_state
-   {
-      modifier_start,                        /* Initial value */
-      modifier_signature,                    /* Have a signature */
-      modifier_IHDR                          /* Have an IHDR */
-   }                        state;           /* My state */
+   modifier_state           state;           /* My state */
 
    /* Information from IHDR: */
    png_byte                 bit_depth;       /* From IHDR */
@@ -2072,7 +2085,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
 static void
 modifier_read(png_structp pp, png_bytep pb, png_size_t st)
 {
-   png_modifier *pm = png_get_io_ptr(pp);
+   png_modifier *pm = voidcast(png_modifier*, png_get_io_ptr(pp));
 
    if (pm == NULL || pm->this.pread != pp)
       png_error(pp, "bad modifier_read call");
@@ -3711,7 +3724,8 @@ standard_info_imp(standard_display *dp, png_structp pp, png_infop pi,
 static void
 standard_info(png_structp pp, png_infop pi)
 {
-   standard_display *dp = png_get_progressive_ptr(pp);
+   standard_display *dp = voidcast(standard_display*,
+      png_get_progressive_ptr(pp));
 
    /* Call with nImages==1 because the progressive reader can only produce one
     * image.
@@ -3722,7 +3736,8 @@ standard_info(png_structp pp, png_infop pi)
 static void
 progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
 {
-   PNG_CONST standard_display *dp = png_get_progressive_ptr(pp);
+   PNG_CONST standard_display *dp = voidcast(standard_display*,
+      png_get_progressive_ptr(pp));
 
    /* When handling interlacing some rows will be absent in each pass, the
     * callback still gets called, but with a NULL pointer.  This is checked
@@ -3897,7 +3912,8 @@ standard_image_validate(standard_display *dp, png_structp pp, int iImage,
 static void
 standard_end(png_structp pp, png_infop pi)
 {
-   standard_display *dp = png_get_progressive_ptr(pp);
+   standard_display *dp = voidcast(standard_display*,
+      png_get_progressive_ptr(pp));
 
    UNUSED(pi)
 
@@ -4657,7 +4673,8 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
 static void
 transform_info(png_structp pp, png_infop pi)
 {
-   transform_info_imp(png_get_progressive_ptr(pp), pp, pi);
+   transform_info_imp(voidcast(transform_display*, png_get_progressive_ptr(pp)),
+      pp, pi);
 }
 
 static void
@@ -4860,7 +4877,8 @@ transform_image_validate(transform_display *dp, png_structp pp, png_infop pi)
 static void
 transform_end(png_structp pp, png_infop pi)
 {
-   transform_display *dp = png_get_progressive_ptr(pp);
+   transform_display *dp = voidcast(transform_display*,
+      png_get_progressive_ptr(pp));
 
    transform_image_validate(dp, pp, pi);
 }
@@ -6213,7 +6231,8 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
 static void
 gamma_info(png_structp pp, png_infop pi)
 {
-   gamma_info_imp(png_get_progressive_ptr(pp), pp, pi);
+   gamma_info_imp(voidcast(gamma_display*, png_get_progressive_ptr(pp)), pp,
+      pi);
 }
 
 /* Validate a single component value - the routine gets the input and output
@@ -7156,7 +7175,7 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi)
 static void
 gamma_end(png_structp pp, png_infop pi)
 {
-   gamma_display *dp = png_get_progressive_ptr(pp);
+   gamma_display *dp = voidcast(gamma_display*, png_get_progressive_ptr(pp));
 
    if (!dp->this.speed)
       gamma_image_validate(dp, pp, pi);
