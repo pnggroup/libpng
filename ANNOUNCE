@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta03 - July 26, 2011
+Libpng 1.5.5beta03 - July 27, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -34,10 +34,11 @@ Version 1.5.5beta02 [July 14, 2011]
   Revised Makefile.am and Makefile.in to look in the right directory for
     pnglibconf.h.prebuilt
 
-Version 1.5.5beta03 [July 26, 2011]
+Version 1.5.5beta03 [July 27, 2011]
   Enabled compilation with g++ compiler.  This compiler does not recognize
     the file extension, so it always compiles with C++ rules.  Made minor
     changes to pngrutil.c to cast results where C++ expects it but C does not.
+  Minor editing of libpng.3 and libpng-manual.txt.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
