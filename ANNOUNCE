@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta04 - July 27, 2011
+Libpng 1.5.5beta04 - July 28, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -40,7 +40,8 @@ Version 1.5.5beta03 [July 27, 2011]
     changes to pngrutil.c to cast results where C++ expects it but C does not.
   Minor editing of libpng.3 and libpng-manual.txt.
 
-Version 1.5.5beta04 [July 27, 2011]
+Version 1.5.5beta04 [July 28, 2011]
+  Revised CMakeLists.txt (Clifford Yapp)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
