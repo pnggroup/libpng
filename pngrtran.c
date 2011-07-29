@@ -3066,21 +3066,32 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 /* Reduce RGB files to grayscale, with or without alpha
- * using the equation given in Poynton's ColorFAQ at
- * <http://www.inforamp.net/~poynton/>  (THIS LINK IS DEAD June 2008)
- * New link:
- * <http://www.poynton.com/notes/colour_and_gamma/>
+ * using the equation given in Poynton's ColorFAQ of 1998-01-04 at
+ * <http://www.inforamp.net/~poynton/>  (THIS LINK IS DEAD June 2008 but
+ * versions dated 1998 through November 2002 have been archived at
+ * http://web.archive.org/web/20000816232553/http://www.inforamp.net/
+ * ~poynton/notes/colour_and_gamma/ColorFAQ.txt )
  * Charles Poynton poynton at poynton.com
  *
  *     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
  *
- *  We approximate this with
- *
- *     Y = 0.21268 * R    + 0.7151 * G    + 0.07217 * B
- *
  *  which can be expressed with integers as
  *
  *     Y = (6969 * R + 23434 * G + 2365 * B)/32768
+ *
+ * Poynton's current link (as of January 2003 through July 2011):
+ * <http://www.poynton.com/notes/colour_and_gamma/>
+ * has changed the numbers slightly:
+ *
+ *     Y = 0.2126*R + 0.7152*G + 0.0722*B
+ *
+ *  which can be expressed with integers as
+ *
+ *     Y = (6966 * R + 23436 * G + 2366 * B)/32768
+ *
+ *  We use the approximation
+ *
+ *     Y = (6968 * R + 23434 * G + 2366 * B)/32768
  *
  *  The calculation is to be done in a linear colorspace.
  *
