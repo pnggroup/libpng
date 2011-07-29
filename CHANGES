@@ -3529,6 +3529,8 @@ Version 1.5.5beta04 [July 29, 2011]
   Updated commentary about the png_rgb_to_gray() default coefficients
     in the manual and in pngrtran.c
 
+Version 1.5.5beta05 [July 29, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
