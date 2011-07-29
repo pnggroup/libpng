@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.5beta04 - July 28, 2011
+ libpng version 1.5.5beta04 - July 29, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.5beta04 - July 28, 2011
+ libpng versions 0.97, January 1998, through 1.5.5beta04 - July 29, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1677,7 +1677,16 @@ space, as recommended in the Charles Poynton's Colour FAQ,
 
    <http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC9>
 
+    Y = 0.2126 * R + 0.7152 * G + 0.0722 * B
+
+Previous versions of this document, 1998 through 2002, recommended a slightly
+different formula:
+
     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
+
+Libpng uses an integer approximation:
+
+    Y = (6968 * R + 23434 * G + 2366 * B)/32768
 
 The calculation is done in a linear colorspace, if the image gamma
 can be determined.
@@ -4500,7 +4509,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-July 28, 2011
+July 29, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

@@ -3524,8 +3524,10 @@ Version 1.5.5beta03 [July 27, 2011]
     changes to pngrutil.c to cast results where C++ expects it but C does not.
   Minor editing of libpng.3 and libpng-manual.txt.
 
-Version 1.5.5beta04 [July 28, 2011]
+Version 1.5.5beta04 [July 29, 2011]
   Revised CMakeLists.txt (Clifford Yapp)
+  Updated commentary about the png_rgb_to_gray() default coefficients
+    in the manual and in pngrtran.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
