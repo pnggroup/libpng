@@ -2104,7 +2104,7 @@ modifier_progressive_read(png_modifier *pm, png_structp pp, png_infop pi)
       png_error(pp, "store state damaged (progressive)");
 
    /* This is another Horowitz and Hill random noise generator.  In this case
-    * the aim is to stress the progressive reader with truely horrible variable
+    * the aim is to stress the progressive reader with truly horrible variable
     * buffer sizes in the range 1..500, so a sequence of 9 bit random numbers
     * is generated.  We could probably just count from 1 to 32767 and get as
     * good a result.

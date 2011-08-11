@@ -3093,6 +3093,11 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  *
  *     Y = (6968 * R + 23434 * G + 2366 * B)/32768
  *
+ *  Starting with libpng-1.5.4, if the image being converted has the
+ *  sRGB chunk, then the sRGB numbers are used by default:
+ *
+ *     Y = 0.33000*R + 0.60000*G + 0.06000*B
+ *
  *  The calculation is to be done in a linear colorspace.
  *
  *  Other integer coefficents can be used via png_set_rgb_to_gray().
