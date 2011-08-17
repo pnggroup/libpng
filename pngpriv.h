@@ -1150,6 +1150,29 @@ PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED
+/* Added at libpng version 1.5.5 */
+typedef struct png_xy
+{
+   png_fixed_point redx, redy;
+   png_fixed_point greenx, greeny;
+   png_fixed_point bluex, bluey;
+   png_fixed_point whitex, whitey;
+} png_xy;
+
+typedef struct png_XYZ
+{
+   png_fixed_point redX, redY, redZ;
+   png_fixed_point greenX, greenY, greenZ;
+   png_fixed_point blueX, blueY, blueZ;
+} png_XYZ;
+
+/* The conversion APIs return 0 on success, non-zero on a parameter error. */
+PNG_EXTERN int png_xy_from_XYZ PNGARG((png_xy *xy, png_XYZ XYZ));
+PNG_EXTERN int png_XYZ_from_xy PNGARG((png_XYZ *XYZ, png_xy xy));
+PNG_EXTERN int png_XYZ_from_xy_checked PNGARG((png_structp png_ptr,
+   png_XYZ *XYZ, png_xy xy));
+#endif
+
 /* Added at libpng version 1.4.0 */
 PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
