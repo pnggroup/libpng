@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta05 - July 29, 2011
+Libpng 1.5.5beta05 - August 17, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -45,7 +45,21 @@ Version 1.5.5beta04 [July 29, 2011]
   Updated commentary about the png_rgb_to_gray() default coefficients
     in the manual and in pngrtran.c
 
-Version 1.5.5beta05 [July 29, 2011]
+Version 1.5.5beta05 [August 17, 2011]
+  Prevent unexpected API exports from non-libpng DLLs on Windows.  The "_DLL"
+    is removed from the test of whether a DLL is being built (this erroneously
+    caused the libpng APIs to be marked as DLL exports in static builds under
+    Microsoft Visual Studio).  Almost all of the libpng building configuration
+    is moved from pngconf.h to pngpriv.h, but PNG_DLL_EXPORT remains in
+    pngconf.h, though, so that it is colocated with the import definition (it
+    is no longer used anywhere in the installed headers).  The VStudio project
+    definitions have been cleaned up: "_USRDLL" has been removed from the
+    static library builds (this was incorrect), and PNG_USE_DLL has been added
+    to pngvalid to test the functionality (pngtest does not supply it,
+    deliberately).  The spurious "_EXPORTS" has been removed from the
+    libpng build (all these errors were a result of copy/paste between project
+    configurations.)
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

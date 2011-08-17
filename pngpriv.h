@@ -44,7 +44,8 @@
  */
 #include <stdlib.h>
 
-#define PNGLIB_BUILD
+#define PNGLIB_BUILD /*libpng is being built, not used*/
+
 #ifdef PNG_USER_CONFIG
 #  include "pngusr.h"
    /* These should have been defined in pngusr.h */
@@ -55,9 +56,79 @@
 #    define PNG_USER_DLLFNAME_POSTFIX "Cb"
 #  endif
 #endif
+
+/* Is this a build of a DLL where compilation of the object modules requires
+ * different preprocessor settings to those required for a simple library?  If
+ * so PNG_BUILD_DLL must be set.
+ *
+ * If libpng is used inside a DLL but that DLL does not export the libpng APIs
+ * PNG_BUILD_DLL must not be set.  To avoid the code below kicking in build a
+ * static library of libpng then link the DLL against that.
+ */
+#ifndef PNG_BUILD_DLL
+#  ifdef DLL_EXPORT
+      /* This is set by libtool when files are compiled for a DLL; libtool
+       * always compiles twice, even on systems where it isn't necessary.  Set
+       * PNG_BUILD_DLL in case it is necessary:
+       */
+#     define PNG_BUILD_DLL
+#  else
+#     ifdef _WINDLL
+         /* This is set by the Microsoft Visual Studio IDE in projects that
+          * build a DLL.  It can't easily be removed from those projects (it
+          * isn't visible in the Visual Studio UI) so it is a fairly reliable
+          * indication that PNG_IMPEXP needs to be set to the DLL export
+          * attributes.
+          */
+#        define PNG_BUILD_DLL
+#     else
+#        ifdef __DLL__
+            /* This is set by the Borland C system when compiling for a DLL
+             * (as above.)
+             */
+#           define PNG_BUILD_DLL
+#        else
+            /* Add additional compiler cases here. */
+#        endif
+#     endif
+#  endif
+#endif /* Setting PNG_BUILD_DLL if required */
+
+/* See pngconf.h for more details: the builder of the library may set this on
+ * the command line to the right thing for the specific compilation system or it
+ * may be automagically set above (at present we know of no system where it does
+ * need to be set on the command line.)
+ *
+ * PNG_IMPEXP must be set here when building the library to prevent pngconf.h
+ * setting it to the "import" setting for a DLL build.
+ */
+#ifndef PNG_IMPEXP
+#  ifdef PNG_BUILD_DLL
+#     define PNG_IMPEXP PNG_DLL_EXPORT
+#  else
+      /* Not building a DLL, or the DLL doesn't require specific export
+       * definitions.
+       */
+#     define PNG_IMPEXP
+#  endif
+#endif
+
+/* No warnings for private or deprecated functions in the build: */
+#ifndef PNG_DEPRECATED
+#  define PNG_DEPRECATED
+#endif
+#ifndef PNG_PRIVATE
+#  define PNG_PRIVATE
+#endif
+
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
+
+/* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
+#ifndef PNG_DLL_EXPORT
+#  define PNG_DLL_EXPORT
+#endif
 
 /* This is used for 16 bit gamma tables - only the top level pointers are const,
  * this could be changed:
@@ -1078,6 +1149,7 @@ PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
     unsigned long *hi_product, unsigned long *lo_product));
 #endif
 
+#ifdef PNG_cHRM_SUPPORTED
 /* Added at libpng version 1.4.0 */
 PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
