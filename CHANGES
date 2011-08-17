@@ -3546,6 +3546,8 @@ Version 1.5.5beta05 [August 17, 2011]
   Added new types and internal functions for CIE RGB end point handling to
     pngpriv.h (functions yet to be implemented).
 
+Version 1.5.5beta06 [August 17, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
