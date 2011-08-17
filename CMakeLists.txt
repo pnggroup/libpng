@@ -213,6 +213,15 @@ if(PNG_TESTS AND PNG_SHARED)
   add_test(pngtest ./pngtest ${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png)
 endif()
 
+# Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set
+IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+	IF(WIN32)
+		SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "bin")
+	ELSE(WIN32)
+		SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
+	ENDIF(WIN32)
+ENDIF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
+
 #
 # Set a variable with CMake code which:
 # Creates a symlink from src to dest (if possible) or alternatively

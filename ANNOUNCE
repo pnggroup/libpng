@@ -63,6 +63,8 @@ Version 1.5.5beta05 [August 17, 2011]
     pngpriv.h (functions yet to be implemented).
 
 Version 1.5.5beta06 [August 17, 2011]
+  Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set in CMakeLists.txt
+    (Clifford Yap)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
