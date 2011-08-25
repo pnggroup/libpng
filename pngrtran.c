@@ -4740,7 +4740,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 #endif
 
 #ifdef PNG_READ_EXPAND_16_SUPPORTED
-/* If the bit depth is 8 and the colour type is not a palette type expand the
+/* If the bit depth is 8 and the color type is not a palette type expand the
  * whole row to 16 bits.  Has no effect otherwise.
  */
 void /* PRIVATE */
