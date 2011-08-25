@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.5beta06 - August 17, 2011
+ * libpng version 1.5.5beta06 - August 25, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.5beta06 - August 17, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.5beta06 - August 25, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -189,7 +189,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.5beta06, August 17, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.5beta06, August 25, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -301,7 +301,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    August 17, 2011
+ *    August 25, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -364,7 +364,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.5beta06"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.5beta06 - August 17, 2011\n"
+     " libpng version 1.5.5beta06 - August 25, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -2048,6 +2048,10 @@ PNG_FP_EXPORT(133, png_uint_32, png_get_cHRM, (png_const_structp png_ptr,
    png_const_infop info_ptr, double *white_x, double *white_y, double *red_x,
     double *red_y, double *green_x, double *green_y, double *blue_x,
     double *blue_y));
+PNG_FP_EXPORT(230, png_uint_32, png_get_cHRM_XYZ, (png_structp png_ptr,
+    png_const_infop info_ptr, double *red_X, double *red_Y, double *red_Z,
+    double *green_X, double *green_Y, double *green_Z, double *blue_X,
+    double *blue_Y, double *blue_Z));
 #ifdef PNG_FIXED_POINT_SUPPORTED /* Otherwise not implemented */
 PNG_FIXED_EXPORT(134, png_uint_32, png_get_cHRM_fixed,
     (png_const_structp png_ptr,
@@ -2057,6 +2061,13 @@ PNG_FIXED_EXPORT(134, png_uint_32, png_get_cHRM_fixed,
     png_fixed_point *int_green_y, png_fixed_point *int_blue_x,
     png_fixed_point *int_blue_y));
 #endif
+PNG_FIXED_EXPORT(231, png_uint_32, png_get_cHRM_XYZ_fixed,
+    (png_structp png_ptr, png_const_infop info_ptr,
+    png_fixed_point *int_red_X, png_fixed_point *int_red_Y,
+    png_fixed_point *int_red_Z, png_fixed_point *int_green_X,
+    png_fixed_point *int_green_Y, png_fixed_point *int_green_Z,
+    png_fixed_point *int_blue_X, png_fixed_point *int_blue_Y,
+    png_fixed_point *int_blue_Z));
 #endif
 
 #ifdef PNG_cHRM_SUPPORTED
@@ -2064,12 +2075,22 @@ PNG_FP_EXPORT(135, void, png_set_cHRM,
     (png_structp png_ptr, png_infop info_ptr,
     double white_x, double white_y, double red_x, double red_y, double green_x,
     double green_y, double blue_x, double blue_y));
+PNG_FP_EXPORT(232, void, png_set_cHRM_XYZ, (png_structp png_ptr,
+    png_infop info_ptr, double red_X, double red_Y, double red_Z,
+    double green_X, double green_Y, double green_Z, double blue_X,
+    double blue_Y, double blue_Z));
 PNG_FIXED_EXPORT(136, void, png_set_cHRM_fixed, (png_structp png_ptr,
     png_infop info_ptr, png_fixed_point int_white_x,
     png_fixed_point int_white_y, png_fixed_point int_red_x,
     png_fixed_point int_red_y, png_fixed_point int_green_x,
     png_fixed_point int_green_y, png_fixed_point int_blue_x,
     png_fixed_point int_blue_y));
+PNG_FIXED_EXPORT(233, void, png_set_cHRM_XYZ_fixed, (png_structp png_ptr,
+    png_infop info_ptr, png_fixed_point int_red_X, png_fixed_point int_red_Y,
+    png_fixed_point int_red_Z, png_fixed_point int_green_X,
+    png_fixed_point int_green_Y, png_fixed_point int_green_Z,
+    png_fixed_point int_blue_X, png_fixed_point int_blue_Y,
+    png_fixed_point int_blue_Z));
 #endif
 
 #ifdef PNG_gAMA_SUPPORTED
@@ -2577,7 +2598,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(229);
+  PNG_EXPORT_LAST_ORDINAL(233);
 #endif
 
 #ifdef __cplusplus

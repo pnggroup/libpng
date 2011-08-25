@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta06 - August 17, 2011
+Libpng 1.5.5beta06 - August 25, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -62,9 +62,22 @@ Version 1.5.5beta05 [August 17, 2011]
   Added new types and internal functions for CIE RGB end point handling to
     pngpriv.h (functions yet to be implemented).
 
-Version 1.5.5beta06 [August 17, 2011]
+Version 1.5.5beta06 [August 25, 2011]
   Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set in CMakeLists.txt
     (Clifford Yap)
+  Fixes to rgb_to_gray and cHRM XYZ APIs (John Bowler):
+    The rgb_to_gray code had errors when combined with gamma correction.
+    Some pixels were treated as true grey when they weren't and such pixels
+    and true grey ones were not gamma corrected (the original value of the
+    red component was used instead).  APIs to get and set cHRM using color
+    space end points have been added and the rgb_to_gray code that defaults
+    based on cHRM (introduced in 1.5.4) has been corrected.   A considerable
+    number of tests has been added to pngvalid for the rgb_to_gray transform.
+    Arithmetic errors in rgb_to_gray whereby the calculated gray value was
+    truncated to the bit depth rather than rounded have been fixed except in
+    the 8-bit non-gamma-corrected case (where consistency seems more important
+    than correctness.)  The code still has considerable inaccuracies in the
+    8-bit case because 8-bit linear arithmetic is used.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

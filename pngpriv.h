@@ -1166,7 +1166,12 @@ typedef struct png_XYZ
    png_fixed_point blueX, blueY, blueZ;
 } png_XYZ;
 
-/* The conversion APIs return 0 on success, non-zero on a parameter error. */
+/* The conversion APIs return 0 on success, non-zero on a parameter error. They
+ * allow conversion between the above representations of a color encoding.  When
+ * converting from XYZ end points to chromaticities the absolute magnitude of
+ * the end points is lost, when converting back the sum of the Y values of the
+ * three end points will be 1.0
+ */
 PNG_EXTERN int png_xy_from_XYZ PNGARG((png_xy *xy, png_XYZ XYZ));
 PNG_EXTERN int png_XYZ_from_xy PNGARG((png_XYZ *XYZ, png_xy xy));
 PNG_EXTERN int png_XYZ_from_xy_checked PNGARG((png_structp png_ptr,

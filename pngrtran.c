@@ -968,13 +968,17 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
       {
          png_uint_16 red_int, green_int;
 
+         /* NOTE: this calculation does not round, but this behavior is retained
+          * for consistency, the inaccuracy is very small.  The code here always
+          * overwrites the coefficients, regardless of whether they have been
+          * defaulted or set already.
+          */
          red_int = (png_uint_16)(((png_uint_32)red*32768L)/100000L);
          green_int = (png_uint_16)(((png_uint_32)green*32768L)/100000L);
 
          png_ptr->rgb_to_gray_red_coeff   = red_int;
          png_ptr->rgb_to_gray_green_coeff = green_int;
-         png_ptr->rgb_to_gray_blue_coeff  =
-          (png_uint_16)(32768 - red_int - green_int);
+         png_ptr->rgb_to_gray_coefficients_set = 1;
       }
 
       else
@@ -983,17 +987,18 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
             png_warning(png_ptr,
                "ignoring out of range rgb_to_gray coefficients");
 
-         /* Use the defaults, from the cHRM chunk if set, else the built in Rec
-          * 709 values (which correspond to sRGB, so we don't have to worry
-          * about the sRGB chunk!)
+         /* Use the defaults, from the cHRM chunk if set, else the historical
+          * values which are close to the sRGB/HDTV/ITU-Rec 709 values.  See
+          * png_do_rgb_to_gray for more discussion of the values.  In this case
+          * the coefficients are not marked as 'set' and are not overwritten if
+          * something has already provided a default.
           */
          if (png_ptr->rgb_to_gray_red_coeff == 0 &&
-            png_ptr->rgb_to_gray_green_coeff == 0 &&
-            png_ptr->rgb_to_gray_blue_coeff == 0)
+            png_ptr->rgb_to_gray_green_coeff == 0)
          {
-            png_ptr->rgb_to_gray_red_coeff   = 6968;  /* .212671 * 32768 + .5 */
-            png_ptr->rgb_to_gray_green_coeff = 23434; /* .715160 * 32768 + .5 */
-            png_ptr->rgb_to_gray_blue_coeff  = 2366;
+            png_ptr->rgb_to_gray_red_coeff   = 6968;
+            png_ptr->rgb_to_gray_green_coeff = 23434;
+            /* png_ptr->rgb_to_gray_blue_coeff  = 2366; */
          }
       }
    }
@@ -1401,7 +1406,7 @@ png_init_read_transformations(png_structp png_ptr)
    if (png_ptr->transformations & PNG_BACKGROUND_EXPAND)
    {
       /* PNG_BACKGROUND_EXPAND: the background is in the file color space, so if
-       * the file was greyscale the background value is gray.
+       * the file was grayscale the background value is gray.
        */
       if (!(png_ptr->color_type & PNG_COLOR_MASK_COLOR))
          png_ptr->mode |= PNG_BACKGROUND_IS_GRAY;
@@ -3089,26 +3094,38 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  *
  *     Y = (6966 * R + 23436 * G + 2366 * B)/32768
  *
- *  We use the approximation
+ *  Historically, however, libpng uses numbers derived from the ITU-R Rec 709
+ *  end point chromaticities and the D65 white point.  Depending on the
+ *  precision used for the D65 white point this produces a variety of different
+ *  numbers, however if the four decimal place value used in ITU-R Rec 709 is
+ *  used (0.3127,0.3290) the Y calculation would be:
+ *
+ *     Y = (6968 * R + 23435 * G + 2366 * B)/32768
+ *
+ *  While this is correct the rounding results in an overflow for white, because
+ *  the sum of the rounded coefficients is 32769, not 32768.  Consequently
+ *  libpng uses, instead, the closest non-overflowing approximation:
  *
  *     Y = (6968 * R + 23434 * G + 2366 * B)/32768
  *
- *  Starting with libpng-1.5.4, if the image being converted has the
- *  sRGB chunk, then the sRGB numbers are used by default:
+ *  Starting with libpng-1.5.5, if the image being converted has a cHRM chunk
+ *  (including an sRGB chunk) then the chromaticities are used to calculate the
+ *  coefficients.  See the chunk handling in pngrutil.c for more information.
  *
- *     Y = 0.33000*R + 0.60000*G + 0.06000*B
+ *  In all cases the calculation is to be done in a linear colorspace.  If no
+ *  gamma information is available to correct the encoding of the original RGB
+ *  values this results in an implicit assumption that the original PNG RGB
+ *  values were linear.
  *
- *  The calculation is to be done in a linear colorspace.
- *
- *  Other integer coefficents can be used via png_set_rgb_to_gray().
+ *  Other integer coefficents can be used via png_set_rgb_to_gray().  Because
+ *  the API takes just red and green coefficients the blue coefficient is
+ *  calculated to make the sum 32768.  This will result in different rounding
+ *  to that used above.
  */
 int /* PRIVATE */
 png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
 
 {
-   png_uint_32 i;
-
-   png_uint_32 row_width = row_info->width;
    int rgb_error = 0;
 
    png_debug(1, "in png_do_rgb_to_gray");
@@ -3116,234 +3133,179 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
    if (!(row_info->color_type & PNG_COLOR_MASK_PALETTE) &&
        (row_info->color_type & PNG_COLOR_MASK_COLOR))
    {
-      png_uint_32 rc = png_ptr->rgb_to_gray_red_coeff;
-      png_uint_32 gc = png_ptr->rgb_to_gray_green_coeff;
-      png_uint_32 bc = png_ptr->rgb_to_gray_blue_coeff;
+      PNG_CONST png_uint_32 rc = png_ptr->rgb_to_gray_red_coeff;
+      PNG_CONST png_uint_32 gc = png_ptr->rgb_to_gray_green_coeff;
+      PNG_CONST png_uint_32 bc = 32768 - rc - gc;
+      PNG_CONST png_uint_32 row_width = row_info->width;
+      PNG_CONST int have_alpha =
+         (row_info->color_type & PNG_COLOR_MASK_ALPHA) != 0;
 
-      if (row_info->color_type == PNG_COLOR_TYPE_RGB)
+      if (row_info->bit_depth == 8)
       {
-         if (row_info->bit_depth == 8)
-         {
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-            if (png_ptr->gamma_from_1 != NULL && png_ptr->gamma_to_1 != NULL)
+         /* Notice that gamma to/from 1 are not necessarily inverses (if
+          * there is an overall gamma correction).  Prior to 1.5.5 this code
+          * checked the linearized values for equality; this doesn't match
+          * the documentation, the original values must be checked.
+          */
+         if (png_ptr->gamma_from_1 != NULL && png_ptr->gamma_to_1 != NULL)
+         {
+            png_bytep sp = row;
+            png_bytep dp = row;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
             {
-               png_bytep sp = row;
-               png_bytep dp = row;
+               png_byte red   = *(sp++);
+               png_byte green = *(sp++);
+               png_byte blue  = *(sp++);
 
-               for (i = 0; i < row_width; i++)
+               if (red != green || red != blue)
                {
-                  png_byte red   = png_ptr->gamma_to_1[*(sp++)];
-                  png_byte green = png_ptr->gamma_to_1[*(sp++)];
-                  png_byte blue  = png_ptr->gamma_to_1[*(sp++)];
+                  red = png_ptr->gamma_to_1[red];
+                  green = png_ptr->gamma_to_1[green];
+                  blue = png_ptr->gamma_to_1[blue];
 
-                  if (red != green || red != blue)
-                  {
-                     rgb_error |= 1;
-                     *(dp++) = png_ptr->gamma_from_1[
-                         (rc*red + gc*green + bc*blue)>>15];
-                  }
-
-                  else
-                     *(dp++) = *(sp - 1);
+                  rgb_error |= 1;
+                  *(dp++) = png_ptr->gamma_from_1[
+                      (rc*red + gc*green + bc*blue + 16384)>>15];
                }
-            }
-            else
-#endif
-            {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
+
+               else
                {
-                  png_byte red   = *(sp++);
-                  png_byte green = *(sp++);
-                  png_byte blue  = *(sp++);
+                  /* If there is no overall correction the table will not be
+                   * set.
+                   */
+                  if (png_ptr->gamma_table != NULL)
+                     red = png_ptr->gamma_table[red];
 
-                  if (red != green || red != blue)
-                  {
-                     rgb_error |= 1;
-                     *(dp++) = (png_byte)((rc*red + gc*green + bc*blue)>>15);
-                  }
-
-                  else
-                     *(dp++) = *(sp - 1);
+                  *(dp++) = red;
                }
+
+               if (have_alpha)
+                  *(dp++) = *(sp++);
             }
          }
-
-         else /* RGB bit_depth == 16 */
+         else
+#endif
          {
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-            if (png_ptr->gamma_16_to_1 != NULL &&
-                png_ptr->gamma_16_from_1 != NULL)
+            png_bytep sp = row;
+            png_bytep dp = row;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
             {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
+               png_byte red   = *(sp++);
+               png_byte green = *(sp++);
+               png_byte blue  = *(sp++);
+
+               if (red != green || red != blue)
                {
-                  png_uint_16 red, green, blue, w;
+                  rgb_error |= 1;
+                  /*NOTE: this is the historical approach which simply
+                   * truncates the results.
+                   */
+                  *(dp++) = (png_byte)((rc*red + gc*green + bc*blue)>>15);
+               }
 
-                  red   = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-                  green = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-                  blue  = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+               else
+                  *(dp++) = red;
 
-                  if (red == green && red == blue)
-                     w = red;
+               if (have_alpha)
+                  *(dp++) = *(sp++);
+            }
+         }
+      }
 
-                  else
-                  {
-                     png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red&0xff)
+      else /* RGB bit_depth == 16 */
+      {
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
+         if (png_ptr->gamma_16_to_1 != NULL && png_ptr->gamma_16_from_1 != NULL)
+         {
+            png_bytep sp = row;
+            png_bytep dp = row;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
+            {
+               png_uint_16 red, green, blue, w;
+
+               red   = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+               green = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+               blue  = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+
+               if (red == green && red == blue)
+               {
+                  if (png_ptr->gamma_16_table != NULL)
+                     w = png_ptr->gamma_16_table[(red&0xff)
                          >> png_ptr->gamma_shift][red>>8];
-                     png_uint_16 green_1 =
-                         png_ptr->gamma_16_to_1[(green&0xff) >>
-                         png_ptr->gamma_shift][green>>8];
-                     png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff)
-                         >> png_ptr->gamma_shift][blue>>8];
-                     png_uint_16 gray16  = (png_uint_16)((rc*red_1 + gc*green_1
-                         + bc*blue_1)>>15);
-                     w = png_ptr->gamma_16_from_1[(gray16&0xff) >>
-                         png_ptr->gamma_shift][gray16 >> 8];
-                     rgb_error |= 1;
-                  }
-
-                  *(dp++) = (png_byte)((w>>8) & 0xff);
-                  *(dp++) = (png_byte)(w & 0xff);
-               }
-            }
-            else
-#endif
-            {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
-               {
-                  png_uint_16 red, green, blue, gray16;
-
-                  red   = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-                  green = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-                  blue  = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-
-                  if (red != green || red != blue)
-                     rgb_error |= 1;
-
-                  gray16  = (png_uint_16)((rc*red + gc*green + bc*blue)>>15);
-                  *(dp++) = (png_byte)((gray16>>8) & 0xff);
-                  *(dp++) = (png_byte)(gray16 & 0xff);
-               }
-            }
-         }
-      }
-      if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-      {
-         if (row_info->bit_depth == 8)
-         {
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-            if (png_ptr->gamma_from_1 != NULL && png_ptr->gamma_to_1 != NULL)
-            {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
-               {
-                  png_byte red   = png_ptr->gamma_to_1[*(sp++)];
-                  png_byte green = png_ptr->gamma_to_1[*(sp++)];
-                  png_byte blue  = png_ptr->gamma_to_1[*(sp++)];
-
-                  if (red != green || red != blue)
-                     rgb_error |= 1;
-
-                  *(dp++) =  png_ptr->gamma_from_1
-                      [(rc*red + gc*green + bc*blue)>>15];
-
-                  *(dp++) = *(sp++);  /* alpha */
-               }
-            }
-            else
-#endif
-            {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
-               {
-                  png_byte red   = *(sp++);
-                  png_byte green = *(sp++);
-                  png_byte blue  = *(sp++);
-                  if (red != green || red != blue)
-                     rgb_error |= 1;
-
-                  *(dp++) =  (png_byte)((rc*red + gc*green + bc*blue)>>15);
-                  *(dp++) = *(sp++);  /* alpha */
-               }
-            }
-         }
-         else /* RGBA bit_depth == 16 */
-         {
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
-            if (png_ptr->gamma_16_to_1 != NULL &&
-                png_ptr->gamma_16_from_1 != NULL)
-            {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
-               {
-                  png_uint_16 red, green, blue, w;
-
-                  red   = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-                  green = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-                  blue  = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
-
-                  if (red == green && red == blue)
-                     w = red;
 
                   else
-                  {
-                     png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red&0xff) >>
-                         png_ptr->gamma_shift][red>>8];
+                     w = red;
+               }
 
-                     png_uint_16 green_1 =
-                         png_ptr->gamma_16_to_1[(green&0xff) >>
-                         png_ptr->gamma_shift][green>>8];
+               else
+               {
+                  png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red&0xff)
+                      >> png_ptr->gamma_shift][red>>8];
+                  png_uint_16 green_1 =
+                      png_ptr->gamma_16_to_1[(green&0xff) >>
+                      png_ptr->gamma_shift][green>>8];
+                  png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff)
+                      >> png_ptr->gamma_shift][blue>>8];
+                  png_uint_16 gray16  = (png_uint_16)((rc*red_1 + gc*green_1
+                      + bc*blue_1 + 16384)>>15);
+                  w = png_ptr->gamma_16_from_1[(gray16&0xff) >>
+                      png_ptr->gamma_shift][gray16 >> 8];
+                  rgb_error |= 1;
+               }
 
-                     png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff) >>
-                         png_ptr->gamma_shift][blue>>8];
+               *(dp++) = (png_byte)((w>>8) & 0xff);
+               *(dp++) = (png_byte)(w & 0xff);
 
-                     png_uint_16 gray16  = (png_uint_16)((rc * red_1
-                         + gc * green_1 + bc * blue_1)>>15);
-
-                     w = png_ptr->gamma_16_from_1[(gray16&0xff) >>
-                         png_ptr->gamma_shift][gray16 >> 8];
-
-                     rgb_error |= 1;
-                  }
-
-                  *(dp++) = (png_byte)((w>>8) & 0xff);
-                  *(dp++) = (png_byte)(w & 0xff);
-                  *(dp++) = *(sp++);  /* alpha */
+               if (have_alpha)
+               {
+                  *(dp++) = *(sp++);
                   *(dp++) = *(sp++);
                }
             }
-            else
+         }
+         else
 #endif
+         {
+            png_bytep sp = row;
+            png_bytep dp = row;
+            png_uint_32 i;
+
+            for (i = 0; i < row_width; i++)
             {
-               png_bytep sp = row;
-               png_bytep dp = row;
-               for (i = 0; i < row_width; i++)
+               png_uint_16 red, green, blue, gray16;
+
+               red   = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+               green = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+               blue  = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+
+               if (red != green || red != blue)
+                  rgb_error |= 1;
+
+               /* From 1.5.5 in the 16 bit case do the accurate convertion even
+                * in the 'fast' case - this is because this is where the code
+                * ends up when handling linear 16 bit data.
+                */
+               gray16  = (png_uint_16)((rc*red + gc*green + bc*blue + 16384) >>
+                  15);
+               *(dp++) = (png_byte)((gray16>>8) & 0xff);
+               *(dp++) = (png_byte)(gray16 & 0xff);
+
+               if (have_alpha)
                {
-                  png_uint_16 red, green, blue, gray16;
-                  red   = (png_uint_16)((*(sp)<<8) | *(sp + 1)); sp += 2;
-                  green = (png_uint_16)((*(sp)<<8) | *(sp + 1)); sp += 2;
-                  blue  = (png_uint_16)((*(sp)<<8) | *(sp + 1)); sp += 2;
-
-                  if (red != green || red != blue)
-                     rgb_error |= 1;
-
-                  gray16  = (png_uint_16)((rc*red + gc*green + bc*blue)>>15);
-                  *(dp++) = (png_byte)((gray16>>8) & 0xff);
-                  *(dp++) = (png_byte)(gray16 & 0xff);
-                  *(dp++) = *(sp++);  /* alpha */
+                  *(dp++) = *(sp++);
                   *(dp++) = *(sp++);
                }
             }
          }
       }
+
       row_info->channels -= 2;
       row_info->color_type = (png_byte)(row_info->color_type &
           ~PNG_COLOR_MASK_COLOR);

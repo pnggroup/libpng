@@ -64,6 +64,39 @@ png_set_cHRM_fixed(png_structp png_ptr, png_infop info_ptr,
    }
 }
 
+void PNGFAPI
+png_set_cHRM_XYZ_fixed(png_structp png_ptr, png_infop info_ptr,
+    png_fixed_point int_red_X, png_fixed_point int_red_Y,
+    png_fixed_point int_red_Z, png_fixed_point int_green_X,
+    png_fixed_point int_green_Y, png_fixed_point int_green_Z,
+    png_fixed_point int_blue_X, png_fixed_point int_blue_Y,
+    png_fixed_point int_blue_Z)
+{
+   png_XYZ XYZ;
+   png_xy xy;
+
+   png_debug1(1, "in %s storage function", "cHRM XYZ fixed");
+
+   if (png_ptr == NULL || info_ptr == NULL)
+      return;
+
+   XYZ.redX = int_red_X;
+   XYZ.redY = int_red_Y;
+   XYZ.redZ = int_red_Z;
+   XYZ.greenX = int_green_X;
+   XYZ.greenY = int_green_Y;
+   XYZ.greenZ = int_green_Z;
+   XYZ.blueX = int_blue_X;
+   XYZ.blueY = int_blue_Y;
+   XYZ.blueZ = int_blue_Z;
+
+   if (png_xy_from_XYZ(&xy, XYZ))
+      png_error(png_ptr, "XYZ values out of representable range");
+
+   png_set_cHRM_fixed(png_ptr, info_ptr, xy.whitex, xy.whitey, xy.redx, xy.redy,
+      xy.greenx, xy.greeny, xy.bluex, xy.bluey);
+}
+
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
@@ -79,6 +112,23 @@ png_set_cHRM(png_structp png_ptr, png_infop info_ptr,
       png_fixed(png_ptr, green_y, "cHRM Green Y"),
       png_fixed(png_ptr, blue_x, "cHRM Blue X"),
       png_fixed(png_ptr, blue_y, "cHRM Blue Y"));
+}
+
+void PNGAPI
+png_set_cHRM_XYZ(png_structp png_ptr, png_infop info_ptr, double red_X,
+    double red_Y, double red_Z, double green_X, double green_Y, double green_Z,
+    double blue_X, double blue_Y, double blue_Z)
+{
+   png_set_cHRM_XYZ_fixed(png_ptr, info_ptr,
+      png_fixed(png_ptr, red_X, "cHRM Red X"),
+      png_fixed(png_ptr, red_Y, "cHRM Red Y"),
+      png_fixed(png_ptr, red_Z, "cHRM Red Z"),
+      png_fixed(png_ptr, green_X, "cHRM Red X"),
+      png_fixed(png_ptr, green_Y, "cHRM Red Y"),
+      png_fixed(png_ptr, green_Z, "cHRM Red Z"),
+      png_fixed(png_ptr, blue_X, "cHRM Red X"),
+      png_fixed(png_ptr, blue_Y, "cHRM Red Y"),
+      png_fixed(png_ptr, blue_Z, "cHRM Red Z"));
 }
 #  endif /* PNG_FLOATING_POINT_SUPPORTED */
 
