@@ -139,8 +139,8 @@ static PNG_CONST char sep[] = ": ";
 
 static PNG_CONST char *colour_types[8] =
 {
-   "greyscale", invalid, "truecolour", "indexed-colour",
-   "greyscale with alpha", invalid, "truecolour with alpha", invalid
+   "grayscale", invalid, "truecolour", "indexed-colour",
+   "grayscale with alpha", invalid, "truecolour with alpha", invalid
 };
 
 /* Convert a double precision value to fixed point. */
@@ -1898,7 +1898,7 @@ static double outerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
    /* There is a serious error in the 2 and 4 bit grayscale transform because
     * the gamma table value (8 bits) is simply shifted, not rounded, so the
-    * error in 4 bit greyscale gamma is up to the value below.  This is a hack
+    * error in 4 bit grayscale gamma is up to the value below.  This is a hack
     * to allow pngvalid to succeed:
     *
     * TODO: fix this in libpng
@@ -2791,7 +2791,7 @@ make_standard_palette(png_store* ps, int npalette, int do_tRNS)
       values[i][3] = (i&4) ? 255 : 0;
    }
 
-   /* Then add 62 greys (one quarter of the remaining 256 slots). */
+   /* Then add 62 grays (one quarter of the remaining 256 slots). */
    {
       int j = 0;
       png_byte random_bytes[4];
@@ -2822,7 +2822,7 @@ make_standard_palette(png_store* ps, int npalette, int do_tRNS)
    }
 
    /* Finally add 192 colors at random - don't worry about matches to things we
-    * already have, chance is less than 1/65536.  Don't worry about greys,
+    * already have, chance is less than 1/65536.  Don't worry about grays,
     * chance is the same, so we get a duplicate or extra gray less than 1 time
     * in 170.
     */
@@ -4691,7 +4691,7 @@ perform_size_test(png_modifier *pm)
       return;
 
    /* For the moment don't do the palette test - it's a waste of time when
-    * compared to the greyscale test.
+    * compared to the grayscale test.
     */
 #if 0
    if (!test_size(pm, 3, 0, 3))
@@ -8024,8 +8024,8 @@ gamma_image_validate(gamma_display *dp, png_structp pp, png_infop pi)
                }
             }
 
-            /* Handle greyscale or RGB components. */
-            if ((in_ct & PNG_COLOR_MASK_COLOR) == 0) /* greyscale */
+            /* Handle grayscale or RGB components. */
+            if ((in_ct & PNG_COLOR_MASK_COLOR) == 0) /* grayscale */
                (void)gamma_component_validate("gray", &vi,
                   sample(std, in_ct, in_bd, x, 0),
                   sample(pRow, out_ct, out_bd, x, 0), alpha/*component*/,
