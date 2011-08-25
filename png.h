@@ -2304,7 +2304,7 @@ PNG_EXPORT(171, void, png_set_sCAL_s,
    handling or default unknown chunk handling is not desired.  Any chunks not
    listed will be handled in the default manner.  The IHDR and IEND chunks
    must not be listed.
-      keep = 0: follow default behaviour
+      keep = 0: follow default behavior
            = 1: do not keep
            = 2: keep only if safe-to-copy
            = 3: keep even if unsafe-to-copy

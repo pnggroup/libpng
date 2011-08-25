@@ -43,7 +43,7 @@ png_set_sig_bytes(png_structp png_ptr, int num_bytes)
  * can simply check the remaining bytes for extra assurance.  Returns
  * an integer less than, equal to, or greater than zero if sig is found,
  * respectively, to be less than, to match, or be greater than the correct
- * PNG signature (this is the same behaviour as strcmp, memcmp, etc).
+ * PNG signature (this is the same behavior as strcmp, memcmp, etc).
  */
 int PNGAPI
 png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
