@@ -235,3 +235,7 @@ EXPORTS
  png_set_alpha_mode @227
  png_set_alpha_mode_fixed @228
  png_set_scale_16 @229
+ png_get_cHRM_XYZ @230
+ png_get_cHRM_XYZ_fixed @231
+ png_set_cHRM_XYZ @232
+ png_set_cHRM_XYZ_fixed @233
