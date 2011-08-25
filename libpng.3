@@ -2119,6 +2119,28 @@ pointer into the info_ptr is returned for any complex types.
     int_file_gamma - 100,000 times the gamma at which the
                      file is written
 
+    png_get_cHRM(png_ptr, info_ptr,  &white_x, &white_y, &red_x, &red_y,
+                     &green_x, &green_y, &blue_x, &blue_y)
+    png_get_cHRM_XYZ(png_ptr, info_ptr, &red_X, &red_Y, &red_Z, &green_X,
+                     &green_Y, &green_Z, &blue_X, &blue_Y, &blue_Z)
+    png_get_cHRM_fixed(png_ptr, info_ptr, &int_white_x, &int_white_y,
+                     &int_red_x, &int_red_y, &int_green_x, &int_green_y,
+                     &int_blue_x, &int_blue_y)
+    png_get_cHRM_XYZ_fixed(png_ptr, info_ptr, &int_red_X, &int_red_Y,
+                     &int_red_Z, &int_green_X, &int_green_Y, &int_green_Z,
+                     &int_blue_X, &int_blue_Y, &int_blue_Z)
+
+    {white,red,green,blue}_{x,y}
+                     A color space encoding specified using the chromaticities
+                     of the end points and the white point. (PNG_INFO_cHRM)
+
+    {red,green,blue}_{X,Y,Z}
+                     A color space encoding specified using the encoding end
+                     points - the CIE tristimulus specification of the intended
+                     color of the red, green and blue channels in the PNG RGB
+                     data.  The white point is simply the sum of the three end
+                     points. (PNG_INFO_cHRM)
+
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
 
     file_srgb_intent - the rendering intent (PNG_INFO_sRGB)
@@ -3668,6 +3690,28 @@ width, height, bit_depth, and color_type must be the same in each call.
 
     int_file_gamma - 100,000 times the gamma at which
                      the image was created
+
+    png_set_cHRM(png_ptr, info_ptr,  white_x, white_y, red_x, red_y,
+                     green_x, green_y, blue_x, blue_y)
+    png_set_cHRM_XYZ(png_ptr, info_ptr, red_X, red_Y, red_Z, green_X,
+                     green_Y, green_Z, blue_X, blue_Y, blue_Z)
+    png_set_cHRM_fixed(png_ptr, info_ptr, int_white_x, int_white_y,
+                     int_red_x, int_red_y, int_green_x, int_green_y,
+                     int_blue_x, int_blue_y)
+    png_set_cHRM_XYZ_fixed(png_ptr, info_ptr, int_red_X, int_red_Y,
+                     int_red_Z, int_green_X, int_green_Y, int_green_Z,
+                     int_blue_X, int_blue_Y, int_blue_Z)
+
+    {white,red,green,blue}_{x,y}
+                     A color space encoding specified using the chromaticities
+                     of the end points and the white point.
+
+    {red,green,blue}_{X,Y,Z}
+                     A color space encoding specified using the encoding end
+                     points - the CIE tristimulus specification of the intended
+                     color of the red, green and blue channels in the PNG RGB
+                     data.  The white point is simply the sum of the three end
+                     points.
 
     png_set_sRGB(png_ptr, info_ptr, srgb_intent);
 
