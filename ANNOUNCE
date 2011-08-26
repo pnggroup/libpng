@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta06 - August 25, 2011
+Libpng 1.5.5beta07 - August 26, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.5beta06.tar.xz (LZMA-compressed, recommended)
-   1.5.5beta06.tar.gz
-   1.5.5beta06.tar.bz2
+   1.5.5beta07.tar.xz (LZMA-compressed, recommended)
+   1.5.5beta07.tar.gz
+   1.5.5beta07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp155b06.7z  (LZMA-compressed, recommended)
-   lp155b06.zip
+   lp155b07.7z  (LZMA-compressed, recommended)
+   lp155b07.zip
 
 Other information:
 
-   1.5.5beta06-README.txt
-   1.5.5beta06-LICENSE.txt
+   1.5.5beta07-README.txt
+   1.5.5beta07-LICENSE.txt
 
 Changes since the last public release (1.5.4):
 
@@ -62,7 +62,7 @@ Version 1.5.5beta05 [August 17, 2011]
   Added new types and internal functions for CIE RGB end point handling to
     pngpriv.h (functions yet to be implemented).
 
-Version 1.5.5beta06 [August 25, 2011]
+Version 1.5.5beta06 [August 26, 2011]
   Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set in CMakeLists.txt
     (Clifford Yap)
   Fixes to rgb_to_gray and cHRM XYZ APIs (John Bowler):
@@ -78,6 +78,8 @@ Version 1.5.5beta06 [August 25, 2011]
     the 8-bit non-gamma-corrected case (where consistency seems more important
     than correctness.)  The code still has considerable inaccuracies in the
     8-bit case because 8-bit linear arithmetic is used.
+
+Version 1.5.5beta07 [August 26, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
