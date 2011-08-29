@@ -3998,8 +3998,8 @@ read_palette(store_palette palette, int *npalette, png_structp pp, png_infop pi)
    if ((png_get_tRNS(pp, pi, &trans_alpha, &num, 0) & PNG_INFO_tRNS) != 0 &&
       (trans_alpha != NULL || num != 1/*returns 1 for a transparent color*/) &&
       /* Oops, if a palette tRNS gets expanded png_read_update_info (at least so
-       * far as 1.5.4) does not zap the trans_alpha pointer, only num_trans, so
-       * in the above call we get a success, we get a pointer (who knows what
+       * far as 1.5.4) does not remove the trans_alpha pointer, only num_trans,
+       * so in the above call we get a success, we get a pointer (who knows what
        * to) and we get num_trans == 0:
        */
       !(trans_alpha != NULL && num == 0)) /* TODO: fix this in libpng. */
@@ -6419,7 +6419,7 @@ image_transform_png_set_rgb_to_gray_mod(PNG_CONST image_transform *this,
           * 1/32768, because even in the rounding case the requirement that
           * coefficients add up to 32768 can cause a larger rounding error.
           *
-          * The only time when rounding doesn occur in 1.5.5 and later is when
+          * The only time when rounding doesn't occur in 1.5.5 and later is when
           * the non-gamma code path is used for less than 16 bit data.
           */
          gray = r * data.red_coefficient + g * data.green_coefficient +
@@ -6492,7 +6492,7 @@ image_transform_png_set_rgb_to_gray_mod(PNG_CONST image_transform *this,
          that->red_sBIT = that->blue_sBIT;
       that->blue_sBIT = that->green_sBIT = that->red_sBIT;
 
-      /* And zap the colour bit in the type: */
+      /* And remove the colour bit in the type: */
       if (that->colour_type == PNG_COLOR_TYPE_RGB)
          that->colour_type = PNG_COLOR_TYPE_GRAY;
       else if (that->colour_type == PNG_COLOR_TYPE_RGB_ALPHA)

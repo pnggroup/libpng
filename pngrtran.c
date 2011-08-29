@@ -1640,7 +1640,7 @@ png_init_read_transformations(png_structp png_ptr)
 
             /* Prevent the transformations being done again.
              *
-             * NOTE: this is highly dubious; it zaps the transformations in
+             * NOTE: this is highly dubious; it removes the transformations in
              * place.  This seems inconsistent with the general treatment of the
              * transformations elsewhere.
              */
