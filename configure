@@ -624,6 +624,8 @@ PNGLIB_VERSION
 SYMBOL_PREFIX
 HAVE_LD_VERSION_SCRIPT_FALSE
 HAVE_LD_VERSION_SCRIPT_TRUE
+HAVE_SOLARIS_LD_FALSE
+HAVE_SOLARIS_LD_TRUE
 LIBPNG_DEFINES
 LIBOBJS
 POW_LIB
@@ -763,8 +765,7 @@ CFLAGS
 LDFLAGS
 LIBS
 CPPFLAGS
-CPP
-CPPFLAGS'
+CPP'
 
 
 # Initialize some variables set by options.
@@ -12418,7 +12419,37 @@ case $host in
 $as_echo "no" >&6; }
 ;;
 * )
-GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if using Solaris linker" >&5
+$as_echo_n "checking if using Solaris linker... " >&6; }
+SLD=`$LD --version 2>&1 | grep Solaris`
+if test "$SLD"; then
+    have_solaris_ld=yes
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+    have_solaris_ld=no
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+ if test "$have_solaris_ld" = "yes"; then
+  HAVE_SOLARIS_LD_TRUE=
+  HAVE_SOLARIS_LD_FALSE='#'
+else
+  HAVE_SOLARIS_LD_TRUE='#'
+  HAVE_SOLARIS_LD_FALSE=
+fi
+
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking if libraries can be versioned" >&5
+$as_echo_n "checking if libraries can be versioned... " >&6; }
+if test "$have_solaris_ld" = "yes"; then
+    GLD=`$LD --help < /dev/null 2>&1 | grep 'M mapfile'`
+else
+    GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
+fi
+
+ if test "$GLD"; then
 if test "$GLD"; then
     have_ld_version_script=yes
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -12625,6 +12656,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCC_TRUE}" && test -z "${am__fastdepCC_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SOLARIS_LD_TRUE}" && test -z "${HAVE_SOLARIS_LD_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SOLARIS_LD\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LD_VERSION_SCRIPT_TRUE}" && test -z "${HAVE_LD_VERSION_SCRIPT_FALSE}"; then

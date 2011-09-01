@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta07 - August 29, 2011
+Libpng 1.5.5beta07 - September 1, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -79,8 +79,9 @@ Version 1.5.5beta06 [August 26, 2011]
     than correctness.)  The code still has considerable inaccuracies in the
     8-bit case because 8-bit linear arithmetic is used.
 
-Version 1.5.5beta07 [August 29, 2011]
+Version 1.5.5beta07 [September 1, 2011]
     Added "$(ARCH)" option to makefile.darwin
+    Added SunOS support to configure.ac and Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

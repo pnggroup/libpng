@@ -44,11 +44,16 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined -export-dynamic \
 	-version-number @PNGLIB_MAJOR@@PNGLIB_MINOR@:@PNGLIB_RELEASE@:0
 
 if HAVE_LD_VERSION_SCRIPT
-  # Versioned symbols and restricted exports
+#   Versioned symbols and restricted exports
+if HAVE_SOLARIS_LD
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -Wl,-M -Ll,libpng.vers
+else
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -Wl,--version-script=libpng.vers
+endif
+
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.vers
 else
-  # Only restricted exports when possible
+#   Only restricted exports when possible
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS += -export-symbols libpng.sym
   libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
 endif
@@ -120,8 +125,8 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 pngvalid.o pngtest.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
-# be built with PNG_USE_READ_MACROS; this stops the read macros interfering
-# with the symbol file format.
+# be built with PNG_USE_READ_MACROS; this prevents the read macros from
+# interfering with the symbol file format.
 SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'\
