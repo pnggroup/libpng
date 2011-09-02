@@ -116,14 +116,12 @@ else
 fi
 AM_CONDITIONAL(HAVE_SOLARIS_LD, test "$have_solaris_ld" = "yes")
 
- AC_MSG_CHECKING([if libraries can be versioned])
 if test "$have_solaris_ld" = "yes"; then
     GLD=`$LD --help < /dev/null 2>&1 | grep 'M mapfile'`
 else
     GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
 fi
 
- if test "$GLD"; then
 if test "$GLD"; then
     have_ld_version_script=yes
     AC_MSG_RESULT(yes)

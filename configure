@@ -12441,15 +12441,12 @@ else
 fi
 
 
- { $as_echo "$as_me:${as_lineno-$LINENO}: checking if libraries can be versioned" >&5
-$as_echo_n "checking if libraries can be versioned... " >&6; }
 if test "$have_solaris_ld" = "yes"; then
     GLD=`$LD --help < /dev/null 2>&1 | grep 'M mapfile'`
 else
     GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
 fi
 
- if test "$GLD"; then
 if test "$GLD"; then
     have_ld_version_script=yes
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
