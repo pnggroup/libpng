@@ -8,7 +8,6 @@ Copyright (C) 2004 Simon-Pierre Cadieux.
 Copyright (C) 2004 Cosmin Truta.
 For conditions of distribution and use, see copyright notice in zlib.h.
 
-
 To use:
 
 1) On the main menu, select "File | Open Solution".

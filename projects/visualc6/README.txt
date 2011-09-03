@@ -4,12 +4,10 @@ Copyright (C) 2000-2004 Simon-Pierre Cadieux.
 Copyright (C) 2004 Cosmin Truta.
 For conditions of distribution and use, see copyright notice in png.h
 
-
 Assumptions:
 * The libpng source files are in ..\..
 * The zlib source files are in ..\..\..\zlib
 * The zlib project files are in ..\..\..\zlib\projects\visualc6
-
 
 To use:
 
@@ -28,7 +26,6 @@ To use:
 5) If you built the sample program (pngtest),
    select "Build | Execute ... (Ctrl+F5)".
 
-
 This project builds the libpng binaries as follows:
 
 * Win32_DLL_Release\libpng13.dll      DLL build
@@ -40,7 +37,6 @@ This project builds the libpng binaries as follows:
 * Win32_LIB_Debug\libpngd.lib         static build (debug version)
 * Win32_LIB_ASM_Release\libpng.lib    static build using ASM code
 * Win32_LIB_ASM_Debug\libpngd.lib     static build using ASM (debug version)
-
 
 Notes:
 
