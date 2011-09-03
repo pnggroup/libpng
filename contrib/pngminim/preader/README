@@ -1,14 +1,15 @@
 This demonstrates the use of PNG_USER_CONFIG and pngusr.h
 
-To build a minimal read-only progressive decoder embedded libpng and
-zlib and with your system's X library, run
+The makefile builds a minimal read-only progressive decoder with
+embedded libpng, zlib and your system's X library.
 
-    gather.sh # to collect needed files from gregbook, libpng, and zlib
+Specify the location of the zlib source (1.2.1 or later) as ZLIBSRC
+on the make command line.
 
 Edit makefile if required, to find your X library and include files,
 then
-    
-    make
- 
+
+    make ZLIBSRC=directory
+
 If you prefer to use the shared libraries, go to contrib/gregbook
-and build the rpng2-x application there. 
+and build the rpng2-x application there.

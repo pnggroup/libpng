@@ -18,14 +18,14 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.5.0alpha01], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.6.0alpha01], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.5.0alpha01
+PNGLIB_VERSION=1.6.0alpha01
 PNGLIB_MAJOR=1
-PNGLIB_MINOR=5
+PNGLIB_MINOR=6
 PNGLIB_RELEASE=0
 
 dnl End of version number stuff
@@ -34,15 +34,38 @@ AC_CONFIG_SRCDIR([pngget.c])
 AM_CONFIG_HEADER(config.h)
 
 # Checks for programs.
+AC_LANG([C])
 AC_PROG_CC
 AC_PROG_LD
 AC_PROG_CPP
 AC_CHECK_TOOL(SED, sed, :)
-AC_LIBTOOL_WIN32_DLL
+AC_CHECK_TOOL(AWK, awk, :)
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_LIBTOOL
+LT_INIT([win32-dll])
+
+# On Solaris 10 and 12 CPP gets set to cc -E, however this still
+# does some input parsing.  We need strict ANSI-C style tokenization,
+# check this:
+AC_REQUIRE_CPP
+AC_MSG_CHECKING([for a C preprocessor that does not parse its input])
+AC_TRY_CPP([1.5.0 16BIT],
+   [DFNCPP="$CPP"],
+   [DFNCPP=""
+   sav_CPP="$CPP"
+   for CPP in "${CC-cc} -E" "${CC-cc} -E -traditional-cpp" "/lib/cpp" "cpp"; do
+      AC_TRY_CPP([1.5.0 16BIT],
+         [DFNCPP="$CPP"]
+         [break],,)
+   done
+   CPP="$sav_CPP"])
+if test -n "$DFNCPP"; then
+   AC_MSG_RESULT([$DFNCPP])
+   AC_SUBST(DFNCPP)
+else
+   AC_MSG_FAILURE([not found], 1)
+fi
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -57,14 +80,48 @@ AC_STRUCT_TM
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset], , AC_ERROR([memset not found in libc]))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_ERROR([cannot find pow])) )
-AC_CHECK_LIB(z, zlibVersion, , AC_ERROR([zlib not installed]))
+AC_ARG_WITH(zlib-prefix,
+   AC_HELP_STRING([--with-zlib-prefix],
+                  [prefix that may have been used in installed zlib]),
+                  [ZPREFIX=${withval}],
+                  [ZPREFIX='z_'])
+AC_CHECK_LIB(z, zlibVersion, ,
+    AC_CHECK_LIB(z, ${ZPREFIX}zlibVersion, ,
+                 AC_ERROR([zlib not installed])))
+
 
 LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 LIBPNG_DEFINES=$LIBPNG_DEFINES
 AC_SUBST(LIBPNG_DEFINES)
 
 AC_MSG_CHECKING([if libraries can be versioned])
-GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
+# Special case for PE/COFF platforms: ld reports
+# support for version-script, but doesn't actually
+# DO anything with it.
+case $host in
+*cygwin* | *mingw32* | *interix* )
+    have_ld_version_script=no
+    AC_MSG_RESULT(no)
+;;
+* )
+
+AC_MSG_CHECKING([if using Solaris linker])
+SLD=`$LD --version 2>&1 | grep Solaris`
+if test "$SLD"; then
+    have_solaris_ld=yes
+    AC_MSG_RESULT(yes)
+else
+    have_solaris_ld=no
+    AC_MSG_RESULT(no)
+fi
+AM_CONDITIONAL(HAVE_SOLARIS_LD, test "$have_solaris_ld" = "yes")
+
+if test "$have_solaris_ld" = "yes"; then
+    GLD=`$LD --help < /dev/null 2>&1 | grep 'M mapfile'`
+else
+    GLD=`$LD --help < /dev/null 2>/dev/null | grep version-script`
+fi
+
 if test "$GLD"; then
     have_ld_version_script=yes
     AC_MSG_RESULT(yes)
@@ -73,6 +130,9 @@ else
     AC_MSG_RESULT(no)
     AC_MSG_WARN(*** You have not enabled versioned symbols.)
 fi
+;;
+esac
+
 AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 
 if test "$have_ld_version_script" = "yes"; then
