@@ -617,13 +617,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.5beta07 - August 26, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.5beta07 - September 8, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.5beta07 - August 26, 2011\
+      return "libpng version 1.5.5beta07 - September 8, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1092,7 +1092,7 @@ int png_XYZ_from_xy_checked(png_structp png_ptr, png_XYZ *XYZ, png_xy xy)
           * overflow while trying to get XYZ values out of it.  This is
           * entirely benign - the cHRM chunk is pretty extreme.
           */
-         png_chunk_benign_error(png_ptr,
+         png_warning(png_ptr,
             "extreme cHRM chunk cannot be converted to tristimulus values");
          break;
 
