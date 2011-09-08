@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "August 26, 2011"
+.TH LIBPNG 3 "September 8, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.5beta07
 .SH SYNOPSIS
@@ -977,7 +977,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.5beta07 - August 26, 2011
+ libpng version 1.5.5beta07 - September 8, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -988,7 +988,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.5beta07 - August 26, 2011
+ libpng versions 0.97, January 1998, through 1.5.5beta07 - September 8, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1668,7 +1668,7 @@ or you can use the fixed point equivalent:
 
    png_set_gamma_fixed(png_ptr, PNG_FP_1*screen_gamma, PNG_FP_1/screen_gamma);
 
-If you don't know the gamma for you system it is probably 2.2 - a good
+If you don't know the gamma for your system it is probably 2.2 - a good
 approximation to the IEC standard for display systems (sRGB).  If images are
 too contrasty or washed out you got the value wrong - check your system
 documentation!
@@ -1697,16 +1697,18 @@ channel.  To display these files correctly you need to compose the data onto a
 suitable background, as described in the PNG specification.
 
 Libpng only supports composing onto a single color (using png_set_background;
-see below.)  Otherwise you must do the composition yourself and, in this case,
+see below).  Otherwise you must do the composition yourself and, in this case,
 you may need to call png_set_alpha_mode:
 
 #if PNG_LIBPNG_VER >= 10504
    png_set_alpha_mode(png_ptr, mode, screen_gamma);
+#else
+   png_set_gamma(png_ptr, screen_gamma, 1.0/screen_gamma);
 #endif
 
-The screen_gamma value is the same as the argument to png_set_gamma, however how
-it affects the output depends on the mode.  png_set_alpha_mode() sets the file
-gamma default to 1/screen_gamma, so normally you don't need to call
+The screen_gamma value is the same as the argument to png_set_gamma; however,
+how it affects the output depends on the mode.  png_set_alpha_mode() sets the
+file gamma default to 1/screen_gamma, so normally you don't need to call
 png_set_gamma.  If you need different defaults call png_set_gamma() before
 png_set_alpha_mode() - if you call it after it will override the settings made
 by png_set_alpha_mode().
@@ -1733,10 +1735,11 @@ scaled, linear encoded, pre-multiplied component values must
 be used!
 
 The remaining modes assume you don't need to do any further color correction or
-that if you do your color correction software knows all about alpha (it
+that if you do, your color correction software knows all about alpha (it
 probably doesn't!)
 
-    PNG_ALPHA_STANDARD:  The data libpng produces is encoded in the standard way
+    PNG_ALPHA_STANDARD:  The data libpng produces
+is encoded in the standard way
 assumed by most correctly written graphics software.
 The gamma encoding will be removed by libpng and the
 linear component values will be pre-multiplied by the
@@ -1766,7 +1769,8 @@ dynamic range.  To avoid problems, and if your software
 supports it, use png_set_expand_16() to force all
 components to 16 bits.
 
-    PNG_ALPHA_OPTIMIZED: This mode is the same as PNG_ALPHA_STANDARD except that
+    PNG_ALPHA_OPTIMIZED: This mode is the same
+as PNG_ALPHA_STANDARD except that
 completely opaque pixels are gamma encoded according to
 the screen_gamma value.  Pixels with alpha less than 1.0
 will still have linear components.
@@ -1786,10 +1790,11 @@ representation of non-opaque pixels are irrelevant.
 You can also try this format if your software is broken;
 it might look better.
 
-    PNG_ALPHA_BROKEN: This is PNG_ALPHA_STANDARD however all component values,
+    PNG_ALPHA_BROKEN: This is PNG_ALPHA_STANDARD;
+however, all component values,
 including the alpha channel are gamma encoded.  This is
 an appropriate format to try if your software, or more
-likely hardware, is totally broken: if it performs
+likely hardware, is totally broken, i.e., if it performs
 linear arithmetic directly on gamma encoded values.
 
 In most cases of broken software or hardware the bug in the final display
@@ -1805,14 +1810,14 @@ them, there are three recommended ways of using png_set_alpha_mode():
        screen_gamma);
 
 You can do color correction on the result (libpng does not currently
-support color correction internally.)  When you handle the alpha channel
+support color correction internally).  When you handle the alpha channel
 you need to undo the gamma encoding and multiply out the alpha.
 
    png_set_alpha_mode(png_ptr, PNG_ALPHA_STANDARD,
        screen_gamma);
    png_set_expand_16(png_ptr);
 
-If you are using the high level interface don't call png_set_expand_16();
+If you are using the high level interface, don't call png_set_expand_16();
 instead pass PNG_TRANSFORM_EXPAND_16 to the interface.
 
 With this mode you can't do color correction, but you can do arithmetic,
@@ -1824,7 +1829,7 @@ including composition and scaling, on the data without further processing.
 You can avoid the expansion to 16-bit components with this mode, but you
 lose the ability to scale the image or perform other linear arithmetic.
 All you can do is compose the result onto a matching output.  Since this
-mode is libpng specific you also need to write your own composition
+mode is libpng-specific you also need to write your own composition
 software.
 
 If you don't need, or can't handle, the alpha channel you can call
@@ -1837,7 +1842,7 @@ transparent parts of this image.
 
 The background_color is an RGB or grayscale value according to the data format
 libpng will produce for you.  Because you don't yet know the format of the PNG
-file if you call png_set_background at this point you must arrange for the
+file, if you call png_set_background at this point you must arrange for the
 format produced by libpng to always have 8-bit or 16-bit components and then
 store the color as an 8-bit or 16-bit color as appropriate.  The color contains
 separate gray and RGB component values, so you can let libpng produce gray or
@@ -3078,7 +3083,7 @@ to load the whole file into memory when it is interlaced.
 
 libpng includes a test program, pngvalid, that illustrates reading and
 writing of interlaced images.  If you can't get interlacing to work in your
-code and don't want to leave it to libpng (the recommended approach) see
+code and don't want to leave it to libpng (the recommended approach), see
 how pngvalid.c does it.
 
 .SS Finishing a sequential read
@@ -4887,6 +4892,9 @@ The number libpng_vn is constructed from the major version, minor
 version with leading zero, and release number with leading zero,
 (e.g., libpng_vn for version 1.0.7 is 10007).
 
+Note that this function does not take a png_ptr, so you can call it
+before you've created one.
+
 You can also check which version of png.h you used when compiling your
 application:
 
@@ -5123,10 +5131,9 @@ In png_get_iCCP, the type of "profile" was changed from png_charpp
 to png_bytepp, and in png_set_iCCP, from png_charp to png_const_bytep.
 
 There are changes of form in png.h, including new and changed macros to
-declare
-parts of the API.  Some API functions with arguments that are pointers to
-data not modified within the function have been corrected to declare
-these arguments with PNG_CONST.
+declare parts of the API.  Some API functions with arguments that are
+pointers to data not modified within the function have been corrected to
+declare these arguments with PNG_CONST.
 
 Much of the internal use of C macros to control the library build has also
 changed and some of this is visible in the exported header files, in
@@ -5200,7 +5207,7 @@ Applications can now choose whether to use these macros or to call the
 corresponding function by defining PNG_USE_READ_MACROS or
 PNG_NO_USE_READ_MACROS before including png.h.  Notice that this is
 only supported from 1.5.0 -defining PNG_NO_USE_READ_MACROS prior to 1.5.0
- will lead to a link failure.
+will lead to a link failure.
 
 Prior to libpng-1.5.4, the zlib compressor used the same set of parameters
 when compressing the IDAT data and textual data such as zTXt and iCCP.
@@ -5531,7 +5538,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIV. Y2K Compliance in libpng
 
-August 26, 2011
+September 8, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5790,7 +5797,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.5beta07 - August 26, 2011:
+Libpng version 1.5.5beta07 - September 8, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5813,7 +5820,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.5beta07, August 26, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.5beta07, September 8, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -5912,7 +5919,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-August 26, 2011
+September 8, 2011
 
 .\" end of man page
 
