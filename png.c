@@ -107,7 +107,8 @@ png_zfree(voidpf png_ptr, voidpf ptr)
 void /* PRIVATE */
 png_reset_crc(png_structp png_ptr)
 {
-   png_ptr->crc = crc32(0, Z_NULL, 0);
+   /* The cast is safe because the crc is a 32 bit value. */
+   png_ptr->crc = (png_uint_32)crc32(0, Z_NULL, 0);
 }
 
 /* Calculate the CRC over a section of data.  We can only pass as
@@ -133,8 +134,35 @@ png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
          need_crc = 0;
    }
 
-   if (need_crc)
-      png_ptr->crc = crc32(png_ptr->crc, ptr, (uInt)length);
+   /* 'uLong' is defined as unsigned long, this means that on some systems it is
+    * a 64 bit value.  crc32, however, returns 32 bits so the following cast is
+    * safe.  'uInt' may be no more than 16 bits, so it is necessary to perform a
+    * loop here.
+    */
+   if (need_crc && length > 0)
+   {
+      uLong crc = png_ptr->crc; /* Should never issue a warning */
+
+      do
+      {
+         uInt safeLength = (uInt)length;
+         if (safeLength == 0)
+            safeLength = (uInt)-1; /* evil, but safe */
+
+         crc = crc32(crc, ptr, safeLength);
+
+         /* The following should never issue compiler warnings, if they do the
+          * target system has characteristics that will probably violate other
+          * assumptions within the libpng code.
+          */
+         ptr += safeLength;
+         length -= safeLength;
+      }
+      while (length > 0);
+
+      /* And the following is always safe because the crc is only 32 bits. */
+      png_ptr->crc = (png_uint_32)crc;
+   }
 }
 
 /* Check a user supplied version number, called from both read and write

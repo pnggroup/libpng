@@ -372,16 +372,15 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_USER_TRANSFORM    0x100000L
 #define PNG_RGB_TO_GRAY_ERR   0x200000L
 #define PNG_RGB_TO_GRAY_WARN  0x400000L
-#define PNG_RGB_TO_GRAY       0x600000L  /* two bits, RGB_TO_GRAY_ERR|WARN */
-#define PNG_ENCODE_ALPHA      0x800000L  /* Added to libpng-1.5.4 */
-#define PNG_ADD_ALPHA         0x1000000L  /* Added to libpng-1.2.7 */
-#define PNG_EXPAND_tRNS       0x2000000L  /* Added to libpng-1.2.9 */
-#define PNG_SCALE_16_TO_8     0x4000000L  /* Added to libpng-1.5.4 */
-                       /*   0x8000000L  unused */
-                       /*  0x10000000L  unused */
-                       /*  0x20000000L  unused */
-                       /*  0x40000000L  unused */
-
+#define PNG_RGB_TO_GRAY       0x600000L /* two bits, RGB_TO_GRAY_ERR|WARN */
+#define PNG_ENCODE_ALPHA      0x800000L /* Added to libpng-1.5.4 */
+#define PNG_ADD_ALPHA         0x1000000L /* Added to libpng-1.2.7 */
+#define PNG_EXPAND_tRNS       0x2000000L /* Added to libpng-1.2.9 */
+#define PNG_SCALE_16_TO_8     0x4000000L /* Added to libpng-1.5.4 */
+                       /*   0x8000000L unused */
+                       /*  0x10000000L unused */
+                       /*  0x20000000L unused */
+                       /*  0x40000000L unused */
 /* Flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
 #define PNG_STRUCT_INFO  0x0002
@@ -406,22 +405,22 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_FLAG_ASSUME_sRGB              0x1000  /* Added to libpng-1.5.4 */
 #define PNG_FLAG_OPTIMIZE_ALPHA           0x2000  /* Added to libpng-1.5.4 */
 #define PNG_FLAG_DETECT_UNINITIALIZED     0x4000  /* Added to libpng-1.5.4 */
-#define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
-#define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000L
-#define PNG_FLAG_LIBRARY_MISMATCH         0x20000L
-#define PNG_FLAG_STRIP_ERROR_NUMBERS      0x40000L
-#define PNG_FLAG_STRIP_ERROR_TEXT         0x80000L
-#define PNG_FLAG_MALLOC_NULL_MEM_OK       0x100000L
-                                  /*      0x200000L  unused */
-                                  /*      0x400000L  unused */
-#define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000L  /* Added to libpng-1.4.0 */
-#define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000L  /* 5 lines added */
-#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000L  /* to libpng-1.5.4 */
-#define PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL   0x4000000L
-#define PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS 0x8000000L
-#define PNG_FLAG_ZTXT_CUSTOM_METHOD      0x10000000L
-                                  /*     0x20000000L  unused */
-                                  /*     0x40000000L  unused */
+#define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000
+#define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000
+#define PNG_FLAG_LIBRARY_MISMATCH         0x20000
+#define PNG_FLAG_STRIP_ERROR_NUMBERS      0x40000
+#define PNG_FLAG_STRIP_ERROR_TEXT         0x80000
+#define PNG_FLAG_MALLOC_NULL_MEM_OK       0x100000
+                                  /*      0x200000  unused */
+                                  /*      0x400000  unused */
+#define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000  /* Added to libpng-1.4.0 */
+#define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000  /* 5 lines added */
+#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000  /* to libpng-1.5.4 */
+#define PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL   0x4000000
+#define PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS 0x8000000
+#define PNG_FLAG_ZTXT_CUSTOM_METHOD      0x10000000
+                                  /*     0x20000000  unused */
+                                  /*     0x40000000  unused */
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)

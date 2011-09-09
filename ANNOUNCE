@@ -88,6 +88,11 @@ Version 1.5.5beta07 [September 7, 2011]
     png_XYZ_from_xy_checked().
 
 Version 1.5.5beta08 [September 9, 2011]
+  Fixed 64-bit compilation errors (gcc). The errors fixed relate
+    to conditions where types that are 32 bits in the GCC 32-bit
+    world (uLong and png_size_t) become 64 bits in the 64-bit
+    world.  This produces potential truncation errors which the
+    compiler correctly flags.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

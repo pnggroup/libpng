@@ -87,10 +87,10 @@ png_int_32 (PNGAPI
 png_get_int_32)(png_const_bytep buf)
 {
    png_uint_32 uval = png_get_uint_32(buf);
-   if ((uval & 0x80000000L) == 0) /* non-negative */
+   if ((uval & 0x80000000) == 0) /* non-negative */
       return uval;
 
-   uval = (uval ^ 0xffffffffL) + 1;  /* 2's complement: -x = ~x+1 */
+   uval = (uval ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
    return -(png_int_32)uval;
 }
 

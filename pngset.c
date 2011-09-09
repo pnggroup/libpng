@@ -620,7 +620,7 @@ png_set_iCCP(png_structp png_ptr, png_infop info_ptr,
 {
    png_charp new_iccp_name;
    png_bytep new_iccp_profile;
-   png_uint_32 length;
+   png_size_t length;
 
    png_debug1(1, "in %s storage function", "iCCP");
 
@@ -966,10 +966,10 @@ png_set_sPLT(png_structp png_ptr,
    {
       png_sPLT_tp to = np + info_ptr->splt_palettes_num + i;
       png_const_sPLT_tp from = entries + i;
-      png_uint_32 length;
+      png_size_t length;
 
       length = png_strlen(from->name) + 1;
-      to->name = (png_charp)png_malloc_warn(png_ptr, (png_size_t)length);
+      to->name = (png_charp)png_malloc_warn(png_ptr, length);
 
       if (to->name == NULL)
       {
@@ -980,7 +980,7 @@ png_set_sPLT(png_structp png_ptr,
 
       png_memcpy(to->name, from->name, length);
       to->entries = (png_sPLT_entryp)png_malloc_warn(png_ptr,
-          (png_size_t)(from->nentries * png_sizeof(png_sPLT_entry)));
+          from->nentries * png_sizeof(png_sPLT_entry));
 
       if (to->entries == NULL)
       {

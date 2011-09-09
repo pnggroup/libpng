@@ -795,7 +795,7 @@ typedef png_info FAR * FAR * png_infopp;
 #define PNG_INFO_iCCP 0x1000   /* ESR, 1.0.6 */
 #define PNG_INFO_sPLT 0x2000   /* ESR, 1.0.6 */
 #define PNG_INFO_sCAL 0x4000   /* ESR, 1.0.6 */
-#define PNG_INFO_IDAT 0x8000L  /* ESR, 1.0.6 */
+#define PNG_INFO_IDAT 0x8000   /* ESR, 1.0.6 */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
