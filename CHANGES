@@ -3577,7 +3577,7 @@ Version 1.5.5beta08 [September 9, 2011]
     world (uLong and png_size_t) become 64 bits in the 64-bit
     world.  This produces potential truncation errors which the
     compiler correctly flags.
-  Relocated new HAVE_SOLARIS_LD definition configure.ac
+  Relocated new HAVE_SOLARIS_LD definition in configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
