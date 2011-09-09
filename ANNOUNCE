@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta07 - September 8, 2011
+Libpng 1.5.5beta08 - September 9, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.5beta07.tar.xz (LZMA-compressed, recommended)
-   1.5.5beta07.tar.gz
-   1.5.5beta07.tar.bz2
+   1.5.5beta08.tar.xz (LZMA-compressed, recommended)
+   1.5.5beta08.tar.gz
+   1.5.5beta08.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp155b07.7z  (LZMA-compressed, recommended)
-   lp155b07.zip
+   lp155b08.7z  (LZMA-compressed, recommended)
+   lp155b08.zip
 
 Other information:
 
-   1.5.5beta07-README.txt
-   1.5.5beta07-LICENSE.txt
+   1.5.5beta08-README.txt
+   1.5.5beta08-LICENSE.txt
 
 Changes since the last public release (1.5.4):
 
@@ -81,11 +81,13 @@ Version 1.5.5beta06 [August 26, 2011]
     than correctness.)  The code still has considerable inaccuracies in the
     8-bit case because 8-bit linear arithmetic is used.
 
-Version 1.5.5beta07 [September 8, 2011]
+Version 1.5.5beta07 [September 7, 2011]
   Added "$(ARCH)" option to makefile.darwin
   Added SunOS support to configure.ac and Makefile.am
   Changed png_chunk_benign_error() to png_warning() in png.c, in
-    png_XYZ_from_xy_checked
+    png_XYZ_from_xy_checked().
+
+Version 1.5.5beta08 [September 9, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
