@@ -95,15 +95,6 @@ LIBPNG_DEFINES=$LIBPNG_DEFINES
 AC_SUBST(LIBPNG_DEFINES)
 
 AC_MSG_CHECKING([if libraries can be versioned])
-# Special case for PE/COFF platforms: ld reports
-# support for version-script, but doesn't actually
-# DO anything with it.
-case $host in
-*cygwin* | *mingw32* | *interix* )
-    have_ld_version_script=no
-    AC_MSG_RESULT(no)
-;;
-* )
 
 AC_MSG_CHECKING([if using Solaris linker])
 SLD=`$LD --version 2>&1 | grep Solaris`
@@ -115,6 +106,16 @@ else
     AC_MSG_RESULT(no)
 fi
 AM_CONDITIONAL(HAVE_SOLARIS_LD, test "$have_solaris_ld" = "yes")
+
+# Special case for PE/COFF platforms: ld reports
+# support for version-script, but doesn't actually
+# DO anything with it.
+case $host in
+*cygwin* | *mingw32* | *interix* )
+    have_ld_version_script=no
+    AC_MSG_RESULT(no)
+;;
+* )
 
 if test "$have_solaris_ld" = "yes"; then
     GLD=`$LD --help < /dev/null 2>&1 | grep 'M mapfile'`
