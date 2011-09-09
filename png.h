@@ -2515,14 +2515,14 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
      { png_uint_16 temp = (png_uint_16)((png_uint_16)(fg) \
            * (png_uint_16)(alpha)                         \
            + (png_uint_16)(bg)*(png_uint_16)(255          \
-           - (png_uint_16)(alpha)) + (png_uint_16)128);   \
+           - (png_uint_16)(alpha)) + 128);                \
        (composite) = (png_byte)((temp + (temp >> 8)) >> 8); }
 
 #  define png_composite_16(composite, fg, alpha, bg)       \
      { png_uint_32 temp = (png_uint_32)((png_uint_32)(fg)  \
            * (png_uint_32)(alpha)                          \
-           + (png_uint_32)(bg)*(png_uint_32)(65535L        \
-           - (png_uint_32)(alpha)) + (png_uint_32)32768L); \
+           + (png_uint_32)(bg)*(65535                      \
+           - (png_uint_32)(alpha)) + 32768);               \
        (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
 
 #else  /* Standard method using integer division */
@@ -2530,12 +2530,12 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
 #  define png_composite(composite, fg, alpha, bg)                          \
      (composite) = (png_byte)(((png_uint_16)(fg) * (png_uint_16)(alpha) +  \
      (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) +       \
-     (png_uint_16)127) / 255)
+     127) / 255)
 
 #  define png_composite_16(composite, fg, alpha, bg)                         \
      (composite) = (png_uint_16)(((png_uint_32)(fg) * (png_uint_32)(alpha) + \
-     (png_uint_32)(bg)*(png_uint_32)(65535L - (png_uint_32)(alpha)) +        \
-     (png_uint_32)32767) / (png_uint_32)65535L)
+     (png_uint_32)(bg)*(png_uint_32)(65535 - (png_uint_32)(alpha)) +         \
+     32767) / 65535)
 #endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
 
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED

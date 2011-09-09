@@ -1066,7 +1066,7 @@ png_get_user_chunk_ptr(png_const_structp png_ptr)
 png_size_t PNGAPI
 png_get_compression_buffer_size(png_const_structp png_ptr)
 {
-   return (png_ptr ? png_ptr->zbuf_size : 0L);
+   return (png_ptr ? png_ptr->zbuf_size : 0);
 }
 
 

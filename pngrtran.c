@@ -973,8 +973,8 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
           * overwrites the coefficients, regardless of whether they have been
           * defaulted or set already.
           */
-         red_int = (png_uint_16)(((png_uint_32)red*32768L)/100000L);
-         green_int = (png_uint_16)(((png_uint_32)green*32768L)/100000L);
+         red_int = (png_uint_16)(((png_uint_32)red*32768)/100000);
+         green_int = (png_uint_16)(((png_uint_32)green*32768)/100000);
 
          png_ptr->rgb_to_gray_red_coeff   = red_int;
          png_ptr->rgb_to_gray_green_coeff = green_int;
@@ -4917,8 +4917,8 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
             png_uint_32 s0   = (*(rp    ) << 8) | *(rp + 1);
             png_uint_32 s1   = (*(rp + 2) << 8) | *(rp + 3);
             png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
-            png_uint_32 red  = (png_uint_32)((s0 + s1 + 65536L) & 0xffffL);
-            png_uint_32 blue = (png_uint_32)((s2 + s1 + 65536L) & 0xffffL);
+            png_uint_32 red  = (s0 + s1 + 65536) & 0xffff;
+            png_uint_32 blue = (s2 + s1 + 65536) & 0xffff;
             *(rp    ) = (png_byte)((red >> 8) & 0xff);
             *(rp + 1) = (png_byte)(red & 0xff);
             *(rp + 4) = (png_byte)((blue >> 8) & 0xff);

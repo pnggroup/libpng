@@ -1722,18 +1722,30 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
             size -= cdigits;
 
             *ascii++ = 69, --size;    /* 'E': PLUS 1 TOTAL 2+precision */
-            if (exp_b10 < 0)
-            {
-               *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
-               exp_b10 = -exp_b10;
-            }
 
-            cdigits = 0;
-
-            while (exp_b10 > 0)
+            /* The following use of an unsigned temporary avoids ambiguities in
+             * the signed arithmetic on exp_b10 and permits GCC at least to do
+             * better optimization.
+             */
             {
-               exponent[cdigits++] = (char)(48 + exp_b10 % 10);
-               exp_b10 /= 10;
+               unsigned int uexp_b10;
+
+               if (exp_b10 < 0)
+               {
+                  *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
+                  uexp_b10 = -exp_b10;
+               }
+
+               else
+                  uexp_b10 = exp_b10;
+
+               cdigits = 0;
+
+               while (uexp_b10 > 0)
+               {
+                  exponent[cdigits++] = (char)(48 + uexp_b10 % 10);
+                  uexp_b10 /= 10;
+               }
             }
 
             /* Need another size check here for the exponent digits, so
@@ -1791,7 +1803,7 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
       else
          num = fp;
 
-      if (num <= 0x80000000U) /* else overflowed */
+      if (num <= 0x80000000) /* else overflowed */
       {
          unsigned int ndigits = 0, first = 16 /* flag value */;
          char digits[10];

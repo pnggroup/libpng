@@ -827,7 +827,7 @@ png_handle_gAMA(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #  ifdef PNG_READ_sRGB_SUPPORTED
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
    {
-      if (PNG_OUT_OF_RANGE(igamma, 45500L, 500))
+      if (PNG_OUT_OF_RANGE(igamma, 45500, 500))
       {
          PNG_WARNING_PARAMETERS(p)
          png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_fixed, igamma);
@@ -994,10 +994,10 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    {
       if (PNG_OUT_OF_RANGE(x_white, 31270,  1000) ||
           PNG_OUT_OF_RANGE(y_white, 32900,  1000) ||
-          PNG_OUT_OF_RANGE(x_red,   64000L, 1000) ||
+          PNG_OUT_OF_RANGE(x_red,   64000,  1000) ||
           PNG_OUT_OF_RANGE(y_red,   33000,  1000) ||
           PNG_OUT_OF_RANGE(x_green, 30000,  1000) ||
-          PNG_OUT_OF_RANGE(y_green, 60000L, 1000) ||
+          PNG_OUT_OF_RANGE(y_green, 60000,  1000) ||
           PNG_OUT_OF_RANGE(x_blue,  15000,  1000) ||
           PNG_OUT_OF_RANGE(y_blue,   6000,  1000))
       {
@@ -1159,7 +1159,7 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #if defined(PNG_READ_gAMA_SUPPORTED) && defined(PNG_READ_GAMMA_SUPPORTED)
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_gAMA))
    {
-      if (PNG_OUT_OF_RANGE(info_ptr->gamma, 45500L, 500))
+      if (PNG_OUT_OF_RANGE(info_ptr->gamma, 45500, 500))
       {
          PNG_WARNING_PARAMETERS(p)
 
@@ -1176,10 +1176,10 @@ png_handle_sRGB(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM))
       if (PNG_OUT_OF_RANGE(info_ptr->x_white, 31270,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->y_white, 32900,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->x_red,   64000L, 1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->x_red,   64000,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->y_red,   33000,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->x_green, 30000,  1000) ||
-          PNG_OUT_OF_RANGE(info_ptr->y_green, 60000L, 1000) ||
+          PNG_OUT_OF_RANGE(info_ptr->y_green, 60000,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->x_blue,  15000,  1000) ||
           PNG_OUT_OF_RANGE(info_ptr->y_blue,   6000,  1000))
       {

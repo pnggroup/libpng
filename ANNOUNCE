@@ -94,6 +94,8 @@ Version 1.5.5beta08 [September 9, 2011]
     world.  This produces potential truncation errors which the
     compiler correctly flags.
   Relocated new HAVE_SOLARIS_LD definition in configure.ac
+  Constant changes for 64-bit compatibility (removal of L suffixes). The
+    16-bit cases still use "L" as we don't have a 16-bit test system.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

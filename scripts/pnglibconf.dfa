@@ -267,10 +267,10 @@ option SET_USER_LIMITS enables SET_CHUNK_CACHE_LIMIT
 option SET_USER_LIMITS enables SET_CHUNK_MALLOC_LIMIT
 
 # Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
-# how large, set these two limits to 0x7fffffffL
+# how large, set these two limits to 0x7fffffff
 
-setting USER_WIDTH_MAX default 1000000L
-setting USER_HEIGHT_MAX default 1000000L
+setting USER_WIDTH_MAX default 1000000
+setting USER_HEIGHT_MAX default 1000000
 
 # Added at libpng-1.2.43.  To accept all valid PNGs no matter
 # how large, set these two limits to 0.

@@ -602,10 +602,10 @@ png_set_sRGB_gAMA_and_cHRM(png_structp png_ptr, png_infop info_ptr,
 #  ifdef PNG_cHRM_SUPPORTED
    png_set_cHRM_fixed(png_ptr, info_ptr,
       /* color      x       y */
-      /* white */ 31270L, 32900L,
-      /* red   */ 64000L, 33000L,
-      /* green */ 30000L, 60000L,
-      /* blue  */ 15000L,  6000L
+      /* white */ 31270, 32900,
+      /* red   */ 64000, 33000,
+      /* green */ 30000, 60000,
+      /* blue  */ 15000,  6000
    );
 #  endif /* cHRM */
 }
