@@ -1,5 +1,5 @@
 
-Libpng 1.5.5beta09 - September 10, 2011
+Libpng 1.5.5beta09 - September 12, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -71,8 +71,8 @@ Version 1.5.5beta06 [August 26, 2011]
     and true grey ones were not gamma corrected (the original value of the
     red component was used instead).  APIs to get and set cHRM using color
     space end points have been added and the rgb_to_gray code that defaults
-    based on cHRM, and the divide-by-zero bug in png_handle_cHRM (introduced
-    in 1.5.4) have been corrected.
+    based on cHRM, and the divide-by-zero bug in png_handle_cHRM (CERT
+    VU#477046, CVE-2011-3328, introduced in 1.5.4) have been corrected.
   A considerable number of tests has been added to pngvalid for the
     rgb_to_gray transform.
   Arithmetic errors in rgb_to_gray whereby the calculated gray value was
@@ -97,7 +97,7 @@ Version 1.5.5beta08 [September 10, 2011]
   Constant changes for 64-bit compatibility (removal of L suffixes). The
     16-bit cases still use "L" as we don't have a 16-bit test system.
 
-Version 1.5.5beta09 [September 10, 2011]
+Version 1.5.5beta09 [September 12, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
