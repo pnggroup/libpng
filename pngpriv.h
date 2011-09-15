@@ -364,23 +364,23 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_EXPAND              0x1000
 #define PNG_GAMMA               0x2000
 #define PNG_GRAY_TO_RGB         0x4000
-#define PNG_FILLER              0x8000L
-#define PNG_PACKSWAP           0x10000L
-#define PNG_SWAP_ALPHA         0x20000L
-#define PNG_STRIP_ALPHA        0x40000L
-#define PNG_INVERT_ALPHA       0x80000L
-#define PNG_USER_TRANSFORM    0x100000L
-#define PNG_RGB_TO_GRAY_ERR   0x200000L
-#define PNG_RGB_TO_GRAY_WARN  0x400000L
-#define PNG_RGB_TO_GRAY       0x600000L /* two bits, RGB_TO_GRAY_ERR|WARN */
-#define PNG_ENCODE_ALPHA      0x800000L /* Added to libpng-1.5.4 */
-#define PNG_ADD_ALPHA         0x1000000L /* Added to libpng-1.2.7 */
-#define PNG_EXPAND_tRNS       0x2000000L /* Added to libpng-1.2.9 */
-#define PNG_SCALE_16_TO_8     0x4000000L /* Added to libpng-1.5.4 */
-                       /*   0x8000000L unused */
-                       /*  0x10000000L unused */
-                       /*  0x20000000L unused */
-                       /*  0x40000000L unused */
+#define PNG_FILLER              0x8000
+#define PNG_PACKSWAP           0x10000
+#define PNG_SWAP_ALPHA         0x20000
+#define PNG_STRIP_ALPHA        0x40000
+#define PNG_INVERT_ALPHA       0x80000
+#define PNG_USER_TRANSFORM    0x100000
+#define PNG_RGB_TO_GRAY_ERR   0x200000
+#define PNG_RGB_TO_GRAY_WARN  0x400000
+#define PNG_RGB_TO_GRAY       0x600000 /* two bits, RGB_TO_GRAY_ERR|WARN */
+#define PNG_ENCODE_ALPHA      0x800000 /* Added to libpng-1.5.4 */
+#define PNG_ADD_ALPHA         0x1000000 /* Added to libpng-1.2.7 */
+#define PNG_EXPAND_tRNS       0x2000000 /* Added to libpng-1.2.9 */
+#define PNG_SCALE_16_TO_8     0x4000000 /* Added to libpng-1.5.4 */
+                       /*   0x8000000 unused */
+                       /*  0x10000000 unused */
+                       /*  0x20000000 unused */
+                       /*  0x40000000 unused */
 /* Flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
 #define PNG_STRUCT_INFO  0x0002
