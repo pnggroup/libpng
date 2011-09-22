@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta01 - September 22, 2011
+Libpng 1.5.6beta02 - September 22, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,99 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.6beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.6beta01.tar.gz
-   1.5.6beta01.tar.bz2
+   1.5.6beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.6beta02.tar.gz
+   1.5.6beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp156b01.7z  (LZMA-compressed, recommended)
-   lp156b01.zip
+   lp156b02.7z  (LZMA-compressed, recommended)
+   lp156b02.zip
 
 Other information:
 
-   1.5.6beta01-README.txt
-   1.5.6beta01-LICENSE.txt
+   1.5.6beta02-README.txt
+   1.5.6beta02-LICENSE.txt
 
-Changes since the last public release (1.5.4):
+Changes since the last public release (1.5.5):
 
-Version 1.5.5beta01 [July 13, 2011]
-  Fixed some typos and made other minor changes in the manual.
-  Updated contrib/pngminus/makefile.std (Samuli Souminen)
-
-Version 1.5.5beta02 [July 14, 2011]
-  Revised Makefile.am and Makefile.in to look in the right directory for
-    pnglibconf.h.prebuilt
-
-Version 1.5.5beta03 [July 27, 2011]
-  Enabled compilation with g++ compiler.  This compiler does not recognize
-    the file extension, so it always compiles with C++ rules.  Made minor
-    changes to pngrutil.c to cast results where C++ expects it but C does not.
-  Minor editing of libpng.3 and libpng-manual.txt.
-
-Version 1.5.5beta04 [July 29, 2011]
-  Revised CMakeLists.txt (Clifford Yapp)
-  Updated commentary about the png_rgb_to_gray() default coefficients
-    in the manual and in pngrtran.c
-
-Version 1.5.5beta05 [August 17, 2011]
-  Prevent unexpected API exports from non-libpng DLLs on Windows.  The "_DLL"
-    is removed from the test of whether a DLL is being built (this erroneously
-    caused the libpng APIs to be marked as DLL exports in static builds under
-    Microsoft Visual Studio).  Almost all of the libpng building configuration
-    is moved from pngconf.h to pngpriv.h, but PNG_DLL_EXPORT remains in
-    pngconf.h, though, so that it is colocated with the import definition (it
-    is no longer used anywhere in the installed headers).  The VStudio project
-    definitions have been cleaned up: "_USRDLL" has been removed from the
-    static library builds (this was incorrect), and PNG_USE_DLL has been added
-    to pngvalid to test the functionality (pngtest does not supply it,
-    deliberately).  The spurious "_EXPORTS" has been removed from the
-    libpng build (all these errors were a result of copy/paste between project
-    configurations.)
-  Added new types and internal functions for CIE RGB end point handling to
-    pngpriv.h (functions yet to be implemented).
-
-Version 1.5.5beta06 [August 26, 2011]
-  Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set in CMakeLists.txt
-    (Clifford Yap)
-  Fixes to rgb_to_gray and cHRM XYZ APIs (John Bowler):
-    The rgb_to_gray code had errors when combined with gamma correction.
-    Some pixels were treated as true grey when they weren't and such pixels
-    and true grey ones were not gamma corrected (the original value of the
-    red component was used instead).  APIs to get and set cHRM using color
-    space end points have been added and the rgb_to_gray code that defaults
-    based on cHRM, and the divide-by-zero bug in png_handle_cHRM (CERT
-    VU#477046, CVE-2011-3328, introduced in 1.5.4) have been corrected.
-  A considerable number of tests has been added to pngvalid for the
-    rgb_to_gray transform.
-  Arithmetic errors in rgb_to_gray whereby the calculated gray value was
-    truncated to the bit depth rather than rounded have been fixed except in
-    the 8-bit non-gamma-corrected case (where consistency seems more important
-    than correctness.)  The code still has considerable inaccuracies in the
-    8-bit case because 8-bit linear arithmetic is used.
-
-Version 1.5.5beta07 [September 7, 2011]
-  Added "$(ARCH)" option to makefile.darwin
-  Added SunOS support to configure.ac and Makefile.am
-  Changed png_chunk_benign_error() to png_warning() in png.c, in
-    png_XYZ_from_xy_checked().
-
-Version 1.5.5beta08 [September 10, 2011]
-  Fixed 64-bit compilation errors (gcc). The errors fixed relate
-    to conditions where types that are 32 bits in the GCC 32-bit
-    world (uLong and png_size_t) become 64 bits in the 64-bit
-    world.  This produces potential truncation errors that the
-    compiler correctly flags.
-  Relocated new HAVE_SOLARIS_LD definition in configure.ac
-  Constant changes for 64-bit compatibility (removal of L suffixes). The
-    16-bit cases still use "L" as we don't have a 16-bit test system.
-
-Version 1.5.5rc01 [September 17, 2011]
-  Removed "L" suffixes from constants in pngpriv.h
-
-Version 1.5.5 [September 22, 2011]
-  No changes.
+Version 1.5.6beta01 [September 22, 2011]
+  Fixed some 64-bit type conversion warnings in pngrtran.c
+  Moved row_info from png_struct to a local variable.
+  The various interlace mask arrays have been made into arrays of
+    bytes and made PNG_CONST and static (previously some arrays were
+    marked PNG_CONST and some weren't).
+  Additional checks have been added to the transform code to validate the
+    pixel depths after the transforms on both read and write.
+  Removed some redundant code from pngwrite.c, in png_desgtroy_write_struct().
+  Changed chunk reading/writing code to use png_uint_32 instead of png_byte[4].
+    This removes the need to allocate temporary strings for chunk names on
+    the stack in the read/write code.  Unknown chunk handling still uses the
+    string form because this is exposed in the API.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

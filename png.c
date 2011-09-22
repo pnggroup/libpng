@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.5 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.6 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_6beta01 Your_png_h_is_not_version_1_5_6beta01;
+typedef png_libpng_version_1_5_6beta02 Your_png_h_is_not_version_1_5_6beta02;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -121,14 +121,14 @@ png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
 {
    int need_crc = 1;
 
-   if (png_ptr->chunk_name[0] & 0x20)                     /* ancillary */
+   if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name))
    {
       if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
          need_crc = 0;
    }
 
-   else                                                    /* critical */
+   else /* critical */
    {
       if (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE)
          need_crc = 0;
@@ -645,13 +645,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.6beta01 - September 22, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.6beta02 - September 22, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.6beta01 - September 22, 2011\
+      return "libpng version 1.5.6beta02 - September 22, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -698,25 +698,43 @@ png_get_header_version(png_const_structp png_ptr)
 #endif
 }
 
-#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-#  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 int PNGAPI
 png_handle_as_unknown(png_structp png_ptr, png_const_bytep chunk_name)
 {
    /* Check chunk_name and return "keep" value if it's on the list, else 0 */
-   int i;
-   png_bytep p;
-   if (png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list<=0)
-      return 0;
+   png_const_bytep p, p_end;
 
-   p = png_ptr->chunk_list + png_ptr->num_chunk_list*5 - 5;
-   for (i = png_ptr->num_chunk_list; i; i--, p -= 5)
+   if (png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list <= 0)
+      return PNG_HANDLE_CHUNK_AS_DEFAULT;
+
+   p_end = png_ptr->chunk_list;
+   p = p_end + png_ptr->num_chunk_list*5; /* beyond end */
+
+   /* The code is the fifth byte after each four byte string.  Historically this
+    * code was always searched from the end of the list, so it should continue
+    * to do so in case there are duplicated entries.
+    */
+   do /* num_chunk_list > 0, so at least one */
+   {
+      p -= 5;
       if (!png_memcmp(chunk_name, p, 4))
-        return ((int)*(p + 4));
-   return 0;
+         return p[4];
+   }
+   while (p > p_end);
+
+   return PNG_HANDLE_CHUNK_AS_DEFAULT;
 }
-#  endif
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+
+int /* PRIVATE */
+png_chunk_unknown_handling(png_structp png_ptr, png_uint_32 chunk_name)
+{
+   png_byte chunk_string[5];
+
+   PNG_CSTRING_FROM_CHUNK(chunk_string, chunk_name);
+   return png_handle_as_unknown(png_ptr, chunk_string);
+}
+#endif
 
 #ifdef PNG_READ_SUPPORTED
 /* This function, added to libpng-1.0.6g, is untested. */

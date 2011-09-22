@@ -3575,17 +3575,33 @@ Version 1.5.5beta08 [September 10, 2011]
   Fixed 64-bit compilation errors (gcc). The errors fixed relate
     to conditions where types that are 32 bits in the GCC 32-bit
     world (uLong and png_size_t) become 64 bits in the 64-bit
-    world.  This produces potential truncation errors that the
+    world.  This produces potential truncation errors which the
     compiler correctly flags.
   Relocated new HAVE_SOLARIS_LD definition in configure.ac
   Constant changes for 64-bit compatibility (removal of L suffixes). The
     16-bit cases still use "L" as we don't have a 16-bit test system.
 
-Version 1.5.5rc01 [September 17, 2011]
-  Removed "L" suffixes from constants in pngpriv.h
+Version 1.5.5rc01 [September 15, 2011]
+  Removed "L" suffixes in pngpriv.h
 
 Version 1.5.5 [September 22, 2011]
   No changes.
+
+Version 1.5.6beta01 [September 22, 2011]
+  Fixed some 64-bit type conversion warnings in pngrtran.c
+  Moved row_info from png_struct to a local variable.
+  The various interlace mask arrays have been made into arrays of
+    bytes and made PNG_CONST and static (previously some arrays were
+    marked PNG_CONST and some weren't).
+  Additional checks have been added to the transform code to validate the
+    pixel depths after the transforms on both read and write.
+  Removed some redundant code from pngwrite.c, in png_destroy_write_struct().
+  Changed chunk reading/writing code to use png_uint_32 instead of png_byte[4].
+    This removes the need to allocate temporary strings for chunk names on
+    the stack in the read/write code.  Unknown chunk handling still uses the
+    string form because this is exposed in the API.
+
+Version 1.5.6beta02 [September 22, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
