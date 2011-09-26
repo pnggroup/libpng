@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta02 - September 26, 2011
+Libpng 1.5.6beta03 - September 26, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.6beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.6beta02.tar.gz
-   1.5.6beta02.tar.bz2
+   1.5.6beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.6beta03.tar.gz
+   1.5.6beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp156b02.7z  (LZMA-compressed, recommended)
-   lp156b02.zip
+   lp156b03.7z  (LZMA-compressed, recommended)
+   lp156b03.zip
 
 Other information:
 
-   1.5.6beta02-README.txt
-   1.5.6beta02-LICENSE.txt
+   1.5.6beta03-README.txt
+   1.5.6beta03-LICENSE.txt
 
 Changes since the last public release (1.5.5):
 
@@ -40,10 +40,12 @@ Version 1.5.6beta01 [September 22, 2011]
     the stack in the read/write code.  Unknown chunk handling still uses the
     string form because this is exposed in the API.
 
-Version 1.5.6beta02 [September 26, 2011]
+Version 1.5.6beta02 [Septhember 26, 2011]
   Added a note in the manual the png_read_update_info() must be called only
     once with a particular info_ptr.
   Fixed a typo in the definition of the new PNG_STRING_FROM_CHUNK(s,c) macro.
+
+Version 1.5.6beta03 [September 26, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
