@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta02 - September 22, 2011
+Libpng 1.5.6beta02 - September 26, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -39,6 +39,10 @@ Version 1.5.6beta01 [September 22, 2011]
     This removes the need to allocate temporary strings for chunk names on
     the stack in the read/write code.  Unknown chunk handling still uses the
     string form because this is exposed in the API.
+
+Version 1.5.6beta02 [September 26, 2011]
+  Added a note in the manual the png_read_update_info() must be called only
+    once with a particular info_ptr.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

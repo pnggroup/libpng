@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "September 22, 2011"
+.TH LIBPNG 3 "September 26, 2011"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.6beta02
 .SH SYNOPSIS
@@ -977,7 +977,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.6beta02 - September 22, 2011
+ libpng version 1.5.6beta02 - September 26, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -988,7 +988,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.6beta02 - September 22, 2011
+ libpng versions 0.97, January 1998, through 1.5.6beta02 - September 26, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -2876,12 +2876,15 @@ of the interlaced image.
 
 After setting the transformations, libpng can update your png_info
 structure to reflect any transformations you've requested with this
-call.  This is most useful to update the info structure's rowbytes
-field so you can use it to allocate your image memory.  This function
-will also update your palette with the correct screen_gamma and
-background if these have been given with the calls above.
+call.
 
     png_read_update_info(png_ptr, info_ptr);
+
+This is most useful to update the info structure's rowbytes
+field so you can use it to allocate your image memory.  This function
+will also update your palette with the correct screen_gamma and
+background if these have been given with the calls above.  You may
+only call png_read_update_info() once with a particular info_ptr.
 
 After you call png_read_update_info(), you can allocate any
 memory you need to hold the image.  The row data is simply
@@ -2891,7 +2894,7 @@ are allocating one large chunk, you will need to build an
 array of pointers to each row, as it will be needed for some
 of the functions below.
 
-Remember: Before you call png_read_update_info(), the png_get_
+Remember: Before you call png_read_update_info(), the png_get_*()
 functions return the values corresponding to the original PNG image.
 After you call png_read_update_info the values refer to the image
 that libpng will output.  Consequently you must call all the png_set_
@@ -5538,7 +5541,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIV. Y2K Compliance in libpng
 
-September 22, 2011
+September 26, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5800,7 +5803,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.6beta02 - September 22, 2011:
+Libpng version 1.5.6beta02 - September 26, 2011:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5823,7 +5826,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.5.6beta02, September 22, 2011, are
+libpng versions 1.2.6, August 15, 2004, through 1.5.6beta02, September 26, 2011, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -5922,7 +5925,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-September 22, 2011
+September 26, 2011
 
 .\" end of man page
 
