@@ -554,7 +554,7 @@ PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
  */
 #define PNG_STRING_FROM_CHUNK(s,c)\
    (void)(((char*)(s))[0]=(char)((c)>>24), ((char*)(s))[1]=(char)((c)>>16),\
-   ((char*)(s))[3]=(char)((c)>>8), ((char*)(s))[3]=(char)((c)))
+   ((char*)(s))[2]=(char)((c)>>8), ((char*)(s))[3]=(char)((c)))
 
 /* Do the same but terminate with a null character. */
 #define PNG_CSTRING_FROM_CHUNK(s,c)\
