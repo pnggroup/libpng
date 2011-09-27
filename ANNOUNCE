@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta03 - September 26, 2011
+Libpng 1.5.6beta03 - September 27, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -45,7 +45,10 @@ Version 1.5.6beta02 [Septhember 26, 2011]
     once with a particular info_ptr.
   Fixed a typo in the definition of the new PNG_STRING_FROM_CHUNK(s,c) macro.
 
-Version 1.5.6beta03 [September 26, 2011]
+Version 1.5.6beta03 [September 27, 2011]
+  Revised test-pngtest.sh to report FAIL when pngtest fails.
+  Added "--strict" option to pngtest, to report FAIL when the failure is
+     only because the resulting valid files are different.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
