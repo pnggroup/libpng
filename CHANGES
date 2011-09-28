@@ -3601,7 +3601,7 @@ Version 1.5.6beta01 [September 22, 2011]
     the stack in the read/write code.  Unknown chunk handling still uses the
     string form because this is exposed in the API.
 
-Version 1.5.6beta02 [Septhember 26, 2011]
+Version 1.5.6beta02 [September 26, 2011]
   Added a note in the manual the png_read_update_info() must be called only
     once with a particular info_ptr.
   Fixed a typo in the definition of the new PNG_STRING_FROM_CHUNK(s,c) macro.
@@ -3612,6 +3612,8 @@ Version 1.5.6beta03 [September 28, 2011]
     only because the resulting valid files are different.
   Revised CMakeLists.txt to work with mingw and removed some material from
     CMakeLists.txt that is no longer useful in libpng-1.5.
+
+Version 1.5.6beta04 [September 28, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
