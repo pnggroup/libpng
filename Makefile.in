@@ -43,7 +43,7 @@ host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT) pngvalid$(EXEEXT)
 
 #   Versioned symbols and restricted exports
-@HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_TRUE@am__append_1 = -Wl,-M Wl,libpng.vers
+@HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_TRUE@am__append_1 = -Wl,-M -Wl,libpng.vers
 @HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_FALSE@am__append_2 = -Wl,--version-script=libpng.vers
 #   Only restricted exports when possible
 @HAVE_LD_VERSION_SCRIPT_FALSE@am__append_3 = -export-symbols libpng.sym

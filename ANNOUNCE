@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta04 - September 28, 2011
+Libpng 1.5.6beta04 - October 5, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -52,7 +52,8 @@ Version 1.5.6beta03 [September 28, 2011]
   Revised CMakeLists.txt to work with mingw and removed some material from
     CMakeLists.txt that is no longer useful in libpng-1.5.
 
-Version 1.5.6beta04 [September 28, 2011]
+Version 1.5.6beta04 [October 5, 2011]
+  Fixed typo in Makefile.in and Makefile.am ("-M Wl" should be "-M -Wl")."
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

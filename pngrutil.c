@@ -3410,6 +3410,9 @@ png_read_finish_row(png_structp png_ptr)
    {
       png_ptr->row_number = 0;
 
+      /* TO DO: don't do this if prev_row isn't needed (requires
+       * read-ahead of the next row's filter byte.
+       */
       png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
       do
