@@ -2994,11 +2994,21 @@ png_combine_row(png_structp png_ptr, png_bytep row, int mask)
             {
                if (m & mask)
                {
-                  png_memcpy(dp, sp, pixel_bytes);
+                  /* Prior to libpng-1.5.6 we used memcpy(), but limited
+                   * experiments show that this simple loop can be
+                   * significantly faster.
+                   */
+                  int j;
+
+                  for (j = pixel_bytes; j; --j)
+                     *(dp++) = *(sp++);
                }
 
-               sp += pixel_bytes;
-               dp += pixel_bytes;
+               else
+               {
+                 sp += pixel_bytes;
+                 dp += pixel_bytes;
+               }
 
                if (m == 1)
                   m = 0x80;
