@@ -56,7 +56,8 @@ Version 1.5.6beta04 [October 5, 2011]
   Fixed typo in Makefile.in and Makefile.am ("-M Wl" should be "-M -Wl")."
 
 Version 1.5.6beta05 [October 6, 2011]
-  Replaced a short but frequently-used memcpy() in png_combine_row() to a loop.
+  Replaced a short but frequently-used memcpy() in png_combine_row() with
+    a loop.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
