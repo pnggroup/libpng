@@ -60,6 +60,10 @@ Version 1.5.6beta05 [October 7, 2011]
     of the code, allowing it to be optimized for Adam7 interlace.  The masks
     passed to png_combine_row() are now generated internally, avoiding
     some code duplication and localizing the interlace handling somewhat.
+  Align png_struct::row_buf - previously it was always unaligned, caused by
+    a bug in the code that attempted to align it; the code needs to subtract
+    one from the pointer to take account of the filter byte prepended to
+    each row.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
