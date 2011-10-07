@@ -390,11 +390,6 @@ png_start_read_image(png_structp png_ptr)
 void PNGAPI
 png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 {
-#ifdef PNG_READ_INTERLACING_SUPPORTED
-   PNG_CONST int png_pass_dsp_mask[7] = {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55,
-       0xff};
-   PNG_CONST int png_pass_mask[7] = {0x80, 0x08, 0x88, 0x22, 0xaa, 0x55, 0xff};
-#endif
    int ret;
 
    png_row_info row_info;
@@ -474,8 +469,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             if (png_ptr->row_number & 0x07)
             {
                if (dsp_row != NULL)
-                  png_combine_row(png_ptr, dsp_row,
-                     png_pass_dsp_mask[png_ptr->pass]);
+                  png_combine_row(png_ptr, dsp_row, 1/*display*/);
                png_read_finish_row(png_ptr);
                return;
             }
@@ -485,8 +479,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             if ((png_ptr->row_number & 0x07) || png_ptr->width < 5)
             {
                if (dsp_row != NULL)
-                  png_combine_row(png_ptr, dsp_row,
-                      png_pass_dsp_mask[png_ptr->pass]);
+                  png_combine_row(png_ptr, dsp_row, 1/*display*/);
 
                png_read_finish_row(png_ptr);
                return;
@@ -497,8 +490,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             if ((png_ptr->row_number & 0x07) != 4)
             {
                if (dsp_row != NULL && (png_ptr->row_number & 4))
-                  png_combine_row(png_ptr, dsp_row,
-                      png_pass_dsp_mask[png_ptr->pass]);
+                  png_combine_row(png_ptr, dsp_row, 1/*display*/);
 
                png_read_finish_row(png_ptr);
                return;
@@ -509,8 +501,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             if ((png_ptr->row_number & 3) || png_ptr->width < 3)
             {
                if (dsp_row != NULL)
-                  png_combine_row(png_ptr, dsp_row,
-                      png_pass_dsp_mask[png_ptr->pass]);
+                  png_combine_row(png_ptr, dsp_row, 1/*display*/);
 
                png_read_finish_row(png_ptr);
                return;
@@ -521,8 +512,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             if ((png_ptr->row_number & 3) != 2)
             {
                if (dsp_row != NULL && (png_ptr->row_number & 2))
-                  png_combine_row(png_ptr, dsp_row,
-                      png_pass_dsp_mask[png_ptr->pass]);
+                  png_combine_row(png_ptr, dsp_row, 1/*display*/);
 
                png_read_finish_row(png_ptr);
                return;
@@ -532,8 +522,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             if ((png_ptr->row_number & 1) || png_ptr->width < 2)
             {
                if (dsp_row != NULL)
-                  png_combine_row(png_ptr, dsp_row,
-                      png_pass_dsp_mask[png_ptr->pass]);
+                  png_combine_row(png_ptr, dsp_row, 1/*display*/);
 
                png_read_finish_row(png_ptr);
                return;
@@ -651,20 +640,20 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
             png_ptr->transformations);
 
       if (dsp_row != NULL)
-         png_combine_row(png_ptr, dsp_row, png_pass_dsp_mask[png_ptr->pass]);
+         png_combine_row(png_ptr, dsp_row, 1/*display*/);
 
       if (row != NULL)
-         png_combine_row(png_ptr, row, png_pass_mask[png_ptr->pass]);
+         png_combine_row(png_ptr, row, 0/*row*/);
    }
 
    else
 #endif
    {
       if (row != NULL)
-         png_combine_row(png_ptr, row, 0xff);
+         png_combine_row(png_ptr, row, -1/*ignored*/);
 
       if (dsp_row != NULL)
-         png_combine_row(png_ptr, dsp_row, 0xff);
+         png_combine_row(png_ptr, dsp_row, -1/*ignored*/);
    }
    png_read_finish_row(png_ptr);
 

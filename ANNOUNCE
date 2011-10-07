@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta05 - October 6, 2011
+Libpng 1.5.6beta05 - October 7, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,9 +55,11 @@ Version 1.5.6beta03 [September 28, 2011]
 Version 1.5.6beta04 [October 5, 2011]
   Fixed typo in Makefile.in and Makefile.am ("-M Wl" should be "-M -Wl")."
 
-Version 1.5.6beta05 [October 6, 2011]
-  Replaced a short but frequently-used memcpy() in png_combine_row() with
-    a loop.
+Version 1.5.6beta05 [October 7, 2011]
+  Speed up png_combine_row() for interlaced images. This reduces the generality
+    of the code, allowing it to be optimized for Adam7 interlace.  The masks
+    passed to png_combine_row() are now generated internally, avoiding
+    some code duplication and localizing the interlace handling somewhat.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

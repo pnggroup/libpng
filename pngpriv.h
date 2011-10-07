@@ -44,6 +44,9 @@
  */
 #include <stdlib.h>
 
+/* This is used to find 'offsetof', used below for alignment tests. */
+#include <stddef.h>
+
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
 #ifdef PNG_USER_CONFIG
@@ -321,6 +324,22 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #    define png_memset  memset
 #  endif
 #endif
+
+/* These macros may need to be architecture dependent, they take a pointer and
+ * an alignment requirement.
+ */
+#ifdef offsetof
+#  define png_alignof(type) offsetof(struct{char c; type t;}, t)
+#endif
+
+/* This implicitly assumes alignment is always to a power of 2. */
+#ifdef png_alignof
+#  define png_isaligned(ptr, type)\
+   ((((char*)ptr-(char*)0) & (png_alignof(type)-1)) == 0)
+#else
+#  define png_isaligned(ptr, type) 0
+#endif
+
 /* End of memory model/platform independent support */
 /* End of 1.5.0beta36 move from pngconf.h */
 
@@ -823,17 +842,34 @@ PNG_EXTERN void png_write_finish_row PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_write_start_row PNGARG((png_structp png_ptr));
 
 /* Combine a row of data, dealing with alpha, etc. if requested.  'row' is an
- * array of png_ptr->width pixels, 'mask' is a mask of the pixels to copy from
- * png_ptr->row_buf+1.  'mask' describes each block of 8 pixels - only the low 8
- * bits are used.  This function is only ever used to write to row buffers
- * provided by the caller of the relevant libpng API and the row must have
- * already been transformed by the read transformations.
+ * array of png_ptr->width pixels.  If the image is not interlaced or this
+ * is the final pass this just does a png_memcpy, otherwise the "display" flag
+ * is used to determine whether to copy pixels that are not in the current pass.
+ *
+ * Because 'png_do_read_interlace' (below) replicates pixels this allows this
+ * function to achieve the documented 'blocky' appearance during interlaced read
+ * if display is 1 and the 'sparkle' appearance, where existing pixels in 'row'
+ * are not changed if they are not in the current pass, when display is 0.
+ *
+ * 'display' must be 0 or 1, otherwise the memcpy will be done regardless.
+ *
+ * The API always reads from the png_struct row buffer and always assumes that
+ * it is full width (png_do_read_interlace has already been called.)
+ *
+ * This function is only ever used to write to row buffers provided by the
+ * caller of the relevant libpng API and the row must have already been
+ * transformed by the read transformations.
  */
 PNG_EXTERN void png_combine_row PNGARG((png_structp png_ptr, png_bytep row,
-    int mask));
+    int display));
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-/* Expand an interlaced row */
+/* Expand an interlaced row: the 'row_info' describes the pass data that has
+ * been read in and must correspond to the pixels in 'row', the pixels are
+ * expanded (moved apart) in 'row' to match the final layout, when doing this
+ * the pixels are *replicated* to the intervening space.  This is essential for
+ * the correct operation of png_combine_row, above.
+ */
 PNG_EXTERN void png_do_read_interlace PNGARG((png_row_infop row_info,
     png_bytep row, int pass, png_uint_32 transformations));
 #endif
