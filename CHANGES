@@ -3625,7 +3625,7 @@ Version 1.5.6beta05 [October 7, 2011]
     a bug in the code that attempted to align it; the code needs to subtract
     one from the pointer to take account of the filter byte prepended to
     each row.
-  Optimized png_combine_row() when rows are aligned This gains a small
+  Optimized png_combine_row() when rows are aligned. This gains a small
     percentage for 16-bit and 32-bit pixels in the typical case where the
     output row buffers are appropriately aligned. The optimization was not
     previously possible because the png_struct buffer was always misaligned.
