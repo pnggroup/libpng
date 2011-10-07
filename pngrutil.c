@@ -2931,12 +2931,13 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 
             /* This is a common optimization for 2 and 4 byte pixels, for other
              * values rely on the toolchain memcpy being optimized.
-             *
-             * TBD: this should use png_isaligned, but currently something isn't
-             * aligned (NOTE: to be investigated in a really serious fashion.)
              */
-            else if (pixel_depth == 2)
+            else if (pixel_depth == sizeof (png_uint_16) &&
+               png_isaligned(sp, png_uint_16) && png_isaligned(dp, png_uint_16))
             {
+               png_uint_16p dp16 = (png_uint_16p)dp;
+               png_uint_16p sp16 = (png_uint_16p)sp;
+
                do
                {
                   m >>= 1;
@@ -2945,16 +2946,20 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                      m = mask;
 
                   if (m & 1)
-                     dp[0] = sp[0], dp[1] = sp[1];
+                     *dp16 = *sp16;
 
-                  dp += 2;
-                  sp += 2;
+                  ++dp16;
+                  ++sp16;
                }
                while (--row_width > 0);
             }
 
-            else if (pixel_depth == 4) /* as above, not optimal */
+            else if (pixel_depth == sizeof (png_uint_32) &&
+               png_isaligned(sp, png_uint_32) && png_isaligned(dp, png_uint_32))
             {
+               png_uint_32p dp32 = (png_uint_32p)dp;
+               png_uint_32p sp32 = (png_uint_32p)sp;
+
                do
                {
                   m >>= 1;
@@ -2963,10 +2968,10 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                      m = mask;
 
                   if (m & 1)
-                     dp[0] = sp[0], dp[1] = sp[1], dp[2] = sp[2], dp[3] = sp[3];
+                     *dp32 = *sp32;
 
-                  dp += 4;
-                  sp += 4;
+                  ++dp32;
+                  ++sp32;
                }
                while (--row_width > 0);
             }
