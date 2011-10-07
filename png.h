@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.6beta05 - October 5, 2011
+ * libpng version 1.5.6beta05 - October 7, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.6beta05 - October 5, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.6beta05 - October 7, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -192,7 +192,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.6beta05, October 5, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.6beta05, October 7, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -304,7 +304,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    October 5, 2011
+ *    October 7, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -367,7 +367,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.6beta05"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.6beta05 - October 5, 2011\n"
+     " libpng version 1.5.6beta05 - October 7, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1831,6 +1831,7 @@ PNG_EXPORT(219, png_size_t, png_process_data_pause, (png_structp, int save));
  */
 PNG_EXPORT(220, png_uint_32, png_process_data_skip, (png_structp));
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
 /* Function that combines rows.  'new_row' is a flag that should come from
  * the callback and be non-NULL if anything needs to be done; the library
  * stores its own version of the new data internally and ignores the passed
@@ -1838,6 +1839,7 @@ PNG_EXPORT(220, png_uint_32, png_process_data_skip, (png_structp));
  */
 PNG_EXPORT(93, void, png_progressive_combine_row, (png_structp png_ptr,
     png_bytep old_row, png_const_bytep new_row));
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
 PNG_EXPORTA(94, png_voidp, png_malloc,

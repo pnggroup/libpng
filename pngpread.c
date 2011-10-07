@@ -239,8 +239,16 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    chunk_name = png_ptr->chunk_name;
 
    if (chunk_name == png_IDAT)
+   {
+      /* This is here above the if/else case statement below because if the
+       * unknown handling marks 'IDAT' as unknown then the IDAT handling case is
+       * completely skipped.
+       *
+       * TODO: there must be a better way of doing this.
+       */
       if (png_ptr->mode & PNG_AFTER_IDAT)
          png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+   }
 
    if (chunk_name == png_IHDR)
    {
@@ -1795,19 +1803,22 @@ png_push_have_row(png_structp png_ptr, png_bytep row)
          (int)png_ptr->pass);
 }
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
 void PNGAPI
 png_progressive_combine_row (png_structp png_ptr, png_bytep old_row,
     png_const_bytep new_row)
 {
-   static PNG_CONST png_byte FARDATA png_pass_dsp_mask[7] =
-      {0xff, 0x0f, 0xff, 0x33, 0xff, 0x55, 0xff};
-
    if (png_ptr == NULL)
       return;
 
-   if (new_row != NULL)    /* new_row must == png_ptr->row_buf here. */
-      png_combine_row(png_ptr, old_row, png_pass_dsp_mask[png_ptr->pass]);
+   /* new_row is a flag here - if it is NULL then the app callback was called
+    * from an empty row (see the calls to png_struct::row_fn below), otherwise
+    * it must be png_ptr->row_buf+1
+    */
+   if (new_row != NULL)
+      png_combine_row(png_ptr, old_row, 1/*display*/);
 }
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 
 void PNGAPI
 png_set_progressive_read_fn(png_structp png_ptr, png_voidp progressive_ptr,

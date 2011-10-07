@@ -4330,6 +4330,7 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
 
       row = store_image_row(dp->ps, pp, 0, y);
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
       /* Combine the new row into the old: */
       if (dp->do_interlace)
       {
@@ -4344,6 +4345,7 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
       PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
       PNG_PASS_COLS(dp->w, pass) > 0)
       png_error(pp, "missing row in progressive de-interlacing");
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
 }
 
 static void
@@ -4549,6 +4551,8 @@ standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
              */
             if (!d.speed)
                standard_image_validate(&d, pp, 0, 1);
+            else
+               d.ps->validated = 1;
          }
       }
 
@@ -5488,7 +5492,10 @@ transform_end(png_structp pp, png_infop pi)
    transform_display *dp = voidcast(transform_display*,
       png_get_progressive_ptr(pp));
 
-   transform_image_validate(dp, pp, pi);
+   if (!dp->this.speed)
+      transform_image_validate(dp, pp, pi);
+   else
+      dp->this.ps->validated = 1;
 }
 
 /* A single test run. */
@@ -5561,6 +5568,8 @@ transform_test(png_modifier *pmIn, PNG_CONST png_uint_32 idIn,
 
          if (!d.this.speed)
             transform_image_validate(&d, pp, pi);
+         else
+            d.this.ps->validated = 1;
       }
 
       modifier_reset(d.pm);
@@ -8080,6 +8089,8 @@ gamma_end(png_structp pp, png_infop pi)
 
    if (!dp->this.speed)
       gamma_image_validate(dp, pp, pi);
+   else
+      dp->this.ps->validated = 1;
 }
 
 /* A single test run checking a gamma transformation.
@@ -8161,6 +8172,8 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
 
          if (!d.this.speed)
             gamma_image_validate(&d, pp, pi);
+         else
+            d.this.ps->validated = 1;
       }
 
       modifier_reset(d.pm);
