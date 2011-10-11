@@ -460,7 +460,13 @@ pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
       if (p == 0) return 0;
    }
 
-   return 1; /* Different */
+   /* Return the index of the changed byte. */
+   {
+      png_uint_32 where = 0;
+
+      while (pa[where] == pb[where]) ++where;
+      return 1+where;
+   }
 }
 
 /*************************** BASIC PNG FILE WRITING ***************************/
@@ -4414,6 +4420,7 @@ static void
 standard_row_validate(standard_display *dp, png_structp pp,
    int iImage, int iDisplay, png_uint_32 y)
 {
+   int where;
    png_byte std[STANDARD_ROWMAX];
 
    memset(std, 0xff, sizeof std);
@@ -4430,11 +4437,12 @@ standard_row_validate(standard_display *dp, png_structp pp,
     * row bytes are always trashed, so we always do a pixel_cmp here even though
     * a memcmp of all cbRow bytes will succeed for the sequential reader.
     */
-   if (iImage >= 0 && pixel_cmp(std, store_image_row(dp->ps, pp, iImage, y),
-      dp->bit_width) != 0)
+   if (iImage >= 0 &&
+      (where = pixel_cmp(std, store_image_row(dp->ps, pp, iImage, y),
+            dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "PNG image row %d changed", y);
+      sprintf(msg, "PNG image row %d changed at byte %d", y, where-1);
       png_error(pp, msg);
    }
 
@@ -4442,11 +4450,12 @@ standard_row_validate(standard_display *dp, png_structp pp,
     * byte at the end of the row if the row is not an exact multiple
     * of 8 bits wide.
     */
-   if (iDisplay >= 0 && pixel_cmp(std, store_image_row(dp->ps, pp, iDisplay, y),
-      dp->bit_width) != 0)
+   if (iDisplay >= 0 &&
+      (where = pixel_cmp(std, store_image_row(dp->ps, pp, iDisplay, y),
+         dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "display row %d changed", y);
+      sprintf(msg, "display row %d changed at byte %d", y, where-1);
       png_error(pp, msg);
    }
 }

@@ -325,17 +325,47 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  endif
 #endif
 
-/* These macros may need to be architecture dependent, they take a pointer and
- * an alignment requirement.
- */
+/* These macros may need to be architecture dependent. */
+#define PNG_ALIGN_NONE   0 /* do not use data alignment */
+#define PNG_ALIGN_ALWAYS 1 /* assume unaligned accesses are OK */
 #ifdef offsetof
-#  define png_alignof(type) offsetof(struct{char c; type t;}, t)
+#  define PNG_ALIGN_OFFSET 2 /* use offsetof to determine alignment */
+#else
+#  define PNG_ALIGN_OFFSET -1 /* prevent the use of this */
+#endif
+#define PNG_ALIGN_SIZE   3 /* use sizeof to determine alignment */
+
+#ifndef PNG_ALIGN_TYPE
+   /* Default to using aligned access optimizations and requiring alignment to a
+    * multiple of the data type size.  Override in a compiler specific fashion
+    * if necessary by inserting tests here:
+    */
+#  define PNG_ALIGN_TYPE PNG_ALIGN_SIZE
+#endif
+
+#if PNG_ALIGN_TYPE == PNG_ALIGN_SIZE
+   /* This is used because in some compiler implementations non-aligned
+    * structure members are supported, so the offsetof approach below fails.
+    * Set PNG_ALIGN_TO_SIZE=0 for compiler combinations where unaligned access
+    * is good for performance.  Do not do this unless you have tested the result
+    * and understand it.
+    */
+#  define png_alignof(type) (sizeof (type))
+#else
+#  if PNG_ALIGN_TYPE == PNG_ALIGN_OFFSET
+#     define png_alignof(type) offsetof(struct{char c; type t;}, t)
+#  else
+#     if PNG_ALIGN_TYPE == PNG_ALIGN_ALWAYS
+#        define png_alignof(type) (1)
+#     endif
+      /* Else leave png_alignof undefined to prevent use thereof */
+#  endif
 #endif
 
 /* This implicitly assumes alignment is always to a power of 2. */
 #ifdef png_alignof
 #  define png_isaligned(ptr, type)\
-   ((((char*)ptr-(char*)0) & (png_alignof(type)-1)) == 0)
+   ((((const char*)ptr-(const char*)0) & (png_alignof(type)-1)) == 0)
 #else
 #  define png_isaligned(ptr, type) 0
 #endif
@@ -859,7 +889,14 @@ PNG_EXTERN void png_write_start_row PNGARG((png_structp png_ptr));
  * This function is only ever used to write to row buffers provided by the
  * caller of the relevant libpng API and the row must have already been
  * transformed by the read transformations.
+ *
+ * The PNG_USE_COMPILE_TIME_MASKS option causes generation of pre-computed
+ * bitmasks for use within the code, otherwise runtime generated masks are used.
+ * The default is compile time masks.
  */
+#ifndef PNG_USE_COMPILE_TIME_MASKS
+#  define PNG_USE_COMPILE_TIME_MASKS 1
+#endif
 PNG_EXTERN void png_combine_row PNGARG((png_structp png_ptr, png_bytep row,
     int display));
 

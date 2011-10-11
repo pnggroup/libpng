@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.6beta05 - October 7, 2011
+ * libpng version 1.5.6beta05 - October 11, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.6beta05 - October 7, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.6beta05 - October 11, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -192,7 +192,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.6beta05, October 7, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.6beta05, October 11, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -304,7 +304,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    October 7, 2011
+ *    October 11, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -367,7 +367,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.6beta05"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.6beta05 - October 7, 2011\n"
+     " libpng version 1.5.6beta05 - October 11, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -2462,8 +2462,16 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
  * full, image which appears in a given pass.  'pass' is in the range 0
  * to 6 and the result is in the range 0 to 7.
  */
-#define PNG_PASS_START_ROW(pass) (((1U&~(pass))<<(3-((pass)>>1)))&7)
-#define PNG_PASS_START_COL(pass) (((1U& (pass))<<(3-(((pass)+1)>>1)))&7)
+#define PNG_PASS_START_ROW(pass) (((1&~(pass))<<(3-((pass)>>1)))&7)
+#define PNG_PASS_START_COL(pass) (((1& (pass))<<(3-(((pass)+1)>>1)))&7)
+
+/* A macro to return the offset between pixels in the output row for a pair of
+ * pixels in the input - effectively the inverse of the 'COL_SHIFT' macro that
+ * follows.  Note that ROW_OFFSET is the offset from one row to the next whereas
+ * COL_OFFSET is from one column to the next, within a row.
+ */
+#define PNG_PASS_ROW_OFFSET(pass) ((pass)>2?(8>>(((pass)-1)>>1)):8)
+#define PNG_PASS_COL_OFFSET(pass) (1<<((7-(pass))>>1))
 
 /* Two macros to help evaluate the number of rows or columns in each
  * pass.  This is expressed as a shift - effectively log2 of the number or
@@ -2498,8 +2506,8 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
  * the tile.
  */
 #define PNG_PASS_MASK(pass,off) ( \
-   ((0x110145AFU>>(((7-(off))-(pass))<<2)) & 0xFU) | \
-   ((0x01145AF0U>>(((7-(off))-(pass))<<2)) & 0xF0U))
+   ((0x110145AF>>(((7-(off))-(pass))<<2)) & 0xF) | \
+   ((0x01145AF0>>(((7-(off))-(pass))<<2)) & 0xF0))
 
 #define PNG_ROW_IN_INTERLACE_PASS(y, pass) \
    ((PNG_PASS_MASK(pass,0) >> ((y)&7)) & 1)
