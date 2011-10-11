@@ -92,7 +92,7 @@ png_write_chunk_header(png_structp png_ptr, png_uint_32 chunk_name,
 {
    png_byte buf[8];
 
-   png_debug2(0, "Writing %s chunk, length = %lu", chunk_string,
+   png_debug2(0, "Writing %s chunk, length = %lu", chunk_name,
       (unsigned long)length);
 
    if (png_ptr == NULL)

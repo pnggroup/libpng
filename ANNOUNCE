@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta05 - October 7, 2011
+Libpng 1.5.6beta05 - October 11, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,7 +55,7 @@ Version 1.5.6beta03 [September 28, 2011]
 Version 1.5.6beta04 [October 5, 2011]
   Fixed typo in Makefile.in and Makefile.am ("-M Wl" should be "-M -Wl")."
 
-Version 1.5.6beta05 [October 7, 2011]
+Version 1.5.6beta05 [October 11, 2011]
   Speed up png_combine_row() for interlaced images. This reduces the generality
     of the code, allowing it to be optimized for Adam7 interlace.  The masks
     passed to png_combine_row() are now generated internally, avoiding
@@ -68,6 +68,7 @@ Version 1.5.6beta05 [October 7, 2011]
     percentage for 16-bit and 32-bit pixels in the typical case where the
     output row buffers are appropriately aligned. The optimization was not
     previously possible because the png_struct buffer was always misaligned.
+  Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6bet01.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
