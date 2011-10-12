@@ -3631,6 +3631,8 @@ Version 1.5.6beta05 [October 12, 2011]
     previously possible because the png_struct buffer was always misaligned.
   Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6bet01.
 
+Version 1.5.6beta06 [October 12, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
