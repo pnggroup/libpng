@@ -3616,7 +3616,7 @@ Version 1.5.6beta03 [September 28, 2011]
 Version 1.5.6beta04 [October 5, 2011]
   Fixed typo in Makefile.in and Makefile.am ("-M Wl" should be "-M -Wl")."
 
-Version 1.5.6beta05 [October 11, 2011]
+Version 1.5.6beta05 [October 12, 2011]
   Speed up png_combine_row() for interlaced images. This reduces the generality
     of the code, allowing it to be optimized for Adam7 interlace.  The masks
     passed to png_combine_row() are now generated internally, avoiding

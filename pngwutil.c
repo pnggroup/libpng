@@ -92,7 +92,7 @@ png_write_chunk_header(png_structp png_ptr, png_uint_32 chunk_name,
 {
    png_byte buf[8];
 
-#ifdef PNG_DEBUG
+#if defined(PNG_DEBUG) && (PNG_DEBUG > 0)
    PNG_CSTRING_FROM_CHUNK(buf, chunk_name);
    png_debug2(0, "Writing %s chunk, length = %lu", buf, (unsigned long)length);
 #endif
