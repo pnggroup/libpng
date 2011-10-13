@@ -1068,6 +1068,15 @@ png_get_compression_buffer_size(png_const_structp png_ptr)
    return (png_ptr ? png_ptr->zbuf_size : 0);
 }
 
+#ifdef PNG_GET_COMPRESSION_BUFFER_SUPPORTED
+/* New in libpng-1.5.6 */
+png_bytep PNGAPI
+png_get_compression_buffer(png_const_structp png_ptr)
+{
+   return (png_ptr ? png_ptr->zbuf : 0);
+}
+#endif
+
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
 /* These functions were added to libpng 1.2.6 and were enabled

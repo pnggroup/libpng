@@ -239,3 +239,4 @@ EXPORTS
  png_get_cHRM_XYZ_fixed @231
  png_set_cHRM_XYZ @232
  png_set_cHRM_XYZ_fixed @233
+ png_get_compression_buffer @234

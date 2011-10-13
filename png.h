@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.6beta06 - October 12, 2011
+ * libpng version 1.5.6beta06 - October 13, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.6beta06 - October 12, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.6beta06 - October 13, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -192,7 +192,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.6beta06, October 12, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.6beta06, October 13, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -304,7 +304,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    October 12, 2011
+ *    October 13, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -367,7 +367,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.6beta06"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.6beta06 - October 12, 2011\n"
+     " libpng version 1.5.6beta06 - October 13, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -994,6 +994,12 @@ PNG_EXPORT(6, png_size_t, png_get_compression_buffer_size,
 
 PNG_EXPORT(7, void, png_set_compression_buffer_size, (png_structp png_ptr,
     png_size_t size));
+
+#ifdef PNG_GET_COMPRESSION_BUFFER_SUPPORTED
+/* New in libpng-1.5.6 */
+PNG_EXPORT(234, png_bytep, png_get_compression_buffer, (png_const_structp
+    png_ptr));
+#endif
 
 /* Moved from pngconf.h in 1.4.0 and modified to ensure setjmp/longjmp
  * match up.
@@ -2617,7 +2623,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(233);
+  PNG_EXPORT_LAST_ORDINAL(234);
 #endif
 
 #ifdef __cplusplus
