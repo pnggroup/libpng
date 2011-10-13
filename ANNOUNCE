@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta06 - October 12, 2011
+Libpng 1.5.6beta06 - October 13, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -68,9 +68,10 @@ Version 1.5.6beta05 [October 12, 2011]
     percentage for 16-bit and 32-bit pixels in the typical case where the
     output row buffers are appropriately aligned. The optimization was not
     previously possible because the png_struct buffer was always misaligned.
-  Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6bet01.
+  Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6beta01.
 
-Version 1.5.6beta06 [October 12, 2011]
+Version 1.5.6beta06 [October 13, 2011]
+  Removed two redundant tests for unitialized row.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
