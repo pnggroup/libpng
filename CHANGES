@@ -3633,6 +3633,8 @@ Version 1.5.6beta05 [October 12, 2011]
 
 Version 1.5.6beta06 [October 14, 2011]
   Removed two redundant tests for unitialized row.
+  Fixed a relatively harmless memory overwrite in compressed text writing
+    with a 1 byte zlib buffer.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

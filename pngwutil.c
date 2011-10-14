@@ -582,7 +582,10 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
    }
 
 #ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-   if (comp->input_len >= 2 && comp->input_len < 16384)
+   /* The zbuf_size test is because the code below doesn't work if zbuf_size is
+    * '1'; simply skip it to avoid memory overwrite.
+    */
+   if (comp->input_len >= 2 && comp->input_len < 16384 && png_ptr->zbuf_size > 1)
    {
       unsigned int z_cmf;  /* zlib compression method and flags */
 
