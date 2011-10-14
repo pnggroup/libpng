@@ -18,11 +18,11 @@ for opts in "--standard" "--standard --progressive-read" \
    "--size" "--size --progressive-read" \
    "--transform"
 do
-   if ./pngvalid  $opts >> pngtest-log.txt 2>&1
+   if ./pngvalid "$@" $opts >> pngtest-log.txt 2>&1
    then
-      echo "  PASS:" pngvalid $opts
+      echo "  PASS: pngvalid" "$@" $opts
    else
-      echo "  FAIL:" pngvalid $opts
+      echo "  FAIL: pngvalid" "$@" $opts
       err=1
    fi
 done

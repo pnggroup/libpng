@@ -1641,8 +1641,9 @@ png_init_read_transformations(png_structp png_ptr)
          /* if (png_ptr->background_gamma_type!=PNG_BACKGROUND_GAMMA_UNKNOWN) */
          else /* color_type != PNG_COLOR_TYPE_PALETTE */
          {
-            png_fixed_point g = PNG_FP_1;
-            png_fixed_point gs = PNG_FP_1;
+            int gs_sig, g_sig;
+            png_fixed_point g = PNG_FP_1;  /* Correction to linear */
+            png_fixed_point gs = PNG_FP_1; /* Correction to screen */
 
             switch (png_ptr->background_gamma_type)
             {
@@ -1666,34 +1667,45 @@ png_init_read_transformations(png_structp png_ptr)
                   png_error(png_ptr, "invalid background gamma type");
             }
 
-            png_ptr->background_1.gray = png_gamma_correct(png_ptr,
-                png_ptr->background.gray, g);
+            g_sig = png_gamma_significant(g);
+            gs_sig = png_gamma_significant(gs);
 
-            png_ptr->background.gray = png_gamma_correct(png_ptr,
-                png_ptr->background.gray, gs);
+            if (g_sig)
+               png_ptr->background_1.gray = png_gamma_correct(png_ptr,
+                   png_ptr->background.gray, g);
+
+            if (gs_sig)
+               png_ptr->background.gray = png_gamma_correct(png_ptr,
+                   png_ptr->background.gray, gs);
 
             if ((png_ptr->background.red != png_ptr->background.green) ||
                 (png_ptr->background.red != png_ptr->background.blue) ||
                 (png_ptr->background.red != png_ptr->background.gray))
             {
                /* RGB or RGBA with color background */
-               png_ptr->background_1.red = png_gamma_correct(png_ptr,
-                   png_ptr->background.red, g);
+               if (g_sig)
+               {
+                  png_ptr->background_1.red = png_gamma_correct(png_ptr,
+                      png_ptr->background.red, g);
 
-               png_ptr->background_1.green = png_gamma_correct(png_ptr,
-                   png_ptr->background.green, g);
+                  png_ptr->background_1.green = png_gamma_correct(png_ptr,
+                      png_ptr->background.green, g);
 
-               png_ptr->background_1.blue = png_gamma_correct(png_ptr,
-                   png_ptr->background.blue, g);
+                  png_ptr->background_1.blue = png_gamma_correct(png_ptr,
+                      png_ptr->background.blue, g);
+               }
 
-               png_ptr->background.red = png_gamma_correct(png_ptr,
-                   png_ptr->background.red, gs);
+               if (gs_sig)
+               {
+                  png_ptr->background.red = png_gamma_correct(png_ptr,
+                      png_ptr->background.red, gs);
 
-               png_ptr->background.green = png_gamma_correct(png_ptr,
-                   png_ptr->background.green, gs);
+                  png_ptr->background.green = png_gamma_correct(png_ptr,
+                      png_ptr->background.green, gs);
 
-               png_ptr->background.blue = png_gamma_correct(png_ptr,
-                   png_ptr->background.blue, gs);
+                  png_ptr->background.blue = png_gamma_correct(png_ptr,
+                      png_ptr->background.blue, gs);
+               }
             }
 
             else
@@ -1705,6 +1717,9 @@ png_init_read_transformations(png_structp png_ptr)
                png_ptr->background.red = png_ptr->background.green
                    = png_ptr->background.blue = png_ptr->background.gray;
             }
+
+            /* The background is now in screen gamma: */
+            png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_SCREEN;
          } /* color_type != PNG_COLOR_TYPE_PALETTE */
       }/* png_ptr->transformations & PNG_BACKGROUND */
 
@@ -3404,7 +3419,8 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
+#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
+   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
 /* Replace any alpha or transparency with the supplied background color.
  * "background" is already in the screen gamma, while "background_1" is
  * at a gamma of 1.0.  Paletted files have already been taken care of.
@@ -4112,7 +4128,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structp png_ptr)
       }
    }
 }
-#endif
+#endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_READ_ALPHA_MODE_SUPPORTED */
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
 /* Gamma correct the image, avoiding the alpha channel.  Make sure

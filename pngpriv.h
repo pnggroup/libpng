@@ -1568,6 +1568,7 @@ PNG_EXTERN png_uint_16 png_gamma_16bit_correct PNGARG((unsigned int value,
     png_fixed_point gamma_value));
 PNG_EXTERN png_byte png_gamma_8bit_correct PNGARG((unsigned int value,
     png_fixed_point gamma_value));
+PNG_EXTERN void png_destroy_gamma_table(png_structp png_ptr);
 PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
     int bit_depth));
 #endif

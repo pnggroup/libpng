@@ -1032,6 +1032,10 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
    if (end_info_ptr != NULL)
       png_info_destroy(png_ptr, end_info_ptr);
 
+#ifdef PNG_READ_GAMMA_SUPPORTED
+   png_destroy_gamma_table(png_ptr);
+#endif
+
    png_free(png_ptr, png_ptr->zbuf);
    png_free(png_ptr, png_ptr->big_row_buf);
    png_free(png_ptr, png_ptr->prev_row);
@@ -1040,15 +1044,6 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
    png_free(png_ptr, png_ptr->palette_lookup);
    png_free(png_ptr, png_ptr->quantize_index);
-#endif
-
-#ifdef PNG_READ_GAMMA_SUPPORTED
-   png_free(png_ptr, png_ptr->gamma_table);
-#endif
-
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
-   png_free(png_ptr, png_ptr->gamma_from_1);
-   png_free(png_ptr, png_ptr->gamma_to_1);
 #endif
 
    if (png_ptr->free_me & PNG_FREE_PLTE)
@@ -1066,42 +1061,6 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr->free_me & PNG_FREE_HIST)
       png_free(png_ptr, png_ptr->hist);
    png_ptr->free_me &= ~PNG_FREE_HIST;
-#endif
-
-#ifdef PNG_READ_GAMMA_SUPPORTED
-   if (png_ptr->gamma_16_table != NULL)
-   {
-      int i;
-      int istop = (1 << (8 - png_ptr->gamma_shift));
-      for (i = 0; i < istop; i++)
-      {
-         png_free(png_ptr, png_ptr->gamma_16_table[i]);
-      }
-   png_free(png_ptr, png_ptr->gamma_16_table);
-   }
-
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
-   if (png_ptr->gamma_16_from_1 != NULL)
-   {
-      int i;
-      int istop = (1 << (8 - png_ptr->gamma_shift));
-      for (i = 0; i < istop; i++)
-      {
-         png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
-      }
-   png_free(png_ptr, png_ptr->gamma_16_from_1);
-   }
-   if (png_ptr->gamma_16_to_1 != NULL)
-   {
-      int i;
-      int istop = (1 << (8 - png_ptr->gamma_shift));
-      for (i = 0; i < istop; i++)
-      {
-         png_free(png_ptr, png_ptr->gamma_16_to_1[i]);
-      }
-   png_free(png_ptr, png_ptr->gamma_16_to_1);
-   }
-#endif
 #endif
 
    inflateEnd(&png_ptr->zstream);

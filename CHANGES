@@ -3635,6 +3635,10 @@ Version 1.5.6beta06 [October 14, 2011]
   Removed two redundant tests for unitialized row.
   Fixed a relatively harmless memory overwrite in compressed text writing
     with a 1 byte zlib buffer.
+  Fixes for multiple calls to png_read_update_info. These fixes attend to
+    most of the errors revealed in pngvalid, however doing the gamma work
+    twice results in inaccuracies that can't be easily fixed.  There is now
+    a warning in the code if this is going to happen.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

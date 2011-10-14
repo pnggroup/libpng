@@ -645,13 +645,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.6beta06 - October 12, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.6beta06 - October 14, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.6beta06 - October 12, 2011\
+      return "libpng version 1.5.6beta06 - October 14, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2663,6 +2663,60 @@ png_build_8bit_table(png_structp png_ptr, png_bytepp ptable,
       table[i] = (png_byte)i;
 }
 
+/* Used from png_read_destroy and below to release the memory used by the gamma
+ * tables.
+ */
+void /* PRIVATE */
+png_destroy_gamma_table(png_structp png_ptr)
+{
+   png_free(png_ptr, png_ptr->gamma_table);
+   png_ptr->gamma_table = NULL;
+
+   if (png_ptr->gamma_16_table != NULL)
+   {
+      int i;
+      int istop = (1 << (8 - png_ptr->gamma_shift));
+      for (i = 0; i < istop; i++)
+      {
+         png_free(png_ptr, png_ptr->gamma_16_table[i]);
+      }
+   png_free(png_ptr, png_ptr->gamma_16_table);
+   png_ptr->gamma_16_table = NULL;
+   }
+
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
+   png_free(png_ptr, png_ptr->gamma_from_1);
+   png_ptr->gamma_from_1 = NULL;
+   png_free(png_ptr, png_ptr->gamma_to_1);
+   png_ptr->gamma_to_1 = NULL;
+
+   if (png_ptr->gamma_16_from_1 != NULL)
+   {
+      int i;
+      int istop = (1 << (8 - png_ptr->gamma_shift));
+      for (i = 0; i < istop; i++)
+      {
+         png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
+      }
+   png_free(png_ptr, png_ptr->gamma_16_from_1);
+   png_ptr->gamma_16_from_1 = NULL;
+   }
+   if (png_ptr->gamma_16_to_1 != NULL)
+   {
+      int i;
+      int istop = (1 << (8 - png_ptr->gamma_shift));
+      for (i = 0; i < istop; i++)
+      {
+         png_free(png_ptr, png_ptr->gamma_16_to_1[i]);
+      }
+   png_free(png_ptr, png_ptr->gamma_16_to_1);
+   png_ptr->gamma_16_to_1 = NULL;
+   }
+#endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
+}
+
 /* We build the 8- or 16-bit gamma tables here.  Note that for 16-bit
  * tables, we don't make a full table if we are reducing to 8-bit in
  * the future.  Note also how the gamma_16 tables are segmented so that
@@ -2672,6 +2726,18 @@ void /* PRIVATE */
 png_build_gamma_table(png_structp png_ptr, int bit_depth)
 {
   png_debug(1, "in png_build_gamma_table");
+
+  /* Remove any existing table; this copes with multiple calls to
+   * png_read_update_info.  The warning is because building the gamma tables
+   * multiple times is a performance hit - it's harmless but the ability to call
+   * png_read_update_info() multiple times is new in 1.5.6 so it seems sensible
+   * to warn if the app introduces such a hit.
+   */
+  if (png_ptr->gamma_table != NULL || png_ptr->gamma_16_table != NULL)
+  {
+    png_warning(png_ptr, "gamma table being rebuilt");
+    png_destroy_gamma_table(png_ptr);
+  }
 
   if (bit_depth <= 8)
   {

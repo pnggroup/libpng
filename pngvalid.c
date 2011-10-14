@@ -7748,7 +7748,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:
 #           endif /* ALPHA_MODE_SUPPORTED */
-               do_compose = (alpha >= 0 && alpha < 1);
+               do_compose = (alpha > 0 && alpha < 1);
                use_input = (alpha != 0);
                break;
 
