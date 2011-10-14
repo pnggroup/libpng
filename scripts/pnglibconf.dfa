@@ -557,9 +557,6 @@ option SAVE_INT_32 requires WRITE
 
 option WRITE_OPTIMIZE_CMF requires WRITE
 
-# Added at libpng-1.5.6
-option GET_COMPRESSION_BUFFER
-
 option READ_COMPRESSED_TEXT disabled
 option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT

@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.6beta06 - October 13, 2011
+ libpng version 1.5.6beta06 - October 14, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.6beta06 - October 13, 2011
+ libpng versions 0.97, January 1998, through 1.5.6beta06 - October 14, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -3692,13 +3692,6 @@ compressed chunks such as zTXt, iTXt, and iCCP:
     png_set_text_compression_method(png_ptr, method);
     #endif
 
-As of libpng version 1.5.6, an API became available for
-retrieving a pointer to the compression buffer:
-
-#if PNG_GET_COMPRESSION_BUFFER_SUPPORTED
-    png_bytep buffer = png_get_compression_buffer(png_ptr);
-#endif
-
 Controlling row filtering
 
 If you want to control whether libpng uses filtering or not, which
@@ -4570,7 +4563,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-October 13, 2011
+October 14, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
