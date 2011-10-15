@@ -1715,6 +1715,11 @@ typedef struct png_modifier
    double                   error_indexed;
 
    /* Flags: */
+   /* Whether to call png_read_update_info, not png_read_start_image, and how
+    * many times to call it.
+    */
+   int                      use_update_info;
+
    /* Whether or not to interlace. */
    int                      interlace_type :9; /* int, but must store '1' */
 
@@ -1798,6 +1803,7 @@ modifier_init(png_modifier *pm)
    pm->error_gray_2 = pm->error_gray_4 = pm->error_gray_8 = 0;
    pm->error_gray_16 = pm->error_color_8 = pm->error_color_16 = 0;
    pm->error_indexed = 0;
+   pm->use_update_info = 0;
    pm->interlace_type = PNG_INTERLACE_NONE;
    pm->test_standard = 0;
    pm->test_size = 0;
@@ -3884,6 +3890,7 @@ typedef struct standard_display
    int         do_interlace;   /* Do interlacing internally */
    int         is_transparent; /* Transparency information was present. */
    int         speed;          /* Doing a speed test */
+   int         use_update_info;/* Call update_info, not start_image */
    struct
    {
       png_uint_16 red;
@@ -3897,7 +3904,7 @@ typedef struct standard_display
 
 static void
 standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
-   int do_interlace)
+   int do_interlace, int use_update_info)
 {
    memset(dp, 0, sizeof *dp);
 
@@ -3921,6 +3928,7 @@ standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
    dp->do_interlace = do_interlace;
    dp->is_transparent = 0;
    dp->speed = ps->speed;
+   dp->use_update_info = use_update_info;
    dp->npalette = 0;
    /* Preset the transparent color to black: */
    memset(&dp->transparent, 0, sizeof dp->transparent);
@@ -4278,7 +4286,16 @@ standard_info_imp(standard_display *dp, png_structp pp, png_infop pi,
    /* And the info callback has to call this (or png_read_update_info - see
     * below in the png_modifier code for that variant.
     */
-   png_start_read_image(pp);
+   if (dp->use_update_info)
+   {
+      /* For debugging the effect of multiple calls: */
+      int i = dp->use_update_info;
+      while (i-- > 0)
+         png_read_update_info(pp, pi);
+   }
+
+   else
+      png_start_read_image(pp);
 
    /* Validate the height, width and rowbytes plus ensure that sufficient buffer
     * exists for decoding the image.
@@ -4496,7 +4513,7 @@ standard_end(png_structp pp, png_infop pi)
 /* A single test run checking the standard image to ensure it is not damaged. */
 static void
 standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
-   int do_interlace)
+   int do_interlace, int use_update_info)
 {
    standard_display d;
    context(psIn, fault);
@@ -4504,7 +4521,7 @@ standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
    /* Set up the display (stack frame) variables from the arguments to the
     * function and initialize the locals that are filled in later.
     */
-   standard_display_init(&d, psIn, id, do_interlace);
+   standard_display_init(&d, psIn, id, do_interlace, use_update_info);
 
    /* Everything is protected by a Try/Catch.  The functions called also
     * typically have local Try/Catch blocks.
@@ -4591,7 +4608,7 @@ test_standard(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
            interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
       {
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            interlace_type, 0, 0, 0), 0/*do_interlace*/);
+            interlace_type, 0, 0, 0), 0/*do_interlace*/, pm->use_update_info);
 
          if (fail(pm))
             return 0;
@@ -4650,25 +4667,29 @@ test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
           * to validate.
           */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            PNG_INTERLACE_NONE, w, h, 0), 0/*do_interlace*/);
+            PNG_INTERLACE_NONE, w, h, 0), 0/*do_interlace*/,
+            pm->use_update_info);
 
          if (fail(pm))
             return 0;
 
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            PNG_INTERLACE_NONE, w, h, 1), 0/*do_interlace*/);
+            PNG_INTERLACE_NONE, w, h, 1), 0/*do_interlace*/,
+            pm->use_update_info);
 
          if (fail(pm))
             return 0;
 
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/);
+            PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/,
+            pm->use_update_info);
 
          if (fail(pm))
             return 0;
 
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            PNG_INTERLACE_ADAM7, w, h, 1), 0/*do_interlace*/);
+            PNG_INTERLACE_ADAM7, w, h, 1), 0/*do_interlace*/,
+            pm->use_update_info);
 
          if (fail(pm))
             return 0;
@@ -4678,13 +4699,15 @@ test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
           * to the code used in the non-interlaced case too.
           */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            PNG_INTERLACE_NONE, w, h, 0), 1/*do_interlace*/);
+            PNG_INTERLACE_NONE, w, h, 0), 1/*do_interlace*/,
+            pm->use_update_info);
 
          if (fail(pm))
             return 0;
 
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            PNG_INTERLACE_ADAM7, w, h, 0), 1/*do_interlace*/);
+            PNG_INTERLACE_ADAM7, w, h, 0), 1/*do_interlace*/,
+            pm->use_update_info);
 
          if (fail(pm))
             return 0;
@@ -5159,7 +5182,8 @@ transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
    memset(dp, 0, sizeof dp);
 
    /* Standard fields */
-   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/);
+   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
+      1/*use_update_info*/);
 
    /* Parameter fields */
    dp->pm = pm;
@@ -5180,7 +5204,13 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    dp->transform_list->set(dp->transform_list, dp, pp, pi);
 
    /* Update the info structure for these transforms: */
-   png_read_update_info(pp, pi);
+   {
+      int i = dp->this.use_update_info;
+      /* Always do one call, even if use_update_info is 0. */
+      do
+         png_read_update_info(pp, pi);
+      while (--i > 0);
+   }
 
    /* And get the output information into the standard_display */
    standard_info_part2(&dp->this, pp, pi, 1/*images*/);
@@ -7012,7 +7042,8 @@ gamma_display_init(gamma_display *dp, png_modifier *pm, png_uint_32 id,
     double background_gamma)
 {
    /* Standard fields */
-   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/);
+   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
+      1/*use_update_info*/);
 
    /* Parameter fields */
    dp->pm = pm;
@@ -7141,7 +7172,13 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
       }
    }
 
-   png_read_update_info(pp, pi);
+   {
+      int i = dp->this.use_update_info;
+      /* Always do one call, even if use_update_info is 0. */
+      do
+         png_read_update_info(pp, pi);
+      while (--i > 0);
+   }
 
    /* Now we may get a different cbRow: */
    standard_info_part2(&dp->this, pp, pi, 1 /*images*/);
@@ -9371,6 +9408,9 @@ int main(int argc, PNG_CONST char **argv)
 
       else if (strcmp(*argv, "--progressive-read") == 0)
          pm.this.progressive = 1;
+
+      else if (strcmp(*argv, "--use-update-info") == 0)
+         ++pm.use_update_info; /* Can call multiple times */
 
       else if (strcmp(*argv, "--interlace") == 0)
          pm.interlace_type = PNG_INTERLACE_ADAM7;

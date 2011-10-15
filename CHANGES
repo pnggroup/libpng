@@ -3631,10 +3631,11 @@ Version 1.5.6beta05 [October 12, 2011]
     previously possible because the png_struct buffer was always misaligned.
   Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6beta01.
 
-Version 1.5.6beta06 [October 14, 2011]
+Version 1.5.6beta06 [October 15, 2011]
   Removed two redundant tests for unitialized row.
   Fixed a relatively harmless memory overwrite in compressed text writing
     with a 1 byte zlib buffer.
+  Add ability to call png_read_update_info multiple times to pngvalid.c.
   Fixes for multiple calls to png_read_update_info. These fixes attend to
     most of the errors revealed in pngvalid, however doing the gamma work
     twice results in inaccuracies that can't be easily fixed.  There is now
