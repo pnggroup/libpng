@@ -3646,6 +3646,8 @@ Version 1.5.6beta06 [October 17, 2011]
     overwrite the end of the image if the row width is not an exact multiple
     of 8 bits and the image is not interlaced.
 
+Version 1.5.6beta07 [October 17, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
