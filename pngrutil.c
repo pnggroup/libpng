@@ -2786,6 +2786,9 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
    png_const_bytep sp = png_ptr->row_buf + 1;
    png_uint_32 row_width = png_ptr->width;
    unsigned int pass = png_ptr->pass;
+   png_bytep end_ptr = 0;
+   png_byte end_byte = 0;
+   unsigned int end_mask;
 
    png_debug(1, "in png_combine_row");
 
@@ -2806,6 +2809,26 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
    /* Don't expect this to ever happen: */
    if (row_width == 0)
       png_error(png_ptr, "internal row width error");
+
+   /* Preserve the last byte in cases where only part of it will be overwritten,
+    * the multiply below may overflow, we don't care because ANSI-C guarantees
+    * we get the low bits.
+    */
+   end_mask = (pixel_depth * row_width) & 7;
+   if (end_mask != 0)
+   {
+      /* ep == NULL is a flag to say do nothing */
+      end_ptr = dp + PNG_ROWBYTES(pixel_depth, row_width) - 1;
+      end_byte = *end_ptr;
+#     ifdef PNG_READ_PACKSWAP_SUPPORTED
+         if (png_ptr->transformations & PNG_PACKSWAP) /* little-endian byte */
+            end_mask = 0xff << end_mask;
+
+         else /* big-endian byte */
+#     endif
+         end_mask = 0xff >> end_mask;
+      /* end_mask is now the bits to *keep* from the destination row */
+   }
 
    /* This reduces to a memcpy for non-interlaced images and for the case where
     * interlacing isn't supported or isn't done (in that case the caller gets a
@@ -2969,7 +2992,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
              * this.
              */
             if (row_width <= pixels_per_byte)
-               return;
+               break; /* May need to restore part of the last byte */
 
             row_width -= pixels_per_byte;
             ++dp;
@@ -3023,6 +3046,10 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
          /* And simply copy these bytes.  Some optimization is possible here,
           * depending on the value of 'bytes_to_copy'.  Speical case the low
           * byte counts, which we know to be frequent.
+          *
+          * Notice that these cases all 'return' rather than 'break' - this
+          * avoids an unnecessary test on whether to restore the last byte
+          * below.
           */
          switch (bytes_to_copy)
          {
@@ -3188,9 +3215,11 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                      bytes_to_copy = row_width;
                }
          }
+
+         /* NOT REACHED*/
       } /* pixel_depth >= 8 */
 
-      /* NOT REACHED*/
+      /* Here if pixel_depth < 8 to check 'end_ptr' below. */
    }
    else
 #endif
@@ -3200,6 +3229,10 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
     * destination row if it is a partial byte.)
     */
    png_memcpy(dp, sp, PNG_ROWBYTES(pixel_depth, row_width));
+
+   /* Restore the overwritten bits from the last byte if necessary. */
+   if (end_ptr != NULL)
+      *end_ptr = (png_byte)((end_byte & end_mask) | (*end_ptr & ~end_mask));
 }
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED

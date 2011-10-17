@@ -433,12 +433,35 @@ pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
       memmove(toBuffer+(toIndex>>3), fromBuffer+(fromIndex>>3), pixelSize>>3);
 }
 
+/* Copy a complete row of pixels, taking into account potential partial
+ * bytes at the end.
+ */
+static void
+row_copy(png_bytep toBuffer, png_const_bytep fromBuffer, unsigned int bitWidth)
+{
+   memcpy(toBuffer, fromBuffer, bitWidth >> 3);
+
+   if ((bitWidth & 7) != 0)
+   {
+      unsigned int mask;
+
+      toBuffer += bitWidth >> 3;
+      fromBuffer += bitWidth >> 3;
+      /* The remaining bits are in the top of the byte, the mask is the bits to
+       * retain.
+       */
+      mask = 0xff >> (bitWidth & 7);
+      *toBuffer = (png_byte)((*toBuffer & mask) | (*fromBuffer & ~mask));
+   }
+}
+
 /* Compare pixels - they are assumed to start at the first byte in the
  * given buffers.
  */
 static int
 pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
 {
+#if PNG_LIBPNG_VER < 10506
    if (memcmp(pa, pb, bit_width>>3) == 0)
    {
       png_uint_32 p;
@@ -459,6 +482,13 @@ pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
 
       if (p == 0) return 0;
    }
+#else
+   /* From libpng-1.5.6 the overwrite should be fixed, so compare the trailing
+    * bits too:
+    */
+   if (memcmp(pa, pb, (bit_width+7)>>3) == 0)
+      return 0;
+#endif
 
    /* Return the index of the changed byte. */
    {
@@ -908,11 +938,13 @@ store_ensure_image(png_store *ps, png_structp pp, int nImages, png_size_t cbRow,
    ps->cb_row = cbRow;
    ps->image_h = cRows;
 
-   /* For error checking, the whole buffer is set to '1' - this matches what
-    * happens with the 'size' test images on write and also matches the unused
-    * bits in the test rows.
+   /* For error checking, the whole buffer is set to 10110010 (0xb2 - 178).
+    * This deliberately doesn't match the bits in the size test image which are
+    * outside the image; these are set to 0xff (all 1).  To make the row
+    * comparison work in the 'size' test case the size rows are pre-initialized
+    * to the same value prior to calling 'standard_row'.
     */
-   memset(ps->image, 0xff, cb);
+   memset(ps->image, 178, cb);
 
    /* Then put in the marks. */
    while (--nImages >= 0)
@@ -4360,7 +4392,7 @@ progressive_row(png_structp pp, png_bytep new_row, png_uint_32 y, int pass)
          if (dp->interlace_type == PNG_INTERLACE_ADAM7)
             deinterlace_row(row, new_row, dp->pixel_size, dp->w, pass);
          else
-            memcpy(row, new_row, dp->cbRow);
+            row_copy(row, new_row, dp->pixel_size * dp->w);
       }
       else
          png_progressive_combine_row(pp, row, new_row);
@@ -4404,10 +4436,12 @@ sequential_row(standard_display *dp, png_structp pp, png_infop pi,
 
                /* The following aids (to some extent) error detection - we can
                 * see where png_read_row wrote.  Use opposite values in row and
-                * display to make this easier.
+                * display to make this easier.  Don't use 0xff (which is used in
+                * the image write code to fill unused bits) or 0 (which is a
+                * likely value to overwrite unused bits with).
                 */
-               memset(row, 0xff, sizeof row);
-               memset(display, 0, sizeof display);
+               memset(row, 0xc5, sizeof row);
+               memset(display, 0x5c, sizeof display);
 
                png_read_row(pp, row, display);
 
@@ -4440,39 +4474,51 @@ standard_row_validate(standard_display *dp, png_structp pp,
    int where;
    png_byte std[STANDARD_ROWMAX];
 
-   memset(std, 0xff, sizeof std);
+   /* The row must be pre-initialized to the magic number here for the size
+    * tests to pass:
+    */
+   memset(std, 178, sizeof std);
    standard_row(pp, std, dp->id, y);
 
    /* At the end both the 'row' and 'display' arrays should end up identical.
     * In earlier passes 'row' will be partially filled in, with only the pixels
     * that have been read so far, but 'display' will have those pixels
     * replicated to fill the unread pixels while reading an interlaced image.
+#if PNG_LIBPNG_VER < 10506
     * The side effect inside the libpng sequential reader is that the 'row'
     * array retains the correct values for unwritten pixels within the row
     * bytes, while the 'display' array gets bits off the end of the image (in
     * the last byte) trashed.  Unfortunately in the progressive reader the
     * row bytes are always trashed, so we always do a pixel_cmp here even though
     * a memcmp of all cbRow bytes will succeed for the sequential reader.
+#endif
     */
    if (iImage >= 0 &&
       (where = pixel_cmp(std, store_image_row(dp->ps, pp, iImage, y),
             dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "PNG image row %d changed at byte %d", y, where-1);
+      sprintf(msg, "PNG image row[%d][%d] changed from %.2x to %.2x", y,
+         where-1, std[where-1],
+         store_image_row(dp->ps, pp, iImage, y)[where-1]);
       png_error(pp, msg);
    }
 
+#if PNG_LIBPNG_VER < 10506
    /* In this case use pixel_cmp because we need to compare a partial
     * byte at the end of the row if the row is not an exact multiple
-    * of 8 bits wide.
+    * of 8 bits wide.  (This is fixed in libpng-1.5.6 and pixel_cmp is
+    * changed to match!)
     */
+#endif
    if (iDisplay >= 0 &&
       (where = pixel_cmp(std, store_image_row(dp->ps, pp, iDisplay, y),
          dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "display row %d changed at byte %d", y, where-1);
+      sprintf(msg, "display  row[%d][%d] changed from %.2x to %.2x", y,
+         where-1, std[where-1],
+         store_image_row(dp->ps, pp, iDisplay, y)[where-1]);
       png_error(pp, msg);
    }
 }
