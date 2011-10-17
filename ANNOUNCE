@@ -80,7 +80,7 @@ Version 1.5.6beta06 [October 17, 2011]
     twice results in inaccuracies that can't be easily fixed.  There is now
     a warning in the code if this is going to happen.
   Turned on multiple png_read_update_info in pngvalid transform tests.
-  Prevent libpng overwriting unused bits at the end of the image when when
+  Prevent libpng overwriting unused bits at the end of the image when
     it is not byte aligned, while reading. Prior to libpng-1.5.6 libpng would
     overwrite the end of the image if the row width is not an exact multiple
     of 8 bits and the image is not interlaced.
