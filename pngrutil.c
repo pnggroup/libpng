@@ -3946,35 +3946,40 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (row_bytes + 48 > png_ptr->old_big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
+     png_free(png_ptr, png_ptr->big_prev_row);
 
      if (png_ptr->interlaced)
         png_ptr->big_row_buf = (png_bytep)png_calloc(png_ptr,
             row_bytes + 48);
 
      else
-        png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr,
-            row_bytes + 48);
+        png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
 
+     png_ptr->big_prev_row = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
      png_ptr->old_big_row_buf_size = row_bytes + 48;
 
 #ifdef PNG_ALIGNED_MEMORY_SUPPORTED
      /* Use 16-byte aligned memory for row_buf with at least 16 bytes
-      * of padding before and after row_buf.
+      * of padding before and after row_buf; treat prev_row similarly.
       * NOTE: the alignment is to the start of the pixels, one beyond the start
       * of the buffer, because of the filter byte.  Prior to libpng 1.5.6 this
-      * was incorrect, the filter byte was aligned, which had the exact opposite
-      * effect to that intended.
+      * was incorrect; the filter byte was aligned, which had the exact
+      * opposite effect of that intended.
       */
      {
         png_bytep temp = png_ptr->big_row_buf + 32;
         int extra = (int)((temp - (png_bytep)0) & 0xf);
         png_ptr->row_buf = temp - extra - 1/*filter byte*/;
+
+        temp = png_ptr->big_prev_row + 32;
+        extra = (int)((temp - (png_bytep)0) & 0xf);
+        png_ptr->prev_row = temp - extra - 1/*filter byte*/;
      }
 
-     png_ptr->old_big_row_buf_size = row_bytes + 48;
 #else
      /* Use 31 bytes of padding before and 17 bytes after row_buf. */
      png_ptr->row_buf = png_ptr->big_row_buf + 31;
+     png_ptr->prev_row = png_ptr->big_prev_row + 31;
 #endif
      png_ptr->old_big_row_buf_size = row_bytes + 48;
    }
@@ -3986,15 +3991,6 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 #endif
    if (png_ptr->rowbytes > (PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory");
-
-   if (png_ptr->rowbytes + 1 > png_ptr->old_prev_row_size)
-   {
-      png_free(png_ptr, png_ptr->prev_row);
-
-      png_ptr->prev_row = (png_bytep)png_malloc(png_ptr, png_ptr->rowbytes + 1);
-
-      png_ptr->old_prev_row_size = png_ptr->rowbytes + 1;
-   }
 
    png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
