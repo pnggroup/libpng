@@ -5183,7 +5183,7 @@ transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
 
    /* Standard fields */
    standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
-      1/*use_update_info*/);
+      pm->use_update_info);
 
    /* Parameter fields */
    dp->pm = pm;
@@ -7043,7 +7043,7 @@ gamma_display_init(gamma_display *dp, png_modifier *pm, png_uint_32 id,
 {
    /* Standard fields */
    standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
-      1/*use_update_info*/);
+      pm->use_update_info);
 
    /* Parameter fields */
    dp->pm = pm;

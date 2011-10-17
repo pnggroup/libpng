@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta06 - October 15, 2011
+Libpng 1.5.6beta06 - October 17, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -70,7 +70,7 @@ Version 1.5.6beta05 [October 12, 2011]
     previously possible because the png_struct buffer was always misaligned.
   Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6beta01.
 
-Version 1.5.6beta06 [October 15, 2011]
+Version 1.5.6beta06 [October 17, 2011]
   Removed two redundant tests for unitialized row.
   Fixed a relatively harmless memory overwrite in compressed text writing
     with a 1 byte zlib buffer.
@@ -79,6 +79,7 @@ Version 1.5.6beta06 [October 15, 2011]
     most of the errors revealed in pngvalid, however doing the gamma work
     twice results in inaccuracies that can't be easily fixed.  There is now
     a warning in the code if this is going to happen.
+  Turned on multiple png_read_update_info in pngvalid transform tests.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
