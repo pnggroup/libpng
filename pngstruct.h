@@ -105,8 +105,12 @@ struct png_struct_def
    png_uint_32 iwidth;        /* width of current interlaced row in pixels */
    png_uint_32 row_number;    /* current row in interlace pass */
    png_uint_32 chunk_name;    /* PNG_CHUNK() id of current chunk */
-   png_bytep prev_row;        /* buffer to save previous (unfiltered) row */
-   png_bytep row_buf;         /* buffer to save current (unfiltered) row */
+   png_bytep prev_row;        /* buffer to save previous (unfiltered) row.
+                               * This is a pointer into big_prev_row
+                               */
+   png_bytep row_buf;         /* buffer to save current (unfiltered) row.
+                               * This is a pointer into big_row_buf
+                               */
    png_bytep sub_row;         /* buffer to save "sub" row when filtering */
    png_bytep up_row;          /* buffer to save "up" row when filtering */
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
@@ -336,9 +340,8 @@ struct png_struct_def
    png_unknown_chunk unknown_chunk;
 #endif
 
-/* New members added in libpng-1.2.26 */
+/* New member added in libpng-1.2.26 */
   png_size_t old_big_row_buf_size;
-  png_size_t old_prev_row_size;
 
 /* New member added in libpng-1.2.30 */
   png_charp chunkdata;  /* buffer for reading chunk data */
@@ -347,5 +350,8 @@ struct png_struct_def
 /* New member added in libpng-1.4.0 */
    png_uint_32 io_state;
 #endif
+
+/* New member added in libpng-1.5.6 */
+   png_bytep big_prev_row;
 };
 #endif /* PNGSTRUCT_H */

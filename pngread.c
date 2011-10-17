@@ -1038,7 +1038,7 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
 
    png_free(png_ptr, png_ptr->zbuf);
    png_free(png_ptr, png_ptr->big_row_buf);
-   png_free(png_ptr, png_ptr->prev_row);
+   png_free(png_ptr, png_ptr->big_prev_row);
    png_free(png_ptr, png_ptr->chunkdata);
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED

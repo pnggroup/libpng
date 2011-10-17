@@ -3956,7 +3956,6 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
         png_ptr->big_row_buf = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
 
      png_ptr->big_prev_row = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
-     png_ptr->old_big_row_buf_size = row_bytes + 48;
 
 #ifdef PNG_ALIGNED_MEMORY_SUPPORTED
      /* Use 16-byte aligned memory for row_buf with at least 16 bytes
