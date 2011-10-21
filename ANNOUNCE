@@ -1,5 +1,5 @@
 
-Libpng 1.5.6beta07 - October 17, 2011
+Libpng 1.5.6beta07 - October 21, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -85,7 +85,7 @@ Version 1.5.6beta06 [October 17, 2011]
     overwrite the end of the image if the row width is not an exact multiple
     of 8 bits and the image is not interlaced.
 
-Version 1.5.6beta07 [October 17, 2011]
+Version 1.5.6beta07 [October 21, 2011]
   Made png_ptr->prev_row an aligned pointer into png_ptr->big_prev_row
     (Mans Rullgard).
 
