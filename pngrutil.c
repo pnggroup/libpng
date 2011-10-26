@@ -941,7 +941,7 @@ png_handle_cHRM(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
-      png_warning(png_ptr, "Missing PLTE before cHRM");
+      png_warning(png_ptr, "Out of place cHRM chunk");
 
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cHRM)
 #  ifdef PNG_READ_sRGB_SUPPORTED

@@ -3650,7 +3650,7 @@ Version 1.5.6beta07 [October 21, 2011]
   Made png_ptr->prev_row an aligned pointer into png_ptr->big_prev_row
     (Mans Rullgard).
 
-Version 1.5.6beta08 [October 21, 2011]
+Version 1.5.6rc01 [October 26, 2011]
   Changed misleading "Missing PLTE before cHRM" warning to "Out of place cHRM"
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
