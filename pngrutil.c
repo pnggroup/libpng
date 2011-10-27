@@ -301,7 +301,7 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
    {
       int ret, avail;
 
-      /* The setting of 'avail_in' used to be outside the loop, by setting it
+      /* The setting of 'avail_in' used to be outside the loop; by setting it
        * inside it is possible to chunk the input to zlib and simply rely on
        * zlib to advance the 'next_in' pointer.  This allows arbitrary amounts o
        * data to be passed through zlib at the unavoidable cost of requiring a
@@ -2817,7 +2817,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
    end_mask = (pixel_depth * row_width) & 7;
    if (end_mask != 0)
    {
-      /* ep == NULL is a flag to say do nothing */
+      /* end_ptr == NULL is a flag to say do nothing */
       end_ptr = dp + PNG_ROWBYTES(pixel_depth, row_width) - 1;
       end_byte = *end_ptr;
 #     ifdef PNG_READ_PACKSWAP_SUPPORTED
@@ -2830,9 +2830,11 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
       /* end_mask is now the bits to *keep* from the destination row */
    }
 
-   /* This reduces to a memcpy for non-interlaced images and for the case where
-    * interlacing isn't supported or isn't done (in that case the caller gets a
-    * sequence of interlace pass rows.)
+   /* For non-interlaced images this reduces to a png_memcpy(). A png_memcpy()
+    * will also happen if interlacing isn't supported or if the application
+    * does not call png_set_interlace_handling().  In the latter cases the
+    * caller just gets a sequence of the unexpanded rows from each interlace
+    * pass.
     */
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE) &&
@@ -2848,9 +2850,9 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 
       if (pixel_depth < 8)
       {
-         /* For pixel depths up to 4bpp the 8-pixel mask can be expanded to fit
+         /* For pixel depths up to 4-bpp the 8-pixel mask can be expanded to fit
           * into 32 bits, then a single loop over the bytes using the four byte
-          * values in the 32 bit mask can be used.  For the 'display' option the
+          * values in the 32-bit mask can be used.  For the 'display' option the
           * expanded mask may also not require any masking within a byte.  To
           * make this work the PACKSWAP option must be taken into account - it
           * simply requires the pixels to be reversed in each byte.
@@ -2869,15 +2871,25 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           *
           * The following defines allow generation of compile time constant bit
           * masks for each pixel depth and each possibility of swapped or not
-          * swapped bytes.  Pass is in the range 0..6, 'x', a pixel index, is in
-          * the range 0..7, the result is 1 if the pixel is to be copied in the
-          * pass, 0 if not.  'S' is for the sparkle method, 'B' for the block
-          * method.
-          */
-#        define S_COPY(p,x) (((p)<4 ? 0x80088822 >> ((3-(p))*8+(7-(x))) :\
-            0xaa55ff00 >> ((7-(p))*8+(7-(x)))) & 1)
-#        define B_COPY(p,x) (((p)<4 ? 0xff0fff33 >> ((3-(p))*8+(7-(x))) :\
-            0xff55ff00 >> ((7-(p))*8+(7-(x)))) & 1)
+          * swapped bytes.  Pass 'p' is in the range 0..6; 'x', a pixel index,
+          * is in the range 0..7; and the result is 1 if the pixel is to be
+          * copied in the pass, 0 if not.  'S' is for the sparkle method, 'B'
+          * for the block method.
+          *
+          * With Microsoft Visual C and potentially other compilers the shifts
+          * below to extract the relevant fields from a 64 bit value are faulted
+          * if evaluated at compile time because the non-taken branch has an
+          * invalid shift (negative or more than 31), hence the following.
+         */
+#        if defined PNG_USE_COMPILE_TIME_MASKS && defined _MSC_VER
+#           define LSR(x,s) ((x)>>((s) & 0x1f))
+#        else
+#           define LSR(x,s) ((x)>>(s))
+#        endif
+#        define S_COPY(p,x) (((p)<4 ? LSR(0x80088822,(3-(p))*8+(7-(x))) :\
+           LSR(0xaa55ff00,(7-(p))*8+(7-(x)))) & 1)
+#        define B_COPY(p,x) (((p)<4 ? LSR(0xff0fff33,(3-(p))*8+(7-(x))) :\
+           LSR(0xff55ff00,(7-(p))*8+(7-(x)))) & 1)
 
          /* Return a mask for pass 'p' pixel 'x' at depth 'd'.  The mask is
           * little endian - the first pixel is at bit 0 - however the extra
@@ -2892,9 +2904,9 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 #        define S_MASKx(p,x,d,s) (S_COPY(p,x)?PIXEL_MASK(p,x,d,s):0)
 #        define B_MASKx(p,x,d,s) (B_COPY(p,x)?PIXEL_MASK(p,x,d,s):0)
 
-         /* Combine 8 of these to get the full mask.  For the 1 and 2 bpp cases
-          * the result needs replicating, for the 4bpp case the above generates
-          * a full 32 bits.
+         /* Combine 8 of these to get the full mask.  For the 1-bpp and 2-bpp
+          * cases the result needs replicating, for the 4-bpp case the above
+          * generates a full 32 bits.
           */
 #        define MASK_EXPAND(m,d) ((m)*((d)==1?0x01010101:((d)==2?0x00010001:1)))
 
@@ -2972,7 +2984,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
             png_uint_32 m;
 
             /* It doesn't matter in the following if png_uint_32 has more than
-             * 32 bits because the high bits always match those in m<<24, it is,
+             * 32 bits because the high bits always match those in m<<24; it is,
              * however, essential to use OR here, not +, because of this.
              */
             m = mask;
@@ -2988,7 +3000,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
             }
 
             /* NOTE: this may overwrite the last byte with garbage if the image
-             * is not an exact number of bytes wide, libpng has always done
+             * is not an exact number of bytes wide; libpng has always done
              * this.
              */
             if (row_width <= pixels_per_byte)
@@ -3044,7 +3056,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
          bytes_to_jump = PNG_PASS_COL_OFFSET(pass) * pixel_depth;
 
          /* And simply copy these bytes.  Some optimization is possible here,
-          * depending on the value of 'bytes_to_copy'.  Speical case the low
+          * depending on the value of 'bytes_to_copy'.  Special case the low
           * byte counts, which we know to be frequent.
           *
           * Notice that these cases all 'return' rather than 'break' - this
@@ -3067,7 +3079,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                }
 
             case 2:
-               /* There is a possibility of a partial copy at the end here, this
+               /* There is a possibility of a partial copy at the end here; this
                 * slows the code down somewhat.
                 */
                do
@@ -3105,12 +3117,12 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 
             default:
 #if PNG_ALIGN_TYPE != PNG_ALIGN_NONE
-               /* Check for double byte alignment and, if possible, use a 16
-                * bit copy.  Don't attempt this for narrow images - ones that
+               /* Check for double byte alignment and, if possible, use a
+                * 16-bit copy.  Don't attempt this for narrow images - ones that
                 * are less than an interlace panel wide.  Don't attempt it for
-                * wide bytes-to-copy either - use the memcpy there.
+                * wide bytes-to-copy either - use the png_memcpy there.
                 */
-               if (bytes_to_copy < 16 /*else use memcpy*/ &&
+               if (bytes_to_copy < 16 /*else use png_memcpy*/ &&
                   png_isaligned(dp, png_uint_16) &&
                   png_isaligned(sp, png_uint_16) &&
                   bytes_to_copy % sizeof (png_uint_16) == 0 &&
@@ -3150,7 +3162,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 
                      /* Get to here when the row_width truncates the final copy.
                       * There will be 1-3 bytes left to copy, so don't try the
-                      * 16bit loop below.
+                      * 16-bit loop below.
                       */
                      dp = (png_bytep)dp32;
                      sp = (png_const_bytep)sp32;
@@ -3160,7 +3172,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                      return;
                   }
 
-                  /* Else do it in 16 bit quantities, but only if the size is
+                  /* Else do it in 16-bit quantities, but only if the size is
                    * not too large.
                    */
                   else
@@ -3189,7 +3201,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                      }
                      while (bytes_to_copy <= row_width);
 
-                     /* End of row - 1 byte left, bytes_to_copy>row_width: */
+                     /* End of row - 1 byte left, bytes_to_copy > row_width: */
                      dp = (png_bytep)dp16;
                      sp = (png_const_bytep)sp16;
                      do
@@ -3200,7 +3212,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                }
 #endif /* PNG_ALIGN_ code */
 
-               /* The true default - use a memcpy: */
+               /* The true default - use a png_memcpy: */
                for (;;)
                {
                   png_memcpy(dp, sp, bytes_to_copy);
@@ -3224,7 +3236,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
    else
 #endif
 
-   /* If here then the switch above wasn't used so just memcpy the whole row
+   /* If here then the switch above wasn't used so just png_memcpy the whole row
     * from the temporary row buffer (notice that this overwrites the end of the
     * destination row if it is a partial byte.)
     */

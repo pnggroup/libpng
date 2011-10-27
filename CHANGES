@@ -3653,7 +3653,9 @@ Version 1.5.6beta07 [October 21, 2011]
 Version 1.5.6rc01 [October 26, 2011]
   Changed misleading "Missing PLTE before cHRM" warning to "Out of place cHRM"
 
-Version 1.5.6rc02 [October 26, 2011]
+Version 1.5.6rc02 [October 27, 2011]
+  Added LSR() macro to defend against buggy compilers that evaluate non-taken
+    code branches and complain about out-of-range shifts. 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
