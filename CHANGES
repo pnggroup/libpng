@@ -3657,6 +3657,8 @@ Version 1.5.6rc02 [October 27, 2011]
   Added LSR() macro to defend against buggy compilers that evaluate non-taken
     code branches and complain about out-of-range shifts. 
 
+Version 1.5.6rc03 [October 27, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
