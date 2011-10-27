@@ -2880,16 +2880,20 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           * below to extract the relevant fields from a 64 bit value are faulted
           * if evaluated at compile time because the non-taken branch has an
           * invalid shift (negative or more than 31), hence the following.
-         */
+          *
+          * TO DO: Also identify the Intel C compiler here.
+          */
 #        if defined PNG_USE_COMPILE_TIME_MASKS && defined _MSC_VER
-#           define LSR(x,s) ((x)>>((s) & 0x1f))
+#           define PNG_LSR(x,s) ((x)>>((s) & 0x1f))
+#           define PNG_LSL(x,s) ((x)<<((s) & 0x1f))
 #        else
-#           define LSR(x,s) ((x)>>(s))
+#           define PNG_LSR(x,s) ((x)>>(s))
+#           define PNG_LSL(x,s) ((x)<<(s))
 #        endif
-#        define S_COPY(p,x) (((p)<4 ? LSR(0x80088822,(3-(p))*8+(7-(x))) :\
-           LSR(0xaa55ff00,(7-(p))*8+(7-(x)))) & 1)
-#        define B_COPY(p,x) (((p)<4 ? LSR(0xff0fff33,(3-(p))*8+(7-(x))) :\
-           LSR(0xff55ff00,(7-(p))*8+(7-(x)))) & 1)
+#        define S_COPY(p,x) (((p)<4 ? PNG_LSR(0x80088822,(3-(p))*8+(7-(x))) :\
+           PNG_LSR(0xaa55ff00,(7-(p))*8+(7-(x)))) & 1)
+#        define B_COPY(p,x) (((p)<4 ? PNG_LSR(0xff0fff33,(3-(p))*8+(7-(x))) :\
+           PNG_LSR(0xff55ff00,(7-(p))*8+(7-(x)))) & 1)
 
          /* Return a mask for pass 'p' pixel 'x' at depth 'd'.  The mask is
           * little endian - the first pixel is at bit 0 - however the extra
@@ -2897,7 +2901,8 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           * within each byte, to match the PNG format.  This is done by XOR of
           * the shift with 7, 6 or 4 for bit depths 1, 2 and 4.
           */
-#        define PIXEL_MASK(p,x,d,s) (((1U<<(d))-1)<<(((x)*(d))^((s)?8-(d):0)))
+#        define PIXEL_MASK(p,x,d,s) \
+            (PNG_LSL(((PNG_LSL(1U,(d)))-1),(((x)*(d))^((s)?8-(d):0))))
 
          /* Hence generate the appropriate 'block' or 'sparkle' pixel copy mask.
           */
