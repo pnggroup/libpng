@@ -3419,7 +3419,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
             for (i = 0; i < row_info->width; i++)
             {
-               png_byte v = (png_byte)((*sp >> sshift) & 0xf);
+               png_byte v = (png_byte)((*sp >> sshift) & 0x0f);
                int j;
 
                for (j = 0; j < jstop; j++)
@@ -3979,11 +3979,11 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       */
      {
         png_bytep temp = png_ptr->big_row_buf + 32;
-        int extra = (int)((temp - (png_bytep)0) & 0xf);
+        int extra = (int)((temp - (png_bytep)0) & 0x0f);
         png_ptr->row_buf = temp - extra - 1/*filter byte*/;
 
         temp = png_ptr->big_prev_row + 32;
-        extra = (int)((temp - (png_bytep)0) & 0xf);
+        extra = (int)((temp - (png_bytep)0) & 0x0f);
         png_ptr->prev_row = temp - extra - 1/*filter byte*/;
      }
 

@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.6rc02 - October 26, 2011
+ libpng version 1.5.6rc02 - October 27, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.6rc02 - October 26, 2011
+ libpng versions 0.97, January 1998, through 1.5.6rc02 - October 27, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4555,6 +4555,9 @@ left parenthesis that follows it:
 We prefer #ifdef and #ifndef to #if defined() and if !defined()
 when there is only one macro being tested.
 
+We prefer to express integers that are used as bit masks in hex format,
+with an even number of lower-case hex digits (e.g., 0x00, 0xff, 0x0100).
+
 We do not use the TAB character for indentation in the C sources.
 
 Lines do not exceed 80 characters.
@@ -4563,7 +4566,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-October 26, 2011
+October 27, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
