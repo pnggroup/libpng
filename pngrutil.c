@@ -2881,7 +2881,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           *    (shift >= 32) ? (a >> (shift-32)) : (b >> shift)
           *
           * Produces warnings with values of 'shift' in the range 33 to 63
-          * because the right hand side of the ?: expression is evalulated by
+          * because the right hand side of the ?: expression is evaluated by
           * the compiler even though it isn't used.  Microsoft Visual C (various
           * versions) and the Intel C compiler are known to do this.  To avoid
           * this the following macros are used in 1.5.6.  This is a temporary
