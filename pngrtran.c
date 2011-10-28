@@ -2484,8 +2484,8 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
             while (bp < bp_end)
             {
-               int byte = (*bp >> 1) & 0x55;
-               *bp++ = (png_byte)byte;
+               int b = (*bp >> 1) & 0x55;
+               *bp++ = (png_byte)b;
             }
             break;
          }
@@ -2503,8 +2503,8 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
             while (bp < bp_end)
             {
-               int byte = (*bp >> gray_shift) & mask;
-               *bp++ = (png_byte)byte;
+               int b = (*bp >> gray_shift) & mask;
+               *bp++ = (png_byte)b;
             }
             break;
          }
@@ -2518,10 +2518,10 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
             while (bp < bp_end)
             {
-               int byte = *bp >> shift[channel];
+               int b = *bp >> shift[channel];
                if (++channel >= channels)
                   channel = 0;
-               *bp++ = (png_byte)byte;
+               *bp++ = (png_byte)b;
             }
             break;
          }

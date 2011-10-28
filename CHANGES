@@ -3657,8 +3657,13 @@ Version 1.5.6rc02 [October 27, 2011]
   Added LSR() macro to defend against buggy compilers that evaluate non-taken
     code branches and complain about out-of-range shifts. 
 
-Version 1.5.6rc03 [October 27, 2011]
+Version 1.5.6rc03 [October 28, 2011]
   Renamed the LSR() macro to PNG_LSR() and added PNG_LSL() macro.
+  Fixed compiler warnings with Intel and MSYS compilers. The logical shift
+    fix for Microsoft Visual C is required by other compilers, so this
+    enables that fix for all compilers when using compile-time constants.
+    Under MSYS 'byte' is a name declared in a system header file, so we
+    changed the name of a local variable to avoid the warnings that result.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

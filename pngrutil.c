@@ -2876,14 +2876,18 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           * copied in the pass, 0 if not.  'S' is for the sparkle method, 'B'
           * for the block method.
           *
-          * With Microsoft Visual C and potentially other compilers the shifts
-          * below to extract the relevant fields from a 64 bit value are faulted
-          * if evaluated at compile time because the non-taken branch has an
-          * invalid shift (negative or more than 31), hence the following.
+          * With some compilers a compile time expression of the general form:
           *
-          * TO DO: Also identify the Intel C compiler here.
+          *    (shift >= 32) ? (a >> (shift-32)) : (b >> shift)
+          *
+          * Produces warnings with values of 'shift' in the range 33 to 63
+          * because the right hand side of the ?: expression is evalulated by
+          * the compiler even though it isn't used.  Microsoft Visual C (various
+          * versions) and the Intel C compiler are known to do this.  To avoid
+          * this the following macros are used in 1.5.6.  This is a temporary
+          * solution to avoid destablizing the code during the release process.
           */
-#        if defined PNG_USE_COMPILE_TIME_MASKS && defined _MSC_VER
+#        if PNG_USE_COMPILE_TIME_MASKS
 #           define PNG_LSR(x,s) ((x)>>((s) & 0x1f))
 #           define PNG_LSL(x,s) ((x)<<((s) & 0x1f))
 #        else
