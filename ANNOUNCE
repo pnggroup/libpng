@@ -1,5 +1,5 @@
 
-Libpng 1.5.6rc03 - October 28, 2011
+Libpng 1.5.6rc04 - October 28, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.6rc03.tar.xz (LZMA-compressed, recommended)
-   1.5.6rc03.tar.gz
-   1.5.6rc03.tar.bz2
+   1.5.6rc04.tar.xz (LZMA-compressed, recommended)
+   1.5.6rc04.tar.gz
+   1.5.6rc04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp156r03.7z  (LZMA-compressed, recommended)
-   lp156r03.zip
+   lp156r04.7z  (LZMA-compressed, recommended)
+   lp156r04.zip
 
 Other information:
 
-   1.5.6rc03-README.txt
-   1.5.6rc03-LICENSE.txt
+   1.5.6rc04-README.txt
+   1.5.6rc04-LICENSE.txt
 
 Changes since the last public release (1.5.5):
 
@@ -104,6 +104,8 @@ Version 1.5.6rc03 [October 28, 2011]
     Under MSYS 'byte' is a name declared in a system header file, so we
     changed the name of a local variable to avoid the warnings that result.
   Added #define PNG_ALIGN_TYPE PNG_ALIGN_NONE to contrib/pngminim/*/pngusr.h
+
+Version 1.5.6rc04 [October 28, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
