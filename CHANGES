@@ -3664,6 +3664,7 @@ Version 1.5.6rc03 [October 28, 2011]
     enables that fix for all compilers when using compile-time constants.
     Under MSYS 'byte' is a name declared in a system header file, so we
     changed the name of a local variable to avoid the warnings that result.
+  Added #define PNG_ALIGN_TYPE PNG_ALIGN_NONE to contrib/pngminim/*/pngusr.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
