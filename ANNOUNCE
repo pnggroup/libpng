@@ -1,32 +1,29 @@
+Libpng 1.5.6 - November 3, 2011
 
-Libpng 1.5.6rc04 - October 28, 2011
-
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.6rc04.tar.xz (LZMA-compressed, recommended)
-   1.5.6rc04.tar.gz
-   1.5.6rc04.tar.bz2
+   libpng-1.5.6.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.6.tar.gz
+   libpng-1.5.6.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp156r04.7z  (LZMA-compressed, recommended)
-   lp156r04.zip
+   lpng156.7z  (LZMA-compressed, recommended)
+   lpng156.zip
 
 Other information:
 
-   1.5.6rc04-README.txt
-   1.5.6rc04-LICENSE.txt
+   libpng-1.5.6-README.txt
+   libpng-1.5.6-LICENSE.txt
 
 Changes since the last public release (1.5.5):
 
-Version 1.5.6beta01 [September 22, 2011]
   Fixed some 64-bit type conversion warnings in pngrtran.c
   Moved row_info from png_struct to a local variable.
   The various interlace mask arrays have been made into arrays of
@@ -39,23 +36,14 @@ Version 1.5.6beta01 [September 22, 2011]
     This removes the need to allocate temporary strings for chunk names on
     the stack in the read/write code.  Unknown chunk handling still uses the
     string form because this is exposed in the API.
-
-Version 1.5.6beta02 [September 26, 2011]
   Added a note in the manual the png_read_update_info() must be called only
     once with a particular info_ptr.
-  Fixed a typo in the definition of the new PNG_STRING_FROM_CHUNK(s,c) macro.
-
-Version 1.5.6beta03 [September 28, 2011]
   Revised test-pngtest.sh to report FAIL when pngtest fails.
   Added "--strict" option to pngtest, to report FAIL when the failure is
     only because the resulting valid files are different.
   Revised CMakeLists.txt to work with mingw and removed some material from
     CMakeLists.txt that is no longer useful in libpng-1.5.
-
-Version 1.5.6beta04 [October 5, 2011]
   Fixed typo in Makefile.in and Makefile.am ("-M Wl" should be "-M -Wl")."
-
-Version 1.5.6beta05 [October 12, 2011]
   Speed up png_combine_row() for interlaced images. This reduces the generality
     of the code, allowing it to be optimized for Adam7 interlace.  The masks
     passed to png_combine_row() are now generated internally, avoiding
@@ -68,9 +56,6 @@ Version 1.5.6beta05 [October 12, 2011]
     percentage for 16-bit and 32-bit pixels in the typical case where the
     output row buffers are appropriately aligned. The optimization was not
     previously possible because the png_struct buffer was always misaligned.
-  Fixed bug in png_write_chunk_header() debug print, introduced in 1.5.6beta01.
-
-Version 1.5.6beta06 [October 17, 2011]
   Removed two redundant tests for unitialized row.
   Fixed a relatively harmless memory overwrite in compressed text writing
     with a 1 byte zlib buffer.
@@ -84,32 +69,19 @@ Version 1.5.6beta06 [October 17, 2011]
     it is not byte aligned, while reading. Prior to libpng-1.5.6 libpng would
     overwrite the partial byte at the end of each row if the row width was not
     an exact multiple of 8 bits and the image is not interlaced.
-
-Version 1.5.6beta07 [October 21, 2011]
   Made png_ptr->prev_row an aligned pointer into png_ptr->big_prev_row
     (Mans Rullgard).
-
-Version 1.5.6rc01 [October 26, 2011]
   Changed misleading "Missing PLTE before cHRM" warning to "Out of place cHRM"
-
-Version 1.5.6rc02 [October 27, 2011]
-  Added LSR() macro to defend against buggy compilers that evaluate non-taken
-    code branches and complain about out-of-range shifts. 
-
-Version 1.5.6rc03 [October 28, 2011]
-  Renamed the LSR() macro to PNG_LSR() and added PNG_LSL() macro.
-  Fixed compiler warnings with Intel and MSYS compilers. The logical shift
-    fix for Microsoft Visual C is required by other compilers, so this
-    enables that fix for all compilers when using compile-time constants.
-    Under MSYS 'byte' is a name declared in a system header file, so we
-    changed the name of a local variable to avoid the warnings that result.
+  Added PNG_LSR() and PNG_LSL() macros to defend against buggy compilers that
+    evaluate non-taken code branches and complain about out-of-range shifts. 
+  Renamed the local variable 'byte' because it appears in a MSYS header
+    file.
   Added #define PNG_ALIGN_TYPE PNG_ALIGN_NONE to contrib/pngminim/*/pngusr.h
 
-Version 1.5.6rc04 [October 28, 2011]
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P

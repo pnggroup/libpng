@@ -3666,7 +3666,8 @@ Version 1.5.6rc03 [October 28, 2011]
     changed the name of a local variable to avoid the warnings that result.
   Added #define PNG_ALIGN_TYPE PNG_ALIGN_NONE to contrib/pngminim/*/pngusr.h
 
-Version 1.5.6rc04 [October 28, 2011]
+Version 1.5.6 [November 3, 2011]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
