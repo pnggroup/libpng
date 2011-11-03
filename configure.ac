@@ -36,6 +36,7 @@ AM_CONFIG_HEADER(config.h)
 # Checks for programs.
 AC_LANG([C])
 AC_PROG_CC
+AM_PROG_AS
 AC_PROG_LD
 AC_PROG_CPP
 AC_CHECK_TOOL(SED, sed, :)
@@ -176,6 +177,14 @@ AC_ARG_WITH(binconfigs,
 	fi],
 	[binconfigs='${binconfigs}'])
 AC_SUBST([binconfigs])
+
+AC_ARG_ENABLE([arm-neon],
+	AC_HELP_STRING([--enable-arm-neon], [Enable ARM NEON optmizations]),
+	[if test "${enableval}" = yes; then
+		AC_DEFINE([PNG_ARM_NEON], [1], [Enable ARM NEON optmizations])
+		AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1], [Align row buffers])
+	fi])
+AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" = yes])
 
 # Config files, substituting as above
 AC_CONFIG_FILES([Makefile libpng.pc:libpng.pc.in])

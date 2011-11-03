@@ -41,12 +41,13 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT) pngvalid$(EXEEXT)
+@PNG_ARM_NEON_TRUE@am__append_1 = arm/filter_neon.S
 
 #   Versioned symbols and restricted exports
-@HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_TRUE@am__append_1 = -Wl,-M -Wl,libpng.vers
-@HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_FALSE@am__append_2 = -Wl,--version-script=libpng.vers
+@HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_TRUE@am__append_2 = -Wl,-M -Wl,libpng.vers
+@HAVE_LD_VERSION_SCRIPT_TRUE@@HAVE_SOLARIS_LD_FALSE@am__append_3 = -Wl,--version-script=libpng.vers
 #   Only restricted exports when possible
-@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_3 = -export-symbols libpng.sym
+@HAVE_LD_VERSION_SCRIPT_FALSE@am__append_4 = -export-symbols libpng.sym
 subdir = .
 DIST_COMMON = README $(am__configure_deps) $(dist_man_MANS) \
 	$(pkginclude_HEADERS) $(srcdir)/Makefile.am \
@@ -91,6 +92,12 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LIBADD =
+am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST = png.c \
+	pngerror.c pngget.c pngmem.c pngpread.c pngread.c pngrio.c \
+	pngrtran.c pngrutil.c pngset.c pngtrans.c pngwio.c pngwrite.c \
+	pngwtran.c pngwutil.c png.h pngconf.h pngdebug.h pnginfo.h \
+	pngpriv.h pngstruct.h arm/filter_neon.S
+@PNG_ARM_NEON_TRUE@am__objects_1 = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo
 am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.lo \
@@ -106,7 +113,8 @@ am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwio.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwrite.lo \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwtran.lo \
-	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo
+	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo \
+	$(am__objects_1)
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
 	$(am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS) \
@@ -127,6 +135,11 @@ DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
+CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
+LTCPPASCOMPILE = $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -139,7 +152,8 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(pngtest_SOURCES) $(pngvalid_SOURCES)
-DIST_SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
+DIST_SOURCES =  \
+	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST) \
 	$(pngtest_SOURCES) $(pngvalid_SOURCES)
 man3dir = $(mandir)/man3
 man5dir = $(mandir)/man5
@@ -174,6 +188,9 @@ AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
+CCAS = @CCAS@
+CCASDEPMODE = @CCASDEPMODE@
+CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CPP = @CPP@
@@ -324,17 +341,17 @@ bin_SCRIPTS = @binconfigs@
 # rules to build libpng, only build the old library on request
 lib_LTLIBRARIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # EXTRA_LTLIBRARIES= libpng.la
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
-	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c pngrutil.c\
-	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
-	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h
-
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c \
+	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c \
+	pngrutil.c pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c \
+	pngwutil.c png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h \
+	pngstruct.h $(am__append_1)
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS = @LIBPNG_DEFINES@
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined \
 	-export-dynamic -version-number \
 	@PNGLIB_MAJOR@@PNGLIB_MINOR@:@PNGLIB_RELEASE@:0 \
-	$(am__append_1) $(am__append_2) $(am__append_3)
+	$(am__append_2) $(am__append_3) $(am__append_4)
 @HAVE_LD_VERSION_SCRIPT_FALSE@libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.sym
 @HAVE_LD_VERSION_SCRIPT_TRUE@libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_DEPENDENCIES = libpng.vers
 pkginclude_HEADERS = png.h pngconf.h
@@ -372,7 +389,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .chk .dfn .out .c .lo .o .obj
+.SUFFIXES: .chk .dfn .out .S .c .lo .o .obj
 am--refresh:
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -517,6 +534,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngget.Plo@am__quote@
@@ -534,6 +552,34 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngvalid.Po@am__quote@
+
+.S.o:
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ $<
+
+.S.obj:
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.S.lo:
+@am__fastdepCCAS_TRUE@	$(LTCPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(LTCPPASCOMPILE) -c -o $@ $<
+
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo: arm/filter_neon.S
+@am__fastdepCCAS_TRUE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo -MD -MP -MF $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.Tpo -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo `test -f 'arm/filter_neon.S' || echo '$(srcdir)/'`arm/filter_neon.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.Tpo $(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.Plo
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='arm/filter_neon.S' object='libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo `test -f 'arm/filter_neon.S' || echo '$(srcdir)/'`arm/filter_neon.S
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
