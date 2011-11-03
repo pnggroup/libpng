@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.6 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
  * Copyright (c) 2011 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -1332,7 +1332,21 @@ store_malloc(png_structp pp, png_alloc_size_t cb)
    }
 
    else
-      store_pool_error(pool->store, pp, "out of memory");
+   {
+      /* NOTE: the PNG user malloc function cannot use the png_ptr it is passed
+       * other than to retrieve the allocation pointer!  libpng calls the
+       * store_malloc callback in two basic cases:
+       *
+       * 1) From png_malloc; png_malloc will do a png_error itself if NULL is
+       *    returned.
+       * 2) From png_struct or png_info structure creation; png_malloc is
+       *    to return so cleanup can be performed.
+       *
+       * To handle this store_malloc can log a message, but can't do anything
+       * else.
+       */
+      store_log(pool->store, pp, "out of memory", 1 /* is_error */);
+   }
 
    return new;
 }
@@ -1342,6 +1356,14 @@ store_free(png_structp pp, png_voidp memory)
 {
    store_pool *pool = voidcast(store_pool*, png_get_mem_ptr(pp));
    store_memory *this = voidcast(store_memory*, memory), **test;
+
+   /* Because libpng calls store_free with a dummy png_struct when deleting
+    * png_struct or png_info via png_destroy_struct_2 it is necessary to check
+    * the passed in png_structp to ensure it is valid, and not pass it to
+    * png_error if it is not.
+    */
+   if (pp != pool->store->pread && pp != pool->store->pwrite)
+      pp = NULL;
 
    /* First check that this 'memory' really is valid memory - it must be in the
     * pool list.  If it is, use the shared memory_free function to free it.
