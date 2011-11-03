@@ -3680,6 +3680,11 @@ Version 1.5.7 [November 3, 2011]
     splits adjacent @ signs with a space; this changes the concatentation
     token from @@@ to PNG_JOIN; that should work with all compiler
     preprocessors.
+  Paeth filter speed improvements from work by Siarhei Siamashka. This
+    changes the 'Paeth' reconstruction function to improve the GCC code
+    generation on x86. The changes are only part of the suggested ones;
+    just the changes that definitely improve speed and remain simple.
+    The changes also slightly increase the clarity of the code. In a
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

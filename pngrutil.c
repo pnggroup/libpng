@@ -3562,68 +3562,106 @@ png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
 }
 
 static void
-png_read_filter_row_paeth(png_row_infop row_info, png_bytep row,
+png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
-   png_size_t i;
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
-   png_bytep lp = row;
-   png_const_bytep cp = prev_row;
-   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   png_size_t istop=row_info->rowbytes - bpp;
+   png_bytep rp_end = row + row_info->rowbytes;
+   int a, c;
 
-   for (i = 0; i < bpp; i++)
+   /* First pixel/byte */
+   c = *prev_row++;
+   a = *row + c;
+   *row++ = (png_byte)a;
+
+   /* Remainder */
+   while (row < rp_end)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
-      rp++;
-   }
+      int b, pa, pb, pc, p;
 
-   for (i = 0; i < istop; i++)   /* Use leftover rp,pp */
-   {
-      int a, b, c, pa, pb, pc, p;
-
-      a = *lp++;
-      b = *pp++;
-      c = *cp++;
+      a &= 0xff; /* From previous iteration or start */
+      b = *prev_row++;
 
       p = b - c;
       pc = a - c;
 
-#ifdef PNG_USE_ABS
-      pa = abs(p);
-      pb = abs(pc);
-      pc = abs(p + pc);
-#else
-      pa = p < 0 ? -p : p;
-      pb = pc < 0 ? -pc : pc;
-      pc = (p + pc) < 0 ? -(p + pc) : p + pc;
-#endif
+#     ifdef PNG_USE_ABS
+         pa = abs(p);
+         pb = abs(pc);
+         pc = abs(p + pc);
+#     else
+         pa = p < 0 ? -p : p;
+         pb = pc < 0 ? -pc : pc;
+         pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+#     endif
 
-      /*
-        if (pa <= pb && pa <= pc)
-           p = a;
+      /* Find the best predictor, the least of pa, pb, pc favoring the earlier
+       * ones in the case of a tie.
+       */
+      if (pb < pa) pa = pb, a = b;
+      if (pc < pa) a = c;
 
-        else if (pb <= pc)
-           p = b;
+      /* Calculate the current pixel in a, and move the previous row pixel to c
+       * for the next time round the loop
+       */
+      c = b;
+      a += *row;
+      *row++ = (png_byte)a;
+   }
+}
 
-        else
-           p = c;
-      */
+static void
+png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
+{
+   int bpp = (row_info->pixel_depth + 7) >> 3;
+   png_bytep rp_end = row + bpp;
 
-      p = (pa <= pb && pa <= pc) ? a : (pb <= pc) ? b : c;
+   /* Process the first pixel in the row completely (this is the same as 'up'
+    * because there is only one candidate predictor for the first row).
+    */
+   while (row < rp_end)
+   {
+      int a = *row + *prev_row++;
+      *row++ = (png_byte)a;
+   }
 
-      *rp = (png_byte)(((int)(*rp) + p) & 0xff);
-      rp++;
+   /* Remainder */
+   rp_end += row_info->rowbytes - bpp;
+
+   while (row < rp_end)
+   {
+      int a, b, c, pa, pb, pc, p;
+
+      c = *(prev_row - bpp);
+      a = *(row - bpp);
+      b = *prev_row++;
+
+      p = b - c;
+      pc = a - c;
+
+#     ifdef PNG_USE_ABS
+         pa = abs(p);
+         pb = abs(pc);
+         pc = abs(p + pc);
+#     else
+         pa = p < 0 ? -p : p;
+         pb = pc < 0 ? -pc : pc;
+         pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+#     endif
+
+      if (pb < pa) pa = pb, a = b;
+      if (pc < pa) a = c;
+
+      c = b;
+      a += *row;
+      *row++ = (png_byte)a;
    }
 }
 
 #ifdef PNG_ARM_NEON
 static void
-png_init_filter_functions_neon(png_structp pp)
+png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
 {
-   unsigned int bpp = (pp->pixel_depth + 7) >> 3;
-
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_neon;
 
    if (bpp == 3) {
@@ -3641,13 +3679,20 @@ png_init_filter_functions_neon(png_structp pp)
 static void
 png_init_filter_functions(png_structp pp)
 {
+   unsigned int bpp = (pp->pixel_depth + 7) >> 3;
+
    pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub;
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up;
    pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg;
-   pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth;
+   if (bpp == 1)
+      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
+         png_read_filter_row_paeth_1byte_pixel;
+   else
+      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
+         png_read_filter_row_paeth_multibyte_pixel;
 
 #ifdef PNG_ARM_NEON
-   png_init_filter_functions_neon(pp);
+   png_init_filter_functions_neon(pp, bpp);
 #endif
 }
 
