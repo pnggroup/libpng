@@ -3670,6 +3670,7 @@ Version 1.5.6 [November 3, 2011]
   No changes.
 
 Version 1.5.7 [November 3, 2011]
+  Added support for ARM processor (Mans Rullgard)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

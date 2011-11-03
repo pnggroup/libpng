@@ -3498,132 +3498,167 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 }
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
 
-/* 1.5.6: Changed to just take a png_row_info (not png_ptr) and to ignore bad
- * adaptive filter bytes.
- */
-void /* PRIVATE */
-png_read_filter_row(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row, int filter)
+static void
+png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
-   switch (filter)
+   png_size_t i;
+   png_size_t istop = row_info->rowbytes;
+   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
+   png_bytep rp = row + bpp;
+   png_bytep lp = row;
+
+   PNG_UNUSED(prev_row)
+
+   for (i = bpp; i < istop; i++)
    {
-      case PNG_FILTER_VALUE_NONE:
-         break;
+      *rp = (png_byte)(((int)(*rp) + (int)(*lp++)) & 0xff);
+      rp++;
+   }
+}
 
-      case PNG_FILTER_VALUE_SUB:
-      {
-         png_size_t i;
-         png_size_t istop = row_info->rowbytes;
-         unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-         png_bytep rp = row + bpp;
-         png_bytep lp = row;
+static void
+png_read_filter_row_up(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
+{
+   png_size_t i;
+   png_size_t istop = row_info->rowbytes;
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
 
-         for (i = bpp; i < istop; i++)
-         {
-            *rp = (png_byte)(((int)(*rp) + (int)(*lp++)) & 0xff);
-            rp++;
-         }
-         break;
-      }
-      case PNG_FILTER_VALUE_UP:
-      {
-         png_size_t i;
-         png_size_t istop = row_info->rowbytes;
-         png_bytep rp = row;
-         png_const_bytep pp = prev_row;
+   for (i = 0; i < istop; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
+      rp++;
+   }
+}
 
-         for (i = 0; i < istop; i++)
-         {
-            *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
-            rp++;
-         }
-         break;
-      }
-      case PNG_FILTER_VALUE_AVG:
-      {
-         png_size_t i;
-         png_bytep rp = row;
-         png_const_bytep pp = prev_row;
-         png_bytep lp = row;
-         unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-         png_size_t istop = row_info->rowbytes - bpp;
+static void
+png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
+{
+   png_size_t i;
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
+   png_bytep lp = row;
+   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
+   png_size_t istop = row_info->rowbytes - bpp;
 
-         for (i = 0; i < bpp; i++)
-         {
-            *rp = (png_byte)(((int)(*rp) +
-                ((int)(*pp++) / 2 )) & 0xff);
+   for (i = 0; i < bpp; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) +
+         ((int)(*pp++) / 2 )) & 0xff);
 
-            rp++;
-         }
+      rp++;
+   }
 
-         for (i = 0; i < istop; i++)
-         {
-            *rp = (png_byte)(((int)(*rp) +
-                (int)(*pp++ + *lp++) / 2 ) & 0xff);
+   for (i = 0; i < istop; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) +
+         (int)(*pp++ + *lp++) / 2 ) & 0xff);
 
-            rp++;
-         }
-         break;
-      }
-      case PNG_FILTER_VALUE_PAETH:
-      {
-         png_size_t i;
-         png_bytep rp = row;
-         png_const_bytep pp = prev_row;
-         png_bytep lp = row;
-         png_const_bytep cp = prev_row;
-         unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-         png_size_t istop=row_info->rowbytes - bpp;
+      rp++;
+   }
+}
 
-         for (i = 0; i < bpp; i++)
-         {
-            *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
-            rp++;
-         }
+static void
+png_read_filter_row_paeth(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
+{
+   png_size_t i;
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
+   png_bytep lp = row;
+   png_const_bytep cp = prev_row;
+   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
+   png_size_t istop=row_info->rowbytes - bpp;
 
-         for (i = 0; i < istop; i++)   /* Use leftover rp,pp */
-         {
-            int a, b, c, pa, pb, pc, p;
+   for (i = 0; i < bpp; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
+      rp++;
+   }
 
-            a = *lp++;
-            b = *pp++;
-            c = *cp++;
+   for (i = 0; i < istop; i++)   /* Use leftover rp,pp */
+   {
+      int a, b, c, pa, pb, pc, p;
 
-            p = b - c;
-            pc = a - c;
+      a = *lp++;
+      b = *pp++;
+      c = *cp++;
+
+      p = b - c;
+      pc = a - c;
 
 #ifdef PNG_USE_ABS
-            pa = abs(p);
-            pb = abs(pc);
-            pc = abs(p + pc);
+      pa = abs(p);
+      pb = abs(pc);
+      pc = abs(p + pc);
 #else
-            pa = p < 0 ? -p : p;
-            pb = pc < 0 ? -pc : pc;
-            pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+      pa = p < 0 ? -p : p;
+      pb = pc < 0 ? -pc : pc;
+      pc = (p + pc) < 0 ? -(p + pc) : p + pc;
 #endif
 
-            /*
-               if (pa <= pb && pa <= pc)
-                  p = a;
+      /*
+        if (pa <= pb && pa <= pc)
+           p = a;
 
-               else if (pb <= pc)
-                  p = b;
+        else if (pb <= pc)
+           p = b;
 
-               else
-                  p = c;
-             */
+        else
+           p = c;
+      */
 
-            p = (pa <= pb && pa <= pc) ? a : (pb <= pc) ? b : c;
+      p = (pa <= pb && pa <= pc) ? a : (pb <= pc) ? b : c;
 
-            *rp = (png_byte)(((int)(*rp) + p) & 0xff);
-            rp++;
-         }
-         break;
-      }
-      default:
-         /* NOT REACHED */
-         break;
+      *rp = (png_byte)(((int)(*rp) + p) & 0xff);
+      rp++;
    }
+}
+
+#ifdef PNG_ARM_NEON
+static void
+png_init_filter_functions_neon(png_structp pp)
+{
+   unsigned int bpp = (pp->pixel_depth + 7) >> 3;
+
+   pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_neon;
+
+   if (bpp == 3) {
+      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_neon;
+      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg3_neon;
+      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth3_neon;
+   } else if (bpp == 4) {
+      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_neon;
+      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_neon;
+      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth4_neon;
+   }
+}
+#endif
+
+static void
+png_init_filter_functions(png_structp pp)
+{
+   pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub;
+   pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up;
+   pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg;
+   pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth;
+
+#ifdef PNG_ARM_NEON
+   png_init_filter_functions_neon(pp);
+#endif
+}
+
+void /* PRIVATE */
+png_read_filter_row(png_structp pp, png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row, int filter)
+{
+   if (pp->read_filter[0] == NULL)
+      png_init_filter_functions(pp);
+   if (filter > PNG_FILTER_VALUE_NONE && filter < PNG_FILTER_VALUE_LAST)
+      pp->read_filter[filter-1](row_info, row, prev_row);
 }
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED

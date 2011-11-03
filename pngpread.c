@@ -985,7 +985,7 @@ png_push_process_row(png_structp png_ptr)
    if (png_ptr->row_buf[0] > PNG_FILTER_VALUE_NONE)
    {
       if (png_ptr->row_buf[0] < PNG_FILTER_VALUE_LAST)
-         png_read_filter_row(&row_info, png_ptr->row_buf + 1,
+         png_read_filter_row(png_ptr, &row_info, png_ptr->row_buf + 1,
             png_ptr->prev_row + 1, png_ptr->row_buf[0]);
       else
          png_error(png_ptr, "bad adaptive filter value");

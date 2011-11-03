@@ -922,8 +922,23 @@ PNG_EXTERN void png_do_write_interlace PNGARG((png_row_infop row_info,
 /* Unfilter a row: check the filter value before calling this, there is no point
  * calling it for PNG_FILTER_VALUE_NONE.
  */
-PNG_EXTERN void png_read_filter_row PNGARG((png_row_infop row_info,
+PNG_EXTERN void png_read_filter_row PNGARG((png_structp pp, png_row_infop row_info,
     png_bytep row, png_const_bytep prev_row, int filter));
+
+PNG_EXTERN void png_read_filter_row_up_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
+PNG_EXTERN void png_read_filter_row_sub3_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
+PNG_EXTERN void png_read_filter_row_sub4_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
+PNG_EXTERN void png_read_filter_row_avg3_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
+PNG_EXTERN void png_read_filter_row_avg4_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
+PNG_EXTERN void png_read_filter_row_paeth3_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
+PNG_EXTERN void png_read_filter_row_paeth4_neon PNGARG((png_row_infop row_info,
+    png_bytep row, png_const_bytep prev_row));
 
 /* Choose the best filter to use and filter the row data */
 PNG_EXTERN void png_write_find_filter PNGARG((png_structp png_ptr,
