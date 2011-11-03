@@ -142,9 +142,9 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 	echo '#include "$<"' >dfn.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c > dfn1.out
-	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
+	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC *-\(.*\)- *PNG_DEFN_END.*$$|\1|p'\
 	    dfn1.out >dfn2.out
-	$(SED) -e 's| *@@@ *||g' -e 's| *$$||' dfn2.out >dfn3.out
+	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' dfn2.out >dfn3.out
 	rm -f dfn.c dfn[12].out
 	mv dfn3.out $@
 

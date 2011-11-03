@@ -35,13 +35,14 @@ BEGIN{
    err=0                        # in-line exit sets this
    start="PNG_DEFN_MAGIC-"      # Arbitrary start
    end="-PNG_DEFN_END"          # Arbitrary end
-   cx= "/@@@*"                  # Open C comment for output file
+   ct="PNG_JOIN"                # Join two tokens
+   cx= "/" ct "*"               # Open C comment for output file
    comment=start cx             # Comment start
    cend="*/" end                # Comment end
-   def=start "#define PNG_@@@"  # Arbitrary define
-   sup="@@@_SUPPORTED" end      # end supported option
-   und=comment "#undef PNG_@@@" # Unsupported option
-   une="@@@_SUPPORTED" cend     # end unsupported option
+   def=start "#define PNG_" ct  # Arbitrary define
+   sup=ct "_SUPPORTED" end      # end supported option
+   und=comment "#undef PNG_" ct # Unsupported option
+   une=ct "_SUPPORTED" cend     # end unsupported option
    error=start "ERROR:"         # error message
 
    # Variables

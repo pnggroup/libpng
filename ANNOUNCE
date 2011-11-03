@@ -33,6 +33,10 @@ Version 1.5.7 [November 3, 2011]
     of a png_struct or png_info failed. This would probably have led to a
     crash.  The pngmem.c implementation of png_malloc() included a cast
     to png_size_t which would fail on large allocations on 16-bit systems.
+  Fix for the preprocessor of the Intel C compiler. The preprocessor
+    splits adjacent @ signs with a space; this changes the concatentation
+    token from @@@ to PNG_JOIN; that should work with all compiler
+    preprocessors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
