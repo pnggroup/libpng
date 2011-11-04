@@ -41,7 +41,7 @@ Version 1.5.7beta01 [November 4, 2011]
     changes the 'Paeth' reconstruction function to improve the GCC code
     generation on x86. The changes are only part of the suggested ones;
     just the changes that definitely improve speed and remain simple.
-    The changes also slightly increase the clarity of the code. In a
+    The changes also slightly increase the clarity of the code.
 
 Version 1.5.7beta02 [November 4, 2011]
 
