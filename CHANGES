@@ -3669,7 +3669,7 @@ Version 1.5.6rc03 [October 28, 2011]
 Version 1.5.6 [November 3, 2011]
   No changes.
 
-Version 1.5.7 [November 3, 2011]
+Version 1.5.7beta01 [November 4, 2011]
   Added support for ARM processor (Mans Rullgard)
   Fixed bug in pngvalid on early allocation failure; fixed type cast in
     pngmem.c; pngvalid would attempt to call png_error() if the allocation
