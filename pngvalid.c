@@ -20,8 +20,21 @@
  */
 
 #define _POSIX_SOURCE 1
+#define _ISOC99_SOURCE 1 /* For floating point */
+#define _GNU_SOURCE 1 /* For the floating point exception extension */
+
+#include <signal.h>
+
+#ifdef HAVE_CONFIG_H
+#  include "config.h"
+#endif
+
+#ifdef HAVE_FEENABLEEXCEPT
+#  include <fenv.h>
+#endif
 
 #include "png.h"
+
 #if PNG_LIBPNG_VER < 10500
 /* This delibarately lacks the PNG_CONST. */
 typedef png_byte *png_const_bytep;
@@ -829,6 +842,19 @@ store_log(png_store* ps, png_structp pp, png_const_charp message, int is_error)
 
    if (ps->verbose)
       store_verbose(ps, pp, is_error ? "error: " : "warning: ", message);
+}
+
+/* Internal error function, called with a png_store but no libpng stuff. */
+static void
+internal_error(png_store *ps, png_const_charp message)
+{
+   store_log(ps, NULL, message, 1 /* error */);
+
+   /* And finally throw an exception. */
+   {
+      struct exception_context *the_exception_context = &ps->exception_context;
+      Throw ps;
+   }
 }
 
 /* Functions to use as PNG callbacks. */
@@ -3679,9 +3705,11 @@ static PNG_CONST struct
     };
 
 static void
-make_error(png_store* volatile ps, png_byte PNG_CONST colour_type,
+make_error(png_store* volatile psIn, png_byte PNG_CONST colour_type,
     png_byte bit_depth, int interlace_type, int test, png_const_charp name)
 {
+   png_store * volatile ps = psIn;
+
    context(ps, fault);
 
    Try
@@ -3965,6 +3993,8 @@ standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
    dp->ps = ps;
    dp->colour_type = COL_FROM_ID(id);
    dp->bit_depth = DEPTH_FROM_ID(id);
+   if (dp->bit_depth < 1 || dp->bit_depth > 16)
+      internal_error(ps, "internal: bad bit depth");
    if (dp->colour_type == 3)
       dp->red_sBIT = dp->blue_sBIT = dp->green_sBIT = dp->alpha_sBIT = 8;
    else
@@ -5333,8 +5363,12 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
          test_pixel.sample_depth = 8;
       else
          test_pixel.sample_depth = test_pixel.bit_depth;
-      /* Don't need sBIT here */
+      /* Don't need sBIT here, but it must be set to non-zero to avoid
+       * arithmetic overflows.
+       */
       test_pixel.have_tRNS = dp->this.is_transparent;
+      test_pixel.red_sBIT = test_pixel.green_sBIT = test_pixel.blue_sBIT =
+         test_pixel.alpha_sBIT = test_pixel.sample_depth;
 
       dp->transform_list->mod(dp->transform_list, &test_pixel, pp, dp);
 
@@ -9267,6 +9301,72 @@ static PNG_CONST color_encoding test_encodings[] =
 /*blue: */ { 0.146774385252705, 0.016589442011321, 0.773892783545073} },
 };
 
+/* signal handler
+ *
+ * This attempts to trap signals and escape without crashing.  It needs a
+ * context pointer so that it can throw an exception (call longjmp) to recover
+ * from the condition; this is handled by making the png_modifier used by 'main'
+ * into a global variable.
+ */
+static png_modifier pm;
+
+static void signal_handler(int signum)
+{
+
+   size_t pos = 0;
+   char msg[64];
+
+   pos = safecat(msg, sizeof msg, pos, "caught signal: ");
+
+   switch (signum)
+   {
+      case SIGABRT:
+         pos = safecat(msg, sizeof msg, pos, "abort");
+         break;
+
+      case SIGFPE:
+         pos = safecat(msg, sizeof msg, pos, "floating point exception");
+         break;
+
+      case SIGILL:
+         pos = safecat(msg, sizeof msg, pos, "illegal instruction");
+         break;
+
+      case SIGINT:
+         pos = safecat(msg, sizeof msg, pos, "interrupt");
+         break;
+
+      case SIGSEGV:
+         pos = safecat(msg, sizeof msg, pos, "invalid memory access");
+         break;
+
+      case SIGTERM:
+         pos = safecat(msg, sizeof msg, pos, "termination request");
+         break;
+
+      default:
+         pos = safecat(msg, sizeof msg, pos, "unknown ");
+         pos = safecatn(msg, sizeof msg, pos, signum);
+         break;
+   }
+
+   store_log(&pm.this, NULL/*png_structp*/, msg, 1/*error*/);
+
+   /* And finally throw an exception so we can keep going, unless this is
+    * SIGTERM in which case stop now.
+    */
+   if (signum != SIGTERM)
+   {
+      struct exception_context *the_exception_context =
+         &pm.this.exception_context;
+
+      Throw &pm.this;
+   }
+
+   else
+      exit(1);
+}
+
 /* main program */
 int main(int argc, PNG_CONST char **argv)
 {
@@ -9288,8 +9388,23 @@ int main(int argc, PNG_CONST char **argv)
    size_t cp = 0;
    char command[1024];
 
-   png_modifier pm;
    context(&pm.this, fault);
+
+   /* Add appropriate signal handlers, just the ANSI specified ones: */
+   signal(SIGABRT, signal_handler);
+   signal(SIGFPE, signal_handler);
+   signal(SIGILL, signal_handler);
+   signal(SIGINT, signal_handler);
+   signal(SIGSEGV, signal_handler);
+   signal(SIGTERM, signal_handler);
+
+#ifdef HAVE_FEENABLEEXCEPT
+   /* Only required to enable FP exceptions on platforms where they start off
+    * disabled; this is not necessary but if it is not done pngvalid will likely
+    * end up ignoring FP conditions that other platforms fault.
+    */
+   feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+#endif
 
    modifier_init(&pm);
 

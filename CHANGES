@@ -3692,6 +3692,12 @@ Version 1.5.7beta02 [November 5, 2011]
     be non-NULL. The cast of the profile length potentially truncated the
     value unnecessarily on a 16-bit int system, so the cast of the (byte)
     compression type to (int) is specified by ANSI-C anyway.
+  Fixed FP division by zero in pngvalid.c; the 'test_pixel' code left
+    the sBIT fields in the test pixel as 0, which resulted in a floating
+    point division by zero which was irrelevant but causes systems where
+    FP exceptions cause a crash. Added code to pngvalid to turn on FP
+    exceptions if the appropriate glibc support is there to ensure this is
+    tested in the future.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
