@@ -682,15 +682,16 @@ png_get_iCCP(png_const_structp png_ptr, png_const_infop info_ptr,
    png_debug1(1, "in %s retrieval function", "iCCP");
 
    if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_iCCP)
-       && name != NULL && profile != NULL && proflen != NULL)
+       && name != NULL && compression_type != NULL && profile != NULL &&
+		 proflen != NULL)
    {
       *name = info_ptr->iccp_name;
       *profile = info_ptr->iccp_profile;
       /* Compression_type is a dummy so the API won't have to change
        * if we introduce multiple compression types later.
        */
-      *proflen = (int)info_ptr->iccp_proflen;
-      *compression_type = (int)info_ptr->iccp_compression;
+      *proflen = info_ptr->iccp_proflen;
+      *compression_type = info_ptr->iccp_compression;
       return (PNG_INFO_iCCP);
    }
 
