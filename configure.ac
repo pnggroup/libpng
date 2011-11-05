@@ -76,6 +76,7 @@ AC_CHECK_HEADERS([malloc.h stdlib.h string.h strings.h])
 AC_C_CONST
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
+AC_C_RESTRICT
 
 # Checks for library functions.
 AC_FUNC_STRTOD
@@ -90,6 +91,11 @@ AC_CHECK_LIB(z, zlibVersion, ,
     AC_CHECK_LIB(z, ${ZPREFIX}zlibVersion, ,
                  AC_ERROR([zlib not installed])))
 
+# The following is for pngvalid, to ensure it catches FP errors even on
+# platforms that don't enable FP exceptions, the function appears in the math
+# library (typically), it's not an error if it is not found.
+AC_CHECK_LIB([m], [feenableexcept])
+AC_CHECK_FUNCS([feenableexcept])
 
 LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 LIBPNG_DEFINES=$LIBPNG_DEFINES
