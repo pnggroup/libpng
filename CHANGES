@@ -196,7 +196,8 @@ Version 0.97 [January, 1998]
   Added more typecasts. 65536L becomes (png_uint_32)65536L, etc. (Glenn R-P)
   Minor corrections in libpng.txt
   Added simple sRGB support (Glenn R-P)
-  Easier conditional compiling, e.g. define PNG_READ/WRITE_NOT_FULLY_SUPPORTED;
+  Easier conditional compiling, e.g.,
+    define PNG_READ/WRITE_NOT_FULLY_SUPPORTED;
     all configurable options can be selected from command-line instead
     of having to edit pngconf.h (Glenn R-P)
   Fixed memory leak in pngwrite.c (free info_ptr->text) (Glenn R-P)
@@ -207,7 +208,8 @@ Version 0.97 [January, 1998]
   Tested NODIV support and made it default behavior (Greg Roelofs)
   Added "-m" option and PNGTEST_DEBUG_MEMORY to pngtest (John Bowler)
   Regularized version numbering scheme and bumped shared-library major
-     version number to 2 to avoid problems with libpng 0.89 apps (Greg Roelofs)
+    version number to 2 to avoid problems with libpng 0.89 apps
+    (Greg Roelofs)
 
 Version 0.98 [January, 1998]
   Cleaned up some typos in libpng.txt and in code documentation
@@ -3444,7 +3446,7 @@ Version 1.5.3beta11 [June 11, 2011]
   Removed string/memory macros that are no longer used and are not
     necessarily fully supportable, particularly png_strncpy and png_snprintf.
   Added log option to pngvalid.c and attempted to improve gamma messages.
-  
+
 Version 1.5.3 [omitted]
   People found the presence of a beta release following an rc release
     to be confusing; therefore we bump the version to libpng-1.5.4beta01
@@ -3655,7 +3657,7 @@ Version 1.5.6rc01 [October 26, 2011]
 
 Version 1.5.6rc02 [October 27, 2011]
   Added LSR() macro to defend against buggy compilers that evaluate non-taken
-    code branches and complain about out-of-range shifts. 
+    code branches and complain about out-of-range shifts.
 
 Version 1.5.6rc03 [October 28, 2011]
   Renamed the LSR() macro to PNG_LSR() and added PNG_LSL() macro.
@@ -3678,7 +3680,7 @@ Version 1.5.7beta01 [November 4, 2011]
     to png_size_t which would fail on large allocations on 16-bit systems.
   Fix for the preprocessor of the Intel C compiler. The preprocessor
     splits adjacent @ signs with a space; this changes the concatentation
-    token from @@@ to PNG_JOIN; that should work with all compiler
+    token from @-@-@ to PNG_JOIN; that should work with all compiler
     preprocessors.
   Paeth filter speed improvements from work by Siarhei Siamashka. This
     changes the 'Paeth' reconstruction function to improve the GCC code
@@ -3698,7 +3700,8 @@ Version 1.5.7beta02 [November 5, 2011]
     FP exceptions cause a crash. Added code to pngvalid to turn on FP
     exceptions if the appropriate glibc support is there to ensure this is
     tested in the future.
-  Updated scripts/pnglibconf.mak to handle the new PNG_JOIN macro.
+  Updated scripts/pnglibconf.mak and scripts/makefile.std to handle the
+    new PNG_JOIN macro.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

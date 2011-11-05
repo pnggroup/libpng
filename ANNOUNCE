@@ -35,7 +35,7 @@ Version 1.5.7beta01 [November 4, 2011]
     to png_size_t which would fail on large allocations on 16-bit systems.
   Fix for the preprocessor of the Intel C compiler. The preprocessor
     splits adjacent @ signs with a space; this changes the concatentation
-    token from @@@ to PNG_JOIN; that should work with all compiler
+    token from @-@-@ to PNG_JOIN; that should work with all compiler
     preprocessors.
   Paeth filter speed improvements from work by Siarhei Siamashka. This
     changes the 'Paeth' reconstruction function to improve the GCC code
@@ -55,7 +55,8 @@ Version 1.5.7beta02 [November 5, 2011]
     FP exceptions cause a crash. Added code to pngvalid to turn on FP
     exceptions if the appropriate glibc support is there to ensure this is
     tested in the future.
-  Updated scripts/pnglibconf.mak to handle the new PNG_JOIN macro.
+  Updated scripts/pnglibconf.mak and scripts/makefile.std to handle the
+    new PNG_JOIN macro.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
