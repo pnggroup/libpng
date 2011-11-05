@@ -37,7 +37,7 @@ pnglibconf.h: pnglibconf.dfn
 	$(ECHO) "If 'cpp -e' crashes try /lib/cpp (e.g. CPP='/lib/cpp')" >&2
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC-\(.*\)-PNG_DEFN_END.*$$|\1|p'\
 	    dfn1.out >dfn2.out
-	$(SED) -e 's| *@@@ *||g' -e 's| *$$||' dfn2.out >dfn3.out
+	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' dfn2.out >dfn3.out
 	$(COPY) dfn3.out $@
 	$(DELETE) dfn.c dfn1.out dfn2.out dfn3.out
 
