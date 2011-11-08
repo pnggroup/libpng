@@ -1708,12 +1708,13 @@ png_image_read_end(png_voidp argument)
    {
       png_uint_32 base_format = png_image_format(png_ptr, info_ptr);
       png_uint_32 change = format ^ base_format;
+      png_fixed_point output_gamma;
+      int mode; /* alpha mode */
 
       /* Set the gamma appropriately, linear for 16-bit input, sRGB otherwise.
        */
       {
-         png_fixed_point input_gamma_default, output_gamma;
-         int mode;
+         png_fixed_point input_gamma_default;
 
          if (base_format & PNG_FORMAT_FLAG_LINEAR)
             input_gamma_default = PNG_GAMMA_LINEAR;
@@ -1722,7 +1723,7 @@ png_image_read_end(png_voidp argument)
 
          if (linear)
          {
-            mode = PNG_ALPHA_STANDARD;
+            mode = PNG_ALPHA_STANDARD; /* associated alpha */
             output_gamma = PNG_GAMMA_LINEAR;
          }
 
@@ -1732,24 +1733,25 @@ png_image_read_end(png_voidp argument)
             output_gamma = PNG_DEFAULT_sRGB;
          }
 
-         /* Set the mode, the default gamma for the file and then, if it
-          * doesn't match the default, the output gamma.
+         /* If the input default and output gamma do not match, because sRGB is
+          * being changed to linear, set the input default now via a dummy call
+          * to png_set_alpha_mode_fixed.
           */
-         png_set_alpha_mode_fixed(png_ptr, mode, input_gamma_default);
          if (input_gamma_default != output_gamma)
-            png_set_alpha_mode(png_ptr, mode, output_gamma);
+            png_set_alpha_mode_fixed(png_ptr, PNG_ALPHA_PNG,
+               input_gamma_default);
+      }
 
-         /* If the bit-depth changes then handle that here. */
-         if (change & PNG_FORMAT_FLAG_LINEAR)
-         {
-            if (linear /*16-bit output*/)
-               png_set_expand_16(png_ptr);
+      /* If the bit-depth changes then handle that here. */
+      if (change & PNG_FORMAT_FLAG_LINEAR)
+      {
+         if (linear /*16-bit output*/)
+            png_set_expand_16(png_ptr);
 
-            else /* 8-bit output */
-               png_set_scale_16(png_ptr);
+         else /* 8-bit output */
+            png_set_scale_16(png_ptr);
 
-            change &= ~PNG_FORMAT_FLAG_LINEAR;
-         }
+         change &= ~PNG_FORMAT_FLAG_LINEAR;
       }
 
       /* Now the background/alpha channel changes. */
@@ -1761,9 +1763,11 @@ png_image_read_end(png_voidp argument)
           */
          if (base_format & PNG_FORMAT_FLAG_ALPHA)
          {
+            /* 16-bit output: just remove the channel */
             if (linear) /* compose on black (well, pre-multiply) */
                png_set_strip_alpha(png_ptr);
 
+            /* 8-bit output: do an appropriate compose */
             else if (display->background != NULL)
             {
                png_color_16 c;
@@ -1793,8 +1797,7 @@ png_image_read_end(png_voidp argument)
                 * one so the code only has to hack on the pixels that require
                 * composition.
                 */
-               png_set_alpha_mode(png_ptr, PNG_ALPHA_OPTIMIZED,
-                  PNG_DEFAULT_sRGB);
+               mode = PNG_ALPHA_OPTIMIZED;
             }
          }
 
@@ -1804,11 +1807,25 @@ png_image_read_end(png_voidp argument)
              * been accomplished, so always add the alpha channel after the
              * component channels.
              */
-            png_set_add_alpha(png_ptr, 255/*opaque*/, PNG_FILLER_AFTER);
+            png_uint_32 filler; /* opaque filler */
+
+            if (linear)
+               filler = 65535;
+
+            else
+               filler = 255;
+
+            png_set_add_alpha(png_ptr, filler, PNG_FILLER_AFTER);
          }
 
          change &= ~PNG_FORMAT_FLAG_ALPHA;
       }
+
+      /* Now set the alpha mode correctly; this is always done, even if there is
+       * no alpha channel in either the input or the output because it correctly
+       * sets the output gamma.
+       */
+      png_set_alpha_mode_fixed(png_ptr, mode, output_gamma);
 
       if (change & PNG_FORMAT_FLAG_COLOR)
       {

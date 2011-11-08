@@ -1910,6 +1910,9 @@ png_write_image_8bit(png_voidp argument)
             ++in_ptr;
             ++out_ptr;
          } /* while out_ptr < row_end */
+
+         png_write_row(png_ptr, output_row);
+         input_row += display->row_bytes/(sizeof (png_uint_16));
       } /* while y */
    }
 
