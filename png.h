@@ -2781,12 +2781,14 @@ typedef struct
    (PNG_IMAGE_CHANNELS((image).format) * (image).width)
    /* Return the total number of components in a single row of the image; this
     * is the minimum 'row stride', the minimum count of components between each
-    * row.  */
+    * row.
+    */
 
 #define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
    (PNG_IMAGE_COMPONENT_SIZE((image).format) * (image).height * (row_stride))
    /* Return the size, in bytes, of an image buffer given a png_image and a row
-    * stride - the number of components to leave space for in each row. */
+    * stride - the number of components to leave space for in each row.
+    */
 
 /* PNG_IMAGE_FLAG_*
  *
@@ -2809,7 +2811,8 @@ typedef struct
 PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
    const char *file_name));
    /* The named file is opened for read and the image filled in from the PNG
-    * header in the file. */
+    * header in the file.
+    */
 
 PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
    FILE* file));
@@ -2842,7 +2845,8 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
 
 PNG_EXPORT(238, void, png_image_free, (png_imagep image));
    /* Free any data allocated by libpng in image->opaque, setting the pointer to
-    * NULL.  May be called at any time after the structure is initialized. */
+    * NULL.  May be called at any time after the structure is initialized.
+    */
 #endif /* PNG_SIMPLIFIED_READ_SUPPORTED */
 
 #ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
