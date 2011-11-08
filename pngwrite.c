@@ -493,8 +493,9 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #ifdef PNG_SETJMP_SUPPORTED
 /* Applications that neglect to set up their own setjmp() and then
-   encounter a png_error() will longjmp here.  Since the jmpbuf is
-   then meaningless we abort instead of returning. */
+ * encounter a png_error() will longjmp here.  Since the jmpbuf is
+ * then meaningless we abort instead of returning.
+ */
 #ifdef USE_FAR_KEYWORD
    if (setjmp(tmp_jmpbuf))
 #else
@@ -1709,8 +1710,8 @@ typedef struct
    png_voidp       local_row;
 } png_image_write_control;
 
-/* Write png_uint_16 input to a 16-bit PNG, the png_ptr has already been set to
- * do any necssary byte swapped.  The component order is defined by the
+/* Write png_uint_16 input to a 16-bit PNG; the png_ptr has already been set to
+ * do any necessary byte swapping.  The component order is defined by the
  * png_image format value.
  */
 static int
@@ -1745,7 +1746,7 @@ png_write_image_16bit(png_voidp argument)
 
    /* Work out the output row end and count over this, note that the increment
     * above to 'row' means that row_end can actually be beyond the end of the
-    * row, this is correct.
+    * row; this is correct.
     */
    row_end = output_row + image->width * (channels+1);
 
@@ -1763,7 +1764,7 @@ png_write_image_16bit(png_voidp argument)
          out_ptr[aindex] = alpha;
 
          /* Calculate a reciprocal.  The correct calculation is simply
-          * component/alpha*65535 << 15. (I.e. 15 bits of precision), this
+          * component/alpha*65535 << 15. (I.e. 15 bits of precision); this
           * allows correct rounding by adding .5 before the shift.  'reciprocal'
           * is only initialized when required.
           */

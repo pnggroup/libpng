@@ -2652,7 +2652,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * 3) Call the appropriate png_image_write... function with a pointer to the
  * image to write the PNG data.
  *
- * png_image is a structure that describes the in-memory formant of an image
+ * png_image is a structure that describes the in-memory format of an image
  * when it is being read or define the in-memory format of an image that you
  * need to write:
  */
@@ -2734,7 +2734,7 @@ typedef struct
 #endif
 
 /* Supported formats are as follows.  Future versions of libpng may support more
- * formats, for compatibility with older versions simply check if the format
+ * formats; for compatibility with older versions simply check if the format
  * macro is defined using #ifdef.  These defines describe the in-memory layout
  * of the components of the pixels of the image.
  *

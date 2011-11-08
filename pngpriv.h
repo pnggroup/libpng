@@ -515,7 +515,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
    abs((int)((c1).green) - (int)((c2).green)) + \
    abs((int)((c1).blue) - (int)((c2).blue)))
 
-/* Added to libpng-1.5.7: sRGB convertion tables */
+/* Added to libpng-1.5.7: sRGB conversion tables */
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 PNG_EXTERN /*PRIVATE*/ PNG_CONST png_uint_16 png_sRGB_table[256];
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,

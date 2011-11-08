@@ -2562,7 +2562,7 @@ png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
    if (row_info->bit_depth == 16)
    {
       png_bytep sp = row; /* source */
-      png_bytep dp = row; /* destinaton */
+      png_bytep dp = row; /* destination */
       png_bytep ep = sp + row_info->rowbytes; /* end+1 */
 
       while (sp < ep)
@@ -2623,7 +2623,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
    if (row_info->bit_depth == 16)
    {
       png_bytep sp = row; /* source */
-      png_bytep dp = row; /* destinaton */
+      png_bytep dp = row; /* destination */
       png_bytep ep = sp + row_info->rowbytes; /* end+1 */
 
       while (sp < ep)
@@ -3331,7 +3331,7 @@ png_do_rgb_to_gray(png_structp png_ptr, png_row_infop row_info, png_bytep row)
                if (red != green || red != blue)
                   rgb_error |= 1;
 
-               /* From 1.5.5 in the 16 bit case do the accurate convertion even
+               /* From 1.5.5 in the 16 bit case do the accurate conversion even
                 * in the 'fast' case - this is because this is where the code
                 * ends up when handling linear 16 bit data.
                 */
