@@ -1,7 +1,7 @@
 #!/bin/awk -f
 # scripts/options.awk - library build configuration control
 #
-# last changed in libpng version 1.5.0 - January 6, 2011
+# last changed in libpng version 1.5.7 - November 11, 2011
 #
 # Copyright (c) 1998-2011 Glenn Randers-Pehrson
 #
@@ -32,6 +32,7 @@
 BEGIN{
    out="/dev/null"              # intermediate, preprocessed, file
    pre=-1                       # preprocess (first line)
+   version=""                   # version information
    err=0                        # in-line exit sets this
    start="PNG_DEFN_MAGIC-"      # Arbitrary start
    end="-PNG_DEFN_END"          # Arbitrary end
@@ -86,6 +87,17 @@ pre == -1{
    }
 }
 
+# While pre-processing if the filename is ANNOUNCE then just look for a line
+# which gives the version information for this build.
+pre && FILENAME ~ /ANNOUNCE$/ && version == "" && $1 == "Libpng"{
+   version=$0
+   print "version =", version >out
+}
+
+pre && FILENAME ~ /ANNOUNCE$/{
+   next
+}
+
 # variable=value
 #   Sets the given variable to the given value (the syntax is fairly
 #   free form, except for deb (you are expected to understand how to
@@ -95,6 +107,11 @@ pre == -1{
 #   rest of the actions, so the variable settings happen during
 #   preprocessing but are recorded in the END action too.  This
 #   allows them to be set on the command line too.
+$0 ~ /^[ 	]*version[ 	]*=/{
+   sub(/^[  ]*version[  ]*=[  ]*/, "")
+   version = $0
+   next
+}
 $0 ~ /^[ 	]*everything[ 	=]*off[ 	]*$/{
    everything = "off"
    next
@@ -163,6 +180,19 @@ $1 == "com"{
       print comment, $0, cend >out
    } else
       print start end >out
+   next
+}
+
+# version
+#   Inserts a version comment
+$1 == "version" && NF == 1{
+   if (version == "") {
+      print "ERROR: no version string set"
+      err = 1 # prevent END{} running
+      exit 1
+   }
+
+   print comment, version, cend >out
    next
 }
 

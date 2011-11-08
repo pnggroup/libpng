@@ -41,11 +41,11 @@ pnglibconf.h: pnglibconf.dfn
 	$(COPY) dfn3.out $@
 	$(DELETE) dfn.c dfn1.out dfn2.out dfn3.out
 
-pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk
+pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk $(srcdir)/ANNOUNCE
 	$(DELETE) $@ dfn1.out dfn2.out
 	$(ECHO) "Calling $(AWK) from scripts/pnglibconf.mak" >&2
 	$(ECHO) "If 'awk' crashes try a better awk (e.g. AWK='nawk')" >&2
-	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out\
+	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out $(srcdir)/ANNOUNCE\
 	    $(srcdir)/scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	$(COPY) dfn2.out $@

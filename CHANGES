@@ -3688,7 +3688,7 @@ Version 1.5.7beta01 [November 4, 2011]
     just the changes that definitely improve speed and remain simple.
     The changes also slightly increase the clarity of the code.
 
-Version 1.5.7beta02 [November 5, 2011]
+Version 1.5.7beta02 [November 8, 2011]
   Check compression_type parameter in png_get_iCCP and remove spurious
     casts. The compression_type parameter is always assigned to, so must
     be non-NULL. The cast of the profile length potentially truncated the
@@ -3702,6 +3702,7 @@ Version 1.5.7beta02 [November 5, 2011]
     tested in the future.
   Updated scripts/pnglibconf.mak and scripts/makefile.std to handle the
     new PNG_JOIN macro.
+  Added versioning to pnglibconf.h comments.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
