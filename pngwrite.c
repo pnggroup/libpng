@@ -1973,17 +1973,25 @@ png_image_write_main(png_voidp argument)
    {
       /* The gamma here is 1.0 (linear) and the cHRM chunk matches sRGB. */
       png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_LINEAR);
-      png_set_cHRM_fixed(png_ptr, info_ptr,
-         /* color      x       y */
-         /* white */ 31270, 32900,
-         /* red   */ 64000, 33000,
-         /* green */ 30000, 60000,
-         /* blue  */ 15000,  6000
-      );
+
+      if (!(image->flags & PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB))
+         png_set_cHRM_fixed(png_ptr, info_ptr,
+            /* color      x       y */
+            /* white */ 31270, 32900,
+            /* red   */ 64000, 33000,
+            /* green */ 30000, 60000,
+            /* blue  */ 15000,  6000
+         );
    }
 
-   else
+   else if (!(image->flags & PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB))
       png_set_sRGB(png_ptr, info_ptr, PNG_sRGB_INTENT_PERCEPTUAL);
+
+   /* Else writing an 8-bit file and the *colors* aren't sRGB, but the 8-bit
+    * space must still be gamma encoded.
+    */
+   else
+      png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_sRGB_INVERSE);
 
    /* Write the file header. */
    png_write_info(png_ptr, info_ptr);
@@ -2081,7 +2089,7 @@ png_image_write_main(png_voidp argument)
 }
 
 int PNGAPI
-png_image_write_to_stdio (png_imagep image, FILE *file, int convert_to_8bit,
+png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
    const void *buffer, png_int_32 row_stride)
 {
    /* Write the image to the given (FILE*). */
@@ -2125,7 +2133,7 @@ png_image_write_to_stdio (png_imagep image, FILE *file, int convert_to_8bit,
 }
 
 int PNGAPI
-png_image_write_to_file (png_imagep image, const char *file_name,
+png_image_write_to_file(png_imagep image, const char *file_name,
    int convert_to_8bit, const void *buffer, png_int_32 row_stride)
 {
    /* Write the image to the named file. */
@@ -2137,56 +2145,38 @@ png_image_write_to_file (png_imagep image, const char *file_name,
 
          if (fp != NULL)
          {
-            if (png_image_write_init(image))
+            if (png_image_write_to_stdio(image, fp, convert_to_8bit, buffer,
+               row_stride))
             {
-               png_image_write_control display;
+               int error; /* from fflush/fclose */
 
-               image->opaque->png_ptr->io_ptr = fp;
-               image->opaque->owned_file = 1;
-               /* No need to close this file now - png_image_free will do that.
-                */
-
-               memset(&display, 0, sizeof display);
-               display.image = image;
-               display.buffer = buffer;
-               display.row_stride = row_stride;
-               display.convert_to_8bit = convert_to_8bit;
-
-               if (png_safe_execute(image, png_image_write_main, &display))
+               /* Make sure the file is flushed correctly. */
+               if (fflush(fp) == 0 && ferror(fp) == 0)
                {
-                  int error; /* from fflush/fclose */
+                  if (fclose(fp) == 0)
+                     return 1;
 
-                  /* Make sure the file is flushed correctly. */
-                  if (fflush(fp) == 0)
-                  {
-                     /* Steal the file pointer back to make sure it closes ok.
-                      */
-                     image->opaque->png_ptr->io_ptr = NULL;
-                     image->opaque->owned_file = 0;
-
-                     if (fclose(fp) == 0)
-                     {
-                        png_image_free(image);
-                        return 1;
-                     }
-                        
-                     error = errno;
-                  }
-
-                  else
-                     error = errno;
-
-                  return png_image_error(image, strerror(error));
+                  error = errno; /* from fclose */
                }
 
-               else /* else cleanup has already happened */
-                  return 0;
+               else
+               {
+                  error = errno; /* from fflush or ferror */
+                  (void)fclose(fp);
+               }
+
+               (void)remove(file_name);
+               /* The image has already been cleaned up; this is just used to
+                * set the error (because the original write succeeded).
+                */
+               return png_image_error(image, strerror(error));
             }
 
             else
             {
                /* Clean up: just the opened file. */
                (void)fclose(fp);
+               (void)remove(file_name);
                return 0;
             }
          }

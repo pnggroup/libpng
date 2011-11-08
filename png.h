@@ -2684,7 +2684,7 @@ typedef struct
  * The channels are encoded in one of two ways:
  *
  * a) As a small integer, value 0..255, contained in a (png_byte).  For the
- * alpha channel the original value is simple value/255.  For the color or
+ * alpha channel the original value is simply value/255.  For the color or
  * luminance channels the value is encoded according to the sRGB specification
  * and matches the 8-bit format expected by typical display devices.
  *
@@ -2742,7 +2742,7 @@ typedef struct
  */
 #define PNG_FORMAT_GRAY 0
 #define PNG_FORMAT_GA   PNG_FORMAT_FLAG_ALPHA
-#define PNG_FORMAT_AG   (PNG_FORMAT_GA|PNG_FORMAT_AFIRST)
+#define PNG_FORMAT_AG   (PNG_FORMAT_GA|PNG_FORMAT_FLAG_AFIRST)
 #define PNG_FORMAT_RGB  PNG_FORMAT_FLAG_COLOR
 #define PNG_FORMAT_BGR  (PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_BGR)
 #define PNG_FORMAT_RGBA (PNG_FORMAT_RGB|PNG_FORMAT_FLAG_ALPHA)
@@ -2755,11 +2755,11 @@ typedef struct
  * always the same - there is no provision for swapping the order of the
  * components in the linear format.
  */
-#define PNG_FORMAT_FP_Y PNG_FORMAT_FLAG_FP
-#define PNG_FORMAT_FP_Y_ALPHA (PNG_FORMAT_FLAG_FP|PNG_FORMAT_FLAG_ALPHA)
-#define PNG_FORMAT_FP_RGB (PNG_FORMAT_FLAG_FP|PNG_FORMAT_FLAG_COLOR)
-#define PNG_FORMAT_FP_RGB_ALPHA \
-   (PNG_FORMAT_FLAG_FP|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA)
+#define PNG_FORMAT_LINEAR_Y PNG_FORMAT_FLAG_LINEAR
+#define PNG_FORMAT_LINEAR_Y_ALPHA (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_ALPHA)
+#define PNG_FORMAT_LINEAR_RGB (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR)
+#define PNG_FORMAT_LINEAR_RGB_ALPHA \
+   (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA)
 
 /* PNG_IMAGE macros
  *
@@ -2828,7 +2828,7 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
    /* Finish reading the image into the supplied buffer and clean up the
     * png_image structure.
     *
-    * row_stride is the step, in png_byte or float units as appropriate,
+    * row_stride is the step, in png_byte or png_uint_16 units as appropriate,
     * between adjacent rows.  A positive stride indicates that the top-most row
     * is first in the buffer - the normal top-down arrangement.  A negative
     * stride indicates that the bottom-most row is first in the buffer.
