@@ -58,6 +58,8 @@ Version 1.5.7beta02 [November 8, 2011]
   Updated scripts/pnglibconf.mak and scripts/makefile.std to handle the
     new PNG_JOIN macro.
   Added versioning to pnglibconf.h comments.
+  Simplified read/write API initial version; basic read/write tested on
+    a variety of images, limited documentation (in the header file.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

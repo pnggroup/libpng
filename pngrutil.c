@@ -2767,18 +2767,13 @@ png_check_chunk_name(png_structp png_ptr, png_uint_32 chunk_name)
    }
 }
 
-/* Combines the row recently read in with the existing pixels in the
- * row.  This routine takes care of alpha and transparency if requested.
- * This routine also handles the two methods of progressive display
- * of interlaced images, depending on the mask value.
- * The mask value describes which pixels are to be combined with
- * the row.  The pattern always repeats every 8 pixels, so just 8
- * bits are needed.  A one indicates the pixel is to be combined,
- * a zero indicates the pixel is to be skipped.  This is in addition
- * to any alpha or transparency value associated with the pixel.  If
- * you want all pixels to be combined, pass 0xff (255) in mask.
+/* Combines the row recently read in with the existing pixels in the row.  This
+ * routine takes care of alpha and transparency if requested.  This routine also
+ * handles the two methods of progressive display of interlaced images,
+ * depending on the 'display' value; if 'display' is true then the whole row
+ * (dp) is filled from the start by replicating the available pixels.  If
+ * 'display' is false only those pixels present in the pass are filled in.
  */
-
 void /* PRIVATE */
 png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 {
@@ -2850,7 +2845,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 
       if (pixel_depth < 8)
       {
-         /* For pixel depths up to 4-bpp the 8-pixel mask can be expanded to fit
+         /* For pixel depths up to 4 bpp the 8-pixel mask can be expanded to fit
           * into 32 bits, then a single loop over the bytes using the four byte
           * values in the 32-bit mask can be used.  For the 'display' option the
           * expanded mask may also not require any masking within a byte.  To
@@ -2859,7 +2854,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           *
           * The 'regular' case requires a mask for each of the first 6 passes,
           * the 'display' case does a copy for the even passes in the range
-          * 0..6.  This has already been handled in the tst above.
+          * 0..6.  This has already been handled in the test above.
           *
           * The masks are arranged as four bytes with the first byte to use in
           * the lowest bits (little-endian) regardless of the order (PACKSWAP or
@@ -2867,7 +2862,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           *
           * NOTE: the whole of this logic depends on the caller of this function
           * only calling it on rows appropriate to the pass.  This function only
-          * understands the 'x' logic, the 'y' logic is handled by the caller.
+          * understands the 'x' logic; the 'y' logic is handled by the caller.
           *
           * The following defines allow generation of compile time constant bit
           * masks for each pixel depth and each possibility of swapped or not
@@ -2885,7 +2880,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
           * the compiler even though it isn't used.  Microsoft Visual C (various
           * versions) and the Intel C compiler are known to do this.  To avoid
           * this the following macros are used in 1.5.6.  This is a temporary
-          * solution to avoid destablizing the code during the release process.
+          * solution to avoid destabilizing the code during the release process.
           */
 #        if PNG_USE_COMPILE_TIME_MASKS
 #           define PNG_LSR(x,s) ((x)>>((s) & 0x1f))
@@ -2930,7 +2925,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
 #if PNG_USE_COMPILE_TIME_MASKS
          /* Utility macros to construct all the masks for a depth/swap
           * combination.  The 's' parameter says whether the format is PNG
-          * (big endian bytes) or not.  Only the three odd numbered passes are
+          * (big endian bytes) or not.  Only the three odd-numbered passes are
           * required for the display/block algorithm.
           */
 #        define S_MASKS(d,s) { S_MASK(0,d,s), S_MASK(1,d,s), S_MASK(2,d,s),\
@@ -2943,7 +2938,8 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
          /* Hence the pre-compiled masks indexed by PACKSWAP (or not), depth and
           * then pass:
           */
-         static PNG_CONST png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] = {
+         static PNG_CONST png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =
+         {
             /* Little-endian byte masks for PACKSWAP */
             { S_MASKS(1,0), S_MASKS(2,0), S_MASKS(4,0) },
             /* Normal (big-endian byte) masks - PNG format */
@@ -2953,7 +2949,8 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
          /* display_mask has only three entries for the odd passes, so index by
           * pass>>1.
           */
-         static PNG_CONST png_uint_32 display_mask[2][3][3] = {
+         static PNG_CONST png_uint_32 display_mask[2][3][3] =
+         {
             /* Little-endian byte masks for PACKSWAP */
             { B_MASKS(1,0), B_MASKS(2,0), B_MASKS(4,0) },
             /* Normal (big-endian byte) masks - PNG format */
@@ -3129,7 +3126,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                /* Check for double byte alignment and, if possible, use a
                 * 16-bit copy.  Don't attempt this for narrow images - ones that
                 * are less than an interlace panel wide.  Don't attempt it for
-                * wide bytes-to-copy either - use the png_memcpy there.
+                * wide bytes_to_copy either - use the png_memcpy there.
                 */
                if (bytes_to_copy < 16 /*else use png_memcpy*/ &&
                   png_isaligned(dp, png_uint_16) &&
@@ -3506,13 +3503,19 @@ png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
    png_size_t istop = row_info->rowbytes;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
    png_bytep rp = row + bpp;
+#if 0
    png_bytep lp = row;
+#endif
 
    PNG_UNUSED(prev_row)
 
    for (i = bpp; i < istop; i++)
    {
+#if 0
       *rp = (png_byte)(((int)(*rp) + (int)(*lp++)) & 0xff);
+#else
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+#endif
       rp++;
    }
 }
@@ -3540,7 +3543,9 @@ png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
    png_size_t i;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
+#if 0
    png_bytep lp = row;
+#endif
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
    png_size_t istop = row_info->rowbytes - bpp;
 
@@ -3555,7 +3560,11 @@ png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
    for (i = 0; i < istop; i++)
    {
       *rp = (png_byte)(((int)(*rp) +
+#if 0
          (int)(*pp++ + *lp++) / 2 ) & 0xff);
+#else
+         (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+#endif
 
       rp++;
    }

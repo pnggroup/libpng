@@ -6,7 +6,7 @@
 #
 com pnglibconf.h - library build configuration
 com
-com libpng version 1.5.3 -  July 7, 2011
+version
 com
 com Copyright (c) 1998-2011 Glenn Randers-Pehrson
 com
@@ -576,3 +576,31 @@ option WRITE_COMPRESSED_TEXT enables WRITE_TEXT
 # leave the row_pointers member out of the info structure.
 
 option INFO_IMAGE
+
+# Simplified API options
+# Read:
+option SIMPLIFIED_READ requires SEQUENTIAL_READ READ_TRANSFORMS SETJMP
+option SIMPLIFIED_READ enables READ_EXPAND READ_16BIT READ_EXPAND_16
+option SIMPLIFIED_READ enables READ_SCALE_16_TO_8 READ_RGB_TO_GRAY
+option SIMPLIFIED_READ enables READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA
+option SIMPLIFIED_READ enables READ_FILLER READ_SWAP
+
+option SIMPLIFIED_READ_AFIRST requires SIMPLIFIED_READ disabled
+option READ_SWAP_ALPHA enables SIMPLIFIED_READ_AFIRST
+
+option SIMPLIFIED_READ_BGR requires SIMPLIFIED_READ disabled
+option READ_BGR enables SIMPLIFIED_READ_BGR
+
+# Write:
+option SIMPLIFIED_WRITE requires WRITE STDIO SETJMP
+option SIMPLIFIED_WRITE enables WRITE_SWAP WRITE_gAMA WRITE_sRGB WRITE_cHRM
+
+option SIMPLIFIED_WRITE_AFIRST requires SIMPLIFIED_WRITE disabled
+option WRITE_SWAP_ALPHA enables SIMPLIFIED_WRITE_AFIRST
+
+option SIMPLIFIED_WRITE_BGR requires SIMPLIFIED_WRITE disabled
+option WRITE_BGR enables SIMPLIFIED_WRITE_BGR
+
+# Formats:
+option FORMAT_AFIRST if SIMPLIFIED_READ_AFIRST SIMPLIFIED_WRITE_AFIRST
+option FORMAT_BGR if SIMPLIFIED_READ_BGR SIMPLIFIED_WRITE_BGR

@@ -12,6 +12,9 @@
  */
 
 #include "pngpriv.h"
+#if defined PNG_SIMPLIFIED_WRITE_SUPPORTED && defined PNG_STDIO_SUPPORTED
+#  include <errno.h>
+#endif
 
 #ifdef PNG_WRITE_SUPPORTED
 
@@ -1651,4 +1654,551 @@ png_write_png(png_structp png_ptr, png_infop info_ptr,
    PNG_UNUSED(params)
 }
 #endif
+
+
+#ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
+#ifdef PNG_STDIO_SUPPORTED /* currently required for png_image_write_* */
+/* Initialize the write structure - general purpose utility. */
+static int
+png_image_write_init(png_imagep image)
+{
+   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, image,
+          png_safe_error, png_safe_warning);
+
+   if (png_ptr != NULL)
+   {
+      png_infop info_ptr = png_create_info_struct(png_ptr);
+
+      if (info_ptr != NULL)
+      {
+         png_controlp control = png_malloc_warn(png_ptr, sizeof *control);
+
+         if (control != NULL)
+         {
+            memset(control, 0, sizeof *control);
+
+            control->png_ptr = png_ptr;
+            control->info_ptr = info_ptr;
+            control->for_write = 1;
+
+            image->opaque = control;
+            return 1;
+         }
+
+         /* Error clean up */
+         png_destroy_info_struct(png_ptr, &info_ptr);
+      }
+
+      png_destroy_write_struct(&png_ptr, NULL);
+   }
+
+   return png_image_error(image, "png_image_read: out of memory");
+}
+
+/* Arguments to png_image_write_main: */
+typedef struct
+{
+   /* Arguments: */
+   png_imagep      image;
+   png_const_voidp buffer;
+   png_int_32      row_stride;
+   int             convert_to_8bit;
+   /* Local variables: */
+   png_const_voidp first_row;
+   ptrdiff_t       row_bytes;
+   png_voidp       local_row;
+} png_image_write_control;
+
+/* Write png_uint_16 input to a 16-bit PNG, the png_ptr has already been set to
+ * do any necssary byte swapped.  The component order is defined by the
+ * png_image format value.
+ */
+static int
+png_write_image_16bit(png_voidp argument)
+{
+   png_image_write_control *display = argument;
+   png_imagep image = display->image;
+   png_structp png_ptr = image->opaque->png_ptr;
+
+   png_const_uint_16p input_row = display->first_row;
+   png_uint_16p output_row = display->local_row;
+   png_uint_16p row_end;
+   int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   int aindex = 0;
+   png_uint_32 y = image->height;
+
+   if (image->format & PNG_FORMAT_FLAG_ALPHA)
+   {
+      if (image->format & PNG_FORMAT_FLAG_AFIRST)
+      {
+         aindex = -1;
+         ++input_row; /* To point to the first component */
+         ++output_row;
+      }
+
+      else
+         aindex = channels;
+   }
+
+   else
+      png_error(png_ptr, "png_write_image: internal call error");
+
+   /* Work out the output row end and count over this, note that the increment
+    * above to 'row' means that row_end can actually be beyond the end of the
+    * row, this is correct.
+    */
+   row_end = output_row + image->width * (channels+1);
+
+   while (y-- > 0)
+   {
+      png_const_uint_16p in_ptr = input_row;
+      png_uint_16p out_ptr = output_row;
+
+      while (out_ptr < row_end)
+      {
+         png_uint_16 alpha = in_ptr[aindex];
+         png_uint_32 reciprocal = 0;
+         int c;
+
+         out_ptr[aindex] = alpha;
+
+         /* Calculate a reciprocal.  The correct calculation is simply
+          * component/alpha*65535 << 15. (I.e. 15 bits of precision), this
+          * allows correct rounding by adding .5 before the shift.  'reciprocal'
+          * is only initialized when required.
+          */
+         if (alpha > 0 && alpha < 65535)
+            reciprocal = ((0xffff<<15)+(alpha>>1))/alpha;
+
+         c = channels;
+         do /* always at least one channel */
+         {
+            png_uint_16 component = *in_ptr++;
+
+            /* The following gives 65535 for an alpha of 0, which is fine,
+             * otherwise if 0/0 is represented as some other value there is more
+             * likely to be a discontinuity which will probably damage
+             * compression when moving from a fully transparent area to a
+             * nearly transparent one.  (The assumption here is that opaque
+             * areas tend not to be 0 intensity.)
+             */
+            if (component >= alpha)
+               component = 65535;
+
+            /* component<alpha, so component/alpha is less than one and
+             * component*reciprocal is less than 2^31.
+             */
+            else if (component > 0 && alpha < 65535)
+            {
+               png_uint_32 calc = component * reciprocal;
+               calc += 16384; /* round to nearest */
+               component = (png_uint_16)(calc >> 15);
+            }
+
+            *out_ptr++ = component;
+         }
+         while (--c > 0);
+
+         /* Skip to next component (skip the intervening alpha channel) */
+         ++in_ptr;
+         ++out_ptr;
+      }
+
+      png_write_row(png_ptr, (png_bytep)output_row);
+      input_row += display->row_bytes/(sizeof (png_uint_16));
+   }
+
+   return 1;
+}
+
+/* Given 16-bit input (1 to 4 channels) write 8-bit output.  If an alpha channel
+ * is present it must be removed from the components, the components are then
+ * written in sRGB encoding.  No components are added or removed.
+ */
+static int
+png_write_image_8bit(png_voidp argument)
+{
+   png_image_write_control *display = argument;
+   png_imagep image = display->image;
+   png_structp png_ptr = image->opaque->png_ptr;
+
+   png_const_uint_16p input_row = display->first_row;
+   png_bytep output_row = display->local_row;
+   png_uint_32 y = image->height;
+   int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+
+   if (image->format & PNG_FORMAT_FLAG_ALPHA)
+   {
+      png_bytep row_end;
+      int aindex;
+
+      if (image->format & PNG_FORMAT_FLAG_AFIRST)
+      {
+         aindex = -1;
+         ++input_row; /* To point to the first component */
+         ++output_row;
+      }
+
+      else
+         aindex = channels;
+
+      /* Use row_end in place of a loop counter: */
+      row_end = output_row + image->width * (channels+1);
+
+      while (y-- > 0)
+      {
+         png_const_uint_16p in_ptr = input_row;
+         png_bytep out_ptr = output_row;
+
+         if (aindex != 0) while (out_ptr < row_end) /* Alpha channel case */
+         {
+            png_uint_16 alpha = in_ptr[aindex];
+            png_uint_32 reciprocal = 0;
+            int c;
+
+            /* Scale and write the alpha channel.  See pngrtran.c
+             * png_do_scale_16_to_8 for a discussion of this calculation.  The
+             * code here has machine native values, so use:
+             *
+             *    (V * 255 + 32895) >> 16
+             */
+            out_ptr[aindex] = (png_byte)((alpha * 255 + 32895) >> 16);
+
+            /* Calculate a reciprocal.  As above the calculation can be done to
+             * 15 bits of accuracy, however the output needs to be scaled in the
+             * range 0..255*65535, so include that scaling here.
+             */
+            if (alpha > 0 && alpha < 65535)
+               reciprocal = (((0xffff*0xff)<<7)+(alpha>>1))/alpha;
+
+            c = channels;
+            do /* always at least one channel */
+            {
+               /* Need 32 bit accuracy in the sRGB tables */
+               png_uint_32 component = *in_ptr++;
+
+               /* The following gives 65535 for an alpha of 0, which is fine,
+                * otherwise if 0/0 is represented as some other value there is
+                * more likely to be a discontinuity which will probably damage
+                * compression when moving from a fully transparent area to a
+                * nearly transparent one.  (The assumption here is that opaque
+                * areas tend not to be 0 intensity.)
+                */
+               if (component >= alpha)
+                  *out_ptr++ = 255;
+
+               /* component<alpha, so component/alpha is less than one and
+                * component*reciprocal is less than 2^31.
+                */
+               else if (component > 0 && alpha < 65535)
+               {
+                  component *= reciprocal;
+                  component += 64; /* round to nearest */
+                  component >>= 7;
+
+                  /* Convert the component to sRGB. */
+                  *out_ptr++ = (png_byte)PNG_sRGB_FROM_LINEAR(component);
+               }
+
+               else
+                  *out_ptr++ = 0;
+            }
+            while (--c > 0);
+
+            /* Skip to next component (skip the intervening alpha channel) */
+            ++in_ptr;
+            ++out_ptr;
+         } /* while out_ptr < row_end */
+      } /* while y */
+   }
+
+   else
+   {
+      /* No alpha channel, so the row_end really is the end of the row and it
+       * is sufficient to loop over the components one by one.
+       */
+      png_bytep row_end = output_row + image->width * channels;
+
+      while (y-- > 0)
+      {
+         png_const_uint_16p in_ptr = input_row;
+         png_bytep out_ptr = output_row;
+
+         while (out_ptr < row_end)
+         {
+            png_uint_32 component = *in_ptr++;
+
+            component *= 255;
+            *out_ptr++ = (png_byte)PNG_sRGB_FROM_LINEAR(component);
+         }
+
+         png_write_row(png_ptr, output_row);
+         input_row += display->row_bytes/(sizeof (png_uint_16));
+      }
+   }
+
+   return 1;
+}
+
+static int
+png_image_write_main(png_voidp argument)
+{
+   png_image_write_control *display = argument;
+   png_imagep image = display->image;
+   png_structp png_ptr = image->opaque->png_ptr;
+   png_infop info_ptr = image->opaque->info_ptr;
+   png_uint_32 format = image->format;
+
+   int linear = (format & PNG_FORMAT_FLAG_LINEAR) != 0; /* input */
+   int alpha = (format & PNG_FORMAT_FLAG_ALPHA) != 0;
+   int write_16bit = linear && !display->convert_to_8bit;
+
+   /* Set the required transforms then write the rows in the correct order. */
+   png_set_IHDR(png_ptr, info_ptr, image->width, image->height,
+      write_16bit ? 16 : 8,
+      ((format & PNG_FORMAT_FLAG_COLOR) ? PNG_COLOR_MASK_COLOR : 0) +
+      ((format & PNG_FORMAT_FLAG_ALPHA) ? PNG_COLOR_MASK_ALPHA : 0),
+      PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+   /* Counter-intuitively the data transformations must be called *after*
+    * png_write_info, not before as in the read code, but the 'set' functions
+    * must still be called before.  Just set the color space information, never
+    * write an interlaced image.
+    */
+   if (write_16bit)
+   {
+      /* The gamma here is 1.0 (linear) and the cHRM chunk matches sRGB. */
+      png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_LINEAR);
+      png_set_cHRM_fixed(png_ptr, info_ptr,
+         /* color      x       y */
+         /* white */ 31270, 32900,
+         /* red   */ 64000, 33000,
+         /* green */ 30000, 60000,
+         /* blue  */ 15000,  6000
+      );
+   }
+
+   else
+      png_set_sRGB(png_ptr, info_ptr, PNG_sRGB_INTENT_PERCEPTUAL);
+
+   /* Write the file header. */
+   png_write_info(png_ptr, info_ptr);
+
+   /* Now set up the data transformations (*after* the header is written),
+    * remove the handled transformations from the 'format' flags for checking.
+    */
+   format &= ~(PNG_FORMAT_FLAG_COLOR | PNG_FORMAT_FLAG_LINEAR |
+      PNG_FORMAT_FLAG_ALPHA);
+
+   /* Check for a little endian system if writing 16 bit files. */
+   if (write_16bit)
+   {
+      PNG_CONST png_uint_16 le = 0x0001;
+
+      if (*(png_const_bytep)&le)
+         png_set_swap(png_ptr);
+   }
+
+#  ifdef PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
+      if (format & PNG_FORMAT_FLAG_BGR)
+      {
+         png_set_bgr(png_ptr);
+         format &= ~PNG_FORMAT_FLAG_BGR;
+      }
+#  endif
+
+#  ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
+      if (format & PNG_FORMAT_FLAG_AFIRST)
+      {
+         png_set_swap_alpha(png_ptr);
+         format &= ~PNG_FORMAT_FLAG_AFIRST;
+      }
+#  endif
+
+   /* That should have handled all the transforms. */
+   if (format != 0)
+      png_error(png_ptr, "png_write_image: unsupported transformation");
+
+   {
+      png_const_bytep row = display->buffer;
+      ptrdiff_t row_bytes = display->row_stride;
+
+      if (linear)
+         row_bytes *= sizeof (png_uint_16);
+
+      if (row_bytes < 0)
+         row += (image->height-1) * (-row_bytes);
+
+      display->first_row = row;
+      display->row_bytes = row_bytes;
+   }
+
+   /* Check for the cases that currently require a pre-transform on the row
+    * before it is written.  This only applies when the input is 16-bit and
+    * either there is an alpha channel or it is converted to 8-bit.
+    */
+   if ((linear && alpha) || display->convert_to_8bit)
+   {
+      png_bytep row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      int result;
+
+      display->local_row = row;
+      if (write_16bit)
+         result = png_safe_execute(image, png_write_image_16bit, display);
+      else
+         result = png_safe_execute(image, png_write_image_8bit, display);
+      display->local_row = NULL;
+
+      png_free(png_ptr, row);
+
+      /* Skip the 'write_end' on error: */
+      if (!result)
+         return 0;
+   }
+
+   /* Otherwise this is the case where the input is in a format currently
+    * supported by the rest of the libpng write code; call it directly.
+    */
+   else
+   {
+      png_const_bytep row = display->first_row;
+      ptrdiff_t row_bytes = display->row_bytes;
+      png_uint_32 y = image->height;
+
+      while (y-- > 0)
+      {
+         png_write_row(png_ptr, row);
+         row += row_bytes;
+      }
+   }
+
+   png_write_end(png_ptr, info_ptr);
+   return 1;
+}
+
+int PNGAPI
+png_image_write_to_stdio (png_imagep image, FILE *file, int convert_to_8bit,
+   const void *buffer, png_int_32 row_stride)
+{
+   /* Write the image to the given (FILE*). */
+   if (image != NULL)
+   {
+      if (file != NULL)
+      {
+         if (png_image_write_init(image))
+         {
+            png_image_write_control display;
+            int result;
+
+            /* This is slightly evil, but png_init_io doesn't do anything other
+             * than this and we haven't changed the standard IO functions so
+             * this saves a 'safe' function.
+             */
+            image->opaque->png_ptr->io_ptr = file;
+
+            memset(&display, 0, sizeof display);
+            display.image = image;
+            display.buffer = buffer;
+            display.row_stride = row_stride;
+            display.convert_to_8bit = convert_to_8bit;
+
+            result = png_safe_execute(image, png_image_write_main, &display);
+            png_image_free(image);
+            return result;
+         }
+
+         else
+            return 0;
+      }
+
+      else
+         return png_image_error(image,
+            "png_image_write_to_stdio: invalid argument");
+   }
+
+   else
+      return 0;
+}
+
+int PNGAPI
+png_image_write_to_file (png_imagep image, const char *file_name,
+   int convert_to_8bit, const void *buffer, png_int_32 row_stride)
+{
+   /* Write the image to the named file. */
+   if (image != NULL)
+   {
+      if (file_name != NULL)
+      {
+         FILE *fp = fopen(file_name, "wb");
+
+         if (fp != NULL)
+         {
+            if (png_image_write_init(image))
+            {
+               png_image_write_control display;
+
+               image->opaque->png_ptr->io_ptr = fp;
+               image->opaque->owned_file = 1;
+               /* No need to close this file now - png_image_free will do that.
+                */
+
+               memset(&display, 0, sizeof display);
+               display.image = image;
+               display.buffer = buffer;
+               display.row_stride = row_stride;
+               display.convert_to_8bit = convert_to_8bit;
+
+               if (png_safe_execute(image, png_image_write_main, &display))
+               {
+                  int error; /* from fflush/fclose */
+
+                  /* Make sure the file is flushed correctly. */
+                  if (fflush(fp) == 0)
+                  {
+                     /* Steal the file pointer back to make sure it closes ok.
+                      */
+                     image->opaque->png_ptr->io_ptr = NULL;
+                     image->opaque->owned_file = 0;
+
+                     if (fclose(fp) == 0)
+                     {
+                        png_image_free(image);
+                        return 1;
+                     }
+                        
+                     error = errno;
+                  }
+
+                  else
+                     error = errno;
+
+                  return png_image_error(image, strerror(error));
+               }
+
+               else /* else cleanup has already happened */
+                  return 0;
+            }
+
+            else
+            {
+               /* Clean up: just the opened file. */
+               (void)fclose(fp);
+               return 0;
+            }
+         }
+
+         else
+            return png_image_error(image, strerror(errno));
+      }
+
+      else
+         return png_image_error(image,
+            "png_image_write_to_file: invalid argument");
+   }
+
+   else
+      return 0;
+}
+#endif /* PNG_STDIO_SUPPORTED */
+#endif /* SIMPLIFIED_WRITE */
 #endif /* PNG_WRITE_SUPPORTED */

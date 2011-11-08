@@ -645,13 +645,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.7beta02 - November 4, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.7beta02 - November 8, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.7beta02 - November 4, 2011\
+      return "libpng version 1.5.7beta02 - November 8, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2854,4 +2854,418 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
   }
 }
 #endif /* READ_GAMMA */
+
+/* sRGB support */
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+/* sRGB conversion tables; these are machine generated with the following code.
+ */
+#ifdef PNG_INCLUDE_SELF_GENERATING_AND_SELF_DOCUMENTING_CODE
+#define _C99_SOURCE 1
+#include <stdio.h>
+#include <math.h>
+#include <stdlib.h>
+
+static unsigned int max_input = 255*65535;
+
+double sRGB(unsigned int i)
+{
+   double l = i;
+   l /= max_input;
+
+   if (l <= 0.0031308)
+      l *= 12.92;
+
+   else
+      l = 1.055 * pow(l, 1/2.4) - 0.055;
+
+   return l;
+}
+
+unsigned int invsRGB(unsigned int i)
+{
+   double l = i/255.;
+
+   if (l <= 0.04045)
+      l /= 12.92;
+
+   else
+      l = pow((l+0.055)/1.055, 2.4);
+
+   l *= 65535;
+   return nearbyint(l);
+}
+
+int main(void)
+{
+   unsigned int i, i16;
+   unsigned short base[512];
+   unsigned char  delta[512];
+   double max_error = 0;
+   double max_error16 = 0;
+   unsigned int error_count = 0;
+   unsigned int error_count16 = 0;
+
+   for (i=0; i<=511; ++i)
+   {
+      double lo = 255 * sRGB(i << 15);
+      double hi = 255 * sRGB((i+1) << 15);
+      unsigned int calc;
+
+      calc = nearbyint((lo+.5) * 256);
+      if (calc > 65535)
+      {
+         fprintf(stderr, "table[%d][0]: overflow %08x (%d)\n", i, calc, calc);
+         exit(1);
+      }
+      base[i] = calc;
+
+      calc = nearbyint((hi-lo) * 32);
+      if (calc > 255)
+      {
+         fprintf(stderr, "table[%d][1]: overflow %08x (%d)\n", i, calc, calc);
+         exit(1);
+      }
+      delta[i] = calc;
+   }
+
+   for (i=0; i <= max_input; ++i)
+   {
+      unsigned int iexact = nearbyint(255*sRGB(i));
+      unsigned int icalc = base[i>>15] + (((i&0x7fff)*delta[i>>15])>>12);
+      icalc >>= 8;
+
+      if (icalc != iexact)
+      {
+         double err = fabs(255*sRGB(i) - icalc);
+
+         ++error_count;
+         if (err > .646)
+         {
+            printf(
+               "/* 0x%08x: exact: %3d, got: %3d [tables: %08x, %08x] (%f) */\n",
+               i, iexact, icalc, base[i>>15], delta[i>>15], err);
+            if (err > max_error)
+               max_error = err;
+         }
+      }
+   }
+
+   for (i16=0; i16 <= 65535; ++i16)
+   {
+      unsigned int i = 255*i16;
+      unsigned int iexact = nearbyint(255*sRGB(i));
+      unsigned int icalc = base[i>>15] + (((i&0x7fff)*delta[i>>15])>>12);
+      icalc >>= 8;
+
+      if (icalc != iexact)
+      {
+         double err = fabs(255*sRGB(i) - icalc);
+
+         ++error_count16;
+         if (err > max_error16)
+            max_error16 = err;
+
+         if (abs(icalc - iexact) > 1)
+            printf(
+               "/* 0x%04x: exact: %3d, got: %3d [tables: %08x, %08x] (%f) */\n",
+               i16, iexact, icalc, base[i>>15], delta[i>>15], err);
+      }
+   }
+
+   printf("/* maximum error: %g, %g%% of readings */\n", max_error,
+      (100.*error_count)/max_input);
+   printf("/* maximum 16-bit error: %g, %g%% of readings */\n", max_error16,
+      (100.*error_count16)/65535);
+
+   printf("PNG_CONST png_uint_16 png_sRGB_table[256] =\n{\n   ");
+   for (i=0; i<255; )
+   {
+      do
+      {
+         printf("%d,", invsRGB(i++));
+      }
+      while ((i & 0x7) != 0 && i<255);
+      if (i<255) printf("\n   ");
+   }
+   printf("%d\n};\n\n", invsRGB(i));
+
+
+   printf("PNG_CONST png_uint_16 png_sRGB_base[512] =\n{\n   ");
+   for (i=0; i<511; )
+   {
+      do
+      {
+         printf("%d,", base[i++]);
+      }
+      while ((i & 0x7) != 0 && i<511);
+      if (i<511) printf("\n   ");
+   }
+   printf("%d\n};\n\n", base[i]);
+
+   printf("PNG_CONST png_byte png_sRGB_delta[512] =\n{\n   ");
+   for (i=0; i<511; )
+   {
+      do
+      {
+         printf("%d,", delta[i++]);
+      }
+      while ((i & 0xf) != 0 && i<511);
+      if (i<511) printf("\n   ");
+   }
+   printf("%d\n};\n\n", delta[i]);
+
+   return 0;
+}
+#endif /* self documenting code */
+
+/* The result is a set of tables with the following errors: */
+/* 0x000148c1: exact:  16, got:  15 [tables: 00000d36, 0000009d] (0.646071) */
+/* 0x000148c2: exact:  16, got:  15 [tables: 00000d36, 0000009d] (0.646218) */
+/* 0x000148c3: exact:  16, got:  15 [tables: 00000d36, 0000009d] (0.646365) */
+/* maximum error: 0.646365, 0.494416% of readings */
+/* maximum 16-bit error: 0.644455, 0.5066% of readings */
+
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+/* The convert-to-sRGB table is only currently required for read. */
+PNG_CONST png_uint_16 png_sRGB_table[256] =
+{
+   0,20,40,60,80,99,119,139,
+   159,179,199,219,241,264,288,313,
+   340,367,396,427,458,491,526,562,
+   599,637,677,718,761,805,851,898,
+   947,997,1048,1101,1156,1212,1270,1330,
+   1391,1453,1517,1583,1651,1720,1790,1863,
+   1937,2013,2090,2170,2250,2333,2418,2504,
+   2592,2681,2773,2866,2961,3058,3157,3258,
+   3360,3464,3570,3678,3788,3900,4014,4129,
+   4247,4366,4488,4611,4736,4864,4993,5124,
+   5257,5392,5530,5669,5810,5953,6099,6246,
+   6395,6547,6700,6856,7014,7174,7335,7500,
+   7666,7834,8004,8177,8352,8528,8708,8889,
+   9072,9258,9445,9635,9828,10022,10219,10417,
+   10619,10822,11028,11235,11446,11658,11873,12090,
+   12309,12530,12754,12980,13209,13440,13673,13909,
+   14146,14387,14629,14874,15122,15371,15623,15878,
+   16135,16394,16656,16920,17187,17456,17727,18001,
+   18277,18556,18837,19121,19407,19696,19987,20281,
+   20577,20876,21177,21481,21787,22096,22407,22721,
+   23038,23357,23678,24002,24329,24658,24990,25325,
+   25662,26001,26344,26688,27036,27386,27739,28094,
+   28452,28813,29176,29542,29911,30282,30656,31033,
+   31412,31794,32179,32567,32957,33350,33745,34143,
+   34544,34948,35355,35764,36176,36591,37008,37429,
+   37852,38278,38706,39138,39572,40009,40449,40891,
+   41337,41785,42236,42690,43147,43606,44069,44534,
+   45002,45473,45947,46423,46903,47385,47871,48359,
+   48850,49344,49841,50341,50844,51349,51858,52369,
+   52884,53401,53921,54445,54971,55500,56032,56567,
+   57105,57646,58190,58737,59287,59840,60396,60955,
+   61517,62082,62650,63221,63795,64372,64952,65535
+};
+#endif /* simplified read only */
+
+/* The base/delta tables are required for both read and write (but currently
+ * only the simplified versions.)
+ */
+PNG_CONST png_uint_16 png_sRGB_base[512] =
+{
+   128,1782,3382,4641,5673,6563,7355,8072,
+   8732,9346,9920,10463,10977,11466,11935,12384,
+   12815,13232,13634,14024,14402,14768,15125,15473,
+   15811,16142,16465,16781,17090,17393,17689,17980,
+   18266,18546,18822,19093,19359,19621,19879,20133,
+   20383,20630,20873,21113,21349,21583,21813,22040,
+   22265,22487,22706,22923,23138,23350,23559,23767,
+   23972,24175,24376,24575,24772,24967,25160,25352,
+   25541,25729,25916,26100,26283,26465,26645,26823,
+   27000,27176,27350,27523,27694,27865,28033,28201,
+   28368,28533,28697,28860,29021,29182,29341,29500,
+   29657,29813,29969,30123,30276,30428,30580,30730,
+   30880,31028,31176,31323,31469,31614,31758,31902,
+   32044,32186,32327,32468,32607,32746,32884,33021,
+   33158,33294,33429,33563,33697,33830,33963,34095,
+   34226,34356,34486,34616,34744,34872,35000,35127,
+   35253,35379,35504,35629,35753,35876,35999,36122,
+   36244,36365,36486,36606,36726,36845,36964,37083,
+   37201,37318,37435,37551,37667,37783,37898,38013,
+   38127,38241,38354,38467,38580,38692,38803,38915,
+   39025,39136,39246,39356,39465,39574,39682,39790,
+   39898,40005,40112,40219,40325,40431,40537,40642,
+   40747,40851,40955,41059,41163,41266,41369,41471,
+   41573,41675,41776,41878,41978,42079,42179,42279,
+   42379,42478,42577,42676,42774,42873,42970,43068,
+   43165,43262,43359,43455,43552,43647,43743,43838,
+   43934,44028,44123,44217,44311,44405,44498,44592,
+   44685,44777,44870,44962,45054,45146,45238,45329,
+   45420,45511,45601,45692,45782,45872,45961,46051,
+   46140,46229,46318,46406,46494,46582,46670,46758,
+   46845,46933,47020,47107,47193,47280,47366,47452,
+   47538,47623,47708,47794,47879,47963,48048,48132,
+   48217,48301,48384,48468,48552,48635,48718,48801,
+   48884,48966,49048,49131,49213,49294,49376,49457,
+   49539,49620,49701,49781,49862,49942,50023,50103,
+   50183,50262,50342,50421,50501,50580,50659,50738,
+   50816,50895,50973,51051,51129,51207,51284,51362,
+   51439,51517,51594,51670,51747,51824,51900,51977,
+   52053,52129,52205,52280,52356,52431,52507,52582,
+   52657,52732,52807,52881,52956,53030,53104,53178,
+   53252,53326,53399,53473,53546,53620,53693,53766,
+   53839,53911,53984,54056,54129,54201,54273,54345,
+   54417,54489,54560,54632,54703,54774,54845,54916,
+   54987,55058,55128,55199,55269,55340,55410,55480,
+   55550,55619,55689,55759,55828,55897,55967,56036,
+   56105,56174,56242,56311,56380,56448,56516,56585,
+   56653,56721,56789,56857,56924,56992,57059,57127,
+   57194,57261,57328,57395,57462,57529,57595,57662,
+   57728,57795,57861,57927,57993,58059,58125,58191,
+   58256,58322,58387,58453,58518,58583,58648,58713,
+   58778,58843,58908,58972,59037,59101,59165,59230,
+   59294,59358,59422,59486,59549,59613,59677,59740,
+   59804,59867,59930,59993,60056,60119,60182,60245,
+   60308,60370,60433,60495,60558,60620,60682,60744,
+   60806,60868,60930,60992,61054,61115,61177,61238,
+   61300,61361,61422,61483,61544,61605,61666,61727,
+   61788,61848,61909,61969,62030,62090,62150,62210,
+   62271,62331,62391,62450,62510,62570,62630,62689,
+   62749,62808,62867,62927,62986,63045,63104,63163,
+   63222,63281,63339,63398,63457,63515,63574,63632,
+   63691,63749,63807,63865,63923,63981,64039,64097,
+   64155,64212,64270,64328,64385,64442,64500,64557,
+   64614,64671,64729,64786,64843,64899,64956,65013,
+   65070,65126,65183,65239,65296,65352,65408,65465
+};
+
+PNG_CONST png_byte png_sRGB_delta[512] =
+{
+   207,200,157,129,111,99,90,82,77,72,68,64,61,59,56,54,
+   52,50,49,47,46,45,43,42,41,40,39,39,38,37,36,36,
+   35,34,34,33,33,32,32,31,31,30,30,30,29,29,28,28,
+   28,27,27,27,26,26,26,26,25,25,25,25,24,24,24,24,
+   23,23,23,23,23,22,22,22,22,22,22,21,21,21,21,21,
+   21,20,20,20,20,20,20,20,20,19,19,19,19,19,19,19,
+   19,18,18,18,18,18,18,18,18,18,18,17,17,17,17,17,
+   17,17,17,17,17,17,16,16,16,16,16,16,16,16,16,16,
+   16,16,16,16,15,15,15,15,15,15,15,15,15,15,15,15,
+   15,15,15,15,14,14,14,14,14,14,14,14,14,14,14,14,
+   14,14,14,14,14,14,14,13,13,13,13,13,13,13,13,13,
+   13,13,13,13,13,13,13,13,13,13,13,13,13,13,12,12,
+   12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,12,
+   12,12,12,12,12,12,12,12,12,12,12,12,11,11,11,11,
+   11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
+   11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,11,
+   11,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+   10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+   10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
+   10,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+   9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+   9,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+   8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,8,
+   8,8,8,8,8,8,8,8,8,7,7,7,7,7,7,7,
+   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7
+};
+
+/* Hence the define in pngpriv.h to calculate the sRGB value of a linear value
+ * expressed as a fixed point integer scaled by 255*65535 (note that the tables
+ * include the +.5 to do rounding correctly.)
+ */
+#endif /* SIMPLIFIED READ/WRITE sRGB support */
+
+/* SIMPLIFIED READ/WRITE SUPPORT */
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+static int
+png_image_free_function(png_voidp argument)
+{
+   png_imagep image = argument;
+   png_controlp cp = image->opaque;
+   png_control c;
+
+   /* Double check that we have a png_ptr - it should be impossible to get here
+    * without one.
+    */
+   if (cp->png_ptr == NULL)
+      return 0;
+
+   /* First free any data held in the control structure. */
+#  ifdef PNG_STDIO_SUPPORTED
+      if (cp->owned_file)
+      {
+         FILE *fp = cp->png_ptr->io_ptr;
+         cp->owned_file = 0;
+
+         /* Ignore errors here. */
+         if (fp != NULL)
+         {
+            cp->png_ptr->io_ptr = NULL;
+            (void)fclose(fp);
+         }
+      }
+#  endif
+
+   /* Copy the control structure so that the original, allocated, version can be
+    * safely freed.  Notice that a png_error here stops the remainder of the
+    * cleanup, but this is probably fine because that would indicate bad memory
+    * problems anyway.
+    */
+   c = *cp;
+   image->opaque = &c;
+   png_free(c.png_ptr, cp);
+
+   /* Then the structures, calling the correct API. */
+   if (c.for_write)
+   {
+#     ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
+         png_destroy_write_struct(&c.png_ptr, &c.info_ptr);
+#     else
+         png_error(c.png_ptr, "simplified write not supported");
+#     endif
+   }
+   else
+   {
+#     ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+         png_destroy_read_struct(&c.png_ptr, &c.info_ptr, NULL);
+#     else
+         png_error(c.png_ptr, "simplified read not supported");
+#     endif
+   }
+
+   /* Success. */
+   return 1;
+}
+
+void PNGAPI
+png_image_free(png_imagep image)
+{
+   /* Safely call the real function, but only if doing so is safe at this point
+    * (if not inside an error handling context).  Otherwise assume
+    * png_safe_execute will call this API after the return.
+    */
+   if (image != NULL && image->opaque != NULL &&
+      image->opaque->error_buf == NULL)
+   {
+      /* Ignore errors here: */
+      (void)png_safe_execute(image, png_image_free_function, image);
+      image->opaque = NULL;
+   }
+}
+
+int /* PRIVATE */
+png_image_error(png_imagep image, png_const_charp error_message)
+{
+   /* Utility to log an error. */
+   png_safecat(image->message, sizeof image->message, 0, error_message);
+   image->warning_or_error = 1;
+   png_image_free(image);
+   return 0;
+}
+
+#endif /* SIMPLIFIED READ/WRITE */
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */

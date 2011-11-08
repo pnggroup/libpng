@@ -936,15 +936,15 @@ png_set_rgb_to_gray_fixed(png_structp png_ptr, int error_action,
 
    switch(error_action)
    {
-      case 1:
+      case PNG_ERROR_ACTION_NONE:
          png_ptr->transformations |= PNG_RGB_TO_GRAY;
          break;
 
-      case 2:
+      case PNG_ERROR_ACTION_WARN:
          png_ptr->transformations |= PNG_RGB_TO_GRAY_WARN;
          break;
 
-      case 3:
+      case PNG_ERROR_ACTION_ERROR:
          png_ptr->transformations |= PNG_RGB_TO_GRAY_ERR;
          break;
 

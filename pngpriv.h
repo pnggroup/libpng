@@ -196,6 +196,23 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #   define PNG_STATIC static
 #endif
 
+/* C99 restrict is used where possible, to do this 'restrict' is defined as
+ * empty if we can't be sure it is supported.  configure builds have already
+ * done this work.
+ */
+#ifdef PNG_CONFIGURE_LIBPNG
+#  define PNG_RESTRICT restrict
+#else
+   /* Modern compilers support restrict, but assume not for anything not
+    * recognized here:
+    */
+#  if defined __GNUC__ || defined _MSC_VER || defined __WATCOMC__
+#     define PNG_RESTRICT restrict
+#  else
+#     define PNG_RESTRICT
+#  endif
+#endif
+
 /* If warnings or errors are turned off the code is disabled or redirected here.
  * From 1.5.4 functions have been added to allow very limited formatting of
  * error and warning messages - this code will also be disabled here.
@@ -497,6 +514,26 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define PNG_COLOR_DIST(c1, c2) (abs((int)((c1).red) - (int)((c2).red)) + \
    abs((int)((c1).green) - (int)((c2).green)) + \
    abs((int)((c1).blue) - (int)((c2).blue)))
+
+/* Added to libpng-1.5.7: sRGB convertion tables */
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+PNG_EXTERN /*PRIVATE*/ PNG_CONST png_uint_16 png_sRGB_table[256];
+   /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
+    * 0..65535.  This table gives the closes 16-bit answers (no errors).
+    */
+#endif
+
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLFIED_WRITE_SUPPORTED
+PNG_EXTERN /*PRIVATE*/ PNG_CONST png_uint_16 png_sRGB_base[512];
+PNG_EXTERN /*PRIVATE*/ PNG_CONST png_byte png_sRGB_delta[512];
+
+#define PNG_sRGB_FROM_LINEAR(linear) ((png_sRGB_base[(linear)>>15] +\
+   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)
+   /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
+    * encoded value with maximum error 0.646365.  Note that the input is not a
+    * 16-bit value; it has been multiplied by 255! */
+#endif
 
 /* Added to libpng-1.2.6 JB */
 #define PNG_ROWBYTES(pixel_bits, width) \
@@ -1587,6 +1624,47 @@ PNG_EXTERN void png_destroy_gamma_table(png_structp png_ptr);
 PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
     int bit_depth));
 #endif
+
+/* SIMPLIFIED READ/WRITE SUPPORT */
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+/* The internal structure that png_image::opaque points to. */
+typedef struct png_control
+{
+   png_structp  png_ptr;
+   png_infop    info_ptr;
+   png_voidp    error_buf;     /* Always a jmp_buf at present. */
+
+   png_const_bytep memory;     /* Memory buffer. */
+   png_size_t      size;       /* Size of the memory buffer. */
+
+   unsigned int for_write :1;  /* Otherwise it is a read structure */
+   unsigned int owned_file :1; /* We own the file in io_ptr */
+} png_control;
+
+/* Utility to safely execute a piece of libpng code catching and logging any
+ * errors that might occur.  Returns true on success, false on failure (either
+ * of the function or as a result of a png_error.)
+ */
+PNG_FUNCTION(void, png_safe_error, (png_structp png_ptr,
+   png_const_charp error_message), PNG_NORETURN);
+
+#ifdef PNG_WARNINGS_SUPPORTED
+   PNG_EXTERN void png_safe_warning(png_structp png_ptr,
+      png_const_charp warning_message);
+#else
+#  define png_safe_warning 0/*dummy argument*/
+#endif
+
+PNG_EXTERN int png_safe_execute PNGARG((png_imagep image,
+   int (*function)(png_voidp), png_voidp arg));
+
+/* Utility to log an error, this also cleans up the png_image, the function
+ * always returns 0 (false).
+ */
+PNG_EXTERN int png_image_error(png_imagep image, png_const_charp error_message);
+
+#endif /* SIMPLIFIED READ/WRITE */
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
