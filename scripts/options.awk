@@ -32,7 +32,8 @@
 BEGIN{
    out="/dev/null"              # intermediate, preprocessed, file
    pre=-1                       # preprocess (first line)
-   version=""                   # version information
+   version="libpng version unknown" # version information
+   version_file=""              # where to find the version
    err=0                        # in-line exit sets this
    start="PNG_DEFN_MAGIC-"      # Arbitrary start
    end="-PNG_DEFN_END"          # Arbitrary end
@@ -87,14 +88,25 @@ pre == -1{
    }
 }
 
-# While pre-processing if the filename is ANNOUNCE then just look for a line
-# which gives the version information for this build.
-pre && FILENAME ~ /ANNOUNCE$/ && version == "" && $1 == "Libpng"{
-   version=$0
-   print "version =", version >out
+# While pre-processing if version is set to "search" look for a version string
+# in the following file.
+pre && version == "search" && version_file == ""{
+   version_file = FILENAME
 }
 
-pre && FILENAME ~ /ANNOUNCE$/{
+pre && version == "search" && version_file != FILENAME{
+   print "version string not found in", version_file
+   err = 1
+   exit 1
+}
+
+pre && version == "search" && $0 ~ /^ \* libpng version/{
+   version = substr($0, 4)
+   print "version =", version >out
+   next
+}
+
+pre && FILENAME == version_file{
    next
 }
 

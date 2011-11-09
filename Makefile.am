@@ -149,10 +149,11 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 	mv dfn3.out $@
 
 # The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
+pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ dfn?.out
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out\
-	    ${srcdir}/scripts/pnglibconf.dfa $(DFA_XTRA) 1>&2
+	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out version=search\
+	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
+	    $(DFA_XTRA) 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	rm dfn1.out
 	mv dfn2.out $@
@@ -167,12 +168,13 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 
 # used on demand to regenerate the standard header, CPPFLAGS should
 # be empty - no non-standard defines
-scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk
+scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ dfn?.out
 	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out\
-	    logunsupported=1 - ${srcdir}/scripts/pnglibconf.dfa 1>&2
+	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out logunsupported=1
+		version=search ${srcdir}/pngconf.h -\
+		${srcdir}/scripts/pnglibconf.dfa 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	rm dfn1.out
 	mv dfn2.out $@
