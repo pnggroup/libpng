@@ -1805,7 +1805,7 @@ png_write_image_16bit(png_voidp argument)
          ++out_ptr;
       }
 
-      png_write_row(png_ptr, (png_bytep)output_row);
+      png_write_row(png_ptr, display->local_row);
       input_row += display->row_bytes/(sizeof (png_uint_16));
    }
 
@@ -1911,7 +1911,7 @@ png_write_image_8bit(png_voidp argument)
             ++out_ptr;
          } /* while out_ptr < row_end */
 
-         png_write_row(png_ptr, output_row);
+         png_write_row(png_ptr, display->local_row);
          input_row += display->row_bytes/(sizeof (png_uint_16));
       } /* while y */
    }
@@ -1998,11 +1998,9 @@ png_image_write_main(png_voidp argument)
 
    /* Now set up the data transformations (*after* the header is written),
     * remove the handled transformations from the 'format' flags for checking.
+    *
+    * First check for a little endian system if writing 16 bit files.
     */
-   format &= ~(PNG_FORMAT_FLAG_COLOR | PNG_FORMAT_FLAG_LINEAR |
-      PNG_FORMAT_FLAG_ALPHA);
-
-   /* Check for a little endian system if writing 16 bit files. */
    if (write_16bit)
    {
       PNG_CONST png_uint_16 le = 0x0001;
@@ -2014,7 +2012,8 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
       if (format & PNG_FORMAT_FLAG_BGR)
       {
-         png_set_bgr(png_ptr);
+         if (format & PNG_FORMAT_FLAG_COLOR)
+            png_set_bgr(png_ptr);
          format &= ~PNG_FORMAT_FLAG_BGR;
       }
 #  endif
@@ -2022,13 +2021,15 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
       if (format & PNG_FORMAT_FLAG_AFIRST)
       {
-         png_set_swap_alpha(png_ptr);
+         if (format & PNG_FORMAT_FLAG_ALPHA)
+            png_set_swap_alpha(png_ptr);
          format &= ~PNG_FORMAT_FLAG_AFIRST;
       }
 #  endif
 
-   /* That should have handled all the transforms. */
-   if (format != 0)
+   /* That should have handled all (both) the transforms. */
+   if ((format & ~(PNG_FORMAT_FLAG_COLOR | PNG_FORMAT_FLAG_LINEAR |
+         PNG_FORMAT_FLAG_ALPHA)) != 0)
       png_error(png_ptr, "png_write_image: unsupported transformation");
 
    {

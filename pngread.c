@@ -1804,10 +1804,12 @@ png_image_read_end(png_voidp argument)
          else /* output needs an alpha channel */
          {
             /* This is tricky because it happens before the swap operation has
-             * been accomplished, so always add the alpha channel after the
-             * component channels.
+             * been accomplished however the swap does *not* swap the added
+             * alpha channel (weird API), so it must be added in the correct
+             * place.
              */
             png_uint_32 filler; /* opaque filler */
+            int where;
 
             if (linear)
                filler = 65535;
@@ -1815,9 +1817,21 @@ png_image_read_end(png_voidp argument)
             else
                filler = 255;
 
-            png_set_add_alpha(png_ptr, filler, PNG_FILLER_AFTER);
+#           ifdef PNG_FORMAT_AFIRST_SUPPORTED
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+               {
+                  where = PNG_FILLER_BEFORE;
+                  change &= ~PNG_FORMAT_FLAG_AFIRST;
+               }
+
+               else
+#           endif
+               where = PNG_FILLER_AFTER;
+
+            png_set_add_alpha(png_ptr, filler, where);
          }
 
+         /* This stops the (irrelevant) call to swap_alpha below. */
          change &= ~PNG_FORMAT_FLAG_ALPHA;
       }
 
@@ -1841,7 +1855,7 @@ png_image_read_end(png_voidp argument)
       }
 
 #     ifdef PNG_FORMAT_BGR_SUPPORTED
-         if (format & PNG_FORMAT_FLAG_BGR)
+         if (change & PNG_FORMAT_FLAG_BGR)
          {
             /* Check only the output format; PNG is never BGR, don't do this if
              * the output is gray, but fix up the 'format' value in that case.
@@ -1857,7 +1871,7 @@ png_image_read_end(png_voidp argument)
 #     endif
 
 #     ifdef PNG_FORMAT_AFIRST_SUPPORTED
-         if (format & PNG_FORMAT_FLAG_AFIRST)
+         if (change & PNG_FORMAT_FLAG_AFIRST)
          {
             /* Only relevant if there is an alpha channel - it's particularly
              * important to handle this correctly because do_local_compose may
@@ -1924,7 +1938,9 @@ png_image_read_end(png_voidp argument)
 #     endif
 
 #     ifdef PNG_FORMAT_AFIRST_SUPPORTED
-         if (png_ptr->transformations & PNG_SWAP_ALPHA)
+         if (png_ptr->transformations & PNG_SWAP_ALPHA ||
+            ((png_ptr->transformations & PNG_ADD_ALPHA) != 0 &&
+            (png_ptr->flags & PNG_FLAG_FILLER_AFTER) == 0))
             info_format |= PNG_FORMAT_FLAG_AFIRST;
 #     endif
 

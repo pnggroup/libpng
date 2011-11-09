@@ -3900,6 +3900,16 @@ png_read_start_row(png_structp png_ptr)
 
    max_pixel_depth = png_ptr->pixel_depth;
 
+   /* WARNING: * png_read_transform_info (pngrtran.c) performs a simpliar set of
+    * calculations to calculate the final pixel depth, then
+    * png_do_read_transforms actually does the transforms.  This means that the
+    * code which effectively calculates this value is actually repeated in three
+    * separate places.  They must all match.  Innocent changes to the order of
+    * transformations can and will break libpng in a way that causes memory
+    * overwrites.
+    *
+    * TODO: fix this.
+    */
 #ifdef PNG_READ_PACK_SUPPORTED
    if ((png_ptr->transformations & PNG_PACK) && png_ptr->bit_depth < 8)
       max_pixel_depth = 8;
@@ -3958,10 +3968,7 @@ png_read_start_row(png_structp png_ptr)
 #ifdef PNG_READ_FILLER_SUPPORTED
    if (png_ptr->transformations & (PNG_FILLER))
    {
-      if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-         max_pixel_depth = 32;
-
-      else if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
+      if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
       {
          if (max_pixel_depth <= 8)
             max_pixel_depth = 16;
@@ -3970,7 +3977,8 @@ png_read_start_row(png_structp png_ptr)
             max_pixel_depth = 32;
       }
 
-      else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
+      else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB ||
+         png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          if (max_pixel_depth <= 32)
             max_pixel_depth = 32;
