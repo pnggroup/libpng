@@ -1404,7 +1404,7 @@ png_image_read_header(png_voidp argument)
       {
          /* gamma is irrelevant because libpng does gamma correction, what
           * matters is if the cHRM chunk doesn't match or, in the absence of
-          * cRHM, if the iCCP profile looks to have different end points.
+          * cRHM, if the iCCP profile appears to have different end points.
           */
          if (info_ptr->valid & PNG_INFO_cHRM)
          {
@@ -1792,7 +1792,7 @@ png_image_read_end(png_voidp argument)
             else /* compose on row: implemented below. */
             {
                do_local_compose = 1;
-               /* This leaves the alpha channel in the output, it has to be
+               /* This leaves the alpha channel in the output, so it has to be
                 * removed by the code below.  Set the encoding to the 'OPTIMIZE'
                 * one so the code only has to hack on the pixels that require
                 * composition.
@@ -1804,7 +1804,7 @@ png_image_read_end(png_voidp argument)
          else /* output needs an alpha channel */
          {
             /* This is tricky because it happens before the swap operation has
-             * been accomplished however the swap does *not* swap the added
+             * been accomplished; however, the swap does *not* swap the added
              * alpha channel (weird API), so it must be added in the correct
              * place.
              */
@@ -1857,7 +1857,7 @@ png_image_read_end(png_voidp argument)
 #     ifdef PNG_FORMAT_BGR_SUPPORTED
          if (change & PNG_FORMAT_FLAG_BGR)
          {
-            /* Check only the output format; PNG is never BGR, don't do this if
+            /* Check only the output format; PNG is never BGR; don't do this if
              * the output is gray, but fix up the 'format' value in that case.
              */
             if (format & PNG_FORMAT_FLAG_COLOR)
@@ -1904,7 +1904,7 @@ png_image_read_end(png_voidp argument)
          png_error(png_ptr, "png_read_image: unsupported transformation");
    }
 
-   /* Update the 'info' structure and make sure the result is as required, first
+   /* Update the 'info' structure and make sure the result is as required; first
     * make sure to turn on the interlace handling if it will be required
     * (because it can't be turned on *after* the call to png_read_update_info!)
     */

@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.6 [November 3, 2011]
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -716,7 +716,7 @@ png_safe_warning(png_structp png_ptr, png_const_charp warning_message)
 {
    png_imagep image = png_ptr->error_ptr;
 
-   /* A warning is just logged if there is no warning or error. */
+   /* A warning is only logged if there is no prior warning or error. */
    if (image->warning_or_error == 0)
    {
       png_safecat(image->message, sizeof image->message, 0, warning_message);

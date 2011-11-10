@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.7beta02 - November 8, 2011
+ * libpng version 1.5.7beta02 - November 9, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.7beta02 - November 8, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.7beta02 - November 9, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -195,7 +195,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.7beta02, November 8, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.7beta02, November 9, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -307,7 +307,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 8, 2011
+ *    November 9, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -373,7 +373,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.7beta02"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.7beta02 - November 8, 2011\n"
+     " libpng version 1.5.7beta02 - November 9, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -2622,8 +2622,8 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 
 /*******************************************************************************
  *  SIMPLIFIED API
- ******************************************************************************/
-/*
+ *******************************************************************************
+ *
  * Please read the documentation in libpng-manual.txt if you don't understand
  * what follows.
  *
@@ -2644,6 +2644,11 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * buffer for the image.
  * 4) Call png_image_finish_read to read the image into your buffer.
  *
+ * There are no restrictions on the format of the PNG input itself; all valid
+ * color types, bit depths, and interlace methods are acceptable, and the
+ * input image is transformed as necessary to the requested in-memory format
+ * during the png_image_finish_read() step.
+ *
  * To write a PNG file using the simplified API:
  *
  * 1) Declare a 'png_image' structure on the stack and memset() it to all zero.
@@ -2655,7 +2660,9 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * png_image is a structure that describes the in-memory format of an image
  * when it is being read or define the in-memory format of an image that you
  * need to write:
+ *
  */
+
 typedef struct png_control *png_controlp;
 typedef struct
 {
@@ -2667,14 +2674,21 @@ typedef struct
 
    /* In the event of an error or warning the following field will be set to a
     * non-zero value and the 'message' field will contain a '\0' terminated
-    * string with the libpng error message.
+    * string with the libpng error or warning message.  If both warnings and
+    * an error were encountered, only the error is recorded.  If there
+    * are multiple warnings, only the first one is recorded.
+    *
+    * As of libpng-1.5.7 the values are
+    *    0 - no warning or error
+    *    1 - error
+    *    2 - warning
     */
    png_uint_32  warning_or_error;
    char         message[64];
 } png_image, *png_imagep;
 
-/* The pixels (samples) of the image have one to four channels in the range 0 to
- * 1.0:
+/* The pixels (samples) of the image have one to four channels whose components
+ * have original values in the range 0 to 1.0:
  *
  * 1: A single gray or luminance channel (G).
  * 2: A gray/luminance channel and an alpha channel (GA).
@@ -2699,7 +2713,8 @@ typedef struct
  *
  *    When an alpha channel is present it is expected to denote pixel coverage
  * of the color or luminance channels and is returned as an associated alpha
- * channel: the color/gray channels are scaled (pre-multiplied) the alpha value.
+ * channel: the color/gray channels are scaled (pre-multiplied) by the alpha
+ * value.
  */
 
 /* PNG_FORMAT_*
@@ -2716,8 +2731,8 @@ typedef struct
  * compiler errors because the definition of one of the following flags has been
  * compiled out it is because libpng does not have the required support.  It is
  * possible, however, for the libpng configuration to enable the format on just
- * read or just write, in that case you will may see an error at run time.  You
- * can guard against this by checking for the definition of:
+ * read or just write; in that case you may see an error at run time.  You can
+ * guard against this by checking for the definition of:
  *
  *    PNG_SIMPLIFIED_{READ,WRITE}_{BGR,AFIRST}_SUPPORTED
  */
@@ -2751,8 +2766,8 @@ typedef struct
 #define PNG_FORMAT_ABGR (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_AFIRST)
 
 /* Then the linear (png_uint_16) formats.  When naming these "Y" is used to
- * indicate a luminance channel.  The component order within the pixel is
- * always the same - there is no provision for swapping the order of the
+ * indicate a luminance (gray) channel.  The component order within the pixel
+ * is always the same - there is no provision for swapping the order of the
  * components in the linear format.
  */
 #define PNG_FORMAT_LINEAR_Y PNG_FORMAT_FLAG_LINEAR
@@ -2810,8 +2825,8 @@ typedef struct
 #ifdef PNG_STDIO_SUPPORTED
 PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
    const char *file_name));
-   /* The named file is opened for read and the image filled in from the PNG
-    * header in the file.
+   /* The named file is opened for read and the image header is filled in
+    * from the PNG header in the file.
     */
 
 PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
@@ -2839,7 +2854,7 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
     * onto the buffer.  The value is an sRGB color to use for the background,
     * for grayscale output the green channel is used.
     *
-    * For linear output removing an alpha channel is always done by compositing
+    * For linear output removing the alpha channel is always done by compositing
     * on black.
     */
 
@@ -2880,6 +2895,9 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  * With all APIs row_stride is handled as in the read APIs - it is the spacing
  * from one row to the next in component sized units (float) and if negative
  * indicates a bottom-up row layout in the buffer.
+ *
+ * Note that the write API does not support interlacing, sub-8-bit pixels,
+ * and indexed (paletted) images.
  */
 #endif /* PNG_SIMPLIFIED_WRITE_SUPPORTED */
 /*******************************************************************************
