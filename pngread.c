@@ -1342,6 +1342,44 @@ png_image_read_init(png_imagep image)
 
             image->opaque = control;
             return 1;
+
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+            /* Prepare the reader to ignore all recognized chunks whose
+             * data will not be used, i.e., all chunks recognized by libpng
+             * except for IHDR, PLTE, IDAT, IEND, tRNS, bKGD, gAMA, cHRM,
+             * and sRGB.
+             *
+             * This provides a small performance improvement and eliminates
+             * any potential vulnerability to security problems in the unused
+             * chunks)
+             */
+            {
+                static /* const */ png_byte chunks_to_ignore[] = {
+                    104,  73,  83,  84, '\0',  /* hIST */
+                    105,  67,  67,  80, '\0',  /* iCCP */
+                    105,  84,  88, 116, '\0',  /* iTXt */
+                    111,  70,  70, 115, '\0',  /* oFFs */
+                    112,  67,  65,  76, '\0',  /* pCAL */
+                    112,  72,  89, 115, '\0',  /* pHYs */
+                    115,  66,  73,  84, '\0',  /* sBIT */
+                    115,  67,  65,  76, '\0',  /* sCAL */
+                    115,  80,  76,  84, '\0',  /* sPLT */
+                    116,  69,  88, 116, '\0',  /* tEXt */
+                    116,  73,  77,  69, '\0',  /* tIME */
+                    122,  84,  88, 116, '\0'   /* zTXt */
+                };
+
+                /* Ignore unknown chunks */
+                png_set_keep_unknown_chunks(png_ptr,
+                  1 /* PNG_HANDLE_CHUNK_NEVER */,
+                  NULL, 0);
+
+                /* Ignore known but unused chunks */
+                png_set_keep_unknown_chunks(png_ptr,
+                  1 /* PNG_HANDLE_CHUNK_NEVER */,
+                  chunks_to_ignore, sizeof(chunks_to_ignore)/5);
+             }
+#endif /* PNG_HANDLE_AS_UNKNOWN_SUPPORTED */
          }
 
          /* Error clean up */
@@ -1425,7 +1463,8 @@ png_image_read_header(png_voidp argument)
 
          else if (info_ptr->valid & PNG_INFO_iCCP)
          {
-#        if 0 /* TODO: IMPLEMENT THIS! */
+#        if 0 /* TODO: IMPLEMENT THIS! Remember to remove iCCP from
+                 the list of unused chunks */
             /* Here if we just have an iCCP chunk. */
             if (!png_iCCP_is_sRGB(png_ptr, info_ptr))
 #        endif
