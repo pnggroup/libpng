@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta02 - November 8, 2011
+Libpng 1.5.7beta02 - November 12, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,7 +43,7 @@ Version 1.5.7beta01 [November 4, 2011]
     just the changes that definitely improve speed and remain simple.
     The changes also slightly increase the clarity of the code.
 
-Version 1.5.7beta02 [November 8, 2011]
+Version 1.5.7beta02 [November 12, 2011]
   Check compression_type parameter in png_get_iCCP and remove spurious
     casts. The compression_type parameter is always assigned to, so must
     be non-NULL. The cast of the profile length potentially truncated the
@@ -60,6 +60,10 @@ Version 1.5.7beta02 [November 8, 2011]
   Added versioning to pnglibconf.h comments.
   Simplified read/write API initial version; basic read/write tested on
     a variety of images, limited documentation (in the header file.)
+  Installed more accurate linear to sRGB conversion tables. The slightly
+    modified tables reduce the number of 16-bit values that
+    convert to an off-by-one 8-bit value.  The "makesRGB.c" code that was used
+    to generate the tables is now in a contrib/sRGBtables sub-directory.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
