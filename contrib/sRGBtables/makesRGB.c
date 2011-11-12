@@ -1,5 +1,12 @@
-/*-
- * makesRGB.c
+/* makesRGB.c -- build sRGB-to-linear and linear-to-sRGB conversion tables
+ *
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ * Copyright (c) 2011 Glenn Randers-Pehrson
+ * Written by John Cunningham Bowler
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  *
  * Make a table to convert 8-bit sRGB encoding values into the closest 16-bit
  * linear value.
@@ -21,9 +28,10 @@
 /* 
  * Utility sRGB calculation functions.
  *
- * Both routines take and return a floating point value in the range 0 to 1.0,
- * doing a calculation according to the sRGB specification.  (In fact the source
- * of the numbers is the wikipedia article.)
+ * Both routines take and return a floating point value in the range
+ * 0 to 1.0, doing a calculation according to the sRGB specification.
+ * (In fact the source of the numbers is the wikipedia article at
+ * http://en.wikipedia.org/wiki/SRGB .)
  */
 double
 sRGB_from_linear(double l)
