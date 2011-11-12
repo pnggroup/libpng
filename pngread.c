@@ -1463,8 +1463,9 @@ png_image_read_header(png_voidp argument)
 
          else if (info_ptr->valid & PNG_INFO_iCCP)
          {
-#        if 0 /* TODO: IMPLEMENT THIS! Remember to remove iCCP from
-                 the list of unused chunks */
+#        if 0
+            /* TODO: IMPLEMENT THIS! Remember to remove iCCP from
+                 the chunks_to_ignore list */
             /* Here if we just have an iCCP chunk. */
             if (!png_iCCP_is_sRGB(png_ptr, info_ptr))
 #        endif
