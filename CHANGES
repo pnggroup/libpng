@@ -3688,7 +3688,7 @@ Version 1.5.7beta01 [November 4, 2011]
     just the changes that definitely improve speed and remain simple.
     The changes also slightly increase the clarity of the code.
 
-Version 1.5.7beta02 [November 12, 2011]
+Version 1.5.7beta02 [November 11, 2011]
   Check compression_type parameter in png_get_iCCP and remove spurious
     casts. The compression_type parameter is always assigned to, so must
     be non-NULL. The cast of the profile length potentially truncated the
@@ -3709,6 +3709,8 @@ Version 1.5.7beta02 [November 12, 2011]
     modified tables reduce the number of 16-bit values that
     convert to an off-by-one 8-bit value.  The "makesRGB.c" code that was used
     to generate the tables is now in a contrib/sRGBtables sub-directory.
+
+Version 1.5.7beta03 [November 12, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

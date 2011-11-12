@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta02 - November 12, 2011
+Libpng 1.5.7beta03 - November 12, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.7beta02.tar.gz
-   1.5.7beta02.tar.bz2
+   1.5.7beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.7beta03.tar.gz
+   1.5.7beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157b02.7z  (LZMA-compressed, recommended)
-   lp157b02.zip
+   lp157b03.7z  (LZMA-compressed, recommended)
+   lp157b03.zip
 
 Other information:
 
-   1.5.7beta02-README.txt
-   1.5.7beta02-LICENSE.txt
+   1.5.7beta03-README.txt
+   1.5.7beta03-LICENSE.txt
 
 Changes since the last public release (1.5.6):
 
@@ -43,7 +43,7 @@ Version 1.5.7beta01 [November 4, 2011]
     just the changes that definitely improve speed and remain simple.
     The changes also slightly increase the clarity of the code.
 
-Version 1.5.7beta02 [November 12, 2011]
+Version 1.5.7beta02 [November 11, 2011]
   Check compression_type parameter in png_get_iCCP and remove spurious
     casts. The compression_type parameter is always assigned to, so must
     be non-NULL. The cast of the profile length potentially truncated the
@@ -64,6 +64,8 @@ Version 1.5.7beta02 [November 12, 2011]
     modified tables reduce the number of 16-bit values that
     convert to an off-by-one 8-bit value.  The "makesRGB.c" code that was used
     to generate the tables is now in a contrib/sRGBtables sub-directory.
+
+Version 1.5.7beta03 [November 12, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
