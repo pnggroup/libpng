@@ -8,6 +8,10 @@
  * and license in png.h
  */
 
+#if defined(__linux__) && defined(__ELF__)
+.section .note.GNU-stack,"",%progbits /* mark stack as non-executable */
+#endif
+
 #ifdef __ELF__
 #   define ELF
 #else
