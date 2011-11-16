@@ -519,14 +519,14 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
    defined PNG_SIMPLIFIED_WRITE_SUPPORTED
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
-PNG_EXTERN /*PRIVATE*/ png_uint_16 png_sRGB_table[256];
+extern /*PRIVATE*/ png_uint_16 png_sRGB_table[256];
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
     * 0..65535.  This table gives the closes 16-bit answers (no errors).
     */
 #endif
 
-PNG_EXTERN /*PRIVATE*/ png_uint_16 png_sRGB_base[512];
-PNG_EXTERN /*PRIVATE*/ png_byte png_sRGB_delta[512];
+extern /*PRIVATE*/ png_uint_16 png_sRGB_base[512];
+extern /*PRIVATE*/ png_byte png_sRGB_delta[512];
 
 #define PNG_sRGB_FROM_LINEAR(linear) ((png_sRGB_base[(linear)>>15] +\
    ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)
