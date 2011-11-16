@@ -12,12 +12,15 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 AUTOMAKE_OPTIONS = foreign
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngvalid
+check_PROGRAMS= pngtest pngvalid pngstest
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngvalid_SOURCES = pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
+pngstest_SOURCES = contrib/libtests/pngstest.c
+pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh \
+	test-pngstest.sh
 TESTS_ENVIRONMENT= srcdir=$(srcdir)
 
 # man pages
@@ -126,7 +129,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-pngvalid.o pngtest.o: pnglibconf.h
+contrib/libtests/pngstest.o pngvalid.o pngtest.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from

@@ -13,11 +13,28 @@
 #include <errno.h>
 #include <ctype.h>
 #include <math.h>
+
+#include <unistd.h>
 #include <fenv.h>
 
 #include "../../png.h"
 
 #include "../sRGBtables/sRGB.h"
+
+/* Cast support: remove GCC whines. */
+static png_byte
+u8d(double d)
+{
+   d = nearbyint(d);
+   return (png_byte)d;
+}
+
+static png_uint_16
+u16d(double d)
+{
+   d = nearbyint(d);
+   return (png_uint_16)d;
+}
 
 /* sRGB support: use exact calculations rounded to the nearest int, see the
  * fesetround() call in main().
@@ -25,7 +42,7 @@
 static png_byte
 sRGB(double linear /*range 0.0 .. 1.0*/)
 {
-   return nearbyint(255 * sRGB_from_linear(linear));
+   return u8d(255 * sRGB_from_linear(linear));
 }
 
 static png_byte
@@ -35,21 +52,9 @@ isRGB(png_uint_16 fixed_linear)
 }
 
 static png_uint_16
-linear(double srgb /*range 0.0 .. 1.0*/)
-{
-   return nearbyint(65535 * linear_from_sRGB(srgb));
-}
-
-static png_uint_16
-ilinear(png_byte fixed_srgb)
-{
-   return linear(fixed_srgb / 255.);
-}
-
-static png_uint_16
 ilineara(png_byte fixed_srgb, png_byte alpha)
 {
-   return nearbyint((257 * alpha) * linear_from_sRGB(fixed_srgb / 255.));
+   return u16d((257 * alpha) * linear_from_sRGB(fixed_srgb / 255.));
 }
 
 #define READ_FILE 1      /* else memory */
@@ -58,34 +63,25 @@ ilineara(png_byte fixed_srgb, png_byte alpha)
 #define VERBOSE 8
 #define KEEP_TMPFILES 16 /* else delete temporary files */
 #define KEEP_GOING 32
-#define ACCUMULATE_ERRORS 64
+
+static void
+print_opts(png_uint_32 opts)
+{
+   if (opts & READ_FILE)
+      printf(" --file");
+   if (opts & USE_STDIO)
+      printf(" --stdio");
+   if (opts & USE_BACKGROUND)
+      printf(" --background");
+   if (opts & VERBOSE)
+      printf(" --verbose");
+   if (opts & KEEP_TMPFILES)
+      printf(" --preserve");
+   if (opts & KEEP_GOING)
+      printf(" --keep-going");
+}
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
-
-/* sRGB convertion: this is exact. */
-
-/* Officially supported formats, in fact all 32 combinations work and are tested
- * below.
- */
-static PNG_CONST png_uint_32 formats[] =
-{
-   FORMAT_NO_CHANGE,
-   PNG_FORMAT_GRAY,
-   PNG_FORMAT_GA,
-   PNG_FORMAT_AG,
-   PNG_FORMAT_RGB,
-   PNG_FORMAT_BGR,
-   PNG_FORMAT_RGBA,
-   PNG_FORMAT_ARGB,
-   PNG_FORMAT_BGRA,
-   PNG_FORMAT_ABGR,
-   PNG_FORMAT_LINEAR_Y,
-   PNG_FORMAT_LINEAR_Y_ALPHA,
-   PNG_FORMAT_LINEAR_RGB,
-   PNG_FORMAT_LINEAR_RGB_ALPHA
-};
-
-#define NFORMATS ((sizeof formats)/(sizeof formats[0]))
 
 /* A name table for all the formats - defines the format of the '+' arguments to
  * pngstest.
@@ -131,15 +127,15 @@ static png_uint_32
 formatof(const char *arg)
 {
    char *ep;
-   png_uint_32 format = strtoul(arg, &ep, 0);
+   unsigned long format = strtoul(arg, &ep, 0);
 
    if (ep > arg && *ep == 0 && format < 32)
-      return format;
+      return (png_uint_32)format;
 
    else for (format=0; format < 32; ++format)
    {
       if (strcmp(format_names[format], arg) == 0)
-         return format;
+         return (png_uint_32)format;
    }
 
    fprintf(stderr, "pngstest: format name '%s' invalid\n", arg);
@@ -390,7 +386,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
 
       case sizeof (png_uint_16):
          {
-            png_const_uint_16p up = (png_uint_16p)pp;
+            png_const_uint_16p up = (png_const_uint_16p)pp;
 
             if ((format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
                (format & PNG_FORMAT_FLAG_ALPHA) != 0)
@@ -415,7 +411,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
                /* Because the 'Y' calculation is linear the pre-multiplication
                 * of the r16,g16,b16 values can be ignored.
                 */
-               pixel->y16 = YfromRGB(pixel->r16, pixel->g16, pixel->b16);
+               pixel->y16 = u16d(YfromRGB(pixel->r16, pixel->g16, pixel->b16));
             }
 
             else
@@ -457,7 +453,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
                   pixel->y8 = sRGB(pixel->y16 * a1);
 
                /* The 8-bit alpha value is just a16/257. */
-               pixel->a8 = nearbyint(pixel->a16 / 257.);
+               pixel->a8 = u8d(pixel->a16 / 257.);
             }
          }
          break;
@@ -509,8 +505,8 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
             pixel->r16 = ilineara(pixel->r8, pixel->a8);
             pixel->g16 = ilineara(pixel->g8, pixel->a8);
             pixel->b16 = ilineara(pixel->b8, pixel->a8);
-            pixel->y16 = nearbyint((257 * pixel->a8) * y);
-            pixel->a16 = pixel->a8 * 257;
+            pixel->y16 = u16d((257 * pixel->a8) * y);
+            pixel->a16 = (png_uint_16)(pixel->a8 * 257);
          }
          break;
    }
@@ -676,25 +672,25 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             {
                double r = nearbyint((65535. * a->r16) / a->a16)/65535;
                double g = nearbyint((65535. * a->g16) / a->a16)/65535;
-               double b = nearbyint((65535. * a->b16) / a->a16)/65535;
+               double blue = nearbyint((65535. * a->b16) / a->a16)/65535;
 
-               a->r16 = nearbyint(r * a->a16);
-               a->g16 = nearbyint(g * a->a16);
-               a->b16 = nearbyint(b * a->a16);
-               a->y16 = nearbyint(YfromRGB(a->r16, a->g16, a->b16));
+               a->r16 = u16d(r * a->a16);
+               a->g16 = u16d(g * a->a16);
+               a->b16 = u16d(blue * a->a16);
+               a->y16 = u16d(YfromRGB(a->r16, a->g16, a->b16));
 
-               a->r8 = nearbyint(r * 255);
-               a->g8 = nearbyint(g * 255);
-               a->b8 = nearbyint(b * 255);
-               a->y8 = nearbyint(255 * YfromRGB(r, g, b));
+               a->r8 = u8d(r * 255);
+               a->g8 = u8d(g * 255);
+               a->b8 = u8d(blue * 255);
+               a->y8 = u8d(255 * YfromRGB(r, g, blue));
             }
 
             else
             {
                double y = nearbyint((65535. * a->y16) / a->a16)/65535.;
 
-               a->b16 = a->g16 = a->r16 = a->y16 = nearbyint(y * a->a16);
-               a->b8 = a->g8 = a->r8 = a->y8 = nearbyint(255 * y);
+               a->b16 = a->g16 = a->r16 = a->y16 = u16d(y * a->a16);
+               a->b8 = a->g8 = a->r8 = a->y8 = u8d(255 * y);
             }
          }
 
@@ -733,21 +729,21 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
                   double r, g, blue;
 
                   r = (255. * b->r16)/b->a16;
-                  b->r8 = nearbyint(r);
+                  b->r8 = u8d(r);
 
                   g = (255. * b->g16)/b->a16;
-                  b->g8 = nearbyint(g);
+                  b->g8 = u8d(g);
 
                   blue = (255. * b->b16)/b->a16;
-                  b->b8 = nearbyint(blue);
+                  b->b8 = u8d(blue);
 
-                  b->y8 = nearbyint(YfromRGB(r, g, blue));
+                  b->y8 = u8d(YfromRGB(r, g, blue));
                }
 
                else
                {
                   b->r8 = b->g8 = b->b8 = b->y8 =
-                     nearbyint((255. * b->y16)/b->a16);
+                     u8d((255. * b->y16)/b->a16);
                }
             }
 
@@ -758,7 +754,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
 
       else if (a->format & PNG_FORMAT_FLAG_ALPHA)
       {
-         png_uint_16 alpha;
+         png_uint_32 alpha;
 
          /* An alpha channel has been removed; the background will have been
           * composed in.  Adjust the 'a' pixel to represent this by doing the
@@ -791,43 +787,43 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             else if (background == NULL)
             {
                double add = alpha * linear_from_sRGB(BUFFER_INIT8/255.);
-               double r, g, b, y;
+               double r, g, blue, y;
 
                r = a->r16 + add;
-               a->r16 = nearbyint(r);
+               a->r16 = u16d(r);
                a->r8 = sRGB(r/65535);
 
                g = a->g16 + add;
-               a->g16 = nearbyint(g);
+               a->g16 = u16d(g);
                a->g8 = sRGB(g/65535);
 
-               b = a->b16 + add;
-               a->b16 = nearbyint(b);
-               a->b8 = sRGB(b/65535);
+               blue = a->b16 + add;
+               a->b16 = u16d(blue);
+               a->b8 = sRGB(blue/65535);
 
-               y = YfromRGB(r, g, b);
-               a->y16 = nearbyint(y);
+               y = YfromRGB(r, g, blue);
+               a->y16 = u16d(y);
                a->y8 = sRGB(y/65535);
             }
 
             else
             {
-               double r, g, b, y;
+               double r, g, blue, y;
 
                r = a->r16 + alpha * linear_from_sRGB(background->red/255.);
-               a->r16 = nearbyint(r);
+               a->r16 = u16d(r);
                a->r8 = sRGB(r/65535);
 
                g = a->g16 + alpha * linear_from_sRGB(background->green/255.);
-               a->g16 = nearbyint(g);
+               a->g16 = u16d(g);
                a->g8 = sRGB(g/65535);
 
-               b = a->b16 + alpha * linear_from_sRGB(background->blue/255.);
-               a->b16 = nearbyint(b);
-               a->b8 = sRGB(b/65535);
+               blue = a->b16 + alpha * linear_from_sRGB(background->blue/255.);
+               a->b16 = u16d(blue);
+               a->b8 = sRGB(blue/65535);
 
-               y = YfromRGB(r, g, b);
-               a->y16 = nearbyint(y * 65535);
+               y = YfromRGB(r, g, blue);
+               a->y16 = u16d(y * 65535);
                a->y8 = sRGB(y);
             }
          }
@@ -850,7 +846,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
                double y = a->y16 + alpha * linear_from_sRGB(
                   (background == NULL ? BUFFER_INIT8 : background->green)/255.);
 
-               a->r16 = a->g16 = a->b16 = a->y16 = nearbyint(y);
+               a->r16 = a->g16 = a->b16 = a->y16 = u16d(y);
                a->r8 = a->g8 = a->b8 = a->y8 = sRGB(y/65535);
             }
          }
@@ -966,6 +962,10 @@ print_pixel(char string[64], Pixel *pixel)
          sprintf(string, "%s(%d,%d,%d,%d)", format_names[pixel->format],
             pixel->r16, pixel->g16, pixel->b16, pixel->a16);
          break;
+
+      default:
+         sprintf(string, "invalid-format");
+         break;
    }
 }
 
@@ -997,7 +997,7 @@ compare_two_images(Image *a, Image *b, int via_linear)
    ptrdiff_t strideb = b->stride;
    png_const_bytep rowa = a->buffer+16;
    png_const_bytep rowb = b->buffer+16;
-   unsigned int channels;
+   png_byte channels;
    int linear = 0;
    int result = 1;
    unsigned int check_alpha = 0; /* must be zero or one */
@@ -1040,8 +1040,8 @@ compare_two_images(Image *a, Image *b, int via_linear)
    if (((formata | PNG_FORMAT_FLAG_ALPHA) & BASE_FORMATS) ==
          (formatb & BASE_FORMATS))
    {
-      unsigned int astart = 0; /* index of first component */
-      unsigned int bstart = 0;
+      png_byte astart = 0; /* index of first component */
+      png_byte bstart = 0;
 
       /* Set to the actual number of channels in 'a' */
       channels = (formata & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
@@ -1101,9 +1101,9 @@ compare_two_images(Image *a, Image *b, int via_linear)
          if ((formata ^ formatb) & PNG_FORMAT_FLAG_BGR) /* Swapped. */
             swap = 2;
 
-         swap_mask[astart+0] = bstart+(0^swap);
-         swap_mask[astart+1] = bstart+1;
-         swap_mask[astart+2] = bstart+(2^swap);
+         swap_mask[astart+0] = (png_byte)(bstart+(0^swap));
+         swap_mask[astart+1] = (png_byte)(bstart+1);
+         swap_mask[astart+2] = (png_byte)(bstart+(2^swap));
       }
 
       else /* grayscale: 1 channel */
@@ -1119,8 +1119,8 @@ compare_two_images(Image *a, Image *b, int via_linear)
       {
          case 2: /* both sides linear */
             {
-               png_uint_16p lppa = (png_uint_16p)ppa;
-               png_uint_16p lppb = (png_uint_16p)ppb;
+               png_const_uint_16p lppa = (png_const_uint_16p)ppa;
+               png_const_uint_16p lppb = (png_const_uint_16p)ppb;
 
                while (x < width) switch (channels)
                {
@@ -1147,11 +1147,13 @@ compare_two_images(Image *a, Image *b, int via_linear)
                      lppa += channels;
                      lppb += channels + check_alpha;
                      ++x;
+                  default:
+                     break;
                }
 
             linear_mismatch:
-               ppa = (png_bytep)lppa;
-               ppb = (png_bytep)lppb;
+               ppa = (png_const_bytep)lppa;
+               ppb = (png_const_bytep)lppb;
             }
             break;
 
@@ -1172,15 +1174,17 @@ compare_two_images(Image *a, Image *b, int via_linear)
                      goto sRGB_mismatch;
 
                   /* The pixels apparently match, but if an alpha channel has
-                   * been added (in b) it must be 65535 too.
+                   * been added (in b) it must be 1.0 too.
                    */
-                  if (check_alpha && 65535 != ppb[swap_mask[3]])
+                  if (check_alpha && 255 != ppb[swap_mask[3]])
                      goto sRGB_mismatch;
 
                   /* This pixel matches, advance to the next. */
                   ppa += channels;
                   ppb += channels + check_alpha;
                   ++x;
+               default:
+                  break;
             }
 
          sRGB_mismatch:
@@ -1282,7 +1286,7 @@ read_file(Image *image, png_uint_32 format)
 
       result = png_image_finish_read(&image->image,
          (image->opts & USE_BACKGROUND) ? &image->background : NULL,
-         image->buffer+16, image->stride);
+         image->buffer+16, (png_int_32)image->stride);
 
       checkbuffer(image, image->file_name);
 
@@ -1371,7 +1375,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       if (f != NULL)
       {
          if (png_image_write_to_stdio(&image->image, f, convert_to_8bit,
-            image->buffer+16, image->stride))
+            image->buffer+16, (png_int_32)image->stride))
          {
             if (fflush(f) == 0)
             {
@@ -1405,7 +1409,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       sprintf(name, "TMP%d-%d.png", getpid(), ++counter);
 
       if (png_image_write_to_file(&image->image, name, convert_to_8bit,
-         image->buffer+16, image->stride))
+         image->buffer+16, (png_int_32)image->stride))
       {
          initimage(output, image->opts, output->tmpfile_name,
             image->stride_extra);
@@ -1526,7 +1530,9 @@ main(int argc, const char **argv)
 {
    png_uint_32 opts = 0;
    png_uint_32 formats = ~0; /* a mask of formats to test */
+   int log_pass = 0;
    int stride_extra = 0;
+   int retval = 0;
    int c;
 
    /* FE_TONEAREST is the IEEE754 round to nearest, preferring even, mode; i.e.
@@ -1539,7 +1545,9 @@ main(int argc, const char **argv)
    {
       const char *arg = argv[c];
 
-      if (strcmp(arg, "--file") == 0)
+      if (strcmp(arg, "--log") == 0)
+         log_pass = 1;
+      else if (strcmp(arg, "--file") == 0)
          opts |= READ_FILE;
       else if (strcmp(arg, "--memory") == 0)
          opts &= ~READ_FILE;
@@ -1563,10 +1571,6 @@ main(int argc, const char **argv)
          opts |= KEEP_GOING;
       else if (strcmp(arg, "--stop") == 0)
          opts &= ~KEEP_GOING;
-      else if (strcmp(arg, "--add-errors") == 0)
-         opts |= ACCUMULATE_ERRORS;
-      else if (strcmp(arg, "--check-errors") == 0)
-         opts &= ~ACCUMULATE_ERRORS;
       else if (arg[0] == '+')
       {
          png_uint_32 format = formatof(arg+1);
@@ -1574,7 +1578,7 @@ main(int argc, const char **argv)
          if (format > 31)
             exit(1);
 
-         if (formats == ~0)
+         if (formats == (png_uint_32)~0)
             formats = 0;
 
          formats |= 1<<format;
@@ -1596,10 +1600,25 @@ main(int argc, const char **argv)
             result = testimage(&image, opts, formats);
          freeimage(&image);
 
-         if (!result)
+         if (log_pass)
+         {
+            if (result)
+               printf("PASS:");
+
+            else
+            {
+               printf("FAIL:");
+               retval = 1;
+            }
+
+            print_opts(opts);
+            printf(" %s\n", arg);
+         }
+
+         else if (!result)
             exit(1);
       }
    }
 
-   return 0;
+   return retval;
 }
