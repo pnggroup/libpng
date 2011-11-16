@@ -516,24 +516,24 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
    abs((int)((c1).blue) - (int)((c2).blue)))
 
 /* Added to libpng-1.5.7: sRGB conversion tables */
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
-PNG_EXTERN /*PRIVATE*/ PNG_CONST png_uint_16 png_sRGB_table[256];
+PNG_EXTERN /*PRIVATE*/ png_uint_16 png_sRGB_table[256];
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
     * 0..65535.  This table gives the closes 16-bit answers (no errors).
     */
 #endif
 
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
-PNG_EXTERN /*PRIVATE*/ PNG_CONST png_uint_16 png_sRGB_base[512];
-PNG_EXTERN /*PRIVATE*/ PNG_CONST png_byte png_sRGB_delta[512];
+PNG_EXTERN /*PRIVATE*/ png_uint_16 png_sRGB_base[512];
+PNG_EXTERN /*PRIVATE*/ png_byte png_sRGB_delta[512];
 
 #define PNG_sRGB_FROM_LINEAR(linear) ((png_sRGB_base[(linear)>>15] +\
    ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)
    /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
     * encoded value with maximum error 0.646365.  Note that the input is not a
     * 16-bit value; it has been multiplied by 255! */
-#endif
+#endif /* PNG_SIMPLIFIED_READ/WRITE */
 
 /* Added to libpng-1.2.6 JB */
 #define PNG_ROWBYTES(pixel_bits, width) \
