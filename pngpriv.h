@@ -234,15 +234,28 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define png_fixed_error(s1,s2) png_err(s1)
 #endif
 
+/* C allows up-casts from (void*) to any pointer and (const void*) to any
+ * pointer to a const object.  C++ regards this as a type error and requires an
+ * explicit, static, cast and provides the static_cast<> rune to ensure that
+ * const is not cast away.
+ */
+#ifdef __cplusplus
+#  define png_voidcast(type, value) static_cast<type>(value)
+#else
+#  define png_voidcast(type, value) (value)
+#endif /* __cplusplus */
+
 #ifndef PNG_EXTERN
 /* The functions exported by PNG_EXTERN are internal functions, which
  * aren't usually used outside the library (as far as I know), so it is
  * debatable if they should be exported at all.  In the future, when it
  * is possible to have run-time registry of chunk-handling functions,
  * some of these might be made available again.
-#  define PNG_EXTERN extern
+ *
+ * 1.5.7: turned the use of 'extern' back on, since it is localized to pngpriv.h
+ * it should be safe now (it is unclear why it was turned off.)
  */
-#  define PNG_EXTERN
+#  define PNG_EXTERN extern
 #endif
 
 /* Some fixed point APIs are still required even if not exported because
@@ -1641,6 +1654,15 @@ typedef struct png_control
    unsigned int for_write :1;  /* Otherwise it is a read structure */
    unsigned int owned_file :1; /* We own the file in io_ptr */
 } png_control;
+
+/* Return the pointer to the jmp_buf from a png_control: necessary because C
+ * does not reveal the type of the elements of jmp_buf.
+ */
+#ifdef __cplusplus
+#  define png_control_jmp_buf(pc) (((jmp_buf*)((pc)->error_buf))[0])
+#else
+#  define png_control_jmp_buf(pc) ((pc)->error_buf)
+#endif
 
 /* Utility to safely execute a piece of libpng code catching and logging any
  * errors that might occur.  Returns true on success, false on failure (either

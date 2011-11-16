@@ -684,7 +684,7 @@ PNG_FUNCTION(void /* PRIVATE */,
 png_safe_error,(png_structp png_ptr, png_const_charp error_message),
    PNG_NORETURN)
 {
-   png_imagep image = png_ptr->error_ptr;
+   png_imagep image = png_voidcast(png_imagep, png_ptr->error_ptr);
 
    /* An error is always logged here, overwriting anything (typically a warning)
     * that is already there:
@@ -694,9 +694,12 @@ png_safe_error,(png_structp png_ptr, png_const_charp error_message),
       png_safecat(image->message, sizeof image->message, 0, error_message);
       image->warning_or_error = 1;
 
-      /* Retrieve the jmp_buf from within the png_control */
+      /* Retrieve the jmp_buf from within the png_control, making this work for
+       * C++ compilation too is pretty tricky: C++ wants a pointer to the first
+       * element of a jmp_buf, but C doesn't tell us the type of that.
+       */
       if (image->opaque != NULL && image->opaque->error_buf != NULL)
-         longjmp(image->opaque->error_buf, 1);
+         longjmp(png_control_jmp_buf(image->opaque), 1);
 
       /* Missing longjmp buffer, the following is to help debugging: */
       {
@@ -714,7 +717,7 @@ png_safe_error,(png_structp png_ptr, png_const_charp error_message),
 void /* PRIVATE */
 png_safe_warning(png_structp png_ptr, png_const_charp warning_message)
 {
-   png_imagep image = png_ptr->error_ptr;
+   png_imagep image = png_voidcast(png_imagep, png_ptr->error_ptr);
 
    /* A warning is only logged if there is no prior warning or error. */
    if (image->warning_or_error == 0)

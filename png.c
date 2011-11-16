@@ -3028,7 +3028,7 @@ png_byte png_sRGB_delta[512] =
 static int
 png_image_free_function(png_voidp argument)
 {
-   png_imagep image = argument;
+   png_imagep image = png_voidcast(png_imagep, argument);
    png_controlp cp = image->opaque;
    png_control c;
 
@@ -3042,7 +3042,7 @@ png_image_free_function(png_voidp argument)
 #  ifdef PNG_STDIO_SUPPORTED
       if (cp->owned_file)
       {
-         FILE *fp = cp->png_ptr->io_ptr;
+         FILE *fp = png_voidcast(FILE*, cp->png_ptr->io_ptr);
          cp->owned_file = 0;
 
          /* Ignore errors here. */

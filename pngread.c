@@ -1332,7 +1332,8 @@ png_image_read_init(png_imagep image)
 
       if (info_ptr != NULL)
       {
-         png_controlp control = png_malloc_warn(png_ptr, sizeof *control);
+         png_controlp control = png_voidcast(png_controlp,
+            png_malloc_warn(png_ptr, sizeof *control));
 
          if (control != NULL)
          {
@@ -1384,7 +1385,7 @@ png_image_format(png_structp png_ptr, png_infop info_ptr)
 static int
 png_image_read_header(png_voidp argument)
 {
-   png_imagep image = argument;
+   png_imagep image = png_voidcast(png_imagep, argument);
    png_structp png_ptr = image->opaque->png_ptr;
    png_infop info_ptr = image->opaque->info_ptr;
 
@@ -1508,7 +1509,7 @@ png_image_memory_read(png_structp png_ptr, png_bytep out, png_size_t need)
 {
    if (png_ptr != NULL)
    {
-      png_imagep image = png_ptr->io_ptr;
+      png_imagep image = png_voidcast(png_imagep, png_ptr->io_ptr);
       if (image != NULL)
       {
          png_controlp cp = image->opaque;
@@ -1546,7 +1547,7 @@ int PNGAPI png_image_begin_read_from_memory(png_imagep image,
              * store it into io_ptr.  Again do this in-place to avoid calling a
              * libpng function that requires error handling.
              */
-            image->opaque->memory = memory;
+            image->opaque->memory = png_voidcast(png_const_bytep, memory);
             image->opaque->size = size;
             image->opaque->png_ptr->io_ptr = image;
             image->opaque->png_ptr->read_data_fn = png_image_memory_read;
@@ -1581,7 +1582,8 @@ typedef struct
 static int
 png_image_read_composite(png_voidp argument)
 {
-   png_image_read_control *display = argument;
+   png_image_read_control *display = png_voidcast(png_image_read_control*,
+      argument);
    png_imagep image = display->image;
    png_structp png_ptr = image->opaque->png_ptr;
    png_byte interlace_type = png_ptr->interlaced;
@@ -1707,7 +1709,8 @@ png_image_read_composite(png_voidp argument)
 static int
 png_image_read_background(png_voidp argument)
 {
-   png_image_read_control *display = argument;
+   png_image_read_control *display = png_voidcast(png_image_read_control*,
+      argument);
    png_imagep image = display->image;
    png_structp png_ptr = image->opaque->png_ptr;
    png_infop info_ptr = image->opaque->info_ptr;
@@ -1965,7 +1968,8 @@ png_image_read_background(png_voidp argument)
 static int
 png_image_read_end(png_voidp argument)
 {
-   png_image_read_control *display = argument;
+   png_image_read_control *display = png_voidcast(png_image_read_control*,
+      argument);
    png_imagep image = display->image;
    png_structp png_ptr = image->opaque->png_ptr;
    png_infop info_ptr = image->opaque->info_ptr;
@@ -2347,7 +2351,7 @@ png_image_read_end(png_voidp argument)
     * display acts as a flag.
     */
    {
-      png_bytep first_row = display->buffer;
+      png_bytep first_row = png_voidcast(png_bytep, display->buffer);
       ptrdiff_t row_bytes = display->row_stride;
 
       if (linear)
@@ -2366,7 +2370,8 @@ png_image_read_end(png_voidp argument)
    if (do_local_compose)
    {
       int result;
-      png_bytep row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
+         png_get_rowbytes(png_ptr, info_ptr)));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_composite, display);
@@ -2379,7 +2384,8 @@ png_image_read_end(png_voidp argument)
    else if (do_local_background == 2)
    {
       int result;
-      png_bytep row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
+         png_get_rowbytes(png_ptr, info_ptr)));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_background, display);

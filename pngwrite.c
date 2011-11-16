@@ -1672,7 +1672,8 @@ png_image_write_init(png_imagep image)
 
       if (info_ptr != NULL)
       {
-         png_controlp control = png_malloc_warn(png_ptr, sizeof *control);
+         png_controlp control = png_voidcast(png_controlp,
+            png_malloc_warn(png_ptr, sizeof *control));
 
          if (control != NULL)
          {
@@ -1717,12 +1718,14 @@ typedef struct
 static int
 png_write_image_16bit(png_voidp argument)
 {
-   png_image_write_control *display = argument;
+   png_image_write_control *display = png_voidcast(png_image_write_control*,
+      argument);
    png_imagep image = display->image;
    png_structp png_ptr = image->opaque->png_ptr;
 
-   png_const_uint_16p input_row = display->first_row;
-   png_uint_16p output_row = display->local_row;
+   png_const_uint_16p input_row = png_voidcast(png_const_uint_16p,
+      display->first_row);
+   png_uint_16p output_row = png_voidcast(png_uint_16p, display->local_row);
    png_uint_16p row_end;
    int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
    int aindex = 0;
@@ -1805,7 +1808,7 @@ png_write_image_16bit(png_voidp argument)
          ++out_ptr;
       }
 
-      png_write_row(png_ptr, display->local_row);
+      png_write_row(png_ptr, png_voidcast(png_const_bytep, display->local_row));
       input_row += display->row_bytes/(sizeof (png_uint_16));
    }
 
@@ -1819,12 +1822,14 @@ png_write_image_16bit(png_voidp argument)
 static int
 png_write_image_8bit(png_voidp argument)
 {
-   png_image_write_control *display = argument;
+   png_image_write_control *display = png_voidcast(png_image_write_control*,
+      argument);
    png_imagep image = display->image;
    png_structp png_ptr = image->opaque->png_ptr;
 
-   png_const_uint_16p input_row = display->first_row;
-   png_bytep output_row = display->local_row;
+   png_const_uint_16p input_row = png_voidcast(png_const_uint_16p,
+      display->first_row);
+   png_bytep output_row = png_voidcast(png_bytep, display->local_row);
    png_uint_32 y = image->height;
    int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
 
@@ -1917,7 +1922,8 @@ png_write_image_8bit(png_voidp argument)
             ++out_ptr;
          } /* while out_ptr < row_end */
 
-         png_write_row(png_ptr, display->local_row);
+         png_write_row(png_ptr, png_voidcast(png_const_bytep,
+            display->local_row));
          input_row += display->row_bytes/(sizeof (png_uint_16));
       } /* while y */
    }
@@ -1953,7 +1959,8 @@ png_write_image_8bit(png_voidp argument)
 static int
 png_image_write_main(png_voidp argument)
 {
-   png_image_write_control *display = argument;
+   png_image_write_control *display = png_voidcast(png_image_write_control*,
+      argument);
    png_imagep image = display->image;
    png_structp png_ptr = image->opaque->png_ptr;
    png_infop info_ptr = image->opaque->info_ptr;
@@ -2039,7 +2046,7 @@ png_image_write_main(png_voidp argument)
       png_error(png_ptr, "png_write_image: unsupported transformation");
 
    {
-      png_const_bytep row = display->buffer;
+      png_const_bytep row = png_voidcast(png_const_bytep, display->buffer);
       ptrdiff_t row_bytes = display->row_stride;
 
       if (linear)
@@ -2058,7 +2065,8 @@ png_image_write_main(png_voidp argument)
     */
    if ((linear && alpha) || display->convert_to_8bit)
    {
-      png_bytep row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+      png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
+         png_get_rowbytes(png_ptr, info_ptr)));
       int result;
 
       display->local_row = row;
@@ -2080,7 +2088,7 @@ png_image_write_main(png_voidp argument)
     */
    else
    {
-      png_const_bytep row = display->first_row;
+      png_const_bytep row = png_voidcast(png_const_bytep, display->first_row);
       ptrdiff_t row_bytes = display->row_bytes;
       png_uint_32 y = image->height;
 
