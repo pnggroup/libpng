@@ -23,37 +23,9 @@
 /* pngpriv.h includes the definition of 'PNG_sRGB_FROM_LINEAR' which is required
  * to verify the actual code.
  */
-#include "../pngpriv.h"
+#include "../../pngpriv.h"
 
-/* 
- * Utility sRGB calculation functions.
- *
- * Both routines take and return a floating point value in the range
- * 0 to 1.0, doing a calculation according to the sRGB specification.
- * (In fact the source of the numbers is the wikipedia article at
- * http://en.wikipedia.org/wiki/SRGB .)
- */
-double
-sRGB_from_linear(double l)
-{
-   if (l <= 0.0031308)
-      l *= 12.92;
-
-   else
-      l = 1.055 * pow(l, 1/2.4) - 0.055;
-
-   return l;
-}
-
-double
-linear_from_sRGB(double s)
-{
-   if (s <= 0.04045)
-      return s / 12.92;
-
-   else
-      return pow((s+0.055)/1.055, 2.4);
-}
+#include "sRGB.h"
 
 /* The tables are declared 'const' in pngpriv.h, so this redefines the tables to
  * be used.
