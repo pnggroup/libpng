@@ -67,6 +67,7 @@ Version 1.5.7beta02 [November 11, 2011]
 
 Version 1.5.7beta03 [November 16, 2011]
   Removed PNG_CONST from the sRGB table declarations in pngpriv.h and png.c
+  Added run-time detection of NEON support.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
