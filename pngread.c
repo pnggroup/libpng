@@ -1316,7 +1316,9 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
  * be made to work with the progressive one.
  */
 /* Do all the *safe* initialization - 'safe' means that png_error won't be
- * called, so setting up the jmp_buf is not required.
+ * called, so setting up the jmp_buf is not required.  This means that anything
+ * called from here must *not* call png_malloc - it has to call png_malloc_warn
+ * instead so that control is returned safely back to this routine.
  */
 static int
 png_image_read_init(png_imagep image)
@@ -1620,7 +1622,7 @@ png_image_read_composite(png_voidp argument)
             startx = PNG_PASS_START_COL(pass);
             stepx = PNG_PASS_COL_OFFSET(pass);
             y = PNG_PASS_START_ROW(pass);
-            stepy = PNG_PASS_COL_OFFSET(pass);
+            stepy = PNG_PASS_ROW_OFFSET(pass);
          }
 
          else
@@ -1629,20 +1631,22 @@ png_image_read_composite(png_voidp argument)
             startx = 0;
             stepx = stepy = 1;
          }
+
+         /* The following are invariants across all the rows: */
+         startx *= channels;
+         stepx *= channels;
          
          for (; y<height; y += stepy)
-            if (interlace_type == PNG_INTERLACE_NONE ||
-               PNG_ROW_IN_INTERLACE_PASS(y, pass))
             {
                png_bytep inrow = display->local_row;
-               png_bytep outrow = row;
-               png_uint_32 x;
+               png_bytep outrow = row + startx;
+               png_const_bytep end_row = row + width * channels;
 
                /* Read the row, which is packed: */
                png_read_row(png_ptr, inrow, NULL);
 
                /* Now do the composition on each pixel in this row. */
-               for (x = startx; x<width; x += stepx, outrow += stepx*channels)
+               for (; outrow < end_row; outrow += stepx)
                {
                   png_byte alpha = inrow[channels];
 
@@ -1666,7 +1670,8 @@ png_image_read_composite(png_voidp argument)
                            component += (255-alpha)*png_sRGB_table[outrow[c]];
 
                            /* So 'component' is scaled by 255*65535 and is
-                            * therefore appropriate for the above tables.
+                            * therefore appropriate for the sRGB to linear
+                            * convertion table.
                             */
                            component = PNG_sRGB_FROM_LINEAR(component);
                         }
@@ -1686,6 +1691,276 @@ png_image_read_composite(png_voidp argument)
    return 1;
 }
 
+/* The do_local_background case; called when all the following transforms are to
+ * be done:
+ *
+ * PNG_RGB_TO_GRAY
+ * PNG_COMPOSITE
+ * PNG_GAMMA
+ *
+ * This is a work-round for the fact that both the PNG_RGB_TO_GRAY and
+ * PNG_COMPOSITE code performs gamma correction, so we get double gamma
+ * correction.  The fix-up is to prevent the PNG_COMPOSITE operation happening
+ * inside libpng, so this routine sees an 8 or 16-bit gray+alpha row and handles
+ * the removal or pre-multiplication of the alpha channel.
+ */
+static int
+png_image_read_background(png_voidp argument)
+{
+   png_image_read_control *display = argument;
+   png_imagep image = display->image;
+   png_structp png_ptr = image->opaque->png_ptr;
+   png_infop info_ptr = image->opaque->info_ptr;
+   png_byte interlace_type = png_ptr->interlaced;
+   png_uint_32 height = image->height;
+   png_uint_32 width = image->width;
+   int pass, passes;
+
+   /* Double check the convoluted logic below.  We expect to get here with
+    * libpng doing rgb to gray and gamma correction but background processing
+    * left to the png_image_read_background function.  The rows libpng produce
+    * might be 8 or 16-bit but should always have two channels; gray plus alpha.
+    */
+   if ((png_ptr->transformations & PNG_RGB_TO_GRAY) == 0)
+      png_error(png_ptr, "lost rgb to gray");
+
+   if ((png_ptr->transformations & PNG_COMPOSE) != 0)
+      png_error(png_ptr, "unexpected compose");
+
+   /* The palette code zaps PNG_GAMMA in place... */
+   if ((png_ptr->color_type & PNG_COLOR_MASK_PALETTE) == 0 &&
+      (png_ptr->transformations & PNG_GAMMA) == 0)
+      png_error(png_ptr, "lost gamma correction");
+
+   if (png_get_channels(png_ptr, info_ptr) != 2)
+      png_error(png_ptr, "lost/gained channels");
+
+   switch (interlace_type)
+   {
+      case PNG_INTERLACE_NONE:
+         passes = 1;
+         break;
+
+      case PNG_INTERLACE_ADAM7:
+         passes = PNG_INTERLACE_ADAM7_PASSES;
+         break;
+
+      default:
+         png_error(png_ptr, "unknown interlace type");
+   }
+
+   switch (png_get_bit_depth(png_ptr, info_ptr))
+   {
+      default:
+         png_error(png_ptr, "unexpected bit depth");
+         break;
+
+      case 8:
+         /* 8-bit sRGB gray values with an alpha channel; the alpha channel is
+          * to be removed by composing on a backgroundi: either the row if
+          * display->background is NULL or display->background.green if not.
+          * Unlike the code above ALPHA_OPTIMIZED has *not* been done.
+          */
+         for (pass = 0; pass < passes; ++pass)
+         {
+            png_bytep        row = display->first_row;
+            unsigned int     startx, stepx, stepy;
+            png_uint_32      y;
+
+            if (interlace_type == PNG_INTERLACE_ADAM7)
+            {
+               /* The row may be empty for a short image: */
+               if (PNG_PASS_COLS(width, pass) == 0)
+                  continue;
+
+               startx = PNG_PASS_START_COL(pass);
+               stepx = PNG_PASS_COL_OFFSET(pass);
+               y = PNG_PASS_START_ROW(pass);
+               stepy = PNG_PASS_ROW_OFFSET(pass);
+            }
+
+            else
+            {
+               y = 0;
+               startx = 0;
+               stepx = stepy = 1;
+            }
+            
+            if (display->background == NULL)
+            {
+               for (; y<height; y += stepy)
+                  {
+                     png_bytep inrow = display->local_row;
+                     png_bytep outrow = row + startx;
+                     png_const_bytep end_row = row + width;
+
+                     /* Read the row, which is packed: */
+                     png_read_row(png_ptr, inrow, NULL);
+
+                     /* Now do the composition on each pixel in this row. */
+                     for (; outrow < end_row; outrow += stepx)
+                     {
+                        png_byte alpha = inrow[1];
+
+                        if (alpha > 0) /* else no change to the output */
+                        {
+                           png_uint_32 component = inrow[0];
+
+                           if (alpha < 255) /* else just use component */
+                           {
+                              /* Since PNG_OPTIMIZED_ALPHA was not set it is
+                               * necessary to invert the sRGB transfer
+                               * function and multiply the alpha out.
+                               */
+                              component = png_sRGB_table[component] * alpha;
+                              component += png_sRGB_table[outrow[0]] *
+                                 (255-alpha);
+                              component = PNG_sRGB_FROM_LINEAR(component);
+                           }
+
+                           outrow[0] = (png_byte)component;
+                        }
+
+                        inrow += 2; /* gray and alpha channel */
+                     }
+
+                     row += display->row_bytes;
+                  }
+            }
+
+            else /* constant background value */
+            {
+               png_byte background8 = display->background->green;
+               png_uint_16 background = png_sRGB_table[background8];
+
+               for (; y<height; y += stepy)
+                  {
+                     png_bytep inrow = display->local_row;
+                     png_bytep outrow = row + startx;
+                     png_const_bytep end_row = row + width;
+
+                     /* Read the row, which is packed: */
+                     png_read_row(png_ptr, inrow, NULL);
+
+                     /* Now do the composition on each pixel in this row. */
+                     for (; outrow < end_row; outrow += stepx)
+                     {
+                        png_byte alpha = inrow[1];
+
+                        if (alpha > 0) /* else use background */
+                        {
+                           png_uint_32 component = inrow[0];
+
+                           if (alpha < 255) /* else just use component */
+                           {
+                              component = png_sRGB_table[component] * alpha;
+                              component += background * (255-alpha);
+                              component = PNG_sRGB_FROM_LINEAR(component);
+                           }
+
+                           outrow[0] = (png_byte)component;
+                        }
+
+                        else
+                           outrow[0] = background8;
+
+                        inrow += 2; /* gray and alpha channel */
+                     }
+
+                     row += display->row_bytes;
+                  }
+            }
+         }
+         break;
+
+      case 16:
+         /* 16-bit linear with pre-multiplied alpha; the pre-multiplication must
+          * still be done and, maybe, the alpha channel removed.  This code also
+          * handles the alpha-first option.
+          */
+         {
+            unsigned int outchannels = png_get_channels(png_ptr, info_ptr);
+            int preserve_alpha = (image->format & PNG_FORMAT_FLAG_ALPHA) != 0;
+            int swap_alpha = 0;
+
+            if (preserve_alpha && (image->format & PNG_FORMAT_FLAG_AFIRST))
+               swap_alpha = 1;
+
+            for (pass = 0; pass < passes; ++pass)
+            {
+               png_uint_16p     row = (png_uint_16p)display->first_row;
+               unsigned int     startx, stepx, stepy; /* all in pixels */
+               png_uint_32      y;
+
+               if (interlace_type == PNG_INTERLACE_ADAM7)
+               {
+                  /* The row may be empty for a short image: */
+                  if (PNG_PASS_COLS(width, pass) == 0)
+                     continue;
+
+                  startx = PNG_PASS_START_COL(pass);
+                  stepx = PNG_PASS_COL_OFFSET(pass);
+                  y = PNG_PASS_START_ROW(pass);
+                  stepy = PNG_PASS_ROW_OFFSET(pass);
+               }
+
+               else
+               {
+                  y = 0;
+                  startx = 0;
+                  stepx = stepy = 1;
+               }
+
+               startx *= outchannels;
+               stepx *= outchannels;
+               
+               for (; y<height; y += stepy)
+                  {
+                     png_uint_16p inrow;
+                     png_uint_16p outrow = row + startx;
+                     png_uint_16p end_row = row + width * outchannels;
+
+                     /* Read the row, which is packed: */
+                     png_read_row(png_ptr, display->local_row, NULL);
+                     inrow = (png_uint_16p)display->local_row;
+
+                     /* Now do the pre-multiplication on each pixel in this row.
+                      */
+                     for (; outrow < end_row; outrow += stepx)
+                     {
+                        png_uint_32 component = inrow[0];
+                        png_uint_16 alpha = inrow[1];
+
+                        if (alpha > 0) /* else 0 */
+                        {
+                           if (alpha < 65535) /* else just use component */
+                           {
+                              component *= alpha;
+                              component += 32767;
+                              component /= 65535;
+                           }
+                        }
+
+                        else
+                           component = 0;
+
+                        outrow[swap_alpha] = (png_uint_16)component;
+                        if (outchannels > 1)
+                           outrow[1 ^ swap_alpha] = alpha;
+
+                        inrow += 2; /* components and alpha channel */
+                     }
+
+                     row += display->row_bytes;
+                  }
+            }
+         }
+         break;
+   }
+
+   return 1;
+}
+
 /* The guts of png_image_finish_read as a png_safe_execute callback. */
 static int
 png_image_read_end(png_voidp argument)
@@ -1698,6 +1973,7 @@ png_image_read_end(png_voidp argument)
    png_uint_32 format = image->format;
    int linear = (format & PNG_FORMAT_FLAG_LINEAR) != 0;
    int do_local_compose = 0;
+   int do_local_background = 0; /* to avoid double gamma correction bug */
    int passes = 0;
 
    /* Add transforms to ensure the correct output format is produced then check
@@ -1713,6 +1989,38 @@ png_image_read_end(png_voidp argument)
       png_fixed_point output_gamma;
       int mode; /* alpha mode */
 
+      /* Do this first so that we have a record if rgb to gray is happening. */
+      if (change & PNG_FORMAT_FLAG_COLOR)
+      {
+         /* gray<->color transformation required. */
+         if (format & PNG_FORMAT_FLAG_COLOR)
+            png_set_gray_to_rgb(png_ptr);
+
+         else
+         {
+            /* libpng can't do both rgb to gray and
+             * background/pre-multiplication if there is also significant gamma
+             * correction, because both operations require linear colors and
+             * the code only supports one transform doing the gamma correction.
+             * Handle this by doing the pre-multiplication or background
+             * operation in this code, if necessary.
+             *
+             * TODO: fix this by rewriting pngrtran.c (!)
+             *
+             * For the moment (given that fixing this in pngrtran.c is an
+             * enormous change) 'do_local_background' is used to indicate that
+             * the problem exists.
+             */
+            if (base_format & PNG_FORMAT_FLAG_ALPHA)
+               do_local_background = 1/*maybe*/;
+
+            png_set_rgb_to_gray_fixed(png_ptr, PNG_ERROR_ACTION_NONE,
+               PNG_RGB_TO_GRAY_DEFAULT, PNG_RGB_TO_GRAY_DEFAULT);
+         }
+
+         change &= ~PNG_FORMAT_FLAG_COLOR;
+      }
+
       /* Set the gamma appropriately, linear for 16-bit input, sRGB otherwise.
        */
       {
@@ -1723,25 +2031,58 @@ png_image_read_end(png_voidp argument)
          else
             input_gamma_default = PNG_DEFAULT_sRGB;
 
-         if (linear)
-         {
+         /* Call png_set_alpha_mode to set the default for the input gamma; the
+          * output gamma is set by a second call below.
+          */
+         png_set_alpha_mode_fixed(png_ptr, PNG_ALPHA_PNG, input_gamma_default);
+      }
+
+      if (linear)
+      {
+         /* If there *is* an alpha channel in the input it must be multiplied
+          * out; use PNG_ALPHA_STANDARD, otherwise just use PNG_ALPHA_PNG.
+          */
+         if (base_format & PNG_FORMAT_FLAG_ALPHA)
             mode = PNG_ALPHA_STANDARD; /* associated alpha */
-            output_gamma = PNG_GAMMA_LINEAR;
-         }
 
          else
-         {
             mode = PNG_ALPHA_PNG;
-            output_gamma = PNG_DEFAULT_sRGB;
+
+         output_gamma = PNG_GAMMA_LINEAR;
+      }
+
+      else
+      {
+         mode = PNG_ALPHA_PNG;
+         output_gamma = PNG_DEFAULT_sRGB;
+      }
+
+      /* If 'do_local_background' is set check for the presence of gamma
+       * correction; this is part of the work-round for the libpng bug
+       * described above.
+       *
+       * TODO: fix libpng and remove this.
+       */
+      if (do_local_background)
+      {
+         png_fixed_point gtest;
+
+         /* This is 'png_gamma_threshold' from pngrtran.c; the test used for
+          * gamma correction, the screen gamma hasn't been set on png_struct
+          * yet; it's set below.  png_struct::gamma, however, is set to the
+          * final value.
+          */
+         if (png_muldiv(&gtest, output_gamma, png_ptr->gamma, PNG_FP_1) &&
+            !png_gamma_significant(gtest))
+            do_local_background = 0;
+
+         else if (mode == PNG_ALPHA_STANDARD)
+         {
+            do_local_background = 2/*required*/;
+            mode = PNG_ALPHA_PNG; /* prevent libpng doing it */
          }
 
-         /* If the input default and output gamma do not match, because sRGB is
-          * being changed to linear, set the input default now via a dummy call
-          * to png_set_alpha_mode_fixed.
-          */
-         if (input_gamma_default != output_gamma)
-            png_set_alpha_mode_fixed(png_ptr, PNG_ALPHA_PNG,
-               input_gamma_default);
+         /* else leave as 1 for the checks below */
       }
 
       /* If the bit-depth changes then handle that here. */
@@ -1765,8 +2106,16 @@ png_image_read_end(png_voidp argument)
           */
          if (base_format & PNG_FORMAT_FLAG_ALPHA)
          {
+            /* If RGB->gray is happening the alpha channel must be left and the
+             * operation completed locally.
+             *
+             * TODO: fix libpng and remove this.
+             */
+            if (do_local_background)
+               do_local_background = 2/*required*/;
+
             /* 16-bit output: just remove the channel */
-            if (linear) /* compose on black (well, pre-multiply) */
+            else if (linear) /* compose on black (well, pre-multiply) */
                png_set_strip_alpha(png_ptr);
 
             /* 8-bit output: do an appropriate compose */
@@ -1843,19 +2192,6 @@ png_image_read_end(png_voidp argument)
        */
       png_set_alpha_mode_fixed(png_ptr, mode, output_gamma);
 
-      if (change & PNG_FORMAT_FLAG_COLOR)
-      {
-         /* gray<->color transformation required. */
-         if (format & PNG_FORMAT_FLAG_COLOR)
-            png_set_gray_to_rgb(png_ptr);
-
-         else
-            png_set_rgb_to_gray_fixed(png_ptr, PNG_ERROR_ACTION_NONE,
-               PNG_RGB_TO_GRAY_DEFAULT, PNG_RGB_TO_GRAY_DEFAULT);
-
-         change &= ~PNG_FORMAT_FLAG_COLOR;
-      }
-
 #     ifdef PNG_FORMAT_BGR_SUPPORTED
          if (change & PNG_FORMAT_FLAG_BGR)
          {
@@ -1881,7 +2217,13 @@ png_image_read_end(png_voidp argument)
              * code to remove.
              */
             if (format & PNG_FORMAT_FLAG_ALPHA)
-               png_set_swap_alpha(png_ptr);
+            {
+               /* Disable this if doing a local background,
+                * TODO: remove this when local background is no longer required.
+                */
+               if (do_local_background != 2)
+                  png_set_swap_alpha(png_ptr);
+            }
 
             else
                format &= ~PNG_FORMAT_FLAG_AFIRST;
@@ -1950,8 +2292,10 @@ png_image_read_end(png_voidp argument)
    /* Update the 'info' structure and make sure the result is as required; first
     * make sure to turn on the interlace handling if it will be required
     * (because it can't be turned on *after* the call to png_read_update_info!)
+    *
+    * TODO: remove the do_local_background fixup below.
     */
-   if (!do_local_compose)
+   if (!do_local_compose && do_local_background != 2)
       passes = png_set_interlace_handling(png_ptr);
 
    png_read_update_info(png_ptr, info_ptr);
@@ -1964,9 +2308,14 @@ png_image_read_end(png_voidp argument)
 
       if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
       {
-         /* This channel may be removed below. */
+         /* do_local_compose removes this channel below. */
          if (!do_local_compose)
-            info_format |= PNG_FORMAT_FLAG_ALPHA;
+         {
+            /* do_local_background does the same if required. */
+            if (do_local_background != 2 ||
+               (format & PNG_FORMAT_FLAG_ALPHA) != 0)
+               info_format |= PNG_FORMAT_FLAG_ALPHA;
+         }
       }
 
       else if (do_local_compose) /* internal error */
@@ -2021,6 +2370,19 @@ png_image_read_end(png_voidp argument)
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_composite, display);
+      display->local_row = NULL;
+      png_free(png_ptr, row);
+
+      return result;
+   }
+
+   else if (do_local_background == 2)
+   {
+      int result;
+      png_bytep row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
+
+      display->local_row = row;
+      result = png_safe_execute(image, png_image_read_background, display);
       display->local_row = NULL;
       png_free(png_ptr, row);
 

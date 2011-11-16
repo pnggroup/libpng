@@ -1878,7 +1878,7 @@ png_write_image_8bit(png_voidp argument)
                /* Need 32 bit accuracy in the sRGB tables */
                png_uint_32 component = *in_ptr++;
 
-               /* The following gives 65535 for an alpha of 0, which is fine,
+               /* The following gives 1.0 for an alpha of 0, which is fine,
                 * otherwise if 0/0 is represented as some other value there is
                 * more likely to be a discontinuity which will probably damage
                 * compression when moving from a fully transparent area to a
@@ -1891,11 +1891,17 @@ png_write_image_8bit(png_voidp argument)
                /* component<alpha, so component/alpha is less than one and
                 * component*reciprocal is less than 2^31.
                 */
-               else if (component > 0 && alpha < 65535)
+               else if (component > 0)
                {
-                  component *= reciprocal;
-                  component += 64; /* round to nearest */
-                  component >>= 7;
+                  if (alpha < 65535)
+                  {
+                     component *= reciprocal;
+                     component += 64; /* round to nearest */
+                     component >>= 7;
+                  }
+
+                  else
+                     component *= 255;
 
                   /* Convert the component to sRGB. */
                   *out_ptr++ = (png_byte)PNG_sRGB_FROM_LINEAR(component);

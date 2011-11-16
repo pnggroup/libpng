@@ -70,6 +70,14 @@ Version 1.5.7beta03 [November 16, 2011]
   Added run-time detection of NEON support.
   Added contrib/libtests; includes simplified API test and timing test and
     a color conversion utility for rapid checking of failed 'pngstest' results.
+  Multiple transform bug fixes plus a work-round for double gamma correction.
+    libpng does not support more than one transform that requires linear data
+    at once - if this is tried typically the results is double gamma
+    correction. Since the simplified APIs can need rgb to gray combined with
+    a compose operation it is necessary to do one of these outside the main
+    libpng transform code. This check-in also contains fixes to various bugs
+    in the simplified APIs themselves and to some bugs in compose and rgb to
+    gray (on palette) itself.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
