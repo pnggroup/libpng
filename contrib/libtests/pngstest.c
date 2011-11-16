@@ -3,7 +3,7 @@
  *
  * Test for the PNG 'simplified' APIs.
  */
-#define _ISOC99_SOURCE 1
+#define _ISOC90_SOURCE 1
 #define MALLOC_CHECK_ 2/*glibc facility: turn on debugging*/
 
 #include <stddef.h>
@@ -14,25 +14,31 @@
 #include <ctype.h>
 #include <math.h>
 
-#include <unistd.h>
-#include <fenv.h>
-
 #include "../../png.h"
 
 #include "../sRGBtables/sRGB.h"
+
+/* Math support - neither Cygwin nor Visual Studio have C99 support and we need
+ * a predictable rounding function, so make one here:
+ */
+static double
+closestinteger(double x)
+{
+   return floor(x + .5);
+}
 
 /* Cast support: remove GCC whines. */
 static png_byte
 u8d(double d)
 {
-   d = nearbyint(d);
+   d = closestinteger(d);
    return (png_byte)d;
 }
 
 static png_uint_16
 u16d(double d)
 {
-   d = nearbyint(d);
+   d = closestinteger(d);
    return (png_uint_16)d;
 }
 
@@ -46,15 +52,24 @@ sRGB(double linear /*range 0.0 .. 1.0*/)
 }
 
 static png_byte
-isRGB(png_uint_16 fixed_linear)
+isRGB(int fixed_linear)
 {
    return sRGB(fixed_linear / 65535.);
 }
 
 static png_uint_16
-ilineara(png_byte fixed_srgb, png_byte alpha)
+ilineara(int fixed_srgb, int alpha)
 {
    return u16d((257 * alpha) * linear_from_sRGB(fixed_srgb / 255.));
+}
+
+static double
+YfromRGBint(int ir, int ig, int ib)
+{
+   double r = ir;
+   double g = ig;
+   double b = ib;
+   return YfromRGB(r, g, b);
 }
 
 #define READ_FILE 1      /* else memory */
@@ -264,7 +279,7 @@ allocbuffer(Image *image)
 
 /* Make sure 16 bytes match the given byte. */
 static int
-check16(png_const_bytep bp, png_byte b)
+check16(png_const_bytep bp, int b)
 {
    int i = 16;
 
@@ -411,7 +426,8 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
                /* Because the 'Y' calculation is linear the pre-multiplication
                 * of the r16,g16,b16 values can be ignored.
                 */
-               pixel->y16 = u16d(YfromRGB(pixel->r16, pixel->g16, pixel->b16));
+               pixel->y16 = u16d(YfromRGBint(pixel->r16, pixel->g16,
+                  pixel->b16));
             }
 
             else
@@ -531,18 +547,18 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
  * done in the simplified API code using the correct sRGB tables.  This needs
  * to be made consistent.
  */
-static unsigned int error_to_linear = 811; /* by experiment */
-static unsigned int error_to_linear_grayscale = 424; /* by experiment */
-static unsigned int error_to_sRGB = 6; /* by experiment */
-static unsigned int error_to_sRGB_grayscale = 11; /* by experiment */
-static unsigned int error_in_compose = 0;
-static unsigned int error_via_linear = 14; /* by experiment */
-static unsigned int error_in_premultiply = 1;
+static int error_to_linear = 811; /* by experiment */
+static int error_to_linear_grayscale = 424; /* by experiment */
+static int error_to_sRGB = 6; /* by experiment */
+static int error_to_sRGB_grayscale = 11; /* by experiment */
+static int error_in_compose = 0;
+static int error_via_linear = 14; /* by experiment */
+static int error_in_premultiply = 1;
 
 static const char *
 cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
 {
-   unsigned int error_limit = 0;
+   int error_limit = 0;
 
    if (b->format & PNG_FORMAT_FLAG_LINEAR)
    {
@@ -670,14 +686,14 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
              */
             if (a->format & PNG_FORMAT_FLAG_COLOR)
             {
-               double r = nearbyint((65535. * a->r16) / a->a16)/65535;
-               double g = nearbyint((65535. * a->g16) / a->a16)/65535;
-               double blue = nearbyint((65535. * a->b16) / a->a16)/65535;
+               double r = closestinteger((65535. * a->r16) / a->a16)/65535;
+               double g = closestinteger((65535. * a->g16) / a->a16)/65535;
+               double blue = closestinteger((65535. * a->b16) / a->a16)/65535;
 
                a->r16 = u16d(r * a->a16);
                a->g16 = u16d(g * a->a16);
                a->b16 = u16d(blue * a->a16);
-               a->y16 = u16d(YfromRGB(a->r16, a->g16, a->b16));
+               a->y16 = u16d(YfromRGBint(a->r16, a->g16, a->b16));
 
                a->r8 = u8d(r * 255);
                a->g8 = u8d(g * 255);
@@ -687,7 +703,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
 
             else
             {
-               double y = nearbyint((65535. * a->y16) / a->a16)/65535.;
+               double y = closestinteger((65535. * a->y16) / a->a16)/65535.;
 
                a->b16 = a->g16 = a->r16 = a->y16 = u16d(y * a->a16);
                a->b8 = a->g8 = a->r8 = a->y8 = u8d(255 * y);
@@ -912,8 +928,6 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
          return err;
       }
    }
-
-   return "not reached";
 }
 
 /* Basic image formats; control the data but not the layout thereof. */
@@ -1320,15 +1334,15 @@ read_one_file(Image *image, png_uint_32 format)
             {
                long int cb = ftell(f);
 
-               if (cb >= 0)
+               if (cb >= 0 && (unsigned long int)cb < (size_t)~(size_t)0)
                {
-                  png_bytep b = malloc(cb);
+                  png_bytep b = malloc((size_t)cb);
 
                   if (b != NULL)
                   {
                      rewind(f);
 
-                     if (fread(b, cb, 1, f) == 1)
+                     if (fread(b, (size_t)cb, 1, f) == 1)
                      {
                         fclose(f);
                         image->input_memory_size = cb;
@@ -1406,7 +1420,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       static int counter = 0;
       char name[32];
 
-      sprintf(name, "TMP%d-%d.png", getpid(), ++counter);
+      sprintf(name, "TMP%d.png", ++counter);
 
       if (png_image_write_to_file(&image->image, name, convert_to_8bit,
          image->buffer+16, (png_int_32)image->stride))
@@ -1529,17 +1543,12 @@ int
 main(int argc, const char **argv)
 {
    png_uint_32 opts = 0;
-   png_uint_32 formats = ~0; /* a mask of formats to test */
+   png_uint_32 formats = (png_uint_32)~0; /* a mask of formats to test */
+   const char *touch = NULL;
    int log_pass = 0;
    int stride_extra = 0;
    int retval = 0;
    int c;
-
-   /* FE_TONEAREST is the IEEE754 round to nearest, preferring even, mode; i.e.
-    * everything rounds to the nearest value except that '.5' rounds to the
-    * nearest even value.
-    */
-   fesetround(FE_TONEAREST);
 
    for (c=1; c<argc; ++c)
    {
@@ -1571,6 +1580,18 @@ main(int argc, const char **argv)
          opts |= KEEP_GOING;
       else if (strcmp(arg, "--stop") == 0)
          opts &= ~KEEP_GOING;
+      else if (strcmp(arg, "--touch") == 0)
+      {
+         if (c+1 < argc)
+            touch = argv[++c];
+
+         else
+         {
+            fprintf(stderr, "%s: %s requires a file name argument\n",
+               argv[0], arg);
+            exit(1);
+         }
+      }
       else if (arg[0] == '+')
       {
          png_uint_32 format = formatof(arg+1);
@@ -1617,6 +1638,31 @@ main(int argc, const char **argv)
 
          else if (!result)
             exit(1);
+      }
+   }
+
+   if (retval == 0 && touch != NULL)
+   {
+      FILE *fsuccess = fopen(touch, "wt");
+
+      if (fsuccess != NULL)
+      {
+         int error = 0;
+         fprintf(fsuccess, "PNG simple API tests succeeded\n");
+         fflush(fsuccess);
+         error = ferror(fsuccess);
+
+         if (fclose(fsuccess) || error)
+         {
+            fprintf(stderr, "%s: write failed\n", touch);
+            exit(1);
+         }
+      }
+
+      else
+      {
+         fprintf(stderr, "%s: open failed\n", touch);
+         exit(1);
       }
    }
 

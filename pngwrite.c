@@ -2028,7 +2028,7 @@ png_image_write_main(png_voidp argument)
 #  endif
 
    /* That should have handled all (both) the transforms. */
-   if ((format & ~(PNG_FORMAT_FLAG_COLOR | PNG_FORMAT_FLAG_LINEAR |
+   if ((format & ~(png_uint_32)(PNG_FORMAT_FLAG_COLOR | PNG_FORMAT_FLAG_LINEAR |
          PNG_FORMAT_FLAG_ALPHA)) != 0)
       png_error(png_ptr, "png_write_image: unsupported transformation");
 
