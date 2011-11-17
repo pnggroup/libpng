@@ -88,6 +88,10 @@ Version 1.5.7beta03 [November 17, 2011]
     this on assembler compilation, even though it does on C compilation.
     This creates security issues if assembler code is enabled; the
     work-around is to set it by default in the flags for $(CCAS)
+  Work around compilers that don't support declaration of const data. Some
+    compilers fault 'extern const' data declarations (because the data is
+    not initialized); this turns on const-ness only for compilers where
+    this is known to work.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

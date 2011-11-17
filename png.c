@@ -645,13 +645,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.7beta03 - November 16, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.7beta03 - November 17, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.7beta03 - November 16, 2011\
+      return "libpng version 1.5.7beta03 - November 17, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2876,7 +2876,7 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 /* The convert-to-sRGB table is only currently required for read. */
-png_uint_16 png_sRGB_table[256] =
+PNG_CONST_DATA png_uint_16 png_sRGB_table[256] =
 {
    0,20,40,60,80,99,119,139,
    159,179,199,219,241,264,288,313,
@@ -2917,7 +2917,7 @@ png_uint_16 png_sRGB_table[256] =
 /* The base/delta tables are required for both read and write (but currently
  * only the simplified versions.)
  */
-png_uint_16 png_sRGB_base[512] =
+PNG_CONST_DATA png_uint_16 png_sRGB_base[512] =
 {
    128,1782,3383,4644,5675,6564,7357,8074,
    8732,9346,9921,10463,10977,11466,11935,12384,
@@ -2985,7 +2985,7 @@ png_uint_16 png_sRGB_base[512] =
    65070,65126,65183,65239,65296,65352,65409,65465
 };
 
-png_byte png_sRGB_delta[512] =
+PNG_CONST_DATA png_byte png_sRGB_delta[512] =
 {
    207,201,158,129,113,100,90,82,77,72,68,64,61,59,56,54,
    52,50,49,47,46,45,43,42,41,40,39,39,38,37,36,36,
