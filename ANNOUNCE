@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta03 - November 17, 2011
+Libpng 1.5.7beta04 - November 17, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7beta03.tar.xz (LZMA-compressed, recommended)
-   1.5.7beta03.tar.gz
-   1.5.7beta03.tar.bz2
+   1.5.7beta04.tar.xz (LZMA-compressed, recommended)
+   1.5.7beta04.tar.gz
+   1.5.7beta04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157b03.7z  (LZMA-compressed, recommended)
-   lp157b03.zip
+   lp157b04.7z  (LZMA-compressed, recommended)
+   lp157b04.zip
 
 Other information:
 
-   1.5.7beta03-README.txt
-   1.5.7beta03-LICENSE.txt
+   1.5.7beta04-README.txt
+   1.5.7beta04-LICENSE.txt
 
 Changes since the last public release (1.5.6):
 
@@ -92,6 +92,8 @@ Version 1.5.7beta03 [November 17, 2011]
     compilers fault 'extern const' data declarations (because the data is
     not initialized); this turns on const-ness only for compilers where
     this is known to work.
+
+Version 1.5.7beta04 [November 17, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
