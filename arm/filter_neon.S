@@ -1,7 +1,8 @@
 
 /* filter_neon.S - NEON optimised filter functions
  *
- * Copyright (c) 2011 Mans Rullgard
+ * Copyright (c) 2011 Glenn Randers-Pehrson
+ * Written by Mans Rullgard, 2011.
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

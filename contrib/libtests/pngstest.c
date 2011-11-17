@@ -18,6 +18,13 @@
 
 #include "../sRGBtables/sRGB.h"
 
+/* The following is to support direct compilation of this file as C++ */
+#ifdef __cplusplus
+#  define voidcast(type, value) static_cast<type>(value)
+#else
+#  define voidcast(type, value) (value)
+#endif /* __cplusplus */
+
 /* Math support - neither Cygwin nor Visual Studio have C99 support and we need
  * a predictable rounding function, so make one here:
  */
@@ -261,7 +268,7 @@ allocbuffer(Image *image)
    if (size+32 > image->bufsize)
    {
       freebuffer(image);
-      image->buffer = malloc(size+32);
+      image->buffer = voidcast(png_bytep, malloc(size+32));
       if (image->buffer == NULL)
       {
          fprintf(stderr,
@@ -1336,7 +1343,7 @@ read_one_file(Image *image, png_uint_32 format)
 
                if (cb >= 0 && (unsigned long int)cb < (size_t)~(size_t)0)
                {
-                  png_bytep b = malloc((size_t)cb);
+                  png_bytep b = voidcast(png_bytep, malloc((size_t)cb));
 
                   if (b != NULL)
                   {

@@ -18,6 +18,4 @@ do
    fi
 done
 
-echo
-
 exit $err
