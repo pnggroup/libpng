@@ -12,19 +12,19 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 AUTOMAKE_OPTIONS = foreign
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngvalid
+TESTS_ENVIRONMENT= srcdir=$(srcdir)
+check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngvalid_SOURCES = pngvalid.c
-pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
-TESTS_ENVIRONMENT= srcdir=$(srcdir)
+TESTS = test-pngtest.sh
 
 # Do the following only if the contrib directory is present.
-check_PROGRAMS+= pngstest
+check_PROGRAMS+= pngvalid pngstest
+pngvalid_SOURCES = pngvalid.c
 pngstest_SOURCES = contrib/libtests/pngstest.c
+pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS += test-pngstest.sh
+TESTS += test-pngvalid-simple.sh test-pngvalid-full.sh test-pngstest.sh
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
