@@ -3710,7 +3710,7 @@ Version 1.5.7beta02 [November 11, 2011]
     convert to an off-by-one 8-bit value.  The "makesRGB.c" code that was used
     to generate the tables is now in a contrib/sRGBtables sub-directory.
 
-Version 1.5.7beta03 [November 16, 2011]
+Version 1.5.7beta03 [November 17, 2011]
   Removed PNG_CONST from the sRGB table declarations in pngpriv.h and png.c
   Added run-time detection of NEON support.
   Added contrib/libtests; includes simplified API test and timing test and
@@ -3723,6 +3723,16 @@ Version 1.5.7beta03 [November 16, 2011]
     libpng transform code. This check-in also contains fixes to various bugs
     in the simplified APIs themselves and to some bugs in compose and rgb to
     gray (on palette) itself.
+  Fixes for C++ compilation using g++ When libpng source is compiled
+    using g++. The compiler imposes C++ rules on the C source; thus it
+    is desireable to make the source work with either C or C++ rules
+    without throwing away useful error information.  This change adds
+    png_voidcast to allow C semantic (void*) cases or the corresponding
+    C++ static_cast operation, as appropriate.
+  Added --noexecstack to assembler file compilation. GCC does not set
+    this on assembler compilation, even though it does on C compilation.
+    This creates security issues if assembler code is enabled; the
+    work-around is to set it by default in the flags for $(CCAS)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
