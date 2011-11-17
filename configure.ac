@@ -189,6 +189,11 @@ AC_SUBST([binconfigs])
 # here (this may by GCC specific)
 AC_SUBST([AM_CCASFLAGS], [--noexecstack])
 
+# Because GCC by default assembles code with an executable stack, even though it
+# compiles C code with a non-executable stack, it is necessary to do a fixup
+# here (this may by GCC specific)
+AC_SUBST([AM_CCASFLAGS], [--noexecstack])
+
 AC_ARG_ENABLE([arm-neon],
 	AC_HELP_STRING([--enable-arm-neon], [Enable ARM NEON optimizations]),
 	[if test "${enableval}" = yes; then
