@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta04 - November 18, 2011
+Libpng 1.5.7beta05 - November 18, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7beta04.tar.xz (LZMA-compressed, recommended)
-   1.5.7beta04.tar.gz
-   1.5.7beta04.tar.bz2
+   1.5.7beta05.tar.xz (LZMA-compressed, recommended)
+   1.5.7beta05.tar.gz
+   1.5.7beta05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157b04.7z  (LZMA-compressed, recommended)
-   lp157b04.zip
+   lp157b05.7z  (LZMA-compressed, recommended)
+   lp157b05.zip
 
 Other information:
 
-   1.5.7beta04-README.txt
-   1.5.7beta04-LICENSE.txt
+   1.5.7beta05-README.txt
+   1.5.7beta05-LICENSE.txt
 
 Changes since the last public release (1.5.6):
 
@@ -93,11 +93,13 @@ Version 1.5.7beta03 [November 17, 2011]
     not initialized); this turns on const-ness only for compilers where
     this is known to work.
 
-Version 1.5.7beta04 [November 18, 2011]
+Version 1.5.7beta04 [November 17, 2011]
   Since the gcc driver does not recognize the --noexecstack flag, we must
     use the -Wa prefix to have it passed through to the assembler.
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
+
+Version 1.5.7beta05 [November 18, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
