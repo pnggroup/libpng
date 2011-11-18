@@ -3738,7 +3738,11 @@ Version 1.5.7beta03 [November 17, 2011]
     not initialized); this turns on const-ness only for compilers where
     this is known to work.
 
-Version 1.5.7beta04 [November 17, 2011]
+Version 1.5.7beta04 [November 18, 2011]
+  Since the gcc driver does not recognize the --noexecstack flag, we must
+    use the -Wa prefix to have it passed through to the assembler.
+    Also removed a duplicate setting of this flag.
+  Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
