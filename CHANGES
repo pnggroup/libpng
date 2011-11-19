@@ -3744,7 +3744,8 @@ Version 1.5.7beta04 [November 17, 2011]
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
-Version 1.5.7beta05 [November 18, 2011]
+Version 1.5.7beta05 [November 19, 2011]
+  Removed "zTXt" from warning in generic chunk decompression function.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

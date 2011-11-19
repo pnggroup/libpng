@@ -490,7 +490,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
    {
       PNG_WARNING_PARAMETERS(p)
       png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_d, comp_type);
-      png_formatted_warning(png_ptr, p, "Unknown zTXt compression type @1");
+      png_formatted_warning(png_ptr, p, "Unknown compression type @1");
 
       /* The recovery is to simply drop the data. */
    }
