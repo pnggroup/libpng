@@ -101,7 +101,8 @@ Version 1.5.7beta04 [November 17, 2011]
 
 Version 1.5.7beta05 [November 19, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
-
+  Validate time settings passed to pngset() and png_convert_to_rfc1123()
+    (Frank Busse).
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

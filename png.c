@@ -599,9 +599,19 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
    if (png_ptr == NULL)
       return (NULL);
 
+   if (ptime->year > 9999  || /* RFC1123 limitation */
+       ptime->month == 0   || ptime->month > 12  ||
+       ptime->day   == 0   || ptime->day   > 31  ||
+       ptime->hour  > 23   || ptime->minute > 59 ||
+       ptime->second > 60)
+   {
+      png_warning(png_ptr, "Ignoring invalid time value");
+      return (NULL);
+   }
+
    {
       size_t pos = 0;
-      char number_buf[5]; /* enough for a four digit year */
+      char number_buf[5]; /* enough for a five-digit year */
 
 #     define APPEND_STRING(string)\
          pos = png_safecat(png_ptr->time_buffer, sizeof png_ptr->time_buffer,\
@@ -612,17 +622,17 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
          if (pos < (sizeof png_ptr->time_buffer)-1)\
             png_ptr->time_buffer[pos++] = (ch)
 
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_u, (unsigned)ptime->day % 32);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_u, (unsigned)ptime->day);
       APPEND(' ');
-      APPEND_STRING(short_months[(ptime->month - 1) % 12]);
+      APPEND_STRING(short_months[(ptime->month - 1)]);
       APPEND(' ');
       APPEND_NUMBER(PNG_NUMBER_FORMAT_u, ptime->year);
       APPEND(' ');
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->hour % 24);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->hour);
       APPEND(':');
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->minute % 60);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->minute);
       APPEND(':');
-      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->second % 61);
+      APPEND_NUMBER(PNG_NUMBER_FORMAT_02u, (unsigned)ptime->second);
       APPEND_STRING(" +0000"); /* This reliably terminates the buffer */
 
 #     undef APPEND
@@ -645,13 +655,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.7beta05 - November 18, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.7beta05 - November 19, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.7beta05 - November 18, 2011\
+      return "libpng version 1.5.7beta05 - November 19, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
