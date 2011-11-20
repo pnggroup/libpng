@@ -599,10 +599,10 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
    if (png_ptr == NULL)
       return (NULL);
 
-   if (ptime->year > 9999  || /* RFC1123 limitation */
-       ptime->month == 0   || ptime->month > 12  ||
-       ptime->day   == 0   || ptime->day   > 31  ||
-       ptime->hour  > 23   || ptime->minute > 59 ||
+   if (ptime->year > 9999 /* RFC1123 limitation */ ||
+       ptime->month == 0    ||  ptime->month > 12  ||
+       ptime->day   == 0    ||  ptime->day   > 31  ||
+       ptime->hour  > 23    ||  ptime->minute > 59 ||
        ptime->second > 60)
    {
       png_warning(png_ptr, "Ignoring invalid time value");
@@ -611,7 +611,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
 
    {
       size_t pos = 0;
-      char number_buf[5]; /* enough for a five-digit year */
+      char number_buf[5]; /* enough for a four-digit year */
 
 #     define APPEND_STRING(string)\
          pos = png_safecat(png_ptr->time_buffer, sizeof png_ptr->time_buffer,\
