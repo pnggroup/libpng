@@ -609,11 +609,18 @@ typedef png_sPLT_t FAR * FAR * png_sPLT_tpp;
 #ifdef PNG_TEXT_SUPPORTED
 /* png_text holds the contents of a text/ztxt/itxt chunk in a PNG file,
  * and whether that contents is compressed or not.  The "key" field
- * points to a regular zero-terminated C string.  The "text", "lang", and
- * "lang_key" fields can be regular C strings, empty strings, or NULL pointers.
+ * points to a regular zero-terminated C string.  The "text" fields can be a
+ * regular C string, an empty string, or a NULL pointer.
  * However, the structure returned by png_get_text() will always contain
- * regular zero-terminated C strings (possibly empty), never NULL pointers,
- * so they can be safely used in printf() and other string-handling functions.
+ * the "text" field as a regular zero-terminated C string (possibly
+ * empty), never a NULL pointer, so it can be safely used in printf() and
+ * other string-handling functions.  Note that the "itxt_length", "lang", and
+ * "lang_key" members of the structure only exist when the library is built
+ * with iTXt chunk support.  Prior to libpng-1.4.0 the library was built by
+ * default without iTXt support. Also note that when iTXt *is* supported,
+ * the "lang" and "lang_key" fields contain NULL pointers when the
+ * "compression" field contains * PNG_TEXT_COMPRESSION_NONE or
+ * PNG_TEXT_COMPRESSION_zTXt.
  */
 typedef struct png_text_struct
 {
