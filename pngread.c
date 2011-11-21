@@ -2423,6 +2423,9 @@ png_image_finish_read(png_imagep image, png_colorp background, void *buffer,
    {
       png_uint_32 check;
 
+      if (row_stride == 0)
+         row_stride = PNG_IMAGE_ROW_STRIDE(*image);
+
       if (row_stride < 0)
          check = -row_stride;
 

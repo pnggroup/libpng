@@ -1970,6 +1970,10 @@ png_image_write_main(png_voidp argument)
    int alpha = (format & PNG_FORMAT_FLAG_ALPHA) != 0;
    int write_16bit = linear && !display->convert_to_8bit;
 
+   /* Default the 'row_stride' parameter if required. */
+   if (display->row_stride == 0)
+      display->row_stride = PNG_IMAGE_ROW_STRIDE(*image);
+
    /* Set the required transforms then write the rows in the correct order. */
    png_set_IHDR(png_ptr, info_ptr, image->width, image->height,
       write_16bit ? 16 : 8,
