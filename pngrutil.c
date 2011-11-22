@@ -2540,6 +2540,14 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       comp_type = *lang++;
    }
 
+   if (comp_flag != PNG_TEXT_COMPRESSION_zTXt)
+   {
+      png_warning(png_ptr, "Unknown iTXt compression type");
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
+      return;
+   }
+
    for (lang_key = lang; *lang_key; lang_key++)
       /* Empty loop */ ;
 

@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta05 - November 21, 2011
+Libpng 1.5.7beta05 - November 22, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -99,12 +99,13 @@ Version 1.5.7beta04 [November 17, 2011]
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
-Version 1.5.7beta05 [November 21, 2011]
+Version 1.5.7beta05 [November 22, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
     (Frank Busse).
-  Allow row_stride==0 to indicate default stride in simplified API
+  Allow row_stride==0 to indicate default stride in simplified API.
   Added MINGW support to CMakeLists.txt
+  Reject invalid compression flag when reading the iTXt chunk.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
