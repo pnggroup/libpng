@@ -3750,7 +3750,7 @@ Version 1.5.7beta05 [November 22, 2011]
     (Frank Busse).
   Allow row_stride==0 to indicate default stride in simplified API.
   Added MINGW support to CMakeLists.txt
-  Reject invalid compression flag when reading the iTXt chunk.
+  Reject invalid compression flag or method when reading the iTXt chunk.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
