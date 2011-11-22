@@ -2,6 +2,13 @@
  * convert.c
  *
  * Convert 8-bit sRGB or 16-bit linear values to another format.
+ *
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ * Copyright (c) 2011 Written by John Cunningham Bowler
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  */
 #define _ISOC99_SOURCE 1
 

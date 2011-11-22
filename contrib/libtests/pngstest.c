@@ -1,6 +1,14 @@
 /*-
  * pngstest.c
  *
+ * Copyright (c) 2011 John Cunningham Bowler
+ *
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
  * Test for the PNG 'simplified' APIs.
  */
 #define _ISOC90_SOURCE 1
@@ -377,7 +385,7 @@ typedef struct
 
 /* This is not particularly fast, but it works.  The input has pixels stored
  * either as pre-multiplied linear 16-bit or as sRGB encoded non-pre-multiplied
- * 8-bit values.  The routine reads either and does exact convertion to the
+ * 8-bit values.  The routine reads either and does exact conversion to the
  * other format.
  *
  * Grayscale values are mapped r==g==b=y.  Non-alpha images have alpha
@@ -541,7 +549,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
  * as defined by the format of the right, or if it is close enough given the
  * permitted error limits.  If the formats match the values should (exactly!)
  *
- * If the right pixel has no alpha channel but the left does it was removed
+ * If the right pixel has no alpha channel but the left does, it was removed
  * somehow.  For an 8-bit *output* removal uses the background color if given
  * else the default (the value filled in to the row buffer by allocbuffer()
  * above.)
@@ -549,7 +557,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
  * The result of this function is NULL if the pixels match else a reason why
  * they don't match.
  *
- * Error values below are inflated because some of the convertions are done
+ * Error values below are inflated because some of the conversions are done
  * inside libpng using a simple power law transform of .45455 and others are
  * done in the simplified API code using the correct sRGB tables.  This needs
  * to be made consistent.
@@ -604,7 +612,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             if (error_limit < error_to_linear)
             {
                error_limit = error_to_linear;
-               err = "sRGB to linear convertion error";
+               err = "sRGB to linear conversion error";
             }
          }
 
@@ -633,7 +641,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             if (error_limit < error_to_linear)
             {
                error_limit = error_to_linear;
-               err = "8-bit gray to linear convertion error";
+               err = "8-bit gray to linear conversion error";
             }
 
             if (abs(a->y16-b->y16) <= error_to_linear)
@@ -647,7 +655,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             if (error_limit < error_to_linear_grayscale)
             {
                error_limit = error_to_linear_grayscale;
-               err = "color to linear gray convertion error";
+               err = "color to linear gray conversion error";
             }
          }
 
@@ -663,7 +671,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
       const char *err;
 
       /* For 8-bit to 8-bit use 'error_via_linear'; this handles the cases where
-       * the original image is compared with the output of another convertion:
+       * the original image is compared with the output of another conversion:
        * see where the parameter is set to non-zero below.
        */
       if (!(a->format & PNG_FORMAT_FLAG_LINEAR) && via_linear)
@@ -882,12 +890,12 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
          if (a->r8 == b->r8 && a->g8 == b->g8 && a->b8 == b->b8)
             return NULL;
 
-         /* Check for linear to 8-bit convertion. */
+         /* Check for linear to 8-bit conversion. */
          if (a->format & PNG_FORMAT_FLAG_LINEAR)
          {
             if (error_limit < error_to_sRGB)
             {
-               err = "linear to sRGB convertion error";
+               err = "linear to sRGB conversion error";
                error_limit = error_to_sRGB;
             }
          }
@@ -915,7 +923,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             if (error_limit < error_to_sRGB)
             {
                error_limit = error_to_sRGB;
-               err = "linear to 8-bit gray convertion error";
+               err = "linear to 8-bit gray conversion error";
             }
          }
 
@@ -925,7 +933,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear)
             if (error_limit < error_to_sRGB_grayscale)
             {
                error_limit = error_to_sRGB_grayscale;
-               err = "color to 8-bit gray convertion error";
+               err = "color to 8-bit gray conversion error";
             }
          }
 
@@ -1505,7 +1513,7 @@ testimage(Image *image, png_uint_32 opts, png_uint_32 formats)
             break;
 
          /* Write the *copy* just made to a new file to make sure the write side
-          * works ok.  Check the convertion to sRGB if the copy is linear.
+          * works ok.  Check the conversion to sRGB if the copy is linear.
           */
          result = write_one_file(&output, &copy, 0/*convert to 8bit*/);
          if (!result)
@@ -1523,7 +1531,7 @@ testimage(Image *image, png_uint_32 opts, png_uint_32 formats)
             if (!result)
                break;
 
-            /* This may involve a convertion via linear, in the ideal world this
+            /* This may involve a conversion via linear; in the ideal world this
              * would round-trip correctly, but libpng 1.5.7 is not the ideal
              * world so allow a drift (error_via_linear).
              *

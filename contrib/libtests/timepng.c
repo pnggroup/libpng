@@ -1,5 +1,13 @@
 /* timepng.c
  *
+ * Copyright (c) 2011 John Cunningham Bowler
+ *
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
  * Load an arbitrary number of PNG files (from the command line, or, if there
  * are no arguments on the command line, from stdin) then run a time test by
  * reading each file by row.  The test does nothing with the read result and
