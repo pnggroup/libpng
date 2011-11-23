@@ -40,7 +40,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = pngtest$(EXEEXT) pngvalid$(EXEEXT) pngstest$(EXEEXT)
+check_PROGRAMS = pngtest$(EXEEXT) pngvalid$(EXEEXT)
 @PNG_ARM_NEON_TRUE@am__append_1 = arm/filter_neon.S
 
 #   Versioned symbols and restricted exports
@@ -124,9 +124,6 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LINK = $(LIBTOOL) --tag=CC \
 	$(AM_CFLAGS) $(CFLAGS) \
 	$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS) $(LDFLAGS) -o \
 	$@
-am_pngstest_OBJECTS = pngstest.$(OBJEXT)
-pngstest_OBJECTS = $(am_pngstest_OBJECTS)
-pngstest_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am_pngtest_OBJECTS = pngtest.$(OBJEXT)
 pngtest_OBJECTS = $(am_pngtest_OBJECTS)
 pngtest_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -154,10 +151,10 @@ LINK = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
-	$(pngstest_SOURCES) $(pngtest_SOURCES) $(pngvalid_SOURCES)
+	$(pngtest_SOURCES) $(pngvalid_SOURCES)
 DIST_SOURCES =  \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST) \
-	$(pngstest_SOURCES) $(pngtest_SOURCES) $(pngvalid_SOURCES)
+	$(pngtest_SOURCES) $(pngvalid_SOURCES)
 man3dir = $(mandir)/man3
 man5dir = $(mandir)/man5
 NROFF = nroff
@@ -184,6 +181,7 @@ distcleancheck_listfiles = find . -type f -print
 pkgincludedir = $(includedir)/$(PNGLIB_BASENAME)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_CCASFLAGS = @AM_CCASFLAGS@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -329,16 +327,14 @@ PNGLIB_BASENAME = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 # to get red "FAIL" and green "PASS" notations during tests.
 # AUTOMAKE_OPTIONS = foreign color-tests
 AUTOMAKE_OPTIONS = foreign
+
+# test programs - run on make check, make distcheck
+TESTS_ENVIRONMENT = srcdir=$(srcdir)
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
 pngvalid_SOURCES = pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngstest_SOURCES = contrib/libtests/pngstest.c
-pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh \
-	test-pngstest.sh
-
-TESTS_ENVIRONMENT = srcdir=$(srcdir)
 
 # man pages
 dist_man_MANS = libpng.3 libpngpf.3 png.5
@@ -494,9 +490,6 @@ clean-checkPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
-pngstest$(EXEEXT): $(pngstest_OBJECTS) $(pngstest_DEPENDENCIES) 
-	@rm -f pngstest$(EXEEXT)
-	$(LINK) $(pngstest_OBJECTS) $(pngstest_LDADD) $(LIBS)
 pngtest$(EXEEXT): $(pngtest_OBJECTS) $(pngtest_DEPENDENCIES) 
 	@rm -f pngtest$(EXEEXT)
 	$(LINK) $(pngtest_OBJECTS) $(pngtest_LDADD) $(LIBS)
@@ -560,7 +553,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwrite.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwtran.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngstest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngtest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngvalid.Po@am__quote@
 
@@ -717,20 +709,6 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo: pngwutil.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pngwutil.c' object='libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo `test -f 'pngwutil.c' || echo '$(srcdir)/'`pngwutil.c
-
-pngstest.o: contrib/libtests/pngstest.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pngstest.o -MD -MP -MF $(DEPDIR)/pngstest.Tpo -c -o pngstest.o `test -f 'contrib/libtests/pngstest.c' || echo '$(srcdir)/'`contrib/libtests/pngstest.c
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pngstest.Tpo $(DEPDIR)/pngstest.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngstest.c' object='pngstest.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngstest.o `test -f 'contrib/libtests/pngstest.c' || echo '$(srcdir)/'`contrib/libtests/pngstest.c
-
-pngstest.obj: contrib/libtests/pngstest.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pngstest.obj -MD -MP -MF $(DEPDIR)/pngstest.Tpo -c -o pngstest.obj `if test -f 'contrib/libtests/pngstest.c'; then $(CYGPATH_W) 'contrib/libtests/pngstest.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngstest.c'; fi`
-@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pngstest.Tpo $(DEPDIR)/pngstest.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngstest.c' object='pngstest.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngstest.obj `if test -f 'contrib/libtests/pngstest.c'; then $(CYGPATH_W) 'contrib/libtests/pngstest.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngstest.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1357,7 +1335,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-contrib/libtests/pngstest.o pngvalid.o pngtest.o: pnglibconf.h
+pngvalid.o pngtest.o: pnglibconf.h
 
 .dfn.out:
 	rm -f $@ dfn.c dfn?.out

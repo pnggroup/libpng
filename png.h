@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.7beta05 - November 22, 2011
+ * libpng version 1.5.7beta05 - November 23, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.7beta05 - November 22, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.7beta05 - November 23, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -195,7 +195,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.7beta05, November 22, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.7beta05, November 23, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -307,7 +307,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 22, 2011
+ *    November 23, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -373,7 +373,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.7beta05"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.7beta05 - November 22, 2011\n"
+     " libpng version 1.5.7beta05 - November 23, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -491,7 +491,6 @@ extern "C" {
  * 2. Type definitions (base types are defined in pngconf.h), structure
  *    definitions.
  * 3. Exported library functions.
- * 4. Simplified API.
  *
  * The library source code has additional files (principally pngpriv.h) that
  * allow configuration of the library.
@@ -2629,296 +2628,6 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
       : (png_int_32)png_get_uint_32(buf)))
 #endif
 
-/*******************************************************************************
- *  SIMPLIFIED API
- *******************************************************************************
- *
- * Please read the documentation in libpng-manual.txt if you don't understand
- * what follows.
- *
- * The simplified API hides the details of both libpng and the PNG file format
- * itself.  It allows PNG files to be read into a very limited number of
- * in-memory bitmap formats or to be written from the same formats.  If these
- * formats do not accomodate your needs then you can, and should, use the more
- * sophisticated APIs above - these support a wide variety of in-memory formats
- * and a wide variety of sophisticated transformations to those formats as well
- * as a wide variety of APIs to manipulate ancilliary information.
- *
- * To read a PNG file using the simplified API:
- *
- * 1) Declare a 'png_image' structure (see below) on the stack and memset() it
- * to all zero.
- * 2) Call the appropriate png_image_begin_read... function.
- * 3) Set the png_image 'format' member to the required format and allocate a
- * buffer for the image.
- * 4) Call png_image_finish_read to read the image into your buffer.
- *
- * There are no restrictions on the format of the PNG input itself; all valid
- * color types, bit depths, and interlace methods are acceptable, and the
- * input image is transformed as necessary to the requested in-memory format
- * during the png_image_finish_read() step.
- *
- * To write a PNG file using the simplified API:
- *
- * 1) Declare a 'png_image' structure on the stack and memset() it to all zero.
- * 2) Initialize the members of the structure that describe the image, setting
- * the 'format' member to the format of the image in memory.
- * 3) Call the appropriate png_image_write... function with a pointer to the
- * image to write the PNG data.
- *
- * png_image is a structure that describes the in-memory format of an image
- * when it is being read or define the in-memory format of an image that you
- * need to write:
- *
- */
-
-typedef struct png_control *png_controlp;
-typedef struct
-{
-   png_uint_32  width;  /* Image width in pixels (columns) */
-   png_uint_32  height; /* Image height in pixels (rows) */
-   png_uint_32  format; /* Image format as defined below */
-   png_uint_32  flags;  /* A bit mask containing informational flags */
-   png_controlp opaque; /* Initialize to NULL, free with png_image_free */
-
-   /* In the event of an error or warning the following field will be set to a
-    * non-zero value and the 'message' field will contain a '\0' terminated
-    * string with the libpng error or warning message.  If both warnings and
-    * an error were encountered, only the error is recorded.  If there
-    * are multiple warnings, only the first one is recorded.
-    *
-    * As of libpng-1.5.7 the values are
-    *    0 - no warning or error
-    *    1 - error
-    *    2 - warning
-    */
-   png_uint_32  warning_or_error;
-   char         message[64];
-} png_image, *png_imagep;
-
-/* The pixels (samples) of the image have one to four channels whose components
- * have original values in the range 0 to 1.0:
- *
- * 1: A single gray or luminance channel (G).
- * 2: A gray/luminance channel and an alpha channel (GA).
- * 3: Three red, green, blue color channels (RGB).
- * 4: Three color channels and an alpha channel (RGBA).
- *
- * The channels are encoded in one of two ways:
- *
- * a) As a small integer, value 0..255, contained in a (png_byte).  For the
- * alpha channel the original value is simply value/255.  For the color or
- * luminance channels the value is encoded according to the sRGB specification
- * and matches the 8-bit format expected by typical display devices.
- *
- *    The color/gray channels are not scaled (pre-multiplied) by the alpha
- * channel and are suitable for passing to color management software.
- *
- * b) As a value in the range 0..65535, contained in a (png_uint_16).  All
- * channels can be converted to the original value by dividing by 65535; all
- * channels are linear.  Color channels use the RGB encoding (RGB end-points) of
- * the sRGB specification.  This encoding is identified by the
- * PNG_FORMAT_FLAG_LINEAR flag below.
- *
- *    When an alpha channel is present it is expected to denote pixel coverage
- * of the color or luminance channels and is returned as an associated alpha
- * channel: the color/gray channels are scaled (pre-multiplied) by the alpha
- * value.
- */
-
-/* PNG_FORMAT_*
- *
- * #defines to be used in png_image::format.  Each #define identifies a
- * particular layout of channel data and, if present, alpha values.  There are
- * separate defines for each of the two channel encodings.
- *
- * A format is built up using single bit flag values.  Not all combinations are
- * valid: use the bit flag values below for testing a format returned by the
- * read APIs, but set formats from the derived values.
- *
- * NOTE: libpng can be built with particular features disabled, if you see
- * compiler errors because the definition of one of the following flags has been
- * compiled out it is because libpng does not have the required support.  It is
- * possible, however, for the libpng configuration to enable the format on just
- * read or just write; in that case you may see an error at run time.  You can
- * guard against this by checking for the definition of:
- *
- *    PNG_SIMPLIFIED_{READ,WRITE}_{BGR,AFIRST}_SUPPORTED
- */
-#define PNG_FORMAT_FLAG_ALPHA    0x01 /* format with an alpha channel */
-#define PNG_FORMAT_FLAG_COLOR    0x02 /* color format: otherwise grayscale */
-#define PNG_FORMAT_FLAG_LINEAR   0x04 /* png_uint_16 channels else png_byte */
-
-#ifdef PNG_FORMAT_BGR_SUPPORTED
-#  define PNG_FORMAT_FLAG_BGR    0x08 /* BGR colors, else order is RGB */
-#endif
-
-#ifdef PNG_FORMAT_AFIRST_SUPPORTED
-#  define PNG_FORMAT_FLAG_AFIRST 0x10 /* alpha channel comes first */
-#endif
-
-/* Supported formats are as follows.  Future versions of libpng may support more
- * formats; for compatibility with older versions simply check if the format
- * macro is defined using #ifdef.  These defines describe the in-memory layout
- * of the components of the pixels of the image.
- *
- * First the single byte formats:
- */
-#define PNG_FORMAT_GRAY 0
-#define PNG_FORMAT_GA   PNG_FORMAT_FLAG_ALPHA
-#define PNG_FORMAT_AG   (PNG_FORMAT_GA|PNG_FORMAT_FLAG_AFIRST)
-#define PNG_FORMAT_RGB  PNG_FORMAT_FLAG_COLOR
-#define PNG_FORMAT_BGR  (PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_BGR)
-#define PNG_FORMAT_RGBA (PNG_FORMAT_RGB|PNG_FORMAT_FLAG_ALPHA)
-#define PNG_FORMAT_ARGB (PNG_FORMAT_RGBA|PNG_FORMAT_FLAG_AFIRST)
-#define PNG_FORMAT_BGRA (PNG_FORMAT_BGR|PNG_FORMAT_FLAG_ALPHA)
-#define PNG_FORMAT_ABGR (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_AFIRST)
-
-/* Then the linear (png_uint_16) formats.  When naming these "Y" is used to
- * indicate a luminance (gray) channel.  The component order within the pixel
- * is always the same - there is no provision for swapping the order of the
- * components in the linear format.
- */
-#define PNG_FORMAT_LINEAR_Y PNG_FORMAT_FLAG_LINEAR
-#define PNG_FORMAT_LINEAR_Y_ALPHA (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_ALPHA)
-#define PNG_FORMAT_LINEAR_RGB (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR)
-#define PNG_FORMAT_LINEAR_RGB_ALPHA \
-   (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA)
-
-/* PNG_IMAGE macros
- *
- * These are convenience macros to derive information from a png_image structure
- */
-#define PNG_IMAGE_CHANNELS(fmt)\
-   (1+((fmt)&(PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA)))
-   /* Return the total number of channels in a given format: 1..4 */
-
-#define PNG_IMAGE_COMPONENT_SIZE(fmt)\
-   (((fmt) & PNG_FORMAT_FLAG_LINEAR) ? sizeof (png_uint_16) : sizeof (png_byte))
-   /* Return the size in bytes of a single component of a pixel in the image. */
-
-#define PNG_IMAGE_PIXEL_SIZE(fmt)\
-   (PNG_IMAGE_CHANNELS(fmt) * PNG_IMAGE_COMPONENT_SIZE(fmt))
-   /* Return the size in bytes of a single pixel in the image. */
-   
-#define PNG_IMAGE_ROW_STRIDE(image)\
-   (PNG_IMAGE_CHANNELS((image).format) * (image).width)
-   /* Return the total number of components in a single row of the image; this
-    * is the minimum 'row stride', the minimum count of components between each
-    * row.
-    */
-
-#define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
-   (PNG_IMAGE_COMPONENT_SIZE((image).format) * (image).height * (row_stride))
-   /* Return the size, in bytes, of an image buffer given a png_image and a row
-    * stride - the number of components to leave space for in each row.
-    */
-
-#define PNG_IMAGE_SIZE(image)\
-   PNG_IMAGE_BUFFER_SIZE(image, PNG_IMAGE_ROW_STRIDE(image))
-   /* Return the size, in bytes, of the image in memory given just a png_image;
-    * the row stride is the minimum stride required for the image.
-    */
-
-/* PNG_IMAGE_FLAG_*
- *
- * Flags containing additional information about the image are held in the
- * 'flags' field of png_image.
- */
-#define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 1
-   /* This indicates the the RGB values of the in-memory bitmap do not
-    * correspond to the red, green and blue end-points defined by sRGB.
-    */
-
-#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
-/* READ APIs
- * ---------
- *
- * The png_image passed to the read APIs must have been initialized by setting
- * the png_controlp field 'opaque' to NULL (or, better, memset the whole thing.)
- */
-#ifdef PNG_STDIO_SUPPORTED
-PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
-   const char *file_name));
-   /* The named file is opened for read and the image header is filled in
-    * from the PNG header in the file.
-    */
-
-PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
-   FILE* file));
-   /* The PNG header is read from the stdio FILE object. */
-#endif /* PNG_STDIO_SUPPORTED */
-
-PNG_EXPORT(236, int, png_image_begin_read_from_memory, (png_imagep image,
-   png_const_voidp memory, png_size_t size));
-   /* The PNG header is read from the given memory buffer. */
-
-PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
-   png_colorp background, void *buffer, png_int_32 row_stride));
-   /* Finish reading the image into the supplied buffer and clean up the
-    * png_image structure.
-    *
-    * row_stride is the step, in png_byte or png_uint_16 units as appropriate,
-    * between adjacent rows.  A positive stride indicates that the top-most row
-    * is first in the buffer - the normal top-down arrangement.  A negative
-    * stride indicates that the bottom-most row is first in the buffer.
-    *
-    * background need only be supplied if an alpha channel must be removed from
-    * a png_byte format and the removal is to be done by compositing on a solid
-    * color; otherwise it may be NULL and any composition will be done directly
-    * onto the buffer.  The value is an sRGB color to use for the background,
-    * for grayscale output the green channel is used.
-    *
-    * For linear output removing the alpha channel is always done by compositing
-    * on black.
-    */
-
-PNG_EXPORT(238, void, png_image_free, (png_imagep image));
-   /* Free any data allocated by libpng in image->opaque, setting the pointer to
-    * NULL.  May be called at any time after the structure is initialized.
-    */
-#endif /* PNG_SIMPLIFIED_READ_SUPPORTED */
-
-#ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
-/* WRITE APIS
- * ----------
- * For write you must initialize a png_image structure to describe the image to
- * be written:
- *
- * opaque: must be initialized to NULL
- * width: image width in pixels
- * height: image height in rows
- * format: the format of the data you wish to write
- * flags: set to 0 unless one of the defined flags applies; set
- *    PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB for color format images where the RGB
- *    values do not correspond to the colors in sRGB.
- */
-PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
-   const char *file, int convert_to_8bit, const void *buffer,
-   png_int_32 row_stride));
-   /* Write the image to the named file. */
-
-PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
-   int convert_to_8_bit, const void *buffer, png_int_32 row_stride));
-   /* Write the image to the given (FILE*). */
-
-/* With all write APIs if image is in one of the linear formats with
- * (png_uint_16) data then setting convert_to_8_bit will cause the output to be
- * a (png_byte) PNG gamma encoded according to the sRGB specification, otherwise
- * a 16-bit linear encoded PNG file is written.
- *
- * With all APIs row_stride is handled as in the read APIs - it is the spacing
- * from one row to the next in component sized units (float) and if negative
- * indicates a bottom-up row layout in the buffer.
- *
- * Note that the write API does not support interlacing, sub-8-bit pixels,
- * and indexed (paletted) images.
- */
-#endif /* PNG_SIMPLIFIED_WRITE_SUPPORTED */
-/*******************************************************************************
- *  END OF SIMPLIFIED API
- ******************************************************************************/
-
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project
  * defs
  */
@@ -2928,7 +2637,7 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(240);
+  PNG_EXPORT_LAST_ORDINAL(233);
 #endif
 
 #ifdef __cplusplus

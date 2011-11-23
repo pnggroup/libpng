@@ -1163,6 +1163,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_text(read_ptr, read_info_ptr, &text_ptr, &num_text) > 0)
       {
          pngtest_debug1("Handling %d iTXt/tEXt/zTXt chunks", num_text);
+
+         if (verbose)
+            printf("\nText compression=%d\n", text_ptr->compression);
+
          png_set_text(write_ptr, write_info_ptr, text_ptr, num_text);
       }
    }

@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.5.7beta05 - November 18, 2011 */
+/* Libpng 1.5.7beta05 - November 23, 2011 */
 
 /* Copyright (c) 1998-2011 Glenn Randers-Pehrson */
 
@@ -128,12 +128,6 @@
 #define PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
 #define PNG_SETJMP_SUPPORTED
 #define PNG_SET_USER_LIMITS_SUPPORTED
-#define PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
-#define PNG_SIMPLIFIED_READ_BGR_SUPPORTED
-#define PNG_SIMPLIFIED_READ_SUPPORTED
-#define PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
-#define PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
-#define PNG_SIMPLIFIED_WRITE_SUPPORTED
 #define PNG_sPLT_SUPPORTED
 #define PNG_sRGB_SUPPORTED
 #define PNG_STDIO_SUPPORTED
