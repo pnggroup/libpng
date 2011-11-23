@@ -18,7 +18,7 @@ pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh
 
-# Do the following only if the contrib directory is present.
+# Only do the following if the contrib directory is present.
 check_PROGRAMS+= pngvalid pngstest
 pngvalid_SOURCES = pngvalid.c
 pngstest_SOURCES = contrib/libtests/pngstest.c

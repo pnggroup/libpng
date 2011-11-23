@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta05 - November 22, 2011
+Libpng 1.6.0alpha01 - November 23, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.7beta05.tar.gz
-   1.5.7beta05.tar.bz2
+   1.6.0alpha01.tar.xz (LZMA-compressed, recommended)
+   1.6.0alpha01.tar.gz
+   1.6.0alpha01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157b05.7z  (LZMA-compressed, recommended)
-   lp157b05.zip
+   lp160a01.7z  (LZMA-compressed, recommended)
+   lp160a01.zip
 
 Other information:
 
-   1.5.7beta05-README.txt
-   1.5.7beta05-LICENSE.txt
+   1.6.0alpha01-README.txt
+   1.6.0alpha01-LICENSE.txt
 
 Changes since the last public release (1.5.6):
 
@@ -99,13 +99,15 @@ Version 1.5.7beta04 [November 17, 2011]
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
-Version 1.5.7beta05 [November 22, 2011]
+Version 1.5.7beta05 [November 23, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
     (Frank Busse).
   Allow row_stride==0 to indicate default stride in simplified API.
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
+
+Version 1.6.0alpha01 [November 23, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

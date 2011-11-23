@@ -22,8 +22,8 @@
 # make clean
 
 VERMAJ = 1
-VERMIN = 5
-VERMIC = 7
+VERMIN = 6
+VERMIC = 0
 VER = $(VERMAJ).$(VERMIN).$(VERMIC)
 NAME = libpng
 PACKAGE = $(NAME)-$(VER)
