@@ -8,36 +8,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0alpha01
 
 \fI\fB
 
-\fBint \fP\fIpng_image_begin_read_from_file\fP\fB, (png_imagep \fIimage,
-
-\fBconst char \fI*file_name)\fP\fB);\fP
-
-\fBint \fP\fIpng_image_begin_read_from_stdio\fP\fB, (png_imagep \fIimage,
-
-\fBFILE* \fIfile)\fP\fB);\fP
-
-\fBint, \fP\fIpng_image_begin_read_from_memory\fP\fB, (png_imagep \fIimage,
-
-\fBpng_const_voidp \fP\fImemory\fP\fB, png_size_t \fIsize)\fP\fB);\fP
-
-\fBint \fP\fIpng_image_finish_read\fP\fB, (png_imagep \fIimage,
-
-\fBpng_colorp \fP\fIbackground\fP\fB, void \fP\fI*buffer\fP\fB, png_int_32 \fIrow_stride)\fP\fB);\fP
-
-\fBvoid \fP\fIpng_image_free\fP\fB, (png_imagep \fIimage)\fP\fB);\fP
-
-\fBint \fP\fIpng_image_write_to_file\fP\fB, (png_imagep \fIimage,
-
-\fBconst char \fP\fI*file\fP\fB, int \fP\fIconvert_to_8bit\fP\fB, const void \fI*buffer,
-
-\fBpng_int_32 \fIrow_stride)\fP\fB);\fP
-
-\fBint \fP\fIpng_image_write_to_stdio\fP\fB, (png_imagep \fP\fIimage\fP\fB, FILE \fI*file,
-
-\fBint \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fIrow_stride)\fP\fB);\fP
-
-\fI\fB
-
 \fBpng_uint_32 png_access_version_number \fI(void\fP\fB);\fP
 
 \fI\fB
