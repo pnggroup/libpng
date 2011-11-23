@@ -3753,7 +3753,7 @@ Version 1.5.7beta05 [November 23, 2011]
   Backed out 'simplified' API changes. The API seems too complex and there
     is a lack of consensus or enthusiasm for the proposals.  The API also
     reveals significant bugs inside libpng (double gamma correction and the
-    known bug of being unable to retrieve a corrected palette.) It seems
+    known bug of being unable to retrieve a corrected palette). It seems
     better to wait until the bugs, at least, are corrected.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
