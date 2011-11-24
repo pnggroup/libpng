@@ -333,7 +333,7 @@ TESTS_ENVIRONMENT = srcdir=$(srcdir)
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh
-pngvalid_SOURCES = pngvalid.c
+pngvalid_SOURCES = contrib/libtests/pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 # man pages
@@ -709,6 +709,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo: pngwutil.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='pngwutil.c' object='libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-pngwutil.lo `test -f 'pngwutil.c' || echo '$(srcdir)/'`pngwutil.c
+
+pngvalid.o: contrib/libtests/pngvalid.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pngvalid.o -MD -MP -MF $(DEPDIR)/pngvalid.Tpo -c -o pngvalid.o `test -f 'contrib/libtests/pngvalid.c' || echo '$(srcdir)/'`contrib/libtests/pngvalid.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pngvalid.Tpo $(DEPDIR)/pngvalid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngvalid.c' object='pngvalid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngvalid.o `test -f 'contrib/libtests/pngvalid.c' || echo '$(srcdir)/'`contrib/libtests/pngvalid.c
+
+pngvalid.obj: contrib/libtests/pngvalid.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pngvalid.obj -MD -MP -MF $(DEPDIR)/pngvalid.Tpo -c -o pngvalid.obj `if test -f 'contrib/libtests/pngvalid.c'; then $(CYGPATH_W) 'contrib/libtests/pngvalid.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngvalid.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pngvalid.Tpo $(DEPDIR)/pngvalid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngvalid.c' object='pngvalid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngvalid.obj `if test -f 'contrib/libtests/pngvalid.c'; then $(CYGPATH_W) 'contrib/libtests/pngvalid.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngvalid.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1335,7 +1349,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-pngvalid.o pngtest.o: pnglibconf.h
+contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
 
 .dfn.out:
 	rm -f $@ dfn.c dfn?.out

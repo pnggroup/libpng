@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.7 [%RDATE%]
  * Copyright (c) 2011 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -33,7 +33,7 @@
 #  include <fenv.h>
 #endif
 
-#include "png.h"
+#include "../../png.h"
 
 #if PNG_LIBPNG_VER < 10500
 /* This delibarately lacks the PNG_CONST. */

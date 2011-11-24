@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta05 - November 23, 2011
+Libpng 1.5.7beta05 - November 24, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -99,7 +99,7 @@ Version 1.5.7beta04 [November 17, 2011]
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
-Version 1.5.7beta05 [November 23, 2011]
+Version 1.5.7beta05 [November 24, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
     (Frank Busse).
@@ -108,8 +108,10 @@ Version 1.5.7beta05 [November 23, 2011]
   Backed out 'simplified' API changes. The API seems too complex and there
     is a lack of consensus or enthusiasm for the proposals.  The API also
     reveals significant bugs inside libpng (double gamma correction and the
-    known bug of being unable to retrieve a corrected palette.) It seems
+    known bug of being unable to retrieve a corrected palette). It seems
     better to wait until the bugs, at least, are corrected.
+  Moved pngvalid.c into contrib/libtests
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.68
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

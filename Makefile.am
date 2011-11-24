@@ -20,9 +20,8 @@ TESTS = test-pngtest.sh
 
 # Only do the following if the contrib directory is present.
 check_PROGRAMS+= pngvalid
-pngvalid_SOURCES = pngvalid.c
+pngvalid_SOURCES = contrib/libtests/pngvalid.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS += test-pngvalid-simple.sh test-pngvalid-full.sh
 
 # man pages
@@ -131,7 +130,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-pngvalid.o pngtest.o: pnglibconf.h
+contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
