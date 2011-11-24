@@ -382,11 +382,12 @@
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   5
 #define PNG_LIBPNG_VER_RELEASE 7
+
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  02
+#define PNG_LIBPNG_VER_BUILD  05
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
