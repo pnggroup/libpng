@@ -13,9 +13,9 @@
 LOCALBASE?=/usr/local
 LIBDIR=	${LOCALBASE}/lib
 MANDIR= ${LOCALBASE}/man
-INCSDIR=${LOCALBASE}/include/libpng15
+INCSDIR=${LOCALBASE}/include/libpng16
 
-LIB=	png15
+LIB=	png16
 SHLIB_MAJOR=	0
 SHLIB_MINOR=	1.6.0alpha01
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \

@@ -376,8 +376,8 @@
 #define PNG_HEADER_VERSION_STRING \
      " libpng version 1.6.0alpha01 - November 24, 2011\n"
 
-#define PNG_LIBPNG_VER_SONUM   15
-#define PNG_LIBPNG_VER_DLLNUM  15
+#define PNG_LIBPNG_VER_SONUM   16
+#define PNG_LIBPNG_VER_DLLNUM  16
 
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1

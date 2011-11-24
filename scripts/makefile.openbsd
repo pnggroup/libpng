@@ -10,7 +10,7 @@ PREFIX?= /usr/local
 LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
-SHLIB_MAJOR=	15
+SHLIB_MAJOR=	16
 SHLIB_MINOR=	1.6.0alpha01
 
 LIB=	png

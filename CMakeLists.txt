@@ -229,9 +229,9 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 15.${PNGLIB_RELEASE}.1.6.0alpha01
-    VERSION 15.${PNGLIB_RELEASE}.0
-    SOVERSION 15
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.0alpha01
+    VERSION 16.${PNGLIB_RELEASE}.0
+    SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
 endif()
 if(PNG_STATIC)
@@ -263,7 +263,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-    # Create a symlink for libpng.dll.a => libpng15.dll.a on Cygwin
+    # Create a symlink for libpng.dll.a => libpng16.dll.a on Cygwin
     if(CYGWIN OR MINGW)
        get_target_property(BUILD_TARGET_LOCATION ${PNG_LIB_NAME} LOCATION_${CMAKE_BUILD_TYPE})
        get_filename_component(BUILD_TARGET_FILE ${BUILD_TARGET_LOCATION} NAME)

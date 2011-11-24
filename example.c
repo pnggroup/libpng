@@ -22,11 +22,165 @@
  * see also the programs in the contrib directory.
  */
 
-#define _POSIX_SOURCE 1  /* libpng and zlib are POSIX-compliant.  You may
-                          * change this if your application uses non-POSIX
-                          * extensions. */
+/* The simple, but restricted, approach to reading a PNG file or data stream
+ * just requires two function calls, as in the following complete program.
+ * Writing a file just needs one function call, so long as the data has an
+ * appropriate layout.
+ *
+ * The following code reads PNG image data from a file and writes it, in a
+ * potentially new format, to a new file.  While this code will compile there is
+ * minimal (insufficient) error checking; for a more realistic version look at
+ * contrib/examples/pngtopng.c
+ */
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <png.h>
 
-#include "png.h"
+int main(int argc, const char **argv)
+{
+   if (argc == 3)
+   {
+      png_image image; /* The control structure used by libpng */
+
+      /* Initialize the 'png_image' structure. */
+      memset(&image, 0, sizeof image);
+
+      /* The first argument is the file to read: */
+      if (png_image_begin_read_from_file(&image, argv[1]))
+      {
+         png_bytep buffer;
+
+         /* Set the format in which to read the PNG file; this code chooses a
+          * simple sRGB format with a non-associated alpha channel, adequate to
+          * store most images.
+          */
+         image.format = PNG_FORMAT_RGBA;
+
+         /* Now allocate enough memory to hold the image in this format; the
+          * PNG_IMAGE_SIZE macro uses the information about the image (width,
+          * height and format) stored in 'image'.
+          */
+         buffer = malloc(PNG_IMAGE_SIZE(image));
+
+         /* If enough memory was available read the image in the desired format
+          * then write the result out to the new file.  'background' is not
+          * necessary when reading the image because the alpha channel is
+          * preserved; if it were to be removed, for example if we requested
+          * PNG_FORMAT_RGB, then either a solid background color would have to
+          * be supplied or the output buffer would have to be initialized to the
+          * actual background of the image.
+          *
+          * The final argument to png_image_finish_read is the 'row_stride' -
+          * this is the number of components allocated for the image in each
+          * row.  It has to be at least as big as the value returned by
+          * PNG_IMAGE_ROW_STRIDE, but if you just allocate space for the
+          * default, minimum, size using PNG_IMAGE_SIZE as above you can pass
+          * zero.
+          */
+         if (buffer != NULL &&
+            png_image_finish_read(&image, NULL/*background*/, buffer,
+               0/*row_stride*/))
+         {
+            /* Now write the image out to the second argument.  In the write
+             * call 'convert_to_8bit' allows 16-bit data to be squashed down to
+             * 8 bits; this isn't necessary here because the original read was
+             * to the 8-bit format.
+             */
+            if (png_image_write_to_file(&image, argv[2], 0/*convert_to_8bit*/,
+               buffer, 0/*row_stride*/))
+            {
+               /* The image has been written successfully. */
+               exit(0);
+            }
+         }
+      }
+
+      /* Something went wrong reading or writing the image.  libpng stores a
+       * textual message in the 'png_image' structure:
+       */
+      fprintf(stderr, "pngtopng: error: %s\n", image.message);
+      exit (1);
+   }
+
+   fprintf(stderr, "pngtopng: usage: pngtopng input-file output-file\n");
+   exit(1);
+}
+
+/* That's it ;-)  Of course you probably want to do more with PNG files than
+ * just converting them all to 32-bit RGBA PNG files; you can do that between
+ * the call to png_image_finish_read and png_image_write_to_file.  You can also
+ * ask for the image data to be presented in a number of different formats.  You
+ * do this by simply changing the 'format' parameter set before allocating the
+ * buffer.
+ *
+ * The format parameter consists of five flags that define various aspects of
+ * the image, you can simply add these together to get the format or you can use
+ * one of the predefined macros from png.h (as above):
+ *
+ * PNG_FORMAT_FLAG_COLOR: if set the image will have three color components per
+ *    pixel (red, green and blue), if not set the image will just have one
+ *    luminance (grayscale) component.
+ *
+ * PNG_FORMAT_FLAG_ALPHA: if set each pixel in the image will have an additional
+ *    alpha value; a linear value that describes the degree the image pixel
+ *    covers (overwrites) the contents of the existing pixel on the display.
+ *
+ * PNG_FORMAT_FLAG_LINEAR: if set the components of each pixel will be returned
+ *    as a series of 16-bit linear values, if not set the components will be
+ *    returned as a series of 8-bit values encoded according to the 'sRGB'
+ *    standard.  The 8-bit format is the normal format for images intended for
+ *    direct display, because almost all display devices do the inverse of the
+ *    sRGB transformation to the data they receive.  The 16-bit format is more
+ *    common for scientific data and image data that must be further processed;
+ *    because it is linear simple math can be done on the component values.
+ *    Regardless of the setting of this flag the alpha channel is always linear,
+ *    although it will be 8 bits or 16 bits wide as specified by the flag.
+ *
+ * PNG_FORMAT_FLAG_BGR: if set the components of a color pixel will be returned
+ *    in the order blue, then green, then red.  If not set the pixel components
+ *    are in the order red, then green, then blue.
+ *
+ * PNG_FORMAT_FLAG_AFIRST: if set the alpha channel (if present) precedes the
+ *    color or grayscale components.  If not set the alpha channel follows the
+ *    components.
+ *
+ * You do not have to read directly from a file.  You can read from memory or,
+ * on systems that support it, from a <stdio.h> FILE*.  This is controlled by
+ * the particular png_image_read_from_ function you call at the start.  Likewise
+ * on write you can write to a FILE* if your system supports it.  Check the
+ * macro PNG_STDIO_SUPPORTED to see if stdio support has been included in your
+ * libpng build.
+ *
+ * If you read 16-bit (PNG_FORMAT_FLAG_LINEAR) data you may need to write it in
+ * the 8-bit format for display.  You do this by setting the convert_to_8bit
+ * flag to 'true'.
+ *
+ * Don't repeatedly convert between the 8-bit and 16-bit forms.  There is
+ * significant data loss when 16-bit data is converted to the 8-bit encoding and
+ * the current libpng implementation of convertion to 16-bit is also
+ * significantly lossy.  The latter will be fixed in the future, but the former
+ * is unavoidable - the 8-bit format just doesn't have enough resolution.
+ */
+
+/* If your program needs more information from the PNG data it reads, or if you
+ * need to do more complex transformations, or minimise transformations, on the
+ * data you read, then you must use one of the several lower level libpng
+ * interfaces.
+ *
+ * All these interfaces require that you do your own error handling - your
+ * program must be able to arrange for control to return to your own code any
+ * time libpng encounters a problem.  There are several ways to do this, but the
+ * standard way is to use the ANSI-C (C90) <setjmp.h> interface to establish a
+ * return point within your own code.  You must do this if you do not use the
+ * simplified interface (above).
+ *
+ * The first step is to include the header files you need, including the libpng
+ * header file.  Include any standard headers and feature test macros your
+ * program requires before including png.h:
+ */
+#include <png.h>
 
  /* The png_jmpbuf() macro, used in error handling, became available in
   * libpng version 1.0.6.  If you want to be able to run your code with older

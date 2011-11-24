@@ -1673,7 +1673,7 @@ png_image_read_composite(png_voidp argument)
 
                            /* So 'component' is scaled by 255*65535 and is
                             * therefore appropriate for the sRGB to linear
-                            * convertion table.
+                            * conversion table.
                             */
                            component = PNG_sRGB_FROM_LINEAR(component);
                         }
