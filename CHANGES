@@ -3754,6 +3754,8 @@ Version 1.5.7beta05 [(PENDING RELEASE)]
 
 Version 1.6.0alpha01 [November 24, 2011]
   Added example programs for the new 'simplified' API.
+  Moved pngvalid.c into contrib/libtests
+  Rebuilt Makefile.in configure with autoconf-2.68
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

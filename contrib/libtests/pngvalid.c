@@ -33,7 +33,7 @@
 #  include <fenv.h>
 #endif
 
-#include "png.h"
+#include "../../png.h"
 
 #if PNG_LIBPNG_VER < 10500
 /* This delibarately lacks the PNG_CONST. */

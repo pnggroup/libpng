@@ -184,6 +184,7 @@ distcleancheck_listfiles = find . -type f -print
 pkgincludedir = $(includedir)/$(PNGLIB_BASENAME)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
+AM_CCASFLAGS = @AM_CCASFLAGS@
 AR = @AR@
 AS = @AS@
 AUTOCONF = @AUTOCONF@
@@ -329,16 +330,17 @@ PNGLIB_BASENAME = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 # to get red "FAIL" and green "PASS" notations during tests.
 # AUTOMAKE_OPTIONS = foreign color-tests
 AUTOMAKE_OPTIONS = foreign
+
+# test programs - run on make check, make distcheck
+TESTS_ENVIRONMENT = srcdir=$(srcdir)
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngvalid_SOURCES = pngvalid.c
-pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngstest_SOURCES = contrib/libtests/pngstest.c
-pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh test-pngvalid-simple.sh test-pngvalid-full.sh \
 	test-pngstest.sh
-
-TESTS_ENVIRONMENT = srcdir=$(srcdir)
+pngvalid_SOURCES = contrib/libtests/pngvalid.c
+pngstest_SOURCES = contrib/libtests/pngstest.c
+pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 # man pages
 dist_man_MANS = libpng.3 libpngpf.3 png.5
@@ -731,6 +733,20 @@ pngstest.obj: contrib/libtests/pngstest.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngstest.c' object='pngstest.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngstest.obj `if test -f 'contrib/libtests/pngstest.c'; then $(CYGPATH_W) 'contrib/libtests/pngstest.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngstest.c'; fi`
+
+pngvalid.o: contrib/libtests/pngvalid.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pngvalid.o -MD -MP -MF $(DEPDIR)/pngvalid.Tpo -c -o pngvalid.o `test -f 'contrib/libtests/pngvalid.c' || echo '$(srcdir)/'`contrib/libtests/pngvalid.c
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pngvalid.Tpo $(DEPDIR)/pngvalid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngvalid.c' object='pngvalid.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngvalid.o `test -f 'contrib/libtests/pngvalid.c' || echo '$(srcdir)/'`contrib/libtests/pngvalid.c
+
+pngvalid.obj: contrib/libtests/pngvalid.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT pngvalid.obj -MD -MP -MF $(DEPDIR)/pngvalid.Tpo -c -o pngvalid.obj `if test -f 'contrib/libtests/pngvalid.c'; then $(CYGPATH_W) 'contrib/libtests/pngvalid.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngvalid.c'; fi`
+@am__fastdepCC_TRUE@	$(am__mv) $(DEPDIR)/pngvalid.Tpo $(DEPDIR)/pngvalid.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='contrib/libtests/pngvalid.c' object='pngvalid.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o pngvalid.obj `if test -f 'contrib/libtests/pngvalid.c'; then $(CYGPATH_W) 'contrib/libtests/pngvalid.c'; else $(CYGPATH_W) '$(srcdir)/contrib/libtests/pngvalid.c'; fi`
 
 mostlyclean-libtool:
 	-rm -f *.lo
@@ -1357,7 +1373,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-contrib/libtests/pngstest.o pngvalid.o pngtest.o: pnglibconf.h
+contrib/libtests/pngstest.o contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
 
 .dfn.out:
 	rm -f $@ dfn.c dfn?.out
