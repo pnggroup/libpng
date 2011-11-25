@@ -1,7 +1,11 @@
-This directory contains examples of libpng usage.
 
-NO COPYRIGHT IS CLAIMED TO ANY OF THE FILES IN THIS DIRECTORY.
-They have been placed in the public domain by the authors.
+This directory (contrib/examples) contains examples of libpng usage.
+
+NO COPYRIGHT RIGHTS ARE CLAIMED TO ANY OF THE FILES IN THIS DIRECTORY.
+
+To the extent possible under law, the authors have waived all copyright and
+related or neighboring rights to this work.  This work is published from:
+United States.
 
 The files may be used freely in any way.  The intention is that appropriate
 parts of the files be used in other libpng-using programs without any need for

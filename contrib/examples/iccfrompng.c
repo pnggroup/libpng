@@ -1,7 +1,9 @@
 /*- iccfrompng
  *
- * COPYRIGHT: please read the file "README.txt" from the containing directory..
- * This file has been placed in the public domain by the authors.
+ * COPYRIGHT: Written by John Cunningham Bowler, 2011.
+ * To the extent possible under law, the author has waived all copyright and
+ * related or neighboring rights to this work.  This work is published from:
+ * United States.
  *
  * Extract any icc profiles found in the given PNG files.  This is a simple
  * example of a program which extracts information from the header of a PNG file
