@@ -3744,7 +3744,7 @@ Version 1.5.7beta04 [November 17, 2011]
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
-Version 1.5.7beta05 [November 24, 2011]
+Version 1.5.7beta05 [November 25, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
     (Frank Busse).
