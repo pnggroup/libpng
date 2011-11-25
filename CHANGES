@@ -3758,6 +3758,8 @@ Version 1.5.7beta05 [November 25, 2011]
   Moved pngvalid.c into contrib/libtests
   Rebuilt Makefile.in, configure, etc., with autoconf-2.68
 
+Version 1.5.7beta06 [November 25, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

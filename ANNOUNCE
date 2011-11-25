@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta05 - November 25, 2011
+Libpng 1.5.7beta06 - November 25, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.7beta05.tar.gz
-   1.5.7beta05.tar.bz2
+   1.5.7beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.7beta06.tar.gz
+   1.5.7beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157b05.7z  (LZMA-compressed, recommended)
-   lp157b05.zip
+   lp157b06.7z  (LZMA-compressed, recommended)
+   lp157b06.zip
 
 Other information:
 
-   1.5.7beta05-README.txt
-   1.5.7beta05-LICENSE.txt
+   1.5.7beta06-README.txt
+   1.5.7beta06-LICENSE.txt
 
 Changes since the last public release (1.5.6):
 
@@ -112,6 +112,8 @@ Version 1.5.7beta05 [November 25, 2011]
     better to wait until the bugs, at least, are corrected.
   Moved pngvalid.c into contrib/libtests
   Rebuilt Makefile.in, configure, etc., with autoconf-2.68
+
+Version 1.5.7beta06 [November 25, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
