@@ -126,6 +126,8 @@ Version 1.6.0alpha01 [November 27, 2011]
     seems likely that it will ask 'malloc' for more than 65535 bytes with any
     image that has a sufficiently large row size (rather than simply failing
     to read such images).
+  Removed machine-generated configure files from the GIT repository (they will
+    continue to appear in the tarball distributions).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
