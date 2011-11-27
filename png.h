@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0alpha01 - November 24, 2011
+ * libpng version 1.6.0alpha01 - November 27, 2011
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0alpha01 - November 24, 2011: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0alpha01 - November 27, 2011: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -196,7 +196,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0alpha01, November 24, 2011, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0alpha01, November 27, 2011, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -308,7 +308,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 24, 2011
+ *    November 27, 2011
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -374,7 +374,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0alpha01"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0alpha01 - November 24, 2011\n"
+     " libpng version 1.6.0alpha01 - November 27, 2011\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -426,25 +426,7 @@
 #endif
 
 #ifndef PNG_VERSION_INFO_ONLY
-#  ifndef PNG_BUILDING_SYMBOL_TABLE
-  /*
-   *   Standard header files (not needed for the version info or while
-   *   building symbol table -- see scripts/pnglibconf.dfa)
-   */
-#    ifdef PNG_SETJMP_SUPPORTED
-#      include <setjmp.h>
-#    endif
-
-    /* Need the time information for converting tIME chunks, it
-     * defines struct tm:
-     */
-#    ifdef PNG_CONVERT_tIME_SUPPORTED
-       /* "time.h" functions are not supported on all operating systems */
-#      include <time.h>
-#    endif
-#  endif
-
-/* Machine specific configuration. */
+   /* Machine specific configuration. */
 #  include "pngconf.h"
 #endif
 
@@ -548,9 +530,9 @@ typedef struct png_color_struct
    png_byte green;
    png_byte blue;
 } png_color;
-typedef png_color FAR * png_colorp;
-typedef PNG_CONST png_color FAR * png_const_colorp;
-typedef png_color FAR * FAR * png_colorpp;
+typedef png_color * png_colorp;
+typedef const png_color * png_const_colorp;
+typedef png_color * * png_colorpp;
 
 typedef struct png_color_16_struct
 {
@@ -560,9 +542,9 @@ typedef struct png_color_16_struct
    png_uint_16 blue;
    png_uint_16 gray;  /* for use in grayscale files */
 } png_color_16;
-typedef png_color_16 FAR * png_color_16p;
-typedef PNG_CONST png_color_16 FAR * png_const_color_16p;
-typedef png_color_16 FAR * FAR * png_color_16pp;
+typedef png_color_16 * png_color_16p;
+typedef const png_color_16 * png_const_color_16p;
+typedef png_color_16 * * png_color_16pp;
 
 typedef struct png_color_8_struct
 {
@@ -572,9 +554,9 @@ typedef struct png_color_8_struct
    png_byte gray;  /* for use in grayscale files */
    png_byte alpha; /* for alpha channel files */
 } png_color_8;
-typedef png_color_8 FAR * png_color_8p;
-typedef PNG_CONST png_color_8 FAR * png_const_color_8p;
-typedef png_color_8 FAR * FAR * png_color_8pp;
+typedef png_color_8 * png_color_8p;
+typedef const png_color_8 * png_const_color_8p;
+typedef png_color_8 * * png_color_8pp;
 
 /*
  * The following two structures are used for the in-core representation
@@ -588,9 +570,9 @@ typedef struct png_sPLT_entry_struct
    png_uint_16 alpha;
    png_uint_16 frequency;
 } png_sPLT_entry;
-typedef png_sPLT_entry FAR * png_sPLT_entryp;
-typedef PNG_CONST png_sPLT_entry FAR * png_const_sPLT_entryp;
-typedef png_sPLT_entry FAR * FAR * png_sPLT_entrypp;
+typedef png_sPLT_entry * png_sPLT_entryp;
+typedef const png_sPLT_entry * png_const_sPLT_entryp;
+typedef png_sPLT_entry * * png_sPLT_entrypp;
 
 /*  When the depth of the sPLT palette is 8 bits, the color and alpha samples
  *  occupy the LSB of their respective members, and the MSB of each member
@@ -604,9 +586,9 @@ typedef struct png_sPLT_struct
    png_sPLT_entryp entries;  /* palette entries */
    png_int_32 nentries;      /* number of palette entries */
 } png_sPLT_t;
-typedef png_sPLT_t FAR * png_sPLT_tp;
-typedef PNG_CONST png_sPLT_t FAR * png_const_sPLT_tp;
-typedef png_sPLT_t FAR * FAR * png_sPLT_tpp;
+typedef png_sPLT_t * png_sPLT_tp;
+typedef const png_sPLT_t * png_const_sPLT_tp;
+typedef png_sPLT_t * * png_sPLT_tpp;
 
 #ifdef PNG_TEXT_SUPPORTED
 /* png_text holds the contents of a text/ztxt/itxt chunk in a PNG file,
@@ -643,9 +625,9 @@ typedef struct png_text_struct
    png_charp lang_key;     /* keyword translated UTF-8 string, 0 or more
                               chars or a NULL pointer */
 } png_text;
-typedef png_text FAR * png_textp;
-typedef PNG_CONST png_text FAR * png_const_textp;
-typedef png_text FAR * FAR * png_textpp;
+typedef png_text * png_textp;
+typedef const png_text * png_const_textp;
+typedef png_text * * png_textpp;
 #endif
 
 /* Supported compression types for text in PNG files (tEXt, and zTXt).
@@ -673,9 +655,9 @@ typedef struct png_time_struct
    png_byte minute;  /* minute of hour, 0 - 59 */
    png_byte second;  /* second of minute, 0 - 60 (for leap seconds) */
 } png_time;
-typedef png_time FAR * png_timep;
-typedef PNG_CONST png_time FAR * png_const_timep;
-typedef png_time FAR * FAR * png_timepp;
+typedef png_time * png_timep;
+typedef const png_time * png_const_timep;
+typedef png_time * * png_timepp;
 
 #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
     defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
@@ -696,9 +678,9 @@ typedef struct png_unknown_chunk_t
 
 
 png_unknown_chunk;
-typedef png_unknown_chunk FAR * png_unknown_chunkp;
-typedef PNG_CONST png_unknown_chunk FAR * png_const_unknown_chunkp;
-typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
+typedef png_unknown_chunk * png_unknown_chunkp;
+typedef const png_unknown_chunk * png_const_unknown_chunkp;
+typedef png_unknown_chunk * * png_unknown_chunkpp;
 #endif
 
 /* Values for the unknown chunk location byte */
@@ -712,9 +694,9 @@ typedef png_unknown_chunk FAR * FAR * png_unknown_chunkpp;
  * applications.  Read libpng-manual.txt or libpng.3 for more info.
  */
 typedef struct png_info_def png_info;
-typedef png_info FAR * png_infop;
-typedef PNG_CONST png_info FAR * png_const_infop;
-typedef png_info FAR * FAR * png_infopp;
+typedef png_info * png_infop;
+typedef const png_info * png_const_infop;
+typedef png_info * * png_infopp;
 
 /* Maximum positive integer used in PNG is (2^31)-1 */
 #define PNG_UINT_31_MAX ((png_uint_32)0x7fffffffL)
@@ -831,16 +813,16 @@ typedef struct png_row_info_struct
    png_byte pixel_depth; /* bits per pixel (depth * channels) */
 } png_row_info;
 
-typedef png_row_info FAR * png_row_infop;
-typedef png_row_info FAR * FAR * png_row_infopp;
+typedef png_row_info * png_row_infop;
+typedef png_row_info * * png_row_infopp;
 
 /* The complete definition of png_struct has, as of libpng-1.5.0,
  * been moved into a separate header file that is not accessible to
  * applications.  Read libpng-manual.txt or libpng.3 for more info.
  */
 typedef struct png_struct_def png_struct;
-typedef PNG_CONST png_struct FAR * png_const_structp;
-typedef png_struct FAR * png_structp;
+typedef const png_struct * png_const_structp;
+typedef png_struct * png_structp;
 
 /* These are the function types for the I/O functions and for the functions
  * that allow the user to override the default I/O functions with his or her
@@ -943,7 +925,7 @@ typedef PNG_CALLBACK(png_voidp, *png_malloc_ptr, (png_structp,
     png_alloc_size_t));
 typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp));
 
-typedef png_struct FAR * FAR * png_structpp;
+typedef png_struct * * png_structpp;
 
 /* Section 3: exported functions
  * Here are the function definitions most commonly used.  This is not
@@ -1105,7 +1087,7 @@ PNG_EXPORT(23, png_const_charp, png_convert_to_rfc1123,
 #ifdef PNG_CONVERT_tIME_SUPPORTED
 /* Convert from a struct tm to png_time */
 PNG_EXPORT(24, void, png_convert_from_struct_tm, (png_timep ptime,
-    PNG_CONST struct tm FAR * ttime));
+    const struct tm * ttime));
 
 /* Convert from time_t to png_time.  Uses gmtime() */
 PNG_EXPORT(25, void, png_convert_from_time_t,

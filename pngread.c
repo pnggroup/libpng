@@ -48,12 +48,6 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    png_structp png_ptr;
    volatile int png_cleanup_needed = 0;
 
-#ifdef PNG_SETJMP_SUPPORTED
-#ifdef USE_FAR_KEYWORD
-   jmp_buf tmp_jmpbuf;
-#endif
-#endif
-
    png_debug(1, "in png_create_read_struct");
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -86,15 +80,8 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
  * encounter a png_error() will longjmp here.  Since the jmpbuf is
  * then meaningless we abort instead of returning.
  */
-#ifdef USE_FAR_KEYWORD
-   if (setjmp(tmp_jmpbuf))
-#else
    if (setjmp(png_jmpbuf(png_ptr))) /* Sets longjmp to match setjmp */
-#endif
       PNG_ABORT();
-#ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(png_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
-#endif
 #endif /* PNG_SETJMP_SUPPORTED */
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -1337,7 +1324,7 @@ png_image_read_init(png_imagep image)
 
          if (control != NULL)
          {
-            memset(control, 0, sizeof *control);
+            png_memset(control, 0, sizeof *control);
 
             control->png_ptr = png_ptr;
             control->info_ptr = info_ptr;
@@ -1520,7 +1507,7 @@ png_image_memory_read(png_structp png_ptr, png_bytep out, png_size_t need)
 
             if (memory != NULL && size >= need)
             {
-               memcpy(out, memory, need);
+               png_memcpy(out, memory, need);
                cp->memory = memory + need;
                cp->size = size - need;
                return;
@@ -2437,7 +2424,7 @@ png_image_finish_read(png_imagep image, png_colorp background, void *buffer,
          int result;
          png_image_read_control display;
 
-         memset(&display, 0, sizeof display);
+         png_memset(&display, 0, sizeof display);
          display.image = image;
          display.buffer = buffer;
          display.row_stride = row_stride;

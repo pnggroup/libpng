@@ -305,7 +305,7 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
        * inside it is possible to chunk the input to zlib and simply rely on
        * zlib to advance the 'next_in' pointer.  This allows arbitrary amounts o
        * data to be passed through zlib at the unavoidable cost of requiring a
-       * window save (memcpy of up to 32768 output bytes) every ZLIB_IO_MAX
+       * window save (png_memcpy of up to 32768 output bytes) every ZLIB_IO_MAX
        * input bytes.
        */
       if (png_ptr->zstream.avail_in == 0 && size > 0)

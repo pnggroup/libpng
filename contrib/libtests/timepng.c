@@ -19,7 +19,11 @@
 
 #include <time.h>
 
-#include "png.h"
+#ifdef HAVE_CONFIG_H
+#  include "../../config.h"
+#endif
+
+#include "../../png.h"
 
 static int read_png(FILE *fp)
 {

@@ -39,13 +39,9 @@
  */
 #define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
 
-/* This is required for the definition of abort(), used as a last ditch
- * error handler when all else fails.
- */
+/* Standard library headers not required by png.h: */
 #include <stdlib.h>
-
-/* This is used to find 'offsetof', used below for alignment tests. */
-#include <stddef.h>
+#include <string.h>
 
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
@@ -136,7 +132,7 @@
 /* This is used for 16 bit gamma tables - only the top level pointers are const,
  * this could be changed:
  */
-typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
+typedef const png_uint_16p * png_const_uint_16pp;
 
 /* Added at libpng-1.2.9 */
 /* Moved to pngpriv.h at libpng-1.5.0 */
@@ -347,33 +343,14 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  endif
 #endif
 
-#ifdef USE_FAR_KEYWORD
-/* Use this to make far-to-near assignments */
-#  define CHECK   1
-#  define NOCHECK 0
-#  define CVT_PTR(ptr) (png_far_to_near(png_ptr,ptr,CHECK))
-#  define CVT_PTR_NOCHECK(ptr) (png_far_to_near(png_ptr,ptr,NOCHECK))
-#  define png_strlen  _fstrlen
-#  define png_memcmp  _fmemcmp    /* SJT: added */
-#  define png_memcpy  _fmemcpy
-#  define png_memset  _fmemset
-#else
-#  ifdef _WINDOWS_  /* Favor Windows over C runtime fns */
-#    define CVT_PTR(ptr)         (ptr)
-#    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_strlen  lstrlenA
-#    define png_memcmp  memcmp
-#    define png_memcpy  CopyMemory
-#    define png_memset  memset
-#  else
-#    define CVT_PTR(ptr)         (ptr)
-#    define CVT_PTR_NOCHECK(ptr) (ptr)
-#    define png_strlen  strlen
-#    define png_memcmp  memcmp      /* SJT: added */
-#    define png_memcpy  memcpy
-#    define png_memset  memset
-#  endif
-#endif
+/* Prior to 1.6.0 if _WINDOWS_ was defined 'lstrlenA' and 'CopyMemory' were used
+ * in place of the ISOC90 functions, this is no longer done in 1.6.0, however
+ * the use of png_foo as a macro defined to the C function is retained.
+ */
+#define png_strlen  strlen
+#define png_memcmp  memcmp
+#define png_memcpy  memcpy
+#define png_memset  memset
 
 /* These macros may need to be architecture dependent. */
 #define PNG_ALIGN_NONE   0 /* do not use data alignment */
@@ -1401,11 +1378,6 @@ PNG_EXTERN void png_read_destroy PNGARG((png_structp png_ptr,
 
 /* Free any memory used in png_ptr struct (old method - NOT DLL EXPORTED) */
 PNG_EXTERN void png_write_destroy PNGARG((png_structp png_ptr));
-
-#ifdef USE_FAR_KEYWORD  /* memory model conversion function */
-PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr, png_voidp ptr,
-    int check));
-#endif /* USE_FAR_KEYWORD */
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,

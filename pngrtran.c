@@ -370,12 +370,12 @@ png_set_alpha_mode(png_structp png_ptr, int mode, double output_gamma)
 
 typedef struct png_dsort_struct
 {
-   struct png_dsort_struct FAR * next;
+   struct png_dsort_struct * next;
    png_byte left;
    png_byte right;
 } png_dsort;
-typedef png_dsort FAR *       png_dsortp;
-typedef png_dsort FAR * FAR * png_dsortpp;
+typedef png_dsort *   png_dsortp;
+typedef png_dsort * * png_dsortpp;
 
 void PNGAPI
 png_set_quantize(png_structp png_ptr, png_colorp palette,
@@ -778,7 +778,6 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
    scrn_gamma = translate_gamma_flags(png_ptr, scrn_gamma, 1/*screen*/);
    file_gamma = translate_gamma_flags(png_ptr, file_gamma, 0/*file*/);
 
-#if PNG_LIBPNG_VER >= 10600
    /* Checking the gamma values for being >0 was added in 1.5.4 along with the
     * premultiplied alpha support; this actually hides an undocumented feature
     * of the previous implementation which allowed gamma processing to be
@@ -787,14 +786,14 @@ png_set_gamma_fixed(png_structp png_ptr, png_fixed_point scrn_gamma,
     * accept '0' for the gamma value it takes, because it isn't always used.
     *
     * Since this is an API change (albeit a very minor one that removes an
-    * undocumented API feature) it will not be made until libpng-1.6.0.
+    * undocumented API feature) the following checks were only enabled in
+    * libpng-1.6.0.
     */
    if (file_gamma <= 0)
       png_error(png_ptr, "invalid file gamma in png_set_gamma");
 
    if (scrn_gamma <= 0)
       png_error(png_ptr, "invalid screen gamma in png_set_gamma");
-#endif
 
    /* Set the gamma values unconditionally - this overrides the value in the PNG
     * file if a gAMA chunk was present.  png_set_alpha_mode provides a

@@ -557,19 +557,9 @@ png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN)
 {
 #ifdef PNG_SETJMP_SUPPORTED
    if (png_ptr && png_ptr->longjmp_fn)
-   {
-#  ifdef USE_FAR_KEYWORD
-      {
-         jmp_buf tmp_jmpbuf;
-         png_memcpy(tmp_jmpbuf, png_ptr->longjmp_buffer, png_sizeof(jmp_buf));
-         png_ptr->longjmp_fn(tmp_jmpbuf, val);
-      }
-
-#  else
-   png_ptr->longjmp_fn(png_ptr->longjmp_buffer, val);
-#  endif
-   }
+      png_ptr->longjmp_fn(png_ptr->longjmp_buffer, val);
 #endif
+
    /* Here if not setjmp support or if png_ptr is null. */
    PNG_ABORT();
 }

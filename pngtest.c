@@ -67,17 +67,6 @@ typedef FILE                * png_FILE_p;
 #  define SINGLE_ROWBUF_ALLOC  /* Makes buffer overruns easier to nail */
 #endif
 
-/* The code uses memcmp and memcpy on large objects (typically row pointers) so
- * it is necessary to do soemthing special on certain architectures, note that
- * the actual support for this was effectively removed in 1.4, so only the
- * memory remains in this program:
- */
-#define CVT_PTR(ptr)         (ptr)
-#define CVT_PTR_NOCHECK(ptr) (ptr)
-#define png_memcmp  memcmp
-#define png_memcpy  memcpy
-#define png_memset  memset
-
 /* Turn on CPU timing
 #define PNGTEST_TIMING
 */
@@ -344,7 +333,6 @@ pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
 }
 #endif
 
-#ifndef USE_FAR_KEYWORD
 static void PNGCBAPI
 pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -369,59 +357,6 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    pngtest_check_io_state(png_ptr, length, PNG_IO_READING);
 #endif
 }
-#else
-/* This is the model-independent version. Since the standard I/O library
-   can't handle far buffers in the medium and small models, we have to copy
-   the data.
-*/
-
-#define NEAR_BUF_SIZE 1024
-#define MIN(a,b) (a <= b ? a : b)
-
-static void PNGCBAPI
-pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
-{
-   png_size_t check;
-   png_byte *n_data;
-   png_FILE_p io_ptr;
-
-   /* Check if data really is near. If so, use usual code. */
-   n_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (png_FILE_p)CVT_PTR(png_get_io_ptr(png_ptr));
-   if ((png_bytep)n_data == data)
-   {
-      check = fread(n_data, 1, length, io_ptr);
-   }
-   else
-   {
-      png_byte buf[NEAR_BUF_SIZE];
-      png_size_t read, remaining, err;
-      check = 0;
-      remaining = length;
-
-      do
-      {
-         read = MIN(NEAR_BUF_SIZE, remaining);
-         err = fread(buf, 1, 1, io_ptr);
-         png_memcpy(data, buf, read); /* Copy far buffer to near buffer */
-         if (err != read)
-            break;
-         else
-            check += err;
-         data += read;
-         remaining -= read;
-      }
-      while (remaining != 0);
-   }
-
-   if (check != length)
-      png_error(png_ptr, "Read Error");
-
-#ifdef PNG_IO_STATE_SUPPORTED
-   pngtest_check_io_state(png_ptr, length, PNG_IO_READING);
-#endif
-}
-#endif /* USE_FAR_KEYWORD */
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 static void PNGCBAPI
@@ -437,7 +372,6 @@ pngtest_flush(png_structp png_ptr)
  * write_data function and use it at run time with png_set_write_fn(), rather
  * than changing the library.
  */
-#ifndef USE_FAR_KEYWORD
 static void PNGCBAPI
 pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
@@ -454,63 +388,6 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    pngtest_check_io_state(png_ptr, length, PNG_IO_WRITING);
 #endif
 }
-#else
-/* This is the model-independent version. Since the standard I/O library
-   can't handle far buffers in the medium and small models, we have to copy
-   the data.
-*/
-
-#define NEAR_BUF_SIZE 1024
-#define MIN(a,b) (a <= b ? a : b)
-
-static void PNGCBAPI
-pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
-{
-   png_size_t check;
-   png_byte *near_data;  /* Needs to be "png_byte *" instead of "png_bytep" */
-   png_FILE_p io_ptr;
-
-   /* Check if data really is near. If so, use usual code. */
-   near_data = (png_byte *)CVT_PTR_NOCHECK(data);
-   io_ptr = (png_FILE_p)CVT_PTR(png_get_io_ptr(png_ptr));
-
-   if ((png_bytep)near_data == data)
-   {
-      check = fwrite(near_data, 1, length, io_ptr);
-   }
-
-   else
-   {
-      png_byte buf[NEAR_BUF_SIZE];
-      png_size_t written, remaining, err;
-      check = 0;
-      remaining = length;
-
-      do
-      {
-         written = MIN(NEAR_BUF_SIZE, remaining);
-         png_memcpy(buf, data, written); /* Copy far buffer to near buffer */
-         err = fwrite(buf, 1, written, io_ptr);
-         if (err != written)
-            break;
-         else
-            check += err;
-         data += written;
-         remaining -= written;
-      }
-      while (remaining != 0);
-   }
-
-   if (check != length)
-   {
-      png_error(png_ptr, "Write Error");
-   }
-
-#ifdef PNG_IO_STATE_SUPPORTED
-   pngtest_check_io_state(png_ptr, length, PNG_IO_WRITING);
-#endif
-}
-#endif /* USE_FAR_KEYWORD */
 
 /* This function is called when there is a warning, but the library thinks
  * it can continue anyway.  Replacement functions don't have to do anything
@@ -563,9 +440,9 @@ typedef struct memory_information
 {
    png_alloc_size_t          size;
    png_voidp                 pointer;
-   struct memory_information FAR *next;
+   struct memory_information *next;
 } memory_information;
-typedef memory_information FAR *memory_infop;
+typedef memory_information *memory_infop;
 
 static memory_infop pinformation = NULL;
 static int current_allocation = 0;
@@ -621,7 +498,7 @@ PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
       pinfo->next = pinformation;
       pinformation = pinfo;
       /* Make sure the caller isn't assuming zeroed memory. */
-      png_memset(pinfo->pointer, 0xdd, pinfo->size);
+      memset(pinfo->pointer, 0xdd, pinfo->size);
 
       if (verbose)
          printf("png_malloc %lu bytes at %p\n", (unsigned long)size,
@@ -648,7 +525,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 
    /* Unlink the element from the list. */
    {
-      memory_infop FAR *ppinfo = &pinformation;
+      memory_infop *ppinfo = &pinformation;
 
       for (;;)
       {
@@ -662,7 +539,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
                fprintf(STDERR, "Duplicate free of memory\n");
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
-            png_memset(ptr, 0x55, pinfo->size);
+            memset(ptr, 0x55, pinfo->size);
             png_free_default(png_ptr, pinfo);
             pinfo = NULL;
             break;
@@ -780,11 +657,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_uint_32 width, height;
    int num_pass, pass;
    int bit_depth, color_type;
-#ifdef PNG_SETJMP_SUPPORTED
-#ifdef USE_FAR_KEYWORD
-   jmp_buf tmp_jmpbuf;
-#endif
-#endif
 
    char inbuf[256], outbuf[256];
 
@@ -850,11 +722,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 #ifdef PNG_SETJMP_SUPPORTED
    pngtest_debug("Setting jmpbuf for read struct");
-#ifdef USE_FAR_KEYWORD
-   if (setjmp(tmp_jmpbuf))
-#else
    if (setjmp(png_jmpbuf(read_ptr)))
-#endif
    {
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
       png_free(read_ptr, row_buf);
@@ -868,18 +736,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       FCLOSE(fpout);
       return (1);
    }
-#ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(read_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
-#endif
 
 #ifdef PNG_WRITE_SUPPORTED
    pngtest_debug("Setting jmpbuf for write struct");
-#ifdef USE_FAR_KEYWORD
 
-   if (setjmp(tmp_jmpbuf))
-#else
    if (setjmp(png_jmpbuf(write_ptr)))
-#endif
    {
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
@@ -891,10 +752,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       FCLOSE(fpout);
       return (1);
    }
-
-#ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(write_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
-#endif
 #endif
 #endif
 
@@ -1179,13 +1036,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         /* We have to use png_memcpy instead of "=" because the string
+         /* We have to use memcpy instead of "=" because the string
           * pointed to by png_convert_to_rfc1123() gets free'ed before
           * we use it.
           */
-         png_memcpy(tIME_string,
-                    png_convert_to_rfc1123(read_ptr, mod_time),
-                    png_sizeof(tIME_string));
+         memcpy(tIME_string, png_convert_to_rfc1123(read_ptr, mod_time),
+            png_sizeof(tIME_string));
 
          tIME_string[png_sizeof(tIME_string) - 1] = '\0';
          tIME_chunk_present++;
@@ -1375,12 +1231,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         /* We have to use png_memcpy instead of "=" because the string
+         /* We have to use memcpy instead of "=" because the string
             pointed to by png_convert_to_rfc1123() gets free'ed before
             we use it */
-         png_memcpy(tIME_string,
-                    png_convert_to_rfc1123(read_ptr, mod_time),
-                    png_sizeof(tIME_string));
+         memcpy(tIME_string, png_convert_to_rfc1123(read_ptr, mod_time),
+            png_sizeof(tIME_string));
 
          tIME_string[png_sizeof(tIME_string) - 1] = '\0';
          tIME_chunk_present++;
@@ -1495,7 +1350,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (!num_in)
          break;
 
-      if (png_memcmp(inbuf, outbuf, num_in))
+      if (memcmp(inbuf, outbuf, num_in))
       {
          fprintf(STDERR, "\nFiles %s and %s are different\n", inname, outname);
 

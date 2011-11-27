@@ -420,7 +420,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 #ifdef PNG_CONVERT_tIME_SUPPORTED
 /* "tm" structure is not supported on WindowsCE */
 void PNGAPI
-png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm FAR * ttime)
+png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
 {
    png_debug(1, "in png_convert_from_struct_tm");
 
@@ -468,11 +468,6 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    volatile
 #endif
    png_structp png_ptr;
-#ifdef PNG_SETJMP_SUPPORTED
-#ifdef USE_FAR_KEYWORD
-   jmp_buf tmp_jmpbuf;
-#endif
-#endif
 
    png_debug(1, "in png_create_write_struct");
 
@@ -496,14 +491,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
  * encounter a png_error() will longjmp here.  Since the jmpbuf is
  * then meaningless we abort instead of returning.
  */
-#ifdef USE_FAR_KEYWORD
-   if (setjmp(tmp_jmpbuf))
-#else
    if (setjmp(png_jmpbuf(png_ptr))) /* sets longjmp to match setjmp */
-#endif
-#ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(png_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
-#endif
       PNG_ABORT();
 #endif
 
@@ -1677,7 +1665,7 @@ png_image_write_init(png_imagep image)
 
          if (control != NULL)
          {
-            memset(control, 0, sizeof *control);
+            png_memset(control, 0, sizeof *control);
 
             control->png_ptr = png_ptr;
             control->info_ptr = info_ptr;
@@ -2127,7 +2115,7 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
              */
             image->opaque->png_ptr->io_ptr = file;
 
-            memset(&display, 0, sizeof display);
+            png_memset(&display, 0, sizeof display);
             display.image = image;
             display.buffer = buffer;
             display.row_stride = row_stride;

@@ -1,5 +1,5 @@
 
-Libpng 1.6.0alpha01 - November 24, 2011
+Libpng 1.6.0alpha01 - November 27, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -107,10 +107,25 @@ Version 1.5.7beta05 [(PENDING RELEASE)]
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
 
-Version 1.6.0alpha01 [November 24, 2011]
+Version 1.6.0alpha01 [November 27, 2011]
   Added example programs for the new 'simplified' API.
   Moved pngvalid.c into contrib/libtests
   Rebuilt Makefile.in, configure, etc., with autoconf-2.68
+  Added ANSI-C (C90) headers and require them, and take advantage of the
+    change. Also fixed some of the projects/* and contrib/* files that needed
+    updates for libpng16 and the move of pngvalid.c.
+    With this change the required ANSI-C header files are assumed to exist: the
+    implementation must provide float.h, limits.h, stdarg.h and stddef.h and
+    libpng relies on limits.h and stddef.h existing and behaving as defined
+    (the other two required headers aren't used).  Non-ANSI systems that don't
+    have stddef.h or limits.h will have to provide an appropriate fake
+    containing the relevant types and #defines.
+  The use of FAR/far has been eliminated and the definition of png_alloc_size_t
+    is now controlled by a flag so that 'small size_t' systems can select it
+    if necessary.  Libpng 1.6 may not currently work on such systems -- it
+    seems likely that it will ask 'malloc' for more than 65535 bytes with any
+    image that has a sufficiently large row size (rather than simply failing
+    to read such images).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
