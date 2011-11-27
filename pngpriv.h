@@ -129,8 +129,8 @@
 #  define PNG_DLL_EXPORT
 #endif
 
-/* This is used for 16 bit gamma tables - only the top level pointers are const,
- * this could be changed:
+/* This is used for 16 bit gamma tables -- only the top level pointers are
+ * const; this could be changed:
  */
 typedef const png_uint_16p * png_const_uint_16pp;
 
@@ -344,7 +344,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #endif
 
 /* Prior to 1.6.0 if _WINDOWS_ was defined 'lstrlenA' and 'CopyMemory' were used
- * in place of the ISOC90 functions, this is no longer done in 1.6.0, however
+ * in place of the ISOC90 functions; this is no longer done in 1.6.0, however
  * the use of png_foo as a macro defined to the C function is retained.
  */
 #define png_strlen  strlen

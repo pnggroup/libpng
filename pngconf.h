@@ -32,8 +32,8 @@
 #include <limits.h>
 #include <stddef.h>
 
-/* Library header files.  These header files are all defined by ISOC90, libpng
- * expects conformant implementations however an ISOC90 conformant system need
+/* Library header files.  These header files are all defined by ISOC90; libpng
+ * expects conformant implementations, however, an ISOC90 conformant system need
  * not provide these header files if the functionality cannot be implemented.
  * In this case it will be necessary to disable the relevant parts of libpng in
  * the build of pnglibconf.h.
