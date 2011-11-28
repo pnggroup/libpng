@@ -9,7 +9,7 @@
  *
  * This code illustrates basic 'by-row' reading of a PNG file using libpng.
  * Rows are read until a particular pixel is found, the value of this pixel is
- * then printed on stdou.
+ * then printed on stdout.
  *
  * The code illustrates how to do this on interlaced as well as non-interlaced
  * images.  Normally you would call png_set_interlace_handling() to have libpng

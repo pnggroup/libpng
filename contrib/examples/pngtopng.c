@@ -5,7 +5,8 @@
  * related or neighboring rights to this work.  This work is published from:
  * United States.
  *
- * Read a PNG and write it out in a fixed format
+ * Read a PNG and write it out in a fixed format, using the 'simplified API'
+ * that was introduced in libpng-1.6.0.
  *
  * This sample code is just the code from the top of 'example.c' with some error
  * handling added.  See example.c for more comments.
@@ -50,11 +51,22 @@ int main(int argc, const char **argv)
 
                else
                   fprintf(stderr, "pngtopng: write %s: %s\n", argv[2],
-                     image.message);
+                      image.message);
+
+               free(buffer);
             }
 
             else
-               fprintf(stderr, "pngtopng: read %s: %s\n", argv[1], image.message);
+            {
+               fprintf(stderr, "pngtopng: read %s: %s\n", argv[1],
+                   image.message);
+
+               /* This is the only place where a 'free' is required; libpng does
+                * the cleanup on error and success, but in this case we couldn't
+                * complete the read because of running out of memory.
+                */
+               png_image_free(&image);
+            }
          }
 
          else

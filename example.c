@@ -97,6 +97,19 @@ int main(int argc, const char **argv)
                exit(0);
             }
          }
+
+         else
+         {
+            /* Calling png_free_image is optional unless the simplified API was
+             * not run to completion.  In this case if there wasn't enough
+             * memory for 'buffer' we didn't complete the read, so we must free
+             * the image:
+             */
+            if (buffer == NULL)
+               png_free_image(&image);
+
+            else
+               free(buffer);
       }
 
       /* Something went wrong reading or writing the image.  libpng stores a
