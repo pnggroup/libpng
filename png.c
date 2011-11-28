@@ -2346,17 +2346,18 @@ png_log16bit(png_uint_32 x)
 static png_uint_32
 png_32bit_exp[16] =
 {
-#  if PNG_DO_BC
+#  ifdef PNG_DO_BC
       for (i=0;i<16;++i) { .5 + e(-i/16*l(2))*2^32; }
-#  endif
+#  else
    /* NOTE: the first entry is deliberately set to the maximum 32-bit value. */
    4294967295U, 4112874773U, 3938502376U, 3771522796U, 3611622603U, 3458501653U,
    3311872529U, 3171459999U, 3037000500U, 2908241642U, 2784941738U, 2666869345U,
    2553802834U, 2445529972U, 2341847524U, 2242560872U
+#  endif
 };
 
 /* Adjustment table; provided to explain the numbers in the code below. */
-#if PNG_DO_BC
+#ifdef PNG_DO_BC
 for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
    11 44937.64284865548751208448
    10 45180.98734845585101160448
