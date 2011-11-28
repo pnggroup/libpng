@@ -655,13 +655,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.7beta06 - November 25, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.5.7beta06 - November 28, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.7beta06 - November 25, 2011\
+      return "libpng version 1.5.7beta06 - November 28, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2174,9 +2174,9 @@ png_64bit_product (long v1, long v2, unsigned long *hi_product,
 static png_uint_32
 png_8bit_l2[128] =
 {
-#  if PNG_DO_BC
+#  ifdef PNG_DO_BC
       for (i=128;i<256;++i) { .5 - l(i/255)/l(2)*65536*65536; }
-#  endif
+#  else
    4270715492U, 4222494797U, 4174646467U, 4127164793U, 4080044201U, 4033279239U,
    3986864580U, 3940795015U, 3895065449U, 3849670902U, 3804606499U, 3759867474U,
    3715449162U, 3671346997U, 3627556511U, 3584073329U, 3540893168U, 3498011834U,
@@ -2199,6 +2199,8 @@ png_8bit_l2[128] =
    324227938U, 298676034U, 273229066U, 247886176U, 222646516U, 197509248U,
    172473545U, 147538590U, 122703574U, 97967701U, 73330182U, 48790236U,
    24347096U, 0U
+#  endif
+
 #if 0
    /* The following are the values for 16-bit tables - these work fine for the
     * 8-bit conversions but produce very slightly larger errors in the 16-bit

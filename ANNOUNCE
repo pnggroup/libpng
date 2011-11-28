@@ -115,6 +115,7 @@ Version 1.5.7beta05 [November 25, 2011]
 
 Version 1.5.7beta06 [November 28, 2011]
   Replaced an "#if" with "ifdef" in pngrtran.c
+  Revised #if PNG_DO_BC block in png.c (use #ifdef and add #else)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
