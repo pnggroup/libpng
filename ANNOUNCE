@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta06 - November 25, 2011
+Libpng 1.5.7beta06 - November 28, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -113,7 +113,8 @@ Version 1.5.7beta05 [November 25, 2011]
   Moved pngvalid.c into contrib/libtests
   Rebuilt Makefile.in, configure, etc., with autoconf-2.68
 
-Version 1.5.7beta06 [November 25, 2011]
+Version 1.5.7beta06 [November 28, 2011]
+  Replaced an "#if" with "ifdef" in pngrtran.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

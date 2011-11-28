@@ -1956,7 +1956,7 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
          info_ptr->bit_depth = 8;
 #     else
 
-#        if PNG_READ_SCALE_16_TO_8_SUPPORTED
+#        ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
             png_ptr->transformations |= PNG_SCALE_16_TO_8;
             info_ptr->bit_depth = 8;
 #        else
