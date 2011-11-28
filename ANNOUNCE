@@ -1,5 +1,5 @@
 
-Libpng 1.5.7beta06 - November 28, 2011
+Libpng 1.5.7rc01 - December 1, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7beta06.tar.xz (LZMA-compressed, recommended)
-   1.5.7beta06.tar.gz
-   1.5.7beta06.tar.bz2
+   1.5.7rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.7rc01.tar.gz
+   1.5.7rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157b06.7z  (LZMA-compressed, recommended)
-   lp157b06.zip
+   lp157r01.7z  (LZMA-compressed, recommended)
+   lp157r01.zip
 
 Other information:
 
-   1.5.7beta06-README.txt
-   1.5.7beta06-LICENSE.txt
+   1.5.7rc01-README.txt
+   1.5.7rc01-LICENSE.txt
 
 Changes since the last public release (1.5.6):
 
@@ -113,8 +113,8 @@ Version 1.5.7beta05 [November 25, 2011]
   Moved pngvalid.c into contrib/libtests
   Rebuilt Makefile.in, configure, etc., with autoconf-2.68
 
-Version 1.5.7beta06 [November 28, 2011]
-  Replaced an "#if" with "ifdef" in pngrtran.c
+Version 1.5.7rc01 [December 1, 2011]
+  Replaced an "#if" with "#ifdef" in pngrtran.c
   Revised #if PNG_DO_BC block in png.c (use #ifdef and add #else)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
