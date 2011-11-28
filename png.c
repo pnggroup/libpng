@@ -655,13 +655,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0alpha01 - November 27, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0alpha01 - November 28, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0alpha01 - November 27, 2011\
+      return "libpng version 1.6.0alpha01 - November 28, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2174,9 +2174,9 @@ png_64bit_product (long v1, long v2, unsigned long *hi_product,
 static png_uint_32
 png_8bit_l2[128] =
 {
-#  if PNG_DO_BC
+#  ifdef PNG_DO_BC
       for (i=128;i<256;++i) { .5 - l(i/255)/l(2)*65536*65536; }
-#  endif
+#  else
    4270715492U, 4222494797U, 4174646467U, 4127164793U, 4080044201U, 4033279239U,
    3986864580U, 3940795015U, 3895065449U, 3849670902U, 3804606499U, 3759867474U,
    3715449162U, 3671346997U, 3627556511U, 3584073329U, 3540893168U, 3498011834U,
@@ -2199,6 +2199,8 @@ png_8bit_l2[128] =
    324227938U, 298676034U, 273229066U, 247886176U, 222646516U, 197509248U,
    172473545U, 147538590U, 122703574U, 97967701U, 73330182U, 48790236U,
    24347096U, 0U
+#  endif
+
 #if 0
    /* The following are the values for 16-bit tables - these work fine for the
     * 8-bit conversions but produce very slightly larger errors in the 16-bit
@@ -2344,17 +2346,18 @@ png_log16bit(png_uint_32 x)
 static png_uint_32
 png_32bit_exp[16] =
 {
-#  if PNG_DO_BC
+#  ifdef PNG_DO_BC
       for (i=0;i<16;++i) { .5 + e(-i/16*l(2))*2^32; }
-#  endif
+#  else
    /* NOTE: the first entry is deliberately set to the maximum 32-bit value. */
    4294967295U, 4112874773U, 3938502376U, 3771522796U, 3611622603U, 3458501653U,
    3311872529U, 3171459999U, 3037000500U, 2908241642U, 2784941738U, 2666869345U,
    2553802834U, 2445529972U, 2341847524U, 2242560872U
+#  endif
 };
 
 /* Adjustment table; provided to explain the numbers in the code below. */
-#if PNG_DO_BC
+#ifdef PNG_DO_BC
 for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
    11 44937.64284865548751208448
    10 45180.98734845585101160448

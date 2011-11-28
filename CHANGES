@@ -3775,6 +3775,7 @@ Version 1.6.0alpha01 [November 28, 2011]
     image that has a sufficiently large row size (rather than simply failing
     to read such images).
   Replaced an "#if" with "ifdef" in pngrtran.c
+  Revised #if PNG_DO_BC blocks in png.c (use #ifdef and add #else)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
