@@ -1,12 +1,12 @@
 /*-
  * sRGB.h
  *
- * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
- * Copyright (c) 2011 John Cunningham Bowler
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  *
- * This code is released under the libpng license.
- * For conditions of distribution and use, see the disclaimer
- * and license in png.h
+ * COPYRIGHT: Written by John Cunningham Bowler, 2011.
+ * To the extent possible under law, the author has waived all copyright and
+ * related or neighboring rights to this work.  This work is published from:
+ * United States.
  *
  * Utility file; not actually a header, this contains definitions of sRGB
  * calculation functions for inclusion in those test programs that need them.

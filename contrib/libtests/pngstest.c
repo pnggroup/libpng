@@ -28,7 +28,7 @@
 
 #include "../../png.h"
 
-#include "../sRGBtables/sRGB.h"
+#include "../tools/sRGB.h"
 
 /* The following is to support direct compilation of this file as C++ */
 #ifdef __cplusplus
