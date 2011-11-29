@@ -9,15 +9,15 @@
 # related or neighboring rights to this work.  This work is published from:
 # United States.
 #
-# Shell script to generate png.c 8 and 16 bit log tables (see the code in png.c
-# for details).
+# Shell script to generate png.c 8-bit and 16-bit log tables (see the code in
+# png.c for details).
 #
-# This script uses the "bc" arbitrary precision calculator to calculate 32 bit
+# This script uses the "bc" arbitrary precision calculator to calculate 32-bit
 # fixed point values of logarithms appropriate to finding the log of an 8-bit
 # (0..255) value and a similar table for the exponent calculation.
 #
-# "bc" must be on the path when the script is executed, the math library (-l)
-# must be available
+# "bc" must be on the path when the script is executed, and the math library
+# (-lm) must be available
 #
 # function to print out a list of numbers as integers; the function truncates
 # the integers which must be one-per-line
@@ -72,8 +72,8 @@ cat <<END
  * each case only the low 16 bits are relevant - the fraction - since the
  * integer bits (the top 4) simply determine a shift.
  *
- * The worst case is the 16-bit distinction between 65535 and 65534, this
- * requires perhaps spurious accuracty in the decoding of the logarithm to
+ * The worst case is the 16-bit distinction between 65535 and 65534; this
+ * requires perhaps spurious accuracy in the decoding of the logarithm to
  * distinguish log2(65535/65534.5) - 10^-5 or 17 bits.  There is little chance
  * of getting this accuracy in practice.
  *

@@ -2,7 +2,7 @@ This directory (contrib/tools) contains tools used by the authors of libpng.
 
 Code and data placed in this directory is not required to build libpng,
 however the code in this directory has been used to generate data or code in
-the body of the libpng source.  The source code idenftifies where this has
+the body of the libpng source.  The source code identifies where this has
 been done.  Code in this directory may not compile on all operating systems
 that libpng supports.
 
