@@ -26,7 +26,7 @@
 #include <signal.h>
 
 #ifdef HAVE_CONFIG_H
-#  include "config.h"
+#  include "../../config.h"
 #endif
 
 #ifdef HAVE_FEENABLEEXCEPT
@@ -90,7 +90,7 @@ typedef png_byte *png_const_bytep;
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
-#include "contrib/visupng/cexcept.h"
+#include "../visupng/cexcept.h"
 
 #ifdef __cplusplus
 #  define this not_the_cpp_this

@@ -3762,6 +3762,10 @@ Version 1.5.7rc01 [December 1, 2011]
   Replaced an "#if" with "#ifdef" in pngrtran.c
   Revised #if PNG_DO_BC block in png.c (use #ifdef and add #else)
 
+Version 1.5.7rc02 [December 2, 2011]
+  Revised project files and contrib/pngvalid/pngvalid.c to account for
+    the relocation of pngvalid into contrib/libtests.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
