@@ -120,6 +120,8 @@ Version 1.5.7rc01 [December 1, 2011]
 Version 1.5.7rc02 [December 2, 2011]
   Revised project files and contrib/pngvalid/pngvalid.c to account for
     the relocation of pngvalid into contrib/libtests.
+  Revised pngconf.h to use " __declspec(restrict)" only when MSC_VER >= 1400,
+    as in libpng-1.5.4.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
