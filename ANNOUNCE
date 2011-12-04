@@ -1,5 +1,5 @@
 
-Libpng 1.5.7rc02 - December 2, 2011
+Libpng 1.5.7rc02 - December 4, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -117,11 +117,12 @@ Version 1.5.7rc01 [December 1, 2011]
   Replaced an "#if" with "#ifdef" in pngrtran.c
   Revised #if PNG_DO_BC block in png.c (use #ifdef and add #else)
 
-Version 1.5.7rc02 [December 2, 2011]
+Version 1.5.7rc02 [December 4, 2011]
   Revised project files and contrib/pngvalid/pngvalid.c to account for
     the relocation of pngvalid into contrib/libtests.
   Revised pngconf.h to use " __declspec(restrict)" only when MSC_VER >= 1400,
     as in libpng-1.5.4.
+  Put CRLF line endings in the owatcom project files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
