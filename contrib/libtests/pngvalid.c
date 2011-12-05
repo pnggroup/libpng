@@ -4091,7 +4091,7 @@ read_palette(store_palette palette, int *npalette, png_structp pp, png_infop pi)
          png_error(pp, "validate: invalid PLTE result");
       /* But there is no palette, so record this: */
       *npalette = 0;
-      memset(palette, 113, sizeof palette);
+      memset(palette, 113, sizeof (store_palette));
    }
 
    trans_alpha = 0;
@@ -5277,7 +5277,7 @@ static void
 transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
     PNG_CONST image_transform *transform_list)
 {
-   memset(dp, 0, sizeof dp);
+   memset(dp, 0, sizeof *dp);
 
    /* Standard fields */
    standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,

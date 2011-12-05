@@ -1,5 +1,5 @@
 
-Libpng 1.6.0alpha01 - December 4, 2011
+Libpng 1.6.0alpha01 - December 5, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -107,7 +107,7 @@ Version 1.5.7beta05 [(PENDING RELEASE)]
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
 
-Version 1.6.0alpha01 [December 4, 2011]
+Version 1.6.0alpha01 [December 5, 2011]
   Removed machine-generated configure files from the GIT repository (they will
     continue to appear in the tarball distributions).
   Restored the new 'simplified' API, which was deleted from libpng-1.5.7.
@@ -134,6 +134,7 @@ Version 1.6.0alpha01 [December 4, 2011]
   Revised pngconf.h to use " __declspec(restrict)" only when MSC_VER >= 1400,
     as in libpng-1.5.4.
   Put CRLF line endings in the owatcom project files.
+  Fixed minor memset/sizeof errors in pngvalid.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
