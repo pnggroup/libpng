@@ -36,7 +36,7 @@
 #include "../../png.h"
 
 #if PNG_LIBPNG_VER < 10500
-/* This delibarately lacks the PNG_CONST. */
+/* This deliberately lacks the PNG_CONST. */
 typedef png_byte *png_const_bytep;
 
 /* This is copied from 1.5.1 png.h: */

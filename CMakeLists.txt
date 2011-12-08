@@ -121,7 +121,7 @@ set(pngtest_sources
   pngtest.c
 )
 set(pngvalid_sources
-  pngvalid.c
+  contrib/libtests/pngvalid.c
 )
 # SOME NEEDED DEFINITIONS
 
@@ -229,7 +229,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 15.${PNGLIB_RELEASE}.1.5.7rc02
+#   VERSION 15.${PNGLIB_RELEASE}.1.5.7rc03
     VERSION 15.${PNGLIB_RELEASE}.0
     SOVERSION 15
     CLEAN_DIRECT_OUTPUT 1)
