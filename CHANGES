@@ -3780,12 +3780,14 @@ Version 1.6.0alpha01 [December 8, 2011]
     as in libpng-1.5.4.
   Put CRLF line endings in the owatcom project files.
   Fixed minor memset/sizeof errors in pngvalid.c.
-  Fixed race conditions in parallel make builds. With higher degress of
+  Fixed race conditions in parallel make builds. With higher degrees of
     parallelism during 'make' the use of the same temporary file names such
     as 'dfn*' can result in a race where a temporary file from one arm of the
     build is deleted or overwritten in another arm.  This changes the
     temporary files for suffix rules to always use $* and ensures that the
     non-suffix rules use unique file names.
+  Updated CMakeLists.txt to account for relocated and new test programs.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

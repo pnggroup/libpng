@@ -121,7 +121,10 @@ set(pngtest_sources
   pngtest.c
 )
 set(pngvalid_sources
-  pngvalid.c
+  contrib/libtests/pngvalid.c
+)
+set(pngstest_sources
+  contrib/libtests/pngstest.c
 )
 # SOME NEEDED DEFINITIONS
 
@@ -172,6 +175,38 @@ if(PNG_TESTS AND PNG_SHARED)
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid ${PNG_LIB_NAME})
   add_test(pngvalid ./pngvalid)
+  add_executable(pngstest ${pngstest_sources})
+  target_link_libraries(pngstest ${PNG_LIB_NAME})
+  add_test(pngstest ./pngstest
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn2c08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn2c16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn4a08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn4a16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn1g04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn2c16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn2c16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbrn2c08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn1g16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbyn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n1g08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n2c08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp1n3p08.png
+  )
 endif()
 
 # Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set
