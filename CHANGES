@@ -3769,8 +3769,12 @@ Version 1.5.7rc02 [December 5, 2011]
     as in libpng-1.5.4.
   Put CRLF line endings in the owatcom project files.
 
-Version 1.5.7rc03 [December 8, 2011]
+Version 1.5.7rc03 [December 7, 2011]
   Updated CMakeLists.txt to account for the relocation of pngvalid.c
+
+Version 1.5.7 [December 15, 2011]
+  Minor fixes to pngvalid.c for gcc 4.6.2 compatibility to remove warnings
+    reported by earlier versions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

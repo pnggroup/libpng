@@ -4091,7 +4091,7 @@ read_palette(store_palette palette, int *npalette, png_structp pp, png_infop pi)
          png_error(pp, "validate: invalid PLTE result");
       /* But there is no palette, so record this: */
       *npalette = 0;
-      memset(palette, 113, sizeof palette);
+      memset(palette, 113, sizeof (store_palette));
    }
 
    trans_alpha = 0;
@@ -5277,7 +5277,7 @@ static void
 transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
     PNG_CONST image_transform *transform_list)
 {
-   memset(dp, 0, sizeof dp);
+   memset(dp, 0, sizeof *dp);
 
    /* Standard fields */
    standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
@@ -9388,7 +9388,7 @@ int main(int argc, PNG_CONST char **argv)
    size_t cp = 0;
    char command[1024];
 
-   context(&pm.this, fault);
+   anon_context(&pm.this);
 
    /* Add appropriate signal handlers, just the ANSI specified ones: */
    signal(SIGABRT, signal_handler);
@@ -9750,7 +9750,7 @@ int main(int argc, PNG_CONST char **argv)
 #endif
    }
 
-   Catch(fault)
+   Catch_anonymous
    {
       fprintf(stderr, "pngvalid: test aborted (probably failed in cleanup)\n");
       if (!pm.this.verbose)

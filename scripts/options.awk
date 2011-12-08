@@ -1,7 +1,7 @@
 #!/bin/awk -f
 # scripts/options.awk - library build configuration control
 #
-# last changed in libpng version 1.5.7 - (PENDING RELEASE)
+# last changed in libpng version 1.5.7 - December 15, 2011
 #
 # Copyright (c) 1998-2011 Glenn Randers-Pehrson
 #

@@ -1,32 +1,29 @@
 
-Libpng 1.5.7rc03 - December 8, 2011
+Libpng 1.5.7 - December 15, 2011
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.7rc03.tar.xz (LZMA-compressed, recommended)
-   1.5.7rc03.tar.gz
-   1.5.7rc03.tar.bz2
+   libpng-1.5.7.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.7.tar.gz
+   libpng-1.5.7.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp157r03.7z  (LZMA-compressed, recommended)
-   lp157r03.zip
+   lpng157.7z  (LZMA-compressed, recommended)
+   lpng157.zip
 
 Other information:
 
-   1.5.7rc03-README.txt
-   1.5.7rc03-LICENSE.txt
+   libpng-1.5.7-README.txt
+   libpng-1.5.7-LICENSE.txt
 
 Changes since the last public release (1.5.6):
-
-Version 1.5.7beta01 [November 4, 2011]
   Added support for ARM processor (Mans Rullgard)
   Fixed bug in pngvalid on early allocation failure; fixed type cast in
     pngmem.c; pngvalid would attempt to call png_error() if the allocation
@@ -42,8 +39,6 @@ Version 1.5.7beta01 [November 4, 2011]
     generation on x86. The changes are only part of the suggested ones;
     just the changes that definitely improve speed and remain simple.
     The changes also slightly increase the clarity of the code.
-
-Version 1.5.7beta02 [November 11, 2011]
   Check compression_type parameter in png_get_iCCP and remove spurious
     casts. The compression_type parameter is always assigned to, so must
     be non-NULL. The cast of the profile length potentially truncated the
@@ -55,29 +50,19 @@ Version 1.5.7beta02 [November 11, 2011]
     FP exceptions cause a crash. Added code to pngvalid to turn on FP
     exceptions if the appropriate glibc support is there to ensure this is
     tested in the future.
-  Updated scripts/pnglibconf.mak and scripts/makefile.std to handle the
-    new PNG_JOIN macro.
   Added versioning to pnglibconf.h comments.
-  Simplified read/write API initial version; basic read/write tested on
-    a variety of images, limited documentation (in the header file.)
   Installed more accurate linear to sRGB conversion tables. The slightly
     modified tables reduce the number of 16-bit values that
     convert to an off-by-one 8-bit value.  The "makesRGB.c" code that was used
     to generate the tables is now in a contrib/sRGBtables sub-directory.
-
-Version 1.5.7beta03 [November 17, 2011]
-  Removed PNG_CONST from the sRGB table declarations in pngpriv.h and png.c
   Added run-time detection of NEON support.
-  Added contrib/libtests; includes simplified API test and timing test and
-    a color conversion utility for rapid checking of failed 'pngstest' results.
   Multiple transform bug fixes plus a work-round for double gamma correction.
     libpng does not support more than one transform that requires linear data
     at once - if this is tried typically the results is double gamma
     correction. Since the simplified APIs can need rgb to gray combined with
     a compose operation it is necessary to do one of these outside the main
     libpng transform code. This check-in also contains fixes to various bugs
-    in the simplified APIs themselves and to some bugs in compose and rgb to
-    gray (on palette) itself.
+    in compose and rgb to gray (on palette).
   Fixes for C++ compilation using g++ When libpng source is compiled
     using g++. The compiler imposes C++ rules on the C source; thus it
     is desireable to make the source work with either C or C++ rules
@@ -88,48 +73,26 @@ Version 1.5.7beta03 [November 17, 2011]
     this on assembler compilation, even though it does on C compilation.
     This creates security issues if assembler code is enabled; the
     work-around is to set it by default in the flags for $(CCAS)
-  Work around compilers that don't support declaration of const data. Some
-    compilers fault 'extern const' data declarations (because the data is
-    not initialized); this turns on const-ness only for compilers where
-    this is known to work.
-
-Version 1.5.7beta04 [November 17, 2011]
-  Since the gcc driver does not recognize the --noexecstack flag, we must
-    use the -Wa prefix to have it passed through to the assembler.
-    Also removed a duplicate setting of this flag.
-  Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
-
-Version 1.5.7beta05 [November 25, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
     (Frank Busse).
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
-  Backed out 'simplified' API changes. The API seems too complex and there
-    is a lack of consensus or enthusiasm for the proposals.  The API also
-    reveals significant bugs inside libpng (double gamma correction and the
-    known bug of being unable to retrieve a corrected palette). It seems
-    better to wait until the bugs, at least, are corrected.
   Moved pngvalid.c into contrib/libtests
   Rebuilt Makefile.in, configure, etc., with autoconf-2.68
-
-Version 1.5.7rc01 [December 1, 2011]
   Replaced an "#if" with "#ifdef" in pngrtran.c
   Revised #if PNG_DO_BC block in png.c (use #ifdef and add #else)
-
-Version 1.5.7rc02 [December 5, 2011]
-  Revised project files and contrib/pngvalid/pngvalid.c to account for
-    the relocation of pngvalid into contrib/libtests.
   Revised pngconf.h to use " __declspec(restrict)" only when MSC_VER >= 1400,
     as in libpng-1.5.4.
   Put CRLF line endings in the owatcom project files.
-
-Version 1.5.7rc03 [December 8, 2011]
   Updated CMakeLists.txt to account for the relocation of pngvalid.c
+  Minor fixes to pngvalid.c for gcc 4.6.2 compatibility to remove warnings
+    reported by earlier versions.
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P
