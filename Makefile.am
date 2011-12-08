@@ -88,7 +88,7 @@ EXTRA_DIST= \
 
 SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
 
-CLEANFILES= dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
+CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
 	check.new pnglibconf.* symbols.new pngtest-log.txt \
 	$(SCRIPT_CLEANFILES)
@@ -143,47 +143,49 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNG_NO_USE_READ_MACROS -DPNG_BUILDING_SYMBOL_TABLE
 
 .dfn.out:
-	rm -f $@ dfn.c dfn?.out
+	rm -f $@ $*.c $*.tf[123]
 	test -d scripts || mkdir scripts
-	echo '#include "$<"' >dfn.c
+	echo '#include "$<"' >$*.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c > dfn1.out
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $*.c > $*.tf1
 	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC *-\(.*\)- *PNG_DEFN_END.*$$|\1|p'\
-	    dfn1.out >dfn2.out
-	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' dfn2.out >dfn3.out
-	rm -f dfn.c dfn[12].out
-	mv dfn3.out $@
+	    $*.tf1 >$*.tf2
+	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' $*.tf2 >$*.tf3
+	rm -f $*.c $*.tf[12]
+	mv $*.tf3 $@
 
 # The .dfn file for pnglibconf.h is machine generated
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
-	rm -f $@ dfn?.out
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out version=search\
+	rm -f $@ $*.tf[45]
+	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf4 version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
 	    $(DFA_XTRA) 1>&2
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
-	rm dfn1.out
-	mv dfn2.out $@
+	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf5 $*.tf4 1>&2
+	rm $*.tf4
+	mv $*.tf5 $@
 
 # Symbol checks (.def and .out files should match)
 scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.out
+
 .out.chk:
-	rm -f $@ symbols.new
+	rm -f $@ $*.new
 	$(AWK) -f ${srcdir}/scripts/checksym.awk ${srcdir}/scripts/${*F}.def\
-	    $< >&2
-	mv symbols.new $@
+	    of="$*.new" $< >&2
+	mv $*.new $@
 
 # used on demand to regenerate the standard header, CPPFLAGS should
 # be empty - no non-standard defines
 scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
-	rm -f $@ dfn?.out
+	rm -f $@ pnglibconf.tf[67]
 	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out logunsupported=1
-		version=search ${srcdir}/pngconf.h -\
-		${srcdir}/scripts/pnglibconf.dfa 1>&2
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
-	rm dfn1.out
-	mv dfn2.out $@
+	$(AWK) -f ${srcdir}/scripts/options.awk out=pnglibconf.tf6\
+	    logunsupported=1 version=search ${srcdir}/pngconf.h -\
+	    ${srcdir}/scripts/pnglibconf.dfa 1>&2
+	$(AWK) -f ${srcdir}/scripts/options.awk out=pnglibconf.tf7\
+	    pnglibconf.tf6 1>&2
+	rm pnglibconf.tf6
+	mv pnglibconf.tf7 $@
 
 $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
 	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h
