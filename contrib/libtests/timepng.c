@@ -14,8 +14,11 @@
  * does no transforms.  The only output is a time as a floating point number of
  * seconds with 9 decimal digits.
  */
+#define _POSIX_C_SOURCE 199309L /* for clock_gettime */
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <time.h>
 

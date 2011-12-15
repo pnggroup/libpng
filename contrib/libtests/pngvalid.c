@@ -36,7 +36,7 @@
 #include "../../png.h"
 
 #if PNG_LIBPNG_VER < 10500
-/* This delibarately lacks the PNG_CONST. */
+/* This deliberately lacks the PNG_CONST. */
 typedef png_byte *png_const_bytep;
 
 /* This is copied from 1.5.1 png.h: */
@@ -9388,7 +9388,7 @@ int main(int argc, PNG_CONST char **argv)
    size_t cp = 0;
    char command[1024];
 
-   context(&pm.this, fault);
+   anon_context(&pm.this);
 
    /* Add appropriate signal handlers, just the ANSI specified ones: */
    signal(SIGABRT, signal_handler);
@@ -9750,7 +9750,7 @@ int main(int argc, PNG_CONST char **argv)
 #endif
    }
 
-   Catch(fault)
+   Catch_anonymous
    {
       fprintf(stderr, "pngvalid: test aborted (probably failed in cleanup)\n");
       if (!pm.this.verbose)

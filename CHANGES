@@ -3744,21 +3744,44 @@ Version 1.5.7beta04 [November 17, 2011]
     Also removed a duplicate setting of this flag.
   Added files that were omitted from the libpng-1.5.7beta03 zip distribution.
 
-Version 1.5.7beta05 [(PENDING RELEASE)]
+Version 1.5.7beta05 [November 25, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
     (Frank Busse).
-  Allow row_stride==0 to indicate default stride in simplified API.
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
+  Backed out 'simplified' API changes. The API seems too complex and there
+    is a lack of consensus or enthusiasm for the proposals.  The API also
+    reveals significant bugs inside libpng (double gamma correction and the
+    known bug of being unable to retrieve a corrected palette). It seems
+    better to wait until the bugs, at least, are corrected.
+  Moved pngvalid.c into contrib/libtests
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.68
 
-Version 1.6.0alpha01 [December 8, 2011]
+Version 1.5.7rc01 [December 1, 2011]
+  Replaced an "#if" with "#ifdef" in pngrtran.c
+  Revised #if PNG_DO_BC block in png.c (use #ifdef and add #else)
+
+Version 1.5.7rc02 [December 5, 2011]
+  Revised project files and contrib/pngvalid/pngvalid.c to account for
+    the relocation of pngvalid into contrib/libtests.
+  Revised pngconf.h to use " __declspec(restrict)" only when MSC_VER >= 1400,
+    as in libpng-1.5.4.
+  Put CRLF line endings in the owatcom project files.
+
+Version 1.5.7rc03 [December 7, 2011]
+  Updated CMakeLists.txt to account for the relocation of pngvalid.c
+
+Version 1.5.7 [December 15, 2011]
+  Minor fixes to pngvalid.c for gcc 4.6.2 compatibility to remove warnings
+    reported by earlier versions.
+  Fixed minor memset/sizeof errors in pngvalid.c.
+
+Version 1.6.0beta01 [December 15, 2011]
   Removed machine-generated configure files from the GIT repository (they will
     continue to appear in the tarball distributions).
   Restored the new 'simplified' API, which was deleted from libpng-1.5.7.
   Added example programs for the new 'simplified' API.
-  Moved pngvalid.c into contrib/libtests
-  Rebuilt Makefile.in, configure, etc., with autoconf-2.68
   Added ANSI-C (C90) headers and require them, and take advantage of the
     change. Also fixed some of the projects/* and contrib/* files that needed
     updates for libpng16 and the move of pngvalid.c.
@@ -3774,20 +3797,13 @@ Version 1.6.0alpha01 [December 8, 2011]
     seems likely that it will ask 'malloc' for more than 65535 bytes with any
     image that has a sufficiently large row size (rather than simply failing
     to read such images).
-  Replaced an "#if" with "ifdef" in pngrtran.c
   New tools directory containing tools used to generate libpng code.
-  Revised pngconf.h to use " __declspec(restrict)" only when MSC_VER >= 1400,
-    as in libpng-1.5.4.
-  Put CRLF line endings in the owatcom project files.
-  Fixed minor memset/sizeof errors in pngvalid.c.
   Fixed race conditions in parallel make builds. With higher degrees of
     parallelism during 'make' the use of the same temporary file names such
     as 'dfn*' can result in a race where a temporary file from one arm of the
     build is deleted or overwritten in another arm.  This changes the
     temporary files for suffix rules to always use $* and ensures that the
     non-suffix rules use unique file names.
-  Updated CMakeLists.txt to account for relocated and new test programs.
-
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
