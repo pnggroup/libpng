@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta01 - December 15, 2011
+Libpng 1.6.0beta02 - December 15, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta01.tar.gz
-   1.6.0beta01.tar.bz2
+   1.6.0beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta02.tar.gz
+   1.6.0beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b01.7z  (LZMA-compressed, recommended)
-   lp160b01.zip
+   lp160b02.7z  (LZMA-compressed, recommended)
+   lp160b02.zip
 
 Other information:
 
-   1.6.0beta01-README.txt
-   1.6.0beta01-LICENSE.txt
+   1.6.0beta02-README.txt
+   1.6.0beta02-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -53,6 +53,8 @@ Version 1.6.0beta01 [December 15, 2011]
     build is deleted or overwritten in another arm.  This changes the
     temporary files for suffix rules to always use $* and ensures that the
     non-suffix rules use unique file names.
+
+Version 1.6.0beta02 [December 15, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

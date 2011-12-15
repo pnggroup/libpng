@@ -3805,6 +3805,8 @@ Version 1.6.0beta01 [December 15, 2011]
     temporary files for suffix rules to always use $* and ensures that the
     non-suffix rules use unique file names.
 
+Version 1.6.0beta02 [December 15, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
