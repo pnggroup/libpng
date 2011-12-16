@@ -3776,6 +3776,10 @@ Version 1.5.7 [December 15, 2011]
   Minor fixes to pngvalid.c for gcc 4.6.2 compatibility to remove warnings
     reported by earlier versions.
 
+Version 1.5.8 [December 16, 2011]
+  Removed '#include config.h"' from contrib/libtests/pngvalid.c.  It's not
+    needed and causes trouble for VPATH building.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
