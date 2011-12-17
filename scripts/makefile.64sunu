@@ -135,12 +135,12 @@ pngtest: pngtest.o $(LIBSO)
 test: pngtest
 	./pngtest
 
-install-headers: png.h pngconf.h
+install-headers: png.h pngconf.h pngconfig.h
 	-@if [ ! -d $(DI) ]; then $(MKDIR_P) $(DI); fi
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
-	cp png.h pngconf.h pnglibconf.h $(DI)/$(LIBNAME)
-	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h $(DI)/$(LIBNAME)/pnglibconf.h
-	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h $(DI)/pnglibconf.h
+	cp png.h pngconf.h pnglibconf.h pngconfig.h $(DI)/$(LIBNAME)
+	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h $(DI)/$(LIBNAME)/pnglibconf.h $(DI)/$LIBNAME)/pngconfig.h
+	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h $(DI)/pnglibconf.h $(DI)/pngconfig.h
 	-@$(RM_F) $(DI)/libpng
 	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 
@@ -222,20 +222,20 @@ writelock:
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngerror.o pngerror.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngrio.o pngrio.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngwio.o pngwio.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngmem.o pngmem.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngset.o pngset.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngget.o pngget.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngread.o pngread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngrtran.o pngrtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngrutil.o pngrutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngtrans.o pngtrans.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngwrite.o pngwrite.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngwtran.o pngwtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngwutil.o pngwutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+png.o png.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngerror.o pngerror.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngrio.o pngrio.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngwio.o pngwio.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngmem.o pngmem.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngset.o pngset.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngget.o pngget.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngread.o pngread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngrtran.o pngrtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngrutil.o pngrutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngtrans.o pngtrans.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngwrite.o pngwrite.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngwtran.o pngwtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngwutil.o pngwutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
+pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 
-pngtest.o: png.h pngconf.h pnglibconf.h
+pngtest.o: png.h pngconf.h pnglibconf.h pngconfig.h

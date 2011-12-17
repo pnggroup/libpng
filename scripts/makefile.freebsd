@@ -17,14 +17,15 @@ NOOBJ=          YES
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
 LIBDIR=		/lib
-INCS=		png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+INCS=		png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 INCSDIR=	/include/libpng
 INCDIR=		${INCSDIR}		# for 4.x bsd.lib.mk
 MAN=		libpng.3 libpngpf.3 png.5
 MANDIR=		/man/man
 SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 		libpng/pngconf.h ${INCSDIR}/../pngconf.h \
-		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h
+		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h \
+		libpng/pngconfig.h ${INCSDIR}/../pngconfig.h
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 

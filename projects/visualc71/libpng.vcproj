@@ -363,6 +363,9 @@
 			<File
 				RelativePath="..\..\pngpriv.h">
 			</File>
+			<File
+				RelativePath="..\..\pngconfig.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

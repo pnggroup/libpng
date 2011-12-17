@@ -21,7 +21,7 @@ SHLIB_MINOR=	1.6.0beta02
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c
-INCS=	png.h pngconf.h pnglibconf.h
+INCS=	png.h pngconf.h pnglibconf.h pngconfig.h
 MAN=	libpng.3 libpngpf.3 png.5
 
 CPPFLAGS+=-I${.CURDIR}

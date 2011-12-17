@@ -40,7 +40,7 @@ lib_LTLIBRARIES=libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c pngrutil.c\
 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
-	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h
+	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngconfig.h
 
 if PNG_ARM_NEON
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/filter_neon.S
@@ -70,7 +70,7 @@ endif
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
-pkginclude_HEADERS= png.h pngconf.h
+pkginclude_HEADERS= png.h pngconf.h pngconfig.h
 nodist_pkginclude_HEADERS= pnglibconf.h
 
 # pkg-config stuff, note that libpng.pc is always required in order
@@ -111,8 +111,9 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
-scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
-scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
+scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h pngconfig.h
+scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt \
+	pngconfig.h
 
 libpng.sym: scripts/sym.out
 	rm -f $@
@@ -188,7 +189,7 @@ scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	mv pnglibconf.tf7 $@
 
 $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
-	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h
+	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h pngconfig.h
 
 test: check-am
 
@@ -201,12 +202,15 @@ dist-hook:
 
 # install the .../include headers as links to the new ones
 install-data-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h \
+                pngconfig.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
 		pngconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
 		pnglibconf.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconfig.h \
+		pngconfig.h
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
@@ -224,7 +228,8 @@ install-exec-hook:
 	done
 
 uninstall-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h \
+            pngconfig.h
 	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
 	rm -f $(DESTDIR)$(bindir)/libpng-config
 	rm -f $(DESTDIR)$(libdir)/libpng.a

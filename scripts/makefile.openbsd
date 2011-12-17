@@ -18,7 +18,7 @@ SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
 	pngread.c pngrio.c pngrtran.c pngrutil.c pngset.c pngtrans.c \
 	pngwio.c pngwrite.c pngwtran.c pngwutil.c
 
-HDRS=	png.h pngconf.h pnglibconf.h
+HDRS=	png.h pngconf.h pnglibconf.h pngconfig.h
 
 CFLAGS+= -W -Wall
 CPPFLAGS+= -I${.CURDIR}
@@ -71,6 +71,7 @@ afterinstall:
 	@rm -f ${DESTDIR}${PREFIX}/include/png.h
 	@rm -f ${DESTDIR}${PREFIX}/include/pngconf.h
 	@rm -f ${DESTDIR}${PREFIX}/include/pnglibconf.h
+	@rm -f ${DESTDIR}${PREFIX}/include/pngconfig.h
 	@rmdir ${DESTDIR}${LIBDIR}/debug 2>/dev/null || true
 	${INSTALL} ${INSTALL_COPY} -o ${SHAREOWN} -g ${SHAREGRP} \
 		-m ${NONBINMODE} ${HDRS} ${DESTDIR}${PREFIX}/include
