@@ -56,14 +56,12 @@ install: libpng.a
 	-@rm -f $(DESTDIR)$(INCPATH)/png.h
 	-@rm -f $(DESTDIR)$(INCPATH)/pngconf.h
 	-@rm -f $(DESTDIR)$(INCPATH)/pnglibconf.h
-	-@rm -f $(DESTDIR)$(INCPATH)/pngconfig.h
 	cp png.h $(DESTDIR)$(INCPATH)/libpng
 	cp pngconf.h $(DESTDIR)$(INCPATH)/libpng
 	cp pnglibconf.h $(DESTDIR)$(INCPATH)/libpng
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconf.h
 	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pnglibconf.h
-	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconfig.h
 	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
 	cp libpng.a $(DESTDIR)$(LIBPATH)
 	chmod 644 $(DESTDIR)$(LIBPATH)/libpng.a
@@ -93,4 +91,4 @@ pngwrite.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pngin
 pngwtran.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngwutil.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 
-pngtest.o: png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest.o: png.h pngconf.h pnglibconf.h

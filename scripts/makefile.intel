@@ -100,7 +100,7 @@ libpng.lib: $(OBJS)
 pngtest.exe: pngtest.obj libpng.lib
 	$(LD) $(LDFLAGS) /OUT:pngtest.exe pngtest.obj libpng.lib $(ZLIBLIB)\zlib.lib
 
-pngtest$(O): png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(O): png.h pngconf.h pnglibconf.h
 	$(CC) $(CFLAGS) $*.c $(ERRFILE)
 
 test: pngtest.exe

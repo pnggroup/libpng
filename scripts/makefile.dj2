@@ -59,4 +59,4 @@ pngwrite.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pngin
 pngwtran.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngwutil.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 
-pngtest.o: png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest.o: png.h pngconf.h pnglibconf.h

@@ -129,7 +129,7 @@ pngwio.obj: pngwio.c png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h         
 pngwrite.obj: pngwrite.c png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngwtran.obj: pngwtran.c png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngwutil.obj: pngwutil.c png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
-pngtest.obj: pngtest.c png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest.obj: pngtest.c png.h pngconf.h pnglibconf.h
 
 $(LIBNAME): $(OBJS)
 	-del $(LIBNAME)

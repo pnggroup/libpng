@@ -82,7 +82,7 @@ libpng.lib: $(OBJS1) $(OBJS2) $(OBJS3)
 	lib libpng $(OBJS2);
 	lib libpng $(OBJS3);
 
-pngtest$(O): png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(O): png.h pngconf.h pnglibconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngtest.exe: pngtest.obj libpng.lib

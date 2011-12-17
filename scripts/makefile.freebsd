@@ -24,8 +24,7 @@ MAN=		libpng.3 libpngpf.3 png.5
 MANDIR=		/man/man
 SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 		libpng/pngconf.h ${INCSDIR}/../pngconf.h \
-		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h \
-		libpng/pngconfig.h ${INCSDIR}/../pngconfig.h
+		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h
 LDADD+=         -lm -lz
 DPADD+=         ${LIBM} ${LIBZ}
 

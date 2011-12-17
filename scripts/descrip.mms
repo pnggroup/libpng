@@ -49,4 +49,4 @@ pngwrite.obj : png.h, pngconf.h, pnglibconf.h, pngpriv.h, pngstruct.h,          
 pngwtran.obj : png.h, pngconf.h, pnglibconf.h, pngpriv.h, pngstruct.h,             pnginfo.h, pngdebug.h, pngconfig.h 
 pngwutil.obj : png.h, pngconf.h, pnglibconf.h, pngpriv.h, pngstruct.h,             pnginfo.h, pngdebug.h, pngconfig.h 
 
-pngtest.obj : png.h, pngconf.h, pngconfig.h
+pngtest.obj : png.h, pngconf.h

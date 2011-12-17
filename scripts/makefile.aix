@@ -83,16 +83,13 @@ install: $(LIBNAME)$(A)
 	-@$(RM_F) $(DI)/$(LIBNAME)/png.h
 	-@$(RM_F) $(DI)/$(LIBNAME)/pngconf.h
 	-@$(RM_F) $(DI)/$(LIBNAME)/pnglibconf.h
-	-@$(RM_F) $(DI)/$(LIBNAME)/pngconfig.h
 	-@$(RM_F) $(DI)/png.h
 	-@$(RM_F) $(DI)/pngconf.h
 	-@$(RM_F) $(DI)/pnglibconf.h
-	-@$(RM_F) $(DI)/pngconfig.h
-	cp png.h pngconf.h pnglibconf.h pngconfig.h $(DI)/$(LIBNAME)
+	cp png.h pngconf.h pnglibconf.h $(DI)/$(LIBNAME)
 	chmod 644 $(DI)/$(LIBNAME)/png.h \
 	$(DI)/$(LIBNAME)/pngconf.h \
-	$(DI)/$(LIBNAME)/pnglibconf.h \
-	$(DI)/$(LIBNAME)/pngconfig.h
+	$(DI)/$(LIBNAME)/pnglibconf.h
 	-@$(RM_F) -r $(DI)/libpng
 	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 	-@$(RM_F) $(DL)/$(LIBNAME)$(A)
@@ -121,4 +118,4 @@ pngwrite$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             png
 pngwtran$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngwutil$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 
-pngtest$(O):  png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(O):  png.h pngconf.h pnglibconf.h

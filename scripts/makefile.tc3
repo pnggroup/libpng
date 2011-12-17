@@ -67,7 +67,7 @@ pngrio$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pngin
 pngwio$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 	$(CC) -c $(CFLAGS) $*.c
 
-pngtest$(O): png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(O): png.h pngconf.h pnglibconf.h
 	$(CC) -c $(CFLAGS) $*.c
 
 pngtrans$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 

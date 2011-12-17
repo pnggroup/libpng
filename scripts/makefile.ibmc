@@ -79,4 +79,4 @@ pngwrite$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             png
 pngwtran$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngwutil$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 
-pngtest$(O):  png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(O):  png.h pngconf.h pnglibconf.h

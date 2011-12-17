@@ -143,7 +143,7 @@ $(LIBNAME): $(OBJS)
 $(LIBOBJS), libpng$(MODEL)
 |
 
-pngtest$(MODEL).obj: pngtest.c png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(MODEL).obj: pngtest.c png.h pngconf.h pnglibconf.h
 	$(CC) $(CFLAGS) -opngtest$(MODEL) -c pngtest.c
 
 pngtest$(MODEL).exe: pngtest$(MODEL).obj

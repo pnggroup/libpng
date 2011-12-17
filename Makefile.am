@@ -70,7 +70,7 @@ endif
 
 #distribute headers in /usr/include/libpng/*
 pkgincludedir= $(includedir)/$(PNGLIB_BASENAME)
-pkginclude_HEADERS= png.h pngconf.h pngconfig.h
+pkginclude_HEADERS= png.h pngconf.h
 nodist_pkginclude_HEADERS= pnglibconf.h
 
 # pkg-config stuff, note that libpng.pc is always required in order
@@ -111,9 +111,8 @@ $(PNGLIB_BASENAME).pc: libpng.pc
 $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
-scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h pngconfig.h
-scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt \
-	pngconfig.h
+scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
+scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
 
 libpng.sym: scripts/sym.out
 	rm -f $@
@@ -202,15 +201,12 @@ dist-hook:
 
 # install the .../include headers as links to the new ones
 install-data-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h \
-                pngconfig.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
 		pngconf.h
 	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
 		pnglibconf.h
-	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconfig.h \
-		pngconfig.h
 	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
 	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
@@ -228,8 +224,7 @@ install-exec-hook:
 	done
 
 uninstall-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h \
-            pngconfig.h
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
 	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
 	rm -f $(DESTDIR)$(bindir)/libpng-config
 	rm -f $(DESTDIR)$(libdir)/libpng.a

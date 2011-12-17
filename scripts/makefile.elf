@@ -33,8 +33,7 @@ RANLIB=ranlib
 RM_F=/bin/rm -f
 
 # where "make install" puts libpng16.a, libpng16.so*,
-# libpng16/png.h, libpng16/pngconf.h, libpng16/pnglibconf.h, and
-# libpng16/pngconfig.h
+# libpng16/png.h, libpng16/pngconf.h, and libpng16/pnglibconf.h
 # Prefix must be a full pathname.
 prefix=/usr/local
 exec_prefix=$(prefix)
@@ -111,7 +110,7 @@ libpng.pc:
 	-e s!@includedir@!$(INCPATH)! \
 	-e s!-lpng16!-lpng16\ -lz\ -lm! > libpng.pc
 
-libpng.syms: png.h pngconf.h pnglibconf.h pngconfig.h
+libpng.syms: png.h pngconf.h pnglibconf.h
 	$(CC) $(CFLAGS) -E -DPNG_BUILDSYMS -DPNG_INTERNAL png.h |\
 	awk -F '[\t [\\]();]' -v PNGMAJ=$(PNGMAJ) 'BEGIN{printf("PNG16_%s {global:\n",PNGMAJ)}\
 	{ for (i=1;i+2<=NF;++i)\
@@ -160,12 +159,12 @@ test: pngtest pngtest-static
 	@echo ""
 	./pngtest-static
 
-install-headers: png.h pngconf.h pnglibconf.h pngconfig.h
+install-headers: png.h pngconf.h pnglibconf.h
 	-@if [ ! -d $(DI) ]; then $(MKDIR_P) $(DI); fi
 	-@if [ ! -d $(DI)/$(LIBNAME) ]; then $(MKDIR_P) $(DI)/$(LIBNAME); fi
-	cp png.h pngconf.h pnglibconf.h pngconfig.h $(DI)/$(LIBNAME)
-	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h $(DI)/$(LIBNAME)/pnglibconf.h $(DI)/$(LIBNAME)/pngconfig.h
-	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h $(DI)/pnglibconf.h $(DI)/pngconfig.h
+	cp png.h pngconf.h pnglibconf.h $(DI)/$(LIBNAME)
+	chmod 644 $(DI)/$(LIBNAME)/png.h $(DI)/$(LIBNAME)/pngconf.h $(DI)/$(LIBNAME)/pnglibconf.h
+	-@$(RM_F) $(DI)/png.h $(DI)/pngconf.h $(DI)/pnglibconf.h
 	-@$(RM_F) $(DI)/libpng
 	(cd $(DI); $(LN_SF) $(LIBNAME) libpng; $(LN_SF) $(LIBNAME)/* .)
 
@@ -261,4 +260,4 @@ pngwtran.o pngwtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h   
 pngwutil.o pngwutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h pngconfig.h 
 
-pngtest.o: png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest.o: png.h pngconf.h pnglibconf.h

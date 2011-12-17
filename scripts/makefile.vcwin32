@@ -88,7 +88,7 @@ libpng.lib: $(OBJS)
 	-$(RM) $@
 	$(AR) $(ARFLAGS) -out:$@ $(OBJS) $(ERRFILE)
 
-pngtest$(O): png.h pngconf.h pnglibconf.h pngconfig.h
+pngtest$(O): png.h pngconf.h pnglibconf.h
 	$(CC) -c $(CFLAGS) $*.c $(ERRFILE)
 
 pngtest.exe: pngtest$(O) libpng.lib

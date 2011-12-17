@@ -87,7 +87,7 @@ $   write sys$output "Building Libpng ..."
 $   CALL MAKE libpng.OLB "lib/crea libpng.olb *.obj" *.OBJ
 $   write sys$output "Building pngtest..."
 $   CALL MAKE pngtest.OBJ "cc ''CCOPT' pngtest" -
-	pngtest.c png.h pngconf.h pnglibconf.h pngconfig.h
+	pngtest.c png.h pngconf.h pnglibconf.h
 $   call make pngtest.exe -
 	"LINK pngtest,libpng.olb/lib,''zlibsrc'libz.olb/lib" -
 	pngtest.obj libpng.olb
