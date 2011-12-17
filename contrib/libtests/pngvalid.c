@@ -25,9 +25,7 @@
 
 #include <signal.h>
 
-#ifdef HAVE_CONFIG_H
-#  include "../../config.h"
-#endif
+#include "../../pngconfig.h"
 
 #ifdef HAVE_FEENABLEEXCEPT
 #  include <fenv.h>
