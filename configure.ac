@@ -97,10 +97,6 @@ AC_CHECK_LIB(z, zlibVersion, ,
 AC_CHECK_LIB([m], [feenableexcept])
 AC_CHECK_FUNCS([feenableexcept])
 
-LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
-LIBPNG_DEFINES=$LIBPNG_DEFINES
-AC_SUBST(LIBPNG_DEFINES)
-
 AC_MSG_CHECKING([if libraries can be versioned])
 
 AC_MSG_CHECKING([if using Solaris linker])

@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2011 John Cunningham Bowler
  *
- * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -23,7 +23,7 @@
 #include <time.h>
 
 #ifdef HAVE_CONFIG_H
-#  include "../../config.h"
+#  include "config.h"
 #endif
 
 #include "../../png.h"

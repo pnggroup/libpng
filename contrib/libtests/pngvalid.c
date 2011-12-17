@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  * Copyright (c) 2011 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -25,7 +25,7 @@
 
 #include <signal.h>
 
-#include "../../pngconfig.h"
+#include "config.h"
 
 #ifdef HAVE_FEENABLEEXCEPT
 #  include <fenv.h>

@@ -55,7 +55,7 @@ Version 1.6.0beta01 [December 15, 2011]
     non-suffix rules use unique file names.
 
 Version 1.6.0beta02 [December 17, 2011]
-  Added pngconfig.h file.  This indirect reference to config.h avoids
+  Added bsconfig.h file.  This indirect reference to config.h avoids
     problems with build scripts that search for config.h and find an
     inappropriate one in the standard paths.
 

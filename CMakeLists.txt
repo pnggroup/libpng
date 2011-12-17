@@ -128,8 +128,6 @@ set(pngstest_sources
 )
 # SOME NEEDED DEFINITIONS
 
-add_definitions(-DPNG_CONFIGURE_LIBPNG)
-
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif(MSVC)

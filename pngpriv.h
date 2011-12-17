@@ -137,15 +137,8 @@ typedef const png_uint_16p * png_const_uint_16pp;
 /* Added at libpng-1.2.9 */
 /* Moved to pngpriv.h at libpng-1.5.0 */
 
-/* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
- * script.  We may need it here to get the correct configuration on things
- * like limits.
- */
-#ifdef PNG_CONFIGURE_LIBPNG
-#  ifdef HAVE_CONFIG_H
-#    include "config.h"
-#  endif
-#endif
+/* Extracted to bsconfig.h at libpng-1.6.0 */
+#include "bsconfig.h"
 
 /* Moved to pngpriv.h at libpng-1.5.0 */
 /* NOTE: some of these may have been used in external applications as
@@ -196,7 +189,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
  * empty if we can't be sure it is supported.  configure builds have already
  * done this work.
  */
-#ifdef PNG_CONFIGURE_LIBPNG
+#ifdef HAVE_CONFIG_H
 #  define PNG_RESTRICT restrict
 #else
    /* Modern compilers support restrict, but assume not for anything not
