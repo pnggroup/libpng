@@ -3805,10 +3805,10 @@ Version 1.6.0beta01 [December 15, 2011]
     temporary files for suffix rules to always use $* and ensures that the
     non-suffix rules use unique file names.
 
-Version 1.6.0beta02 [December 17, 2011]
-  Added bsconfig.h file.  This indirect reference to config.h avoids
-    problems with build scripts that search for config.h and find an
-    inappropriate one in the standard paths.
+Version 1.6.0beta02 [December 18, 2011]
+  Correct configure builds where build and source directories are separate.
+    The include path of 'config.h' was erroneously made relative in pngvalid.c
+    in libpng 1.5.7.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

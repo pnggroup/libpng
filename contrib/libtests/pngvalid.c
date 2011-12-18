@@ -25,13 +25,22 @@
 
 #include <signal.h>
 
-#include "config.h"
+#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#  include <config.h>
+#endif
 
-#ifdef HAVE_FEENABLEEXCEPT
+#ifdef HAVE_FEENABLEEXCEPT /* from config.h, if included */
 #  include <fenv.h>
 #endif
 
-#include "../../png.h"
+/* Define the following to use this test against your installed libpng, rather
+ * than the one being built here:
+ */
+#ifdef PNG_FREESTANDING_TESTS
+#  include <png.h>
+#else
+#  include "../../png.h"
+#endif
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the PNG_CONST. */

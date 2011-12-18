@@ -22,11 +22,18 @@
 
 #include <time.h>
 
-#ifdef HAVE_CONFIG_H
-#  include "config.h"
+#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#  include <config.h>
 #endif
 
-#include "../../png.h"
+/* Define the following to use this test against your installed libpng, rather
+ * than the one being built here:
+ */
+#ifdef PNG_FREESTANDING_TESTS
+#  include <png.h>
+#else
+#  include "../../png.h"
+#endif
 
 static int read_png(FILE *fp)
 {

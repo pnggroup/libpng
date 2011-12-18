@@ -137,8 +137,18 @@ typedef const png_uint_16p * png_const_uint_16pp;
 /* Added at libpng-1.2.9 */
 /* Moved to pngpriv.h at libpng-1.5.0 */
 
-/* Extracted to bsconfig.h at libpng-1.6.0 */
-#include "bsconfig.h"
+/* If HAVE_CONFIG_H is defined during the build then the build system must
+ * provide an appropriate "config.h" file on the include path.  The header file
+ * must provide definitions as required below (search for "HAVE_CONFIG_H");
+ * see configure.ac for more details of the requirements.  The macro
+ * "PNG_NO_CONFIG_H" is provided for maintainers to test for dependencies on
+ * 'configure'; define this macro to prevent the configure build including the
+ * configure generated config.h.  Libpng is expected to compile without *any*
+ * special build system support on a reasonably ANSI-C compliant system.
+ */
+#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#  include <config.h>
+#endif
 
 /* Moved to pngpriv.h at libpng-1.5.0 */
 /* NOTE: some of these may have been used in external applications as
