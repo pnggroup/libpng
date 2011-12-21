@@ -41,7 +41,7 @@ libpng.lib: $(OBJS)
 -$(RM) libpng.lib
 $(AR) libpng.lib r $(OBJS)
 
-$(OBJS): pngconfig.h pngpriv.h png.h pngconf.h pnglibconf.h pnginfo.h pngstruct.h pngdebug.h
+$(OBJS): pngpriv.h png.h pngconf.h pnglibconf.h pnginfo.h pngstruct.h pngdebug.h
 
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
 $(CP) scripts/pnglibconf.h.prebuilt pnglibconf.h
