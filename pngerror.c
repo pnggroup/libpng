@@ -492,11 +492,108 @@ jmp_buf* PNGAPI
 png_set_longjmp_fn(png_structp png_ptr, png_longjmp_ptr longjmp_fn,
     size_t jmp_buf_size)
 {
-   if (png_ptr == NULL || jmp_buf_size != png_sizeof(jmp_buf))
+   /* From libpng 1.6.0 the app gets one chance to set a 'jmpbuf_size' value
+    * and it must not change after that.  Libpng doesn't care how big the
+    * buffer is, just that it doesn't change.
+    *
+    * If the buffer size is no *larger* than the size of jmp_buf when libpng is
+    * compiled a built in jmp_buf is returned; this preserves the pre-1.6.0
+    * semantics that this call will not fail.  If the size is larger, however,
+    * the buffer is allocated and this may fail, causing the function to return
+    * NULL.
+    */
+   if (png_ptr == NULL)
       return NULL;
 
+   if (png_ptr->jmp_buf_ptr == NULL)
+   {
+      png_ptr->jmp_buf_size = 0; /* not allocated */
+
+      if (jmp_buf_size <= sizeof png_ptr->jmp_buf_local)
+         png_ptr->jmp_buf_ptr = &png_ptr->jmp_buf_local;
+
+      else
+      {
+         png_ptr->jmp_buf_ptr = png_voidcast(jmp_buf *,
+            png_malloc_warn(png_ptr, jmp_buf_size));
+
+         if (png_ptr->jmp_buf_ptr == NULL)
+            return NULL; /* new NULL return on OOM */
+
+         png_ptr->jmp_buf_size = jmp_buf_size;
+      }
+   }
+
+   else /* Already allocated: check the size */
+   {
+      size_t size = png_ptr->jmp_buf_size;
+
+      if (size == 0)
+      {
+         size = sizeof png_ptr->jmp_buf_local;
+         if (png_ptr->jmp_buf_ptr != &png_ptr->jmp_buf_local)
+         {
+            /* This is an internal error in libpng: somehow we have been left
+             * with a stack allocated jmp_buf when the application regained
+             * control.  It's always possible to fix this up, but for the moment
+             * this is a png_error because that makes it easy to detect.
+             */
+            png_error(png_ptr, "Libpng jmp_buf still allocated");
+            /* png_ptr->jmp_buf_ptr = &png_ptr->jmp_buf_local; */
+         }
+      }
+
+      if (size != jmp_buf_size)
+      {
+         png_warning(png_ptr, "Application jmp_buf size changed");
+         return NULL; /* caller will probably crash: no choice here */
+      }
+   }
+
+   /* Finally fill in the function, now we have a satisfactory buffer. It is
+    * valid to change the function on every call.
+    */
    png_ptr->longjmp_fn = longjmp_fn;
-   return &png_ptr->longjmp_buffer;
+   return png_ptr->jmp_buf_ptr;
+}
+
+void /* PRIVATE */
+png_free_jmpbuf(png_structp png_ptr)
+{
+   if (png_ptr != NULL)
+   {
+      jmp_buf *jb = png_ptr->jmp_buf_ptr;
+
+      /* A size of 0 is used to indicate a local, stack, allocation of the
+       * pointer; used here and in png.c
+       */
+      if (jb != NULL && png_ptr->jmp_buf_size > 0)
+      {
+
+         /* This stuff is so that a failure to free the error control structure
+          * does not leave libpng in a state with no valid error handling: the
+          * free always succeeds, if there is an error it gets ignored.
+          */
+         if (jb != &png_ptr->jmp_buf_local)
+         {
+            /* Make an internal, libpng, jmp_buf to return here */
+            jmp_buf free_jmp_buf;
+
+            if (!setjmp(free_jmp_buf))
+            {
+               png_ptr->jmp_buf_ptr = &free_jmp_buf; /* come back here */
+               png_ptr->jmp_buf_size = 0; /* stack allocation */
+               png_ptr->longjmp_fn = longjmp;
+               png_free(png_ptr, jb); /* Return to setjmp on error */
+            }
+         }
+      }
+
+      /* *Always* cancel everything out: */
+      png_ptr->jmp_buf_size = 0;
+      png_ptr->jmp_buf_ptr = NULL;
+      png_ptr->longjmp_fn = 0;
+   }
 }
 #endif
 
@@ -556,8 +653,8 @@ PNG_FUNCTION(void,PNGAPI
 png_longjmp,(png_structp png_ptr, int val),PNG_NORETURN)
 {
 #ifdef PNG_SETJMP_SUPPORTED
-   if (png_ptr && png_ptr->longjmp_fn)
-      png_ptr->longjmp_fn(png_ptr->longjmp_buffer, val);
+   if (png_ptr && png_ptr->longjmp_fn && png_ptr->jmp_buf_ptr)
+      png_ptr->longjmp_fn(*png_ptr->jmp_buf_ptr, val);
 #endif
 
    /* Here if not setjmp support or if png_ptr is null. */
@@ -618,7 +715,7 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
 /* This function is called when the application wants to use another method
  * of handling errors and warnings.  Note that the error function MUST NOT
  * return to the calling routine or serious problems will occur.  The return
- * method used in the default routine calls longjmp(png_ptr->longjmp_buffer, 1)
+ * method used in the default routine calls longjmp(png_ptr->jmp_buf_ptr, 1)
  */
 void PNGAPI
 png_set_error_fn(png_structp png_ptr, png_voidp error_ptr,

@@ -29,8 +29,10 @@
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
-   jmp_buf longjmp_buffer;    /* used in png_error */
    png_longjmp_ptr longjmp_fn;/* setjmp non-local goto function. */
+   jmp_buf *jmp_buf_ptr;      /* passed to longjmp_fn */
+   size_t jmp_buf_size;       /* size of the above, if allocated */
+   jmp_buf jmp_buf_local;     /* New name in 1.6.0 for jmp_buf in png_struct */
 #endif
    png_error_ptr error_fn;    /* function for printing errors and aborting */
 #ifdef PNG_WARNINGS_SUPPORTED

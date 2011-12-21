@@ -60,6 +60,21 @@ Version 1.6.0beta02 [December 21, 2011]
     in libpng 1.5.7.
 
 Version 1.6.0beta03 [December 21, 2011]
+  Start-up code size improvements, error handler flexibility. These changes
+    alter how the tricky allocation of the initial png_struct and png_info
+    structures are handled. png_info is now handled in pretty much the same
+    way as everything else, except that the allocations handle NULL return
+    silently.  png_struct is changed in a similar way on allocation and on
+    deallocation a 'safety' error handler is put in place (which should never
+    be required).  The error handler itself is changed to permit mismatches
+    in the application and libpng error buffer size; however, this means a
+    silent change to the API to return the jmp_buf if the size doesn't match
+    the size from the libpng compilation; libpng now allocates the memory and
+    this may fail.  Overall these changes result in slight code size
+    reductions; however, this is a reduction in code that is always executed
+    so is particularly valuable.  Overall on a 64-bit system the libpng DLL
+    decreases in code size by 1733 bytes.  pngerror.o increases in size by
+    about 465 bytes because of the new functionality.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

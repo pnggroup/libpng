@@ -489,7 +489,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_FLAG_LIBRARY_MISMATCH         0x20000
 #define PNG_FLAG_STRIP_ERROR_NUMBERS      0x40000
 #define PNG_FLAG_STRIP_ERROR_TEXT         0x80000
-#define PNG_FLAG_MALLOC_NULL_MEM_OK       0x100000
+                                  /*      0x100000  unused */
                                   /*      0x200000  unused */
                                   /*      0x400000  unused */
 #define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000  /* Added to libpng-1.4.0 */
@@ -677,34 +677,47 @@ PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
 extern "C" {
 #endif /* __cplusplus */
 
-/* These functions are used internally in the code.  They generally
- * shouldn't be used unless you are writing code to add or replace some
- * functionality in libpng.  More information about most functions can
- * be found in the files where the functions are located.
+/* Internal functions; these are not exported from a DLL however because they
+ * are used within several of the C source files they have to be C extern.
  */
 
 /* Check the user version string for compatibility, returns false if the version
  * numbers aren't compatible.
  */
-PNG_EXTERN int png_user_version_check(png_structp png_ptr,
-   png_const_charp user_png_ver);
+PNG_EXTERN int png_user_version_check PNGARG((png_structp png_ptr,
+   png_const_charp user_png_ver));
 
-/* Allocate memory for an internal libpng struct */
-PNG_EXTERN PNG_FUNCTION(png_voidp,png_create_struct,PNGARG((int type)),
-   PNG_ALLOCATED);
+/* Internal base allocator - no messages, NULL on failure to allocate.  This
+ * does, however, call the application provided allocator and that could call
+ * png_error (although that would be a bug in the application implementation.)
+ */
+PNG_EXTERN PNG_FUNCTION(png_voidp,png_malloc_base,PNGARG((png_structp png_ptr,
+   png_alloc_size_t size)),PNG_ALLOCATED);
+
+/* Magic to create a struct when there is no struct to call the user supplied
+ * memory allocators.  Because error handling has not been set up the memory
+ * handlers can't safely call png_error, but this is an obscure and undocumented
+ * restriction so libpng has to assume that the 'free' handler, at least, might
+ * call png_error.
+ */
+PNG_EXTERN PNG_FUNCTION(png_structp,png_create_png_struct,
+   PNGARG((png_const_charp user_png_ver, png_voidp error_ptr,
+    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
+    png_malloc_ptr malloc_fn, png_free_ptr free_fn)),PNG_ALLOCATED);
 
 /* Free memory from internal libpng struct */
-PNG_EXTERN void png_destroy_struct PNGARG((png_voidp struct_ptr));
-
-PNG_EXTERN PNG_FUNCTION(png_voidp,png_create_struct_2,
-   PNGARG((int type, png_malloc_ptr malloc_fn, png_voidp mem_ptr)),
-   PNG_ALLOCATED);
-PNG_EXTERN void png_destroy_struct_2 PNGARG((png_voidp struct_ptr,
-    png_free_ptr free_fn, png_voidp mem_ptr));
+#if 0 /* no longer used */
+PNG_EXTERN void png_destroy_struct_2 PNGARG((png_structp png_ptr,
+    png_voidp struct_ptr));
+#endif
+PNG_EXTERN void png_destroy_png_struct PNGARG((png_structp png_ptr));
 
 /* Free any memory that info_ptr points to and reset struct. */
 PNG_EXTERN void png_info_destroy PNGARG((png_structp png_ptr,
     png_infop info_ptr));
+
+/* Free an allocated jmp_buf (always succeeds) */
+PNG_EXTERN void png_free_jmpbuf PNGARG((png_structp png_ptr));
 
 /* Function to allocate memory for zlib.  PNGAPI is disallowed. */
 PNG_EXTERN PNG_FUNCTION(voidpf,png_zalloc,PNGARG((voidpf png_ptr, uInt items,
@@ -1374,13 +1387,6 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
     int color_type, int interlace_type, int compression_type,
     int filter_type));
-
-/* Free all memory used by the read (old method - NOT DLL EXPORTED) */
-PNG_EXTERN void png_read_destroy PNGARG((png_structp png_ptr,
-    png_infop info_ptr, png_infop end_info_ptr));
-
-/* Free any memory used in png_ptr struct (old method - NOT DLL EXPORTED) */
-PNG_EXTERN void png_write_destroy PNGARG((png_structp png_ptr));
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,

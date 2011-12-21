@@ -1065,8 +1065,8 @@ PNG_EXPORT(17, void, png_write_chunk_end, (png_structp png_ptr));
 PNG_EXPORTA(18, png_infop, png_create_info_struct, (png_structp png_ptr),
     PNG_ALLOCATED);
 
-PNG_EXPORT(19, void, png_info_init_3, (png_infopp info_ptr,
-    png_size_t png_info_struct_size));
+PNG_EXPORTA(19, void, png_info_init_3, (png_infopp info_ptr,
+    png_size_t png_info_struct_size), PNG_DEPRECATED);
 
 /* Writes all the PNG information before the image. */
 PNG_EXPORT(20, void, png_write_info_before_PLTE,
@@ -1894,8 +1894,9 @@ PNG_EXPORT(99, void, png_data_freer,
 
 #ifdef PNG_USER_MEM_SUPPORTED
 PNG_EXPORTA(100, png_voidp, png_malloc_default, (png_structp png_ptr,
-    png_alloc_size_t size), PNG_ALLOCATED);
-PNG_EXPORT(101, void, png_free_default, (png_structp png_ptr, png_voidp ptr));
+    png_alloc_size_t size), PNG_ALLOCATED PNG_DEPRECATED);
+PNG_EXPORTA(101, void, png_free_default, (png_structp png_ptr, png_voidp ptr),
+   PNG_DEPRECATED);
 #endif
 
 #ifdef PNG_ERROR_TEXT_SUPPORTED

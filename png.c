@@ -72,26 +72,20 @@ png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
 PNG_FUNCTION(voidpf /* PRIVATE */,
 png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
 {
-   png_voidp ptr;
-   png_structp p=(png_structp)png_ptr;
-   png_uint_32 save_flags=p->flags;
-   png_alloc_size_t num_bytes;
+   png_alloc_size_t num_bytes = size;
 
    if (png_ptr == NULL)
-      return (NULL);
+      return NULL;
 
-   if (items > PNG_UINT_32_MAX/size)
+   if (items >= (~(png_alloc_size_t)0)/size)
    {
-     png_warning (p, "Potential overflow in png_zalloc()");
-     return (NULL);
+      png_warning (png_voidcast(png_structp, png_ptr),
+         "Potential overflow in png_zalloc()");
+      return NULL;
    }
-   num_bytes = (png_alloc_size_t)items * size;
 
-   p->flags|=PNG_FLAG_MALLOC_NULL_MEM_OK;
-   ptr = (png_voidp)png_malloc((png_structp)png_ptr, num_bytes);
-   p->flags=save_flags;
-
-   return ((voidpf)ptr);
+   num_bytes *= items;
+   return png_malloc_warn(png_voidcast(png_structp, png_ptr), num_bytes);
 }
 
 /* Function to free memory for zlib */
@@ -220,12 +214,124 @@ png_user_version_check(png_structp png_ptr, png_const_charp user_png_ver)
    return 1;
 }
 
-/* Allocate the memory for an info_struct for the application.  We don't
- * really need the png_ptr, but it could potentially be useful in the
- * future.  This should be used in favour of malloc(png_sizeof(png_info))
- * and png_info_init() so that applications that want to use a shared
- * libpng don't have to be recompiled if png_info changes size.
+/* Generic function to create a png_struct for either read or write - this
+ * contains the common initialization.
  */
+PNG_FUNCTION(png_structp /* PRIVATE */,
+png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
+    png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
+    png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
+{
+   png_struct create_struct;
+#  ifdef PNG_SETJMP_SUPPORTED
+      jmp_buf create_jmp_buf;
+#  endif
+
+   /* This temporary stack-allocated structure is used to provide a place to
+    * build enough context to allow the user provided memory allocator (if any)
+    * to be called.
+    */
+   png_memset(&create_struct, 0, sizeof create_struct);
+
+   /* Added at libpng-1.2.6 */
+#  ifdef PNG_USER_LIMITS_SUPPORTED
+      create_struct.user_width_max = PNG_USER_WIDTH_MAX;
+      create_struct.user_height_max = PNG_USER_HEIGHT_MAX;
+
+#     ifdef PNG_USER_CHUNK_CACHE_MAX
+         /* Added at libpng-1.2.43 and 1.4.0 */
+         create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
+#     endif
+
+#     ifdef PNG_SET_USER_CHUNK_MALLOC_MAX
+         /* Added at libpng-1.2.43 and 1.4.1, required only for read but exists
+          * in png_struct regardless.
+          */
+         create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
+#     endif
+#  endif
+
+   /* The following two API calls simply set fields in png_struct, so it is safe
+    * to do them now even though error handling is not yet set up.
+    */
+#  ifdef PNG_USER_MEM_SUPPORTED
+      png_set_mem_fn(&create_struct, mem_ptr, malloc_fn, free_fn);
+#  endif
+
+   /* (*error_fn) can return control to the caller after the error_ptr is set,
+    * this will result in a memory leak unless the error_fn does something
+    * extremely sophisticated.  The design lacks merit but is implicit in the
+    * API.
+    */
+   png_set_error_fn(&create_struct, error_ptr, error_fn, warn_fn);
+
+#  ifdef PNG_SETJMP_SUPPORTED
+      if (!setjmp(create_jmp_buf))
+      {
+         /* Temporarily fake out the longjmp information until we have
+          * successfully completed this function.  This only works if we have
+          * setjmp() support compiled in, but it is safe - this stuff should
+          * never happen.
+          */
+         create_struct.jmp_buf_ptr = &create_jmp_buf;
+         create_struct.jmp_buf_size = 0; /*stack allocation*/
+         create_struct.longjmp_fn = longjmp;
+#  else
+      {
+#  endif
+         /* Call the general version checker (shared with read and write code):
+          */
+         if (png_user_version_check(&create_struct, user_png_ver))
+         {
+
+            /* TODO: delay initializing the zlib structure until it really is
+             * needed.
+             */
+            /* Initialize zbuf - compression/decompression buffer */
+            create_struct.zbuf_size = PNG_ZBUF_SIZE;
+            create_struct.zbuf = png_voidcast(png_bytep,
+               png_malloc_warn(&create_struct, create_struct.zbuf_size));
+
+            /* Finally allocate the png_struct itself. */
+            if (create_struct.zbuf != NULL)
+            {
+               png_structp png_ptr = png_voidcast(png_structp,
+                  png_malloc_warn(&create_struct, sizeof *png_ptr));
+
+               if (png_ptr != NULL)
+               {
+#                 ifdef PNG_SETJMP_SUPPORTED
+                     /* Eliminate the local error handling: */
+                     create_struct.jmp_buf_ptr = NULL;
+                     create_struct.jmp_buf_size = 0;
+                     create_struct.longjmp_fn = 0;
+#                 endif
+
+                  *png_ptr = create_struct;
+
+                  /* This is the successful return point */
+                  return png_ptr;
+               }
+            }
+         }
+      }
+
+   /* A longjmp because of a bug in the application storage allocator or a
+    * simple failure to allocate the png_struct.
+    */
+   if (create_struct.zbuf != NULL)
+   {
+      png_bytep zbuf = create_struct.zbuf;
+
+      /* Ensure we don't keep on returning to this point: */
+      create_struct.zbuf = NULL;
+      png_free(&create_struct, zbuf);
+   }
+
+   return NULL;
+}
+
+/* Allocate the memory for an info_struct for the application. */
 PNG_FUNCTION(png_infop,PNGAPI
 png_create_info_struct,(png_structp png_ptr),PNG_ALLOCATED)
 {
@@ -234,24 +340,29 @@ png_create_info_struct,(png_structp png_ptr),PNG_ALLOCATED)
    png_debug(1, "in png_create_info_struct");
 
    if (png_ptr == NULL)
-      return (NULL);
+      return NULL;
 
-#ifdef PNG_USER_MEM_SUPPORTED
-   info_ptr = (png_infop)png_create_struct_2(PNG_STRUCT_INFO,
-      png_ptr->malloc_fn, png_ptr->mem_ptr);
-#else
-   info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO);
-#endif
+   /* Use the internal API that does not (or at least should not) error out, so
+    * that this call always returns ok.  The application typically sets up the
+    * error handling *after* creating the info_struct because this is the way it
+    * has always been done in 'example.c'.
+    */
+   info_ptr = png_voidcast(png_infop, png_malloc_base(png_ptr,
+      sizeof *info_ptr));
+
    if (info_ptr != NULL)
-      png_info_init_3(&info_ptr, png_sizeof(png_info));
+      png_memset(info_ptr, 0, sizeof *info_ptr);
 
-   return (info_ptr);
+   return info_ptr;
 }
 
 /* This function frees the memory associated with a single info struct.
  * Normally, one would use either png_destroy_read_struct() or
  * png_destroy_write_struct() to free an info struct, but this may be
- * useful for some applications.
+ * useful for some applications.  From libpng 1.6.0 this function is also used
+ * internally to implement the png_info release part of the 'struct' destroy
+ * APIs.  This ensures that all possible approaches free the same data (all of
+ * it).
  */
 void PNGAPI
 png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
@@ -268,25 +379,31 @@ png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
 
    if (info_ptr != NULL)
    {
-      png_info_destroy(png_ptr, info_ptr);
-
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)info_ptr, png_ptr->free_fn,
-          png_ptr->mem_ptr);
-#else
-      png_destroy_struct((png_voidp)info_ptr);
-#endif
+      /* Do this first in case of an error below; if the app implements its own
+       * memory management this can lead to png_free calling png_error, which
+       * will abort this routine and return control to the app error handler.
+       * An infinite loop may result if it then tries to free the same info
+       * ptr.
+       */
       *info_ptr_ptr = NULL;
+
+      png_info_destroy(png_ptr, info_ptr);
+      png_free(png_ptr, info_ptr);
    }
 }
 
 /* Initialize the info structure.  This is now an internal function (0.89)
  * and applications using it are urged to use png_create_info_struct()
- * instead.
+ * instead.  Use deprecated in 1.6.0, internal use removed (used internally it
+ * is just a memset).
+ *
+ * NOTE: it is almost inconceivable that this API is used because it bypasses
+ * the user-memory mechanism and the user error handling/warning mechanisms in
+ * those cases where it does anything other than a memset.
  */
-
-void PNGAPI
-png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
+PNG_FUNCTION(void,PNGAPI
+png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
+   PNG_DEPRECATED)
 {
    png_infop info_ptr = *ptr_ptr;
 
@@ -297,13 +414,16 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
 
    if (png_sizeof(png_info) > png_info_struct_size)
    {
-      png_destroy_struct(info_ptr);
-      info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO);
+      *ptr_ptr = NULL;
+      /* The following line is why this API should not be used: */
+      free(info_ptr);
+      info_ptr = png_voidcast(png_infop, png_malloc_base(NULL,
+         sizeof *info_ptr));
       *ptr_ptr = info_ptr;
    }
 
    /* Set everything to 0 */
-   png_memset(info_ptr, 0, png_sizeof(png_info));
+   png_memset(info_ptr, 0, sizeof *info_ptr);
 }
 
 void PNGAPI
@@ -548,7 +668,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
    }
 #endif
 
-   png_info_init_3(&info_ptr, png_sizeof(png_info));
+   png_memset(info_ptr, 0, sizeof *info_ptr);
 }
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
