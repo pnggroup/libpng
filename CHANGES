@@ -3776,7 +3776,7 @@ Version 1.5.7 [December 15, 2011]
   Minor fixes to pngvalid.c for gcc 4.6.2 compatibility to remove warnings
     reported by earlier versions.
 
-Version 1.5.8 [December 16, 2011]
+Version 1.5.8beta01 [December 21, 2011]
   Removed '#include config.h"' from contrib/libtests/pngvalid.c.  It's not
     needed and causes trouble for VPATH building.
 
