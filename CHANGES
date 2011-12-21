@@ -3810,6 +3810,8 @@ Version 1.6.0beta02 [December 21, 2011]
     The include path of 'config.h' was erroneously made relative in pngvalid.c
     in libpng 1.5.7.
 
+Version 1.6.0beta03 [December 21, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
