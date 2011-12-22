@@ -2596,8 +2596,8 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  *  SIMPLIFIED API
  *******************************************************************************
  *
- * Please read the documentation in libpng-manual.txt if you don't understand
- * what follows.
+ * Please read the documentation in libpng-manual.txt (TODO: write said
+ * documentation) if you don't understand what follows.
  *
  * The simplified API hides the details of both libpng and the PNG file format
  * itself.  It allows PNG files to be read into a very limited number of
