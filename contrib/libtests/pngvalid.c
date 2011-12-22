@@ -3887,6 +3887,9 @@ perform_formatting_test(png_store *volatile ps)
    {
       png_const_charp correct = "29 Aug 2079 13:53:60 +0000";
       png_const_charp result;
+#     if PNG_LIBPNG_VER >= 10600
+         char timestring[29];
+#     endif
       png_structp pp;
       png_time pt;
 
@@ -3904,7 +3907,15 @@ perform_formatting_test(png_store *volatile ps)
       pt.minute = 53;
       pt.second = 60; /* a leap second */
 
-      result = png_convert_to_rfc1123(pp, &pt);
+#     if PNG_LIBPNG_VER < 10600
+         result = png_convert_to_rfc1123(pp, &pt);
+#     else
+         if (png_convert_to_rfc1123_buffer(timestring, &pt))
+            result = timestring;
+
+         else
+            result = NULL;
+#     endif
 
       if (result == NULL)
          png_error(pp, "png_convert_to_rfc1123 failed");

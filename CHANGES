@@ -3810,7 +3810,7 @@ Version 1.6.0beta02 [December 21, 2011]
     The include path of 'config.h' was erroneously made relative in pngvalid.c
     in libpng 1.5.7.
 
-Version 1.6.0beta03 [December 21, 2011]
+Version 1.6.0beta03 [December 22, 2011]
   Start-up code size improvements, error handler flexibility. These changes
     alter how the tricky allocation of the initial png_struct and png_info
     structures are handled. png_info is now handled in pretty much the same
