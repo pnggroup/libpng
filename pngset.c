@@ -1024,9 +1024,9 @@ png_set_unknown_chunks(png_structp png_ptr,
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns == 0)
       return;
 
-   np = (png_unknown_chunkp)png_malloc_warn(png_ptr,
+   np = png_voidcast(png_unknown_chunkp, png_malloc_warn(png_ptr,
        (png_size_t)(info_ptr->unknown_chunks_num + num_unknowns) *
-       png_sizeof(png_unknown_chunk));
+       png_sizeof(png_unknown_chunk)));
 
    if (np == NULL)
    {
@@ -1223,7 +1223,7 @@ png_set_compression_buffer_size(png_structp png_ptr, png_size_t size)
 }
 
 void PNGAPI
-png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
+png_set_invalid(png_const_structp png_ptr, png_infop info_ptr, int mask)
 {
    if (png_ptr && info_ptr)
       info_ptr->valid &= ~mask;

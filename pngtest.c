@@ -1036,14 +1036,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         /* We have to use memcpy instead of "=" because the string
-          * pointed to by png_convert_to_rfc1123() gets free'ed before
-          * we use it.
-          */
-         memcpy(tIME_string, png_convert_to_rfc1123(read_ptr, mod_time),
-            png_sizeof(tIME_string));
+         if (png_convert_to_rfc1123_buffer(tIME_string, mod_time))
+            tIME_string[png_sizeof(tIME_string) - 1] = '\0';
 
-         tIME_string[png_sizeof(tIME_string) - 1] = '\0';
+         else
+            strcpy(tIME_string, "*** invalid time ***");
+
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }
@@ -1231,13 +1229,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         /* We have to use memcpy instead of "=" because the string
-            pointed to by png_convert_to_rfc1123() gets free'ed before
-            we use it */
-         memcpy(tIME_string, png_convert_to_rfc1123(read_ptr, mod_time),
-            png_sizeof(tIME_string));
+         if (png_convert_to_rfc1123_buffer(tIME_string, mod_time))
+            tIME_string[png_sizeof(tIME_string) - 1] = '\0';
 
-         tIME_string[png_sizeof(tIME_string) - 1] = '\0';
+         else
+            strcpy(tIME_string, "*** invalid time ***");
+
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
       }

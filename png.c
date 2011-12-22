@@ -92,7 +92,7 @@ png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
 void /* PRIVATE */
 png_zfree(voidpf png_ptr, voidpf ptr)
 {
-   png_free((png_structp)png_ptr, (png_voidp)ptr);
+   png_free(png_voidcast(png_const_structp,png_ptr), ptr);
 }
 
 /* Reset the CRC variable to 32 bits of 1's.  Care must be taken
@@ -333,7 +333,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 /* Allocate the memory for an info_struct for the application. */
 PNG_FUNCTION(png_infop,PNGAPI
-png_create_info_struct,(png_structp png_ptr),PNG_ALLOCATED)
+png_create_info_struct,(png_const_structp png_ptr),PNG_ALLOCATED)
 {
    png_infop info_ptr;
 
@@ -365,7 +365,7 @@ png_create_info_struct,(png_structp png_ptr),PNG_ALLOCATED)
  * it).
  */
 void PNGAPI
-png_destroy_info_struct(png_structp png_ptr, png_infopp info_ptr_ptr)
+png_destroy_info_struct(png_const_structp png_ptr, png_infopp info_ptr_ptr)
 {
    png_infop info_ptr = NULL;
 
@@ -427,7 +427,7 @@ png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
 }
 
 void PNGAPI
-png_data_freer(png_structp png_ptr, png_infop info_ptr,
+png_data_freer(png_const_structp png_ptr, png_infop info_ptr,
    int freer, png_uint_32 mask)
 {
    png_debug(1, "in png_data_freer");
@@ -447,7 +447,7 @@ png_data_freer(png_structp png_ptr, png_infop info_ptr,
 }
 
 void PNGAPI
-png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
+png_free_data(png_const_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    int num)
 {
    png_debug(1, "in png_free_data");
@@ -570,12 +570,6 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 #endif
 
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
-   if (png_ptr->unknown_chunk.data)
-   {
-      png_free(png_ptr, png_ptr->unknown_chunk.data);
-      png_ptr->unknown_chunk.data = NULL;
-   }
-
    if ((mask & PNG_FREE_UNKN) & info_ptr->free_me)
    {
       if (num != -1)
@@ -617,7 +611,7 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
    /* Free any PLTE entry that was internally allocated */
    if ((mask & PNG_FREE_PLTE) & info_ptr->free_me)
    {
-      png_zfree(png_ptr, info_ptr->palette);
+      png_free(png_ptr, info_ptr->palette);
       info_ptr->palette = NULL;
       info_ptr->valid &= ~PNG_INFO_PLTE;
       info_ptr->num_palette = 0;
@@ -653,20 +647,11 @@ png_free_data(png_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
  * that png_free() checks for NULL pointers for us.
  */
 void /* PRIVATE */
-png_info_destroy(png_structp png_ptr, png_infop info_ptr)
+png_info_destroy(png_const_structp png_ptr, png_infop info_ptr)
 {
    png_debug(1, "in png_info_destroy");
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
-
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   if (png_ptr->num_chunk_list)
-   {
-      png_free(png_ptr, png_ptr->chunk_list);
-      png_ptr->chunk_list = NULL;
-      png_ptr->num_chunk_list = 0;
-   }
-#endif
 
    png_memset(info_ptr, 0, sizeof *info_ptr);
 }
@@ -677,7 +662,7 @@ png_info_destroy(png_structp png_ptr, png_infop info_ptr)
  * pointer before png_write_destroy() or png_read_destroy() are called.
  */
 png_voidp PNGAPI
-png_get_io_ptr(png_structp png_ptr)
+png_get_io_ptr(png_const_structp png_ptr)
 {
    if (png_ptr == NULL)
       return (NULL);
@@ -709,38 +694,31 @@ png_init_io(png_structp png_ptr, png_FILE_p fp)
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
-png_const_charp PNGAPI
-png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
+int PNGAPI
+png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 {
    static PNG_CONST char short_months[12][4] =
         {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
 
-   if (png_ptr == NULL)
-      return (NULL);
+   if (out == NULL)
+      return 0;
 
    if (ptime->year > 9999 /* RFC1123 limitation */ ||
        ptime->month == 0    ||  ptime->month > 12  ||
        ptime->day   == 0    ||  ptime->day   > 31  ||
        ptime->hour  > 23    ||  ptime->minute > 59 ||
        ptime->second > 60)
-   {
-      png_warning(png_ptr, "Ignoring invalid time value");
-      return (NULL);
-   }
+      return 0;
 
    {
       size_t pos = 0;
       char number_buf[5]; /* enough for a four-digit year */
 
-#     define APPEND_STRING(string)\
-         pos = png_safecat(png_ptr->time_buffer, sizeof png_ptr->time_buffer,\
-            pos, (string))
+#     define APPEND_STRING(string) pos = png_safecat(out, 29, pos, (string))
 #     define APPEND_NUMBER(format, value)\
          APPEND_STRING(PNG_FORMAT_NUMBER(number_buf, format, (value)))
-#     define APPEND(ch)\
-         if (pos < (sizeof png_ptr->time_buffer)-1)\
-            png_ptr->time_buffer[pos++] = (ch)
+#     define APPEND(ch) if (pos < 28) out[pos++] = (ch)
 
       APPEND_NUMBER(PNG_NUMBER_FORMAT_u, (unsigned)ptime->day);
       APPEND(' ');
@@ -760,8 +738,30 @@ png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
 #     undef APPEND_STRING
    }
 
-   return png_ptr->time_buffer;
+   return 1;
 }
+
+#     if PNG_LIBPNG_VER < 10700
+/* Original API that uses a private buffer in png_struct.
+ * TODO: deprecate this, it causes png_struct to carry a spurious temporary
+ * buffer (png_struct::time_buffer), better to have the caller pass this in.
+ */
+png_const_charp PNGAPI
+png_convert_to_rfc1123(png_structp png_ptr, png_const_timep ptime)
+{
+   if (png_ptr != NULL)
+   {
+      /* The only failure above if png_ptr != NULL is from an invalid ptime */
+      if (!png_convert_to_rfc1123_buffer(png_ptr->time_buffer, ptime))
+         png_warning(png_ptr, "Ignoring invalid time value");
+
+      else
+         return png_ptr->time_buffer;
+   }
+
+   return NULL;
+}
+#     endif
 #  endif /* PNG_TIME_RFC1123_SUPPORTED */
 
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
@@ -775,13 +775,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta03 - December 21, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta03 - December 22, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta03 - December 21, 2011\
+      return "libpng version 1.6.0beta03 - December 22, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1256,7 +1256,7 @@ int png_XYZ_from_xy(png_XYZ *XYZ, png_xy xy)
    return 0; /*success*/
 }
 
-int png_XYZ_from_xy_checked(png_structp png_ptr, png_XYZ *XYZ, png_xy xy)
+int png_XYZ_from_xy_checked(png_const_structp png_ptr, png_XYZ *XYZ, png_xy xy)
 {
    switch (png_XYZ_from_xy(XYZ, xy))
    {
@@ -1286,7 +1286,7 @@ int png_XYZ_from_xy_checked(png_structp png_ptr, png_XYZ *XYZ, png_xy xy)
 #endif
 
 void /* PRIVATE */
-png_check_IHDR(png_structp png_ptr,
+png_check_IHDR(png_const_structp png_ptr,
    png_uint_32 width, png_uint_32 height, int bit_depth,
    int color_type, int interlace_type, int compression_type,
    int filter_type)
@@ -2008,7 +2008,7 @@ png_ascii_from_fixed(png_structp png_ptr, png_charp ascii, png_size_t size,
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
    !defined(PNG_FIXED_POINT_MACRO_SUPPORTED)
 png_fixed_point
-png_fixed(png_structp png_ptr, double fp, png_const_charp text)
+png_fixed(png_const_structp png_ptr, double fp, png_const_charp text)
 {
    double r = floor(100000 * fp + .5);
 
@@ -2147,7 +2147,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
  * result.
  */
 png_fixed_point
-png_muldiv_warn(png_structp png_ptr, png_fixed_point a, png_int_32 times,
+png_muldiv_warn(png_const_structp png_ptr, png_fixed_point a, png_int_32 times,
     png_int_32 divisor)
 {
    png_fixed_point result;

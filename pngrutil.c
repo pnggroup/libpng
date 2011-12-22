@@ -21,7 +21,7 @@
 #define png_strtod(p,a,b) strtod(a,b)
 
 png_uint_32 PNGAPI
-png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
+png_get_uint_31(png_const_structp png_ptr, png_const_bytep buf)
 {
    png_uint_32 uval = png_get_uint_32(buf);
 
@@ -2783,7 +2783,7 @@ png_check_chunk_name(png_structp png_ptr, png_uint_32 chunk_name)
  * 'display' is false only those pixels present in the pass are filled in.
  */
 void /* PRIVATE */
-png_combine_row(png_structp png_ptr, png_bytep dp, int display)
+png_combine_row(png_const_structp png_ptr, png_bytep dp, int display)
 {
    unsigned int pixel_depth = png_ptr->transformed_pixel_depth;
    png_const_bytep sp = png_ptr->row_buf + 1;

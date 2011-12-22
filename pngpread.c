@@ -1805,7 +1805,7 @@ png_push_have_row(png_structp png_ptr, png_bytep row)
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
 void PNGAPI
-png_progressive_combine_row (png_structp png_ptr, png_bytep old_row,
+png_progressive_combine_row(png_const_structp png_ptr, png_bytep old_row,
     png_const_bytep new_row)
 {
    if (png_ptr == NULL)

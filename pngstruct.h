@@ -140,8 +140,10 @@ struct png_struct_def
                               /* pixel depth used for the row buffers */
    png_byte transformed_pixel_depth;
                               /* pixel depth after read/write transforms */
+#if PNG_LIBPNG_VER < 10600
    png_byte io_chunk_string[5];
                               /* string name of chunk */
+#endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
    png_uint_16 filler;           /* filler bytes for pixel expansion */
@@ -250,8 +252,10 @@ struct png_struct_def
    png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
 #endif
 
+#if PNG_LIBPNG_VER < 10700
 #ifdef PNG_TIME_RFC1123_SUPPORTED
    char time_buffer[29]; /* String to hold RFC 1123 time text */
+#endif
 #endif
 
 /* New members added in libpng-1.0.6 */
@@ -338,8 +342,12 @@ struct png_struct_def
 
 /* New member added in libpng-1.0.25 and 1.2.17 */
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
-   /* Storage for unknown chunk that the library doesn't recognize. */
+   /* Temporary storage for unknown chunk that the library doesn't recognize,
+    * used while reading the chunk.
+    */
+#ifdef PNG_READ_SUPPORTED
    png_unknown_chunk unknown_chunk;
+#endif
 #endif
 
 /* New member added in libpng-1.2.26 */

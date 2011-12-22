@@ -240,8 +240,10 @@ typedef const png_uint_16p * png_const_uint_16pp;
  */
 #ifdef __cplusplus
 #  define png_voidcast(type, value) static_cast<type>(value)
+#  define png_constcast(type, value) const_cast<type>(value)
 #else
 #  define png_voidcast(type, value) (value)
+#  define png_constcast(type, value) ((type)(value))
 #endif /* __cplusplus */
 
 #ifndef PNG_EXTERN
@@ -596,8 +598,8 @@ extern /*PRIVATE*/ PNG_CONST_DATA png_byte png_sRGB_delta[512];
 #define png_fixed(png_ptr, fp, s) ((fp) <= 21474 && (fp) >= -21474 ?\
     ((png_fixed_point)(100000 * (fp))) : (png_fixed_error(png_ptr, s),0))
 #else
-PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
-   png_const_charp text));
+PNG_EXTERN png_fixed_point png_fixed PNGARG((png_const_structp png_ptr,
+   double fp, png_const_charp text));
 #endif
 #endif
 
@@ -691,8 +693,8 @@ PNG_EXTERN int png_user_version_check PNGARG((png_structp png_ptr,
  * does, however, call the application provided allocator and that could call
  * png_error (although that would be a bug in the application implementation.)
  */
-PNG_EXTERN PNG_FUNCTION(png_voidp,png_malloc_base,PNGARG((png_structp png_ptr,
-   png_alloc_size_t size)),PNG_ALLOCATED);
+PNG_EXTERN PNG_FUNCTION(png_voidp,png_malloc_base,
+   PNGARG((png_const_structp png_ptr, png_alloc_size_t size)),PNG_ALLOCATED);
 
 /* Magic to create a struct when there is no struct to call the user supplied
  * memory allocators.  Because error handling has not been set up the memory
@@ -706,14 +708,10 @@ PNG_EXTERN PNG_FUNCTION(png_structp,png_create_png_struct,
     png_malloc_ptr malloc_fn, png_free_ptr free_fn)),PNG_ALLOCATED);
 
 /* Free memory from internal libpng struct */
-#if 0 /* no longer used */
-PNG_EXTERN void png_destroy_struct_2 PNGARG((png_structp png_ptr,
-    png_voidp struct_ptr));
-#endif
 PNG_EXTERN void png_destroy_png_struct PNGARG((png_structp png_ptr));
 
 /* Free any memory that info_ptr points to and reset struct. */
-PNG_EXTERN void png_info_destroy PNGARG((png_structp png_ptr,
+PNG_EXTERN void png_info_destroy PNGARG((png_const_structp png_ptr,
     png_infop info_ptr));
 
 /* Free an allocated jmp_buf (always succeeds) */
@@ -960,8 +958,8 @@ PNG_EXTERN void png_write_start_row PNGARG((png_structp png_ptr));
 #ifndef PNG_USE_COMPILE_TIME_MASKS
 #  define PNG_USE_COMPILE_TIME_MASKS 1
 #endif
-PNG_EXTERN void png_combine_row PNGARG((png_structp png_ptr, png_bytep row,
-    int display));
+PNG_EXTERN void png_combine_row PNGARG((png_const_structp png_ptr,
+    png_bytep row, int display));
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
 /* Expand an interlaced row: the 'row_info' describes the pass data that has
@@ -1378,18 +1376,18 @@ typedef struct png_XYZ
  */
 PNG_EXTERN int png_xy_from_XYZ PNGARG((png_xy *xy, png_XYZ XYZ));
 PNG_EXTERN int png_XYZ_from_xy PNGARG((png_XYZ *XYZ, png_xy xy));
-PNG_EXTERN int png_XYZ_from_xy_checked PNGARG((png_structp png_ptr,
+PNG_EXTERN int png_XYZ_from_xy_checked PNGARG((png_const_structp png_ptr,
    png_XYZ *XYZ, png_xy xy));
 #endif
 
 /* Added at libpng version 1.4.0 */
-PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
+PNG_EXTERN void png_check_IHDR PNGARG((png_const_structp png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
     int color_type, int interlace_type, int compression_type,
     int filter_type));
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
-PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_structp png_ptr,
+PNG_EXTERN PNG_FUNCTION(void, png_fixed_error, (png_const_structp png_ptr,
    png_const_charp name),PNG_NORETURN);
 #endif
 
@@ -1455,7 +1453,7 @@ PNG_EXTERN void png_warning_parameter_unsigned(png_warning_parameters p,
 PNG_EXTERN void png_warning_parameter_signed(png_warning_parameters p,
     int number, int format, png_int_32 value);
 
-PNG_EXTERN void png_formatted_warning(png_structp png_ptr,
+PNG_EXTERN void png_formatted_warning(png_const_structp png_ptr,
     png_warning_parameters p, png_const_charp message);
     /* 'message' follows the X/Open approach of using @1, @2 to insert
      * parameters previously supplied using the above functions.  Errors in
@@ -1600,7 +1598,7 @@ PNG_EXTERN int png_muldiv PNGARG((png_fixed_point_p res, png_fixed_point a,
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
 /* Same deal, but issue a warning on overflow and return 0. */
-PNG_EXTERN png_fixed_point png_muldiv_warn PNGARG((png_structp png_ptr,
+PNG_EXTERN png_fixed_point png_muldiv_warn PNGARG((png_const_structp png_ptr,
     png_fixed_point a, png_int_32 multiplied_by, png_int_32 divided_by));
 #endif
 

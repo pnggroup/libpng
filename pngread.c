@@ -920,6 +920,14 @@ png_read_destroy(png_structp png_ptr)
 #endif /* PNG_TEXT_SUPPORTED */
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+   png_free(png_ptr, png_ptr->unknown_chunk.data);
+#endif
+
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   png_free(png_ptr, png_ptr->chunk_list);
+#endif
+
    /* NOTE: the 'setjmp' buffer may still be allocated and the memory and error
     * callbacks are still set at this point.  They are required to complete the
     * destruction of the png_struct itself.
