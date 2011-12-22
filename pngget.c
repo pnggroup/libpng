@@ -326,7 +326,7 @@ png_get_y_pixels_per_inch(png_const_structp png_ptr, png_const_infop info_ptr)
 
 #ifdef PNG_FIXED_POINT_SUPPORTED
 static png_fixed_point
-png_fixed_inches_from_microns(png_structp png_ptr, png_int_32 microns)
+png_fixed_inches_from_microns(png_const_structp png_ptr, png_int_32 microns)
 {
    /* Convert from metres * 1,000,000 to inches * 100,000, meters to
     * inches is simply *(100/2.54), so we want *(10/2.54) == 500/127.
@@ -337,7 +337,7 @@ png_fixed_inches_from_microns(png_structp png_ptr, png_int_32 microns)
 }
 
 png_fixed_point PNGAPI
-png_get_x_offset_inches_fixed(png_structp png_ptr,
+png_get_x_offset_inches_fixed(png_const_structp png_ptr,
     png_const_infop info_ptr)
 {
    return png_fixed_inches_from_microns(png_ptr,
@@ -347,7 +347,7 @@ png_get_x_offset_inches_fixed(png_structp png_ptr,
 
 #ifdef PNG_FIXED_POINT_SUPPORTED
 png_fixed_point PNGAPI
-png_get_y_offset_inches_fixed(png_structp png_ptr,
+png_get_y_offset_inches_fixed(png_const_structp png_ptr,
     png_const_infop info_ptr)
 {
    return png_fixed_inches_from_microns(png_ptr,
@@ -464,7 +464,7 @@ png_get_bKGD(png_const_structp png_ptr, png_infop info_ptr,
  * cHRM chunk in 1.5.4
  */
 png_uint_32 PNGFAPI
-png_get_cHRM_XYZ_fixed(png_structp png_ptr, png_const_infop info_ptr,
+png_get_cHRM_XYZ_fixed(png_const_structp png_ptr, png_const_infop info_ptr,
     png_fixed_point *int_red_X, png_fixed_point *int_red_Y,
     png_fixed_point *int_red_Z, png_fixed_point *int_green_X,
     png_fixed_point *int_green_Y, png_fixed_point *int_green_Z,
@@ -551,7 +551,7 @@ png_get_cHRM(png_const_structp png_ptr, png_const_infop info_ptr,
 }
 
 png_uint_32 PNGAPI
-png_get_cHRM_XYZ(png_structp png_ptr, png_const_infop info_ptr,
+png_get_cHRM_XYZ(png_const_structp png_ptr, png_const_infop info_ptr,
    double *red_X, double *red_Y, double *red_Z, double *green_X,
    double *green_Y, double *green_Z, double *blue_X, double *blue_Y,
    double *blue_Z)
@@ -733,11 +733,10 @@ png_get_hIST(png_const_structp png_ptr, png_const_infop info_ptr,
 #endif
 
 png_uint_32 PNGAPI
-png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
+png_get_IHDR(png_const_structp png_ptr, png_infop info_ptr,
     png_uint_32 *width, png_uint_32 *height, int *bit_depth,
     int *color_type, int *interlace_type, int *compression_type,
     int *filter_type)
-
 {
    png_debug1(1, "in %s retrieval function", "IHDR");
 
@@ -764,7 +763,7 @@ png_get_IHDR(png_structp png_ptr, png_infop info_ptr,
     * application has ignored our advice not to mess with the members
     * of info_ptr directly.
     */
-   png_check_IHDR (png_ptr, info_ptr->width, info_ptr->height,
+   png_check_IHDR(png_ptr, info_ptr->width, info_ptr->height,
        info_ptr->bit_depth, info_ptr->color_type, info_ptr->interlace_type,
        info_ptr->compression_type, info_ptr->filter_type);
 
@@ -821,7 +820,7 @@ png_get_pCAL(png_const_structp png_ptr, png_const_infop info_ptr,
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 #    ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
 png_uint_32 PNGAPI
-png_get_sCAL_fixed(png_structp png_ptr, png_const_infop info_ptr,
+png_get_sCAL_fixed(png_const_structp png_ptr, png_const_infop info_ptr,
     int *unit, png_fixed_point *width, png_fixed_point *height)
 {
    if (png_ptr != NULL && info_ptr != NULL &&
@@ -1102,7 +1101,7 @@ png_get_chunk_malloc_max (png_const_structp png_ptr)
 /* These functions were added to libpng 1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
 png_uint_32 PNGAPI
-png_get_io_state (png_structp png_ptr)
+png_get_io_state (png_const_structp png_ptr)
 {
    return png_ptr->io_state;
 }
@@ -1113,12 +1112,14 @@ png_get_io_chunk_type (png_const_structp png_ptr)
    return png_ptr->chunk_name;
 }
 
+#if PNG_LIBPNG_VER < 10600
 png_const_bytep PNGAPI
 png_get_io_chunk_name (png_structp png_ptr)
 {
    PNG_CSTRING_FROM_CHUNK(png_ptr->io_chunk_string, png_ptr->chunk_name);
    return png_ptr->io_chunk_string;
 }
+#endif
 #endif /* ?PNG_IO_STATE_SUPPORTED */
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
