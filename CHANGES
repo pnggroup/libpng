@@ -3827,6 +3827,8 @@ Version 1.6.0beta03 [December 22, 2011]
     decreases in code size by 1733 bytes.  pngerror.o increases in size by
     about 465 bytes because of the new functionality.
 
+Version 1.6.0beta04 [December 22, 2011]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta03 - December 22, 2011
+Libpng 1.6.0beta04 - December 22, 2011
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta03.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta03.tar.gz
-   1.6.0beta03.tar.bz2
+   1.6.0beta04.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta04.tar.gz
+   1.6.0beta04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b03.7z  (LZMA-compressed, recommended)
-   lp160b03.zip
+   lp160b04.7z  (LZMA-compressed, recommended)
+   lp160b04.zip
 
 Other information:
 
-   1.6.0beta03-README.txt
-   1.6.0beta03-LICENSE.txt
+   1.6.0beta04-README.txt
+   1.6.0beta04-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -75,6 +75,8 @@ Version 1.6.0beta03 [December 22, 2011]
     so is particularly valuable.  Overall on a 64-bit system the libpng DLL
     decreases in code size by 1733 bytes.  pngerror.o increases in size by
     about 465 bytes because of the new functionality.
+
+Version 1.6.0beta04 [December 22, 2011]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
