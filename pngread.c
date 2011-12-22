@@ -26,10 +26,12 @@ PNG_FUNCTION(png_structp,PNGAPI
 png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn),PNG_ALLOCATED)
 {
-
-#ifdef PNG_USER_MEM_SUPPORTED
-   return (png_create_read_struct_2(user_png_ver, error_ptr, error_fn,
-       warn_fn, NULL, NULL, NULL));
+#ifndef PNG_USER_MEM_SUPPORTED
+   png_structp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
+      error_fn, warn_fn, NULL, NULL, NULL);
+#else
+   return png_create_read_struct_2(user_png_ver, error_ptr, error_fn,
+       warn_fn, NULL, NULL, NULL);
 }
 
 /* Alternate create PNG structure for reading, and allocate any memory
@@ -40,122 +42,66 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
     png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
 {
+   png_structp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
+      error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
 #endif /* PNG_USER_MEM_SUPPORTED */
 
-#ifdef PNG_SETJMP_SUPPORTED
-   volatile
-#endif
-   png_structp png_ptr;
-   volatile int png_cleanup_needed = 0;
-
-   png_debug(1, "in png_create_read_struct");
-
-#ifdef PNG_USER_MEM_SUPPORTED
-   png_ptr = (png_structp)png_create_struct_2(PNG_STRUCT_PNG,
-       malloc_fn, mem_ptr);
-#else
-   png_ptr = (png_structp)png_create_struct(PNG_STRUCT_PNG);
-#endif
-   if (png_ptr == NULL)
-      return (NULL);
-
-   /* Added at libpng-1.2.6 */
-#ifdef PNG_USER_LIMITS_SUPPORTED
-   png_ptr->user_width_max = PNG_USER_WIDTH_MAX;
-   png_ptr->user_height_max = PNG_USER_HEIGHT_MAX;
-
-#  ifdef PNG_USER_CHUNK_CACHE_MAX
-   /* Added at libpng-1.2.43 and 1.4.0 */
-   png_ptr->user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
-#  endif
-
-#  ifdef PNG_SET_USER_CHUNK_MALLOC_MAX
-   /* Added at libpng-1.2.43 and 1.4.1 */
-   png_ptr->user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
-#  endif
-#endif
-
-#ifdef PNG_SETJMP_SUPPORTED
-/* Applications that neglect to set up their own setjmp() and then
- * encounter a png_error() will longjmp here.  Since the jmpbuf is
- * then meaningless we abort instead of returning.
- */
-   if (setjmp(png_jmpbuf(png_ptr))) /* Sets longjmp to match setjmp */
-      PNG_ABORT();
-#endif /* PNG_SETJMP_SUPPORTED */
-
-#ifdef PNG_USER_MEM_SUPPORTED
-   png_set_mem_fn(png_ptr, mem_ptr, malloc_fn, free_fn);
-#endif
-
-   png_set_error_fn(png_ptr, error_ptr, error_fn, warn_fn);
-
-   /* Call the general version checker (shared with read and write code): */
-   if (!png_user_version_check(png_ptr, user_png_ver))
-      png_cleanup_needed = 1;
-
-   if (!png_cleanup_needed)
+   if (png_ptr != NULL)
    {
-   /* Initialize zbuf - compression buffer */
-   png_ptr->zbuf_size = PNG_ZBUF_SIZE;
-   png_ptr->zbuf = (png_bytep)png_malloc_warn(png_ptr, png_ptr->zbuf_size);
+      int ok = 0;
 
-   if (png_ptr->zbuf == NULL)
-      png_cleanup_needed = 1;
-   }
+      /* TODO: why does this happen here on read, but in png_write_IHDR on
+       * write?
+       */
+      png_ptr->zstream.zalloc = png_zalloc;
+      png_ptr->zstream.zfree = png_zfree;
+      png_ptr->zstream.opaque = png_ptr;
 
-   png_ptr->zstream.zalloc = png_zalloc;
-   png_ptr->zstream.zfree = png_zfree;
-   png_ptr->zstream.opaque = (voidpf)png_ptr;
-
-   if (!png_cleanup_needed)
-   {
       switch (inflateInit(&png_ptr->zstream))
       {
          case Z_OK:
-            break; /* Do nothing */
+            ok = 1;
+            break;
 
          case Z_MEM_ERROR:
             png_warning(png_ptr, "zlib memory error");
-            png_cleanup_needed = 1;
             break;
 
          case Z_STREAM_ERROR:
             png_warning(png_ptr, "zlib stream error");
-            png_cleanup_needed = 1;
             break;
 
          case Z_VERSION_ERROR:
             png_warning(png_ptr, "zlib version error");
-            png_cleanup_needed = 1;
             break;
 
-         default: png_warning(png_ptr, "Unknown zlib error");
-            png_cleanup_needed = 1;
+         default:
+            png_warning(png_ptr, "Unknown zlib error");
+            break;
       }
+
+      if (ok)
+      {
+         png_ptr->zstream.next_out = png_ptr->zbuf;
+         png_ptr->zstream.avail_out = png_ptr->zbuf_size;
+
+         /* TODO: delay this, it can be done in png_init_io (if the app doesn't
+          * do it itself) avoiding setting the default function if it is not
+          * required.
+          */
+         png_set_read_fn(png_ptr, NULL, NULL);
+
+         return png_ptr;
+      }
+
+      /* Else something went wrong in the zlib initialization above; it would
+       * much simplify this code if the creation of the zlib stuff was to be
+       * delayed until it is needed.
+       */
+      png_destroy_read_struct(&png_ptr, NULL, NULL);
    }
 
-   if (png_cleanup_needed)
-   {
-      /* Clean up PNG structure and deallocate any memory. */
-      png_free(png_ptr, png_ptr->zbuf);
-      png_ptr->zbuf = NULL;
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr,
-          (png_free_ptr)free_fn, (png_voidp)mem_ptr);
-#else
-      png_destroy_struct((png_voidp)png_ptr);
-#endif
-      return (NULL);
-   }
-
-   png_ptr->zstream.next_out = png_ptr->zbuf;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-
-   png_set_read_fn(png_ptr, NULL, NULL);
-
-
-   return (png_ptr);
+   return NULL;
 }
 
 
@@ -925,103 +871,11 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-/* Free all memory used by the read */
-void PNGAPI
-png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
-    png_infopp end_info_ptr_ptr)
+/* Free all memory used in the read struct */
+static void
+png_read_destroy(png_structp png_ptr)
 {
-   png_structp png_ptr = NULL;
-   png_infop info_ptr = NULL, end_info_ptr = NULL;
-#ifdef PNG_USER_MEM_SUPPORTED
-   png_free_ptr free_fn = NULL;
-   png_voidp mem_ptr = NULL;
-#endif
-
-   png_debug(1, "in png_destroy_read_struct");
-
-   if (png_ptr_ptr != NULL)
-      png_ptr = *png_ptr_ptr;
-   if (png_ptr == NULL)
-      return;
-
-#ifdef PNG_USER_MEM_SUPPORTED
-   free_fn = png_ptr->free_fn;
-   mem_ptr = png_ptr->mem_ptr;
-#endif
-
-   if (info_ptr_ptr != NULL)
-      info_ptr = *info_ptr_ptr;
-
-   if (end_info_ptr_ptr != NULL)
-      end_info_ptr = *end_info_ptr_ptr;
-
-   png_read_destroy(png_ptr, info_ptr, end_info_ptr);
-
-   if (info_ptr != NULL)
-   {
-#ifdef PNG_TEXT_SUPPORTED
-      png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, -1);
-#endif
-
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)info_ptr, (png_free_ptr)free_fn,
-          (png_voidp)mem_ptr);
-#else
-      png_destroy_struct((png_voidp)info_ptr);
-#endif
-      *info_ptr_ptr = NULL;
-   }
-
-   if (end_info_ptr != NULL)
-   {
-#ifdef PNG_READ_TEXT_SUPPORTED
-      png_free_data(png_ptr, end_info_ptr, PNG_FREE_TEXT, -1);
-#endif
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)end_info_ptr, (png_free_ptr)free_fn,
-          (png_voidp)mem_ptr);
-#else
-      png_destroy_struct((png_voidp)end_info_ptr);
-#endif
-      *end_info_ptr_ptr = NULL;
-   }
-
-   if (png_ptr != NULL)
-   {
-#ifdef PNG_USER_MEM_SUPPORTED
-      png_destroy_struct_2((png_voidp)png_ptr, (png_free_ptr)free_fn,
-          (png_voidp)mem_ptr);
-#else
-      png_destroy_struct((png_voidp)png_ptr);
-#endif
-      *png_ptr_ptr = NULL;
-   }
-}
-
-/* Free all memory used by the read (old method) */
-void /* PRIVATE */
-png_read_destroy(png_structp png_ptr, png_infop info_ptr,
-    png_infop end_info_ptr)
-{
-#ifdef PNG_SETJMP_SUPPORTED
-   jmp_buf tmp_jmp;
-#endif
-   png_error_ptr error_fn;
-#ifdef PNG_WARNINGS_SUPPORTED
-   png_error_ptr warning_fn;
-#endif
-   png_voidp error_ptr;
-#ifdef PNG_USER_MEM_SUPPORTED
-   png_free_ptr free_fn;
-#endif
-
    png_debug(1, "in png_read_destroy");
-
-   if (info_ptr != NULL)
-      png_info_destroy(png_ptr, info_ptr);
-
-   if (end_info_ptr != NULL)
-      png_info_destroy(png_ptr, end_info_ptr);
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
    png_destroy_gamma_table(png_ptr);
@@ -1066,37 +920,37 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
 #endif /* PNG_TEXT_SUPPORTED */
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
-   /* Save the important info out of the png_struct, in case it is
-    * being used again.
+   /* NOTE: the 'setjmp' buffer may still be allocated and the memory and error
+    * callbacks are still set at this point.  They are required to complete the
+    * destruction of the png_struct itself.
     */
-#ifdef PNG_SETJMP_SUPPORTED
-   png_memcpy(tmp_jmp, png_ptr->longjmp_buffer, png_sizeof(jmp_buf));
-#endif
+}
 
-   error_fn = png_ptr->error_fn;
-#ifdef PNG_WARNINGS_SUPPORTED
-   warning_fn = png_ptr->warning_fn;
-#endif
-   error_ptr = png_ptr->error_ptr;
-#ifdef PNG_USER_MEM_SUPPORTED
-   free_fn = png_ptr->free_fn;
-#endif
+/* Free all memory used by the read */
+void PNGAPI
+png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
+    png_infopp end_info_ptr_ptr)
+{
+   png_structp png_ptr = NULL;
 
-   png_memset(png_ptr, 0, png_sizeof(png_struct));
+   png_debug(1, "in png_destroy_read_struct");
 
-   png_ptr->error_fn = error_fn;
-#ifdef PNG_WARNINGS_SUPPORTED
-   png_ptr->warning_fn = warning_fn;
-#endif
-   png_ptr->error_ptr = error_ptr;
-#ifdef PNG_USER_MEM_SUPPORTED
-   png_ptr->free_fn = free_fn;
-#endif
+   if (png_ptr_ptr != NULL)
+      png_ptr = *png_ptr_ptr;
 
-#ifdef PNG_SETJMP_SUPPORTED
-   png_memcpy(png_ptr->longjmp_buffer, tmp_jmp, png_sizeof(jmp_buf));
-#endif
+   if (png_ptr == NULL)
+      return;
 
+   /* libpng 1.6.0: use the API to destroy info structs to ensure consistent
+    * behavior.  Prior to 1.6.0 libpng did extra 'info' destruction in this API.
+    * The extra was, apparently, unnecessary yet this hides memory leak bugs.
+    */
+   png_destroy_info_struct(png_ptr, end_info_ptr_ptr);
+   png_destroy_info_struct(png_ptr, info_ptr_ptr);
+
+   *png_ptr_ptr = NULL;
+   png_read_destroy(png_ptr);
+   png_destroy_png_struct(png_ptr);
 }
 
 void PNGAPI
