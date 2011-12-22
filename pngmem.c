@@ -72,16 +72,21 @@ png_malloc_base,(png_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
     * to implement a user memory handler.  This checks to be sure it isn't
     * called with big numbers.
     */
+#ifdef PNG_USER_MEM_SUPPORTED
+   PNG_UNUSED(png_ptr)
+#endif
    if (size > 0 && size <= ~(size_t)0
 #     ifdef PNG_MAX_MALLOC_64K
          && size <= 65536U
 #     endif
       )
    {
+#ifdef PNG_USER_MEM_SUPPORTED
       if (png_ptr != NULL && png_ptr->malloc_fn != NULL)
          return png_ptr->malloc_fn(png_ptr, size);
 
       else
+#endif
          return malloc((size_t)size); /* checked for truncation above */
    }
 
