@@ -205,7 +205,7 @@ EXPORTS
  png_get_y_offset_inches @197
  png_get_pHYs_dpi @198
  png_get_io_state @199
- png_get_io_chunk_name @200
+;png_get_io_chunk_name @200
  png_get_uint_32 @201
  png_get_uint_16 @202
  png_get_int_32 @203
@@ -246,3 +246,4 @@ EXPORTS
  png_image_free @238
  png_image_write_to_file @239
  png_image_write_to_stdio @240
+ png_convert_to_rfc1123_buffer @241
