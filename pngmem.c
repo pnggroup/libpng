@@ -22,7 +22,7 @@
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Free a png_struct */
 void /* PRIVATE */
-png_destroy_png_struct(png_structp png_ptr)
+png_destroy_png_struct(png_structrp png_ptr)
 {
    if (png_ptr != NULL)
    {
@@ -47,7 +47,7 @@ png_destroy_png_struct(png_structp png_ptr)
  * have the ability to do that.
  */
 PNG_FUNCTION(png_voidp,PNGAPI
-png_calloc,(png_const_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
+png_calloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
@@ -65,7 +65,7 @@ png_calloc,(png_const_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
  * if the allocation cannot be done (for any reason.)
  */
 PNG_FUNCTION(png_voidp /* PRIVATE */,
-png_malloc_base,(png_const_structp png_ptr, png_alloc_size_t size),
+png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
    PNG_ALLOCATED)
 {
    /* Moved to png_malloc_base from png_malloc_default in 1.6.0; the DOS
@@ -84,7 +84,7 @@ png_malloc_base,(png_const_structp png_ptr, png_alloc_size_t size),
    {
 #ifdef PNG_USER_MEM_SUPPORTED
       if (png_ptr != NULL && png_ptr->malloc_fn != NULL)
-         return png_ptr->malloc_fn(png_constcast(png_structp,png_ptr), size);
+         return png_ptr->malloc_fn(png_constcast(png_structrp,png_ptr), size);
 
       else
 #endif
@@ -100,7 +100,7 @@ png_malloc_base,(png_const_structp png_ptr, png_alloc_size_t size),
  * function png_malloc_default is also provided.
  */
 PNG_FUNCTION(png_voidp,PNGAPI
-png_malloc,(png_const_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
+png_malloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 {
    png_voidp ret;
 
@@ -117,7 +117,7 @@ png_malloc,(png_const_structp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
 
 #ifdef PNG_USER_MEM_SUPPORTED
 PNG_FUNCTION(png_voidp,PNGAPI
-png_malloc_default,(png_const_structp png_ptr, png_alloc_size_t size),
+png_malloc_default,(png_const_structrp png_ptr, png_alloc_size_t size),
    PNG_ALLOCATED PNG_DEPRECATED)
 {
    png_voidp ret;
@@ -140,7 +140,7 @@ png_malloc_default,(png_const_structp png_ptr, png_alloc_size_t size),
  * png_error, if it fails to allocate the requested memory.
  */
 PNG_FUNCTION(png_voidp,PNGAPI
-png_malloc_warn,(png_const_structp png_ptr, png_alloc_size_t size),
+png_malloc_warn,(png_const_structrp png_ptr, png_alloc_size_t size),
    PNG_ALLOCATED)
 {
    if (png_ptr != NULL)
@@ -160,21 +160,21 @@ png_malloc_warn,(png_const_structp png_ptr, png_alloc_size_t size),
  * without taking any action.
  */
 void PNGAPI
-png_free(png_const_structp png_ptr, png_voidp ptr)
+png_free(png_const_structrp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL || ptr == NULL)
       return;
 
 #ifdef PNG_USER_MEM_SUPPORTED
    if (png_ptr->free_fn != NULL)
-      png_ptr->free_fn(png_constcast(png_structp,png_ptr), ptr);
+      png_ptr->free_fn(png_constcast(png_structrp,png_ptr), ptr);
 
    else
       png_free_default(png_ptr, ptr);
 }
 
 PNG_FUNCTION(void,PNGAPI
-png_free_default,(png_const_structp png_ptr, png_voidp ptr),PNG_DEPRECATED)
+png_free_default,(png_const_structrp png_ptr, png_voidp ptr),PNG_DEPRECATED)
 {
    if (png_ptr == NULL || ptr == NULL)
       return;
@@ -188,7 +188,7 @@ png_free_default,(png_const_structp png_ptr, png_voidp ptr),PNG_DEPRECATED)
  * of allocating and freeing memory.
  */
 void PNGAPI
-png_set_mem_fn(png_structp png_ptr, png_voidp mem_ptr, png_malloc_ptr
+png_set_mem_fn(png_structrp png_ptr, png_voidp mem_ptr, png_malloc_ptr
   malloc_fn, png_free_ptr free_fn)
 {
    if (png_ptr != NULL)
@@ -204,7 +204,7 @@ png_set_mem_fn(png_structp png_ptr, png_voidp mem_ptr, png_malloc_ptr
  * pointer before png_write_destroy and png_read_destroy are called.
  */
 png_voidp PNGAPI
-png_get_mem_ptr(png_const_structp png_ptr)
+png_get_mem_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)
       return NULL;

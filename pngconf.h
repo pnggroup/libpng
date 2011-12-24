@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta04 - December 22, 2011
+ * libpng version 1.6.0beta04 - December 24, 2011
  *
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -334,9 +334,10 @@
 
 #ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
   /* Support for compiler specific function attributes.  These are used
-   * so that where compiler support is available incorrect use of API
+   * so that where compiler support is available, incorrect use of API
    * functions in png.h will generate compiler warnings.  Added at libpng
-   * version 1.2.41.
+   * version 1.2.41.  Disabling these removes the warnings but may also produce
+   * less efficient code.
    */
 #  if defined(__GNUC__)
 #    ifndef PNG_USE_RESULT
@@ -360,9 +361,11 @@
           __attribute__((__deprecated__))
 #      endif
 #    endif
-#  endif /* __GNUC__ */
+#    ifndef PNG_RESTRICT
+#      define PNG_RESTRICT __restrict
+#    endif
 
-#  if defined(_MSC_VER)  && (_MSC_VER >= 1300)
+#  elif defined(_MSC_VER)  && (_MSC_VER >= 1300)
 #    ifndef PNG_USE_RESULT
 #      define PNG_USE_RESULT /* not supported */
 #    endif
@@ -379,6 +382,16 @@
 #    endif
 #    ifndef PNG_PRIVATE
 #      define PNG_PRIVATE __declspec(deprecated)
+#    endif
+#    ifndef PNG_RESTRICT
+#      if (_MSC_VER >= 1400)
+#        define PNG_RESTRICT __restrict
+#      endif
+#    endif
+
+#  elif defined(__WATCOMC__)
+#    ifndef PNG_RESTRICT
+#      define PNG_RESTRICT __restrict
 #    endif
 #  endif /* _MSC_VER */
 #endif /* PNG_PEDANTIC_WARNINGS */

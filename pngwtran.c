@@ -1,7 +1,7 @@
 
 /* pngwtran.c - transforms the data in a row for PNG writers
  *
- * Last changed in libpng 1.5.6 [November 3, 2011]
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -20,7 +20,7 @@
  * transformations is significant.
  */
 void /* PRIVATE */
-png_do_write_transformations(png_structp png_ptr, png_row_infop row_info)
+png_do_write_transformations(png_structrp png_ptr, png_row_infop row_info)
 {
    png_debug(1, "in png_do_write_transformations");
 

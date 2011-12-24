@@ -86,6 +86,11 @@ Version 1.6.0beta04 [December 24, 2011]
     which meant it didn't exist even on systems where FP was available but not
     preferred.
   Added pngvalid.c compile time checks for const APIs.
+  Implemented 'restrict' for png_info and png_struct. Because of the way
+    libpng works both png_info and png_struct are always accessed via a
+    single pointer.  This means adding C99 'restrict' to the pointer gives
+    the compiler some opportunity to optimize the code.  This change allows
+    that.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

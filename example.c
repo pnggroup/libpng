@@ -39,6 +39,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <png.h>
+#include <zlib.h>
 
 int main(int argc, const char **argv)
 {

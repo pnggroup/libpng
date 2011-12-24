@@ -1,7 +1,7 @@
 
 /* pngrio.c - functions for data input
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -29,7 +29,7 @@
  * to read more then 64K on a 16 bit machine.
  */
 void /* PRIVATE */
-png_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
+png_read_data(png_structrp png_ptr, png_bytep data, png_size_t length)
 {
    png_debug1(4, "reading %d bytes", (int)length);
 
@@ -84,7 +84,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
  *                be used.
  */
 void PNGAPI
-png_set_read_fn(png_structp png_ptr, png_voidp io_ptr,
+png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
    png_rw_ptr read_data_fn)
 {
    if (png_ptr == NULL)

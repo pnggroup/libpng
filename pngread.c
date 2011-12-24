@@ -51,7 +51,8 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
       int ok = 0;
 
       /* TODO: why does this happen here on read, but in png_write_IHDR on
-       * write?
+       * write?  If it happened there then there would be no error handling case
+       * here and png_ptr could be a png_structrp.
        */
       png_ptr->zstream.zalloc = png_zalloc;
       png_ptr->zstream.zfree = png_zfree;
@@ -115,7 +116,7 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
  * read if it is determined that this isn't a valid PNG file.
  */
 void PNGAPI
-png_read_info(png_structp png_ptr, png_infop info_ptr)
+png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_debug(1, "in png_read_info");
 
@@ -278,7 +279,7 @@ png_read_info(png_structp png_ptr, png_infop info_ptr)
 
 /* Optional call to update the users info_ptr structure */
 void PNGAPI
-png_read_update_info(png_structp png_ptr, png_infop info_ptr)
+png_read_update_info(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_debug(1, "in png_read_update_info");
 
@@ -301,7 +302,7 @@ png_read_update_info(png_structp png_ptr, png_infop info_ptr)
  * If the user doesn't call this, we will do it ourselves.
  */
 void PNGAPI
-png_start_read_image(png_structp png_ptr)
+png_start_read_image(png_structrp png_ptr)
 {
    png_debug(1, "in png_start_read_image");
 
@@ -312,7 +313,7 @@ png_start_read_image(png_structp png_ptr)
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 void PNGAPI
-png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
+png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
 {
    int ret;
 
@@ -612,7 +613,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
  */
 
 void PNGAPI
-png_read_rows(png_structp png_ptr, png_bytepp row,
+png_read_rows(png_structrp png_ptr, png_bytepp row,
     png_bytepp display_row, png_uint_32 num_rows)
 {
    png_uint_32 i;
@@ -667,7 +668,7 @@ png_read_rows(png_structp png_ptr, png_bytepp row,
  * [*] png_handle_alpha() does not exist yet, as of this version of libpng
  */
 void PNGAPI
-png_read_image(png_structp png_ptr, png_bytepp image)
+png_read_image(png_structrp png_ptr, png_bytepp image)
 {
    png_uint_32 i, image_height;
    int pass, j;
@@ -732,7 +733,7 @@ png_read_image(png_structp png_ptr, png_bytepp image)
  * or time information at the end of the file, if info is not NULL.
  */
 void PNGAPI
-png_read_end(png_structp png_ptr, png_infop info_ptr)
+png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_debug(1, "in png_read_end");
 
@@ -873,7 +874,7 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 
 /* Free all memory used in the read struct */
 static void
-png_read_destroy(png_structp png_ptr)
+png_read_destroy(png_structrp png_ptr)
 {
    png_debug(1, "in png_read_destroy");
 
@@ -939,7 +940,7 @@ void PNGAPI
 png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
     png_infopp end_info_ptr_ptr)
 {
-   png_structp png_ptr = NULL;
+   png_structrp png_ptr = NULL;
 
    png_debug(1, "in png_destroy_read_struct");
 
@@ -962,7 +963,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
 }
 
 void PNGAPI
-png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
+png_set_read_status_fn(png_structrp png_ptr, png_read_status_ptr read_row_fn)
 {
    if (png_ptr == NULL)
       return;
@@ -974,7 +975,7 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void PNGAPI
-png_read_png(png_structp png_ptr, png_infop info_ptr,
+png_read_png(png_structrp png_ptr, png_inforp info_ptr,
                            int transforms,
                            voidp params)
 {
@@ -1208,7 +1209,7 @@ png_image_read_init(png_imagep image)
 
 /* Utility to find the base format of a PNG file from a png_struct. */
 static png_uint_32
-png_image_format(png_structp png_ptr, png_infop info_ptr)
+png_image_format(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_uint_32 format = 0;
 
@@ -1235,8 +1236,8 @@ static int
 png_image_read_header(png_voidp argument)
 {
    png_imagep image = png_voidcast(png_imagep, argument);
-   png_structp png_ptr = image->opaque->png_ptr;
-   png_infop info_ptr = image->opaque->info_ptr;
+   png_structrp png_ptr = image->opaque->png_ptr;
+   png_inforp info_ptr = image->opaque->info_ptr;
 
    png_read_info(png_ptr, info_ptr);
 
@@ -1434,7 +1435,7 @@ png_image_read_composite(png_voidp argument)
    png_image_read_control *display = png_voidcast(png_image_read_control*,
       argument);
    png_imagep image = display->image;
-   png_structp png_ptr = image->opaque->png_ptr;
+   png_structrp png_ptr = image->opaque->png_ptr;
    png_byte interlace_type = png_ptr->interlaced;
    int passes;
 
@@ -1561,8 +1562,8 @@ png_image_read_background(png_voidp argument)
    png_image_read_control *display = png_voidcast(png_image_read_control*,
       argument);
    png_imagep image = display->image;
-   png_structp png_ptr = image->opaque->png_ptr;
-   png_infop info_ptr = image->opaque->info_ptr;
+   png_structrp png_ptr = image->opaque->png_ptr;
+   png_inforp info_ptr = image->opaque->info_ptr;
    png_byte interlace_type = png_ptr->interlaced;
    png_uint_32 height = image->height;
    png_uint_32 width = image->width;
@@ -1820,8 +1821,8 @@ png_image_read_end(png_voidp argument)
    png_image_read_control *display = png_voidcast(png_image_read_control*,
       argument);
    png_imagep image = display->image;
-   png_structp png_ptr = image->opaque->png_ptr;
-   png_infop info_ptr = image->opaque->info_ptr;
+   png_structrp png_ptr = image->opaque->png_ptr;
+   png_inforp info_ptr = image->opaque->info_ptr;
 
    png_uint_32 format = image->format;
    int linear = (format & PNG_FORMAT_FLAG_LINEAR) != 0;
