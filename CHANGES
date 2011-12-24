@@ -3780,7 +3780,8 @@ Version 1.5.7 [December 15, 2011]
 Version 1.6.0beta01 [December 15, 2011]
   Removed machine-generated configure files from the GIT repository (they will
     continue to appear in the tarball distributions).
-  Restored the new 'simplified' API, which was deleted from libpng-1.5.7.
+  Restored the new 'simplified' API, which was started in libpng-1.5.7beta02
+    but later deleted from libpng-1.5.7beta05.
   Added example programs for the new 'simplified' API.
   Added ANSI-C (C90) headers and require them, and take advantage of the
     change. Also fixed some of the projects/* and contrib/* files that needed
@@ -3827,7 +3828,10 @@ Version 1.6.0beta03 [December 22, 2011]
     decreases in code size by 1733 bytes.  pngerror.o increases in size by
     about 465 bytes because of the new functionality.
 
-Version 1.6.0beta04 [December 22, 2011]
+Version 1.6.0beta04 [December 24, 2011]
+  Regenerated configure scripts with automake-1.11.2
+  Eliminated png_info_destroy. It is now used only in png.c and only calls one
+    other internal functions and memset.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

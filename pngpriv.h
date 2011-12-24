@@ -710,10 +710,6 @@ PNG_EXTERN PNG_FUNCTION(png_structp,png_create_png_struct,
 /* Free memory from internal libpng struct */
 PNG_EXTERN void png_destroy_png_struct PNGARG((png_structp png_ptr));
 
-/* Free any memory that info_ptr points to and reset struct. */
-PNG_EXTERN void png_info_destroy PNGARG((png_const_structp png_ptr,
-    png_infop info_ptr));
-
 /* Free an allocated jmp_buf (always succeeds) */
 PNG_EXTERN void png_free_jmpbuf PNGARG((png_structp png_ptr));
 

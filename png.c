@@ -387,7 +387,8 @@ png_destroy_info_struct(png_const_structp png_ptr, png_infopp info_ptr_ptr)
        */
       *info_ptr_ptr = NULL;
 
-      png_info_destroy(png_ptr, info_ptr);
+      png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
+      png_memset(info_ptr, 0, sizeof *info_ptr);
       png_free(png_ptr, info_ptr);
    }
 }
@@ -641,20 +642,6 @@ png_free_data(png_const_structp png_ptr, png_infop info_ptr, png_uint_32 mask,
 
    info_ptr->free_me &= ~mask;
 }
-
-/* This is an internal routine to free any memory that the info struct is
- * pointing to before re-using it or freeing the struct itself.  Recall
- * that png_free() checks for NULL pointers for us.
- */
-void /* PRIVATE */
-png_info_destroy(png_const_structp png_ptr, png_infop info_ptr)
-{
-   png_debug(1, "in png_info_destroy");
-
-   png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
-
-   png_memset(info_ptr, 0, sizeof *info_ptr);
-}
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
 
 /* This function returns a pointer to the io_ptr associated with the user
@@ -775,13 +762,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta04 - December 22, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta04 - December 24, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta04 - December 22, 2011\
+      return "libpng version 1.6.0beta04 - December 24, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
