@@ -3836,6 +3836,7 @@ Version 1.6.0beta04 [December 24, 2011]
     it was disabled whenever internal fixed point arithmetic was selected,
     which meant it didn't exist even on systems where FP was available but not
     preferred.
+  Added pngvalid.c compile time checks for const APIs.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
