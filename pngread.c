@@ -1437,7 +1437,7 @@ png_image_read_composite(png_voidp argument)
    png_imagep image = display->image;
    png_structrp png_ptr = image->opaque->png_ptr;
    png_byte interlace_type = png_ptr->interlaced;
-   int passes;
+   int passes = 0;
 
    switch (interlace_type)
    {
@@ -1567,7 +1567,7 @@ png_image_read_background(png_voidp argument)
    png_byte interlace_type = png_ptr->interlaced;
    png_uint_32 height = image->height;
    png_uint_32 width = image->width;
-   int pass, passes;
+   int pass, passes = 0;
 
    /* Double check the convoluted logic below.  We expect to get here with
     * libpng doing rgb to gray and gamma correction but background processing
