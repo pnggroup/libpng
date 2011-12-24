@@ -79,8 +79,12 @@ Version 1.6.0beta03 [December 22, 2011]
 
 Version 1.6.0beta04 [December 24, 2011]
   Regenerated configure scripts with automake-1.11.2
-  Eliminated png_info_destroy. It is now used only in png.c and only calls one
-    other internal functions and memset.
+  Eliminated png_info_destroy(). It is now used only in png.c and only calls
+    one other internal function and memset().
+  Enabled png_get_sCAL_fixed() if floating point APIs are enabled. Previously
+    it was disabled whenever internal fixed point arithmetic was selected,
+    which meant it didn't exist even on systems where FP was available but not
+    preferred.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

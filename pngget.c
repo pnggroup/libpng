@@ -818,7 +818,8 @@ png_get_pCAL(png_const_structp png_ptr, png_const_infop info_ptr,
 
 #ifdef PNG_sCAL_SUPPORTED
 #  ifdef PNG_FIXED_POINT_SUPPORTED
-#    ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+#    if (defined PNG_FLOATING_ARITHMETIC_SUPPORTED) || \
+         (defined PNG_FLOATING_POINT_SUPPORTED)
 png_uint_32 PNGAPI
 png_get_sCAL_fixed(png_const_structp png_ptr, png_const_infop info_ptr,
     int *unit, png_fixed_point *width, png_fixed_point *height)
@@ -827,7 +828,10 @@ png_get_sCAL_fixed(png_const_structp png_ptr, png_const_infop info_ptr,
        (info_ptr->valid & PNG_INFO_sCAL))
    {
       *unit = info_ptr->scal_unit;
-      /*TODO: make this work without FP support */
+      /*TODO: make this work without FP support; the API is currently eliminated
+       * if neither floating point APIs nor internal floating point arithmetic
+       * are enabled.
+       */
       *width = png_fixed(png_ptr, atof(info_ptr->scal_s_width), "sCAL width");
       *height = png_fixed(png_ptr, atof(info_ptr->scal_s_height),
          "sCAL height");
