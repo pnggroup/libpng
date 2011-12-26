@@ -97,8 +97,6 @@ AC_CHECK_LIB(z, zlibVersion, ,
 AC_CHECK_LIB([m], [feenableexcept])
 AC_CHECK_FUNCS([feenableexcept])
 
-AC_MSG_CHECKING([if libraries can be versioned])
-
 AC_MSG_CHECKING([if using Solaris linker])
 SLD=`$LD --version 2>&1 | grep Solaris`
 if test "$SLD"; then
@@ -110,6 +108,7 @@ else
 fi
 AM_CONDITIONAL(HAVE_SOLARIS_LD, test "$have_solaris_ld" = "yes")
 
+AC_MSG_CHECKING([if libraries can be versioned])
 # Special case for PE/COFF platforms: ld reports
 # support for version-script, but doesn't actually
 # DO anything with it.
