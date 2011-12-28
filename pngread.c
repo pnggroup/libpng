@@ -903,12 +903,6 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->free_me &= ~PNG_FREE_TRNS;
 #endif
 
-#ifdef PNG_READ_hIST_SUPPORTED
-   if (png_ptr->free_me & PNG_FREE_HIST)
-      png_free(png_ptr, png_ptr->hist);
-   png_ptr->free_me &= ~PNG_FREE_HIST;
-#endif
-
    inflateEnd(&png_ptr->zstream);
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
@@ -1437,7 +1431,7 @@ png_image_read_composite(png_voidp argument)
    png_imagep image = display->image;
    png_structrp png_ptr = image->opaque->png_ptr;
    png_byte interlace_type = png_ptr->interlaced;
-   int passes = 0;
+   int passes;
 
    switch (interlace_type)
    {
@@ -1450,6 +1444,7 @@ png_image_read_composite(png_voidp argument)
          break;
 
       default:
+         passes = 0;
          png_error(png_ptr, "unknown interlace type");
    }
 
@@ -1567,7 +1562,7 @@ png_image_read_background(png_voidp argument)
    png_byte interlace_type = png_ptr->interlaced;
    png_uint_32 height = image->height;
    png_uint_32 width = image->width;
-   int pass, passes = 0;
+   int pass, passes;
 
    /* Double check the convoluted logic below.  We expect to get here with
     * libpng doing rgb to gray and gamma correction but background processing
@@ -1599,6 +1594,7 @@ png_image_read_background(png_voidp argument)
          break;
 
       default:
+         passes = 0;
          png_error(png_ptr, "unknown interlace type");
    }
 

@@ -874,7 +874,7 @@ PNG_EXTERN void png_write_iTXt PNGARG((png_structrp png_ptr,
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED  /* Added at version 1.0.14 and 1.2.4 */
-PNG_EXTERN int png_set_text_2 PNGARG((png_structrp png_ptr,
+PNG_EXTERN int png_set_text_2 PNGARG((png_const_structrp png_ptr,
     png_inforp info_ptr, png_const_textp text_ptr, int num_text));
 #endif
 
@@ -1316,7 +1316,7 @@ PNG_EXTERN void png_do_write_intrapixel PNGARG((png_row_infop row_info,
 
 /* Added at libpng version 1.4.0 */
 #ifdef PNG_CHECK_cHRM_SUPPORTED
-PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structrp png_ptr,
+PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_const_structrp png_ptr,
     png_fixed_point int_white_x, png_fixed_point int_white_y,
     png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
     int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
@@ -1452,12 +1452,12 @@ PNG_EXTERN void png_formatted_warning(png_const_structrp png_ptr,
 #define PNG_sCAL_MAX_DIGITS (PNG_sCAL_PRECISION+1/*.*/+1/*E*/+10/*exponent*/)
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
-PNG_EXTERN void png_ascii_from_fp PNGARG((png_structrp png_ptr, png_charp ascii,
-    png_size_t size, double fp, unsigned int precision));
+PNG_EXTERN void png_ascii_from_fp PNGARG((png_const_structrp png_ptr,
+    png_charp ascii, png_size_t size, double fp, unsigned int precision));
 #endif /* FLOATING_POINT */
 
 #ifdef PNG_FIXED_POINT_SUPPORTED
-PNG_EXTERN void png_ascii_from_fixed PNGARG((png_structrp png_ptr,
+PNG_EXTERN void png_ascii_from_fixed PNGARG((png_const_structrp png_ptr,
     png_charp ascii, png_size_t size, png_fixed_point fp));
 #endif /* FIXED_POINT */
 #endif /* READ_sCAL */

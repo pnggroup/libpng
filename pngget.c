@@ -432,7 +432,7 @@ png_get_channels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 }
 
 png_const_bytep PNGAPI
-png_get_signature(png_const_structrp png_ptr, png_inforp info_ptr)
+png_get_signature(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
       return(info_ptr->signature);
@@ -733,7 +733,7 @@ png_get_hIST(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #endif
 
 png_uint_32 PNGAPI
-png_get_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
+png_get_IHDR(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_uint_32 *width, png_uint_32 *height, int *bit_depth,
     int *color_type, int *interlace_type, int *compression_type,
     int *filter_type)
@@ -975,7 +975,8 @@ png_get_text(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
 #ifdef PNG_tIME_SUPPORTED
 png_uint_32 PNGAPI
-png_get_tIME(png_const_structrp png_ptr, png_inforp info_ptr, png_timep *mod_time)
+png_get_tIME(png_const_structrp png_ptr, png_inforp info_ptr,
+    png_timep *mod_time)
 {
    png_debug1(1, "in %s retrieval function", "tIME");
 

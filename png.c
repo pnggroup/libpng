@@ -762,13 +762,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta04 - December 24, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta04 - December 28, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta04 - December 24, 2011\
+      return "libpng version 1.6.0beta04 - December 28, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -884,7 +884,7 @@ png_access_version_number(void)
 #  ifdef PNG_CHECK_cHRM_SUPPORTED
 
 int /* PRIVATE */
-png_check_cHRM_fixed(png_structrp png_ptr,
+png_check_cHRM_fixed(png_const_structrp png_ptr,
    png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
    png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
    png_fixed_point blue_x, png_fixed_point blue_y)
@@ -1608,7 +1608,7 @@ png_pow10(int power)
  * precision.
  */
 void /* PRIVATE */
-png_ascii_from_fp(png_structrp png_ptr, png_charp ascii, png_size_t size,
+png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
     double fp, unsigned int precision)
 {
    /* We use standard functions from math.h, but not printf because
@@ -1922,8 +1922,8 @@ png_ascii_from_fp(png_structrp png_ptr, png_charp ascii, png_size_t size,
 /* Function to format a fixed point value in ASCII.
  */
 void /* PRIVATE */
-png_ascii_from_fixed(png_structrp png_ptr, png_charp ascii, png_size_t size,
-    png_fixed_point fp)
+png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
+    png_size_t size, png_fixed_point fp)
 {
    /* Require space for 10 decimal digits, a decimal point, a minus sign and a
     * trailing \0, 13 characters:

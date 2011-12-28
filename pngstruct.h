@@ -238,10 +238,6 @@ struct png_struct_def
    png_bytep quantize_index; /* index translation for palette files */
 #endif
 
-#if defined(PNG_READ_QUANTIZE_SUPPORTED) || defined(PNG_hIST_SUPPORTED)
-   png_uint_16p hist;                /* histogram */
-#endif
-
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    png_byte heuristic_method;        /* heuristic for row filter selection */
    png_byte num_prev_filters;        /* number of weights for previous rows */
