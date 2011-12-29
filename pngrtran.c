@@ -97,7 +97,7 @@ png_set_background_fixed(png_structrp png_ptr,
 {
    png_debug(1, "in png_set_background_fixed");
 
-   if (png_ptr == NULL)
+   if (png_ptr == NULL || background_color == NULL)
       return;
 
    if (background_gamma_code == PNG_BACKGROUND_GAMMA_UNKNOWN)
@@ -110,8 +110,7 @@ png_set_background_fixed(png_structrp png_ptr,
    png_ptr->transformations &= ~PNG_ENCODE_ALPHA;
    png_ptr->flags &= ~PNG_FLAG_OPTIMIZE_ALPHA;
 
-   png_memcpy(&(png_ptr->background), background_color,
-      png_sizeof(png_color_16));
+   png_ptr->background = *background_color;
    png_ptr->background_gamma = background_gamma;
    png_ptr->background_gamma_type = (png_byte)(background_gamma_code);
    if (need_expand)

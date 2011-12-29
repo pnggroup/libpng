@@ -762,13 +762,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta04 - December 28, 2011" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta04 - December 29, 2011" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta04 - December 28, 2011\
+      return "libpng version 1.6.0beta04 - December 29, 2011\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -822,7 +822,7 @@ png_handle_as_unknown(png_structrp png_ptr, png_const_bytep chunk_name)
    /* Check chunk_name and return "keep" value if it's on the list, else 0 */
    png_const_bytep p, p_end;
 
-   if (png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list <= 0)
+   if (png_ptr == NULL || chunk_name == NULL || png_ptr->num_chunk_list == 0)
       return PNG_HANDLE_CHUNK_AS_DEFAULT;
 
    p_end = png_ptr->chunk_list;
