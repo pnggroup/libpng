@@ -96,7 +96,7 @@ png_err,(png_const_structrp png_ptr),PNG_NORETURN)
     * will crash in this case.
     */
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
-      (*(png_ptr->error_fn))(png_ptr, "");
+      (*(png_ptr->error_fn))(png_constcast(png_structrp,png_ptr), "");
 
    /* If the custom handler doesn't exist, or if it returns,
       use the default handler, which will not return. */
