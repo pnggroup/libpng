@@ -3846,11 +3846,14 @@ Version 1.6.0beta04 [December 29, 2011]
     location in configure.ac (Gilles Espinasse).
   Changed png_memcpy to C assignment where appropriate. Changed all those
     uses of png_memcpy that were doing a simple assignment to assignments
-    (all those cases where the thing being copied is a non-array C L-value.)
-    Added some error checking to png_set_*() routines and removed the
-    reference to the non-exported function png_memcpy() from example.c. Fixed
-    the Visual C 64-bit build - it requires jmp_buf to be aligned, but it had
-    become misaligned.
+    (all those cases where the thing being copied is a non-array C L-value).
+  Added some error checking to png_set_*() routines.
+  Removed the reference to the non-exported function png_memcpy() from
+    example.c.
+  Fixed the Visual C 64-bit build - it requires jmp_buf to be aligned, but
+    it had become misaligned.
+  Revised contrib/pngminus/pnm2png.c to avoid warnings when png_uint_32
+    and unsigned long are of different sizes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
