@@ -3828,7 +3828,7 @@ Version 1.6.0beta03 [December 22, 2011]
     decreases in code size by 1733 bytes.  pngerror.o increases in size by
     about 465 bytes because of the new functionality.
 
-Version 1.6.0beta04 [December 29, 2011]
+Version 1.6.0beta04 [December 30, 2011]
   Regenerated configure scripts with automake-1.11.2
   Eliminated png_info_destroy(). It is now used only in png.c and only calls
     one other internal function and memset().

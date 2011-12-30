@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta04 - December 22, 2011
+ libpng version 1.6.0beta04 - December 30, 2011
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta04 - December 22, 2011
+ libpng versions 0.97, January 1998, through 1.6.0beta04 - December 30, 2011
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -27,6 +27,24 @@ libpng-manual.txt - A description on how to use and modify libpng
  Updated/rewritten per request in the libpng FAQ
  Copyright (c) 1995, 1996 Frank J. T. Wojcik
  December 18, 1995 & January 20, 1996
+
+ TABLE OF CONTENTS
+
+    I. Introduction
+   II. Structures
+  III. Reading
+   IV. Writing
+    V. Modifying/Customizing libpng
+   VI. MNG support
+  VII. Changes to Libpng from version 0.88
+ VIII. Changes to Libpng from version 1.0.x to 1.2.x
+   IX. Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
+    X. Changes to Libpng from version 1.4.x to 1.5.x
+   XI. Changes to Libpng from version 1.5.x to 1.6.x
+  XII. Detecting libpng
+ XIII. Source code repository
+  XIV. Coding style
+   XV. Y2K Compliance in libpng
 
 I. Introduction
 
@@ -3432,7 +3450,7 @@ if you transfer responsibility for free'ing text_ptr from libpng to your
 application, your application must not separately free those members.
 For a more compact example of writing a PNG image, see the file example.c.
 
-V. Modifying/Customizing libpng:
+V. Modifying/Customizing libpng
 
 There are two issues here.  The first is changing how libpng does
 standard things like memory allocation, input/output, and error handling.
@@ -4484,7 +4502,7 @@ simple verbal discriptions of bug fixes, reported either to the
 SourceForge bug tracker, to the png-mng-implement at lists.sf.net
 mailing list, or directly to glennrp.
 
-XV. Coding style
+XIV. Coding style
 
 Our coding style is similar to the "Allman" style, with curly
 braces on separate lines:
@@ -4598,7 +4616,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XV. Y2K Compliance in libpng
 
-December 22, 2011
+December 30, 2011
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
