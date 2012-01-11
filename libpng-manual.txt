@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta05 - December 30, 2011
+ libpng version 1.6.0beta05 - January 11, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta05 - December 30, 2011
+ libpng versions 0.97, January 1998, through 1.6.0beta05 - January 11, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -34,17 +34,18 @@ libpng-manual.txt - A description on how to use and modify libpng
    II. Structures
   III. Reading
    IV. Writing
-    V. Modifying/Customizing libpng
-   VI. MNG support
-  VII. Changes to Libpng from version 0.88
- VIII. Changes to Libpng from version 1.0.x to 1.2.x
-   IX. Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
-    X. Changes to Libpng from version 1.4.x to 1.5.x
-   XI. Changes to Libpng from version 1.5.x to 1.6.x
-  XII. Detecting libpng
- XIII. Source code repository
-  XIV. Coding style
-   XV. Y2K Compliance in libpng
+    V. Simplified API
+   VI. Modifying/Customizing libpng
+  VII. MNG support
+ VIII. Changes to Libpng from version 0.88
+   IX. Changes to Libpng from version 1.0.x to 1.2.x
+    X. Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
+   XI. Changes to Libpng from version 1.4.x to 1.5.x
+  XII. Changes to Libpng from version 1.5.x to 1.6.x
+ XIII. Detecting libpng
+  XIV. Source code repository
+   XV. Coding style
+  XVI. Y2K Compliance in libpng
 
 I. Introduction
 
@@ -707,7 +708,8 @@ assumes that the PNG data matches your system, to keep this default call:
 
 or you can use the fixed point equivalent:
 
-   png_set_gamma_fixed(png_ptr, PNG_FP_1*screen_gamma, PNG_FP_1/screen_gamma);
+   png_set_gamma_fixed(png_ptr, PNG_FP_1*screen_gamma,
+      PNG_FP_1/screen_gamma);
 
 If you don't know the gamma for your system it is probably 2.2 - a good
 approximation to the IEC standard for display systems (sRGB).  If images are
@@ -719,12 +721,15 @@ display driver, a few systems, including older Macs, change the response by
 default.  As of 1.5.4 three special values are available to handle common
 situations:
 
-   PNG_DEFAULT_sRGB: Indicates that the system conforms to the IEC 61966-2-1
-                     standard.  This matches almost all systems.
-   PNG_GAMMA_MAC_18: Indicates that the system is an older (pre Mac OS 10.6)
-                     Apple Macintosh system with the default settings.
-   PNG_GAMMA_LINEAR: Just the fixed point value for 1.0 - indicates that the
-                     system expects data with no gamma encoding.
+   PNG_DEFAULT_sRGB: Indicates that the system conforms to the
+                     IEC 61966-2-1 standard.  This matches almost
+                     all systems.
+   PNG_GAMMA_MAC_18: Indicates that the system is an older
+                     (pre Mac OS 10.6) Apple Macintosh system with
+                     the default settings.
+   PNG_GAMMA_LINEAR: Just the fixed point value for 1.0 - indicates
+                     that the system expects data with no gamma
+                     encoding.
 
 You would use the linear (unencoded) value if you need to process the pixel
 values further because this avoids the need to decode and reencode each
@@ -741,11 +746,11 @@ Libpng only supports composing onto a single color (using png_set_background;
 see below).  Otherwise you must do the composition yourself and, in this case,
 you may need to call png_set_alpha_mode:
 
-#if PNG_LIBPNG_VER >= 10504
-   png_set_alpha_mode(png_ptr, mode, screen_gamma);
-#else
-   png_set_gamma(png_ptr, screen_gamma, 1.0/screen_gamma);
-#endif
+   #if PNG_LIBPNG_VER >= 10504
+      png_set_alpha_mode(png_ptr, mode, screen_gamma);
+   #else
+      png_set_gamma(png_ptr, screen_gamma, 1.0/screen_gamma);
+   #endif
 
 The screen_gamma value is the same as the argument to png_set_gamma; however,
 how it affects the output depends on the mode.  png_set_alpha_mode() sets the
@@ -1165,27 +1170,32 @@ pointer into the info_ptr is returned for any complex types.
     int_file_gamma - 100,000 times the gamma at which the
                      file is written
 
-    png_get_cHRM(png_ptr, info_ptr,  &white_x, &white_y, &red_x, &red_y,
-                     &green_x, &green_y, &blue_x, &blue_y)
-    png_get_cHRM_XYZ(png_ptr, info_ptr, &red_X, &red_Y, &red_Z, &green_X,
-                     &green_Y, &green_Z, &blue_X, &blue_Y, &blue_Z)
-    png_get_cHRM_fixed(png_ptr, info_ptr, &int_white_x, &int_white_y,
-                     &int_red_x, &int_red_y, &int_green_x, &int_green_y,
-                     &int_blue_x, &int_blue_y)
+    png_get_cHRM(png_ptr, info_ptr,  &white_x, &white_y, &red_x,
+                     &red_y, &green_x, &green_y, &blue_x, &blue_y)
+    png_get_cHRM_XYZ(png_ptr, info_ptr, &red_X, &red_Y, &red_Z,
+                     &green_X, &green_Y, &green_Z, &blue_X, &blue_Y,
+                     &blue_Z)
+    png_get_cHRM_fixed(png_ptr, info_ptr, &int_white_x,
+                     &int_white_y, &int_red_x, &int_red_y,
+                     &int_green_x, &int_green_y, &int_blue_x,
+                     &int_blue_y)
     png_get_cHRM_XYZ_fixed(png_ptr, info_ptr, &int_red_X, &int_red_Y,
-                     &int_red_Z, &int_green_X, &int_green_Y, &int_green_Z,
-                     &int_blue_X, &int_blue_Y, &int_blue_Z)
+                     &int_red_Z, &int_green_X, &int_green_Y,
+                     &int_green_Z, &int_blue_X, &int_blue_Y,
+                     &int_blue_Z)
 
     {white,red,green,blue}_{x,y}
-                     A color space encoding specified using the chromaticities
-                     of the end points and the white point. (PNG_INFO_cHRM)
+                     A color space encoding specified using the
+                     chromaticities of the end points and the
+                     white point. (PNG_INFO_cHRM)
 
     {red,green,blue}_{X,Y,Z}
-                     A color space encoding specified using the encoding end
-                     points - the CIE tristimulus specification of the intended
-                     color of the red, green and blue channels in the PNG RGB
-                     data.  The white point is simply the sum of the three end
-                     points. (PNG_INFO_cHRM)
+                     A color space encoding specified using the
+                     encoding end points - the CIE tristimulus
+                     specification of the intended color of the red,
+                     green and blue channels in the PNG RGB data.
+                     The white point is simply the sum of the three
+                     end points. (PNG_INFO_cHRM)
 
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
 
@@ -1589,17 +1599,19 @@ Within the matrix,
      "A" means the transformation is obtained by png_set_add_alpha().
      "X" means the transformation is obtained by png_set_expand().
      "1" means the transformation is obtained by
-         png_set_expand_gray_1_2_4_to_8() (and by png_set_expand() if there
-         is no transparency in the original or the final format).
+         png_set_expand_gray_1_2_4_to_8() (and by png_set_expand()
+         if there is no transparency in the original or the final
+         format).
      "C" means the transformation is obtained by png_set_gray_to_rgb().
      "G" means the transformation is obtained by png_set_rgb_to_gray().
      "P" means the transformation is obtained by
          png_set_expand_palette_to_rgb().
      "p" means the transformation is obtained by png_set_packing().
      "Q" means the transformation is obtained by png_set_quantize().
-     "T" means the transformation is obtained by png_set_tRNS_to_alpha().
-     "B" means the transformation is obtained by png_set_background(), or
-         png_strip_alpha().
+     "T" means the transformation is obtained by
+         png_set_tRNS_to_alpha().
+     "B" means the transformation is obtained by
+         png_set_background(), or png_strip_alpha().
 
 When an entry has multiple transforms listed all are required to cause the
 right overall transformation.  When two transforms are separated by a comma
@@ -1684,8 +1696,8 @@ with alpha.
 
     if (color_type == PNG_COLOR_TYPE_RGB ||
         color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-       png_set_rgb_to_gray(png_ptr, error_action, double red_weight,
-          double green_weight);
+       png_set_rgb_to_gray(png_ptr, error_action,
+          double red_weight, double green_weight);
 
     error_action = 1: silently do the conversion
 
@@ -1707,7 +1719,8 @@ with alpha.
 In the corresponding fixed point API the red_weight and green_weight values are
 simply scaled by 100,000:
 
-    png_set_rgb_to_gray(png_ptr, error_action, png_fixed_point red_weight,
+    png_set_rgb_to_gray(png_ptr, error_action,
+       png_fixed_point red_weight,
        png_fixed_point green_weight);
 
 If you have set error_action = 1 or 2, you can
@@ -3450,7 +3463,283 @@ if you transfer responsibility for free'ing text_ptr from libpng to your
 application, your application must not separately free those members.
 For a more compact example of writing a PNG image, see the file example.c.
 
-V. Modifying/Customizing libpng
+V. Simplified API
+
+The simplified API, which became available in libpng-1.6.0, hides the details
+of both libpng and the PNG file format itself.
+It allows PNG files to be read into a very limited number of
+in-memory bitmap formats or to be written from the same formats.  If these
+formats do not accomodate your needs then you can, and should, use the more
+sophisticated APIs above - these support a wide variety of in-memory formats
+and a wide variety of sophisticated transformations to those formats as well
+as a wide variety of APIs to manipulate ancilliary information.
+
+To read a PNG file using the simplified API:
+
+  1) Declare a 'png_image' structure (see below) on the
+     stack and memset() it to all zero.
+
+  2) Call the appropriate png_image_begin_read... function.
+
+  3) Set the png_image 'format' member to the required
+     format and allocate a buffer for the image.
+
+  4) Call png_image_finish_read to read the image into
+     your buffer.
+
+There are no restrictions on the format of the PNG input itself; all valid
+color types, bit depths, and interlace methods are acceptable, and the
+input image is transformed as necessary to the requested in-memory format
+during the png_image_finish_read() step.
+
+To write a PNG file using the simplified API:
+
+  1) Declare a 'png_image' structure on the stack and memset()
+     it to all zero.
+
+  2) Initialize the members of the structure that describe the
+     image, setting the 'format' member to the format of the
+     image in memory.
+
+  3) Call the appropriate png_image_write... function with a
+     pointer to the image to write the PNG data.
+
+png_image is a structure that describes the in-memory format of an image
+when it is being read or define the in-memory format of an image that you
+need to write.  The "png_image" structure contains the following members:
+
+   png_uint_32  width   Image width in pixels (columns)
+   png_uint_32  height  Image height in pixels (rows)
+   png_uint_32  format  Image format as defined below
+   png_uint_32  flags   A bit mask containing informational flags
+   png_controlp opaque  Initialize to NULL, free with png_image_free
+
+In the event of an error or warning the following field will be set to a
+non-zero value and the 'message' field will contain a '\0' terminated
+string with the libpng error or warning message.  If both warnings and
+an error were encountered, only the error is recorded.  If there
+are multiple warnings, only the first one is recorded.
+
+As of libpng-1.6.0 the values are
+   0 - no warning or error
+   1 - error
+   2 - warning
+
+   png_uint_32  warning_or_error;
+   char         message[64];
+
+The pixels (samples) of the image have one to four channels whose components
+have original values in the range 0 to 1.0:
+ 
+  1: A single gray or luminance channel (G).
+  2: A gray/luminance channel and an alpha channel (GA).
+  3: Three red, green, blue color channels (RGB).
+  4: Three color channels and an alpha channel (RGBA).
+
+The channels are encoded in one of two ways:
+
+  a) As a small integer, value 0..255, contained in a (png_byte).  For the
+alpha channel the original value is simply value/255.  For the color or
+luminance channels the value is encoded according to the sRGB specification
+and matches the 8-bit format expected by typical display devices.
+
+The color/gray channels are not scaled (pre-multiplied) by the alpha
+channel and are suitable for passing to color management software.
+
+  b) As a value in the range 0..65535, contained in a (png_uint_16).  All
+channels can be converted to the original value by dividing by 65535; all
+channels are linear.  Color channels use the RGB encoding (RGB end-points) of
+the sRGB specification.  This encoding is identified by the
+PNG_FORMAT_FLAG_LINEAR flag below.
+
+When an alpha channel is present it is expected to denote pixel coverage
+of the color or luminance channels and is returned as an associated alpha
+channel: the color/gray channels are scaled (pre-multiplied) by the alpha
+value.
+
+PNG_FORMAT_*
+
+The #defines to be used in png_image::format.  Each #define identifies a
+particular layout of channel data and, if present, alpha values.  There are
+separate defines for each of the two channel encodings.
+
+A format is built up using single bit flag values.  Not all combinations are
+valid: use the bit flag values below for testing a format returned by the
+read APIs, but set formats from the derived values.
+
+NOTE: libpng can be built with particular features disabled, if you see
+compiler errors because the definition of one of the following flags has been
+compiled out it is because libpng does not have the required support.  It is
+possible, however, for the libpng configuration to enable the format on just
+read or just write; in that case you may see an error at run time.  You can
+guard against this by checking for the definition of:
+
+   PNG_SIMPLIFIED_{READ,WRITE}_{BGR,AFIRST}_SUPPORTED
+
+   PNG_FORMAT_FLAG_ALPHA    0x01 format with an alpha channel
+   PNG_FORMAT_FLAG_COLOR    0x02 color format: otherwise grayscale
+   PNG_FORMAT_FLAG_LINEAR   0x04 png_uint_16 channels else png_byte
+   PNG_FORMAT_FLAG_BGR      0x08 BGR colors, else order is RGB
+   PNG_FORMAT_FLAG_AFIRST   0x10 alpha channel comes first
+
+Supported formats are as follows.  Future versions of libpng may support more
+formats; for compatibility with older versions simply check if the format
+macro is defined using #ifdef.  These defines describe the in-memory layout
+of the components of the pixels of the image.
+
+First the single byte formats:
+
+   PNG_FORMAT_GRAY 0
+   PNG_FORMAT_GA   PNG_FORMAT_FLAG_ALPHA
+   PNG_FORMAT_AG   (PNG_FORMAT_GA|PNG_FORMAT_FLAG_AFIRST)
+   PNG_FORMAT_RGB  PNG_FORMAT_FLAG_COLOR
+   PNG_FORMAT_BGR  (PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_BGR)
+   PNG_FORMAT_RGBA (PNG_FORMAT_RGB|PNG_FORMAT_FLAG_ALPHA)
+   PNG_FORMAT_ARGB (PNG_FORMAT_RGBA|PNG_FORMAT_FLAG_AFIRST)
+   PNG_FORMAT_BGRA (PNG_FORMAT_BGR|PNG_FORMAT_FLAG_ALPHA)
+   PNG_FORMAT_ABGR (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_AFIRST)
+
+Then the linear (png_uint_16) formats.  When naming these "Y" is used to
+indicate a luminance (gray) channel.  The component order within the pixel
+is always the same - there is no provision for swapping the order of the
+components in the linear format.
+
+   PNG_FORMAT_LINEAR_Y PNG_FORMAT_FLAG_LINEAR
+   PNG_FORMAT_LINEAR_Y_ALPHA
+      (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_ALPHA)
+   PNG_FORMAT_LINEAR_RGB
+      (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR)
+   PNG_FORMAT_LINEAR_RGB_ALPHA
+      (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|
+      PNG_FORMAT_FLAG_ALPHA)
+
+PNG_IMAGE macros
+
+These are convenience macros to derive information from a png_image structure:
+
+  PNG_IMAGE_CHANNELS(fmt)
+    Returns the total number of channels in a given format: 1..4
+
+  PNG_IMAGE_COMPONENT_SIZE(fmt)
+    Returns the size in bytes of a single component of a pixel
+    in the image.
+
+  PNG_IMAGE_PIXEL_SIZE(fmt)
+    Returns the size in bytes of a single pixel in the image.
+   
+  PNG_IMAGE_ROW_STRIDE(image)
+    Returns the total number of components in a single row
+    of the image; this is the minimum 'row stride', the minimum
+    count of components between each row.
+
+  PNG_IMAGE_BUFFER_SIZE(image, row_stride)
+    Returns the size, in bytes, of an image buffer given
+    a png_image and a row stride - the number of components to
+    leave space for in each row.
+
+  PNG_IMAGE_SIZE(image)
+    Returns the size, in bytes, of the image in memory given
+    just a png_image; the row stride is the minimum stride
+    required for the image.
+
+PNG_IMAGE_FLAG_
+
+Flags containing additional information about the image are held
+  in the 'flags' field of png_image.
+
+   PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB
+      This indicates the the RGB values of the in-memory
+      bitmap do not correspond to the red, green and blue
+      end-points defined by sRGB.
+
+READ APIs
+
+   The png_image passed to the read APIs must have been initialized by setting
+   the png_controlp field 'opaque' to NULL (or, better, memset the whole thing.)
+
+   int png_image_begin_read_from_file( png_imagep image,
+     const char *file_name)
+
+     The named file is opened for read and the image header
+     is filled in from the PNG header in the file.
+   
+
+   int png_image_begin_read_from_stdio (png_imagep image,
+     FILE* file)
+
+      The PNG header is read from the stdio FILE object.
+
+   int png_image_begin_read_from_memory(png_imagep image,
+      png_const_voidp memory, png_size_t size)
+
+      The PNG header is read from the given memory buffer.
+
+   int png_image_finish_read(png_imagep image,
+      png_colorp background, void *buffer, png_int_32 row_stride));
+
+      Finish reading the image into the supplied buffer and
+      clean up the png_image structure.
+     
+      row_stride is the step, in png_byte or png_uint_16 units
+      as appropriate, between adjacent rows.  A positive stride
+      indicates that the top-most row is first in the buffer -
+      the normal top-down arrangement.  A negative stride
+      indicates that the bottom-most row is first in the buffer.
+     
+      background need only be supplied if an alpha channel must
+      be removed from a png_byte format and the removal is to be
+      done by compositing on a solid color; otherwise it may be
+      NULL and any composition will be done directly onto the
+      buffer.  The value is an sRGB color to use for the
+      background, for grayscale output the green channel is used.
+     
+      For linear output removing the alpha channel is always done
+      by compositing on black.
+
+   void png_image_free(png_imagep image)
+
+      Free any data allocated by libpng in image->opaque,
+      setting the pointer to NULL.  May be called at any time
+      after the structure is initialized.
+
+
+WRITE APIS
+
+For write you must initialize a png_image structure to describe the image to
+be written:
+
+   opaque: must be initialized to NULL
+   width: image width in pixels
+   height: image height in rows
+   format: the format of the data you wish to write
+   flags: set to 0 unless one of the defined flags applies; set
+      PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB for color format images
+      where the RGB values do not correspond to the colors in sRGB.
+
+   int png_image_write_to_file, (png_imagep image,
+      const char *file, int convert_to_8bit, const void *buffer,
+      png_int_32 row_stride));
+
+      Write the image to the named file.
+
+   int png_image_write_to_stdio(png_imagep image, FILE *file,
+      int convert_to_8_bit, const void *buffer, png_int_32 row_stride)
+
+      Write the image to the given (FILE*).
+
+With all write APIs if image is in one of the linear formats with
+(png_uint_16) data then setting convert_to_8_bit will cause the output to be
+a (png_byte) PNG gamma encoded according to the sRGB specification, otherwise
+a 16-bit linear encoded PNG file is written.
+
+With all APIs row_stride is handled as in the read APIs - it is the spacing
+from one row to the next in component sized units (float) and if negative
+indicates a bottom-up row layout in the buffer.
+
+Note that the write API does not support interlacing, sub-8-bit pixels,
+and indexed (paletted) images.
+
+VI. Modifying/Customizing libpng
 
 There are two issues here.  The first is changing how libpng does
 standard things like memory allocation, input/output, and error handling.
@@ -3871,7 +4160,7 @@ When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
 having level = 0 will be printed.  There aren't any such statements in
 this version of libpng, but if you insert some they will be printed.
 
-VI.  MNG support
+VII.  MNG support
 
 The MNG specification (available at http://www.libpng.org/pub/mng) allows
 certain extensions to PNG for PNG images that are embedded in MNG datastreams.
@@ -3898,7 +4187,7 @@ or any other MNG chunks; your application must provide its own support for
 them.  You may wish to consider using libmng (available at
 http://www.libmng.com) instead.
 
-VII.  Changes to Libpng from version 0.88
+VIII.  Changes to Libpng from version 0.88
 
 It should be noted that versions of libpng later than 0.96 are not
 distributed by the original libpng author, Guy Schalnat, nor by
@@ -3950,7 +4239,7 @@ application:
 
    png_uint_32 application_vn = PNG_LIBPNG_VER;
 
-VIII.  Changes to Libpng from version 1.0.x to 1.2.x
+IX.  Changes to Libpng from version 1.0.x to 1.2.x
 
 Support for user memory management was enabled by default.  To
 accomplish this, the functions png_create_read_struct_2(),
@@ -4047,7 +4336,7 @@ which also expands tRNS to alpha was replaced with
     png_set_expand_gray_1_2_4_to_8()
 which does not. It has been deprecated since libpng-1.0.18 and 1.2.9.
 
-IX.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
+X.  Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
 
 Private libpng prototypes and macro definitions were moved from
 png.h and pngconf.h into a new pngpriv.h header file.
@@ -4155,7 +4444,7 @@ was renamed to PNG_READ_QUANTIZE_SUPPORTED.
 
 We removed the trailing '.' from the warning and error messages.
 
-X.  Changes to Libpng from version 1.4.x to 1.5.x
+XI.  Changes to Libpng from version 1.4.x to 1.5.x
 
 From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
@@ -4445,7 +4734,10 @@ pngusr.h a system builder may also define equivalent options in pngusr.dfa
 DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
 how to do this, and a case where pngusr.h is still required.
 
-XI.  Changes to Libpng from version 1.5.x to 1.6.x
+XII.  Changes to Libpng from version 1.5.x to 1.6.x
+
+A "simplified API" has been added (see documentation in png.h and a simple
+example in contrib/examples/pngtopng.c)
 
 We no longer include string.h in png.h.  The include statement has been moved
 to pngpriv.h, where it is not accessible by applications.  Applications that
@@ -4466,10 +4758,7 @@ The following has been removed:
      function returns a 32-bit integer instead of
      a string.
 
-A "simplified API" has been added (see documentation in png.h and a simple
-example in contrib/examples/pngtopng.c)
-
-XII.  Detecting libpng
+XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
 changed, and is unaffected by conditional compilation macros.  It is the
@@ -4478,7 +4767,7 @@ libpng version since 0.88.  In an autoconf "configure.in" you could use
 
     AC_CHECK_LIB(png, png_get_io_ptr, ...
 
-XIII. Source code repository
+XV. Source code repository
 
 Since about February 2009, version 1.2.34, libpng has been under "git" source
 control.  The git repository was built from old libpng-x.y.z.tar.gz files
@@ -4502,7 +4791,7 @@ simple verbal discriptions of bug fixes, reported either to the
 SourceForge bug tracker, to the png-mng-implement at lists.sf.net
 mailing list, or directly to glennrp.
 
-XIV. Coding style
+XV. Coding style
 
 Our coding style is similar to the "Allman" style, with curly
 braces on separate lines:
@@ -4614,9 +4903,9 @@ Lines do not exceed 80 characters.
 
 Other rules can be inferred by inspecting the libpng source.
 
-XV. Y2K Compliance in libpng
+XVI. Y2K Compliance in libpng
 
-December 30, 2011
+January 11, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
