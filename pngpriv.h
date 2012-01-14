@@ -1436,7 +1436,7 @@ PNG_EXTERN void png_formatted_warning(png_const_structrp png_ptr,
     png_warning_parameters p, png_const_charp message);
     /* 'message' follows the X/Open approach of using @1, @2 to insert
      * parameters previously supplied using the above functions.  Errors in
-     * specifying the paramters will simple result in garbage substitutions.
+     * specifying the parameters will simple result in garbage substitutions.
      */
 #endif
 
@@ -1446,7 +1446,7 @@ PNG_EXTERN void png_formatted_warning(png_const_structrp png_ptr,
 #if defined(PNG_READ_sCAL_SUPPORTED)
 /* MAX_DIGITS is actually the maximum number of characters in an sCAL
  * width or height, derived from the precision (number of significant
- * digits - a build time settable option) and assumpitions about the
+ * digits - a build time settable option) and assumptions about the
  * maximum ridiculous exponent.
  */
 #define PNG_sCAL_MAX_DIGITS (PNG_sCAL_PRECISION+1/*.*/+1/*E*/+10/*exponent*/)
