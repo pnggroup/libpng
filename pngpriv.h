@@ -1411,7 +1411,7 @@ PNG_EXTERN png_charp png_format_number(png_const_charp start, png_charp end,
 #ifdef PNG_WARNINGS_SUPPORTED
 /* New defines and members adding in libpng-1.5.4 */
 #  define PNG_WARNING_PARAMETER_SIZE 32
-#  define PNG_WARNING_PARAMETER_COUNT 8
+#  define PNG_WARNING_PARAMETER_COUNT 8 /* Maximum 9; see pngerror.c */
 
 /* An l-value of this type has to be passed to the APIs below to cache the
  * values of the parameters to a formatted warning message.

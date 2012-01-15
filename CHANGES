@@ -3855,8 +3855,10 @@ Version 1.6.0beta04 [December 30, 2011]
   Revised contrib/pngminus/pnm2png.c to avoid warnings when png_uint_32
     and unsigned long are of different sizes.
 
-Version 1.6.0beta05 [January 11, 2012]
+Version 1.6.0beta05 [January 15, 2012]
   Updated manual with description of the simplified API (copied from png.h)
+  Fix bug in pngerror.c: some long warnings were being improperly truncated
+    (bug introduced in libpng-1.5.3beta05).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
