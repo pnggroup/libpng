@@ -524,7 +524,7 @@ png_uint_32 get_value (FILE *pnm_file, int depth)
 {
   static png_uint_32 mask = 0;
   png_byte token[16];
-  unsigned long ulret_value;
+  unsigned long ul_ret_value;
   png_uint_32 ret_value;
   int i = 0;
 
@@ -533,8 +533,8 @@ png_uint_32 get_value (FILE *pnm_file, int depth)
       mask = (mask << 1) | 0x01;
 
   get_token (pnm_file, (char *) token);
-  sscanf ((const char *) token, "%lu", &ulret_value);
-  ret_value = (png_uint_32) ulret_value;
+  sscanf ((const char *) token, "%lu", &ul_ret_value);
+  ret_value = (png_uint_32) ul_ret_value;
 
   ret_value &= mask;
 

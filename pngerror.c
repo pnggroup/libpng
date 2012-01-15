@@ -346,9 +346,9 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
    /* i is always less than (sizeof msg), so: */
    msg[i] = '\0';
 
-   /* And this is the formatted message, it may be larger than
-    * PNG_MAX_ERROR_TEXT, but that is only used for 'chunk' errors and these are
-    * not (currently) formatted.
+   /* And this is the formatted message. It may be larger than
+    * PNG_MAX_ERROR_TEXT, but that is only used for 'chunk' errors and these
+    * are not (currently) formatted.
     */
    png_warning(png_ptr, msg);
 }
