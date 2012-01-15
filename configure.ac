@@ -18,15 +18,15 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.5.7], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.5.8beta01], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.5.7
+PNGLIB_VERSION=1.5.8beta01
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=5
-PNGLIB_RELEASE=7
+PNGLIB_RELEASE=8
 
 dnl End of version number stuff
 
@@ -101,8 +101,6 @@ LIBPNG_DEFINES=-DPNG_CONFIGURE_LIBPNG
 LIBPNG_DEFINES=$LIBPNG_DEFINES
 AC_SUBST(LIBPNG_DEFINES)
 
-AC_MSG_CHECKING([if libraries can be versioned])
-
 AC_MSG_CHECKING([if using Solaris linker])
 SLD=`$LD --version 2>&1 | grep Solaris`
 if test "$SLD"; then
@@ -114,6 +112,7 @@ else
 fi
 AM_CONDITIONAL(HAVE_SOLARIS_LD, test "$have_solaris_ld" = "yes")
 
+AC_MSG_CHECKING([if libraries can be versioned])
 # Special case for PE/COFF platforms: ld reports
 # support for version-script, but doesn't actually
 # DO anything with it.

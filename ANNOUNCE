@@ -1,5 +1,5 @@
 
-Libpng 1.5.8beta01 - December 21, 2011
+Libpng 1.5.8beta01 - January 15, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,9 +26,13 @@ Other information:
 
 Changes since the last public release (1.5.7):
 
-Version 1.5.8beta01 [December 21, 2011]
+Version 1.5.8beta01 [January 15, 2012]
   Removed '#include config.h"' from contrib/libtests/pngvalid.c.  It's not
     needed and causes trouble for VPATH building.
+  Moved AC_MSG_CHECKING([if libraries can be versioned]) later to the proper
+    location in configure.ac (Gilles Espinasse).
+  Fix bug in pngerror.c: some long warnings were being improperly truncated
+    (bug introduced in libpng-1.5.3beta05).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
