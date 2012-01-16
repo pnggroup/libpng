@@ -1561,6 +1561,32 @@ png_image_write_init(png_imagep image)
    return png_image_error(image, "png_image_read: out of memory");
 }
 
+int PNGAPI
+png_image_write_colormap(png_imagep image, png_const_bytep colormap)
+{
+   if (image != NULL)
+   {
+      if (colormap != NULL)
+      {
+         if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0)
+         {
+            image->colormap = colormap; /* alias, caller must preserve */
+            image->format |= PNG_FORMAT_FLAG_COLORMAP;
+         }
+
+         else
+            return png_image_error(image,
+               "png_image_write_colormap: colormap already set");
+      }
+
+      else
+         return png_image_error(image,
+            "png_image_write_colormap: invalid argument");
+   }
+
+   return 0;
+}
+
 /* Arguments to png_image_write_main: */
 typedef struct
 {
@@ -1839,11 +1865,15 @@ png_image_write_main(png_voidp argument)
       display->row_stride = PNG_IMAGE_ROW_STRIDE(*image);
 
    /* Set the required transforms then write the rows in the correct order. */
-   png_set_IHDR(png_ptr, info_ptr, image->width, image->height,
-      write_16bit ? 16 : 8,
-      ((format & PNG_FORMAT_FLAG_COLOR) ? PNG_COLOR_MASK_COLOR : 0) +
-      ((format & PNG_FORMAT_FLAG_ALPHA) ? PNG_COLOR_MASK_ALPHA : 0),
-      PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+   if (format & PNG_FORMAT_FLAG_COLORMAP)
+      return png_image_error(image, "png_image_write: colormap NYI");
+
+   else
+      png_set_IHDR(png_ptr, info_ptr, image->width, image->height,
+         write_16bit ? 16 : 8,
+         ((format & PNG_FORMAT_FLAG_COLOR) ? PNG_COLOR_MASK_COLOR : 0) +
+         ((format & PNG_FORMAT_FLAG_ALPHA) ? PNG_COLOR_MASK_ALPHA : 0),
+         PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* Counter-intuitively the data transformations must be called *after*
     * png_write_info, not before as in the read code, but the 'set' functions

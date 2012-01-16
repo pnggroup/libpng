@@ -789,7 +789,7 @@ png_safe_error,(png_structp png_nonconst_ptr, png_const_charp error_message),
    if (image != NULL)
    {
       png_safecat(image->message, sizeof image->message, 0, error_message);
-      image->warning_or_error = 1;
+      image->warning_or_error |= PNG_IMAGE_ERROR;
 
       /* Retrieve the jmp_buf from within the png_control, making this work for
        * C++ compilation too is pretty tricky: C++ wants a pointer to the first
@@ -821,7 +821,7 @@ png_safe_warning(png_structp png_nonconst_ptr, png_const_charp warning_message)
    if (image->warning_or_error == 0)
    {
       png_safecat(image->message, sizeof image->message, 0, warning_message);
-      image->warning_or_error = 2;
+      image->warning_or_error |= PNG_IMAGE_WARNING;
    }
 }
 #endif

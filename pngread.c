@@ -1243,7 +1243,14 @@ png_image_read_header(png_voidp argument)
       png_uint_32 format = png_image_format(png_ptr, info_ptr);
 
       image->format = format;
-      image->flags = 0;
+
+      /* If the image is currently color mapped set the color map *flag* (but
+       * not the format, which is only set on demand.)
+       */
+      if (png_ptr->color_type & PNG_COLOR_MASK_PALETTE)
+         image->flags = PNG_IMAGE_FLAG_COLORMAP;
+      else
+         image->flags = 0;
 
       /* Now try to work out whether the color data does not match sRGB. */
       if ((format & PNG_FORMAT_FLAG_COLOR) != 0 &&
@@ -1273,8 +1280,7 @@ png_image_read_header(png_voidp argument)
          else if (info_ptr->valid & PNG_INFO_iCCP)
          {
 #        if 0
-            /* TODO: IMPLEMENT THIS! Remember to remove iCCP from
-                 the chunks_to_ignore list */
+            /* TODO: IMPLEMENT THIS! */
             /* Here if we just have an iCCP chunk. */
             if (!png_iCCP_is_sRGB(png_ptr, info_ptr))
 #        endif
@@ -1405,6 +1411,27 @@ int PNGAPI png_image_begin_read_from_memory(png_imagep image,
             "png_image_begin_read_from_memory: invalid argument");
    }
 
+   return 0;
+}
+
+int PNGAPI
+png_image_read_colormap(png_imagep image, png_bytep colormap,
+   png_colorp background)
+{
+   if (image != NULL)
+   {
+      if (colormap != NULL)
+      {
+         /* TODO: NYI: IMPLEMENT ME */
+         return png_image_error(image, "png_image_read_colormap: NYI");
+      }
+
+      else
+         return png_image_error(image,
+            "png_image_read_colormap: invalid argument");
+   }
+
+   PNG_UNUSED(background)
    return 0;
 }
 
