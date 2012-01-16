@@ -127,7 +127,8 @@ print_opts(png_uint_32 opts)
 /* A name table for all the formats - defines the format of the '+' arguments to
  * pngstest.
  */
-static PNG_CONST char * PNG_CONST format_names[32] =
+#define FORMAT_COUNT 64
+static PNG_CONST char * PNG_CONST format_names[FORMAT_COUNT] =
 {
    "sRGB-gray",
    "sRGB-gray+alpha",
@@ -137,6 +138,16 @@ static PNG_CONST char * PNG_CONST format_names[32] =
    "linear-gray+alpha",
    "linear-rgb",
    "linear-rgb+alpha",
+
+   "color-mapped-sRGB-gray",
+   "color-mapped-sRGB-gray+alpha",
+   "color-mapped-sRGB-rgb",
+   "color-mapped-sRGB-rgb+alpha",
+   "color-mapped-linear-gray",
+   "color-mapped-linear-gray+alpha",
+   "color-mapped-linear-rgb",
+   "color-mapped-linear-rgb+alpha",
+
    "sRGB-gray",
    "sRGB-gray+alpha",
    "sRGB-bgr",
@@ -145,6 +156,16 @@ static PNG_CONST char * PNG_CONST format_names[32] =
    "linear-gray+alpha",
    "linear-bgr",
    "linear-bgr+alpha",
+
+   "color-mapped-sRGB-gray",
+   "color-mapped-sRGB-gray+alpha",
+   "color-mapped-sRGB-bgr",
+   "color-mapped-sRGB-bgr+alpha",
+   "color-mapped-linear-gray",
+   "color-mapped-linear-gray+alpha",
+   "color-mapped-linear-bgr",
+   "color-mapped-linear-bgr+alpha",
+
    "sRGB-gray",
    "alpha+sRGB-gray",
    "sRGB-rgb",
@@ -153,6 +174,16 @@ static PNG_CONST char * PNG_CONST format_names[32] =
    "alpha+linear-gray",
    "linear-rgb",
    "alpha+linear-rgb",
+
+   "color-mapped-sRGB-gray",
+   "color-mapped-alpha+sRGB-gray",
+   "color-mapped-sRGB-rgb",
+   "color-mapped-alpha+sRGB-rgb",
+   "color-mapped-linear-gray",
+   "color-mapped-alpha+linear-gray",
+   "color-mapped-linear-rgb",
+   "color-mapped-alpha+linear-rgb",
+
    "sRGB-gray",
    "alpha+sRGB-gray",
    "sRGB-bgr",
@@ -161,6 +192,15 @@ static PNG_CONST char * PNG_CONST format_names[32] =
    "alpha+linear-gray",
    "linear-bgr",
    "alpha+linear-bgr",
+
+   "color-mapped-sRGB-gray",
+   "color-mapped-alpha+sRGB-gray",
+   "color-mapped-sRGB-bgr",
+   "color-mapped-alpha+sRGB-bgr",
+   "color-mapped-linear-gray",
+   "color-mapped-alpha+linear-gray",
+   "color-mapped-linear-bgr",
+   "color-mapped-alpha+linear-bgr",
 };
 
 /* Decode an argument to a format number. */
@@ -170,17 +210,73 @@ formatof(const char *arg)
    char *ep;
    unsigned long format = strtoul(arg, &ep, 0);
 
-   if (ep > arg && *ep == 0 && format < 32)
+   if (ep > arg && *ep == 0 && format < FORMAT_COUNT)
       return (png_uint_32)format;
 
-   else for (format=0; format < 32; ++format)
+   else for (format=0; format < FORMAT_COUNT; ++format)
    {
       if (strcmp(format_names[format], arg) == 0)
          return (png_uint_32)format;
    }
 
    fprintf(stderr, "pngstest: format name '%s' invalid\n", arg);
-   return 32;
+   return FORMAT_COUNT;
+}
+
+/* Bitset/test functions for formats */
+#define FORMAT_SET_COUNT (FORMAT_COUNT / 32)
+typedef struct
+{
+   png_uint_32 bits[FORMAT_SET_COUNT];
+}
+format_list;
+
+static void format_init(format_list *pf)
+{
+   int i;
+   for (i=0; i<FORMAT_SET_COUNT; ++i)
+      pf->bits[i] = ~(png_uint_32)0;
+}
+
+static void format_clear(format_list *pf)
+{
+   int i;
+   for (i=0; i<FORMAT_SET_COUNT; ++i)
+      pf->bits[i] = 0;
+}
+
+static int format_is_initial(format_list *pf)
+{
+   int i;
+   for (i=0; i<FORMAT_SET_COUNT; ++i)
+      if (pf->bits[i] != ~(png_uint_32)0)
+         return 0;
+
+   return 1;
+}
+
+static int format_set(format_list *pf, png_uint_32 format)
+{
+   if (format < FORMAT_COUNT)
+      return pf->bits[format >> 5] |= ((png_uint_32)1) << (format & 31);
+
+   return 0;
+}
+
+#if 0 /* currently unused */
+static int format_unset(format_list *pf, png_uint_32 format)
+{
+   if (format < FORMAT_COUNT)
+      return pf->bits[format >> 5] &= ~((png_uint_32)1) << (format & 31);
+
+   return 0;
+}
+#endif
+
+static int format_isset(format_list *pf, png_uint_32 format)
+{
+   return format < FORMAT_COUNT &&
+      (pf->bits[format >> 5] & (((png_uint_32)1) << (format & 31))) != 0;
 }
 
 /* THE Image STRUCTURE */
@@ -193,6 +289,7 @@ typedef struct
    png_uint_32 opts;
    const char *file_name;
    int         stride_extra;
+   int         cmap_size;
    FILE       *input_file;
    png_voidp   input_memory;
    png_size_t  input_memory_size;
@@ -202,6 +299,7 @@ typedef struct
    png_size_t  allocsize;
    png_color   background;
    char        tmpfile_name[32];
+   png_byte    colormap[256*4*2];
 }
 Image;
 
@@ -403,6 +501,8 @@ typedef struct
  * 65535/255.  Color images have a correctly calculated Y value using the sRGB Y
  * calculation.
  *
+ * Colors are looked up in the color map if required.
+ *
  * The API returns false if an error is detected; this can only be if the alpha
  * value is less than the component in the linear case.
  */
@@ -412,17 +512,25 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
    png_uint_32 format = image->image.format;
    int result = 1;
 
-   pixel->format = format;
+   if (format & PNG_FORMAT_FLAG_COLORMAP)
+   {
+      /* The actual sample is in the color-map, indexed by the pixel */
+      pixel->format = PNG_FORMAT_OF_COLORMAP(format);
+      pp = image->colormap + PNG_IMAGE_SAMPLE_SIZE(format) * *pp;
+   }
+
+   else
+      pixel->format = format;
 
    /* Initialize the alpha values for opaque: */
    pixel->a8 = 255;
    pixel->a16 = 65535;
 
-   switch (PNG_IMAGE_COMPONENT_SIZE(format))
+   switch (PNG_IMAGE_SAMPLE_COMPONENT_SIZE(format))
    {
       default:
-         fprintf(stderr, "pngstest: impossible component size: %lu\n",
-            (unsigned long)PNG_IMAGE_COMPONENT_SIZE(format));
+         fprintf(stderr, "pngstest: impossible sample component size: %lu\n",
+            (unsigned long)PNG_IMAGE_SAMPLE_COMPONENT_SIZE(format));
          exit(1);
 
       case sizeof (png_uint_16):
@@ -1485,7 +1593,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 }
 
 static int
-testimage(Image *image, png_uint_32 opts, png_uint_32 formats)
+testimage(Image *image, png_uint_32 opts, format_list *pf)
 {
    int result;
    Image copy;
@@ -1511,7 +1619,12 @@ testimage(Image *image, png_uint_32 opts, png_uint_32 formats)
       newimage(&output);
       
       result = 1;
-      for (format=0; format<32; ++format) if (formats & (1<<format))
+      for (format=0; format<64; ++format)
+         if (format_isset(pf, format)
+#if 1 /* TEMPORARY: disable testing color map stuff */
+            && (format & PNG_FORMAT_FLAG_COLORMAP) == 0
+#endif
+            )
       {
          resetimage(&copy);
          result = read_file(&copy, format);
@@ -1569,12 +1682,14 @@ int
 main(int argc, const char **argv)
 {
    png_uint_32 opts = 0;
-   png_uint_32 formats = (png_uint_32)~0; /* a mask of formats to test */
+   format_list formats;
    const char *touch = NULL;
    int log_pass = 0;
    int stride_extra = 0;
    int retval = 0;
    int c;
+
+   format_init(&formats);
 
    for (c=1; c<argc; ++c)
    {
@@ -1622,13 +1737,13 @@ main(int argc, const char **argv)
       {
          png_uint_32 format = formatof(arg+1);
 
-         if (format > 31)
+         if (format > FORMAT_COUNT)
             exit(1);
 
-         if (formats == (png_uint_32)~0)
-            formats = 0;
+         if (format_is_initial(&formats))
+            format_clear(&formats);
 
-         formats |= 1<<format;
+         format_set(&formats, format);
       }
       else if (arg[0] == '-')
       {
@@ -1644,7 +1759,7 @@ main(int argc, const char **argv)
          initimage(&image, opts, arg, stride_extra);
          result = read_one_file(&image, FORMAT_NO_CHANGE);
          if (result)
-            result = testimage(&image, opts, formats);
+            result = testimage(&image, opts, &formats);
          freeimage(&image);
 
          if (log_pass)
