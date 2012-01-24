@@ -1768,8 +1768,8 @@ png_init_read_transformations(png_structrp png_ptr)
          int num_palette = png_ptr->num_palette;
          int i;
 
-         /*NOTE: there are other transformations that should probably be in here
-          * too.
+         /* NOTE: there are other transformations that should probably be in
+          * here too.
           */
          for (i = 0; i < num_palette; i++)
          {
@@ -2272,7 +2272,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-   /*NOTE: moved here in 1.5.4 (from much later in this list.) */
+   /* NOTE: moved here in 1.5.4 (from much later in this list.) */
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
        (png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
       png_do_gray_to_rgb(row_info, png_ptr->row_buf + 1);
@@ -3291,7 +3291,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                if (red != green || red != blue)
                {
                   rgb_error |= 1;
-                  /*NOTE: this is the historical approach which simply
+                  /* NOTE: this is the historical approach which simply
                    * truncates the results.
                    */
                   *(dp++) = (png_byte)((rc*red + gc*green + bc*blue)>>15);
