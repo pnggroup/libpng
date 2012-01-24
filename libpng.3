@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "January 16, 2012"
+.TH LIBPNG 3 "January 24, 2012"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0beta06
 .SH SYNOPSIS
@@ -1003,7 +1003,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta06 - January 16, 2012
+ libpng version 1.6.0beta06 - January 24, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -1014,7 +1014,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta06 - January 16, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta06 - January 24, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4516,20 +4516,24 @@ need to write.  The "png_image" structure contains the following members:
    png_uint_32  format  Image format as defined below
    png_uint_32  flags   A bit mask containing informational flags
    png_controlp opaque  Initialize to NULL, free with png_image_free
-
-In the event of an error or warning the following field will be set to a
-non-zero value and the 'message' field will contain a '\0' terminated
-string with the libpng error or warning message.  If both warnings and
-an error were encountered, only the error is recorded.  If there
-are multiple warnings, only the first one is recorded.
-
-As of libpng-1.6.0 the values are
-   0 - no warning or error
-   1 - error
-   2 - warning
-
+   png_const_bytep colormap A pointer to the application color-map
    png_uint_32  warning_or_error;
    char         message[64];
+
+In the event of an error or warning the following field wrning_or_error
+field will be set to a non-zero value and the 'message' field will contain
+a '\0' terminated string with the libpng error or warning message.  If both
+warnings and an error were encountered, only the error is recorded.  If there
+are multiple warnings, only the first one is recorded.
+
+The upper 30 bits of this value are reserved; the low two bits contain
+a two bit code such that a value more than 1 indicates a failure in the API
+just called:
+    
+   0 - no warning or error
+   1 - warning
+   2 - error
+   3 - error preceded by warning
 
 The pixels (samples) of the image have one to four channels whose components
 have original values in the range 0 to 1.0:
@@ -4541,7 +4545,7 @@ have original values in the range 0 to 1.0:
 
 The channels are encoded in one of two ways:
 
-  a) As a small integer, value 0..255, contained in a (png_byte).  For the
+  a) As a small integer, value 0..255, contained in a single byte.  For the
 alpha channel the original value is simply value/255.  For the color or
 luminance channels the value is encoded according to the sRGB specification
 and matches the 8-bit format expected by typical display devices.
@@ -4549,7 +4553,7 @@ and matches the 8-bit format expected by typical display devices.
 The color/gray channels are not scaled (pre-multiplied) by the alpha
 channel and are suitable for passing to color management software.
 
-  b) As a value in the range 0..65535, contained in a (png_uint_16).  All
+  b) As a value in the range 0..65535, contained in a 2-byte integer.  All
 channels can be converted to the original value by dividing by 65535; all
 channels are linear.  Color channels use the RGB encoding (RGB end-points) of
 the sRGB specification.  This encoding is identified by the
@@ -4560,6 +4564,12 @@ of the color or luminance channels and is returned as an associated alpha
 channel: the color/gray channels are scaled (pre-multiplied) by the alpha
 value.
 
+When a color-mapped image is used as a result of calling
+png_image_read_colormap or png_image_write_colormap the channels are encoded
+in the color-map and the descriptions above apply to the color-map entries.
+The image data is encoded as small integers, value 0..255, that index the
+entries in the color-map.  One integer (one byte) is stored for each pixel.
+
 PNG_FORMAT_*
 
 The #defines to be used in png_image::format.  Each #define identifies a
@@ -4569,6 +4579,11 @@ separate defines for each of the two channel encodings.
 A format is built up using single bit flag values.  Not all combinations are
 valid: use the bit flag values below for testing a format returned by the
 read APIs, but set formats from the derived values.
+
+When reading or writing color-mapped images the format should be set to the
+format of the entries in the color-map then png_image_{read,write}_colormap
+called to read or write the color-map and set the format correctly for the
+image data.  Do not set the PNG_FORMAT_FLAG_COLORMAP bit directly!
 
 NOTE: libpng can be built with particular features disabled, if you see
 compiler errors because the definition of one of the following flags has been
@@ -4582,8 +4597,9 @@ guard against this by checking for the definition of:
    PNG_FORMAT_FLAG_ALPHA    0x01 format with an alpha channel
    PNG_FORMAT_FLAG_COLOR    0x02 color format: otherwise grayscale
    PNG_FORMAT_FLAG_LINEAR   0x04 png_uint_16 channels else png_byte
-   PNG_FORMAT_FLAG_BGR      0x08 BGR colors, else order is RGB
-   PNG_FORMAT_FLAG_AFIRST   0x10 alpha channel comes first
+   PNG_FORMAT_FLAG_COLORMAP 0x08 libpng use only
+   PNG_FORMAT_FLAG_BGR      0x10 BGR colors, else order is RGB
+   PNG_FORMAT_FLAG_AFIRST   0x20 alpha channel comes first
 
 Supported formats are as follows.  Future versions of libpng may support more
 formats; for compatibility with older versions simply check if the format
@@ -4602,7 +4618,7 @@ First the single byte formats:
    PNG_FORMAT_BGRA (PNG_FORMAT_BGR|PNG_FORMAT_FLAG_ALPHA)
    PNG_FORMAT_ABGR (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_AFIRST)
 
-Then the linear (png_uint_16) formats.  When naming these "Y" is used to
+Then the linear 2-byte formats.  When naming these "Y" is used to
 indicate a luminance (gray) channel.  The component order within the pixel
 is always the same - there is no provision for swapping the order of the
 components in the linear format.
@@ -4616,16 +4632,124 @@ components in the linear format.
       (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|
       PNG_FORMAT_FLAG_ALPHA)
 
+Color-mapped formats are obtained by calling png_image_{read,write}_colormap,
+as appropriate after setting png_image::format to the format of the color-map
+to be read or written.  Applications may check the value of
+PNG_FORMAT_FLAG_COLORMAP to see if they have called the colormap API.  The
+format of the color-map may be extracted using the following macro.
+
+   PNG_FORMAT_OF_COLORMAP(fmt) ((fmt) & ~PNG_FORMAT_FLAG_COLORMAP)
+
 PNG_IMAGE macros
 
-These are convenience macros to derive information from a png_image structure:
+These are convenience macros to derive information from a png_image
+structure.  The PNG_IMAGE_SAMPLE_ macros return values appropriate to the
+actual image sample values - either the entries in the color-map or the
+pixels in the image.  The PNG_IMAGE_PIXEL_ macros return corresponding values
+for the pixels and will always return 1 after a call to
+png_image_{read,write}_colormap.  The remaining macros return information
+about the rows in the image and the complete image.
 
-  PNG_IMAGE_CHANNELS(fmt)
+NOTE: All the macros that take a png_image::format parameter are compile time
+constants if the format parameter is, itself, a constant.  Therefore these
+macros can be used in array declarations and case labels where required.
+Similarly the macros are also pre-processor constants (sizeof is not used) so
+they can be used in #if tests.
+
+First the information about the samples.
+
+  PNG_IMAGE_SAMPLE_CHANNELS(fmt)
     Returns the total number of channels in a given format: 1..4
 
-  PNG_IMAGE_COMPONENT_SIZE(fmt)
-    Returns the size in bytes of a single component of a pixel
-    in the image.
+  PNG_IMAGE_SAMPLE_COMPONENT_SIZE(fmt)
+    Returns the size in bytes of a single component of a pixel or color-map
+    entry (as appropriate) in the image.
+
+
++
++#define PNG_IMAGE_SAMPLE_SIZE(fmt)\
++   (PNG_IMAGE_SAMPLE_CHANNELS(fmt) * PNG_IMAGE_SAMPLE_COMPONENT_SIZE(fmt))
++   /* This is the size of the sample data for one sample.  If the image is
++    * color-mapped it is the size of one color-map entry (and image pixels are
++    * one byte in size), otherwise it is the size of one image pixel.
++    */
++
++#define PNG_IMAGE_COLORMAP_SIZE(fmt) (PNG_IMAGE_SAMPLE_SIZE(format) * 256)
++   /* The size of the color-map required by the format; this is the size of the
++    * color-map buffer passed to the png_image_{read,write}_colormap APIs, it is
++    * a fixed number determined by the format so can easily be allocated on the
++    * stack if necessary.
++    */
++
++/* Corresponding information about the pixels */
++#define PNG_IMAGE_PIXEL_(test,fmt)\
++   (((fmt)&PNG_FORMAT_FLAG_COLORMAP)?1:test(fmt))
++
++#define PNG_IMAGE_PIXEL_CHANNELS(fmt)\
++   PNG_IMAGE_PIXEL_(PNG_IMAGE_SAMPLE_CHANNELS,fmt)
++   /* The number of separate channels (components) in a pixel; 1 for a
++    * color-mapped image.
++    */
++
++#define PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)\
++   PNG_IMAGE_PIXEL_(PNG_IMAGE_SAMPLE_COMPONENT_SIZE,fmt)
++   /* The size, in bytes, of each component in a pixel; 1 for a color-mapped
++    * image.
++    */
+ 
+-#define PNG_IMAGE_PIXEL_SIZE(fmt)\
+-   (PNG_IMAGE_CHANNELS(fmt) * PNG_IMAGE_COMPONENT_SIZE(fmt))
+-   /* Return the size in bytes of a single pixel in the image. */
+-   
++#define PNG_IMAGE_PIXEL_SIZE(fmt) PNG_IMAGE_PIXEL_(PNG_IMAGE_SAMPLE_SIZE,fmt)
++   /* The size, in bytes, of a complete pixel; 1 for a color-mapped image. */
++
++/* Information about the whole row, or whole image */
+ #define PNG_IMAGE_ROW_STRIDE(image)\
+-   (PNG_IMAGE_CHANNELS((image).format) * (image).width)
++   (PNG_IMAGE_PIXEL_CHANNELS((image).format) * (image).width)
+    /* Return the total number of components in a single row of the image; this
+     * is the minimum 'row stride', the minimum count of components between each
++    * row.  For a color-mapped image this is the minimum number of bytes in a
+     * row.
+     */
+ 
+ #define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
+-   (PNG_IMAGE_COMPONENT_SIZE((image).format) * (image).height * (row_stride))
++   (PNG_IMAGE_PIXEL_COMPONENT_SIZE((image).format)*(image).height*(row_stride))
+    /* Return the size, in bytes, of an image buffer given a png_image and a row
+     * stride - the number of components to leave space for in each row.
+     */
+@@ -2815,17 +2903,24 @@ typedef struct
+  * Flags containing additional information about the image are held in the
+  * 'flags' field of png_image.
+  */
+-#define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 1
++#define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 0x01
+    /* This indicates the the RGB values of the in-memory bitmap do not
+     * correspond to the red, green and blue end-points defined by sRGB.
+     */
+ 
++#define PNG_IMAGE_FLAG_COLORMAP 0x02
++   /* The PNG is color-mapped.  If this flag is set png_image_read_colormap
++    * can be used without further loss of image information.  If it is not set
++    * png_image_read_colormap will cause significant loss if the image has any
++    * colors (if PNG_FORMAT_FLAG_COLOR is set).
++    */
++
+ #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+ /* READ APIs
+  * ---------
+  *
+  * The png_image passed to the read APIs must have been initialized by setting
+- * the png_controlp field 'opaque' to NULL (or, better, memset the whole thing.)
++ * the png_controlp field 'opaque' to NULL (or, safer, memset the whole thing.)
+  */
+
+
+
+
+
 
   PNG_IMAGE_PIXEL_SIZE(fmt)
     Returns the size in bytes of a single pixel in the image.
@@ -5909,7 +6033,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-January 16, 2012
+January 24, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6177,7 +6301,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.0beta06 - January 16, 2012:
+Libpng version 1.6.0beta06 - January 24, 2012:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6200,7 +6324,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.0beta06, January 16, 2012, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.0beta06, January 24, 2012, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6299,7 +6423,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-January 16, 2012
+January 24, 2012
 
 .\" end of man page
 
