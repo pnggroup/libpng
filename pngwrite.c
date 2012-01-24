@@ -1561,32 +1561,6 @@ png_image_write_init(png_imagep image)
    return png_image_error(image, "png_image_read: out of memory");
 }
 
-int PNGAPI
-png_image_write_colormap(png_imagep image, png_const_bytep colormap)
-{
-   if (image != NULL)
-   {
-      if (colormap != NULL)
-      {
-         if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0)
-         {
-            image->colormap = colormap; /* alias, caller must preserve */
-            image->format |= PNG_FORMAT_FLAG_COLORMAP;
-         }
-
-         else
-            return png_image_error(image,
-               "png_image_write_colormap: colormap already set");
-      }
-
-      else
-         return png_image_error(image,
-            "png_image_write_colormap: invalid argument");
-   }
-
-   return 0;
-}
-
 /* Arguments to png_image_write_main: */
 typedef struct
 {
@@ -1594,6 +1568,7 @@ typedef struct
    png_imagep      image;
    png_const_voidp buffer;
    png_int_32      row_stride;
+   png_const_voidp colormap;
    int             convert_to_8bit;
    /* Local variables: */
    png_const_voidp first_row;
@@ -1708,7 +1683,58 @@ png_write_image_16bit(png_voidp argument)
 /* Given 16-bit input (1 to 4 channels) write 8-bit output.  If an alpha channel
  * is present it must be removed from the components, the components are then
  * written in sRGB encoding.  No components are added or removed.
+ *
+ * Calculate an alpha reciprocal to reverse pre-multiplication.  As above the
+ * calculation can be done to 15 bits of accuracy; however, the output needs to
+ * be scaled in the range 0..255*65535, so include that scaling here.
  */
+#define UNP_RECIPROCAL(alpha) ((((0xffff*0xff)<<7)+(alpha>>1))/alpha)
+
+static png_byte
+png_unpremultiply(png_uint_32 component, png_uint_32 alpha,
+   png_uint_32 reciprocal/*from the above macro*/)
+{
+   /* The following gives 1.0 for an alpha of 0, which is fine, otherwise if 0/0
+    * is represented as some other value there is more likely to be a
+    * discontinuity which will probably damage compression when moving from a
+    * fully transparent area to a nearly transparent one.  (The assumption here
+    * is that opaque areas tend not to be 0 intensity.)
+    *
+    * There is a rounding problem here; if alpha is less than 128 it will end up
+    * as 0 when scaled to 8 bits.  To avoid introducing spurious colors into the
+    * output change for this too.
+    */
+   if (component >= alpha || alpha < 128)
+      return 255;
+
+   /* component<alpha, so component/alpha is less than one and
+    * component*reciprocal is less than 2^31.
+    */
+   else if (component > 0)
+   {
+      /* The test is that alpha/257 (rounded) is less than 255, the first value
+       * that becomes 255 is 65407.
+       * NOTE: this must agree with the PNG_DIV257 macro (which must, therefore,
+       * be exact!)  [Could also test reciprocal != 0]
+       */
+      if (alpha < 65407)
+      {
+         component *= reciprocal;
+         component += 64; /* round to nearest */
+         component >>= 7;
+      }
+
+      else
+         component *= 255;
+
+      /* Convert the component to sRGB. */
+      return (png_byte)PNG_sRGB_FROM_LINEAR(component);
+   }
+
+   else
+      return 0;
+}
+
 static int
 png_write_image_8bit(png_voidp argument)
 {
@@ -1749,62 +1775,19 @@ png_write_image_8bit(png_voidp argument)
          if (aindex != 0) while (out_ptr < row_end) /* Alpha channel case */
          {
             png_uint_16 alpha = in_ptr[aindex];
+            png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
             png_uint_32 reciprocal = 0;
             int c;
 
-            /* Scale and write the alpha channel.  See pngrtran.c
-             * png_do_scale_16_to_8 for a discussion of this calculation.  The
-             * code here has machine native values, so use:
-             *
-             *    (V * 255 + 32895) >> 16
-             */
-            out_ptr[aindex] = (png_byte)((alpha * 255 + 32895) >> 16);
+            /* Scale and write the alpha channel. */
+            out_ptr[aindex] = alphabyte;
 
-            /* Calculate a reciprocal.  As above the calculation can be done to
-             * 15 bits of accuracy, however the output needs to be scaled in the
-             * range 0..255*65535, so include that scaling here.
-             */
-            if (alpha > 0 && alpha < 65535)
-               reciprocal = (((0xffff*0xff)<<7)+(alpha>>1))/alpha;
+            if (alphabyte > 0 && alphabyte < 255)
+               reciprocal = UNP_RECIPROCAL(alpha);
 
             c = channels;
             do /* always at least one channel */
-            {
-               /* Need 32 bit accuracy in the sRGB tables */
-               png_uint_32 component = *in_ptr++;
-
-               /* The following gives 1.0 for an alpha of 0, which is fine,
-                * otherwise if 0/0 is represented as some other value there is
-                * more likely to be a discontinuity which will probably damage
-                * compression when moving from a fully transparent area to a
-                * nearly transparent one.  (The assumption here is that opaque
-                * areas tend not to be 0 intensity.)
-                */
-               if (component >= alpha)
-                  *out_ptr++ = 255;
-
-               /* component<alpha, so component/alpha is less than one and
-                * component*reciprocal is less than 2^31.
-                */
-               else if (component > 0)
-               {
-                  if (alpha < 65535)
-                  {
-                     component *= reciprocal;
-                     component += 64; /* round to nearest */
-                     component >>= 7;
-                  }
-
-                  else
-                     component *= 255;
-
-                  /* Convert the component to sRGB. */
-                  *out_ptr++ = (png_byte)PNG_sRGB_FROM_LINEAR(component);
-               }
-
-               else
-                  *out_ptr++ = 0;
-            }
+               *out_ptr++ = png_unpremultiply(*in_ptr++, alpha, reciprocal);
             while (--c > 0);
 
             /* Skip to next component (skip the intervening alpha channel) */
@@ -1846,6 +1829,151 @@ png_write_image_8bit(png_voidp argument)
    return 1;
 }
 
+static void
+png_image_set_PLTE(png_image_write_control *display)
+{
+   const png_imagep image = display->image;
+   const void *cmap = display->colormap;
+   const int entries = image->colormap_entries > 256 ? 256 :
+      (int)image->colormap_entries;
+
+   /* NOTE: the caller must check for cmap != NULL and entries != 0 */
+   const png_uint_32 format = image->format;
+   const int channels = PNG_IMAGE_SAMPLE_CHANNELS(format);
+
+#  ifdef PNG_FORMAT_BGR_SUPPORTED
+      const int afirst = (format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
+         (format & PNG_FORMAT_FLAG_ALPHA) != 0;
+#  else
+#     define afirst 0
+#  endif
+
+#  ifdef PNG_FORMAT_BGR_SUPPORTED
+      const int bgr = (format & PNG_FORMAT_FLAG_BGR) ? 2 : 0;
+#  else
+#     define bgr 0
+#  endif
+
+   int i, num_trans;
+   png_color palette[256];
+   png_byte tRNS[256];
+
+   memset(tRNS, 255, sizeof tRNS);
+   memset(palette, 0, sizeof palette);
+
+   for (i=num_trans=0; i<entries; ++i)
+   {
+      /* This gets automatically converted to sRGB with reversal of the
+       * pre-multiplication if the color-map has an alpha channel.
+       */
+      if (format & PNG_FORMAT_FLAG_LINEAR)
+      {
+         png_const_uint_16p entry = png_voidcast(png_const_uint_16p, cmap);
+         
+         entry += i * channels;
+
+         if (channels & 1) /* no alpha */
+         {
+            if (channels >= 3) /* RGB */
+            {
+               palette[i].blue = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
+                  entry[(2 ^ bgr)]);
+               palette[i].green = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
+                  entry[1]);
+               palette[i].red = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
+                  entry[bgr]);
+            }
+
+            else /* Gray */
+               palette[i].blue = palette[i].red = palette[i].green =
+                  (png_byte)PNG_sRGB_FROM_LINEAR(255 * *entry);
+         }
+
+         else /* alpha */
+         {
+            png_uint_16 alpha = entry[afirst ? 0 : channels-1];
+            png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
+            png_uint_32 reciprocal = 0;
+
+            /* Calculate a reciprocal, as in the png_write_image_8bit code above
+             * this is designed to produce a value scaled to 255*65535 when
+             * divided by 128 (i.e. asr 7).
+             */
+            if (alphabyte > 0 && alphabyte < 255)
+               reciprocal = (((0xffff*0xff)<<7)+(alpha>>1))/alpha;
+
+            tRNS[i] = alphabyte;
+            if (alphabyte < 255)
+               num_trans = i+1;
+
+            if (channels >= 3) /* RGB */
+            {
+               palette[i].blue = png_unpremultiply(entry[afirst + (2 ^ bgr)],
+                  alpha, reciprocal);
+               palette[i].green = png_unpremultiply(entry[afirst + 1], alpha,
+                  reciprocal);
+               palette[i].red = png_unpremultiply(entry[afirst + bgr], alpha,
+                  reciprocal);
+            }
+
+            else /* gray */
+               palette[i].blue = palette[i].red = palette[i].green =
+                  png_unpremultiply(entry[afirst], alpha, reciprocal);
+         }
+      }
+
+      else /* Color-map has sRGB values */
+      {
+         png_const_bytep entry = png_voidcast(png_const_bytep, cmap);
+         
+         entry += i * channels;
+
+         switch (channels)
+         {
+            case 4:
+               tRNS[i] = entry[afirst ? 0 : 3];
+               if (tRNS[i] < 255)
+                  num_trans = i+1;
+               /* FALL THROUGH */
+            case 3:
+               palette[i].blue = entry[afirst + (2 ^ bgr)];
+               palette[i].green = entry[afirst + 1];
+               palette[i].red = entry[afirst + bgr];
+               break;
+
+            case 2:
+               tRNS[i] = entry[1 ^ afirst];
+               if (tRNS[i] < 255)
+                  num_trans = i+1;
+               /* FALL THROUGH */
+            case 1:
+               palette[i].blue = palette[i].red = palette[i].green =
+                  entry[afirst];
+               break;
+
+            default:
+               break;
+         }
+      }
+   }
+
+#  ifdef afirst
+#     undef afirst
+#  endif
+#  ifdef bgr
+#     undef bgr
+#  endif
+
+   png_set_PLTE(image->opaque->png_ptr, image->opaque->info_ptr, palette,
+      entries);
+
+   if (num_trans > 0)
+      png_set_tRNS(image->opaque->png_ptr, image->opaque->info_ptr, tRNS,
+         num_trans, NULL);
+
+   image->colormap_entries = entries;
+}
+
 static int
 png_image_write_main(png_voidp argument)
 {
@@ -1856,9 +1984,10 @@ png_image_write_main(png_voidp argument)
    png_inforp info_ptr = image->opaque->info_ptr;
    png_uint_32 format = image->format;
 
-   int linear = (format & PNG_FORMAT_FLAG_LINEAR) != 0; /* input */
-   int alpha = (format & PNG_FORMAT_FLAG_ALPHA) != 0;
-   int write_16bit = linear && !display->convert_to_8bit;
+   int colormap = (format & PNG_FORMAT_FLAG_COLORMAP) != 0;
+   int linear = !colormap && (format & PNG_FORMAT_FLAG_LINEAR) != 0; /* input */
+   int alpha = !colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0;
+   int write_16bit = linear && !colormap && !display->convert_to_8bit;
 
    /* Default the 'row_stride' parameter if required. */
    if (display->row_stride == 0)
@@ -1866,7 +1995,23 @@ png_image_write_main(png_voidp argument)
 
    /* Set the required transforms then write the rows in the correct order. */
    if (format & PNG_FORMAT_FLAG_COLORMAP)
-      return png_image_error(image, "png_image_write: colormap NYI");
+   {
+      if (display->colormap != NULL && image->colormap_entries > 0)
+      {
+         png_uint_32 entries = image->colormap_entries;
+
+         png_set_IHDR(png_ptr, info_ptr, image->width, image->height,
+            entries > 16 ? 8 : (entries > 4 ? 4 : (entries > 2 ? 2 : 1)),
+            PNG_COLOR_TYPE_PALETTE, PNG_INTERLACE_NONE,
+            PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+         png_image_set_PLTE(display);
+      }
+
+      else
+         png_error(image->opaque->png_ptr,
+            "no color-map for color-mapped image");
+   }
 
    else
       png_set_IHDR(png_ptr, info_ptr, image->width, image->height,
@@ -1880,6 +2025,7 @@ png_image_write_main(png_voidp argument)
     * must still be called before.  Just set the color space information, never
     * write an interlaced image.
     */
+
    if (write_16bit)
    {
       /* The gamma here is 1.0 (linear) and the cHRM chunk matches sRGB. */
@@ -1923,7 +2069,7 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
       if (format & PNG_FORMAT_FLAG_BGR)
       {
-         if (format & PNG_FORMAT_FLAG_COLOR)
+         if (!colormap && (format & PNG_FORMAT_FLAG_COLOR) != 0)
             png_set_bgr(png_ptr);
          format &= ~PNG_FORMAT_FLAG_BGR;
       }
@@ -1932,15 +2078,21 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
       if (format & PNG_FORMAT_FLAG_AFIRST)
       {
-         if (format & PNG_FORMAT_FLAG_ALPHA)
+         if (!colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0)
             png_set_swap_alpha(png_ptr);
          format &= ~PNG_FORMAT_FLAG_AFIRST;
       }
 #  endif
 
+   /* If there are 16 or fewer color-map entries we wrote a lower bit depth
+    * above, but the application data is still byte packed.
+    */
+   if (colormap && image->colormap_entries <= 16)
+      png_set_packing(png_ptr);
+
    /* That should have handled all (both) the transforms. */
    if ((format & ~(png_uint_32)(PNG_FORMAT_FLAG_COLOR | PNG_FORMAT_FLAG_LINEAR |
-         PNG_FORMAT_FLAG_ALPHA)) != 0)
+         PNG_FORMAT_FLAG_ALPHA | PNG_FORMAT_FLAG_COLORMAP)) != 0)
       png_error(png_ptr, "png_write_image: unsupported transformation");
 
    {
@@ -1961,7 +2113,7 @@ png_image_write_main(png_voidp argument)
     * before it is written.  This only applies when the input is 16-bit and
     * either there is an alpha channel or it is converted to 8-bit.
     */
-   if ((linear && alpha) || display->convert_to_8bit)
+   if ((linear && alpha) || (!colormap && display->convert_to_8bit))
    {
       png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
          png_get_rowbytes(png_ptr, info_ptr)));
@@ -2003,10 +2155,10 @@ png_image_write_main(png_voidp argument)
 
 int PNGAPI
 png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
-   const void *buffer, png_int_32 row_stride)
+   const void *buffer, png_int_32 row_stride, const void *colormap)
 {
    /* Write the image to the given (FILE*). */
-   if (image != NULL)
+   if (image != NULL || image->version != PNG_IMAGE_VERSION)
    {
       if (file != NULL)
       {
@@ -2025,6 +2177,7 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
             display.image = image;
             display.buffer = buffer;
             display.row_stride = row_stride;
+            display.colormap = colormap;
             display.convert_to_8bit = convert_to_8bit;
 
             result = png_safe_execute(image, png_image_write_main, &display);
@@ -2047,10 +2200,11 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
 
 int PNGAPI
 png_image_write_to_file(png_imagep image, const char *file_name,
-   int convert_to_8bit, const void *buffer, png_int_32 row_stride)
+   int convert_to_8bit, const void *buffer, png_int_32 row_stride,
+   const void *colormap)
 {
    /* Write the image to the named file. */
-   if (image != NULL)
+   if (image != NULL || image->version != PNG_IMAGE_VERSION)
    {
       if (file_name != NULL)
       {
@@ -2059,7 +2213,7 @@ png_image_write_to_file(png_imagep image, const char *file_name,
          if (fp != NULL)
          {
             if (png_image_write_to_stdio(image, fp, convert_to_8bit, buffer,
-               row_stride))
+               row_stride, colormap))
             {
                int error; /* from fflush/fclose */
 

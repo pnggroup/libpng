@@ -114,6 +114,8 @@ Version 1.6.0beta06 [January 24, 2012]
     changes some of the macro definitions in png.h, app code
     may need corresponding changes.
   Increased the formatted warning buffer to 192 bytes.
+  Added color-map support to simplified API. This is an initial version for
+    review; the documentation has not yet been updated.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

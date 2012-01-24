@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta06 - January 16, 2012
+ * libpng version 1.6.0beta06 - January 24, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta06 - January 16, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta06 - January 24, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta06, January 16, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta06, January 24, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    January 16, 2012
+ *    January 24, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -376,7 +376,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta06"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta06 - January 16, 2012\n"
+     " libpng version 1.6.0beta06 - January 24, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2636,48 +2636,47 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  *
  * To read a PNG file using the simplified API:
  *
- * 1) Declare a 'png_image' structure (see below) on the stack and memset() it
- *    to all zero.
+ * 1) Declare a 'png_image' structure (see below) on the stack and set the
+ *    version field to PNG_IMAGE_VERSION.
  * 2) Call the appropriate png_image_begin_read... function.
  * 3) Set the png_image 'format' member to the required sample format.
- * 4) [Optionally] Call png_image_read_colormap to read the image color-map and
- *    request return of a color-mapped image.
- * 5) Allocate a buffer for the image.
- * 6) Call png_image_finish_read to read the image into your buffer.
+ * 4) Allocate a buffer for the image and, if required, the color-map.
+ * 5) Call png_image_finish_read to read the image and, if required, the
+ *    color-map into your buffers.
  *
  * There are no restrictions on the format of the PNG input itself; all valid
  * color types, bit depths, and interlace methods are acceptable, and the
  * input image is transformed as necessary to the requested in-memory format
  * during the png_image_finish_read() step.  The only caveat is that if you
- * request a color-mapped image from a PNG that was not originally color-mapped
- * the transformation is extremely lossy and the result may look terrible.
+ * request a color-mapped image from a PNG that is full-color or makes
+ * complex use of an alpha channel the transformation is extremely lossy and the
+ * result may look terrible.
  *
  * To write a PNG file using the simplified API:
  *
  * 1) Declare a 'png_image' structure on the stack and memset() it to all zero.
  * 2) Initialize the members of the structure that describe the image, setting
  *    the 'format' member to the format of the image samples.
- * 3) [Optionally] call png_image_write_colormap to set the image color-map if
- *    the data to be written is color-mapped.
- * 4) Call the appropriate png_image_write... function with a pointer to the
- *    image to write the PNG data.
+ * 3) Call the appropriate png_image_write... function with a pointer to the
+ *    image and, if necessary, the color-map to write the PNG data.
  *
  * png_image is a structure that describes the in-memory format of an image
- * when it is being read or define the in-memory format of an image that you
+ * when it is being read or defines the in-memory format of an image that you
  * need to write:
  */
+#define PNG_IMAGE_VERSION 1
 
 typedef struct png_control *png_controlp;
 typedef struct
 {
-   png_uint_32  width;  /* Image width in pixels (columns) */
-   png_uint_32  height; /* Image height in pixels (rows) */
-   png_uint_32  format; /* Image format as defined below */
-   png_uint_32  flags;  /* A bit mask containing informational flags */
-   png_controlp opaque; /* Initialize to NULL, free with png_image_free */
-
-   /* The following is only used for write; initialize it to NULL */
-   png_const_bytep colormap; /* A pointer to the application color-map */
+   png_controlp opaque;    /* Initialize to NULL, free with png_image_free */
+   png_uint_32  version;   /* Set to PNG_IMAGE_VERSION */
+   png_uint_32  width;     /* Image width in pixels (columns) */
+   png_uint_32  height;    /* Image height in pixels (rows) */
+   png_uint_32  format;    /* Image format as defined below */
+   png_uint_32  flags;     /* A bit mask containing informational flags */
+   png_uint_32  colormap_entries;
+                           /* Number of entries in the color-map */
 
    /* In the event of an error or warning the following field will be set to a
     * non-zero value and the 'message' field will contain a '\0' terminated
@@ -2706,15 +2705,15 @@ typedef struct
    char         message[64];
 } png_image, *png_imagep;
 
-/* The pixels (samples) of the image have one to four channels whose components
- * have original values in the range 0 to 1.0:
+/* The samples of the image have one to four channels whose components have
+ * original values in the range 0 to 1.0:
  *
  * 1: A single gray or luminance channel (G).
  * 2: A gray/luminance channel and an alpha channel (GA).
  * 3: Three red, green, blue color channels (RGB).
  * 4: Three color channels and an alpha channel (RGBA).
  *
- * The channels are encoded in one of two ways:
+ * The components are encoded in one of two ways:
  *
  * a) As a small integer, value 0..255, contained in a single byte.  For the
  * alpha channel the original value is simply value/255.  For the color or
@@ -2735,22 +2734,24 @@ typedef struct
  * channel: the color/gray channels are scaled (pre-multiplied) by the alpha
  * value.
  *
- * When a color-mapped image is used as a result of calling
- * png_image_read_colormap or png_image_write_colormap the channels are encoded
- * in the color-map and the descriptions above apply to the color-map entries.
- * The image data is encoded as small integers, value 0..255, that index the
- * entries in the color-map.  One integer (one byte) is stored for each pixel.
+ * The samples are either contained directly in the image data, between 1 and 8
+ * bytes per pixel according to the encoding, or are held in a color-map indexed
+ * by bytes in the image data.  In the case of a color-map the color-map entries
+ * are individual samples, encoded as above, and the image data has one byte per
+ * pixel to select the relevant sample from the color-map.
  */
 
 /* PNG_FORMAT_*
  *
  * #defines to be used in png_image::format.  Each #define identifies a
- * particular layout of channel data and, if present, alpha values.  There are
- * separate defines for each of the two channel encodings.
+ * particular layout of sample data and, if present, alpha values.  There are
+ * separate defines for each of the two component encodings.
  *
- * A format is built up using single bit flag values.  Not all combinations are
- * valid: use the bit flag values below for testing a format returned by the
- * read APIs, but set formats from the derived values.
+ * A format is built up using single bit flag values.  All combinations are
+ * valid.  Formats can be built up from the flag values or you can use one of
+ * the predefined values below.  When testing formats always use the FORMAT_FLAG
+ * macros to test for individual features - future versions of the library may
+ * add new flags.
  *
  * When reading or writing color-mapped images the format should be set to the
  * format of the entries in the color-map then png_image_{read,write}_colormap
@@ -2762,14 +2763,15 @@ typedef struct
  * compiled out it is because libpng does not have the required support.  It is
  * possible, however, for the libpng configuration to enable the format on just
  * read or just write; in that case you may see an error at run time.  You can
- * guard against this by checking for the definition of:
+ * guard against this by checking for the definition of the appropriate
+ * "_SUPPORTED" macro, one of:
  *
  *    PNG_SIMPLIFIED_{READ,WRITE}_{BGR,AFIRST}_SUPPORTED
  */
 #define PNG_FORMAT_FLAG_ALPHA    0x01U /* format with an alpha channel */
 #define PNG_FORMAT_FLAG_COLOR    0x02U /* color format: otherwise grayscale */
 #define PNG_FORMAT_FLAG_LINEAR   0x04U /* 2 byte channels else 1 byte */
-#define PNG_FORMAT_FLAG_COLORMAP 0x08U /* libpng use only */
+#define PNG_FORMAT_FLAG_COLORMAP 0x08U /* image data is color-mapped */
 
 #ifdef PNG_FORMAT_BGR_SUPPORTED
 #  define PNG_FORMAT_FLAG_BGR    0x10U /* BGR colors, else order is RGB */
@@ -2779,13 +2781,9 @@ typedef struct
 #  define PNG_FORMAT_FLAG_AFIRST 0x20U /* alpha channel comes first */
 #endif
 
-/* Supported formats are as follows.  Future versions of libpng may support more
- * formats; for compatibility with older versions simply check if the format
- * macro is defined using #ifdef.  These defines describe the in-memory layout
- * of the components of the pixels of the image or, for color-mapped images, the
- * layout of the entries of the color-map.
+/* Commonly used formats have predefined macros.
  *
- * First the single byte formats:
+ * First the single byte (sRGB) formats:
  */
 #define PNG_FORMAT_GRAY 0
 #define PNG_FORMAT_GA   PNG_FORMAT_FLAG_ALPHA
@@ -2798,9 +2796,7 @@ typedef struct
 #define PNG_FORMAT_ABGR (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_AFIRST)
 
 /* Then the linear 2-byte formats.  When naming these "Y" is used to
- * indicate a luminance (gray) channel.  The component order within the pixel
- * is always the same - there is no provision for swapping the order of the
- * components in the linear format.
+ * indicate a luminance (gray) channel.
  */
 #define PNG_FORMAT_LINEAR_Y PNG_FORMAT_FLAG_LINEAR
 #define PNG_FORMAT_LINEAR_Y_ALPHA (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_ALPHA)
@@ -2808,13 +2804,17 @@ typedef struct
 #define PNG_FORMAT_LINEAR_RGB_ALPHA \
    (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA)
 
-/* Color-mapped formats are obtained by calling png_image_{read,write}_colormap,
- * as appropriate after setting png_image::format to the format of the color-map
- * to be read or written.  Applications may check the value of
- * PNG_FORMAT_FLAG_COLORMAP to see if they have called the colormap API.  The
- * format of the color-map may be extracted using the following macro.
+/* With color-mapped formats the image data is one byte for each pixel, the byte
+ * is an index into the color-map which is formatted as above.  To obtain a
+ * color-mapped format it is sufficient just to add the PNG_FOMAT_FLAG_COLORMAP
+ * to one of the above definitions, or you can use one of the definitions below.
  */
-#define PNG_FORMAT_OF_COLORMAP(fmt) ((fmt) & ~PNG_FORMAT_FLAG_COLORMAP)
+#define PNG_FORMAT_RGB_COLORMAP  (PNG_FORMAT_RGB|PNG_FORMAT_FLAG_COLORMAP)
+#define PNG_FORMAT_BGR_COLORMAP  (PNG_FORMAT_BGR|PNG_FORMAT_FLAG_COLORMAP)
+#define PNG_FORMAT_RGBA_COLORMAP (PNG_FORMAT_RGBA|PNG_FORMAT_FLAG_COLORMAP)
+#define PNG_FORMAT_ARGB_COLORMAP (PNG_FORMAT_ARGB|PNG_FORMAT_FLAG_COLORMAP)
+#define PNG_FORMAT_BGRA_COLORMAP (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_COLORMAP)
+#define PNG_FORMAT_ABGR_COLORMAP (PNG_FORMAT_ABGR|PNG_FORMAT_FLAG_COLORMAP)
 
 /* PNG_IMAGE macros
  *
@@ -2822,9 +2822,9 @@ typedef struct
  * structure.  The PNG_IMAGE_SAMPLE_ macros return values appropriate to the
  * actual image sample values - either the entries in the color-map or the
  * pixels in the image.  The PNG_IMAGE_PIXEL_ macros return corresponding values
- * for the pixels and will always return 1 after a call to
- * png_image_{read,write}_colormap.  The remaining macros return information
- * about the rows in the image and the complete image.
+ * for the pixels and will always return 1 for color-mapped formats.  The
+ * remaining macros return information about the rows in the image and the
+ * complete image.
  *
  * NOTE: All the macros that take a png_image::format parameter are compile time
  * constants if the format parameter is, itself, a constant.  Therefore these
@@ -2841,7 +2841,7 @@ typedef struct
 #define PNG_IMAGE_SAMPLE_COMPONENT_SIZE(fmt)\
    ((((fmt) & PNG_FORMAT_FLAG_LINEAR) >> 2)+1)
    /* Return the size in bytes of a single component of a pixel or color-map
-    * entry (as appropriate) in the image.
+    * entry (as appropriate) in the image: 1 or 2.
     */
 
 #define PNG_IMAGE_SAMPLE_SIZE(fmt)\
@@ -2851,11 +2851,19 @@ typedef struct
     * one byte in size), otherwise it is the size of one image pixel.
     */
 
-#define PNG_IMAGE_COLORMAP_SIZE(fmt) (PNG_IMAGE_SAMPLE_SIZE(format) * 256)
-   /* The size of the color-map required by the format; this is the size of the
-    * color-map buffer passed to the png_image_{read,write}_colormap APIs, it is
-    * a fixed number determined by the format so can easily be allocated on the
-    * stack if necessary.
+#define PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(fmt)\
+   (PNG_IMAGE_SAMPLE_CHANNELS(fmt) * 256)
+   /* The maximum size of the color-map required by the format expressed in a
+    * count of components.  This can be used to compile-time allocate a
+    * color-map:
+    *
+    * png_uint_16 colormap[PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(linear_fmt)];
+    *
+    * png_byte colormap[PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(sRGB_fmt)];
+    *
+    * Alternatively use the PNG_IMAGE_COLORMAP_SIZE macro below to use the
+    * information from one of the png_image_begin_read_ APIs and dynamically
+    * allocate the required memory.
     */
 
 /* Corresponding information about the pixels */
@@ -2898,6 +2906,14 @@ typedef struct
     * the row stride is the minimum stride required for the image.
     */
 
+#define PNG_IMAGE_COLORMAP_SIZE(image)\
+   (PNG_IMAGE_SAMPLE_SIZE((image).format) * (image).colormap_entries)
+   /* Return the size, in bytes, of the color-map of this image.  If the image
+    * format is not a color-map format this will return a size sufficient for
+    * 256 entries in the given format; check PNG_IMAGE_FORMAT_FLAG_COLORMAP if
+    * you don't want to allocate a color-map in this case.
+    */
+
 /* PNG_IMAGE_FLAG_*
  *
  * Flags containing additional information about the image are held in the
@@ -2906,13 +2922,6 @@ typedef struct
 #define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 0x01
    /* This indicates the the RGB values of the in-memory bitmap do not
     * correspond to the red, green and blue end-points defined by sRGB.
-    */
-
-#define PNG_IMAGE_FLAG_COLORMAP 0x02
-   /* The PNG is color-mapped.  If this flag is set png_image_read_colormap
-    * can be used without further loss of image information.  If it is not set
-    * png_image_read_colormap will cause significant loss if the image has any
-    * colors (if PNG_FORMAT_FLAG_COLOR is set).
     */
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
@@ -2938,28 +2947,9 @@ PNG_EXPORT(236, int, png_image_begin_read_from_memory, (png_imagep image,
    png_const_voidp memory, png_size_t size));
    /* The PNG header is read from the given memory buffer. */
 
-PNG_EXPORT(242, int, png_image_read_colormap, (png_imagep image,
-   png_bytep colormap, png_colorp background));
-   /* Set the png_image to read a color-mapped image.  image->format must be set
-    * to the format required for the color-map, typically PNG_FORMAT_RGBA or
-    * just PNG_FORMAT_RGB if an alpha channel is to be removed.
-    *
-    * The color-map is filled in and the actual number of valid entries
-    * returned, 0 is returned on error.  A subsequent call to
-    * png_image_finish_read will return the color-mapped image data; one byte
-    * per pixel.
-    *
-    * background is used as described below to remove alpha or transparency
-    * information from an 8-bit color-map by compositing onto a solid color.
-    *
-    * If background is NULL *and* PNG_FORMAT_RGB is requested *and* the input
-    * has an alpha channel then the call will currently FAIL, however, in the
-    * future, libpng may be extended to composite onto the buffer in this case
-    * too.
-    */
-
 PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
-   png_colorp background, void *buffer, png_int_32 row_stride));
+   png_colorp background, void *buffer, png_int_32 row_stride,
+   void *colormap));
    /* Finish reading the image into the supplied buffer and clean up the
     * png_image structure.
     *
@@ -2974,12 +2964,22 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
     * onto the buffer.  The value is an sRGB color to use for the background,
     * for grayscale output the green channel is used.
     *
-    * If png_image_read_colormap has been called the value of background must be
-    * the same as that passed to the colormap call or the resultant image pixels
-    * are implementation defined and may vary between libpng minor releases.
+    * background must be supplied when an alpha channel must be removed from a
+    * single byte color-mapped output format, in other words if:
+    *
+    * 1) The original format from png_image_begin_read_from_* had
+    *    PNG_FORMAT_FLAG_ALPHA set.
+    * 2) The format set by the application does not.
+    * 3) The format set by the application has PNG_FORMAT_FLAG_COLORMAP set and
+    *    PNG_FORMAT_FLAG_LINEAR *not* set.
     *
     * For linear output removing the alpha channel is always done by compositing
-    * on black.
+    * on black and background is ignored.:
+    *
+    * colormap must be supplied when PNG_FORMAT_FLAG_COLORMAP is set.  It must
+    * be at least the size (in bytes) returned by PNG_IMAGE_COLORMAP_SIZE.
+    * image->colormap_entries will be updated to the actual number of entries
+    * written to the colormap; this may be less than the original value.
     */
 
 PNG_EXPORT(238, void, png_image_free, (png_imagep image));
@@ -2992,42 +2992,38 @@ PNG_EXPORT(238, void, png_image_free, (png_imagep image));
 /* WRITE APIS
  * ----------
  * For write you must initialize a png_image structure to describe the image to
- * be written:
+ * be written.  To do this use memset to set the whole structure to 0 then
+ * initialize fields describing your image.
  *
+ * version: must be set to PNG_IMAGE_VERSION
  * opaque: must be initialized to NULL
- * colormap: must be initialized to NULL
  * width: image width in pixels
  * height: image height in rows
- * format: the format of the data you wish to write
+ * format: the format of the data (image and color-map) you wish to write
  * flags: set to 0 unless one of the defined flags applies; set
  *    PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB for color format images where the RGB
  *    values do not correspond to the colors in sRGB.
+ * colormap_entries: set to the number of entries in the color-map (0 to 256)
  */
-PNG_EXPORT(243, int, png_image_write_colormap, (png_imagep image,
-   png_const_bytep colormap));
-   /* Optionally write a color-mapped image.  'format' must be set to the format
-    * of the data in the color-map and must not be changed after the call.  The
-    * colormap *pointer* is retained, the color-map data itself is not copied;
-    * the data must not be freed until after the called to png_image_write_*
-    */
-
 PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
    const char *file, int convert_to_8bit, const void *buffer,
-   png_int_32 row_stride));
+   png_int_32 row_stride, const void *colormap));
    /* Write the image to the named file. */
 
 PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
-   int convert_to_8_bit, const void *buffer, png_int_32 row_stride));
+   int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
+   const void *colormap));
    /* Write the image to the given (FILE*). */
 
-/* With all write APIs if image is in one of the linear formats with 16-bit data
- * then setting convert_to_8_bit will cause the output to be an 8-bit PNG gamma
- * encoded according to the sRGB specification, otherwise a 16-bit linear
+/* With both write APIs if image is in one of the linear formats with 16-bit
+ * data then setting convert_to_8_bit will cause the output to be an 8-bit PNG
+ * gamma encoded according to the sRGB specification, otherwise a 16-bit linear
  * encoded PNG file is written.
  *
- * With color-mapped data png_image_write_colormap must be called.  The palette
- * may contain linear (16-bit) entries, these will be converted to sRGB values
- * regardless of the setting of convert_to_8_bit.
+ * With color-mapped data formats the colormap parameter point to a color-map
+ * with at least image->colormap_entries encoded in the specified format.  If
+ * the format is linear the written PNG color-map will be converted to sRGB
+ * regardless of the convert_to_8_bit flag.
  *
  * With all APIs row_stride is handled as in the read APIs - it is the spacing
  * from one row to the next in component sized units (1 or 2 bytes) and if
@@ -3049,7 +3045,7 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(243);
+  PNG_EXPORT_LAST_ORDINAL(241);
 #endif
 
 #ifdef __cplusplus

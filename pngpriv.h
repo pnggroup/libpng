@@ -519,19 +519,30 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 extern /*PRIVATE*/ PNG_CONST_DATA png_uint_16 png_sRGB_table[256];
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
-    * 0..65535.  This table gives the closes 16-bit answers (no errors).
+    * 0..65535.  This table gives the closest 16-bit answers (no errors).
     */
 #endif
 
 extern /*PRIVATE*/ PNG_CONST_DATA png_uint_16 png_sRGB_base[512];
 extern /*PRIVATE*/ PNG_CONST_DATA png_byte png_sRGB_delta[512];
 
-#define PNG_sRGB_FROM_LINEAR(linear) ((png_sRGB_base[(linear)>>15] +\
-   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)
+#define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
+   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
    /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
     * encoded value with maximum error 0.646365.  Note that the input is not a
     * 16-bit value; it has been multiplied by 255! */
 #endif /* PNG_SIMPLIFIED_READ/WRITE */
+
+/* Added to libpng-1.6.0: scale a 16-bit value in the range 0..65535 to 0..255
+ * by dividing by 257 *with rounding*.  This macro is exact for the given range.
+ * See the discourse in pngrtran.c png_do_scale_16_to_8.  The values in the
+ * macro were established by experiment (modifying the added value).  The macro
+ * has a second variant that takes a value already scaled by 255 and divides by
+ * 65535 - this has a maximum error of .502.  Over the range 0..65535*65535 it
+ * only gives off-by-one errors and only for 0.5% (1 in 200) of the values.
+ */
+#define PNG_DIV65535(v24) (((v24) + 32895) >> 16)
+#define PNG_DIV257(v16) PNG_DIV65535((png_uint_32)(v16) * 255)
 
 /* Added to libpng-1.2.6 JB */
 #define PNG_ROWBYTES(pixel_bits, width) \
@@ -1622,16 +1633,19 @@ PNG_EXTERN void png_build_gamma_table PNGARG((png_structrp png_ptr,
 /* The internal structure that png_image::opaque points to. */
 typedef struct png_control
 {
-   png_structp  png_ptr;
-   png_infop    info_ptr;
-   png_voidp    error_buf;     /* Always a jmp_buf at present. */
+   png_structp png_ptr;
+   png_infop   info_ptr;
+   png_voidp   error_buf;           /* Always a jmp_buf at present. */
 
-   png_const_bytep memory;     /* Memory buffer. */
-   png_size_t      size;       /* Size of the memory buffer. */
+   png_const_bytep memory;          /* Memory buffer. */
+   png_size_t      size;            /* Size of the memory buffer. */
 
-   unsigned int for_write :1;  /* Otherwise it is a read structure */
-   unsigned int owned_file :1; /* We own the file in io_ptr */
+   unsigned int for_write       :1; /* Otherwise it is a read structure */
+   unsigned int owned_file      :1; /* We own the file in io_ptr */
 } png_control;
+
+/* This is used to name an sPLT written by the simplified API. */
+#define LIBPNG_SPLT_NAME "libpng " PNG_LIBPNG_VER_STRING
 
 /* Return the pointer to the jmp_buf from a png_control: necessary because C
  * does not reveal the type of the elements of jmp_buf.
