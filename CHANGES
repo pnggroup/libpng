@@ -3869,6 +3869,8 @@ Version 1.6.0beta06 [January 24, 2012]
     review; the documentation has not yet been updated.
   Fixed Min/GW uninstall to remove libpng.dll.a
 
+Version 1.6.0beta07 [January 24, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

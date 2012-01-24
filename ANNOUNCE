@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta06 - January 24, 2012
+Libpng 1.6.0beta07 - January 24, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta06.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta06.tar.gz
-   1.6.0beta06.tar.bz2
+   1.6.0beta07.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta07.tar.gz
+   1.6.0beta07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b06.7z  (LZMA-compressed, recommended)
-   lp160b06.zip
+   lp160b07.7z  (LZMA-compressed, recommended)
+   lp160b07.zip
 
 Other information:
 
-   1.6.0beta06-README.txt
-   1.6.0beta06-LICENSE.txt
+   1.6.0beta07-README.txt
+   1.6.0beta07-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -117,6 +117,8 @@ Version 1.6.0beta06 [January 24, 2012]
   Added color-map support to simplified API. This is an initial version for
     review; the documentation has not yet been updated.
   Fixed Min/GW uninstall to remove libpng.dll.a
+
+Version 1.6.0beta07 [January 24, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
