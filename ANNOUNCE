@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta06 - January 16, 2012
+Libpng 1.6.0beta06 - January 24, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -109,10 +109,11 @@ Version 1.6.0beta05 [January 15, 2012]
   Fix bug in pngerror.c: some long warnings were being improperly truncated
     (bug introduced in libpng-1.5.3beta05).
 
-Version 1.6.0beta06 [January 16, 2012]
-  Add palette support to the simplified APIs. This commit
+Version 1.6.0beta06 [January 24, 2012]
+  Added palette support to the simplified APIs. This commit
     changes some of the macro definitions in png.h, app code
     may need corresponding changes.
+  Increased the formatted warning buffer to 192 bytes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
