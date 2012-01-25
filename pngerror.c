@@ -1,8 +1,8 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.7 [December 15, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.7 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -281,11 +281,13 @@ void
 png_formatted_warning(png_structp png_ptr, png_warning_parameters p,
    png_const_charp message)
 {
-   /* The internal buffer is just 128 bytes - enough for all our messages,
-    * overflow doesn't happen because this code checks!
+   /* The internal buffer is just 192 bytes - enough for all our messages,
+    * overflow doesn't happen because this code checks!  If someone figures
+    * out how to send us a message longer than 192 bytes, all that will
+    * happen is that the message will be truncated appropriately.
     */
    size_t i = 0; /* Index in the msg[] buffer: */
-   char msg[128];
+   char msg[192];
 
    /* Each iteration through the following loop writes at most one character
     * to msg[i++] then returns here to validate that there is still space for

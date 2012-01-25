@@ -1436,6 +1436,7 @@ uninstall-hook:
 	rm -f $(DESTDIR)$(bindir)/libpng-config
 	rm -f $(DESTDIR)$(libdir)/libpng.a
 	rm -f $(DESTDIR)$(libdir)/libpng.la
+	rm -f $(DESTDIR)$(libdir)/libpng.dll.a
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

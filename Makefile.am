@@ -225,3 +225,4 @@ uninstall-hook:
 	rm -f $(DESTDIR)$(bindir)/libpng-config
 	rm -f $(DESTDIR)$(libdir)/libpng.a
 	rm -f $(DESTDIR)$(libdir)/libpng.la
+	rm -f $(DESTDIR)$(libdir)/libpng.dll.a
