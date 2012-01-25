@@ -94,6 +94,12 @@ CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
 
+# PNG_COPTS give extra options for the C compiler to be used on all compilation
+# steps (unless targe_CFLAGS is specified; that will take precedence over
+# AM_CFLAGS)
+PNG_COPTS = @PNG_COPTS@
+AM_CFLAGS = ${PNG_COPTS}
+
 # DFNCPP is normally just CPP - the C preprocessor - but on Solaris and maybe
 # other operating systems (NeXT?) the C preprocessor selected by configure
 # checks input tokens for validity - effectively it performs part of the ANSI-C
