@@ -1644,9 +1644,6 @@ typedef struct png_control
    unsigned int owned_file      :1; /* We own the file in io_ptr */
 } png_control;
 
-/* This is used to name an sPLT written by the simplified API. */
-#define LIBPNG_SPLT_NAME "libpng " PNG_LIBPNG_VER_STRING
-
 /* Return the pointer to the jmp_buf from a png_control: necessary because C
  * does not reveal the type of the elements of jmp_buf.
  */
