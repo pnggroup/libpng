@@ -1,49 +1,42 @@
 
-Libpng 1.5.8rc02 - January 25, 2012
+Libpng 1.5.8 - February 1, 2012
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.8rc02.tar.xz (LZMA-compressed, recommended)
-   1.5.8rc02.tar.gz
-   1.5.8rc02.tar.bz2
+   libpng-1.5.8.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.8.tar.gz
+   libpng-1.5.8.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp158r02.7z  (LZMA-compressed, recommended)
-   lp158r02.zip
+   lpng158.7z  (LZMA-compressed, recommended)
+   lpng158.zip
 
 Other information:
 
-   1.5.8rc02-README.txt
-   1.5.8rc02-LICENSE.txt
+   libpng-1.5.8-README.txt
+   libpng-1.5.8-LICENSE.txt
 
 Changes since the last public release (1.5.7):
-
-Version 1.5.8beta01 [January 15, 2011]
   Removed '#include config.h"' from contrib/libtests/pngvalid.c.  It's not
     needed and causes trouble for VPATH building.
   Moved AC_MSG_CHECKING([if libraries can be versioned]) later to the proper
     location in configure.ac (Gilles Espinasse).
   Fix bug in pngerror.c: some long warnings were being improperly truncated
-    (bug introduced in libpng-1.5.3beta05).
-
-Version 1.5.8rc01 [January 25, 2012]
-  No changes.
-
-Version 1.5.8rc02
+    (bug introduced in libpng-1.5.4).
   Fixed Min/GW uninstall to remove libpng.dll.a
   Conditionalize the install rules for MINGW and CYGWIN in CMakeLists.txt
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P

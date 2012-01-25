@@ -3784,10 +3784,10 @@ Version 1.5.8beta01 [January 15, 2011]
   Fix bug in pngerror.c: some long warnings were being improperly truncated
     (bug introduced in libpng-1.5.3beta05).
 
-Version 1.5.8rc01 [January 25, 2012]
+Version 1.5.8rc01 [January 21, 2012]
   No changes.
 
-Version 1.5.8rc02
+Version 1.5.8rc02 [January 25, 2012]
   Fixed Min/GW uninstall to remove libpng.dll.a
   Conditionalize the install rules for MINGW and CYGWIN in CMakeLists.txt
 
