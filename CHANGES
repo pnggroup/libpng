@@ -3884,6 +3884,7 @@ Version 1.6.0beta07 [January 25, 2012]
     the option the tests written in configure itself fail compilation because
     they cause compiler warnings.
   Rewrote autogen.sh to run autoreconf instead of running tools one-by-one.
+  Conditionalize the install rules for MINGW and CYGWIN in CMakeLists.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
