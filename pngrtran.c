@@ -3508,8 +3508,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      if ((png_uint_16)((*sp >> shift) & 0x01)
                         == png_ptr->trans_color.gray)
                      {
-                        *sp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
-                        *sp |= (png_byte)(png_ptr->background.gray << shift);
+                        unsigned int tmp = *sp & (0x7f7f >> (7 - shift));
+                        tmp |= png_ptr->background.gray << shift;
+                        *sp = (png_byte)(tmp & 0xff);
                      }
 
                      if (!shift)
@@ -3536,17 +3537,19 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x03)
                             == png_ptr->trans_color.gray)
                         {
-                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-                           *sp |= (png_byte)(png_ptr->background.gray << shift);
+                           unsigned int tmp = *sp & (0x3f3f >> (6 - shift));
+                           tmp |= png_ptr->background.gray << shift;
+                           *sp = (png_byte)(tmp & 0xff);
                         }
 
                         else
                         {
-                           png_byte p = (png_byte)((*sp >> shift) & 0x03);
-                           png_byte g = (png_byte)((gamma_table [p | (p << 2) |
-                               (p << 4) | (p << 6)] >> 6) & 0x03);
-                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-                           *sp |= (png_byte)(g << shift);
+                           unsigned int p = (*sp >> shift) & 0x03;
+                           unsigned int g = (gamma_table [p | (p << 2) |
+                               (p << 4) | (p << 6)] >> 6) & 0x03;
+                           unsigned int tmp = *sp & (0x3f3f >> (6 - shift));
+                           tmp |= g << shift;
+                           *sp = (png_byte)(tmp & 0xff);
                         }
 
                         if (!shift)
@@ -3570,8 +3573,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x03)
                             == png_ptr->trans_color.gray)
                         {
-                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
-                           *sp |= (png_byte)(png_ptr->background.gray << shift);
+                           unsigned int tmp = *sp & (0x3f3f >> (6 - shift));
+                           tmp |= png_ptr->background.gray << shift;
+                           *sp = (png_byte)(tmp & 0xff);
                         }
 
                         if (!shift)
@@ -3599,17 +3603,19 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == png_ptr->trans_color.gray)
                         {
-                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-                           *sp |= (png_byte)(png_ptr->background.gray << shift);
+                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
+                           tmp |= png_ptr->background.gray << shift;
+                           *sp = (png_byte)(tmp & 0xff);
                         }
 
                         else
                         {
-                           png_byte p = (png_byte)((*sp >> shift) & 0x0f);
-                           png_byte g = (png_byte)((gamma_table[p |
-                               (p << 4)] >> 4) & 0x0f);
-                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-                           *sp |= (png_byte)(g << shift);
+                           unsigned int p = (*sp >> shift) & 0x0f;
+                           unsigned int g = (gamma_table[p | (p << 4)] >> 4) &
+                              0x0f;
+                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
+                           tmp |= g << shift;
+                           *sp = (png_byte)(tmp & 0xff);
                         }
 
                         if (!shift)
@@ -3633,8 +3639,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == png_ptr->trans_color.gray)
                         {
-                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
-                           *sp |= (png_byte)(png_ptr->background.gray << shift);
+                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
+                           tmp |= png_ptr->background.gray << shift;
+                           *sp = (png_byte)(tmp & 0xff);
                         }
 
                         if (!shift)
@@ -4617,7 +4624,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
    {
       if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
       {
-         png_uint_16 gray = (png_uint_16)(trans_color ? trans_color->gray : 0);
+         unsigned int gray = trans_color ? trans_color->gray : 0;
 
          if (row_info->bit_depth < 8)
          {
@@ -4625,7 +4632,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
             {
                case 1:
                {
-                  gray = (png_uint_16)((gray & 0x01) * 0xff);
+                  gray = (gray & 0x01) * 0xff;
                   sp = row + (png_size_t)((row_width - 1) >> 3);
                   dp = row + (png_size_t)row_width - 1;
                   shift = 7 - (int)((row_width + 7) & 0x07);
@@ -4653,7 +4660,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
                case 2:
                {
-                  gray = (png_uint_16)((gray & 0x03) * 0x55);
+                  gray = (gray & 0x03) * 0x55;
                   sp = row + (png_size_t)((row_width - 1) >> 2);
                   dp = row + (png_size_t)row_width - 1;
                   shift = (int)((3 - ((row_width + 3) & 0x03)) << 1);
@@ -4678,7 +4685,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
                case 4:
                {
-                  gray = (png_uint_16)((gray & 0x0f) * 0x11);
+                  gray = (gray & 0x0f) * 0x11;
                   sp = row + (png_size_t)((row_width - 1) >> 1);
                   dp = row + (png_size_t)row_width - 1;
                   shift = (int)((1 - ((row_width + 1) & 0x01)) << 2);
@@ -4731,8 +4738,8 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
             else if (row_info->bit_depth == 16)
             {
-               png_byte gray_high = (png_byte)((gray >> 8) & 0xff);
-               png_byte gray_low = (png_byte)(gray & 0xff);
+               unsigned int gray_high = (gray >> 8) & 0xff;
+               unsigned int gray_low = gray & 0xff;
                sp = row + row_info->rowbytes - 1;
                dp = row + (row_info->rowbytes << 1) - 1;
                for (i = 0; i < row_width; i++)

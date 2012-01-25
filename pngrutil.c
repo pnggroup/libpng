@@ -3315,8 +3315,9 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                v = (png_byte)((*sp >> sshift) & 0x01);
                for (j = 0; j < jstop; j++)
                {
-                  *dp &= (png_byte)((0x7f7f >> (7 - dshift)) & 0xff);
-                  *dp |= (png_byte)(v << dshift);
+                  unsigned int tmp = *dp & (0x7f7f >> (7 - dshift));
+                  tmp |= v << dshift;
+                  *dp = (png_byte)(tmp & 0xff);
 
                   if (dshift == s_end)
                   {
@@ -3377,8 +3378,9 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                v = (png_byte)((*sp >> sshift) & 0x03);
                for (j = 0; j < jstop; j++)
                {
-                  *dp &= (png_byte)((0x3f3f >> (6 - dshift)) & 0xff);
-                  *dp |= (png_byte)(v << dshift);
+                  unsigned int tmp = *dp & (0x3f3f >> (6 - dshift));
+                  tmp |= v << dshift;
+                  *dp = (png_byte)(tmp & 0xff);
 
                   if (dshift == s_end)
                   {
@@ -3438,8 +3440,9 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
                for (j = 0; j < jstop; j++)
                {
-                  *dp &= (png_byte)((0xf0f >> (4 - dshift)) & 0xff);
-                  *dp |= (png_byte)(v << dshift);
+                  unsigned int tmp = *dp & (0xf0f >> (4 - dshift));
+                  tmp |= v << dshift;
+                  *dp = (png_byte)(tmp & 0xff);
 
                   if (dshift == s_end)
                   {

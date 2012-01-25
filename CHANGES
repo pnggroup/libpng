@@ -3869,7 +3869,11 @@ Version 1.6.0beta06 [January 24, 2012]
     review; the documentation has not yet been updated.
   Fixed Min/GW uninstall to remove libpng.dll.a
 
-Version 1.6.0beta07 [January 24, 2012]
+Version 1.6.0beta07 [January 25, 2012]
+  Eliminated Intel icc/icl compiler warnings. The Intel (GCC derived)
+    compiler issues slightly different warnings from those issued by the
+    current vesions of GCC. This eliminates those warnings by
+    adding/removing casts and small code rewrites.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

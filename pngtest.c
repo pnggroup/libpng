@@ -89,8 +89,6 @@ static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
 static int verbose = 0;
 static int strict = 0;
 
-int test_one_file PNGARG((PNG_CONST char *inname, PNG_CONST char *outname));
-
 #ifdef __TURBOC__
 #include <mem.h>
 #endif
@@ -109,9 +107,7 @@ static int status_pass = 1;
 static int status_dots_requested = 0;
 static int status_dots = 1;
 
-void PNGCBAPI
-read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
-void PNGCBAPI
+static void PNGCBAPI
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
    if (png_ptr == NULL || row_number > PNG_UINT_31_MAX)
@@ -135,9 +131,7 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
    fprintf(stdout, "r");
 }
 
-void PNGCBAPI
-write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass);
-void PNGCBAPI
+static void PNGCBAPI
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
    if (png_ptr == NULL || row_number > PNG_UINT_31_MAX || pass > 7)
@@ -153,9 +147,7 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
  * 5 in case illegal filter values are present.)
  */
 static png_uint_32 filters_used[256];
-void PNGCBAPI
-count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data);
-void PNGCBAPI
+static void PNGCBAPI
 count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    if (png_ptr != NULL && row_info != NULL)
@@ -170,9 +162,7 @@ count_filters(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 static png_uint_32 zero_samples;
 
-void PNGCBAPI
-count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data);
-void PNGCBAPI
+static void PNGCBAPI
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
@@ -636,7 +626,7 @@ static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
 /* END of code to demonstrate user chunk support */
 
 /* Test one file */
-int
+static int
 test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    static png_FILE_p fpin;

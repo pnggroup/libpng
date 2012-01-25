@@ -2903,9 +2903,9 @@ make_standard_palette(png_store* ps, int npalette, int do_tRNS)
     */
    for (; i<8; ++i)
    {
-      values[i][1] = (i&1) ? 255 : 0;
-      values[i][2] = (i&2) ? 255 : 0;
-      values[i][3] = (i&4) ? 255 : 0;
+      values[i][1] = (png_byte)((i&1) ? 255U : 0U);
+      values[i][2] = (png_byte)((i&2) ? 255U : 0U);
+      values[i][3] = (png_byte)((i&4) ? 255U : 0U);
    }
 
    /* Then add 62 grays (one quarter of the remaining 256 slots). */
@@ -3166,20 +3166,20 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
    switch (bit_size(pp, colour_type, bit_depth))
    {
       case 1:
-         while (i<128/8) buffer[i] = v & 0xff, v += 17, ++i;
+         while (i<128/8) buffer[i] = (png_byte)(v & 0xff), v += 17, ++i;
          return;
 
       case 2:
-         while (i<128/4) buffer[i] = v & 0xff, v += 33, ++i;
+         while (i<128/4) buffer[i] = (png_byte)(v & 0xff), v += 33, ++i;
          return;
 
       case 4:
-         while (i<128/2) buffer[i] = v & 0xff, v += 65, ++i;
+         while (i<128/2) buffer[i] = (png_byte)(v & 0xff), v += 65, ++i;
          return;
 
       case 8:
          /* 256 bytes total, 128 bytes in each row set as follows: */
-         while (i<128) buffer[i] = v & 0xff, ++v, ++i;
+         while (i<128) buffer[i] = (png_byte)(v & 0xff), ++v, ++i;
          return;
 
       case 16:
@@ -3187,7 +3187,12 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
           * GA case as well as the 16 bit G case.
           */
          while (i<128)
-            buffer[2*i] = (v>>8) & 0xff, buffer[2*i+1] = v & 0xff, ++v, ++i;
+         {
+            buffer[2*i] = (png_byte)((v>>8) & 0xff);
+            buffer[2*i+1] = (png_byte)(v & 0xff);
+            ++v;
+            ++i;
+         }
 
          return;
 
@@ -3196,9 +3201,9 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          while (i<128)
          {
             /* Three bytes per pixel, r, g, b, make b by r^g */
-            buffer[3*i+0] = (v >> 8) & 0xff;
-            buffer[3*i+1] = v & 0xff;
-            buffer[3*i+2] = ((v >> 8) ^ v) & 0xff;
+            buffer[3*i+0] = (png_byte)((v >> 8) & 0xff);
+            buffer[3*i+1] = (png_byte)(v & 0xff);
+            buffer[3*i+2] = (png_byte)(((v >> 8) ^ v) & 0xff);
             ++v;
             ++i;
          }
@@ -3209,10 +3214,10 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          /* 65535 pixels, r, g, b, a; just replicate */
          while (i<128)
          {
-            buffer[4*i+0] = (v >> 8) & 0xff;
-            buffer[4*i+1] = v & 0xff;
-            buffer[4*i+2] = (v >> 8) & 0xff;
-            buffer[4*i+3] = v & 0xff;
+            buffer[4*i+0] = (png_byte)((v >> 8) & 0xff);
+            buffer[4*i+1] = (png_byte)(v & 0xff);
+            buffer[4*i+2] = (png_byte)((v >> 8) & 0xff);
+            buffer[4*i+3] = (png_byte)(v & 0xff);
             ++v;
             ++i;
          }
@@ -3226,14 +3231,14 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          while (i<128)
          {
             png_uint_32 t = v++;
-            buffer[6*i+0] = (t >> 8) & 0xff;
-            buffer[6*i+1] = t & 0xff;
+            buffer[6*i+0] = (png_byte)((t >> 8) & 0xff);
+            buffer[6*i+1] = (png_byte)(t & 0xff);
             t *= 257;
-            buffer[6*i+2] = (t >> 8) & 0xff;
-            buffer[6*i+3] = t & 0xff;
+            buffer[6*i+2] = (png_byte)((t >> 8) & 0xff);
+            buffer[6*i+3] = (png_byte)(t & 0xff);
             t *= 17;
-            buffer[6*i+4] = (t >> 8) & 0xff;
-            buffer[6*i+5] = t & 0xff;
+            buffer[6*i+4] = (png_byte)((t >> 8) & 0xff);
+            buffer[6*i+5] = (png_byte)(t & 0xff);
             ++i;
          }
 
@@ -3244,15 +3249,15 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          while (i<128)
          {
             png_uint_32 t = v++;
-            buffer[8*i+0] = (t >> 8) & 0xff;
-            buffer[8*i+1] = t & 0xff;
-            buffer[8*i+4] = (t >> 8) & 0xff;
-            buffer[8*i+5] = t & 0xff;
+            buffer[8*i+0] = (png_byte)((t >> 8) & 0xff);
+            buffer[8*i+1] = (png_byte)(t & 0xff);
+            buffer[8*i+4] = (png_byte)((t >> 8) & 0xff);
+            buffer[8*i+5] = (png_byte)(t & 0xff);
             t *= 257;
-            buffer[8*i+2] = (t >> 8) & 0xff;
-            buffer[8*i+3] = t & 0xff;
-            buffer[8*i+6] = (t >> 8) & 0xff;
-            buffer[8*i+7] = t & 0xff;
+            buffer[8*i+2] = (png_byte)((t >> 8) & 0xff);
+            buffer[8*i+3] = (png_byte)(t & 0xff);
+            buffer[8*i+6] = (png_byte)((t >> 8) & 0xff);
+            buffer[8*i+7] = (png_byte)(t & 0xff);
             ++i;
          }
          return;
@@ -4591,8 +4596,8 @@ standard_row_validate(standard_display *dp, png_const_structp pp,
             dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "PNG image row[%d][%d] changed from %.2x to %.2x", y,
-         where-1, std[where-1],
+      sprintf(msg, "PNG image row[%lu][%d] changed from %.2x to %.2x",
+         (unsigned long)y, where-1, std[where-1],
          store_image_row(dp->ps, pp, iImage, y)[where-1]);
       png_error(pp, msg);
    }
@@ -4609,8 +4614,8 @@ standard_row_validate(standard_display *dp, png_const_structp pp,
          dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "display  row[%d][%d] changed from %.2x to %.2x", y,
-         where-1, std[where-1],
+      sprintf(msg, "display  row[%lu][%d] changed from %.2x to %.2x",
+         (unsigned long)y, where-1, std[where-1],
          store_image_row(dp->ps, pp, iDisplay, y)[where-1]);
       png_error(pp, msg);
    }
@@ -8277,7 +8282,8 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
          char msg[64];
 
          /* No transform is expected on the threshold tests. */
-         sprintf(msg, "gamma: below threshold row %d changed", y);
+         sprintf(msg, "gamma: below threshold row %lu changed",
+            (unsigned long)y);
 
          png_error(pp, msg);
       }
@@ -9425,7 +9431,7 @@ static void signal_handler(int signum)
 }
 
 /* main program */
-int main(int argc, PNG_CONST char **argv)
+int main(int argc, char **argv)
 {
    volatile int summary = 1;  /* Print the error summary at the end */
    volatile int memstats = 0; /* Print memory statistics at the end */

@@ -1530,7 +1530,10 @@ compare_two_images(Image *a, Image *b, int via_linear)
       png_byte bstart = 0;
 
       /* Set to the actual number of channels in 'a' */
-      channels = (formata & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+      if (formata & PNG_FORMAT_FLAG_COLOR)
+         channels = 3U;
+      else
+         channels = 1U;
 
       if (formata & PNG_FORMAT_FLAG_ALPHA)
       {
@@ -2282,7 +2285,7 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
 }
 
 int
-main(int argc, const char **argv)
+main(int argc, char **argv)
 {
    png_uint_32 opts = 0;
    format_list formats;

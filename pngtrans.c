@@ -648,7 +648,7 @@ png_get_user_transform_ptr(png_const_structrp png_ptr)
    if (png_ptr == NULL)
       return (NULL);
 
-   return ((png_voidp)png_ptr->user_transform_ptr);
+   return png_ptr->user_transform_ptr;
 }
 #endif
 
