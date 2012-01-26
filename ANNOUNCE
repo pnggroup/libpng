@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta07 - January 25, 2012
+Libpng 1.6.0beta07 - January 26, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -118,7 +118,7 @@ Version 1.6.0beta06 [January 24, 2012]
     review; the documentation has not yet been updated.
   Fixed Min/GW uninstall to remove libpng.dll.a
 
-Version 1.6.0beta07 [January 25, 2012]
+Version 1.6.0beta07 [January 26, 2012]
   Eliminated Intel icc/icl compiler warnings. The Intel (GCC derived)
     compiler issues slightly different warnings from those issued by the
     current vesions of GCC. This eliminates those warnings by
@@ -133,7 +133,8 @@ Version 1.6.0beta07 [January 25, 2012]
     the option the tests written in configure itself fail compilation because
     they cause compiler warnings.
   Rewrote autogen.sh to run autoreconf instead of running tools one-by-one.
-  Conditionalize the install rules for MINGW and CYGWIN in CMakeLists.txt
+  Conditionalize the install rules for MINGW and CYGWIN in CMakeLists.txt and
+    set CMAKE_LIBRARY_OUTPUT_DIRECTORY to "lib" on all platforms (C. Yapp).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
