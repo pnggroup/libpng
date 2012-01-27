@@ -10,6 +10,7 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 # to get red "FAIL" and green "PASS" notations during tests.
 # AUTOMAKE_OPTIONS = foreign color-tests
 AUTOMAKE_OPTIONS = foreign
+ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
 TESTS_ENVIRONMENT= srcdir=$(srcdir)
