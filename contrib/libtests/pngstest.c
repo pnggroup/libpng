@@ -393,7 +393,7 @@ typedef struct
    png_size_t  allocsize;
    png_color   background;
    char        tmpfile_name[32];
-   png_byte    colormap[256*4*2];
+   png_uint_16 colormap[256*4];
 }
 Image;
 
@@ -611,7 +611,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
    int result = 1;
 
    if (format & PNG_FORMAT_FLAG_COLORMAP)
-      pp = image->colormap + PNG_IMAGE_SAMPLE_SIZE(format) * *pp;
+      pp = (png_bytep)image->colormap + PNG_IMAGE_SAMPLE_SIZE(format) * *pp;
 
    pixel->format = format;
 
@@ -1727,8 +1727,7 @@ compare_two_images(Image *a, Image *b, int via_linear)
 
                while (x < width)
                {
-                  png_const_uint_16p lppa = ((png_const_uint_16p)a->colormap) +
-                     channels * *ppa;
+                  png_const_uint_16p lppa = a->colormap + channels * *ppa;
 
                   switch (channels)
                   {
@@ -1771,8 +1770,7 @@ compare_two_images(Image *a, Image *b, int via_linear)
 
                while (x < width)
                {
-                  png_const_uint_16p lppb = ((png_const_uint_16p)b->colormap) +
-                     channels * *ppb;
+                  png_const_uint_16p lppb = b->colormap + channels * *ppb;
 
                   switch (channels)
                   {
@@ -1843,66 +1841,76 @@ compare_two_images(Image *a, Image *b, int via_linear)
             break;
 
          case 4+3: /* both sides sRGB, imagea color-mapped */
-            while (x < width) switch (channels)
+            while (x < width)
             {
-               case 4:
-                  if (a->colormap[ppa[3]] != ppb[swap_mask[3]])
-                     goto sRGB_colormapa_mismatch;
-               case 3:
-                  if (a->colormap[ppa[2]] != ppb[swap_mask[2]])
-                     goto sRGB_colormapa_mismatch;
-               case 2:
-                  if (a->colormap[ppa[1]] != ppb[swap_mask[1]])
-                     goto sRGB_colormapa_mismatch;
-               case 1:
-                  if (a->colormap[ppa[0]] != ppb[swap_mask[0]])
-                     goto sRGB_mismatch;
+               png_const_bytep colormap_a = (png_const_bytep)a->colormap;
+               
+               switch (channels)
+               {
+                  case 4:
+                     if (colormap_a[ppa[3]] != ppb[swap_mask[3]])
+                        goto sRGB_colormapa_mismatch;
+                  case 3:
+                     if (colormap_a[ppa[2]] != ppb[swap_mask[2]])
+                        goto sRGB_colormapa_mismatch;
+                  case 2:
+                     if (colormap_a[ppa[1]] != ppb[swap_mask[1]])
+                        goto sRGB_colormapa_mismatch;
+                  case 1:
+                     if (colormap_a[ppa[0]] != ppb[swap_mask[0]])
+                        goto sRGB_mismatch;
 
-                  /* The pixels apparently match, but if an alpha channel has
-                   * been added (in b) it must be 1.0 too.
-                   */
-                  if (check_alpha && 255 != ppb[swap_mask[3]])
-                     goto sRGB_colormapa_mismatch;
+                     /* The pixels apparently match, but if an alpha channel has
+                      * been added (in b) it must be 1.0 too.
+                      */
+                     if (check_alpha && 255 != ppb[swap_mask[3]])
+                        goto sRGB_colormapa_mismatch;
 
-                  /* This pixel matches, advance to the next. */
-                  ppa += 1;
-                  ppb += channels + check_alpha;
-                  ++x;
-               default:
-                  goto sRGB_colormapa_mismatch;
+                     /* This pixel matches, advance to the next. */
+                     ppa += 1;
+                     ppb += channels + check_alpha;
+                     ++x;
+                  default:
+                     goto sRGB_colormapa_mismatch;
+               }
             }
 
          sRGB_colormapa_mismatch:
             break;
 
          case 8+3: /* both sides sRGB, imageb color-mapped */
-            while (x < width) switch (channels)
+            while (x < width)
             {
-               case 4:
-                  if (ppa[3] != b->colormap[ppb[swap_mask[3]]])
-                     goto sRGB_colormapb_mismatch;
-               case 3:
-                  if (ppa[2] != b->colormap[ppb[swap_mask[2]]])
-                     goto sRGB_colormapb_mismatch;
-               case 2:
-                  if (ppa[1] != b->colormap[ppb[swap_mask[1]]])
-                     goto sRGB_colormapb_mismatch;
-               case 1:
-                  if (ppa[0] != b->colormap[ppb[swap_mask[0]]])
-                     goto sRGB_colormapb_mismatch;
+               png_const_bytep colormap_b = (png_const_bytep)b->colormap;
+               
+               switch (channels)
+               {
+                  case 4:
+                     if (ppa[3] != colormap_b[ppb[swap_mask[3]]])
+                        goto sRGB_colormapb_mismatch;
+                  case 3:
+                     if (ppa[2] != colormap_b[ppb[swap_mask[2]]])
+                        goto sRGB_colormapb_mismatch;
+                  case 2:
+                     if (ppa[1] != colormap_b[ppb[swap_mask[1]]])
+                        goto sRGB_colormapb_mismatch;
+                  case 1:
+                     if (ppa[0] != colormap_b[ppb[swap_mask[0]]])
+                        goto sRGB_colormapb_mismatch;
 
-                  /* The pixels apparently match, but if an alpha channel has
-                   * been added (in b) it must be 1.0 too.
-                   */
-                  if (check_alpha && 255 != b->colormap[ppb[swap_mask[3]]])
-                     goto sRGB_colormapb_mismatch;
+                     /* The pixels apparently match, but if an alpha channel has
+                      * been added (in b) it must be 1.0 too.
+                      */
+                     if (check_alpha && 255 != colormap_b[ppb[swap_mask[3]]])
+                        goto sRGB_colormapb_mismatch;
 
-                  /* This pixel matches, advance to the next. */
-                  ppa += channels;
-                  ppb += 1;
-                  ++x;
-               default:
-                  goto sRGB_colormapb_mismatch;
+                     /* This pixel matches, advance to the next. */
+                     ppa += channels;
+                     ppb += 1;
+                     ++x;
+                  default:
+                     goto sRGB_colormapb_mismatch;
+               }
             }
 
          sRGB_colormapb_mismatch:
