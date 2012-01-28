@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.6.0beta07 - January 24, 2012
+Makefiles for  libpng version 1.6.0beta07 - January 28, 2012
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
@@ -62,15 +62,21 @@ Other supporting scripts:
  pngwin.dfn        =>  Used to maintain pngwin.def
  SCOPTIONS.ppc     =>  Used with smakefile.ppc
 
-checksym.awk       =>  Used for maintaining pnglibconf.h
-def.dfn            =>  Used for maintaining pnglibconf.h
-options.awk        =>  Used for maintaining pnglibconf.h
-pnglibconf.dfa     =>  Used for maintaining pnglibconf.h
-pnglibconf.mak     =>  Used for maintaining pnglibconf.h
-sym.dfn            =>  Used for symbol versioning
-symbols.def        =>  Used for symbol versioning
-symbols.dfn        =>  Used for symbol versioning
-vers.dfn           =>  Used for symbol versioning
+ checksym.awk       =>  Used for maintaining pnglibconf.h
+ def.dfn            =>  Used for maintaining pnglibconf.h
+ options.awk        =>  Used for maintaining pnglibconf.h
+ pnglibconf.dfa     =>  Used for maintaining pnglibconf.h
+ pnglibconf.mak     =>  Used for maintaining pnglibconf.h
+ sym.dfn            =>  Used for symbol versioning
+ symbols.def        =>  Used for symbol versioning
+ symbols.dfn        =>  Used for symbol versioning
+ vers.dfn           =>  Used for symbol versioning
+
+ libtool.m4        =>  Used by autoconf tools
+ ltoptions.m4      =>  Used by autoconf tools
+ ltsugar.m4        =>  Used by autoconf tools
+ ltversion.m4      =>  Used by autoconf tools
+ lt~obsolete.m4    =>  Used by autoconf tools
 
 
 Further information can be found in comments in the individual makefiles.
