@@ -14,15 +14,20 @@ dnl Makefile.am to upgrade the package name.
 dnl This is here to prevent earlier autoconf from being used, it
 dnl should not be necessary to regenerate configure if the time
 dnl stamps are correct
-AC_PREREQ([2.59])
+AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.0beta08], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.0beta08],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 AM_INIT_AUTOMAKE
-dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
+
+dnl configure.ac and Makefile.am expect automake 1.11.2 or a compatible later
+dnl version; aclocal.m4 will generate a failure if you use a prior version of
+dnl automake, so the following is not necessary (and is not defined anyway):
+dnl AM_PREREQ([1.11.2])
+dnl stop configure from automagically running automake
 
 PNGLIB_VERSION=1.6.0beta08
 PNGLIB_MAJOR=1
@@ -45,7 +50,11 @@ AC_CHECK_TOOL(AWK, awk, :)
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+
+dnl libtool/libtoolize; version 2.4.2 is the tested version, this or any
+dnl compatible later version may be used
 LT_INIT([win32-dll])
+LT_PREREQ([2.4.2])
 
 # On Solaris 10 and 12 CPP gets set to cc -E, however this still
 # does some input parsing.  We need strict ANSI-C style tokenization,

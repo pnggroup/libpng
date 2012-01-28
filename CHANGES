@@ -3895,6 +3895,7 @@ Version 1.6.0beta07 [January 28, 2012]
 
 Version 1.6.0beta08 [January 28, 2012]
   Fixed Image::colormap mis-alignment in pngstest.c
+  Check libtool/libtoolize version number (2.4.2) in configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
