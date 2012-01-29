@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta08 - January 28, 2012
+Libpng 1.6.0beta08 - January 29, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -142,10 +142,14 @@ Version 1.6.0beta07 [January 28, 2012]
     and renamed three whose names were inconsistent with those in
     pngsuite/README.txt.
 
-Version 1.6.0beta08 [January 28, 2012]
+Version 1.6.0beta08 [January 29, 2012]
   Fixed Image::colormap misalignment in pngstest.c
   Check libtool/libtoolize version number (2.4.2) in configure.ac
-  Divide pngstest into separate runs for basic and transparent images.
+  Divide test-pngstest.sh into separate pngstest runs for basic and
+    transparent images.
+  Moved automake options to AM_INIT_AUTOMAKE in configure.ac
+  Added color-tests, silent-rules (Not yet implemented in Makefile.am) and
+    version checking to configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -20,7 +20,13 @@ dnl Version number stuff here:
 
 AC_INIT([libpng],[1.6.0beta08],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
-AM_INIT_AUTOMAKE
+
+# libpng does not follow GNU file name conventions (hence 'foreign')
+# color-tests requires automake 1.11 or later
+# silent-rules requires automake 1.11 or later
+# dist-xz requires automake 1.11 or later
+# 1.11.1 fixes a security issue in 1.11
+AM_INIT_AUTOMAKE([1.11.1 foreign dist-xz dist-bzip2 color-tests silent-rules])
 AM_MAINTAINER_MODE
 
 dnl configure.ac and Makefile.am expect automake 1.11.2 or a compatible later

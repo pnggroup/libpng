@@ -4,12 +4,6 @@
 
 PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
-# libpng does not follow GNU file name conventions
-
-# "color-tests" requires automake 1.11.1 or later.  Enable it if you like,
-# to get red "FAIL" and green "PASS" notations during tests.
-# AUTOMAKE_OPTIONS = foreign color-tests
-AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
