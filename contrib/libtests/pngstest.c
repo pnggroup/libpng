@@ -44,6 +44,44 @@
 #  define voidcast(type, value) (value)
 #endif /* __cplusplus */
 
+/* Generate random bytes.  This uses a boring repeatable algorithm and it
+ * is implemented here so that it gives the same set of numbers on every
+ * architecture.  It's a linear congruential generator (Knuth or Sedgewick
+ * "Algorithms") but it comes from the 'feedback taps' table in Horowitz and
+ * Hill, "The Art of Electronics".
+ */
+static void
+make_random_bytes(png_uint_32* seed, void* pv, size_t size)
+{
+   png_uint_32 u0 = seed[0], u1 = seed[1];
+   png_bytep bytes = voidcast(png_bytep, pv);
+
+   /* There are thirty three bits, the next bit in the sequence is bit-33 XOR
+    * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
+    */
+   size_t i;
+   for (i=0; i<size; ++i)
+   {
+      /* First generate 8 new bits then shift them in at the end. */
+      png_uint_32 u = ((u0 >> (20-8)) ^ ((u1 << 7) | (u0 >> (32-7)))) & 0xff;
+      u1 <<= 8;
+      u1 |= u0 >> 24;
+      u0 <<= 8;
+      u0 |= u;
+      *bytes++ = (png_byte)u;
+   }
+
+   seed[0] = u0;
+   seed[1] = u1;
+}
+
+static void
+random_color(png_colorp color)
+{
+   static png_uint_32 color_seed[2] = { 0x12345678, 0x9abcdef };
+   make_random_bytes(color_seed, color, sizeof *color);
+}
+
 /* Math support - neither Cygwin nor Visual Studio have C99 support and we need
  * a predictable rounding function, so make one here:
  */
@@ -109,9 +147,6 @@ power_law_error8(int value)
       double vd = value / 255.;
       double e = fabs(
          pow(linear_from_sRGB(vd), 1/2.2) - sRGB_from_linear(pow(vd, 2.2)));
-
-      /* TODO: remove this, it's a math check */
-      if (e*255 >= 17) abort();
 
       /* Always allow an extra 1 here for rounding errors */
       e = 1+floor(255 * e);
@@ -194,7 +229,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 
 #define READ_FILE 1      /* else memory */
 #define USE_STDIO 2      /* else use file name */
-#define USE_BACKGROUND 4 /* else composite in place */
+/* 4: unused */
 #define VERBOSE 8
 #define KEEP_TMPFILES 16 /* else delete temporary files */
 #define KEEP_GOING 32
@@ -206,8 +241,6 @@ print_opts(png_uint_32 opts)
       printf(" --file");
    if (opts & USE_STDIO)
       printf(" --stdio");
-   if (opts & USE_BACKGROUND)
-      printf(" --background");
    if (opts & VERBOSE)
       printf(" --verbose");
    if (opts & KEEP_TMPFILES)
@@ -330,21 +363,23 @@ static void format_init(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
-      pf->bits[i] = ~(png_uint_32)0;
+      pf->bits[i] = 0; /* All off */
 }
 
+#if 0 /* currently unused */
 static void format_clear(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
       pf->bits[i] = 0;
 }
+#endif
 
 static int format_is_initial(format_list *pf)
 {
    int i;
    for (i=0; i<FORMAT_SET_COUNT; ++i)
-      if (pf->bits[i] != ~(png_uint_32)0)
+      if (pf->bits[i] != 0)
          return 0;
 
    return 1;
@@ -374,6 +409,38 @@ static int format_isset(format_list *pf, png_uint_32 format)
       (pf->bits[format >> 5] & (((png_uint_32)1) << (format & 31))) != 0;
 }
 
+static void format_default(format_list *pf, int redundant)
+{
+   if (redundant)
+   {
+      int i;
+      
+      /* set everything, including flags that are pointless */
+      for (i=0; i<FORMAT_SET_COUNT; ++i)
+         pf->bits[i] = ~(png_uint_32)0;
+   }
+
+   else
+   {
+      png_uint_32 f;
+
+      for (f=0; f<FORMAT_COUNT; ++f)
+      {
+         /* Eliminate redundant settings. */
+         /* BGR is meaningless if no color: */
+         if ((f & PNG_FORMAT_FLAG_COLOR) == 0 && (f & PNG_FORMAT_FLAG_BGR) != 0)
+            continue;
+
+         /* AFIRST is meaningless if no alpha: */
+         if ((f & PNG_FORMAT_FLAG_ALPHA) == 0 &&
+            (f & PNG_FORMAT_FLAG_AFIRST) != 0)
+            continue;
+
+         format_set(pf, f);
+      }
+   }
+}
+
 /* THE Image STRUCTURE */
 /* The super-class of a png_image, contains the decoded image plus the input
  * data necessary to re-read the file with a different format.
@@ -391,7 +458,7 @@ typedef struct
    ptrdiff_t   stride;
    png_size_t  bufsize;
    png_size_t  allocsize;
-   png_color   background;
+   /* png_color   background; */
    char        tmpfile_name[32];
    png_uint_16 colormap[256*4];
 }
@@ -1315,7 +1382,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
              */
             if ((a->format & PNG_FORMAT_FLAG_COLOR) == 0)
             {
-               /*TODO: grayscale input */
+               /* grayscale input, currently generates no additional errors */
             }
 
             else if ((a->format & PNG_FORMAT_FLAG_COLORMAP) == 0)
@@ -1474,7 +1541,8 @@ badpixel(Image *ia, png_uint_32 x, png_uint_32 y, Pixel *pa, const char *reason)
  * to * give image 'b'.  The formats may have been changed.
  */
 static int
-compare_two_images(Image *a, Image *b, int via_linear)
+compare_two_images(Image *a, Image *b, int via_linear,
+   png_const_colorp background)
 {
    png_uint_32 width = a->image.width;
    png_uint_32 height = a->image.height;
@@ -1492,8 +1560,6 @@ compare_two_images(Image *a, Image *b, int via_linear)
    png_byte swap_mask[4];
    png_uint_32 x, y;
    png_const_bytep ppa, ppb;
-   const png_color *background =
-      ((b->opts & USE_BACKGROUND) ? &b->background : NULL);
 
    /* This should never happen: */
    if (width != b->image.width || height != b->image.height)
@@ -1968,7 +2034,7 @@ compare_two_images(Image *a, Image *b, int via_linear)
  * input_memory have been set.
  */
 static int
-read_file(Image *image, png_uint_32 format)
+read_file(Image *image, png_uint_32 format, png_const_colorp background)
 {
    memset(&image->image, 0, sizeof image->image);
    image->image.version = PNG_IMAGE_VERSION;
@@ -1999,21 +2065,26 @@ read_file(Image *image, png_uint_32 format)
       int result;
       png_uint_32 image_format;
 
-      /* Various random settings for detecting overwrites */
-      image->background.red = 89;
-      image->background.green = 78;
-      image->background.blue = 178;
-
       /* Print both original and output formats. */
       image_format = image->image.format;
 
       if (image->opts & VERBOSE)
-         printf("%s %lu x %lu %s -> %s\n", image->file_name,
+      {
+         printf("%s %lu x %lu %s -> %s", image->file_name,
             (unsigned long)image->image.width,
             (unsigned long)image->image.height,
             format_names[image_format & FORMAT_MASK],
             (format & FORMAT_NO_CHANGE) != 0 || image->image.format == format
             ? "no change" : format_names[format & FORMAT_MASK]);
+
+         if (background != NULL)
+            printf(" background(%d,%d,%d)\n", background->red,
+               background->green, background->blue);
+         else
+            printf("\n");
+
+         fflush(stdout);
+      }
 
       /* 'NO_CHANGE' combined with the color-map flag forces the base format
        * flags to be set on read to ensure that the original representation is
@@ -2031,16 +2102,10 @@ read_file(Image *image, png_uint_32 format)
 
       image->image.format = format;
 
-      /* Force the background if the output is colormapped and not linear */
-      if ((format & PNG_FORMAT_FLAG_COLORMAP) != 0 &&
-         (format & PNG_FORMAT_FLAG_LINEAR) == 0)
-         image->opts |= USE_BACKGROUND;
-
       image->stride = PNG_IMAGE_ROW_STRIDE(image->image) + image->stride_extra;
       allocbuffer(image);
 
-      result = png_image_finish_read(&image->image,
-         (image->opts & USE_BACKGROUND) ? &image->background : NULL,
+      result = png_image_finish_read(&image->image, background,
          image->buffer+16, (png_int_32)image->stride, image->colormap);
 
       checkbuffer(image, image->file_name);
@@ -2054,10 +2119,11 @@ read_file(Image *image, png_uint_32 format)
 }
 
 /* Reads from a filename, which must be in image->file_name, but uses
- * image->opts to choose the method.
+ * image->opts to choose the method.  The file is always read in its native
+ * format (the one the simplified API suggests).
  */
 static int
-read_one_file(Image *image, png_uint_32 format)
+read_one_file(Image *image)
 {
    if (!(image->opts & READ_FILE) || (image->opts & USE_STDIO))
    {
@@ -2117,7 +2183,7 @@ read_one_file(Image *image, png_uint_32 format)
             strerror(errno));
    }
 
-   return read_file(image, format);
+   return read_file(image, FORMAT_NO_CHANGE, NULL);
 }
 
 static int
@@ -2186,7 +2252,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
     * the linear, color and maybe alpha flags, this will cause spurious failures
     * under some circumstances.
     */
-   if (read_file(output, image->image.format | FORMAT_NO_CHANGE))
+   if (read_file(output, image->image.format | FORMAT_NO_CHANGE, NULL))
    {
       png_uint_32 original_format = image->image.format;
 
@@ -2198,7 +2264,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
          return logerror(image, image->file_name, ": format changed on read: ",
             output->file_name);
 
-      return compare_two_images(image, output, 0);
+      return compare_two_images(image, output, 0/*via linear*/, NULL);
    }
 
    else
@@ -2227,23 +2293,69 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
    image->tmpfile_name[0] = 0;
 
    {
-      png_uint_32 format;
+      png_uint_32 counter;
       Image output;
 
       newimage(&output);
       
       result = 1;
-      for (format=0; format<64; ++format)
-         if (format_isset(pf, format))
+
+      /* Use the low bit of 'counter' to indicate whether or not to do alpha
+       * removal with a background color or by composting onto the image; this
+       * step gets skipped if it isn't relevant
+       */
+      for (counter=0; counter<2*FORMAT_COUNT; ++counter)
+         if (format_isset(pf, counter >> 1))
       {
+         png_uint_32 format = counter >> 1;
+
+         png_color background_color;
+         png_colorp background = NULL;
+
+         /* If there is a format change that removes the alpha channel then
+          * the background is relevant.  If the output is 8-bit color-mapped
+          * then a background color *must* be provided, otherwise there are
+          * two tests to do - one with a color, the other with NULL.  The
+          * NULL test happens second.
+          */
+         if ((counter & 1) == 0)
+         {
+            if ((format & PNG_FORMAT_FLAG_ALPHA) == 0 &&
+               (image->image.format & PNG_FORMAT_FLAG_ALPHA) != 0)
+            {
+               /* Alpha/transparency will be removed, the background is
+                * relevant: make it a color the first time
+                */
+               random_color(&background_color);
+               background = &background_color;
+
+               /* BUT if the output is to a color-mapped 8-bit format then
+                * the background must always be a color, so increment 'counter'
+                * to skip the NULL test.
+                */
+               if ((format & PNG_FORMAT_FLAG_COLORMAP) != 0 &&
+                  (format & PNG_FORMAT_FLAG_LINEAR) == 0)
+                  ++counter;
+            }
+
+            /* Otherwise an alpha channel is not being eliminated, just leave
+             * background NULL and skip the (counter & 1) NULL test.
+             */
+            else
+               ++counter;
+         }
+         /* else just use NULL for background */
+
+
          resetimage(&copy);
-         copy.opts = opts; /* because read_file can change it */
-         result = read_file(&copy, format);
+         copy.opts = opts; /* in case read_file needs to change it */
+
+         result = read_file(&copy, format, background);
          if (!result)
             break;
 
          /* Make sure the file just read matches the original file. */
-         result = compare_two_images(image, &copy, 0);
+         result = compare_two_images(image, &copy, 0/*via linear*/, background);
          if (!result)
             break;
 
@@ -2255,8 +2367,10 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
          if (!result)
             break;
 
-         /* Validate against the original too: */
-         result = compare_two_images(image, &output, 0);
+         /* Validate against the original too; the background is needed here
+          * as well so that compare_two_images knows what color was used.
+          */
+         result = compare_two_images(image, &output, 0, background);
          if (!result)
             break;
 
@@ -2278,7 +2392,8 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
              * linear), handle this by composing on black when doing the
              * comparison.
              */
-            result = compare_two_images(image, &output, 1/*via_linear*/);
+            result = compare_two_images(image, &output, 1/*via_linear*/,
+               background);
             if (!result)
                break;
          }
@@ -2299,6 +2414,7 @@ main(int argc, char **argv)
    format_list formats;
    const char *touch = NULL;
    int log_pass = 0;
+   int redundant = 0;
    int stride_extra = 0;
    int retval = 0;
    int c;
@@ -2319,10 +2435,6 @@ main(int argc, char **argv)
          opts |= USE_STDIO;
       else if (strcmp(arg, "--name") == 0)
          opts &= ~USE_STDIO;
-      else if (strcmp(arg, "--background") == 0)
-         opts |= USE_BACKGROUND;
-      else if (strcmp(arg, "--composite") == 0)
-         opts &= ~USE_BACKGROUND;
       else if (strcmp(arg, "--verbose") == 0)
          opts |= VERBOSE;
       else if (strcmp(arg, "--quiet") == 0)
@@ -2333,6 +2445,8 @@ main(int argc, char **argv)
          opts &= ~KEEP_TMPFILES;
       else if (strcmp(arg, "--keep-going") == 0)
          opts |= KEEP_GOING;
+      else if (strcmp(arg, "--redundant") == 0)
+         redundant = 1;
       else if (strcmp(arg, "--stop") == 0)
          opts &= ~KEEP_GOING;
       else if (strcmp(arg, "--touch") == 0)
@@ -2355,9 +2469,6 @@ main(int argc, char **argv)
          if (format > FORMAT_COUNT)
             exit(1);
 
-         if (format_is_initial(&formats))
-            format_clear(&formats);
-
          format_set(&formats, format);
       }
       else if (arg[0] == '-')
@@ -2371,9 +2482,12 @@ main(int argc, char **argv)
          int result;
          Image image;
 
+         if (format_is_initial(&formats))
+            format_default(&formats, redundant);
+
          newimage(&image);
          initimage(&image, opts, arg, stride_extra);
-         result = read_one_file(&image, FORMAT_NO_CHANGE);
+         result = read_one_file(&image);
          if (result)
             result = testimage(&image, opts, &formats);
          freeimage(&image);

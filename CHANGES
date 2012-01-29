@@ -3901,6 +3901,10 @@ Version 1.6.0beta08 [January 29, 2012]
   Moved automake options to AM_INIT_AUTOMAKE in configure.ac
   Added color-tests, silent-rules (Not yet implemented in Makefile.am) and
     version checking to configure.ac
+  Improved pngstest speed by not doing redundant tests and add const to
+    the background parameter of png_image_finish_read. The --background
+    option is now done automagically only when required, so that commandline
+    option no longer exists.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

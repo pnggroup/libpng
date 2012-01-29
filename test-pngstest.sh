@@ -7,7 +7,7 @@ echo >> pngtest-log.txt
 echo "============ pngstest.sh ==============" >> pngtest-log.txt
 
 echo "Running test-pngstest.sh on contrib/pngsuite/*.png"
-for opts in "" "--background"
+for opts in ""
 do
    if ./pngstest --log "$@" $opts ${srcdir}/contrib/pngsuite/bas*.png \
       >>pngtest-log.txt 2>&1

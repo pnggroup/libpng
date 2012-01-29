@@ -1191,7 +1191,7 @@ typedef struct
    png_voidp  buffer;
    png_int_32 row_stride;
    png_voidp  colormap;
-   png_colorp background;
+   png_const_colorp background;
    /* Local variables: */
    png_bytep       local_row;
    png_bytep       first_row;
@@ -3882,8 +3882,8 @@ png_image_read_direct(png_voidp argument)
 }
 
 int PNGAPI
-png_image_finish_read(png_imagep image, png_colorp background, void *buffer,
-   png_int_32 row_stride, void *colormap)
+png_image_finish_read(png_imagep image, png_const_colorp background,
+   void *buffer, png_int_32 row_stride, void *colormap)
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
