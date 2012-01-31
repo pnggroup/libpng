@@ -139,6 +139,7 @@
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
+#include "pngprefix.h"
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
@@ -360,9 +361,14 @@ typedef const png_uint_16p * png_const_uint_16pp;
  * To enable listing global, but internal, symbols the following macros should
  * always be used to declare an extern data or function object in this file.
  */
-#define PNG_INTERNAL_DATA(type, name, array) extern type name array
-#define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
-   extern PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
+#ifndef PNG_INTERNAL_DATA
+#  define PNG_INTERNAL_DATA(type, name, array) extern type name array
+#endif
+
+#ifndef PNG_INTERNAL_FUNCTION
+#  define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
+      extern PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
+#endif
 
 /* CONSTANTS and UTILITY MACROS
  * These are used internally by libpng and not exposed in the API

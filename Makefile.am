@@ -83,7 +83,7 @@ SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
 
 CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
-	check.new pnglibconf.* symbols.new pngtest-log.txt \
+	check.new pnglibconf.* pngprefix.h symbols.new pngtest-log.txt \
 	$(SCRIPT_CLEANFILES)
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
@@ -111,6 +111,7 @@ $(PNGLIB_BASENAME)-config: libpng-config
 	cp libpng-config $@
 
 scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
+scripts/prefix.out: png.h pngconf.h pnglibconf.out
 scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
 
 libpng.sym: scripts/sym.out
@@ -119,9 +120,34 @@ libpng.sym: scripts/sym.out
 libpng.vers: scripts/vers.out
 	rm -f $@
 	cp $? $@
+
+if prefix
+# Rename functions in scripts/prefix.out with a PNG_PREFIX prefix.
+# Rename macros in scripts/macro.lst from PNG_PREFIXpng_ to PNG_ (the actual
+# implementation of the macro).
+pnglibconf.h: pnglibconf.out scripts/prefix.out scripts/macro.lst
+	rm -f $@
+	$(AWK) 's==0 && NR>1{print prev}\
+	   s==0{prev=$$0}\
+	   s==1{print "#define", $$1, "@PNG_PREFIX@" $$1}\
+	   s==2{print "#define @PNG_PREFIX@png_" $$1, "PNG_" $$1}\
+	   END{print prev}' s=0 pnglibconf.out s=1 scripts/prefix.out\
+	   s=2 ${srcdir}/scripts/macro.lst >pnglibconf.tf8
+	mv pnglibconf.tf8 $@
+
+pngprefix.h: scripts/intprefix.out
+	rm -f pngprefix.tf1
+	$(AWK) '{print "#define", $$1, "@PNG_PREFIX@" $$1}' $? >pngprefix.tf1
+	mv pngprefix.tf1 $@
+else
 pnglibconf.h: pnglibconf.out
 	rm -f $@
 	cp $? $@
+
+pngprefix.h: # is empty
+	:>$@
+endif
+
 $(srcdir)/scripts/pnglibconf.h.prebuilt:
 	@echo "Attempting to build $@" >&2
 	@echo "This is a machine generated file, but if you want to make" >&2
@@ -140,6 +166,10 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNGLIB_VERSION='@PNGLIB_VERSION@'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'\
 		-DPNG_NO_USE_READ_MACROS -DPNG_BUILDING_SYMBOL_TABLE
+
+if prefix
+SYMBOL_CFLAGS += -DPNG_PREFIX='@PNG_PREFIX@'
+endif
 
 .dfn.out:
 	rm -f $@ $*.c $*.tf[123]
@@ -187,7 +217,7 @@ scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	mv pnglibconf.tf7 $@
 
 $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
-	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h
+	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h pngprefix.h
 
 test: check-am
 

@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta08 - January 29, 2012
+ * libpng version 1.6.0beta08 - January 31, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta08 - January 29, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta08 - January 31, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta08, January 29, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta08, January 31, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    January 29, 2012
+ *    January 31, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -376,7 +376,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta08"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta08 - January 29, 2012\n"
+     " libpng version 1.6.0beta08 - January 31, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -1949,12 +1949,10 @@ PNG_EXPORT(106, void, png_chunk_warning, (png_const_structrp png_ptr,
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 /* Benign error in libpng.  Can continue, but may have a problem.
  * User can choose whether to handle as a fatal error or as a warning. */
-#  undef png_benign_error
 PNG_EXPORT(107, void, png_benign_error, (png_const_structrp png_ptr,
     png_const_charp warning_message));
 
 /* Same, chunk name is prepended to message. */
-#  undef png_chunk_benign_error
 PNG_EXPORT(108, void, png_chunk_benign_error, (png_const_structrp png_ptr,
     png_const_charp warning_message));
 
@@ -2599,7 +2597,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * The png_get_int_32() routine assumes we are using two's complement
  * format for negative values, which is almost certainly true.
  */
-#  define png_get_uint_32(buf) \
+#  define PNG_get_uint_32(buf) \
      (((png_uint_32)(*(buf)) << 24) + \
       ((png_uint_32)(*((buf) + 1)) << 16) + \
       ((png_uint_32)(*((buf) + 2)) << 8) + \
@@ -2608,15 +2606,31 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
    /* From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
     * function) incorrectly returned a value of type png_uint_32.
     */
-#  define png_get_uint_16(buf) \
+#  define PNG_get_uint_16(buf) \
      ((png_uint_16) \
       (((unsigned int)(*(buf)) << 8) + \
        ((unsigned int)(*((buf) + 1)))))
 
-#  define png_get_int_32(buf) \
+#  define PNG_get_int_32(buf) \
      ((png_int_32)((*(buf) & 0x80) \
       ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
       : (png_int_32)png_get_uint_32(buf)))
+
+   /* If PNG_PREFIX is defined the same thing as below happens in pnglibconf.h,
+    * but defining a macro name prefixed with PNG_PREFIX.
+    */
+#  ifndef PNG_PREFIX
+#     define png_get_uint_32(buf) PNG_get_uint_32(buf)
+#     define png_get_uint_16(buf) PNG_get_uint_16(buf)
+#     define png_get_int_32(buf)  PNG_get_int_32(buf)
+#  endif
+#else
+#  ifdef PNG_PREFIX
+      /* No macros; revert to the (redefined) function */
+#     define PNG_get_uint_32 (png_get_uint_32)
+#     define PNG_get_uint_16 (png_get_uint_16)
+#     define PNG_get_int_32  (png_get_int_32)
+#  endif
 #endif
 
 /*******************************************************************************

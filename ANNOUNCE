@@ -157,6 +157,8 @@ Version 1.6.0beta08 [January 31, 2012]
   Cleaned up pngpriv.h to consistently declare all functions and data.
     Also eliminated PNG_CONST_DATA, which is apparently not needed but we
     can't be sure until it is gone.
+  Added symbol prefixing that allows all the libpng external symbols
+    to be prefixed (suggested by Reuben Hawkins).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

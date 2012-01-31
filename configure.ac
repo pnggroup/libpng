@@ -221,6 +221,16 @@ AC_ARG_WITH(binconfigs,
    [binconfigs='${binconfigs}'])
 AC_SUBST([binconfigs])
 
+# Support for prefixes to the API function names; this will generate defines
+# at the start of the build to rename exported library functions
+AC_ARG_WITH(libpng-prefix,
+   AS_HELP_STRING([[[--with-libpng-prefix]]],
+      [prefix libpng exported function (API) names with the given value]),
+   [if test "${withval:-no}" != "no"; then
+      AC_SUBST([PNG_PREFIX], [${withval}])
+    fi])
+AM_CONDITIONAL([prefix], [test "${with_libpng_prefix:-no}" != "no"])
+
 # Because GCC by default assembles code with an executable stack, even though it
 # compiles C code with a non-executable stack, it is necessary to do a fixup
 # here (this may by GCC specific)

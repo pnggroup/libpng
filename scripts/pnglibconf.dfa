@@ -161,6 +161,12 @@ setting USER_VERSIONINFO_LEGALTRADEMARKS
 
 setting API_RULE default 0
 
+# This allows a prefix to be added to the front of every API functon name (and
+# therefore every symbol) by redefining all the function names with the prefix
+# in a new file "pngprefix.h"; this file must be installed in png.h if this
+# facility is used.
+setting PREFIX
+
 # Default to using the read macros
 
 setting DEFAULT_READ_MACROS default 1
