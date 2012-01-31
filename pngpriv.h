@@ -139,7 +139,9 @@
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
-#include "pngprefix.h"
+#ifdef PNG_PREFIX
+#  include "pngprefix.h"
+#endif
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
