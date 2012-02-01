@@ -27,6 +27,8 @@ AC_CONFIG_MACRO_DIR([scripts])
 # dist-xz requires automake 1.11 or later
 # 1.11.1 fixes a security issue in 1.11
 AM_INIT_AUTOMAKE([1.11.1 foreign dist-xz dist-bzip2 color-tests silent-rules])
+# was:
+# AM_INIT_AUTOMAKE
 AM_MAINTAINER_MODE
 
 dnl configure.ac and Makefile.am expect automake 1.11.2 or a compatible later
