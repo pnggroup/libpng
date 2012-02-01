@@ -3893,7 +3893,7 @@ Version 1.6.0beta07 [January 28, 2012]
     and renamed three whose names were inconsistent with those in
     pngsuite/README.txt.
 
-Version 1.6.0beta08 [%DATE%]
+Version 1.6.0beta08 [February 1, 2012]
   Fixed Image::colormap misalignment in pngstest.c
   Check libtool/libtoolize version number (2.4.2) in configure.ac
   Divide test-pngstest.sh into separate pngstest runs for basic and
@@ -3911,6 +3911,8 @@ Version 1.6.0beta08 [%DATE%]
   Added symbol prefixing that allows all the libpng external symbols
     to be prefixed (suggested by Reuben Hawkins).
   Updated "ftbb*.png" list in the owatcom and vstudio projects.
+  Fixed 'prefix' builds on clean systems. The generation of pngprefix.h
+    should not require itself.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

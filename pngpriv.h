@@ -139,7 +139,7 @@
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
-#ifdef PNG_PREFIX
+#if defined PNG_PREFIX && !defined PNGPREFIX_H
 #  include "pngprefix.h"
 #endif
 

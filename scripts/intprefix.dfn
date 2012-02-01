@@ -15,4 +15,5 @@
 #define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
 	PNG_DEFN_MAGIC-name-PNG_DEFN_END
 
+#define PNGPREFIX_H /* self generation */
 #include "../pngpriv.h"
