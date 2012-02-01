@@ -9,20 +9,25 @@ On Unix/Linux and similar systems, you can simply type
 
 and ignore the rest of this document.
 
-If configure does not work on your system and you have a reasonably
-up-to-date set of tools, running ./autogen.sh before running ./configure
-may fix the problem.  You can also run the individual commands in
-autogen.sh with the --force option, if supported by your version of
-the tools.  To be really sure that you aren't using any of the included
-pre-built scripts, you can do this:
+If configure does not work on your system, or if you have a need to
+change configure.ac or Makefile.am, and you have a reasonably
+up-to-date set of tools, running ./autogen.sh in a git clone before
+running ./configure may fix the problem.  To be really sure that you
+aren't using any of the included pre-built scripts, you can do this:
 
     ./configure --enable-maintainer-mode
     make maintainer-clean
-    ./autogen.sh
+    ./autogen.sh   # only in a GIT clone; see below!
     ./configure [--prefix=/path] [other options]
     make
     make install
     make check
+
+As of libpng-1.6.0, autogen.sh only works properly in a
+git clone.  If you are working with a tar distribution, you must
+get a git clone, run autogen.sh there, and then copy the resulting
+configuration files from there to your working directory. Then you can
+run configure and make as previously with earlier versions of libpng.
 
 Instead, you can use one of the custom-built makefiles in the
 "scripts" directory
