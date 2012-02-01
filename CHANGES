@@ -3888,7 +3888,9 @@ Version 1.6.0beta07 [January 28, 2012]
     set CMAKE_LIBRARY_OUTPUT_DIRECTORY to "lib" on all platforms (C. Yapp).
   Freeze libtool files in the 'scripts' directory. This version of autogen.sh
     attempts to dissuade people from running it when it is not, or should not,
-    be necessary.
+    be necessary.  In fact, autogen.sh does not work when run in a libpng
+    directory extracted from atar distribution anymore. You must run it in
+    a GIT clone instead.
   Added two images to contrib/pngsuite (1-bit and 2-bit transparent grayscale),
     and renamed three whose names were inconsistent with those in
     pngsuite/README.txt.
@@ -3913,6 +3915,8 @@ Version 1.6.0beta08 [February 1, 2012]
   Updated "ftbb*.png" list in the owatcom and vstudio projects.
   Fixed 'prefix' builds on clean systems. The generation of pngprefix.h
     should not require itself.
+  Updated INSTALL to explain that autogen.sh must be run in a GIT clone,
+    not in a libpng directory extracted from a tar distribution.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
