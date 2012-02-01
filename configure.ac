@@ -231,7 +231,7 @@ AC_ARG_WITH(libpng-prefix,
    [if test "${withval:-no}" != "no"; then
       AC_SUBST([PNG_PREFIX], [${withval}])
     fi])
-AM_CONDITIONAL([prefix], [test "${with_libpng_prefix:-no}" != "no"])
+AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
 
 # Because GCC by default assembles code with an executable stack, even though it
 # compiles C code with a non-executable stack, it is necessary to do a fixup

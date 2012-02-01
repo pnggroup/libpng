@@ -121,7 +121,7 @@ libpng.vers: scripts/vers.out
 	rm -f $@
 	cp $? $@
 
-if prefix
+if DO_PNG_PREFIX
 # Rename functions in scripts/prefix.out with a PNG_PREFIX prefix.
 # Rename macros in scripts/macro.lst from PNG_PREFIXpng_ to PNG_ (the actual
 # implementation of the macro).
@@ -167,7 +167,7 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DSYMBOL_PREFIX='$(SYMBOL_PREFIX)'\
 		-DPNG_NO_USE_READ_MACROS -DPNG_BUILDING_SYMBOL_TABLE
 
-if prefix
+if DO_PNG_PREFIX
 SYMBOL_CFLAGS += -DPNG_PREFIX='@PNG_PREFIX@'
 endif
 
