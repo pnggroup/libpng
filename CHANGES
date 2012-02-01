@@ -3918,8 +3918,10 @@ Version 1.6.0beta08 [February 1, 2012]
   Updated INSTALL to explain that autogen.sh must be run in a GIT clone,
     not in a libpng directory extracted from a tar distribution.
 
-Version 1.6.0beta09 [February 1, 2012]
-  Reverted the prebuilt configure files to libpng-1.6.0beta05.
+Version 1.6.0beta09 [February 1, 2011]
+  Reverted the prebuilt configure files to libpng-1.6.0beta05 condition.
+
+Version 1.6.0beta10 [February 1, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
