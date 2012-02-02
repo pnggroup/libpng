@@ -191,16 +191,18 @@ if(PNG_TESTS AND PNG_SHARED)
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn4a16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a16.png
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn1g04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g04.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn2c16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn2c16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbrn2c08.png
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn1g16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn0g16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbyn3p08.png
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n1g08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n0g08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n2c08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp1n3p08.png
