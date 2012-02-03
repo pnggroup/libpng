@@ -17,11 +17,11 @@
  */
 
 #define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-        PNG_DFN "@" name "@ @@" ordinal "@"
+	PNG_DEFN_MAGIC-name @ordinal-PNG_DEFN_END
 #define PNG_REMOVED(ordinal, type, name, args, attributes)\
-        PNG_DFN "; @" name "@ @@" ordinal "@"
+	PNG_DEFN_MAGIC-; name @ordinal-PNG_DEFN_END
 #define PNG_EXPORT_LAST_ORDINAL(ordinal)\
-        PNG_DFN "; @@" ordinal "@"
+	PNG_DEFN_MAGIC-; @ordinal-PNG_DEFN_END
 
 /* Read the defaults, but use scripts/pnglibconf.h.prebuilt; the 'standard'
  * header file.

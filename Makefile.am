@@ -7,44 +7,19 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid
-
+TESTS_ENVIRONMENT= srcdir=$(srcdir)
+check_PROGRAMS= pngtest
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+TESTS = test-pngtest.sh
 
+# Only do the following if the contrib directory is present.
+check_PROGRAMS+= pngvalid pngstest
 pngvalid_SOURCES = contrib/libtests/pngvalid.c
-pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-
 pngstest_SOURCES = contrib/libtests/pngstest.c
+pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-
-pngunknown_SOURCES = contrib/libtests/pngunknown.c
-pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-
-# Generally these are single line shell scripts to run a test with a particular
-# set of parameters:
-TESTS =\
-   tests/pngtest\
-   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
-   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
-   tests/pngvalid-gamma-expand16-background\
-   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
-   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
-   tests/pngvalid-progressive-interlace-size\
-   tests/pngvalid-progressive-interlace-standard\
-   tests/pngvalid-progressive-interlace-transform\
-   tests/pngvalid-progressive-standard tests/pngvalid-standard\
-   tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
-   tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
-   tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
-   tests/pngstest-3p04 tests/pngstest-3p08 tests/pngstest-4a08\
-   tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
-   tests/pngstest-error tests/pngunknown-IDAT\
-   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
-   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg
-
-# These tests are expected, and required, to fail:
-XFAIL_TESTS = tests/pngstest-error
+TESTS += test-pngvalid-simple.sh test-pngvalid-full.sh test-pngstest.sh
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
@@ -60,11 +35,10 @@ lib_LTLIBRARIES=libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c pngrutil.c\
 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
-	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
+	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h
 
 if PNG_ARM_NEON
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
-	arm/filter_neon.S
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/filter_neon.S
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
@@ -97,14 +71,12 @@ nodist_pkginclude_HEADERS= pnglibconf.h
 pkgconfigdir = @pkgconfigdir@
 pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
-# Extra source distribution files, '${srcdir}' is used below to stop build files
-# from those directories being included.  This only works if the configure is
-# not done in the source directory!
+#extra source distribution files.
 EXTRA_DIST= \
 	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
-	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
+	$(TESTS) \
 	CMakeLists.txt example.c libpng-manual.txt
 
 SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
@@ -141,7 +113,6 @@ $(PNGLIB_BASENAME)-config: libpng-config
 scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
 scripts/prefix.out: png.h pngconf.h pnglibconf.out
 scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
-scripts/intprefix.out: pnglibconf.h
 
 libpng.sym: scripts/sym.out
 	rm -f $@
@@ -187,7 +158,6 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
 contrib/libtests/pngstest.o contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
-contrib/libtests/pngunknown.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
@@ -202,21 +172,23 @@ SYMBOL_CFLAGS += -DPNG_PREFIX='@PNG_PREFIX@'
 endif
 
 .dfn.out:
-	rm -f $@ $*.c $*.tf[12]
-	test -d scripts || mkdir scripts || test -d scripts
+	rm -f $@ $*.c $*.tf[123]
+	test -d scripts || mkdir scripts
 	echo '#include "$<"' >$*.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $*.c > $*.tf1
-	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
-	rm -f $*.c $*.tf1
-	mv $*.tf2 $@
+	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC *-\(.*\)- *PNG_DEFN_END.*$$|\1|p'\
+	    $*.tf1 >$*.tf2
+	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' $*.tf2 >$*.tf3
+	rm -f $*.c $*.tf[12]
+	mv $*.tf3 $@
 
 # The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
+pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ $*.tf[45]
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf4 version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
-	    ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
+	    $(DFA_XTRA) 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf5 $*.tf4 1>&2
 	rm $*.tf4
 	mv $*.tf5 $@
@@ -258,24 +230,22 @@ dist-hook:
 
 # install the .../include headers as links to the new ones
 install-data-hook:
-	cd '$(DESTDIR)$(includedir)'; rm -f png.h pngconf.h pnglibconf.h
-	cd '$(DESTDIR)$(includedir)'; $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
-	cd '$(DESTDIR)$(includedir)'; $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
 		pngconf.h
-	cd '$(DESTDIR)$(includedir)'; $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
+	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
 		pnglibconf.h
-	cd '$(DESTDIR)$(pkgconfigdir)'; rm -f libpng.pc
-	cd '$(DESTDIR)$(pkgconfigdir)'; $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
+	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
+	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
 # do evil things to libpng to cause libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ to be used
 install-exec-hook:
-	cd '$(DESTDIR)$(bindir)'; rm -f libpng-config
-	cd '$(DESTDIR)$(bindir)';\
-	   $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
+	cd $(DESTDIR)$(bindir); rm -f libpng-config
+	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
 	@set -x;\
-	cd '$(DESTDIR)$(libdir)';\
-	for ext in a la so so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@\
-	   sl dylib dll.a; do\
+	cd $(DESTDIR)$(libdir);\
+	for ext in a la so so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@ sl dylib dll.a; do\
 		rm -f libpng.$$ext;\
                 if test -f $(PNGLIB_BASENAME).$$ext; then\
                        $(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
@@ -283,13 +253,9 @@ install-exec-hook:
 	done
 
 uninstall-hook:
-	cd '$(DESTDIR)$(includedir)'; rm -f png.h pngconf.h pnglibconf.h
-	rm -f '$(DESTDIR)$(pkgconfigdir)/libpng.pc'
-	rm -f '$(DESTDIR)$(bindir)/libpng-config'
-	rm -f '$(DESTDIR)$(libdir)/libpng.a'
-	rm -f '$(DESTDIR)$(libdir)/libpng.la'
-	rm -f '$(DESTDIR)$(libdir)/libpng.so'
-	rm -f '$(DESTDIR)$(libdir)/libpng.so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@'
-	rm -f '$(DESTDIR)$(libdir)/libpng.sl'
-	rm -f '$(DESTDIR)$(libdir)/libpng.dylib'
-	rm -f '$(DESTDIR)$(libdir)/libpng.dll.a'
+	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
+	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
+	rm -f $(DESTDIR)$(bindir)/libpng-config
+	rm -f $(DESTDIR)$(libdir)/libpng.a
+	rm -f $(DESTDIR)$(libdir)/libpng.la
+	rm -f $(DESTDIR)$(libdir)/libpng.dll.a

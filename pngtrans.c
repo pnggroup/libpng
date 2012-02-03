@@ -1,8 +1,8 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -122,79 +122,32 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
    if (png_ptr == NULL)
       return;
 
-   /* In libpng 1.6 it is possible to determine whether this is a read or write
-    * operation and therefore to do more checking here for a valid call.
-    */
-   if (png_ptr->mode & PNG_IS_READ_STRUCT)
-   {
-#     ifdef PNG_READ_FILLER_SUPPORTED
-         /* On read png_set_filler is always valid, regardless of the base PNG
-          * format, because other transformations can give a format where the
-          * filler code can execute (basically an 8 or 16-bit component RGB or G
-          * format.)
-          *
-          * NOTE: usr_channels is not used by the read code!  (This has led to
-          * confusion in the past.)  The filler is only used in the read code.
-          */
-         png_ptr->filler = (png_uint_16)filler;
-#     else
-         png_app_error(png_ptr, "png_set_filler not supported on read");
-         PNG_UNUSED(filler) /* not used in the write case */
-         return;
-#     endif
-   }
-
-   else /* write */
-   {
-#     ifdef PNG_WRITE_FILLER_SUPPORTED
-         /* On write the usr_channels parameter must be set correctly at the
-          * start to record the number of channels in the app-supplied data.
-          */
-         switch (png_ptr->color_type)
-         {
-            case PNG_COLOR_TYPE_RGB:
-               png_ptr->usr_channels = 4;
-               break;
-
-            case PNG_COLOR_TYPE_GRAY:
-               if (png_ptr->bit_depth >= 8)
-               {
-                  png_ptr->usr_channels = 2;
-                  break;
-               }
-
-               else
-               {
-                  /* There simply isn't any code in libpng to strip out bits
-                   * from bytes when the components are less than a byte in
-                   * size!
-                   */
-                  png_app_error(png_ptr,
-                     "png_set_filler is invalid for low bit depth gray output");
-                  return;
-               }
-
-            default:
-               png_app_error(png_ptr,
-                  "png_set_filler: inappropriate color type");
-               return;
-         }
-#     else
-         png_app_error(png_ptr, "png_set_filler not supported on write");
-         return;
-#     endif
-   }
-
-   /* Here on success - libpng supports the operation, set the transformation
-    * and the flag to say where the filler channel is.
-    */
    png_ptr->transformations |= PNG_FILLER;
+   png_ptr->filler = (png_uint_16)filler;
 
    if (filler_loc == PNG_FILLER_AFTER)
       png_ptr->flags |= PNG_FLAG_FILLER_AFTER;
 
    else
       png_ptr->flags &= ~PNG_FLAG_FILLER_AFTER;
+
+   /* This should probably go in the "do_read_filler" routine.
+    * I attempted to do that in libpng-1.0.1a but that caused problems
+    * so I restored it in libpng-1.0.2a
+   */
+
+   if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
+   {
+      png_ptr->usr_channels = 4;
+   }
+
+   /* Also I added this in libpng-1.0.2a (what happens when we expand
+    * a less-than-8-bit grayscale to GA?) */
+
+   if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY && png_ptr->bit_depth >= 8)
+   {
+      png_ptr->usr_channels = 2;
+   }
 }
 
 /* Added to libpng-1.2.7 */
@@ -207,9 +160,7 @@ png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
       return;
 
    png_set_filler(png_ptr, filler, filler_loc);
-   /* The above may fail to do anything. */
-   if (png_ptr->transformations & PNG_FILLER)
-      png_ptr->transformations |= PNG_ADD_ALPHA;
+   png_ptr->transformations |= PNG_ADD_ALPHA;
 }
 
 #endif
@@ -668,109 +619,6 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 }
 #endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
 
-#if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
-    defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
-/* Added at libpng-1.5.10 */
-void /* PRIVATE */
-png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
-{
-   if (png_ptr->num_palette < (1 << row_info->bit_depth) &&
-      png_ptr->num_palette > 0) /* num_palette can be 0 in MNG files */
-   {
-      /* Calculations moved outside switch in an attempt to stop different
-       * compiler warnings.  'padding' is in *bits* within the last byte, it is
-       * an 'int' because pixel_depth becomes an 'int' in the expression below,
-       * and this calculation is used because it avoids warnings that other
-       * forms produced on either GCC or MSVC.
-       */
-      int padding = (-row_info->pixel_depth * row_info->width) & 7;
-      png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
-
-      switch (row_info->bit_depth)
-      {
-         case 1:
-         {
-            /* in this case, all bytes must be 0 so we don't need
-             * to unpack the pixels except for the rightmost one.
-             */
-            for (; rp > png_ptr->row_buf; rp--)
-            {
-              if (*rp >> padding != 0)
-                 png_ptr->num_palette_max = 1;
-              padding = 0;
-            }
-
-            break;
-         }
-
-         case 2:
-         {
-            for (; rp > png_ptr->row_buf; rp--)
-            {
-              int i = ((*rp >> padding) & 0x03);
-
-              if (i > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = i;
-
-              i = (((*rp >> padding) >> 2) & 0x03);
-
-              if (i > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = i;
-
-              i = (((*rp >> padding) >> 4) & 0x03);
-
-              if (i > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = i;
-
-              i = (((*rp >> padding) >> 6) & 0x03);
-
-              if (i > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = i;
-
-              padding = 0;
-            }
-
-            break;
-         }
-
-         case 4:
-         {
-            for (; rp > png_ptr->row_buf; rp--)
-            {
-              int i = ((*rp >> padding) & 0x0f);
-
-              if (i > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = i;
-
-              i = (((*rp >> padding) >> 4) & 0x0f);
-
-              if (i > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = i;
-
-              padding = 0;
-            }
-
-            break;
-         }
-
-         case 8:
-         {
-            for (; rp > png_ptr->row_buf; rp--)
-            {
-               if (*rp > png_ptr->num_palette_max)
-                  png_ptr->num_palette_max = (int) *rp;
-            }
-
-            break;
-         }
-
-         default:
-            break;
-      }
-   }
-}
-#endif /* PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED */
-
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
@@ -800,7 +648,7 @@ png_get_user_transform_ptr(png_const_structrp png_ptr)
    if (png_ptr == NULL)
       return (NULL);
 
-   return png_ptr->user_transform_ptr;
+   return ((png_voidp)png_ptr->user_transform_ptr);
 }
 #endif
 

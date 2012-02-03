@@ -29,17 +29,13 @@ int main(int argc, const char **argv)
    {
       png_image image;
 
-      /* Only the image structure version number needs to be set. */
       memset(&image, 0, sizeof image);
-      image.version = PNG_IMAGE_VERSION;
 
       if (png_image_begin_read_from_file(&image, argv[1]))
       {
          png_bytep buffer;
-
-         /* Change this to try different formats!  If you set a colormap format
-          * then you must also supply a colormap below.
-          */
+         
+         /* Change this to try different formats! */
          image.format = PNG_FORMAT_RGBA;
 
          buffer = malloc(PNG_IMAGE_SIZE(image));
@@ -47,11 +43,10 @@ int main(int argc, const char **argv)
          if (buffer != NULL)
          {
             if (png_image_finish_read(&image, NULL/*background*/, buffer,
-               0/*row_stride*/, NULL/*colormap for PNG_FORMAT_FLAG_COLORMAP */))
+               0/*row_stride*/))
             {
                if (png_image_write_to_file(&image, argv[2],
-                  0/*convert_to_8bit*/, buffer, 0/*row_stride*/,
-                  NULL/*colormap*/))
+                  0/*convert_to_8bit*/, buffer, 0/*row_stride*/))
                   result = 0;
 
                else

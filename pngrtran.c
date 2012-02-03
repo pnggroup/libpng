@@ -1,8 +1,8 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.1 [(PENDING RELEASE)]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -88,36 +88,6 @@ png_set_crc_action(png_structrp png_ptr, int crit_action, int ancil_action)
    }
 }
 
-#ifdef PNG_READ_TRANSFORMS_SUPPORTED
-/* Is it OK to set a transformation now?  Only if png_start_read_image or
- * png_read_update_info have not been called.  It is not necessary for the IHDR
- * to have been read in all cases, the parameter allows for this check too.
- */
-static int
-png_rtran_ok(png_structrp png_ptr, int need_IHDR)
-{
-   if (png_ptr != NULL)
-   {
-      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-         png_app_error(png_ptr,
-            "invalid after png_start_read_image or png_read_update_info");
-
-      else if (need_IHDR && (png_ptr->mode & PNG_HAVE_IHDR) == 0)
-         png_app_error(png_ptr, "invalid before the PNG header has been read");
-
-      else
-      {
-         /* Turn on failure to initialize correctly for all transforms. */
-         png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
-
-         return 1; /* Ok */
-      }
-   }
-
-   return 0; /* no png_error possible! */
-}
-#endif
-
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
 /* Handle alpha and tRNS via a background color */
 void PNGFAPI
@@ -127,7 +97,7 @@ png_set_background_fixed(png_structrp png_ptr,
 {
    png_debug(1, "in png_set_background_fixed");
 
-   if (!png_rtran_ok(png_ptr, 0) || background_color == NULL)
+   if (png_ptr == NULL || background_color == NULL)
       return;
 
    if (background_gamma_code == PNG_BACKGROUND_GAMMA_UNKNOWN)
@@ -171,7 +141,7 @@ png_set_scale_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_scale_16");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= PNG_SCALE_16_TO_8;
@@ -185,7 +155,7 @@ png_set_strip_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_strip_16");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
@@ -198,7 +168,7 @@ png_set_strip_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_strip_alpha");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= PNG_STRIP_ALPHA;
@@ -277,7 +247,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
 
    png_debug(1, "in png_set_alpha_mode");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    output_gamma = translate_gamma_flags(png_ptr, output_gamma, 1/*screen*/);
@@ -349,11 +319,8 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
     * the side effect that the gamma in a second call to png_set_alpha_mode will
     * be ignored.)
     */
-   if (png_ptr->colorspace.gamma == 0)
-   {
-      png_ptr->colorspace.gamma = file_gamma;
-      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
-   }
+   if (png_ptr->gamma == 0)
+      png_ptr->gamma = file_gamma;
 
    /* But always set the output gamma: */
    png_ptr->screen_gamma = output_gamma;
@@ -364,8 +331,8 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
    if (compose)
    {
       /* And obtain alpha pre-multiplication by composing on black: */
-      memset(&png_ptr->background, 0, (sizeof png_ptr->background));
-      png_ptr->background_gamma = png_ptr->colorspace.gamma; /* just in case */
+      png_memset(&png_ptr->background, 0, sizeof png_ptr->background);
+      png_ptr->background_gamma = png_ptr->gamma; /* just in case */
       png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_FILE;
       png_ptr->transformations &= ~PNG_BACKGROUND_EXPAND;
 
@@ -375,6 +342,9 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
 
       png_ptr->transformations |= PNG_COMPOSE;
    }
+
+   /* New API, make sure apps call the correct initializers: */
+   png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -413,7 +383,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 {
    png_debug(1, "in png_set_quantize");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= PNG_QUANTIZE;
@@ -423,7 +393,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       int i;
 
       png_ptr->quantize_index = (png_bytep)png_malloc(png_ptr,
-          (png_uint_32)(num_palette * (sizeof (png_byte))));
+          (png_uint_32)(num_palette * png_sizeof(png_byte)));
       for (i = 0; i < num_palette; i++)
          png_ptr->quantize_index[i] = (png_byte)i;
    }
@@ -440,7 +410,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
          /* Initialize an array to sort colors */
          png_ptr->quantize_sort = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(num_palette * (sizeof (png_byte))));
+             (png_uint_32)(num_palette * png_sizeof(png_byte)));
 
          /* Initialize the quantize_sort array */
          for (i = 0; i < num_palette; i++)
@@ -574,9 +544,9 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
          /* Initialize palette index arrays */
          png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(num_palette * (sizeof (png_byte))));
+             (png_uint_32)(num_palette * png_sizeof(png_byte)));
          png_ptr->palette_to_index = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(num_palette * (sizeof (png_byte))));
+             (png_uint_32)(num_palette * png_sizeof(png_byte)));
 
          /* Initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -586,7 +556,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
          }
 
          hash = (png_dsortpp)png_calloc(png_ptr, (png_uint_32)(769 *
-             (sizeof (png_dsortp))));
+             png_sizeof(png_dsortp)));
 
          num_new_palette = num_palette;
 
@@ -616,7 +586,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
                   {
 
                      t = (png_dsortp)png_malloc_warn(png_ptr,
-                         (png_uint_32)(sizeof (png_dsort)));
+                         (png_uint_32)(png_sizeof(png_dsort)));
 
                      if (t == NULL)
                          break;
@@ -741,12 +711,12 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       png_size_t num_entries = ((png_size_t)1 << total_bits);
 
       png_ptr->palette_lookup = (png_bytep)png_calloc(png_ptr,
-          (png_uint_32)(num_entries * (sizeof (png_byte))));
+          (png_uint_32)(num_entries * png_sizeof(png_byte)));
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
-          (sizeof (png_byte))));
+          png_sizeof(png_byte)));
 
-      memset(distance, 0xff, num_entries * (sizeof (png_byte)));
+      png_memset(distance, 0xff, num_entries * png_sizeof(png_byte));
 
       for (i = 0; i < num_palette; i++)
       {
@@ -800,7 +770,7 @@ png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
 {
    png_debug(1, "in png_set_gamma_fixed");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    /* New in libpng-1.5.4 - reserve particular negative values as flags. */
@@ -828,8 +798,7 @@ png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
     * file if a gAMA chunk was present.  png_set_alpha_mode provides a
     * different, easier, way to default the file gamma.
     */
-   png_ptr->colorspace.gamma = file_gamma;
-   png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
+   png_ptr->gamma = file_gamma;
    png_ptr->screen_gamma = scrn_gamma;
 }
 
@@ -853,10 +822,11 @@ png_set_expand(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
 
 /* GRR 19990627:  the following three functions currently are identical
@@ -883,10 +853,11 @@ png_set_palette_to_rgb(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_palette_to_rgb");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
 
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
@@ -895,11 +866,14 @@ png_set_expand_gray_1_2_4_to_8(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= PNG_EXPAND;
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
+
+
 
 /* Expand tRNS chunks to alpha channels. */
 void PNGAPI
@@ -907,10 +881,8 @@ png_set_tRNS_to_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_tRNS_to_alpha");
 
-   if (!png_rtran_ok(png_ptr, 0))
-      return;
-
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
@@ -923,10 +895,14 @@ png_set_expand_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand_16");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
    png_ptr->transformations |= (PNG_EXPAND_16 | PNG_EXPAND | PNG_EXPAND_tRNS);
+   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+
+   /* New API, make sure apps call the correct initializers: */
+   png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
 }
 #endif
 
@@ -936,12 +912,13 @@ png_set_gray_to_rgb(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_gray_to_rgb");
 
-   if (!png_rtran_ok(png_ptr, 0))
-      return;
-
-   /* Because rgb must be 8 bits or more: */
-   png_set_expand_gray_1_2_4_to_8(png_ptr);
-   png_ptr->transformations |= PNG_GRAY_TO_RGB;
+   if (png_ptr != NULL)
+   {
+      /* Because rgb must be 8 bits or more: */
+      png_set_expand_gray_1_2_4_to_8(png_ptr);
+      png_ptr->transformations |= PNG_GRAY_TO_RGB;
+      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   }
 }
 #endif
 
@@ -952,9 +929,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
 {
    png_debug(1, "in png_set_rgb_to_gray");
 
-   /* Need the IHDR here because of the check on color_type below. */
-   /* TODO: fix this */
-   if (!png_rtran_ok(png_ptr, 1))
+   if (png_ptr == NULL)
       return;
 
    switch(error_action)
@@ -975,19 +950,15 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
          png_error(png_ptr, "invalid error action to rgb_to_gray");
          break;
    }
-
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #ifdef PNG_READ_EXPAND_SUPPORTED
       png_ptr->transformations |= PNG_EXPAND;
 #else
    {
-      /* Make this an error in 1.6 because otherwise the application may assume
-       * that it just worked and get a memory overwrite.
-       */
-      png_error(png_ptr,
+      png_warning(png_ptr,
         "Cannot do RGB_TO_GRAY without EXPAND_SUPPORTED");
 
-      /* png_ptr->transformations &= ~PNG_RGB_TO_GRAY; */
+      png_ptr->transformations &= ~PNG_RGB_TO_GRAY;
    }
 #endif
    {
@@ -1011,7 +982,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
       else
       {
          if (red >= 0 && green >= 0)
-            png_app_warning(png_ptr,
+            png_warning(png_ptr,
                "ignoring out of range rgb_to_gray coefficients");
 
          /* Use the defaults, from the cHRM chunk if set, else the historical
@@ -1040,13 +1011,16 @@ void PNGAPI
 png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
    double green)
 {
+   if (png_ptr == NULL)
+      return;
+
    png_set_rgb_to_gray_fixed(png_ptr, error_action,
       png_fixed(png_ptr, red, "rgb to gray red coefficient"),
       png_fixed(png_ptr, green, "rgb to gray green coefficient"));
 }
 #endif /* FLOATING POINT */
 
-#endif /* RGB_TO_GRAY */
+#endif
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
@@ -1056,7 +1030,7 @@ png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
 {
    png_debug(1, "in png_set_read_user_transform_fn");
 
-   if (!png_rtran_ok(png_ptr, 0))
+   if (png_ptr == NULL)
       return;
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
@@ -1245,7 +1219,7 @@ png_init_rgb_transformations(png_structrp png_ptr)
             default:
 
             case 8:
-               /* FALL THROUGH (Already 8 bits) */
+               /* Already 8 bits, fall through */
 
             case 16:
                /* Already a full 16 bits */
@@ -1291,17 +1265,17 @@ png_init_read_transformations(png_structrp png_ptr)
        */
       int gamma_correction = 0;
 
-      if (png_ptr->colorspace.gamma != 0) /* has been set */
+      if (png_ptr->gamma != 0) /* has been set */
       {
          if (png_ptr->screen_gamma != 0) /* screen set too */
-            gamma_correction = png_gamma_threshold(png_ptr->colorspace.gamma,
+            gamma_correction = png_gamma_threshold(png_ptr->gamma,
                png_ptr->screen_gamma);
 
          else
             /* Assume the output matches the input; a long time default behavior
              * of libpng, although the standard has nothing to say about this.
              */
-            png_ptr->screen_gamma = png_reciprocal(png_ptr->colorspace.gamma);
+            png_ptr->screen_gamma = png_reciprocal(png_ptr->gamma);
       }
 
       else if (png_ptr->screen_gamma != 0)
@@ -1310,7 +1284,7 @@ png_init_read_transformations(png_structrp png_ptr)
           * png_set_alpha_mode (even if the alpha handling mode isn't required
           * or isn't changed from the default.)
           */
-         png_ptr->colorspace.gamma = png_reciprocal(png_ptr->screen_gamma);
+         png_ptr->gamma = png_reciprocal(png_ptr->screen_gamma);
 
       else /* neither are set */
          /* Just in case the following prevents any processing - file and screen
@@ -1318,10 +1292,7 @@ png_init_read_transformations(png_structrp png_ptr)
           * third gamma value other than png_set_background with 'UNIQUE', and,
           * prior to 1.5.4
           */
-         png_ptr->screen_gamma = png_ptr->colorspace.gamma = PNG_FP_1;
-
-      /* We have a gamma value now. */
-      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
+         png_ptr->screen_gamma = png_ptr->gamma = PNG_FP_1;
 
       /* Now turn the gamma transformation on or off as appropriate.  Notice
        * that PNG_GAMMA just refers to the file->screen correction.  Alpha
@@ -1403,16 +1374,9 @@ png_init_read_transformations(png_structrp png_ptr)
    }
 #endif
 
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-   /* Make sure the coefficients for the rgb to gray conversion are set
-    * appropriately.
-    */
-   if (png_ptr->transformations & PNG_RGB_TO_GRAY)
-      png_colorspace_set_rgb_coefficients(png_ptr);
-#endif
-
-#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-#if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
+#if defined(PNG_READ_EXPAND_SUPPORTED) && \
+   defined(PNG_READ_BACKGROUND_SUPPORTED) && \
+   defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
    /* Detect gray background and attempt to enable optimization for
     * gray --> RGB case.
     *
@@ -1454,8 +1418,7 @@ png_init_read_transformations(png_structrp png_ptr)
          }
       }
    }
-#endif /* PNG_READ_EXPAND_SUPPORTED && PNG_READ_BACKGROUND_SUPPORTED */
-#endif /* PNG_READ_GRAY_TO_RGB_SUPPORTED */
+#endif /* PNG_READ_GRAY_TO_RGB_SUPPORTED (etc) */
 
    /* For indexed PNG data (PNG_COLOR_TYPE_PALETTE) many of the transformations
     * can be performed directly on the palette, and some (such as rgb to gray)
@@ -1491,7 +1454,7 @@ png_init_read_transformations(png_structrp png_ptr)
        * NOTE: this discards the low 16 bits of the user supplied background
        * color, but until expand_16 works properly there is no choice!
        */
-#     define CHOP(x) (x)=((png_uint_16)PNG_DIV257(x))
+#     define CHOP(x) (x)=((png_uint_16)(((png_uint_32)(x)*255+32895) >> 16))
       CHOP(png_ptr->background.red);
       CHOP(png_ptr->background.green);
       CHOP(png_ptr->background.blue);
@@ -1551,10 +1514,10 @@ png_init_read_transformations(png_structrp png_ptr)
     */
    if ((png_ptr->transformations & PNG_GAMMA)
       || ((png_ptr->transformations & PNG_RGB_TO_GRAY)
-         && (png_gamma_significant(png_ptr->colorspace.gamma) ||
+         && (png_gamma_significant(png_ptr->gamma) ||
             png_gamma_significant(png_ptr->screen_gamma)))
       || ((png_ptr->transformations & PNG_COMPOSE)
-         && (png_gamma_significant(png_ptr->colorspace.gamma)
+         && (png_gamma_significant(png_ptr->gamma)
             || png_gamma_significant(png_ptr->screen_gamma)
 #  ifdef PNG_READ_BACKGROUND_SUPPORTED
             || (png_ptr->background_gamma_type == PNG_BACKGROUND_GAMMA_UNIQUE
@@ -1611,8 +1574,8 @@ png_init_read_transformations(png_structrp png_ptr)
                      break;
 
                   case PNG_BACKGROUND_GAMMA_FILE:
-                     g = png_reciprocal(png_ptr->colorspace.gamma);
-                     gs = png_reciprocal2(png_ptr->colorspace.gamma,
+                     g = png_reciprocal(png_ptr->gamma);
+                     gs = png_reciprocal2(png_ptr->gamma,
                         png_ptr->screen_gamma);
                      break;
 
@@ -1720,9 +1683,8 @@ png_init_read_transformations(png_structrp png_ptr)
                   break;
 
                case PNG_BACKGROUND_GAMMA_FILE:
-                  g = png_reciprocal(png_ptr->colorspace.gamma);
-                  gs = png_reciprocal2(png_ptr->colorspace.gamma,
-                     png_ptr->screen_gamma);
+                  g = png_reciprocal(png_ptr->gamma);
+                  gs = png_reciprocal2(png_ptr->gamma, png_ptr->screen_gamma);
                   break;
 
                case PNG_BACKGROUND_GAMMA_UNIQUE:
@@ -1806,8 +1768,8 @@ png_init_read_transformations(png_structrp png_ptr)
          int num_palette = png_ptr->num_palette;
          int i;
 
-         /* NOTE: there are other transformations that should probably be in
-          * here too.
+         /*NOTE: there are other transformations that should probably be in here
+          * too.
           */
          for (i = 0; i < num_palette; i++)
          {
@@ -1866,14 +1828,11 @@ png_init_read_transformations(png_structrp png_ptr)
 
 #ifdef PNG_READ_SHIFT_SUPPORTED
    if ((png_ptr->transformations & PNG_SHIFT) &&
-      !(png_ptr->transformations & PNG_EXPAND) &&
        (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE))
    {
       int i;
       int istop = png_ptr->num_palette;
       int shift = 8 - png_ptr->sig_bit.red;
-
-      png_ptr->transformations &= ~PNG_SHIFT;
 
       /* significant bits can be in the range 1 to 7 for a meaninful result, if
        * the number of significant bits is 0 then no shift is done (this is an
@@ -1964,12 +1923,8 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
     * however it seems that the code in png_init_read_transformations, which has
     * been called before this from png_read_update_info->png_read_start_row
     * sometimes does the gamma transform and cancels the flag.
-    *
-    * TODO: this looks wrong; the info_ptr should end up with a gamma equal to
-    * the screen_gamma value.  The following probably results in weirdness if
-    * the info_ptr is used by the app after the rows have been read.
     */
-   info_ptr->colorspace.gamma = png_ptr->colorspace.gamma;
+   info_ptr->gamma = png_ptr->gamma;
 #endif
 
    if (info_ptr->bit_depth == 16)
@@ -2132,9 +2087,8 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
    /* The following is debugging; prior to 1.5.4 the code was never compiled in;
     * in 1.5.4 PNG_FLAG_DETECT_UNINITIALIZED was added and the macro
-    * PNG_WARN_UNINITIALIZED_ROW removed.  In 1.6 the new flag is set only for
-    * all transformations, however in practice the ROW_INIT always gets done on
-    * demand, if necessary.
+    * PNG_WARN_UNINITIALIZED_ROW removed.  In 1.5 the new flag is set only for
+    * selected new APIs to ensure that there is no API change.
     */
    if ((png_ptr->flags & PNG_FLAG_DETECT_UNINITIALIZED) != 0 &&
       !(png_ptr->flags & PNG_FLAG_ROW_INIT))
@@ -2239,8 +2193,8 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       png_do_gray_to_rgb(row_info, png_ptr->row_buf + 1);
 #endif
 
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
-   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
+#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
+   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
    if (png_ptr->transformations & PNG_COMPOSE)
       png_do_compose(row_info, png_ptr->row_buf + 1, png_ptr);
 #endif
@@ -2251,8 +2205,8 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       /* Because RGB_TO_GRAY does the gamma transform. */
       !(png_ptr->transformations & PNG_RGB_TO_GRAY) &&
 #endif
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
-   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
+#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
+   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
       /* Because PNG_COMPOSE does the gamma transform if there is something to
        * do (if there is an alpha channel or transparency.)
        */
@@ -2318,7 +2272,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-   /* NOTE: moved here in 1.5.4 (from much later in this list.) */
+   /*NOTE: moved here in 1.5.4 (from much later in this list.) */
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) &&
        (png_ptr->mode & PNG_BACKGROUND_IS_GRAY))
       png_do_gray_to_rgb(row_info, png_ptr->row_buf + 1);
@@ -2338,13 +2292,6 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 #ifdef PNG_READ_PACK_SUPPORTED
    if (png_ptr->transformations & PNG_PACK)
       png_do_unpack(row_info, png_ptr->row_buf + 1);
-#endif
-
-#ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   /* Added at libpng-1.5.10 */
-   if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
-       png_ptr->num_palette_max >= 0)
-      png_do_check_palette_indexes(png_ptr, row_info);
 #endif
 
 #ifdef PNG_READ_BGR_SUPPORTED
@@ -3284,7 +3231,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
 
       if (row_info->bit_depth == 8)
       {
-#ifdef PNG_READ_GAMMA_SUPPORTED
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
          /* Notice that gamma to/from 1 are not necessarily inverses (if
           * there is an overall gamma correction).  Prior to 1.5.5 this code
           * checked the linearized values for equality; this doesn't match
@@ -3344,7 +3291,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                if (red != green || red != blue)
                {
                   rgb_error |= 1;
-                  /* NOTE: this is the historical approach which simply
+                  /*NOTE: this is the historical approach which simply
                    * truncates the results.
                    */
                   *(dp++) = (png_byte)((rc*red + gc*green + bc*blue)>>15);
@@ -3361,7 +3308,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
 
       else /* RGB bit_depth == 16 */
       {
-#ifdef PNG_READ_GAMMA_SUPPORTED
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
          if (png_ptr->gamma_16_to_1 != NULL && png_ptr->gamma_16_from_1 != NULL)
          {
             png_bytep sp = row;
@@ -3518,8 +3465,8 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
-   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
+#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
+   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
 /* Replace any alpha or transparency with the supplied background color.
  * "background" is already in the screen gamma, while "background_1" is
  * at a gamma of 1.0.  Paletted files have already been taken care of.
@@ -3535,12 +3482,12 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
    png_const_uint_16pp gamma_16_from_1 = png_ptr->gamma_16_from_1;
    png_const_uint_16pp gamma_16_to_1 = png_ptr->gamma_16_to_1;
    int gamma_shift = png_ptr->gamma_shift;
-   int optimize = (png_ptr->flags & PNG_FLAG_OPTIMIZE_ALPHA) != 0;
 #endif
 
    png_bytep sp;
    png_uint_32 i;
    png_uint_32 row_width = row_info->width;
+   int optimize = (png_ptr->flags & PNG_FLAG_OPTIMIZE_ALPHA) != 0;
    int shift;
 
    png_debug(1, "in png_do_compose");
@@ -3561,9 +3508,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      if ((png_uint_16)((*sp >> shift) & 0x01)
                         == png_ptr->trans_color.gray)
                      {
-                        unsigned int tmp = *sp & (0x7f7f >> (7 - shift));
-                        tmp |= png_ptr->background.gray << shift;
-                        *sp = (png_byte)(tmp & 0xff);
+                        *sp &= (png_byte)((0x7f7f >> (7 - shift)) & 0xff);
+                        *sp |= (png_byte)(png_ptr->background.gray << shift);
                      }
 
                      if (!shift)
@@ -3590,19 +3536,17 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x03)
                             == png_ptr->trans_color.gray)
                         {
-                           unsigned int tmp = *sp & (0x3f3f >> (6 - shift));
-                           tmp |= png_ptr->background.gray << shift;
-                           *sp = (png_byte)(tmp & 0xff);
+                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                           *sp |= (png_byte)(png_ptr->background.gray << shift);
                         }
 
                         else
                         {
-                           unsigned int p = (*sp >> shift) & 0x03;
-                           unsigned int g = (gamma_table [p | (p << 2) |
-                               (p << 4) | (p << 6)] >> 6) & 0x03;
-                           unsigned int tmp = *sp & (0x3f3f >> (6 - shift));
-                           tmp |= g << shift;
-                           *sp = (png_byte)(tmp & 0xff);
+                           png_byte p = (png_byte)((*sp >> shift) & 0x03);
+                           png_byte g = (png_byte)((gamma_table [p | (p << 2) |
+                               (p << 4) | (p << 6)] >> 6) & 0x03);
+                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                           *sp |= (png_byte)(g << shift);
                         }
 
                         if (!shift)
@@ -3626,9 +3570,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x03)
                             == png_ptr->trans_color.gray)
                         {
-                           unsigned int tmp = *sp & (0x3f3f >> (6 - shift));
-                           tmp |= png_ptr->background.gray << shift;
-                           *sp = (png_byte)(tmp & 0xff);
+                           *sp &= (png_byte)((0x3f3f >> (6 - shift)) & 0xff);
+                           *sp |= (png_byte)(png_ptr->background.gray << shift);
                         }
 
                         if (!shift)
@@ -3656,19 +3599,17 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == png_ptr->trans_color.gray)
                         {
-                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
-                           tmp |= png_ptr->background.gray << shift;
-                           *sp = (png_byte)(tmp & 0xff);
+                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                           *sp |= (png_byte)(png_ptr->background.gray << shift);
                         }
 
                         else
                         {
-                           unsigned int p = (*sp >> shift) & 0x0f;
-                           unsigned int g = (gamma_table[p | (p << 4)] >> 4) &
-                              0x0f;
-                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
-                           tmp |= g << shift;
-                           *sp = (png_byte)(tmp & 0xff);
+                           png_byte p = (png_byte)((*sp >> shift) & 0x0f);
+                           png_byte g = (png_byte)((gamma_table[p |
+                               (p << 4)] >> 4) & 0x0f);
+                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                           *sp |= (png_byte)(g << shift);
                         }
 
                         if (!shift)
@@ -3692,9 +3633,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == png_ptr->trans_color.gray)
                         {
-                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
-                           tmp |= png_ptr->background.gray << shift;
-                           *sp = (png_byte)(tmp & 0xff);
+                           *sp &= (png_byte)((0xf0f >> (4 - shift)) & 0xff);
+                           *sp |= (png_byte)(png_ptr->background.gray << shift);
                         }
 
                         if (!shift)
@@ -3753,10 +3693,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if (v == png_ptr->trans_color.gray)
                         {
                            /* Background is already in screen gamma */
-                           *sp = (png_byte)((png_ptr->background.gray >> 8)
-                                & 0xff);
-                           *(sp + 1) = (png_byte)(png_ptr->background.gray
-                                & 0xff);
+                           *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
+                           *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                         }
 
                         else
@@ -3779,10 +3717,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 
                         if (v == png_ptr->trans_color.gray)
                         {
-                           *sp = (png_byte)((png_ptr->background.gray >> 8)
-                                & 0xff);
-                           *(sp + 1) = (png_byte)(png_ptr->background.gray
-                                & 0xff);
+                           *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
+                           *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                         }
                      }
                   }
@@ -3862,12 +3798,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         /* Background is already in screen gamma */
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
-                                & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green
-                                & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
-                                & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 
@@ -3908,12 +3841,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      {
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
-                                & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green
-                                & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
-                                & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
                   }
@@ -3968,7 +3898,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         *sp = (png_byte)png_ptr->background.gray;
 
                      else if (a < 0xff)
-                        png_composite(*sp, *sp, a, png_ptr->background.gray);
+                        png_composite(*sp, *sp, a, png_ptr->background_1.gray);
                   }
                }
             }
@@ -3996,8 +3926,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      else if (a == 0)
                      {
                         /* Background is already in screen gamma */
-                        *sp = (png_byte)((png_ptr->background.gray >> 8)
-                                & 0xff);
+                        *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                      }
 
@@ -4027,8 +3956,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 
                      if (a == 0)
                      {
-                        *sp = (png_byte)((png_ptr->background.gray >> 8)
-                                & 0xff);
+                        *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                      }
 
@@ -4037,7 +3965,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         png_uint_16 g, v;
 
                         g = (png_uint_16)(((*sp) << 8) + *(sp + 1));
-                        png_composite_16(v, g, a, png_ptr->background.gray);
+                        png_composite_16(v, g, a, png_ptr->background_1.gray);
                         *sp = (png_byte)((v >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(v & 0xff);
                      }
@@ -4158,12 +4086,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         /* Background is already in screen gamma */
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
-                                & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green
-                                & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
-                                & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 
@@ -4174,16 +4099,14 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 1) >> gamma_shift][*sp];
                         png_composite_16(w, v, a, png_ptr->background_1.red);
                         if (!optimize)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
-                                8];
+                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
                         *sp = (png_byte)((w >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(w & 0xff);
 
                         v = gamma_16_to_1[*(sp + 3) >> gamma_shift][*(sp + 2)];
                         png_composite_16(w, v, a, png_ptr->background_1.green);
                         if (!optimize)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
-                                8];
+                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
 
                         *(sp + 2) = (png_byte)((w >> 8) & 0xff);
                         *(sp + 3) = (png_byte)(w & 0xff);
@@ -4191,8 +4114,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 5) >> gamma_shift][*(sp + 4)];
                         png_composite_16(w, v, a, png_ptr->background_1.blue);
                         if (!optimize)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
-                                8];
+                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
 
                         *(sp + 4) = (png_byte)((w >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(w & 0xff);
@@ -4213,12 +4135,9 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      {
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
-                                & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green
-                                & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
-                                & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 
@@ -4698,7 +4617,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
    {
       if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
       {
-         unsigned int gray = trans_color ? trans_color->gray : 0;
+         png_uint_16 gray = (png_uint_16)(trans_color ? trans_color->gray : 0);
 
          if (row_info->bit_depth < 8)
          {
@@ -4706,7 +4625,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
             {
                case 1:
                {
-                  gray = (gray & 0x01) * 0xff;
+                  gray = (png_uint_16)((gray & 0x01) * 0xff);
                   sp = row + (png_size_t)((row_width - 1) >> 3);
                   dp = row + (png_size_t)row_width - 1;
                   shift = 7 - (int)((row_width + 7) & 0x07);
@@ -4734,7 +4653,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
                case 2:
                {
-                  gray = (gray & 0x03) * 0x55;
+                  gray = (png_uint_16)((gray & 0x03) * 0x55);
                   sp = row + (png_size_t)((row_width - 1) >> 2);
                   dp = row + (png_size_t)row_width - 1;
                   shift = (int)((3 - ((row_width + 3) & 0x03)) << 1);
@@ -4759,7 +4678,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
                case 4:
                {
-                  gray = (gray & 0x0f) * 0x11;
+                  gray = (png_uint_16)((gray & 0x0f) * 0x11);
                   sp = row + (png_size_t)((row_width - 1) >> 1);
                   dp = row + (png_size_t)row_width - 1;
                   shift = (int)((1 - ((row_width + 1) & 0x01)) << 2);
@@ -4812,8 +4731,8 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
             else if (row_info->bit_depth == 16)
             {
-               unsigned int gray_high = (gray >> 8) & 0xff;
-               unsigned int gray_low = gray & 0xff;
+               png_byte gray_high = (png_byte)((gray >> 8) & 0xff);
+               png_byte gray_low = (png_byte)(gray & 0xff);
                sp = row + row_info->rowbytes - 1;
                dp = row + (row_info->rowbytes << 1) - 1;
                for (i = 0; i < row_width; i++)

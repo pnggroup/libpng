@@ -1,8 +1,8 @@
 
 /* pngmem.c - stub functions for memory allocation
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -30,7 +30,7 @@ png_destroy_png_struct(png_structrp png_ptr)
        * png_get_mem_ptr, so fake a temporary png_struct to support this.
        */
       png_struct dummy_struct = *png_ptr;
-      memset(png_ptr, 0, (sizeof *png_ptr));
+      memset(png_ptr, 0, sizeof *png_ptr);
       png_free(&dummy_struct, png_ptr);
 
 #     ifdef PNG_SETJMP_SUPPORTED
@@ -54,7 +54,7 @@ png_calloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
    ret = png_malloc(png_ptr, size);
 
    if (ret != NULL)
-      memset(ret, 0, size);
+      png_memset(ret, 0, size);
 
    return ret;
 }
@@ -76,7 +76,7 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
 #ifdef PNG_USER_MEM_SUPPORTED
    PNG_UNUSED(png_ptr)
 #endif
-   if (size > 0 && size <= PNG_SIZE_MAX
+   if (size > 0 && size <= ~(size_t)0
 #     ifdef PNG_MAX_MALLOC_64K
          && size <= 65536U
 #     endif
@@ -93,68 +93,6 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
 
    else
       return NULL;
-}
-
-/* This is really here only to work round a spurious warning in GCC 4.6 and 4.7
- * that arises because of the checks in png_realloc_array that are repeated in
- * png_malloc_array.
- */
-static png_voidp
-png_malloc_array_checked(png_const_structrp png_ptr, int nelements,
-   size_t element_size)
-{
-   png_alloc_size_t req = nelements; /* known to be > 0 */
-
-   if (req <= PNG_SIZE_MAX/element_size)
-      return png_malloc_base(png_ptr, req * element_size);
-
-   /* The failure case when the request is too large */
-   return NULL;
-}
-
-PNG_FUNCTION(png_voidp /* PRIVATE */,
-png_malloc_array,(png_const_structrp png_ptr, int nelements,
-   size_t element_size),PNG_ALLOCATED)
-{
-   if (nelements <= 0 || element_size == 0)
-      png_error(png_ptr, "internal error: array alloc");
-
-   return png_malloc_array_checked(png_ptr, nelements, element_size);
-}
-
-PNG_FUNCTION(png_voidp /* PRIVATE */,
-png_realloc_array,(png_const_structrp png_ptr, png_const_voidp old_array,
-   int old_elements, int add_elements, size_t element_size),PNG_ALLOCATED)
-{
-   /* These are internal errors: */
-   if (add_elements <= 0 || element_size == 0 || old_elements < 0 ||
-      (old_array == NULL && old_elements > 0))
-      png_error(png_ptr, "internal error: array realloc");
-
-   /* Check for overflow on the elements count (so the caller does not have to
-    * check.)
-    */
-   if (add_elements <= INT_MAX - old_elements)
-   {
-      png_voidp new_array = png_malloc_array_checked(png_ptr,
-         old_elements+add_elements, element_size);
-
-      if (new_array != NULL)
-      {
-         /* Because png_malloc_array worked the size calculations below cannot
-          * overflow.
-          */
-         if (old_elements > 0)
-            memcpy(new_array, old_array, element_size*(unsigned)old_elements);
-
-         memset((char*)new_array + element_size*(unsigned)old_elements, 0,
-            element_size*(unsigned)add_elements);
-
-         return new_array;
-      }
-   }
-
-   return NULL; /* error */
 }
 
 /* Various functions that have different error handling are derived from this.

@@ -103,7 +103,7 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
                      index < num_trans ? trans_alpha[index] : 255);
 
                else /* no transparency */
-                  printf("INDEXED %u = %d %d %d\n", index,
+                  printf("INDEXED %u = %d %d %d\n", index, 
                      palette[index].red, palette[index].green,
                      palette[index].blue);
             }
@@ -273,7 +273,7 @@ int main(int argc, const char **argv)
                            ystep = xstep = 1;
                         }
 
-                        /* To find the pixel, loop over 'py' for each pass
+                        /* To find the pixel loop over 'py' for each pass
                          * reading a row and then checking to see if it
                          * contains the pixel.
                          */
@@ -283,13 +283,12 @@ int main(int argc, const char **argv)
 
                            /* png_read_row takes two pointers.  When libpng
                             * handles the interlace the first is filled in
-                            * pixel-by-pixel, and the second receives the same
+                            * pixel-by-pixel, the second receives the same
                             * pixels but they are replicated across the
                             * unwritten pixels so far for each pass.  When we
                             * do the interlace, however, they just contain
                             * the pixels from the interlace pass - giving
-                            * both is wasteful and pointless, so we pass a
-                            * NULL pointer.
+                            * both is wasteful and pointless.
                             */
                            png_read_row(png_ptr, row_tmp, NULL);
 
@@ -327,7 +326,7 @@ int main(int argc, const char **argv)
                else
                {
                   /* Else libpng has raised an error.  An error message has
-                   * already been output, so it is only necessary to clean up
+                   * already been output, it is only necessary to clean up
                    * locally allocated data:
                    */
                   if (row != NULL)

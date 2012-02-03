@@ -1,9 +1,9 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.1beta05 - February 27, 2013
+ * libpng version 1.6.0beta05 - February 3, 2012
  *
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -21,26 +21,6 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
-
-/* To do: Do all of this in scripts/pnglibconf.dfa */
-#ifdef PNG_SAFE_LIMITS_SUPPORTED
-#  ifdef PNG_USER_WIDTH_MAX
-#    undef PNG_USER_WIDTH_MAX
-#    define PNG_USER_WIDTH_MAX 1000000L
-#  endif
-#  ifdef PNG_USER_HEIGHT_MAX
-#    undef PNG_USER_HEIGHT_MAX
-#    define PNG_USER_HEIGHT_MAX 1000000L
-#  endif
-#  ifdef PNG_USER_CHUNK_MALLOC_MAX
-#    undef PNG_USER_CHUNK_MALLOC_MAX
-#    define PNG_USER_CHUNK_MALLOC_MAX 4000000L
-#  endif
-#  ifdef PNG_USER_CHUNK_CACHE_MAX
-#    undef PNG_USER_CHUNK_CACHE_MAX
-#    define PNG_USER_CHUNK_CACHE_MAX 128
-#  endif
-#endif
 
 #ifndef PNG_BUILDING_SYMBOL_TABLE /* else includes may cause problems */
 
@@ -87,8 +67,8 @@
 
 /* This controls optimization of the reading of 16 and 32 bit values
  * from PNG files.  It can be set on a per-app-file basis - it
- * just changes whether a macro is used when the function is called.
- * The library builder sets the default; if read functions are not
+ * just changes whether a macro is used to the function is called.
+ * The library builder sets the default, if read functions are not
  * built into the library the macro implementation is forced on.
  */
 #ifndef PNG_READ_INT_FUNCTIONS_SUPPORTED
@@ -198,16 +178,18 @@
  * ==========================
  * This code is used at build time to find PNG_IMPEXP, the API settings
  * and PNG_EXPORT_TYPE(), it may also set a macro to indicate the DLL
- * import processing is possible.  On Windows systems it also sets
+ * import processing is possible.  On Windows/x86 systems it also sets
  * compiler-specific macros to the values required to change the calling
  * conventions of the various functions.
  */
-#if defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
-    defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
-  /* Windows system (DOS doesn't support DLLs).  Includes builds under Cygwin or
-   * MinGW on any architecture currently supported by Windows.  Also includes
-   * Watcom builds but these need special treatment because they are not
-   * compatible with GCC or Visual C because of different calling conventions.
+#if ( defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
+      defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) ) &&\
+    ( defined(_X86_) || defined(_X64_) || defined(_M_IX86) ||\
+      defined(_M_X64) || defined(_M_IA64) )
+  /* Windows system (DOS doesn't support DLLs) running on x86/x64.  Includes
+   * builds under Cygwin or MinGW.  Also includes Watcom builds but these need
+   * special treatment because they are not compatible with GCC or Visual C
+   * because of different calling conventions.
    */
 #  if PNG_API_RULE == 2
     /* If this line results in an error, either because __watcall is not
@@ -218,12 +200,9 @@
 #    define PNGCAPI __watcall
 #  endif
 
-#  if defined(__GNUC__) || (defined(_MSC_VER) && (_MSC_VER >= 800))
+#  if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
 #    define PNGCAPI __cdecl
 #    if PNG_API_RULE == 1
-       /* If this line results in an error __stdcall is not understood and
-        * PNG_API_RULE should not have been set to '1'.
-        */
 #      define PNGAPI __stdcall
 #    endif
 #  else
@@ -261,7 +240,7 @@
 #    endif
 #  endif /* compiler */
 
-#else /* !Windows */
+#else /* !Windows/x86 */
 #  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
 #    define PNGAPI _System
 #  else /* !Windows/x86 && !OS/2 */
@@ -367,28 +346,24 @@
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __attribute__((__noreturn__))
 #    endif
-#    if __GNUC__ >= 3
-#      ifndef PNG_ALLOCATED
-#        define PNG_ALLOCATED  __attribute__((__malloc__))
+#    ifndef PNG_ALLOCATED
+#      define PNG_ALLOCATED  __attribute__((__malloc__))
+#    endif
+#    ifndef PNG_DEPRECATED
+#      define PNG_DEPRECATED __attribute__((__deprecated__))
+#    endif
+#    ifndef PNG_PRIVATE
+#      if 0 /* Doesn't work so we use deprecated instead*/
+#        define PNG_PRIVATE \
+          __attribute__((warning("This function is not exported by libpng.")))
+#      else
+#        define PNG_PRIVATE \
+          __attribute__((__deprecated__))
 #      endif
-#      ifndef PNG_DEPRECATED
-#        define PNG_DEPRECATED __attribute__((__deprecated__))
-#      endif
-#      ifndef PNG_PRIVATE
-#        if 0 /* Doesn't work so we use deprecated instead*/
-#          define PNG_PRIVATE \
-            __attribute__((warning("This function is not exported by libpng.")))
-#        else
-#          define PNG_PRIVATE \
-            __attribute__((__deprecated__))
-#        endif
-#      endif
-#      if ((__GNUC__ != 3) || !defined(__GNUC_MINOR__) || (__GNUC_MINOR__ >= 1))
-#        ifndef PNG_RESTRICT
-#          define PNG_RESTRICT __restrict
-#        endif
-#      endif /*  __GNUC__ == 3.0 */
-#    endif /*  __GNUC__ >= 3 */
+#    endif
+#    ifndef PNG_RESTRICT
+#      define PNG_RESTRICT __restrict
+#    endif
 
 #  elif defined(_MSC_VER)  && (_MSC_VER >= 1300)
 #    ifndef PNG_USE_RESULT
@@ -436,13 +411,10 @@
 #ifndef PNG_PRIVATE
 #  define PNG_PRIVATE     /* This is a private libpng function */
 #endif
-#ifndef PNG_RESTRICT
-#  define PNG_RESTRICT    /* The C99 "restrict" feature */
-#endif
 #ifndef PNG_FP_EXPORT     /* A floating point API. */
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 #     define PNG_FP_EXPORT(ordinal, type, name, args)\
-         PNG_EXPORT(ordinal, type, name, args);
+         PNG_EXPORT(ordinal, type, name, args)
 #  else                   /* No floating point APIs */
 #     define PNG_FP_EXPORT(ordinal, type, name, args)
 #  endif
@@ -450,7 +422,7 @@
 #ifndef PNG_FIXED_EXPORT  /* A fixed point API. */
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 #     define PNG_FIXED_EXPORT(ordinal, type, name, args)\
-         PNG_EXPORT(ordinal, type, name, args);
+         PNG_EXPORT(ordinal, type, name, args)
 #  else                   /* No fixed point APIs */
 #     define PNG_FIXED_EXPORT(ordinal, type, name, args)
 #  endif
@@ -493,9 +465,9 @@
 #  error "libpng requires an unsigned 16 bit type"
 #endif
 
-#if INT_MIN < -2147483646 && INT_MAX > 2147483646
+#if INT_MIN < -2147483646 && INT_MAX > 2147483646 
    typedef int png_int_32;
-#elif LONG_MIN < -2147483646 && LONG_MAX > 2147483646
+#elif LONG_MIN < -2147483646 && LONG_MAX > 2147483646 
    typedef long int png_int_32;
 #else
 #  error "libpng requires a signed 32 bit (or more) type"
@@ -541,7 +513,7 @@ typedef ptrdiff_t png_ptrdiff_t;
  * png_uint_32) should be explicitly applied; however, we do not expect to
  * encounter practical situations that require such conversions.
  *
- * PNG_SMALL_SIZE_T must be defined if the maximum value of size_t is less than
+ * PNG_SMALL_SIZE_T must be defined if the maximum value of size_t is less than 
  * 4294967295 - i.e. less than the maximum value of png_uint_32.
  */
 #ifdef PNG_SMALL_SIZE_T
@@ -549,6 +521,12 @@ typedef ptrdiff_t png_ptrdiff_t;
 #else
    typedef png_size_t png_alloc_size_t;
 #endif
+
+/* This macro makes the sizeof operator look and behave like a function, except
+ * that it can take a type without the enclosing () as an argument so long as
+ * the type contains no "," characters.
+ */
+#define png_sizeof(x) (sizeof (x))
 
 /* Prior to 1.6.0 libpng offered limited support for Microsoft C compiler
  * implementations of Intel CPU specific support of user-mode segmented address

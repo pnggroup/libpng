@@ -1,8 +1,8 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
- * Copyright (c) 2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Copyright (c) 2012 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -24,9 +24,8 @@
 #define _GNU_SOURCE 1 /* For the floating point exception extension */
 
 #include <signal.h>
-#include <stdio.h>
 
-#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
+#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
 #  include <config.h>
 #endif
 
@@ -42,8 +41,6 @@
 #else
 #  include "../../png.h"
 #endif
-
-#ifdef PNG_WRITE_SUPPORTED /* else pngvalid can do nothing */
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the PNG_CONST. */
@@ -85,10 +82,10 @@ typedef png_byte *png_const_bytep;
    /* 1.6.0 constifies many APIs, the following exists to allow pngvalid to be
     * compiled against earlier versions.
     */
-#  define png_const_structp png_structp
+#  define png_const_strutp png_structp
 #endif
 
-#include <zlib.h>   /* For crc32 */
+#include "zlib.h"   /* For crc32 */
 
 #include <float.h>  /* For floating point constants */
 #include <stdlib.h> /* For malloc */
@@ -107,11 +104,7 @@ typedef png_byte *png_const_bytep;
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
-#ifdef PNG_FREESTANDING_TESTS
-#  include <cexcept.h>
-#else
-#  include "../visupng/cexcept.h"
-#endif
+#include "../visupng/cexcept.h"
 
 #ifdef __cplusplus
 #  define this not_the_cpp_this
@@ -177,7 +170,6 @@ static PNG_CONST char *colour_types[8] =
    "grayscale with alpha", invalid, "truecolour with alpha", invalid
 };
 
-#ifdef PNG_READ_SUPPORTED
 /* Convert a double precision value to fixed point. */
 static png_fixed_point
 fix(double d)
@@ -185,14 +177,12 @@ fix(double d)
    d = floor(d * PNG_FP_1 + .5);
    return (png_fixed_point)d;
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /* Generate random bytes.  This uses a boring repeatable algorithm and it
  * is implemented here so that it gives the same set of numbers on every
  * architecture.  It's a linear congruential generator (Knuth or Sedgewick
  * "Algorithms") but it comes from the 'feedback taps' table in Horowitz and
- * Hill, "The Art of Electronics" (Pseudo-Random Bit Sequences and Noise
- * Generation.)
+ * Hill, "The Art of Electronics".
  */
 static void
 make_random_bytes(png_uint_32* seed, void* pv, size_t size)
@@ -225,7 +215,6 @@ make_four_random_bytes(png_uint_32* seed, png_bytep bytes)
    make_random_bytes(seed, bytes, 4);
 }
 
-#ifdef PNG_READ_SUPPORTED
 static void
 randomize(void *pv, size_t size)
 {
@@ -245,7 +234,6 @@ random_mod(unsigned int max)
    return x % max; /* 0 .. max-1 */
 }
 
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static int
 random_choice(void)
 {
@@ -255,8 +243,6 @@ random_choice(void)
 
    return x & 1;
 }
-#endif
-#endif /* PNG_READ_SUPPORTED */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
  * simply records whether pngvalid did the interlace itself or whether it
@@ -269,7 +255,7 @@ random_choice(void)
 
 #define COL_FROM_ID(id) ((png_byte)((id)& 0x7U))
 #define DEPTH_FROM_ID(id) ((png_byte)(((id) >> 3) & 0x1fU))
-#define PALETTE_FROM_ID(id) (((id) >> 8) & 0x1f)
+#define PALETTE_FROM_ID(id) ((int)(((id) >> 8) & 0x1f))
 #define INTERLACE_FROM_ID(id) ((int)(((id) >> 13) & 0x3))
 #define DO_INTERLACE_FROM_ID(id) ((int)(((id)>>15) & 1))
 #define WIDTH_FROM_ID(id) (((id)>>16) & 0xff)
@@ -278,7 +264,7 @@ random_choice(void)
 /* Utility to construct a standard name for a standard image. */
 static size_t
 standard_name(char *buffer, size_t bufsize, size_t pos, png_byte colour_type,
-    int bit_depth, unsigned int npalette, int interlace_type,
+    int bit_depth, int npalette, int interlace_type,
     png_uint_32 w, png_uint_32 h, int do_interlace)
 {
    pos = safecat(buffer, bufsize, pos, colour_types[colour_type]);
@@ -340,11 +326,10 @@ standard_name_from_id(char *buffer, size_t bufsize, size_t pos, png_uint_32 id)
 /* The following defines the number of different palettes to generate for
  * each log bit depth of a colour type 3 standard image.
  */
-#define PALETTE_COUNT(bit_depth) ((bit_depth) > 4 ? 1U : 16U)
+#define PALETTE_COUNT(bit_depth) ((bit_depth) > 4 ? 1 : 16)
 
 static int
-next_format(png_bytep colour_type, png_bytep bit_depth,
-   unsigned int* palette_number)
+next_format(png_bytep colour_type, png_bytep bit_depth, int* palette_number)
 {
    if (*bit_depth == 0)
    {
@@ -475,7 +460,6 @@ pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
       memmove(toBuffer+(toIndex>>3), fromBuffer+(fromIndex>>3), pixelSize>>3);
 }
 
-#ifdef PNG_READ_SUPPORTED
 /* Copy a complete row of pixels, taking into account potential partial
  * bytes at the end.
  */
@@ -541,7 +525,6 @@ pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
       return 1+where;
    }
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /*************************** BASIC PNG FILE WRITING ***************************/
 /* A png_store takes data from the sequential writer or provides data
@@ -652,7 +635,6 @@ store_pool_mark(png_bytep mark)
    make_four_random_bytes(store_seed, mark);
 }
 
-#ifdef PNG_READ_SUPPORTED
 /* Use this for random 32 bit values; this function makes sure the result is
  * non-zero.
  */
@@ -672,7 +654,6 @@ random_32(void)
          return result;
    }
 }
-#endif /* PNG_READ_SUPPORTED */
 
 static void
 store_pool_init(png_store *ps, store_pool *pool)
@@ -878,7 +859,6 @@ store_log(png_store* ps, png_const_structp pp, png_const_charp message,
       store_verbose(ps, pp, is_error ? "error: " : "warning: ", message);
 }
 
-#ifdef PNG_READ_SUPPORTED
 /* Internal error function, called with a png_store but no libpng stuff. */
 static void
 internal_error(png_store *ps, png_const_charp message)
@@ -891,7 +871,6 @@ internal_error(png_store *ps, png_const_charp message)
       Throw ps;
    }
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /* Functions to use as PNG callbacks. */
 static void
@@ -1029,7 +1008,6 @@ store_ensure_image(png_store *ps, png_const_structp pp, int nImages,
    }
 }
 
-#ifdef PNG_READ_SUPPORTED
 static void
 store_image_check(PNG_CONST png_store* ps, png_const_structp pp, int iImage)
 {
@@ -1059,7 +1037,6 @@ store_image_check(PNG_CONST png_store* ps, png_const_structp pp, int iImage)
       }
    }
 }
-#endif /* PNG_READ_SUPPORTED */
 
 static void
 store_write(png_structp ppIn, png_bytep pb, png_size_t st)
@@ -1095,7 +1072,6 @@ store_flush(png_structp ppIn)
    UNUSED(ppIn) /*DOES NOTHING*/
 }
 
-#ifdef PNG_READ_SUPPORTED
 static size_t
 store_read_buffer_size(png_store *ps)
 {
@@ -1213,7 +1189,6 @@ store_progressive_read(png_store *ps, png_structp pp, png_infop pi)
    }
    while (store_read_buffer_next(ps));
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /* The caller must fill this in: */
 static store_palette_entry *
@@ -1240,7 +1215,6 @@ store_write_palette(png_store *ps, int npalette)
    return ps->palette;
 }
 
-#ifdef PNG_READ_SUPPORTED
 static store_palette_entry *
 store_current_palette(png_store *ps, int *npalette)
 {
@@ -1254,7 +1228,6 @@ store_current_palette(png_store *ps, int *npalette)
    *npalette = ps->current->npalette;
    return ps->current->palette;
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /***************************** MEMORY MANAGEMENT*** ***************************/
 /* A store_memory is simply the header for an allocated block of memory.  The
@@ -1529,29 +1502,25 @@ set_store_for_write(png_store *ps, png_infopp ppi,
 }
 
 /* Cleanup when finished reading (either due to error or in the success case).
- * This routine exists even when there is no read support to make the code
- * tidier (avoid a mass of ifdefs) and so easier to maintain.
  */
 static void
 store_read_reset(png_store *ps)
 {
-#  ifdef PNG_READ_SUPPORTED
-      if (ps->pread != NULL)
+   if (ps->pread != NULL)
+   {
+      anon_context(ps);
+
+      Try
+         png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
+
+      Catch_anonymous
       {
-         anon_context(ps);
-
-         Try
-            png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
-
-         Catch_anonymous
-         {
-            /* error already output: continue */
-         }
-
-         ps->pread = NULL;
-         ps->piread = NULL;
+         /* error already output: continue */
       }
-#  endif
+
+      ps->pread = NULL;
+      ps->piread = NULL;
+   }
 
    /* Always do this to be safe. */
    store_pool_delete(ps, &ps->read_memory_pool);
@@ -1562,7 +1531,6 @@ store_read_reset(png_store *ps)
    ps->validated = 0;
 }
 
-#ifdef PNG_READ_SUPPORTED
 static void
 store_read_set(png_store *ps, png_uint_32 id)
 {
@@ -1640,7 +1608,6 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
 
    return ps->pread;
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /* The overall cleanup of a store simply calls the above then removes all the
  * saved files.  This does not delete the store itself.
@@ -1680,19 +1647,6 @@ typedef struct CIE_color
    double X, Y, Z;
 } CIE_color;
 
-typedef struct color_encoding
-{
-   /* A description of an (R,G,B) encoding of color (as defined above); this
-    * includes the actual colors of the (R,G,B) triples (1,0,0), (0,1,0) and
-    * (0,0,1) plus an encoding value that is used to encode the linear
-    * components R, G and B to give the actual values R^gamma, G^gamma and
-    * B^gamma that are stored.
-    */
-   double    gamma;            /* Encoding (file) gamma of space */
-   CIE_color red, green, blue; /* End points */
-} color_encoding;
-
-#ifdef PNG_READ_SUPPORTED
 static double
 chromaticity_x(CIE_color c)
 {
@@ -1705,11 +1659,23 @@ chromaticity_y(CIE_color c)
    return c.Y / (c.X + c.Y + c.Z);
 }
 
+typedef struct color_encoding
+{
+   /* A description of an (R,G,B) encoding of color (as defined above); this
+    * includes the actual colors of the (R,G,B) triples (1,0,0), (0,1,0) and
+    * (0,0,1) plus an encoding value that is used to encode the linear
+    * components R, G and B to give the actual values R^gamma, G^gamma and
+    * B^gamma that are stored.
+    */
+   double    gamma;            /* Encoding (file) gamma of space */
+   CIE_color red, green, blue; /* End points */
+} color_encoding;
+
 static CIE_color
 white_point(PNG_CONST color_encoding *encoding)
 {
    CIE_color white;
-
+   
    white.X = encoding->red.X + encoding->green.X + encoding->blue.X;
    white.Y = encoding->red.Y + encoding->green.Y + encoding->blue.Y;
    white.Z = encoding->red.Z + encoding->green.Z + encoding->blue.Z;
@@ -1717,7 +1683,6 @@ white_point(PNG_CONST color_encoding *encoding)
    return white;
 }
 
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static void
 normalize_color_encoding(color_encoding *encoding)
 {
@@ -1737,7 +1702,6 @@ normalize_color_encoding(color_encoding *encoding)
       encoding->blue.Z /= whiteY;
    }
 }
-#endif
 
 static size_t
 safecat_color_encoding(char *buffer, size_t bufsize, size_t pos,
@@ -1778,7 +1742,6 @@ safecat_color_encoding(char *buffer, size_t bufsize, size_t pos,
 
    return pos;
 }
-#endif /* PNG_READ_SUPPORTED */
 
 typedef struct png_modifier
 {
@@ -1972,7 +1935,6 @@ modifier_init(png_modifier *pm)
  * to a calculation - not a digitization operation - unless the following API is
  * called directly.
  */
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static double digitize(PNG_CONST png_modifier *pm, double value,
    int sample_depth, int do_round)
 {
@@ -1997,10 +1959,7 @@ static double digitize(PNG_CONST png_modifier *pm, double value,
    if (do_round) value += .5;
    return floor(value)/digitization_factor;
 }
-#endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
-   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
 static double abserr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
    /* Absolute error permitted in linear values - affected by the bit depth of
@@ -2012,9 +1971,7 @@ static double abserr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
    else
       return pm->maxabs8;
 }
-#endif
 
-#ifdef PNG_READ_GAMMA_SUPPORTED
 static double calcerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
    /* Error in the linear composition arithmetic - only relevant when
@@ -2131,7 +2088,6 @@ static int output_quantization_factor(PNG_CONST png_modifier *pm, int in_depth,
    else
       return 1;
 }
-#endif /* PNG_READ_GAMMA_SUPPORTED */
 
 /* One modification structure must be provided for each chunk to be modified (in
  * fact more than one can be provided if multiple separate changes are desired
@@ -2184,7 +2140,6 @@ modification_init(png_modification *pmm)
    modification_reset(pmm);
 }
 
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static void
 modifier_current_encoding(PNG_CONST png_modifier *pm, color_encoding *ce)
 {
@@ -2196,7 +2151,6 @@ modifier_current_encoding(PNG_CONST png_modifier *pm, color_encoding *ce)
 
    ce->gamma = pm->current_gamma;
 }
-#endif
 
 static size_t
 safecat_current_encoding(char *buffer, size_t bufsize, size_t pos,
@@ -2822,7 +2776,6 @@ srgb_modification_init(srgb_modification *me, png_modifier *pm, png_byte intent)
    pm->modifications = &me->this;
 }
 
-#ifdef PNG_READ_GAMMA_SUPPORTED
 typedef struct sbit_modification
 {
    png_modification this;
@@ -2889,7 +2842,6 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
    me->this.next = pm->modifications;
    pm->modifications = &me->this;
 }
-#endif /* PNG_READ_GAMMA_SUPPORTED */
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 /***************************** STANDARD PNG FILES *****************************/
@@ -2951,9 +2903,9 @@ make_standard_palette(png_store* ps, int npalette, int do_tRNS)
     */
    for (; i<8; ++i)
    {
-      values[i][1] = (png_byte)((i&1) ? 255U : 0U);
-      values[i][2] = (png_byte)((i&2) ? 255U : 0U);
-      values[i][3] = (png_byte)((i&4) ? 255U : 0U);
+      values[i][1] = (i&1) ? 255 : 0;
+      values[i][2] = (i&2) ? 255 : 0;
+      values[i][3] = (i&4) ? 255 : 0;
    }
 
    /* Then add 62 grays (one quarter of the remaining 256 slots). */
@@ -3168,7 +3120,6 @@ transform_height(png_const_structp pp, png_byte colour_type, png_byte bit_depth)
    }
 }
 
-#ifdef PNG_READ_SUPPORTED
 /* The following can only be defined here, now we have the definitions
  * of the transform image sizes.
  */
@@ -3204,7 +3155,6 @@ standard_rowsize(png_const_structp pp, png_uint_32 id)
    width *= bit_size(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id));
    return (width + 7) / 8;
 }
-#endif /* PNG_READ_SUPPORTED */
 
 static void
 transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
@@ -3216,20 +3166,20 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
    switch (bit_size(pp, colour_type, bit_depth))
    {
       case 1:
-         while (i<128/8) buffer[i] = (png_byte)(v & 0xff), v += 17, ++i;
+         while (i<128/8) buffer[i] = v & 0xff, v += 17, ++i;
          return;
 
       case 2:
-         while (i<128/4) buffer[i] = (png_byte)(v & 0xff), v += 33, ++i;
+         while (i<128/4) buffer[i] = v & 0xff, v += 33, ++i;
          return;
 
       case 4:
-         while (i<128/2) buffer[i] = (png_byte)(v & 0xff), v += 65, ++i;
+         while (i<128/2) buffer[i] = v & 0xff, v += 65, ++i;
          return;
 
       case 8:
          /* 256 bytes total, 128 bytes in each row set as follows: */
-         while (i<128) buffer[i] = (png_byte)(v & 0xff), ++v, ++i;
+         while (i<128) buffer[i] = v & 0xff, ++v, ++i;
          return;
 
       case 16:
@@ -3237,12 +3187,7 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
           * GA case as well as the 16 bit G case.
           */
          while (i<128)
-         {
-            buffer[2*i] = (png_byte)((v>>8) & 0xff);
-            buffer[2*i+1] = (png_byte)(v & 0xff);
-            ++v;
-            ++i;
-         }
+            buffer[2*i] = (v>>8) & 0xff, buffer[2*i+1] = v & 0xff, ++v, ++i;
 
          return;
 
@@ -3251,9 +3196,9 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          while (i<128)
          {
             /* Three bytes per pixel, r, g, b, make b by r^g */
-            buffer[3*i+0] = (png_byte)((v >> 8) & 0xff);
-            buffer[3*i+1] = (png_byte)(v & 0xff);
-            buffer[3*i+2] = (png_byte)(((v >> 8) ^ v) & 0xff);
+            buffer[3*i+0] = (v >> 8) & 0xff;
+            buffer[3*i+1] = v & 0xff;
+            buffer[3*i+2] = ((v >> 8) ^ v) & 0xff;
             ++v;
             ++i;
          }
@@ -3264,10 +3209,10 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          /* 65535 pixels, r, g, b, a; just replicate */
          while (i<128)
          {
-            buffer[4*i+0] = (png_byte)((v >> 8) & 0xff);
-            buffer[4*i+1] = (png_byte)(v & 0xff);
-            buffer[4*i+2] = (png_byte)((v >> 8) & 0xff);
-            buffer[4*i+3] = (png_byte)(v & 0xff);
+            buffer[4*i+0] = (v >> 8) & 0xff;
+            buffer[4*i+1] = v & 0xff;
+            buffer[4*i+2] = (v >> 8) & 0xff;
+            buffer[4*i+3] = v & 0xff;
             ++v;
             ++i;
          }
@@ -3281,14 +3226,14 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          while (i<128)
          {
             png_uint_32 t = v++;
-            buffer[6*i+0] = (png_byte)((t >> 8) & 0xff);
-            buffer[6*i+1] = (png_byte)(t & 0xff);
+            buffer[6*i+0] = (t >> 8) & 0xff;
+            buffer[6*i+1] = t & 0xff;
             t *= 257;
-            buffer[6*i+2] = (png_byte)((t >> 8) & 0xff);
-            buffer[6*i+3] = (png_byte)(t & 0xff);
+            buffer[6*i+2] = (t >> 8) & 0xff;
+            buffer[6*i+3] = t & 0xff;
             t *= 17;
-            buffer[6*i+4] = (png_byte)((t >> 8) & 0xff);
-            buffer[6*i+5] = (png_byte)(t & 0xff);
+            buffer[6*i+4] = (t >> 8) & 0xff;
+            buffer[6*i+5] = t & 0xff;
             ++i;
          }
 
@@ -3299,15 +3244,15 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          while (i<128)
          {
             png_uint_32 t = v++;
-            buffer[8*i+0] = (png_byte)((t >> 8) & 0xff);
-            buffer[8*i+1] = (png_byte)(t & 0xff);
-            buffer[8*i+4] = (png_byte)((t >> 8) & 0xff);
-            buffer[8*i+5] = (png_byte)(t & 0xff);
+            buffer[8*i+0] = (t >> 8) & 0xff;
+            buffer[8*i+1] = t & 0xff;
+            buffer[8*i+4] = (t >> 8) & 0xff;
+            buffer[8*i+5] = t & 0xff;
             t *= 257;
-            buffer[8*i+2] = (png_byte)((t >> 8) & 0xff);
-            buffer[8*i+3] = (png_byte)(t & 0xff);
-            buffer[8*i+6] = (png_byte)((t >> 8) & 0xff);
-            buffer[8*i+7] = (png_byte)(t & 0xff);
+            buffer[8*i+2] = (t >> 8) & 0xff;
+            buffer[8*i+3] = t & 0xff;
+            buffer[8*i+6] = (t >> 8) & 0xff;
+            buffer[8*i+7] = t & 0xff;
             ++i;
          }
          return;
@@ -3332,8 +3277,8 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
  */
 static void
 make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
-    png_byte PNG_CONST bit_depth, unsigned int palette_number,
-    int interlace_type, png_const_charp name)
+    png_byte PNG_CONST bit_depth, int palette_number, int interlace_type,
+    png_const_charp name)
 {
    context(ps, fault);
 
@@ -3357,11 +3302,6 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
 #ifdef PNG_TEXT_SUPPORTED
-#  if defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED)
-#     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_zTXt
-#  else
-#     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_NONE
-#  endif
       {
          static char key[] = "image name"; /* must be writeable */
          size_t pos;
@@ -3371,7 +3311,7 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          /* Use a compressed text string to test the correct interaction of text
           * compression and IDAT compression.
           */
-         text.compression = TEXT_COMPRESSION;
+         text.compression = PNG_TEXT_COMPRESSION_zTXt;
          text.key = key;
          /* Yuck: the text must be writable! */
          pos = safecat(copy, sizeof copy, 0, ps->wname);
@@ -3429,7 +3369,7 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          /* Use a compressed text string to test the correct interaction of text
           * compression and IDAT compression.
           */
-         text.compression = TEXT_COMPRESSION;
+         text.compression = PNG_TEXT_COMPRESSION_zTXt;
          text.key = key;
          text.text = comment;
          text.text_length = (sizeof comment)-1;
@@ -3465,7 +3405,7 @@ make_transform_images(png_store *ps)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   unsigned int palette_number = 0;
+   int palette_number = 0;
 
    /* This is in case of errors. */
    safecat(ps->test, sizeof ps->test, 0, "make standard images");
@@ -3513,7 +3453,6 @@ interlace_row(png_bytep buffer, png_const_bytep imageRow,
    }
 }
 
-#ifdef PNG_READ_SUPPORTED
 static void
 deinterlace_row(png_bytep buffer, png_const_bytep row,
    unsigned int pixel_size, png_uint_32 w, int pass)
@@ -3534,7 +3473,6 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
       ++xin;
    }
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /* Build a single row for the 'size' test images; this fills in only the
  * first bit_width bits of the sample row.
@@ -3591,30 +3529,6 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
       png_set_IHDR(pp, pi, w, h, bit_depth, colour_type, interlace_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
-#ifdef PNG_TEXT_SUPPORTED
-      {
-         static char key[] = "image name"; /* must be writeable */
-         size_t pos;
-         png_text text;
-         char copy[FILE_NAME_SIZE];
-
-         /* Use a compressed text string to test the correct interaction of text
-          * compression and IDAT compression.
-          */
-         text.compression = TEXT_COMPRESSION;
-         text.key = key;
-         /* Yuck: the text must be writable! */
-         pos = safecat(copy, sizeof copy, 0, ps->wname);
-         text.text = copy;
-         text.text_length = pos;
-         text.itxt_length = 0;
-         text.lang = 0;
-         text.lang_key = 0;
-
-         png_set_text(pp, pi, &text, 1);
-      }
-#endif
 
       if (colour_type == 3) /* palette */
          init_standard_palette(ps, pp, pi, 1U << bit_depth, 0/*do tRNS*/);
@@ -3693,27 +3607,6 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          }
       }
 
-#ifdef PNG_TEXT_SUPPORTED
-      {
-         static char key[] = "end marker";
-         static char comment[] = "end";
-         png_text text;
-
-         /* Use a compressed text string to test the correct interaction of text
-          * compression and IDAT compression.
-          */
-         text.compression = TEXT_COMPRESSION;
-         text.key = key;
-         text.text = comment;
-         text.text_length = (sizeof comment)-1;
-         text.itxt_length = 0;
-         text.lang = 0;
-         text.lang_key = 0;
-
-         png_set_text(pp, pi, &text, 1);
-      }
-#endif
-
       png_write_end(pp, pi);
 
       /* And store this under the appropriate id, then clean up. */
@@ -3778,7 +3671,6 @@ make_size_images(png_store *ps)
    make_size(ps, 6, 3, WRITE_BDHI);
 }
 
-#ifdef PNG_READ_SUPPORTED
 /* Return a row based on image id and 'y' for checking: */
 static void
 standard_row(png_const_structp pp, png_byte std[STANDARD_ROWMAX],
@@ -3790,7 +3682,6 @@ standard_row(png_const_structp pp, png_byte std[STANDARD_ROWMAX],
       size_row(std, WIDTH_FROM_ID(id) * bit_size(pp, COL_FROM_ID(id),
          DEPTH_FROM_ID(id)), y);
 }
-#endif /* PNG_READ_SUPPORTED */
 
 /* Tests - individual test cases */
 /* Like 'make_standard' but errors are deliberately introduced into the calls
@@ -4075,7 +3966,6 @@ perform_formatting_test(png_store *volatile ps)
 #endif
 }
 
-#ifdef PNG_READ_SUPPORTED
 /* Because we want to use the same code in both the progressive reader and the
  * sequential reader it is necessary to deal with the fact that the progressive
  * reader callbacks only have one parameter (png_get_progressive_ptr()), so this
@@ -4670,114 +4560,6 @@ sequential_row(standard_display *dp, png_structp pp, png_infop pi,
    png_read_end(pp, pi);
 }
 
-#ifdef PNG_TEXT_SUPPORTED
-static void
-standard_check_text(png_const_structp pp, png_const_textp tp,
-   png_const_charp keyword, png_const_charp text)
-{
-   char msg[1024];
-   size_t pos = safecat(msg, sizeof msg, 0, "text: ");
-   size_t ok;
-
-   pos = safecat(msg, sizeof msg, pos, keyword);
-   pos = safecat(msg, sizeof msg, pos, ": ");
-   ok = pos;
-
-   if (tp->compression != TEXT_COMPRESSION)
-   {
-      char buf[64];
-
-      sprintf(buf, "compression [%d->%d], ", TEXT_COMPRESSION,
-         tp->compression);
-      pos = safecat(msg, sizeof msg, pos, buf);
-   }
-
-   if (tp->key == NULL || strcmp(tp->key, keyword) != 0)
-   {
-      pos = safecat(msg, sizeof msg, pos, "keyword \"");
-      if (tp->key != NULL)
-      {
-         pos = safecat(msg, sizeof msg, pos, tp->key);
-         pos = safecat(msg, sizeof msg, pos, "\", ");
-      }
-
-      else
-         pos = safecat(msg, sizeof msg, pos, "null, ");
-   }
-
-   if (tp->text == NULL)
-      pos = safecat(msg, sizeof msg, pos, "text lost, ");
-
-   else
-   {
-      if (tp->text_length != strlen(text))
-      {
-         char buf[64];
-         sprintf(buf, "text length changed[%lu->%lu], ",
-            (unsigned long)strlen(text), (unsigned long)tp->text_length);
-         pos = safecat(msg, sizeof msg, pos, buf);
-      }
-
-      if (strcmp(tp->text, text) != 0)
-      {
-         pos = safecat(msg, sizeof msg, pos, "text becomes \"");
-         pos = safecat(msg, sizeof msg, pos, tp->text);
-         pos = safecat(msg, sizeof msg, pos, "\" (was \"");
-         pos = safecat(msg, sizeof msg, pos, text);
-         pos = safecat(msg, sizeof msg, pos, "\"), ");
-      }
-   }
-
-   if (tp->itxt_length != 0)
-      pos = safecat(msg, sizeof msg, pos, "iTXt length set, ");
-
-   if (tp->lang != NULL)
-   {
-      pos = safecat(msg, sizeof msg, pos, "iTXt language \"");
-      pos = safecat(msg, sizeof msg, pos, tp->lang);
-      pos = safecat(msg, sizeof msg, pos, "\", ");
-   }
-
-   if (tp->lang_key != NULL)
-   {
-      pos = safecat(msg, sizeof msg, pos, "iTXt keyword \"");
-      pos = safecat(msg, sizeof msg, pos, tp->lang_key);
-      pos = safecat(msg, sizeof msg, pos, "\", ");
-   }
-
-   if (pos > ok)
-   {
-      msg[pos-2] = '\0'; /* Remove the ", " at the end */
-      png_error(pp, msg);
-   }
-}
-
-static void
-standard_text_validate(standard_display *dp, png_const_structp pp,
-   png_infop pi)
-{
-   png_textp tp = NULL;
-   png_uint_32 num_text = png_get_text(pp, pi, &tp, NULL);
-
-   if (num_text == 2 && tp != NULL)
-   {
-      standard_check_text(pp, tp, "image name", dp->ps->current->name);
-      standard_check_text(pp, tp+1, "end marker", "end");
-   }
-
-   else
-   {
-      char msg[64];
-
-      sprintf(msg, "expected two text items, got %lu",
-         (unsigned long)num_text);
-      png_error(pp, msg);
-   }
-}
-#else
-#  define standard_text_validate(dp,pp,pi) ((void)0)
-#endif
-
 static void
 standard_row_validate(standard_display *dp, png_const_structp pp,
    int iImage, int iDisplay, png_uint_32 y)
@@ -4809,8 +4591,8 @@ standard_row_validate(standard_display *dp, png_const_structp pp,
             dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "PNG image row[%lu][%d] changed from %.2x to %.2x",
-         (unsigned long)y, where-1, std[where-1],
+      sprintf(msg, "PNG image row[%d][%d] changed from %.2x to %.2x", y,
+         where-1, std[where-1],
          store_image_row(dp->ps, pp, iImage, y)[where-1]);
       png_error(pp, msg);
    }
@@ -4827,8 +4609,8 @@ standard_row_validate(standard_display *dp, png_const_structp pp,
          dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "display  row[%lu][%d] changed from %.2x to %.2x",
-         (unsigned long)y, where-1, std[where-1],
+      sprintf(msg, "display  row[%d][%d] changed from %.2x to %.2x", y,
+         where-1, std[where-1],
          store_image_row(dp->ps, pp, iDisplay, y)[where-1]);
       png_error(pp, msg);
    }
@@ -4865,7 +4647,6 @@ standard_end(png_structp ppIn, png_infop pi)
    /* Validate the image - progressive reading only produces one variant for
     * interlaced images.
     */
-   standard_text_validate(dp, pp, pi);
    standard_image_validate(dp, pp, 0, -1);
 }
 
@@ -4935,10 +4716,7 @@ standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
              * image is correct.
              */
             if (!d.speed)
-            {
-               standard_text_validate(&d, pp, pi);
                standard_image_validate(&d, pp, 0, 1);
-            }
             else
                d.ps->validated = 1;
          }
@@ -6016,7 +5794,6 @@ image_transform_default_ini(PNG_CONST image_transform *this,
    this->next->ini(this->next, that);
 }
 
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
 static int
 image_transform_default_add(image_transform *this,
     PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
@@ -6029,7 +5806,6 @@ image_transform_default_add(image_transform *this,
 
    return 1;
 }
-#endif
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
 /* png_set_palette_to_rgb */
@@ -7345,7 +7121,7 @@ perform_transform_test(png_modifier *pm)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   unsigned int palette_number = 0;
+   int palette_number = 0;
 
    while (next_format(&colour_type, &bit_depth, &palette_number))
    {
@@ -7708,7 +7484,6 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
 {
    switch (do_background)
    {
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
       case PNG_BACKGROUND_GAMMA_SCREEN:
       case PNG_BACKGROUND_GAMMA_FILE:
       case PNG_BACKGROUND_GAMMA_UNIQUE:
@@ -7726,7 +7501,6 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
                input_sample = background;
          }
          break;
-#endif
 
 #ifdef PNG_READ_ALPHA_MODE_SUPPORTED
       case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
@@ -7759,9 +7533,6 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
          /* Standard cases where no compositing is done (so the component
           * value is already correct.)
           */
-         UNUSED(alpha)
-         UNUSED(background)
-         UNUSED(compose)
          break;
    }
 
@@ -8161,13 +7932,11 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
              */
             switch (do_background)
             {
-#           ifdef PNG_READ_BACKGROUND_SUPPORTED
-               case PNG_BACKGROUND_GAMMA_SCREEN:
-               case PNG_BACKGROUND_GAMMA_FILE:
-               case PNG_BACKGROUND_GAMMA_UNIQUE:
-                  use_background = (alpha >= 0 && alpha < 1);
-                  /*FALL THROUGH*/
-#           endif
+            case PNG_BACKGROUND_GAMMA_SCREEN:
+            case PNG_BACKGROUND_GAMMA_FILE:
+            case PNG_BACKGROUND_GAMMA_UNIQUE:
+               use_background = (alpha >= 0 && alpha < 1);
+               /*FALL THROUGH*/
 #           ifdef PNG_READ_ALPHA_MODE_SUPPORTED
                case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
@@ -8508,8 +8277,7 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
          char msg[64];
 
          /* No transform is expected on the threshold tests. */
-         sprintf(msg, "gamma: below threshold row %lu changed",
-            (unsigned long)y);
+         sprintf(msg, "gamma: below threshold row %d changed", y);
 
          png_error(pp, msg);
       }
@@ -8714,7 +8482,7 @@ perform_gamma_threshold_tests(png_modifier *pm)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   unsigned int palette_number = 0;
+   int palette_number = 0;
 
    /* Don't test more than one instance of each palette - it's pointless, in
     * fact this test is somewhat excessive since libpng doesn't make this
@@ -8779,7 +8547,7 @@ static void perform_gamma_transform_tests(png_modifier *pm)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   unsigned int palette_number = 0;
+   int palette_number = 0;
 
    while (next_format(&colour_type, &bit_depth, &palette_number))
    {
@@ -8808,8 +8576,11 @@ static void perform_gamma_sbit_tests(png_modifier *pm)
     */
    for (sbit=pm->sbitlow; sbit<(1<<READ_BDHI); ++sbit)
    {
-      png_byte colour_type = 0, bit_depth = 0;
-      unsigned int npalette = 0;
+      png_byte colour_type, bit_depth;
+      int npalette;
+
+      colour_type = bit_depth = 0;
+      npalette = 0;
 
       while (next_format(&colour_type, &bit_depth, &npalette))
          if ((colour_type & PNG_COLOR_MASK_ALPHA) == 0 &&
@@ -8895,8 +8666,8 @@ static void perform_gamma_scale16_tests(png_modifier *pm)
 }
 #endif /* 16 to 8 bit conversion */
 
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
-   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
+#if defined PNG_READ_BACKGROUND_SUPPORTED ||\
+   defined PNG_READ_ALPHA_MODE_SUPPORTED
 static void gamma_composition_test(png_modifier *pm,
    PNG_CONST png_byte colour_type, PNG_CONST png_byte bit_depth,
    PNG_CONST int palette_number,
@@ -9025,7 +8796,7 @@ perform_gamma_composition_tests(png_modifier *pm, int do_background,
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   unsigned int palette_number = 0;
+   int palette_number = 0;
 
    /* Skip the non-alpha cases - there is no setting of a transparency colour at
     * present.
@@ -9086,9 +8857,7 @@ perform_gamma_test(png_modifier *pm, int summary)
    /* Save certain values for the temporary overrides below. */
    unsigned int calculations_use_input_precision =
       pm->calculations_use_input_precision;
-#  ifdef PNG_READ_BACKGROUND_SUPPORTED
-      double maxout8 = pm->maxout8;
-#  endif
+   double maxout8 = pm->maxout8;
 
    /* First some arbitrary no-transform tests: */
    if (!pm->this.speed && pm->test_gamma_threshold)
@@ -9207,7 +8976,6 @@ perform_gamma_test(png_modifier *pm, int summary)
 #endif
 }
 #endif /* PNG_READ_GAMMA_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED */
 
 /* INTERLACE MACRO VALIDATION */
 /* This is copied verbatim from the specification, it is simply the pass
@@ -9657,7 +9425,7 @@ static void signal_handler(int signum)
 }
 
 /* main program */
-int main(int argc, char **argv)
+int main(int argc, PNG_CONST char **argv)
 {
    volatile int summary = 1;  /* Print the error summary at the end */
    volatile int memstats = 0; /* Print memory statistics at the end */
@@ -10016,9 +9784,7 @@ int main(int argc, char **argv)
       {
          perform_interlace_macro_validation();
          perform_formatting_test(&pm.this);
-#        ifdef PNG_READ_SUPPORTED
-            perform_standard_test(&pm);
-#        endif
+         perform_standard_test(&pm);
          perform_error_test(&pm);
       }
 
@@ -10026,9 +9792,7 @@ int main(int argc, char **argv)
       if (pm.test_size)
       {
          make_size_images(&pm.this);
-#        ifdef PNG_READ_SUPPORTED
-            perform_size_test(&pm);
-#        endif
+         perform_size_test(&pm);
       }
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
@@ -10121,20 +9885,7 @@ int main(int argc, char **argv)
             exit(1);
          }
       }
-
-      else
-      {
-         fprintf(stderr, "%s: open failed\n", touch);
-         exit(1);
-      }
    }
 
    return 0;
 }
-#else /* write not supported */
-int main(void)
-{
-   fprintf(stderr, "pngvalid: no write support in libpng, all tests skipped\n");
-   return 0;
-}
-#endif
