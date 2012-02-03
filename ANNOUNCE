@@ -1,42 +1,37 @@
 
-Libpng 1.5.8 - February 1, 2012
+Libpng 1.5.9beta01 - February 3, 2012
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.8.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.8.tar.gz
-   libpng-1.5.8.tar.bz2
+   1.5.9beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.9beta01.tar.gz
+   1.5.9beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng158.7z  (LZMA-compressed, recommended)
-   lpng158.zip
+   lp159b01.7z  (LZMA-compressed, recommended)
+   lp159b01.zip
 
 Other information:
 
-   libpng-1.5.8-README.txt
-   libpng-1.5.8-LICENSE.txt
+   1.5.9beta01-README.txt
+   1.5.9beta01-LICENSE.txt
 
-Changes since the last public release (1.5.7):
-  Removed '#include config.h"' from contrib/libtests/pngvalid.c.  It's not
-    needed and causes trouble for VPATH building.
-  Moved AC_MSG_CHECKING([if libraries can be versioned]) later to the proper
-    location in configure.ac (Gilles Espinasse).
-  Fix bug in pngerror.c: some long warnings were being improperly truncated
-    (bug introduced in libpng-1.5.4).
-  Fixed Min/GW uninstall to remove libpng.dll.a
-  Conditionalize the install rules for MINGW and CYGWIN in CMakeLists.txt
+Changes since the last public release (1.5.8):
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+Version 1.5.9beta01 [February 3, 2012]
+  Rebuilt configure scripts in the tar distributions.
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe)
-or to glennrp at users.sourceforge.net
+to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P
