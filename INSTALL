@@ -17,17 +17,12 @@ aren't using any of the included pre-built scripts, you can do this:
 
     ./configure --enable-maintainer-mode
     make maintainer-clean
-    ./autogen.sh   # only in a GIT clone; see below!
+    ./autogen.sh --maintainer --clean
+    ./autogen.sh --maintainer
     ./configure [--prefix=/path] [other options]
     make
     make install
     make check
-
-As of libpng-1.6.0, autogen.sh only works properly in a
-git clone.  If you are working with a tar distribution, you must
-get a git clone, run autogen.sh there, and then copy the resulting
-configuration files from there to your working directory. Then you can
-run configure and make as previously with earlier versions of libpng.
 
 Instead, you can use one of the custom-built makefiles in the
 "scripts" directory

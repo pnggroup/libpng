@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.6.0beta10 - February 1, 2012
+Makefiles for  libpng version 1.6.0beta10 - February 3, 2012
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
@@ -77,6 +77,10 @@ Other supporting scripts:
  ltsugar.m4        =>  Used by autoconf tools
  ltversion.m4      =>  Used by autoconf tools
  lt~obsolete.m4    =>  Used by autoconf tools
+
+ intprefix.dfn     =>  Used by autoconf tools
+ macro.lst         =>  Used by autoconf tools
+ prefix.dfn        =>  Used by autoconf tools
 
 
 Further information can be found in comments in the individual makefiles.
