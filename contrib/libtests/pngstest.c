@@ -848,7 +848,7 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
 static int error_to_linear = 811; /* by experiment */
 static int error_to_linear_grayscale = 424; /* by experiment */
 static int error_to_sRGB = 6; /* by experiment */
-static int error_to_sRGB_grayscale = 11; /* by experiment */
+static int error_to_sRGB_grayscale = 15; /* libpng error by calculation */
 static int error_in_compose = 0;
 static int error_via_linear = 14; /* by experiment */
 static int error_in_premultiply = 1;

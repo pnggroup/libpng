@@ -180,6 +180,14 @@ Version 1.6.0beta11 [February 4, 2012]
   Fix character count in pngstest command in projects/owatcom/pngstest.tgt
   Revised test-pngstest.sh to report PASS/FAIL for each image.
   Updated documentation about the simplified API.
+  Corrected estimate of error in libpng png_set_rgb_to_gray API.  The API is
+    extremely inaccurate for sRGB conversions because it uses an 8-bit
+    intermediate linear value and it does not use the sRGB transform, so it
+    suffers from the known instability in gamma transforms for values close
+    to 0 (see Poynton).  The net result is that the calculation has a maximum
+    error of 14.99/255; 0.5/255^(1/2.2).  pngstest now uses 15 for the
+    permitted 8-bit error. This may still not be enough because of arithmetic
+    error.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
