@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta11 - February 3, 2012
+ libpng version 1.6.0beta11 - February 4, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta11 - February 3, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta11 - February 4, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -3662,119 +3662,52 @@ First the information about the samples.
     Returns the size in bytes of a single component of a pixel or color-map
     entry (as appropriate) in the image.
 
+  PNG_IMAGE_SAMPLE_SIZE(fmt)
+    This is the size of the sample data for one sample.  If the image is
+    color-mapped it is the size of one color-map entry (and image pixels are
+    one byte in size), otherwise it is the size of one image pixel.
 
-+
-+#define PNG_IMAGE_SAMPLE_SIZE(fmt)\
-+   (PNG_IMAGE_SAMPLE_CHANNELS(fmt) * PNG_IMAGE_SAMPLE_COMPONENT_SIZE(fmt))
-+   /* This is the size of the sample data for one sample.  If the image is
-+    * color-mapped it is the size of one color-map entry (and image pixels are
-+    * one byte in size), otherwise it is the size of one image pixel.
-+    */
-+
-+#define PNG_IMAGE_COLORMAP_SIZE(fmt) (PNG_IMAGE_SAMPLE_SIZE(format) * 256)
-+   /* The size of the color-map required by the format; this is the size of the
-+    * color-map buffer passed to the png_image_{read,write}_colormap APIs, it is
-+    * a fixed number determined by the format so can easily be allocated on the
-+    * stack if necessary.
-+    */
-+
-+/* Corresponding information about the pixels */
-+#define PNG_IMAGE_PIXEL_(test,fmt)\
-+   (((fmt)&PNG_FORMAT_FLAG_COLORMAP)?1:test(fmt))
-+
-+#define PNG_IMAGE_PIXEL_CHANNELS(fmt)\
-+   PNG_IMAGE_PIXEL_(PNG_IMAGE_SAMPLE_CHANNELS,fmt)
-+   /* The number of separate channels (components) in a pixel; 1 for a
-+    * color-mapped image.
-+    */
-+
-+#define PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)\
-+   PNG_IMAGE_PIXEL_(PNG_IMAGE_SAMPLE_COMPONENT_SIZE,fmt)
-+   /* The size, in bytes, of each component in a pixel; 1 for a color-mapped
-+    * image.
-+    */
+  PNG_IMAGE_COLORMAP_SIZE(fmt)
+   The size of the color-map required by the format; this is the size of the
+   color-map buffer passed to the png_image_{read,write}_colormap APIs, it is
+   a fixed number determined by the format so can easily be allocated on the
+   stack if necessary.
+
+Corresponding information about the pixels
+
+  PNG_IMAGE_PIXEL_(test,fmt)
+
+  PNG_IMAGE_PIXEL_CHANNELS(fmt)
+   The number of separate channels (components) in a pixel; 1 for a
+   color-mapped image.
+
+  PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)\
+   The size, in bytes, of each component in a pixel; 1 for a color-mapped
+   image.
  
--#define PNG_IMAGE_PIXEL_SIZE(fmt)\
--   (PNG_IMAGE_CHANNELS(fmt) * PNG_IMAGE_COMPONENT_SIZE(fmt))
--   /* Return the size in bytes of a single pixel in the image. */
--   
-+#define PNG_IMAGE_PIXEL_SIZE(fmt) PNG_IMAGE_PIXEL_(PNG_IMAGE_SAMPLE_SIZE,fmt)
-+   /* The size, in bytes, of a complete pixel; 1 for a color-mapped image. */
-+
-+/* Information about the whole row, or whole image */
- #define PNG_IMAGE_ROW_STRIDE(image)\
--   (PNG_IMAGE_CHANNELS((image).format) * (image).width)
-+   (PNG_IMAGE_PIXEL_CHANNELS((image).format) * (image).width)
-    /* Return the total number of components in a single row of the image; this
-     * is the minimum 'row stride', the minimum count of components between each
-+    * row.  For a color-mapped image this is the minimum number of bytes in a
-     * row.
-     */
- 
- #define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
--   (PNG_IMAGE_COMPONENT_SIZE((image).format) * (image).height * (row_stride))
-+   (PNG_IMAGE_PIXEL_COMPONENT_SIZE((image).format)*(image).height*(row_stride))
-    /* Return the size, in bytes, of an image buffer given a png_image and a row
-     * stride - the number of components to leave space for in each row.
-     */
-@@ -2815,17 +2903,24 @@ typedef struct
-  * Flags containing additional information about the image are held in the
-  * 'flags' field of png_image.
-  */
--#define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 1
-+#define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 0x01
-    /* This indicates the the RGB values of the in-memory bitmap do not
-     * correspond to the red, green and blue end-points defined by sRGB.
-     */
- 
-+#define PNG_IMAGE_FLAG_COLORMAP 0x02
-+   /* The PNG is color-mapped.  If this flag is set png_image_read_colormap
-+    * can be used without further loss of image information.  If it is not set
-+    * png_image_read_colormap will cause significant loss if the image has any
-+    * colors (if PNG_FORMAT_FLAG_COLOR is set).
-+    */
-+
- #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
- /* READ APIs
-  * ---------
-  *
-  * The png_image passed to the read APIs must have been initialized by setting
-- * the png_controlp field 'opaque' to NULL (or, better, memset the whole thing.)
-+ * the png_controlp field 'opaque' to NULL (or, safer, memset the whole thing.)
-  */
-
-
-
-
-
-
   PNG_IMAGE_PIXEL_SIZE(fmt)
-    Returns the size in bytes of a single pixel in the image.
-   
+   The size, in bytes, of a complete pixel; 1 for a color-mapped image.
+
+Information about the whole row, or whole image
+
   PNG_IMAGE_ROW_STRIDE(image)
-    Returns the total number of components in a single row
-    of the image; this is the minimum 'row stride', the minimum
-    count of components between each row.
+   Returns the total number of components in a single row of the image; this
+   is the minimum 'row stride', the minimum count of components between each
+   row.  For a color-mapped image this is the minimum number of bytes in a
+   row.
 
   PNG_IMAGE_BUFFER_SIZE(image, row_stride)
-    Returns the size, in bytes, of an image buffer given
-    a png_image and a row stride - the number of components to
-    leave space for in each row.
+    Returns the size, in bytes, of an image buffer given a png_image and a row
+    stride - the number of components to leave space for in each row.
 
-  PNG_IMAGE_SIZE(image)
-    Returns the size, in bytes, of the image in memory given
-    just a png_image; the row stride is the minimum stride
-    required for the image.
-
-PNG_IMAGE_FLAG_
-
-Flags containing additional information about the image are held
-  in the 'flags' field of png_image.
-
-   PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB
-      This indicates the the RGB values of the in-memory
-      bitmap do not correspond to the red, green and blue
-      end-points defined by sRGB.
+  PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB == 0x01
+    This indicates the the RGB values of the in-memory bitmap do not
+    correspond to the red, green and blue end-points defined by sRGB.
+ 
+  PNG_IMAGE_FLAG_COLORMAP == 0x02
+    The PNG is color-mapped.  If this flag is set png_image_read_colormap
+    can be used without further loss of image information.  If it is not set
+    png_image_read_colormap will cause significant loss if the image has any
 
 READ APIs
 
@@ -3786,7 +3719,6 @@ READ APIs
 
      The named file is opened for read and the image header
      is filled in from the PNG header in the file.
-   
 
    int png_image_begin_read_from_stdio (png_imagep image,
      FILE* file)
@@ -5043,7 +4975,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 3, 2012
+February 4, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
