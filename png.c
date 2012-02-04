@@ -762,13 +762,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta11 - February 3, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta11 - February 4, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta11 - February 3, 2012\
+      return "libpng version 1.6.0beta11 - February 4, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2974,9 +2974,11 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 #if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
    defined PNG_SIMPLIFIED_WRITE_SUPPORTED
 /* sRGB conversion tables; these are machine generated with the code in
- * contrib/tools/makesRGB.c.  The sRGB to linear table is exact (to the
- * nearest 16 bit linear fraction).  The inverse (linear to sRGB) table has
- * accuracies as follows:
+ * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
+ * specification (see the article at http://en.wikipedia.org/wiki/SRGB)
+ * is used, not the gamma=1/2.2 approximation use elsewhere in libpng.
+ * The sRGB to linear table is exact (to the nearest 16 bit linear fraction).
+ * The inverse (linear to sRGB) table has accuracies as follows:
  *
  * For all possible (255*65535+1) input values:
  *

@@ -3758,6 +3758,10 @@ READ APIs
       setting the pointer to NULL.  May be called at any time
       after the structure is initialized.
 
+When the simplified API needs to convert between sRGB and linear colorspaces,
+the actual sRGB transfer curve defined in the sRGB specification (see the
+article at http://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
+approximation used elsewhere in libpng.
 
 WRITE APIS
 
