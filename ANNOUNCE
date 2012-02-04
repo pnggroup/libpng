@@ -177,6 +177,7 @@ Version 1.6.0beta10 [February 3, 2012]
 
 Version 1.6.0beta11 [February 4, 2012]
   Fix character count in pngstest command in projects/owatcom/pngstest.tgt
+  Revised test-pngstest.sh to report PASS/FAIL for each image.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

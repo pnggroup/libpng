@@ -3925,9 +3925,11 @@ Version 1.6.0beta10 [February 3, 2012]
   Added Z_SOLO for zlib-1.2.6+ and correct pngstest tests
   Updated list of test images in CMakeLists.txt
   Updated the prebuilt configure files to current condition.
+  Revised INSTALL information about autogen.sh; it works in tar distributions.
 
 Version 1.6.0beta11 [February 4, 2012]
   Fix character count in pngstest command in projects/owatcom/pngstest.tgt
+  Revised test-pngstest.sh to report PASS/FAIL for each image.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
