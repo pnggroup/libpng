@@ -3797,6 +3797,9 @@ Version 1.5.8 [February 1, 2012]
 Version 1.5.9beta01 [February 3, 2012]
   Rebuilt configure scripts in the tar distributions.
 
+Version 1.5.9beta02 [February 6, 2012]
+  Removed two unused definitions from scripts/pnglibconf.h.prebuilt
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
