@@ -443,6 +443,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
                return;
             }
             break;
+
          case 5:
             if ((png_ptr->row_number & 1) || png_ptr->width < 2)
             {
@@ -1981,7 +1982,7 @@ make_rgb_colormap(png_image_read_control *display)
 #define PNG_RGB_INDEX(r,g,b) \
    ((png_byte)(6 * (6 * PNG_DIV51(r) + PNG_DIV51(g)) + PNG_DIV51(b)))
 
-static int 
+static int
 png_image_read_colormap(png_voidp argument)
 {
    png_image_read_control *display =
@@ -2672,7 +2673,7 @@ png_image_read_colormap(png_voidp argument)
                         output_encoding);
                   }
                }
-               
+
                else
                   png_create_colormap_entry(display, i, colormap[i].red,
                      colormap[i].green, colormap[i].blue,
@@ -3070,7 +3071,7 @@ png_image_read_colormapped(png_voidp argument)
       {
          png_uint_32      y = image->height;
          png_bytep        row = display->first_row;
-         
+
          while (y-- > 0)
          {
             png_read_row(png_ptr, row, NULL);
@@ -3230,13 +3231,13 @@ png_image_read_background(png_voidp argument)
    if ((png_ptr->transformations & PNG_COMPOSE) != 0)
       png_error(png_ptr, "unexpected compose");
 
-   /* The palette code zaps PNG_GAMMA in place... */
-   if ((png_ptr->color_type & PNG_COLOR_MASK_PALETTE) == 0 &&
-      (png_ptr->transformations & PNG_GAMMA) == 0)
-      png_error(png_ptr, "lost gamma correction");
-
    if (png_get_channels(png_ptr, info_ptr) != 2)
       png_error(png_ptr, "lost/gained channels");
+
+   /* Expect the 8-bit case to always remove the alpha channel */
+   if ((image->format & PNG_FORMAT_FLAG_LINEAR) == 0 &&
+      (image->format & PNG_FORMAT_FLAG_ALPHA) != 0)
+      png_error(png_ptr, "unexpected 8-bit transformation");
 
    switch (png_ptr->interlaced)
    {
@@ -3293,7 +3294,7 @@ png_image_read_background(png_voidp argument)
                   startx = 0;
                   stepx = stepy = 1;
                }
-               
+
                if (display->background == NULL)
                {
                   for (; y<height; y += stepy)
@@ -3390,8 +3391,8 @@ png_image_read_background(png_voidp argument)
          {
             png_bytep    first_row = display->first_row;
             ptrdiff_t    step_row = display->row_bytes;
-            unsigned int outchannels = png_get_channels(png_ptr, info_ptr);
             int preserve_alpha = (image->format & PNG_FORMAT_FLAG_ALPHA) != 0;
+            unsigned int outchannels = 1+preserve_alpha;
             int swap_alpha = 0;
 
             if (preserve_alpha && (image->format & PNG_FORMAT_FLAG_AFIRST))
@@ -3399,9 +3400,11 @@ png_image_read_background(png_voidp argument)
 
             for (pass = 0; pass < passes; ++pass)
             {
-               unsigned int     startx, stepx, stepy; /* all in pixels */
+               unsigned int     startx, stepx, stepy;
                png_uint_32      y;
 
+               /* The 'x' start and step are adjusted to output components here.
+                */
                if (png_ptr->interlaced == PNG_INTERLACE_ADAM7)
                {
                   /* The row may be empty for a short image: */
@@ -3454,7 +3457,7 @@ png_image_read_background(png_voidp argument)
                         component = 0;
 
                      outrow[swap_alpha] = (png_uint_16)component;
-                     if (outchannels > 1)
+                     if (preserve_alpha)
                         outrow[1 ^ swap_alpha] = alpha;
 
                      inrow += 2; /* components and alpha channel */
@@ -3489,7 +3492,7 @@ png_image_read_direct(png_voidp argument)
     * need 8 bits minimum, no palette and expanded tRNS.
     */
    png_set_expand(png_ptr);
-   
+
    /* Now check the format to see if it was modified. */
    {
       png_uint_32 base_format = png_image_format(png_ptr) &
@@ -3800,10 +3803,21 @@ png_image_read_direct(png_voidp argument)
 #     endif
 
 #     ifdef PNG_FORMAT_AFIRST_SUPPORTED
-         if (png_ptr->transformations & PNG_SWAP_ALPHA ||
+         if (do_local_background == 2)
+         {
+            if (format & PNG_FORMAT_FLAG_AFIRST)
+               info_format |= PNG_FORMAT_FLAG_AFIRST;
+         }
+
+         if ((png_ptr->transformations & PNG_SWAP_ALPHA) != 0 ||
             ((png_ptr->transformations & PNG_ADD_ALPHA) != 0 &&
             (png_ptr->flags & PNG_FLAG_FILLER_AFTER) == 0))
+         {
+            if (do_local_background == 2)
+               png_error(png_ptr, "unexpected alpha swap transformation");
+
             info_format |= PNG_FORMAT_FLAG_AFIRST;
+         }
 #     endif
 
       /* This is actually an internal error. */
@@ -3869,7 +3883,7 @@ png_image_read_direct(png_voidp argument)
       {
          png_uint_32      y = image->height;
          png_bytep        row = display->first_row;
-         
+
          while (y-- > 0)
          {
             png_read_row(png_ptr, row, NULL);

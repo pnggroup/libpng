@@ -121,6 +121,19 @@ isRGB(int fixed_linear)
    return sRGB(fixed_linear / 65535.);
 }
 
+static png_byte
+unpremultiply(int component, int alpha)
+{
+   if (alpha == 0)
+      return 255; /* Arbitrary, but consistent with the libpng code */
+
+   else if (alpha >= 65535)
+      return isRGB(component);
+
+   else
+      return sRGB((double)component / alpha);
+}
+
 static png_uint_16
 ilineara(int fixed_srgb, int alpha)
 {
@@ -414,7 +427,7 @@ static void format_default(format_list *pf, int redundant)
    if (redundant)
    {
       int i;
-      
+
       /* set everything, including flags that are pointless */
       for (i=0; i<FORMAT_SET_COUNT; ++i)
          pf->bits[i] = ~(png_uint_32)0;
@@ -458,7 +471,6 @@ typedef struct
    ptrdiff_t   stride;
    png_size_t  bufsize;
    png_size_t  allocsize;
-   /* png_color   background; */
    char        tmpfile_name[32];
    png_uint_16 colormap[256*4];
 }
@@ -671,7 +683,7 @@ typedef struct
  * The API returns false if an error is detected; this can only be if the alpha
  * value is less than the component in the linear case.
  */
-static int 
+static int
 get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
 {
    png_uint_32 format = image->image.format;
@@ -848,14 +860,89 @@ get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
 static int error_to_linear = 811; /* by experiment */
 static int error_to_linear_grayscale = 424; /* by experiment */
 static int error_to_sRGB = 6; /* by experiment */
-static int error_to_sRGB_grayscale = 15; /* libpng error by calculation */
-static int error_in_compose = 0;
-static int error_via_linear = 14; /* by experiment */
+static int error_to_sRGB_grayscale = 17; /* libpng error by calculation +
+                                            2 by experiment */
+static int error_in_compose = 2; /* by experiment */
 static int error_in_premultiply = 1;
 
+/* The following is *just* the result of a round trip from 8-bit sRGB to linear
+ * then back to 8-bit sRGB when it is done by libpng.  There are two problems:
+ *
+ * 1) libpng currently uses a 2.2 power law with no linear segment, this results
+ * in instability in the low values and even with 16-bit precision sRGB(1) ends
+ * up mapping to sRGB(0) as a result of rounding in the 16-bit representation.
+ * This gives an error of 1 in the handling of value 1 only.
+ *
+ * 2) libpng currently uses an intermediate 8-bit linear value in gamma
+ * correction of 8-bit values.  This results in many more errors, the worse of
+ * which is mapping sRGB(14) to sRGB(0).
+ *
+ * The general 'error_via_linear' is more complex because of pre-multiplication,
+ * this compounds the 8-bit errors according to the alpha value of the pixel.
+ * As a result 256 values are pre-calculated for error_via_linear.
+ */
+static int error_in_libpng_gamma;
+static int error_via_linear[256]; /* Indexed by 8-bit alpha */
+
+static void
+init_error_via_linear(void)
+{
+   int alpha;
+
+   error_via_linear[0] = 255; /* transparent pixel */
+
+   for (alpha=1; alpha<=255; ++alpha)
+   {
+      /* 16-bit values less than 128.5 get rounded to 8-bit 0 and so the worst
+       * case error arises with 16-bit 128.5, work out what sRGB
+       * (non-associated) value generates 128.5; any value less than this is
+       * going to map to 0, so the worst error is floor(value).
+       *
+       * Note that errors are considerably higher (more than a factor of 2)
+       * because libpng uses a simple power law for sRGB data at present.
+       *
+       * Add .1 for arithmetic errors inside libpng.
+       */
+      double v = floor(255*pow(.5/*(128.5 * 255 / 65535)*/ / alpha, 1/2.2)+.1);
+
+      error_via_linear[alpha] = (int)v;
+   }
+
+   /* This is actually 14.99, but, despite the closeness to 15, 14 seems to work
+    * ok in this case.
+    */
+   error_in_libpng_gamma = 14;
+}
+
+/* A precalculated floating point linear background value, for grayscale the
+ * green channel is used.
+ */
+typedef struct
+{
+   double r, g, b;
+}
+precalc_background;
+
+static void
+init_background(precalc_background *ppb, const png_color *background)
+{
+   if (background == NULL)
+   {
+      double v = linear_from_sRGB(BUFFER_INIT8/255.);
+      ppb->r = ppb->g = ppb->b = v;
+   }
+
+   else
+   {
+      ppb->r = linear_from_sRGB(background->red/255.);
+      ppb->g = linear_from_sRGB(background->green/255.);
+      ppb->b = linear_from_sRGB(background->blue/255.);
+   }
+}
+
 static const char *
-cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
-   int multiple_algorithms)
+cmppixel(Pixel *a, Pixel *b, const precalc_background *background,
+   int via_linear, int multiple_algorithms)
 {
    int error_limit = 0;
 
@@ -1120,63 +1207,25 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
        * see where the parameter is set to non-zero below.
        */
       if (!(a->format & PNG_FORMAT_FLAG_LINEAR) && via_linear)
-         error_limit = error_via_linear;
-
-      if (b->format & PNG_FORMAT_FLAG_COLOR)
-         err = "8-bit color mismatch";
-      
-      else
-         err = "8-bit gray mismatch";
-
-      /* If the original data had an alpha channel and was not pre-multiplied
-       * pre-multiplication may lose precision in non-opaque pixel values.  If
-       * the output is linear the premultiplied 16-bit values will be used, but
-       * if 'via_linear' is set an intermediate 16-bit pre-multiplied form has
-       * been used and this must be taken into account here.
-       */
-      if (via_linear && (a->format & PNG_FORMAT_FLAG_ALPHA) &&
-         !(a->format & PNG_FORMAT_FLAG_LINEAR) &&
-         a->a16 < 65535)
       {
-         if (a->a16 > 0)
-         {
-            /* First calculate the rounded 16-bit component values, (r,g,b) or y
-             * as appropriate, then back-calculate the 8-bit values for
-             * comparison below.
-             */
-            if (a->format & PNG_FORMAT_FLAG_COLOR)
-            {
-               double r = closestinteger((65535. * a->r16) / a->a16)/65535;
-               double g = closestinteger((65535. * a->g16) / a->a16)/65535;
-               double blue = closestinteger((65535. * a->b16) / a->a16)/65535;
-
-               a->r16 = u16d(r * a->a16);
-               a->g16 = u16d(g * a->a16);
-               a->b16 = u16d(blue * a->a16);
-               a->y16 = u16d(YfromRGBint(a->r16, a->g16, a->b16));
-
-               a->r8 = u8d(r * 255);
-               a->g8 = u8d(g * 255);
-               a->b8 = u8d(blue * 255);
-               a->y8 = u8d(255 * YfromRGB(r, g, blue));
-            }
-
-            else
-            {
-               double y = closestinteger((65535. * a->y16) / a->a16)/65535.;
-
-               a->b16 = a->g16 = a->r16 = a->y16 = u16d(y * a->a16);
-               a->b8 = a->g8 = a->r8 = a->y8 = u8d(255 * y);
-            }
-         }
+         if (a->a8 > 0)
+            error_limit = error_via_linear[a->a8];
 
          else
          {
-            a->r16 = a->g16 = a->b16 = a->y16 = 0;
-            a->r8 = a->g8 = a->b8 = a->y8 = 255;
+            /* The transform to linear will have set the component values to
+             * 65535, so they will come back as 255:
+             */
+            error_limit = 0;
+            a->y8 = a->r8 = a->g8 = a->b8 = 255;
          }
       }
 
+      if (b->format & PNG_FORMAT_FLAG_COLOR)
+         err = "8-bit color mismatch";
+
+      else
+         err = "8-bit gray mismatch";
 
       if (b->format & PNG_FORMAT_FLAG_ALPHA)
       {
@@ -1225,25 +1274,14 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
             {
                if (b->format & PNG_FORMAT_FLAG_COLOR)
                {
-                  double r, g, blue;
-
-                  r = (255. * b->r16)/b->a16;
-                  b->r8 = u8d(r);
-
-                  g = (255. * b->g16)/b->a16;
-                  b->g8 = u8d(g);
-
-                  blue = (255. * b->b16)/b->a16;
-                  b->b8 = u8d(blue);
-
-                  b->y8 = u8d(YfromRGB(r, g, blue));
+                  b->r8 = unpremultiply(b->r16, b->a16);
+                  b->g8 = unpremultiply(b->g16, b->a16);
+                  b->b8 = unpremultiply(b->b16, b->a16);
+                  b->y8 = unpremultiply(b->y16, b->a16);
                }
 
                else
-               {
-                  b->r8 = b->g8 = b->b8 = b->y8 =
-                     u8d((255. * b->y16)/b->a16);
-               }
+                  b->r8 = b->g8 = b->b8 = b->y8 = unpremultiply(b->y16, b->a16);
             }
 
             else
@@ -1279,45 +1317,25 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
                a->b8 = isRGB(a->b16);
                a->y8 = isRGB(a->y16);
 
-               /* There should be no libpng error in this (ideally) */
-               error_limit = 0;
-            }
-
-            else if (background == NULL)
-            {
-               double add = alpha * linear_from_sRGB(BUFFER_INIT8/255.);
-               double r, g, blue, y;
-
-               r = a->r16 + add;
-               a->r16 = u16d(r);
-               a->r8 = sRGB(r/65535);
-
-               g = a->g16 + add;
-               a->g16 = u16d(g);
-               a->g8 = sRGB(g/65535);
-
-               blue = a->b16 + add;
-               a->b16 = u16d(blue);
-               a->b8 = sRGB(blue/65535);
-
-               y = YfromRGB(r, g, blue);
-               a->y16 = u16d(y);
-               a->y8 = sRGB(y/65535);
+               /* There should be no libpng error in this (ideally), but the
+                * libpng gamma correction code has off-by-one errors.
+                */
+               error_limit = error_in_libpng_gamma;
             }
 
             else
             {
                double r, g, blue, y;
 
-               r = a->r16 + alpha * linear_from_sRGB(background->red/255.);
+               r = a->r16 + alpha * background->r;
                a->r16 = u16d(r);
                a->r8 = sRGB(r/65535);
 
-               g = a->g16 + alpha * linear_from_sRGB(background->green/255.);
+               g = a->g16 + alpha * background->g;
                a->g16 = u16d(g);
                a->g8 = sRGB(g/65535);
 
-               blue = a->b16 + alpha * linear_from_sRGB(background->blue/255.);
+               blue = a->b16 + alpha * background->b;
                a->b16 = u16d(blue);
                a->b8 = sRGB(blue/65535);
 
@@ -1334,7 +1352,11 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
             if (via_linear)
             {
                a->r8 = a->g8 = a->b8 = a->y8 = isRGB(a->y16);
-               error_limit = 0;
+
+               /* There should be no libpng error in this (ideally), but the
+                * libpng gamma correction code has off-by-one errors.
+                */
+               error_limit = error_in_libpng_gamma;
             }
 
             else
@@ -1342,8 +1364,7 @@ cmppixel(Pixel *a, Pixel *b, const png_color *background, int via_linear,
                /* When the output is gray the background comes from just the
                 * green channel.
                 */
-               double y = a->y16 + alpha * linear_from_sRGB(
-                  (background == NULL ? BUFFER_INIT8 : background->green)/255.);
+               double y = a->y16 + alpha * background->g;
 
                a->r16 = a->g16 = a->b16 = a->y16 = u16d(y);
                a->r8 = a->g8 = a->b8 = a->y8 = sRGB(y/65535);
@@ -1557,6 +1578,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
    int two_algorithms = ((formata ^ formatb) & PNG_FORMAT_FLAG_COLORMAP) != 0;
    int result = 1;
    unsigned int check_alpha = 0; /* must be zero or one */
+   precalc_background pb;
    png_byte swap_mask[4];
    png_uint_32 x, y;
    png_const_bytep ppa, ppb;
@@ -1565,6 +1587,9 @@ compare_two_images(Image *a, Image *b, int via_linear,
    if (width != b->image.width || height != b->image.height)
       return logerror(a, a->file_name, ": width x height changed: ",
          b->file_name);
+
+   /* Set up the background */
+   init_background(&pb, background);
 
    /* Find the first row and inter-row space. */
    if (!(formata & PNG_FORMAT_FLAG_COLORMAP) &&
@@ -1635,6 +1660,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
       {
          /* Only 'b' has an alpha channel */
          check_alpha = 1;
+
          if (formatb & PNG_FORMAT_FLAG_AFIRST)
          {
             bstart = 1;
@@ -1702,7 +1728,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
                      return badpixel(b, entry, 0, &pixel_b,
                         "bad palette entry value");
 
-                  if (cmppixel(&pixel_a, &pixel_b, background, via_linear,
+                  if (cmppixel(&pixel_a, &pixel_b, &pb, via_linear,
                      0/*multiple_algorithms*/) != NULL)
                      break;
 
@@ -1910,7 +1936,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
             while (x < width)
             {
                png_const_bytep colormap_a = (png_const_bytep)a->colormap;
-               
+
                switch (channels)
                {
                   case 4:
@@ -1948,7 +1974,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
             while (x < width)
             {
                png_const_bytep colormap_b = (png_const_bytep)b->colormap;
-               
+
                switch (channels)
                {
                   case 4:
@@ -2000,7 +2026,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
          if (!get_pixel(b, &pixel_b, ppb))
             return badpixel(b, x, y, &pixel_b, "bad pixel value");
 
-         mismatch = cmppixel(&pixel_a, &pixel_b, background, via_linear,
+         mismatch = cmppixel(&pixel_a, &pixel_b, &pb, via_linear,
             two_algorithms);
 
          if (mismatch != NULL)
@@ -2297,7 +2323,7 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
       Image output;
 
       newimage(&output);
-      
+
       result = 1;
 
       /* Use the low bit of 'counter' to indicate whether or not to do alpha
@@ -2419,6 +2445,7 @@ main(int argc, char **argv)
    int retval = 0;
    int c;
 
+   init_error_via_linear();
    format_init(&formats);
 
    for (c=1; c<argc; ++c)

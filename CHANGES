@@ -3927,7 +3927,7 @@ Version 1.6.0beta10 [February 3, 2012]
   Updated the prebuilt configure files to current condition.
   Revised INSTALL information about autogen.sh; it works in tar distributions.
 
-Version 1.6.0beta11 [February 4, 2012]
+Version 1.6.0beta11 [February 10, 2012]
   Fix character count in pngstest command in projects/owatcom/pngstest.tgt
   Revised test-pngstest.sh to report PASS/FAIL for each image.
   Updated documentation about the simplified API.
@@ -3939,6 +3939,14 @@ Version 1.6.0beta11 [February 4, 2012]
     error of 14.99/255; 0.5/255^(1/2.2).  pngstest now uses 15 for the
     permitted 8-bit error. This may still not be enough because of arithmetic
     error.
+  Removed some unused arrays (with #ifdef) from png_read_push_finish_row().
+  Fixed a memory overwrite bug in simplified read of RGB PNG with
+    non-linear gamma Also bugs in the error checking in pngread.c and changed
+    quite a lot of the checks in pngstest.c to be correct; either correctly
+    written or not over-optimistic.  The pngstest changes are insufficient to
+    allow all possible RGB transforms to be passed; pngstest cmppixel needs
+    to be rewritten to make it clearer which errors it allows and then changed
+    to permit known inaccuracies.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
