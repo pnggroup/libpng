@@ -1201,6 +1201,7 @@ png_push_process_row(png_structp png_ptr)
 void /* PRIVATE */
 png_read_push_finish_row(png_structp png_ptr)
 {
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1219,6 +1220,7 @@ png_read_push_finish_row(png_structp png_ptr)
     * it, uncomment it here and in png.h
    static PNG_CONST png_byte FARDATA png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
    */
+#endif
 
    png_ptr->row_number++;
    if (png_ptr->row_number < png_ptr->num_rows)
