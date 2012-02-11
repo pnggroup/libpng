@@ -3797,8 +3797,10 @@ Version 1.5.8 [February 1, 2012]
 Version 1.5.9beta01 [February 3, 2012]
   Rebuilt configure scripts in the tar distributions.
 
-Version 1.5.9beta02 [February 6, 2012]
+Version 1.5.9beta02 [February 11, 2012]
   Removed two unused definitions from scripts/pnglibconf.h.prebuilt
+  Removed some unused arrays (with #ifdef) from png_read_push_finish_row().
+  Removed tests for no-longer-used *_EMPTY_PLTE_SUPPORTED in pngstruct.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
