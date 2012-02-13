@@ -61,6 +61,20 @@
 #  define PNG_RESTRICT restrict
 #endif
 
+/* To support symbol prefixing it is necessary to know *before* including png.h
+ * whether the fixed point (and maybe other) APIs are exported, because if they
+ * are not internal definitions may be required.  This is handled below just
+ * before png.h is included, but load the configuration now if it is available.
+ */
+#ifndef PNGLCONF_H
+#  include "pnglibconf.h"
+#endif
+
+/* Local renames may change non-exported API functions from png.h */
+#if defined PNG_PREFIX && !defined PNGPREFIX_H
+#  include "pngprefix.h"
+#endif
+
 #ifdef PNG_USER_CONFIG
 #  include "pngusr.h"
    /* These should have been defined in pngusr.h */
@@ -136,12 +150,44 @@
 #  define PNG_PRIVATE
 #endif
 
+/* Symbol preprocessing support.
+ *
+ * To enable listing global, but internal, symbols the following macros should
+ * always be used to declare an extern data or function object in this file.
+ */
+#ifndef PNG_INTERNAL_DATA
+#  define PNG_INTERNAL_DATA(type, name, array) extern type name array
+#endif
+
+#ifndef PNG_INTERNAL_FUNCTION
+#  define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
+      extern PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
+#endif
+
+/* If floating or fixed point APIs are disabled they may still be compiled
+ * internally.  To handle this make sure they are declared as the appropriate
+ * internal extern function (otherwise the symbol prefixing stuff won't work and
+ * the functions will be used without definitions.)
+ *
+ * NOTE: although all the API functions are declared here they are not all
+ * actually built!
+ */
+#ifndef PNG_FP_EXPORT
+#  ifndef PNG_FLOATING_POINT_SUPPORTED
+#     define PNG_FP_EXPORT(ordinal, type, name, args)\
+         PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
+#  endif
+#endif
+#ifndef PNG_FIXED_EXPORT
+#  ifndef PNG_FIXED_POINT_SUPPORTED
+#     define PNG_FIXED_EXPORT(ordinal, type, name, args)\
+         PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
+#  endif
+#endif
+
 #include "png.h"
 #include "pnginfo.h"
 #include "pngstruct.h"
-#if defined PNG_PREFIX && !defined PNGPREFIX_H
-#  include "pngprefix.h"
-#endif
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
@@ -358,20 +404,6 @@ typedef const png_uint_16p * png_const_uint_16pp;
 /* End of memory model/platform independent support */
 /* End of 1.5.0beta36 move from pngconf.h */
 
-/* Symbol preprocessing support.
- *
- * To enable listing global, but internal, symbols the following macros should
- * always be used to declare an extern data or function object in this file.
- */
-#ifndef PNG_INTERNAL_DATA
-#  define PNG_INTERNAL_DATA(type, name, array) extern type name array
-#endif
-
-#ifndef PNG_INTERNAL_FUNCTION
-#  define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
-      extern PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
-#endif
-
 /* CONSTANTS and UTILITY MACROS
  * These are used internally by libpng and not exposed in the API
  */
@@ -576,7 +608,7 @@ PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
 #define png_fixed(png_ptr, fp, s) ((fp) <= 21474 && (fp) >= -21474 ?\
     ((png_fixed_point)(100000 * (fp))) : (png_fixed_error(png_ptr, s),0))
 #endif
-/* else the corresponding function is defined below, inside the scopt of the
+/* else the corresponding function is defined below, inside the scope of the
  * cplusplus test.
  */
 #endif
@@ -796,14 +828,8 @@ PNG_INTERNAL_FUNCTION(void,png_write_IDAT,(png_structrp png_ptr, png_bytep data,
 PNG_INTERNAL_FUNCTION(void,png_write_IEND,(png_structrp png_ptr),PNG_EMPTY);
 
 #ifdef PNG_WRITE_gAMA_SUPPORTED
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_write_gAMA,(png_structrp png_ptr, double file_gamma),
-   PNG_EMPTY);
-#  endif
-#  ifdef PNG_FIXED_POINT_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_gAMA_fixed,(png_structrp png_ptr,
     png_fixed_point file_gamma),PNG_EMPTY);
-#  endif
 #endif
 
 #ifdef PNG_WRITE_sBIT_SUPPORTED

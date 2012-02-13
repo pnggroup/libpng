@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta11 - February 10, 2012
+Libpng 1.6.0beta11 - February 13, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -176,7 +176,7 @@ Version 1.6.0beta10 [February 3, 2012]
   Updated the prebuilt configure files to current condition.
   Revised INSTALL information about autogen.sh; it works in tar distributions.
 
-Version 1.6.0beta11 [February 10, 2012]
+Version 1.6.0beta11 [February 13, 2012]
   Fix character count in pngstest command in projects/owatcom/pngstest.tgt
   Revised test-pngstest.sh to report PASS/FAIL for each image.
   Updated documentation about the simplified API.
@@ -196,6 +196,17 @@ Version 1.6.0beta11 [February 10, 2012]
     allow all possible RGB transforms to be passed; pngstest cmppixel needs
     to be rewritten to make it clearer which errors it allows and then changed
     to permit known inaccuracies.
+  Removed tests for no-longer-used *_EMPTY_PLTE_SUPPORTED from pngstruct.h
+  Fixed fixed/float API export conditionals. 1) If FIXED_POINT or
+    FLOATING_POINT options were switched off, png.h ended up with lone ';'
+    characters.  This is not valid ANSI-C outside a function.  The ';'
+    characters have been moved inside the definition of PNG_FP_EXPORT and
+    PNG_FIXED_EXPORT. 2) If either option was switched off, the declaration
+    of the corresponding functions were completely omitted, even though some
+    of them are still used internally.  The result is still valid, but
+    produces warnings from gcc with some warning options (including -Wall). The
+    fix is to cause png.h to declare the functions with PNG_INTERNAL_FUNCTION
+    when png.h is included from pngpriv.h.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

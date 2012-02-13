@@ -184,7 +184,7 @@ endif
 	mv $*.tf3 $@
 
 # The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
+pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h $(DFA_XTRA)
 	rm -f $@ $*.tf[45]
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf4 version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\

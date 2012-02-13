@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta11 - February 3, 2012
+ * libpng version 1.6.0beta11 - February 13, 2012
  *
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -414,7 +414,7 @@
 #ifndef PNG_FP_EXPORT     /* A floating point API. */
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 #     define PNG_FP_EXPORT(ordinal, type, name, args)\
-         PNG_EXPORT(ordinal, type, name, args)
+         PNG_EXPORT(ordinal, type, name, args);
 #  else                   /* No floating point APIs */
 #     define PNG_FP_EXPORT(ordinal, type, name, args)
 #  endif
@@ -422,7 +422,7 @@
 #ifndef PNG_FIXED_EXPORT  /* A fixed point API. */
 #  ifdef PNG_FIXED_POINT_SUPPORTED
 #     define PNG_FIXED_EXPORT(ordinal, type, name, args)\
-         PNG_EXPORT(ordinal, type, name, args)
+         PNG_EXPORT(ordinal, type, name, args);
 #  else                   /* No fixed point APIs */
 #     define PNG_FIXED_EXPORT(ordinal, type, name, args)
 #  endif
