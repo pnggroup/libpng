@@ -396,11 +396,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
        * and we have nothing to do - the code will exit through the
        * error case below.
        */
-#if defined(PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED) || \
-    defined(PNG_USER_CHUNK_MALLOC_MAX)
-      else
-#endif
-      if (expanded_size > 0)
+      else if (expanded_size > 0)
       {
          /* Success (maybe) - really uncompress the chunk. */
          png_size_t new_size = 0;
