@@ -701,7 +701,7 @@ png_push_save_buffer(png_structp png_ptr)
       new_max = png_ptr->save_buffer_size + png_ptr->current_buffer_size + 256;
       old_buffer = png_ptr->save_buffer;
       png_ptr->save_buffer = (png_bytep)png_malloc_warn(png_ptr,
-         (png_size_t)new_max);
+         new_max);
       if (png_ptr->save_buffer == NULL)
       {
         png_free(png_ptr, old_buffer);
@@ -1219,7 +1219,7 @@ png_push_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-      (png_size_t)(length + 1));
+      length + 1);
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1319,7 +1319,7 @@ png_push_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-      (png_size_t)(length + 1));
+      length + 1);
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1518,7 +1518,7 @@ png_push_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32
 #endif
 
    png_ptr->current_text = (png_charp)png_malloc(png_ptr,
-      (png_size_t)(length + 1));
+      length + 1);
    png_ptr->current_text[length] = '\0';
    png_ptr->current_text_ptr = png_ptr->current_text;
    png_ptr->current_text_size = (png_size_t)length;
@@ -1657,7 +1657,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
       png_ptr->unknown_chunk.name[png_sizeof(png_ptr->unknown_chunk.name) - 1]
         = '\0';
 
-      png_ptr->unknown_chunk.size = (png_size_t)length;
+      png_ptr->unknown_chunk.size = length;
 
       if (length == 0)
          png_ptr->unknown_chunk.data = NULL;
@@ -1665,7 +1665,7 @@ png_push_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32
       else
       {
          png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr,
-            (png_size_t)length);
+            length);
          png_crc_read(png_ptr, (png_bytep)png_ptr->unknown_chunk.data, length);
       }
 

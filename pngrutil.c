@@ -377,15 +377,18 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       /* Now check the limits on this chunk - if the limit fails the
        * compressed data will be removed, the prefix will remain.
        */
+      if (prefix_size >= (~(png_size_t)0) - 1 ||
+         expanded_size >= (~(png_size_t)0) - 1 - prefix_size
 #ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
-      if (png_ptr->user_chunk_malloc_max &&
+         || (png_ptr->user_chunk_malloc_max &&
           (prefix_size + expanded_size >= png_ptr->user_chunk_malloc_max - 1))
 #else
 #  ifdef PNG_USER_CHUNK_MALLOC_MAX
-      if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
+         || ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
           prefix_size + expanded_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
 #  endif
 #endif
+         )
          png_warning(png_ptr, "Exceeded size limit while expanding chunk");
 
       /* If the size is zero either there was an error and a message
@@ -1261,7 +1264,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
-   slength = (png_size_t)length;
+   slength = length;
    png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
 
    if (png_crc_finish(png_ptr, skip))
