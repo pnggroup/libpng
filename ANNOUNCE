@@ -1,5 +1,5 @@
 
-Libpng 1.2.47beta01 - July 12, 2011
+Libpng 1.2.47rc01 - February 17, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,41 +9,44 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.47beta01.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.47beta01.tar.gz
-   libpng-1.2.47beta01.tar.bz2
+   libpng-1.2.47rc01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.47rc01.tar.gz
+   libpng-1.2.47rc01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.47beta01-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.47beta01-no-config.tar.gz
-   libpng-1.2.47beta01-no-config.tar.bz2
+   libpng-1.2.47rc01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.47rc01-no-config.tar.gz
+   libpng-1.2.47rc01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1247b01.zip
-   lp1247b01.7z
-   lp1247b01.tar.bz2
+   lp1247r01.zip
+   lp1247r01.7z
+   lp1247r01.tar.bz2
 
 Project files
 
-   libpng-1.2.47beta01-project-netware.zip
-   libpng-1.2.47beta01-project-wince.zip
+   libpng-1.2.47rc01-project-netware.zip
+   libpng-1.2.47rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.47beta01-README.txt
-   libpng-1.2.47beta01-KNOWNBUGS.txt
-   libpng-1.2.47beta01-LICENSE.txt
-   libpng-1.2.47beta01-Y2K-compliance.txt
-   libpng-1.2.47beta01-[previous version]-diff.txt
+   libpng-1.2.47rc01-README.txt
+   libpng-1.2.47rc01-KNOWNBUGS.txt
+   libpng-1.2.47rc01-LICENSE.txt
+   libpng-1.2.47rc01-Y2K-compliance.txt
+   libpng-1.2.47rc01-[previous version]-diff.txt
 
 Changes since the last public release (1.2.46):
 
-version 1.2.47beta01 [July 12, 2011]
+version 1.2.47beta01 [February 17, 2012]
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
+
+version 1.2.47rc01 [February 17, 2012]
+  Fixed CVE-2011-3026 buffer overrun bug.
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
