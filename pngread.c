@@ -537,7 +537,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
             if (*rp >= png_ptr->num_palette)
             {
                png_warning(png_ptr,"Found invalid palette index");
-               png_ptr->num_palette=*rp;
+               png_ptr->num_palette=*rp + 1;
             }
             rp++;
          }
