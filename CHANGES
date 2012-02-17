@@ -3927,7 +3927,7 @@ Version 1.6.0beta10 [February 3, 2012]
   Updated the prebuilt configure files to current condition.
   Revised INSTALL information about autogen.sh; it works in tar distributions.
 
-Version 1.6.0beta11 [February 13, 2012]
+Version 1.6.0beta11 [February 17, 2012]
   Fix character count in pngstest command in projects/owatcom/pngstest.tgt
   Revised test-pngstest.sh to report PASS/FAIL for each image.
   Updated documentation about the simplified API.
@@ -3958,6 +3958,9 @@ Version 1.6.0beta11 [February 13, 2012]
     produces warnings from gcc with some warning options (including -Wall). The
     fix is to cause png.h to declare the functions with PNG_INTERNAL_FUNCTION
     when png.h is included from pngpriv.h.
+  Check for invalid palette index while reading paletted PNG.  When one is
+    found, issue a warning and increase png_ptr->num_palette accordingly.
+    Apps are responsible for checking to see if that happened.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
