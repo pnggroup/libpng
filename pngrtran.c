@@ -2294,6 +2294,34 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       png_do_unpack(row_info, png_ptr->row_buf + 1);
 #endif
 
+/* Added at libpng-1.6.0 */
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+   /* To do: Fix does not check sub-8-bit rows that have not been unpacked. */
+   if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
+      row_info->bit_depth == 8)
+     if (png_ptr->num_palette < (1 << png_ptr->bit_depth))
+     {
+        if ((png_ptr->interlaced && png_ptr->pass == 6) ||
+            (!png_ptr->interlaced && png_ptr->pass == 0))
+        {
+           png_uint_32 i;
+           png_bytep rp = png_ptr->row_buf+1; /* +1 to skip the filter byte */
+  
+           for (i = 0; i <= row_info->rowbytes; i++)
+           {
+              if (*rp >= png_ptr->num_palette)
+              {
+                 /* Should this be a benign error instead of a warning? */
+                 png_warning(png_ptr,"Found invalid palette index");
+                 break;
+              }
+  
+              rp++;
+           }
+        }
+     }
+#endif
+
 #ifdef PNG_READ_BGR_SUPPORTED
    if (png_ptr->transformations & PNG_BGR)
       png_do_bgr(row_info, png_ptr->row_buf + 1);

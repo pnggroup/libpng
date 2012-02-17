@@ -523,27 +523,6 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
          png_error(png_ptr, "bad adaptive filter value");
    }
 
-   if ((png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) &&
-      (png_ptr->num_palette < (1 << png_ptr->bit_depth)))
-   {
-      if ((png_ptr->interlaced && png_ptr->pass == 6) ||
-          (!png_ptr->interlaced && png_ptr->pass == 0))
-      {
-         png_uint_32 i;
-         png_bytep rp = png_ptr->row_buf+1;
-
-         for (i = 0; i <= row_info.rowbytes; i++)
-         {
-            if (*rp >= png_ptr->num_palette)
-            {
-               png_warning(png_ptr,"Found invalid palette index");
-               png_ptr->num_palette=*rp + 1;
-            }
-            rp++;
-         }
-      }
-   }
-
    /* libpng 1.5.6: the following line was copying png_ptr->rowbytes before
     * 1.5.6, while the buffer really is this big in current versions of libpng
     * it may not be in the future, so this was changed just to copy the
