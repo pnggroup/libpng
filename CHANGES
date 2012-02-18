@@ -1,4 +1,4 @@
-/*
+#if 0
 CHANGES - changes for libpng
 
 version 0.2
@@ -2725,6 +2725,15 @@ version 1.2.46rc02 and 1.0.56rc02 [July 8, 2011]
 version 1.2.46 and 1.0.56 [July 9, 2011]
   Udated copyright year to 2011.
 
+version 1.2.47beta01 [February 17, 2012]
+  Updated contrib/pngminus/makefile.std (Samuli Souminen)
+
+version 1.0.57rc01 and 1.2.47rc01 [February 17, 2012]
+  Fixed CVE-2011-3026 buffer overrun bug.
+
+version 1.0.57 and 1.2.47 [February 18, 2012]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
@@ -2732,4 +2741,4 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
-*/
+#endif
