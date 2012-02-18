@@ -1,47 +1,42 @@
 
-Libpng 1.5.9rc01 - February 17, 2012
+Libpng 1.5.9 - February 18, 2012
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.9rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.9rc01.tar.gz
-   1.5.9rc01.tar.bz2
+   libpng-1.5.9.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.9.tar.gz
+   libpng-1.5.9.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp159r01.7z  (LZMA-compressed, recommended)
-   lp159r01.zip
+   lpng159.7z  (LZMA-compressed, recommended)
+   lpng159.zip
 
 Other information:
 
-   1.5.9rc01-README.txt
-   1.5.9rc01-LICENSE.txt
+   libpng-1.5.9-README.txt
+   libpng-1.5.9-LICENSE.txt
 
 Changes since the last public release (1.5.8):
 
-Version 1.5.9beta01 [February 3, 2012]
   Rebuilt configure scripts in the tar distributions.
-
-Version 1.5.9beta02 [February 16, 2012]
   Removed two unused definitions from scripts/pnglibconf.h.prebuilt
   Removed some unused arrays (with #ifdef) from png_read_push_finish_row().
   Removed tests for no-longer-used *_EMPTY_PLTE_SUPPORTED from pngstruct.h
-
-Version 1.5.9rc01 [February 17, 2012]
   Fixed CVE-2011-3026 buffer overrun bug.  Deal more correctly with the test
     on iCCP chunk length. Also removed spurious casts that may hide problems
     on 16-bit systems.
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P
