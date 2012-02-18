@@ -2739,8 +2739,11 @@ version 1.2.46 and 1.0.56 [July 9, 2011]
 version 1.2.47beta01 [February 17, 2012]
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
 
-version 1.2.47rc01 [February 17, 2012]
+version 1.0.57rc01 and 1.2.47rc01 [February 17, 2012]
   Fixed CVE-2011-3026 buffer overrun bug.
+
+version 1.0.57 and 1.2.47 [February 18, 2012]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
