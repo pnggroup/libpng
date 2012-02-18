@@ -1,38 +1,34 @@
 
-Libpng 1.4.9rc01 - February 17, 2012
+Libpng 1.4.9 - February 18, 2012
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.9rc01.tar.xz (LZMA-compressed, recommended)
-   1.4.9rc01.tar.gz
-   1.4.9rc01.tar.bz2
+   libpng-1.4.9.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.9.tar.gz
+   libpng-1.4.9.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp149r01.7z (LZMA-compressed, recommended)
-   lp149r01.zip
+   lpng149.7z (LZMA-compressed, recommended)
+   lpng149.zip
 
 Other information:
 
-   1.4.9rc01-README.txt
-   1.4.9rc01-LICENSE.txt
+   libpng-1.4.9-README.txt
+   libpng-1.4.9-LICENSE.txt
 
 Changes since the last public release (1.4.8):
 
-version 1.4.9beta01 [February 16, 2012]
   Added vstudio/* and CMakeLists to EXTRA_DIST in Makefile.in and Makefile.am
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
   Added SunOS support to configure.ac and Makefile.am (but configure and
     Makefile.in were not updated)
-
-version 1.4.9rc01 [February 17, 2012]
   Fixed CVE-2011-3026 buffer overrun bug.  Deal more correctly with the test
     on iCCP chunk length. Also removed spurious casts that may hide problems
     on 16-bit systems.
