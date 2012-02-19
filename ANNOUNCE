@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta12 - February 17, 2012
+Libpng 1.6.0beta13 - February 19, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta12.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta12.tar.gz
-   1.6.0beta12.tar.bz2
+   1.6.0beta13.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta13.tar.gz
+   1.6.0beta13.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b12.7z  (LZMA-compressed, recommended)
-   lp160b12.zip
+   lp160b13.7z  (LZMA-compressed, recommended)
+   lp160b13.zip
 
 Other information:
 
-   1.6.0beta12-README.txt
-   1.6.0beta12-LICENSE.txt
+   1.6.0beta13-README.txt
+   1.6.0beta13-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -211,7 +211,7 @@ Version 1.6.0beta11 [February 16, 2012]
     found, issue a warning and increase png_ptr->num_palette accordingly.
     Apps are responsible for checking to see if that happened.
 
-Version 1.6.0beta12 [February 17, 2012]
+Version 1.6.0beta12 [February 18, 2012]
   Do not increase num_palette on invalid_index.
   Relocated check for invalid palette index to pngrtran.c, after unpacking
     the sub-8-bit pixels.
@@ -219,6 +219,7 @@ Version 1.6.0beta12 [February 17, 2012]
     on iCCP chunk length. Also removed spurious casts that may hide problems
     on 16-bit systems.
 
+Version 1.6.0beta13 [February 19, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

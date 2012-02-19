@@ -3962,13 +3962,15 @@ Version 1.6.0beta11 [February 16, 2012]
     found, issue a warning and increase png_ptr->num_palette accordingly.
     Apps are responsible for checking to see if that happened.
 
-Version 1.6.0beta12 [February 17, 2012]
+Version 1.6.0beta12 [February 18, 2012]
   Do not increase num_palette on invalid_index.
   Relocated check for invalid palette index to pngrtran.c, after unpacking
     the sub-8-bit pixels.
   Fixed CVE-2011-3026 buffer overrun bug.  Deal more correctly with the test
     on iCCP chunk length. Also removed spurious casts that may hide problems
     on 16-bit systems.
+
+Version 1.6.0beta13 [February 19, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
