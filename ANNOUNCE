@@ -1,52 +1,49 @@
 
-Libpng 1.2.47 - February 18, 2012
+Libpng 1.2.48beta01 - February 20, 2012
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.47.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.47.tar.gz
-   libpng-1.2.47.tar.bz2
+   libpng-1.2.48beta01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.48beta01.tar.gz
+   libpng-1.2.48beta01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.47-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.47-no-config.tar.gz
-   libpng-1.2.47-no-config.tar.bz2
+   libpng-1.2.48beta01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.48beta01-no-config.tar.gz
+   libpng-1.2.48beta01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1247.zip
-   lpng1247.7z
-   lpng1247.tar.bz2
+   lp1248b01.zip
+   lp1248b01.7z
+   lp1248b01.tar.bz2
 
 Project files
 
-   libpng-1.2.47-project-netware.zip
-   libpng-1.2.47-project-wince.zip
+   libpng-1.2.48beta01-project-netware.zip
+   libpng-1.2.48beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.47-README.txt
-   libpng-1.2.47-KNOWNBUGS.txt
-   libpng-1.2.47-LICENSE.txt
-   libpng-1.2.47-Y2K-compliance.txt
-   libpng-1.2.47-[previous version]-diff.txt
+   libpng-1.2.48beta01-README.txt
+   libpng-1.2.48beta01-KNOWNBUGS.txt
+   libpng-1.2.48beta01-LICENSE.txt
+   libpng-1.2.48beta01-Y2K-compliance.txt
+   libpng-1.2.48beta01-[previous version]-diff.txt
 
 Changes since the last public release (1.2.46):
 
-version 1.2.47 [February 18, 2012]
+version 1.2.48beta01 [February 20, 2012]
 
-  Updated contrib/pngminus/makefile.std (Samuli Souminen)
-  Fixed CVE-2011-3026 buffer overrun bug.
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe) or to glennrp at users.sourceforge.net
