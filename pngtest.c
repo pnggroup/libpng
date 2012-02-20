@@ -1702,4 +1702,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_9 your_png_h_is_not_version_1_4_9;
+typedef version_1_4_10beta01 your_png_h_is_not_version_1_4_10beta01;
