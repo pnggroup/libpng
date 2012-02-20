@@ -27,6 +27,7 @@ Other information:
 Changes since the last public release (1.4.8):
 
 version 1.4.10beta01 [February 20, 2012]
+  Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
