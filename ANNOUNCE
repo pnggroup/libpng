@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta13 - February 19, 2012
+Libpng 1.6.0beta13 - February 21, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -219,7 +219,11 @@ Version 1.6.0beta12 [February 18, 2012]
     on iCCP chunk length. Also removed spurious casts that may hide problems
     on 16-bit systems.
 
-Version 1.6.0beta13 [February 19, 2012]
+Version 1.6.0beta13 [February 21, 2012]
+  Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
+    pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
+    now that png_ptr->buffer is inaccessible to applications, the special
+    handling is no longer useful.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
