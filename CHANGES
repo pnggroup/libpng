@@ -3810,8 +3810,10 @@ Version 1.5.9rc01 [February 17, 2012]
 Version 1.5.9 [February 18, 2012]
   No changes.
 
-Version 1.5.10beta01 [February 19, 2012]
+Version 1.5.10beta01 [February 21, 2012]
   Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
+  Always put the CMAKE_LIBRARY in "lib" (removed special WIN32 case).
+  Removed empty vstudio/pngstest directory (Clifford Yapp).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
