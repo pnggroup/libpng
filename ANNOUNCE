@@ -48,6 +48,7 @@ version 1.2.48beta01 [February 22, 2012]
     pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
     now that png_ptr->buffer is inaccessible to applications, the special
     handling is no longer useful.
+  Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
