@@ -1,5 +1,5 @@
 
-Libpng 1.2.48beta01 - February 20, 2012
+Libpng 1.2.48beta01 - February 22, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,8 +42,12 @@ Other information:
 
 Changes since the last public release (1.2.46):
 
-version 1.2.48beta01 [February 20, 2012]
+version 1.2.48beta01 [February 22, 2012]
   Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
+  Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
+    pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
+    now that png_ptr->buffer is inaccessible to applications, the special
+    handling is no longer useful.
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
