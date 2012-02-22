@@ -6,9 +6,9 @@ pngsuite
 Permission to use, copy, modify, and distribute these images for any
 purpose and without fee is hereby granted.
 
-The 15 "bas*.png" images are part of the much larger PngSuite test-set of 
-images, available for developers of PNG supporting software. The 
-complete set, available at http:/www.schaik.com/pngsuite/, contains 
+The 15 "bas*.png" images are part of the much larger PngSuite test-set of
+images, available for developers of PNG supporting software. The
+complete set, available at http:/www.schaik.com/pngsuite/, contains
 a variety of images to test interlacing, gamma settings, ancillary
 chunks, etc.
 
@@ -48,7 +48,7 @@ can use them to test the proper functioning of PNG software.
     ftbwn3p08.png  8-bit paletted, white bKGD
     ftbyn3p08.png  8-bit paletted, yellow bKGD
     ftp0n0g08.png  8-bit grayscale, opaque
-    ftp0n2c08.png  8-bit truecolor, opaque 
+    ftp0n2c08.png  8-bit truecolor, opaque
     ftp0n3p08.png  8-bit paletted, opaque
     ftp1n3p08.png  8-bit paletted, no bKGD
 

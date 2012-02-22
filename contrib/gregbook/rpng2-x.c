@@ -96,8 +96,8 @@
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
 #define VERSION   "2.03 of 25 February 2010"
-#define RESNAME   "rpng2"	/* our X resource application name */
-#define RESCLASS  "Rpng"	/* our X resource class name */
+#define RESNAME   "rpng2"       /* our X resource application name */
+#define RESCLASS  "Rpng"       /* our X resource class name */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -132,7 +132,7 @@
                   (e.type == KeyPress &&   /*  v--- or 1 for shifted keys */  \
                   ((k = XLookupKeysym(&e.xkey, 0)) == XK_q || k == XK_Escape)))
 
-#define NO_24BIT_MASKS	/* undef case not fully written--only for redisplay() */
+#define NO_24BIT_MASKS /* undef case not fully written--only for redisplay() */
 
 #define rgb1_max   bg_freq
 #define rgb1_min   bg_gray
@@ -302,7 +302,7 @@ int main(int argc, char **argv)
     int have_bg = FALSE;
 #ifdef FEATURE_LOOP
     int loop = FALSE;
-    long loop_interval = -1;		/* seconds (100,000 max) */
+    long loop_interval = -1;            /* seconds (100,000 max) */
 #endif
     double LUT_exponent;                /* just the lookup table */
     double CRT_exponent = 2.2;          /* just the monitor */
@@ -485,9 +485,6 @@ int main(int argc, char **argv)
           "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
           "is displayed) to quit.\n"
           "\n", PROGNAME,
-#if (defined(__i386__) || defined(_M_IX86) || defined(__x86_64__))
-          (int)strlen(PROGNAME), " ",
-#endif
           (int)strlen(PROGNAME), " ", default_display_exponent, num_bgpat-1);
         exit(1);
     }
@@ -594,7 +591,7 @@ int main(int argc, char **argv)
                   "(unexpectedly) while reading PNG image file\n");
                 exit(3);
             } else /* if (error) */ {
-                // will print error message below
+                /* will print error message below */
             }
             break;
         }
@@ -784,8 +781,9 @@ static void rpng2_x_init(void)
     if (rpng2_x_create_window()) {
 
         /* GRR TEMPORARY HACK:  this is fundamentally no different from cases
-         * above; libpng should longjmp() back to us when png_ptr goes away.
-         * If we/it segfault instead, seems like a libpng bug... */
+         * above; libpng should call our error handler to longjmp() back to us
+         * when png_ptr goes away.  If we/it segfault instead, seems like a
+         * libpng bug... */
 
         /* we're here via libpng callback, so if window fails, clean and bail */
         readpng2_cleanup(&rpng2_info);
@@ -1279,7 +1277,7 @@ static int rpng2_x_load_bg_image(void)
         for (row = 0;  row < rpng2_info.height;  ++row) {
             src = bg_data + row*bg_rowbytes;
             dest = ximage->data + row*ximage_rowbytes;
-            if (bpp == 32) {	/* slightly optimized version */
+            if (bpp == 32) {    /* slightly optimized version */
                 for (i = rpng2_info.width;  i > 0;  --i) {
                     red   = *src++;
                     green = *src++;

@@ -1,5 +1,5 @@
 
-Libpng 1.4.9beta01 - September 2, 2011
+Libpng 1.5.10beta01 - February 21, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,31 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.9beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.9beta01.tar.gz
-   1.4.9beta01.tar.bz2
+   1.5.10beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.10beta01.tar.gz
+   1.5.10beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp149b01.7z (LZMA-compressed, recommended)
-   lp149b01.zip
+   lp1510b01.7z  (LZMA-compressed, recommended)
+   lp1510b01.zip
 
 Other information:
 
-   1.4.9beta01-README.txt
-   1.4.9beta01-LICENSE.txt
+   1.5.10beta01-README.txt
+   1.5.10beta01-LICENSE.txt
 
-Changes since the last public release (1.4.8):
+Changes since the last public release (1.5.9):
 
-version 1.4.9beta01 [September 2, 2011]
-  Added vstudio/* and CMakeLists to EXTRA_DIST in Makefile.in and Makefile.am
-  Updated contrib/pngminus/makefile.std (Samuli Souminen)
-  Added SunOS support to configure.ac and Makefile.am (but configure and
-    Makefile.in were not updated)
+Version 1.5.10beta01 [February 21, 2012]
+  Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
+  Always put the CMAKE_LIBRARY in "lib" (removed special WIN32 case).
+  Removed empty vstudio/pngstest directory (Clifford Yapp).
+  Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
+    pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
+    now that png_ptr->buffer is inaccessible to applications, the special
+    handling is no longer useful.
+  Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
 
-Send comments/corrections/commendations to glennrp at users.sourceforge.net
-or to png-mng-implement at lists.sf.net (subscription required; visit
-https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P

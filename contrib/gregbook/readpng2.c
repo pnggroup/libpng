@@ -55,8 +55,10 @@
 
 
 #include <stdlib.h>     /* for exit() prototype */
+#include <setjmp.h>
 
-#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include <zlib.h>
+#include "png.h"        /* libpng header from the local directory */
 #include "readpng2.h"   /* typedefs, common macros, public prototypes */
 
 
@@ -216,7 +218,11 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
     mainprog_info  *mainprog_ptr;
     int  color_type, bit_depth;
     png_uint_32 width, height;
+#ifdef PNG_FLOATING_POINT_SUPPORTED
     double  gamma;
+#else
+    png_fixed_point gamma;
+#endif
 
 
     /* setjmp() doesn't make sense here, because we'd either have to exit(),
@@ -305,8 +311,14 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
         png_set_expand(png_ptr);
     if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
         png_set_expand(png_ptr);
+#ifdef PNG_READ_16_TO_8_SUPPORTED
     if (bit_depth == 16)
+#  ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+        png_set_scale_16(png_ptr);
+#  else
         png_set_strip_16(png_ptr);
+#  endif
+#endif
     if (color_type == PNG_COLOR_TYPE_GRAY ||
         color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
         png_set_gray_to_rgb(png_ptr);
@@ -327,11 +339,19 @@ static void readpng2_info_callback(png_structp png_ptr, png_infop info_ptr)
      * "gamma" value for the entire display system, i.e., the product of
      * LUT_exponent and CRT_exponent. */
 
+#ifdef PNG_FLOATING_POINT_SUPPORTED
     if (png_get_gAMA(png_ptr, info_ptr, &gamma))
         png_set_gamma(png_ptr, mainprog_ptr->display_exponent, gamma);
     else
         png_set_gamma(png_ptr, mainprog_ptr->display_exponent, 0.45455);
-
+#else
+    if (png_get_gAMA_fixed(png_ptr, info_ptr, &gamma))
+        png_set_gamma_fixed(png_ptr,
+            (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), gamma);
+    else
+        png_set_gamma_fixed(png_ptr,
+            (png_fixed_point)(100000*mainprog_ptr->display_exponent+.5), 45455);
+#endif
 
     /* we'll let libpng expand interlaced images, too */
 
@@ -480,5 +500,12 @@ static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)
         exit(99);
     }
 
+    /* Now we have our data structure we can use the information in it
+     * to return control to our own higher level code (all the points
+     * where 'setjmp' is called in this file.)  This will work with other
+     * error handling mechanisms as well - libpng always calls png_error
+     * when it can proceed no further, thus, so long as the error handler
+     * is intercepted, application code can do its own error recovery.
+     */
     longjmp(mainprog_ptr->jmpbuf, 1);
 }
