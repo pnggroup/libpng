@@ -31,10 +31,6 @@
 #define PNG_QUANTIZE_GREEN_BITS 5
 #define PNG_QUANTIZE_RED_BITS 5
 #define PNG_sCAL_PRECISION 5
-#define PNG_USER_CHUNK_CACHE_MAX 0
-#define PNG_USER_CHUNK_MALLOC_MAX 0
-#define PNG_USER_HEIGHT_MAX 0x7fffffff
-#define PNG_USER_WIDTH_MAX 0x7fffffff
 #define PNG_WEIGHT_SHIFT 8
 #define PNG_ZBUF_SIZE 8192
 /* end of settings */

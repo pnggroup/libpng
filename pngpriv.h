@@ -194,6 +194,45 @@
 #  define PNG_DLL_EXPORT
 #endif
 
+/* SECURITY and SAFETY:
+ *
+ * By default libpng is built without any internal limits on image size,
+ * individual heap (png_malloc) allocations or the total amount of memory used.
+ * If PNG_SAFE_LIMITS_SUPPORTED is defined, however, the limits below are used
+ * (unless individually overridden).  These limits are believed to be fairly
+ * safe, but builders of secure systems should verify the values against the
+ * real system capabilities.
+ */
+#ifdef PNG_SAFE_LIMITS_SUPPORTED
+   /* 'safe' limits */
+#  ifndef PNG_USER_WIDTH_MAX
+#     define PNG_USER_WIDTH_MAX 1000000
+#  endif
+#  ifndef PNG_USER_HEIGHT_MAX
+#     define PNG_USER_HEIGHT_MAX 1000000
+#  endif
+#  ifndef PNG_USER_CHUNK_CACHE_MAX
+#     define PNG_USER_CHUNK_CACHE_MAX 128
+#  endif
+#  ifndef PNG_USER_CHUNK_MALLOC_MAX
+#     define PNG_USER_CHUNK_MALLOC_MAX 8000000
+#  endif
+#else
+   /* values for no limits */
+#  ifndef PNG_USER_WIDTH_MAX
+#     define PNG_USER_WIDTH_MAX 0x7fffffff
+#  endif
+#  ifndef PNG_USER_HEIGHT_MAX
+#     define PNG_USER_HEIGHT_MAX 0x7fffffff
+#  endif
+#  ifndef PNG_USER_CHUNK_CACHE_MAX
+#     define PNG_USER_CHUNK_CACHE_MAX 0
+#  endif
+#  ifndef PNG_USER_CHUNK_MALLOC_MAX
+#     define PNG_USER_CHUNK_MALLOC_MAX 0
+#  endif
+#endif
+
 /* This is used for 16 bit gamma tables -- only the top level pointers are
  * const; this could be changed:
  */

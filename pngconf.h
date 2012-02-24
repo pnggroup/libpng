@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta13 - February 19, 2012
+ * libpng version 1.6.0beta13 - February 24, 2012
  *
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -21,6 +21,26 @@
 
 #ifndef PNGCONF_H
 #define PNGCONF_H
+
+/* To do: Do all of this in scripts/pnglibconf.dfa */
+#ifdef PNG_SAFE_LIMITS_SUPPORTED
+#  ifdef PNG_USER_WIDTH_MAX
+#    undef PNG_USER_WIDTH_MAX
+#    define PNG_USER_WIDTH_MAX 1000000L
+#  endif
+#  ifdef PNG_USER_HEIGHT_MAX
+#    undef PNG_USER_HEIGHT_MAX
+#    define PNG_USER_HEIGHT_MAX 1000000L
+#  endif
+#  ifdef PNG_USER_CHUNK_MALLOC_MAX
+#    undef PNG_USER_CHUNK_MALLOC_MAX
+#    define PNG_USER_CHUNK_MALLOC_MAX 4000000L
+#  endif
+#  ifdef PNG_USER_CHUNK_CACHE_MAX
+#    undef PNG_USER_CHUNK_CACHE_MAX
+#    define PNG_USER_CHUNK_CACHE_MAX 128
+#  endif
+#endif
 
 #ifndef PNG_BUILDING_SYMBOL_TABLE /* else includes may cause problems */
 
