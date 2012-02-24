@@ -3827,6 +3827,8 @@ Version 1.5.10beta01 [February 24, 2012]
   Revised the SAFE_LIMITS feature to be the same as the feature in libpng16.
   Added information about the new limits in the manual.
 
+Version 1.5.10beta02 [February 24, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
