@@ -3826,6 +3826,10 @@ Version 1.5.10beta01 [February 24, 2012]
     or put #define PNG_SAFE_LIMITS_SUPPORTED in pnglibconf.h.
 
 Version 1.5.10beta02 [February 24, 2012]
+  Revised pngconf.h to always set the "safe" limits when
+    PNG_SAFE_LIMITS_SUPPORTED is defined, even if pnglibconf.h has
+    been edited to remove the limit definitions.
+  Added information about the new limits in the manual.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

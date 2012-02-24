@@ -5238,6 +5238,21 @@ PNG_USER_WIDTH_MAX and PNG_USER_HEIGHT_MAX, although this document said
 that it could be used to override them.  Now this function will reduce or
 increase the limits.
 
+Starting in libpng-1.5.10, the user limits can be set en masse with the
+configuration option PNG_SAFE_LIMITS.  If this option is enabled, then
+the limits in pnglibconf.h are ignored and a set of "safe" limits is
+applied in pngconf.h.  These can be overridden by application calls
+to png_set_user_limits(), png_set_user_chunk_cache_max(), and/or
+png_set_user_malloc_max() that increase or decrease the limits.  Also,
+in libpng-1.5.10 the default width and height limits were increased
+from 1,000,000 to 0x7ffffff (i.e., made unlimited).  Therefore, the
+limits are now
+                               default      safe
+   png_user_width_max        0x7fffffff    1,000,000
+   png_user_height_max       0x7fffffff    1,000,000
+   png_user_chunk_cache_max  0 (unlimited)   128
+   png_user_chunk_malloc_max 0 (unlimited) 4,000,000
+
 B. Changes to the build and configuration of libpng
 
 Details of internal changes to the library code can be found in the CHANGES
