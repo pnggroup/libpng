@@ -3825,6 +3825,8 @@ Version 1.5.10beta01 [February 24, 2012]
     To enable, use PNG_COPTS=-DPNG_SAFE_LIMITS on the configure command
     or put #define PNG_SAFE_LIMITS_SUPPORTED in pnglibconf.h.
 
+Version 1.5.10beta02 [February 24, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
