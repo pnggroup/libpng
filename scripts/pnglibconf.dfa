@@ -261,7 +261,7 @@ option USER_LIMITS
 option SET_USER_LIMITS requires USER_LIMITS
 
 # Added at libpng-1.5.10
-option SAFE_LIMITS requires USER_LIMITS
+option SAFE_LIMITS enables USER_LIMITS
 
 # Feature added at libpng-1.4.0, this flag added at 1.4.1
 option SET_USER_LIMITS enables SET_CHUNK_CACHE_LIMIT
