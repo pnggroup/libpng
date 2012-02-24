@@ -3822,13 +3822,9 @@ Version 1.5.10beta01 [February 24, 2012]
   Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
   Added PNG_SAFE_LIMITS feature to pnglibconf.dfa and code in pngconf.h
     to reset the user limits to safe ones if PNG_SAFE_LIMITS is defined.
-    To enable, use PNG_COPTS=-DPNG_SAFE_LIMITS on the configure command
-    or put #define PNG_SAFE_LIMITS_SUPPORTED in pnglibconf.h.
-
-Version 1.5.10beta02 [February 24, 2012]
-  Revised pngconf.h to always set the "safe" limits when
-    PNG_SAFE_LIMITS_SUPPORTED is defined, even if pnglibconf.h has
-    been edited to remove the limit definitions.
+    To enable, use "CPPFLAGS=-DPNG_SAFE_LIMITS_SUPPORTED=" on the configure
+    command or put "#define PNG_SAFE_LIMITS_SUPPORTED" in pnglibconf.h.
+  Revised the SAFE_LIMITS feature to be the same as the feature in libpng16.
   Added information about the new limits in the manual.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

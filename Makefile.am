@@ -153,11 +153,11 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 	mv dfn3.out $@
 
 # The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
+pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa
 	rm -f $@ dfn?.out
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
-	    $(DFA_XTRA) 1>&2
+ 	    ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	rm dfn1.out
 	mv dfn2.out $@
