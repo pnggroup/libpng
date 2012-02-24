@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta13 - February 24, 2012
+Libpng 1.6.0beta14 - February 24, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta13.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta13.tar.gz
-   1.6.0beta13.tar.bz2
+   1.6.0beta14.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta14.tar.gz
+   1.6.0beta14.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b13.7z  (LZMA-compressed, recommended)
-   lp160b13.zip
+   lp160b14.7z  (LZMA-compressed, recommended)
+   lp160b14.zip
 
 Other information:
 
-   1.6.0beta13-README.txt
-   1.6.0beta13-LICENSE.txt
+   1.6.0beta14-README.txt
+   1.6.0beta14-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -228,6 +228,8 @@ Version 1.6.0beta13 [February 24, 2012]
     to reset the user limits to safe ones if PNG_SAFE_LIMITS is defined.
     To enable, use CPPFLAGS=-DPNG_SAFE_LIMITS on the configure command
     or put #define PNG_SAFE_LIMITS_SUPPORTED in pnglibconf.h.prebuilt.
+
+Version 1.6.0beta14 [February 24, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
