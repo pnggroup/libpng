@@ -37,3 +37,5 @@ option SETJMP on
 option STDIO on
 option READ_EXPAND on
 option READ_STRIP_16_TO_8 on
+option USER_LIMITS on
+@#define PNG_SECURE
