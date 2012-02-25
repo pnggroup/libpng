@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "February 24, 2012"
+.TH LIBPNG 3 "February 25, 2012"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0beta14
 .SH SYNOPSIS
@@ -1003,7 +1003,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta14 - February 24, 2012
+ libpng version 1.6.0beta14 - February 25, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -1014,7 +1014,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta14 - February 24, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta14 - February 25, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -5643,6 +5643,20 @@ PNG_USER_WIDTH_MAX and PNG_USER_HEIGHT_MAX, although this document said
 that it could be used to override them.  Now this function will reduce or
 increase the limits.
 
+Starting in libpng-1.5.10, the user limits can be set en masse with the
+configuration option PNG_SAFE_LIMITS_SUPPORTED.  If this option is enabled,
+a set of "safe" limits is applied in pngpriv.h.  These can be overridden by
+application calls to png_set_user_limits(), png_set_user_chunk_cache_max(),
+and/or png_set_user_malloc_max() that increase or decrease the limits.  Also,
+in libpng-1.5.10 the default width and height limits were increased
+from 1,000,000 to 0x7ffffff (i.e., made unlimited).  Therefore, the
+limits are now
+                               default      safe
+   png_user_width_max        0x7fffffff    1,000,000
+   png_user_height_max       0x7fffffff    1,000,000
+   png_user_chunk_cache_max  0 (unlimited)   128
+   png_user_chunk_malloc_max 0 (unlimited) 8,000,000
+
 B. Changes to the build and configuration of libpng
 
 Details of internal changes to the library code can be found in the CHANGES
@@ -5983,7 +5997,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-February 24, 2012
+February 25, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6251,7 +6265,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.0beta14 - February 24, 2012:
+Libpng version 1.6.0beta14 - February 25, 2012:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6274,7 +6288,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.0beta14, February 24, 2012, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.0beta14, February 25, 2012, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6373,7 +6387,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-February 24, 2012
+February 25, 2012
 
 .\" end of man page
 
