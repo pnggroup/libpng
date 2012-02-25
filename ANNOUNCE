@@ -1,5 +1,5 @@
 
-Libpng 1.5.10beta02 - February 24, 2012
+Libpng 1.5.10beta02 - February 25, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -37,12 +37,13 @@ Version 1.5.10beta01 [February 24, 2012]
   Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
   Added PNG_SAFE_LIMITS feature to pnglibconf.dfa and code in pngconf.h
     to reset the user limits to safe ones if PNG_SAFE_LIMITS is defined.
-    To enable, use "CPPFLAGS=-DPNG_SAFE_LIMITS_SUPPORTED=" on the configure
+    To enable, use "CPPFLAGS=-DPNG_SAFE_LIMITS_SUPPORTED" on the configure
     command or put "#define PNG_SAFE_LIMITS_SUPPORTED" in pnglibconf.h.
   Revised the SAFE_LIMITS feature to be the same as the feature in libpng16.
   Added information about the new limits in the manual.
 
-Version 1.5.10beta02 [February 24, 2012]
+Version 1.5.10beta02 [February 25, 2012]
+  Updated Makefile.in
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
