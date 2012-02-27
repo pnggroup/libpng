@@ -1,8 +1,8 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.5.7 [December 15, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.10 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1065,12 +1065,6 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
-
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-#ifdef PNG_TEXT_SUPPORTED
-   png_free(png_ptr, png_ptr->current_text);
-#endif /* PNG_TEXT_SUPPORTED */
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
    /* Save the important info out of the png_struct, in case it is
     * being used again.
