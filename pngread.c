@@ -911,12 +911,6 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-#ifdef PNG_TEXT_SUPPORTED
-   png_free(png_ptr, png_ptr->current_text);
-#endif /* PNG_TEXT_SUPPORTED */
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
-
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    png_free(png_ptr, png_ptr->unknown_chunk.data);
 #endif

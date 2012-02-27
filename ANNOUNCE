@@ -235,6 +235,8 @@ Version 1.6.0beta14 [February 27, 2012]
   Updated Makefile.in
 
 Version 1.6.0beta15 [February 27, 2012]
+  Removed unused "current_text" members of png_struct and the png_free()
+    of png_ptr->current_text from pngread.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
