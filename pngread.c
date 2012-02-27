@@ -1300,12 +1300,6 @@ png_read_destroy(png_structp png_ptr, png_infop info_ptr,
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-#ifdef PNG_TEXT_SUPPORTED
-   png_free(png_ptr, png_ptr->current_text);
-#endif /* PNG_TEXT_SUPPORTED */
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
-
    /* Save the important info out of the png_struct, in case it is
     * being used again.
     */
