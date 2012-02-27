@@ -2759,6 +2759,8 @@ version 1.2.48beta01 [February 27, 2012]
     causing out-of-bounds read in png_set_sCAL() because of failure to copy
     the string terminators (Franke Busse).
 
+version 1.2.48beta02 [February 27, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
