@@ -42,7 +42,7 @@ BEGIN{
    comment=start cx             # Comment start
    cend="*/" end                # Comment end
    def=start "#define PNG_" ct  # Arbitrary define
-   sup=ct "_SUPPORTED" end      # end supported option
+   sup=ct "_SUPPORTED 1" end    # end supported option
    und=comment "#undef PNG_" ct # Unsupported option
    une=ct "_SUPPORTED" cend     # end unsupported option
    error=start "ERROR:"         # error message
