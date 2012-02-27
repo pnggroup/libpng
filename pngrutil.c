@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.48 [February 22, 2012]
+ * Last changed in libpng 1.2.48 [February 27, 2012]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -247,8 +247,8 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
       {
          if (output != 0 && output_size > count)
          {
-            int copy = output_size - count;
-            if (avail < copy) copy = avail;
+            png_size_t copy = output_size - count;
+            if ((png_size_t) avail < copy) copy = (png_size_t) avail;
             png_memcpy(output + count, png_ptr->zbuf, copy);
          }
          count += avail;
@@ -1858,11 +1858,11 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       png_ptr->chunkdata = NULL;
       return;
    }
-   png_memcpy(swidth, ep, (png_size_t)png_strlen(ep));
+   png_memcpy(swidth, ep, (png_size_t)png_strlen(ep) + 1);
 #endif
 #endif
 
-   for (ep = png_ptr->chunkdata; *ep; ep++)
+   for (ep = png_ptr->chunkdata + 1; *ep; ep++)
       /* Empty loop */ ;
    ep++;
 
@@ -1902,7 +1902,7 @@ png_handle_sCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
       return;
    }
-   png_memcpy(sheight, ep, (png_size_t)png_strlen(ep));
+   png_memcpy(sheight, ep, (png_size_t)png_strlen(ep) + 1);
 #endif
 #endif
 

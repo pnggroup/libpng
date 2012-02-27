@@ -1,5 +1,5 @@
 
-Libpng 1.2.48beta01 - February 22, 2012
+Libpng 1.2.48beta01 - February 27, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,13 +42,17 @@ Other information:
 
 Changes since the last public release (1.2.46):
 
-version 1.2.48beta01 [February 22, 2012]
+version 1.2.48beta01 [February 27, 2012]
   Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
   Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
     pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
     now that png_ptr->buffer is inaccessible to applications, the special
     handling is no longer useful.
   Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
+  Fixed incorrect type (int copy should be png_size_t copy) in png_inflate().
+  Fixed off-by-one bug in png_handle_sCAL() when using fixed point arithmetic,
+    causing out-of-bounds read in png_set_sCAL() because of failure to copy
+    the string terminators (Franke Busse).
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

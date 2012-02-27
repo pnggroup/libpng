@@ -2741,17 +2741,23 @@ version 1.2.47beta01 [February 17, 2012]
 
 version 1.0.57rc01 and 1.2.47rc01 [February 17, 2012]
   Fixed CVE-2011-3026 buffer overrun bug.
+  Fixed CVE-2011-3026 buffer overrun bug.  This bug was introduced when
+    iCCP chunk support was added at libpng-1.0.6.
 
 version 1.0.57 and 1.2.47 [February 18, 2012]
   No changes.
 
-version 1.2.48beta01 [February 22, 2012]
+version 1.2.48beta01 [February 27, 2012]
   Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
   Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
     pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
     now that png_ptr->buffer is inaccessible to applications, the special
     handling is no longer useful.
   Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
+  Fixed incorrect type (int copy should be png_size_t copy) in png_inflate().
+  Fixed off-by-one bug in png_handle_sCAL() when using fixed point arithmetic,
+    causing out-of-bounds read in png_set_sCAL() because of failure to copy
+    the string terminators (Franke Busse).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
