@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.48beta01 - February 20, 2012
+ * libpng version 1.2.48beta01 - February 27, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -10,7 +10,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.48beta01 - February 20, 2012: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.48beta01 - February 27, 2012: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -307,7 +307,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.48beta01, February 20, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.2.48beta01, February 27, 2012, are
  * Copyright (c) 2004, 2006-2011 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -419,7 +419,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 20, 2012
+ *    February 27, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -483,7 +483,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.2.48beta01"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.48beta01 - February 20, 2012\n"
+   " libpng version 1.2.48beta01 - February 27, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
