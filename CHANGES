@@ -2853,6 +2853,7 @@ version 1.4.10beta01 [February 27, 2011]
     the string terminators (Franke Busse).
 
 version 1.4.10beta02 [February 27, 2012]
+  Removed the png_free() of unused png_ptr->current_text from pngread.c.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
