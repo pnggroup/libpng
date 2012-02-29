@@ -37,6 +37,20 @@
 
 #include "../tools/sRGB.h"
 
+/* KNOWN ISSUES
+ *
+ * These defines switch on alternate algorithms for format convertions to match
+ * the current libpng implementation; they are set to allow pngstest to pass
+ * even though libpng is producing answers that are not as correct as they
+ * should be.
+ */
+#define ALLOW_UNUSED_GPC 0
+   /* If true include unused static GPC functions and declare an external array
+    * of them to hide the fact that they are unused.  This is for development
+    * use while testing the correct function to use to take into account libpng
+    * misbehavior, such as using a simple power law to correct sRGB to linear.
+    */
+
 /* The following is to support direct compilation of this file as C++ */
 #ifdef __cplusplus
 #  define voidcast(type, value) static_cast<type>(value)
@@ -107,8 +121,27 @@ u16d(double d)
 }
 
 /* sRGB support: use exact calculations rounded to the nearest int, see the
- * fesetround() call in main().
+ * fesetround() call in main().  sRGB_to_d optimizes the 8 to 16-bit convertion.
  */
+static double sRGB_to_d[256];
+static double g22_to_d[256];
+
+static void
+init_sRGB_to_d(void)
+{
+   int i;
+
+   sRGB_to_d[0] = 0;
+   for (i=1; i<255; ++i)
+      sRGB_to_d[i] = linear_from_sRGB(i/255.);
+   sRGB_to_d[255] = 1;
+
+   g22_to_d[0] = 0;
+   for (i=1; i<255; ++i)
+      g22_to_d[i] = pow(i/255., 1/.45455);
+   g22_to_d[255] = 1;
+}
+
 static png_byte
 sRGB(double linear /*range 0.0 .. 1.0*/)
 {
@@ -121,10 +154,11 @@ isRGB(int fixed_linear)
    return sRGB(fixed_linear / 65535.);
 }
 
+#if 0 /* not used */
 static png_byte
 unpremultiply(int component, int alpha)
 {
-   if (alpha == 0)
+   if (alpha <= component)
       return 255; /* Arbitrary, but consistent with the libpng code */
 
    else if (alpha >= 65535)
@@ -133,12 +167,33 @@ unpremultiply(int component, int alpha)
    else
       return sRGB((double)component / alpha);
 }
+#endif
+
+static png_uint_16
+ilinear(int fixed_srgb)
+{
+   return u16d(65535 * sRGB_to_d[fixed_srgb]);
+}
 
 static png_uint_16
 ilineara(int fixed_srgb, int alpha)
 {
-   return u16d((257 * alpha) * linear_from_sRGB(fixed_srgb / 255.));
+   return u16d((257 * alpha) * sRGB_to_d[fixed_srgb]);
 }
+
+static png_uint_16
+ilinear_g22(int fixed_srgb)
+{
+   return u16d(65535 * g22_to_d[fixed_srgb]);
+}
+
+#if ALLOW_UNUSED_GPC
+static png_uint_16
+ilineara_g22(int fixed_srgb, int alpha)
+{
+   return u16d((257 * alpha) * g22_to_d[fixed_srgb]);
+}
+#endif
 
 static double
 YfromRGBint(int ir, int ig, int ib)
@@ -149,6 +204,7 @@ YfromRGBint(int ir, int ig, int ib)
    return YfromRGB(r, g, b);
 }
 
+#if 0 /* unused */
 /* The error that results from using a 2.2 power law in place of the correct
  * sRGB transform, given an 8-bit value which might be either sRGB or power-law.
  */
@@ -159,7 +215,7 @@ power_law_error8(int value)
    {
       double vd = value / 255.;
       double e = fabs(
-         pow(linear_from_sRGB(vd), 1/2.2) - sRGB_from_linear(pow(vd, 2.2)));
+         pow(sRGB_to_d[value], 1/2.2) - sRGB_from_linear(pow(vd, 2.2)));
 
       /* Always allow an extra 1 here for rounding errors */
       e = 1+floor(255 * e);
@@ -239,6 +295,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 
    return 0;
 }
+#endif /* unused */
 
 #define READ_FILE 1      /* else memory */
 #define USE_STDIO 2      /* else use file name */
@@ -246,6 +303,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 #define VERBOSE 8
 #define KEEP_TMPFILES 16 /* else delete temporary files */
 #define KEEP_GOING 32
+#define ACCUMULATE 64
 
 static void
 print_opts(png_uint_32 opts)
@@ -260,6 +318,8 @@ print_opts(png_uint_32 opts)
       printf(" --preserve");
    if (opts & KEEP_GOING)
       printf(" --keep-going");
+   if (opts & ACCUMULATE)
+      printf(" --accumulate");
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -664,208 +724,1588 @@ checkopaque(Image *image)
  */
 typedef struct
 {
-   png_uint_32 format;
-   png_uint_16 r16, g16, b16, y16, a16;
-   png_byte    r8, g8, b8, y8, a8;
+   /* The components, for grayscale images the gray value is in 'g' and if alpha
+    * is not present 'a' is set to 255 or 65535 according to format.
+    */
+   int         r, g, b, a;
 } Pixel;
 
-/* This is not particularly fast, but it works.  The input has pixels stored
- * either as pre-multiplied linear 16-bit or as sRGB encoded non-pre-multiplied
- * 8-bit values.  The routine reads either and does exact conversion to the
- * other format.
- *
- * Grayscale values are mapped r==g==b=y.  Non-alpha images have alpha
- * 65535/255.  Color images have a correctly calculated Y value using the sRGB Y
- * calculation.
- *
- * Colors are looked up in the color map if required.
- *
- * The API returns false if an error is detected; this can only be if the alpha
- * value is less than the component in the linear case.
- */
-static int
-get_pixel(Image *image, Pixel *pixel, png_const_bytep pp)
+typedef struct
 {
-   png_uint_32 format = image->image.format;
-   int result = 1;
+   /* The background as the original sRGB 8-bit value converted to the final
+    * integer format and as a double precision linear value in the range 0..1
+    * for with partially transparent pixels.
+    */
+   int ir, ig, ib;
+   double dr, dg, db; /* linear r,g,b scaled to 0..1 */
+} Background;
 
-   if (format & PNG_FORMAT_FLAG_COLORMAP)
-      pp = (png_bytep)image->colormap + PNG_IMAGE_SAMPLE_SIZE(format) * *pp;
+/* Basic image formats; control the data but not the layout thereof. */
+#define BASE_FORMATS\
+   (PNG_FORMAT_FLAG_ALPHA|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_LINEAR)
 
-   pixel->format = format;
+/* Read a Pixel from a buffer.  The code below stores the correct routine for
+ * the format in a function pointer, these are the routines:
+ */
+static void
+gp_g8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
 
-   /* Initialize the alpha values for opaque: */
-   pixel->a8 = 255;
-   pixel->a16 = 65535;
-
-   switch (PNG_IMAGE_SAMPLE_COMPONENT_SIZE(format))
-   {
-      default:
-         fflush(stdout);
-         fprintf(stderr, "pngstest: impossible sample component size: %lu\n",
-            (unsigned long)PNG_IMAGE_SAMPLE_COMPONENT_SIZE(format));
-         exit(1);
-
-      case sizeof (png_uint_16):
-         {
-            png_const_uint_16p up = (png_const_uint_16p)pp;
-
-            if ((format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
-               (format & PNG_FORMAT_FLAG_ALPHA) != 0)
-               pixel->a16 = *up++;
-
-            if ((format & PNG_FORMAT_FLAG_COLOR) != 0)
-            {
-               if ((format & PNG_FORMAT_FLAG_BGR) != 0)
-               {
-                  pixel->b16 = *up++;
-                  pixel->g16 = *up++;
-                  pixel->r16 = *up++;
-               }
-
-               else
-               {
-                  pixel->r16 = *up++;
-                  pixel->g16 = *up++;
-                  pixel->b16 = *up++;
-               }
-
-               /* Because the 'Y' calculation is linear the pre-multiplication
-                * of the r16,g16,b16 values can be ignored.
-                */
-               pixel->y16 = u16d(YfromRGBint(pixel->r16, pixel->g16,
-                  pixel->b16));
-            }
-
-            else
-               pixel->r16 = pixel->g16 = pixel->b16 = pixel->y16 = *up++;
-
-            if ((format & PNG_FORMAT_FLAG_AFIRST) == 0 &&
-               (format & PNG_FORMAT_FLAG_ALPHA) != 0)
-               pixel->a16 = *up++;
-
-            /* 'a1' is 1/65535 * 1/alpha, for alpha in the range 0..1 */
-            if (pixel->a16 == 0)
-            {
-               if (pixel->r16 > 0 || pixel->g16 > 0 || pixel->b16 > 0)
-                  result = 0;
-
-               pixel->r8 = pixel->g8 = pixel->b8 = pixel->y8 = 255;
-               pixel->a8 = 0;
-            }
-
-            else
-            {
-               double a1 = 1. / pixel->a16;
-
-               if (pixel->a16 < pixel->r16)
-                  result = 0, pixel->r8 = 255;
-               else
-                  pixel->r8 = sRGB(pixel->r16 * a1);
-
-               if (pixel->a16 < pixel->g16)
-                  result = 0, pixel->g8 = 255;
-               else
-                  pixel->g8 = sRGB(pixel->g16 * a1);
-
-               if (pixel->a16 < pixel->b16)
-                  result = 0, pixel->b8 = 255;
-               else
-                  pixel->b8 = sRGB(pixel->b16 * a1);
-
-               if (pixel->a16 < pixel->y16)
-                  result = 0, pixel->y8 = 255;
-               else
-                  pixel->y8 = sRGB(pixel->y16 * a1);
-
-               /* The 8-bit alpha value is just a16/257. */
-               pixel->a8 = u8d(pixel->a16 / 257.);
-            }
-         }
-         break;
-
-      case sizeof (png_byte):
-         {
-            double y;
-
-            if ((format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
-               (format & PNG_FORMAT_FLAG_ALPHA) != 0)
-               pixel->a8 = *pp++;
-
-            if ((format & PNG_FORMAT_FLAG_COLOR) != 0)
-            {
-               if ((format & PNG_FORMAT_FLAG_BGR) != 0)
-               {
-                  pixel->b8 = *pp++;
-                  pixel->g8 = *pp++;
-                  pixel->r8 = *pp++;
-               }
-
-               else
-               {
-                  pixel->r8 = *pp++;
-                  pixel->g8 = *pp++;
-                  pixel->b8 = *pp++;
-               }
-
-               /* The y8 value requires convert to linear, convert to &, convert
-                * to sRGB:
-                */
-               y = YfromRGB(linear_from_sRGB(pixel->r8/255.),
-                  linear_from_sRGB(pixel->g8/255.),
-                  linear_from_sRGB(pixel->b8/255.));
-
-               pixel->y8 = sRGB(y);
-            }
-
-            else
-            {
-               pixel->r8 = pixel->g8 = pixel->b8 = pixel->y8 = *pp++;
-               y = linear_from_sRGB(pixel->y8/255.);
-            }
-
-            if ((format & PNG_FORMAT_FLAG_AFIRST) == 0 &&
-               (format & PNG_FORMAT_FLAG_ALPHA) != 0)
-               pixel->a8 = *pp++;
-
-            pixel->r16 = ilineara(pixel->r8, pixel->a8);
-            pixel->g16 = ilineara(pixel->g8, pixel->a8);
-            pixel->b16 = ilineara(pixel->b8, pixel->a8);
-            pixel->y16 = u16d((257 * pixel->a8) * y);
-            pixel->a16 = (png_uint_16)(pixel->a8 * 257);
-         }
-         break;
-   }
-
-   return result;
+   p->r = p->g = p->b = pp[0];
+   p->a = 255;
 }
 
-/* Two pixels are equal if the value of the left equals the value of the right
- * as defined by the format of the right, or if it is close enough given the
- * permitted error limits.  If the formats match the values should (exactly!)
- *
- * If the right pixel has no alpha channel but the left does, it was removed
- * somehow.  For an 8-bit *output* removal uses the background color if given
- * else the default (the value filled in to the row buffer by allocbuffer()
- * above.)
- *
- * The result of this function is NULL if the pixels match else a reason why
- * they don't match.
- *
- * Error values below are inflated because some of the conversions are done
- * inside libpng using a simple power law transform of .45455 and others are
- * done in the simplified API code using the correct sRGB tables.  This needs
- * to be made consistent.
- */
-static int error_to_linear = 811; /* by experiment */
-static int error_to_linear_grayscale = 424; /* by experiment */
-static int error_to_sRGB = 6; /* by experiment */
-static int error_to_sRGB_grayscale = 17; /* libpng error by calculation +
-                                            2 by experiment */
-static int error_in_compose = 2; /* by experiment */
-static int error_in_premultiply = 1;
+static void
+gp_ga8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
 
-/* The following is *just* the result of a round trip from 8-bit sRGB to linear
+   p->r = p->g = p->b = pp[0];
+   p->a = pp[1];
+}
+
+static void
+gp_ag8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = p->g = p->b = pp[1];
+   p->a = pp[0];
+}
+
+static void
+gp_rgb8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = pp[0];
+   p->g = pp[1];
+   p->b = pp[2];
+   p->a = 255;
+}
+
+static void
+gp_bgr8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = pp[2];
+   p->g = pp[1];
+   p->b = pp[0];
+   p->a = 255;
+}
+
+static void
+gp_rgba8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = pp[0];
+   p->g = pp[1];
+   p->b = pp[2];
+   p->a = pp[3];
+}
+
+static void
+gp_bgra8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = pp[2];
+   p->g = pp[1];
+   p->b = pp[0];
+   p->a = pp[3];
+}
+
+static void
+gp_argb8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = pp[1];
+   p->g = pp[2];
+   p->b = pp[3];
+   p->a = pp[0];
+}
+
+static void
+gp_abgr8(Pixel *p, png_const_voidp pb)
+{
+   png_const_bytep pp = voidcast(png_const_bytep, pb);
+
+   p->r = pp[3];
+   p->g = pp[2];
+   p->b = pp[1];
+   p->a = pp[0];
+}
+
+static void
+gp_g16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = p->g = p->b = pp[0];
+   p->a = 65535;
+}
+
+static void
+gp_ga16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = p->g = p->b = pp[0];
+   p->a = pp[1];
+}
+
+static void
+gp_ag16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = p->g = p->b = pp[1];
+   p->a = pp[0];
+}
+
+static void
+gp_rgb16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = pp[0];
+   p->g = pp[1];
+   p->b = pp[2];
+   p->a = 65535;
+}
+
+static void
+gp_bgr16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = pp[2];
+   p->g = pp[1];
+   p->b = pp[0];
+   p->a = 65535;
+}
+
+static void
+gp_rgba16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = pp[0];
+   p->g = pp[1];
+   p->b = pp[2];
+   p->a = pp[3];
+}
+
+static void
+gp_bgra16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = pp[2];
+   p->g = pp[1];
+   p->b = pp[0];
+   p->a = pp[3];
+}
+
+static void
+gp_argb16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = pp[1];
+   p->g = pp[2];
+   p->b = pp[3];
+   p->a = pp[0];
+}
+
+static void
+gp_abgr16(Pixel *p, png_const_voidp pb)
+{
+   png_const_uint_16p pp = voidcast(png_const_uint_16p, pb);
+
+   p->r = pp[3];
+   p->g = pp[2];
+   p->b = pp[1];
+   p->a = pp[0];
+}
+
+/* Given a format, return the correct one of the above functions. */
+static void (*
+get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
+{
+   /* The color-map flag is irrelevant here - the caller of the function
+    * returned must either pass the buffer or, for a color-mapped image, the
+    * correct entry in the color-map.
+    */
+   if (format & PNG_FORMAT_FLAG_LINEAR)
+   {
+      if (format & PNG_FORMAT_FLAG_COLOR)
+      {
+         if (format & PNG_FORMAT_FLAG_BGR)
+         {
+            if (format & PNG_FORMAT_FLAG_ALPHA)
+            {
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+                  return gp_abgr16;
+
+               else
+                  return gp_bgra16;
+            }
+
+            else
+               return gp_bgr16;
+         }
+
+         else
+         {
+            if (format & PNG_FORMAT_FLAG_ALPHA)
+            {
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+                  return gp_argb16;
+
+               else
+                  return gp_rgba16;
+            }
+
+            else
+               return gp_rgb16;
+         }
+      }
+
+      else
+      {
+         if (format & PNG_FORMAT_FLAG_ALPHA)
+         {
+            if (format & PNG_FORMAT_FLAG_AFIRST)
+               return gp_ag16;
+
+            else
+               return gp_ga16;
+         }
+
+         else
+            return gp_g16;
+      }
+   }
+
+   else
+   {
+      if (format & PNG_FORMAT_FLAG_COLOR)
+      {
+         if (format & PNG_FORMAT_FLAG_BGR)
+         {
+            if (format & PNG_FORMAT_FLAG_ALPHA)
+            {
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+                  return gp_abgr8;
+
+               else
+                  return gp_bgra8;
+            }
+
+            else
+               return gp_bgr8;
+         }
+
+         else
+         {
+            if (format & PNG_FORMAT_FLAG_ALPHA)
+            {
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+                  return gp_argb8;
+
+               else
+                  return gp_rgba8;
+            }
+
+            else
+               return gp_rgb8;
+         }
+      }
+
+      else
+      {
+         if (format & PNG_FORMAT_FLAG_ALPHA)
+         {
+            if (format & PNG_FORMAT_FLAG_AFIRST)
+               return gp_ag8;
+
+            else
+               return gp_ga8;
+         }
+
+         else
+            return gp_g8;
+      }
+   }
+}
+
+/* Convertion between pixel formats.  The code above effectively eliminates the
+ * component ordering changes leaving three basic changes:
+ *
+ * 1) Remove an alpha channel by pre-multiplication or compositing on a
+ *    background color.  (Adding an alpha channel is a no-op.)
+ *
+ * 2) Remove color by mapping to grayscale.  (Grayscale to color is a no-op.)
+ *
+ * 3) Convert between 8-bit and 16-bit components.  (Both directtions are
+ *    relevant.)
+ *
+ * This gives the following base format convertion matrix:
+ *
+ *   OUT:    ----- 8-bit -----    ----- 16-bit -----
+ *   IN     G    GA   RGB  RGBA  G    GA   RGB  RGBA
+ *  8 G     .    .    .    .     lin  lin  lin  lin
+ *  8 GA    bckg .    bckc .     pre' pre  pre' pre
+ *  8 RGB   g8   g8   .    .     glin glin lin  lin
+ *  8 RGBA  g8b  g8   bckc .     gpr' gpre pre' pre
+ * 16 G     sRGB sRGB sRGB sRGB  .    .    .    .
+ * 16 GA    b16g unpg b16c unpc  A    .    A    .
+ * 16 RGB   sG   sG   sRGB sRGB  g16  g16  .    .
+ * 16 RGBA  gb16 sGp  cb16 sCp   g16  g16' A    .
+ *
+ *  8-bit to 8-bit:
+ * bckg: composite on gray background
+ * bckc: composite on color background
+ * g8:   convert sRGB components to sRGB grayscale
+ * g8b:  convert sRGB components to grayscale and composite on gray background
+ *
+ *  8-bit to 16-bit:
+ * lin:  make sRGB components linear, alpha := 65535
+ * pre:  make sRGB components linear and premultiply by alpha  (scale alpha)
+ * pre': as 'pre' but alpha := 65535
+ * glin: make sRGB components linear, convert to grayscale, alpha := 65535
+ * gpre: make sRGB components grayscale and linear and premultiply by alpha
+ * gpr': as 'gpre' but alpha := 65535
+ *
+ *  16-bit to 8-bit:
+ * sRGB: convert linear components to sRGB, alpha := 255
+ * unpg: unpremultiply gray component and convert to sRGB (scale alpha)
+ * unpc: unpremultiply color components and convert to sRGB (scale alpha)
+ * b16g: composite linear onto gray background and convert the result to sRGB
+ * b16c: composite linear onto color background and convert the result to sRGB
+ * sG:   convert linear RGB to sRGB grayscale
+ * sGp:  unpremultiply RGB then convert to sRGB grayscale
+ * sCp:  unpremultiply RGB then convert to sRGB
+ * gb16: composite linear onto background and convert to sRGB grayscale
+ *       (order doesn't matter, the composite and grayscale operations permute)
+ * cb16: composite linear onto background and convert to sRGB
+ *
+ *  16-bit to 16-bit:
+ * A:    set alpha to 65535
+ * g16:  convert linear RGB to linear grayscale (alpha := 65535)
+ * g16': as 'g16' but alpha is unchanged
+ */
+/* Simple copy: */
+static void
+gpc_noop(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+   out->r = in->r;
+   out->g = in->g;
+   out->b = in->b;
+   out->a = in->a;
+}
+
+#if ALLOW_UNUSED_GPC
+static void
+gpc_nop8(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+   if (in->a == 0)
+      out->r = out->g = out->b = 255;
+
+   else
+   {
+      out->r = in->r;
+      out->g = in->g;
+      out->b = in->b;
+   }
+
+   out->a = in->a;
+}
+#endif
+
+#if ALLOW_UNUSED_GPC
+static void
+gpc_nop6(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+   if (in->a == 0)
+      out->r = out->g = out->b = 65535;
+
+   else
+   {
+      out->r = in->r;
+      out->g = in->g;
+      out->b = in->b;
+   }
+
+   out->a = in->a;
+}
+#endif
+
+/* 8-bit to 8-bit convertions */
+/* bckg: composite on gray background */
+static void
+gpc_bckg(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+      out->r = out->g = out->b = back->ig;
+
+   else if (in->a >= 255)
+      out->r = out->g = out->b = in->g;
+
+   else
+   {
+      double a = in->a / 255.;
+
+      out->r = out->g = out->b = sRGB(sRGB_to_d[in->g] * a + back->dg * (1-a));
+   }
+
+   out->a = 255;
+}
+
+/* bckc: composite on color background */
+static void
+gpc_bckc(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+   {
+      out->r = back->ir;
+      out->g = back->ig;
+      out->b = back->ib;
+   }
+
+   else if (in->a >= 255)
+   {
+      out->r = in->r;
+      out->g = in->g;
+      out->b = in->b;
+   }
+
+   else
+   {
+      double a = in->a / 255.;
+
+      out->r = sRGB(sRGB_to_d[in->r] * a + back->dr * (1-a));
+      out->g = sRGB(sRGB_to_d[in->g] * a + back->dg * (1-a));
+      out->b = sRGB(sRGB_to_d[in->b] * a + back->db * (1-a));
+   }
+
+   out->a = 255;
+}
+
+/* g8: convert sRGB components to sRGB grayscale */
+static void
+gpc_g8(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = in->g;
+
+   else
+      out->r = out->g = out->b =
+         sRGB(YfromRGB(sRGB_to_d[in->r], sRGB_to_d[in->g], sRGB_to_d[in->b]));
+
+   out->a = in->a;
+}
+
+/* g8b: convert sRGB components to grayscale and composite on gray background */
+static void
+gpc_g8b(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+      out->r = out->g = out->b = back->ig;
+
+   else if (in->a >= 255)
+   {
+      if (in->r == in->g && in->g == in->b)
+         out->r = out->g = out->b = in->g;
+
+      else
+         out->r = out->g = out->b = sRGB(YfromRGB(
+            sRGB_to_d[in->r], sRGB_to_d[in->g], sRGB_to_d[in->b]));
+   }
+
+   else
+   {
+      double a = in->a/255.;
+
+      out->r = out->g = out->b = sRGB(a * YfromRGB(sRGB_to_d[in->r],
+         sRGB_to_d[in->g], sRGB_to_d[in->b]) + back->dg * (1-a));
+   }
+
+   out->a = 255;
+}
+
+/* 8-bit to 16-bit convertions */
+/* lin: make sRGB components linear, alpha := 65535 */
+static void
+gpc_lin(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = ilinear(in->r);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = ilinear(in->b);
+   }
+
+   else
+   {
+      out->g = ilinear(in->g);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = ilinear(in->b);
+   }
+
+   out->a = 65535;
+}
+
+/* pre: make sRGB components linear and premultiply by alpha (scale alpha) */
+static void
+gpc_pre(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = ilineara(in->r, in->a);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = ilineara(in->b, in->a);
+   }
+
+   else
+   {
+      out->g = ilineara(in->g, in->a);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = ilineara(in->b, in->a);
+   }
+
+   out->a = in->a * 257;
+}
+
+/* pre': as 'pre' but alpha := 65535 */
+static void
+gpc_preq(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = ilineara(in->r, in->a);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = ilineara(in->b, in->a);
+   }
+
+   else
+   {
+      out->g = ilineara(in->g, in->a);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = ilineara(in->b, in->a);
+   }
+
+   out->a = 65535;
+}
+
+/* glin: make sRGB components linear, convert to grayscale, alpha := 65535 */
+static void
+gpc_glin(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = ilinear(in->g);
+
+   else
+      out->r = out->g = out->b = u16d(65535 *
+         YfromRGB(sRGB_to_d[in->r], sRGB_to_d[in->g], sRGB_to_d[in->b]));
+
+   out->a = 65535;
+}
+
+/* gpre: make sRGB components grayscale and linear and premultiply by alpha */
+static void
+gpc_gpre(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = ilineara(in->g, in->a);
+
+   else
+      out->r = out->g = out->b = u16d(in->a * 257 *
+         YfromRGB(sRGB_to_d[in->r], sRGB_to_d[in->g], sRGB_to_d[in->b]));
+
+   out->a = 257 * in->a;
+}
+
+/* gpr': as 'gpre' but alpha := 65535 */
+static void
+gpc_gprq(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = ilineara(in->g, in->a);
+
+   else
+      out->r = out->g = out->b = u16d(in->a * 257 *
+         YfromRGB(sRGB_to_d[in->r], sRGB_to_d[in->g], sRGB_to_d[in->b]));
+
+   out->a = 65535;
+}
+
+/* 8-bit to 16-bit convertions for gAMA 45455 encoded values */
+/* Lin: make gAMA 45455 components linear, alpha := 65535 */
+static void
+gpc_Lin(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = ilinear_g22(in->r);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = ilinear_g22(in->b);
+   }
+
+   else
+   {
+      out->g = ilinear_g22(in->g);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = ilinear_g22(in->b);
+   }
+
+   out->a = 65535;
+}
+
+#if ALLOW_UNUSED_GPC
+/* Pre: make gAMA 45455 components linear and premultiply by alpha (scale alpha)
+ */
+static void
+gpc_Pre(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = ilineara_g22(in->r, in->a);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = ilineara_g22(in->b, in->a);
+   }
+
+   else
+   {
+      out->g = ilineara_g22(in->g, in->a);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = ilineara_g22(in->b, in->a);
+   }
+
+   out->a = in->a * 257;
+}
+#endif
+
+#if ALLOW_UNUSED_GPC
+/* Pre': as 'Pre' but alpha := 65535 */
+static void
+gpc_Preq(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = ilineara_g22(in->r, in->a);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = ilineara_g22(in->b, in->a);
+   }
+
+   else
+   {
+      out->g = ilineara_g22(in->g, in->a);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = ilineara_g22(in->b, in->a);
+   }
+
+   out->a = 65535;
+}
+#endif
+
+#if ALLOW_UNUSED_GPC
+/* Glin: make gAMA 45455 components linear, convert to grayscale, alpha := 65535
+ */
+static void
+gpc_Glin(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = ilinear_g22(in->g);
+
+   else
+      out->r = out->g = out->b = u16d(65535 *
+         YfromRGB(g22_to_d[in->r], g22_to_d[in->g], g22_to_d[in->b]));
+
+   out->a = 65535;
+}
+#endif
+
+#if ALLOW_UNUSED_GPC
+/* Gpre: make gAMA 45455 components grayscale and linear and premultiply by
+ * alpha.
+ */
+static void
+gpc_Gpre(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = ilineara_g22(in->g, in->a);
+
+   else
+      out->r = out->g = out->b = u16d(in->a * 257 *
+         YfromRGB(g22_to_d[in->r], g22_to_d[in->g], g22_to_d[in->b]));
+
+   out->a = 257 * in->a;
+}
+#endif
+
+#if ALLOW_UNUSED_GPC
+/* Gpr': as 'Gpre' but alpha := 65535 */
+static void
+gpc_Gprq(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->r == in->g && in->g == in->b)
+      out->r = out->g = out->b = ilineara_g22(in->g, in->a);
+
+   else
+      out->r = out->g = out->b = u16d(in->a * 257 *
+         YfromRGB(g22_to_d[in->r], g22_to_d[in->g], g22_to_d[in->b]));
+
+   out->a = 65535;
+}
+#endif
+
+/* 16-bit to 8-bit convertions */
+/* sRGB: convert linear components to sRGB, alpha := 255 */
+static void
+gpc_sRGB(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = isRGB(in->r);
+
+   if (in->g == in->r)
+   {
+      out->g = out->r;
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else
+         out->b = isRGB(in->b);
+   }
+
+   else
+   {
+      out->g = isRGB(in->g);
+
+      if (in->b == in->r)
+         out->b = out->r;
+
+      else if (in->b == in->g)
+         out->b = out->g;
+
+      else
+         out->b = isRGB(in->b);
+   }
+
+   out->a = 255;
+}
+
+/* unpg: unpremultiply gray component and convert to sRGB (scale alpha) */
+static void
+gpc_unpg(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->a <= 128)
+   {
+      out->r = out->g = out->b = 255;
+      out->a = 0;
+   }
+
+   else
+   {
+      out->r = out->g = out->b = sRGB((double)in->g / in->a);
+      out->a = u8d(in->a / 257.);
+   }
+}
+
+/* unpc: unpremultiply color components and convert to sRGB (scale alpha) */
+static void
+gpc_unpc(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->a <= 128)
+   {
+      out->r = out->g = out->b = 255;
+      out->a = 0;
+   }
+
+   else
+   {
+      out->r = sRGB((double)in->r / in->a);
+      out->g = sRGB((double)in->g / in->a);
+      out->b = sRGB((double)in->b / in->a);
+      out->a = u8d(in->a / 257.);
+   }
+}
+
+/* b16g: composite linear onto gray background and convert the result to sRGB */
+static void
+gpc_b16g(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+      out->r = out->g = out->b = back->ig;
+
+   else
+   {
+      double a = in->a/65535.;
+      double a1 = 1-a;
+
+      a /= 65535;
+      out->r = out->g = out->b = sRGB(in->g * a + back->dg * a1);
+   }
+
+   out->a = 255;
+}
+
+/* b16c: composite linear onto color background and convert the result to sRGB*/
+static void
+gpc_b16c(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+   {
+      out->r = back->ir;
+      out->g = back->ig;
+      out->b = back->ib;
+   }
+
+   else
+   {
+      double a = in->a/65535.;
+      double a1 = 1-a;
+
+      a /= 65535;
+      out->r = sRGB(in->r * a + back->dr * a1);
+      out->g = sRGB(in->g * a + back->dg * a1);
+      out->b = sRGB(in->b * a + back->db * a1);
+   }
+
+   out->a = 255;
+}
+
+/* sG: convert linear RGB to sRGB grayscale */
+static void
+gpc_sG(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   out->r = out->g = out->b = sRGB(YfromRGBint(in->r, in->g, in->b)/65535);
+   out->a = 255;
+}
+
+/* sGp: unpremultiply RGB then convert to sRGB grayscale */
+static void
+gpc_sGp(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->a <= 128)
+   {
+      out->r = out->g = out->b = 255;
+      out->a = 0;
+   }
+
+   else
+   {
+      out->r = out->g = out->b = sRGB(YfromRGBint(in->r, in->g, in->b)/in->a);
+      out->a = u8d(in->a / 257.);
+   }
+}
+
+/* sCp: unpremultiply RGB then convert to sRGB */
+static void
+gpc_sCp(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+
+   if (in->a <= 128)
+   {
+      out->r = out->g = out->b = 255;
+      out->a = 0;
+   }
+
+   else
+   {
+      out->r = sRGB((double)in->r / in->a);
+      out->g = sRGB((double)in->g / in->a);
+      out->b = sRGB((double)in->b / in->a);
+      out->a = u8d(in->a / 257.);
+   }
+}
+
+/* gb16: composite linear onto background and convert to sRGB grayscale */
+/*  (order doesn't matter, the composite and grayscale operations permute) */
+static void
+gpc_gb16(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+      out->r = out->g = out->b = back->ig;
+
+   else if (in->a >= 65535)
+      out->r = out->g = out->b = isRGB(in->g);
+
+   else
+   {
+      double a = in->a / 65535.;
+      double a1 = 1-a;
+
+      a /= 65535;
+      out->r = out->g = out->b = sRGB(in->g * a + back->dg * a1);
+   }
+
+   out->a = 255;
+}
+
+/* cb16: composite linear onto background and convert to sRGB */
+static void
+gpc_cb16(Pixel *out, const Pixel *in, const Background *back)
+{
+   if (in->a <= 0)
+      out->r = out->g = out->b = back->ig;
+
+   else if (in->a >= 65535)
+   {
+      out->r = isRGB(in->r);
+      out->g = isRGB(in->g);
+      out->b = isRGB(in->b);
+   }
+
+   else
+   {
+      double a = in->a / 65535.;
+      double a1 = 1-a;
+
+      a /= 65535;
+      out->r = sRGB(in->r * a + back->dr * a1);
+      out->g = sRGB(in->g * a + back->dg * a1);
+      out->b = sRGB(in->b * a + back->db * a1);
+   }
+
+   out->a = 255;
+}
+
+/* 16-bit to 16-bit convertions */
+/* A:    set alpha to 65535 */
+static void
+gpc_A(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+   out->r = in->r;
+   out->g = in->g;
+   out->b = in->b;
+   out->a = 65535;
+}
+
+/* g16:  convert linear RGB to linear grayscale (alpha := 65535) */
+static void
+gpc_g16(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+   out->r = out->g = out->b = u16d(YfromRGBint(in->r, in->g, in->b));
+   out->a = 65535;
+}
+
+/* g16': as 'g16' but alpha is unchanged */
+static void
+gpc_g16q(Pixel *out, const Pixel *in, const Background *back)
+{
+   (void)back;
+   out->r = out->g = out->b = u16d(YfromRGBint(in->r, in->g, in->b));
+   out->a = in->a;
+}
+
+#if ALLOW_UNUSED_GPC
+/* Unused functions (to hide them from GCC unused function warnings) */
+void (* const gpc_unused[])
+   (Pixel *out, const Pixel *in, const Background *back) =
+{
+   gpc_Pre, gpc_Preq, gpc_Glin, gpc_Gpre, gpc_Gprq, gpc_nop8, gpc_nop6
+};
+#endif
+
+/*   OUT:    ----- 8-bit -----    ----- 16-bit -----
+ *   IN     G    GA   RGB  RGBA  G    GA   RGB  RGBA
+ *  8 G     .    .    .    .     lin  lin  lin  lin
+ *  8 GA    bckg .    bckc .     pre' pre  pre' pre
+ *  8 RGB   g8   g8   .    .     glin glin lin  lin
+ *  8 RGBA  g8b  g8   bckc .     gpr' gpre pre' pre
+ * 16 G     sRGB sRGB sRGB sRGB  .    .    .    .
+ * 16 GA    b16g unpg b16c unpc  A    .    A    .
+ * 16 RGB   sG   sG   sRGB sRGB  g16  g16  .    .
+ * 16 RGBA  gb16 sGp  cb16 sCp   g16  g16' A    .
+ *
+ * The matrix is held in an array indexed thus:
+ *
+ *   gpc_fn[out_format & BASE_FORMATS][in_format & BASE_FORMATS];
+ */
+/* This will produce a compile time error if the FORMAT_FLAG values don't
+ * match the above matrix!
+ */
+#if PNG_FORMAT_FLAG_ALPHA == 1 && PNG_FORMAT_FLAG_COLOR == 2 &&\
+   PNG_FORMAT_FLAG_LINEAR == 4
+static void (* const gpc_fn[8/*in*/][8/*out*/])
+   (Pixel *out, const Pixel *in, const Background *back) =
+{
+/*out: G-8     GA-8     RGB-8    RGBA-8    G-16     GA-16   RGB-16  RGBA-16 */
+   {gpc_noop,gpc_noop,gpc_noop,gpc_noop, gpc_Lin, gpc_Lin, gpc_Lin, gpc_Lin },
+   {gpc_bckg,gpc_noop,gpc_bckc,gpc_noop, gpc_preq,gpc_pre, gpc_preq,gpc_pre },
+   {gpc_g8,  gpc_g8,  gpc_noop,gpc_noop, gpc_glin,gpc_glin,gpc_lin, gpc_lin },
+   {gpc_g8b, gpc_g8,  gpc_bckc,gpc_noop, gpc_gprq,gpc_gpre,gpc_preq,gpc_pre },
+   {gpc_sRGB,gpc_sRGB,gpc_sRGB,gpc_sRGB, gpc_noop,gpc_noop,gpc_noop,gpc_noop},
+   {gpc_b16g,gpc_unpg,gpc_b16c,gpc_unpc, gpc_A,   gpc_noop,gpc_A,   gpc_noop},
+   {gpc_sG,  gpc_sG,  gpc_sRGB,gpc_sRGB, gpc_g16, gpc_g16, gpc_noop,gpc_noop},
+   {gpc_gb16,gpc_sGp, gpc_cb16,gpc_sCp,  gpc_g16, gpc_g16q,gpc_A,   gpc_noop}
+};
+
+/* The array is repeated for the cases where both the input and output are color
+ * mapped because then different algorithms are used.
+ */
+static void (* const gpc_fn_colormapped[8/*in*/][8/*out*/])
+   (Pixel *out, const Pixel *in, const Background *back) =
+{
+/*out: G-8     GA-8     RGB-8    RGBA-8    G-16     GA-16   RGB-16  RGBA-16 */
+   {gpc_noop,gpc_noop,gpc_noop,gpc_noop, gpc_lin, gpc_lin, gpc_lin, gpc_lin },
+   {gpc_bckg,gpc_noop,gpc_bckc,gpc_noop, gpc_preq,gpc_pre, gpc_preq,gpc_pre },
+   {gpc_g8,  gpc_g8,  gpc_noop,gpc_noop, gpc_glin,gpc_glin,gpc_lin, gpc_lin },
+   {gpc_g8b, gpc_g8,  gpc_bckc,gpc_noop, gpc_gprq,gpc_gpre,gpc_preq,gpc_pre },
+   {gpc_sRGB,gpc_sRGB,gpc_sRGB,gpc_sRGB, gpc_noop,gpc_noop,gpc_noop,gpc_noop},
+   {gpc_b16g,gpc_unpg,gpc_b16c,gpc_unpc, gpc_A,   gpc_noop,gpc_A,   gpc_noop},
+   {gpc_sG,  gpc_sG,  gpc_sRGB,gpc_sRGB, gpc_g16, gpc_g16, gpc_noop,gpc_noop},
+   {gpc_gb16,gpc_sGp, gpc_cb16,gpc_sCp,  gpc_g16, gpc_g16q,gpc_A,   gpc_noop}
+};
+
+/* The error arrays record the error in the same matrix; 64 entries, however
+ * the different algorithms used in libpng for colormap and direct convertions
+ * mean that four separate matrices are used (for each combination of
+ * colormapped and direct.)
+ *
+ * In some cases the convertion between sRGB formats goes via a linear
+ * intermediate; an sRGB to linear convertion (as above) is followed by a simple
+ * linear to sRGB step with no other convertions.  This is done by a separate
+ * error array from an arbitrary 'in' format to one of the four basic outputs
+ * (since final output is always sRGB not colormapped).
+ *
+ * These arrays may be modified if the --accumulate flag is set during the run;
+ * then instead of logging errors they are simply added in.
+ *
+ * The three entries are currently for transparent, partially transparent and
+ * opaque input pixel values.  Notice that alpha should be exact in each case.
+ *
+ * Errors in alpha should only occur when converting from a direct format
+ * to a colormapped format, when alpha is effectively smashed (so large
+ * errors can occur.)  There should be no error in the '0' and 'opaque'
+ * values.  The fourth entry in the array is used for the alpha error (and it
+ * should always be zero for the 'via linear' case since this is never color
+ * mapped.)
+ *
+ * Mapping to a colormap smashes the colors, it is necessary to have separate
+ * values for these cases because they are much larger; it is very much
+ * impossible to obtain a reasonable result, these are held in
+ * gpc_error_to_colormap.
+ */
+#if PNG_FORMAT_FLAG_COLORMAP == 8 /* extra check also required */
+/* START MACHINE GENERATED */
+static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
+{
+ { /* input: sRGB-gray */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 261, 0 }, { 0, 0, 261, 0 }, { 0, 0, 261, 0 }, { 0, 0, 261, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: sRGB-gray+alpha */
+  { 0, 15, 0, 0 }, { 0, 0, 0, 0 }, { 0, 16, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 678, 710, 0 }, { 0, 678, 710, 0 }, { 0, 678, 710, 0 }, { 0, 678, 710, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: sRGB-rgb */
+  { 0, 0, 17, 0 }, { 0, 0, 17, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 863, 0 }, { 0, 0, 863, 0 }, { 0, 0, 811, 0 }, { 0, 0, 811, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: sRGB-rgb+alpha */
+  { 0, 3, 7, 0 }, { 0, 3, 7, 0 }, { 0, 13, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 688, 743, 0 }, { 0, 688, 743, 0 }, { 0, 688, 743, 0 }, { 0, 688, 743, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: linear-gray */
+  { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: linear-gray+alpha */
+  { 0, 59, 6, 0 }, { 182, 2, 6, 0 }, { 0, 63, 6, 0 }, { 182, 2, 6, 0 },
+  { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 1, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: linear-rgb */
+  { 0, 0, 2, 0 }, { 0, 0, 2, 0 }, { 0, 0, 3, 0 }, { 0, 0, 3, 0 },
+  { 0, 0, 4, 0 }, { 0, 0, 4, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: linear-rgb+alpha */
+  { 0, 121, 143, 0 }, { 178, 2, 7, 0 }, { 237, 66, 7, 0 }, { 255, 3, 7, 0 },
+  { 0, 4, 4, 0 }, { 0, 5, 4, 0 }, { 0, 0, 0, 0 }, { 0, 1, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-sRGB-gray */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-sRGB-gray+alpha */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-sRGB-rgb */
+  { 0, 0, 12, 0 }, { 0, 0, 12, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 },
+  { 0, 0, 459, 0 }, { 0, 0, 459, 0 }, { 0, 0, 286, 0 }, { 0, 0, 286, 0 },
+  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 460, 0 }, { 0, 0, 460, 0 }, { 0, 0, 263, 0 }, { 0, 0, 263, 0 }
+ }, { /* input: color-mapped-sRGB-rgb+alpha */
+  { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 },
+  { 0, 0, 427, 0 }, { 0, 0, 427, 0 }, { 0, 0, 263, 0 }, { 0, 0, 263, 0 },
+  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 460, 0 }, { 0, 0, 460, 0 }, { 0, 0, 263, 0 }, { 0, 0, 263, 0 }
+ }, { /* input: color-mapped-linear-gray */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 282, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-gray+alpha */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 282, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-rgb */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 263, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-rgb+alpha */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 263, 0 }
+ }
+};
+static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =
+{
+ { /* input: sRGB-gray */
+  { 0, 0, 7, 0 }, { 0, 0, 7, 0 }, { 0, 0, 7, 0 }, { 0, 0, 7, 0 }
+ }, { /* input: sRGB-gray+alpha */
+  { 0, 6, 3, 0 }, { 0, 53, 3, 0 }, { 0, 6, 3, 0 }, { 0, 53, 3, 0 }
+ }, { /* input: sRGB-rgb */
+  { 0, 0, 17, 0 }, { 0, 0, 17, 0 }, { 0, 0, 14, 0 }, { 0, 0, 14, 0 }
+ }, { /* input: sRGB-rgb+alpha */
+  { 0, 8, 10, 0 }, { 0, 13, 10, 0 }, { 0, 12, 8, 0 }, { 0, 53, 8, 0 }
+ }, { /* input: linear-gray */
+  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }
+ }, { /* input: linear-gray+alpha */
+  { 0, 1, 1, 0 }, { 0, 0, 1, 0 }, { 0, 1, 1, 0 }, { 0, 0, 1, 0 }
+ }, { /* input: linear-rgb */
+  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: linear-rgb+alpha */
+  { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 0, 1, 0 }
+ }, { /* input: color-mapped-sRGB-gray */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-sRGB-gray+alpha */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-sRGB-rgb */
+  { 0, 0, 12, 0 }, { 0, 0, 12, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }
+ }, { /* input: color-mapped-sRGB-rgb+alpha */
+  { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-gray */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-gray+alpha */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-rgb */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }, { /* input: color-mapped-linear-rgb+alpha */
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+ }
+};
+static png_uint_16 gpc_error_to_colormap[8/*i*/][8/*o*/][4] =
+{
+ { /* input: sRGB-gray */
+  { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 },
+  { 0, 0, 559, 0 }, { 0, 0, 559, 0 }, { 0, 0, 559, 0 }, { 0, 0, 559, 0 }
+ }, { /* input: sRGB-gray+alpha */
+  { 0, 10, 2, 0 }, { 0, 255, 2, 25 }, { 0, 88, 2, 0 }, { 0, 255, 2, 25 },
+  { 0, 824, 745, 0 }, { 0, 15462, 745, 6425 }, { 0, 824, 745, 0 }, { 0, 15462, 745, 6425 }
+ }, { /* input: sRGB-rgb */
+  { 0, 0, 17, 0 }, { 0, 0, 17, 0 }, { 0, 0, 25, 0 }, { 0, 0, 25, 0 },
+  { 0, 0, 871, 0 }, { 0, 0, 871, 0 }, { 0, 0, 13677, 0 }, { 0, 0, 13677, 0 }
+ }, { /* input: sRGB-rgb+alpha */
+  { 0, 63, 77, 0 }, { 0, 162, 7, 25 }, { 0, 220, 25, 0 }, { 0, 255, 25, 63 },
+  { 0, 17534, 18452, 0 }, { 0, 15614, 1001, 6425 }, { 0, 13050, 13677, 0 }, { 0, 48573, 13677, 16191 }
+ }, { /* input: linear-gray */
+  { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 },
+  { 0, 0, 761, 0 }, { 0, 0, 761, 0 }, { 0, 0, 761, 0 }, { 0, 0, 761, 0 }
+ }, { /* input: linear-gray+alpha */
+  { 0, 53, 6, 0 }, { 0, 255, 6, 25 }, { 0, 91, 6, 0 }, { 0, 255, 6, 25 },
+  { 0, 585, 783, 0 }, { 0, 12262, 783, 6342 }, { 0, 585, 783, 0 }, { 0, 12262, 783, 6342 }
+ }, { /* input: linear-rgb */
+  { 0, 0, 2, 0 }, { 0, 0, 2, 0 }, { 0, 0, 26, 0 }, { 0, 0, 26, 0 },
+  { 0, 0, 766, 0 }, { 0, 0, 766, 0 }, { 0, 0, 12684, 0 }, { 0, 0, 12684, 0 }
+ }, { /* input: linear-rgb+alpha */
+  { 0, 181, 196, 0 }, { 0, 179, 7, 25 }, { 206, 186, 29, 0 }, { 0, 255, 29, 62 },
+  { 0, 17173, 18137, 0 }, { 0, 14770, 1178, 6342 }, { 0, 11165, 13107, 0 }, { 0, 46509, 13107, 15983 }
+ }
+};
+/* END MACHINE GENERATED */
+#endif /* COLORMAP flag check */
+#endif /* flag checks */
+
+typedef struct
+{
+   /* Basic pixel information: */
+   Image*       in_image;   /* Input image */
+   const Image* out_image;  /* Output image */
+
+   /* 'background' is the value passed to the gpc_ routines, it may be NULL if
+    * it should not be used (*this* program has an error if it crashes as a
+    * result!)
+    */
+   Background        background_color;
+   const Background* background;
+
+   /* Precalculated values: */
+   int          in_opaque;  /* Value of input alpha that is opaque */
+   int          is_palette; /* Sample values come from the palette */
+   int          accumulate; /* Accumlate component errors (don't log) */
+
+   void (*in_gp)(Pixel*, png_const_voidp);
+   void (*out_gp)(Pixel*, png_const_voidp);
+
+   void (*transform)(Pixel *out, const Pixel *in, const Background *back);
+      /* A function to perform the required transform */
+
+   void (*from_linear)(Pixel *out, const Pixel *in, const Background *back);
+      /* For 'via_linear' transforms the final, from linear, step, else NULL */
+
+   png_uint_16 error[4];
+      /* Three error values for transparent, partially transparent and opaque
+       * input pixels (in turn).
+       */
+
+   png_uint_16 *error_ptr;
+      /* Where these are stored in the static array (for 'accumulate') */
+}
+Transform;
+
+/* Return a 'transform' as above for the given format convertion. */
+static void
+transform_from_formats(Transform *result, Image *in_image,
+   const Image *out_image, png_const_colorp background, int via_linear)
+{
+   png_uint_32 in_format, out_format;
+   png_uint_32 in_base, out_base;
+
+   memset(result, 0, sizeof *result);
+
+   /* Store the original images for error messages */
+   result->in_image = in_image;
+   result->out_image = out_image;
+
+   in_format = in_image->image.format;
+   out_format = out_image->image.format;
+
+   if (in_format & PNG_FORMAT_FLAG_LINEAR)
+      result->in_opaque = 65535;
+   else
+      result->in_opaque = 255;
+
+   result->is_palette = 0; /* set by caller if required */
+   result->accumulate = (in_image->opts & ACCUMULATE) != 0;
+
+   /* The loaders (which need the ordering information) */
+   result->in_gp = get_pixel(in_format);
+   result->out_gp = get_pixel(out_format);
+
+   /* Remove the ordering information: */
+   in_format &= BASE_FORMATS | PNG_FORMAT_FLAG_COLORMAP;
+   in_base = in_format & BASE_FORMATS;
+   out_format &= BASE_FORMATS | PNG_FORMAT_FLAG_COLORMAP;
+   out_base = out_format & BASE_FORMATS;
+
+   if (via_linear)
+   {
+      /* Check for an error in this program: */
+      if (out_format & (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLORMAP))
+      {
+         fprintf(stderr, "internal transform via linear error 0x%x->0x%x\n",
+            in_format, out_format);
+         exit(1);
+      }
+
+      result->transform = gpc_fn[in_base][out_base | PNG_FORMAT_FLAG_LINEAR];
+      result->from_linear = gpc_fn[out_base | PNG_FORMAT_FLAG_LINEAR][out_base];
+      result->error_ptr = gpc_error_via_linear[in_format][out_format];
+   }
+
+   else if (~in_format & out_format & PNG_FORMAT_FLAG_COLORMAP)
+   {
+      /* The input is not colormapped but the output is, the errors will
+       * typically be large (only the grayscale-no-alpha case permits preserving
+       * even 8-bit values.)
+       */
+      result->transform = gpc_fn[in_base][out_base];
+      result->from_linear = NULL;
+      result->error_ptr = gpc_error_to_colormap[in_base][out_base];
+   }
+
+   else
+   {
+      /* The caller handles the colormap->pixel value convertion, so the
+       * transform function just gets a pixel value, however because libpng
+       * currently contains a different implementation for mapping a colormap if
+       * both input and output are colormapped we need different convertion
+       * functions to deal with errors in the libpng implementation.
+       */
+      if (in_format & out_format & PNG_FORMAT_FLAG_COLORMAP)
+         result->transform = gpc_fn_colormapped[in_base][out_base];
+      else
+         result->transform = gpc_fn[in_base][out_base];
+      result->from_linear = NULL;
+      result->error_ptr = gpc_error[in_format][out_format];
+   }
+
+   /* Follow the libpng simplified API rules to work out what to pass to the gpc
+    * routines as a background value, if one is not required pass NULL so that
+    * this program crashes in the even of a programming error.
+    */
+   result->background = NULL; /* default: not required */
+
+   /* Rule 1: background only need be supplied if alpha is to be removed */
+   if (in_format & ~out_format & PNG_FORMAT_FLAG_ALPHA)
+   {
+      /* The input value is 'NULL' to use the background and (otherwise) an sRGB
+       * background color (to use a solid color).  The code above uses a fixed
+       * byte value, BUFFER_INIT8, for buffer even for 16-bit output.  For
+       * linear (16-bit) output the sRGB background color is ignored; the
+       * composition is always on the background (so BUFFER_INIT8 * 257), except
+       * that for the colormap (i.e. linear colormapped output) black is used.
+       */
+      result->background = &result->background_color;
+
+      if (out_format & PNG_FORMAT_FLAG_LINEAR || via_linear)
+      {
+         if (out_format & PNG_FORMAT_FLAG_COLORMAP)
+         {
+            result->background_color.ir =
+               result->background_color.ig =
+               result->background_color.ib = 0;
+            result->background_color.dr =
+               result->background_color.dg =
+               result->background_color.db = 0;
+         }
+
+         else
+         {
+            result->background_color.ir =
+               result->background_color.ig =
+               result->background_color.ib = BUFFER_INIT8 * 257;
+            result->background_color.dr =
+               result->background_color.dg =
+               result->background_color.db = 0;
+         }
+      }
+
+      else /* sRGB output */
+      {
+         if (background != NULL)
+         {
+            if (out_format & PNG_FORMAT_FLAG_COLOR)
+            {
+               result->background_color.ir = background->red;
+               result->background_color.ig = background->green;
+               result->background_color.ib = background->blue;
+               /* TODO: sometimes libpng uses the power law convertion here, how
+                * to handle this?
+                */
+               result->background_color.dr = sRGB_to_d[background->red];
+               result->background_color.dg = sRGB_to_d[background->green];
+               result->background_color.db = sRGB_to_d[background->blue];
+            }
+
+            else /* grayscale: libpng only looks at 'g' */
+            {
+               result->background_color.ir =
+                  result->background_color.ig =
+                  result->background_color.ib = background->green;
+               /* TODO: sometimes libpng uses the power law convertion here, how
+                * to handle this?
+                */
+               result->background_color.dr =
+                  result->background_color.dg =
+                  result->background_color.db = sRGB_to_d[background->green];
+            }
+         }
+
+         else if ((out_format & PNG_FORMAT_FLAG_COLORMAP) == 0)
+         {
+            result->background_color.ir =
+               result->background_color.ig =
+               result->background_color.ib = BUFFER_INIT8;
+            /* TODO: sometimes libpng uses the power law convertion here, how
+             * to handle this?
+             */
+            result->background_color.dr =
+               result->background_color.dg =
+               result->background_color.db = sRGB_to_d[BUFFER_INIT8];
+         }
+
+         /* Else the output is colormapped and a background color must be
+          * provided; if pngstest crashes then that is a bug in this program
+          * (though libpng should png_error as well.)
+          */
+         else
+            result->background = NULL;
+      }
+   }
+
+   if (result->background == NULL)
+   {
+      result->background_color.ir =
+         result->background_color.ig =
+         result->background_color.ib = -1; /* not used */
+      result->background_color.dr =
+         result->background_color.dg =
+         result->background_color.db = 1E30; /* not used */
+   }
+
+
+   /* Copy the error values into the Transform: */
+   result->error[0] = result->error_ptr[0];
+   result->error[1] = result->error_ptr[1];
+   result->error[2] = result->error_ptr[2];
+   result->error[3] = result->error_ptr[3];
+}
+
+
+/* Compare two pixels.
+ *
+ * OLD error values:
+static int error_to_linear = 811; * by experiment *
+static int error_to_linear_grayscale = 424; * by experiment *
+static int error_to_sRGB = 6; * by experiment *
+static int error_to_sRGB_grayscale = 17; * libpng error by calculation +
+                                            2 by experiment *
+static int error_in_compose = 2; * by experiment *
+static int error_in_premultiply = 1;
+ *
+ * The following is *just* the result of a round trip from 8-bit sRGB to linear
  * then back to 8-bit sRGB when it is done by libpng.  There are two problems:
  *
  * 1) libpng currently uses a 2.2 power law with no linear segment, this results
@@ -881,6 +2321,7 @@ static int error_in_premultiply = 1;
  * this compounds the 8-bit errors according to the alpha value of the pixel.
  * As a result 256 values are pre-calculated for error_via_linear.
  */
+#if 0
 static int error_in_libpng_gamma;
 static int error_via_linear[256]; /* Indexed by 8-bit alpha */
 
@@ -913,602 +2354,30 @@ init_error_via_linear(void)
     */
    error_in_libpng_gamma = 14;
 }
-
-/* A precalculated floating point linear background value, for grayscale the
- * green channel is used.
- */
-typedef struct
-{
-   double r, g, b;
-}
-precalc_background;
+#endif
 
 static void
-init_background(precalc_background *ppb, const png_color *background)
+print_pixel(char string[64], const Pixel *pixel, png_uint_32 format)
 {
-   if (background == NULL)
+   switch (format & (PNG_FORMAT_FLAG_ALPHA|PNG_FORMAT_FLAG_COLOR))
    {
-      double v = linear_from_sRGB(BUFFER_INIT8/255.);
-      ppb->r = ppb->g = ppb->b = v;
-   }
-
-   else
-   {
-      ppb->r = linear_from_sRGB(background->red/255.);
-      ppb->g = linear_from_sRGB(background->green/255.);
-      ppb->b = linear_from_sRGB(background->blue/255.);
-   }
-}
-
-static const char *
-cmppixel(Pixel *a, Pixel *b, const precalc_background *background,
-   int via_linear, int multiple_algorithms)
-{
-   int error_limit = 0;
-
-   if (b->format & PNG_FORMAT_FLAG_LINEAR)
-   {
-      /* If the input was non-opaque then use the pre-multiplication error
-       * limit.
-       */
-      if ((a->format & PNG_FORMAT_FLAG_ALPHA) && a->a16 < 65535 &&
-         error_limit < error_in_premultiply)
-         error_limit = error_in_premultiply;
-
-      if (b->format & PNG_FORMAT_FLAG_ALPHA)
-      {
-         if ((b->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
-            (a->format & PNG_FORMAT_FLAG_COLORMAP) != 0 ||
-            (a->format & PNG_FORMAT_FLAG_ALPHA) == 0)
-         {
-            /* Expect an exact match. */
-            if (b->a16 != a->a16)
-               return "linear alpha mismatch";
-         }
-
-         else
-         {
-            /* Transform from non-color-mapped format with alpha to color-map
-             * with alpha.  Most alphs is lost.
-             */
-            if (b->format & PNG_FORMAT_FLAG_COLOR)
-            {
-               /* Color; three levels of alpha (only!) */
-               if (abs(b->a16 - a->a16) > 16384)
-                  return "linear color-mapped color alpha mismatch";
-            }
-
-            else
-            {
-               /* Grayscale (GA palette), 6 levels of alpha. */
-               if (abs(b->a16 - a->a16) > 6554)
-                  return "linear color-mapped gray alpha mismatch";
-            }
-
-            /* If the alpha ends up as zero skip any check on the color
-             * components.
-             */
-            if (b->a16 == 0 && b->y16 == 0)
-               return NULL;
-         }
-      }
-
-      else if (a->format & PNG_FORMAT_FLAG_ALPHA)
-      {
-         /* An alpha channel has been removed, the destination is linear so the
-          * removal algorithm is just the premultiplication - compose on black -
-          * and the 16-bit colors are correct already.
-          */
-      }
-
-      if (b->format & PNG_FORMAT_FLAG_COLOR)
-      {
-         const char *err = "linear color mismatch";
-
-         /* Check for an exact match. */
-         if (a->r16 == b->r16 && a->g16 == b->g16 && a->b16 == b->b16)
-            return NULL;
-
-         /* Not an exact match; allow drift only if the input is 8-bit */
-         if (!(a->format & PNG_FORMAT_FLAG_LINEAR))
-         {
-            if (error_limit < error_to_linear)
-            {
-               error_limit = error_to_linear;
-               err = "sRGB to linear conversion error";
-            }
-         }
-
-         /* Well, ok, if the file is color-mapped the color-mapping probably
-          * used colors spaced at 51 in sRGB space, so there is massive drift to
-          * be allowed here.
-          */
-         if (b->format & PNG_FORMAT_FLAG_COLORMAP)
-         {
-            /* If the input (a) was detectably grayscale then just permit the
-             * grayscale errors; we require libpng to at least do this.
-             */
-            if ((a->format & PNG_FORMAT_FLAG_COLOR) == 0)
-            {
-               png_byte v = isRGB(a->y16);
-
-               if (b->r8 == v && b->g8 == v && b->b8 == v)
-                  return NULL;
-
-               if ((a->format & PNG_FORMAT_FLAG_ALPHA) != 0 &&
-                  (b->format & PNG_FORMAT_FLAG_ALPHA) == 0) /* alpha removed */
-               {
-                  /* Alpha was removed by compose-on-black; fix up the pixel a
-                   * '8-bit' values to match.
-                   */
-                  a->r8 = isRGB(a->r16);
-                  a->g8 = isRGB(a->g16);
-                  a->b8 = isRGB(a->b16);
-                  a->y8 = isRGB(a->y16);
-
-                  if (b->y8 == 255 && a->y8 == 254)
-                     return NULL; /* transparency hacked 254->255 */
-
-                  else if (b->y8 == 254 && a->a8 != 0)
-                     return "possible error in transparency hack (color)";
-               }
-
-               if ((b->format & PNG_FORMAT_FLAG_ALPHA) != 0)
-               {
-                  /* GA color-map; limited accuracy for opaque pixels, +/- 26
-                   * accuracy for partially transparent ones.
-                   */
-                  if (error_limit < 1)
-                     error_limit = 1;
-
-                  if (a->a8 > 0 && a->a8 < 255)
-                  {
-                     if (error_limit < 26)
-                        error_limit = 26;
-                  }
-               }
-            }
-
-            else /* input is not detectably grayscale */
-            {
-               /* The input was forced into an sRGB 666 color-map; error +/-26,
-                * guess the error limit from the actual input values.
-                */
-               int red = (isRGB(a->r16)+25)/51;
-               int green = (isRGB(a->g16)+25)/51;
-               int blue = (isRGB(a->b16)+25)/51;
-
-               if ((red-1)*51 <= b->r8 && (red+1)*51 >= b->r8 &&
-                  (green-1)*51 <= b->g8 && (green+1)*51 >= b->g8 &&
-                  (blue-1)*51 <= b->b8 && (blue+1)*51 >= b->b8)
-                  return NULL;
-
-               return "666 color-map error";
-            }
-
-            /* Now compare the 8-bit values, not the 16-bit ones. */
-            if (compare_8bit(a->r8, b->r8, error_limit, multiple_algorithms) &&
-               compare_8bit(a->g8, b->g8, error_limit, multiple_algorithms) &&
-               compare_8bit(a->b8, b->b8, error_limit, multiple_algorithms))
-               return NULL;
-
-            return "linear color-map color mismatch";
-         }
-
-         else if (compare_16bit(a->r16, b->r16, error_limit,
-               multiple_algorithms) &&
-            compare_16bit(a->g16, b->g16, error_limit, multiple_algorithms) &&
-            compare_16bit(a->b16, b->b16, error_limit, multiple_algorithms))
-            return NULL;
-
-         return err;
-      }
-
-      else /* b is grayscale */
-      {
-         const char *err = "linear gray mismatch";
-
-         /* Check for an exact match. */
-         if (a->y16 == b->y16 && a->a16 == b->a16)
-            return NULL;
-
-         /* Not an exact match; allow drift only if the input is 8-bit or if it
-          * has been converted from color.
-          */
-         if (!(a->format & PNG_FORMAT_FLAG_LINEAR))
-         {
-            /* Converted to linear, check for that drift. */
-            if (error_limit < error_to_linear)
-            {
-               error_limit = error_to_linear;
-               err = "8-bit gray to linear conversion error";
-            }
-
-            if (abs(a->y16-b->y16) <= error_to_linear)
-               return NULL;
-
-         }
-
-         if (a->format & PNG_FORMAT_FLAG_COLOR)
-         {
-            /* Converted to grayscale, allow drift */
-            if (error_limit < error_to_linear_grayscale)
-            {
-               error_limit = error_to_linear_grayscale;
-               err = "color to linear gray conversion error";
-            }
-         }
-
-         if (b->format & PNG_FORMAT_FLAG_COLORMAP)
-         {
-            /* Forced into a colormap, since the format is a grayscale one we
-             * can calculate the permitted error from the sRGB bucket the value
-             * should fall into.
-             */
-            png_byte v = a->y8;
-
-            if (b->y8 == v && a->a8 == b->a8)
-               return NULL;
-
-            if ((a->format & PNG_FORMAT_FLAG_ALPHA) != 0 &&
-               (b->format & PNG_FORMAT_FLAG_ALPHA) == 0) /* alpha removed */
-            {
-               /* Alpha was removed by compose-on-black; fix up the pixel a
-                * '8-bit' values to match.
-                */
-               a->r8 = isRGB(a->r16);
-               a->g8 = isRGB(a->g16);
-               a->b8 = isRGB(a->b16);
-               a->y8 = isRGB(a->y16);
-
-               if (b->y8 == 255 && a->y8 == 254)
-                  return NULL; /* transparency hacked 254->255 */
-
-               else if (b->y8 == 254 && a->a8 != 0)
-                  return "possible error in transparency hack (gray)";
-            }
-
-            if ((b->format & PNG_FORMAT_FLAG_ALPHA) != 0)
-            {
-               /* GA color-map; limited accuracy for opaque pixels, +/- 26
-                * accuracy for partially transparent ones.
-                */
-               if (error_limit < 1)
-                  error_limit = 1;
-
-               if (a->a8 > 0 && a->a8 < 255)
-               {
-                  if (error_limit < 26)
-                     error_limit = 26;
-               }
-            }
-
-            /* And compare the 8-bit values, not the 16-bit ones. */
-            if (compare_8bit(a->y8, b->y8, error_limit, multiple_algorithms))
-               return NULL;
-
-            return "linear color-map gray mismatch";
-         }
-
-         else if (compare_16bit(a->y16, b->y16, error_limit,
-            multiple_algorithms))
-            return NULL;
-
-         return err;
-      }
-   }
-
-   else /* RHS is 8-bit */
-   {
-      const char *err;
-
-      /* For 8-bit to 8-bit use 'error_via_linear'; this handles the cases where
-       * the original image is compared with the output of another conversion:
-       * see where the parameter is set to non-zero below.
-       */
-      if (!(a->format & PNG_FORMAT_FLAG_LINEAR) && via_linear)
-      {
-         if (a->a8 > 0)
-            error_limit = error_via_linear[a->a8];
-
-         else
-         {
-            /* The transform to linear will have set the component values to
-             * 65535, so they will come back as 255:
-             */
-            error_limit = 0;
-            a->y8 = a->r8 = a->g8 = a->b8 = 255;
-         }
-      }
-
-      if (b->format & PNG_FORMAT_FLAG_COLOR)
-         err = "8-bit color mismatch";
-
-      else
-         err = "8-bit gray mismatch";
-
-      if (b->format & PNG_FORMAT_FLAG_ALPHA)
-      {
-         /* Expect an exact match on the 8 bit value. */
-         if (b->a8 != a->a8)
-            return "8-bit alpha mismatch";
-
-         /* If the input was not color-mapped but the output is transparent
-          * pixels will have been forced to just one palette entry, with the
-          * value 255,255,255,0.
-          */
-         if ((a->format & PNG_FORMAT_FLAG_COLORMAP) == 0 &&
-            (b->format & PNG_FORMAT_FLAG_COLORMAP) != 0 &&
-             (a->format & PNG_FORMAT_FLAG_ALPHA) != 0 &&
-             a->a16 == 0)
-         {
-            if (b->format & PNG_FORMAT_FLAG_COLOR)
-            {
-               if (b->r8 == 255 && b->g8 == 255 && b->b8 == 255 && b->a8 == 0)
-                  return NULL;
-
-               return "bad RGB color-map transparent entry";
-            }
-
-            else if (b->y8 == 255 && b->a8 == 0)
-               return NULL;
-
-            return "bad gray color-map transparent entry";
-         }
-
-         /* If the *input* was linear+alpha as well libpng will have converted
-          * the non-premultiplied format directly to the sRGB non-premultiplied
-          * format and the precision loss on an intermediate pre-multiplied
-          * format will have been avoided.  In this case we will get spurious
-          * values in the non-opaque pixels.
-          */
-         if (!via_linear && (a->format & PNG_FORMAT_FLAG_LINEAR) != 0 &&
-            (a->format & PNG_FORMAT_FLAG_ALPHA) != 0 &&
-            a->a16 < 65535)
-         {
-            /* We don't know the original values (libpng has already removed
-             * them) but we can make sure they are in range here by doing a
-             * comparison on the pre-multiplied values instead.
-             */
-            if (a->a16 > 0)
-            {
-               if (b->format & PNG_FORMAT_FLAG_COLOR)
-               {
-                  b->r8 = unpremultiply(b->r16, b->a16);
-                  b->g8 = unpremultiply(b->g16, b->a16);
-                  b->b8 = unpremultiply(b->b16, b->a16);
-                  b->y8 = unpremultiply(b->y16, b->a16);
-               }
-
-               else
-                  b->r8 = b->g8 = b->b8 = b->y8 = unpremultiply(b->y16, b->a16);
-            }
-
-            else
-               b->r8 = b->g8 = b->b8 = b->y8 = 255;
-         }
-      }
-
-      else if (a->format & PNG_FORMAT_FLAG_ALPHA)
-      {
-         png_uint_32 alpha;
-
-         /* An alpha channel has been removed; the background will have been
-          * composed in.  Adjust the 'a' pixel to represent this by doing the
-          * correct compose.  Set the error limit, above, to an appropriate
-          * value for the compose operation.
-          */
-         if (error_limit < error_in_compose)
-            error_limit = error_in_compose;
-
-         alpha = 65535 - a->a16; /* for the background */
-
-         if (b->format & PNG_FORMAT_FLAG_COLOR) /* background is rgb */
-         {
-            err = "8-bit color compose error";
-
-            if (via_linear)
-            {
-               /* The 16-bit values are already correct (being pre-multiplied),
-                * just recalculate the 8-bit values.
-                */
-               a->r8 = isRGB(a->r16);
-               a->g8 = isRGB(a->g16);
-               a->b8 = isRGB(a->b16);
-               a->y8 = isRGB(a->y16);
-
-               /* There should be no libpng error in this (ideally), but the
-                * libpng gamma correction code has off-by-one errors.
-                */
-               error_limit = error_in_libpng_gamma;
-            }
-
-            else
-            {
-               double r, g, blue, y;
-
-               r = a->r16 + alpha * background->r;
-               a->r16 = u16d(r);
-               a->r8 = sRGB(r/65535);
-
-               g = a->g16 + alpha * background->g;
-               a->g16 = u16d(g);
-               a->g8 = sRGB(g/65535);
-
-               blue = a->b16 + alpha * background->b;
-               a->b16 = u16d(blue);
-               a->b8 = sRGB(blue/65535);
-
-               y = YfromRGB(r, g, blue);
-               a->y16 = u16d(y * 65535);
-               a->y8 = sRGB(y);
-            }
-         }
-
-         else /* background is gray */
-         {
-            err = "8-bit gray compose error";
-
-            if (via_linear)
-            {
-               a->r8 = a->g8 = a->b8 = a->y8 = isRGB(a->y16);
-
-               /* There should be no libpng error in this (ideally), but the
-                * libpng gamma correction code has off-by-one errors.
-                */
-               error_limit = error_in_libpng_gamma;
-            }
-
-            else
-            {
-               /* When the output is gray the background comes from just the
-                * green channel.
-                */
-               double y = a->y16 + alpha * background->g;
-
-               a->r16 = a->g16 = a->b16 = a->y16 = u16d(y);
-               a->r8 = a->g8 = a->b8 = a->y8 = sRGB(y/65535);
-            }
-         }
-
-         /* NOTE: the alpha channel is the original one, so logpixel will show
-          * the original alpha but the composed color channels.  This gives
-          * linear values that are apparently wrong on error, but is useful.
-          */
-      }
-
-      if (b->format & PNG_FORMAT_FLAG_COLOR)
-      {
-
-         /* Check for an exact match. */
-         if (a->r8 == b->r8 && a->g8 == b->g8 && a->b8 == b->b8)
-            return NULL;
-
-         /* Check for linear to 8-bit conversion. */
-         if (a->format & PNG_FORMAT_FLAG_LINEAR)
-         {
-            if (error_limit < error_to_sRGB)
-            {
-               err = "linear to sRGB conversion error";
-               error_limit = error_to_sRGB;
-            }
-         }
-
-         /* Check for color-map trashing. */
-         if (b->format & PNG_FORMAT_FLAG_COLORMAP)
-         {
-            /* The data has been forced into an RGB666 colormap.  Unless the
-             * original was detectably grayscale or color-mapped (we expect
-             * color maps to be preserved.)
-             */
-            if ((a->format & PNG_FORMAT_FLAG_COLOR) == 0)
-            {
-               /* grayscale input, currently generates no additional errors */
-            }
-
-            else if ((a->format & PNG_FORMAT_FLAG_COLORMAP) == 0)
-            {
-               /* color-map input */
-               if (error_limit < 26)
-                  error_limit = 26;
-            }
-
-            else
-            {
-               /* Color-map to color-map: expect no errors. */
-            }
-         }
-
-         if (compare_8bit(a->r8, b->r8, error_limit, multiple_algorithms) &&
-            compare_8bit(a->g8, b->g8, error_limit, multiple_algorithms) &&
-            compare_8bit(a->b8, b->b8, error_limit, multiple_algorithms))
-            return NULL;
-
-         return err;
-      }
-
-      else /* b is grayscale */
-      {
-         /* Check for an exact match. */
-         if (a->y8 == b->y8)
-            return NULL;
-
-         /* Not an exact match; allow drift only if the input is linear or if it
-          * has been converted from color.
-          */
-         if (a->format & PNG_FORMAT_FLAG_LINEAR)
-         {
-            /* Converted to linear, check for that drift. */
-            if (error_limit < error_to_sRGB)
-            {
-               error_limit = error_to_sRGB;
-               err = "linear to 8-bit gray conversion error";
-            }
-         }
-
-         if (a->format & PNG_FORMAT_FLAG_COLOR)
-         {
-            /* Converted to grayscale, allow drift */
-            if (error_limit < error_to_sRGB_grayscale)
-            {
-               error_limit = error_to_sRGB_grayscale;
-               err = "color to 8-bit gray conversion error";
-            }
-         }
-
-         if (compare_8bit(a->y8, b->y8, error_limit, multiple_algorithms))
-            return NULL;
-
-         return err;
-      }
-   }
-}
-
-/* Basic image formats; control the data but not the layout thereof. */
-#define BASE_FORMATS\
-   (PNG_FORMAT_FLAG_ALPHA|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_LINEAR)
-
-static void
-print_pixel(char string[64], Pixel *pixel)
-{
-   switch (pixel->format & BASE_FORMATS)
-   {
-      case 0: /* 8-bit, one channel */
-         sprintf(string, "%s(%d)", format_names[pixel->format], pixel->y8);
+      case 0:
+         sprintf(string, "%s(%d)", format_names[format], pixel->g);
          break;
 
       case PNG_FORMAT_FLAG_ALPHA:
-         sprintf(string, "%s(%d,%d)", format_names[pixel->format], pixel->y8,
-            pixel->a8);
+         sprintf(string, "%s(%d,%d)", format_names[format], pixel->g,
+            pixel->a);
          break;
 
       case PNG_FORMAT_FLAG_COLOR:
-         sprintf(string, "%s(%d,%d,%d)", format_names[pixel->format],
-            pixel->r8, pixel->g8, pixel->b8);
+         sprintf(string, "%s(%d,%d,%d)", format_names[format],
+            pixel->r, pixel->g, pixel->b);
          break;
 
       case PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA:
-         sprintf(string, "%s(%d,%d,%d,%d)", format_names[pixel->format],
-            pixel->r8, pixel->g8, pixel->b8, pixel->a8);
-         break;
-
-      case PNG_FORMAT_FLAG_LINEAR:
-         sprintf(string, "%s(%d)", format_names[pixel->format], pixel->y16);
-         break;
-
-      case PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_ALPHA:
-         sprintf(string, "%s(%d,%d)", format_names[pixel->format], pixel->y16,
-            pixel->a16);
-         break;
-
-      case PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR:
-         sprintf(string, "%s(%d,%d,%d)", format_names[pixel->format],
-            pixel->r16, pixel->g16, pixel->b16);
-         break;
-
-      case PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_ALPHA:
-         sprintf(string, "%s(%d,%d,%d,%d)", format_names[pixel->format],
-            pixel->r16, pixel->g16, pixel->b16, pixel->a16);
+         sprintf(string, "%s(%d,%d,%d,%d)", format_names[format],
+            pixel->r, pixel->g, pixel->b, pixel->a);
          break;
 
       default:
@@ -1518,44 +2387,238 @@ print_pixel(char string[64], Pixel *pixel)
 }
 
 static int
-logpixel(Image *original, Image *copy, png_uint_32 x, png_uint_32 y, Pixel *a,
-   Pixel *b, const char *reason)
+logpixel(const Transform *transform, png_uint_32 x, png_uint_32 y,
+   const Pixel *in, const Pixel *calc, const Pixel *out, const char *reason)
 {
-   char pixel_a[64], pixel_b[64];
+   const png_uint_32 in_format = transform->in_image->image.format;
+   const png_uint_32 out_format = transform->out_image->image.format;
 
-   print_pixel(pixel_a, a);
-   print_pixel(pixel_b, b);
-   if (original->file_name != copy->file_name)
+   png_uint_32 back_format = out_format & ~PNG_FORMAT_FLAG_ALPHA;
+   const char *via_linear = "";
+
+   char pixel_in[64], pixel_calc[64], pixel_out[64], pixel_loc[64];
+   char background_info[100];
+
+   print_pixel(pixel_in, in, in_format);
+   print_pixel(pixel_calc, calc, out_format);
+   print_pixel(pixel_out, out, out_format);
+
+   if (transform->is_palette)
+      sprintf(pixel_loc, "palette: %lu", (unsigned long)y);
+   else
+      sprintf(pixel_loc, "%lu,%lu", (unsigned long)x, (unsigned long)y);
+
+   if (transform->from_linear != NULL)
    {
-      char error_buffer[256];
+      via_linear = " (via linear)";
+      /* And as a result the *read* format which did any background processing
+       * was itself linear, so the background color information is also
+       * linear.
+       */
+      back_format |= PNG_FORMAT_FLAG_LINEAR;
+   }
+
+   if (transform->background != NULL)
+   {
+      Pixel back;
+      char pixel_back[64];
+
+      back.r = transform->background->ir;
+      back.g = transform->background->ig;
+      back.b = transform->background->ib;
+      back.a = -1; /* not used */
+
+      print_pixel(pixel_back, &back, back_format);
+      sprintf(background_info, " on background %s", pixel_back);
+   }
+
+   else
+      background_info[0] = 0;
+
+   if (transform->in_image->file_name != transform->out_image->file_name)
+   {
+      char error_buffer[512];
       sprintf(error_buffer,
-         "(%lu,%lu) %s:\n\t%s ->\n\t\t%s\n\tUse --preserve and examine: ",
-         (unsigned long)x, (unsigned long)y, reason, pixel_a, pixel_b);
-      return logerror(original, original->file_name, error_buffer,
-         copy->file_name);
+         "(%s) %s error%s:\n %s%s ->\n       %s\n  not: %s.\n"
+         "Use --preserve and examine: ", pixel_loc, reason, via_linear,
+         pixel_in, background_info, pixel_out, pixel_calc);
+      return logerror(transform->in_image, transform->in_image->file_name,
+         error_buffer, transform->out_image->file_name);
    }
 
    else
    {
-      char error_buffer[256];
+      char error_buffer[512];
       sprintf(error_buffer,
-         "(%lu,%lu) %s:\n\t%s ->\n\t\t%s.\n"
-         "\tThe error happened when reading the original file with this format",
-         (unsigned long)x, (unsigned long)y, reason, pixel_a, pixel_b);
-      return logerror(original, original->file_name, error_buffer, "");
+         "(%s) %s error%s:\n %s%s ->\n       %s\n  not: %s.\n"
+         " The error happened when reading the original file with this format.",
+         pixel_loc, reason, via_linear, pixel_in, background_info, pixel_out,
+         pixel_calc);
+      return logerror(transform->in_image, transform->in_image->file_name,
+         error_buffer, "");
    }
 }
 
 static int
-badpixel(Image *ia, png_uint_32 x, png_uint_32 y, Pixel *pa, const char *reason)
+cmppixel(Transform *transform, png_const_voidp in, png_const_voidp out,
+   png_uint_32 x, png_uint_32 y/*or palette index*/)
 {
-   char pixel_a[64];
-   char error_buffer[128];
+   int maxerr;
+   png_const_charp errmsg;
+   Pixel pixel_in, pixel_calc, pixel_out;
 
-   print_pixel(pixel_a, pa);
-   sprintf(error_buffer, "(%lu,%lu) %s: ", (unsigned long)x, (unsigned long)y,
-      reason);
-   return logerror(ia, ia->file_name, error_buffer, pixel_a);
+   transform->in_gp(&pixel_in, in);
+
+   if (transform->from_linear == NULL)
+      transform->transform(&pixel_calc, &pixel_in, transform->background);
+
+   else
+   {
+      transform->transform(&pixel_out, &pixel_in, transform->background);
+      transform->from_linear(&pixel_calc, &pixel_out, NULL);
+   }
+
+   transform->out_gp(&pixel_out, out);
+
+   /* Eliminate the case where both the input and output pixel are transparent;
+    * then the other components don't matter in the 8-bot format, this removes
+    * the inconsistency in libpng handling.
+    */
+   if (pixel_in.a == 0 && pixel_calc.a == 0 && pixel_out.a == 0 &&
+      (transform->in_opaque == 255 || (pixel_out.r == pixel_out.g &&
+            pixel_out.g == pixel_out.b && pixel_out.b == 0)))
+      return 1;
+
+   /* Check for alpha errors first; an alpha error can damage the components too
+    * so avoid spurious checks on components if one is found.
+    */
+   errmsg = NULL;
+   {
+      int err_a = abs(pixel_calc.a-pixel_out.a);
+      
+      if (err_a > transform->error[3])
+      {
+         /* If accumulating check the components too */
+         if (transform->accumulate)
+            transform->error[3] = (png_uint_16)err_a;
+
+         else
+            errmsg = "alpha";
+      }
+   }
+
+   if (errmsg == NULL) /* else just signal an alpha error */
+   {
+      int err_r = abs(pixel_calc.r - pixel_out.r);
+      int err_g = abs(pixel_calc.g - pixel_out.g);
+      int err_b = abs(pixel_calc.b - pixel_out.b);
+      int limit;
+
+      if ((err_r | err_g | err_b) == 0)
+         return 1; /* exact match */
+
+      /* Mismatch on a component, check the input alpha */
+      if (pixel_in.a >= transform->in_opaque)
+      {
+         errmsg = "opaque component";
+         limit = 2; /* opaque */
+      }
+
+      else if (pixel_in.a > 0)
+      {
+         errmsg = "alpha component";
+         limit = 1; /* partially transparent */
+      }
+
+      else
+      {
+         errmsg = "transparent component (background)";
+         limit = 0; /* transparent */
+      }
+
+      maxerr = err_r;
+      if (maxerr < err_g) maxerr = err_g;
+      if (maxerr < err_b) maxerr = err_b;
+
+      if (maxerr <= transform->error[limit])
+         return 1; /* within the error limits */
+
+      /* Handle a component mis-match; log it, just return an error code, or
+       * accumulate it.
+       */
+      if (transform->accumulate)
+      {
+         transform->error[limit] = (png_uint_16)maxerr;
+         return 1; /* to cause the caller to keep going */
+      }
+   }
+
+   /* Failure to match and not accumulating, so the error must be logged. */
+   return logpixel(transform, x, y, &pixel_in, &pixel_calc, &pixel_out, errmsg);
+}
+
+static png_byte
+component_loc(png_byte loc[4], png_uint_32 format)
+{
+   /* Given a format return the number of channels and the location of
+    * each channel.
+    *
+    * The mask 'loc' contains the component offset of the channels in the
+    * following order.  Note that if 'format' is grayscale the entries 1-3 must
+    * all contain the location of the gray channel.
+    *
+    * 0: alpha
+    * 1: red or gray
+    * 2: green or gray
+    * 3: blue or gray
+    */
+   png_byte channels;
+
+   if (format & PNG_FORMAT_FLAG_COLOR)
+   {
+      channels = 3;
+
+      loc[2] = 1;
+
+      if (format & PNG_FORMAT_FLAG_BGR)
+      {
+         loc[1] = 2;
+         loc[3] = 0;
+      }
+
+      else
+      {
+         loc[1] = 0;
+         loc[3] = 2;
+      }
+   }
+
+   else
+   {
+      channels = 1;
+      loc[0] = loc[1] = loc[2] = 0;
+   }
+
+   if (format & PNG_FORMAT_FLAG_ALPHA)
+   {
+      if (format & PNG_FORMAT_FLAG_AFIRST)
+      {
+         loc[0] = 0;
+         ++loc[1];
+         ++loc[2];
+         ++loc[3];
+      }
+
+      else
+         loc[0] = channels;
+
+      ++channels;
+   }
+
+   else
+      loc[0] = 4; /* not present */
+
+   return channels;
 }
 
 /* Compare two images, the original 'a', which was written out then read back in
@@ -1565,31 +2628,29 @@ static int
 compare_two_images(Image *a, Image *b, int via_linear,
    png_const_colorp background)
 {
-   png_uint_32 width = a->image.width;
-   png_uint_32 height = a->image.height;
-   png_uint_32 formata = a->image.format;
-   png_uint_32 formatb = b->image.format;
    ptrdiff_t stridea = a->stride;
    ptrdiff_t strideb = b->stride;
    png_const_bytep rowa = a->buffer+16;
    png_const_bytep rowb = b->buffer+16;
-   png_byte channels;
-   int fast_track = 0;
-   int two_algorithms = ((formata ^ formatb) & PNG_FORMAT_FLAG_COLORMAP) != 0;
-   int result = 1;
-   unsigned int check_alpha = 0; /* must be zero or one */
-   precalc_background pb;
-   png_byte swap_mask[4];
-   png_uint_32 x, y;
-   png_const_bytep ppa, ppb;
+   const png_uint_32 width = a->image.width;
+   const png_uint_32 height = a->image.height;
+   const png_uint_32 formata = a->image.format;
+   const png_uint_32 formatb = b->image.format;
+   const unsigned int a_sample = PNG_IMAGE_SAMPLE_SIZE(formata);
+   const unsigned int b_sample = PNG_IMAGE_SAMPLE_SIZE(formatb);
+   int alpha_added, alpha_removed;
+   int bchannels;
+   int btoa[4];
+   png_uint_32 y;
+   Transform tr;
 
    /* This should never happen: */
    if (width != b->image.width || height != b->image.height)
       return logerror(a, a->file_name, ": width x height changed: ",
          b->file_name);
 
-   /* Set up the background */
-   init_background(&pb, background);
+   /* Set up the background and the transform */
+   transform_from_formats(&tr, a, b, background, via_linear);
 
    /* Find the first row and inter-row space. */
    if (!(formata & PNG_FORMAT_FLAG_COLORMAP) &&
@@ -1603,457 +2664,259 @@ compare_two_images(Image *a, Image *b, int via_linear,
    if (stridea < 0) rowa += (height-1) * (-stridea);
    if (strideb < 0) rowb += (height-1) * (-strideb);
 
-   /* The following are used only if the formats match, except that 'channels'
-    * is a flag for matching formats.
+   /* First shortcut the two colormap case by comparing the image data; if it
+    * matches then we expect the colormaps to match, although this is not
+    * absolutely necessary for an image match.  If the colormaps fail to match
+    * then there is a problem in libpng.
     */
-   channels = 0;
-   swap_mask[3] = swap_mask[2] = swap_mask[1] = swap_mask[0] = 0;
-
-   /* Set up the masks if no base format change, or if the format change was
-    * just to add an alpha channel (note that this ignores whether or not the
-    * image is color-mapped.)
-    */
-   if (((formata & BASE_FORMATS) == (formatb & BASE_FORMATS)) ||
-      ((formata | PNG_FORMAT_FLAG_ALPHA) & BASE_FORMATS) ==
-         (formatb & BASE_FORMATS))
+   if (formata & formatb & PNG_FORMAT_FLAG_COLORMAP)
    {
-      png_byte astart = 0; /* index of first component */
-      png_byte bstart = 0;
+      /* Only check colormap entries that actually exist; */
+      png_const_bytep ppa, ppb;
+      int match;
+      png_byte in_use[256];
 
-      /* Set to the actual number of channels in 'a' */
-      if (formata & PNG_FORMAT_FLAG_COLOR)
-         channels = 3U;
-      else
-         channels = 1U;
+      memset(in_use, 0, sizeof in_use);
 
-      if (formata & PNG_FORMAT_FLAG_ALPHA)
+      ppa = rowa;
+      ppb = rowb;
+
+      /* Do this the slow way to accumulate the 'in_use' flags */
+      for (y=0, match=1; y<height && match; ++y, ppa += stridea, ppb += strideb)
       {
-         /* Both formats have an alpha channel */
-         if (formata & PNG_FORMAT_FLAG_AFIRST)
-         {
-            astart = 1;
+         png_uint_32 x;
 
-            if (formatb & PNG_FORMAT_FLAG_AFIRST)
+         for (x=0; x<width; ++x)
+         {
+            png_byte aval = ppa[x];
+
+            if (aval != ppb[x])
             {
-               bstart = 1;
-               swap_mask[0] = 0;
+               match = 0;
+               break;
             }
 
-            else
-               swap_mask[0] = channels; /* 'b' alpha is at end */
+            in_use[aval] = 1;
          }
-
-         else if (formatb & PNG_FORMAT_FLAG_AFIRST)
-         {
-            /* 'a' alpha is at end, 'b' is at start (0) */
-            bstart = 1;
-            swap_mask[channels] = 0;
-         }
-
-         else
-            swap_mask[channels] = channels;
-
-         ++channels;
       }
 
-      else if (formatb & PNG_FORMAT_FLAG_ALPHA)
+      /* If the buffers match then the colormaps must too. */
+      if (match)
       {
-         /* Only 'b' has an alpha channel */
-         check_alpha = 1;
+         /* Do the color-maps match, entry by entry?  Only check the 'in_use'
+          * entries.  An error here should be logged as a color-map error.
+          */
+         png_const_bytep a_cmap = (png_const_bytep)a->colormap;
+         png_const_bytep b_cmap = (png_const_bytep)b->colormap;
+         int result = 1; /* match by default */
 
-         if (formatb & PNG_FORMAT_FLAG_AFIRST)
+         /* This is used in logpixel to get the error message correct. */
+         tr.is_palette = 1;
+
+         for (y=0; y<256; ++y, a_cmap += a_sample, b_cmap += b_sample)
+            if (in_use[y])
          {
-            bstart = 1;
-            /* Put the location of the alpha channel in swap_mask[3], since it
-             * cannot be used if 'a' does not have an alpha channel.
-             */
-            swap_mask[3] = 0;
+            if (y >= a->image.colormap_entries)
+               {
+               char pindex[4];
+               sprintf(pindex, "%lu", (unsigned long)y);
+               return logerror(a, a->file_name, "bad pixel index ", pindex);
+               }
+
+            if (y >= b->image.colormap_entries)
+               {
+               char pindex[4];
+               sprintf(pindex, "%lu", (unsigned long)y);
+               return logerror(b, b->file_name, "bad pixel index ", pindex);
+               }
+
+            /* All the mismatches are logged here; there can only be 256! */
+            if (!cmppixel(&tr, a_cmap, b_cmap, 0, y))
+               result = 0;
          }
 
-         else
-            swap_mask[3] = channels;
+         /* If reqested copy the error values back from the Transform. */
+         if (a->opts & ACCUMULATE)
+         {
+            tr.error_ptr[0] = tr.error[0];
+            tr.error_ptr[1] = tr.error[1];
+            tr.error_ptr[2] = tr.error[2];
+            tr.error_ptr[3] = tr.error[3];
+         }
+
+         return result;
       }
 
-      if (formata & PNG_FORMAT_FLAG_COLOR)
-      {
-         unsigned int swap = 0;
+      /* else the image buffers don't match pixel-wise so compare sample values
+       * instead.
+       */
+   }
 
-         /* Colors match, but are they swapped? */
-         if ((formata ^ formatb) & PNG_FORMAT_FLAG_BGR) /* Swapped. */
-            swap = 2;
+   /* We can directly compare pixel values without the need to use the read
+    * or transform support (i.e. a memory compare) if:
+    *
+    * 1) The bit depth has not changed.
+    * 2) RGB to grayscale has not been done (the reverse is ok; we just compare
+    *    the three RGB values to the original grayscale.)
+    * 3) An alpha channel has not been removed from an 8-bit format, or the
+    *    8-bit alpha value of the pixel was 255 (opaque).
+    *
+    * If an alpha channel has been *added* then it must have the relevant opaque
+    * value (255 or 65535).
+    *
+    * The fist two the tests (in the order given above) (using the boolean
+    * equivalence !a && !b == !(a || b))
+    */
+   if (!(((formata ^ formatb) & PNG_FORMAT_FLAG_LINEAR) |
+      (formata & (formatb ^ PNG_FORMAT_FLAG_COLOR) & PNG_FORMAT_FLAG_COLOR)))
+   {
+      /* Was an alpha channel changed? */
+      const png_uint_32 alpha_changed = (formata ^ formatb) &
+         PNG_FORMAT_FLAG_ALPHA;
 
-         swap_mask[astart+0] = (png_byte)(bstart+(0^swap));
-         swap_mask[astart+1] = (png_byte)(bstart+1);
-         swap_mask[astart+2] = (png_byte)(bstart+(2^swap));
-      }
+      /* Was an alpha channel removed?  (The third test.)  If so the direct
+       * comparison is only possible if the input alpha is opaque.
+       */
+      alpha_removed = (formata & alpha_changed) != 0;
 
-      else /* grayscale: 1 channel */
-         swap_mask[astart] = bstart;
+      /* Was an alpha channel added? */
+      alpha_added = (formatb & alpha_changed) != 0;
 
-      /* Now work out if the fast-track match is possible - the byte
-       * representations need to be equivalent (apart from the addition of an
-       * opaque alpha channel) but allow indirection via a color-map
+      /* The channels may have been moved between input and output, this finds
+       * out how, recording the result in the btoa array, which says where in
+       * 'a' to find each channel of 'b'.  If alpha was added then btoa[alpha]
+       * ends up as 4 (and is not used.)
        */
       {
-         png_uint_32 f = (formata & formatb);
+         int i;
+         png_byte aloc[4];
+         png_byte bloc[4];
+
+         /* The following are used only if the formats match, except that
+          * 'bchannels' is a flag for matching formats.  btoa[x] says, for each
+          * channel in b, where to find the corresponding value in a, for the
+          * bchannels.  achannels may be different for a gray to rgb transform
+          * (a will be 1 or 2, b will be 3 or 4 channels.)
+          */
+         (void)component_loc(aloc, formata);
+         bchannels = component_loc(bloc, formatb);
+
+         /* Hence the btoa array. */
+         for (i=0; i<4; ++i) if (bloc[i] < 4)
+            btoa[bloc[i]] = aloc[i]; /* may be '4' for alpha */
+
+         if (alpha_added)
+            alpha_added = bloc[0]; /* location of alpha channel in image b */
+
+         else
+            alpha_added = 4; /* Won't match an image b channel */
+
+         if (alpha_removed)
+            alpha_removed = aloc[0]; /* location of alpha channel in image a */
+
+         else
+            alpha_removed = 4;
+      }
+   }
+
+   else
+   {
+      /* Direct compare is not possible, cancel out all the corresponding local
+       * variables.
+       */
+      bchannels = 0;
+      alpha_removed = alpha_added = 4;
+      btoa[3] = btoa[2] = btoa[1] = btoa[0] = 4; /* 4 == not present */
+   }
+
+   for (y=0; y<height; ++y, rowa += stridea, rowb += strideb)
+   {
+      png_const_bytep ppa, ppb;
+      png_uint_32 x;
+
+      for (x=0, ppa=rowa, ppb=rowb; x<width; ++x)
+      {
+         png_const_bytep psa, psb;
 
          if (formata & PNG_FORMAT_FLAG_COLORMAP)
-            fast_track += 4; /* image a color-mapped */
+            psa = (png_const_bytep)a->colormap + a_sample * *ppa++;
+         else
+            psa = ppa, ppa += a_sample;
 
          if (formatb & PNG_FORMAT_FLAG_COLORMAP)
-            fast_track += 8; /* image b color-mapped */
+            psb = (png_const_bytep)b->colormap + b_sample * *ppb++;
+         else
+            psb = ppb, ppb += b_sample;
 
-         if (fast_track == 12)
+         /* Do the fast test if possible. */
+         if (bchannels)
          {
-            /* Do the color-maps match, entry by entry?   Always do this the
-             * slow way unless the maps are identical, the number of entries
-             * must match.
+            /* Check each 'b' channel against either the corresponding 'a'
+             * channel or the opaque alpha value, as appropriate.  If
+             * alpha_removed value is set (not 4) then also do this only if the
+             * 'a' alpha channel (alpha_removed) is opaque; only relevant for
+             * the 8-bit case.
              */
-            unsigned int entries = a->image.colormap_entries;
-
-            if (entries == b->image.colormap_entries)
+            if (formatb & PNG_FORMAT_FLAG_LINEAR) /* 16-bit checks */
             {
-               unsigned int entry = 0;
+               png_const_uint_16p pua = (png_const_uint_16p)psa;
+               png_const_uint_16p pub = (png_const_uint_16p)psb;
 
-               while (entry < entries)
+               switch (bchannels)
                {
-                  Pixel pixel_a, pixel_b;
-                  png_byte p = (png_byte)entry;
-
-                  if (!get_pixel(a, &pixel_a, &p))
-                     return badpixel(a, entry, 0, &pixel_a,
-                        "bad palette entry value");
-
-                  if (!get_pixel(b, &pixel_b, &p))
-                     return badpixel(b, entry, 0, &pixel_b,
-                        "bad palette entry value");
-
-                  if (cmppixel(&pixel_a, &pixel_b, &pb, via_linear,
-                     0/*multiple_algorithms*/) != NULL)
-                     break;
-
-                  ++entry;
+                  case 4:
+                     if (pua[btoa[3]] != pub[3]) break;
+                  case 3:
+                     if (pua[btoa[2]] != pub[2]) break;
+                  case 2:
+                     if (pua[btoa[1]] != pub[1]) break;
+                  case 1:
+                     if (pua[btoa[0]] != pub[0]) break;
+                     if (alpha_added != 4 && pub[alpha_added] != 65535) break;
+                     continue; /* x loop */
+                  default:
+                     break; /* impossible */
                }
+            }
 
-               /* both sides color-mapped, color-maps match */
-               if (entry == entries)
-                  fast_track += 1;
-
-               /* else color-map entries are mismatched so compare pixel by
-                * pixel.
-                */
+            else if (alpha_removed == 4 || psa[alpha_removed] == 255)
+            {
+               switch (bchannels)
+               {
+                  case 4:
+                     if (psa[btoa[3]] != psb[3]) break;
+                  case 3:
+                     if (psa[btoa[2]] != psb[2]) break;
+                  case 2:
+                     if (psa[btoa[1]] != psb[1]) break;
+                  case 1:
+                     if (psa[btoa[0]] != psb[0]) break;
+                     if (alpha_added != 4 && psb[alpha_added] != 255) break;
+                     continue; /* x loop */
+                  default:
+                     break; /* impossible */
+               }
             }
          }
 
-         else if (f & PNG_FORMAT_FLAG_LINEAR)
-            fast_track += 2; /* linear */
-
-         else if (!((formata | formatb) & PNG_FORMAT_FLAG_LINEAR))
-            fast_track += 3; /* sRGB */
+         /* If we get to here the fast match failed; do the slow match for this
+          * pixel.
+          */
+         if (!cmppixel(&tr, psa, psb, x, y) && (a->opts & KEEP_GOING) == 0)
+            return 0; /* error case */
       }
    }
 
-   ppa = rowa;
-   ppb = rowb;
-   for (x=y=0; y<height;)
+   /* If reqested copy the error values back from the Transform. */
+   if (a->opts & ACCUMULATE)
    {
-      /* Do the fast test if possible. */
-      switch (fast_track)
-      {
-         case 8+4+1: /* both sides color-mapped and color-maps match */
-            while (x < width)
-            {
-               if (ppa[0] != ppb[0])
-                  break;
-
-               /* This pixel matches, advance to the next. */
-               ++ppa;
-               ++ppb;
-               ++x;
-            }
-            break;
-
-         case 2: /* both sides double byte, neither color-mapped */
-            {
-               png_const_uint_16p lppa = (png_const_uint_16p)ppa;
-               png_const_uint_16p lppb = (png_const_uint_16p)ppb;
-
-               while (x < width) switch (channels)
-               {
-                  case 4:
-                     if (lppa[3] != lppb[swap_mask[3]])
-                        goto linear_mismatch;
-                  case 3:
-                     if (lppa[2] != lppb[swap_mask[2]])
-                        goto linear_mismatch;
-                  case 2:
-                     if (lppa[1] != lppb[swap_mask[1]])
-                        goto linear_mismatch;
-                  case 1:
-                     if (lppa[0] != lppb[swap_mask[0]])
-                        goto linear_mismatch;
-
-                     /* The pixels apparently match, but if an alpha channel has
-                      * been added (in b) it must be 65535 too.
-                      */
-                     if (check_alpha && 65535 != lppb[swap_mask[3]])
-                        goto linear_mismatch;
-
-                     /* This pixel matches, advance to the next. */
-                     lppa += channels;
-                     lppb += channels + check_alpha;
-                     ++x;
-                  default:
-                     goto linear_mismatch;
-               }
-
-            linear_mismatch:
-               ppa = (png_const_bytep)lppa;
-               ppb = (png_const_bytep)lppb;
-            }
-            break;
-
-         case 4+2: /* both sides double byte, imagea is color-mapped */
-            {
-               png_const_uint_16p lppb = (png_const_uint_16p)ppb;
-
-               while (x < width)
-               {
-                  png_const_uint_16p lppa = a->colormap + channels * *ppa;
-
-                  switch (channels)
-                  {
-                     case 4:
-                        if (lppa[3] != lppb[swap_mask[3]])
-                           goto linear_colormapa_mismatch;
-                     case 3:
-                        if (lppa[2] != lppb[swap_mask[2]])
-                           goto linear_colormapa_mismatch;
-                     case 2:
-                        if (lppa[1] != lppb[swap_mask[1]])
-                           goto linear_colormapa_mismatch;
-                     case 1:
-                        if (lppa[0] != lppb[swap_mask[0]])
-                           goto linear_colormapa_mismatch;
-
-                        /* The pixels apparently match, but if an alpha channel
-                         * has been added (in b) it must be 65535 too.
-                         */
-                        if (check_alpha && 65535 != lppb[swap_mask[3]])
-                           goto linear_colormapa_mismatch;
-
-                        /* This pixel matches, advance to the next. */
-                        ppa += 1;
-                        lppb += channels + check_alpha;
-                        ++x;
-                     default:
-                        goto linear_colormapa_mismatch;
-                  }
-               }
-
-            linear_colormapa_mismatch:
-               ppb = (png_const_bytep)lppb;
-            }
-            break;
-
-         case 8+2: /* both sides double byte, imageb color-mapped */
-            {
-               png_const_uint_16p lppa = (png_const_uint_16p)ppa;
-
-               while (x < width)
-               {
-                  png_const_uint_16p lppb = b->colormap + channels * *ppb;
-
-                  switch (channels)
-                  {
-                     case 4:
-                        if (lppa[3] != lppb[swap_mask[3]])
-                           goto linear_colormapb_mismatch;
-                     case 3:
-                        if (lppa[2] != lppb[swap_mask[2]])
-                           goto linear_colormapb_mismatch;
-                     case 2:
-                        if (lppa[1] != lppb[swap_mask[1]])
-                           goto linear_colormapb_mismatch;
-                     case 1:
-                        if (lppa[0] != lppb[swap_mask[0]])
-                           goto linear_colormapb_mismatch;
-
-                        /* The pixels apparently match, but if an alpha channel
-                         * has been added (in b) it must be 65535 too.
-                         */
-                        if (check_alpha && 65535 != lppb[swap_mask[3]])
-                           goto linear_colormapb_mismatch;
-
-                        /* This pixel matches, advance to the next. */
-                        lppa += channels;
-                        ppb += 1;
-                        ++x;
-                     default:
-                        goto linear_colormapb_mismatch;
-                  }
-               }
-
-            linear_colormapb_mismatch:
-               ppa = (png_const_bytep)lppa;
-            }
-            break;
-
-         case 3: /* both sides sRGB, neither color-mapped */
-            while (x < width) switch (channels)
-            {
-               case 4:
-                  if (ppa[3] != ppb[swap_mask[3]])
-                     goto sRGB_mismatch;
-               case 3:
-                  if (ppa[2] != ppb[swap_mask[2]])
-                     goto sRGB_mismatch;
-               case 2:
-                  if (ppa[1] != ppb[swap_mask[1]])
-                     goto sRGB_mismatch;
-               case 1:
-                  if (ppa[0] != ppb[swap_mask[0]])
-                     goto sRGB_mismatch;
-
-                  /* The pixels apparently match, but if an alpha channel has
-                   * been added (in b) it must be 1.0 too.
-                   */
-                  if (check_alpha && 255 != ppb[swap_mask[3]])
-                     goto sRGB_mismatch;
-
-                  /* This pixel matches, advance to the next. */
-                  ppa += channels;
-                  ppb += channels + check_alpha;
-                  ++x;
-               default:
-                  goto sRGB_mismatch;
-            }
-
-         sRGB_mismatch:
-            break;
-
-         case 4+3: /* both sides sRGB, imagea color-mapped */
-            while (x < width)
-            {
-               png_const_bytep colormap_a = (png_const_bytep)a->colormap;
-
-               switch (channels)
-               {
-                  case 4:
-                     if (colormap_a[ppa[3]] != ppb[swap_mask[3]])
-                        goto sRGB_colormapa_mismatch;
-                  case 3:
-                     if (colormap_a[ppa[2]] != ppb[swap_mask[2]])
-                        goto sRGB_colormapa_mismatch;
-                  case 2:
-                     if (colormap_a[ppa[1]] != ppb[swap_mask[1]])
-                        goto sRGB_colormapa_mismatch;
-                  case 1:
-                     if (colormap_a[ppa[0]] != ppb[swap_mask[0]])
-                        goto sRGB_mismatch;
-
-                     /* The pixels apparently match, but if an alpha channel has
-                      * been added (in b) it must be 1.0 too.
-                      */
-                     if (check_alpha && 255 != ppb[swap_mask[3]])
-                        goto sRGB_colormapa_mismatch;
-
-                     /* This pixel matches, advance to the next. */
-                     ppa += 1;
-                     ppb += channels + check_alpha;
-                     ++x;
-                  default:
-                     goto sRGB_colormapa_mismatch;
-               }
-            }
-
-         sRGB_colormapa_mismatch:
-            break;
-
-         case 8+3: /* both sides sRGB, imageb color-mapped */
-            while (x < width)
-            {
-               png_const_bytep colormap_b = (png_const_bytep)b->colormap;
-
-               switch (channels)
-               {
-                  case 4:
-                     if (ppa[3] != colormap_b[ppb[swap_mask[3]]])
-                        goto sRGB_colormapb_mismatch;
-                  case 3:
-                     if (ppa[2] != colormap_b[ppb[swap_mask[2]]])
-                        goto sRGB_colormapb_mismatch;
-                  case 2:
-                     if (ppa[1] != colormap_b[ppb[swap_mask[1]]])
-                        goto sRGB_colormapb_mismatch;
-                  case 1:
-                     if (ppa[0] != colormap_b[ppb[swap_mask[0]]])
-                        goto sRGB_colormapb_mismatch;
-
-                     /* The pixels apparently match, but if an alpha channel has
-                      * been added (in b) it must be 1.0 too.
-                      */
-                     if (check_alpha && 255 != colormap_b[ppb[swap_mask[3]]])
-                        goto sRGB_colormapb_mismatch;
-
-                     /* This pixel matches, advance to the next. */
-                     ppa += channels;
-                     ppb += 1;
-                     ++x;
-                  default:
-                     goto sRGB_colormapb_mismatch;
-               }
-            }
-
-         sRGB_colormapb_mismatch:
-            break;
-
-         default: /* formats do not match */
-            break;
-      }
-
-      /* If at the end of the row advance to the next row, if not at the end
-       * compare the pixels the slow way.
-       */
-      if (x < width)
-      {
-         Pixel pixel_a, pixel_b;
-         const char *mismatch;
-
-         if (!get_pixel(a, &pixel_a, ppa))
-            return badpixel(a, x, y, &pixel_a, "bad pixel value");
-
-         if (!get_pixel(b, &pixel_b, ppb))
-            return badpixel(b, x, y, &pixel_b, "bad pixel value");
-
-         mismatch = cmppixel(&pixel_a, &pixel_b, &pb, via_linear,
-            two_algorithms);
-
-         if (mismatch != NULL)
-         {
-            (void)logpixel(a, b, x, y, &pixel_a, &pixel_b, mismatch);
-
-            if ((a->opts & KEEP_GOING) == 0)
-               return 0;
-
-            result = 0;
-         }
-
-         ++x;
-      }
-
-      if (x >= width)
-      {
-         x = 0;
-         ++y;
-         rowa += stridea;
-         rowb += strideb;
-         ppa = rowa;
-         ppb = rowb;
-      }
+      tr.error_ptr[0] = tr.error[0];
+      tr.error_ptr[1] = tr.error[1];
+      tr.error_ptr[2] = tr.error[2];
+      tr.error_ptr[3] = tr.error[3];
    }
 
-   return result;
+   return 1;
 }
 
 /* Read the file; how the read gets done depends on which of input_file and
@@ -2372,7 +3235,6 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
          }
          /* else just use NULL for background */
 
-
          resetimage(&copy);
          copy.opts = opts; /* in case read_file needs to change it */
 
@@ -2445,7 +3307,10 @@ main(int argc, char **argv)
    int retval = 0;
    int c;
 
+   init_sRGB_to_d();
+#if 0
    init_error_via_linear();
+#endif
    format_init(&formats);
 
    for (c=1; c<argc; ++c)
@@ -2454,6 +3319,11 @@ main(int argc, char **argv)
 
       if (strcmp(arg, "--log") == 0)
          log_pass = 1;
+      else if (strcmp(arg, "--fresh") == 0)
+      {
+         memset(gpc_error, 0, sizeof gpc_error);
+         memset(gpc_error_via_linear, 0, sizeof gpc_error_via_linear);
+      }
       else if (strcmp(arg, "--file") == 0)
          opts |= READ_FILE;
       else if (strcmp(arg, "--memory") == 0)
@@ -2472,6 +3342,8 @@ main(int argc, char **argv)
          opts &= ~KEEP_TMPFILES;
       else if (strcmp(arg, "--keep-going") == 0)
          opts |= KEEP_GOING;
+      else if (strcmp(arg, "--accumulate") == 0)
+         opts |= ACCUMULATE;
       else if (strcmp(arg, "--redundant") == 0)
          redundant = 1;
       else if (strcmp(arg, "--stop") == 0)
@@ -2537,6 +3409,101 @@ main(int argc, char **argv)
          else if (!result)
             exit(1);
       }
+   }
+
+   if (opts & ACCUMULATE)
+   {
+      unsigned int in;
+
+      printf("static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =\n");
+      printf("{\n");
+      for (in=0; in<16; ++in)
+      {
+         unsigned int out;
+         printf(" { /* input: %s */\n ", format_names[in]);
+         for (out=0; out<16; ++out)
+         {
+            unsigned int alpha;
+            printf(" {");
+            for (alpha=0; alpha<4; ++alpha)
+            {
+               printf(" %d", gpc_error[in][out][alpha]);
+               if (alpha < 3) putchar(',');
+            }
+            printf(" }");
+            if (out < 15)
+            {
+               putchar(',');
+               if (out % 4 == 3) printf("\n ");
+            }
+         }
+         printf("\n }");
+
+         if (in < 15)
+            putchar(',');
+         else
+            putchar('\n');
+      }
+      printf("};\n");
+
+      printf("static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =\n");
+      printf("{\n");
+      for (in=0; in<16; ++in)
+      {
+         unsigned int out;
+         printf(" { /* input: %s */\n ", format_names[in]);
+         for (out=0; out<4; ++out)
+         {
+            unsigned int alpha;
+            printf(" {");
+            for (alpha=0; alpha<4; ++alpha)
+            {
+               printf(" %d", gpc_error_via_linear[in][out][alpha]);
+               if (alpha < 3) putchar(',');
+            }
+            printf(" }");
+            if (out < 3)
+               putchar(',');
+         }
+         printf("\n }");
+
+         if (in < 15)
+            putchar(',');
+         else
+            putchar('\n');
+      }
+      printf("};\n");
+
+      printf("static png_uint_16 gpc_error_to_colormap[8/*i*/][8/*o*/][4] =\n");
+      printf("{\n");
+      for (in=0; in<8; ++in)
+      {
+         unsigned int out;
+         printf(" { /* input: %s */\n ", format_names[in]);
+         for (out=0; out<8; ++out)
+         {
+            unsigned int alpha;
+            printf(" {");
+            for (alpha=0; alpha<4; ++alpha)
+            {
+               printf(" %d", gpc_error_to_colormap[in][out][alpha]);
+               if (alpha < 3) putchar(',');
+            }
+            printf(" }");
+            if (out < 7)
+            {
+               putchar(',');
+               if (out % 4 == 3) printf("\n ");
+            }
+         }
+         printf("\n }");
+
+         if (in < 7)
+            putchar(',');
+         else
+            putchar('\n');
+      }
+      printf("};\n");
    }
 
    if (retval == 0 && touch != NULL)
