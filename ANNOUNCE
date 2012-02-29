@@ -1,5 +1,5 @@
 
-Libpng 1.2.48beta02 - February 27, 2012
+Libpng 1.2.48beta02 - February 29, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,8 +55,9 @@ version 1.2.48beta01 [Febuary 27, 2012]
     causing out-of-bounds read in png_set_sCAL() because of failure to copy
     the string terminators (Franke Busse).
 
-version 1.2.48beta02 [February 27, 2012]
+version 1.2.48beta02 [February 29, 2012]
   Removed the png_free() of unused png_ptr->current_text from pngread.c.
+  Added libpng license text to pnggccrd.c and pngvcrd.c (requested by Chrome).
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
