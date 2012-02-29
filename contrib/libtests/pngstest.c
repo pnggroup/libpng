@@ -1771,7 +1771,11 @@ static void
 gpc_cb16(Pixel *out, const Pixel *in, const Background *back)
 {
    if (in->a <= 0)
-      out->r = out->g = out->b = back->ig;
+   {
+      out->r = back->ir;
+      out->g = back->ig;
+      out->b = back->ib;
+   }
 
    else if (in->a >= 65535)
    {
@@ -1923,7 +1927,7 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: sRGB-gray+alpha */
-  { 0, 15, 0, 0 }, { 0, 0, 0, 0 }, { 0, 16, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 13, 0, 0 }, { 0, 0, 0, 0 }, { 0, 16, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 678, 710, 0 }, { 0, 678, 710, 0 }, { 0, 678, 710, 0 }, { 0, 678, 710, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
@@ -1943,7 +1947,7 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: linear-gray+alpha */
-  { 0, 59, 6, 0 }, { 182, 2, 6, 0 }, { 0, 63, 6, 0 }, { 182, 2, 6, 0 },
+  { 0, 62, 6, 0 }, { 0, 2, 6, 0 }, { 0, 66, 6, 0 }, { 0, 2, 6, 0 },
   { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 1, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
@@ -1953,7 +1957,7 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: linear-rgb+alpha */
-  { 0, 121, 143, 0 }, { 178, 2, 7, 0 }, { 237, 66, 7, 0 }, { 255, 3, 7, 0 },
+  { 0, 124, 143, 0 }, { 0, 2, 7, 0 }, { 0, 66, 7, 0 }, { 0, 3, 7, 0 },
   { 0, 4, 4, 0 }, { 0, 5, 4, 0 }, { 0, 0, 0, 0 }, { 0, 1, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
@@ -2053,7 +2057,7 @@ static png_uint_16 gpc_error_to_colormap[8/*i*/][8/*o*/][4] =
   { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 },
   { 0, 0, 761, 0 }, { 0, 0, 761, 0 }, { 0, 0, 761, 0 }, { 0, 0, 761, 0 }
  }, { /* input: linear-gray+alpha */
-  { 0, 53, 6, 0 }, { 0, 255, 6, 25 }, { 0, 91, 6, 0 }, { 0, 255, 6, 25 },
+  { 0, 58, 6, 0 }, { 0, 255, 6, 25 }, { 0, 91, 6, 0 }, { 0, 255, 6, 25 },
   { 0, 585, 783, 0 }, { 0, 12262, 783, 6342 }, { 0, 585, 783, 0 }, { 0, 12262, 783, 6342 }
  }, { /* input: linear-rgb */
   { 0, 0, 2, 0 }, { 0, 0, 2, 0 }, { 0, 0, 26, 0 }, { 0, 0, 26, 0 },
@@ -2081,9 +2085,10 @@ typedef struct
    const Background* background;
 
    /* Precalculated values: */
-   int          in_opaque;  /* Value of input alpha that is opaque */
-   int          is_palette; /* Sample values come from the palette */
-   int          accumulate; /* Accumlate component errors (don't log) */
+   int          in_opaque;   /* Value of input alpha that is opaque */
+   int          is_palette;  /* Sample values come from the palette */
+   int          accumulate;  /* Accumlate component errors (don't log) */
+   int          output_8bit; /* Output is 8 bit (else 16 bit) */
 
    void (*in_gp)(Pixel*, png_const_voidp);
    void (*out_gp)(Pixel*, png_const_voidp);
@@ -2125,6 +2130,8 @@ transform_from_formats(Transform *result, Image *in_image,
       result->in_opaque = 65535;
    else
       result->in_opaque = 255;
+
+   result->output_8bit = (out_format & PNG_FORMAT_FLAG_LINEAR) == 0;
 
    result->is_palette = 0; /* set by caller if required */
    result->accumulate = (in_image->opts & ACCUMULATE) != 0;
@@ -2480,13 +2487,11 @@ cmppixel(Transform *transform, png_const_voidp in, png_const_voidp out,
 
    transform->out_gp(&pixel_out, out);
 
-   /* Eliminate the case where both the input and output pixel are transparent;
-    * then the other components don't matter in the 8-bot format, this removes
-    * the inconsistency in libpng handling.
+   /* Eliminate the case where both the input and output pixel are transparent
+    * and the output is 8-bit - any component values are valid.
     */
-   if (pixel_in.a == 0 && pixel_calc.a == 0 && pixel_out.a == 0 &&
-      (transform->in_opaque == 255 || (pixel_out.r == pixel_out.g &&
-            pixel_out.g == pixel_out.b && pixel_out.b == 0)))
+   if (transform->output_8bit &&
+      pixel_in.a == 0 && pixel_calc.a == 0 && pixel_out.a == 0)
       return 1;
 
    /* Check for alpha errors first; an alpha error can damage the components too

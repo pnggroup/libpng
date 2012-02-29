@@ -1592,7 +1592,7 @@ png_write_image_16bit(png_voidp argument)
       display->first_row);
    png_uint_16p output_row = png_voidcast(png_uint_16p, display->local_row);
    png_uint_16p row_end;
-   int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
    int aindex = 0;
    png_uint_32 y = image->height;
 
@@ -1625,7 +1625,7 @@ png_write_image_16bit(png_voidp argument)
 
       while (out_ptr < row_end)
       {
-         png_uint_16 alpha = in_ptr[aindex];
+         const png_uint_16 alpha = in_ptr[aindex];
          png_uint_32 reciprocal = 0;
          int c;
 
@@ -1747,7 +1747,7 @@ png_write_image_8bit(png_voidp argument)
       display->first_row);
    png_bytep output_row = png_voidcast(png_bytep, display->local_row);
    png_uint_32 y = image->height;
-   int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
 
    if (image->format & PNG_FORMAT_FLAG_ALPHA)
    {
@@ -1772,7 +1772,7 @@ png_write_image_8bit(png_voidp argument)
          png_const_uint_16p in_ptr = input_row;
          png_bytep out_ptr = output_row;
 
-         if (aindex != 0) while (out_ptr < row_end) /* Alpha channel case */
+         while (out_ptr < row_end)
          {
             png_uint_16 alpha = in_ptr[aindex];
             png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
