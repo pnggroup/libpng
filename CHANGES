@@ -3986,12 +3986,17 @@ Version 1.6.0beta14 [February 27, 2012]
   Added information about the new limits in the manual.
   Updated Makefile.in
 
-Version 1.6.0beta15 [February 29, 2012]
+Version 1.6.0beta15 [March 2, 2012]
   Removed unused "current_text" members of png_struct and the png_free()
     of png_ptr->current_text from pngread.c
   Rewrote pngstest.c for substantial speed improvement.
   Fixed transparent pixel and 16-bit rgb tests in pngstest and removed a
     spurious check in pngwrite.c
+  Added PNG_IMAGE_FLAG_FAST for the benefit of applications that store
+    intermediate files, or intermediate in-memory data, while processing
+    image data with the simplified API.  The option makes the files larger
+    but faster to write and read.  pngstest now uses this by default; this
+    can be disabled with the --slow option.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

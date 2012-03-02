@@ -304,6 +304,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 #define KEEP_TMPFILES 16 /* else delete temporary files */
 #define KEEP_GOING 32
 #define ACCUMULATE 64
+#define FAST_WRITE 128
 
 static void
 print_opts(png_uint_32 opts)
@@ -1932,7 +1933,7 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: sRGB-rgb */
-  { 0, 0, 17, 0 }, { 0, 0, 17, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 0, 19, 0 }, { 0, 0, 19, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 863, 0 }, { 0, 0, 863, 0 }, { 0, 0, 811, 0 }, { 0, 0, 811, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
@@ -2010,7 +2011,7 @@ static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =
  }, { /* input: sRGB-gray+alpha */
   { 0, 6, 3, 0 }, { 0, 53, 3, 0 }, { 0, 6, 3, 0 }, { 0, 53, 3, 0 }
  }, { /* input: sRGB-rgb */
-  { 0, 0, 17, 0 }, { 0, 0, 17, 0 }, { 0, 0, 14, 0 }, { 0, 0, 14, 0 }
+  { 0, 0, 19, 0 }, { 0, 0, 19, 0 }, { 0, 0, 15, 0 }, { 0, 0, 15, 0 }
  }, { /* input: sRGB-rgb+alpha */
   { 0, 8, 10, 0 }, { 0, 13, 10, 0 }, { 0, 12, 8, 0 }, { 0, 53, 8, 0 }
  }, { /* input: linear-gray */
@@ -3083,6 +3084,9 @@ read_one_file(Image *image)
 static int
 write_one_file(Image *output, Image *image, int convert_to_8bit)
 {
+   if (image->opts & FAST_WRITE)
+      image->image.flags |= PNG_IMAGE_FLAG_FAST;
+
    if (image->opts & USE_STDIO)
    {
       FILE *f = tmpfile();
@@ -3303,7 +3307,7 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
 int
 main(int argc, char **argv)
 {
-   png_uint_32 opts = 0;
+   png_uint_32 opts = FAST_WRITE;
    format_list formats;
    const char *touch = NULL;
    int log_pass = 0;
@@ -3347,6 +3351,10 @@ main(int argc, char **argv)
          opts &= ~KEEP_TMPFILES;
       else if (strcmp(arg, "--keep-going") == 0)
          opts |= KEEP_GOING;
+      else if (strcmp(arg, "--fast") == 0)
+         opts |= FAST_WRITE;
+      else if (strcmp(arg, "--slow") == 0)
+         opts &= ~FAST_WRITE;
       else if (strcmp(arg, "--accumulate") == 0)
          opts |= ACCUMULATE;
       else if (strcmp(arg, "--redundant") == 0)

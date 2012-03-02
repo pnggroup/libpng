@@ -731,6 +731,15 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    }
 #endif
 
+#if 0 /* To do: implement png_do_check_palette_indexes() */
+   /* Check for out-of-range palette index */
+   if (png_ptr->num_palette < (1 << png_ptr->bit_depth))
+      png_do_check_palette_indexes(&row_info, png_ptr->row_buf + 1,
+        png_ptr->num_palette_max);
+   if (png_ptr->num_palette_max > num_palette + 1)
+      png_warning(png_ptr, "Palette index exceeded num_palette");
+#endif
+
    /* Find a filter if necessary, filter the row and write it out. */
    png_write_find_filter(png_ptr, &row_info);
 
@@ -2107,6 +2116,18 @@ png_image_write_main(png_voidp argument)
 
       display->first_row = row;
       display->row_bytes = row_bytes;
+   }
+
+   /* Apply 'fast' options if the flag is set. */
+   if ((image->flags & PNG_IMAGE_FLAG_FAST) != 0)
+   {
+      png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, PNG_NO_FILTERS);
+      /* NOTE: determined by experiment using pngstest, this reflects some
+       * balance between the time to write the image once and the time to read
+       * it about 50 times.  The speed-up in pngstest was about 10-20% of the
+       * total (user) time on a heavily loaded system.
+       */
+      png_set_compression_level(png_ptr, 3);
    }
 
    /* Check for the cases that currently require a pre-transform on the row
