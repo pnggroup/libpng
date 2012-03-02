@@ -373,7 +373,7 @@ typedef struct
 } compression_state;
 
 /* Compress given text into storage in the png_ptr structure */
-static int /* PRIVATE */
+static png_size_t /* PRIVATE */
 png_text_compress(png_structrp png_ptr,
     png_const_charp text, png_size_t text_len, int compression,
     compression_state *comp)
@@ -390,7 +390,7 @@ png_text_compress(png_structrp png_ptr,
    if (compression == PNG_TEXT_COMPRESSION_NONE)
    {
       comp->input = (png_const_bytep)text;
-      return((int)text_len);
+      return text_len;
    }
 
    if (compression >= PNG_TEXT_COMPRESSION_LAST)
@@ -419,7 +419,7 @@ png_text_compress(png_structrp png_ptr,
    png_zlib_claim(png_ptr, PNG_ZLIB_FOR_TEXT);
 
    /* Set up the compression buffers */
-   /* TODO: the following cast hides a potential overflow problem. */
+   /* TODO: the following cast hides a ****CERTAIN**** overflow problem. */
    png_ptr->zstream.avail_in = (uInt)text_len;
 
    /* NOTE: assume zlib doesn't overwrite the input */
@@ -516,9 +516,8 @@ png_text_compress(png_structrp png_ptr,
                   old_ptr = comp->output_ptr;
 
                   /* This could be optimized to realloc() */
-                  comp->output_ptr = (png_bytepp)png_malloc(png_ptr,
-                      (png_alloc_size_t)(comp->max_output_ptr *
-                      png_sizeof(png_charp)));
+                  comp->output_ptr = png_voidcast(png_bytepp,png_malloc(png_ptr,
+                      comp->max_output_ptr * png_sizeof(png_charp)));
 
                   png_memcpy(comp->output_ptr, old_ptr,
                       old_max * png_sizeof(png_charp));
@@ -527,15 +526,13 @@ png_text_compress(png_structrp png_ptr,
                }
 
                else
-                  comp->output_ptr = (png_bytepp)png_malloc(png_ptr,
-                      (png_alloc_size_t)(comp->max_output_ptr *
-                      png_sizeof(png_charp)));
+                  comp->output_ptr = png_voidcast(png_bytepp,png_malloc(png_ptr,
+                      comp->max_output_ptr * png_sizeof(png_charp)));
             }
 
             /* Save the data */
-            comp->output_ptr[comp->num_output_ptr] =
-                (png_bytep)png_malloc(png_ptr,
-                (png_alloc_size_t)png_ptr->zbuf_size);
+            comp->output_ptr[comp->num_output_ptr] = png_voidcast(png_bytep,
+                png_malloc(png_ptr, png_ptr->zbuf_size));
 
             png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
                 png_ptr->zbuf_size);
@@ -559,12 +556,13 @@ png_text_compress(png_structrp png_ptr,
    } while (ret != Z_STREAM_END);
 
    /* Text length is number of buffers plus last buffer */
+   /* TODO: this ****WILL**** overflow */
    text_len = png_ptr->zbuf_size * comp->num_output_ptr;
 
    if (png_ptr->zstream.avail_out < png_ptr->zbuf_size)
-      text_len += png_ptr->zbuf_size - (png_size_t)png_ptr->zstream.avail_out;
+      text_len += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
 
-   return((int)text_len);
+   return text_len;
 }
 
 /* Ship the compressed text out via chunk writes */
@@ -641,12 +639,13 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
       }
 
       else
-         png_error(png_ptr,
+         png_warning(png_ptr, /* must be a warning or the data isn't freed */
              "Invalid zlib compression method or flags in non-IDAT chunk");
    }
 #endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
 
    /* Write saved output buffers, if any */
+   /* WARNING: SIDE EFFECT; the code below is what actually frees the data */
    for (i = 0; i < comp->num_output_ptr; i++)
    {
       png_write_chunk_data(png_ptr, comp->output_ptr[i],
@@ -1092,14 +1091,42 @@ png_write_sRGB(png_structrp png_ptr, int srgb_intent)
 /* Write an iCCP chunk */
 void /* PRIVATE */
 png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
-    png_const_charp profile, int profile_len)
+    png_const_bytep profile, png_uint_32 profile_len)
 {
-   png_size_t name_len;
+   png_size_t name_len, compressed_profile_len;
    png_charp new_name;
    compression_state comp;
-   int embedded_profile_len = 0;
+   png_uint_32 embedded_profile_len = 0;
 
    png_debug(1, "in png_write_iCCP");
+
+   if (compression_type != PNG_COMPRESSION_TYPE_BASE)
+      png_error(png_ptr, "Unknown compression type for iCCP chunk");
+
+   if (profile == NULL)
+      png_error(png_ptr, "No profile for iCCP chunk");
+
+   if (profile_len < 132)
+      png_error(png_ptr, "ICC profile too short");
+
+   if (profile_len & 3)
+      png_error(png_ptr, "ICC profile length invalid (not a multiple of 4)");
+
+   embedded_profile_len = png_get_uint_32(profile);
+
+   if (profile_len != embedded_profile_len)
+      png_error(png_ptr, "Profile length does not match profile");
+
+   if ((png_size_t)profile_len != profile_len)
+   {
+      /* This isn't an application error, technically, but all the same do
+       * not short-change the app by writing a PNG without the profile!
+       */
+      png_error(png_ptr, "Profile length exceeds system limits");
+   }
+
+   if ((name_len = png_check_keyword(png_ptr, name, &new_name)) == 0)
+      return;
 
    comp.num_output_ptr = 0;
    comp.max_output_ptr = 0;
@@ -1107,64 +1134,37 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
    comp.input = NULL;
    comp.input_len = 0;
 
-   if ((name_len = png_check_keyword(png_ptr, name, &new_name)) == 0)
-      return;
+   compressed_profile_len = png_text_compress(png_ptr, (png_const_charp)profile,
+       (png_size_t)/*ok*/profile_len, PNG_COMPRESSION_TYPE_BASE, &comp);
 
-   if (compression_type != PNG_COMPRESSION_TYPE_BASE)
-      png_warning(png_ptr, "Unknown compression type in iCCP chunk");
-
-   if (profile == NULL)
-      profile_len = 0;
-
-   if (profile_len > 3)
-      embedded_profile_len =
-          ((*( (png_const_bytep)profile    ))<<24) |
-          ((*( (png_const_bytep)profile + 1))<<16) |
-          ((*( (png_const_bytep)profile + 2))<< 8) |
-          ((*( (png_const_bytep)profile + 3))    );
-
-   if (embedded_profile_len < 0)
+   /* 'name_len' is 1..79, so the following is safe: */
+   if (compressed_profile_len > PNG_UINT_31_MAX - name_len - 2)
    {
-      png_warning(png_ptr,
-          "Embedded profile length in iCCP chunk is negative");
-
       png_free(png_ptr, new_name);
-      return;
+
+      /* TODO: there is no 'compression_free' function */
+      if (comp.output_ptr)
+      {
+         int i;
+         for (i = 0; i < comp.num_output_ptr; i++)
+            png_free(png_ptr, comp.output_ptr[i]);
+         png_free(png_ptr, comp.output_ptr);
+      }
+
+      png_error(png_ptr, "Compressed profile exceeds PNG size limits");
    }
-
-   if (profile_len < embedded_profile_len)
-   {
-      png_warning(png_ptr,
-          "Embedded profile length too large in iCCP chunk");
-
-      png_free(png_ptr, new_name);
-      return;
-   }
-
-   if (profile_len > embedded_profile_len)
-   {
-      png_warning(png_ptr,
-          "Truncating profile to actual length in iCCP chunk");
-
-      profile_len = embedded_profile_len;
-   }
-
-   if (profile_len)
-      profile_len = png_text_compress(png_ptr, profile,
-          (png_size_t)profile_len, PNG_COMPRESSION_TYPE_BASE, &comp);
 
    /* Make sure we include the NULL after the name and the compression type */
    png_write_chunk_header(png_ptr, png_iCCP,
-       (png_uint_32)(name_len + profile_len + 2));
+       (png_uint_32)/*ok*/(name_len + compressed_profile_len + 2));
 
    new_name[name_len + 1] = 0x00;
 
-   png_write_chunk_data(png_ptr, (png_bytep)new_name,
-       (png_size_t)(name_len + 2));
+   png_write_chunk_data(png_ptr, (png_bytep)new_name, name_len + 2);
 
-   if (profile_len)
+   if (compressed_profile_len)
    {
-      comp.input_len = profile_len;
+      comp.input_len = compressed_profile_len;
       png_write_compressed_data_out(png_ptr, &comp);
    }
 

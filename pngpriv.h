@@ -898,7 +898,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_sRGB,(png_structrp png_ptr,
 #ifdef PNG_WRITE_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_iCCP,(png_structrp png_ptr,
     png_const_charp name, int compression_type,
-    png_const_charp profile, int proflen),PNG_EMPTY);
+    png_const_bytep profile, png_uint_32 proflen),PNG_EMPTY);
    /* Note to maintainer: profile should be png_bytep */
 #endif
 

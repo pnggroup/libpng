@@ -749,7 +749,10 @@ insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
                      params[1], (unsigned long)fake_len);
                   exit(1);
                }
-               proflen = (png_uint_32)fake_len;
+               proflen = (png_uint_32)(fake_len & ~3U);
+               /* Always fix up the profile length. */
+               png_save_uint_32(profile, proflen);
+               break;
             }
          }
 
@@ -777,7 +780,7 @@ insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
       {
          fprintf(stderr, "--insert iCCP %s: profile length field wrong:\n",
             params[1]);
-         fprintf(stderr, "  actual %lu, recorded value %lu (correted)\n",
+         fprintf(stderr, "  actual %lu, recorded value %lu (corrected)\n",
             (unsigned long)proflen, (unsigned long)prof_header);
          png_save_uint_32(profile, proflen);
       }
@@ -820,6 +823,20 @@ set_text(png_structp png_ptr, png_infop info_ptr, png_textp text,
             text->text = (png_charp)file;
          }
          break;
+
+      case '0': case '1': case '2': case '3': case '4':
+      case '5': case '6': case '7': case '8': case '9':
+         {
+            png_bytep data = NULL;
+            png_size_t fake_len = load_fake(param, &data);
+
+            if (fake_len > 0) /* else a simple parameter */
+            {
+               text->text_length = fake_len;
+               text->text = (png_charp)data;
+               break;
+            }
+         }
 
       default:
          text->text = param;
@@ -864,9 +881,9 @@ insert_iTXt(png_structp png_ptr, png_infop info_ptr, int nparams,
    check_param_count(nparams, 4);
    clear_text(&text, params[0]);
    text.compression = 2; /* iTXt + deflate */
-   text.lang = params[2];/* language tag */
-   text.lang_key = params[3]; /* translated keyword */
-   set_text(png_ptr, info_ptr, &text, params[1]);
+   text.lang = params[1];/* language tag */
+   text.lang_key = params[2]; /* translated keyword */
+   set_text(png_ptr, info_ptr, &text, params[3]);
 }
 
 static void

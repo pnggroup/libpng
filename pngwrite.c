@@ -73,7 +73,7 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_WRITE_iCCP_SUPPORTED
    if (info_ptr->valid & PNG_INFO_iCCP)
       png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
-          (png_charp)info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
+          info_ptr->iccp_profile, info_ptr->iccp_proflen);
 #endif
 #ifdef PNG_WRITE_sBIT_SUPPORTED
    if (info_ptr->valid & PNG_INFO_sBIT)
