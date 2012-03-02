@@ -256,7 +256,7 @@ Version 1.6.0beta15 [March 2, 2012]
     all potentially valid ICC profiles and reject obviously invalid ones.
     It now uses png_error() to do so rather than casually writing a PNG
     without the necessary color data.
-  Removed whitespace from the end of line in all source files and scripts.
+  Removed whitespace from the end of lines in all source files and scripts.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
