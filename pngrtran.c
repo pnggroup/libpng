@@ -2304,7 +2304,6 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
          (!png_ptr->interlaced && png_ptr->pass == 0)))
       {
          png_bytep rp = png_ptr->row_buf + 1 + row_info->rowbytes;
-         int index, padding;
 
          switch (row_info->bit_depth)
          {
@@ -2313,7 +2312,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
                /* in this case, all bytes must be 0 so we don't need
                 * to unpack the pixels except for the rightmost one.
                 */
-               padding = 8*row_info->rowbytes - png_ptr->width;
+               int padding = 8*row_info->rowbytes - png_ptr->width;
 
                for (; rp > png_ptr->row_buf; rp--)
                {
@@ -2327,11 +2326,11 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
             case 2:
             {
-               padding = 2*(4*row_info->rowbytes - png_ptr->width);
+               int padding = 2*(4*row_info->rowbytes - png_ptr->width);
 
                for (; rp > png_ptr->row_buf; rp--)
                {
-                 index = ((*rp >> padding) & 0x03);
+                 int index = ((*rp >> padding) & 0x03);
 
                  if (index > png_ptr->num_palette_max)
                     png_ptr->num_palette_max = index;
@@ -2359,11 +2358,11 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
             case 4:
             {
-               padding = 4*(2*row_info->rowbytes - png_ptr->width);
+               int padding = 4*(2*row_info->rowbytes - png_ptr->width);
 
                for (; rp > png_ptr->row_buf; rp--)
                {
-                 index = ((*rp >> padding) & 0x0f);
+                 int index = ((*rp >> padding) & 0x0f);
 
                  if (index > png_ptr->num_palette_max)
                     png_ptr->num_palette_max = index;
