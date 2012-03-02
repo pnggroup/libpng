@@ -3997,6 +3997,11 @@ Version 1.6.0beta15 [March 2, 2012]
     image data with the simplified API.  The option makes the files larger
     but faster to write and read.  pngstest now uses this by default; this
     can be disabled with the --slow option.
+  Improved pngstest fine tuning of error numbers, new test file generator.
+    The generator generates images that test the full range of sample values,
+    allow the error numbers in pngstest to be tuned and checked.  makepng
+    also allows generation of images with extra chunks, although this is
+    still work-in-progress.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1924,41 +1924,41 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
 {
  { /* input: sRGB-gray */
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 0, 261, 0 }, { 0, 0, 261, 0 }, { 0, 0, 261, 0 }, { 0, 0, 261, 0 },
+  { 0, 0, 372, 0 }, { 0, 0, 372, 0 }, { 0, 0, 372, 0 }, { 0, 0, 372, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: sRGB-gray+alpha */
-  { 0, 13, 0, 0 }, { 0, 0, 0, 0 }, { 0, 16, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 678, 710, 0 }, { 0, 678, 710, 0 }, { 0, 678, 710, 0 }, { 0, 678, 710, 0 },
+  { 0, 18, 0, 0 }, { 0, 0, 0, 0 }, { 0, 20, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 897, 788, 0 }, { 0, 897, 788, 0 }, { 0, 897, 788, 0 }, { 0, 897, 788, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: sRGB-rgb */
   { 0, 0, 19, 0 }, { 0, 0, 19, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 0, 863, 0 }, { 0, 0, 863, 0 }, { 0, 0, 811, 0 }, { 0, 0, 811, 0 },
+  { 0, 0, 893, 0 }, { 0, 0, 893, 0 }, { 0, 0, 811, 0 }, { 0, 0, 811, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: sRGB-rgb+alpha */
-  { 0, 3, 7, 0 }, { 0, 3, 7, 0 }, { 0, 13, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 688, 743, 0 }, { 0, 688, 743, 0 }, { 0, 688, 743, 0 }, { 0, 688, 743, 0 },
+  { 0, 4, 7, 0 }, { 0, 14, 7, 0 }, { 0, 19, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 832, 764, 0 }, { 0, 832, 764, 0 }, { 0, 897, 788, 0 }, { 0, 897, 788, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: linear-gray */
-  { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 },
+  { 0, 0, 9, 0 }, { 0, 0, 9, 0 }, { 0, 0, 9, 0 }, { 0, 0, 9, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: linear-gray+alpha */
-  { 0, 62, 6, 0 }, { 0, 2, 6, 0 }, { 0, 66, 6, 0 }, { 0, 2, 6, 0 },
+  { 0, 74, 9, 0 }, { 0, 20, 9, 0 }, { 0, 74, 9, 0 }, { 0, 20, 9, 0 },
   { 0, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 }, { 0, 1, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: linear-rgb */
-  { 0, 0, 2, 0 }, { 0, 0, 2, 0 }, { 0, 0, 3, 0 }, { 0, 0, 3, 0 },
+  { 0, 0, 9, 0 }, { 0, 0, 9, 0 }, { 0, 0, 9, 0 }, { 0, 0, 9, 0 },
   { 0, 0, 4, 0 }, { 0, 0, 4, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: linear-rgb+alpha */
-  { 0, 124, 143, 0 }, { 0, 2, 7, 0 }, { 0, 66, 7, 0 }, { 0, 3, 7, 0 },
+  { 0, 126, 143, 0 }, { 0, 9, 7, 0 }, { 0, 74, 9, 0 }, { 0, 16, 9, 0 },
   { 0, 4, 4, 0 }, { 0, 5, 4, 0 }, { 0, 0, 0, 0 }, { 0, 1, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
@@ -1978,10 +1978,10 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
   { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 460, 0 }, { 0, 0, 460, 0 }, { 0, 0, 263, 0 }, { 0, 0, 263, 0 }
  }, { /* input: color-mapped-sRGB-rgb+alpha */
-  { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 },
-  { 0, 0, 427, 0 }, { 0, 0, 427, 0 }, { 0, 0, 263, 0 }, { 0, 0, 263, 0 },
-  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 0, 460, 0 }, { 0, 0, 460, 0 }, { 0, 0, 263, 0 }, { 0, 0, 263, 0 }
+  { 0, 6, 8, 0 }, { 0, 7, 8, 0 }, { 0, 75, 8, 0 }, { 0, 9, 8, 0 },
+  { 0, 585, 427, 0 }, { 0, 585, 427, 0 }, { 0, 717, 409, 0 }, { 0, 717, 409, 0 },
+  { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 1, 0, 0 }, { 0, 0, 0, 0 },
+  { 0, 13323, 460, 0 }, { 0, 334, 460, 0 }, { 0, 16480, 263, 0 }, { 0, 243, 263, 0 }
  }, { /* input: color-mapped-linear-gray */
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
@@ -1991,17 +1991,17 @@ static png_uint_16 gpc_error[16/*in*/][16/*out*/][4/*a*/] =
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 0, 0, 0 }, { 0, 0, 282, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+  { 0, 0, 0, 0 }, { 0, 253, 282, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: color-mapped-linear-rgb */
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 263, 0 }, { 0, 0, 0, 0 }
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 265, 0 }, { 0, 0, 0, 0 }
  }, { /* input: color-mapped-linear-rgb+alpha */
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 },
-  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 263, 0 }
+  { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 243, 265, 0 }
  }
 };
 static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =
@@ -2009,19 +2009,19 @@ static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =
  { /* input: sRGB-gray */
   { 0, 0, 7, 0 }, { 0, 0, 7, 0 }, { 0, 0, 7, 0 }, { 0, 0, 7, 0 }
  }, { /* input: sRGB-gray+alpha */
-  { 0, 6, 3, 0 }, { 0, 53, 3, 0 }, { 0, 6, 3, 0 }, { 0, 53, 3, 0 }
+  { 0, 15, 15, 0 }, { 0, 186, 15, 0 }, { 0, 15, 15, 0 }, { 0, 186, 15, 0 }
  }, { /* input: sRGB-rgb */
   { 0, 0, 19, 0 }, { 0, 0, 19, 0 }, { 0, 0, 15, 0 }, { 0, 0, 15, 0 }
  }, { /* input: sRGB-rgb+alpha */
-  { 0, 8, 10, 0 }, { 0, 13, 10, 0 }, { 0, 12, 8, 0 }, { 0, 53, 8, 0 }
+  { 0, 9, 10, 0 }, { 0, 180, 10, 0 }, { 0, 14, 15, 0 }, { 0, 186, 15, 0 }
  }, { /* input: linear-gray */
   { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }
  }, { /* input: linear-gray+alpha */
-  { 0, 1, 1, 0 }, { 0, 0, 1, 0 }, { 0, 1, 1, 0 }, { 0, 0, 1, 0 }
+  { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }
  }, { /* input: linear-rgb */
-  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+  { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }
  }, { /* input: linear-rgb+alpha */
-  { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }, { 0, 0, 1, 0 }
+  { 0, 1, 1, 0 }, { 0, 8, 1, 0 }, { 0, 1, 1, 0 }, { 0, 1, 1, 0 }
  }, { /* input: color-mapped-sRGB-gray */
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: color-mapped-sRGB-gray+alpha */
@@ -2029,7 +2029,7 @@ static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =
  }, { /* input: color-mapped-sRGB-rgb */
   { 0, 0, 12, 0 }, { 0, 0, 12, 0 }, { 0, 0, 1, 0 }, { 0, 0, 1, 0 }
  }, { /* input: color-mapped-sRGB-rgb+alpha */
-  { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
+  { 0, 4, 8, 0 }, { 0, 9, 8, 0 }, { 0, 8, 3, 0 }, { 0, 32, 3, 0 }
  }, { /* input: color-mapped-linear-gray */
   { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }
  }, { /* input: color-mapped-linear-gray+alpha */
@@ -2043,29 +2043,29 @@ static png_uint_16 gpc_error_via_linear[16][4/*out*/][4] =
 static png_uint_16 gpc_error_to_colormap[8/*i*/][8/*o*/][4] =
 {
  { /* input: sRGB-gray */
-  { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 }, { 0, 0, 8, 0 },
-  { 0, 0, 559, 0 }, { 0, 0, 559, 0 }, { 0, 0, 559, 0 }, { 0, 0, 559, 0 }
+  { 0, 0, 9, 0 }, { 0, 0, 9, 0 }, { 0, 0, 9, 0 }, { 0, 0, 9, 0 },
+  { 0, 0, 560, 0 }, { 0, 0, 560, 0 }, { 0, 0, 560, 0 }, { 0, 0, 560, 0 }
  }, { /* input: sRGB-gray+alpha */
-  { 0, 10, 2, 0 }, { 0, 255, 2, 25 }, { 0, 88, 2, 0 }, { 0, 255, 2, 25 },
-  { 0, 824, 745, 0 }, { 0, 15462, 745, 6425 }, { 0, 824, 745, 0 }, { 0, 15462, 745, 6425 }
+  { 0, 19, 2, 0 }, { 0, 255, 2, 25 }, { 0, 88, 2, 0 }, { 0, 255, 2, 25 },
+  { 0, 1012, 745, 0 }, { 0, 16026, 745, 6425 }, { 0, 1012, 745, 0 }, { 0, 16026, 745, 6425 }
  }, { /* input: sRGB-rgb */
-  { 0, 0, 17, 0 }, { 0, 0, 17, 0 }, { 0, 0, 25, 0 }, { 0, 0, 25, 0 },
-  { 0, 0, 871, 0 }, { 0, 0, 871, 0 }, { 0, 0, 13677, 0 }, { 0, 0, 13677, 0 }
+  { 0, 0, 19, 0 }, { 0, 0, 19, 0 }, { 0, 0, 25, 0 }, { 0, 0, 25, 0 },
+  { 0, 0, 937, 0 }, { 0, 0, 937, 0 }, { 0, 0, 13677, 0 }, { 0, 0, 13677, 0 }
  }, { /* input: sRGB-rgb+alpha */
-  { 0, 63, 77, 0 }, { 0, 162, 7, 25 }, { 0, 220, 25, 0 }, { 0, 255, 25, 63 },
-  { 0, 17534, 18452, 0 }, { 0, 15614, 1001, 6425 }, { 0, 13050, 13677, 0 }, { 0, 48573, 13677, 16191 }
+  { 0, 63, 77, 0 }, { 0, 255, 19, 25 }, { 0, 220, 25, 0 }, { 0, 255, 25, 67 },
+  { 0, 17534, 18491, 0 }, { 0, 15614, 2824, 6425 }, { 0, 14019, 13677, 0 }, { 0, 48573, 13677, 17219 }
  }, { /* input: linear-gray */
-  { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 }, { 0, 0, 6, 0 },
-  { 0, 0, 761, 0 }, { 0, 0, 761, 0 }, { 0, 0, 761, 0 }, { 0, 0, 761, 0 }
+  { 0, 0, 73, 0 }, { 0, 0, 73, 0 }, { 0, 0, 73, 0 }, { 0, 0, 73, 0 },
+  { 0, 0, 18817, 0 }, { 0, 0, 18817, 0 }, { 0, 0, 18817, 0 }, { 0, 0, 18817, 0 }
  }, { /* input: linear-gray+alpha */
-  { 0, 58, 6, 0 }, { 0, 255, 6, 25 }, { 0, 91, 6, 0 }, { 0, 255, 6, 25 },
-  { 0, 585, 783, 0 }, { 0, 12262, 783, 6342 }, { 0, 585, 783, 0 }, { 0, 12262, 783, 6342 }
+  { 0, 74, 74, 0 }, { 0, 255, 74, 25 }, { 0, 97, 74, 0 }, { 0, 255, 74, 25 },
+  { 0, 18919, 18907, 0 }, { 0, 24549, 18907, 6552 }, { 0, 18919, 18907, 0 }, { 0, 24549, 18907, 6552 }
  }, { /* input: linear-rgb */
-  { 0, 0, 2, 0 }, { 0, 0, 2, 0 }, { 0, 0, 26, 0 }, { 0, 0, 26, 0 },
-  { 0, 0, 766, 0 }, { 0, 0, 766, 0 }, { 0, 0, 12684, 0 }, { 0, 0, 12684, 0 }
+  { 0, 0, 73, 0 }, { 0, 0, 73, 0 }, { 0, 0, 98, 0 }, { 0, 0, 98, 0 },
+  { 0, 0, 18664, 0 }, { 0, 0, 18664, 0 }, { 0, 0, 24998, 0 }, { 0, 0, 24998, 0 }
  }, { /* input: linear-rgb+alpha */
-  { 0, 181, 196, 0 }, { 0, 179, 7, 25 }, { 206, 186, 29, 0 }, { 0, 255, 29, 62 },
-  { 0, 17173, 18137, 0 }, { 0, 14770, 1178, 6342 }, { 0, 11165, 13107, 0 }, { 0, 46509, 13107, 15983 }
+  { 0, 181, 196, 0 }, { 0, 255, 61, 25 }, { 206, 187, 98, 0 }, { 0, 255, 98, 67 },
+  { 0, 18141, 18137, 0 }, { 0, 17494, 17504, 6553 }, { 0, 24979, 24992, 0 }, { 0, 46509, 24992, 17347 }
  }
 };
 /* END MACHINE GENERATED */
@@ -2488,11 +2488,16 @@ cmppixel(Transform *transform, png_const_voidp in, png_const_voidp out,
 
    transform->out_gp(&pixel_out, out);
 
-   /* Eliminate the case where both the input and output pixel are transparent
-    * and the output is 8-bit - any component values are valid.
+   /* Eliminate the case where the input and output values match exactly. */
+   if (pixel_calc.a == pixel_out.a && pixel_calc.r == pixel_out.r &&
+      pixel_calc.g == pixel_out.g && pixel_calc.b == pixel_out.b)
+      return 1;
+
+   /* Eliminate the case where the output pixel is transparent and the output
+    * is 8-bit - any component values are valid.  Don't check the input alpha
+    * here to also skip the 16-bit small alpha cases.
     */
-   if (transform->output_8bit &&
-      pixel_in.a == 0 && pixel_calc.a == 0 && pixel_out.a == 0)
+   if (transform->output_8bit && pixel_calc.a == 0 && pixel_out.a == 0)
       return 1;
 
    /* Check for alpha errors first; an alpha error can damage the components too
@@ -2512,6 +2517,13 @@ cmppixel(Transform *transform, png_const_voidp in, png_const_voidp out,
             errmsg = "alpha";
       }
    }
+
+   /* Now if *either* of the output alphas are 0 but alpha is within tolerance
+    * eliminate the 8-bit component comparison.
+    */
+   if (errmsg == NULL && transform->output_8bit &&
+      (pixel_calc.a == 0 || pixel_out.a == 0))
+      return 1;
 
    if (errmsg == NULL) /* else just signal an alpha error */
    {
@@ -2722,22 +2734,35 @@ compare_two_images(Image *a, Image *b, int via_linear,
          for (y=0; y<256; ++y, a_cmap += a_sample, b_cmap += b_sample)
             if (in_use[y])
          {
+            /* The colormap entries should be valid, but because libpng doesn't
+             * do any checking at present the original image may contain invalid
+             * pixel values.  These cause an error here (at present) unless
+             * accumulating errors in which case the program just ignores them.
+             */
             if (y >= a->image.colormap_entries)
+            {
+               if ((a->opts & ACCUMULATE) == 0)
                {
-               char pindex[4];
-               sprintf(pindex, "%lu", (unsigned long)y);
-               return logerror(a, a->file_name, "bad pixel index ", pindex);
+                  char pindex[4];
+                  sprintf(pindex, "%lu", (unsigned long)y);
+                  logerror(a, a->file_name, ": bad pixel index: ", pindex);
                }
+               result = 0;
+            }
 
-            if (y >= b->image.colormap_entries)
-               {
-               char pindex[4];
-               sprintf(pindex, "%lu", (unsigned long)y);
-               return logerror(b, b->file_name, "bad pixel index ", pindex);
-               }
+            else if (y >= b->image.colormap_entries)
+            {
+               if ((a->opts & ACCUMULATE) == 0)
+                  {
+                  char pindex[4];
+                  sprintf(pindex, "%lu", (unsigned long)y);
+                  logerror(b, b->file_name, ": bad pixel index: ", pindex);
+                  }
+               result = 0;
+            }
 
             /* All the mismatches are logged here; there can only be 256! */
-            if (!cmppixel(&tr, a_cmap, b_cmap, 0, y))
+            else if (!cmppixel(&tr, a_cmap, b_cmap, 0, y))
                result = 0;
          }
 
@@ -2748,6 +2773,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
             tr.error_ptr[1] = tr.error[1];
             tr.error_ptr[2] = tr.error[2];
             tr.error_ptr[3] = tr.error[3];
+            result = 1; /* force a continue */
          }
 
          return result;
@@ -3304,6 +3330,38 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
    return result;
 }
 
+static int
+test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
+   int stride_extra, int log_pass)
+{
+   int result;
+   Image image;
+
+   newimage(&image);
+   initimage(&image, opts, file_name, stride_extra);
+   result = read_one_file(&image);
+   if (result)
+      result = testimage(&image, opts, formats);
+   freeimage(&image);
+
+   if (log_pass)
+   {
+      if (result)
+         printf("PASS:");
+
+      else
+         printf("FAIL:");
+
+      print_opts(opts);
+      printf(" %s\n", file_name);
+   }
+
+   else if (!result)
+      exit(1);
+
+   return result;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -3383,7 +3441,7 @@ main(int argc, char **argv)
 
          format_set(&formats, format);
       }
-      else if (arg[0] == '-')
+      else if (arg[0] == '-' && arg[1] != 0 && (arg[1] != '0' || arg[2] != 0))
       {
          fflush(stdout);
          fprintf(stderr, "%s: unknown option: %s\n", argv[0], arg);
@@ -3391,36 +3449,57 @@ main(int argc, char **argv)
       }
       else
       {
-         int result;
-         Image image;
-
          if (format_is_initial(&formats))
             format_default(&formats, redundant);
 
-         newimage(&image);
-         initimage(&image, opts, arg, stride_extra);
-         result = read_one_file(&image);
-         if (result)
-            result = testimage(&image, opts, &formats);
-         freeimage(&image);
-
-         if (log_pass)
+         if (arg[0] == '-')
          {
-            if (result)
-               printf("PASS:");
+            const int term = (arg[1] == '0' ? 0 : '\n');
+            unsigned int ich = 0;
 
-            else
+            /* Loop reading files, use a static buffer to simplify this and just
+             * stop if the name gets to long.
+             */
+            static char buffer[4096];
+
+            do
             {
-               printf("FAIL:");
-               retval = 1;
-            }
+               int ch = getchar();
 
-            print_opts(opts);
-            printf(" %s\n", arg);
+               /* Don't allow '\0' in file names, and terminate with '\n' or,
+                * for -0, just '\0' (use -print0 to find to make this work!)
+                */
+               if (ch == EOF || ch == term || ch == 0)
+               {
+                  buffer[ich] = 0;
+
+                  if (ich > 0 && !test_one_file(buffer, &formats, opts,
+                     stride_extra, log_pass))
+                     retval = 1;
+
+                  if (ch == EOF)
+                     break;
+
+                  ich = 0;
+                  --ich; /* so that the increment below sets it to 0 again */
+               }
+
+               else
+                  buffer[ich] = (char)ch;
+            } while (++ich < sizeof buffer);
+
+            if (ich)
+            {
+               buffer[32] = 0;
+               buffer[4095] = 0;
+               fprintf(stderr, "%s...%s: file name too long\n", buffer,
+                  buffer+(4096-32));
+               exit(1);
+            }
          }
 
-         else if (!result)
-            exit(1);
+         else if (!test_one_file(arg, &formats, opts, stride_extra, log_pass))
+            retval = 1;
       }
    }
 
