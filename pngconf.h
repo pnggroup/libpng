@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta15 - February 27, 2012
+ * libpng version 1.6.0beta15 - March 2, 2012
  *
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -485,9 +485,9 @@
 #  error "libpng requires an unsigned 16 bit type"
 #endif
 
-#if INT_MIN < -2147483646 && INT_MAX > 2147483646 
+#if INT_MIN < -2147483646 && INT_MAX > 2147483646
    typedef int png_int_32;
-#elif LONG_MIN < -2147483646 && LONG_MAX > 2147483646 
+#elif LONG_MIN < -2147483646 && LONG_MAX > 2147483646
    typedef long int png_int_32;
 #else
 #  error "libpng requires a signed 32 bit (or more) type"
@@ -533,7 +533,7 @@ typedef ptrdiff_t png_ptrdiff_t;
  * png_uint_32) should be explicitly applied; however, we do not expect to
  * encounter practical situations that require such conversions.
  *
- * PNG_SMALL_SIZE_T must be defined if the maximum value of size_t is less than 
+ * PNG_SMALL_SIZE_T must be defined if the maximum value of size_t is less than
  * 4294967295 - i.e. less than the maximum value of png_uint_32.
  */
 #ifdef PNG_SMALL_SIZE_T

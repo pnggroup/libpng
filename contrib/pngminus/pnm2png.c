@@ -239,7 +239,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
     get_token(pnm_file, maxval_token);
     sscanf (maxval_token, "%lu", &ul_maxval);
     maxval = (png_uint_32) ul_maxval;
-    
+
     if (maxval <= 1)
       bit_depth = 1;
     else if (maxval <= 3)

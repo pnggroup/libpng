@@ -2350,7 +2350,7 @@ PNG_EXPORT(176, int, png_get_unknown_chunks, (png_const_structrp png_ptr,
  */
 PNG_EXPORT(177, void, png_set_invalid, (png_const_structrp png_ptr,
     png_inforp info_ptr, int mask));
- 
+
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 /* The "params" pointer is currently not used and is for future expansion. */
 PNG_EXPORT(178, void, png_read_png, (png_structrp png_ptr, png_inforp info_ptr,

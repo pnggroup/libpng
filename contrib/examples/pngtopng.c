@@ -34,7 +34,7 @@ int main(int argc, const char **argv)
       if (png_image_begin_read_from_file(&image, argv[1]))
       {
          png_bytep buffer;
-         
+
          /* Change this to try different formats! */
          image.format = PNG_FORMAT_RGBA;
 

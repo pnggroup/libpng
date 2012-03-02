@@ -134,7 +134,7 @@ do
       libpng_autotools_file_missing=1
    fi
 done
-# 
+#
 # The cache directory doesn't matter - it will be regenerated and does not exist
 # anyway in a tarball.
 #

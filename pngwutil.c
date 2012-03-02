@@ -1109,7 +1109,7 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
    if (profile_len < 132)
       png_error(png_ptr, "ICC profile too short");
 
-   if (profile_len & 3)
+   if (profile_len & 0x03)
       png_error(png_ptr, "ICC profile length invalid (not a multiple of 4)");
 
    embedded_profile_len = png_get_uint_32(profile);

@@ -2506,7 +2506,7 @@ cmppixel(Transform *transform, png_const_voidp in, png_const_voidp out,
    errmsg = NULL;
    {
       int err_a = abs(pixel_calc.a-pixel_out.a);
-      
+
       if (err_a > transform->error[3])
       {
          /* If accumulating check the components too */

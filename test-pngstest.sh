@@ -20,5 +20,5 @@ do
       fi
    done
 done
-   
+
 exit $err

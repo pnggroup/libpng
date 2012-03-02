@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta15 - February 27, 2012
+ libpng version 1.6.0beta15 - March 2, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta15 - February 27, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta15 - March 2, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -3526,7 +3526,7 @@ are multiple warnings, only the first one is recorded.
 The upper 30 bits of this value are reserved; the low two bits contain
 a two bit code such that a value more than 1 indicates a failure in the API
 just called:
-    
+
    0 - no warning or error
    1 - warning
    2 - error
@@ -3534,7 +3534,7 @@ just called:
 
 The pixels (samples) of the image have one to four channels whose components
 have original values in the range 0 to 1.0:
- 
+
   1: A single gray or luminance channel (G).
   2: A gray/luminance channel and an alpha channel (GA).
   3: Three red, green, blue color channels (RGB).
@@ -3684,7 +3684,7 @@ Corresponding information about the pixels
   PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)\
    The size, in bytes, of each component in a pixel; 1 for a color-mapped
    image.
- 
+
   PNG_IMAGE_PIXEL_SIZE(fmt)
    The size, in bytes, of a complete pixel; 1 for a color-mapped image.
 
@@ -3703,7 +3703,7 @@ Information about the whole row, or whole image
   PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB == 0x01
     This indicates the the RGB values of the in-memory bitmap do not
     correspond to the red, green and blue end-points defined by sRGB.
- 
+
   PNG_IMAGE_FLAG_COLORMAP == 0x02
     The PNG is color-mapped.  If this flag is set png_image_read_colormap
     can be used without further loss of image information.  If it is not set
@@ -3735,20 +3735,20 @@ READ APIs
 
       Finish reading the image into the supplied buffer and
       clean up the png_image structure.
-     
+
       row_stride is the step, in png_byte or png_uint_16 units
       as appropriate, between adjacent rows.  A positive stride
       indicates that the top-most row is first in the buffer -
       the normal top-down arrangement.  A negative stride
       indicates that the bottom-most row is first in the buffer.
-     
+
       background need only be supplied if an alpha channel must
       be removed from a png_byte format and the removal is to be
       done by compositing on a solid color; otherwise it may be
       NULL and any composition will be done directly onto the
       buffer.  The value is an sRGB color to use for the
       background, for grayscale output the green channel is used.
-     
+
       For linear output removing the alpha channel is always done
       by compositing on black.
 
@@ -4993,7 +4993,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 27, 2012
+March 2, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

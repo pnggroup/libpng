@@ -1881,7 +1881,7 @@ png_image_set_PLTE(png_image_write_control *display)
       if (format & PNG_FORMAT_FLAG_LINEAR)
       {
          png_const_uint_16p entry = png_voidcast(png_const_uint_16p, cmap);
-         
+
          entry += i * channels;
 
          if (channels & 1) /* no alpha */
@@ -1937,7 +1937,7 @@ png_image_set_PLTE(png_image_write_control *display)
       else /* Color-map has sRGB values */
       {
          png_const_bytep entry = png_voidcast(png_const_bytep, cmap);
-         
+
          entry += i * channels;
 
          switch (channels)

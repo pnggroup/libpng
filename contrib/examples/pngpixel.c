@@ -103,7 +103,7 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
                      index < num_trans ? trans_alpha[index] : 255);
 
                else /* no transparency */
-                  printf("INDEXED %u = %d %d %d\n", index, 
+                  printf("INDEXED %u = %d %d %d\n", index,
                      palette[index].red, palette[index].green,
                      palette[index].blue);
             }
