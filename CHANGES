@@ -4010,6 +4010,8 @@ Version 1.6.0beta15 [March 2, 2012]
     without the necessary color data.
   Removed whitespace from the end of lines in all source files and scripts.
 
+Version 1.6.0beta16 [March 2, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

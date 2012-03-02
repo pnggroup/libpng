@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta15 - March 2, 2012
+Libpng 1.6.0beta16 - March 2, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta15.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta15.tar.gz
-   1.6.0beta15.tar.bz2
+   1.6.0beta16.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta16.tar.gz
+   1.6.0beta16.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b15.7z  (LZMA-compressed, recommended)
-   lp160b15.zip
+   lp160b16.7z  (LZMA-compressed, recommended)
+   lp160b16.zip
 
 Other information:
 
-   1.6.0beta15-README.txt
-   1.6.0beta15-LICENSE.txt
+   1.6.0beta16-README.txt
+   1.6.0beta16-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -257,6 +257,8 @@ Version 1.6.0beta15 [March 2, 2012]
     It now uses png_error() to do so rather than casually writing a PNG
     without the necessary color data.
   Removed whitespace from the end of lines in all source files and scripts.
+
+Version 1.6.0beta16 [March 2, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
