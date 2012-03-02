@@ -2760,9 +2760,12 @@ version 1.2.48beta01 [February 27, 2012]
     the string terminators.  This bug was introduced in libpng-1.0.6 (Frank
     Busse).
 
-version 1.2.48beta02 [February 29, 2012]
+version 1.2.48rc01 [March 2, 2012]
   Removed the png_free() of unused png_ptr->current_text from pngread.c.
   Added libpng license text to pnggccrd.c and pngvcrd.c (requested by Chrome).
+
+version 1.2.48rc02 [March 2, 2012]
+  Removed all of the assembler code from pnggccrd.c and just "return 2;".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

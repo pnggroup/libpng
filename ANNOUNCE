@@ -1,5 +1,5 @@
 
-Libpng 1.2.48beta02 - February 29, 2012
+Libpng 1.2.48rc02 - March 2, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.48beta02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.48beta02.tar.gz
-   libpng-1.2.48beta02.tar.bz2
+   libpng-1.2.48rc02.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.48rc02.tar.gz
+   libpng-1.2.48rc02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.48beta02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.48beta02-no-config.tar.gz
-   libpng-1.2.48beta02-no-config.tar.bz2
+   libpng-1.2.48rc02-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.48rc02-no-config.tar.gz
+   libpng-1.2.48rc02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1248b02.zip
-   lp1248b02.7z
-   lp1248b02.tar.bz2
+   lp1248r02.zip
+   lp1248r02.7z
+   lp1248r02.tar.bz2
 
 Project files
 
-   libpng-1.2.48beta02-project-netware.zip
-   libpng-1.2.48beta02-project-wince.zip
+   libpng-1.2.48rc02-project-netware.zip
+   libpng-1.2.48rc02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.48beta02-README.txt
-   libpng-1.2.48beta02-KNOWNBUGS.txt
-   libpng-1.2.48beta02-LICENSE.txt
-   libpng-1.2.48beta02-Y2K-compliance.txt
-   libpng-1.2.48beta02-[previous version]-diff.txt
+   libpng-1.2.48rc02-README.txt
+   libpng-1.2.48rc02-KNOWNBUGS.txt
+   libpng-1.2.48rc02-LICENSE.txt
+   libpng-1.2.48rc02-Y2K-compliance.txt
+   libpng-1.2.48rc02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.46):
 
@@ -55,7 +55,7 @@ version 1.2.48beta01 [Febuary 27, 2012]
     causing out-of-bounds read in png_set_sCAL() because of failure to copy
     the string terminators (Franke Busse).
 
-version 1.2.48beta02 [February 29, 2012]
+version 1.2.48rc01 [March 2, 2012]
   Removed the png_free() of unused png_ptr->current_text from pngread.c.
   Added libpng license text to pnggccrd.c and pngvcrd.c (requested by Chrome).
 
