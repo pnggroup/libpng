@@ -731,12 +731,15 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    }
 #endif
 
-#if 0 /* To do: implement png_do_check_palette_indexes() */
+/* Added at libpng-1.5.10 */
+#ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Check for out-of-range palette index */
+#if 0 /* To do: implement png_do_check_palette_indexes() */
    if (png_ptr->num_palette < (1 << png_ptr->bit_depth))
       png_do_check_palette_indexes(&row_info, png_ptr->row_buf + 1,
         png_ptr->num_palette_max);
-   if (png_ptr->num_palette_max > num_palette + 1)
+#endif
+   if (png_ptr->num_palette_max > png_ptr->num_palette + 1)
       png_warning(png_ptr, "Palette index exceeded num_palette");
 #endif
 
