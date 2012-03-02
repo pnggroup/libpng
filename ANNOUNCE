@@ -55,9 +55,12 @@ version 1.2.48beta01 [Febuary 27, 2012]
     causing out-of-bounds read in png_set_sCAL() because of failure to copy
     the string terminators (Franke Busse).
 
-version 1.2.48rc01 [March 2, 2012]
+version 1.2.48rc01 [March 3, 2012]
   Removed the png_free() of unused png_ptr->current_text from pngread.c.
   Added libpng license text to pnggccrd.c and pngvcrd.c (requested by Chrome).
+
+version 1.2.48rc02 [March 2, 2012]
+  Removed all of the assembler code from pnggccrd.c and just "return 2;".
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

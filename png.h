@@ -276,7 +276,7 @@
  *    1.2.47                  13    10247  12.so.0.47[.0]
  *    1.0.57                  10    10057  10.so.0.57[.0]
  *    1.2.48beta01            13    10248  12.so.0.48[.0]
- *    1.2.48rc01              13    10248  12.so.0.48[.0]
+ *    1.2.48rc01-02           13    10248  12.so.0.48[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
