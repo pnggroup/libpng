@@ -619,6 +619,107 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 }
 #endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
 
+#if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
+    defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+/* Added at libpng-1.5.10 */
+void /* PRIVATE */
+png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
+{
+      if (png_ptr->num_palette < (1 << row_info->bit_depth) &&
+         png_ptr->num_palette_max >= 0 &&
+         ((png_ptr->interlaced && png_ptr->pass == 6) ||
+         (!png_ptr->interlaced && png_ptr->pass == 0)))
+   {
+      png_bytep rp = png_ptr->row_buf + 1 + row_info->rowbytes;
+
+      switch (row_info->bit_depth)
+      {
+         case 1:
+         {
+            /* in this case, all bytes must be 0 so we don't need
+             * to unpack the pixels except for the rightmost one.
+             */
+            int padding = 8*row_info->rowbytes - png_ptr->width;
+
+            for (; rp > png_ptr->row_buf; rp--)
+            {
+              if (*rp >> padding != 0)
+                 png_ptr->num_palette_max = 1;
+              padding = 0;
+            }
+
+            break;
+         }
+
+         case 2:
+         {
+            int padding = 2*(4*row_info->rowbytes - png_ptr->width);
+
+            for (; rp > png_ptr->row_buf; rp--)
+            {
+              int index = ((*rp >> padding) & 0x03);
+
+              if (index > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = index;
+
+              index = (((*rp >> padding) >> 2) & 0x03);
+
+              if (index > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = index;
+
+              index = (((*rp >> padding) >> 4) & 0x03);
+
+              if (index > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = index;
+
+              index = (((*rp >> padding) >> 6) & 0x03);
+
+              if (index > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = index;
+
+              padding = 0;
+            }
+
+            break;
+         }
+
+         case 4:
+         {
+            int padding = 4*(2*row_info->rowbytes - png_ptr->width);
+
+            for (; rp > png_ptr->row_buf; rp--)
+            {
+              int index = ((*rp >> padding) & 0x0f);
+
+              if (index > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = index;
+
+              index = (((*rp >> padding) >> 4) & 0x0f);
+
+              if (index > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = index;
+
+              padding = 0;
+            }
+
+            break;
+         }
+
+         case 8:
+         {
+            for (; rp > png_ptr->row_buf; rp--)
+            {
+               if (*rp >= png_ptr->num_palette_max)
+                  png_ptr->num_palette_max = (int) *rp;
+            }
+
+            break;
+         }
+      }
+   }
+}
+#endif /* PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED */
+
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED

@@ -4002,15 +4002,16 @@ Version 1.6.0beta15 [March 2, 2012]
     allow the error numbers in pngstest to be tuned and checked.  makepng
     also allows generation of images with extra chunks, although this is
     still work-in-progress.
-  Added tests for invalid palette index while reading and writing (work in
-    progress, the latter isn't finished).
+  Added check for invalid palette index while reading.
   Fixed some bugs in ICC profile writing. The code should now accept
     all potentially valid ICC profiles and reject obviously invalid ones.
     It now uses png_error() to do so rather than casually writing a PNG
     without the necessary color data.
   Removed whitespace from the end of lines in all source files and scripts.
 
-Version 1.6.0beta16 [March 2, 2012]
+Version 1.6.0beta16 [March 3, 2012]
+  Relocated palette-index checking function from pngrutil.c to pngtrans.c
+  Added palette-index checking while writing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1438,6 +1438,13 @@ PNG_INTERNAL_FUNCTION(void,png_check_IHDR,(png_const_structrp png_ptr,
     int color_type, int interlace_type, int compression_type,
     int filter_type),PNG_EMPTY);
 
+/* Added at libpng version 1.5.10 */
+#if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
+    defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+PNG_INTERNAL_FUNCTION(void,png_do_check_palette_indexes,
+   (png_structrp png_ptr, png_row_infop row_info),PNG_EMPTY);
+#endif
+
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_INTERNAL_FUNCTION(void,png_fixed_error,(png_const_structrp png_ptr,
    png_const_charp name),PNG_NORETURN);

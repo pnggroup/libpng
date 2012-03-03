@@ -748,8 +748,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
    /* Report invalid palette index; added at libng-1.5.10 */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
       png_ptr->num_palette_max > png_ptr->num_palette)
-     png_warning(png_ptr, "palette index exceeded num_palette; "
-         "pixel(s) rendered opaque black");
+     png_warning(png_ptr, "Read palette index exceeding num_palette");
 #endif
 
    do

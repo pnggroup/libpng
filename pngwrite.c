@@ -308,6 +308,11 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
    if (!(png_ptr->mode & PNG_HAVE_IDAT))
       png_error(png_ptr, "No IDATs written into file");
 
+#ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
+   if (png_ptr->num_palette_max > png_ptr->num_palette)
+      png_warning(png_ptr, "Wrote palette index exceeding num_palette");
+#endif
+
    /* See if user wants us to write information chunks */
    if (info_ptr != NULL)
    {
@@ -734,13 +739,8 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
 /* Added at libpng-1.5.10 */
 #ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Check for out-of-range palette index */
-#if 0 /* To do: implement png_do_check_palette_indexes() */
-   if (png_ptr->num_palette < (1 << png_ptr->bit_depth))
-      png_do_check_palette_indexes(&row_info, png_ptr->row_buf + 1,
-        png_ptr->num_palette_max);
-#endif
-   if (png_ptr->num_palette_max > png_ptr->num_palette + 1)
-      png_warning(png_ptr, "Palette index exceeded num_palette");
+   if(row_info.color_type == PNG_COLOR_TYPE_PALETTE)
+      png_do_check_palette_indexes(png_ptr, &row_info);
 #endif
 
    /* Find a filter if necessary, filter the row and write it out. */

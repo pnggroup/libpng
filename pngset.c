@@ -1310,4 +1310,22 @@ png_set_benign_errors(png_structrp png_ptr, int allowed)
       png_ptr->flags &= ~PNG_FLAG_BENIGN_ERRORS_WARN;
 }
 #endif /* PNG_BENIGN_ERRORS_SUPPORTED */
+
+#ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
+   /* Do not report invalid palette index; added at libng-1.5.10 */
+void PNGAPI
+png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
+{
+   png_debug(1, "in png_set_check_for_invalid_index");
+
+   if (allowed)
+      png_ptr->num_palette_max = 0;
+
+   else
+      png_ptr->num_palette_max = -1;
+}
+
+
+#endif
+
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

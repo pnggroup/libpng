@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta16 - March 2, 2012
+Libpng 1.6.0beta16 - March 3, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -258,7 +258,9 @@ Version 1.6.0beta15 [March 2, 2012]
     without the necessary color data.
   Removed whitespace from the end of lines in all source files and scripts.
 
-Version 1.6.0beta16 [March 2, 2012]
+Version 1.6.0beta16 [March 3, 2012]
+  Relocated palette-index checking function from pngrutil.c to pngtrans.c
+  Added palette-index checking while writing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

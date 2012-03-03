@@ -126,7 +126,7 @@ struct png_struct_def
 
 /* Added at libpng-1.5.10 */
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   png_uint_16 num_palette_max; /* maximum palette index found in IDAT */
+   int num_palette_max;       /* maximum palette index found in IDAT */
 #endif
 
    png_uint_16 num_trans;     /* number of transparency values */
