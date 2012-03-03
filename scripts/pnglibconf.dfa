@@ -590,7 +590,8 @@ option INFO_IMAGE
 # Turn this off to disable warning about invalid palette index and
 # leave the num_palette_max member out of the png structure.
 
-option CHECK_FOR_INVALID_INDEX
+option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
+option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
 option READ_CHECK_FOR_INVALID_INDEX requires READ CHECK_FOR_INVALID_INDEX
 option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
 
