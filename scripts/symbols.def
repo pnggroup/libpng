@@ -247,3 +247,4 @@ EXPORTS
  png_image_write_to_file @239
  png_image_write_to_stdio @240
  png_convert_to_rfc1123_buffer @241
+ png_set_check_for_invalid_index @242
