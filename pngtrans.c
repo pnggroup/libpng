@@ -625,11 +625,16 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 {
-      if (png_ptr->num_palette < (1 << row_info->bit_depth) &&
-         png_ptr->num_palette_max >= 0 &&
-         ((png_ptr->interlaced && png_ptr->pass == 6) ||
-         (!png_ptr->interlaced && png_ptr->pass == 0)))
+   if (png_ptr->num_palette < (1 << row_info->bit_depth) &&
+      png_ptr->num_palette_max >= 0)
    {
+      /* Calculations moved outside switch in an attempt to stop different
+       * compiler warnings.  'padding' is in *bits* within the last byte, it is
+       * an 'int' because pixel_depth becomes an 'int' in the expression below,
+       * and this calculation is used because it avoids warnings that other
+       * forms produced on either GCC or MSVC.
+       */
+      int padding = (-row_info->pixel_depth * row_info->width) & 7;
       png_bytep rp = png_ptr->row_buf + 1 + row_info->rowbytes;
 
       switch (row_info->bit_depth)
@@ -639,8 +644,6 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
             /* in this case, all bytes must be 0 so we don't need
              * to unpack the pixels except for the rightmost one.
              */
-            int padding = 8*row_info->rowbytes - png_ptr->width;
-
             for (; rp > png_ptr->row_buf; rp--)
             {
               if (*rp >> padding != 0)
@@ -653,29 +656,27 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 
          case 2:
          {
-            int padding = 2*(4*row_info->rowbytes - png_ptr->width);
-
             for (; rp > png_ptr->row_buf; rp--)
             {
-              int index = ((*rp >> padding) & 0x03);
+              int i = ((*rp >> padding) & 0x03);
 
-              if (index > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = index;
+              if (i > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = i;
 
-              index = (((*rp >> padding) >> 2) & 0x03);
+              i = (((*rp >> padding) >> 2) & 0x03);
 
-              if (index > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = index;
+              if (i > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = i;
 
-              index = (((*rp >> padding) >> 4) & 0x03);
+              i = (((*rp >> padding) >> 4) & 0x03);
 
-              if (index > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = index;
+              if (i > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = i;
 
-              index = (((*rp >> padding) >> 6) & 0x03);
+              i = (((*rp >> padding) >> 6) & 0x03);
 
-              if (index > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = index;
+              if (i > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = i;
 
               padding = 0;
             }
@@ -685,19 +686,17 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 
          case 4:
          {
-            int padding = 4*(2*row_info->rowbytes - png_ptr->width);
-
             for (; rp > png_ptr->row_buf; rp--)
             {
-              int index = ((*rp >> padding) & 0x0f);
+              int i = ((*rp >> padding) & 0x0f);
 
-              if (index > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = index;
+              if (i > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = i;
 
-              index = (((*rp >> padding) >> 4) & 0x0f);
+              i = (((*rp >> padding) >> 4) & 0x0f);
 
-              if (index > png_ptr->num_palette_max)
-                 png_ptr->num_palette_max = index;
+              if (i > png_ptr->num_palette_max)
+                 png_ptr->num_palette_max = i;
 
               padding = 0;
             }
@@ -715,6 +714,9 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 
             break;
          }
+
+         default:
+            break;
       }
    }
 }
