@@ -822,14 +822,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_data,(png_structrp png_ptr, png_bytep data,
 
 /* Read bytes into buf, and update png_ptr->crc */
 PNG_INTERNAL_FUNCTION(void,png_crc_read,(png_structrp png_ptr, png_bytep buf,
-    png_size_t length),PNG_EMPTY);
-
-/* Decompress data in a chunk that uses compression */
-#if defined(PNG_READ_COMPRESSED_TEXT_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_decompress_chunk,(png_structrp png_ptr,
-   int comp_type, png_size_t chunklength, png_size_t prefix_length,
-   png_size_t *data_length),PNG_EMPTY);
-#endif
+    png_uint_32 length),PNG_EMPTY);
 
 /* Read "skip" bytes, read the file crc, and (optionally) verify png_ptr->crc */
 PNG_INTERNAL_FUNCTION(int,png_crc_finish,(png_structrp png_ptr,

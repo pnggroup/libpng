@@ -186,7 +186,7 @@ png_read_chunk_header(png_structrp png_ptr)
 
 /* Read data, and (optionally) run it through the CRC. */
 void /* PRIVATE */
-png_crc_read(png_structrp png_ptr, png_bytep buf, png_size_t length)
+png_crc_read(png_structrp png_ptr, png_bytep buf, png_uint_32 length)
 {
    if (png_ptr == NULL)
       return;
@@ -203,10 +203,10 @@ png_crc_read(png_structrp png_ptr, png_bytep buf, png_size_t length)
 int /* PRIVATE */
 png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
 {
-   png_size_t i;
-   png_size_t istop = png_ptr->zbuf_size;
+   png_uint_32 i;
+   uInt istop = png_ptr->zbuf_size;
 
-   for (i = (png_size_t)skip; i > istop; i -= istop)
+   for (i = skip; i > istop; i -= istop)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
    }
@@ -278,11 +278,44 @@ png_crc_error(png_structrp png_ptr)
 }
 
 #ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
-static png_size_t
-png_inflate(png_structrp png_ptr, png_bytep data, png_size_t size,
-    png_bytep output, png_size_t output_size)
+/* png_inflate: returns one of the following error codes.  If output is not NULL
+ * the uncompressed data is placed there, up to output_size.  output_size is
+ * adjusted to the actual amount of uncompressed data.   If
+ * PNG_INFLATE_TRUNCATED is returned partial output will have been produced; no
+ * error or warning is produced in this case.
+ */
+#define PNG_INFLATE_OK        1
+#define PNG_INFLATE_TRUNCATED 2 /* output_size will be unchanged */
+#define PNG_INFLATE_ERROR     3 /* a chunk warning has been output */
+
+static void
+stash_error(png_structrp png_ptr, png_const_charp message)
 {
-   png_size_t count = 0;
+   size_t len = strlen(message);
+
+   if (len >= png_ptr->zbuf_size)
+      len = png_ptr->zbuf_size-1;
+
+   memcpy(png_ptr->zbuf, message, len);
+   png_ptr->zbuf[len] = 0;
+}
+
+static int
+png_inflate(png_structrp png_ptr, png_bytep data, png_uint_32 input_size,
+    png_bytep output, png_alloc_size_t *output_size)
+{
+   int ret;
+   png_alloc_size_t avail_out = *output_size;
+   png_uint_32 avail_in = input_size;
+
+   /* TODO: PROBLEM: png_ptr-zstream is not reset via inflateReset after reading
+    * the image, consequently the first compressed chunk (zTXt or iTXt) after
+    * the data gets a 'finished' stream and the first call to inflate returns
+    * zero decompressed bytes.  This was handled silently before 1.6 by
+    * returning empty uncompressed data.  This is a temporary work-round (it's
+    * harmless if the stream is already reset).
+    */
+   inflateReset(&png_ptr->zstream);
 
    /* zlib can't necessarily handle more than 65535 bytes at once (i.e. it can't
     * even necessarily handle 65536 bytes) because the type uInt is "16 bits or
@@ -294,13 +327,21 @@ png_inflate(png_structrp png_ptr, png_bytep data, png_size_t size,
     * at least some of the use by some period of time.
     */
    png_ptr->zstream.next_in = data;
-   /* avail_in is set below from 'size' */
+   /* avail_in and avail_out are set below from 'size' */
    png_ptr->zstream.avail_in = 0;
+   png_ptr->zstream.avail_out = 0;
 
-   while (1)
+   /* Read directly into the output if it is available (this is set to
+    * png_ptr->zbuf below if output is NULL).
+    */
+   if (output != NULL)
+      png_ptr->zstream.next_out = output;
+
+   do
    {
-      int ret, avail;
+      uInt avail;
 
+      /* zlib INPUT BUFFER */
       /* The setting of 'avail_in' used to be outside the loop; by setting it
        * inside it is possible to chunk the input to zlib and simply rely on
        * zlib to advance the 'next_in' pointer.  This allows arbitrary amounts o
@@ -308,96 +349,111 @@ png_inflate(png_structrp png_ptr, png_bytep data, png_size_t size,
        * window save (png_memcpy of up to 32768 output bytes) every ZLIB_IO_MAX
        * input bytes.
        */
-      if (png_ptr->zstream.avail_in == 0 && size > 0)
+      avail_in += png_ptr->zstream.avail_in; /* not consumed last time */
+
+      avail = ZLIB_IO_MAX;
+
+      if (avail_in < avail)
+         avail = (uInt)avail_in; /* safe: < than ZLIB_IO_MAX */
+
+      avail_in -= avail;
+      png_ptr->zstream.avail_in = avail;
+
+      /* zlib OUTPUT BUFFER */
+      avail_out += png_ptr->zstream.avail_out; /* not written last time */
+
+      avail = ZLIB_IO_MAX; /* maximum zlib can process */
+
+      if (output == NULL)
       {
-         if (size <= ZLIB_IO_MAX)
+         /* Reset the output buffer each time round if output is NULL and make
+          * available the full buffer, up to 'remaining_space'
+          */
+         png_ptr->zstream.next_out = png_ptr->zbuf;
+         if (png_ptr->zbuf_size < avail)
+            avail = png_ptr->zbuf_size;
+      }
+
+      if (avail_out < avail)
+         avail = (uInt)avail_out; /* safe: < ZLIB_IO_MAX */
+
+      png_ptr->zstream.avail_out = avail;
+      avail_out -= avail;
+
+      /* zlib inflate call */
+      /* In fact 'avail_out' may be 0 at this point, that happens at the end of
+       * the read when the final LZ end code was not passed at the end of the
+       * previous chunk of input data.  Tell zlib if we have reached the end of
+       * the output buffer.
+       *
+       * TODO: this prevents multiple calls to inflate, but may help inflate
+       * avoid overhead.  Make using Z_FINISH an option for the caller.
+       */
+      ret = inflate(&png_ptr->zstream, avail_out > 0 ? Z_NO_FLUSH : Z_FINISH);
+   } while (ret == Z_OK);
+
+   /* Claw back the 'size' and 'remaining_space' byte counts. */
+   avail_in += png_ptr->zstream.avail_in;
+   avail_out += png_ptr->zstream.avail_out;
+
+   /* Always reset the zstream, it must be left in inflateInit state.
+    *
+    * TODO: don't do this on Z_BUF_ERROR and no remaining space, then the
+    * caller can use png_inflate incrementally.  Also change to using the
+    * same approach as in the write code - init and reset only on demand.
+    */
+   png_ptr->zstream.next_in = NULL;
+   png_ptr->zstream.avail_in = 0;
+   png_ptr->zstream.next_out = NULL;
+   png_ptr->zstream.avail_out = 0;
+   inflateReset(&png_ptr->zstream);
+
+   /* Update the output size if the output was not filled.
+    *
+    * TODO: do this with 'size' as well, not currently a parameter.
+    */
+   if (avail_out > 0)
+      *output_size -= avail_out;
+
+   /* Error messages are stashed in png_ptr->zbuf, to avoid any errors in the
+    * errors do this first:
+    */
+   png_ptr->zbuf[0] = 0;
+
+   switch (ret)
+   {
+      case Z_STREAM_END:
+         return PNG_INFLATE_OK;
+
+      case Z_BUF_ERROR: /* no progress in zlib */
+         if (avail_out > 0) /* input truncated */
          {
-            /* The value is less than ZLIB_IO_MAX so the cast is safe: */
-            png_ptr->zstream.avail_in = (uInt)size;
-            size = 0;
+            stash_error(png_ptr, "LZ data truncated");
+            return PNG_INFLATE_ERROR;
          }
+
+         else if (avail_in > 0) /* output truncated */
+         {
+            /* TODO: currently restarting a partial read isn't supporte because
+             * of the inflateReset above, change this to do the Reset/Init on
+             * demand.
+             */
+            stash_error(png_ptr, "uncompressed data too large");
+            return PNG_INFLATE_TRUNCATED;
+         }
+
+      default:
+         /* Everything else is an error, expect 'Z_DATA_ERROR' and
+          * zstream.msg to be non-NULL.  In any case just copy something
+          * into zbuf and return the error code.
+          */
+         if (png_ptr->zstream.msg != NULL)
+            stash_error(png_ptr, png_ptr->zstream.msg);
 
          else
-         {
-            png_ptr->zstream.avail_in = ZLIB_IO_MAX;
-            size -= ZLIB_IO_MAX;
-         }
-      }
+            stash_error(png_ptr, "LZ data damaged");
 
-      /* Reset the output buffer each time round - we empty it
-       * after every inflate call.
-       */
-      png_ptr->zstream.next_out = png_ptr->zbuf;
-      png_ptr->zstream.avail_out = png_ptr->zbuf_size;
-
-      ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
-      avail = png_ptr->zbuf_size - png_ptr->zstream.avail_out;
-
-      /* First copy/count any new output - but only if we didn't
-       * get an error code.
-       */
-      if ((ret == Z_OK || ret == Z_STREAM_END) && avail > 0)
-      {
-         png_size_t space = avail; /* > 0, see above */
-
-         if (output != 0 && output_size > count)
-         {
-            png_size_t copy = output_size - count;
-
-            if (space < copy)
-               copy = space;
-
-            png_memcpy(output + count, png_ptr->zbuf, copy);
-         }
-         count += space;
-      }
-
-      if (ret == Z_OK)
-         continue;
-
-      /* Termination conditions - always reset the zstream, it
-       * must be left in inflateInit state.
-       */
-      png_ptr->zstream.avail_in = 0;
-      inflateReset(&png_ptr->zstream);
-
-      if (ret == Z_STREAM_END)
-         return count; /* NOTE: may be zero. */
-
-      /* Now handle the error codes - the API always returns 0
-       * and the error message is dumped into the uncompressed
-       * buffer if available.
-       */
-#     ifdef PNG_WARNINGS_SUPPORTED
-      {
-         png_const_charp msg;
-
-         if (png_ptr->zstream.msg != 0)
-            msg = png_ptr->zstream.msg;
-
-         else switch (ret)
-         {
-            case Z_BUF_ERROR:
-               msg = "Buffer error in compressed datastream";
-               break;
-
-            case Z_DATA_ERROR:
-               msg = "Data error in compressed datastream";
-               break;
-
-            default:
-               msg = "Incomplete compressed datastream";
-               break;
-         }
-
-         png_chunk_warning(png_ptr, msg);
-      }
-#     endif
-
-      /* 0 means an error - notice that this code simply ignores
-       * zero length compressed chunks as a result.
-       */
-      return 0;
+         return PNG_INFLATE_ERROR;
    }
 }
 
@@ -408,115 +464,104 @@ png_inflate(png_structrp png_ptr, png_bytep data, png_size_t size,
  * holding the original prefix part and an uncompressed version of the
  * trailing part (the malloc area passed in is freed).
  */
-void /* PRIVATE */
-png_decompress_chunk(png_structrp png_ptr, int comp_type,
-    png_size_t chunklength,
-    png_size_t prefix_size, png_size_t *newlength)
+static png_const_charp
+png_decompress_chunk(png_structrp png_ptr, png_uint_32 chunklength,
+   png_uint_32 prefix_size,
+   png_alloc_size_t *newlength /* must be initialized to the maximum! */,
+   int terminate /*add a '\0' to the end of the uncompressed data*/)
 {
-   /* The caller should guarantee this */
-   if (prefix_size > chunklength)
-   {
-      /* The recovery is to delete the chunk. */
-      png_warning(png_ptr, "invalid chunklength");
-      prefix_size = 0; /* To delete everything */
-   }
+   /* TODO: implement different limits for different types of chunk.
+    *
+    * The caller supplies *newlength set to the maximum length of the
+    * uncompressed data, but this routine allocates space for the prefix and
+    * maybe a '\0' terminator too.  We have to assume that 'prefix_size' is
+    * limited only by the maximum chunk size.
+    */
+   png_alloc_size_t limit = PNG_SIZE_MAX;
 
-   else if (comp_type == PNG_COMPRESSION_TYPE_BASE)
-   {
-      png_size_t expanded_size = png_inflate(png_ptr,
-          (png_bytep)(png_ptr->chunkdata + prefix_size),
-          chunklength - prefix_size,
-          0,            /* output */
-          0);           /* output size */
-
-      /* Now check the limits on this chunk - if the limit fails the
-       * compressed data will be removed, the prefix will remain.
-       */
-#ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
-      if (png_ptr->user_chunk_malloc_max &&
-          (prefix_size + expanded_size >= png_ptr->user_chunk_malloc_max - 1))
-#else
-#  ifdef PNG_USER_CHUNK_MALLOC_MAX
-      if ((PNG_USER_CHUNK_MALLOC_MAX > 0) &&
-          prefix_size + expanded_size >= PNG_USER_CHUNK_MALLOC_MAX - 1)
+#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+      if (png_ptr->user_chunk_malloc_max > 0 &&
+         png_ptr->user_chunk_malloc_max < limit)
+         limit = png_ptr->user_chunk_malloc_max;
+#  elif PNG_USER_CHUNK_MALLOC_MAX > 0
+      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
+         limit = PNG_USER_CHUNK_MALLOC_MAX;
 #  endif
-#endif
-         png_warning(png_ptr, "Exceeded size limit while expanding chunk");
 
-      /* If the size is zero either there was an error and a message
-       * has already been output (warning) or the size really is zero
-       * and we have nothing to do - the code will exit through the
-       * error case below.
-       */
-#if defined(PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED) || \
-    defined(PNG_USER_CHUNK_MALLOC_MAX)
-      else if (expanded_size > 0)
-#else
-      if (expanded_size > 0)
-#endif
+   if (limit >= prefix_size + (terminate != 0))
+   {
+      limit -= prefix_size + (terminate != 0);
+
+      if (limit < *newlength)
+         *newlength = limit;
+
+      switch (png_inflate(png_ptr,
+         (png_bytep)png_ptr->chunkdata + prefix_size,
+         chunklength - prefix_size, NULL /* output */, newlength))
       {
-         /* Success (maybe) - really uncompress the chunk. */
-         png_size_t new_size = 0;
-         png_charp text = (png_charp)png_malloc_warn(png_ptr,
-             prefix_size + expanded_size + 1);
-
-         if (text != NULL)
-         {
-            png_memcpy(text, png_ptr->chunkdata, prefix_size);
-            new_size = png_inflate(png_ptr,
-                (png_bytep)(png_ptr->chunkdata + prefix_size),
-                chunklength - prefix_size,
-                (png_bytep)(text + prefix_size), expanded_size);
-            text[prefix_size + expanded_size] = 0; /* just in case */
-
-            if (new_size == expanded_size)
+         case PNG_INFLATE_OK:
+            /* Success (maybe) - really uncompress the chunk. */
             {
-               png_free(png_ptr, png_ptr->chunkdata);
-               png_ptr->chunkdata = text;
-               *newlength = prefix_size + expanded_size;
-               return; /* The success return! */
+               /* Because of the limit checks above we know that the new,
+                * expanded, size will fit in a size_t (let alone an
+                * png_alloc_size_t).  Use png_malloc_base here to avoid an
+                * extra OOM message.
+                */
+               png_alloc_size_t new_size = *newlength;
+               png_bytep text = png_voidcast(png_bytep, png_malloc_base(
+                  png_ptr, prefix_size + new_size + (terminate != 0)));
+
+               if (text == NULL)
+                  break; /* out of memory */
+
+               /* This should now work, although it is possible a logic
+                * error might result.
+                */
+               switch (png_inflate(png_ptr, (png_bytep)png_ptr->chunkdata +
+                  prefix_size, chunklength - prefix_size, text + prefix_size,
+                  newlength))
+               {
+                  case PNG_INFLATE_OK:
+                     if (new_size == *newlength)
+                     {
+                        if (terminate)
+                           text[prefix_size + *newlength] = 0;
+
+                        if (prefix_size > 0)
+                           png_memcpy(text, png_ptr->chunkdata, prefix_size);
+
+                        png_free(png_ptr, png_ptr->chunkdata);
+                        png_ptr->chunkdata = (png_charp)text;
+                        return NULL;
+                     }
+
+                     /* This is an unexpected internal error. */
+                     /* FALL THROUGH */
+
+                  case PNG_INFLATE_TRUNCATED:
+                     png_free(png_ptr, text);
+                     return "libpng inflate error";
+
+                  default: /* PNG_INFLATE_ERROR */
+                     png_free(png_ptr, text);
+                     return (png_const_charp)png_ptr->zbuf;
+               }
             }
 
-            png_warning(png_ptr, "png_inflate logic error");
-            png_free(png_ptr, text);
-         }
+         case PNG_INFLATE_TRUNCATED:
+            /* This means that there wasn't enough space to uncompress the
+             * chunk.
+             */
+            break;
 
-         else
-            png_warning(png_ptr, "Not enough memory to decompress chunk");
+         default: /* PNG_INFLATE_ERROR */
+            /* png_inflate puts the error message in zbuf. */
+            return (png_const_charp)png_ptr->zbuf;
       }
    }
 
-   else /* if (comp_type != PNG_COMPRESSION_TYPE_BASE) */
-   {
-      PNG_WARNING_PARAMETERS(p)
-      png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_d, comp_type);
-      png_formatted_warning(png_ptr, p, "Unknown compression type @1");
-
-      /* The recovery is to simply drop the data. */
-   }
-
-   /* Generic error return - leave the prefix, delete the compressed
-    * data, reallocate the chunkdata to remove the potentially large
-    * amount of compressed data.
-    */
-   {
-      png_charp text = (png_charp)png_malloc_warn(png_ptr, prefix_size + 1);
-
-      if (text != NULL)
-      {
-         if (prefix_size > 0)
-            png_memcpy(text, png_ptr->chunkdata, prefix_size);
-
-         png_free(png_ptr, png_ptr->chunkdata);
-         png_ptr->chunkdata = text;
-
-         /* This is an extra zero in the 'uncompressed' part. */
-         *(png_ptr->chunkdata + prefix_size) = 0x00;
-      }
-      /* Ignore a malloc error here - it is safe. */
-   }
-
-   *newlength = prefix_size;
+   /* out of memory returns. */
+   return "insufficient memory";
 }
 #endif /* PNG_READ_COMPRESSED_TEXT_SUPPORTED */
 
@@ -850,7 +895,7 @@ png_handle_gAMA(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_sBIT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   png_size_t truelen;
+   unsigned int truelen;
    png_byte buf[4];
 
    png_debug(1, "in png_handle_sBIT");
@@ -884,7 +929,7 @@ png_handle_sBIT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       truelen = 3;
 
    else
-      truelen = (png_size_t)png_ptr->channels;
+      truelen = png_ptr->channels;
 
    if (length != truelen || length > 4)
    {
@@ -1237,13 +1282,8 @@ void /* PRIVATE */
 png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 /* Note: this does not properly handle chunks that are > 64K under DOS */
 {
-   png_byte compression_type;
-   png_bytep pC;
-   png_charp profile;
-   png_uint_32 skip = 0;
-   png_uint_32 profile_size;
-   png_alloc_size_t profile_length;
-   png_size_t slength, prefix_length, data_length;
+   png_uint_32 keyword_length;
+   png_const_charp error_message = NULL;
 
    png_debug(1, "in png_handle_iCCP");
 
@@ -1252,118 +1292,126 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
-      png_warning(png_ptr, "Invalid iCCP after IDAT");
       png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "Invalid iCCP after IDAT");
       return;
    }
 
    else if (png_ptr->mode & PNG_HAVE_PLTE)
-      /* Should be an error, but we can cope with it */
-      png_warning(png_ptr, "Out of place iCCP chunk");
-
-   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_iCCP))
    {
-      png_warning(png_ptr, "Duplicate iCCP chunk");
+      /* Ignore out-of-place iCCP chunks because other implementations may
+       * *have* to do so, so it is misleading if libpng handles them.
+       */
       png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "Out of place iCCP chunk");
       return;
    }
 
-#ifdef PNG_MAX_MALLOC_64K
-   if (length > (png_uint_32)65535L)
+   if (info_ptr != NULL && (info_ptr->valid & (PNG_INFO_iCCP|PNG_INFO_sRGB)))
    {
-      png_warning(png_ptr, "iCCP chunk too large to fit in memory");
-      skip = length - (png_uint_32)65535L;
-      length = (png_uint_32)65535L;
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "Duplicate color profile");
+      return;
    }
-#endif
 
    png_free(png_ptr, png_ptr->chunkdata);
-   png_ptr->chunkdata = (png_charp)png_malloc(png_ptr, length + 1);
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   /* TODO: read the chunk in pieces, validating it as we go. */
+   png_ptr->chunkdata = png_voidcast(png_charp, png_malloc(png_ptr, length));
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
 
-   if (png_crc_finish(png_ptr, skip))
+   if (png_crc_finish(png_ptr, 0))
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
       return;
    }
 
-   png_ptr->chunkdata[slength] = 0x00;
-
-   for (profile = png_ptr->chunkdata; *profile; profile++)
+   /* TODO: also check that the keyword contents match the spec! */
+   for (keyword_length = 0;
+      keyword_length < length && png_ptr->chunkdata[keyword_length] != 0;
+      ++keyword_length)
       /* Empty loop to find end of name */ ;
 
-   ++profile;
+   if (keyword_length > 79 || keyword_length < 1)
+   {
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
+      png_chunk_benign_error(png_ptr, "Bad iCCP keyword");
+      return;
+   }
 
-   /* There should be at least one zero (the compression type byte)
-    * following the separator, and we should be on it
+   /* There should be at least one zero (the compression type byte) following
+    * the separator followed by some LZ data; check for at least one byte.
+    * Since a chunk length is no more than 2^31 the addition below is safe.
     */
-   if (profile >= png_ptr->chunkdata + slength - 1)
+   if (keyword_length + 3 >= length)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
-      png_warning(png_ptr, "Malformed iCCP chunk");
+      png_chunk_benign_error(png_ptr, "iCCP chunk too short");
       return;
    }
 
-   /* Compression_type should always be zero */
-   compression_type = *profile++;
-
-   if (compression_type)
-   {
-      png_warning(png_ptr, "Ignoring nonzero compression type in iCCP chunk");
-      compression_type = 0x00;  /* Reset it to zero (libpng-1.0.6 through 1.0.8
-                                 wrote nonzero) */
-   }
-
-   prefix_length = profile - png_ptr->chunkdata;
-   png_decompress_chunk(png_ptr, compression_type,
-       slength, prefix_length, &data_length);
-
-   profile_length = data_length - prefix_length;
-
-   if (prefix_length > data_length || profile_length < 4)
-   {
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      png_warning(png_ptr, "Profile size field missing from iCCP chunk");
-      return;
-   }
-
-   /* Check the profile_size recorded in the first 32 bits of the ICC profile */
-   pC = (png_bytep)(png_ptr->chunkdata + prefix_length);
-   profile_size = ((*(pC    )) << 24) |
-                  ((*(pC + 1)) << 16) |
-                  ((*(pC + 2)) <<  8) |
-                  ((*(pC + 3))      );
-
-   /* NOTE: the following guarantees that 'profile_length' fits into 32 bits,
-    * because profile_size is a 32 bit value.
+   /* We only understand '0' compression - deflate - so if we get a different
+    * value we can't safely decode the chunk.
     */
-   if (profile_size < profile_length)
-      profile_length = profile_size;
-
-   /* And the following guarantees that profile_size == profile_length. */
-   if (profile_size > profile_length)
+   if (png_ptr->chunkdata[keyword_length+1] != PNG_COMPRESSION_TYPE_BASE)
    {
-      PNG_WARNING_PARAMETERS(p)
-
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
-
-      png_warning_parameter_unsigned(p, 1, PNG_NUMBER_FORMAT_u, profile_size);
-      png_warning_parameter_unsigned(p, 2, PNG_NUMBER_FORMAT_u, profile_length);
-      png_formatted_warning(png_ptr, p,
-         "Ignoring iCCP chunk with declared size = @1 and actual length = @2");
+      png_chunk_benign_error(png_ptr, "Bad compression type in iCCP chunk");
       return;
    }
 
-   png_set_iCCP(png_ptr, info_ptr, png_ptr->chunkdata,
-       compression_type, (png_bytep)png_ptr->chunkdata + prefix_length,
-       profile_size);
+   {
+      png_alloc_size_t uncompressed_length;
+
+      /* TODO: this is slightly broken, an ICC profile can be up to 2^32-1 bytes
+       * in length, but it is stored here with the keyword and the compression
+       * type prefixed to it.  This means that on 32-bit systems the code can't
+       * accept, or express, the maximum length.
+       */
+      if (PNG_SIZE_MAX > 0xffffffffU/*ICC profile maximum*/)
+         uncompressed_length = 0xffffffffU;
+
+      else
+         uncompressed_length = PNG_SIZE_MAX;
+
+      /* TODO: at present png_decompress_chunk imposes a single application
+       * level memory limit, this should be split to different values for iCCP
+       * and text chunks.
+       */
+      error_message = png_decompress_chunk(png_ptr, length, keyword_length+2,
+         &uncompressed_length, 0/*do not terminate*/);
+
+      if (error_message == NULL)
+      {
+         /* It worked; png_ptr->chunkdata now contains the full uncompressed ICC
+          * profile.  The cast below is safe because of the checks above, the
+          * final uncompressed length can be at most 2^32-1
+          */
+         png_uint_32 profile_length = (png_uint_32)uncompressed_length;
+         png_bytep profile = (png_bytep)png_ptr->chunkdata + (keyword_length+2);
+
+         /* Now perform some basic checks.
+          *
+          * TODO: do a lot more checks, the format is pretty simple, at least
+          * check that the whole tag table is there.
+          */
+         if (profile_length > 132 && png_get_uint_32(profile) == profile_length)
+            png_set_iCCP(png_ptr, info_ptr, png_ptr->chunkdata,
+                PNG_COMPRESSION_TYPE_BASE, profile, profile_length);
+
+         else
+            error_message = "Malformed ICC profile";
+      }
+   }
+
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
+
+   if (error_message != NULL)
+      png_chunk_benign_error(png_ptr, error_message);
 }
 #endif /* PNG_READ_iCCP_SUPPORTED */
 
@@ -1429,8 +1477,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * that the PNG_MAX_MALLOC_64K test is enabled in this case, but this is a
     * potential breakage point if the types in pngconf.h aren't exactly right.
     */
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
 
    if (png_crc_finish(png_ptr, skip))
    {
@@ -1439,6 +1486,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
+   slength = length;
    png_ptr->chunkdata[slength] = 0x00;
 
    for (entry_start = (png_bytep)png_ptr->chunkdata; *entry_start;
@@ -1606,7 +1654,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
          return;
       }
 
-      png_crc_read(png_ptr, buf, (png_size_t)length);
+      png_crc_read(png_ptr, buf, length);
       png_ptr->num_trans = 1;
       png_ptr->trans_color.red = png_get_uint_16(buf);
       png_ptr->trans_color.green = png_get_uint_16(buf + 2);
@@ -1636,7 +1684,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
          return;
       }
 
-      png_crc_read(png_ptr, readbuf, (png_size_t)length);
+      png_crc_read(png_ptr, readbuf, length);
       png_ptr->num_trans = (png_uint_16)length;
    }
 
@@ -1662,7 +1710,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_bKGD(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   png_size_t truelen;
+   unsigned int truelen;
    png_byte buf[6];
    png_color_16 background;
 
@@ -1923,7 +1971,6 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_byte type, nparams;
    png_charp buf, units, endptr;
    png_charpp params;
-   png_size_t slength;
    int i;
 
    png_debug(1, "in png_handle_pCAL");
@@ -1956,8 +2003,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
 
    if (png_crc_finish(png_ptr, 0))
    {
@@ -1966,13 +2012,13 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   png_ptr->chunkdata[slength] = 0x00; /* Null terminate the last string */
+   png_ptr->chunkdata[length] = 0x00; /* Null terminate the last string */
 
    png_debug(3, "Finding end of pCAL purpose string");
    for (buf = png_ptr->chunkdata; *buf; buf++)
       /* Empty loop */ ;
 
-   endptr = png_ptr->chunkdata + slength;
+   endptr = png_ptr->chunkdata + length;
 
    /* We need to have at least 12 bytes after the purpose string
     * in order to get the parameter information.
@@ -2105,8 +2151,8 @@ png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
+   slength = length;
    png_ptr->chunkdata[slength] = 0x00; /* Null terminate the last string */
 
    if (png_crc_finish(png_ptr, 0))
@@ -2217,7 +2263,6 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_charp key;
    png_charp text;
    png_uint_32 skip = 0;
-   png_size_t slength;
    int ret;
 
    png_debug(1, "in png_handle_tEXt");
@@ -2265,8 +2310,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
      return;
    }
 
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
 
    if (png_crc_finish(png_ptr, skip))
    {
@@ -2277,12 +2321,12 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    key = png_ptr->chunkdata;
 
-   key[slength] = 0x00;
+   key[length] = 0x00;
 
    for (text = key; *text; text++)
       /* Empty loop to find end of key */ ;
 
-   if (text != key + slength)
+   if (text != key + length)
       text++;
 
    text_ptr = (png_textp)png_malloc_warn(png_ptr,
@@ -2320,11 +2364,8 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   png_textp text_ptr;
-   png_charp text;
-   int comp_type;
-   int ret;
-   png_size_t slength, prefix_len, data_len;
+   png_const_charp errmsg = NULL;
+   png_uint_32 keyword_length;
 
    png_debug(1, "in png_handle_zTXt");
 
@@ -2352,29 +2393,17 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_ptr->mode & PNG_HAVE_IDAT)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
-#ifdef PNG_MAX_MALLOC_64K
-   /* We will no doubt have problems with chunks even half this size, but
-    * there is no hard and fast rule to tell us where to stop.
-    */
-   if (length > (png_uint_32)65535L)
-   {
-      png_warning(png_ptr, "zTXt chunk too large to fit in memory");
-      png_crc_finish(png_ptr, length);
-      return;
-   }
-#endif
-
    png_free(png_ptr, png_ptr->chunkdata);
-   png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   png_ptr->chunkdata = png_voidcast(png_charp, png_malloc_warn(png_ptr,
+      length));
 
    if (png_ptr->chunkdata == NULL)
    {
-      png_warning(png_ptr, "Out of memory processing zTXt chunk");
+      png_chunk_benign_error(png_ptr, "insufficient memory");
       return;
    }
 
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
 
    if (png_crc_finish(png_ptr, 0))
    {
@@ -2383,65 +2412,64 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   png_ptr->chunkdata[slength] = 0x00;
+   /* TODO: also check that the keyword contents match the spec! */
+   for (keyword_length = 0;
+      keyword_length < length && png_ptr->chunkdata[keyword_length] != 0;
+      ++keyword_length)
+      /* Empty loop to find end of name */ ;
 
-   for (text = png_ptr->chunkdata; *text; text++)
-      /* Empty loop */ ;
+   if (keyword_length > 79 || keyword_length < 1)
+      errmsg = "bad keyword";
 
-   /* zTXt must have some text after the chunkdataword */
-   if (text >= png_ptr->chunkdata + slength - 2)
-   {
-      png_warning(png_ptr, "Truncated zTXt chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
+   /* zTXt must have some LZ data after the keyword, although it may expand to
+    * zero bytes; we need a '\0' at the end of the keyword, the compression type
+    * then the LZ data:
+    */
+   else if (keyword_length + 3 > length)
+      errmsg = "truncated";
+
+   else if (png_ptr->chunkdata[keyword_length+1] != PNG_COMPRESSION_TYPE_BASE)
+      errmsg = "unknown compression type";
 
    else
    {
-       comp_type = *(++text);
+      png_alloc_size_t uncompressed_length = PNG_SIZE_MAX;
 
-       if (comp_type != PNG_TEXT_COMPRESSION_zTXt)
-       {
-          png_warning(png_ptr, "Unknown compression type in zTXt chunk");
-          comp_type = PNG_TEXT_COMPRESSION_zTXt;
-       }
+      /* TODO: at present png_decompress_chunk imposes a single application
+       * level memory limit, this should be split to different values for iCCP
+       * and text chunks.
+       */
+      errmsg = png_decompress_chunk(png_ptr, length, keyword_length+2,
+         &uncompressed_length, 1/*terminate*/);
 
-       text++;        /* Skip the compression_method byte */
+      if (errmsg == NULL)
+      {
+         png_text text;
+
+         /* It worked; png_ptr->chunkdata now looks like a tEXt chunk except for
+          * the extra compression type byte and the fact that it isn't
+          * necessarily '\0' terminated.
+          */
+         png_ptr->chunkdata[uncompressed_length+(keyword_length+2)] = 0;
+
+         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.key = png_ptr->chunkdata;
+         text.text = png_ptr->chunkdata + keyword_length+2;
+         text.text_length = uncompressed_length;
+         text.itxt_length = 0;
+         text.lang = NULL;
+         text.lang_key = NULL;
+
+         if (png_set_text_2(png_ptr, info_ptr, &text, 1))
+            errmsg = "insufficient memory to store zTXt chunk";
+      }
    }
 
-   prefix_len = text - png_ptr->chunkdata;
-
-   png_decompress_chunk(png_ptr, comp_type,
-       (png_size_t)length, prefix_len, &data_len);
-
-   text_ptr = (png_textp)png_malloc_warn(png_ptr,
-       png_sizeof(png_text));
-
-   if (text_ptr == NULL)
-   {
-      png_warning(png_ptr, "Not enough memory to process zTXt chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
-
-   text_ptr->compression = comp_type;
-   text_ptr->key = png_ptr->chunkdata;
-   text_ptr->lang = NULL;
-   text_ptr->lang_key = NULL;
-   text_ptr->itxt_length = 0;
-   text_ptr->text = png_ptr->chunkdata + prefix_len;
-   text_ptr->text_length = data_len;
-
-   ret = png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
-
-   png_free(png_ptr, text_ptr);
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
 
-   if (ret)
-      png_error(png_ptr, "Insufficient memory to store zTXt chunk");
+   if (errmsg != NULL)
+      png_chunk_benign_error(png_ptr, errmsg);
 }
 #endif
 
@@ -2450,12 +2478,8 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   png_textp text_ptr;
-   png_charp key, lang, text, lang_key;
-   int comp_flag;
-   int comp_type = 0;
-   int ret;
-   png_size_t slength, prefix_len, data_len;
+   png_const_charp errmsg = NULL;
+   png_uint_32 prefix_length;
 
    png_debug(1, "in png_handle_iTXt");
 
@@ -2483,29 +2507,17 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_ptr->mode & PNG_HAVE_IDAT)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
-#ifdef PNG_MAX_MALLOC_64K
-   /* We will no doubt have problems with chunks even half this size, but
-    * there is no hard and fast rule to tell us where to stop.
-    */
-   if (length > (png_uint_32)65535L)
-   {
-      png_warning(png_ptr, "iTXt chunk too large to fit in memory");
-      png_crc_finish(png_ptr, length);
-      return;
-   }
-#endif
-
    png_free(png_ptr, png_ptr->chunkdata);
-   png_ptr->chunkdata = (png_charp)png_malloc_warn(png_ptr, length + 1);
+   png_ptr->chunkdata = png_voidcast(png_charp, png_malloc_warn(png_ptr,
+      length+1));
 
    if (png_ptr->chunkdata == NULL)
    {
-      png_warning(png_ptr, "No memory to process iTXt chunk");
+      png_chunk_benign_error(png_ptr, "insufficient memory");
       return;
    }
 
-   slength = (png_size_t)length;
-   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, slength);
+   png_crc_read(png_ptr, (png_bytep)png_ptr->chunkdata, length);
 
    if (png_crc_finish(png_ptr, 0))
    {
@@ -2514,104 +2526,103 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   png_ptr->chunkdata[slength] = 0x00;
-
-   for (lang = png_ptr->chunkdata; *lang; lang++)
+   /* First the keyword. */
+   for (prefix_length=0;
+      prefix_length < length && png_ptr->chunkdata[prefix_length] != 0;
+      ++prefix_length)
       /* Empty loop */ ;
 
-   lang++;        /* Skip NUL separator */
+   /* Perform a basic check on the keyword length here. */
+   if (prefix_length > 79 || prefix_length < 1)
+      errmsg = "bad keyword";
 
-   /* iTXt must have a language tag (possibly empty), two compression bytes,
-    * translated keyword (possibly empty), and possibly some text after the
-    * keyword
+   /* Expect keyword, compression flag, compression type, language, translated
+    * keyword (both may be empty but are 0 terminated) then the text, which may
+    * be empty.
     */
+   else if (prefix_length + 5 > length)
+      errmsg = "truncated";
 
-   if (lang >= png_ptr->chunkdata + slength - 3)
+   else if (png_ptr->chunkdata[prefix_length+1] == 0 ||
+      (png_ptr->chunkdata[prefix_length+1] == 1 &&
+      png_ptr->chunkdata[prefix_length+2] == PNG_COMPRESSION_TYPE_BASE))
    {
-      png_warning(png_ptr, "Truncated iTXt chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
+      int compressed = png_ptr->chunkdata[prefix_length+1] != 0;
+      png_uint_32 language_offset, translated_keyword_offset;
+      png_alloc_size_t uncompressed_length = 0;
+
+      /* Now the language tag */
+      prefix_length += 3;
+      language_offset = prefix_length;
+
+      for (; prefix_length < length && png_ptr->chunkdata[prefix_length] != 0;
+         ++prefix_length)
+         /* Empty loop */ ;
+
+      /* WARNING: the length may be invalid here, this is checked below. */
+      translated_keyword_offset = ++prefix_length;
+
+      for (; prefix_length < length && png_ptr->chunkdata[prefix_length] != 0;
+         ++prefix_length)
+         /* Empty loop */ ;
+
+      /* prefix_length should now be at the trailing '\0' of the translated
+       * keyword, but it may already be over the end.  None of this arithmetic
+       * can overflow because chunks are at most 2^31 bytes long, but on 16-bit
+       * systems the available allocaton may overflow.
+       */
+      ++prefix_length;
+
+      if (!compressed && prefix_length <= length)
+         uncompressed_length = length - prefix_length;
+
+      else if (compressed && prefix_length < length)
+      {
+         uncompressed_length = PNG_SIZE_MAX;
+
+         /* TODO: at present png_decompress_chunk imposes a single application
+          * level memory limit, this should be split to different values for
+          * iCCP and text chunks.
+          */
+         errmsg = png_decompress_chunk(png_ptr, length, prefix_length,
+            &uncompressed_length, 1/*terminate*/);
+      }
+
+      else
+         errmsg = "truncated";
+
+      if (errmsg == NULL)
+      {
+         png_text text;
+
+         png_ptr->chunkdata[uncompressed_length+prefix_length] = 0;
+
+         if (compressed)
+            text.compression = PNG_ITXT_COMPRESSION_NONE;
+
+         else
+            text.compression = PNG_ITXT_COMPRESSION_zTXt;
+
+         text.key = png_ptr->chunkdata;
+         text.lang = png_ptr->chunkdata + language_offset;
+         text.lang_key = png_ptr->chunkdata + translated_keyword_offset;
+         text.text = png_ptr->chunkdata + prefix_length;
+         text.text_length = 0;
+         text.itxt_length = uncompressed_length;
+
+         if (png_set_text_2(png_ptr, info_ptr, &text, 1))
+            errmsg = "insufficient memory";
+      }
    }
 
    else
-   {
-      comp_flag = *lang++;
-      comp_type = *lang++;
-   }
+      errmsg = "bad compression info";
 
-   if (comp_type || (comp_flag && comp_flag != PNG_TEXT_COMPRESSION_zTXt))
-   {
-      png_warning(png_ptr, "Unknown iTXt compression type or method");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
-
-   for (lang_key = lang; *lang_key; lang_key++)
-      /* Empty loop */ ;
-
-   lang_key++;        /* Skip NUL separator */
-
-   if (lang_key >= png_ptr->chunkdata + slength)
-   {
-      png_warning(png_ptr, "Truncated iTXt chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
-
-   for (text = lang_key; *text; text++)
-      /* Empty loop */ ;
-
-   text++;        /* Skip NUL separator */
-
-   if (text >= png_ptr->chunkdata + slength)
-   {
-      png_warning(png_ptr, "Malformed iTXt chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
-
-   prefix_len = text - png_ptr->chunkdata;
-
-   key=png_ptr->chunkdata;
-
-   if (comp_flag)
-      png_decompress_chunk(png_ptr, comp_type,
-          (size_t)length, prefix_len, &data_len);
-
-   else
-      data_len = png_strlen(png_ptr->chunkdata + prefix_len);
-
-   text_ptr = (png_textp)png_malloc_warn(png_ptr,
-       png_sizeof(png_text));
-
-   if (text_ptr == NULL)
-   {
-      png_warning(png_ptr, "Not enough memory to process iTXt chunk");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
-
-   text_ptr->compression = (int)comp_flag + 1;
-   text_ptr->lang_key = png_ptr->chunkdata + (lang_key - key);
-   text_ptr->lang = png_ptr->chunkdata + (lang - key);
-   text_ptr->itxt_length = data_len;
-   text_ptr->text_length = 0;
-   text_ptr->key = png_ptr->chunkdata;
-   text_ptr->text = png_ptr->chunkdata + prefix_len;
-
-   ret = png_set_text_2(png_ptr, info_ptr, text_ptr, 1);
-
-   png_free(png_ptr, text_ptr);
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
 
-   if (ret)
-      png_error(png_ptr, "Insufficient memory to store iTXt chunk");
+   if (errmsg != NULL)
+      png_chunk_benign_error(png_ptr, errmsg);
 }
 #endif
 

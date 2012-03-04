@@ -491,8 +491,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
          png_ptr->zstream.next_in = png_ptr->zbuf;
          if (png_ptr->zbuf_size > png_ptr->idat_size)
             png_ptr->zstream.avail_in = (uInt)png_ptr->idat_size;
-         png_crc_read(png_ptr, png_ptr->zbuf,
-             (png_size_t)png_ptr->zstream.avail_in);
+         png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zstream.avail_in);
          png_ptr->idat_size -= png_ptr->zstream.avail_in;
       }
 
