@@ -1,8 +1,8 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.7 [December 15, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.10 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1281,4 +1281,20 @@ png_set_benign_errors(png_structp png_ptr, int allowed)
       png_ptr->flags &= ~PNG_FLAG_BENIGN_ERRORS_WARN;
 }
 #endif /* PNG_BENIGN_ERRORS_SUPPORTED */
+
+#ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
+   /* Do not report invalid palette index; added at libng-1.5.10 */
+void PNGAPI
+png_set_check_for_invalid_index(png_structp png_ptr, int allowed)
+{
+   png_debug(1, "in png_set_check_for_invalid_index");
+
+   if (allowed)
+      png_ptr->num_palette_max = 0;
+
+   else
+      png_ptr->num_palette_max = -1;
+}
+#endif
+
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

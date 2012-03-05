@@ -801,6 +801,13 @@ png_read_end(png_structp png_ptr, png_infop info_ptr)
 
    png_crc_finish(png_ptr, 0); /* Finish off CRC from last IDAT chunk */
 
+#ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
+   /* Report invalid palette index; added at libng-1.5.10 */
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+      png_ptr->num_palette_max > png_ptr->num_palette)
+     png_warning(png_ptr, "Read palette index exceeding num_palette");
+#endif
+
    do
    {
       png_uint_32 length = png_read_chunk_header(png_ptr);

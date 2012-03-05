@@ -2,11 +2,11 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.7 [December 15, 2011]
+ * Last changed in libpng 1.5.10 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -1394,6 +1394,13 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
     int color_type, int interlace_type, int compression_type,
     int filter_type));
+
+/* Added at libpng version 1.5.10 */
+#if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
+    defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+PNG_EXTERN void png_do_check_palette_indexes PNGARG((png_structp png_ptr,
+    png_row_infop row_info));
+#endif
 
 /* Free all memory used by the read (old method - NOT DLL EXPORTED) */
 PNG_EXTERN void png_read_destroy PNGARG((png_structp png_ptr,
