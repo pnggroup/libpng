@@ -272,6 +272,9 @@ Version 1.6.0beta16 [March 4, 2012]
     unary '-' operator on an unsigned value (even though it is well defined
     by ANSI-C to be ~x+1).  The padding calculation was changed to use a
     different method.  Removed the tests on png_ptr->pass.
+  Added contrib/libtests/tarith.c to test internal arithmetic functions from
+    png.c. This is a libpng maintainer program used to validate changes to the
+    internal arithmetic functions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
