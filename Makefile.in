@@ -102,7 +102,7 @@ am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST = png.c \
 	pngerror.c pngget.c pngmem.c pngpread.c pngread.c pngrio.c \
 	pngrtran.c pngrutil.c pngset.c pngtrans.c pngwio.c pngwrite.c \
 	pngwtran.c pngwutil.c png.h pngconf.h pngdebug.h pnginfo.h \
-	pngpriv.h pngstruct.h arm/filter_neon.S
+	pngpriv.h pngstruct.h arm/filter_neon.S pngusr.dfa
 @PNG_ARM_NEON_TRUE@am__objects_1 = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-filter_neon.lo
 am_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS =  \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la-png.lo \
@@ -356,7 +356,7 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c \
 	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c \
 	pngrutil.c pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c \
 	pngwutil.c png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h \
-	pngstruct.h $(am__append_1)
+	pngstruct.h pngusr.dfa $(am__append_1)
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_CPPFLAGS = @LIBPNG_DEFINES@
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined \
@@ -1373,11 +1373,11 @@ contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
 	mv dfn3.out $@
 
 # The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
+pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
 	rm -f $@ dfn?.out
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
-	    $(DFA_XTRA) 1>&2
+	    ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	rm dfn1.out
 	mv dfn2.out $@

@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.5.10beta01
+;Version 1.5.10beta03
  png_access_version_number @1
  png_set_sig_bytes @2
  png_sig_cmp @3
@@ -239,3 +239,4 @@ EXPORTS
  png_get_cHRM_XYZ_fixed @231
  png_set_cHRM_XYZ @232
  png_set_cHRM_XYZ_fixed @233
+ png_set_check_for_invalid_index @234

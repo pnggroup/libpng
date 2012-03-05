@@ -27,7 +27,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # The syntax is detailed in scripts/options.awk, this is a summary
 # only:
 #
-# setting <name> [requires ...] [default]
+# setting <name> [default]
 #    #define PNG_<name> <value>  /* value comes from current setting */
 # option <name> [requires ...] [if ...] [enables ...] [disabled]
 #    #define PNG_<name>_SUPPORTED if the requirements are met and
@@ -266,20 +266,22 @@ option SET_USER_LIMITS enables SET_CHUNK_CACHE_LIMIT
 
 option SET_USER_LIMITS enables SET_CHUNK_MALLOC_LIMIT
 
-# Added at libpng-1.0.16 and 1.2.6.  To accept all valid PNGs no matter
-# how large, set these two limits to 0x7fffffff
+# Libpng limits.
+#
+# If these settings are *not* set libpng will not limit the size of
+# images or the size of data in ancilliary chunks.  This does lead to
+# security issues if PNG files come from untrusted sources.
+setting USER_WIDTH_MAX
+setting USER_HEIGHT_MAX
+setting USER_CHUNK_CACHE_MAX
+setting USER_CHUNK_MALLOC_MAX
 
-setting USER_WIDTH_MAX default 1000000
-setting USER_HEIGHT_MAX default 1000000
-
-# Added at libpng-1.2.43.  To accept all valid PNGs no matter
-# how large, set these two limits to 0.
-
-setting USER_CHUNK_CACHE_MAX default 0
-
-# Added at libpng-1.2.43
-
-setting USER_CHUNK_MALLOC_MAX default 0
+# To default all these settings to values that are large but probably
+# safe turn the SAFE_LIMITS option on; this will cause the value in
+# pngpriv.h to be used.  Individual values can also be set, simply set
+# them in pngusr.dfa with '@#define PNG_setting value' lines.
+option SAFE_LIMITS enables USER_LIMITS disabled
+= SAFE_LIMITS SAFE_LIMITS
 
 # All of the following options relate to code capabilities for
 # processing image data before creating a PNG or after reading one.
@@ -576,3 +578,13 @@ option WRITE_COMPRESSED_TEXT enables WRITE_TEXT
 # leave the row_pointers member out of the info structure.
 
 option INFO_IMAGE
+
+# added at libpng-1.5.10
+# Turn this off to disable warning about invalid palette index and
+# leave the num_palette_max member out of the png structure.
+
+option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
+option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
+option READ_CHECK_FOR_INVALID_INDEX requires READ CHECK_FOR_INVALID_INDEX
+option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
+
