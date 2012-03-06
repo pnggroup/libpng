@@ -1324,8 +1324,6 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
    else
       png_ptr->num_palette_max = -1;
 }
-
-
 #endif
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
