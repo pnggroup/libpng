@@ -4037,6 +4037,8 @@ Version 1.6.0beta16 [March 6, 2012]
     If the call to deflateInit2() is wrong a png_warning will be issued
     (in fact this is harmless, but the PNG data produced may be sub-optimal).
 
+Version 1.6.0beta17 [March 6, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
