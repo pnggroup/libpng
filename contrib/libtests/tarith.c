@@ -90,12 +90,12 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
    while (--argc > 0)
       if (strcmp(*++argv, "-a") == 0)
          showall = 1;
-      else if (strcmp(*++argv, "-e") == 0 && argc > 0)
+      else if (strcmp(*argv, "-e") == 0 && argc > 0)
       {
 	 --argc;
          max_error = atof(*++argv);
       }
-      else if (strcmp(*++argv, "-E") == 0 && argc > 0)
+      else if (strcmp(*argv, "-E") == 0 && argc > 0)
       {
 	 --argc;
          max_error_abs = atof(*++argv);
