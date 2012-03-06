@@ -3535,6 +3535,30 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
       png_set_IHDR(pp, pi, w, h, bit_depth, colour_type, interlace_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
+#ifdef PNG_TEXT_SUPPORTED
+      {
+         static char key[] = "image name"; /* must be writeable */
+         size_t pos;
+         png_text text;
+         char copy[FILE_NAME_SIZE];
+
+         /* Use a compressed text string to test the correct interaction of text
+          * compression and IDAT compression.
+          */
+         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.key = key;
+         /* Yuck: the text must be writable! */
+         pos = safecat(copy, sizeof copy, 0, ps->wname);
+         text.text = copy;
+         text.text_length = pos;
+         text.itxt_length = 0;
+         text.lang = 0;
+         text.lang_key = 0;
+
+         png_set_text(pp, pi, &text, 1);
+      }
+#endif
+
       if (colour_type == 3) /* palette */
          init_standard_palette(ps, pp, pi, 1U << bit_depth, 0/*do tRNS*/);
 
@@ -3611,6 +3635,27 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
             }
          }
       }
+
+#ifdef PNG_TEXT_SUPPORTED
+      {
+         static char key[] = "end marker";
+         static char comment[] = "end";
+         png_text text;
+
+         /* Use a compressed text string to test the correct interaction of text
+          * compression and IDAT compression.
+          */
+         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.key = key;
+         text.text = comment;
+         text.text_length = (sizeof comment)-1;
+         text.itxt_length = 0;
+         text.lang = 0;
+         text.lang_key = 0;
+
+         png_set_text(pp, pi, &text, 1);
+      }
+#endif
 
       png_write_end(pp, pi);
 
@@ -4565,6 +4610,114 @@ sequential_row(standard_display *dp, png_structp pp, png_infop pi,
    png_read_end(pp, pi);
 }
 
+#ifdef PNG_TEXT_SUPPORTED
+static void
+standard_check_text(png_const_structp pp, png_const_textp tp,
+   png_const_charp keyword, png_const_charp text)
+{
+   char msg[1024];
+   size_t pos = safecat(msg, sizeof msg, 0, "text: ");
+   size_t ok;
+
+   pos = safecat(msg, sizeof msg, pos, keyword);
+   pos = safecat(msg, sizeof msg, pos, ": ");
+   ok = pos;
+
+   if (tp->compression != PNG_TEXT_COMPRESSION_zTXt)
+   {
+      char buf[64];
+
+      sprintf(buf, "compression [%d->%d], ", PNG_TEXT_COMPRESSION_zTXt,
+         tp->compression);
+      pos = safecat(msg, sizeof msg, pos, buf);
+   }
+
+   if (tp->key == NULL || strcmp(tp->key, keyword) != 0)
+   {
+      pos = safecat(msg, sizeof msg, pos, "keyword \"");
+      if (tp->key != NULL)
+      {
+         pos = safecat(msg, sizeof msg, pos, tp->key);
+         pos = safecat(msg, sizeof msg, pos, "\", ");
+      }
+
+      else
+         pos = safecat(msg, sizeof msg, pos, "null, ");
+   }
+
+   if (tp->text == NULL)
+      pos = safecat(msg, sizeof msg, pos, "text lost, ");
+
+   else
+   {
+      if (tp->text_length != strlen(text))
+      {
+         char buf[64];
+         sprintf(buf, "text length changed[%lu->%lu], ", strlen(text),
+            tp->text_length);
+         pos = safecat(msg, sizeof msg, pos, buf);
+      }
+
+      if (strcmp(tp->text, text) != 0)
+      {
+         pos = safecat(msg, sizeof msg, pos, "text becomes \"");
+         pos = safecat(msg, sizeof msg, pos, tp->text);
+         pos = safecat(msg, sizeof msg, pos, "\" (was \"");
+         pos = safecat(msg, sizeof msg, pos, text);
+         pos = safecat(msg, sizeof msg, pos, "\", ");
+      }
+   }
+
+   if (tp->itxt_length != 0)
+      pos = safecat(msg, sizeof msg, pos, "iTXt length set, ");
+      
+   if (tp->lang != NULL)
+   {
+      pos = safecat(msg, sizeof msg, pos, "iTXt language \"");
+      pos = safecat(msg, sizeof msg, pos, tp->lang);
+      pos = safecat(msg, sizeof msg, pos, "\", ");
+   }
+      
+   if (tp->lang_key != NULL)
+   {
+      pos = safecat(msg, sizeof msg, pos, "iTXt keyword \"");
+      pos = safecat(msg, sizeof msg, pos, tp->lang_key);
+      pos = safecat(msg, sizeof msg, pos, "\", ");
+   }
+      
+   if (pos > ok)
+   {
+      msg[pos-2] = '\0'; /* Remove the ", " at the end */
+      png_error(pp, msg);
+   }
+}
+
+static void
+standard_text_validate(standard_display *dp, png_const_structp pp,
+   png_const_infop pi)
+{
+   png_textp tp = NULL;
+   png_uint_32 num_text = png_get_text(pp, pi, &tp, NULL);
+
+   if (num_text == 2 && tp != NULL)
+   {
+      standard_check_text(pp, tp, "image name", dp->ps->current->name);
+      standard_check_text(pp, tp+1, "end marker", "end");
+   }
+
+   else
+   {
+      char msg[64];
+
+      sprintf(msg, "expected two text items, got %lu",
+         (unsigned long)num_text);
+      png_error(pp, msg);
+   }
+}
+#else
+#  define standard_text_validate(dp,pp,pi) ((void)0)
+#endif
+
 static void
 standard_row_validate(standard_display *dp, png_const_structp pp,
    int iImage, int iDisplay, png_uint_32 y)
@@ -4652,6 +4805,7 @@ standard_end(png_structp ppIn, png_infop pi)
    /* Validate the image - progressive reading only produces one variant for
     * interlaced images.
     */
+   standard_text_validate(dp, pp, pi);
    standard_image_validate(dp, pp, 0, -1);
 }
 
@@ -4721,7 +4875,10 @@ standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
              * image is correct.
              */
             if (!d.speed)
+            {
+               standard_text_validate(&d, pp, pi);
                standard_image_validate(&d, pp, 0, 1);
+            }
             else
                d.ps->validated = 1;
          }

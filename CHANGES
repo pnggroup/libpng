@@ -4032,6 +4032,7 @@ Version 1.6.0beta16 [March 6, 2012]
     is now fixed, all initialization is delayed, and the code checks for
     changed parameters on deflate rather than always calling
     deflatedEnd/deflateInit.
+  Validate the zTXt strings in pngvalid.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
