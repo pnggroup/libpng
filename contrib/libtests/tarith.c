@@ -77,6 +77,8 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
    int    showall = 0;
    double max_error=2;      /* As a percentage error-in-last-digit/.5 */
    double max_error_abs=17; /* Used when precision is DBL_DIG */
+   double max = 0;
+   double max_abs = 0;
    double test = 0; /* Important to test this. */
    int    precision = 5;
    int    nonfinite = 0;
@@ -185,20 +187,8 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
          /* Check the result against the original. */
 	 double out = atof(buffer);
 	 double change = fabs((out - test)/test);
-	 double allow;
-	 double percent;
-	 
-	 if (precision >= DBL_DIG)
-	 {
-	    allow = .5/pow(10, DBL_DIG-1);
-	    percent = max_error_abs;
-	 }
-
-	 else
-	 {
-	    allow = .5/pow(10, precision-1);
-	    percent = max_error;
-	 }
+	 double allow = .5/pow(10,
+            (precision >= DBL_DIG) ? DBL_DIG-1 : precision-1);
 
 	 /* NOTE: if you hit this error case are you compiling with gcc
 	  * and -O0?  Try -O2 - the errors can accumulate if the FP
@@ -210,12 +200,25 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
 	 if (change >= allow && (isfinite(out) ||
 	     fabs(test/DBL_MAX) <= 1-allow))
 	 {
-	    if (showall || (change-allow)*100/allow >= percent)
+            double percent = (precision >= DBL_DIG) ? max_error_abs : max_error;
+            double allowp = (change-allow)*100/allow;
+
+            if (precision >= DBL_DIG)
+            {
+               if (max_abs < allowp) max_abs = allowp;
+            }
+
+            else
+            {
+               if (max < allowp) max = allowp;
+            }
+
+	    if (showall || allowp >= percent)
 	    {
 	       fprintf(stderr,
 		  "%.*g[%d] -> '%s' -> %.*g number changed (%g > %g (%d%%))\n",
 		  DBL_DIG, test, precision, buffer, DBL_DIG, out, change, allow,
-		  (int)round((change-allow)*100/allow));
+		  (int)round(allowp));
 	       failed = 1;
 	    }
 	    else
@@ -256,6 +259,8 @@ skip:
 
    printf("Tested %d finite values, %d non-finite, %d OK (%d failed) %d minor "
       "arithmetic errors\n", finite, nonfinite, ok, failcount, minorarith);
+   printf(" Error with >=%d digit precision %.2f%%\n", DBL_DIG, max_abs);
+   printf(" Error with < %d digit precision %.2f%%\n", DBL_DIG, max);
 
    return 0;
 }
