@@ -65,9 +65,9 @@ struct png_struct_def
    png_uint_32 flags;         /* flags indicating various things to libpng */
    png_uint_32 transformations; /* which transformations to perform */
 
-   z_stream zstream;          /* pointer to decompression structure (below) */
+   z_stream zstream;          /* decompression structure */
    png_bytep zbuf;            /* buffer for zlib */
-   uInt zbuf_size;            /* size of zbuf (typically 65536) */
+   uInt zbuf_size;            /* size of zbuf */
 
 #ifdef PNG_WRITE_SUPPORTED
    int zlib_level;            /* holds zlib compression level */

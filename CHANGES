@@ -4033,6 +4033,9 @@ Version 1.6.0beta16 [March 6, 2012]
     changed parameters on deflate rather than always calling
     deflatedEnd/deflateInit.
   Validate the zTXt strings in pngvalid.
+  Added code to validate the windowBits value passed to deflateInit2().
+    If the call to deflateInit2() is wrong a png_warning will be issued
+    (in fact this is harmless, but the PNG data produced may be sub-optimal).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

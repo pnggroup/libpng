@@ -305,7 +305,11 @@ png_deflate_claim(png_structrp png_ptr, int for_IDAT,
       }
 
       /* Adjust 'windowBits' down if larger than 'data_size'; to stop this
-       * happening just pass 32768 as the data_size parameter.
+       * happening just pass 32768 as the data_size parameter.  Notice that zlib
+       * requires an extra 262 bytes in the window in addition to the data to be
+       * able to see the whole of the data, so if data_size+262 takes us to the
+       * next windowBits size we need to fix up the value later.  (Because even
+       * though deflate needs the extra window, inflate does not!)
        */
       if (data_size <= 256)
          windowBits = 8;
@@ -316,6 +320,20 @@ png_deflate_claim(png_structrp png_ptr, int for_IDAT,
          if (data_size > test)
             break;
          --windowBits;
+      }
+
+      if (windowBits < 15)
+      {
+         png_uint_32 test = 1U << windowBits;
+
+         if (data_size + 262U > test)
+         {
+            ++windowBits;
+            png_ptr->flags |= PNG_FLAG_ZSTREAM_CMF_FIXUP;
+         }
+
+         else
+            png_ptr->flags &= ~PNG_FLAG_ZSTREAM_CMF_FIXUP;
       }
 
       /* Check against the previous initialized values, if any. */
@@ -630,6 +648,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
       {
          unsigned int z_cinfo;
          unsigned int half_z_window_size;
+         int reduced = 0;
          png_size_t uncompressed_text_size = comp->input_len;
 
          z_cinfo = z_cmf >> 4;
@@ -640,7 +659,11 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
          {
             z_cinfo--;
             half_z_window_size >>= 1;
+            reduced = 1;
          }
+
+         if (reduced && !(png_ptr->flags & PNG_FLAG_ZSTREAM_CMF_FIXUP))
+            png_warning(png_ptr, "internal data size error (text)");
 
          z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
 
@@ -960,25 +983,10 @@ png_write_IDAT(png_structrp png_ptr, png_bytep data, png_size_t length)
          if (length >= 2 &&
              png_ptr->height < 16384 && png_ptr->width < 16384)
          {
-            /* Compute the maximum possible length of the datastream */
-
-            /* Number of pixels, plus for each row a filter byte
-             * and possibly a padding byte, so increase the maximum
-             * size to account for these.
-             */
             unsigned int z_cinfo;
             unsigned int half_z_window_size;
-            png_uint_32 uncompressed_idat_size = png_ptr->height *
-                ((png_ptr->width *
-                png_ptr->channels * png_ptr->bit_depth + 15) >> 3);
-
-            /* If it's interlaced, each block of 8 rows is sent as up to
-             * 14 rows, i.e., 6 additional rows, each with a filter byte
-             * and possibly a padding byte
-             */
-            if (png_ptr->interlaced)
-               uncompressed_idat_size += ((png_ptr->height + 7)/8) *
-                   (png_ptr->bit_depth < 8 ? 12 : 6);
+            int reduced = 0;
+            png_alloc_size_t uncompressed_idat_size = png_image_size(png_ptr);
 
             z_cinfo = z_cmf >> 4;
             half_z_window_size = 1 << (z_cinfo + 7);
@@ -988,7 +996,11 @@ png_write_IDAT(png_structrp png_ptr, png_bytep data, png_size_t length)
             {
                z_cinfo--;
                half_z_window_size >>= 1;
+               reduced = 1;
             }
+
+            if (reduced && !(png_ptr->flags & PNG_FLAG_ZSTREAM_CMF_FIXUP))
+               png_warning(png_ptr, "internal data size error (IDAT)");
 
             z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
 

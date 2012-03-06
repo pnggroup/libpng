@@ -513,7 +513,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_FLAG_ZSTREAM_INITIALIZED      0x0002 /* Added to libpng-1.6.0 */
 #define PNG_FLAG_ZSTREAM_IN_USE           0x0004 /* Added to libpng-1.6.0 */
 #define PNG_FLAG_ZSTREAM_ENDED            0x0008 /* Added to libpng-1.6.0 */
-                                  /*      0x0010    unused */
+#define PNG_FLAG_ZSTREAM_CMF_FIXUP        0x0010 /* Added to libpng-1.6.0 */
                                   /*      0x0020    unused */
 #define PNG_FLAG_ROW_INIT                 0x0040
 #define PNG_FLAG_FILLER_AFTER             0x0080
