@@ -2850,10 +2850,14 @@ version 1.4.10beta01 [February 27, 2011]
   Fixed incorrect type (int copy should be png_size_t copy) in png_inflate().
   Fixed off-by-one bug in png_handle_sCAL() when using fixed point arithmetic,
     causing out-of-bounds read in png_set_sCAL() because of failure to copy
-    the string terminators (Franke Busse).
+    the string terminators.  This bug was introduced in libpng-1.0.6 (Frank
+    Busse).
 
-version 1.4.10beta02 [February 27, 2012]
+version 1.4.10rc01 [March 2, 2012]
   Removed the png_free() of unused png_ptr->current_text from pngread.c.
+
+version 1.4.10rc02 [March 6, 2012]
+  Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition in png.h
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
