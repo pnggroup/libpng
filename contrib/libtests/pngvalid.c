@@ -4664,7 +4664,7 @@ standard_check_text(png_const_structp pp, png_const_textp tp,
          pos = safecat(msg, sizeof msg, pos, tp->text);
          pos = safecat(msg, sizeof msg, pos, "\" (was \"");
          pos = safecat(msg, sizeof msg, pos, text);
-         pos = safecat(msg, sizeof msg, pos, "\", ");
+         pos = safecat(msg, sizeof msg, pos, "\"), ");
       }
    }
 
