@@ -48,61 +48,14 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (png_ptr != NULL)
    {
-      int ok = 0;
-
-      /* TODO: why does this happen here on read, but in png_write_IHDR on
-       * write?  If it happened there then there would be no error handling case
-       * here and png_ptr could be a png_structrp.
+      /* TODO: delay this, it can be done in png_init_io (if the app doesn't
+       * do it itself) avoiding setting the default function if it is not
+       * required.
        */
-      png_ptr->zstream.zalloc = png_zalloc;
-      png_ptr->zstream.zfree = png_zfree;
-      png_ptr->zstream.opaque = png_ptr;
-
-      switch (inflateInit(&png_ptr->zstream))
-      {
-         case Z_OK:
-            ok = 1;
-            break;
-
-         case Z_MEM_ERROR:
-            png_warning(png_ptr, "zlib memory error");
-            break;
-
-         case Z_STREAM_ERROR:
-            png_warning(png_ptr, "zlib stream error");
-            break;
-
-         case Z_VERSION_ERROR:
-            png_warning(png_ptr, "zlib version error");
-            break;
-
-         default:
-            png_warning(png_ptr, "Unknown zlib error");
-            break;
-      }
-
-      if (ok)
-      {
-         png_ptr->zstream.next_out = png_ptr->zbuf;
-         png_ptr->zstream.avail_out = png_ptr->zbuf_size;
-
-         /* TODO: delay this, it can be done in png_init_io (if the app doesn't
-          * do it itself) avoiding setting the default function if it is not
-          * required.
-          */
-         png_set_read_fn(png_ptr, NULL, NULL);
-
-         return png_ptr;
-      }
-
-      /* Else something went wrong in the zlib initialization above; it would
-       * much simplify this code if the creation of the zlib stuff was to be
-       * delayed until it is needed.
-       */
-      png_destroy_read_struct(&png_ptr, NULL, NULL);
+      png_set_read_fn(png_ptr, NULL, NULL);
    }
 
-   return NULL;
+   return png_ptr;
 }
 
 
@@ -471,15 +424,17 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
       png_error(png_ptr, "Invalid attempt to read row data");
 
    png_ptr->zstream.next_out = png_ptr->row_buf;
-   png_ptr->zstream.avail_out =
-       (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
+   /* TODO: WARNING: BAD NEWS ALERT: this fails, terminally, if the row width is
+    * bigger than a uInt.
+    */
+   png_ptr->zstream.avail_out = (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
        png_ptr->iwidth) + 1);
 
    do
    {
       if (!(png_ptr->zstream.avail_in))
       {
-         while (!png_ptr->idat_size)
+         while (png_ptr->idat_size == 0)
          {
             png_crc_finish(png_ptr, 0);
 
@@ -487,7 +442,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
             if (png_ptr->chunk_name != png_IDAT)
                png_error(png_ptr, "Not enough image data");
          }
-         png_ptr->zstream.avail_in = (uInt)png_ptr->zbuf_size;
+         png_ptr->zstream.avail_in = png_ptr->zbuf_size;
          png_ptr->zstream.next_in = png_ptr->zbuf;
          if (png_ptr->zbuf_size > png_ptr->idat_size)
             png_ptr->zstream.avail_in = (uInt)png_ptr->idat_size;
@@ -495,7 +450,11 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
          png_ptr->idat_size -= png_ptr->zstream.avail_in;
       }
 
-      ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
+      /* Use NO_FLUSH, not SYNC_FLUSH, here because we keep reading data until
+       * we have a row to process (so leave it to zlib to decide when to flush
+       * the output.)
+       */
+      ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
 
       if (ret == Z_STREAM_END)
       {
@@ -503,7 +462,9 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
             png_ptr->idat_size)
             png_benign_error(png_ptr, "Extra compressed data");
          png_ptr->mode |= PNG_AFTER_IDAT;
-         png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
+         /* Release the stream */
+         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
+         png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
          break;
       }
 

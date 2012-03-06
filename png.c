@@ -283,7 +283,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
           */
          if (png_user_version_check(&create_struct, user_png_ver))
          {
-
             /* TODO: delay initializing the zlib structure until it really is
              * needed.
              */
@@ -308,6 +307,13 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 #                 endif
 
                   *png_ptr = create_struct;
+
+                  /* png_ptr->zstream holds a back-pointer to the png_struct, so
+                   * this can only be done now:
+                   */
+                  png_ptr->zstream.zalloc = png_zalloc;
+                  png_ptr->zstream.zfree = png_zfree;
+                  png_ptr->zstream.opaque = png_ptr;
 
                   /* This is the successful return point */
                   return png_ptr;
@@ -762,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta16 - March 3, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta16 - March 6, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta16 - March 3, 2012\
+      return "libpng version 1.6.0beta16 - March 6, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";

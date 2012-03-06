@@ -68,20 +68,8 @@ struct png_struct_def
    z_stream zstream;          /* pointer to decompression structure (below) */
    png_bytep zbuf;            /* buffer for zlib */
    uInt zbuf_size;            /* size of zbuf (typically 65536) */
+
 #ifdef PNG_WRITE_SUPPORTED
-
-/* Added in 1.5.4: state to keep track of whether the zstream has been
- * initialized and if so whether it is for IDAT or some other chunk.
- */
-#define PNG_ZLIB_UNINITIALIZED 0
-#define PNG_ZLIB_FOR_IDAT      1
-#define PNG_ZLIB_FOR_TEXT      2 /* anything other than IDAT */
-#define PNG_ZLIB_USE_MASK      3 /* bottom two bits */
-#define PNG_ZLIB_IN_USE        4 /* a flag value */
-
-   png_uint_32 zlib_state;       /* State of zlib initialization */
-/* End of material added at libpng 1.5.4 */
-
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
    int zlib_window_bits;      /* holds zlib compression window bits */
@@ -89,8 +77,7 @@ struct png_struct_def
    int zlib_strategy;         /* holds zlib compression strategy */
 #endif
 /* Added at libpng 1.5.4 */
-#if defined(PNG_WRITE_COMPRESSED_TEXT_SUPPORTED) || \
-    defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
    int zlib_text_window_bits;      /* holds zlib compression window bits */
@@ -98,6 +85,14 @@ struct png_struct_def
    int zlib_text_strategy;         /* holds zlib compression strategy */
 #endif
 /* End of material added at libpng 1.5.4 */
+/* Added at libpng 1.6.0 */
+#ifdef PNG_WRITE_SUPPORTED
+   int zlib_set_level;        /* Actual values set into the zstream on write */
+   int zlib_set_method;
+   int zlib_set_window_bits;
+   int zlib_set_mem_level;
+   int zlib_set_strategy;
+#endif
 
    png_uint_32 width;         /* width of image in pixels */
    png_uint_32 height;        /* height of image in pixels */

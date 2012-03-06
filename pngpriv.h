@@ -510,36 +510,36 @@ typedef const png_uint_16p * png_const_uint_16pp;
 
 /* Flags for the png_ptr->flags rather than declaring a byte for each one */
 #define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x0001
-#define PNG_FLAG_ZLIB_CUSTOM_LEVEL        0x0002
-#define PNG_FLAG_ZLIB_CUSTOM_MEM_LEVEL    0x0004
-#define PNG_FLAG_ZLIB_CUSTOM_WINDOW_BITS  0x0008
-#define PNG_FLAG_ZLIB_CUSTOM_METHOD       0x0010
-#define PNG_FLAG_ZLIB_FINISHED            0x0020
+#define PNG_FLAG_ZSTREAM_INITIALIZED      0x0002 /* Added to libpng-1.6.0 */
+#define PNG_FLAG_ZSTREAM_IN_USE           0x0004 /* Added to libpng-1.6.0 */
+#define PNG_FLAG_ZSTREAM_ENDED            0x0008 /* Added to libpng-1.6.0 */
+                                  /*      0x0010    unused */
+                                  /*      0x0020    unused */
 #define PNG_FLAG_ROW_INIT                 0x0040
 #define PNG_FLAG_FILLER_AFTER             0x0080
 #define PNG_FLAG_CRC_ANCILLARY_USE        0x0100
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-#define PNG_FLAG_ASSUME_sRGB              0x1000  /* Added to libpng-1.5.4 */
-#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000  /* Added to libpng-1.5.4 */
-#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000  /* Added to libpng-1.5.4 */
+#define PNG_FLAG_ASSUME_sRGB              0x1000 /* Added to libpng-1.5.4 */
+#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000 /* Added to libpng-1.5.4 */
+#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000 /* Added to libpng-1.5.4 */
 #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000
-#define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000
-#define PNG_FLAG_LIBRARY_MISMATCH         0x20000
-#define PNG_FLAG_STRIP_ERROR_NUMBERS      0x40000
-#define PNG_FLAG_STRIP_ERROR_TEXT         0x80000
-                                  /*      0x100000  unused */
-                                  /*      0x200000  unused */
-                                  /*      0x400000  unused */
-#define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000  /* Added to libpng-1.4.0 */
-#define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000  /* 5 lines added */
-#define PNG_FLAG_ZTXT_CUSTOM_LEVEL       0x2000000  /* to libpng-1.5.4 */
-#define PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL   0x4000000
-#define PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS 0x8000000
-#define PNG_FLAG_ZTXT_CUSTOM_METHOD      0x10000000
-                                  /*     0x20000000  unused */
-                                  /*     0x40000000  unused */
+#define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000
+#define PNG_FLAG_LIBRARY_MISMATCH        0x20000
+#define PNG_FLAG_STRIP_ERROR_NUMBERS     0x40000
+#define PNG_FLAG_STRIP_ERROR_TEXT        0x80000
+#define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000 /* Added to libpng-1.4.0 */
+                                  /*    0x200000    unused */
+                                  /*    0x400000    unused */
+                                  /*    0x800000    unused */
+                                  /*   0x1000000    unused */
+                                  /*   0x2000000    unused */
+                                  /*   0x4000000    unused */
+                                  /*   0x8000000    unused */
+                                  /*  0x10000000    unused */
+                                  /*  0x20000000    unused */
+                                  /*  0x40000000    unused */
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)
@@ -733,6 +733,9 @@ extern "C" {
  *
  * All of these functions must be declared with PNG_INTERNAL_FUNCTION.
  */
+
+/* Zlib support */
+PNG_INTERNAL_FUNCTION(void,png_inflate_claim,(png_structrp png_ptr),PNG_EMPTY);
 
 #if defined PNG_FLOATING_POINT_SUPPORTED &&\
    !defined PNG_FIXED_POINT_MACRO_SUPPORTED

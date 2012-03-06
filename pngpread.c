@@ -766,7 +766,7 @@ png_push_read_IDAT(png_structrp png_ptr)
       {
          png_ptr->process_mode = PNG_READ_CHUNK_MODE;
 
-         if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
+         if (!(png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED))
             png_error(png_ptr, "Not enough compressed data");
 
          return;
@@ -838,6 +838,7 @@ png_push_read_IDAT(png_structrp png_ptr)
       png_crc_finish(png_ptr, 0);
       png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
       png_ptr->mode |= PNG_AFTER_IDAT;
+      png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
    }
 }
 
@@ -854,13 +855,14 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
     * handle the uncompressed results.
     */
    png_ptr->zstream.next_in = buffer;
+   /* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */
    png_ptr->zstream.avail_in = (uInt)buffer_length;
 
    /* Keep going until the decompressed data is all processed
     * or the stream marked as finished.
     */
    while (png_ptr->zstream.avail_in > 0 &&
-          !(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
+      !(png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED))
    {
       int ret;
 
@@ -871,9 +873,9 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
        */
       if (!(png_ptr->zstream.avail_out > 0))
       {
-         png_ptr->zstream.avail_out =
-             (uInt) PNG_ROWBYTES(png_ptr->pixel_depth,
-             png_ptr->iwidth) + 1;
+         /* TODO: WARNING: TRUNCATION ERROR: DANGER WILL ROBINSON: */
+         png_ptr->zstream.avail_out = (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
+             png_ptr->iwidth) + 1);
 
          png_ptr->zstream.next_out = png_ptr->row_buf;
       }
@@ -891,7 +893,8 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
       if (ret != Z_OK && ret != Z_STREAM_END)
       {
          /* Terminate the decompression. */
-         png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
+         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
+         png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
 
          /* This may be a truncated stream (missing or
           * damaged end code).  Treat that as a warning.
@@ -919,7 +922,8 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
          {
             /* Extra data. */
             png_warning(png_ptr, "Extra compressed data in IDAT");
-            png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
+            png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
+            png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
 
             /* Do no more processing; skip the unprocessed
              * input check below.
@@ -934,7 +938,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
 
       /* And check for the end of the stream. */
       if (ret == Z_STREAM_END)
-         png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
+         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
    }
 
    /* All the data should have been processed, if anything

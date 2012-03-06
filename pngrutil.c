@@ -277,6 +277,59 @@ png_crc_error(png_structrp png_ptr)
       return (0);
 }
 
+/* png_inflate_claim: claim the zstream for some nefarious purpose that involves
+ * decompression.
+ */
+void /* PRIVATE */
+png_inflate_claim(png_structrp png_ptr)
+{
+   /* Implementation note: unlike 'png_deflate_claim' this internal function
+    * does not take the size of the data as an argument.  Some efficiency could
+    * be gained by using this when it is known *if* the zlib stream itself does
+    * not record the number, however this is a chimera: the original writer of
+    * the PNG may have selected a lower window size, and we really must follow
+    * that because, for systems with with limited capabilities, we would
+    * otherwise reject the applications attempts to use a smaller window size.
+    * (zlib doesn't have an interface to say "this or lower"!)
+    */
+   if (!(png_ptr->flags & PNG_FLAG_ZSTREAM_IN_USE))
+   {
+      int ret; /* zlib return code */
+
+      /* Do this for safety now. */
+      png_ptr->flags &= ~PNG_FLAG_ZSTREAM_ENDED;
+
+      if (png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED)
+         ret = inflateReset(&png_ptr->zstream);
+
+      else
+      {
+         ret = inflateInit(&png_ptr->zstream);
+
+         if (ret == Z_OK)
+            png_ptr->flags |= PNG_FLAG_ZSTREAM_INITIALIZED;
+      }
+
+      if (ret == Z_OK)
+         png_ptr->flags |= PNG_FLAG_ZSTREAM_IN_USE;
+
+      else
+      {
+         /* A problem; the flags are set ok, but we need a credible error
+          * message.
+          */
+         if (png_ptr->zstream.msg != NULL)
+            png_error(png_ptr, png_ptr->zstream.msg);
+
+         else
+            png_error(png_ptr, "zlib initialization error");
+      }
+   }
+
+   else
+      png_error(png_ptr, "zstream already in use (internal error)");
+}
+
 #ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
 /* png_inflate: returns one of the following error codes.  If output is not NULL
  * the uncompressed data is placed there, up to output_size.  output_size is
@@ -307,15 +360,6 @@ png_inflate(png_structrp png_ptr, png_bytep data, png_uint_32 input_size,
    int ret;
    png_alloc_size_t avail_out = *output_size;
    png_uint_32 avail_in = input_size;
-
-   /* TODO: PROBLEM: png_ptr-zstream is not reset via inflateReset after reading
-    * the image, consequently the first compressed chunk (zTXt or iTXt) after
-    * the data gets a 'finished' stream and the first call to inflate returns
-    * zero decompressed bytes.  This was handled silently before 1.6 by
-    * returning empty uncompressed data.  This is a temporary work-round (it's
-    * harmless if the stream is already reset).
-    */
-   inflateReset(&png_ptr->zstream);
 
    /* zlib can't necessarily handle more than 65535 bytes at once (i.e. it can't
     * even necessarily handle 65536 bytes) because the type uInt is "16 bits or
@@ -423,6 +467,7 @@ png_inflate(png_structrp png_ptr, png_bytep data, png_uint_32 input_size,
    switch (ret)
    {
       case Z_STREAM_END:
+         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
          return PNG_INFLATE_OK;
 
       case Z_BUF_ERROR: /* no progress in zlib */
@@ -479,6 +524,8 @@ png_decompress_chunk(png_structrp png_ptr, png_uint_32 chunklength,
     */
    png_alloc_size_t limit = PNG_SIZE_MAX;
 
+   png_inflate_claim(png_ptr);
+
 #  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
@@ -532,6 +579,7 @@ png_decompress_chunk(png_structrp png_ptr, png_uint_32 chunklength,
 
                         png_free(png_ptr, png_ptr->chunkdata);
                         png_ptr->chunkdata = (png_charp)text;
+                        png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
                         return NULL;
                      }
 
@@ -540,10 +588,12 @@ png_decompress_chunk(png_structrp png_ptr, png_uint_32 chunklength,
 
                   case PNG_INFLATE_TRUNCATED:
                      png_free(png_ptr, text);
+                     png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
                      return "libpng inflate error";
 
                   default: /* PNG_INFLATE_ERROR */
                      png_free(png_ptr, text);
+                     png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
                      return (png_const_charp)png_ptr->zbuf;
                }
             }
@@ -556,11 +606,13 @@ png_decompress_chunk(png_structrp png_ptr, png_uint_32 chunklength,
 
          default: /* PNG_INFLATE_ERROR */
             /* png_inflate puts the error message in zbuf. */
+            png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
             return (png_const_charp)png_ptr->zbuf;
       }
    }
 
    /* out of memory returns. */
+   png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
    return "insufficient memory";
 }
 #endif /* PNG_READ_COMPRESSED_TEXT_SUPPORTED */
@@ -3830,19 +3882,20 @@ png_read_finish_row(png_structrp png_ptr)
    }
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
 
-   if (!(png_ptr->flags & PNG_FLAG_ZLIB_FINISHED))
+   /* Here after at the end of the last row of the last pass. */
+   if (!(png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED))
    {
-      char extra;
+      Byte extra;
       int ret;
 
-      png_ptr->zstream.next_out = (Byte *)&extra;
-      png_ptr->zstream.avail_out = (uInt)1;
+      png_ptr->zstream.next_out = &extra;
+      png_ptr->zstream.avail_out = 1;
 
       for (;;)
       {
          if (!(png_ptr->zstream.avail_in))
          {
-            while (!png_ptr->idat_size)
+            while (png_ptr->idat_size == 0)
             {
                png_crc_finish(png_ptr, 0);
                png_ptr->idat_size = png_read_chunk_header(png_ptr);
@@ -3850,17 +3903,17 @@ png_read_finish_row(png_structrp png_ptr)
                   png_error(png_ptr, "Not enough image data");
             }
 
-            png_ptr->zstream.avail_in = (uInt)png_ptr->zbuf_size;
+            png_ptr->zstream.avail_in = png_ptr->zbuf_size;
             png_ptr->zstream.next_in = png_ptr->zbuf;
 
             if (png_ptr->zbuf_size > png_ptr->idat_size)
-               png_ptr->zstream.avail_in = (uInt)png_ptr->idat_size;
+               png_ptr->zstream.avail_in = png_ptr->idat_size;
 
             png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zstream.avail_in);
             png_ptr->idat_size -= png_ptr->zstream.avail_in;
          }
 
-         ret = inflate(&png_ptr->zstream, Z_PARTIAL_FLUSH);
+         ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
 
          if (ret == Z_STREAM_END)
          {
@@ -3868,8 +3921,7 @@ png_read_finish_row(png_structrp png_ptr)
                 png_ptr->idat_size)
                png_warning(png_ptr, "Extra compressed data");
 
-            png_ptr->mode |= PNG_AFTER_IDAT;
-            png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
+            png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
             break;
          }
 
@@ -3880,11 +3932,8 @@ png_read_finish_row(png_structrp png_ptr)
          if (!(png_ptr->zstream.avail_out))
          {
             png_warning(png_ptr, "Extra compressed data");
-            png_ptr->mode |= PNG_AFTER_IDAT;
-            png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
             break;
          }
-
       }
       png_ptr->zstream.avail_out = 0;
    }
@@ -3892,8 +3941,7 @@ png_read_finish_row(png_structrp png_ptr)
    if (png_ptr->idat_size || png_ptr->zstream.avail_in)
       png_warning(png_ptr, "Extra compression data");
 
-   inflateReset(&png_ptr->zstream);
-
+   png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
    png_ptr->mode |= PNG_AFTER_IDAT;
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
@@ -3921,7 +3969,7 @@ png_read_start_row(png_structrp png_ptr)
    png_size_t row_bytes;
 
    png_debug(1, "in png_read_start_row");
-   png_ptr->zstream.avail_in = 0;
+
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
    png_init_read_transformations(png_ptr);
 #endif
@@ -4168,6 +4216,9 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_debug1(3, "rowbytes = %lu,", (unsigned long)png_ptr->rowbytes);
    png_debug1(3, "irowbytes = %lu",
        (unsigned long)PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1);
+
+   /* Finally claim the zstream for the inflate of the IDAT data. */
+   png_inflate_claim(png_ptr);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }

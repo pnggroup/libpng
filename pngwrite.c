@@ -472,6 +472,23 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
       error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
 #endif /* PNG_USER_MEM_SUPPORTED */
 
+   /* Set the zlib control values to defaults; they can be overridden by the
+    * application after the struct has been created.
+    */
+   png_ptr->zlib_strategy = Z_FILTERED; /* may be overridden if no filters */
+   png_ptr->zlib_level = Z_DEFAULT_COMPRESSION;
+   png_ptr->zlib_mem_level = 8;
+   png_ptr->zlib_window_bits = 15;
+   png_ptr->zlib_method = 8;
+
+#ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
+   png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
+   png_ptr->zlib_text_level = Z_DEFAULT_COMPRESSION;
+   png_ptr->zlib_text_mem_level = 8;
+   png_ptr->zlib_text_window_bits = 15;
+   png_ptr->zlib_text_method = 8;
+#endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
+
    if (png_ptr != NULL)
    {
       /* TODO: delay this, it can be done in png_init_io() (if the app doesn't
@@ -827,7 +844,7 @@ png_write_destroy(png_structrp png_ptr)
    png_debug(1, "in png_write_destroy");
 
    /* Free any memory zlib uses */
-   if (png_ptr->zlib_state != PNG_ZLIB_UNINITIALIZED)
+   if (png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED)
       deflateEnd(&png_ptr->zstream);
 
    /* Free our memory.  png_free checks NULL for us. */
@@ -1266,7 +1283,6 @@ png_set_compression_level(png_structrp png_ptr, int level)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_LEVEL;
    png_ptr->zlib_level = level;
 }
 
@@ -1278,7 +1294,6 @@ png_set_compression_mem_level(png_structrp png_ptr, int mem_level)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_MEM_LEVEL;
    png_ptr->zlib_mem_level = mem_level;
 }
 
@@ -1290,6 +1305,8 @@ png_set_compression_strategy(png_structrp png_ptr, int strategy)
    if (png_ptr == NULL)
       return;
 
+   /* The flag setting here prevents the libpng dynamic selection of strategy.
+    */
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
    png_ptr->zlib_strategy = strategy;
 }
@@ -1303,22 +1320,24 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
    if (png_ptr == NULL)
       return;
 
+   /* Prior to 1.6.0 this would warn but then set the window_bits value, this
+    * meant that negative window bits values could be selected which would cause
+    * libpng to write a non-standard PNG file with raw deflate or gzip
+    * compressed IDAT or ancilliary chunks.  Such files can be read and there is
+    * no warning on read, so this seems like a very bad idea.
+    */
    if (window_bits > 15)
+   {
       png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
+      window_bits = 15;
+   }
 
    else if (window_bits < 8)
+   {
       png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
+      window_bits = 8;
+   }
 
-#ifndef WBITS_8_OK
-   /* Avoid libpng bug with 256-byte windows */
-   if (window_bits == 8)
-      {
-        png_warning(png_ptr, "Compression window is being reset to 512");
-        window_bits = 9;
-      }
-
-#endif
-   png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_WINDOW_BITS;
    png_ptr->zlib_window_bits = window_bits;
 }
 
@@ -1330,10 +1349,12 @@ png_set_compression_method(png_structrp png_ptr, int method)
    if (png_ptr == NULL)
       return;
 
+   /* This would produce an invalid PNG file if it worked, but it doesn't and
+    * deflate will fault it, so it is harmless to just warn here.
+    */
    if (method != 8)
       png_warning(png_ptr, "Only compression method 8 is supported by PNG");
 
-   png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_METHOD;
    png_ptr->zlib_method = method;
 }
 
@@ -1347,7 +1368,6 @@ png_set_text_compression_level(png_structrp png_ptr, int level)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_LEVEL;
    png_ptr->zlib_text_level = level;
 }
 
@@ -1359,7 +1379,6 @@ png_set_text_compression_mem_level(png_structrp png_ptr, int mem_level)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_MEM_LEVEL;
    png_ptr->zlib_text_mem_level = mem_level;
 }
 
@@ -1371,7 +1390,6 @@ png_set_text_compression_strategy(png_structrp png_ptr, int strategy)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_STRATEGY;
    png_ptr->zlib_text_strategy = strategy;
 }
 
@@ -1385,21 +1403,17 @@ png_set_text_compression_window_bits(png_structrp png_ptr, int window_bits)
       return;
 
    if (window_bits > 15)
+   {
       png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
+      window_bits = 15;
+   }
 
    else if (window_bits < 8)
+   {
       png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
+      window_bits = 8;
+   }
 
-#ifndef WBITS_8_OK
-   /* Avoid libpng bug with 256-byte windows */
-   if (window_bits == 8)
-      {
-        png_warning(png_ptr, "Text compression window is being reset to 512");
-        window_bits = 9;
-      }
-
-#endif
-   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS;
    png_ptr->zlib_text_window_bits = window_bits;
 }
 
@@ -1414,7 +1428,6 @@ png_set_text_compression_method(png_structrp png_ptr, int method)
    if (method != 8)
       png_warning(png_ptr, "Only compression method 8 is supported by PNG");
 
-   png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_METHOD;
    png_ptr->zlib_text_method = method;
 }
 #endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
