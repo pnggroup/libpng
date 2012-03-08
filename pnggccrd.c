@@ -1,14 +1,15 @@
 /* pnggccrd.c
  *
- * Last changed in libpng 1.2.48 [March 2, 2012]
+ * Last changed in libpng 1.2.48 [March 8, 2012]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * This code snippet is for use by configure's compilation test. The
- * remainder of the file was removed from libpng-1.2.20.
+ * This code snippet is for use by configure's compilation test. Most of the
+ * remainder of the file was removed from libpng-1.2.20, and all of the
+ * assembler code was removed from libpng-1.2.48.
  */
 
 #if (!defined _MSC_VER) && \
