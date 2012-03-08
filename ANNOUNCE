@@ -1,5 +1,5 @@
 
-Libpng 1.0.57 - February 18, 2012
+Libpng 1.0.58 - March 8, 2012
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,42 +8,54 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.57.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.57.tar.gz
-   libpng-1.0.57.tar.bz2
+   libpng-1.0.58.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.58.tar.gz
+   libpng-1.0.58.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.57-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.57-no-config.tar.gz
-   libpng-1.0.57-no-config.tar.bz2
+   libpng-1.0.58-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.58-no-config.tar.gz
+   libpng-1.0.58-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1057.zip
-   lpng1057.7z
-   lpng1057.tar.bz2
+   lpng1058.zip
+   lpng1058.7z
+   lpng1058.tar.bz2
 
 Project files
 
-   libpng-1.0.57-project-netware.zip
-   libpng-1.0.57-project-wince.zip
+   libpng-1.0.58-project-netware.zip
+   libpng-1.0.58-project-wince.zip
 
 Other information:
 
-   libpng-1.0.57-README.txt
-   libpng-1.0.57-KNOWNBUGS.txt
-   libpng-1.0.57-LICENSE.txt
-   libpng-1.0.57-Y2K-compliance.txt
+   libpng-1.0.58-README.txt
+   libpng-1.0.58-KNOWNBUGS.txt
+   libpng-1.0.58-LICENSE.txt
+   libpng-1.0.58-Y2K-compliance.txt
 
 Changes since the last public release (1.0.56):
 
-version 1.0.57 [February 18, 2012]
+version 1.0.57 [March 8, 2012]
 
-  Updated contrib/pngminus/makefile.std (Samuli Souminen)
-  Fixed CVE-2011-3026 buffer overrun bug.
+  Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
+  Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
+    pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
+    now that png_ptr->buffer is inaccessible to applications, the special
+    handling is no longer useful.
+  Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
+  Fixed incorrect type (int copy should be png_size_t copy) in png_inflate().
+  Fixed off-by-one bug in png_handle_sCAL() when using fixed point arithmetic,
+    causing out-of-bounds read in png_set_sCAL() because of failure to copy
+    the string terminators.  This bug was introduced in libpng-1.0.6 (Frank
+    Busse).
+  Removed the png_free() of unused png_ptr->current_text from pngread.c.
+  Added libpng license text to pnggccrd.c and pngvcrd.c (requested by Chrome).
+  Removed all of the assembler code from pnggccrd.c and just "return 2;".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
