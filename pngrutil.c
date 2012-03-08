@@ -1359,12 +1359,15 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   if (info_ptr != NULL && (info_ptr->valid & (PNG_INFO_iCCP|PNG_INFO_sRGB)))
+   if ((png_ptr->mode & PNG_HAVE_iCCP) || (info_ptr != NULL &&
+      (info_ptr->valid & (PNG_INFO_iCCP|PNG_INFO_sRGB))))
    {
       png_crc_finish(png_ptr, length);
       png_chunk_benign_error(png_ptr, "Duplicate color profile");
       return;
    }
+
+   png_ptr->mode |= PNG_HAVE_iCCP;
 
    png_free(png_ptr, png_ptr->chunkdata);
    /* TODO: read the chunk in pieces, validating it as we go. */

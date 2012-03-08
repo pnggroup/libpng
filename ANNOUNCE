@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta17 - March 6, 2012
+Libpng 1.6.0beta17 - March 8, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -286,7 +286,9 @@ Version 1.6.0beta16 [March 6, 2012]
     If the call to deflateInit2() is wrong a png_warning will be issued
     (in fact this is harmless, but the PNG data produced may be sub-optimal).
 
-Version 1.6.0beta17 [March 6, 2012]
+Version 1.6.0beta17 [March 8, 2012]
+  Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition. 
+  Reject iCCP chunk after the first, even if the first one is invalid.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

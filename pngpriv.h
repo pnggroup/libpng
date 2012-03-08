@@ -466,6 +466,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_BACKGROUND_IS_GRAY     0x800
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
+#define PNG_HAVE_iCCP             0x4000
 
 /* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001
