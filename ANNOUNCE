@@ -38,9 +38,9 @@ Other information:
    libpng-1.0.58-LICENSE.txt
    libpng-1.0.58-Y2K-compliance.txt
 
-Changes since the last public release (1.0.56):
+Changes since the last public release (1.0.57):
 
-version 1.0.57 [March 8, 2012]
+version 1.0.58 [March 8, 2012]
 
   Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
   Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
