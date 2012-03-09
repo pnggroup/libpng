@@ -68,6 +68,7 @@
  */
 #define _ISOC99_SOURCE /* for strtoull */
 
+#include <stddef.h> /* for offsetof */
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -1071,15 +1072,24 @@ main(int argc, char **argv)
       const char *arg = *++argv;
 
       if (strcmp(arg, "--sRGB") == 0)
+      {
          gamma = PNG_DEFAULT_sRGB;
+         continue;
+      }
 
-      else if (strcmp(arg, "--linear") == 0)
+      if (strcmp(arg, "--linear") == 0)
+      {
          gamma = PNG_FP_1;
+         continue;
+      }
 
-      else if (strcmp(arg, "--1.8") == 0)
+      if (strcmp(arg, "--1.8") == 0)
+      {
          gamma = PNG_GAMMA_MAC_18;
+         continue;
+      }
 
-      else if (argc >= 3 && strcmp(arg, "--insert") == 0)
+      if (argc >= 3 && strcmp(arg, "--insert") == 0)
       {
          png_const_charp what = *++argv;
          png_charp param = *++argv;
@@ -1094,36 +1104,57 @@ main(int argc, char **argv)
             *insert_ptr = new_insert;
             insert_ptr = &new_insert->next;
          }
+
+         continue;
       }
 
-      else if (arg[0] == '-')
+      if (arg[0] == '-')
       {
          fprintf(stderr, "makepng: %s: invalid option\n", arg);
          exit(1);
       }
 
-      else if (strcmp(arg, "palette") == 0)
-         color_type = PNG_COLOR_TYPE_PALETTE;
-
-      else if (strncmp(arg, "gray", 4) == 0)
+      if (strcmp(arg, "palette") == 0)
       {
-         color_type = PNG_COLOR_TYPE_GRAY;
-         if (strcmp(arg+4, "a") == 0 ||
+         color_type = PNG_COLOR_TYPE_PALETTE;
+         continue;
+      }
+
+      if (strncmp(arg, "gray", 4) == 0)
+      {
+         if (arg[5] == 0)
+         {
+            color_type = PNG_COLOR_TYPE_GRAY;
+            continue;
+         }
+
+         else if (strcmp(arg+4, "a") == 0 ||
             strcmp(arg+4, "alpha") == 0 ||
             strcmp(arg+4, "-alpha") == 0)
+         {
             color_type = PNG_COLOR_TYPE_GRAY_ALPHA;
+            continue;
+         }
       }
 
-      else if (strncmp(arg, "rgb", 3) == 0)
+      if (strncmp(arg, "rgb", 3) == 0)
       {
-         color_type = PNG_COLOR_TYPE_RGB;
-         if (strcmp(arg+3, "a") == 0 ||
+         if (arg[4] == 0)
+         {
+            color_type = PNG_COLOR_TYPE_RGB;
+            continue;
+         }
+
+         else if (strcmp(arg+3, "a") == 0 ||
             strcmp(arg+3, "alpha") == 0 ||
             strcmp(arg+3, "-alpha") == 0)
+         {
             color_type = PNG_COLOR_TYPE_RGB_ALPHA;
+            continue;
+         }
       }
 
-      else if (color_type == 8)
+      if (color_type == 8)
       {
          color_type = atoi(arg);
          if (color_type < 0 || color_type > 6 || color_type == 1 ||
@@ -1132,9 +1163,11 @@ main(int argc, char **argv)
             fprintf(stderr, "makepng: %s: not a valid color type\n", arg);
             exit(1);
          }
+
+         continue;
       }
 
-      else if (bit_depth == 32)
+      if (bit_depth == 32)
       {
          bit_depth = atoi(arg);
          if (bit_depth <= 0 || bit_depth > 16 ||
@@ -1143,9 +1176,11 @@ main(int argc, char **argv)
             fprintf(stderr, "makepng: %s: not a valid bit depth\n", arg);
             exit(1);
          }
+
+         continue;
       }
 
-      else if (argc == 1) /* It's the file name */
+      if (argc == 1) /* It's the file name */
       {
          fp = fopen(arg, "wb");
          if (fp == NULL)
@@ -1153,13 +1188,12 @@ main(int argc, char **argv)
             fprintf(stderr, "%s: %s: could not open\n", arg, strerror(errno));
             exit(1);
          }
+
+         continue;
       }
 
-      else
-      {
-         fprintf(stderr, "makepng: %s: unknown argument\n", arg);
-         exit(1);
-      }
+      fprintf(stderr, "makepng: %s: unknown argument\n", arg);
+      exit(1);
    } /* argument while loop */
 
    if (color_type == 8 || bit_depth == 32)
