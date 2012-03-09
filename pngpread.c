@@ -838,7 +838,7 @@ png_push_read_IDAT(png_structrp png_ptr)
       png_crc_finish(png_ptr, 0);
       png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
       png_ptr->mode |= PNG_AFTER_IDAT;
-      png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
+      png_ptr->zowner = 0;
    }
 }
 
@@ -894,7 +894,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
       {
          /* Terminate the decompression. */
          png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
-         png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
+         png_ptr->zowner = 0;
 
          /* This may be a truncated stream (missing or
           * damaged end code).  Treat that as a warning.
@@ -923,7 +923,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
             /* Extra data. */
             png_warning(png_ptr, "Extra compressed data in IDAT");
             png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
-            png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
+            png_ptr->zowner = 0;
 
             /* Do no more processing; skip the unprocessed
              * input check below.

@@ -197,7 +197,7 @@ png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
       return;
 
    /* On 64 bit architectures 'length' may not fit in a png_uint_32. */
-   if (length > PNG_UINT_32_MAX)
+   if (length > PNG_UINT_31_MAX)
       png_error(png_ptr, "length exceeds PNG maxima");
 
    png_write_chunk_header(png_ptr, chunk_name, (png_uint_32)length);
@@ -257,12 +257,90 @@ png_image_size(png_structrp png_ptr)
       return 0xffffffffU;
 }
 
-/* Initialize the compressor for the appropriate type of compression. */
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+   /* This is the code to hack the first two bytes of the deflate stream (the
+    * deflate header) to correct the windowBits value to match the actual data
+    * size.  Note that the second argument is the *uncompressed* size but the
+    * first argument is the *compressed* data (and it must be deflate
+    * compressed.)
+    */
 static void
-png_deflate_claim(png_structrp png_ptr, int for_IDAT,
+optimize_cmf(png_bytep data, png_alloc_size_t data_size)
+{
+   /* Optimize the CMF field in the zlib stream.  The resultant zlib stream is
+    * still compliant to the stream specification.
+    */
+   if (data_size <= 16384) /* else windowBits must be 15 */
+   {
+      unsigned int z_cmf = data[0];  /* zlib compression method and flags */
+
+      if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
+      {
+         unsigned int z_cinfo;
+         unsigned int half_z_window_size;
+
+         z_cinfo = z_cmf >> 4;
+         half_z_window_size = 1U << (z_cinfo + 7);
+
+         if (data_size <= half_z_window_size) /* else no change */
+         {
+            unsigned int tmp;
+
+            do
+            {
+               half_z_window_size >>= 1;
+               --z_cinfo;
+            }
+            while (z_cinfo > 0 && data_size <= half_z_window_size);
+
+            z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
+
+            data[0] = (png_byte)z_cmf;
+            tmp = data[1] & 0xe0;
+            tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
+            data[1] = (png_byte)tmp;
+         }
+      }
+   }
+}
+#else
+#  define optimize_cmf(dp,dl) ((void)0)
+#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
+
+/* Initialize the compressor for the appropriate type of compression. */
+static int
+png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
    png_alloc_size_t data_size)
 {
-   if (!(png_ptr->flags & PNG_FLAG_ZSTREAM_IN_USE))
+   if (png_ptr->zowner != 0)
+   {
+      char msg[64];
+
+      PNG_STRING_FROM_CHUNK(msg, owner);
+      msg[4] = ':';
+      msg[5] = ' ';
+      PNG_STRING_FROM_CHUNK(msg+6, png_ptr->zowner);
+      /* So the message that results is "<chunk> using zstream"; this is an
+       * internal error, but is very useful for debugging.  i18n requirements
+       * are minimal.
+       */
+      (void)png_safecat(msg, sizeof msg, 10, " using zstream");
+#     if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
+         png_warning(png_ptr, msg);
+
+         /* Attempt sane error recovery */
+         if (png_ptr->zowner == png_IDAT) /* don't steal from IDAT */
+         {
+            png_ptr->zstream.msg = PNGZ_MSG_CAST("in use by IDAT");
+            return Z_STREAM_ERROR;
+         }
+
+         png_ptr->zowner = 0;
+#     else
+         png_error(png_ptr, msg);
+#     endif
+   }
+
    {
       int level = png_ptr->zlib_level;
       int method = png_ptr->zlib_method;
@@ -271,10 +349,7 @@ png_deflate_claim(png_structrp png_ptr, int for_IDAT,
       int strategy; /* set below */
       int ret; /* zlib return code */
 
-      /* Do this for safety now. */
-      png_ptr->flags &= ~PNG_FLAG_ZSTREAM_ENDED;
-
-      if (for_IDAT)
+      if (owner == png_IDAT)
       {
          if (png_ptr->flags & PNG_FLAG_ZLIB_CUSTOM_STRATEGY)
             strategy = png_ptr->zlib_strategy;
@@ -311,29 +386,20 @@ png_deflate_claim(png_structrp png_ptr, int for_IDAT,
        * next windowBits size we need to fix up the value later.  (Because even
        * though deflate needs the extra window, inflate does not!)
        */
-      if (data_size <= 256)
-         windowBits = 8;
-
-      else if (data_size <= 16384) /* Else 15 bits required */ for (;;)
+      if (data_size <= 16384)
       {
-         png_uint_32 test = 1U << (windowBits-1);
-         if (data_size > test)
-            break;
-         --windowBits;
-      }
+         /* IMPLEMENTATION NOTE: this 'half_window_size' stuff is only here to
+          * work round a Microsoft Visual C misbehavior which, contrary to C-90,
+          * widens the result of the following shift to 64-bits if (and,
+          * apparently, only if) it is used in a test.
+          */
+         unsigned int half_window_size = 1U << (windowBits-1);
 
-      if (windowBits < 15)
-      {
-         png_uint_32 test = 1U << windowBits;
-
-         if (data_size + 262U > test)
+         while (data_size + 262 <= half_window_size)
          {
-            ++windowBits;
-            png_ptr->flags |= PNG_FLAG_ZSTREAM_CMF_FIXUP;
+            half_window_size >>= 1;
+            --windowBits;
          }
-
-         else
-            png_ptr->flags &= ~PNG_FLAG_ZSTREAM_CMF_FIXUP;
       }
 
       /* Check against the previous initialized values, if any. */
@@ -349,6 +415,14 @@ png_deflate_claim(png_structrp png_ptr, int for_IDAT,
 
          png_ptr->flags &= ~PNG_FLAG_ZSTREAM_INITIALIZED;
       }
+
+      /* For safety clear out the input and output pointers (currently zlib
+       * doesn't use them on Init, but it might in the future).
+       */
+      png_ptr->zstream.next_in = NULL;
+      png_ptr->zstream.avail_in = 0;
+      png_ptr->zstream.next_out = NULL;
+      png_ptr->zstream.avail_out = 0;
 
       /* Now initialize if required, setting the new parameters, otherwise just
        * to a simple reset to the previous parameters.
@@ -369,356 +443,324 @@ png_deflate_claim(png_structrp png_ptr, int for_IDAT,
        * pretty much the same set of error codes.
        */
       if (ret == Z_OK)
-      {
-         /* No problem, so the stream is now 'in use'. */
-         png_ptr->flags |= PNG_FLAG_ZSTREAM_IN_USE;
-      }
+         png_ptr->zowner = owner;
 
       else
-      {
-         /* A problem; the flags are set ok, but we need a credible error
-          * message.
-          */
-         if (png_ptr->zstream.msg != NULL)
-            png_error(png_ptr, png_ptr->zstream.msg);
+         png_zstream_error(png_ptr, ret);
 
-         else
-            png_error(png_ptr, "zlib initialization error");
-      }
+      return ret;
    }
-
-   else
-      png_error(png_ptr, "zstream already in use (internal error)");
-}
-
-/* The opposite: release the stream.  It is also reset, this API will warn on
- * error but will not fail.
- */
-static void
-png_deflate_release(png_structrp png_ptr)
-{
-   if (png_ptr->flags & PNG_FLAG_ZSTREAM_IN_USE)
-      png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
-
-   else
-      png_warning(png_ptr, "zstream not in use (internal error)");
 }
 
 #ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
 /* This pair of functions encapsulates the operation of (a) compressing a
  * text string, and (b) issuing it later as a series of chunk data writes.
  * The compression_state structure is shared context for these functions
- * set up by the caller in order to make the whole mess thread-safe.
+ * set up by the caller to allow access to the relevant local variables.
+ *
+ * compression_buffer (new in 1.6.0) is just a linked list of zbuffer_size
+ * temporary buffers.  From 1.6.0 it is retained in png_struct so that it will
+ * be correctly freed in the event of a write error (previous implementations
+ * just leaked memory.)
  */
-
 typedef struct
 {
-   png_const_bytep input;   /* The uncompressed input data */
-   png_size_t input_len;    /* Its length */
-   int num_output_ptr;      /* Number of output pointers used */
-   int max_output_ptr;      /* Size of output_ptr */
-   png_bytep *output_ptr;   /* Array of pointers to output */
+   png_const_bytep      input;        /* The uncompressed input data */
+   png_alloc_size_t     input_len;    /* Its length */
+   png_uint_32          output_len;   /* Final compressed length */
+   png_byte             output[1024]; /* First block of output */
 } compression_state;
 
-/* Compress given text into storage in the png_ptr structure */
-static png_size_t /* PRIVATE */
-png_text_compress(png_structrp png_ptr,
-    png_const_charp text, png_size_t text_len, int compression,
-    compression_state *comp)
+static void
+png_text_compress_init(compression_state *comp, png_const_bytep input,
+   png_alloc_size_t input_len)
+{
+   comp->input = input;
+   comp->input_len = input_len;
+   comp->output_len = 0;
+}
+
+void /* PRIVATE */
+png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
+{
+   png_compression_bufferp list = *listp;
+
+   if (list != NULL)
+   {
+      *listp = NULL;
+
+      do
+      {
+         png_compression_bufferp next = list->next;
+
+         png_free(png_ptr, list);
+         list = next;
+      }
+      while (list != NULL);
+   }
+}
+
+/* Compress the data in the compression state input */
+static int
+png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
+   compression_state *comp, png_uint_32 prefix_len)
 {
    int ret;
 
-   comp->num_output_ptr = 0;
-   comp->max_output_ptr = 0;
-   comp->output_ptr = NULL;
-   comp->input = NULL;
-   comp->input_len = text_len;
-
-   /* We may just want to pass the text right through */
-   if (compression == PNG_TEXT_COMPRESSION_NONE)
-   {
-      comp->input = (png_const_bytep)text;
-      return text_len;
-   }
-
-   if (compression >= PNG_TEXT_COMPRESSION_LAST)
-   {
-      PNG_WARNING_PARAMETERS(p)
-
-      png_warning_parameter_signed(p, 1, PNG_NUMBER_FORMAT_d,
-         compression);
-      png_formatted_warning(png_ptr, p, "Unknown compression type @1");
-   }
-
-   /* We can't write the chunk until we find out how much data we have,
-    * which means we need to run the compressor first and save the
-    * output.  This shouldn't be a problem, as the vast majority of
-    * comments should be reasonable, but we will set up an array of
-    * malloc'd pointers to be sure.
+   /* To find the length of the output it is necessary to first compress the
+    * input, the result is buffered rather than using the two-pass algorithm
+    * that is used on the inflate side; deflate is assumed to be slower and a
+    * PNG writer is assumed to have more memory available than a PNG reader.
     *
-    * If we knew the application was well behaved, we could simplify this
-    * greatly by assuming we can always malloc an output buffer large
-    * enough to hold the compressed text ((1001 * text_len / 1000) + 12)
-    * and malloc this directly.  The only time this would be a bad idea is
-    * if we can't malloc more than 64K and we have 64K of random input
-    * data, or if the input string is incredibly large (although this
-    * wouldn't cause a failure, just a slowdown due to swapping).
+    * IMPLEMENTATION NOTE: the zlib API deflateBound() can be used to find an
+    * upper limit on the output size, but it is always bigger than the input
+    * size so it is likely to be more efficient to use this linked-list
+    * approach.
     */
-   png_deflate_claim(png_ptr, 0/*!for IDAT*/, text_len);
+   ret = png_deflate_claim(png_ptr, chunk_name, comp->input_len);
 
-   /* Set up the compression buffers */
-   /* TODO: the following cast hides a ****CERTAIN**** overflow problem. */
-   png_ptr->zstream.avail_in = (uInt)text_len;
+   if (ret != Z_OK)
+      return ret;
 
-   /* NOTE: assume zlib doesn't overwrite the input */
-   png_ptr->zstream.next_in = (Bytef *)text;
-   png_ptr->zstream.avail_out = png_ptr->zbuf_size;
-   png_ptr->zstream.next_out = png_ptr->zbuf;
-
-   /* This is the same compression loop as in png_write_row() */
-   do
+   /* Set up the compression buffers, we need a loop here to avoid overflowing a
+    * uInt.  Use ZLIB_IO_MAX to limit the input.  The output is always limited
+    * by the output buffer size, so there is no need to check that.  Since this
+    * is ANSI-C we know that an 'int', hence a uInt, is always at least 16 bits
+    * in size.
+    */
    {
-      /* Compress the data */
-      ret = deflate(&png_ptr->zstream, Z_NO_FLUSH);
+      png_compression_bufferp *end = &png_ptr->zbuffer_list;
+      png_alloc_size_t input_len = comp->input_len; /* may be zero! */
+      png_uint_32 output_len;
 
-      if (ret != Z_OK)
+      /* zlib updates these for us: */
+      png_ptr->zstream.next_in = PNGZ_INPUT_CAST(comp->input);
+      png_ptr->zstream.avail_in = 0; /* Set below */
+      png_ptr->zstream.next_out = comp->output;
+      png_ptr->zstream.avail_out = sizeof comp->output;
+
+      output_len = png_ptr->zstream.avail_out;
+
+      do
       {
-         /* Error */
-         if (png_ptr->zstream.msg != NULL)
-            png_error(png_ptr, png_ptr->zstream.msg);
+         uInt avail_in = ZLIB_IO_MAX;
 
-         else
-            png_error(png_ptr, "zlib error");
-      }
+         if (avail_in > input_len)
+            avail_in = (uInt)input_len;
 
-      /* Check to see if we need more room */
-      if (!(png_ptr->zstream.avail_out))
-      {
-         /* Make sure the output array has room */
-         if (comp->num_output_ptr >= comp->max_output_ptr)
+         input_len -= avail_in;
+
+         png_ptr->zstream.avail_in = avail_in;
+
+         if (png_ptr->zstream.avail_out == 0)
          {
-            int old_max;
+            png_compression_buffer *next;
 
-            old_max = comp->max_output_ptr;
-            comp->max_output_ptr = comp->num_output_ptr + 4;
-            if (comp->output_ptr != NULL)
+            /* Chunk data is limited to 2^31 bytes in length, so the prefix
+             * length must be counted here.
+             */
+            if (output_len + prefix_len > PNG_UINT_31_MAX)
             {
-               png_bytepp old_ptr;
-
-               old_ptr = comp->output_ptr;
-
-               comp->output_ptr = (png_bytepp)png_malloc(png_ptr,
-                   (png_alloc_size_t)
-                   (comp->max_output_ptr * png_sizeof(png_charpp)));
-
-               png_memcpy(comp->output_ptr, old_ptr, old_max
-                   * png_sizeof(png_charp));
-
-               png_free(png_ptr, old_ptr);
+               ret = Z_MEM_ERROR;
+               break;
             }
-            else
-               comp->output_ptr = (png_bytepp)png_malloc(png_ptr,
-                   (png_alloc_size_t)
-                   (comp->max_output_ptr * png_sizeof(png_charp)));
-         }
 
-         /* Save the data */
-         comp->output_ptr[comp->num_output_ptr] =
-             (png_bytep)png_malloc(png_ptr,
-             (png_alloc_size_t)png_ptr->zbuf_size);
-
-         png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
-             png_ptr->zbuf_size);
-
-         comp->num_output_ptr++;
-
-         /* and reset the buffer */
-         png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-         png_ptr->zstream.next_out = png_ptr->zbuf;
-      }
-   /* Continue until we don't have any more to compress */
-   } while (png_ptr->zstream.avail_in);
-
-   /* Finish the compression */
-   do
-   {
-      /* Tell zlib we are finished */
-      ret = deflate(&png_ptr->zstream, Z_FINISH);
-
-      if (ret == Z_OK)
-      {
-         /* Check to see if we need more room */
-         if (!(png_ptr->zstream.avail_out))
-         {
-            /* Check to make sure our output array has room */
-            if (comp->num_output_ptr >= comp->max_output_ptr)
+            /* Need a new (malloc'ed) buffer, but there may be one present
+             * already.
+             */
+            next = *end;
+            if (next == NULL)
             {
-               int old_max;
+               next = png_voidcast(png_compression_bufferp, png_malloc_base
+                  (png_ptr, PNG_COMPRESSION_BUFFER_SIZE(png_ptr)));
 
-               old_max = comp->max_output_ptr;
-               comp->max_output_ptr = comp->num_output_ptr + 4;
-               if (comp->output_ptr != NULL)
+               if (next == NULL)
                {
-                  png_bytepp old_ptr;
-
-                  old_ptr = comp->output_ptr;
-
-                  /* This could be optimized to realloc() */
-                  comp->output_ptr = png_voidcast(png_bytepp,png_malloc(png_ptr,
-                      comp->max_output_ptr * png_sizeof(png_charp)));
-
-                  png_memcpy(comp->output_ptr, old_ptr,
-                      old_max * png_sizeof(png_charp));
-
-                  png_free(png_ptr, old_ptr);
+                  ret = Z_MEM_ERROR;
+                  break;
                }
 
-               else
-                  comp->output_ptr = png_voidcast(png_bytepp,png_malloc(png_ptr,
-                      comp->max_output_ptr * png_sizeof(png_charp)));
+               /* Link in this buffer (so that it will be freed later) */
+               next->next = NULL;
+               *end = next;
             }
 
-            /* Save the data */
-            comp->output_ptr[comp->num_output_ptr] = png_voidcast(png_bytep,
-                png_malloc(png_ptr, png_ptr->zbuf_size));
+            png_ptr->zstream.next_out = next->output;
+            png_ptr->zstream.avail_out = png_ptr->zbuffer_size;
+            output_len += png_ptr->zstream.avail_out;
 
-            png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
-                png_ptr->zbuf_size);
-
-            comp->num_output_ptr++;
-
-            /* and reset the buffer pointers */
-            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-            png_ptr->zstream.next_out = png_ptr->zbuf;
+            /* Move 'end' to the next buffer pointer. */
+            end = &next->next;
          }
+
+         /* Compress the data */
+         ret = deflate(&png_ptr->zstream,
+            input_len > 0 ? Z_NO_FLUSH : Z_FINISH);
+
+         /* Claw back input data that was not consumed (because avail_in is
+          * reset above every time round the loop).
+          */
+         input_len += png_ptr->zstream.avail_in;
+         png_ptr->zstream.avail_in = 0; /* safety */
       }
-      else if (ret != Z_STREAM_END)
+      while (ret == Z_OK);
+
+      /* There may be some space left in the last output buffer, this needs to
+       * be subtracted from output_len.
+       */
+      output_len -= png_ptr->zstream.avail_out;
+      png_ptr->zstream.avail_out = 0; /* safety */
+      comp->output_len = output_len;
+
+      /* Now double check the output length, put in a custom message if it is
+       * too long.  Otherwise ensure the z_stream::msg pointer is set to
+       * something.
+       */
+      if (output_len + prefix_len >= PNG_UINT_31_MAX)
       {
-         /* We got an error */
-         if (png_ptr->zstream.msg != NULL)
-            png_error(png_ptr, png_ptr->zstream.msg);
-
-         else
-            png_error(png_ptr, "zlib error");
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("compressed data too long");
+         ret = Z_MEM_ERROR;
       }
-   } while (ret != Z_STREAM_END);
 
-   /* Text length is number of buffers plus last buffer */
-   /* TODO: this ****WILL**** overflow */
-   text_len = png_ptr->zbuf_size * comp->num_output_ptr;
+      else
+         png_zstream_error(png_ptr, ret);
 
-   if (png_ptr->zstream.avail_out < png_ptr->zbuf_size)
-      text_len += png_ptr->zbuf_size - png_ptr->zstream.avail_out;
+      /* Reset zlib for another zTXt/iTXt or image data */
+      png_ptr->zowner = 0;
 
-   return text_len;
+      /* The only success case is Z_STREAM_END, input_len must be 0, if not this
+       * is an internal error.
+       */
+      if (ret == Z_STREAM_END && input_len == 0)
+      {
+         /* Fix up the deflate header, if required */
+         optimize_cmf(comp->output, comp->input_len);
+
+         /* But Z_OK is returned, not Z_STREAM_END; this allows the claim
+          * function above to return Z_STREAM_END on an error (though it never
+          * does in the current versions of zlib.)
+          */
+         return Z_OK;
+      }
+
+      else
+         return ret;
+   }
 }
 
 /* Ship the compressed text out via chunk writes */
-static void /* PRIVATE */
+static void
 png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
 {
-   int i;
+   png_uint_32 output_len = comp->output_len;
+   png_const_bytep output = comp->output;
+   png_uint_32 avail = sizeof comp->output;
+   png_compression_buffer *next = png_ptr->zbuffer_list;
 
-   /* Handle the no-compression case */
-   if (comp->input)
+   for (;;)
    {
-      png_write_chunk_data(png_ptr, comp->input, comp->input_len);
+      if (avail > output_len)
+         avail = output_len;
 
-      return;
+      png_write_chunk_data(png_ptr, output, avail);
+
+      output_len -= avail;
+
+      if (output_len == 0 || next == NULL)
+         break;
+
+      avail = png_ptr->zbuffer_size;
+      output = next->output;
+      next = next->next;
    }
 
-#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-   /* The zbuf_size test is because the code below doesn't work if zbuf_size is
-    * '1'; simply skip it to avoid memory overwrite.
-    */
-   if (comp->input_len >= 2 && comp->input_len < 16384 && png_ptr->zbuf_size > 1)
-   {
-      unsigned int z_cmf;  /* zlib compression method and flags */
-
-      /* Optimize the CMF field in the zlib stream.  This hack of the zlib
-       * stream is compliant to the stream specification.
-       */
-
-      if (comp->num_output_ptr)
-        z_cmf = comp->output_ptr[0][0];
-      else
-        z_cmf = png_ptr->zbuf[0];
-
-      if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
-      {
-         unsigned int z_cinfo;
-         unsigned int half_z_window_size;
-         int reduced = 0;
-         png_size_t uncompressed_text_size = comp->input_len;
-
-         z_cinfo = z_cmf >> 4;
-         half_z_window_size = 1 << (z_cinfo + 7);
-
-         while (uncompressed_text_size <= half_z_window_size &&
-             half_z_window_size >= 256)
-         {
-            z_cinfo--;
-            half_z_window_size >>= 1;
-            reduced = 1;
-         }
-
-         if (reduced && !(png_ptr->flags & PNG_FLAG_ZSTREAM_CMF_FIXUP))
-            png_warning(png_ptr, "internal data size error (text)");
-
-         z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
-
-         if (comp->num_output_ptr)
-         {
-
-           if (comp->output_ptr[0][0] != z_cmf)
-           {
-              int tmp;
-
-              comp->output_ptr[0][0] = (png_byte)z_cmf;
-              tmp = comp->output_ptr[0][1] & 0xe0;
-              tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
-              comp->output_ptr[0][1] = (png_byte)tmp;
-           }
-         }
-         else
-         {
-            int tmp;
-
-            png_ptr->zbuf[0] = (png_byte)z_cmf;
-            tmp = png_ptr->zbuf[1] & 0xe0;
-            tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
-            png_ptr->zbuf[1] = (png_byte)tmp;
-         }
-      }
-
-      else
-         png_warning(png_ptr, /* must be a warning or the data isn't freed */
-             "Invalid zlib compression method or flags in non-IDAT chunk");
-   }
-#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
-
-   /* Write saved output buffers, if any */
-   /* WARNING: SIDE EFFECT; the code below is what actually frees the data */
-   for (i = 0; i < comp->num_output_ptr; i++)
-   {
-      png_write_chunk_data(png_ptr, comp->output_ptr[i],
-          (png_size_t)png_ptr->zbuf_size);
-
-      png_free(png_ptr, comp->output_ptr[i]);
-   }
-
-   if (comp->max_output_ptr != 0)
-      png_free(png_ptr, comp->output_ptr);
-
-   /* Write anything left in zbuf */
-   if (png_ptr->zstream.avail_out < (png_uint_32)png_ptr->zbuf_size)
-      png_write_chunk_data(png_ptr, png_ptr->zbuf,
-          (png_size_t)(png_ptr->zbuf_size - png_ptr->zstream.avail_out));
-
-   /* Reset zlib for another zTXt/iTXt or image data */
-   png_deflate_release(png_ptr);
+   /* This is an internal error; 'next' must have been NULL! */
+   if (output_len > 0)
+      png_error(png_ptr, "error writing ancilliary chunked compressed data");
 }
 #endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
+
+#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
+    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
+/* Check that the tEXt or zTXt keyword is valid per PNG 1.0 specification,
+ * and if invalid, correct the keyword rather than discarding the entire
+ * chunk.  The PNG 1.0 specification requires keywords 1-79 characters in
+ * length, forbids leading or trailing whitespace, multiple internal spaces,
+ * and the non-break space (0x80) from ISO 8859-1.  Returns keyword length.
+ *
+ * The 'new_key' buffer must be 80 characters in size (for the keyword plus a
+ * trailing '\0').  If this routine returns 0 then there was no keyword, or a
+ * valid one could not be generated, and the caller must png_error.
+ */
+static png_uint_32
+png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
+{
+   png_const_charp orig_key = key;
+   png_uint_32 key_len = 0;
+   int bad_character = 0;
+   int space = 1;
+
+   png_debug(1, "in png_check_keyword");
+
+   if (key == NULL)
+   {
+      *new_key = 0;
+      return 0;
+   }
+   
+   while (*key && key_len < 79)
+   {
+      png_byte ch = (png_byte)(0xff & *key++);
+
+      if ((ch > 32 && ch <= 126) || (ch >= 161 /*&& ch <= 255*/))
+         *new_key++ = ch, ++key_len, space = 0;
+
+      else if (!space)
+      {
+         /* A space or an invalid character when one wasn't seen immediately
+          * before; output just a space.
+          */
+         *new_key++ = 32, ++key_len, space = 1;
+
+         /* If the character was not a space then it is inalid. */
+         if (ch != 32)
+            bad_character = ch;
+      }
+
+      else if (!bad_character)
+         bad_character = ch; /* just skip it, record the first error */
+   }
+
+   if (key_len > 0 && space) /* trailing space */
+   {
+      --key_len, --new_key;
+      if (!bad_character)
+         bad_character = 32;
+   }
+
+   /* Terminate the keyword */
+   *new_key = 0;
+
+   if (key_len == 0)
+      return 0;
+
+   /* Try to only output one warning per keyword: */
+   if (*key) /* keyword too long */
+      png_warning(png_ptr, "keyword truncated");
+
+   else if (bad_character)
+   {
+      PNG_WARNING_PARAMETERS(p)
+
+      png_warning_parameter(p, 1, orig_key);
+      png_warning_parameter_signed(p, 2, PNG_NUMBER_FORMAT_02x, bad_character);
+
+      png_formatted_warning(png_ptr, p, "keyword \"@1\": bad character '0x@2'");
+   }
+
+   return key_len;
+}
+#endif
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
  * information.  Note that the rest of this code depends upon this
@@ -958,78 +1000,158 @@ png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
    png_ptr->mode |= PNG_HAVE_PLTE;
 }
 
-/* Write an IDAT chunk */
+/* This is similar to png_text_compress, above, except that it does not require
+ * all of the data at once and, instead of buffering the compressed result,
+ * writes it as IDAT chunks.  Unlike png_text_compress it *can* png_error out
+ * because it calls the write interface.  As a result it does its own error
+ * reporting and does not return an error code.  In the event of error it will
+ * just call png_error.  The input data length may exceed 32-bits.  The 'flush'
+ * parameter is exactly the same as that to deflate, with the following
+ * meanings:
+ *
+ * Z_NO_FLUSH: normal incremental output of compressed data
+ * Z_SYNC_FLUSH: do a SYNC_FLUSH, used by png_write_flush
+ * Z_FINISH: this is the end of the input, do a Z_FINISH and clean up
+ *
+ * The routine manages the acquire and release of the png_ptr->zstream by
+ * checking and (at the end) clearing png_ptr->zowner, it does some sanity
+ * checks on the 'mode' flags while doing this.
+ */
 void /* PRIVATE */
-png_write_IDAT(png_structrp png_ptr, png_bytep data, png_size_t length)
+png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
+   png_alloc_size_t input_len, int flush)
 {
-   png_debug(1, "in png_write_IDAT");
-
-#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-   if (!(png_ptr->mode & PNG_HAVE_IDAT) &&
-       png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
+   if (png_ptr->zowner != png_IDAT)
    {
-      /* Optimize the CMF field in the zlib stream.  This hack of the zlib
-       * stream is compliant to the stream specification.
+      /* First time.   Ensure we have a temporary buffer for compression and
+       * trim the buffer list if it has more than one entry to free memory.
        */
-      unsigned int z_cmf = data[0];  /* zlib compression method and flags */
-
-      if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
+      if (png_ptr->zbuffer_list == NULL)
       {
-         /* Avoid memory underflows and multiplication overflows.
-          *
-          * The conditions below are practically always satisfied;
-          * however, they still must be checked.
-          */
-         if (length >= 2 &&
-             png_ptr->height < 16384 && png_ptr->width < 16384)
-         {
-            unsigned int z_cinfo;
-            unsigned int half_z_window_size;
-            int reduced = 0;
-            png_alloc_size_t uncompressed_idat_size = png_image_size(png_ptr);
-
-            z_cinfo = z_cmf >> 4;
-            half_z_window_size = 1 << (z_cinfo + 7);
-
-            while (uncompressed_idat_size <= half_z_window_size &&
-                half_z_window_size >= 256)
-            {
-               z_cinfo--;
-               half_z_window_size >>= 1;
-               reduced = 1;
-            }
-
-            if (reduced && !(png_ptr->flags & PNG_FLAG_ZSTREAM_CMF_FIXUP))
-               png_warning(png_ptr, "internal data size error (IDAT)");
-
-            z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
-
-            if (data[0] != z_cmf)
-            {
-               int tmp;
-               data[0] = (png_byte)z_cmf;
-               tmp = data[1] & 0xe0;
-               tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
-               data[1] = (png_byte)tmp;
-            }
-         }
+         png_ptr->zbuffer_list = png_voidcast(png_compression_bufferp,
+            png_malloc(png_ptr, PNG_COMPRESSION_BUFFER_SIZE(png_ptr)));
+         png_ptr->zbuffer_list->next = NULL;
       }
 
       else
-         png_error(png_ptr,
-             "Invalid zlib compression method or flags in IDAT");
+         png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list->next);
+
+      /* It is a terminal error if we can't claim the zstream. */
+      if (png_deflate_claim(png_ptr, png_IDAT, png_image_size(png_ptr)) != Z_OK)
+         png_error(png_ptr, png_ptr->zstream.msg);
+
+      /* The output state is maintained in png_ptr->zstream, so it must be
+       * initialized here after the claim.
+       */
+      png_ptr->zstream.next_out = png_ptr->zbuffer_list->output;
+      png_ptr->zstream.avail_out = png_ptr->zbuffer_size;
    }
-#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
 
-   png_write_complete_chunk(png_ptr, png_IDAT, data, length);
-   png_ptr->mode |= PNG_HAVE_IDAT;
-
-   /* Prior to 1.5.4 this code was replicated in every caller (except at the
-    * end, where it isn't technically necessary).  Since this function has
-    * flushed the data we can safely reset the zlib output buffer here.
+   /* Now loop reading and writing until all the input is consumed or an error
+    * terminates the operation.  The _out values are maintained across calls to
+    * this function, but the input must be reset each time.
     */
-   png_ptr->zstream.next_out = png_ptr->zbuf;
-   png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
+   png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
+   png_ptr->zstream.avail_in = 0; /* set below */
+   for (;;)
+   {
+      int ret;
+
+      /* INPUT: from the row data */
+      uInt avail = ZLIB_IO_MAX;
+
+      if (avail > input_len)
+         avail = (uInt)input_len; /* safe because of the check */
+
+      png_ptr->zstream.avail_in = avail;
+      input_len -= avail;
+
+      ret = deflate(&png_ptr->zstream, input_len > 0 ? Z_NO_FLUSH : flush);
+
+      /* Include as-yet unconsumed input */
+      input_len += png_ptr->zstream.avail_in;
+      png_ptr->zstream.avail_in = 0;
+
+      /* OUTPUT: write complete IDAT chunks when avail_out drops to zero, note
+       * that these two zstream fields are preserved across the calls, therefore
+       * there is no need to set these up on entry to the loop.
+       */
+      if (png_ptr->zstream.avail_out == 0)
+      {
+         png_bytep data = png_ptr->zbuffer_list->output;
+         uInt size = png_ptr->zbuffer_size;
+
+         /* Write an IDAT containing the data then reset the buffer.  The
+          * first IDAT may need deflate header optimization.
+          */
+#        ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+            if (!(png_ptr->mode & PNG_HAVE_IDAT) &&
+               png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
+               optimize_cmf(data, png_image_size(png_ptr));
+#        endif
+
+         png_write_complete_chunk(png_ptr, png_IDAT, data, size);
+         png_ptr->mode |= PNG_HAVE_IDAT;
+
+         png_ptr->zstream.next_out = data;
+         png_ptr->zstream.avail_out = size;
+
+         /* For SYNC_FLUSH or FINISH it is essential to keep calling zlib with
+          * the same flush parameter until it has finished output, for NO_FLUSH
+          * it doesn't matter.
+          */
+         if (ret == Z_OK && flush != Z_NO_FLUSH)
+            continue;
+      }
+
+      /* The order of these checks doesn't matter much; it just effect which
+       * possible error might be detected if multiple things go wrong at once.
+       */
+      if (ret == Z_OK) /* most likely return code! */
+      {
+         /* If all the input has been consumed then just return.  If Z_FINISH
+          * was used as the flush parameter something has gone wrong if we get
+          * here.
+          */
+         if (input_len == 0)
+         {
+            if (flush == Z_FINISH)
+               png_error(png_ptr, "Z_OK on Z_FINISH with output space");
+
+            return;
+         }
+      }
+
+      else if (ret == Z_STREAM_END && flush == Z_FINISH)
+      {
+         /* This is the end of the IDAT data; any pending output must be
+          * flushed.  For small PNG files we may still be at the beginning.
+          */
+         png_bytep data = png_ptr->zbuffer_list->output;
+         uInt size = png_ptr->zbuffer_size - png_ptr->zstream.avail_out;
+
+#        ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+            if (!(png_ptr->mode & PNG_HAVE_IDAT) &&
+               png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
+               optimize_cmf(data, png_image_size(png_ptr));
+#        endif
+
+         png_write_complete_chunk(png_ptr, png_IDAT, data, size);
+         png_ptr->zstream.avail_out = 0;
+         png_ptr->zstream.next_out = NULL;
+         png_ptr->mode |= PNG_HAVE_IDAT | PNG_AFTER_IDAT;
+
+         png_ptr->zowner = 0; /* Release the stream */
+         return;
+      }
+
+      else
+      {
+         /* This is an error condition. */
+         png_zstream_error(png_ptr, ret);
+         png_error(png_ptr, png_ptr->zstream.msg);
+      }
+   }
 }
 
 /* Write an IEND chunk */
@@ -1081,10 +1203,9 @@ void /* PRIVATE */
 png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
     png_const_bytep profile, png_uint_32 profile_len)
 {
-   png_size_t name_len, compressed_profile_len;
-   png_charp new_name;
+   png_uint_32 name_len;
+   png_byte new_name[81]; /* 1 byte for the compression byte */
    compression_state comp;
-   png_uint_32 embedded_profile_len = 0;
 
    png_debug(1, "in png_write_iCCP");
 
@@ -1100,64 +1221,36 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
    if (profile_len & 0x03)
       png_error(png_ptr, "ICC profile length invalid (not a multiple of 4)");
 
-   embedded_profile_len = png_get_uint_32(profile);
-
-   if (profile_len != embedded_profile_len)
-      png_error(png_ptr, "Profile length does not match profile");
-
-   if ((png_size_t)profile_len != profile_len)
    {
-      /* This isn't an application error, technically, but all the same do
-       * not short-change the app by writing a PNG without the profile!
-       */
-      png_error(png_ptr, "Profile length exceeds system limits");
+      png_uint_32 embedded_profile_len = png_get_uint_32(profile);
+
+      if (profile_len != embedded_profile_len)
+         png_error(png_ptr, "Profile length does not match profile");
    }
 
-   if ((name_len = png_check_keyword(png_ptr, name, &new_name)) == 0)
-      return;
+   name_len = png_check_keyword(png_ptr, name, new_name);
 
-   comp.num_output_ptr = 0;
-   comp.max_output_ptr = 0;
-   comp.output_ptr = NULL;
-   comp.input = NULL;
-   comp.input_len = 0;
+   if (name_len == 0)
+      png_error(png_ptr, "iCCP: invalid keyword");
 
-   compressed_profile_len = png_text_compress(png_ptr, (png_const_charp)profile,
-       (png_size_t)/*ok*/profile_len, PNG_COMPRESSION_TYPE_BASE, &comp);
-
-   /* 'name_len' is 1..79, so the following is safe: */
-   if (compressed_profile_len > PNG_UINT_31_MAX - name_len - 2)
-   {
-      png_free(png_ptr, new_name);
-
-      /* TODO: there is no 'compression_free' function */
-      if (comp.output_ptr)
-      {
-         int i;
-         for (i = 0; i < comp.num_output_ptr; i++)
-            png_free(png_ptr, comp.output_ptr[i]);
-         png_free(png_ptr, comp.output_ptr);
-      }
-
-      png_error(png_ptr, "Compressed profile exceeds PNG size limits");
-   }
+   new_name[++name_len] = PNG_COMPRESSION_TYPE_BASE;
 
    /* Make sure we include the NULL after the name and the compression type */
-   png_write_chunk_header(png_ptr, png_iCCP,
-       (png_uint_32)/*ok*/(name_len + compressed_profile_len + 2));
+   ++name_len;
 
-   new_name[name_len + 1] = 0x00;
+   png_text_compress_init(&comp, profile, profile_len);
 
-   png_write_chunk_data(png_ptr, (png_bytep)new_name, name_len + 2);
+   /* Allow for keyword terminator and compression byte */
+   if (png_text_compress(png_ptr, png_iCCP, &comp, name_len) != Z_OK)
+      png_error(png_ptr, png_ptr->zstream.msg);
 
-   if (compressed_profile_len)
-   {
-      comp.input_len = compressed_profile_len;
-      png_write_compressed_data_out(png_ptr, &comp);
-   }
+   png_write_chunk_header(png_ptr, png_iCCP, name_len + comp.output_len);
+
+   png_write_chunk_data(png_ptr, new_name, name_len);
+
+   png_write_compressed_data_out(png_ptr, &comp);
 
    png_write_chunk_end(png_ptr);
-   png_free(png_ptr, new_name);
 }
 #endif
 
@@ -1166,8 +1259,8 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
 void /* PRIVATE */
 png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
 {
-   png_size_t name_len;
-   png_charp new_name;
+   png_uint_32 name_len;
+   png_byte new_name[80];
    png_byte entrybuf[10];
    png_size_t entry_size = (spalette->depth == 8 ? 6 : 10);
    png_size_t palette_size = entry_size * spalette->nentries;
@@ -1178,8 +1271,10 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
 
    png_debug(1, "in png_write_sPLT");
 
-   if ((name_len = png_check_keyword(png_ptr,spalette->name, &new_name))==0)
-      return;
+   name_len = png_check_keyword(png_ptr, spalette->name, new_name);
+
+   if (name_len == 0)
+      png_error(png_ptr, "sPLT: invalid keyword");
 
    /* Make sure we include the NULL after the name */
    png_write_chunk_header(png_ptr, png_sPLT,
@@ -1212,7 +1307,7 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
          png_save_uint_16(entrybuf + 8, ep->frequency);
       }
 
-      png_write_chunk_data(png_ptr, entrybuf, (png_size_t)entry_size);
+      png_write_chunk_data(png_ptr, entrybuf, entry_size);
    }
 #else
    ep=spalette->entries;
@@ -1236,12 +1331,11 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
          png_save_uint_16(entrybuf + 8, ep[i].frequency);
       }
 
-      png_write_chunk_data(png_ptr, entrybuf, (png_size_t)entry_size);
+      png_write_chunk_data(png_ptr, entrybuf, entry_size);
    }
 #endif
 
    png_write_chunk_end(png_ptr);
-   png_free(png_ptr, new_name);
 }
 #endif
 
@@ -1496,151 +1590,21 @@ png_write_hIST(png_structrp png_ptr, png_const_uint_16p hist, int num_hist)
 }
 #endif
 
-#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
-    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
-/* Check that the tEXt or zTXt keyword is valid per PNG 1.0 specification,
- * and if invalid, correct the keyword rather than discarding the entire
- * chunk.  The PNG 1.0 specification requires keywords 1-79 characters in
- * length, forbids leading or trailing whitespace, multiple internal spaces,
- * and the non-break space (0x80) from ISO 8859-1.  Returns keyword length.
- *
- * The new_key is allocated to hold the corrected keyword and must be freed
- * by the calling routine.  This avoids problems with trying to write to
- * static keywords without having to have duplicate copies of the strings.
- */
-png_size_t /* PRIVATE */
-png_check_keyword(png_structrp png_ptr, png_const_charp key, png_charpp new_key)
-{
-   png_size_t key_len;
-   png_const_charp ikp;
-   png_charp kp, dp;
-   int kflag;
-   int kwarn=0;
-
-   png_debug(1, "in png_check_keyword");
-
-   *new_key = NULL;
-
-   if (key == NULL || (key_len = png_strlen(key)) == 0)
-   {
-      png_warning(png_ptr, "zero length keyword");
-      return ((png_size_t)0);
-   }
-
-   png_debug1(2, "Keyword to be checked is '%s'", key);
-
-   *new_key = (png_charp)png_malloc_warn(png_ptr, (png_uint_32)(key_len + 2));
-
-   if (*new_key == NULL)
-   {
-      png_warning(png_ptr, "Out of memory while procesing keyword");
-      return ((png_size_t)0);
-   }
-
-   /* Replace non-printing characters with a blank and print a warning */
-   for (ikp = key, dp = *new_key; *ikp != '\0'; ikp++, dp++)
-   {
-      if ((png_byte)*ikp < 0x20 ||
-         ((png_byte)*ikp > 0x7E && (png_byte)*ikp < 0xA1))
-      {
-         PNG_WARNING_PARAMETERS(p)
-
-         png_warning_parameter_unsigned(p, 1, PNG_NUMBER_FORMAT_02x,
-            (png_byte)*ikp);
-         png_formatted_warning(png_ptr, p, "invalid keyword character 0x@1");
-         *dp = ' ';
-      }
-
-      else
-      {
-         *dp = *ikp;
-      }
-   }
-   *dp = '\0';
-
-   /* Remove any trailing white space. */
-   kp = *new_key + key_len - 1;
-   if (*kp == ' ')
-   {
-      png_warning(png_ptr, "trailing spaces removed from keyword");
-
-      while (*kp == ' ')
-      {
-         *(kp--) = '\0';
-         key_len--;
-      }
-   }
-
-   /* Remove any leading white space. */
-   kp = *new_key;
-   if (*kp == ' ')
-   {
-      png_warning(png_ptr, "leading spaces removed from keyword");
-
-      while (*kp == ' ')
-      {
-         kp++;
-         key_len--;
-      }
-   }
-
-   png_debug1(2, "Checking for multiple internal spaces in '%s'", kp);
-
-   /* Remove multiple internal spaces. */
-   for (kflag = 0, dp = *new_key; *kp != '\0'; kp++)
-   {
-      if (*kp == ' ' && kflag == 0)
-      {
-         *(dp++) = *kp;
-         kflag = 1;
-      }
-
-      else if (*kp == ' ')
-      {
-         key_len--;
-         kwarn = 1;
-      }
-
-      else
-      {
-         *(dp++) = *kp;
-         kflag = 0;
-      }
-   }
-   *dp = '\0';
-   if (kwarn)
-      png_warning(png_ptr, "extra interior spaces removed from keyword");
-
-   if (key_len == 0)
-   {
-      png_free(png_ptr, *new_key);
-      png_warning(png_ptr, "Zero length keyword");
-   }
-
-   if (key_len > 79)
-   {
-      png_warning(png_ptr, "keyword length must be 1 - 79 characters");
-      (*new_key)[79] = '\0';
-      key_len = 79;
-   }
-
-   return (key_len);
-}
-#endif
-
 #ifdef PNG_WRITE_tEXt_SUPPORTED
 /* Write a tEXt chunk */
 void /* PRIVATE */
 png_write_tEXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
     png_size_t text_len)
 {
-   png_size_t key_len;
-   png_charp new_key;
+   png_uint_32 key_len;
+   png_byte new_key[80];
 
    png_debug(1, "in png_write_tEXt");
 
-   if ((key_len = png_check_keyword(png_ptr, key, &new_key))==0)
-      return;
+   key_len = png_check_keyword(png_ptr, key, new_key);
+
+   if (key_len == 0)
+      png_error(png_ptr, "tEXt: invalid keyword");
 
    if (text == NULL || *text == '\0')
       text_len = 0;
@@ -1648,24 +1612,24 @@ png_write_tEXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
    else
       text_len = png_strlen(text);
 
+   if (text_len > PNG_UINT_31_MAX - (key_len+1))
+      png_error(png_ptr, "tEXt: text too long");
+
    /* Make sure we include the 0 after the key */
    png_write_chunk_header(png_ptr, png_tEXt,
-       (png_uint_32)(key_len + text_len + 1));
+       (png_uint_32)/*checked above*/(key_len + text_len + 1));
    /*
     * We leave it to the application to meet PNG-1.0 requirements on the
     * contents of the text.  PNG-1.0 through PNG-1.2 discourage the use of
     * any non-Latin-1 characters except for NEWLINE.  ISO PNG will forbid them.
     * The NUL character is forbidden by PNG-1.0 through PNG-1.2 and ISO PNG.
     */
-   png_write_chunk_data(png_ptr, (png_bytep)new_key,
-       (png_size_t)(key_len + 1));
+   png_write_chunk_data(png_ptr, new_key, key_len + 1);
 
    if (text_len)
-      png_write_chunk_data(png_ptr, (png_const_bytep)text,
-          (png_size_t)text_len);
+      png_write_chunk_data(png_ptr, (png_const_bytep)text, text_len);
 
    png_write_chunk_end(png_ptr);
-   png_free(png_ptr, new_key);
 }
 #endif
 
@@ -1675,55 +1639,45 @@ void /* PRIVATE */
 png_write_zTXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
     png_size_t text_len, int compression)
 {
-   png_size_t key_len;
-   png_byte buf;
-   png_charp new_key;
+   png_uint_32 key_len;
+   png_byte new_key[81];
    compression_state comp;
 
    png_debug(1, "in png_write_zTXt");
+   PNG_UNUSED(text_len); /* Always use strlen */
 
-   comp.num_output_ptr = 0;
-   comp.max_output_ptr = 0;
-   comp.output_ptr = NULL;
-   comp.input = NULL;
-   comp.input_len = 0;
-
-   if ((key_len = png_check_keyword(png_ptr, key, &new_key)) == 0)
+   if (compression == PNG_TEXT_COMPRESSION_NONE)
    {
-      png_free(png_ptr, new_key);
+      png_write_tEXt(png_ptr, key, text, 0);
       return;
    }
 
-   if (text == NULL || *text == '\0' || compression==PNG_TEXT_COMPRESSION_NONE)
-   {
-      png_write_tEXt(png_ptr, new_key, text, (png_size_t)0);
-      png_free(png_ptr, new_key);
-      return;
-   }
+   if (compression != PNG_TEXT_COMPRESSION_zTXt)
+      png_error(png_ptr, "zTXt: invalid compression type");
 
-   text_len = png_strlen(text);
+   key_len = png_check_keyword(png_ptr, key, new_key);
+
+   if (key_len == 0)
+      png_error(png_ptr, "zTXt: invalid keyword");
+
+   /* Add the compression method and 1 for the keyword separator. */
+   new_key[++key_len] = PNG_COMPRESSION_TYPE_BASE;
+   ++key_len;
 
    /* Compute the compressed data; do it now for the length */
-   text_len = png_text_compress(png_ptr, text, text_len, compression,
-       &comp);
+   png_text_compress_init(&comp, (png_const_bytep)text,
+      text == NULL ? 0 : strlen(text));
+
+   if (png_text_compress(png_ptr, png_zTXt, &comp, key_len) != Z_OK)
+      png_error(png_ptr, png_ptr->zstream.msg);
 
    /* Write start of chunk */
-   png_write_chunk_header(png_ptr, png_zTXt,
-       (png_uint_32)(key_len+text_len + 2));
+   png_write_chunk_header(png_ptr, png_zTXt, key_len + comp.output_len);
 
    /* Write key */
-   png_write_chunk_data(png_ptr, (png_bytep)new_key,
-       (png_size_t)(key_len + 1));
-
-   png_free(png_ptr, new_key);
-
-   buf = (png_byte)compression;
-
-   /* Write compression */
-   png_write_chunk_data(png_ptr, &buf, (png_size_t)1);
+   png_write_chunk_data(png_ptr, new_key, key_len);
 
    /* Write the compressed data */
-   comp.input_len = text_len;
    png_write_compressed_data_out(png_ptr, &comp);
 
    /* Close the chunk */
@@ -1737,90 +1691,94 @@ void /* PRIVATE */
 png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
     png_const_charp lang, png_const_charp lang_key, png_const_charp text)
 {
-   png_size_t lang_len, key_len, lang_key_len, text_len;
-   png_charp new_lang;
-   png_charp new_key = NULL;
-   png_byte cbuf[2];
+   png_uint_32 key_len, prefix_len;
+   png_size_t lang_len, lang_key_len;
+   png_byte new_key[82];
    compression_state comp;
 
    png_debug(1, "in png_write_iTXt");
 
-   comp.num_output_ptr = 0;
-   comp.max_output_ptr = 0;
-   comp.output_ptr = NULL;
-   comp.input = NULL;
+   key_len = png_check_keyword(png_ptr, key, new_key);
+   
+   if (key_len == 0)
+      png_error(png_ptr, "iTXt: invalid keyword");
 
-   if ((key_len = png_check_keyword(png_ptr, key, &new_key)) == 0)
-      return;
-
-   if ((lang_len = png_check_keyword(png_ptr, lang, &new_lang)) == 0)
+   /* Set the compression flag */
+   switch (compression)
    {
-      png_warning(png_ptr, "Empty language field in iTXt chunk");
-      new_lang = NULL;
-      lang_len = 0;
+      case PNG_ITXT_COMPRESSION_NONE:
+      case PNG_TEXT_COMPRESSION_NONE:
+         compression = new_key[++key_len] = 0; /* no compression */
+         break;
+
+      case PNG_TEXT_COMPRESSION_zTXt:
+      case PNG_ITXT_COMPRESSION_zTXt:
+         compression = new_key[++key_len] = 1; /* compressed */
+         break;
+
+      default:
+         png_error(png_ptr, "iTXt: invalid compression");
    }
 
-   if (lang_key == NULL)
-      lang_key_len = 0;
-
-   else
-      lang_key_len = png_strlen(lang_key);
-
-   if (text == NULL)
-      text_len = 0;
-
-   else
-      text_len = png_strlen(text);
-
-   /* Compute the compressed data; do it now for the length */
-   text_len = png_text_compress(png_ptr, text, text_len, compression - 2,
-       &comp);
-
-
-   /* Make sure we include the compression flag, the compression byte,
-    * and the NULs after the key, lang, and lang_key parts
-    */
-
-   png_write_chunk_header(png_ptr, png_iTXt, (png_uint_32)(
-        5 /* comp byte, comp flag, terminators for key, lang and lang_key */
-        + key_len
-        + lang_len
-        + lang_key_len
-        + text_len));
+   new_key[++key_len] = PNG_COMPRESSION_TYPE_BASE;
+   ++key_len; /* for the keywod separator */
 
    /* We leave it to the application to meet PNG-1.0 requirements on the
     * contents of the text.  PNG-1.0 through PNG-1.2 discourage the use of
-    * any non-Latin-1 characters except for NEWLINE.  ISO PNG will forbid them.
+    * any non-Latin-1 characters except for NEWLINE.  ISO PNG, however,
+    * specifies that the text is UTF-8 and this really doesn't require any
+    * checking.
+    *
     * The NUL character is forbidden by PNG-1.0 through PNG-1.2 and ISO PNG.
+    *
+    * TODO: validate the language tag correctly (see the spec.)
     */
-   png_write_chunk_data(png_ptr, (png_bytep)new_key, (png_size_t)(key_len + 1));
+   if (lang == NULL) lang = ""; /* empty language is valid */
+   lang_len = strlen(lang)+1;
+   if (lang_key == NULL) lang_key = ""; /* may be empty */
+   lang_key_len = strlen(lang_key)+1;
+   if (text == NULL) text = ""; /* may be empty */
 
-   /* Set the compression flag */
-   if (compression == PNG_ITXT_COMPRESSION_NONE ||
-       compression == PNG_TEXT_COMPRESSION_NONE)
-      cbuf[0] = 0;
+   prefix_len = key_len;
+   if (lang_len > PNG_UINT_31_MAX-prefix_len)
+      prefix_len = PNG_UINT_31_MAX;
+   else
+      prefix_len = (png_uint_32)(prefix_len + lang_len);
 
-   else /* compression == PNG_ITXT_COMPRESSION_zTXt */
-      cbuf[0] = 1;
+   if (lang_key_len > PNG_UINT_31_MAX-prefix_len)
+      prefix_len = PNG_UINT_31_MAX;
+   else
+      prefix_len = (png_uint_32)(prefix_len + lang_key_len);
 
-   /* Set the compression method */
-   cbuf[1] = 0;
+   png_text_compress_init(&comp, (png_const_bytep)text, strlen(text));
 
-   png_write_chunk_data(png_ptr, cbuf, (png_size_t)2);
+   if (compression)
+   {
+      if (png_text_compress(png_ptr, png_iTXt, &comp, prefix_len) != Z_OK)
+         png_error(png_ptr, png_ptr->zstream.msg);
+   }
 
-   cbuf[0] = 0;
-   png_write_chunk_data(png_ptr, (new_lang ? (png_const_bytep)new_lang : cbuf),
-       (png_size_t)(lang_len + 1));
+   else
+   {
+      if (comp.input_len > PNG_UINT_31_MAX-prefix_len)
+         png_error(png_ptr, "iTXt: uncompressed text too long");
+   }
 
-   png_write_chunk_data(png_ptr, (lang_key ? (png_const_bytep)lang_key : cbuf),
-       (png_size_t)(lang_key_len + 1));
+   png_write_chunk_header(png_ptr, png_iTXt, comp.output_len + prefix_len);
 
-   png_write_compressed_data_out(png_ptr, &comp);
+   png_write_chunk_data(png_ptr, new_key, key_len);
+
+   png_write_chunk_data(png_ptr, (png_const_bytep)lang, lang_len);
+
+   png_write_chunk_data(png_ptr, (png_const_bytep)lang_key, lang_key_len);
+
+   if (compression)
+      png_write_compressed_data_out(png_ptr, &comp);
+
+   else
+      png_write_chunk_data(png_ptr, (png_const_bytep)text, comp.input_len);
 
    png_write_chunk_end(png_ptr);
-
-   png_free(png_ptr, new_key);
-   png_free(png_ptr, new_lang);
 }
 #endif
 
@@ -1851,18 +1809,25 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
     png_int_32 X1, int type, int nparams, png_const_charp units,
     png_charpp params)
 {
-   png_size_t purpose_len, units_len, total_len;
+   png_uint_32 purpose_len;
+   png_size_t units_len, total_len;
    png_size_tp params_len;
    png_byte buf[10];
-   png_charp new_purpose;
+   png_byte new_purpose[80];
    int i;
 
    png_debug1(1, "in png_write_pCAL (%d parameters)", nparams);
 
    if (type >= PNG_EQUATION_LAST)
-      png_warning(png_ptr, "Unrecognized equation type for pCAL chunk");
+      png_error(png_ptr, "Unrecognized equation type for pCAL chunk");
 
-   purpose_len = png_check_keyword(png_ptr, purpose, &new_purpose) + 1;
+   purpose_len = png_check_keyword(png_ptr, purpose, new_purpose);
+
+   if (purpose_len == 0)
+      png_error(png_ptr, "pCAL: invalid keyword");
+   
+   ++purpose_len; /* terminator */
+
    png_debug1(3, "pCAL purpose length = %d", (int)purpose_len);
    units_len = png_strlen(units) + (nparams == 0 ? 0 : 1);
    png_debug1(3, "pCAL units length = %d", (int)units_len);
@@ -1884,15 +1849,13 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
 
    png_debug1(3, "pCAL total length = %d", (int)total_len);
    png_write_chunk_header(png_ptr, png_pCAL, (png_uint_32)total_len);
-   png_write_chunk_data(png_ptr, (png_const_bytep)new_purpose, purpose_len);
+   png_write_chunk_data(png_ptr, new_purpose, purpose_len);
    png_save_int_32(buf, X0);
    png_save_int_32(buf + 4, X1);
    buf[8] = (png_byte)type;
    buf[9] = (png_byte)nparams;
    png_write_chunk_data(png_ptr, buf, (png_size_t)10);
    png_write_chunk_data(png_ptr, (png_const_bytep)units, (png_size_t)units_len);
-
-   png_free(png_ptr, new_purpose);
 
    for (i = 0; i < nparams; i++)
    {
@@ -2090,10 +2053,6 @@ png_write_start_row(png_structrp png_ptr)
       png_ptr->num_rows = png_ptr->height;
       png_ptr->usr_width = png_ptr->width;
    }
-
-   png_deflate_claim(png_ptr, 1/*for IDAT*/, png_image_size(png_ptr));
-   png_ptr->zstream.avail_out = png_ptr->zbuf_size;
-   png_ptr->zstream.next_out = png_ptr->zbuf;
 }
 
 /* Internal use only.  Called when finished processing a row of data. */
@@ -2115,8 +2074,6 @@ png_write_finish_row(png_structrp png_ptr)
    /* Offset to next interlace block in the y direction */
    static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 #endif
-
-   int ret;
 
    png_debug(1, "in png_write_finish_row");
 
@@ -2179,41 +2136,7 @@ png_write_finish_row(png_structrp png_ptr)
 
    /* If we get here, we've just written the last row, so we need
       to flush the compressor */
-   do
-   {
-      /* Tell the compressor we are done */
-      ret = deflate(&png_ptr->zstream, Z_FINISH);
-
-      /* Check for an error */
-      if (ret == Z_OK)
-      {
-         /* Check to see if we need more room */
-         if (!(png_ptr->zstream.avail_out))
-         {
-            png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
-            png_ptr->zstream.next_out = png_ptr->zbuf;
-            png_ptr->zstream.avail_out = (uInt)png_ptr->zbuf_size;
-         }
-      }
-
-      else if (ret != Z_STREAM_END)
-      {
-         if (png_ptr->zstream.msg != NULL)
-            png_error(png_ptr, png_ptr->zstream.msg);
-
-         else
-            png_error(png_ptr, "zlib error");
-      }
-   } while (ret != Z_STREAM_END);
-
-   /* Write any extra space */
-   if (png_ptr->zstream.avail_out < png_ptr->zbuf_size)
-   {
-      png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size -
-          png_ptr->zstream.avail_out);
-   }
-
-   png_deflate_release(png_ptr);
+   png_compress_IDAT(png_ptr, NULL, 0, Z_FINISH);
 }
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
@@ -3081,65 +3004,13 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 /* Do the actual writing of a previously filtered row. */
 static void
 png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
-   png_size_t avail/*includes filter byte*/)
+   png_size_t full_row_length/*includes filter byte*/)
 {
    png_debug(1, "in png_write_filtered_row");
 
    png_debug1(2, "filter = %d", filtered_row[0]);
-   /* Set up the zlib input buffer */
 
-   png_ptr->zstream.next_in = filtered_row;
-   png_ptr->zstream.avail_in = 0;
-   /* Repeat until we have compressed all the data */
-   do
-   {
-      int ret; /* Return of zlib */
-
-      /* Record the number of bytes available - zlib supports at least 65535
-       * bytes at one step, depending on the size of the zlib type 'uInt', the
-       * maximum size zlib can write at once is ZLIB_IO_MAX (from pngpriv.h).
-       * Use this because on 16 bit systems 'rowbytes' can be up to 65536 (i.e.
-       * one more than 16 bits) and, in this case 'rowbytes+1' can overflow a
-       * uInt.  ZLIB_IO_MAX can be safely reduced to cause zlib to be called
-       * with smaller chunks of data.
-       */
-      if (png_ptr->zstream.avail_in == 0)
-      {
-         if (avail > ZLIB_IO_MAX)
-         {
-            png_ptr->zstream.avail_in  = ZLIB_IO_MAX;
-            avail -= ZLIB_IO_MAX;
-         }
-
-         else
-         {
-            /* So this will fit in the available uInt space: */
-            png_ptr->zstream.avail_in = (uInt)avail;
-            avail = 0;
-         }
-      }
-
-      /* Compress the data */
-      ret = deflate(&png_ptr->zstream, Z_NO_FLUSH);
-
-      /* Check for compression errors */
-      if (ret != Z_OK)
-      {
-         if (png_ptr->zstream.msg != NULL)
-            png_error(png_ptr, png_ptr->zstream.msg);
-
-         else
-            png_error(png_ptr, "zlib error");
-      }
-
-      /* See if it is time to write another IDAT */
-      if (!(png_ptr->zstream.avail_out))
-      {
-         /* Write the IDAT and reset the zlib output buffer */
-         png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
-      }
-   /* Repeat until all data has been compressed */
-   } while (avail > 0 || png_ptr->zstream.avail_in > 0);
+   png_compress_IDAT(png_ptr, filtered_row, full_row_length, Z_NO_FLUSH);
 
    /* Swap the current and previous rows */
    if (png_ptr->prev_row != NULL)

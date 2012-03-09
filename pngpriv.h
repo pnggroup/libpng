@@ -467,6 +467,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
 #define PNG_HAVE_iCCP             0x4000
+#define PNG_IS_READ_STRUCT        0x8000 /* Else is a write struct */
 
 /* Flags for the transformations the PNG library does on the image data */
 #define PNG_BGR                 0x0001
@@ -512,9 +513,9 @@ typedef const png_uint_16p * png_const_uint_16pp;
 /* Flags for the png_ptr->flags rather than declaring a byte for each one */
 #define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x0001
 #define PNG_FLAG_ZSTREAM_INITIALIZED      0x0002 /* Added to libpng-1.6.0 */
-#define PNG_FLAG_ZSTREAM_IN_USE           0x0004 /* Added to libpng-1.6.0 */
+                                  /*      0x0004    unused */
 #define PNG_FLAG_ZSTREAM_ENDED            0x0008 /* Added to libpng-1.6.0 */
-#define PNG_FLAG_ZSTREAM_CMF_FIXUP        0x0010 /* Added to libpng-1.6.0 */
+                                  /*      0x0010    unused */
                                   /*      0x0020    unused */
 #define PNG_FLAG_ROW_INIT                 0x0040
 #define PNG_FLAG_FILLER_AFTER             0x0080
@@ -550,18 +551,6 @@ typedef const png_uint_16p * png_const_uint_16pp;
 
 #define PNG_FLAG_CRC_MASK           (PNG_FLAG_CRC_ANCILLARY_MASK | \
                                      PNG_FLAG_CRC_CRITICAL_MASK)
-
-/* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
- * can handle at once.  This type need be no larger than 16 bits (so maximum of
- * 65535), this define allows us to discover how big it is, but limited by the
- * maximuum for png_size_t.  The value can be overriden in a library build
- * (pngusr.h, or set it in CPPFLAGS) and it works to set it to a considerably
- * lower value (e.g. 255 works).  A lower value may help memory usage (slightly)
- * and may even improve performance on some systems (and degrade it on others.)
- */
-#ifndef ZLIB_IO_MAX
-#  define ZLIB_IO_MAX ((uInt)-1)
-#endif
 
 /* Save typing and make code easier to understand */
 
@@ -736,7 +725,18 @@ extern "C" {
  */
 
 /* Zlib support */
-PNG_INTERNAL_FUNCTION(void,png_inflate_claim,(png_structrp png_ptr),PNG_EMPTY);
+#define PNG_UNEXPECTED_ZLIB_RETURN (-7)
+PNG_INTERNAL_FUNCTION(void, png_zstream_error,(png_structrp png_ptr, int ret),
+   PNG_EMPTY);
+   /* Used by the zlib handling functions to ensure that z_stream::msg is always
+    * set before they return.
+    */
+
+#ifdef PNG_WRITE_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_free_buffer_list,(png_structrp png_ptr,
+   png_compression_bufferp *list),PNG_EMPTY);
+   /* Free the buffer list used by the compressed write code. */
+#endif
 
 #if defined PNG_FLOATING_POINT_SUPPORTED &&\
    !defined PNG_FIXED_POINT_MACRO_SUPPORTED
@@ -851,15 +851,16 @@ PNG_INTERNAL_FUNCTION(void,png_flush,(png_structrp png_ptr),PNG_EMPTY);
 /* Write the IHDR chunk, and update the png_struct with the necessary
  * information.
  */
-PNG_INTERNAL_FUNCTION(void,png_write_IHDR,(png_structrp png_ptr, png_uint_32 width,
-   png_uint_32 height, int bit_depth, int color_type, int compression_method,
-   int filter_method, int interlace_method),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_IHDR,(png_structrp png_ptr,
+   png_uint_32 width, png_uint_32 height, int bit_depth, int color_type,
+   int compression_method, int filter_method, int interlace_method),PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(void,png_write_PLTE,(png_structrp png_ptr,
    png_const_colorp palette, png_uint_32 num_pal),PNG_EMPTY);
 
-PNG_INTERNAL_FUNCTION(void,png_write_IDAT,(png_structrp png_ptr, png_bytep data,
-   png_size_t length),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_compress_IDAT,(png_structrp png_ptr,
+   png_const_bytep row_data, png_alloc_size_t row_data_length, int flush),
+   PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(void,png_write_IEND,(png_structrp png_ptr),PNG_EMPTY);
 
@@ -921,15 +922,9 @@ PNG_INTERNAL_FUNCTION(void,png_write_hIST,(png_structrp png_ptr,
 #endif
 
 /* Chunks that have keywords */
-#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
-    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
-PNG_INTERNAL_FUNCTION(png_size_t,png_check_keyword,(png_structrp png_ptr,
-    png_const_charp key, png_charpp new_key),PNG_EMPTY);
-#endif
-
 #ifdef PNG_WRITE_tEXt_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_write_tEXt,(png_structrp png_ptr, png_const_charp key,
-    png_const_charp text, png_size_t text_len),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_tEXt,(png_structrp png_ptr,
+   png_const_charp key, png_const_charp text, png_size_t text_len),PNG_EMPTY);
 #endif
 
 #ifdef PNG_WRITE_zTXt_SUPPORTED
@@ -1054,8 +1049,24 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_neon,(png_row_infop row_in
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
     png_row_infop row_info),PNG_EMPTY);
 
-/* Finish a row while reading, dealing with interlacing passes, etc. */
-PNG_INTERNAL_FUNCTION(void,png_read_finish_row,(png_structrp png_ptr),PNG_EMPTY);
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_read_IDAT_data,(png_structrp png_ptr,
+   png_bytep output, png_alloc_size_t avail_out),PNG_EMPTY);
+   /* Read 'avail_out' bytes of data from the IDAT stream.  If the output buffer
+    * is NULL the function checks, instead, for the end of the stream.  In this
+    * case a benign error will be issued if the stream end is not found or if
+    * extra data has to be consumed.
+    */
+PNG_INTERNAL_FUNCTION(void,png_read_finish_IDAT,(png_structrp png_ptr),
+   PNG_EMPTY);
+   /* This cleans up when the IDAT LZ stream does not end when the last image
+    * byte is read; there is still some pending input.
+    */
+
+PNG_INTERNAL_FUNCTION(void,png_read_finish_row,(png_structrp png_ptr),
+   PNG_EMPTY);
+   /* Finish a row while reading, dealing with interlacing passes, etc. */
+#endif
 
 /* Initialize the row buffers, etc. */
 PNG_INTERNAL_FUNCTION(void,png_read_start_row,(png_structrp png_ptr),PNG_EMPTY);

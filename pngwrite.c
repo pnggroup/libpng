@@ -475,6 +475,8 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    /* Set the zlib control values to defaults; they can be overridden by the
     * application after the struct has been created.
     */
+   png_ptr->zbuffer_size = PNG_ZBUF_SIZE;
+
    png_ptr->zlib_strategy = Z_FILTERED; /* may be overridden if no filters */
    png_ptr->zlib_level = Z_DEFAULT_COMPRESSION;
    png_ptr->zlib_mem_level = 8;
@@ -784,8 +786,6 @@ png_set_flush(png_structrp png_ptr, int nrows)
 void PNGAPI
 png_write_flush(png_structrp png_ptr)
 {
-   int wrote_IDAT;
-
    png_debug(1, "in png_write_flush");
 
    if (png_ptr == NULL)
@@ -795,39 +795,7 @@ png_write_flush(png_structrp png_ptr)
    if (png_ptr->row_number >= png_ptr->num_rows)
       return;
 
-   do
-   {
-      int ret;
-
-      /* Compress the data */
-      ret = deflate(&png_ptr->zstream, Z_SYNC_FLUSH);
-      wrote_IDAT = 0;
-
-      /* Check for compression errors */
-      if (ret != Z_OK)
-      {
-         if (png_ptr->zstream.msg != NULL)
-            png_error(png_ptr, png_ptr->zstream.msg);
-
-         else
-            png_error(png_ptr, "zlib error");
-      }
-
-      if (!(png_ptr->zstream.avail_out))
-      {
-         /* Write the IDAT and reset the zlib output buffer */
-         png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
-         wrote_IDAT = 1;
-      }
-   } while (wrote_IDAT == 1);
-
-   /* If there is any data left to be output, write it into a new IDAT */
-   if (png_ptr->zbuf_size != png_ptr->zstream.avail_out)
-   {
-      /* Write the IDAT and reset the zlib output buffer */
-      png_write_IDAT(png_ptr, png_ptr->zbuf,
-          png_ptr->zbuf_size - png_ptr->zstream.avail_out);
-   }
+   png_compress_IDAT(png_ptr, NULL, 0, Z_SYNC_FLUSH);
    png_ptr->flush_rows = 0;
    png_flush(png_ptr);
 }
@@ -848,7 +816,7 @@ png_write_destroy(png_structrp png_ptr)
       deflateEnd(&png_ptr->zstream);
 
    /* Free our memory.  png_free checks NULL for us. */
-   png_free(png_ptr, png_ptr->zbuf);
+   png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
    png_free(png_ptr, png_ptr->row_buf);
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);

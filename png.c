@@ -283,41 +283,29 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
           */
          if (png_user_version_check(&create_struct, user_png_ver))
          {
-            /* TODO: delay initializing the zlib structure until it really is
-             * needed.
-             */
-            /* Initialize zbuf - compression/decompression buffer */
-            create_struct.zbuf_size = PNG_ZBUF_SIZE;
-            create_struct.zbuf = png_voidcast(png_bytep,
-               png_malloc_warn(&create_struct, create_struct.zbuf_size));
+            png_structrp png_ptr = png_voidcast(png_structrp,
+               png_malloc_warn(&create_struct, sizeof *png_ptr));
 
-            /* Finally allocate the png_struct itself. */
-            if (create_struct.zbuf != NULL)
+            if (png_ptr != NULL)
             {
-               png_structrp png_ptr = png_voidcast(png_structrp,
-                  png_malloc_warn(&create_struct, sizeof *png_ptr));
+               /* png_ptr->zstream holds a back-pointer to the png_struct, so
+                * this can only be done now:
+                */
+               create_struct.zstream.zalloc = png_zalloc;
+               create_struct.zstream.zfree = png_zfree;
+               create_struct.zstream.opaque = png_ptr;
 
-               if (png_ptr != NULL)
-               {
-#                 ifdef PNG_SETJMP_SUPPORTED
-                     /* Eliminate the local error handling: */
-                     create_struct.jmp_buf_ptr = NULL;
-                     create_struct.jmp_buf_size = 0;
-                     create_struct.longjmp_fn = 0;
-#                 endif
+#              ifdef PNG_SETJMP_SUPPORTED
+                  /* Eliminate the local error handling: */
+                  create_struct.jmp_buf_ptr = NULL;
+                  create_struct.jmp_buf_size = 0;
+                  create_struct.longjmp_fn = 0;
+#              endif
 
-                  *png_ptr = create_struct;
+               *png_ptr = create_struct;
 
-                  /* png_ptr->zstream holds a back-pointer to the png_struct, so
-                   * this can only be done now:
-                   */
-                  png_ptr->zstream.zalloc = png_zalloc;
-                  png_ptr->zstream.zfree = png_zfree;
-                  png_ptr->zstream.opaque = png_ptr;
-
-                  /* This is the successful return point */
-                  return png_ptr;
-               }
+               /* This is the successful return point */
+               return png_ptr;
             }
          }
       }
@@ -325,15 +313,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
    /* A longjmp because of a bug in the application storage allocator or a
     * simple failure to allocate the png_struct.
     */
-   if (create_struct.zbuf != NULL)
-   {
-      png_bytep zbuf = create_struct.zbuf;
-
-      /* Ensure we don't keep on returning to this point: */
-      create_struct.zbuf = NULL;
-      png_free(&create_struct, zbuf);
-   }
-
    return NULL;
 }
 
@@ -768,13 +747,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta17 - March 6, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta17 - March 9, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta17 - March 6, 2012\
+      return "libpng version 1.6.0beta17 - March 9, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -867,6 +846,7 @@ png_reset_zstream(png_structrp png_ptr)
    if (png_ptr == NULL)
       return Z_STREAM_ERROR;
 
+   /* WARNING: this resets the window bits to the maximum! */
    return (inflateReset(&png_ptr->zstream));
 }
 #endif /* PNG_READ_SUPPORTED */
@@ -882,6 +862,76 @@ png_access_version_number(void)
 
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
+/* Ensure that png_ptr->zstream.msg holds some appropriate error message string.
+ * If it doesn't 'ret' is used to set it to something appropriate, even in cases
+ * like Z_OK or Z_STREAM_END where the error code is apparently a success code.
+ */
+void /* PRIVATE */
+png_zstream_error(png_structrp png_ptr, int ret)
+{
+   /* Translate 'ret' into an appropriate error string, priority is given to the
+    * one in zstream if set.  This always returns a string, even in cases like
+    * Z_OK or Z_STREAM_END where the error code is a success code.
+    */
+   if (png_ptr->zstream.msg == NULL) switch (ret)
+   {
+      default:
+      case Z_OK:
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("unexpected zlib return code");
+         break;
+
+      case Z_STREAM_END:
+         /* Normal exit */
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("unexpected end of LZ stream");
+         break;
+
+      case Z_NEED_DICT:
+         /* This means the deflate stream did not have a dictionary; this
+          * indicates a bogus PNG.
+          */
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("missing LZ dictionary");
+         break;
+
+      case Z_ERRNO:
+         /* gz APIs only: should not happen */
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("zlib IO error");
+         break;
+
+      case Z_STREAM_ERROR:
+         /* internal libpng error */
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("bad parameters to zlib");
+         break;
+
+      case Z_DATA_ERROR:
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("damaged LZ stream");
+         break;
+
+      case Z_MEM_ERROR:
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("insufficient memory");
+         break;
+
+      case Z_BUF_ERROR:
+         /* End of input or output; not a problem if the caller is doing
+          * incremental read or write.
+          */
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("truncated");
+         break;
+
+      case Z_VERSION_ERROR:
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("unsupported zlib version");
+         break;
+
+      case PNG_UNEXPECTED_ZLIB_RETURN:
+         /* Compile errors here mean that zlib now uses the value co-opted in
+          * pngpriv.h for PNG_UNEXPECTED_ZLIB_RETURN; update the switch above
+          * and change pngpriv.h.  Note that this message is "... return",
+          * whereas the default/Z_OK one is "... return code".
+          */
+         png_ptr->zstream.msg = PNGZ_MSG_CAST("unexpected zlib return");
+         break;
+   }
+}
+
 /* png_convert_size: a PNGAPI but no longer in png.h, so deleted
  * at libpng 1.5.5!
  */

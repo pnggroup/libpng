@@ -1070,7 +1070,24 @@ png_get_user_chunk_ptr(png_const_structrp png_ptr)
 png_size_t PNGAPI
 png_get_compression_buffer_size(png_const_structrp png_ptr)
 {
-   return (png_ptr ? png_ptr->zbuf_size : 0);
+   if (png_ptr == NULL)
+      return 0;
+
+#  ifdef PNG_WRITE_SUPPORTED
+      if (png_ptr->mode & PNG_IS_READ_STRUCT)
+#  endif
+   {
+#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+         return png_ptr->IDAT_read_size;
+#     else
+         return PNG_IDAT_READ_SIZE;
+#     endif
+   }
+
+#  ifdef PNG_WRITE_SUPPORTED
+      else
+         return png_ptr->zbuffer_size;
+#  endif
 }
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED

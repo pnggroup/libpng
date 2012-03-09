@@ -516,6 +516,30 @@ setting sCAL_PRECISION default 5
 
 setting ZBUF_SIZE default 8192
 
+# This is the size of the decompression buffer used when counting or checking
+# the decompressed size of an LZ stream from a compressed ancilliary chunk; the
+# decompressed data is never used so a different size may be optimal.  This size
+# was determined using contrib/libtests/timepng.c with compressed zTXt data
+# around 11MByte in size.  Slight speed improvements (up to about 14% in
+# timepng) can be achieved by very large increases (to 32kbyte) on regular data,
+# but highly compressible data shows only around 2% improvement.   The size is
+# chosen to minimize the effects of DoS attacks based on using very large
+# amounts of highly compressible data.
+
+setting INFLATE_BUF_SIZE default 1024
+
+# This is the maximum amount of IDAT data that the sequential reader will
+# process at one time.  The setting does not affect the size of IDAT chunks
+# read, just the amount read at once.  Neither does it affect the progressive
+# reader, which processes just the amount of data the application gives it.
+# The sequential reader is currently unable to process more than one IDAT at
+# once - it has to read and process each one in turn.  There is no point setting
+# this to a value larger than the IDAT chunks typically encountered (it would
+# just waste memory) but there may be some point in reducing it below the value
+# of ZBUF_SIZE (the size of IDAT chunks written by libpng.)
+
+setting IDAT_READ_SIZE default PNG_ZBUF_SIZE
+
 # Ancillary chunks
 chunk bKGD
 chunk cHRM

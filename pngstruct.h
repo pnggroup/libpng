@@ -24,7 +24,50 @@
  * in this structure and is required for decompressing the LZ compressed
  * data in PNG files.
  */
+#ifndef ZLIB_CONST
+   /* We must ensure that zlib uses 'const' in declarations. */
+#  define ZLIB_CONST
+#endif
 #include "zlib.h"
+#ifdef const
+   /* zlib.h sometimes #defines const to nothing, undo this. */
+#  undef const
+#endif
+
+/* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
+ * with older builds.
+ */
+#if ZLIB_VERNUM < 0x1260
+#  define PNGZ_MSG_CAST(s) png_constcast(char*,s)
+#  define PNGZ_INPUT_CAST(b) png_constcast(png_bytep,b)
+#else
+#  define PNGZ_MSG_CAST(s) (s)
+#  define PNGZ_INPUT_CAST(b) (b)
+#endif
+
+/* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
+ * can handle at once.  This type need be no larger than 16 bits (so maximum of
+ * 65535), this define allows us to discover how big it is, but limited by the
+ * maximuum for png_size_t.  The value can be overriden in a library build
+ * (pngusr.h, or set it in CPPFLAGS) and it works to set it to a considerably
+ * lower value (e.g. 255 works).  A lower value may help memory usage (slightly)
+ * and may even improve performance on some systems (and degrade it on others.)
+ */
+#ifndef ZLIB_IO_MAX
+#  define ZLIB_IO_MAX ((uInt)-1)
+#endif
+
+#ifdef PNG_WRITE_SUPPORTED
+/* The type of a compression buffer list used by the write code. */
+typedef struct png_compression_buffer
+{
+   struct png_compression_buffer *next;
+   png_byte                       output[1]; /* actually zbuf_size */
+} png_compression_buffer, *png_compression_bufferp;
+
+#define PNG_COMPRESSION_BUFFER_SIZE(pp)\
+   (offsetof(png_compression_buffer, output) + (pp)->zbuffer_size)
+#endif
 
 struct png_struct_def
 {
@@ -65,11 +108,13 @@ struct png_struct_def
    png_uint_32 flags;         /* flags indicating various things to libpng */
    png_uint_32 transformations; /* which transformations to perform */
 
-   z_stream zstream;          /* decompression structure */
-   png_bytep zbuf;            /* buffer for zlib */
-   uInt zbuf_size;            /* size of zbuf */
+   png_uint_32 zowner;        /* ID (chunk type) of zstream owner, 0 if none */
+   z_stream    zstream;       /* decompression structure */
 
 #ifdef PNG_WRITE_SUPPORTED
+   png_compression_bufferp zbuffer_list; /* Created on demand during write */
+   uInt                    zbuffer_size; /* size of the actual buffer */
+
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
    int zlib_window_bits;      /* holds zlib compression window bits */
@@ -341,8 +386,14 @@ struct png_struct_def
 /* New member added in libpng-1.2.26 */
   png_size_t old_big_row_buf_size;
 
+#ifdef PNG_READ_SUPPORTED
 /* New member added in libpng-1.2.30 */
-  png_charp chunkdata;  /* buffer for reading chunk data */
+  png_bytep        read_buffer;      /* buffer for reading chunk data */
+  png_alloc_size_t read_buffer_size; /* current size of the buffer */
+#endif
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+  uInt             IDAT_read_size;   /* limit on read buffer size for IDAT */
+#endif
 
 #ifdef PNG_IO_STATE_SUPPORTED
 /* New member added in libpng-1.4.0 */

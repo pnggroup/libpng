@@ -48,6 +48,14 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (png_ptr != NULL)
    {
+      png_ptr->mode = PNG_IS_READ_STRUCT;
+
+      /* Adding in libpng-1.6.0; this can be used to detect a read structure if
+       * required (it will be zero in a write structure.)
+       */
+#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+         png_ptr->IDAT_read_size = PNG_IDAT_READ_SIZE;
+#     endif
       /* TODO: delay this, it can be done in png_init_io (if the app doesn't
        * do it itself) avoiding setting the default function if it is not
        * required.
@@ -268,8 +276,6 @@ png_start_read_image(png_structrp png_ptr)
 void PNGAPI
 png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
 {
-   int ret;
-
    png_row_info row_info;
 
    if (png_ptr == NULL)
@@ -423,56 +429,8 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
    if (!(png_ptr->mode & PNG_HAVE_IDAT))
       png_error(png_ptr, "Invalid attempt to read row data");
 
-   png_ptr->zstream.next_out = png_ptr->row_buf;
-   /* TODO: WARNING: BAD NEWS ALERT: this fails, terminally, if the row width is
-    * bigger than a uInt.
-    */
-   png_ptr->zstream.avail_out = (uInt)(PNG_ROWBYTES(png_ptr->pixel_depth,
-       png_ptr->iwidth) + 1);
-
-   do
-   {
-      if (!(png_ptr->zstream.avail_in))
-      {
-         while (png_ptr->idat_size == 0)
-         {
-            png_crc_finish(png_ptr, 0);
-
-            png_ptr->idat_size = png_read_chunk_header(png_ptr);
-            if (png_ptr->chunk_name != png_IDAT)
-               png_error(png_ptr, "Not enough image data");
-         }
-         png_ptr->zstream.avail_in = png_ptr->zbuf_size;
-         png_ptr->zstream.next_in = png_ptr->zbuf;
-         if (png_ptr->zbuf_size > png_ptr->idat_size)
-            png_ptr->zstream.avail_in = (uInt)png_ptr->idat_size;
-         png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zstream.avail_in);
-         png_ptr->idat_size -= png_ptr->zstream.avail_in;
-      }
-
-      /* Use NO_FLUSH, not SYNC_FLUSH, here because we keep reading data until
-       * we have a row to process (so leave it to zlib to decide when to flush
-       * the output.)
-       */
-      ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
-
-      if (ret == Z_STREAM_END)
-      {
-         if (png_ptr->zstream.avail_out || png_ptr->zstream.avail_in ||
-            png_ptr->idat_size)
-            png_benign_error(png_ptr, "Extra compressed data");
-         png_ptr->mode |= PNG_AFTER_IDAT;
-         /* Release the stream */
-         png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;
-         png_ptr->flags &= ~PNG_FLAG_ZSTREAM_IN_USE;
-         break;
-      }
-
-      if (ret != Z_OK)
-         png_error(png_ptr, png_ptr->zstream.msg ? png_ptr->zstream.msg :
-             "Decompression error");
-
-   } while (png_ptr->zstream.avail_out);
+   /* Fill the row with IDAT data: */
+   png_read_IDAT_data(png_ptr, png_ptr->row_buf, row_info.rowbytes + 1);
 
    if (png_ptr->row_buf[0] > PNG_FILTER_VALUE_NONE)
    {
@@ -702,7 +660,10 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
    if (png_ptr == NULL)
       return;
 
-   png_crc_finish(png_ptr, 0); /* Finish off CRC from last IDAT chunk */
+   /* If png_read_end is called in the middle of reading the rows there may
+    * still be pending IDAT data and an owned zstream.  Deal with this here.
+    */
+   png_read_finish_IDAT(png_ptr);
 
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Report invalid palette index; added at libng-1.5.10 */
@@ -851,10 +812,9 @@ png_read_destroy(png_structrp png_ptr)
    png_destroy_gamma_table(png_ptr);
 #endif
 
-   png_free(png_ptr, png_ptr->zbuf);
    png_free(png_ptr, png_ptr->big_row_buf);
    png_free(png_ptr, png_ptr->big_prev_row);
-   png_free(png_ptr, png_ptr->chunkdata);
+   png_free(png_ptr, png_ptr->read_buffer);
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
    png_free(png_ptr, png_ptr->palette_lookup);
