@@ -619,6 +619,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
          if (comp->num_output_ptr)
          {
 
+#if 0 /* The following sometimes produces incorrect zlib datastreams */
            if (comp->output_ptr[0][0] != z_cmf)
            {
               int tmp;
@@ -628,6 +629,7 @@ png_write_compressed_data_out(png_structp png_ptr, compression_state *comp)
               tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
               comp->output_ptr[0][1] = (png_byte)tmp;
            }
+#endif /* 0 */
          }
          else
          {

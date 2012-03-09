@@ -3835,8 +3835,11 @@ Version 1.5.10beta03 [March 6, 2012]
     of png_ptr->current_text from pngread.c
   Added palette-index checking.
 
-Version 1.5.10beta04 [March 6, 2012]
+Version 1.5.10beta04 [March 9, 2012]
   Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition.
+  Disabled part of the CMF optimization of non-IDAT compressed chunks, which
+    was added at libpng-1.5.4.  It sometimes produces too small of a window.
+    This has been fixed in libpng-1.6.0.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
