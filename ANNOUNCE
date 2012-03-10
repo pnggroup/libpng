@@ -48,7 +48,8 @@ Version 1.5.10beta02 [February 27, 2012]
 Version 1.5.10beta03 [March 6, 2012]
   Removed unused "current_text" members of png_struct and the png_free()
     of png_ptr->current_text from pngread.c
-  Added palette-index checking.
+  Added palette-index checking. Issue a png_warning() if an invalid index is
+    found.
 
 Version 1.5.10beta04 [March 10, 2012]
   Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition.
@@ -57,6 +58,7 @@ Version 1.5.10beta04 [March 10, 2012]
 
 Version 1.5.10beta05 [March 10, 2012]
   Reject all iCCP chunks after the first, even if the first one is invalid.
+  Issue a png_benign_error() instead of png_warning() about bad palette index.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
