@@ -3838,7 +3838,7 @@ Version 1.5.10beta03 [March 6, 2012]
 Version 1.5.10beta04 [March 10, 2012]
   Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition.
   Fixed CMF optimization of non-IDAT compressed chunks, which was added at
-    libpng-1.5.4.  It sometimes produces too small of a window.
+    libpng-1.5.4.  It sometimes produced too small of a window.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
