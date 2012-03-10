@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta17 - March 10, 2012
+Libpng 1.6.0beta18 - March 10, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta17.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta17.tar.gz
-   1.6.0beta17.tar.bz2
+   1.6.0beta18.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta18.tar.gz
+   1.6.0beta18.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b17.7z  (LZMA-compressed, recommended)
-   lp160b17.zip
+   lp160b18.7z  (LZMA-compressed, recommended)
+   lp160b18.zip
 
 Other information:
 
-   1.6.0beta17-README.txt
-   1.6.0beta17-LICENSE.txt
+   1.6.0beta18-README.txt
+   1.6.0beta18-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -297,6 +297,8 @@ Version 1.6.0beta17 [March 10, 2012]
     This works round a bug introduced in 1.5.4 where compressed ancillary
     chunks could end up with a too-small windowBits value in the deflate
     header.
+
+Version 1.6.0beta18 [March 10, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
