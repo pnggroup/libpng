@@ -5529,7 +5529,8 @@ From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
 Checking for invalid palette index on read or write was added at libpng
-1.5.10.  This is enabled by default but can be disabled in each png_ptr with
+1.5.10.  When an invalid index is found, libpng issues a benign error.
+This is enabled by default but can be disabled in each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 

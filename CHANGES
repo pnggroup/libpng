@@ -4050,6 +4050,7 @@ Version 1.6.0beta17 [March 10, 2012]
     header.
 
 Version 1.6.0beta18 [March 10, 2012]
+  Issue a png_benign_error() instead of png_warning() about bad palette index.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
