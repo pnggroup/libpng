@@ -326,7 +326,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
  * chunk apparently owns the stream.  Prior to release it does a png_error.
  */
 static int
-png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
+png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
 {
    if (png_ptr->zowner != 0)
    {
@@ -373,9 +373,10 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
       if (png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED)
       {
 #        if ZLIB_VERNUM < 0x1240
+            PNG_UNUSED(window_bits)
             ret = inflateReset(&png_ptr->zstream);
 #        else
-            ret = inflateReset2(&png_ptr->zstream, 0/*use stream windowBits*/);
+            ret = inflateReset2(&png_ptr->zstream, window_bits);
 #        endif
       }
 
@@ -384,7 +385,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 #        if ZLIB_VERNUM < 0x1240
             ret = inflateInit(&png_ptr->zstream);
 #        else
-            ret = inflateInit2(&png_ptr->zstream, 0/*use stream windowBits*/);
+            ret = inflateInit2(&png_ptr->zstream, window_bits);
 #        endif
 
          if (ret == Z_OK)
@@ -571,8 +572,14 @@ png_decompress_chunk(png_structrp png_ptr,
       if (limit < *newlength)
          *newlength = limit;
 
-      /* Now try to claim the stream */
-      ret = png_inflate_claim(png_ptr, png_ptr->chunk_name);
+      /* Now try to claim the stream; the 'warn' setting causes zlib to be told
+       * to use the maximum window size during inflate; this hides errors in the
+       * deflate header window bits value which is used if '0' is passed.  In
+       * fact this only has an effect with zlib versions 1.2.4 and later - see
+       * the comments in png_inflate_claim above.
+       */
+      ret = png_inflate_claim(png_ptr, png_ptr->chunk_name,
+         png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN ? 15 : 0);
 
       if (ret == Z_OK)
       {
@@ -584,11 +591,14 @@ png_decompress_chunk(png_structrp png_ptr,
           
          if (ret == Z_STREAM_END)
          {
-#if 1
+            /* Use 'inflateReset' here, not 'inflateReset2' because this
+             * preserves the previously decided window size (otherwise it would
+             * be necessary to store the previous window size.)  In practice
+             * this doesn't matter anyway, because png_inflate will call inflate
+             * with Z_FINISH in almost all cases, so the window will not be
+             * maintained.
+             */
             if (inflateReset(&png_ptr->zstream) == Z_OK)
-#else
-            if (inflateReset2(&png_ptr->zstream, 0/*from stream*/) == Z_OK)
-#endif
             {
                /* Because of the limit checks above we know that the new,
                 * expanded, size will fit in a size_t (let alone an
@@ -3884,7 +3894,11 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
       }
 
       /* Use NO_FLUSH; this gives zlib the maximum opportunity to optimize the
-       * process.
+       * process.  If the LZ stream is truncated the sequential reader will
+       * terminally damage the stream, above, by reading the chunk header of the
+       * following chunk (it then exits with png_error).
+       *
+       * TODO: deal more elegantly with truncated IDAT lists.
        */
       ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
 
@@ -4336,8 +4350,12 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_free(png_ptr, buffer);
    }
 
-   /* Finally claim the zstream for the inflate of the IDAT data. */
-   if (png_inflate_claim(png_ptr, png_IDAT) != Z_OK)
+   /* Finally claim the zstream for the inflate of the IDAT data, use the bits
+    * value from the stream (note that this will result in a fatal error if the
+    * IDAT stream has a bogus deflate header window_bits value, but this should
+    * not be happening any longer!)
+    */
+   if (png_inflate_claim(png_ptr, png_IDAT, 0) != Z_OK)
       png_error(png_ptr, png_ptr->zstream.msg);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;

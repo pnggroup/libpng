@@ -4037,13 +4037,17 @@ Version 1.6.0beta16 [March 6, 2012]
     If the call to deflateInit2() is wrong a png_warning will be issued
     (in fact this is harmless, but the PNG data produced may be sub-optimal).
 
-Version 1.6.0beta17 [March 9, 2012]
+Version 1.6.0beta17 [March 10, 2012]
   Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition. 
   Reject all iCCP chunks after the first, even if the first one is invalid.
   Deflate/inflate was reworked to move common zlib calls into single
     functions [rw]util.c.  A new shared keyword check routine was also added
     and the 'zbuf' is no longer allocated on progressive read.  It is now
     possible to call png_inflate() incrementally.
+  If benign errors are disabled use maximum window on ancilliary inflate.
+    This works round a bug introduced in 1.5.4 where compressed ancillary
+    chunks could end up with a too-small windowBits value in the deflate
+    header.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
