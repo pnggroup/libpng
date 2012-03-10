@@ -3830,10 +3830,15 @@ Version 1.5.10beta01 [February 24, 2012]
 Version 1.5.10beta02 [February 27, 2012]
   Updated Makefile.in
 
-Version 1.5.10beta03 [March 5, 2012]
+Version 1.5.10beta03 [March 6, 2012]
   Removed unused "current_text" members of png_struct and the png_free()
     of png_ptr->current_text from pngread.c
   Added palette-index checking.
+
+Version 1.5.10beta04 [March 10, 2012]
+  Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition.
+  Fixed CMF optimization of non-IDAT compressed chunks, which was added at
+    libpng-1.5.4.  It sometimes produced too small of a window.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
