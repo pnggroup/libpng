@@ -56,6 +56,7 @@ Version 1.5.10beta04 [March 10, 2012]
     libpng-1.5.4.  It sometimes produced too small of a window.
 
 Version 1.5.10beta05 [March 10, 2012]
+  Reject all iCCP chunks after the first, even if the first one is invalid.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
