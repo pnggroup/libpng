@@ -2692,29 +2692,35 @@ compare_two_images(Image *a, Image *b, int via_linear,
       /* Only check colormap entries that actually exist; */
       png_const_bytep ppa, ppb;
       int match;
-      png_byte in_use[256];
+      png_byte in_use[256], amax = 0, bmax = 0;
 
       memset(in_use, 0, sizeof in_use);
 
       ppa = rowa;
       ppb = rowb;
 
-      /* Do this the slow way to accumulate the 'in_use' flags */
+      /* Do this the slow way to accumulate the 'in_use' flags, don't break out
+       * of the loop until the end; this validates the color-mapped data to
+       * ensure all pixels are valid color-map indexes.
+       */
       for (y=0, match=1; y<height && match; ++y, ppa += stridea, ppb += strideb)
       {
          png_uint_32 x;
 
          for (x=0; x<width; ++x)
          {
+            png_byte bval = ppb[x];
             png_byte aval = ppa[x];
 
-            if (aval != ppb[x])
-            {
+            if (bval > bmax)
+               bmax = bval;
+
+            if (bval != aval)
                match = 0;
-               break;
-            }
 
             in_use[aval] = 1;
+            if (aval > amax)
+               amax = aval;
          }
       }
 
@@ -2743,8 +2749,9 @@ compare_two_images(Image *a, Image *b, int via_linear,
             {
                if ((a->opts & ACCUMULATE) == 0)
                {
-                  char pindex[4];
-                  sprintf(pindex, "%lu", (unsigned long)y);
+                  char pindex[9];
+                  sprintf(pindex, "%lu[%lu]", (unsigned long)y,
+                     (unsigned long)a->image.colormap_entries);
                   logerror(a, a->file_name, ": bad pixel index: ", pindex);
                }
                result = 0;
@@ -2754,8 +2761,9 @@ compare_two_images(Image *a, Image *b, int via_linear,
             {
                if ((a->opts & ACCUMULATE) == 0)
                   {
-                  char pindex[4];
-                  sprintf(pindex, "%lu", (unsigned long)y);
+                  char pindex[9];
+                  sprintf(pindex, "%lu[%lu]", (unsigned long)y,
+                     (unsigned long)b->image.colormap_entries);
                   logerror(b, b->file_name, ": bad pixel index: ", pindex);
                   }
                result = 0;
@@ -2780,8 +2788,30 @@ compare_two_images(Image *a, Image *b, int via_linear,
       }
 
       /* else the image buffers don't match pixel-wise so compare sample values
-       * instead.
+       * instead, but first validate that the pixel indexes are in range (but
+       * only if not accumulating, when the error is ignored.)
        */
+      else if ((a->opts & ACCUMULATE) == 0)
+      {
+         /* Check the original image first,
+          * TODO: deal with input images with bad pixel values?
+          */
+         if (amax >= a->image.colormap_entries)
+         {
+            char pindex[9];
+            sprintf(pindex, "%d[%lu]", amax,
+               (unsigned long)a->image.colormap_entries);
+            return logerror(a, a->file_name, ": bad pixel index: ", pindex);
+         }
+
+         else if (bmax >= b->image.colormap_entries)
+         {
+            char pindex[9];
+            sprintf(pindex, "%d[%lu]", bmax,
+               (unsigned long)b->image.colormap_entries);
+            return logerror(b, b->file_name, ": bad pixel index: ", pindex);
+         }
+      }
    }
 
    /* We can directly compare pixel values without the need to use the read
