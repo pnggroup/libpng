@@ -301,7 +301,8 @@ Version 1.6.0beta17 [March 10, 2012]
 Version 1.6.0beta18 [March 11, 2012]
   Issue a png_benign_error() instead of png_warning() about bad palette index.
   In pngtest, treat benign errors as errors if "-strict" is present.
-  Fix an off-by-one error in the palette index checking function.
+  Fixed an off-by-one error in the palette index checking function.
+  Fixed a compiler warning under Cygwin (Windows-7, 32-bit system)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

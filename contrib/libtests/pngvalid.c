@@ -4653,8 +4653,8 @@ standard_check_text(png_const_structp pp, png_const_textp tp,
       if (tp->text_length != strlen(text))
       {
          char buf[64];
-         sprintf(buf, "text length changed[%lu->%lu], ", strlen(text),
-            tp->text_length);
+         sprintf(buf, "text length changed[%lu->%lu], ",
+            (unsigned long)strlen(text), (unsigned long)tp->text_length);
          pos = safecat(msg, sizeof msg, pos, buf);
       }
 
