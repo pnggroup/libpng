@@ -745,6 +745,17 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 
+   if (strict)
+   {
+      /* Treat png_benign_error() as errors on read */
+      png_set_benign_errors(read_ptr, 0);
+   
+      /* Treat them as errors on write */
+      png_set_benign_errors(write_ptr, 0);
+
+      /* if strict is not set, then both are treated as warnings. */
+   }
+
    pngtest_debug("Initializing input and output streams");
 #ifdef PNG_STDIO_SUPPORTED
    png_init_io(read_ptr, fpin);
