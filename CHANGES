@@ -2859,6 +2859,8 @@ version 1.4.10rc01 [March 2, 2012]
 version 1.4.10rc02 [March 6, 2012]
   Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition in png.h
 
+version 1.4.10 [March 15, 2012]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
