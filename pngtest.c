@@ -1023,7 +1023,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          pngtest_debug1("Handling %d iTXt/tEXt/zTXt chunks", num_text);
 
          if (verbose)
-            printf("\n Text compression=%d\n", text_ptr->compression);
+         {
+            int i;
+
+            printf("\n");
+            for (i=0; i<num_text; i++)
+            {
+               printf("   Text compression[%d]=%d\n",
+                     i, text_ptr[i].compression);
+            }
+         }
 
          png_set_text(write_ptr, write_info_ptr, text_ptr, num_text);
       }
@@ -1218,6 +1227,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_text(read_ptr, end_info_ptr, &text_ptr, &num_text) > 0)
       {
          pngtest_debug1("Handling %d iTXt/tEXt/zTXt chunks", num_text);
+
+         if (verbose)
+         {
+            int i;
+
+            printf("\n");
+            for (i=0; i<num_text; i++)
+            {
+               printf("   Text compression[%d]=%d\n",
+                     i, text_ptr[i].compression);
+            }
+         }
+
          png_set_text(write_ptr, write_end_info_ptr, text_ptr, num_text);
       }
    }

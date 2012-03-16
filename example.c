@@ -864,25 +864,38 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_set_gAMA(png_ptr, info_ptr, gamma);
 
    /* Optionally write comments into the image */
-   text_ptr[0].key = "Title";
-   text_ptr[0].text = "Mona Lisa";
-   text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
-   text_ptr[0].itxt_length = 0;
-   text_ptr[0].lang = NULL;
-   text_ptr[0].lang_key = NULL;
-   text_ptr[1].key = "Author";
-   text_ptr[1].text = "Leonardo DaVinci";
-   text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
-   text_ptr[1].itxt_length = 0;
-   text_ptr[1].lang = NULL;
-   text_ptr[1].lang_key = NULL;
-   text_ptr[2].key = "Description";
-   text_ptr[2].text = "<long text>";
-   text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
-   text_ptr[2].itxt_length = 0;
-   text_ptr[2].lang = NULL;
-   text_ptr[2].lang_key = NULL;
-   png_set_text(png_ptr, info_ptr, text_ptr, 3);
+   {
+      png_text text_ptr[3];
+
+      char key0[]="Title";
+      char text0[]="Mona Lisa";
+      text_ptr[0].key = key0;
+      text_ptr[0].text = text0;
+      text_ptr[0].compression = PNG_TEXT_COMPRESSION_NONE;
+      text_ptr[0].itxt_length = 0;
+      text_ptr[0].lang = NULL;
+      text_ptr[0].lang_key = NULL;
+
+      char key1[]="Author";
+      char text1[]="Leonardo DaVinci";
+      text_ptr[1].key = key1;
+      text_ptr[1].text = text1;
+      text_ptr[1].compression = PNG_TEXT_COMPRESSION_NONE;
+      text_ptr[1].itxt_length = 0;
+      text_ptr[1].lang = NULL;
+      text_ptr[1].lang_key = NULL;
+
+      char key2[]="Description";
+      char text2[]="<long text>";
+      text_ptr[2].key = key2;
+      text_ptr[2].text = text2;
+      text_ptr[2].compression = PNG_TEXT_COMPRESSION_zTXt;
+      text_ptr[2].itxt_length = 0;
+      text_ptr[2].lang = NULL;
+      text_ptr[2].lang_key = NULL;
+
+      png_set_text(write_ptr, write_info_ptr, text_ptr, 3);
+   }
 
    /* Other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs */
 
