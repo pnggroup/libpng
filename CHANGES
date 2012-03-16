@@ -4066,7 +4066,7 @@ Version 1.6.0beta18 [March 16, 2012]
     from to benign errors. Configuration now makes read benign
     errors warnings and write benign errors to errors by default (thus
     changing the behavior on read).  The simplified API always forces
-    read benign errors to errors (regardless of the system default, unless
+    read benign errors to warnings (regardless of the system default, unless
     this is disabled in which case the simplified API can't be built.)
 
 Version 1.6.0beta19 [March 16, 2012]
