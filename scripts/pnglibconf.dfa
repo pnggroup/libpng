@@ -186,10 +186,36 @@ option READ_INT_FUNCTIONS requires READ
 option WRITE_INT_FUNCTIONS disabled
 option WRITE enables WRITE_INT_FUNCTIONS
 
-# Generic options - affect both read and write.
+# Error controls
+#
+# WARNINGS: normally on, if off no warnings are generated
+# ERROR_TEXT: normally on, if off errors happen but there is no message
+# ERROR_NUMBERS: unimplemented feature, therefore disabled
+# BENIGN_ERRORS: support for just issuing warnings for recoverable errors
+#
+# BENIGN_READ_ERRORS:
+#     By default recoverable errors on read should just generate warnings,
+#     generally safe but PNG files that don't conform to the specification will
+#     be accepted if a meaningful result can be produced.
+#
+# BENIGN_WRITE_ERRORS:
+#     By default recoverable errors on write should just generate warnings,
+#     not generally safe because this allows the application to write invalid
+#     PNG files.  Applications should enable this themselves; it's useful
+#     because it means that a failure to write an ancilliary chunk can often be
+#     ignored.
 
 option WARNINGS
+option ERROR_TEXT
+option ERROR_NUMBERS disabled
+
 option BENIGN_ERRORS
+option BENIGN_WRITE_ERRORS requires BENIGN_ERRORS disabled
+option BENIGN_READ_ERRORS requires BENIGN_ERRORS
+
+
+# Generic options - affect both read and write.
+
 option MNG_FEATURES
 
 # Arithmetic options, the first is the big switch that chooses between internal
@@ -199,10 +225,6 @@ option MNG_FEATURES
 option FLOATING_ARITHMETIC
 option FLOATING_POINT enables ok_math
 option FIXED_POINT enables ok_math
-
-# Added at libpng version 1.4.0
-
-option ERROR_TEXT
 
 # The following is always on (defined empty)
 
@@ -229,10 +251,6 @@ option TIME_RFC1123
 
 option SETJMP
 = NO_SETJMP SETJMP_NOT_SUPPORTED
-
-# For the moment this is disabled (no code support):
-
-option ERROR_NUMBERS disabled
 
 # If this is disabled it is not possible for apps to get the
 # values from the 'info' structure, this effectively removes
@@ -622,6 +640,7 @@ option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
 # Simplified API options (added at libpng-1.6.0)
 # Read:
 option SIMPLIFIED_READ requires SEQUENTIAL_READ READ_TRANSFORMS SETJMP
+option SIMPLIFIED_READ requires BENIGN_ERRORS
 option SIMPLIFIED_READ enables READ_EXPAND READ_16BIT READ_EXPAND_16
 option SIMPLIFIED_READ enables READ_SCALE_16_TO_8 READ_RGB_TO_GRAY
 option SIMPLIFIED_READ enables READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA

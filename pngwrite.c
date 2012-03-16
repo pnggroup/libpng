@@ -491,6 +491,15 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    png_ptr->zlib_text_method = 8;
 #endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
 
+   /* This is a highly dubious configuration option; by default it is off, but
+    * it may be appropriate for private builds that are testing extensions not
+    * conformant to the current specification, or of applications that must not
+    * fail to write at all costs!
+    */
+#  ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
+      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+#  endif
+
    if (png_ptr != NULL)
    {
       /* TODO: delay this, it can be done in png_init_io() (if the app doesn't
@@ -1981,6 +1990,11 @@ png_image_write_main(png_voidp argument)
    int linear = !colormap && (format & PNG_FORMAT_FLAG_LINEAR) != 0; /* input */
    int alpha = !colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0;
    int write_16bit = linear && !colormap && !display->convert_to_8bit;
+
+#  ifdef PNG_BENIGN_ERRORS_SUPPORTED
+      /* Make sure we error out on any bad situation */
+      png_set_benign_errors(png_ptr, 0/*error*/);
+#  endif
 
    /* Default the 'row_stride' parameter if required. */
    if (display->row_stride == 0)

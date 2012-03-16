@@ -50,12 +50,17 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    {
       png_ptr->mode = PNG_IS_READ_STRUCT;
 
-      /* Adding in libpng-1.6.0; this can be used to detect a read structure if
+      /* Added in libpng-1.6.0; this can be used to detect a read structure if
        * required (it will be zero in a write structure.)
        */
 #     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
          png_ptr->IDAT_read_size = PNG_IDAT_READ_SIZE;
 #     endif
+
+#     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+         png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+#     endif
+
       /* TODO: delay this, it can be done in png_init_io (if the app doesn't
        * do it itself) avoiding setting the default function if it is not
        * required.
@@ -1085,6 +1090,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
 /* Arguments to png_image_finish_read: */
 
 /* Encoding of PNG data (used by the color-map code) */
+/* TODO: change these, dang, ANSI-C reserves the 'E' namespace. */
 #  define E_NOTSET  0 /* File encoding not yet known */
 #  define E_sRGB    1 /* 8-bit encoded to sRGB gamma */
 #  define E_LINEAR  2 /* 16-bit linear: not encoded, NOT pre-multiplied! */
@@ -1237,6 +1243,7 @@ png_image_read_header(png_voidp argument)
    png_structrp png_ptr = image->opaque->png_ptr;
    png_inforp info_ptr = image->opaque->info_ptr;
 
+   png_set_benign_errors(png_ptr, 1/*warn*/);
    png_read_info(png_ptr, info_ptr);
 
    /* Do this the fast way; just read directly out of png_struct. */

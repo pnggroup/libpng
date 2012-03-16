@@ -1297,31 +1297,33 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_sRGB");
 
+   if (png_ptr->mode & PNG_HAVE_iCCP)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "duplicate color profile");
+      return;
+   }
+
+   png_ptr->mode |= PNG_HAVE_iCCP; /* well, a colorspace */
+
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
-      png_error(png_ptr, "Missing IHDR before sRGB");
+      png_error(png_ptr, "missing IHDR");
 
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
-      png_warning(png_ptr, "Invalid sRGB after IDAT");
       png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid after IDAT");
       return;
    }
 
    else if (png_ptr->mode & PNG_HAVE_PLTE)
       /* Should be an error, but we can cope with it */
-      png_warning(png_ptr, "Out of place sRGB chunk");
-
-   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_sRGB))
-   {
-      png_warning(png_ptr, "Duplicate sRGB chunk");
-      png_crc_finish(png_ptr, length);
-      return;
-   }
+      png_chunk_benign_error(png_ptr, "out of place");
 
    if (length != 1)
    {
-      png_warning(png_ptr, "Incorrect sRGB chunk length");
       png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "incorrect length");
       return;
    }
 
@@ -1419,7 +1421,7 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 #ifdef PNG_READ_iCCP_SUPPORTED
 void /* PRIVATE */
 png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
-/* Note: this does not properly handle chunks that are > 64K under DOS */
+/* Note: this does not properly handle profiles that are > 64K under DOS */
 {
    png_uint_32 keyword_length;
    png_const_charp error_message = NULL;
@@ -1427,13 +1429,23 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    png_debug(1, "in png_handle_iCCP");
 
+   /* Do this first to set the 'HAVE_iCCP' flag in all cases, even errors */
+   if (png_ptr->mode & PNG_HAVE_iCCP)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "duplicate color profile");
+      return;
+   }
+
+   png_ptr->mode |= PNG_HAVE_iCCP;
+
    if (!(png_ptr->mode & PNG_HAVE_IHDR))
-      png_error(png_ptr, "Missing IHDR before iCCP");
+      png_error(png_ptr, "missing IHDR");
 
    else if (png_ptr->mode & PNG_HAVE_IDAT)
    {
       png_crc_finish(png_ptr, length);
-      png_chunk_benign_error(png_ptr, "Invalid iCCP after IDAT");
+      png_chunk_benign_error(png_ptr, "invalid after IDAT");
       return;
    }
 
@@ -1443,19 +1455,22 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
        * *have* to do so, so it is misleading if libpng handles them.
        */
       png_crc_finish(png_ptr, length);
-      png_chunk_benign_error(png_ptr, "Out of place iCCP chunk");
+      png_chunk_benign_error(png_ptr, "out of place");
       return;
    }
 
-   if ((png_ptr->mode & PNG_HAVE_iCCP) || (info_ptr != NULL &&
-      (info_ptr->valid & (PNG_INFO_iCCP|PNG_INFO_sRGB))))
+   else if (length < 132) /* minimum ICC profile size */
    {
       png_crc_finish(png_ptr, length);
-      png_chunk_benign_error(png_ptr, "Duplicate color profile");
+      png_chunk_benign_error(png_ptr, "too short");
       return;
    }
 
-   png_ptr->mode |= PNG_HAVE_iCCP;
+   /* Now read the first 132 bytes.  The largest LZ data requirement for 132
+    * bytes of input is infinite; by doing really foolish things with the SYNC
+    * options to deflate it is possible to extend 132 bytes without limit.
+    */
+   /**** WIP ****/
 
    /* TODO: read the chunk in pieces, validating it as we go. */
    buffer = png_read_buffer(png_ptr, length, 0/*!warn*/);
