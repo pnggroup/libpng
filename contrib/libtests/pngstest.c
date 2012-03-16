@@ -3374,6 +3374,9 @@ test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
       result = testimage(&image, opts, formats);
    freeimage(&image);
 
+   /* Ensure that stderr is flushed into any log file */
+   fflush(stderr);
+
    if (log_pass)
    {
       if (result)
@@ -3384,6 +3387,8 @@ test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
 
       print_opts(opts);
       printf(" %s\n", file_name);
+      /* stdout may not be line-buffered if it is piped to a file, so: */
+      fflush(stdout);
    }
 
    else if (!result)
