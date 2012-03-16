@@ -2263,6 +2263,13 @@ PNG_EXPORT(163, void, png_set_text, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_const_textp text_ptr, int num_text));
 #endif
 
+#ifdef PNG_WRITE_TEXT_SUPPORTED
+PNG_EXPORT(243, void, png_set_itxt, (png_const_structrp png_ptr,
+    png_inforp info_ptr, const int in_flag, const int in_method,
+    png_const_charp in_key, png_const_charp in_text, png_const_charp in_lang,
+    png_const_charp in_lang_key));
+#endif
+
 #ifdef PNG_tIME_SUPPORTED
 PNG_EXPORT(164, png_uint_32, png_get_tIME, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_timep *mod_time));
@@ -3081,7 +3088,7 @@ PNG_EXPORT(242, void, png_set_check_for_invalid_index,
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(242);
+  PNG_EXPORT_LAST_ORDINAL(243);
 #endif
 
 #ifdef __cplusplus
