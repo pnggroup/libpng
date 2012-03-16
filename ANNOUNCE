@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta18 - March 16, 2012
+Libpng 1.6.0beta19 - March 16, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta18.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta18.tar.gz
-   1.6.0beta18.tar.bz2
+   1.6.0beta19.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta19.tar.gz
+   1.6.0beta19.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b18.7z  (LZMA-compressed, recommended)
-   lp160b18.zip
+   lp160b19.7z  (LZMA-compressed, recommended)
+   lp160b19.zip
 
 Other information:
 
-   1.6.0beta18-README.txt
-   1.6.0beta18-LICENSE.txt
+   1.6.0beta19-README.txt
+   1.6.0beta19-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -315,8 +315,10 @@ Version 1.6.0beta18 [March 16, 2012]
     from to benign errors. Configuration now makes read benign
     errors warnings and write benign errors to errors by default (thus
     changing the behavior on read).  The simplified API always forces
-    read errors to benign errors (regardless of the system default, unless
+    read benign errors to errors (regardless of the system default, unless
     this is disabled in which case the simplified API can't be built.)
+
+Version 1.6.0beta19 [March 16, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
