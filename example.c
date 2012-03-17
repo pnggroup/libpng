@@ -863,13 +863,6 @@ void write_png(char *file_name /* , ... other image information ... */)
     */
    png_set_gAMA(png_ptr, info_ptr, gamma);
 
-#if PNG_LIBPNG_VER >= 1.6.0
-   png_set_itxt(png_ptr, info_ptr, 0, 0, "Title", "Mona Lisa", NULL, NULL); 
-   png_set_itxt(png_ptr, info_ptr, 0, 0, "Author", "Leonardo da Vinci", NULL,
-       NULL);
-   png_set_itxt(png_ptr, info_ptr, 3, 0, "Description", "<long text>", NULL,
-       NULL);
-#else
    /* Optionally write comments into the image */
    {
       png_text text_ptr[3];
@@ -903,7 +896,6 @@ void write_png(char *file_name /* , ... other image information ... */)
 
       png_set_text(write_ptr, write_info_ptr, text_ptr, 3);
    }
-#endif
 
    /* Other optional chunks like cHRM, bKGD, tRNS, tIME, oFFs, pHYs */
 
