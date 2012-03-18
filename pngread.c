@@ -50,6 +50,11 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    {
       png_ptr->mode = PNG_IS_READ_STRUCT;
 
+      /* Turn this on for all transforms in an attempt to detect failure to call
+       * the image reading start stuff.
+       */
+      png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
+
       /* Added in libpng-1.6.0; this can be used to detect a read structure if
        * required (it will be zero in a write structure.)
        */

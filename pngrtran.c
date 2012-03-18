@@ -826,7 +826,12 @@ png_set_expand(png_structrp png_ptr)
       return;
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+   {
+      /* TODO: should probably be an error */
+      png_warning(png_ptr, "png_set_expand called after row initialization");
+      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   }
 }
 
 /* GRR 19990627:  the following three functions currently are identical
@@ -857,7 +862,13 @@ png_set_palette_to_rgb(png_structrp png_ptr)
       return;
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+   {
+      /* TODO: should probably be an error */
+      png_warning(png_ptr,
+         "png_set_palette_to_rgb called after row initialization");
+      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   }
 }
 
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
@@ -870,7 +881,13 @@ png_set_expand_gray_1_2_4_to_8(png_structrp png_ptr)
       return;
 
    png_ptr->transformations |= PNG_EXPAND;
-   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+   {
+      /* TODO: should probably be an error */
+      png_warning(png_ptr,
+         "png_set_expand_gray_1_2_4_to_8 called after row initialization");
+      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   }
 }
 
 
@@ -882,7 +899,13 @@ png_set_tRNS_to_alpha(png_structrp png_ptr)
    png_debug(1, "in png_set_tRNS_to_alpha");
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+   {
+      /* TODO: should probably be an error */
+      png_warning(png_ptr,
+         "png_set_tRNS_to_alpha called after row initialization");
+      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   }
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
@@ -899,7 +922,13 @@ png_set_expand_16(png_structrp png_ptr)
       return;
 
    png_ptr->transformations |= (PNG_EXPAND_16 | PNG_EXPAND | PNG_EXPAND_tRNS);
-   png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+   {
+      /* TODO: should probably be an error */
+      png_warning(png_ptr,
+         "png_set_expand_16 called after row initialization");
+      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+   }
 
    /* New API, make sure apps call the correct initializers: */
    png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
@@ -917,7 +946,13 @@ png_set_gray_to_rgb(png_structrp png_ptr)
       /* Because rgb must be 8 bits or more: */
       png_set_expand_gray_1_2_4_to_8(png_ptr);
       png_ptr->transformations |= PNG_GRAY_TO_RGB;
-      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+      {
+         /* TODO: should probably be an error */
+         png_warning(png_ptr,
+            "png_set_gray_to_rgb called after row initialization");
+         png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
+      }
    }
 }
 #endif

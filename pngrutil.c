@@ -4105,6 +4105,17 @@ png_read_start_row(png_structrp png_ptr)
 
    png_debug(1, "in png_read_start_row");
 
+   /* Because init_read_transformations, below, modifies values in png_struct
+    * it will not always work correctly if called twice.  This error detects
+    * that condition but just warns, because it does tend to work most of the
+    * time.
+    */
+   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+   {
+      png_warning(png_ptr, "unexpected duplicate call to png_read_start_row");
+      png_ptr->zowner = 0; /* release previous claim */
+   }
+
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
    png_init_read_transformations(png_ptr);
 #endif
