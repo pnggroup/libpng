@@ -307,7 +307,7 @@ png_write_end(png_structp png_ptr, png_infop info_ptr)
 
 #ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
    if (png_ptr->num_palette_max > png_ptr->num_palette)
-      png_warning(png_ptr, "Wrote palette index exceeding num_palette");
+      png_benign_error(png_ptr, "Wrote palette index exceeding num_palette");
 #endif
 
    /* See if user wants us to write information chunks */

@@ -1257,12 +1257,15 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Should be an error, but we can cope with it */
       png_warning(png_ptr, "Out of place iCCP chunk");
 
-   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_iCCP))
+   if ((png_ptr->mode & PNG_HAVE_iCCP) || (info_ptr != NULL &&
+      (info_ptr->valid & (PNG_INFO_iCCP|PNG_INFO_sRGB))))
    {
       png_warning(png_ptr, "Duplicate iCCP chunk");
       png_crc_finish(png_ptr, length);
       return;
    }
+
+   png_ptr->mode |= PNG_HAVE_iCCP;
 
 #ifdef PNG_MAX_MALLOC_64K
    if (length > (png_uint_32)65535L)

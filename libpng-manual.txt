@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.10beta04 - March 10, 2012
+ libpng version 1.5.10rc01 - March 19, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.10beta04 - March 10, 2012
+ libpng versions 0.97, January 1998, through 1.5.10rc01 - March 19, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4143,7 +4143,8 @@ From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
 Checking for invalid palette index on read or write was added at libpng
-1.5.10.  This is enabled by default but can be disabled in each png_ptr with
+1.5.10.  When an invalid index is found, libpng issues a benign error.
+This is enabled by default but can be disabled in each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 
@@ -4596,13 +4597,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-March 10, 2012
+March 19, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.5.10beta04 are Y2K compliant.  It is my belief that earlier
+upward through 1.5.10rc01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
