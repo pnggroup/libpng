@@ -4069,7 +4069,7 @@ Version 1.6.0beta18 [March 16, 2012]
     read benign errors to warnings (regardless of the system default, unless
     this is disabled in which case the simplified API can't be built.)
 
-Version 1.6.0beta19 [March 19, 2012]
+Version 1.6.0beta19 [March 18, 2012]
   Work around for duplicate row start calls; added warning messages.
     This turns on PNG_FLAG_DETECT_UNINITIALIZED to detect app code that
     fails to call one of the 'start' routines (not enabled in libpng-1.5
@@ -4089,6 +4089,8 @@ Version 1.6.0beta19 [March 19, 2012]
     yet because a warning is produced.
   Avoid the double gamma correction warning in the simplified API.
     This allows the --strict option to pass in the pngstest checks
+
+Version 1.6.0beta20 [March 19, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
