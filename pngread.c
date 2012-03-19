@@ -50,11 +50,6 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    {
       png_ptr->mode = PNG_IS_READ_STRUCT;
 
-      /* Turn this on for all transforms in an attempt to detect failure to call
-       * the image reading start stuff.
-       */
-      png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
-
       /* Added in libpng-1.6.0; this can be used to detect a read structure if
        * required (it will be zero in a write structure.)
        */
@@ -254,16 +249,24 @@ png_read_update_info(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_debug(1, "in png_read_update_info");
 
-   if (png_ptr == NULL)
-      return;
+   if (png_ptr != NULL)
+   {
+      if ((png_ptr->flags & PNG_FLAG_ROW_INIT) == 0)
+      {
+         png_read_start_row(png_ptr);
 
-   png_read_start_row(png_ptr);
+#        ifdef PNG_READ_TRANSFORMS_SUPPORTED
+            png_read_transform_info(png_ptr, info_ptr);
+#        else
+            PNG_UNUSED(info_ptr)
+#        endif
+      }
 
-#ifdef PNG_READ_TRANSFORMS_SUPPORTED
-   png_read_transform_info(png_ptr, info_ptr);
-#else
-   PNG_UNUSED(info_ptr)
-#endif
+      /* New in 1.6.0 this avoids the bug of doing the initializations twice */
+      else
+         png_error(png_ptr,
+            "png_read_update_info/png_start_read_image: duplicate call");
+   }
 }
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
@@ -278,7 +281,15 @@ png_start_read_image(png_structrp png_ptr)
    png_debug(1, "in png_start_read_image");
 
    if (png_ptr != NULL)
-     png_read_start_row(png_ptr);
+   {
+      if ((png_ptr->flags & PNG_FLAG_ROW_INIT) == 0)
+         png_read_start_row(png_ptr);
+
+      /* New in 1.6.0 this avoids the bug of doing the initializations twice */
+      else
+         png_error(png_ptr,
+            "png_start_read_image/png_read_update_info: duplicate call");
+   }
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 

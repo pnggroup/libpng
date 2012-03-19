@@ -88,6 +88,33 @@ png_set_crc_action(png_structrp png_ptr, int crit_action, int ancil_action)
    }
 }
 
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
+/* Is it OK to set a transformation now?  Only if png_start_read_image or
+ * png_read_update_info have not been called.  It is not necessary for the IHDR
+ * to have been read in all cases, the parameter allows for this check too.
+ */
+static int
+png_rtran_ok(png_structrp png_ptr, int need_IHDR)
+{
+   if (png_ptr != NULL)
+   {
+      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
+         png_error(png_ptr,
+            "invalid after png_start_read_image or png_read_update_info");
+
+      if (need_IHDR && (png_ptr->mode & PNG_HAVE_IHDR) == 0)
+         png_error(png_ptr, "invalid before the PNG header has been read");
+
+      /* Turn on failure to initialize correctly for all transforms. */
+      png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
+
+      return 1; /* Ok */
+   }
+
+   return 0; /* no png_error possible! */
+}
+#endif
+
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
 /* Handle alpha and tRNS via a background color */
 void PNGFAPI
@@ -97,7 +124,7 @@ png_set_background_fixed(png_structrp png_ptr,
 {
    png_debug(1, "in png_set_background_fixed");
 
-   if (png_ptr == NULL || background_color == NULL)
+   if (!png_rtran_ok(png_ptr, 0) || background_color == NULL)
       return;
 
    if (background_gamma_code == PNG_BACKGROUND_GAMMA_UNKNOWN)
@@ -141,7 +168,7 @@ png_set_scale_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_scale_16");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= PNG_SCALE_16_TO_8;
@@ -155,7 +182,7 @@ png_set_strip_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_strip_16");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= PNG_16_TO_8;
@@ -168,7 +195,7 @@ png_set_strip_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_strip_alpha");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= PNG_STRIP_ALPHA;
@@ -247,7 +274,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
 
    png_debug(1, "in png_set_alpha_mode");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    output_gamma = translate_gamma_flags(png_ptr, output_gamma, 1/*screen*/);
@@ -342,9 +369,6 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
 
       png_ptr->transformations |= PNG_COMPOSE;
    }
-
-   /* New API, make sure apps call the correct initializers: */
-   png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -383,7 +407,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 {
    png_debug(1, "in png_set_quantize");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= PNG_QUANTIZE;
@@ -770,7 +794,7 @@ png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
 {
    png_debug(1, "in png_set_gamma_fixed");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    /* New in libpng-1.5.4 - reserve particular negative values as flags. */
@@ -822,16 +846,10 @@ png_set_expand(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-   {
-      /* TODO: should probably be an error */
-      png_warning(png_ptr, "png_set_expand called after row initialization");
-      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-   }
 }
 
 /* GRR 19990627:  the following three functions currently are identical
@@ -858,17 +876,10 @@ png_set_palette_to_rgb(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_palette_to_rgb");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-   {
-      /* TODO: should probably be an error */
-      png_warning(png_ptr,
-         "png_set_palette_to_rgb called after row initialization");
-      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-   }
 }
 
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
@@ -877,20 +888,11 @@ png_set_expand_gray_1_2_4_to_8(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= PNG_EXPAND;
-   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-   {
-      /* TODO: should probably be an error */
-      png_warning(png_ptr,
-         "png_set_expand_gray_1_2_4_to_8 called after row initialization");
-      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-   }
 }
-
-
 
 /* Expand tRNS chunks to alpha channels. */
 void PNGAPI
@@ -898,14 +900,10 @@ png_set_tRNS_to_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_tRNS_to_alpha");
 
+   if (!png_rtran_ok(png_ptr, 0))
+      return;
+
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
-   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-   {
-      /* TODO: should probably be an error */
-      png_warning(png_ptr,
-         "png_set_tRNS_to_alpha called after row initialization");
-      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-   }
 }
 #endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
 
@@ -918,20 +916,10 @@ png_set_expand_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand_16");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
    png_ptr->transformations |= (PNG_EXPAND_16 | PNG_EXPAND | PNG_EXPAND_tRNS);
-   if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-   {
-      /* TODO: should probably be an error */
-      png_warning(png_ptr,
-         "png_set_expand_16 called after row initialization");
-      png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-   }
-
-   /* New API, make sure apps call the correct initializers: */
-   png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
 }
 #endif
 
@@ -941,19 +929,12 @@ png_set_gray_to_rgb(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_gray_to_rgb");
 
-   if (png_ptr != NULL)
-   {
-      /* Because rgb must be 8 bits or more: */
-      png_set_expand_gray_1_2_4_to_8(png_ptr);
-      png_ptr->transformations |= PNG_GRAY_TO_RGB;
-      if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-      {
-         /* TODO: should probably be an error */
-         png_warning(png_ptr,
-            "png_set_gray_to_rgb called after row initialization");
-         png_ptr->flags &= ~PNG_FLAG_ROW_INIT;
-      }
-   }
+   if (!png_rtran_ok(png_ptr, 0))
+      return;
+
+   /* Because rgb must be 8 bits or more: */
+   png_set_expand_gray_1_2_4_to_8(png_ptr);
+   png_ptr->transformations |= PNG_GRAY_TO_RGB;
 }
 #endif
 
@@ -964,7 +945,9 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
 {
    png_debug(1, "in png_set_rgb_to_gray");
 
-   if (png_ptr == NULL)
+   /* Need the IHDR here because of the check on color_type below. */
+   /* TODO: fix this */
+   if (!png_rtran_ok(png_ptr, 1))
       return;
 
    switch(error_action)
@@ -990,10 +973,13 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
       png_ptr->transformations |= PNG_EXPAND;
 #else
    {
-      png_warning(png_ptr,
+      /* Make this an error in 1.6 because otherwise the application may assume
+       * that it just worked and get a memory overwrite.
+       */
+      png_error(png_ptr,
         "Cannot do RGB_TO_GRAY without EXPAND_SUPPORTED");
 
-      png_ptr->transformations &= ~PNG_RGB_TO_GRAY;
+      /* png_ptr->transformations &= ~PNG_RGB_TO_GRAY; */
    }
 #endif
    {
@@ -1046,16 +1032,13 @@ void PNGAPI
 png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
    double green)
 {
-   if (png_ptr == NULL)
-      return;
-
    png_set_rgb_to_gray_fixed(png_ptr, error_action,
       png_fixed(png_ptr, red, "rgb to gray red coefficient"),
       png_fixed(png_ptr, green, "rgb to gray green coefficient"));
 }
 #endif /* FLOATING POINT */
 
-#endif
+#endif /* RGB_TO_GRAY */
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
@@ -1065,7 +1048,7 @@ png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
 {
    png_debug(1, "in png_set_read_user_transform_fn");
 
-   if (png_ptr == NULL)
+   if (!png_rtran_ok(png_ptr, 0))
       return;
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
@@ -2122,8 +2105,9 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
    /* The following is debugging; prior to 1.5.4 the code was never compiled in;
     * in 1.5.4 PNG_FLAG_DETECT_UNINITIALIZED was added and the macro
-    * PNG_WARN_UNINITIALIZED_ROW removed.  In 1.5 the new flag is set only for
-    * selected new APIs to ensure that there is no API change.
+    * PNG_WARN_UNINITIALIZED_ROW removed.  In 1.6 the new flag is set only for
+    * all transformations, however in practice the ROW_INIT always gets done on
+    * demand, if necessary.
     */
    if ((png_ptr->flags & PNG_FLAG_DETECT_UNINITIALIZED) != 0 &&
       !(png_ptr->flags & PNG_FLAG_ROW_INIT))

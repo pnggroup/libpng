@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta19 - March 18, 2012
+Libpng 1.6.0beta19 - March 19, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -318,7 +318,7 @@ Version 1.6.0beta18 [March 16, 2012]
     read benign errors to warnings (regardless of the system default, unless
     this is disabled in which case the simplified API can't be built.)
 
-Version 1.6.0beta19 [March 18, 2012]
+Version 1.6.0beta19 [March 19, 2012]
   Work around for duplicate row start calls; added warning messages.
     This turns on PNG_FLAG_DETECT_UNINITIALIZED to detect app code that
     fails to call one of the 'start' routines (not enabled in libpng-1.5
@@ -328,6 +328,11 @@ Version 1.6.0beta19 [March 18, 2012]
     they were before changes to use png_inflate_claim. Somehow webkit is
     causing this to happen; this is probably a mis-feature in the zlib
     changes so this commit is only a work-round.
+  Removed erroneous setting of DETECT_UNINITIALIZED and added more
+    checks. The code now does a png_error if an attempt is made to do the
+    row initialization twice; this is an application error and it has
+    serious consequences because the transform data in png_struct is
+    changed by each call.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
