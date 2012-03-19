@@ -299,7 +299,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 
 #define READ_FILE 1      /* else memory */
 #define USE_STDIO 2      /* else use file name */
-/* 4: unused */
+#define STRICT 4         /* fail on warnings too */
 #define VERBOSE 8
 #define KEEP_TMPFILES 16 /* else delete temporary files */
 #define KEEP_GOING 32
@@ -313,6 +313,8 @@ print_opts(png_uint_32 opts)
       printf(" --file");
    if (opts & USE_STDIO)
       printf(" --stdio");
+   if (opts & STRICT)
+      printf(" --strict");
    if (opts & VERBOSE)
       printf(" --verbose");
    if (opts & KEEP_TMPFILES)
@@ -321,6 +323,8 @@ print_opts(png_uint_32 opts)
       printf(" --keep-going");
    if (opts & ACCUMULATE)
       printf(" --accumulate");
+   if (!(opts & FAST_WRITE)) /* --fast is currently the default */
+      printf(" --slow");
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -714,6 +718,9 @@ checkopaque(Image *image)
       png_image_free(&image->image);
       return logerror(image, image->file_name, ": opaque not NULL", "");
    }
+
+   else if (image->image.warning_or_error != 0 && (image->opts & STRICT) != 0)
+      return logerror(image, image->file_name, " --strict", "");
 
    else
       return 1;
@@ -3454,6 +3461,8 @@ main(int argc, char **argv)
          redundant = 1;
       else if (strcmp(arg, "--stop") == 0)
          opts &= ~KEEP_GOING;
+      else if (strcmp(arg, "--strict") == 0)
+         opts |= STRICT;
       else if (strcmp(arg, "--touch") == 0)
       {
          if (c+1 < argc)

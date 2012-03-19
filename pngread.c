@@ -1839,6 +1839,17 @@ png_create_colormap_entry(png_image_read_control *display,
 }
 
 static int
+make_gray_file_colormap(png_image_read_control *display)
+{
+   unsigned int i;
+
+   for (i=0; i<256; ++i)
+      png_create_colormap_entry(display, i, i, i, i, 255, E_FILE);
+
+   return i;
+}
+
+static int
 make_gray_colormap(png_image_read_control *display)
 {
    unsigned int i;
@@ -2368,7 +2379,23 @@ png_image_read_colormap(png_voidp argument)
                if (PNG_GRAY_COLORMAP_ENTRIES > image->colormap_entries)
                   png_error(png_ptr, "rgb[gray] color-map: too few entries");
 
-               cmap_entries = make_gray_colormap(display);
+               /* Ideally this code would use libpng to do the gamma correction,
+                * but if an input alpha channel is to be removed we will hit the
+                * libpng bug in gamma+compose+rgb-to-gray (the double gamma
+                * correction bug).  Fix this by dropping the gamma correction in
+                * this case and doing it in the palette; this will result in
+                * duplicate palette entries, but that's better than the
+                * alternative of double gamma correction.
+                */
+               if ((png_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
+                  png_ptr->num_trans > 0) && png_gamma_not_sRGB(png_ptr->gamma))
+               {
+                  cmap_entries = make_gray_file_colormap(display);
+                  data_encoding = E_FILE;
+               }
+
+               else
+                  cmap_entries = make_gray_colormap(display);
 
                /* But if the input has alpha or transparency it must be removed
                 */
@@ -2383,18 +2410,38 @@ png_image_read_colormap(png_voidp argument)
                    * it.  Achieve this simply by ensuring that the entry
                    * selected for the background really is the background color.
                    */
-                  if (output_encoding == E_LINEAR)
+                  if (data_encoding == E_FILE) /* from the fixup above */
+                  {
+                     /* The app supplied a gray which is in output_encoding, we
+                      * need to convert it to a value of the input (E_FILE)
+                      * encoding then set this palette entry to the required
+                      * output encoding.
+                      */
+                     if (output_encoding == E_sRGB)
+                        gray = png_sRGB_table[gray]; /* now E_LINEAR */
+
+                     gray = PNG_DIV257(png_gamma_16bit_correct(gray,
+                        png_ptr->gamma)); /* now E_FILE */
+
+                     /* And make sure the corresponding palette entry contains
+                      * exactly the required sRGB value.
+                      */
+                     png_create_colormap_entry(display, gray, back_g, back_g,
+                        back_g, 0/*unused*/, output_encoding);
+                  }
+
+                  else if (output_encoding == E_LINEAR)
                   {
                      gray = PNG_sRGB_FROM_LINEAR(gray * 255);
 
                      /* And make sure the corresponding palette entry matches.
                       */
                      png_create_colormap_entry(display, gray, back_g, back_g,
-                        back_g, 65535, E_LINEAR);
+                        back_g, 0/*unused*/, E_LINEAR);
                   }
 
-                  /* The background passed to libpng, however, must be the sRGB
-                   * value.
+                  /* The background passed to libpng, however, must be the
+                   * output (normally sRGB) value.
                    */
                   c.index = 0; /*unused*/
                   c.gray = c.red = c.green = c.blue = (png_uint_16)gray;
@@ -2657,13 +2704,12 @@ png_image_read_colormap(png_voidp argument)
          png_error(png_ptr, "bad data option (internal error)");
          break;
 
-      case E_FILE:
-         /* Make no changes */
-         break;
-
       case E_sRGB:
          /* Change to 8-bit sRGB */
          png_set_alpha_mode_fixed(png_ptr, PNG_ALPHA_PNG, PNG_GAMMA_sRGB);
+         /* FALL THROUGH */
+
+      case E_FILE:
          if (png_ptr->bit_depth > 8)
             png_set_scale_16(png_ptr);
          break;

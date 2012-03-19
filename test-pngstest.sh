@@ -11,7 +11,7 @@ for image in ${srcdir}/contrib/pngsuite/*.png
 do
    for opts in ""
    do
-      if ./pngstest --log "$@" $opts $image >>pngtest-log.txt 2>&1
+      if ./pngstest --strict --log "$@" $opts $image >>pngtest-log.txt 2>&1
       then
          echo "  PASS: pngstest $opts $image"
       else

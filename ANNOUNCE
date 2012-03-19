@@ -336,6 +336,8 @@ Version 1.6.0beta19 [March 19, 2012]
   Added application error reporting and added chunk names to read
     benign errors; also added --strict to pngstest - not enabled
     yet because a warning is produced.
+  Avoid the double gamma correction warning in the simplified API.
+    This allows the --strict option to pass in the pngstest checks
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
