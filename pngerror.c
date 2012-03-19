@@ -360,12 +360,47 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
 void PNGAPI
 png_benign_error(png_const_structrp png_ptr, png_const_charp error_message)
 {
-  if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+   if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
+   {
+#     ifdef PNG_READ_SUPPORTED
+         if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
+            png_ptr->chunk_name != 0)
+            png_chunk_warning(png_ptr, error_message);
+         else
+#     endif
+      png_warning(png_ptr, error_message);
+   }
+
+   else
+   {
+#     ifdef PNG_READ_SUPPORTED
+         if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
+            png_ptr->chunk_name != 0)
+            png_chunk_error(png_ptr, error_message);
+         else
+#     endif
+      png_error(png_ptr, error_message);
+   }
+}
+
+void /* PRIVATE */
+png_app_warning(png_const_structrp png_ptr, png_const_charp error_message)
+{
+  if (png_ptr->flags & PNG_FLAG_APP_WARNINGS_WARN)
      png_warning(png_ptr, error_message);
   else
      png_error(png_ptr, error_message);
 }
-#endif
+
+void /* PRIVATE */
+png_app_error(png_const_structrp png_ptr, png_const_charp error_message)
+{
+  if (png_ptr->flags & PNG_FLAG_APP_ERRORS_WARN)
+     png_warning(png_ptr, error_message);
+  else
+     png_error(png_ptr, error_message);
+}
+#endif /* BENIGN_ERRORS */
 
 /* These utilities are used internally to build an error message that relates
  * to the current chunk.  The chunk name comes from png_ptr->chunk_name,

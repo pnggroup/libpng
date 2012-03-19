@@ -4084,6 +4084,9 @@ Version 1.6.0beta19 [March 19, 2012]
     row initialization twice; this is an application error and it has
     serious consequences because the transform data in png_struct is
     changed by each call.
+  Added application error reporting and added chunk names to read
+    benign errors; also added --strict to pngstest - not enabled
+    yet because a warning is produced.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

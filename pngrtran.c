@@ -99,16 +99,19 @@ png_rtran_ok(png_structrp png_ptr, int need_IHDR)
    if (png_ptr != NULL)
    {
       if (png_ptr->flags & PNG_FLAG_ROW_INIT)
-         png_error(png_ptr,
+         png_app_error(png_ptr,
             "invalid after png_start_read_image or png_read_update_info");
 
-      if (need_IHDR && (png_ptr->mode & PNG_HAVE_IHDR) == 0)
-         png_error(png_ptr, "invalid before the PNG header has been read");
+      else if (need_IHDR && (png_ptr->mode & PNG_HAVE_IHDR) == 0)
+         png_app_error(png_ptr, "invalid before the PNG header has been read");
 
-      /* Turn on failure to initialize correctly for all transforms. */
-      png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
+      else
+      {
+         /* Turn on failure to initialize correctly for all transforms. */
+         png_ptr->flags |= PNG_FLAG_DETECT_UNINITIALIZED;
 
-      return 1; /* Ok */
+         return 1; /* Ok */
+      }
    }
 
    return 0; /* no png_error possible! */

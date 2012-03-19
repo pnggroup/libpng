@@ -532,8 +532,8 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_FLAG_STRIP_ERROR_NUMBERS     0x40000
 #define PNG_FLAG_STRIP_ERROR_TEXT        0x80000
 #define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000 /* Added to libpng-1.4.0 */
-                                  /*    0x200000    unused */
-                                  /*    0x400000    unused */
+#define PNG_FLAG_APP_WARNINGS_WARN      0x200000 /* Added to libpng-1.6.0 */
+#define PNG_FLAG_APP_ERRORS_WARN        0x400000 /* Added to libpng-1.6.0 */
                                   /*    0x800000    unused */
                                   /*   0x1000000    unused */
                                   /*   0x2000000    unused */
@@ -1528,6 +1528,37 @@ PNG_INTERNAL_FUNCTION(void,png_formatted_warning,(png_const_structrp png_ptr,
     * parameters previously supplied using the above functions.  Errors in
     * specifying the parameters will simple result in garbage substitutions.
     */
+#endif
+
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
+/* Application errors (new in 1.6); use these functions (declared below) for
+ * errors in the parameters or order of API function calls on read.  The
+ * 'warning' should be used for an error that can be handled completely, the
+ * 'error' for one which can be handled safely but which may lose application
+ * information or settings.
+ *
+ * By default these both result in a png_error call prior to release, while in a
+ * released version the 'warning' is just a warning.  However if the application
+ * explicitly disables benign errors (explicitly permitting the code to lose
+ * information) they both turn into warnings.
+ *
+ * If benign errors aren't supported they end up as the corresponding base call
+ * (png_warning or png_error.)
+ */
+PNG_INTERNAL_FUNCTION(void,png_app_warning,(png_const_structrp png_ptr,
+   png_const_charp message),PNG_EMPTY);
+   /* The application provided invalid parameters to an API function or called
+    * an API function at the wrong time, libpng can completely recovered.
+    */
+
+PNG_INTERNAL_FUNCTION(void,png_app_error,(png_const_structrp png_ptr,
+   png_const_charp message),PNG_EMPTY);
+   /* As above but libpng will ignore the call, or attempt some other partial
+    * recovery from the error.
+    */
+#else
+#  define png_app_warning(pp,s) png_warning(pp,s)
+#  define png_app_error(pp,s) png_error(pp,s)
 #endif
 
 /* ASCII to FP interfaces, currently only implemented if sCAL

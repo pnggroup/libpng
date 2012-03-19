@@ -59,6 +59,13 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
          png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+
+         /* In stable builds only warn if an application error can be completely
+          * handled.
+          */
+#        if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
+            png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
+#        endif
 #     endif
 
       /* TODO: delay this, it can be done in png_init_io (if the app doesn't
@@ -264,7 +271,7 @@ png_read_update_info(png_structrp png_ptr, png_inforp info_ptr)
 
       /* New in 1.6.0 this avoids the bug of doing the initializations twice */
       else
-         png_error(png_ptr,
+         png_app_error(png_ptr,
             "png_read_update_info/png_start_read_image: duplicate call");
    }
 }
@@ -287,7 +294,7 @@ png_start_read_image(png_structrp png_ptr)
 
       /* New in 1.6.0 this avoids the bug of doing the initializations twice */
       else
-         png_error(png_ptr,
+         png_app_error(png_ptr,
             "png_start_read_image/png_read_update_info: duplicate call");
    }
 }
