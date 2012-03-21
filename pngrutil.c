@@ -1436,6 +1436,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                               sizeof profile_header);
 
                            size = (sizeof profile_header) + 12 * tag_count;
+
                            ret = png_inflate_read(png_ptr, local_buffer,
                               sizeof local_buffer, &length,
                               profile + (sizeof profile_header), &size, 0);
@@ -1451,6 +1452,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                   */
                                  size = profile_length - (sizeof profile_header)
                                     - 12 * tag_count;
+
                                  ret = png_inflate_read(png_ptr, local_buffer,
                                     sizeof local_buffer, &length,
                                     profile + (sizeof profile_header) +
@@ -1458,6 +1460,24 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                                  if (size == 0)
                                  {
+                                    int
+                                      icheck;
+
+                                    /* Known sRGB profiles:
+                                     * 0: not a known sRGB profile
+                                     * 1: HP-Microsoft sRGB v2
+                                     * 2: ICC sRGB v4 perceptual
+                                     * 3: ICC sRGB v2 perceptual
+                                     *    no black-compensation
+                                     */
+
+                                    png_uint_32 check_crc[4] = {0,
+                                        0xf29e526dUL, 0xbbef7812UL,
+                                        0x427ebb21UL},
+
+                                    check_len[4] = {0, 3144, 60960,
+                                        3052};
+
                                     if (ret != Z_STREAM_END)
                                        png_chunk_warning(png_ptr,
                                           png_ptr->zstream.msg);
@@ -1475,12 +1495,40 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     if (png_crc_finish(png_ptr, length))
                                        return;
 
+                                    /* See if it's a known sRGB profile. */
+
+                                    for (icheck=3; icheck > 0; icheck--)
+                                    {
+                                       if (profile_length == check_len[icheck])
+                                       {
+                                          png_uint_32 profile_crc = crc32(0,
+                                              profile, profile_length);
+
+                                          if (profile_crc ==
+                                              check_crc[icheck])
+                                          {
+                                             (void)png_colorspace_set_sRGB(
+                                                 png_ptr,
+                                                 &png_ptr->colorspace,
+                                                 PNG_sRGB_INTENT_PERCEPTUAL,
+                                                 0);
+
+                                              png_colorspace_sync(png_ptr,
+                                                 info_ptr);
+
+                                              png_free(png_ptr, profile);
+
+                                              return;
+                                           }
+                                       }
+                                    } 
+
                                     /* Set the gAMA and cHRM information */
                                     png_icc_set_gAMA_and_cHRM(png_ptr,
                                        &png_ptr->colorspace, keyword, profile,
                                        0/*prefer explicit gAMA/cHRM*/);
 
-                                    /* And steal the profile for info_ptr. */
+                                    /* Steal the profile for info_ptr. */
                                     if (info_ptr != NULL)
                                     {
                                        png_free_data(png_ptr, info_ptr,
