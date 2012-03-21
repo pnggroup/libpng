@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta20 - March 19, 2012
+ * libpng version 1.6.0beta20 - March 21, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta20 - March 19, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta20 - March 21, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta20, March 19, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta20, March 21, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 19, 2012
+ *    March 21, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -376,7 +376,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta20"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta20 - March 19, 2012\n"
+     " libpng version 1.6.0beta20 - March 21, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -1095,9 +1095,9 @@ PNG_EXPORTA(19, void, png_info_init_3, (png_infopp info_ptr,
 
 /* Writes all the PNG information before the image. */
 PNG_EXPORT(20, void, png_write_info_before_PLTE,
-    (png_structrp png_ptr, png_inforp info_ptr));
+    (png_structrp png_ptr, png_const_inforp info_ptr));
 PNG_EXPORT(21, void, png_write_info,
-    (png_structrp png_ptr, png_inforp info_ptr));
+    (png_structrp png_ptr, png_const_inforp info_ptr));
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the information before the actual image data. */
@@ -1892,9 +1892,12 @@ PNG_EXPORT(98, void, png_free_data, (png_const_structrp png_ptr,
 /* Reassign responsibility for freeing existing data, whether allocated
  * by libpng or by the application; this works on the png_info structure passed
  * in, it does not change the state for other png_info structures.
+ *
+ * It is unlikely that this function works correctly as of 1.6.0 and using it
+ * may result either in memory leaks or double free of allocated data.
  */
-PNG_EXPORT(99, void, png_data_freer, (png_const_structrp png_ptr,
-    png_inforp info_ptr, int freer, png_uint_32 mask));
+PNG_EXPORTA(99, void, png_data_freer, (png_const_structrp png_ptr,
+    png_inforp info_ptr, int freer, png_uint_32 mask), PNG_DEPRECATED);
 
 /* Assignments for png_data_freer */
 #define PNG_DESTROY_WILL_FREE_DATA 1
@@ -2084,14 +2087,12 @@ PNG_FP_EXPORT(230, png_uint_32, png_get_cHRM_XYZ, (png_const_structrp png_ptr,
     png_const_inforp info_ptr, double *red_X, double *red_Y, double *red_Z,
     double *green_X, double *green_Y, double *green_Z, double *blue_X,
     double *blue_Y, double *blue_Z))
-#ifdef PNG_FIXED_POINT_SUPPORTED /* Otherwise not implemented */
 PNG_FIXED_EXPORT(134, png_uint_32, png_get_cHRM_fixed,
     (png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_fixed_point *int_white_x, png_fixed_point *int_white_y,
     png_fixed_point *int_red_x, png_fixed_point *int_red_y,
     png_fixed_point *int_green_x, png_fixed_point *int_green_y,
     png_fixed_point *int_blue_x, png_fixed_point *int_blue_y))
-#endif
 PNG_FIXED_EXPORT(231, png_uint_32, png_get_cHRM_XYZ_fixed,
     (png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_fixed_point *int_red_X, png_fixed_point *int_red_Y,

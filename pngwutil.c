@@ -1200,20 +1200,23 @@ png_write_sRGB(png_structrp png_ptr, int srgb_intent)
 #ifdef PNG_WRITE_iCCP_SUPPORTED
 /* Write an iCCP chunk */
 void /* PRIVATE */
-png_write_iCCP(png_structrp png_ptr, png_const_charp name, int compression_type,
-    png_const_bytep profile, png_uint_32 profile_len)
+png_write_iCCP(png_structrp png_ptr, png_const_charp name,
+    png_const_bytep profile)
 {
    png_uint_32 name_len;
+   png_uint_32 profile_len;
    png_byte new_name[81]; /* 1 byte for the compression byte */
    compression_state comp;
 
    png_debug(1, "in png_write_iCCP");
 
-   if (compression_type != PNG_COMPRESSION_TYPE_BASE)
-      png_error(png_ptr, "Unknown compression type for iCCP chunk");
-
+   /* These are all internal problems: the profile should have been checked
+    * before when it was stored.
+    */
    if (profile == NULL)
-      png_error(png_ptr, "No profile for iCCP chunk");
+      png_error(png_ptr, "No profile for iCCP chunk"); /* internal error */
+
+   profile_len = png_get_uint_32(profile);
 
    if (profile_len < 132)
       png_error(png_ptr, "ICC profile too short");
@@ -1401,35 +1404,26 @@ png_write_sBIT(png_structrp png_ptr, png_const_color_8p sbit, int color_type)
 #ifdef PNG_WRITE_cHRM_SUPPORTED
 /* Write the cHRM chunk */
 void /* PRIVATE */
-png_write_cHRM_fixed(png_structrp png_ptr, png_fixed_point white_x,
-    png_fixed_point white_y, png_fixed_point red_x, png_fixed_point red_y,
-    png_fixed_point green_x, png_fixed_point green_y, png_fixed_point blue_x,
-    png_fixed_point blue_y)
+png_write_cHRM_fixed(png_structrp png_ptr, const png_xy *xy)
 {
    png_byte buf[32];
 
    png_debug(1, "in png_write_cHRM");
 
    /* Each value is saved in 1/100,000ths */
-#ifdef PNG_CHECK_cHRM_SUPPORTED
-   if (png_check_cHRM_fixed(png_ptr, white_x, white_y, red_x, red_y,
-       green_x, green_y, blue_x, blue_y))
-#endif
-   {
-      png_save_uint_32(buf, (png_uint_32)white_x);
-      png_save_uint_32(buf + 4, (png_uint_32)white_y);
+   png_save_int_32(buf,      xy->whitex);
+   png_save_int_32(buf +  4, xy->whitey);
 
-      png_save_uint_32(buf + 8, (png_uint_32)red_x);
-      png_save_uint_32(buf + 12, (png_uint_32)red_y);
+   png_save_int_32(buf +  8, xy->redx);
+   png_save_int_32(buf + 12, xy->redy);
 
-      png_save_uint_32(buf + 16, (png_uint_32)green_x);
-      png_save_uint_32(buf + 20, (png_uint_32)green_y);
+   png_save_int_32(buf + 16, xy->greenx);
+   png_save_int_32(buf + 20, xy->greeny);
 
-      png_save_uint_32(buf + 24, (png_uint_32)blue_x);
-      png_save_uint_32(buf + 28, (png_uint_32)blue_y);
+   png_save_int_32(buf + 24, xy->bluex);
+   png_save_int_32(buf + 28, xy->bluey);
 
-      png_write_complete_chunk(png_ptr, png_cHRM, buf, (png_size_t)32);
-   }
+   png_write_complete_chunk(png_ptr, png_cHRM, buf, 32);
 }
 #endif
 

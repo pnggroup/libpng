@@ -349,8 +349,11 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
     * the side effect that the gamma in a second call to png_set_alpha_mode will
     * be ignored.)
     */
-   if (png_ptr->gamma == 0)
-      png_ptr->gamma = file_gamma;
+   if (png_ptr->colorspace.gamma == 0)
+   {
+      png_ptr->colorspace.gamma = file_gamma;
+      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
+   }
 
    /* But always set the output gamma: */
    png_ptr->screen_gamma = output_gamma;
@@ -362,7 +365,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
    {
       /* And obtain alpha pre-multiplication by composing on black: */
       png_memset(&png_ptr->background, 0, sizeof png_ptr->background);
-      png_ptr->background_gamma = png_ptr->gamma; /* just in case */
+      png_ptr->background_gamma = png_ptr->colorspace.gamma; /* just in case */
       png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_FILE;
       png_ptr->transformations &= ~PNG_BACKGROUND_EXPAND;
 
@@ -825,7 +828,8 @@ png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
     * file if a gAMA chunk was present.  png_set_alpha_mode provides a
     * different, easier, way to default the file gamma.
     */
-   png_ptr->gamma = file_gamma;
+   png_ptr->colorspace.gamma = file_gamma;
+   png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
    png_ptr->screen_gamma = scrn_gamma;
 }
 
@@ -971,6 +975,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
          png_error(png_ptr, "invalid error action to rgb_to_gray");
          break;
    }
+
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #ifdef PNG_READ_EXPAND_SUPPORTED
       png_ptr->transformations |= PNG_EXPAND;
@@ -1006,7 +1011,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
       else
       {
          if (red >= 0 && green >= 0)
-            png_warning(png_ptr,
+            png_app_warning(png_ptr,
                "ignoring out of range rgb_to_gray coefficients");
 
          /* Use the defaults, from the cHRM chunk if set, else the historical
@@ -1286,17 +1291,17 @@ png_init_read_transformations(png_structrp png_ptr)
        */
       int gamma_correction = 0;
 
-      if (png_ptr->gamma != 0) /* has been set */
+      if (png_ptr->colorspace.gamma != 0) /* has been set */
       {
          if (png_ptr->screen_gamma != 0) /* screen set too */
-            gamma_correction = png_gamma_threshold(png_ptr->gamma,
+            gamma_correction = png_gamma_threshold(png_ptr->colorspace.gamma,
                png_ptr->screen_gamma);
 
          else
             /* Assume the output matches the input; a long time default behavior
              * of libpng, although the standard has nothing to say about this.
              */
-            png_ptr->screen_gamma = png_reciprocal(png_ptr->gamma);
+            png_ptr->screen_gamma = png_reciprocal(png_ptr->colorspace.gamma);
       }
 
       else if (png_ptr->screen_gamma != 0)
@@ -1305,7 +1310,7 @@ png_init_read_transformations(png_structrp png_ptr)
           * png_set_alpha_mode (even if the alpha handling mode isn't required
           * or isn't changed from the default.)
           */
-         png_ptr->gamma = png_reciprocal(png_ptr->screen_gamma);
+         png_ptr->colorspace.gamma = png_reciprocal(png_ptr->screen_gamma);
 
       else /* neither are set */
          /* Just in case the following prevents any processing - file and screen
@@ -1313,7 +1318,10 @@ png_init_read_transformations(png_structrp png_ptr)
           * third gamma value other than png_set_background with 'UNIQUE', and,
           * prior to 1.5.4
           */
-         png_ptr->screen_gamma = png_ptr->gamma = PNG_FP_1;
+         png_ptr->screen_gamma = png_ptr->colorspace.gamma = PNG_FP_1;
+
+      /* We have a gamma value now. */
+      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
 
       /* Now turn the gamma transformation on or off as appropriate.  Notice
        * that PNG_GAMMA just refers to the file->screen correction.  Alpha
@@ -1395,9 +1403,16 @@ png_init_read_transformations(png_structrp png_ptr)
    }
 #endif
 
-#if defined(PNG_READ_EXPAND_SUPPORTED) && \
-   defined(PNG_READ_BACKGROUND_SUPPORTED) && \
-   defined(PNG_READ_GRAY_TO_RGB_SUPPORTED)
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+   /* Make sure the coefficients for the rgb to gray convertion are set
+    * appropriately.
+    */
+   if (png_ptr->transformations & PNG_RGB_TO_GRAY)
+      png_colorspace_set_rgb_coefficients(png_ptr);
+#endif
+
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
+#if defined PNG_READ_EXPAND_SUPPORTED && defined PNG_READ_BACKGROUND_SUPPORTED
    /* Detect gray background and attempt to enable optimization for
     * gray --> RGB case.
     *
@@ -1439,7 +1454,8 @@ png_init_read_transformations(png_structrp png_ptr)
          }
       }
    }
-#endif /* PNG_READ_GRAY_TO_RGB_SUPPORTED (etc) */
+#endif /* PNG_READ_EXPAND_SUPPORTED && PNG_READ_BACKGROUND_SUPPORTED */
+#endif /* PNG_READ_GRAY_TO_RGB_SUPPORTED */
 
    /* For indexed PNG data (PNG_COLOR_TYPE_PALETTE) many of the transformations
     * can be performed directly on the palette, and some (such as rgb to gray)
@@ -1535,10 +1551,10 @@ png_init_read_transformations(png_structrp png_ptr)
     */
    if ((png_ptr->transformations & PNG_GAMMA)
       || ((png_ptr->transformations & PNG_RGB_TO_GRAY)
-         && (png_gamma_significant(png_ptr->gamma) ||
+         && (png_gamma_significant(png_ptr->colorspace.gamma) ||
             png_gamma_significant(png_ptr->screen_gamma)))
       || ((png_ptr->transformations & PNG_COMPOSE)
-         && (png_gamma_significant(png_ptr->gamma)
+         && (png_gamma_significant(png_ptr->colorspace.gamma)
             || png_gamma_significant(png_ptr->screen_gamma)
 #  ifdef PNG_READ_BACKGROUND_SUPPORTED
             || (png_ptr->background_gamma_type == PNG_BACKGROUND_GAMMA_UNIQUE
@@ -1595,8 +1611,8 @@ png_init_read_transformations(png_structrp png_ptr)
                      break;
 
                   case PNG_BACKGROUND_GAMMA_FILE:
-                     g = png_reciprocal(png_ptr->gamma);
-                     gs = png_reciprocal2(png_ptr->gamma,
+                     g = png_reciprocal(png_ptr->colorspace.gamma);
+                     gs = png_reciprocal2(png_ptr->colorspace.gamma,
                         png_ptr->screen_gamma);
                      break;
 
@@ -1704,8 +1720,9 @@ png_init_read_transformations(png_structrp png_ptr)
                   break;
 
                case PNG_BACKGROUND_GAMMA_FILE:
-                  g = png_reciprocal(png_ptr->gamma);
-                  gs = png_reciprocal2(png_ptr->gamma, png_ptr->screen_gamma);
+                  g = png_reciprocal(png_ptr->colorspace.gamma);
+                  gs = png_reciprocal2(png_ptr->colorspace.gamma,
+                     png_ptr->screen_gamma);
                   break;
 
                case PNG_BACKGROUND_GAMMA_UNIQUE:
@@ -1944,8 +1961,12 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
     * however it seems that the code in png_init_read_transformations, which has
     * been called before this from png_read_update_info->png_read_start_row
     * sometimes does the gamma transform and cancels the flag.
+    *
+    * TODO: this looks wrong; the info_ptr should end up with a gamma equal to
+    * the screen_gamma value.  The following probably results in weirdness if
+    * the info_ptr is used by the app after the rows have been read.
     */
-   info_ptr->gamma = png_ptr->gamma;
+   info_ptr->colorspace.gamma = png_ptr->colorspace.gamma;
 #endif
 
    if (info_ptr->bit_depth == 16)

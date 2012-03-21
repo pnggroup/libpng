@@ -70,11 +70,13 @@ struct png_info_def
    png_byte filter_type;    /* must be PNG_FILTER_TYPE_BASE (from IHDR) */
    png_byte interlace_type; /* One of PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
 
+#ifdef PNG_READ_SUPPORTED
    /* The following is informational only on read, and not used on writes. */
    png_byte channels;       /* number of data channels per pixel (1, 2, 3, 4) */
    png_byte pixel_depth;    /* number of bits per pixel */
    png_byte spare_byte;     /* to align the data, and for future use */
    png_byte signature[8];   /* magic bytes read by libpng from start of file */
+#endif
 
    /* The rest of the data is optional.  If you are reading, check the
     * valid field to see if the information in these are valid.  If you
@@ -82,18 +84,25 @@ struct png_info_def
     * and initialize the appropriate fields below.
     */
 
-#if defined(PNG_gAMA_SUPPORTED)
-   /* The gAMA chunk describes the gamma characteristics of the system
-    * on which the image was created, normally in the range [1.0, 2.5].
-    * Data is valid if (valid & PNG_INFO_gAMA) is non-zero.
+#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+   /* png_colorspace only contains 'flags' if neither GAMMA or COLORSPACE are
+    * defined.  When COLORSPACE is switched on all the colorspace-defining
+    * chunks should be enabled, when GAMMA is switched on all the gamma-defining
+    * chunks should be enabled.  If this is not done it becomes possible to read
+    * inconsistent PNG files and assign a probably incorrect interpretation to
+    * the information.  (In other words, by carefully choosing which chunks to
+    * recognize the system configuration can select an interpretation for PNG
+    * files containing ambiguous data and this will result in inconsistent
+    * behavior between different libpng builds!)
     */
-   png_fixed_point gamma;
+   png_colorspace colorspace;
 #endif
 
-#ifdef PNG_sRGB_SUPPORTED
-    /* GR-P, 0.96a */
-    /* Data valid if (valid & PNG_INFO_sRGB) non-zero. */
-   png_byte srgb_intent; /* sRGB rendering intent [0, 1, 2, or 3] */
+#ifdef PNG_iCCP_SUPPORTED
+   /* iCCP chunk data. */
+   png_charp iccp_name;     /* profile name */
+   png_bytep iccp_profile;  /* International Color Consortium profile data */
+   png_uint_32 iccp_proflen;  /* ICC profile data length */
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED
@@ -183,23 +192,6 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    png_uint_16p hist;
 #endif
 
-#ifdef PNG_cHRM_SUPPORTED
-   /* The cHRM chunk describes the CIE color characteristics of the monitor
-    * on which the PNG was created.  This data allows the viewer to do gamut
-    * mapping of the input image to ensure that the viewer sees the same
-    * colors in the image as the creator.  Values are in the range
-    * [0.0, 0.8].  Data valid if (valid & PNG_INFO_cHRM) non-zero.
-    */
-   png_fixed_point x_white;
-   png_fixed_point y_white;
-   png_fixed_point x_red;
-   png_fixed_point y_red;
-   png_fixed_point x_green;
-   png_fixed_point y_green;
-   png_fixed_point x_blue;
-   png_fixed_point y_blue;
-#endif
-
 #ifdef PNG_pCAL_SUPPORTED
    /* The pCAL chunk describes a transformation between the stored pixel
     * values and original physical data values used to create the image.
@@ -229,14 +221,6 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
    int unknown_chunks_num;
-#endif
-
-#ifdef PNG_iCCP_SUPPORTED
-   /* iCCP chunk data. */
-   png_charp iccp_name;     /* profile name */
-   png_bytep iccp_profile;  /* International Color Consortium profile data */
-   png_uint_32 iccp_proflen;  /* ICC profile data length */
-   png_byte iccp_compression; /* Always zero */
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED

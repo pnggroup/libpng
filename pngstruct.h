@@ -69,6 +69,76 @@ typedef struct png_compression_buffer
    (offsetof(png_compression_buffer, output) + (pp)->zbuffer_size)
 #endif
 
+/* Colorspace support; structures used in png_struct, png_info and in internal
+ * functions to hold and communicate information about the color space.
+ *
+ * PNG_COLORSPACE_SUPPORTED is only required if the application will perform
+ * colorspace corrections, otherwise all the colorspace information can be
+ * skipped and the size of libpng can be reduced (significantly) by compiling
+ * out the colorspace support.
+ */
+#ifdef PNG_COLORSPACE_SUPPORTED
+/* The chromaticities of the red, green and blue colorants and the chromaticity
+ * of the corresponding white point (i.e. of rgb(1.0,1.0,1.0)).
+ */
+typedef struct png_xy
+{
+   png_fixed_point redx, redy;
+   png_fixed_point greenx, greeny;
+   png_fixed_point bluex, bluey;
+   png_fixed_point whitex, whitey;
+} png_xy;
+
+/* The same data as above but encoded as CIE XYZ values.  When this data comes
+ * from chromaticities the sum of the Y values is assumed to be 1.0
+ */
+typedef struct png_XYZ
+{
+   png_fixed_point redX, redY, redZ;
+   png_fixed_point greenX, greenY, greenZ;
+   png_fixed_point blueX, blueY, blueZ;
+} png_XYZ;
+#endif /* COLORSPACE */
+
+#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+/* A colorspace is all the above plus, potentially, profile information,
+ * however at present libpng does not use the profile internally so it is only
+ * stored in the png_info struct (if iCCP is supported.)  The rendering intent
+ * is retained here and is checked.
+ *
+ * The file gamma encoding information is also stored here and gamma correction
+ * is done by libpng, whereas color correction must currently be done by the
+ * application.
+ */
+typedef struct png_colorspace
+{
+#ifdef PNG_GAMMA_SUPPORTED
+   png_fixed_point gamma;        /* File gamma */
+#endif
+
+#ifdef PNG_COLORSPACE_SUPPORTED
+   png_xy      end_points_xy;    /* End points as chromaticities */
+   png_XYZ     end_points_XYZ;   /* End points as CIE XYZ colorant values */
+   png_uint_16 rendering_intent; /* Rendering intent of a profile */
+#endif
+
+   /* Flags are always defined to simplify the code. */
+   png_uint_16 flags;            /* As defined below */
+} png_colorspace, * PNG_RESTRICT png_colorspacerp;
+
+typedef const png_colorspace * PNG_RESTRICT png_const_colorspacerp;
+
+#define PNG_COLORSPACE_HAVE_GAMMA           0x0001
+#define PNG_COLORSPACE_HAVE_ENDPOINTS       0x0002
+#define PNG_COLORSPACE_HAVE_INTENT          0x0004
+#define PNG_COLORSPACE_FROM_gAMA            0x0008
+#define PNG_COLORSPACE_FROM_cHRM            0x0010
+#define PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB 0x0020
+#define PNG_COLORSPACE_MATCHES_sRGB         0x0040 /* exact match on profile */
+#define PNG_COLORSPACE_INVALID              0x8000
+#define PNG_COLORSPACE_CANCEL(flags)        (0xffff ^ (flags))
+#endif /* COLORSPACE || GAMMA */
+
 struct png_struct_def
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -153,10 +223,12 @@ struct png_struct_def
    png_bytep row_buf;         /* buffer to save current (unfiltered) row.
                                * This is a pointer into big_row_buf
                                */
+#ifdef PNG_WRITE_SUPPORTED
    png_bytep sub_row;         /* buffer to save "sub" row when filtering */
    png_bytep up_row;          /* buffer to save "up" row when filtering */
    png_bytep avg_row;         /* buffer to save "avg" row when filtering */
    png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
+#endif
    png_size_t info_rowbytes;  /* Added in 1.5.4: cache of updated row bytes */
 
    png_uint_32 idat_size;     /* current IDAT size for read */
@@ -186,11 +258,6 @@ struct png_struct_def
                               /* pixel depth used for the row buffers */
    png_byte transformed_pixel_depth;
                               /* pixel depth after read/write transforms */
-#if PNG_LIBPNG_VER < 10600
-   png_byte io_chunk_string[5];
-                              /* string name of chunk */
-#endif
-
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
    png_uint_16 filler;           /* filler bytes for pixel expansion */
 #endif
@@ -213,7 +280,6 @@ struct png_struct_def
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
    int gamma_shift;      /* number of "insignificant" bits in 16-bit gamma */
-   png_fixed_point gamma;        /* file gamma value */
    png_fixed_point screen_gamma; /* screen gamma value (display_exponent) */
 
    png_bytep gamma_table;     /* gamma table for 8-bit depth files */
@@ -305,11 +371,6 @@ struct png_struct_def
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    unsigned int num_chunk_list;
    png_bytep chunk_list;
-#endif
-
-#ifdef PNG_READ_sRGB_SUPPORTED
-   /* Added in 1.5.5 to record an sRGB chunk in the png. */
-   png_byte is_sRGB;
 #endif
 
 /* New members added in libpng-1.0.3 */
@@ -405,5 +466,11 @@ struct png_struct_def
 
    void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_infop row_info,
       png_bytep row, png_const_bytep prev_row);
+
+#ifdef PNG_READ_SUPPORTED
+#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+   png_colorspace   colorspace;
+#endif
+#endif
 };
 #endif /* PNGSTRUCT_H */

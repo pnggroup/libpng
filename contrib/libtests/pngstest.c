@@ -3099,7 +3099,7 @@ read_one_file(Image *image)
             {
                long int cb = ftell(f);
 
-               if (cb >= 0 && (unsigned long int)cb < (size_t)~(size_t)0)
+               if (cb > 0 && (unsigned long int)cb < (size_t)~(size_t)0)
                {
                   png_bytep b = voidcast(png_bytep, malloc((size_t)cb));
 
@@ -3118,17 +3118,22 @@ read_one_file(Image *image)
                      {
                         free(b);
                         return logclose(image, f, image->file_name,
-                           ": read failed");
+                           ": read failed: ");
                      }
                   }
 
                   else
                      return logclose(image, f, image->file_name,
-                        ": out of memory");
+                        ": out of memory: ");
                }
 
+               else if (cb == 0)
+                  return logclose(image, f, image->file_name,
+                     ": zero length: ");
+
                else
-                  return logclose(image, f, image->file_name, ": tell failed");
+                  return logclose(image, f, image->file_name,
+                     ": tell failed: ");
             }
 
             else
@@ -3169,7 +3174,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
             }
 
             else
-               return logclose(image, f, "tmpfile", ": flush");
+               return logclose(image, f, "tmpfile", ": flush: ");
          }
 
          else

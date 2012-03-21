@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.6.0beta20 - March 19, 2012 */
+/* Libpng 1.6.0beta20 - March 21, 2012 */
 
 /* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
 
@@ -44,9 +44,9 @@
 /*#undef PNG_BENIGN_WRITE_ERRORS_SUPPORTED*/
 #define PNG_bKGD_SUPPORTED
 #define PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED
-#define PNG_CHECK_cHRM_SUPPORTED
 #define PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 #define PNG_cHRM_SUPPORTED
+#define PNG_COLORSPACE_SUPPORTED
 #define PNG_CONSOLE_IO_SUPPORTED
 #define PNG_CONVERT_tIME_SUPPORTED
 #define PNG_EASY_ACCESS_SUPPORTED
@@ -58,6 +58,7 @@
 #define PNG_FORMAT_AFIRST_SUPPORTED
 #define PNG_FORMAT_BGR_SUPPORTED
 #define PNG_gAMA_SUPPORTED
+#define PNG_GAMMA_SUPPORTED
 #define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #define PNG_hIST_SUPPORTED
 #define PNG_iCCP_SUPPORTED

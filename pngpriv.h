@@ -186,8 +186,8 @@
 #endif
 
 #include "png.h"
-#include "pnginfo.h"
 #include "pngstruct.h"
+#include "pnginfo.h"
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
@@ -457,16 +457,16 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_HAVE_IDAT               0x04
 /* #define PNG_AFTER_IDAT           0x08 (defined in png.h) */
 #define PNG_HAVE_IEND               0x10
-#define PNG_HAVE_gAMA               0x20
-#define PNG_HAVE_cHRM               0x40
-#define PNG_HAVE_sRGB               0x80
+                   /*               0x20 (unused) */
+                   /*               0x40 (unused) */
+                   /*               0x80 (unused) */
 #define PNG_HAVE_CHUNK_HEADER      0x100
 #define PNG_WROTE_tIME             0x200
 #define PNG_WROTE_INFO_BEFORE_PLTE 0x400
 #define PNG_BACKGROUND_IS_GRAY     0x800
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
-#define PNG_HAVE_iCCP             0x4000
+                   /*             0x4000 (unused) */
 #define PNG_IS_READ_STRUCT        0x8000 /* Else is a write struct */
 
 /* Flags for the transformations the PNG library does on the image data */
@@ -875,17 +875,9 @@ PNG_INTERNAL_FUNCTION(void,png_write_sBIT,(png_structrp png_ptr,
 #endif
 
 #ifdef PNG_WRITE_cHRM_SUPPORTED
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_write_cHRM,(png_structrp png_ptr,
-    double white_x, double white_y,
-    double red_x, double red_y, double green_x, double green_y,
-    double blue_x, double blue_y),PNG_EMPTY);
-#  endif
 PNG_INTERNAL_FUNCTION(void,png_write_cHRM_fixed,(png_structrp png_ptr,
-    png_fixed_point int_white_x, png_fixed_point int_white_y,
-    png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
-    int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
-    png_fixed_point int_blue_y),PNG_EMPTY);
+    const png_xy *xy), PNG_EMPTY);
+    /* The xy value must have been previously validated */
 #endif
 
 #ifdef PNG_WRITE_sRGB_SUPPORTED
@@ -895,9 +887,11 @@ PNG_INTERNAL_FUNCTION(void,png_write_sRGB,(png_structrp png_ptr,
 
 #ifdef PNG_WRITE_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_iCCP,(png_structrp png_ptr,
-    png_const_charp name, int compression_type,
-    png_const_bytep profile, png_uint_32 proflen),PNG_EMPTY);
-   /* Note to maintainer: profile should be png_bytep */
+   png_const_charp name, png_const_bytep profile), PNG_EMPTY);
+   /* The profile must have been previously validated for correctness, the
+    * length comes from the first four bytes.  Only the base, deflate,
+    * compression is supported.
+    */
 #endif
 
 #ifdef PNG_WRITE_sPLT_SUPPORTED
@@ -1395,50 +1389,71 @@ PNG_INTERNAL_FUNCTION(void,png_do_write_intrapixel,(png_row_infop row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 
+/* Added at libpng version 1.6.0 */
+#ifdef PNG_GAMMA_SUPPORTED
+PNG_INTERNAL_FUNCTION(int,png_colorspace_set_gamma,(png_const_structrp png_ptr,
+    png_colorspacerp colorspace, png_fixed_point gAMA, int preferred),
+    PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void,png_colorspace_sync_info,(png_const_structrp png_ptr,
+    png_inforp info_ptr), PNG_EMPTY);
+    /* Synchronize the info 'valid' flags with the colorspace */
+
+PNG_INTERNAL_FUNCTION(void,png_colorspace_sync,(png_const_structrp png_ptr,
+    png_inforp info_ptr), PNG_EMPTY);
+    /* Copy the png_struct colorspace to the info_struct and call the above to
+     * synchronize the flags.  Checks for NULL info_ptr and does nothing.
+     */
+#endif
+
 /* Added at libpng version 1.4.0 */
-#ifdef PNG_CHECK_cHRM_SUPPORTED
-PNG_INTERNAL_FUNCTION(int,png_check_cHRM_fixed,(png_const_structrp png_ptr,
-    png_fixed_point int_white_x, png_fixed_point int_white_y,
-    png_fixed_point int_red_x, png_fixed_point int_red_y, png_fixed_point
-    int_green_x, png_fixed_point int_green_y, png_fixed_point int_blue_x,
-    png_fixed_point int_blue_y),PNG_EMPTY);
-#endif
-
-#ifdef PNG_CHECK_cHRM_SUPPORTED
-/* Added at libpng version 1.2.34 and 1.4.0 */
-/* Currently only used by png_check_cHRM_fixed */
-PNG_INTERNAL_FUNCTION(void,png_64bit_product,(long v1, long v2,
-    unsigned long *hi_product, unsigned long *lo_product),PNG_EMPTY);
-#endif
-
-#ifdef PNG_cHRM_SUPPORTED
-/* Added at libpng version 1.5.5 */
-typedef struct png_xy
-{
-   png_fixed_point redx, redy;
-   png_fixed_point greenx, greeny;
-   png_fixed_point bluex, bluey;
-   png_fixed_point whitex, whitey;
-} png_xy;
-
-typedef struct png_XYZ
-{
-   png_fixed_point redX, redY, redZ;
-   png_fixed_point greenX, greenY, greenZ;
-   png_fixed_point blueX, blueY, blueZ;
-} png_XYZ;
-
-/* The conversion APIs return 0 on success, non-zero on a parameter error. They
- * allow conversion between the above representations of a color encoding.  When
- * converting from XYZ end points to chromaticities the absolute magnitude of
- * the end points is lost, when converting back the sum of the Y values of the
- * three end points will be 1.0
+#ifdef PNG_COLORSPACE_SUPPORTED
+/* These internal functions are for maintaining the colorspace structure within
+ * a png_info or png_struct (or, indeed, both).
  */
-PNG_INTERNAL_FUNCTION(int,png_xy_from_XYZ,(png_xy *xy, png_XYZ XYZ),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,png_XYZ_from_xy,(png_XYZ *XYZ, png_xy xy),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,png_XYZ_from_xy_checked,(png_const_structrp png_ptr,
-   png_XYZ *XYZ, png_xy xy),PNG_EMPTY);
-#endif
+PNG_INTERNAL_FUNCTION(int,png_colorspace_set_chromaticities,
+   (png_const_structrp png_ptr, png_colorspacerp colorspace, const png_xy *xy,
+    int preferred), PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(int,png_colorspace_set_endpoints,
+   (png_const_structrp png_ptr, png_colorspacerp colorspace, const png_XYZ *XYZ,
+    int preferred), PNG_EMPTY);
+
+#ifdef PNG_sRGB_SUPPORTED
+PNG_INTERNAL_FUNCTION(int,png_colorspace_set_sRGB,(png_const_structrp png_ptr,
+   png_colorspacerp colorspace, int intent, int preferred), PNG_EMPTY);
+#endif /* sRGB */
+
+#ifdef PNG_iCCP_SUPPORTED
+PNG_INTERNAL_FUNCTION(int,png_colorspace_set_ICC,(png_const_structrp png_ptr,
+   png_colorspacerp colorspace, png_const_charp name,
+   png_uint_32 profile_length, png_const_bytep profile, int preferred),
+   PNG_EMPTY);
+   /* The 'name' is used for information only */
+
+/* Routines for checking parts of an ICC profile. */
+PNG_INTERNAL_FUNCTION(int,png_icc_check_length,(png_const_structrp png_ptr,
+   png_colorspacerp colorspace, png_const_charp name,
+   png_uint_32 profile_length), PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int,png_icc_check_header,(png_const_structrp png_ptr,
+   png_colorspacerp colorspace, png_const_charp name,
+   png_uint_32 profile_length,
+   png_const_bytep profile /* first 132 bytes only */), PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int,png_icc_check_tag_table,(png_const_structrp png_ptr,
+   png_colorspacerp colorspace, png_const_charp name,
+   png_uint_32 profile_length,
+   png_const_bytep profile /* header plus whole tag table */), PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_icc_set_gAMA_and_cHRM,(
+   png_const_structrp png_ptr, png_colorspacerp colorspace,
+   png_const_charp name, png_const_bytep profile, int preferred), PNG_EMPTY);
+#endif /* iCCP */
+
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_colorspace_set_rgb_coefficients,
+   (png_structrp png_ptr), PNG_EMPTY);
+   /* Set the rgb_to_gray coefficients from the colorspace Y values */
+#endif /* READ_RGB_TO_GRAY */
+#endif /* COLORSPACE */
 
 /* Added at libpng version 1.4.0 */
 PNG_INTERNAL_FUNCTION(void,png_check_IHDR,(png_const_structrp png_ptr,

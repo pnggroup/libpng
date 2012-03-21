@@ -28,7 +28,7 @@
  * them in png_write_end(), and compressing them.
  */
 void PNGAPI
-png_write_info_before_PLTE(png_structrp png_ptr, png_inforp info_ptr)
+png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
 {
    png_debug(1, "in png_write_info_before_PLTE");
 
@@ -60,32 +60,61 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 #endif
    /* The rest of these check to see if the valid field has the appropriate
     * flag set, and if it does, writes the chunk.
+    *
+    * 1.6.0: COLORSPACE support controls the writing of these chunks too, and
+    * the chunks will be written if the WRITE routine is there and information
+    * is available in the COLORSPACE.  (See png_colorspace_sync_info in png.c
+    * for where the valid flags get set.)
+    *
+    * Under certain circumstances the colorspace can be invalidated without
+    * syncing the info_struct 'valid' flags; this happens if libpng detects and
+    * error and calls png_error while the color space is being set, yet the
+    * application continues writing the PNG.  So check the 'invalid' flag here
+    * too.
     */
-#ifdef PNG_WRITE_gAMA_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_gAMA)
-      png_write_gAMA_fixed(png_ptr, info_ptr->gamma);
-#endif
-#ifdef PNG_WRITE_sRGB_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_sRGB)
-      png_write_sRGB(png_ptr, (int)info_ptr->srgb_intent);
+#ifdef PNG_GAMMA_SUPPORTED
+#  ifdef PNG_WRITE_gAMA_SUPPORTED
+      if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
+         (info_ptr->colorspace.flags & PNG_COLORSPACE_FROM_gAMA) &&
+         (info_ptr->valid & PNG_INFO_gAMA))
+         png_write_gAMA_fixed(png_ptr, info_ptr->colorspace.gamma);
+#  endif
 #endif
 
-#ifdef PNG_WRITE_iCCP_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_iCCP)
-      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
-          info_ptr->iccp_profile, info_ptr->iccp_proflen);
-#endif
+#ifdef PNG_COLORSPACE_SUPPORTED
+   /* Write only one of sRGB or an ICC profile, favour sRGB if the profile
+    * matches sRGB.
+    */
+#  ifdef PNG_WRITE_sRGB_SUPPORTED
+      if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
+         (info_ptr->valid & PNG_INFO_sRGB))
+         png_write_sRGB(png_ptr, info_ptr->colorspace.rendering_intent);
+
+#     ifdef PNG_WRITE_iCCP_SUPPORTED
+         else
+#     endif
+#  endif /* WRITE_sRGB */
+
+#  ifdef PNG_WRITE_iCCP_SUPPORTED
+      if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
+         (info_ptr->valid & PNG_INFO_iCCP))
+         png_write_iCCP(png_ptr, info_ptr->iccp_name,
+            info_ptr->iccp_profile);
+#  endif
+#endif /* COLORSPACE */
+
 #ifdef PNG_WRITE_sBIT_SUPPORTED
    if (info_ptr->valid & PNG_INFO_sBIT)
       png_write_sBIT(png_ptr, &(info_ptr->sig_bit), info_ptr->color_type);
 #endif
-#ifdef PNG_WRITE_cHRM_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_cHRM)
-      png_write_cHRM_fixed(png_ptr,
-          info_ptr->x_white, info_ptr->y_white,
-          info_ptr->x_red, info_ptr->y_red,
-          info_ptr->x_green, info_ptr->y_green,
-          info_ptr->x_blue, info_ptr->y_blue);
+
+#ifdef PNG_COLORSPACE_SUPPORTED
+#  ifdef PNG_WRITE_cHRM_SUPPORTED
+      if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
+         (info_ptr->colorspace.flags & PNG_COLORSPACE_FROM_cHRM) &&
+         (info_ptr->valid & PNG_INFO_cHRM))
+         png_write_cHRM_fixed(png_ptr, &info_ptr->colorspace.end_points_xy);
+#  endif
 #endif
 
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
@@ -122,7 +151,7 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 }
 
 void PNGAPI
-png_write_info(png_structrp png_ptr, png_inforp info_ptr)
+png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 {
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
    int i;

@@ -1061,6 +1061,7 @@ int
 main(int argc, char **argv)
 {
    FILE *fp = stdout;
+   const char *file_name = NULL;
    int color_type = 8; /* invalid */
    int bit_depth = 32; /* invalid */
    png_fixed_point gamma = 0; /* not set */
@@ -1189,6 +1190,7 @@ main(int argc, char **argv)
             exit(1);
          }
 
+         file_name = arg;
          continue;
       }
 
@@ -1204,5 +1206,12 @@ main(int argc, char **argv)
       exit(1);
    }
 
-   return write_png(fp, color_type, bit_depth, gamma, head_insert);
+   {
+      int ret = write_png(fp, color_type, bit_depth, gamma, head_insert);
+
+      if (ret != 0 && file_name != NULL)
+         remove(file_name);
+
+      return ret;
+   }
 }

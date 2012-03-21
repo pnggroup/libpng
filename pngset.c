@@ -42,26 +42,27 @@ png_set_cHRM_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
     png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
     png_fixed_point blue_x, png_fixed_point blue_y)
 {
+   png_xy xy;
+
    png_debug1(1, "in %s storage function", "cHRM fixed");
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-#  ifdef PNG_CHECK_cHRM_SUPPORTED
-   if (png_check_cHRM_fixed(png_ptr,
-       white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y))
-#  endif
-   {
-      info_ptr->x_white = white_x;
-      info_ptr->y_white = white_y;
-      info_ptr->x_red   = red_x;
-      info_ptr->y_red   = red_y;
-      info_ptr->x_green = green_x;
-      info_ptr->y_green = green_y;
-      info_ptr->x_blue  = blue_x;
-      info_ptr->y_blue  = blue_y;
-      info_ptr->valid |= PNG_INFO_cHRM;
-   }
+   xy.redx = red_x;
+   xy.redy = red_y;
+   xy.greenx = green_x;
+   xy.greeny = green_y;
+   xy.bluex = blue_x;
+   xy.bluey = blue_y;
+   xy.whitex = white_x;
+   xy.whitey = white_y;
+
+   if (png_colorspace_set_chromaticities(png_ptr, &info_ptr->colorspace, &xy,
+      2/* override with app values*/))
+      info_ptr->colorspace.flags |= PNG_COLORSPACE_FROM_cHRM;
+
+   png_colorspace_sync_info(png_ptr, info_ptr);
 }
 
 void PNGFAPI
@@ -73,7 +74,6 @@ png_set_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
     png_fixed_point int_blue_Z)
 {
    png_XYZ XYZ;
-   png_xy xy;
 
    png_debug1(1, "in %s storage function", "cHRM XYZ fixed");
 
@@ -90,11 +90,10 @@ png_set_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
    XYZ.blueY = int_blue_Y;
    XYZ.blueZ = int_blue_Z;
 
-   if (png_xy_from_XYZ(&xy, XYZ))
-      png_error(png_ptr, "XYZ values out of representable range");
+   if (png_colorspace_set_endpoints(png_ptr, &info_ptr->colorspace, &XYZ, 2))
+      info_ptr->colorspace.flags |= PNG_COLORSPACE_FROM_cHRM;
 
-   png_set_cHRM_fixed(png_ptr, info_ptr, xy.whitex, xy.whitey, xy.redx, xy.redy,
-      xy.greenx, xy.greeny, xy.bluex, xy.bluey);
+   png_colorspace_sync_info(png_ptr, info_ptr);
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -153,12 +152,15 @@ png_set_gAMA_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
     * displays that are all black or all white.)
     */
    if (file_gamma < 16 || file_gamma > 625000000)
-      png_warning(png_ptr, "Out of range gamma value ignored");
+      png_app_error(png_ptr, "Out of range gamma value ignored");
 
    else
    {
-      info_ptr->gamma = file_gamma;
-      info_ptr->valid |= PNG_INFO_gAMA;
+      if (png_colorspace_set_gamma(png_ptr, &info_ptr->colorspace, file_gamma,
+         2/* overrided with app value */))
+         info_ptr->colorspace.flags |= PNG_COLORSPACE_FROM_gAMA;
+
+      png_colorspace_sync_info(png_ptr, info_ptr);
    }
 }
 
@@ -593,8 +595,10 @@ png_set_sRGB(png_const_structrp png_ptr, png_inforp info_ptr, int srgb_intent)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   info_ptr->srgb_intent = (png_byte)srgb_intent;
-   info_ptr->valid |= PNG_INFO_sRGB;
+   (void)png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent,
+      2/* app value overrides*/);
+
+   png_colorspace_sync_info(png_ptr, info_ptr);
 }
 
 void PNGAPI
@@ -606,21 +610,15 @@ png_set_sRGB_gAMA_and_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_set_sRGB(png_ptr, info_ptr, srgb_intent);
+   if (png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent,
+      2/* app value overrides*/))
+   {
+      /* And cause the gAMA and cHRM to be written too */
+      info_ptr->colorspace.flags |=
+         PNG_COLORSPACE_FROM_gAMA|PNG_COLORSPACE_FROM_cHRM;
+   }
 
-#  ifdef PNG_gAMA_SUPPORTED
-   png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_sRGB_INVERSE);
-#  endif
-
-#  ifdef PNG_cHRM_SUPPORTED
-   png_set_cHRM_fixed(png_ptr, info_ptr,
-      /* color      x       y */
-      /* white */ 31270, 32900,
-      /* red   */ 64000, 33000,
-      /* green */ 30000, 60000,
-      /* blue  */ 15000,  6000
-   );
-#  endif /* cHRM */
+   png_colorspace_sync_info(png_ptr, info_ptr);
 }
 #endif /* sRGB */
 
@@ -640,12 +638,34 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL || name == NULL || profile == NULL)
       return;
 
+   if (compression_type != PNG_COMPRESSION_TYPE_BASE)
+      png_app_error(png_ptr, "Invalid iCCP compression method");
+
+   /* Set the colorspace first because this validates the profile; do not
+    * override previously set app cHRM or gAMA here (because likely as not the
+    * application knows better than libpng what the correct values are.)
+    */
+   {
+      int result = png_colorspace_set_ICC(png_ptr, &info_ptr->colorspace, name,
+         proflen, profile, 0/* do *not* override the app cHRM or gAMA */);
+
+      png_colorspace_sync_info(png_ptr, info_ptr);
+
+      /* Don't do any of the copying if the profile was bad, or inconsistent. */
+      if (!result)
+         return;
+
+      /* But do write the gAMA and cHRM chunks from the profile. */
+      info_ptr->colorspace.flags |=
+         PNG_COLORSPACE_FROM_gAMA|PNG_COLORSPACE_FROM_cHRM;
+   }
+
    length = png_strlen(name)+1;
    new_iccp_name = png_voidcast(png_charp, png_malloc_warn(png_ptr, length));
 
    if (new_iccp_name == NULL)
    {
-      png_warning(png_ptr, "Insufficient memory to process iCCP chunk");
+      png_benign_error(png_ptr, "Insufficient memory to process iCCP chunk");
       return;
    }
 
@@ -655,8 +675,8 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
    if (new_iccp_profile == NULL)
    {
-      png_free (png_ptr, new_iccp_name);
-      png_warning(png_ptr,
+      png_free(png_ptr, new_iccp_name);
+      png_benign_error(png_ptr,
           "Insufficient memory to process iCCP profile");
       return;
    }
@@ -668,10 +688,6 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    info_ptr->iccp_proflen = proflen;
    info_ptr->iccp_name = new_iccp_name;
    info_ptr->iccp_profile = new_iccp_profile;
-   /* Compression is always zero but is here so the API and info structure
-    * does not have to change if we introduce multiple compression types
-    */
-   info_ptr->iccp_compression = (png_byte)compression_type;
    info_ptr->free_me |= PNG_FREE_ICCP;
    info_ptr->valid |= PNG_INFO_iCCP;
 }
@@ -1081,7 +1097,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       to->size = from->size;
 
       /* Note our location in the read or write sequence */
-      to->location = (png_byte)(png_ptr->mode & 0xff);
+      to->location = (png_byte)png_ptr->mode;
 
       if (from->size == 0)
          to->data=NULL;

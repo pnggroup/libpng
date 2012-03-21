@@ -32,8 +32,12 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # option <name> [requires ...] [if ...] [enables ...] [disabled]
 #    #define PNG_<name>_SUPPORTED if the requirements are met and
 #    enable the other options listed
-# chunk <name> [requires ...] [disabled]
-#    Enable chunk processing for the given ancillary chunk
+# chunk <name> [requires ...] [enables ...] [disabled]
+#    Enable chunk processing for the given ancillary chunk; any
+#    'requires something' expands to READ_something for read and
+#    WRITE_something for write, but the enables list members are
+#    used as given (e.g. enables GAMMA just expands to that on the
+#    correspond READ_name and WRITE_name lines.)
 #
 # Note that the 'on' and 'off' keywords, while valid on both option
 # and chunk, should not be used in this file because they force the
@@ -461,9 +465,18 @@ option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 #   API is implemented, they get recorded in pnglibconf.h, but
 #   can't be changed by the application.
 
-# Check the correctness of cHRM chunks
+# Colorspace support (enabled as required); just the support for colorant
+# information.  Gamma support, likewise, is just support for the gamma
+# information, READ_GAMMA is required for gamma transformations (so it
+# is possible to read PNG gamma without enabling all the libpng transform
+# code - do this for applications that do their own gamma processing)
+#
+# As of 1.6.0 COLORSPACE is only useful if the application processes the
+# information; this is because the library does not do any colorspace
+# processing, it just validates the data in the PNG file.
 
-option CHECK_cHRM requires cHRM
+option GAMMA disabled
+option COLORSPACE enables GAMMA disabled
 
 #
 # Artificially align memory - the code typically aligns to 8 byte
@@ -560,18 +573,18 @@ setting IDAT_READ_SIZE default PNG_ZBUF_SIZE
 
 # Ancillary chunks
 chunk bKGD
-chunk cHRM
-chunk gAMA
+chunk cHRM enables COLORSPACE
+chunk gAMA enables GAMMA
 chunk hIST
-chunk iCCP
+chunk iCCP enables COLORSPACE GAMMA
 chunk iTXt
 chunk oFFs
 chunk pCAL
-chunk sCAL
 chunk pHYs
 chunk sBIT
+chunk sCAL
 chunk sPLT
-chunk sRGB
+chunk sRGB enables COLORSPACE GAMMA
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS

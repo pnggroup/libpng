@@ -1278,41 +1278,17 @@ png_image_read_header(png_voidp argument)
 
       image->format = format;
 
-      /* Now try to work out whether the color data does not match sRGB. */
-      if ((format & PNG_FORMAT_FLAG_COLOR) != 0 &&
-         (info_ptr->valid & PNG_INFO_sRGB) == 0)
-      {
-         /* gamma is irrelevant because libpng does gamma correction, what
-          * matters is if the cHRM chunk doesn't match or, in the absence of
-          * cRHM, if the iCCP profile appears to have different end points.
-          */
-         if (info_ptr->valid & PNG_INFO_cHRM)
-         {
-            /* TODO: this is a copy'n'paste from pngrutil.c, make a common
-             * checking function.  This checks for a 1% error.
-             */
-            /* The cHRM chunk is used in preference to iCCP */
-            if (PNG_OUT_OF_RANGE(info_ptr->x_white, 31270,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->y_white, 32900,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->x_red,   64000,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->y_red,   33000,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->x_green, 30000,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->y_green, 60000,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->x_blue,  15000,  1000) ||
-                PNG_OUT_OF_RANGE(info_ptr->y_blue,   6000,  1000))
-               image->flags |= PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB;
-         }
-
-         else if (info_ptr->valid & PNG_INFO_iCCP)
-         {
-#        if 0
-            /* TODO: IMPLEMENT THIS! */
-            /* Here if we just have an iCCP chunk. */
-            if (!png_iCCP_is_sRGB(png_ptr, info_ptr))
-#        endif
-               image->flags |= PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB;
-         }
-      }
+#ifdef PNG_COLORSPACE_SUPPORTED
+      /* Does the colorspace match sRGB?  If there is no color endpoint
+       * (colorant) information assume yes, otherwise require the
+       * 'ENDPOINTS_MATCHE_sRGB' colorspace flag to have been set.  If the
+       * colorspace has been determined to be invalid ignore it.
+       */
+      if ((format & PNG_FORMAT_FLAG_COLOR) != 0 && ((png_ptr->colorspace.flags
+         & (PNG_COLORSPACE_HAVE_ENDPOINTS|PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB|
+            PNG_COLORSPACE_INVALID)) == PNG_COLORSPACE_HAVE_ENDPOINTS))
+         image->flags |= PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB;
+#endif
    }
 
    /* We need the maximum number of entries regardless of the format the
@@ -1529,7 +1505,7 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
 static void
 set_file_encoding(png_image_read_control *display)
 {
-   png_fixed_point g = display->image->opaque->png_ptr->gamma;
+   png_fixed_point g = display->image->opaque->png_ptr->colorspace.gamma;
    if (png_gamma_significant(g))
    {
       if (png_gamma_not_sRGB(g))
@@ -2388,7 +2364,8 @@ png_image_read_colormap(png_voidp argument)
                 * alternative of double gamma correction.
                 */
                if ((png_ptr->color_type == PNG_COLOR_TYPE_RGB_ALPHA ||
-                  png_ptr->num_trans > 0) && png_gamma_not_sRGB(png_ptr->gamma))
+                  png_ptr->num_trans > 0) &&
+                  png_gamma_not_sRGB(png_ptr->colorspace.gamma))
                {
                   cmap_entries = make_gray_file_colormap(display);
                   data_encoding = E_FILE;
@@ -2421,7 +2398,7 @@ png_image_read_colormap(png_voidp argument)
                         gray = png_sRGB_table[gray]; /* now E_LINEAR */
 
                      gray = PNG_DIV257(png_gamma_16bit_correct(gray,
-                        png_ptr->gamma)); /* now E_FILE */
+                        png_ptr->colorspace.gamma)); /* now E_FILE */
 
                      /* And make sure the corresponding palette entry contains
                       * exactly the required sRGB value.
@@ -3582,8 +3559,8 @@ png_image_read_direct(png_voidp argument)
           * yet; it's set below.  png_struct::gamma, however, is set to the
           * final value.
           */
-         if (png_muldiv(&gtest, output_gamma, png_ptr->gamma, PNG_FP_1) &&
-            !png_gamma_significant(gtest))
+         if (png_muldiv(&gtest, output_gamma, png_ptr->colorspace.gamma,
+               PNG_FP_1) && !png_gamma_significant(gtest))
             do_local_background = 0;
 
          else if (mode == PNG_ALPHA_STANDARD)
