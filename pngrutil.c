@@ -1501,7 +1501,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     {
                                        if (profile_length == check_len[icheck])
                                        {
-                                          png_uint_32 profile_crc = crc32(0,
+                                          uLong profile_crc = crc32(0,
                                               profile, profile_length);
 
                                           if (profile_crc ==
