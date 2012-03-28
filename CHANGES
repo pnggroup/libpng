@@ -4090,11 +4090,11 @@ Version 1.6.0beta19 [March 18, 2012]
   Avoid the double gamma correction warning in the simplified API.
     This allows the --strict option to pass in the pngstest checks
 
-Version 1.6.0beta20 [March 22, 2012]
+Version 1.6.0beta20 [March 28, 2012]
   Changed chunk handler warnings into benign errors, incrementally load iCCP
   Recognize known sRGB ICC profiles while reading and handle them as if the
     sRGB chunk had appeared instead.
-  Added checksum-icc.c to contrib/libtests
+  Added checksum-icc.c to contrib/tools
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

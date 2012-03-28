@@ -1435,7 +1435,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                            memcpy(profile, profile_header,
                               sizeof profile_header);
 
-                           size = (sizeof profile_header) + 12 * tag_count;
+                           size = 12 * tag_count;
 
                            ret = png_inflate_read(png_ptr, local_buffer,
                               sizeof local_buffer, &length,
@@ -1515,8 +1515,6 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                                               png_colorspace_sync(png_ptr,
                                                  info_ptr);
-
-                                              png_free(png_ptr, profile);
 
                                               return;
                                            }
