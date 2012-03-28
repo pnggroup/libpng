@@ -1314,6 +1314,67 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
 #ifdef PNG_READ_iCCP_SUPPORTED
+#ifdef PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
+int /* PRIVATE */
+png_compare_ICC_profile_with_sRGB(png_structrp png_ptr, png_bytep profile,
+    png_uint_32 length)
+{
+   /* See if it's a known sRGB profile. If it is, return intent;
+    * if not, return -1.
+    */
+
+   int
+     icheck;
+
+   /* Known sRGB profiles:
+    * 0: not a known sRGB profile
+    * 1: HP-Microsoft sRGB v2 perceptual
+    * 2: ICC sRGB v4 perceptual
+    * 3: ICC sRGB v2 perceptual
+    *    no black-compensation
+    */
+
+   typedef struct png_sRGB_check_struct
+   {
+      uLong crc;
+      uLong adler;
+      png_uint_32 check_len;
+      int intent;
+   } png_sRGB_check;
+
+   png_sRGB_check check[3] =
+   {  
+      { 0xf29e526dUL, 0x0398f3fcUL,   3144UL,    0 },
+      { 0xbbef7812UL, 0x209c35d2UL,  60960UL,    0 },
+      { 0x427ebb21UL, 0x4909e5e1UL,   3052UL,    0 }
+   };
+      
+   if (png_ptr == NULL)
+      return -1;
+
+   for (icheck = 2; icheck >= 0; icheck--)
+   {
+      if (length == check[icheck].check_len)
+      {
+         uLong profile_adler = adler32(1, profile, length);
+
+         if (profile_adler == (uLong) check[icheck].adler)
+         {
+            uLong profile_crc = crc32(0, profile, length);
+
+            if (profile_crc == (uLong) check[icheck].crc)
+               return check[icheck].intent;
+
+            else
+               return -1;
+         }
+      }
+   } 
+
+   return -1;
+}
+#endif
+
 void /* PRIVATE */
 png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 /* Note: this does not properly handle profiles that are > 64K under DOS */
@@ -1460,23 +1521,10 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                                  if (size == 0)
                                  {
+#ifdef PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
                                     int
-                                      icheck;
-
-                                    /* Known sRGB profiles:
-                                     * 0: not a known sRGB profile
-                                     * 1: HP-Microsoft sRGB v2
-                                     * 2: ICC sRGB v4 perceptual
-                                     * 3: ICC sRGB v2 perceptual
-                                     *    no black-compensation
-                                     */
-
-                                    png_uint_32 check_crc[4] = {0,
-                                        0xf29e526dUL, 0xbbef7812UL,
-                                        0x427ebb21UL},
-
-                                    check_len[4] = {0, 3144, 60960,
-                                        3052};
+                                      intent;
+#endif
 
                                     if (ret != Z_STREAM_END)
                                        png_chunk_warning(png_ptr,
@@ -1495,31 +1543,16 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     if (png_crc_finish(png_ptr, length))
                                        return;
 
+#ifdef PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
                                     /* See if it's a known sRGB profile. */
+                                    intent =
+                                        png_compare_ICC_profile_with_sRGB(
+                                            png_ptr, profile, profile_length);
 
-                                    for (icheck=3; icheck > 0; icheck--)
-                                    {
-                                       if (profile_length == check_len[icheck])
-                                       {
-                                          uLong profile_crc = crc32(0,
-                                              profile, profile_length);
-
-                                          if (profile_crc ==
-                                              check_crc[icheck])
-                                          {
-                                             (void)png_colorspace_set_sRGB(
-                                                 png_ptr,
-                                                 &png_ptr->colorspace,
-                                                 PNG_sRGB_INTENT_PERCEPTUAL,
-                                                 0);
-
-                                              png_colorspace_sync(png_ptr,
-                                                 info_ptr);
-
-                                              return;
-                                           }
-                                       }
-                                    } 
+                                    if (intent >= 0)
+                                       png_chunk_warning(png_ptr,
+                                         "describes sRGB\n");
+#endif
 
                                     /* Set the gAMA and cHRM information */
                                     png_icc_set_gAMA_and_cHRM(png_ptr,
