@@ -1866,11 +1866,14 @@ png_init_read_transformations(png_structrp png_ptr)
 
 #ifdef PNG_READ_SHIFT_SUPPORTED
    if ((png_ptr->transformations & PNG_SHIFT) &&
+      !(png_ptr->transformations & PNG_EXPAND) &&
        (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE))
    {
       int i;
       int istop = png_ptr->num_palette;
       int shift = 8 - png_ptr->sig_bit.red;
+
+      png_ptr->transformations &= ~PNG_SHIFT;
 
       /* significant bits can be in the range 1 to 7 for a meaninful result, if
        * the number of significant bits is 0 then no shift is done (this is an

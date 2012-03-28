@@ -344,6 +344,7 @@ Version 1.6.0beta20 [March 28, 2012]
   Recognize known sRGB ICC profiles while reading and issue a warning about
     it, if PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED is defined.
   Added checksum-icc.c to contrib/tools
+  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
