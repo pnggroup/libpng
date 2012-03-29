@@ -478,7 +478,46 @@ option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 option GAMMA disabled
 option COLORSPACE enables GAMMA disabled
 
+# When an ICC profile is read, or png_set, it will be checked for a match
+# against known sRGB profiles if the sRGB handling is enabled.  This
+# setting controls how much work is done during the check:
 #
+# 0: Just validate the profile MD5 signature if present, otherwise use
+#    the checks in option 1.
+#
+# 1: Additionally check the length, intent and adler32 checksum of the
+#    actual data.   If enabled this will reject known profiles that have
+#    had the rendering intent in the header changed as well as other edits
+#    done without updating the checksum.  See the discussion below.
+#
+# 2: Additionally checksum all the data using the ethernet CRC32 algorithm.
+#    This makes it more difficult to fake profiles and makes it less likely
+#    to get a false positive on profiles with no signature, but is probably
+#    just a waste of time since all currently approved ICC sRGB profiles have
+#    a secure MD5 signature.
+#
+# The rendering intent.  An ICC profile stores an intended rendering intent,
+# but does not include the value in the signature.  The intent is documented
+# as the intent that should be used when combining two profiles.  The sRGB
+# profile is intended, however, to be used with any of the four defined intents.
+# For this reason the sRGB chunk includes an 'intent' to be used when displaying
+# the image (intent is really a property of the image not the profile.)
+#
+# Unfortunately the iCCP chunk does not.  It may therefore be that some
+# applications modify the intent in profiles (including sRGB profiles) to work
+# round this problem.  Selecting an option other than option '0' will cause such
+# modified profiles to be rejected.
+#
+# Security.  The use of Adler32 and CRC32 checksums does not help significantly
+# with any security issues.  It is relatively easy to produce arbitrary profiles
+# with the required checksums on current computer systems.  Nevertheless
+# security does not seem to be an issue because the only consequence of a false
+# positive is a false assertion that the profile is an sRGB profile.  This might
+# be used to hide data from libpng using applications, but it doesn't seem
+# possible to damage them.
+
+setting sRGB_PROFILE_CHECKS default 2
+
 # Artificially align memory - the code typically aligns to 8 byte
 # boundaries if this is switched on, it's a small waste of space
 # but can help (in theory) on some architectures.  Only affects
@@ -649,9 +688,6 @@ option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
 option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
 option READ_CHECK_FOR_INVALID_INDEX requires READ CHECK_FOR_INVALID_INDEX
 option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
-
-# added at libpng-1.6.0
-option WARN_IF_iCCP_IS_sRGB requires READ iCCP
 
 # Simplified API options (added at libpng-1.6.0)
 # Read:

@@ -82,25 +82,32 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
 #endif
 
 #ifdef PNG_COLORSPACE_SUPPORTED
-   /* Write only one of sRGB or an ICC profile, favour sRGB if the profile
-    * matches sRGB.
+   /* Write only one of sRGB or an ICC profile.  If a profile was supplied
+    * and it matches one of the known sRGB ones issue a warning.
     */
+#  ifdef PNG_WRITE_iCCP_SUPPORTED
+      if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
+         (info_ptr->valid & PNG_INFO_iCCP))
+      {
+#        ifdef PNG_WRITE_sRGB_SUPPORTED
+            if (info_ptr->valid & PNG_INFO_sRGB)
+               png_app_warning(png_ptr,
+                  "profile matches sRGB but writing iCCP instead");
+#        endif
+
+         png_write_iCCP(png_ptr, info_ptr->iccp_name,
+            info_ptr->iccp_profile);
+      }
+#     ifdef PNG_WRITE_sRGB_SUPPORTED
+         else
+#     endif
+#  endif
+
 #  ifdef PNG_WRITE_sRGB_SUPPORTED
       if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
          (info_ptr->valid & PNG_INFO_sRGB))
          png_write_sRGB(png_ptr, info_ptr->colorspace.rendering_intent);
-
-#     ifdef PNG_WRITE_iCCP_SUPPORTED
-         else
-#     endif
 #  endif /* WRITE_sRGB */
-
-#  ifdef PNG_WRITE_iCCP_SUPPORTED
-      if (!(info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) &&
-         (info_ptr->valid & PNG_INFO_iCCP))
-         png_write_iCCP(png_ptr, info_ptr->iccp_name,
-            info_ptr->iccp_profile);
-#  endif
 #endif /* COLORSPACE */
 
 #ifdef PNG_WRITE_sBIT_SUPPORTED
@@ -527,6 +534,16 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     */
 #  ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
       png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+      /* In stable builds only warn if an application error can be completely
+       * handled.
+       */
+#  endif
+
+   /* App warnings are warnings in release (or release candidate) builds but
+    * are errors during development.
+    */
+#  if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
+      png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
 #  endif
 
    if (png_ptr != NULL)

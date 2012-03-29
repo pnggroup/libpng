@@ -1443,9 +1443,14 @@ PNG_INTERNAL_FUNCTION(int,png_icc_check_tag_table,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
    png_uint_32 profile_length,
    png_const_bytep profile /* header plus whole tag table */), PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_icc_set_gAMA_and_cHRM,(
+PNG_INTERNAL_FUNCTION(int,png_icc_set_gAMA_and_cHRM,(
    png_const_structrp png_ptr, png_colorspacerp colorspace,
-   png_const_charp name, png_const_bytep profile, int preferred), PNG_EMPTY);
+   png_const_charp name, png_const_bytep profile, uLong adler, int preferred),
+   PNG_EMPTY);
+   /* 'adler' is the Adler32 checksum of the uncompressed profile data, it may
+    * be 0 to indicate that it is not available.  It is used, if provided, as a
+    * fast check on the profile when checking to see if it is sRGB.
+    */
 #endif /* iCCP */
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED

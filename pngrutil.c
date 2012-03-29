@@ -338,7 +338,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
        * are minimal.
        */
       (void)png_safecat(msg, sizeof msg, 4, " using zstream");
-#     if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
+#     if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
          png_chunk_warning(png_ptr, msg);
          png_ptr->zowner = 0;
 #     else
@@ -1314,72 +1314,12 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 #endif /* PNG_READ_sRGB_SUPPORTED */
 
 #ifdef PNG_READ_iCCP_SUPPORTED
-#ifdef PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
-int /* PRIVATE */
-png_compare_ICC_profile_with_sRGB(png_structrp png_ptr, png_bytep profile,
-    png_uint_32 length)
-{
-   /* See if it's a known sRGB profile. If it is, return intent;
-    * if not, return -1.
-    */
-
-   int
-     icheck;
-
-   /* Known sRGB profiles:
-    * 0: not a known sRGB profile
-    * 1: HP-Microsoft sRGB v2 perceptual
-    * 2: ICC sRGB v4 perceptual
-    * 3: ICC sRGB v2 perceptual
-    *    no black-compensation
-    */
-
-   typedef struct png_sRGB_check_struct
-   {
-      uLong crc;
-      uLong adler;
-      png_uint_32 check_len;
-      int intent;
-   } png_sRGB_check;
-
-   png_sRGB_check check[3] =
-   {  
-      { 0xf29e526dUL, 0x0398f3fcUL,   3144UL,    0 },
-      { 0xbbef7812UL, 0x209c35d2UL,  60960UL,    0 },
-      { 0x427ebb21UL, 0x4909e5e1UL,   3052UL,    0 }
-   };
-      
-   if (png_ptr == NULL)
-      return -1;
-
-   for (icheck = 2; icheck >= 0; icheck--)
-   {
-      if (length == check[icheck].check_len)
-      {
-         uLong profile_adler = adler32(1, profile, length);
-
-         if (profile_adler == (uLong) check[icheck].adler)
-         {
-            uLong profile_crc = crc32(0, profile, length);
-
-            if (profile_crc == (uLong) check[icheck].crc)
-               return check[icheck].intent;
-
-            else
-               return -1;
-         }
-      }
-   } 
-
-   return -1;
-}
-#endif
-
 void /* PRIVATE */
 png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 /* Note: this does not properly handle profiles that are > 64K under DOS */
 {
-   png_const_charp errmsg;
+   png_const_charp errmsg = NULL; /* error message output, or no error */
+   int finished = 0; /* crc checked */
 
    png_debug(1, "in png_handle_iCCP");
 
@@ -1452,14 +1392,13 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
             if (png_inflate_claim(png_ptr, png_iCCP,
                png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN ? 15 : 0) == Z_OK)
             {
-               int ret;
                Byte profile_header[132];
                Byte local_buffer[PNG_INFLATE_BUF_SIZE];
                png_alloc_size_t size = sizeof profile_header;
 
                png_ptr->zstream.next_in = (Bytef*)keyword + (keyword_length+2);
                png_ptr->zstream.avail_in = read_length;
-               ret = png_inflate_read(png_ptr, local_buffer,
+               (void)png_inflate_read(png_ptr, local_buffer,
                   sizeof local_buffer, &length, profile_header, &size,
                   0/*finish: don't, because the output is too small*/);
 
@@ -1469,8 +1408,6 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                    */
                   const png_uint_32 profile_length =
                      png_get_uint_32(profile_header);
-
-                  errmsg = NULL; /* flag to say error message output */
 
                   if (png_icc_check_length(png_ptr, &png_ptr->colorspace,
                      keyword, profile_length))
@@ -1498,10 +1435,13 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                            size = 12 * tag_count;
 
-                           ret = png_inflate_read(png_ptr, local_buffer,
+                           (void)png_inflate_read(png_ptr, local_buffer,
                               sizeof local_buffer, &length,
                               profile + (sizeof profile_header), &size, 0);
 
+                           /* Still expect a a buffer error because we expect
+                            * there to be some tag data!
+                            */
                            if (size == 0)
                            {
                               if (png_icc_check_tag_table(png_ptr,
@@ -1514,53 +1454,43 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                  size = profile_length - (sizeof profile_header)
                                     - 12 * tag_count;
 
-                                 ret = png_inflate_read(png_ptr, local_buffer,
+                                 (void)png_inflate_read(png_ptr, local_buffer,
                                     sizeof local_buffer, &length,
                                     profile + (sizeof profile_header) +
                                     12 * tag_count, &size, 1/*finish*/);
 
-                                 if (size == 0)
+                                 if (length > 0 && !(png_ptr->flags &
+                                       PNG_FLAG_BENIGN_ERRORS_WARN))
+                                    errmsg = "extra compressed data";
+
+                                 /* But otherwise allow extra data: */
+                                 else if (size == 0)
                                  {
-#ifdef PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
-                                    int
-                                      intent;
-#endif
+                                    int ok;
 
-                                    if (ret != Z_STREAM_END)
-                                       png_chunk_warning(png_ptr,
-                                          png_ptr->zstream.msg);
-
-                                    else if (length > 0)
+                                    if (length > 0)
+                                    {
+                                       /* This can be handled completely, so
+                                        * keep going.
+                                        */
                                        png_chunk_warning(png_ptr,
                                           "extra compressed data");
+                                    }
 
-                                    /* But, because we got the whole profile,
-                                     * assume it is ok.
+                                    png_crc_finish(png_ptr, length);
+                                    finished = 1;
+
+                                    /* Set the gAMA and cHRM information, this
+                                     * checks for a known sRGB profile.  The
+                                     * result is 0 on error.
                                      */
-                                    png_ptr->zowner = 0;
-
-                                    /* Yet the CRC should still be correct */
-                                    if (png_crc_finish(png_ptr, length))
-                                       return;
-
-#ifdef PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
-                                    /* See if it's a known sRGB profile. */
-                                    intent =
-                                        png_compare_ICC_profile_with_sRGB(
-                                            png_ptr, profile, profile_length);
-
-                                    if (intent >= 0)
-                                       png_chunk_warning(png_ptr,
-                                         "describes sRGB\n");
-#endif
-
-                                    /* Set the gAMA and cHRM information */
-                                    png_icc_set_gAMA_and_cHRM(png_ptr,
+                                    ok = png_icc_set_gAMA_and_cHRM(png_ptr,
                                        &png_ptr->colorspace, keyword, profile,
+                                       png_ptr->zstream.adler,
                                        0/*prefer explicit gAMA/cHRM*/);
 
                                     /* Steal the profile for info_ptr. */
-                                    if (info_ptr != NULL)
+                                    if (ok && info_ptr != NULL)
                                     {
                                        png_free_data(png_ptr, info_ptr,
                                           PNG_FREE_ICCP, 0);
@@ -1568,33 +1498,50 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                        info_ptr->iccp_name = png_voidcast(char*,
                                           png_malloc_base(png_ptr,
                                           keyword_length+1));
-                                       if (info_ptr->iccp_name == NULL)
+                                       if (info_ptr->iccp_name != NULL)
+                                       {
+                                          memcpy(info_ptr->iccp_name, keyword,
+                                             keyword_length+1);
+                                          info_ptr->iccp_proflen =
+                                             profile_length;
+                                          info_ptr->iccp_profile = profile;
+                                          png_ptr->read_buffer = NULL; /*steal*/
+                                          info_ptr->free_me |= PNG_FREE_ICCP;
+                                          info_ptr->valid |= PNG_INFO_iCCP;
+                                       }
+
+                                       else
                                        {
                                           png_ptr->colorspace.flags |=
                                              PNG_COLORSPACE_INVALID;
-                                          png_colorspace_sync(png_ptr,
-                                             info_ptr);
-                                          png_chunk_benign_error(png_ptr,
-                                             "out of memory");
-                                          return;
+                                          errmsg = "out of memory";
                                        }
-
-                                       memcpy(info_ptr->iccp_name, keyword,
-                                          keyword_length+1);
-                                       info_ptr->iccp_proflen = profile_length;
-                                       info_ptr->iccp_profile = profile;
-                                       png_ptr->read_buffer = NULL; /*steal*/
-                                       info_ptr->free_me |= PNG_FREE_ICCP;
-                                       info_ptr->valid |= PNG_INFO_iCCP;
-
-                                       png_colorspace_sync(png_ptr, info_ptr);
                                     }
 
-                                    return;
+                                    /* else the profile remains in the read
+                                     * buffer which gets reused for subsequent
+                                     * chunks.
+                                     */
+
+                                    if (info_ptr != NULL)
+                                       png_colorspace_sync(png_ptr, info_ptr);
+
+                                    if (errmsg == NULL && ok)
+                                    {
+                                       png_ptr->zowner = 0;
+                                       return;
+                                    }
+
+                                    /* else png_icc_set_gAMA_and_cHRM has
+                                     * already output an error.
+                                     */
                                  }
 
-                                 else
+                                 else if (size > 0)
                                     errmsg = "truncated";
+
+                                 else
+                                    errmsg = png_ptr->zstream.msg;
                               }
 
                               /* else png_icc_check_tag_table output an error */
@@ -1637,7 +1584,9 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       errmsg = "too many profiles";
 
    /* Failure: the reason is in 'errmsg' */
-   png_crc_finish(png_ptr, length);
+   if (!finished)
+      png_crc_finish(png_ptr, length);
+
    png_ptr->colorspace.flags |= PNG_COLORSPACE_INVALID;
    png_colorspace_sync(png_ptr, info_ptr);
    if (errmsg != NULL) /* else already output */

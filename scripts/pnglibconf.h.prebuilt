@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.6.0beta20 - March 28, 2012 */
+/* Libpng 1.6.0beta20 - March 29, 2012 */
 
 /* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
 
@@ -33,6 +33,7 @@
 #define PNG_QUANTIZE_GREEN_BITS 5
 #define PNG_QUANTIZE_RED_BITS 5
 #define PNG_sCAL_PRECISION 5
+#define PNG_sRGB_PROFILE_CHECKS 2
 #define PNG_WEIGHT_SHIFT 8
 #define PNG_ZBUF_SIZE 8192
 /* end of settings */
@@ -138,7 +139,6 @@
 #define PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
 #define PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
 #define PNG_SIMPLIFIED_WRITE_SUPPORTED
-#define PNG_WARN_IF_iCCP_IS_sRGB_SUPPORTED
 #define PNG_sPLT_SUPPORTED
 #define PNG_sRGB_SUPPORTED
 #define PNG_STDIO_SUPPORTED

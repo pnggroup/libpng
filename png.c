@@ -747,13 +747,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta20 - March 21, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta20 - March 29, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta20 - March 21, 2012\
+      return "libpng version 1.6.0beta20 - March 29, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1974,17 +1974,192 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 1;
 }
 
-void /* PRIVATE */
+#ifdef PNG_sRGB_SUPPORTED
+/* Information about the known ICC sRGB profiles */
+static const struct
+{
+   png_uint_32 adler, crc, length;
+   png_uint_32 md5[4];
+   png_uint_16 have_md5;
+   png_uint_16 intent;
+
+#  define PNG_MD5(a,b,c,d) { a, b, c, d }, (a!=0)||(b!=0)||(c!=0)||(d!=0)
+#  define PNG_ICC_CHECKSUM(adler, crc, md5, intent, date, length, fname)\
+      { adler, crc, length, md5, intent },
+
+} png_sRGB_checks[] =
+{
+   /* This data comes from contrib/tools/checksum-icc run on downloads of
+    * all four ICC sRGB profiles from www.color.org.
+    */
+   /* adler32, crc32, MD5[4], intent, date, length, file-name */
+   PNG_ICC_CHECKSUM(0x0a3fd9f6, 0x3b8772b9,
+      PNG_MD5(0x29f83dde, 0xaff255ae, 0x7842fae4, 0xca83390d), 0,
+      "2009/03/27 21:36:31", 3048, "sRGB_IEC61966-2-1_black_scaled.icc")
+
+   /* ICC sRGB v2 perceptual no black-compensation: */
+   PNG_ICC_CHECKSUM(0x4909e5e1, 0x427ebb21,
+      PNG_MD5(0xc95bd637, 0xe95d8a3b, 0x0df38f99, 0xc1320389), 1,
+      "2009/03/27 21:37:45", 3052, "sRGB_IEC61966-2-1_no_black_scaling.icc")
+
+   PNG_ICC_CHECKSUM(0xfd2144a1, 0x306fd8ae,
+      PNG_MD5(0xfc663378, 0x37e2886b, 0xfd72e983, 0x8228f1b8), 0,
+      "2009/08/10 17:28:01", 60988, "sRGB_v4_ICC_preference_displayclass.icc")
+
+   /* ICC sRGB v4 perceptual */
+   PNG_ICC_CHECKSUM(0x209c35d2, 0xbbef7812,
+      PNG_MD5(0x34562abf, 0x994ccd06, 0x6d2c5721, 0xd0d68c5d), 0,
+      "2007/07/25 00:05:37", 60960, "sRGB_v4_ICC_preference.icc")
+
+   /* The following profiles have no known MD5 checksum, if there is a match
+    * on the (empty) MD5 the other fields are used to attempt a match and
+    * a warning is produced.  The first two of these profiles have a 'cprt' tag
+    * which suggests that they were also made by Hewlett Packard.
+    */
+   PNG_ICC_CHECKSUM(0xa054d762, 0x5d5129ce,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1,
+      "2004/07/21 18:57:42", 3024, "sRGB_IEC61966-2-1_noBPC.icc")
+
+   PNG_ICC_CHECKSUM(0xf784f3fb, 0x182ea552,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0,
+      "1998/02/09 06:49:00", 3144, "sRGB Profile.icc")
+
+   PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0,
+      "unknown", 3144, "HP-Microsoft sRGB v2 perceptual")
+};
+
+static int
+png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
+   png_const_bytep profile, uLong adler)
+{
+   /* The quick check is to verify just the MD5 signature and trust to the
+    * rest of the data.  Because the profile has already been verified for
+    * correctness this is safe.  png_colorspace_set_sRGB will check the 'intent'
+    * field too, so if the profile has been editted with an intent not defined
+    * by sRGB (but maybe defined by a later ICC specification) the read of
+    * the profile will fail at that point.
+    */
+   png_uint_32 length = 0;
+   png_uint_32 intent = 0x10000; /* invalid */
+#if PNG_sRGB_PROFILE_CHECKS > 1
+   uLong crc = 0; /* the value for 0 length data */
+#endif
+   unsigned int i;
+
+   for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
+   {
+      if (png_get_uint_32(profile+84) == png_sRGB_checks[i].md5[0] &&
+         png_get_uint_32(profile+88) == png_sRGB_checks[i].md5[1] &&
+         png_get_uint_32(profile+92) == png_sRGB_checks[i].md5[2] &&
+         png_get_uint_32(profile+96) == png_sRGB_checks[i].md5[3])
+      {
+         /* This may be one of the old HP profiles without an MD5, in that
+          * case we can only use the length and Adler32 (note that these
+          * are not used by default if there is an MD5!)
+          */
+#        if PNG_sRGB_PROFILE_CHECKS == 0
+            if (png_sRGB_checks[i].have_md5)
+               return 1;
+#        endif
+
+         /* Profile is unsigned or more checks have been configured in. */
+         if (length == 0)
+         {
+            length = png_get_uint_32(profile);
+            intent = png_get_uint_32(profile+64);
+         }
+
+         /* Length *and* intent must match */
+         if (length == png_sRGB_checks[i].length &&
+            intent == png_sRGB_checks[i].intent)
+         {
+            /* Now calculate the alder32 if not done already. */
+            if (adler == 0)
+            {
+               adler = adler32(0, NULL, 0);
+               adler = adler32(adler, profile, length);
+            }
+
+            if (adler == png_sRGB_checks[i].adler)
+            {
+               /* These basic checks suggest that the data has not been
+                * modified, but if the check level is more than 1 perform
+                * our own crc32 checksum on the data.
+                */
+#              if PNG_sRGB_PROFILE_CHECKS > 1
+                  if (crc == 0)
+                  {
+                     crc = crc32(0, NULL, 0);
+                     crc = crc32(crc, profile, length);
+                  }
+
+                  /* So this check must pass for the 'return' below to happen.
+                   */
+                  if (crc == png_sRGB_checks[i].crc)
+#              endif
+               {
+                  /* Warn that this being done; this isn't even an error since
+                   * the profile is perfectly valid, but it would be nice if
+                   * people used the up-to-date ones.
+                   */
+                  if (!png_sRGB_checks[i].have_md5)
+                  {
+#                    ifdef PNG_READ_SUPPORTED
+                        if (png_ptr->mode & PNG_IS_READ_STRUCT)
+                           png_chunk_warning(png_ptr,
+                              "out-of-date sRGB profile with no signature");
+                        else
+#                    endif
+                     png_app_warning(png_ptr,
+                        "out-of-date sRGB profile with no signature");
+                  }
+
+                  return 1;
+               }
+            }
+         }
+
+#        if PNG_sRGB_PROFILE_CHECKS > 0
+            /* The signature matched, but the profile had been changed in some
+             * way.  This is an apparent violation of the ICC terms of use and,
+             * anyway, the rejection may be unexpected.
+             */
+            if (png_sRGB_checks[i].have_md5)
+               png_benign_error(png_ptr,
+                  "copyright violation: edited ICC profile ignored");
+#        endif
+      }
+   }
+
+   return 0; /* no match */
+}
+#endif
+
+int /* PRIVATE */
 png_icc_set_gAMA_and_cHRM(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile,
-   int preferred)
+   uLong adler, int preferred)
 {
-   /* TODO: implement this! */
-   PNG_UNUSED(png_ptr)
-   PNG_UNUSED(colorspace)
-   PNG_UNUSED(name)
-   PNG_UNUSED(profile)
-   PNG_UNUSED(preferred)
+#  ifdef PNG_sRGB_SUPPORTED
+      /* 1) Is this profile one of the known ICC sRGB profiles?  If it is just
+       *    set the sRGB information.
+       */
+      if (png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler))
+         return png_colorspace_set_sRGB(png_ptr, colorspace,
+            (int)/*already checked*/png_get_uint_32(profile+64), preferred);
+
+      else
+#  endif
+
+   /* 2) Attempt to extract the gAMA and cHRM information from non-sRGB
+    *    profiles.
+    */
+   {
+      /* TODO: implement this! */
+      PNG_UNUSED(name) /* NYI */
+      return 1;
+   }
 }
 
 int /* PRIVATE */
@@ -2000,7 +2175,8 @@ png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
       && png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
          profile))
    {
-      png_icc_set_gAMA_and_cHRM(png_ptr, colorspace, name, profile, preferred);
+      png_icc_set_gAMA_and_cHRM(png_ptr, colorspace, name, profile, 0,
+         preferred);
       return 1;
    }
 

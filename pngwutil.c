@@ -325,7 +325,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
        * are minimal.
        */
       (void)png_safecat(msg, sizeof msg, 10, " using zstream");
-#     if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
+#     if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
          png_warning(png_ptr, msg);
 
          /* Attempt sane error recovery */
