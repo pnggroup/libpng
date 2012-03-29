@@ -4100,6 +4100,8 @@ Version 1.6.0beta20 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
     CVE-2011-3048).
 
+Version 1.6.0beta21 [March 29, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
