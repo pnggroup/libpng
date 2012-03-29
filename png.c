@@ -2025,8 +2025,8 @@ static const struct
       "1998/02/09 06:49:00", 3144, "sRGB Profile.icc")
 
    PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
-      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0,
-      "unknown", 3144, "HP-Microsoft sRGB v2 perceptual")
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1,
+      "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };
 
 static int

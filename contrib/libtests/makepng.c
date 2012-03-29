@@ -417,6 +417,8 @@ write_png(FILE *fp, int color_type, int bit_depth,
       return 1;
    }
 
+   /* Allow benign errors so that we can write PNGs with errors */
+   png_set_benign_errors(png_ptr, 1/*allowed*/);
    png_init_io(png_ptr, fp);
 
    info_ptr = png_create_info_struct(png_ptr);
