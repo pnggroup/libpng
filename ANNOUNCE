@@ -1,5 +1,5 @@
 
-Libpng 1.4.10 - March 15, 2012
+Libpng 1.4.11 - March 29, 2012
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,36 +8,26 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.4.10.tar.xz (LZMA-compressed, recommended)
-   libpng-1.4.10.tar.gz
-   libpng-1.4.10.tar.bz2
+   libpng-1.4.11.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.11.tar.gz
+   libpng-1.4.11.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1410.7z (LZMA-compressed, recommended)
-   lpng1410.zip
+   lpng1411.7z (LZMA-compressed, recommended)
+   lpng1411.zip
 
 Other information:
 
-   libpng-1.4.10-README.txt
-   libpng-1.4.10-LICENSE.txt
+   libpng-1.4.11-README.txt
+   libpng-1.4.11-LICENSE.txt
 
-Changes since the last public release (1.4.9):
+Changes since the last public release (1.4.10):
 
-  Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
-  Eliminated redundant png_push_read_tEXt|zTXt|iTXt|unknown code from
-    pngpread.c and use the sequential png_handle_tEXt, etc., in pngrutil.c;
-    now that png_ptr->buffer is inaccessible to applications, the special
-    handling is no longer useful.
-  Fixed bug with png_handle_hIST with odd chunk length (Frank Busse).
-  Fixed incorrect type (int copy should be png_size_t copy) in png_inflate().
-  Fixed off-by-one bug in png_handle_sCAL() when using fixed point arithmetic,
-    causing out-of-bounds read in png_set_sCAL() because of failure to copy
-    the string terminators.  This bug was introduced in libpng-1.0.6 (Frank
-    Busse).
-  Removed the png_free() of unused png_ptr->current_text from pngread.c.
-  Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition in png.h
+  Revised png_set_text_2() to avoid potential memory corruption (fixes
+    CVE-2011-3048).
+  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
