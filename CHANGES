@@ -4097,7 +4097,7 @@ Version 1.6.0beta20 [March 29, 2012]
   Recognize known sRGB ICC profiles while reading; prefer writing the
     iCCP profile over writing the sRGB chunk, controlled by the
     PNG_sRGB_PROFILE_CHECKS option.
-  Revised png_set_text_2() to avoid potential memory corruption.
+  Revised png_set_text_2() to avoid a potential memory corruption.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
