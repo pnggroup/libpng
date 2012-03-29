@@ -1,32 +1,30 @@
 
-Libpng 1.5.10rc01 - March 19, 2012
+Libpng 1.5.10 - March 29, 2012
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.10rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.10rc01.tar.gz
-   1.5.10rc01.tar.bz2
+   libpng-1.5.10.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.10.tar.gz
+   libpng-1.5.10.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1510r01.7z  (LZMA-compressed, recommended)
-   lp1510r01.zip
+   lpng1510.7z  (LZMA-compressed, recommended)
+   lpng1510.zip
 
 Other information:
 
-   1.5.10rc01-README.txt
-   1.5.10rc01-LICENSE.txt
+   libpng-1.5.10-README.txt
+   libpng-1.5.10-LICENSE.txt
 
 Changes since the last public release (1.5.9):
 
-Version 1.5.10beta01 [February 24, 2012]
   Removed two useless #ifdef directives from pngread.c and one from pngrutil.c
   Always put the CMAKE_LIBRARY in "lib" (removed special WIN32 case).
   Removed empty vstudio/pngstest directory (Clifford Yapp).
@@ -41,35 +39,26 @@ Version 1.5.10beta01 [February 24, 2012]
     command or put "#define PNG_SAFE_LIMITS_SUPPORTED" in pnglibconf.h.
   Revised the SAFE_LIMITS feature to be the same as the feature in libpng16.
   Added information about the new limits in the manual.
-
-Version 1.5.10beta02 [February 27, 2012]
   Updated Makefile.in
-
-Version 1.5.10beta03 [March 6, 2012]
   Removed unused "current_text" members of png_struct and the png_free()
     of png_ptr->current_text from pngread.c
-  Added palette-index checking. Issue a png_warning() if an invalid index is
-    found.
-
-Version 1.5.10beta04 [March 10, 2012]
   Fixed PNG_LIBPNG_BUILD_BASE_TYPE definition.
   Fixed CMF optimization of non-IDAT compressed chunks, which was added at
     libpng-1.5.4.  It sometimes produced too small of a window.
-
-Version 1.5.10beta05 [March 10, 2012]
   Reject all iCCP chunks after the first, even if the first one is invalid.
-  Issue a png_benign_error() instead of png_warning() about bad palette index.
-  Fixed an off-by-one error in the palette index checking function.
+  Added palette-index checking. Issue a png_benign_error() if an invalid
+    index is found.
   Revised example.c to put text strings in a temporary character array
     instead of directly assigning string constants to png_textp members.
     This avoids compiler warnings when -Wwrite-strings is enabled.
+  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+  Revised png_set_text_2() to avoid potential memory corruption (fixes
+    CVE-2011-3048).
 
-Version 1.5.10rc01 [March 19, 2012]
-  No changes.
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P

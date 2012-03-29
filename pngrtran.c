@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.5.10 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.10 [March 8, 2012]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1830,11 +1830,14 @@ png_init_read_transformations(png_structp png_ptr)
 
 #ifdef PNG_READ_SHIFT_SUPPORTED
    if ((png_ptr->transformations & PNG_SHIFT) &&
+      !(png_ptr->transformations & PNG_EXPAND) &&
        (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE))
    {
       int i;
       int istop = png_ptr->num_palette;
       int shift = 8 - png_ptr->sig_bit.red;
+
+      png_ptr->transformations &= ~PNG_SHIFT;
 
       /* significant bits can be in the range 1 to 7 for a meaninful result, if
        * the number of significant bits is 0 then no shift is done (this is an

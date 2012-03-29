@@ -3849,8 +3849,10 @@ Version 1.5.10beta05 [March 10, 2012]
     instead of directly assigning string constants to png_textp members.
     This avoids compiler warnings when -Wwrite-strings is enabled.
 
-Version 1.5.10rc01 [March 19, 2012]
-  No changes.
+Version 1.5.10 [March 29, 2012]
+  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+  Revised png_set_text_2() to avoid potential memory corruption (fixes
+    CVE-2011-3048).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

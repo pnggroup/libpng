@@ -692,24 +692,28 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
     */
    if (info_ptr->num_text + num_text > info_ptr->max_text)
    {
+      int old_max_text = info_ptr->max_text;
+      int old_num_text = info_ptr->num_text;
+
       if (info_ptr->text != NULL)
       {
          png_textp old_text;
-         int old_max;
 
-         old_max = info_ptr->max_text;
          info_ptr->max_text = info_ptr->num_text + num_text + 8;
          old_text = info_ptr->text;
+
          info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
             (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
 
          if (info_ptr->text == NULL)
          {
-            png_free(png_ptr, old_text);
+            /* Restore to previous condition */
+            info_ptr->max_text = old_max_text;
+            info_ptr->text = old_text;
             return(1);
          }
 
-         png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max *
+         png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max_text *
              png_sizeof(png_text)));
          png_free(png_ptr, old_text);
       }
@@ -721,7 +725,12 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
          info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
              (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
          if (info_ptr->text == NULL)
+         {
+            /* Restore to previous condition */
+            info_ptr->num_text = old_num_text;
+            info_ptr->max_text = old_max_text;
             return(1);
+         }
          info_ptr->free_me |= PNG_FREE_TEXT;
       }
 
