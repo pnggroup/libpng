@@ -1896,14 +1896,14 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
          "intent outside defined range");
 
    /* At this point the tag table can't be checked because it hasn't necessarily
-    * been loaded, however various header fields can be checked.  These checks
+    * been loaded; however, various header fields can be checked.  These checks
     * are for values permitted by the PNG spec in an ICC profile; the PNG spec
-    * restricts the profiles than can be passed in an iCCP chunk (they must be
+    * restricts the profiles that can be passed in an iCCP chunk (they must be
     * appropriate to processing PNG data!)
     */
 
    /* Data checks (could be skipped).  These checks must be independent of the
-    * version number, however the version number doesn't accomodate changes in
+    * version number; however, the version number doesn't accomodate changes in
     * the header fields (just the known tags and the interpretation of the
     * data.)
     */
@@ -1921,10 +1921,10 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * and 4)."
     *
     * This code does not check the color type because png_set_iCCP may be called
-    * before png_set_IHDR on write and because, anyway, the spec is
+    * before png_set_IHDR on write and because, anyway, the PNG spec is
     * fundamentally flawed: RGB profiles can be used quite meaningfully for
-    * grayscale images and both RGB and palette images may only have gray colors
-    * in them, so gray profiles may be appropriate.
+    * grayscale images and both RGB and palette images might only have gray
+    * colors in them, so gray profiles may be appropriate.
     */
    temp = png_get_uint_32(profile+16); /* data colour space field */
    if (temp != 0x52474220 /* 'RGB ' */ && temp != 0x47524159 /* 'GRAY' */)
@@ -2011,7 +2011,7 @@ static const struct
       PNG_MD5(0x34562abf, 0x994ccd06, 0x6d2c5721, 0xd0d68c5d), 0,
       "2007/07/25 00:05:37", 60960, "sRGB_v4_ICC_preference.icc")
 
-   /* The following profiles have no known MD5 checksum, if there is a match
+   /* The following profiles have no known MD5 checksum. If there is a match
     * on the (empty) MD5 the other fields are used to attempt a match and
     * a warning is produced.  The first two of these profiles have a 'cprt' tag
     * which suggests that they were also made by Hewlett Packard.
@@ -2033,10 +2033,10 @@ static int
 png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
    png_const_bytep profile, uLong adler)
 {
-   /* The quick check is to verify just the MD5 signature and trust to the
+   /* The quick check is to verify just the MD5 signature and trust the
     * rest of the data.  Because the profile has already been verified for
     * correctness this is safe.  png_colorspace_set_sRGB will check the 'intent'
-    * field too, so if the profile has been editted with an intent not defined
+    * field too, so if the profile has been edited with an intent not defined
     * by sRGB (but maybe defined by a later ICC specification) the read of
     * the profile will fail at that point.
     */
@@ -2050,8 +2050,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
    {
       if (png_get_uint_32(profile+84) == png_sRGB_checks[i].md5[0] &&
-         png_get_uint_32(profile+88) == png_sRGB_checks[i].md5[1] &&
-         png_get_uint_32(profile+92) == png_sRGB_checks[i].md5[2] &&
+          png_get_uint_32(profile+88) == png_sRGB_checks[i].md5[1] &&
+          png_get_uint_32(profile+92) == png_sRGB_checks[i].md5[2] &&
          png_get_uint_32(profile+96) == png_sRGB_checks[i].md5[3])
       {
          /* This may be one of the old HP profiles without an MD5, in that
@@ -2142,7 +2142,7 @@ png_icc_set_gAMA_and_cHRM(png_const_structrp png_ptr,
    uLong adler, int preferred)
 {
 #  ifdef PNG_sRGB_SUPPORTED
-      /* 1) Is this profile one of the known ICC sRGB profiles?  If it is just
+      /* 1) Is this profile one of the known ICC sRGB profiles?  If it is, just
        *    set the sRGB information.
        */
       if (png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler))
