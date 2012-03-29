@@ -2770,6 +2770,11 @@ version 1.2.48rc02 [March 2, 2012]
 version 1.0.58 and 1.2.48 [March 8, 2012]
   No changes.
 
+version 1.2.49rc01 [March 29, 2012]
+  Revised png_set_text_2() to avoid potential memory corruption (fixes
+    CVE-2011-3048).
+  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
