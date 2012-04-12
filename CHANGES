@@ -3854,6 +3854,8 @@ Version 1.5.10 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
     CVE-2011-3048).
 
+Version 1.5.11 [April 12, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
