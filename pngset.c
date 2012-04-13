@@ -1291,8 +1291,10 @@ png_set_benign_errors(png_structp png_ptr, int allowed)
 }
 #endif /* PNG_BENIGN_ERRORS_SUPPORTED */
 
-#ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   /* Do not report invalid palette index; added at libng-1.5.10 */
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+/* Whether to report invalid palette index; added at libng-1.5.10
+ *   allowed  - one of 0: disable; 1: enable
+ */
 void PNGAPI
 png_set_check_for_invalid_index(png_structp png_ptr, int allowed)
 {

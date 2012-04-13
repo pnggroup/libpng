@@ -1,5 +1,5 @@
 
-Libpng 1.5.11beta01 - April 12, 2012
+Libpng 1.5.11beta01 - April 13, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,12 @@ Other information:
 
 Changes since the last public release (1.5.10):
 
-Version 1.5.11 [April 12, 2012]
+Version 1.5.11 [April 13, 2012]
+  Revised scripts/makefile.darwin: use system zlib; remove quotes around
+    architecture list; add missing ppc architecture; add architecture options
+    to shared library link; don't try to create a shared lib based on missing
+    RELEASE variable.
+  Enable png_set_check_for_invalid_index() for both read and write.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
