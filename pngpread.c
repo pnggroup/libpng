@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.5.9 [February 18, 2012]
+ * Last changed in libpng 1.5.11 [(PENDING RELEASE)]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -255,8 +255,11 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_push_have_end(png_ptr, info_ptr);
    }
 
+#ifdef PNG_HANDLE_UNKNOWN_SUPPORTED
+   else
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   else if (png_chunk_unknown_handling(png_ptr, chunk_name))
+   if (png_chunk_unknown_handling(png_ptr, chunk_name))
+#endif
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
@@ -550,6 +553,8 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
    }
 
 #endif
+
+#ifdef PNG_HANDLE_UNKNOWN_SUPPORTED
    else
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -559,6 +564,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
       png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length);
    }
+#endif
 
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
 }
