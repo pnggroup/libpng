@@ -1259,10 +1259,8 @@ PNG_EXTERN void png_handle_zTXt PNGARG((png_structp png_ptr, png_infop info_ptr,
     png_uint_32 length));
 #endif
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
     png_infop info_ptr, png_uint_32 length));
-#endif
 
 PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
     png_uint_32 chunk_name));

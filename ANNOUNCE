@@ -32,7 +32,8 @@ Version 1.5.11 [April 24, 2012]
     to shared library link; don't try to create a shared lib based on missing
     RELEASE variable.
   Enable png_set_check_for_invalid_index() for both read and write.
-  Fixed problem with use of PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpread.c
+  Removed #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpriv.h around
+    declaration of png_handle_unknown().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

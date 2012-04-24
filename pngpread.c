@@ -255,11 +255,8 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_push_have_end(png_ptr, info_ptr);
    }
 
-#ifdef PNG_HANDLE_UNKNOWN_SUPPORTED
-   else
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   if (png_chunk_unknown_handling(png_ptr, chunk_name))
-#endif
+   else if (png_chunk_unknown_handling(png_ptr, chunk_name))
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
@@ -285,8 +282,8 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
             png_error(png_ptr, "Missing PLTE before IDAT");
       }
    }
-
 #endif
+
    else if (chunk_name == png_PLTE)
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -554,7 +551,6 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
 
 #endif
 
-#ifdef PNG_HANDLE_UNKNOWN_SUPPORTED
    else
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -564,7 +560,6 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       }
       png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length);
    }
-#endif
 
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
 }
