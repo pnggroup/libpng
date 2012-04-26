@@ -34,7 +34,7 @@ Version 1.5.11 [April 26, 2012]
   Enable png_set_check_for_invalid_index() for both read and write.
   Removed #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpriv.h around
     declaration of png_handle_unknown().
-  Added -lssp_nonshared to scripts/makefile.freebsd
+  Added -lssp_nonshared in a comment in scripts/makefile.freebsd
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
