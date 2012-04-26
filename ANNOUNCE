@@ -24,12 +24,7 @@ Other information:
    1.4.12beta01-README.txt
    1.4.12beta01-LICENSE.txt
 
-Changes since the last public release (1.4.10):
-
-version 1.4.11 [March 29, 2012]
-  Revised png_set_text_2() to avoid potential memory corruption (fixes
-    CVE-2011-3048).
-  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+Changes since the last public release (1.4.11):
 
 version 1.4.12 [April 26, 2012]
 
