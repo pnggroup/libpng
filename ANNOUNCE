@@ -1,33 +1,37 @@
 
-Libpng 1.4.11 - March 29, 2012
+Libpng 1.4.12beta01 - April 26, 2012
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.4.11.tar.xz (LZMA-compressed, recommended)
-   libpng-1.4.11.tar.gz
-   libpng-1.4.11.tar.bz2
+   1.4.12beta01.tar.xz (LZMA-compressed, recommended)
+   1.4.12beta01.tar.gz
+   1.4.12beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1411.7z (LZMA-compressed, recommended)
-   lpng1411.zip
+   lp1412b01.7z (LZMA-compressed, recommended)
+   lp1412b01.zip
 
 Other information:
 
-   libpng-1.4.11-README.txt
-   libpng-1.4.11-LICENSE.txt
+   1.4.12beta01-README.txt
+   1.4.12beta01-LICENSE.txt
 
 Changes since the last public release (1.4.10):
 
+version 1.4.11 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
     CVE-2011-3048).
   Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+
+version 1.4.12 [April 26, 2012]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
