@@ -11,8 +11,8 @@ SHLIB_VER?=     15
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}
 SHLIB_MINOR=	0
-NOPROFILE=	YES
-NOOBJ=          YES
+NO_PROFILE=	YES
+NO_OBJ=          YES
 
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
