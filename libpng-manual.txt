@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta21 - March 29, 2012
+ libpng version 1.6.0beta21 - April 27, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta21 - March 29, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta21 - April 27, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -822,7 +822,7 @@ the screen_gamma value.  Pixels with alpha less than 1.0
 will still have linear components.
 
 Use this format if you have control over your
-compositing software and do don't do other arithmetic
+compositing software and so don't do other arithmetic
 (such as scaling) on the data you get from libpng.  Your
 compositing software can simply copy opaque pixels to
 the output but still has linear values for the
@@ -1152,6 +1152,15 @@ png_get_<chunk>(png_ptr, info_ptr, ...) functions return non-zero if the
 data has been read, or zero if it is missing.  The parameters to the
 png_get_<chunk> are set directly if they are simple data types, or a
 pointer into the info_ptr is returned for any complex types.
+
+The colorspace data from gAMA, cHRM, sRGB, iCCP, and sBIT chunks
+is simply returned to give the application information about how the
+image was encoded.  Libpng itself only does transformations using the file
+gamma when combining semitransparent pixels with the background color, and,
+since libpng-1.6.0, when converting between 8-bit sRGB and 16-bit linear pixels
+within the simplified API.  Libpng also uses the file gamma when converting
+RGB to gray, beginning with libpng-1.0.5, if the application calls
+png_set_rgb_to_gray()).
 
     png_get_PLTE(png_ptr, info_ptr, &palette,
                      &num_palette);
@@ -5003,7 +5012,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-March 29, 2012
+April 27, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
