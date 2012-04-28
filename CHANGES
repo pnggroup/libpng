@@ -3854,7 +3854,7 @@ Version 1.5.10 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
     CVE-2011-3048).
 
-Version 1.5.11 [April 28, 2012]
+Version 1.5.11beta01 [April 28, 2012]
   Revised scripts/makefile.darwin: use system zlib; remove quotes around
     architecture list; add missing ppc architecture; add architecture options
     to shared library link; don't try to create a shared lib based on missing
@@ -3864,6 +3864,8 @@ Version 1.5.11 [April 28, 2012]
     declaration of png_handle_unknown().
   Added -lssp_nonshared in a comment in scripts/makefile.freebsd
     and changed deprecated NOOBJ and NOPROFILE to NO_OBJ and NO_PROFILE.
+
+Version 1.5.11beta02 [April 28, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
