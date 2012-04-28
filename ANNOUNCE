@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta21 - April 27, 2012
+Libpng 1.6.0beta22 - April 28, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta21.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta21.tar.gz
-   1.6.0beta21.tar.bz2
+   1.6.0beta22.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta22.tar.gz
+   1.6.0beta22.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b21.7z  (LZMA-compressed, recommended)
-   lp160b21.zip
+   lp160b22.7z  (LZMA-compressed, recommended)
+   lp160b22.zip
 
 Other information:
 
-   1.6.0beta21-README.txt
-   1.6.0beta21-LICENSE.txt
+   1.6.0beta22-README.txt
+   1.6.0beta22-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -359,6 +359,8 @@ Version 1.6.0beta21 [April 27, 2012]
     declaration of png_handle_unknown().
   Added -lssp_nonshared in a comment in scripts/makefile.freebsd
     and changed deprecated NOOBJ and NOPROFILE to NO_OBJ and NO_PROFILE.
+
+Version 1.6.0beta22 [April 28, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
