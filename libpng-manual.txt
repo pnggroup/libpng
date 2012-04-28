@@ -1,6 +1,6 @@
-libpng-manual.txt - A description on how to use and modify libpng
+Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.11beta01 - April 12, 2012
+ libpng version 1.5.11beta01 - April 28, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.11beta01 - April 12, 2012
+ libpng versions 0.97, January 1998, through 1.5.11beta01 - April 28, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -799,7 +799,7 @@ the screen_gamma value.  Pixels with alpha less than 1.0
 will still have linear components.
 
 Use this format if you have control over your
-compositing software and do don't do other arithmetic
+compositing software and so don't do other arithmetic
 (such as scaling) on the data you get from libpng.  Your
 compositing software can simply copy opaque pixels to
 the output but still has linear values for the
@@ -1130,6 +1130,11 @@ data has been read, or zero if it is missing.  The parameters to the
 png_get_<chunk> are set directly if they are simple data types, or a
 pointer into the info_ptr is returned for any complex types.
 
+The colorspace data from gAMA, cHRM, sRGB, iCCP, and sBIT chunks
+is simply returned to give the application information about how the
+image was encoded.  Libpng itself only does transformations using the file
+gamma when combining semitransparent pixels with the background color.
+
     png_get_PLTE(png_ptr, info_ptr, &palette,
                      &num_palette);
 
@@ -1141,7 +1146,7 @@ pointer into the info_ptr is returned for any complex types.
     png_get_gAMA(png_ptr, info_ptr, &file_gamma);
     png_get_gAMA_fixed(png_ptr, info_ptr, &int_file_gamma);
 
-    file_gamma     - the gamma at which the file is
+    file_gamma     - the gamma at which the file was
                      written (PNG_INFO_gAMA)
 
     int_file_gamma - 100,000 times the gamma at which the
@@ -4597,7 +4602,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-April 12, 2012
+April 28, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
