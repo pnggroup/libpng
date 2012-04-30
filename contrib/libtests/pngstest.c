@@ -54,8 +54,11 @@
 /* The following is to support direct compilation of this file as C++ */
 #ifdef __cplusplus
 #  define voidcast(type, value) static_cast<type>(value)
+#  define aligncastconst(type, value) \
+      static_cast<type>(static_cast<const void*>(value))
 #else
 #  define voidcast(type, value) (value)
+#  define aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
 
 /* Generate random bytes.  This uses a boring repeatable algorithm and it
@@ -2928,8 +2931,8 @@ compare_two_images(Image *a, Image *b, int via_linear,
              */
             if (formatb & PNG_FORMAT_FLAG_LINEAR) /* 16-bit checks */
             {
-               png_const_uint_16p pua = (png_const_uint_16p)psa;
-               png_const_uint_16p pub = (png_const_uint_16p)psb;
+               png_const_uint_16p pua = aligncastconst(png_const_uint_16p, psa);
+               png_const_uint_16p pub = aligncastconst(png_const_uint_16p, psb);
 
                switch (bchannels)
                {
