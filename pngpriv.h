@@ -312,9 +312,15 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #ifdef __cplusplus
 #  define png_voidcast(type, value) static_cast<type>(value)
 #  define png_constcast(type, value) const_cast<type>(value)
+#  define png_aligncast(type, value) \
+   static_cast<type>(static_cast<void*>(value))
+#  define png_aligncastconst(type, value) \
+   static_cast<type>(static_cast<const void*>(value))
 #else
 #  define png_voidcast(type, value) (value)
 #  define png_constcast(type, value) ((type)(value))
+#  define png_aligncast(type, value) ((void*)(value))
+#  define png_aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
 
 /* Some fixed point APIs are still required even if not exported because

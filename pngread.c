@@ -1145,8 +1145,8 @@ typedef struct
    png_voidp  colormap;
    png_const_colorp background;
    /* Local variables: */
-   png_bytep       local_row;
-   png_bytep       first_row;
+   png_voidp       local_row;
+   png_voidp       first_row;
    ptrdiff_t       row_bytes;           /* step between rows */
    int             file_encoding;       /* E_ values above */
    png_fixed_point gamma_to_linear;     /* For E_FILE, reciprocal of gamma */
@@ -2771,7 +2771,7 @@ png_image_read_and_map(png_voidp argument)
       png_uint_32  height = image->height;
       png_uint_32  width = image->width;
       int          proc = display->colormap_processing;
-      png_bytep    first_row = display->first_row;
+      png_bytep    first_row = png_voidcast(png_bytep, display->first_row);
       ptrdiff_t    step_row = display->row_bytes;
       int pass;
 
@@ -2801,7 +2801,7 @@ png_image_read_and_map(png_voidp argument)
 
          for (; y<height; y += stepy)
          {
-            png_bytep inrow = display->local_row;
+            png_bytep inrow = png_voidcast(png_bytep, display->local_row);
             png_bytep outrow = first_row + y * step_row;
             png_const_bytep end_row = outrow + width;
 
@@ -3011,14 +3011,18 @@ png_image_read_colormapped(png_voidp argument)
     * size libpng requires and call the relevant processing routine safely.
     */
    {
-      png_bytep first_row = png_voidcast(png_bytep, display->buffer);
+      png_voidp first_row = display->buffer;
       ptrdiff_t row_bytes = display->row_stride;
 
       /* The following expression is designed to work correctly whether it gives
        * a signed or an unsigned result.
        */
       if (row_bytes < 0)
-         first_row += (image->height-1) * (-row_bytes);
+      {
+         char *ptr = png_voidcast(char*, first_row);
+         ptr += (image->height-1) * (-row_bytes);
+         first_row = png_voidcast(png_voidp, ptr);
+      }
 
       display->first_row = first_row;
       display->row_bytes = row_bytes;
@@ -3027,8 +3031,7 @@ png_image_read_colormapped(png_voidp argument)
    if (passes == 0)
    {
       int result;
-      png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
-         png_get_rowbytes(png_ptr, info_ptr)));
+      png_voidp row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_and_map, display);
@@ -3045,7 +3048,7 @@ png_image_read_colormapped(png_voidp argument)
       while (--passes >= 0)
       {
          png_uint_32      y = image->height;
-         png_bytep        row = display->first_row;
+         png_bytep        row = png_voidcast(png_bytep, display->first_row);
 
          while (y-- > 0)
          {
@@ -3086,7 +3089,6 @@ png_image_read_composite(png_voidp argument)
    {
       png_uint_32  height = image->height;
       png_uint_32  width = image->width;
-      png_bytep    first_row = display->first_row;
       ptrdiff_t    step_row = display->row_bytes;
       unsigned int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
       int pass;
@@ -3118,12 +3120,16 @@ png_image_read_composite(png_voidp argument)
 
          for (; y<height; y += stepy)
          {
-            png_bytep inrow = display->local_row;
-            png_bytep outrow = first_row + y * step_row;
-            png_const_bytep end_row = outrow + width * channels;
+            png_bytep inrow = png_voidcast(png_bytep, display->local_row);
+            png_bytep outrow;
+            png_const_bytep end_row;
 
             /* Read the row, which is packed: */
             png_read_row(png_ptr, inrow, NULL);
+
+            outrow = png_voidcast(png_bytep, display->first_row);
+            outrow += y * step_row;
+            end_row = outrow + width * channels;
 
             /* Now do the composition on each pixel in this row. */
             outrow += startx;
@@ -3242,12 +3248,13 @@ png_image_read_background(png_voidp argument)
           * Unlike the code above ALPHA_OPTIMIZED has *not* been done.
           */
          {
-            png_bytep first_row = display->first_row;
+            png_bytep first_row = png_voidcast(png_bytep, display->first_row);
             ptrdiff_t step_row = display->row_bytes;
 
             for (pass = 0; pass < passes; ++pass)
             {
-               png_bytep        row = display->first_row;
+               png_bytep        row = png_voidcast(png_bytep,
+                                                   display->first_row);
                unsigned int     startx, stepx, stepy;
                png_uint_32      y;
 
@@ -3274,7 +3281,8 @@ png_image_read_background(png_voidp argument)
                {
                   for (; y<height; y += stepy)
                   {
-                     png_bytep inrow = display->local_row;
+                     png_bytep inrow = png_voidcast(png_bytep,
+                        display->local_row);
                      png_bytep outrow = first_row + y * step_row;
                      png_const_bytep end_row = outrow + width;
 
@@ -3318,7 +3326,8 @@ png_image_read_background(png_voidp argument)
 
                   for (; y<height; y += stepy)
                   {
-                     png_bytep inrow = display->local_row;
+                     png_bytep inrow = png_voidcast(png_bytep,
+                        display->local_row);
                      png_bytep outrow = first_row + y * step_row;
                      png_const_bytep end_row = outrow + width;
 
@@ -3364,8 +3373,12 @@ png_image_read_background(png_voidp argument)
           * handles the alpha-first option.
           */
          {
-            png_bytep    first_row = display->first_row;
-            ptrdiff_t    step_row = display->row_bytes;
+            png_uint_16p first_row = png_voidcast(png_uint_16p,
+               display->first_row);
+            /* The division by two is safe because the caller passed in a
+             * stride which was multiplied by 2 (below) to get row_bytes.
+             */
+            ptrdiff_t    step_row = display->row_bytes / 2;
             int preserve_alpha = (image->format & PNG_FORMAT_FLAG_ALPHA) != 0;
             unsigned int outchannels = 1+preserve_alpha;
             int swap_alpha = 0;
@@ -3403,12 +3416,13 @@ png_image_read_background(png_voidp argument)
                for (; y<height; y += stepy)
                {
                   png_const_uint_16p inrow;
-                  png_uint_16p outrow = (png_uint_16p)(first_row + y*step_row);
+                  png_uint_16p outrow = first_row + y*step_row;
                   png_uint_16p end_row = outrow + width * outchannels;
 
                   /* Read the row, which is packed: */
-                  png_read_row(png_ptr, display->local_row, NULL);
-                  inrow = (png_const_uint_16p)display->local_row;
+                  png_read_row(png_ptr, png_voidcast(png_bytep,
+                     display->local_row), NULL);
+                  inrow = png_voidcast(png_const_uint_16p, display->local_row);
 
                   /* Now do the pre-multiplication on each pixel in this row.
                    */
@@ -3806,7 +3820,7 @@ png_image_read_direct(png_voidp argument)
     * display acts as a flag.
     */
    {
-      png_bytep first_row = png_voidcast(png_bytep, display->buffer);
+      png_voidp first_row = display->buffer;
       ptrdiff_t row_bytes = display->row_stride;
 
       if (linear)
@@ -3816,7 +3830,11 @@ png_image_read_direct(png_voidp argument)
        * a signed or an unsigned result.
        */
       if (row_bytes < 0)
-         first_row += (image->height-1) * (-row_bytes);
+      {
+         char *ptr = png_voidcast(char*, first_row);
+         ptr += (image->height-1) * (-row_bytes);
+         first_row = png_voidcast(png_voidp, ptr);
+      }
 
       display->first_row = first_row;
       display->row_bytes = row_bytes;
@@ -3825,8 +3843,7 @@ png_image_read_direct(png_voidp argument)
    if (do_local_compose)
    {
       int result;
-      png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
-         png_get_rowbytes(png_ptr, info_ptr)));
+      png_voidp row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_composite, display);
@@ -3839,8 +3856,7 @@ png_image_read_direct(png_voidp argument)
    else if (do_local_background == 2)
    {
       int result;
-      png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
-         png_get_rowbytes(png_ptr, info_ptr)));
+      png_voidp row = png_malloc(png_ptr, png_get_rowbytes(png_ptr, info_ptr));
 
       display->local_row = row;
       result = png_safe_execute(image, png_image_read_background, display);
@@ -3857,7 +3873,7 @@ png_image_read_direct(png_voidp argument)
       while (--passes >= 0)
       {
          png_uint_32      y = image->height;
-         png_bytep        row = display->first_row;
+         png_bytep        row = png_voidcast(png_bytep, display->first_row);
 
          while (y-- > 0)
          {
