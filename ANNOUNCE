@@ -1,5 +1,5 @@
 
-Libpng 1.5.11beta02 - April 28, 2012
+Libpng 1.5.11rc01 - May 22, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.11beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.11beta02.tar.gz
-   1.5.11beta02.tar.bz2
+   1.5.11rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.11rc01.tar.gz
+   1.5.11rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1511b02.7z  (LZMA-compressed, recommended)
-   lp1511b02.zip
+   lp1511r01.7z  (LZMA-compressed, recommended)
+   lp1511r01.zip
 
 Other information:
 
-   1.5.11beta02-README.txt
-   1.5.11beta02-LICENSE.txt
+   1.5.11rc01-README.txt
+   1.5.11rc01-LICENSE.txt
 
 Changes since the last public release (1.5.10):
 
@@ -37,7 +37,8 @@ Version 1.5.11beta01 [April 28, 2012]
   Added -lssp_nonshared in a comment in scripts/makefile.freebsd
     and changed deprecated NOOBJ and NOPROFILE to NO_OBJ and NO_PROFILE.
 
-Version 1.5.11beta02 [April 28, 2012]
+Version 1.5.11rc01 [May 22, 2012]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
