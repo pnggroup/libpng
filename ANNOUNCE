@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta22 - May 23, 2012
+Libpng 1.6.0beta23 - May 23, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta22.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta22.tar.gz
-   1.6.0beta22.tar.bz2
+   1.6.0beta23.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta23.tar.gz
+   1.6.0beta23.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b22.7z  (LZMA-compressed, recommended)
-   lp160b22.zip
+   lp160b23.7z  (LZMA-compressed, recommended)
+   lp160b23.zip
 
 Other information:
 
-   1.6.0beta22-README.txt
-   1.6.0beta22-LICENSE.txt
+   1.6.0beta23-README.txt
+   1.6.0beta23-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -368,6 +368,8 @@ Version 1.6.0beta22 [May 23, 2012]
     where the cast is previously verified or pngstest.c where it is OK, by
     introducing new png_aligncast macros to do the cast in a way that clang
     accepts.
+
+Version 1.6.0beta23 [May 23, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

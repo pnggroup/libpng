@@ -4120,6 +4120,8 @@ Version 1.6.0beta22 [May 23, 2012]
     introducing new png_aligncast macros to do the cast in a way that clang
     accepts.
 
+Version 1.6.0beta23 [May 23, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
