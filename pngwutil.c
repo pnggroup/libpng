@@ -722,7 +722,7 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
           */
          *new_key++ = 32, ++key_len, space = 1;
 
-         /* If the character was not a space then it is inalid. */
+         /* If the character was not a space then it is invalid. */
          if (ch != 32)
             bad_character = ch;
       }

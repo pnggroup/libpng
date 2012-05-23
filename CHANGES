@@ -4111,13 +4111,14 @@ Version 1.6.0beta21 [April 27, 2012]
   Added -lssp_nonshared in a comment in scripts/makefile.freebsd
     and changed deprecated NOOBJ and NOPROFILE to NO_OBJ and NO_PROFILE.
 
-Version 1.6.0beta22 [April 30, 2012]
+Version 1.6.0beta22 [May 23, 2012]
   Removed need for -Wno-cast-align with clang.  clang correctly warns on
     alignment increasing pointer casts when -Wcast-align is passed. This
-    fixes the cases clang warns about either (pngread.c) by eliminating the
-    casts from png_bytep to png_uint_16p or, for pngrutil.c where the cast
-    is previously verified or pngstest.c where it is OK by introducing new
-    png_aligncast macros to do the cast in a way that clang accepts.
+    fixes the cases that clang warns about either by eliminating the
+    casts from png_bytep to png_uint_16p (pngread.c), or, for pngrutil.c
+    where the cast is previously verified or pngstest.c where it is OK, by
+    introducing new png_aligncast macros to do the cast in a way that clang
+    accepts.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
