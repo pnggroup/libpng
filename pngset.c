@@ -149,7 +149,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
     * possible for 1/gamma to overflow the limit of 21474 and this means the
     * gamma value must be at least 5/100000 and hence at most 20000.0.  For
     * safety the limits here are a little narrower.  The values are 0.00016 to
-    * 6250.0, which are truly ridiculous gammma values (and will produce
+    * 6250.0, which are truly ridiculous gamma values (and will produce
     * displays that are all black or all white.)
     */
    if (file_gamma < 16 || file_gamma > 625000000)
