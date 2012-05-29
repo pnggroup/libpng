@@ -1,5 +1,5 @@
 
-Libpng 1.5.11rc02 - May 23, 2012
+Libpng 1.5.11rc02 - May 29, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -40,8 +40,9 @@ Version 1.5.11beta01 [April 28, 2012]
 Version 1.5.11rc01 [May 23, 2012]
   No changes.
 
-Version 1.5.11rc02 [May 23, 2012]
+Version 1.5.11rc02 [May 29, 2012]
   Fixed some typos in comments.
+  Revised CMakeLists.txt to not attempt to make a symlink under mingw.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
