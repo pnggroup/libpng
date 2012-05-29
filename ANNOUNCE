@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta23 - May 23, 2012
+Libpng 1.6.0beta23 - May 29, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -369,7 +369,8 @@ Version 1.6.0beta22 [May 23, 2012]
     introducing new png_aligncast macros to do the cast in a way that clang
     accepts.
 
-Version 1.6.0beta23 [May 23, 2012]
+Version 1.6.0beta23 [May 29, 2012]
+  Revised CMakeLists.txt to not attempt to make a symlink under mingw.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
