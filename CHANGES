@@ -3871,6 +3871,9 @@ Version 1.5.11rc01 [May 23, 2012]
 Version 1.5.11rc02 [May 29, 2012]
   Fixed some typos in comments.
   Revised CMakeLists.txt to not attempt to make a symlink under mingw.
+  Added two images to contrib/pngsuite (1-bit and 2-bit transparent grayscale),
+    and renamed three whose names were inconsistent with those in
+    pngsuite/README.txt.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
