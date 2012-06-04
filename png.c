@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_11rc03 Your_png_h_is_not_version_1_5_11rc03;
+typedef png_libpng_version_1_5_11rc04 Your_png_h_is_not_version_1_5_11rc04;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -655,13 +655,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.11rc03 - May 29, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.5.11rc04 - June 4, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.11rc03 - May 29, 2012\
+      return "libpng version 1.5.11rc04 - June 4, 2012\
       Copyright (c) 1998-2011 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -969,8 +969,8 @@ int png_XYZ_from_xy(png_XYZ *XYZ, png_xy xy)
     * and it is certain that it becomes unstable where the end points are close
     * together.
     *
-    * So this code uses the perhaps slighly less optimal but more understandable
-    * and totally obvious approach of calculating color-scale.
+    * So this code uses the perhaps slightly less optimal but more
+    * understandable and totally obvious approach of calculating color-scale.
     *
     * This algorithm depends on the precision in white-scale and that is
     * (1/white-y), so we can immediately see that as white-y approaches 0 the
