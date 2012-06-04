@@ -185,9 +185,9 @@ AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 if test "$have_ld_version_script" = "yes"; then
     AC_MSG_CHECKING([for symbol prefix])
     SYMBOL_PREFIX=`echo "PREFIX=__USER_LABEL_PREFIX__" \
-                   | ${CPP-${CC-gcc} -E} - 2>&1 \
-                   | ${EGREP-grep} "^PREFIX=" \
-                   | ${SED-sed} "s:^PREFIX=::"`
+                  | ${CPP-${CC-gcc} -E} - 2>&1 \
+                  | ${EGREP-grep} "^PREFIX=" \
+                  | ${SED-sed} -e "s:^PREFIX=::" -e "s:__USER_LABEL_PREFIX__::"`
     AC_SUBST(SYMBOL_PREFIX)
     AC_MSG_RESULT($SYMBOL_PREFIX)
 fi
