@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta23 - June 6, 2012
+Libpng 1.6.0beta24 - June 6, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta23.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta23.tar.gz
-   1.6.0beta23.tar.bz2
+   1.6.0beta24.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta24.tar.gz
+   1.6.0beta24.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b23.7z  (LZMA-compressed, recommended)
-   lp160b23.zip
+   lp160b24.7z  (LZMA-compressed, recommended)
+   lp160b24.zip
 
 Other information:
 
-   1.6.0beta23-README.txt
-   1.6.0beta23-LICENSE.txt
+   1.6.0beta24-README.txt
+   1.6.0beta24-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -379,6 +379,8 @@ Version 1.6.0beta23 [June 6, 2012]
   Improved performance of new do_check_palette_indexes() function (only
     update the value when it actually increases, move test for whether
     the check is wanted out of the function.
+
+Version 1.6.0beta24 [June 6, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
