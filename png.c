@@ -747,13 +747,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta23 - May 23, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta23 - June 6, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta23 - May 23, 2012\
+      return "libpng version 1.6.0beta23 - June 6, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1282,8 +1282,8 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
     * and it is certain that it becomes unstable where the end points are close
     * together.
     *
-    * So this code uses the perhaps slighly less optimal but more understandable
-    * and totally obvious approach of calculating color-scale.
+    * So this code uses the perhaps slightly less optimal but more
+    * understandable and totally obvious approach of calculating color-scale.
     *
     * This algorithm depends on the precision in white-scale and that is
     * (1/white-y), so we can immediately see that as white-y approaches 0 the
