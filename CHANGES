@@ -4120,13 +4120,16 @@ Version 1.6.0beta22 [May 23, 2012]
     introducing new png_aligncast macros to do the cast in a way that clang
     accepts.
 
-Version 1.6.0beta23 [June 4, 2012]
+Version 1.6.0beta23 [June 6, 2012]
   Revised CMakeLists.txt to not attempt to make a symlink under mingw.
   Made fixes for new optimization warnings from gcc 4.7.0. The compiler
     performs an optimization which is safe; however it then warns about it.
     Changing the type of 'palette_number' in pngvalid.c removes the warning.
   Do not depend upon a GCC feature macro being available for use in generating
     the linker mapfile symbol prefix.
+  Improved performance of new do_check_palette_indexes() function (only
+    update the value when it actually increases, move test for whether
+    the check is wanted out of the function.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

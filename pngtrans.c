@@ -625,8 +625,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 {
-   if (png_ptr->num_palette < (1 << row_info->bit_depth) &&
-      png_ptr->num_palette_max >= 0)
+   if (png_ptr->num_palette < (1 << row_info->bit_depth))
    {
       /* Calculations moved outside switch in an attempt to stop different
        * compiler warnings.  'padding' is in *bits* within the last byte, it is
@@ -708,7 +707,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
          {
             for (; rp > png_ptr->row_buf; rp--)
             {
-               if (*rp >= png_ptr->num_palette_max)
+               if (*rp > png_ptr->num_palette_max)
                   png_ptr->num_palette_max = (int) *rp;
             }
 

@@ -2342,7 +2342,8 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Added at libpng-1.5.10 */
-   if (row_info->color_type == PNG_COLOR_TYPE_PALETTE)
+   if (row_info->color_type == PNG_COLOR_TYPE_PALETTE &&
+       png_ptr->num_palette_max >= 0)
       png_do_check_palette_indexes(png_ptr, row_info);
 #endif
 
