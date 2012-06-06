@@ -3882,7 +3882,8 @@ Version 1.5.11rc03 [June 4, 2012]
     performs an optimization which is safe; however it then warns about it.
     Changing the type of 'palette_number' in pngvalid.c removes the warning.
 
-Version 1.5.11rc04 [June 4, 2012]
+Version 1.5.11rc04 [June 6, 2012]
+  Improved performance of new do_check_palette_indexes() function.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
