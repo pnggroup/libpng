@@ -1,5 +1,5 @@
 
-Libpng 1.5.11rc04 - June 6, 2012
+Libpng 1.5.11rc05 - June 6, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.11rc04.tar.xz (LZMA-compressed, recommended)
-   1.5.11rc04.tar.gz
-   1.5.11rc04.tar.bz2
+   1.5.11rc05.tar.xz (LZMA-compressed, recommended)
+   1.5.11rc05.tar.gz
+   1.5.11rc05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1511r04.7z  (LZMA-compressed, recommended)
-   lp1511r04.zip
+   lp1511r05.7z  (LZMA-compressed, recommended)
+   lp1511r05.zip
 
 Other information:
 
-   1.5.11rc04-README.txt
-   1.5.11rc04-LICENSE.txt
+   1.5.11rc05-README.txt
+   1.5.11rc05-LICENSE.txt
 
 Changes since the last public release (1.5.10):
 
@@ -56,6 +56,8 @@ Version 1.5.11rc03 [June 4, 2012]
 
 Version 1.5.11rc04 [June 6, 2012]
   Improved efficiency of new do_check_palette_indexes() function.
+
+Version 1.5.11rc05 [June 6, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
