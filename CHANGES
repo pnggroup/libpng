@@ -3885,7 +3885,8 @@ Version 1.5.11rc03 [June 4, 2012]
 Version 1.5.11rc04 [June 6, 2012]
   Improved performance of new do_check_palette_indexes() function.
 
-Version 1.5.11rc05 [June 6, 2012]
+Version 1.5.11rc05 [June 7, 2012]
+  Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
