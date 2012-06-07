@@ -1,7 +1,7 @@
 
 VisualStudio instructions
 
-libpng version 1.6.0beta24 - June 7, 2012
+libpng version 1.6.0beta25 - June 7, 2012
 
 Copyright (c) 1998-2010 Glenn Randers-Pehrson
 

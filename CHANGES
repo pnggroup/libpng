@@ -4134,6 +4134,8 @@ Version 1.6.0beta23 [June 6, 2012]
 Version 1.6.0beta24 [June 7, 2012]
   Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
 
+Version 1.6.0beta25 [June 7, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
