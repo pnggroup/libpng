@@ -625,7 +625,8 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 void /* PRIVATE */
 png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 {
-   if (png_ptr->num_palette < (1 << row_info->bit_depth))
+   if (png_ptr->num_palette < (1 << row_info->bit_depth) &&
+      png_ptr->num_palette > 0) /* num_palette can be 0 in MNG files */
    {
       /* Calculations moved outside switch in an attempt to stop different
        * compiler warnings.  'padding' is in *bits* within the last byte, it is
