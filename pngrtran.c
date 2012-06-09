@@ -1404,7 +1404,7 @@ png_init_read_transformations(png_structrp png_ptr)
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-   /* Make sure the coefficients for the rgb to gray convertion are set
+   /* Make sure the coefficients for the rgb to gray conversion are set
     * appropriately.
     */
    if (png_ptr->transformations & PNG_RGB_TO_GRAY)

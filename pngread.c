@@ -2020,7 +2020,7 @@ png_image_read_colormap(png_voidp argument)
 
             /* png_create_colormap_entry just takes an RGBA and writes the
              * corresponding color-map entry using the format from 'image',
-             * including the required convertion to sRGB or linear as
+             * including the required conversion to sRGB or linear as
              * appropriate.  The input values are always either sRGB (if the
              * gamma correction flag is 0) or 0..255 scaled file encoded values
              * (if the function must gamma correct them).
