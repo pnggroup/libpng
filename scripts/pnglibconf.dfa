@@ -21,7 +21,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # C compiler to generate 'pnglibconf.h' - a list of all the
 # configuration options.  The file lists the various options
 # that can *only* be specified during the libpng build;
-# pnglibconf.h freezes the definitons selected for the specific
+# pnglibconf.h freezes the definitions selected for the specific
 # build.
 #
 # The syntax is detailed in scripts/options.awk, this is a summary
