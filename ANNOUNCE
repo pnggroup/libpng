@@ -1,5 +1,5 @@
 
-Libpng 1.5.11rc06 - June 7, 2012
+Libpng 1.5.11rc06 - June 9, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -60,7 +60,8 @@ Version 1.5.11rc04 [June 6, 2012]
 Version 1.5.11rc05 [June 7, 2012]
   Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
 
-Version 1.5.11rc06 [June 7, 2012]
+Version 1.5.11rc06 [June 9, 2012]
+  Include zlib.h in contrib/gregbook and visupng examples.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
