@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta25 - June 7, 2012
+Libpng 1.6.0beta25 - June 12, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -76,6 +76,8 @@ Version 1.6.0beta03 [December 22, 2011]
     so is particularly valuable.  Overall on a 64-bit system the libpng DLL
     decreases in code size by 1733 bytes.  pngerror.o increases in size by
     about 465 bytes because of the new functionality.
+  Added png_convert_to_rfc1123_buffer() and deprecated png_convert_to_rfc1123()
+    to avoid including a spurious buffer in the png_struct.
 
 Version 1.6.0beta04 [December 30, 2011]
   Regenerated configure scripts with automake-1.11.2
@@ -383,7 +385,7 @@ Version 1.6.0beta23 [June 6, 2012]
 Version 1.6.0beta24 [June 7, 2012]
   Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
 
-Version 1.6.0beta25 [June 7, 2012]
+Version 1.6.0beta25 [June 12, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

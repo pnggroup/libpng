@@ -354,6 +354,7 @@ struct png_struct_def
 #endif
 
 #if PNG_LIBPNG_VER < 10700
+/* To do: remove this from libpng-1.7 */
 #ifdef PNG_TIME_RFC1123_SUPPORTED
    char time_buffer[29]; /* String to hold RFC 1123 time text */
 #endif

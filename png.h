@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta25 - June 7, 2012
+ * libpng version 1.6.0beta25 - June 12, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta25 - June 7, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta25 - June 12, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta25, June 7, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta25, June 12, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 7, 2012
+ *    June 12, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -330,8 +330,9 @@
  *        "png_char time_buffer" in png_struct
  *
  *    There are seven time-related functions:
- *        png.c: png_convert_to_rfc_1123() in png.c
- *          (formerly png_convert_to_rfc_1152() in error)
+ *        png.c: png_convert_to_rfc_1123_buffer() in png.c
+ *          (formerly png_convert_to_rfc_1123() prior to libpng-1.5.x and
+ *          png_convert_to_rfc_1152() in error prior to libpng-0.98)
  *        png_convert_from_struct_tm() in pngwrite.c, called in pngwrite.c
  *        png_convert_from_time_t() in pngwrite.c
  *        png_get_tIME() in pngget.c
@@ -342,8 +343,8 @@
  *    All handle dates properly in a Y2K environment.  The
  *    png_convert_from_time_t() function calls gmtime() to convert from system
  *    clock time, which returns (year - 1900), which we properly convert to
- *    the full 4-digit year.  There is a possibility that applications using
- *    libpng are not passing 4-digit years into the png_convert_to_rfc_1123()
+ *    the full 4-digit year.  There is a possibility that libpng applications
+ *    are not passing 4-digit years into the png_convert_to_rfc_1123_buffer()
  *    function, or that they are incorrectly passing only a 2-digit year
  *    instead of "year - 1900" into the png_convert_from_struct_tm() function,
  *    but this is not under our control.  The libpng documentation has always
@@ -376,7 +377,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta25"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta25 - June 7, 2012\n"
+     " libpng version 1.6.0beta25 - June 12, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -1111,6 +1112,7 @@ PNG_EXPORT(22, void, png_read_info,
     * png_struct, this will be removed in future versions.
     */
 #if PNG_LIBPNG_VER < 10700
+/* To do: remove this from libpng17 (and from libpng17/png.c and pngstruct.h) */
 PNG_EXPORTA(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
     png_const_timep ptime),PNG_DEPRECATED);
 #endif

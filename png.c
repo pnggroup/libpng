@@ -714,8 +714,9 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 }
 
 #     if PNG_LIBPNG_VER < 10700
+/* To do: remove the following from libpng-1.7 */
 /* Original API that uses a private buffer in png_struct.
- * TODO: deprecate this, it causes png_struct to carry a spurious temporary
+ * Deprecated because it causes png_struct to carry a spurious temporary
  * buffer (png_struct::time_buffer), better to have the caller pass this in.
  */
 png_const_charp PNGAPI
@@ -747,13 +748,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta25 - June 7, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta25 - June 12, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta25 - June 7, 2012\
+      return "libpng version 1.6.0beta25 - June 12, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
