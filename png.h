@@ -336,8 +336,8 @@
  *        "png_uint_16 year" in png_time_struct.
  *
  *    The string is
- *        "char time_buffer[29]" in png_struct.  This is no
- *    longer used and will be removed from libpng-1.7.0.
+ *        "char time_buffer[29]" in png_struct.  This will be no
+ *    longer used in libpng-1.6.0 and will be removed from libpng-1.7.0.
  *
  *    There are seven time-related functions:
  *        png.c: png_convert_to_rfc_1123() in png.c

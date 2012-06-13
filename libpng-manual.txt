@@ -4619,7 +4619,8 @@ The integer is
     "png_uint_16 year" in png_time_struct.
 
 The string is
-    "png_charp time_buffer" in png_struct
+    "char time_buffer[29]" in png_struct.  This will no
+longer be used in libpng-1.6.x and will be removed from libpng-1.7.0.
 
 There are seven time-related functions:
 

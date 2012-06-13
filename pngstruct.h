@@ -248,6 +248,7 @@ struct png_struct_def
 #endif
 
 #ifdef PNG_TIME_RFC1123_SUPPORTED
+   /* This is going to be unused in libpng16 and removed from libpng17 */
    char time_buffer[29]; /* String to hold RFC 1123 time text */
 #endif
 
