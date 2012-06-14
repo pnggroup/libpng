@@ -3879,7 +3879,7 @@ Version 1.5.11rc03 [June 4, 2012]
   Do not depend upon a GCC feature macro being available for use in generating
     the linker mapfile symbol prefix.
   Made fixes for new optimization warnings from gcc 4.7.0. The compiler
-    performs an optimization which is safe; however it then warns about it.
+    performed an optimization which is safe but then warned about it.
     Changing the type of 'palette_number' in pngvalid.c removes the warning.
 
 Version 1.5.11rc04 [June 6, 2012]
@@ -3888,8 +3888,8 @@ Version 1.5.11rc04 [June 6, 2012]
 Version 1.5.11rc05 [June 7, 2012]
   Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
 
-Version 1.5.11rc06 [June 9, 2012]
-  Include zlib.h in contrib/gregbook and visupng examples.
+Version 1.5.11 [June 14, 2012]
+  Include zlib.h in contrib/gregbook and contrib/visupng examples.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

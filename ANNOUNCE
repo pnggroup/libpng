@@ -1,32 +1,29 @@
 
-Libpng 1.5.11rc06 - June 9, 2012
+Libpng 1.5.11 - June 14, 2012
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.11rc06.tar.xz (LZMA-compressed, recommended)
-   1.5.11rc06.tar.gz
-   1.5.11rc06.tar.bz2
+   libpng-1.5.11.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.11.tar.gz
+   libpng-1.5.11.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1511r06.7z  (LZMA-compressed, recommended)
-   lp1511r06.zip
+   lpng1511.7z  (LZMA-compressed, recommended)
+   lpng1511.zip
 
 Other information:
 
-   1.5.11rc06-README.txt
-   1.5.11rc06-LICENSE.txt
+   libpng-1.5.11-README.txt
+   libpng-1.5.11-LICENSE.txt
 
 Changes since the last public release (1.5.10):
-
-Version 1.5.11beta01 [April 28, 2012]
   Revised scripts/makefile.darwin: use system zlib; remove quotes around
     architecture list; add missing ppc architecture; add architecture options
     to shared library link; don't try to create a shared lib based on missing
@@ -36,36 +33,23 @@ Version 1.5.11beta01 [April 28, 2012]
     declaration of png_handle_unknown().
   Added -lssp_nonshared in a comment in scripts/makefile.freebsd
     and changed deprecated NOOBJ and NOPROFILE to NO_OBJ and NO_PROFILE.
-
-Version 1.5.11rc01 [May 23, 2012]
-  No changes.
-
-Version 1.5.11rc02 [May 29, 2012]
-  Fixed some typos in comments.
   Revised CMakeLists.txt to not attempt to make a symlink under mingw.
   Added two images to contrib/pngsuite (1-bit and 2-bit transparent grayscale),
     and renamed three whose names were inconsistent with those in
     pngsuite/README.txt.
-
-Version 1.5.11rc03 [June 4, 2012]
   Do not depend upon a GCC feature macro being available for use in generating
     the linker mapfile symbol prefix.
   Made fixes for new optimization warnings from gcc 4.7.0. The compiler
-    performs an optimization which is safe; however it then warns about it.
+    performed an optimization which is safe but then warned about it.
     Changing the type of 'palette_number' in pngvalid.c removes the warning.
-
-Version 1.5.11rc04 [June 6, 2012]
   Improved efficiency of new do_check_palette_indexes() function.
-
-Version 1.5.11rc05 [June 7, 2012]
   Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
+  Include zlib.h in contrib/gregbook and contrib/visupng examples.
 
-Version 1.5.11rc06 [June 9, 2012]
-  Include zlib.h in contrib/gregbook and visupng examples.
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P
