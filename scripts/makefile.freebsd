@@ -11,8 +11,8 @@ SHLIB_VER?=     15
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}
 SHLIB_MINOR=	0
-NOPROFILE=	YES
-NOOBJ=          YES
+NO_PROFILE=	YES
+NO_OBJ=          YES
 
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
@@ -25,7 +25,10 @@ MANDIR=		/man/man
 SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 		libpng/pngconf.h ${INCSDIR}/../pngconf.h \
 		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h
+
 LDADD+=         -lm -lz
+#LDADD+=         -lm -lz -lssp_nonshared   # for OSVERSION >= 800000 ?
+
 DPADD+=         ${LIBM} ${LIBZ}
 
 CFLAGS+= -I.

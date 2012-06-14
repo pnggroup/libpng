@@ -15,10 +15,8 @@ prefix=/usr/local
 exec_prefix=$(prefix)
 
 # Where the zlib library and include files are located
-#ZLIBLIB=/usr/local/lib
-#ZLIBINC=/usr/local/include
-ZLIBLIB=../zlib
-ZLIBINC=../zlib
+ZLIBLIB=/usr/lib
+ZLIBINC=/usr/include
 
 # Library name:
 LIBNAME = libpng15
@@ -37,7 +35,7 @@ MKDIR_P=mkdir -p
 LN_SF=ln -sf
 RANLIB=ranlib
 RM_F=/bin/rm -f
-ARCH="-arch i386 -arch x86_64"
+ARCH=-arch ppc -arch i386 -arch x86_64
 
 # CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops
 CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops $(ARCH)
@@ -107,7 +105,7 @@ $(LIBSOMAJ): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
 	 -current_version 15 -compatibility_version 15 \
-	 -o $(LIBSOMAJ) \
+ 	 $(ARCH) -o $(LIBSOMAJ) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 pngtest: pngtest.o $(LIBSO)
@@ -136,10 +134,10 @@ install-static: install-headers libpng.a
 install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	-@if [ ! -d $(DL) ]; then $(MKDIR_P) $(DL); fi
 	-@$(RM_F) $(DL)/$(LIBSO)
-	-@$(RM_F) $(DL)/$(LIBSOREL)
+	-@$(RM_F) $(DL)/$(LIBSOMAJ)
 	-@$(RM_F) $(DL)/$(OLDSO)
-	cp $(LIBSOMAJ) $(DL)/$(LIBSOREL)
-	chmod 755 $(DL)/$(LIBSOREL)
+	cp $(LIBSOMAJ) $(DL)
+	chmod 755 $(DL)/$(LIBSOMAJ)
 	(cd $(DL); \
 	$(LN_SF) $(LIBSOREL) $(LIBSO); \
 	$(LN_SF) $(LIBSO) $(OLDSO))

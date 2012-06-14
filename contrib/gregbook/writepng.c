@@ -55,8 +55,9 @@
 
 
 #include <stdlib.h>     /* for exit() prototype */
+#include <zlib.h>
 
-#include "png.h"        /* libpng header; includes zlib.h and setjmp.h */
+#include "png.h"        /* libpng header, includes setjmp.h */
 #include "writepng.h"   /* typedefs, common macros, public prototypes */
 
 

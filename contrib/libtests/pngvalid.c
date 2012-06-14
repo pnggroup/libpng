@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.8 [%RDATE%]
+ * Last changed in libpng 1.5.8 [February 1, 2012]
  * Copyright (c) 2012 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -244,7 +244,7 @@ random_choice(void)
 
 #define COL_FROM_ID(id) ((png_byte)((id)& 0x7U))
 #define DEPTH_FROM_ID(id) ((png_byte)(((id) >> 3) & 0x1fU))
-#define PALETTE_FROM_ID(id) ((int)(((id) >> 8) & 0x1f))
+#define PALETTE_FROM_ID(id) (((id) >> 8) & 0x1f)
 #define INTERLACE_FROM_ID(id) ((int)(((id) >> 13) & 0x3))
 #define DO_INTERLACE_FROM_ID(id) ((int)(((id)>>15) & 1))
 #define WIDTH_FROM_ID(id) (((id)>>16) & 0xff)
@@ -253,7 +253,7 @@ random_choice(void)
 /* Utility to construct a standard name for a standard image. */
 static size_t
 standard_name(char *buffer, size_t bufsize, size_t pos, png_byte colour_type,
-    int bit_depth, int npalette, int interlace_type,
+    int bit_depth, unsigned int npalette, int interlace_type,
     png_uint_32 w, png_uint_32 h, int do_interlace)
 {
    pos = safecat(buffer, bufsize, pos, colour_types[colour_type]);
@@ -315,10 +315,11 @@ standard_name_from_id(char *buffer, size_t bufsize, size_t pos, png_uint_32 id)
 /* The following defines the number of different palettes to generate for
  * each log bit depth of a colour type 3 standard image.
  */
-#define PALETTE_COUNT(bit_depth) ((bit_depth) > 4 ? 1 : 16)
+#define PALETTE_COUNT(bit_depth) ((bit_depth) > 4 ? 1U : 16U)
 
 static int
-next_format(png_bytep colour_type, png_bytep bit_depth, int* palette_number)
+next_format(png_bytep colour_type, png_bytep bit_depth,
+   unsigned int* palette_number)
 {
    if (*bit_depth == 0)
    {
@@ -3256,8 +3257,8 @@ transform_row(png_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
  */
 static void
 make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
-    png_byte PNG_CONST bit_depth, int palette_number, int interlace_type,
-    png_const_charp name)
+    png_byte PNG_CONST bit_depth, unsigned int palette_number,
+    int interlace_type, png_const_charp name)
 {
    context(ps, fault);
 
@@ -3384,7 +3385,7 @@ make_transform_images(png_store *ps)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   int palette_number = 0;
+   unsigned int palette_number = 0;
 
    /* This is in case of errors. */
    safecat(ps->test, sizeof ps->test, 0, "make standard images");
@@ -7069,7 +7070,7 @@ perform_transform_test(png_modifier *pm)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   int palette_number = 0;
+   unsigned int palette_number = 0;
 
    while (next_format(&colour_type, &bit_depth, &palette_number))
    {
@@ -8428,7 +8429,7 @@ perform_gamma_threshold_tests(png_modifier *pm)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   int palette_number = 0;
+   unsigned int palette_number = 0;
 
    /* Don't test more than one instance of each palette - it's pointless, in
     * fact this test is somewhat excessive since libpng doesn't make this
@@ -8493,7 +8494,7 @@ static void perform_gamma_transform_tests(png_modifier *pm)
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   int palette_number = 0;
+   unsigned int palette_number = 0;
 
    while (next_format(&colour_type, &bit_depth, &palette_number))
    {
@@ -8522,11 +8523,8 @@ static void perform_gamma_sbit_tests(png_modifier *pm)
     */
    for (sbit=pm->sbitlow; sbit<(1<<READ_BDHI); ++sbit)
    {
-      png_byte colour_type, bit_depth;
-      int npalette;
-
-      colour_type = bit_depth = 0;
-      npalette = 0;
+      png_byte colour_type = 0, bit_depth = 0;
+      unsigned int npalette = 0;
 
       while (next_format(&colour_type, &bit_depth, &npalette))
          if ((colour_type & PNG_COLOR_MASK_ALPHA) == 0 &&
@@ -8742,7 +8740,7 @@ perform_gamma_composition_tests(png_modifier *pm, int do_background,
 {
    png_byte colour_type = 0;
    png_byte bit_depth = 0;
-   int palette_number = 0;
+   unsigned int palette_number = 0;
 
    /* Skip the non-alpha cases - there is no setting of a transparency colour at
     * present.
