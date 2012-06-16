@@ -39,7 +39,7 @@
 
 /* KNOWN ISSUES
  *
- * These defines switch on alternate algorithms for format convertions to match
+ * These defines switch on alternate algorithms for format conversions to match
  * the current libpng implementation; they are set to allow pngstest to pass
  * even though libpng is producing answers that are not as correct as they
  * should be.
@@ -124,7 +124,7 @@ u16d(double d)
 }
 
 /* sRGB support: use exact calculations rounded to the nearest int, see the
- * fesetround() call in main().  sRGB_to_d optimizes the 8 to 16-bit convertion.
+ * fesetround() call in main().  sRGB_to_d optimizes the 8 to 16-bit conversion.
  */
 static double sRGB_to_d[256];
 static double g22_to_d[256];
@@ -235,7 +235,7 @@ power_law_error16(int value)
    if (value > 0 && value < 65535)
    {
       /* Round trip the value through an 8-bit representation but using
-       * non-matching to/from convertions.
+       * non-matching to/from conversions.
        */
       double vd = value / 65535.;
       double e = fabs(
@@ -1066,7 +1066,7 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
  * 3) Convert between 8-bit and 16-bit components.  (Both directtions are
  *    relevant.)
  *
- * This gives the following base format convertion matrix:
+ * This gives the following base format conversion matrix:
  *
  *   OUT:    ----- 8-bit -----    ----- 16-bit -----
  *   IN     G    GA   RGB  RGBA  G    GA   RGB  RGBA
@@ -1160,7 +1160,7 @@ gpc_nop6(Pixel *out, const Pixel *in, const Background *back)
 }
 #endif
 
-/* 8-bit to 8-bit convertions */
+/* 8-bit to 8-bit conversions */
 /* bckg: composite on gray background */
 static void
 gpc_bckg(Pixel *out, const Pixel *in, const Background *back)
@@ -1255,7 +1255,7 @@ gpc_g8b(Pixel *out, const Pixel *in, const Background *back)
    out->a = 255;
 }
 
-/* 8-bit to 16-bit convertions */
+/* 8-bit to 16-bit conversions */
 /* lin: make sRGB components linear, alpha := 65535 */
 static void
 gpc_lin(Pixel *out, const Pixel *in, const Background *back)
@@ -1412,7 +1412,7 @@ gpc_gprq(Pixel *out, const Pixel *in, const Background *back)
    out->a = 65535;
 }
 
-/* 8-bit to 16-bit convertions for gAMA 45455 encoded values */
+/* 8-bit to 16-bit conversions for gAMA 45455 encoded values */
 /* Lin: make gAMA 45455 components linear, alpha := 65535 */
 static void
 gpc_Lin(Pixel *out, const Pixel *in, const Background *back)
@@ -1583,7 +1583,7 @@ gpc_Gprq(Pixel *out, const Pixel *in, const Background *back)
 }
 #endif
 
-/* 16-bit to 8-bit convertions */
+/* 16-bit to 8-bit conversions */
 /* sRGB: convert linear components to sRGB, alpha := 255 */
 static void
 gpc_sRGB(Pixel *out, const Pixel *in, const Background *back)
@@ -1809,7 +1809,7 @@ gpc_cb16(Pixel *out, const Pixel *in, const Background *back)
    out->a = 255;
 }
 
-/* 16-bit to 16-bit convertions */
+/* 16-bit to 16-bit conversions */
 /* A:    set alpha to 65535 */
 static void
 gpc_A(Pixel *out, const Pixel *in, const Background *back)
@@ -1900,13 +1900,13 @@ static void (* const gpc_fn_colormapped[8/*in*/][8/*out*/])
 };
 
 /* The error arrays record the error in the same matrix; 64 entries, however
- * the different algorithms used in libpng for colormap and direct convertions
+ * the different algorithms used in libpng for colormap and direct conversions
  * mean that four separate matrices are used (for each combination of
  * colormapped and direct.)
  *
- * In some cases the convertion between sRGB formats goes via a linear
- * intermediate; an sRGB to linear convertion (as above) is followed by a simple
- * linear to sRGB step with no other convertions.  This is done by a separate
+ * In some cases the conversion between sRGB formats goes via a linear
+ * intermediate; an sRGB to linear conversion (as above) is followed by a simple
+ * linear to sRGB step with no other conversions.  This is done by a separate
  * error array from an arbitrary 'in' format to one of the four basic outputs
  * (since final output is always sRGB not colormapped).
  *
@@ -2120,7 +2120,7 @@ typedef struct
 }
 Transform;
 
-/* Return a 'transform' as above for the given format convertion. */
+/* Return a 'transform' as above for the given format conversion. */
 static void
 transform_from_formats(Transform *result, Image *in_image,
    const Image *out_image, png_const_colorp background, int via_linear)
@@ -2185,10 +2185,10 @@ transform_from_formats(Transform *result, Image *in_image,
 
    else
    {
-      /* The caller handles the colormap->pixel value convertion, so the
+      /* The caller handles the colormap->pixel value conversion, so the
        * transform function just gets a pixel value, however because libpng
        * currently contains a different implementation for mapping a colormap if
-       * both input and output are colormapped we need different convertion
+       * both input and output are colormapped we need different conversion
        * functions to deal with errors in the libpng implementation.
        */
       if (in_format & out_format & PNG_FORMAT_FLAG_COLORMAP)
@@ -2249,7 +2249,7 @@ transform_from_formats(Transform *result, Image *in_image,
                result->background_color.ir = background->red;
                result->background_color.ig = background->green;
                result->background_color.ib = background->blue;
-               /* TODO: sometimes libpng uses the power law convertion here, how
+               /* TODO: sometimes libpng uses the power law conversion here, how
                 * to handle this?
                 */
                result->background_color.dr = sRGB_to_d[background->red];
@@ -2262,7 +2262,7 @@ transform_from_formats(Transform *result, Image *in_image,
                result->background_color.ir =
                   result->background_color.ig =
                   result->background_color.ib = background->green;
-               /* TODO: sometimes libpng uses the power law convertion here, how
+               /* TODO: sometimes libpng uses the power law conversion here, how
                 * to handle this?
                 */
                result->background_color.dr =
@@ -2276,7 +2276,7 @@ transform_from_formats(Transform *result, Image *in_image,
             result->background_color.ir =
                result->background_color.ig =
                result->background_color.ib = BUFFER_INIT8;
-            /* TODO: sometimes libpng uses the power law convertion here, how
+            /* TODO: sometimes libpng uses the power law conversion here, how
              * to handle this?
              */
             result->background_color.dr =

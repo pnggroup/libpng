@@ -213,7 +213,7 @@ case "$mode" in
       exec >&2
       echo "Your system has a partial set of autotools generated files."
       echo "autogen.sh is unable to proceed.  The full set of files is"
-      echo "contained in the distribution archive and you do not need to run"
-      echo "autogen.sh if you use it."
+      echo "contained in the libpng 'tar' distribution archive and you do"
+      echo "not need to run autogen.sh if you use it."
       exit 1;;
 esac

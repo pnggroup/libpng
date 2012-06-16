@@ -195,7 +195,7 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
 	  * code above is not optimized and may drift outside the .5 in
 	  * DBL_DIG allowed.  In any case a small number of errors may
 	  * occur (very small ones - 1 or 2%) because of rounding in the
-	  * calculations, either in the convertion API or in atof.
+	  * calculations, either in the conversion API or in atof.
 	  */
 	 if (change >= allow && (isfinite(out) ||
 	     fabs(test/DBL_MAX) <= 1-allow))
@@ -942,7 +942,7 @@ int validation_gamma(int argc, char **argv)
 /* Various validation routines are included herein, they require some
  * definition for png_warning and png_error, seetings of VALIDATION:
  *
- * 1: validates the ASCII to floating point convertions
+ * 1: validates the ASCII to floating point conversions
  * 2: validates png_muldiv
  * 3: accuracy test of fixed point gamma tables
  */
