@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta25 - June 16, 2012
+Libpng 1.6.0beta26 - June 16, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta25.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta25.tar.gz
-   1.6.0beta25.tar.bz2
+   1.6.0beta26.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta26.tar.gz
+   1.6.0beta26.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b25.7z  (LZMA-compressed, recommended)
-   lp160b25.zip
+   lp160b26.7z  (LZMA-compressed, recommended)
+   lp160b26.zip
 
 Other information:
 
-   1.6.0beta25-README.txt
-   1.6.0beta25-LICENSE.txt
+   1.6.0beta26-README.txt
+   1.6.0beta26-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -392,6 +392,8 @@ Version 1.6.0beta25 [June 16, 2012]
     same as num_chunks == 0. Revised png_image_skip_unused_chunks() to
     provide a list of chunks to be processed instead of a list of chunks to
     ignore.  Revised contrib/gregbook/readpng2.c accordingly.
+
+Version 1.6.0beta26 [June 16, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
