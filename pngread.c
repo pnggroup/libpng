@@ -1462,31 +1462,26 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
     *
     * This provides a small performance improvement and eliminates any
     * potential vulnerability to security problems in the unused chunks.
-    *
-    * TODO: make it so that this is an explicit list to process, not a list
-    * to ignore?
     */
    {
-       static PNG_CONST png_byte chunks_to_ignore[] = {
-           104,  73,  83,  84, '\0',  /* hIST */
-           105,  84,  88, 116, '\0',  /* iTXt */
-           111,  70,  70, 115, '\0',  /* oFFs */
-           112,  67,  65,  76, '\0',  /* pCAL */
-           112,  72,  89, 115, '\0',  /* pHYs */
-           115,  67,  65,  76, '\0',  /* sCAL */
-           115,  80,  76,  84, '\0',  /* sPLT */
-           116,  69,  88, 116, '\0',  /* tEXt */
-           116,  73,  77,  69, '\0',  /* tIME */
-           122,  84,  88, 116, '\0'   /* zTXt */
-       };
+         static PNG_CONST png_byte chunks_to_process[] = {
+            98,  75,  71,  68, '\0',  /* bKGD */
+            99,  72,  82,  77, '\0',  /* cHRM */
+           103,  65,  77,  65, '\0',  /* gAMA */
+           105,  67,  67,  80, '\0',  /* iCCP */
+           115,  66,  73,  84, '\0',  /* sBIT */
+           115,  82,  71,  66, '\0',  /* sRGB */
+           };
 
-       /* Ignore unknown chunks */
+       /* Ignore unknown chunks and all other chunks except for the
+        * IHDR, PLTE, tRNS, IDAT, and IEND chunks.
+        */
        png_set_keep_unknown_chunks(png_ptr, 1 /* PNG_HANDLE_CHUNK_NEVER */,
-         NULL, 0);
+         NULL, -1);
 
-       /* Ignore known but unused chunks */
-       png_set_keep_unknown_chunks(png_ptr, 1 /* PNG_HANDLE_CHUNK_NEVER */,
-         chunks_to_ignore, (sizeof chunks_to_ignore)/5);
+       /* But do not ignore image data handling chunks */
+       png_set_keep_unknown_chunks(png_ptr, 0 /* PNG_HANDLE_CHUNK_AS_DEFAULT */,
+         chunks_to_process, (sizeof chunks_to_process)/5);
     }
 }
 

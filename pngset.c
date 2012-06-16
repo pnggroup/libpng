@@ -1183,14 +1183,44 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       else
          png_ptr->flags &= ~PNG_FLAG_KEEP_UNSAFE_CHUNKS;
 
-      return;
+      if (num_chunksIn == 0)
+        return;
    }
+
+   if (num_chunksIn < 0)
+      {
+         /* Ignore all unknown chunks and all chunks recognized by
+          * libpng except for IHDR, PLTE, tRNS, IDAT, and IEND
+          */
+         static PNG_CONST png_byte chunks_to_ignore[] = {
+            98,  75,  71,  68, '\0',  /* bKGD */
+            99,  72,  82,  77, '\0',  /* cHRM */
+           103,  65,  77,  65, '\0',  /* gAMA */
+           104,  73,  83,  84, '\0',  /* hIST */
+           105,  67,  67,  80, '\0',  /* iCCP */
+           105,  84,  88, 116, '\0',  /* iTXt */
+           111,  70,  70, 115, '\0',  /* oFFs */
+           112,  67,  65,  76, '\0',  /* pCAL */
+           112,  72,  89, 115, '\0',  /* pHYs */
+           115,  66,  73,  84, '\0',  /* sBIT */
+           115,  67,  65,  76, '\0',  /* sCAL */
+           115,  80,  76,  84, '\0',  /* sPLT */
+           115,  84,  69,  82, '\0',  /* sTER */
+           115,  82,  71,  66, '\0',  /* sRGB */
+           116,  69,  88, 116, '\0',  /* tEXt */
+           116,  73,  77,  69, '\0',  /* tIME */
+           122,  84,  88, 116, '\0'   /* zTXt */
+           };
+
+         chunk_list = chunks_to_ignore;
+         num_chunks = (unsigned int) sizeof(chunks_to_ignore)/5;
+       }
 
    if (chunk_list == NULL)
       return;
 
-   /* The argument is >0 */
-   num_chunks = (unsigned int)num_chunksIn;
+   if (num_chunksIn > 0)
+     num_chunks = (unsigned int)num_chunksIn;
 
    old_num_chunks = png_ptr->num_chunk_list;
    new_list = png_voidcast(png_bytep, png_malloc(png_ptr,

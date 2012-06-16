@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta25 - June 12, 2012
+ * libpng version 1.6.0beta25 - June 16, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta25 - June 12, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta25 - June 16, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta25, June 12, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta25, June 16, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 12, 2012
+ *    June 16, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -320,14 +320,15 @@
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
- *    that will hold years up to 65535.  The other holds the date in text
- *    format, and will hold years up to 9999.
+ *    that will hold years up to 65535.  The other, which is deprecated,
+ *    holds the date in text format, and will hold years up to 9999.
  *
  *    The integer is
  *        "png_uint_16 year" in png_time_struct.
  *
  *    The string is
- *        "png_char time_buffer" in png_struct
+ *        "char time_buffer[29]" in png_struct.  This is no longer used
+ *    in libpng-1.6.x and will be removed from libpng-1.7.0.
  *
  *    There are seven time-related functions:
  *        png.c: png_convert_to_rfc_1123_buffer() in png.c
@@ -377,7 +378,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta25"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta25 - June 12, 2012\n"
+     " libpng version 1.6.0beta25 - June 16, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2318,15 +2319,22 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 /* Provide a list of chunks and how they are to be handled, if the built-in
-   handling or default unknown chunk handling is not desired.  Any chunks not
-   listed will be handled in the default manner.  The IHDR and IEND chunks
-   must not be listed.  Because this turns off the default handling for chunks
-   that would otherwise be recognized the behavior of libpng transformations may
-   well become incorrect!
-      keep = 0: PNG_HANDLE_CHUNK_AS_DEFAULT: follow default behavior
-           = 1: PNG_HANDLE_CHUNK_NEVER:      do not keep
-           = 2: PNG_HANDLE_CHUNK_IF_SAFE:    keep only if safe-to-copy
-           = 3: PNG_HANDLE_CHUNK_ALWAYS:     keep even if unsafe-to-copy
+ * handling or default unknown chunk handling is not desired.  Any chunks not
+ * listed will be handled in the default manner.  The IHDR and IEND chunks
+ * must not be listed.  Because this turns off the default handling for chunks
+ * that would otherwise be recognized the behavior of libpng transformations may
+ * well become incorrect!
+ *    keep = 0: PNG_HANDLE_CHUNK_AS_DEFAULT: follow default behavior
+ *         = 1: PNG_HANDLE_CHUNK_NEVER:      do not keep
+ *         = 2: PNG_HANDLE_CHUNK_IF_SAFE:    keep only if safe-to-copy
+ *         = 3: PNG_HANDLE_CHUNK_ALWAYS:     keep even if unsafe-to-copy
+ * If num_chunks is 0, then the "keep" parameter specifies the default
+ * manner for handling unknown chunks.  If num_chunks is positive, then
+ * the "keep" parameter specifies the manner for handling only those chunks
+ * appearing in the chunk_list array.  If it is negative, then the "keep"
+ * parameter specifies the manner for handling all unknown chunks plus
+ * all chunks recognized by libpng except for the IHDR, PLTE, tRNS, IDAT,
+ * and IEND chunks.
 */
 PNG_EXPORT(172, void, png_set_keep_unknown_chunks, (png_structrp png_ptr,
     int keep, png_const_bytep chunk_list, int num_chunks));

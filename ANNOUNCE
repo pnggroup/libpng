@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta25 - June 12, 2012
+Libpng 1.6.0beta25 - June 16, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -385,7 +385,13 @@ Version 1.6.0beta23 [June 6, 2012]
 Version 1.6.0beta24 [June 7, 2012]
   Don't check palette indexes if num_palette is 0 (as it can be in MNG files).
 
-Version 1.6.0beta25 [June 12, 2012]
+Version 1.6.0beta25 [June 16, 2012]
+  Revised png_set_keep_unknown_chunks() so num_chunks < 0 means ignore all
+    unknown chunks and all known chunks except for IHDR, PLTE, tRNS, IDAT,
+    and IEND.  Previously it only meant ignore all unknown chunks, the
+    same as num_chunks == 0. Revised png_image_skip_unused_chunks() to
+    provide a list of chunks to be processed instead of a list of chunks to
+    ignore.  Revised contrib/gregbook/readpng2.c accordingly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "June 12, 2012"
+.TH LIBPNG 3 "June 16, 2012"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0beta25
 .SH SYNOPSIS
@@ -1007,7 +1007,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta25 - June 12, 2012
+ libpng version 1.6.0beta25 - June 16, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -1018,7 +1018,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta25 - June 12, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta25 - June 16, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -1579,6 +1579,7 @@ chunk types. To change this, you can call:
 
     png_set_keep_unknown_chunks(png_ptr, keep,
         chunk_list, num_chunks);
+
     keep       - 0: default unknown chunk handling
                  1: ignore; do not keep
                  2: keep only if safe-to-copy
@@ -1592,11 +1593,16 @@ chunk types. To change this, you can call:
 
     chunk_list - list of chunks affected (a byte string,
                  five bytes per chunk, NULL or '\0' if
-                 num_chunks is 0)
+                 num_chunks is positive; ignored if
+                 numchunks <= 0).
 
     num_chunks - number of chunks affected; if 0, all
-                 unknown chunks are affected.  If nonzero,
-                 only the chunks in the list are affected
+                 unknown chunks are affected.  If positive,
+                 only the chunks in the list are affected,
+                 and if negative all unknown chunks and
+                 all known chunks except for the IHDR,
+                 PLTE, tRNS, IDAT, and IEND chunks are
+                 affected.
 
 Unknown chunks declared in this way will be saved as raw data onto a
 list of png_unknown_chunk structures.  If a chunk that is normally
@@ -6021,7 +6027,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-June 12, 2012
+June 16, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6030,16 +6036,16 @@ This is your unofficial assurance that libpng from version 0.71 and
 upward through 1.6.0beta25 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
-Libpng only has three year fields.  One is a 2-byte unsigned integer that
-will hold years up to 65535.  The other two hold the date in text
-format, and will hold years up to 9999.
+Libpng only has two year fields.  One is a 2-byte unsigned integer
+that will hold years up to 65535.  The other, which is deprecated,
+holds the date in text format, and will hold years up to 9999.
 
 The integer is
     "png_uint_16 year" in png_time_struct.
 
-The strings are
-    "png_charp time_buffer" in png_struct and
-    "near_time_buffer", which is a local character string in png.c.
+The string is
+    "char time_buffer[29]" in png_struct.  This is no longer used
+in libpng-1.6.x and will be removed from libpng-1.7.0.
 
 There are seven time-related functions:
 
@@ -6289,7 +6295,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.0beta25 - June 12, 2012:
+Libpng version 1.6.0beta25 - June 16, 2012:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6312,7 +6318,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.0beta25, June 12, 2012, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.0beta25, June 16, 2012, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6411,7 +6417,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-June 12, 2012
+June 16, 2012
 
 .\" end of man page
 
