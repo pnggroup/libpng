@@ -396,6 +396,7 @@ Version 1.6.0beta25 [June 16, 2012]
 Version 1.6.0beta26 [June 25, 2012]
   Removed scripts/makefile.cegcc from the *.zip and *.7z distributions; it
     depends on configure, which is not included in those archives.
+  Moved scripts/chkfmt to contrib/tools.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
