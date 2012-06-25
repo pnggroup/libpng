@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.5.11):
 
-Version 1.5.12 [June 25, 2012]
+Version 1.5.12beta01 [June 25, 2012]
 
   Removed scripts/makefile.cegcc from the *.zip and *.7z distributions; it
     depends on configure, which is not included in those archives.
