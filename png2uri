@@ -1,0 +1,49 @@
+#!/bin/sh
+#
+# png2uri
+#
+# NO COPYRIGHT RIGHTS ARE CLAIMED TO THIS SOFTWARE.
+#
+# To the extent possible under law, the author has waived all copyright and
+# related or neighboring rights to this work. This work is published from
+# the United States of America in 2012.
+#
+# This png2uri software may be used freely in any way.
+#
+# The source is the original work of the person named below.  No other person
+# or organization has made contributions to this work.
+#
+# ORIGINAL AUTHORS
+#     The following people have contributed to the code or comments in this
+#     file.  None of the people below claim any rights with regard to the
+#     contents of this file.
+#
+#     Glenn Randers-Pehrson <glennrp@users.sourceforge.net>
+#
+# png2uri is a command-line application that creates an HTML "img" tag on
+# standard output containing a data URI, from a PNG file or from standard
+# input.
+#
+# Usage: png2uri [file]
+#
+# Requires /bin/sh and a uuencode(1) that takes the "-m" option to mean
+# to encode in base64.
+#
+# If you prefer a web-based converter or a java application, this isn't
+# it. Use your search engine and look for "png data uri" to find one.
+#
+
+case x$1 in
+  x)
+      # Convert standard input.
+      echo "<img alt=\"PNG\" title=\"PNG\" src=\"data:image/png;base64,"
+      uuencode -m PNG |grep -v base64|grep -v ====
+      echo "\">"
+      ;;
+  *)
+      # Convert the named file.
+      echo "<img alt=\"$1\" title=\"$1\" src=\"data:image/png;base64,"
+      uuencode -m $1 $1 |grep -v base64|grep -v ====
+      echo "\">"
+      ;;
+esac
