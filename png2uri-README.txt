@@ -21,12 +21,22 @@
 
  png2uri is a command-line application that creates an HTML "img" tag on
  standard output containing a data URI, from a PNG file or from standard
- input.
+ input. Other formats besides the default, PNG, are supported, via the "-f
+ or --format option or, if that option was not supplied, by inspection of
+ the filename extension.
 
- Usage: png2uri [-u|--uri_only] [file]
+ Usage: png2uri [-f format|--format format] [-u|--uri_only] [file]
 
-        options: -u|--uri_only|--url_only: omit the surrounding "img" tag
-                 and only write the data URI.
+        options: -f|--format TYPE: 
+                 write "image/TYPE" instead of "image/png" in the
+                 data uri.  TYPE can be png, jpg, jpeg, bmp, or gif,
+                 or any of those in upper case.  To write any other
+                 type, include the complete MIME type as in
+                 "--format image/x-jng" or "-f audio/mpeg".
+
+                 -u|--uri_only|--url_only
+                 omit the surrounding "img" tag and only write the
+                 data URI.
 
  Requires /bin/sh and a uuencode(1) that takes the "-m" option to mean
  to encode in base64.  A surprising number of machines that I've tried
@@ -61,6 +71,10 @@
       use "====" instead to remove the first line of uuencode output.
 
       Implemented "-u" and "--url_only" option.
+
+   Version 1.0.2, July 4, 2012:
+
+      Implemented "-f TYPE" and "--format TYPE" option.
 
  TO DO
 
@@ -98,10 +112,10 @@
        Linux magick.imagemagick.org 3.4.4-3.fc17.x86_64 #1 SMP Tue Jun 26
            20:54:56 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
 
- 2. This script can be trivially modified to support another image format
+ 2. This script can be trivially modified to support any other MIME type
  (e.g., change PNG to JPG and "image/png" to "image/jpeg" throughout).
- To do: do that, via a "-f/--format jpg|jpeg|png|bmp|gif" option and by
- inspecting the filename extension.
+ To do: do that, via a "-f/--format jpg|jpeg|png|bmp|gif" option (done
+ as of version 1.0.2) and by inspecting the filename extension (still to do).
 
  3. Find out if the script works on Windows and Mac or can be modified to
  do so.

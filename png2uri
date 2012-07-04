@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# png2uri version 1.0.1, July 4, 2012.
+# png2uri version 1.0.2, July 4, 2012.
 #
 # NO COPYRIGHT RIGHTS ARE CLAIMED TO THIS SOFTWARE.
 #
@@ -23,37 +23,75 @@
 # png2uri is a command-line application that creates an HTML "img" tag on
 # standard output containing a data URI in accordance with RFC-2397, from
 # a PNG file or from a PNG datastream received from standard input.
+# Other formats besides the default, PNG, are supported, via the "-f or
+# --format option or, if that option was not supplied, by inspection of the
+# filename extension.
 #
-# Usage: png2uri [-u|--uri_only] [file]
+# Usage: png2uri [-f type|--format type] [-u|--uri_only] [file]
 #
-#        options: -u|--uri_only|--url_only: omit the surrounding "img" tag
-#                 and only write the data URI.
+#        options: -f|--format TYPE: 
+#                 write "image/TYPE" instead of "image/png" in the
+#                 data uri.  TYPE can be png, jpg, jpeg, bmp, or gif,
+#                 or any of those in upper case.  To write any other
+#                 type, include the complete MIME type as in
+#                 "--format image/x-jng" or "-f audio/mpeg".
+#
+#                 -u|--uri_only|--url_only
+#                 omit the surrounding "img" tag and only write the
+#                 data URI.
 #
 # Requires /bin/sh and a uuencode(1) that takes the "-m" option to mean
-# to encode in base64 according to RFC-3548.
+# to encode in base64 according to RFC-3548, and a working "sed".
 #
 # If you prefer a web-based converter or a java application, this isn't
 # it. Use your search engine and look for "png data uri" to find one.
 #
 
 uri_only="false"
+format="unknown"
 
 while true
 do
 case x$1 in
+  x-f|x--format)
+      shift
+      case x$1 in
+         xpng|xPNG)
+           format=image/png
+         ;;
+         xjpeg|xJPEG|xjpg|xJPG)
+           format=image/jpeg
+         ;;
+         xbmp|xBMP)
+           format=image/bmp
+         ;;
+         xgif|xGIF)
+           format=image/gif
+         ;;
+         *)
+           format=$1
+         ;;
+      esac
+      shift
+      ;;
   x-u|x--ur*)
       uri_only="true"
       shift
       ;;
   x)
       # Convert standard input.
+      case $format in
+        unknown)
+           format=image/png
+           ;;
+      esac
       case $uri_only in
          true)
-            echo "data:image/png;base64,"
+            echo "data:$format;base64,"
             uuencode -m ==== | grep -v ====
             ;;
          false)
-            echo "<img alt=\"PNG\" title=\"PNG\" src=\"data:image/png;base64,"
+            echo "<img alt=\"PNG\" title=\"PNG\" src=\"data:$format;base64,"
             uuencode -m ==== | grep -v ====
             echo "\">"
             ;;
@@ -62,13 +100,30 @@ case x$1 in
       ;;
   *)
       # Convert the named file.
+      case $format in
+        unknown)
+           format=image/png
+           extension=`echo $1 | sed "s/.*\.//"`
+           case x$extension in
+              xjpeg|xJPEG|xjpg|xJPG)
+                format=image/jpeg
+              ;;
+              xbmp|xBMP)
+                format=image/bmp
+              ;;
+              xgif|xGIF)
+                format=image/gif
+              ;;
+            esac
+         ;;
+      esac
       case $uri_only in
          true)
-            echo "data:image/png;base64,"
+            echo "data:$format;base64,"
             uuencode -m $1 ==== | grep -v ====
             ;;
          false)
-            echo "<img alt=\"$1\" title=\"$1\" src=\"data:image/png;base64,"
+            echo "<img alt=\"$1\" title=\"$1\" src=\"data:$format;base64,"
             uuencode -m $1 ==== | grep -v ====
             echo "\">"
             ;;
