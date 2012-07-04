@@ -112,16 +112,11 @@
        Linux magick.imagemagick.org 3.4.4-3.fc17.x86_64 #1 SMP Tue Jun 26
            20:54:56 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
 
- 2. This script can be trivially modified to support any other MIME type
- (e.g., change PNG to JPG and "image/png" to "image/jpeg" throughout).
- To do: do that, via a "-f/--format jpg|jpeg|png|bmp|gif" option (done
- as of version 1.0.2) and by inspecting the filename extension (still to do).
-
- 3. Find out if the script works on Windows and Mac or can be modified to
+ 2. Find out if the script works on Windows and Mac or can be modified to
  do so.
 
- 4. Make it work as a drag-and-drop application.
+ 3. Make it work as a drag-and-drop application.
 
- 5. But keep it simple!
+ 4. But keep it simple!
 
 */
