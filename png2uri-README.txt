@@ -71,6 +71,10 @@
    Mike Scalora's web-based converter
       http://www.scalora.org/projects/uriencoder/
 
+   Data URL Maker (a web-based drag-and-drop converter), CSS Optimizer,
+   and Data URL Toolkit (a PERL implementation)
+      http://dataurl.net/#about
+
  CHANGE LOG
 
    Version 1.0.0, July 3, 2012:
