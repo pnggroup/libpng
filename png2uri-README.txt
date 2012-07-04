@@ -23,25 +23,55 @@
  standard output containing a data URI, from a PNG file or from standard
  input.
 
- Usage: png2uri [file]
+ Usage: png2uri [-u|--uri_only] [file]
+
+        options: -u|--uri_only|--url_only: omit the surrounding "img" tag
+                 and only write the data URI.
 
  Requires /bin/sh and a uuencode(1) that takes the "-m" option to mean
  to encode in base64.  A surprising number of machines that I've tried
- (3 out of 8) don't have uuencode installed.
+ (3 out of 9) don't have uuencode installed.
 
  REFERENCES:
     http://en.wikipedia.org/wiki/Data_URI_scheme
+
     Masinter, L. "RFC 2397 - The "data" URL scheme",
       Internet Engineering Task Force, August 1998
+
+    http://en.wikipedia.org/wiki/Base64
+
+    IETF, "RFC 3548 - The Base16, Base32, and Base64 Data Encodings",
+      July 2003.
+
+ OTHER IMPLEMENTATIONS
 
  If you prefer a web-based converter or a java application, this isn't
  it. Use your search engine and look for "png data uri" to find one.
 
- To do: test on various platforms. The following have been tried
+ CHANGE LOG
+
+   Version 1.0.0, July 3, 2012:
+
+      Initial release.
+
+   Version 1.0.1, July 4, 2012:
+
+      The string "base64" could conceivably appear within the encoded data
+      and any line containing "base64" is removed; revised script to
+      use "====" instead to remove the first line of uuencode output.
+
+      Implemented "-u" and "--url_only" option.
+
+ TO DO
+
+ 1. Test on various platforms. The following have been tried
 
     Ubuntu 10.04 (data is folded to 60 characters)
        Linux glenn.rp 2.6.32-41-generic #91-Ubuntu SMP Wed Jun 13 11:43:55
           UTC 2012 x86_64 GNU/Linux
+       Linux nancy.rp 2.6.32-41-generic #91-Ubuntu SMP Wed Jun 13 11:43:55
+          UTC 2012 x86_64 GNU/Linux (uuencode not found.  Fixed that with
+          "sudo aptitude install sharutils", then data folded to 60 chars)
 
     Ubuntu 12.04 (FAILED: uuencode not found but manpage for POSIX uuencode
     exists)
@@ -68,22 +98,16 @@
        Linux magick.imagemagick.org 3.4.4-3.fc17.x86_64 #1 SMP Tue Jun 26
            20:54:56 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
 
- This script can be trivially modified to support another image format
+ 2. This script can be trivially modified to support another image format
  (e.g., change PNG to JPG and "image/png" to "image/jpeg" throughout).
-
  To do: do that, via a "-f/--format jpg|jpeg|png|bmp|gif" option and by
  inspecting the filename extension.
 
- If you only want the data uri and not the surrounding "< img src= .. >"
- simply use your text editor to get rid of it.
-
- To do: do that via a -u/--uri-only option.
-
- To do: find out if the script works on Windows and Mac or can be modified to
+ 3. Find out if the script works on Windows and Mac or can be modified to
  do so.
 
- To do: make it work as a drag-and-drop application.
+ 4. Make it work as a drag-and-drop application.
 
- To do: But keep it simple!
+ 5. But keep it simple!
 
 */

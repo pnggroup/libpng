@@ -1,8 +1,6 @@
 #!/bin/sh
 #
-# png2uri
-#
-# version 1.0.0, July 3, 2012
+# png2uri version 1.0.1, July 4, 2012.
 #
 # NO COPYRIGHT RIGHTS ARE CLAIMED TO THIS SOFTWARE.
 #
@@ -23,29 +21,59 @@
 #     Glenn Randers-Pehrson <glennrp@users.sourceforge.net>
 #
 # png2uri is a command-line application that creates an HTML "img" tag on
-# standard output containing a data URI, from a PNG file or from standard
-# input.
+# standard output containing a data URI in accordance with RFC-2397, from
+# a PNG file or from a PNG datastream received from standard input.
 #
-# Usage: png2uri [file]
+# Usage: png2uri [-u|--uri_only] [file]
+#
+#        options: -u|--uri_only|--url_only: omit the surrounding "img" tag
+#                 and only write the data URI.
 #
 # Requires /bin/sh and a uuencode(1) that takes the "-m" option to mean
-# to encode in base64.
+# to encode in base64 according to RFC-3548.
 #
 # If you prefer a web-based converter or a java application, this isn't
 # it. Use your search engine and look for "png data uri" to find one.
 #
 
+uri_only="false"
+
+while true
+do
 case x$1 in
+  x-u|x--ur*)
+      uri_only="true"
+      shift
+      ;;
   x)
       # Convert standard input.
-      echo "<img alt=\"PNG\" title=\"PNG\" src=\"data:image/png;base64,"
-      uuencode -m PNG |grep -v base64|grep -v ====
-      echo "\">"
+      case $uri_only in
+         true)
+            echo "data:image/png;base64,"
+            uuencode -m ==== | grep -v ====
+            ;;
+         false)
+            echo "<img alt=\"PNG\" title=\"PNG\" src=\"data:image/png;base64,"
+            uuencode -m ==== | grep -v ====
+            echo "\">"
+            ;;
+      esac
+      exit
       ;;
   *)
       # Convert the named file.
-      echo "<img alt=\"$1\" title=\"$1\" src=\"data:image/png;base64,"
-      uuencode -m $1 $1 |grep -v base64|grep -v ====
-      echo "\">"
+      case $uri_only in
+         true)
+            echo "data:image/png;base64,"
+            uuencode -m $1 ==== | grep -v ====
+            ;;
+         false)
+            echo "<img alt=\"$1\" title=\"$1\" src=\"data:image/png;base64,"
+            uuencode -m $1 ==== | grep -v ====
+            echo "\">"
+            ;;
+      esac
+      exit
       ;;
 esac
+done
