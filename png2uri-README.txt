@@ -57,6 +57,19 @@
 
  If you prefer a web-based converter or a java application, this isn't
  it. Use your search engine and look for "png data uri" to find one.
+ Here are some:
+
+   A PHP script:
+      http://css-tricks.com/snippets/php/create-data-uris/
+
+   Hixie's web-based converter
+      http://software.hixie.ch/utilities/cgi/data/data/
+ 
+   Websemantics' web-based converter
+      http://websemantics.co.uk/online_tools/image_to_data_uri_convertor
+
+   Mike Scalora's web-based converter
+      http://www.scalora.org/projects/uriencoder/
 
  CHANGE LOG
 
