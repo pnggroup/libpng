@@ -21,8 +21,8 @@
 
  png2uri is a command-line application that creates an HTML "img" tag on
  standard output containing a data URI, from a PNG file or from standard
- input. Other formats besides the default, PNG, are supported, via the "-f
- or --format option or, if that option was not supplied, by inspection of
+ input. Other formats besides the default, PNG, are supported, via the "-f"
+ or "--format" option or, if that option was not supplied, by inspection of
  the filename extension.
 
  Usage: png2uri [-f format|--format format] [-u|--uri_only] [file]
@@ -92,6 +92,12 @@
    Version 1.0.2, July 4, 2012:
 
       Implemented "-f TYPE" and "--format TYPE" option.
+
+   Version 1.0.3, July 5, 2012:
+
+      Changed environment variable "format" to PNG2URI_FMT reduce possibility`
+      of name conflict, and changed "uri_only" to PNG2URI_URI.  Fixed some
+      indentation.
 
  TO DO
 
