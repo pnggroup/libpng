@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# png2uri version 1.0.3, July 5, 2012.
+# png2uri version 1.0.4, July 6, 2012.
 #
 # NO COPYRIGHT RIGHTS ARE CLAIMED TO THIS SOFTWARE.
 #
@@ -40,15 +40,29 @@
 #                 omit the surrounding "img" tag and only write the
 #                 data URI.
 #
-# Requires /bin/sh and a uuencode(1) that takes the "-m" option to mean
-# to encode in base64 according to RFC-3548, and a working "sed".
+# Requires /bin/sh and a "base64" or "uuencode -m" that encodes its input
+# in base64 according to RFC-3548 and writes the result on standard output,
+# "uname", and a working "sed".
 #
 # If you prefer a web-based converter or a java application, this isn't
 # it. Use your search engine and look for "data uri" to find one.
 #
+# I guess we need a "configure" script to figure out which of base64(1)
+# or uuencode(1) to use, since neither is always present (uuencode must
+# be installed as part of "sharutils" on Gnu/Linux platforms, which often
+# hasn't happened). Here is a minimal "configure":
 
-PNG2URI_URI="true"
+case X`uname` in
+  XLinux)
+    PNG2URI_BASE64=use_base64
+    ;;
+  *)
+    PNG2URI_BASE64=use_uuencode
+    ;;
+esac
+
 PNG2URI_FMT="unknown"
+PNG2URI_URI="true"
 
 while true
 do
@@ -96,12 +110,26 @@ case X$1 in
       case X$PNG2URI_URI in
         Xfalse)
           echo "data:$PNG2URI_FMT;base64,"
-          uuencode -m ==== | grep -v ====
+          case X$PNG2URI_BASE64 in
+            Xuse_base64)
+              base64
+              ;;
+            Xuse_uuencode)
+              uuencode -m ==== | grep -v ====
+              ;;
+          esac
           ;;
 
         *)
           echo "<img alt=\"PNG\" title=\"PNG\" src=\"data:$PNG2URI_FMT;base64,"
-          uuencode -m ==== | grep -v ====
+          case X$PNG2URI_BASE64 in
+            Xuse_base64)
+              base64
+              ;;
+            Xuse_uuencode)
+              uuencode -m ==== | grep -v ====
+              ;;
+          esac
           echo "\">"
           ;;
       esac
@@ -134,11 +162,25 @@ case X$1 in
       case X$PNG2URI_URI in
         Xfalse)
             echo "data:$PNG2URI_FMT;base64,"
-            uuencode -m $1 ==== | grep -v ====
+            case X$PNG2URI_BASE64 in
+              Xuse_base64)
+                base64 < $1
+                ;;
+              Xuse_uuencode)
+                uuencode -m $1 ==== | grep -v ====
+                ;;
+            esac
             ;;
         *)
             echo "<img alt=\"$1\" title=\"$1\" src=\"data:$PNG2URI_FMT;base64,"
-            uuencode -m $1 ==== | grep -v ====
+            case X$PNG2URI_BASE64 in
+              Xuse_base64)
+                base64 < $1
+                ;;
+              Xuse_uuencode)
+                uuencode -m $1 ==== | grep -v ====
+                ;;
+            esac
             echo "\">"
             ;;
       esac
