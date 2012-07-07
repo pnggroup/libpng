@@ -25,7 +25,7 @@
  or "--format" option or, if that option was not supplied, by inspection of
  the filename extension.
 
- Usage: png2uri [-f format|--format format] [-u|--uri_only] [file]
+ Usage: png2uri [-f format|--format format] [-u|--uri_only] [infile [outfile]]
 
         options: -f|--format TYPE: 
                  write "image/TYPE" instead of "image/png" in the
@@ -112,48 +112,25 @@
       of "sharutils", which often doesnn't happen.  SunOS and FreeBSD don't
       supply "base64" so we use "uuencode" instead.
 
+   Version 1.0.5, July 7, 2012:
+
+      Eliminated use of "uname" and use the return of "base64" and "uuencode"
+      to select the workable one (checking "base64" first); suggested by
+      John Bowler.  Added a check for too many arguments, also a JB suggestion.
+      Accept output filename as an optional final argument.
+
  TO DO
 
  1. Test on various other platforms. I assume we'll soon find one that has
     neither "uuencode" nor "base64".  The following have been tried
 
-    Ubuntu 10.04 (uuencode output was folded to 60 characters)
-       Linux glenn.rp 2.6.32-41-generic #91-Ubuntu SMP Wed Jun 13 11:43:55
-          UTC 2012 x86_64 GNU/Linux
-       Linux nancy.rp 2.6.32-41-generic #91-Ubuntu SMP Wed Jun 13 11:43:55
-          UTC 2012 x86_64 GNU/Linux (uuencode not found.  Fixed that with
-          "sudo aptitude install sharutils", then finally fixed by using
-          base64() instead of uuencode())
-
-    Ubuntu 12.04 (uuencode not found but manpage for POSIX uuencode exists;
-       base64 works)
-       Linux scooby 3.0.0-22-generic #36-Ubuntu SMP Tue Jun 12 17:37:42 UTC 2012
-          x86_64 x86_64 x86_64 GNU/Linux
-
-    SunOS 5.10 (uuencode data is folded to 68 characters)
-       Does not work with "base64"!  Reconfigured png2uri to use "uuencode".
-       on non-Linux platforms.
-       SunOS freddy 5.10 Generic_147441-13 i86pc i386 i86pc
-       SunOS blade 5.10 Generic_144488-12 sun4u sparc SUNW,Sun-Blade-2500
-
-    Sunos 5.11 (uuencode data is folded to 68 characters)
-       SunOS weerd 5.11 oi_151a4 i86pc i386 i86pc
-
-    FreeBSD 8.0 (uuencode data is folded to 76 characters)
-       "base64 not found"; use uuencode.
-       FreeBSD shaggy.simplesystems.org 8.0-RELEASE-p1 FreeBSD 8.0-RELEASE-p1
-           #1: Mon Dec 21 11:26:14 CST 2009
-           zsh@shaggy.simplesystems.org:/usr/src/sys/i386/compile/GENERIC
-           i386
-
-    Red Hat? (uuencode not found but manpage for POSIX uuencode
-    exists; worked when base64 was used instead of uuencode)
-       Linux studio.imagemagick.org 2.6.18-308.4.1.el5xen #1 SMP Tue Apr 17
-           17:49:15 EDT 2012 x86_64 x86_64 x86_64 GNU/Linux
-       Linux magick.imagemagick.org 3.4.4-3.fc17.x86_64 #1 SMP Tue Jun 26
-           20:54:56 UTC 2012 x86_64 x86_64 x86_64 GNU/Linux
-       Two other Redhat Enterprise platforms also worked with base64, but
-           uuencode was not installed.
+    Ubuntu 10.04 (using "base64")
+    Ubuntu 12.04 (using "base64")
+    SunOS 5.10   (using "uuencode")
+    SunOS 5.11   (using "uuencode")
+    FreeBSD 8.0  (using "uuencode")
+    Redhat Gnu/Linux (using "base64")
+    Redhat Enterprise (using "base64")
 
  2. Find out if the script works on Windows and Mac or can be modified to
  do so.
