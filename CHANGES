@@ -2740,7 +2740,6 @@ version 1.2.47beta01 [February 17, 2012]
   Updated contrib/pngminus/makefile.std (Samuli Souminen)
 
 version 1.0.57rc01 and 1.2.47rc01 [February 17, 2012]
-  Fixed CVE-2011-3026 buffer overrun bug.
   Fixed CVE-2011-3026 buffer overrun bug.  This bug was introduced when
     iCCP chunk support was added at libpng-1.0.6.
 
@@ -2770,10 +2769,13 @@ version 1.2.48rc02 [March 2, 2012]
 version 1.0.58 and 1.2.48 [March 8, 2012]
   No changes.
 
-version 1.2.49rc01 [March 29, 2012]
+version 1.0.59 and 1.2.49 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
     CVE-2011-3048).
   Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+
+version 1.0.60 and 1.2.50 [July 9, 2012]
+  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

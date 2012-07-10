@@ -1,5 +1,5 @@
 
-Libpng 1.2.49 - March 29, 2012
+Libpng 1.2.50 - July 10, 2012
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,44 +8,44 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.49.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.49.tar.gz
-   libpng-1.2.49.tar.bz2
+   libpng-1.2.50.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.50.tar.gz
+   libpng-1.2.50.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.49-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.49-no-config.tar.gz
-   libpng-1.2.49-no-config.tar.bz2
+   libpng-1.2.50-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.50-no-config.tar.gz
+   libpng-1.2.50-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1249.zip
-   lpng1249.7z
-   lpng1249.tar.bz2
+   lpng1250.zip
+   lpng1250.7z
+   lpng1250.tar.bz2
 
 Project files
 
-   libpng-1.2.49-project-netware.zip
-   libpng-1.2.49-project-wince.zip
+   libpng-1.2.50-project-netware.zip
+   libpng-1.2.50-project-wince.zip
 
 Other information:
 
-   libpng-1.2.49-README.txt
-   libpng-1.2.49-KNOWNBUGS.txt
-   libpng-1.2.49-LICENSE.txt
-   libpng-1.2.49-Y2K-compliance.txt
-   libpng-1.2.49-[previous version]-diff.txt
+   libpng-1.2.50-README.txt
+   libpng-1.2.50-KNOWNBUGS.txt
+   libpng-1.2.50-LICENSE.txt
+   libpng-1.2.50-Y2K-compliance.txt
+   libpng-1.2.50-[previous version]-diff.txt
 
-Changes since the last public release (1.2.48):
+Changes since the last public release (1.2.49):
 
-version 1.2.49 [March 29, 2012]
+version 1.2.50 [July 10, 2012]
 
-  Revised png_set_text_2() to avoid potential memory corruption (fixes
-    CVE-2011-3048).
-  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+version 1.0.60 and 1.2.50 [July 8, 2012]
+  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

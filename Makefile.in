@@ -354,7 +354,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.2.49.txt pnggccrd.c pngvcrd.c
+	example.c libpng-1.2.50.txt pnggccrd.c pngvcrd.c
 
 CLEANFILES = pngout.png libpng12.pc libpng12-config libpng.vers \
 libpng.sym
@@ -1146,7 +1146,7 @@ distcheck: dist
 	*.zip*) \
 	  unzip $(distdir).zip ;;\
 	esac
-	chmod -R a-w $(distdir); chmod a+w $(distdir)
+	chmod -R a-w $(distdir); chmod u+w $(distdir)
 	mkdir $(distdir)/_build
 	mkdir $(distdir)/_inst
 	chmod a-w $(distdir)
