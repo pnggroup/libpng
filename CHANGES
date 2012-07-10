@@ -2868,7 +2868,11 @@ version 1.4.11 [March 29, 2012]
     CVE-2011-3048).
   Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
 
-version 1.4.12 [April 26, 2012]
+version 1.4.12 [July 10, 2012]
+  Added two images to contrib/pngsuite (1-bit and 2-bit transparent grayscale),
+    and renamed three whose names were inconsistent with those in
+    pngsuite/README.txt.
+  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
