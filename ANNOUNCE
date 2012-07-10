@@ -1,5 +1,5 @@
 
-Libpng 1.0.59 - March 29, 2012
+Libpng 1.0.60 - July 10, 2012
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,43 +8,43 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.0.59.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.59.tar.gz
-   libpng-1.0.59.tar.bz2
+   libpng-1.0.60.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.60.tar.gz
+   libpng-1.0.60.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.0.59-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.0.59-no-config.tar.gz
-   libpng-1.0.59-no-config.tar.bz2
+   libpng-1.0.60-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.0.60-no-config.tar.gz
+   libpng-1.0.60-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1059.zip
-   lpng1059.7z
-   lpng1059.tar.bz2
+   lpng1060.zip
+   lpng1060.7z
+   lpng1060.tar.bz2
 
 Project files
 
-   libpng-1.0.59-project-netware.zip
-   libpng-1.0.59-project-wince.zip
+   libpng-1.0.60-project-netware.zip
+   libpng-1.0.60-project-wince.zip
 
 Other information:
 
-   libpng-1.0.59-README.txt
-   libpng-1.0.59-KNOWNBUGS.txt
-   libpng-1.0.59-LICENSE.txt
-   libpng-1.0.59-Y2K-compliance.txt
+   libpng-1.0.60-README.txt
+   libpng-1.0.60-KNOWNBUGS.txt
+   libpng-1.0.60-LICENSE.txt
+   libpng-1.0.60-Y2K-compliance.txt
 
-Changes since the last public release (1.0.58):
+Changes since the last public release (1.0.59):
 
-version 1.0.59 [March 29, 2012]
+version 1.0.60 [July 10, 2012]
 
-  Revised png_set_text_2() to avoid potential memory corruption (fixes
-    CVE-2011-3048).
-  Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
+version 1.0.60 and 1.2.50 [July 8, 2012]
+  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
