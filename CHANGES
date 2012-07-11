@@ -3891,6 +3891,11 @@ Version 1.5.11rc05 [June 7, 2012]
 Version 1.5.11 [June 14, 2012]
   Include zlib.h in contrib/gregbook and contrib/visupng examples.
 
+Version 1.5.12 [July 11, 2012]
+  Removed scripts/makefile.cegcc from the *.zip and *.7z distributions; it
+    depends on configure, which is not included in those archives.
+  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
