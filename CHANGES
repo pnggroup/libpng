@@ -2874,6 +2874,8 @@ version 1.4.12 [July 10, 2012]
     pngsuite/README.txt.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
+version 1.4.13beta01 [July 14, 2012]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
