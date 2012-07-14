@@ -3896,6 +3896,9 @@ Version 1.5.12 [July 11, 2012]
     depends on configure, which is not included in those archives.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
+Version 1.5.13beta01 [July 14, 2012]
+  Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

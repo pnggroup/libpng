@@ -1,38 +1,37 @@
 
-Libpng 1.5.12 - July 11, 2012
+Libpng 1.5.13beta01 - July 14, 2012
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.12.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.12.tar.gz
-   libpng-1.5.12.tar.bz2
+   1.5.13beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.13beta01.tar.gz
+   1.5.13beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1512.7z  (LZMA-compressed, recommended)
-   lpng1512.zip
+   lp1513b01.7z  (LZMA-compressed, recommended)
+   lp1513b01.zip
 
 Other information:
 
-   libpng-1.5.12-README.txt
-   libpng-1.5.12-LICENSE.txt
+   1.5.13beta01-README.txt
+   1.5.13beta01-LICENSE.txt
 
-Changes since the last public release (1.5.11):
+Changes since the last public release (1.5.12):
 
-  Removed scripts/makefile.cegcc from the *.zip and *.7z distributions; it
-    depends on configure, which is not included in those archives.
-  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+Version 1.5.13beta01 [July 14, 2012]
+  Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
 
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe)
-or to glennrp at users.sourceforge.net
+to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P
