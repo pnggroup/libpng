@@ -1389,29 +1389,23 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __attribute__((__noreturn__))
 #    endif
-#    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED  __attribute__((__malloc__))
-#    endif
-#    ifndef PNG_DEPRECATED
-#      define PNG_DEPRECATED __attribute__((__deprecated__))
-#    endif
-
-    /* This specifically protects structure members that should only be
-     * accessed from within the library, therefore should be empty during
-     * a library build.
-     */
-#    ifndef PNG_DEPSTRUCT
-#      define PNG_DEPSTRUCT  __attribute__((__deprecated__))
-#    endif
-#    ifndef PNG_PRIVATE
-#      if 0 /* Doesn't work so we use deprecated instead*/
-#        define PNG_PRIVATE \
-          __attribute__((warning("This function is not exported by libpng.")))
-#      else
-#        define PNG_PRIVATE \
-          __attribute__((__deprecated__))
+#    if __GNUC__ >= 3
+#      ifndef PNG_ALLOCATED
+#        define PNG_ALLOCATED  __attribute__((__malloc__))
 #      endif
-#    endif /* PNG_PRIVATE */
+#      ifndef PNG_DEPRECATED
+#        define PNG_DEPRECATED __attribute__((__deprecated__))
+#      endif
+#      ifndef PNG_PRIVATE
+#        if 0 /* Doesn't work so we use deprecated instead*/
+#          define PNG_PRIVATE \
+            __attribute__((warning("This function is not exported by libpng.")))
+#        else
+#          define PNG_PRIVATE \
+            __attribute__((__deprecated__))
+#        endif
+#      endif
+#    endif /*  __GNUC__ >= 3 */
 #  endif /* __GNUC__ */
 #endif /* PNG_PEDANTIC_WARNINGS */
 
