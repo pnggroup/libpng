@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta26 - July 10, 2012
+Libpng 1.6.0beta27 - July 14, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta26.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta26.tar.gz
-   1.6.0beta26.tar.bz2
+   1.6.0beta27.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta27.tar.gz
+   1.6.0beta27.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b26.7z  (LZMA-compressed, recommended)
-   lp160b26.zip
+   lp160b27.7z  (LZMA-compressed, recommended)
+   lp160b27.zip
 
 Other information:
 
-   1.6.0beta26-README.txt
-   1.6.0beta26-LICENSE.txt
+   1.6.0beta27-README.txt
+   1.6.0beta27-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -398,6 +398,8 @@ Version 1.6.0beta26 [July 10, 2012]
     depends on configure, which is not included in those archives.
   Moved scripts/chkfmt to contrib/tools.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+
+Version 1.6.0beta27 [July 14, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

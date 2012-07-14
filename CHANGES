@@ -4150,6 +4150,8 @@ Version 1.6.0beta26 [July 10, 2012]
   Moved scripts/chkfmt to contrib/tools.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
+Version 1.6.0beta27 [July 14, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
