@@ -382,7 +382,7 @@
             __attribute__((__deprecated__))
 #        endif
 #      endif
-#      if ((__GNUC__ != 3) || (__GNUC_MINOR__ >= 1))
+#      if ((__GNUC__ != 3) || !defined(__GNUC_MINOR__) || (__GNUC_MINOR__ >= 1))
 #        ifndef PNG_RESTRICT
 #          define PNG_RESTRICT __restrict
 #        endif
