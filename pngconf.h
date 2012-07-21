@@ -435,6 +435,9 @@
 #ifndef PNG_PRIVATE
 #  define PNG_PRIVATE     /* This is a private libpng function */
 #endif
+#ifndef PNG_RESTRICT
+#  define PNG_RESTRICT    /* The C99 "restrict" feature */
+#endif
 #ifndef PNG_FP_EXPORT     /* A floating point API. */
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 #     define PNG_FP_EXPORT(ordinal, type, name, args)\
