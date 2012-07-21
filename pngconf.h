@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta27 - July 14, 2012
+ * libpng version 1.6.0beta27 - July 21, 2012
  *
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -366,24 +366,28 @@
 #    ifndef PNG_NORETURN
 #      define PNG_NORETURN   __attribute__((__noreturn__))
 #    endif
-#    ifndef PNG_ALLOCATED
-#      define PNG_ALLOCATED  __attribute__((__malloc__))
-#    endif
-#    ifndef PNG_DEPRECATED
-#      define PNG_DEPRECATED __attribute__((__deprecated__))
-#    endif
-#    ifndef PNG_PRIVATE
-#      if 0 /* Doesn't work so we use deprecated instead*/
-#        define PNG_PRIVATE \
-          __attribute__((warning("This function is not exported by libpng.")))
-#      else
-#        define PNG_PRIVATE \
-          __attribute__((__deprecated__))
+#    if __GNUC__ >= 3
+#      ifndef PNG_ALLOCATED
+#        define PNG_ALLOCATED  __attribute__((__malloc__))
 #      endif
-#    endif
-#    ifndef PNG_RESTRICT
-#      define PNG_RESTRICT __restrict
-#    endif
+#      ifndef PNG_DEPRECATED
+#        define PNG_DEPRECATED __attribute__((__deprecated__))
+#      endif
+#      ifndef PNG_PRIVATE
+#        if 0 /* Doesn't work so we use deprecated instead*/
+#          define PNG_PRIVATE \
+            __attribute__((warning("This function is not exported by libpng.")))
+#        else
+#          define PNG_PRIVATE \
+            __attribute__((__deprecated__))
+#        endif
+#      endif
+#      if ((__GNUC__ != 3) || (__GNUC_MINOR__ >= 1))
+#        ifndef PNG_RESTRICT
+#          define PNG_RESTRICT __restrict
+#        endif
+#      endif /*  __GNUC__ == 3.0 */
+#    endif /*  __GNUC__ >= 3 */
 
 #  elif defined(_MSC_VER)  && (_MSC_VER >= 1300)
 #    ifndef PNG_USE_RESULT
