@@ -1,5 +1,5 @@
 
-Libpng 1.5.13beta01 - July 14, 2012
+Libpng 1.5.13beta01 - August 3, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,8 +26,9 @@ Other information:
 
 Changes since the last public release (1.5.12):
 
-Version 1.5.13beta01 [July 14, 2012]
+Version 1.5.13beta01 [August 3, 2012]
   Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
+  Removed references to png_zalloc() and png_zfree() from the manual.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
