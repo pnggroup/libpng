@@ -2865,7 +2865,7 @@ version 1.4.10 [March 15, 2012]
 
 version 1.4.11 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
-    CVE-2011-3048).
+    CVE-2011-3048, also known as CVE-2012-3425).
   Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
 
 version 1.4.12 [July 10, 2012]
@@ -2874,8 +2874,9 @@ version 1.4.12 [July 10, 2012]
     pngsuite/README.txt.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
-version 1.4.13beta01 [July 14, 2012]
+version 1.4.13beta01 [August 3, 2012]
   Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
+  Removed references to png_zalloc() and png_zfree() from the manual.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
