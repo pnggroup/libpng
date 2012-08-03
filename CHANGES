@@ -4100,7 +4100,7 @@ Version 1.6.0beta20 [March 29, 2012]
     iCCP profile over writing the sRGB chunk, controlled by the
     PNG_sRGB_PROFILE_CHECKS option.
   Revised png_set_text_2() to avoid potential memory corruption (fixes
-    CVE-2011-3048).
+    CVE-2011-3048, also known as CVE-2012-3425).
 
 Version 1.6.0beta21 [April 27, 2012]
   Revised scripts/makefile.darwin: use system zlib; remove quotes around
@@ -4150,9 +4150,10 @@ Version 1.6.0beta26 [July 10, 2012]
   Moved scripts/chkfmt to contrib/tools.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
-Version 1.6.0beta27 [July 21, 2012]
+Version 1.6.0beta27 [August 3, 2012]
   Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
   Do not use __restrict when GNUC is <= 3.1
+  Removed references to png_zalloc() and png_zfree() from the manual.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
