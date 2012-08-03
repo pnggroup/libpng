@@ -3229,7 +3229,7 @@ sPLT, only the n'th item in the structure is freed, where n is "seq".
 The default behavior is only to free data that was allocated internally
 by libpng.  This can be changed, so that libpng will not free the data,
 or so that it will free data that was allocated by the user with png_malloc()
-and passed in via a png_set_*() function, with
+or png_calloc() and passed in via a png_set_*() function, with
 
     png_data_freer(png_ptr, info_ptr, freer, mask)
 
@@ -3250,7 +3250,7 @@ or png_destroy_*() is supposed to free the data.  When the user assumes
 responsibility for libpng-allocated data, the application must use
 png_free() to free it, and when the user transfers responsibility to libpng
 for data that the user has allocated, the user must have used png_malloc()
-to allocate it.
+or png_calloc() to allocate it.
 
 If you allocated your row_pointers in a single block, as suggested above in
 the description of the high level read interface, you must not transfer
@@ -4432,7 +4432,7 @@ png_destroy_write_struct().
 The default behavior is only to free data that was allocated internally
 by libpng.  This can be changed, so that libpng will not free the data,
 or so that it will free data that was allocated by the user with png_malloc()
-and passed in via a png_set_*() function, with
+or png_calloc() and passed in via a png_set_*() function, with
 
     png_data_freer(png_ptr, info_ptr, freer, mask)
 
@@ -4468,7 +4468,7 @@ When the user assumes responsibility for libpng-allocated data, the
 application must use
 png_free() to free it, and when the user transfers responsibility to libpng
 for data that the user has allocated, the user must have used png_malloc()
-to allocate it.
+or png_calloc() to allocate it.
 
 If you allocated text_ptr.text, text_ptr.lang, and text_ptr.translated_keyword
 separately, do not transfer responsibility for freeing text_ptr to libpng,
@@ -4832,12 +4832,13 @@ in pngmem.c, pngrio.c, pngwio.c, and pngerror.c, respectively.  To change
 these functions, call the appropriate png_set_*_fn() function.
 
 Memory allocation is done through the functions png_malloc(), png_calloc(),
-and png_free().  These currently just call the standard C functions.
-png_calloc() calls png_malloc() and then clears the newly
-allocated memory to zero.  There is limited support for certain systems
-with segmented memory architectures and the types of pointers declared by
-png.h match this; you will have to use appropriate pointers in your
-application.  Since it is
+and png_free().  The png_malloc() and png_free() functions currently just
+call the standard C functions and png_calloc() calls png_malloc() and then
+clears the newly allocated memory to zero; note that png_calloc(png_ptr, size)
+is not the same as the calloc(number, size) function provided by stdlib.h.
+There is limited support for certain systems with segmented memory
+architectures and the types of pointers declared by png.h match this; you
+will have to use appropriate pointers in your application.  Since it is
 unlikely that the method of handling memory allocation on a platform
 will change between applications, these functions must be modified in
 the library at compile time.  If you prefer to use a different method
@@ -5516,7 +5517,9 @@ png_set_strip_error_numbers() was removed from the library by default.
 
 The png_zalloc() and png_zfree() functions are no longer exported.
 The png_zalloc() function no longer zeroes out the memory that it
-allocates.
+allocates.  Applications that called png_zalloc(png_ptr, number, size)
+can call png_calloc(png_ptr, number*size) instead, and can call
+png_free() instead of png_zfree().
 
 Support for dithering was disabled by default in libpng-1.4.0, because
 it has not been well tested and doesn't actually "dither".
