@@ -3902,6 +3902,8 @@ Version 1.5.13beta01 [August 8, 2012]
   Revised PNG_FP_EXPORT and PNG_FIXED_EXPORT macros to avoid generating
     lone semicolons (patch ported from libpng-1.6.0beta11).
 
+Version 1.5.13beta02 [August 8, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

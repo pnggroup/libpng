@@ -1,5 +1,5 @@
 
-Libpng 1.5.13beta01 - August 8, 2012
+Libpng 1.5.13beta02 - August 8, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.13beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.13beta01.tar.gz
-   1.5.13beta01.tar.bz2
+   1.5.13beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.13beta02.tar.gz
+   1.5.13beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1513b01.7z  (LZMA-compressed, recommended)
-   lp1513b01.zip
+   lp1513b02.7z  (LZMA-compressed, recommended)
+   lp1513b02.zip
 
 Other information:
 
-   1.5.13beta01-README.txt
-   1.5.13beta01-LICENSE.txt
+   1.5.13beta02-README.txt
+   1.5.13beta02-LICENSE.txt
 
 Changes since the last public release (1.5.12):
 
@@ -31,6 +31,8 @@ Version 1.5.13beta01 [August 8, 2012]
   Removed references to png_zalloc() and png_zfree() from the manual.
   Revised PNG_FP_EXPORT and PNG_FIXED_EXPORT macros to avoid generating
     lone semicolons (patch ported from libpng-1.6.0beta11).
+
+Version 1.5.13beta02 [August 8, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
