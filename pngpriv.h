@@ -170,12 +170,17 @@
  * the functions will be used without definitions.)
  *
  * NOTE: although all the API functions are declared here they are not all
- * actually built!
+ * actually built!  Because the declarations are still made it is necessary to
+ * fake out types that they depend on.
  */
 #ifndef PNG_FP_EXPORT
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
 #     define PNG_FP_EXPORT(ordinal, type, name, args)\
          PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
+      typedef struct png_incomplete png_double;
+      typedef png_double*           png_doublep;
+      typedef const png_double*     png_const_doublep;
+      typedef png_double**          png_doublepp;
 #  endif
 #endif
 #ifndef PNG_FIXED_EXPORT
