@@ -410,6 +410,9 @@ Version 1.6.0beta27 [August 9, 2012]
     declared even though the functions are never actually defined.  This
     change provides a dummy definition so that the declarations work, yet any
     implementation will fail to compile because of an incomplete type.
+  Re-eliminated the use of strcpy() in pngtest.c.  An unncessary use of
+    strcpy() was accidentally re-introduced in libpng16; this change replaces
+    it with strncpy().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

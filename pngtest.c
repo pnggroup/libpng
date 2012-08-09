@@ -1050,7 +1050,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             tIME_string[png_sizeof(tIME_string) - 1] = '\0';
 
          else
-            strcpy(tIME_string, "*** invalid time ***");
+         {
+            strncpy(tIME_string, "*** invalid time ***", sizeof tIME_string);
+            tIME_string[(sizeof tIME_string)-1] = '\0';
+         }
 
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
@@ -1256,7 +1259,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
             tIME_string[png_sizeof(tIME_string) - 1] = '\0';
 
          else
-            strcpy(tIME_string, "*** invalid time ***");
+         {
+            strncpy(tIME_string, "*** invalid time ***", sizeof tIME_string);
+            tIME_string[(sizeof tIME_string)-1] = '\0';
+         }
 
          tIME_chunk_present++;
 #endif /* PNG_TIME_RFC1123_SUPPORTED */
