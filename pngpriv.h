@@ -1577,7 +1577,7 @@ PNG_INTERNAL_FUNCTION(void,png_formatted_warning,(png_const_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_app_warning,(png_const_structrp png_ptr,
    png_const_charp message),PNG_EMPTY);
    /* The application provided invalid parameters to an API function or called
-    * an API function at the wrong time, libpng can completely recovered.
+    * an API function at the wrong time, libpng can completely recover.
     */
 
 PNG_INTERNAL_FUNCTION(void,png_app_error,(png_const_structrp png_ptr,

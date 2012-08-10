@@ -4166,6 +4166,13 @@ Version 1.6.0beta27 [August 10, 2012]
     it with strncpy().
   Eliminated use of png_sizeof(); use sizeof() instead.
   Use a consistent style for (sizeof type) and (sizeof (array))
+  Cleanup of png_set_filler().  This function does very different things on
+    read and write.  In libpng 1.6 the two cases can be distinguished and
+    considerable code cleanup, and extra error checking, is possible.  This
+    makes calls on the write side that have no effect be ignored with a
+    png_app_error(), which can be disabled in the app using
+    png_set_benign_errors(), and removes the spurious use of usr_channels
+    on the read side.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

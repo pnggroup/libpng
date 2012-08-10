@@ -252,7 +252,9 @@ struct png_struct_def
    png_byte usr_bit_depth;    /* bit depth of users row: write only */
    png_byte pixel_depth;      /* number of bits per pixel */
    png_byte channels;         /* number of channels in file */
+#ifdef PNG_WRITE_SUPPORTED
    png_byte usr_channels;     /* channels at start of write: write only */
+#endif
    png_byte sig_bytes;        /* magic bytes read/written from start of file */
    png_byte maximum_pixel_depth;
                               /* pixel depth used for the row buffers */

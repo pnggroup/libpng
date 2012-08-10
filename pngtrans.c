@@ -122,32 +122,79 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
    if (png_ptr == NULL)
       return;
 
+   /* In libpng 1.6 it is possible to determine whether this is a read or write
+    * operation and therefore to do more checking here for a valid call.
+    */
+   if (png_ptr->mode & PNG_IS_READ_STRUCT)
+   {
+#     ifdef PNG_READ_FILLER_SUPPORTED
+         /* On read png_set_filler is always valid, regardless of the base PNG
+          * format, because other transformations can give a format where the
+          * filler code can execute (basically an 8 or 16-bit component RGB or G
+          * format.)
+          *
+          * NOTE: usr_channels is not used by the read code!  (This has led to
+          * confusion in the past.)  The filler is only used in the read code.
+          */
+         png_ptr->filler = (png_uint_16)filler;
+#     else
+         png_app_error(png_ptr, "png_set_filler not supported on read");
+         PNG_UNUSED(filler); /* not used in the write case */
+         return;
+#     endif
+   }
+
+   else /* write */
+   {
+#     ifdef PNG_WRITE_FILLER_SUPPORTED
+         /* On write the usr_channels parameter must be set correctly at the
+          * start to record the number of channels in the app-supplied data.
+          */
+         switch (png_ptr->color_type)
+         {
+            case PNG_COLOR_TYPE_RGB:
+               png_ptr->usr_channels = 4;
+               break;
+
+            case PNG_COLOR_TYPE_GRAY:
+               if (png_ptr->bit_depth >= 8)
+               {
+                  png_ptr->usr_channels = 2;
+                  break;
+               }
+
+               else
+               {
+                  /* There simply isn't any code in libpng to strip out bits
+                   * from bytes when the components are less than a byte in
+                   * size!
+                   */
+                  png_app_error(png_ptr,
+                     "png_set_filler is invalid for low bit depth gray output");
+                  return;
+               }
+
+            default:
+               png_app_error(png_ptr,
+                  "png_set_filler: inappropriate color type");
+               return;
+         }
+#     else
+         png_app_error(png_ptr, "png_set_filler not supported on write");
+         return;
+#     endif
+   }
+
+   /* Here on success - libpng supports the operation, set the transformation
+    * and the flag to say where the filler channel is.
+    */
    png_ptr->transformations |= PNG_FILLER;
-   png_ptr->filler = (png_uint_16)filler;
 
    if (filler_loc == PNG_FILLER_AFTER)
       png_ptr->flags |= PNG_FLAG_FILLER_AFTER;
 
    else
       png_ptr->flags &= ~PNG_FLAG_FILLER_AFTER;
-
-   /* This should probably go in the "do_read_filler" routine.
-    * I attempted to do that in libpng-1.0.1a but that caused problems
-    * so I restored it in libpng-1.0.2a
-   */
-
-   if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
-   {
-      png_ptr->usr_channels = 4;
-   }
-
-   /* Also I added this in libpng-1.0.2a (what happens when we expand
-    * a less-than-8-bit grayscale to GA?) */
-
-   if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY && png_ptr->bit_depth >= 8)
-   {
-      png_ptr->usr_channels = 2;
-   }
 }
 
 /* Added to libpng-1.2.7 */
@@ -160,7 +207,9 @@ png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
       return;
 
    png_set_filler(png_ptr, filler, filler_loc);
-   png_ptr->transformations |= PNG_ADD_ALPHA;
+   /* The above may fail to do anything. */
+   if (png_ptr->transformations & PNG_FILLER)
+      png_ptr->transformations |= PNG_ADD_ALPHA;
 }
 
 #endif
