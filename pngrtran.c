@@ -364,7 +364,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
    if (compose)
    {
       /* And obtain alpha pre-multiplication by composing on black: */
-      png_memset(&png_ptr->background, 0, sizeof png_ptr->background);
+      png_memset(&png_ptr->background, 0, (sizeof png_ptr->background));
       png_ptr->background_gamma = png_ptr->colorspace.gamma; /* just in case */
       png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_FILE;
       png_ptr->transformations &= ~PNG_BACKGROUND_EXPAND;
@@ -423,7 +423,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       int i;
 
       png_ptr->quantize_index = (png_bytep)png_malloc(png_ptr,
-          (png_uint_32)(num_palette * png_sizeof(png_byte)));
+          (png_uint_32)(num_palette * (sizeof (png_byte))));
       for (i = 0; i < num_palette; i++)
          png_ptr->quantize_index[i] = (png_byte)i;
    }
@@ -440,7 +440,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
          /* Initialize an array to sort colors */
          png_ptr->quantize_sort = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(num_palette * png_sizeof(png_byte)));
+             (png_uint_32)(num_palette * (sizeof (png_byte))));
 
          /* Initialize the quantize_sort array */
          for (i = 0; i < num_palette; i++)
@@ -574,9 +574,9 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
          /* Initialize palette index arrays */
          png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(num_palette * png_sizeof(png_byte)));
+             (png_uint_32)(num_palette * (sizeof (png_byte))));
          png_ptr->palette_to_index = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(num_palette * png_sizeof(png_byte)));
+             (png_uint_32)(num_palette * (sizeof (png_byte))));
 
          /* Initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -586,7 +586,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
          }
 
          hash = (png_dsortpp)png_calloc(png_ptr, (png_uint_32)(769 *
-             png_sizeof(png_dsortp)));
+             (sizeof (png_dsortp))));
 
          num_new_palette = num_palette;
 
@@ -616,7 +616,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
                   {
 
                      t = (png_dsortp)png_malloc_warn(png_ptr,
-                         (png_uint_32)(png_sizeof(png_dsort)));
+                         (png_uint_32)(sizeof (png_dsort)));
 
                      if (t == NULL)
                          break;
@@ -741,12 +741,12 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       png_size_t num_entries = ((png_size_t)1 << total_bits);
 
       png_ptr->palette_lookup = (png_bytep)png_calloc(png_ptr,
-          (png_uint_32)(num_entries * png_sizeof(png_byte)));
+          (png_uint_32)(num_entries * (sizeof (png_byte))));
 
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
-          png_sizeof(png_byte)));
+          (sizeof (png_byte))));
 
-      png_memset(distance, 0xff, num_entries * png_sizeof(png_byte));
+      png_memset(distance, 0xff, num_entries * (sizeof (png_byte)));
 
       for (i = 0; i < num_palette; i++)
       {

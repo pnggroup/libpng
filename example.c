@@ -48,7 +48,7 @@ int main(int argc, const char **argv)
       png_image image; /* The control structure used by libpng */
 
       /* Initialize the 'png_image' structure. */
-      memset(&image, 0, sizeof image);
+      memset(&image, 0, (sizeof image));
 
       /* The first argument is the file to read: */
       if (png_image_begin_read_from_file(&image, argv[1]))
@@ -833,7 +833,7 @@ void write_png(char *file_name /* , ... other image information ... */)
 
    /* Set the palette if there is one.  REQUIRED for indexed-color images */
    palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
-             * png_sizeof(png_color));
+             * (sizeof (png_color)));
    /* ... Set palette colors ... */
    png_set_PLTE(png_ptr, info_ptr, palette, PNG_MAX_PALETTE_LENGTH);
    /* You must not free palette here, because png_set_PLTE only makes a link to
@@ -968,11 +968,13 @@ void write_png(char *file_name /* , ... other image information ... */)
     * use the first method if you aren't handling interlacing yourself.
     */
    png_uint_32 k, height, width;
+
    /* In this example, "image" is a one-dimensional array of bytes */
    png_byte image[height*width*bytes_per_pixel];
+
    png_bytep row_pointers[height];
 
-   if (height > PNG_UINT_32_MAX/png_sizeof(png_bytep))
+   if (height > PNG_UINT_32_MAX/(sizeof (png_bytep)))
      png_error (png_ptr, "Image is too tall to process in memory");
 
    /* Set up pointers into your "image" byte array */

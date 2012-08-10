@@ -201,7 +201,7 @@ png_set_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
     * version 1.2.1
     */
    info_ptr->hist = png_voidcast(png_uint_16p, png_malloc_warn(png_ptr,
-       PNG_MAX_PALETTE_LENGTH * png_sizeof(png_uint_16)));
+       PNG_MAX_PALETTE_LENGTH * (sizeof (png_uint_16))));
 
    if (info_ptr->hist == NULL)
    {
@@ -351,7 +351,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    png_memcpy(info_ptr->pcal_units, units, length);
 
    info_ptr->pcal_params = png_voidcast(png_charpp, png_malloc_warn(png_ptr,
-       (png_size_t)((nparams + 1) * png_sizeof(png_charp))));
+       (png_size_t)((nparams + 1) * (sizeof (png_charp)))));
 
    if (info_ptr->pcal_params == NULL)
    {
@@ -359,7 +359,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
       return;
    }
 
-   png_memset(info_ptr->pcal_params, 0, (nparams + 1) * png_sizeof(png_charp));
+   png_memset(info_ptr->pcal_params, 0, (nparams + 1) * (sizeof (png_charp)));
 
    for (i = 0; i < nparams; i++)
    {
@@ -468,9 +468,9 @@ png_set_sCAL(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
       char swidth[PNG_sCAL_MAX_DIGITS+1];
       char sheight[PNG_sCAL_MAX_DIGITS+1];
 
-      png_ascii_from_fp(png_ptr, swidth, sizeof swidth, width,
+      png_ascii_from_fp(png_ptr, swidth, (sizeof swidth), width,
          PNG_sCAL_PRECISION);
-      png_ascii_from_fp(png_ptr, sheight, sizeof sheight, height,
+      png_ascii_from_fp(png_ptr, sheight, (sizeof sheight), height,
          PNG_sCAL_PRECISION);
 
       png_set_sCAL_s(png_ptr, info_ptr, unit, swidth, sheight);
@@ -498,8 +498,8 @@ png_set_sCAL_fixed(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
       char swidth[PNG_sCAL_MAX_DIGITS+1];
       char sheight[PNG_sCAL_MAX_DIGITS+1];
 
-      png_ascii_from_fixed(png_ptr, swidth, sizeof swidth, width);
-      png_ascii_from_fixed(png_ptr, sheight, sizeof sheight, height);
+      png_ascii_from_fixed(png_ptr, swidth, (sizeof swidth), width);
+      png_ascii_from_fixed(png_ptr, sheight, (sizeof sheight), height);
 
       png_set_sCAL_s(png_ptr, info_ptr, unit, swidth, sheight);
    }
@@ -560,9 +560,9 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
     * too-large sample values.
     */
    png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
-       PNG_MAX_PALETTE_LENGTH * png_sizeof(png_color)));
+       PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
 
-   png_memcpy(png_ptr->palette, palette, num_palette * png_sizeof(png_color));
+   png_memcpy(png_ptr->palette, palette, num_palette * (sizeof (png_color)));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
 
@@ -733,7 +733,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          old_text = info_ptr->text;
 
          info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
-            (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
+            (png_size_t)(info_ptr->max_text * (sizeof (png_text))));
 
          if (info_ptr->text == NULL)
          {
@@ -744,7 +744,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          }
 
          png_memcpy(info_ptr->text, old_text, (png_size_t)(old_max_text *
-             png_sizeof(png_text)));
+             (sizeof (png_text))));
          png_free(png_ptr, old_text);
       }
 
@@ -753,7 +753,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          info_ptr->max_text = num_text + 8;
          info_ptr->num_text = 0;
          info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
-             (png_size_t)(info_ptr->max_text * png_sizeof(png_text)));
+             (png_size_t)(info_ptr->max_text * (sizeof (png_text))));
          if (info_ptr->text == NULL)
          {
             /* Restore to previous condition */
@@ -999,7 +999,7 @@ png_set_sPLT(png_const_structrp png_ptr,
       return;
 
    np = png_voidcast(png_sPLT_tp, png_malloc_warn(png_ptr,
-       (info_ptr->splt_palettes_num + nentries) * png_sizeof(png_sPLT_t)));
+       (info_ptr->splt_palettes_num + nentries) * (sizeof (png_sPLT_t))));
 
    if (np == NULL)
    {
@@ -1008,7 +1008,7 @@ png_set_sPLT(png_const_structrp png_ptr,
    }
 
    png_memcpy(np, info_ptr->splt_palettes,
-       info_ptr->splt_palettes_num * png_sizeof(png_sPLT_t));
+       info_ptr->splt_palettes_num * (sizeof (png_sPLT_t)));
 
    png_free(png_ptr, info_ptr->splt_palettes);
    info_ptr->splt_palettes=NULL;
@@ -1026,7 +1026,7 @@ png_set_sPLT(png_const_structrp png_ptr,
        * NULL, otherwise libpng will crash later on while trying to free the
        * uninitialized pointers.
        */
-      png_memset(to, 0, sizeof *to);
+      png_memset(to, 0, (sizeof *to));
 
       if (from->name == NULL || from->entries == NULL)
          continue;
@@ -1043,7 +1043,7 @@ png_set_sPLT(png_const_structrp png_ptr,
 
       png_memcpy(to->name, from->name, length);
       to->entries = png_voidcast(png_sPLT_entryp, png_malloc_warn(png_ptr,
-          from->nentries * png_sizeof(png_sPLT_entry)));
+          from->nentries * (sizeof (png_sPLT_entry))));
 
       if (to->entries == NULL)
       {
@@ -1054,7 +1054,7 @@ png_set_sPLT(png_const_structrp png_ptr,
       }
 
       png_memcpy(to->entries, from->entries,
-          from->nentries * png_sizeof(png_sPLT_entry));
+          from->nentries * (sizeof (png_sPLT_entry)));
 
       to->nentries = from->nentries;
       to->depth = from->depth;
@@ -1080,7 +1080,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
 
    np = png_voidcast(png_unknown_chunkp, png_malloc_warn(png_ptr,
        (png_size_t)(info_ptr->unknown_chunks_num + num_unknowns) *
-       png_sizeof(png_unknown_chunk)));
+       (sizeof (png_unknown_chunk))));
 
    if (np == NULL)
    {
@@ -1091,7 +1091,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
 
    png_memcpy(np, info_ptr->unknown_chunks,
        (png_size_t)info_ptr->unknown_chunks_num *
-       png_sizeof(png_unknown_chunk));
+       (sizeof (png_unknown_chunk)));
 
    png_free(png_ptr, info_ptr->unknown_chunks);
    info_ptr->unknown_chunks = NULL;
@@ -1101,8 +1101,8 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
       png_const_unknown_chunkp from = unknowns + i;
 
-      png_memcpy(to->name, from->name, png_sizeof(from->name));
-      to->name[png_sizeof(to->name)-1] = '\0';
+      png_memcpy(to->name, from->name, (sizeof from->name));
+      to->name[(sizeof to->name)-1] = '\0';
       to->size = from->size;
 
       /* Note our location in the read or write sequence */
@@ -1213,7 +1213,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
            };
 
          chunk_list = chunks_to_ignore;
-         num_chunks = (unsigned int) sizeof(chunks_to_ignore)/5;
+         num_chunks = (unsigned int)(sizeof chunks_to_ignore)/5;
        }
 
    if (chunk_list == NULL)

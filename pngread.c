@@ -933,7 +933,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
     * PNG file before the first IDAT (image data chunk).
     */
    png_read_info(png_ptr, info_ptr);
-   if (info_ptr->height > PNG_UINT_32_MAX/png_sizeof(png_bytep))
+   if (info_ptr->height > PNG_UINT_32_MAX/(sizeof (png_bytep)))
       png_error(png_ptr, "Image is too high to process with png_read_png()");
 
    /* -------------- image transformations start here ------------------- */
@@ -1080,7 +1080,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
       png_uint_32 iptr;
 
       info_ptr->row_pointers = (png_bytepp)png_malloc(png_ptr,
-          info_ptr->height * png_sizeof(png_bytep));
+          info_ptr->height * (sizeof (png_bytep)));
       for (iptr=0; iptr<info_ptr->height; iptr++)
          info_ptr->row_pointers[iptr] = NULL;
 
@@ -1169,7 +1169,7 @@ png_image_read_init(png_imagep image)
       /* And set the rest of the structure to NULL to ensure that the various
        * fields are consistent.
        */
-      memset(image, 0, sizeof *image);
+      memset(image, 0, (sizeof *image));
       image->version = PNG_IMAGE_VERSION;
 
       if (png_ptr != NULL)
@@ -1179,11 +1179,11 @@ png_image_read_init(png_imagep image)
          if (info_ptr != NULL)
          {
             png_controlp control = png_voidcast(png_controlp,
-               png_malloc_warn(png_ptr, sizeof *control));
+               png_malloc_warn(png_ptr, (sizeof *control)));
 
             if (control != NULL)
             {
-               png_memset(control, 0, sizeof *control);
+               png_memset(control, 0, (sizeof *control));
 
                control->png_ptr = png_ptr;
                control->info_ptr = info_ptr;
@@ -3907,7 +3907,7 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
             int result;
             png_image_read_control display;
 
-            png_memset(&display, 0, sizeof display);
+            png_memset(&display, 0, (sizeof display));
             display.image = image;
             display.buffer = buffer;
             display.row_stride = row_stride;

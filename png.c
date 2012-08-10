@@ -194,10 +194,11 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
          size_t pos = 0;
          char m[128];
 
-         pos = png_safecat(m, sizeof m, pos, "Application built with libpng-");
-         pos = png_safecat(m, sizeof m, pos, user_png_ver);
-         pos = png_safecat(m, sizeof m, pos, " but running with ");
-         pos = png_safecat(m, sizeof m, pos, png_libpng_ver);
+         pos = png_safecat(m, (sizeof m), pos,
+             "Application built with libpng-");
+         pos = png_safecat(m, (sizeof m), pos, user_png_ver);
+         pos = png_safecat(m, (sizeof m), pos, " but running with ");
+         pos = png_safecat(m, (sizeof m), pos, png_libpng_ver);
 
          png_warning(png_ptr, m);
 #endif
@@ -231,7 +232,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     * build enough context to allow the user provided memory allocator (if any)
     * to be called.
     */
-   png_memset(&create_struct, 0, sizeof create_struct);
+   png_memset(&create_struct, 0, (sizeof create_struct));
 
    /* Added at libpng-1.2.6 */
 #  ifdef PNG_USER_LIMITS_SUPPORTED
@@ -284,7 +285,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
          if (png_user_version_check(&create_struct, user_png_ver))
          {
             png_structrp png_ptr = png_voidcast(png_structrp,
-               png_malloc_warn(&create_struct, sizeof *png_ptr));
+               png_malloc_warn(&create_struct, (sizeof *png_ptr)));
 
             if (png_ptr != NULL)
             {
@@ -333,10 +334,10 @@ png_create_info_struct,(png_const_structrp png_ptr),PNG_ALLOCATED)
     * has always been done in 'example.c'.
     */
    info_ptr = png_voidcast(png_inforp, png_malloc_base(png_ptr,
-      sizeof *info_ptr));
+      (sizeof *info_ptr)));
 
    if (info_ptr != NULL)
-      png_memset(info_ptr, 0, sizeof *info_ptr);
+      png_memset(info_ptr, 0, (sizeof *info_ptr));
 
    return info_ptr;
 }
@@ -373,7 +374,7 @@ png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
       *info_ptr_ptr = NULL;
 
       png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
-      png_memset(info_ptr, 0, sizeof *info_ptr);
+      png_memset(info_ptr, 0, (sizeof *info_ptr));
       png_free(png_ptr, info_ptr);
    }
 }
@@ -398,18 +399,18 @@ png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
    if (info_ptr == NULL)
       return;
 
-   if (png_sizeof(png_info) > png_info_struct_size)
+   if ((sizeof (png_info)) > png_info_struct_size)
    {
       *ptr_ptr = NULL;
       /* The following line is why this API should not be used: */
       free(info_ptr);
       info_ptr = png_voidcast(png_inforp, png_malloc_base(NULL,
-         sizeof *info_ptr));
+         (sizeof *info_ptr)));
       *ptr_ptr = info_ptr;
    }
 
    /* Set everything to 0 */
-   png_memset(info_ptr, 0, sizeof *info_ptr);
+   png_memset(info_ptr, 0, (sizeof *info_ptr));
 }
 
 /* The following API is not called internally */
@@ -748,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta27 - July 14, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta27 - August 10, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta27 - July 14, 2012\
+      return "libpng version 1.6.0beta27 - August 10, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1691,20 +1692,20 @@ profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    if (colorspace != NULL)
       colorspace->flags |= PNG_COLORSPACE_INVALID;
 
-   pos = png_safecat(message, sizeof message, 0, "profile '");
+   pos = png_safecat(message, (sizeof message), 0, "profile '");
    pos = png_safecat(message, pos+79, pos, name);
-   pos = png_safecat(message, sizeof message, pos, "': ");
+   pos = png_safecat(message, (sizeof message), pos, "': ");
 #  ifdef PNG_WARNINGS_SUPPORTED
       {
          char number[PNG_NUMBER_BUFFER_SIZE];
 
-         pos = png_safecat(message, sizeof message, pos,
+         pos = png_safecat(message, (sizeof message), pos,
             png_format_number(number, number+(sizeof number),
                PNG_NUMBER_FORMAT_x, value));
       }
-      pos = png_safecat(message, sizeof message, pos, ": ");
+      pos = png_safecat(message, (sizeof message), pos, ": ");
 #  endif
-   pos = png_safecat(message, sizeof message, pos, reason);
+   pos = png_safecat(message, (sizeof message), pos, reason);
 
    if (colorspace != NULL)
    {
@@ -3578,12 +3579,12 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
    unsigned int i;
 
    png_uint_16pp table = *ptable =
-       (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
+       (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
 
    for (i = 0; i < num; i++)
    {
       png_uint_16p sub_table = table[i] =
-          (png_uint_16p)png_malloc(png_ptr, 256 * png_sizeof(png_uint_16));
+          (png_uint_16p)png_malloc(png_ptr, 256 * (sizeof (png_uint_16)));
 
       /* The 'threshold' test is repeated here because it can arise for one of
        * the 16-bit tables even if the others don't hit it.
@@ -3645,7 +3646,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
    png_uint_32 last;
 
    png_uint_16pp table = *ptable =
-       (png_uint_16pp)png_calloc(png_ptr, num * png_sizeof(png_uint_16p));
+       (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
 
    /* 'num' is the number of tables and also the number of low bits of low
     * bits of the input 16-bit value used to select a table.  Each table is
@@ -3653,7 +3654,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
     */
    for (i = 0; i < num; i++)
       table[i] = (png_uint_16p)png_malloc(png_ptr,
-          256 * png_sizeof(png_uint_16));
+          256 * (sizeof (png_uint_16)));
 
    /* 'gamma_val' is set to the reciprocal of the value calculated above, so
     * pow(out,g) is an *input* value.  'last' is the last input value set.
@@ -4160,7 +4161,7 @@ int /* PRIVATE */
 png_image_error(png_imagep image, png_const_charp error_message)
 {
    /* Utility to log an error. */
-   png_safecat(image->message, sizeof image->message, 0, error_message);
+   png_safecat(image->message, (sizeof image->message), 0, error_message);
    image->warning_or_error |= PNG_IMAGE_ERROR;
    png_image_free(image);
    return 0;

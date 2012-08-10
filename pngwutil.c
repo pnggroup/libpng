@@ -324,7 +324,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
        * internal error, but is very useful for debugging.  i18n requirements
        * are minimal.
        */
-      (void)png_safecat(msg, sizeof msg, 10, " using zstream");
+      (void)png_safecat(msg, (sizeof msg), 10, " using zstream");
 #     if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
          png_warning(png_ptr, msg);
 
@@ -537,7 +537,7 @@ png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
       png_ptr->zstream.next_in = PNGZ_INPUT_CAST(comp->input);
       png_ptr->zstream.avail_in = 0; /* Set below */
       png_ptr->zstream.next_out = comp->output;
-      png_ptr->zstream.avail_out = sizeof comp->output;
+      png_ptr->zstream.avail_out = (sizeof comp->output);
 
       output_len = png_ptr->zstream.avail_out;
 
@@ -654,7 +654,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
 {
    png_uint_32 output_len = comp->output_len;
    png_const_bytep output = comp->output;
-   png_uint_32 avail = sizeof comp->output;
+   png_uint_32 avail = (sizeof comp->output);
    png_compression_buffer *next = png_ptr->zbuffer_list;
 
    for (;;)
@@ -1828,7 +1828,7 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
    total_len = purpose_len + units_len + 10;
 
    params_len = (png_size_tp)png_malloc(png_ptr,
-       (png_alloc_size_t)(nparams * png_sizeof(png_size_t)));
+       (png_alloc_size_t)(nparams * (sizeof (png_size_t))));
 
    /* Find the length of each parameter, making sure we don't count the
     * null terminator for the last parameter.

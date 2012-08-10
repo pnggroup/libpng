@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta27 - July 21, 2012
+ * libpng version 1.6.0beta27 - August 10, 2012
  *
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -551,7 +551,8 @@ typedef ptrdiff_t png_ptrdiff_t;
 
 /* This macro makes the sizeof operator look and behave like a function, except
  * that it can take a type without the enclosing () as an argument so long as
- * the type contains no "," characters.
+ * the type contains no "," characters.  As of libpng-1.6.0, this macro is no
+ * longer used in the libpng source code.
  */
 #define png_sizeof(x) (sizeof (x))
 

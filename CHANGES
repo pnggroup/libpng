@@ -4150,7 +4150,7 @@ Version 1.6.0beta26 [July 10, 2012]
   Moved scripts/chkfmt to contrib/tools.
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
-Version 1.6.0beta27 [August 9, 2012]
+Version 1.6.0beta27 [August 10, 2012]
   Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
   Do not use __restrict when GNUC is <= 3.1
   Removed references to png_zalloc() and png_zfree() from the manual.
@@ -4164,6 +4164,8 @@ Version 1.6.0beta27 [August 9, 2012]
   Re-eliminated the use of strcpy() in pngtest.c.  An unncessary use of
     strcpy() was accidentally re-introduced in libpng16; this change replaces
     it with strncpy().
+  Eliminated use of png_sizeof(); use sizeof() instead.
+  Use a consistent style for (sizeof type) and (sizeof (array))
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

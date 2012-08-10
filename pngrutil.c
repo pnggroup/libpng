@@ -211,7 +211,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
       png_uint_32 len;
       png_byte tmpbuf[PNG_INFLATE_BUF_SIZE];
 
-      len = sizeof tmpbuf;
+      len = (sizeof tmpbuf);
       if (len > skip)
          len = skip;
       skip -= len;
@@ -337,7 +337,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
        * internal error, but is very useful for debugging.  i18n requirements
        * are minimal.
        */
-      (void)png_safecat(msg, sizeof msg, 4, " using zstream");
+      (void)png_safecat(msg, (sizeof msg), 4, " using zstream");
 #     if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
          png_chunk_warning(png_ptr, msg);
          png_ptr->zowner = 0;
@@ -479,8 +479,8 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
              * make available the full buffer, up to 'remaining_space'
              */
             png_ptr->zstream.next_out = local_buffer;
-            if (sizeof local_buffer < avail)
-               avail = sizeof local_buffer;
+            if ((sizeof local_buffer) < avail)
+               avail = (sizeof local_buffer);
          }
 
          if (avail_out < avail)
@@ -1394,12 +1394,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
             {
                Byte profile_header[132];
                Byte local_buffer[PNG_INFLATE_BUF_SIZE];
-               png_alloc_size_t size = sizeof profile_header;
+               png_alloc_size_t size = (sizeof profile_header);
 
                png_ptr->zstream.next_in = (Bytef*)keyword + (keyword_length+2);
                png_ptr->zstream.avail_in = read_length;
                (void)png_inflate_read(png_ptr, local_buffer,
-                  sizeof local_buffer, &length, profile_header, &size,
+                  (sizeof local_buffer), &length, profile_header, &size,
                   0/*finish: don't, because the output is too small*/);
 
                if (size == 0)
@@ -1431,12 +1431,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                         if (profile != NULL)
                         {
                            memcpy(profile, profile_header,
-                              sizeof profile_header);
+                              (sizeof profile_header));
 
                            size = 12 * tag_count;
 
                            (void)png_inflate_read(png_ptr, local_buffer,
-                              sizeof local_buffer, &length,
+                              (sizeof local_buffer), &length,
                               profile + (sizeof profile_header), &size, 0);
 
                            /* Still expect a a buffer error because we expect
@@ -1455,7 +1455,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     - 12 * tag_count;
 
                                  (void)png_inflate_read(png_ptr, local_buffer,
-                                    sizeof local_buffer, &length,
+                                    (sizeof local_buffer), &length,
                                     profile + (sizeof profile_header) +
                                     12 * tag_count, &size, 1/*finish*/);
 
@@ -1694,7 +1694,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    dl = (png_int_32)(data_length / entry_size);
-   max_dl = PNG_SIZE_MAX / png_sizeof(png_sPLT_entry);
+   max_dl = PNG_SIZE_MAX / (sizeof (png_sPLT_entry));
 
    if (dl > max_dl)
    {
@@ -1705,7 +1705,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    new_palette.nentries = (png_int_32)(data_length / entry_size);
 
    new_palette.entries = (png_sPLT_entryp)png_malloc_warn(
-       png_ptr, new_palette.nentries * png_sizeof(png_sPLT_entry));
+       png_ptr, new_palette.nentries * (sizeof (png_sPLT_entry)));
 
    if (new_palette.entries == NULL)
    {
@@ -2211,7 +2211,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_debug(3, "Allocating pCAL parameters array");
 
    params = png_voidcast(png_charpp, png_malloc_warn(png_ptr,
-       nparams * png_sizeof(png_charp)));
+       nparams * (sizeof (png_charp))));
 
    if (params == NULL)
    {
@@ -3250,22 +3250,22 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                if (bytes_to_copy < 16 /*else use png_memcpy*/ &&
                   png_isaligned(dp, png_uint_16) &&
                   png_isaligned(sp, png_uint_16) &&
-                  bytes_to_copy % sizeof (png_uint_16) == 0 &&
-                  bytes_to_jump % sizeof (png_uint_16) == 0)
+                  bytes_to_copy % (sizeof (png_uint_16)) == 0 &&
+                  bytes_to_jump % (sizeof (png_uint_16)) == 0)
                {
                   /* Everything is aligned for png_uint_16 copies, but try for
                    * png_uint_32 first.
                    */
                   if (png_isaligned(dp, png_uint_32) &&
                      png_isaligned(sp, png_uint_32) &&
-                     bytes_to_copy % sizeof (png_uint_32) == 0 &&
-                     bytes_to_jump % sizeof (png_uint_32) == 0)
+                     bytes_to_copy % (sizeof (png_uint_32)) == 0 &&
+                     bytes_to_jump % (sizeof (png_uint_32)) == 0)
                   {
                      png_uint_32p dp32 = png_aligncast(png_uint_32p,dp);
                      png_const_uint_32p sp32 = png_aligncastconst(
                         png_const_uint_32p, sp);
                      unsigned int skip = (bytes_to_jump-bytes_to_copy) /
-                        sizeof (png_uint_32);
+                        (sizeof (png_uint_32));
 
                      do
                      {
@@ -3273,7 +3273,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                         do
                         {
                            *dp32++ = *sp32++;
-                           c -= sizeof (png_uint_32);
+                           c -= (sizeof (png_uint_32));
                         }
                         while (c > 0);
 
@@ -3307,7 +3307,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      png_const_uint_16p sp16 = png_aligncastconst(
                         png_const_uint_16p, sp);
                      unsigned int skip = (bytes_to_jump-bytes_to_copy) /
-                        sizeof (png_uint_16);
+                        (sizeof (png_uint_16));
 
                      do
                      {
@@ -3315,7 +3315,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                         do
                         {
                            *dp16++ = *sp16++;
-                           c -= sizeof (png_uint_16);
+                           c -= (sizeof (png_uint_16));
                         }
                         while (c > 0);
 
@@ -3793,7 +3793,7 @@ static int png_have_hwcap(unsigned cap)
    if (!f)
       return 0;
 
-   while (fread(&aux, sizeof(aux), 1, f) > 0)
+   while (fread(&aux, (sizeof aux), 1, f) > 0)
    {
       if (aux.a_type == AT_HWCAP &&
           aux.a_un.a_val & cap)
@@ -3935,7 +3935,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
       else /* check for end */
       {
          png_ptr->zstream.next_out = tmpbuf;
-         png_ptr->zstream.avail_out = sizeof tmpbuf;
+         png_ptr->zstream.avail_out = (sizeof tmpbuf);
       }
 
       /* Use NO_FLUSH; this gives zlib the maximum opportunity to optimize the

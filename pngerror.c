@@ -555,7 +555,7 @@ png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
    {
       png_ptr->jmp_buf_size = 0; /* not allocated */
 
-      if (jmp_buf_size <= sizeof png_ptr->jmp_buf_local)
+      if (jmp_buf_size <= (sizeof png_ptr->jmp_buf_local))
          png_ptr->jmp_buf_ptr = &png_ptr->jmp_buf_local;
 
       else
@@ -576,7 +576,7 @@ png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
 
       if (size == 0)
       {
-         size = sizeof png_ptr->jmp_buf_local;
+         size = (sizeof png_ptr->jmp_buf_local);
          if (png_ptr->jmp_buf_ptr != &png_ptr->jmp_buf_local)
          {
             /* This is an internal error in libpng: somehow we have been left
@@ -825,7 +825,7 @@ png_safe_error,(png_structp png_nonconst_ptr, png_const_charp error_message),
     */
    if (image != NULL)
    {
-      png_safecat(image->message, sizeof image->message, 0, error_message);
+      png_safecat(image->message, (sizeof image->message), 0, error_message);
       image->warning_or_error |= PNG_IMAGE_ERROR;
 
       /* Retrieve the jmp_buf from within the png_control, making this work for
@@ -837,9 +837,10 @@ png_safe_error,(png_structp png_nonconst_ptr, png_const_charp error_message),
 
       /* Missing longjmp buffer, the following is to help debugging: */
       {
-         size_t pos = png_safecat(image->message, sizeof image->message, 0,
+         size_t pos = png_safecat(image->message, (sizeof image->message), 0,
             "bad longjmp: ");
-         png_safecat(image->message, sizeof image->message, pos, error_message);
+         png_safecat(image->message, (sizeof image->message), pos,
+             error_message);
       }
    }
 
@@ -857,7 +858,7 @@ png_safe_warning(png_structp png_nonconst_ptr, png_const_charp warning_message)
    /* A warning is only logged if there is no prior warning or error. */
    if (image->warning_or_error == 0)
    {
-      png_safecat(image->message, sizeof image->message, 0, warning_message);
+      png_safecat(image->message, (sizeof image->message), 0, warning_message);
       image->warning_or_error |= PNG_IMAGE_WARNING;
    }
 }

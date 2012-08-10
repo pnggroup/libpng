@@ -1116,7 +1116,7 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
       if (num_weights > 0)
       {
          png_ptr->prev_filters = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_byte) * num_weights));
+             (png_uint_32)((sizeof (png_byte)) * num_weights));
 
          /* To make sure that the weighting starts out fairly */
          for (i = 0; i < num_weights; i++)
@@ -1125,10 +1125,10 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
          }
 
          png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
+             (png_uint_32)((sizeof (png_uint_16)) * num_weights));
 
          png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
+             (png_uint_32)((sizeof (png_uint_16)) * num_weights));
 
          for (i = 0; i < num_weights; i++)
          {
@@ -1146,10 +1146,10 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
       if (png_ptr->filter_costs == NULL)
       {
          png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
+             (png_uint_32)((sizeof (png_uint_16)) * PNG_FILTER_VALUE_LAST));
 
          png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
+             (png_uint_32)((sizeof (png_uint_16)) * PNG_FILTER_VALUE_LAST));
       }
 
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
@@ -1586,11 +1586,11 @@ png_image_write_init(png_imagep image)
       if (info_ptr != NULL)
       {
          png_controlp control = png_voidcast(png_controlp,
-            png_malloc_warn(png_ptr, sizeof *control));
+            png_malloc_warn(png_ptr, (sizeof *control)));
 
          if (control != NULL)
          {
-            png_memset(control, 0, sizeof *control);
+            png_memset(control, 0, (sizeof *control));
 
             control->png_ptr = png_ptr;
             control->info_ptr = info_ptr;
@@ -1907,8 +1907,8 @@ png_image_set_PLTE(png_image_write_control *display)
    png_color palette[256];
    png_byte tRNS[256];
 
-   memset(tRNS, 255, sizeof tRNS);
-   memset(palette, 0, sizeof palette);
+   memset(tRNS, 255, (sizeof tRNS));
+   memset(palette, 0, (sizeof palette));
 
    for (i=num_trans=0; i<entries; ++i)
    {
@@ -2154,7 +2154,7 @@ png_image_write_main(png_voidp argument)
       ptrdiff_t row_bytes = display->row_stride;
 
       if (linear)
-         row_bytes *= sizeof (png_uint_16);
+         row_bytes *= (sizeof (png_uint_16));
 
       if (row_bytes < 0)
          row += (image->height-1) * (-row_bytes);
@@ -2239,7 +2239,7 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
              */
             image->opaque->png_ptr->io_ptr = file;
 
-            png_memset(&display, 0, sizeof display);
+            png_memset(&display, 0, (sizeof display));
             display.image = image;
             display.buffer = buffer;
             display.row_stride = row_stride;

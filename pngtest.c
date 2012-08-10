@@ -462,7 +462,7 @@ PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
       memory_infop pinfo;
       png_set_mem_fn(png_ptr, NULL, NULL, NULL);
       pinfo = (memory_infop)png_malloc(png_ptr,
-         png_sizeof(*pinfo));
+         (sizeof *pinfo));
       pinfo->size = size;
       current_allocation += size;
       total_allocation += size;
@@ -1047,12 +1047,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
          if (png_convert_to_rfc1123_buffer(tIME_string, mod_time))
-            tIME_string[png_sizeof(tIME_string) - 1] = '\0';
+            tIME_string[(sizeof tIME_string) - 1] = '\0';
 
          else
          {
-            strncpy(tIME_string, "*** invalid time ***", sizeof tIME_string);
-            tIME_string[(sizeof tIME_string)-1] = '\0';
+            strncpy(tIME_string, "*** invalid time ***", (sizeof tIME_string));
+            tIME_string[(sizeof tIME_string) - 1] = '\0';
          }
 
          tIME_chunk_present++;
@@ -1256,7 +1256,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
          if (png_convert_to_rfc1123_buffer(tIME_string, mod_time))
-            tIME_string[png_sizeof(tIME_string) - 1] = '\0';
+            tIME_string[(sizeof tIME_string) - 1] = '\0';
 
          else
          {
