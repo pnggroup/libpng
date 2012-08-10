@@ -425,6 +425,12 @@ Version 1.6.0beta27 [August 10, 2012]
   Insist on autotools 1.12.1 for git builds because there are security issues
     with 1.12 and insisting on anything less would allow 1.12 to be used.
   Removed info_ptr->signature[8] from WRITE-only builds.
+  Add some conditions for compiling png_fixed().  This is a small function
+    but it requires "-lm" on some platforms.
+  Cause pngtest --strict to fail on any warning from libpng (not just errors)
+    and cause it not to fail at the comparison step if libpng lacks support
+    for writing chunks that it reads from the input (currently only implemented
+    for compressed text chunks).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

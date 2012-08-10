@@ -88,6 +88,9 @@ static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
 
 static int verbose = 0;
 static int strict = 0;
+static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
+static int error_count = 0; /* count calls to png_error */
+static int warning_count = 0; /* count calls to png_warning */
 
 #ifdef __TURBOC__
 #include <mem.h>
@@ -391,6 +394,8 @@ pngtest_warning(png_structp png_ptr, png_const_charp message)
    char *test;
    test = png_get_error_ptr(png_ptr);
 
+   ++warning_count;
+
    if (test == NULL)
      fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
 
@@ -406,6 +411,8 @@ pngtest_warning(png_structp png_ptr, png_const_charp message)
 static void PNGCBAPI
 pngtest_error(png_structp png_ptr, png_const_charp message)
 {
+   ++error_count;
+
    pngtest_warning(png_ptr, message);
    /* We can return because png_error calls the default handler, which is
     * actually OK in this case.
@@ -624,6 +631,45 @@ static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
 }
 #endif
 /* END of code to demonstrate user chunk support */
+
+/* START of code to check that libpng has the required text support; this only
+ * checks for the write support because if read support is missing the chunk
+ * will simply not be reported back to pngtest.
+ */
+#ifdef PNG_TEXT_SUPPORTED
+static void
+pngtest_check_text_support(png_const_structp png_ptr, png_textp text_ptr,
+   int num_text)
+{
+   while (num_text > 0)
+   {
+      switch (text_ptr[--num_text].compression)
+      {
+         case PNG_TEXT_COMPRESSION_NONE:
+            break;
+
+         case PNG_TEXT_COMPRESSION_zTXt:
+#           ifndef PNG_WRITE_zTXt_SUPPORTED
+               ++unsupported_chunks;
+#           endif
+            break;
+
+         case PNG_ITXT_COMPRESSION_NONE:
+         case PNG_ITXT_COMPRESSION_zTXt:
+#           ifndef PNG_WRITE_iTXt_SUPPORTED
+               ++unsupported_chunks;
+#           endif
+            break;
+
+         default:
+            /* This is an error */
+            png_error(png_ptr, "invalid text chunk compression field");
+            break;
+      }
+   }
+}
+#endif
+/* END of code to check that libpng has the required text support */
 
 /* Test one file */
 static int
@@ -1022,6 +1068,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          pngtest_debug1("Handling %d iTXt/tEXt/zTXt chunks", num_text);
 
+         pngtest_check_text_support(read_ptr, text_ptr, num_text);
+
          if (verbose)
          {
             int i;
@@ -1231,6 +1279,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          pngtest_debug1("Handling %d iTXt/tEXt/zTXt chunks", num_text);
 
+         pngtest_check_text_support(read_ptr, text_ptr, num_text);
+
          if (verbose)
          {
             int i;
@@ -1324,6 +1374,37 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    FCLOSE(fpin);
    FCLOSE(fpout);
 
+   /* Summarize any warnings or errors and in 'strict' mode fail the test.
+    * Unsupported chunks can result in warnings, in that case ignore the strict
+    * setting, otherwise fail the test on warnings as well as errors.
+    */
+   if (error_count > 0)
+   {
+      /* We don't really expect to get here because of the setjmp handling
+       * above, but this is safe.
+       */
+      fprintf(STDERR, "%s: %d libpng errors found (%d warnings)\n",
+         inname, error_count, warning_count);
+
+      if (strict != 0)
+         return (1);
+   }
+
+   else if (unsupported_chunks > 0)
+   {
+      fprintf(STDERR, "%s: unsupported chunks (%d)%s\n",
+         inname, unsupported_chunks, strict ? ": IGNORED --strict!" : "");
+   }
+
+   else if (warning_count > 0)
+   {
+      fprintf(STDERR, "%s: %d libpng warnings found\n",
+         inname, warning_count);
+
+      if (strict != 0)
+         return (1);
+   }
+
    pngtest_debug("Opening files for comparison");
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
@@ -1350,7 +1431,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          fprintf(STDERR, "\nFiles %s and %s are of a different size\n",
                  inname, outname);
 
-         if (wrote_question == 0)
+         if (wrote_question == 0 && unsupported_chunks == 0)
          {
             fprintf(STDERR,
          "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
@@ -1366,7 +1447,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          FCLOSE(fpin);
          FCLOSE(fpout);
 
-         if (strict != 0)
+         if (strict != 0 && unsupported_chunks == 0)
            return (1);
 
          else
@@ -1380,7 +1461,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          fprintf(STDERR, "\nFiles %s and %s are different\n", inname, outname);
 
-         if (wrote_question == 0)
+         if (wrote_question == 0 && unsupported_chunks == 0)
          {
             fprintf(STDERR,
          "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
@@ -1396,7 +1477,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          FCLOSE(fpin);
          FCLOSE(fpout);
 
-         if (strict != 0)
+         /* NOTE: the unsupported_chunks escape is permitted here because
+          * unsupported text chunk compression will result in the compression
+          * mode being changed (to NONE) yet, in the test case, the result can
+          * be exactly the same size!
+          */
+         if (strict != 0 && unsupported_chunks == 0)
            return (1);
 
          else
