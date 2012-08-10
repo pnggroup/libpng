@@ -70,11 +70,15 @@ struct png_info_def
    png_byte filter_type;    /* must be PNG_FILTER_TYPE_BASE (from IHDR) */
    png_byte interlace_type; /* One of PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
 
+   /* The following are set by png_set_IHDR, called from the application on
+    * write, but the are never actually used by the write code.
+    */
    png_byte channels;       /* number of data channels per pixel (1, 2, 3, 4) */
    png_byte pixel_depth;    /* number of bits per pixel */
    png_byte spare_byte;     /* to align the data, and for future use */
 
 #ifdef PNG_READ_SUPPORTED
+   /* This is never set during write */
    png_byte signature[8];   /* magic bytes read by libpng from start of file */
 #endif
 
