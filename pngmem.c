@@ -30,7 +30,7 @@ png_destroy_png_struct(png_structrp png_ptr)
        * png_get_mem_ptr, so fake a temporary png_struct to support this.
        */
       png_struct dummy_struct = *png_ptr;
-      png_memset(png_ptr, 0, (sizeof *png_ptr));
+      memset(png_ptr, 0, (sizeof *png_ptr));
       png_free(&dummy_struct, png_ptr);
 
 #     ifdef PNG_SETJMP_SUPPORTED
@@ -54,7 +54,7 @@ png_calloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
    ret = png_malloc(png_ptr, size);
 
    if (ret != NULL)
-      png_memset(ret, 0, size);
+      memset(ret, 0, size);
 
    return ret;
 }

@@ -762,7 +762,7 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    png_debug1(3, "row_info->rowbytes = %lu", (unsigned long)row_info.rowbytes);
 
    /* Copy user's row into buffer, leaving room for filter byte. */
-   png_memcpy(png_ptr->row_buf + 1, row, row_info.rowbytes);
+   memcpy(png_ptr->row_buf + 1, row, row_info.rowbytes);
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* Handle interlacing */
@@ -1590,7 +1590,7 @@ png_image_write_init(png_imagep image)
 
          if (control != NULL)
          {
-            png_memset(control, 0, (sizeof *control));
+            memset(control, 0, (sizeof *control));
 
             control->png_ptr = png_ptr;
             control->info_ptr = info_ptr;
@@ -1907,8 +1907,8 @@ png_image_set_PLTE(png_image_write_control *display)
    png_color palette[256];
    png_byte tRNS[256];
 
-   png_memset(tRNS, 255, (sizeof tRNS));
-   png_memset(palette, 0, (sizeof palette));
+   memset(tRNS, 255, (sizeof tRNS));
+   memset(palette, 0, (sizeof palette));
 
    for (i=num_trans=0; i<entries; ++i)
    {
@@ -2239,7 +2239,7 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
              */
             image->opaque->png_ptr->io_ptr = file;
 
-            png_memset(&display, 0, (sizeof display));
+            memset(&display, 0, (sizeof display));
             display.image = image;
             display.buffer = buffer;
             display.row_stride = row_stride;

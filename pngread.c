@@ -474,7 +474,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
     * it may not be in the future, so this was changed just to copy the
     * interlaced count:
     */
-   png_memcpy(png_ptr->prev_row, png_ptr->row_buf, row_info.rowbytes + 1);
+   memcpy(png_ptr->prev_row, png_ptr->row_buf, row_info.rowbytes + 1);
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
    if ((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
@@ -1169,7 +1169,7 @@ png_image_read_init(png_imagep image)
       /* And set the rest of the structure to NULL to ensure that the various
        * fields are consistent.
        */
-      png_memset(image, 0, (sizeof *image));
+      memset(image, 0, (sizeof *image));
       image->version = PNG_IMAGE_VERSION;
 
       if (png_ptr != NULL)
@@ -1183,7 +1183,7 @@ png_image_read_init(png_imagep image)
 
             if (control != NULL)
             {
-               png_memset(control, 0, (sizeof *control));
+               memset(control, 0, (sizeof *control));
 
                control->png_ptr = png_ptr;
                control->info_ptr = info_ptr;
@@ -1399,7 +1399,7 @@ png_image_memory_read(png_structp png_ptr, png_bytep out, png_size_t need)
 
             if (memory != NULL && size >= need)
             {
-               png_memcpy(out, memory, need);
+               memcpy(out, memory, need);
                cp->memory = memory + need;
                cp->size = size - need;
                return;
@@ -2527,7 +2527,7 @@ png_image_read_colormap(png_voidp argument)
                    * PNG_CMAP_RGB algorithm will use.  If the two entries don't
                    * match, add the new one and set this as the background index.
                    */
-                  if (png_memcmp((png_const_bytep)display->colormap +
+                  if (memcmp((png_const_bytep)display->colormap +
                         sample_size * cmap_entries,
                      (png_const_bytep)display->colormap +
                         sample_size * PNG_RGB_INDEX(r,g,b),
@@ -3907,7 +3907,7 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
             int result;
             png_image_read_control display;
 
-            png_memset(&display, 0, (sizeof display));
+            memset(&display, 0, (sizeof display));
             display.image = image;
             display.buffer = buffer;
             display.row_stride = row_stride;

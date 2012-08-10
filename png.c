@@ -62,7 +62,7 @@ png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
    if (start + num_to_check > 8)
       num_to_check = 8 - start;
 
-   return ((int)(png_memcmp(&sig[start], &png_signature[start], num_to_check)));
+   return ((int)(memcmp(&sig[start], &png_signature[start], num_to_check)));
 }
 
 #endif /* PNG_READ_SUPPORTED */
@@ -232,7 +232,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     * build enough context to allow the user provided memory allocator (if any)
     * to be called.
     */
-   png_memset(&create_struct, 0, (sizeof create_struct));
+   memset(&create_struct, 0, (sizeof create_struct));
 
    /* Added at libpng-1.2.6 */
 #  ifdef PNG_USER_LIMITS_SUPPORTED
@@ -337,7 +337,7 @@ png_create_info_struct,(png_const_structrp png_ptr),PNG_ALLOCATED)
       (sizeof *info_ptr)));
 
    if (info_ptr != NULL)
-      png_memset(info_ptr, 0, (sizeof *info_ptr));
+      memset(info_ptr, 0, (sizeof *info_ptr));
 
    return info_ptr;
 }
@@ -374,7 +374,7 @@ png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
       *info_ptr_ptr = NULL;
 
       png_free_data(png_ptr, info_ptr, PNG_FREE_ALL, -1);
-      png_memset(info_ptr, 0, (sizeof *info_ptr));
+      memset(info_ptr, 0, (sizeof *info_ptr));
       png_free(png_ptr, info_ptr);
    }
 }
@@ -410,7 +410,7 @@ png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
    }
 
    /* Set everything to 0 */
-   png_memset(info_ptr, 0, (sizeof *info_ptr));
+   memset(info_ptr, 0, (sizeof *info_ptr));
 }
 
 /* The following API is not called internally */
@@ -822,7 +822,7 @@ png_handle_as_unknown(png_structrp png_ptr, png_const_bytep chunk_name)
    do /* num_chunk_list > 0, so at least one */
    {
       p -= 5;
-      if (!png_memcmp(chunk_name, p, 4))
+      if (!memcmp(chunk_name, p, 4))
          return p[4];
    }
    while (p > p_end);

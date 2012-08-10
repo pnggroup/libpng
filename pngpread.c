@@ -649,7 +649,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
       else
          save_size = png_ptr->save_buffer_size;
 
-      png_memcpy(ptr, png_ptr->save_buffer_ptr, save_size);
+      memcpy(ptr, png_ptr->save_buffer_ptr, save_size);
       length -= save_size;
       ptr += save_size;
       png_ptr->buffer_size -= save_size;
@@ -666,7 +666,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
       else
          save_size = png_ptr->current_buffer_size;
 
-      png_memcpy(ptr, png_ptr->current_buffer_ptr, save_size);
+      memcpy(ptr, png_ptr->current_buffer_ptr, save_size);
       png_ptr->buffer_size -= save_size;
       png_ptr->current_buffer_size -= save_size;
       png_ptr->current_buffer_ptr += save_size;
@@ -715,13 +715,13 @@ png_push_save_buffer(png_structrp png_ptr)
          png_error(png_ptr, "Insufficient memory for save_buffer");
       }
 
-      png_memcpy(png_ptr->save_buffer, old_buffer, png_ptr->save_buffer_size);
+      memcpy(png_ptr->save_buffer, old_buffer, png_ptr->save_buffer_size);
       png_free(png_ptr, old_buffer);
       png_ptr->save_buffer_max = new_max;
    }
    if (png_ptr->current_buffer_size)
    {
-      png_memcpy(png_ptr->save_buffer + png_ptr->save_buffer_size,
+      memcpy(png_ptr->save_buffer + png_ptr->save_buffer_size,
          png_ptr->current_buffer_ptr, png_ptr->current_buffer_size);
       png_ptr->save_buffer_size += png_ptr->current_buffer_size;
       png_ptr->current_buffer_size = 0;
@@ -976,7 +976,7 @@ png_push_process_row(png_structrp png_ptr)
     * it may not be in the future, so this was changed just to copy the
     * interlaced row count:
     */
-   png_memcpy(png_ptr->prev_row, png_ptr->row_buf, row_info.rowbytes + 1);
+   memcpy(png_ptr->prev_row, png_ptr->row_buf, row_info.rowbytes + 1);
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
    if (png_ptr->transformations)
@@ -1210,7 +1210,7 @@ png_read_push_finish_row(png_structrp png_ptr)
    if (png_ptr->interlaced)
    {
       png_ptr->row_number = 0;
-      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+      memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
       do
       {

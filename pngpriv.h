@@ -988,7 +988,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_start_row,(png_structrp png_ptr),PNG_EMPTY)
 
 /* Combine a row of data, dealing with alpha, etc. if requested.  'row' is an
  * array of png_ptr->width pixels.  If the image is not interlaced or this
- * is the final pass this just does a png_memcpy, otherwise the "display" flag
+ * is the final pass this just does a memcpy, otherwise the "display" flag
  * is used to determine whether to copy pixels that are not in the current pass.
  *
  * Because 'png_do_read_interlace' (below) replicates pixels this allows this

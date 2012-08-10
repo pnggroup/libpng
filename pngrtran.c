@@ -364,7 +364,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
    if (compose)
    {
       /* And obtain alpha pre-multiplication by composing on black: */
-      png_memset(&png_ptr->background, 0, (sizeof png_ptr->background));
+      memset(&png_ptr->background, 0, (sizeof png_ptr->background));
       png_ptr->background_gamma = png_ptr->colorspace.gamma; /* just in case */
       png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_FILE;
       png_ptr->transformations &= ~PNG_BACKGROUND_EXPAND;
@@ -746,7 +746,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
           (sizeof (png_byte))));
 
-      png_memset(distance, 0xff, num_entries * (sizeof (png_byte)));
+      memset(distance, 0xff, num_entries * (sizeof (png_byte)));
 
       for (i = 0; i < num_palette; i++)
       {

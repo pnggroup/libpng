@@ -463,7 +463,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
           * inside it is possible to chunk the input to zlib and simply rely on
           * zlib to advance the 'next_in' pointer.  This allows arbitrary
           * amounts of data to be passed through zlib at the unavoidable cost of
-          * requiring a window save (png_memcpy of up to 32768 output bytes)
+          * requiring a window save (memcpy of up to 32768 output bytes)
           * every ZLIB_IO_MAX input bytes.
           */
          avail_in += png_ptr->zstream.avail_in; /* not consumed last time */
@@ -633,7 +633,7 @@ png_decompress_chunk(png_structrp png_ptr,
                            text[prefix_size + *newlength] = 0;
 
                         if (prefix_size > 0)
-                           png_memcpy(text, png_ptr->read_buffer, prefix_size);
+                           memcpy(text, png_ptr->read_buffer, prefix_size);
 
                         {
                            png_bytep old_ptr = png_ptr->read_buffer;
@@ -1438,7 +1438,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                         if (profile != NULL)
                         {
-                           png_memcpy(profile, profile_header,
+                           memcpy(profile, profile_header,
                               (sizeof profile_header));
 
                            size = 12 * tag_count;
@@ -1508,7 +1508,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                           keyword_length+1));
                                        if (info_ptr->iccp_name != NULL)
                                        {
-                                          png_memcpy(info_ptr->iccp_name, keyword,
+                                          memcpy(info_ptr->iccp_name, keyword,
                                              keyword_length+1);
                                           info_ptr->iccp_proflen =
                                              profile_length;
@@ -2952,7 +2952,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
       /* end_mask is now the bits to *keep* from the destination row */
    }
 
-   /* For non-interlaced images this reduces to a png_memcpy(). A png_memcpy()
+   /* For non-interlaced images this reduces to a memcpy(). A memcpy()
     * will also happen if interlacing isn't supported or if the application
     * does not call png_set_interlace_handling().  In the latter cases the
     * caller just gets a sequence of the unexpanded rows from each interlace
@@ -3253,9 +3253,9 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                /* Check for double byte alignment and, if possible, use a
                 * 16-bit copy.  Don't attempt this for narrow images - ones that
                 * are less than an interlace panel wide.  Don't attempt it for
-                * wide bytes_to_copy either - use the png_memcpy there.
+                * wide bytes_to_copy either - use the memcpy there.
                 */
-               if (bytes_to_copy < 16 /*else use png_memcpy*/ &&
+               if (bytes_to_copy < 16 /*else use memcpy*/ &&
                   png_isaligned(dp, png_uint_16) &&
                   png_isaligned(sp, png_uint_16) &&
                   bytes_to_copy % (sizeof (png_uint_16)) == 0 &&
@@ -3347,10 +3347,10 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                }
 #endif /* PNG_ALIGN_ code */
 
-               /* The true default - use a png_memcpy: */
+               /* The true default - use a memcpy: */
                for (;;)
                {
-                  png_memcpy(dp, sp, bytes_to_copy);
+                  memcpy(dp, sp, bytes_to_copy);
 
                   if (row_width <= bytes_to_jump)
                      return;
@@ -3371,11 +3371,11 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
    else
 #endif
 
-   /* If here then the switch above wasn't used so just png_memcpy the whole row
+   /* If here then the switch above wasn't used so just memcpy the whole row
     * from the temporary row buffer (notice that this overwrites the end of the
     * destination row if it is a partial byte.)
     */
-   png_memcpy(dp, sp, PNG_ROWBYTES(pixel_depth, row_width));
+   memcpy(dp, sp, PNG_ROWBYTES(pixel_depth, row_width));
 
    /* Restore the overwritten bits from the last byte if necessary. */
    if (end_ptr != NULL)
@@ -3604,11 +3604,11 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
                png_byte v[8];
                int j;
 
-               png_memcpy(v, sp, pixel_bytes);
+               memcpy(v, sp, pixel_bytes);
 
                for (j = 0; j < jstop; j++)
                {
-                  png_memcpy(dp, v, pixel_bytes);
+                  memcpy(dp, v, pixel_bytes);
                   dp -= pixel_bytes;
                }
 
@@ -4082,7 +4082,7 @@ png_read_finish_row(png_structrp png_ptr)
       /* TO DO: don't do this if prev_row isn't needed (requires
        * read-ahead of the next row's filter byte.
        */
-      png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+      memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
       do
       {
@@ -4380,7 +4380,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (png_ptr->rowbytes > (PNG_SIZE_MAX - 1))
       png_error(png_ptr, "Row has too many bytes to allocate in memory");
 
-   png_memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
+   memset(png_ptr->prev_row, 0, png_ptr->rowbytes + 1);
 
    png_debug1(3, "width = %u,", png_ptr->width);
    png_debug1(3, "height = %u,", png_ptr->height);

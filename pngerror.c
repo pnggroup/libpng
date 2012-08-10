@@ -517,7 +517,7 @@ png_fixed_error,(png_const_structrp png_ptr, png_const_charp name),PNG_NORETURN)
 #  define fixed_message_ln ((sizeof fixed_message)-1)
    int  iin;
    char msg[fixed_message_ln+PNG_MAX_ERROR_TEXT];
-   png_memcpy(msg, fixed_message, fixed_message_ln);
+   memcpy(msg, fixed_message, fixed_message_ln);
    iin = 0;
    if (name != NULL) while (iin < (PNG_MAX_ERROR_TEXT-1) && name[iin] != 0)
    {
