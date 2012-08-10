@@ -4173,6 +4173,8 @@ Version 1.6.0beta27 [August 10, 2012]
     png_app_error(), which can be disabled in the app using
     png_set_benign_errors(), and removes the spurious use of usr_channels
     on the read side.
+  Insist on autotools 1.12.1 for git builds because there are security issues
+    with 1.12 and insisting on anything less would allow 1.12 to be used.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
