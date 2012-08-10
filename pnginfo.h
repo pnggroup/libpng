@@ -55,7 +55,7 @@
 
 struct png_info_def
 {
-   /* the following are necessary for every PNG file */
+   /* The following are necessary for every PNG file */
    png_uint_32 width;  /* width of image in pixels (from IHDR) */
    png_uint_32 height; /* height of image in pixels (from IHDR) */
    png_uint_32 valid;  /* valid chunk data (see PNG_INFO_ below) */
@@ -70,13 +70,10 @@ struct png_info_def
    png_byte filter_type;    /* must be PNG_FILTER_TYPE_BASE (from IHDR) */
    png_byte interlace_type; /* One of PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
 
-#ifdef PNG_READ_SUPPORTED
-   /* The following is informational only on read, and not used on writes. */
    png_byte channels;       /* number of data channels per pixel (1, 2, 3, 4) */
    png_byte pixel_depth;    /* number of bits per pixel */
    png_byte spare_byte;     /* to align the data, and for future use */
    png_byte signature[8];   /* magic bytes read by libpng from start of file */
-#endif
 
    /* The rest of the data is optional.  If you are reading, check the
     * valid field to see if the information in these are valid.  If you

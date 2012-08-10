@@ -1033,8 +1033,10 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
          png_ptr->zbuffer_list->next = NULL;
       }
 
+#ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
       else
          png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list->next);
+#endif
 
       /* It is a terminal error if we can't claim the zstream. */
       if (png_deflate_claim(png_ptr, png_IDAT, png_image_size(png_ptr)) != Z_OK)

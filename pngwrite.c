@@ -872,7 +872,9 @@ png_write_destroy(png_structrp png_ptr)
       deflateEnd(&png_ptr->zstream);
 
    /* Free our memory.  png_free checks NULL for us. */
+#ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
+#endif
    png_free(png_ptr, png_ptr->row_buf);
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);

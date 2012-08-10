@@ -312,8 +312,16 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
       else if (warn < 2) /* else silent */
       {
-         (warn ? png_chunk_warning : png_chunk_error)(png_ptr,
-            "insufficient memory to read chunk");
+#ifdef PNG_WARNINGS_SUPPORTED
+         if (warn)
+             png_chunk_warning(png_ptr, "insufficient memory to read chunk");
+         else
+#endif
+         {
+#ifdef PNG_ERROR_TEXT_SUPPORTED
+             png_chunk_error(png_ptr, "insufficient memory to read chunk");
+#endif
+         }
       }
    }
 

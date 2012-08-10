@@ -1297,7 +1297,7 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
       }
 #  endif
 
-#  ifdef PNG_WRITE_SUPPORTED
+#ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
       if (!(png_ptr->mode & PNG_IS_READ_STRUCT))
       {
          if (png_ptr->zowner != 0)
