@@ -1607,7 +1607,7 @@ png_write_tEXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
       text_len = 0;
 
    else
-      text_len = png_strlen(text);
+      text_len = strlen(text);
 
    if (text_len > PNG_UINT_31_MAX - (key_len+1))
       png_error(png_ptr, "tEXt: text too long");
@@ -1663,7 +1663,7 @@ png_write_zTXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
 
    /* Compute the compressed data; do it now for the length */
    png_text_compress_init(&comp, (png_const_bytep)text,
-      text == NULL ? 0 : png_strlen(text));
+      text == NULL ? 0 : strlen(text));
 
    if (png_text_compress(png_ptr, png_zTXt, &comp, key_len) != Z_OK)
       png_error(png_ptr, png_ptr->zstream.msg);
@@ -1731,9 +1731,9 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
     * TODO: validate the language tag correctly (see the spec.)
     */
    if (lang == NULL) lang = ""; /* empty language is valid */
-   lang_len = png_strlen(lang)+1;
+   lang_len = strlen(lang)+1;
    if (lang_key == NULL) lang_key = ""; /* may be empty */
-   lang_key_len = png_strlen(lang_key)+1;
+   lang_key_len = strlen(lang_key)+1;
    if (text == NULL) text = ""; /* may be empty */
 
    prefix_len = key_len;
@@ -1747,7 +1747,7 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
    else
       prefix_len = (png_uint_32)(prefix_len + lang_key_len);
 
-   png_text_compress_init(&comp, (png_const_bytep)text, png_strlen(text));
+   png_text_compress_init(&comp, (png_const_bytep)text, strlen(text));
 
    if (compression)
    {
@@ -1826,7 +1826,7 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
    ++purpose_len; /* terminator */
 
    png_debug1(3, "pCAL purpose length = %d", (int)purpose_len);
-   units_len = png_strlen(units) + (nparams == 0 ? 0 : 1);
+   units_len = strlen(units) + (nparams == 0 ? 0 : 1);
    png_debug1(3, "pCAL units length = %d", (int)units_len);
    total_len = purpose_len + units_len + 10;
 
@@ -1838,7 +1838,7 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
     */
    for (i = 0; i < nparams; i++)
    {
-      params_len[i] = png_strlen(params[i]) + (i == nparams - 1 ? 0 : 1);
+      params_len[i] = strlen(params[i]) + (i == nparams - 1 ? 0 : 1);
       png_debug2(3, "pCAL parameter %d length = %lu", i,
           (unsigned long)params_len[i]);
       total_len += params_len[i];
@@ -1875,8 +1875,8 @@ png_write_sCAL_s(png_structrp png_ptr, int unit, png_const_charp width,
 
    png_debug(1, "in png_write_sCAL_s");
 
-   wlen = png_strlen(width);
-   hlen = png_strlen(height);
+   wlen = strlen(width);
+   hlen = strlen(height);
    total_len = wlen + hlen + 2;
 
    if (total_len > 64)

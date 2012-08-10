@@ -2466,7 +2466,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    text_info.lang_key = NULL;
    text_info.itxt_length = 0;
    text_info.text = text;
-   text_info.text_length = png_strlen(text);
+   text_info.text_length = strlen(text);
 
    if (png_set_text_2(png_ptr, info_ptr, &text_info, 1))
       png_warning(png_ptr, "Insufficient memory to process text chunk");

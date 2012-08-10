@@ -549,13 +549,6 @@ typedef ptrdiff_t png_ptrdiff_t;
    typedef png_size_t png_alloc_size_t;
 #endif
 
-/* This macro makes the sizeof operator look and behave like a function, except
- * that it can take a type without the enclosing () as an argument so long as
- * the type contains no "," characters.  As of libpng-1.6.0, this macro is no
- * longer used in the libpng source code.
- */
-#define png_sizeof(x) (sizeof (x))
-
 /* Prior to 1.6.0 libpng offered limited support for Microsoft C compiler
  * implementations of Intel CPU specific support of user-mode segmented address
  * spaces, where 16-bit pointers address more than 65536 bytes of memory using

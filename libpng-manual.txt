@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta27 - August 3, 2012
+ libpng version 1.6.0beta27 - August 10, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta27 - August 3, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta27 - August 10, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4564,7 +4564,7 @@ directive.  It does not matter whether this is placed prior to or after
 the '"#include png.h"' directive.
 
 We moved the png_strcpy(), png_strncpy(), png_strlen(), png_memcpy(),
-png_memcmp(), png_sprintf, and png_memcpy() macros into a private
+png_memcmp(), png_sprintf(), and png_memcpy() macros into a private
 header file (pngpriv.h) that is not accessible by applications.
 
 In png_get_iCCP, the type of "profile" was changed from png_charpp
@@ -4874,6 +4874,9 @@ The following has been removed:
      with png_get_io_chunk_type().  The new
      function returns a 32-bit integer instead of
      a string.
+   The png_sizeof(), png_strlen(), png_strncpy(), png_strcpy(), png_strncpy(),
+     png_memcpy(), png_memcmp(), png_sprintf(), and png_memset() macros are
+     no longer used in the libpng sources and have been removed.
 
 XIII.  Detecting libpng
 
@@ -4993,6 +4996,17 @@ above the comment that says
 
   /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
+We put a space after the "sizeof" operator and we omit the
+optional parentheses around its argument when the argument
+is an expression, not a type name, and we always enclose the
+sizeof operator, with its argument, in parentheses:
+
+  (sizeof (png_uint_32))
+  (sizeof array)
+
+Prior to libpng-1.6.0 we used a "png_sizeof()" macro, formatted as
+though it were a function.
+
 To avoid polluting the global namespace, the names of all exported
 functions and variables begin with  "png_", and all publicly visible C
 preprocessor macros begin with "PNG".  We request that applications that
@@ -5022,7 +5036,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-August 3, 2012
+August 10, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

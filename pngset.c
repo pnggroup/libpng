@@ -299,7 +299,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
       || (nparams > 0 && params == NULL))
       return;
 
-   length = png_strlen(purpose) + 1;
+   length = strlen(purpose) + 1;
    png_debug1(3, "allocating purpose for info (%lu bytes)",
        (unsigned long)length);
 
@@ -315,7 +315,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    /* Validate params[nparams] */
    for (i=0; i<nparams; ++i)
       if (params[i] == NULL ||
-         !png_check_fp_string(params[i], png_strlen(params[i])))
+         !png_check_fp_string(params[i], strlen(params[i])))
          png_error(png_ptr, "Invalid format for pCAL parameter");
 
    info_ptr->pcal_purpose = png_voidcast(png_charp,
@@ -335,7 +335,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    info_ptr->pcal_type = (png_byte)type;
    info_ptr->pcal_nparams = (png_byte)nparams;
 
-   length = png_strlen(units) + 1;
+   length = strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)",
      (unsigned long)length);
 
@@ -363,7 +363,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 
    for (i = 0; i < nparams; i++)
    {
-      length = png_strlen(params[i]) + 1;
+      length = strlen(params[i]) + 1;
       png_debug2(3, "allocating parameter %d for info (%lu bytes)", i,
           (unsigned long)length);
 
@@ -401,11 +401,11 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
    if (unit != 1 && unit != 2)
       png_error(png_ptr, "Invalid sCAL unit");
 
-   if (swidth == NULL || (lengthw = png_strlen(swidth)) == 0 ||
+   if (swidth == NULL || (lengthw = strlen(swidth)) == 0 ||
        swidth[0] == 45 /* '-' */ || !png_check_fp_string(swidth, lengthw))
       png_error(png_ptr, "Invalid sCAL width");
 
-   if (sheight == NULL || (lengthh = png_strlen(sheight)) == 0 ||
+   if (sheight == NULL || (lengthh = strlen(sheight)) == 0 ||
        sheight[0] == 45 /* '-' */ || !png_check_fp_string(sheight, lengthh))
       png_error(png_ptr, "Invalid sCAL height");
 
@@ -660,7 +660,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
          PNG_COLORSPACE_FROM_gAMA|PNG_COLORSPACE_FROM_cHRM;
    }
 
-   length = png_strlen(name)+1;
+   length = strlen(name)+1;
    new_iccp_name = png_voidcast(png_charp, png_malloc_warn(png_ptr, length));
 
    if (new_iccp_name == NULL)
@@ -783,7 +783,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          continue;
       }
 
-      key_len = png_strlen(text_ptr[i].key);
+      key_len = strlen(text_ptr[i].key);
 
       if (text_ptr[i].compression <= 0)
       {
@@ -797,13 +797,13 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          /* Set iTXt data */
 
          if (text_ptr[i].lang != NULL)
-            lang_len = png_strlen(text_ptr[i].lang);
+            lang_len = strlen(text_ptr[i].lang);
 
          else
             lang_len = 0;
 
          if (text_ptr[i].lang_key != NULL)
-            lang_key_len = png_strlen(text_ptr[i].lang_key);
+            lang_key_len = strlen(text_ptr[i].lang_key);
 
          else
             lang_key_len = 0;
@@ -829,7 +829,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 
       else
       {
-         text_length = png_strlen(text_ptr[i].text);
+         text_length = strlen(text_ptr[i].text);
          textp->compression = text_ptr[i].compression;
       }
 
@@ -1031,7 +1031,7 @@ png_set_sPLT(png_const_structrp png_ptr,
       if (from->name == NULL || from->entries == NULL)
          continue;
 
-      length = png_strlen(from->name) + 1;
+      length = strlen(from->name) + 1;
       to->name = png_voidcast(png_charp, png_malloc_warn(png_ptr, length));
 
       if (to->name == NULL)
