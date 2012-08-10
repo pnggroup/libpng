@@ -423,7 +423,6 @@ png_get_pHYs_dpi(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #endif  /* PNG_EASY_ACCESS_SUPPORTED */
 
 
-#ifdef PNG_READ_SUPPORTED
 png_byte PNGAPI
 png_get_channels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
@@ -433,6 +432,7 @@ png_get_channels(png_const_structrp png_ptr, png_const_inforp info_ptr)
    return (0);
 }
 
+#ifdef PNG_READ_SUPPORTED
 png_const_bytep PNGAPI
 png_get_signature(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {

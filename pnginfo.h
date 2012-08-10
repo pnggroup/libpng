@@ -73,7 +73,10 @@ struct png_info_def
    png_byte channels;       /* number of data channels per pixel (1, 2, 3, 4) */
    png_byte pixel_depth;    /* number of bits per pixel */
    png_byte spare_byte;     /* to align the data, and for future use */
+
+#ifdef PNG_READ_SUPPORTED
    png_byte signature[8];   /* magic bytes read by libpng from start of file */
+#endif
 
    /* The rest of the data is optional.  If you are reading, check the
     * valid field to see if the information in these are valid.  If you

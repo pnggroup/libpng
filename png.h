@@ -2008,11 +2008,9 @@ PNG_EXPORT(113, void, png_set_rows, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_bytepp row_pointers));
 #endif
 
-#ifdef PNG_READ_SUPPORTED
 /* Returns number of color channels in image. */
 PNG_EXPORT(114, png_byte, png_get_channels, (png_const_structrp png_ptr,
     png_const_inforp info_ptr));
-#endif
 
 #ifdef PNG_EASY_ACCESS_SUPPORTED
 /* Returns image width in pixels. */
