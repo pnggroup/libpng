@@ -139,7 +139,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
          png_ptr->filler = (png_uint_16)filler;
 #     else
          png_app_error(png_ptr, "png_set_filler not supported on read");
-         PNG_UNUSED(filler); /* not used in the write case */
+         PNG_UNUSED(filler) /* not used in the write case */
          return;
 #     endif
    }

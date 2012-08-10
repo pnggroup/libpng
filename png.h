@@ -1238,7 +1238,7 @@ PNG_FIXED_EXPORT(228, void, png_set_alpha_mode_fixed, (png_structrp png_ptr,
     int mode, png_fixed_point output_gamma))
 #endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_ALPHA_MODE_SUPPORTED)
+#if defined(PNG_GAMMA_SUPPORTED) || defined(PNG_READ_ALPHA_MODE_SUPPORTED)
 /* The output_gamma value is a screen gamma in libpng terminology: it expresses
  * how to decode the output values, not how they are encoded.  The values used
  * correspond to the normal numbers used to describe the overall gamma of a
@@ -1958,9 +1958,11 @@ PNG_EXPORT(106, void, png_chunk_warning, (png_const_structrp png_ptr,
 PNG_EXPORT(107, void, png_benign_error, (png_const_structrp png_ptr,
     png_const_charp warning_message));
 
-/* Same, chunk name is prepended to message. */
+#ifdef PNG_READ_SUPPORTED
+/* Same, chunk name is prepended to message (only during read) */
 PNG_EXPORT(108, void, png_chunk_benign_error, (png_const_structrp png_ptr,
     png_const_charp warning_message));
+#endif
 
 PNG_EXPORT(109, void, png_set_benign_errors,
     (png_structrp png_ptr, int allowed));

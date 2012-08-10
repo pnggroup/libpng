@@ -1593,7 +1593,7 @@ PNG_INTERNAL_FUNCTION(void,png_app_error,(png_const_structrp png_ptr,
 /* ASCII to FP interfaces, currently only implemented if sCAL
  * support is required.
  */
-#if defined(PNG_READ_sCAL_SUPPORTED)
+#if defined(PNG_sCAL_SUPPORTED)
 /* MAX_DIGITS is actually the maximum number of characters in an sCAL
  * width or height, derived from the precision (number of significant
  * digits - a build time settable option) and assumptions about the
@@ -1611,7 +1611,7 @@ PNG_INTERNAL_FUNCTION(void,png_ascii_from_fp,(png_const_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_ascii_from_fixed,(png_const_structrp png_ptr,
    png_charp ascii, png_size_t size, png_fixed_point fp),PNG_EMPTY);
 #endif /* FIXED_POINT */
-#endif /* READ_sCAL */
+#endif /* sCAL */
 
 #if defined(PNG_sCAL_SUPPORTED) || defined(PNG_pCAL_SUPPORTED)
 /* An internal API to validate the format of a floating point number.
@@ -1733,7 +1733,7 @@ PNG_INTERNAL_FUNCTION(png_fixed_point,png_muldiv_warn,
    png_int_32 divided_by),PNG_EMPTY);
 #endif
 
-#ifdef PNG_READ_GAMMA_SUPPORTED
+#ifdef PNG_GAMMA_SUPPORTED
 /* Calculate a reciprocal - used for gamma values.  This returns
  * 0 if the argument is 0 in order to maintain an undefined value,
  * there are no warnings.
@@ -1741,12 +1741,18 @@ PNG_INTERNAL_FUNCTION(png_fixed_point,png_muldiv_warn,
 PNG_INTERNAL_FUNCTION(png_fixed_point,png_reciprocal,(png_fixed_point a),
    PNG_EMPTY);
 
+#ifdef PNG_READ_GAMMA_SUPPORTED
 /* The same but gives a reciprocal of the product of two fixed point
  * values.  Accuracy is suitable for gamma calculations but this is
- * not exact - use png_muldiv for that.
+ * not exact - use png_muldiv for that.  Only required at present on read.
  */
 PNG_INTERNAL_FUNCTION(png_fixed_point,png_reciprocal2,(png_fixed_point a,
    png_fixed_point b),PNG_EMPTY);
+#endif
+
+/* Return true if the gamma value is significantly different from 1.0 */
+PNG_INTERNAL_FUNCTION(int,png_gamma_significant,(png_fixed_point gamma_value),
+   PNG_EMPTY);
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
@@ -1759,8 +1765,6 @@ PNG_INTERNAL_FUNCTION(png_fixed_point,png_reciprocal2,(png_fixed_point a,
  */
 PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_correct,(png_structrp png_ptr,
    unsigned int value, png_fixed_point gamma_value),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,png_gamma_significant,(png_fixed_point gamma_value),
-   PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_16bit_correct,(unsigned int value,
    png_fixed_point gamma_value),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(png_byte,png_gamma_8bit_correct,(unsigned int value,
@@ -1819,6 +1823,11 @@ PNG_INTERNAL_FUNCTION(int,png_safe_execute,(png_imagep image,
  */
 PNG_INTERNAL_FUNCTION(int,png_image_error,(png_imagep image,
    png_const_charp error_message),PNG_EMPTY);
+
+#ifndef PNG_SIMPLIFIED_READ_SUPPORTED
+/* png_image_free is used by the write code but not exported */
+PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
+#endif /* !SIMPLIFIED_READ */
 
 #endif /* SIMPLIFIED READ/WRITE */
 

@@ -1709,10 +1709,12 @@ profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
 
    if (colorspace != NULL)
    {
-      if (png_ptr->mode & PNG_IS_READ_STRUCT)
-         png_chunk_benign_error(png_ptr, message);
+#     ifdef PNG_READ_SUPPORTED
+         if (png_ptr->mode & PNG_IS_READ_STRUCT)
+            png_chunk_benign_error(png_ptr, message);
 
-      else
+         else
+#     endif
          png_app_error(png_ptr, message);
    }
 
@@ -2548,7 +2550,7 @@ png_check_fp_string(png_const_charp string, png_size_t size)
 }
 #endif /* pCAL or sCAL */
 
-#ifdef PNG_READ_sCAL_SUPPORTED
+#ifdef PNG_sCAL_SUPPORTED
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 /* Utility used below - a simple accurate power of ten from an integral
  * exponent.
@@ -3130,7 +3132,7 @@ png_muldiv_warn(png_const_structrp png_ptr, png_fixed_point a, png_int_32 times,
 }
 #endif
 
-#ifdef PNG_READ_GAMMA_SUPPORTED /* more fixed point functions for gamma */
+#ifdef PNG_GAMMA_SUPPORTED /* more fixed point functions for gamma */
 /* Calculate a reciprocal, return 0 on div-by-zero or overflow. */
 png_fixed_point
 png_reciprocal(png_fixed_point a)
@@ -3150,6 +3152,18 @@ png_reciprocal(png_fixed_point a)
    return 0; /* error/overflow */
 }
 
+/* This is the shared test on whether a gamma value is 'significant' - whether
+ * it is worth doing gamma correction.
+ */
+int /* PRIVATE */
+png_gamma_significant(png_fixed_point gamma_val)
+{
+   return gamma_val < PNG_FP_1 - PNG_GAMMA_THRESHOLD_FIXED ||
+       gamma_val > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED;
+}
+#endif
+
+#ifdef PNG_READ_GAMMA_SUPPORTED
 /* A local convenience routine. */
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
@@ -3548,16 +3562,6 @@ png_gamma_correct(png_structrp png_ptr, unsigned int value,
 
    else
       return png_gamma_16bit_correct(value, gamma_val);
-}
-
-/* This is the shared test on whether a gamma value is 'significant' - whether
- * it is worth doing gamma correction.
- */
-int /* PRIVATE */
-png_gamma_significant(png_fixed_point gamma_val)
-{
-   return gamma_val < PNG_FP_1 - PNG_GAMMA_THRESHOLD_FIXED ||
-       gamma_val > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED;
 }
 
 /* Internal function to build a single 16-bit table - the table consists of
