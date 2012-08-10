@@ -24,6 +24,7 @@
 #define _GNU_SOURCE 1 /* For the floating point exception extension */
 
 #include <signal.h>
+#include <stdio.h>
 
 #if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
 #  include <config.h>
@@ -41,6 +42,8 @@
 #else
 #  include "../../png.h"
 #endif
+
+#ifdef PNG_WRITE_SUPPORTED /* else pngvalid can do nothing */
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the PNG_CONST. */
@@ -82,10 +85,10 @@ typedef png_byte *png_const_bytep;
    /* 1.6.0 constifies many APIs, the following exists to allow pngvalid to be
     * compiled against earlier versions.
     */
-#  define png_const_strutp png_structp
+#  define png_const_structp png_structp
 #endif
 
-#include "zlib.h"   /* For crc32 */
+#include <zlib.h>   /* For crc32 */
 
 #include <float.h>  /* For floating point constants */
 #include <stdlib.h> /* For malloc */
@@ -170,6 +173,7 @@ static PNG_CONST char *colour_types[8] =
    "grayscale with alpha", invalid, "truecolour with alpha", invalid
 };
 
+#ifdef PNG_READ_SUPPORTED
 /* Convert a double precision value to fixed point. */
 static png_fixed_point
 fix(double d)
@@ -177,6 +181,7 @@ fix(double d)
    d = floor(d * PNG_FP_1 + .5);
    return (png_fixed_point)d;
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* Generate random bytes.  This uses a boring repeatable algorithm and it
  * is implemented here so that it gives the same set of numbers on every
@@ -215,6 +220,7 @@ make_four_random_bytes(png_uint_32* seed, png_bytep bytes)
    make_random_bytes(seed, bytes, 4);
 }
 
+#ifdef PNG_READ_SUPPORTED
 static void
 randomize(void *pv, size_t size)
 {
@@ -243,6 +249,7 @@ random_choice(void)
 
    return x & 1;
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
  * simply records whether pngvalid did the interlace itself or whether it
@@ -461,6 +468,7 @@ pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
       memmove(toBuffer+(toIndex>>3), fromBuffer+(fromIndex>>3), pixelSize>>3);
 }
 
+#ifdef PNG_READ_SUPPORTED
 /* Copy a complete row of pixels, taking into account potential partial
  * bytes at the end.
  */
@@ -526,6 +534,7 @@ pixel_cmp(png_const_bytep pa, png_const_bytep pb, png_uint_32 bit_width)
       return 1+where;
    }
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /*************************** BASIC PNG FILE WRITING ***************************/
 /* A png_store takes data from the sequential writer or provides data
@@ -636,6 +645,7 @@ store_pool_mark(png_bytep mark)
    make_four_random_bytes(store_seed, mark);
 }
 
+#ifdef PNG_READ_SUPPORTED
 /* Use this for random 32 bit values; this function makes sure the result is
  * non-zero.
  */
@@ -655,6 +665,7 @@ random_32(void)
          return result;
    }
 }
+#endif /* PNG_READ_SUPPORTED */
 
 static void
 store_pool_init(png_store *ps, store_pool *pool)
@@ -860,6 +871,7 @@ store_log(png_store* ps, png_const_structp pp, png_const_charp message,
       store_verbose(ps, pp, is_error ? "error: " : "warning: ", message);
 }
 
+#ifdef PNG_READ_SUPPORTED
 /* Internal error function, called with a png_store but no libpng stuff. */
 static void
 internal_error(png_store *ps, png_const_charp message)
@@ -872,6 +884,7 @@ internal_error(png_store *ps, png_const_charp message)
       Throw ps;
    }
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* Functions to use as PNG callbacks. */
 static void
@@ -1009,6 +1022,7 @@ store_ensure_image(png_store *ps, png_const_structp pp, int nImages,
    }
 }
 
+#ifdef PNG_READ_SUPPORTED
 static void
 store_image_check(PNG_CONST png_store* ps, png_const_structp pp, int iImage)
 {
@@ -1038,6 +1052,7 @@ store_image_check(PNG_CONST png_store* ps, png_const_structp pp, int iImage)
       }
    }
 }
+#endif /* PNG_READ_SUPPORTED */
 
 static void
 store_write(png_structp ppIn, png_bytep pb, png_size_t st)
@@ -1073,6 +1088,7 @@ store_flush(png_structp ppIn)
    UNUSED(ppIn) /*DOES NOTHING*/
 }
 
+#ifdef PNG_READ_SUPPORTED
 static size_t
 store_read_buffer_size(png_store *ps)
 {
@@ -1190,6 +1206,7 @@ store_progressive_read(png_store *ps, png_structp pp, png_infop pi)
    }
    while (store_read_buffer_next(ps));
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* The caller must fill this in: */
 static store_palette_entry *
@@ -1216,6 +1233,7 @@ store_write_palette(png_store *ps, int npalette)
    return ps->palette;
 }
 
+#ifdef PNG_READ_SUPPORTED
 static store_palette_entry *
 store_current_palette(png_store *ps, int *npalette)
 {
@@ -1229,6 +1247,7 @@ store_current_palette(png_store *ps, int *npalette)
    *npalette = ps->current->npalette;
    return ps->current->palette;
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /***************************** MEMORY MANAGEMENT*** ***************************/
 /* A store_memory is simply the header for an allocated block of memory.  The
@@ -1503,25 +1522,29 @@ set_store_for_write(png_store *ps, png_infopp ppi,
 }
 
 /* Cleanup when finished reading (either due to error or in the success case).
+ * This routine exists even when there is no read support to make the code
+ * tidier (avoid a mass of ifdefs) and so easier to maintain.
  */
 static void
 store_read_reset(png_store *ps)
 {
-   if (ps->pread != NULL)
-   {
-      anon_context(ps);
-
-      Try
-         png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
-
-      Catch_anonymous
+#  ifdef PNG_READ_SUPPORTED
+      if (ps->pread != NULL)
       {
-         /* error already output: continue */
-      }
+         anon_context(ps);
 
-      ps->pread = NULL;
-      ps->piread = NULL;
-   }
+         Try
+            png_destroy_read_struct(&ps->pread, &ps->piread, NULL);
+
+         Catch_anonymous
+         {
+            /* error already output: continue */
+         }
+
+         ps->pread = NULL;
+         ps->piread = NULL;
+      }
+#  endif
 
    /* Always do this to be safe. */
    store_pool_delete(ps, &ps->read_memory_pool);
@@ -1532,6 +1555,7 @@ store_read_reset(png_store *ps)
    ps->validated = 0;
 }
 
+#ifdef PNG_READ_SUPPORTED
 static void
 store_read_set(png_store *ps, png_uint_32 id)
 {
@@ -1609,6 +1633,7 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
 
    return ps->pread;
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* The overall cleanup of a store simply calls the above then removes all the
  * saved files.  This does not delete the store itself.
@@ -1648,18 +1673,6 @@ typedef struct CIE_color
    double X, Y, Z;
 } CIE_color;
 
-static double
-chromaticity_x(CIE_color c)
-{
-   return c.X / (c.X + c.Y + c.Z);
-}
-
-static double
-chromaticity_y(CIE_color c)
-{
-   return c.Y / (c.X + c.Y + c.Z);
-}
-
 typedef struct color_encoding
 {
    /* A description of an (R,G,B) encoding of color (as defined above); this
@@ -1671,6 +1684,19 @@ typedef struct color_encoding
    double    gamma;            /* Encoding (file) gamma of space */
    CIE_color red, green, blue; /* End points */
 } color_encoding;
+
+#ifdef PNG_READ_SUPPORTED
+static double
+chromaticity_x(CIE_color c)
+{
+   return c.X / (c.X + c.Y + c.Z);
+}
+
+static double
+chromaticity_y(CIE_color c)
+{
+   return c.Y / (c.X + c.Y + c.Z);
+}
 
 static CIE_color
 white_point(PNG_CONST color_encoding *encoding)
@@ -1743,6 +1769,7 @@ safecat_color_encoding(char *buffer, size_t bufsize, size_t pos,
 
    return pos;
 }
+#endif /* PNG_READ_SUPPORTED */
 
 typedef struct png_modifier
 {
@@ -3121,6 +3148,7 @@ transform_height(png_const_structp pp, png_byte colour_type, png_byte bit_depth)
    }
 }
 
+#ifdef PNG_READ_SUPPORTED
 /* The following can only be defined here, now we have the definitions
  * of the transform image sizes.
  */
@@ -3156,6 +3184,7 @@ standard_rowsize(png_const_structp pp, png_uint_32 id)
    width *= bit_size(pp, COL_FROM_ID(id), DEPTH_FROM_ID(id));
    return (width + 7) / 8;
 }
+#endif /* PNG_READ_SUPPORTED */
 
 static void
 transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
@@ -3464,6 +3493,7 @@ interlace_row(png_bytep buffer, png_const_bytep imageRow,
    }
 }
 
+#ifdef PNG_READ_SUPPORTED
 static void
 deinterlace_row(png_bytep buffer, png_const_bytep row,
    unsigned int pixel_size, png_uint_32 w, int pass)
@@ -3484,6 +3514,7 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
       ++xin;
    }
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* Build a single row for the 'size' test images; this fills in only the
  * first bit_width bits of the sample row.
@@ -3727,6 +3758,7 @@ make_size_images(png_store *ps)
    make_size(ps, 6, 3, WRITE_BDHI);
 }
 
+#ifdef PNG_READ_SUPPORTED
 /* Return a row based on image id and 'y' for checking: */
 static void
 standard_row(png_const_structp pp, png_byte std[STANDARD_ROWMAX],
@@ -3738,6 +3770,7 @@ standard_row(png_const_structp pp, png_byte std[STANDARD_ROWMAX],
       size_row(std, WIDTH_FROM_ID(id) * bit_size(pp, COL_FROM_ID(id),
          DEPTH_FROM_ID(id)), y);
 }
+#endif /* PNG_READ_SUPPORTED */
 
 /* Tests - individual test cases */
 /* Like 'make_standard' but errors are deliberately introduced into the calls
@@ -4022,6 +4055,7 @@ perform_formatting_test(png_store *volatile ps)
 #endif
 }
 
+#ifdef PNG_READ_SUPPORTED
 /* Because we want to use the same code in both the progressive reader and the
  * sequential reader it is necessary to deal with the fact that the progressive
  * reader callbacks only have one parameter (png_get_progressive_ptr()), so this
@@ -9142,6 +9176,7 @@ perform_gamma_test(png_modifier *pm, int summary)
 #endif
 }
 #endif /* PNG_READ_GAMMA_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED */
 
 /* INTERLACE MACRO VALIDATION */
 /* This is copied verbatim from the specification, it is simply the pass
@@ -9950,7 +9985,9 @@ int main(int argc, char **argv)
       {
          perform_interlace_macro_validation();
          perform_formatting_test(&pm.this);
-         perform_standard_test(&pm);
+#        ifdef PNG_READ_SUPPORTED
+            perform_standard_test(&pm);
+#        endif
          perform_error_test(&pm);
       }
 
@@ -9958,7 +9995,9 @@ int main(int argc, char **argv)
       if (pm.test_size)
       {
          make_size_images(&pm.this);
-         perform_size_test(&pm);
+#        ifdef PNG_READ_SUPPORTED
+            perform_size_test(&pm);
+#        endif
       }
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
@@ -10055,3 +10094,10 @@ int main(int argc, char **argv)
 
    return 0;
 }
+#else /* write not supported */
+int main(void)
+{
+   fprintf(stderr, "pngvalid: no write support in libpng, all tests skipped\n");
+   return 0;
+}
+#endif

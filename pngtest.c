@@ -33,16 +33,23 @@
 
 #define _POSIX_SOURCE 1
 
-#include "zlib.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+/* Defined so I can write to a file on gui/windowing platforms */
+/*  #define STDERR stderr  */
+#define STDERR stdout   /* For DOS */
+
 #include "png.h"
+
+#ifdef PNG_READ_SUPPORTED /* else nothing can be done */
+#include "zlib.h"
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
 #  define PNG_ZBUF_SIZE 8192
 #endif
-#  include <stdio.h>
-#  include <stdlib.h>
-#  include <string.h>
-#  define FCLOSE(file) fclose(file)
+#define FCLOSE(file) fclose(file)
 
 #ifndef PNG_STDIO_SUPPORTED
 typedef FILE                * png_FILE_p;
@@ -96,10 +103,6 @@ static int warning_count = 0; /* count calls to png_warning */
 #include <mem.h>
 #endif
 
-/* Defined so I can write to a file on gui/windowing platforms */
-/*  #define STDERR stderr  */
-#define STDERR stdout   /* For DOS */
-
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
@@ -134,6 +137,7 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
    fprintf(stdout, "r");
 }
 
+#ifdef PNG_WRITE_SUPPORTED
 static void PNGCBAPI
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
@@ -142,6 +146,7 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 
    fprintf(stdout, "w");
 }
+#endif
 
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
@@ -271,8 +276,6 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
     }
 }
 #endif /* PNG_WRITE_USER_TRANSFORM_SUPPORTED */
-
-static int wrote_question = 0;
 
 #ifndef PNG_STDIO_SUPPORTED
 /* START of code to validate stdio-free compilation */
@@ -694,8 +697,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int num_pass, pass;
    int bit_depth, color_type;
 
-   char inbuf[256], outbuf[256];
-
    row_buf = NULL;
 
    if ((fpin = fopen(inname, "rb")) == NULL)
@@ -795,9 +796,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       /* Treat png_benign_error() as errors on read */
       png_set_benign_errors(read_ptr, 0);
-   
+
+#ifdef PNG_WRITE_SUPPORTED
       /* Treat them as errors on write */
       png_set_benign_errors(write_ptr, 0);
+#endif
 
       /* if strict is not set, then both are treated as warnings. */
    }
@@ -1383,22 +1386,25 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       /* We don't really expect to get here because of the setjmp handling
        * above, but this is safe.
        */
-      fprintf(STDERR, "%s: %d libpng errors found (%d warnings)\n",
+      fprintf(STDERR, "\n  %s: %d libpng errors found (%d warnings)",
          inname, error_count, warning_count);
 
       if (strict != 0)
          return (1);
    }
 
-   else if (unsupported_chunks > 0)
-   {
-      fprintf(STDERR, "%s: unsupported chunks (%d)%s\n",
-         inname, unsupported_chunks, strict ? ": IGNORED --strict!" : "");
-   }
+#  ifdef PNG_WRITE_SUPPORTED
+      /* If there we no write support nothing was written! */
+      else if (unsupported_chunks > 0)
+      {
+         fprintf(STDERR, "\n  %s: unsupported chunks (%d)%s",
+            inname, unsupported_chunks, strict ? ": IGNORED --strict!" : "");
+      }
+#  endif
 
    else if (warning_count > 0)
    {
-      fprintf(STDERR, "%s: %d libpng warnings found\n",
+      fprintf(STDERR, "\n  %s: %d libpng warnings found",
          inname, warning_count);
 
       if (strict != 0)
@@ -1419,76 +1425,85 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 
-   for (;;)
+#ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
    {
-      png_size_t num_in, num_out;
+      int wrote_question = 0;
 
-         num_in = fread(inbuf, 1, 1, fpin);
-         num_out = fread(outbuf, 1, 1, fpout);
-
-      if (num_in != num_out)
+      for (;;)
       {
-         fprintf(STDERR, "\nFiles %s and %s are of a different size\n",
-                 inname, outname);
+         png_size_t num_in, num_out;
+         char inbuf[256], outbuf[256];
 
-         if (wrote_question == 0 && unsupported_chunks == 0)
+
+         num_in = fread(inbuf, 1, sizeof inbuf, fpin);
+         num_out = fread(outbuf, 1, sizeof outbuf, fpout);
+
+         if (num_in != num_out)
          {
-            fprintf(STDERR,
-         "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
-              inname, PNG_ZBUF_SIZE);
-            fprintf(STDERR,
-              "\n   filtering heuristic (libpng default), compression");
-            fprintf(STDERR,
-              " level (zlib default),\n   and zlib version (%s)?\n\n",
-              ZLIB_VERSION);
-            wrote_question = 1;
-         }
+            fprintf(STDERR, "\nFiles %s and %s are of a different size\n",
+                    inname, outname);
 
-         FCLOSE(fpin);
-         FCLOSE(fpout);
-
-         if (strict != 0 && unsupported_chunks == 0)
-           return (1);
-
-         else
-           return (0);
-      }
-
-      if (!num_in)
-         break;
-
-      if (memcmp(inbuf, outbuf, num_in))
-      {
-         fprintf(STDERR, "\nFiles %s and %s are different\n", inname, outname);
-
-         if (wrote_question == 0 && unsupported_chunks == 0)
-         {
-            fprintf(STDERR,
+            if (wrote_question == 0 && unsupported_chunks == 0)
+            {
+               fprintf(STDERR,
          "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
                  inname, PNG_ZBUF_SIZE);
-            fprintf(STDERR,
-              "\n   filtering heuristic (libpng default), compression");
-            fprintf(STDERR,
-              " level (zlib default),\n   and zlib version (%s)?\n\n",
-              ZLIB_VERSION);
-            wrote_question = 1;
+               fprintf(STDERR,
+                 "\n   filtering heuristic (libpng default), compression");
+               fprintf(STDERR,
+                 " level (zlib default),\n   and zlib version (%s)?\n\n",
+                 ZLIB_VERSION);
+               wrote_question = 1;
+            }
+
+            FCLOSE(fpin);
+            FCLOSE(fpout);
+
+            if (strict != 0 && unsupported_chunks == 0)
+              return (1);
+
+            else
+              return (0);
          }
 
-         FCLOSE(fpin);
-         FCLOSE(fpout);
+         if (!num_in)
+            break;
 
-         /* NOTE: the unsupported_chunks escape is permitted here because
-          * unsupported text chunk compression will result in the compression
-          * mode being changed (to NONE) yet, in the test case, the result can
-          * be exactly the same size!
-          */
-         if (strict != 0 && unsupported_chunks == 0)
-           return (1);
+         if (memcmp(inbuf, outbuf, num_in))
+         {
+            fprintf(STDERR, "\nFiles %s and %s are different\n", inname,
+               outname);
 
-         else
-           return (0);
+            if (wrote_question == 0 && unsupported_chunks == 0)
+            {
+               fprintf(STDERR,
+         "   Was %s written with the same maximum IDAT chunk size (%d bytes),",
+                    inname, PNG_ZBUF_SIZE);
+               fprintf(STDERR,
+                 "\n   filtering heuristic (libpng default), compression");
+               fprintf(STDERR,
+                 " level (zlib default),\n   and zlib version (%s)?\n\n",
+                 ZLIB_VERSION);
+               wrote_question = 1;
+            }
+
+            FCLOSE(fpin);
+            FCLOSE(fpout);
+
+            /* NOTE: the unsupported_chunks escape is permitted here because
+             * unsupported text chunk compression will result in the compression
+             * mode being changed (to NONE) yet, in the test case, the result
+             * can be exactly the same size!
+             */
+            if (strict != 0 && unsupported_chunks == 0)
+              return (1);
+
+            else
+              return (0);
+         }
       }
    }
+#endif /* PNG_WRITE_SUPPORTED */
 
    FCLOSE(fpin);
    FCLOSE(fpout);
@@ -1782,6 +1797,15 @@ main(int argc, char *argv[])
 
    return (int)(ierror != 0);
 }
+#else
+int
+main(void)
+{
+   fprintf(STDERR,
+      " test ignored because libpng was not built with read support\n");
+   return 0;
+}
+#endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
 typedef png_libpng_version_1_6_0beta27 Your_png_h_is_not_version_1_6_0beta27;

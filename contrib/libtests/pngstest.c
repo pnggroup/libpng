@@ -35,6 +35,7 @@
 #  include "../../png.h"
 #endif
 
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED /* Else nothing can be done */
 #include "../tools/sRGB.h"
 
 /* KNOWN ISSUES
@@ -3152,6 +3153,7 @@ read_one_file(Image *image)
    return read_file(image, FORMAT_NO_CHANGE, NULL);
 }
 
+#ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
 static int
 write_one_file(Image *output, Image *image, int convert_to_8bit)
 {
@@ -3240,6 +3242,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       return logerror(output, output->tmpfile_name,
          ": read of new file failed", "");
 }
+#endif
 
 static int
 testimage(Image *image, png_uint_32 opts, format_list *pf)
@@ -3327,44 +3330,48 @@ testimage(Image *image, png_uint_32 opts, format_list *pf)
          if (!result)
             break;
 
-         /* Write the *copy* just made to a new file to make sure the write side
-          * works ok.  Check the conversion to sRGB if the copy is linear.
-          */
-         output.opts = opts;
-         result = write_one_file(&output, &copy, 0/*convert to 8bit*/);
-         if (!result)
-            break;
-
-         /* Validate against the original too; the background is needed here
-          * as well so that compare_two_images knows what color was used.
-          */
-         result = compare_two_images(image, &output, 0, background);
-         if (!result)
-            break;
-
-         if ((format & PNG_FORMAT_FLAG_LINEAR) != 0 &&
-            (format & PNG_FORMAT_FLAG_COLORMAP) == 0)
-         {
-            /* 'output' is linear, convert to the corresponding sRGB format. */
-            output.opts = opts;
-            result = write_one_file(&output, &copy, 1/*convert to 8bit*/);
-            if (!result)
-               break;
-
-            /* This may involve a conversion via linear; in the ideal world this
-             * would round-trip correctly, but libpng 1.5.7 is not the ideal
-             * world so allow a drift (error_via_linear).
-             *
-             * 'image' has an alpha channel but 'output' does not then there
-             * will a strip-alpha-channel operation (because 'output' is
-             * linear), handle this by composing on black when doing the
-             * comparison.
+#        ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
+            /* Write the *copy* just made to a new file to make sure the write
+             * side works ok.  Check the conversion to sRGB if the copy is
+             * linear.
              */
-            result = compare_two_images(image, &output, 1/*via_linear*/,
-               background);
+            output.opts = opts;
+            result = write_one_file(&output, &copy, 0/*convert to 8bit*/);
             if (!result)
                break;
-         }
+
+            /* Validate against the original too; the background is needed here
+             * as well so that compare_two_images knows what color was used.
+             */
+            result = compare_two_images(image, &output, 0, background);
+            if (!result)
+               break;
+
+            if ((format & PNG_FORMAT_FLAG_LINEAR) != 0 &&
+               (format & PNG_FORMAT_FLAG_COLORMAP) == 0)
+            {
+               /* 'output' is linear, convert to the corresponding sRGB format.
+                */
+               output.opts = opts;
+               result = write_one_file(&output, &copy, 1/*convert to 8bit*/);
+               if (!result)
+                  break;
+
+               /* This may involve a conversion via linear; in the ideal world
+                * this would round-trip correctly, but libpng 1.5.7 is not the
+                * ideal world so allow a drift (error_via_linear).
+                *
+                * 'image' has an alpha channel but 'output' does not then there
+                * will a strip-alpha-channel operation (because 'output' is
+                * linear), handle this by composing on black when doing the
+                * comparison.
+                */
+               result = compare_two_images(image, &output, 1/*via_linear*/,
+                  background);
+               if (!result)
+                  break;
+            }
+#        endif /* PNG_SIMPLIFIED_WRITE_SUPPORTED */
       }
 
       freeimage(&output);
@@ -3399,6 +3406,10 @@ test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
 
       else
          printf("FAIL:");
+
+#     ifndef PNG_SIMPLIFIED_WRITE_SUPPORTED
+         printf(" (no write)");
+#     endif
 
       print_opts(opts);
       printf(" %s\n", file_name);
@@ -3679,3 +3690,11 @@ main(int argc, char **argv)
 
    return retval;
 }
+
+#else /* !PNG_SIMPLIFIED_READ_SUPPORTED */
+int main(void)
+{
+   fprintf(stderr, "pngstest: no read support in libpng, test skipped\n");
+   return 0;
+}
+#endif /* PNG_SIMPLIFIED_READ_SUPPORTED */

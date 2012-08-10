@@ -433,6 +433,10 @@ Version 1.6.0beta27 [August 10, 2012]
     for compressed text chunks).
   Consistently use png_memset(), png_memcpy(), and png_memcmp(), except in
     pngtest.c and example.c where these macros are not visible.
+  Make all three "make check" test programs work without READ or WRITE support.
+    Now "make check" will succeed even if libpng is compiled with -DPNG_NO_READ
+    or -DPNG_NO_WRITE.  The tests performed are reduced, but the basic reading
+    and writing of a PNG file is always tested by one or more of the tests.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
