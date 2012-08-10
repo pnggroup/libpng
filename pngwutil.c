@@ -452,6 +452,27 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
    }
 }
 
+/* Clean up (or trim) a linked list of compression buffers. */
+void /* PRIVATE */
+png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
+{
+   png_compression_bufferp list = *listp;
+
+   if (list != NULL)
+   {
+      *listp = NULL;
+
+      do
+      {
+         png_compression_bufferp next = list->next;
+
+         png_free(png_ptr, list);
+         list = next;
+      }
+      while (list != NULL);
+   }
+}
+
 #ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
 /* This pair of functions encapsulates the operation of (a) compressing a
  * text string, and (b) issuing it later as a series of chunk data writes.
@@ -478,26 +499,6 @@ png_text_compress_init(compression_state *comp, png_const_bytep input,
    comp->input = input;
    comp->input_len = input_len;
    comp->output_len = 0;
-}
-
-void /* PRIVATE */
-png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
-{
-   png_compression_bufferp list = *listp;
-
-   if (list != NULL)
-   {
-      *listp = NULL;
-
-      do
-      {
-         png_compression_bufferp next = list->next;
-
-         png_free(png_ptr, list);
-         list = next;
-      }
-      while (list != NULL);
-   }
 }
 
 /* Compress the data in the compression state input */
@@ -1025,6 +1026,8 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
    {
       /* First time.   Ensure we have a temporary buffer for compression and
        * trim the buffer list if it has more than one entry to free memory.
+       * If 'WRITE_COMPRESSED_TEXT' is not set the list will never have been
+       * created at this point, but the check here is quick and safe.
        */
       if (png_ptr->zbuffer_list == NULL)
       {
@@ -1033,10 +1036,8 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
          png_ptr->zbuffer_list->next = NULL;
       }
 
-#ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
       else
          png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list->next);
-#endif
 
       /* It is a terminal error if we can't claim the zstream. */
       if (png_deflate_claim(png_ptr, png_IDAT, png_image_size(png_ptr)) != Z_OK)
@@ -1640,7 +1641,7 @@ png_write_zTXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
    compression_state comp;
 
    png_debug(1, "in png_write_zTXt");
-   PNG_UNUSED(text_len); /* Always use strlen */
+   PNG_UNUSED(text_len) /* Always use strlen */
 
    if (compression == PNG_TEXT_COMPRESSION_NONE)
    {

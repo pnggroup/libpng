@@ -3308,6 +3308,11 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
 #ifdef PNG_TEXT_SUPPORTED
+#  if (defined PNG_READ_zTXt_SUPPORTED) && (defined PNG_WRITE_zTXt_SUPPORTED)
+#     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_zTXt
+#  else
+#     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_NONE
+#  endif
       {
          static char key[] = "image name"; /* must be writeable */
          size_t pos;
@@ -3317,7 +3322,7 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          /* Use a compressed text string to test the correct interaction of text
           * compression and IDAT compression.
           */
-         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.compression = TEXT_COMPRESSION;
          text.key = key;
          /* Yuck: the text must be writable! */
          pos = safecat(copy, sizeof copy, 0, ps->wname);
@@ -3375,7 +3380,7 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          /* Use a compressed text string to test the correct interaction of text
           * compression and IDAT compression.
           */
-         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.compression = TEXT_COMPRESSION;
          text.key = key;
          text.text = comment;
          text.text_length = (sizeof comment)-1;
@@ -3546,7 +3551,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          /* Use a compressed text string to test the correct interaction of text
           * compression and IDAT compression.
           */
-         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.compression = TEXT_COMPRESSION;
          text.key = key;
          /* Yuck: the text must be writable! */
          pos = safecat(copy, sizeof copy, 0, ps->wname);
@@ -3646,7 +3651,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          /* Use a compressed text string to test the correct interaction of text
           * compression and IDAT compression.
           */
-         text.compression = PNG_TEXT_COMPRESSION_zTXt;
+         text.compression = TEXT_COMPRESSION;
          text.key = key;
          text.text = comment;
          text.text_length = (sizeof comment)-1;
@@ -4624,11 +4629,11 @@ standard_check_text(png_const_structp pp, png_const_textp tp,
    pos = safecat(msg, sizeof msg, pos, ": ");
    ok = pos;
 
-   if (tp->compression != PNG_TEXT_COMPRESSION_zTXt)
+   if (tp->compression != TEXT_COMPRESSION)
    {
       char buf[64];
 
-      sprintf(buf, "compression [%d->%d], ", PNG_TEXT_COMPRESSION_zTXt,
+      sprintf(buf, "compression [%d->%d], ", TEXT_COMPRESSION,
          tp->compression);
       pos = safecat(msg, sizeof msg, pos, buf);
    }
