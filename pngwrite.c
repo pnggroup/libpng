@@ -1907,8 +1907,8 @@ png_image_set_PLTE(png_image_write_control *display)
    png_color palette[256];
    png_byte tRNS[256];
 
-   memset(tRNS, 255, (sizeof tRNS));
-   memset(palette, 0, (sizeof palette));
+   png_memset(tRNS, 255, (sizeof tRNS));
+   png_memset(palette, 0, (sizeof palette));
 
    for (i=num_trans=0; i<entries; ++i)
    {

@@ -1169,7 +1169,7 @@ png_image_read_init(png_imagep image)
       /* And set the rest of the structure to NULL to ensure that the various
        * fields are consistent.
        */
-      memset(image, 0, (sizeof *image));
+      png_memset(image, 0, (sizeof *image));
       image->version = PNG_IMAGE_VERSION;
 
       if (png_ptr != NULL)
@@ -2527,7 +2527,7 @@ png_image_read_colormap(png_voidp argument)
                    * PNG_CMAP_RGB algorithm will use.  If the two entries don't
                    * match, add the new one and set this as the background index.
                    */
-                  if (memcmp((png_const_bytep)display->colormap +
+                  if (png_memcmp((png_const_bytep)display->colormap +
                         sample_size * cmap_entries,
                      (png_const_bytep)display->colormap +
                         sample_size * PNG_RGB_INDEX(r,g,b),

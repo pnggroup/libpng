@@ -1438,7 +1438,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
                         if (profile != NULL)
                         {
-                           memcpy(profile, profile_header,
+                           png_memcpy(profile, profile_header,
                               (sizeof profile_header));
 
                            size = 12 * tag_count;
@@ -1508,7 +1508,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                           keyword_length+1));
                                        if (info_ptr->iccp_name != NULL)
                                        {
-                                          memcpy(info_ptr->iccp_name, keyword,
+                                          png_memcpy(info_ptr->iccp_name, keyword,
                                              keyword_length+1);
                                           info_ptr->iccp_proflen =
                                              profile_length;

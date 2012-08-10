@@ -4182,6 +4182,8 @@ Version 1.6.0beta27 [August 10, 2012]
     and cause it not to fail at the comparison step if libpng lacks support
     for writing chunks that it reads from the input (currently only implemented
     for compressed text chunks).
+  Consistently use png_memset(), png_memcpy(), and png_memcmp(), except in
+    pngtest.c and example.c where these macros are not visible.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

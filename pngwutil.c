@@ -1663,7 +1663,7 @@ png_write_zTXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
 
    /* Compute the compressed data; do it now for the length */
    png_text_compress_init(&comp, (png_const_bytep)text,
-      text == NULL ? 0 : strlen(text));
+      text == NULL ? 0 : png_strlen(text));
 
    if (png_text_compress(png_ptr, png_zTXt, &comp, key_len) != Z_OK)
       png_error(png_ptr, png_ptr->zstream.msg);
@@ -1731,9 +1731,9 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
     * TODO: validate the language tag correctly (see the spec.)
     */
    if (lang == NULL) lang = ""; /* empty language is valid */
-   lang_len = strlen(lang)+1;
+   lang_len = png_strlen(lang)+1;
    if (lang_key == NULL) lang_key = ""; /* may be empty */
-   lang_key_len = strlen(lang_key)+1;
+   lang_key_len = png_strlen(lang_key)+1;
    if (text == NULL) text = ""; /* may be empty */
 
    prefix_len = key_len;
@@ -1747,7 +1747,7 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
    else
       prefix_len = (png_uint_32)(prefix_len + lang_key_len);
 
-   png_text_compress_init(&comp, (png_const_bytep)text, strlen(text));
+   png_text_compress_init(&comp, (png_const_bytep)text, png_strlen(text));
 
    if (compression)
    {
