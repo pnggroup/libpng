@@ -749,8 +749,13 @@ PNG_INTERNAL_FUNCTION(void,png_free_buffer_list,(png_structrp png_ptr,
    /* Free the buffer list used by the compressed write code. */
 #endif
 
-#if defined PNG_FLOATING_POINT_SUPPORTED &&\
-   !defined PNG_FIXED_POINT_MACRO_SUPPORTED
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
+   !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
+   (defined(PNG_gAMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED) || \
+   defined(PNG_sCAL_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)) || \
+   (defined(PNG_sCAL_SUPPORTED) && \
+   defined(PNG_FLOATING_ARITHMETIC_SUPPORTED))
 PNG_INTERNAL_FUNCTION(png_fixed_point,png_fixed,(png_const_structrp png_ptr,
    double fp, png_const_charp text),PNG_EMPTY);
 #endif
