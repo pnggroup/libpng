@@ -1161,13 +1161,38 @@ png_permit_mng_features (png_structrp png_ptr, png_uint_32 mng_features)
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 void PNGAPI
-png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
+png_set_keep_unknown_chunks(png_structrp png_ptr, int keepIn,
     png_const_bytep chunk_list, int num_chunksIn)
 {
    png_bytep new_list, p;
+   png_byte keep;
    unsigned int i, num_chunks, old_num_chunks;
    if (png_ptr == NULL)
       return;
+
+   switch (keepIn)
+   {
+      case PNG_HANDLE_CHUNK_AS_DEFAULT:
+         keep = PNG_HANDLE_CHUNK_AS_DEFAULT;
+         break;
+
+      case PNG_HANDLE_CHUNK_NEVER:
+         keep = PNG_HANDLE_CHUNK_NEVER;
+         break;
+
+      case PNG_HANDLE_CHUNK_IF_SAFE:
+         keep = PNG_HANDLE_CHUNK_IF_SAFE;
+         break;
+
+      case PNG_HANDLE_CHUNK_ALWAYS:
+         keep = PNG_HANDLE_CHUNK_ALWAYS;
+         break;
+
+
+      default:
+         png_app_error(png_ptr, "png_set_keep_unknown_chunks: invalid keep");
+         return;
+   }
 
    if (num_chunksIn <= 0)
    {
@@ -1188,41 +1213,52 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
    }
 
    if (num_chunksIn < 0)
-      {
-         /* Ignore all unknown chunks and all chunks recognized by
-          * libpng except for IHDR, PLTE, tRNS, IDAT, and IEND
-          */
-         static PNG_CONST png_byte chunks_to_ignore[] = {
-            98,  75,  71,  68, '\0',  /* bKGD */
-            99,  72,  82,  77, '\0',  /* cHRM */
-           103,  65,  77,  65, '\0',  /* gAMA */
-           104,  73,  83,  84, '\0',  /* hIST */
-           105,  67,  67,  80, '\0',  /* iCCP */
-           105,  84,  88, 116, '\0',  /* iTXt */
-           111,  70,  70, 115, '\0',  /* oFFs */
-           112,  67,  65,  76, '\0',  /* pCAL */
-           112,  72,  89, 115, '\0',  /* pHYs */
-           115,  66,  73,  84, '\0',  /* sBIT */
-           115,  67,  65,  76, '\0',  /* sCAL */
-           115,  80,  76,  84, '\0',  /* sPLT */
-           115,  84,  69,  82, '\0',  /* sTER */
-           115,  82,  71,  66, '\0',  /* sRGB */
-           116,  69,  88, 116, '\0',  /* tEXt */
-           116,  73,  77,  69, '\0',  /* tIME */
-           122,  84,  88, 116, '\0'   /* zTXt */
-           };
+   {
+      /* Ignore all unknown chunks and all chunks recognized by
+       * libpng except for IHDR, PLTE, tRNS, IDAT, and IEND
+       */
+      static PNG_CONST png_byte chunks_to_ignore[] = {
+         98,  75,  71,  68, '\0',  /* bKGD */
+         99,  72,  82,  77, '\0',  /* cHRM */
+        103,  65,  77,  65, '\0',  /* gAMA */
+        104,  73,  83,  84, '\0',  /* hIST */
+        105,  67,  67,  80, '\0',  /* iCCP */
+        105,  84,  88, 116, '\0',  /* iTXt */
+        111,  70,  70, 115, '\0',  /* oFFs */
+        112,  67,  65,  76, '\0',  /* pCAL */
+        112,  72,  89, 115, '\0',  /* pHYs */
+        115,  66,  73,  84, '\0',  /* sBIT */
+        115,  67,  65,  76, '\0',  /* sCAL */
+        115,  80,  76,  84, '\0',  /* sPLT */
+        115,  84,  69,  82, '\0',  /* sTER */
+        115,  82,  71,  66, '\0',  /* sRGB */
+        116,  69,  88, 116, '\0',  /* tEXt */
+        116,  73,  77,  69, '\0',  /* tIME */
+        122,  84,  88, 116, '\0'   /* zTXt */
+      };
 
-         chunk_list = chunks_to_ignore;
-         num_chunks = (unsigned int)(sizeof chunks_to_ignore)/5;
-       }
+      chunk_list = chunks_to_ignore;
+      num_chunks = (sizeof chunks_to_ignore)/5;
+   }
 
-   if (chunk_list == NULL)
-      return;
+   else /* num_chunksIn > 0 */
+   {
+      if (chunk_list == NULL)
+         return;
 
-   if (num_chunksIn > 0)
-     num_chunks = (unsigned int)num_chunksIn;
+      num_chunks = num_chunksIn;
+   }
 
    old_num_chunks = png_ptr->num_chunk_list;
+
+   /* Since num_chunks is always restricted to UINT_MAX/5 this can't overflow.
+    */
+   if (num_chunks + old_num_chunks > UINT_MAX/5)
+   {
+      png_app_error(png_ptr, "png_set_keep_unknown_chunks: too many chunks");
+      return;
+   }
+
    new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
        5 * (num_chunks + old_num_chunks)));
 
@@ -1233,11 +1269,10 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       png_ptr->chunk_list=NULL;
    }
 
-   memcpy(new_list + 5*old_num_chunks, chunk_list,
-      5*(unsigned int)num_chunks);
+   memcpy(new_list + 5*old_num_chunks, chunk_list, 5*num_chunks);
 
    for (p = new_list + 5*old_num_chunks + 4, i = 0; i<num_chunks; i++, p += 5)
-      *p=(png_byte)keep;
+      *p=keep;
 
    png_ptr->num_chunk_list = old_num_chunks + num_chunks;
    png_ptr->chunk_list = new_list;
@@ -1306,14 +1341,14 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
               "Compression buffer size cannot be changed because it is in use");
             return;
          }
-  
+
          if (size > ZLIB_IO_MAX)
          {
             png_warning(png_ptr,
                "Compression buffer size limited to system maximum");
             size = ZLIB_IO_MAX; /* must fit */
          }
-  
+
          else if (size < 6)
          {
             /* Deflate will potentially go into an infinite loop on a SYNC_FLUSH
@@ -1323,7 +1358,7 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
                "Compression buffer size cannot be reduced below 6");
             return;
          }
-  
+
          if (png_ptr->zbuffer_size != size)
          {
             png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);

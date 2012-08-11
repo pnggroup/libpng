@@ -439,6 +439,8 @@ Version 1.6.0beta27 [August 10, 2012]
     png_strlen(), png_memset(), png_memcpy(), and png_memcmp() macros.
   Removed the png_sizeof(), png_strlen(), png_memset(), png_memcpy(), and
     png_memcmp() macros.
+  Work around gcc 3.x and Microsoft Visual Studio 2010 complaints. Both object
+    to the split initialization of num_chunks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
