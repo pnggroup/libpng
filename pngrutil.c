@@ -574,7 +574,7 @@ png_decompress_chunk(png_structrp png_ptr,
    if (limit >= prefix_size + (terminate != 0))
    {
       int ret;
-      
+
       limit -= prefix_size + (terminate != 0);
 
       if (limit < *newlength)
@@ -596,7 +596,7 @@ png_decompress_chunk(png_structrp png_ptr,
          ret = png_inflate(png_ptr, png_ptr->chunk_name, 1/*finish*/,
             /* input: */ png_ptr->read_buffer + prefix_size, &lzsize,
             /* output: */ NULL, newlength);
-          
+
          if (ret == Z_STREAM_END)
          {
             /* Use 'inflateReset' here, not 'inflateReset2' because this
@@ -1009,7 +1009,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * maintainers to ignore it.
     */
 #ifdef PNG_READ_tRNS_SUPPORTED
-   if (png_ptr->num_trans > 0 || 
+   if (png_ptr->num_trans > 0 ||
       (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS) != 0))
    {
       /* Cancel this because otherwise it would be used if the transforms
@@ -1587,7 +1587,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       else
          errmsg = "bad keyword";
    }
-   
+
    else
       errmsg = "too many profiles";
 

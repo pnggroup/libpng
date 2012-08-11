@@ -749,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta27 - August 10, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta27 - August 11, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta27 - August 10, 2012\
+      return "libpng version 1.6.0beta27 - August 11, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1065,7 +1065,7 @@ png_colorspace_sync(png_const_structrp png_ptr, png_inforp info_ptr)
  *    C and D are the 16-bit words of V2, AD is the product of
  *    A and D, and X || Y is (X << 16) + Y.
 */
-static void 
+static void
 png_64bit_product (long v1, long v2, unsigned long *hi_product,
     unsigned long *lo_product)
 {

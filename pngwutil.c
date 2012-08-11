@@ -708,7 +708,7 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
       *new_key = 0;
       return 0;
    }
-   
+
    while (*key && key_len < 79)
    {
       png_byte ch = (png_byte)(0xff & *key++);
@@ -1696,7 +1696,7 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
    png_debug(1, "in png_write_iTXt");
 
    key_len = png_check_keyword(png_ptr, key, new_key);
-   
+
    if (key_len == 0)
       png_error(png_ptr, "iTXt: invalid keyword");
 
@@ -1822,7 +1822,7 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
 
    if (purpose_len == 0)
       png_error(png_ptr, "pCAL: invalid keyword");
-   
+
    ++purpose_len; /* terminator */
 
    png_debug1(3, "pCAL purpose length = %d", (int)purpose_len);
