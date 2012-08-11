@@ -4193,6 +4193,8 @@ Version 1.6.0beta27 [August 11, 2012]
   Work around gcc 3.x and Microsoft Visual Studio 2010 complaints. Both object
     to the split initialization of num_chunks.
 
+Version 1.6.0beta28 [August 11, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
