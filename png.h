@@ -1550,7 +1550,8 @@ PNG_EXPORT(57, void, png_read_image, (png_structrp png_ptr, png_bytepp image));
 #endif
 
 /* Write a row of image data */
-PNG_EXPORT(58, void, png_write_row, (png_structrp png_ptr, png_const_bytep row));
+PNG_EXPORT(58, void, png_write_row, (png_structrp png_ptr,
+    png_const_bytep row));
 
 /* Write a few rows of image data: (*row) is not written; however, the type
  * is declared as writeable to maintain compatibility with previous versions
@@ -1564,7 +1565,8 @@ PNG_EXPORT(59, void, png_write_rows, (png_structrp png_ptr, png_bytepp row,
 PNG_EXPORT(60, void, png_write_image, (png_structrp png_ptr, png_bytepp image));
 
 /* Write the end of the PNG file. */
-PNG_EXPORT(61, void, png_write_end, (png_structrp png_ptr, png_inforp info_ptr));
+PNG_EXPORT(61, void, png_write_end, (png_structrp png_ptr,
+    png_inforp info_ptr));
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the end of the PNG file. */
@@ -1869,11 +1871,12 @@ PNG_EXPORT(90, void, png_set_progressive_read_fn, (png_structrp png_ptr,
     png_progressive_row_ptr row_fn, png_progressive_end_ptr end_fn));
 
 /* Returns the user pointer associated with the push read functions */
-PNG_EXPORT(91, png_voidp, png_get_progressive_ptr, (png_const_structrp png_ptr));
+PNG_EXPORT(91, png_voidp, png_get_progressive_ptr,
+    (png_const_structrp png_ptr));
 
 /* Function to be called when data becomes available */
-PNG_EXPORT(92, void, png_process_data, (png_structrp png_ptr, png_inforp info_ptr,
-    png_bytep buffer, png_size_t buffer_size));
+PNG_EXPORT(92, void, png_process_data, (png_structrp png_ptr,
+    png_inforp info_ptr, png_bytep buffer, png_size_t buffer_size));
 
 /* A function which may be called *only* within png_process_data to stop the
  * processing of any more data.  The function returns the number of bytes

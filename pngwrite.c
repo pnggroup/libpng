@@ -841,7 +841,7 @@ png_write_flush(png_structrp png_ptr)
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-static void png_reset_filter_heuristics(png_structrp png_ptr); /* forward decl */
+static void png_reset_filter_heuristics(png_structrp png_ptr);/* forward decl */
 #endif
 
 /* Free any memory used in png_ptr struct without freeing the struct itself. */

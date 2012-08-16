@@ -80,7 +80,8 @@ png_error,(png_const_structrp png_ptr, png_const_charp error_message),
    }
 #endif
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
-      (*(png_ptr->error_fn))(png_constcast(png_structrp,png_ptr), error_message);
+      (*(png_ptr->error_fn))(png_constcast(png_structrp,png_ptr),
+          error_message);
 
    /* If the custom handler doesn't exist, or if it returns,
       use the default handler, which will not return. */
@@ -497,7 +498,8 @@ png_chunk_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 #ifdef PNG_READ_SUPPORTED
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 void PNGAPI
-png_chunk_benign_error(png_const_structrp png_ptr, png_const_charp error_message)
+png_chunk_benign_error(png_const_structrp png_ptr, png_const_charp
+    error_message)
 {
    if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
       png_chunk_warning(png_ptr, error_message);

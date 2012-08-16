@@ -3753,8 +3753,10 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if (v == png_ptr->trans_color.gray)
                         {
                            /* Background is already in screen gamma */
-                           *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
-                           *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
+                           *sp = (png_byte)((png_ptr->background.gray >> 8)
+                                & 0xff);
+                           *(sp + 1) = (png_byte)(png_ptr->background.gray
+                                & 0xff);
                         }
 
                         else
@@ -3777,8 +3779,10 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 
                         if (v == png_ptr->trans_color.gray)
                         {
-                           *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
-                           *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
+                           *sp = (png_byte)((png_ptr->background.gray >> 8)
+                                & 0xff);
+                           *(sp + 1) = (png_byte)(png_ptr->background.gray
+                                & 0xff);
                         }
                      }
                   }
@@ -3858,9 +3862,12 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         /* Background is already in screen gamma */
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
+                                & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green
+                                & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
+                                & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 
@@ -3901,9 +3908,12 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      {
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
+                                & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green
+                                & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
+                                & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
                   }
@@ -3986,7 +3996,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      else if (a == 0)
                      {
                         /* Background is already in screen gamma */
-                        *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
+                        *sp = (png_byte)((png_ptr->background.gray >> 8)
+                                & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                      }
 
@@ -4016,7 +4027,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 
                      if (a == 0)
                      {
-                        *sp = (png_byte)((png_ptr->background.gray >> 8) & 0xff);
+                        *sp = (png_byte)((png_ptr->background.gray >> 8)
+                                & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                      }
 
@@ -4146,9 +4158,12 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         /* Background is already in screen gamma */
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
+                                & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green
+                                & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
+                                & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 
@@ -4159,14 +4174,16 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 1) >> gamma_shift][*sp];
                         png_composite_16(w, v, a, png_ptr->background_1.red);
                         if (!optimize)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
+                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
+                                8];
                         *sp = (png_byte)((w >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(w & 0xff);
 
                         v = gamma_16_to_1[*(sp + 3) >> gamma_shift][*(sp + 2)];
                         png_composite_16(w, v, a, png_ptr->background_1.green);
                         if (!optimize)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
+                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
+                                8];
 
                         *(sp + 2) = (png_byte)((w >> 8) & 0xff);
                         *(sp + 3) = (png_byte)(w & 0xff);
@@ -4174,7 +4191,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 5) >> gamma_shift][*(sp + 4)];
                         png_composite_16(w, v, a, png_ptr->background_1.blue);
                         if (!optimize)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >> 8];
+                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
+                                8];
 
                         *(sp + 4) = (png_byte)((w >> 8) & 0xff);
                         *(sp + 5) = (png_byte)(w & 0xff);
@@ -4195,9 +4213,12 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      {
                         *sp = (png_byte)((png_ptr->background.red >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(png_ptr->background.red & 0xff);
-                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8) & 0xff);
-                        *(sp + 3) = (png_byte)(png_ptr->background.green & 0xff);
-                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8) & 0xff);
+                        *(sp + 2) = (png_byte)((png_ptr->background.green >> 8)
+                                & 0xff);
+                        *(sp + 3) = (png_byte)(png_ptr->background.green
+                                & 0xff);
+                        *(sp + 4) = (png_byte)((png_ptr->background.blue >> 8)
+                                & 0xff);
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 

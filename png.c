@@ -1477,7 +1477,8 @@ png_XYZ_normalize(png_XYZ *XYZ)
 
    /* Normalize by scaling so the sum of the end-point Y values is PNG_FP_1.
     * IMPLEMENTATION NOTE: ANSI requires signed overflow not to occur, therefore
-    * relying on addition of two positive values producing a negative one is not    * safe.
+    * relying on addition of two positive values producing a negative one is not
+    * safe.
     */
    Y = XYZ->redY;
    if (0x7fffffff - Y < XYZ->greenX) return 1;

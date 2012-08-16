@@ -2537,7 +2537,8 @@ png_image_read_colormap(png_voidp argument)
 
                   /* Compare the newly-created color-map entry with the one the
                    * PNG_CMAP_RGB algorithm will use.  If the two entries don't
-                   * match, add the new one and set this as the background index.
+                   * match, add the new one and set this as the background
+                   * index.
                    */
                   if (memcmp((png_const_bytep)display->colormap +
                         sample_size * cmap_entries,
