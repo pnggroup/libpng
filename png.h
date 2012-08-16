@@ -718,7 +718,7 @@ typedef struct png_unknown_chunk_t
     png_byte *data;   /* Data, should not be modified on read! */
     png_size_t size;
 
-    /* On write 'locaation' must be set using the flag values listed below.
+    /* On write 'location' must be set using the flag values listed below.
      * Notice that on read it is set by libpng however the values stored have
      * more bits set than are listed below.  Always treat the value as a
      * bitmask.  On write set only one bit - setting multiple bits may cause the
@@ -2373,7 +2373,7 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  *    PNG_HANDLE_CHUNK_NEVER:
  *       Discard the chunk data.
  *    PNG_HANDLE_CHUNK_IF_SAFE:
- *       Keep the chunk data if the chunk is not critial else raise a chunk
+ *       Keep the chunk data if the chunk is not critical else raise a chunk
  *       error.
  *    PNG_HANDLE_CHUNK_ALWAYS:
  *       Keep the chunk data.
@@ -2775,7 +2775,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * formats do not accomodate your needs then you can, and should, use the more
  * sophisticated APIs above - these support a wide variety of in-memory formats
  * and a wide variety of sophisticated transformations to those formats as well
- * as a wide variety of APIs to manipulate ancilliary information.
+ * as a wide variety of APIs to manipulate ancillary information.
  *
  * To read a PNG file using the simplified API:
  *

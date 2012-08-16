@@ -669,7 +669,7 @@ option READ_USER_CHUNKS enables READ_UNKNOWN_CHUNKS USER_CHUNKS
 # on by the following option.  In 1.6.0 turning this option *off* no longer
 # disables png_set_keep_unknown_chunks, a behavior which effectively prevented
 # unknown chunk saving by the first mechanism on read.
-# 
+#
 # Notice that this option no longer affects the write code either.  It can be
 # safely disabled and will prevent applications stopping libpng reading known
 # chunks.

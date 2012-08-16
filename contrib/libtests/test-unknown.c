@@ -99,8 +99,8 @@ typedef png_byte *png_const_bytep;
 #define png_vpAg PNG_CHUNK('v', 'p', 'A', 'g')
 
 /* Test on flag values as defined in the spec (section 5.4): */
-#define PNG_CHUNK_ANCILLIARY(c)   (1 & ((c) >> 29))
-#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLIARY(c))
+#define PNG_CHUNK_ANCILLARY(c )   (1 & ((c) >> 29))
+#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
 #define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
 #define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
 #define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
@@ -195,15 +195,15 @@ find_by_flag(png_uint_32 flag)
 }
 
 static int
-ancilliary(const char *name)
+ancillary(const char *name)
 {
-   return PNG_CHUNK_ANCILLIARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
+   return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
 }
 
 static int
-ancilliaryb(const png_byte *name)
+ancillaryb(const png_byte *name)
 {
-   return PNG_CHUNK_ANCILLIARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
+   return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
 }
 
 static int error_count = 0;
@@ -286,7 +286,7 @@ get_unknown(const char *file, int def, png_const_structp png_ptr,
                break;
 
             case PNG_HANDLE_CHUNK_IF_SAFE:
-               if (!ancilliaryb(unknown[num_unknown].name))
+               if (!ancillaryb(unknown[num_unknown].name))
                {
                   fprintf(stderr,
                      "%s: if-safe: %s: unknown critical chunk saved\n",
@@ -528,10 +528,10 @@ check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
                break;
 
             case PNG_HANDLE_CHUNK_IF_SAFE:
-               if (ancilliary(chunk_info[i].name))
+               if (ancillary(chunk_info[i].name))
                {
                   if (!(flag & unknown))
-                     error = "IF-SAFE: unknown ancilliary chunk lost";
+                     error = "IF-SAFE: unknown ancillary chunk lost";
                }
 
                else if (flag & unknown)
@@ -570,10 +570,10 @@ check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
                break;
 
             case PNG_HANDLE_CHUNK_IF_SAFE:
-               if (ancilliary(chunk_info[i].name))
+               if (ancillary(chunk_info[i].name))
                {
                   if (!(flag & unknown))
-                     error = "IF-SAFE: known ancilliary chunk lost";
+                     error = "IF-SAFE: known ancillary chunk lost";
                }
 
                else if (flag & unknown)
@@ -643,7 +643,7 @@ main(int argc, const char **argv)
    /* Chunks should either be known or unknown, never both and this should apply
     * whether the chunk is before or after the IDAT (actually, the app can
     * probably change this by swapping the handling after the image, but this
-    * test does not to that.)
+    * test does not do that.)
     */
    check_error(argc[argv],
       (flags[0][0]|flags[0][2]) & (flags[0][1]|flags[0][3]),

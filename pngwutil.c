@@ -677,7 +677,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
 
    /* This is an internal error; 'next' must have been NULL! */
    if (output_len > 0)
-      png_error(png_ptr, "error writing ancilliary chunked compressed data");
+      png_error(png_ptr, "error writing ancillary chunked compressed data");
 }
 #endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
 

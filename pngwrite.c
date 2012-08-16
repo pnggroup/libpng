@@ -38,7 +38,7 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
          int keep = png_handle_as_unknown(png_ptr, up->name);
 
          /* NOTE: this code is radically different from the read side in the
-          * matter of handling an ancilliary unknown chunk.  In the read side
+          * matter of handling an ancillary unknown chunk.  In the read side
           * the default behavior is to discard it, in the code below the default
           * behavior is to write it.  Critical chunks are, however, only
           * written if explicitly listed or if the default is set to write all
@@ -1330,7 +1330,7 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
    /* Prior to 1.6.0 this would warn but then set the window_bits value, this
     * meant that negative window bits values could be selected which would cause
     * libpng to write a non-standard PNG file with raw deflate or gzip
-    * compressed IDAT or ancilliary chunks.  Such files can be read and there is
+    * compressed IDAT or ancillary chunks.  Such files can be read and there is
     * no warning on read, so this seems like a very bad idea.
     */
    if (window_bits > 15)
