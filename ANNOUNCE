@@ -450,6 +450,14 @@ Version 1.6.0beta28 [August 16, 2012]
     There is a new test program, test-unknown.c, which is a work in progress
     (not currently part of the test suite).  Comments in the header files now
     explain how the unknown handling works.
+  Allow fine grain control of unknown chunk APIs. This change allows
+    png_set_keep_unknown_chunks() to be turned off if not required and causes
+    both read and write to behave appropriately (on read this is only possible
+    if the user callback is used to handle unknown chunks).  The change
+    also removes the support for storing unknown chunks in the info_struct
+    if the only unknown handling enabled is via the callback, allowing libpng
+    to be configured with callback reading and none of the unnecessary code.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -2814,7 +2814,9 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
     * function.
     */
 #  ifndef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
+#     ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+         keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
+#     endif
 #  endif
 
    /* One of the following methods will read the chunk or skip it (at least one

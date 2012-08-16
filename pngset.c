@@ -1111,6 +1111,29 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0)
       return;
 
+   /* Check for the failure cases where support has been disabled at compile
+    * time.  This code is hardly ever compiled - it's here because
+    * STORE_UNKNOWN_CHUNKS is set by both read and write code (compiling in this
+    * code) but may be meaningless if the read or write handling of unknown
+    * chunks is not compiled in.
+    */
+#  if !(defined PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) && \
+      (defined PNG_READ_SUPPORTED)
+      if (png_ptr->mode & PNG_IS_READ_STRUCT)
+      {
+         png_app_error(png_ptr, "no unknown chunk support on read");
+         return;
+      }
+#  endif
+#  if !(defined PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED) && \
+      (defined PNG_WRITE_SUPPORTED)
+      if (!(png_ptr->mode & PNG_IS_READ_STRUCT))
+      {
+         png_app_error(png_ptr, "no unknown chunk support on write");
+         return;
+      }
+#  endif
+
    /* Prior to 1.6.0 this code used png_malloc_warn, however this meant that
     * unknown critical chunks could be lost with just a warning resulting in
     * undefined behavior.  Changing to png_malloc fixes this by producing a

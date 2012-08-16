@@ -567,12 +567,14 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 
 
 /* Demonstration of user chunk support of the sTER and vpAg chunks */
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
 
 /* (sTER is a public chunk not yet known by libpng.  vpAg is a private
 chunk used in ImageMagick to store "virtual page" size).  */
 
-static png_uint_32 user_chunk_data[4];
+/* The initializer must match the values actually stored in pngtest.png so that
+ * pngtest will pass if we don't have read callback support.
+ */
+static png_uint_32 user_chunk_data[4] = {2, 'd', 'd', 0};
 
     /* 0: sTER mode + 1
      * 1: vpAg width
@@ -580,6 +582,7 @@ static png_uint_32 user_chunk_data[4];
      * 3: vpAg units
      */
 
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
 static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
    png_unknown_chunkp chunk)
 {
@@ -726,7 +729,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        pngtest_warning);
 #endif
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
    user_chunk_data[0] = 0;
    user_chunk_data[1] = 0;
    user_chunk_data[2] = 0;
@@ -862,6 +865,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_set_write_user_transform_fn(write_ptr, count_zero_samples);
 #endif
 
+#if 0 /* the following code is pointless, it doesn't work unless
+         PNG_READ_USER_CHUNKS_SUPPORTED, in which case it does nothing. */
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 #ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 #  ifndef PNG_HANDLE_CHUNK_ALWAYS
 #    define PNG_HANDLE_CHUNK_ALWAYS       3
@@ -875,6 +881,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #  endif
    png_set_keep_unknown_chunks(write_ptr, PNG_HANDLE_CHUNK_IF_SAFE,
       NULL, 0);
+#endif
+#endif
 #endif
 
    pngtest_debug("Reading info struct");
@@ -1163,7 +1171,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
  */
    png_write_info(write_ptr, write_info_ptr);
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    if (user_chunk_data[0] != 0)
    {
       png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
@@ -1198,7 +1205,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_write_chunk(write_ptr, png_vpAg, vpag_chunk_data, 9);
    }
 
-#endif
 #endif
 
 #ifdef SINGLE_ROWBUF_ALLOC

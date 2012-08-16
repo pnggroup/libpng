@@ -35,6 +35,10 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
            ++up)
          if (up->location & where)
       {
+         /* If per-chunk unknown chunk handling is enabled use it, otherwise
+          * just write the chunks the application has set.
+          */
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
          int keep = png_handle_as_unknown(png_ptr, up->name);
 
          /* NOTE: this code is radically different from the read side in the
@@ -54,6 +58,7 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
               keep == PNG_HANDLE_CHUNK_ALWAYS ||
               (keep == PNG_HANDLE_CHUNK_AS_DEFAULT &&
                png_ptr->unknown_default == PNG_HANDLE_CHUNK_ALWAYS)))
+#endif
          {
             /* TODO: review, what is wrong with a zero length unknown chunk? */
             if (up->size == 0)
@@ -872,7 +877,7 @@ png_write_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->inv_filter_costs);
 #endif
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
    png_free(png_ptr, png_ptr->chunk_list);
 #endif
 
