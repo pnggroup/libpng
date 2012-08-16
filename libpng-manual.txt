@@ -1,9 +1,9 @@
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.13beta02 - August 8, 2012
+ libpng version 1.5.13beta02 - August 16, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
- Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ Copyright (c) 1998-2012 Glenn Randers-Pehrson
 
  This document is released under the libpng license.
  For conditions of distribution and use, see the disclaimer
@@ -11,9 +11,9 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.13beta02 - August 8, 2012
+ libpng versions 0.97, January 1998, through 1.5.13beta02 - August 16, 2012
  Updated and distributed by Glenn Randers-Pehrson
- Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ Copyright (c) 1998-2012 Glenn Randers-Pehrson
 
  libpng 1.0 beta 6  version 0.96 May 28, 1997
  Updated and distributed by Andreas Dilger
@@ -4090,8 +4090,8 @@ png_get_mmx_bitdepth_threshold(), png_get_mmx_rowbytes_threshold(),
 png_set_asm_flags(), and png_mmx_supported()
 
 We removed the obsolete png_check_sig(), png_memcpy_check(), and
-png_memset_check() functions.  Instead use !png_sig_cmp(), memcpy(),
-and memset(), respectively.
+png_memset_check() functions.  Instead use !png_sig_cmp(), png_memcpy(),
+and png_memset(), respectively.
 
 The function png_set_gray_1_2_4_to_8() was removed. It has been
 deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
@@ -4173,9 +4173,12 @@ to information in zlib.h will need to add the '#include "zlib.h"'
 directive.  It does not matter whether it is placed prior to or after
 the '"#include png.h"' directive.
 
-We moved the png_strcpy(), png_strncpy(), png_strlen(), png_memcpy(),
-png_memcmp(), png_sprintf, and png_memcpy() macros into a private
-header file (pngpriv.h) that is not accessible to applications.
+The png_sprintf(), png_strcpy(), and png_strncpy() macros are no longer used
+and were removed.
+
+We moved the png_strlen(), png_memcpy(), png_memset(), and png_memcmp()
+macros into a private header file (pngpriv.h) that is not accessible to
+applications.
 
 In png_get_iCCP, the type of "profile" was changed from png_charpp
 to png_bytepp, and in png_set_iCCP, from png_charp to png_const_bytep.
@@ -4605,7 +4608,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-August 8, 2012
+August 16, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
