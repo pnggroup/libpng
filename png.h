@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta28 - August 11, 2012
+ * libpng version 1.6.0beta28 - August 16, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta28 - August 11, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta28 - August 16, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta28, August 11, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta28, August 16, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    August 11, 2012
+ *    August 16, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -378,7 +378,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta28"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta28 - August 11, 2012\n"
+     " libpng version 1.6.0beta28 - August 16, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -704,20 +704,26 @@ typedef png_time * png_timep;
 typedef const png_time * png_const_timep;
 typedef png_time * * png_timepp;
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
-    defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 /* png_unknown_chunk is a structure to hold queued chunks for which there is
  * no specific support.  The idea is that we can use this to queue
  * up private chunks for output even though the library doesn't actually
  * know about their semantics.
+ *
+ * The data in the structure is set by libpng on read and used on write.
  */
 typedef struct png_unknown_chunk_t
 {
-    png_byte name[5];
-    png_byte *data;
+    png_byte name[5]; /* Textual chunk name with '\0' terminator */
+    png_byte *data;   /* Data, should not be modified on read! */
     png_size_t size;
 
-    /* libpng-using applications should NOT directly modify this byte. */
+    /* On write 'locaation' must be set using the flag values listed below.
+     * Notice that on read it is set by libpng however the values stored have
+     * more bits set than are listed below.  Always treat the value as a
+     * bitmask.  On write set only one bit - setting multiple bits may cause the
+     * chunk to be written in multiple places.
+     */
     png_byte location; /* mode of operation at read time */
 }
 png_unknown_chunk;
@@ -727,8 +733,7 @@ typedef const png_unknown_chunk * png_const_unknown_chunkp;
 typedef png_unknown_chunk * * png_unknown_chunkpp;
 #endif
 
-/* Values for the unknown chunk location byte */
-
+/* Flag values for the unknown chunk location byte. */
 #define PNG_HAVE_IHDR  0x01
 #define PNG_HAVE_PLTE  0x02
 #define PNG_AFTER_IDAT 0x08
@@ -896,7 +901,8 @@ typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp,
     png_unknown_chunkp));
 #endif
 #ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
-typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp));
+/* not used anywhere */
+/* typedef PNG_CALLBACK(void, *png_unknown_chunk_ptr, (png_structp)); */
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -1826,9 +1832,31 @@ PNG_EXPORT(217, png_uint_32, png_get_current_row_number, (png_const_structrp));
 PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
 #endif
 
-#ifdef PNG_USER_CHUNKS_SUPPORTED
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+/* This callback is called only for *unknown* chunks, if
+ * PNG_HANDLE_AS_UNKNOWN_SUPPORTED is set then it is possible to set known
+ * chunks to be treated as unknown, however in this case the callback must do
+ * any processing required by the chunk (e.g. by calling the appropriate
+ * png_set_ APIs.)
+ *
+ * There is no write support - on write, by default, all the chunks in the
+ * 'unknown' list are written in the specified position.
+ *
+ * The integer return from the callback function is interpreted thus:
+ *
+ * negative: An error occured, png_chunk_error will be called.
+ *     zero: The chunk was not handled, the chunk will be discarded unless
+ *           png_set_keep_unknown_chunks has been used to set a 'keep' behavior
+ *           for this particular chunk, in which case that will be used.  A
+ *           critical chunk will cause an error at this point unless it is to be
+ *           saved.
+ * positive: The chunk was handled, libpng will ignore/discard it.
+ */
 PNG_EXPORT(88, void, png_set_read_user_chunk_fn, (png_structrp png_ptr,
     png_voidp user_chunk_ptr, png_user_chunk_ptr read_user_chunk_fn));
+#endif
+
+#ifdef PNG_USER_CHUNKS_SUPPORTED
 PNG_EXPORT(89, png_voidp, png_get_user_chunk_ptr, (png_const_structrp png_ptr));
 #endif
 
@@ -1913,8 +1941,10 @@ PNG_EXPORTA(99, void, png_data_freer, (png_const_structrp png_ptr,
 #define PNG_FREE_ROWS 0x0040
 #define PNG_FREE_PCAL 0x0080
 #define PNG_FREE_SCAL 0x0100
-#define PNG_FREE_UNKN 0x0200
-#define PNG_FREE_LIST 0x0400
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+#  define PNG_FREE_UNKN 0x0200
+#endif
+/*      PNG_FREE_LIST 0x0400    removed in 1.6.0 because it is ignored */
 #define PNG_FREE_PLTE 0x1000
 #define PNG_FREE_TRNS 0x2000
 #define PNG_FREE_TEXT 0x4000
@@ -2321,40 +2351,123 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
     png_const_charp swidth, png_const_charp sheight));
 #endif /* PNG_sCAL_SUPPORTED */
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-/* Provide a list of chunks and how they are to be handled, if the built-in
- * handling or default unknown chunk handling is not desired.  Any chunks not
- * listed will be handled in the default manner.  The IHDR and IEND chunks
- * must not be listed.  Because this turns off the default handling for chunks
- * that would otherwise be recognized the behavior of libpng transformations may
- * well become incorrect!
- *    keep = 0: PNG_HANDLE_CHUNK_AS_DEFAULT: follow default behavior
- *         = 1: PNG_HANDLE_CHUNK_NEVER:      do not keep
- *         = 2: PNG_HANDLE_CHUNK_IF_SAFE:    keep only if safe-to-copy
- *         = 3: PNG_HANDLE_CHUNK_ALWAYS:     keep even if unsafe-to-copy
- * If num_chunks is 0, then the "keep" parameter specifies the default
- * manner for handling unknown chunks.  If num_chunks is positive, then
- * the "keep" parameter specifies the manner for handling only those chunks
- * appearing in the chunk_list array.  If it is negative, then the "keep"
- * parameter specifies the manner for handling all unknown chunks plus
- * all chunks recognized by libpng except for the IHDR, PLTE, tRNS, IDAT,
- * and IEND chunks.
-*/
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+/* Provide the default handling for all unknown chunks or, optionally, for
+ * specific unknown chunks.
+ *
+ * NOTE: prior to 1.6.0 the handling specified for particular chunks on read was
+ * ignored and the default was used, the per-chunk setting only had an effect on
+ * write.  If you wish to have chunk-specific handling on read in code that must
+ * work on earlier versions you must use a user chunk callback to specify the
+ * desired handling (keep or discard.)
+ *
+ * The 'keep' parameter is a PNG_HANDLE_CHUNK_ value as listed below.  The
+ * parameter is interpreted as follows:
+ *
+ * READ:
+ *    PNG_HANDLE_CHUNK_AS_DEFAULT:
+ *       Known chunks: do normal libpng processing, do not keep the chunk (but
+ *          set the comments below about PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+ *       Unknown chunks: for a specific chunk use the global default, when used
+ *          as the default discard the chunk data.
+ *    PNG_HANDLE_CHUNK_NEVER:
+ *       Discard the chunk data.
+ *    PNG_HANDLE_CHUNK_IF_SAFE:
+ *       Keep the chunk data if the chunk is not critial else raise a chunk
+ *       error.
+ *    PNG_HANDLE_CHUNK_ALWAYS:
+ *       Keep the chunk data.
+ *
+ * If the chunk data is saved it can be retrieved using png_get_unknown_chunks,
+ * below.  Notice that specifying "AS_DEFAULT" as a global default is equivalent
+ * to specifying "NEVER", however when "AS_DEFAULT" is used for specific chunks
+ * it simply resets the behavior to the libpng default.
+ *
+ * The per-chunk handling is always used when there is a png_user_chunk_ptr
+ * callback and the callback returns 0; the chunk is then always stored *unless*
+ * it is critical and the per-chunk setting is other than ALWAYS.  Notice that
+ * the global default is *not* used in this case.  (In effect the per-chunk
+ * value is incremented to at least IF_SAFE.)
+ *
+ * PNG_HANDLE_AS_UNKNOWN_SUPPORTED:
+ *    If this is *not* set known chunks will always be handled by libpng and
+ *    will never be stored in the unknown chunk list.  Known chunks listed to
+ *    png_set_keep_unknown_chunks will have no effect.  If it is set then known
+ *    chunks listed with a keep other than AS_DEFAULT will *never* be processed
+ *    by libpng, in addition critical chunks must either be processed by the
+ *    callback or saved.
+ *
+ *    The IHDR and IEND chunks must not be listed.  Because this turns off the
+ *    default handling for chunks that would otherwise be recognized the
+ *    behavior of libpng transformations may well become incorrect!
+ *
+ * WRITE:
+ *    When writing chunks the options only apply to the chunks specified by
+ *    png_set_unknown_chunks (below), libpng will *always* write known chunks
+ *    required by png_set_ calls and will always write the core critical chunks
+ *    (as required for PLTE).
+ *
+ *    Each chunk in the png_set_unknown_chunks list is looked up in the
+ *    png_set_keep_unknown_chunks list to find the keep setting, this is then
+ *    interpreted as follows:
+ *
+ *    PNG_HANDLE_CHUNK_AS_DEFAULT:
+ *       Write safe-to-copy chunks and write other chunks if the global
+ *       default is set to _ALWAYS, otherwise don't write this chunk.
+ *    PNG_HANDLE_CHUNK_NEVER:
+ *       Do not write the chunk.
+ *    PNG_HANDLE_CHUNK_IF_SAFE:
+ *       Write the chunk if it is safe-to-copy, otherwise do not write it.
+ *    PNG_HANDLE_CHUNK_ALWAYS:
+ *       Write the chunk.
+ *
+ * Note that the default behavior is effectively the opposite of the read case -
+ * in read unknown chunks are not stored by default, in write they are written
+ * by default.  Also the behavior of PNG_HANDLE_CHUNK_IF_SAFE is very different
+ * - on write the safe-to-copy bit is checked, on read the critical bit is
+ * checked and on read if the chunk is critical an error will be raised.
+ *
+ * num_chunks:
+ * ===========
+ *    If num_chunks is positive, then the "keep" parameter specifies the manner
+ *    for handling only those chunks appearing in the chunk_list array,
+ *    otherwise the chunk list array is ignored.
+ *
+ *    If num_chunks is 0 the "keep" parameter specifies the default behavior for
+ *    unknown chunks, as described above.
+ *
+ *    If num_chunks is negative, then the "keep" parameter specifies the manner
+ *    for handling all unknown chunks plus all chunks recognized by libpng
+ *    except for the IHDR, PLTE, tRNS, IDAT, and IEND chunks (which continue to
+ *    be processed by libpng.
+ */
 PNG_EXPORT(172, void, png_set_keep_unknown_chunks, (png_structrp png_ptr,
     int keep, png_const_bytep chunk_list, int num_chunks));
 
-/* The handling code is returned; the result is therefore true (non-zero) if
- * special handling is required, false for the default handling.
+/* The "keep" PNG_HANDLE_CHUNK_ parameter for the specified chunk is returned;
+ * the result is therefore true (non-zero) if special handling is required,
+ * false for the default handling.
  */
-PNG_EXPORT(173, int, png_handle_as_unknown, (png_structrp png_ptr,
+PNG_EXPORT(173, int, png_handle_as_unknown, (png_const_structrp png_ptr,
     png_const_bytep chunk_name));
 #endif
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 PNG_EXPORT(174, void, png_set_unknown_chunks, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_const_unknown_chunkp unknowns,
     int num_unknowns));
+   /* NOTE: prior to 1.6.0 this routine set the 'location' field of the added
+    * unknowns to the location currently stored in the png_struct.  This is
+    * invariably the wrong value on write.  To fix this call the following API
+    * for each chunk in the list with the correct location.  If you know your
+    * code won't be compiled on earlier versions you can rely on
+    * png_set_unknown_chunks(write-ptr, png_get_unknown_chunks(read-ptr)) doing
+    * the correct thing.
+    */
+
 PNG_EXPORT(175, void, png_set_unknown_chunk_location,
     (png_const_structrp png_ptr, png_inforp info_ptr, int chunk, int location));
+
 PNG_EXPORT(176, int, png_get_unknown_chunks, (png_const_structrp png_ptr,
     png_const_inforp info_ptr, png_unknown_chunkpp entries));
 #endif
@@ -2393,6 +2506,7 @@ PNG_EXPORT(184, png_uint_32, png_permit_mng_features, (png_structrp png_ptr,
 #define PNG_HANDLE_CHUNK_NEVER        1
 #define PNG_HANDLE_CHUNK_IF_SAFE      2
 #define PNG_HANDLE_CHUNK_ALWAYS       3
+#define PNG_HANDLE_CHUNK_LAST         4
 
 /* Strip the prepended error numbers ("#nnn ") from error and warning
  * messages before passing them to the error or warning handler.

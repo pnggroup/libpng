@@ -368,12 +368,16 @@ struct png_struct_def
 
 #ifdef PNG_USER_CHUNKS_SUPPORTED
    png_voidp user_chunk_ptr;
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
    png_user_chunk_ptr read_user_chunk_fn; /* user read chunk handler */
 #endif
+#endif
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   unsigned int num_chunk_list;
-   png_bytep chunk_list;
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+   int          unknown_default; /* As PNG_HANDLE_* */
+   unsigned int num_chunk_list;  /* Number of entries in the list */
+   png_bytep    chunk_list;      /* List of png_byte[5]; the textual chunk name
+                                  * followed by a PNG_HANDLE_* byte */
 #endif
 
 /* New members added in libpng-1.0.3 */
@@ -438,13 +442,11 @@ struct png_struct_def
 #endif
 
 /* New member added in libpng-1.0.25 and 1.2.17 */
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
    /* Temporary storage for unknown chunk that the library doesn't recognize,
     * used while reading the chunk.
     */
-#ifdef PNG_READ_SUPPORTED
    png_unknown_chunk unknown_chunk;
-#endif
 #endif
 
 /* New member added in libpng-1.2.26 */

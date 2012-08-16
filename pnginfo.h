@@ -220,11 +220,10 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 /* New members added in libpng-1.0.6 */
    png_uint_32 free_me;     /* flags items libpng is responsible for freeing */
 
-#if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED) || \
- defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
-   int unknown_chunks_num;
+   unsigned int unknown_chunks_num;
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED

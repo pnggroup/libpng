@@ -635,9 +635,52 @@ chunk zTXt
 
 option READ_OPT_PLTE requires READ_ANCILLARY_CHUNKS
 
-option READ_UNKNOWN_CHUNKS requires READ
-option READ_UNKNOWN_CHUNKS enables UNKNOWN_CHUNKS READ_USER_CHUNKS
-option READ_USER_CHUNKS requires READ enables USER_CHUNKS
+# Unknown chunk handling
+#
+# 'UNKNOWN_CHUNKS' is a global option to disable all unknown chunk handling on
+# read or write; everything else below requires it (directly or indirectly).
+option UNKNOWN_CHUNKS
+
+# There are three main options to control the ability to read and write unknown
+# chunks.  If either read option is turned on then unknown chunks will be read,
+# otherwise they are skipped.  If the write option is turned on unknown chunks
+# set by png_set_unknown_chunks will be written otherwise it is an error to call
+# that API on a write struct.
+option WRITE_UNKNOWN_CHUNKS requires WRITE requires UNKNOWN_CHUNKS
+option WRITE_UNKNOWN_CHUNKS enables STORE_UNKNOWN_CHUNKS SET_UNKNOWN_CHUNKS
+
+# The first way to read user chunks is to have libpng save them for a later call
+# to png_get_unknown_chunks, the application must call
+# png_set_keep_unknown_chunks to cause this to actually happen (see png.h)
+option SAVE_UNKNOWN_CHUNKS requires READ requires UNKNOWN_CHUNKS
+option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS
+
+# The second approach is to use an application provided callback to process the
+# chunks, the callback can either handle the chunk entirely itself or request
+# that libpng store the chunk for later retrieval via png_get_unknown_chunks.
+#
+# Note that there is no 'WRITE_USER_CHUNKS' so the USER_CHUNKS option is always
+# the same as READ_USER_CHUNKS at present
+option READ_USER_CHUNKS requires READ requires UNKNOWN_CHUNKS
+option READ_USER_CHUNKS enables READ_UNKNOWN_CHUNKS USER_CHUNKS
+
+# A further option allows known chunks to be handled using the unknown code by
+# providing the relevant chunks to png_set_keep_unknown_chunks.  This is turned
+# on by the following option.  In 1.6.0 turning this option *off* no longer
+# disables png_set_keep_unknown_chunks, a behavior which effectively prevented
+# unknown chunk saving by the first mechanism on read.
+# 
+# Notice that this option no longer affects the write code either.  It can be
+# safely disabled and will prevent applications stopping libpng reading known
+# chunks.
+option HANDLE_AS_UNKNOWN requires SET_UNKNOWN_CHUNKS
+
+# The following options are derived from the above and should not be turned on
+# explicitly.
+option READ_UNKNOWN_CHUNKS requires UNKNOWN_CHUNKS disabled
+option READ_UNKNOWN_CHUNKS enables STORE_UNKNOWN_CHUNKS SET_UNKNOWN_CHUNKS
+option STORE_UNKNOWN_CHUNKS requires UNKNOWN_CHUNKS disabled
+option SET_UNKNOWN_CHUNKS requires UNKNOWN_CHUNKS disabled
 
 option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 # The "tm" structure is not supported on WindowsCE
@@ -647,10 +690,6 @@ option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 @#endif
 
 option WRITE_FILTER requires WRITE
-
-option WRITE_UNKNOWN_CHUNKS requires WRITE
-
-option HANDLE_AS_UNKNOWN
 
 option SAVE_INT_32 requires WRITE
 

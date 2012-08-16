@@ -91,6 +91,10 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 void PNGAPI
 png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 {
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   int keep;
+#endif
+
    png_debug(1, "in png_read_info");
 
    if (png_ptr == NULL || info_ptr == NULL)
@@ -104,13 +108,30 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
       png_uint_32 length = png_read_chunk_header(png_ptr);
       png_uint_32 chunk_name = png_ptr->chunk_name;
 
+      /* IDAT logic needs to happen here to simplify getting the two flags
+       * right.
+       */
+      if (chunk_name == png_IDAT)
+      {
+         if (!(png_ptr->mode & PNG_HAVE_IHDR))
+            png_chunk_error(png_ptr, "Missing IHDR before IDAT");
+
+         else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+             !(png_ptr->mode & PNG_HAVE_PLTE))
+            png_chunk_error(png_ptr, "Missing PLTE before IDAT");
+
+         else if (png_ptr->mode & PNG_AFTER_IDAT)
+            png_chunk_benign_error(png_ptr, "Too many IDATs found");
+
+         png_ptr->mode |= PNG_HAVE_IDAT;
+      }
+
+      else if (png_ptr->mode & PNG_HAVE_IDAT)
+         png_ptr->mode |= PNG_AFTER_IDAT;
+
       /* This should be a binary subdivision search or a hash for
        * matching the chunk name rather than a linear search.
        */
-      if (chunk_name == png_IDAT)
-         if (png_ptr->mode & PNG_AFTER_IDAT)
-            png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
-
       if (chunk_name == png_IHDR)
          png_handle_IHDR(png_ptr, info_ptr, length);
 
@@ -118,26 +139,16 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_IEND(png_ptr, info_ptr, length);
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      else if (png_chunk_unknown_handling(png_ptr, chunk_name) !=
-         PNG_HANDLE_CHUNK_AS_DEFAULT)
+      else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)))
       {
-         if (chunk_name == png_IDAT)
-            png_ptr->mode |= PNG_HAVE_IDAT;
-
-         png_handle_unknown(png_ptr, info_ptr, length);
+         png_handle_unknown(png_ptr, info_ptr, length, keep);
 
          if (chunk_name == png_PLTE)
             png_ptr->mode |= PNG_HAVE_PLTE;
 
          else if (chunk_name == png_IDAT)
          {
-            if (!(png_ptr->mode & PNG_HAVE_IHDR))
-               png_error(png_ptr, "Missing IHDR before IDAT");
-
-            else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-                !(png_ptr->mode & PNG_HAVE_PLTE))
-               png_error(png_ptr, "Missing PLTE before IDAT");
-
+            png_ptr->idat_size = 0; /* It has been consumed */
             break;
          }
       }
@@ -147,15 +158,7 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 
       else if (chunk_name == png_IDAT)
       {
-         if (!(png_ptr->mode & PNG_HAVE_IHDR))
-            png_error(png_ptr, "Missing IHDR before IDAT");
-
-         else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-             !(png_ptr->mode & PNG_HAVE_PLTE))
-            png_error(png_ptr, "Missing PLTE before IDAT");
-
          png_ptr->idat_size = length;
-         png_ptr->mode |= PNG_HAVE_IDAT;
          break;
       }
 
@@ -245,7 +248,8 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 #endif
 
       else
-         png_handle_unknown(png_ptr, info_ptr, length);
+         png_handle_unknown(png_ptr, info_ptr, length,
+            PNG_HANDLE_CHUNK_AS_DEFAULT);
    }
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
@@ -683,6 +687,10 @@ png_read_image(png_structrp png_ptr, png_bytepp image)
 void PNGAPI
 png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 {
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   int keep;
+#endif
+
    png_debug(1, "in png_read_end");
 
    if (png_ptr == NULL)
@@ -691,7 +699,10 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
    /* If png_read_end is called in the middle of reading the rows there may
     * still be pending IDAT data and an owned zstream.  Deal with this here.
     */
-   png_read_finish_IDAT(png_ptr);
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   if (!png_chunk_unknown_handling(png_ptr, png_IDAT))
+#endif
+      png_read_finish_IDAT(png_ptr);
 
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Report invalid palette index; added at libng-1.5.10 */
@@ -712,15 +723,14 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_IEND(png_ptr, info_ptr, length);
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      else if (png_chunk_unknown_handling(png_ptr, chunk_name) !=
-         PNG_HANDLE_CHUNK_AS_DEFAULT)
+      else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)))
       {
          if (chunk_name == png_IDAT)
          {
             if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
                png_benign_error(png_ptr, "Too many IDATs found");
          }
-         png_handle_unknown(png_ptr, info_ptr, length);
+         png_handle_unknown(png_ptr, info_ptr, length, keep);
          if (chunk_name == png_PLTE)
             png_ptr->mode |= PNG_HAVE_PLTE;
       }
@@ -825,7 +835,8 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 #endif
 
       else
-         png_handle_unknown(png_ptr, info_ptr, length);
+         png_handle_unknown(png_ptr, info_ptr, length,
+            PNG_HANDLE_CHUNK_AS_DEFAULT);
    } while (!(png_ptr->mode & PNG_HAVE_IEND));
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
@@ -866,11 +877,12 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#if (defined PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) &&\
+   (defined PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free(png_ptr, png_ptr->unknown_chunk.data);
 #endif
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
    png_free(png_ptr, png_ptr->chunk_list);
 #endif
 
@@ -1476,11 +1488,11 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
        /* Ignore unknown chunks and all other chunks except for the
         * IHDR, PLTE, tRNS, IDAT, and IEND chunks.
         */
-       png_set_keep_unknown_chunks(png_ptr, 1 /* PNG_HANDLE_CHUNK_NEVER */,
+       png_set_keep_unknown_chunks(png_ptr, PNG_HANDLE_CHUNK_NEVER,
          NULL, -1);
 
        /* But do not ignore image data handling chunks */
-       png_set_keep_unknown_chunks(png_ptr, 0 /* PNG_HANDLE_CHUNK_AS_DEFAULT */,
+       png_set_keep_unknown_chunks(png_ptr, PNG_HANDLE_CHUNK_AS_DEFAULT,
          chunks_to_process, (sizeof chunks_to_process)/5);
     }
 }

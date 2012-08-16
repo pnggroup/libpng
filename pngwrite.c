@@ -18,6 +18,54 @@
 
 #ifdef PNG_WRITE_SUPPORTED
 
+#ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
+/* Write out all the unknown chunks for the current given location */
+static void
+write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
+   unsigned int where)
+{
+   if (info_ptr->unknown_chunks_num)
+   {
+      png_const_unknown_chunkp up;
+
+      png_debug(5, "writing extra chunks");
+
+      for (up = info_ptr->unknown_chunks;
+           up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
+           ++up)
+         if (up->location & where)
+      {
+         int keep = png_handle_as_unknown(png_ptr, up->name);
+
+         /* NOTE: this code is radically different from the read side in the
+          * matter of handling an ancilliary unknown chunk.  In the read side
+          * the default behavior is to discard it, in the code below the default
+          * behavior is to write it.  Critical chunks are, however, only
+          * written if explicitly listed or if the default is set to write all
+          * unknown chunks.
+          *
+          * The default handling is also slightly weird - it is not possible to
+          * stop the writing of all unsafe-to-copy chunks!
+          *
+          * TODO: REVIEW: this would seem to be a bug.
+          */
+         if (keep != PNG_HANDLE_CHUNK_NEVER &&
+             ((up->name[3] & 0x20) /* safe-to-copy overrides everything */ ||
+              keep == PNG_HANDLE_CHUNK_ALWAYS ||
+              (keep == PNG_HANDLE_CHUNK_AS_DEFAULT &&
+               png_ptr->unknown_default == PNG_HANDLE_CHUNK_ALWAYS)))
+         {
+            /* TODO: review, what is wrong with a zero length unknown chunk? */
+            if (up->size == 0)
+               png_warning(png_ptr, "Writing zero-length unknown chunk");
+
+            png_write_chunk(png_ptr, up->name, up->data, up->size);
+         }
+      }
+   }
+}
+#endif /* PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED */
+
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
  * and put it in the correct location here.  If you want the chunk written
@@ -54,10 +102,12 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
        info_ptr->bit_depth, info_ptr->color_type, info_ptr->compression_type,
        info_ptr->filter_type,
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
-       info_ptr->interlace_type);
+       info_ptr->interlace_type
 #else
-       0);
+       0
 #endif
+      );
+
    /* The rest of these check to see if the valid field has the appropriate
     * flag set, and if it does, writes the chunk.
     *
@@ -125,34 +175,9 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
 #endif
 
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
-   if (info_ptr->unknown_chunks_num)
-   {
-      png_unknown_chunk *up;
-
-      png_debug(5, "writing extra chunks");
-
-      for (up = info_ptr->unknown_chunks;
-           up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
-           up++)
-      {
-         int keep = png_handle_as_unknown(png_ptr, up->name);
-
-         if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location &&
-             !(up->location & PNG_HAVE_PLTE) &&
-             !(up->location & PNG_HAVE_IDAT) &&
-             !(up->location & PNG_AFTER_IDAT) &&
-             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
-             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
-         {
-            if (up->size == 0)
-               png_warning(png_ptr, "Writing zero-length unknown chunk");
-
-            png_write_chunk(png_ptr, up->name, up->data, up->size);
-         }
-      }
-   }
+      write_unknown_chunks(png_ptr, info_ptr, PNG_HAVE_IHDR);
 #endif
+
       png_ptr->mode |= PNG_WROTE_INFO_BEFORE_PLTE;
    }
 }
@@ -302,29 +327,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 #endif /* tEXt */
 
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
-   if (info_ptr->unknown_chunks_num)
-   {
-      png_unknown_chunk *up;
-
-      png_debug(5, "writing extra chunks");
-
-      for (up = info_ptr->unknown_chunks;
-           up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
-           up++)
-      {
-         int keep = png_handle_as_unknown(png_ptr, up->name);
-         if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location &&
-             (up->location & PNG_HAVE_PLTE) &&
-             !(up->location & PNG_HAVE_IDAT) &&
-             !(up->location & PNG_AFTER_IDAT) &&
-             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
-             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
-         {
-            png_write_chunk(png_ptr, up->name, up->data, up->size);
-         }
-      }
-   }
+   write_unknown_chunks(png_ptr, info_ptr, PNG_HAVE_PLTE);
 #endif
 }
 
@@ -416,27 +419,7 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
       }
 #endif
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
-   if (info_ptr->unknown_chunks_num)
-   {
-      png_unknown_chunk *up;
-
-      png_debug(5, "writing extra chunks");
-
-      for (up = info_ptr->unknown_chunks;
-           up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
-           up++)
-      {
-         int keep = png_handle_as_unknown(png_ptr, up->name);
-         if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location &&
-             (up->location & PNG_AFTER_IDAT) &&
-             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
-             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
-         {
-            png_write_chunk(png_ptr, up->name, up->data, up->size);
-         }
-      }
-   }
+      write_unknown_chunks(png_ptr, info_ptr, PNG_AFTER_IDAT);
 #endif
    }
 
@@ -889,7 +872,7 @@ png_write_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->inv_filter_costs);
 #endif
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
    png_free(png_ptr, png_ptr->chunk_list);
 #endif
 

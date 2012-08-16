@@ -556,7 +556,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    }
 #endif
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
    if ((mask & PNG_FREE_UNKN) & info_ptr->free_me)
    {
       if (num != -1)
@@ -570,7 +570,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
       else
       {
-         int i;
+         unsigned int i;
 
          if (info_ptr->unknown_chunks_num)
          {
@@ -749,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta28 - August 11, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta28 - August 16, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta28 - August 11, 2012\
+      return "libpng version 1.6.0beta28 - August 16, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -802,9 +802,9 @@ png_get_header_version(png_const_structrp png_ptr)
 #endif
 }
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 int PNGAPI
-png_handle_as_unknown(png_structrp png_ptr, png_const_bytep chunk_name)
+png_handle_as_unknown(png_const_structrp png_ptr, png_const_bytep chunk_name)
 {
    /* Check chunk_name and return "keep" value if it's on the list, else 0 */
    png_const_bytep p, p_end;
@@ -816,29 +816,37 @@ png_handle_as_unknown(png_structrp png_ptr, png_const_bytep chunk_name)
    p = p_end + png_ptr->num_chunk_list*5; /* beyond end */
 
    /* The code is the fifth byte after each four byte string.  Historically this
-    * code was always searched from the end of the list, so it should continue
-    * to do so in case there are duplicated entries.
+    * code was always searched from the end of the list, this is no longer
+    * necessary because the 'set' routine handles duplicate entries correcty.
     */
    do /* num_chunk_list > 0, so at least one */
    {
       p -= 5;
+
       if (!memcmp(chunk_name, p, 4))
          return p[4];
    }
    while (p > p_end);
 
+   /* This means that known chunks should be processed and unknown chunks should
+    * be handled according to the value of png_ptr->unknown_default; this can be
+    * confusing because, as a result, there are two levels of defaulting for
+    * unknown chunks.
+    */
    return PNG_HANDLE_CHUNK_AS_DEFAULT;
 }
 
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 int /* PRIVATE */
-png_chunk_unknown_handling(png_structrp png_ptr, png_uint_32 chunk_name)
+png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
 {
    png_byte chunk_string[5];
 
    PNG_CSTRING_FROM_CHUNK(chunk_string, chunk_name);
    return png_handle_as_unknown(png_ptr, chunk_string);
 }
-#endif
+#endif /* READ_UNKNOWN_CHUNKS */
+#endif /* SET_UNKNOWN_CHUNKS */
 
 #ifdef PNG_READ_SUPPORTED
 /* This function, added to libpng-1.0.6g, is untested. */

@@ -528,8 +528,8 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_FLAG_ASSUME_sRGB              0x1000 /* Added to libpng-1.5.4 */
 #define PNG_FLAG_OPTIMIZE_ALPHA           0x2000 /* Added to libpng-1.5.4 */
 #define PNG_FLAG_DETECT_UNINITIALIZED     0x4000 /* Added to libpng-1.5.4 */
-#define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000
-#define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000
+/* #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000 */
+/* #define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000 */
 #define PNG_FLAG_LIBRARY_MISMATCH        0x20000
 #define PNG_FLAG_STRIP_ERROR_NUMBERS     0x40000
 #define PNG_FLAG_STRIP_ERROR_TEXT        0x80000
@@ -1310,19 +1310,28 @@ PNG_INTERNAL_FUNCTION(void,png_handle_zTXt,(png_structrp png_ptr, png_inforp inf
     png_uint_32 length),PNG_EMPTY);
 #endif
 
-PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
-    png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
-
 PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_structrp png_ptr,
     png_uint_32 chunk_name),PNG_EMPTY);
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-/* Exactly as png_handle_as_unknown() except that the argument is a 32-bit chunk
- * name, not a string.
- */
-PNG_INTERNAL_FUNCTION(int,png_chunk_unknown_handling,(png_structrp png_ptr,
-    png_uint_32 chunk_name),PNG_EMPTY);
+#ifdef PNG_READ_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
+    png_inforp info_ptr, png_uint_32 length, int keep),PNG_EMPTY);
+   /* This is the function that gets called for unknown chunks.  The 'keep'
+    * argument is either non-0 for a known chunk that has been set to be handled
+    * as unknown or 0 for an unknown chunk.  By default the function just skips
+    * the chunk or errors out if it is critical.
+    */
+
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+PNG_INTERNAL_FUNCTION(int,png_chunk_unknown_handling,
+    (png_const_structrp png_ptr, png_uint_32 chunk_name),PNG_EMPTY);
+   /* Exactly as the API png_handle_as_unknown() except that the argument is a
+    * 32-bit chunk name, not a string.
+    */
 #endif
+#endif /* PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED */
 
 /* Handle the transformations for reading and writing */
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED

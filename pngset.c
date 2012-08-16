@@ -1067,79 +1067,121 @@ png_set_sPLT(png_const_structrp png_ptr,
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+static png_byte
+check_location(png_const_structrp png_ptr, unsigned int location)
+{
+   location &= (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT);
+
+   /* New in 1.6.0; copy the location and check it.  This is an API
+    * change, previously the app had to use the
+    * png_set_unknown_chunk_location API below for each chunk.
+    */
+   if (location == 0 && !(png_ptr->mode & PNG_IS_READ_STRUCT))
+   {
+      /* Write struct, so unknown chunks come from the app */
+      png_app_warning(png_ptr,
+         "png_set_unknown_chunks now expects a valid location");
+      /* Use the old behavior */
+      location = png_ptr->mode &
+         (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT);
+   }
+
+   if (location == 0)
+      png_error(png_ptr, "invalid location in png_set_unknown_chunks");
+
+   /* Now reduce the location to the top-most set bit by removing each least
+    * significant bit in turn.
+    */
+   while (location != (location & -location))
+      location &= (png_byte)~(location & -location);
+
+   /* The cast is safe because 'location' is a bit mask and only the low four
+    * bits are significant.
+    */
+   return (png_byte)location;
+}
+
 void PNGAPI
 png_set_unknown_chunks(png_const_structrp png_ptr,
    png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
 {
    png_unknown_chunkp np;
-   int i;
 
-   if (png_ptr == NULL || info_ptr == NULL || num_unknowns == 0)
+   if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0)
       return;
 
-   np = png_voidcast(png_unknown_chunkp, png_malloc_warn(png_ptr,
-       (png_size_t)(info_ptr->unknown_chunks_num + num_unknowns) *
+   /* Prior to 1.6.0 this code used png_malloc_warn, however this meant that
+    * unknown critical chunks could be lost with just a warning resulting in
+    * undefined behavior.  Changing to png_malloc fixes this by producing a
+    * png_error.  The (png_size_t) cast was also removed as it hides a potential
+    * overflow.
+    *
+    * TODO: fix the potential overflow in the multiply
+    */
+   np = png_voidcast(png_unknown_chunkp, png_malloc(png_ptr,
+       (info_ptr->unknown_chunks_num + (unsigned int)num_unknowns) *
        (sizeof (png_unknown_chunk))));
 
-   if (np == NULL)
-   {
-      png_warning(png_ptr,
-          "Out of memory while processing unknown chunk");
-      return;
-   }
-
    memcpy(np, info_ptr->unknown_chunks,
-       (png_size_t)info_ptr->unknown_chunks_num *
-       (sizeof (png_unknown_chunk)));
+       info_ptr->unknown_chunks_num * (sizeof (png_unknown_chunk)));
 
    png_free(png_ptr, info_ptr->unknown_chunks);
-   info_ptr->unknown_chunks = NULL;
+   info_ptr->unknown_chunks = np; /* safe because it is initialized */
+   info_ptr->free_me |= PNG_FREE_UNKN;
 
-   for (i = 0; i < num_unknowns; i++)
+   np += info_ptr->unknown_chunks_num;
+
+   /* Increment unknown_chunks_num each time round the loop to protect the
+    * just-allocated chunk data.
+    */
+   for (; --num_unknowns >= 0;
+      ++np, ++unknowns, ++(info_ptr->unknown_chunks_num))
    {
-      png_unknown_chunkp to = np + info_ptr->unknown_chunks_num + i;
-      png_const_unknown_chunkp from = unknowns + i;
+      memcpy(np->name, unknowns->name, (sizeof unknowns->name));
+      np->name[(sizeof np->name)-1] = '\0';
+      np->size = unknowns->size;
+      np->location = check_location(png_ptr, unknowns->location);
 
-      memcpy(to->name, from->name, (sizeof from->name));
-      to->name[(sizeof to->name)-1] = '\0';
-      to->size = from->size;
-
-      /* Note our location in the read or write sequence */
-      to->location = (png_byte)png_ptr->mode;
-
-      if (from->size == 0)
-         to->data=NULL;
+      if (unknowns->size == 0)
+         np->data = NULL;
 
       else
       {
-         to->data = (png_bytep)png_malloc_warn(png_ptr,
-             (png_size_t)from->size);
-
-         if (to->data == NULL)
-         {
-            png_warning(png_ptr,
-                "Out of memory while processing unknown chunk");
-            to->size = 0;
-         }
-
-         else
-            memcpy(to->data, from->data, from->size);
+         /* png_error is safe here because the list is stored in png_ptr */
+         np->data = png_voidcast(png_bytep,
+            png_malloc(png_ptr, unknowns->size));
+         memcpy(np->data, unknowns->data, unknowns->size);
       }
    }
-
-   info_ptr->unknown_chunks = np;
-   info_ptr->unknown_chunks_num += num_unknowns;
-   info_ptr->free_me |= PNG_FREE_UNKN;
 }
 
 void PNGAPI
 png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
     int chunk, int location)
 {
-   if (png_ptr != NULL && info_ptr != NULL && chunk >= 0 && chunk <
-       info_ptr->unknown_chunks_num)
-      info_ptr->unknown_chunks[chunk].location = (png_byte)location;
+   /* This API is pretty pointless in 1.6.0 because the location can be set
+    * before the call to png_set_unknown_chunks.
+    *
+    * TODO: add a png_app_warning in 1.7
+    */
+   if (png_ptr != NULL && info_ptr != NULL && chunk >= 0 &&
+      (unsigned int)chunk < info_ptr->unknown_chunks_num)
+   {
+      if ((location & (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT)) == 0)
+      {
+         png_app_error(png_ptr, "invalid unknown chunk location");
+         /* Fake out the pre 1.6.0 behavior: */
+         if ((location & PNG_HAVE_IDAT)) /* undocumented! */
+            location = PNG_AFTER_IDAT;
+
+         else
+            location = PNG_HAVE_IHDR; /* also undocumented */
+      }
+
+      info_ptr->unknown_chunks[chunk].location =
+         check_location(png_ptr, (png_byte)location);
+   }
 }
 #endif
 
@@ -1160,54 +1202,51 @@ png_permit_mng_features (png_structrp png_ptr, png_uint_32 mng_features)
 #endif
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+static unsigned int
+add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
+{
+   unsigned int i;
+
+   /* Utility function: update the 'keep' state of a chunk if it is already in
+    * the list, otherwise add it to the list.
+    */
+   for (i=0; i<count; ++i, list += 5) if (memcmp(list, add, 4) == 0)
+   {
+      list[4] = (png_byte)keep;
+      return count;
+   }
+
+   if (keep != PNG_HANDLE_CHUNK_AS_DEFAULT)
+   {
+      ++count;
+      memcpy(list, add, 4);
+      list[4] = (png_byte)keep;
+   }
+
+   return count;
+}
+
 void PNGAPI
-png_set_keep_unknown_chunks(png_structrp png_ptr, int keepIn,
+png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
     png_const_bytep chunk_list, int num_chunksIn)
 {
-   png_bytep new_list, p;
-   png_byte keep;
-   unsigned int i, num_chunks, old_num_chunks;
+   png_bytep new_list;
+   unsigned int num_chunks, old_num_chunks;
+
    if (png_ptr == NULL)
       return;
 
-   switch (keepIn)
+   if (keep < 0 || keep >= PNG_HANDLE_CHUNK_LAST)
    {
-      case PNG_HANDLE_CHUNK_AS_DEFAULT:
-         keep = PNG_HANDLE_CHUNK_AS_DEFAULT;
-         break;
-
-      case PNG_HANDLE_CHUNK_NEVER:
-         keep = PNG_HANDLE_CHUNK_NEVER;
-         break;
-
-      case PNG_HANDLE_CHUNK_IF_SAFE:
-         keep = PNG_HANDLE_CHUNK_IF_SAFE;
-         break;
-
-      case PNG_HANDLE_CHUNK_ALWAYS:
-         keep = PNG_HANDLE_CHUNK_ALWAYS;
-         break;
-
-
-      default:
-         png_app_error(png_ptr, "png_set_keep_unknown_chunks: invalid keep");
-         return;
+      png_app_error(png_ptr, "png_set_keep_unknown_chunks: invalid keep");
+      return;
    }
 
    if (num_chunksIn <= 0)
    {
-      if (keep == PNG_HANDLE_CHUNK_ALWAYS || keep == PNG_HANDLE_CHUNK_IF_SAFE)
-         png_ptr->flags |= PNG_FLAG_KEEP_UNKNOWN_CHUNKS;
+      png_ptr->unknown_default = keep;
 
-      else
-         png_ptr->flags &= ~PNG_FLAG_KEEP_UNKNOWN_CHUNKS;
-
-      if (keep == PNG_HANDLE_CHUNK_ALWAYS)
-         png_ptr->flags |= PNG_FLAG_KEEP_UNSAFE_CHUNKS;
-
-      else
-         png_ptr->flags &= ~PNG_FLAG_KEEP_UNSAFE_CHUNKS;
-
+      /* '0' means just set the flags, so stop here */
       if (num_chunksIn == 0)
         return;
    }
@@ -1244,12 +1283,20 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keepIn,
    else /* num_chunksIn > 0 */
    {
       if (chunk_list == NULL)
+      {
+         /* Prior to 1.6.0 this was silently ignored, now it is an app_error
+          * which can be switched off.
+          */
+         png_app_error(png_ptr, "png_set_keep_unknown_chunks: no chunk list");
          return;
+      }
 
       num_chunks = num_chunksIn;
    }
 
    old_num_chunks = png_ptr->num_chunk_list;
+   if (png_ptr->chunk_list == NULL)
+      old_num_chunks = 0;
 
    /* Since num_chunks is always restricted to UINT_MAX/5 this can't overflow.
     */
@@ -1259,24 +1306,73 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keepIn,
       return;
    }
 
-   new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
-       5 * (num_chunks + old_num_chunks)));
-
-   if (png_ptr->chunk_list != NULL)
+   /* If these chunks are being reset to the default then no more memory is
+    * required because add_one_chunk above doesn't extend the list if the 'keep'
+    * parameter is the default.
+    */
+   if (keep)
    {
-      memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
-      png_free(png_ptr, png_ptr->chunk_list);
-      png_ptr->chunk_list=NULL;
+      new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
+          5 * (num_chunks + old_num_chunks)));
+
+      if (old_num_chunks > 0)
+         memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
    }
 
-   memcpy(new_list + 5*old_num_chunks, chunk_list, 5*num_chunks);
+   else if (old_num_chunks > 0)
+      new_list = png_ptr->chunk_list;
 
-   for (p = new_list + 5*old_num_chunks + 4, i = 0; i<num_chunks; i++, p += 5)
-      *p=keep;
+   else
+      new_list = NULL;
 
-   png_ptr->num_chunk_list = old_num_chunks + num_chunks;
-   png_ptr->chunk_list = new_list;
-   png_ptr->free_me |= PNG_FREE_LIST;
+   /* Add the new chunks together with each one's handling code.  If the chunk
+    * already exists the code is updated, otherwise the chunk is added to the
+    * end.  (In libpng 1.6.0 order no longer matters because this code enforces
+    * the earlier convention that the last setting is the one that is used.)
+    */
+   if (new_list != NULL)
+   {
+      png_const_bytep inlist;
+      png_bytep outlist;
+      unsigned int i;
+
+      for (i=0; i<num_chunks; ++i)
+         old_num_chunks = add_one_chunk(new_list, old_num_chunks,
+            chunk_list+5*i, keep);
+
+      /* Now remove any spurious 'default' entries. */
+      num_chunks = 0;
+      for (i=0, inlist=outlist=new_list; i<old_num_chunks; ++i, inlist += 5)
+         if (inlist[4])
+         {
+            if (outlist != inlist)
+               memcpy(outlist, inlist, 5);
+            outlist += 5;
+            ++num_chunks;
+         }
+
+      /* This means the application has removed all the specialized handling. */
+      if (num_chunks == 0)
+      {
+         if (png_ptr->chunk_list != new_list)
+            png_free(png_ptr, new_list);
+
+         new_list = NULL;
+      }
+   }
+
+   else
+      num_chunks = 0;
+
+   png_ptr->num_chunk_list = num_chunks;
+
+   if (png_ptr->chunk_list != new_list)
+   {
+      if (png_ptr->chunk_list != NULL)
+         png_free(png_ptr, png_ptr->chunk_list);
+
+      png_ptr->chunk_list = new_list;
+   }
 }
 #endif
 

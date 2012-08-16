@@ -185,6 +185,9 @@ void /* PRIVATE */
 png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_uint_32 chunk_name;
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+   int keep; /* unknown handling method */
+#endif
 
    /* First we make sure we have enough data for the 4 byte chunk name
     * and the 4 byte chunk length before proceeding with decoding the
@@ -216,14 +219,28 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
    if (chunk_name == png_IDAT)
    {
-      /* This is here above the if/else case statement below because if the
-       * unknown handling marks 'IDAT' as unknown then the IDAT handling case is
-       * completely skipped.
-       *
-       * TODO: there must be a better way of doing this.
-       */
       if (png_ptr->mode & PNG_AFTER_IDAT)
          png_ptr->mode |= PNG_HAVE_CHUNK_AFTER_IDAT;
+
+      /* If we reach an IDAT chunk, this means we have read all of the
+       * header chunks, and we can start reading the image (or if this
+       * is called after the image has been read - we have an error).
+       */
+      if (!(png_ptr->mode & PNG_HAVE_IHDR))
+         png_error(png_ptr, "Missing IHDR before IDAT");
+
+      else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+          !(png_ptr->mode & PNG_HAVE_PLTE))
+         png_error(png_ptr, "Missing PLTE before IDAT");
+
+      png_ptr->mode |= PNG_HAVE_IDAT;
+
+      if (!(png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
+         if (png_ptr->push_length == 0)
+            return;
+
+      if (png_ptr->mode & PNG_AFTER_IDAT)
+         png_benign_error(png_ptr, "Too many IDATs found");
    }
 
    if (chunk_name == png_IHDR)
@@ -255,7 +272,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   else if (png_chunk_unknown_handling(png_ptr, chunk_name))
+   else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)))
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {
@@ -263,23 +280,10 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
          return;
       }
 
-      if (chunk_name == png_IDAT)
-         png_ptr->mode |= PNG_HAVE_IDAT;
-
-      png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length);
+      png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length, keep);
 
       if (chunk_name == png_PLTE)
          png_ptr->mode |= PNG_HAVE_PLTE;
-
-      else if (chunk_name == png_IDAT)
-      {
-         if (!(png_ptr->mode & PNG_HAVE_IHDR))
-            png_error(png_ptr, "Missing IHDR before IDAT");
-
-         else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-             !(png_ptr->mode & PNG_HAVE_PLTE))
-            png_error(png_ptr, "Missing PLTE before IDAT");
-      }
    }
 
 #endif
@@ -295,30 +299,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
    else if (chunk_name == png_IDAT)
    {
-      /* If we reach an IDAT chunk, this means we have read all of the
-       * header chunks, and we can start reading the image (or if this
-       * is called after the image has been read - we have an error).
-       */
-
-      if (!(png_ptr->mode & PNG_HAVE_IHDR))
-         png_error(png_ptr, "Missing IHDR before IDAT");
-
-      else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-          !(png_ptr->mode & PNG_HAVE_PLTE))
-         png_error(png_ptr, "Missing PLTE before IDAT");
-
-      if (png_ptr->mode & PNG_HAVE_IDAT)
-      {
-         if (!(png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT))
-            if (png_ptr->push_length == 0)
-               return;
-
-         if (png_ptr->mode & PNG_AFTER_IDAT)
-            png_benign_error(png_ptr, "Too many IDATs found");
-      }
-
       png_ptr->idat_size = png_ptr->push_length;
-      png_ptr->mode |= PNG_HAVE_IDAT;
       png_ptr->process_mode = PNG_READ_IDAT_MODE;
       png_push_have_info(png_ptr, info_ptr);
       png_ptr->zstream.avail_out =
@@ -556,7 +537,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
          png_push_save_buffer(png_ptr);
          return;
       }
-      png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length);
+      png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length,
+         PNG_HANDLE_CHUNK_AS_DEFAULT);
    }
 
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;

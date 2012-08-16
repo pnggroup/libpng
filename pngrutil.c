@@ -2732,136 +2732,247 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 }
 #endif
 
-/* This function is called when we haven't found a handler for a
- * chunk.  If there isn't a problem with the chunk itself (ie bad
- * chunk name, CRC, or a critical chunk), the chunk is silently ignored
- * -- unless the PNG_FLAG_UNKNOWN_CHUNKS_SUPPORTED flag is on in which
- * case it will be saved away to be written out later.
- */
-void /* PRIVATE */
-png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
-   png_uint_32 length)
-{
-   png_uint_32 skip = 0;
-
-   png_debug(1, "in png_handle_unknown");
-
-#ifdef PNG_USER_LIMITS_SUPPORTED
-   if (png_ptr->user_chunk_cache_max != 0)
-   {
-      if (png_ptr->user_chunk_cache_max == 1)
-      {
-         png_crc_finish(png_ptr, length);
-         return;
-      }
-
-      if (--png_ptr->user_chunk_cache_max == 1)
-      {
-         png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
-         return;
-      }
-   }
-#endif
-
-   if (png_ptr->mode & PNG_HAVE_IDAT)
-   {
-      if (png_ptr->chunk_name != png_IDAT)
-         png_ptr->mode |= PNG_AFTER_IDAT;
-   }
-
-   if (PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
-   {
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      if (png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name) !=
-          PNG_HANDLE_CHUNK_ALWAYS
-#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-          && png_ptr->read_user_chunk_fn == NULL
-#endif
-          )
-#endif
-         png_chunk_error(png_ptr, "unknown critical chunk");
-   }
-
 #ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
-   if ((png_ptr->flags & PNG_FLAG_KEEP_UNKNOWN_CHUNKS)
-#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-       || (png_ptr->read_user_chunk_fn != NULL)
-#endif
-       )
-   {
-#ifdef PNG_MAX_MALLOC_64K
-      if (length > 65535)
-      {
-         png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr,
-            "unknown chunk too large to fit in memory");
-         return;
-      }
-#endif
+/* Utility function for png_handle_unknown; set up png_ptr::unknown_chunk */
+static int
+png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
+{
+   png_alloc_size_t limit = PNG_SIZE_MAX;
 
-      /* TODO: this code is very close to the unknown handling in pngpread.c,
-       * maybe it can be put into a common utility routine?
-       * png_struct::unknown_chunk is just used as a temporary variable, along
-       * with the data into which the chunk is read.  These can be eliminated.
-       */
+   if (png_ptr->unknown_chunk.data != NULL)
+   {
+      png_free(png_ptr, png_ptr->unknown_chunk.data);
+      png_ptr->unknown_chunk.data = NULL;
+   }
+
+#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+      if (png_ptr->user_chunk_malloc_max > 0 &&
+         png_ptr->user_chunk_malloc_max < limit)
+         limit = png_ptr->user_chunk_malloc_max;
+
+#  elif PNG_USER_CHUNK_MALLOC_MAX > 0
+      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
+         limit = PNG_USER_CHUNK_MALLOC_MAX;
+#  endif
+
+   if (length <= limit)
+   {
       PNG_CSTRING_FROM_CHUNK(png_ptr->unknown_chunk.name, png_ptr->chunk_name);
-      png_ptr->unknown_chunk.size = (png_size_t)length;
+      /* The following is safe because of the PNG_SIZE_MAX init above */
+      png_ptr->unknown_chunk.size = (png_size_t)length/*SAFE*/;
+      /* 'mode' is a flag array, only the bottom four bits matter here */
+      png_ptr->unknown_chunk.location = (png_byte)png_ptr->mode/*SAFE*/;
 
       if (length == 0)
          png_ptr->unknown_chunk.data = NULL;
 
       else
       {
-         png_ptr->unknown_chunk.data = (png_bytep)png_malloc(png_ptr, length);
-         png_crc_read(png_ptr, png_ptr->unknown_chunk.data, length);
+         /* Do a 'warn' here - it is handled below. */
+         png_ptr->unknown_chunk.data = png_voidcast(png_bytep,
+            png_malloc_warn(png_ptr, length));
       }
+   }
 
-#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-      if (png_ptr->read_user_chunk_fn != NULL)
-      {
-         /* Callback to user unknown chunk handler */
-         int ret;
-
-         ret = (*(png_ptr->read_user_chunk_fn))
-             (png_ptr, &png_ptr->unknown_chunk);
-
-         if (ret < 0)
-            png_chunk_error(png_ptr, "error in user chunk");
-
-         if (ret == 0)
-         {
-            if (PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
-            {
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-               if (png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name) !=
-                   PNG_HANDLE_CHUNK_ALWAYS)
-#endif
-                  png_chunk_error(png_ptr, "unknown critical chunk");
-            }
-
-            png_set_unknown_chunks(png_ptr, info_ptr,
-                &png_ptr->unknown_chunk, 1);
-         }
-      }
-
-      else
-#endif
-         png_set_unknown_chunks(png_ptr, info_ptr, &png_ptr->unknown_chunk, 1);
-
-      png_free(png_ptr, png_ptr->unknown_chunk.data);
-      png_ptr->unknown_chunk.data = NULL;
+   if (png_ptr->unknown_chunk.data == NULL && length > 0)
+   {
+      /* This is benign because we clean up correctly */
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "unknown chunk exceeds memory limits");
+      return 0;
    }
 
    else
-#endif
-      skip = length;
+   {
+      if (length > 0)
+         png_crc_read(png_ptr, png_ptr->unknown_chunk.data, length);
+      png_crc_finish(png_ptr, 0);
+      return 1;
+   }
+}
+#endif /* PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
 
-   png_crc_finish(png_ptr, skip);
+/* Handle an unknown, or known but disabled, chunk */
+void /* PRIVATE */
+png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
+   png_uint_32 length, int keep)
+{
+   int handled = 0; /* the chunk was handled */
 
-#ifndef PNG_READ_USER_CHUNKS_SUPPORTED
-   PNG_UNUSED(info_ptr) /* Quiet compiler warnings about unused info_ptr */
-#endif
+   png_debug(1, "in png_handle_unknown");
+
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+   /* NOTE: this code is based on the code in libpng-1.4.12 except for fixing
+    * the bug which meant that setting a non-default behavior for a specific
+    * chunk would be ignored (the default was always used unless a user
+    * callback was installed).
+    *
+    * 'keep' is the value from the png_chunk_unknown_handling, the setting for
+    * this specific chunk_name, if PNG_HANDLE_AS_UNKNOWN_SUPPORTED, if not it
+    * will always be PNG_HANDLE_CHUNK_AS_DEFAULT and it needs to be set here.
+    * This is just an optimization to avoid multiple calls to the lookup
+    * function.
+    */
+#  ifndef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+      keep = png_chunk_unknown_handling(png_ptr, png_ptr->chunk_name);
+#  endif
+
+   /* One of the following methods will read the chunk or skip it (at least one
+    * of these is always defined because this is the only way to switch on
+    * PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+    */
+#  ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+      /* The user callback takes precedence over the chunk keep value, but the
+       * keep value is still required to validate a save of a critical chunk.
+       */
+      if (png_ptr->read_user_chunk_fn != NULL)
+      {
+         if (png_cache_unknown_chunk(png_ptr, length))
+         {
+            /* Callback to user unknown chunk handler */
+            int ret = (*(png_ptr->read_user_chunk_fn))(png_ptr,
+               &png_ptr->unknown_chunk);
+
+            /* ret is:
+             * negative: An error occured, png_chunk_error will be called.
+             *     zero: The chunk was not handled, the chunk will be discarded
+             *           unless png_set_keep_unknown_chunks has been used to set
+             *           a 'keep' behavior for this particular chunk, in which
+             *           case that will be used.  A critical chunk will cause an
+             *           error at this point unless it is to be saved.
+             * positive: The chunk was handled, libpng will ignore/discard it.
+             */
+            if (ret < 0)
+               png_chunk_error(png_ptr, "error in user chunk");
+
+            else if (ret == 0)
+            {
+               /* If the keep value is 'default' or 'never' override it, but
+                * still error out on critical chunks unless the keep value is
+                * 'always'  While this is weird it is the behavior in 1.4.12.  A
+                * possible improvement would be to obey the value set for the
+                * chunk, but this would be an API change that would probably
+                * damage some applications.
+                *
+                * The png_app_warning below catches the case that matters, where
+                * the application has neither set specific save for this chunk
+                * or global save.
+                */
+               if (keep < PNG_HANDLE_CHUNK_IF_SAFE)
+               {
+#                 ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+                     if (png_ptr->unknown_default < PNG_HANDLE_CHUNK_IF_SAFE)
+                        png_app_warning(png_ptr,
+ "forcing save of an unhandled chunk; please call png_set_keep_unknown_chunks");
+#                 endif
+                  keep = PNG_HANDLE_CHUNK_IF_SAFE;
+               }
+            }
+
+            else /* chunk was handled */
+            {
+               handled = 1;
+               /* Critical chunks can be safely discarded at this point. */
+               keep = PNG_HANDLE_CHUNK_NEVER;
+            }
+         }
+
+         else
+            keep = PNG_HANDLE_CHUNK_NEVER; /* insufficient memory */
+      }
+
+#     ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+         else
+#     endif
+#  endif /* PNG_READ_USER_CHUNKS_SUPPORTED */
+
+#  ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+      {
+         /* keep is currently just the per-chunk setting, if there was no
+          * setting change it to the global default now (not that this may
+          * still be AS_DEFAULT) then obtain the cache of the chunk if required,
+          * if not simply skip the chunk.
+          */
+         if (keep == PNG_HANDLE_CHUNK_AS_DEFAULT)
+            keep = png_ptr->unknown_default;
+
+         if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
+            (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
+             PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+         {
+            if (!png_cache_unknown_chunk(png_ptr, length))
+               keep = PNG_HANDLE_CHUNK_NEVER;
+         }
+
+         else
+            png_crc_finish(png_ptr, length);
+      }
+#  else
+#     ifndef PNG_READ_USER_CHUNKS_SUPPORTED
+#        error no method to support READ_UNKNOWN_CHUNKS
+#     endif
+#  endif
+
+#  ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+      /* Now store the chunk in the chunk list if appropriate, and if the limits
+       * permit it.
+       */
+      if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
+         (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
+          PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+      {
+#     ifdef PNG_USER_LIMITS_SUPPORTED
+         switch (png_ptr->user_chunk_cache_max)
+         {
+            case 2:
+               png_ptr->user_chunk_cache_max = 1;
+               png_chunk_benign_error(png_ptr, "no space in chunk cache");
+               /* FALL THROUGH */
+            case 1:
+               /* NOTE: prior to 1.6.0 this case resulted in an unknown critical
+                * chunk being skipped, now there will be a hard error below.
+                */
+               break;
+
+            default: /* not at limit */
+               --(png_ptr->user_chunk_cache_max);
+               /* FALL THROUGH */
+            case 0: /* no limit */
+#     endif /* PNG_USER_LIMITS_SUPPORTED */
+               /* Here when the limit isn't reached or when limits are compiled
+                * out; store the chunk.
+                */
+               png_set_unknown_chunks(png_ptr, info_ptr,
+                  &png_ptr->unknown_chunk, 1);
+               handled = 1;
+#     ifdef PNG_USER_LIMITS_SUPPORTED
+               break;
+         }
+#     endif
+      }
+#  else /* no store support! */
+      PNG_UNUSED(info_ptr)
+#     error untested code (reading unknown chunks with no store support)
+#  endif
+
+   /* Regardless of the error handling below the cached data (if any) can be
+    * freed now.  Notice that the data is not freed if there is a png_error, but
+    * it will be freed by destroy_read_struct.
+    */
+   if (png_ptr->unknown_chunk.data != NULL)
+      png_free(png_ptr, png_ptr->unknown_chunk.data);
+   png_ptr->unknown_chunk.data = NULL;
+
+#else /* !PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
+   /* There is no support to read an unknown chunk, so just skip it. */
+   png_crc_finish(png_ptr, length);
+   PNG_UNUSED(info_ptr)
+   PNG_UNUSED(keep)
+#endif /* !PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
+
+   /* Check for unhandled critical chunks */
+   if (!handled && PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
+      png_chunk_error(png_ptr, "unhandled critical chunk");
 }
 
 /* This function is called to verify that a chunk name is valid.
