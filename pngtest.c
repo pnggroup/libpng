@@ -108,6 +108,17 @@ static int warning_count = 0; /* count calls to png_warning */
 #  define png_jmpbuf(png_ptr) png_ptr->jmpbuf
 #endif
 
+/* Defines for unknown chunk handling if required. */
+#ifndef PNG_HANDLE_CHUNK_ALWAYS
+#  define PNG_HANDLE_CHUNK_ALWAYS       3
+#endif
+#ifndef PNG_HANDLE_CHUNK_IF_SAFE
+#  define PNG_HANDLE_CHUNK_IF_SAFE      2
+#endif
+
+/* Utility to save typing/errors, the argument must be a name */
+#define MEMZERO(var) ((void)memset(&var, 0, sizeof var))
+
 /* Example of using row callbacks to make a simple progress meter */
 static int status_pass = 1;
 static int status_dots_requested = 0;
@@ -566,28 +577,73 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 /* END of code to test memory allocation/deallocation */
 
 
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
 /* Demonstration of user chunk support of the sTER and vpAg chunks */
 
 /* (sTER is a public chunk not yet known by libpng.  vpAg is a private
 chunk used in ImageMagick to store "virtual page" size).  */
 
-/* The initializer must match the values actually stored in pngtest.png so that
- * pngtest will pass if we don't have read callback support.
- */
-static png_uint_32 user_chunk_data[4] = {2, 'd', 'd', 0};
+static struct user_chunk_data
+{
+   png_const_infop info_ptr;
+   png_uint_32     vpAg_width, vpAg_height;
+   png_byte        vpAg_units;
+   png_byte        sTER_mode;
+   int             location[2];
+}
+user_chunk_data;
 
-    /* 0: sTER mode + 1
-     * 1: vpAg width
-     * 2: vpAg height
-     * 3: vpAg units
-     */
+/* Used for location and order; zero means nothing. */
+#define have_sTER   0x01
+#define have_vpAg   0x02
+#define before_PLTE 0x10
+#define before_IDAT 0x20
+#define after_IDAT  0x40
 
-#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+static void
+init_callback_info(png_const_infop info_ptr)
+{
+   MEMZERO(user_chunk_data);
+   user_chunk_data.info_ptr = info_ptr;
+}
+
+static int
+set_location(png_structp png_ptr, struct user_chunk_data *data, int what)
+{
+   int location;
+
+   if ((data->location[0] & what) || (data->location[1] & what))
+      return 0; /* already have one of these */
+
+   /* Find where we are (the code below zeros info_ptr to indicate that the
+    * chunks before the first IDAT have been read.)
+    */
+   if (data->info_ptr == NULL) /* after IDAT */
+      location = what | after_IDAT;
+
+   else if (png_get_valid(png_ptr, data->info_ptr, PNG_INFO_PLTE))
+      location = what | before_IDAT;
+
+   else
+      location = what | before_PLTE;
+
+   if (data->location[0] == 0)
+      data->location[0] = location;
+
+   else
+      data->location[1] = location;
+
+   return 1; /* handled */
+}
+
 static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
    png_unknown_chunkp chunk)
 {
-   png_uint_32
-     *my_user_chunk_data;
+   struct user_chunk_data *my_user_chunk_data =
+      (struct user_chunk_data*)png_get_user_chunk_ptr(png_ptr);
+
+   if (my_user_chunk_data == NULL)
+      png_error(png_ptr, "lost user chunk pointer");
 
    /* Return one of the following:
     *    return (-n);  chunk had an error
@@ -612,9 +668,14 @@ static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
          if (chunk->data[0] != 0 && chunk->data[0] != 1)
             return (-1);  /* Invalid mode */
 
-         my_user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
-         my_user_chunk_data[0]=chunk->data[0]+1;
-         return (1);
+         if (set_location(png_ptr, my_user_chunk_data, have_sTER))
+         {
+            my_user_chunk_data->sTER_mode=chunk->data[0];
+            return (1);
+         }
+
+         else
+            return (0); /* duplicate sTER - give it to libpng */
       }
 
    if (chunk->name[0] != 118 || chunk->name[1] != 112 ||    /* v  p */
@@ -626,15 +687,70 @@ static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
    if (chunk->size != 9)
       return (-1); /* Error return */
 
-   my_user_chunk_data=(png_uint_32 *) png_get_user_chunk_ptr(png_ptr);
+   if (!set_location(png_ptr, my_user_chunk_data, have_vpAg))
+      return (0);  /* duplicate vpAg */
 
-   my_user_chunk_data[1]=png_get_uint_31(png_ptr, chunk->data);
-   my_user_chunk_data[2]=png_get_uint_31(png_ptr, chunk->data + 4);
-   my_user_chunk_data[3]=(png_uint_32)chunk->data[8];
+   my_user_chunk_data->vpAg_width = png_get_uint_31(png_ptr, chunk->data);
+   my_user_chunk_data->vpAg_height = png_get_uint_31(png_ptr, chunk->data + 4);
+   my_user_chunk_data->vpAg_units = chunk->data[8];
 
    return (1);
-
 }
+
+#ifdef PNG_WRITE_SUPPORTED
+static void
+write_sTER_chunk(png_structp write_ptr)
+{
+   png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
+
+   if (verbose)
+      fprintf(STDERR, "\n stereo mode = %d\n", user_chunk_data.sTER_mode);
+
+   png_write_chunk(write_ptr, png_sTER, &user_chunk_data.sTER_mode, 1);
+}
+
+static void
+write_vpAg_chunk(png_structp write_ptr)
+{
+   png_byte png_vpAg[5] = {118, 112,  65, 103, '\0'};
+
+   png_byte vpag_chunk_data[9];
+
+   if (verbose)
+      fprintf(STDERR, " vpAg = %lu x %lu, units = %d\n",
+        (unsigned long)user_chunk_data.vpAg_width,
+        (unsigned long)user_chunk_data.vpAg_height,
+        user_chunk_data.vpAg_units);
+
+   png_save_uint_32(vpag_chunk_data, user_chunk_data.vpAg_width);
+   png_save_uint_32(vpag_chunk_data + 4, user_chunk_data.vpAg_height);
+   vpag_chunk_data[8] = user_chunk_data.vpAg_units;
+   png_write_chunk(write_ptr, png_vpAg, vpag_chunk_data, 9);
+}
+
+static void
+write_chunks(png_structp write_ptr, int location)
+{
+   int i;
+
+   /* Notice that this preserves the original chunk order, however chunks
+    * intercepted by the callback will be written *after* chunks passed to
+    * libpng.  This will actually reverse a pair of sTER chunks or a pair of
+    * vpAg chunks, resulting in an error later.  This is not worth worrying
+    * about - the chunks should not be duplicated!
+    */
+   for (i=0; i<2; ++i)
+   {
+      if (user_chunk_data.location[i] == (location | have_sTER))
+         write_sTER_chunk(write_ptr);
+
+      else if (user_chunk_data.location[i] == (location | have_vpAg))
+         write_vpAg_chunk(write_ptr);
+   }
+}
+#endif /* PNG_WRITE_SUPPORTED */
+#else /* !PNG_READ_USER_CHUNKS_SUPPORTED */
+#  define write_chunks(pp,loc) ((void)0)
 #endif
 /* END of code to demonstrate user chunk support */
 
@@ -729,15 +845,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        pngtest_warning);
 #endif
 
-#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-   user_chunk_data[0] = 0;
-   user_chunk_data[1] = 0;
-   user_chunk_data[2] = 0;
-   user_chunk_data[3] = 0;
-   png_set_read_user_chunk_fn(read_ptr, user_chunk_data,
-     read_user_chunk_callback);
-
-#endif
 #ifdef PNG_WRITE_SUPPORTED
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    write_ptr =
@@ -758,6 +865,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_WRITE_SUPPORTED
    write_info_ptr = png_create_info_struct(write_ptr);
    write_end_info_ptr = png_create_info_struct(write_ptr);
+#endif
+
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+   init_callback_info(read_info_ptr);
+   png_set_read_user_chunk_fn(read_ptr, &user_chunk_data,
+     read_user_chunk_callback);
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -865,28 +978,36 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_set_write_user_transform_fn(write_ptr, count_zero_samples);
 #endif
 
-#if 0 /* the following code is pointless, it doesn't work unless
-         PNG_READ_USER_CHUNKS_SUPPORTED, in which case it does nothing. */
 #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
-#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
-#  ifndef PNG_HANDLE_CHUNK_ALWAYS
-#    define PNG_HANDLE_CHUNK_ALWAYS       3
-#  endif
+   /* Preserve all the unknown chunks, if possible.  If this is disabled then,
+    * even if the png_{get,set}_unknown_chunks stuff is enabled, we can't use
+    * libpng to *save* the unknown chunks on read (because we can't switch the
+    * save option on!)
+    *
+    * Notice that if SET_UNKNOWN_CHUNKS is *not* supported read will discard all
+    * unknown chunks and write will write them all.
+    */
+#ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
    png_set_keep_unknown_chunks(read_ptr, PNG_HANDLE_CHUNK_ALWAYS,
       NULL, 0);
 #endif
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
-#  ifndef PNG_HANDLE_CHUNK_IF_SAFE
-#    define PNG_HANDLE_CHUNK_IF_SAFE      2
-#  endif
-   png_set_keep_unknown_chunks(write_ptr, PNG_HANDLE_CHUNK_IF_SAFE,
+   png_set_keep_unknown_chunks(write_ptr, PNG_HANDLE_CHUNK_ALWAYS,
       NULL, 0);
-#endif
 #endif
 #endif
 
    pngtest_debug("Reading info struct");
    png_read_info(read_ptr, read_info_ptr);
+
+#ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+   /* This is a bit of a hack; there is no obvious way in the callback function
+    * to determine that the chunks before the first IDAT have been read, so
+    * remove the info_ptr (which is only used to determine position relative to
+    * PLTE) here to indicate that we are after the IDAT.
+    */
+   user_chunk_data.info_ptr = NULL;
+#endif
 
    pngtest_debug("Transferring info struct");
    {
@@ -1149,16 +1270,20 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
       if (num_unknowns)
       {
-         int i;
          png_set_unknown_chunks(write_ptr, write_info_ptr, unknowns,
            num_unknowns);
+#if PNG_LIBPNG_VER < 10600
          /* Copy the locations from the read_info_ptr.  The automatically
-          * generated locations in write_info_ptr are wrong because we
-          * haven't written anything yet.
+          * generated locations in write_end_info_ptr are wrong prior to 1.6.0
+          * because they are reset from the write pointer (removed in 1.6.0).
           */
-         for (i = 0; i < num_unknowns; i++)
-           png_set_unknown_chunk_location(write_ptr, write_info_ptr, i,
-             unknowns[i].location);
+         {
+            int i;
+            for (i = 0; i < num_unknowns; i++)
+              png_set_unknown_chunk_location(write_ptr, write_info_ptr, i,
+                unknowns[i].location);
+         }
+#endif
       }
    }
 #endif
@@ -1166,45 +1291,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_WRITE_SUPPORTED
    pngtest_debug("Writing info struct");
 
-/* If we wanted, we could write info in two steps:
- * png_write_info_before_PLTE(write_ptr, write_info_ptr);
- */
+   /* Write the info in two steps so that if we write the 'unknown' chunks here
+    * they go to the correct place.
+    */
+   png_write_info_before_PLTE(write_ptr, write_info_ptr);
+
+   write_chunks(write_ptr, before_PLTE); /* before PLTE */
+
    png_write_info(write_ptr, write_info_ptr);
 
-   if (user_chunk_data[0] != 0)
-   {
-      png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
-
-      unsigned char
-        ster_chunk_data[1];
-
-      if (verbose)
-         fprintf(STDERR, "\n stereo mode = %lu\n",
-           (unsigned long)(user_chunk_data[0] - 1));
-
-      ster_chunk_data[0]=(unsigned char)(user_chunk_data[0] - 1);
-      png_write_chunk(write_ptr, png_sTER, ster_chunk_data, 1);
-   }
-
-   if (user_chunk_data[1] != 0 || user_chunk_data[2] != 0)
-   {
-      png_byte png_vpAg[5] = {118, 112,  65, 103, '\0'};
-
-      unsigned char
-        vpag_chunk_data[9];
-
-      if (verbose)
-         fprintf(STDERR, " vpAg = %lu x %lu, units = %lu\n",
-           (unsigned long)user_chunk_data[1],
-           (unsigned long)user_chunk_data[2],
-           (unsigned long)user_chunk_data[3]);
-
-      png_save_uint_32(vpag_chunk_data, user_chunk_data[1]);
-      png_save_uint_32(vpag_chunk_data + 4, user_chunk_data[2]);
-      vpag_chunk_data[8] = (unsigned char)(user_chunk_data[3] & 0xff);
-      png_write_chunk(write_ptr, png_vpAg, vpag_chunk_data, 9);
-   }
-
+   write_chunks(write_ptr, before_IDAT); /* after PLTE */
 #endif
 
 #ifdef SINGLE_ROWBUF_ALLOC
@@ -1336,20 +1432,32 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
       if (num_unknowns)
       {
-         int i;
          png_set_unknown_chunks(write_ptr, write_end_info_ptr, unknowns,
            num_unknowns);
+#if PNG_LIBPNG_VER < 10600
          /* Copy the locations from the read_info_ptr.  The automatically
-          * generated locations in write_end_info_ptr are wrong because we
-          * haven't written the end_info yet.
+          * generated locations in write_end_info_ptr are wrong prior to 1.6.0
+          * because they are reset from the write pointer (removed in 1.6.0).
           */
-         for (i = 0; i < num_unknowns; i++)
-           png_set_unknown_chunk_location(write_ptr, write_end_info_ptr, i,
-             unknowns[i].location);
+         {
+            int i;
+            for (i = 0; i < num_unknowns; i++)
+              png_set_unknown_chunk_location(write_ptr, write_end_info_ptr, i,
+                unknowns[i].location);
+         }
+#endif
       }
    }
 #endif
+
 #ifdef PNG_WRITE_SUPPORTED
+   /* When the unknown vpAg/sTER chunks are written by pngtest the only way to
+    * do it is to write them *before* calling png_write_end.  When unknown
+    * chunks are written by libpng, however, they are written just before IEND.     * There seems to be no way round this, however vpAg/sTER are not expected
+    * after IDAT.
+    */
+   write_chunks(write_ptr, after_IDAT);
+
    png_write_end(write_ptr, write_end_info_ptr);
 #endif
 

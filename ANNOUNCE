@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta28 - August 16, 2012
+Libpng 1.6.0beta28 - August 17, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -442,7 +442,7 @@ Version 1.6.0beta27 [August 11, 2012]
   Work around gcc 3.x and Microsoft Visual Studio 2010 complaints. Both object
     to the split initialization of num_chunks.
 
-Version 1.6.0beta28 [August 16, 2012]
+Version 1.6.0beta28 [August 17, 2012]
   Unknown handling fixes and clean up. This adds more correct option
     control of the unknown handling, corrects the pre-existing bug where
     the per-chunk 'keep' setting is ignored and makes it possible to skip
@@ -457,7 +457,11 @@ Version 1.6.0beta28 [August 16, 2012]
     also removes the support for storing unknown chunks in the info_struct
     if the only unknown handling enabled is via the callback, allowing libpng
     to be configured with callback reading and none of the unnecessary code.
-
+  Corrected fix for unknown handling in pngtest. This reinstates the
+    libpng handling of unknown chunks other than vpAg and sTER (including
+    unsafe-to-copy chunks which were dropped before) and eliminates the
+    repositioning of vpAg and sTER in pngtest.png by changing pngtest.png
+    (so the chunks are where libpng would put them).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

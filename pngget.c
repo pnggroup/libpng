@@ -1062,7 +1062,7 @@ png_get_tRNS(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 #endif
 
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 int PNGAPI
 png_get_unknown_chunks(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_unknown_chunkpp unknowns)
