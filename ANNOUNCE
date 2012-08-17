@@ -462,6 +462,13 @@ Version 1.6.0beta28 [August 17, 2012]
     unsafe-to-copy chunks which were dropped before) and eliminates the
     repositioning of vpAg and sTER in pngtest.png by changing pngtest.png
     (so the chunks are where libpng would put them).
+  Added "tunknown" test and corrected a logic error in png_handle_unknown()
+    when SAVE support is absent.  Moved the shell test scripts for
+    contrib/libtests from the libpng top directory to contrib/libtests.
+    png_handle_unknown() must always read or skip the chunk, if
+    SAVE_UNKNOWN_CHUNKS is turned off *and* the application does not set
+    a user callback an unknown chunk will not be read, leading to a read
+    error, which was revealed by the "tunknown" test.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

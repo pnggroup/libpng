@@ -11,12 +11,9 @@
  *
  * NOTES:
  *   This is a C program that is intended to be linked against libpng.  It
- *   generates bitmaps internally, stores them as PNG files (using the
- *   sequential write code) then reads them back (using the sequential
- *   read code) and validates that the result has the correct data.
- *
- *   The program can be modified and extended to test the correctness of
- *   transformations performed by libpng.
+ *   allows the libpng unknown handling code to be tested by interpreting
+ *   arguemnts to save or discard combinations of chunks.  The program is
+ *   currently just a minimal validation for the built-in libpng facilities.
  */
 
 #include <stdlib.h>
@@ -24,6 +21,8 @@
 #include <stdio.h>
 
 #include <png.h>
+
+#ifdef PNG_READ_SUPPORTED
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the PNG_CONST. */
@@ -365,11 +364,20 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
 
                if (chunk >= 0)
                {
-                  png_byte name[5];
+                  /* These #if tests have the effect of skipping the arguments
+                   * if SAVE support is unavailable - we can't do a useful test
+                   * in this case, so we just check the arguments!  This could
+                   * be improved in the future by using the read callback.
+                   */
+#                 ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+                     png_byte name[5];
 
-                  memcpy(name, chunk_info[chunk].name, 5);
-                  png_set_keep_unknown_chunks(png_ptr, option, name, 1);
-                  chunk_info[chunk].keep = option;
+                     memcpy(name, chunk_info[chunk].name, 5);
+                     png_set_keep_unknown_chunks(png_ptr, option, name, 1);
+                     chunk_info[chunk].keep = option;
+#                 else
+                     (void)option;
+#                 endif
                   continue;
                }
 
@@ -378,8 +386,10 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
             case 7: /* default */
                if (memcmp(argv[i], "default", 7) == 0)
                {
-                  png_set_keep_unknown_chunks(png_ptr, option, NULL, 0);
-                  def = option;
+#                 ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+                     png_set_keep_unknown_chunks(png_ptr, option, NULL, 0);
+                     def = option;
+#                 endif
                   continue;
                }
 
@@ -388,14 +398,20 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
             case 3: /* all */
                if (memcmp(argv[i], "all", 3) == 0)
                {
-                  png_set_keep_unknown_chunks(png_ptr, option, NULL, -1);
-                  def = option;
+#                 ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+                     png_set_keep_unknown_chunks(png_ptr, option, NULL, -1);
+                     def = option;
 
-                  for (chunk = 0; chunk < NINFO; ++chunk)
-                     if (chunk_info[chunk].all)
-                        chunk_info[chunk].keep = option;
+                     for (chunk = 0; chunk < NINFO; ++chunk)
+                        if (chunk_info[chunk].all)
+                           chunk_info[chunk].keep = option;
+#                 endif
                   continue;
                }
+
+               break;
+
+            default: /* some misplaced = */
 
                break;
          }
@@ -499,7 +515,7 @@ check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
       int i = find_by_flag(flag);
       int keep = chunk_info[i].keep;
       const char *type;
-      const char *error = NULL;
+      const char *errorx = NULL;
 
       if (chunk_info[i].unknown)
       {
@@ -513,34 +529,38 @@ check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
             type = "UNKNOWN (specified)";
 
          if (flag & known)
-            error = "chunk processed";
+            errorx = "chunk processed";
 
          else switch (keep)
          {
             case PNG_HANDLE_CHUNK_AS_DEFAULT:
                if (flag & unknown)
-                  error = "DEFAULT: unknown chunk saved";
+                  errorx = "DEFAULT: unknown chunk saved";
                break;
 
             case PNG_HANDLE_CHUNK_NEVER:
                if (flag & unknown)
-                  error = "DISCARD: unknown chunk saved";
+                  errorx = "DISCARD: unknown chunk saved";
                break;
 
             case PNG_HANDLE_CHUNK_IF_SAFE:
                if (ancillary(chunk_info[i].name))
                {
                   if (!(flag & unknown))
-                     error = "IF-SAFE: unknown ancillary chunk lost";
+                     errorx = "IF-SAFE: unknown ancillary chunk lost";
                }
 
                else if (flag & unknown)
-                  error = "IF-SAFE: unknown critical chunk saved";
+                  errorx = "IF-SAFE: unknown critical chunk saved";
                break;
 
             case PNG_HANDLE_CHUNK_ALWAYS:
                if (!(flag & unknown))
-                  error = "SAVE: unknown chunk lost";
+                  errorx = "SAVE: unknown chunk lost";
+               break;
+
+            default:
+               errorx = "internal error: bad keep";
                break;
          }
       } /* unknown chunk */
@@ -555,43 +575,47 @@ check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
              * caught below when checking for inconsistent processing.
              */
             if (keep != PNG_HANDLE_CHUNK_AS_DEFAULT)
-               error = "!DEFAULT: known chunk processed";
+               errorx = "!DEFAULT: known chunk processed";
          }
 
          else /* not processed */ switch (keep)
          {
             case PNG_HANDLE_CHUNK_AS_DEFAULT:
-               error = "DEFAULT: known chunk not processed";
+               errorx = "DEFAULT: known chunk not processed";
                break;
 
             case PNG_HANDLE_CHUNK_NEVER:
                if (flag & unknown)
-                  error = "DISCARD: known chunk saved";
+                  errorx = "DISCARD: known chunk saved";
                break;
 
             case PNG_HANDLE_CHUNK_IF_SAFE:
                if (ancillary(chunk_info[i].name))
                {
                   if (!(flag & unknown))
-                     error = "IF-SAFE: known ancillary chunk lost";
+                     errorx = "IF-SAFE: known ancillary chunk lost";
                }
 
                else if (flag & unknown)
-                  error = "IF-SAFE: known critical chunk saved";
+                  errorx = "IF-SAFE: known critical chunk saved";
                break;
 
             case PNG_HANDLE_CHUNK_ALWAYS:
                if (!(flag & unknown))
-                  error = "SAVE: known chunk lost";
+                  errorx = "SAVE: known chunk lost";
+               break;
+
+            default:
+               errorx = "internal error: bad keep (2)";
                break;
          }
       }
 
-      if (error != NULL)
+      if (errorx != NULL)
       {
          ++error_count;
          fprintf(stderr, "%s: %s %s %s: %s\n",
-            file, type, chunk_info[i].name, position, error);
+            file, type, chunk_info[i].name, position, errorx);
       }
 
       chunks &= ~flag;
@@ -622,6 +646,10 @@ main(int argc, const char **argv)
       exit(2);
    }
 
+#  ifndef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+      fprintf(stderr,
+         "test-unknown: warning: no 'save' support so arguments ignored\n");
+#  endif
    fp = fopen(argv[argc], "rb");
    if (fp == NULL)
    {
@@ -681,3 +709,13 @@ main(int argc, const char **argv)
 
    return error_count + (strict ? warning_count : 0);
 }
+
+#else
+int
+main(void)
+{
+   fprintf(stderr,
+   " test ignored because libpng was not built with unknown chunk support\n");
+   return 0;
+}
+#endif

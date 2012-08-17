@@ -2883,9 +2883,8 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
             keep = PNG_HANDLE_CHUNK_NEVER; /* insufficient memory */
       }
 
-#     ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
-         else
-#     endif
+      else
+         /* Use the SAVE_UNKNOWN_CHUNKS code or skip the chunk */
 #  endif /* PNG_READ_USER_CHUNKS_SUPPORTED */
 
 #  ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
@@ -2913,6 +2912,19 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 #     ifndef PNG_READ_USER_CHUNKS_SUPPORTED
 #        error no method to support READ_UNKNOWN_CHUNKS
 #     endif
+
+      {
+         /* If here there is no read callback pointer set and no support is
+          * compiled in to just save the unknown chunks, so simply skip this
+          * chunk.  If 'keep' is something other than AS_DEFAULT or NEVER then
+          * the app has erroneously asked for unknown chunk saving when there
+          * is no support.
+          */
+         if (keep > PNG_HANDLE_CHUNK_NEVER)
+            png_app_error(png_ptr, "no unknown chunk support available");
+
+         png_crc_finish(png_ptr, length);
+      }
 #  endif
 
 #  ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED

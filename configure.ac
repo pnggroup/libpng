@@ -25,7 +25,7 @@ AC_CONFIG_MACRO_DIR([scripts])
 # color-tests requires automake 1.11 or later
 # silent-rules requires automake 1.11 or later
 # dist-xz requires automake 1.11 or later
-# 1.11.1 fixes a security issue in 1.11
+# 1.12.2 fixes a security issue in 1.11.2 and 1.12.1
 AM_INIT_AUTOMAKE([1.12.2 foreign dist-xz dist-bzip2 color-tests silent-rules])
 # was:
 # AM_INIT_AUTOMAKE
