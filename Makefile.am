@@ -14,14 +14,14 @@ pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 TESTS = test-pngtest.sh
 
 # Only do the following if the contrib directory is present.
-check_PROGRAMS+= pngvalid pngstest tunknown
+check_PROGRAMS+= pngvalid pngstest pngunknown
 pngvalid_SOURCES = contrib/libtests/pngvalid.c
 pngstest_SOURCES = contrib/libtests/pngstest.c
-tunknown_SOURCES = contrib/libtests/test-unknown.c
+pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-tunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS += contrib/libtests/test-unknown.sh\
+pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+TESTS += contrib/libtests/test-pngunknown.sh\
 	 contrib/libtests/test-pngvalid-simple.sh\
 	 contrib/libtests/test-pngvalid-full.sh\
 	 contrib/libtests/test-pngstest.sh

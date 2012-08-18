@@ -1,5 +1,5 @@
 
-/* test-unknown.c - test the read side unknown chunk handling
+/* pngunknown.c - test the read side unknown chunk handling
  *
  * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  * Copyright (c) 2012 Glenn Randers-Pehrson
@@ -12,7 +12,7 @@
  * NOTES:
  *   This is a C program that is intended to be linked against libpng.  It
  *   allows the libpng unknown handling code to be tested by interpreting
- *   arguemnts to save or discard combinations of chunks.  The program is
+ *   arguments to save or discard combinations of chunks.  The program is
  *   currently just a minimal validation for the built-in libpng facilities.
  */
 
@@ -61,7 +61,7 @@ typedef png_byte *png_const_bytep;
 #endif
 
 #if PNG_LIBPNG_VER < 10600
-   /* 1.6.0 constifies many APIs, the following exists to allow pngvalid to be
+   /* 1.6.0 constifies many APIs. The following exists to allow pngvalid to be
     * compiled against earlier versions.
     */
 #  define png_const_structp png_structp
@@ -189,7 +189,7 @@ find_by_flag(png_uint_32 flag)
 
    while (--i >= 0) if (chunk_info[i].flag == flag) return i;
 
-   fprintf(stderr, "test-unknown: internal error\n");
+   fprintf(stderr, "pngunknown: internal error\n");
    exit(4);
 }
 
@@ -270,7 +270,7 @@ get_unknown(const char *file, int def, png_const_structp png_ptr,
       {
          int chunk = findb(unknown[num_unknown].name);
 
-         /* Chunks not know to test-unknown must be validated here; since they
+         /* Chunks not known to pngunknown must be validated here; since they
           * must also be unknown to libpng the 'def' behavior should have been
           * used.
           */
@@ -640,7 +640,7 @@ main(int argc, const char **argv)
 
    if (--argc < 1)
    {
-      fprintf(stderr, "test-unknown: usage:\n"
+      fprintf(stderr, "pngunknown: usage:\n"
       " %s {(CHNK|default|all)=(default|discard|if-safe|save)} testfile.png\n",
          program);
       exit(2);
@@ -648,7 +648,7 @@ main(int argc, const char **argv)
 
 #  ifndef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
       fprintf(stderr,
-         "test-unknown: warning: no 'save' support so arguments ignored\n");
+         "pngunknown: warning: no 'save' support so arguments ignored\n");
 #  endif
    fp = fopen(argv[argc], "rb");
    if (fp == NULL)

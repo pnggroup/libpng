@@ -9,9 +9,9 @@ image="${srcdir}/pngtest.png"
 exec 4>&1 1>>pngtest-log.txt 2>&1
 
 echo
-echo "============ test-unknown.sh =============="
+echo "============ test-pngunknown.sh =============="
 
-echo "Running test-unknown.sh" >&4
+echo "Running test-pngunknown.sh" >&4
 
 for tests in \
  "discard default=discard"\
@@ -26,11 +26,11 @@ do
    test="$1"
    shift
 
-   if ./tunknown "$@" "$image" 4>&-
+   if ./pngunknown "$@" "$image" 4>&-
    then
-      echo "  PASS: test-unknown $test" >&4
+      echo "  PASS: test-pngunknown $test" >&4
    else
-      echo "  FAIL: test-unknown $test" >&4
+      echo "  FAIL: test-pngunknown $test" >&4
       err=1
    fi
 done

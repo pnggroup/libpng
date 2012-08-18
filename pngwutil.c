@@ -235,18 +235,18 @@ png_image_size(png_structrp png_ptr)
           */
          png_uint_32 w = png_ptr->width;
          unsigned int pd = png_ptr->pixel_depth;
-         png_alloc_size_t cbBase;
+         png_alloc_size_t cb_base;
          int pass;
 
-         for (cbBase=0, pass=0; pass<=6; ++pass)
+         for (cb_base=0, pass=0; pass<=6; ++pass)
          {
             png_uint_32 pw = PNG_PASS_COLS(w, pass);
 
             if (pw > 0)
-               cbBase += (PNG_ROWBYTES(pd, pw)+1) * PNG_PASS_ROWS(h, pass);
+               cb_base += (PNG_ROWBYTES(pd, pw)+1) * PNG_PASS_ROWS(h, pass);
          }
 
-         return cbBase;
+         return cb_base;
       }
 
       else

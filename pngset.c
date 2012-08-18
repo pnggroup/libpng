@@ -80,15 +80,15 @@ png_set_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   XYZ.redX = int_red_X;
-   XYZ.redY = int_red_Y;
-   XYZ.redZ = int_red_Z;
-   XYZ.greenX = int_green_X;
-   XYZ.greenY = int_green_Y;
-   XYZ.greenZ = int_green_Z;
-   XYZ.blueX = int_blue_X;
-   XYZ.blueY = int_blue_Y;
-   XYZ.blueZ = int_blue_Z;
+   XYZ.red_X = int_red_X;
+   XYZ.red_Y = int_red_Y;
+   XYZ.red_Z = int_red_Z;
+   XYZ.green_X = int_green_X;
+   XYZ.green_Y = int_green_Y;
+   XYZ.green_Z = int_green_Z;
+   XYZ.blue_X = int_blue_X;
+   XYZ.blue_Y = int_blue_Y;
+   XYZ.blue_Z = int_blue_Z;
 
    if (png_colorspace_set_endpoints(png_ptr, &info_ptr->colorspace, &XYZ, 2))
       info_ptr->colorspace.flags |= PNG_COLORSPACE_FROM_cHRM;
@@ -1251,7 +1251,7 @@ add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
 
 void PNGAPI
 png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
-    png_const_bytep chunk_list, int num_chunksIn)
+    png_const_bytep chunk_list, int num_chunks_in)
 {
    png_bytep new_list;
    unsigned int num_chunks, old_num_chunks;
@@ -1265,16 +1265,16 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       return;
    }
 
-   if (num_chunksIn <= 0)
+   if (num_chunks_in <= 0)
    {
       png_ptr->unknown_default = keep;
 
       /* '0' means just set the flags, so stop here */
-      if (num_chunksIn == 0)
+      if (num_chunks_in == 0)
         return;
    }
 
-   if (num_chunksIn < 0)
+   if (num_chunks_in < 0)
    {
       /* Ignore all unknown chunks and all chunks recognized by
        * libpng except for IHDR, PLTE, tRNS, IDAT, and IEND
@@ -1303,7 +1303,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       num_chunks = (sizeof chunks_to_ignore)/5;
    }
 
-   else /* num_chunksIn > 0 */
+   else /* num_chunks_in > 0 */
    {
       if (chunk_list == NULL)
       {
@@ -1314,7 +1314,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
          return;
       }
 
-      num_chunks = num_chunksIn;
+      num_chunks = num_chunks_in;
    }
 
    old_num_chunks = png_ptr->num_chunk_list;

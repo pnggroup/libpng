@@ -534,31 +534,31 @@ png_get_cHRM_XYZ(png_const_structrp png_ptr, png_const_inforp info_ptr,
       png_debug1(1, "in %s retrieval function", "cHRM_XYZ(float)");
 
       if (red_X != NULL)
-         *red_X = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.redX,
+         *red_X = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.red_X,
             "cHRM red X");
       if (red_Y != NULL)
-         *red_Y = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.redY,
+         *red_Y = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.red_Y,
             "cHRM red Y");
       if (red_Z != NULL)
-         *red_Z = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.redZ,
+         *red_Z = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.red_Z,
             "cHRM red Z");
       if (green_X != NULL)
          *green_X = png_float(png_ptr,
-            info_ptr->colorspace.end_points_XYZ.greenX, "cHRM green X");
+            info_ptr->colorspace.end_points_XYZ.green_X, "cHRM green X");
       if (green_Y != NULL)
          *green_Y = png_float(png_ptr,
-            info_ptr->colorspace.end_points_XYZ.greenY, "cHRM green Y");
+            info_ptr->colorspace.end_points_XYZ.green_Y, "cHRM green Y");
       if (green_Z != NULL)
          *green_Z = png_float(png_ptr,
-            info_ptr->colorspace.end_points_XYZ.greenZ, "cHRM green Z");
+            info_ptr->colorspace.end_points_XYZ.green_Z, "cHRM green Z");
       if (blue_X != NULL)
-         *blue_X = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blueX,
+         *blue_X = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blue_X,
             "cHRM blue X");
       if (blue_Y != NULL)
-         *blue_Y = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blueY,
+         *blue_Y = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blue_Y,
             "cHRM blue Y");
       if (blue_Z != NULL)
-         *blue_Z = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blueZ,
+         *blue_Z = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blue_Z,
             "cHRM blue Z");
       return (PNG_INFO_cHRM);
    }
@@ -582,23 +582,23 @@ png_get_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
       png_debug1(1, "in %s retrieval function", "cHRM_XYZ");
 
       if (int_red_X != NULL)
-         *int_red_X = info_ptr->colorspace.end_points_XYZ.redX;
+         *int_red_X = info_ptr->colorspace.end_points_XYZ.red_X;
       if (int_red_Y != NULL)
-         *int_red_Y = info_ptr->colorspace.end_points_XYZ.redY;
+         *int_red_Y = info_ptr->colorspace.end_points_XYZ.red_Y;
       if (int_red_Z != NULL)
-         *int_red_Z = info_ptr->colorspace.end_points_XYZ.redZ;
+         *int_red_Z = info_ptr->colorspace.end_points_XYZ.red_Z;
       if (int_green_X != NULL)
-         *int_green_X = info_ptr->colorspace.end_points_XYZ.greenX;
+         *int_green_X = info_ptr->colorspace.end_points_XYZ.green_X;
       if (int_green_Y != NULL)
-         *int_green_Y = info_ptr->colorspace.end_points_XYZ.greenY;
+         *int_green_Y = info_ptr->colorspace.end_points_XYZ.green_Y;
       if (int_green_Z != NULL)
-         *int_green_Z = info_ptr->colorspace.end_points_XYZ.greenZ;
+         *int_green_Z = info_ptr->colorspace.end_points_XYZ.green_Z;
       if (int_blue_X != NULL)
-         *int_blue_X = info_ptr->colorspace.end_points_XYZ.blueX;
+         *int_blue_X = info_ptr->colorspace.end_points_XYZ.blue_X;
       if (int_blue_Y != NULL)
-         *int_blue_Y = info_ptr->colorspace.end_points_XYZ.blueY;
+         *int_blue_Y = info_ptr->colorspace.end_points_XYZ.blue_Y;
       if (int_blue_Z != NULL)
-         *int_blue_Z = info_ptr->colorspace.end_points_XYZ.blueZ;
+         *int_blue_Z = info_ptr->colorspace.end_points_XYZ.blue_Z;
       return (PNG_INFO_cHRM);
    }
 

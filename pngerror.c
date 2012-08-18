@@ -867,9 +867,9 @@ png_safe_warning(png_structp png_nonconst_ptr, png_const_charp warning_message)
 #endif
 
 int /* PRIVATE */
-png_safe_execute(png_imagep imageIn, int (*function)(png_voidp), png_voidp arg)
+png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
 {
-   volatile png_imagep image = imageIn;
+   volatile png_imagep image = image_in;
    volatile int result;
    volatile png_voidp saved_error_buf;
    jmp_buf safe_jmpbuf;

@@ -94,9 +94,9 @@ typedef struct png_xy
  */
 typedef struct png_XYZ
 {
-   png_fixed_point redX, redY, redZ;
-   png_fixed_point greenX, greenY, greenZ;
-   png_fixed_point blueX, blueY, blueZ;
+   png_fixed_point red_X, red_Y, red_Z;
+   png_fixed_point green_X, green_Y, green_Z;
+   png_fixed_point blue_X, blue_Y, blue_Z;
 } png_XYZ;
 #endif /* COLORSPACE */
 
