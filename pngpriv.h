@@ -1471,7 +1471,9 @@ PNG_INTERNAL_FUNCTION(int,png_icc_set_gAMA_and_cHRM,(
    PNG_EMPTY);
    /* 'adler' is the Adler32 checksum of the uncompressed profile data. It may
     * be zero to indicate that it is not available.  It is used, if provided,
-    * as a fast check on the profile when checking to see if it is sRGB.
+    * as a fast check on the profile when checking to see if it is sRGB.  The
+    * result is false only if an error is detected in the profile; the routine
+    * may return true without actually setting cHRM and gAMA values.
     */
 #endif /* iCCP */
 

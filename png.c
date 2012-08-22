@@ -749,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta28 - August 18, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta28 - August 22, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta28 - August 18, 2012\
+      return "libpng version 1.6.0beta28 - August 22, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1028,10 +1028,6 @@ png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
 
          else
             info_ptr->valid &= ~PNG_INFO_cHRM;
-
-         /* TODO: at present it is possible to png_set a detectably inconsistent
-          * ICC profile, this should be handled, somehow.
-          */
 #     endif
 
       if (info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA)
@@ -1619,7 +1615,8 @@ png_colorspace_set_xy_and_XYZ(png_const_structrp png_ptr,
       colorspace->flags |= PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB;
 
    else
-      colorspace->flags &= 0xff ^ PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB;
+      colorspace->flags &= PNG_COLORSPACE_CANCEL(
+         PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB);
 
    return 2; /* ok and changed */
 }
@@ -1948,12 +1945,25 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * application requirements; the spec provides no guidance, but it's pretty
     * weird if the profile is not scanner ('scnr'), monitor ('mntr'), printer
     * ('prtr') or 'spac' (for generic color spaces).  Issue a warning in these
-    * cases.
+    * cases.  Issue an error for device link or abstract profiles - these don't
+    * contain the records necessary to transform the color-space to anything
+    * other than the target device (and not even that for an abstract profile).
+    * Profiles of these classes may not be embedded in images.
     */
    temp = png_get_uint_32(profile+12); /* profile/device class */
    if (temp != 0x73636E72 /* 'scnr' */ && temp != 0x6D6E7472 /* 'mntr' */ &&
       temp != 0x70727472 /* 'prtr' */ && temp != 0x73706163 /* 'spac' */)
-      (void)profile_error(png_ptr, NULL, name, temp, "unexpected class");
+   {
+      if (temp == 0x6C696E6B /* 'link' */ || temp == 0x61627374 /* 'abst' */)
+         return profile_error(png_ptr, colorspace, name, temp,
+            "invalid class");
+
+      /* This can only be 0x6E6D636C: a 'nmcl' profile.  This is a device
+       * specific profile.
+       */
+      else
+         (void)profile_error(png_ptr, NULL, name, temp, "unexpected ICC class");
+   }
 
    return 1;
 }
@@ -2166,10 +2176,14 @@ png_icc_set_gAMA_and_cHRM(png_const_structrp png_ptr,
 #  endif
 
    /* 2) Attempt to extract the gAMA and cHRM information from non-sRGB
-    *    profiles.
+    *    profiles.  Always set the rendering intent from the profile.
     */
    {
-      /* TODO: implement this! */
+      /* TODO: implement this; at present it is possible to set a detectably
+       * incorrect ICC profile which, unfortunately, is likely to cause external
+       * color management software to crash (though the checks on the tag table
+       * do actually eliminate the most dangerous errors).
+       */
       PNG_UNUSED(name) /* NYI */
       return 1;
    }
@@ -3240,8 +3254,7 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
  * or 16-bit sample values.
  *
  * The tables used here were calculated using simple 'bc' programs, but C double
- * precision floating point arithmetic would work fine.  The programs are given
- * at the head of each table.
+ * precision floating point arithmetic would work fine.
  *
  * 8-bit log table
  *   This is a table of -log(value/255)/log(2) for 'value' in the range 128 to
@@ -3295,18 +3308,18 @@ png_8bit_l2[128] =
 #endif
 };
 
-PNG_STATIC png_int_32
+static png_int_32
 png_log8bit(unsigned int x)
 {
    unsigned int lg2 = 0;
    /* Each time 'x' is multiplied by 2, 1 must be subtracted off the final log,
     * because the log is actually negate that means adding 1.  The final
     * returned value thus has the range 0 (for 255 input) to 7.994 (for 1
-    * input), return 7.99998 for the overflow (log 0) case - so the result is
+    * input), return -1 for the overflow (log 0) case, - so the result is
     * always at most 19 bits.
     */
    if ((x &= 0xff) == 0)
-      return 0xffffffff;
+      return -1;
 
    if ((x & 0xf0) == 0)
       lg2  = 4, x <<= 4;
@@ -3351,14 +3364,14 @@ png_log8bit(unsigned int x)
  * Zero  (257):      0
  * End   (258):  23499
  */
-PNG_STATIC png_int_32
+static png_int_32
 png_log16bit(png_uint_32 x)
 {
    unsigned int lg2 = 0;
 
    /* As above, but now the input has 16 bits. */
    if ((x &= 0xffff) == 0)
-      return 0xffffffff;
+      return -1;
 
    if ((x & 0xff00) == 0)
       lg2  = 8, x <<= 8;
@@ -3442,7 +3455,7 @@ for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
     0 45425.85339951654943850496
 #endif
 
-PNG_STATIC png_uint_32
+static png_uint_32
 png_exp(png_fixed_point x)
 {
    if (x > 0 && x <= 0xfffff) /* Else overflow or zero (underflow) */
@@ -3490,7 +3503,7 @@ png_exp(png_fixed_point x)
    return 0;
 }
 
-PNG_STATIC png_byte
+static png_byte
 png_exp8bit(png_fixed_point lg2)
 {
    /* Get a 32-bit value: */
@@ -3504,7 +3517,7 @@ png_exp8bit(png_fixed_point lg2)
    return (png_byte)((x + 0x7fffffU) >> 24);
 }
 
-PNG_STATIC png_uint_16
+static png_uint_16
 png_exp16bit(png_fixed_point lg2)
 {
    /* Get a 32-bit value: */
