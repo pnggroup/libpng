@@ -749,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta28 - August 22, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta28 - August 25, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta28 - August 22, 2012\
+      return "libpng version 1.6.0beta28 - August 25, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1693,24 +1693,25 @@ profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_alloc_size_t value, png_const_charp reason)
 {
    size_t pos;
-   char message[256];
+   char message[196]; /* see below for calculation */
 
    if (colorspace != NULL)
       colorspace->flags |= PNG_COLORSPACE_INVALID;
 
-   pos = png_safecat(message, (sizeof message), 0, "profile '");
-   pos = png_safecat(message, pos+79, pos, name);
-   pos = png_safecat(message, (sizeof message), pos, "': ");
+   pos = png_safecat(message, (sizeof message), 0, "profile '"); /* 9 chars */
+   pos = png_safecat(message, pos+79, pos, name); /* Truncate to 79 chars */
+   pos = png_safecat(message, (sizeof message), pos, "': "); /* +2 = 90 */
 #  ifdef PNG_WARNINGS_SUPPORTED
       {
-         char number[PNG_NUMBER_BUFFER_SIZE];
+         char number[PNG_NUMBER_BUFFER_SIZE]; /* +24 = 114*/
 
          pos = png_safecat(message, (sizeof message), pos,
             png_format_number(number, number+(sizeof number),
                PNG_NUMBER_FORMAT_x, value));
       }
-      pos = png_safecat(message, (sizeof message), pos, ": ");
+      pos = png_safecat(message, (sizeof message), pos, "h: "); /* +2 = 116 */
 #  endif
+   /* The 'reason' is an arbitrary message, allow +79 maximum 195 */
    pos = png_safecat(message, (sizeof message), pos, reason);
 
    if (colorspace != NULL)
@@ -1874,7 +1875,7 @@ png_icc_check_length(png_const_structrp png_ptr, png_colorspacerp colorspace,
 int /* PRIVATE */
 png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_uint_32 profile_length,
-   png_const_bytep profile/* first 132 bytes only */)
+   png_const_bytep profile/* first 132 bytes only */, int color_type)
 {
    png_uint_32 temp;
 
@@ -1930,16 +1931,37 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * 6), or a greyscale colour space for greyscale images (PNG colour types 0
     * and 4)."
     *
-    * This code does not check the color type because png_set_iCCP may be called
-    * before png_set_IHDR on write and because, anyway, the PNG spec is
-    * fundamentally flawed: RGB profiles can be used quite meaningfully for
-    * grayscale images and both RGB and palette images might only have gray
-    * colors in them, so gray profiles may be appropriate.
+    * This checking code ensures the embedded profile (on either read or write)
+    * conforms to the specification requirements.  Notice that an ICC 'gray'
+    * color-space profile contains the information to transform the monochrome
+    * data to XYZ or L*a*b (according to which PCS the profile uses) and this
+    * should be used in preference to the standard libpng K channel replication
+    * into R, G and B channels.
+    *
+    * Previously it was suggested that an RGB profile on grayscale data could be
+    * handled.  However it it is clear that using an RGB profile in this context
+    * must be an error - there is no specification of what it means.  Thus it is
+    * almost certainly more correct to ignore the profile.
     */
    temp = png_get_uint_32(profile+16); /* data colour space field */
-   if (temp != 0x52474220 /* 'RGB ' */ && temp != 0x47524159 /* 'GRAY' */)
-      return profile_error(png_ptr, colorspace, name, temp,
-         "invalid color space");
+   switch (temp)
+   {
+      case 0x52474220: /* 'RGB ' */
+         if (!(color_type & PNG_COLOR_MASK_COLOR))
+            return profile_error(png_ptr, colorspace, name, temp,
+               "RGB color space not permitted on grayscale PNG");
+         break;
+
+      case 0x47524159: /* 'GRAY' */
+         if (color_type & PNG_COLOR_MASK_COLOR)
+            return profile_error(png_ptr, colorspace, name, temp,
+               "Gray color space not permitted on RGB PNG");
+         break;
+
+      default:
+         return profile_error(png_ptr, colorspace, name, temp,
+            "invalid color space");
+   }
 
    /* It is up to the application to check that the profile class matches the
     * application requirements; the spec provides no guidance, but it's pretty
@@ -1956,13 +1978,16 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    {
       if (temp == 0x6C696E6B /* 'link' */ || temp == 0x61627374 /* 'abst' */)
          return profile_error(png_ptr, colorspace, name, temp,
-            "invalid class");
+            "invalid ICC profile class");
 
       /* This can only be 0x6E6D636C: a 'nmcl' profile.  This is a device
-       * specific profile.
+       * specific profile.  The checks on the tags below will ensure that it can
+       * actually be used, but it certainly is not expected and is probably an
+       * error.
        */
       else
-         (void)profile_error(png_ptr, NULL, name, temp, "unexpected ICC class");
+         (void)profile_error(png_ptr, NULL, name, temp,
+            "unexpected ICC profile class");
    }
 
    return 1;
@@ -1976,6 +2001,16 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_uint_32 tag_count = png_get_uint_32(profile+128);
    png_uint_32 itag;
    png_const_bytep tag = profile+132; /* The first tag */
+   int have_AToB0Tag = 0;   /* Whether the profile has an AToB0Tag */
+   int have_grayTRCTag = 0; /* Whether the profile has a grayTRCTag */
+   unsigned int matrix_TRC_tags = 0; /* Which matrix/TRC tags are present */
+#  define HAVE_redMatrixColumnTag   0x01
+#  define HAVE_greenMatrixColumnTag 0x02
+#  define HAVE_blueMatrixColumnTag  0x04
+#  define HAVE_redTRCTag            0x10
+#  define HAVE_greenTRCTag          0x20
+#  define HAVE_blueTRCTag           0x40
+#  define HAVE_all_tags             0x77
 
    for (itag=0; itag < tag_count; ++itag, tag += 12)
    {
@@ -1992,9 +2027,90 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
          tag_length > profile_length - tag_start)
          return profile_error(png_ptr, colorspace, name, tag_id,
             "tag data outside profile");
+
+      /* Check the tag_id for the specific profiles which must be present for
+       * the profile to be valid.
+       */
+      switch (tag_id)
+      {
+         case 0x41324230: /* 'A2B0' - AToB0Tag */
+            have_AToB0Tag = 1;
+            break;
+
+         case 0x6B545243: /* 'kTRC' - grayTRCTag */
+            have_grayTRCTag = 1;
+            break;
+
+         case 0x7258595A: /* 'rXYZ' - redMatrixColumnTag */
+            matrix_TRC_tags |= HAVE_redMatrixColumnTag;
+            break;
+
+         case 0x72545243: /* 'rTRC' - redTRCTag */
+            matrix_TRC_tags |= HAVE_redTRCTag;
+            break;
+
+         case 0x6758595A: /* 'gXYZ' - greenMatrixColumnTag */
+            matrix_TRC_tags |= HAVE_greenMatrixColumnTag;
+            break;
+
+         case 0x67545243: /* 'gTRC' - greenTRCTag */
+            matrix_TRC_tags |= HAVE_greenTRCTag;
+            break;
+
+         case 0x6258595A: /* 'bXYZ' - blueMatrixColumnTag */
+            matrix_TRC_tags |= HAVE_blueMatrixColumnTag;
+            break;
+
+         case 0x62545243: /* 'bTRC' - blueTRCTag */
+            matrix_TRC_tags |= HAVE_blueTRCTag;
+            break;
+
+         default:
+            break;
+      }
    }
 
-   return 1;
+   /* An AToB0Tag works in all valid profiles, but if it is absent then
+    * something matching the profile class and color space must be present.
+    */
+   if (!have_AToB0Tag)
+   {
+      png_uint_32 profile_class = png_get_uint_32(profile+12);
+
+      switch (profile_class)
+      {
+         case 0x73636E72: /* 'scnr' - an input profile */
+         case 0x6D6E7472: /* 'mntr' - a display device profile */
+         case 0x70727472: /* 'prtr' - an output device profile */
+            if (png_get_uint_32(profile+16) /* color space */ ==
+               0x47524159 /* gray */)
+            {
+               if (!have_grayTRCTag)
+                  return profile_error(png_ptr, colorspace, name, profile_class,
+                     "missing grayTRCTag for monochrome profile");
+            }
+
+            else
+            {
+               if (matrix_TRC_tags != HAVE_all_tags)
+                  return profile_error(png_ptr, colorspace, name, profile_class,
+                     "missing Matrix/TRC tags for RGB profile");
+            }
+
+            return 1;
+
+         case 0x73706163: /* 'spac' */
+            return profile_error(png_ptr, colorspace, name, profile_class,
+               "missing AToB0Tag for colorspace profile");
+
+         default: /* should have been checked before */
+            png_error(png_ptr, "invalid ICC class");
+            return 0; /* NOT REACHED */
+      }
+   }
+
+   else
+      return 1;
 }
 
 #ifdef PNG_sRGB_SUPPORTED
@@ -2192,14 +2308,15 @@ png_icc_set_gAMA_and_cHRM(png_const_structrp png_ptr,
 int /* PRIVATE */
 png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_uint_32 profile_length,
-   png_const_bytep profile, int preferred)
+   png_const_bytep profile, int preferred, int color_type)
 {
    if (colorspace->flags & PNG_COLORSPACE_INVALID)
       return 0;
 
    if (png_icc_check_length(png_ptr, colorspace, name, profile_length) &&
-      png_icc_check_header(png_ptr, colorspace, name, profile_length, profile)
-      && png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
+      png_icc_check_header(png_ptr, colorspace, name, profile_length, profile,
+         color_type) &&
+      png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
          profile))
    {
       png_icc_set_gAMA_and_cHRM(png_ptr, colorspace, name, profile, 0,

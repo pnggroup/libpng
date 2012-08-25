@@ -281,13 +281,6 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #  define PNG_ZBUF_SIZE 65536L
 #endif
 
-/* PNG_STATIC is used to mark internal file scope functions if they need to be
- * accessed for implementation tests (see the code in tests/?*).
- */
-#ifndef PNG_STATIC
-#   define PNG_STATIC static
-#endif
-
 /* If warnings or errors are turned off the code is disabled or redirected here.
  * From 1.5.4 functions have been added to allow very limited formatting of
  * error and warning messages - this code will also be disabled here.
@@ -1449,8 +1442,8 @@ PNG_INTERNAL_FUNCTION(int,png_colorspace_set_sRGB,(png_const_structrp png_ptr,
 #ifdef PNG_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(int,png_colorspace_set_ICC,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
-   png_uint_32 profile_length, png_const_bytep profile, int preferred),
-   PNG_EMPTY);
+   png_uint_32 profile_length, png_const_bytep profile, int preferred,
+   int color_type), PNG_EMPTY);
    /* The 'name' is used for information only */
 
 /* Routines for checking parts of an ICC profile. */
@@ -1460,7 +1453,8 @@ PNG_INTERNAL_FUNCTION(int,png_icc_check_length,(png_const_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(int,png_icc_check_header,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
    png_uint_32 profile_length,
-   png_const_bytep profile /* first 132 bytes only */), PNG_EMPTY);
+   png_const_bytep profile /* first 132 bytes only */, int color_type),
+   PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(int,png_icc_check_tag_table,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
    png_uint_32 profile_length,

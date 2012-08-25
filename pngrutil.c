@@ -1424,7 +1424,8 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                       * byte header.
                       */
                      if (png_icc_check_header(png_ptr, &png_ptr->colorspace,
-                        keyword, profile_length, profile_header))
+                        keyword, profile_length, profile_header,
+                        png_ptr->color_type))
                      {
                         /* Now read the tag table; a variable size buffer is
                          * needed at this point, allocate one for the whole

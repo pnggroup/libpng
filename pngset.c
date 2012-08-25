@@ -643,11 +643,14 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
    /* Set the colorspace first because this validates the profile; do not
     * override previously set app cHRM or gAMA here (because likely as not the
-    * application knows better than libpng what the correct values are.)
+    * application knows better than libpng what the correct values are.)  Pass
+    * the info_ptr color_type field to png_colorspace_set_ICC because in the
+    * write case it has not yet been stored in png_ptr.
     */
    {
       int result = png_colorspace_set_ICC(png_ptr, &info_ptr->colorspace, name,
-         proflen, profile, 0/* do *not* override the app cHRM or gAMA */);
+         proflen, profile, 0/* do *not* override the app cHRM or gAMA */,
+         info_ptr->color_type);
 
       png_colorspace_sync_info(png_ptr, info_ptr);
 

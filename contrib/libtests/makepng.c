@@ -72,6 +72,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 #include <math.h>
 #include <errno.h>
 
@@ -1125,7 +1126,7 @@ main(int argc, char **argv)
 
       if (strncmp(arg, "gray", 4) == 0)
       {
-         if (arg[5] == 0)
+         if (arg[4] == 0)
          {
             color_type = PNG_COLOR_TYPE_GRAY;
             continue;
@@ -1142,7 +1143,7 @@ main(int argc, char **argv)
 
       if (strncmp(arg, "rgb", 3) == 0)
       {
-         if (arg[4] == 0)
+         if (arg[3] == 0)
          {
             color_type = PNG_COLOR_TYPE_RGB;
             continue;
@@ -1157,7 +1158,7 @@ main(int argc, char **argv)
          }
       }
 
-      if (color_type == 8)
+      if (color_type == 8 && isdigit(arg[0]))
       {
          color_type = atoi(arg);
          if (color_type < 0 || color_type > 6 || color_type == 1 ||
@@ -1170,7 +1171,7 @@ main(int argc, char **argv)
          continue;
       }
 
-      if (bit_depth == 32)
+      if (bit_depth == 32 && isdigit(arg[0]))
       {
          bit_depth = atoi(arg);
          if (bit_depth <= 0 || bit_depth > 16 ||
