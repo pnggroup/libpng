@@ -4193,7 +4193,7 @@ Version 1.6.0beta27 [August 11, 2012]
   Work around gcc 3.x and Microsoft Visual Studio 2010 complaints. Both object
     to the split initialization of num_chunks.
 
-Version 1.6.0beta28 [August 25, 2012]
+Version 1.6.0beta28 [August 29, 2012]
   Unknown handling fixes and clean up. This adds more correct option
     control of the unknown handling, corrects the pre-existing bug where
     the per-chunk 'keep' setting is ignored and makes it possible to skip
