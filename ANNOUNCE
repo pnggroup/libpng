@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta28 - August 29, 2012
+Libpng 1.6.0beta29 - August 29, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta28.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta28.tar.gz
-   1.6.0beta28.tar.bz2
+   1.6.0beta29.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta29.tar.gz
+   1.6.0beta29.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b28.7z  (LZMA-compressed, recommended)
-   lp160b28.zip
+   lp160b29.7z  (LZMA-compressed, recommended)
+   lp160b29.zip
 
 Other information:
 
-   1.6.0beta28-README.txt
-   1.6.0beta28-LICENSE.txt
+   1.6.0beta29-README.txt
+   1.6.0beta29-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -481,6 +481,8 @@ Version 1.6.0beta28 [August 29, 2012]
     app behavior and might even cause app crashes.) Check that profiles
     contain the tags needed to process the PNG (tags all required by the ICC
     spec). Removed unused PNG_STATIC from pngpriv.h.
+
+Version 1.6.0beta29 [August 29, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
