@@ -49,6 +49,7 @@ int main(int argc, const char **argv)
 
       /* Initialize the 'png_image' structure. */
       memset(&image, 0, (sizeof image));
+      image.version = PNG_IMAGE_VERSION;
 
       /* The first argument is the file to read: */
       if (png_image_begin_read_from_file(&image, argv[1]))
@@ -75,16 +76,28 @@ int main(int argc, const char **argv)
           * be supplied or the output buffer would have to be initialized to the
           * actual background of the image.
           *
-          * The final argument to png_image_finish_read is the 'row_stride' -
+          * The fourth argument to png_image_finish_read is the 'row_stride' -
           * this is the number of components allocated for the image in each
           * row.  It has to be at least as big as the value returned by
           * PNG_IMAGE_ROW_STRIDE, but if you just allocate space for the
           * default, minimum, size using PNG_IMAGE_SIZE as above you can pass
           * zero.
+          *
+          * The final argument is a pointer to a buffer for the colormap;
+          * colormaps have exactly the same format as a row of image pixels (so
+          * you choose what format to make the colormap by setting
+          * image.format).  A colormap is only returned if
+          * PNG_FORMAT_FLAG_COLORMAP is also set in image.format, so in this
+          * case NULL is passed as the final argument.  If you do want to force
+          * all images into an index/color-mapped format then you can use:
+          *
+          *    PNG_IMAGE_COLORMAP_SIZE(image)
+          *
+          * to find the maximum size of the colormap in bytes.
           */
          if (buffer != NULL &&
             png_image_finish_read(&image, NULL/*background*/, buffer,
-               0/*row_stride*/))
+               0/*row_stride*/, NULL/*colormap*/))
          {
             /* Now write the image out to the second argument.  In the write
              * call 'convert_to_8bit' allows 16-bit data to be squashed down to
@@ -92,7 +105,7 @@ int main(int argc, const char **argv)
              * to the 8-bit format.
              */
             if (png_image_write_to_file(&image, argv[2], 0/*convert_to_8bit*/,
-               buffer, 0/*row_stride*/))
+               buffer, 0/*row_stride*/, NULL/*colormap*/))
             {
                /* The image has been written successfully. */
                exit(0);

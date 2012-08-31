@@ -1357,6 +1357,10 @@ png_image_begin_read_from_stdio(png_imagep image, FILE* file)
             "png_image_begin_read_from_stdio: invalid argument");
    }
 
+   else if (image != NULL)
+      return png_image_error(image,
+         "png_image_begin_read_from_stdio: incorrect PNG_IMAGE_VERSION");
+
    return 0;
 }
 
@@ -1390,6 +1394,10 @@ png_image_begin_read_from_file(png_imagep image, const char *file_name)
          return png_image_error(image,
             "png_image_begin_read_from_file: invalid argument");
    }
+
+   else if (image != NULL)
+      return png_image_error(image,
+         "png_image_begin_read_from_file: incorrect PNG_IMAGE_VERSION");
 
    return 0;
 }
@@ -1451,6 +1459,10 @@ int PNGAPI png_image_begin_read_from_memory(png_imagep image,
          return png_image_error(image,
             "png_image_begin_read_from_memory: invalid argument");
    }
+
+   else if (image != NULL)
+      return png_image_error(image,
+         "png_image_begin_read_from_memory: incorrect PNG_IMAGE_VERSION");
 
    return 0;
 }
@@ -3953,6 +3965,10 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
          return png_image_error(image,
             "png_image_finish_read: invalid argument");
    }
+
+   else if (image != NULL)
+      return png_image_error(image,
+         "png_image_finish_read: damaged PNG_IMAGE_VERSION");
 
    return 0;
 }

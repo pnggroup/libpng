@@ -4233,7 +4233,9 @@ Version 1.6.0beta28 [August 29, 2012]
     contain the tags needed to process the PNG (tags all required by the ICC
     spec). Removed unused PNG_STATIC from pngpriv.h.
 
-Version 1.6.0beta29 [August 29, 2012]
+Version 1.6.0beta29 [August 31, 2012]
+  Fixed the simplified API example programs and improved the error message
+    if the version field is not set.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
