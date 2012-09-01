@@ -4234,9 +4234,12 @@ Version 1.6.0beta28 [August 29, 2012]
     spec). Removed unused PNG_STATIC from pngpriv.h.
 
 Version 1.6.0beta29 [September 1, 2012]
-  Fixed the simplified API example programs and improved the error message
-    if the version field is not set.
+  Fixed the simplified API example programs to add the *colormap parameter
+    to several of he API and improved the error message if the version field
+    is not set.
   Added contrib/examples/* to the *.zip and *.7z distributions.
+  Updated simplified API synopses and description of the png_image structure
+    in the manual.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

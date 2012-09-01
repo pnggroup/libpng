@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "August 29, 2012"
+.TH LIBPNG 3 "September 1, 2012"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0beta29
 .SH SYNOPSIS
@@ -440,7 +440,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0beta29
 
 \fI\fB
 
-\fBint png_image_finish_read (png_imagep \fP\fIimage\fP\fB, png_colorp \fP\fIbackground\fP\fB, void \fP\fI*buffer\fP\fB, png_int_32 \fIrow_stride\fP\fB);\fP
+\fBint png_image_finish_read (png_imagep \fP\fIimage\fP\fB, png_colorp \fP\fIbackground\fP\fB, void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap\fP\fB);\fP
 
 \fI\fB
 
@@ -448,13 +448,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0beta29
 
 \fI\fB
 
-\fBint png_image_write_to_file (png_imagep \fP\fIimage\fP\fB, const char \fP\fI*file\fP\fB, int \fP\fIconvert_to_8bit\fP\fB, const void \fI*buffer,
-
-\fBpng_int_32 \fIrow_stride\fP\fB);\fP
+\fBint png_image_write_to_file (png_imagep \fP\fIimage\fP\fB, const char \fP\fI*file\fP\fB, int \fP\fIconvert_to_8bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap\fP\fB);\fP
 
 \fI\fB
 
-\fBint png_image_write_to_stdio (png_imagep \fP\fIimage\fP\fB, FILE \fP\fI*file\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fIrow_stride)\fP\fB);\fP
+\fBint png_image_write_to_stdio (png_imagep \fP\fIimage\fP\fB, FILE \fP\fI*file\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap)\fP\fB);\fP
 
 \fI\fB
 
@@ -999,7 +997,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta29 - August 29, 2012
+ libpng version 1.6.0beta29 - September 1, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -1010,7 +1008,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta29 - August 29, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta29 - September 1, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4523,12 +4521,13 @@ png_image is a structure that describes the in-memory format of an image
 when it is being read or define the in-memory format of an image that you
 need to write.  The "png_image" structure contains the following members:
 
+   png_uint_32  version Set to PNG_IMAGE_VERSION
    png_uint_32  width   Image width in pixels (columns)
    png_uint_32  height  Image height in pixels (rows)
    png_uint_32  format  Image format as defined below
    png_uint_32  flags   A bit mask containing informational flags
    png_controlp opaque  Initialize to NULL, free with png_image_free
-   png_const_bytep colormap A pointer to the application color-map
+   png_uint_32  colormap_entries; Number of entries in the color-map
    png_uint_32  warning_or_error;
    char         message[64];
 
@@ -4688,6 +4687,22 @@ First the information about the samples.
    a fixed number determined by the format so can easily be allocated on the
    stack if necessary.
 
+#define PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(fmt)\
+   (PNG_IMAGE_SAMPLE_CHANNELS(fmt) * 256)
+   /* The maximum size of the color-map required by the format expressed in a
+    * count of components.  This can be used to compile-time allocate a
+    * color-map:
+    *
+    * png_uint_16 colormap[PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(linear_fmt)];
+    *
+    * png_byte colormap[PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(sRGB_fmt)];
+    *
+    * Alternatively use the PNG_IMAGE_COLORMAP_SIZE macro below to use the
+    * information from one of the png_image_begin_read_ APIs and dynamically
+    * allocate the required memory.
+    */
+
+
 Corresponding information about the pixels
 
   PNG_IMAGE_PIXEL_(test,fmt)
@@ -4746,7 +4761,8 @@ READ APIs
       The PNG header is read from the given memory buffer.
 
    int png_image_finish_read(png_imagep image,
-      png_colorp background, void *buffer, png_int_32 row_stride));
+      png_colorp background, void *buffer,
+      png_int_32 row_stride, void *colormap));
 
       Finish reading the image into the supplied buffer and
       clean up the png_image structure.
@@ -4783,6 +4799,7 @@ WRITE APIS
 For write you must initialize a png_image structure to describe the image to
 be written:
 
+   version: must be set to PNG_IMAGE_VERSION
    opaque: must be initialized to NULL
    width: image width in pixels
    height: image height in rows
@@ -4790,15 +4807,17 @@ be written:
    flags: set to 0 unless one of the defined flags applies; set
       PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB for color format images
       where the RGB values do not correspond to the colors in sRGB.
+   colormap_entries: set to the number of entries in the color-map (0 to 256)
 
    int png_image_write_to_file, (png_imagep image,
       const char *file, int convert_to_8bit, const void *buffer,
-      png_int_32 row_stride));
+      png_int_32 row_stride, const void *colormap));
 
       Write the image to the named file.
 
    int png_image_write_to_stdio(png_imagep image, FILE *file,
-      int convert_to_8_bit, const void *buffer, png_int_32 row_stride)
+      int convert_to_8_bit, const void *buffer,
+      png_int_32 row_stride, const void *colormap)
 
       Write the image to the given (FILE*).
 
@@ -6043,7 +6062,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-August 29, 2012
+September 1, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6311,7 +6330,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.0beta29 - August 29, 2012:
+Libpng version 1.6.0beta29 - September 1, 2012:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6334,7 +6353,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.0beta29, August 29, 2012, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.0beta29, September 1, 2012, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6433,7 +6452,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-August 29, 2012
+September 1, 2012
 
 .\" end of man page
 
