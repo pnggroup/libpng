@@ -488,6 +488,12 @@ Version 1.6.0beta29 [September 1, 2012]
   Added contrib/examples/* to the *.zip and *.7z distributions.
   Updated simplified API synopses and description of the png_image structure
     in the manual.
+  Made makepng and pngtest produce identical PNGs, add "--relaxed" option
+    to pngtest. The "--relaxed" option turns off the benign errors that are
+    enabled by default in pre-RC builds. makepng can now write ICC profiles
+    where the length has not been extended to a multiple of 4, and pngtest
+    now intercepts all libpng errors, allowing the previously-introduced
+    "--strict test" on no warnings to actually work.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

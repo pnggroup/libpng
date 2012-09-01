@@ -95,6 +95,7 @@ static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
 
 static int verbose = 0;
 static int strict = 0;
+static int relaxed = 0;
 static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
 static int error_count = 0; /* count calls to png_error */
 static int warning_count = 0; /* count calls to png_warning */
@@ -395,6 +396,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    pngtest_check_io_state(png_ptr, length, PNG_IO_WRITING);
 #endif
 }
+#endif /* !PNG_STDIO_SUPPORTED */
 
 /* This function is called when there is a warning, but the library thinks
  * it can continue anyway.  Replacement functions don't have to do anything
@@ -405,16 +407,15 @@ static void PNGCBAPI
 pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
    PNG_CONST char *name = "UNKNOWN (ERROR!)";
-   char *test;
-   test = png_get_error_ptr(png_ptr);
+   PNG_CONST char **test= (PNG_CONST char **)png_get_error_ptr(png_ptr);
 
    ++warning_count;
 
-   if (test == NULL)
+   if (test == NULL || *test == NULL)
      fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
 
    else
-     fprintf(STDERR, "%s: libpng warning: %s\n", test, message);
+     fprintf(STDERR, "%s: libpng warning: %s\n", *test, message);
 }
 
 /* This is the default error handling function.  Note that replacements for
@@ -432,7 +433,7 @@ pngtest_error(png_structp png_ptr, png_const_charp message)
     * actually OK in this case.
     */
 }
-#endif /* !PNG_STDIO_SUPPORTED */
+
 /* END of code to validate stdio-free compilation */
 
 /* START of code to validate memory allocation and deallocation */
@@ -799,6 +800,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    static png_FILE_p fpin;
    static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
+   static PNG_CONST char *fp_name;
    png_structp read_ptr;
    png_infop read_info_ptr, end_info_ptr;
 #ifdef PNG_WRITE_SUPPORTED
@@ -817,6 +819,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 
    row_buf = NULL;
+   fp_name = inname;
 
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
@@ -840,10 +843,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    read_ptr =
       png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
-#ifndef PNG_STDIO_SUPPORTED
-   png_set_error_fn(read_ptr, (png_voidp)inname, pngtest_error,
-       pngtest_warning);
-#endif
+   png_set_error_fn(read_ptr, &fp_name, pngtest_error, pngtest_warning);
 
 #ifdef PNG_WRITE_SUPPORTED
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
@@ -854,10 +854,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    write_ptr =
       png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
-#ifndef PNG_STDIO_SUPPORTED
-   png_set_error_fn(write_ptr, (png_voidp)inname, pngtest_error,
-       pngtest_warning);
-#endif
+   png_set_error_fn(write_ptr, &fp_name, pngtest_error, pngtest_warning);
 #endif
    pngtest_debug("Allocating read_info, write_info and end_info structures");
    read_info_ptr = png_create_info_struct(read_ptr);
@@ -918,7 +915,20 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_set_benign_errors(write_ptr, 0);
 #endif
 
-      /* if strict is not set, then both are treated as warnings. */
+      /* if strict is not set, then app warnings and errors are treated as
+       * warnings in release builds, but not in unstable builds; this can be
+       * changed with '--relaxed'.
+       */
+   }
+   
+   else if (relaxed)
+   {
+      /* Allow application (pngtest) errors and warnings to pass */
+      png_set_benign_errors(read_ptr, 1);
+
+#ifdef PNG_WRITE_SUPPORTED
+      png_set_benign_errors(write_ptr, 1);
+#endif
    }
 
    pngtest_debug("Initializing input and output streams");
@@ -937,14 +947,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       NULL);
 #    endif
 #  endif
-#endif
-
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-   /* Normally one would use Z_DEFAULT_STRATEGY for text compression.
-    * This is here just to make pngtest replicate the results from libpng
-    * versions prior to 1.5.4, and to test this new API.
-    */
-   png_set_text_compression_strategy(write_ptr, Z_FILTERED);
 #endif
 
    if (status_dots_requested == 1)
@@ -1451,6 +1453,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+   /* Normally one would use Z_DEFAULT_STRATEGY for text compression.
+    * This is here just to make pngtest replicate the results from libpng
+    * versions prior to 1.5.4, and to test this new API.
+    */
+   png_set_text_compression_strategy(write_ptr, Z_FILTERED);
+#endif
+
    /* When the unknown vpAg/sTER chunks are written by pngtest the only way to
     * do it is to write them *before* calling png_write_end.  When unknown
     * chunks are written by libpng, however, they are written just before IEND.     * There seems to be no way round this, however vpAg/sTER are not expected
@@ -1703,6 +1713,16 @@ main(int argc, char *argv[])
          verbose = 1;
          inname = argv[2];
          strict++;
+         relaxed = 0;
+      }
+
+      else if (strcmp(argv[1], "--relaxed") == 0)
+      {
+         status_dots_requested = 0;
+         verbose = 1;
+         inname = argv[2];
+         strict = 0;
+         relaxed++;
       }
 
       else

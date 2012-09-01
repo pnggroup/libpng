@@ -392,11 +392,36 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
    }
 }
 
-static int /* 0 on success, else an error code */
-write_png(FILE *fp, int color_type, int bit_depth,
-   volatile png_fixed_point gamma, chunk_insert * volatile insert)
+
+static void PNGCBAPI
+makepng_warning(png_structp png_ptr, png_const_charp message)
 {
-   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,0,0,0);
+   const char **ep = png_get_error_ptr(png_ptr);
+   const char *name;
+
+   if (ep != NULL && *ep != NULL)
+      name = *ep;
+
+   else
+      name = "makepng";
+
+  fprintf(stderr, "%s: warning: %s\n", name, message);
+}
+
+static void PNGCBAPI
+makepng_error(png_structp png_ptr, png_const_charp message)
+{
+   makepng_warning(png_ptr, message);
+   png_longjmp(png_ptr, 1);
+}
+
+static int /* 0 on success, else an error code */
+write_png(const char **name, FILE *fp, int color_type, int bit_depth,
+   volatile png_fixed_point gamma, chunk_insert * volatile insert,
+   unsigned int filters)
+{
+   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+      name, makepng_error, makepng_warning);
    volatile png_infop info_ptr = NULL;
    volatile png_bytep row = NULL;
 
@@ -517,7 +542,7 @@ write_png(FILE *fp, int color_type, int bit_depth,
       png_write_info(png_ptr, info_ptr);
 
       /* Restrict the filters */
-      png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, PNG_NO_FILTERS);
+      png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, filters);
 
       {
          int passes = png_set_interlace_handling(png_ptr);
@@ -604,7 +629,10 @@ load_file(png_const_charp name, png_bytepp result)
 
                if (total > 0)
                {
-                  png_bytep data = malloc(total);
+                  /* Round up to a multiple of 4 here to allow an iCCP profile
+                   * to be padded to a 4x boundary.
+                   */
+                  png_bytep data = malloc((total+3)&~3);
 
                   if (data != NULL)
                   {
@@ -729,12 +757,13 @@ insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
       case '<':
          {
             png_size_t filelen = load_file(params[1]+1, &profile);
-            if (filelen > 0xffffffff) /* Maximum profile length */
+            if (filelen > 0xfffffffc) /* Maximum profile length */
             {
                fprintf(stderr, "%s: file too long (%lu) for an ICC profile\n",
                   params[1]+1, (unsigned long)filelen);
                exit(1);
             }
+
             proflen = (png_uint_32)filelen;
          }
          break;
@@ -771,9 +800,14 @@ insert_iCCP(png_structp png_ptr, png_infop info_ptr, int nparams,
    if (proflen & 3)
    {
       fprintf(stderr,
-         "--insert iCCP %s: profile length must be a multiple of 4\n",
+         "makepng: --insert iCCP %s: profile length made a multiple of 4\n",
          params[1]);
-      result = 0; /* Cannot fix this! */
+
+      /* load_file allocates extra space for this padding, the ICC spec requires
+       * padding with zero bytes.
+       */
+      while (proflen & 3)
+         profile[proflen++] = 0;
    }
 
    if (profile != NULL && proflen > 3)
@@ -1067,6 +1101,7 @@ main(int argc, char **argv)
    const char *file_name = NULL;
    int color_type = 8; /* invalid */
    int bit_depth = 32; /* invalid */
+   unsigned int filters = PNG_ALL_FILTERS;
    png_fixed_point gamma = 0; /* not set */
    chunk_insert *head_insert = NULL;
    chunk_insert **insert_ptr = &head_insert;
@@ -1090,6 +1125,12 @@ main(int argc, char **argv)
       if (strcmp(arg, "--1.8") == 0)
       {
          gamma = PNG_GAMMA_MAC_18;
+         continue;
+      }
+
+      if (strcmp(arg, "--nofilters") == 0)
+      {
+         filters = PNG_FILTER_NONE;
          continue;
       }
 
@@ -1209,8 +1250,30 @@ main(int argc, char **argv)
       exit(1);
    }
 
+   /* Restrict the filters for more speed to those we know are used for the
+    * generated images.
+    */
+   if (filters == PNG_ALL_FILTERS)
    {
-      int ret = write_png(fp, color_type, bit_depth, gamma, head_insert);
+      if ((color_type & PNG_COLOR_MASK_PALETTE) != 0 || bit_depth < 8)
+         filters = PNG_FILTER_NONE;
+
+      else if (color_type & PNG_COLOR_MASK_COLOR) /* rgb */
+      {
+         if (bit_depth == 8)
+            filters &= ~(PNG_FILTER_NONE | PNG_FILTER_AVG);
+
+         else
+            filters = PNG_FILTER_SUB | PNG_FILTER_PAETH;
+      }
+
+      else /* gray 8 or 16-bit */
+         filters &= ~PNG_FILTER_NONE;
+   }
+
+   {
+      int ret = write_png(&file_name, fp, color_type, bit_depth, gamma,
+         head_insert, filters);
 
       if (ret != 0 && file_name != NULL)
          remove(file_name);
