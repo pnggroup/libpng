@@ -147,11 +147,11 @@ typedef const png_colorspace * PNG_RESTRICT png_const_colorspacerp;
    /* The profile description and copyright must be present in all valid ICC
     * profiles, however libpng does not use them so absence is just reported as
     * a warning.  The media white point should be present too, but if it isn't
-    * all we lose is the ability to know if it differs from the adopted white
+    * all we lose is the ability to know if it differs from the adapted white
     * (i.e. the information that the device maxima are actually colored;
     * a non-white substrate for a printer, or an uncorrected scan for example.)
-    * The chromaticAdaptationTag tells us that the adopted white of the original
-    * differs from the PCS adopted white (which is identical to the PCS
+    * The chromaticAdaptationTag tells us that the adapted white of the original
+    * differs from the PCS adapted white (which is identical to the PCS
     * illuminant and should always be D50).
     */
 #  define PNG_ICC_profileDescriptionTag  0x00000010U /* required */

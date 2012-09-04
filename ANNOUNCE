@@ -499,7 +499,7 @@ Version 1.6.0beta29 [September 4, 2012]
     checking.  Several errors that caused rejection of the profile are now
     handled with a warning in such a way that the invalid profiles will be
     read by default in release (but not pre-RC) builds but will not be
-    written by default.  The easy part of handling a cHRM chunk is written,
+    written by default.  The easy part of handling the cHRM chunk is written,
     where the ICC profile contains the required data.  The more difficult
     part plus guessing a gAMA value requires code to pass selected RGB values
     through the profile.

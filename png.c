@@ -1995,10 +1995,10 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
       return profile_error(png_ptr, colorspace, name, temp,
          "invalid signature");
 
-   /* Currently the PCS illuminant/adopted white point are required to be D50,
+   /* Currently the PCS illuminant/adapted white point are required to be D50,
     * however the profile contains a record of the illuminant so perhaps ICC
     * expects to be able to change this in the future (despite the rationale in
-    * the introduction for using a fixed PCS adopted white.)  Consequently the
+    * the introduction for using a fixed PCS adapted white.)  Consequently the
     * following is just a warning.
     */
    if (memcmp(profile+68, D50_nCIEXYZ, 12) != 0)
@@ -2371,7 +2371,7 @@ png_icc_find_wtpt(png_const_structrp png_ptr, png_const_charp name,
             temp == 0x73706163 /* 'spac' */) &&
             memcmp(profile+68, tag+8, 12) != 0)
             (void)profile_error(png_ptr, NULL, name, temp,
-               "media white point differs from image adopted white");
+               "media white point differs from image adapted white");
 
          (*adapted_white_point)[0] = png_get_int_32(tag+ 8);
          (*adapted_white_point)[1] = png_get_int_32(tag+12);
@@ -2437,10 +2437,10 @@ png_icc_find_chad(png_const_structrp png_ptr, png_const_charp name,
     * colorant values.
     *
     * All of the methods for determining the cHRM values depend on
-    * reversing the adaptatation to the PCS adopted white (D50); this is
+    * reversing the adaptatation to the PCS adapted white (D50); this is
     * because in all cases one or other PCS value has to be used.
     *
-    * This routine determines if 'chad' tag is present (if not the adopted white
+    * This routine determines if 'chad' tag is present (if not the adapted white
     * of the scene is D50 and no adaptation was performed) and returns the
     * inverted matrix.
     */
@@ -2515,7 +2515,7 @@ png_icc_set_cHRM_from_chrm(png_const_structrp png_ptr,
     * the PCS white, however the white point, which tells us the relative
     * intensity of the colorants, is not given.  We can get the white point from
     * the mediaWhitePointTag value, which should be present in all profiles,
-    * however this is adapted to the PCS illuminated/adopted white, so must be
+    * however this is adapted to the PCS illuminated/adapted white, so must be
     * unadapted.
     */
 {
@@ -2593,7 +2593,7 @@ png_icc_set_cHRM_from_chrm(png_const_structrp png_ptr,
                {
                   /* For the perfect reflector 'Y' shall be normalized
                    * to 1,0 (see ICC 2010 4.14, XYZNumber), but this is
-                   * the media white point (not the adopted white)
+                   * the media white point (not the adapted white)
                    * adapted to the PCS illuminant, so Y might be some
                    * other value, this sanity check is mainly to avoid
                    * integer overflow.
@@ -2771,7 +2771,7 @@ png_icc_set_cHRM_from_endpoints(png_const_structrp png_ptr,
          png_XYZ cHRM_XYZ;
 
          /* Now we have colorant XYZ values in their unadapted form
-          * (i.e. implicitly with an adopted white of the media).
+          * (i.e. implicitly with an adapted white of the media).
           * This is what PNG uses for cHRM, but they need to be
           * converted to the libpng structure.
           *
@@ -3028,8 +3028,8 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
 
          case 0x63686164: /* 'chad' - chromaticAdaptationTag */
             /* The tag must be a 9 element array of s15Fixed16ArrayType, the tag
-             * is optional, if absent it indicates that the original adopted
-             * white was the same as the PCS adopted white - D50.
+             * is optional, if absent it indicates that the original adapted
+             * white was the same as the PCS adapted white - D50.
              */
             if (tag_length != 44)
                (void)profile_error(png_ptr, NULL, name, tag_start,
