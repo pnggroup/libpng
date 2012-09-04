@@ -272,7 +272,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    }
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-   else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)))
+   else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)) != 0)
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
       {

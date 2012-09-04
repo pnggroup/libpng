@@ -403,19 +403,24 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
  * here if you don't want to.  In the default configuration, png_ptr is
  * not used, but it is passed in case it may be useful.
  */
+typedef struct
+{
+   PNG_CONST char *file_name;
+}  pngtest_error_parameters;
+
 static void PNGCBAPI
 pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
    PNG_CONST char *name = "UNKNOWN (ERROR!)";
-   PNG_CONST char **test= (PNG_CONST char **)png_get_error_ptr(png_ptr);
+   pngtest_error_parameters *test =
+      (pngtest_error_parameters*)png_get_error_ptr(png_ptr);
 
    ++warning_count;
 
-   if (test == NULL || *test == NULL)
-     fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
+   if (test != NULL && test->file_name != NULL)
+      name = test->file_name;
 
-   else
-     fprintf(STDERR, "%s: libpng warning: %s\n", *test, message);
+   fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
 }
 
 /* This is the default error handling function.  Note that replacements for
@@ -800,7 +805,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 {
    static png_FILE_p fpin;
    static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
-   static PNG_CONST char *fp_name;
+   pngtest_error_parameters error_parameters;
    png_structp read_ptr;
    png_infop read_info_ptr, end_info_ptr;
 #ifdef PNG_WRITE_SUPPORTED
@@ -819,7 +824,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    int bit_depth, color_type;
 
    row_buf = NULL;
-   fp_name = inname;
+   error_parameters.file_name = inname;
 
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
@@ -843,7 +848,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    read_ptr =
       png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
-   png_set_error_fn(read_ptr, &fp_name, pngtest_error, pngtest_warning);
+   png_set_error_fn(read_ptr, &error_parameters, pngtest_error,
+      pngtest_warning);
 
 #ifdef PNG_WRITE_SUPPORTED
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
@@ -854,7 +860,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    write_ptr =
       png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
-   png_set_error_fn(write_ptr, &fp_name, pngtest_error, pngtest_warning);
+   png_set_error_fn(write_ptr, &error_parameters, pngtest_error,
+      pngtest_warning);
 #endif
    pngtest_debug("Allocating read_info, write_info and end_info structures");
    read_info_ptr = png_create_info_struct(read_ptr);

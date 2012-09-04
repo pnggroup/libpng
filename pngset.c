@@ -649,8 +649,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
     */
    {
       int result = png_colorspace_set_ICC(png_ptr, &info_ptr->colorspace, name,
-         proflen, profile, 0/* do *not* override the app cHRM or gAMA */,
-         info_ptr->color_type);
+         proflen, profile, info_ptr->color_type);
 
       png_colorspace_sync_info(png_ptr, info_ptr);
 
@@ -1072,7 +1071,7 @@ png_set_sPLT(png_const_structrp png_ptr,
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 static png_byte
-check_location(png_const_structrp png_ptr, unsigned int location)
+check_location(png_const_structrp png_ptr, int location)
 {
    location &= (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT);
 
@@ -1086,8 +1085,8 @@ check_location(png_const_structrp png_ptr, unsigned int location)
       png_app_warning(png_ptr,
          "png_set_unknown_chunks now expects a valid location");
       /* Use the old behavior */
-      location = png_ptr->mode &
-         (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT);
+      location = (png_byte)(png_ptr->mode &
+         (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT));
    }
 
    if (location == 0)
@@ -1097,7 +1096,7 @@ check_location(png_const_structrp png_ptr, unsigned int location)
     * significant bit in turn.
     */
    while (location != (location & -location))
-      location &= (png_byte)~(location & -location);
+      location &= ~(location & -location);
 
    /* The cast is safe because 'location' is a bit mask and only the low four
     * bits are significant.
@@ -1206,7 +1205,7 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 
       info_ptr->unknown_chunks[chunk].location =
-         check_location(png_ptr, (png_byte)location);
+         check_location(png_ptr, location);
    }
 }
 #endif

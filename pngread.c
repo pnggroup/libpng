@@ -139,7 +139,7 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_IEND(png_ptr, info_ptr, length);
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)))
+      else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)) != 0)
       {
          png_handle_unknown(png_ptr, info_ptr, length, keep);
 
@@ -723,7 +723,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_IEND(png_ptr, info_ptr, length);
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)))
+      else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)) != 0)
       {
          if (chunk_name == png_IDAT)
          {

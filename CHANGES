@@ -4233,7 +4233,7 @@ Version 1.6.0beta28 [August 29, 2012]
     contain the tags needed to process the PNG (tags all required by the ICC
     spec). Removed unused PNG_STATIC from pngpriv.h.
 
-Version 1.6.0beta29 [September 1, 2012]
+Version 1.6.0beta29 [September 4, 2012]
   Fixed the simplified API example programs to add the *colormap parameter
     to several of he API and improved the error message if the version field
     is not set.
@@ -4246,6 +4246,15 @@ Version 1.6.0beta29 [September 1, 2012]
     where the length has not been extended to a multiple of 4, and pngtest
     now intercepts all libpng errors, allowing the previously-introduced
     "--strict test" on no warnings to actually work.
+  Improved ICC profile handling including cHRM chunk generation and fixed
+    Cygwin+MSVC build errors. The ICC profile handling now includes more
+    checking.  Several errors that caused rejection of the profile are now
+    handled with a warning in such a way that the invalid profiles will be
+    read by default in release (but not pre-RC) builds but will not be
+    written by default.  The easy part of handling a cHRM chunk is written,
+    where the ICC profile contains the required data.  The more difficult
+    part plus guessing a gAMA value requires code to pass selected RGB values
+    through the profile.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

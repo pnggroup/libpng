@@ -1495,8 +1495,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                      */
                                     ok = png_icc_set_gAMA_and_cHRM(png_ptr,
                                        &png_ptr->colorspace, keyword, profile,
-                                       png_ptr->zstream.adler,
-                                       0/*prefer explicit gAMA/cHRM*/);
+                                       png_ptr->zstream.adler);
 
                                     /* Steal the profile for info_ptr. */
                                     if (ok && info_ptr != NULL)

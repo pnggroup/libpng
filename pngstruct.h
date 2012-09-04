@@ -119,6 +119,7 @@ typedef struct png_colorspace
 #ifdef PNG_COLORSPACE_SUPPORTED
    png_xy      end_points_xy;    /* End points as chromaticities */
    png_XYZ     end_points_XYZ;   /* End points as CIE XYZ colorant values */
+   png_uint_32 icc_info;         /* Record of information from the colorspace */
    png_uint_16 rendering_intent; /* Rendering intent of a profile */
 #endif
 
@@ -128,6 +129,75 @@ typedef struct png_colorspace
 
 typedef const png_colorspace * PNG_RESTRICT png_const_colorspacerp;
 
+/* ICC specific flags for the 'icc_info' field. */
+/* The first four bits are for information defined from the profile, the
+ * remainder of the bits indicate the presence of specific tags.  The #define
+ * names are derived from the tag name in the ICC 2010 (v4) specification.
+ */
+#  define PNG_ICC_PCSXYZ                 0x00000001U /* PCSXYS, else PCSLAB */
+#  define PNG_ICC_RGB                    0x00000002U /* 'RGB ', else 'GRAY ' */
+                                      /* 0x00000004U    reserved */
+                                      /* 0x00000008U    reserved */
+
+   /* A utility to return the number of channels on the A side of the transform
+    * given an info value (can be optimized).
+    */
+#  define PNG_ICC_CHANNELS(info) ((((info)&PNG_ICC_RGB)?2U:0U)+1U)
+
+   /* The profile description and copyright must be present in all valid ICC
+    * profiles, however libpng does not use them so absence is just reported as
+    * a warning.  The media white point should be present too, but if it isn't
+    * all we lose is the ability to know if it differs from the adopted white
+    * (i.e. the information that the device maxima are actually colored;
+    * a non-white substrate for a printer, or an uncorrected scan for example.)
+    * The chromaticAdaptationTag tells us that the adopted white of the original
+    * differs from the PCS adopted white (which is identical to the PCS
+    * illuminant and should always be D50).
+    */
+#  define PNG_ICC_profileDescriptionTag  0x00000010U /* required */
+#  define PNG_ICC_copyrightTag           0x00000020U /* required */
+#  define PNG_ICC_mediaWhitePointTag     0x00000040U /* required */
+#  define PNG_ICC_chromaticAdaptationTag 0x00000080U /* optional */
+
+   /* Tags that are required in all profiles (except DeviceLink): */
+#  define PNG_ICC_REQUIRED_BASE          0x00000070U
+
+   /* Other tags have to appear in specific profiles.  In general a profile must
+    * either contain appropriate TRC and (for RGB profiles) matrix tags *or* it
+    * must contain AToB0 and BToA0 - the CLUT based transforms to an absolute
+    * colorimetric PCS.  In the TRC case the PCS encoding must be PCSXYZ.
+    */
+#  define PNG_ICC_redMatrixColumnTag     0x00000100U
+#  define PNG_ICC_greenMatrixColumnTag   0x00000200U
+#  define PNG_ICC_blueMatrixColumnTag    0x00000400U
+                                      /* 0x00000800U    reserved */
+#  define PNG_ICC_redTRCTag              0x00001000U
+#  define PNG_ICC_greenTRCTag            0x00002000U
+#  define PNG_ICC_blueTRCTag             0x00004000U
+#  define PNG_ICC_grayTRCTag             0x00008000U
+#  define PNG_ICC_REQUIRED_RGB_MATRIXTRC 0x00007700U /* Required for RGB TRC */
+#  define PNG_ICC_ALL_TRC                0x0000f000U /* Includes all TRCTags */
+#  define PNG_ICC_REQUIRED_MATRIX        0x00000700U /* All MatrixColumnTags */
+
+#  define PNG_ICC_AToB0Tag               0x00010000U
+#  define PNG_ICC_BToA0Tag               0x00020000U
+#  define PNG_ICC_AToB1Tag               0x00040000U
+#  define PNG_ICC_BToA1Tag               0x00080000U
+#  define PNG_ICC_AToB2Tag               0x00100000U
+#  define PNG_ICC_BToA2Tag               0x00200000U
+#  define PNG_ICC_AToB_TAGS              0x00050000U /* Just AToB0 and AToB1 */
+#  define PNG_ICC_ALL_LUT                0x003f0000U
+                                      /* 0x00400000U    reserved */
+                                      /* 0x00800000U    reserved */
+
+   /* The ICC profile specification allows for shortcuts in the cHRM calculation
+    * via the colorant table (clrt) or the chromaticity tag (chrm).
+    */
+#  define PNG_ICC_chromaticityTag        0x01000000U
+#  define PNG_ICC_colorantTableTag       0x02000000U
+#  define PNG_ICC_gamutTag               0x04000000U
+
+/* General flags for the 'flags' field */
 #define PNG_COLORSPACE_HAVE_GAMMA           0x0001
 #define PNG_COLORSPACE_HAVE_ENDPOINTS       0x0002
 #define PNG_COLORSPACE_HAVE_INTENT          0x0004
