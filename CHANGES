@@ -4256,6 +4256,8 @@ Version 1.6.0beta29 [September 4, 2012]
     part plus guessing a gAMA value requires code to pass selected RGB values
     through the profile.
 
+Version 1.6.0beta30 [September 4, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

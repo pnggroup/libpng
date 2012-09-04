@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta29 - September 4, 2012
+Libpng 1.6.0beta30 - September 4, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta29.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta29.tar.gz
-   1.6.0beta29.tar.bz2
+   1.6.0beta30.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta30.tar.gz
+   1.6.0beta30.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b29.7z  (LZMA-compressed, recommended)
-   lp160b29.zip
+   lp160b30.7z  (LZMA-compressed, recommended)
+   lp160b30.zip
 
 Other information:
 
-   1.6.0beta29-README.txt
-   1.6.0beta29-LICENSE.txt
+   1.6.0beta30-README.txt
+   1.6.0beta30-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -503,6 +503,8 @@ Version 1.6.0beta29 [September 4, 2012]
     where the ICC profile contains the required data.  The more difficult
     part plus guessing a gAMA value requires code to pass selected RGB values
     through the profile.
+
+Version 1.6.0beta30 [September 4, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
