@@ -2477,17 +2477,17 @@ png_icc_find_chad(png_const_structrp png_ptr, png_const_charp name,
                return 2;
 
             (void)profile_error(png_ptr, NULL, name, temp,
-               "singular or overflowed ICC profile chromaticAdaptaionTag");
+               "singular or overflowed ICC profile chromaticAdaptationTag");
          }
 
          else
             (void)profile_error(png_ptr, NULL, name, temp,
-               "invalid type for ICC profile chromaticAdaptaionTag");
+               "invalid type for ICC profile chromaticAdaptationTag");
       }
 
       else /* Internal libpng error */
          (void)profile_error(png_ptr, NULL, name, tag_length,
-            "invalid length for ICC profile chromaticAdaptaionTag");
+            "invalid length for ICC profile chromaticAdaptationTag");
    }
 
    else
