@@ -2155,15 +2155,26 @@ png_find_icc_tag(png_const_bytep profile, png_uint_32 tag, png_uint_32p length)
  * png_int_32)[], not (const (png_int_32[])), consequently a compiler may object
  * to passing a (png_int_32[]) (which does not have const elements).
  */
-typedef png_int_32                      png_icc_vector[3];
-typedef png_int_32 (*PNG_RESTRICT       png_icc_vectorrp)[3];
-typedef const png_int_32 (*PNG_RESTRICT png_const_icc_vectorrp)[3];
-#define png_cpv(vector) png_constcast(const png_icc_vector*,&vector)
+#if __GNUC__ == 4 && __GNUC_MINOR__ == 2
+   /* GCC 4.2 has an optimization bug which means that if this code is compiled
+    * with any optimization (i.e. not -O0) it somehow manages to make casts to
+    * png_const_icc_matrixrp not work in some cases and so warns for some
+    * function calls.  This works round the problem without harming optimization
+    * with other compilers.
+    */
+#  define PNG_ICC_CONST
+#else
+#  define PNG_ICC_CONST const
+#endif
+typedef png_int_32                              png_icc_vector[3];
+typedef png_int_32 (*PNG_RESTRICT               png_icc_vectorrp)[3];
+typedef PNG_ICC_CONST png_int_32 (*PNG_RESTRICT png_const_icc_vectorrp)[3];
+#define png_cpv(vector) png_constcast(PNG_ICC_CONST png_icc_vector*,&vector)
 
-typedef png_int_32                      png_icc_matrix[3][3];
-typedef png_int_32 (*PNG_RESTRICT       png_icc_matrixrp)[3][3];
-typedef const png_int_32 (*PNG_RESTRICT png_const_icc_matrixrp)[3][3];
-#define png_cpm(matrix) png_constcast(const png_icc_matrix*,&matrix)
+typedef png_int_32                              png_icc_matrix[3][3];
+typedef png_int_32 (*PNG_RESTRICT               png_icc_matrixrp)[3][3];
+typedef PNG_ICC_CONST png_int_32 (*PNG_RESTRICT png_const_icc_matrixrp)[3][3];
+#define png_cpm(matrix) png_constcast(PNG_ICC_CONST png_icc_matrix*,&matrix)
 
 /* These two painfully complex routines are to detect under or overflow on
  * addition or subtraction of two 32-bit signed integers.  There's probably a
