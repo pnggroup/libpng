@@ -749,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta30 - September 5, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta30 - September 6, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta30 - September 5, 2012\
+      return "libpng version 1.6.0beta30 - September 6, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2155,14 +2155,14 @@ png_find_icc_tag(png_const_bytep profile, png_uint_32 tag, png_uint_32p length)
  * png_int_32)[], not (const (png_int_32[])), consequently a compiler may object
  * to passing a (png_int_32[]) (which does not have const elements).
  */
-typedef png_int_32                          png_icc_vector[3];
-typedef png_icc_vector * PNG_RESTRICT       png_icc_vectorrp;
-typedef const png_icc_vector * PNG_RESTRICT png_const_icc_vectorrp;
+typedef png_int_32                      png_icc_vector[3];
+typedef png_int_32 (*PNG_RESTRICT       png_icc_vectorrp)[3];
+typedef const png_int_32 (*PNG_RESTRICT png_const_icc_vectorrp)[3];
 #define png_cpv(vector) png_constcast(const png_icc_vector*,&vector)
 
-typedef png_icc_vector                      png_icc_matrix[3];
-typedef png_icc_matrix * PNG_RESTRICT       png_icc_matrixrp;
-typedef const png_icc_matrix * PNG_RESTRICT png_const_icc_matrixrp;
+typedef png_int_32                      png_icc_matrix[3][3];
+typedef png_int_32 (*PNG_RESTRICT       png_icc_matrixrp)[3][3];
+typedef const png_int_32 (*PNG_RESTRICT png_const_icc_matrixrp)[3][3];
 #define png_cpm(matrix) png_constcast(const png_icc_matrix*,&matrix)
 
 /* These two painfully complex routines are to detect under or overflow on
@@ -2200,8 +2200,8 @@ png_sub(png_int_32 * PNG_RESTRICT result, png_int_32 a, png_int_32 b)
 }
 
 static int
-png_matrix_x_vector(const png_const_icc_matrixrp m,
-   const png_const_icc_vectorrp v, const png_icc_vectorrp o)
+png_matrix_x_vector(png_const_icc_matrixrp m, png_const_icc_vectorrp v,
+   png_icc_vectorrp o)
    /* Apply the matrix (prefixed) to the column vector, updating the vector with
     * the result.
     */
@@ -2230,8 +2230,8 @@ png_matrix_x_vector(const png_const_icc_matrixrp m,
 }
 
 static int
-png_matrix_x_TmatrixT(const png_const_icc_matrixrp m1,
-   const png_const_icc_matrixrp m2, const png_icc_matrixrp o)
+png_matrix_x_TmatrixT(png_const_icc_matrixrp m1, png_const_icc_matrixrp m2,
+   png_icc_matrixrp o)
    /* NOTE: this passes in the transpose of the input matrix (because it passes
     * rows, not columns to x_vector) and then transposes the output too.  To get
     * correct matrix multiplication of two matrices it is necessary to transpose
