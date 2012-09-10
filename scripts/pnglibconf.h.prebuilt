@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.5.13beta02 - August 8, 2012 */
+/* Libpng 1.5.13beta03 - September 10, 2012 */
 
 /* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
 

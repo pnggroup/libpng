@@ -3902,7 +3902,7 @@ Version 1.5.13beta01 [August 8, 2012]
   Revised PNG_FP_EXPORT and PNG_FIXED_EXPORT macros to avoid generating
     lone semicolons (patch ported from libpng-1.6.0beta11).
 
-Version 1.5.13beta02 [August 10, 2012]
+Version 1.5.13beta02 [September 10, 2012]
   Corrected handling of the image array and the row_pointers array in example.c
   When png_set_filler is used to strip a filler channel during write, the
     code prior to 1.5 would ignore the case where the output required an
@@ -3913,6 +3913,7 @@ Version 1.5.13beta02 [August 10, 2012]
     expected to issue an error on the erroneous png_set_filler call.
   Use png_memset() consistently (pngmem.c contained some bare "memset" calls).
 
+Version 1.5.13beta03 [September 10, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
