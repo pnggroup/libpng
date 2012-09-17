@@ -1,5 +1,5 @@
 
-Libpng 1.5.13beta03 - September 10, 2012
+Libpng 1.5.13rc01 - September 17, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.13beta03.tar.xz (LZMA-compressed, recommended)
-   1.5.13beta03.tar.gz
-   1.5.13beta03.tar.bz2
+   1.5.13rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.13rc01.tar.gz
+   1.5.13rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1513b03.7z  (LZMA-compressed, recommended)
-   lp1513b03.zip
+   lp1513r01.7z  (LZMA-compressed, recommended)
+   lp1513r01.zip
 
 Other information:
 
-   1.5.13beta03-README.txt
-   1.5.13beta03-LICENSE.txt
+   1.5.13rc01-README.txt
+   1.5.13rc01-LICENSE.txt
 
 Changes since the last public release (1.5.12):
 
@@ -43,7 +43,8 @@ Version 1.5.13beta02 [September 10, 2012]
     expected to issue an error on the erroneous png_set_filler call.
   Use png_memset() consistently (pngmem.c contained some bare "memset" calls).
 
-Version 1.5.13beta03 [September 10, 2012]
+Version 1.5.13rc01 [September 17, 2012]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit
