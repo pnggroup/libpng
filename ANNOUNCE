@@ -1,38 +1,33 @@
 
-Libpng 1.5.13rc01 - September 17, 2012
+Libpng 1.5.13 - September 27, 2012
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.13rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.13rc01.tar.gz
-   1.5.13rc01.tar.bz2
+   libpng-1.5.13.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.13.tar.gz
+   libpng-1.5.13.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1513r01.7z  (LZMA-compressed, recommended)
-   lp1513r01.zip
+   lpng1513.7z  (LZMA-compressed, recommended)
+   lpng1513.zip
 
 Other information:
 
-   1.5.13rc01-README.txt
-   1.5.13rc01-LICENSE.txt
+   libpng-1.5.13-README.txt
+   libpng-1.5.13-LICENSE.txt
 
 Changes since the last public release (1.5.12):
-
-Version 1.5.13beta01 [August 8, 2012]
   Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
   Removed references to png_zalloc() and png_zfree() from the manual.
   Revised PNG_FP_EXPORT and PNG_FIXED_EXPORT macros to avoid generating
     lone semicolons (patch ported from libpng-1.6.0beta11).
-
-Version 1.5.13beta02 [September 10, 2012]
   Corrected handling of the image array and the row_pointers array in example.c
   When png_set_filler is used to strip a filler channel during write, the
     code prior to 1.5 would ignore the case where the output required an
@@ -43,12 +38,10 @@ Version 1.5.13beta02 [September 10, 2012]
     expected to issue an error on the erroneous png_set_filler call.
   Use png_memset() consistently (pngmem.c contained some bare "memset" calls).
 
-Version 1.5.13rc01 [September 17, 2012]
-  No changes.
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
+to subscribe)
+or to glennrp at users.sourceforge.net
 
 Glenn R-P
