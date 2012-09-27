@@ -3920,6 +3920,7 @@ Version 1.5.13 [September 27, 2012]
   No changes.
 
 Version 1.5.14beta01 [September 27, 2012]
+  Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
