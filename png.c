@@ -1,4 +1,4 @@
- 
+
 /* png.c - location for general purpose libpng functions
  *
  * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
@@ -749,13 +749,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta30 - September 6, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta30 - September 27, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta30 - September 6, 2012\
+      return "libpng version 1.6.0beta30 - September 27, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3386,14 +3386,17 @@ static const struct
 
    /* This is a 'mntr' (display) profile with a mediaWhitePointTag that does not
     * match the D50 PCS illuminant in the header (it is in fact the D65 values,
-    * so the white point is recorded as 
+    * so the white point is recorded as the un-adapted value.)  The profiles
+    * below only differ in one byte - the intent - and are basically the same as
+    * the previous profile except for the mediaWhitePointTag error and a missing
+    * chromaticAdaptationTag.
     */
    PNG_ICC_CHECKSUM(0xf784f3fb, 0x182ea552,
       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 1/*broken*/,
-      "1998/02/09 06:49:00", 3144, "sRGB Profile.icc")
+      "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 perceptual")
 
    PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
-      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 0,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };
 
