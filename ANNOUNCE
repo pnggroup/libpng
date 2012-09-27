@@ -517,6 +517,7 @@ Version 1.6.0beta30 [September 27, 2012]
   Added a work around for GCC 4.2 optimization bug.
   Marked the broken (bad white point) original HP sRGB profiles correctly and
     correct comments.
+  Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
