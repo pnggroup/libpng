@@ -91,6 +91,7 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <BrowseInformation>true</BrowseInformation>
       <FloatingPointExceptions>false</FloatingPointExceptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

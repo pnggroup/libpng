@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta30 - September 29, 2012
+Libpng 1.6.0beta30 - September 30, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -504,7 +504,7 @@ Version 1.6.0beta29 [September 4, 2012]
     part plus guessing a gAMA value requires code to pass selected RGB values
     through the profile.
 
-Version 1.6.0beta30 [September 29, 2012]
+Version 1.6.0beta30 [September 30, 2012]
   Changed ICC profile matrix/vector types to not depend on array type rules.
     By the ANSI-C standard the new types should be identical to the previous
     versions, and all known versions of gcc tested with the previous versions
@@ -518,7 +518,10 @@ Version 1.6.0beta30 [September 29, 2012]
   Marked the broken (bad white point) original HP sRGB profiles correctly and
     correct comments.
   Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7
-  Add updated WARNING file from libpng 1.5/vstudio
+  Use /MDd for vstudio debug builds. Also added pngunkown to the vstudio
+    builds, fixed build errors and corrected a minor exit code error in
+    pngvalid if the 'touch' file name is invalid.
+  Add updated WARNING file to projects/vstudio from libpng 1.5/vstudio
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
