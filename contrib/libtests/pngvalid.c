@@ -10090,6 +10090,12 @@ int main(int argc, char **argv)
             exit(1);
          }
       }
+
+      else
+      {
+         fprintf(stderr, "%s: open failed\n", touch);
+         exit(1);
+      }
    }
 
    return 0;

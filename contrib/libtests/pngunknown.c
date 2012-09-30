@@ -19,8 +19,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <setjmp.h>
 
-#include <png.h>
+/* Define the following to use this test against your installed libpng, rather
+ * than the one being built here:
+ */
+#ifdef PNG_FREESTANDING_TESTS
+#  include <png.h>
+#else
+#  include "../../png.h"
+#endif
 
 #ifdef PNG_READ_SUPPORTED
 
@@ -156,6 +164,14 @@ static struct
 
 #define NINFO ((int)((sizeof chunk_info)/(sizeof chunk_info[0])))
 
+static void
+clear_keep(void)
+{
+   int i = NINFO;
+   while (--i >= 0)
+      chunk_info[i].keep = 0;
+}
+
 static int
 find(const char *name)
 {
@@ -205,34 +221,101 @@ ancillaryb(const png_byte *name)
    return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
 }
 
-static int error_count = 0;
-static int warning_count = 0;
+/* Type of an error_ptr */
+typedef struct
+{
+   jmp_buf     error_return;
+   png_structp png_ptr;
+   png_infop   info_ptr, end_ptr;
+   int         error_count;
+   int         warning_count;
+   const char *program;
+   const char *file;
+   const char *test;
+} display;
+
+static const char init[] = "initialization";
+static const char cmd[] = "command line";
 
 static void
-error(png_structp png_ptr, const char *message)
+init_display(display *d, const char *program)
 {
-   fprintf(stderr, "libpng error: %s\n", message);
-   exit(1);
-   (void)png_ptr;
+   memset(d, 0, sizeof *d);
+   d->png_ptr = NULL;
+   d->info_ptr = d->end_ptr = NULL;
+   d->error_count = d->warning_count = 0;
+   d->program = program;
+   d->file = program;
+   d->test = init;
+}
+
+static void
+clean_display(display *d)
+{
+   png_destroy_read_struct(&d->png_ptr, &d->info_ptr, &d->end_ptr);
+
+   /* This must not happen - it might cause an app crash */
+   if (d->png_ptr != NULL || d->info_ptr != NULL || d->end_ptr != NULL)
+   {
+      fprintf(stderr, "%s(%s): png_destroy_read_struct error\n", d->file,
+         d->test);
+      exit(1);
+   }
+
+   /* Invalidate the test */
+   d->test = init;
+}
+
+PNG_FUNCTION(void, display_exit, (display *d), static PNG_NORETURN)
+{
+   ++(d->error_count);
+
+   if (d->png_ptr != NULL)
+      clean_display(d);
+
+   /* During initialization and if this is a single command line argument set
+    * exit now - there is only one test, otherwise longjmp to do the next test.
+    */
+   if (d->test == init || d->test == cmd)
+      exit(1);
+
+   longjmp(d->error_return, 1);
+}
+
+static int
+display_rc(const display *d, int strict)
+{
+   return d->error_count + (strict ? d->warning_count : 0);
+}
+
+/* libpng error and warning callbacks */
+PNG_FUNCTION(void, error, (png_structp png_ptr, const char *message),
+   static PNG_NORETURN)
+{
+   display *d = (display*)png_get_error_ptr(png_ptr);
+
+   fprintf(stderr, "%s(%s): libpng error: %s\n", d->file, d->test, message);
+   display_exit(d);
 }
 
 static void
 warning(png_structp png_ptr, const char *message)
 {
-   ++warning_count;
-   fprintf(stderr, "libpng warning: %s\n", message);
-   (void)png_ptr;
+   display *d = (display*)png_get_error_ptr(png_ptr);
+
+   fprintf(stderr, "%s(%s): libpng warning: %s\n", d->file, d->test, message);
+   ++(d->warning_count);
 }
 
 static png_uint_32
-get_valid(const char *file, png_const_structp png_ptr, png_const_infop info_ptr)
+get_valid(display *d, png_const_infop info_ptr)
 {
-   png_uint_32 flags = png_get_valid(png_ptr, info_ptr, (png_uint_32)~0);
+   png_uint_32 flags = png_get_valid(d->png_ptr, info_ptr, (png_uint_32)~0);
 
    /* Map the text chunks back into the flags */
    {
       png_textp text;
-      png_uint_32 ntext = png_get_text(png_ptr, info_ptr, &text, NULL);
+      png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL);
 
       while (ntext-- > 0) switch (text[ntext].compression)
       {
@@ -247,9 +330,9 @@ get_valid(const char *file, png_const_structp png_ptr, png_const_infop info_ptr)
             flags |= PNG_INFO_iTXt;
             break;
          default:
-            fprintf(stderr, "%s: unknown text compression %d\n", file,
-               text[ntext].compression);
-            exit(1);
+            fprintf(stderr, "%s(%s): unknown text compression %d\n", d->file,
+               d->test, text[ntext].compression);
+            display_exit(d);
       }
    }
 
@@ -257,14 +340,13 @@ get_valid(const char *file, png_const_structp png_ptr, png_const_infop info_ptr)
 }
 
 static png_uint_32
-get_unknown(const char *file, int def, png_const_structp png_ptr,
-   png_const_infop info_ptr)
+get_unknown(display *d, int def, png_const_infop info_ptr)
 {
    /* Create corresponding 'unknown' flags */
    png_uint_32 flags = 0;
    {
       png_unknown_chunkp unknown;
-      int num_unknown = png_get_unknown_chunks(png_ptr, info_ptr, &unknown);
+      int num_unknown = png_get_unknown_chunks(d->png_ptr, info_ptr, &unknown);
 
       while (--num_unknown >= 0)
       {
@@ -279,18 +361,19 @@ get_unknown(const char *file, int def, png_const_structp png_ptr,
             default: /* impossible */
             case PNG_HANDLE_CHUNK_AS_DEFAULT:
             case PNG_HANDLE_CHUNK_NEVER:
-               fprintf(stderr, "%s: %s: %s: unknown chunk saved\n",
-                  file, def ? "discard" : "default", unknown[num_unknown].name);
-               ++error_count;
+               fprintf(stderr, "%s(%s): %s: %s: unknown chunk saved\n",
+                  d->file, d->test, def ? "discard" : "default",
+                  unknown[num_unknown].name);
+               ++(d->error_count);
                break;
 
             case PNG_HANDLE_CHUNK_IF_SAFE:
                if (!ancillaryb(unknown[num_unknown].name))
                {
                   fprintf(stderr,
-                     "%s: if-safe: %s: unknown critical chunk saved\n",
-                     file, unknown[num_unknown].name);
-                  ++error_count;
+                     "%s(%s): if-safe: %s: unknown critical chunk saved\n",
+                     d->file, d->test, unknown[num_unknown].name);
+                  ++(d->error_count);
                   break;
                }
                /* FALL THROUGH (safe) */
@@ -307,35 +390,42 @@ get_unknown(const char *file, int def, png_const_structp png_ptr,
 }
 
 static int
-check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
+check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/,
+   display *d)
 {
-   png_structp png_ptr;
-   png_infop info_ptr, end_ptr;
    int i, def = PNG_HANDLE_CHUNK_AS_DEFAULT, npasses, ipass;
    png_uint_32 height;
 
-   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, error, warning);
-   if (png_ptr == NULL)
+   /* Some of these errors are permanently fatal and cause an exit here, others
+    * are per-test and cause an error return.
+    */
+   d->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, d, error,
+      warning);
+   if (d->png_ptr == NULL)
    {
-      fprintf(stderr, "%s: could not allocate png struct\n", argv[argc]);
+      fprintf(stderr, "%s(%s): could not allocate png struct\n", d->file,
+         d->test);
+      /* Terminate here, this error is not test specific. */
       exit(1);
    }
 
-   info_ptr = png_create_info_struct(png_ptr);
-   end_ptr = png_create_info_struct(png_ptr);
-   if (info_ptr == NULL || end_ptr == NULL)
+   d->info_ptr = png_create_info_struct(d->png_ptr);
+   d->end_ptr = png_create_info_struct(d->png_ptr);
+   if (d->info_ptr == NULL || d->end_ptr == NULL)
    {
-      fprintf(stderr, "%s: could not allocate png info\n", argv[argc]);
+      fprintf(stderr, "%s(%s): could not allocate png info\n", d->file,
+         d->test);
+      clean_display(d);
       exit(1);
    }
 
-   png_init_io(png_ptr, fp);
+   png_init_io(d->png_ptr, fp);
 
    /* Handle each argument in turn; multiple settings are possible for the same
     * chunk and multiple calls will occur (the last one should override all
     * preceding ones).
     */
-   for (i=1; i<argc; ++i)
+   for (i=0; i<argc; ++i)
    {
       const char *equals = strchr(argv[i], '=');
 
@@ -353,8 +443,9 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
             option = PNG_HANDLE_CHUNK_ALWAYS;
          else
          {
-            fprintf(stderr, "%s: unrecognized chunk option\n", argv[i]);
-            exit(2);
+            fprintf(stderr, "%s(%s): %s: unrecognized chunk option\n", d->file,
+               d->test, argv[i]);
+            display_exit(d);
          }
 
          switch (equals - argv[i])
@@ -373,10 +464,8 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
                      png_byte name[5];
 
                      memcpy(name, chunk_info[chunk].name, 5);
-                     png_set_keep_unknown_chunks(png_ptr, option, name, 1);
+                     png_set_keep_unknown_chunks(d->png_ptr, option, name, 1);
                      chunk_info[chunk].keep = option;
-#                 else
-                     (void)option;
 #                 endif
                   continue;
                }
@@ -387,9 +476,9 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
                if (memcmp(argv[i], "default", 7) == 0)
                {
 #                 ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
-                     png_set_keep_unknown_chunks(png_ptr, option, NULL, 0);
-                     def = option;
+                     png_set_keep_unknown_chunks(d->png_ptr, option, NULL, 0);
 #                 endif
+                  def = option;
                   continue;
                }
 
@@ -399,7 +488,7 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
                if (memcmp(argv[i], "all", 3) == 0)
                {
 #                 ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
-                     png_set_keep_unknown_chunks(png_ptr, option, NULL, -1);
+                     png_set_keep_unknown_chunks(d->png_ptr, option, NULL, -1);
                      def = option;
 
                      for (chunk = 0; chunk < NINFO; ++chunk)
@@ -417,13 +506,14 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
          }
       }
 
-      fprintf(stderr, "%s: unrecognized chunk argument\n", argv[i]);
-      exit(2);
+      fprintf(stderr, "%s(%s): %s: unrecognized chunk argument\n", d->file,
+         d->test, argv[i]);
+      display_exit(d);
    }
 
-   png_read_info(png_ptr, info_ptr);
+   png_read_info(d->png_ptr, d->info_ptr);
 
-   switch (png_get_interlace_type(png_ptr, info_ptr))
+   switch (png_get_interlace_type(d->png_ptr, d->info_ptr))
    {
       case PNG_INTERLACE_NONE:
          npasses = 1;
@@ -434,7 +524,9 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
          break;
 
       default:
-         fprintf(stderr, "%s: invalid interlace type\n", argv[argc]);
+         /* Hard error because it is not test specific */
+         fprintf(stderr, "%s(%s): invalid interlace type\n", d->file, d->test);
+         clean_display(d);
          exit(1);
    }
 
@@ -443,12 +535,12 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
     */
    if (chunk_info[0/*IDAT*/].keep == PNG_HANDLE_CHUNK_AS_DEFAULT)
    {
-      png_start_read_image(png_ptr);
-      height = png_get_image_height(png_ptr, info_ptr);
+      png_start_read_image(d->png_ptr);
+      height = png_get_image_height(d->png_ptr, d->info_ptr);
 
       if (npasses > 1)
       {
-         png_uint_32 width = png_get_image_width(png_ptr, info_ptr);
+         png_uint_32 width = png_get_image_width(d->png_ptr, d->info_ptr);
 
          for (ipass=0; ipass<npasses; ++ipass)
          {
@@ -459,7 +551,7 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
                png_uint_32 y;
 
                for (y=0; y<height; ++y) if (PNG_ROW_IN_INTERLACE_PASS(y, ipass))
-                  png_read_row(png_ptr, NULL, NULL);
+                  png_read_row(d->png_ptr, NULL, NULL);
             }
          }
       } /* interlaced */
@@ -469,49 +561,50 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/)
          png_uint_32 y;
 
          for (y=0; y<height; ++y)
-            png_read_row(png_ptr, NULL, NULL);
+            png_read_row(d->png_ptr, NULL, NULL);
       }
    }
 
-   png_read_end(png_ptr, end_ptr);
+   png_read_end(d->png_ptr, d->end_ptr);
 
-   flags[0] = get_valid(argv[argc], png_ptr, info_ptr);
-   flags[1] = get_unknown(argv[argc], def, png_ptr, info_ptr);
+   flags[0] = get_valid(d, d->info_ptr);
+   flags[1] = get_unknown(d, def, d->info_ptr);
 
    /* Only png_read_png sets PNG_INFO_IDAT! */
    flags[chunk_info[0/*IDAT*/].keep != PNG_HANDLE_CHUNK_AS_DEFAULT] |=
       PNG_INFO_IDAT;
 
-   flags[2] = get_valid(argv[argc], png_ptr, end_ptr);
-   flags[3] = get_unknown(argv[argc], def, png_ptr, end_ptr);
+   flags[2] = get_valid(d, d->end_ptr);
+   flags[3] = get_unknown(d, def, d->end_ptr);
 
-   png_destroy_read_struct(&png_ptr, &info_ptr, &end_ptr);
+   clean_display(d);
 
    return def;
 }
 
 static void
-check_error(const char *file, png_uint_32 flags, const char *message)
+check_error(display *d, png_uint_32 flags, const char *message)
 {
    while (flags)
    {
-      png_uint_32 flag = flags & -flags;
+      png_uint_32 flag = flags & -(png_int_32)flags;
       int i = find_by_flag(flag);
 
-      fprintf(stderr, "%s: chunk %s: %s\n", file, chunk_info[i].name, message);
-      ++error_count;
+      fprintf(stderr, "%s(%s): chunk %s: %s\n", d->file, d->test,
+         chunk_info[i].name, message);
+      ++(d->error_count);
 
       flags &= ~flag;
    }
 }
 
 static void
-check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
+check_handling(display *d, int def, png_uint_32 chunks, png_uint_32 known,
    png_uint_32 unknown, const char *position)
 {
    while (chunks)
    {
-      png_uint_32 flag = chunks & -chunks;
+      png_uint_32 flag = chunks & -(png_int_32)chunks;
       int i = find_by_flag(flag);
       int keep = chunk_info[i].keep;
       const char *type;
@@ -613,71 +706,36 @@ check_handling(const char *file, int def, png_uint_32 chunks, png_uint_32 known,
 
       if (errorx != NULL)
       {
-         ++error_count;
-         fprintf(stderr, "%s: %s %s %s: %s\n",
-            file, type, chunk_info[i].name, position, errorx);
+         ++(d->error_count);
+         fprintf(stderr, "%s(%s): %s %s %s: %s\n",
+            d->file, d->test, type, chunk_info[i].name, position, errorx);
       }
 
       chunks &= ~flag;
    }
 }
 
-int
-main(int argc, const char **argv)
+static void
+perform_one_test(FILE *fp, int argc, const char **argv,
+   png_uint_32 *default_flags, display *d)
 {
-   FILE *fp;
-   png_uint_32 flags[2/*default/+options*/][4/*valid,unknown{before,after}*/];
-   int def, strict = 0;
-   const char *program = argv[0];
-   const char *count_argv[3];
+   int def;
+   png_uint_32 flags[2][4];
 
-   if (argc > 1 && strcmp(argv[1], "--strict") == 0)
-   {
-      strict = 1;
-      --argc;
-      ++argv;
-   }
-
-   if (--argc < 1)
-   {
-      fprintf(stderr, "pngunknown: usage:\n"
-      " %s {(CHNK|default|all)=(default|discard|if-safe|save)} testfile.png\n",
-         program);
-      exit(2);
-   }
-
-#  ifndef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
-      fprintf(stderr,
-         "pngunknown: warning: no 'save' support so arguments ignored\n");
-#  endif
-   fp = fopen(argv[argc], "rb");
-   if (fp == NULL)
-   {
-      perror(argv[argc]);
-      exit(2);
-   }
-
-   /* First find all the chunks, known and unknown, in the test file: */
-   count_argv[0] = program;
-   count_argv[1] = "default=save";
-   count_argv[2] = argv[argc];
-   (void)check(fp, 2, count_argv, flags[0]);
-
-   /* Now find what the various supplied options cause to change: */
    rewind(fp);
-   def = check(fp, argc, argv, flags[1]);
-   fclose(fp);
+   clear_keep();
+   memcpy(flags[0], default_flags, sizeof flags[0]);
+
+   def = check(fp, argc, argv, flags[1], d);
 
    /* Chunks should either be known or unknown, never both and this should apply
     * whether the chunk is before or after the IDAT (actually, the app can
     * probably change this by swapping the handling after the image, but this
     * test does not do that.)
     */
-   check_error(argc[argv],
-      (flags[0][0]|flags[0][2]) & (flags[0][1]|flags[0][3]),
+   check_error(d, (flags[0][0]|flags[0][2]) & (flags[0][1]|flags[0][3]),
       "chunk handled inconsistently in count tests");
-   check_error(argc[argv],
-      (flags[1][0]|flags[1][2]) & (flags[1][1]|flags[1][3]),
+   check_error(d, (flags[1][0]|flags[1][2]) & (flags[1][1]|flags[1][3]),
       "chunk handled inconsistently in option tests");
 
    /* Now find out what happened to each chunk before and after the IDAT and
@@ -689,25 +747,206 @@ main(int argc, const char **argv)
       png_uint_32 test;
 
       test = flags[1][0] & ~flags[0][0];
-      check_error(argv[argc], test, "new known chunk before IDAT");
+      check_error(d, test, "new known chunk before IDAT");
       test = flags[1][1] & ~(flags[0][0] | flags[0][1]);
-      check_error(argv[argc], test, "new unknown chunk before IDAT");
+      check_error(d, test, "new unknown chunk before IDAT");
       test = flags[1][2] & ~flags[0][2];
-      check_error(argv[argc], test, "new known chunk after IDAT");
+      check_error(d, test, "new known chunk after IDAT");
       test = flags[1][3] & ~(flags[0][2] | flags[0][3]);
-      check_error(argv[argc], test, "new unknown chunk after IDAT");
+      check_error(d, test, "new unknown chunk after IDAT");
    }
 
    /* Now each chunk in the original list should have been handled according to
     * the options set for that chunk, regardless of whether libpng knows about
     * it or not.
     */
-   check_handling(argv[argc], def, flags[0][0] | flags[0][1], flags[1][0],
-      flags[1][1], "before IDAT");
-   check_handling(argv[argc], def, flags[0][2] | flags[0][3], flags[1][2],
-      flags[1][3], "after IDAT");
+   check_handling(d, def, flags[0][0] | flags[0][1], flags[1][0], flags[1][1],
+      "before IDAT");
+   check_handling(d, def, flags[0][2] | flags[0][3], flags[1][2], flags[1][3],
+      "after IDAT");
+}
 
-   return error_count + (strict ? warning_count : 0);
+static void
+perform_one_test_safe(FILE *fp, int argc, const char **argv,
+   png_uint_32 *default_flags, display *d, const char *test)
+{
+   if (setjmp(d->error_return) == 0)
+   {
+      d->test = test; /* allow use of d->error_return */
+      perform_one_test(fp, argc, argv, default_flags, d);
+      d->test = init; /* prevent use of d->error_return */
+   }
+}
+
+static const char *standard_tests[] =
+{
+ "discard", "default=discard", 0,
+ "save", "default=save", 0,
+ "if-safe", "default=if-safe", 0,
+ "vpAg", "vpAg=if-safe", 0,
+ "sTER", "sTER=if-safe", 0,
+ "IDAT", "default=discard", "IDAT=save", 0,
+ "sAPI", "bKGD=save", "cHRM=save", "gAMA=save", "all=discard", "iCCP=save",
+   "sBIT=save", "sRGB=save", 0,
+ 0/*end*/
+};
+
+static PNG_NORETURN void
+usage(const char *program, const char *reason)
+{
+   fprintf(stderr, "pngunknown: %s: usage:\n %s [--strict] "
+      "--default|{(CHNK|default|all)=(default|discard|if-safe|save)} "
+      "testfile.png\n", reason, program);
+   exit(2);
+}
+
+int
+main(int argc, const char **argv)
+{
+   FILE *fp;
+   png_uint_32 default_flags[4/*valid,unknown{before,after}*/];
+   int strict = 0, default_tests = 0;
+   const char *count_argv = "default=save";
+   const char *touch_file = NULL;
+   display d;
+
+   init_display(&d, argv[0]);
+
+   while (++argv, --argc > 0)
+   {
+      if (strcmp(*argv, "--strict") == 0)
+         strict = 1;
+
+      else if (strcmp(*argv, "--default") == 0)
+         default_tests = 1;
+
+      else if (strcmp(*argv, "--touch") == 0)
+      {
+         if (argc > 1)
+            touch_file = *++argv, --argc;
+
+         else
+            usage(d.program, "--touch: missing file name");
+      }
+
+      else
+         break;
+   }
+
+   /* A file name is required, but there should be no other arguments if
+    * --default was specified.
+    */
+   if (argc <= 0)
+      usage(d.program, "missing test file");
+
+   /* GCC BUG: if (default_tests && argc != 1) triggers some weird GCC argc
+    * optimization which causes warnings with -Wstrict-overflow!
+    */
+   else if (default_tests) if (argc != 1)
+      usage(d.program, "extra arguments");
+
+#  ifndef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+      fprintf(stderr, "%s: warning: no 'save' support so arguments ignored\n",
+         d.program);
+#  endif
+
+   /* The name of the test file is the last argument; remove it. */
+   d.file = argv[--argc];
+
+   fp = fopen(d.file, "rb");
+   if (fp == NULL)
+   {
+      perror(d.file);
+      exit(2);
+   }
+
+   /* First find all the chunks, known and unknown, in the test file, a failure
+    * here aborts the whole test.
+    */
+   if (check(fp, 1, &count_argv, default_flags, &d) !=
+      PNG_HANDLE_CHUNK_ALWAYS)
+   {
+      fprintf(stderr, "%s: %s: internal error\n", d.program, d.file);
+      exit(3);
+   }
+
+   /* Now find what the various supplied options cause to change: */
+   if (!default_tests)
+   {
+      d.test = cmd; /* acts as a flag to say exit, do not longjmp */
+      perform_one_test(fp, argc, argv, default_flags, &d);
+      d.test = init;
+   }
+
+   else
+   {
+      const char **test = standard_tests;
+
+      /* Set the exit_test pointer here so we can continue after a libpng error.
+       * NOTE: this leaks memory because the png_struct data from the failing
+       * test is never freed.
+       */
+      while (*test)
+      {
+         const char *this_test = *test++;
+         const char **next = test;
+         int count = display_rc(&d, strict), new_count;
+         const char *result;
+         int arg_count = 0;
+
+         while (*next) ++next, ++arg_count;
+
+         perform_one_test_safe(fp, arg_count, test, default_flags, &d,
+            this_test);
+
+         new_count = display_rc(&d, strict);
+
+         if (new_count == count)
+            result = "PASS";
+
+         else
+            result = "FAIL";
+
+         printf("%s: %s %s\n", result, d.program, this_test);
+
+         test = next+1;
+      }
+   }
+
+   fclose(fp);
+
+   if (display_rc(&d, strict) == 0)
+   {
+      /* Success, touch the success file if appropriate */
+      if (touch_file != NULL)
+      {
+         FILE *fsuccess = fopen(touch_file, "wt");
+
+         if (fsuccess != NULL)
+         {
+            int err = 0;
+            fprintf(fsuccess, "PNG unknown tests succeeded\n");
+            fflush(fsuccess);
+            err = ferror(fsuccess);
+
+            if (fclose(fsuccess) || err)
+            {
+               fprintf(stderr, "%s: write failed\n", touch_file);
+               exit(1);
+            }
+         }
+
+         else
+         {
+            fprintf(stderr, "%s: open failed\n", touch_file);
+            exit(1);
+         }
+      }
+
+      return 0;
+   }
+
+   return 1;
 }
 
 #else
