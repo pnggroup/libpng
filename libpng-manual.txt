@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta30 - September 4, 2012
+ libpng version 1.6.0beta30 - October 10, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta30 - September 4, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta30 - October 10, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -67,7 +67,7 @@ of reducing the amount of time and effort it takes to support the PNG
 file format in application programs.
 
 The PNG specification (second edition), November 2003, is available as
-a W3C Recommendation and as an ISO Standard (ISO/IEC 15948:2003 (E)) at
+a W3C Recommendation and as an ISO Standard (ISO/IEC 15948:2004 (E)) at
 <http://www.w3.org/TR/2003/REC-PNG-20031110/
 The W3C and ISO documents have identical technical content.
 
@@ -5019,7 +5019,7 @@ pngtest) appear in
 pngpriv.h
 above the comment that says
 
-  /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
+  /* Maintainer: Put new private prototypes here ^ */
 
 We put a space after the "sizeof" operator and we omit the
 optional parentheses around its argument when the argument
@@ -5033,7 +5033,7 @@ Prior to libpng-1.6.0 we used a "png_sizeof()" macro, formatted as
 though it were a function.
 
 To avoid polluting the global namespace, the names of all exported
-functions and variables begin with  "png_", and all publicly visible C
+functions and variables begin with "png_", and all publicly visible C
 preprocessor macros begin with "PNG".  We request that applications that
 use libpng *not* begin any of their own symbols with either of these strings.
 
@@ -5047,7 +5047,7 @@ left parenthesis that follows it:
     for (i = 2; i > 0; --i)
        y[i] = a(x) + (int)b;
 
-We prefer #ifdef and #ifndef to #if defined() and if !defined()
+We prefer #ifdef and #ifndef to #if defined() and #if !defined()
 when there is only one macro being tested.
 
 We prefer to express integers that are used as bit masks in hex format,
@@ -5064,7 +5064,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-September 4, 2012
+October 10, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
