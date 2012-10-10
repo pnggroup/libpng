@@ -1583,14 +1583,14 @@ PNG_EXTERN void png_ascii_from_fixed PNGARG((png_structp png_ptr,
 #define PNG_FP_IS_POSITIVE(state) (((state) & PNG_FP_NZ_MASK) == PNG_FP_Z_MASK)
 #define PNG_FP_IS_NEGATIVE(state) (((state) & PNG_FP_NZ_MASK) == PNG_FP_NZ_MASK)
 
-/* The actual parser.  This can be called repeatedly, it updates
+/* The actual parser.  This can be called repeatedly. It updates
  * the index into the string and the state variable (which must
- * be initialzed to 0).  It returns a result code, as above.  There
+ * be initialized to 0).  It returns a result code, as above.  There
  * is no point calling the parser any more if it fails to advance to
  * the end of the string - it is stuck on an invalid character (or
  * terminated by '\0').
  *
- * Note that the pointer will consume an E or even an E+ then leave
+ * Note that the pointer will consume an E or even an E+ and then leave
  * a 'maybe' state even though a preceding integer.fraction is valid.
  * The PNG_FP_WAS_VALID flag indicates that a preceding substring was
  * a valid number.  It's possible to recover from this by calling
@@ -1664,7 +1664,7 @@ PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
     int bit_depth));
 #endif
 
-/* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
+/* Maintainer: Put new private prototypes here ^ */
 
 #include "pngdebug.h"
 
