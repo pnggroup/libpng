@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta01 - September 29, 2012
+Libpng 1.5.14beta01 - October 24, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,8 +26,20 @@ Other information:
 
 Changes since the last public release (1.5.13):
 
+Version 1.5.14beta01 [October 24, 2012]
   Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7
   Warn about the incorrect runtime library setting for VS2010 debug DLL builds.
+  Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
+    pngrtran.c (Domani Hannes).
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe)
+or to glennrp at users.sourceforge.net
+
+Glenn R-P
+#endif
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
 (subscription required; visit

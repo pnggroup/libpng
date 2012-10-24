@@ -3920,7 +3920,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structp png_ptr)
                         *sp = (png_byte)png_ptr->background.gray;
 
                      else if (a < 0xff)
-                        png_composite(*sp, *sp, a, png_ptr->background_1.gray);
+                        png_composite(*sp, *sp, a, png_ptr->background.gray);
                   }
                }
             }
@@ -3989,7 +3989,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structp png_ptr)
                         png_uint_16 g, v;
 
                         g = (png_uint_16)(((*sp) << 8) + *(sp + 1));
-                        png_composite_16(v, g, a, png_ptr->background_1.gray);
+                        png_composite_16(v, g, a, png_ptr->background.gray);
                         *sp = (png_byte)((v >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(v & 0xff);
                      }
