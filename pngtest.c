@@ -927,7 +927,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        * changed with '--relaxed'.
        */
    }
-   
+
    else if (relaxed)
    {
       /* Allow application (pngtest) errors and warnings to pass */
