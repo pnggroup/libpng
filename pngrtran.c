@@ -3284,7 +3284,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
 
       if (row_info->bit_depth == 8)
       {
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
+#ifdef PNG_READ_GAMMA_SUPPORTED
          /* Notice that gamma to/from 1 are not necessarily inverses (if
           * there is an overall gamma correction).  Prior to 1.5.5 this code
           * checked the linearized values for equality; this doesn't match
@@ -3361,7 +3361,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
 
       else /* RGB bit_depth == 16 */
       {
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
+#ifdef PNG_READ_GAMMA_SUPPORTED
          if (png_ptr->gamma_16_to_1 != NULL && png_ptr->gamma_16_from_1 != NULL)
          {
             png_bytep sp = row;
@@ -3535,12 +3535,12 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
    png_const_uint_16pp gamma_16_from_1 = png_ptr->gamma_16_from_1;
    png_const_uint_16pp gamma_16_to_1 = png_ptr->gamma_16_to_1;
    int gamma_shift = png_ptr->gamma_shift;
+   int optimize = (png_ptr->flags & PNG_FLAG_OPTIMIZE_ALPHA) != 0;
 #endif
 
    png_bytep sp;
    png_uint_32 i;
    png_uint_32 row_width = row_info->width;
-   int optimize = (png_ptr->flags & PNG_FLAG_OPTIMIZE_ALPHA) != 0;
    int shift;
 
    png_debug(1, "in png_do_compose");

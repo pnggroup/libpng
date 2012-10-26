@@ -4290,6 +4290,7 @@ Version 1.6.0beta31 [October 26, 2012]
     has been changed to allow an external CMS to be used.  This code is
     temporarily disabled until a suitable set of test cases using one or more
     external CMS implementations have been implemented.
+  Make builds -DPNG_NO_READ_GAMMA compile (the unit tests still fail).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

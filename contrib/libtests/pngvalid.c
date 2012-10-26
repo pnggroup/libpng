@@ -2004,6 +2004,7 @@ static double abserr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
       return pm->maxabs8;
 }
 
+#ifdef PNG_READ_GAMMA_SUPPORTED
 static double calcerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
    /* Error in the linear composition arithmetic - only relevant when
@@ -2120,6 +2121,7 @@ static int output_quantization_factor(PNG_CONST png_modifier *pm, int in_depth,
    else
       return 1;
 }
+#endif /* PNG_READ_GAMMA_SUPPORTED */
 
 /* One modification structure must be provided for each chunk to be modified (in
  * fact more than one can be provided if multiple separate changes are desired
@@ -2808,6 +2810,7 @@ srgb_modification_init(srgb_modification *me, png_modifier *pm, png_byte intent)
    pm->modifications = &me->this;
 }
 
+#ifdef PNG_READ_GAMMA_SUPPORTED
 typedef struct sbit_modification
 {
    png_modification this;
@@ -2874,6 +2877,7 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
    me->this.next = pm->modifications;
    pm->modifications = &me->this;
 }
+#endif /* PNG_READ_GAMMA_SUPPORTED */
 #endif /* PNG_READ_TRANSFORMS_SUPPORTED */
 
 /***************************** STANDARD PNG FILES *****************************/
