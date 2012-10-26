@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta31 - October 24, 2012
+Libpng 1.6.0beta31 - October 26, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -525,7 +525,8 @@ Version 1.6.0beta30 [October 24, 2012]
   Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
     pngrtran.c (Domani Hannes).
 
-Version 1.6.0beta31 [October 24, 2012]
+Version 1.6.0beta31 [October 26, 2012]
+  Undid the erroneous change to vstudio/pngvalid build in libpng-1.6.0beta30.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
