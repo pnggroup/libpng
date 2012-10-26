@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.6.0beta31 - October 24, 2012 */
+/* Libpng 1.6.0beta31 - October 26, 2012 */
 
 /* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
 
@@ -63,6 +63,7 @@
 #define PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 #define PNG_hIST_SUPPORTED
 #define PNG_iCCP_SUPPORTED
+/*#undef PNG_ICC_SUPPORTED*/
 #define PNG_INCH_CONVERSIONS_SUPPORTED
 #define PNG_INFO_IMAGE_SUPPORTED
 #define PNG_IO_STATE_SUPPORTED

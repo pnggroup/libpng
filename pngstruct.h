@@ -203,8 +203,9 @@ typedef const png_colorspace * PNG_RESTRICT png_const_colorspacerp;
 #define PNG_COLORSPACE_HAVE_INTENT          0x0004
 #define PNG_COLORSPACE_FROM_gAMA            0x0008
 #define PNG_COLORSPACE_FROM_cHRM            0x0010
-#define PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB 0x0020
-#define PNG_COLORSPACE_MATCHES_sRGB         0x0040 /* exact match on profile */
+#define PNG_COLORSPACE_FROM_sRGB            0x0020
+#define PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB 0x0040
+#define PNG_COLORSPACE_MATCHES_sRGB         0x0080 /* exact match on profile */
 #define PNG_COLORSPACE_INVALID              0x8000
 #define PNG_COLORSPACE_CANCEL(flags)        (0xffff ^ (flags))
 #endif /* COLORSPACE || GAMMA */
@@ -547,5 +548,17 @@ struct png_struct_def
    png_colorspace   colorspace;
 #endif
 #endif
+
+#ifdef PNG_ICC_SUPPORTED
+   /* Full ICC support requires an external CMS be registered in the png_struct
+    * after it is created.  The registration stores this information.
+    */
+   png_cms_transform_ptr cms_transform_fn;
+   png_cms_datap         cms_data_ptr;
+#ifdef PNG_READ_SUPPORTED
+   int                   cms_bytes_per_pixel; /* non-standard output size */
+   int                   cms_intent;          /* for non-standard output */
+#endif
+#endif /* PNG_ICC_SUPPORTED */
 };
 #endif /* PNGSTRUCT_H */

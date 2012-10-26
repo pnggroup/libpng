@@ -478,6 +478,20 @@ option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 option GAMMA disabled
 option COLORSPACE enables GAMMA disabled
 
+# ICC profile support; basic ICC profile support is enabled if iCCP chunk read
+# or write is enabled.  The application must perform all iCCP profile handling
+# itself.  If full support is enabled with the option below libpng will attempt
+# to do more processing using the profile data itself, this includes setting
+# appropriate values for cHRM and gAMA chunks if not present in the stream.
+#
+# ICC profile support is not build in to core libpng because of the size of the
+# code required; an external ICC implementation must be passed to libpng to
+# enable it.
+#
+# WARNING: this option is CURRENTLY UNTESTED because a test CMS implementation
+# has not yet been written, as a result it is disabled in current beta builds.
+option ICC requires iCCP enables SAVE_INT_32 disabled
+
 # When an ICC profile is read, or png_set, it will be checked for a match
 # against known sRGB profiles if the sRGB handling is enabled.  This
 # setting controls how much work is done during the check:
@@ -694,9 +708,10 @@ option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 
 option WRITE_FILTER requires WRITE
 
-option SAVE_INT_32 requires WRITE
-
-# png_save_int_32 is required by the ancillary chunks oFFs and pCAL
+option SAVE_INT_32 disabled
+# png_save_int_32 is required internally for writing the ancillary chunks oFFs
+# and pCAL and for both reading and writing iCCP (for the generation/checking of
+# the corresponding cHRM/gAMA chunks) if full ICC is supported.
 
 # added at libpng-1.5.4
 

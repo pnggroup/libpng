@@ -1406,9 +1406,12 @@ PNG_INTERNAL_FUNCTION(void,png_do_write_intrapixel,(png_row_infop row_info,
 
 /* Added at libpng version 1.6.0 */
 #ifdef PNG_GAMMA_SUPPORTED
-PNG_INTERNAL_FUNCTION(int,png_colorspace_set_gamma,(png_const_structrp png_ptr,
-    png_colorspacerp colorspace, png_fixed_point gAMA, int preferred),
-    PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_colorspace_set_gamma,(png_const_structrp png_ptr,
+    png_colorspacerp colorspace, png_fixed_point gAMA), PNG_EMPTY);
+   /* Set the colorspace gamma with a value provided by the application or by
+    * the gAMA chunk on read.  The value will override anything set by an ICC
+    * profile.
+    */
 
 PNG_INTERNAL_FUNCTION(void,png_colorspace_sync_info,(png_const_structrp png_ptr,
     png_inforp info_ptr), PNG_EMPTY);
@@ -1436,7 +1439,12 @@ PNG_INTERNAL_FUNCTION(int,png_colorspace_set_endpoints,
 
 #ifdef PNG_sRGB_SUPPORTED
 PNG_INTERNAL_FUNCTION(int,png_colorspace_set_sRGB,(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, int intent, int preferred), PNG_EMPTY);
+   png_colorspacerp colorspace, int intent), PNG_EMPTY);
+   /* This does set the colorspace gAMA and cHRM values too, but doesn't set the
+    * flags to write them, if it returns false there was a problem and an error
+    * message has already been output (but the colorspace may still need to be
+    * synced to record the invalid flag).
+    */
 #endif /* sRGB */
 
 #ifdef PNG_iCCP_SUPPORTED
@@ -1459,14 +1467,15 @@ PNG_INTERNAL_FUNCTION(int,png_icc_check_tag_table,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
    png_uint_32 profile_length,
    png_const_bytep profile /* header plus whole tag table */), PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,png_icc_set_gAMA_and_cHRM,(
+PNG_INTERNAL_FUNCTION(void,png_icc_set_gAMA_and_cHRM,(
    png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_const_bytep profile, uLong adler), PNG_EMPTY);
    /* 'adler' is the Adler32 checksum of the uncompressed profile data. It may
     * be zero to indicate that it is not available.  It is used, if provided,
-    * as a fast check on the profile when checking to see if it is sRGB.  The
-    * result is false only if an error is detected in the profile; the routine
-    * may return true without actually setting cHRM and gAMA values.
+    * as a fast check on the profile when checking to see if it is sRGB.
+    * The routine may not set gAMA or cHRM if there are problems in the profile,
+    * however none of these problems are fatal (the profile has already been
+    * checked.)
     */
 #endif /* iCCP */
 
@@ -1597,6 +1606,21 @@ PNG_INTERNAL_FUNCTION(void,png_app_error,(png_const_structrp png_ptr,
 #  define png_app_warning(pp,s) png_warning(pp,s)
 #  define png_app_error(pp,s) png_error(pp,s)
 #endif
+
+PNG_INTERNAL_FUNCTION(void,png_chunk_report,(png_const_structrp png_ptr,
+   png_const_charp message, int error),PNG_EMPTY);
+   /* Report a recoverable issue in chunk data.  On read this is used to report
+    * a problem found while reading a particular chunk and the
+    * png_chunk_benign_error or png_chunk_warning function is used as
+    * appropriate.  On write this is used to report an error that comes from
+    * data set via an application call to a png_set_ API and png_app_error or
+    * png_app_warning is used as appropriate.
+    *
+    * The 'error' parameter must have one of the following values:
+    */
+#define PNG_CHUNK_WARNING     0 /* never an error */
+#define PNG_CHUNK_WRITE_ERROR 1 /* an error only on write */
+#define PNG_CHUNK_ERROR       2 /* always an error */
 
 /* ASCII to FP interfaces, currently only implemented if sCAL
  * support is required.

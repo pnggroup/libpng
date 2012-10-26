@@ -1087,31 +1087,7 @@ png_handle_gAMA(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    igamma = png_get_fixed_point(NULL, buf);
 
-   /* The gAMA value is unsigned (and is a power law correction, so 0 is
-    * meaningless.)
-    */
-   if (igamma <= 0)
-   {
-      png_chunk_benign_error(png_ptr, "out of range");
-      return;
-   }
-
-   /* If a colorspace error has already been output skip this chunk */
-   if (png_ptr->colorspace.flags & PNG_COLORSPACE_INVALID)
-      return;
-
-   if (png_ptr->colorspace.flags & PNG_COLORSPACE_FROM_gAMA)
-   {
-      png_ptr->colorspace.flags |= PNG_COLORSPACE_INVALID;
-      png_colorspace_sync(png_ptr, info_ptr);
-
-      png_chunk_benign_error(png_ptr, "duplicate");
-      return;
-   }
-
-   png_ptr->colorspace.flags |= PNG_COLORSPACE_FROM_gAMA;
-   (void)png_colorspace_set_gamma(png_ptr, &png_ptr->colorspace, igamma,
-      1/*prefer gAMA values*/);
+   png_colorspace_set_gamma(png_ptr, &png_ptr->colorspace, igamma);
    png_colorspace_sync(png_ptr, info_ptr);
 }
 #endif
@@ -1285,13 +1261,6 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0))
       return;
 
-   /* Check for bad intent */
-   if (intent >= PNG_sRGB_INTENT_LAST)
-   {
-      png_chunk_benign_error(png_ptr, "Unknown sRGB intent");
-      return;
-   }
-
    /* If a colorspace error has already been output skip this chunk */
    if (png_ptr->colorspace.flags & PNG_COLORSPACE_INVALID)
       return;
@@ -1307,16 +1276,7 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   /* Do not override gAMA or cHRM from the PNG file; just check they match.
-    * This is because we write a cHRM which corresponds to D65, however there is
-    * an issue with CMMs that assume a D50 environment that requires adaptation
-    * of the white point.  This way at least it is possible to supply an
-    * adapated value (so long as it is within the tolerance limits for a match
-    * against the D65 chromaticities.)
-    *
-    * TODO: get expert opinions on this issue
-    */
-   (void)png_colorspace_set_sRGB(png_ptr, &png_ptr->colorspace, intent, 0);
+   png_colorspace_set_sRGB(png_ptr, &png_ptr->colorspace, intent);
    png_colorspace_sync(png_ptr, info_ptr);
 }
 #endif /* PNG_READ_sRGB_SUPPORTED */
@@ -1475,8 +1435,6 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                  /* But otherwise allow extra data: */
                                  else if (size == 0)
                                  {
-                                    int ok;
-
                                     if (length > 0)
                                     {
                                        /* This can be handled completely, so
@@ -1493,12 +1451,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                      * checks for a known sRGB profile.  The
                                      * result is 0 on error.
                                      */
-                                    ok = png_icc_set_gAMA_and_cHRM(png_ptr,
+                                    png_icc_set_gAMA_and_cHRM(png_ptr,
                                        &png_ptr->colorspace, keyword, profile,
                                        png_ptr->zstream.adler);
 
                                     /* Steal the profile for info_ptr. */
-                                    if (ok && info_ptr != NULL)
+                                    if (info_ptr != NULL)
                                     {
                                        png_free_data(png_ptr, info_ptr,
                                           PNG_FREE_ICCP, 0);
@@ -1534,15 +1492,11 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     if (info_ptr != NULL)
                                        png_colorspace_sync(png_ptr, info_ptr);
 
-                                    if (errmsg == NULL && ok)
+                                    if (errmsg == NULL)
                                     {
                                        png_ptr->zowner = 0;
                                        return;
                                     }
-
-                                    /* else png_icc_set_gAMA_and_cHRM has
-                                     * already output an error.
-                                     */
                                  }
 
                                  else if (size > 0)

@@ -528,6 +528,16 @@ Version 1.6.0beta30 [October 24, 2012]
 Version 1.6.0beta31 [October 26, 2012]
   Undid the erroneous change to vstudio/pngvalid build in libpng-1.6.0beta30.
   Made pngvalid so that it will build outside the libpng source tree.
+  Changed ICC profile support to allow use of an external color management
+    system (CMS). In practice it is not possible to obtain cHRM information
+    reliably using just the end-point tags because they do not exist in the
+    vast majority of profiles.  Instead it is necessary to run the endpoints
+    through the ICC colorimetric intent transform (as described in the v4
+    spec).  Since this is likely to be too much code inside libpng for too
+    little gain (it implies a fairly complete CMS implementation) the code
+    has been changed to allow an external CMS to be used.  This code is
+    temporarily disabled until a suitable set of test cases using one or more
+    external CMS implementations have been implemented.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

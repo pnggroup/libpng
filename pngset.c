@@ -143,25 +143,8 @@ png_set_gAMA_fixed(png_const_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   /* Changed in libpng-1.5.4 to limit the values to ensure overflow can't
-    * occur.  Since the fixed point representation is assymetrical it is
-    * possible for 1/gamma to overflow the limit of 21474 and this means the
-    * gamma value must be at least 5/100000 and hence at most 20000.0.  For
-    * safety the limits here are a little narrower.  The values are 0.00016 to
-    * 6250.0, which are truly ridiculous gamma values (and will produce
-    * displays that are all black or all white.)
-    */
-   if (file_gamma < 16 || file_gamma > 625000000)
-      png_app_error(png_ptr, "Out of range gamma value ignored");
-
-   else
-   {
-      if (png_colorspace_set_gamma(png_ptr, &info_ptr->colorspace, file_gamma,
-         2/* overrided with app value */))
-         info_ptr->colorspace.flags |= PNG_COLORSPACE_FROM_gAMA;
-
-      png_colorspace_sync_info(png_ptr, info_ptr);
-   }
+   png_colorspace_set_gamma(png_ptr, &info_ptr->colorspace, file_gamma);
+   png_colorspace_sync_info(png_ptr, info_ptr);
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -595,9 +578,7 @@ png_set_sRGB(png_const_structrp png_ptr, png_inforp info_ptr, int srgb_intent)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   (void)png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent,
-      2/* app value overrides*/);
-
+   png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent);
    png_colorspace_sync_info(png_ptr, info_ptr);
 }
 
@@ -610,10 +591,9 @@ png_set_sRGB_gAMA_and_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent,
-      2/* app value overrides*/))
+   if (png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent))
    {
-      /* And cause the gAMA and cHRM to be written too */
+      /* This causes the gAMA and cHRM to be written too */
       info_ptr->colorspace.flags |=
          PNG_COLORSPACE_FROM_gAMA|PNG_COLORSPACE_FROM_cHRM;
    }
@@ -1569,5 +1549,35 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
       png_ptr->num_palette_max = -1;
 }
 #endif
+
+#ifdef PNG_ICC_SUPPORTED
+void PNGAPI
+png_set_cms(png_structrp png_ptr, png_cms_datap cms_data_ptr,
+   png_cms_transform_ptr cms_transform_function)
+{
+   png_ptr->cms_transform_fn = cms_transform_function;
+   png_ptr->cms_data_ptr = cms_data_ptr;
+}
+
+#ifdef PNG_READ_SUPPORTED
+void PNGAPI
+png_set_cms_output(png_structrp png_ptr, int bytes_per_pixel,
+   int rendering_intent)
+{
+   if (png_ptr->mode & PNG_IS_READ_STRUCT)
+   {
+      png_ptr->cms_bytes_per_pixel = bytes_per_pixel;
+      png_ptr->cms_intent = rendering_intent;
+
+      /* A CMS must be registered before calling this */
+      if (png_ptr->cms_transform_fn == NULL)
+         png_app_error(png_ptr, "no CMS registered to transform output");
+   }
+
+   else
+      png_app_error(png_ptr, "attempt to do CMS tranform on write");
+}
+#endif /* PNG_READ_SUPPORTED */
+#endif /* PNG_ICC_SUPPORTED */
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */

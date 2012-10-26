@@ -663,6 +663,23 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
 }
 #  endif
 
+#ifdef PNG_SAVE_INT_32_SUPPORTED
+/* The png_save_int_32 function assumes integers are stored in two's
+ * complement format.  If this isn't the case, then this routine needs to
+ * be modified to write data in two's complement format.  Note that,
+ * the following works correctly even if png_int_32 has more than 32 bits
+ * (compare the more complex code required on read for sign extention.)
+ */
+void PNGAPI
+png_save_int_32(png_bytep buf, png_int_32 i)
+{
+   buf[0] = (png_byte)((i >> 24) & 0xff);
+   buf[1] = (png_byte)((i >> 16) & 0xff);
+   buf[2] = (png_byte)((i >> 8) & 0xff);
+   buf[3] = (png_byte)(i & 0xff);
+}
+#endif
+
 #  ifdef PNG_TIME_RFC1123_SUPPORTED
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
@@ -749,13 +766,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta31 - October 24, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta31 - October 26, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta31 - October 24, 2012\
+      return "libpng version 1.6.0beta31 - October 26, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -950,73 +967,100 @@ png_zstream_error(png_structrp png_ptr, int ret)
 #ifdef PNG_GAMMA_SUPPORTED /* always set if COLORSPACE */
 static int
 png_colorspace_check_gamma(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, png_fixed_point gAMA, int preferred)
-   /* preferred:
+   png_colorspacerp colorspace, png_fixed_point gAMA, int from)
+   /* This is called to check a new gamma value against an existing one.  The
+    * routine returns false if the new gamma value should not be written.
     *
-    *    0: do not override an existing setting, but *do* check for
-    *       compatibility with an existing setting.
-    *    1: preferred over an existing setting, but only if the existing
-    *       setting is compatible with this one (i.e. approximately the same.)
-    *    2: overrides existing setting and does not check for compatibility.
+    * 'from' says where the new gamma value comes from:
     *
-    * result:
-    *    0: incompatible existing setting, failure case
-    *    1: compatible existing setting, existing value retained
-    *    2: value written, either an existing value was compatible and preferred
-    *       was set or preferred was 2 and an existing value was ignored
-    *
-    * Use thus:
-    *    If you don't want to override an existing setting and *don't* want to
-    *    check for compatibility don't call this if the PNG_COLORSPACE_HAVE_
-    *    flag is set.
-    *
-    *    If you want to override an existing setting unconditionally - with no
-    *    check on compatibility - call with preferred == 2.
-    *
-    *    Otherwise you want to check for compatibility with an existing setting,
-    *    call with preferred == 0 to favor the existing setting, == 1 to
-    *    override the existing setting.
+    *    0: the new gamma value is the libpng estimate for an ICC profile
+    *    1: the new gamma value comes from a gAMA chunk
+    *    2: the new gamma value comes from an sRGB chunk
     */
 {
-   /* The 'invalid' flag needs to be sticky, doing things this way avoids having
-    * many messages caused by just one invalid colorspace chunk.
-    */
-   if (colorspace->flags & PNG_COLORSPACE_INVALID)
-      return 0;
+   png_fixed_point gtest;
 
-   if (preferred < 2 && (colorspace->flags & PNG_COLORSPACE_HAVE_GAMMA))
+   if ((colorspace->flags & PNG_COLORSPACE_HAVE_GAMMA) != 0 &&
+      (!png_muldiv(&gtest, colorspace->gamma, PNG_FP_1, gAMA) ||
+      png_gamma_significant(gtest)))
    {
-      png_fixed_point gtest;
-
-      if (!png_muldiv(&gtest, colorspace->gamma, PNG_FP_1, gAMA) ||
-         png_gamma_significant(gtest))
+      /* Either this is an sRGB image, in which case the calculated gamma
+       * approximation should match, or this is an image with a profile and the
+       * value libpng calculates for the gamma of the profile does not match the
+       * value recorded in the file.  The former, sRGB, case is an error, the
+       * latter is just a warning.
+       */
+      if ((colorspace->flags & PNG_COLORSPACE_FROM_sRGB) != 0 || from == 2)
       {
-         colorspace->flags |= PNG_COLORSPACE_INVALID;
-         png_benign_error(png_ptr, "inconsistent gamma values");
-         return 0; /* failed */
+         png_chunk_report(png_ptr, "gamma value does not match sRGB",
+            PNG_CHUNK_ERROR);
+         /* Do not overwrite an sRGB value */
+         return from == 2;
       }
 
-      else if (!preferred)
-         return 1; /* ok, use existing gamma */
+      else /* sRGB tag not involved */
+      {
+         png_chunk_report(png_ptr, "gamma value does not match libpng estimate",
+            PNG_CHUNK_WARNING);
+         return from == 1;
+      }
    }
 
-   return 2; /* ok, write gamma */
+   return 1;
 }
 
-int /* PRIVATE */
+void /* PRIVATE */
 png_colorspace_set_gamma(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, png_fixed_point gAMA, int preferred)
+   png_colorspacerp colorspace, png_fixed_point gAMA)
 {
-   int result = png_colorspace_check_gamma(png_ptr, colorspace, gAMA,
-      preferred);
+   /* Changed in libpng-1.5.4 to limit the values to ensure overflow can't
+    * occur.  Since the fixed point representation is assymetrical it is
+    * possible for 1/gamma to overflow the limit of 21474 and this means the
+    * gamma value must be at least 5/100000 and hence at most 20000.0.  For
+    * safety the limits here are a little narrower.  The values are 0.00016 to
+    * 6250.0, which are truly ridiculous gamma values (and will produce
+    * displays that are all black or all white.)
+    *
+    * In 1.6.0 this test replaces the ones in pngrutil.c, in the gAMA chunk
+    * handling code, which only required the value to be >0.
+    */
+   png_const_charp errmsg;
 
-   if (result == 2)
+   if (gAMA < 16 || gAMA > 625000000)
+      errmsg = "gamma value out of range";
+
+#  ifdef PNG_READ_gAMA_SUPPORTED
+      /* Allow the application to set the gamma value more than once */
+      else if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
+         (colorspace->flags & PNG_COLORSPACE_FROM_gAMA) != 0)
+         errmsg = "duplicate";
+#  endif
+
+   /* Do nothing if the colorspace is already invalid */
+   else if (colorspace->flags & PNG_COLORSPACE_INVALID)
+      return;
+
+   else
    {
-      colorspace->gamma = gAMA;
-      colorspace->flags |= PNG_COLORSPACE_HAVE_GAMMA;
+      if (png_colorspace_check_gamma(png_ptr, colorspace, gAMA, 1/*from gAMA*/))
+      {
+         /* Store this gamma value. */
+         colorspace->gamma = gAMA;
+         colorspace->flags |=
+            (PNG_COLORSPACE_HAVE_GAMMA | PNG_COLORSPACE_FROM_gAMA);
+      }
+
+      /* At present if the check_gamma test fails the gamma of the colorspace is
+       * not updated however the colorspace is not invalidated.  This
+       * corresponds to the case where the existing gamma comes from an sRGB
+       * chunk or profile.  An error message has already been output.
+       */
+      return;
    }
 
-   return result;
+   /* Error exit - errmsg has been set. */
+   colorspace->flags |= PNG_COLORSPACE_INVALID;
+   png_chunk_report(png_ptr, errmsg, PNG_CHUNK_WRITE_ERROR);
 }
 
 void /* PRIVATE */
@@ -1078,117 +1122,6 @@ png_colorspace_sync(png_const_structrp png_ptr, png_inforp info_ptr)
 #endif
 
 #ifdef PNG_COLORSPACE_SUPPORTED
-#if 0
-/* Added at libpng version 1.2.34 (Dec 8, 2008) and 1.4.0 (Jan 2,
- * 2010: moved from pngset.c) */
-/*
- *    Multiply two 32-bit numbers, V1 and V2, using 32-bit
- *    arithmetic, to produce a 64-bit result in the HI/LO words.
- *
- *                  A B
- *                x C D
- *               ------
- *              AD || BD
- *        AC || CB || 0
- *
- *    where A and B are the high and low 16-bit words of V1,
- *    C and D are the 16-bit words of V2, AD is the product of
- *    A and D, and X || Y is (X << 16) + Y.
-*/
-static void
-png_64bit_product (long v1, long v2, unsigned long *hi_product,
-    unsigned long *lo_product)
-{
-   int a, b, c, d;
-   long lo, hi, x, y;
-
-   a = (v1 >> 16) & 0xffff;
-   b = v1 & 0xffff;
-   c = (v2 >> 16) & 0xffff;
-   d = v2 & 0xffff;
-
-   lo = b * d;                   /* BD */
-   x = a * d + c * b;            /* AD + CB */
-   y = ((lo >> 16) & 0xffff) + x;
-
-   lo = (lo & 0xffff) | ((y & 0xffff) << 16);
-   hi = (y >> 16) & 0xffff;
-
-   hi += a * c;                  /* AC */
-
-   *hi_product = (unsigned long)hi;
-   *lo_product = (unsigned long)lo;
-}
-
-static int
-png_check_cHRM_fixed(png_const_structrp png_ptr,
-   png_fixed_point white_x, png_fixed_point white_y, png_fixed_point red_x,
-   png_fixed_point red_y, png_fixed_point green_x, png_fixed_point green_y,
-   png_fixed_point blue_x, png_fixed_point blue_y)
-{
-   int ret = 1;
-   unsigned long xy_hi,xy_lo,yx_hi,yx_lo;
-
-   png_debug(1, "in function png_check_cHRM_fixed");
-
-   if (png_ptr == NULL)
-      return 0;
-
-   /* (x,y,z) values are first limited to 0..100000 (PNG_FP_1), the white
-    * y must also be greater than 0.  To test for the upper limit calculate
-    * (PNG_FP_1-y) - x must be <= to this for z to be >= 0 (and the expression
-    * cannot overflow.)  At this point we know x and y are >= 0 and (x+y) is
-    * <= PNG_FP_1.  The previous test on PNG_MAX_UINT_31 is removed because it
-    * pointless (and it produces compiler warnings!)
-    */
-   if (white_x < 0 || white_y <= 0 ||
-         red_x < 0 ||   red_y <  0 ||
-       green_x < 0 || green_y <  0 ||
-        blue_x < 0 ||  blue_y <  0)
-   {
-      png_warning(png_ptr,
-        "Ignoring attempt to set negative chromaticity value");
-      ret = 0;
-   }
-   /* And (x+y) must be <= PNG_FP_1 (so z is >= 0) */
-   if (white_x > PNG_FP_1 - white_y)
-   {
-      png_warning(png_ptr, "Invalid cHRM white point");
-      ret = 0;
-   }
-
-   if (red_x > PNG_FP_1 - red_y)
-   {
-      png_warning(png_ptr, "Invalid cHRM red point");
-      ret = 0;
-   }
-
-   if (green_x > PNG_FP_1 - green_y)
-   {
-      png_warning(png_ptr, "Invalid cHRM green point");
-      ret = 0;
-   }
-
-   if (blue_x > PNG_FP_1 - blue_y)
-   {
-      png_warning(png_ptr, "Invalid cHRM blue point");
-      ret = 0;
-   }
-
-   png_64bit_product(green_x - red_x, blue_y - red_y, &xy_hi, &xy_lo);
-   png_64bit_product(green_y - red_y, blue_x - red_x, &yx_hi, &yx_lo);
-
-   if (xy_hi == yx_hi && xy_lo == yx_lo)
-   {
-      png_warning(png_ptr,
-         "Ignoring attempt to set cHRM RGB triangle with zero area");
-      ret = 0;
-   }
-
-   return ret;
-}
-#endif /*0*/
-
 /* Added at libpng-1.5.5 to support read and write of true CIEXYZ values for
  * cHRM, as opposed to using chromaticities.  These internal APIs return
  * non-zero on a parameter error.  The X, Y and Z values are required to be
@@ -1713,6 +1646,28 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
 }
 
 #if defined PNG_sRGB_SUPPORTED || defined PNG_iCCP_SUPPORTED
+/* Error message generation */
+static char
+png_icc_tag_char(png_uint_32 byte)
+{
+   byte &= 0xff;
+   if (byte >= 32 && byte <= 126)
+      return (char)byte;
+   else
+      return '?';
+}
+
+static void
+png_icc_tag_name(char *name, png_uint_32 tag)
+{
+   name[0] = '\'';
+   name[1] = png_icc_tag_char(tag >> 24);
+   name[2] = png_icc_tag_char(tag >> 16);
+   name[3] = png_icc_tag_char(tag >>  8);
+   name[4] = png_icc_tag_char(tag      );
+   name[5] = '\'';
+}
+
 static int
 is_ICC_signature_char(png_alloc_size_t it)
 {
@@ -1729,7 +1684,7 @@ static int is_ICC_signature(png_alloc_size_t it)
 }
 
 static int
-profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
+png_icc_profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_alloc_size_t value, png_const_charp reason)
 {
    size_t pos;
@@ -1743,12 +1698,9 @@ profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    pos = png_safecat(message, (sizeof message), pos, "': "); /* +2 = 90 */
    if (is_ICC_signature(value))
    {
-      message[pos++] = '\''; /* total +8; less than the else clause */
-      message[pos++] = (char)(value >> 24);
-      message[pos++] = (char)(value >> 16);
-      message[pos++] = (char)(value >>  8);
-      message[pos++] = (char)(value);
-      message[pos++] = '\'';
+      /* So 'value' is at most 4 bytes and the following cast is safe */
+      png_icc_tag_name(message+pos, (png_uint_32)value);
+      pos += 6; /* total +8; less than the else clause */
       message[pos++] = ':';
       message[pos++] = ' ';
    }
@@ -1766,123 +1718,34 @@ profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    /* The 'reason' is an arbitrary message, allow +79 maximum 195 */
    pos = png_safecat(message, (sizeof message), pos, reason);
 
-   if (colorspace != NULL)
-   {
-#     ifdef PNG_READ_SUPPORTED
-         if (png_ptr->mode & PNG_IS_READ_STRUCT)
-            png_chunk_benign_error(png_ptr, message);
-
-         else
-#     endif
-         png_app_error(png_ptr, message);
-   }
-
-#  ifdef PNG_WARNINGS_SUPPORTED
-      else
-      {
-         /* This is recoverable, but make it unconditionally an app_error on
-          * write to avoid writing invalid ICC profiles into PNG files.  (I.e.
-          * we handle them on read, with a warning, but on write unless the app
-          * turns off application errors the PNG won't be written.)
-          */
-#        ifdef PNG_READ_SUPPORTED
-            if (png_ptr->mode & PNG_IS_READ_STRUCT)
-               png_chunk_warning(png_ptr, message);
-
-            else
-#        endif
-            png_app_error(png_ptr, message);
-      }
-#  endif
+   /* This is recoverable, but make it unconditionally an app_error on write to
+    * avoid writing invalid ICC profiles into PNG files.  (I.e.  we handle them
+    * on read, with a warning, but on write unless the app turns off
+    * application errors the PNG won't be written.)
+    */
+   png_chunk_report(png_ptr, message,
+      (colorspace != NULL) ? PNG_CHUNK_ERROR : PNG_CHUNK_WRITE_ERROR);
 
    return 0;
-}
-
-static int /* PRIVATE */
-png_colorspace_set_profile(png_const_structrp png_ptr, png_const_charp name,
-   png_colorspacerp colorspace, png_fixed_point gAMA, const png_xy *xy,
-   const png_XYZ *XYZ, int intent, int preferred)
-{
-   int write_intent, write_gamma, result;
-
-   if (colorspace->flags & PNG_COLORSPACE_INVALID)
-      return 0;
-
-   /* Similar to the above routines, but ensure that both the gamma and the
-    * end-points are checked before doing any assignment.
-    */
-   if (preferred < 2 && (colorspace->flags & PNG_COLORSPACE_HAVE_INTENT))
-   {
-      if (colorspace->rendering_intent != intent)
-         return profile_error(png_ptr, colorspace, name, (unsigned)intent,
-            "inconsistent rendering intents");
-
-      write_intent = 0; /* Ok, don't change */
-   }
-
-   else
-      write_intent = 1; /* Needs to be written */
-
-   switch (png_colorspace_check_gamma(png_ptr, colorspace, gAMA, preferred))
-   {
-      case 2:
-         write_gamma = 1;
-         break;
-
-      case 1:
-         write_gamma = 0; /* current value ok and preferred */
-         break;
-
-      default: /* error */
-         return 0;
-   }
-
-   /* Everything seems ok up to this point, update the endpoints and, if this
-    * works, do the gamma and intent too.
-    */
-   result = png_colorspace_set_xy_and_XYZ(png_ptr, colorspace, xy, XYZ,
-      preferred);
-
-   switch (result)
-   {
-      case 2: /* ok, changed */
-      case 1: /* ok, no end-point change */
-         if (write_intent)
-         {
-            /* The value of intent must be checked in the caller; bugs in GCC
-             * force 'int' to be used as the parameter type.
-             */
-            colorspace->rendering_intent = (png_uint_16)intent;
-            colorspace->flags |= PNG_COLORSPACE_HAVE_INTENT;
-            result = 2;
-         }
-
-         if (write_gamma)
-         {
-            colorspace->gamma = gAMA;
-            colorspace->flags |= PNG_COLORSPACE_HAVE_GAMMA;
-            result = 2;
-         }
-
-         return result;
-
-      default: /* failure */
-         return 0;
-   }
 }
 #endif /* sRGB || iCCP */
 
 #ifdef PNG_sRGB_SUPPORTED
 int /* PRIVATE */
 png_colorspace_set_sRGB(png_const_structrp png_ptr, png_colorspacerp colorspace,
-   int intent, int preferred)
+   int intent)
 {
    /* sRGB sets known gamma, end points and (from the chunk) intent. */
    /* IMPORTANT: these are not necessarily the values found in an ICC profile
-    * because ICC profiles assume a D50 environment and therefore use XYZ values
-    * appropriate to a D50 environment.  Perhaps we should too; it's just
-    * slightly weird because the chromaticities of the adapted colorants don't
-    * match the above values.
+    * because ICC profiles store values adapted to a D50 environment; it is
+    * expected that the ICC profile mediaWhitePointTag will be D50, see the
+    * checks and code elsewhere to understand this better.
+    *
+    * These XYZ values, which are accurate to 5dp, produce rgb to gray
+    * coefficients of (6968,23435,2366), which are reduced (because they add up
+    * to 32769 not 32768) to (6968,23434,2366).  These are the values that
+    * libpng has traditionally used (and are the best values given the 15bit
+    * algorithm used by the rgb to gray code.)
     */
    static const png_XYZ sRGB_XYZ = /* D65 XYZ (*not* the D50 adapted values!) */
    {
@@ -1892,26 +1755,68 @@ png_colorspace_set_sRGB(png_const_structrp png_ptr, png_colorspacerp colorspace,
       /* blue  */ 18048,  7219, 95053
    };
 
-   int result;
+   /* Do nothing if the colorspace is already invalidated. */
+   if (colorspace->flags & PNG_COLORSPACE_INVALID)
+      return 0;
 
-   /* The above XYZ values, which are accurate to 5dp, produce rgb to gray
-    * coefficients of (6968,23435,2366), which are reduced (because they add up
-    * to 32769 not 32768) to (6968,23434,2366).  These are the values that
-    * libpng has traditionally used (and are the best values given the 15bit
-    * algorithm used by the rgb to gray code.)
+   /* Check the intent, then check for existing settings.  It is valid for the
+    * PNG file to have cHRM or gAMA chunks along with sRGB, but the values must
+    * be consistent with the correct values.  If, however, this function is
+    * called below because an iCCP chunk matches sRGB then it is quite
+    * conceivable that an older app recorded incorrect gAMA and cHRM because of
+    * an incorrect calculation based on the values in the profile - this does
+    * *not* invalidate the profile (though it still produces an error, which can
+    * be ignored.)
     */
    if (intent < 0 || intent >= PNG_sRGB_INTENT_LAST)
-      return profile_error(png_ptr, colorspace, "sRGB", (unsigned)intent,
-         "invalid sRGB rendering intent");
+      return png_icc_profile_error(png_ptr, colorspace, "sRGB",
+         (unsigned)intent, "invalid sRGB rendering intent");
 
-   result = png_colorspace_set_profile(png_ptr, "sRGB", colorspace,
-      PNG_GAMMA_sRGB_INVERSE, &sRGB_xy, &sRGB_XYZ, intent, preferred);
+   if ((colorspace->flags & PNG_COLORSPACE_HAVE_INTENT) != 0 &&
+      colorspace->rendering_intent != intent)
+      return png_icc_profile_error(png_ptr, colorspace, "sRGB",
+         (unsigned)intent, "inconsistent rendering intents");
 
-   /* The implicit profile is the sRGB one, so: */
-   if (result)
-      colorspace->flags |= PNG_COLORSPACE_MATCHES_sRGB;
+   if ((colorspace->flags & PNG_COLORSPACE_FROM_sRGB) != 0)
+   {
+      png_benign_error(png_ptr, "duplicate sRGB information ignored");
+      return 0; /* not set */
+   }
 
-   return result;
+   /* If the standard sRGB cHRM chunk does not match the one from the PNG file
+    * warn but overwrite the value with the correct one.
+    */
+   if ((colorspace->flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0 &&
+      !png_colorspace_endpoints_match(&sRGB_xy, &colorspace->end_points_xy,
+         100))
+      png_chunk_report(png_ptr, "cHRM chunk does not match sRGB",
+         PNG_CHUNK_ERROR);
+
+   /* This check is just done for the error reporting - the routine always
+    * returns true when the 'from' argument corresponds to sRGB (2).
+    */
+   (void)png_colorspace_check_gamma(png_ptr, colorspace, PNG_GAMMA_sRGB_INVERSE,
+      2/*from sRGB*/);
+
+   /* intent: bugs in GCC force 'int' to be used as the parameter type. */
+   colorspace->rendering_intent = (png_uint_16)intent;
+   colorspace->flags |= PNG_COLORSPACE_HAVE_INTENT;
+
+   /* endpoints */
+   colorspace->end_points_xy = sRGB_xy;
+   colorspace->end_points_XYZ = sRGB_XYZ;
+   colorspace->flags |=
+      (PNG_COLORSPACE_HAVE_ENDPOINTS|PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB);
+
+   /* gamma */
+   colorspace->gamma = PNG_GAMMA_sRGB_INVERSE;
+   colorspace->flags |= PNG_COLORSPACE_HAVE_GAMMA;
+
+   /* Finally record that we have an sRGB profile */
+   colorspace->flags |=
+      (PNG_COLORSPACE_MATCHES_sRGB|PNG_COLORSPACE_FROM_sRGB);
+
+   return 1/*set*/;
 }
 #endif /* sRGB */
 
@@ -1929,11 +1834,11 @@ png_icc_check_length(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_uint_32 profile_length)
 {
    if (profile_length < 132)
-      return profile_error(png_ptr, colorspace, name, profile_length,
+      return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
          "too short");
 
    if (profile_length & 3)
-      return profile_error(png_ptr, colorspace, name, profile_length,
+      return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
          "invalid length");
 
    return 1;
@@ -1954,13 +1859,13 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     */
    temp = png_get_uint_32(profile);
    if (temp != profile_length)
-      return profile_error(png_ptr, colorspace, name, temp,
+      return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "length does not match profile");
 
    temp = png_get_uint_32(profile+128); /* tag count: 12 bytes/tag */
    if (temp > 357913930 || /* (2^32-4-132)/12: maxium possible tag count */
       profile_length < 132+12*temp) /* truncated tag table */
-      return profile_error(png_ptr, colorspace, name, temp,
+      return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "tag count too large");
 
    /* The 'intent' must be valid or we can't store it, ICC limits the intent to
@@ -1968,14 +1873,14 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     */
    temp = png_get_uint_32(profile+64);
    if (temp >= 0xffff) /* The ICC limit */
-      return profile_error(png_ptr, colorspace, name, temp,
+      return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "invalid rendering intent");
 
    /* This is just a warning because the profile may be valid in future
     * versions.
     */
    if (temp >= PNG_sRGB_INTENT_LAST)
-      (void)profile_error(png_ptr, NULL, name, temp,
+      (void)png_icc_profile_error(png_ptr, NULL, name, temp,
          "intent outside defined range");
 
    /* At this point the tag table can't be checked because it hasn't necessarily
@@ -1992,7 +1897,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     */
    temp = png_get_uint_32(profile+36); /* signature 'ascp' */
    if (temp != 0x61637370)
-      return profile_error(png_ptr, colorspace, name, temp,
+      return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "invalid signature");
 
    /* Currently the PCS illuminant/adopted white point (the computational
@@ -2003,7 +1908,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * following is just a warning.
     */
    if (memcmp(profile+68, D50_nCIEXYZ, 12) != 0)
-      (void)profile_error(png_ptr, NULL, name, 0/*no tag value*/,
+      (void)png_icc_profile_error(png_ptr, NULL, name, 0/*no tag value*/,
          "PCS illuminant is not D50");
 
    /* The PNG spec requires this:
@@ -2031,19 +1936,19 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    {
       case 0x52474220: /* 'RGB ' */
          if (!(color_type & PNG_COLOR_MASK_COLOR))
-            return profile_error(png_ptr, colorspace, name, temp,
+            return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "RGB color space not permitted on grayscale PNG");
          info |= PNG_ICC_RGB;
          break;
 
       case 0x47524159: /* 'GRAY' */
          if (color_type & PNG_COLOR_MASK_COLOR)
-            return profile_error(png_ptr, colorspace, name, temp,
+            return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "Gray color space not permitted on RGB PNG");
          break;
 
       default:
-         return profile_error(png_ptr, colorspace, name, temp,
+         return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "invalid ICC profile color space");
    }
 
@@ -2068,7 +1973,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
 
       case 0x61627374: /* 'abst' */
          /* May not be embedded in an image */
-         return profile_error(png_ptr, colorspace, name, temp,
+         return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "invalid embedded Abstract ICC profile");
 
       case 0x6C696E6B: /* 'link' */
@@ -2078,7 +1983,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
           * therefore a DeviceLink profile should not be found embedded in a
           * PNG.
           */
-         return profile_error(png_ptr, colorspace, name, temp,
+         return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "unexpected DeviceLink ICC profile class");
 
       case 0x6E6D636C: /* 'nmcl' */
@@ -2086,7 +1991,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
           * contain an AToB0 tag that is open to misintrepretation.  Almost
           * certainly it will fail the tests below.
           */
-         (void)profile_error(png_ptr, NULL, name, temp,
+         (void)png_icc_profile_error(png_ptr, NULL, name, temp,
             "unexpected NamedColor ICC profile class");
          break;
 
@@ -2096,7 +2001,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
           * tag content to ensure they are backward compatible with one of the
           * understood profiles.
           */
-         (void)profile_error(png_ptr, NULL, name, temp,
+         (void)png_icc_profile_error(png_ptr, NULL, name, temp,
             "unrecognized ICC profile class");
          break;
    }
@@ -2115,7 +2020,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
          break;
 
       default:
-         return profile_error(png_ptr, colorspace, name, temp,
+         return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "unexpected ICC PCS encoding");
    }
 
@@ -2124,8 +2029,9 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 1;
 }
 
+#ifdef PNG_ICC_SUPPORTED
 static png_uint_32
-png_find_icc_tag(png_const_bytep profile, png_uint_32 tag, png_uint_32p length)
+png_icc_find_tag(png_const_bytep profile, png_uint_32 tag, png_uint_32p length)
    /* Find a single tag in the tag table, returns 0 if the tag is not found,
     * else returns the offset in the profile of the tag and, via *length, the
     * length from the tag table.
@@ -2348,7 +2254,40 @@ png_invert_matrix(png_const_icc_matrixrp m, png_icc_matrixrp o)
 }
 
 static int
-png_icc_find_wtpt(png_const_structrp png_ptr, png_const_charp name,
+png_icc_XYZ_compare(png_const_bytep xyz1, png_const_bytep xyz2)
+   /* The arguments are 12 byte big-endian XYZ values as s15Fixed16 values, they
+    * are compared and the routine returns 0 if they are within about +/-1/1024
+    * else 1.  The input values are always big-endian.
+    */
+{
+   int i;
+
+   for (i=0; i<3; ++i)
+   {
+      int diff = 0;
+      int j;
+
+      /* This won't overflow. */
+      for (j=0; j<3; ++j)
+         diff = (diff << 8) + (*xyz1++ - *xyz2++);
+
+      if (diff < -1 || diff > 1)
+         return 1; /* Too big a difference */
+
+      diff = (diff << 8) + (*xyz1++ - *xyz2++);
+
+      /* This is the limit on the difference, 64/65536 or +/- 1/1024 (determined
+       * by experiment) at present.
+       */
+      if (diff <= -64 || diff >= 64)
+         return 1;
+   }
+
+   return 0;
+}
+
+static int
+png_icc_check_wtpt(png_const_structrp png_ptr, png_const_charp name,
    png_const_bytep profile, png_icc_vectorrp adapted_white_point)
    /* The mediaWhitePointTag contains an adapted white point (the observer
     * white point) expressed as XYZ tristimulus values. It is always adapted
@@ -2356,7 +2295,7 @@ png_icc_find_wtpt(png_const_structrp png_ptr, png_const_charp name,
     */
 {
    png_uint_32 tag_length;
-   png_uint_32 tag_start = png_find_icc_tag(profile, 0x77747074/*'wtpt'*/,
+   png_uint_32 tag_start = png_icc_find_tag(profile, 0x77747074/*'wtpt'*/,
       &tag_length);
 
    if (tag_start > 0 && tag_length == 20)
@@ -2378,59 +2317,68 @@ png_icc_find_wtpt(png_const_structrp png_ptr, png_const_charp name,
           * profile "sRGB Profile.icc".)  In that profile the mediaWhitePointTag
           * is incorrectly recorded with the D65 (not D50) values.
           */
+         if (adapted_white_point != NULL)
+         {
+            (*adapted_white_point)[0] = png_get_int_32(tag+ 8);
+            (*adapted_white_point)[1] = png_get_int_32(tag+12);
+            (*adapted_white_point)[2] = png_get_int_32(tag+16);
+         }
+
+         if (png_icc_XYZ_compare(profile+68, tag+8) == 0)
+            return 1;
+
+         /* The media white point differs from the PCS illuminant.
+          *
+          * This deserves a warning; the PNG data stream is technically invalid
+          * because either the ICC profile is wrong or the color data in the
+          * image is not encoded in the way the PNG specification expects, such
+          * that colors with r==g==b are achromatic.
+          *
+          * Notice that on write the application can write a cHRM chunk to
+          * attempt to minimize the problems this might cause, however the data
+          * has the property that the maximum of all the colorants (r,g,b ==
+          * 1,1,1) does not correspond to an achromatic color and this is
+          * impossible to represent in PNG with just cHRM.
+          *
+          * If this is a monitor of color-space class profile then the profile
+          * is wrong (the white point should always be the same as the image
+          * adopted white), otherwise a simple warning is produced.
+          */
          temp = png_get_uint_32(profile+12);
-         if ((temp == 0x6D6E7472 /* 'mntr' */ ||
-            temp == 0x73706163 /* 'spac' */) &&
-            memcmp(profile+68, tag+8, 12) != 0)
-            (void)profile_error(png_ptr, NULL, name, temp,
+
+         if (temp == 0x6D6E7472 /* 'mntr' */ ||
+            temp == 0x73706163 /* 'spac' */)
+            (void)png_icc_profile_error(png_ptr, NULL, name, temp,
                "media white point differs from image adopted white");
 
-         (*adapted_white_point)[0] = png_get_int_32(tag+ 8);
-         (*adapted_white_point)[1] = png_get_int_32(tag+12);
-         (*adapted_white_point)[2] = png_get_int_32(tag+16);
-         return 1;
+         else
+            png_warning(png_ptr, "ICC profile indicates that image data does "
+               "not conform to the PNG specification");
+
+         return 0;
       }
 
       else
-         (void)profile_error(png_ptr, NULL, name, temp,
-            "invalid type for mediaWhitePointTag");
-   }
-
-   else /* This should have been caught before */
-      png_error(png_ptr, "lost 'wtpt'");
-
-   return 0;
-}
-
-static int
-png_icc_find_XYZ(png_const_structrp png_ptr, png_const_charp name,
-   png_const_bytep profile, png_uint_32 tag_id, png_icc_vectorrp column)
-{
-   png_uint_32 tag_length;
-   png_uint_32 tag_start = png_find_icc_tag(profile, tag_id, &tag_length);
-
-   if (tag_start > 0 && tag_length == 20)
-   {
-      png_const_bytep tag = profile+tag_start;
-      png_uint_32 temp = png_get_uint_32(tag);
-
-      if (temp == 0x58595A20 /* 'XYZ ' */)
       {
-         (*column)[0] = png_get_int_32(tag+ 8);
-         (*column)[1] = png_get_int_32(tag+12);
-         (*column)[2] = png_get_int_32(tag+16);
-         return 1;
+         (void)png_icc_profile_error(png_ptr, NULL, name, temp,
+            "invalid type for mediaWhitePointTag");
+         /* Assume it matches the PCS illuminant */
       }
-
-      else
-         (void)profile_error(png_ptr, NULL, name, temp,
-            "invalid type for <rgb>MatrixColumnTag");
    }
 
-   else /* This should have been caught before */
-      png_error(png_ptr, "lost '[c]XYZ'");
+   /* else: no mediaWhitePointTag, already reported */
 
-   return 0;
+   /* Here if the mediaWhitePointTag is absent or invalid, assume the PCS
+    * illuminant; this is an error in the profile, but is mostly harmless.
+    */
+   if (adapted_white_point != NULL)
+   {
+      (*adapted_white_point)[0] = png_get_int_32(profile+68);
+      (*adapted_white_point)[1] = png_get_int_32(profile+72);
+      (*adapted_white_point)[2] = png_get_int_32(profile+76);
+   }
+
+   return 1;
 }
 
 static int /* 0: fail, 1: identity, 2: not identity */
@@ -2459,7 +2407,7 @@ png_icc_find_chad(png_const_structrp png_ptr, png_const_charp name,
    {
    png_uint_32 tag_start, tag_length;
 
-   tag_start = png_find_icc_tag(profile, 0x63686164/*'chad'*/, &tag_length);
+   tag_start = png_icc_find_tag(profile, 0x63686164/*'chad'*/, &tag_length);
 
    if (tag_start > 0)
    {
@@ -2487,17 +2435,17 @@ png_icc_find_chad(png_const_structrp png_ptr, png_const_charp name,
                   inverted_adaptation_matrix))
                return 2;
 
-            (void)profile_error(png_ptr, NULL, name, temp,
+            (void)png_icc_profile_error(png_ptr, NULL, name, temp,
                "singular or overflowed ICC profile chromaticAdaptationTag");
          }
 
          else
-            (void)profile_error(png_ptr, NULL, name, temp,
+            (void)png_icc_profile_error(png_ptr, NULL, name, temp,
                "invalid type for ICC profile chromaticAdaptationTag");
       }
 
       else /* Internal libpng error */
-         (void)profile_error(png_ptr, NULL, name, tag_length,
+         (void)png_icc_profile_error(png_ptr, NULL, name, tag_length,
             "invalid length for ICC profile chromaticAdaptationTag");
    }
 
@@ -2519,171 +2467,14 @@ png_icc_find_chad(png_const_structrp png_ptr, png_const_charp name,
    return 0;
 }
 
-static int
-png_icc_set_cHRM_from_chrm(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile)
-   /* Find the PNG cHRM chunk values from the chromaticityTag entry from the ICC
-    * profile.  This tag stores the chromaticities of the colorants unadapted to
-    * the PCS white, however the white point, which tells us the relative
-    * intensity of the colorants, is not given.  We can get the white point from
-    * the mediaWhitePointTag value, which should be present in all profiles,
-    * however this is adapted to the PCS illuminated/adopted white, so must be
-    * unadapted.
-    */
-{
-   png_uint_32 tag_length;
-   png_uint_32 tag_start = png_find_icc_tag(profile, 0x6368726D/* 'chrm' */,
-      &tag_length);
-
-   if (tag_start > 0 && tag_length == 36)
-   {
-      png_const_bytep tag = profile+tag_start;
-      png_uint_32 temp = png_get_uint_32(tag);
-
-      if (temp == 0x6368726D && /* type must be 'chrm' */
-         png_get_uint_16(tag+8) == 3) /* three channels */
-      {
-         png_xy cHRM_xy;
-
-         tag += 12;
-
-         /* The ICC chromaticities are stored as 16.16 unsigned numbers,
-          * convert to png_fixed_point, because the ICC values are
-          * unsigned the >>1 below is used to avoid unsigned/signed
-          * overflow.
-          */
-         if (png_muldiv(&cHRM_xy.redx,
-               (png_int_32)(png_get_uint_32(tag+ 0)>>1), PNG_FP_1, 65536>>1) &&
-            png_muldiv(&cHRM_xy.redy,
-               (png_int_32)(png_get_uint_32(tag+ 4)>>1), PNG_FP_1, 65536>>1) &&
-            png_muldiv(&cHRM_xy.greenx,
-               (png_int_32)(png_get_uint_32(tag+ 8)>>1), PNG_FP_1, 65536>>1) &&
-            png_muldiv(&cHRM_xy.greeny,
-               (png_int_32)(png_get_uint_32(tag+12)>>1), PNG_FP_1, 65536>>1) &&
-            png_muldiv(&cHRM_xy.bluex,
-               (png_int_32)(png_get_uint_32(tag+16)>>1), PNG_FP_1, 65536>>1) &&
-            png_muldiv(&cHRM_xy.bluey,
-               (png_int_32)(png_get_uint_32(tag+20)>>1), PNG_FP_1, 65536>>1))
-         {
-            /* We need a white point chromaticity too, this comes from the
-             * media white point, but the value in the profile is adapted
-             * to the PCS illuminant (D50) so must be unadapted first.
-             */
-            png_icc_vector adapted_profile_white;
-
-            if (png_icc_find_wtpt(png_ptr, name, profile,
-               &adapted_profile_white))
-            {
-               png_icc_vector profile_white;
-               png_icc_matrix adaptation, inverted_adaptation;
-
-               /* The media white point tag is chromatically adapted using the
-                * chromatic adaptation matrix and so the adaptation must be
-                * inverted to find the original white point.
-                */
-               switch (png_icc_find_chad(png_ptr, name, profile, &adaptation,
-                  &inverted_adaptation))
-               {
-                  default: /* error */
-                     return 0;
-
-                  case 1:  /* identity */
-                     break;
-
-                  case 2:  /* apply the matrix */
-                     if (!png_matrix_x_vector(png_cpm(inverted_adaptation),
-                        png_cpv(adapted_profile_white), &profile_white))
-                     {
-                        (void)profile_error(png_ptr, NULL, name, 0,
-                           "overflow unadapting mediaWhitePointTag");
-                        return 0;
-                     }
-
-                     break;
-               }
-
-               {
-                  /* For the perfect reflector 'Y' shall be normalized
-                   * to 1,0 (see ICC 2010 4.14, XYZNumber), but this is
-                   * the media white point (not the adopted white)
-                   * adapted to the PCS illuminant, so Y might be some
-                   * other value, this sanity check is mainly to avoid
-                   * integer overflow.
-                   */
-                  png_int_32 white = profile_white[0] + profile_white[1] +
-                     profile_white[2];
-
-                  /* This is a hard error because it makes the profile
-                   * meaningless.
-                   */
-                  if (profile_white[0] < 0 || profile_white[0] > 655360 ||
-                     profile_white[1] < 0 || profile_white[1] > 655360 ||
-                     profile_white[2] < 0 || profile_white[2] > 655360 ||
-                     white < 1000 || white > 655360)
-                     (void)profile_error(png_ptr, NULL, name, 0,
-                        "bad XYZ in media white point");
-
-                  else
-                  {
-                     /* We want X/(X+Y+Z)*PNG_FP_1 to scale back to a
-                      * png_fixed_point value, this may produce ridiculous
-                      * numbers, but the checking on a png_xy value
-                      * detects them.
-                      */
-                     if (png_muldiv(&cHRM_xy.whitex, profile_white[0], PNG_FP_1,
-                           white) &&
-                        png_muldiv(&cHRM_xy.whitey, profile_white[0], PNG_FP_1,
-                           white))
-                     {
-                        png_XYZ cHRM_XYZ;
-
-                        /* This function returns 0 on success: */
-                        if (!png_colorspace_check_xy(&cHRM_XYZ, &cHRM_xy))
-                           return png_colorspace_set_xy_and_XYZ(png_ptr,
-                              colorspace, &cHRM_xy, &cHRM_XYZ,
-                              0/*not preferred*/);
-
-                        /* Else the XYZ value was invalid */
-                        (void)profile_error(png_ptr, NULL, name, temp,
-                           "invalid colorantTableTag end points");
-                     }
-
-                     else
-                        return profile_error(png_ptr, colorspace, name, 0,
-                          "overflow in media white point chromaticities");
-                  }
-               }
-            } /* 'wtpt' exists and is valid */
-
-            else
-               (void)profile_error(png_ptr, NULL, name, 0,
-                  "missing or invalid mediaWhitePointTag");
-         } /* 'chrm' tag convertion to png_xy ok */
-
-         else
-            (void)profile_error(png_ptr, NULL, name, 0,
-               "overflow in ICC 'chrm' tag chromaticities");
-      }
-
-      else
-         (void)profile_error(png_ptr, NULL, name, temp,
-            "invalid type or colorant count for ICC profile chromaticityTag");
-   }
-
-   else /* checked before, so should not fail */
-      png_error(png_ptr, "lost 'chrm'");
-
-   return 0;
-}
-
-static int
+static void
 png_icc_set_cHRM_from_endpoints(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile,
-   png_const_icc_matrixrp XYZ)
+   png_const_uint_16p pcsxyz)
    /* The input XYZ values are the three red, green, blue endpoints still
     * adapted to the PCS illuminant.  The adaptation is inverted and the result
     * applied to the profile.  The result is also checked against the
-    * mediaWhitePointTag, which should match the sum of the end points.
+    * PCS illuminant, which should match the sum of the end points.
     */
 {
    png_icc_matrix adaptation, inverted_adaptation;
@@ -2692,98 +2483,69 @@ png_icc_set_cHRM_from_endpoints(png_const_structrp png_ptr,
 
    if (chad) /* else error finding 'chad' */
    {
-      png_icc_matrix end_points;
+      png_byte end_point_white[3*4];
+      png_icc_matrix XYZ, end_points;
 
-      if ((colorspace->icc_info & PNG_ICC_mediaWhitePointTag) != 0)
+      /* Sanity check the adapted colorants against the PCS white point -
+       * because of the checks performed before calling this routine the adapted
+       * colorant white point should always match the PCS illuminant.
+       */
       {
-         png_icc_vector profile_white;
+         int i;
 
-         if (png_icc_find_wtpt(png_ptr, name, profile, &profile_white))
+         for (i=0; i<3; ++i)
          {
-            png_icc_vector end_point_white;
-            int i;
+            png_int_32 c = pcsxyz[i];
 
-            /* Sanity check the adapted colorants against the adapted
-             * media white point.
-             */
-            for (i=0; i<3; ++i)
-               end_point_white[i] = (*XYZ)[0][i] + (*XYZ)[1][i] + (*XYZ)[2][i];
-
-            /* The values are s15Fixed16Number values.  The delta value allows
-             * the two versions of the end point to differ by about 0.001 (1 in
-             * 1024) and this is consistent with the test in
-             * png_colorspace_set_xy_and_XYZ above.
-             */
-            if (PNG_OUT_OF_RANGE(profile_white[0], end_point_white[0], 64) ||
-                PNG_OUT_OF_RANGE(profile_white[1], end_point_white[1], 64) ||
-                PNG_OUT_OF_RANGE(profile_white[2], end_point_white[2], 64))
-            {
-               /* It is possible that the white point stored was not adapted to
-                * the PCS illuminant, check for that case here and do not abort
-                * setting cHRM if it seems to be true.
-                */
-               png_icc_vector adapted_white;
-
-               if (chad != 2 /* Else no chad */ ||
-                  !png_matrix_x_vector(png_cpm(adaptation),
-                     png_cpv(profile_white), &adapted_white) ||
-                   PNG_OUT_OF_RANGE(adapted_white[0], end_point_white[0], 64) ||
-                   PNG_OUT_OF_RANGE(adapted_white[1], end_point_white[1], 64) ||
-                   PNG_OUT_OF_RANGE(adapted_white[2], end_point_white[2], 64))
-               {
-                  (void)profile_error(png_ptr, NULL, name, 0,
-                     "colorant end-points do not match mediaWhitePointTag");
-                  return 0;
-               }
-
-               else
-               {
-                  /* This happens because some writers of profiles (and,
-                   * perhaps, some CMS software) no not notice that the
-                   * mediaWhitePointTag requires the XYZ of the white point
-                   * adapted to the PCS illuminant (using the chad); this is why
-                   * the mediaWhitePointTag is always D50 for display profiles!
-                   */
-                  (void)profile_error(png_ptr, NULL, name, 0,
-                     "ICC.1:2010 9.2.34 mediaWhitePointTag not adapted to PCS"
-                     " Illuminant (ignored)");
-               }
-            }
+            c += pcsxyz[i+3];
+            c += pcsxyz[i+6];
+            /* Convert u1Fixed15Number to s15Fixed16Number */
+            png_save_int_32(end_point_white+4*i, 2*c);
          }
 
-         else
-            png_error(png_ptr, "lost 'wtpt'"); /* internal error */
+         if (png_icc_XYZ_compare(profile+68, end_point_white) != 0)
+         {
+            /* The colorant (media) white point differs from the PCS illuminant.
+             */
+            (void)png_icc_profile_error(png_ptr, NULL, name,
+               colorspace->icc_info,
+               "colorant white point differs from image adopted white");
+            return;
+         }
       }
 
-      switch (chad)
       {
-         default: /* error */
-            return 0;
+         int row, col;
 
-         case 1:  /* identity */
+         /* The png_icc_matrix is a matrix of s15Fixed16Number, the pcsxyz
+          * returned by the CMS is u1Fixed15, so multiply by 65536/32768
+          */
+         for (row=0; row<3; ++row) for (col=0; col<3; ++col)
+            XYZ[row][col] = 2 * pcsxyz[3*row + col];
+      }
+
+      if (chad == 1) /* identity */
             memcpy(&end_points, XYZ, sizeof end_points);
-            break;
 
-         case 2:  /* apply the matrix */
-            /* The input XYZ rows are unadapted using the 'chad' matrix and
-             * assigned to the end_points rows.
-             */
-            if (!png_matrix_x_TmatrixT(png_cpm(inverted_adaptation), XYZ,
-               &end_points))
-            {
-               (void)profile_error(png_ptr, NULL, name, 0,
-                  "overflow unadapting colorant end-points");
-               return 0;
-            }
-
-            break;
+      else /* apply the matrix */
+      {
+         /* The input XYZ rows are unadapted using the 'chad' matrix and
+          * assigned to the end_points rows.
+          */
+         if (!png_matrix_x_TmatrixT(png_cpm(inverted_adaptation), png_cpm(XYZ),
+            &end_points))
+         {
+            (void)png_icc_profile_error(png_ptr, NULL, name, 0,
+               "overflow unadapting colorant end-points");
+            return;
+         }
       }
 
       {
          png_XYZ cHRM_XYZ;
 
          /* Now we have colorant XYZ values in their unadapted form
-          * (i.e. implicitly with an adopted white of the media).
+          * (i.e. implicitly with an adopted white of the original scene).
           * This is what PNG uses for cHRM, but they need to be
           * converted to the libpng structure.
           *
@@ -2808,154 +2570,129 @@ png_icc_set_cHRM_from_endpoints(png_const_structrp png_ptr,
 
             /* This function returns 0 on success: */
             if (!png_colorspace_check_XYZ(&xy, &cHRM_XYZ))
-               return png_colorspace_set_xy_and_XYZ(png_ptr,
-                  colorspace, &xy, &cHRM_XYZ, 0/*not preferred*/);
+            {
+               /* TODO: review this, it currently overwrites an explicit cHRM
+                * chunk, this seems safer as the cHRM chunk is often calculated
+                * incorrectly.  In release builds this overwrites silently,
+                * in pre-release it will cause an error.
+                */
+               (void)png_colorspace_set_xy_and_XYZ(png_ptr,
+                  colorspace, &xy, &cHRM_XYZ,
+                  (PNG_LIBPNG_BUILD_BASE_TYPE < PNG_LIBPNG_BUILD_RC) ? 1 : 2);
+               return;
+            }
 
             /* Else the XYZ value was invalid */
-            (void)profile_error(png_ptr, NULL, name, 0,
+            (void)png_icc_profile_error(png_ptr, NULL, name, 0,
                "invalid colorant end-points");
          }
 
          else
-            (void)profile_error(png_ptr, NULL, name, 0,
+            (void)png_icc_profile_error(png_ptr, NULL, name, 0,
                "overflow converting colorant end-points to cHRM");
       }
    }
-
-   return 0;
 }
 
-static int
-png_icc_set_cHRM_from_clrt(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile)
-   /* Find the cHRM values from the colorantTableTag, if present.  The
-    * colorantTableTag ('clrt')  lists the PCS values as three 16-bit integer
-    * (0..65535) for each colorant.  Beause these are PCS values they have been
-    * adapted to the profile color space, so the corresponding L*a*b* or XYZ
-    * values may need to be converted back to the unadapted values by applying
-    * the inverse of chromaticAdaptationTag.  Note that the values in the
-    * colorantTableTag can also be derived directly by passing the maximum value
-    * for each colorant through the AToB1Tag transformation, but this is a lot
-    * more work.
-    */
+#ifndef PNG_FLOATING_ARITHMETIC_SUPPORTED
+/* This is defined below, so a forward declaration is needed here. */
+static png_int_32 png_log16bit(png_uint_32 x);
+#endif
+
+static void
+png_icc_set_gAMA_from_Y(png_const_structrp png_ptr, png_colorspacerp colorspace,
+   png_uint_32 y, int is_u1Fixed15/*scale of y*/)
 {
-   png_uint_32 tag_length, tag_start;
+   /* PNG gAMA approximates the actual transfer function used to encode
+    * the image data with a single number in a power law equation:
+    *
+    *    image = sample ^ gAMA
+    *
+    * So given a test image value (GRAY_TEST) and the value of Y, 'y',
+    * which the transform produces we can simply deduce the value of gAMA:
+    *
+    *    gAMA = log(GRAY_TEST)/log(y)
+    *
+    * However this will produce different answers for each point on the
+    * profile, unless the profile really is a simple power law transform
+    * (this is hardly ever found in practice.)
+    *
+    * In fact most image encoding uses some variant of a linear segment
+    * followed by a power law - sRGB, ITU REC709 and L*a*b* all do this.
+    * We know (from the PNG spec) that sRGB should be encoded with a gAMA
+    * of .45455 (1/2.2) and it is easy to find that the sRGB transfer
+    * function crosses this power law transfer at about 0.389222.  This is
+    * 25508 as a 16-bit value or 99.25 in 8-bits.
+    */
+#  define GRAY_TEST   99 /* /255 */
+   /*
+    * Feeding this number through the above equations (see
+    * contrib/tools/icc-gamma.bc) gives the following results:
+    *
+    *    sRGB:          45455
+    *    L*a*b*:        42069
+    *    2.2 power law: 45455
+    *    ITU REC-709:   52333 (because of the linear segment)
+    *    Apple Mac:     65087 (by applying a 1.45 power law to sRGB)
+    */
+#  ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+      double dl;
 
-   tag_start = png_find_icc_tag(profile, 0x636C7274/*'clrt'*/, &tag_length);
+      if (is_u1Fixed15) y *= 2;
 
-   if (tag_start > 0 && tag_length == 126)
-   {
-      /* The type is also 'clrt' (note that the tag table has already been
-       * checked to ensure all tags are at least 8 bytes long!)  The checks
-       * below ensure that the tag is exactly the expected size.
+      /* The constant is 100000*log(99/255) */
+      dl = floor(.5 - 94614.36950238362194 / log(y / 65535.));
+
+      /* We expect a reasonable gAMA value from this calculation; check for a
+       * number in the range 20,000 (.2) to 200,000 (2).
        */
-      png_const_bytep tag = profile+tag_start;
-      png_uint_32 temp = png_get_uint_32(tag+0);
-
-      if (temp == 0x636C7274/*'clrt'*/)
+      if (dl > 20000. && dl < 200000.)
       {
-         temp = png_get_uint_32(tag+8);
+         png_int_32 l = (png_int_32)dl;
+#  else
+      /* The fixed point calculation is somewhat more complex.
+       *
+       * Because PCSXYZ is scaled by 32768, whereas the input to png_log16bit
+       * is scaled by 65535 the value of 'l' corresponds to y*32768/65535,
+       * thus the required calculation is:
+       *
+       *           100000 * 89456.43138
+       *    gAMA = --------------------
+       *                l + 65535
+       *
+       * l     = 65536*-log2(y)
+       * 89456 = -65536*log2(99/255)
+       * 65535 = -65536*log2(32768/65535) (but only for PCSXYZ)
+       *
+       * 8945643138 = 1581061 * 5658
+       */
+      png_int_32 l = png_log16bit(y);
 
-         if (temp == 3) /* count */
+      if (is_u1Fixed15 && l >= 0)
+         l += 65535; /* Overflow will just make this negative */
+
+      if (png_muldiv(&l, 1581061, 5658, l) && l >= 20000 && l <= 200000)
+      {
+#  endif
+         if (png_colorspace_check_gamma(png_ptr, colorspace, l,
+            0/*from profile*/))
          {
-            int i, j;
-            png_icc_matrix XYZ; /* end points, r,g,b in each row */
-
-            /* Colorants are 38 byte structures consisting of a 32 byte
-             * name followed by three two byte PCS values.  Read the three
-             * values and convert PCSLAB to PCSXYZ if necessary.
-             *
-             *
-             * NOTE: these values are (0..65535) and must be scaled to the
-             * actual output range before use.  The PCSXYZ 16-bit format is
-             * u1Fixed15Number in which 1,0 is 0x8000.  The PCSLAB 16-bit format
-             * is somewhat more complex - see ICC 2010 (v4) 6.3.4.2
-             */
-            tag += 12 + 32;
-            for (i=0; i<3; ++i, tag += 32) for (j=0; j<3; ++j, tag += 2)
-               XYZ[i][j] = png_get_uint_16(tag);
-
-            if ((colorspace->icc_info & PNG_ICC_PCSXYZ) != 0)
-            {
-               /* Convert from u1Fixed15Number to s15Fixed16Number */
-               for (i=0; i<3; ++i) for (j=0; j<3; ++j)
-                  XYZ[i][j] = (XYZ[i][j] << 1) + (XYZ[i][j] >> 15);
-            }
-
-            else
-            {
-               /* Convert from the 16 bit Lab format to 32 bit XYZ */
-               /* TODO: implement this */
-               png_warning(png_ptr,
-                  "TODO: skipping ICC 'clrt' tag because PCS is Lab");
-               return 0;
-            }
-
-            return png_icc_set_cHRM_from_endpoints(png_ptr, colorspace, name,
-               profile, png_cpm(XYZ));
+            /* Store this gamma value. */
+            colorspace->gamma = l;
+            colorspace->flags |= PNG_COLORSPACE_HAVE_GAMMA;
          }
-
-         else
-            (void)profile_error(png_ptr, NULL, name, temp,
-               "invalid colorant count for ICC profile colorantTableTag");
       }
 
       else
-         (void)profile_error(png_ptr, NULL, name, temp,
-            "invalid type for ICC profile colorantTableTag");
-   }
-
-   else
-      png_error(png_ptr, "lost 'clrt'");
-
-   return 0; /* error or 'clrt' not found */
+      {
+         /* This is just a warning that the algorithm has failed in an
+          * apparently extreme way.  (This is here mainly to discover
+          * profiles on which the algorithm doesn't work.)
+          */
+         png_warning(png_ptr, "ICC profile gamma value out of range");
+      }
 }
-
-static int
-png_icc_set_cHRM_from_MatrixTRC(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile)
-{
-   /* The profile contains a set of RGB Matrix and TRC tags, these can be used
-    * to find the colorant XYZ in the PCS encoding (which must be PCSXYZ.)
-    * This is a simplistic implementation which does not run the curve (TRC)
-    * part and assumes that 1,0 maps to 1,0 in the matrix (or at least to the
-    * same scaled value in each case.)
-    *
-    * This applies to true 3-component Matrix TRC profiles and the profiles
-    * produced by lcms where the MatrixColumnTag values are used in place of the
-    * ColorantTableTag on non-TRC profiles, however these profiles still fail to
-    * set a cHRM because the mediaWhitePointTag value is wrong (an example is
-    * SA216x.icc, a scanner profile copyright Samsung for the Samnsung CLX-216x
-    * scanner and with CMS type lcms).
-    */
-   png_icc_matrix XYZ; /* end points, r,g,b in each row */
-
-   if (png_icc_find_XYZ(png_ptr, name, profile, 0x7258595A/*rXYZ*/, XYZ+0) &&
-      png_icc_find_XYZ(png_ptr, name, profile, 0x6758595A/*gXYZ*/, XYZ+1) &&
-      png_icc_find_XYZ(png_ptr, name, profile, 0x6258595A/*bXYZ*/, XYZ+2))
-   {
-      /* TODO: run r/g/b through the TRCs to check that the TRC transformed
-       * values for 0 and 1 really are 0 and 1!
-       */
-      return png_icc_set_cHRM_from_endpoints(png_ptr, colorspace, name, profile,
-         png_cpm(XYZ));
-   }
-
-   return 0;
-}
-
-static int
-png_icc_set_cHRM_from_LUT(png_const_structrp png_ptr,
-   png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile)
-{
-   /* TODO: implement this */
-   PNG_UNUSED(png_ptr)
-   PNG_UNUSED(colorspace)
-   PNG_UNUSED(name)
-   PNG_UNUSED(profile)
-
-   return 0;
-}
+#endif /* PNG_ICC_SUPPORTED */
 
 int /* PRIVATE */
 png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
@@ -2989,7 +2726,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
           * only a warning here because libpng does not care about the
           * alignment.
           */
-         (void)profile_error(png_ptr, NULL, name, tag_id,
+         (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
             "ICC profile tag start not a multiple of 4");
       }
 
@@ -2998,7 +2735,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        */
       if (tag_length < 8)
       {
-         (void)profile_error(png_ptr, NULL, name, tag_id,
+         (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
             "short ICC profile tag skipped");
          continue;
       }
@@ -3007,7 +2744,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        * profile.
        */
       if (tag_start > profile_length || tag_length > profile_length - tag_start)
-         return profile_error(png_ptr, colorspace, name, tag_id,
+         return png_icc_profile_error(png_ptr, colorspace, name, tag_id,
             "ICC profile tag outside profile");
 
       /* Check the tag_id for the specific tags which must be present for the
@@ -3031,7 +2768,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * bytes).
              */
             if (tag_length != 20)
-               (void)profile_error(png_ptr, NULL, name, tag_length,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_length,
                   "invalid media white point length");
 
             else
@@ -3044,7 +2781,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * white was the same as the PCS adopted white - D50.
              */
             if (tag_length != 44)
-               (void)profile_error(png_ptr, NULL, name, tag_start,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_start,
                   "invalid chromatic adaptation matrix length");
 
             else
@@ -3071,11 +2808,11 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * clearly outlawed by the specification.
              */
             if (tag_length != 20)
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid <rgb>MatrixColumnTag length");
 
             else if (!(tags & PNG_ICC_RGB))
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid <rgb>MatrixColumnTag on monochrome profile");
 
             else
@@ -3101,11 +2838,11 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * requires special handling below.
              */
             if (!(tags & PNG_ICC_RGB))
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid <rgb>TRCTag on monochrome profile");
 
             else if (!(tags & PNG_ICC_PCSXYZ))
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid <rgb>TRCTag (requires PCSXYZ encoding)");
 
             else
@@ -3115,7 +2852,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
 
          case 0x6B545243: /* 'kTRC' - grayTRCTag */
             if ((tags & PNG_ICC_RGB) != 0)
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid grayTRCTag on RGB profile");
 
             else
@@ -3131,7 +2868,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * is shortest, only 12 bytes for an identity response.
              */
             if (tag_length < 12)
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid <rgbk>TRCTag length");
 
             else
@@ -3169,7 +2906,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * longer.  In fact all need more data than this in practice.
              */
             if (tag_length < 32)
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid LUT Tag length");
 
             else
@@ -3185,7 +2922,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * number of channels, the permitted type is chromaticityType.
              */
             if (tag_length != 12 + 8*PNG_ICC_CHANNELS(tags))
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid chromaticityTag length");
 
             else
@@ -3197,7 +2934,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
              * colorants are determined by the number of channels, as above.
              */
             if (tag_length != 12 + 38*PNG_ICC_CHANNELS(tags))
-               (void)profile_error(png_ptr, NULL, name, tag_id,
+               (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
                   "invalid colorantTableTag length");
 
             else
@@ -3326,12 +3063,12 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        * information and will probably result in a second warning here.
        */
       if ((required_tags & ~tags) != 0)
-         (void)profile_error(png_ptr, NULL, name, (required_tags & ~tags),
-            "required tags missing");
+         (void)png_icc_profile_error(png_ptr, NULL, name,
+            (required_tags & ~tags), "required tags missing");
 
       if ((tags & ~permitted_tags) != 0)
-         (void)profile_error(png_ptr, NULL, name, (tags & ~permitted_tags),
-            "unpermitted tags present");
+         (void)png_icc_profile_error(png_ptr, NULL, name,
+            (tags & ~permitted_tags), "unpermitted tags present");
    }
 
    return 1; /* success, maybe with warnings */
@@ -3421,8 +3158,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
    {
       if (png_get_uint_32(profile+84) == png_sRGB_checks[i].md5[0] &&
-          png_get_uint_32(profile+88) == png_sRGB_checks[i].md5[1] &&
-          png_get_uint_32(profile+92) == png_sRGB_checks[i].md5[2] &&
+         png_get_uint_32(profile+88) == png_sRGB_checks[i].md5[1] &&
+         png_get_uint_32(profile+92) == png_sRGB_checks[i].md5[2] &&
          png_get_uint_32(profile+96) == png_sRGB_checks[i].md5[3])
       {
          /* This may be one of the old HP profiles without an MD5, in that
@@ -3477,14 +3214,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
                       * discourage their use, skip the 'have_md5' warning below,
                       * which is made irrelevant by this error.
                       */
-#                    ifdef PNG_READ_SUPPORTED
-                        if (png_ptr->mode & PNG_IS_READ_STRUCT)
-                           png_chunk_benign_error(png_ptr,
-                              "known incorrect sRGB profile");
-                        else
-#                    endif
-                     png_app_error(png_ptr,
-                        "known incorrect sRGB profile");
+                     png_chunk_report(png_ptr, "known incorrect sRGB profile",
+                        PNG_CHUNK_ERROR);
                   }
 
                   /* Warn that this being done; this isn't even an error since
@@ -3493,14 +3224,9 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
                    */
                   else if (!png_sRGB_checks[i].have_md5)
                   {
-#                    ifdef PNG_READ_SUPPORTED
-                        if (png_ptr->mode & PNG_IS_READ_STRUCT)
-                           png_chunk_warning(png_ptr,
-                              "out-of-date sRGB profile with no signature");
-                        else
-#                    endif
-                     png_app_warning(png_ptr,
-                        "out-of-date sRGB profile with no signature");
+                     png_chunk_report(png_ptr,
+                        "out-of-date sRGB profile with no signature",
+                        PNG_CHUNK_WARNING);
                   }
 
                   return 1+png_sRGB_checks[i].is_broken;
@@ -3524,31 +3250,22 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 }
 #endif
 
-int /* PRIVATE */
+void /* PRIVATE */
 png_icc_set_gAMA_and_cHRM(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name, png_const_bytep profile,
    uLong adler)
 {
-   int set;
-   png_uint_32 info;
-
 #  ifdef PNG_sRGB_SUPPORTED
+   {
       /* 1) Is this profile one of the known ICC sRGB profiles?  If it is, just
        *    set the sRGB information.
        */
-      set = png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler);
+      int set = png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler);
 
-      if (set)
+      /* It is, simply set the profile intent. */
+      if (set && png_colorspace_set_sRGB(png_ptr, colorspace,
+         (int)/*already checked*/png_get_uint_32(profile+64)))
       {
-         /* It is, simply set the profile intent. */
-         int done = png_colorspace_set_sRGB(png_ptr, colorspace,
-            (int)/*already checked*/png_get_uint_32(profile+64),
-            0/* check gAMA and cHRM against sRGB but do not override */);
-
-         /* Stop here on error */
-         if (!done)
-            return done;
-
 #        if PNG_LIBPNG_BUILD_BASE_TYPE < PNG_LIBPNG_BUILD_RC
             /* In pre-RC builds run sRGB profiles through the profile checking
              * code; this is because it is a useful validation of that code and
@@ -3560,93 +3277,112 @@ png_icc_set_gAMA_and_cHRM(png_const_structrp png_ptr,
              */
             if (set >= 2)
 #        endif
-            return set;
+            return;
       }
+   }
+#  else
+      PNG_UNUSED(adler)
+#     ifndef PNG_ICC_SUPPORTED
+         PNG_UNUSED(png_ptr)
+         PNG_UNUSED(colorspace)
+         PNG_UNUSED(profile)
+#     endif
 #  endif
 
+#ifdef PNG_ICC_SUPPORTED
    /* 2) Attempt to extract the gAMA and cHRM information from non-sRGB
     *    profiles.  Always set the rendering intent from the profile.
+    *
+    *    Doing this requires a large body of code to parse an ICC profile and
+    *    implement ICC color correction.  This is because the profile tags that
+    *    store colorant information are rarely, if ever, present in practice.
+    *    It is therefore necessary to follow the algorithm described in section
+    *    10.4 (colorantTableType) and transform the RGB colorants through the
+    *    full profile.
+    *
+    *    Similarly to calculate a value for the PNG gAMA chunk it is necessary
+    *    to process at least one gray level through the transform.
+    *
+    *    The code to do this relies on a CMS implementation provided by the
+    *    application.
     */
-   info = colorspace->icc_info;
-
-   /* The cHRM chunk is only useful for an RGB image/profile, note that the
-    * check on 'set' causes pre-RC builds to do a spurious check on sRGB
-    * profiles, this validates the libpng algorithms because the known sRGB
-    * profiles are known to be correct.
-    */
-   if ((info & PNG_ICC_RGB) != 0 &&
-      (set || (colorspace->flags & PNG_COLORSPACE_HAVE_ENDPOINTS) == 0))
+   if (png_ptr->cms_transform_fn != NULL) /* Else no support */
    {
-      /* There are three ways to determine the correct value for cHRM, in order
-       * of preference they are:
-       *
-       * 1) Use 'chrm' - the chromaticityTag - if present for the colorant
-       *    chromaticities and combine this with the chromaticity of the media
-       *    white point (unadapted).
-       * 2) Use 'clrt' - the colorantTableTag - if present; reverse the
-       *    adaptation of the colorant end points the PCS illuminant and
-       *    use the XYZ values so obtained to set the cHRM values.
-       * 3) Use the XYZ values of the colorant obtained following section 10.4
-       *    of the ICC 2010 (v4) specification in the 'EXAMPLE' paragraph.  The
-       *    specification states that the AToB1Tag should be used, but the
-       *    Matrix TRC method is also colorimetric (see Table 25) and works in
-       *    older profiles too.
-       *
-       * For methods (2) and (3) the mediaWhitePointTag provides a check - it
-       * should match the sum of the adapted colorant end points.
+      png_uint_32 info = colorspace->icc_info;
+      png_alloc_size_t sample_bytes = 0/*error*/;
+      png_uint_16 pcsxyz[4/*samples*/ * 3/*components*/];
+
+      /* The input array; we want one sample to work out the gAMA chunk value
+       * and, for color images, three samples with the colorant endpoints.  The
+       * sample used for gAMA calculation is discussed below.  This gives the
+       * following byte array which works for either case (RGB or grayscale):
        */
-      if ((info & (PNG_ICC_chromaticityTag|PNG_ICC_mediaWhitePointTag)) ==
-            (PNG_ICC_chromaticityTag|PNG_ICC_mediaWhitePointTag) &&
-         png_icc_set_cHRM_from_chrm(png_ptr, colorspace, name, profile))
+      static const png_byte samples[] =
       {
-         /* finished */
-      }
+         GRAY_TEST, GRAY_TEST, GRAY_TEST, /* see png_icc_set_gAMA_from_Y */
+         255,   0,   0, /* red */
+           0, 255,   0, /* green */
+           0,   0, 255  /* blue */
+      };
 
-      else if ((info & PNG_ICC_colorantTableTag) != 0 &&
-         png_icc_set_cHRM_from_clrt(png_ptr, colorspace, name, profile))
-      {
-         /* finished */
-      }
-
-      /* (3): divided into two caes, where we have the MatrixColumnTags for all
-       * columns of the Matrix (and may have TRC tags too) as opposed to the
-       * case where the AToB LUT has to be used.
-       *
-       * At present only do this if the full set of TRC *and* MatrixColumn tags
-       * are present.  The code will handle the case where there is just the
-       * MatrixColumn set, and some lcms profiles have MatrixColumn but no TRC,
-       * but this seems to be erroneous (the result does not match the
-       * mediaWhitePointTag.)
+      /* The cHRM chunk is only useful for an RGB image/profile, note that the
+       * check on 'set' causes pre-RC builds to do a spurious check on sRGB
+       * profiles, this validates the libpng algorithms because the known sRGB
+       * profiles are known to be correct (except for the 'broken' ones which
+       * are excluded by the 'set >= 2' test above.)
        */
-      else if ((info & PNG_ICC_REQUIRED_RGB_MATRIXTRC) ==
-            PNG_ICC_REQUIRED_RGB_MATRIXTRC &&
-         png_icc_set_cHRM_from_MatrixTRC(png_ptr, colorspace, name, profile))
+      if ((info & PNG_ICC_RGB) != 0)
       {
-         /* finished */
+         if ((info & PNG_ICC_mediaWhitePointTag) == 0 /* Assume D50 */ ||
+            png_icc_check_wtpt(png_ptr, name, profile, NULL))
+         {
+            /* The mediaWhitePointTag is absent (an error, but we assume
+             * it was meant to be D50) or is sufficiently close to the PCS
+             * illuminant.  This is the normal case.
+             *
+             * The code does not actually need the media white point,
+             * because it is the same as the PCS illuminant if we get to
+             * this point.
+             */
+            sample_bytes = sizeof samples; /* i.e. all of them */
+         }
+
+         else
+         {
+            /* The mediaWhitePointTag has a major problem or doesn't match
+             * the PCS illuminant.  A cHRM chunk cannot be generated for
+             * this profile, so just do gAMA:
+             */
+            sample_bytes = 3; /* Just the gray value */
+         }
       }
 
-      else if ((info & PNG_ICC_AToB_TAGS) != 0 &&
-         png_icc_set_cHRM_from_LUT(png_ptr, colorspace, name, profile))
+      else
       {
-         /* finished */
+         /* This is a grayscale image/profile, so just do gAMA */
+         sample_bytes = 1;
       }
-   } /* 'RGB ' profile */
 
-   /* TODO: implement discovery of gAMA. */
+      /* Now apply the transform. */
+      if (png_ptr->cms_transform_fn(png_ptr, png_ptr->cms_data_ptr, samples,
+            sample_bytes, pcsxyz, sizeof pcsxyz, 0/*format*/,
+            PNG_sRGB_INTENT_RELATIVE))
+      {
+         /* First handle the gAMA based on the 'Y' value in pcsxyz, it is either
+          * a grayscale 16-bit achromatic value with 1.0 represented as 65535 or
+          * a the Y part of a PCSXYZ value with 1.0 represented as 32768.
+          */
+         png_uint_32 y = (sample_bytes != 1 ? pcsxyz[1] : pcsxyz[0]);
+         png_icc_set_gAMA_from_Y(png_ptr, colorspace, y, sample_bytes != 1);
 
-   /* Only write the intent if there is no other setting; the intent recorded in
-    * the profile is somewhat curious since the profile can have support for
-    * several intents.
-    */
-   if ((colorspace->flags & PNG_COLORSPACE_HAVE_INTENT) == 0)
-   {
-      colorspace->rendering_intent = (png_uint_16)/*already checked*/
-         png_get_uint_32(profile+64);
-      colorspace->flags |= PNG_COLORSPACE_HAVE_INTENT;
-      set = 2;
+         if (sample_bytes == sizeof samples) /* RGB samples too */
+            png_icc_set_cHRM_from_endpoints(png_ptr, colorspace, name,
+               profile, pcsxyz+3/*skip the gamma sample*/);
+      } /* sample_bytes > 0 */
    }
-
-   return set;
+#else
+   PNG_UNUSED(name)
+#endif /* PNG_ICC_SUPPORTED */
 }
 
 int /* PRIVATE */
