@@ -107,7 +107,11 @@ typedef png_byte *png_const_bytep;
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
-#include "../visupng/cexcept.h"
+#ifdef PNG_FREESTANDING_TESTS
+#  include <cexcept.h>
+#else
+#  include "../visupng/cexcept.h"
+#endif
 
 #ifdef __cplusplus
 #  define this not_the_cpp_this

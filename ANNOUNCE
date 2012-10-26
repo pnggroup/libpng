@@ -527,6 +527,7 @@ Version 1.6.0beta30 [October 24, 2012]
 
 Version 1.6.0beta31 [October 26, 2012]
   Undid the erroneous change to vstudio/pngvalid build in libpng-1.6.0beta30.
+  Made pngvalid so that it will build outside the libpng source tree.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
