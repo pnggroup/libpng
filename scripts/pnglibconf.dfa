@@ -147,6 +147,12 @@ logunsupported = 1
 @#  endif
 @#endif
 
+# IN DEVELOPMENT
+# These are currently experimental features; define them if you want (NOTE:
+# experimental options must be disabled before they are defined in this file!)
+
+option ICC disabled
+
 # Note that PNG_USR_CONFIG only has an effect when building
 # pnglibconf.h
 
@@ -312,6 +318,20 @@ setting USER_CHUNK_MALLOC_MAX
 option SAFE_LIMITS enables USER_LIMITS disabled
 = SAFE_LIMITS SAFE_LIMITS
 
+# ICC profile support; basic ICC profile support is enabled if iCCP chunk read
+# or write is enabled.  The application must perform all iCCP profile handling
+# itself.  If full support is enabled with the option below libpng will attempt
+# to do more processing using the profile data itself, this includes setting
+# appropriate values for cHRM and gAMA chunks if not present in the stream.
+#
+# ICC profile support is not build in to core libpng because of the size of the
+# code required; an external ICC implementation must be passed to libpng to
+# enable it.
+#
+# WARNING: this option is CURRENTLY UNTESTED because a test CMS implementation
+# has not yet been written, as a result it is disabled in current beta builds.
+option ICC requires iCCP enables SAVE_INT_32
+
 # All of the following options relate to code capabilities for
 # processing image data before creating a PNG or after reading one.
 # You can remove these capabilities safely and still be PNG
@@ -319,6 +339,19 @@ option SAFE_LIMITS enables USER_LIMITS disabled
 # See the comments above about how to change options and settings.
 
 # READ options
+#
+# WARNING: in libpng 1.5 maintained configuration compatibility with earlier
+# versions.  In some cases turning off an option turned off other options, in
+# others it was ineffective unless dependent options were also turned off.
+# Libpng 1.6 changes this: in general if you turn off an option that affects
+# APIs it stays off and simply disables APIs that depend on it.
+#
+# As a result if you simply port the libpng 1.5 configuration to libpng 1.6 you
+# will probably see build failures due to missing APIs.  Fixing these failures
+# requires some, perhaps considerable, knowledge of what your libpng using
+# applications are doing, fortunately there is no great reason for you to move
+# to libpng 1.6; the new interfaces in 1.6 will take several years to become
+# popular.
 
 option READ enables READ_INTERLACING
 
@@ -336,27 +369,42 @@ option READ_QUANTIZE requires READ
 option READ_TRANSFORMS requires READ
 = NO_READ_TRANSFORMS READ_TRANSFORMS_NOT_SUPPORTED
 
-option READ_EXPAND requires READ_TRANSFORMS
-option READ_EXPAND_16 requires READ_TRANSFORMS READ_16BIT enables READ_EXPAND
-option READ_SHIFT requires READ_TRANSFORMS
-option READ_PACK requires READ_TRANSFORMS
-option READ_BGR requires READ_TRANSFORMS
-option READ_SWAP requires READ_TRANSFORMS READ_16BIT
-option READ_PACKSWAP requires READ_TRANSFORMS
-option READ_INVERT requires READ_TRANSFORMS
-option READ_BACKGROUND requires READ_TRANSFORMS enables READ_STRIP_ALPHA
-option READ_STRIP_16_TO_8 requires READ_TRANSFORMS
-option READ_SCALE_16_TO_8 requires READ_TRANSFORMS
-option READ_FILLER requires READ_TRANSFORMS
-option READ_GAMMA requires READ_TRANSFORMS enables READ_gAMA
-option READ_GRAY_TO_RGB requires READ_TRANSFORMS
+# Read gamma handling.  Gamma processing is a core part of libpng and many of
+# the capabilities are dependent on libpng performing gamma correction.
+#
+# In libpng 1.6 disabling gamma processing (setting PNG_NO_READ_GAMMA)
+# consistently disables those parts of the API that depend on it.  Prior to
+# 1.6.0 this was not true; the results were unpredictable and varied between
+# releases.
+#
+# If you disable gamma processing and your program no longer compiles you need
+# to ask whether you really need the APIs that are missing.  If you do then you
+# almost certainly need the gamma processing.
+#
+# If you handle gamma issues outside libpng then you do not need the libpng
+# gamma processing; and it is an enormous waste of space.  You just need to
+# remove the use of libpng APIs that depend on it.
+option READ_GAMMA requires READ_TRANSFORMS READ_gAMA
 
-option READ_ALPHA_MODE requires READ_TRANSFORMS enables READ_GAMMA
-option READ_SWAP_ALPHA requires READ_TRANSFORMS
+option READ_ALPHA_MODE requires READ_TRANSFORMS READ_GAMMA
+option READ_BACKGROUND requires READ_TRANSFORMS READ_STRIP_ALPHA READ_GAMMA
+option READ_BGR requires READ_TRANSFORMS
+option READ_EXPAND_16 requires READ_TRANSFORMS READ_16BIT READ_EXPAND
+option READ_EXPAND requires READ_TRANSFORMS
+option READ_FILLER requires READ_TRANSFORMS
+option READ_GRAY_TO_RGB requires READ_TRANSFORMS
 option READ_INVERT_ALPHA requires READ_TRANSFORMS
+option READ_INVERT requires READ_TRANSFORMS
+option READ_PACK requires READ_TRANSFORMS
+option READ_PACKSWAP requires READ_TRANSFORMS
+option READ_RGB_TO_GRAY requires READ_TRANSFORMS READ_GAMMA
+option READ_SCALE_16_TO_8 requires READ_TRANSFORMS
+option READ_SHIFT requires READ_TRANSFORMS
+option READ_STRIP_16_TO_8 requires READ_TRANSFORMS
 option READ_STRIP_ALPHA requires READ_TRANSFORMS
+option READ_SWAP_ALPHA requires READ_TRANSFORMS
+option READ_SWAP requires READ_TRANSFORMS READ_16BIT
 option READ_USER_TRANSFORM requires READ_TRANSFORMS
-option READ_RGB_TO_GRAY requires READ_TRANSFORMS
 
 option PROGRESSIVE_READ requires READ
 option SEQUENTIAL_READ requires READ
@@ -379,11 +427,6 @@ option INCH_CONVERSIONS
 # API to build a grayscale palette
 
 option BUILD_GRAYSCALE_PALETTE
-
-# IN DEVELOPMENT
-# These are currently experimental features; define them if you want
-
-# NOTHING HERE
 
 # WRITE options
 
@@ -477,20 +520,6 @@ option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 
 option GAMMA disabled
 option COLORSPACE enables GAMMA disabled
-
-# ICC profile support; basic ICC profile support is enabled if iCCP chunk read
-# or write is enabled.  The application must perform all iCCP profile handling
-# itself.  If full support is enabled with the option below libpng will attempt
-# to do more processing using the profile data itself, this includes setting
-# appropriate values for cHRM and gAMA chunks if not present in the stream.
-#
-# ICC profile support is not build in to core libpng because of the size of the
-# code required; an external ICC implementation must be passed to libpng to
-# enable it.
-#
-# WARNING: this option is CURRENTLY UNTESTED because a test CMS implementation
-# has not yet been written, as a result it is disabled in current beta builds.
-option ICC requires iCCP enables SAVE_INT_32 disabled
 
 # When an ICC profile is read, or png_set, it will be checked for a match
 # against known sRGB profiles if the sRGB handling is enabled.  This
@@ -749,7 +778,7 @@ option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
 # Simplified API options (added at libpng-1.6.0)
 # Read:
 option SIMPLIFIED_READ requires SEQUENTIAL_READ READ_TRANSFORMS SETJMP
-option SIMPLIFIED_READ requires BENIGN_ERRORS
+option SIMPLIFIED_READ requires BENIGN_ERRORS READ_GAMMA
 option SIMPLIFIED_READ enables READ_EXPAND READ_16BIT READ_EXPAND_16
 option SIMPLIFIED_READ enables READ_SCALE_16_TO_8 READ_RGB_TO_GRAY
 option SIMPLIFIED_READ enables READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA

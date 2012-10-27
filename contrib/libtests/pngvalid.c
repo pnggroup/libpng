@@ -244,6 +244,7 @@ random_mod(unsigned int max)
    return x % max; /* 0 .. max-1 */
 }
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static int
 random_choice(void)
 {
@@ -253,6 +254,7 @@ random_choice(void)
 
    return x & 1;
 }
+#endif
 #endif /* PNG_READ_SUPPORTED */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
@@ -1714,6 +1716,7 @@ white_point(PNG_CONST color_encoding *encoding)
    return white;
 }
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static void
 normalize_color_encoding(color_encoding *encoding)
 {
@@ -1733,6 +1736,7 @@ normalize_color_encoding(color_encoding *encoding)
       encoding->blue.Z /= whiteY;
    }
 }
+#endif
 
 static size_t
 safecat_color_encoding(char *buffer, size_t bufsize, size_t pos,
@@ -1967,6 +1971,7 @@ modifier_init(png_modifier *pm)
  * to a calculation - not a digitization operation - unless the following API is
  * called directly.
  */
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static double digitize(PNG_CONST png_modifier *pm, double value,
    int sample_depth, int do_round)
 {
@@ -1991,7 +1996,10 @@ static double digitize(PNG_CONST png_modifier *pm, double value,
    if (do_round) value += .5;
    return floor(value)/digitization_factor;
 }
+#endif
 
+#if (defined PNG_READ_GAMMA_SUPPORTED) ||\
+   (defined PNG_READ_RGB_TO_GRAY_SUPPORTED)
 static double abserr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
    /* Absolute error permitted in linear values - affected by the bit depth of
@@ -2003,6 +2011,7 @@ static double abserr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
    else
       return pm->maxabs8;
 }
+#endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
 static double calcerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
@@ -2174,6 +2183,7 @@ modification_init(png_modification *pmm)
    modification_reset(pmm);
 }
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static void
 modifier_current_encoding(PNG_CONST png_modifier *pm, color_encoding *ce)
 {
@@ -2185,6 +2195,7 @@ modifier_current_encoding(PNG_CONST png_modifier *pm, color_encoding *ce)
 
    ce->gamma = pm->current_gamma;
 }
+#endif
 
 static size_t
 safecat_current_encoding(char *buffer, size_t bufsize, size_t pos,
@@ -6004,6 +6015,7 @@ image_transform_default_ini(PNG_CONST image_transform *this,
    this->next->ini(this->next, that);
 }
 
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
 static int
 image_transform_default_add(image_transform *this,
     PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
@@ -6016,6 +6028,7 @@ image_transform_default_add(image_transform *this,
 
    return 1;
 }
+#endif
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
 /* png_set_palette_to_rgb */
@@ -7694,6 +7707,7 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
 {
    switch (do_background)
    {
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
       case PNG_BACKGROUND_GAMMA_SCREEN:
       case PNG_BACKGROUND_GAMMA_FILE:
       case PNG_BACKGROUND_GAMMA_UNIQUE:
@@ -7711,6 +7725,7 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
                input_sample = background;
          }
          break;
+#endif
 
 #ifdef PNG_READ_ALPHA_MODE_SUPPORTED
       case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
@@ -7743,6 +7758,9 @@ gamma_component_compose(int do_background, double input_sample, double alpha,
          /* Standard cases where no compositing is done (so the component
           * value is already correct.)
           */
+         UNUSED(alpha)
+         UNUSED(background)
+         UNUSED(compose)
          break;
    }
 
@@ -8142,11 +8160,13 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
              */
             switch (do_background)
             {
-            case PNG_BACKGROUND_GAMMA_SCREEN:
-            case PNG_BACKGROUND_GAMMA_FILE:
-            case PNG_BACKGROUND_GAMMA_UNIQUE:
-               use_background = (alpha >= 0 && alpha < 1);
-               /*FALL THROUGH*/
+#           ifdef PNG_READ_BACKGROUND_SUPPORTED
+               case PNG_BACKGROUND_GAMMA_SCREEN:
+               case PNG_BACKGROUND_GAMMA_FILE:
+               case PNG_BACKGROUND_GAMMA_UNIQUE:
+                  use_background = (alpha >= 0 && alpha < 1);
+                  /*FALL THROUGH*/
+#           endif
 #           ifdef PNG_READ_ALPHA_MODE_SUPPORTED
                case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
@@ -9065,7 +9085,9 @@ perform_gamma_test(png_modifier *pm, int summary)
    /* Save certain values for the temporary overrides below. */
    unsigned int calculations_use_input_precision =
       pm->calculations_use_input_precision;
-   double maxout8 = pm->maxout8;
+#  ifdef PNG_READ_BACKGROUND_SUPPORTED
+      double maxout8 = pm->maxout8;
+#  endif
 
    /* First some arbitrary no-transform tests: */
    if (!pm->this.speed && pm->test_gamma_threshold)

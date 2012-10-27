@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta31 - October 26, 2012
+Libpng 1.6.0beta31 - October 27, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -525,7 +525,7 @@ Version 1.6.0beta30 [October 24, 2012]
   Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
     pngrtran.c (Domani Hannes).
 
-Version 1.6.0beta31 [October 26, 2012]
+Version 1.6.0beta31 [October 27, 2012]
   Undid the erroneous change to vstudio/pngvalid build in libpng-1.6.0beta30.
   Made pngvalid so that it will build outside the libpng source tree.
   Changed ICC profile support to allow use of an external color management
@@ -538,7 +538,16 @@ Version 1.6.0beta31 [October 26, 2012]
     has been changed to allow an external CMS to be used.  This code is
     temporarily disabled until a suitable set of test cases using one or more
     external CMS implementations have been implemented.
-  Make builds -DPNG_NO_READ_GAMMA compile (the unit tests still fail).
+  Made builds -DPNG_NO_READ_GAMMA compile (the unit tests still fail).
+  Made PNG_NO_READ_GAMMA switch off interfaces that depend on READ_GAMMA.
+    Prior to 1.6.0 switching off READ_GAMMA did unpredictable things to the
+    interfaces that use it (specifically, png_do_background in 1.4 would
+    simply display composite for grayscale images but do composition
+    with the incorrect arithmetic for color ones). In 1.6 the semantic
+    of -DPNG_NO_READ_GAMMA is changed to simply disable any interface that
+    depends on it; this obliges people who set it to consider whether they
+    really want it off if they happen to use any of the interfaces in
+    question (typically most users who disable it won't).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
