@@ -548,6 +548,8 @@ Version 1.6.0beta31 [October 27, 2012]
     depends on it; this obliges people who set it to consider whether they
     really want it off if they happen to use any of the interfaces in
     question (typically most users who disable it won't).
+  Fixed GUIDs in projects/vstudio. Some were duplicated or missing,
+    resulting in VS2010 having to update the files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

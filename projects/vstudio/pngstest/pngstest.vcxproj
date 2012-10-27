@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9B36B6FE-7FC0-434F-A71F-BBEF8099F1D8}</ProjectGuid>
+    <ProjectGuid>{277AC57F-313B-4D06-B119-A3CDB672D2FF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>pngstest</RootNamespace>
   </PropertyGroup>
