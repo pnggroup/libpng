@@ -4306,6 +4306,8 @@ Version 1.6.0beta31 [November 1, 2012]
     for too little gain; implementing full ICC color correction is maybe
     desireable but is left up to applications.
 
+Version 1.6.0beta32 [November 1, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
