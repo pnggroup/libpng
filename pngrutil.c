@@ -1276,7 +1276,7 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   png_colorspace_set_sRGB(png_ptr, &png_ptr->colorspace, intent);
+   (void)png_colorspace_set_sRGB(png_ptr, &png_ptr->colorspace, intent);
    png_colorspace_sync(png_ptr, info_ptr);
 }
 #endif /* PNG_READ_sRGB_SUPPORTED */
@@ -1447,13 +1447,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     png_crc_finish(png_ptr, length);
                                     finished = 1;
 
-                                    /* Set the gAMA and cHRM information, this
-                                     * checks for a known sRGB profile.  The
-                                     * result is 0 on error.
-                                     */
-                                    png_icc_set_gAMA_and_cHRM(png_ptr,
-                                       &png_ptr->colorspace, keyword, profile,
-                                       png_ptr->zstream.adler);
+#                                   ifdef PNG_sRGB_SUPPORTED
+                                       /* Check for a match against sRGB */
+                                       png_icc_set_sRGB(png_ptr,
+                                          &png_ptr->colorspace, profile,
+                                          png_ptr->zstream.adler);
+#                                   endif
 
                                     /* Steal the profile for info_ptr. */
                                     if (info_ptr != NULL)

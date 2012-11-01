@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta31 - October 26, 2012
+ * libpng version 1.6.0beta31 - November 1, 2012
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta31 - October 26, 2012: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta31 - November 1, 2012: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta31, October 26, 2012, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta31, November 1, 2012, are
  * Copyright (c) 2004, 2006-2012 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    October 26, 2012
+ *    November 1, 2012
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -378,7 +378,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta31"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta31 - October 26, 2012\n"
+     " libpng version 1.6.0beta31 - November 1, 2012\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -3204,90 +3204,6 @@ PNG_EXPORT(242, void, png_set_check_for_invalid_index,
     (png_structrp png_ptr, int allowed));
 #endif
 
-/*******************************************************************************
- *  CMS (Color Management System) SUPPORT
- *******************************************************************************
- *
- * The PNG file format supports embedding of ICC profiles, however libpng
- * provides only limited support for handling these profiles.  In particular
- * libpng includes no support for using the profile to transform data into a
- * different color space.  If PNG_ICC_SUPPORTED is set, however, libpng allows
- * an external CMS to be registered into the png_struct after it is created.
- * This simply records a single callback function to transform samples between
- * two color spaces.
- */
-typedef struct png_cms_data *png_cms_datap, * PNG_RESTRICT png_cms_datarp;
-   /* An opaque type defined by a specific implementation to hold whatever data
-    * is required.  The implementation is responsible for all storage management
-    * of this data.
-    */
-
-typedef PNG_CALLBACK(png_uint_32, *png_cms_transform_ptr,
-   (png_const_structrp png_ptr, png_cms_datarp data_ptr, png_const_voidp input,
-   png_alloc_size_t input_bytes, png_voidp output,
-   png_alloc_size_t output_bytes, int format, int intent));
-   /* Transform input[input_bytes] of samples to output[output_bytes].  The
-    * format of the input and output is given by 'format'.  The function shall
-    * transform only so much input as there is space for in the output buffer.
-    * 'intent' is the ICC intent required for the transformation.
-    *
-    * The connection space data (which may be either the input or output) is
-    * always either 16-bit achromatic data (as described in Annex F.2 of the v4
-    * ICC specification) for grayscale PNG files or 16-bit PCSXYZ data for RGB
-    * PNG files.  Any alpha channel may be present in the connection space, in
-    * which case it is a 16-bit channel and the alpha value follows each sample.
-    * Samples are not pre-multiplied by the alpha.  The connection space data
-    * is stored as an array of png_uint_16 values in the native representation
-    * of the machine.
-    *
-    * For transforms to the connection space the input is in the PNG format
-    * using either 8-bit or big-endian 16-bit components.  16-bit quantities use
-    * the PNG layout - big-endian in two bytes.
-    *
-    * By default a transform from the connection space will be to 8-bit sRGB
-    * (with an optional alpha value) or 8-bit gray encoded with the inverse of
-    * the sRGB transfer function.  If png_set_cms_output is called, however, the
-    * transform may produce arbitrary output in a format potentially not handled
-    * by libpng.
-    *
-    * It is valid to register a CMS when writing a PNG image, however the CMS
-    * will only be used to generate appropriate values for cHRM and gAMA of the
-    * profile.
-    *
-    * The format parameter is made up of the following flags:
-    */
-#define PNG_CMS_FORMAT_FLAG_ALPHA 0x01 /* data has alpha channel */
-#define PNG_CMS_FORMAT_FLAG_16BIT 0x02 /* 16-bit image components else 8-bit */
-#define PNG_CMS_FORMAT_FLAG_PCS   0x04 /* input is PCS data, else image data */
-
-#ifdef PNG_ICC_SUPPORTED
-PNG_EXPORT(243, void, png_set_cms, (png_structrp png_ptr,
-   png_cms_datap cms_data_ptr, png_cms_transform_ptr cms_transform_function));
-   /* Register the CMS transform function.  The given pointer will be passed to
-    * every call to the function.
-    */
-
-#ifdef PNG_READ_SUPPORTED
-PNG_EXPORT(244, void, png_set_cms_output, (png_structrp png_ptr,
-   int bytes_per_pixel, int rendering_intent));
-   /* Inform libpng that the transform function will write output requiring
-    * bytes_per_pixel bytes for each sample.  The output need not be in any
-    * particular format, for example the transform could produce a print
-    * separation.  libpng will provide a buffer equal in size to the row width
-    * of the image times the bytes_per_pixel value (and the application must
-    * provide this size buffer.)
-    *
-    * This also forces the CMS transform to be used even when it is apparently
-    * not necessary (e.g. for sRGB input data, or for PNG files with no ICC
-    * profile information and no sRGB data.)  The intent overrides the default,
-    * which is perceptual.
-    */
-#endif
-#endif
-/*******************************************************************************
- *  END OF CMS (Color Management System) SUPPORT
- ******************************************************************************/
-
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project
  * defs
  */
@@ -3297,7 +3213,7 @@ PNG_EXPORT(244, void, png_set_cms_output, (png_structrp png_ptr,
  * scripts/symbols.def as well.
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(244);
+  PNG_EXPORT_LAST_ORDINAL(242);
 #endif
 
 #ifdef __cplusplus

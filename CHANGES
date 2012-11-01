@@ -4277,7 +4277,7 @@ Version 1.6.0beta30 [October 24, 2012]
   Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
     pngrtran.c (Domani Hannes).
 
-Version 1.6.0beta31 [October 27, 2012]
+Version 1.6.0beta31 [November 1, 2012]
   Undid the erroneous change to vstudio/pngvalid build in libpng-1.6.0beta30.
   Made pngvalid so that it will build outside the libpng source tree.
   Changed ICC profile support to allow use of an external color management
@@ -4302,6 +4302,9 @@ Version 1.6.0beta31 [October 27, 2012]
     question (typically most users who disable it won't).
   Fixed GUIDs in projects/vstudio. Some were duplicated or missing,
     resulting in VS2010 having to update the files.
+  Removed non-working ICC profile support code. There was too much code
+    for too little gain; implementing full ICC color correction is maybe
+    desireable but is left up to applications.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

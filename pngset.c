@@ -578,7 +578,7 @@ png_set_sRGB(png_const_structrp png_ptr, png_inforp info_ptr, int srgb_intent)
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent);
+   (void)png_colorspace_set_sRGB(png_ptr, &info_ptr->colorspace, srgb_intent);
    png_colorspace_sync_info(png_ptr, info_ptr);
 }
 
@@ -1549,35 +1549,4 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
       png_ptr->num_palette_max = -1;
 }
 #endif
-
-#ifdef PNG_ICC_SUPPORTED
-void PNGAPI
-png_set_cms(png_structrp png_ptr, png_cms_datap cms_data_ptr,
-   png_cms_transform_ptr cms_transform_function)
-{
-   png_ptr->cms_transform_fn = cms_transform_function;
-   png_ptr->cms_data_ptr = cms_data_ptr;
-}
-
-#ifdef PNG_READ_SUPPORTED
-void PNGAPI
-png_set_cms_output(png_structrp png_ptr, int bytes_per_pixel,
-   int rendering_intent)
-{
-   if (png_ptr->mode & PNG_IS_READ_STRUCT)
-   {
-      png_ptr->cms_bytes_per_pixel = bytes_per_pixel;
-      png_ptr->cms_intent = rendering_intent;
-
-      /* A CMS must be registered before calling this */
-      if (png_ptr->cms_transform_fn == NULL)
-         png_app_error(png_ptr, "no CMS registered to transform output");
-   }
-
-   else
-      png_app_error(png_ptr, "attempt to do CMS tranform on write");
-}
-#endif /* PNG_READ_SUPPORTED */
-#endif /* PNG_ICC_SUPPORTED */
-
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
