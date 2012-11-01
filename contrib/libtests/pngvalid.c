@@ -191,7 +191,8 @@ fix(double d)
  * is implemented here so that it gives the same set of numbers on every
  * architecture.  It's a linear congruential generator (Knuth or Sedgewick
  * "Algorithms") but it comes from the 'feedback taps' table in Horowitz and
- * Hill, "The Art of Electronics".
+ * Hill, "The Art of Electronics" (Pseudo-Random Bit Sequences and Noise
+ * Generation.)
  */
 static void
 make_random_bytes(png_uint_32* seed, void* pv, size_t size)
