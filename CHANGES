@@ -4280,16 +4280,6 @@ Version 1.6.0beta30 [October 24, 2012]
 Version 1.6.0beta31 [November 1, 2012]
   Undid the erroneous change to vstudio/pngvalid build in libpng-1.6.0beta30.
   Made pngvalid so that it will build outside the libpng source tree.
-  Changed ICC profile support to allow use of an external color management
-    system (CMS). In practice it is not possible to obtain cHRM information
-    reliably using just the end-point tags because they do not exist in the
-    vast majority of profiles.  Instead it is necessary to run the endpoints
-    through the ICC colorimetric intent transform (as described in the v4
-    spec).  Since this is likely to be too much code inside libpng for too
-    little gain (it implies a fairly complete CMS implementation) the code
-    has been changed to allow an external CMS to be used.  This code is
-    temporarily disabled until a suitable set of test cases using one or more
-    external CMS implementations have been implemented.
   Made builds -DPNG_NO_READ_GAMMA compile (the unit tests still fail).
   Made PNG_NO_READ_GAMMA switch off interfaces that depend on READ_GAMMA.
     Prior to 1.6.0 switching off READ_GAMMA did unpredictable things to the
@@ -4302,11 +4292,13 @@ Version 1.6.0beta31 [November 1, 2012]
     question (typically most users who disable it won't).
   Fixed GUIDs in projects/vstudio. Some were duplicated or missing,
     resulting in VS2010 having to update the files.
-  Removed non-working ICC profile support code. There was too much code
-    for too little gain; implementing full ICC color correction is maybe
-    desireable but is left up to applications.
+  Removed non-working ICC profile support code that was mostly added to
+    libpng-1.6.0beta29 and beta30. There was too much code for too little
+    gain; implementing full ICC color correction may be desireable but is left
+    up to applications.
 
-Version 1.6.0beta32 [November 1, 2012]
+Version 1.6.0beta32 [November 2, 2012]
+  Fixed an intermittent SEGV in pngstest.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

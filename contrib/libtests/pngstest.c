@@ -2625,7 +2625,7 @@ component_loc(png_byte loc[4], png_uint_32 format)
    else
    {
       channels = 1;
-      loc[0] = loc[1] = loc[2] = 0;
+      loc[1] = loc[2] = loc[3] = 0;
    }
 
    if (format & PNG_FORMAT_FLAG_ALPHA)
