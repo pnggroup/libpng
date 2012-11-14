@@ -11,7 +11,7 @@
  * Make a test PNG image.  The arguments are as follows:
  *
  *  makepng [--sRGB|--linear|--1.8] [--color=<color>] color-type bit-depth \
- *	[file-name]
+ *      [file-name]
  *
  * The color-type may be numeric (and must match the numbers used by the PNG
  * specification) or one of the format names listed below.  The bit-depth is the
@@ -60,7 +60,7 @@
  * 16 bits:           256x256
  * More than 16 bits: 1024x1024
  *
- * Row filtering is turned off (the 'none' filter is used on every row) and  the
+ * Row filtering is turned off (the 'none' filter is used on every row) and the
  * images are not interlaced.
  *
  * If --color is given then the whole image has that color, color-mapped images
@@ -251,7 +251,7 @@ set_value(png_bytep row, size_t rowbytes, png_uint_32 x, unsigned int bit_depth,
 {
    unsigned int mask = (1U << bit_depth)-1;
 
-   x *= bit_depth;  /* Maxium x is 4*1024, maxium bit_depth is 16 */
+   x *= bit_depth;  /* Maximum x is 4*1024, maximum bit_depth is 16 */
 
    if (value <= mask)
    {
@@ -1232,7 +1232,7 @@ find_insert(png_const_charp what, png_charp param)
 }
 
 /* This is a not-very-good parser for a sequence of numbers (including 0).  It
- * doesn't accept some apparenly valid things, but it accepts all the sensible
+ * doesn't accept some apparently valid things, but it accepts all the sensible
  * combinations.
  */
 static void
@@ -1318,8 +1318,8 @@ main(int argc, char **argv)
 
       if (strncmp(arg, "--color=", 8) == 0)
       {
-	  parse_color(arg+8, colors);
-	  continue;
+          parse_color(arg+8, colors);
+          continue;
       }
 
       if (argc >= 3 && strcmp(arg, "--insert") == 0)

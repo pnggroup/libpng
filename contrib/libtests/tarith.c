@@ -92,12 +92,12 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
          showall = 1;
       else if (strcmp(*argv, "-e") == 0 && argc > 0)
       {
-	 --argc;
+         --argc;
          max_error = atof(*++argv);
       }
       else if (strcmp(*argv, "-E") == 0 && argc > 0)
       {
-	 --argc;
+         --argc;
          max_error_abs = atof(*++argv);
       }
       else
@@ -118,7 +118,7 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
          ++nonfinite;
 
       if (verbose)
-	 fprintf(stderr, "%.*g %d\n", DBL_DIG, test, precision);
+         fprintf(stderr, "%.*g %d\n", DBL_DIG, test, precision);
 
       /* Check for overflow in the buffer by setting a marker. */
       memset(buffer, 71, sizeof buffer);
@@ -131,8 +131,8 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
       if (buffer[precision+7] != 71)
       {
          fprintf(stderr, "%g[%d] -> '%s'[%lu] buffer overflow\n", test,
-	    precision, buffer, (unsigned long)strlen(buffer));
-	 failed = 1;
+            precision, buffer, (unsigned long)strlen(buffer));
+         failed = 1;
       }
 
       /* Following are used for the number parser below and must be
@@ -143,19 +143,19 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
       if (!isfinite(test))
       {
          /* Expect 'inf' */
-	 if (test >= 0 && strcmp(buffer, "inf") ||
-	     test <  0 && strcmp(buffer, "-inf"))
-	 {
-	    fprintf(stderr, "%g[%d] -> '%s' but expected 'inf'\n", test,
-	       precision, buffer);
-	    failed = 1;
-	 }
+         if (test >= 0 && strcmp(buffer, "inf") ||
+             test <  0 && strcmp(buffer, "-inf"))
+         {
+            fprintf(stderr, "%g[%d] -> '%s' but expected 'inf'\n", test,
+               precision, buffer);
+            failed = 1;
+         }
       }
       else if (!png_check_fp_number(buffer, precision+10, &state, &index) ||
           buffer[index] != 0)
       {
-	 fprintf(stderr, "%g[%d] -> '%s' but has bad format ('%c')\n", test,
-	 precision, buffer, buffer[index]);
+         fprintf(stderr, "%g[%d] -> '%s' but has bad format ('%c')\n", test,
+         precision, buffer, buffer[index]);
          failed = 1;
       }
       else if (PNG_FP_IS_NEGATIVE(state) && !(test < 0))
@@ -185,21 +185,21 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
       else
       {
          /* Check the result against the original. */
-	 double out = atof(buffer);
-	 double change = fabs((out - test)/test);
-	 double allow = .5/pow(10,
+         double out = atof(buffer);
+         double change = fabs((out - test)/test);
+         double allow = .5/pow(10,
             (precision >= DBL_DIG) ? DBL_DIG-1 : precision-1);
 
-	 /* NOTE: if you hit this error case are you compiling with gcc
-	  * and -O0?  Try -O2 - the errors can accumulate if the FP
-	  * code above is not optimized and may drift outside the .5 in
-	  * DBL_DIG allowed.  In any case a small number of errors may
-	  * occur (very small ones - 1 or 2%) because of rounding in the
-	  * calculations, either in the conversion API or in atof.
-	  */
-	 if (change >= allow && (isfinite(out) ||
-	     fabs(test/DBL_MAX) <= 1-allow))
-	 {
+         /* NOTE: if you hit this error case are you compiling with gcc
+          * and -O0?  Try -O2 - the errors can accumulate if the FP
+          * code above is not optimized and may drift outside the .5 in
+          * DBL_DIG allowed.  In any case a small number of errors may
+          * occur (very small ones - 1 or 2%) because of rounding in the
+          * calculations, either in the conversion API or in atof.
+          */
+         if (change >= allow && (isfinite(out) ||
+             fabs(test/DBL_MAX) <= 1-allow))
+         {
             double percent = (precision >= DBL_DIG) ? max_error_abs : max_error;
             double allowp = (change-allow)*100/allow;
 
@@ -213,16 +213,16 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
                if (max < allowp) max = allowp;
             }
 
-	    if (showall || allowp >= percent)
-	    {
-	       fprintf(stderr,
-		  "%.*g[%d] -> '%s' -> %.*g number changed (%g > %g (%d%%))\n",
-		  DBL_DIG, test, precision, buffer, DBL_DIG, out, change, allow,
-		  (int)round(allowp));
-	       failed = 1;
-	    }
-	    else
-	       ++minorarith;
+            if (showall || allowp >= percent)
+            {
+               fprintf(stderr,
+                  "%.*g[%d] -> '%s' -> %.*g number changed (%g > %g (%d%%))\n",
+                  DBL_DIG, test, precision, buffer, DBL_DIG, out, change, allow,
+                  (int)round(allowp));
+               failed = 1;
+            }
+            else
+               ++minorarith;
          }
       }
 
@@ -239,15 +239,15 @@ skip:
 
       /* Generate random numbers. */
       if (test == 0 || !isfinite(test))
-	 test = precision+1;
+         test = precision+1;
       else
       {
-	 /* Derive the exponent from the previous rand() value. */
-	 int exponent = precision % (DBL_MAX_EXP - DBL_MIN_EXP) + DBL_MIN_EXP;
-	 int tmp;
-	 test = frexp(test * rand(), &tmp);
-	 test = ldexp(test, exponent);
-	 precision >>= 8; /* arbitrary */
+         /* Derive the exponent from the previous rand() value. */
+         int exponent = precision % (DBL_MAX_EXP - DBL_MIN_EXP) + DBL_MIN_EXP;
+         int tmp;
+         test = frexp(test * rand(), &tmp);
+         test = ldexp(test, exponent);
+         precision >>= 8; /* arbitrary */
       }
 
       /* This limits the precision to 32 digits, enough for standard
@@ -646,17 +646,17 @@ int validation_muldiv(int count, int argc, char **argv)
        */
       {
          long u1, u2;
-	 int n = 0;
-	 if (a < 0) u1 = -a, n = 1; else u1 = a;
-	 if (times < 0) u2 = -times, n = !n; else u2 = times;
-	 png_64bit_product(u1, u2, &hi, &lo);
-	 if (n)
-	 {
-	    /* -x = ~x+1 */
-	    lo = ((~lo) + 1) & 0xffffffff;
-	    hi = ~hi;
-	    if (lo == 0) ++hi;
-	 }
+         int n = 0;
+         if (a < 0) u1 = -a, n = 1; else u1 = a;
+         if (times < 0) u2 = -times, n = !n; else u2 = times;
+         png_64bit_product(u1, u2, &hi, &lo);
+         if (n)
+         {
+            /* -x = ~x+1 */
+            lo = ((~lo) + 1) & 0xffffffff;
+            hi = ~hi;
+            if (lo == 0) ++hi;
+         }
       }
 
       fp = a;
@@ -664,48 +664,48 @@ int validation_muldiv(int count, int argc, char **argv)
       if ((fp & 0xffffffff) != lo || ((fp >> 32) & 0xffffffff) != hi)
       {
          fprintf(stderr, "png_64bit_product %d * %d -> %lx|%.8lx not %llx\n",
-	    a, times, hi, lo, fp);
-	 ++error64;
+            a, times, hi, lo, fp);
+         ++error64;
       }
 
       if (div != 0)
       {
-	 /* Round - this is C round to zero. */
-	 if ((fp < 0) != (div < 0))
-	   fp -= div/2;
-	 else
-	   fp += div/2;
+         /* Round - this is C round to zero. */
+         if ((fp < 0) != (div < 0))
+           fp -= div/2;
+         else
+           fp += div/2;
 
-	 fp /= div;
-	 fpround = fp;
-	 /* Assume 2's complement here: */
-	 ok = fpround <= PNG_UINT_31_MAX &&
-	      fpround >= -1-(long long int)PNG_UINT_31_MAX;
-	 if (!ok) ++overflow;
+         fp /= div;
+         fpround = fp;
+         /* Assume 2's complement here: */
+         ok = fpround <= PNG_UINT_31_MAX &&
+              fpround >= -1-(long long int)PNG_UINT_31_MAX;
+         if (!ok) ++overflow;
       }
       else
         ok = 0, ++overflow, fpround = fp/*misleading*/;
 
       if (verbose)
          fprintf(stderr, "TEST %d * %d / %d -> %lld (%s)\n", a, times, div,
-	    fp, ok ? "ok" : "overflow");
+            fp, ok ? "ok" : "overflow");
 
       ++tested;
       if (png_muldiv(&result, a, times, div) != ok)
       {
-	 ++error;
-	 if (ok)
-	     fprintf(stderr, "%d * %d / %d -> overflow (expected %lld)\n", a,
-	        times, div, fp);
+         ++error;
+         if (ok)
+             fprintf(stderr, "%d * %d / %d -> overflow (expected %lld)\n", a,
+                times, div, fp);
          else
-	     fprintf(stderr, "%d * %d / %d -> %d (expected overflow %lld)\n", a,
-	        times, div, result, fp);
+             fprintf(stderr, "%d * %d / %d -> %d (expected overflow %lld)\n", a,
+                times, div, result, fp);
       }
       else if (ok && result != fpround)
       {
          ++error;
          fprintf(stderr, "%d * %d / %d -> %d not %lld\n", a, times, div, result,
-	    fp);
+            fp);
       }
       else
          ++passed;
@@ -775,7 +775,7 @@ int validation_gamma(int argc, char **argv)
    /* Silence the output with -s, just test the gamma functions with -g: */
    while (--argc > 0)
       if (strcmp(*++argv, "-s") == 0)
-	 silent = 1;
+         silent = 1;
       else if (strcmp(*argv, "-g") == 0)
          onlygamma = 1;
       else
@@ -790,100 +790,100 @@ int validation_gamma(int argc, char **argv)
       maxerr = 0;
       for (i=0; i<256; ++i)
       {
-	 double correct = -log(i/255.)/log(2.)*65536;
-	 double error = png_log8bit(i) - correct;
+         double correct = -log(i/255.)/log(2.)*65536;
+         double error = png_log8bit(i) - correct;
 
-	 if (i != 0 && fabs(error) > maxerr)
-	    maxerr = fabs(error);
+         if (i != 0 && fabs(error) > maxerr)
+            maxerr = fabs(error);
 
-	 if (i == 0 && png_log8bit(i) != 0xffffffff ||
-	     i != 0 && png_log8bit(i) != floor(correct+.5))
-	 {
-	    fprintf(stderr, "8 bit log error: %d: got %u, expected %f\n",
-	       i, png_log8bit(i), correct);
-	 }
+         if (i == 0 && png_log8bit(i) != 0xffffffff ||
+             i != 0 && png_log8bit(i) != floor(correct+.5))
+         {
+            fprintf(stderr, "8 bit log error: %d: got %u, expected %f\n",
+               i, png_log8bit(i), correct);
+         }
       }
 
       if (!silent)
-	 printf("maximum 8 bit log error = %f\n", maxerr);
+         printf("maximum 8 bit log error = %f\n", maxerr);
 
       maxerr = 0;
       for (i=0; i<65536; ++i)
       {
-	 double correct = -log(i/65535.)/log(2.)*65536;
-	 double error = png_log16bit(i) - correct;
+         double correct = -log(i/65535.)/log(2.)*65536;
+         double error = png_log16bit(i) - correct;
 
-	 if (i != 0 && fabs(error) > maxerr)
-	    maxerr = fabs(error);
+         if (i != 0 && fabs(error) > maxerr)
+            maxerr = fabs(error);
 
-	 if (i == 0 && png_log16bit(i) != 0xffffffff ||
-	     i != 0 && png_log16bit(i) != floor(correct+.5))
-	 {
-	    if (error > .68) /* By experiment error is less than .68 */
-	    {
-	       fprintf(stderr, "16 bit log error: %d: got %u, expected %f"
-		  " error: %f\n", i, png_log16bit(i), correct, error);
-	    }
-	 }
+         if (i == 0 && png_log16bit(i) != 0xffffffff ||
+             i != 0 && png_log16bit(i) != floor(correct+.5))
+         {
+            if (error > .68) /* By experiment error is less than .68 */
+            {
+               fprintf(stderr, "16 bit log error: %d: got %u, expected %f"
+                  " error: %f\n", i, png_log16bit(i), correct, error);
+            }
+         }
       }
 
       if (!silent)
-	 printf("maximum 16 bit log error = %f\n", maxerr);
+         printf("maximum 16 bit log error = %f\n", maxerr);
 
       /* Now exponentiations. */
       maxerr = 0;
       for (i=0; i<=0xfffff; ++i)
       {
-	 double correct = exp(-i/65536. * log(2.)) * (65536. * 65536);
-	 double error = png_exp(i) - correct;
+         double correct = exp(-i/65536. * log(2.)) * (65536. * 65536);
+         double error = png_exp(i) - correct;
 
-	 if (fabs(error) > maxerr)
-	    maxerr = fabs(error);
-	 if (fabs(error) > 1883) /* By experiment. */
-	 {
-	    fprintf(stderr, "32 bit exp error: %d: got %u, expected %f"
-		  " error: %f\n", i, png_exp(i), correct, error);
-	 }
+         if (fabs(error) > maxerr)
+            maxerr = fabs(error);
+         if (fabs(error) > 1883) /* By experiment. */
+         {
+            fprintf(stderr, "32 bit exp error: %d: got %u, expected %f"
+                  " error: %f\n", i, png_exp(i), correct, error);
+         }
       }
 
       if (!silent)
-	 printf("maximum 32 bit exp error = %f\n", maxerr);
+         printf("maximum 32 bit exp error = %f\n", maxerr);
 
       maxerr = 0;
       for (i=0; i<=0xfffff; ++i)
       {
-	 double correct = exp(-i/65536. * log(2.)) * 255;
-	 double error = png_exp8bit(i) - correct;
+         double correct = exp(-i/65536. * log(2.)) * 255;
+         double error = png_exp8bit(i) - correct;
 
-	 if (fabs(error) > maxerr)
-	    maxerr = fabs(error);
-	 if (fabs(error) > .50002) /* By experiment */
-	 {
-	    fprintf(stderr, "8 bit exp error: %d: got %u, expected %f"
-		  " error: %f\n", i, png_exp8bit(i), correct, error);
-	 }
+         if (fabs(error) > maxerr)
+            maxerr = fabs(error);
+         if (fabs(error) > .50002) /* By experiment */
+         {
+            fprintf(stderr, "8 bit exp error: %d: got %u, expected %f"
+                  " error: %f\n", i, png_exp8bit(i), correct, error);
+         }
       }
 
       if (!silent)
-	 printf("maximum 8 bit exp error = %f\n", maxerr);
+         printf("maximum 8 bit exp error = %f\n", maxerr);
 
       maxerr = 0;
       for (i=0; i<=0xfffff; ++i)
       {
-	 double correct = exp(-i/65536. * log(2.)) * 65535;
-	 double error = png_exp16bit(i) - correct;
+         double correct = exp(-i/65536. * log(2.)) * 65535;
+         double error = png_exp16bit(i) - correct;
 
-	 if (fabs(error) > maxerr)
-	    maxerr = fabs(error);
-	 if (fabs(error) > .524) /* By experiment */
-	 {
-	    fprintf(stderr, "16 bit exp error: %d: got %u, expected %f"
-		  " error: %f\n", i, png_exp16bit(i), correct, error);
-	 }
+         if (fabs(error) > maxerr)
+            maxerr = fabs(error);
+         if (fabs(error) > .524) /* By experiment */
+         {
+            fprintf(stderr, "16 bit exp error: %d: got %u, expected %f"
+                  " error: %f\n", i, png_exp16bit(i), correct, error);
+         }
       }
 
       if (!silent)
-	 printf("maximum 16 bit exp error = %f\n", maxerr);
+         printf("maximum 16 bit exp error = %f\n", maxerr);
    } /* !onlygamma */
 
    /* Test the overall gamma correction. */
@@ -894,45 +894,45 @@ int validation_gamma(int argc, char **argv)
       png_fixed_point gfp = floor(g * PNG_FP_1 + .5);
 
       if (!silent)
-	 printf("Test gamma %f\n", g);
+         printf("Test gamma %f\n", g);
 
       maxerr = 0;
       for (j=0; j<256; ++j)
       {
          double correct = pow(j/255., g) * 255;
-	 png_byte out = png_gamma_8bit_correct(j, gfp);
-	 double error = out - correct;
+         png_byte out = png_gamma_8bit_correct(j, gfp);
+         double error = out - correct;
 
-	 if (fabs(error) > maxerr)
-	    maxerr = fabs(error);
-	 if (out != floor(correct+.5))
-	 {
-	    fprintf(stderr, "8bit %d ^ %f: got %d expected %f error %f\n",
-	       j, g, out, correct, error);
-	 }
+         if (fabs(error) > maxerr)
+            maxerr = fabs(error);
+         if (out != floor(correct+.5))
+         {
+            fprintf(stderr, "8bit %d ^ %f: got %d expected %f error %f\n",
+               j, g, out, correct, error);
+         }
       }
 
       if (!silent)
-	 printf("gamma %f: maximum 8 bit error %f\n", g, maxerr);
+         printf("gamma %f: maximum 8 bit error %f\n", g, maxerr);
 
       maxerr = 0;
       for (j=0; j<65536; ++j)
       {
          double correct = pow(j/65535., g) * 65535;
-	 png_uint_16 out = png_gamma_16bit_correct(j, gfp);
-	 double error = out - correct;
+         png_uint_16 out = png_gamma_16bit_correct(j, gfp);
+         double error = out - correct;
 
-	 if (fabs(error) > maxerr)
-	    maxerr = fabs(error);
-	 if (fabs(error) > 1.62)
-	 {
-	    fprintf(stderr, "16bit %d ^ %f: got %d expected %f error %f\n",
-	       j, g, out, correct, error);
-	 }
+         if (fabs(error) > maxerr)
+            maxerr = fabs(error);
+         if (fabs(error) > 1.62)
+         {
+            fprintf(stderr, "16bit %d ^ %f: got %d expected %f error %f\n",
+               j, g, out, correct, error);
+         }
       }
 
       if (!silent)
-	 printf("gamma %f: maximum 16 bit error %f\n", g, maxerr);
+         printf("gamma %f: maximum 16 bit error %f\n", g, maxerr);
    }
 
    return 0;
