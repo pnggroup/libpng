@@ -10,7 +10,8 @@
  *
  * Make a test PNG image.  The arguments are as follows:
  *
- *  makepng [--sRGB|--linear|--1.8] color-type bit-depth [file-name]
+ *  makepng [--sRGB|--linear|--1.8] [--color=<color>] color-type bit-depth \
+ *	[file-name]
  *
  * The color-type may be numeric (and must match the numbers used by the PNG
  * specification) or one of the format names listed below.  The bit-depth is the
@@ -23,7 +24,8 @@
  * approximately value^(1/1.45) to the color values and so a gAMA chunk of 65909
  * is written (1.45/2.2).
  *
- * The image data is generated internally.  The images used are as follows:
+ * The image data is generated internally.  Unless --color is given the images
+ * used are as follows:
  *
  * 1 channel: a square image with a diamond, the least luminous colors are on
  *    the edge of the image, the most luminous in the center.
@@ -60,6 +62,11 @@
  *
  * Row filtering is turned off (the 'none' filter is used on every row) and  the
  * images are not interlaced.
+ *
+ * If --color is given then the whole image has that color, color-mapped images
+ * will have exactly one palette entry and all image files with be 16x16 in
+ * size.  The color value is 1 to 4 decimal numbers as appropriate for the color
+ * type.
  *
  * If file-name is given then the PNG is written to that file, else it is
  * written to stdout.  Notice that stdout is not supported on systems where, by
@@ -128,18 +135,24 @@ pixel_depth_of_type(int color_type, int bit_depth)
 }
 
 static unsigned int
-image_size_of_type(int color_type, int bit_depth)
+image_size_of_type(int color_type, int bit_depth, unsigned int *colors)
 {
-   int pixel_depth = pixel_depth_of_type(color_type, bit_depth);
-
-   if (pixel_depth < 8)
-      return 64;
-
-   else if (pixel_depth > 16)
-      return 1024;
+   if (*colors)
+      return 16;
 
    else
-      return 256;
+   {
+      int pixel_depth = pixel_depth_of_type(color_type, bit_depth);
+
+      if (pixel_depth < 8)
+         return 64;
+
+      else if (pixel_depth > 16)
+         return 1024;
+
+      else
+         return 256;
+   }
 }
 
 static void
@@ -155,7 +168,7 @@ set_color(png_colorp color, png_bytep trans, unsigned int red,
 
 static int
 generate_palette(png_colorp palette, png_bytep trans, int bit_depth,
-   png_const_bytep gamma_table)
+   png_const_bytep gamma_table, unsigned int *colors)
 {
    /*
     * 1-bit: entry 0 is transparent-red, entry 1 is opaque-white
@@ -166,39 +179,69 @@ generate_palette(png_colorp palette, png_bytep trans, int bit_depth,
     * 4-bit: the 16 combinations of the 2-bit case
     * 8-bit: the 256 combinations of the 4-bit case
     */
-   if (bit_depth == 1)
+   switch (colors[0])
    {
-      set_color(palette+0, trans+0, 255, 0, 0, 0, gamma_table);
-      set_color(palette+1, trans+1, 255, 255, 255, 255, gamma_table);
-      return 2;
-   }
+      default:
+         fprintf(stderr, "makepng: --colors=...: invalid count %u\n",
+            colors[0]);
+         exit(1);
 
-   else
-   {
-      unsigned int size = 1U << (bit_depth/2); /* 2, 4 or 16 */
-      unsigned int x, y, ip;
-
-      for (x=0; x<size; ++x) for (y=0; y<size; ++y)
-      {
-         ip = x + (size * y);
-
-         /* size is at most 16, so the scaled value below fits in 16 bits */
-#        define interp(pos, c1, c2) ((pos * c1) + ((size-pos) * c2))
-#        define xyinterp(x, y, c1, c2, c3, c4) (((size * size / 2) +\
-            (interp(x, c1, c2) * y + (size-y) * interp(x, c3, c4))) /\
-            (size*size))
-
-         set_color(palette+ip, trans+ip,
-            /* color:    green, red,blue,white */
-            xyinterp(x, y,   0, 255,   0, 255),
-            xyinterp(x, y, 255,   0,   0, 255),
-            xyinterp(x, y,   0,   0, 255, 255),
-            /* alpha:        0, 102, 204, 255) */
-            xyinterp(x, y,   0, 102, 204, 255),
+      case 1:
+         set_color(palette+0, trans+0, colors[1], colors[1], colors[1], 255,
             gamma_table);
-      }
+         return 1;
 
-      return ip+1;
+      case 2:
+         set_color(palette+0, trans+0, colors[1], colors[1], colors[1],
+            colors[2], gamma_table);
+         return 1;
+
+      case 3:
+         set_color(palette+0, trans+0, colors[1], colors[2], colors[3], 255,
+            gamma_table);
+         return 1;
+
+      case 4:
+         set_color(palette+0, trans+0, colors[1], colors[2], colors[3],
+            colors[4], gamma_table);
+         return 1;
+
+      case 0:
+         if (bit_depth == 1)
+         {
+            set_color(palette+0, trans+0, 255, 0, 0, 0, gamma_table);
+            set_color(palette+1, trans+1, 255, 255, 255, 255, gamma_table);
+            return 2;
+         }
+
+         else
+         {
+            unsigned int size = 1U << (bit_depth/2); /* 2, 4 or 16 */
+            unsigned int x, y, ip;
+
+            for (x=0; x<size; ++x) for (y=0; y<size; ++y)
+            {
+               ip = x + (size * y);
+
+               /* size is at most 16, so the scaled value below fits in 16 bits
+                */
+#              define interp(pos, c1, c2) ((pos * c1) + ((size-pos) * c2))
+#              define xyinterp(x, y, c1, c2, c3, c4) (((size * size / 2) +\
+                  (interp(x, c1, c2) * y + (size-y) * interp(x, c3, c4))) /\
+                  (size*size))
+
+               set_color(palette+ip, trans+ip,
+                  /* color:    green, red,blue,white */
+                  xyinterp(x, y,   0, 255,   0, 255),
+                  xyinterp(x, y, 255,   0,   0, 255),
+                  xyinterp(x, y,   0,   0, 255, 255),
+                  /* alpha:        0, 102, 204, 255) */
+                  xyinterp(x, y,   0, 102, 204, 255),
+                  gamma_table);
+            }
+
+            return ip+1;
+         }
    }
 }
 
@@ -265,12 +308,13 @@ set_value(png_bytep row, size_t rowbytes, png_uint_32 x, unsigned int bit_depth,
 
 static void
 generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
-   int bit_depth, png_const_bytep gamma_table, double conv)
+   int bit_depth, png_const_bytep gamma_table, double conv,
+   unsigned int *colors)
 {
-   png_uint_32 size_max = image_size_of_type(color_type, bit_depth)-1;
+   png_uint_32 size_max = image_size_of_type(color_type, bit_depth, colors)-1;
    png_uint_32 depth_max = (1U << bit_depth)-1; /* up to 65536 */
 
-   switch (channels_of_type(color_type))
+   if (colors[0] == 0) switch (channels_of_type(color_type))
    {
    /* 1 channel: a square image with a diamond, the least luminous colors are on
     *    the edge of the image, the most luminous in the center.
@@ -390,6 +434,98 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
          fprintf(stderr, "makepng: internal bad channel count\n");
          exit(2);
    }
+
+   else if (color_type & PNG_COLOR_MASK_PALETTE)
+   {
+      /* Palette with fixed color: the image rows are all 0 and the image width
+       * is 16.
+       */
+      memset(row, rowbytes, 0);
+   }
+
+   else if (colors[0] == channels_of_type(color_type))
+      switch (channels_of_type(color_type))
+      {
+         case 1:
+            {
+               const png_uint_32 luma = colors[1];
+               png_uint_32 x;
+
+               for (x=0; x<=size_max; ++x)
+                  set_value(row, rowbytes, x, bit_depth, luma, gamma_table,
+                     conv);
+            }
+            break;
+
+         case 2:
+            {
+               const png_uint_32 luma = colors[1];
+               const png_uint_32 alpha = colors[2];
+               png_uint_32 x;
+
+               for (x=0; x<size_max; ++x)
+               {
+                  set_value(row, rowbytes, 2*x, bit_depth, luma, gamma_table,
+                     conv);
+                  set_value(row, rowbytes, 2*x+1, bit_depth, alpha, gamma_table,
+                     conv);
+               }
+            }
+            break;
+
+         case 3:
+            {
+               const png_uint_32 red = colors[1];
+               const png_uint_32 green = colors[2];
+               const png_uint_32 blue = colors[3];
+               png_uint_32 x;
+
+               for (x=0; x<=size_max; ++x)
+               {
+                  set_value(row, rowbytes, 3*x+0, bit_depth, red, gamma_table,
+                     conv);
+                  set_value(row, rowbytes, 3*x+1, bit_depth, green, gamma_table,
+                     conv);
+                  set_value(row, rowbytes, 3*x+2, bit_depth, blue, gamma_table,
+                     conv);
+               }
+            }
+            break;
+
+         case 4:
+            {
+               const png_uint_32 red = colors[1];
+               const png_uint_32 green = colors[2];
+               const png_uint_32 blue = colors[3];
+               const png_uint_32 alpha = colors[4];
+               png_uint_32 x;
+
+               for (x=0; x<=size_max; ++x)
+               {
+                  set_value(row, rowbytes, 4*x+0, bit_depth, red, gamma_table,
+                     conv);
+                  set_value(row, rowbytes, 4*x+1, bit_depth, green, gamma_table,
+                     conv);
+                  set_value(row, rowbytes, 4*x+2, bit_depth, blue, gamma_table,
+                     conv);
+                  set_value(row, rowbytes, 4*x+3, bit_depth, alpha, gamma_table,
+                     conv);
+               }
+            }
+         break;
+
+         default:
+            fprintf(stderr, "makepng: internal bad channel count\n");
+            exit(2);
+      }
+
+   else
+   {
+      fprintf(stderr,
+         "makepng: --color: count(%u) does not match channels(%u)\n",
+         colors[0], channels_of_type(color_type));
+      exit(1);
+   }
 }
 
 
@@ -418,7 +554,7 @@ makepng_error(png_structp png_ptr, png_const_charp message)
 static int /* 0 on success, else an error code */
 write_png(const char **name, FILE *fp, int color_type, int bit_depth,
    volatile png_fixed_point gamma, chunk_insert * volatile insert,
-   unsigned int filters)
+   unsigned int filters, unsigned int *colors)
 {
    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
       name, makepng_error, makepng_warning);
@@ -452,7 +588,7 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
       png_error(png_ptr, "OOM allocating info structure");
 
    {
-      unsigned int size = image_size_of_type(color_type, bit_depth);
+      unsigned int size = image_size_of_type(color_type, bit_depth, colors);
       png_fixed_point real_gamma = 45455; /* For sRGB */
       png_byte gamma_table[256];
       double conv;
@@ -504,7 +640,8 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
          png_color palette[256];
          png_byte trans[256];
 
-         npalette = generate_palette(palette, trans, bit_depth, gamma_table);
+         npalette = generate_palette(palette, trans, bit_depth, gamma_table,
+            colors);
          png_set_PLTE(png_ptr, info_ptr, palette, npalette);
          png_set_tRNS(png_ptr, info_ptr, trans, npalette-1,
             NULL/*transparent color*/);
@@ -561,7 +698,7 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
             for (y=0; y<size; ++y)
             {
                generate_row(row, rowbytes, y, color_type, bit_depth,
-                  gamma_table, conv);
+                  gamma_table, conv, colors);
                png_write_row(png_ptr, row);
             }
          }
@@ -1094,6 +1231,48 @@ find_insert(png_const_charp what, png_charp param)
    return NULL;
 }
 
+/* This is a not-very-good parser for a sequence of numbers (including 0).  It
+ * doesn't accept some apparenly valid things, but it accepts all the sensible
+ * combinations.
+ */
+static void
+parse_color(char *arg, unsigned int *colors)
+{
+   unsigned int ncolors = 0;
+
+   while (*arg && ncolors < 4)
+   {
+      char *ep = arg;
+
+      unsigned long ul = strtoul(arg, &ep, 0);
+
+      if (ul > 65535)
+      {
+         fprintf(stderr, "makepng --color=...'%s': too big\n", arg);
+         exit(1);
+      }
+
+      if (ep == arg)
+      {
+         fprintf(stderr, "makepng --color=...'%s': not a valid color\n", arg);
+         exit(1);
+      }
+
+      if (*ep) ++ep; /* skip a separator */
+      arg = ep;
+
+      colors[++ncolors] = (unsigned int)ul; /* checked above */
+   }
+
+   if (*arg)
+   {
+      fprintf(stderr, "makepng --color=...'%s': too many values\n", arg);
+      exit(1);
+   }
+
+   *colors = ncolors;
+}
+
 int
 main(int argc, char **argv)
 {
@@ -1101,14 +1280,17 @@ main(int argc, char **argv)
    const char *file_name = NULL;
    int color_type = 8; /* invalid */
    int bit_depth = 32; /* invalid */
+   unsigned int colors[5];
    unsigned int filters = PNG_ALL_FILTERS;
    png_fixed_point gamma = 0; /* not set */
    chunk_insert *head_insert = NULL;
    chunk_insert **insert_ptr = &head_insert;
 
+   memset(colors, 0, sizeof colors);
+
    while (--argc > 0)
    {
-      const char *arg = *++argv;
+      char *arg = *++argv;
 
       if (strcmp(arg, "--sRGB") == 0)
       {
@@ -1132,6 +1314,12 @@ main(int argc, char **argv)
       {
          filters = PNG_FILTER_NONE;
          continue;
+      }
+
+      if (strncmp(arg, "--color=", 8) == 0)
+      {
+	  parse_color(arg+8, colors);
+	  continue;
       }
 
       if (argc >= 3 && strcmp(arg, "--insert") == 0)
@@ -1245,9 +1433,24 @@ main(int argc, char **argv)
    if (color_type == 8 || bit_depth == 32)
    {
       fprintf(stderr, "usage: makepng [--sRGB|--linear|--1.8] "
-         "color-type bit-depth [file-name]\n"
+         "[--color=...] color-type bit-depth [file-name]\n"
          "  Make a test PNG file, by default writes to stdout.\n");
       exit(1);
+   }
+
+   /* Check the colors */
+   {
+      const unsigned int lim = (color_type == PNG_COLOR_TYPE_PALETTE ? 255U :
+         (1U<<bit_depth)-1);
+      unsigned int i;
+
+      for (i=1; i<=colors[0]; ++i)
+         if (colors[i] > lim)
+         {
+            fprintf(stderr, "makepng: --color=...: %u out of range [0..%u]\n",
+               colors[i], lim);
+            exit(1);
+         }
    }
 
    /* Restrict the filters for more speed to those we know are used for the
@@ -1273,7 +1476,7 @@ main(int argc, char **argv)
 
    {
       int ret = write_png(&file_name, fp, color_type, bit_depth, gamma,
-         head_insert, filters);
+         head_insert, filters, colors);
 
       if (ret != 0 && file_name != NULL)
          remove(file_name);
