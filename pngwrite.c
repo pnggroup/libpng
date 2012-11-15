@@ -1595,7 +1595,7 @@ png_image_write_init(png_imagep image)
       png_destroy_write_struct(&png_ptr, NULL);
    }
 
-   return png_image_error(image, "png_image_read: out of memory");
+   return png_image_error(image, "png_image_write_: out of memory");
 }
 
 /* Arguments to png_image_write_main: */
@@ -2212,7 +2212,7 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
    const void *buffer, png_int_32 row_stride, const void *colormap)
 {
    /* Write the image to the given (FILE*). */
-   if (image != NULL || image->version != PNG_IMAGE_VERSION)
+   if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
       if (file != NULL)
       {
@@ -2262,7 +2262,7 @@ png_image_write_to_file(png_imagep image, const char *file_name,
    const void *colormap)
 {
    /* Write the image to the named file. */
-   if (image != NULL || image->version != PNG_IMAGE_VERSION)
+   if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
       if (file_name != NULL)
       {

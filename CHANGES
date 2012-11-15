@@ -4297,10 +4297,11 @@ Version 1.6.0beta31 [November 1, 2012]
     gain; implementing full ICC color correction may be desireable but is left
     up to applications.
 
-Version 1.6.0beta32 [November 14, 2012]
+Version 1.6.0beta32 [November 15, 2012]
   Fixed an intermittent SEGV in pngstest due to an uninitialized array element.
   Added the ability for contrib/libtests/makepng.c to make a PNG with just one
     color. This is useful for debugging pngstest color inaccuracy reports.
+  Fixed error checking in the simplified write API (Olaf van der Spek)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
