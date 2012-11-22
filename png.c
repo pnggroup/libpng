@@ -128,10 +128,10 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
          need_crc = 0;
    }
 
-   /* 'uLong' is defined as unsigned long, this means that on some systems it is
-    * a 64 bit value.  crc32, however, returns 32 bits so the following cast is
-    * safe.  'uInt' may be no more than 16 bits, so it is necessary to perform a
-    * loop here.
+   /* 'uLong' is defined in zlib.h as unsigned long; this means that on some
+    * systems it is a 64 bit value.  crc32, however, returns 32 bits so the
+    * following cast is safe.  'uInt' may be no more than 16 bits, so it is
+    * necessary to perform a loop here.
     */
    if (need_crc && length > 0)
    {
@@ -145,7 +145,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 
          crc = crc32(crc, ptr, safe_length);
 
-         /* The following should never issue compiler warnings, if they do the
+         /* The following should never issue compiler warnings; if they do the
           * target system has characteristics that will probably violate other
           * assumptions within the libpng code.
           */
@@ -160,7 +160,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 }
 
 /* Check a user supplied version number, called from both read and write
- * functions that create a png_struct
+ * functions that create a png_struct.
  */
 int
 png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
@@ -184,10 +184,12 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
      /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
       * we must recompile any applications that use any older library version.
       * For versions after libpng 1.0, we will be compatible, so we need
-      * only check the first digit.
+      * only check the first and third digits (note that when we reach version
+      * 1.10 we will need to check the fourth symbol, namely user_png_ver[3]).
       */
       if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
-          (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
+          (user_png_ver[0] == '1' && (user_png_ver[2] != png_libpng_ver[2] ||
+          user_png_ver[3] != png_libpng_ver[3])) ||
           (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
       {
 #ifdef PNG_WARNINGS_SUPPORTED
@@ -766,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta32 - November 1, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta32 - November 22, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta32 - November 1, 2012\
+      return "libpng version 1.6.0beta32 - November 22, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
