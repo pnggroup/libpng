@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta32 - November 1, 2012
+ libpng version 1.6.0beta32 - November 25, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta32 - November 1, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta32 - November 25, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -2567,6 +2567,20 @@ You can #define PNG_ABORT() to a function that does something
 more useful than abort(), as long as your function does not
 return.
 
+Checking for invalid palette index on write was added at libpng
+1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
+a benign error.  This is enabled by default because this condition is an
+error according to the PNG specification, Clause 11.3.2, but the error can
+be ignored in each png_ptr with
+
+   png_set_check_for_invalid_index(png_ptr, 0);
+
+If the error is ignored, or if png_benign_error() treats it as a warning,
+any invalid pixels are written as-is by the encoder, resulting in an
+invalid PNG datastream as output.  In this case the application is
+responsible for ensuring that the pixel indexes are in range when it writes
+a PLTE chunk with fewer entries than the bit depth would allow.
+
 Now you need to set up the output code.  The default for libpng is to
 use the C function fwrite().  If you use this, you will need to pass a
 valid FILE * in the function png_init_io().  Be sure that the file is
@@ -3534,7 +3548,7 @@ need to write.  The "png_image" structure contains the following members:
    png_uint_32  warning_or_error;
    char         message[64];
 
-In the event of an error or warning the following field wrning_or_error
+In the event of an error or warning the following field warning_or_error
 field will be set to a non-zero value and the 'message' field will contain
 a '\0' terminated string with the libpng error or warning message.  If both
 warnings and an error were encountered, only the error is recorded.  If there
@@ -4562,13 +4576,22 @@ function) incorrectly returned a value of type png_uint_32.
 
 Checking for invalid palette index on read or write was added at libpng
 1.5.10.  When an invalid index is found, libpng issues a benign error.
-This is enabled by default but can be disabled in each png_ptr with
+This is enabled by default because this condition is an error according
+to the PNG specification, Clause 11.3.2, but the error can be ignored in
+each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 
       allowed  - one of
-                 0: disable
-                 1: enable
+                 0: disable benign error (accept the
+                    invalid data without warning).
+                 1: enable benign error (treat the
+                    invalid data as an error or a
+                    warning).
+
+If the error is ignored, or if png_benign_error() treats it as a warning,
+any invalid pixels are decoded as opaque black by the decoder and written
+as-is by the encoder.
 
 A. Changes that affect users of libpng
 
@@ -5064,7 +5087,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-November 1, 2012
+November 25, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
