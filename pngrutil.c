@@ -196,7 +196,7 @@ png_crc_read(png_structrp png_ptr, png_bytep buf, png_uint_32 length)
 }
 
 /* Optionally skip data and then check the CRC.  Depending on whether we
- * are reading a ancillary or critical chunk, and how the program has set
+ * are reading an ancillary or critical chunk, and how the program has set
  * things up, we may calculate the CRC on the data and print a message.
  * Returns '1' if there was a CRC error, '0' otherwise.
  */
@@ -282,7 +282,7 @@ png_crc_error(png_structrp png_ptr)
 
 /* Manage the read buffer; this simply reallocates the buffer if it is not small
  * enough (or if it is not allocated).  The routine returns a pointer to the
- * buffer, if an error occurs and 'warn' is set the routine returns NULL, else
+ * buffer; if an error occurs and 'warn' is set the routine returns NULL, else
  * it will call png_error (via png_malloc) on failure.  (warn == 2 means
  * 'silent').
  */
@@ -357,11 +357,11 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
    /* Implementation note: unlike 'png_deflate_claim' this internal function
     * does not take the size of the data as an argument.  Some efficiency could
     * be gained by using this when it is known *if* the zlib stream itself does
-    * not record the number, however this is a chimera: the original writer of
-    * the PNG may have selected a lower window size, and we really must follow
-    * that because, for systems with with limited capabilities, we would
-    * otherwise reject the applications attempts to use a smaller window size.
-    * (zlib doesn't have an interface to say "this or lower"!)
+    * not record the number; however, this is an illusion: the original writer
+    * follow of the PNG may have selected a lower window size, and we really
+    * must do that because, for systems with with limited capabilities, we
+    * would otherwise reject the application's attempts to use a smaller window
+    * size (zlib doesn't have an interface to say "this or lower"!).
     *
     * inflateReset2 was added to zlib 1.2.4; before this the window could not be
     * reset, therefore it is necessary to always allocate the maximum window
