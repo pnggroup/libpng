@@ -4959,7 +4959,7 @@ very old broken Microsoft/HP sRGB profile.
 
 The library now issues a warning if both background processing and RGB to
 gray are used when gamma correction happens. As with previous versions of
-the library the results are numerically very incorrect.
+the library the results are numerically very incorrect in this case.
 
 There are some minor arithmetic changes in some transforms such as
 png_set_background(), that might be detected by certain regression tests.
