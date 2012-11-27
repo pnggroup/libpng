@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0beta32 - November 25, 2012
+ libpng version 1.6.0beta33 - November 27, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0beta32 - November 25, 2012
+ libpng versions 0.97, January 1998, through 1.6.0beta33 - November 27, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -4898,10 +4898,27 @@ how to do this, and a case where pngusr.h is still required.
 XII.  Changes to Libpng from version 1.5.x to 1.6.x
 
 A "simplified API" has been added (see documentation in png.h and a simple
-example in contrib/examples/pngtopng.c)
+example in contrib/examples/pngtopng.c).  The new publicly visible API
+includes the following:
+
+   macros:
+     PNG_FORMAT_*
+     PNG_IMAGE_*
+   structures:
+     png_control
+     png_image
+   read functions
+     png_image_begin_read_from_file()
+     png_image_begin_read_from_stdio()
+     png_image_begin_read_from_memory()
+     png_image_finish_read()
+     png_image_free()
+   write functions
+     png_image_write_to_file()
+     png_image_write_to_stdio()
 
 Starting with libpng-1.6.0, you can configure libpng to prefix all exported
-symbols.
+symbols, using the PNG_PREFIX macro.
 
 We no longer include string.h in png.h.  The include statement has been moved
 to pngpriv.h, where it is not accessible by applications.  Applications that
@@ -4924,7 +4941,33 @@ The following has been removed:
    The png_sizeof(), png_strlen(), png_memcpy(), png_memcmp(), and
      png_memset() macros are no longer used in the libpng sources and
      have been removed.  These had already been made invisible to applications
-     since libpng-1.5.0.
+     (i.e., defined in the private pngpriv.h header file) since libpng-1.5.0.
+
+The signatures of many exported functions were changed, such that
+   png_structp became png_structrp or png_const_structrp
+   png_infop became png_inforp or png_const_inforp
+where "rp" indicates a "restricted pointer".
+
+The new default for chunk_benign_error() is warn on read, error on write.
+In some cases png_warning has been replaced by png_chunk_error(); applications
+won't see a change unless the it makes benign_error call png_error.
+
+Error detection in some chunks has improved; in particular the iCCP chunk
+reader now does pretty complete validation of the basic format.  Some bad
+profiles that were previously accepted are now rejected, in particular the
+very old broken Microsoft/HP sRGB profile.
+
+The library now issues a warning if both background processing and RGB to
+gray are used when gamma correction happens. As with previous versions of
+the library the results are numerically very incorrect.
+
+There are some minor arithmetic changes in some transforms such as
+png_set_background(), that might be detected by certain regression tests.
+
+Unknown chunk handling has been improved internally, without any API change.
+This adds more correct option control of the unknown handling, corrects
+a pre-existing bug where the per-chunk 'keep' setting is ignored, and makes
+it possible to skip IDAT chunks in the sequential reader.
 
 XIII.  Detecting libpng
 
@@ -5087,13 +5130,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-November 25, 2012
+November 27, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.0beta32 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.0beta33 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
