@@ -4948,10 +4948,6 @@ The signatures of many exported functions were changed, such that
    png_infop became png_inforp or png_const_inforp
 where "rp" indicates a "restricted pointer".
 
-The new default for chunk_benign_error() is warn on read, error on write.
-In some cases png_warning has been replaced by png_chunk_error(); applications
-won't see a change unless the it makes benign_error call png_error.
-
 Error detection in some chunks has improved; in particular the iCCP chunk
 reader now does pretty complete validation of the basic format.  Some bad
 profiles that were previously accepted are now rejected, in particular the
