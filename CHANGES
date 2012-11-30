@@ -3925,7 +3925,8 @@ Version 1.5.14beta01 [October 24, 2012]
   Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
     pngrtran.c (Domani Hannes).
 
-Version 1.5.14beta02 [October 24, 2012]
+Version 1.5.14beta02 [November 30, 2012]
+  Added missing "-" in front of DZ_SOLO in contrib/pngminim/*/makefile.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
