@@ -33,7 +33,7 @@ Version 1.5.14beta01 [October 24, 2012]
     pngrtran.c (Domani Hannes).
 
 Version 1.5.14beta02 [November 30, 2012]
-  Added missing "-" in front of DZ_SOLO in contrib/pngminim/*/makefile.
+  Added missing "-" in front of DNO_GZIP in contrib/pngminim/*/makefile.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
