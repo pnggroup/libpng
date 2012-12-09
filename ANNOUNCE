@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta32 - November 25, 2012
+Libpng 1.6.0beta33 - December 9, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta32.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta32.tar.gz
-   1.6.0beta32.tar.bz2
+   1.6.0beta33.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta33.tar.gz
+   1.6.0beta33.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b32.7z  (LZMA-compressed, recommended)
-   lp160b32.zip
+   lp160b33.7z  (LZMA-compressed, recommended)
+   lp160b33.zip
 
 Other information:
 
-   1.6.0beta32-README.txt
-   1.6.0beta32-LICENSE.txt
+   1.6.0beta33-README.txt
+   1.6.0beta33-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -551,6 +551,10 @@ Version 1.6.0beta32 [November 25, 2012]
     color. This is useful for debugging pngstest color inaccuracy reports.
   Fixed error checking in the simplified write API (Olaf van der Spek)
   Made png_user_version_check() ok to use with libpng version 1.10.x and later.
+
+Version 1.6.0beta33 [December 9, 2012]
+  Fixed typo in png.c (PNG_SET_CHUNK_MALLOC_MAX should be PNG_CHUNK_MALLOC_MAX)
+    that causes the MALLOC_MAX limit not to work (John Bowler)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
