@@ -1427,7 +1427,8 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
    {
       if (num_trans <= 0 || num_trans > (int)png_ptr->num_palette)
       {
-         png_warning(png_ptr, "Invalid number of transparent colors specified");
+         png_app_warning(png_ptr,
+             "Invalid number of transparent colors specified");
          return;
       }
 
@@ -1441,7 +1442,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       /* One 16 bit value */
       if (tran->gray >= (1 << png_ptr->bit_depth))
       {
-         png_warning(png_ptr,
+         png_app_warning(png_ptr,
              "Ignoring attempt to write tRNS chunk out-of-range for bit_depth");
 
          return;
@@ -1463,7 +1464,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       if (buf[0] | buf[2] | buf[4])
 #endif
       {
-         png_warning(png_ptr,
+         png_app_warning(png_ptr,
            "Ignoring attempt to write 16-bit tRNS chunk when bit_depth is 8");
          return;
       }
@@ -1473,7 +1474,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
 
    else
    {
-      png_warning(png_ptr, "Can't write tRNS with an alpha channel");
+      png_app_warning(png_ptr, "Can't write tRNS with an alpha channel");
    }
 }
 #endif
