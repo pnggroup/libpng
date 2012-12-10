@@ -35,6 +35,7 @@ Version 1.5.14beta01 [October 24, 2012]
 Version 1.5.14beta02 [December 10, 2012]
   Added missing "-" in front of DNO_GZIP in contrib/pngminim/*/makefile.
   Check for png_ptr==NULL earlier in png_zalloc().
+  Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

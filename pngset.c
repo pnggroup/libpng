@@ -897,6 +897,12 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   if (num_trans < 0 || num_trans > PNG_MAX_PALETTE_LENGTH)
+      {
+        png_warning(png_ptr, "Ignoring invalid num_trans value");
+        return;
+      }
+
    if (trans_alpha != NULL)
    {
        /* It may not actually be necessary to set png_ptr->trans_alpha here;
