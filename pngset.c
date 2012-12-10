@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.49 [March 29, 2012]
+ * Last changed in libpng 1.2.51 [December 10, 2012]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -849,6 +849,12 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
+
+   if (num_trans < 0 || num_trans > PNG_MAX_PALETTE_LENGTH)
+      {
+        png_warning(png_ptr, "Ignoring invalid num_trans value");
+        return;
+      }
 
    if (trans != NULL)
    {

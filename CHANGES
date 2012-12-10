@@ -2771,11 +2771,15 @@ version 1.0.58 and 1.2.48 [March 8, 2012]
 
 version 1.0.59 and 1.2.49 [March 29, 2012]
   Revised png_set_text_2() to avoid potential memory corruption (fixes
-    CVE-2011-3048).
+    CVE-2011-3048, also known as CVE-2012-3425).
   Prevent PNG_EXPAND+PNG_SHIFT doing the shift twice.
 
 version 1.0.60 and 1.2.50 [July 9, 2012]
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
+
+version 1.2.51beta01 [December 10, 2012]
+  Rebuilt the configure scripts with autoconf-2.69
+  Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
