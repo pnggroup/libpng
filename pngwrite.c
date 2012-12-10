@@ -936,7 +936,8 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
 #ifdef PNG_WRITE_FILTER_SUPPORTED
          case 5:
          case 6:
-         case 7: png_warning(png_ptr, "Unknown row filter for method 0");
+         case 7: png_app_error(png_ptr, "Unknown row filter for method 0");
+            /* Fall through */
 #endif /* PNG_WRITE_FILTER_SUPPORTED */
          case PNG_FILTER_VALUE_NONE:
             png_ptr->do_filter = PNG_FILTER_NONE; break;
@@ -958,7 +959,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
             png_ptr->do_filter = (png_byte)filters; break;
 #else
          default:
-            png_warning(png_ptr, "Unknown row filter for method 0");
+            png_app_error(png_ptr, "Unknown row filter for method 0");
 #endif /* PNG_WRITE_FILTER_SUPPORTED */
       }
 
