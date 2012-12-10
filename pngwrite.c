@@ -1042,6 +1042,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
          case 5:
          case 6:
          case 7: png_warning(png_ptr, "Unknown row filter for method 0");
+             /* FALL THROUGH */
 #endif /* PNG_WRITE_FILTER_SUPPORTED */
          case PNG_FILTER_VALUE_NONE:
             png_ptr->do_filter = PNG_FILTER_NONE; break;
