@@ -910,52 +910,89 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (trans_alpha != NULL)
+   if (info_ptr->color_type & PNG_COLOR_MASK_ALPHA)
+      png_chunk_report(png_ptr,
+         "png_set_tRNS: invalid on PNG with alpha channel", PNG_CHUNK_ERROR);
+
+   else if (info_ptr->color_type & PNG_COLOR_MASK_PALETTE)
    {
-       /* It may not actually be necessary to set png_ptr->trans_alpha here;
-        * we do it for backward compatibility with the way the png_handle_tRNS
-        * function used to do the allocation.
-        *
-        * 1.6.0: The above statement is incorrect; png_handle_tRNS effectively
-        * relies on png_set_tRNS storing the information in png_struct
-        * (otherwise it won't be there for the code in pngrtran.c).
-        */
+      int max_num;
 
-       png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
+      /* Free the old data; num_trans 0 can be used to kill the tRNS */
+      png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
 
-       /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1 */
-       png_ptr->trans_alpha = info_ptr->trans_alpha = png_voidcast(png_bytep,
-         png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
+      /* Do this just in case the old data was not owned by libpng: */
+      info_ptr->valid &= ~PNG_INFO_tRNS;
+      info_ptr->trans_alpha = NULL;
+      info_ptr->num_trans = 0;
 
-       if (num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH)
-          memcpy(info_ptr->trans_alpha, trans_alpha, (png_size_t)num_trans);
+      /* Expect png_set_PLTE to happen before png_set_tRNS, so num_palette will
+       * be set, but this is not a requirement of the API.
+       */
+      if (png_ptr->num_palette)
+         max_num = png_ptr->num_palette;
+
+      else
+         max_num = 1 << png_ptr->bit_depth;
+
+      if (num_trans > max_num)
+      {
+         png_chunk_report(png_ptr, "png_set_tRNS: num_trans too large",
+            PNG_CHUNK_ERROR);
+         /* If control returns simply limit it; the behavior prior to 1.7 was to
+          * issue a warning and skip the palette in png_write_tRNS.
+          */
+         num_trans = max_num;
+      }
+
+      /* But only attempt a malloc if there is something to do; so the app can
+       * set a tRNS array then later delete it.
+       */
+      if (num_trans > 0 && trans_alpha != NULL)
+      {
+         /* Changed from num_trans to PNG_MAX_PALETTE_LENGTH in version 1.2.1,
+          * this avoids issues where a palette image contains out of range
+          * indices.
+          */
+         info_ptr->trans_alpha = png_voidcast(png_bytep, png_malloc(png_ptr,
+            PNG_MAX_PALETTE_LENGTH));
+         info_ptr->free_me |= PNG_FREE_TRNS;
+
+         memcpy(info_ptr->trans_alpha, trans_alpha, num_trans);
+         info_ptr->valid |= PNG_INFO_tRNS;
+         info_ptr->num_trans = (png_uint_16)num_trans; /* SAFE */
+      }
    }
 
-   if (trans_color != NULL)
+   else /* not a PALETTE image */
    {
-      int sample_max = (1 << info_ptr->bit_depth);
+      /* Invalidate any prior transparent color, set num_trans too, it is not
+       * used internally in this case but png_get_tRNS still returns it.
+       */
+      info_ptr->valid &= ~PNG_INFO_tRNS;
+      info_ptr->num_trans = 0; /* for png_get_tRNS */
 
-      if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
-          trans_color->gray > sample_max) ||
-          (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
-          (trans_color->red > sample_max ||
-          trans_color->green > sample_max ||
-          trans_color->blue > sample_max)))
-         png_warning(png_ptr,
-            "tRNS chunk has out-of-range samples for bit_depth");
+      if (trans_color != NULL)
+      {
+         int sample_max = (1 << info_ptr->bit_depth);
 
-      info_ptr->trans_color = *trans_color;
+         if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+             trans_color->gray <= sample_max) ||
+             (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+             trans_color->red <= sample_max &&
+             trans_color->green <= sample_max &&
+             trans_color->blue <= sample_max))
+         {
+            info_ptr->trans_color = *trans_color;
+            info_ptr->valid |= PNG_INFO_tRNS;
+            info_ptr->num_trans = 1; /* for png_get_tRNS */
+         }
 
-      if (num_trans == 0)
-         num_trans = 1;
-   }
-
-   info_ptr->num_trans = (png_uint_16)num_trans;
-
-   if (num_trans != 0)
-   {
-      info_ptr->valid |= PNG_INFO_tRNS;
-      info_ptr->free_me |= PNG_FREE_TRNS;
+         else
+            png_chunk_report(png_ptr,
+               "tRNS chunk has out-of-range samples for bit_depth",
+               PNG_CHUNK_ERROR);
+      }
    }
 }
 #endif
@@ -1498,8 +1535,13 @@ png_set_user_limits (png_structrp png_ptr, png_uint_32 user_width_max,
 void PNGAPI
 png_set_chunk_cache_max (png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 {
-    if (png_ptr)
-       png_ptr->user_chunk_cache_max = user_chunk_cache_max;
+#  ifdef PNG_READ_SUPPORTED
+      if (png_ptr)
+         png_ptr->user_chunk_cache_max = user_chunk_cache_max;
+#  else
+      PNG_UNUSED(png_ptr)
+      PNG_UNUSED(user_chunk_cache_max)
+#  endif
 }
 
 /* This function was added to libpng 1.4.1 */
@@ -1507,8 +1549,13 @@ void PNGAPI
 png_set_chunk_malloc_max (png_structrp png_ptr,
     png_alloc_size_t user_chunk_malloc_max)
 {
-   if (png_ptr)
-      png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
+#  ifdef PNG_READ_SUPPORTED
+      if (png_ptr)
+         png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
+#  else
+      PNG_UNUSED(png_ptr)
+      PNG_UNUSED(user_chunk_malloc_max)
+#  endif
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 

@@ -216,8 +216,13 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
       if ((png_ptr->transformations & PNG_INVERT_ALPHA) &&
           info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         int j;
-         for (j = 0; j<(int)info_ptr->num_trans; j++)
+         int j, jend;
+
+         jend = info_ptr->num_trans;
+         if (jend > PNG_MAX_PALETTE_LENGTH)
+            jend = PNG_MAX_PALETTE_LENGTH;
+
+         for (j = 0; j<jend; ++j)
             info_ptr->trans_alpha[j] =
                (png_byte)(255 - info_ptr->trans_alpha[j]);
       }
@@ -927,42 +932,52 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
    if ((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
        (method == PNG_INTRAPIXEL_DIFFERENCING))
       method = PNG_FILTER_TYPE_BASE;
-
 #endif
-   if (method == PNG_FILTER_TYPE_BASE)
-   {
-      switch (filters & (PNG_ALL_FILTERS | 0x07))
+
+   /* The only supported method, except for the check above, is
+    * PNG_FILTER_TYPE_BASE.  The code below does not use 'method' other than
+    * for the check, so just keep going if png_app_error returns.
+    */
+   if (method != PNG_FILTER_TYPE_BASE)
+      png_app_error(png_ptr, "Unknown custom filter method");
+
+   /* If filter writing is not supported the 'filters' value must be zero,
+    * otherwise the value must be a single, valid, filter value or a set of the
+    * mask values.  The defines in png.h are such that the filter masks used in
+    * this API and internally are 1<<(3+value), value is in the range 0..4, so
+    * this fits in a byte.
+    */
+#  ifdef PNG_WRITE_FILTER_SUPPORTED
+      /* Notice that PNG_NO_FILTERS is 0 and passes this test; this is OK
+       * because filters then gets set to PNG_FILTER_NONE, as is required.
+       */
+      if (filters < PNG_FILTER_VALUE_LAST)
+         filters = 0x08 << filters;
+
+      else if ((filters & ~PNG_ALL_FILTERS) != 0)
       {
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-         case 5:
-         case 6:
-         case 7: png_app_error(png_ptr, "Unknown row filter for method 0");
-            /* FALL THROUGH */
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
-         case PNG_FILTER_VALUE_NONE:
-            png_ptr->do_filter = PNG_FILTER_NONE; break;
+         png_app_error(png_ptr, "png_set_filter: invalid filters mask/value");
 
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-         case PNG_FILTER_VALUE_SUB:
-            png_ptr->do_filter = PNG_FILTER_SUB; break;
+         /* For compatibility with the previous behavior assume a mask value was
+          * passed and ignore the non-mask bits.
+          */
+         filters &= PNG_ALL_FILTERS;
 
-         case PNG_FILTER_VALUE_UP:
-            png_ptr->do_filter = PNG_FILTER_UP; break;
-
-         case PNG_FILTER_VALUE_AVG:
-            png_ptr->do_filter = PNG_FILTER_AVG; break;
-
-         case PNG_FILTER_VALUE_PAETH:
-            png_ptr->do_filter = PNG_FILTER_PAETH; break;
-
-         default:
-            png_ptr->do_filter = (png_byte)filters; break;
-#else
-         default:
-            png_app_error(png_ptr, "Unknown row filter for method 0");
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
+         /* For a possibly foolish consistency (it shouldn't matter) set
+          * PNG_FILTER_NONE rather than 0.
+          */
+         if (filters == 0)
+            filters = PNG_FILTER_NONE;
       }
+#  else
+      /* PNG_FILTER_VALUE_NONE and PNG_NO_FILTERS are both 0. */
+      if (filters != 0 && filters != PNG_FILTER_NONE)
+         png_app_error(png_ptr, "png_set_filter: no filters supported");
 
+      filters = PNG_FILTER_NONE;
+#  endif
+
+#  ifdef PNG_WRITE_FILTER_SUPPORTED
       /* If we have allocated the row_buf, this means we have already started
        * with the image and we should have allocated all of the filter buffers
        * that have been selected.  If prev_row isn't already allocated, then
@@ -971,75 +986,45 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
        * wants to start and stop using particular filters during compression,
        * it should start out with all of the filters, and then add and
        * remove them after the start of compression.
+       *
+       * NOTE: this is a nasty constraint on the code, because it means that the
+       * prev_row buffer must be maintained even if there are currently no
+       * 'prev_row' requiring filters active.
        */
       if (png_ptr->row_buf != NULL)
       {
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-         if ((png_ptr->do_filter & PNG_FILTER_SUB) && png_ptr->sub_row == NULL)
+         /* Repeat the checks in png_write_start_row; 1 pixel high or wide
+          * images cannot benefit from certain filters.  If this isn't done here
+          * the check below will fire on 1 pixel high images.
+          */
+         if (png_ptr->height == 1)
+            filters &= ~(PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+
+         if (png_ptr->width == 1)
+            filters &= ~(PNG_FILTER_SUB|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+
+         if ((filters & (PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH)) != 0
+            && png_ptr->prev_row == NULL)
          {
-            png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
-                (png_ptr->rowbytes + 1));
-            png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
+            /* This is the error case, however it is benign - the previous row
+             * is not available so the filter can't be used.  Just warn here.
+             */
+            png_app_warning(png_ptr,
+               "png_set_filter: UP/AVG/PAETH cannot be added after start");
+            filters &= ~(PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
          }
 
-         if ((png_ptr->do_filter & PNG_FILTER_UP) && png_ptr->up_row == NULL)
-         {
-            if (png_ptr->prev_row == NULL)
-            {
-               png_warning(png_ptr, "Can't add Up filter after starting");
-               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
-                   ~PNG_FILTER_UP);
-            }
-
-            else
-            {
-               png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
-                   (png_ptr->rowbytes + 1));
-               png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
-            }
-         }
-
-         if ((png_ptr->do_filter & PNG_FILTER_AVG) && png_ptr->avg_row == NULL)
-         {
-            if (png_ptr->prev_row == NULL)
-            {
-               png_warning(png_ptr, "Can't add Average filter after starting");
-               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
-                   ~PNG_FILTER_AVG);
-            }
-
-            else
-            {
-               png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-                   (png_ptr->rowbytes + 1));
-               png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
-            }
-         }
-
-         if ((png_ptr->do_filter & PNG_FILTER_PAETH) &&
-             png_ptr->paeth_row == NULL)
-         {
-            if (png_ptr->prev_row == NULL)
-            {
-               png_warning(png_ptr, "Can't add Paeth filter after starting");
-               png_ptr->do_filter &= (png_byte)(~PNG_FILTER_PAETH);
-            }
-
-            else
-            {
-               png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
-                   (png_ptr->rowbytes + 1));
-               png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
-            }
-         }
-
-         if (png_ptr->do_filter == PNG_NO_FILTERS)
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
-            png_ptr->do_filter = PNG_FILTER_NONE;
+         /* Allocate any required buffers that have not already been allocated.
+          */
+         png_write_alloc_filter_row_buffers(png_ptr, filters);
       }
-   }
-   else
-      png_error(png_ptr, "Unknown custom filter method");
+#  endif /* PNG_WRITE_FILTER_SUPPORTED */
+
+   /* Finally store the value.
+    * TODO: this field could probably be removed if neither READ nor
+    * WRITE_FILTER are supported.
+    */
+   png_ptr->do_filter = (png_byte)filters; /* SAFE: checked above */
 }
 
 /* This allows us to influence the way in which libpng chooses the "best"

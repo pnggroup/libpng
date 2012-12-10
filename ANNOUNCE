@@ -28,6 +28,23 @@ Changes since the last public release (1.6.0):
 
 Version 1.7.0alpha01 [December 10, 2012]
   Started 1.7.0 branch from libpng-1.6.0beta33.
+  Made 8-bit compose and rgb_to_grayscale accuracy improvements.  These
+    changes cause 16-bit arithmetic to be used for 8-bit data in the gamma
+    corrected compose and grayscale operations.  The arithmetic errors have
+    three sources all of which are fixed in this commit:
+    1) 8-bit linear calculations produce massive errors for lower intensity
+       values.
+    2) The old 16-bit "16 to 8" gamma table code erroneously wrote the lowest
+       output value into a table entry which corresponded to multiple output
+       values (so where the value written should have been the closest to the
+       transformed input value.)
+    3) In a number of cases the code to access the 16-bit table did not round;
+       it did a simple shift, which was wrong and made the side effects of (2)
+       even worse.
+  The new gamma code does not have the 16-to-8 problem at the cost of slighly
+    more calculations and the algorithm used to minimize the number of
+    calculations has been extended to all the 16-bit tables; it has advantages
+    for any significant gamma correction.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

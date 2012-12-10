@@ -1832,6 +1832,8 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     */
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
        &(png_ptr->trans_color));
+
+   png_ptr->trans_alpha = info_ptr->trans_alpha;
 }
 #endif
 
@@ -4410,7 +4412,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_error(png_ptr, "This image requires a row greater than 64KB");
 #endif
 
-   if (row_bytes + 48 > png_ptr->old_big_row_buf_size)
+   if (row_bytes + 48 > png_ptr->big_row_buf_size)
    {
      png_free(png_ptr, png_ptr->big_row_buf);
      png_free(png_ptr, png_ptr->big_prev_row);
@@ -4447,7 +4449,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
      png_ptr->row_buf = png_ptr->big_row_buf + 31;
      png_ptr->prev_row = png_ptr->big_prev_row + 31;
 #endif
-     png_ptr->old_big_row_buf_size = row_bytes + 48;
+     png_ptr->big_row_buf_size = row_bytes + 48;
    }
 
 #ifdef PNG_MAX_MALLOC_64K

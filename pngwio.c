@@ -151,6 +151,7 @@ png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
 #  endif
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
+#ifdef PNG_READ_SUPPORTED
    /* It is an error to read while writing a png file */
    if (png_ptr->read_data_fn != NULL)
    {
@@ -160,5 +161,6 @@ png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
           "Can't set both read_data_fn and write_data_fn in the"
           " same structure");
    }
+#endif
 }
 #endif /* PNG_WRITE_SUPPORTED */

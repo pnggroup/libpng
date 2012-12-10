@@ -458,7 +458,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_HAVE_CHUNK_HEADER      0x100
 #define PNG_WROTE_tIME             0x200
 #define PNG_WROTE_INFO_BEFORE_PLTE 0x400
-#define PNG_BACKGROUND_IS_GRAY     0x800
+                   /*              0x800 (unused) */
 #define PNG_HAVE_PNG_SIGNATURE    0x1000
 #define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
                    /*             0x4000 (unused) */
@@ -472,10 +472,10 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_SWAP_BYTES          0x0010
 #define PNG_INVERT_MONO         0x0020
 #define PNG_QUANTIZE            0x0040
-#define PNG_COMPOSE             0x0080     /* Was PNG_BACKGROUND */
-#define PNG_BACKGROUND_EXPAND   0x0100
-#define PNG_EXPAND_16           0x0200     /* Added to libpng 1.5.2 */
-#define PNG_16_TO_8             0x0400     /* Becomes 'chop' in 1.5.4 */
+#define PNG_COMPOSE             0x0080 /* Was PNG_BACKGROUND */
+                       /*       0x0100 unused */
+#define PNG_EXPAND_16           0x0200 /* Added to libpng 1.5.2 */
+#define PNG_16_TO_8             0x0400 /* Becomes 'chop' in 1.5.4 */
 #define PNG_RGBA                0x0800
 #define PNG_EXPAND              0x1000
 #define PNG_GAMMA               0x2000
@@ -490,13 +490,13 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_RGB_TO_GRAY_WARN  0x400000
 #define PNG_RGB_TO_GRAY       0x600000 /* two bits, RGB_TO_GRAY_ERR|WARN */
 #define PNG_ENCODE_ALPHA      0x800000 /* Added to libpng-1.5.4 */
-#define PNG_ADD_ALPHA         0x1000000 /* Added to libpng-1.2.7 */
-#define PNG_EXPAND_tRNS       0x2000000 /* Added to libpng-1.2.9 */
-#define PNG_SCALE_16_TO_8     0x4000000 /* Added to libpng-1.5.4 */
-                       /*   0x8000000 unused */
-                       /*  0x10000000 unused */
-                       /*  0x20000000 unused */
-                       /*  0x40000000 unused */
+#define PNG_ADD_ALPHA        0x1000000 /* Added to libpng-1.2.7 */
+#define PNG_EXPAND_tRNS      0x2000000 /* Added to libpng-1.2.9 */
+#define PNG_SCALE_16_TO_8    0x4000000 /* Added to libpng-1.5.4 */
+                       /*    0x8000000 unused */
+                       /*   0x10000000 unused */
+                       /*   0x20000000 unused */
+                       /*   0x40000000 unused */
 /* Flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
 #define PNG_STRUCT_INFO  0x0002
@@ -529,8 +529,8 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000 /* Added to libpng-1.4.0 */
 #define PNG_FLAG_APP_WARNINGS_WARN      0x200000 /* Added to libpng-1.6.0 */
 #define PNG_FLAG_APP_ERRORS_WARN        0x400000 /* Added to libpng-1.6.0 */
-                                  /*    0x800000    unused */
-                                  /*   0x1000000    unused */
+#define PNG_FLAG_BACKGROUND_IS_GRAY     0x800000
+#define PNG_FLAG_BACKGROUND_EXPAND     0x1000000
                                   /*   0x2000000    unused */
                                   /*   0x4000000    unused */
                                   /*   0x8000000    unused */
@@ -731,6 +731,16 @@ PNG_INTERNAL_FUNCTION(void, png_zstream_error,(png_structrp png_ptr, int ret),
 PNG_INTERNAL_FUNCTION(void,png_free_buffer_list,(png_structrp png_ptr,
    png_compression_bufferp *list),PNG_EMPTY);
    /* Free the buffer list used by the compressed write code. */
+#endif
+
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_alloc_filter_row_buffers,
+   (png_structrp png_ptr, int filters),PNG_EMPTY);
+   /* Allocate pixel row buffers to cache filtered rows while testing candidate
+    * filters.
+    * TODO: avoid this, only one spare row buffer (at most) is required, this
+    * wastes a lot of memory for large images.
+    */
 #endif
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
@@ -1802,7 +1812,7 @@ PNG_INTERNAL_FUNCTION(png_byte,png_gamma_8bit_correct,(unsigned int value,
    png_fixed_point gamma_value),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_destroy_gamma_table,(png_structrp png_ptr),
    PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_build_gamma_table,(png_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(void,png_build_gamma_tables,(png_structrp png_ptr,
    int bit_depth),PNG_EMPTY);
 #endif
 

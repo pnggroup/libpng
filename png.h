@@ -1116,13 +1116,10 @@ PNG_EXPORT(22, void, png_read_info,
 #ifdef PNG_TIME_RFC1123_SUPPORTED
    /* Convert to a US string format: there is no localization support in this
     * routine.  The original implementation used a 29 character buffer in
-    * png_struct, this will be removed in future versions.
+    * png_struct, this has been removed.
     */
-#if PNG_LIBPNG_VER < 10700
-/* To do: remove this from libpng17 (and from libpng17/png.c and pngstruct.h) */
-PNG_EXPORTA(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
-    png_const_timep ptime),PNG_DEPRECATED);
-#endif
+PNG_REMOVED(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
+    png_const_timep ptime),PNG_DEPRECATED)
 PNG_EXPORT(241, int, png_convert_to_rfc1123_buffer, (char out[29],
     png_const_timep ptime));
 #endif
@@ -1619,22 +1616,8 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
 PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
     int filters));
 
-/* Flags for png_set_filter() to say which filters to use.  The flags
- * are chosen so that they don't conflict with real filter types
- * below, in case they are supplied instead of the #defined constants.
- * These values should NOT be changed.
- */
-#define PNG_NO_FILTERS     0x00
-#define PNG_FILTER_NONE    0x08
-#define PNG_FILTER_SUB     0x10
-#define PNG_FILTER_UP      0x20
-#define PNG_FILTER_AVG     0x40
-#define PNG_FILTER_PAETH   0x80
-#define PNG_ALL_FILTERS (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP | \
-                         PNG_FILTER_AVG | PNG_FILTER_PAETH)
-
 /* Filter values (not flags) - used in pngwrite.c, pngwutil.c for now.
- * These defines should NOT be changed.
+ * These defines match the values in the PNG specification.
  */
 #define PNG_FILTER_VALUE_NONE  0
 #define PNG_FILTER_VALUE_SUB   1
@@ -1642,6 +1625,26 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
 #define PNG_FILTER_VALUE_AVG   3
 #define PNG_FILTER_VALUE_PAETH 4
 #define PNG_FILTER_VALUE_LAST  5
+
+/* The above values are valid arguments to png_set_filter() if only a single
+ * filter is to be used.  If multiple filters are to be allowed (the default is
+ * to allow any of them) then a combination of the following masks must be used
+ * and the low three bits of the argument to png_set_filter must be 0.
+ *
+ * The resultant argument fits in a single byte.
+ */
+#define PNG_FILTER_NONE    (0x08 << PNG_FILTER_VALUE_NONE)
+#define PNG_FILTER_SUB     (0x08 << PNG_FILTER_VALUE_SUB)
+#define PNG_FILTER_UP      (0x08 << PNG_FILTER_VALUE_UP)
+#define PNG_FILTER_AVG     (0x08 << PNG_FILTER_VALUE_AVG)
+#define PNG_FILTER_PAETH   (0x08 << PNG_FILTER_VALUE_PAETH)
+
+/* Then two convenience values.  PNG_NO_FILTERS is the same as
+ * PNG_FILTER_VALUE_NONE, but this is harmless because they mean the same thing.
+ */
+#define PNG_NO_FILTERS     0x00
+#define PNG_ALL_FILTERS    (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP | \
+   PNG_FILTER_AVG | PNG_FILTER_PAETH)
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* EXPERIMENTAL */
 /* The "heuristic_method" is given by one of the PNG_FILTER_HEURISTIC_

@@ -102,6 +102,7 @@ png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
    png_ptr->read_data_fn = read_data_fn;
 #endif
 
+#ifdef PNG_WRITE_SUPPORTED
    /* It is an error to write to a read device */
    if (png_ptr->write_data_fn != NULL)
    {
@@ -110,6 +111,7 @@ png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
           "Can't set both read_data_fn and write_data_fn in the"
           " same structure");
    }
+#endif
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
    png_ptr->output_flush_fn = NULL;
