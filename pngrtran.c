@@ -1245,7 +1245,7 @@ png_init_rgb_transformations(png_structrp png_ptr)
             default:
 
             case 8:
-               /* Already 8 bits, fall through */
+               /* FALL THROUGH (Already 8 bits) */
 
             case 16:
                /* Already a full 16 bits */
