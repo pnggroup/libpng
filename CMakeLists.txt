@@ -34,7 +34,7 @@ project(libpng C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
-set(PNGLIB_MINOR 6)
+set(PNGLIB_MINOR 7)
 set(PNGLIB_RELEASE 0)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
@@ -260,9 +260,9 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.0beta33
-    VERSION 16.${PNGLIB_RELEASE}.0
-    SOVERSION 16
+#   VERSION 17.${PNGLIB_RELEASE}.1.7.0alpha01
+    VERSION 17.${PNGLIB_RELEASE}.0
+    SOVERSION 17
     CLEAN_DIRECT_OUTPUT 1)
 endif()
 if(PNG_STATIC)
@@ -294,7 +294,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-    # Create a symlink for libpng.dll.a => libpng16.dll.a on Cygwin
+    # Create a symlink for libpng.dll.a => libpng17.dll.a on Cygwin
     if(CYGWIN OR MINGW)
        get_target_property(BUILD_TARGET_LOCATION ${PNG_LIB_NAME} LOCATION_${CMAKE_BUILD_TYPE})
        get_filename_component(BUILD_TARGET_FILE ${BUILD_TARGET_LOCATION} NAME)

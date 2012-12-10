@@ -1,7 +1,7 @@
 
 VisualStudio instructions
 
-libpng version 1.6.0beta33 - December 10, 2012
+libpng version 1.7.0alpha01 - December 10, 2012
 
 Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -40,7 +40,7 @@ problems.
 
 If you don't use the Visual Studio defaults your application must still be built
 with the default runtime option (/MD).  If, for some reason, it is not then your
-application will crash inside libpng16.dll as soon as libpng tries to read
+application will crash inside libpng17.dll as soon as libpng tries to read
 from a file handle you pass in.
 
 If you do not want to use the DLL, for example for a very small application,
