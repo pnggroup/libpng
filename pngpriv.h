@@ -1862,6 +1862,15 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 
 #endif /* SIMPLIFIED READ/WRITE */
 
+#ifdef PNG_FILTER_OPTIMIZATIONS
+PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+   /* This is the initialization function for hardware specific optimizations,
+    * one implementation (for ARM NEON machines) is contained in
+    * arm/filter_neon.c.  It need not be defined - the generic code will be used
+    * if not.
+    */
+#endif
+
 /* Maintainer: Put new private prototypes here ^ */
 
 #include "pngdebug.h"

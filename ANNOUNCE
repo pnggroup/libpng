@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta33 - December 10, 2012
+Libpng 1.6.0beta33 - December 13, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -552,12 +552,15 @@ Version 1.6.0beta32 [November 25, 2012]
   Fixed error checking in the simplified write API (Olaf van der Spek)
   Made png_user_version_check() ok to use with libpng version 1.10.x and later.
 
-Version 1.6.0beta33 [December 10, 2012]
+Version 1.6.0beta33 [December 13, 2012]
   Fixed typo in png.c (PNG_SET_CHUNK_MALLOC_MAX should be PNG_CHUNK_MALLOC_MAX)
     that causes the MALLOC_MAX limit not to work (John Bowler)
   Change png_warning() to png_app_error() in pngwrite.c and comment the
     fall-through condition.
   Change png_warning() to png_app_warning() in png_write_tRNS().
+  Rearranged the ARM-NEON optimizations: Isolated the machine specific code
+    to the hardware subdirectory and added comments to pngrutil.c so that
+    implementors of other optimizations know what to do.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

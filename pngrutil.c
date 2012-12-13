@@ -3863,66 +3863,6 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
    }
 }
 
-#ifdef PNG_ARM_NEON
-
-#ifdef __linux__
-#include <stdio.h>
-#include <elf.h>
-#include <asm/hwcap.h>
-
-static int png_have_hwcap(unsigned cap)
-{
-   FILE *f = fopen("/proc/self/auxv", "r");
-   Elf32_auxv_t aux;
-   int have_cap = 0;
-
-   if (!f)
-      return 0;
-
-   while (fread(&aux, (sizeof aux), 1, f) > 0)
-   {
-      if (aux.a_type == AT_HWCAP &&
-          aux.a_un.a_val & cap)
-      {
-         have_cap = 1;
-         break;
-      }
-   }
-
-   fclose(f);
-
-   return have_cap;
-}
-#endif /* __linux__ */
-
-static void
-png_init_filter_functions_neon(png_structrp pp, unsigned int bpp)
-{
-#ifdef __linux__
-   if (!png_have_hwcap(HWCAP_NEON))
-      return;
-#endif
-
-   pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_neon;
-
-   if (bpp == 3)
-   {
-      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_neon;
-      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg3_neon;
-      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
-         png_read_filter_row_paeth3_neon;
-   }
-
-   else if (bpp == 4)
-   {
-      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_neon;
-      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_neon;
-      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
-          png_read_filter_row_paeth4_neon;
-   }
-}
-#endif /* PNG_ARM_NEON */
-
 static void
 png_init_filter_functions(png_structrp pp)
 {
@@ -3938,8 +3878,16 @@ png_init_filter_functions(png_structrp pp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
          png_read_filter_row_paeth_multibyte_pixel;
 
-#ifdef PNG_ARM_NEON
-   png_init_filter_functions_neon(pp, bpp);
+#ifdef PNG_FILTER_OPTIMIZATIONS
+   /* To use this define PNG_FILTER_OPTIMIZATIONS as the name of a function to
+    * call to install hardware optimizations for the above functions; simply
+    * replace whatever elements of the pp->read_filter[] array with a hardware
+    * specific (or, for that matter, generic) optimization.
+    *
+    * To see an example of this examine what configure.ac does when
+    * --enable-arm-neon is specified on the command line.
+    */
+   PNG_FILTER_OPTIMIZATIONS(pp, bpp);
 #endif
 }
 
