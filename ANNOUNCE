@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta33 - December 15, 2012
+Libpng 1.6.0beta34 - December 15, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta33.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta33.tar.gz
-   1.6.0beta33.tar.bz2
+   1.6.0beta34.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta34.tar.gz
+   1.6.0beta34.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b33.7z  (LZMA-compressed, recommended)
-   lp160b33.zip
+   lp160b34.7z  (LZMA-compressed, recommended)
+   lp160b34.zip
 
 Other information:
 
-   1.6.0beta33-README.txt
-   1.6.0beta33-LICENSE.txt
+   1.6.0beta34-README.txt
+   1.6.0beta34-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -563,6 +563,8 @@ Version 1.6.0beta33 [December 15, 2012]
     implementors of other optimizations know what to do.
   Fixed cases of unquoted DESTDIR in Makefile.am
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.2.5.
+
+Version 1.6.0beta34 [December 15, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
