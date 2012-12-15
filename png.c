@@ -430,26 +430,6 @@ png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
    memset(info_ptr, 0, (sizeof *info_ptr));
 }
 
-/* The following API is not called internally */
-void PNGAPI
-png_data_freer(png_const_structrp png_ptr, png_inforp info_ptr,
-   int freer, png_uint_32 mask)
-{
-   png_debug(1, "in png_data_freer");
-
-   if (png_ptr == NULL || info_ptr == NULL)
-      return;
-
-   if (freer == PNG_DESTROY_WILL_FREE_DATA)
-      info_ptr->free_me |= mask;
-
-   else if (freer == PNG_USER_WILL_FREE_DATA)
-      info_ptr->free_me &= ~mask;
-
-   else
-      png_error(png_ptr, "Unknown freer parameter in png_data_freer");
-}
-
 void PNGAPI
 png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    int num)
@@ -860,19 +840,6 @@ png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
 #endif /* READ_UNKNOWN_CHUNKS */
 #endif /* SET_UNKNOWN_CHUNKS */
 
-#ifdef PNG_READ_SUPPORTED
-/* This function, added to libpng-1.0.6g, is untested. */
-int PNGAPI
-png_reset_zstream(png_structrp png_ptr)
-{
-   if (png_ptr == NULL)
-      return Z_STREAM_ERROR;
-
-   /* WARNING: this resets the window bits to the maximum! */
-   return (inflateReset(&png_ptr->zstream));
-}
-#endif /* PNG_READ_SUPPORTED */
-
 /* This function was added to libpng-1.0.7 */
 png_uint_32 PNGAPI
 png_access_version_number(void)
@@ -880,8 +847,6 @@ png_access_version_number(void)
    /* Version of *.c files used when building libpng */
    return((png_uint_32)PNG_LIBPNG_VER);
 }
-
-
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Ensure that png_ptr->zstream.msg holds some appropriate error message string.

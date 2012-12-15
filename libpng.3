@@ -44,7 +44,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0alpha02
 
 \fI\fB
 
-\fBpng_charp png_convert_to_rfc1123 (png_structp \fP\fIpng_ptr\fP\fB, png_timep \fIptime\fP\fB);\fP
+\fBpng_charp png_convert_to_rfc1123_buffer (png_structp \fP\fIpng_ptr\fP\fB, char \fP\fIout[29]\fP\fB, png_timep \fIptime\fP\fB);\fP
 
 \fI\fB
 
@@ -65,10 +65,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0alpha02
 \fI\fB
 
 \fBpng_structp png_create_write_struct_2 (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
-
-\fI\fB
-
-\fBvoid png_data_freer (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIfreer\fP\fB, png_uint_32 \fImask)\fP\fB);\fP
 
 \fI\fB
 
@@ -456,10 +452,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0alpha02
 
 \fI\fB
 
-\fBvoid png_info_init_3 (png_infopp \fP\fIinfo_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
-
-\fI\fB
-
 \fBvoid png_init_io (png_structp \fP\fIpng_ptr\fP\fB, FILE \fI*fp\fP\fB);\fP
 
 \fI\fB
@@ -525,10 +517,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0alpha02
 \fI\fB
 
 \fBvoid png_read_update_info (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
-
-\fI\fB
-
-\fBint png_reset_zstream (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
@@ -4080,8 +4068,8 @@ tEXt chunk use RFC 1123 format dates (e.g. "22 May 1997 18:07:10 GMT"),
 although this isn't a requirement.  Unlike the tIME chunk, the
 "Creation Time" tEXt chunk is not expected to be automatically changed
 by the software.  To facilitate the use of RFC 1123 dates, a function
-png_convert_to_rfc1123_buffer(buffer, png_timep) is provided to convert
-from PNG time to an RFC 1123 format string.  The caller must provide
+png_convert_to_rfc1123_buffer(png_ptr, buffer, png_timep) is provided to
+convert from PNG time to an RFC 1123 format string.  The caller must provide
 a writeable buffer of at least 29 bytes.
 
 .SS Writing unknown chunks
@@ -5931,7 +5919,7 @@ The following API are now DEPRECATED:
    png_malloc_default()
    png_free_default()
 
-The following has been removed:
+The following have been removed:
    png_get_io_chunk_name(), which has been replaced
      with png_get_io_chunk_type().  The new
      function returns a 32-bit integer instead of

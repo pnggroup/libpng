@@ -3083,8 +3083,8 @@ tEXt chunk use RFC 1123 format dates (e.g. "22 May 1997 18:07:10 GMT"),
 although this isn't a requirement.  Unlike the tIME chunk, the
 "Creation Time" tEXt chunk is not expected to be automatically changed
 by the software.  To facilitate the use of RFC 1123 dates, a function
-png_convert_to_rfc1123_buffer(buffer, png_timep) is provided to convert
-from PNG time to an RFC 1123 format string.  The caller must provide
+png_convert_to_rfc1123_buffer(png_ptr, buffer, png_timep) is provided to
+convert from PNG time to an RFC 1123 format string.  The caller must provide
 a writeable buffer of at least 29 bytes.
 
 Writing unknown chunks
@@ -4933,7 +4933,7 @@ The following API are now DEPRECATED:
    png_malloc_default()
    png_free_default()
 
-The following has been removed:
+The following have been removed:
    png_get_io_chunk_name(), which has been replaced
      with png_get_io_chunk_type().  The new
      function returns a 32-bit integer instead of
