@@ -4344,6 +4344,7 @@ Version 1.7.0alpha01 [December 15, 2012]
     the hardware subdirectory, and add comments to pngrutil.c so that
     implementors of other optimizations will know what to do.
   Fixed cases of unquoted DESTDIR in Makefile.am.
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.12.5.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
