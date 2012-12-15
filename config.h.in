@@ -76,8 +76,8 @@
 /* Align row buffers */
 #undef PNG_ALIGNED_MEMORY_SUPPORTED
 
-/* Enable ARM NEON optimizations */
-#undef PNG_ARM_NEON
+/* ARM NEON filter initialization function */
+#undef PNG_FILTER_OPTIMIZATIONS
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

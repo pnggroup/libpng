@@ -9,6 +9,7 @@
  * and license in png.h
  */
 
+#ifdef __arm__
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits /* mark stack as non-executable */
 #endif
@@ -223,3 +224,4 @@ func    png_read_filter_row_paeth3_neon, export=1
 
         pop             {r4,pc}
 endfunc
+#endif

@@ -3931,6 +3931,12 @@ Version 1.5.14beta02 [December 15, 2012]
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
   Fixed a minor bug in types to malloc and major bug in handling compressed
     iTXt. Compressed iTXt could not be handled.
+  Rearranged building of ARM NEON optimizations. The ARM specific code is
+    split out entirely to the arm subdirectory and changes to configure.ac and
+    Makefile.am to add new stuff are reduced.  Now material code changes,
+    although for build test purposes, --enable-arm-neon now builds on non-ARM
+    systems.
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.2.5.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

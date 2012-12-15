@@ -1664,6 +1664,15 @@ PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
     int bit_depth));
 #endif
 
+#ifdef PNG_FILTER_OPTIMIZATIONS
+PNG_EXTERN void PNG_FILTER_OPTIMIZATIONS(png_structp png_ptr, unsigned int bpp);
+   /* This is the initialization function for hardware specific optimizations,
+    * one implementation (for ARM NEON machines) is contained in
+    * arm/filter_neon.c.  It need not be defined - the generic code will be used
+    * if not.
+    */
+#endif
+
 /* Maintainer: Put new private prototypes here ^ */
 
 #include "pngdebug.h"
