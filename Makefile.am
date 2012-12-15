@@ -43,7 +43,8 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
 
 if PNG_ARM_NEON
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/filter_neon.S
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
+	arm/filter_neon.S
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h

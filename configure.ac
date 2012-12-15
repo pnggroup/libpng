@@ -241,8 +241,11 @@ AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
 AC_ARG_ENABLE([arm-neon],
    AS_HELP_STRING([[[--enable-arm-neon]]], [Enable ARM NEON optimizations]),
    [if test "${enableval}" = "yes"; then
-      AC_DEFINE([PNG_ARM_NEON], [1], [Enable ARM NEON optimizations])
-      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1], [Align row buffers])
+      AC_DEFINE([PNG_FILTER_OPTIMIZATIONS],
+                [png_init_filter_functions_neon],
+                [ARM NEON filter initialization function])
+      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1],
+                [Align row buffers])
     fi])
 AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" = yes])
 

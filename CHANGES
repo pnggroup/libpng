@@ -4338,8 +4338,11 @@ Version 1.7.0alpha01 [December 15, 2012]
     in png.h have been made more clear. Minor fixes to
     contrib/libtests/timepng.c and some of the png_*_tRNS logic, including
     more error detection in png_set_tRNS.
-  Clean up USER_LIMITS feature, removing members from png_struct when not
+  Cleaned up USER_LIMITS feature, removing members from png_struct when not
     required.
+  Rearranged ARM-NEON optimizations to isolate the machine specific code to
+    the hardware subdirectory, and add comments to pngrutil.c so that
+    implementors of other optimizations will know what to do.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
