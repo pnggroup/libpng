@@ -58,6 +58,7 @@ Version 1.7.0alpha01 [December 15, 2012]
   Rearranged ARM-NEON optimizations to isolate the machine specific code to
     the hardware subdirectory, and add comments to pngrutil.c so that
     implementors of other optimizations will know what to do.
+  Fixed cases of unquoted DESTDIR in Makefile.am.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
