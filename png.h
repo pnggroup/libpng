@@ -166,7 +166,8 @@
  *    1.5.7beta01-05          15    10507  15.so.15.7[.0]
  *    1.5.7rc01-03            15    10507  15.so.15.7[.0]
  *    1.5.7                   15    10507  15.so.15.7[.0]
- *    1.6.0beta01-32          16    10600  16.so.16.0[.0]
+ *    1.6.0beta01-33          16    10600  16.so.16.0[.0]
+ *    1.7.0alpha01-02         17    10700  17.so.17.0[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
