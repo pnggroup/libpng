@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta02 - December 10, 2012
+Libpng 1.5.14beta02 - December 15, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -32,23 +32,17 @@ Version 1.5.14beta01 [October 24, 2012]
   Fixed build when using #define PNG_NO_READ_GAMMA in png_do_compose() in
     pngrtran.c (Domani Hannes).
 
-Version 1.5.14beta02 [December 10, 2012]
+Version 1.5.14beta02 [December 15, 2012]
   Added missing "-" in front of DNO_GZIP in contrib/pngminim/*/makefile.
   Check for png_ptr==NULL earlier in png_zalloc().
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
+  Fixed a minor bug in types to malloc and major bug in handling compressed
+    iTXt. Compressed iTXt could not be handled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)
 or to glennrp at users.sourceforge.net
-
-Glenn R-P
-#endif
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net:
-(subscription required; visit
-https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe) or to glennrp at users.sourceforge.net
 
 Glenn R-P
