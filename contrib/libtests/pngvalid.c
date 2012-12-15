@@ -1873,7 +1873,7 @@ typedef struct png_modifier
    /* Run the odd-sized image and interlace read/write tests? */
    unsigned int             test_size :1;
 
-   /* Run tests on reading with a combiniation of transforms, */
+   /* Run tests on reading with a combination of transforms, */
    unsigned int             test_transform :1;
 
    /* When to use the use_input_precision option, this controls the gamma
@@ -6638,7 +6638,7 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
           *
           *  Each component of which is +/-1/65535 from the gamma_to_1 table
           *  lookup, resulting in a base error of +/-6.  The gamma_from_1
-          *  convertion adds another +/-2 in the 16-bit case and
+          *  conversion adds another +/-2 in the 16-bit case and
           *  +/-(1<<(15-PNG_MAX_GAMMA_8)) in the 8-bit case.
           */
          that->pm->limit += pow(
@@ -6964,7 +6964,7 @@ image_transform_png_set_rgb_to_gray_mod(PNG_CONST image_transform *this,
 
          else if (data.gamma == 1)
          {
-            /* There is no need to do the convertions to and from linear space,
+            /* There is no need to do the conversions to and from linear space,
              * so the calculation should be a lot more accurate.  There is a
              * built in 1/32768 error in the coefficients because they only have
              * 15 bits and are adjusted to make sure they add up to 32768, so

@@ -1225,7 +1225,7 @@ png_init_background_transformations(png_structrp png_ptr)
          bit_depth = 16;
    }
 
-   /* Now make the background have the correct format, this involves reading the
+   /* Now make the background have the correct format. This involves reading the
     * correct fields from png_ptr->background, adjusting the bit depth of the
     * result and potentially gamma correcting the value then calculating the
     * png_ptr->background_1 values too.
@@ -1570,7 +1570,7 @@ png_init_read_transformations(png_structrp png_ptr)
       png_init_rgb_transformations(png_ptr);
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
-   /* Set up the background information if required, it is only used if
+   /* Set up the background information if required. It is only used if
     * PNG_COMPOSE is specified.
     */
    if (png_ptr->transformations & PNG_COMPOSE)

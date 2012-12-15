@@ -1055,8 +1055,10 @@ PNG_EXPORTA(9, void, png_longjmp, (png_const_structrp png_ptr, int val),
     PNG_NORETURN);
 
 #ifdef PNG_READ_SUPPORTED
-/* Reset the compression stream */
-PNG_EXPORTA(10, int, png_reset_zstream, (png_structrp png_ptr), PNG_DEPRECATED);
+/* Reset the compression stream
+ * Removed from libpng-1.7.0
+ */
+PNG_REMOVED(10, int, png_reset_zstream, (png_structrp png_ptr), PNG_DEPRECATED);
 #endif
 
 /* New functions added in libpng-1.0.2 (not enabled by default until 1.2.0) */
@@ -1095,11 +1097,9 @@ PNG_EXPORT(17, void, png_write_chunk_end, (png_structrp png_ptr));
 PNG_EXPORTA(18, png_infop, png_create_info_struct, (png_const_structrp png_ptr),
     PNG_ALLOCATED);
 
-/* DEPRECATED: this function allowed init structures to be created using the
- * default allocation method (typically malloc).  Use is deprecated in 1.6.0 and
- * the API will be removed in the future.
- */
-PNG_EXPORTA(19, void, png_info_init_3, (png_infopp info_ptr,
+
+/* Removed from libpng-1.7.0 */
+PNG_REMOVED(19, void, png_info_init_3, (png_infopp info_ptr,
     png_size_t png_info_struct_size), PNG_DEPRECATED);
 
 /* Writes all the PNG information before the image. */
@@ -1117,7 +1117,7 @@ PNG_EXPORT(22, void, png_read_info,
 #ifdef PNG_TIME_RFC1123_SUPPORTED
    /* Convert to a US string format: there is no localization support in this
     * routine.  The original implementation used a 29 character buffer in
-    * png_struct, this has been removed.
+    * png_struct; this was removed from libpng-1.7.0
     */
 PNG_REMOVED(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
     png_const_timep ptime),PNG_DEPRECATED)
@@ -1927,20 +1927,10 @@ PNG_EXPORT(97, void, png_free, (png_const_structrp png_ptr, png_voidp ptr));
 PNG_EXPORT(98, void, png_free_data, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 free_me, int num));
 
-/* Reassign responsibility for freeing existing data, whether allocated
- * by libpng or by the application; this works on the png_info structure passed
- * in, it does not change the state for other png_info structures.
- *
- * It is unlikely that this function works correctly as of 1.6.0 and using it
- * may result either in memory leaks or double free of allocated data.
- */
-PNG_EXPORTA(99, void, png_data_freer, (png_const_structrp png_ptr,
+/* Removed from libpng-1.7.0 */
+PNG_REMOVED(99, void, png_data_freer, (png_const_structrp png_ptr,
     png_inforp info_ptr, int freer, png_uint_32 mask), PNG_DEPRECATED);
 
-/* Assignments for png_data_freer */
-#define PNG_DESTROY_WILL_FREE_DATA 1
-#define PNG_SET_WILL_FREE_DATA 1
-#define PNG_USER_WILL_FREE_DATA 2
 /* Flags for png_ptr->free_me and info_ptr->free_me */
 #define PNG_FREE_HIST 0x0008
 #define PNG_FREE_ICCP 0x0010

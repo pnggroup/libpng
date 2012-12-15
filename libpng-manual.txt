@@ -42,10 +42,11 @@ libpng-manual.txt - A description on how to use and modify libpng
     X. Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
    XI. Changes to Libpng from version 1.4.x to 1.5.x
   XII. Changes to Libpng from version 1.5.x to 1.6.x
- XIII. Detecting libpng
-  XIV. Source code repository
-   XV. Coding style
-  XVI. Y2K Compliance in libpng
+ XIII. Changes to Libpng from version 1.6.x to 1.7.x
+  XIV. Detecting libpng
+   XV. Source code repository
+  XVI. Coding style
+ XVII. Y2K Compliance in libpng
 
 I. Introduction
 
@@ -4965,7 +4966,18 @@ This adds more correct option control of the unknown handling, corrects
 a pre-existing bug where the per-chunk 'keep' setting is ignored, and makes
 it possible to skip IDAT chunks in the sequential reader.
 
-XIII.  Detecting libpng
+XIII.  Changes to Libpng from version 1.6.x to 1.7.x
+
+Some functions that were deprecated in libpng-1.6.0 were removed:
+    png_reset_zstream(),
+    png_info_init_3(),
+    and png_data_freer() and its associated flags.
+
+The 8-bit compose and rgb_to_grayscale operatons were made more accurate.
+While these did not introduce API incompatibility, there may be differences
+in unit test results.
+
+XIV.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
 changed, and is unaffected by conditional compilation macros.  It is the
@@ -4998,7 +5010,7 @@ simple verbal discriptions of bug fixes, reported either to the
 SourceForge bug tracker, to the png-mng-implement at lists.sf.net
 mailing list, or directly to glennrp.
 
-XV. Coding style
+XVI. Coding style
 
 Our coding style is similar to the "Allman" style, with curly
 braces on separate lines:
@@ -5124,7 +5136,7 @@ Lines do not exceed 80 characters.
 
 Other rules can be inferred by inspecting the libpng source.
 
-XVI. Y2K Compliance in libpng
+XVII. Y2K Compliance in libpng
 
 December 15, 2012
 
