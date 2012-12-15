@@ -253,22 +253,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
       create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
 #  endif
 
-   /* Added at libpng-1.2.6 */
-#  ifdef PNG_USER_LIMITS_SUPPORTED
-      create_struct.user_width_max = PNG_USER_WIDTH_MAX;
-      create_struct.user_height_max = PNG_USER_HEIGHT_MAX;
-
-#     ifdef PNG_USER_CHUNK_CACHE_MAX
-         /* Added at libpng-1.2.43 and 1.4.0 */
-         create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
-#     endif
-
-#     ifdef PNG_USER_CHUNK_MALLOC_MAX
-         /* Added at libpng-1.2.43 and 1.4.1 */
-         create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
-#     endif
-#  endif
-
    /* The following two API calls simply set fields in png_struct, so it is safe
     * to do them now even though error handling is not yet set up.
     */

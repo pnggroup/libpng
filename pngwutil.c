@@ -1427,11 +1427,8 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
    {
       if (num_trans <= 0 || num_trans > png_ptr->num_palette)
       {
-         /* This is an error which can only be reliably detected late, change to
-          * a png_app_warning here so that it will fail in debug.  It should be
-          * a png_app_error.
-          */
-         png_app_warning(png_ptr,
+         /* This is an error which can only be reliably detected late. */
+         png_app_error(png_ptr,
             "Invalid number of transparent colors specified");
          return;
       }
@@ -1447,7 +1444,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       if (tran->gray >= (1 << png_ptr->bit_depth))
       {
          /* This can no longer happen because it is checked in png_set_tRNS */
-         png_warning(png_ptr,
+         png_app_error(png_ptr,
              "Ignoring attempt to write tRNS chunk out-of-range for bit_depth");
 
          return;
@@ -1470,7 +1467,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
 #endif
       {
          /* Also checked in png_set_tRNS */
-         png_warning(png_ptr,
+         png_app_error(png_ptr,
            "Ignoring attempt to write 16-bit tRNS chunk when bit_depth is 8");
          return;
       }
@@ -1481,7 +1478,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
    else
    {
       /* Checked in png_set_tRNS */
-      png_warning(png_ptr, "Can't write tRNS with an alpha channel");
+      png_app_error(png_ptr, "Can't write tRNS with an alpha channel");
    }
 }
 #endif
