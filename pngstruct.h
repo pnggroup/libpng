@@ -243,18 +243,21 @@ struct png_struct_def
 #endif
 #endif /* PNG_READ_SUPPORTED */
 
-#ifdef PNG_USER_LIMITS_SUPPORTED
-   /* The limits only affect read from libpng 1.7 */
-   /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
-    * can occupy when decompressed.  0 means unlimited.
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   png_uint_32 user_width_max;        /* Maximum width on read */
+   png_uint_32 user_height_max;       /* Maximum height on read */
+   /* Total memory that a single zTXt, sPLT, iTXt, iCCP, or unknown chunk
+    * can occupy when decompressed.  0 means unlimited.  This field is a counter
+    * - it is decremented as memory is allocated.
     */
    png_alloc_size_t user_chunk_malloc_max;
+#endif
+#ifdef PNG_USER_LIMITS_SUPPORTED
    /* limit on total *number* of sPLT, text and unknown chunks that can be
-    * stored.  0 means unlimited.
+    * stored.  0 means unlimited.  This field is a counter - it is decremented
+    * as chunks are encountered.
     */
    png_uint_32 user_chunk_cache_max;
-   png_uint_32 user_width_max;
-   png_uint_32 user_height_max;
 #endif
 
    /* The progressive reader gets passed data and calls application handling

@@ -562,7 +562,7 @@ png_decompress_chunk(png_structrp png_ptr,
     */
    png_alloc_size_t limit = PNG_SIZE_MAX;
 
-#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPOPRTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;
@@ -1582,7 +1582,8 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
       if (--png_ptr->user_chunk_cache_max == 1)
       {
-         png_warning(png_ptr, "No space in chunk cache for sPLT");
+         /* Warn the first time */
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          png_crc_finish(png_ptr, length);
          return;
       }
@@ -2372,7 +2373,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          return;
       }
    }
@@ -2451,7 +2452,7 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          return;
       }
    }
@@ -2560,7 +2561,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "no space in chunk cache");
+         png_chunk_benign_error(png_ptr, "chunk cache full");
          return;
       }
    }
@@ -2700,7 +2701,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       png_ptr->unknown_chunk.data = NULL;
    }
 
-#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPOPRTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;
@@ -2895,7 +2896,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
          {
             case 2:
                png_ptr->user_chunk_cache_max = 1;
-               png_chunk_benign_error(png_ptr, "no space in chunk cache");
+               png_chunk_benign_error(png_ptr, "chunk cache full");
                /* FALL THROUGH */
             case 1:
                /* NOTE: prior to 1.6.0 this case resulted in an unknown critical

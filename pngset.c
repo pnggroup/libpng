@@ -1524,24 +1524,19 @@ png_set_user_limits (png_structrp png_ptr, png_uint_32 user_width_max,
     * rejected by png_set_IHDR().  To accept any PNG datastream
     * regardless of dimensions, set both limits to 0x7ffffffL.
     */
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->user_width_max = user_width_max;
-   png_ptr->user_height_max = user_height_max;
+   if (png_ptr != NULL)
+   {
+      png_ptr->user_width_max = user_width_max;
+      png_ptr->user_height_max = user_height_max;
+   }
 }
 
 /* This function was added to libpng 1.4.0 */
 void PNGAPI
 png_set_chunk_cache_max (png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 {
-#  ifdef PNG_READ_SUPPORTED
-      if (png_ptr)
-         png_ptr->user_chunk_cache_max = user_chunk_cache_max;
-#  else
-      PNG_UNUSED(png_ptr)
-      PNG_UNUSED(user_chunk_cache_max)
-#  endif
+   if (png_ptr != NULL)
+      png_ptr->user_chunk_cache_max = user_chunk_cache_max;
 }
 
 /* This function was added to libpng 1.4.1 */
@@ -1549,13 +1544,8 @@ void PNGAPI
 png_set_chunk_malloc_max (png_structrp png_ptr,
     png_alloc_size_t user_chunk_malloc_max)
 {
-#  ifdef PNG_READ_SUPPORTED
-      if (png_ptr)
-         png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
-#  else
-      PNG_UNUSED(png_ptr)
-      PNG_UNUSED(user_chunk_malloc_max)
-#  endif
+   if (png_ptr != NULL)
+      png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
 

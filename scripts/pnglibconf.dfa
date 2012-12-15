@@ -276,40 +276,28 @@ option USER_MEM
 
 option IO_STATE
 
-# This is only for PowerPC big-endian and 680x0 systems
-# some testing, not enabled by default.
-# NO LONGER USED
-
-#option READ_BIG_ENDIAN disabled
-
-# Allow users to control limits on what the READ code will
-# read:
-
-# Added at libpng-1.2.43; adds limit fields to png_struct,
-# allows some usages of these fields, from 1.7.0 only limits read
+# Libpng limits: limit the size of images and data on read.
+#
+# If this option is disabled all the limit checking code will be disabled:
 
 option USER_LIMITS requires READ
 
-# Added at libpng-1.2.6; adds setting APIs, allows additional
-# usage of this field (UTSL)
-
-option SET_USER_LIMITS requires USER_LIMITS
-
-# Feature added at libpng-1.4.0, this flag added at 1.4.1
-option SET_USER_LIMITS enables SET_CHUNK_CACHE_LIMIT
-# Feature added at libpng-1.4.1, this flag added at 1.4.1
-
-option SET_USER_LIMITS enables SET_CHUNK_MALLOC_LIMIT
-
-# Libpng limits.
-#
-# If these settings are *not* set libpng will not limit the size of
+# If the following settings are *not* set libpng will not limit the size of
 # images or the size of data in ancilliary chunks.  This does lead to
-# security issues if PNG files come from untrusted sources.
+# security issues if PNG files come from untrusted sources.  Settings have the
+# following interpretations:
+#
+# USER_WIDTH_MAX: maximum width of an image that will be read
+# USER_HEIGHT_MAX: maximum height
+# USER_CHUNK_MALLOC_MAX: maximum in-memory (decompressed) size of a single chunk
+# USER_CHUNK_CACHE_MAX: maximum number of chunks to be cached
+#
+# Only chunks that are variable in number are counted towards the
+# USER_CHUNK_CACHE_MAX limit
 setting USER_WIDTH_MAX
 setting USER_HEIGHT_MAX
-setting USER_CHUNK_CACHE_MAX
 setting USER_CHUNK_MALLOC_MAX
+setting USER_CHUNK_CACHE_MAX
 
 # To default all these settings to values that are large but probably
 # safe turn the SAFE_LIMITS option on; this will cause the value in
@@ -317,6 +305,10 @@ setting USER_CHUNK_MALLOC_MAX
 # them in pngusr.dfa with '@#define PNG_setting value' lines.
 option SAFE_LIMITS enables USER_LIMITS disabled
 = SAFE_LIMITS SAFE_LIMITS
+
+# If this option is enabled APIs to set the above limits at run time are added;
+# without these the hardwired (compile time) limits will be used.
+option SET_USER_LIMITS requires USER_LIMITS
 
 # All of the following options relate to code capabilities for
 # processing image data before creating a PNG or after reading one.

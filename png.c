@@ -236,6 +236,23 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     */
    memset(&create_struct, 0, (sizeof create_struct));
 
+   /* These limits are only used on read at present, and if READ is not turned
+    * on neither will USER_LIMITS be.  The width/height and chunk malloc limits
+    * are constants, so if they cannot be set they don't get defined in
+    * png_struct, the user_chunk_cache limits is a down-counter, when it reaches
+    * 1 no more chunks will be handled.  0 means unlimited, consequently the
+    * limit is 1 more than the number of chunks that will be handled.
+    */
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
+      create_struct.user_width_max = PNG_USER_WIDTH_MAX;
+      create_struct.user_height_max = PNG_USER_HEIGHT_MAX;
+      create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
+#  endif
+#  ifdef PNG_USER_LIMITS_SUPPORTED
+      /* Must exist even if the initial value is constant */
+      create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
+#  endif
+
    /* Added at libpng-1.2.6 */
 #  ifdef PNG_USER_LIMITS_SUPPORTED
       create_struct.user_width_max = PNG_USER_WIDTH_MAX;
