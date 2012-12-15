@@ -2452,7 +2452,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_textp text_ptr;
    png_charp key, lang, text, lang_key;
    int comp_flag;
-   int comp_type = 0;
+   int comp_type;
    int ret;
    png_size_t slength, prefix_len, data_len;
 
@@ -2533,15 +2533,24 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   else
+   comp_flag = *lang++;
+   comp_type = *lang++;
+
+   /* 1.5.14: The spec says "for uncompressed text decoders shall ignore [the
+    * compression type]".  The compression flag shall be 0 (no compression) or
+    * 1 (compressed with method 0 - deflate.)
+    */
+   if (comp_flag != 0 && comp_flag != 1)
    {
-      comp_flag = *lang++;
-      comp_type = *lang++;
+      png_warning(png_ptr, "invalid iTXt compression flag");
+      png_free(png_ptr, png_ptr->chunkdata);
+      png_ptr->chunkdata = NULL;
+      return;
    }
 
-   if (comp_type || (comp_flag && comp_flag != PNG_TEXT_COMPRESSION_zTXt))
+   if (comp_flag/*compressed*/ && comp_type != 0)
    {
-      png_warning(png_ptr, "Unknown iTXt compression type or method");
+      png_warning(png_ptr, "unknown iTXt compression type");
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
       return;
@@ -2577,7 +2586,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    key=png_ptr->chunkdata;
 
-   if (comp_flag)
+   if (comp_flag/*compressed*/)
       png_decompress_chunk(png_ptr, comp_type,
           (size_t)length, prefix_len, &data_len);
 
@@ -2595,7 +2604,8 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       return;
    }
 
-   text_ptr->compression = (int)comp_flag + 1;
+   text_ptr->compression =
+      (comp_flag ? PNG_ITXT_COMPRESSION_zTXt : PNG_ITXT_COMPRESSION_NONE);
    text_ptr->lang_key = png_ptr->chunkdata + (lang_key - key);
    text_ptr->lang = png_ptr->chunkdata + (lang - key);
    text_ptr->itxt_length = data_len;

@@ -460,24 +460,21 @@ png_text_compress(png_structp png_ptr,
                old_ptr = comp->output_ptr;
 
                comp->output_ptr = (png_bytepp)png_malloc(png_ptr,
-                   (png_alloc_size_t)
-                   (comp->max_output_ptr * png_sizeof(png_charpp)));
+                   (comp->max_output_ptr * png_sizeof(png_bytep)));
 
                png_memcpy(comp->output_ptr, old_ptr, old_max
-                   * png_sizeof(png_charp));
+                   * png_sizeof(png_bytep));
 
                png_free(png_ptr, old_ptr);
             }
             else
                comp->output_ptr = (png_bytepp)png_malloc(png_ptr,
-                   (png_alloc_size_t)
-                   (comp->max_output_ptr * png_sizeof(png_charp)));
+                   (comp->max_output_ptr * png_sizeof(png_bytep)));
          }
 
          /* Save the data */
          comp->output_ptr[comp->num_output_ptr] =
-             (png_bytep)png_malloc(png_ptr,
-             (png_alloc_size_t)png_ptr->zbuf_size);
+             (png_bytep)png_malloc(png_ptr, png_ptr->zbuf_size);
 
          png_memcpy(comp->output_ptr[comp->num_output_ptr], png_ptr->zbuf,
              png_ptr->zbuf_size);
