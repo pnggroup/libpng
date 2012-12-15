@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha01 - December 10, 2012
+Libpng 1.7.0alpha01 - December 15, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.6.0):
 
-Version 1.7.0alpha01 [December 10, 2012]
+Version 1.7.0alpha01 [December 15, 2012]
   Started 1.7.0 branch from libpng-1.6.0beta33.
   Made 8-bit compose and rgb_to_grayscale accuracy improvements.  These
     changes cause 16-bit arithmetic to be used for 8-bit data in the gamma
@@ -45,6 +45,14 @@ Version 1.7.0alpha01 [December 10, 2012]
     more calculations and the algorithm used to minimize the number of
     calculations has been extended to all the 16-bit tables; it has advantages
     for any significant gamma correction.
+  Rearranged png_struct, remove unused members, change png_set_filter handling
+    png_struct members rearranged - partly to reorder to avoid packing, partly
+    to put frequently accessed members at the start and partly to make
+    the grouping more clear. png_set_filter code has been rewritten and the
+    code shared with png_write_start_row moved to a common function.  Comments
+    in png.h have been made more clear. Minor fixes to
+    contrib/libtests/timepng.c and some of the png_*_tRNS logic, including
+    more error detection in png_set_tRNS.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

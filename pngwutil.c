@@ -1446,6 +1446,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       /* One 16 bit value */
       if (tran->gray >= (1 << png_ptr->bit_depth))
       {
+         /* This can no longer happen because it is checked in png_set_tRNS */
          png_warning(png_ptr,
              "Ignoring attempt to write tRNS chunk out-of-range for bit_depth");
 
@@ -1468,7 +1469,8 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       if (buf[0] | buf[2] | buf[4])
 #endif
       {
-         png_app_warning(png_ptr,
+         /* Also checked in png_set_tRNS */
+         png_warning(png_ptr,
            "Ignoring attempt to write 16-bit tRNS chunk when bit_depth is 8");
          return;
       }
@@ -1521,7 +1523,6 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
       if (buf[0] | buf[2] | buf[4])
 #endif
       {
-         /* This can no longer happen because it is checked in png_set_tRNS */
          png_warning(png_ptr,
              "Ignoring attempt to write 16-bit bKGD chunk when bit_depth is 8");
 
@@ -1535,7 +1536,6 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
    {
       if (back->gray >= (1 << png_ptr->bit_depth))
       {
-         /* Also checked in png_set_tRNS */
          png_warning(png_ptr,
              "Ignoring attempt to write bKGD chunk out-of-range for bit_depth");
 

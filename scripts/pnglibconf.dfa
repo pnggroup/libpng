@@ -286,9 +286,9 @@ option IO_STATE
 # read:
 
 # Added at libpng-1.2.43; adds limit fields to png_struct,
-# allows some usages of these fields
+# allows some usages of these fields, from 1.7.0 only limits read
 
-option USER_LIMITS
+option USER_LIMITS requires READ
 
 # Added at libpng-1.2.6; adds setting APIs, allows additional
 # usage of this field (UTSL)

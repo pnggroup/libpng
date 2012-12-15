@@ -1009,7 +1009,9 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
 
          png_ptr->rgb_to_gray_red_coeff   = red_int;
          png_ptr->rgb_to_gray_green_coeff = green_int;
-         png_ptr->rgb_to_gray_coefficients_set = 1;
+#        if defined PNG_COLORS_SPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+            png_ptr->colorspace.flags |= PNG_COLORSPACE_RGB_TO_GRAY_SET;
+#        endif
       }
 
       else
