@@ -44,6 +44,7 @@ Version 1.5.14beta02 [December 15, 2012]
     although for build test purposes, --enable-arm-neon now builds on non-ARM
     systems.
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.2.5.
+  Fixed cases of unquoted DESTDIR in Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
