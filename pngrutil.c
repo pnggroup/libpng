@@ -3865,6 +3865,14 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
 
 static void
 png_init_filter_functions(png_structrp pp)
+   /* This function is called once for every PNG image to set the
+    * implementations required to reverse the filtering of PNG rows.  Reversing
+    * the filter is the first transformation performed on the row data.  It is
+    * performed in place, therefore an implementation can be selected based on
+    * the image pixel format.  If the implementation depends on image width then
+    * take care to ensure that it works corretly if the image is interlaced -
+    * interlacing causes the actual row width to vary.
+    */
 {
    unsigned int bpp = (pp->pixel_depth + 7) >> 3;
 
@@ -3895,6 +3903,10 @@ void /* PRIVATE */
 png_read_filter_row(png_structrp pp, png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row, int filter)
 {
+   /* OPTIMIZATION: DO NOT MODIFY THIS FUNCTION, instead #define
+    * PNG_FILTER_OPTIMIZATIONS to a function that overrides the generic
+    * implementations.  See png_init_filter_functions above.
+    */
    if (pp->read_filter[0] == NULL)
       png_init_filter_functions(pp);
    if (filter > PNG_FILTER_VALUE_NONE && filter < PNG_FILTER_VALUE_LAST)

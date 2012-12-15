@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2011 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
+ * Last changed in libpng 1.5.7 [December 15, 2011]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

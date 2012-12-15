@@ -1,8 +1,9 @@
 
-/* filter_neon.S - NEON optimised filter functions
+/* arm_init.c - NEON optimised filter functions
  *
- * Copyright (c) 2011 Glenn Randers-Pehrson
+ * Copyright (c) 2012 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
+ * Last changed in libpng 1.5.14 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -50,6 +51,17 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
       return;
 #endif
 
+   /* IMPORTANT: any new external functions used here must be declared using
+    * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the
+    * 'prefix' option to configure works:
+    *
+    *    ./configure --with-libpng-prefix=foobar_
+    *
+    * Verify you have got this right by running the above command, doing a build
+    * and examining pngprefix.h; it must contain a #define for every external
+    * function you add.  (Notice that this happens automatically for the
+    * initialization function.)
+    */
    pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_neon;
 
    if (bpp == 3)
