@@ -3939,6 +3939,8 @@ Version 1.5.14beta02 [December 15, 2012]
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.2.5.
   Fixed cases of unquoted DESTDIR in Makefile.am
 
+Version 1.5.14beta03 [December 15, 2012]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
