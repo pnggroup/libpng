@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_0beta32 Your_png_h_is_not_version_1_6_0beta32;
+typedef png_libpng_version_1_7_0alpha02 Your_png_h_is_not_version_1_7_0alpha02;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -380,40 +380,6 @@ png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
    }
 }
 
-/* Initialize the info structure.  This is now an internal function (0.89)
- * and applications using it are urged to use png_create_info_struct()
- * instead.  Use deprecated in 1.6.0, internal use removed (used internally it
- * is just a memset).
- *
- * NOTE: it is almost inconceivable that this API is used because it bypasses
- * the user-memory mechanism and the user error handling/warning mechanisms in
- * those cases where it does anything other than a memset.
- */
-PNG_FUNCTION(void,PNGAPI
-png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
-   PNG_DEPRECATED)
-{
-   png_inforp info_ptr = *ptr_ptr;
-
-   png_debug(1, "in png_info_init_3");
-
-   if (info_ptr == NULL)
-      return;
-
-   if ((sizeof (png_info)) > png_info_struct_size)
-   {
-      *ptr_ptr = NULL;
-      /* The following line is why this API should not be used: */
-      free(info_ptr);
-      info_ptr = png_voidcast(png_inforp, png_malloc_base(NULL,
-         (sizeof *info_ptr)));
-      *ptr_ptr = info_ptr;
-   }
-
-   /* Set everything to 0 */
-   memset(info_ptr, 0, (sizeof *info_ptr));
-}
-
 void PNGAPI
 png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    int num)
@@ -725,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta32 - November 25, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0alpha02 - December 16, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta32 - November 25, 2012\
+      return "libpng version 1.7.0alpha02 - December 16, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";

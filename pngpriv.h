@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -1873,7 +1873,8 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 #endif /* SIMPLIFIED READ/WRITE */
 
 #ifdef PNG_FILTER_OPTIMIZATIONS
-PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structrp png_ptr,
+    unsigned int bpp), PNG_EMPTY);
    /* This is the initialization function for hardware specific optimizations,
     * one implementation (for ARM NEON machines) is contained in
     * arm/filter_neon.c.  It need not be defined - the generic code will be used

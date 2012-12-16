@@ -1983,7 +1983,7 @@ modifier_init(png_modifier *pm)
  * in the rgb_to_gray check, replacing it with an exact copy of the libpng 1.5
  * algorithm.
  */
-#define DIGITIZE PNG_LIBPNG_VER < 10600
+#define DIGITIZE PNG_LIBPNG_VER < 10700
 
 /* If pm->calculations_use_input_precision is set then operations will happen
  * with the precision of the input, not the precision of the output depth.
@@ -8190,7 +8190,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
              * lost.  This can result in up to a +/-1 error in the presence of
              * an sbit less than the bit depth.
              */
-#           if PNG_LIBPNG_VER < 10600
+#           if PNG_LIBPNG_VER < 10700
 #              define SBIT_ERROR .5
 #           else
 #              define SBIT_ERROR 1.
@@ -9905,11 +9905,8 @@ int main(int argc, char **argv)
    /* Default assume_16_bit_calculations appropriately; this tells the checking
     * code that 16-bit arithmetic is used for 8-bit samples when it would make a
     * difference.
-    *
-    * TODO: IMPORTANT; set to '>= 10600' below to enable development, change
-    * this to the correct value before release!
     */
-   pm.assume_16_bit_calculations = PNG_LIBPNG_VER >= 10600;
+   pm.assume_16_bit_calculations = PNG_LIBPNG_VER >= 10700;
 
    /* Currently 16 bit expansion happens at the end of the pipeline, so the
     * calculations are done in the input bit depth not the output.

@@ -110,30 +110,10 @@ png_malloc,(png_const_structrp png_ptr, png_alloc_size_t size),PNG_ALLOCATED)
    ret = png_malloc_base(png_ptr, size);
 
    if (ret == NULL)
-       png_error(png_ptr, "Out of memory"); /* 'm' means png_malloc */
+       png_error(png_ptr, "Out of memory");
 
    return ret;
 }
-
-#ifdef PNG_USER_MEM_SUPPORTED
-PNG_FUNCTION(png_voidp,PNGAPI
-png_malloc_default,(png_const_structrp png_ptr, png_alloc_size_t size),
-   PNG_ALLOCATED PNG_DEPRECATED)
-{
-   png_voidp ret;
-
-   if (png_ptr == NULL)
-      return NULL;
-
-   /* Passing 'NULL' here bypasses the application provided memory handler. */
-   ret = png_malloc_base(NULL/*use malloc*/, size);
-
-   if (ret == NULL)
-      png_error(png_ptr, "Out of Memory"); /* 'M' means png_malloc_default */
-
-   return ret;
-}
-#endif /* PNG_USER_MEM_SUPPORTED */
 
 /* This function was added at libpng version 1.2.3.  The png_malloc_warn()
  * function will issue a png_warning and return NULL instead of issuing a
@@ -170,17 +150,8 @@ png_free(png_const_structrp png_ptr, png_voidp ptr)
       png_ptr->free_fn(png_constcast(png_structrp,png_ptr), ptr);
 
    else
-      png_free_default(png_ptr, ptr);
-}
-
-PNG_FUNCTION(void,PNGAPI
-png_free_default,(png_const_structrp png_ptr, png_voidp ptr),PNG_DEPRECATED)
-{
-   if (png_ptr == NULL || ptr == NULL)
-      return;
 #endif /* PNG_USER_MEM_SUPPORTED */
-
-   free(ptr);
+      free(ptr);
 }
 
 #ifdef PNG_USER_MEM_SUPPORTED

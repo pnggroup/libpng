@@ -43,7 +43,7 @@ static int png_have_hwcap(unsigned cap)
 #endif /* __linux__ && __arm__ */
 
 void
-png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
+png_init_filter_functions_neon(png_structrp pp, unsigned int bpp)
 {
 #ifdef __arm__
 #ifdef __linux__

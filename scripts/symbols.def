@@ -101,8 +101,6 @@ EXPORTS
  png_malloc_warn @96
  png_free @97
  png_free_data @98
- png_malloc_default @100
- png_free_default @101
  png_error @102
  png_chunk_error @103
  png_err @104
