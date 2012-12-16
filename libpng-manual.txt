@@ -4931,8 +4931,10 @@ The following API are now DEPRECATED:
    png_info_init_3()
    png_convert_to_rfc1123() which has been replaced
      with png_convert_to_rfc1123_buffer()
+   png_data_freer()
    png_malloc_default()
    png_free_default()
+   png_reset_zstream()
 
 The following have been removed:
    png_get_io_chunk_name(), which has been replaced
@@ -4971,7 +4973,9 @@ XIII.  Changes to Libpng from version 1.6.x to 1.7.x
 Some functions that were deprecated in libpng-1.6.0 were removed:
     png_reset_zstream(),
     png_info_init_3(),
-    and png_data_freer() and its associated flags.
+    png_data_freer() and its associated flags,
+    png_malloc_default(),
+    and png_free_default().
 
 The 8-bit compose and rgb_to_grayscale operatons were made more accurate.
 While these did not introduce API incompatibility, there may be differences
