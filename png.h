@@ -1055,11 +1055,8 @@ PNG_EXPORTA(9, void, png_longjmp, (png_const_structrp png_ptr, int val),
     PNG_NORETURN);
 
 #ifdef PNG_READ_SUPPORTED
-/* REMOVED: this function allowed init structures to be created using the
- * default allocation method (typically malloc).  Removed in 1.7.0
- */
-PNG_REMOVED(10, void, png_info_init_3, (png_infopp info_ptr,
-    png_size_t png_info_struct_size), PNG_DEPRECATED)
+/* Reset the compression stream -- Removed from libpng-1.7.0 */
+PNG_REMOVED(10, int, png_reset_zstream, (png_structrp png_ptr), PNG_DEPRECATED)
 #endif
 
 /* New functions added in libpng-1.0.2 (not enabled by default until 1.2.0) */
@@ -1098,10 +1095,9 @@ PNG_EXPORT(17, void, png_write_chunk_end, (png_structrp png_ptr));
 PNG_EXPORTA(18, png_infop, png_create_info_struct, (png_const_structrp png_ptr),
     PNG_ALLOCATED);
 
-
 /* Removed from libpng-1.7.0 */
 PNG_REMOVED(19, void, png_info_init_3, (png_infopp info_ptr,
-    png_size_t png_info_struct_size), PNG_DEPRECATED);
+    png_size_t png_info_struct_size), PNG_DEPRECATED)
 
 /* Writes all the PNG information before the image. */
 PNG_EXPORT(20, void, png_write_info_before_PLTE,
@@ -1939,7 +1935,7 @@ PNG_EXPORT(98, void, png_free_data, (png_const_structrp png_ptr,
 PNG_REMOVED(99, void, png_data_freer, (png_const_structrp png_ptr,
     png_inforp info_ptr, int freer, png_uint_32 mask), PNG_DEPRECATED)
 
-/* Flags for png_ptr->free_me and info_ptr->free_me */
+/* Flags for png_free_data */
 #define PNG_FREE_HIST 0x0008
 #define PNG_FREE_ICCP 0x0010
 #define PNG_FREE_SPLT 0x0020
