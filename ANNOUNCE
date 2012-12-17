@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha02 - December 16, 2012
+Libpng 1.7.0alpha02 - December 17, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -61,12 +61,15 @@ Version 1.7.0alpha01 [December 15, 2012]
   Fixed cases of unquoted DESTDIR in Makefile.am.
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.12.5.
 
-Version 1.7.0alpha02 [December 16, 2012]
+Version 1.7.0alpha02 [December 17, 2012]
   Removed functions that were deprecated in libpng-1.6.0:
     png_reset_zstream(), png_info_init_3(), and png_data_freer() and its
     associated flags.
   Removed some duplicated lines from contrib/tools/scale.c and png.c.
   Changed some instances of png_warning() to png_app_error().
+  Updated some left over "1.6.0beta32" in code sources.
+  Fixed a "png_structp" prototype (should be png_structrp) in arm_init.c
+  Updated the version-number hack in pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
