@@ -1409,7 +1409,7 @@ If you would rather avoid the complexity of setjmp/longjmp issues,
 you can compile libpng with PNG_NO_SETJMP, in which case
 errors will result in a call to PNG_ABORT() which defaults to abort().
 
-You can #define PNG_ABORT() to a function that does something
+You can #define PNG_ABORT to a function or other C code that does something
 more useful than abort(), as long as your function does not
 return.
 
@@ -3539,9 +3539,9 @@ section below for more information on the libpng error handling.
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
 you can compile libpng with PNG_NO_SETJMP, in which case
-errors will result in a call to PNG_ABORT() which defaults to abort().
+errors will result in a call to PNG_ABORT which defaults to abort().
 
-You can #define PNG_ABORT() to a function that does something
+You can #define PNG_ABORT to a function or other C code that does something
 more useful than abort(), as long as your function does not
 return.
 
@@ -4920,7 +4920,7 @@ Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
 should never return to its caller.  Currently, this is handled via
 setjmp() and longjmp() (unless you have compiled libpng with
-PNG_NO_SETJMP, in which case it is handled via PNG_ABORT()),
+PNG_NO_SETJMP, in which case it is handled via PNG_ABORT),
 but you could change this to do things like exit() if you should wish,
 as long as your function does not return.
 
@@ -5954,6 +5954,25 @@ Some functions that were deprecated in libpng-1.6.0 were removed:
     png_data_freer() and its associated flags,
     png_malloc_default(),
     and png_free_default().
+
+The PNG_ABORT() macro was changed to PNG_ABORT, and the default is now
+"abort()" for all platforms (previously it was "ExitProcess(0)" on
+Windows platforms).  Starting with libpng-1.7.0 you have to define
+PNG_ABORT instead of PNG_ABORT(), e.g.,
+
+    #if PNGCRUSH_LIBPNG_VER >= 10700
+    #  ifdef _WINDOWS_
+    #    define PNG_ABORT ExitProcess(0);
+    #  else
+    #    define PNG_ABORT abort();
+    #  endif
+    #else
+    #  ifdef _WINDOWS_
+    #    define PNG_ABORT() ExitProcess(0)
+    #  else
+    #    define PNG_ABORT() abort()
+    #  endif
+    #endif
 
 The 8-bit compose and rgb_to_grayscale operations were made more accurate.
 While these did not introduce API incompatibility, there may be differences
