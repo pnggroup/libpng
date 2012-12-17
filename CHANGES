@@ -4356,6 +4356,7 @@ Version 1.7.0alpha02 [December 17, 2012]
   Fixed a "png_structp" prototype (should be png_structrp) in arm_init.c
   Updated the version-number hack in pngvalid.c
   
+Version 1.7.0alpha03 [December 17, 2012]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
