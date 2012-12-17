@@ -3031,6 +3031,7 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
 
    png_compress_IDAT(png_ptr, filtered_row, full_row_length, Z_NO_FLUSH);
 
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    /* Swap the current and previous rows */
    if (png_ptr->prev_row != NULL)
    {
@@ -3040,6 +3041,7 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
       png_ptr->prev_row = png_ptr->row_buf;
       png_ptr->row_buf = tptr;
    }
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
 
    /* Finish row - updates counters and flushes zlib if last row */
    png_write_finish_row(png_ptr);
