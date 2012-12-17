@@ -115,31 +115,137 @@ AC_ARG_ENABLE(werror,
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h strings.h])
+# Headers used in pngpriv.h:
+AC_CHECK_HEADERS([stdlib.h string.h float.h fp.h math.h m68881.h])
+# Additional headers used in pngconf.h:
+AC_CHECK_HEADERS([limits.h stddef.h stdio.h setjmp.h time.h])
+# Used by pngread.c (for the simplified API):
+AC_CHECK_HEADERS([errno.h])
+# The following are not required for the standard 'make' build of libpng:
+# Additional requirements of contrib/libtests/makepng.c:
+AC_CHECK_HEADERS([ctype.h])
+# Additional requirements of contrib/libtests/pngvalid.c:
+AC_CHECK_HEADERS([fenv.h])
+# Additional requirements of contrib/libtests/tarith.c:
+AC_CHECK_HEADERS([assert.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_C_CONST
-AC_TYPE_SIZE_T
-AC_STRUCT_TM
+# Most of these have been removed from 1.7.0 because they checked for non-ANSI-C
+# behaviors and the result were, anyway, not used by earlier versions of libpng.
 AC_C_RESTRICT
 
-# Checks for library functions.
-AC_FUNC_STRTOD
-AC_CHECK_FUNCS([memset], , AC_MSG_ERROR(memset not found in libc))
-AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_MSG_ERROR(cannot find pow)) )
-AC_ARG_WITH(zlib-prefix,
-   AS_HELP_STRING([[[--with-zlib-prefix]]],
-      [prefix that may have been used in installed zlib]),
-      [ZPREFIX=${withval}],
-      [ZPREFIX='z_'])
-AC_CHECK_LIB(z, zlibVersion, ,
-    AC_CHECK_LIB(z, ${ZPREFIX}zlibVersion, , AC_MSG_ERROR(zlib not installed)))
+# Checks for library functions; these need to be in order, least demanding to
+# most because the -l directives are added to the head of the list at each
+# check.
+# ANSI-C functions: all are required but they don't have to be implemented in
+# libc, it is perfectly ok to configure with an extra, wrapper, library preset
+# in LIBS.  NOTE: this list may not be complete
+AC_CHECK_FUNCS([memset memcpy strncpy],,
+               AC_MSG_FAILURE([missing ANSI-C functions]))
+
+# floor and ceil are required for FLOATING_POINT, but they can be turned off on
+# the configure command line (and they are independent.)  Default is to 'on'
+AC_ARG_ENABLE([floating-point],[Enable floating point APIs],,
+              [enable_floating_point=yes])
+AC_ARG_ENABLE([fixed-point],[Enable fixed point APIs],,
+              [enable_fixed_point=yes])
+AC_ARG_ENABLE([floating-arithmetic],[Use floating point arithmetic internally],,
+              [enable_floating_arithmetic=yes])
+
+# But if there is no floor/ceil turn both options off:
+if test "$enable_floating_point" = yes -o "$enable_floating_arithmetic" = yes
+then
+   AC_SEARCH_LIBS([floor],[m],,
+                  [AC_MSG_WARN([not found])
+                   enable_floating_point=no
+                   enable_floating_arithmetic=no])
+   AC_SEARCH_LIBS([frexp],[m],,
+                  [AC_MSG_WARN([not found])
+                   enable_floating_point=no
+                   enable_floating_arithmetic=no])
+fi
+if test "$enable_floating_arithmetic" = yes
+then
+   AC_SEARCH_LIBS([pow],[m],,
+                  [AC_MSG_WARN([not found])
+                   enable_floating_arithmetic="no"])
+fi
+
+# Set the relevant defines if required (only if required), this will override
+# anything on the command line.
+if test "$enable_floating_point" != yes
+then
+   AC_MSG_NOTICE([Floating point APIs disabled])
+   AC_DEFINE([PNG_NO_FLOATING_POINT],[1],
+             [No support for floating point APIs])
+fi
+if test "$enable_fixed_point" != yes
+then
+   AC_MSG_NOTICE([Fixed point APIs disabled])
+   AC_DEFINE([PNG_NO_FIXED_POINT],[1],
+             [No support for fixed point APIs])
+fi
+if test "$enable_floating_arithmetic" != yes
+then
+   AC_MSG_NOTICE([Fixed point arithmetic will be used])
+   AC_DEFINE([PNG_NO_FLOATING_ARITHMETIC],[1],
+             [No support for floating point arithmetic])
+fi
 
 # The following is for pngvalid, to ensure it catches FP errors even on
 # platforms that don't enable FP exceptions, the function appears in the math
 # library (typically), it's not an error if it is not found.
-AC_CHECK_LIB([m], [feenableexcept])
-AC_CHECK_FUNCS([feenableexcept])
+AC_SEARCH_LIBS([feenableexcept],[m],AC_DEFINE([HAVE_FEENABLEEXCEPT],[1],
+      [Define to 1 if the feenableexcept function is available]))
+# Required by pngvalid:
+AC_SEARCH_LIBS([ceil],[m])
+
+# zlib checks and arguments;
+#  package zlib: argument is the name of the library
+#  zlib-header: the name of the header file
+#  zlib-prefix: the prefix for library functions, if any
+AC_ARG_WITH([zlib],
+   AS_HELP_STRING([[[--with-zlib=<name>]]],
+                  [base name of the zlib implementation (e.g. 'z')]),,
+   [with_zlib='z'])
+
+AC_ARG_WITH([zlib-prefix],
+   AS_HELP_STRING([[[--with-zlib-prefix=<prefix>]]],
+                  [prefix for zlib API functions]),
+   [if test "$withval" = "" -o "$withval" = yes; then
+      with_zlib_prefix='z_'
+      AC_DEFINE([PNG_ZLIB_PREFIX],[z_],[Standard zlib prefix])
+   elif test "${withval}" != "no"; then
+      AC_DEFINE_UNQUOTED([PNG_ZLIB_PREFIX],[${withval}],
+         [User defined zlib prefix])
+   else
+      with_zlib_prefix=
+   fi
+   if test "$with_zlib_prefix" != ""; then
+      AC_DEFINE([Z_PREFIX],[1],[Tell zlib.h to prefix function names])
+   fi])
+
+AC_ARG_WITH([zlib-header],
+   AS_HELP_STRING([[[--with-zlib-header='<file>' or '"file"']]],
+      [C include argument to locate zlib header file, e.g. <zlib.h>, take
+       care to put single quotes round this on the command line]),
+   [AC_DEFINE_UNQUOTED([PNG_ZLIB_HEADER],[${withval}],[Zlib header file])],
+   with_zlib_header='<zlib.h>')
+
+# AC_CHECK_LIB isn't quite enough for this because we need the special header
+# file too.
+LIBS="-l${with_zlib} $LIBS"
+AC_MSG_CHECKING(
+   [[Library '${with_zlib}' and #include ${with_zlib_header} for symbol '${with_zlib_prefix}zlibVersion']])
+AC_LINK_IFELSE(
+   [AC_LANG_PROGRAM(
+      [[
+#define Z_PREFIX 1
+#include ${with_zlib_header}
+      ]],
+      [[(void)${with_zlib_prefix}zlibVersion();]])],
+   AC_MSG_RESULT([ok]),
+   AC_MSG_FAILURE([not found]))
 
 AC_MSG_CHECKING([if using Solaris linker])
 SLD=`$LD --version 2>&1 | grep Solaris`
@@ -252,8 +358,7 @@ AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" = yes])
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 
 # Config files, substituting as above
-AC_CONFIG_FILES([Makefile libpng.pc:libpng.pc.in])
-AC_CONFIG_FILES([libpng-config:libpng-config.in],
-   [chmod +x libpng-config])
+AC_CONFIG_FILES([Makefile libpng.pc])
+AC_CONFIG_FILES([libpng-config], [chmod +x libpng-config])
 
 AC_OUTPUT

@@ -8,7 +8,7 @@ com pnglibconf.h - library build configuration
 com
 version
 com
-com Copyright (c) 1998-2011 Glenn Randers-Pehrson
+com Copyright (c) 1998-2012 Glenn Randers-Pehrson
 com
 com This code is released under the libpng license.
 com For conditions of distribution and use, see the disclaimer
@@ -207,7 +207,7 @@ setting ZLIB_HEADER default <zlib.h>
 # cannot proceed beyond the PNG_ABORT operation and compilation of pngerror.c is
 # likely to fail if the operation implemented does not clearly terminate the
 # thread or process.  The default implementation is the ANSI-C abort function,
-# any manner of C code may be used.
+# but any manner of C code may be used.
 
 setting ABORT default { (abort()); }
 
