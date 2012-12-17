@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <png.h>
-#include <zlib.h>
+#include PNG_ZLIB_HEADER /* this is the header libpng was built with */
 
 int main(int argc, const char **argv)
 {

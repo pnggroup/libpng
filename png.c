@@ -2976,7 +2976,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
    png_error(png_ptr, "ASCII conversion buffer too small");
 }
 #   endif /* FIXED_POINT */
-#endif /* READ_SCAL */
+#endif /* SCAL */
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
    !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \

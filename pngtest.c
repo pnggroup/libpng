@@ -44,7 +44,7 @@
 #include "png.h"
 
 #ifdef PNG_READ_SUPPORTED /* else nothing can be done */
-#include "zlib.h"
+#include PNG_ZLIB_HEADER /* defined by pnglibconf.h */
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
 #  define PNG_ZBUF_SIZE 8192
@@ -99,10 +99,6 @@ static int relaxed = 0;
 static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
 static int error_count = 0; /* count calls to png_error */
 static int warning_count = 0; /* count calls to png_warning */
-
-#ifdef __TURBOC__
-#include <mem.h>
-#endif
 
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf

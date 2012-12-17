@@ -39,8 +39,10 @@
  */
 #ifdef PNG_FREESTANDING_TESTS
 #  include <png.h>
+#  include <zlib.h>   /* For crc32 */
 #else
 #  include "../../png.h"
+#  include PNG_ZLIB_HEADER
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED /* else pngvalid can do nothing */
@@ -87,8 +89,6 @@ typedef png_byte *png_const_bytep;
     */
 #  define png_const_structp png_structp
 #endif
-
-#include <zlib.h>   /* For crc32 */
 
 #include <float.h>  /* For floating point constants */
 #include <stdlib.h> /* For malloc */

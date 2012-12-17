@@ -334,17 +334,25 @@ typedef const png_uint_16p * png_const_uint_16pp;
 /* Other defines specific to compilers can go here.  Try to keep
  * them inside an appropriate ifdef/endif pair for portability.
  */
-#if defined(PNG_FLOATING_POINT_SUPPORTED) ||\
-    defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
+#if defined PNG_sCAL_SUPPORTED && defined PNG_FLOATING_POINT_SUPPORTED
    /* png.c requires the following ANSI-C constants if the conversion of
     * floating point to ASCII is implemented therein:
     *
+    *  DBL_MIN_10_EXP Minimum negative integer such that 10^integer is a
+    *                 normalized (double) value.
     *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
     *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
     *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
     */
 #  include <float.h>
+#endif /* sCAL && FLOATING_POINT */
 
+#if defined PNG_FLOATING_ARITHMETIC_SUPPORTED ||\
+   defined PNG_FLOATING_POINT_SUPPORTED
+   /* Certain floating point functions are used internally; only floor and ceil
+    * if FLOATING_POINT is supported, but if FLOATING_ARITHMETIC is used then
+    * pow and exp are needed too.
+    */
 #  if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
     defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
      /* We need to check that <math.h> hasn't already been included earlier
@@ -363,32 +371,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
       */
 #    include <m68881.h>
 #  endif
-#endif
-
-/* This provides the non-ANSI (far) memory allocation routines. */
-#if defined(__TURBOC__) && defined(__MSDOS__)
-#  include <mem.h>
-#  include <alloc.h>
-#endif
-
-#if defined(WIN32) || defined(_Windows) || defined(_WINDOWS) || \
-    defined(_WIN32) || defined(__WIN32__)
-#  include <windows.h>  /* defines _WINDOWS_ macro */
-#endif
-
-/* Moved here around 1.5.0beta36 from pngconf.h */
-/* Users may want to use these so they are not private.  Any library
- * functions that are passed far data must be model-independent.
- */
-
-/* Memory model/platform independent fns */
-#ifndef PNG_ABORT
-#  ifdef _WINDOWS_
-#    define PNG_ABORT() ExitProcess(0)
-#  else
-#    define PNG_ABORT() abort()
-#  endif
-#endif
+#endif /* FLOATING_ARITHMETIC || FLOATING_POINT */
 
 /* These macros may need to be architecture dependent. */
 #define PNG_ALIGN_NONE   0 /* do not use data alignment */

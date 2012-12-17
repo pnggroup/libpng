@@ -109,6 +109,13 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 
 logunsupported = 1
 
+# The following allows the output from configure to modify the contents of
+# pnglibconf.h
+
+@#ifdef HAVE_CONFIG_H
+@#  include "config.h"
+@#endif
+
 # PNG_USER_CONFIG has to be defined on the compiler command line
 # to cause pngusr.h to be read while constructing pnglibconf.h
 #
@@ -177,6 +184,32 @@ setting API_RULE default 0
 # by causing a similar build-time only file, pngprefix.h, to be generated.
 
 setting PREFIX
+
+# This says that a prefix has been added to zlib API function names; at present
+# it is informational, the builder of zlib must ensure that zlib.h contains the
+# appropriate renames
+
+setting ZLIB_PREFIX
+
+# This is used to select an alternative zlib header file - it must look pretty
+# much like the standard zlib.h, but this makes it easier to ensure the correct
+# header file is used.  Set it to the "" or <> quoted file name (a full file
+# name is acceptable).  Prior to 1.7.0 this used "zlib.h", so it would use a
+# zlib.h in the same directory as the libpng source, from 1.7.0 it defaults to
+# just searching the -I directories.  Prior to 1.6.0 the #include appeared in
+# the exported header files - so it was quite important to use "zlib.h" to
+# ensure that applications always got the zlib.h from the same directory as
+# png.h.
+
+setting ZLIB_HEADER default <zlib.h>
+
+# Define this to something that will stop, at least, the current thread; control
+# cannot proceed beyond the PNG_ABORT operation and compilation of pngerror.c is
+# likely to fail if the operation implemented does not clearly terminate the
+# thread or process.  The default implementation is the ANSI-C abort function,
+# any manner of C code may be used.
+
+setting ABORT default { (abort()); }
 
 # Default to using the read macros
 

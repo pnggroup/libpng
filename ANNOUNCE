@@ -72,6 +72,10 @@ Version 1.7.0alpha02 [December 17, 2012]
   Updated the version-number hack in pngvalid.c
 
 Version 1.7.0alpha03 [December 17, 2012]
+  Cleaned up and enhanced the configure option; libpng now correctly
+    links and tests against zlib with a prefix; tests have been clarified; and
+    irrelevant or obsolete things (as defined by the autotools man page) have
+    been removed.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

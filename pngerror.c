@@ -546,7 +546,15 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
 }
 
 #ifdef PNG_ERROR_TEXT_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
+   (!defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
+   (defined(PNG_gAMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED) || \
+   defined(PNG_sCAL_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)) ||\
+    defined(PNG_READ_ALPHA_MODE_SUPPORTED) ||\
+    defined(PNG_READ_GAMMA_SUPPORTED)) || \
+   (defined(PNG_sCAL_SUPPORTED) && \
+   defined(PNG_FLOATING_ARITHMETIC_SUPPORTED))
 PNG_FUNCTION(void,
 png_fixed_error,(png_const_structrp png_ptr, png_const_charp name),PNG_NORETURN)
 {
@@ -740,8 +748,17 @@ png_longjmp,(png_const_structrp png_ptr, int val),PNG_NORETURN)
       png_ptr->longjmp_fn(*png_ptr->jmp_buf_ptr, val);
 #endif
 
-   /* Here if not setjmp support or if png_ptr is null. */
-   PNG_ABORT();
+   /* It is an error if control reaches this point, because png_longjmp must not
+    * return the only choice is to terminate the whole process (or maybe
+    * thread), to do this the ANSI-C abort() function is used unless a different
+    * method is implemented by overriding the default configuration setting for
+    * PNG_ABORT (see scripts/pnglibconf.dfa).
+    *
+    * API change: prior to 1.7.0 PNG_ABORT was invoked as a function type macro
+    * with no arguments 'PNG_ABORT();', in 1.7.0 this is changed to a simple
+    * macro that is defined in the configuration.
+    */
+   PNG_ABORT
 }
 
 #ifdef PNG_WARNINGS_SUPPORTED

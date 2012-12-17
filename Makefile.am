@@ -120,6 +120,8 @@ scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
 scripts/prefix.out: png.h pngconf.h pnglibconf.out
 scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
 
+pnglibconf.out: config.h
+
 libpng.sym: scripts/sym.out
 	rm -f $@
 	cp $? $@
@@ -131,7 +133,7 @@ if DO_PNG_PREFIX
 # Rename functions in scripts/prefix.out with a PNG_PREFIX prefix.
 # Rename macros in scripts/macro.lst from PNG_PREFIXpng_ to PNG_ (the actual
 # implementation of the macro).
-pnglibconf.h: pnglibconf.out scripts/prefix.out scripts/macro.lst
+pnglibconf.h: pnglibconf.out scripts/prefix.out scripts/macro.lst config.h
 	rm -f $@
 	$(AWK) 's==0 && NR>1{print prev}\
 	   s==0{prev=$$0}\
