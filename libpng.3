@@ -137,7 +137,9 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0alpha03
 
 \fBpng_uint_32 png_get_PLTE (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_colorp \fP\fI*palette\fP\fB, int \fI*num_palette\fP\fB);\fP
 
-\fBpng_byte png_get_rgb_to_gray_status (png_const_structp png_ptr) png_uint_32 png_get_rowbytes (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+\fBpng_byte png_get_rgb_to_gray_status (png_const_structp \fIpng_ptr\fP\fB);\fP
+
+\fBpng_uint_32 png_get_rowbytes (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fBpng_bytepp png_get_rows (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
@@ -161,11 +163,15 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0alpha03
 
 \fBpng_uint_32 png_get_tRNS (png_const_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fP\fI*trans_alpha\fP\fB, int \fP\fI*num_trans\fP\fB, png_color_16p \fI*trans_color\fP\fB);\fP
 
-\fB/* This function is really an inline macro. */ png_uint_16 png_get_uint_16 (png_bytep \fIbuf\fP\fB);\fP
+\fB/* This function is really an inline macro. \fI*/
+
+\fBpng_uint_16 png_get_uint_16 (png_bytep \fIbuf\fP\fB);\fP
 
 \fBpng_uint_32 png_get_uint_31 (png_structp \fP\fIpng_ptr\fP\fB, png_bytep \fIbuf\fP\fB);\fP
 
-\fB/* This function is really an inline macro. */ png_uint_32 png_get_uint_32 (png_bytep \fIbuf\fP\fB);\fP
+\fB/* This function is really an inline macro. \fI*/
+
+\fBpng_uint_32 png_get_uint_32 (png_bytep \fIbuf\fP\fB);\fP
 
 \fBpng_uint_32 png_get_unknown_chunks (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_unknown_chunkpp \fIunknowns\fP\fB);\fP
 
