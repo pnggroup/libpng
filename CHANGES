@@ -3943,6 +3943,8 @@ Version 1.5.14beta03 [December 15, 2012]
 
 Version 1.5.14beta04 [December 18, 2012]
   Cleaned up whitespace in the synopsis portion of the manpage "libpng.3"
+  Disassembled the version number in scripts/options.awk (necessary for
+    building on SunOs)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
