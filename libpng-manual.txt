@@ -1,6 +1,6 @@
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.14beta04 - December 15, 2012
+ libpng version 1.5.14beta04 - December 18, 2012
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2012 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.14beta04 - December 15, 2012
+ libpng versions 0.97, January 1998, through 1.5.14beta04 - December 18, 2012
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2012 Glenn Randers-Pehrson
 
@@ -4612,7 +4612,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-December 15, 2012
+December 18, 2012
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

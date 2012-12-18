@@ -3941,7 +3941,8 @@ Version 1.5.14beta03 [December 15, 2012]
   Fixed a minor bug in types to malloc and major bug in handling compressed
     iTXt. Compressed iTXt could not be handled.
 
-Version 1.5.14beta04 [December 15, 2012]
+Version 1.5.14beta04 [December 18, 2012]
+  Cleaned up whitespace in the synopsis portion of the manpage "libpng.3"
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
