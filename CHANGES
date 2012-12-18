@@ -4372,6 +4372,8 @@ Version 1.7.0alpha03 [December 18, 2012]
     png_fixed and the gamma code specific version of the same to avoid floor(),
     which may be a library function (not an intrinsic). Removed unused #if 0
     code.
+  Disassembled the version number in scripts/options.awk (necessary for
+    building on SunOs)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
