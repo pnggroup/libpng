@@ -1169,7 +1169,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 #endif
 #ifdef PNG_sCAL_SUPPORTED
-#ifdef PNG_FLOATING_POINT_SUPPORTED
+#if defined PNG_FLOATING_POINT_SUPPORTED && \
+   defined PNG_FLOATING_ARITHMETIC_SUPPORTED
    {
       int unit;
       double scal_width, scal_height;

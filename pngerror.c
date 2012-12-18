@@ -546,15 +546,13 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
 }
 
 #ifdef PNG_ERROR_TEXT_SUPPORTED
+
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
-   (!defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
    (defined(PNG_gAMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED) || \
    defined(PNG_sCAL_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) || \
-   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)) ||\
-    defined(PNG_READ_ALPHA_MODE_SUPPORTED) ||\
-    defined(PNG_READ_GAMMA_SUPPORTED)) || \
-   (defined(PNG_sCAL_SUPPORTED) && \
-   defined(PNG_FLOATING_ARITHMETIC_SUPPORTED))
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)) || \
+   (defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) &&\
+   defined(PNG_sCAL_SUPPORTED))
 PNG_FUNCTION(void,
 png_fixed_error,(png_const_structrp png_ptr, png_const_charp name),PNG_NORETURN)
 {

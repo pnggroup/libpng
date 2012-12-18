@@ -152,23 +152,24 @@ AC_ARG_ENABLE([fixed-point],[Enable fixed point APIs],,
 AC_ARG_ENABLE([floating-arithmetic],[Use floating point arithmetic internally],,
               [enable_floating_arithmetic=yes])
 
-# But if there is no floor/ceil turn both options off:
-if test "$enable_floating_point" = yes -o "$enable_floating_arithmetic" = yes
+# Check for a requirement for math library support
+if test "$enable_floating_arithmetic" = yes
 then
    AC_SEARCH_LIBS([floor],[m],,
                   [AC_MSG_WARN([not found])
-                   enable_floating_point=no
                    enable_floating_arithmetic=no])
    AC_SEARCH_LIBS([frexp],[m],,
                   [AC_MSG_WARN([not found])
-                   enable_floating_point=no
                    enable_floating_arithmetic=no])
-fi
-if test "$enable_floating_arithmetic" = yes
-then
+   AC_SEARCH_LIBS([modf],[m],,
+                  [AC_MSG_WARN([not found])
+                   enable_floating_arithmetic=no])
+   AC_SEARCH_LIBS([atof],[m],,
+                  [AC_MSG_WARN([not found])
+                   enable_floating_arithmetic=no])
    AC_SEARCH_LIBS([pow],[m],,
                   [AC_MSG_WARN([not found])
-                   enable_floating_arithmetic="no"])
+                   enable_floating_arithmetic=no])
 fi
 
 # Set the relevant defines if required (only if required), this will override
@@ -209,6 +210,7 @@ AC_ARG_WITH([zlib],
                   [base name of the zlib implementation (e.g. 'z')]),,
    [with_zlib='z'])
 
+z_prefix=
 AC_ARG_WITH([zlib-prefix],
    AS_HELP_STRING([[[--with-zlib-prefix=<prefix>]]],
                   [prefix for zlib API functions]),
@@ -223,6 +225,7 @@ AC_ARG_WITH([zlib-prefix],
    fi
    if test "$with_zlib_prefix" != ""; then
       AC_DEFINE([Z_PREFIX],[1],[Tell zlib.h to prefix function names])
+      z_prefix="#define Z_PREFIX 1"
    fi])
 
 AC_ARG_WITH([zlib-header],
@@ -240,7 +243,7 @@ AC_MSG_CHECKING(
 AC_LINK_IFELSE(
    [AC_LANG_PROGRAM(
       [[
-#define Z_PREFIX 1
+${z_prefix}
 #include ${with_zlib_header}
       ]],
       [[(void)${with_zlib_prefix}zlibVersion();]])],

@@ -257,16 +257,10 @@ convert_gamma_value(png_structrp png_ptr, double output_gamma)
     * bug reports.  Negative values fail inside the _fixed API unless they
     * correspond to the flag values.
     */
-   if (output_gamma > 0 && output_gamma < 128)
-      output_gamma *= PNG_FP_1;
+   if (output_gamma < 0 || output_gamma > 128)
+      output_gamma *= .00001;
 
-   /* This preserves -1 and -2 exactly: */
-   output_gamma = floor(output_gamma + .5);
-
-   if (output_gamma > PNG_FP_MAX || output_gamma < PNG_FP_MIN)
-      png_fixed_error(png_ptr, "gamma value");
-
-   return (png_fixed_point)output_gamma;
+   return png_fixed(png_ptr, output_gamma, "gamma value");
 }
 #  endif
 #endif /* READ_ALPHA_MODE || READ_GAMMA */

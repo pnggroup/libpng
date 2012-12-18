@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0alpha03 - December 17, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0alpha03 - December 18, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0alpha03 - December 17, 2012\
+      return "libpng version 1.7.0alpha03 - December 18, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2978,22 +2978,30 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
 #   endif /* FIXED_POINT */
 #endif /* SCAL */
 
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
-   !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
+#if !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && (\
+   defined(PNG_FLOATING_POINT_SUPPORTED) && \
    (defined(PNG_gAMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED) || \
    defined(PNG_sCAL_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)) || \
-   (defined(PNG_sCAL_SUPPORTED) && \
-   defined(PNG_FLOATING_ARITHMETIC_SUPPORTED))
+   (defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) &&\
+   defined(PNG_sCAL_SUPPORTED)))
 png_fixed_point
 png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 {
-   double r = floor(100000 * fp + .5);
+   if (fp < 0)
+   {
+      if (fp > -21474.836485)
+         return (png_fixed_point)(100000*fp - .5);
+   }
 
-   if (r > 2147483647. || r < -2147483648.)
-      png_fixed_error(png_ptr, text);
+   else
+   {
+      if (fp < 21474.836475)
+         return (png_fixed_point)(100000*fp + .5);
+   }
 
-   return (png_fixed_point)r;
+   /* Overflow */
+   png_fixed_error(png_ptr, text);
 }
 #endif
 
@@ -3570,334 +3578,6 @@ png_gamma_correct(png_structrp png_ptr, unsigned int value,
    else
       return png_gamma_16bit_correct(value, gamma_val);
 }
-
-#if 0
-/* Internal function to build a single 16-bit table - the table consists of
- * 'num' 256 entry subtables, where 'num' is determined by 'shift' - the amount
- * to shift the input values right (or 16-number_of_signifiant_bits).
- *
- * The caller is responsible for ensuring that the table gets cleaned up on
- * png_error (i.e. if one of the mallocs below fails) - i.e. the *table argument
- * should be somewhere that will be cleaned.
- */
-static void
-png_build_16bit_table(png_structrp png_ptr, png_uint_16p *ptable,
-   PNG_CONST unsigned int shift, PNG_CONST png_fixed_point gamma_val)
-{
-   /* Various values derived from 'shift': */
-   PNG_CONST unsigned int num = 1U << (8U - shift);
-   PNG_CONST unsigned int max = (1U << (16U - shift))-1U;
-   PNG_CONST unsigned int max_by_2 = 1U << (15U-shift);
-   unsigned int i;
-
-   png_uint_16pp table = *ptable =
-       (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
-
-   for (i = 0; i < num; i++)
-   {
-      png_uint_16p sub_table = table[i] =
-          (png_uint_16p)png_malloc(png_ptr, 256 * (sizeof (png_uint_16)));
-
-      /* The 'threshold' test is repeated here because it can arise for one of
-       * the 16-bit tables even if the others don't hit it.
-       */
-      if (png_gamma_significant(gamma_val))
-      {
-         /* The old code would overflow at the end and this would cause the
-          * 'pow' function to return a result >1, resulting in an
-          * arithmetic error.  This code follows the spec exactly; ig is
-          * the recovered input sample, it always has 8-16 bits.
-          *
-          * We want input * 65535/max, rounded, the arithmetic fits in 32
-          * bits (unsigned) so long as max <= 32767.
-          */
-         unsigned int j;
-         for (j = 0; j < 256; j++)
-         {
-            png_uint_32 ig = (j << (8-shift)) + i;
-#           ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-               /* Inline the 'max' scaling operation: */
-               double d = floor(65535*pow(ig/(double)max, gamma_val*.00001)+.5);
-               sub_table[j] = (png_uint_16)d;
-#           else
-               if (shift)
-                  ig = (ig * 65535U + max_by_2)/max;
-
-               sub_table[j] = png_gamma_16bit_correct(ig, gamma_val);
-#           endif
-         }
-      }
-      else
-      {
-         /* We must still build a table, but do it the fast way. */
-         unsigned int j;
-
-         for (j = 0; j < 256; j++)
-         {
-            png_uint_32 ig = (j << (8-shift)) + i;
-
-            if (shift)
-               ig = (ig * 65535U + max_by_2)/max;
-
-            sub_table[j] = (png_uint_16)ig;
-         }
-      }
-   }
-}
-
-/* NOTE: this function expects the *inverse* of the overall gamma transformation
- * required.
- */
-static void
-png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
-   PNG_CONST unsigned int shift, PNG_CONST png_fixed_point gamma_val)
-{
-   PNG_CONST unsigned int num = 1U << (8U - shift);
-   PNG_CONST unsigned int max = (1U << (16U - shift))-1U;
-   unsigned int i;
-   png_uint_32 last;
-
-   png_uint_16pp table = *ptable =
-       (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
-
-   /* 'num' is the number of tables and also the number of low bits of low
-    * bits of the input 16-bit value used to select a table.  Each table is
-    * itself indexed by the high 8 bits of the value.
-    */
-   for (i = 0; i < num; i++)
-      table[i] = (png_uint_16p)png_malloc(png_ptr,
-          256 * (sizeof (png_uint_16)));
-
-   /* 'gamma_val' is set to the reciprocal of the value calculated above, so
-    * pow(out,g) is an *input* value.  'last' is the last input value set.
-    *
-    * In the loop 'i' is used to find output values.  Since the output is
-    * 8-bit there are only 256 possible values.  The tables are set up to
-    * select the closest possible output value for each input by finding
-    * the input value at the boundary between each pair of output values
-    * and filling the table up to that boundary with the lower output
-    * value.
-    *
-    * The boundary values are 0.5,1.5..253.5,254.5.  Since these are 9-bit
-    * values the code below uses a 16-bit value in i; the values start at
-    * 128.5 (for 0.5) and step by 257, for a total of 254 values (the last
-    * entries are filled with 255).  Start i at 128 and fill all 'last'
-    * table entries <= 'max'
-    */
-   last = 0;
-   for (i = 0; i < 255; ++i) /* 8-bit output value */
-   {
-      /* Find the corresponding maximum input value */
-      png_uint_16 out = (png_uint_16)(i * 257U); /* 16-bit output value */
-
-      /* Find the boundary value in 16 bits: */
-      png_uint_32 bound = png_gamma_16bit_correct(out+128U, gamma_val);
-
-      /* Adjust (round) to (16-shift) bits: */
-      bound = (bound * max + 32768U)/65535U + 1U;
-
-      while (last < bound)
-      {
-         table[last & (0xffU >> shift)][last >> (8U - shift)] = out;
-         last++;
-      }
-   }
-
-   /* And fill in the final entries. */
-   while (last < (num << 8))
-   {
-      table[last & (0xff >> shift)][last >> (8U - shift)] = 65535U;
-      last++;
-   }
-}
-
-/* Build a single 8-bit table: same as the 16-bit case but much simpler (and
- * typically much faster).  Note that libpng currently does no sBIT processing
- * (apparently contrary to the spec) so a 256 entry table is always generated.
- */
-static void
-png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
-   PNG_CONST png_fixed_point gamma_val)
-{
-   unsigned int i;
-   png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);
-
-   if (png_gamma_significant(gamma_val)) for (i=0; i<256; i++)
-      table[i] = png_gamma_8bit_correct(i, gamma_val);
-
-   else for (i=0; i<256; ++i)
-      table[i] = (png_byte)i;
-}
-
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
-   defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
-   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-static void
-png_build_8to16_table(png_structrp png_ptr, png_uint_16pp ptable,
-   PNG_CONST png_fixed_point gamma_val)
-{
-   unsigned int i;
-   png_uint_16p table = *ptable = (png_uint_16p)png_malloc(png_ptr,
-      sizeof (png_uint_16[256]));
-
-   if (png_gamma_significant(gamma_val)) for (i=0; i<256; i++)
-      table[i] = png_gamma_16bit_correct(i*257, gamma_val);
-
-   else for (i=0; i<256; ++i)
-      table[i] = (png_uint_16)(i*257);
-}
-
-static void
-png_build_16to8_table(png_structrp png_ptr, png_bytepp ptable8,
-   png_uint_16pp ptable16, png_fixed_point gamma_val, int gamma_shift)
-   /* Build a table of (1<<(16-gamma_shift))+1 entries to find 8-bit values
-    * encoded by gamma_val.  The table is to be indexed with a 16-bit value
-    * scaled down by gamma_shift:
-    *
-    *    table[(value + (1<<(gamma_shift-1)) >> gamma_shift]
-    *
-    * Because of the rounding the table is 2^(16-gamma_shift)+1 entries.
-    * Each table entry must contain value^gamma_val, rounded to 8 bits.
-    */
-{
-   unsigned int size = 1U << (16-gamma_shift);
-   unsigned int add = (gamma_shift > 0 ? 1U<<(gamma_shift-1) : 0U);
-   png_bytep table8;
-   png_uint_16p table16;
-   unsigned int i;
-
-   /* If 'table8' it gets the output values as 8-bit bytes, if 'table16' is set
-    * the same values are scaled by 257 to give 16-bit values.
-    */
-   if (ptable8)
-   {
-      table8 = png_voidcast(png_bytep, png_malloc(png_ptr, size+1));
-      *ptable8 = table8;
-      table8[0] = 0;
-   }
-
-   else
-      table8 = NULL;
-
-   if (ptable16)
-   {
-      table16 = png_voidcast(png_uint_16p, png_malloc(png_ptr,
-         sizeof (png_uint_16) * (size+1)));
-      *ptable16 = table16;
-      table16[0] = 0;
-   }
-
-   else
-      table16 = NULL;
-
-   i = 1;
-
-#  define FILL(val) do {\
-      if (table8) table8[i] = (val);\
-      if (table16) table16[i] = (png_uint_16)((val)*257U);\
-      ++i;
-   } while (0)
-
-   if (gamma_val < PNG_FP_1 - PNG_GAMMA_THRESHOLD_FIXED)
-   {
-      /* gamma < 1; the output values will jump by more than one for each table
-       * entry initially.
-       */
-      png_byte last_out = 0;
-
-      while (i < size)
-      {
-         png_byte out = (png_byte)PNG_DIV257(png_gamma_16bit_correct(
-            i << gamma_shift, gamma_val));
-
-         FILL(out);
-
-         if (out <= last_out)
-         {
-            /* The table values are no longer advancing at each step, swap to
-             * finding the *last* table index corresponding to this value
-             * of 'out' - this is the one that corresponds to out+.5, below this
-             * is calculated as out*257+128; the exact value would be
-             * out*257+128.5, so we get a lower value, rounding ensures that we
-             * fill all the table entries corresponding to 'out' (with some very
-             * small chance of error at the boundaries.)
-             */
-            png_fixed_point gamma_inv = png_reciprocal(gamma_val);
-
-            while (out < 255 && i < size)
-            {
-               unsigned int next_index = (png_gamma_16bit_correct(out*257+128,
-                  gamma_inv) + add) >> gamma_shift;
-
-               while (i <= next_index && i < size)
-                  FILL(out);
-
-               ++out;
-            }
-
-            break; /* fill remaining entries with 255 */
-         }
-      }
-   }
-
-   else if (gamma_val > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED)
-   {
-      /* gamma > 1; initially multiple table entries will correspond to the same
-       * value, invert the above loops.
-       */
-      png_fixed_point gamma_inv = png_reciprocal(gamma_val);
-      png_byte out = 0;
-
-      while (out < 255)
-      {
-         unsigned int next_index = (png_gamma_16bit_correct(out*257+128,
-            gamma_inv) + add) >> gamma_shift;
-
-         /* If this 'out' value falls in the same slot as the last one
-          * recalculate the value for this slot.
-          */
-         if (next_index <= i)
-         {
-            i = next_index;
-            break;
-         }
-
-         while (i <= next_index && i < size)
-            FILL(out);
-
-         ++out;
-      }
-
-      while (i < size && out < 255)
-      {
-         out = (png_byte)PNG_DIV257(png_gamma_16bit_correct(i << gamma_shift,
-            gamma_val));
-         FILL(out);
-      }
-   }
-
-   else /* gamma_val not significant */
-   {
-      png_byte out = 0; /* current output value */
-
-      add += 128;
-
-      while (out < 255 && i < size) {
-         unsigned int next_index = (out*257+add) >> gamma_shift;
-         
-         while (i <= next_index && i < size)
-            FILL(out);
-
-         ++out;
-      }
-   }
-
-   /* Fill in the remainder of the table */
-   while (i <= size)
-      FILL(255);
-}
-#endif /* BACKGROUND || ALPHA_MODE || RGB_TO_GRAY */
-#endif /* UNUSED */
 
 #define PNG_GAMMA_TABLE_8       0 /* 8-bit entries in png_byte */
 #define PNG_GAMMA_TABLE_8_IN_16 1 /* 8-bit entries * 257 in png_uint_16 */

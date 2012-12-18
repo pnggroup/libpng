@@ -4363,6 +4363,15 @@ Version 1.7.0alpha03 [December 18, 2012]
     been removed.
   Documented new PNG_ABORT behavior in the manual and commentary in pngerror.c
   Cleaned up whitespace in the synopsis portion of the manpage "libpng.3"
+  Fixed previous support for Z_PREFIX in configure builds, corrected sCAL APIs;
+    some of these use floating point arithmetic so they need to be disabled if
+    floating point arithmetic is switched off.  This is a quiet API change -
+    previously it appeared that the APIs were supported if fixed point
+    arithmetic was used internally, however they required certain APIs (floor,
+    modf, frexp, atof) that are part of C floating point support. Changed
+    png_fixed and the gamma code specific version of the same to avoid floor(),
+    which may be a library function (not an intrinsic). Removed unused #if 0
+    code.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

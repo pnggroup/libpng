@@ -431,7 +431,8 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
    info_ptr->free_me |= PNG_FREE_SCAL;
 }
 
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
+#  if defined PNG_FLOATING_POINT_SUPPORTED &&\
+      defined PNG_FLOATING_ARITHMETIC_SUPPORTED
 void PNGAPI
 png_set_sCAL(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
     double width, double height)
