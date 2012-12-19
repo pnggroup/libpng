@@ -4373,11 +4373,12 @@ Version 1.7.0alpha03 [December 19, 2012]
     which may be a library function (not an intrinsic). Removed unused #if 0
     code.
   Disassembled the version number in scripts/options.awk (necessary for
-    building on SunOs)
+    building on SunOs).
 
   ===========================================================================
-  NOTICE: The location of the git repository at SourceForge has changed.
-          visit http://libpng.sf.net/ for details.
+                       NOTICE November 17, 2012:
+     The location of the git repository at SourceForge has changed.
+               Visit http://libpng.sf.net/ for details.
   ===========================================================================
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
