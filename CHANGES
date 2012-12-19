@@ -3944,11 +3944,14 @@ Version 1.5.14beta03 [December 15, 2012]
 Version 1.5.14beta04 [December 19, 2012]
   Cleaned up whitespace in the synopsis portion of the manpage "libpng.3"
   Disassembled the version number in scripts/options.awk (necessary for
-    building on SunOs)
+    building on SunOs).
+
+Version 1.5.14beta05 [December 19, 2012]
 
   ===========================================================================
-  NOTICE: The location of the git repository at SourceForge has changed.
-          visit http://libpng.sf.net/ for details.
+                       NOTICE November 17, 2012:
+     The location of the git repository at SourceForge has changed.
+               Visit http://libpng.sf.net/ for details.
   ===========================================================================
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
