@@ -4316,10 +4316,15 @@ Version 1.6.0beta33 [December 15, 2012]
   Fixed cases of unquoted DESTDIR in Makefile.am
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.12.5.
 
-Version 1.6.0beta34 [December 18, 2012]
+Version 1.6.0beta34 [December 19, 2012]
   Cleaned up whitespace in the synopsis portion of the manpage "libpng.3"
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs)
+
+  ===========================================================================
+  NOTICE: The location of the git repository at SourceForge has changed.
+          visit http://libpng.sf.net/ for details.
+  ===========================================================================
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
