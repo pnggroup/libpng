@@ -4321,6 +4321,8 @@ Version 1.6.0beta34 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
+Version 1.6.0beta35 [December 19, 2012]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
