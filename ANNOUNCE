@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha03 - December 19, 2012
+Libpng 1.7.0alpha04 - December 19, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0alpha03.tar.xz (LZMA-compressed, recommended)
-   1.7.0alpha03.tar.gz
-   1.7.0alpha03.tar.bz2
+   1.7.0alpha04.tar.xz (LZMA-compressed, recommended)
+   1.7.0alpha04.tar.gz
+   1.7.0alpha04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170a03.7z  (LZMA-compressed, recommended)
-   lp170a03.zip
+   lp170a04.7z  (LZMA-compressed, recommended)
+   lp170a04.zip
 
 Other information:
 
-   1.7.0alpha03-README.txt
-   1.7.0alpha03-LICENSE.txt
+   1.7.0alpha04-README.txt
+   1.7.0alpha04-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -89,6 +89,8 @@ Version 1.7.0alpha03 [December 19, 2012]
     code.
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
+
+Version 1.7.0alpha04 [December 19, 2012]
 
   ===========================================================================
                        NOTICE November 17, 2012:

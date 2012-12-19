@@ -5,6 +5,6 @@ includedir=@includedir@/libpng17
 
 Name: libpng
 Description: Loads and saves PNG files
-Version: 1.7.0alpha03
+Version: 1.7.0alpha04
 Libs: -L${libdir} -lpng17
 Cflags: -I${includedir}

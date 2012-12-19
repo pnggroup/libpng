@@ -4375,6 +4375,8 @@ Version 1.7.0alpha03 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
+Version 1.7.0alpha04 [December 19, 2012]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
