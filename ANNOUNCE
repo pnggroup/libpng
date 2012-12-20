@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha04 - December 19, 2012
+Libpng 1.7.0alpha04 - December 20, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -90,7 +90,8 @@ Version 1.7.0alpha03 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
-Version 1.7.0alpha04 [December 19, 2012]
+Version 1.7.0alpha04 [December 20, 2012]
+  Added scripts/makefile.msys contributed by Christopher M. Wheeler
 
   ===========================================================================
                        NOTICE November 17, 2012:

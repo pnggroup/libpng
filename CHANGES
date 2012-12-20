@@ -4375,7 +4375,8 @@ Version 1.7.0alpha03 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
-Version 1.7.0alpha04 [December 19, 2012]
+Version 1.7.0alpha04 [December 20, 2012]
+  Added scripts/makefile.msys contributed by Christopher M. Wheeler
 
   ===========================================================================
                        NOTICE November 17, 2012:
