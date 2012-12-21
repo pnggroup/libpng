@@ -959,7 +959,8 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
             PNG_MAX_PALETTE_LENGTH));
          info_ptr->free_me |= PNG_FREE_TRNS;
 
-         memcpy(info_ptr->trans_alpha, trans_alpha, num_trans);
+         memcpy(info_ptr->trans_alpha, trans_alpha,
+            (unsigned)/*SAFE*/num_trans);
          info_ptr->valid |= PNG_INFO_tRNS;
          info_ptr->num_trans = (png_uint_16)num_trans; /* SAFE */
       }

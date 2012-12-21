@@ -1289,14 +1289,15 @@ png_init_background_transformations(png_structrp png_ptr)
           */
          if (expand && (color_type & PNG_COLOR_MASK_PALETTE) != 0)
          {
-            unsigned int index = png_ptr->background.index;
+            unsigned int background_index = png_ptr->background.index;
 
-            if (index < png_ptr->num_palette && png_ptr->palette != NULL)
+            if (background_index < png_ptr->num_palette &&
+               png_ptr->palette != NULL)
             {
                /* In fact 'mult' is always 1 at present in this case */
-               CORRECT(png_ptr->palette[index].red, red);
-               CORRECT(png_ptr->palette[index].green, green);
-               CORRECT(png_ptr->palette[index].blue, blue);
+               CORRECT(png_ptr->palette[background_index].red, red);
+               CORRECT(png_ptr->palette[background_index].green, green);
+               CORRECT(png_ptr->palette[background_index].blue, blue);
             }
 
             else

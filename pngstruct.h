@@ -148,8 +148,16 @@ struct png_struct_def
     * (char), (short), (int) and pointer types are kept separate, however
     * associated members under the control of the same #define are still
     * together.
-    *
-    * First the frequently accessed fields.  Many processors perform arithmetic
+    */
+#ifdef PNG_SETJMP_SUPPORTED
+   /* jmp_buf can have very high alignment requirements on some systems, so put
+    * it first (the other setjmp members are later as they are infrequently
+    * accesed.)
+    */
+   jmp_buf jmp_buf_local;
+#endif
+
+   /* Next the frequently accessed fields.  Many processors perform arithmetic
     * in the address pipeline, but frequently the amount of addition or
     * subtraction is limited.  By putting these fields at the head of png_struct
     * the hope is that such processors will generate code that is both smaller
@@ -198,10 +206,6 @@ struct png_struct_def
 
    /* ERROR HANDLING */
 #ifdef PNG_SETJMP_SUPPORTED
-   /* jmp_buf can have very high alignment requirements on some systems, so put
-    * it first.
-    */
-   jmp_buf         jmp_buf_local;
    jmp_buf        *jmp_buf_ptr;   /* passed to longjmp_fn */
    png_longjmp_ptr longjmp_fn;    /* setjmp non-local goto function. */
    size_t          jmp_buf_size;  /* size of *jmp_buf_ptr, if allocated */

@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0alpha04 - December 19, 2012" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0alpha04 - December 21, 2012" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2012 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0alpha04 - December 19, 2012\
+      return "libpng version 1.7.0alpha04 - December 21, 2012\
       Copyright (c) 1998-2012 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3589,7 +3589,7 @@ typedef struct
    png_uint_32     mult;
    unsigned int    add;
    unsigned int    shift;  /* input value is (i * mult + add) >> shift */
-   unsigned int    output; /* One of the above values */
+   int             output; /* One of the above values */
    int             adjust; /* Divide or multiple output by 257 */
    png_voidp       table;  /* Lookup table */
 }  gamma_table_data;
@@ -3679,7 +3679,7 @@ write_gamma_table(const gamma_table_data *data, png_uint_32 lo,
 
 static void *
 png_build_gamma_table(png_structrp png_ptr, png_fixed_point gamma_val,
-   unsigned int output/*as above*/, unsigned int input_depth, int use_shift)
+   int output/*as above*/, int input_depth, int use_shift)
    /* Build a gamma lookup table to encode input_depth bit input values.
     * The table will have 2^input_depth entries plus an extra one if use_shift
     * is specified.  With shift the table is accessed:
