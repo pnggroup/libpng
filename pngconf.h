@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.0beta35 - December 19, 2012
+ * libpng version 1.6.0beta35 - December 21, 2012
  *
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -198,18 +198,16 @@
  * ==========================
  * This code is used at build time to find PNG_IMPEXP, the API settings
  * and PNG_EXPORT_TYPE(), it may also set a macro to indicate the DLL
- * import processing is possible.  On Windows/x86 systems it also sets
+ * import processing is possible.  On Windows systems it also sets
  * compiler-specific macros to the values required to change the calling
  * conventions of the various functions.
  */
-#if ( defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
-      defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__) ) &&\
-    ( defined(_X86_) || defined(_X64_) || defined(_M_IX86) ||\
-      defined(_M_X64) || defined(_M_IA64) )
-  /* Windows system (DOS doesn't support DLLs) running on x86/x64.  Includes
-   * builds under Cygwin or MinGW.  Also includes Watcom builds but these need
-   * special treatment because they are not compatible with GCC or Visual C
-   * because of different calling conventions.
+#if defined(_Windows) || defined(_WINDOWS) || defined(WIN32) ||\
+    defined(_WIN32) || defined(__WIN32__) || defined(__CYGWIN__)
+  /* Windows system (DOS doesn't support DLLs).  Includes builds under Cygwin or
+   * MinGW on any architecture currently supported by Windows.  Also includes
+   * Watcom builds but these need special treatment because they are not
+   * compatible with GCC or Visual C because of different calling conventions.
    */
 #  if PNG_API_RULE == 2
     /* If this line results in an error, either because __watcall is not
@@ -223,6 +221,9 @@
 #  if defined(__GNUC__) || (defined (_MSC_VER) && (_MSC_VER >= 800))
 #    define PNGCAPI __cdecl
 #    if PNG_API_RULE == 1
+       /* If this line results in an error __stdcall is not understood and
+        * PNG_API_RULE should not have been set to '1'.
+        */
 #      define PNGAPI __stdcall
 #    endif
 #  else
@@ -260,7 +261,7 @@
 #    endif
 #  endif /* compiler */
 
-#else /* !Windows/x86 */
+#else /* !Windows */
 #  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
 #    define PNGAPI _System
 #  else /* !Windows/x86 && !OS/2 */

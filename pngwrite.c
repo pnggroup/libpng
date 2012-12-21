@@ -447,7 +447,6 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
 }
 
 #ifdef PNG_CONVERT_tIME_SUPPORTED
-/* "tm" structure is not supported on WindowsCE */
 void PNGAPI
 png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
 {
