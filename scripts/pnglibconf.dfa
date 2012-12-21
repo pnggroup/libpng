@@ -182,6 +182,22 @@ setting PREFIX
 
 setting DEFAULT_READ_MACROS default 1
 
+# These settings configure the default compression level (0-9) and 'strategy';
+# strategy is as defined by the implementors of zlib, it describes the input
+# data and modifies the zlib parameters in an attempt to optimize the balance
+# between search and huffman encoding in the zlib algorithms.  The defaults are
+# the zlib.h defaults - the apparently recursive definition does not arise
+# because the name of the setting is prefixed by PNG_
+#
+# The TEXT values are the defaults when writing compressed text (all forms)
+
+setting Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
+setting Z_DEFAULT_STRATEGY default Z_FILTERED
+setting Z_DEFAULT_NOFILTER_STRATEGY default Z_DEFAULT_STRATEGY
+
+setting TEXT_Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
+setting TEXT_Z_DEFAULT_STRATEGY default Z_DEFAULT_STRATEGY
+
 # The alternative is to call functions to read PNG values, if
 # the functions are turned *off* the read macros must always
 # be enabled, so turning this off will actually force the

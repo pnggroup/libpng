@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.6.0beta35 - December 19, 2012 */
+/* Libpng 1.6.0beta35 - December 21, 2012 */
 
 /* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
 
@@ -34,8 +34,13 @@
 #define PNG_QUANTIZE_RED_BITS 5
 #define PNG_sCAL_PRECISION 5
 #define PNG_sRGB_PROFILE_CHECKS 2
+#define PNG_TEXT_Z_DEFAULT_COMPRESSION Z_DEFAULT_COMPRESSION
+#define PNG_TEXT_Z_DEFAULT_STRATEGY Z_DEFAULT_STRATEGY
 #define PNG_WEIGHT_SHIFT 8
 #define PNG_ZBUF_SIZE 8192
+#define PNG_Z_DEFAULT_COMPRESSION Z_DEFAULT_COMPRESSION
+#define PNG_Z_DEFAULT_NOFILTER_STRATEGY Z_DEFAULT_STRATEGY
+#define PNG_Z_DEFAULT_STRATEGY Z_FILTERED
 /* end of settings */
 /* options */
 #define PNG_16BIT_SUPPORTED

@@ -501,15 +501,19 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     */
    png_ptr->zbuffer_size = PNG_ZBUF_SIZE;
 
-   png_ptr->zlib_strategy = Z_FILTERED; /* may be overridden if no filters */
-   png_ptr->zlib_level = Z_DEFAULT_COMPRESSION;
+   /* The 'zlib_strategy' setting is irrelevant because png_default_claim in
+    * pngwutil.c defaults it according to whether or not filters will be used,
+    * and ignores this setting.
+    */
+   png_ptr->zlib_strategy = PNG_Z_DEFAULT_STRATEGY;
+   png_ptr->zlib_level = PNG_Z_DEFAULT_COMPRESSION;
    png_ptr->zlib_mem_level = 8;
    png_ptr->zlib_window_bits = 15;
    png_ptr->zlib_method = 8;
 
 #ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
-   png_ptr->zlib_text_strategy = Z_DEFAULT_STRATEGY;
-   png_ptr->zlib_text_level = Z_DEFAULT_COMPRESSION;
+   png_ptr->zlib_text_strategy = PNG_TEXT_Z_DEFAULT_STRATEGY;
+   png_ptr->zlib_text_level = PNG_TEXT_Z_DEFAULT_COMPRESSION;
    png_ptr->zlib_text_mem_level = 8;
    png_ptr->zlib_text_window_bits = 15;
    png_ptr->zlib_text_method = 8;
