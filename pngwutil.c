@@ -338,10 +338,10 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
             strategy = png_ptr->zlib_strategy;
 
          else if (png_ptr->do_filter != PNG_FILTER_NONE)
-            strategy = Z_FILTERED;
+            strategy = PNG_Z_DEFAULT_STRATEGY;
 
          else
-            strategy = Z_DEFAULT_STRATEGY;
+            strategy = PNG_Z_DEFAULT_NOFILTER_STRATEGY;
       }
 
       else

@@ -203,6 +203,24 @@ setting ZLIB_PREFIX
 
 setting ZLIB_HEADER default <zlib.h>
 
+# These settings configure the default compression level (0-9) and 'strategy';
+# strategy is as defined by the implementors of zlib, it describes the input
+# data and modifies the zlib parameters in an attempt to optimize the balance
+# between search and huffman encoding in the zlib algorithms.  The defaults are
+# the zlib.h defaults - the apparently recursive definition does not arise
+# because the name of the setting is prefixed by PNG_
+#
+# The TEXT values are the defaults when writing compressed text (all forms)
+
+setting Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
+# TODO: why aren't these Z_RLE; zlib.h says that Z_RLE, specifically, is
+# appropriate for PNG images, maybe it doesn't exist in all versions?
+setting Z_DEFAULT_STRATEGY default Z_FILTERED
+setting Z_DEFAULT_NOFILTER_STRATEGY default Z_DEFAULT_STRATEGY
+
+setting TEXT_Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
+setting TEXT_Z_DEFAULT_STRATEGY default Z_DEFAULT_STRATEGY
+
 # Define this to something that will stop, at least, the current thread; control
 # cannot proceed beyond the PNG_ABORT operation and compilation of pngerror.c is
 # likely to fail if the operation implemented does not clearly terminate the
