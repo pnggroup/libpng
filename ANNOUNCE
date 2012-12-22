@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta35 - December 21, 2012
+Libpng 1.6.0beta35 - December 22, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -569,14 +569,14 @@ Version 1.6.0beta34 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
-Version 1.6.0beta35 [December 21, 2012]
+Version 1.6.0beta35 [December 22, 2012]
   Made default Zlib compression settings be configurable. This adds #defines to
     pnglibconf.h to control the defaults.
-  Fixed Windows build issues, enabled ARM compilation. Various warnings issued by
-    earlier versions of GCC fixed for Cygwin and Min/GW (which both use old GCCs.)
-    ARM support is enabled by default in zlib.props (unsupported by Microsoft) and
-    ARM compilation is made possible by deleting the check for x86. The test programs
-    cannot be run because they are not signed.
+  Fixed Windows build issues, enabled ARM compilation. Various warnings issued
+    by earlier versions of GCC fixed for Cygwin and Min/GW (which both use old
+    GCCs.) ARM support is enabled by default in zlib.props (unsupported by
+    Microsoft) and ARM compilation is made possible by deleting the check for
+    x86. The test programs cannot be run because they are not signed.
 
   ===========================================================================
                        NOTICE November 17, 2012:
