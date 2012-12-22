@@ -4385,6 +4385,8 @@ Version 1.7.0alpha04 [December 23, 2012]
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
 
+Version 1.7.0alpha05 [December 23, 2012]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
