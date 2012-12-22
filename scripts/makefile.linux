@@ -236,4 +236,4 @@ pngwtran.o pngwtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h   
 pngwutil.o pngwutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h
 pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h
 
-pngtest.o: png.h pngconf.h
+pngtest.o: png.h pngconf.h pnglibconf.h
