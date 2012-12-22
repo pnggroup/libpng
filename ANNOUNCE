@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta05 - December 22, 2012
+Libpng 1.5.14beta06 - December 23, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.14beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.14beta05.tar.gz
-   1.5.14beta05.tar.bz2
+   1.5.14beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.14beta06.tar.gz
+   1.5.14beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1514b05.7z  (LZMA-compressed, recommended)
-   lp1514b05.zip
+   lp1514b06.7z  (LZMA-compressed, recommended)
+   lp1514b06.zip
 
 Other information:
 
-   1.5.14beta05-README.txt
-   1.5.14beta05-LICENSE.txt
+   1.5.14beta06-README.txt
+   1.5.14beta06-LICENSE.txt
 
 Changes since the last public release (1.5.13):
 
@@ -53,12 +53,14 @@ Version 1.5.14beta04 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
-Version 1.5.14beta05 [December 22, 2012]
+Version 1.5.14beta05 [December 23, 2012]
   Fixed Windows build issues, enabled ARM compilation. Various warnings issued
     by earlier versions of GCC fixed for Cygwin and Min/GW (which both use old
     GCCs.) ARM support is enabled by default in zlib.props (unsupported by
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
+
+Version 1.5.14beta06 [December 23, 2012]
 
   ===========================================================================
                        NOTICE November 17, 2012:
