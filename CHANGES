@@ -4321,7 +4321,7 @@ Version 1.6.0beta34 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
-Version 1.6.0beta35 [December 22, 2012]
+Version 1.6.0beta35 [December 23, 2012]
   Made default Zlib compression settings be configurable. This adds #defines to
     pnglibconf.h to control the defaults.
   Fixed Windows build issues, enabled ARM compilation. Various warnings issued
@@ -4329,6 +4329,8 @@ Version 1.6.0beta35 [December 22, 2012]
     GCCs.) ARM support is enabled by default in zlib.props (unsupported by
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
+
+Version 1.6.0beta36 [December 23, 2012]
 
   ===========================================================================
                        NOTICE November 17, 2012:

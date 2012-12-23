@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta35 - December 22, 2012
+Libpng 1.6.0beta36 - December 23, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta35.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta35.tar.gz
-   1.6.0beta35.tar.bz2
+   1.6.0beta36.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta36.tar.gz
+   1.6.0beta36.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b35.7z  (LZMA-compressed, recommended)
-   lp160b35.zip
+   lp160b36.7z  (LZMA-compressed, recommended)
+   lp160b36.zip
 
 Other information:
 
-   1.6.0beta35-README.txt
-   1.6.0beta35-LICENSE.txt
+   1.6.0beta36-README.txt
+   1.6.0beta36-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -569,7 +569,7 @@ Version 1.6.0beta34 [December 19, 2012]
   Disassembled the version number in scripts/options.awk (necessary for
     building on SunOs).
 
-Version 1.6.0beta35 [December 22, 2012]
+Version 1.6.0beta35 [December 23, 2012]
   Made default Zlib compression settings be configurable. This adds #defines to
     pnglibconf.h to control the defaults.
   Fixed Windows build issues, enabled ARM compilation. Various warnings issued
@@ -577,6 +577,8 @@ Version 1.6.0beta35 [December 22, 2012]
     GCCs.) ARM support is enabled by default in zlib.props (unsupported by
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
+
+Version 1.6.0beta36 [December 23, 2012]
 
   ===========================================================================
                        NOTICE November 17, 2012:
