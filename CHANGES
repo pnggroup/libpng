@@ -4389,6 +4389,8 @@ Version 1.7.0alpha05 [December 24, 2012]
   Discontinued distributing libpng-1.x.x.tar.bz2.
   Discontinued distributing libpng-1.7.0-1.6.0-diff.txt and similar.
 
+Version 1.7.0alpha06 [December 24, 2012]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.

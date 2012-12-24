@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha05 - December 24, 2012
+Libpng 1.7.0alpha06 - December 24, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0alpha05.tar.xz (LZMA-compressed, recommended)
-   1.7.0alpha05.tar.gz
-   1.7.0alpha05.tar.bz2
+   1.7.0alpha06.tar.xz (LZMA-compressed, recommended)
+   1.7.0alpha06.tar.gz
+   1.7.0alpha06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170a05.7z  (LZMA-compressed, recommended)
-   lp170a05.zip
+   lp170a06.7z  (LZMA-compressed, recommended)
+   lp170a06.zip
 
 Other information:
 
-   1.7.0alpha05-README.txt
-   1.7.0alpha05-LICENSE.txt
+   1.7.0alpha06-README.txt
+   1.7.0alpha06-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -103,6 +103,8 @@ Version 1.7.0alpha04 [December 23, 2012]
 Version 1.7.0alpha05 [December 24, 2012]
   Discontinued distributing libpng-1.x.x.tar.bz2.
   Discontinued distributing libpng-1.7.0-1.6.0-diff.txt and similar.
+
+Version 1.7.0alpha06 [December 24, 2012]
 
   ===========================================================================
                        NOTICE November 17, 2012:
