@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta36 - December 23, 2012
+Libpng 1.6.0beta36 - December 24, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -562,7 +562,7 @@ Version 1.6.0beta33 [December 15, 2012]
     to the hardware subdirectory and added comments to pngrutil.c so that
     implementors of other optimizations know what to do.
   Fixed cases of unquoted DESTDIR in Makefile.am
-  Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.12.5.
+  Rebuilt Makefile.in, etc., with autoconf-2.69 and automake-1.12.5.
 
 Version 1.6.0beta34 [December 19, 2012]
   Cleaned up whitespace in the synopsis portion of the manpage "libpng.3"
@@ -578,7 +578,10 @@ Version 1.6.0beta35 [December 23, 2012]
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
 
-Version 1.6.0beta36 [December 23, 2012]
+Version 1.6.0beta36 [December 24, 2012]
+  Discontinued distributing libpng-1.x.x.tar.bz2.
+  Discontinued distributing libpng-1.7.0-1.6.0-diff.txt and similar.
+  Rebuilt configure with autoconf-2.69 (inadvertently not done in beta33)
 
   ===========================================================================
                        NOTICE November 17, 2012:
