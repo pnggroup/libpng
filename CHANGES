@@ -4330,10 +4330,11 @@ Version 1.6.0beta35 [December 23, 2012]
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
 
-Version 1.6.0beta36 [December 24, 2012]
+Version 1.6.0beta36 [December 27, 2012]
   Discontinued distributing libpng-1.x.x.tar.bz2.
   Discontinued distributing libpng-1.7.0-1.6.0-diff.txt and similar.
   Rebuilt configure with autoconf-2.69 (inadvertently not done in beta33)
+  Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 
   ===========================================================================
                        NOTICE November 17, 2012:
