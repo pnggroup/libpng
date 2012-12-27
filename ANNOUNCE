@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha06 - December 24, 2012
+Libpng 1.7.0alpha06 - December 27, 2012
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -104,7 +104,8 @@ Version 1.7.0alpha05 [December 24, 2012]
   Discontinued distributing libpng-1.x.x.tar.bz2.
   Discontinued distributing libpng-1.7.0-1.6.0-diff.txt and similar.
 
-Version 1.7.0alpha06 [December 24, 2012]
+Version 1.7.0alpha06 [December 27, 2012]
+  Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 
   ===========================================================================
                        NOTICE November 17, 2012:
