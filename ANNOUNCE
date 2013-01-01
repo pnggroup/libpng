@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha06 - January 1, 2013
+Libpng 1.7.0alpha07 - January 1, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0alpha06.tar.xz (LZMA-compressed, recommended)
-   1.7.0alpha06.tar.gz
-   1.7.0alpha06.tar.bz2
+   1.7.0alpha07.tar.xz (LZMA-compressed, recommended)
+   1.7.0alpha07.tar.gz
+   1.7.0alpha07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170a06.7z  (LZMA-compressed, recommended)
-   lp170a06.zip
+   lp170a07.7z  (LZMA-compressed, recommended)
+   lp170a07.zip
 
 Other information:
 
-   1.7.0alpha06-README.txt
-   1.7.0alpha06-LICENSE.txt
+   1.7.0alpha07-README.txt
+   1.7.0alpha07-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -106,6 +106,8 @@ Version 1.7.0alpha05 [December 24, 2012]
 
 Version 1.7.0alpha06 [January 1, 2013]
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
+
+Version 1.7.0alpha07 [January 1, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
