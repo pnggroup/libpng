@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta36 - January 1, 2013
+Libpng 1.6.0beta37 - January 1, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta36.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta36.tar.gz
-   1.6.0beta36.tar.bz2
+   1.6.0beta37.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta37.tar.gz
+   1.6.0beta37.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b36.7z  (LZMA-compressed, recommended)
-   lp160b36.zip
+   lp160b37.7z  (LZMA-compressed, recommended)
+   lp160b37.zip
 
 Other information:
 
-   1.6.0beta36-README.txt
-   1.6.0beta36-LICENSE.txt
+   1.6.0beta37-README.txt
+   1.6.0beta37-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -578,11 +578,13 @@ Version 1.6.0beta35 [December 23, 2012]
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
 
-Version 1.6.0beta36 [January 1, 2013]
+Version 1.6.0beta36 [January 2, 2013]
   Discontinued distributing libpng-1.x.x.tar.bz2.
   Discontinued distributing libpng-1.7.0-1.6.0-diff.txt and similar.
   Rebuilt configure with autoconf-2.69 (inadvertently not done in beta33)
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
+
+Version 1.6.0beta37 [January 1, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
