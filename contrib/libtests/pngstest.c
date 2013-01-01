@@ -1,7 +1,7 @@
 /*-
  * pngstest.c
  *
- * Copyright (c) 2012 John Cunningham Bowler
+ * Copyright (c) 2013 John Cunningham Bowler
  *
  * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  *
