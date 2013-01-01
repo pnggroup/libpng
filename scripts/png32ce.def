@@ -5,7 +5,7 @@
 LIBRARY lpngce
 
 EXPORTS
-;Version 1.2.50
+;Version 1.2.51beta01
   png_build_grayscale_palette  @1
   png_check_sig        @2
   png_chunk_error      @3
