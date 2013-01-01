@@ -3957,6 +3957,8 @@ Version 1.5.14beta06 [January 1, 2013]
   Discontinued distributing libpng-1.5.14-1.5.13-diff.txt and similar.
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 
+Version 1.5.14beta07 [January 1, 2013]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
