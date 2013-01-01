@@ -3,7 +3,7 @@
 
 /* example.c - an example of using libpng
  * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
- * Maintained 1998-2012 Glenn Randers-Pehrson
+ * Maintained 1998-2013 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  * To the extent possible under law, the authors have waived
