@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.46 [February 25, 2011]
+ * Last changed in libpng 1.2.51 [February 25, 2011]
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,7 +17,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_50 Your_png_h_is_not_version_1_2_50;
+typedef version_1_2_51beta01 Your_png_h_is_not_version_1_2_51beta01;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
@@ -724,14 +724,14 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.2.50 - July 10, 2012" PNG_STRING_NEWLINE \
-     "Copyright (c) 1998-2011 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
+     "libpng version 1.2.51beta01 - January 1, 2013" PNG_STRING_NEWLINE \
+     "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.2.50 - July 10, 2012\
-      Copyright (c) 1998-2011 Glenn Randers-Pehrson\
+      return ((png_charp) "libpng version 1.2.51beta01 - January 1, 2013\
+      Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
 #endif
