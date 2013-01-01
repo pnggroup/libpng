@@ -2880,6 +2880,7 @@ version 1.4.13beta01 [January 1, 2013]
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
 
 version 1.4.13beta02 [January 1, 2013]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
