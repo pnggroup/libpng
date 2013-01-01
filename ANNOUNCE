@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta06 - December 27, 2012
+Libpng 1.5.14beta06 - January 1, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -60,7 +60,7 @@ Version 1.5.14beta05 [December 23, 2012]
     Microsoft) and ARM compilation is made possible by deleting the check for
     x86. The test programs cannot be run because they are not signed.
 
-Version 1.5.14beta06 [December 27, 2012]
+Version 1.5.14beta06 [January 1, 2013]
   Discontinued distributing libpng-1.5.14-1.5.13-diff.txt and similar.
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 

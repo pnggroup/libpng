@@ -2,7 +2,7 @@
 /* pngwrite.c - general routines to write a PNG file
  *
  * Last changed in libpng 1.5.14 [(PENDING RELEASE)]
- * Copyright (c) 1998-2012 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
