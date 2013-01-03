@@ -2777,9 +2777,11 @@ version 1.0.59 and 1.2.49 [March 29, 2012]
 version 1.0.60 and 1.2.50 [July 9, 2012]
   Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
 
-version 1.2.51beta01 [January 1, 2013]
+version 1.2.51beta01 [January 3, 2013]
   Rebuilt the configure scripts with autoconf-2.69
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
+  Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
+    in configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

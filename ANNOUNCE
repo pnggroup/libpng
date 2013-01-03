@@ -1,5 +1,5 @@
 
-Libpng 1.2.51beta01 - January 1, 2013
+Libpng 1.2.51beta01 - January 3, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,8 +42,10 @@ Other information:
 
 Changes since the last public release (1.2.50):
 
-version 1.2.51beta01 [January 1, 2013]
+version 1.2.51beta01 [January 3, 2013]
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
+  Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
+    in configure.ac
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

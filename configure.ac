@@ -31,7 +31,7 @@ PNGLIB_RELEASE=51
 dnl End of version number stuff
 
 AC_CONFIG_SRCDIR([pngget.c])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC
