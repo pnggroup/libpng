@@ -4746,7 +4746,9 @@ png_do_expand(png_row_infop row_info, png_bytep row,
          {
             if (row_info->bit_depth == 8)
             {
-               gray = gray & 0xff;
+               /* NOTE: prior to libpng 1.5.14 this cleared out the top bits of
+                * 'gray', however if those are set it is an error.
+                */
                sp = row + (png_size_t)row_width - 1;
                dp = row + (png_size_t)(row_width << 1) - 1;
 

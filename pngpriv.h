@@ -416,7 +416,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #if PNG_ALIGN_TYPE == PNG_ALIGN_SIZE
    /* This is used because in some compiler implementations non-aligned
     * structure members are supported, so the offsetof approach below fails.
-    * Set PNG_ALIGN_TO_SIZE=0 for compiler combinations where unaligned access
+    * Set PNG_ALIGN_SIZE=0 for compiler combinations where unaligned access
     * is good for performance.  Do not do this unless you have tested the result
     * and understand it.
     */
@@ -823,10 +823,8 @@ PNG_EXTERN void png_write_IEND PNGARG((png_structp png_ptr));
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_write_gAMA PNGARG((png_structp png_ptr, double file_gamma));
 #  endif
-#  ifdef PNG_FIXED_POINT_SUPPORTED
 PNG_EXTERN void png_write_gAMA_fixed PNGARG((png_structp png_ptr,
     png_fixed_point file_gamma));
-#  endif
 #endif
 
 #ifdef PNG_WRITE_sBIT_SUPPORTED
@@ -1491,14 +1489,16 @@ PNG_EXTERN void png_formatted_warning(png_structp png_ptr,
 /* ASCII to FP interfaces, currently only implemented if sCAL
  * support is required.
  */
-#if defined(PNG_READ_sCAL_SUPPORTED)
+#ifdef PNG_sCAL_SUPPORTED
 /* MAX_DIGITS is actually the maximum number of characters in an sCAL
  * width or height, derived from the precision (number of significant
  * digits - a build time settable option) and assumpitions about the
  * maximum ridiculous exponent.
  */
 #define PNG_sCAL_MAX_DIGITS (PNG_sCAL_PRECISION+1/*.*/+1/*E*/+10/*exponent*/)
+#endif
 
+#ifdef PNG_sCAL_SUPPORTED
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 PNG_EXTERN void png_ascii_from_fp PNGARG((png_structp png_ptr, png_charp ascii,
     png_size_t size, double fp, unsigned int precision));
@@ -1629,7 +1629,7 @@ PNG_EXTERN png_fixed_point png_muldiv_warn PNGARG((png_structp png_ptr,
     png_fixed_point a, png_int_32 multiplied_by, png_int_32 divided_by));
 #endif
 
-#ifdef PNG_READ_GAMMA_SUPPORTED
+#if (defined PNG_READ_GAMMA_SUPPORTED) || (defined PNG_cHRM_SUPPORTED)
 /* Calculate a reciprocal - used for gamma values.  This returns
  * 0 if the argument is 0 in order to maintain an undefined value,
  * there are no warnings.
@@ -1663,6 +1663,62 @@ PNG_EXTERN void png_destroy_gamma_table(png_structp png_ptr);
 PNG_EXTERN void png_build_gamma_table PNGARG((png_structp png_ptr,
     int bit_depth));
 #endif
+
+/* Missing declarations if FIXED_POINT is *not* supported - fixed properly
+ * in libpng 1.6
+ */
+#ifndef PNG_FIXED_POINT_SUPPORTED
+#ifdef PNG_cHRM_SUPPORTED
+PNG_EXTERN png_uint_32 png_get_cHRM_XYZ_fixed PNGARG(
+    (png_structp png_ptr, png_const_infop info_ptr,
+    png_fixed_point *int_red_X, png_fixed_point *int_red_Y,
+    png_fixed_point *int_red_Z, png_fixed_point *int_green_X,
+    png_fixed_point *int_green_Y, png_fixed_point *int_green_Z,
+    png_fixed_point *int_blue_X, png_fixed_point *int_blue_Y,
+    png_fixed_point *int_blue_Z));
+PNG_EXTERN void png_set_cHRM_XYZ_fixed PNGARG((png_structp png_ptr,
+    png_infop info_ptr, png_fixed_point int_red_X, png_fixed_point int_red_Y,
+    png_fixed_point int_red_Z, png_fixed_point int_green_X,
+    png_fixed_point int_green_Y, png_fixed_point int_green_Z,
+    png_fixed_point int_blue_X, png_fixed_point int_blue_Y,
+    png_fixed_point int_blue_Z));
+PNG_EXTERN void png_set_cHRM_fixed PNGARG((png_structp png_ptr,
+    png_infop info_ptr, png_fixed_point int_white_x,
+    png_fixed_point int_white_y, png_fixed_point int_red_x,
+    png_fixed_point int_red_y, png_fixed_point int_green_x,
+    png_fixed_point int_green_y, png_fixed_point int_blue_x,
+    png_fixed_point int_blue_y));
+#endif
+
+#ifdef PNG_gAMA_SUPPORTED
+PNG_EXTERN png_uint_32 png_get_gAMA_fixed PNGARG(
+    (png_const_structp png_ptr, png_const_infop info_ptr,
+    png_fixed_point *int_file_gamma));
+PNG_EXTERN void png_set_gAMA_fixed PNGARG((png_structp png_ptr,
+    png_infop info_ptr, png_fixed_point int_file_gamma));
+#endif
+
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
+PNG_EXTERN void png_set_background_fixed PNGARG((png_structp png_ptr,
+    png_const_color_16p background_color, int background_gamma_code,
+    int need_expand, png_fixed_point background_gamma));
+#endif
+
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
+PNG_EXTERN void png_set_alpha_mode_fixed PNGARG((png_structp png_ptr,
+    int mode, png_fixed_point output_gamma));
+#endif
+
+#ifdef PNG_READ_GAMMA_SUPPORTED
+PNG_EXTERN void png_set_gamma_fixed PNGARG((png_structp png_ptr,
+    png_fixed_point screen_gamma, png_fixed_point override_file_gamma));
+#endif
+
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+PNG_EXTERN void png_set_rgb_to_gray_fixed PNGARG((png_structp png_ptr,
+    int error_action, png_fixed_point red, png_fixed_point green));
+#endif
+#endif /* FIX MISSING !FIXED_POINT DECLARATIONS */
 
 #ifdef PNG_FILTER_OPTIMIZATIONS
 PNG_EXTERN void PNG_FILTER_OPTIMIZATIONS(png_structp png_ptr, unsigned int bpp);

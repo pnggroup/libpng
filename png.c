@@ -658,13 +658,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.14beta07 - January 1, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.5.14beta07 - January 6, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.14beta07 - January 1, 2013\
+      return "libpng version 1.5.14beta07 - January 6, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1461,7 +1461,7 @@ png_check_fp_string(png_const_charp string, png_size_t size)
 }
 #endif /* pCAL or sCAL */
 
-#ifdef PNG_READ_sCAL_SUPPORTED
+#ifdef PNG_sCAL_SUPPORTED
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
 /* Utility used below - a simple accurate power of ten from an integral
  * exponent.
@@ -2047,7 +2047,8 @@ png_muldiv_warn(png_structp png_ptr, png_fixed_point a, png_int_32 times,
 }
 #endif
 
-#ifdef PNG_READ_GAMMA_SUPPORTED /* more fixed point functions for gamma */
+#if (defined PNG_READ_GAMMA_SUPPORTED) || (defined PNG_cHRM_SUPPORTED)
+/* more fixed point functions for gamma and cHRM (xy/XYZ) suport. */
 /* Calculate a reciprocal, return 0 on div-by-zero or overflow. */
 png_fixed_point
 png_reciprocal(png_fixed_point a)
@@ -2067,6 +2068,7 @@ png_reciprocal(png_fixed_point a)
    return 0; /* error/overflow */
 }
 
+#ifdef PNG_READ_GAMMA_SUPPORTED
 /* A local convenience routine. */
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
@@ -2088,6 +2090,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 
    return 0; /* overflow */
 }
+#endif /* READ_GAMMA */
 
 /* The inverse of the above. */
 png_fixed_point
@@ -2115,7 +2118,7 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
 
    return 0; /* overflow */
 }
-#endif /* READ_GAMMA */
+#endif /* READ_GAMMA || cHRM */
 
 #ifdef PNG_CHECK_cHRM_SUPPORTED
 /* Added at libpng version 1.2.34 (Dec 8, 2008) and 1.4.0 (Jan 2,

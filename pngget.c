@@ -175,6 +175,9 @@ png_get_pixel_aspect_ratio(png_const_structp png_ptr, png_const_infop info_ptr)
          return ((float)((float)info_ptr->y_pixels_per_unit
              /(float)info_ptr->x_pixels_per_unit));
    }
+#else
+   PNG_UNUSED(png_ptr)
+   PNG_UNUSED(info_ptr)
 #endif
 
    return ((float)0.0);
@@ -203,6 +206,9 @@ png_get_pixel_aspect_ratio_fixed(png_const_structp png_ptr,
           (png_int_32)info_ptr->x_pixels_per_unit))
          return res;
    }
+#else
+   PNG_UNUSED(png_ptr)
+   PNG_UNUSED(info_ptr)
 #endif
 
    return 0;
