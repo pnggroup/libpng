@@ -3957,7 +3957,7 @@ Version 1.5.14beta06 [January 1, 2013]
   Discontinued distributing libpng-1.5.14-1.5.13-diff.txt and similar.
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 
-Version 1.5.14beta07 [January 6, 2013]
+Version 1.5.14beta07 [January 6, 2012]
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
   De-configured build fixes to make a range of deconfiguration options (such
@@ -3965,6 +3965,8 @@ Version 1.5.14beta07 [January 6, 2013]
     pngtest and pngvalid to the libpng 1.6 versions (with some modifications)
     which provide more extensive testing.  Replaced pngtest.png because pngtest
     writes the ancillary chunks in a different order.
+
+Version 1.5.14beta08 [January 7, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:

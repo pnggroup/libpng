@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta07 - January 6, 2013
+Libpng 1.5.14beta08 - January 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.14beta07.tar.xz (LZMA-compressed, recommended)
-   1.5.14beta07.tar.gz
-   1.5.14beta07.tar.bz2
+   1.5.14beta08.tar.xz (LZMA-compressed, recommended)
+   1.5.14beta08.tar.gz
+   1.5.14beta08.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1514b07.7z  (LZMA-compressed, recommended)
-   lp1514b07.zip
+   lp1514b08.7z  (LZMA-compressed, recommended)
+   lp1514b08.zip
 
 Other information:
 
-   1.5.14beta07-README.txt
-   1.5.14beta07-LICENSE.txt
+   1.5.14beta08-README.txt
+   1.5.14beta08-LICENSE.txt
 
 Changes since the last public release (1.5.13):
 
@@ -64,7 +64,7 @@ Version 1.5.14beta06 [January 1, 2013]
   Discontinued distributing libpng-1.5.14-1.5.13-diff.txt and similar.
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 
-Version 1.5.14beta07 [January 6, 2013]
+Version 1.5.14beta07 [January 6, 2012]
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
   De-configured build fixes to make a range of deconfiguration options (such
@@ -72,6 +72,8 @@ Version 1.5.14beta07 [January 6, 2013]
     pngtest and pngvalid to the libpng 1.6 versions (with some modifications)
     which provide more extensive testing.  Replaced pngtest.png because pngtest
     writes the ancillary chunks in a different order.
+
+Version 1.5.14beta08 [January 7, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
