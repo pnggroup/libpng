@@ -1086,11 +1086,12 @@ check_location(png_const_structrp png_ptr, int location)
 
 void PNGAPI
 png_set_unknown_chunks(png_const_structrp png_ptr,
-   png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
+   png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns_in)
 {
+   png_uint_32 num_unknowns;
    png_unknown_chunkp np;
 
-   if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0)
+   if (png_ptr == NULL || info_ptr == NULL || num_unknowns_in <= 0)
       return;
 
    /* Check for the failure cases where support has been disabled at compile
@@ -1121,9 +1122,24 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
     * undefined behavior.  Changing to png_malloc fixes this by producing a
     * png_error.  The (png_size_t) cast was also removed as it hides a potential
     * overflow.
-    *
-    * TODO: fix the potential overflow in the multiply
     */
+   num_unknowns = (unsigned int)/*SAFE*/num_unknowns_in;
+
+   /* There are two overflow conditions, one on the count one on memory, on a
+    * 32-bit system the memory limit is critical, on a 64-bit system the count
+    * limit.
+    */
+   if (num_unknowns > PNG_UINT_32_MAX - info_ptr->unknown_chunks_num ||
+      num_unknowns > PNG_SIZE_MAX/(sizeof *np) - info_ptr->unknown_chunks_num)
+   {
+      /* This is a benign read error (user limits are disabled and we are about
+       * to overflow 2^32 chunks) and an application write error.
+       */
+      png_chunk_report(png_ptr, "too many unknown chunks",
+         PNG_CHUNK_WRITE_ERROR);
+      return;
+   }
+
    np = png_voidcast(png_unknown_chunkp, png_malloc(png_ptr,
        (info_ptr->unknown_chunks_num + (unsigned int)num_unknowns) *
        (sizeof (png_unknown_chunk))));
@@ -1140,8 +1156,8 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
    /* Increment unknown_chunks_num each time round the loop to protect the
     * just-allocated chunk data.
     */
-   for (; --num_unknowns >= 0;
-      ++np, ++unknowns, ++(info_ptr->unknown_chunks_num))
+   for (; num_unknowns > 0;
+      --num_unknowns, ++np, ++unknowns, ++(info_ptr->unknown_chunks_num))
    {
       memcpy(np->name, unknowns->name, (sizeof unknowns->name));
       np->name[(sizeof np->name)-1] = '\0';
