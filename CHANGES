@@ -4392,7 +4392,9 @@ Version 1.7.0alpha05 [December 24, 2012]
 Version 1.7.0alpha06 [January 1, 2013]
   Fixed 'make distcheck' on SUN OS - libpng.so was not being removed
 
-Version 1.7.0alpha07 [January 1, 2013]
+Version 1.7.0alpha07 [January 10, 2013]
+  Fixed conceivable but difficult to repro overflow. Also added two test
+    programs to generate and test a PNG which should have the problem.
 
   ===========================================================================
                        NOTICE November 17, 2012:
