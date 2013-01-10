@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta37 - January 10, 2013
+Libpng 1.6.0beta38 - January 10, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta37.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta37.tar.gz
+   1.6.0beta38.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta38.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b37.7z  (LZMA-compressed, recommended)
-   lp160b37.zip
+   lp160b38.7z  (LZMA-compressed, recommended)
+   lp160b38.zip
 
 Other information:
 
-   1.6.0beta37-README.txt
-   1.6.0beta37-LICENSE.txt
+   1.6.0beta38-README.txt
+   1.6.0beta38-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -586,6 +586,8 @@ Version 1.6.0beta36 [January 2, 2013]
 Version 1.6.0beta37 [January 10, 2013]
   Fixed conceivable but difficult to repro overflow. Also added two test
     programs to generate and test a PNG which should have the problem.
+
+Version 1.6.0beta38 [January 10, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
