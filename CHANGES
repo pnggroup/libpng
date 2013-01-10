@@ -3969,6 +3969,8 @@ Version 1.5.14beta07 [January 6, 2012]
 Version 1.5.14beta08 [January 10, 2013]
   Check validity of "num_unknowns" parameter of png_set_unknown_chunks().
 
+Version 1.5.14beta09 [January 10, 2013]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
