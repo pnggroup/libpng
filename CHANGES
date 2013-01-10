@@ -4396,6 +4396,8 @@ Version 1.7.0alpha07 [January 10, 2013]
   Fixed conceivable but difficult to repro overflow. Also added two test
     programs to generate and test a PNG which should have the problem.
 
+Version 1.7.0alpha08 [January 10, 2013]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
