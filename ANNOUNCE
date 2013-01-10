@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta08 - January 7, 2013
+Libpng 1.5.14beta08 - January 10, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -73,7 +73,8 @@ Version 1.5.14beta07 [January 6, 2012]
     which provide more extensive testing.  Replaced pngtest.png because pngtest
     writes the ancillary chunks in a different order.
 
-Version 1.5.14beta08 [January 7, 2013]
+Version 1.5.14beta08 [January 10, 2013]
+  Check validity of "num_unknowns" parameter of png_set_unknown_chunks().
 
   ===========================================================================
                        NOTICE November 17, 2012:
