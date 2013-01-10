@@ -411,7 +411,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #if PNG_ALIGN_TYPE == PNG_ALIGN_SIZE
    /* This is used because in some compiler implementations non-aligned
     * structure members are supported, so the offsetof approach below fails.
-    * Set PNG_ALIGN_TO_SIZE=0 for compiler combinations where unaligned access
+    * Set PNG_ALIGN_SIZE=0 for compiler combinations where unaligned access
     * is good for performance.  Do not do this unless you have tested the result
     * and understand it.
     */

@@ -358,8 +358,8 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
     * does not take the size of the data as an argument.  Some efficiency could
     * be gained by using this when it is known *if* the zlib stream itself does
     * not record the number; however, this is an illusion: the original writer
-    * follow of the PNG may have selected a lower window size, and we really
-    * must do that because, for systems with with limited capabilities, we
+    * of the PNG may have selected a lower window size, and we really must
+    * follow that because, for systems with with limited capabilities, we
     * would otherwise reject the application's attempts to use a smaller window
     * size (zlib doesn't have an interface to say "this or lower"!).
     *
