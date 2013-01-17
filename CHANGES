@@ -4399,6 +4399,8 @@ Version 1.7.0alpha07 [January 10, 2013]
 Version 1.7.0alpha08 [January 17, 2013]
   Corrected previous attempt at overflow detection in png_set_unknown_chunks().
 
+Version 1.7.0alpha09 [January 17, 2013]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
