@@ -690,6 +690,17 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.
     */
+
+   if (num_text < 0 ||
+       num_text > INT_MAX - info_ptr->num_text - 8 ||
+       (unsigned int)/*SAFE*/(num_text +/*SAFE*/
+       info_ptr->num_text + 8) >=
+       PNG_SIZE_MAX/png_sizeof(png_text))
+   {
+      png_warning(png_ptr, "too many text chunks");
+      return(0);
+   }
+
    if (info_ptr->num_text + num_text > info_ptr->max_text)
    {
       int old_max_text = info_ptr->max_text;
