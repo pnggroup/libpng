@@ -1130,7 +1130,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
     * limit.
     */
    if (num_unknowns > PNG_UINT_32_MAX - info_ptr->unknown_chunks_num ||
-      num_unknowns > PNG_SIZE_MAX/(sizeof *np) - info_ptr->unknown_chunks_num)
+      num_unknowns + info_ptr->unknown_chunks_num > PNG_SIZE_MAX/(sizeof *np))
    {
       /* This is a benign read error (user limits are disabled and we are about
        * to overflow 2^32 chunks) and an application write error.
@@ -1141,7 +1141,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
    }
 
    np = png_voidcast(png_unknown_chunkp, png_malloc(png_ptr,
-       (info_ptr->unknown_chunks_num + (unsigned int)num_unknowns) *
+       (info_ptr->unknown_chunks_num + num_unknowns) *
        (sizeof (png_unknown_chunk))));
 
    memcpy(np, info_ptr->unknown_chunks,

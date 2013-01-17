@@ -4340,7 +4340,8 @@ Version 1.6.0beta37 [January 10, 2013]
   Fixed conceivable but difficult to repro overflow. Also added two test
     programs to generate and test a PNG which should have the problem.
 
-Version 1.6.0beta38 [January 10, 2013]
+Version 1.6.0beta38 [January 17, 2013]
+  Corrected previous attempt at overflow detection in png_set_unknown_chunks().
 
   ===========================================================================
                        NOTICE November 17, 2012:
