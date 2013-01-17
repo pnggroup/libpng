@@ -81,7 +81,7 @@ Version 1.5.14rc01 [January 17, 2013]
   No changes.
 
 Version 1.5.14rc02 [January 17, 2013]
-  Change info_ptr->unknown_chunks_num to type png_uint_32
+  Revised test for validity of "num_unknowns" to eliminate compiler warnings.
 
   ===========================================================================
                        NOTICE November 17, 2012:
