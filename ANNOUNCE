@@ -1,5 +1,5 @@
 
-Libpng 1.5.14beta09 - January 10, 2013
+Libpng 1.5.14rc01 - January 17, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.14beta09.tar.xz (LZMA-compressed, recommended)
-   1.5.14beta09.tar.gz
-   1.5.14beta09.tar.bz2
+   1.5.14rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.14rc01.tar.gz
+   1.5.14rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1514b09.7z  (LZMA-compressed, recommended)
-   lp1514b09.zip
+   lp1514r01.7z  (LZMA-compressed, recommended)
+   lp1514r01.zip
 
 Other information:
 
-   1.5.14beta09-README.txt
-   1.5.14beta09-LICENSE.txt
+   1.5.14rc01-README.txt
+   1.5.14rc01-LICENSE.txt
 
 Changes since the last public release (1.5.13):
 
@@ -74,9 +74,11 @@ Version 1.5.14beta07 [January 6, 2012]
     writes the ancillary chunks in a different order.
 
 Version 1.5.14beta08 [January 10, 2013]
-  Check validity of "num_unknowns" parameter of png_set_unknown_chunks().
+  Check validity of "num_unknowns" parameter of png_set_unknown_chunks()
+    (Bug report from yuris).
 
-Version 1.5.14beta09 [January 10, 2013]
+Version 1.5.14rc01 [January 17, 2013]
+  No changes.
 
   ===========================================================================
                        NOTICE November 17, 2012:

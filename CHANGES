@@ -3967,9 +3967,11 @@ Version 1.5.14beta07 [January 6, 2012]
     writes the ancillary chunks in a different order.
 
 Version 1.5.14beta08 [January 10, 2013]
-  Check validity of "num_unknowns" parameter of png_set_unknown_chunks().
+  Check validity of "num_unknowns" parameter of png_set_unknown_chunks()
+    (Bug report from yuris).
 
-Version 1.5.14beta09 [January 10, 2013]
+Version 1.5.14rc01 [January 17, 2013]
+  No changes.
 
   ===========================================================================
                        NOTICE November 17, 2012:
