@@ -969,9 +969,18 @@ png_set_sPLT(png_structp png_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   np = (png_sPLT_tp)png_malloc_warn(png_ptr,
-       (info_ptr->splt_palettes_num + nentries) *
-       (png_size_t)png_sizeof(png_sPLT_t));
+   if (nentries < 0 ||
+       nentries > INT_MAX-info_ptr->splt_palettes_num ||
+       (unsigned int)/*SAFE*/(nentries +/*SAFE*/
+       info_ptr->splt_palettes_num) >=
+       PNG_SIZE_MAX/png_sizeof(png_sPLT_t))
+      np=NULL;
+
+   else
+
+      np = (png_sPLT_tp)png_malloc_warn(png_ptr,
+          (info_ptr->splt_palettes_num + nentries) *
+          (png_size_t)png_sizeof(png_sPLT_t));
 
    if (np == NULL)
    {

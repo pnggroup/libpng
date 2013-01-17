@@ -84,6 +84,7 @@ Version 1.5.14rc02 [January 17, 2013]
   Revised test for validity of "num_unknowns" to eliminate compiler warnings.
 
 Version 1.5.14rc03 [January 17, 2013]
+  Check validity of "nentries" parameter of png_set_sPLT().
 
   ===========================================================================
                        NOTICE November 17, 2012:
