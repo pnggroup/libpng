@@ -3973,6 +3973,9 @@ Version 1.5.14beta08 [January 10, 2013]
 Version 1.5.14rc01 [January 17, 2013]
   No changes.
 
+Version 1.5.14rc02 [January 17, 2013]
+  Change info_ptr->unknown_chunks_num to type png_uint_32
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
