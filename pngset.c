@@ -1041,9 +1041,9 @@ png_set_unknown_chunks(png_structp png_ptr,
 
    if (num_unknowns < 0 ||
        num_unknowns > INT_MAX-info_ptr->unknown_chunks_num ||
-      (unsigned int)/*SAFE*/(num_unknowns +/*SAFE*/
-            info_ptr->unknown_chunks_num) >=
-         PNG_SIZE_MAX/png_sizeof(png_unknown_chunk))
+       (unsigned int)/*SAFE*/(num_unknowns +/*SAFE*/
+       info_ptr->unknown_chunks_num) >=
+       PNG_SIZE_MAX/png_sizeof(png_unknown_chunk))
       np=NULL;
 
    else
