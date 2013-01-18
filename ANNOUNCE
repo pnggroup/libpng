@@ -1,5 +1,5 @@
 
-Libpng 1.5.14rc03 - January 17, 2013
+Libpng 1.5.14rc03 - January 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -83,9 +83,9 @@ Version 1.5.14rc01 [January 17, 2013]
 Version 1.5.14rc02 [January 17, 2013]
   Revised test for validity of "num_unknowns" to eliminate compiler warnings.
 
-Version 1.5.14rc03 [January 17, 2013]
-  Check validity of "nentries" parameter of png_set_sPLT().
-  Check validity of "num_text" parameter of png_set_text_2().
+Version 1.5.14rc03 [January 18, 2013]
+  Check the validity of the "nentries" parameter of png_set_sPLT() and the
+  "num_text" parameter of png_set_text_2().
 
   ===========================================================================
                        NOTICE November 17, 2012:
