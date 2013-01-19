@@ -435,7 +435,7 @@ struct png_struct_def
    /* Added in libpng-1.4.0: Total number of sPLT, text, and unknown
     * chunks that can be stored (0 means unlimited).
     */
-   png_uint_32 user_chunk_cache_max;
+   int user_chunk_cache_max;
 
    /* Total memory that a zTXt, sPLT, iTXt, iCCP, or unknown chunk
     * can occupy when decompressed.  0 means unlimited.

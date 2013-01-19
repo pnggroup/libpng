@@ -226,13 +226,13 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* The type of this field must match png_struct::user_chunk_cache_max,
     * else overflow can occur.
     */
-   png_uint_32 unknown_chunks_num;
+   int unknown_chunks_num;
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Data on sPLT chunks (there may be more than one). */
    png_sPLT_tp splt_palettes;
-   png_uint_32 splt_palettes_num;
+   int splt_palettes_num;
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
