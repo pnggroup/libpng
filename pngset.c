@@ -701,7 +701,22 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.
+    *
+    * There were two overflow conditions here, one on the count and one on
+    * memory. On a 32-bit system the memory limit is critical, while on a
+    * 64-bit system the count limit is critical.  This test defends against
+    * both.
     */
+   if (num_text < 0 ||
+       num_text > INT_MAX - info_ptr->num_text - 8 ||
+       (unsigned int)/*SAFE*/(num_text +/*SAFE*/
+       info_ptr->num_text + 8) >=
+       PNG_SIZE_MAX/(sizeof (png_text)))
+   {
+      png_warning(png_ptr, "too many text chunks");
+      return(0);
+   }
+
    if (info_ptr->num_text + num_text > info_ptr->max_text)
    {
       int old_max_text = info_ptr->max_text;
@@ -980,8 +995,16 @@ png_set_sPLT(png_const_structrp png_ptr,
       entries == NULL)
       return;
 
-   np = png_voidcast(png_sPLT_tp, png_malloc_warn(png_ptr,
-       (info_ptr->splt_palettes_num + nentries) * (sizeof (png_sPLT_t))));
+   /* See explanation of this in png_set_text_2(). */
+   if (nentries < 0 ||
+       nentries > INT_MAX-info_ptr->splt_palettes_num ||
+       (unsigned int)(nentries + info_ptr->splt_palettes_num) >=
+       PNG_SIZE_MAX/(sizeof (png_sPLT_t)))
+      np=NULL;
+
+   else
+      np = png_voidcast(png_sPLT_tp, png_malloc_warn(png_ptr,
+          (info_ptr->splt_palettes_num + nentries) * (sizeof (png_sPLT_t))));
 
    if (np == NULL)
    {
@@ -1086,12 +1109,11 @@ check_location(png_const_structrp png_ptr, int location)
 
 void PNGAPI
 png_set_unknown_chunks(png_const_structrp png_ptr,
-   png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns_in)
+   png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
 {
-   png_uint_32 num_unknowns;
    png_unknown_chunkp np;
 
-   if (png_ptr == NULL || info_ptr == NULL || num_unknowns_in <= 0)
+   if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0)
       return;
 
    /* Check for the failure cases where support has been disabled at compile
@@ -1117,32 +1139,31 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       }
 #  endif
 
-   /* Prior to 1.6.0 this code used png_malloc_warn, however this meant that
-    * unknown critical chunks could be lost with just a warning resulting in
-    * undefined behavior.  Changing to png_malloc fixes this by producing a
-    * png_error.  The (png_size_t) cast was also removed as it hides a potential
-    * overflow.
-    */
-   num_unknowns = (unsigned int)/*SAFE*/num_unknowns_in;
+    /*  See the comments in png_set_text_2().  */
+   if (num_unknowns < 0 ||
+       num_unknowns > INT_MAX-info_ptr->unknown_chunks_num ||
+       (unsigned int)(num_unknowns +
+       info_ptr->unknown_chunks_num) >=
+       PNG_SIZE_MAX/(sizeof (png_unknown_chunk)))
+      np=NULL;
 
-   /* There are two overflow conditions, one on the count one on memory, on a
-    * 32-bit system the memory limit is critical, on a 64-bit system the count
-    * limit.
-    */
-   if (num_unknowns > PNG_UINT_32_MAX - info_ptr->unknown_chunks_num ||
-      num_unknowns + info_ptr->unknown_chunks_num > PNG_SIZE_MAX/(sizeof *np))
-   {
-      /* This is a benign read error (user limits are disabled and we are about
-       * to overflow 2^32 chunks) and an application write error.
+   else
+      /* Prior to 1.6.0 this code used png_malloc_warn; however, this meant that
+       * unknown critical chunks could be lost with just a warning resulting in
+       * undefined behavior.  Changing to png_malloc fixes this by producing a
+       * png_error.  The (png_size_t) cast was also removed as it hides a
+       * potential overflow.
        */
-      png_chunk_report(png_ptr, "too many unknown chunks",
-         PNG_CHUNK_WRITE_ERROR);
+      np = png_voidcast(png_unknown_chunkp, png_malloc(png_ptr,
+          (info_ptr->unknown_chunks_num + num_unknowns) *
+          (sizeof (png_unknown_chunk))));
+
+   if (np == NULL)
+   {
+      png_warning(png_ptr,
+          "Out of memory while processing unknown chunk");
       return;
    }
-
-   np = png_voidcast(png_unknown_chunkp, png_malloc(png_ptr,
-       (info_ptr->unknown_chunks_num + num_unknowns) *
-       (sizeof (png_unknown_chunk))));
 
    memcpy(np, info_ptr->unknown_chunks,
        info_ptr->unknown_chunks_num * (sizeof (png_unknown_chunk)));
@@ -1515,7 +1536,7 @@ void PNGAPI
 png_set_chunk_cache_max (png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 {
     if (png_ptr)
-       png_ptr->user_chunk_cache_max = user_chunk_cache_max;
+       png_ptr->user_chunk_cache_max = (int) user_chunk_cache_max;
 }
 
 /* This function was added to libpng 1.4.1 */
