@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta40 - January 20, 2013
+Libpng 1.6.0beta41 - January 20, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta40.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta40.tar.gz
+   1.6.0beta41.tar.xz (LZMA-compressed, recommended)
+   1.6.0beta41.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b40.7z  (LZMA-compressed, recommended)
-   lp160b40.zip
+   lp160b41.7z  (LZMA-compressed, recommended)
+   lp160b41.zip
 
 Other information:
 
-   1.6.0beta40-README.txt
-   1.6.0beta40-LICENSE.txt
+   1.6.0beta41-README.txt
+   1.6.0beta41-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -593,6 +593,8 @@ Version 1.6.0beta39 [January 19, 2013]
 
 Version 1.6.0beta40 [January 20, 2013]
   Use consistent handling of overflows in text, sPLT and unknown png_set_* APIs
+
+Version 1.6.0beta41 [January 20, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
