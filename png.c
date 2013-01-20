@@ -545,7 +545,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       {
          if (info_ptr->splt_palettes_num)
          {
-            unsigned int i;
+            int i;
             for (i = 0; i < info_ptr->splt_palettes_num; i++)
                png_free_data(png_ptr, info_ptr, PNG_FREE_SPLT, (int)i);
 
@@ -572,7 +572,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
       else
       {
-         unsigned int i;
+         int i;
 
          if (info_ptr->unknown_chunks_num)
          {
@@ -768,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0beta40 - January 19, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.6.0beta40 - January 20, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0beta40 - January 19, 2013\
+      return "libpng version 1.6.0beta40 - January 20, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
