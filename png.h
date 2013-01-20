@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.0beta40 - January 19, 2013
+ * libpng version 1.6.0beta40 - January 20, 2013
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.0beta40 - January 19, 2013: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.0beta40 - January 20, 2013: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -198,7 +198,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta40, January 19, 2013, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.0beta40, January 20, 2013, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -310,7 +310,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    January 19, 2013
+ *    January 20, 2013
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -378,7 +378,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.0beta40"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.0beta40 - January 19, 2013\n"
+     " libpng version 1.6.0beta40 - January 20, 2013\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2182,7 +2182,7 @@ PNG_FIXED_EXPORT(140, void, png_set_gAMA_fixed, (png_const_structrp png_ptr,
 
 #ifdef PNG_hIST_SUPPORTED
 PNG_EXPORT(141, png_uint_32, png_get_hIST, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr, png_uint_16p *hist));
+    png_inforp info_ptr, png_uint_16p *hist));
 #endif
 
 #ifdef PNG_hIST_SUPPORTED
@@ -2214,7 +2214,7 @@ PNG_EXPORT(146, void, png_set_oFFs, (png_const_structrp png_ptr,
 
 #ifdef PNG_pCAL_SUPPORTED
 PNG_EXPORT(147, png_uint_32, png_get_pCAL, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr, png_charp *purpose, png_int_32 *X0,
+    png_inforp info_ptr, png_charp *purpose, png_int_32 *X0,
     png_int_32 *X1, int *type, int *nparams, png_charp *units,
     png_charpp *params));
 #endif
@@ -2237,7 +2237,7 @@ PNG_EXPORT(150, void, png_set_pHYs, (png_const_structrp png_ptr,
 #endif
 
 PNG_EXPORT(151, png_uint_32, png_get_PLTE, (png_const_structrp png_ptr,
-   png_const_inforp info_ptr, png_colorp *palette, int *num_palette));
+   png_inforp info_ptr, png_colorp *palette, int *num_palette));
 
 PNG_EXPORT(152, void, png_set_PLTE, (png_structrp png_ptr,
     png_inforp info_ptr, png_const_colorp palette, int num_palette));
@@ -2266,7 +2266,7 @@ PNG_EXPORT(157, void, png_set_sRGB_gAMA_and_cHRM, (png_const_structrp png_ptr,
 
 #ifdef PNG_iCCP_SUPPORTED
 PNG_EXPORT(158, png_uint_32, png_get_iCCP, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr, png_charpp name, int *compression_type,
+    png_inforp info_ptr, png_charpp name, int *compression_type,
     png_bytepp profile, png_uint_32 *proflen));
 #endif
 
@@ -2277,8 +2277,8 @@ PNG_EXPORT(159, void, png_set_iCCP, (png_const_structrp png_ptr,
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
-PNG_EXPORT(160, png_uint_32, png_get_sPLT, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr, png_sPLT_tpp entries));
+PNG_EXPORT(160, int, png_get_sPLT, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_sPLT_tpp entries));
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
@@ -2288,8 +2288,8 @@ PNG_EXPORT(161, void, png_set_sPLT, (png_const_structrp png_ptr,
 
 #ifdef PNG_TEXT_SUPPORTED
 /* png_get_text also returns the number of text chunks in *num_text */
-PNG_EXPORT(162, png_uint_32, png_get_text, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr, png_textp *text_ptr, int *num_text));
+PNG_EXPORT(162, int, png_get_text, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_textp *text_ptr, int *num_text));
 #endif
 
 /* Note while png_set_text() will accept a structure whose text,
@@ -2472,7 +2472,7 @@ PNG_EXPORT(175, void, png_set_unknown_chunk_location,
     (png_const_structrp png_ptr, png_inforp info_ptr, int chunk, int location));
 
 PNG_EXPORT(176, int, png_get_unknown_chunks, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr, png_unknown_chunkpp entries));
+    png_inforp info_ptr, png_unknown_chunkpp entries));
 #endif
 
 /* Png_free_data() will turn off the "valid" flag for anything it frees.

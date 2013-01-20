@@ -4754,7 +4754,7 @@ standard_check_text(png_const_structp pp, png_const_textp tp,
 
 static void
 standard_text_validate(standard_display *dp, png_const_structp pp,
-   png_const_infop pi)
+   png_infop pi)
 {
    png_textp tp = NULL;
    png_uint_32 num_text = png_get_text(pp, pi, &tp, NULL);

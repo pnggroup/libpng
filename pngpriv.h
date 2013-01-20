@@ -757,6 +757,23 @@ PNG_INTERNAL_FUNCTION(int,png_user_version_check,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_base,(png_const_structrp png_ptr,
    png_alloc_size_t size),PNG_ALLOCATED);
 
+#if defined PNG_TEXT_SUPPORTED || defined PNG_sPLT_SUPPORTED ||\
+   defined PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+/* Internal array allocator, outputs no error or warning messages on failure,
+ * just returns NULL.  
+ */
+PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_array,(png_const_structrp png_ptr,
+   int nelements, size_t element_size),PNG_ALLOCATED);
+
+/* The same but an existing array is extended by add_elements.  This function
+ * also memsets the new elements to 0 and copies the old elements.  The old
+ * array is not freed or altered.
+ */
+PNG_INTERNAL_FUNCTION(png_voidp,png_realloc_array,(png_const_structrp png_ptr,
+   png_const_voidp array, int old_elements, int add_elements,
+   size_t element_size),PNG_ALLOCATED);
+#endif /* text, sPLT or unknown chunks */
+
 /* Magic to create a struct when there is no struct to call the user supplied
  * memory allocators.  Because error handling has not been set up the memory
  * handlers can't safely call png_error, but this is an obscure and undocumented

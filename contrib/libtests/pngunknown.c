@@ -308,7 +308,7 @@ warning(png_structp png_ptr, const char *message)
 }
 
 static png_uint_32
-get_valid(display *d, png_const_infop info_ptr)
+get_valid(display *d, png_infop info_ptr)
 {
    png_uint_32 flags = png_get_valid(d->png_ptr, info_ptr, (png_uint_32)~0);
 
@@ -340,7 +340,7 @@ get_valid(display *d, png_const_infop info_ptr)
 }
 
 static png_uint_32
-get_unknown(display *d, int def, png_const_infop info_ptr)
+get_unknown(display *d, int def, png_infop info_ptr)
 {
    /* Create corresponding 'unknown' flags */
    png_uint_32 flags = 0;

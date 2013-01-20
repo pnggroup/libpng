@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta40 - January 19, 2013
+Libpng 1.6.0beta40 - January 20, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -591,7 +591,8 @@ Version 1.6.0beta39 [January 19, 2013]
   Again corrected attempt at overflow detection in png_set_unknown_chunks().
   Added overflow detection in png_set_sPLT() and png_set_text_2().
 
-Version 1.6.0beta40 [January 19, 2013]
+Version 1.6.0beta40 [January 20, 2013]
+  Use consistent handling of overflows in text, sPLT and unknown png_set_* APIs
 
   ===========================================================================
                        NOTICE November 17, 2012:

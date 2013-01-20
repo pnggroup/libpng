@@ -696,78 +696,62 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
    png_debug1(1, "in %lx storage function", png_ptr == NULL ? "unexpected" :
       (unsigned long)png_ptr->chunk_name);
 
-   if (png_ptr == NULL || info_ptr == NULL || num_text == 0)
+   if (png_ptr == NULL || info_ptr == NULL || num_text <= 0 || text_ptr == NULL)
       return(0);
 
    /* Make sure we have enough space in the "text" array in info_struct
-    * to hold all of the incoming text_ptr objects.
-    *
-    * There were two overflow conditions here, one on the count and one on
-    * memory. On a 32-bit system the memory limit is critical, while on a
-    * 64-bit system the count limit is critical.  This test defends against
-    * both.
+    * to hold all of the incoming text_ptr objects.  This compare can't overflow
+    * because max_text >= num_text (anyway, subtract of two positive integers
+    * can't overflow in any case.)
     */
-   if (num_text < 0 ||
-       num_text > INT_MAX - info_ptr->num_text - 8 ||
-       (unsigned int)/*SAFE*/(num_text +/*SAFE*/
-       info_ptr->num_text + 8) >=
-       PNG_SIZE_MAX/(sizeof (png_text)))
+   if (num_text > info_ptr->max_text - info_ptr->num_text)
    {
-      png_warning(png_ptr, "too many text chunks");
-      return(0);
-   }
-
-   if (info_ptr->num_text + num_text > info_ptr->max_text)
-   {
-      int old_max_text = info_ptr->max_text;
       int old_num_text = info_ptr->num_text;
+      int max_text;
+      png_textp new_text = NULL;
 
-      if (info_ptr->text != NULL)
+      /* Calculate an appropriate max_text, checking for overflow. */
+      max_text = old_num_text;
+      if (num_text <= INT_MAX - max_text)
       {
-         png_textp old_text;
+         max_text += num_text;
 
-         info_ptr->max_text = info_ptr->num_text + num_text + 8;
-         old_text = info_ptr->text;
+         /* Round up to a multiple of 8 */
+         if (max_text < INT_MAX-8)
+            max_text = (max_text + 8) & ~0x7;
 
-         info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
-            (png_size_t)(info_ptr->max_text * (sizeof (png_text))));
+         else
+            max_text = INT_MAX;
 
-         if (info_ptr->text == NULL)
-         {
-            /* Restore to previous condition */
-            info_ptr->max_text = old_max_text;
-            info_ptr->text = old_text;
-            return(1);
-         }
-
-         memcpy(info_ptr->text, old_text, (png_size_t)(old_max_text *
-             (sizeof (png_text))));
-         png_free(png_ptr, old_text);
+         /* Now allocate a new array and copy the old members in, this does all
+          * the overflow checks.
+          */
+         new_text = png_voidcast(png_textp,png_realloc_array(png_ptr,
+            info_ptr->text, old_num_text, max_text-old_num_text,
+            sizeof *new_text));
       }
 
-      else
+      if (new_text == NULL)
       {
-         info_ptr->max_text = num_text + 8;
-         info_ptr->num_text = 0;
-         info_ptr->text = (png_textp)png_malloc_warn(png_ptr,
-             (png_size_t)(info_ptr->max_text * (sizeof (png_text))));
-         if (info_ptr->text == NULL)
-         {
-            /* Restore to previous condition */
-            info_ptr->num_text = old_num_text;
-            info_ptr->max_text = old_max_text;
-            return(1);
-         }
-         info_ptr->free_me |= PNG_FREE_TEXT;
+         png_chunk_report(png_ptr, "too many text chunks",
+            PNG_CHUNK_WRITE_ERROR);
+         return 1;
       }
 
-      png_debug1(3, "allocated %d entries for info_ptr->text",
-          info_ptr->max_text);
+      png_free(png_ptr, info_ptr->text);
+
+      info_ptr->text = new_text;
+      info_ptr->free_me |= PNG_FREE_TEXT;
+      info_ptr->max_text = max_text;
+      /* num_text is adjusted below as the entries are copied in */
+
+      png_debug1(3, "allocated %d entries for info_ptr->text", max_text);
    }
+
    for (i = 0; i < num_text; i++)
    {
-      png_size_t text_length, key_len;
-      png_size_t lang_len, lang_key_len;
+      size_t text_length, key_len;
+      size_t lang_len, lang_key_len;
       png_textp textp = &(info_ptr->text[info_ptr->num_text]);
 
       if (text_ptr[i].key == NULL)
@@ -776,7 +760,8 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       if (text_ptr[i].compression < PNG_TEXT_COMPRESSION_NONE ||
           text_ptr[i].compression >= PNG_TEXT_COMPRESSION_LAST)
       {
-         png_warning(png_ptr, "text compression mode is out of range");
+         png_chunk_report(png_ptr, "text compression mode is out of range",
+            PNG_CHUNK_WRITE_ERROR);
          continue;
       }
 
@@ -807,7 +792,8 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 #  else /* PNG_iTXt_SUPPORTED */
       {
-         png_warning(png_ptr, "iTXt chunk not supported");
+         png_chunk_report(png_ptr, "iTXt chunk not supported",
+            PNG_CHUNK_WRITE_ERROR);
          continue;
       }
 #  endif
@@ -830,19 +816,22 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          textp->compression = text_ptr[i].compression;
       }
 
-      textp->key = (png_charp)png_malloc_warn(png_ptr,
-          (png_size_t)
-          (key_len + text_length + lang_len + lang_key_len + 4));
+      textp->key = png_voidcast(png_charp,png_malloc_base(png_ptr,
+          key_len + text_length + lang_len + lang_key_len + 4));
 
       if (textp->key == NULL)
-         return(1);
+      {
+         png_chunk_report(png_ptr, "text chunk: out of memory",
+               PNG_CHUNK_WRITE_ERROR);
+         return 1;
+      }
 
       png_debug2(2, "Allocated %lu bytes at %p in png_set_text",
           (unsigned long)(png_uint_32)
           (key_len + lang_len + lang_key_len + text_length + 4),
           textp->key);
 
-      memcpy(textp->key, text_ptr[i].key,(png_size_t)(key_len));
+      memcpy(textp->key, text_ptr[i].key, key_len);
       *(textp->key + key_len) = '\0';
 
       if (text_ptr[i].compression > 0)
@@ -864,8 +853,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 
       if (text_length)
-         memcpy(textp->text, text_ptr[i].text,
-             (png_size_t)(text_length));
+         memcpy(textp->text, text_ptr[i].text, text_length);
 
       *(textp->text + text_length) = '\0';
 
@@ -886,6 +874,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       info_ptr->num_text++;
       png_debug1(3, "transferred text chunk %d", info_ptr->num_text);
    }
+
    return(0);
 }
 #endif
@@ -989,86 +978,87 @@ png_set_sPLT(png_const_structrp png_ptr,
  */
 {
    png_sPLT_tp np;
-   int i;
 
-   if (png_ptr == NULL || info_ptr == NULL || nentries <= 0 ||
-      entries == NULL)
+   if (png_ptr == NULL || info_ptr == NULL || nentries <= 0 || entries == NULL)
       return;
 
-   /* See explanation of this in png_set_text_2(). */
-   if (nentries < 0 ||
-       nentries > INT_MAX-info_ptr->splt_palettes_num ||
-       (unsigned int)(nentries + info_ptr->splt_palettes_num) >=
-       PNG_SIZE_MAX/(sizeof (png_sPLT_t)))
-      np=NULL;
-
-   else
-      np = png_voidcast(png_sPLT_tp, png_malloc_warn(png_ptr,
-          (info_ptr->splt_palettes_num + nentries) * (sizeof (png_sPLT_t))));
+   /* Use the internal realloc function, which checks for all the possible
+    * overflows.  Notice that the parameters are (int) and (size_t)
+    */
+   np = png_voidcast(png_sPLT_tp,png_realloc_array(png_ptr,
+      info_ptr->splt_palettes, info_ptr->splt_palettes_num, nentries,
+      sizeof *np));
 
    if (np == NULL)
    {
-      png_warning(png_ptr, "No memory for sPLT palettes");
+      /* Out of memory or too many chunks */
+      png_chunk_report(png_ptr, "too many sPLT chunks", PNG_CHUNK_WRITE_ERROR);
       return;
    }
 
-   memcpy(np, info_ptr->splt_palettes,
-       info_ptr->splt_palettes_num * (sizeof (png_sPLT_t)));
-
    png_free(png_ptr, info_ptr->splt_palettes);
-   info_ptr->splt_palettes=NULL;
+   info_ptr->splt_palettes = np;
+   info_ptr->free_me |= PNG_FREE_SPLT;
 
-   /* TODO: fix this, it apparently leaves NULL entries in the event of OOM
-    * below.
-    */
-   for (i = 0; i < nentries; i++)
+   np += info_ptr->splt_palettes_num;
+
+   do
    {
-      png_sPLT_tp to = np + info_ptr->splt_palettes_num + i;
-      png_const_sPLT_tp from = entries + i;
       png_size_t length;
 
-      /* In event of error below the name and entries fields must be set to
-       * NULL, otherwise libpng will crash later on while trying to free the
-       * uninitialized pointers.
+      /* Skip invalid input entries */
+      if (entries->name == NULL || entries->entries == NULL)
+      {
+         /* png_handle_sPLT doesn't do this, so this is an app error */
+         png_app_error(png_ptr, "png_set_sPLT: invalid sPLT");
+         /* Just skip the invalid entry */
+         continue;
+      }
+
+      np->depth = entries->depth;
+
+      /* In the even of out-of-memory just return - there's no point keeping on
+       * trying to add sPLT chunks.
        */
-      memset(to, 0, (sizeof *to));
+      length = strlen(entries->name) + 1;
+      np->name = png_voidcast(png_charp, png_malloc_base(png_ptr, length));
 
-      if (from->name == NULL || from->entries == NULL)
-         continue;
+      if (np->name == NULL)
+         break;
 
-      length = strlen(from->name) + 1;
-      to->name = png_voidcast(png_charp, png_malloc_warn(png_ptr, length));
+      memcpy(np->name, entries->name, length);
 
-      if (to->name == NULL)
+      /* IMPORTANT: we have memory now that won't get freed if something else
+       * goes wrong, this code must free it.  png_malloc_array produces no
+       * warnings, use a png_chunk_report (below) if there is an error.
+       */
+      np->entries = png_voidcast(png_sPLT_entryp, png_malloc_array(png_ptr,
+          entries->nentries, sizeof (png_sPLT_entry)));
+
+      if (np->entries == NULL)
       {
-         png_warning(png_ptr,
-             "Out of memory while processing sPLT chunk");
-         continue;
+         png_free(png_ptr, np->name);
+         break;
       }
 
-      memcpy(to->name, from->name, length);
-      to->entries = png_voidcast(png_sPLT_entryp, png_malloc_warn(png_ptr,
-          from->nentries * (sizeof (png_sPLT_entry))));
+      np->nentries = entries->nentries;
+      /* This multiply can't overflow because png_malloc_array has already
+       * checked it when doing the allocation.
+       */
+      memcpy(np->entries, entries->entries,
+         entries->nentries * sizeof (png_sPLT_entry));
 
-      if (to->entries == NULL)
-      {
-         png_warning(png_ptr, "Out of memory while processing sPLT chunk");
-         png_free(png_ptr, to->name);
-         to->name = NULL;
-         continue;
-      }
-
-      memcpy(to->entries, from->entries,
-          from->nentries * (sizeof (png_sPLT_entry)));
-
-      to->nentries = from->nentries;
-      to->depth = from->depth;
+      /* Note that 'continue' skips the advance of the out pointer and out
+       * count, so an invalid entry is not added.
+       */
+      info_ptr->valid |= PNG_INFO_sPLT;
+      ++(info_ptr->splt_palettes_num);
+      ++np;
    }
+   while (++entries, --nentries);
 
-   info_ptr->splt_palettes = np;
-   info_ptr->splt_palettes_num += nentries;
-   info_ptr->valid |= PNG_INFO_sPLT;
-   info_ptr->free_me |= PNG_FREE_SPLT;
+   if (nentries > 0)
+      png_chunk_report(png_ptr, "sPLT out of memory", PNG_CHUNK_WRITE_ERROR);
 }
 #endif /* PNG_sPLT_SUPPORTED */
 
@@ -1092,6 +1082,9 @@ check_location(png_const_structrp png_ptr, int location)
          (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT));
    }
 
+   /* This need not be an internal error - if the app calls
+    * png_set_unknown_chunks on a read pointer it must get the location right.
+    */
    if (location == 0)
       png_error(png_ptr, "invalid location in png_set_unknown_chunks");
 
@@ -1113,7 +1106,8 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
 {
    png_unknown_chunkp np;
 
-   if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0)
+   if (png_ptr == NULL || info_ptr == NULL || num_unknowns <= 0 ||
+      unknowns == NULL)
       return;
 
    /* Check for the failure cases where support has been disabled at compile
@@ -1139,34 +1133,21 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       }
 #  endif
 
-    /*  See the comments in png_set_text_2().  */
-   if (num_unknowns < 0 ||
-       num_unknowns > INT_MAX-info_ptr->unknown_chunks_num ||
-       (unsigned int)(num_unknowns +
-       info_ptr->unknown_chunks_num) >=
-       PNG_SIZE_MAX/(sizeof (png_unknown_chunk)))
-      np=NULL;
-
-   else
-      /* Prior to 1.6.0 this code used png_malloc_warn; however, this meant that
-       * unknown critical chunks could be lost with just a warning resulting in
-       * undefined behavior.  Changing to png_malloc fixes this by producing a
-       * png_error.  The (png_size_t) cast was also removed as it hides a
-       * potential overflow.
-       */
-      np = png_voidcast(png_unknown_chunkp, png_malloc(png_ptr,
-          (info_ptr->unknown_chunks_num + num_unknowns) *
-          (sizeof (png_unknown_chunk))));
+   /* Prior to 1.6.0 this code used png_malloc_warn; however, this meant that
+    * unknown critical chunks could be lost with just a warning resulting in
+    * undefined behavior.  Now png_chunk_report is used to provide behavior
+    * appropriate to read or write.
+    */
+   np = png_voidcast(png_unknown_chunkp, png_realloc_array(png_ptr,
+         info_ptr->unknown_chunks, info_ptr->unknown_chunks_num, num_unknowns,
+         sizeof *np));
 
    if (np == NULL)
    {
-      png_warning(png_ptr,
-          "Out of memory while processing unknown chunk");
+      png_chunk_report(png_ptr, "too many unknown chunks",
+         PNG_CHUNK_WRITE_ERROR);
       return;
    }
-
-   memcpy(np, info_ptr->unknown_chunks,
-       info_ptr->unknown_chunks_num * (sizeof (png_unknown_chunk)));
 
    png_free(png_ptr, info_ptr->unknown_chunks);
    info_ptr->unknown_chunks = np; /* safe because it is initialized */
@@ -1177,24 +1158,41 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
    /* Increment unknown_chunks_num each time round the loop to protect the
     * just-allocated chunk data.
     */
-   for (; num_unknowns > 0;
-      --num_unknowns, ++np, ++unknowns, ++(info_ptr->unknown_chunks_num))
+   for (; num_unknowns > 0; --num_unknowns, ++unknowns)
    {
-      memcpy(np->name, unknowns->name, (sizeof unknowns->name));
+      memcpy(np->name, unknowns->name, (sizeof np->name));
       np->name[(sizeof np->name)-1] = '\0';
-      np->size = unknowns->size;
       np->location = check_location(png_ptr, unknowns->location);
 
       if (unknowns->size == 0)
+      {
          np->data = NULL;
+         np->size = 0;
+      }
 
       else
       {
-         /* png_error is safe here because the list is stored in png_ptr */
          np->data = png_voidcast(png_bytep,
-            png_malloc(png_ptr, unknowns->size));
+            png_malloc_base(png_ptr, unknowns->size));
+
+         if (np->data == NULL)
+         {
+            png_chunk_report(png_ptr, "unknown chunk: out of memory",
+               PNG_CHUNK_WRITE_ERROR);
+            /* But just skip storing the unknown chunk */
+            continue;
+         }
+
          memcpy(np->data, unknowns->data, unknowns->size);
+         np->size = unknowns->size;
       }
+
+      /* These increments are skipped on out-of-memory for the data - the
+       * unknown chunk entry gets overwritten if the png_chunk_report returns.
+       * This is correct in the read case (the chunk is just dropped.)
+       */
+      ++np;
+      ++(info_ptr->unknown_chunks_num);
    }
 }
 
@@ -1208,7 +1206,7 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
     * TODO: add a png_app_warning in 1.7
     */
    if (png_ptr != NULL && info_ptr != NULL && chunk >= 0 &&
-      (unsigned int)chunk < info_ptr->unknown_chunks_num)
+      chunk < info_ptr->unknown_chunks_num)
    {
       if ((location & (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT)) == 0)
       {
@@ -1536,7 +1534,7 @@ void PNGAPI
 png_set_chunk_cache_max (png_structrp png_ptr, png_uint_32 user_chunk_cache_max)
 {
     if (png_ptr)
-       png_ptr->user_chunk_cache_max = (int) user_chunk_cache_max;
+       png_ptr->user_chunk_cache_max = user_chunk_cache_max;
 }
 
 /* This function was added to libpng 1.4.1 */
