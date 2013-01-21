@@ -678,7 +678,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_TEXT_SUPPORTED
 void PNGAPI
-png_set_text(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_text(png_structrp png_ptr, png_inforp info_ptr,
     png_const_textp text_ptr, int num_text)
 {
    int ret;
@@ -689,7 +689,7 @@ png_set_text(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 
 int /* PRIVATE */
-png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
+png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
     png_const_textp text_ptr, int num_text)
 {
    int i;
@@ -736,6 +736,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       {
          png_chunk_report(png_ptr, "too many text chunks",
             PNG_CHUNK_WRITE_ERROR);
+
          return 1;
       }
 
@@ -1005,7 +1006,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_sPLT_SUPPORTED
 void PNGAPI
-png_set_sPLT(png_const_structrp png_ptr,
+png_set_sPLT(png_structrp png_ptr,
     png_inforp info_ptr, png_const_sPLT_tp entries, int nentries)
 /*
  *  entries        - array of png_sPLT_t structures
@@ -1032,6 +1033,7 @@ png_set_sPLT(png_const_structrp png_ptr,
    {
       /* Out of memory or too many chunks */
       png_chunk_report(png_ptr, "too many sPLT chunks", PNG_CHUNK_WRITE_ERROR);
+
       return;
    }
 
@@ -1140,7 +1142,7 @@ check_location(png_const_structrp png_ptr, int location)
 }
 
 void PNGAPI
-png_set_unknown_chunks(png_const_structrp png_ptr,
+png_set_unknown_chunks(png_structrp png_ptr,
    png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
 {
    png_unknown_chunkp np;
@@ -1185,6 +1187,7 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
    {
       png_chunk_report(png_ptr, "too many unknown chunks",
          PNG_CHUNK_WRITE_ERROR);
+
       return;
    }
 
@@ -1382,7 +1385,6 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
    if (num_chunks + old_num_chunks > UINT_MAX/5)
    {
       png_app_error(png_ptr, "png_set_keep_unknown_chunks: too many chunks");
-      return;
    }
 
    /* If these chunks are being reset to the default then no more memory is

@@ -123,7 +123,7 @@ png_malloc_array,(png_const_structrp png_ptr, int nelements,
 }
 
 PNG_FUNCTION(png_voidp /* PRIVATE */,
-png_realloc_array,(png_const_structrp png_ptr, png_const_voidp old_array,
+png_realloc_array,(png_structrp png_ptr, png_const_voidp old_array,
    int old_elements, int add_elements, size_t element_size),PNG_ALLOCATED)
 {
    /* These are internal errors: */
@@ -153,6 +153,11 @@ png_realloc_array,(png_const_structrp png_ptr, png_const_voidp old_array,
          return new_array;
       }
    }
+
+   /* The potential overflow case.  Set the cache counter so libpng will
+    * not make any more attempts
+    */
+   png_ptr->user_chunk_cache_max = 2;
 
    return NULL; /* error */
 }

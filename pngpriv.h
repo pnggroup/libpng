@@ -762,7 +762,7 @@ PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_array,(png_const_structrp png_ptr,
  * also memsets the new elements to 0 and copies the old elements.  The old
  * array is not freed or altered.
  */
-PNG_INTERNAL_FUNCTION(png_voidp,png_realloc_array,(png_const_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(png_voidp,png_realloc_array,(png_structrp png_ptr,
    png_const_voidp array, int old_elements, int add_elements,
    size_t element_size),PNG_ALLOCATED);
 #endif /* text, sPLT or unknown chunks */
@@ -943,7 +943,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_iTXt,(png_structrp png_ptr,
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED  /* Added at version 1.0.14 and 1.2.4 */
-PNG_INTERNAL_FUNCTION(int,png_set_text_2,(png_const_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(int,png_set_text_2,(png_structrp png_ptr,
     png_inforp info_ptr, png_const_textp text_ptr, int num_text),PNG_EMPTY);
 #endif
 

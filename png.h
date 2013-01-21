@@ -2284,7 +2284,7 @@ PNG_EXPORT(160, int, png_get_sPLT, (png_const_structrp png_ptr,
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
-PNG_EXPORT(161, void, png_set_sPLT, (png_const_structrp png_ptr,
+PNG_EXPORT(161, void, png_set_sPLT, (png_structrp png_ptr,
     png_inforp info_ptr, png_const_sPLT_tp entries, int nentries));
 #endif
 
@@ -2302,7 +2302,7 @@ PNG_EXPORT(162, int, png_get_text, (png_const_structrp png_ptr,
  */
 
 #ifdef PNG_TEXT_SUPPORTED
-PNG_EXPORT(163, void, png_set_text, (png_const_structrp png_ptr,
+PNG_EXPORT(163, void, png_set_text, (png_structrp png_ptr,
     png_inforp info_ptr, png_const_textp text_ptr, int num_text));
 #endif
 
@@ -2462,7 +2462,7 @@ PNG_EXPORT(173, int, png_handle_as_unknown, (png_const_structrp png_ptr,
 #endif
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
-PNG_EXPORT(174, void, png_set_unknown_chunks, (png_const_structrp png_ptr,
+PNG_EXPORT(174, void, png_set_unknown_chunks, (png_structrp png_ptr,
     png_inforp info_ptr, png_const_unknown_chunkp unknowns,
     int num_unknowns));
    /* NOTE: prior to 1.6.0 this routine set the 'location' field of the added

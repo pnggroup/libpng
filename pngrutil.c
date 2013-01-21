@@ -1658,8 +1658,8 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    if (dl > max_dl)
    {
-       png_warning(png_ptr, "sPLT chunk too long");
-       return;
+      png_warning(png_ptr, "sPLT chunk too long");
+      return;
    }
 
    new_palette.nentries = (png_int_32)(data_length / entry_size);
@@ -1669,8 +1669,8 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    if (new_palette.entries == NULL)
    {
-       png_warning(png_ptr, "sPLT chunk requires too much memory");
-       return;
+      png_warning(png_ptr, "sPLT chunk requires too much memory");
+      return;
    }
 
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
