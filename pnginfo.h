@@ -223,16 +223,13 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
-   /* The type of this field must match png_struct::user_chunk_cache_max,
-    * else overflow can occur.
-    */
-   png_uint_32 unknown_chunks_num;
+   int                unknown_chunks_num;
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Data on sPLT chunks (there may be more than one). */
    png_sPLT_tp splt_palettes;
-   png_uint_32 splt_palettes_num;
+   int         splt_palettes_num;
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED

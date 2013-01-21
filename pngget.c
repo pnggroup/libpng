@@ -701,7 +701,7 @@ png_get_sRGB(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
 #ifdef PNG_iCCP_SUPPORTED
 png_uint_32 PNGAPI
-png_get_iCCP(png_const_structrp png_ptr, png_const_inforp info_ptr,
+png_get_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
     png_charpp name, int *compression_type,
     png_bytepp profile, png_uint_32 *proflen)
 {
@@ -726,14 +726,14 @@ png_get_iCCP(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
-png_uint_32 PNGAPI
-png_get_sPLT(png_const_structrp png_ptr, png_const_inforp info_ptr,
+int PNGAPI
+png_get_sPLT(png_const_structrp png_ptr, png_inforp info_ptr,
     png_sPLT_tpp spalettes)
 {
    if (png_ptr != NULL && info_ptr != NULL && spalettes != NULL)
    {
       *spalettes = info_ptr->splt_palettes;
-      return ((png_uint_32)info_ptr->splt_palettes_num);
+      return info_ptr->splt_palettes_num;
    }
 
    return (0);
@@ -742,7 +742,7 @@ png_get_sPLT(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
 #ifdef PNG_hIST_SUPPORTED
 png_uint_32 PNGAPI
-png_get_hIST(png_const_structrp png_ptr, png_const_inforp info_ptr,
+png_get_hIST(png_const_structrp png_ptr, png_inforp info_ptr,
     png_uint_16p *hist)
 {
    png_debug1(1, "in %s retrieval function", "hIST");
@@ -818,7 +818,7 @@ png_get_oFFs(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
 #ifdef PNG_pCAL_SUPPORTED
 png_uint_32 PNGAPI
-png_get_pCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
+png_get_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
     png_charp *purpose, png_int_32 *X0, png_int_32 *X1, int *type, int *nparams,
     png_charp *units, png_charpp *params)
 {
@@ -938,7 +938,7 @@ png_get_pHYs(png_const_structrp png_ptr, png_const_inforp info_ptr,
 #endif /* pHYs */
 
 png_uint_32 PNGAPI
-png_get_PLTE(png_const_structrp png_ptr, png_const_inforp info_ptr,
+png_get_PLTE(png_const_structrp png_ptr, png_inforp info_ptr,
     png_colorp *palette, int *num_palette)
 {
    png_debug1(1, "in %s retrieval function", "PLTE");
@@ -974,8 +974,8 @@ png_get_sBIT(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED
-png_uint_32 PNGAPI
-png_get_text(png_const_structrp png_ptr, png_const_inforp info_ptr,
+int PNGAPI
+png_get_text(png_const_structrp png_ptr, png_inforp info_ptr,
     png_textp *text_ptr, int *num_text)
 {
    if (png_ptr != NULL && info_ptr != NULL && info_ptr->num_text > 0)
@@ -989,7 +989,7 @@ png_get_text(png_const_structrp png_ptr, png_const_inforp info_ptr,
       if (num_text != NULL)
          *num_text = info_ptr->num_text;
 
-      return ((png_uint_32)info_ptr->num_text);
+      return info_ptr->num_text;
    }
 
    if (num_text != NULL)
@@ -1064,7 +1064,7 @@ png_get_tRNS(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 int PNGAPI
-png_get_unknown_chunks(png_const_structrp png_ptr, png_const_inforp info_ptr,
+png_get_unknown_chunks(png_const_structrp png_ptr, png_inforp info_ptr,
     png_unknown_chunkpp unknowns)
 {
    if (png_ptr != NULL && info_ptr != NULL && unknowns != NULL)
