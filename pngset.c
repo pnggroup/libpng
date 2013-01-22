@@ -1385,6 +1385,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
    if (num_chunks + old_num_chunks > UINT_MAX/5)
    {
       png_app_error(png_ptr, "png_set_keep_unknown_chunks: too many chunks");
+      return;
    }
 
    /* If these chunks are being reset to the default then no more memory is
