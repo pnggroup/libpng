@@ -1,5 +1,5 @@
 
-Libpng 1.4.13beta02 - January 22, 2013
+Libpng 1.4.13beta03 - January 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.13beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.13beta02.tar.gz
-   1.4.13beta02.tar.bz2
+   1.4.13beta03.tar.xz (LZMA-compressed, recommended)
+   1.4.13beta03.tar.gz
+   1.4.13beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1413b02.7z (LZMA-compressed, recommended)
-   lp1413b02.zip
+   lp1413b03.7z (LZMA-compressed, recommended)
+   lp1413b03.zip
 
 Other information:
 
-   1.4.13beta02-README.txt
-   1.4.13beta02-LICENSE.txt
+   1.4.13beta03-README.txt
+   1.4.13beta03-LICENSE.txt
 
 Changes since the last public release (1.4.11):
 
@@ -41,6 +41,8 @@ version 1.4.13beta02 [January 22, 2013]
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
+
+version 1.4.13beta03 [January 22, 2013]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
