@@ -2879,9 +2879,10 @@ version 1.4.13beta01 [January 1, 2013]
   Removed references to png_zalloc() and png_zfree() from the manual.
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
 
-version 1.4.13beta02 [January 3, 2013]
+version 1.4.13beta02 [January 22, 2013]
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
+  Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
