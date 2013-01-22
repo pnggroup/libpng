@@ -1,5 +1,5 @@
 
-Libpng 1.2.51beta01 - January 22, 2013
+Libpng 1.2.51beta02 - January 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.51beta01.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51beta01.tar.gz
-   libpng-1.2.51beta01.tar.bz2
+   libpng-1.2.51beta02.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51beta02.tar.gz
+   libpng-1.2.51beta02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.51beta01-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51beta01-no-config.tar.gz
-   libpng-1.2.51beta01-no-config.tar.bz2
+   libpng-1.2.51beta02-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51beta02-no-config.tar.gz
+   libpng-1.2.51beta02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1251b01.zip
-   lp1251b01.7z
-   lp1251b01.tar.bz2
+   lp1251b02.zip
+   lp1251b02.7z
+   lp1251b02.tar.bz2
 
 Project files
 
-   libpng-1.2.51beta01-project-netware.zip
-   libpng-1.2.51beta01-project-wince.zip
+   libpng-1.2.51beta02-project-netware.zip
+   libpng-1.2.51beta02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.51beta01-README.txt
-   libpng-1.2.51beta01-KNOWNBUGS.txt
-   libpng-1.2.51beta01-LICENSE.txt
-   libpng-1.2.51beta01-Y2K-compliance.txt
-   libpng-1.2.51beta01-[previous version]-diff.txt
+   libpng-1.2.51beta02-README.txt
+   libpng-1.2.51beta02-KNOWNBUGS.txt
+   libpng-1.2.51beta02-LICENSE.txt
+   libpng-1.2.51beta02-Y2K-compliance.txt
+   libpng-1.2.51beta02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.50):
 
@@ -46,7 +46,9 @@ version 1.2.51beta01 [January 22, 2013]
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
-  Change default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
+  Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
+
+version 1.2.51beta02 [January 22, 2013]
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
