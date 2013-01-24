@@ -3980,6 +3980,9 @@ Version 1.5.14rc03 [January 18, 2013]
   Check the validity of the "nentries" parameter of png_set_sPLT() and the
   "num_text" parameter of png_set_text_2().
 
+Version 1.5.14 [January 24, 2013]
+  Removed an obsolete line from the manual.
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
