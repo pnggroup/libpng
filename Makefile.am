@@ -41,7 +41,8 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
 
 if PNG_ARM_NEON
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/filter_neon.S
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
+	arm/filter_neon.S
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
@@ -197,22 +198,24 @@ dist-hook:
 
 # install the .../include headers as links to the new ones
 install-data-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
-	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
-	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
+	cd '$(DESTDIR)$(includedir)'; rm -f png.h pngconf.h pnglibconf.h
+	cd '$(DESTDIR)$(includedir)'; $(LN_S) $(PNGLIB_BASENAME)/png.h png.h
+	cd '$(DESTDIR)$(includedir)'; $(LN_S) $(PNGLIB_BASENAME)/pngconf.h \
 		pngconf.h
-	cd $(DESTDIR)$(includedir); $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
+	cd '$(DESTDIR)$(includedir)'; $(LN_S) $(PNGLIB_BASENAME)/pnglibconf.h \
 		pnglibconf.h
-	cd $(DESTDIR)$(pkgconfigdir); rm -f libpng.pc
-	cd $(DESTDIR)$(pkgconfigdir); $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
+	cd '$(DESTDIR)$(pkgconfigdir)'; rm -f libpng.pc
+	cd '$(DESTDIR)$(pkgconfigdir)'; $(LN_S) $(PNGLIB_BASENAME).pc libpng.pc
 
 # do evil things to libpng to cause libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@ to be used
 install-exec-hook:
-	cd $(DESTDIR)$(bindir); rm -f libpng-config
-	cd $(DESTDIR)$(bindir); $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
+	cd '$(DESTDIR)$(bindir)'; rm -f libpng-config
+	cd '$(DESTDIR)$(bindir)';\
+	   $(LN_S) $(PNGLIB_BASENAME)-config libpng-config
 	@set -x;\
-	cd $(DESTDIR)$(libdir);\
-	for ext in a la so so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@ sl dylib dll.a; do\
+	cd '$(DESTDIR)$(libdir)';\
+	for ext in a la so so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@\
+	   sl dylib dll.a; do\
 		rm -f libpng.$$ext;\
                 if test -f $(PNGLIB_BASENAME).$$ext; then\
                        $(LN_S) $(PNGLIB_BASENAME).$$ext libpng.$$ext;\
@@ -220,9 +223,13 @@ install-exec-hook:
 	done
 
 uninstall-hook:
-	cd $(DESTDIR)$(includedir); rm -f png.h pngconf.h pnglibconf.h
-	rm -f $(DESTDIR)$(pkgconfigdir)/libpng.pc
-	rm -f $(DESTDIR)$(bindir)/libpng-config
-	rm -f $(DESTDIR)$(libdir)/libpng.a
-	rm -f $(DESTDIR)$(libdir)/libpng.la
-	rm -f $(DESTDIR)$(libdir)/libpng.dll.a
+	cd '$(DESTDIR)$(includedir)'; rm -f png.h pngconf.h pnglibconf.h
+	rm -f '$(DESTDIR)$(pkgconfigdir)/libpng.pc'
+	rm -f '$(DESTDIR)$(bindir)/libpng-config'
+	rm -f '$(DESTDIR)$(libdir)/libpng.a'
+	rm -f '$(DESTDIR)$(libdir)/libpng.la'
+	rm -f '$(DESTDIR)$(libdir)/libpng.so'
+	rm -f '$(DESTDIR)$(libdir)/libpng.so.@PNGLIB_MAJOR@@PNGLIB_MINOR@.@PNGLIB_RELEASE@'
+	rm -f '$(DESTDIR)$(libdir)/libpng.sl'
+	rm -f '$(DESTDIR)$(libdir)/libpng.dylib'
+	rm -f '$(DESTDIR)$(libdir)/libpng.dll.a'

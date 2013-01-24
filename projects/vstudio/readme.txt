@@ -1,7 +1,7 @@
 
 VisualStudio instructions
 
-libpng version 1.5.13 - September 27, 2012
+libpng version 1.5.14 - January 24, 2013
 
 Copyright (c) 1998-2010 Glenn Randers-Pehrson
 
@@ -12,6 +12,14 @@ and license in png.h
 This directory  contains support for building libpng under MicroSoft
 VisualStudio 2010.  It may also work under later versions of VisualStudio.
 You should be familiar with VisualStudio before using this directory.
+
+WARNING
+=======
+Libpng 1.5 erroneously uses /MD when building debug DLL versions of libpng.
+It should use /MDd - you can change this under properties\C/C++\Code
+Generation\Runtime Library if you need to use the debug runtime for debug
+builds.  This will be changed in libpng 1.6 but is currently retained for
+compatibility with older libpng 1.5 releases.
 
 Initial preparations
 ====================

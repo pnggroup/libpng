@@ -18,20 +18,20 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.5.13], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.5.14], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.5.13
+PNGLIB_VERSION=1.5.14
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=5
-PNGLIB_RELEASE=13
+PNGLIB_RELEASE=14
 
 dnl End of version number stuff
 
 AC_CONFIG_SRCDIR([pngget.c])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_LANG([C])
@@ -191,8 +191,11 @@ AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
 AC_ARG_ENABLE([arm-neon],
 	AC_HELP_STRING([--enable-arm-neon], [Enable ARM NEON optimizations]),
 	[if test "${enableval}" = yes; then
-		AC_DEFINE([PNG_ARM_NEON], [1], [Enable ARM NEON optimizations])
-		AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1], [Align row buffers])
+		AC_DEFINE([PNG_FILTER_OPTIMIZATIONS],
+                          [png_init_filter_functions_neon],
+                          [ARM NEON filter initialization function])
+		AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1],
+                          [Align row buffers])
 	fi])
 AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" = yes])
 

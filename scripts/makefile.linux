@@ -10,7 +10,7 @@
 # Library name:
 LIBNAME = libpng15
 PNGMAJ = 15
-RELEASE = 13
+RELEASE = 14
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
@@ -236,4 +236,4 @@ pngwtran.o pngwtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pn
 pngwutil.o pngwutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 
-pngtest.o: png.h pngconf.h
+pngtest.o: png.h pngconf.h pnglibconf.h

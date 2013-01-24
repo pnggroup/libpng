@@ -102,6 +102,7 @@ pre && version == "search" && version_file != FILENAME{
 
 pre && version == "search" && $0 ~ /^ \* libpng version/{
    version = substr($0, 4)
+   gsub(/\./, " PNG_JOIN . PNG_JOIN", version)
    print "version =", version >out
    next
 }
