@@ -4347,7 +4347,8 @@ Version 1.6.0beta39 [January 19, 2013]
 Version 1.6.0beta40 [January 20, 2013]
   Use consistent handling of overflows in text, sPLT and unknown png_set_* APIs
 
-Version 1.6.0beta41 [January 20, 2013]
+Version 1.6.0rc01 [January 26, 2013]
+  No changes.
 
   ===========================================================================
                        NOTICE November 17, 2012:
