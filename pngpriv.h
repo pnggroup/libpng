@@ -39,6 +39,7 @@
  */
 #define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
 
+#ifndef PNG_VERSION_INFO_ONLY
 /* This is required for the definition of abort(), used as a last ditch
  * error handler when all else fails.
  */
@@ -46,6 +47,7 @@
 
 /* This is used to find 'offsetof', used below for alignment tests. */
 #include <stddef.h>
+#endif /* !PNG_VERSION_INFO_ONLY */
 
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
@@ -125,8 +127,6 @@
 #endif
 
 #include "png.h"
-#include "pnginfo.h"
-#include "pngstruct.h"
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
@@ -172,14 +172,6 @@
 #     define PNG_USER_CHUNK_MALLOC_MAX 0
 #  endif
 #endif
-
-/* This is used for 16 bit gamma tables - only the top level pointers are const,
- * this could be changed:
- */
-typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
-
-/* Added at libpng-1.2.9 */
-/* Moved to pngpriv.h at libpng-1.5.0 */
 
 /* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
  * script.  We may need it here to get the correct configuration on things
@@ -308,6 +300,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #  define PNGFAPI /* PRIVATE */
 #endif
 
+#ifndef PNG_VERSION_INFO_ONLY
 /* Other defines specific to compilers can go here.  Try to keep
  * them inside an appropriate ifdef/endif pair for portability.
  */
@@ -352,6 +345,7 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
     defined(_WIN32) || defined(__WIN32__)
 #  include <windows.h>  /* defines _WINDOWS_ macro */
 #endif
+#endif /* !PNG_VERSION_INFO_ONLY */
 
 /* Moved here around 1.5.0beta36 from pngconf.h */
 /* Users may want to use these so they are not private.  Any library
@@ -617,8 +611,10 @@ typedef PNG_CONST png_uint_16p FAR * png_const_uint_16pp;
 #define png_fixed(png_ptr, fp, s) ((fp) <= 21474 && (fp) >= -21474 ?\
     ((png_fixed_point)(100000 * (fp))) : (png_fixed_error(png_ptr, s),0))
 #else
+#ifndef PNG_VERSION_INFO_ONLY
 PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
    png_const_charp text));
+#endif /* !PNG_VERSION_INFO_ONLY */
 #endif
 #endif
 
@@ -692,6 +688,18 @@ PNG_EXTERN png_fixed_point png_fixed PNGARG((png_structp png_ptr, double fp,
 #define PNG_GAMMA_MAC_INVERSE 65909
 #define PNG_GAMMA_sRGB_INVERSE 45455
 
+/* Almost everything below is C specific; the #defines above can be used in
+ * non-C code (so long as it is C-preprocessed) the rest of this stuff cannot.
+ */
+#ifndef PNG_VERSION_INFO_ONLY
+
+#include "pngstruct.h"
+#include "pnginfo.h"
+
+/* This is used for 16 bit gamma tables -- only the top level pointers are
+ * const; this could be changed:
+ */
+typedef const png_uint_16p * png_const_uint_16pp;
 
 /* Inhibit C++ name-mangling for libpng functions but not for system calls. */
 #ifdef __cplusplus
@@ -1737,4 +1745,5 @@ PNG_EXTERN void PNG_FILTER_OPTIMIZATIONS(png_structp png_ptr, unsigned int bpp);
 }
 #endif
 
+#endif /* PNG_VERSION_INFO_ONLY */
 #endif /* PNGPRIV_H */
