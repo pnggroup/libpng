@@ -123,6 +123,8 @@ Version 1.7.0alpha10 [February 5, 2013]
   Added png_get_palette_max() function.
   Changed png_size_t to size_t throughout headers, make sRGB check numbers
     consistent.
+  Fixed ARM support (Mans Rullgard).
+  Removed stray out-of-order #endif and #ifdef (Mans Rullgard).
 
   ===========================================================================
                        NOTICE November 17, 2012:
