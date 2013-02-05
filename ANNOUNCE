@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta01 - February 5, 2013
+Libpng 1.5.15beta02 - February 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,28 +9,30 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.15beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.15beta01.tar.gz
-   1.5.15beta01.tar.bz2
+   1.5.15beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.15beta02.tar.gz
+   1.5.15beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1515b01.7z  (LZMA-compressed, recommended)
-   lp1515b01.zip
+   lp1515b02.7z  (LZMA-compressed, recommended)
+   lp1515b02.zip
 
 Other information:
 
-   1.5.15beta01-README.txt
-   1.5.15beta01-LICENSE.txt
+   1.5.15beta02-README.txt
+   1.5.15beta02-LICENSE.txt
 
 Changes since the last public release (1.5.14):
 
-Version 1.5.15beta01 [February 5, 2013]
+Version 1.5.15beta01 [February 4, 2013]
   Enabled renaming of the extern (but not DLL exported) ARM filter functions.
     Also enabled inclusion of pngpriv.h in non-C files by preventing C/C++
     specific definitions if PNG_VERSION_INFO_ONLY is defined.
   Added png_get_palette_max() function.
+
+Version 1.5.15beta02 [February 5, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
