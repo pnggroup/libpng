@@ -142,26 +142,22 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 		-DPNG_NO_USE_READ_MACROS -DPNG_BUILDING_SYMBOL_TABLE
 
 .dfn.out:
-	rm -f $@ dfn.c dfn?.out
+	rm -f $@ $@.c $@.?
 	test -d scripts || mkdir scripts
-	echo '#include "$<"' >dfn.c
+	echo '#include "$<"' >$@.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) dfn.c > dfn1.out
-	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC *-\(.*\)- *PNG_DEFN_END.*$$|\1|p'\
-	    dfn1.out >dfn2.out
-	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' dfn2.out >dfn3.out
-	rm -f dfn.c dfn[12].out
-	mv dfn3.out $@
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $@.c > $@.1
+	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$@.2" $@.1 1>&2
+	mv $@.2 $2
 
 # The .dfn file for pnglibconf.h is machine generated
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
-	rm -f $@ dfn?.out
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out version=search\
-	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
+	rm -f $@ pnglibconf.pre $@.?
+	$(AWK) -f ${srcdir}/scripts/options.awk out="pnglibconf.pre"\
+	    version=search ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
 	    ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2
-	rm dfn1.out
-	mv dfn2.out $@
+	$(AWK) -f ${srcdir}/scripts/options.awk out="$@.1" pnglibconf.pre 1>&2
+	mv $@.1 $@
 
 # Symbol checks (.def and .out files should match)
 scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.out

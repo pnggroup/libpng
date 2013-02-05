@@ -3990,6 +3990,11 @@ Version 1.5.15beta01 [February 4, 2013]
   Added png_get_palette_max() function.
 
 Version 1.5.15beta02 [February 5, 2013]
+  Made a probably general fix for the preprocessing used to generate source
+    files. This change might make the check for a special C preprocessor
+    unnecessary, and it also eliminates the requirement for sed in the
+    configure build process. NOTE: this is incomplete, a change must also
+    be made to pnglibconf.mak
 
   ===========================================================================
                        NOTICE November 17, 2012:
