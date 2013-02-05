@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta02 - February 5, 2013
+Libpng 1.5.15beta03 - February 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.15beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.15beta02.tar.gz
-   1.5.15beta02.tar.bz2
+   1.5.15beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.15beta03.tar.gz
+   1.5.15beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1515b02.7z  (LZMA-compressed, recommended)
-   lp1515b02.zip
+   lp1515b03.7z  (LZMA-compressed, recommended)
+   lp1515b03.zip
 
 Other information:
 
-   1.5.15beta02-README.txt
-   1.5.15beta02-LICENSE.txt
+   1.5.15beta03-README.txt
+   1.5.15beta03-LICENSE.txt
 
 Changes since the last public release (1.5.14):
 
@@ -36,11 +36,12 @@ Version 1.5.15beta02 [February 5, 2013]
   Made a probably general fix for the preprocessing used to generate source
     files. This change might make the check for a special C preprocessor
     unnecessary, and it also eliminates the requirement for sed in the
-    configure build process. NOTE: this is incomplete, a change must also
-    be made to pnglibconf.mak
+    configure build process.
   Fix typo in Makefile.am, fix scripts/pnglibconf.mak and makefile.std
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13
   Fix 'setting' handling in options.awk and fixed palette_max API
+
+Version 1.5.15beta03 [February 5, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
