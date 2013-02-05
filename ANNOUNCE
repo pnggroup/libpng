@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha10 - January 21, 2013
+Libpng 1.7.0alpha10 - February 4, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -116,7 +116,10 @@ Version 1.7.0alpha08 [January 17, 2013]
 Version 1.7.0alpha09 [January 21, 2013]
   Pulled changes to multi-chunk handling from libpng-1.6.0beta40.
 
-Version 1.7.0alpha10 [January 21, 2013]
+Version 1.7.0alpha10 [February 4, 2013]
+  Make symbol prefixing work with the ARM neon optimizations. Also
+    allow pngpriv.h to be included for preprocessor definitions only, so
+    it can be used in non-C/C++ files.
 
   ===========================================================================
                        NOTICE November 17, 2012:
