@@ -4351,8 +4351,10 @@ Version 1.6.0beta40 [January 20, 2013]
 Version 1.6.0rc01 [January 26, 2013]
   No changes.
 
-Version 1.6.0rc02 [February 5, 2013]
+Version 1.6.0rc02 [February 4, 2013]
   Added png_get_palette_max() function.
+
+Version 1.6.0rc03 [February 5, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
