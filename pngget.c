@@ -1163,7 +1163,7 @@ png_get_io_chunk_type (png_const_structrp png_ptr)
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 int PNGAPI
-png_get_max_palette_index(png_const_structp png_ptr, png_const_infop info_ptr)
+png_get_palette_max(png_const_structp png_ptr, png_const_infop info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
       return png_ptr->num_palette_max;
