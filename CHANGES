@@ -3983,10 +3983,11 @@ Version 1.5.14rc03 [January 18, 2013]
 Version 1.5.14 [January 24, 2013]
   Removed an obsolete line from the manual.
 
-Version 1.5.15beta01 [February 4, 2013]
+Version 1.5.15beta01 [February 5, 2013]
   Enabled renaming of the extern (but not DLL exported) ARM filter functions.
     Also enabled inclusion of pngpriv.h in non-C files by preventing C/C++
     specific definitions if PNG_VERSION_INFO_ONLY is defined.
+  Added png_get_palette_max() function.
 
   ===========================================================================
                        NOTICE November 17, 2012:

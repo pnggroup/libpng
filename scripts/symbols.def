@@ -240,3 +240,4 @@ EXPORTS
  png_set_cHRM_XYZ @232
  png_set_cHRM_XYZ_fixed @233
  png_set_check_for_invalid_index @234
+ png_get_palette_max @235
