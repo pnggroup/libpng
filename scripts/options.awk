@@ -48,6 +48,8 @@ BEGIN{
    dq="@'"                      # For a single double quote
    start=" PNG_DFN \""          # Start stuff to output (can't contain a "!)
    end="\" "                    # End stuff to output
+   subs="@\" "                  # Substitute start (substitute a C macro)
+   sube=" \"@"                  # Substitute end
    comment=start "/*"           # Comment start
    cend="*/" end                # Comment end
    def=start "#define PNG_"     # Arbitrary define
@@ -497,10 +499,17 @@ END{
          # All the requirements have been processed, output
          # this setting.
          if (deb) print "setting", i
+         deflt = defaults[i]
+         # A leading @ means leave it unquoted so the preprocessor
+         # can substitute the build time value
+         if (deflt ~ /^ @/)
+            deflt = " " subs substr(deflt, 3) sube
+         # Remove any spurious trailing spaces
+         sub(/ *$/,"",deflt)
          print "" >out
          print "/* setting: ", i >out
          print " *   requires:" setting[i] >out
-         print " *   default: ", defaults[i], "*/" >out
+         print " *   default: ", defaults[i] defltinfo, "*/" >out
          if (defaults[i] == "") { # no default, only check if defined
             print "#ifdef PNG_" i >out
          }
@@ -512,13 +521,14 @@ END{
          if (defaults[i] != "") { # default handling
             print "#ifdef PNG_" i >out
          }
-         print def i, "PNG_" i end >out
+         # PNG_<i> is defined, so substitute the value:
+         print def i, subs "PNG_" i sube end >out
          if (defaults[i] != "") {
             print "#else /*default*/" >out
             # And add the default definition for the benefit
             # of later settings an options test:
-            print "# define PNG_" i defaults[i] >out
-            print def i defaults[i] end >out
+            print "# define PNG_" i deflt >out
+            print def i deflt end >out
          }
          print "#endif" >out
 

@@ -3997,6 +3997,7 @@ Version 1.5.15beta02 [February 5, 2013]
     be made to pnglibconf.mak
   Fix typo in Makefile.am, fix scripts/pnglibconf.mak and makefile.std
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13
+  Fix 'setting' handling in options.awk and fixed palette_max API
 
   ===========================================================================
                        NOTICE November 17, 2012:

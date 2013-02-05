@@ -2655,7 +2655,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
     defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
 PNG_EXPORT(234, void, png_set_check_for_invalid_index, (png_structp png_ptr,
     int allowed));
-PNG_EXPORT(235, void, png_get_palette_max, (png_structp png_ptr,
+PNG_EXPORT(235, int, png_get_palette_max, (png_const_structp png_ptr,
     png_const_infop info_ptr));
 #endif
 
