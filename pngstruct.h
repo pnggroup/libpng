@@ -28,7 +28,9 @@
    /* We must ensure that zlib uses 'const' in declarations. */
 #  define ZLIB_CONST
 #endif
+
 #include PNG_ZLIB_HEADER
+
 #ifdef const
    /* zlib.h sometimes #defines const to nothing, undo this. */
 #  undef const

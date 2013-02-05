@@ -4409,9 +4409,10 @@ Version 1.7.0alpha10 [February 5, 2013]
   Added png_get_palette_max() function.
   Changed png_size_t to size_t throughout headers, make sRGB check numbers
     consistent.
-  Ported libpng 1.5 options.awk/dfn file handling to 1.7, fixed one bug.
   Fixed ARM support (Mans Rullgard).
   Removed stray out-of-order #endif and #ifdef (Mans Rullgard).
+  Ported libpng 1.5 options.awk/dfn file handling to 1.7, fixed one bug.
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13.
 
 
   ===========================================================================

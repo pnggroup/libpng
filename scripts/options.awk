@@ -35,17 +35,28 @@ BEGIN{
    version="libpng version unknown" # version information
    version_file=""              # where to find the version
    err=0                        # in-line exit sets this
-   start="PNG_DEFN_MAGIC-"      # Arbitrary start
-   end="-PNG_DEFN_END"          # Arbitrary end
-   ct="PNG_JOIN"                # Join two tokens
-   cx= "/" ct "*"               # Open C comment for output file
-   comment=start cx             # Comment start
+   # The following definitions prevent the C preprocessor noticing the lines
+   # that will be in the final output file.  Some C preprocessors tokenise
+   # the lines, for example by inserting spaces around operators, and all
+   # C preprocessors notice lines that start with '#', most remove comments.
+   # The technique adopted here is to make the final output lines into
+   # C strings (enclosed in double quotes), preceeded by PNG_DFN.  As a
+   # consequence the output cannot contain a 'raw' double quote - instead put
+   # @' in, this will be replaced by a single " afterward.  See the parser
+   # script dfn.awk for more capabilities (not required here).  Note that if
+   # you need a " in a 'setting' in pnglibconf.dfa it must also be @'!
+   dq="@'"                      # For a single double quote
+   start=" PNG_DFN \""          # Start stuff to output (can't contain a "!)
+   end="\" "                    # End stuff to output
+   subs="@\" "                  # Substitute start (substitute a C macro)
+   sube=" \"@"                  # Substitute end
+   comment=start "/*"           # Comment start
    cend="*/" end                # Comment end
-   def=start "#define PNG_" ct  # Arbitrary define
-   sup=ct "_SUPPORTED" end      # end supported option
-   und=comment "#undef PNG_" ct # Unsupported option
-   une=ct "_SUPPORTED" cend     # end unsupported option
-   error=start "ERROR:"         # error message
+   def=start "#define PNG_"     # Arbitrary define
+   sup="_SUPPORTED" end         # end supported option
+   und=comment "#undef PNG_"    # Unsupported option
+   une="_SUPPORTED" cend        # end unsupported option
+   error=start "ERROR:"         # error message, terminate with 'end'
 
    # Variables
    deb=0                        # debug - set on command line
@@ -102,7 +113,6 @@ pre && version == "search" && version_file != FILENAME{
 
 pre && version == "search" && $0 ~ /^ \* libpng version/{
    version = substr($0, 4)
-   gsub(/\./, " PNG_JOIN . PNG_JOIN", version)
    print "version =", version >out
    next
 }
@@ -473,6 +483,8 @@ END{
    print "" >out
    print "/* SETTINGS */" >out
    print comment, "settings", cend >out
+   # Sort (in dfn.awk) on field 2, the setting name
+   print "PNG_DFN_START_SORT 2" >out
    finished = 0
    while (!finished) {
       finished = 1
@@ -492,10 +504,17 @@ END{
          # All the requirements have been processed, output
          # this setting.
          if (deb) print "setting", i
+         deflt = defaults[i]
+         # A leading @ means leave it unquoted so the preprocessor
+         # can substitute the build time value
+         if (deflt ~ /^ @/)
+            deflt = " " subs substr(deflt, 3) sube
+         # Remove any spurious trailing spaces
+         sub(/ *$/,"",deflt)
          print "" >out
          print "/* setting: ", i >out
          print " *   requires:" setting[i] >out
-         print " *   default: ", defaults[i], "*/" >out
+         print " *   default: ", defaults[i] defltinfo, "*/" >out
          if (defaults[i] == "") { # no default, only check if defined
             print "#ifdef PNG_" i >out
          }
@@ -507,13 +526,14 @@ END{
          if (defaults[i] != "") { # default handling
             print "#ifdef PNG_" i >out
          }
-         print def i, "PNG_" i end >out
+         # PNG_<i> is defined, so substitute the value:
+         print def i, subs "PNG_" i sube end >out
          if (defaults[i] != "") {
             print "#else /*default*/" >out
             # And add the default definition for the benefit
             # of later settings an options test:
-            print "# define PNG_" i defaults[i] >out
-            print def i defaults[i] end >out
+            print "# define PNG_" i deflt >out
+            print def i deflt end >out
          }
          print "#endif" >out
 
@@ -529,6 +549,7 @@ END{
          exit 1
       }
    }
+   print "PNG_DFN_END_SORT" >out
    print comment, "end of settings", cend >out
 
    # Now do the options - somewhat more complex.  The dependency
@@ -622,6 +643,9 @@ END{
       }
    }
    if (err) exit 1
+
+   # Sort options too
+   print "PNG_DFN_START_SORT 2" >out
 
    # option[i] is now the complete list of all the tokens we may
    # need to output, go through it as above, depth first.
@@ -774,10 +798,11 @@ END{
          exit 1
       }
    }
+   print "PNG_DFN_END_SORT" >out
    print comment, "end of options", cend >out
 
    # Regular end - everything looks ok
    if (protect != "") {
-      print start "#endif", cx, protect, "*/" end >out
+      print start "#endif", "/*", protect, "*/" end >out
    }
 }
