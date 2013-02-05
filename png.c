@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0alpha10 - January 21, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0alpha10 - February 5, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0alpha10 - January 21, 2013\
+      return "libpng version 1.7.0alpha10 - February 5, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2035,7 +2035,7 @@ static const struct
       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 perceptual")
 
-   PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
+   PNG_ICC_CHECKSUM(0x0398f3fc, 0xf29e526d,
       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };

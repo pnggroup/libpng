@@ -4407,6 +4407,8 @@ Version 1.7.0alpha10 [February 5, 2013]
     allow pngpriv.h to be included for preprocessor definitions only, so
     it can be used in non-C/C++ files.
   Added png_get_palette_max() function.
+  Changed png_size_t to size_t throughout headers, make sRGB check numbers
+    consistent.
 
   ===========================================================================
                        NOTICE November 17, 2012:

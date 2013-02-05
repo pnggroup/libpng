@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.7.0alpha10 - January 21, 2013
+ * libpng version 1.7.0alpha10 - February 5, 2013
  *
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -511,6 +511,8 @@
 
 /* Prior to 1.6.0 it was possible to disable the use of size_t, 1.6.0, however,
  * requires an ISOC90 compiler and relies on consistent behavior of sizeof.
+ *
+ * DEPRECATED: don't use these types, instead use size_t and ptrdiff_t.
  */
 typedef size_t png_size_t;
 typedef ptrdiff_t png_ptrdiff_t;
@@ -531,13 +533,13 @@ typedef ptrdiff_t png_ptrdiff_t;
 #  endif
 #endif
 
-/* png_alloc_size_t is guaranteed to be no smaller than png_size_t, and no
- * smaller than png_uint_32.  Casts from png_size_t or png_uint_32 to
+/* png_alloc_size_t is guaranteed to be no smaller than size_t, and no
+ * smaller than png_uint_32.  Casts from size_t or png_uint_32 to
  * png_alloc_size_t are not necessary; in fact, it is recommended not to use
  * them at all so that the compiler can complain when something turns out to be
  * problematic.
  *
- * Casts in the other direction (from png_alloc_size_t to png_size_t or
+ * Casts in the other direction (from png_alloc_size_t to size_t or
  * png_uint_32) should be explicitly applied; however, we do not expect to
  * encounter practical situations that require such conversions.
  *
@@ -547,7 +549,7 @@ typedef ptrdiff_t png_ptrdiff_t;
 #ifdef PNG_SMALL_SIZE_T
    typedef png_uint_32 png_alloc_size_t;
 #else
-   typedef png_size_t png_alloc_size_t;
+   typedef size_t png_alloc_size_t;
 #endif
 
 /* Prior to 1.6.0 libpng offered limited support for Microsoft C compiler
@@ -583,8 +585,8 @@ typedef char                  * png_charp;
 typedef const char            * png_const_charp;
 typedef png_fixed_point       * png_fixed_point_p;
 typedef const png_fixed_point * png_const_fixed_point_p;
-typedef png_size_t            * png_size_tp;
-typedef const png_size_t      * png_const_size_tp;
+typedef size_t                * png_size_tp;
+typedef const size_t          * png_const_size_tp;
 
 #ifdef PNG_STDIO_SUPPORTED
 typedef FILE            * png_FILE_p;
