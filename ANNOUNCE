@@ -38,6 +38,8 @@ Version 1.5.15beta02 [February 5, 2013]
     unnecessary, and it also eliminates the requirement for sed in the
     configure build process. NOTE: this is incomplete, a change must also
     be made to pnglibconf.mak
+  Fix typo in Makefile.am, fix scripts/pnglibconf.mak and makefile.std
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

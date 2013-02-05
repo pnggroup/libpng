@@ -87,7 +87,8 @@ EXTRA_DIST= \
 
 SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
 
-CLEANFILES= dfn.c dfn?.out pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
+CLEANFILES= dfn.c dfn?.out *.out.? scripts/*.out.? pngout.png \
+	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
 	check.new pnglibconf.* symbols.new pngtest-log.txt \
 	$(SCRIPT_CLEANFILES)
@@ -148,7 +149,7 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $@.c > $@.1
 	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$@.2" $@.1 1>&2
-	mv $@.2 $2
+	mv $@.2 $@
 
 # The .dfn file for pnglibconf.h is machine generated
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
