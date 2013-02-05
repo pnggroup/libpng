@@ -43,7 +43,7 @@ LN_SF=ln -sf
 
 #ARCH = -march=pentium3
 #ARCH = -march=i686
-ARCH = 
+ARCH =
 CDEBUG = -g -DPNG_DEBUG=5
 LDDEBUG =
 CRELEASE = -O2
