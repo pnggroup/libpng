@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.6.0rc01
+;Version 1.6.0rc02
  png_access_version_number @1
  png_set_sig_bytes @2
  png_sig_cmp @3
@@ -247,3 +247,4 @@ EXPORTS
  png_image_write_to_stdio @240
  png_convert_to_rfc1123_buffer @241
  png_set_check_for_invalid_index @242
+ png_get_palette_max @243

@@ -3779,7 +3779,8 @@ Version 1.5.7 [December 15, 2011]
 
 Version 1.6.0beta01 [December 15, 2011]
   Removed machine-generated configure files from the GIT repository (they will
-    continue to appear in the tarball distributions).
+    continue to appear in the tarball distributions and in the libpng15 and
+    earlier GIT branches).
   Restored the new 'simplified' API, which was started in libpng-1.5.7beta02
     but later deleted from libpng-1.5.7beta05.
   Added example programs for the new 'simplified' API.
@@ -4349,6 +4350,9 @@ Version 1.6.0beta40 [January 20, 2013]
 
 Version 1.6.0rc01 [January 26, 2013]
   No changes.
+
+Version 1.6.0rc02 [February 5, 2013]
+  Added png_get_palette_max() function.
 
   ===========================================================================
                        NOTICE November 17, 2012:

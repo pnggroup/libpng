@@ -1,5 +1,5 @@
 
-Libpng 1.6.0rc01 - January 26, 2013
+Libpng 1.6.0rc02 - February 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.0rc01.tar.gz
+   1.6.0rc02.tar.xz (LZMA-compressed, recommended)
+   1.6.0rc02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160r01.7z  (LZMA-compressed, recommended)
-   lp160r01.zip
+   lp160r02.7z  (LZMA-compressed, recommended)
+   lp160r02.zip
 
 Other information:
 
-   1.6.0rc01-README.txt
-   1.6.0rc01-LICENSE.txt
+   1.6.0rc02-README.txt
+   1.6.0rc02-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -596,6 +596,9 @@ Version 1.6.0beta40 [January 20, 2013]
 
 Version 1.6.0rc01 [January 26, 2013]
   No changes.
+
+Version 1.6.0rc02 [February 5, 2013]
+  Added png_get_palette_max() function.
 
   ===========================================================================
                        NOTICE November 17, 2012:
