@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -843,8 +843,9 @@ png_get_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
-#  ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-#     ifdef PNG_FIXED_POINT_SUPPORTED
+#  ifdef PNG_FIXED_POINT_SUPPORTED
+#    if (defined PNG_FLOATING_ARITHMETIC_SUPPORTED) || \
+         (defined PNG_FLOATING_POINT_SUPPORTED)
 png_uint_32 PNGAPI
 png_get_sCAL_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, png_fixed_point *width, png_fixed_point *height)
@@ -865,8 +866,9 @@ png_get_sCAL_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
    return(0);
 }
-#     endif /* FIXED_POINT */
-#     ifdef PNG_FLOATING_POINT_SUPPORTED
+#    endif /* FLOATING_ARITHMETIC */
+#  endif /* FIXED_POINT */
+#  ifdef PNG_FLOATING_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, double *width, double *height)
@@ -882,9 +884,7 @@ png_get_sCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
    return(0);
 }
-#     endif /* FLOATING POINT */
-#  endif /* FLOATING_ARITHMETIC */
-
+#  endif /* FLOATING POINT */
 png_uint_32 PNGAPI
 png_get_sCAL_s(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, png_charpp width, png_charpp height)
@@ -1160,5 +1160,16 @@ png_get_io_chunk_type (png_const_structrp png_ptr)
    return png_ptr->chunk_name;
 }
 #endif /* ?PNG_IO_STATE_SUPPORTED */
+
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+int PNGAPI
+png_get_palette_max(png_const_structp png_ptr, png_const_infop info_ptr)
+{
+   if (png_ptr != NULL && info_ptr != NULL)
+      return png_ptr->num_palette_max;
+
+   return (-1);
+}
+#endif
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
