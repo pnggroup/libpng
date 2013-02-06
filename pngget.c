@@ -843,9 +843,8 @@ png_get_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
-#  ifdef PNG_FIXED_POINT_SUPPORTED
-#    if (defined PNG_FLOATING_ARITHMETIC_SUPPORTED) || \
-         (defined PNG_FLOATING_POINT_SUPPORTED)
+#  ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+#     ifdef PNG_FIXED_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, png_fixed_point *width, png_fixed_point *height)
@@ -866,9 +865,9 @@ png_get_sCAL_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
    return(0);
 }
-#    endif /* FLOATING_ARITHMETIC */
-#  endif /* FIXED_POINT */
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
+#     endif /* FIXED_POINT */
+
+#     ifdef PNG_FLOATING_POINT_SUPPORTED
 png_uint_32 PNGAPI
 png_get_sCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, double *width, double *height)
@@ -884,7 +883,9 @@ png_get_sCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
    return(0);
 }
-#  endif /* FLOATING POINT */
+#     endif /* FLOATING POINT */
+#  endif /* FLOATING_ARITHMETIC */
+
 png_uint_32 PNGAPI
 png_get_sCAL_s(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, png_charpp width, png_charpp height)
