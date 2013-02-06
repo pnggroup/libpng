@@ -4414,6 +4414,11 @@ Version 1.7.0alpha10 [February 6, 2013]
   Ported libpng 1.5 options.awk/dfn file handling to 1.7, fixed one bug.
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13.
   Minor fixes to assembler changes, verified with a dummy .S file
+  Removed cc -E workround, corrected png_get_palette_max API. Tested on
+    SUN OS cc 5.9, which demonstrates the tokenization problem previously
+    avoided by using /lib/cpp.  Since all .dfn output is now protected
+    in double quotes unless it is to be macro substituted the fix should work
+    everywhere.
 
   ===========================================================================
                        NOTICE November 17, 2012:

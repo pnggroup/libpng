@@ -53,8 +53,7 @@ AC_PROG_CC
 AM_PROG_AS
 LT_PATH_LD
 AC_PROG_CPP
-AC_CHECK_TOOL(SED, sed, :)
-AC_CHECK_TOOL(AWK, awk, :)
+AC_PROG_AWK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -64,29 +63,22 @@ dnl compatible later version may be used
 LT_INIT([win32-dll])
 LT_PREREQ([2.4.2])
 
-# On Solaris 10 and 12 CPP gets set to cc -E, however this still
-# does some input parsing.  We need strict ANSI-C style tokenization,
-# check this:
-AC_REQUIRE_CPP
-AC_MSG_CHECKING([for a C preprocessor that does not parse its input])
-AC_PREPROC_IFELSE([AC_LANG_SOURCE([[1.1.1 16BIT]])],
-   [DFNCPP="$CPP"],
-   [  DFNCPP=""
-      sav_CPP="$CPP"
-      for CPP in "${CC-cc} -E" "${CC-cc} -E -traditional-cpp" "/lib/cpp" "cpp"
-      do
-         AC_PREPROC_IFELSE([AC_LANG_SOURCE([[1.1.1 16BIT]])],
-            [DFNCPP="$CPP"]
-            [break],,)
-      done
-      CPP="$sav_CPP"
-   ])
-if test -n "$DFNCPP"; then
-   AC_MSG_RESULT([$DFNCPP])
-   AC_SUBST(DFNCPP)
+# Some awks crash when confronted with pnglibconf.dfa, do a test run now
+# to make sure this doesn't happen
+AC_MSG_CHECKING([that AWK works])
+if ${AWK} -f ${srcdir}/scripts/options.awk out="/dev/null" version=search\
+   ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
+   ${srcdir}/pngusr.dfa 1>&2
+then
+   AC_MSG_RESULT([ok])
 else
-   AC_MSG_FAILURE([not found], 1)
+   AC_MSG_FAILURE([failed], 1)
 fi
+
+# This is a remnant of the old cc -E validation, where it may have been
+# necessary to use a different preprocessor for .dfn files
+DFNCPP="$CPP"
+AC_SUBST(DFNCPP)
 
 # -Werror cannot be passed to GCC in CFLAGS because configure will fail (it
 # checks the compiler with a program that generates a warning), add the
@@ -116,7 +108,7 @@ AC_ARG_ENABLE(werror,
 # Checks for header files.
 AC_HEADER_STDC
 # Headers used in pngpriv.h:
-AC_CHECK_HEADERS([stdlib.h string.h float.h fp.h math.h m68881.h])
+AC_CHECK_HEADERS([assert.h stdlib.h string.h float.h fp.h math.h m68881.h])
 # Additional headers used in pngconf.h:
 AC_CHECK_HEADERS([limits.h stddef.h stdio.h setjmp.h time.h])
 # Used by pngread.c (for the simplified API):
@@ -126,8 +118,6 @@ AC_CHECK_HEADERS([errno.h])
 AC_CHECK_HEADERS([ctype.h])
 # Additional requirements of contrib/libtests/pngvalid.c:
 AC_CHECK_HEADERS([fenv.h])
-# Additional requirements of contrib/libtests/tarith.c:
-AC_CHECK_HEADERS([assert.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 # Most of these have been removed from 1.7.0 because they checked for non-ANSI-C
