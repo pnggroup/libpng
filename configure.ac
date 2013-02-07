@@ -19,7 +19,7 @@ AC_PREREQ(2.59)
 dnl Version number stuff here:
 
 AC_INIT([libpng], [1.5.15beta03], [png-mng-implement@lists.sourceforge.net])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([serial-tests])
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
@@ -39,34 +39,12 @@ AC_PROG_CC
 AM_PROG_AS
 AC_PROG_LD
 AC_PROG_CPP
-AC_CHECK_TOOL(SED, sed, :)
-AC_CHECK_TOOL(AWK, awk, :)
+AC_PROG_SED
+AC_PROG_AWK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 LT_INIT([win32-dll])
-
-# On Solaris 10 and 12 CPP gets set to cc -E, however this still
-# does some input parsing.  We need strict ANSI-C style tokenization,
-# check this:
-AC_REQUIRE_CPP
-AC_MSG_CHECKING([for a C preprocessor that does not parse its input])
-AC_TRY_CPP([1.5.0 16BIT],
-   [DFNCPP="$CPP"],
-   [DFNCPP=""
-   sav_CPP="$CPP"
-   for CPP in "${CC-cc} -E" "${CC-cc} -E -traditional-cpp" "/lib/cpp" "cpp"; do
-      AC_TRY_CPP([1.5.0 16BIT],
-         [DFNCPP="$CPP"]
-         [break],,)
-   done
-   CPP="$sav_CPP"])
-if test -n "$DFNCPP"; then
-   AC_MSG_RESULT([$DFNCPP])
-   AC_SUBST(DFNCPP)
-else
-   AC_MSG_FAILURE([not found], 1)
-fi
 
 # Checks for header files.
 AC_HEADER_STDC
@@ -77,6 +55,11 @@ AC_C_CONST
 AC_TYPE_SIZE_T
 AC_STRUCT_TM
 AC_C_RESTRICT
+
+# This is a remnant of the old cc -E validation, where it may have been
+# necessary to use a different preprocessor for .dfn files
+DFNCPP="$CPP"
+AC_SUBST(DFNCPP)
 
 # Checks for library functions.
 AC_FUNC_STRTOD
