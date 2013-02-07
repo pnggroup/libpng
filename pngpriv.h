@@ -40,10 +40,17 @@
 #define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
 
 #ifndef PNG_VERSION_INFO_ONLY
+/* Keep standard libraries at the top of this file */
+
 /* Standard library headers not required by png.h: */
 #  include <stdlib.h>
 #  include <string.h>
-#endif
+
+/* For headers only required with some build configurations see the lines after
+ * pnglibconf.h is included!
+ */
+
+#endif /* VERSION_INFO_ONLY */
 
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
@@ -87,6 +94,36 @@
 #    define PNG_USER_DLLFNAME_POSTFIX "Cb"
 #  endif
 #endif
+
+#ifndef PNG_VERSION_INFO_ONLY
+/* Additional standard libaries required in certain cases, put only standard
+ * ANSI-C89 headers here.  If not available, or non-functional, the problem
+ * should be fixed by writing a wrapper for the header and the file on your
+ * include path.
+ */
+#if defined PNG_sCAL_SUPPORTED && defined PNG_FLOATING_POINT_SUPPORTED
+   /* png.c requires the following ANSI-C constants if the conversion of
+    * floating point to ASCII is implemented therein:
+    *
+    *  DBL_MIN_10_EXP Minimum negative integer such that 10^integer is a
+    *                 normalized (double) value.
+    *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
+    *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
+    *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
+    */
+#  include <float.h>
+#endif /* sCAL && FLOATING_POINT */
+
+#if defined PNG_FLOATING_ARITHMETIC_SUPPORTED ||\
+   defined PNG_FLOATING_POINT_SUPPORTED
+   /* ANSI-C90 math functions are required.  Full compliance with the standard
+    * is probably not a requirement, but the functions must exist and be
+    * declared in <math.h>
+    */
+#  include <math.h>
+#endif /* FLOATING_ARITHMETIC || FLOATING_POINT */
+
+#endif /* VERSION_INFO_ONLY */
 
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
@@ -194,9 +231,25 @@
 #  endif
 #endif
 
+/* Include png.h here to get the version info and other macros, pngstruct.h and
+ * pnginfo.h are included later under the protection of !PNG_VERSION_INFO_ONLY
+ */
+#include "png.h"
+
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
 #  define PNG_DLL_EXPORT
+#endif
+
+/* asserts are turned off in release code, but are in even in release candidates
+ * because often system builders only check future libpng releases when a
+ * release candidate is available.
+ */
+#if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
+#  define NDEBUG
+#endif
+#ifndef PNG_VERSION_INFO_ONLY
+#  include <assert.h>
 #endif
 
 /* SECURITY and SAFETY:
@@ -325,50 +378,6 @@
 #else
 #  define PNGFAPI /* PRIVATE */
 #endif
-
-#ifndef PNG_VERSION_INFO_ONLY
-/* Other defines specific to compilers can go here.  Try to keep
- * them inside an appropriate ifdef/endif pair for portability.
- */
-#if defined PNG_sCAL_SUPPORTED && defined PNG_FLOATING_POINT_SUPPORTED
-   /* png.c requires the following ANSI-C constants if the conversion of
-    * floating point to ASCII is implemented therein:
-    *
-    *  DBL_MIN_10_EXP Minimum negative integer such that 10^integer is a
-    *                 normalized (double) value.
-    *  DBL_DIG  Maximum number of decimal digits (can be set to any constant)
-    *  DBL_MIN  Smallest normalized fp number (can be set to an arbitrary value)
-    *  DBL_MAX  Maximum floating point number (can be set to an arbitrary value)
-    */
-#  include <float.h>
-#endif /* sCAL && FLOATING_POINT */
-
-#if defined PNG_FLOATING_ARITHMETIC_SUPPORTED ||\
-   defined PNG_FLOATING_POINT_SUPPORTED
-   /* Certain floating point functions are used internally; only floor and ceil
-    * if FLOATING_POINT is supported, but if FLOATING_ARITHMETIC is used then
-    * pow and exp are needed too.
-    */
-#  if (defined(__MWERKS__) && defined(macintosh)) || defined(applec) || \
-    defined(THINK_C) || defined(__SC__) || defined(TARGET_OS_MAC)
-     /* We need to check that <math.h> hasn't already been included earlier
-      * as it seems it doesn't agree with <fp.h>, yet we should really use
-      * <fp.h> if possible.
-      */
-#    if !defined(__MATH_H__) && !defined(__MATH_H) && !defined(__cmath__)
-#      include <fp.h>
-#    endif
-#  else
-#    include <math.h>
-#  endif
-#  if defined(_AMIGA) && defined(__SASC) && defined(_M68881)
-     /* Amiga SAS/C: We must include builtin FPU functions when compiling using
-      * MATH=68881
-      */
-#    include <m68881.h>
-#  endif
-#endif /* FLOATING_ARITHMETIC || FLOATING_POINT */
-#endif /* VERSION_INFO_ONLY */
 
 /* These macros may need to be architecture dependent. */
 #define PNG_ALIGN_NONE   0 /* do not use data alignment */
@@ -533,12 +542,15 @@
    abs((int)((c1).green) - (int)((c2).green)) + \
    abs((int)((c1).blue) - (int)((c2).blue)))
 
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
 /* See below for the definitions of the tables used in these macros */
 #define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
    ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
    /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
     * encoded value with maximum error 0.646365.  Note that the input is not a
     * 16-bit value; it has been multiplied by 255! */
+#endif /* PNG_SIMPLIFIED_READ/WRITE */
 
 /* Added to libpng-1.6.0: scale a 16-bit value in the range 0..65535 to 0..255
  * by dividing by 257 *with rounding*.  This macro is exact for the given range.
@@ -679,7 +691,6 @@
  */
 #ifndef PNG_VERSION_INFO_ONLY
 
-#include "png.h"
 #include "pngstruct.h"
 #include "pnginfo.h"
 
@@ -691,6 +702,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 /* Added to libpng-1.5.7: sRGB conversion tables */
 #if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
    defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
     * 0..65535.  This table gives the closest 16-bit answers (no errors).
@@ -699,6 +711,7 @@ PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
 
 PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_base, [512]);
 PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
+#endif /* PNG_SIMPLIFIED_READ/WRITE */
 
 
 /* Inhibit C++ name-mangling for libpng functions but not for system calls. */
