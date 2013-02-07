@@ -4360,6 +4360,8 @@ Version 1.6.0rc03 [February 5, 2013]
 Version 1.6.0rc04 [February 7, 2013]
   Turn serial tests back on (recently turned off by autotools upgrade).
 
+Version 1.6.0rc05 [February 7, 2013]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
