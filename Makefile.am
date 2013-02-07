@@ -7,24 +7,41 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-TESTS_ENVIRONMENT= srcdir=$(srcdir)
-check_PROGRAMS= pngtest
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid
+
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS = test-pngtest.sh
 
-# Only do the following if the contrib directory is present.
-check_PROGRAMS+= pngvalid pngstest pngunknown
 pngvalid_SOURCES = contrib/libtests/pngvalid.c
-pngstest_SOURCES = contrib/libtests/pngstest.c
-pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngstest_SOURCES = contrib/libtests/pngstest.c
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS += contrib/libtests/test-pngunknown.sh\
-	 contrib/libtests/test-pngvalid-simple.sh\
-	 contrib/libtests/test-pngvalid-full.sh\
-	 contrib/libtests/test-pngstest.sh
+
+# Generally these are single line shell scripts to run a test with a particular
+# set of parameters:
+TESTS = tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
+   tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
+   tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
+   tests/pngstest-3p04 tests/pngstest-3p08 tests/pngstest-4a08\
+   tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
+   tests/pngstest-error tests/pngtest tests/pngunknown-IDAT\
+   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
+   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
+   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
+   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+   tests/pngvalid-gamma-expand16-background\
+   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
+   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+   tests/pngvalid-progressive-interlace-size\
+   tests/pngvalid-progressive-interlace-standard\
+   tests/pngvalid-progressive-interlace-transform\
+   tests/pngvalid-progressive-standard tests/pngvalid-standard
+# These tests are expected, and required, to fail:
+XFAIL_TESTS = tests/pngstest-error
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5

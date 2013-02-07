@@ -4421,6 +4421,10 @@ Version 1.7.0alpha10 [February 5, 2013]
     everywhere.
 
 Version 1.7.0alpha11 [February 7, 2013]
+  Enable parallel tests and rearrange TESTS order to take advantage of
+    the massive speed improvements use a make capable of parallel builds
+    on a multi-CPU machine and pass the right arguments to make (-j10000
+    for GNU make) to get the build to run in parallel.
 
   ===========================================================================
                        NOTICE November 17, 2012:
