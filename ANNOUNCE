@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha10 - February 7, 2013
+Libpng 1.7.0alpha11 - February 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0alpha10.tar.xz (LZMA-compressed, recommended)
-   1.7.0alpha10.tar.gz
+   1.7.0alpha11.tar.xz (LZMA-compressed, recommended)
+   1.7.0alpha11.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170a10.7z  (LZMA-compressed, recommended)
-   lp170a10.zip
+   lp170a11.7z  (LZMA-compressed, recommended)
+   lp170a11.zip
 
 Other information:
 
-   1.7.0alpha10-README.txt
-   1.7.0alpha10-LICENSE.txt
+   1.7.0alpha11-README.txt
+   1.7.0alpha11-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -116,7 +116,7 @@ Version 1.7.0alpha08 [January 17, 2013]
 Version 1.7.0alpha09 [January 21, 2013]
   Pulled changes to multi-chunk handling from libpng-1.6.0beta40.
 
-Version 1.7.0alpha10 [February 7, 2013]
+Version 1.7.0alpha10 [February 5, 2013]
   Make symbol prefixing work with the ARM neon optimizations. Also
     allow pngpriv.h to be included for preprocessor definitions only, so
     it can be used in non-C/C++ files.
@@ -133,6 +133,8 @@ Version 1.7.0alpha10 [February 7, 2013]
     avoided by using /lib/cpp.  Since all .dfn output is now protected
     in double quotes unless it is to be macro substituted the fix should work
     everywhere.
+
+Version 1.7.0alpha11 [February 7, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:

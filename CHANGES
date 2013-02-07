@@ -4402,7 +4402,7 @@ Version 1.7.0alpha08 [January 17, 2013]
 Version 1.7.0alpha09 [January 21, 2013]
   Pulled changes to multi-chunk handling from libpng-1.6.0beta40.
 
-Version 1.7.0alpha10 [February 7, 2013]
+Version 1.7.0alpha10 [February 5, 2013]
   Make symbol prefixing work with the ARM neon optimizations. Also
     allow pngpriv.h to be included for preprocessor definitions only, so
     it can be used in non-C/C++ files.
@@ -4419,6 +4419,8 @@ Version 1.7.0alpha10 [February 7, 2013]
     avoided by using /lib/cpp.  Since all .dfn output is now protected
     in double quotes unless it is to be macro substituted the fix should work
     everywhere.
+
+Version 1.7.0alpha11 [February 7, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
