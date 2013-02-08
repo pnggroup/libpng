@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "February 7, 2013"
+.TH LIBPNG 3 "February 8, 2013"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0rc05
 .SH SYNOPSIS
@@ -504,7 +504,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0rc05 - February 7, 2013
+ libpng version 1.6.0rc05 - February 8, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -515,7 +515,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0rc05 - February 7, 2013
+ libpng versions 0.97, January 1998, through 1.6.0rc05 - February 8, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -5096,12 +5096,16 @@ any invalid pixels are decoded as opaque black by the decoder and written
 as-is by the encoder.
 
 Retrieving the maximum palette index found was added at libpng-1.5.15.
-This statement must appear after png_read_png() or png_read_image().
+This statement must appear after png_read_png() or png_read_image() while
+reading, and after png_write_png() or png_write_image() while writing.
 
    int max_palette = png_get_palette_max(png_ptr, info_ptr);
 
-This will return the maximum palette index found, or "-1" if the palette
-was not checked, or "0" if no palette was found.
+This will return the maximum palette index found in the image, or "-1" if
+the palette was not checked, or "0" if no palette was found.  Note that this
+does not account for any palette index used by ancillary chunks such as the
+bKGD chunk; you must check those separately to determine the maximum
+palette index actually used.
 
 A. Changes that affect users of libpng
 
@@ -5642,7 +5646,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-February 7, 2013
+February 8, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5911,7 +5915,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.0rc05 - February 7, 2013:
+Libpng version 1.6.0rc05 - February 8, 2013:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5934,7 +5938,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.0rc05, February 7, 2013, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.0rc05, February 8, 2013, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6033,7 +6037,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-February 7, 2013
+February 8, 2013
 
 .\" end of man page
 
