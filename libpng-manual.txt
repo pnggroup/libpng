@@ -4592,12 +4592,16 @@ any invalid pixels are decoded as opaque black by the decoder and written
 as-is by the encoder.
 
 Retrieving the maximum palette index found was added at libpng-1.5.15.
-This statement must appear after png_read_png() or png_read_image().
+This statement must appear after png_read_png() or png_read_image() while
+reading, and after png_write_png() or png_write_image() while writing.
 
    int max_palette = png_get_palette_max(png_ptr, info_ptr);
 
-This will return the maximum palette index found, or "-1" if the palette
-was not checked, or "0" if no palette was found.
+This will return the maximum palette index found in the image, or "-1" if
+the palette was not checked, or "0" if no palette was found.  Note that this
+does not account for any palette index used by ancillary chunks such as the
+bKGD chunk; you must check those separately to determine the maximum
+palette index actually used.
 
 A. Changes that affect users of libpng
 

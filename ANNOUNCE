@@ -149,12 +149,6 @@ Version 1.7.0alpha11 [February 8, 2013]
     which may be a library function (not an intrinsic). Removed unused #if 0
     code.
 
-  ===========================================================================
-                       NOTICE November 17, 2012:
-     The location of the git repository at SourceForge has changed.
-               Visit http://libpng.sf.net/ for details.
-  ===========================================================================
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
