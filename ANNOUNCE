@@ -148,6 +148,12 @@ Version 1.7.0alpha11 [February 8, 2013]
     png_fixed and the gamma code specific version of the same to avoid floor(),
     which may be a library function (not an intrinsic). Removed unused #if 0
     code.
+  Fixed make distcheck to skip over the test result files. They were
+    being included because the whole of the 'tests' directory is included,
+    fixed to just include the actual test files and tests/pngstest.  Also
+    reverted the previous erroneous change to remove the ${srcdir} from the
+    front of contrib, scripts, projects and added an explanation of what is
+    going on to Makefile.am
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -97,11 +97,14 @@ nodist_pkginclude_HEADERS= pnglibconf.h
 pkgconfigdir = @pkgconfigdir@
 pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
-#extra source distribution files.
+# Extra source distribution files, '${srcdir}' is used below to stop build files
+# from those directories being included.  This only works if the configure is
+# not done in the source directory!
 EXTRA_DIST= \
 	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	contrib projects scripts tests \
+	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
+	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 
 SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
