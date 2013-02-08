@@ -23,14 +23,7 @@ pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
-TESTS = tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
-   tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
-   tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
-   tests/pngstest-3p04 tests/pngstest-3p08 tests/pngstest-4a08\
-   tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
-   tests/pngstest-error tests/pngtest tests/pngunknown-IDAT\
-   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
-   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
+TESTS =\
    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
    tests/pngvalid-gamma-expand16-background\
@@ -39,7 +32,17 @@ TESTS = tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
    tests/pngvalid-progressive-interlace-size\
    tests/pngvalid-progressive-interlace-standard\
    tests/pngvalid-progressive-interlace-transform\
-   tests/pngvalid-progressive-standard tests/pngvalid-standard
+   tests/pngvalid-progressive-standard tests/pngvalid-standard\
+   tests/pngtest\
+   tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
+   tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
+   tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
+   tests/pngstest-3p04 tests/pngstest-3p08 tests/pngstest-4a08\
+   tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
+   tests/pngstest-error tests/pngunknown-IDAT\
+   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
+   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg
+
 # These tests are expected, and required, to fail:
 XFAIL_TESTS = tests/pngstest-error
 
@@ -98,8 +101,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 EXTRA_DIST= \
 	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
-	$(TESTS) \
+	contrib projects scripts tests \
 	CMakeLists.txt example.c libpng-manual.txt
 
 SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn

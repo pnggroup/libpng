@@ -1,23 +1,2 @@
 #!/bin/sh
-#
-# The name of the script should be:
-#
-#  pngstest-....
-#
-# Where the last four characters are the suffix of a PNGSuite test file, or
-# -error, in which case the x files are used.
-case "$0" in
-   */pngstest-????)
-      suffix="${0##*/pngstest\-}"
-      exec ./pngstest --tmpfile "error" "${srcdir}/contrib/pngsuite/"[^x]*"${suffix}.png";;
-
-   */pngstest-error)
-      # Test files may not exist, fake a failure if not
-      set "${srcdir}/contrib/pngsuite/"x*"${suffix}.png"
-      if test $# -ne 1 -o $1 != "${srcdir}/contrib/pngsuite/x*${suffix}.png"
-      then
-         exec ./pngstest --tmpfile "${suffix}" "${srcdir}/contrib/pngsuite/"x*"${suffix}.png"
-      else
-         exit 1
-      fi;;
-esac
+exec "${srcdir}/tests/pngstest" 6a08

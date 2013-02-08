@@ -4420,11 +4420,20 @@ Version 1.7.0alpha10 [February 5, 2013]
     in double quotes unless it is to be macro substituted the fix should work
     everywhere.
 
-Version 1.7.0alpha11 [February 7, 2013]
+Version 1.7.0alpha11 [February 8, 2013]
   Enable parallel tests and rearrange TESTS order to take advantage of
     the massive speed improvements use a make capable of parallel builds
     on a multi-CPU machine and pass the right arguments to make (-j10000
     for GNU make) to get the build to run in parallel.
+  Fixed previous support for Z_PREFIX in configure builds, corrected
+    sCAL APIs; some of these use floating point arithmetic so need to be
+    disabled if floating point arithmetic is switched off.  This is a quiet API
+    change - previously it appeared that the APIs were supported if fixed point
+    arithmetic was used internally, however they required certain APIs (floor,
+    modf, frexp, atof) that are part of C floating point support. Changed
+    png_fixed and the gamma code specific version of the same to avoid floor(),
+    which may be a library function (not an intrinsic). Removed unused #if 0
+    code.
 
   ===========================================================================
                        NOTICE November 17, 2012:
