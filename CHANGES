@@ -4361,12 +4361,9 @@ Version 1.6.0rc04 [February 7, 2013]
   Turn serial tests back on (recently turned off by autotools upgrade).
 
 Version 1.6.0rc05 [February 8, 2013]
+  Update manual about png_get_palette_max().
 
-  ===========================================================================
-                       NOTICE November 17, 2012:
-     The location of the git repository at SourceForge has changed.
-               Visit http://libpng.sf.net/ for details.
-  ===========================================================================
+Version 1.6.0rc06 [February 8, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

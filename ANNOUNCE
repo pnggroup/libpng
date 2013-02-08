@@ -1,5 +1,5 @@
 
-Libpng 1.6.0rc05 - February 8, 2013
+Libpng 1.6.0rc06 - February 8, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0rc05.tar.xz (LZMA-compressed, recommended)
-   1.6.0rc05.tar.gz
+   1.6.0rc06.tar.xz (LZMA-compressed, recommended)
+   1.6.0rc06.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160r05.7z  (LZMA-compressed, recommended)
-   lp160r05.zip
+   lp160r06.7z  (LZMA-compressed, recommended)
+   lp160r06.zip
 
 Other information:
 
-   1.6.0rc05-README.txt
-   1.6.0rc05-LICENSE.txt
+   1.6.0rc06-README.txt
+   1.6.0rc06-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -607,6 +607,9 @@ Version 1.6.0rc04 [February 7, 2013]
   Turn serial tests back on (recently turned off by autotools upgrade).
 
 Version 1.6.0rc05 [February 8, 2013]
+  Update manual about png_get_palette_max().
+
+Version 1.6.0rc06 [February 8, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
