@@ -4371,6 +4371,8 @@ Version 1.6.0rc06 [February 9, 2013]
     build pngprefix.h and pnglibconf.h, often the error goes unnoticed
     because there is a system pnglibconf.h to use instead.
 
+Version 1.6.0rc07 [February 9, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
