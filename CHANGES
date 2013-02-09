@@ -4420,7 +4420,7 @@ Version 1.7.0alpha10 [February 5, 2013]
     in double quotes unless it is to be macro substituted the fix should work
     everywhere.
 
-Version 1.7.0alpha11 [February 8, 2013]
+Version 1.7.0alpha11 [February 9, 2013]
   Enable parallel tests and rearrange TESTS order to take advantage of
     the massive speed improvements use a make capable of parallel builds
     on a multi-CPU machine and pass the right arguments to make (-j10000
@@ -4440,6 +4440,12 @@ Version 1.7.0alpha11 [February 8, 2013]
     reverted the previous erroneous change to remove the ${srcdir} from the
     front of contrib, scripts, projects and added an explanation of what is
     going on to Makefile.am
+  Fixed missing dependency in --prefix builds. The intermediate
+    internal 'prefix.h' file can only be generated correctly after pnglibconf.h,
+    however the dependency was not in Makefile.am.  The symptoms are
+    unpredictable depending on the order make chooses to build pngprefix.h and
+    pnglibconf.h, often the error goes unnoticed because there is a system
+    pnglibconf.h to use instead.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
