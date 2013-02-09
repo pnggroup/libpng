@@ -119,6 +119,7 @@ $(PNGLIB_BASENAME)-config: libpng-config
 scripts/sym.out scripts/vers.out: png.h pngconf.h pnglibconf.h
 scripts/prefix.out: png.h pngconf.h pnglibconf.out
 scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
+scripts/intprefix.out: pnglibconf.h
 
 libpng.sym: scripts/sym.out
 	rm -f $@

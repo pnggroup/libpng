@@ -4363,7 +4363,13 @@ Version 1.6.0rc04 [February 7, 2013]
 Version 1.6.0rc05 [February 8, 2013]
   Update manual about png_get_palette_max().
 
-Version 1.6.0rc06 [February 8, 2013]
+Version 1.6.0rc06 [February 9, 2013]
+  Fixed missing dependency in --prefix builds The intermediate
+    internal 'prefix.h' file can only be generated correctly after
+    pnglibconf.h, however the dependency was not in Makefile.am.  The
+    symptoms are unpredictable depending on the order make chooses to
+    build pngprefix.h and pnglibconf.h, often the error goes unnoticed
+    because there is a system pnglibconf.h to use instead.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
