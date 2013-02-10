@@ -3199,14 +3199,14 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  *  END OF SIMPLIFIED API
  ******************************************************************************/
 
-#if defined(PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 PNG_EXPORT(242, void, png_set_check_for_invalid_index,
     (png_structrp png_ptr, int allowed));
-#if defined(PNG_GET_PALETTE_MAX_SUPPORTED)
+#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
 PNG_EXPORT(243, int, png_get_palette_max, (png_const_structp png_ptr,
     png_const_infop info_ptr));
-#endif
-#endif
+#  endif
+#endif /* CHECK_FOR_INVALID_INDEX */
 
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project
  * defs, scripts/pnglibconf.h, and scripts/pnglibconf.h.prebuilt
