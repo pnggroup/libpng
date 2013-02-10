@@ -1,5 +1,5 @@
 
-Libpng 1.6.0rc07 - February 9, 2013
+Libpng 1.6.0rc07 - February 10, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -617,7 +617,9 @@ Version 1.6.0rc06 [February 9, 2013]
     build pngprefix.h and pnglibconf.h, often the error goes unnoticed
     because there is a system pnglibconf.h to use instead.
 
-Version 1.6.0rc07 [February 9, 2013]
+Version 1.6.0rc07 [February 10, 2013]
+  Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+    block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
