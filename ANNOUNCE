@@ -1,5 +1,5 @@
 
-Libpng 1.6.0rc07 - February 10, 2013
+Libpng 1.6.0rc08 - February 10, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0rc07.tar.xz (LZMA-compressed, recommended)
-   1.6.0rc07.tar.gz
+   1.6.0rc08.tar.xz (LZMA-compressed, recommended)
+   1.6.0rc08.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160r07.7z  (LZMA-compressed, recommended)
-   lp160r07.zip
+   lp160r08.7z  (LZMA-compressed, recommended)
+   lp160r08.zip
 
 Other information:
 
-   1.6.0rc07-README.txt
-   1.6.0rc07-LICENSE.txt
+   1.6.0rc08-README.txt
+   1.6.0rc08-LICENSE.txt
 
 Changes since the last public release (1.5.7):
 
@@ -620,6 +620,8 @@ Version 1.6.0rc06 [February 9, 2013]
 Version 1.6.0rc07 [February 10, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
+
+Version 1.6.0rc08 [February 10, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
