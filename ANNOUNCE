@@ -1,5 +1,5 @@
 
-Libpng 1.7.0alpha11 - February 9, 2013
+Libpng 1.7.0alpha11 - February 10, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -134,7 +134,7 @@ Version 1.7.0alpha10 [February 5, 2013]
     in double quotes unless it is to be macro substituted the fix should work
     everywhere.
 
-Version 1.7.0alpha11 [February 9, 2013]
+Version 1.7.0alpha11 [February 10, 2013]
   Enable parallel tests and rearrange TESTS order to take advantage of
     the massive speed improvements use a make capable of parallel builds
     on a multi-CPU machine and pass the right arguments to make (-j10000
@@ -160,6 +160,13 @@ Version 1.7.0alpha11 [February 9, 2013]
     unpredictable depending on the order make chooses to build pngprefix.h and
     pnglibconf.h, often the error goes unnoticed because there is a system
     pnglibconf.h to use instead.
+  Accept "," as a separator in pnglibconf.dfa and allow for
+    continuation lines. This adds to the syntax of "option" and "chunk" lines,
+    allowing the elements to be separated by a "," at the end of an element and
+    interpreting a "," at end of line as a continuation - so the following line
+    is read.  The new syntax is optional and solely provided for readability.
+  Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+    block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

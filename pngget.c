@@ -1163,6 +1163,7 @@ png_get_io_chunk_type (png_const_structrp png_ptr)
 #endif /* ?PNG_IO_STATE_SUPPORTED */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+#ifdef PNG_GET_PALETTE_MAX_SUPPORTED
 int PNGAPI
 png_get_palette_max(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
@@ -1171,6 +1172,7 @@ png_get_palette_max(png_const_structrp png_ptr, png_const_inforp info_ptr)
 
    return (-1);
 }
+#endif
 #endif
 
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
