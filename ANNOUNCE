@@ -622,6 +622,7 @@ Version 1.6.0rc07 [February 10, 2013]
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
 Version 1.6.0rc08 [February 10, 2013]
+  Fix typo in png.h #ifdef
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
