@@ -252,46 +252,71 @@ $1 == "file" && NF >= 2{
 #   be later) entry may turn an option on or off explicitly.
 
 $1 == "option" && NF >= 2{
-   onoff = option[$2]  # records current (and the default is "", enabled)
+   opt = $2
+   sub(/,$/,"",opt)
+   onoff = option[opt]  # records current (and the default is "", enabled)
    key = ""
-   for (i=3; i<=NF; ++i) {
-      if ($(i) == "on" || $(i) == "off" || $(i) == "disabled") {
-         key = ""
-         if (onoff != $(i)) {
-            # on or off can zap disabled or enabled:
-            if (onoff == "" || (onoff == "disabled" || onoff == "enabled") && ($(i) == "on" || $(i) == "off")) {
-               # It's easy to mis-spell the option when turning it
-               # on or off, so warn about it here:
-               if (onoff == "" && ($(i) == "on" || $(i) == "off")) {
-                  print $2 ": ERROR: turning unrecognized option", $(i)
-                  # For the moment error out - it is safer
-                  err = 1 # prevent END{} running
-                  exit 1
-               }
-               onoff = $(i)
-            } else {
-               # Print a message, otherwise the error
-               # below is incomprehensible
-               print $2 ": currently", onoff ": attempt to turn", $(i)
-               break
-            }
+   istart = 3
+   do {
+      if (istart == 1) {     # continuation line
+         val = getline
+
+         if (val != 1) { # error reading it
+            if (val == 0)
+               print "option", opt ": ERROR: missing contination line"
+            else
+               print "option", opt ": ERROR: error reading continuation line"
+
+            # This is a hard error
+            err = 1 # prevent END{} running
+            exit 1
          }
-      } else if ($(i) == "requires" || $(i) == "if" || $(i) == "enables") {
-         key = $(i)
-      } else if (key == "requires") {
-         requires[$2] = requires[$2] " " $(i)
-      } else if (key == "if") {
-         iffs[$2] = iffs[$2] " " $(i)
-      } else if (key == "enables") {
-         enabledby[$(i)] = enabledby[$(i)] " " $2
-      } else
-         break # bad line format
-   }
+      }
+
+      for (i=istart; i<=NF; ++i) {
+         val=$(i)
+         sub(/,$/,"",val)
+         if (val == "on" || val == "off" || val == "disabled") {
+            key = ""
+            if (onoff != val) {
+               # on or off can zap disabled or enabled:
+               if (onoff == "" || (onoff == "disabled" || onoff == "enabled") &&
+                   (val == "on" || val == "off")) {
+                  # It's easy to mis-spell the option when turning it
+                  # on or off, so warn about it here:
+                  if (onoff == "" && (val == "on" || val == "off")) {
+                     print "option", opt ": ERROR: turning unrecognized option", val
+                     # For the moment error out - it is safer
+                     err = 1 # prevent END{} running
+                     exit 1
+                  }
+                  onoff = val
+               } else {
+                  # Print a message, otherwise the error
+                  # below is incomprehensible
+                  print "option", opt ": currently", onoff ": attempt to turn", val
+                  break
+               }
+            }
+         } else if (val == "requires" || val == "if" || val == "enables") {
+            key = val
+         } else if (key == "requires") {
+            requires[opt] = requires[opt] " " val
+         } else if (key == "if") {
+            iffs[opt] = iffs[opt] " " val
+         } else if (key == "enables") {
+            enabledby[val] = enabledby[val] " " opt
+         } else
+            break # bad line format
+      }
+
+      istart = 1
+   } while (i > NF && $0 ~ /,$/)
 
    if (i > NF) {
       # Set the option, defaulting to 'enabled'
       if (onoff == "") onoff = "enabled"
-      option[$2] = onoff
+      option[opt] = onoff
       next
    }
    # Else fall through to the error handler
@@ -311,41 +336,62 @@ $1 == "option" && NF >= 2{
 pre != 0 && $1 == "chunk" && NF >= 2{
    # 'chunk' is handled on the first pass by writing appropriate
    # 'option' lines into the intermediate file.
+   opt = $2
+   sub(/,$/,"",opt)
    onoff = ""
    reqread = ""
    reqwrite = ""
    enables = ""
-   i = 3 # indicates format error
-   if (NF > 2) {
+   req = 0
+   istart = 3
+   do {
+      if (istart == 1) {     # continuation line
+         val = getline
+
+         if (val != 1) { # error reading it
+            if (val == 0)
+               print "chunk", opt ": ERROR: missing contination line"
+            else
+               print "chunk", opt ": ERROR: error reading continuation line"
+
+            # This is a hard error
+            err = 1 # prevent END{} running
+            exit 1
+         }
+      }
+
       # read the keywords/additional OPTS
-      req = 0
-      for (i=3; i<=NF; ++i) {
-         if ($(i) == "on" || $(i) == "off" || $(i) == "disabled") {
-            if (onoff != $(i)) {
+      for (i=istart; i<=NF; ++i) {
+         val = $(i)
+         sub(/,$/,"",val)
+         if (val == "on" || val == "off" || val == "disabled") {
+            if (onoff != val) {
                if (onoff == "")
-                  onoff = $(i)
+                  onoff = val
                else
                   break # on/off conflict
             }
             req = 0
-         } else if ($(i) == "requires")
+         } else if (val == "requires")
             req = 1
-         else if ($(i) == "enables")
+         else if (val == "enables")
             req = 2
          else if (req == 1){
-            reqread = reqread " READ_" $(i)
-            reqwrite = reqwrite " WRITE_" $(i)
+            reqread = reqread " READ_" val
+            reqwrite = reqwrite " WRITE_" val
          } else if (req == 2)
-            enables = enables " " $(i)
+            enables = enables " " val
          else
             break # bad line: handled below
       }
-   }
+
+      istart = 1
+   } while (i > NF && $0 ~ /,$/)
 
    if (i > NF) {
       # Output new 'option' lines to the intermediate file (out)
-      print "option READ_" $2, "requires READ_ANCILLARY_CHUNKS" reqread, "enables", $2 enables , onoff >out
-      print "option WRITE_" $2, "requires WRITE_ANCILLARY_CHUNKS" reqwrite, "enables", $2 enables, onoff >out
+      print "option READ_" opt, "requires READ_ANCILLARY_CHUNKS" reqread, "enables", opt enables , onoff >out
+      print "option WRITE_" opt, "requires WRITE_ANCILLARY_CHUNKS" reqwrite, "enables", opt enables, onoff >out
       next
    }
    # Else hit the error handler below - bad line format!
