@@ -2651,16 +2651,14 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
       : (png_int_32)png_get_uint_32(buf)))
 #endif
 
-#if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
-    defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 PNG_EXPORT(234, void, png_set_check_for_invalid_index, (png_structp png_ptr,
     int allowed));
-#if defined(PNG_READ_GET_PALETTE_MAX_SUPPORTED) || \
-    defined(PNG_READ_GET_PALETTE_MAX_SUPPORTED)
+#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
 PNG_EXPORT(235, int, png_get_palette_max, (png_const_structp png_ptr,
     png_const_infop info_ptr));
-#endif
-#endif
+#  endif
+#endif /* CHECK_FOR_INVALID_INDEX */
 
 /* Maintainer: Put new public prototypes here ^, in libpng.3, and project
  * defs
