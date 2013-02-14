@@ -42,7 +42,7 @@ BEGIN{
    comment=start cx             # Comment start
    cend="*/" end                # Comment end
    def=start "#define PNG_" ct  # Arbitrary define
-   sup=ct "_SUPPORTED 1" end    # end supported option
+   sup=ct "_SUPPORTED" end      # end supported option
    und=comment "#undef PNG_" ct # Unsupported option
    une=ct "_SUPPORTED" cend     # end unsupported option
    error=start "ERROR:"         # error message
@@ -287,15 +287,15 @@ $1 == "option" && NF >= 2{
    # Else fall through to the error handler
 }
 
-# chunk NAME [requires OPT] [on|off|disabled]
+# chunk NAME [requires OPT] [enables LIST] [on|off|disabled]
 #   Expands to the 'option' settings appropriate to the reading and
 #   writing of an ancilliary PNG chunk 'NAME':
 #
 #   option READ_NAME requires READ_ANCILLARY_CHUNKS [READ_OPT]
-#   option READ_NAME enables NAME
+#   option READ_NAME enables NAME LIST
 #   [option READ_NAME off]
 #   option WRITE_NAME requires WRITE_ANCILLARY_CHUNKS [WRITE_OPT]
-#   option WRITE_NAME enables NAME
+#   option WRITE_NAME enables NAME LIST
 #   [option WRITE_NAME off]
 
 pre != 0 && $1 == "chunk" && NF >= 2{
@@ -304,6 +304,7 @@ pre != 0 && $1 == "chunk" && NF >= 2{
    onoff = ""
    reqread = ""
    reqwrite = ""
+   enables = ""
    i = 3 # indicates format error
    if (NF > 2) {
       # read the keywords/additional OPTS
@@ -316,21 +317,25 @@ pre != 0 && $1 == "chunk" && NF >= 2{
                else
                   break # on/off conflict
             }
+            req = 0
          } else if ($(i) == "requires")
             req = 1
-         else if (req != 1)
-            break # bad line: handled below
-         else {
+         else if ($(i) == "enables")
+            req = 2
+         else if (req == 1){
             reqread = reqread " READ_" $(i)
             reqwrite = reqwrite " WRITE_" $(i)
-         }
+         } else if (req == 2)
+            enables = enables " " $(i)
+         else
+            break # bad line: handled below
       }
    }
 
    if (i > NF) {
       # Output new 'option' lines to the intermediate file (out)
-      print "option READ_" $2, "requires READ_ANCILLARY_CHUNKS" reqread, "enables", $2, onoff >out
-      print "option WRITE_" $2, "requires WRITE_ANCILLARY_CHUNKS" reqwrite, "enables", $2, onoff >out
+      print "option READ_" $2, "requires READ_ANCILLARY_CHUNKS" reqread, "enables", $2 enables , onoff >out
+      print "option WRITE_" $2, "requires WRITE_ANCILLARY_CHUNKS" reqwrite, "enables", $2 enables, onoff >out
       next
    }
    # Else hit the error handler below - bad line format!

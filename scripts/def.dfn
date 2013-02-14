@@ -25,7 +25,7 @@ S-OS2 DESCRIPTION "PNG image compression library"-E
 S-OS2 CODE PRELOAD MOVEABLE DISCARDABLE-E
 S--E
 S-EXPORTS-E
-S-;Version 1.5.0beta58-E
+S-;Version 1.6.0-E
 
 /* NOTE: PNG_JOIN is interpreted by the calling script as a signal to
  * join the two things on either side, so we can do symbol

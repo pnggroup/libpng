@@ -1,7 +1,7 @@
 
 /* arm_init.c - NEON optimised filter functions
  *
- * Copyright (c) 2013 Glenn Randers-Pehrson
+ * Copyright (c) 2012 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
  * Last changed in libpng 1.5.14 [(PENDING RELEASE)]
  *

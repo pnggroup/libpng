@@ -6,7 +6,7 @@
 # and license in png.h
 
 PREFIX?=        /usr/local
-SHLIB_VER?=     15
+SHLIB_VER?=     16
 
 LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}
@@ -17,7 +17,7 @@ NO_OBJ=          YES
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
 LIBDIR=		/lib
-INCS=		png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+INCS=		png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h             pnginfo.h pngdebug.h
 INCSDIR=	/include/libpng
 INCDIR=		${INCSDIR}		# for 4.x bsd.lib.mk
 MAN=		libpng.3 libpngpf.3 png.5
@@ -27,7 +27,7 @@ SYMLINKS=       libpng/png.h ${INCSDIR}/../png.h \
 		libpng/pnglibconf.h ${INCSDIR}/../pnglibconf.h
 
 LDADD+=         -lm -lz
-#LDADD+=         -lm -lz -lssp_nonshared   # for OSVERSION >= 800000 ?
+#LDADD+=         -lm -lz -lssp_nonshared   # for OSVERSION < 800000 ?
 
 DPADD+=         ${LIBM} ${LIBZ}
 

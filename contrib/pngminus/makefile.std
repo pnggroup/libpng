@@ -8,9 +8,9 @@ LD=$(CC)
 RM=rm -f
 
 #PNGPATH = /usr/local
-#PNGINC = -I$(PNGPATH)/include/libpng15
-#PNGLIB = -L$(PNGPATH)/lib -lpng15
-#PNGLIBS = $(PNGPATH)/lib/libpng15.a
+#PNGINC = -I$(PNGPATH)/include/libpng16
+#PNGLIB = -L$(PNGPATH)/lib -lpng16
+#PNGLIBS = $(PNGPATH)/lib/libpng16.a
 PNGINC = -I../..
 PNGLIB = -L../.. -lpng
 PNGLIBS = ../../libpng.a

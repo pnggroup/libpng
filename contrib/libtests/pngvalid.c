@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.14 [%RDATE%]
+ * Last changed in libpng 1.6.0 [February 14, 2013]
  * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -4754,7 +4754,7 @@ standard_check_text(png_const_structp pp, png_const_textp tp,
 
 static void
 standard_text_validate(standard_display *dp, png_const_structp pp,
-   png_const_infop pi, int check_end)
+   png_infop pi)
 {
    png_textp tp = NULL;
    png_uint_32 num_text = png_get_text(pp, pi, &tp, NULL);
@@ -4762,13 +4762,7 @@ standard_text_validate(standard_display *dp, png_const_structp pp,
    if (num_text == 2 && tp != NULL)
    {
       standard_check_text(pp, tp, "image name", dp->ps->current->name);
-
-      /* This exists because prior to 1.6 the progressive reader left the
-       * png_struct z_stream unreset at the end of the image, so subsequent
-       * attempts to use it simply returns Z_STREAM_END.
-       */
-      if (check_end)
-         standard_check_text(pp, tp+1, "end marker", "end");
+      standard_check_text(pp, tp+1, "end marker", "end");
    }
 
    else
@@ -4781,7 +4775,7 @@ standard_text_validate(standard_display *dp, png_const_structp pp,
    }
 }
 #else
-#  define standard_text_validate(dp,pp,pi,check_end) ((void)0)
+#  define standard_text_validate(dp,pp,pi) ((void)0)
 #endif
 
 static void
@@ -4871,8 +4865,7 @@ standard_end(png_structp ppIn, png_infop pi)
    /* Validate the image - progressive reading only produces one variant for
     * interlaced images.
     */
-   standard_text_validate(dp, pp, pi,
-      PNG_LIBPNG_VER >= 10600/*check_end: see comments above*/);
+   standard_text_validate(dp, pp, pi);
    standard_image_validate(dp, pp, 0, -1);
 }
 
@@ -4943,7 +4936,7 @@ standard_test(png_store* PNG_CONST psIn, png_uint_32 PNG_CONST id,
              */
             if (!d.speed)
             {
-               standard_text_validate(&d, pp, pi, 1/*check_end*/);
+               standard_text_validate(&d, pp, pi);
                standard_image_validate(&d, pp, 0, 1);
             }
             else

@@ -5,8 +5,9 @@
 # awk -f checksym.awk official-def list-to-check
 #
 # Output is a file in the current directory called 'symbols.new',
-# stdout holds error messages.  Error code indicates success or
-# failure.
+# the value of the awk variable "of" (which can be changed on the
+# command line if required.)  stdout holds error messages.  Error
+# code indicates success or failure.
 #
 # NOTE: this is a pure, old fashioned, awk script.  It will
 # work with any awk
@@ -21,6 +22,7 @@ BEGIN{
    mastero = 0      # highest ordinal in master file
    symbolo = 0      # highest ordinal in png.h
    missing = "error"# log an error on missing symbols
+   of="symbols.new" # default to a fixed name
 }
 
 # Read existing definitions from the master file (the first
@@ -151,11 +153,11 @@ END{
 
       # Finally generate symbols.new
       if (symbol[o] != "")
-         print " " symbol[o], "@" o > "symbols.new"
+         print " " symbol[o], "@" o > of
    }
 
    if (err != 0) {
-      print "*** A new list is in symbols.new ***"
+      print "*** A new list is in", of, "***"
       exit 1
    }
 }

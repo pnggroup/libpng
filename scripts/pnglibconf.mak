@@ -18,7 +18,8 @@ SED = sed
 COPY = cp
 DELETE = rm -f
 ECHO = echo
-DFA_XTRA = # Appended to scripts/options.awk
+DFA_XTRA = # Put your configuration file here, see scripts/pnglibconf.dfa.  Eg:
+# DFA_XTRA = pngusr.dfa
 
 # CPPFLAGS should contain the options to control the result,
 # but DEFS and CFLAGS are also supported here, override
@@ -41,13 +42,13 @@ pnglibconf.h: pnglibconf.dfn
 	$(COPY) dfn3.out $@
 	$(DELETE) dfn.c dfn1.out dfn2.out dfn3.out
 
-pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk $(srcdir)/pngconf.h
+pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk $(srcdir)/pngconf.h $(srcdir)/pngusr.dfa
 	$(DELETE) $@ dfn1.out dfn2.out
 	$(ECHO) "Calling $(AWK) from scripts/pnglibconf.mak" >&2
 	$(ECHO) "If 'awk' crashes try a better awk (e.g. AWK='nawk')" >&2
 	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn1.out version=search\
 		$(srcdir)/pngconf.h $(srcdir)/scripts/pnglibconf.dfa\
-		$(DFA_XTRA) 1>&2
+		$(srcdir)/pngusr.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f $(srcdir)/scripts/options.awk out=dfn2.out dfn1.out 1>&2
 	$(COPY) dfn2.out $@
 	$(DELETE) dfn1.out dfn2.out

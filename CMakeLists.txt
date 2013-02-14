@@ -34,8 +34,8 @@ project(libpng C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
-set(PNGLIB_MINOR 5)
-set(PNGLIB_RELEASE 14)
+set(PNGLIB_MINOR 6)
+set(PNGLIB_RELEASE 0)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -123,9 +123,10 @@ set(pngtest_sources
 set(pngvalid_sources
   contrib/libtests/pngvalid.c
 )
+set(pngstest_sources
+  contrib/libtests/pngstest.c
+)
 # SOME NEEDED DEFINITIONS
-
-add_definitions(-DPNG_CONFIGURE_LIBPNG)
 
 if(MSVC)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
@@ -172,6 +173,40 @@ if(PNG_TESTS AND PNG_SHARED)
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid ${PNG_LIB_NAME})
   add_test(pngvalid ./pngvalid)
+  add_executable(pngstest ${pngstest_sources})
+  target_link_libraries(pngstest ${PNG_LIB_NAME})
+  add_test(pngstest ./pngstest
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn0g16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn2c08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn2c16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn4a08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn4a16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn2c16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn2c16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbrn2c08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn0g16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbyn3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n0g08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n2c08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n3p08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp1n3p08.png
+  )
 endif()
 
 # Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set
@@ -207,7 +242,7 @@ endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 # we use the same files like ./configure, so we have to set its vars
 # Only do this on Windows for Cygwin - the files don't make much sense outside
 # a UNIX look alike
-if(NOT WIN32 OR CYGWIN OR MINGW) 
+if(NOT WIN32 OR CYGWIN OR MINGW)
   set(prefix      ${CMAKE_INSTALL_PREFIX})
   set(exec_prefix ${CMAKE_INSTALL_PREFIX})
   set(libdir      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
@@ -225,9 +260,9 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 15.${PNGLIB_RELEASE}.1.5.14
-    VERSION 15.${PNGLIB_RELEASE}.0
-    SOVERSION 15
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.0
+    VERSION 16.${PNGLIB_RELEASE}.0
+    SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
 endif()
 if(PNG_STATIC)
@@ -259,7 +294,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL )
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
-    # Create a symlink for libpng.dll.a => libpng15.dll.a on Cygwin
+    # Create a symlink for libpng.dll.a => libpng16.dll.a on Cygwin
     if(CYGWIN OR MINGW)
        get_target_property(BUILD_TARGET_LOCATION ${PNG_LIB_NAME} LOCATION_${CMAKE_BUILD_TYPE})
        get_filename_component(BUILD_TARGET_FILE ${BUILD_TARGET_LOCATION} NAME)

@@ -16,9 +16,9 @@ prefix=/usr/local
 exec_prefix=$(prefix)
 
 # Library name:
-LIBNAME = libpng15
-PNGMAJ = 15
-RELEASE = 14
+LIBNAME = libpng16
+PNGMAJ = 16
+RELEASE = 0
 
 # Shared library names:
 LIBSO=$(LIBNAME).dll
@@ -129,7 +129,7 @@ libpng.pc:
 	-e s!@exec_prefix@!$(exec_prefix)! \
 	-e s!@libdir@!$(LIBPATH)! \
 	-e s!@includedir@!$(INCPATH)! \
-	-e s!-lpng15!-lpng15\ -lz\ -lm! > libpng.pc
+	-e s!-lpng16!-lpng16\ -lz\ -lm! > libpng.pc
 
 libpng-config:
 	( cat scripts/libpng-config-head.in; \
@@ -137,7 +137,7 @@ libpng-config:
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo R_opts=\"-Wl,-rpath,$(LIBPATH)\"; \
-	echo libs=\"-lpng15 -lz -lm\"; \
+	echo libs=\"-lpng16 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
 
 install-shared: install-headers $(LIBSOMAJ) libpng.pc

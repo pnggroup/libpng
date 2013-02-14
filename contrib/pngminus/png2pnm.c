@@ -18,6 +18,7 @@
 #include <mem.h>
 #include <fcntl.h>
 #endif
+#include <zlib.h>
 
 #ifndef BOOL
 #define BOOL unsigned char
