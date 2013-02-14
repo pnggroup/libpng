@@ -1,7 +1,7 @@
 /*-
  * sRGB.h
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.0 [February 14, 2013]
  *
  * COPYRIGHT: Written by John Cunningham Bowler, 2012.
  * To the extent possible under law, the author has waived all copyright and
