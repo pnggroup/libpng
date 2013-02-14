@@ -5,7 +5,7 @@
 LIBRARY
 
 EXPORTS
-;Version 1.6.0
+;Version 1.6.1beta01
  png_access_version_number @1
  png_set_sig_bytes @2
  png_sig_cmp @3
