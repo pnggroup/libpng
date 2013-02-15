@@ -4006,6 +4006,8 @@ Version 1.5.15beta04 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
+Version 1.5.15beta05 [February 15, 2013]
+
   ===========================================================================
                        NOTICE November 17, 2012:
      The location of the git repository at SourceForge has changed.
