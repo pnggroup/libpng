@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta04 - February 10, 2013
+Libpng 1.5.15beta04 - February 15, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -45,7 +45,7 @@ Version 1.5.15beta03 [February 7, 2013]
   Remove SUN OS cc -E workround - no longer required
   Turn serial tests back on (recently turned off by autotools upgrade).
 
-Version 1.5.15beta04 [February 10, 2013]
+Version 1.5.15beta04 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
