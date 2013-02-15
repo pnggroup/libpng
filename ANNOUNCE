@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta01 - February 15, 2013
+Libpng 1.7.0beta02 - February 15, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta01.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta01.tar.gz
+   1.7.0beta02.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b01.7z  (LZMA-compressed, recommended)
-   lp170b01.zip
+   lp170b02.7z  (LZMA-compressed, recommended)
+   lp170b02.zip
 
 Other information:
 
-   1.7.0beta01-README.txt
-   1.7.0beta01-LICENSE.txt
+   1.7.0beta02-README.txt
+   1.7.0beta02-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -167,6 +167,8 @@ Version 1.7.0beta01 [February 15, 2013]
     is read.  The new syntax is optional and solely provided for readability.
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
+
+Version 1.7.0beta02 [February 15, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

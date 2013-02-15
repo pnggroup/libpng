@@ -4454,6 +4454,8 @@ Version 1.7.0beta01 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
+Version 1.7.0beta02 [February 15, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
