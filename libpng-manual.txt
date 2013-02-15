@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0alpha11 - February 8, 2013
+ libpng version 1.7.0beta01 - February 15, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0alpha11 - February 8, 2013
+ libpng versions 0.97, January 1998, through 1.7.0beta01 - February 15, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2011 Glenn Randers-Pehrson
 
@@ -3982,6 +3982,15 @@ compiler documentation for more details.  For an alternative approach, you
 may wish to use the "cexcept" facility (see http://cexcept.sourceforge.net),
 which is illustrated in pngvalid.c and in contrib/visupng.
 
+Beginning in libpng-1.4.0, the png_set_benign_errors() API became available.
+You can use this to handle certain errors (normally handled as errors)
+as warnings.
+
+    png_set_benign_errors (png_ptr, int allowed);
+
+    allowed: 0: (default) treat png_benign_error() an error.
+             1: treat png_benign_error() as a warning.
+
 Custom chunks
 
 If you need to read or write custom chunks, you may need to get deeper
@@ -4989,7 +4998,8 @@ Some functions that were deprecated in libpng-1.6.0 were removed:
 The PNG_ABORT() macro was changed to PNG_ABORT, and the default is now
 "abort()" for all platforms (previously it was "ExitProcess(0)" on
 Windows platforms).  Starting with libpng-1.7.0 you have to define
-PNG_ABORT instead of PNG_ABORT(), e.g.,
+PNG_ABORT instead of PNG_ABORT(), and you must include a terminating
+semicolon in your definition, e.g.,
 
     #if PNGCRUSH_LIBPNG_VER >= 10700
     #  ifdef _WINDOWS_
@@ -5170,13 +5180,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-February 8, 2013
+February 15, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.7.0alpha11 are Y2K compliant.  It is my belief that earlier
+upward through 1.7.0beta01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
