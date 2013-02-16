@@ -1,5 +1,5 @@
 
-Libpng 1.6.1beta01 - February 16, 2013
+Libpng 1.6.1beta02 - February 16, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.1beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.1beta01.tar.gz
+   1.6.1beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.1beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp161b01.7z  (LZMA-compressed, recommended)
-   lp161b01.zip
+   lp161b02.7z  (LZMA-compressed, recommended)
+   lp161b02.zip
 
 Other information:
 
-   1.6.1beta01-README.txt
-   1.6.1beta01-LICENSE.txt
+   1.6.1beta02-README.txt
+   1.6.1beta02-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -43,6 +43,8 @@ Version 1.6.1beta01 [February 16, 2013]
   Use approved/supported Android method to check for NEON, use Linux/POSIX
     1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
     library calls (ported from libpng15).
+
+Version 1.6.1beta02 [February 16, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
