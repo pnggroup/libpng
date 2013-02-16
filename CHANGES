@@ -4386,6 +4386,7 @@ Version 1.6.1 [February 16, 2013]
     to be included for preprocessor definitions only, so it can be used in non-C/C++
     files. Back ported from libpng 1.7.
   Made sRGB check numbers consistent.
+  Ported libpng 1.5 options.awk/dfn file handling to 1.6, fixed one bug.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -180,16 +180,14 @@ SYMBOL_CFLAGS += -DPNG_PREFIX='@PNG_PREFIX@'
 endif
 
 .dfn.out:
-	rm -f $@ $*.c $*.tf[123]
+	rm -f $@ $*.c $*.tf[12]
 	test -d scripts || mkdir scripts
 	echo '#include "$<"' >$*.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $*.c > $*.tf1
-	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC *-\(.*\)- *PNG_DEFN_END.*$$|\1|p'\
-	    $*.tf1 >$*.tf2
-	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' $*.tf2 >$*.tf3
-	rm -f $*.c $*.tf[12]
-	mv $*.tf3 $@
+	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
+	rm -f $*.c $*.tf1
+	mv $*.tf2 $@
 
 # The .dfn file for pnglibconf.h is machine generated
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)

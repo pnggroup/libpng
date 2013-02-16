@@ -190,13 +190,17 @@ setting DEFAULT_READ_MACROS default 1
 # because the name of the setting is prefixed by PNG_
 #
 # The TEXT values are the defaults when writing compressed text (all forms)
+#
+# Include the zlib header too, so that the defaults below are known
+@#  include <zlib.h>
 
-setting Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
-setting Z_DEFAULT_STRATEGY default Z_FILTERED
-setting Z_DEFAULT_NOFILTER_STRATEGY default Z_DEFAULT_STRATEGY
+# The '@' here means to substitute the value when pnglibconf.h is built
+setting Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
+setting Z_DEFAULT_STRATEGY default @Z_FILTERED
+setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
 
-setting TEXT_Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
-setting TEXT_Z_DEFAULT_STRATEGY default Z_DEFAULT_STRATEGY
+setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
+setting TEXT_Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
 
 # The alternative is to call functions to read PNG values, if
 # the functions are turned *off* the read macros must always

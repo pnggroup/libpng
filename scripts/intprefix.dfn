@@ -10,10 +10,10 @@
  */
 
 #define PNG_INTERNAL_DATA(type, name, array)\
-	PNG_DEFN_MAGIC-name-PNG_DEFN_END
+        PNG_DFN "@" name "@"
 
 #define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
-	PNG_DEFN_MAGIC-name-PNG_DEFN_END
+        PNG_DFN "@" name "@"
 
 #define PNGPREFIX_H /* self generation */
 #include "../pngpriv.h"
