@@ -39,9 +39,11 @@
  */
 #define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
 
+#ifndef PNG_VERSION_INFO_ONLY
 /* Standard library headers not required by png.h: */
-#include <stdlib.h>
-#include <string.h>
+#  include <stdlib.h>
+#  include <string.h>
+#endif
 
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
@@ -177,10 +179,12 @@
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
 #     define PNG_FP_EXPORT(ordinal, type, name, args)\
          PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
-      typedef struct png_incomplete png_double;
-      typedef png_double*           png_doublep;
-      typedef const png_double*     png_const_doublep;
-      typedef png_double**          png_doublepp;
+#     ifndef PNG_VERSION_INFO_ONLY
+         typedef struct png_incomplete png_double;
+         typedef png_double*           png_doublep;
+         typedef const png_double*     png_const_doublep;
+         typedef png_double**          png_doublepp;
+#     endif
 #  endif
 #endif
 #ifndef PNG_FIXED_EXPORT
@@ -191,8 +195,6 @@
 #endif
 
 #include "png.h"
-#include "pngstruct.h"
-#include "pnginfo.h"
 
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
@@ -237,11 +239,6 @@
 #     define PNG_USER_CHUNK_MALLOC_MAX 0
 #  endif
 #endif
-
-/* This is used for 16 bit gamma tables -- only the top level pointers are
- * const; this could be changed:
- */
-typedef const png_uint_16p * png_const_uint_16pp;
 
 /* Moved to pngpriv.h at libpng-1.5.0 */
 /* NOTE: some of these may have been used in external applications as
@@ -331,6 +328,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
 #  define PNGFAPI /* PRIVATE */
 #endif
 
+#ifndef PNG_VERSION_INFO_ONLY
 /* Other defines specific to compilers can go here.  Try to keep
  * them inside an appropriate ifdef/endif pair for portability.
  */
@@ -375,6 +373,7 @@ typedef const png_uint_16p * png_const_uint_16pp;
     defined(_WIN32) || defined(__WIN32__)
 #  include <windows.h>  /* defines _WINDOWS_ macro */
 #endif
+#endif /* PNG_VERSION_INFO_ONLY */
 
 /* Moved here around 1.5.0beta36 from pngconf.h */
 /* Users may want to use these so they are not private.  Any library
@@ -553,26 +552,6 @@ typedef const png_uint_16p * png_const_uint_16pp;
    abs((int)((c1).green) - (int)((c2).green)) + \
    abs((int)((c1).blue) - (int)((c2).blue)))
 
-/* Added to libpng-1.5.7: sRGB conversion tables */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
-#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
-PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
-   /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
-    * 0..65535.  This table gives the closest 16-bit answers (no errors).
-    */
-#endif
-
-PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_base, [512]);
-PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
-
-#define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
-   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
-   /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
-    * encoded value with maximum error 0.646365.  Note that the input is not a
-    * 16-bit value; it has been multiplied by 255! */
-#endif /* PNG_SIMPLIFIED_READ/WRITE */
-
 /* Added to libpng-1.6.0: scale a 16-bit value in the range 0..65535 to 0..255
  * by dividing by 257 *with rounding*.  This macro is exact for the given range.
  * See the discourse in pngrtran.c png_do_scale_16_to_8.  The values in the
@@ -706,6 +685,39 @@ PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
 #define PNG_GAMMA_MAC_OLD 151724  /* Assume '1.8' is really 2.2/1.45! */
 #define PNG_GAMMA_MAC_INVERSE 65909
 #define PNG_GAMMA_sRGB_INVERSE 45455
+
+/* Almost everything below is C specific; the #defines above can be used in
+ * non-C code (so long as it is C-preprocessed) the rest of this stuff cannot.
+ */
+#ifndef PNG_VERSION_INFO_ONLY
+
+#include "pngstruct.h"
+#include "pnginfo.h"
+
+/* This is used for 16 bit gamma tables -- only the top level pointers are
+ * const; this could be changed:
+ */
+typedef const png_uint_16p * png_const_uint_16pp;
+
+/* Added to libpng-1.5.7: sRGB conversion tables */
+#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
+   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
+   /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
+    * 0..65535.  This table gives the closest 16-bit answers (no errors).
+    */
+#endif
+
+PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_base, [512]);
+PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
+
+#define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
+   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
+   /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
+    * encoded value with maximum error 0.646365.  Note that the input is not a
+    * 16-bit value; it has been multiplied by 255! */
+#endif /* PNG_SIMPLIFIED_READ/WRITE */
 
 
 /* Inhibit C++ name-mangling for libpng functions but not for system calls. */
@@ -1896,4 +1908,5 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr, unsi
 }
 #endif
 
+#endif /* PNG_VERSION_INFO_ONLY */
 #endif /* PNGPRIV_H */
