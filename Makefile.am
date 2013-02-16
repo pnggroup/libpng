@@ -144,7 +144,7 @@ SYMBOL_CFLAGS = -DPNGLIB_LIBNAME='PNG@PNGLIB_MAJOR@@PNGLIB_MINOR@_0'\
 
 .dfn.out:
 	rm -f $@ $@.c $@.?
-	test -d scripts || mkdir scripts
+	test -d scripts || mkdir scripts || test -d scripts
 	echo '#include "$<"' >$@.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $@.c > $@.1
