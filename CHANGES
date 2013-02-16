@@ -3672,7 +3672,8 @@ Version 1.5.6 [November 3, 2011]
   No changes.
 
 Version 1.5.7beta01 [November 4, 2011]
-  Added support for ARM processor (Mans Rullgard)
+  Added support for ARM processor, when decoding all PNG up-filtered rows
+    and any other-filtered rows with 3 or 4 bytes per pixel (Mans Rullgard).
   Fixed bug in pngvalid on early allocation failure; fixed type cast in
     pngmem.c; pngvalid would attempt to call png_error() if the allocation
     of a png_struct or png_info failed. This would probably have led to a
@@ -4381,7 +4382,7 @@ Version 1.6.0rc08 [February 10, 2013]
 Version 1.6.0 [February 14, 2013]
   No changes.
 
-Version 1.6.1 [February 16, 2013]
+Version 1.6.1beta01 [February 16, 2013]
   Made symbol prefixing work with the ARM neon optimizations. Also allow
     pngpriv.h to be included for preprocessor definitions only, so it can
     be used in non-C/C++ files. Back ported from libpng 1.7.
