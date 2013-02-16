@@ -154,7 +154,7 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
    static volatile sig_atomic_t no_neon = -1; /* not checked */
 
    if (no_neon < 0)
-      no_neon = !png_have_neon(png_structp);
+      no_neon = !png_have_neon(pp);
 
    if (no_neon)
       return;
