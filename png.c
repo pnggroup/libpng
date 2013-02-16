@@ -3090,7 +3090,7 @@ png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || \
-    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG__READ_pHYs_SUPPORTED)
+    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* muldiv functions */
 /* This API takes signed arguments and rounds the result to the nearest
  * integer (or, for a fixed point number - the standard argument - to
