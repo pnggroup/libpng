@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta05 - February 15, 2013
+Libpng 1.5.15beta05 - February 16, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -49,7 +49,10 @@ Version 1.5.15beta04 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
-Version 1.5.15beta05 [February 15, 2013]
+Version 1.5.15beta05 [February 16, 2013]
+  Use approved/supported Android method to check for NEON, use Linux/POSIX
+    1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
+    library calls.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
