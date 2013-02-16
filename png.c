@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta02 - February 15, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta02 - February 16, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta02 - February 15, 2013\
+      return "libpng version 1.7.0beta02 - February 16, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3006,7 +3006,7 @@ png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || \
-    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG__READ_pHYs_SUPPORTED)
+    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* muldiv functions */
 /* This API takes signed arguments and rounds the result to the nearest
  * integer (or, for a fixed point number - the standard argument - to
