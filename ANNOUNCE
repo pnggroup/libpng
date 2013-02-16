@@ -40,6 +40,9 @@ Version 1.6.1 [February 16, 2013]
   scripts/pnglibconf.dfa formatting improvements back ported from libpng17.
   Fixed a race condition in the creation of the build 'scripts' directory
     while building with a parallel make.
+  Use approved/supported Android method to check for NEON, use Linux/POSIX
+    1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
+    library calls (ported from libpng15).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
