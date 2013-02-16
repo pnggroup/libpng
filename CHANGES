@@ -4382,17 +4382,20 @@ Version 1.6.0 [February 14, 2013]
   No changes.
 
 Version 1.6.1 [February 16, 2013]
-  Made symbol prefixing work with the ARM neon optimizations. Also allow pngpriv.h
-    to be included for preprocessor definitions only, so it can be used in non-C/C++
-    files. Back ported from libpng 1.7.
+  Made symbol prefixing work with the ARM neon optimizations. Also allow
+    pngpriv.h to be included for preprocessor definitions only, so it can
+    be used in non-C/C++ files. Back ported from libpng 1.7.
   Made sRGB check numbers consistent.
   Ported libpng 1.5 options.awk/dfn file handling to 1.6, fixed one bug.
-  Removed cc -E workround, corrected png_get_palette_max API Tested on SUN OS cc 5.9,
-    which demonstrates the tokenization problem previously avoided by using /lib/cpp.
-    Since all .dfn output is now protected in double quotes unless it is to be macro
-    substituted the fix should work everywhere.
+  Removed cc -E workround, corrected png_get_palette_max API Tested on
+    SUN OS cc 5.9, which demonstrates the tokenization problem previously
+    avoided by using /lib/cpp.  Since all .dfn output is now protected in
+    double quotes unless it is to be macro substituted the fix should
+    work everywhere.
   Enabled parallel tests - back ported from libpng-1.7.
-  scripts/pnglibconf.dfa formatting improvements back ported from libpng 1.7.
+  scripts/pnglibconf.dfa formatting improvements back ported from libpng17.
+  Fixed a race condition in the creation of the build 'scripts' directory
+    while building with a parallel make.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
