@@ -4457,6 +4457,9 @@ Version 1.7.0beta01 [February 15, 2013]
 Version 1.7.0beta02 [February 16, 2013]
   Fixed a race condition in the creation of the build 'scripts' directory
     while building with a parallel make.
+  Use approved/supported Android method to check for NEON, use Linux/POSIX
+    1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
+    library calls (ported from libpng15).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
