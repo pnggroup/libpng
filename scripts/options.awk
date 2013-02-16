@@ -30,7 +30,7 @@
 # are copied to the preprocessed file).
 
 BEGIN{
-   out="/dev/null"              # intermediate, preprocessed, file
+   out=""                       # intermediate, preprocessed, file
    pre=-1                       # preprocess (first line)
    version="libpng version unknown" # version information
    version_file=""              # where to find the version
@@ -79,7 +79,7 @@ BEGIN{
 }
 
 # The output file must be specified before any input:
-out == "/dev/null" {
+out == "" {
    print "out=output.file must be given on the command line"
    err = 1
    exit 1

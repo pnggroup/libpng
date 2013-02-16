@@ -31,6 +31,10 @@ Version 1.6.1 [February 16, 2013]
     files. Back ported from libpng 1.7.
   Made sRGB check numbers consistent.
   Ported libpng 1.5 options.awk/dfn file handling to 1.6, fixed one bug.
+  Removed cc -E workround, corrected png_get_palette_max API Tested on SUN OS cc 5.9,
+    which demonstrates the tokenization problem previously avoided by using /lib/cpp.
+    Since all .dfn output is now protected in double quotes unless it is to be macro
+    substituted the fix should work everywhere.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
