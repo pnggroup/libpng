@@ -36,6 +36,7 @@ Version 1.6.1 [February 16, 2013]
     Since all .dfn output is now protected in double quotes unless it is to be macro
     substituted the fix should work everywhere.
   Enabled parallel tests - back ported from libpng-1.7.
+  scripts/pnglibconf.dfa formatting improvements back ported from libpng 1.7.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
