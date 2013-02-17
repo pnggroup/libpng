@@ -1116,16 +1116,16 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
     * code) but may be meaningless if the read or write handling of unknown
     * chunks is not compiled in.
     */
-#  if !(defined PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) && \
-      (defined PNG_READ_SUPPORTED)
+#  if !defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) && \
+      defined(PNG_READ_SUPPORTED)
       if (png_ptr->mode & PNG_IS_READ_STRUCT)
       {
          png_app_error(png_ptr, "no unknown chunk support on read");
          return;
       }
 #  endif
-#  if !(defined PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED) && \
-      (defined PNG_WRITE_SUPPORTED)
+#  if !defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED) && \
+      defined(PNG_WRITE_SUPPORTED)
       if (!(png_ptr->mode & PNG_IS_READ_STRUCT))
       {
          png_app_error(png_ptr, "no unknown chunk support on write");

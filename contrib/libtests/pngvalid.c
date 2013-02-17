@@ -26,7 +26,7 @@
 #include <signal.h>
 #include <stdio.h>
 
-#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
 #endif
 
@@ -1999,8 +1999,8 @@ static double digitize(PNG_CONST png_modifier *pm, double value,
 }
 #endif
 
-#if (defined PNG_READ_GAMMA_SUPPORTED) ||\
-   (defined PNG_READ_RGB_TO_GRAY_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
 static double abserr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
    /* Absolute error permitted in linear values - affected by the bit depth of
@@ -3357,7 +3357,7 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
 #ifdef PNG_TEXT_SUPPORTED
-#  if (defined PNG_READ_zTXt_SUPPORTED) && (defined PNG_WRITE_zTXt_SUPPORTED)
+#  if defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED)
 #     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_zTXt
 #  else
 #     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_NONE
@@ -8895,8 +8895,8 @@ static void perform_gamma_scale16_tests(png_modifier *pm)
 }
 #endif /* 16 to 8 bit conversion */
 
-#if defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_ALPHA_MODE_SUPPORTED
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
 static void gamma_composition_test(png_modifier *pm,
    PNG_CONST png_byte colour_type, PNG_CONST png_byte bit_depth,
    PNG_CONST int palette_number,

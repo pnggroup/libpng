@@ -1407,8 +1407,10 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
       red_inverse))
       return 1;
 
-   if (!png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse)) return 1;
-   if (!png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse)) return 1;
+   if (!png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse))
+      return 1;
+   if (!png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse))
+      return 1;
    if (!png_muldiv(&XYZ->green_Z, PNG_FP_1 - xy->greenx - xy->greeny, PNG_FP_1,
       green_inverse))
       return 1;

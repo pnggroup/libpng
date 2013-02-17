@@ -516,7 +516,7 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
    /* This is always supported, but for just read or just write it
     * unconditionally does the right thing.
     */
-#  if (defined PNG_READ_SUPPORTED) && (defined PNG_WRITE_SUPPORTED)
+#  if defined(PNG_READ_SUPPORTED) && defined(PNG_WRITE_SUPPORTED)
       if (png_ptr->mode & PNG_IS_READ_STRUCT)
 #  endif
 
@@ -530,7 +530,7 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
       }
 #  endif
 
-#  if (defined PNG_READ_SUPPORTED) && (defined PNG_WRITE_SUPPORTED)
+#  if defined(PNG_READ_SUPPORTED) && defined(PNG_WRITE_SUPPORTED)
       else if (!(png_ptr->mode & PNG_IS_READ_STRUCT))
 #  endif
 
