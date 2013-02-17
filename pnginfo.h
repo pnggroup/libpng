@@ -88,7 +88,7 @@ struct png_info_def
     * and initialize the appropriate fields below.
     */
 
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
    /* png_colorspace only contains 'flags' if neither GAMMA or COLORSPACE are
     * defined.  When COLORSPACE is switched on all the colorspace-defining
     * chunks should be enabled, when GAMMA is switched on all the gamma-defining

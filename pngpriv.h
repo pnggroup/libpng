@@ -63,7 +63,7 @@
  * configure generated config.h.  Libpng is expected to compile without *any*
  * special build system support on a reasonably ANSI-C compliant system.
  */
-#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
 
    /* Pick up the definition of 'restrict' from config.h if it was read: */
@@ -80,7 +80,7 @@
 #endif
 
 /* Local renames may change non-exported API functions from png.h */
-#if defined PNG_PREFIX && !defined PNGPREFIX_H
+#if defined(PNG_PREFIX) && !defined(PNGPREFIX_H)
 #  include "pngprefix.h"
 #endif
 
@@ -101,7 +101,7 @@
  * should be fixed by writing a wrapper for the header and the file on your
  * include path.
  */
-#if defined PNG_sCAL_SUPPORTED && defined PNG_FLOATING_POINT_SUPPORTED
+#if defined(PNG_sCAL_SUPPORTED) && defined(PNG_FLOATING_POINT_SUPPORTED)
    /* png.c requires the following ANSI-C constants if the conversion of
     * floating point to ASCII is implemented therein:
     *
@@ -114,8 +114,8 @@
 #  include <float.h>
 #endif /* sCAL && FLOATING_POINT */
 
-#if defined PNG_FLOATING_ARITHMETIC_SUPPORTED ||\
-   defined PNG_FLOATING_POINT_SUPPORTED
+#if defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) ||\
+   defined(PNG_FLOATING_POINT_SUPPORTED)
    /* ANSI-C90 math functions are required.  Full compliance with the standard
     * is probably not a requirement, but the functions must exist and be
     * declared in <math.h>
@@ -542,8 +542,8 @@
    abs((int)((c1).green) - (int)((c2).green)) + \
    abs((int)((c1).blue) - (int)((c2).blue)))
 
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* See below for the definitions of the tables used in these macros */
 #define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
    ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
@@ -700,8 +700,8 @@
 typedef const png_uint_16p * png_const_uint_16pp;
 
 /* Added to libpng-1.5.7: sRGB conversion tables */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
@@ -773,8 +773,8 @@ PNG_INTERNAL_FUNCTION(int,png_user_version_check,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_base,(png_const_structrp png_ptr,
    png_alloc_size_t size),PNG_ALLOCATED);
 
-#if defined PNG_TEXT_SUPPORTED || defined PNG_sPLT_SUPPORTED ||\
-   defined PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
+   defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED)
 /* Internal array allocator, outputs no error or warning messages on failure,
  * just returns NULL.
  */
@@ -1840,8 +1840,8 @@ PNG_INTERNAL_FUNCTION(void,png_build_gamma_tables,(png_structrp png_ptr,
 #endif
 
 /* SIMPLIFIED READ/WRITE SUPPORT */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* The internal structure that png_image::opaque points to. */
 typedef struct png_control
 {

@@ -1,11 +1,11 @@
 
 /* pngstruct.h - header file for PNG reference library
  *
- * Copyright (c) 1998-2012 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -102,7 +102,7 @@ typedef struct png_XYZ
 } png_XYZ;
 #endif /* COLORSPACE */
 
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
 /* A colorspace is all the above plus, potentially, profile information,
  * however at present libpng does not use the profile internally so it is only
  * stored in the png_info struct (if iCCP is supported.)  The rendering intent
@@ -241,7 +241,7 @@ struct png_struct_def
    void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_infop row_info,
       png_bytep row, png_const_bytep prev_row);
 
-#if (defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED)
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
    /* The png_struct colorspace structure is only required on read - on write it
     * is in (just) the info_struct.
     */
@@ -327,7 +327,7 @@ struct png_struct_def
     * Members that hold pointers to the decompressed image rows.
     */
    png_bytep row_buf;  /* buffer for the current (unfiltered) row */
-#if (defined PNG_WRITE_FILTER_SUPPORTED) || (defined PNG_READ_SUPPORTED)
+#if defined(PNG_WRITE_FILTER_SUPPORTED) || defined(PNG_READ_SUPPORTED)
    png_bytep prev_row; /* buffer to save the previous (unfiltered) row */
 #endif
 
@@ -420,9 +420,9 @@ struct png_struct_def
    png_bytep gamma_table;        /* gamma table for 8-bit depth files */
    png_uint_16p gamma_16_table;  /* gamma table for 16-bit depth files */
 
-#if defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_ALPHA_MODE_SUPPORTED ||\
-   defined PNG_READ_RGB_TO_GRAY_SUPPORTED
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED) ||\
+   defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
    png_bytep gamma_from_1;       /* converts from 1.0 to screen */
    png_uint_16p gamma_to_1;      /* converts from file to 1.0 */
    png_uint_16p gamma_16_from_1; /* converts from 1.0 to screen */
@@ -430,14 +430,15 @@ struct png_struct_def
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
 #endif /* PNG_READ_GAMMA_SUPPORTED */
 
-#if defined PNG_READ_tRNS_SUPPORTED || defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_EXPAND_SUPPORTED
+#if defined(PNG_READ_tRNS_SUPPORTED) || \
+   defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_EXPAND_SUPPORTED)
    png_bytep trans_alpha;           /* alpha values for paletted files */
 #endif
 
    /* Integer values */
-#if defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_ALPHA_MODE_SUPPORTED
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    png_fixed_point background_gamma;
 #endif
 #ifdef PNG_READ_GAMMA_SUPPORTED
@@ -446,13 +447,14 @@ struct png_struct_def
 #endif
 
    /* png_color_16 */
-#if defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_ALPHA_MODE_SUPPORTED
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    png_color_16 background;   /* background color in screen gamma space */
    png_color_16 background_1; /* background normalized to gamma 1.0 */
 #endif
-#if defined PNG_READ_tRNS_SUPPORTED || defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_EXPAND_SUPPORTED
+#if defined(PNG_READ_tRNS_SUPPORTED) || \
+   defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_EXPAND_SUPPORTED)
    png_color_16 trans_color;  /* transparent color for non-paletted files */
 #endif
 
@@ -464,13 +466,13 @@ struct png_struct_def
 #endif
 
    /* png_color_8 */
-#if defined PNG_READ_GAMMA_SUPPORTED || defined PNG_READ_sBIT_SUPPORTED
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_READ_sBIT_SUPPORTED)
    png_color_8 sig_bit;       /* significant bits in each available channel */
 #endif
 
    /* png_byte */
-#if defined PNG_READ_BACKGROUND_SUPPORTED ||\
-   defined PNG_READ_ALPHA_MODE_SUPPORTED
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    png_byte background_gamma_type;
 #endif
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
@@ -478,12 +480,12 @@ struct png_struct_def
 #endif
 
    /* SHIFT - both READ_SHIFT and WRITE_SHIFT */
-#if defined PNG_READ_SHIFT_SUPPORTED || defined PNG_WRITE_SHIFT_SUPPORTED
+#if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
    png_color_8 shift;         /* shift for significant bit tranformation */
 #endif
 
    /* FILLER SUPPORT (pixel expansion or read, contraction on write) */
-#if defined PNG_READ_FILLER_SUPPORTED || defined PNG_WRITE_FILLER_SUPPORTED
+#if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
    png_uint_16 filler;              /* filler bytes for pixel expansion */
 #endif
 

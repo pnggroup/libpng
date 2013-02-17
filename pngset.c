@@ -431,8 +431,8 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
    info_ptr->free_me |= PNG_FREE_SCAL;
 }
 
-#  if defined PNG_FLOATING_POINT_SUPPORTED &&\
-      defined PNG_FLOATING_ARITHMETIC_SUPPORTED
+#  if defined(PNG_FLOATING_POINT_SUPPORTED) &&\
+      defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
 void PNGAPI
 png_set_sCAL(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
     double width, double height)
@@ -1157,16 +1157,16 @@ png_set_unknown_chunks(png_structrp png_ptr,
     * code) but may be meaningless if the read or write handling of unknown
     * chunks is not compiled in.
     */
-#  if !(defined PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) && \
-      (defined PNG_READ_SUPPORTED)
+#  if !defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) && \
+      defined(PNG_READ_SUPPORTED)
       if (png_ptr->mode & PNG_IS_READ_STRUCT)
       {
          png_app_error(png_ptr, "no unknown chunk support on read");
          return;
       }
 #  endif
-#  if !(defined PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED) && \
-      (defined PNG_WRITE_SUPPORTED)
+#  if !defined(PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED) && \
+      defined(PNG_WRITE_SUPPORTED)
       if (!(png_ptr->mode & PNG_IS_READ_STRUCT))
       {
          png_app_error(png_ptr, "no unknown chunk support on write");

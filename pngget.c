@@ -552,14 +552,14 @@ png_get_cHRM_XYZ(png_const_structrp png_ptr, png_const_inforp info_ptr,
          *green_Z = png_float(png_ptr,
             info_ptr->colorspace.end_points_XYZ.green_Z, "cHRM green Z");
       if (blue_X != NULL)
-         *blue_X = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blue_X,
-            "cHRM blue X");
+         *blue_X = png_float(png_ptr,
+            info_ptr->colorspace.end_points_XYZ.blue_X, "cHRM blue X");
       if (blue_Y != NULL)
-         *blue_Y = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blue_Y,
-            "cHRM blue Y");
+         *blue_Y = png_float(png_ptr,
+            info_ptr->colorspace.end_points_XYZ.blue_Y, "cHRM blue Y");
       if (blue_Z != NULL)
-         *blue_Z = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.blue_Z,
-            "cHRM blue Z");
+         *blue_Z = png_float(png_ptr,
+            info_ptr->colorspace.end_points_XYZ.blue_Z, "cHRM blue Z");
       return (PNG_INFO_cHRM);
    }
 

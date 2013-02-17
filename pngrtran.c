@@ -1003,7 +1003,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
 
          png_ptr->rgb_to_gray_red_coeff   = red_int;
          png_ptr->rgb_to_gray_green_coeff = green_int;
-#        if defined PNG_COLORS_SPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#        if defined(PNG_COLORS_SPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
             png_ptr->colorspace.flags |= PNG_COLORSPACE_RGB_TO_GRAY_SET;
 #        endif
       }
@@ -2136,8 +2136,8 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       png_do_gray_to_rgb(row_info, png_ptr->row_buf + 1);
 #endif
 
-#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
-   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
    if (png_ptr->transformations & PNG_COMPOSE)
       png_do_compose(row_info, png_ptr->row_buf + 1, png_ptr);
 #endif
@@ -2148,8 +2148,8 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       /* Because RGB_TO_GRAY does the gamma transform. */
       !(png_ptr->transformations & PNG_RGB_TO_GRAY) &&
 #endif
-#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
-   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
       /* Because PNG_COMPOSE does the gamma transform if there is something to
        * do (if there is an alpha channel or transparency.)
        */
@@ -3410,8 +3410,8 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
-#if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
-   (defined PNG_READ_ALPHA_MODE_SUPPORTED)
+#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
+   defined(PNG_READ_ALPHA_MODE_SUPPORTED)
 /* Replace any alpha or transparency with the supplied background color.
  * "background" is already in the screen gamma, while "background_1" is
  * at a gamma of 1.0.  Paletted files have already been taken care of.

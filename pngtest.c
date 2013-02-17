@@ -1169,8 +1169,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 #endif
 #ifdef PNG_sCAL_SUPPORTED
-#if defined PNG_FLOATING_POINT_SUPPORTED && \
-   defined PNG_FLOATING_ARITHMETIC_SUPPORTED
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
+   defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
    {
       int unit;
       double scal_width, scal_height;
@@ -1467,7 +1467,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    /* When the unknown vpAg/sTER chunks are written by pngtest the only way to
     * do it is to write them *before* calling png_write_end.  When unknown
-    * chunks are written by libpng, however, they are written just before IEND.     * There seems to be no way round this, however vpAg/sTER are not expected
+    * chunks are written by libpng, however, they are written just before IEND.
+    * There seems to be no way round this, however vpAg/sTER are not expected
     * after IDAT.
     */
    write_chunks(write_ptr, after_IDAT);

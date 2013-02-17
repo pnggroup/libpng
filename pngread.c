@@ -15,7 +15,7 @@
  */
 
 #include "pngpriv.h"
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED && defined PNG_STDIO_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 #  include <errno.h>
 #endif
 
@@ -877,8 +877,8 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#if (defined PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) &&\
-   (defined PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) && \
+   defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free(png_ptr, png_ptr->unknown_chunk.data);
 #endif
 
