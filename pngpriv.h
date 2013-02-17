@@ -73,7 +73,7 @@
 #endif
 
 /* Local renames may change non-exported API functions from png.h */
-#if defined PNG_PREFIX && !defined PNGPREFIX_H
+#if defined(PNG_PREFIX) && !defined(PNGPREFIX_H)
 #  include "pngprefix.h"
 #endif
 
@@ -700,8 +700,8 @@
 typedef const png_uint_16p * png_const_uint_16pp;
 
 /* Added to libpng-1.5.7: sRGB conversion tables */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
    /* Convert from an sRGB encoded value 0..255 to a 16-bit linear value,
@@ -769,8 +769,8 @@ PNG_INTERNAL_FUNCTION(int,png_user_version_check,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_base,(png_const_structrp png_ptr,
    png_alloc_size_t size),PNG_ALLOCATED);
 
-#if defined PNG_TEXT_SUPPORTED || defined PNG_sPLT_SUPPORTED ||\
-   defined PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
+   defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED)
 /* Internal array allocator, outputs no error or warning messages on failure,
  * just returns NULL.  
  */
@@ -1836,8 +1836,8 @@ PNG_INTERNAL_FUNCTION(void,png_build_gamma_table,(png_structrp png_ptr,
 #endif
 
 /* SIMPLIFIED READ/WRITE SUPPORT */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* The internal structure that png_image::opaque points to. */
 typedef struct png_control
 {

@@ -844,8 +844,8 @@ png_set_strip_error_numbers(png_structrp png_ptr, png_uint_32 strip_mode)
 }
 #endif
 
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
    /* Currently the above both depend on SETJMP_SUPPORTED, however it would be
     * possible to implement without setjmp support just so long as there is some
     * way to handle the error return here:

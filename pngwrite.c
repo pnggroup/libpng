@@ -12,7 +12,7 @@
  */
 
 #include "pngpriv.h"
-#if defined PNG_SIMPLIFIED_WRITE_SUPPORTED && defined PNG_STDIO_SUPPORTED
+#if defined(PNG_SIMPLIFIED_WRITE_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 #  include <errno.h>
 #endif
 

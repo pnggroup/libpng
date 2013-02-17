@@ -768,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.1beta02 - February 16, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.6.1beta02 - February 17, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.1beta02 - February 16, 2013\
+      return "libpng version 1.6.1beta02 - February 17, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1647,7 +1647,7 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
    return 0; /* failed */
 }
 
-#if defined PNG_sRGB_SUPPORTED || defined PNG_iCCP_SUPPORTED
+#if defined(PNG_sRGB_SUPPORTED) || defined(PNG_iCCP_SUPPORTED)
 /* Error message generation */
 static char
 png_icc_tag_char(png_uint_32 byte)
@@ -4011,8 +4011,8 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 #endif /* READ_GAMMA */
 
 /* sRGB support */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* sRGB conversion tables; these are machine generated with the code in
  * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
  * specification (see the article at http://en.wikipedia.org/wiki/SRGB)
@@ -4180,8 +4180,8 @@ const png_byte png_sRGB_delta[512] =
 #endif /* SIMPLIFIED READ/WRITE sRGB support */
 
 /* SIMPLIFIED READ/WRITE SUPPORT */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 static int
 png_image_free_function(png_voidp argument)
 {

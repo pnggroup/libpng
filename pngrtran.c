@@ -1412,7 +1412,7 @@ png_init_read_transformations(png_structrp png_ptr)
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-#if defined PNG_READ_EXPAND_SUPPORTED && defined PNG_READ_BACKGROUND_SUPPORTED
+#if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* Detect gray background and attempt to enable optimization for
     * gray --> RGB case.
     *

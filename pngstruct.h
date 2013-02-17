@@ -100,7 +100,7 @@ typedef struct png_XYZ
 } png_XYZ;
 #endif /* COLORSPACE */
 
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
 /* A colorspace is all the above plus, potentially, profile information,
  * however at present libpng does not use the profile internally so it is only
  * stored in the png_info struct (if iCCP is supported.)  The rendering intent
@@ -476,7 +476,7 @@ struct png_struct_def
       png_bytep row, png_const_bytep prev_row);
 
 #ifdef PNG_READ_SUPPORTED
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
    png_colorspace   colorspace;
 #endif
 #endif
