@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.1beta02 - February 17, 2013
+ libpng version 1.6.1beta02 - February 18, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.1beta02 - February 17, 2013
+ libpng versions 0.97, January 1998, through 1.6.1beta02 - February 18, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -636,7 +636,7 @@ callback function:
 
       /* also ignore unused known chunks: */
       png_set_keep_unknown_chunks(read_ptr, 1, unused_chunks,
-         (int)sizeof(unused_chunks)/5);
+         (int)(sizeof unused_chunks)/5);
     #endif
 
 User limits
@@ -988,7 +988,7 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
-   if (height > PNG_UINT_32_MAX/png_sizeof(png_byte))
+   if (height > PNG_UINT_32_MAX/(sizeof (png_byte)))
       png_error (png_ptr,
           "Image is too tall to process in memory");
 
@@ -997,7 +997,7 @@ row_pointers prior to calling png_read_png() with
           "Image is too wide to process in memory");
 
    row_pointers = png_malloc(png_ptr,
-       height*png_sizeof(png_bytep));
+       height*(sizeof (png_bytep)));
 
    for (int i=0; i<height, i++)
       row_pointers[i]=NULL;  /* security precaution */
@@ -5151,7 +5151,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 17, 2013
+February 18, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
