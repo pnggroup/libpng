@@ -4464,6 +4464,8 @@ Version 1.7.0beta02 [February 18, 2013]
   Use parentheses more consistently in "#if defined(MACRO)" tests.
   Folded long lines.
 
+Version 1.7.0beta03 [February 18, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
