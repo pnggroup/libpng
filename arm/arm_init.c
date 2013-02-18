@@ -20,7 +20,7 @@
  * Andoid intends to define __ANDROID__, however there are bugs in their
  * toolchain; use -D__ANDROID__ to work round this.
  */
-#if defined __linux__ && defined __arm__
+#if defined(__linux__) && defined(__arm__)
 #define CHECK_NEON
 #include <signal.h> /* for sig_atomic_t */
 
