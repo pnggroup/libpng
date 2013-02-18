@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta02 - February 16, 2013
+Libpng 1.7.0beta02 - February 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -168,12 +168,14 @@ Version 1.7.0beta01 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
-Version 1.7.0beta02 [February 16, 2013]
+Version 1.7.0beta02 [February 18, 2013]
   Fixed a race condition in the creation of the build 'scripts' directory
     while building with a parallel make.
   Use approved/supported Android method to check for NEON, use Linux/POSIX
     1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
     library calls (ported from libpng15).
+  Use parentheses more consistently in "#if defined(MACRO)" tests.
+  Folded long lines.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

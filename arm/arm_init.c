@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
- * Last changed in libpng 1.5.14 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.15 [%RDATE%]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -20,7 +20,7 @@
  * Andoid intends to define __ANDROID__, however there are bugs in their
  * toolchain; use -D__ANDROID__ to work round this.
  */
-#if defined __linux__ && defined __arm__
+#if defined(__linux__) && defined(__arm__)
 #define CHECK_NEON
 #include <signal.h> /* for sig_atomic_t */
 

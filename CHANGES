@@ -3672,7 +3672,8 @@ Version 1.5.6 [November 3, 2011]
   No changes.
 
 Version 1.5.7beta01 [November 4, 2011]
-  Added support for ARM processor (Mans Rullgard)
+  Added support for ARM processor, when decoding all PNG up-filtered rows
+    and any other-filtered rows with 3 or 4 bytes per pixel (Mans Rullgard).
   Fixed bug in pngvalid on early allocation failure; fixed type cast in
     pngmem.c; pngvalid would attempt to call png_error() if the allocation
     of a png_struct or png_info failed. This would probably have led to a
@@ -4454,12 +4455,14 @@ Version 1.7.0beta01 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
-Version 1.7.0beta02 [February 16, 2013]
+Version 1.7.0beta02 [February 18, 2013]
   Fixed a race condition in the creation of the build 'scripts' directory
     while building with a parallel make.
   Use approved/supported Android method to check for NEON, use Linux/POSIX
     1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
     library calls (ported from libpng15).
+  Use parentheses more consistently in "#if defined(MACRO)" tests.
+  Folded long lines.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
