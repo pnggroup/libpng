@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
- * Last changed in libpng 1.5.14 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.15 [%RDATE%]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -56,7 +56,7 @@ png_have_neon(png_structp png_ptr)
 #include <elf.h>
 #include <asm/hwcap.h>
 
-/* A read call may be interupted, in which case it returns -1 and sets errno to
+/* A read call may be interrupted, in which case it returns -1 and sets errno to
  * EINTR if nothing was done, otherwise (if something was done) a partial read
  * may result.
  */

@@ -1496,7 +1496,7 @@ contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
 
 .dfn.out:
 	rm -f $@ $@.c $@.?
-	test -d scripts || mkdir scripts
+	test -d scripts || mkdir scripts || test -d scripts
 	echo '#include "$<"' >$@.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $@.c > $@.1
