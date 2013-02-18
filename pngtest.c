@@ -1469,7 +1469,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    /* When the unknown vpAg/sTER chunks are written by pngtest the only way to
     * do it is to write them *before* calling png_write_end.  When unknown
-    * chunks are written by libpng, however, they are written just before IEND.     * There seems to be no way round this, however vpAg/sTER are not expected
+    * chunks are written by libpng, however, they are written just before IEND.
+    * There seems to be no way round this, however vpAg/sTER are not expected
     * after IDAT.
     */
    write_chunks(write_ptr, after_IDAT);
@@ -1948,4 +1949,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_15beta02 Your_png_h_is_not_version_1_5_15beta02;
+typedef png_libpng_version_1_5_15beta05 Your_png_h_is_not_version_1_5_15beta05;

@@ -238,7 +238,7 @@
    /* Modern compilers support restrict, but assume not for anything not
     * recognized here:
     */
-#  if defined __GNUC__ || defined _MSC_VER || defined __WATCOMC__
+#  if defined(__GNUC__) || defined(_MSC_VER) || defined(__WATCOMC__)
 #     define PNG_RESTRICT restrict
 #  else
 #     define PNG_RESTRICT
@@ -1637,7 +1637,7 @@ PNG_EXTERN png_fixed_point png_muldiv_warn PNGARG((png_structp png_ptr,
     png_fixed_point a, png_int_32 multiplied_by, png_int_32 divided_by));
 #endif
 
-#if (defined PNG_READ_GAMMA_SUPPORTED) || (defined PNG_cHRM_SUPPORTED)
+#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED)
 /* Calculate a reciprocal - used for gamma values.  This returns
  * 0 if the argument is 0 in order to maintain an undefined value,
  * there are no warnings.
