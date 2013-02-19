@@ -4464,7 +4464,8 @@ Version 1.7.0beta02 [February 18, 2013]
   Use parentheses more consistently in "#if defined(MACRO)" tests.
   Folded long lines.
 
-Version 1.7.0beta03 [February 18, 2013]
+Version 1.7.0beta03 [February 19, 2013]
+  Reenabled code to allow zero length PLTE chunks for MNG.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

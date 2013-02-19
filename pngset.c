@@ -515,7 +515,7 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
 
    png_debug1(1, "in %s storage function", "PLTE");
 
-   if (png_ptr == NULL || info_ptr == NULL || palette == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return;
 
    if (num_palette < 0 || num_palette > PNG_MAX_PALETTE_LENGTH)
@@ -528,6 +528,17 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
          png_warning(png_ptr, "Invalid palette length");
          return;
       }
+   }
+
+   if ((num_palette > 0 && palette == NULL) ||
+      (num_palette == 0
+#        ifdef PNG_MNG_FEATURES_SUPPORTED
+            && (png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) == 0
+#        endif
+      ))
+   {
+      png_chunk_report(png_ptr, "Invalid palette", PNG_CHUNK_ERROR);
+      return;
    }
 
    /* It may not actually be necessary to set png_ptr->palette here;
@@ -546,7 +557,8 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
    png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
 
-   memcpy(png_ptr->palette, palette, num_palette * (sizeof (png_color)));
+   if (num_palette > 0)
+      memcpy(png_ptr->palette, palette, num_palette * (sizeof (png_color)));
    info_ptr->palette = png_ptr->palette;
    info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
 
