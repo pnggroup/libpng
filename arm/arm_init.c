@@ -16,12 +16,17 @@
 
 #include "../pngpriv.h"
 
+#if defined(PNG_FILTER_OPTIMIZATIONS) && defined(__arm__) && \
+   defined(__ARM_NEON__)
 /* __arm__ is defined by GCC, MSVC defines _M_ARM to the ARM version number,
  * Andoid intends to define __ANDROID__, however there are bugs in their
  * toolchain; use -D__ANDROID__ to work round this.
+ *
+ * __ARM_NEON__ is used to ensure that the compiler has the appropriate ARM
+ * NEON support
  */
-#if defined(__linux__) && defined(__arm__)
-#define CHECK_NEON
+
+#ifdef PNG_ARM_NEON_CHECK_SUPPORTED /* Do run-time checks */
 #include <signal.h> /* for sig_atomic_t */
 
 #ifdef __ANDROID__
@@ -43,7 +48,7 @@ png_have_neon(png_structp png_ptr)
    return andoid_getCpuFamily() == ANDROID_CPU_FAMILY_ARM &&
       (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON) != 0;
 }
-#else
+#elif defined(__linux__)
 /* The generic __linux__ implementation requires reading /proc/self/auxv and
  * looking at each element for one that records NEON capabilities.
  */
@@ -143,14 +148,20 @@ png_have_neon(png_structp png_ptr)
    close(fd);
    return 0;
 }
-#endif /* !__ANDROID__ */
-#endif /* __linux__ && __arm__ */
+#else
+   /* We don't know how to do a run-time check on this system */
+#  error "no support for run-time ARM NEON checks"
+#endif /* OS checks */
+#endif /* PNG_ARM_NEON_CHECK_SUPPORTED */
+
+#ifndef PNG_ALIGNED_MEMORY_SUPPORTED
+#  error "ALIGNED_MEMORY is required; set: -DPNG_ALIGNED_MEMORY_SUPPORTED"
+#endif
 
 void
 png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
 {
-#ifdef __arm__
-#ifdef CHECK_NEON
+#ifdef PNG_ARM_NEON_CHECK_SUPPORTED
    static volatile sig_atomic_t no_neon = -1; /* not checked */
 
    if (no_neon < 0)
@@ -158,7 +169,7 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
 
    if (no_neon)
       return;
-#endif
+#endif /* PNG_ARM_NEON_CHECK_SUPPORTED */
 
    /* IMPORTANT: any new external functions used here must be declared using
     * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the
@@ -188,8 +199,5 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
           png_read_filter_row_paeth4_neon;
    }
-#else
-   PNG_UNUSED(pp)
-   PNG_UNUSED(bpp)
-#endif
 }
+#endif /* FILTER_OPTIMIZATIONS && __arm__ && __ARM_NEON__ */

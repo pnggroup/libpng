@@ -232,15 +232,20 @@ AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
 AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
 
 AC_ARG_ENABLE([arm-neon],
-   AS_HELP_STRING([[[--enable-arm-neon]]], [Enable ARM NEON optimizations]),
-   [if test "${enableval}" = "yes"; then
+   AS_HELP_STRING([[[--enable-arm-neon]]],
+      [Enable ARM NEON optimizations: use 'always' to turn off run-time checks]),
+   [if test "${enableval}" = "yes" -o "${enableval}" = "always"; then
       AC_DEFINE([PNG_FILTER_OPTIMIZATIONS],
                 [png_init_filter_functions_neon],
                 [ARM NEON filter initialization function])
-      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1],
+      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [],
                 [Align row buffers])
+      if test "${enableval}" = "always"; then
+         AC_DEFINE([PNG_NO_ARM_NEON_CHECK], [],
+                   [Turn off run-time checking for ARM NEON support])
+      fi
     fi])
-AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" = yes])
+AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" != "no"])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

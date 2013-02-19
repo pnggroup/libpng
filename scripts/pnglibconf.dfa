@@ -136,6 +136,12 @@ logunsupported = 1
 # - PNG_USER_VERSIONINFO_COMPANYNAME
 # - PNG_USER_VERSIONINFO_LEGALTRADEMARKS
 
+# It is necessary to include configures definitions here so that AC_DEFINE
+# in configure.ac works in a comprehensible way
+@#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
+@#  include "config.h"
+@#endif
+
 @#ifdef PNG_USER_CONFIG
 @#  include "pngusr.h"
 @#endif
@@ -186,6 +192,18 @@ setting PREFIX
 # Default to using the read macros
 
 setting DEFAULT_READ_MACROS default 1
+
+# This setting allows a hardware or configuration specific filter optimization
+# function to be specified, the argument is the name of the filter initializaion
+# function to use.
+
+setting FILTER_OPTIMIZATIONS
+
+# This option turns on runtime checks for ARM NEON support, it is irrelevant
+# on other platforms and it is irrelevant unless NEON code is turned on.  Checks
+# are on by default
+
+option ARM_NEON_CHECK
 
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib, it describes the input
@@ -577,7 +595,7 @@ setting sRGB_PROFILE_CHECKS default 2
 # but can help (in theory) on some architectures.  Only affects
 # internal structures.  Added at libpng 1.4.0
 
-option ALIGN_MEMORY
+option ALIGNED_MEMORY
 
 # Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
 # See png[wr]util.c, normally this should always be *on*
