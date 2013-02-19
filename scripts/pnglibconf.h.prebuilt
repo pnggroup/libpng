@@ -3,7 +3,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.5.15beta06 - February 18, 2013 */
+/* Libpng 1.5.15beta06 - February 19, 2013 */
 
 /* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
 
@@ -36,7 +36,8 @@
 /* end of settings */
 /* options */
 #define PNG_16BIT_SUPPORTED 1
-#define PNG_ALIGN_MEMORY_SUPPORTED 1
+#define PNG_ALIGNED_MEMORY_SUPPORTED
+#define PNG_ARM_NEON_CHECK_SUPPORTED
 #define PNG_BENIGN_ERRORS_SUPPORTED 1
 #define PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED 1
 #define PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED 1
