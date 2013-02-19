@@ -1,5 +1,5 @@
 
-Libpng 1.6.1beta02 - February 16, 2013
+Libpng 1.6.1beta02 - February 19, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -44,7 +44,10 @@ Version 1.6.1beta01 [February 16, 2013]
     1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
     library calls (ported from libpng15).
 
-Version 1.6.1beta02 [February 16, 2013]
+Version 1.6.1beta02 [February 19, 2013]
+  Use parentheses more consistently in "#if defined(MACRO)" tests.
+  Folded long lines.
+  Reenabled code to allow zero length PLTE chunks for MNG.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
