@@ -4406,6 +4406,8 @@ Version 1.6.1beta02 [February 19, 2013]
   Folded long lines.
   Reenabled code to allow zero length PLTE chunks for MNG.
 
+Version 1.6.1beta03 [February 19, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
