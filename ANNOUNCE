@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta06 - February 19, 2013
+Libpng 1.5.15beta06 - February 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -57,9 +57,10 @@ Version 1.5.15beta05 [February 17, 2013]
     while building with a parallel make.
   Use parentheses more consistently in "#if defined(MACRO)" tests.
 
-Version 1.5.15beta06 [February 19, 2013]
+Version 1.5.15beta06 [February 22, 2013]
   Fixed PNG_ALIGN(ED)_MEMORY and add ability to turn off ARM_NEON
     runtime checks
+  Updated INSTALL.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
