@@ -41,15 +41,30 @@ is not already on your system.  zlib can usually be found
 wherever you got libpng.  zlib can be placed in another directory,
 at the same level as libpng.
 
+If your system already has a preinstalled zlib you will still need
+to have access to the zlib.h and zconf.h include files that
+correspond to the version of zlib that's installed.
+
+If you wish to test with a particular zlib that is not first in the
+standard library search path, put ZLIBLIB, ZLIBINC, INCLUDES, LDFLAGS,
+LIBS, and LD_LIBRARY_PATH in your environment before running "make test"
+or "make distcheck":
+
+ZLIBLIB=/path/to/lib export ZLIBLIB
+ZLIBINC=/path/to/include export ZLIBINC
+INCLUDES="-I$ZLIBINC" export INCLUDES
+LDFLAGS="-L$ZLIBLIB" export LDFLAGS
+LIBS=$ZLIBLIB/libz.a export LIBS
+LD_LIBRARY_PATH="$ZLIBLIB:$LD_LIBRARY_PATH" export LD_LIBRARY_PATH
+
+If you are using one of the makefile scripts, put ZLIBLIB and ZLIBINC
+in your environment and type "make ZLIBLIB=$ZLIBLIB ZLIBINC=$ZLIBINC test".
+
 If you want to use "cmake" (see www.cmake.org), type
 
    cmake . -DCMAKE_INSTALL_PREFIX=/path
    make
    make install
-
-If your system already has a preinstalled zlib you will still need
-to have access to the zlib.h and zconf.h include files that
-correspond to the version of zlib that's installed.
 
 You can rename the directories that you downloaded (they
 might be called "libpng-x.y.z" or "libpngNN" and "zlib-1.2.5"
@@ -71,6 +86,7 @@ Your directory structure should look like this:
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
              gregbook
+             libtests
              pngminim
              pngminus
              pngsuite
