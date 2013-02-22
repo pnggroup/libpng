@@ -1,5 +1,5 @@
 
-Libpng 1.6.1beta03 - February 19, 2013
+Libpng 1.6.1beta03 - February 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -49,13 +49,14 @@ Version 1.6.1beta02 [February 19, 2013]
   Folded long lines.
   Reenabled code to allow zero length PLTE chunks for MNG.
 
-Version 1.6.1beta03 [February 19, 2013]
+Version 1.6.1beta03 [February 22, 2013]
   Fixed ALIGNED_MEMORY support.
   Allow run-time ARM NEON checking to be disabled. A new configure option:
     --enable-arm-neon=always will stop the run-time checks. New checks
     within arm/arm_init.c will cause the code not to be compiled unless
     __ARM_NEON__ is set. This should make it fail safe (if someone asks
     for it on then the build will fail if it can't be done.)
+  Updated the INSTALL document.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
