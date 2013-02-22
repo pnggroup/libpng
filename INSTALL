@@ -67,8 +67,8 @@ If you want to use "cmake" (see www.cmake.org), type
    make install
 
 You can rename the directories that you downloaded (they
-might be called "libpng-x.y.z" or "libpngNN" and "zlib-1.2.5"
-or "zlib125") so that you have directories called "zlib" and "libpng".
+might be called "libpng-x.y.z" or "libpngNN" and "zlib-1.2.7"
+or "zlib127") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
