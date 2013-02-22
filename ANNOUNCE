@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta06 - February 22, 2013
+Libpng 1.5.15beta07 - February 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.15beta06.tar.xz (LZMA-compressed, recommended)
-   1.5.15beta06.tar.gz
-   1.5.15beta06.tar.bz2
+   1.5.15beta07.tar.xz (LZMA-compressed, recommended)
+   1.5.15beta07.tar.gz
+   1.5.15beta07.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1515b06.7z  (LZMA-compressed, recommended)
-   lp1515b06.zip
+   lp1515b07.7z  (LZMA-compressed, recommended)
+   lp1515b07.zip
 
 Other information:
 
-   1.5.15beta06-README.txt
-   1.5.15beta06-LICENSE.txt
+   1.5.15beta07-README.txt
+   1.5.15beta07-LICENSE.txt
 
 Changes since the last public release (1.5.14):
 
@@ -60,7 +60,9 @@ Version 1.5.15beta05 [February 17, 2013]
 Version 1.5.15beta06 [February 22, 2013]
   Fixed PNG_ALIGN(ED)_MEMORY and add ability to turn off ARM_NEON
     runtime checks
-  Updated INSTALL.
+  Updated the INSTALL document.
+
+Version 1.5.15beta07 [February 22, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

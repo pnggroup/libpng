@@ -4018,7 +4018,9 @@ Version 1.5.15beta05 [February 17, 2013]
 Version 1.5.15beta06 [February 22, 2013]
   Fixed PNG_ALIGN(ED)_MEMORY and add ability to turn off ARM_NEON
     runtime checks
-  Updated INSTALL.
+  Updated the INSTALL document.
+
+Version 1.5.15beta07 [February 22, 2013]
 
   ===========================================================================
                        NOTICE November 17, 2012:
