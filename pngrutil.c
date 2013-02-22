@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.5.15 [March 28, 2013]
+ * Last changed in libpng 1.5.14 [January 24, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,6 +17,8 @@
 #include "pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
+
+#define png_strtod(p,a,b) strtod(a,b)
 
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
@@ -3159,7 +3161,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                   {
                      png_uint_32p dp32 = (png_uint_32p)dp;
                      png_const_uint_32p sp32 = (png_const_uint_32p)sp;
-                     size_t skip = (bytes_to_jump-bytes_to_copy) /
+                     unsigned int skip = (bytes_to_jump-bytes_to_copy) /
                         sizeof (png_uint_32);
 
                      do
@@ -3200,7 +3202,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                   {
                      png_uint_16p dp16 = (png_uint_16p)dp;
                      png_const_uint_16p sp16 = (png_const_uint_16p)sp;
-                     size_t skip = (bytes_to_jump-bytes_to_copy) /
+                     unsigned int skip = (bytes_to_jump-bytes_to_copy) /
                         sizeof (png_uint_16);
 
                      do

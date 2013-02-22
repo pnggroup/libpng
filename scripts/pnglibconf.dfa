@@ -27,7 +27,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # The syntax is detailed in scripts/options.awk, this is a summary
 # only:
 #
-# setting <name> [requires ...] [default]
+# setting <name> [default]
 #    #define PNG_<name> <value>  /* value comes from current setting */
 # option <name> [requires ...] [if ...] [enables ...] [disabled]
 #    #define PNG_<name>_SUPPORTED if the requirements are met and
@@ -191,23 +191,12 @@ option WRITE enables WRITE_INT_FUNCTIONS
 
 setting FILTER_OPTIMIZATIONS
 
-# Implementation specific control of the optimizations, enabled by those
-# hardware or software options that need it (typically when run-time choices
-# must be made by the user)
-option SET_OPTION disabled
- 
-# These options are specific to the ARM NEON hardware optimizations:
-#
-# ARM_NEON: the optimization itself
-# ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
-# ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
-#                 supported, this is poorly supported and deprectated - use the
-#                 png_set_hardware API.
-option ARM_NEON disabled,
-   sets FILTER_OPTIMIZATIONS png_init_filter_functions_neon
-option ARM_NEON_API disabled enables SET_OPTION ARM_NEON
-option ARM_NEON_CHECK disabled enables ARM_NEON
- 
+# This option turns on runtime checks for ARM NEON support, it is irrelevant
+# on other platforms and it is irrelevant unless NEON code is turned on.  Checks
+# are on by default
+
+option ARM_NEON_CHECK
+
 # Generic options - affect both read and write.
 
 option WARNINGS
@@ -379,12 +368,6 @@ option INCH_CONVERSIONS
 # API to build a grayscale palette
 
 option BUILD_GRAYSCALE_PALETTE
-
-# This changes the default for the ARM NEON optimizations according to
-# __ARM_NEON__
-@#ifdef __ARM_NEON__
-@#  define PNG_ARM_NEON_SUPPORTED
-@#endif
 
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want

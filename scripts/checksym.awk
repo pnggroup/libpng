@@ -5,9 +5,8 @@
 # awk -f checksym.awk official-def list-to-check
 #
 # Output is a file in the current directory called 'symbols.new',
-# the value of the awk variable "of" (which can be changed on the
-# command line if required.)  stdout holds error messages.  Error
-# code indicates success or failure.
+# stdout holds error messages.  Error code indicates success or
+# failure.
 #
 # NOTE: this is a pure, old fashioned, awk script.  It will
 # work with any awk
@@ -22,7 +21,6 @@ BEGIN{
    mastero = 0      # highest ordinal in master file
    symbolo = 0      # highest ordinal in png.h
    missing = "error"# log an error on missing symbols
-   of="symbols.new" # default to a fixed name
 }
 
 # Read existing definitions from the master file (the first
@@ -113,16 +111,6 @@ END{
       err = 1
    }
    unexported=0
-   # Add a standard header to symbols.new:
-   print ";Version INSERT-VERSION-HERE" >of
-   print ";--------------------------------------------------------------" >of
-   print "; LIBPNG symbol list as a Win32 DEF file" >of
-   print "; Contains all the symbols that can be exported from libpng" >of
-   print ";--------------------------------------------------------------" >of
-   print "LIBRARY" >of
-   print "" >of
-   print "EXPORTS" >of
-
    for (o=1; o<=lasto; ++o) {
       if (symbol[o] == "" && removed[o] == "") {
          if (unexported == 0) unexported = o
@@ -163,11 +151,11 @@ END{
 
       # Finally generate symbols.new
       if (symbol[o] != "")
-         print " " symbol[o], "@" o > of
+         print " " symbol[o], "@" o > "symbols.new"
    }
 
    if (err != 0) {
-      print "*** A new list is in", of, "***"
+      print "*** A new list is in symbols.new ***"
       exit 1
    }
 }

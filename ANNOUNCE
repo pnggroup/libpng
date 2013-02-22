@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta06 - May 12, 2013
+Libpng 1.5.15beta06 - February 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,59 +9,58 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.16beta06.tar.xz (LZMA-compressed, recommended)
-   1.5.16beta06.tar.gz
-   1.5.16beta06.tar.bz2
+   1.5.15beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.15beta06.tar.gz
+   1.5.15beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1516b06.7z  (LZMA-compressed, recommended)
-   lp1516b06.zip
+   lp1515b06.7z  (LZMA-compressed, recommended)
+   lp1515b06.zip
 
 Other information:
 
-   1.5.16beta06-README.txt
-   1.5.16beta06-LICENSE.txt
+   1.5.15beta06-README.txt
+   1.5.15beta06-LICENSE.txt
 
-Changes since the last public release (1.5.15):
+Changes since the last public release (1.5.14):
 
-Version 1.5.16beta01 [April 25, 2013]
-  Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
-    (Flavio Medeiros).
-  Revised stack marking in arm/filter_neon.S and configure.ac
-  Ensure that NEON filter stuff is completely disabled when switched 'off'.
-    Previously the ARM NEON specific files were still built if the option
-    was switched 'off' as opposed to being explicitly disabled.
-  Avoid a compiler warning about unused png_ptr in translate_gamma_flags()
+Version 1.5.15beta01 [February 4, 2013]
+  Enabled renaming of the extern (but not DLL exported) ARM filter functions.
+    Also enabled inclusion of pngpriv.h in non-C files by preventing C/C++
+    specific definitions if PNG_VERSION_INFO_ONLY is defined.
+  Added png_get_palette_max() function.
 
-Version 1.5.16beta02 [April 26, 2013]
-  Revise pngtest.c to skip tests of unsupported features.
-  Regenerated configure files.
+Version 1.5.15beta02 [February 5, 2013]
+  Made a probably general fix for the preprocessing used to generate source
+    files. This change might make the check for a special C preprocessor
+    unnecessary, and it also eliminates the requirement for sed in the
+    configure build process.
+  Fix typo in Makefile.am, fix scripts/pnglibconf.mak and makefile.std
+  Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13
+  Fix 'setting' handling in options.awk and fixed palette_max API
 
-Version 1.5.16beta03 [April 26, 2013]
-  Test for 'arm*' not just 'arm' in the host_cpu configure variable.
+Version 1.5.15beta03 [February 7, 2013]
+  Remove SUN OS cc -E workround - no longer required
+  Turn serial tests back on (recently turned off by autotools upgrade).
 
-Version 1.5.16beta04 [May 1, 2013]
-  Expanded manual paragraph about writing private chunks, particularly
-    the need to call png_set_keep_unknown_chunks() when writing them.
+Version 1.5.15beta04 [February 15, 2013]
+  Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+    block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
 
-Version 1.5.16beta05 [May 9, 2013]
-  Updated contrib/pngminus/pnm2png.c (Paul Stewart):
-    Check for EOF
-    Ignore "#" delimited comments in input file to pnm2png.c.
-    Fixed whitespace handling
-    Added a call to png_set_packing()
-    Initialize dimension values so if sscanf fails at least we have known
-      invalid values.
+Version 1.5.15beta05 [February 17, 2013]
+  Use approved/supported Android method to check for NEON, use Linux/POSIX
+    1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
+    library calls.
+  Fixed a race condition in the creation of the build 'scripts' directory
+    while building with a parallel make.
+  Use parentheses more consistently in "#if defined(MACRO)" tests.
 
-Version 1.5.16beta06 [May 12, 2013]
-  Allow contrib/pnminus/pnm2png.c to compile without WRITE_INVERT and WRITE_PACK
-    supported (writes error message that it can't read P1 or P4 PBM files).
-  Revised contrib/pngminim/*/makefile to separate CPPFLAGS and CPFLAGS, and
-    to generate pnglibconf.h with the right zlib header files.
-  Ported contrib/pngminus/pnm2png.c changes back from libpng-1.6.3beta06,
-    to use unsigned long, not png_uint_32 arguments to sscanf().
+Version 1.5.15beta06 [February 22, 2013]
+  Fixed PNG_ALIGN(ED)_MEMORY and add ability to turn off ARM_NEON
+    runtime checks
+  Updated INSTALL.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

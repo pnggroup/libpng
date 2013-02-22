@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.5.15 [March 28, 2013]
+ * Last changed in libpng 1.5.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -43,20 +43,7 @@
 
 #include "png.h"
 
-#if defined PNG_READ_SUPPORTED && /* else nothing can be done */\
-   defined PNG_READ_bKGD_SUPPORTED &&\
-   defined PNG_READ_cHRM_SUPPORTED &&\
-   defined PNG_READ_gAMA_SUPPORTED &&\
-   defined PNG_READ_oFFs_SUPPORTED &&\
-   defined PNG_READ_pCAL_SUPPORTED &&\
-   defined PNG_READ_pHYs_SUPPORTED &&\
-   defined PNG_READ_sBIT_SUPPORTED &&\
-   defined PNG_READ_sCAL_SUPPORTED &&\
-   defined PNG_READ_sRGB_SUPPORTED &&\
-   defined PNG_READ_tEXt_SUPPORTED &&\
-   defined PNG_READ_tIME_SUPPORTED &&\
-   defined PNG_READ_zTXt_SUPPORTED
-
+#ifdef PNG_READ_SUPPORTED /* else nothing can be done */
 #include "zlib.h"
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
@@ -1962,4 +1949,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_16beta05 Your_png_h_is_not_version_1_5_16beta05;
+typedef png_libpng_version_1_5_15beta06 Your_png_h_is_not_version_1_5_15beta06;

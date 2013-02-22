@@ -73,17 +73,14 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Turn on ARM Neon optimizations at run-time */
-#undef PNG_ARM_NEON_API_SUPPORTED
+/* Align row buffers */
+#undef PNG_ALIGNED_MEMORY_SUPPORTED
 
-/* Check for ARM Neon support at run-time */
-#undef PNG_ARM_NEON_CHECK_SUPPORTED
+/* ARM NEON filter initialization function */
+#undef PNG_FILTER_OPTIMIZATIONS
 
-/* Enable ARM Neon optimizations */
-#undef PNG_ARM_NEON_SUPPORTED
-
-/* Disable ARM Neon optimizations */
-#undef PNG_NO_ARM_NEON
+/* Turn off run-time checking for ARM NEON support */
+#undef PNG_NO_ARM_NEON_CHECK
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

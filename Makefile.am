@@ -174,7 +174,7 @@ scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ dfn?.out
 	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
-	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out logunsupported=1\
+	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn1.out logunsupported=1
 		version=search ${srcdir}/pngconf.h -\
 		${srcdir}/scripts/pnglibconf.dfa 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=dfn2.out dfn1.out 1>&2

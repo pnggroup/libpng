@@ -4018,94 +4018,13 @@ Version 1.5.15beta05 [February 17, 2013]
 Version 1.5.15beta06 [February 22, 2013]
   Fixed PNG_ALIGN(ED)_MEMORY and add ability to turn off ARM_NEON
     runtime checks
-  Updated the INSTALL document.
+  Updated INSTALL.
 
-Version 1.5.15beta07 [February 27, 2013]
-  Revised INSTALL to recommend using CPPFLAGS instead of INCLUDES.
-  Revised scripts/makefile.freebsd to respect ZLIBLIB and ZLIBINC.
-  Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
-    with CRLF line endings.
-
-Version 1.5.15beta08 [March 5, 2013]
-  Avoid a possible memory leak in contrib/gregbook/readpng.c
-  Made the _SUPPORTED macro definitions consistent. The change made in
-    libpng15 to #define *_SUPPORTED 1, to match the use of -D*_SUPPORTED
-    (which means -D*_SUPPORTED=1) and avoid compiler warnings from GCC was made
-    inconsistently and causes problems as a result, also some additions in
-    pnglibconf.h.prebuilt were inconsistent (omitting the 1). This changes 1.5
-    back to the scheme used both before (1.4) and after (1.6). This might cause
-    some build scripts to issue warnings, and might, in the extreme, cause some
-    applications to fail (but they would fail anyway against 1.6).  It seems
-    safer to go for consistency, given the change in 1.6, not correctness here,
-    particularly as 'make check' currently warns anyway on the symbols.dfn check
-    because of the inconsistencies.
-  Corrected Android builds and corrected libpng.vers with symbol
-    prefixing This adds an API to set optimization options externally,
-    providing an alternative and general solution for the non-portable
-    run-time tests used by the ARM Neon code.  It also makes those tests
-    compile and link on Android.
-  The order of settings vs options in pnglibconf.h is reversed to allow
-    settings to depend on options and options can now set (or override) the
-    defaults for settings.
-
-Version 1.5.15beta09 [March 13, 2013]
-  Fixed CMakelists.txt to allow building a single variant of the library
-    (Claudio Bley):
-  Introduced a PNG_LIB_TARGETS variable that lists all activated library
-    targets.  It is an error if this variable ends up empty, ie. you have
-    to build at least one library variant.
-  Made the *_COPY targets only depend on library targets actually being build.
-  Use PNG_LIB_TARGETS to unify a code path.
-  Changed the CREATE_SYMLINK macro to expect the full path to a file as the
-    first argument. When symlinking the filename component of that path is
-    determined and used as the link target.
-  Use copy_if_different in the CREATE_SYMLINK macro.
-  Eliminated two warnings from the Intel C compiler. The warnings are
-    technically valid, although a reasonable treatment of division would
-    show it to be incorrect.
-
-Version 1.5.15rc01 [March 21, 2013]
-  No changes.
-
-Version 1.5.15 [March 28, 2013]
-  No changes.
-
-Version 1.5.16beta01 [April 25, 2013]
-  Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
-    (Flavio Medeiros).
-  Revised stack marking in arm/filter_neon.S and configure.ac.
-  Ensure that NEON filter stuff is completely disabled when switched 'off'.
-    Previously the ARM NEON specific files were still built if the option
-    was switched 'off' as opposed to being explicitly disabled.
-  Avoid a compiler warning about unused png_ptr in translate_gamma_flags()
-
-Version 1.5.16beta02 [April 26, 2013]
-  Revise pngtest.c to skip tests of unsupported features.
-  Regenerated configure files.
-
-Version 1.5.16beta03 [April 26, 2013]
-  Test for 'arm*' not just 'arm' in the host_cpu configure variable.
-
-Version 1.5.16beta04 [May 1, 2013]
-  Expanded manual paragraph about writing private chunks, particularly
-    the need to call png_set_keep_unknown_chunks() when writing them.
-
-Version 1.5.16beta05 [May 9, 2013]
-  Updated contrib/pngminus/pnm2png.c (Paul Stewart):
-    Check for EOF
-    Ignore "#" delimited comments in input file to pnm2png.c.
-    Fixed whitespace handling
-    Added a call to png_set_packing()
-    Initialize dimension values so if sscanf fails at least we have known
-      invalid values.
-
-Version 1.5.16beta06 [May 12, 2013]
-  Allow contrib/pnminus/pnm2png.c to compile without WRITE_INVERT and WRITE_PACK
-    supported (writes error message that it can't read P1 or P4 PBM files).
-  Revised contrib/pngminim/*/makefile to separate CPPFLAGS and CPFLAGS, and
-    to generate pnglibconf.h with the right zlib header files.
-  Ported contrib/pngminus/pnm2png.c changes back from libpng-1.6.3beta06,
-    to use unsigned long, not png_uint_32 arguments to sscanf().
+  ===========================================================================
+                       NOTICE November 17, 2012:
+     The location of the git repository at SourceForge has changed.
+               Visit http://libpng.sf.net/ for details.
+  ===========================================================================
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
