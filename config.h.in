@@ -79,6 +79,9 @@
 /* ARM NEON filter initialization function */
 #undef PNG_FILTER_OPTIMIZATIONS
 
+/* Turn off run-time checking for ARM NEON support */
+#undef PNG_NO_ARM_NEON_CHECK
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
