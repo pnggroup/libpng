@@ -4415,6 +4415,8 @@ Version 1.6.1beta03 [February 22, 2013]
     for it on then the build will fail if it can't be done.)
   Updated the INSTALL document.
 
+Version 1.6.1beta04 [February 22, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
