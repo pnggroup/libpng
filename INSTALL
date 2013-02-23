@@ -46,15 +46,14 @@ to have access to the zlib.h and zconf.h include files that
 correspond to the version of zlib that's installed.
 
 If you wish to test with a particular zlib that is not first in the
-standard library search path, put ZLIBLIB, ZLIBINC, INCLUDES, LDFLAGS,
-LIBS, and LD_LIBRARY_PATH in your environment before running "make test"
+standard library search path, put ZLIBLIB, ZLIBINC, CPPFLAGS, LDFLAGS,
+and LD_LIBRARY_PATH in your environment before running "make test"
 or "make distcheck":
 
 ZLIBLIB=/path/to/lib export ZLIBLIB
 ZLIBINC=/path/to/include export ZLIBINC
-INCLUDES="-I$ZLIBINC" export INCLUDES
+CPPFLAGS="-I$ZLIBINC" export CPPFLAGS
 LDFLAGS="-L$ZLIBLIB" export LDFLAGS
-LIBS=$ZLIBLIB/libz.a export LIBS
 LD_LIBRARY_PATH="$ZLIBLIB:$LD_LIBRARY_PATH" export LD_LIBRARY_PATH
 
 If you are using one of the makefile scripts, put ZLIBLIB and ZLIBINC
