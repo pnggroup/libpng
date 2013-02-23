@@ -4020,7 +4020,9 @@ Version 1.5.15beta06 [February 22, 2013]
     runtime checks
   Updated the INSTALL document.
 
-Version 1.5.15beta07 [February 22, 2013]
+Version 1.5.15beta07 [February 23, 2013]
+  Revised INSTALL to recommend using CPPFLAGS instead of INCLUDES.
+  Revised scripts/makefile.freebsd to respect ZLIBDIR and ZLIBINC.
 
   ===========================================================================
                        NOTICE November 17, 2012:
