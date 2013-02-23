@@ -24,6 +24,7 @@ pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
 TESTS =\
+   tests/pngtest\
    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
    tests/pngvalid-gamma-expand16-background\
@@ -33,7 +34,6 @@ TESTS =\
    tests/pngvalid-progressive-interlace-standard\
    tests/pngvalid-progressive-interlace-transform\
    tests/pngvalid-progressive-standard tests/pngvalid-standard\
-   tests/pngtest\
    tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
    tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
    tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
