@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.1beta04 - February 22, 2013
+ libpng version 1.6.1beta04 - February 26, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.1beta04 - February 22, 2013
+ libpng versions 0.97, January 1998, through 1.6.1beta04 - February 26, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4973,6 +4973,9 @@ reader now does pretty complete validation of the basic format.  Some bad
 profiles that were previously accepted are now rejected, in particular the
 very old broken Microsoft/HP sRGB profile.
 
+The library now issues an error if the application attempts to set a
+transform after it calls png_read_update_info().
+
 The library now issues a warning if both background processing and RGB to
 gray are used when gamma correction happens. As with previous versions of
 the library the results are numerically very incorrect in this case.
@@ -5151,7 +5154,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 22, 2013
+February 26, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
