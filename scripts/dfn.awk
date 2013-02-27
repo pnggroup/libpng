@@ -31,11 +31,11 @@ NR==1 && out == "/dev/null" {
 
 # Output can be sorted; two lines are recognized
 $1 == "PNG_DFN_START_SORT"{
-   sort=$2
+   sort=0+$2
    next
 }
 
-$1 == "PNG_DFN_END_SORT"{
+$1 ~ /^PNG_DFN_END_SORT/{
    # Do a very simple, slow, sort; notice that blank lines won't be
    # output by this
    for (entry in array) {
