@@ -4415,9 +4415,11 @@ Version 1.6.1beta03 [February 22, 2013]
     for it on then the build will fail if it can't be done.)
   Updated the INSTALL document.
 
-Version 1.6.1beta04 [February 23, 2013]
+Version 1.6.1beta04 [February 27, 2013]
   Revised INSTALL to recommend using CPPFLAGS instead of INCLUDES.
   Revised scripts/makefile.freebsd to respect ZLIBDIR and ZLIBINC.
+  Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
+    with CRLF line endings.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
