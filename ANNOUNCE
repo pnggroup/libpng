@@ -1,5 +1,5 @@
 
-Libpng 1.6.1beta04 - February 27, 2013
+Libpng 1.6.1beta05 - February 27, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.1beta04.tar.xz (LZMA-compressed, recommended)
-   1.6.1beta04.tar.gz
+   1.6.1beta05.tar.xz (LZMA-compressed, recommended)
+   1.6.1beta05.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp161b04.7z  (LZMA-compressed, recommended)
-   lp161b04.zip
+   lp161b05.7z  (LZMA-compressed, recommended)
+   lp161b05.zip
 
 Other information:
 
-   1.6.1beta04-README.txt
-   1.6.1beta04-LICENSE.txt
+   1.6.1beta05-README.txt
+   1.6.1beta05-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -63,6 +63,8 @@ Version 1.6.1beta04 [February 27, 2013]
   Revised scripts/makefile.freebsd to respect ZLIBDIR and ZLIBINC.
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
+
+Version 1.6.1beta05 [February 27, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

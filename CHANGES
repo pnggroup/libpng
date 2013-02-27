@@ -4421,6 +4421,8 @@ Version 1.6.1beta04 [February 27, 2013]
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
 
+Version 1.6.1beta05 [February 27, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
