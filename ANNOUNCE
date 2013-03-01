@@ -1,5 +1,5 @@
 
-Libpng 1.2.51beta02 - January 22, 2013
+Libpng 1.2.51beta02 - March 1, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -48,7 +48,8 @@ version 1.2.51beta01 [January 22, 2013]
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
 
-version 1.2.51beta02 [January 22, 2013]
+version 1.2.51beta02 [March 1, 2013]
+  Avoid a possible memory leak in contrib/gregbook/readpng.c
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
