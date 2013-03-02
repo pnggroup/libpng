@@ -19,12 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9B36B6FE-7FC0-434F-A71F-BBEF8099F1D8}</ProjectGuid>
+    <ProjectGuid>{277AC57F-313B-4D06-B119-A3CDB672D2FF}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>pngstest</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(SolutionDir)\zlib.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
@@ -91,16 +91,17 @@
       <FunctionLevelLinking>false</FunctionLevelLinking>
       <BrowseInformation>true</BrowseInformation>
       <FloatingPointExceptions>false</FloatingPointExceptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libpng16.lib;zlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>libpng16.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
     </Link>
     <CustomBuildStep>
       <Message>Executing libpng simplified API test program</Message>
-      <Command>"$(OutDir)pngstest.exe" --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn1g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn1g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n1g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
+      <Command>"$(OutDir)pngstest.exe" --strict --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn0g01.png ../../../contrib/pngsuite/ftbbn0g02.png ../../../contrib/pngsuite/ftbbn0g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn0g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n0g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
       <Outputs>$(IntDir)pngstest.out</Outputs>
       <Inputs>$(OutDir)pngstest.exe</Inputs>
     </CustomBuildStep>
@@ -133,7 +134,7 @@
     </Link>
     <CustomBuildStep>
       <Message>Executing libpng simplified API test program</Message>
-      <Command>"$(OutDir)pngstest.exe" --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn1g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn1g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n1g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
+      <Command>"$(OutDir)pngstest.exe" --strict --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn0g01.png ../../../contrib/pngsuite/ftbbn0g02.png ../../../contrib/pngsuite/ftbbn0g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn0g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n0g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
       <Outputs>$(IntDir)pngstest.out</Outputs>
       <Inputs>$(OutDir)pngstest.exe</Inputs>
     </CustomBuildStep>
@@ -162,13 +163,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libpng16.lib;zlib.lib</AdditionalDependencies>
+      <AdditionalDependencies>libpng16.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <CustomBuildStep>
       <Message>Executing libpng simplified API test program</Message>
-      <Command>"$(OutDir)pngstest.exe" --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn1g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn1g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n1g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
+      <Command>"$(OutDir)pngstest.exe" --strict --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn0g01.png ../../../contrib/pngsuite/ftbbn0g02.png ../../../contrib/pngsuite/ftbbn0g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn0g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n0g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
       <Outputs>$(IntDir)pngstest.out</Outputs>
       <Inputs>$(OutDir)pngstest.exe</Inputs>
     </CustomBuildStep>
@@ -204,7 +205,7 @@
     </Link>
     <CustomBuildStep>
       <Message>Executing libpng simplified API test program</Message>
-      <Command>"$(OutDir)pngstest.exe" --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn1g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn1g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n1g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
+      <Command>"$(OutDir)pngstest.exe" --strict --log --touch "$(IntDir)pngstest.out" ../../../contrib/pngsuite/basn0g01.png ../../../contrib/pngsuite/basn0g02.png ../../../contrib/pngsuite/basn0g04.png ../../../contrib/pngsuite/basn0g08.png ../../../contrib/pngsuite/basn0g16.png ../../../contrib/pngsuite/basn2c08.png ../../../contrib/pngsuite/basn2c16.png ../../../contrib/pngsuite/basn3p01.png ../../../contrib/pngsuite/basn3p02.png ../../../contrib/pngsuite/basn3p04.png ../../../contrib/pngsuite/basn3p08.png ../../../contrib/pngsuite/basn4a08.png ../../../contrib/pngsuite/basn4a16.png ../../../contrib/pngsuite/basn6a08.png ../../../contrib/pngsuite/basn6a16.png ../../../contrib/pngsuite/ftbbn0g01.png ../../../contrib/pngsuite/ftbbn0g02.png ../../../contrib/pngsuite/ftbbn0g04.png ../../../contrib/pngsuite/ftbbn2c16.png ../../../contrib/pngsuite/ftbbn3p08.png ../../../contrib/pngsuite/ftbgn2c16.png ../../../contrib/pngsuite/ftbgn3p08.png ../../../contrib/pngsuite/ftbrn2c08.png ../../../contrib/pngsuite/ftbwn0g16.png ../../../contrib/pngsuite/ftbwn3p08.png ../../../contrib/pngsuite/ftbyn3p08.png ../../../contrib/pngsuite/ftp0n0g08.png ../../../contrib/pngsuite/ftp0n2c08.png ../../../contrib/pngsuite/ftp0n3p08.png ../../../contrib/pngsuite/ftp1n3p08.png</Command>
       <Outputs>$(IntDir)pngstest.out</Outputs>
       <Inputs>$(OutDir)pngstest.exe</Inputs>
     </CustomBuildStep>

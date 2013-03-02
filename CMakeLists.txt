@@ -35,7 +35,7 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 0)
+set(PNGLIB_RELEASE 1)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -191,16 +191,18 @@ if(PNG_TESTS AND PNG_SHARED)
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn4a16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/basn6a16.png
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn1g04.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g01.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g02.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn0g04.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn2c16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbbn3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn2c16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbgn3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbrn2c08.png
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn1g16.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn0g16.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbwn3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftbyn3p08.png
-    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n1g08.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n0g08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n2c08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp0n3p08.png
     ${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/ftp1n3p08.png
@@ -209,11 +211,7 @@ endif()
 
 # Ensure the CMAKE_LIBRARY_OUTPUT_DIRECTORY is set
 IF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
-  IF(WIN32)
-    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "bin")
-  ELSE(WIN32)
-    SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
-  ENDIF(WIN32)
+  SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "lib")
 ENDIF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 
 # Set a variable with CMake code which:
@@ -221,7 +219,7 @@ ENDIF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 # copies if different.
 macro(CREATE_SYMLINK SRC_FILE DEST_FILE)
   FILE(REMOVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE})
-  if(WIN32 AND NOT CYGWIN AND NOT MINGW)
+  if(WIN32 AND NOT CYGWIN AND NOT MSYS)
     ADD_CUSTOM_COMMAND(
         OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE}   ${CMAKE_CURRENT_BINARY_DIR}/${DEST_FILE}
         COMMAND ${CMAKE_COMMAND} -E copy        ${CMAKE_CURRENT_BINARY_DIR}/${SRC_FILE} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE}
@@ -229,10 +227,10 @@ macro(CREATE_SYMLINK SRC_FILE DEST_FILE)
         DEPENDS ${PNG_LIB_NAME} ${PNG_LIB_NAME_STATIC}
         )
     ADD_CUSTOM_TARGET(${DEST_FILE}_COPY ALL DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE})
-  else(WIN32 AND NOT CYGWIN AND NOT MINGW)
+  else(WIN32 AND NOT CYGWIN AND NOT MSYS)
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SRC_FILE} ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ${SRC_FILE} ${DEST_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  endif(WIN32 AND NOT CYGWIN AND NOT MINGW)
+  endif(WIN32 AND NOT CYGWIN AND NOT MSYS)
 endmacro()
 
 # libpng is a library so default to 'lib'
@@ -244,25 +242,25 @@ endif(NOT DEFINED CMAKE_INSTALL_LIBDIR)
 # we use the same files like ./configure, so we have to set its vars
 # Only do this on Windows for Cygwin - the files don't make much sense outside
 # a UNIX look alike
-if(NOT WIN32 OR CYGWIN OR MINGW) 
-set(prefix      ${CMAKE_INSTALL_PREFIX})
-set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-set(libdir      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
-set(LIBS        "-lz -lm")
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
-CREATE_SYMLINK(${PNGLIB_NAME}.pc libpng.pc)
+if(NOT WIN32 OR CYGWIN OR MINGW)
+  set(prefix      ${CMAKE_INSTALL_PREFIX})
+  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+  set(libdir      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
+  set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
+  set(LIBS        "-lz -lm")
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
+  CREATE_SYMLINK(${PNGLIB_NAME}.pc libpng.pc)
 
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
-  ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config @ONLY)
-CREATE_SYMLINK(${PNGLIB_NAME}-config libpng-config)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config @ONLY)
+  CREATE_SYMLINK(${PNGLIB_NAME}-config libpng-config)
 endif(NOT WIN32 OR CYGWIN OR MINGW)
 
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.0beta05
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.1beta05
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
@@ -334,10 +332,13 @@ if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL )
   install(FILES ${libpng_public_hdrs}   DESTINATION include/${PNGLIB_NAME})
 endif()
 if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL )
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config DESTINATION bin)
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
-          DESTINATION bin)
+  if(NOT WIN32 OR CYGWIN OR MINGW)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config DESTINATION bin)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+            DESTINATION bin)
+  endif(NOT WIN32 OR CYGWIN OR MINGW)
 endif()
+
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
   # Install man pages
   if(NOT PNG_MAN_DIR)
@@ -346,14 +347,16 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
   install(FILES libpng.3 libpngpf.3      DESTINATION ${PNG_MAN_DIR}/man3)
   install(FILES png.5                    DESTINATION ${PNG_MAN_DIR}/man5)
   # Install pkg-config files
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
-          DESTINATION bin)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
-          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
-          DESTINATION bin)
+  if(NOT WIN32 OR CYGWIN OR MINGW)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
+            DESTINATION bin)
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+            DESTINATION bin)
+  endif(NOT WIN32 OR CYGWIN OR MINGW)
 endif()
 
 # On versions of CMake that support it, create an export file CMake

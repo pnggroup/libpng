@@ -1,7 +1,8 @@
 
 pngsuite
 --------
-(c) Willem van Schaik, 1999, 2011
+(c) Willem van Schaik, 1999, 2011, 2012
+Two images are by Glenn Randers-Pehrson, 2012
 
 Permission to use, copy, modify, and distribute these images for any
 purpose and without fee is hereby granted.
@@ -38,6 +39,8 @@ can use them to test the proper functioning of PNG software.
     basn6a08.png   8-bit RGBA
     basn6a16.png  16-bit RGBA
 
+    ftbbn0g01.png  1-bit grayscale, black bKGD
+    ftbbn0g02.png  2-bit grayscale, black bKGD
     ftbbn0g04.png  4-bit grayscale, black bKGD
     ftbbn2c16.png 16-bit truecolor, black bKGD
     ftbbn3p08.png  8-bit paletted, black bKGD

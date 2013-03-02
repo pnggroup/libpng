@@ -1,5 +1,5 @@
 
-Libpng 1.6.0beta05 - February 3, 2012
+Libpng 1.6.1beta05 - March 2, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,105 +9,65 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.0beta05.tar.xz (LZMA-compressed, recommended)
-   1.6.0beta05.tar.gz
-   1.6.0beta05.tar.bz2
+   1.6.1beta05.tar.xz (LZMA-compressed, recommended)
+   1.6.1beta05.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp160b05.7z  (LZMA-compressed, recommended)
-   lp160b05.zip
+   lp161b05.7z  (LZMA-compressed, recommended)
+   lp161b05.zip
 
 Other information:
 
-   1.6.0beta05-README.txt
-   1.6.0beta05-LICENSE.txt
+   1.6.1beta05-README.txt
+   1.6.1beta05-LICENSE.txt
 
-Changes since the last public release (1.5.7):
+Changes since the last public release (1.6.0):
 
-Version 1.6.0beta01 [December 15, 2011]
-  Removed machine-generated configure files from the GIT repository (they will
-    continue to appear in the tarball distributions).
-  Restored the new 'simplified' API, which was started in libpng-1.5.7beta02
-    but later deleted from libpng-1.5.7beta05.
-  Added example programs for the new 'simplified' API.
-  Added ANSI-C (C90) headers and require them, and take advantage of the
-    change. Also fixed some of the projects/* and contrib/* files that needed
-    updates for libpng16 and the move of pngvalid.c.
-    With this change the required ANSI-C header files are assumed to exist: the
-    implementation must provide float.h, limits.h, stdarg.h and stddef.h and
-    libpng relies on limits.h and stddef.h existing and behaving as defined
-    (the other two required headers aren't used).  Non-ANSI systems that don't
-    have stddef.h or limits.h will have to provide an appropriate fake
-    containing the relevant types and #defines.
-  The use of FAR/far has been eliminated and the definition of png_alloc_size_t
-    is now controlled by a flag so that 'small size_t' systems can select it
-    if necessary.  Libpng 1.6 may not currently work on such systems -- it
-    seems likely that it will ask 'malloc' for more than 65535 bytes with any
-    image that has a sufficiently large row size (rather than simply failing
-    to read such images).
-  New tools directory containing tools used to generate libpng code.
-  Fixed race conditions in parallel make builds. With higher degrees of
-    parallelism during 'make' the use of the same temporary file names such
-    as 'dfn*' can result in a race where a temporary file from one arm of the
-    build is deleted or overwritten in another arm.  This changes the
-    temporary files for suffix rules to always use $* and ensures that the
-    non-suffix rules use unique file names.
+Version 1.6.1beta01 [February 16, 2013]
+  Made symbol prefixing work with the ARM neon optimizations. Also allow
+    pngpriv.h to be included for preprocessor definitions only, so it can
+    be used in non-C/C++ files. Back ported from libpng 1.7.
+  Made sRGB check numbers consistent.
+  Ported libpng 1.5 options.awk/dfn file handling to 1.6, fixed one bug.
+  Removed cc -E workround, corrected png_get_palette_max API Tested on
+    SUN OS cc 5.9, which demonstrates the tokenization problem previously
+    avoided by using /lib/cpp.  Since all .dfn output is now protected in
+    double quotes unless it is to be macro substituted the fix should
+    work everywhere.
+  Enabled parallel tests - back ported from libpng-1.7.
+  scripts/pnglibconf.dfa formatting improvements back ported from libpng17.
+  Fixed a race condition in the creation of the build 'scripts' directory
+    while building with a parallel make.
+  Use approved/supported Android method to check for NEON, use Linux/POSIX
+    1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
+    library calls (ported from libpng15).
 
-Version 1.6.0beta02 [December 21, 2011]
-  Correct configure builds where build and source directories are separate.
-    The include path of 'config.h' was erroneously made relative in pngvalid.c
-    in libpng 1.5.7.
+Version 1.6.1beta02 [February 19, 2013]
+  Use parentheses more consistently in "#if defined(MACRO)" tests.
+  Folded long lines.
+  Reenabled code to allow zero length PLTE chunks for MNG.
 
-Version 1.6.0beta03 [December 22, 2011]
-  Start-up code size improvements, error handler flexibility. These changes
-    alter how the tricky allocation of the initial png_struct and png_info
-    structures are handled. png_info is now handled in pretty much the same
-    way as everything else, except that the allocations handle NULL return
-    silently.  png_struct is changed in a similar way on allocation and on
-    deallocation a 'safety' error handler is put in place (which should never
-    be required).  The error handler itself is changed to permit mismatches
-    in the application and libpng error buffer size; however, this means a
-    silent change to the API to return the jmp_buf if the size doesn't match
-    the size from the libpng compilation; libpng now allocates the memory and
-    this may fail.  Overall these changes result in slight code size
-    reductions; however, this is a reduction in code that is always executed
-    so is particularly valuable.  Overall on a 64-bit system the libpng DLL
-    decreases in code size by 1733 bytes.  pngerror.o increases in size by
-    about 465 bytes because of the new functionality.
+Version 1.6.1beta03 [February 22, 2013]
+  Fixed ALIGNED_MEMORY support.
+  Allow run-time ARM NEON checking to be disabled. A new configure option:
+    --enable-arm-neon=always will stop the run-time checks. New checks
+    within arm/arm_init.c will cause the code not to be compiled unless
+    __ARM_NEON__ is set. This should make it fail safe (if someone asks
+    for it on then the build will fail if it can't be done.)
+  Updated the INSTALL document.
 
-Version 1.6.0beta04 [December 30, 2011]
-  Regenerated configure scripts with automake-1.11.2
-  Eliminated png_info_destroy(). It is now used only in png.c and only calls
-    one other internal function and memset().
-  Enabled png_get_sCAL_fixed() if floating point APIs are enabled. Previously
-    it was disabled whenever internal fixed point arithmetic was selected,
-    which meant it didn't exist even on systems where FP was available but not
-    preferred.
-  Added pngvalid.c compile time checks for const APIs.
-  Implemented 'restrict' for png_info and png_struct. Because of the way
-    libpng works both png_info and png_struct are always accessed via a
-    single pointer.  This means adding C99 'restrict' to the pointer gives
-    the compiler some opportunity to optimize the code.  This change allows
-    that.
-  Moved AC_MSG_CHECKING([if libraries can be versioned]) later to the proper
-    location in configure.ac (Gilles Espinasse).
-  Changed png_memcpy to C assignment where appropriate. Changed all those
-    uses of png_memcpy that were doing a simple assignment to assignments
-    (all those cases where the thing being copied is a non-array C L-value).
-  Added some error checking to png_set_*() routines.
-  Removed the reference to the non-exported function png_memcpy() from
-    example.c.
-  Fixed the Visual C 64-bit build - it requires jmp_buf to be aligned, but
-    it had become misaligned.
-  Revised contrib/pngminus/pnm2png.c to avoid warnings when png_uint_32
-    and unsigned long are of different sizes.
+Version 1.6.1beta04 [February 27, 2013]
+  Revised INSTALL to recommend using CPPFLAGS instead of INCLUDES.
+  Revised scripts/makefile.freebsd to respect ZLIBLIB and ZLIBINC.
+  Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
+    with CRLF line endings.
 
-Version 1.6.0beta05 [February 3, 2012]
-  Updated manual with description of the simplified API (copied from png.h)
-  Fix bug in pngerror.c: some long warnings were being improperly truncated
-    (bug introduced in libpng-1.5.3beta05).
+Version 1.6.1beta05 [March 2, 2013]
+  Avoid a possible memory leak in contrib/gregbook/readpng.c
+  Fixed bug introduced in libpng-1.6.0beta28 that causes libpng to handle chunks
+    even when they have been tagged PNG_HANDLE_CHUNK_NEVER.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

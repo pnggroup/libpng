@@ -74,7 +74,7 @@ done
 #
 # The autotools generated files:
 libpng_autotools_files="Makefile.in aclocal.m4 config.guess config.h.in\
-   config.sub configure depcomp install-sh ltmain.sh missing"
+   config.sub configure depcomp install-sh ltmain.sh missing test-driver"
 #
 # These are separate because 'maintainer-clean' does not remove them.
 libpng_libtool_files="scripts/libtool.m4 scripts/ltoptions.m4\
@@ -134,7 +134,7 @@ do
       libpng_autotools_file_missing=1
    fi
 done
-# 
+#
 # The cache directory doesn't matter - it will be regenerated and does not exist
 # anyway in a tarball.
 #
@@ -213,7 +213,7 @@ case "$mode" in
       exec >&2
       echo "Your system has a partial set of autotools generated files."
       echo "autogen.sh is unable to proceed.  The full set of files is"
-      echo "contained in the distribution archive and you do not need to run"
-      echo "autogen.sh if you use it."
+      echo "contained in the libpng 'tar' distribution archive and you do"
+      echo "not need to run autogen.sh if you use it."
       exit 1;;
 esac
