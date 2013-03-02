@@ -2813,7 +2813,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
                 * the application has not set specific save or ignore for this
                 * chunk or global save or ignore.
                 */
-               if (keep < PNG_HANDLE_CHUNK_NEVER)
+               if (keep < PNG_HANDLE_CHUNK_IF_SAFE)
                {
 #                 ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
                      if (png_ptr->unknown_default < PNG_HANDLE_CHUNK_IF_SAFE)
