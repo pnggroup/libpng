@@ -560,7 +560,7 @@ png_decompress_chunk(png_structrp png_ptr,
     */
    png_alloc_size_t limit = PNG_SIZE_MAX;
 
-#  ifdef PNG_SET_USER_LIMITS_SUPPOPRTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;
@@ -2699,7 +2699,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       png_ptr->unknown_chunk.data = NULL;
    }
 
-#  ifdef PNG_SET_USER_LIMITS_SUPPOPRTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
          png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;
@@ -2805,21 +2805,22 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
             {
                /* If the keep value is 'default' or 'never' override it, but
                 * still error out on critical chunks unless the keep value is
-                * 'always'  While this is weird it is the behavior in 1.4.12.  A
-                * possible improvement would be to obey the value set for the
+                * 'always'  While this is weird it is the behavior in 1.4.12.
+                * A possible improvement would be to obey the value set for the
                 * chunk, but this would be an API change that would probably
                 * damage some applications.
                 *
                 * The png_app_warning below catches the case that matters, where
-                * the application has neither set specific save for this chunk
-                * or global save.
+                * the application has not set specific save or ignore for this
+                * chunk or global save or ignore.
                 */
-               if (keep < PNG_HANDLE_CHUNK_IF_SAFE)
+               if (keep < PNG_HANDLE_CHUNK_NEVER)
                {
 #                 ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
                      if (png_ptr->unknown_default < PNG_HANDLE_CHUNK_IF_SAFE)
                         png_app_warning(png_ptr,
- "forcing save of an unhandled chunk; please call png_set_keep_unknown_chunks");
+                           "forcing save of an unhandled chunk;"
+                           " please call png_set_keep_unknown_chunks");
 #                 endif
                   keep = PNG_HANDLE_CHUNK_IF_SAFE;
                }
