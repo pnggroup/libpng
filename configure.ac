@@ -178,7 +178,7 @@ AC_ARG_ENABLE([arm-neon],
        AC_DEFINE([PNG_FILTER_OPTIMIZATIONS],
                  [png_init_filter_functions_neon],
                  [ARM NEON filter initialization function])
-      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1],
+      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [],
                 [Align row buffers])
       if test "${enableval}" = "always"; then
          AC_DEFINE([PNG_NO_ARM_NEON_CHECK], [],

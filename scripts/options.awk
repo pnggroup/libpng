@@ -53,7 +53,7 @@ BEGIN{
    comment=start "/*"           # Comment start
    cend="*/" end                # Comment end
    def=start "#define PNG_"     # Arbitrary define
-   sup="_SUPPORTED 1" end       # end supported option
+   sup="_SUPPORTED" end         # end supported option
    und=comment "#undef PNG_"    # Unsupported option
    une="_SUPPORTED" cend        # end unsupported option
    error=start "ERROR:"         # error message, terminate with 'end'

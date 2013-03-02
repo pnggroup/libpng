@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta08 - March 1, 2013
+Libpng 1.5.15beta08 - March 2, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -68,8 +68,19 @@ Version 1.5.15beta07 [February 27, 2013]
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
 
-Version 1.5.15beta08 [March 1, 2013]
+Version 1.5.15beta08 [March 2, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
+  Made the _SUPPORTED macro definitions consistent. The change made in
+    libpng15 to #define *_SUPPORTED 1, to match the use of -D*_SUPPORTED
+    (which means -D*_SUPPORTED=1) and avoid compiler warnings from GCC was made
+    inconsistently and causes problems as a result, also some additions in
+    pnglibconf.h.prebuilt were inconsistent (omitting the 1). This changes 1.5
+    back to the scheme used both before (1.4) and after (1.6). This might cause
+    some build scripts to issue warnings, and might, in the extreme, cause some
+    applications to fail (but they would fail anyway against 1.6).  It seems
+    safer to go for consistency, given the change in 1.6, not correctness here,
+    particularly as 'make check' currently warns anyway on the symbols.dfn check
+    because of the inconsistencies.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
