@@ -4425,6 +4425,7 @@ Version 1.6.1beta05 [March 1, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
 
 Version 1.6.1beta06 [March 2, 2013]
+  Better documentation of unknown handling API interactions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

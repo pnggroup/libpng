@@ -1031,9 +1031,14 @@ you can retrieve with
     png_get_user_chunk_ptr(png_ptr);
 
 If you call the png_set_read_user_chunk_fn() function, then all unknown
-chunks will be saved when read, in case your callback function will need
-one or more of them.  This behavior can be changed with the
-png_set_keep_unknown_chunks() function, described below.
+chunks which the callback does not handle will be saved when read.  You can
+cause them to be discarded by returning '1' ("handled") instead of '0'.  This
+behavior will change in libpng 1.7 and the default handling set by the
+png_set_keep_unknown_chunks() function, described below, will be used when the
+callback returns 0.  If you want the existing behavior you should set the global
+default to PNG_HANDLE_CHUNK_IF_SAFE now; this is compatible with all current
+versions of libpng and with 1.7.  Libpng 1.6 issues a warning if you keep the
+default, or PNG_HANDLE_CHUNK_NEVER, and the callback returns 0.
 
 At this point, you can set up a callback function that will be
 called after each row has been read, which you can use to control
@@ -1132,8 +1137,10 @@ callback function:
     ...
 
     #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
-      /* ignore all unknown chunks: */
-      png_set_keep_unknown_chunks(read_ptr, 1, NULL, 0);
+      /* ignore all unknown chunks
+       * (use global setting "2" for libpng16 and earlier):
+       */
+      png_set_keep_unknown_chunks(read_ptr, 2, NULL, 0);
 
       /* except for vpAg: */
       png_set_keep_unknown_chunks(read_ptr, 2, vpAg, 1);

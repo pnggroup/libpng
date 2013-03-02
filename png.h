@@ -1838,7 +1838,7 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
 #endif
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-/* This callback is called only for *unknown* chunks, if
+/* This callback is called only for *unknown* chunks.  If
  * PNG_HANDLE_AS_UNKNOWN_SUPPORTED is set then it is possible to set known
  * chunks to be treated as unknown, however in this case the callback must do
  * any processing required by the chunk (e.g. by calling the appropriate
@@ -1850,12 +1850,12 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
  * The integer return from the callback function is interpreted thus:
  *
  * negative: An error occured, png_chunk_error will be called.
- *     zero: The chunk was not handled, the chunk will be discarded unless
- *           png_set_keep_unknown_chunks has been used to set a 'keep' behavior
- *           for this particular chunk, in which case that will be used.  A
- *           critical chunk will cause an error at this point unless it is to be
- *           saved.
+ *     zero: The chunk was not handled, the chunk will be saved. A critical
+ *           chunk will cause an error at this point unless it is to be saved.
  * positive: The chunk was handled, libpng will ignore/discard it.
+ *
+ * See "INTERACTION WTIH USER CHUNK CALLBACKS" below for important notes about
+ * how this behavior will change in libpng 1.7
  */
 PNG_EXPORT(88, void, png_set_read_user_chunk_fn, (png_structrp png_ptr,
     png_voidp user_chunk_ptr, png_user_chunk_ptr read_user_chunk_fn));
@@ -2389,11 +2389,20 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  * to specifying "NEVER", however when "AS_DEFAULT" is used for specific chunks
  * it simply resets the behavior to the libpng default.
  *
+ * INTERACTION WTIH USER CHUNK CALLBACKS:
  * The per-chunk handling is always used when there is a png_user_chunk_ptr
  * callback and the callback returns 0; the chunk is then always stored *unless*
  * it is critical and the per-chunk setting is other than ALWAYS.  Notice that
  * the global default is *not* used in this case.  (In effect the per-chunk
  * value is incremented to at least IF_SAFE.)
+ *
+ * IMPORTANT NOTE: this behavior will change in libpng 1.7 - the global and
+ * per-chunk defaults will be honored.  If you want to preserve the current
+ * behavior when your callback returns 0 you must set PNG_HANDLE_CHUNK_IF_SAFE
+ * as the default - if you don't do this libpng 1.6 will issue a warning.
+ *
+ * If you want unhandled unknown chunks to be discarded in libpng 1.6 and
+ * earlier simply return '1' (handled).
  *
  * PNG_HANDLE_AS_UNKNOWN_SUPPORTED:
  *    If this is *not* set known chunks will always be handled by libpng and
