@@ -2801,37 +2801,19 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
             if (ret < 0)
                png_chunk_error(png_ptr, "error in user chunk");
 
-            else if (ret == 0)
-            {
-               /* If the keep value is 'default' or 'never' override it, but
-                * still error out on critical chunks unless the keep value is
-                * 'always'  While this is weird it is the behavior in 1.4.12.
-                * A possible improvement would be to obey the value set for the
-                * chunk, but this would be an API change that would probably
-                * damage some applications.
-                *
-                * The png_app_warning below catches the case that matters, where
-                * the application has not set specific save or ignore for this
-                * chunk or global save or ignore.
-                */
-               if (keep < PNG_HANDLE_CHUNK_NEVER)
-               {
-#                 ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
-                     if (png_ptr->unknown_default < PNG_HANDLE_CHUNK_IF_SAFE)
-                        png_app_warning(png_ptr,
-                           "forcing save of an unhandled chunk;"
-                           " please call png_set_keep_unknown_chunks");
-#                 endif
-                  keep = PNG_HANDLE_CHUNK_IF_SAFE;
-               }
-            }
-
-            else /* chunk was handled */
+            else if (ret > 0) /* chunk was handled */
             {
                handled = 1;
                /* Critical chunks can be safely discarded at this point. */
                keep = PNG_HANDLE_CHUNK_NEVER;
             }
+
+            /* else: use the default handling.
+             * NOTE: this is an API change in 1.7.0, prior to 1.7.0 libpng would
+             * force keep to PNG_HANDLE_CHUNK_IF_SAFE at this point, and 1.6.0
+             * would issue a warning if this caused a default of discarding the
+             * chunk to be changed.
+             */
          }
 
          else

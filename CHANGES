@@ -4480,10 +4480,13 @@ Version 1.7.0beta04 [February 27, 2013]
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
 
-Version 1.7.0beta05 [March 2, 2013]
+Version 1.7.0beta05 [March 3, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
-  Fixed bug introduced in libpng-1.6.0beta28 that causes libpng to handle chunks
-    even when they have been tagged PNG_HANDLE_CHUNK_NEVER.
+  Changed user chunk callback API to respect global and per chunk defaults.
+    Previously a return of 0 from a user chunk callback would result in the
+    chunk being saved (if this was safe, even if the chunk was unsafe-to-copy);
+    this change respects the defaults set by the application, so unknown chunks
+    can be discarded by default and known-safe ones preserved.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

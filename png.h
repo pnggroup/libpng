@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta05 - March 2, 2013
+ * libpng version 1.7.0beta05 - March 3, 2013
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta05 - March 2, 2013: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta05 - March 3, 2013: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -201,7 +201,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta05, March 2, 2013, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta05, March 3, 2013, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -313,7 +313,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 2, 2013
+ *    March 3, 2013
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -381,7 +381,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta05"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta05 - March 2, 2013\n"
+     " libpng version 1.7.0beta05 - March 3, 2013\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -1838,7 +1838,7 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
 #endif
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-/* This callback is called only for *unknown* chunks, if
+/* This callback is called only for *unknown* chunks.  If
  * PNG_HANDLE_AS_UNKNOWN_SUPPORTED is set then it is possible to set known
  * chunks to be treated as unknown, however in this case the callback must do
  * any processing required by the chunk (e.g. by calling the appropriate
@@ -1850,11 +1850,13 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
  * The integer return from the callback function is interpreted thus:
  *
  * negative: An error occured, png_chunk_error will be called.
- *     zero: The chunk was not handled, the chunk will be discarded unless
- *           png_set_keep_unknown_chunks has been used to set a 'keep' behavior
- *           for this particular chunk, in which case that will be used.  A
- *           critical chunk will cause an error at this point unless it is to be
- *           saved.
+ *     zero: The chunk was not handled, the default unknown handling is used
+ *           (even if this was a chunk that would otherwise be known.)
+ *           NOTE: prior to libpng 1.7 handling values of
+ *           PNG_HANDLE_CHUNK_AS_DEFAULT and PNG_HANDLE_CHUNK_NEVER were
+ *           converted to PNG_HANDLE_CHUNK_IF_SAFE (libpng 1.6.0 warns if this
+ *           happens) so it was not possible to discard unknown chunk data if a
+ *           user callback was installed.
  * positive: The chunk was handled, libpng will ignore/discard it.
  */
 PNG_EXPORT(88, void, png_set_read_user_chunk_fn, (png_structrp png_ptr,
@@ -2369,8 +2371,13 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  * NOTE: prior to 1.6.0 the handling specified for particular chunks on read was
  * ignored and the default was used, the per-chunk setting only had an effect on
  * write.  If you wish to have chunk-specific handling on read in code that must
- * work on earlier versions you must use a user chunk callback to specify the
+ * work on earlier versions you must use a user chunk callback to implement the
  * desired handling (keep or discard.)
+ * 
+ * NOTE: prior to 1.7.0 when a user callback returned '0', indicating that the
+ * chunk had not been handled, libpng would preserve it regardless of the
+ * default or per-chunk settings.  For compatibility with earlier versions
+ * simply return '1' (handled) from the callback to discard the chunk.
  *
  * The 'keep' parameter is a PNG_HANDLE_CHUNK_ value as listed below.  The
  * parameter is interpreted as follows:
