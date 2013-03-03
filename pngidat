@@ -1,0 +1,4 @@
+#!/bin/sh
+
+root=`echo $1 | sed -e s/.png$//`
+pngidat.exe < file.png | pigz -d > $root.idat
