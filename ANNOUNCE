@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta08 - March 2, 2013
+Libpng 1.5.15beta08 - March 4, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -68,7 +68,7 @@ Version 1.5.15beta07 [February 27, 2013]
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
 
-Version 1.5.15beta08 [March 2, 2013]
+Version 1.5.15beta08 [March 4, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Made the _SUPPORTED macro definitions consistent. The change made in
     libpng15 to #define *_SUPPORTED 1, to match the use of -D*_SUPPORTED
@@ -81,6 +81,15 @@ Version 1.5.15beta08 [March 2, 2013]
     safer to go for consistency, given the change in 1.6, not correctness here,
     particularly as 'make check' currently warns anyway on the symbols.dfn check
     because of the inconsistencies.
+  Corrected Android builds and corrected libpng.vers with symbol
+    prefixing This adds an API to set optimization options externally,
+    providing an alternative and general solution for the non-portable
+    run-time tests used by the ARM Neon code.  It also makes those tests
+    compile and link on Android.
+  The order of settings vs options in pnglibconf.h is reversed to allow
+    settings to depend on options and options can now set (or override) the
+    defaults for settings.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

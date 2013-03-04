@@ -1,43 +1,25 @@
-
-/* libpng STANDARD API DEFINITION */
-
+/* 1.5.15beta08 STANDARD API DEFINITION */
 /* pnglibconf.h - library build configuration */
 
-/* Libpng 1.5.15beta08 - March 2, 2013 */
+/* libpng version 1.5.15beta08 - March 4, 2013 */
 
-/* Copyright (c) 1998-2012 Glenn Randers-Pehrson */
+/* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
 
 /* This code is released under the libpng license. */
 /* For conditions of distribution and use, see the disclaimer */
 /* and license in png.h */
 
 /* pnglibconf.h */
+/* Machine generated file: DO NOT EDIT */
 /* Derived from: scripts/pnglibconf.dfa */
-/* If you edit this file by hand you must obey the rules expressed in */
-/* pnglibconf.dfa with respect to the dependencies between the following */
-/* symbols.  It is much better to generate a new file using */
-/* scripts/libpngconf.mak */
-
 #ifndef PNGLCONF_H
 #define PNGLCONF_H
-/* settings */
-#define PNG_API_RULE 0
-#define PNG_CALLOC_SUPPORTED
-#define PNG_COST_SHIFT 3
-#define PNG_DEFAULT_READ_MACROS 1
-#define PNG_GAMMA_THRESHOLD_FIXED 5000
-#define PNG_MAX_GAMMA_8 11
-#define PNG_QUANTIZE_BLUE_BITS 5
-#define PNG_QUANTIZE_GREEN_BITS 5
-#define PNG_QUANTIZE_RED_BITS 5
-#define PNG_WEIGHT_SHIFT 8
-#define PNG_ZBUF_SIZE 8192
-#define PNG_sCAL_PRECISION 5
-/* end of settings */
 /* options */
 #define PNG_16BIT_SUPPORTED
 #define PNG_ALIGNED_MEMORY_SUPPORTED
-#define PNG_ARM_NEON_CHECK_SUPPORTED
+/*#undef PNG_ARM_NEON_API_SUPPORTED*/
+/*#undef PNG_ARM_NEON_CHECK_SUPPORTED*/
+/*#undef PNG_ARM_NEON_SUPPORTED*/
 #define PNG_BENIGN_ERRORS_SUPPORTED
 #define PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED
 #define PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
@@ -116,6 +98,7 @@
 #define PNG_SETJMP_SUPPORTED
 #define PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
 #define PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+/*#undef PNG_SET_OPTION_SUPPORTED*/
 #define PNG_SET_USER_LIMITS_SUPPORTED
 #define PNG_STDIO_SUPPORTED
 #define PNG_TEXT_SUPPORTED
@@ -188,4 +171,18 @@
 #define PNG_tRNS_SUPPORTED
 #define PNG_zTXt_SUPPORTED
 /* end of options */
+/* settings */
+#define PNG_API_RULE 0
+#define PNG_CALLOC_SUPPORTED
+#define PNG_COST_SHIFT 3
+#define PNG_DEFAULT_READ_MACROS 1
+#define PNG_GAMMA_THRESHOLD_FIXED 5000
+#define PNG_MAX_GAMMA_8 11
+#define PNG_QUANTIZE_BLUE_BITS 5
+#define PNG_QUANTIZE_GREEN_BITS 5
+#define PNG_QUANTIZE_RED_BITS 5
+#define PNG_WEIGHT_SHIFT 8
+#define PNG_ZBUF_SIZE 8192
+#define PNG_sCAL_PRECISION 5
+/* end of settings */
 #endif /* PNGLCONF_H */

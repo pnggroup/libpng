@@ -658,13 +658,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.15beta08 - February 27, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.5.15beta08 - March 4, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.15beta08 - February 27, 2013\
+      return "libpng version 1.5.15beta08 - March 4, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2878,3 +2878,24 @@ png_build_gamma_table(png_structp png_ptr, int bit_depth)
 }
 #endif /* READ_GAMMA */
 #endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+
+/* HARDWARE OPTION SUPPORT */
+#ifdef PNG_SET_OPTION_SUPPORTED
+int PNGAPI
+png_set_option(png_structp png_ptr, int option, int onoff)
+{
+   if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
+      (option & 1) == 0)
+   {
+      int mask = 3 << option;
+      int setting = (2 + (onoff != 0)) << option;
+      int current = png_ptr->options;
+
+      png_ptr->options = (png_byte)((current & ~mask) | setting);
+
+      return (current & mask) >> option;
+   }
+
+   return PNG_OPTION_INVALID;
+}
+#endif

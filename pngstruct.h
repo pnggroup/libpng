@@ -355,5 +355,10 @@ struct png_struct_def
 /* New member added in libpng-1.5.7 */
    void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_infop row_info,
       png_bytep row, png_const_bytep prev_row);
+
+   /* Options */
+#ifdef PNG_SET_OPTION_SUPPORTED
+   png_byte options;           /* On/off state (up to 4 options) */
+#endif
 };
 #endif /* PNGSTRUCT_H */
