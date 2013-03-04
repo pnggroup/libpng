@@ -64,11 +64,15 @@ BEGIN{
    logunsupported=0             # write unsupported options too
 
    # Precreate arrays
+   # for each option:
    option[""] = ""    # list of all options: default enabled/disabled
    done[""] = 1       # marks option as having been output
    requires[""] = ""  # requires by option
    iffs[""] = ""      # if by option
    enabledby[""] = "" # options that enable it by option
+   sets[""] = ""      # settings set by each option
+   setval[""] = ""    # value to set (indexed: 'option sets[option]')
+   # for each setting:
    setting[""] = ""   # requires by setting
    defaults[""] = ""  # used for a defaulted value
    doneset[""] = 1    # marks setting as having been output
@@ -200,7 +204,7 @@ $1 == "com"{
    if (NF > 1) {
       # sub(/^[ 	]*com[ 	]*/, "")
       $1 = ""
-      print comment, $0, cend >out
+      print comment $0, cend >out
    } else
       print start end >out
    next
@@ -237,7 +241,9 @@ $1 == "file" && NF >= 2{
    next
 }
 
-# option NAME ( (requires|enables|if) NAME* | on | off | disabled )*
+# option NAME ( (requires|enables|if) NAME* | on | off | disabled |
+#                sets SETTING VALUE+ )*
+#     
 #   Declares an option 'NAME' and describes its default setting (disabled)
 #   and its relationship to other options.  The option is disabled
 #   unless *all* the options listed after 'requires' are set and at
@@ -298,7 +304,7 @@ $1 == "option" && NF >= 2{
                   break
                }
             }
-         } else if (val == "requires" || val == "if" || val == "enables") {
+         } else if (val == "requires" || val == "if" || val == "enables" || val =="sets") {
             key = val
          } else if (key == "requires") {
             requires[opt] = requires[opt] " " val
@@ -306,6 +312,12 @@ $1 == "option" && NF >= 2{
             iffs[opt] = iffs[opt] " " val
          } else if (key == "enables") {
             enabledby[val] = enabledby[val] " " opt
+         } else if (key == "sets") {
+            sets[opt] = sets[opt] " " val
+            key = "setval"
+            set = val
+         } else if (key == "setval") {
+            setval[opt " " set] = setval[opt " " set] " " val
          } else
             break # bad line format
       }
@@ -522,83 +534,7 @@ END{
       exit 0
    }
 
-   # Do the 'setting' values first, the algorithm the standard
-   # tree walk (O(1)) done in an O(2) while/for loop; interations
-   # settings x depth, outputing the deepest required macros
-   # first.
-   print "" >out
-   print "/* SETTINGS */" >out
-   print comment, "settings", cend >out
-   # Sort (in dfn.awk) on field 2, the setting name
-   print "PNG_DFN_START_SORT 2" >out
-   finished = 0
-   while (!finished) {
-      finished = 1
-      movement = 0 # done nothing
-      for (i in setting) if (!doneset[i]) {
-         nreqs = split(setting[i], r)
-         if (nreqs > 0) {
-            for (j=1; j<=nreqs; ++j) if (!doneset[r[j]]) {
-               break
-            }
-            if (j<=nreqs) {
-               finished = 0
-               continue # try a different setting
-            }
-         }
-
-         # All the requirements have been processed, output
-         # this setting.
-         if (deb) print "setting", i
-         deflt = defaults[i]
-         # A leading @ means leave it unquoted so the preprocessor
-         # can substitute the build time value
-         if (deflt ~ /^ @/)
-            deflt = " " subs substr(deflt, 3) sube
-         # Remove any spurious trailing spaces
-         sub(/ *$/,"",deflt)
-         print "" >out
-         print "/* setting: ", i >out
-         print " *   requires:" setting[i] >out
-         print " *   default: ", defaults[i] defltinfo, "*/" >out
-         if (defaults[i] == "") { # no default, only check if defined
-            print "#ifdef PNG_" i >out
-         }
-         for (j=1; j<=nreqs; ++j) {
-            print "# ifndef PNG_" r[j] >out
-            print error, i, "requires", r[j] end >out
-            print "# endif" >out
-         }
-         if (defaults[i] != "") { # default handling
-            print "#ifdef PNG_" i >out
-         }
-         # PNG_<i> is defined, so substitute the value:
-         print def i, subs "PNG_" i sube end >out
-         if (defaults[i] != "") {
-            print "#else /*default*/" >out
-            # And add the default definition for the benefit
-            # of later settings an options test:
-            print "# define PNG_" i deflt >out
-            print def i deflt end >out
-         }
-         print "#endif" >out
-
-         doneset[i] = 1
-         ++movement
-      }
-
-      if (!finished && !movement) {
-         print "setting: loop or missing setting in 'requires', cannot process:"
-         for (i in setting) if (!doneset[i]) {
-            print "  setting", i, "requires" setting[i]
-         }
-         exit 1
-      }
-   }
-   print "PNG_DFN_END_SORT" >out
-   print comment, "end of settings", cend >out
-
-   # Now do the options - somewhat more complex.  The dependency
+   # Do the options first (allowing options to set settings).  The dependency
    # tree is thus:
    #
    #   name     >     name
@@ -690,7 +626,7 @@ END{
    }
    if (err) exit 1
 
-   # Sort options too
+   # Sort options:
    print "PNG_DFN_START_SORT 2" >out
 
    # option[i] is now the complete list of all the tokens we may
@@ -730,8 +666,9 @@ END{
          print "" >out
          print "/* option:", i, option[i] >out
          print " *   requires:  " requires[i] >out
-         print " *   if:      " iffs[i] >out
-         print " *   enabled-by:" enabledby[i], "*/" >out
+         print " *   if:        " iffs[i] >out
+         print " *   enabled-by:" enabledby[i] >out
+         print " *   sets:      " sets[i], "*/" >out
          print "#undef PNG_on" >out
          print "#define PNG_on 1" >out
 
@@ -814,6 +751,21 @@ END{
             print error, i, "is on: enabled by:" iffs[i] enabledby[i] ", requires" requires[i] end >out
          } else if (i !~ /^ok_/) {
             print def i sup >out
+            # Supported option, set required settings
+            nreqs = split(sets[i], r)
+            for (j=1; j<=nreqs; ++j) {
+               print "#    ifdef PNG_set_" r[j] >out
+               # Some other option has already set a value:
+               print error, i, "sets", r[j] ": duplicate setting" end >out
+               print error, "   previous value: " end "PNG_set_" r[j] >out
+               print "#    else" >out
+               # Else set the default: note that this won't accept arbitrary
+               # values, the setval string must be acceptable to all the C
+               # compilers we use.  That means it must be VERY simple; a number,
+               # a name or a string.
+               print "#     define PNG_set_" r[j], setval[i " " r[j]] >out
+               print "#    endif" >out
+            }
          }
          print "#   endif /* definition */" >out
          print "#endif /*requires, if*/" >out
@@ -846,6 +798,93 @@ END{
    }
    print "PNG_DFN_END_SORT" >out
    print comment, "end of options", cend >out
+
+   # Do the 'setting' values second, the algorithm the standard
+   # tree walk (O(1)) done in an O(2) while/for loop; interations
+   # settings x depth, outputing the deepest required macros
+   # first.
+   print "" >out
+   print "/* SETTINGS */" >out
+   print comment, "settings", cend >out
+   # Sort (in dfn.awk) on field 2, the setting name
+   print "PNG_DFN_START_SORT 2" >out
+   finished = 0
+   while (!finished) {
+      finished = 1
+      movement = 0 # done nothing
+      for (i in setting) if (!doneset[i]) {
+         nreqs = split(setting[i], r)
+         if (nreqs > 0) {
+            # By default assume the requires values are options, but if there
+            # is no option with that name check for a setting
+            for (j=1; j<=nreqs; ++j) if (option[r[j]] == "" && !doneset[r[j]]) {
+               break
+            }
+            if (j<=nreqs) {
+               finished = 0
+               continue # try a different setting
+            }
+         }
+
+         # All the requirements have been processed, output
+         # this setting.
+         if (deb) print "setting", i
+         deflt = defaults[i]
+         # Remove any spurious trailing spaces
+         sub(/ *$/,"",deflt)
+         # A leading @ means leave it unquoted so the preprocessor
+         # can substitute the build time value
+         if (deflt ~ /^ @/)
+            deflt = " " subs substr(deflt, 3) sube
+         print "" >out
+         print "/* setting: ", i >out
+         print " *   requires:" setting[i] >out
+         print " *   default: ", defaults[i] deflt, "*/" >out
+         for (j=1; j<=nreqs; ++j) {
+            if (option[r[j]] != "")
+               print "#ifndef PNG_" r[j] "_SUPPORTED" >out
+            else
+               print "#ifndef PNG_" r[j] >out
+            print error, i, "requires", r[j] end >out
+            print "# endif" >out
+         }
+         # The precedence is:
+         #
+         #  1) External definition; trumps:
+         #  2) Option 'sets' value; trumps:
+         #  3) Setting 'default'
+         #
+         print "#ifdef PNG_" i >out
+         # PNG_<i> is defined, so substitute the value:
+         print def i, subs "PNG_" i sube end >out
+         print "#else /* use default */" >out
+         print "# ifdef PNG_set_" i >out
+         # Value from an option 'sets' argument
+         print def i, subs "PNG_set_" i sube end >out
+         # This is so that subsequent tests on the setting work:
+         print "#  define PNG_" i, "1" >out
+         if (defaults[i] != "") {
+            print "# else /*default*/" >out
+            print def i deflt end >out
+            print "#  define PNG_" i, "1" >out
+         }
+         print "# endif /* defaults */" >out
+         print "#endif /* setting", i, "*/" >out
+
+         doneset[i] = 1
+         ++movement
+      }
+
+      if (!finished && !movement) {
+         print "setting: loop or missing setting in 'requires', cannot process:"
+         for (i in setting) if (!doneset[i]) {
+            print "  setting", i, "requires" setting[i]
+         }
+         exit 1
+      }
+   }
+   print "PNG_DFN_END_SORT" >out
+   print comment, "end of settings", cend >out
 
    # Regular end - everything looks ok
    if (protect != "") {

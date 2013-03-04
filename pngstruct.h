@@ -508,6 +508,11 @@ struct png_struct_def
    png_byte filter_type;
 #endif
 
+   /* Options */
+#ifdef PNG_SET_OPTION_SUPPORTED
+   png_byte options;           /* On/off state (up to 4 options) */
+#endif
+
    /* COMPRESSION AND DECOMPRESSION SUPPORT.
     *
     * zlib expects a 'zstream' as the fundamental control structure, it allows

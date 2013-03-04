@@ -16,16 +16,7 @@
 
 #include "../pngpriv.h"
 
-#if defined(PNG_FILTER_OPTIMIZATIONS) && defined(__arm__) && \
-   defined(__ARM_NEON__)
-/* __arm__ is defined by GCC, MSVC defines _M_ARM to the ARM version number,
- * Andoid intends to define __ANDROID__, however there are bugs in their
- * toolchain; use -D__ANDROID__ to work round this.
- *
- * __ARM_NEON__ is used to ensure that the compiler has the appropriate ARM
- * NEON support
- */
-
+#ifdef PNG_ARM_NEON_SUPPORTED
 #ifdef PNG_ARM_NEON_CHECK_SUPPORTED /* Do run-time checks */
 #include <signal.h> /* for sig_atomic_t */
 
@@ -45,7 +36,8 @@ png_have_neon(png_structp png_ptr)
     * implemented as below, therefore it is better to cache the result (these
     * function calls may be slow!)
     */
-   return andoid_getCpuFamily() == ANDROID_CPU_FAMILY_ARM &&
+   PNG_UNUSED(png_ptr)
+   return android_getCpuFamily() == ANDROID_CPU_FAMILY_ARM &&
       (android_getCpuFeatures() & ANDROID_CPU_ARM_FEATURE_NEON) != 0;
 }
 #elif defined(__linux__)
@@ -161,15 +153,39 @@ png_have_neon(png_structp png_ptr)
 void
 png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
 {
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+   switch ((pp->options >> PNG_ARM_NEON) & 3)
+   {
+      case PNG_OPTION_UNSET:
+         /* Allow the run-time check to execute if it has been enabled -
+          * thus both API and CHECK can be turned on.  If it isn't supported
+          * this case will fall through to the 'default' below, which just
+          * returns.
+          */
+#endif /* PNG_ARM_NEON_API_SUPPORTED */
 #ifdef PNG_ARM_NEON_CHECK_SUPPORTED
-   static volatile sig_atomic_t no_neon = -1; /* not checked */
+         {
+            static volatile sig_atomic_t no_neon = -1; /* not checked */
 
-   if (no_neon < 0)
-      no_neon = !png_have_neon(pp);
+            if (no_neon < 0)
+               no_neon = !png_have_neon(pp);
 
-   if (no_neon)
-      return;
+            if (no_neon)
+               return;
+         }
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+         break;
+#endif
 #endif /* PNG_ARM_NEON_CHECK_SUPPORTED */
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+      case PNG_OPTION_ON:
+         /* Option turned on */
+         break;
+
+      default: /* OFF or INVALID */
+         return;
+   }
+#endif
 
    /* IMPORTANT: any new external functions used here must be declared using
     * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the
