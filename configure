@@ -1435,8 +1435,13 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
-  --enable-arm-neon     Enable ARM NEON optimizations: use 'always' to turn
-                          off run-time checks
+  --enable-arm-neon     Enable ARM NEON optimizations: =off, check, api, on:
+                          off: disable the optimizations; check: use internal
+                          checking code (deprecated and poorly supported);
+                          api: disable by default, enable by a call to
+                          png_set_option; on: turn on unconditionally. The
+                          default is 'on' if __ARM_NEON__ is defined,
+                          otherwise 'off'.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -12812,19 +12817,26 @@ AM_CCASFLAGS=-Wa,--noexecstack
 
 # Check whether --enable-arm-neon was given.
 if test "${enable_arm_neon+set}" = set; then :
-  enableval=$enable_arm_neon; if test "${enableval}" = "yes" -o "${enableval}" = "always"; then
+  enableval=$enable_arm_neon; case "$enableval" in
+      off)
 
-$as_echo "#define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon" >>confdefs.h
+$as_echo "#define PNG_NO_ARM_NEON /**/" >>confdefs.h
+;;
+      check)
 
+$as_echo "#define PNG_ARM_NEON_CHECK_SUPPORTED /**/" >>confdefs.h
+;;
+      api)
 
-$as_echo "#define PNG_ALIGNED_MEMORY_SUPPORTED 1" >>confdefs.h
+$as_echo "#define PNG_ARM_NEON_API_SUPPORTED /**/" >>confdefs.h
+;;
+      on)
 
-      if test "${enableval}" = "always"; then
-
-$as_echo "#define PNG_NO_ARM_NEON_CHECK /**/" >>confdefs.h
-
-      fi
-    fi
+$as_echo "#define PNG_ARM_NEON_SUPPORTED /**/" >>confdefs.h
+;;
+      *)
+         as_fn_error $? "arm-neon: option value required (off/check/api/on)" "$LINENO" 5;;
+   esac
 fi
 
  if test "${enable_arm_neon:-no}" != "no"; then
