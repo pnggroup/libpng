@@ -1,5 +1,5 @@
 
-Libpng 1.6.1beta06 - March 4, 2013
+Libpng 1.6.1beta07 - March 4, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.1beta06.tar.xz (LZMA-compressed, recommended)
-   1.6.1beta06.tar.gz
+   1.6.1beta07.tar.xz (LZMA-compressed, recommended)
+   1.6.1beta07.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp161b06.7z  (LZMA-compressed, recommended)
-   lp161b06.zip
+   lp161b07.7z  (LZMA-compressed, recommended)
+   lp161b07.zip
 
 Other information:
 
-   1.6.1beta06-README.txt
-   1.6.1beta06-LICENSE.txt
+   1.6.1beta07-README.txt
+   1.6.1beta07-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -67,6 +67,7 @@ Version 1.6.1beta04 [February 27, 2013]
 Version 1.6.1beta05 [March 1, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
 
+
 Version 1.6.1beta06 [March 4, 2013]
   Better documentation of unknown handling API interactions.
   Corrected Android builds and corrected libpng.vers with symbol
@@ -78,6 +79,7 @@ Version 1.6.1beta06 [March 4, 2013]
     settings to depend on options and options can now set (or override) the
     defaults for settings.
 
+Version 1.6.1beta07 [March 4, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

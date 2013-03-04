@@ -4435,6 +4435,8 @@ Version 1.6.1beta06 [March 4, 2013]
     settings to depend on options and options can now set (or override) the
     defaults for settings.
 
+Version 1.6.1beta07 [March 4, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
