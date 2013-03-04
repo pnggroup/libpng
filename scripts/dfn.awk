@@ -61,75 +61,143 @@ $1 ~ /^PNG_DFN_END_SORT/{
 }
 
 /^[^"]*PNG_DFN *".*"[^"]*$/{
-    # A definition line, apparently correctly formated, extract the
-    # definition then replace any doubled "" that remain with a single
-    # double quote.  Notice that the original doubled double quotes
-    # may have been split by tokenization
-    orig=$0
+   # A definition line, apparently correctly formated, extract the
+   # definition then replace any doubled "" that remain with a single
+   # double quote.  Notice that the original doubled double quotes
+   # may have been split by tokenization
+   #
+   # Sometimes GCC splits the PNG_DFN lines, we know this has happened
+   # if the quotes aren't closed and must read another line.  In this
+   # case it is essential to reject lines that start '#' because those
+   # are introduced #line directives.
+   orig=$0
+   line=$0
+   lineno=FNR
+   if (lineno == "") lineno=NR
 
-    if (gsub(/^[^"]*PNG_DFN *"/,"") != 1 || gsub(/"[^"]*$/, "") != 1) {
-	print "line", NR, "processing failed:"
+   if (sub(/^[^"]*PNG_DFN *"/,"",line) != 1) {
+	print "line", lineno ": processing failed:"
 	print orig
-	print $0
 	err=1
-    } else {
+       next
+   } else {
 	++out_count
-    }
+   }
 
-    # Now examine quotes within the value:
-    #
-    #   @" - delete this and any following spaces
-    #   "@ - delete this and any original spaces
-    #   @' - replace this by a double quote
-    #
-    # This allows macro substitution by the C compiler thus:
-    #
-    #   #define first_name John
-    #   #define last_name Smith
-    #
-    #	PNG_DFN"#define name @'@" first_name "@ @" last_name "@@'"
-    #
-    # Might get C preprocessed to:
-    #
-    #   PNG_DFN "#define foo @'@" John "@ @" Smith "@@'"
-    #
-    # Which this script reduces to:
-    #
-    #	#define name "John Smith"
-    #
-    while (sub(/@" */, "")) {
-	if (!sub(/ *"@/, "")) {
-	    print "unbalanced @\" ... \"@ pair"
-	    err=1
-	    break
-	}
-    }
+   # Now examine quotes within the value:
+   #
+   #   @" - delete this and any following spaces
+   #   "@ - delete this and any preceding spaces
+   #   @' - replace this by a double quote
+   #
+   # This allows macro substitution by the C compiler thus:
+   #
+   #   #define first_name John
+   #   #define last_name Smith
+   #
+   #	PNG_DFN"#define name @'@" first_name "@ @" last_name "@@'"
+   #
+   # Might get C preprocessed to:
+   #
+   #   PNG_DFN "#define foo @'@" John "@ @" Smith "@@'"
+   #
+   # Which this script reduces to:
+   #
+   #	#define name "John Smith"
+   #
+   while (1) {
+      # While there is an @" remove it and the next "@
+      if (line ~ /@"/) {
+         if (line ~ /@".*"@/) {
+            # Do this special case first to avoid swallowing extra spaces
+            # before or after the @ stuff:
+            if (!sub(/@" *"@/, "", line)) {
+               # Ok, do it in pieces - there has to be a non-space between the
+               # two.  NOTE: really weird things happen if a leading @" is
+               # lost - the code will error out below (I believe).
+               if (!sub(/@" */, "", line) || !sub(/ *"@/, "", line)) {
+                  print "line", lineno, ": internal error:", orig
+                  exit 1
+               }
+            }
+         }
 
-    # Put any needed double quotes in
-    gsub(/@'/,"\"")
+         # There is no matching "@.  Assume a split line
+         else while (1) {
+            if (getline nextline) {
+               # If the line starts with '#' it is a preprocesor line directive
+               # from cc -E, skip it:
+               if (nextline !~ /^#/) {
+                  line = line " " nextline
+                  break
+               }
+            } else {
+               # This is end-of-input - probably a missig "@ on the first line:
+               print "line", lineno ": unbalanced @\" ... \"@ pair"
+               err=1
+               next
+            }
+         }
 
-    # Remove any trailing spaces (not really required, but for
-    # editorial consistency
-    sub(/ *$/, "")
+         # Keep going until all the @" have gone
+         continue
+      }
 
-    if (sort)
-       array[$(sort)] = $0
+      # Attempt to remove a trailing " (not preceded by '@') - if this can
+      # be done stop now, if not assume a split line again
+      if (sub(/"[^"]*$/, "", line))
+         break
 
-    else
-       print $0 >out
-    next
+      # Read another line
+      while (1) {
+         if (getline nextline) {
+            if (nextline !~ /^#/) {
+               line = line " " nextline
+               # Go back to stripping @" "@ pairs
+               break
+            }
+         } else {
+            print "line", lineno ": unterminated PNG_DFN string"
+            err=1
+            next
+         }
+      }
+   }
+
+   # Put any needed double quotes in (at the end, because these would otherwise
+   # interfere with the processing above.)
+   gsub(/@'/,"\"", line)
+
+   # Remove any trailing spaces (not really required, but for
+   # editorial consistency
+   sub(/ *$/, "", line)
+
+   # Remove trailing CR
+   sub(/$/, "", line)
+
+   if (sort) {
+      if (split(line, parts) < sort) {
+         print "line", lineno ": missing sort field:", line
+         err=1
+      } else
+         array[parts[sort]] = line
+   }
+
+   else
+      print line >out
+   next
 }
 
 /PNG_DFN/{
-    print "line", NR, "incorrectly formated PNG_DFN line:"
-    print $0
-    err = 1
+   print "line", NR, "incorrectly formated PNG_DFN line:"
+   print $0
+   err = 1
 }
 
 END{
-    if (out_count > 0 || err > 0)
+   if (out_count > 0 || err > 0)
 	exit err
 
-    print "no definition lines found"
-    exit 1
+   print "no definition lines found"
+   exit 1
 }

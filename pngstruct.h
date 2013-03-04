@@ -357,6 +357,11 @@ struct png_struct_def
    png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
 #endif
 
+   /* Options */
+#ifdef PNG_SET_OPTION_SUPPORTED
+   png_byte options;           /* On/off state (up to 4 options) */
+#endif
+
 #if PNG_LIBPNG_VER < 10700
 /* To do: remove this from libpng-1.7 */
 #ifdef PNG_TIME_RFC1123_SUPPORTED

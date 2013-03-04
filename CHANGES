@@ -4424,8 +4424,16 @@ Version 1.6.1beta04 [February 27, 2013]
 Version 1.6.1beta05 [March 1, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
 
-Version 1.6.1beta06 [March 2, 2013]
+Version 1.6.1beta06 [March 4, 2013]
   Better documentation of unknown handling API interactions.
+  Corrected Android builds and corrected libpng.vers with symbol
+    prefixing This adds an API to set optimization options externally,
+    providing an alternative and general solution for the non-portable
+    run-time tests used by the ARM Neon code.  It also makes those tests
+    compile and link on Android.
+  The order of settings vs options in pnglibconf.h is reversed to allow
+    settings to depend on options and options can now set (or override) the
+    defaults for settings.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

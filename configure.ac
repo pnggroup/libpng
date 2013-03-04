@@ -233,18 +233,27 @@ AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
 
 AC_ARG_ENABLE([arm-neon],
    AS_HELP_STRING([[[--enable-arm-neon]]],
-      [Enable ARM NEON optimizations: use 'always' to turn off run-time checks]),
-   [if test "${enableval}" = "yes" -o "${enableval}" = "always"; then
-      AC_DEFINE([PNG_FILTER_OPTIMIZATIONS],
-                [png_init_filter_functions_neon],
-                [ARM NEON filter initialization function])
-      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [],
-                [Align row buffers])
-      if test "${enableval}" = "always"; then
-         AC_DEFINE([PNG_NO_ARM_NEON_CHECK], [],
-                   [Turn off run-time checking for ARM NEON support])
-      fi
-    fi])
+      [Enable ARM NEON optimizations: =off, check, api, on:]
+      [off: disable the optimizations; check: use internal checking code]
+      [(deprecated and poorly supported); api: disable by default, enable by]
+      [a call to png_set_option; on: turn on unconditionally.  The]
+      [default is 'on' if __ARM_NEON__ is defined, otherwise 'off'.]),
+   [case "$enableval" in
+      off)
+         AC_DEFINE([PNG_NO_ARM_NEON], [],
+                   [Disable ARM Neon optimizations]);;
+      check)
+         AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
+                   [Check for ARM Neon support at run-time]);;
+      api)
+         AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
+                   [Turn on ARM Neon optimizations at run-time]);;
+      on)
+         AC_DEFINE([PNG_ARM_NEON_SUPPORTED], [],
+                   [Enable ARM Neon optimizations]);;
+      *)
+         AC_MSG_ERROR([arm-neon: option value required (off/check/api/on)]);;
+   esac])
 AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" != "no"])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])

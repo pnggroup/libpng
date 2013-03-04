@@ -27,7 +27,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # The syntax is detailed in scripts/options.awk; this is a summary
 # only:
 #
-# setting <name> [default]
+# setting <name> [requires ...] [default]
 #    #define PNG_<name> <value>  /* value comes from current setting */
 # option <name> [requires ...] [if ...] [enables ...] [disabled]
 #    #define PNG_<name>_SUPPORTED if the requirements are met and
@@ -158,6 +158,12 @@ logunsupported = 1
 @#  endif
 @#endif
 
+# This changes the default for the ARM NEON optimizations according to
+# __ARM_NEON__
+@#ifdef __ARM_NEON__
+@#  define PNG_ARM_NEON_SUPPORTED
+@#endif
+
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want (NOTE:
 # experimental options must be disabled before they are defined in this file!)
@@ -199,11 +205,22 @@ setting DEFAULT_READ_MACROS default 1
 
 setting FILTER_OPTIMIZATIONS
 
-# This option turns on runtime checks for ARM NEON support, it is irrelevant
-# on other platforms and it is irrelevant unless NEON code is turned on.  Checks
-# are on by default
+# Implementation specific control of the optimizations, enabled by those
+# hardware or software options that need it (typically when run-time choices
+# must be made by the user)
+option SET_OPTION disabled
 
-option ARM_NEON_CHECK
+# These options are specific to the ARM NEON hardware optimizations:
+#
+# ARM_NEON: the optimization itself
+# ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
+# ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
+#                 supported, this is poorly supported and deprectated - use the
+#                 png_set_hardware API.
+option ARM_NEON disabled,
+   sets FILTER_OPTIMIZATIONS png_init_filter_functions_neon
+option ARM_NEON_API disabled enables SET_OPTION ARM_NEON
+option ARM_NEON_CHECK disabled enables ARM_NEON
 
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib, it describes the input
