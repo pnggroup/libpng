@@ -2817,9 +2817,13 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
                {
 #                 ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
                      if (png_ptr->unknown_default < PNG_HANDLE_CHUNK_IF_SAFE)
+                     {
+                        png_chunk_warning(png_ptr, "Saving unknown chunk:");
                         png_app_warning(png_ptr,
                            "forcing save of an unhandled chunk;"
                            " please call png_set_keep_unknown_chunks");
+                           /* with keep = PNG_HANDLE_CHUNK_IF_SAFE */
+                     }
 #                 endif
                   keep = PNG_HANDLE_CHUNK_IF_SAFE;
                }
