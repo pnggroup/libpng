@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta08 - March 4, 2013
+Libpng 1.5.15beta09 - March 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.15beta08.tar.xz (LZMA-compressed, recommended)
-   1.5.15beta08.tar.gz
-   1.5.15beta08.tar.bz2
+   1.5.15beta09.tar.xz (LZMA-compressed, recommended)
+   1.5.15beta09.tar.gz
+   1.5.15beta09.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1515b08.7z  (LZMA-compressed, recommended)
-   lp1515b08.zip
+   lp1515b09.7z  (LZMA-compressed, recommended)
+   lp1515b09.zip
 
 Other information:
 
-   1.5.15beta08-README.txt
-   1.5.15beta08-LICENSE.txt
+   1.5.15beta09-README.txt
+   1.5.15beta09-LICENSE.txt
 
 Changes since the last public release (1.5.14):
 
@@ -68,7 +68,7 @@ Version 1.5.15beta07 [February 27, 2013]
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
 
-Version 1.5.15beta08 [March 4, 2013]
+Version 1.5.15beta08 [March 5, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Made the _SUPPORTED macro definitions consistent. The change made in
     libpng15 to #define *_SUPPORTED 1, to match the use of -D*_SUPPORTED
@@ -90,6 +90,7 @@ Version 1.5.15beta08 [March 4, 2013]
     settings to depend on options and options can now set (or override) the
     defaults for settings.
 
+Version 1.5.15beta09 [March 5, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
