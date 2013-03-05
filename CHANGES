@@ -4480,7 +4480,7 @@ Version 1.7.0beta04 [February 27, 2013]
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
 
-Version 1.7.0beta05 [March 4, 2013]
+Version 1.7.0beta05 [March 5, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Changed user chunk callback API to respect global and per chunk defaults.
     Previously a return of 0 from a user chunk callback would result in the
