@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta05 - March 5, 2013
+Libpng 1.7.0beta06 - March 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta05.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta05.tar.gz
+   1.7.0beta06.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta06.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b05.7z  (LZMA-compressed, recommended)
-   lp170b05.zip
+   lp170b06.7z  (LZMA-compressed, recommended)
+   lp170b06.zip
 
 Other information:
 
-   1.7.0beta05-README.txt
-   1.7.0beta05-LICENSE.txt
+   1.7.0beta06-README.txt
+   1.7.0beta06-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -207,6 +207,8 @@ Version 1.7.0beta05 [March 5, 2013]
     compile and link on Android.  The order of settings vs options in
     pnglibconf.h is reversed to allow settings to depend on options and
     options can now set (or override) the defaults for settings.
+
+Version 1.7.0beta06 [March 5, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
