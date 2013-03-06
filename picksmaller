@@ -7,7 +7,7 @@
 # Selects the smaller of file.zdat (extracted from a PNG) or
 # file.idat.zlib (same but recompressed with zopfli)
 
-# picksmall file1 file2
+# picksmaller file1 file2
 
 for file in $*
 do

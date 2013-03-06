@@ -1,0 +1,18 @@
+#!/bin/sh
+
+# For use in the pngzop project
+# Copyright 2013 by Glenn Randers-Pehrson
+# Released under the pngcrush license (equivalent to the libpng license)
+
+# Usage:
+# move_best *.zdat
+# assumes that for each *.zdat, *.idat.zlib exists
+#
+# moves the smaller of root.zdat or root.idat.zlib
+# to root.best
+
+for file in $*
+do
+root=`echo $file | sed -e "s/.zdat$//"`
+cp `picksmaller $root.zdat` $root.best
+done
