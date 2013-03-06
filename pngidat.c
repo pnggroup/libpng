@@ -1,18 +1,21 @@
 #include <stdio.h>
 
-/* Copyright 2013 Glenn Randers-Pehrson */
+/* Copyright 2013 Glenn Randers-Pehrson
+ * Released under the pngcrush license (equivalent to the libpng license)
+ */
 
 /* Usage:            
- * pngidat.exe < file.png | pigz -d > file.idat
+ * pngidat.exe < file.png > file.zdat
  *
- * file.idat is the image datastream, with the filter bytes.
+ * file.idat is the zlib datastream from the PNG IDAT chunks.
+ *
  */
 
 main()
 {
-   int i;
-   int buf[5];
-   int c;
+   unsigned int i;
+   unsigned int buf[5];
+   unsigned int c;
 
    buf[4]='\0';
 
@@ -23,7 +26,7 @@ main()
 for (;;)
 {
    /* read length */
-   int length;
+   unsigned int length;
    buf[0]=getchar();
    if (buf[0] == EOF)
       break;
@@ -46,7 +49,9 @@ for (;;)
             break;
          putchar(c);
       }
-      /* skip crc byte */
+      if (c == EOF)
+         break;
+      /* skip crc bytes */
       for (i=4; i; i--)
       {
          c=getchar();
@@ -59,7 +64,13 @@ for (;;)
    else
    {
       for (i=length+4; i; i--)
+      {
          c=getchar();
+         if (c == EOF)
+            break;
+      }
+      if (c == EOF)
+         break;
    }
 }
 }

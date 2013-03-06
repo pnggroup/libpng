@@ -1,5 +1,11 @@
 #!/bin/sh
 
+# For use in the pngzop project
+# Copyright 2013 by Glenn Randers-Pehrson
+# Released under the pngcrush license (equivalent to the libpng license)
+
+# Extracts the data from the IDAT chunks in a set of # PNG files.
+
 for x in $*
 do
   root=`echo $1 | sed -e s/.png$//`

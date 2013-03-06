@@ -1,0 +1,27 @@
+#!/bin/sh
+
+# For use in the pngzop project
+# Copyright 2013 by Glenn Randers-Pehrson
+# Released under the pngcrush license (equivalent to the libpng license)
+
+# Selects the smaller of file.zdat (extracted from a PNG) or
+# file.idat.zlib (same but recompressed with zopfli)
+
+# picksmall file1 file2
+
+for file in $*
+do
+file1=$1
+file2=`echo $file1 | sed -e "s/zdat/idat.zlib/"`
+shift
+
+size1=`ls -l $file1 | sed -e "s/[^ ]* [^ ]* [^ ]* [^ ]* //" -e "s/ .*//"`
+size2=`ls -l $file2 | sed -e "s/[^ ]* [^ ]* [^ ]* [^ ]* //" -e "s/ .*//"`
+
+if [ $size1 -le $size2 ] ; then
+echo $file1
+else
+echo $file2
+fi
+
+done
