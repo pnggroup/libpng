@@ -440,7 +440,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
       /* Palette with fixed color: the image rows are all 0 and the image width
        * is 16.
        */
-      memset(row, rowbytes, 0);
+      memset(row, 0, rowbytes);
    }
 
    else if (colors[0] == channels_of_type(color_type))
@@ -624,8 +624,8 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
 
             gamma_table[0] = 0;
 
-            for (i=0; i<255; ++i)
-               gamma_table[i] = (png_byte)floor(pow(i/255.,conv) * 255 + 127.5);
+            for (i=1; i<255; ++i)
+               gamma_table[i] = (png_byte)floor(pow(i/255.,conv) * 255 + .5);
 
             gamma_table[255] = 255;
          }

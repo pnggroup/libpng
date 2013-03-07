@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta06 - March 5, 2013
+Libpng 1.7.0beta06 - March 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -208,7 +208,20 @@ Version 1.7.0beta05 [March 5, 2013]
     pnglibconf.h is reversed to allow settings to depend on options and
     options can now set (or override) the defaults for settings.
 
-Version 1.7.0beta06 [March 5, 2013]
+Version 1.7.0beta06 [March 7, 2013]
+  Corrected simplified API default gamma for color-mapped output, added
+    a flag to change default. In 1.6.0 when the simplified API was used
+    to produce color-mapped output from an input image with no gamma
+    information the gamma assumed for the input could be different from
+    that assumed for non-color-mapped output.  In particular 16-bit depth
+    input files were assumed to be sRGB encoded, whereas in the 'direct'
+    case they were assumed to have linear data.  This was an error.  The
+    fix makes the simplified API treat all input files the same way and
+    adds a new flag to the png_image::flags member to allow the
+    application/user to specify that 16-bit files contain sRGB data
+    rather than the default linear.
+  Fixed bugs in the pngpixel and makepng test programs.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

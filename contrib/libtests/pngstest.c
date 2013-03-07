@@ -315,6 +315,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 #define KEEP_GOING 32
 #define ACCUMULATE 64
 #define FAST_WRITE 128
+#define sRGB_16BIT 256
 
 static void
 print_opts(png_uint_32 opts)
@@ -335,6 +336,8 @@ print_opts(png_uint_32 opts)
       printf(" --accumulate");
    if (!(opts & FAST_WRITE)) /* --fast is currently the default */
       printf(" --slow");
+   if (opts & sRGB_16BIT)
+      printf(" --sRGB-16bit");
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -3026,6 +3029,10 @@ read_file(Image *image, png_uint_32 format, png_const_colorp background)
          return logerror(image, "file init: ", image->file_name, "");
    }
 
+   /* This must be set after the begin_read call: */
+   if (image->opts & sRGB_16BIT)
+      image->image.flags |= PNG_IMAGE_FLAG_16BIT_sRGB;
+
    /* Have an initialized image with all the data we need plus, maybe, an
     * allocated file (myfile) or buffer (mybuffer) that need to be freed.
     */
@@ -3488,6 +3495,10 @@ main(int argc, char **argv)
          opts &= ~KEEP_GOING;
       else if (strcmp(arg, "--strict") == 0)
          opts |= STRICT;
+      else if (strcmp(arg, "--sRGB-16bit") == 0)
+         opts |= sRGB_16BIT;
+      else if (strcmp(arg, "--linear-16bit") == 0)
+         opts &= ~sRGB_16BIT;
       else if (strcmp(arg, "--tmpfile") == 0)
       {
          if (c+1 < argc)
