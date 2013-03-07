@@ -98,6 +98,9 @@ Version 1.5.15beta09 [March 7, 2013]
     to build at least one library variant.
   Made the *_COPY targets only depend on library targets actually being build.
   Use PNG_LIB_TARGETS to unify a code path.
+  Changed the CREATE_SYMLINK macro to expact the full path to a file as the
+    first argument. When symlinking the filename component of that path is
+    determined and used as the link target.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
