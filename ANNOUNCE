@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta09 - March 5, 2013
+Libpng 1.5.15beta09 - March 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -90,7 +90,14 @@ Version 1.5.15beta08 [March 5, 2013]
     settings to depend on options and options can now set (or override) the
     defaults for settings.
 
-Version 1.5.15beta09 [March 5, 2013]
+Version 1.5.15beta09 [March 7, 2013]
+  Fixed CMakelists.txt to allow building a single variant of the library
+    (Claudio Bley):
+  Introduced a PNG_LIB_TARGETS variable that lists all activated library
+    targets.  It is an error if this variable ends up empty, ie. you have
+    to build at least one library variant.
+  Made the *_COPY targets only depend on library targets actually being build.
+  Use PNG_LIB_TARGETS to unify a code path.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
