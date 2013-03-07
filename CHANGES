@@ -4457,7 +4457,7 @@ Version 1.6.1beta08 [March 7, 2013]
     to build at least one library variant.
   Made the *_COPY targets only depend on library targets actually being build.
   Use PNG_LIB_TARGETS to unify a code path.
-  Changed the CREATE_SYMLINK macro to expact the full path to a file as the
+  Changed the CREATE_SYMLINK macro to expect the full path to a file as the
     first argument. When symlinking the filename component of that path is
     determined and used as the link target.
   Use copy_if_different in the CREATE_SYMLINK macro.
