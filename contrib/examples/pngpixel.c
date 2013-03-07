@@ -37,7 +37,7 @@ component(png_const_bytep row, png_uint_32 x, unsigned int c,
     * bytes wide.  Since the row fitted into memory, however, the following must
     * work:
     */
-   png_uint_32 bit_offset_hi = bit_depth * ((x >> 6) * channels + c);
+   png_uint_32 bit_offset_hi = bit_depth * ((x >> 6) * channels);
    png_uint_32 bit_offset_lo = bit_depth * ((x & 0x3f) * channels + c);
 
    row = (png_const_bytep)(((PNG_CONST png_byte (*)[8])row) + bit_offset_hi);

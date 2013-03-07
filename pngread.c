@@ -2004,6 +2004,28 @@ png_image_read_colormap(png_voidp argument)
    else
       back_b = back_r = back_g = 255;
 
+   /* Default the input file gamma if required - this is necessary because
+    * libpng assumes that if no gamma information is present the data is in the
+    * output format, but the simplified API deduces the gamma from the input
+    * format.
+    */
+   if ((png_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA) == 0)
+   {
+      /* Do this directly, not using the png_colorspace functions, to ensure
+       * that it happens even if the colorspace is invalid (though probably if
+       * it is the setting will be ignored)  Note that the same thing can be
+       * achieved at the application interface with png_set_gAMA.
+       */
+      if (png_ptr->bit_depth == 16 &&
+         (image->flags & PNG_IMAGE_FLAG_16BIT_sRGB) == 0)
+         png_ptr->colorspace.gamma = PNG_GAMMA_LINEAR;
+
+      else
+         png_ptr->colorspace.gamma = PNG_GAMMA_sRGB_INVERSE;
+
+      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
+   }
+
    /* Decide what to do based on the PNG color type of the input data.  The
     * utility function png_create_colormap_entry deals with most aspects of the
     * output transformations; this code works out how to produce bytes of
@@ -3547,7 +3569,8 @@ png_image_read_direct(png_voidp argument)
       {
          png_fixed_point input_gamma_default;
 
-         if (base_format & PNG_FORMAT_FLAG_LINEAR)
+         if ((base_format & PNG_FORMAT_FLAG_LINEAR) &&
+            (image->flags & PNG_IMAGE_FLAG_16BIT_sRGB) == 0)
             input_gamma_default = PNG_GAMMA_LINEAR;
          else
             input_gamma_default = PNG_DEFAULT_sRGB;
