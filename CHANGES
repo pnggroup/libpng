@@ -4059,6 +4059,7 @@ Version 1.5.15beta09 [March 7, 2013]
   Changed the CREATE_SYMLINK macro to expact the full path to a file as the
     first argument. When symlinking the filename component of that path is
     determined and used as the link target.
+  Use copy_if_different in the CREATE_SYMLINK macro.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
