@@ -1,5 +1,5 @@
 
-Libpng 1.6.1beta08 - March 7, 2013
+Libpng 1.6.1beta09 - March 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.1beta08.tar.xz (LZMA-compressed, recommended)
-   1.6.1beta08.tar.gz
+   1.6.1beta09.tar.xz (LZMA-compressed, recommended)
+   1.6.1beta09.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp161b08.7z  (LZMA-compressed, recommended)
-   lp161b08.zip
+   lp161b09.7z  (LZMA-compressed, recommended)
+   lp161b09.zip
 
 Other information:
 
-   1.6.1beta08-README.txt
-   1.6.1beta08-LICENSE.txt
+   1.6.1beta09-README.txt
+   1.6.1beta09-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -105,6 +105,8 @@ Version 1.6.1beta08 [March 7, 2013]
     first argument. When symlinking the filename component of that path is
     determined and used as the link target.
   Use copy_if_different in the CREATE_SYMLINK macro.
+
+Version 1.6.1beta09 [March 7, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
