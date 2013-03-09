@@ -1,0 +1,211 @@
+
+Corpus contains 1734 PNG files from mozilla hg repo
+5491004 total bytes (complete PNG files)
+5019516 total bytes (IDAT chunk data)
+35154779 total bytes uncompressed IDATs
+
+mogrify -strip *.png
+added vpAG, bKGD, and pHYs chunks. (was old mogrify)
+scooby> time q16mogrify -strip *.png
+real	0m13.500s user	0m13.057s sys	0m0.424s
+5061691 total bytes (complete PNG files)
+
+Corpus divided into two parts: small, stripped PNGs less than 1024 bytes,
+and large, stripped PNGs greater than or equal to 1024 bytes.
+
+pngcrush -brute -d BF_brute *.png
+CPU time decoding 35.690, encoding 255.190, other 19.960, total 310.840 seconds
+4738882 total bytes (complete PNG files)
+4281038 total bytes (IDAT chunk data)
+
+6850560 2013-03-02 22:04 mozilla-corpus.tar
+4995464 2013-03-02 22:04 ../mozilla-corpus.tar.xz (xz)
+4994412 2013-03-02 22:04 ../mozilla-corpus.tar.xz (xz -9)
+
+scooby> time gzip -9n *.idat
+real	0m5.553s user	0m5.344s sys	0m0.200s
+time gzip -d *.gz
+real	0m0.778s user	0m0.552s sys	0m0.224s
+
+scooby> time gzip -9n *.idat
+real	0m5.648s user	0m5.436s sys	0m0.200s
+4360009 total bytes (includes 20820 bytes of gzip overhead)
+4339189 total bytes (without 20820 bytes of gzip overhead)
+scooby> time gunzip *.idat.gz
+real	0m0.762s user	0m0.568s sys	0m0.188s
+
+
+scooby> time bzip2 *idat
+real	0m3.830s user	0m3.452s sys	0m0.320s
+4015342 total bytes
+scooby> time bzip2 -d *bz2
+real	0m1.011s user	0m0.716s sys	0m0.292s
+
+
+scooby> time xz *idat
+real	0m14.621s user	0m14.305s sys	0m0.236s
+3813468 total bytes
+scooby> time xz -d *.xz
+real	0m0.716s user	0m0.452s sys	0m0.256s
+
+scooby> nohup time zopfli --zlib *.idat &
+587.24user 0.40system 9:48.10elapsed 
+4035633 total
+
+pngcrush -d PC_default *.png
+CPU time decoding 1.710, encoding 21.600, other 1.190, total 24.500 seconds
+4757749 total bytes (complete PNG files)
+4299905 total bytes (IDAT chunk data)
+
+scooby> time gzip -9n *.idat
+real	0m5.504s user	0m5.260s sys	0m0.236s
+   4369829 total
+scooby> time gunzip *gz
+real	0m0.791s user	0m0.576s sys	0m0.212s
+
+scooby> time xz *.idat
+real	0m14.481s user	0m14.145s sys	0m0.308s
+   3820192 total
+scooby> time xz -d *.xz
+real	0m0.693s user	0m0.468s sys	0m0.220s
+
+scooby> time bzip2 -9 *.idat
+real	0m3.603s user	0m3.220s sys	0m0.376s
+   4022529 total
+scooby> time bzip2 -d *bz2
+real	0m0.989s user	0m0.732s sys	0m0.252s
+
+time zopfli --zlib *.idat
+590.4 sec
+   4047719 total
+
+pngcrush -m 7 -force *.png # filter 0 level 9 strategy 0
+CPU time decoding 0.690, encoding 17.270, other 0.670, total 18.630 seconds
+5593778 total PNG size
+5136096 total IDAT size
+
+scooby> time gzip -n9 *.idat
+real	0m2.835s user	0m2.556s sys	0m0.268s
+   5153307 total
+scooby> time gunzip *.gz
+real	0m0.800s user	0m0.524s sys	0m0.272s
+scooby> time gzip -n9 *.idat
+real	0m7.134s user	0m6.812s sys	0m0.200s
+  4773010 total
+scooby> time gunzip *gz
+real	0m0.763s user	0m0.536s sys	0m0.224s
+
+
+scooby> time bzip2 -9 *.idat
+real	0m5.024s user	0m4.684s sys	0m0.308s
+   4614708 total
+scooby> time bzip2 -d *.bz2
+real	0m1.033s user	0m0.732s sys	0m0.296s
+
+scooby> time xz *.idat
+real	0m12.970s user	0m12.673s sys	0m0.280s
+  4138560 total
+scooby> time xz -d *xz 
+real	0m0.758s user	0m0.476s sys	0m0.280s
+
+zopli --zlib *.png
+98.45user 0.47system 1:39.12elapsed 99%CPU (0avgtext+0avgdata 40192maxresident)k
+4864938 
+
+pngcrush -m 6 -force *.png
+CPU time decoding 0.430, encoding 16.090, other 0.870, total 17.390 seconds
+4763290
+
+scooby> time gzip -n9 *.idat
+real	0m2.833s user	0m2.548s sys	0m0.236s
+4752190
+scooby> gunzip *gz
+real	0m0.767s user	0m0.580s sys	0m0.184s
+
+bzip2 -9
+real	0m2.523s user	0m2.164s sys	0m0.272s
+  5492706 total
+
+
+scooby> time xz *.idat
+real	0m15.198s user	0m14.873s sys	0m0.272s
+   4231288 total
+scooby> time xz -d *xz
+real	0m0.707s user	0m0.488s sys	0m0.216s
+
+zopfli
+91.32user 0.62system 1:32.02elapsed
+5153680
+
+nohup time pngcrush -brute -reduce -force -d PC_reduced *.png&
+ CPU time decoding 36.160, encoding 244.460, other 16.910, total 297.530 seconds
+4108911
+
+time gzip -9n *.idat
+real	0m5.315s user	0m5.068s sys	0m0.240s
+   4187025 total
+time gunzip *.gz
+real	0m0.766s user	0m0.512s sys	0m0.252s
+
+scooby> time bzip2 -9 *.idat
+real	0m3.618s user	0m3.220s sys	0m0.328s
+   3844856 total
+
+scooby> time xz *.idat
+real	0m14.098s user	0m13.753s sys	0m0.284s
+  3651752 total
+
+zopfli
+81.01user 0.45system 1:21.59elapsed
+
+Summary:
+
+      Method           time   IDAT bytes
+    original files      n/a    5019516
+
+    pngcrush -brute   310.8    4281038
+    gzip -9n            5.6    4339189
+    zopfli --zlib     596.7    4035633
+    bzip2 -9            3.8    4015342
+    xz                 14.6    3813468
+
+    pngcrush default   24.5    4299905
+    gzip -9n            5.5    4349009
+    zopfli --zlib     590.4    4047719
+    bzip2 -9            3.6    4022529
+    xz                 14.5    3820192
+
+    pngcrush none      18.6    5136096
+    zopfli --zlib      98.9    4864938
+    gzip -n9            2.8    5132487
+    bzip2 -9            3.8    4614708
+    xz                 12.8    4138560
+
+    pngcrush adaptive  17.4    4763290
+    zopfli --zlib      99.0    5153680
+    gzip -n9            2.8    4752190
+    bzip2 -9            2.6    5492706
+    xz                 15.2    4231288
+
+    pngcrush -reduce  297.5    4108911
+    gzip -9n            5.3    4187025
+    zopfli --zlib      81.5    4461661
+    bzip2 -9            3.6    3844856
+    xz                 13.8    3651752
+
+
+    Kodak 24 test images (some rotated to portrait)
+    time zopfli --zlib *.idat
+    real	2m52.325s user	2m52.107s sys	0m0.060s
+     kodim*.png  15249498 total
+     kodim*.zdat 15246402 total
+     kodim*.zlib 14717411 total
+
+    Size range    pngcrush   zopfli    z/pc
+    0-200            11818    11618   .9831
+    201-1000        140290   136015   .9695
+    1001-10000     1040052  1000877   .9623
+    10001-200000   2756452  2568988   .9320
+    300000-450000   332611   318047   .9562
+    450001-999999 15246402 14717411   .9653
+
