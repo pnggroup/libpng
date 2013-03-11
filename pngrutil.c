@@ -3397,7 +3397,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      png_uint_16p dp16 = png_aligncast(png_uint_16p, dp);
                      png_const_uint_16p sp16 = png_aligncastconst(
                         png_const_uint_16p, sp);
-                     unsigned int skip = (bytes_to_jump-bytes_to_copy) /
+                     size_t skip = (bytes_to_jump-bytes_to_copy) /
                         (sizeof (png_uint_16));
 
                      do
