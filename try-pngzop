@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# try-pngzop
+
+# usage: try-pngzop dir ...
+
+# runs pngzop on each PNG file in a set of directories
+
+# For use in the pngzop project
+# Copyright 2013 by Glenn Randers-Pehrson
+# Released under the pngcrush license (equivalent to the libpng license)
+
+# From a PNG file, finds the smallest resulting compressed IDAT
+# data from zopfli compression of filter types 0 through 4 and
+# "adaptive" (f5) filtering.
+
+for dir in $*
+do
+(
+    cd $dir
+    for n in *.png
+    do
+        pngzop $n > $n.zop
+        pngcrush -brute -force $n $n.bf.png
+        pngzdat $n.bf.png
+    done
+)
+done
