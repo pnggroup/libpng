@@ -9,8 +9,15 @@
 
 for x in $*
 do
-  root=`echo $1 | sed -e s/.png$//`
-  pngidat.exe < $1 | zpipe -d  > $root.idat
-  ls -l $root.idat
+  case $1 in
+      *.png)
+          root=`echo $1 | sed -e "s/.png$//"`
+          pngidat.exe < $1 | zpipe -d  > $root.idat
+          ;;
+      *.zdat)
+          root=`echo $1 | sed -e "s/.zdat$//"`
+          zpipe -d < $1 > $root.idat
+          ;;
+    esac
   shift
 done
