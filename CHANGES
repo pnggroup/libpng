@@ -4462,7 +4462,10 @@ Version 1.6.1beta08 [March 7, 2013]
     determined and used as the link target.
   Use copy_if_different in the CREATE_SYMLINK macro.
 
-Version 1.6.1beta09 [March 7, 2013]
+Version 1.6.1beta09 [March 11, 2013]
+  Eliminated a warning from the Intel C compiler. The warning is
+    technically valid, although a reasonable treatment of division would
+    show it to be incorrect.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
