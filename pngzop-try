@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# try-pngzop
+# pngzop-try
 
-# usage: try-pngzop dir ...
+# usage: pngzop-try dir ...
 
 # runs pngzop on each PNG file in a set of directories
 

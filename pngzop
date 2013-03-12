@@ -1,17 +1,6 @@
 #!/bin/sh
 
-# pngzop file.png > file_pz.idat
-
-# For use in the pngzop project
-# Copyright 2013 by Glenn Randers-Pehrson
-# Released under the pngcrush license (equivalent to the libpng license)
-
-# From a PNG file, finds the smallest resulting compressed IDAT
-# data from zopfli compression of filter types 0 through 4 and
-# "adaptive" (f5) filtering.
-
-# To do: replace the IDAT chunks in the source PNG file with the
-# result.
+# pngzop file.png > file_pz.png 
 
 for f in 0 1 2 3 4 5
 do
@@ -20,5 +9,5 @@ do
   pngidat pngzop-f$f-$$.png
   zopfli --i25 --zlib pngzop-f$f-$$.idat
 done
-echo `ls -S pngzop-f?-$$.idat.zlib | tail -1`
+cat `ls -S pngzop-f?-$$.idat.zlib | tail -1`
 rm pngzop-f?-$$.png pngzop-f?-$$.idat pngzop-f?-$$.idat.zlib
