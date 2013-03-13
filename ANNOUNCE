@@ -1,5 +1,5 @@
 
-Libpng 1.5.15beta09 - March 13, 2013
+Libpng 1.5.15beta10 - March 13, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.15beta09.tar.xz (LZMA-compressed, recommended)
-   1.5.15beta09.tar.gz
-   1.5.15beta09.tar.bz2
+   1.5.15beta10.tar.xz (LZMA-compressed, recommended)
+   1.5.15beta10.tar.gz
+   1.5.15beta10.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1515b09.7z  (LZMA-compressed, recommended)
-   lp1515b09.zip
+   lp1515b10.7z  (LZMA-compressed, recommended)
+   lp1515b10.zip
 
 Other information:
 
-   1.5.15beta09-README.txt
-   1.5.15beta09-LICENSE.txt
+   1.5.15beta10-README.txt
+   1.5.15beta10-LICENSE.txt
 
 Changes since the last public release (1.5.14):
 
@@ -105,6 +105,8 @@ Version 1.5.15beta09 [March 13, 2013]
   Eliminated two warnings from the Intel C compiler. The warnings are
     technically valid, although a reasonable treatment of division would
     show it to be incorrect.
+
+Version 1.5.15beta10 [March 13, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
