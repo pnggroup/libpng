@@ -4462,7 +4462,7 @@ Version 1.6.1beta08 [March 7, 2013]
     determined and used as the link target.
   Use copy_if_different in the CREATE_SYMLINK macro.
 
-Version 1.6.1beta09 [March 11, 2013]
+Version 1.6.1beta09 [March 13, 2013]
   Eliminated two warnings from the Intel C compiler. The warnings are
     technically valid, although a reasonable treatment of division would
     show it to be incorrect.
