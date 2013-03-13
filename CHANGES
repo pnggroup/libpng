@@ -4048,7 +4048,7 @@ Version 1.5.15beta08 [March 5, 2013]
     settings to depend on options and options can now set (or override) the
     defaults for settings.
 
-Version 1.5.15beta09 [March 7, 2013]
+Version 1.5.15beta09 [March 13, 2013]
   Fixed CMakelists.txt to allow building a single variant of the library
     (Claudio Bley):
   Introduced a PNG_LIB_TARGETS variable that lists all activated library
@@ -4056,10 +4056,13 @@ Version 1.5.15beta09 [March 7, 2013]
     to build at least one library variant.
   Made the *_COPY targets only depend on library targets actually being build.
   Use PNG_LIB_TARGETS to unify a code path.
-  Changed the CREATE_SYMLINK macro to expact the full path to a file as the
+  Changed the CREATE_SYMLINK macro to expect the full path to a file as the
     first argument. When symlinking the filename component of that path is
     determined and used as the link target.
   Use copy_if_different in the CREATE_SYMLINK macro.
+  Eliminated two warnings from the Intel C compiler. The warnings are
+    technically valid, although a reasonable treatment of division would
+    show it to be incorrect.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

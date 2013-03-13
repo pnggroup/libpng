@@ -3161,7 +3161,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
                   {
                      png_uint_32p dp32 = (png_uint_32p)dp;
                      png_const_uint_32p sp32 = (png_const_uint_32p)sp;
-                     unsigned int skip = (bytes_to_jump-bytes_to_copy) /
+                     size_t skip = (bytes_to_jump-bytes_to_copy) /
                         sizeof (png_uint_32);
 
                      do
