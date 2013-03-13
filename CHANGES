@@ -4467,6 +4467,8 @@ Version 1.6.1beta09 [March 13, 2013]
     technically valid, although a reasonable treatment of division would
     show it to be incorrect.
 
+Version 1.6.1beta10 [March 13, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
