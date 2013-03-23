@@ -1,0 +1,171 @@
+
+a
+/scratch/glennrp/ZZ/a
+pngcrush
+0.28user 0.13system 0:00.42elapsed 97%CPU (0avgtext+0avgdata 7616maxresident)k
+856inputs+3032outputs (1major+13991minor)pagefaults 0swaps
+  895  1631 46623 total
+pngcrush -brute
+6.60user 1.45system 0:08.10elapsed 99%CPU (0avgtext+0avgdata 7632maxresident)k
+0inputs+3032outputs (0major+143660minor)pagefaults 0swaps
+  914  1660 46368 total
+pngzop_pngcrush
+15.60user 5.94system 0:27.81elapsed 77%CPU (0avgtext+0avgdata 17104maxresident)k
+256inputs+9624outputs (1major+5472314minor)pagefaults 0swaps
+  900  1658 46145 total
+pngzop_brute
+119.13user 38.43system 0:43.11elapsed 365%CPU (0avgtext+0avgdata 17200maxresident)k
+16inputs+63808outputs (0major+28282648minor)pagefaults 0swaps
+  907  1666 46139 total
+
+b
+/scratch/glennrp/ZZ/b
+pngcrush
+1.09user 0.20system 0:01.30elapsed 99%CPU (0avgtext+0avgdata 7584maxresident)k
+0inputs+5848outputs (0major+40961minor)pagefaults 0swaps
+  2655   7715 354086 total
+pngcrush -brute
+17.20user 3.74system 0:21.02elapsed 99%CPU (0avgtext+0avgdata 7584maxresident)k
+0inputs+5840outputs (0major+816211minor)pagefaults 0swaps
+  2627   7592 351517 total
+pngzop_pngcrush
+57.00user 10.76system 1:19.73elapsed 84%CPU (0avgtext+0avgdata 14352maxresident)k
+0inputs+18976outputs (0major+10346028minor)pagefaults 0swaps
+  2609   7379 347229 total
+pngzop_brute
+371.07user 67.23system 1:53.12elapsed 387%CPU (0avgtext+0avgdata 14432maxresident)k
+0inputs+125536outputs (0major+53809985minor)pagefaults 0swaps
+  2579   7340 346825 total
+
+c
+/scratch/glennrp/ZZ/c
+pngcrush
+2.27user 0.24system 0:02.53elapsed 99%CPU (0avgtext+0avgdata 7648maxresident)k
+80inputs+3904outputs (0major+44991minor)pagefaults 0swaps
+  4423  18786 862928 total
+pngcrush -brute
+35.26user 2.58system 0:37.93elapsed 99%CPU (0avgtext+0avgdata 7648maxresident)k
+0inputs+3896outputs (0major+408699minor)pagefaults 0swaps
+  4361  18766 858463 total
+pngzop_pngcrush
+104.93user 7.65system 2:00.50elapsed 93%CPU (0avgtext+0avgdata 72224maxresident)k
+0inputs+17576outputs (0major+7394969minor)pagefaults 0swaps
+  4218  18601 838686 total
+pngzop_brute
+658.97user 49.82system 2:52.64elapsed 410%CPU (0avgtext+0avgdata 72304maxresident)k
+0inputs+114424outputs (0major+40850802minor)pagefaults 0swaps
+  4257  18413 837426 total
+
+d
+/scratch/glennrp/ZZ/d
+pngcrush
+9.19user 0.21system 0:09.42elapsed 99%CPU (0avgtext+0avgdata 7680maxresident)k
+0inputs+3992outputs (0major+116721minor)pagefaults 0swaps
+   7364   41546 1903162 total
+pngcrush -brute
+116.36user 3.20system 1:59.67elapsed 99%CPU (0avgtext+0avgdata 7664maxresident)k
+0inputs+3992outputs (0major+1804892minor)pagefaults 0swaps
+   7350   41372 1895523 total
+pngzop_pngcrush
+442.75user 3.94system 7:28.62elapsed 99%CPU (0avgtext+0avgdata 63888maxresident)k
+0inputs+35920outputs (0major+3546630minor)pagefaults 0swaps
+   6962   39478 1767997 total
+pngzop_brute
+2439.72user 20.39system 7:48.45elapsed 525%CPU (0avgtext+0avgdata 80224maxresident)k
+32inputs+230680outputs (0major+15883572minor)pagefaults 0swaps
+   6976   39490 1767559 total
+
+e
+/scratch/glennrp/ZZ/e
+pngcrush
+2.14user 0.00system 0:02.15elapsed 99%CPU (0avgtext+0avgdata 7312maxresident)k
+0inputs+656outputs (0major+1986minor)pagefaults 0swaps
+  1455   8129 335339 ie_pc.png
+pngcrush -brute
+19.64user 0.09system 0:19.75elapsed 99%CPU (0avgtext+0avgdata 7360maxresident)k
+0inputs+656outputs (0major+31375minor)pagefaults 0swaps
+   432   4399 332668 ie_bf.png
+pngzop_pngcrush
+40.27user 0.01system 0:40.33elapsed 99%CPU (0avgtext+0avgdata 74320maxresident)k
+0inputs+5152outputs (0major+13657minor)pagefaults 0swaps
+   940   6117 317125 ie_pngzop.png
+pngzop_brute
+239.30user 0.14system 0:43.02elapsed 556%CPU (0avgtext+0avgdata 82912maxresident)k
+0inputs+32960outputs (0major+66496minor)pagefaults 0swaps
+   940   6117 317125 ie_pngzop_brute.png
+
+f
+/scratch/glennrp/ZZ/f
+pngcrush
+10.48user 0.05system 0:10.55elapsed 99%CPU (0avgtext+0avgdata 7600maxresident)k
+0inputs+8544outputs (0major+12446minor)pagefaults 0swaps
+  16040   88064 4357651 total
+pngcrush -brute
+143.58user 0.68system 2:24.40elapsed 99%CPU (0avgtext+0avgdata 7456maxresident)k
+0inputs+8520outputs (0major+247399minor)pagefaults 0swaps
+  16087   89458 4346809 total
+pngzop_pngcrush
+111.85user 0.22system 1:52.24elapsed 99%CPU (0avgtext+0avgdata 64464maxresident)k
+0inputs+35216outputs (0major+103379minor)pagefaults 0swaps
+  15330   87361 4167473 total
+pngzop_brute
+538.88user 1.01system 1:38.01elapsed 550%CPU (0avgtext+0avgdata 80528maxresident)k
+0inputs+235432outputs (0major+386614minor)pagefaults 0swaps
+  15330   87361 4167473 total
+
+g
+/scratch/glennrp/ZZ/g
+pngcrush
+9.18user 0.05system 0:09.24elapsed 99%CPU (0avgtext+0avgdata 7456maxresident)k
+0inputs+11160outputs (0major+13841minor)pagefaults 0swaps
+  20369  116425 5694210 total
+pngcrush -brute
+135.51user 0.87system 2:16.51elapsed 99%CPU (0avgtext+0avgdata 7456maxresident)k
+0inputs+11128outputs (0major+277945minor)pagefaults 0swaps
+  20572  116699 5676667 total
+pngzop_pngcrush
+103.02user 0.25system 1:43.37elapsed 99%CPU (0avgtext+0avgdata 68976maxresident)k
+0inputs+42632outputs (0major+103176minor)pagefaults 0swaps
+  20331  115203 5447000 total
+pngzop_brute
+525.62user 1.00system 1:34.61elapsed 556%CPU (0avgtext+0avgdata 83728maxresident)k
+0inputs+284472outputs (0major+451658minor)pagefaults 0swaps
+  20444  117512 5440483 total
+
+h
+/scratch/glennrp/ZZ/h
+pngcrush
+5.31user 0.03system 0:05.35elapsed 99%CPU (0avgtext+0avgdata 7616maxresident)k
+0inputs+10312outputs (0major+11047minor)pagefaults 0swaps
+  19671  112525 5263535 total
+pngcrush -brute
+86.52user 0.71system 1:27.32elapsed 99%CPU (0avgtext+0avgdata 7456maxresident)k
+0inputs+10240outputs (0major+216611minor)pagefaults 0swaps
+  19547  109623 5225980 total
+pngzop_pngcrush
+67.07user 0.17system 1:07.29elapsed 99%CPU (0avgtext+0avgdata 78944maxresident)k
+0inputs+36376outputs (0major+84000minor)pagefaults 0swaps
+  18817  106842 5077291 total
+pngzop_brute
+363.02user 0.84system 1:04.50elapsed 564%CPU (0avgtext+0avgdata 80912maxresident)k
+0inputs+243320outputs (0major+347055minor)pagefaults 0swaps
+  18977  107006 5077025 total
+
+i
+/scratch/glennrp/ZZ/i
+pngcrush
+7.63user 0.04system 0:07.68elapsed 99%CPU (0avgtext+0avgdata 7552maxresident)k
+0inputs+1768outputs (0major+11345minor)pagefaults 0swaps
+  3365  19152 888909 total
+pngcrush -brute
+70.08user 0.54system 1:10.69elapsed 99%CPU (0avgtext+0avgdata 7392maxresident)k
+0inputs+1760outputs (0major+215227minor)pagefaults 0swaps
+  3339  19069 888023 total
+pngzop_pngcrush
+203.64user 0.25system 3:24.19elapsed 99%CPU (0avgtext+0avgdata 257024maxresident)k
+0inputs+21824outputs (0major+179439minor)pagefaults 0swaps
+  3123  17887 828950 total
+pngzop_brute
+1162.93user 1.66system 3:44.79elapsed 518%CPU (0avgtext+0avgdata 280768maxresident)k
+0inputs+138608outputs (0major+1071825minor)pagefaults 0swaps
+  3215  17897 827208 total

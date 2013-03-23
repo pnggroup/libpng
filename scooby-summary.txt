@@ -1,0 +1,47 @@
+
+Scooby results with zopfli --I25:
+
+a pngcrush         0.28user 0.13system 0:00.42elapsed  46623 total
+  pngcrush -brute  6.60user 1.45system 0:08.10elapsed  46368 total
+  pngzop_pngcrush 15.60user 5.94system 0:27.81elapsed  46145 total
+  pngzop_brute   119.13user 38.43system 0:43.11elapsed 46139 total
+
+b pngcrush         1.09user 0.20system 0:01.30elapsed  354086 total
+  pngcrush -brute 17.20user 3.74system 0:21.02elapsed  351517 total
+  pngzop_pngcrush 57.00user 10.76system 1:19.73elapsed 347229 total
+  pngzop_brute   371.07user 67.23system 1:53.12elapsed 346825 total
+
+c pngcrush          2.27user 0.24system 0:02.53elapsed  862928 total
+  pngcrush -brute  35.26user 2.58system 0:37.93elapsed  858463 total
+  pngzop_pngcrush 104.93user 7.65system 2:00.50elapsed  838686 total
+  pngzop_brute    658.97user 49.82system 2:52.64elapsed 837426 total
+
+d pngcrush          9.19user 0.21system 0:09.42elapsed  1903162 total
+  pngcrush -brute 116.36user 3.20system 1:59.67elapsed  1895523 total
+  pngzop_pngcrush 442.75user 3.94system 7:28.62elapsed  1767997 total
+  pngzop_brute   2439.72user 20.39system 7:48.45elapsed 1767559 total
+
+e pngcrush         2.14user 0.00system 0:02.15elapsed 335339 ie_pc.png
+  pngcrush -brute 19.64user 0.09system 0:19.75elapsed 332668 ie_bf.png
+  pngzop_pngcrush 40.27user 0.01system 0:40.33elapsed 317125 ie_pngzop.png
+  pngzop_brute   239.30user 0.14system 0:43.02elapsed 317125 ie_pngzop_brute.png
+
+f pngcrush        10.48user 0.05system 0:10.55elapsed 4357651 total
+  pngcrush -brute143.58user 0.68system 2:24.40elapsed 4346809 total
+  pngzop_pngcrush111.85user 0.22system 1:52.24elapsed 4167473 total
+  pngzop_brute   538.88user 1.01system 1:38.01elapsed 4167473 total
+
+g pngcrush          9.18user 0.05system 0:09.24elapsed 5694210 total
+  pngcrush -brute 135.51user 0.87system 2:16.51elapsed 5676667 total
+  pngzop_pngcrush 103.02user 0.25system 1:43.37elapsed 5447000 total
+  pngzop_brute    525.62user 1.00system 1:34.61elapsed 5440483 total
+
+h pngcrush          5.31user 0.03system 0:05.35elapsed 5263535 total
+  pngcrush -brute  86.52user 0.71system 1:27.32elapsed 5225980 total
+  pngzop_pngcrush  67.07user 0.17system 1:07.29elapsed 5077291 total
+  pngzop_brute    363.02user 0.84system 1:04.50elapsed 5077025 total
+
+i pngcrush          7.63user 0.04system 0:07.68elapsed  888909 total
+  pngcrush -brute  70.08user 0.54system 1:10.69elapsed  888023 total
+  pngzop_pngcrush 203.64user 0.25system 3:24.19elapsed  828950 total
+  pngzop_brute   1162.93user 1.66system 3:44.79elapsed  827208 total
