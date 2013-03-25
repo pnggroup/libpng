@@ -40,7 +40,7 @@ wait
 rm -f ${root}_f?.idat
 
 # Copy the smallest result to file.zlib
-cat `ls -S ${root}_f?.idat.zlib | tail -1` > ${root}.zlib
+cat `pngzop_smallest.sh ${root}_f?.idat.zlib | tail -1` > ${root}.zlib
 rm -f ${root}_f?.idat.zlib
 
 shift
