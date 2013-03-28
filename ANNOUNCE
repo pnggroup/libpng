@@ -1,38 +1,34 @@
 
-Libpng 1.5.15rc01 - March 21, 2013
+Libpng 1.5.15 - March 28, 2013
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.15rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.15rc01.tar.gz
-   1.5.15rc01.tar.bz2
+   libpng-1.5.15.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.15.tar.gz
+   libpng-1.5.15.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1515r01.7z  (LZMA-compressed, recommended)
-   lp1515r01.zip
+   lpng1515.7z  (LZMA-compressed, recommended)
+   lpng1515.zip
 
 Other information:
 
-   1.5.15rc01-README.txt
-   1.5.15rc01-LICENSE.txt
+   libpng-1.5.15-README.txt
+   libpng-1.5.15-LICENSE.txt
 
 Changes since the last public release (1.5.14):
 
-Version 1.5.15beta01 [February 4, 2013]
   Enabled renaming of the extern (but not DLL exported) ARM filter functions.
     Also enabled inclusion of pngpriv.h in non-C files by preventing C/C++
     specific definitions if PNG_VERSION_INFO_ONLY is defined.
   Added png_get_palette_max() function.
-
-Version 1.5.15beta02 [February 5, 2013]
   Made a probably general fix for the preprocessing used to generate source
     files. This change might make the check for a special C preprocessor
     unnecessary, and it also eliminates the requirement for sed in the
@@ -40,35 +36,23 @@ Version 1.5.15beta02 [February 5, 2013]
   Fix typo in Makefile.am, fix scripts/pnglibconf.mak and makefile.std
   Rebuilt Makefile.in, configure, etc., with autoconf-2.69 and automake-1.13
   Fix 'setting' handling in options.awk and fixed palette_max API
-
-Version 1.5.15beta03 [February 7, 2013]
   Remove SUN OS cc -E workround - no longer required
   Turn serial tests back on (recently turned off by autotools upgrade).
-
-Version 1.5.15beta04 [February 15, 2013]
   Enclosed the new png_get_palette_max in #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
     block, and revised pnglibconf.h and pnglibconf.h.prebuilt accordingly.
-
-Version 1.5.15beta05 [February 17, 2013]
   Use approved/supported Android method to check for NEON, use Linux/POSIX
     1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
     library calls.
   Fixed a race condition in the creation of the build 'scripts' directory
     while building with a parallel make.
   Use parentheses more consistently in "#if defined(MACRO)" tests.
-
-Version 1.5.15beta06 [February 22, 2013]
   Fixed PNG_ALIGN(ED)_MEMORY and add ability to turn off ARM_NEON
     runtime checks
   Updated the INSTALL document.
-
-Version 1.5.15beta07 [February 27, 2013]
   Revised INSTALL to recommend using CPPFLAGS instead of INCLUDES.
   Revised scripts/makefile.freebsd to respect ZLIBLIB and ZLIBINC.
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
-
-Version 1.5.15beta08 [March 5, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Made the _SUPPORTED macro definitions consistent. The change made in
     libpng15 to #define *_SUPPORTED 1, to match the use of -D*_SUPPORTED
@@ -89,8 +73,6 @@ Version 1.5.15beta08 [March 5, 2013]
   The order of settings vs options in pnglibconf.h is reversed to allow
     settings to depend on options and options can now set (or override) the
     defaults for settings.
-
-Version 1.5.15beta09 [March 13, 2013]
   Fixed CMakelists.txt to allow building a single variant of the library
     (Claudio Bley):
   Introduced a PNG_LIB_TARGETS variable that lists all activated library
@@ -105,9 +87,6 @@ Version 1.5.15beta09 [March 13, 2013]
   Eliminated two warnings from the Intel C compiler. The warnings are
     technically valid, although a reasonable treatment of division would
     show it to be incorrect.
-
-Version 1.5.15rc01 [March 21, 2013]
-  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
