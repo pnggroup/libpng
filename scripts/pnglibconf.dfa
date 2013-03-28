@@ -27,7 +27,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # The syntax is detailed in scripts/options.awk; this is a summary
 # only:
 #
-# setting <name> [default]
+# setting <name> [requires ...] [default]
 #    #define PNG_<name> <value>  /* value comes from current setting */
 # option <name> [requires ...] [if ...] [enables ...] [disabled]
 #    #define PNG_<name>_SUPPORTED if the requirements are met and
@@ -38,6 +38,11 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #    WRITE_something for write, but the enables list members are
 #    used as given (e.g. enables GAMMA just expands to that on the
 #    correspond READ_name and WRITE_name lines.)
+#
+# "," may be used to separate options on an 'option' line and is ignored; it
+# doesn't change the meaning of the line.  (NOT setting, where "," becomes
+# part of the setting!)  A comma at the end of an option line causes a
+# continuation (the next line is included in the option too.)
 #
 # Note that the 'on' and 'off' keywords, while valid on both option
 # and chunk, should not be used in this file because they force the
@@ -131,6 +136,12 @@ logunsupported = 1
 # - PNG_USER_VERSIONINFO_COMPANYNAME
 # - PNG_USER_VERSIONINFO_LEGALTRADEMARKS
 
+# It is necessary to include configures definitions here so that AC_DEFINE
+# in configure.ac works in a comprehensible way
+@#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
+@#  include "config.h"
+@#endif
+
 @#ifdef PNG_USER_CONFIG
 @#  include "pngusr.h"
 @#endif
@@ -145,6 +156,12 @@ logunsupported = 1
 @#  ifndef PNG_API_RULE
 @#     define PNG_API_RULE 2 /* Use Watcom calling conventions */
 @#  endif
+@#endif
+
+# This changes the default for the ARM NEON optimizations according to
+# __ARM_NEON__
+@#ifdef __ARM_NEON__
+@#  define PNG_ARM_NEON_SUPPORTED
 @#endif
 
 # IN DEVELOPMENT
@@ -182,6 +199,29 @@ setting PREFIX
 
 setting DEFAULT_READ_MACROS default 1
 
+# This setting allows a hardware or configuration specific filter optimization
+# function to be specified, the argument is the name of the filter initializaion
+# function to use.
+
+setting FILTER_OPTIMIZATIONS
+
+# Implementation specific control of the optimizations, enabled by those
+# hardware or software options that need it (typically when run-time choices
+# must be made by the user)
+option SET_OPTION disabled
+
+# These options are specific to the ARM NEON hardware optimizations:
+#
+# ARM_NEON: the optimization itself
+# ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
+# ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
+#                 supported, this is poorly supported and deprectated - use the
+#                 png_set_hardware API.
+option ARM_NEON disabled,
+   sets FILTER_OPTIMIZATIONS png_init_filter_functions_neon
+option ARM_NEON_API disabled enables SET_OPTION ARM_NEON
+option ARM_NEON_CHECK disabled enables ARM_NEON
+
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib, it describes the input
 # data and modifies the zlib parameters in an attempt to optimize the balance
@@ -190,13 +230,17 @@ setting DEFAULT_READ_MACROS default 1
 # because the name of the setting is prefixed by PNG_
 #
 # The TEXT values are the defaults when writing compressed text (all forms)
+#
+# Include the zlib header too, so that the defaults below are known
+@#  include <zlib.h>
 
-setting Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
-setting Z_DEFAULT_STRATEGY default Z_FILTERED
-setting Z_DEFAULT_NOFILTER_STRATEGY default Z_DEFAULT_STRATEGY
+# The '@' here means to substitute the value when pnglibconf.h is built
+setting Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
+setting Z_DEFAULT_STRATEGY default @Z_FILTERED
+setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
 
-setting TEXT_Z_DEFAULT_COMPRESSION default Z_DEFAULT_COMPRESSION
-setting TEXT_Z_DEFAULT_STRATEGY default Z_DEFAULT_STRATEGY
+setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
+setting TEXT_Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
 
 # The alternative is to call functions to read PNG values, if
 # the functions are turned *off* the read macros must always
@@ -386,12 +430,12 @@ option READ_TRANSFORMS requires READ
 # If you handle gamma issues outside libpng then you do not need the libpng
 # gamma processing; and it is an enormous waste of space.  You just need to
 # remove the use of libpng APIs that depend on it.
-option READ_GAMMA requires READ_TRANSFORMS READ_gAMA
+option READ_GAMMA requires READ_TRANSFORMS, READ_gAMA
 
-option READ_ALPHA_MODE requires READ_TRANSFORMS READ_GAMMA
-option READ_BACKGROUND requires READ_TRANSFORMS READ_STRIP_ALPHA READ_GAMMA
+option READ_ALPHA_MODE requires READ_TRANSFORMS, READ_GAMMA
+option READ_BACKGROUND requires READ_TRANSFORMS, READ_STRIP_ALPHA, READ_GAMMA
 option READ_BGR requires READ_TRANSFORMS
-option READ_EXPAND_16 requires READ_TRANSFORMS READ_16BIT READ_EXPAND
+option READ_EXPAND_16 requires READ_TRANSFORMS, READ_16BIT, READ_EXPAND
 option READ_EXPAND requires READ_TRANSFORMS
 option READ_FILLER requires READ_TRANSFORMS
 option READ_GRAY_TO_RGB requires READ_TRANSFORMS
@@ -399,13 +443,13 @@ option READ_INVERT_ALPHA requires READ_TRANSFORMS
 option READ_INVERT requires READ_TRANSFORMS
 option READ_PACK requires READ_TRANSFORMS
 option READ_PACKSWAP requires READ_TRANSFORMS
-option READ_RGB_TO_GRAY requires READ_TRANSFORMS READ_GAMMA
+option READ_RGB_TO_GRAY requires READ_TRANSFORMS, READ_GAMMA
 option READ_SCALE_16_TO_8 requires READ_TRANSFORMS
 option READ_SHIFT requires READ_TRANSFORMS
 option READ_STRIP_16_TO_8 requires READ_TRANSFORMS
 option READ_STRIP_ALPHA requires READ_TRANSFORMS
 option READ_SWAP_ALPHA requires READ_TRANSFORMS
-option READ_SWAP requires READ_TRANSFORMS READ_16BIT
+option READ_SWAP requires READ_TRANSFORMS, READ_16BIT
 option READ_USER_TRANSFORM requires READ_TRANSFORMS
 
 option PROGRESSIVE_READ requires READ
@@ -444,7 +488,7 @@ option WRITE_TRANSFORMS requires WRITE
 option WRITE_SHIFT requires WRITE_TRANSFORMS
 option WRITE_PACK requires WRITE_TRANSFORMS
 option WRITE_BGR requires WRITE_TRANSFORMS
-option WRITE_SWAP requires WRITE_TRANSFORMS WRITE_16BIT
+option WRITE_SWAP requires WRITE_TRANSFORMS, WRITE_16BIT
 option WRITE_PACKSWAP requires WRITE_TRANSFORMS
 option WRITE_INVERT requires WRITE_TRANSFORMS
 option WRITE_FILLER requires WRITE_TRANSFORMS
@@ -466,8 +510,8 @@ option WRITE_FLUSH requires WRITE
 
 # Note: these can be turned off explicitly if not required by the
 # apps implementing the user transforms
-option USER_TRANSFORM_PTR if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
-option USER_TRANSFORM_INFO if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
+option USER_TRANSFORM_PTR if READ_USER_TRANSFORM, WRITE_USER_TRANSFORM
+option USER_TRANSFORM_INFO if READ_USER_TRANSFORM, WRITE_USER_TRANSFORM
 
 # This enables API to set compression parameters for compressing
 # non-IDAT chunks (zTXt, iTXt, iCCP, and unknown chunks).  This feature
@@ -568,7 +612,7 @@ setting sRGB_PROFILE_CHECKS default 2
 # but can help (in theory) on some architectures.  Only affects
 # internal structures.  Added at libpng 1.4.0
 
-option ALIGN_MEMORY
+option ALIGNED_MEMORY
 
 # Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
 # See png[wr]util.c, normally this should always be *on*
@@ -660,7 +704,7 @@ chunk bKGD
 chunk cHRM enables COLORSPACE
 chunk gAMA enables GAMMA
 chunk hIST
-chunk iCCP enables COLORSPACE GAMMA
+chunk iCCP enables COLORSPACE, GAMMA
 chunk iTXt
 chunk oFFs
 chunk pCAL
@@ -668,7 +712,7 @@ chunk pHYs
 chunk sBIT
 chunk sCAL
 chunk sPLT
-chunk sRGB enables COLORSPACE GAMMA
+chunk sRGB enables COLORSPACE, GAMMA
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS
@@ -698,7 +742,7 @@ option WRITE_UNKNOWN_CHUNKS enables STORE_UNKNOWN_CHUNKS
 # to png_get_unknown_chunks, the application must call
 # png_set_keep_unknown_chunks to cause this to actually happen (see png.h)
 option SAVE_UNKNOWN_CHUNKS requires READ requires SET_UNKNOWN_CHUNKS
-option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS STORE_UNKNOWN_CHUNKS
+option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS, STORE_UNKNOWN_CHUNKS
 
 # The second approach is to use an application provided callback to process the
 # chunks, the callback can either handle the chunk entirely itself or request
@@ -706,8 +750,8 @@ option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS STORE_UNKNOWN_CHUNKS
 #
 # Note that there is no 'WRITE_USER_CHUNKS' so the USER_CHUNKS option is always
 # the same as READ_USER_CHUNKS at present
-option READ_USER_CHUNKS requires READ requires UNKNOWN_CHUNKS
-option READ_USER_CHUNKS enables READ_UNKNOWN_CHUNKS USER_CHUNKS
+option READ_USER_CHUNKS requires READ, UNKNOWN_CHUNKS
+option READ_USER_CHUNKS enables READ_UNKNOWN_CHUNKS, USER_CHUNKS
 
 # Two further options are provided to allow detailed control of the handling.
 # The first enables png_set_keep_unknown_chunks; this allows the default to be
@@ -774,8 +818,8 @@ option INFO_IMAGE
 
 option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
 option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
-option READ_CHECK_FOR_INVALID_INDEX requires READ CHECK_FOR_INVALID_INDEX
-option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE CHECK_FOR_INVALID_INDEX
+option READ_CHECK_FOR_INVALID_INDEX requires READ, CHECK_FOR_INVALID_INDEX
+option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE, CHECK_FOR_INVALID_INDEX
 
 # added at libpng-1.5.15
 option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX WRITE_GET_PALETTE_MAX
@@ -784,12 +828,11 @@ option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
 
 # Simplified API options (added at libpng-1.6.0)
 # Read:
-option SIMPLIFIED_READ requires SEQUENTIAL_READ READ_TRANSFORMS SETJMP
-option SIMPLIFIED_READ requires BENIGN_ERRORS READ_GAMMA
-option SIMPLIFIED_READ enables READ_EXPAND READ_16BIT READ_EXPAND_16
-option SIMPLIFIED_READ enables READ_SCALE_16_TO_8 READ_RGB_TO_GRAY
-option SIMPLIFIED_READ enables READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA
-option SIMPLIFIED_READ enables READ_FILLER READ_SWAP
+option SIMPLIFIED_READ,
+   requires SEQUENTIAL_READ READ_TRANSFORMS, SETJMP, BENIGN_ERRORS READ_GAMMA,
+   enables READ_EXPAND, READ_16BIT READ_EXPAND_16, READ_SCALE_16_TO_8,
+      READ_RGB_TO_GRAY, READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA,
+      READ_FILLER, READ_SWAP
 
 option SIMPLIFIED_READ_AFIRST requires SIMPLIFIED_READ disabled
 option READ_SWAP_ALPHA enables SIMPLIFIED_READ_AFIRST
@@ -798,8 +841,9 @@ option SIMPLIFIED_READ_BGR requires SIMPLIFIED_READ disabled
 option READ_BGR enables SIMPLIFIED_READ_BGR
 
 # Write:
-option SIMPLIFIED_WRITE requires WRITE STDIO SETJMP
-option SIMPLIFIED_WRITE enables WRITE_SWAP WRITE_gAMA WRITE_sRGB WRITE_cHRM
+option SIMPLIFIED_WRITE,
+   requires WRITE STDIO, SETJMP,
+   enables WRITE_SWAP WRITE_gAMA, WRITE_sRGB WRITE_cHRM
 
 option SIMPLIFIED_WRITE_AFIRST requires SIMPLIFIED_WRITE disabled
 option WRITE_SWAP_ALPHA enables SIMPLIFIED_WRITE_AFIRST
@@ -808,5 +852,5 @@ option SIMPLIFIED_WRITE_BGR requires SIMPLIFIED_WRITE disabled
 option WRITE_BGR enables SIMPLIFIED_WRITE_BGR
 
 # Formats:
-option FORMAT_AFIRST if SIMPLIFIED_READ_AFIRST SIMPLIFIED_WRITE_AFIRST
-option FORMAT_BGR if SIMPLIFIED_READ_BGR SIMPLIFIED_WRITE_BGR
+option FORMAT_AFIRST if SIMPLIFIED_READ_AFIRST, SIMPLIFIED_WRITE_AFIRST
+option FORMAT_BGR if SIMPLIFIED_READ_BGR, SIMPLIFIED_WRITE_BGR

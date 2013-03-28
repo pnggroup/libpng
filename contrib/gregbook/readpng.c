@@ -215,6 +215,10 @@ uch *readpng_get_image(double display_exponent, int *pChannels, ulg *pRowbytes)
      * libpng function */
 
     if (setjmp(png_jmpbuf(png_ptr))) {
+        free(image_data);
+        image_data = NULL;
+        free(row_pointers);
+        row_pointers = NULL;
         png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
         return NULL;
     }

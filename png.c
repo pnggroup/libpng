@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_0 Your_png_h_is_not_version_1_6_0;
+typedef png_libpng_version_1_6_1 Your_png_h_is_not_version_1_6_1;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -768,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.0 - February 14, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.6.1 - March 28, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.0 - February 14, 2013\
+      return "libpng version 1.6.1 - March 28, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1407,8 +1407,10 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
       red_inverse))
       return 1;
 
-   if (!png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse)) return 1;
-   if (!png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse)) return 1;
+   if (!png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse))
+      return 1;
+   if (!png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse))
+      return 1;
    if (!png_muldiv(&XYZ->green_Z, PNG_FP_1 - xy->greenx - xy->greeny, PNG_FP_1,
       green_inverse))
       return 1;
@@ -1647,7 +1649,7 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
    return 0; /* failed */
 }
 
-#if defined PNG_sRGB_SUPPORTED || defined PNG_iCCP_SUPPORTED
+#if defined(PNG_sRGB_SUPPORTED) || defined(PNG_iCCP_SUPPORTED)
 /* Error message generation */
 static char
 png_icc_tag_char(png_uint_32 byte)
@@ -2127,7 +2129,7 @@ static const struct
       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 perceptual")
 
-   PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
+   PNG_ICC_CHECKSUM(0x0398f3fc, 0xf29e526d,
       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };
@@ -2177,7 +2179,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
          if (length == png_sRGB_checks[i].length &&
             intent == png_sRGB_checks[i].intent)
          {
-            /* Now calculate the alder32 if not done already. */
+            /* Now calculate the adler32 if not done already. */
             if (adler == 0)
             {
                adler = adler32(0, NULL, 0);
@@ -3090,7 +3092,7 @@ png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 #endif
 
 #if defined(PNG_READ_GAMMA_SUPPORTED) || \
-    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG__READ_pHYs_SUPPORTED)
+    defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* muldiv functions */
 /* This API takes signed arguments and rounds the result to the nearest
  * integer (or, for a fixed point number - the standard argument - to
@@ -4010,9 +4012,30 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 }
 #endif /* READ_GAMMA */
 
+/* HARDWARE OPTION SUPPORT */
+#ifdef PNG_SET_OPTION_SUPPORTED
+int PNGAPI
+png_set_option(png_structrp png_ptr, int option, int onoff)
+{
+   if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
+      (option & 1) == 0)
+   {
+      int mask = 3 << option;
+      int setting = (2 + (onoff != 0)) << option;
+      int current = png_ptr->options;
+
+      png_ptr->options = (png_byte)((current & ~mask) | setting);
+
+      return (current & mask) >> option;
+   }
+
+   return PNG_OPTION_INVALID;
+}
+#endif
+
 /* sRGB support */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* sRGB conversion tables; these are machine generated with the code in
  * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
  * specification (see the article at http://en.wikipedia.org/wiki/SRGB)
@@ -4180,8 +4203,8 @@ const png_byte png_sRGB_delta[512] =
 #endif /* SIMPLIFIED READ/WRITE sRGB support */
 
 /* SIMPLIFIED READ/WRITE SUPPORT */
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 static int
 png_image_free_function(png_voidp argument)
 {

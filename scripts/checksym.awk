@@ -113,6 +113,16 @@ END{
       err = 1
    }
    unexported=0
+   # Add a standard header to symbols.new:
+   print ";Version INSERT-VERSION-HERE" >of
+   print ";--------------------------------------------------------------" >of
+   print "; LIBPNG symbol list as a Win32 DEF file" >of
+   print "; Contains all the symbols that can be exported from libpng" >of
+   print ";--------------------------------------------------------------" >of
+   print "LIBRARY" >of
+   print "" >of
+   print "EXPORTS" >of
+
    for (o=1; o<=lasto; ++o) {
       if (symbol[o] == "" && removed[o] == "") {
          if (unexported == 0) unexported = o

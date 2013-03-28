@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "February 14, 2013"
+.TH LIBPNG 3 "March 28, 2013"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.0
+libpng \- Portable Network Graphics (PNG) Reference Library 1.6.1
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -504,7 +504,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.0 - February 14, 2013
+ libpng version 1.6.1 - March 28, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -515,7 +515,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.0 - February 14, 2013
+ libpng versions 0.97, January 1998, through 1.6.1 - March 28, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -1031,9 +1031,14 @@ you can retrieve with
     png_get_user_chunk_ptr(png_ptr);
 
 If you call the png_set_read_user_chunk_fn() function, then all unknown
-chunks will be saved when read, in case your callback function will need
-one or more of them.  This behavior can be changed with the
-png_set_keep_unknown_chunks() function, described below.
+chunks which the callback does not handle will be saved when read.  You can
+cause them to be discarded by returning '1' ("handled") instead of '0'.  This
+behavior will change in libpng 1.7 and the default handling set by the
+png_set_keep_unknown_chunks() function, described below, will be used when the
+callback returns 0.  If you want the existing behavior you should set the global
+default to PNG_HANDLE_CHUNK_IF_SAFE now; this is compatible with all current
+versions of libpng and with 1.7.  Libpng 1.6 issues a warning if you keep the
+default, or PNG_HANDLE_CHUNK_NEVER, and the callback returns 0.
 
 At this point, you can set up a callback function that will be
 called after each row has been read, which you can use to control
@@ -1132,15 +1137,17 @@ callback function:
     ...
 
     #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
-      /* ignore all unknown chunks: */
-      png_set_keep_unknown_chunks(read_ptr, 1, NULL, 0);
+      /* ignore all unknown chunks
+       * (use global setting "2" for libpng16 and earlier):
+       */
+      png_set_keep_unknown_chunks(read_ptr, 2, NULL, 0);
 
       /* except for vpAg: */
       png_set_keep_unknown_chunks(read_ptr, 2, vpAg, 1);
 
       /* also ignore unused known chunks: */
       png_set_keep_unknown_chunks(read_ptr, 1, unused_chunks,
-         (int)sizeof(unused_chunks)/5);
+         (int)(sizeof unused_chunks)/5);
     #endif
 
 .SS User limits
@@ -1492,7 +1499,7 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
-   if (height > PNG_UINT_32_MAX/png_sizeof(png_byte))
+   if (height > PNG_UINT_32_MAX/(sizeof (png_byte)))
       png_error (png_ptr,
           "Image is too tall to process in memory");
 
@@ -1501,7 +1508,7 @@ row_pointers prior to calling png_read_png() with
           "Image is too wide to process in memory");
 
    row_pointers = png_malloc(png_ptr,
-       height*png_sizeof(png_bytep));
+       height*(sizeof (png_bytep)));
 
    for (int i=0; i<height, i++)
       row_pointers[i]=NULL;  /* security precaution */
@@ -5458,7 +5465,7 @@ The following API are now DEPRECATED:
    png_free_default()
    png_reset_zstream()
 
-The following has been removed:
+The following have been removed:
    png_get_io_chunk_name(), which has been replaced
      with png_get_io_chunk_type().  The new
      function returns a 32-bit integer instead of
@@ -5477,6 +5484,9 @@ Error detection in some chunks has improved; in particular the iCCP chunk
 reader now does pretty complete validation of the basic format.  Some bad
 profiles that were previously accepted are now rejected, in particular the
 very old broken Microsoft/HP sRGB profile.
+
+The library now issues an error if the application attempts to set a
+transform after it calls png_read_update_info().
 
 The library now issues a warning if both background processing and RGB to
 gray are used when gamma correction happens. As with previous versions of
@@ -5639,7 +5649,8 @@ left parenthesis that follows it:
        y[i] = a(x) + (int)b;
 
 We prefer #ifdef and #ifndef to #if defined() and #if !defined()
-when there is only one macro being tested.
+when there is only one macro being tested.  We always use parentheses
+with "defined".
 
 We prefer to express integers that are used as bit masks in hex format,
 with an even number of lower-case hex digits (e.g., 0x00, 0xff, 0x0100).
@@ -5655,13 +5666,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-February 14, 2013
+March 28, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.0 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.1 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -5869,6 +5880,8 @@ the first widely used release:
  1.6.0beta01-40      16    10600  16.so.16.0[.0]
  1.6.0rc01-08        16    10600  16.so.16.0[.0]
  1.6.0               16    10600  16.so.16.0[.0]
+ 1.6.1rc01           16    10601  16.so.16.1[.0]
+ 1.6.1               16    10601  16.so.16.1[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -5925,7 +5938,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.0 - February 14, 2013:
+Libpng version 1.6.1 - March 28, 2013:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5948,7 +5961,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.0, February 14, 2013, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.1, March 28, 2013, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6047,7 +6060,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-February 14, 2013
+March 28, 2013
 
 .\" end of man page
 

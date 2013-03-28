@@ -7,24 +7,44 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-TESTS_ENVIRONMENT= srcdir=$(srcdir)
-check_PROGRAMS= pngtest
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid
+
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS = test-pngtest.sh
 
-# Only do the following if the contrib directory is present.
-check_PROGRAMS+= pngvalid pngstest pngunknown
 pngvalid_SOURCES = contrib/libtests/pngvalid.c
-pngstest_SOURCES = contrib/libtests/pngstest.c
-pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngstest_SOURCES = contrib/libtests/pngstest.c
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-TESTS += contrib/libtests/test-pngunknown.sh\
-	 contrib/libtests/test-pngvalid-simple.sh\
-	 contrib/libtests/test-pngvalid-full.sh\
-	 contrib/libtests/test-pngstest.sh
+
+# Generally these are single line shell scripts to run a test with a particular
+# set of parameters:
+TESTS =\
+   tests/pngtest\
+   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
+   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+   tests/pngvalid-gamma-expand16-background\
+   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
+   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+   tests/pngvalid-progressive-interlace-size\
+   tests/pngvalid-progressive-interlace-standard\
+   tests/pngvalid-progressive-interlace-transform\
+   tests/pngvalid-progressive-standard tests/pngvalid-standard\
+   tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
+   tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
+   tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
+   tests/pngstest-3p04 tests/pngstest-3p08 tests/pngstest-4a08\
+   tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
+   tests/pngstest-error tests/pngunknown-IDAT\
+   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
+   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg
+
+# These tests are expected, and required, to fail:
+XFAIL_TESTS = tests/pngstest-error
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
@@ -77,12 +97,14 @@ nodist_pkginclude_HEADERS= pnglibconf.h
 pkgconfigdir = @pkgconfigdir@
 pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 
-#extra source distribution files.
+# Extra source distribution files, '${srcdir}' is used below to stop build files
+# from those directories being included.  This only works if the configure is
+# not done in the source directory!
 EXTRA_DIST= \
 	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
-	$(TESTS) \
+	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 
 SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
@@ -180,16 +202,14 @@ SYMBOL_CFLAGS += -DPNG_PREFIX='@PNG_PREFIX@'
 endif
 
 .dfn.out:
-	rm -f $@ $*.c $*.tf[123]
-	test -d scripts || mkdir scripts
+	rm -f $@ $*.c $*.tf[12]
+	test -d scripts || mkdir scripts || test -d scripts
 	echo '#include "$<"' >$*.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $*.c > $*.tf1
-	$(SED) -n -e 's|^.*PNG_DEFN_MAGIC *-\(.*\)- *PNG_DEFN_END.*$$|\1|p'\
-	    $*.tf1 >$*.tf2
-	$(SED) -e 's| *PNG_JOIN *||g' -e 's| *$$||' $*.tf2 >$*.tf3
-	rm -f $*.c $*.tf[12]
-	mv $*.tf3 $@
+	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
+	rm -f $*.c $*.tf1
+	mv $*.tf2 $@
 
 # The .dfn file for pnglibconf.h is machine generated
 pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)

@@ -1,11 +1,11 @@
 
 /* pnginfo.h - header file for PNG reference library
  *
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -88,7 +88,7 @@ struct png_info_def
     * and initialize the appropriate fields below.
     */
 
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
    /* png_colorspace only contains 'flags' if neither GAMMA or COLORSPACE are
     * defined.  When COLORSPACE is switched on all the colorspace-defining
     * chunks should be enabled, when GAMMA is switched on all the gamma-defining

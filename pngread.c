@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -15,7 +15,7 @@
  */
 
 #include "pngpriv.h"
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED && defined PNG_STDIO_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 #  include <errno.h>
 #endif
 
@@ -877,8 +877,8 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#if (defined PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) &&\
-   (defined PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
+#if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) &&\
+   defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free(png_ptr, png_ptr->unknown_chunk.data);
 #endif
 
@@ -2003,6 +2003,28 @@ png_image_read_colormap(png_voidp argument)
 
    else
       back_b = back_r = back_g = 255;
+
+   /* Default the input file gamma if required - this is necessary because
+    * libpng assumes that if no gamma information is present the data is in the
+    * output format, but the simplified API deduces the gamma from the input
+    * format.
+    */
+   if ((png_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA) == 0)
+   {
+      /* Do this directly, not using the png_colorspace functions, to ensure
+       * that it happens even if the colorspace is invalid (though probably if
+       * it is the setting will be ignored)  Note that the same thing can be
+       * achieved at the application interface with png_set_gAMA.
+       */
+      if (png_ptr->bit_depth == 16 &&
+         (image->flags & PNG_IMAGE_FLAG_16BIT_sRGB) == 0)
+         png_ptr->colorspace.gamma = PNG_GAMMA_LINEAR;
+
+      else
+         png_ptr->colorspace.gamma = PNG_GAMMA_sRGB_INVERSE;
+
+      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
+   }
 
    /* Decide what to do based on the PNG color type of the input data.  The
     * utility function png_create_colormap_entry deals with most aspects of the
@@ -3547,7 +3569,8 @@ png_image_read_direct(png_voidp argument)
       {
          png_fixed_point input_gamma_default;
 
-         if (base_format & PNG_FORMAT_FLAG_LINEAR)
+         if ((base_format & PNG_FORMAT_FLAG_LINEAR) &&
+            (image->flags & PNG_IMAGE_FLAG_16BIT_sRGB) == 0)
             input_gamma_default = PNG_GAMMA_LINEAR;
          else
             input_gamma_default = PNG_DEFAULT_sRGB;

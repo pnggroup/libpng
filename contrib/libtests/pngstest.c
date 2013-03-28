@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -22,7 +22,7 @@
 #include <ctype.h>
 #include <math.h>
 
-#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
 #endif
 
@@ -61,6 +61,12 @@
 #  define voidcast(type, value) (value)
 #  define aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
+
+/* During parallel runs of pngstest each temporary file needs a unique name,
+ * this is used to permit uniqueness using a command line argument which can be
+ * up to 22 characters long.
+ */
+static char tmpf[23] = "TMP";
 
 /* Generate random bytes.  This uses a boring repeatable algorithm and it
  * is implemented here so that it gives the same set of numbers on every
@@ -309,6 +315,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 #define KEEP_GOING 32
 #define ACCUMULATE 64
 #define FAST_WRITE 128
+#define sRGB_16BIT 256
 
 static void
 print_opts(png_uint_32 opts)
@@ -329,6 +336,8 @@ print_opts(png_uint_32 opts)
       printf(" --accumulate");
    if (!(opts & FAST_WRITE)) /* --fast is currently the default */
       printf(" --slow");
+   if (opts & sRGB_16BIT)
+      printf(" --sRGB-16bit");
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -3020,6 +3029,10 @@ read_file(Image *image, png_uint_32 format, png_const_colorp background)
          return logerror(image, "file init: ", image->file_name, "");
    }
 
+   /* This must be set after the begin_read call: */
+   if (image->opts & sRGB_16BIT)
+      image->image.flags |= PNG_IMAGE_FLAG_16BIT_sRGB;
+
    /* Have an initialized image with all the data we need plus, maybe, an
     * allocated file (myfile) or buffer (mybuffer) that need to be freed.
     */
@@ -3198,7 +3211,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       static int counter = 0;
       char name[32];
 
-      sprintf(name, "TMP%d.png", ++counter);
+      sprintf(name, "%s%d.png", tmpf, ++counter);
 
       if (png_image_write_to_file(&image->image, name, convert_to_8bit,
          image->buffer+16, (png_int_32)image->stride, image->colormap))
@@ -3482,6 +3495,34 @@ main(int argc, char **argv)
          opts &= ~KEEP_GOING;
       else if (strcmp(arg, "--strict") == 0)
          opts |= STRICT;
+      else if (strcmp(arg, "--sRGB-16bit") == 0)
+         opts |= sRGB_16BIT;
+      else if (strcmp(arg, "--linear-16bit") == 0)
+         opts &= ~sRGB_16BIT;
+      else if (strcmp(arg, "--tmpfile") == 0)
+      {
+         if (c+1 < argc)
+         {
+            if (strlen(argv[++c]) >= sizeof tmpf)
+            {
+               fflush(stdout);
+               fprintf(stderr, "%s: %s is too long for a temp file prefix\n",
+                  argv[0], argv[c]);
+               exit(99);
+            }
+
+            /* Safe: checked above */
+            strcpy(tmpf, argv[c]);
+         }
+
+         else
+         {
+            fflush(stdout);
+            fprintf(stderr, "%s: %s requires a temporary file prefix\n",
+               argv[0], arg);
+            exit(99);
+         }
+      }
       else if (strcmp(arg, "--touch") == 0)
       {
          if (c+1 < argc)
@@ -3492,7 +3533,7 @@ main(int argc, char **argv)
             fflush(stdout);
             fprintf(stderr, "%s: %s requires a file name argument\n",
                argv[0], arg);
-            exit(1);
+            exit(99);
          }
       }
       else if (arg[0] == '+')
@@ -3500,7 +3541,7 @@ main(int argc, char **argv)
          png_uint_32 format = formatof(arg+1);
 
          if (format > FORMAT_COUNT)
-            exit(1);
+            exit(99);
 
          format_set(&formats, format);
       }
@@ -3508,7 +3549,7 @@ main(int argc, char **argv)
       {
          fflush(stdout);
          fprintf(stderr, "%s: unknown option: %s\n", argv[0], arg);
-         exit(1);
+         exit(99);
       }
       else
       {
@@ -3557,7 +3598,7 @@ main(int argc, char **argv)
                buffer[4095] = 0;
                fprintf(stderr, "%s...%s: file name too long\n", buffer,
                   buffer+(4096-32));
-               exit(1);
+               exit(99);
             }
          }
 
@@ -3676,7 +3717,7 @@ main(int argc, char **argv)
          {
             fflush(stdout);
             fprintf(stderr, "%s: write failed\n", touch);
-            exit(1);
+            exit(99);
          }
       }
 
@@ -3684,7 +3725,7 @@ main(int argc, char **argv)
       {
          fflush(stdout);
          fprintf(stderr, "%s: open failed\n", touch);
-         exit(1);
+         exit(99);
       }
    }
 
@@ -3695,6 +3736,7 @@ main(int argc, char **argv)
 int main(void)
 {
    fprintf(stderr, "pngstest: no read support in libpng, test skipped\n");
-   return 0;
+   /* So the test is skipped: */
+   return 77;
 }
 #endif /* PNG_SIMPLIFIED_READ_SUPPORTED */

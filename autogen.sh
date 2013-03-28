@@ -74,7 +74,7 @@ done
 #
 # The autotools generated files:
 libpng_autotools_files="Makefile.in aclocal.m4 config.guess config.h.in\
-   config.sub configure depcomp install-sh ltmain.sh missing"
+   config.sub configure depcomp install-sh ltmain.sh missing test-driver"
 #
 # These are separate because 'maintainer-clean' does not remove them.
 libpng_libtool_files="scripts/libtool.m4 scripts/ltoptions.m4\

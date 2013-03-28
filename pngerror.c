@@ -1,7 +1,7 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -516,7 +516,7 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
    /* This is always supported, but for just read or just write it
     * unconditionally does the right thing.
     */
-#  if (defined PNG_READ_SUPPORTED) && (defined PNG_WRITE_SUPPORTED)
+#  if defined(PNG_READ_SUPPORTED) && defined(PNG_WRITE_SUPPORTED)
       if (png_ptr->mode & PNG_IS_READ_STRUCT)
 #  endif
 
@@ -530,7 +530,7 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
       }
 #  endif
 
-#  if (defined PNG_READ_SUPPORTED) && (defined PNG_WRITE_SUPPORTED)
+#  if defined(PNG_READ_SUPPORTED) && defined(PNG_WRITE_SUPPORTED)
       else if (!(png_ptr->mode & PNG_IS_READ_STRUCT))
 #  endif
 
@@ -844,8 +844,8 @@ png_set_strip_error_numbers(png_structrp png_ptr, png_uint_32 strip_mode)
 }
 #endif
 
-#if defined PNG_SIMPLIFIED_READ_SUPPORTED ||\
-   defined PNG_SIMPLIFIED_WRITE_SUPPORTED
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
+   defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
    /* Currently the above both depend on SETJMP_SUPPORTED, however it would be
     * possible to implement without setjmp support just so long as there is some
     * way to handle the error return here:

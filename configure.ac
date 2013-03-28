@@ -18,7 +18,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.0],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.1],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -26,9 +26,11 @@ AC_CONFIG_MACRO_DIR([scripts])
 # silent-rules requires automake 1.11 or later
 # dist-xz requires automake 1.11 or later
 # 1.12.2 fixes a security issue in 1.11.2 and 1.12.1
-AM_INIT_AUTOMAKE([1.12.2 foreign dist-xz color-tests silent-rules serial-tests])
-# was:
-# AM_INIT_AUTOMAKE
+# 1.13 is required for parallel tests
+AM_INIT_AUTOMAKE([1.13 foreign dist-xz color-tests silent-rules])
+# The following line causes --disable-maintainer-mode to be the default to
+# configure, this is necessary because libpng distributions cannot rely on the
+# time stamps of the autotools generated files being correct
 AM_MAINTAINER_MODE
 
 dnl configure.ac and Makefile.am expect automake 1.11.2 or a compatible later
@@ -37,10 +39,10 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.0
+PNGLIB_VERSION=1.6.1
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
-PNGLIB_RELEASE=0
+PNGLIB_RELEASE=1
 
 dnl End of version number stuff
 
@@ -53,8 +55,7 @@ AC_PROG_CC
 AM_PROG_AS
 LT_PATH_LD
 AC_PROG_CPP
-AC_CHECK_TOOL(SED, sed, :)
-AC_CHECK_TOOL(AWK, awk, :)
+AC_PROG_AWK
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
@@ -64,29 +65,22 @@ dnl compatible later version may be used
 LT_INIT([win32-dll])
 LT_PREREQ([2.4.2])
 
-# On Solaris 10 and 12 CPP gets set to cc -E, however this still
-# does some input parsing.  We need strict ANSI-C style tokenization,
-# check this:
-AC_REQUIRE_CPP
-AC_MSG_CHECKING([for a C preprocessor that does not parse its input])
-AC_PREPROC_IFELSE([AC_LANG_SOURCE([[1.1.1 16BIT]])],
-   [DFNCPP="$CPP"],
-   [  DFNCPP=""
-      sav_CPP="$CPP"
-      for CPP in "${CC-cc} -E" "${CC-cc} -E -traditional-cpp" "/lib/cpp" "cpp"
-      do
-         AC_PREPROC_IFELSE([AC_LANG_SOURCE([[1.1.1 16BIT]])],
-            [DFNCPP="$CPP"]
-            [break],,)
-      done
-      CPP="$sav_CPP"
-   ])
-if test -n "$DFNCPP"; then
-   AC_MSG_RESULT([$DFNCPP])
-   AC_SUBST(DFNCPP)
+# Some awks crash when confronted with pnglibconf.dfa, do a test run now
+# to make sure this doesn't happen
+AC_MSG_CHECKING([that AWK works])
+if ${AWK} -f ${srcdir}/scripts/options.awk out="/dev/null" version=search\
+   ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
+   ${srcdir}/pngusr.dfa 1>&2
+then
+   AC_MSG_RESULT([ok])
 else
-   AC_MSG_FAILURE([not found], 1)
+   AC_MSG_FAILURE([failed], 1)
 fi
+
+# This is a remnant of the old cc -E validation, where it may have been
+# necessary to use a different preprocessor for .dfn files
+DFNCPP="$CPP"
+AC_SUBST(DFNCPP)
 
 # -Werror cannot be passed to GCC in CFLAGS because configure will fail (it
 # checks the compiler with a program that generates a warning), add the
@@ -115,7 +109,6 @@ AC_ARG_ENABLE(werror,
 
 # Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS([malloc.h stdlib.h string.h strings.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -239,15 +232,29 @@ AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
 AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
 
 AC_ARG_ENABLE([arm-neon],
-   AS_HELP_STRING([[[--enable-arm-neon]]], [Enable ARM NEON optimizations]),
-   [if test "${enableval}" = "yes"; then
-      AC_DEFINE([PNG_FILTER_OPTIMIZATIONS],
-                [png_init_filter_functions_neon],
-                [ARM NEON filter initialization function])
-      AC_DEFINE([PNG_ALIGNED_MEMORY_SUPPORTED], [1],
-                [Align row buffers])
-    fi])
-AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" = yes])
+   AS_HELP_STRING([[[--enable-arm-neon]]],
+      [Enable ARM NEON optimizations: =off, check, api, on:]
+      [off: disable the optimizations; check: use internal checking code]
+      [(deprecated and poorly supported); api: disable by default, enable by]
+      [a call to png_set_option; on: turn on unconditionally.  The]
+      [default is 'on' if __ARM_NEON__ is defined, otherwise 'off'.]),
+   [case "$enableval" in
+      off)
+         AC_DEFINE([PNG_NO_ARM_NEON], [],
+                   [Disable ARM Neon optimizations]);;
+      check)
+         AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
+                   [Check for ARM Neon support at run-time]);;
+      api)
+         AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
+                   [Turn on ARM Neon optimizations at run-time]);;
+      on)
+         AC_DEFINE([PNG_ARM_NEON_SUPPORTED], [],
+                   [Enable ARM Neon optimizations]);;
+      *)
+         AC_MSG_ERROR([arm-neon: option value required (off/check/api/on)]);;
+   esac])
+AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" != "no"])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

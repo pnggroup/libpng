@@ -1,8 +1,8 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
- * Copyright (c) 1998-2012 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -2804,21 +2804,26 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
             {
                /* If the keep value is 'default' or 'never' override it, but
                 * still error out on critical chunks unless the keep value is
-                * 'always'  While this is weird it is the behavior in 1.4.12.  A
-                * possible improvement would be to obey the value set for the
+                * 'always'  While this is weird it is the behavior in 1.4.12.
+                * A possible improvement would be to obey the value set for the
                 * chunk, but this would be an API change that would probably
                 * damage some applications.
                 *
                 * The png_app_warning below catches the case that matters, where
-                * the application has neither set specific save for this chunk
-                * or global save.
+                * the application has not set specific save or ignore for this
+                * chunk or global save or ignore.
                 */
                if (keep < PNG_HANDLE_CHUNK_IF_SAFE)
                {
 #                 ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
                      if (png_ptr->unknown_default < PNG_HANDLE_CHUNK_IF_SAFE)
+                     {
+                        png_chunk_warning(png_ptr, "Saving unknown chunk:");
                         png_app_warning(png_ptr,
- "forcing save of an unhandled chunk; please call png_set_keep_unknown_chunks");
+                           "forcing save of an unhandled chunk;"
+                           " please call png_set_keep_unknown_chunks");
+                           /* with keep = PNG_HANDLE_CHUNK_IF_SAFE */
+                     }
 #                 endif
                   keep = PNG_HANDLE_CHUNK_IF_SAFE;
                }
@@ -3350,7 +3355,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      png_uint_32p dp32 = png_aligncast(png_uint_32p,dp);
                      png_const_uint_32p sp32 = png_aligncastconst(
                         png_const_uint_32p, sp);
-                     unsigned int skip = (bytes_to_jump-bytes_to_copy) /
+                     size_t skip = (bytes_to_jump-bytes_to_copy) /
                         (sizeof (png_uint_32));
 
                      do
@@ -3392,7 +3397,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      png_uint_16p dp16 = png_aligncast(png_uint_16p, dp);
                      png_const_uint_16p sp16 = png_aligncastconst(
                         png_const_uint_16p, sp);
-                     unsigned int skip = (bytes_to_jump-bytes_to_copy) /
+                     size_t skip = (bytes_to_jump-bytes_to_copy) /
                         (sizeof (png_uint_16));
 
                      do

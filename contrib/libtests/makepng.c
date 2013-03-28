@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -83,7 +83,7 @@
 #include <math.h>
 #include <errno.h>
 
-#if (defined HAVE_CONFIG_H) && !(defined PNG_NO_CONFIG_H)
+#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
 #endif
 
@@ -440,7 +440,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
       /* Palette with fixed color: the image rows are all 0 and the image width
        * is 16.
        */
-      memset(row, rowbytes, 0);
+      memset(row, 0, rowbytes);
    }
 
    else if (colors[0] == channels_of_type(color_type))
@@ -624,8 +624,8 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
 
             gamma_table[0] = 0;
 
-            for (i=0; i<255; ++i)
-               gamma_table[i] = (png_byte)floor(pow(i/255.,conv) * 255 + 127.5);
+            for (i=1; i<255; ++i)
+               gamma_table[i] = (png_byte)floor(pow(i/255.,conv) * 255 + .5);
 
             gamma_table[255] = 255;
          }

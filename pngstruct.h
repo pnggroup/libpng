@@ -5,7 +5,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -100,7 +100,7 @@ typedef struct png_XYZ
 } png_XYZ;
 #endif /* COLORSPACE */
 
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
 /* A colorspace is all the above plus, potentially, profile information,
  * however at present libpng does not use the profile internally so it is only
  * stored in the png_info struct (if iCCP is supported.)  The rendering intent
@@ -357,6 +357,11 @@ struct png_struct_def
    png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
 #endif
 
+   /* Options */
+#ifdef PNG_SET_OPTION_SUPPORTED
+   png_byte options;           /* On/off state (up to 4 options) */
+#endif
+
 #if PNG_LIBPNG_VER < 10700
 /* To do: remove this from libpng-1.7 */
 #ifdef PNG_TIME_RFC1123_SUPPORTED
@@ -471,11 +476,12 @@ struct png_struct_def
 /* New member added in libpng-1.5.6 */
    png_bytep big_prev_row;
 
+/* New member added in libpng-1.5.7 */
    void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_row_infop row_info,
       png_bytep row, png_const_bytep prev_row);
 
 #ifdef PNG_READ_SUPPORTED
-#if defined PNG_COLORSPACE_SUPPORTED || defined PNG_GAMMA_SUPPORTED
+#if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
    png_colorspace   colorspace;
 #endif
 #endif
