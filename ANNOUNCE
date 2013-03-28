@@ -1,31 +1,29 @@
 
-Libpng 1.6.1rc01 - March 21, 2013
+Libpng 1.6.1 - March 28, 2013
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.1rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.1rc01.tar.gz
+   libpng-1.6.1.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.1.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp161r01.7z  (LZMA-compressed, recommended)
-   lp161r01.zip
+   lpng161.7z  (LZMA-compressed, recommended)
+   lpng161.zip
 
 Other information:
 
-   1.6.1rc01-README.txt
-   1.6.1rc01-LICENSE.txt
+   libpng-1.6.1-README.txt
+   libpng-1.6.1-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
-Version 1.6.1beta01 [February 16, 2013]
   Made symbol prefixing work with the ARM neon optimizations. Also allow
     pngpriv.h to be included for preprocessor definitions only, so it can
     be used in non-C/C++ files. Back ported from libpng 1.7.
@@ -43,13 +41,9 @@ Version 1.6.1beta01 [February 16, 2013]
   Use approved/supported Android method to check for NEON, use Linux/POSIX
     1003.1 API to check /proc/self/auxv avoiding buffer allocation and other
     library calls (ported from libpng15).
-
-Version 1.6.1beta02 [February 19, 2013]
   Use parentheses more consistently in "#if defined(MACRO)" tests.
   Folded long lines.
   Reenabled code to allow zero length PLTE chunks for MNG.
-
-Version 1.6.1beta03 [February 22, 2013]
   Fixed ALIGNED_MEMORY support.
   Allow run-time ARM NEON checking to be disabled. A new configure option:
     --enable-arm-neon=always will stop the run-time checks. New checks
@@ -57,18 +51,11 @@ Version 1.6.1beta03 [February 22, 2013]
     __ARM_NEON__ is set. This should make it fail safe (if someone asks
     for it on then the build will fail if it can't be done.)
   Updated the INSTALL document.
-
-Version 1.6.1beta04 [February 27, 2013]
   Revised INSTALL to recommend using CPPFLAGS instead of INCLUDES.
   Revised scripts/makefile.freebsd to respect ZLIBLIB and ZLIBINC.
   Revised scripts/dfn.awk to work with the buggy MSYS awk that has trouble
     with CRLF line endings.
-
-Version 1.6.1beta05 [March 1, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
-
-
-Version 1.6.1beta06 [March 4, 2013]
   Better documentation of unknown handling API interactions.
   Corrected Android builds and corrected libpng.vers with symbol
     prefixing This adds an API to set optimization options externally,
@@ -78,8 +65,6 @@ Version 1.6.1beta06 [March 4, 2013]
   The order of settings vs options in pnglibconf.h is reversed to allow
     settings to depend on options and options can now set (or override) the
     defaults for settings.
-
-Version 1.6.1beta07 [March 7, 2013]
   Corrected simplified API default gamma for color-mapped output, added
     a flag to change default. In 1.6.0 when the simplified API was used
     to produce color-mapped output from an input image with no gamma
@@ -92,8 +77,6 @@ Version 1.6.1beta07 [March 7, 2013]
     application/user to specify that 16-bit files contain sRGB data
     rather than the default linear.
   Fixed bugs in the pngpixel and makepng test programs.
-
-Version 1.6.1beta08 [March 7, 2013]
   Fixed CMakelists.txt to allow building a single variant of the library
     (Claudio Bley):
   Introduced a PNG_LIB_TARGETS variable that lists all activated library
@@ -105,14 +88,9 @@ Version 1.6.1beta08 [March 7, 2013]
     first argument. When symlinking the filename component of that path is
     determined and used as the link target.
   Use copy_if_different in the CREATE_SYMLINK macro.
-
-Version 1.6.1beta09 [March 13, 2013]
   Eliminated two warnings from the Intel C compiler. The warnings are
     technically valid, although a reasonable treatment of division would
     show it to be incorrect.
-
-Version 1.6.1rc01 [March 21, 2013]
-  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
