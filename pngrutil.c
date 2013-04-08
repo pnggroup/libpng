@@ -3983,7 +3983,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          png_ptr->zstream.avail_out = out;
       }
 
-      else /* check for end */
+      else /* after last row, checking for end */
       {
          png_ptr->zstream.next_out = tmpbuf;
          png_ptr->zstream.avail_out = (sizeof tmpbuf);
@@ -3998,10 +3998,13 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
        */
       ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
 
-      /* Take the unconsumed output back (so, in the 'check' case this just
-       * counts up).
-       */
-      avail_out += png_ptr->zstream.avail_out;
+      /* Take the unconsumed output back. */
+      if (output != NULL)
+         avail_out += png_ptr->zstream.avail_out;
+
+      else /* avail_out counts the extra bytes */
+         avail_out += (sizeof tmpbuf) - png_ptr->zstream.avail_out;
+
       png_ptr->zstream.avail_out = 0;
 
       if (ret == Z_STREAM_END)
@@ -4040,7 +4043,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
       if (output != NULL)
          png_error(png_ptr, "Not enough image data");
 
-      else /* checking */
+      else /* the deflate stream contained extra data */
          png_chunk_benign_error(png_ptr, "Too much image data");
    }
 }

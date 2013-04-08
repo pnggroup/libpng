@@ -4473,8 +4473,11 @@ Version 1.6.1rc01 [March 21, 2013]
 Version 1.6.1 [March 28, 2013]
   No changes.
 
-Version 1.6.2beta01 [April 1, 2013]
+Version 1.6.2beta01 [April 8, 2013]
   Updated documentation of 1.5.x to 1.6.x changes in iCCP chunk handling.
+  Fixed incorrect warning of excess deflate data. End condition - the
+    warning would be produced if the end of the deflate stream wasn't read
+    in the last row.  The warning is harmless.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
