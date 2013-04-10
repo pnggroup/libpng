@@ -1,0 +1,172 @@
+#!/bin/sh
+
+# pngzop
+
+# Copyright 2013 by Glenn Randers-Pehrson
+# Released under the pngcrush license (equivalent to the libpng license)
+
+# Extracts the concatenated data from the IDAT chunks in a set of PNG files,
+# recompresses them with zopfli, and embeds them in a new set of PNG files
+# with suffix ".png" replaced (by default) with "_pngzop.png"
+
+# Requires zopfli, pngcrush (version 1.7.56 or later), zpipe (from the
+# zlib-1.2.7 distribution, in the "examples" directory), and "mkdir -p",
+# along with these programs that should have been installed along with
+# this "pngzop" script:
+#
+#        pngzop_get_ihdr.exe
+#        pngzop_get_idat.exe
+#        pngzop_get_iend.exe
+#        pngzop_zlib_to_idat.exe
+
+# Usage:
+# pngzop [-b|--brute] [-d|--directory dir] [-e|--extension ext] *.png
+
+# Input: *.png
+# Output: *_pngzop.png
+
+# To do: Adjust zlib CMF to reflect actual windowBits required.
+
+brute=
+directory=.
+extension=
+
+for x in $*
+do
+case $1 in
+  -b|--brute)
+    brute=true
+    shift;;
+  -d|--directory)
+    shift
+    directory=$1
+    shift;;
+  -e|--extension)
+    shift
+    extension=$1
+    shift;;
+  *)
+    break;;
+esac
+done
+
+# If a directory was defined, don't change filenames (extension == .png)
+# unless an extension was also defined.
+case x$directory in
+    x.)
+      ;;
+    *)
+      case x$extension in
+        x)
+          extension=.png
+          ;;
+        *)
+          ;;
+      esac
+      mkdir -p $directory
+      ;;
+esac
+
+case x$extension in
+  x)
+    extension=_pngzop.png
+    ;;
+  *)
+    ;;
+esac
+
+case x$brute in
+  xtrue)
+      for x in $*
+      do
+        root=`echo $x | sed -e s/.png$//`
+        pngzop_get_ihdr.exe < $x > ${directory}/${root}${extension}
+
+        # Generate trial PNGs with filter none, 4 PNG filters, and adaptive
+        # filter
+        for f in 0 1 2 3 4 5
+        do
+          pngcrush -q -m 1 -f $f -force $x ${root}_f$f.png &
+        done
+        wait
+
+        # Extract and decompress the zlib datastream from the concatenated
+        # IDAT chunks.
+        for f in 0 1 2 3 4 5
+        do
+          pngzop_get_idat.exe < ${root}_f$f.png | zpipe -d > ${root}_f$f.idat &
+        done
+        wait
+        rm -f ${root}_f?.png
+
+        # Recompress the IDAT data using zopfli
+        for f in 0 1 2 3 4 5
+        do
+          zopfli --i25 --zlib ${root}_f$f.idat &
+        done
+        wait
+        rm -f ${root}_f?.idat
+
+        # Copy the smallest result to file.zlib
+
+        file=${root}_f0.idat.zlib
+        smallest=$file
+        smallsize=`ls -l $file | sed -e "
+s/[^ 	]*[	 ]*\
+[^ 	]*[	 ]*\
+[^ 	]*[	 ]*\
+[^ 	]*[	 ]*\
+//" -e "s/[ 	].*//"`
+
+        for f in 1 2 3 4 5
+        do
+
+        file=${root}_f$f.idat.zlib
+
+        size=`ls -l $file | sed -e "
+s/[^ 	]*[	 ]*\
+[^ 	]*[	 ]*\
+[^ 	]*[	 ]*\
+[^ 	]*[	 ]*\
+//" -e "s/[ 	].*//"`
+
+        if [ $smallsize -gt $size 	] ; then
+        smallest=$file
+        smallsize=$size
+        fi
+        done
+
+        pngzop_zlib_to_idat.exe < $smallest >> ${directory}/${root}${extension}
+        rm -f ${root}_f?.idat.zlib
+        pngzop_get_iend.exe < $x >> ${directory}/${root}${extension}
+
+      done
+    ;;
+
+  x)
+    for x in $*
+    do
+      root=`echo $x | sed -e s/.png$//`
+      pngzop_get_ihdr.exe < $x > ${directory}/${root}${extension}
+      rm -f ${root}_L9.png
+
+      # Do pngcrush level 9 with none, 4 filters, and adaptive filtering, and
+      # select the smallest.
+      pngcrush -q -m 113 -m 114 -m 115 -m 116 -m 117 -m 118 \
+         -force $x ${root}_L9.png
+
+      # Extract and decompress the zlib datastream from the concatenated
+      # IDAT chunks.
+      pngzop_get_idat.exe < ${root}_L9.png | zpipe -d > ${root}_L9.idat
+      rm ${root}_L9.png
+
+      # Recompress with zopfli and write it on output.
+      zopfli --i25 --zlib -c ${root}_L9.idat |
+        pngzop_zlib_to_idat.exe >> ${directory}/${root}${extension}
+      rm ${root}_L9.idat
+      pngzop_get_iend.exe < $x >> ${directory}/${root}${extension}
+      shift
+    done
+    ;;
+
+esac
