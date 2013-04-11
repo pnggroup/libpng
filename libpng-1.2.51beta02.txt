@@ -1,6 +1,6 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.51beta02 - January 22, 2013
+ libpng version 1.2.51beta02 - April 11, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.51beta02 - January 22, 2013
+ libpng versions 0.97, January 1998, through 1.2.51beta02 - April 11, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -3057,11 +3057,11 @@ control.  The git repository was built from old libpng-x.y.z.tar.gz files
 going back to version 0.70.  You can access the git repository (read only)
 at
 
-    git://libpng.git.sourceforge.net/gitroot/libpng
+    git://git.code.sf.net/p/libpng/code
 
-or you can browse it via "gitweb" at
+or you can browse it with a web browser by selecting the "code" button at
 
-    http://libpng.git.sourceforge.net/git/gitweb.cgi?p=libpng
+    https://sourceforge.net/projects/libpng/
 
 Patches can be sent to glennrp at users.sourceforge.net or to
 png-mng-implement at lists.sourceforge.net or you can upload them to
@@ -3179,7 +3179,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-January 22, 2013
+April 11, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
