@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.2 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1055,9 +1055,6 @@ png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
     read_user_transform_fn)
 {
    png_debug(1, "in png_set_read_user_transform_fn");
-
-   if (!png_rtran_ok(png_ptr, 0))
-      return;
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    png_ptr->transformations |= PNG_USER_TRANSFORM;
