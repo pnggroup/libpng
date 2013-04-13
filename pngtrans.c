@@ -786,9 +786,11 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
       (png_ptr->flags & PNG_FLAG_ROW_INIT) != 0)
-         png_app_error(png_ptr,
+   {
+      png_app_error(png_ptr,
             "info change after png_start_read_image or png_read_update_info");
       return;
+   }
 #endif
 
    png_ptr->user_transform_ptr = user_transform_ptr;
