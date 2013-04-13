@@ -4484,6 +4484,7 @@ Version 1.6.2beta01 [April 13, 2013]
     transform_info is called.
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
+  Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
