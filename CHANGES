@@ -4482,6 +4482,8 @@ Version 1.6.2beta01 [April 13, 2013]
     png_set of the transform function, but that doesn't matter unless the
     transform function changes the rowbuf size, and that is only valid if
     transform_info is called.
+  Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
+    (Flavio Medeiros).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
