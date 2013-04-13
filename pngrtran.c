@@ -1056,9 +1056,6 @@ png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
 {
    png_debug(1, "in png_set_read_user_transform_fn");
 
-   if (!png_rtran_ok(png_ptr, 0))
-      return;
-
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    png_ptr->transformations |= PNG_USER_TRANSFORM;
    png_ptr->read_user_transform_fn = read_user_transform_fn;
