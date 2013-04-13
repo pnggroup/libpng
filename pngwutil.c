@@ -1742,15 +1742,15 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
    {
       if (png_text_compress(png_ptr, png_iTXt, &comp, prefix_len) != Z_OK)
          png_error(png_ptr, png_ptr->zstream.msg);
+      png_write_chunk_header(png_ptr, png_iTXt, comp.output_len + prefix_len);
    }
 
    else
    {
       if (comp.input_len > PNG_UINT_31_MAX-prefix_len)
          png_error(png_ptr, "iTXt: uncompressed text too long");
+      png_write_chunk_header(png_ptr, png_iTXt, strlen(text) + prefix_len);
    }
-
-   png_write_chunk_header(png_ptr, png_iTXt, comp.output_len + prefix_len);
 
    png_write_chunk_data(png_ptr, new_key, key_len);
 
