@@ -1,5 +1,5 @@
 
-Libpng 1.6.2beta01 - April 13, 2013
+Libpng 1.6.2beta01 - April 14, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,7 +25,7 @@ Other information:
 
 Changes since the last public release (1.6.1):
 
-Version 1.6.2beta01 [April 13, 2013]
+Version 1.6.2beta01 [April 14, 2013]
   Updated documentation of 1.5.x to 1.6.x changes in iCCP chunk handling.
   Fixed incorrect warning of excess deflate data. End condition - the
     warning would be produced if the end of the deflate stream wasn't read
