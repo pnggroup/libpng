@@ -1738,7 +1738,6 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
    {
       if (png_text_compress(png_ptr, png_iTXt, &comp, prefix_len) != Z_OK)
          png_error(png_ptr, png_ptr->zstream.msg);
-      png_write_chunk_header(png_ptr, png_iTXt, comp.output_len + prefix_len);
    }
 
    else
