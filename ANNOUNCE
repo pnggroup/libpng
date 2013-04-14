@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta07 - April 14, 2013
+Libpng 1.7.0beta08 - April 14, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta07.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta07.tar.gz
+   1.7.0beta08.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta08.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b07.7z  (LZMA-compressed, recommended)
-   lp170b07.zip
+   lp170b08.7z  (LZMA-compressed, recommended)
+   lp170b08.zip
 
 Other information:
 
-   1.7.0beta07-README.txt
-   1.7.0beta07-LICENSE.txt
+   1.7.0beta08-README.txt
+   1.7.0beta08-LICENSE.txt
 
 Changes since the last public release (1.6.0):
 
@@ -248,6 +248,8 @@ Version 1.7.0beta07 [April 14, 2013]
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
   Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
+
+Version 1.7.0beta08 [April 14, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
