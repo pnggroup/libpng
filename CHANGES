@@ -4486,6 +4486,8 @@ Version 1.6.2beta01 [April 14, 2013]
     (Flavio Medeiros).
   Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
 
+Version 1.6.2beta02 [April 14, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
