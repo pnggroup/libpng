@@ -41,6 +41,9 @@ Version 1.6.2beta01 [April 14, 2013]
 Version 1.6.2beta02 [April 17, 2013]
   Added contrib/tools/fixitxt.c, to repair the erroneous iTXt chunk length
     written by libpng-1.6.0 and 1.6.1.
+    Levchenko).
+  Added #ifdef PNG_WRITE_sRGB_SUPPORTED, etc., tests where needed in
+    png_image_write_main() in pngwrite.c (bug report from Yuriy Levchenko).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
