@@ -1,5 +1,5 @@
 
-Libpng 1.6.2beta02 - April 14, 2013
+Libpng 1.6.2beta02 - April 17, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -38,7 +38,9 @@ Version 1.6.2beta01 [April 14, 2013]
     (Flavio Medeiros).
   Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
 
-Version 1.6.2beta02 [April 14, 2013]
+Version 1.6.2beta02 [April 17, 2013]
+  Added contrib/tools/fixitxt.c, to repair the erroneous iTXt chunk length
+    written by libpng-1.6.0 and 1.6.1.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
