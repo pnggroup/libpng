@@ -227,6 +227,8 @@ translate_gamma_flags(png_structrp png_ptr, png_fixed_point output_gamma,
        */
 #     ifdef PNG_READ_sRGB_SUPPORTED
          png_ptr->flags |= PNG_FLAG_ASSUME_sRGB;
+#     else
+         PNG_UNUSED(png_ptr)
 #     endif
       if (is_screen)
          output_gamma = PNG_GAMMA_sRGB;

@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta08 - April 17, 2013
+Libpng 1.7.0beta08 - April 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -249,7 +249,7 @@ Version 1.7.0beta07 [April 14, 2013]
     (Flavio Medeiros).
   Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
 
-Version 1.7.0beta08 [April 17, 2013]
+Version 1.7.0beta08 [April 18, 2013]
   Added contrib/tools/fixitxt.c, to repair the erroneous iTXt chunk length
     written by libpng-1.6.0 and 1.6.1.
 

@@ -25,13 +25,15 @@
  *     gcc -O -o fixitxt fixitxt.c -lz
  */
 
+#define MAX_LENGTH 500000
+
 #define GETBREAK c=getchar(); if (c == EOF) break;
 #include <zlib.h>
 
 main()
 {
    unsigned int i;
-   unsigned char buf[100000];
+   unsigned char buf[MAX_LENGTH];
    unsigned long crc;
    unsigned int c;
 
@@ -46,13 +48,13 @@ if (c != EOF)
 for (;;)
  {
    /* Read the length */
-   unsigned int length;
+   unsigned long length;
    c=GETBREAK; buf[0] = c;
    c=GETBREAK; buf[1] = c;
    c=GETBREAK; buf[2] = c;
    c=GETBREAK; buf[3] = c;
 
-   length=buf[0]<<24 | buf[1]<<16 | buf[2] << 8 | buf[3];
+   length=((((unsigned long) buf[0]<<8 + buf[1]<<16) + buf[2] << 8) + buf[3]);
    /* Read the chunkname */
    c=GETBREAK; buf[4] = c;
    c=GETBREAK; buf[5] = c;
@@ -63,6 +65,9 @@ for (;;)
    /* The iTXt chunk type expressed as integers is (105, 84, 88, 116) */
    if (buf[4] == 105 && buf[5] == 84 && buf[6] == 88 && buf[7] == 116)
    {
+      if (length >= MAX_LENGTH-12)
+         break;  /* To do: handle this more gracefully */
+
       /* Initialize the CRC */
       crc = crc32(0, Z_NULL, 0);
 
@@ -85,6 +90,9 @@ for (;;)
            break;
 
         length++;
+
+        if (length >= MAX_LENGTH-12)
+           break;
 
         c=GETBREAK;
         buf[length+11]=c;
@@ -115,11 +123,7 @@ for (;;)
       {
          c=GETBREAK;
          putchar(c);
-         buf[i]=c;
       }
-
-      crc = crc32(0, Z_NULL, 0);
-      crc = crc32(crc, buf+4, (uInt)length+4);
 
       if (c == EOF)
       {
