@@ -139,23 +139,128 @@ static struct
    { "PLTE", PNG_INFO_PLTE, png_PLTE, 0, 0, ABSENT, 0 },
 
    /* Non-critical chunks that libpng handles */
-   { "bKGD", PNG_INFO_bKGD, png_bKGD, 0, 1,  START, 0 },
-   { "cHRM", PNG_INFO_cHRM, png_cHRM, 0, 1,  START, 0 },
-   { "gAMA", PNG_INFO_gAMA, png_gAMA, 0, 1,  START, 0 },
-   { "hIST", PNG_INFO_hIST, png_hIST, 0, 1, ABSENT, 0 },
-   { "iCCP", PNG_INFO_iCCP, png_iCCP, 0, 1, ABSENT, 0 },
-   { "iTXt", PNG_INFO_iTXt, png_iTXt, 0, 1, ABSENT, 0 },
-   { "oFFs", PNG_INFO_oFFs, png_oFFs, 0, 1,  START, 0 },
-   { "pCAL", PNG_INFO_pCAL, png_pCAL, 0, 1,  START, 0 },
-   { "pHYs", PNG_INFO_pHYs, png_pHYs, 0, 1,  START, 0 },
-   { "sBIT", PNG_INFO_sBIT, png_sBIT, 0, 1,  START, 0 },
-   { "sCAL", PNG_INFO_sCAL, png_sCAL, 0, 1,  START, 0 },
-   { "sPLT", PNG_INFO_sPLT, png_sPLT, 0, 1, ABSENT, 0 },
-   { "sRGB", PNG_INFO_sRGB, png_sRGB, 0, 1,  START, 0 },
-   { "tEXt", PNG_INFO_tEXt, png_tEXt, 0, 1,  START, 0 },
-   { "tIME", PNG_INFO_tIME, png_tIME, 0, 1,  START, 0 },
-   { "tRNS", PNG_INFO_tRNS, png_tRNS, 0, 0, ABSENT, 0 },
-   { "zTXt", PNG_INFO_zTXt, png_zTXt, 0, 1,    END, 0 },
+   /* This is a mess but it seems to be the only way to do it - there is no way to
+    * check for definition outside a #if.
+    */
+   { "bKGD", PNG_INFO_bKGD, png_bKGD,
+#     ifdef PNG_READ_bKGD_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "cHRM", PNG_INFO_cHRM, png_cHRM,
+#     ifdef PNG_READ_cHRM_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "gAMA", PNG_INFO_gAMA, png_gAMA,
+#     ifdef PNG_READ_gAMA_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "hIST", PNG_INFO_hIST, png_hIST,
+#     ifdef PNG_READ_hIST_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1, ABSENT, 0 },
+   { "iCCP", PNG_INFO_iCCP, png_iCCP,
+#     ifdef PNG_READ_iCCP_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1, ABSENT, 0 },
+   { "iTXt", PNG_INFO_iTXt, png_iTXt,
+#     ifdef PNG_READ_iTXt_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1, ABSENT, 0 },
+   { "oFFs", PNG_INFO_oFFs, png_oFFs,
+#     ifdef PNG_READ_oFFs_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "pCAL", PNG_INFO_pCAL, png_pCAL,
+#     ifdef PNG_READ_pCAL_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "pHYs", PNG_INFO_pHYs, png_pHYs,
+#     ifdef PNG_READ_pHYs_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "sBIT", PNG_INFO_sBIT, png_sBIT,
+#     ifdef PNG_READ_sBIT_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "sCAL", PNG_INFO_sCAL, png_sCAL,
+#     ifdef PNG_READ_sCAL_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "sPLT", PNG_INFO_sPLT, png_sPLT,
+#     ifdef PNG_READ_sPLT_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1, ABSENT, 0 },
+   { "sRGB", PNG_INFO_sRGB, png_sRGB,
+#     ifdef PNG_READ_sRGB_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "tEXt", PNG_INFO_tEXt, png_tEXt,
+#     ifdef PNG_READ_tEXt_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "tIME", PNG_INFO_tIME, png_tIME,
+#     ifdef PNG_READ_tIME_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  START, 0 },
+   { "tRNS", PNG_INFO_tRNS, png_tRNS,
+#     ifdef PNG_READ_tRNS_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      0, ABSENT, 0 },
+   { "zTXt", PNG_INFO_zTXt, png_zTXt,
+#     ifdef PNG_READ_zTXt_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,    END, 0 },
 
    /* No libpng handling */
    { "sTER", PNG_INFO_sTER, png_sTER, 1, 1,  START, 0 },
@@ -955,6 +1060,7 @@ main(void)
 {
    fprintf(stderr,
    " test ignored because libpng was not built with unknown chunk support\n");
-   return 0;
+   /* So the test is skipped: */
+   return 77;
 }
 #endif

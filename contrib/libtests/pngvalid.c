@@ -10139,6 +10139,7 @@ int main(int argc, char **argv)
 int main(void)
 {
    fprintf(stderr, "pngvalid: no write support in libpng, all tests skipped\n");
-   return 0;
+   /* So the test is skipped: */
+   return 77;
 }
 #endif

@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.2 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2074,12 +2074,9 @@ png_image_write_main(png_voidp argument)
 
    if (write_16bit)
    {
-#ifdef PNG_WRITE_gAMA_SUPPORTED
       /* The gamma here is 1.0 (linear) and the cHRM chunk matches sRGB. */
       png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_LINEAR);
-#endif
 
-#ifdef PNG_WRITE_cHRM_SUPPORTED
       if (!(image->flags & PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB))
          png_set_cHRM_fixed(png_ptr, info_ptr,
             /* color      x       y */
@@ -2089,20 +2086,15 @@ png_image_write_main(png_voidp argument)
             /* blue  */ 15000,  6000
          );
    }
-#endif
 
-#ifdef PNG_WRITE_sRGB_SUPPORTED
    else if (!(image->flags & PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB))
       png_set_sRGB(png_ptr, info_ptr, PNG_sRGB_INTENT_PERCEPTUAL);
-#endif
 
-#ifdef PNG_WRITE_gAMA_SUPPORTED
    /* Else writing an 8-bit file and the *colors* aren't sRGB, but the 8-bit
     * space must still be gamma encoded.
     */
    else
       png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_sRGB_INVERSE);
-#endif
 
    /* Write the file header. */
    png_write_info(png_ptr, info_ptr);

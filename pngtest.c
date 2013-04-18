@@ -43,7 +43,23 @@
 
 #include "png.h"
 
-#ifdef PNG_READ_SUPPORTED /* else nothing can be done */
+/* Known chunks that exist in pngtest.png must be supported or pngtest will fail
+ * simply as a result of re-ordering them.  This may be fixed in 1.7
+ */
+#if defined PNG_READ_SUPPORTED && /* else nothing can be done */\
+   defined PNG_READ_bKGD_SUPPORTED &&\
+   defined PNG_READ_cHRM_SUPPORTED &&\
+   defined PNG_READ_gAMA_SUPPORTED &&\
+   defined PNG_READ_oFFs_SUPPORTED &&\
+   defined PNG_READ_pCAL_SUPPORTED &&\
+   defined PNG_READ_pHYs_SUPPORTED &&\
+   defined PNG_READ_sBIT_SUPPORTED &&\
+   defined PNG_READ_sCAL_SUPPORTED &&\
+   defined PNG_READ_sRGB_SUPPORTED &&\
+   defined PNG_READ_tEXt_SUPPORTED &&\
+   defined PNG_READ_tIME_SUPPORTED &&\
+   defined PNG_READ_zTXt_SUPPORTED
+
 #include "zlib.h"
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
@@ -1945,7 +1961,8 @@ main(void)
 {
    fprintf(STDERR,
       " test ignored because libpng was not built with read support\n");
-   return 0;
+   /* And skip this test */
+   return 77;
 }
 #endif
 
