@@ -18,17 +18,6 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-png_uint_32 PNGAPI
-png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
-{
-   png_uint_32 uval = png_get_uint_32(buf);
-
-   if (uval > PNG_UINT_31_MAX)
-      png_error(png_ptr, "PNG unsigned integer out of range");
-
-   return (uval);
-}
-
 #if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_READ_cHRM_SUPPORTED)
 /* The following is a variation on the above for use with the fixed
  * point values used for gAMA and cHRM.  Instead of png_error it
@@ -51,7 +40,7 @@ png_get_fixed_point(png_structrp png_ptr, png_const_bytep buf)
 
    return PNG_FIXED_ERROR;
 }
-#endif
+#endif /* READ_gAMA or READ_cHRM */
 
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
 /* NOTE: the read macros will obscure these definitions, so that if
@@ -67,48 +56,38 @@ png_get_fixed_point(png_structrp png_ptr, png_const_bytep buf)
 png_uint_32 (PNGAPI
 png_get_uint_32)(png_const_bytep buf)
 {
-   png_uint_32 uval =
-       ((png_uint_32)(*(buf    )) << 24) +
-       ((png_uint_32)(*(buf + 1)) << 16) +
-       ((png_uint_32)(*(buf + 2)) <<  8) +
-       ((png_uint_32)(*(buf + 3))      ) ;
-
-   return uval;
+   return PNG_U32(buf[0], buf[1], buf[2], buf[3]);
 }
 
-/* Grab a signed 32-bit integer from a buffer in big-endian format.  The
- * data is stored in the PNG file in two's complement format and there
- * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
- * the following code does a two's complement to native conversion.
- */
+/* Grab a signed 32-bit integer from a buffer in big-endian format. */
 png_int_32 (PNGAPI
 png_get_int_32)(png_const_bytep buf)
 {
-   png_uint_32 uval = png_get_uint_32(buf);
-   if ((uval & 0x80000000) == 0) /* non-negative */
-      return uval;
-
-   uval = (uval ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
-   return -(png_int_32)uval;
+   return PNG_S32(buf[0], buf[1], buf[2], buf[3]);
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
 png_uint_16 (PNGAPI
 png_get_uint_16)(png_const_bytep buf)
 {
-   /* ANSI-C requires an int value to accomodate at least 16 bits so this
-    * works and allows the compiler not to worry about possible narrowing
-    * on 32 bit systems.  (Pre-ANSI systems did not make integers smaller
-    * than 16 bits either.)
-    */
-   unsigned int val =
-       ((unsigned int)(*buf) << 8) +
-       ((unsigned int)(*(buf + 1)));
-
-   return (png_uint_16)val;
+   return PNG_U16(buf[0], buf[1]);
 }
-
 #endif /* PNG_READ_INT_FUNCTIONS_SUPPORTED */
+
+/* This is an exported function however its error handling is too harsh for most
+ * internal use.  For example if it were used for reading the chunk parameters
+ * it would error out even on ancilliary chunks that can be ignored.
+ */
+png_uint_32 PNGAPI
+png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
+{
+   png_uint_32 uval = png_get_uint_32(buf);
+
+   if (uval > PNG_UINT_31_MAX)
+      png_error(png_ptr, "PNG unsigned integer out of range");
+
+   return uval;
+}
 
 /* Read and check the PNG file signature */
 void /* PRIVATE */
@@ -219,7 +198,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
 
    if (png_crc_error(png_ptr))
    {
-      if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name) ?
+      if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) ?
           !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) :
           (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
       {
@@ -248,7 +227,7 @@ png_crc_error(png_structrp png_ptr)
    png_uint_32 crc;
    int need_crc = 1;
 
-   if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name))
+   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
    {
       if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
@@ -2836,7 +2815,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
          if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
-             PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+             PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
          {
             if (!png_cache_unknown_chunk(png_ptr, length))
                keep = PNG_HANDLE_CHUNK_NEVER;
@@ -2870,7 +2849,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
        */
       if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
          (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
-          PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+          PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
       {
 #     ifdef PNG_USER_LIMITS_SUPPORTED
          switch (png_ptr->user_chunk_cache_max)

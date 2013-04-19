@@ -4541,7 +4541,10 @@ Version 1.7.0beta08 [April 18, 2013]
     written by libpng-1.6.0 and 1.6.1.
   Disallow storing sRGB information when the sRGB is not supported.
 
-Version 1.7.0beta09 [April 18, 2013]
+Version 1.7.0beta09 [April 19, 2013]
+  Exposed PNG chunk types in png.h
+  Modified png_uint_32 macros/code to make as few assumptions as possible
+    about the hardware.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

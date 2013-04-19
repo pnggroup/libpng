@@ -719,18 +719,18 @@ static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
 static void
 write_sTER_chunk(png_structp write_ptr)
 {
-   png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
+   png_byte sTER[5] = {115,  84,  69,  82, '\0'};
 
    if (verbose)
       fprintf(STDERR, "\n stereo mode = %d\n", user_chunk_data.sTER_mode);
 
-   png_write_chunk(write_ptr, png_sTER, &user_chunk_data.sTER_mode, 1);
+   png_write_chunk(write_ptr, sTER, &user_chunk_data.sTER_mode, 1);
 }
 
 static void
 write_vpAg_chunk(png_structp write_ptr)
 {
-   png_byte png_vpAg[5] = {118, 112,  65, 103, '\0'};
+   png_byte vpAg[5] = {118, 112,  65, 103, '\0'};
 
    png_byte vpag_chunk_data[9];
 
@@ -743,7 +743,7 @@ write_vpAg_chunk(png_structp write_ptr)
    png_save_uint_32(vpag_chunk_data, user_chunk_data.vpAg_width);
    png_save_uint_32(vpag_chunk_data + 4, user_chunk_data.vpAg_height);
    vpag_chunk_data[8] = user_chunk_data.vpAg_units;
-   png_write_chunk(write_ptr, png_vpAg, vpag_chunk_data, 9);
+   png_write_chunk(write_ptr, vpAg, vpag_chunk_data, 9);
 }
 
 static void

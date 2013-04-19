@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta09 - April 18, 2013
+ * libpng version 1.7.0beta09 - April 19, 2013
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta09 - April 18, 2013: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta09 - April 19, 2013: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -200,7 +200,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta09, April 18, 2013, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta09, April 19, 2013, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -312,7 +312,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    April 18, 2013
+ *    April 19, 2013
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -380,7 +380,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta09"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta09 - April 18, 2013\n"
+     " libpng version 1.7.0beta09 - April 19, 2013\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -464,11 +464,6 @@
 
 #ifndef PNG_VERSION_INFO_ONLY
 
-/* Inhibit C++ name-mangling for libpng functions but not for system calls. */
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 /* Version information for C files, stored in png.c.  This had better match
  * the version above.
  */
@@ -476,17 +471,129 @@ extern "C" {
 
 /* This file is arranged in several sections:
  *
- * 1. Any configuration options that can be specified by for the application
+ * 1. ISO-PNG constants and definitions; values defined by PNG and not specific
+ *    to the libpng API.
+ * 2. Any configuration options that can be specified by for the application
  *    code when it is built.  (Build time configuration is in pnglibconf.h)
- * 2. Type definitions (base types are defined in pngconf.h), structure
+ * 3. Type definitions (base types are defined in pngconf.h), structure
  *    definitions.
- * 3. Exported library functions.
- * 4. Simplified API.
+ * 4. Exported library functions.
+ * 5. Simplified API.
  *
  * The library source code has additional files (principally pngpriv.h) that
  * allow configuration of the library.
  */
-/* Section 1: run time configuration
+
+/* Section 1: ISO PNG constants and macros. */
+
+/* ISO-PNG defines byte encodings for 16 and 32-bit unsigned values and 32-bit
+ * signed values.  The macros PNG_U16, PNG_U32 and PNG_S32 return values of type
+ * (png_uint_16), (png_uint_32) and (png_int_32) which are target machine
+ * specific representations of these values, using the types defined in
+ * pngconf.h.  The macros take two or four byte values in the order in which
+ * they would occur in a PNG stream.
+ *
+ * These macros must return compile time constants if passed constant values -
+ * machine specific implementations are not permitted.  These macros are used by
+ * default in the API functions/macros png_get_uint_16, png_get_uint_32,
+ * png_get_uint_31 and png_get_int_32 declared below: these functions or macros
+ * are the correct places for machine specific implementations (such as hardware
+ * specific instructions.)
+ *
+ * The macros defined here are generic and intended to give maximum flexibility
+ * in implementation to the compiler; only PNG_S32 contains a sequence point,
+ * there are no side effects and the expressions used permit the maximum
+ * parallelization (relevant because the four bytes may be loaded in parallel.)
+ */
+#define PNG_u2(b1, b2) (((unsigned int)(b1) << 8) + (b2))
+
+#define PNG_U16(b1, b2) ((png_uint_16)PNG_u2(b1, b2))
+#define PNG_U32(b1, b2, b3, b4)\
+   (((png_uint_32)PNG_u2(b1, b2) << 16) + PNG_u2(b3, b4))
+
+/* ISO-PNG states that signed 32-bit values are stored in two's complement
+ * format.  There is no guarantee that (png_int_32) is exactly 32 bits, so the
+ * following macro tests for a negative number and generates the machine format
+ * directly by portable arithmetic operations.  The cost is that the argument
+ * 'b1' is evaluated twice.
+ */
+#define PNG_S32(b1, b2, b3, b4) ((b1) & 0x80\
+      ? -(png_int_32)((PNG_U32(b1, b2, b3, b4) ^ 0xffffffff) + 1)\
+      : (png_int_32)PNG_U32(b1, b2, b3, b4))
+
+/* Constants for known chunk types.
+ *
+ * MAINTAINERS: If you need to add a chunk, define the name here.
+ * For historical reasons these constants have the form png_<name>; i.e.
+ * the prefix is lower case.  Please use decimal values as the parameters to
+ * match the ISO PNG specification and to avoid relying on the C locale
+ * interpretation of character values.
+ *
+ * Notice that PNG_U32 is used to define a 32-bit value for the 4 byte chunk
+ * type.  In fact the specification does not express chunk types this way,
+ * however using a 32-bit value means that the chunk type can be read from the
+ * stream using exactly the same code as used for a 32-bit unsigned value and
+ * can be examined far more efficiently (using one arithmetic compare).
+ *
+ * Prior to 1.5.6 the chunk type constants were expressed as C strings.  The
+ * libpng API still uses strings for 'unknown' chunks and a macro,
+ * PNG_STRING_FROM_CHUNK, allows a string to be generated if required.  Notice
+ * that for portable code numeric values must still be used; the string "IHDR"
+ * is not portable and neither is PNG_U32('I', 'H', 'D', 'R').
+ *
+ * In 1.7.0 the definitions were made public in png.h to avoid having to
+ * duplicate the same definitions in application code.
+ */
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
+#define png_IDAT PNG_U32( 73,  68,  65,  84)
+#define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_PLTE PNG_U32( 80,  76,  84,  69)
+#define png_bKGD PNG_U32( 98,  75,  71,  68)
+#define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_hIST PNG_U32(104,  73,  83,  84)
+#define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_iTXt PNG_U32(105,  84,  88, 116)
+#define png_oFFs PNG_U32(111,  70,  70, 115)
+#define png_pCAL PNG_U32(112,  67,  65,  76)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
+#define png_pHYs PNG_U32(112,  72,  89, 115)
+#define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sPLT PNG_U32(115,  80,  76,  84)
+#define png_sRGB PNG_U32(115,  82,  71,  66)
+#define png_sTER PNG_U32(115,  84,  69,  82)
+#define png_tEXt PNG_U32(116,  69,  88, 116)
+#define png_tIME PNG_U32(116,  73,  77,  69)
+#define png_tRNS PNG_U32(116,  82,  78,  83)
+#define png_zTXt PNG_U32(122,  84,  88, 116)
+
+/* The following will work on (signed char*) strings, whereas the PNG_U32 macro
+ * used directory would fail on top-bit-set values because of the sign
+ * extension.
+ */
+#define PNG_CHUNK_FROM_STRING(s)\
+   PNG_U32(0xff&(s)[0], 0xff&(s)[1], 0xff&(s)[2], 0xff&(s)[3])
+
+/* This uses (char), not (png_byte) to avoid warnings on systems where (char) is
+ * signed and the argument is a (char[])  This macro will fail miserably on
+ * systems where (char) is more than 8 bits.
+ */
+#define PNG_STRING_FROM_CHUNK(s,c)\
+   (void)(((char*)(s))[0]=(char)((c)>>24), ((char*)(s))[1]=(char)((c)>>16),\
+   ((char*)(s))[2]=(char)((c)>>8), ((char*)(s))[3]=(char)((c)))
+
+/* Do the same but terminate with a null character. */
+#define PNG_CSTRING_FROM_CHUNK(s,c)\
+   (void)(PNG_STRING_FROM_CHUNK(s,c), ((char*)(s))[4] = 0)
+
+/* Test on flag values as defined in the spec (section 5.4): */
+#define PNG_CHUNK_ANCILLARY(c)    (1 & ((c) >> 29))
+#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
+#define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
+#define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
+#define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
+
+/* Section 2: run time configuration
  * See pnglibconf.h for build time configuration
  *
  * Run time configuration allows the application to choose between
@@ -516,7 +623,12 @@ extern "C" {
  * Otherwise the calls are mapped to png_error.
  */
 
-/* Section 2: type definitions, including structures and compile time
+/* Inhibit C++ name-mangling for libpng functions but not for system calls. */
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
+/* Section 3: type definitions, including structures and compile time
  * constants.
  * See pngconf.h for base types that vary by machine/system
  */
@@ -960,7 +1072,7 @@ typedef PNG_CALLBACK(png_voidp, *png_malloc_ptr, (png_structp,
     png_alloc_size_t));
 typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp));
 
-/* Section 3: exported functions
+/* Section 4: exported functions
  * Here are the function definitions most commonly used.  This is not
  * the place to find out how to use libpng.  See libpng-manual.txt for the
  * full explanation, see example.c for the summary.  This just provides
@@ -2372,7 +2484,7 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  * write.  If you wish to have chunk-specific handling on read in code that must
  * work on earlier versions you must use a user chunk callback to implement the
  * desired handling (keep or discard.)
- * 
+ *
  * NOTE: prior to 1.7.0 when a user callback returned '0', indicating that the
  * chunk had not been handled, libpng would preserve it regardless of the
  * default or per-chunk settings.  For compatibility with earlier versions
@@ -2740,27 +2852,18 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 
 #ifdef PNG_USE_READ_MACROS
 /* Inline macros to do direct reads of bytes from the input buffer.
- * The png_get_int_32() routine assumes we are using two's complement
- * format for negative values, which is almost certainly true.
  */
+#  define PNG_B(ptr, offset) (((png_const_bytep)(ptr))[offset])
 #  define PNG_get_uint_32(buf) \
-     (((png_uint_32)(*(buf)) << 24) + \
-      ((png_uint_32)(*((buf) + 1)) << 16) + \
-      ((png_uint_32)(*((buf) + 2)) << 8) + \
-      ((png_uint_32)(*((buf) + 3))))
+      PNG_U32(PNG_B(buf,0), PNG_B(buf,1), PNG_B(buf,2), PNG_B(buf,3))
 
    /* From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
     * function) incorrectly returned a value of type png_uint_32.
     */
-#  define PNG_get_uint_16(buf) \
-     ((png_uint_16) \
-      (((unsigned int)(*(buf)) << 8) + \
-       ((unsigned int)(*((buf) + 1)))))
+#  define PNG_get_uint_16(buf) PNG_U16(PNG_B(buf,0), PNG_B(buf,1))
 
 #  define PNG_get_int_32(buf) \
-     ((png_int_32)((*(buf) & 0x80) \
-      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
-      : (png_int_32)png_get_uint_32(buf)))
+      PNG_S32(PNG_B(buf,0), PNG_B(buf,1), PNG_B(buf,2), PNG_B(buf,3))
 
    /* If PNG_PREFIX is defined the same thing as below happens in pnglibconf.h,
     * but defining a macro name prefixed with PNG_PREFIX.
@@ -2779,8 +2882,62 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 #  endif
 #endif
 
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+PNG_EXPORT(242, void, png_set_check_for_invalid_index,
+    (png_structrp png_ptr, int allowed));
+#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+PNG_EXPORT(243, int, png_get_palette_max, (png_const_structrp png_ptr,
+    png_const_inforp info_ptr));
+#  endif
+#endif /* CHECK_FOR_INVALID_INDEX */
+
 /*******************************************************************************
- *  SIMPLIFIED API
+ *  IMPLEMENTATION OPTIONS
+ *******************************************************************************
+ *
+ * Support for arbitrary implementation-specific optimizations.  The API allows
+ * particular options to be turned on or off.  'Option' is the number of the
+ * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
+ * by the PNG_OPTION_ defines below.
+ *
+ * HARDWARE: normally hardware capabilites, such as the Intel SSE instructions,
+ *           are detected at run time, however sometimes it may be impossible
+ *           to do this in user mode, in which case it is necessary to discover
+ *           the capabilities in an OS specific way.  Such capabilities are
+ *           listed here when libpng has support for them and must be turned
+ *           ON by the application if present.
+ *
+ * SOFTWARE: sometimes software optimizations actually result in performance
+ *           decrease on some architectures or systems, or with some sets of
+ *           PNG images.  'Software' options allow such optimizations to be
+ *           selected at run time.
+ */
+#ifdef PNG_SET_OPTION_SUPPORTED
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
+#endif
+#define PNG_OPTION_NEXT  2 /* Next option - numbers must be even */
+
+/* Return values: NOTE: there are four values and 'off' is *not* zero */
+#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
+#define PNG_OPTION_INVALID 1 /* Option number out of range */
+#define PNG_OPTION_OFF     2
+#define PNG_OPTION_ON      3
+
+PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
+   int onoff));
+#endif
+
+/*******************************************************************************
+ *  END OF HARDWARE OPTIONS
+ ******************************************************************************/
+
+/* Maintainer: Put new public prototypes here ^, in libpng.3, and project
+ * defs
+ */
+
+/*******************************************************************************
+ *  Section 5: SIMPLIFIED API
  *******************************************************************************
  *
  * Please read the documentation in libpng-manual.txt (TODO: write said
@@ -3229,60 +3386,6 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
 /*******************************************************************************
  *  END OF SIMPLIFIED API
  ******************************************************************************/
-
-#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-PNG_EXPORT(242, void, png_set_check_for_invalid_index,
-    (png_structrp png_ptr, int allowed));
-#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
-PNG_EXPORT(243, int, png_get_palette_max, (png_const_structrp png_ptr,
-    png_const_inforp info_ptr));
-#  endif
-#endif /* CHECK_FOR_INVALID_INDEX */
-
-/*******************************************************************************
- *  IMPLEMENTATION OPTIONS
- *******************************************************************************
- *
- * Support for arbitrary implementation-specific optimizations.  The API allows
- * particular options to be turned on or off.  'Option' is the number of the
- * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
- * by the PNG_OPTION_ defines below.
- *
- * HARDWARE: normally hardware capabilites, such as the Intel SSE instructions,
- *           are detected at run time, however sometimes it may be impossible
- *           to do this in user mode, in which case it is necessary to discover
- *           the capabilities in an OS specific way.  Such capabilities are
- *           listed here when libpng has support for them and must be turned
- *           ON by the application if present.
- *
- * SOFTWARE: sometimes software optimizations actually result in performance
- *           decrease on some architectures or systems, or with some sets of
- *           PNG images.  'Software' options allow such optimizations to be
- *           selected at run time.
- */
-#ifdef PNG_SET_OPTION_SUPPORTED
-#ifdef PNG_ARM_NEON_API_SUPPORTED
-#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
-#endif
-#define PNG_OPTION_NEXT  2 /* Next option - numbers must be even */
-
-/* Return values: NOTE: there are four values and 'off' is *not* zero */
-#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
-#define PNG_OPTION_INVALID 1 /* Option number out of range */
-#define PNG_OPTION_OFF     2
-#define PNG_OPTION_ON      3
-
-PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
-   int onoff));
-#endif
-
-/*******************************************************************************
- *  END OF HARDWARE OPTIONS
- ******************************************************************************/
-
-/* Maintainer: Put new public prototypes here ^, in libpng.3, and project
- * defs
- */
 
 /* The last ordinal number (this is the *last* one already used; the next
  * one to use is one more than this.)  Maintainer, remember to add an entry to
