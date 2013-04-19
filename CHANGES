@@ -4491,6 +4491,11 @@ Version 1.6.2rc01 [April 18, 2013]
     written by libpng-1.6.0 and 1.6.1.
   Disallow storing sRGB information when the sRGB is not supported.
 
+Version 1.6.2rc02 [April 18, 2013]
+  Merge pngtest.c with libpng-1.7.0
+
+Version 1.6.2rc03 [April 19, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
