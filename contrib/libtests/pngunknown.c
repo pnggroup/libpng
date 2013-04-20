@@ -75,42 +75,8 @@ typedef png_byte *png_const_bytep;
 #  define png_const_structp png_structp
 #endif
 
-
-/* Copied from pngpriv.h */
-#define PNG_32b(b,s) ((png_uint_32)(b) << (s))
-#define PNG_CHUNK(b1,b2,b3,b4) \
-   (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
-
-#define png_IHDR PNG_CHUNK( 73,  72,  68,  82)
-#define png_IDAT PNG_CHUNK( 73,  68,  65,  84)
-#define png_IEND PNG_CHUNK( 73,  69,  78,  68)
-#define png_PLTE PNG_CHUNK( 80,  76,  84,  69)
-#define png_bKGD PNG_CHUNK( 98,  75,  71,  68)
-#define png_cHRM PNG_CHUNK( 99,  72,  82,  77)
-#define png_gAMA PNG_CHUNK(103,  65,  77,  65)
-#define png_hIST PNG_CHUNK(104,  73,  83,  84)
-#define png_iCCP PNG_CHUNK(105,  67,  67,  80)
-#define png_iTXt PNG_CHUNK(105,  84,  88, 116)
-#define png_oFFs PNG_CHUNK(111,  70,  70, 115)
-#define png_pCAL PNG_CHUNK(112,  67,  65,  76)
-#define png_sCAL PNG_CHUNK(115,  67,  65,  76)
-#define png_pHYs PNG_CHUNK(112,  72,  89, 115)
-#define png_sBIT PNG_CHUNK(115,  66,  73,  84)
-#define png_sPLT PNG_CHUNK(115,  80,  76,  84)
-#define png_sRGB PNG_CHUNK(115,  82,  71,  66)
-#define png_sTER PNG_CHUNK(115,  84,  69,  82)
-#define png_tEXt PNG_CHUNK(116,  69,  88, 116)
-#define png_tIME PNG_CHUNK(116,  73,  77,  69)
-#define png_tRNS PNG_CHUNK(116,  82,  78,  83)
-#define png_zTXt PNG_CHUNK(122,  84,  88, 116)
-#define png_vpAg PNG_CHUNK('v', 'p', 'A', 'g')
-
-/* Test on flag values as defined in the spec (section 5.4): */
-#define PNG_CHUNK_ANCILLARY(c )   (1 & ((c) >> 29))
-#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
-#define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
-#define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
-#define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
+/* Types of chunks not know to libpng */
+#define png_vpAg PNG_U32(118, 112, 65, 103)
 
 /* Chunk information */
 #define PNG_INFO_tEXt 0x10000000U
@@ -317,13 +283,13 @@ find_by_flag(png_uint_32 flag)
 static int
 ancillary(const char *name)
 {
-   return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
+   return PNG_CHUNK_ANCILLARY(PNG_U32(name[0], name[1], name[2], name[3]));
 }
 
 static int
 ancillaryb(const png_byte *name)
 {
-   return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
+   return PNG_CHUNK_ANCILLARY(PNG_U32(name[0], name[1], name[2], name[3]));
 }
 
 /* Type of an error_ptr */
