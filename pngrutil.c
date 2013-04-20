@@ -221,7 +221,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
 
    if (png_crc_error(png_ptr))
    {
-      if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name) ?
+      if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) ?
           !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) :
           (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
       {
@@ -250,7 +250,7 @@ png_crc_error(png_structrp png_ptr)
    png_uint_32 crc;
    int need_crc = 1;
 
-   if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name))
+   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
    {
       if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
@@ -2857,7 +2857,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
          if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
-             PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+             PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
          {
             if (!png_cache_unknown_chunk(png_ptr, length))
                keep = PNG_HANDLE_CHUNK_NEVER;
@@ -2891,7 +2891,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
        */
       if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
          (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
-          PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+          PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
       {
 #     ifdef PNG_USER_LIMITS_SUPPORTED
          switch (png_ptr->user_chunk_cache_max)

@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_2rc02 Your_png_h_is_not_version_1_6_2rc02;
+typedef png_libpng_version_1_6_2rc03 Your_png_h_is_not_version_1_6_2rc03;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -115,7 +115,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 {
    int need_crc = 1;
 
-   if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name))
+   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
    {
       if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
@@ -768,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.2rc02 - April 18, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.6.2rc03 - April 19, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.2rc02 - April 18, 2013\
+      return "libpng version 1.6.2rc03 - April 19, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1866,7 +1866,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
          "length does not match profile");
 
    temp = png_get_uint_32(profile+128); /* tag count: 12 bytes/tag */
-   if (temp > 357913930 || /* (2^32-4-132)/12: maxium possible tag count */
+   if (temp > 357913930 || /* (2^32-4-132)/12: maximum possible tag count */
       profile_length < 132+12*temp) /* truncated tag table */
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "tag count too large");
