@@ -3875,7 +3875,7 @@ png_init_filter_functions(png_structrp pp)
     * the filter is the first transformation performed on the row data.  It is
     * performed in place, therefore an implementation can be selected based on
     * the image pixel format.  If the implementation depends on image width then
-    * take care to ensure that it works corretly if the image is interlaced -
+    * take care to ensure that it works correctly if the image is interlaced -
     * interlacing causes the actual row width to vary.
     */
 {

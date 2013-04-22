@@ -1,5 +1,5 @@
 
-Libpng 1.6.2rc03 - April 19, 2013
+Libpng 1.6.2rc03 - April 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -47,7 +47,8 @@ Version 1.6.2rc01 [April 18, 2013]
 Version 1.6.2rc02 [April 18, 2013]
   Merge pngtest.c with libpng-1.7.0
 
-Version 1.6.2rc03 [April 19, 2013]
+Version 1.6.2rc03 [April 22, 2013]
+  Trivial spelling cleanup.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
