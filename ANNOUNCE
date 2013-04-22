@@ -1,5 +1,5 @@
 
-Libpng 1.6.2rc05 - April 23, 2013
+Libpng 1.6.2rc03 - April 22, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.2rc05.tar.xz (LZMA-compressed, recommended)
-   1.6.2rc05.tar.gz
+   1.6.2rc03.tar.xz (LZMA-compressed, recommended)
+   1.6.2rc03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp162r05.7z  (LZMA-compressed, recommended)
-   lp162r05.zip
+   lp162r03.7z  (LZMA-compressed, recommended)
+   lp162r03.zip
 
 Other information:
 
-   1.6.2rc05-README.txt
-   1.6.2rc05-LICENSE.txt
+   1.6.2rc03-README.txt
+   1.6.2rc03-LICENSE.txt
 
 Changes since the last public release (1.6.1):
 
@@ -49,15 +49,6 @@ Version 1.6.2rc02 [April 18, 2013]
 
 Version 1.6.2rc03 [April 22, 2013]
   Trivial spelling cleanup.
-
-Version 1.6.2rc04 [April 22, 2013]
-  Revised stack marking in arm/filter_neon.S and configure.ac
-
-Version 1.6.2rc05 [April 23, 2013]
-  Ensure that NEON filter stuff is completely disabled when switched 'off'.
-    Previously the ARM NEON specific files were still built if the option
-    was switched 'off' as opposed to being explicitly disabled.
-
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
