@@ -240,9 +240,12 @@ AC_ARG_ENABLE([arm-neon],
       [a call to png_set_option; on: turn on unconditionally.  The]
       [default is 'on' if __ARM_NEON__ is defined, otherwise 'off'.]),
    [case "$enableval" in
-      off)
+      no|off)
+         # disable the default enabling on __ARM_NEON__ systems:
          AC_DEFINE([PNG_NO_ARM_NEON], [],
-                   [Disable ARM Neon optimizations]);;
+                   [Disable ARM Neon optimizations])
+         # Prevent use of the assembler files below:
+         enable_arm_neon=no;;
       check)
          AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
                    [Check for ARM Neon support at run-time]);;
