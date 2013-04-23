@@ -166,11 +166,6 @@ AC_ARG_WITH(binconfigs,
 	[binconfigs='${binconfigs}'])
 AC_SUBST([binconfigs])
 
-# Because GCC by default assembles code with an executable stack, even though it
-# compiles C code with a non-executable stack, it is necessary to do a fixup
-# here (this may by GCC specific)
-AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
-
 AC_ARG_ENABLE([arm-neon],
    AS_HELP_STRING([[[--enable-arm-neon]]],
       [Enable ARM NEON optimizations: =off, check, api, on:]

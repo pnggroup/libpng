@@ -4070,9 +4070,10 @@ Version 1.5.15rc01 [March 21, 2013]
 Version 1.5.15 [March 28, 2013]
   No changes.
 
-Version 1.5.16beta01 [April 13, 2013]
+Version 1.5.16beta01 [April 23, 2013]
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
+  Revised stack marking in arm/filter_neon.S and configure.ac
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
