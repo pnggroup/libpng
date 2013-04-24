@@ -4545,10 +4545,12 @@ Version 1.7.0beta09 [April 24, 2013]
   Exposed PNG chunk types in png.h
   Modified png_uint_32 macros/code to make as few assumptions as possible
     about the hardware.
-  Revised stack marking in arm/filter_neon.S and configure.ac
+  Revised stack marking in arm/filter_neon.S and configure.ac.
   Ensure that NEON filter stuff is completely disabled when switched 'off'.
     Previously the ARM NEON specific files were still built if the option
     was switched 'off' as opposed to being explicitly disabled.
+
+Version 1.7.0beta10 [April 24, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
