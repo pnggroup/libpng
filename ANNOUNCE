@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta09 - April 19, 2013
+Libpng 1.7.0beta09 - April 24, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -254,9 +254,13 @@ Version 1.7.0beta08 [April 18, 2013]
     written by libpng-1.6.0 and 1.6.1.
   Disallow storing sRGB information when the sRGB is not supported.
 
-Version 1.7.0beta09 [April 19, 2013]
+Version 1.7.0beta09 [April 24, 2013]
   Exposed PNG chunk types in png.h
   Modified png_uint_32 macros/code to make as few assumptions as possible
+  Revised stack marking in arm/filter_neon.S and configure.ac
+  Ensure that NEON filter stuff is completely disabled when switched 'off'.
+    Previously the ARM NEON specific files were still built if the option
+    was switched 'off' as opposed to being explicitly disabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -76,7 +76,7 @@ png_get_uint_16)(png_const_bytep buf)
 
 /* This is an exported function however its error handling is too harsh for most
  * internal use.  For example if it were used for reading the chunk parameters
- * it would error out even on ancilliary chunks that can be ignored.
+ * it would error out even on ancillary chunks that can be ignored.
  */
 png_uint_32 PNGAPI
 png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
