@@ -4551,7 +4551,7 @@ Version 1.7.0beta09 [April 24, 2013]
     was switched 'off' as opposed to being explicitly disabled.
 
 Version 1.7.0beta10 [April 24, 2013]
-  Attempt to fix the PNG_ARM_NEON mess.
+  Attempt to fix the PNG_ARM_NEON configuration mess.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
