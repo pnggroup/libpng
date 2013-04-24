@@ -4497,7 +4497,7 @@ Version 1.6.2rc02 [April 18, 2013]
 Version 1.6.2rc03 [April 22, 2013]
   Trivial spelling cleanup.
 
-Version 1.6.2rc04 and 1.6.2rc06 [omitted]
+Version 1.6.2rc04 and 1.6.2rc05 [omitted]
 
 Version 1.6.2rc06 [April 24, 2013]
   Reverted to version 1.6.2rc03.  Recent changes to arm/neon support
