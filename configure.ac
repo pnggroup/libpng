@@ -226,30 +226,48 @@ AC_ARG_WITH(libpng-prefix,
     fi])
 AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
 
+# HOST SPECIFIC OPTIONS
+# =====================
+#
+# ARM
+# ===
+#
+# ARM NEON (SIMD) support.
+
 AC_ARG_ENABLE([arm-neon],
    AS_HELP_STRING([[[--enable-arm-neon]]],
-      [Enable ARM NEON optimizations: =off, check, api, on:]
-      [off: disable the optimizations; check: use internal checking code]
+      [Enable ARM NEON optimizations: =no/off, check, api, yes/on:]
+      [no/off: disable the optimizations; check: use internal checking code]
       [(deprecated and poorly supported); api: disable by default, enable by]
-      [a call to png_set_option; on: turn on unconditionally.  The]
-      [default is 'on' if __ARM_NEON__ is defined, otherwise 'off'.]),
+      [a call to png_set_option; yes/on: turn on unconditionally.]),
    [case "$enableval" in
-      off)
+      no|off)
+         # disable the default enabling on __ARM_NEON__ systems:
          AC_DEFINE([PNG_NO_ARM_NEON], [],
-                   [Disable ARM Neon optimizations]);;
+                   [Disable ARM Neon optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_arm_neon=no;;
       check)
          AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
                    [Check for ARM Neon support at run-time]);;
       api)
          AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
                    [Turn on ARM Neon optimizations at run-time]);;
-      on)
+      yes|on)
          AC_DEFINE([PNG_ARM_NEON_SUPPORTED], [],
                    [Enable ARM Neon optimizations]);;
       *)
-         AC_MSG_ERROR([arm-neon: option value required (off/check/api/on)]);;
+         AC_MSG_ERROR([--enable-arm-neon=${enable_arm_neon}: invalid value])
    esac])
-AM_CONDITIONAL([PNG_ARM_NEON], [test "${enable_arm_neon:-no}" != "no"])
+
+# If enable/disable was not specified default to using the optimizations if the
+# host CPU is ARM and the compiler is targeting a NEON host.  The latter test
+# is done in scripts/pnglibconf.dfa by checking for __ARM_NEON__.  The
+# AM_CONDITIONAL below controls whether the ARM NEON source files are built.
+
+AM_CONDITIONAL([PNG_ARM_NEON],
+   [test "$enable_arm_neon" != 'no' &&
+    test "$host_cpu" = 'arm' -o "$enable_arm_neon" != ''])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

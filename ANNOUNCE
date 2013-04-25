@@ -27,6 +27,9 @@ Changes since the last public release (1.6.2):
 
 Version 1.6.3beta01 [April 25, 2013]
   Revised stack marking in arm/filter_neon.S and configure.ac.
+  Ensure that NEON filter stuff is completely disabled when switched 'off'.
+    Previously the ARM NEON specific files were still built if the option
+    was switched 'off' as opposed to being explicitly disabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
