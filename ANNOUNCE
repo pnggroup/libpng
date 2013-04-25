@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta01 - April 23, 2013
+Libpng 1.5.16beta01 - April 25, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,10 +26,13 @@ Other information:
 
 Changes since the last public release (1.5.15):
 
-Version 1.5.16beta01 [April 23, 2013]
+Version 1.5.16beta01 [April 25, 2013]
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
   Revised stack marking in arm/filter_neon.S and configure.ac
+  Ensure that NEON filter stuff is completely disabled when switched 'off'.
+    Previously the ARM NEON specific files were still built if the option
+    was switched 'off' as opposed to being explicitly disabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
