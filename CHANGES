@@ -4504,9 +4504,11 @@ Version 1.6.2rc06 [April 24, 2013]
     have been ported to libpng-1.7.0beta09 and will reappear in version
     1.6.3beta01.
 
-Version 1.6.2 [March 25, 2013]
+Version 1.6.2 [April 25, 2013]
+  No changes.
 
 Version 1.6.3beta01 [April 25, 2013]
+  Revised stack marking in arm/filter_neon.S and configure.ac.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
