@@ -23,7 +23,7 @@
 
 VERMAJ = 1
 VERMIN = 6
-VERMIC = 2
+VERMIC = 3
 VER = $(VERMAJ).$(VERMIN).$(VERMIC)
 NAME = libpng
 PACKAGE = $(NAME)-$(VER)
