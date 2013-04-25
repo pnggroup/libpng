@@ -4504,6 +4504,8 @@ Version 1.6.2rc06 [April 24, 2013]
     have been ported to libpng-1.7.0beta09 and will reappear in version
     1.6.3beta01.
 
+Version 1.6.2 [April 25, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
