@@ -4473,6 +4473,39 @@ Version 1.6.1rc01 [March 21, 2013]
 Version 1.6.1 [March 28, 2013]
   No changes.
 
+Version 1.6.2beta01 [April 14, 2013]
+  Updated documentation of 1.5.x to 1.6.x changes in iCCP chunk handling.
+  Fixed incorrect warning of excess deflate data. End condition - the
+    warning would be produced if the end of the deflate stream wasn't read
+    in the last row.  The warning is harmless.
+  Corrected the test on user transform changes on read. It was in the
+    png_set of the transform function, but that doesn't matter unless the
+    transform function changes the rowbuf size, and that is only valid if
+    transform_info is called.
+  Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
+    (Flavio Medeiros).
+  Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
+
+Version 1.6.2rc01 [April 18, 2013]
+  Added contrib/tools/fixitxt.c, to repair the erroneous iTXt chunk length
+    written by libpng-1.6.0 and 1.6.1.
+  Disallow storing sRGB information when the sRGB is not supported.
+
+Version 1.6.2rc02 [April 18, 2013]
+  Merge pngtest.c with libpng-1.7.0
+
+Version 1.6.2rc03 [April 22, 2013]
+  Trivial spelling cleanup.
+
+Version 1.6.2rc04 and 1.6.2rc05 [omitted]
+
+Version 1.6.2rc06 [April 24, 2013]
+  Reverted to version 1.6.2rc03.  Recent changes to arm/neon support
+    have been ported to libpng-1.7.0beta09 and will reappear in version
+    1.6.3beta01.
+
+Version 1.6.2 [April 25, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

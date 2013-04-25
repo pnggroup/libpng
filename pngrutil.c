@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.2 [April 25, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -221,7 +221,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
 
    if (png_crc_error(png_ptr))
    {
-      if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name) ?
+      if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) ?
           !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) :
           (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
       {
@@ -250,7 +250,7 @@ png_crc_error(png_structrp png_ptr)
    png_uint_32 crc;
    int need_crc = 1;
 
-   if (PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name))
+   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
    {
       if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
@@ -2857,7 +2857,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
          if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
             (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
-             PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+             PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
          {
             if (!png_cache_unknown_chunk(png_ptr, length))
                keep = PNG_HANDLE_CHUNK_NEVER;
@@ -2891,7 +2891,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
        */
       if (keep == PNG_HANDLE_CHUNK_ALWAYS ||
          (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
-          PNG_CHUNK_ANCILLIARY(png_ptr->chunk_name)))
+          PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)))
       {
 #     ifdef PNG_USER_LIMITS_SUPPORTED
          switch (png_ptr->user_chunk_cache_max)
@@ -3875,7 +3875,7 @@ png_init_filter_functions(png_structrp pp)
     * the filter is the first transformation performed on the row data.  It is
     * performed in place, therefore an implementation can be selected based on
     * the image pixel format.  If the implementation depends on image width then
-    * take care to ensure that it works corretly if the image is interlaced -
+    * take care to ensure that it works correctly if the image is interlaced -
     * interlacing causes the actual row width to vary.
     */
 {
@@ -3983,7 +3983,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          png_ptr->zstream.avail_out = out;
       }
 
-      else /* check for end */
+      else /* after last row, checking for end */
       {
          png_ptr->zstream.next_out = tmpbuf;
          png_ptr->zstream.avail_out = (sizeof tmpbuf);
@@ -3998,10 +3998,13 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
        */
       ret = inflate(&png_ptr->zstream, Z_NO_FLUSH);
 
-      /* Take the unconsumed output back (so, in the 'check' case this just
-       * counts up).
-       */
-      avail_out += png_ptr->zstream.avail_out;
+      /* Take the unconsumed output back. */
+      if (output != NULL)
+         avail_out += png_ptr->zstream.avail_out;
+
+      else /* avail_out counts the extra bytes */
+         avail_out += (sizeof tmpbuf) - png_ptr->zstream.avail_out;
+
       png_ptr->zstream.avail_out = 0;
 
       if (ret == Z_STREAM_END)
@@ -4040,7 +4043,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
       if (output != NULL)
          png_error(png_ptr, "Not enough image data");
 
-      else /* checking */
+      else /* the deflate stream contained extra data */
          png_chunk_benign_error(png_ptr, "Too much image data");
    }
 }

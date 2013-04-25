@@ -18,7 +18,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.1],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.2],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -39,10 +39,10 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.1
+PNGLIB_VERSION=1.6.2
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
-PNGLIB_RELEASE=1
+PNGLIB_RELEASE=2
 
 dnl End of version number stuff
 
@@ -229,7 +229,7 @@ AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
 # Because GCC by default assembles code with an executable stack, even though it
 # compiles C code with a non-executable stack, it is necessary to do a fixup
 # here (this may by GCC specific)
-AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
+# AC_SUBST([AM_CCASFLAGS], [-Wa,--noexecstack])
 
 AC_ARG_ENABLE([arm-neon],
    AS_HELP_STRING([[[--enable-arm-neon]]],

@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.2 [April 25, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -675,8 +675,8 @@
    (void)(PNG_STRING_FROM_CHUNK(s,c), ((char*)(s))[4] = 0)
 
 /* Test on flag values as defined in the spec (section 5.4): */
-#define PNG_CHUNK_ANCILLIARY(c)   (1 & ((c) >> 29))
-#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLIARY(c))
+#define PNG_CHUNK_ANCILLARY(c)   (1 & ((c) >> 29))
+#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
 #define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
 #define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
 #define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))

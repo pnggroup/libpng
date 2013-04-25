@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
+ * Last changed in libpng 1.6.2 [April 25, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1744,6 +1744,9 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
    {
       if (comp.input_len > PNG_UINT_31_MAX-prefix_len)
          png_error(png_ptr, "iTXt: uncompressed text too long");
+
+      /* So the string will fit in a chunk: */
+      comp.output_len = (png_uint_32)/*SAFE*/comp.input_len;
    }
 
    png_write_chunk_header(png_ptr, png_iTXt, comp.output_len + prefix_len);

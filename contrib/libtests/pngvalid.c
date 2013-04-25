@@ -4599,9 +4599,13 @@ progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
       }
       else
          png_progressive_combine_row(pp, row, new_row);
-   } else if (dp->interlace_type == PNG_INTERLACE_ADAM7 &&
-      PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
-      PNG_PASS_COLS(dp->w, pass) > 0)
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
+   }
+
+#ifdef PNG_READ_INTERLACING_SUPPORTED
+   else if (dp->interlace_type == PNG_INTERLACE_ADAM7 &&
+       PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+       PNG_PASS_COLS(dp->w, pass) > 0)
       png_error(pp, "missing row in progressive de-interlacing");
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
 }
@@ -10135,6 +10139,7 @@ int main(int argc, char **argv)
 int main(void)
 {
    fprintf(stderr, "pngvalid: no write support in libpng, all tests skipped\n");
-   return 0;
+   /* So the test is skipped: */
+   return 77;
 }
 #endif

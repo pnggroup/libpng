@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.2 [April 25, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -223,6 +223,8 @@ translate_gamma_flags(png_structrp png_ptr, png_fixed_point output_gamma,
        */
 #     ifdef PNG_READ_sRGB_SUPPORTED
          png_ptr->flags |= PNG_FLAG_ASSUME_sRGB;
+#     else
+         PNG_UNUSED(png_ptr)
 #     endif
       if (is_screen)
          output_gamma = PNG_GAMMA_sRGB;
@@ -1055,9 +1057,6 @@ png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
     read_user_transform_fn)
 {
    png_debug(1, "in png_set_read_user_transform_fn");
-
-   if (!png_rtran_ok(png_ptr, 0))
-      return;
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    png_ptr->transformations |= PNG_USER_TRANSFORM;
