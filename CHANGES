@@ -4492,7 +4492,7 @@ Version 1.6.2rc01 [April 18, 2013]
   Disallow storing sRGB information when the sRGB is not supported.
 
 Version 1.6.2rc02 [April 18, 2013]
-  Merge pngtest.c with libpng-1.7.0.
+  Merge pngtest.c with libpng-1.7.0
 
 Version 1.6.2rc03 [April 22, 2013]
   Trivial spelling cleanup.
@@ -4516,6 +4516,8 @@ Version 1.6.3beta01 [April 25, 2013]
 Version 1.6.3beta02 [April 26, 2013]
   Test for 'arm*' not just 'arm' in the host_cpu configure variable.
   Rebuilt the configure scripts.
+
+Version 1.6.3beta03 [April 26, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
