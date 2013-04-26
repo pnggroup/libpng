@@ -12843,13 +12843,15 @@ $as_echo "#define PNG_ARM_NEON_SUPPORTED /**/" >>confdefs.h
 fi
 
 
-# If enable/disable was not specified default to using the optimizations if the
-# host CPU is ARM and the compiler is targeting a NEON host.  The latter test
-# is done in scripts/pnglibconf.dfa by checking for __ARM_NEON__.  The
-# AM_CONDITIONAL below controls whether the ARM NEON source files are built.
+# Add ARM specific files to all builds where the host_cpu is arm ('arm*') or
+# where ARM optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'arm*')
 
  if test "$enable_arm_neon" != 'no' &&
-    test "$host_cpu" = 'arm' -o "$enable_arm_neon" != ''; then
+    case "$host_cpu" in
+      arm*) :;;
+      *)    test "$enable_arm_neon" != '';;
+    esac; then
   PNG_ARM_NEON_TRUE=
   PNG_ARM_NEON_FALSE='#'
 else
