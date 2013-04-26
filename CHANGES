@@ -4492,7 +4492,7 @@ Version 1.6.2rc01 [April 18, 2013]
   Disallow storing sRGB information when the sRGB is not supported.
 
 Version 1.6.2rc02 [April 18, 2013]
-  Merge pngtest.c with libpng-1.7.0
+  Merge pngtest.c with libpng-1.7.0.
 
 Version 1.6.2rc03 [April 22, 2013]
   Trivial spelling cleanup.
