@@ -4079,6 +4079,8 @@ Version 1.5.16beta01 [April 25, 2013]
     was switched 'off' as opposed to being explicitly disabled.
   Avoid a compiler warning about unused png_ptr in translate_gamma_flags()
 
+Version 1.5.16beta02 [April 26, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

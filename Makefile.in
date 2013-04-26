@@ -288,7 +288,6 @@ distcleancheck_listfiles = find . -type f -print
 pkgincludedir = $(includedir)/$(PNGLIB_BASENAME)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
-AM_CCASFLAGS = @AM_CCASFLAGS@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 AS = @AS@

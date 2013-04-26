@@ -18,12 +18,12 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.5.16beta01], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.5.16beta02], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE([serial-tests])
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.5.16beta01
+PNGLIB_VERSION=1.5.16beta02
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=5
 PNGLIB_RELEASE=16
@@ -201,7 +201,7 @@ AC_ARG_ENABLE([arm-neon],
    esac])
 
 # If enable/disable was not specified default to using the optimizations if the
-# host CPU is ARM and the comppiler is targeting a NEON host.  The latter test
+# host CPU is ARM and the compiler is targeting a NEON host.  The latter test
 # is done in scripts/pnglibconf.dfa by checking for __ARM_NEON__.  The
 # AM_CONDITIONAL below controls whether the ARM NEON source files are built.
 
@@ -209,7 +209,7 @@ AM_CONDITIONAL([PNG_ARM_NEON],
    [test "$enable_arm_neon" != 'no' &&
     test "$host_cpu" = 'arm' -o "$enable_arm_neon" != ''])
  
- AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
+AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 
 # Config files, substituting as above
 AC_CONFIG_FILES([Makefile libpng.pc:libpng.pc.in])
