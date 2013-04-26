@@ -4084,6 +4084,7 @@ Version 1.5.16beta02 [April 26, 2013]
   Regenerated configure files.
 
 Version 1.5.16beta03 [April 26, 2013]
+  Test for 'arm*' not just 'arm' in the host_cpu configure variable.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
