@@ -32,6 +32,8 @@ Version 1.6.3beta01 [April 25, 2013]
     was switched 'off' as opposed to being explicitly disabled.
 
 Version 1.6.3beta02 [April 26, 2013]
+  Test for 'arm*' not just 'arm' in the host_cpu configure variable.
+  Rebuilt the configure scripts.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

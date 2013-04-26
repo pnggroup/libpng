@@ -260,14 +260,16 @@ AC_ARG_ENABLE([arm-neon],
          AC_MSG_ERROR([--enable-arm-neon=${enable_arm_neon}: invalid value])
    esac])
 
-# If enable/disable was not specified default to using the optimizations if the
-# host CPU is ARM and the compiler is targeting a NEON host.  The latter test
-# is done in scripts/pnglibconf.dfa by checking for __ARM_NEON__.  The
-# AM_CONDITIONAL below controls whether the ARM NEON source files are built.
+# Add ARM specific files to all builds where the host_cpu is arm ('arm*') or
+# where ARM optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'arm*')
 
 AM_CONDITIONAL([PNG_ARM_NEON],
    [test "$enable_arm_neon" != 'no' &&
-    test "$host_cpu" = 'arm' -o "$enable_arm_neon" != ''])
+    case "$host_cpu" in
+      arm*) :;;
+      *)    test "$enable_arm_neon" != '';;
+    esac])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 
