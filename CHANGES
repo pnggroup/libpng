@@ -4550,10 +4550,11 @@ Version 1.7.0beta09 [April 24, 2013]
     Previously the ARM NEON specific files were still built if the option
     was switched 'off' as opposed to being explicitly disabled.
 
-Version 1.7.0beta09 [April 24, 2013]
+Version 1.7.0beta10 [April 24, 2013]
   Attempt to fix the PNG_ARM_NEON configuration mess.
 
-Version 1.7.0beta11 [April 24, 2013]
+Version 1.7.0beta11 [April 26, 2013]
+  Test for 'arm*' not just 'arm' in the host_cpu configure variable.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
