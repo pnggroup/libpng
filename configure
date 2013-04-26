@@ -12844,7 +12844,7 @@ fi
 
 
 # If enable/disable was not specified default to using the optimizations if the
-# host CPU is ARM and the comppiler is targeting a NEON host.  The latter test
+# host CPU is ARM and the compiler is targeting a NEON host.  The latter test
 # is done in scripts/pnglibconf.dfa by checking for __ARM_NEON__.  The
 # AM_CONDITIONAL below controls whether the ARM NEON source files are built.
 
@@ -12858,7 +12858,7 @@ else
 fi
 
 
- { $as_echo "$as_me:${as_lineno-$LINENO}: Extra options for compiler: $PNG_COPTS" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: Extra options for compiler: $PNG_COPTS" >&5
 $as_echo "$as_me: Extra options for compiler: $PNG_COPTS" >&6;}
 
 # Config files, substituting as above

@@ -4080,6 +4080,7 @@ Version 1.5.16beta01 [April 25, 2013]
   Avoid a compiler warning about unused png_ptr in translate_gamma_flags()
 
 Version 1.5.16beta02 [April 26, 2013]
+  Revise pngtest.c to skip tests of unsupported features.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
