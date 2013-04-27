@@ -4517,7 +4517,9 @@ Version 1.6.3beta02 [April 26, 2013]
   Test for 'arm*' not just 'arm' in the host_cpu configure variable.
   Rebuilt the configure scripts.
 
-Version 1.6.3beta03 [April 26, 2013]
+Version 1.6.3beta03 [April 27, 2013]
+  Expanded manual paragraph about writing private chunks, particularly
+    the need to call png_set_keep_unknown_chunks() when writing them.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

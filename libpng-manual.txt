@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.3beta03 - April 26, 2013
+ libpng version 1.6.3beta03 - April 27, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.3beta03 - April 26, 2013
+ libpng versions 0.97, January 1998, through 1.6.3beta03 - April 27, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -50,9 +50,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 I. Introduction
 
 This file describes how to use and modify the PNG reference library
-(known as libpng) for your own use.  There are five sections to this
-file: introduction, structures, reading, writing, and modification and
-configuration notes for various special platforms.  In addition to this
+(known as libpng) for your own use.  In addition to this
 file, example.c is a good starting point for using the library, as
 it is heavily commented and should include everything most people
 will need.  We assume that libpng is already installed; see the
@@ -3093,13 +3091,31 @@ a writeable buffer of at least 29 bytes.
 
 Writing unknown chunks
 
-You can use the png_set_unknown_chunks function to queue up chunks
-for writing.  You give it a chunk name, raw data, and a size; that's
-all there is to it.  The chunks will be written by the next following
-png_write_info_before_PLTE, png_write_info, or png_write_end function.
-Any chunks previously read into the info structure's unknown-chunk
-list will also be written out in a sequence that satisfies the PNG
-specification's ordering rules.
+You can use the png_set_unknown_chunks function to queue up private chunks
+for writing.  You give it a chunk name, location, raw data, and a size.  You
+also must use png_set_keep_unknown_chunks() to ensure that libpng will
+handle them.  That's all there is to it.  The chunks will be written by the
+next following png_write_info_before_PLTE, png_write_info, or png_write_end
+function, depending upon the specified location.  Any chunks previously
+read into the info structure's unknown-chunk list will also be written out
+in a sequence that satisfies the PNG specification's ordering rules.
+
+Here is an example of writing two private chunks, prVt and miNE:
+
+    #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
+    /* Set unknown chunk data */
+    png_unknown_chunk unkc[2];
+    png_set_keep_unknown_chunks(png, PNG_HANDLE_CHUNK_ALWAYS, NULL, 0);
+    strcpy((char *) unkc[0].name, "prVt";
+    unkc[0].data = (unsigned char *) "PRIVATE CHUNK DATA";
+    unkc[0].size = strlen(unkc[0].data)+1;
+    unkc[0].location = PNG_HAVE_IHDR;
+    strcpy((char *) unkc[1].name, "miNE";
+    unkc[1].data = (unsigned char *) "MY CHUNK DATA";
+    unkc[1].size = strlen(unkc[0].data)+1;
+    unkc[1].location = PNG_AFTER_IDAT;
+    png_set_unknown_chunks(png, info, unkc, 2);
+    #endif
 
 The high-level write interface
 
@@ -4947,7 +4963,7 @@ symbols, using the PNG_PREFIX macro.
 
 We no longer include string.h in png.h.  The include statement has been moved
 to pngpriv.h, where it is not accessible by applications.  Applications that
-need access to information in string.h must add an '#include "string.h"'
+need access to information in string.h must add an '#include <string.h>'
 directive.  It does not matter whether this is placed prior to or after
 the '"#include png.h"' directive.
 
@@ -5165,7 +5181,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-April 26, 2013
+April 27, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
