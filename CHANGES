@@ -4560,6 +4560,8 @@ Version 1.7.0beta12 [April 29, 2013]
   Added png_app_warning for out-of-range unknown chunk index in
     png_set_unknown_chunk_location().
   Expanded manual paragraph about writing private chunks.
+  Avoid dereferencing NULL pointer possibly returned from
+     png_create_write_struct() (Andrew Church).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
