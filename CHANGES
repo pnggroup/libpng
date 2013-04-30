@@ -4556,7 +4556,7 @@ Version 1.7.0beta10 [April 24, 2013]
 Version 1.7.0beta11 [April 26, 2013]
   Test for 'arm*', not just 'arm' in the host_cpu configure variable.
 
-Version 1.7.0beta12 [April 29, 2013]
+Version 1.7.0beta12 [April 30, 2013]
   Added png_app_warning for out-of-range unknown chunk index in
     png_set_unknown_chunk_location().
   Expanded manual paragraph about writing private chunks.

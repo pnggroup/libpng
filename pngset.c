@@ -1256,8 +1256,6 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
 {
    /* This API is pretty pointless in 1.6.0 because the location can be set
     * before the call to png_set_unknown_chunks.
-    *
-    * TODO: add a png_app_warning in 1.7
     */
    if (png_ptr != NULL && info_ptr != NULL && chunk >= 0 &&
       chunk < info_ptr->unknown_chunks_num)
@@ -1276,6 +1274,10 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
       info_ptr->unknown_chunks[chunk].location =
          check_location(png_ptr, location);
    }
+
+   /* TODO: make this an error in 1.8 (or maybe it will become one in 1.7!) */
+   else if (png_ptr != NULL)
+      png_app_warning(png_ptr, "unknown chunk index out of range");
 }
 #endif
 
