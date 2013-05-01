@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta04 - April 26, 2013
+Libpng 1.5.16beta04 - May 1, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,7 +42,9 @@ Version 1.5.16beta02 [April 26, 2013]
 Version 1.5.16beta03 [April 26, 2013]
   Test for 'arm*' not just 'arm' in the host_cpu configure variable.
 
-Version 1.5.16beta04 [April 26, 2013]
+Version 1.5.16beta04 [May 1, 2013]
+  Expanded manual paragraph about writing private chunks, particularly
+    the need to call png_set_keep_unknown_chunks() when writing them.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

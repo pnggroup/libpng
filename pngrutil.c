@@ -18,8 +18,6 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#define png_strtod(p,a,b) strtod(a,b)
-
 png_uint_32 PNGAPI
 png_get_uint_31(png_structp png_ptr, png_const_bytep buf)
 {
