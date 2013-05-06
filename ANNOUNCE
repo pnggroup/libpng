@@ -1,5 +1,5 @@
 
-Libpng 1.6.3beta04 - April 30, 2013
+Libpng 1.6.3beta04 - May 6, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -41,7 +41,9 @@ Version 1.6.3beta03 [April 30, 2013]
   Avoid dereferencing NULL pointer possibly returned from
      png_create_write_struct() (Andrew Church).
 
-Version 1.6.3beta04 [April 30, 2013]
+Version 1.6.3beta04 [May 6, 2013]
+  Calculate our own zlib windowBits when decoding rather than trusting the
+    CMF bytes in the PNG datastream.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

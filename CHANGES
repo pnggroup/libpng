@@ -4485,6 +4485,7 @@ Version 1.6.2beta01 [April 14, 2013]
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
   Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
+    Bug was introduced in libpng-1.6.0.
 
 Version 1.6.2rc01 [April 18, 2013]
   Added contrib/tools/fixitxt.c, to repair the erroneous iTXt chunk length
@@ -4523,7 +4524,9 @@ Version 1.6.3beta03 [April 30, 2013]
   Avoid dereferencing NULL pointer possibly returned from
      png_create_write_struct() (Andrew Church).
 
-Version 1.6.3beta04 [April 30, 2013]
+Version 1.6.3beta04 [May 6, 2013]
+  Calculate our own zlib windowBits when decoding rather than trusting the
+    CMF bytes in the PNG datastream.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
