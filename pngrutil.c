@@ -4520,6 +4520,11 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
     * windowBts predicted from the uncompressed data size, not the value from
     * the stream.  If READ_OPTIMIZE_WINDOWBITS_SUPPORTED is not defined, then
     * simply use a 32kbyte window (windowBits=15).
+    *
+    * To do: make this behavior optional via a run-time png_set_something(),
+    * with options to use windowBits=0 (use the zlib header data),
+    * windowBits=15 (use a 32kbyte window), or required_window_bits
+    * computed from the image size, pixel size, and interlacing setting.
     */
 #ifdef PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED
    if (png_inflate_claim(png_ptr, png_IDAT,
