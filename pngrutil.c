@@ -4163,7 +4163,8 @@ png_read_finish_row(png_structrp png_ptr)
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-#ifdef PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED
+#ifdef PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED 
+#if ZLIB_VERNUM > 0x1280
 /* This is the code to to select a windowBits value to match the smallest
  * possible sliding window needed to contain the entire uncompressed image.
  */
@@ -4230,6 +4231,7 @@ png_read_image_size(png_structrp png_ptr)
       return 0xffffffffU;
 }
 
+#endif /* ZLIB_VERNUM */
 #endif /* PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED */
 
 void /* PRIVATE */
@@ -4519,17 +4521,24 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 #ifdef PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED
    /* To do in libpng17: get windowBits from the CMF bytes and select the
     * smaller of that and the required_window_bits.  Requires a one-byte
-    * lookahead into the first IDAT chunk data.
+    * lookahead into the first IDAT chunk data, and requires actually
+    * injecting the revised CMF bytes into the datastream before reading.
     */
    {
+#if ZLIB_VERNUM < 0x1290
       unsigned int windowBits;
+#endif /* ZLIB_VERNUM */
 
       if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
       {
+#if ZLIB_VERNUM < 0x1290
+         windowBits=15;
+#else
          /* Compute required windowBits from the image size, pixel size, and
           * interlacing setting.
           */
          windowBits=required_window_bits(png_read_image_size(png_ptr));
+#endif /* ZLIB_VERNUM */
       }
 
       else

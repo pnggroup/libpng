@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta05 - May 2, 2013
+Libpng 1.6.3beta05 - May 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,44 +9,48 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.16beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.16beta05.tar.gz
-   1.5.16beta05.tar.bz2
+   1.6.3beta05.tar.xz (LZMA-compressed, recommended)
+   1.6.3beta05.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1516b05.7z  (LZMA-compressed, recommended)
-   lp1516b05.zip
+   lp163b05.7z  (LZMA-compressed, recommended)
+   lp163b05.zip
 
 Other information:
 
-   1.5.16beta05-README.txt
-   1.5.16beta05-LICENSE.txt
+   1.6.3beta05-README.txt
+   1.6.3beta05-LICENSE.txt
 
-Changes since the last public release (1.5.15):
+Changes since the last public release (1.6.2):
 
-Version 1.5.16beta01 [April 25, 2013]
-  Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
-    (Flavio Medeiros).
-  Revised stack marking in arm/filter_neon.S and configure.ac
+Version 1.6.3beta01 [April 25, 2013]
+  Revised stack marking in arm/filter_neon.S and configure.ac.
   Ensure that NEON filter stuff is completely disabled when switched 'off'.
     Previously the ARM NEON specific files were still built if the option
     was switched 'off' as opposed to being explicitly disabled.
-  Avoid a compiler warning about unused png_ptr in translate_gamma_flags()
 
-Version 1.5.16beta02 [April 26, 2013]
-  Revise pngtest.c to skip tests of unsupported features.
-  Regenerated configure files.
-
-Version 1.5.16beta03 [April 26, 2013]
+Version 1.6.3beta02 [April 26, 2013]
   Test for 'arm*' not just 'arm' in the host_cpu configure variable.
+  Rebuilt the configure scripts.
 
-Version 1.5.16beta04 [May 1, 2013]
+Version 1.6.3beta03 [April 30, 2013]
   Expanded manual paragraph about writing private chunks, particularly
     the need to call png_set_keep_unknown_chunks() when writing them.
+  Avoid dereferencing NULL pointer possibly returned from
+     png_create_write_struct() (Andrew Church).
 
-Version 1.5.16beta05 [May 2, 2013]
+Version 1.6.3beta04 [May 6, 2013]
+  Calculate our own zlib windowBits when decoding rather than trusting the
+    CMF bytes in the PNG datastream.
+
+Version 1.6.3beta05 [May 7, 2013]
+  Choose to use windowBits==15 or the zlib header setting via the
+    benign-errors setting.  If benign errors are allowed, then ignore
+    the windowBits setting in the zlib header.
+  Zlib-1.2.8 and earlier don't allow us to decrease the windowBits, so
+    undid the improvement in beta04.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
