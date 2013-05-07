@@ -462,10 +462,18 @@ void get_token(FILE *pnm_file, char *token)
   int i = 0;
   int ret;
 
-  /* remove white-space */
+  /* remove white-space and comment lines */
   do
   {
     ret = fgetc(pnm_file);
+    if (ret == '#') {
+      /* the rest of this line is a comment */
+      do
+      {
+        ret = fgetc(pnm_file);
+      }
+      while ((ret != '\n') && (ret != '\r') && (ret != EOF));
+    }
     if (ret == EOF) break;
     token[i] = (unsigned char) ret;
   }
