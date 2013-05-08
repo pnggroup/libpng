@@ -194,9 +194,8 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-contrib/libtests/pngstest.o contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
-contrib/libtests/pngunknown.o contrib/libtests/timepng.o: pnglibconf.h
-contrib/libtests/pngdeflate.o contrib/libtests/fixitxt.o: pnglibconf.h
+pngstest.o pngvalid.o pngtest.o pngunknown.o timepng.o: pnglibconf.h
+pngdeflate.o fixitxt.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
