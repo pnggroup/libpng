@@ -26,14 +26,14 @@
 #endif
 
 #if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
-#  error pngdeflate will not work with libpng versions prior to 1.6.3
+#  error "pngdeflate will not work with libpng versions prior to 1.6.3"
 #endif
 
 #ifdef PNG_READ_SUPPORTED
 #include <zlib.h>
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
-#  error pngdeflate not supported in this libpng version
+#  error "pngdeflate not supported in this libpng version"
 #endif
 
 #if PNG_ZLIB_VERNUM >= 0x1240
