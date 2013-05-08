@@ -13,6 +13,8 @@ everything = off
 # Switch on the write code - this makes a minimalist encoder
 
 option WRITE on
+option WRITE_INVERT on
+option WRITE_PACK on
 
 # You must choose fixed or floating point arithmetic:
 # option FLOATING_POINT on

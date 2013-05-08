@@ -4534,8 +4534,6 @@ Version 1.6.3beta05 [May 8, 2013]
     the windowBits setting in the zlib header.
   Zlib-1.2.8 and earlier don't allow us to decrease the windowBits, so
     undid the improvement in beta04.
-  Check for EOF in contrib/pngminus/pnm2png.c (Paul Stewart).
-  Ignore "#" delimited comments in input file to pnm2png.c.
   Added an option to force maximum window size for inflating. For inflate,
     reverted previous fixes.
   Added fixitxt and pngdeflate to the built programs and removed warnings
@@ -4547,6 +4545,13 @@ Version 1.6.3beta05 [May 8, 2013]
     1.6 and later.
   Fixed gnu issues: g++ needs a static_cast, gcc 4.4.7 has a broken warning
     message which it is easier to work round than ignore.
+  Updated contrib/pngminus/pnm2png.c (Paul Stewart):
+    Check for EOF
+    Ignore "#" delimited comments in input file to pnm2png.c.
+    Fixed whitespace handling
+    Added a call to png_set_packing()
+    Initialize dimension values so if sscanf fails at least we have known
+      invalid values.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
