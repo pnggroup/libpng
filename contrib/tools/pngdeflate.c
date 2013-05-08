@@ -13,12 +13,46 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#ifdef PNG_READ_SUPPORTED
 #include <string.h>
 #include <ctype.h>
 
-#include <png.h>
+/* Define the following to use this program against your installed libpng,
+ * rather than the one being built here:
+ */
+#ifdef PNG_FREESTANDING_TESTS
+#  include <png.h>
+#else
+#  include "../../png.h"
+#endif
+
+#if PNG_LIBPNG_VER < 10600 /* 1.6.0 */
+#  error pngdeflate will not work with libpng versions prior to 1.6
+#endif
+
+#ifdef PNG_READ_SUPPORTED
 #include <zlib.h>
+
+#ifndef PNG_MAXIMUM_INFLATE_WINDOW
+#  if PNG_LIBPNG_VER != 10600 && PNG_LIBPNG_VER != 10601 && \
+      PNG_LIBPNG_VER != 10602
+#     error pngdeflate not supported in this libpng version
+#  endif
+#endif
+
+/* Copied from pngpriv.h */
+#ifdef __cplusplus
+#  define png_voidcast(type, value) static_cast<type>(value)
+#  define png_constcast(type, value) const_cast<type>(value)
+#  define png_aligncast(type, value) \
+   static_cast<type>(static_cast<void*>(value))
+#  define png_aligncastconst(type, value) \
+   static_cast<type>(static_cast<const void*>(value))
+#else
+#  define png_voidcast(type, value) (value)
+#  define png_constcast(type, value) ((type)(value))
+#  define png_aligncast(type, value) ((void*)(value))
+#  define png_aligncastconst(type, value) ((const void*)(value))
+#endif /* __cplusplus */
 
 static int idat_error = 0;
 static int verbose = 0;
@@ -204,8 +238,8 @@ read_png(FILE *fp)
    {
       png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
-      row = malloc(rowbytes);
-      display = malloc(rowbytes);
+      row = png_voidcast(png_byte*, malloc(rowbytes));
+      display = png_voidcast(png_byte*, malloc(rowbytes));
 
       if (row == NULL || display == NULL)
          png_error(png_ptr, "OOM allocating row buffers");
@@ -524,11 +558,10 @@ fix_one(FILE *fp, FILE *fpIn, IDAT_info *info, png_uint_32 max_IDAT, int strip)
          {
             rx(fpIn, info->header + state, 1);
             wx(fp, info->header + state, 1);
-            ++state;
             ++len_IDAT;
             --len;
 
-            if (state == 2)
+            if (state++ == 1)
             {
                /* The zlib stream is used to validate the compressed IDAT
                 * data in the most relaxed way possible.

@@ -4541,6 +4541,12 @@ Version 1.6.3beta05 [May 8, 2013]
   Added fixitxt and pngdeflate to the built programs and removed warnings
     from the source code and timepng that are revealed as a result.  Fixed
     fixitxt when the chunk length is more than 65535 (untested, no test case).
+  Detect wrong libpng versions linked to pngdeflate, which currently
+    only works with libpng versions that can be made to reliably fail when
+    the deflate data contains an out-of-window reference.  This means only
+    1.6 and later.
+  Fixed gnu issues: g++ needs a static_cast, gcc 4.4.7 has a broken warning
+    message which it is easier to work round than ignore.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
