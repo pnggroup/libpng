@@ -369,7 +369,8 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
       int ret; /* zlib return code */
 #     if ZLIB_VERNUM >= 0x1240
 
-#        ifdef PNG_SET_OPTION_SUPPORTED
+#        if defined(PNG_SET_OPTION_SUPPORTED) && \
+            defined(PNG_MAXIMUM_INFLATE_WINDOW)
             int window_bits;
 
             if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
