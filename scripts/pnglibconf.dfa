@@ -399,7 +399,7 @@ option SAFE_LIMITS enables USER_LIMITS disabled
 # to libpng 1.6; the new interfaces in 1.6 will take several years to become
 # popular.
 
-option READ enables READ_INTERLACING
+option READ enables READ_INTERLACING SET_OPTION
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
@@ -825,9 +825,6 @@ option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE, CHECK_FOR_INVALID_INDEX
 option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX WRITE_GET_PALETTE_MAX
 option READ_GET_PALETTE_MAX requires READ_CHECK_FOR_INVALID_INDEX disabled
 option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
-
-# added at libpng-1.6.3
-option READ_OPTIMIZE_WINDOWBITS requires READ
 
 # Simplified API options (added at libpng-1.6.0)
 # Read:

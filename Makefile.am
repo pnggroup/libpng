@@ -9,6 +9,9 @@ ACLOCAL_AMFLAGS = -I scripts
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest pngunknown pngstest pngvalid
 
+# Utilities - installed
+bin_PROGRAMS= pngdeflate fixitxt
+
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
@@ -20,6 +23,11 @@ pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngdeflate_SOURCES = contrib/tools/pngdeflate.c
+pngdeflate_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+fixitxt_SOURCES = contrib/tools/fixitxt.c
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
@@ -187,7 +195,8 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
 contrib/libtests/pngstest.o contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
-contrib/libtests/pngunknown.o: pnglibconf.h
+contrib/libtests/pngunknown.o contrib/libtests/timepng.o: pnglibconf.h
+contrib/libtests/pngdeflate.o contrib/libtests/fixitxt.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from

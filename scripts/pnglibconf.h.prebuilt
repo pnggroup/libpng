@@ -2,7 +2,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng version 1.6.3beta05 - May 6, 2013 */
+/* Libpng version 1.6.3beta05 - May 8, 2013 */
 
 /* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
 
@@ -105,10 +105,9 @@
 #define PNG_SETJMP_SUPPORTED
 #define PNG_SET_CHUNK_CACHE_LIMIT_SUPPORTED
 #define PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
-/*#undef PNG_SET_OPTION_SUPPORTED*/
+#define PNG_SET_OPTION_SUPPORTED
 #define PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 #define PNG_SET_USER_LIMITS_SUPPORTED
-#define PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED
 #define PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
 #define PNG_SIMPLIFIED_READ_BGR_SUPPORTED
 #define PNG_SIMPLIFIED_READ_SUPPORTED

@@ -24,18 +24,20 @@
  *
  *     gcc -O -o fixitxt fixitxt.c -lz
  */
+#include <zlib.h>
 
 #define MAX_LENGTH 500000
 
-#define GETBREAK c=getchar(); if (c == EOF) break;
-#include <zlib.h>
+#define GETBREAK ((unsigned char)(inchar=getchar())); if (inchar == EOF) break
 
-main()
+int
+main(void)
 {
    unsigned int i;
    unsigned char buf[MAX_LENGTH];
    unsigned long crc;
-   unsigned int c;
+   unsigned char c;
+   int inchar;
 
 /* Skip 8-byte signature */
    for (i=8; i; i--)
@@ -44,17 +46,16 @@ main()
       putchar(c);
    }
 
-if (c != EOF)
+if (inchar != EOF)
 for (;;)
  {
    /* Read the length */
-   unsigned long length;
-   c=GETBREAK; buf[0] = c;
-   c=GETBREAK; buf[1] = c;
-   c=GETBREAK; buf[2] = c;
-   c=GETBREAK; buf[3] = c;
+   unsigned long length; /* must be 32 bits! */
+   c=GETBREAK; buf[0] = c; length  = c; length <<= 8;
+   c=GETBREAK; buf[1] = c; length += c; length <<= 8;
+   c=GETBREAK; buf[2] = c; length += c; length <<= 8;
+   c=GETBREAK; buf[3] = c; length += c;
 
-   length=((((unsigned long) buf[0]<<8 + buf[1]<<16) + buf[2] << 8) + buf[3]);
    /* Read the chunkname */
    c=GETBREAK; buf[4] = c;
    c=GETBREAK; buf[5] = c;
@@ -125,7 +126,7 @@ for (;;)
          putchar(c);
       }
 
-      if (c == EOF)
+      if (inchar == EOF)
       {
          break;
       }
@@ -135,10 +136,12 @@ for (;;)
          break;
    }
 
-   if (c == EOF)
+   if (inchar == EOF)
       break;
 
    if (buf[4] == 73 && buf[5] == 69 && buf[6] == 78 && buf[7] == 68)
      break;
  }
+
+ return 0;
 }

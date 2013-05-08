@@ -332,7 +332,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
  * chunk apparently owns the stream.  Prior to release it does a png_error.
  */
 static int
-png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
+png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 {
    if (png_ptr->zowner != 0)
    {
@@ -367,6 +367,21 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
     */
    {
       int ret; /* zlib return code */
+#     if ZLIB_VERNUM >= 0x1240
+
+#        ifdef PNG_SET_OPTION_SUPPORTED
+            int window_bits;
+
+            if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
+               PNG_OPTION_ON)
+               window_bits = 15;
+
+            else
+               window_bits = 0;
+#        else
+#           define window_bits 0
+#        endif
+#     endif
 
       /* Set this for safety, just in case the previous owner left pointers to
        * memory allocations.
@@ -379,7 +394,6 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
       if (png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED)
       {
 #        if ZLIB_VERNUM < 0x1240
-            PNG_UNUSED(window_bits)
             ret = inflateReset(&png_ptr->zstream);
 #        else
             ret = inflateReset2(&png_ptr->zstream, window_bits);
@@ -406,6 +420,10 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner, int window_bits)
 
       return ret;
    }
+
+#  ifdef window_bits
+#     undef window_bits
+#  endif
 }
 
 #ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
@@ -578,14 +596,8 @@ png_decompress_chunk(png_structrp png_ptr,
       if (limit < *newlength)
          *newlength = limit;
 
-      /* Now try to claim the stream; the 'warn' setting causes zlib to be told
-       * to use the maximum window size during inflate; this hides errors in the
-       * deflate header window bits value which is used if '0' is passed.  In
-       * fact this only has an effect with zlib versions 1.2.4 and later - see
-       * the comments in png_inflate_claim above.
-       */
-      ret = png_inflate_claim(png_ptr, png_ptr->chunk_name,
-         png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN ? 15 : 0);
+      /* Now try to claim the stream. */
+      ret = png_inflate_claim(png_ptr, png_ptr->chunk_name);
 
       if (ret == Z_OK)
       {
@@ -1355,8 +1367,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
          {
             read_length -= keyword_length+2;
 
-            if (png_inflate_claim(png_ptr, png_iCCP,
-               png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN ? 15 : 0) == Z_OK)
+            if (png_inflate_claim(png_ptr, png_iCCP) == Z_OK)
             {
                Byte profile_header[132];
                Byte local_buffer[PNG_INFLATE_BUF_SIZE];
@@ -4163,77 +4174,6 @@ png_read_finish_row(png_structrp png_ptr)
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
-#ifdef PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED 
-#if ZLIB_VERNUM > 0x1280
-/* This is the code to to select a windowBits value to match the smallest
- * possible sliding window needed to contain the entire uncompressed image.
- */
-static unsigned int
-required_window_bits(png_alloc_size_t data_size)
-{
-   unsigned int windowBits = 15;
-   if (data_size <= 16384) /* else windowBits must be 15 */
-   {
-      unsigned int half_z_window_size = 1U << (windowBits-1);  /* 16384 */
-
-      do
-      {
-         half_z_window_size >>= 1;
-         --windowBits;
-      }
-      while (windowBits > 8 && data_size <= half_z_window_size);
-   }
-   return windowBits;
-}
-/* This is used below to find the size of an image to pass to png_deflate_claim,
- * so it only needs to be accurate if the size is less than 16384 bytes (the
- * point at which a lower LZ window size can be used.)
- *
- * To do: merge this with png_image_size() in pngwutil.c and put the result
- * in png.c as a PNG_INTERNAL_FUNCTION.
- */
-static png_alloc_size_t
-png_read_image_size(png_structrp png_ptr)
-{
-   /* Only return sizes up to the maximum of a png_uint_32, do this by limiting
-    * the width and height used to 15 bits.
-    */
-   png_uint_32 h = png_ptr->height;
-
-   if (png_ptr->rowbytes < 32768 && h < 32768)
-   {
-      if (png_ptr->interlaced)
-      {
-         /* Interlacing makes the image larger because of the replication of
-          * both the filter byte and the padding to a byte boundary.
-          */
-         png_uint_32 w = png_ptr->width;
-         unsigned int pd = png_ptr->pixel_depth;
-         png_alloc_size_t cb_base;
-         int pass;
-
-         for (cb_base=0, pass=0; pass<=6; ++pass)
-         {
-            png_uint_32 pw = PNG_PASS_COLS(w, pass);
-
-            if (pw > 0)
-               cb_base += (PNG_ROWBYTES(pd, pw)+1) * PNG_PASS_ROWS(h, pass);
-         }
-
-         return cb_base;
-      }
-
-      else
-         return (png_ptr->rowbytes+1) * h;
-   }
-
-   else
-      return 0xffffffffU;
-}
-
-#endif /* ZLIB_VERNUM */
-#endif /* PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED */
-
 void /* PRIVATE */
 png_read_start_row(png_structrp png_ptr)
 {
@@ -4518,37 +4458,13 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
       png_free(png_ptr, buffer);
    }
 
-#ifdef PNG_READ_OPTIMIZE_WINDOWBITS_SUPPORTED
-   /* To do in libpng17: get windowBits from the CMF bytes and select the
-    * smaller of that and the required_window_bits.  Requires a one-byte
-    * lookahead into the first IDAT chunk data, and requires actually
-    * injecting the revised CMF bytes into the datastream before reading.
+   /* Finally claim the zstream for the inflate of the IDAT data, use the bits
+    * value from the stream (note that this will result in a fatal error if the
+    * IDAT stream has a bogus deflate header window_bits value, but this should
+    * not be happening any longer!)
     */
-   {
-#if ZLIB_VERNUM < 0x1290
-      unsigned int windowBits;
-#endif /* ZLIB_VERNUM */
-
-      if (png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN)
-      {
-#if ZLIB_VERNUM < 0x1290
-         windowBits=15;
-#else
-         /* Compute required windowBits from the image size, pixel size, and
-          * interlacing setting.
-          */
-         windowBits=required_window_bits(png_read_image_size(png_ptr));
-#endif /* ZLIB_VERNUM */
-      }
-
-      else
-#endif
-         windowBits=0; /* Use the setting from the zlib CMF bytes */
-
-      /* Finally claim the zstream for the inflate of the IDAT data */
-      if (png_inflate_claim(png_ptr, png_IDAT, windowBits) != Z_OK)
-         png_error(png_ptr, png_ptr->zstream.msg);
-   }
+   if (png_inflate_claim(png_ptr, png_IDAT) != Z_OK)
+      png_error(png_ptr, png_ptr->zstream.msg);
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }

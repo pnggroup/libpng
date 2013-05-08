@@ -4528,7 +4528,7 @@ Version 1.6.3beta04 [May 6, 2013]
   Calculate our own zlib windowBits when decoding rather than trusting the
     CMF bytes in the PNG datastream.
 
-Version 1.6.3beta05 [May 7, 2013]
+Version 1.6.3beta05 [May 8, 2013]
   Choose to use windowBits==15 or the zlib header setting via the
     benign-errors setting.  If benign errors are allowed, then ignore
     the windowBits setting in the zlib header.
@@ -4536,6 +4536,11 @@ Version 1.6.3beta05 [May 7, 2013]
     undid the improvement in beta04.
   Check for EOF in contrib/pngminus/pnm2png.c (Paul Stewart).
   Ignore "#" delimited comments in input file to pnm2png.c.
+  Added an option to force maximum window size for inflating. For inflate,
+    reverted previous fixes.
+  Added fixitxt and pngdeflate to the built programs and removed warnings
+    from the source code and timepng that are revealed as a result.  Fixed
+    fixitxt when the chunk length is more than 65535 (untested, no test case).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
