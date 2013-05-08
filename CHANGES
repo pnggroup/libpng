@@ -4552,6 +4552,8 @@ Version 1.6.3beta05 [May 8, 2013]
     Added a call to png_set_packing()
     Initialize dimension values so if sscanf fails at least we have known
       invalid values.
+  Attempt to detect configuration issues with pngdeflate, which requires
+    both the correct libpng and the correct zlib to function correctly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

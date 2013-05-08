@@ -367,7 +367,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
     */
    {
       int ret; /* zlib return code */
-#     if ZLIB_VERNUM >= 0x1240
+#     if PNG_ZLIB_VERNUM >= 0x1240
 
 #        if defined(PNG_SET_OPTION_SUPPORTED) && \
             defined(PNG_MAXIMUM_INFLATE_WINDOW)
@@ -394,7 +394,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       if (png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED)
       {
-#        if ZLIB_VERNUM < 0x1240
+#        if PNG_ZLIB_VERNUM < 0x1240
             ret = inflateReset(&png_ptr->zstream);
 #        else
             ret = inflateReset2(&png_ptr->zstream, window_bits);
@@ -403,7 +403,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       else
       {
-#        if ZLIB_VERNUM < 0x1240
+#        if PNG_ZLIB_VERNUM < 0x1240
             ret = inflateInit(&png_ptr->zstream);
 #        else
             ret = inflateInit2(&png_ptr->zstream, window_bits);

@@ -25,19 +25,18 @@
 #  include "../../png.h"
 #endif
 
-#if PNG_LIBPNG_VER < 10600 /* 1.6.0 */
-#  error pngdeflate will not work with libpng versions prior to 1.6
+#if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
+#  error pngdeflate will not work with libpng versions prior to 1.6.3
 #endif
 
 #ifdef PNG_READ_SUPPORTED
 #include <zlib.h>
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
-#  if PNG_LIBPNG_VER != 10600 && PNG_LIBPNG_VER != 10601 && \
-      PNG_LIBPNG_VER != 10602
-#     error pngdeflate not supported in this libpng version
-#  endif
+#  error pngdeflate not supported in this libpng version
 #endif
+
+#if PNG_ZLIB_VERNUM >= 0x1240
 
 /* Copied from pngpriv.h */
 #ifdef __cplusplus
@@ -726,8 +725,8 @@ fix_one(FILE *fp, FILE *fpIn, IDAT_info *info, png_uint_32 max_IDAT, int strip)
                      break;
                   /* Fall trhough */
 
-               default: /* Keep only IHDR, PLTE */
-                  if (tag == png_IHDR || tag == png_PLTE)
+               default: /* Keep only IHDR, PLTE, tRNS */
+                  if (tag == png_IHDR || tag == png_PLTE || tag == png_tRNS)
                      break;
 
                   skip = 1;
@@ -994,8 +993,8 @@ usage(const char *prog, int rc)
 #  endif
       "  --optimize (-o): Find the smallest deflate window size for the file.\n"
       "                   Also outputs a summary for each file.\n"
-      "  --strip (-s): Remove chunks except for IHDR, PLTE, IEND, gAMA, sRGB.\n"
-      "                If given twice remove gAMA and sRGB as well.\n"
+      "  --strip (-s): Remove chunks except for IHDR, PLTE, IEND, tRNS, gAMA,\n"
+      "                sRGB.  If given twice remove gAMA and sRGB as well.\n"
       "  --errors (-e): Output errors from libpng (except too-far-back).\n");
    fprintf(stderr,
       "  --warnings (-w): Output warnings from libpng.\n"
@@ -1168,6 +1167,16 @@ main(int argc, const char **argv)
 
    return err != 0;
 }
+
+#else /* PNG_ZLIB_VERNUM < 0x1240 */
+int
+main(void)
+{
+   fprintf(stderr, "pngdeflate needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
+      PNG_ZLIB_VERNUM);
+   return 77;
+}
+#endif /* PNG_ZLIB_VERNUM */
 
 #else /* No read support */
 
