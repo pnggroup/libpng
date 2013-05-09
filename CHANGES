@@ -4560,6 +4560,8 @@ Version 1.6.3beta05 [May 9, 2013]
   Added information in the documentation about problems with and fixes for
   the bad CRC and bad iTXt chunk situations.
 
+Version 1.6.3beta06 [May 9, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
