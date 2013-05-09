@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.3beta05 - May 6, 2013
+ libpng version 1.6.3beta05 - May 9, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.3beta05 - May 6, 2013
+ libpng versions 0.97, January 1998, through 1.6.3beta05 - May 9, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -5035,6 +5035,20 @@ The machine-generated configure files are no longer included in branches
 libpng16 and later of the GIT repository.  They continue to be included
 in the tarball releases, however.
 
+Libpng-1.6.0 and later use the CMF bytes at the beginning of the IDAT stream
+to set the size of the sliding window for reading instead of using the default
+32-kbyte sliding window size.  It was discovered that there are hundreds of PNG
+files in the wild that have incorrect CMF bytes that cause libpng to now issue
+a "too far back" error and reject the file.  Libpng-1.6.3 provides a way to
+revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a 32-kbyte
+sliding window), and provides a tool (called "contrib/tools/pnginflate"),
+for optimizing the CMF bytes correctly.
+
+Libpng-1.6.0 and libpng-1.6.1 wrote uncompressed iTXt chunks with the wrong
+length, which resulted in PNG files that cannot be read beyond the bad iTXt
+chunk.  This error was fixed in libpng-1.6.3, and a tool (called
+contrib/tools/png-fix-itxt) has been added to the libpng distribution.
+
 XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
@@ -5197,7 +5211,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-May 6, 2013
+May 9, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

@@ -1,8 +1,8 @@
-#include <stdio.h>
 
-/* fixitxt version 1.0.0
+/* png-fix-itxt version 1.0.0
  *
  * Copyright 2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.3 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -10,7 +10,7 @@
  *
  * Usage:            
  *
- *     fixitxt.exe < bad.png > good.png
+ *     png-fix-itxt.exe < bad.png > good.png
  *
  * Fixes a PNG file written with libpng-1.6.0 or 1.6.1 that has one or more
  * uncompressed iTXt chunks.  Assumes that the actual length is greater
@@ -22,8 +22,14 @@
  *
  * Requires zlib (for crc32 and Z_NULL); build with
  *
- *     gcc -O -o fixitxt fixitxt.c -lz
+ *     gcc -O -o png-fix-itxt png-fix-itxt.c -lz
+ *
+ * If you need to handle iTXt chunks larger than 500000 kbytes you must
+ * rebuild png-fix-itxt with a larger values of MAX_LENGTH (or a smaller value
+ * if you know you will never encounter such huge iTXt chunks).
  */
+
+#include <stdio.h>
 #include <zlib.h>
 
 #define MAX_LENGTH 500000

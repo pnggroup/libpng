@@ -691,8 +691,8 @@ fix_one(FILE *fp, FILE *fpIn, IDAT_info *info, png_uint_32 max_IDAT, int strip)
             }
          } /* while len > 0 && state < 4 */
 
-         /* The above loop only exits on 0 bytes left or end of stream, if
-          * the stream ended with bytes left discard them:
+         /* The above loop only exits on 0 bytes left or end of stream. If
+          * the stream ended with bytes left, discard them:
           */
          if (len > 0)
          {
@@ -723,7 +723,7 @@ fix_one(FILE *fp, FILE *fpIn, IDAT_info *info, png_uint_32 max_IDAT, int strip)
                case 1:  /* Keep gAMA, sRGB */
                   if (tag == png_gAMA || tag == png_sRGB)
                      break;
-                  /* Fall trhough */
+                  /* Fall through */
 
                default: /* Keep only IHDR, PLTE, tRNS */
                   if (tag == png_IHDR || tag == png_PLTE || tag == png_tRNS)

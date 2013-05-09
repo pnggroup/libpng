@@ -4528,7 +4528,7 @@ Version 1.6.3beta04 [May 6, 2013]
   Calculate our own zlib windowBits when decoding rather than trusting the
     CMF bytes in the PNG datastream.
 
-Version 1.6.3beta05 [May 8, 2013]
+Version 1.6.3beta05 [May 9, 2013]
   Choose to use windowBits==15 or the zlib header setting via the
     benign-errors setting.  If benign errors are allowed, then ignore
     the windowBits setting in the zlib header.
@@ -4555,6 +4555,9 @@ Version 1.6.3beta05 [May 8, 2013]
   Attempt to detect configuration issues with pngdeflate, which requires
     both the correct libpng and the correct zlib to function correctly.
   Check ZLIB_VERNUM for mismatches, enclose #error in quotes
+  Renamed contrib/tools/fixitxt to contrib/tools/png-fix-itxt.
+  Added information in the documentation about problems with and fixes for
+  the bad CRC and bad iTXt chunk situations.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
