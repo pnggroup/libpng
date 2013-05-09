@@ -999,7 +999,7 @@ usage(const char *prog, int rc)
    fprintf(stderr,
       "  --warnings (-w): Output warnings from libpng.\n"
       "  --verbose (-v): Output more verbose messages.\n"
-      "  --max=<number>: Output IDAT chunks sized <mumber>.  If not given the\n"
+      "  --max=<number>: Output IDAT chunks sized <number>.  If not given the\n"
       "                  the IDAT chunks will be the maximum size permitted\n"
       "                  (2^31-1 bytes.)\n"
       "  --out=<file>: Save the result for the next PNG to <file>.\n"
@@ -1039,7 +1039,7 @@ usage(const char *prog, int rc)
    fprintf(stderr,
       "   image-bits: The window bits value corresponding to the size of the\n"
       "               uncompressed PNG image data.  When --optimize is not\n"
-      "               given but --strip is this value will be used if lower\n"
+      "               given but --strip is, this value will be used if lower\n"
       "               than the current value.\n"
       "   opt-flag: < if the optimized bit value is less than that implied by\n"
       "               the PNG image size (opt-bits < image-bits)\n"
