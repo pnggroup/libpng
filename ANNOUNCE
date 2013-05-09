@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta05 - May 9, 2013
+Libpng 1.5.16beta06 - May 9, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.16beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.16beta05.tar.gz
-   1.5.16beta05.tar.bz2
+   1.5.16beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.16beta06.tar.gz
+   1.5.16beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1516b05.7z  (LZMA-compressed, recommended)
-   lp1516b05.zip
+   lp1516b06.7z  (LZMA-compressed, recommended)
+   lp1516b06.zip
 
 Other information:
 
-   1.5.16beta05-README.txt
-   1.5.16beta05-LICENSE.txt
+   1.5.16beta06-README.txt
+   1.5.16beta06-LICENSE.txt
 
 Changes since the last public release (1.5.15):
 
@@ -54,6 +54,10 @@ Version 1.5.16beta05 [May 9, 2013]
     Added a call to png_set_packing()
     Initialize dimension values so if sscanf fails at least we have known
       invalid values.
+
+Version 1.5.16beta06 [May 9, 2013]
+  Allow contrib/pnminus/pnm2png.c to compile without WRITE_INVERT and WRITE_PACK
+    supported (writes error message that it can't read P1 or P4 PBM files).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
