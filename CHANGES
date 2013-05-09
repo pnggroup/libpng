@@ -4556,6 +4556,7 @@ Version 1.6.3beta05 [May 9, 2013]
     both the correct libpng and the correct zlib to function correctly.
   Check ZLIB_VERNUM for mismatches, enclose #error in quotes
   Renamed contrib/tools/fixitxt to contrib/tools/png-fix-itxt.
+  Renamed contrib/tools/pnginflate to contrib/tools/png-fix-too-far-back.
   Added information in the documentation about problems with and fixes for
   the bad CRC and bad iTXt chunk situations.
 

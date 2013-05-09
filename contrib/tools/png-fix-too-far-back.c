@@ -1,4 +1,4 @@
-/* pngdeflate.c
+/* png-fix-too-far-back.c
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
@@ -8,7 +8,7 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * Tool to check and fix the deflate 'too far back' problem, see the usage
+ * Tool to check and fix the zlib inflate 'too far back' problem, see the usage
  * message for more information.
  */
 #include <stdlib.h>
@@ -26,14 +26,14 @@
 #endif
 
 #if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
-#  error "pngdeflate will not work with libpng versions prior to 1.6.3"
+#  error "png-fix-too-far-back will not work with libpng prior to 1.6.3"
 #endif
 
 #ifdef PNG_READ_SUPPORTED
 #include <zlib.h>
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
-#  error "pngdeflate not supported in this libpng version"
+#  error "png-fix-too-far-back not supported in this libpng version"
 #endif
 
 #if PNG_ZLIB_VERNUM >= 0x1240
@@ -592,7 +592,7 @@ fix_one(FILE *fp, FILE *fpIn, IDAT_info *info, png_uint_32 max_IDAT, int strip)
             rx(fpIn, &b, 1);
             --len;
 
-            /* Do this 1 byte at a time to maximize the chance of
+            /* Do this 1 byte at a time to guarantee
              * detecting errors (in particular zlib can skip the
              * 'too-far-back' error if the output buffer is bigger than
              * the window size.)
@@ -1172,7 +1172,8 @@ main(int argc, const char **argv)
 int
 main(void)
 {
-   fprintf(stderr, "pngdeflate needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
+   fprintf(stderr,
+      "png-fix-too-far-back needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
       PNG_ZLIB_VERNUM);
    return 77;
 }
@@ -1183,7 +1184,7 @@ main(void)
 int
 main(void)
 {
-   fprintf(stderr, "pngdeflate does not work without read support\n");
+   fprintf(stderr, "png-fix-too-far-back does not work without read support\n");
    return 77;
 }
 #endif /* PNG_READ_SUPPORTED */
