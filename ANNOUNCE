@@ -68,8 +68,6 @@ Version 1.6.3beta05 [May 9, 2013]
   Check ZLIB_VERNUM for mismatches, enclose #error in quotes
   Added information in the documentation about problems with and fixes for
     the bad CRC and bad iTXt chunk situations.
-  Attempt to detect configuration issues with pngdeflate, which requires
-    both the correct libpng and the correct zlib to function correctly.
 
 Version 1.6.3beta06 [May 9, 2013]
 
