@@ -5545,9 +5545,10 @@ to set the size of the sliding window for reading instead of using the default
 32-kbyte sliding window size.  It was discovered that there are hundreds of PNG
 files in the wild that have incorrect CMF bytes that cause libpng to now issue
 a "too far back" error and reject the file.  Libpng-1.6.3 provides a way to
-revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a 32-kbyte
-sliding window), and provides a tool (called "contrib/tools/pnginflate"),
-for optimizing the CMF bytes correctly.
+revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
+32-kbyte sliding window), and provides a tool
+(contrib/tools/png-fix-too-far-back) for optimizing the CMF bytes
+correctly.
 
 Libpng-1.6.0 and libpng-1.6.1 wrote uncompressed iTXt chunks with the wrong
 length, which resulted in PNG files that cannot be read beyond the bad iTXt
