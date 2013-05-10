@@ -155,10 +155,12 @@ png_realloc_array,(png_structrp png_ptr, png_const_voidp old_array,
    }
 
 #ifdef PNG_READ_SUPPORTED
+# ifdef PNG_USER_LIMITS_SUPPORTED
    /* The potential overflow case.  Set the cache counter so libpng will
     * not make any more attempts
     */
    png_ptr->user_chunk_cache_max = 2;
+# endif
 #endif
 
    return NULL; /* error */
