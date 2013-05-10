@@ -4564,10 +4564,15 @@ Version 1.7.0beta12 [April 30, 2013]
      png_create_write_struct() (Andrew Church).
 
 Version 1.7.0beta13 [May 10, 2013]
-  Check for EOF in contrib/pngminus/pnm2png.c (Paul Stewart).
-  Ignore "#" delimited comments in input file to pnm2png.c.
   Revised contrib/pngminim/*/makefile to generate pnglibconf.h with the
     right zlib header files.
+  Updated contrib/pngminus/pnm2png.c (Paul Stewart):
+    Check for EOF
+    Ignore "#" delimited comments in input file to pnm2png.c.
+    Fixed whitespace handling
+    Added a call to png_set_packing()
+    Initialize dimension values so if sscanf fails at least we have known
+      invalid values.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
