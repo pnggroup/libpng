@@ -238,6 +238,7 @@ option SET_OPTION disabled
 # ARM_NEON: the optimization itself
 # ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
 # ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
+setting ZLIB_VERNUM default @ZLIB_VERNUM
 #                 supported, this is poorly supported and deprectated - use the
 #                 png_set_hardware API.
 option ARM_NEON disabled,
@@ -425,7 +426,7 @@ option SET_USER_LIMITS requires USER_LIMITS
 # to libpng 1.6; the new interfaces in 1.6 will take several years to become
 # popular.
 
-option READ enables READ_INTERLACING
+option READ enables READ_INTERLACING SET_OPTION
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit

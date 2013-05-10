@@ -4573,6 +4573,23 @@ Version 1.7.0beta13 [May 10, 2013]
     Added a call to png_set_packing()
     Initialize dimension values so if sscanf fails at least we have known
       invalid values.
+  Calculate our own zlib windowBits when decoding rather than trusting the
+    CMF bytes in the PNG datastream.
+  Added an option to force maximum window size for inflating, which was
+    the behavior of libpng15 and earlier.
+  Added png-fix-itxt and png-fix-too-far-back to the built programs and
+    removed warnings from the source code and timepng that are revealed as
+    a result.
+  Detect wrong libpng versions linked to png-fix-too-far-back, which currently
+    only works with libpng versions that can be made to reliably fail when
+    the deflate data contains an out-of-window reference.  This means only
+    1.6 and later.
+  Attempt to detect configuration issues with png-fix-too-far-back, which
+    requires both the correct libpng and the correct zlib to function
+    correctly.
+  Check ZLIB_VERNUM for mismatches, enclose #error in quotes
+  Added information in the documentation about problems with and fixes for
+    the bad CRC and bad iTXt chunk situations.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
