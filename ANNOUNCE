@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta06 - May 10, 2013
+Libpng 1.5.16beta06 - May 12, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,11 +55,13 @@ Version 1.5.16beta05 [May 9, 2013]
     Initialize dimension values so if sscanf fails at least we have known
       invalid values.
 
-Version 1.5.16beta06 [May 10, 2013]
+Version 1.5.16beta06 [May 12, 2013]
   Allow contrib/pnminus/pnm2png.c to compile without WRITE_INVERT and WRITE_PACK
     supported (writes error message that it can't read P1 or P4 PBM files).
   Revised contrib/pngminim/*/makefile to separate CPPFLAGS and CPFLAGS, and
     to generate pnglibconf.h with the right zlib header files.
+  Ported contrib/pngminus/pnm2png.c changes back from libpng-1.6.3beta06,
+    to use unsigned long, not png_uint_32 arguments to sscanf().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
