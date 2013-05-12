@@ -4107,6 +4107,8 @@ Version 1.5.16beta06 [May 12, 2013]
   Ported contrib/pngminus/pnm2png.c changes back from libpng-1.6.3beta06,
     to use unsigned long, not png_uint_32 arguments to sscanf().
 
+Version 1.5.16beta07 [May 12, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
