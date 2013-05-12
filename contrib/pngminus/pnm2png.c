@@ -210,7 +210,9 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   int           alpha_present;
   int           row, col;
   BOOL          raw, alpha_raw = FALSE;
+#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   BOOL          packed_bitmap = FALSE;
+#endif
   png_uint_32   tmp16;
   int           i;
 
@@ -223,6 +225,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   }
   else if ((type_token[1] == '1') || (type_token[1] == '4'))
   {
+#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
     raw = (type_token[1] == '4');
     color_type = PNG_COLOR_TYPE_GRAY;
     get_token(pnm_file, width_token);
@@ -233,6 +236,10 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
     height = (png_uint_32) ul_height;
     bit_depth = 1;
     packed_bitmap = TRUE;
+#else
+    fprintf (stderr, "PNM2PNG built without PNG_WRITE_INVERT_SUPPORTED and \n");
+    fprintf (stderr, "PNG_WRITE_PACK_SUPPORTED can't read PBM (P1,P4) files\n");
+#endif
   }
   else if ((type_token[1] == '2') || (type_token[1] == '5'))
   {
@@ -351,10 +358,12 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
 
   alpha_present = (channels - 1) % 2;
 
+#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   if (packed_bitmap)
     /* row data is as many bytes as can fit width x channels x bit_depth */
     row_bytes = (width * channels * bit_depth + 7) / 8;
   else
+#endif
     /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
@@ -366,11 +375,14 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
 
   for (row = 0; row < height; row++)
   {
+#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
     if (packed_bitmap) {
       for (i = 0; i < row_bytes; i++)
         /* png supports this format natively so no conversion is needed */
         *pix_ptr++ = get_data (pnm_file, 8);
-    } else {
+    } else
+#endif
+    {
       for (col = 0; col < width; col++)
       {
         for (i = 0; i < (channels - alpha_present); i++)
@@ -421,11 +433,13 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
     return FALSE;
   }
 
+#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   if (packed_bitmap == TRUE)
   {
     png_set_packing (png_ptr);
     png_set_invert_mono (png_ptr);
   }
+#endif
 
   /* setjmp() must be called in every function that calls a PNG-reading libpng function */
   if (setjmp (png_jmpbuf(png_ptr)))

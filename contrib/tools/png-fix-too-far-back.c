@@ -16,6 +16,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#define PROGRAM_NAME "png-fix-too-far-back"
+
 /* Define the following to use this program against your installed libpng,
  * rather than the one being built here:
  */
@@ -822,7 +824,7 @@ fix_file(FILE *fp, const char *file, png_uint_32 max_IDAT, int inplace,
    }
 
    /* With no arguments just check this file */
-   if (optimize == 0 && strip == 0 && output == NULL)
+   if (optimize == 0 && strip == 0 && inplace == 0 && output == NULL)
       return !read_png(fpIn);
 
    /* Otherwise, maybe, fix it */
@@ -981,77 +983,109 @@ fix_file(FILE *fp, const char *file, png_uint_32 max_IDAT, int inplace,
 static void
 usage(const char *prog, int rc)
 {
-   fprintf(stderr,
-      "Usage: %s {[options] png-file}\n", prog);
-   fprintf(stderr,
-      "  Tests, optimizes and fixes the zlib header in PNG files.\n"
-      "  Optionally, when fixing, strips ancilliary chunks from the file.\n");
-   fprintf(stderr,
-      "\nOptions:\n"
-#  ifdef PNG_MAXIMUM_INFLATE_WINDOW
-      "  --test: Test the PNG_MAXIMUM_INFLATE_WINDOW option.\n"
-#  endif
-      "  --optimize (-o): Find the smallest deflate window size for the file.\n"
-      "                   Also outputs a summary for each file.\n"
-      "  --strip (-s): Remove chunks except for IHDR, PLTE, IEND, tRNS, gAMA,\n"
-      "                sRGB.  If given twice remove gAMA and sRGB as well.\n"
-      "  --errors (-e): Output errors from libpng (except too-far-back).\n");
-   fprintf(stderr,
-      "  --warnings (-w): Output warnings from libpng.\n"
-      "  --verbose (-v): Output more verbose messages.\n"
-      "  --max=<number>: Output IDAT chunks sized <number>.  If not given the\n"
-      "                  the IDAT chunks will be the maximum size permitted\n"
-      "                  (2^31-1 bytes.)\n"
-      "  --out=<file>: Save the result for the next PNG to <file>.\n"
-      "  --inplace (-i): Modify the file in place.\n");
-   fprintf(stderr,
-      "\nExit codes:\n"
-      "  0: Success, all files pass the test, all output written ok.\n"
-      "  1: At least one file had a read error, all files checked.\n"
-      "  2: A file had an unrecoverable error (integer overflow, bad format),\n"
-      "     the program exited immediately, without processing further files.\n"
-      "  3: An IO or out of memory error, or a file could not be opened.h\n");
-   fprintf(stderr,
-      "\nDescription:\n"
-      "  %s checks each PNG file on the command line for errors.\n"
-      "  By default it is silent and just exits with an error code (as above)\n"
-      "  if any error is detected.  With --optimize, --strip or --out,\n"
-      "  however, the zlib \"invalid distance too far back\" error is fixed\n"
-      "  and the program exits with a 0 success code unless some other error\n"
-      "  is encountered.\n"
-      "\n", prog);
-   fprintf(stderr,
-      "  Use --errors to display the other errors, use --optimize to test\n"
-      "  different values for the deflate \"window bits\" parameter and find\n"
-      "  the smallest that works.\n"
-      "\n"
-      "  Notice that some PNG files with the zlib header problem can still be\n"
-      "  read by libpng.  This program will still detect the error.\n"
-      "\n");
-   fprintf(stderr,
-      "  The output produced with --optimize is as follows:\n"
-      "\n"
-      "     opt-bits curr-bits image-bits opt-flag opt-type change file\n"
-      "\n"
-      "   opt-bits:   The minimum window bits (8-15) that works, if the file\n"
-      "               is written this is the value that will be stored.\n"
-      "   curr-bits:  The value currently stored in the file.\n");
-   fprintf(stderr,
-      "   image-bits: The window bits value corresponding to the size of the\n"
-      "               uncompressed PNG image data.  When --optimize is not\n"
-      "               given but --strip is, this value will be used if lower\n"
-      "               than the current value.\n"
-      "   opt-flag: < if the optimized bit value is less than that implied by\n"
-      "               the PNG image size (opt-bits < image-bits)\n"
-      "             = if optimization is not possible (opt-bits = image-bits)\n"
-      "   opt-type: reduce   if opts-bits < curr-bits\n");
-   fprintf(stderr,
-      "             ok       if opt-bits = curr-bits (no change required)\n"
-      "             INCREASE if opt-bits > curr-bits (the file has the bug)\n"
-      "   change:     opt-bits - curr-bits, so negative if optimization is\n"
-      "               possible, 0 if no change is required, positive if the\n"
-      "               bug is present.\n"
-      "   file:       The file name.\n");
+   /* ANSI C-90 limits strings to 509 characters, so use a string array: */
+   size_t i;
+   static const char *usage_string[] = {
+"  Tests, optimizes and optionally fixes the zlib header in PNG files.\n",
+"  Optionally, when fixing, strips ancilliary chunks from the file.\n",
+"\n",
+"OPTIONS\n",
+"  OPERATION\n",
+"      By default files are just checked for readability.\n",
+"    --optimize (-o):\n",
+"      Find the smallest deflate window size for the file, also outputs\n",
+"      a summary of the result for each file.\n",
+"    --strip (-s):\n",
+"      Remove chunks except for IHDR, PLTE, IEND, tRNS, gAMA, sRGB.  If\n",
+"      given twice remove gAMA and sRGB as well.\n",
+"    --max=<number>:\n",
+"      Use IDAT chunks sized <number>.  If not given the the IDAT\n",
+"      chunks will be the maximum size permitted; 2^31-1 bytes.\n",
+"  MESSAGES\n",
+"      By default the program is silent.\n",
+"    --errors (-e):\n",
+"      Output errors from libpng (except too-far-back).\n",
+"    --warnings (-w):\n",
+"      Output warnings from libpng.\n",
+"    --verbose (-v):\n",
+"      Describe program progress (refer to the source).\n",
+"  OUTPUT\n",
+"      By default nothing is written.\n",
+"    --out=<file>:\n",
+"      Write the optimized/corrected version of the next PNG to\n",
+"      <file>.  This overrides the following two options\n",
+"    --suffix=<suffix>:\n",
+"      Set --out=<name><suffix> for all following files, unless\n",
+"      overridden on a per-file basis by explicit --out.  If no\n",
+"      --suffix= value is given behaves as --inplace.\n",
+"    --inplace (-i):\n",
+"      Modify the file in place.  THIS IS DANGEROUS - please keep a\n",
+"      backup of the file because a program interrupt or bug will\n",
+"      result in a corrupted file.\n",
+#ifdef PNG_MAXIMUM_INFLATE_WINDOW
+"  INTERNAL OPTIONS\n",
+"    --test:\n",
+"      Test the PNG_MAXIMUM_INFLATE_WINDOW option.  Setting this\n",
+"      disables output as this would produce a broken file.\n",
+#endif
+"\n",
+"EXIT CODES\n",
+"  0: Success, all files pass the test, any output written ok.\n",
+"  1: At least one file had a read error, all files checked.\n",
+"  2: A file had an unrecoverable error (integer overflow, bad format),\n",
+"     the program exited immediately, without processing further files.\n",
+"  3: An IO or out of memory error, or a file could not be opened.h\n",
+"\n",
+"DESCRIPTION\n",
+"  " PROGRAM_NAME " checks each PNG file on the command line\n",
+"  for errors.  By default it is silent and just returns an exit code\n",
+"  (as above).  Options allow the zlib error:\n",
+"\n",
+"        \"invalid distance too far back\"\n",
+"\n",
+"  to be fixed during the read and therefore test the file for other\n",
+"  errors that may prevent reading.\n",
+"\n",
+"  Setting one of the \"OUTPUT\" options causes the possibly modified\n",
+"  file to be written to a new file or, with --inplace, to the existing\n",
+"  file.\n",
+"\n",
+"  IMPORTANT: --inplace will overwrite the original file, if you use it\n",
+"  be sure to keep a backup of the original file, this program can fail\n",
+"  during the write and has been known to have serious bugs!  A failure\n",
+"  during write will certainly damage the original file.\n",
+"\n",
+"  Notice that some PNG files with the zlib header problem can still be\n",
+"  read by libpng under some circumstances.  This program will still\n",
+"  detect and, if requested, correct the error.\n",
+"\n",
+"  The output produced with --optimize is as follows:\n",
+"\n",
+"     opt-bits curr-bits image-bits opt-flag opt-type change file\n",
+"\n",
+"   opt-bits:   The minimum window bits (8-15) that works, if the file\n",
+"               is written this is the value that will be stored.\n",
+"   curr-bits:  The value currently stored in the file.\n",
+"   image-bits: The window bits value corresponding to the size of the\n",
+"               uncompressed PNG image data.  When --optimize is not\n",
+"               given but --strip is, this value will be used if lower\n",
+"               than the current value.\n",
+"   opt-flag: < if the optimized bit value is less than that implied by\n",
+"               the PNG image size (opt-bits < image-bits)\n",
+"             = if optimization is not possible (opt-bits = image-bits)\n",
+"   opt-type: reduce   if opts-bits < curr-bits\n",
+"             ok       if opt-bits = curr-bits (no change required)\n",
+"             INCREASE if opt-bits > curr-bits (the file has the bug)\n",
+"   change:     opt-bits - curr-bits, so negative if optimization is\n",
+"               possible, 0 if no change is required, positive if the\n",
+"               bug is present.\n",
+"   file:       The file name.\n",
+};
+
+   fprintf(stderr, "Usage: %s {[options] png-file}\n", prog);
+
+   for (i=0; i < (sizeof usage_string)/(sizeof usage_string[0]); ++i)
+      fputs(usage_string[i], stderr);
 
    exit(rc);
 }
@@ -1063,6 +1097,7 @@ main(int argc, const char **argv)
    png_uint_32 max_IDAT = 0x7fffffff;
    FILE *fp;
    const char *outfile = NULL;
+   const char *suffix = NULL;
    const char *prog = *argv;
    static const png_byte idat_bytes[4] = { 73,  68,  65,  84 };
    static const png_byte iend_bytes[4] = { 73,  69,  78,  68 };
@@ -1111,6 +1146,9 @@ main(int argc, const char **argv)
       else if (strncmp(*argv, "--out=", 6) == 0)
          outfile = 6+*argv;
 
+      else if (strncmp(*argv, "--suffix=", 9) == 0)
+         suffix = 9+*argv;
+
       else if (strcmp(*argv, "--strip") == 0 || strcmp(*argv, "-s") == 0)
          ++strip;
 
@@ -1133,10 +1171,43 @@ main(int argc, const char **argv)
 
       else
       {
-         int ret;
+         int ret, overwrite;
+
+         if (outfile != NULL)
+            overwrite = 0;
+
+         else if (suffix != NULL)
+         {
+            if (*suffix == 0)
+               overwrite = 1;
+
+            else
+            {
+               static char temp_name[FILENAME_MAX];
+               size_t filelen = strlen(*argv);
+               size_t suffixlen = strlen(suffix);
+
+               if (filelen + suffixlen >= FILENAME_MAX)
+               {
+                  fprintf(stderr, "%s: output file name too long: %s%s\n", prog,
+                     *argv, suffix);
+                  exit(3);
+               }
+
+               memcpy(temp_name, *argv, filelen);
+               memcpy(temp_name+filelen, suffix, suffixlen);
+               temp_name[filelen+suffixlen] = 0;
+
+               outfile = temp_name;
+               overwrite = 0;
+             }
+         }
+
+         else
+            overwrite = inplace;
 
          err +=
-            fix_file(fp, *argv, max_IDAT, inplace, strip, optimize, outfile);
+            fix_file(fp, *argv, max_IDAT, overwrite, strip, optimize, outfile);
 
          if (fpIn != NULL)
          {
