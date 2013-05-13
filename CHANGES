@@ -4563,9 +4563,10 @@ Version 1.7.0beta12 [April 30, 2013]
   Avoid dereferencing NULL pointer possibly returned from
      png_create_write_struct() (Andrew Church).
 
-Version 1.7.0beta13 [May 10, 2013]
+Version 1.7.0beta13 [May 13, 2013]
   Revised contrib/pngminim/*/makefile to generate pnglibconf.h with the
     right zlib header files.
+  Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
   Updated contrib/pngminus/pnm2png.c (Paul Stewart):
     Check for EOF
     Ignore "#" delimited comments in input file to pnm2png.c.
