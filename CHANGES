@@ -4563,7 +4563,7 @@ Version 1.7.0beta12 [April 30, 2013]
   Avoid dereferencing NULL pointer possibly returned from
      png_create_write_struct() (Andrew Church).
 
-Version 1.7.0beta13 [May 13, 2013]
+Version 1.7.0beta13 [May 12, 2013]
   Revised contrib/pngminim/*/makefile to generate pnglibconf.h with the
     right zlib header files.
   Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
@@ -4591,6 +4591,8 @@ Version 1.7.0beta13 [May 13, 2013]
   Check ZLIB_VERNUM for mismatches, enclose #error in quotes
   Added information in the documentation about problems with and fixes for
     the bad CRC and bad iTXt chunk situations.
+
+Version 1.7.0beta14 [May 13, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
