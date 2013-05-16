@@ -1,5 +1,5 @@
 
-Libpng 1.5.16beta07 - May 12, 2013
+Libpng 1.5.16rc01 - May 16, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.16beta07.tar.xz (LZMA-compressed, recommended)
-   1.5.16beta07.tar.gz
-   1.5.16beta07.tar.bz2
+   1.5.16rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.16rc01.tar.gz
+   1.5.16rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1516b07.7z  (LZMA-compressed, recommended)
-   lp1516b07.zip
+   lp1516r01.7z  (LZMA-compressed, recommended)
+   lp1516r01.zip
 
 Other information:
 
-   1.5.16beta07-README.txt
-   1.5.16beta07-LICENSE.txt
+   1.5.16rc01-README.txt
+   1.5.16rc01-LICENSE.txt
 
 Changes since the last public release (1.5.15):
 
@@ -58,12 +58,13 @@ Version 1.5.16beta05 [May 9, 2013]
 Version 1.5.16beta06 [May 12, 2013]
   Allow contrib/pnminus/pnm2png.c to compile without WRITE_INVERT and WRITE_PACK
     supported (writes error message that it can't read P1 or P4 PBM files).
-  Revised contrib/pngminim/*/makefile to separate CPPFLAGS and CPFLAGS, and
+  Revised contrib/pngminim/*/makefile to separate CPPFLAGS and CFLAGS, and
     to generate pnglibconf.h with the right zlib header files.
   Ported contrib/pngminus/pnm2png.c changes back from libpng-1.6.3beta06,
     to use unsigned long, not png_uint_32 arguments to sscanf().
 
-Version 1.5.16beta07 [May 12, 2013]
+Version 1.5.16rc01 [May 16, 2013]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
