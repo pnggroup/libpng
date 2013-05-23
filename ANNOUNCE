@@ -1,32 +1,30 @@
 
-Libpng 1.5.16rc01 - May 16, 2013
+Libpng 1.5.16 - May 23, 2013
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.16rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.16rc01.tar.gz
-   1.5.16rc01.tar.bz2
+   libpng-1.5.16.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.16.tar.gz
+   libpng-1.5.16.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1516r01.7z  (LZMA-compressed, recommended)
-   lp1516r01.zip
+   lpng1516.7z  (LZMA-compressed, recommended)
+   lpng1516.zip
 
 Other information:
 
-   1.5.16rc01-README.txt
-   1.5.16rc01-LICENSE.txt
+   libpng-1.5.16-README.txt
+   libpng-1.5.16-LICENSE.txt
 
 Changes since the last public release (1.5.15):
 
-Version 1.5.16beta01 [April 25, 2013]
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
   Revised stack marking in arm/filter_neon.S and configure.ac
@@ -34,19 +32,11 @@ Version 1.5.16beta01 [April 25, 2013]
     Previously the ARM NEON specific files were still built if the option
     was switched 'off' as opposed to being explicitly disabled.
   Avoid a compiler warning about unused png_ptr in translate_gamma_flags()
-
-Version 1.5.16beta02 [April 26, 2013]
   Revise pngtest.c to skip tests of unsupported features.
-  Regenerated configure files.
-
-Version 1.5.16beta03 [April 26, 2013]
   Test for 'arm*' not just 'arm' in the host_cpu configure variable.
-
-Version 1.5.16beta04 [May 1, 2013]
+  Rebuilt the configure scripts.
   Expanded manual paragraph about writing private chunks, particularly
     the need to call png_set_keep_unknown_chunks() when writing them.
-
-Version 1.5.16beta05 [May 9, 2013]
   Updated contrib/pngminus/pnm2png.c (Paul Stewart):
     Check for EOF
     Ignore "#" delimited comments in input file to pnm2png.c.
@@ -54,17 +44,12 @@ Version 1.5.16beta05 [May 9, 2013]
     Added a call to png_set_packing()
     Initialize dimension values so if sscanf fails at least we have known
       invalid values.
-
-Version 1.5.16beta06 [May 12, 2013]
   Allow contrib/pnminus/pnm2png.c to compile without WRITE_INVERT and WRITE_PACK
     supported (writes error message that it can't read P1 or P4 PBM files).
   Revised contrib/pngminim/*/makefile to separate CPPFLAGS and CFLAGS, and
     to generate pnglibconf.h with the right zlib header files.
   Ported contrib/pngminus/pnm2png.c changes back from libpng-1.6.3beta06,
     to use unsigned long, not png_uint_32 arguments to sscanf().
-
-Version 1.5.16rc01 [May 16, 2013]
-  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
