@@ -1,4 +1,4 @@
-README for libpng version 1.6.3beta07 - May 12, 2013 (shared library 16.0)
+README for libpng version 1.6.3beta07 - June 4, 2013 (shared library 16.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -167,23 +167,25 @@ Files in this distribution:
       pngwrite.c    =>  High-level write functions
       pngwtran.c    =>  Write data transformations
       pngwutil.c    =>  Write utility functions
+      arm           =>  Contains optimized code for the ARM platform
       contrib       =>  Contributions
+       examples         =>  Example programs
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",
                             O'Reilly, 1999
-       msvctest     =>  Builds and runs pngtest using a MSVC workspace
-       pngminus     =>  Simple pnm2png and png2pnm programs
-       pngsuite     =>  Test images
+       libtests         =>  Test programs
+       pngminim         =>  Minimal decoder, encoder, and progressive decoder
+                            programs demonstrating use of pngusr.dfa
+       pngminus         =>  Simple pnm2png and png2pnm programs
+       pngsuite         =>  Test images
+       tools            =>  Various tools
        visupng      =>  Contains a MSVC workspace for VisualPng
       projects      =>  Contains project files and workspaces for
                         building a DLL
-       cbuilder5        =>  Contains a Borland workspace for building
-                            libpng and zlib
-       visualc6         =>  Contains a Microsoft Visual C++ (MSVC)
-                            workspace for building libpng and zlib
+       owatcom          =>  Contains a WATCOM project for building libpng
        visualc71        =>  Contains a Microsoft Visual C++ (MSVC)
                             workspace for building libpng and zlib
-       xcode            =>  Contains an Apple xcode
+       vstudio          =>  Contains a Microsoft Visual C++ (MSVC)
                             workspace for building libpng and zlib
       scripts       =>  Directory containing scripts for building libpng:
                             (see scripts/README.txt for the list of scripts)
