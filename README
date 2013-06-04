@@ -1,4 +1,4 @@
-README for libpng version 1.4.13beta03 - January 22, 2013 (shared library 14.0)
+README for libpng version 1.4.13beta03 - June 4, 2013 (shared library 14.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -167,15 +167,20 @@ Files in this distribution:
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",
                             O'Reilly, 1999
-       msvctest     =>  Builds and runs pngtest using a MSVC workspace
-       pngminus     =>  Simple pnm2png and png2pnm programs
-       pngsuite     =>  Test images
-       visupng      =>  Contains a MSVC workspace for VisualPng
+       pngminim         =>  Minimal decoder, encoder, and progressive decoder
+                            programs demonstrating use of pngusr.dfa
+       pngminus         =>  Simple pnm2png and png2pnm programs
+       pngsuite         =>  Test images
+       visupng          =>  Contains a MSVC workspace for VisualPng
       projects      =>  Contains project files and workspaces for
                         building a DLL
-       c5builder        =>  Contains a Borland workspace for building
-                            libpng and zlib
        visualc6         =>  Contains a Microsoft Visual C++ (MSVC)
+                            workspace for building libpng and zlib
+       visualc71        =>  Contains a Microsoft Visual C++ (MSVC)
+                            workspace for building libpng and zlib
+       vstudio          =>  Contains a Microsoft Visual C++ (MSVC)
+                            workspace for building libpng and zlib
+       xcode            =>  Contains an Apple xcode
                             workspace for building libpng and zlib
       scripts       =>  Directory containing scripts for building libpng:
        descrip.mms      =>  VMS makefile for MMS or MMK
