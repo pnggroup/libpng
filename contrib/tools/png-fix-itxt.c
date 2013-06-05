@@ -109,10 +109,10 @@ for (;;)
       }
 
       /* Update length bytes */
-        buf[0] = (length << 24) & 0xff;
-        buf[1] = (length << 16) & 0xff;
-        buf[2] = (length <<  8) & 0xff;
-        buf[3] = (length      ) & 0xff;
+      buf[0] = (unsigned char)((length << 24) & 0xff);
+      buf[1] = (unsigned char)((length << 16) & 0xff);
+      buf[2] = (unsigned char)((length <<  8) & 0xff);
+      buf[3] = (unsigned char)((length      ) & 0xff);
 
       /* Write the fixed iTXt chunk (length, name, data, crc) */
       for (i=0; i<length+12; i++)
