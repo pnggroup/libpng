@@ -4113,8 +4113,9 @@ Version 1.5.16rc01 [May 16, 2013]
 Version 1.5.16 [May 23, 2013]
   No changes.
 
-Version 1.5.17beta01 [June 4, 2013]
+Version 1.5.17beta01 [June 5, 2013]
   Removed a redundant test from png_set_IHDR().
+  Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

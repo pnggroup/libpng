@@ -1,5 +1,5 @@
 
-Libpng 1.5.17beta01 - June 4, 2013
+Libpng 1.5.17beta01 - June 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,8 +26,9 @@ Other information:
 
 Changes since the last public release (1.5.16):
 
-Version 1.5.17beta01 [June 4, 2013]
+Version 1.5.17beta01 [June 5, 2013]
   Removed a redundant test from png_set_IHDR().
+  Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
