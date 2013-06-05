@@ -1,5 +1,5 @@
 
-Libpng 1.6.3beta07 - June 4, 2013
+Libpng 1.6.3beta07 - June 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -77,8 +77,9 @@ Version 1.6.3beta06 [May 12, 2013]
     right zlib header files.
   Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
 
-Version 1.6.3beta07 [June 4, 2013]
+Version 1.6.3beta07 [June 5, 2013]
   Removed a redundant test in png_set_IHDR().
+  Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

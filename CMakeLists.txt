@@ -9,6 +9,8 @@
 cmake_minimum_required(VERSION 2.4.4)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
+set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
+
 if(UNIX AND NOT DEFINED CMAKE_BUILD_TYPE)
   if(CMAKE_MAJOR_VERSION EQUAL 2 AND CMAKE_MINOR_VERSION EQUAL 4)
     # workaround CMake 2.4.x bug
