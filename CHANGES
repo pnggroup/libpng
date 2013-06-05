@@ -4564,6 +4564,7 @@ Version 1.6.3beta06 [May 12, 2013]
 Version 1.6.3beta07 [June 5, 2013]
   Removed a redundant test in png_set_IHDR().
   Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
+  Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
