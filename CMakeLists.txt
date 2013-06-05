@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (C) 2007-2011 Glenn Randers-Pehrson
+# Copyright (C) 2007-2013 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -10,27 +10,6 @@ cmake_minimum_required(VERSION 2.4.4)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
-
-if(UNIX AND NOT DEFINED CMAKE_BUILD_TYPE)
-  if(CMAKE_MAJOR_VERSION EQUAL 2 AND CMAKE_MINOR_VERSION EQUAL 4)
-    # workaround CMake 2.4.x bug
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are:
-           None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used)
-           Debug
-           Release
-           RelWithDebInfo
-           MinSizeRel.")
-  else()
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are:
-           None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used)
-           Debug
-           Release
-           RelWithDebInfo
-           MinSizeRel.")
-  endif()
-endif()
 
 project(libpng C)
 enable_testing()
