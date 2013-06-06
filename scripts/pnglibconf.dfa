@@ -165,12 +165,6 @@ logunsupported = 1
 @#  endif
 @#endif
 
-# This changes the default for the ARM NEON optimizations according to
-# __ARM_NEON__
-@#ifdef __ARM_NEON__
-@#  define PNG_ARM_NEON_SUPPORTED
-@#endif
-
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want (NOTE:
 # experimental options must be disabled before they are defined in this file!)
@@ -236,6 +230,8 @@ option SET_OPTION disabled
 # These options are specific to the ARM NEON hardware optimizations:
 #
 # ARM_NEON: the optimization itself
+# ARM_NEON_NOT: disable the optimization even on systems that apparently support
+#               it (where the compiler defines __ARM_NEON__).
 # ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
 # ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
 setting ZLIB_VERNUM default @ZLIB_VERNUM
@@ -243,6 +239,7 @@ setting ZLIB_VERNUM default @ZLIB_VERNUM
 #                 png_set_hardware API.
 option ARM_NEON disabled,
    sets FILTER_OPTIMIZATIONS png_init_filter_functions_neon
+option ARM_NEON_NOT disabled
 option ARM_NEON_API disabled enables SET_OPTION ARM_NEON
 option ARM_NEON_CHECK disabled enables ARM_NEON
 
