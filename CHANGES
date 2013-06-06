@@ -4567,6 +4567,9 @@ Version 1.6.3beta07 [June 6, 2013]
   Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
   Enclose the prototypes for the simplified write API in
     #ifdef PNG_STDIO_SUPPORTED/#endif
+  Make ARM NEON support work at compile time (not just configure time).
+    This moves the test on __ARM_NEON__ into pngconf.h to avoid issues when
+    using a compiler that compiles for multiple architectures at one time.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
