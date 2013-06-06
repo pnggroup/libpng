@@ -4592,10 +4592,11 @@ Version 1.7.0beta13 [May 12, 2013]
   Added information in the documentation about problems with and fixes for
     the bad CRC and bad iTXt chunk situations.
 
-Version 1.7.0beta14 [June 5, 2013]
+Version 1.7.0beta14 [June 6, 2013]
   Removed a redundant test in png_set_IHDR().
   Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
   Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
+  Enclose the prototypes for the simplified write API in #ifdef STDIO/#endif
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
