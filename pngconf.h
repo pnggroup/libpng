@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.3beta07 - May 12, 2013
+ * libpng version 1.6.3beta07 - June 6, 2013
  *
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -193,6 +193,30 @@
  *                from a DLL - used to define PNG_IMPEXP when
  *                PNG_USE_DLL is set.
  */
+
+/* Compile time options.
+ * =====================
+ * In a multi-arch build the compiler may compile the code several times for the
+ * same object module, producing different codes for different architectures.
+ * When this happens configure-time setting of the target host options cannot be
+ * done and this interferes with the handling of the ARM NEON optimizations, and
+ * possibly other similiar optimizations.  Put additional tests here; in general
+ * this is needed when the same option can be changed at both compile time and
+ * run time depending on the target OS (i.e. iOS vs Android.)
+ */
+#ifdef __ARM_NEON__
+   /* If the default below causes problems set PNG_ARM_NEON_NOT_SUPPORTED either
+    * by passing --enable-arm-neon=no to configure or setting it in some other
+    * way when pnglibconf.h is built.
+    */
+#  if (!defined PNG_ARM_NEON_SUPPORTED) && (!defined PNG_ARM_NEON_NOT_SUPPORTED)
+#     define PNG_ARM_NEON_SUPPORTED
+#  endif
+#endif
+
+#if (defined PNG_ARM_NEON_SUPPORTED) && (defined PNG_ARM_NEON_NOT_SUPPORTED)
+#  error configuration: ARM_NEON cannot both be supported and disabled
+#endif
 
 /* System specific discovery.
  * ==========================
