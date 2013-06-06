@@ -4561,10 +4561,12 @@ Version 1.6.3beta06 [May 12, 2013]
     right zlib header files.
   Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
 
-Version 1.6.3beta07 [June 5, 2013]
+Version 1.6.3beta07 [June 6, 2013]
   Removed a redundant test in png_set_IHDR().
   Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
   Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
+  Enclose the prototypes for the simplified write API in
+    #ifdef PNG_STDIO_SUPPORTED/#endif
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
