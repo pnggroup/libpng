@@ -16,7 +16,7 @@
 
 #include "../pngpriv.h"
 
-#ifdef PNG_ARM_NEON_SUPPORTED
+#if PNG_ARM_NEON_OPT > 0
 #ifdef PNG_ARM_NEON_CHECK_SUPPORTED /* Do run-time checks */
 #include <signal.h> /* for sig_atomic_t */
 
@@ -216,4 +216,4 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
           png_read_filter_row_paeth4_neon;
    }
 }
-#endif /* PNG_ARM_NEON_SUPPORTED */
+#endif /* PNG_ARM_NEON_OPT > 0 */

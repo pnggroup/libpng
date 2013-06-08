@@ -1,7 +1,7 @@
 /* 1.5.17beta01 STANDARD API DEFINITION */
 /* pnglibconf.h - library build configuration */
 
-/* libpng version 1.5.17beta01 - May 23, 2013 */
+/* libpng version 1.5.17beta01 - June 8, 2013 */
 
 /* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
 
@@ -19,7 +19,6 @@
 #define PNG_ALIGNED_MEMORY_SUPPORTED
 /*#undef PNG_ARM_NEON_API_SUPPORTED*/
 /*#undef PNG_ARM_NEON_CHECK_SUPPORTED*/
-/*#undef PNG_ARM_NEON_SUPPORTED*/
 #define PNG_BENIGN_ERRORS_SUPPORTED
 #define PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED
 #define PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
