@@ -88,6 +88,38 @@
 #  endif
 #endif
 
+/* Compile time options.
+ * =====================
+ * In a multi-arch build the compiler may compile the code several times for the
+ * same object module, producing different binaries for different architectures.
+ * When this happens configure-time setting of the target host options cannot be
+ * done and this interferes with the handling of the ARM NEON optimizations, and
+ * possibly other similiar optimizations.  Put additional tests here; in general
+ * this is needed when the same option can be changed at both compile time and
+ * run time depending on the target OS (i.e. iOS vs Android.)  The changes have
+ * to occur here to get the symbol prefixing to work consistently.
+ */
+#ifndef PNG_ARM_NEON_OPT
+   /* ARM NEON optimizations are being controlled by the compiler settings,
+    * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
+    * with GCC) then the compiler will define __ARM_NEON__ and we can rely
+    * unconditionally on NEON instructions not crashing, otherwise we must
+    * disable use of NEON instructions:
+    */
+#  ifdef __ARM_NEON__
+#     define PNG_ARM_NEON_OPT 2
+#  else
+#     define PNG_ARM_NEON_OPT 0
+#  endif
+#endif
+
+#if PNG_ARM_NEON_OPT > 0
+   /* NEON optimizations are to be at least considered by libpng, enable the
+    * callbacks to do this.  (This is what matters for the symbol prefixing.)
+    */
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
+#endif
+
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
  * so PNG_BUILD_DLL must be set.

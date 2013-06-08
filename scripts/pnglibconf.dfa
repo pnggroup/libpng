@@ -193,31 +193,38 @@ setting PREFIX
 
 setting DEFAULT_READ_MACROS default 1
 
-# This setting allows a hardware or configuration specific filter optimization
-# function to be specified, the argument is the name of the filter initializaion
-# function to use.
-
-setting FILTER_OPTIMIZATIONS
-
 # Implementation specific control of the optimizations, enabled by those
 # hardware or software options that need it (typically when run-time choices
 # must be made by the user)
 option SET_OPTION disabled
 
-# These options are specific to the ARM NEON hardware optimizations:
+# These options are specific to the ARM NEON hardware optimizations.  At present
+# these optimizations depend on GCC specific pre-processing of an assembler (.S)
+# file so they probably won't work with other compilers.
 #
-# ARM_NEON: the optimization itself
-# ARM_NEON_NOT: disable the optimization even on systems that apparently support
-#               it (where the compiler defines __ARM_NEON__).
-# ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
-# ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
-#                 supported, this is poorly supported and deprectated - use the
-#                 png_set_hardware API.
-option ARM_NEON disabled,
-   sets FILTER_OPTIMIZATIONS png_init_filter_functions_neon
-option ARM_NEON_NOT disabled
-option ARM_NEON_API disabled enables SET_OPTION ARM_NEON
-option ARM_NEON_CHECK disabled enables ARM_NEON
+# ARM_NEON_OPT: unset: check at compile time (__ARM_NEON__ must be defined by
+#                      the compiler, typically as a result of specifying
+#                      -mfpu=neon on the command line.)
+#                   0: disable (even if the CPU has a NEON FPU.)
+#                   1: check at run time (via ARM_NEON_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mfpu=neon to GCC in CFLAGS)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as -mfpu=neon will achieve the same
+#           effect as well as applying NEON optimizations to the rest of the
+#           libpng code.
+#           NOTE: any setting other than '0' requires ALIGNED_MEMORY
+# ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
+#                 with png_set_option
+# ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
+#                 extensions are supported, this is poorly supported and
+#                 deprectated - use the png_set_option API.
+setting ARM_NEON_OPT
+option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
+   sets ARM_NEON_OPT 1
+option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
+   sets ARM_NEON_OPT 1
 
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib, it describes the input

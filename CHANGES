@@ -4561,7 +4561,7 @@ Version 1.6.3beta06 [May 12, 2013]
     right zlib header files.
   Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
 
-Version 1.6.3beta07 [June 6, 2013]
+Version 1.6.3beta07 [June 8, 2013]
   Removed a redundant test in png_set_IHDR().
   Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
   Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
@@ -4570,6 +4570,13 @@ Version 1.6.3beta07 [June 6, 2013]
   Make ARM NEON support work at compile time (not just configure time).
     This moves the test on __ARM_NEON__ into pngconf.h to avoid issues when
     using a compiler that compiles for multiple architectures at one time.
+  Removed PNG_FILTER_OPTIMIZATIONS and PNG_ARM_NEON_SUPPORTED from
+    pnglibconf.h, allowing more of the decisions to be made internally
+    (pngpriv.h) during the compile.  Without this, symbol prefixing is broken
+    under certain circumstances on ARM platforms.  Now only the API parts of
+    the optimizations ('check' vs 'api') are exposed in the public header files
+    except that the new setting PNG_ARM_NEON_OPT documents how libpng makes the
+    decision about whether or not to use the optimizations.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
