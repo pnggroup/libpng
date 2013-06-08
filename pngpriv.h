@@ -159,7 +159,7 @@
 #endif
 
 #if PNG_ARM_NEON_OPT > 0
-   /* NEON optimizations are to be at least considered by libpng, enable the
+   /* NEON optimizations are to be at least considered by libpng, so enable the
     * callbacks to do this.
     */
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
