@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.6.3beta07 - May 12, 2013
+Makefiles for  libpng version 1.6.3beta07 - June 8, 2013
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile

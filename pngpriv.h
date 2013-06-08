@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Last changed in libpng 1.6.3 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -122,7 +122,7 @@
 #endif
 
 #if PNG_ARM_NEON_OPT > 0
-   /* NEON optimizations are to be at least considered by libpng, enable the
+   /* NEON optimizations are to be at least considered by libpng, so enable the
     * callbacks to do this.
     */
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
