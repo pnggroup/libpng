@@ -4577,6 +4577,14 @@ Version 1.6.3beta07 [June 8, 2013]
     the optimizations ('check' vs 'api') are exposed in the public header files
     except that the new setting PNG_ARM_NEON_OPT documents how libpng makes the
     decision about whether or not to use the optimizations.
+  Protect symbol prefixing against CC/CPPFLAGS/CFLAGS useage.
+    Previous iOS/Xcode fixes for the ARM NEON optimizations moved the test
+    on __ARM_NEON__ from configure time to compile time.  This breaks symbol
+    prefixing because the definition of the special png_init_filter_functions
+    call was hidden at configure time if the relevant compiler arguments are
+    passed in CFLAGS as opposed to CC.  This change attempts to avoid all
+    the confusion that would result by declaring the init function even when
+    it is not used, so that it will always get prefixed.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

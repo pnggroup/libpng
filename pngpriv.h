@@ -96,8 +96,16 @@
  * done and this interferes with the handling of the ARM NEON optimizations, and
  * possibly other similiar optimizations.  Put additional tests here; in general
  * this is needed when the same option can be changed at both compile time and
- * run time depending on the target OS (i.e. iOS vs Android.)  The changes have
- * to occur here to get the symbol prefixing to work consistently.
+ * run time depending on the target OS (i.e. iOS vs Android.)
+ *
+ * NOTE: symbol prefixing does not pass $(CFLAGS) to the preprocessor, because
+ * this is not possible with certain compilers (Oracle SUN OS CC), as a result
+ * it is necessary to ensure that all extern functions that *might* be used
+ * regardless of $(CFLAGS) get declared in this file.  The test on __ARM_NEON__
+ * below is one example of this behavior because it is controlled by the
+ * presence or not of -mfpu=neon on the GCC command line, it is possible to do
+ * this in $(CC), e.g. "CC=gcc -mfpu=neon", but people who build libpng rarely
+ * do this.
  */
 #ifndef PNG_ARM_NEON_OPT
    /* ARM NEON optimizations are being controlled by the compiler settings,
@@ -115,7 +123,7 @@
 
 #if PNG_ARM_NEON_OPT > 0
    /* NEON optimizations are to be at least considered by libpng, enable the
-    * callbacks to do this.  (This is what matters for the symbol prefixing.)
+    * callbacks to do this.
     */
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
 #endif
@@ -1941,14 +1949,22 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 
 #endif /* SIMPLIFIED READ/WRITE */
 
+/* These are initialization functions for hardware specific PNG filter
+ * optimizations; list these here then select the appropriate one at compile
+ * time using the macro PNG_FILTER_OPTIMIZATIONS.  If the macro is not defined
+ * the generic code is used.
+ */
 #ifdef PNG_FILTER_OPTIMIZATIONS
 PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr,
-    unsigned int bpp), PNG_EMPTY);
-   /* This is the initialization function for hardware specific optimizations,
-    * one implementation (for ARM NEON machines) is contained in
-    * arm/filter_neon.c.  It need not be defined - the generic code will be used
-    * if not.
+   unsigned int bpp), PNG_EMPTY);
+   /* Just declare the optimization that will be used */
+#else
+   /* List *all* the possible optimizations here - this branch is required if
+    * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
+    * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
     */
+PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
+   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
 /* Maintainer: Put new private prototypes here ^ */
