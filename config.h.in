@@ -80,10 +80,7 @@
 #undef PNG_ARM_NEON_CHECK_SUPPORTED
 
 /* Enable ARM Neon optimizations */
-#undef PNG_ARM_NEON_SUPPORTED
-
-/* Disable ARM Neon optimizations */
-#undef PNG_NO_ARM_NEON
+#undef PNG_ARM_NEON_OPT
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

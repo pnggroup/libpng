@@ -1439,7 +1439,8 @@ Optional Features:
                           use internal checking code (deprecated and poorly
                           supported); api: disable by default, enable by a
                           call to png_set_option; yes/on: turn on
-                          unconditionally.
+                          unconditionally. If not specified: determined by the
+                          compiler.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -12821,7 +12822,7 @@ if test "${enable_arm_neon+set}" = set; then :
       no|off)
          # disable the default enabling on __ARM_NEON__ systems:
 
-$as_echo "#define PNG_NO_ARM_NEON /**/" >>confdefs.h
+$as_echo "#define PNG_ARM_NEON_OPT 0" >>confdefs.h
 
          # Prevent inclusion of the assembler files below:
          enable_arm_neon=no;;
@@ -12835,8 +12836,14 @@ $as_echo "#define PNG_ARM_NEON_API_SUPPORTED /**/" >>confdefs.h
 ;;
       yes|on)
 
-$as_echo "#define PNG_ARM_NEON_SUPPORTED /**/" >>confdefs.h
-;;
+$as_echo "#define PNG_ARM_NEON_OPT 2" >>confdefs.h
+
+         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --enable-arm-neon: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass -mfpu=neon
+            to the compiler." >&5
+$as_echo "$as_me: WARNING: --enable-arm-neon: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass -mfpu=neon
+            to the compiler." >&2;};;
       *)
          as_fn_error $? "--enable-arm-neon=${enable_arm_neon}: invalid value" "$LINENO" 5
    esac
