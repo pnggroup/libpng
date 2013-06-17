@@ -4136,7 +4136,8 @@ Version 1.5.17beta01 [June 8, 2013]
     the confusion that would result by declaring the init function even when
     it is not used, so that it will always get prefixed.
 
-Version 1.5.17beta02 [June 8, 2013]
+Version 1.5.17rc01 [June 17, 2013]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
