@@ -1,8 +1,8 @@
 
-Makefiles for  libpng version 1.2.51beta02 - June 18, 2013
+Makefiles for  libpng version 1.2.51beta03 - June 18, 2013
 
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng12.so.0.1.2.51beta02)
+                       (gcc, creates libpng12.so.0.1.2.51beta03)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -20,7 +20,7 @@ Makefiles for  libpng version 1.2.51beta02 - June 18, 2013
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       gcc, creates libpng12.so.0.1.2.51beta02)
+                       gcc, creates libpng12.so.0.1.2.51beta03)
  makefile.freebsd  =>  FreeBSD makefile
  makefile.gcc      =>  Generic gcc makefile
  makefile.gccmmx   =>  Generic gcc makefile previously using MMX code
@@ -38,14 +38,14 @@ Makefiles for  libpng version 1.2.51beta02 - June 18, 2013
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires pngos2.def)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng12.so.0.1.2.51beta02)
+                       creates libpng12.so.0.1.2.51beta03)
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng12.so.0.1.2.51beta02)
+                       creates libpng12.so.0.1.2.51beta03)
  makefile.solaris-x86  =>  Solaris 2.X makefile (gcc, no MMX code,
-                       creates libpng12.so.0.1.2.51beta02)
+                       creates libpng12.so.0.1.2.51beta03)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng12.so.0.1.2.51beta02)
+                       creates libpng12.so.0.1.2.51beta03)
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile

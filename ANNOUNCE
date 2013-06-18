@@ -1,5 +1,5 @@
 
-Libpng 1.2.51beta02 - June 18, 2013
+Libpng 1.2.51beta03 - June 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.51beta02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51beta02.tar.gz
-   libpng-1.2.51beta02.tar.bz2
+   libpng-1.2.51beta03.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51beta03.tar.gz
+   libpng-1.2.51beta03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.51beta02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51beta02-no-config.tar.gz
-   libpng-1.2.51beta02-no-config.tar.bz2
+   libpng-1.2.51beta03-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51beta03-no-config.tar.gz
+   libpng-1.2.51beta03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1251b02.zip
-   lp1251b02.7z
-   lp1251b02.tar.bz2
+   lp1251b03.zip
+   lp1251b03.7z
+   lp1251b03.tar.bz2
 
 Project files
 
-   libpng-1.2.51beta02-project-netware.zip
-   libpng-1.2.51beta02-project-wince.zip
+   libpng-1.2.51beta03-project-netware.zip
+   libpng-1.2.51beta03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.51beta02-README.txt
-   libpng-1.2.51beta02-KNOWNBUGS.txt
-   libpng-1.2.51beta02-LICENSE.txt
-   libpng-1.2.51beta02-Y2K-compliance.txt
-   libpng-1.2.51beta02-[previous version]-diff.txt
+   libpng-1.2.51beta03-README.txt
+   libpng-1.2.51beta03-KNOWNBUGS.txt
+   libpng-1.2.51beta03-LICENSE.txt
+   libpng-1.2.51beta03-Y2K-compliance.txt
+   libpng-1.2.51beta03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.50):
 
@@ -48,9 +48,11 @@ version 1.2.51beta01 [January 22, 2013]
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
 
-version 1.2.51beta02 [June 18, 2013]
+version 1.2.51beta02 [June 13, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Revised libpng.3 so that "doclift" can process it.
+
+version 1.2.51beta03 [June 18, 2013]
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
