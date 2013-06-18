@@ -2889,6 +2889,8 @@ version 1.4.13beta03 [June 18, 2013]
   Removed a redundant test from png_set_IHDR().
   Revised libpng.3 so that "doclift" can process it.
 
+version 1.4.13beta04 [June 18, 2013]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
