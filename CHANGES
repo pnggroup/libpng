@@ -4589,6 +4589,8 @@ Version 1.6.3beta07 [June 8, 2013]
 Version 1.6.3beta08 [June 18, 2013]
   Revised libpng.3 so that "doclift" can process it.
 
+Version 1.6.3beta09 [June 18, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
