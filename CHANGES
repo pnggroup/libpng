@@ -2784,8 +2784,9 @@ version 1.2.51beta01 [January 22, 2013]
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
 
-version 1.2.51beta02 [March 1, 2013]
+version 1.2.51beta02 [June 18, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
+  Revised libpng.3 so that "doclift" can process it.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

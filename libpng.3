@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "April 11, 2013"
+.TH LIBPNG 3 "June 18, 2013"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.2.51beta02
 .SH SYNOPSIS
@@ -342,11 +342,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.51beta02
 
 \fI\fB
 
-\fBDEPRECATED: void png_info_init (png_infop \fIinfo_ptr\fP\fB);\fP
+\fBDEPRECATED void png_info_init (png_infop \fIinfo_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBDEPRECATED: void png_info_init_2 (png_infopp \fP\fIptr_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
+\fBDEPRECATED void png_info_init_2 (png_infopp \fP\fIptr_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
 
 \fI\fB
 
@@ -374,7 +374,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.51beta02
 
 \fI\fB
 
-\fBDEPRECATED: void png_permit_empty_plte (png_structp \fP\fIpng_ptr\fP\fB, int \fIempty_plte_permitted\fP\fB);\fP
+\fBDEPRECATED void png_permit_empty_plte (png_structp \fP\fIpng_ptr\fP\fB, int \fIempty_plte_permitted\fP\fB);\fP
 
 \fI\fB
 
@@ -398,11 +398,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.51beta02
 
 \fI\fB
 
-\fBDEPRECATED: void png_read_init (png_structp \fIpng_ptr\fP\fB);\fP
+\fBDEPRECATED void png_read_init (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBDEPRECATED: void png_read_init_2 (png_structpp \fP\fIptr_ptr\fP\fB, png_const_charp \fP\fIuser_png_ver\fP\fB, png_size_t \fP\fIpng_struct_size\fP\fB, png_size_t \fIpng_info_size\fP\fB);\fP
+\fBDEPRECATED void png_read_init_2 (png_structpp \fP\fIptr_ptr\fP\fB, png_const_charp \fP\fIuser_png_ver\fP\fB, png_size_t \fP\fIpng_struct_size\fP\fB, png_size_t \fIpng_info_size\fP\fB);\fP
 
 \fI\fB
 
@@ -774,11 +774,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.2.51beta02
 
 \fI\fB
 
-\fBDEPRECATED: void png_write_init (png_structp \fIpng_ptr\fP\fB);\fP
+\fBDEPRECATED void png_write_init (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fI\fB
 
-\fBDEPRECATED: void png_write_init_2 (png_structpp \fP\fIptr_ptr\fP\fB, png_const_charp \fP\fIuser_png_ver\fP\fB, png_size_t \fP\fIpng_struct_size\fP\fB, png_size_t \fIpng_info_size\fP\fB);\fP
+\fBDEPRECATED void png_write_init_2 (png_structpp \fP\fIptr_ptr\fP\fB, png_const_charp \fP\fIuser_png_ver\fP\fB, png_size_t \fP\fIpng_struct_size\fP\fB, png_size_t \fIpng_info_size\fP\fB);\fP
 
 \fI\fB
 
@@ -821,7 +821,7 @@ Following is a copy of the libpng.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.51beta02 - April 11, 2013
+ libpng version 1.2.51beta02 - June 18, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
@@ -832,7 +832,7 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.51beta02 - April 11, 2013
+ libpng versions 0.97, January 1998, through 1.2.51beta02 - June 18, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2009 Glenn Randers-Pehrson
 
@@ -3670,12 +3670,12 @@ the message, "message" is the formatted string to be printed,
 and p1 and p2 are parameters that are to be embedded in the string
 according to printf-style formatting directives.  For example,
 
-   png_debug1(2, "foo=%d\n", foo);
+   png_debug1(2, "foo=%d", foo);
 
 is expanded to
 
    if(PNG_DEBUG > 2)
-     fprintf(PNG_DEBUG_FILE, "foo=%d\n", foo);
+     fprintf(PNG_DEBUG_FILE, "foo=%d\en", foo);
 
 When PNG_DEBUG is defined but is zero, the macros aren't defined, but you
 can still use PNG_DEBUG to control your own debugging:
@@ -4000,7 +4000,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XIII. Y2K Compliance in libpng
 
-April 11, 2013
+June 18, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -4385,7 +4385,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.2.51beta02 - April 11, 2013:
+Libpng version 1.2.51beta02 - June 18, 2013:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -4408,7 +4408,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.2.51beta02, April 11, 2013, are
+libpng versions 1.2.6, August 15, 2004, through 1.2.51beta02, June 18, 2013, are
 Copyright (c) 2004,2006-2008 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -4507,7 +4507,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-April 11, 2013
+June 18, 2013
 
 .\" end of man page
 
