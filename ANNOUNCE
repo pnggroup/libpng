@@ -103,7 +103,7 @@ Version 1.6.3beta07 [June 8, 2013]
     it is not used, so that it will always get prefixed.
 
 Version 1.6.3beta08 [June 18, 2013]
-  Revised libpng.3 so that "doclift" can process it.
+  Revised libpng.3 so that "doclifter" can process it.
 
 Version 1.6.3beta09 [June 18, 2013]
 
