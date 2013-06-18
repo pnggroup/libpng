@@ -1,5 +1,5 @@
 
-Libpng 1.4.13beta03 - June 4, 2013
+Libpng 1.4.13beta03 - June 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,7 +42,7 @@ version 1.4.13beta02 [January 22, 2013]
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
 
-version 1.4.13beta03 [June 4, 2013]
+version 1.4.13beta03 [June 18, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Removed a redundant test from png_set_IHDR().
 
