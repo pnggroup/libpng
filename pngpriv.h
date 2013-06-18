@@ -131,7 +131,7 @@
  * same object module, producing different binaries for different architectures.
  * When this happens configure-time setting of the target host options cannot be
  * done and this interferes with the handling of the ARM NEON optimizations, and
- * possibly other similiar optimizations.  Put additional tests here; in general
+ * possibly other similar optimizations.  Put additional tests here; in general
  * this is needed when the same option can be changed at both compile time and
  * run time depending on the target OS (i.e. iOS vs Android.)
  *
