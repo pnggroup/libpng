@@ -1,5 +1,5 @@
 
-Libpng 1.6.3beta08 - June 8, 2013
+Libpng 1.6.3beta08 - June 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -102,7 +102,8 @@ Version 1.6.3beta07 [June 8, 2013]
     the confusion that would result by declaring the init function even when
     it is not used, so that it will always get prefixed.
 
-Version 1.6.3beta08 [June 8, 2013]
+Version 1.6.3beta08 [June 18, 2013]
+  Revised libpng.3 so that "doclift" can process it.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
