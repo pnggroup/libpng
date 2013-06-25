@@ -1,5 +1,5 @@
 
-Libpng 1.5.17rc03 - June 18, 2013
+Libpng 1.5.17rc03 - June 25, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -49,13 +49,16 @@ Version 1.5.17beta01 [June 8, 2013]
     the confusion that would result by declaring the init function even when
     it is not used, so that it will always get prefixed.
 
-Version 1.5.17rc01 [June 18, 2013]
+Version 1.5.17rc01 [June 25, 2013]
   No changes.
 
 Version 1.5.17rc02 [June 18, 2013]
   Revised libpng.3 so that "doclifter" can process it.
 
-Version 1.5.17rc03 [June 18, 2013]
+Version 1.5.17rc03 [June 25, 2013]
+  Revised example.c to illustrate use of PNG_DEFAULT_sRGB and PNG_GAMMA_MAC_18
+    as parameters for png_set_gamma().  These have been available since
+    libpng-1.5.4.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

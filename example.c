@@ -259,9 +259,9 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    /* If we don't have another value */
    else
    {
-      screen_gamma = 2.2;  /* A good guess for a PC monitor in a dimly
-                              lit room */
-      screen_gamma = 1.7 or 1.0;  /* A good guess for Mac systems */
+      screen_gamma = PNG_DEFAULT_sRGB;  /* A good guess for a PC monitor
+                              in a dimly lit room */
+      screen_gamma = PNG_GAMMA_MAC_18 or 1.0; /* Good guesses for Mac systems */
    }
 
    /* Tell libpng to handle the gamma conversion for you.  The final call
@@ -273,7 +273,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    int intent;
 
    if (png_get_sRGB(png_ptr, info_ptr, &intent))
-      png_set_gamma(png_ptr, screen_gamma, 0.45455);
+      png_set_gamma(png_ptr, screen_gamma, PNG_DEFAULT_sRGB);
    else
    {
       double image_gamma;
