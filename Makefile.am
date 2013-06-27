@@ -10,7 +10,7 @@ ACLOCAL_AMFLAGS = -I scripts
 check_PROGRAMS= pngtest pngunknown pngstest pngvalid
 
 # Utilities - installed
-bin_PROGRAMS= png-fix-too-far-back png-fix-itxt
+bin_PROGRAMS= pngfix png-fix-itxt
 
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -24,8 +24,8 @@ pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
-png_fix_too_far_back_SOURCES = contrib/tools/png-fix-too-far-back.c
-png_fix_too_far_back_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+pngfix_SOURCES = contrib/tools/pngfix.c
+pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 
@@ -196,7 +196,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
 pngstest.o pngvalid.o pngtest.o pngunknown.o timepng.o: pnglibconf.h
-png-fix-too-far-back.o png-fix-itxt.o: pnglibconf.h
+pngfix.o png-fix-itxt.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
