@@ -4469,5 +4469,4 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
-
 #endif /* PNG_READ_SUPPORTED */

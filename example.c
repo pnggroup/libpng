@@ -442,7 +442,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    else
    {
       screen_gamma = PNG_DEFAULT_sRGB;  /* A good guess for a PC monitor
-                              in a dimly lit room */
+                                           in a dimly lit room */
       screen_gamma = PNG_GAMMA_MAC_18 or 1.0; /* Good guesses for Mac systems */
    }
 
