@@ -2,8 +2,8 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.5.10 [March 8, 2012]
- * Maintained 1998-2012 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.17 [June 27, 2013]
+ * Maintained 1998-2013 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
  */
@@ -260,7 +260,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    else
    {
       screen_gamma = PNG_DEFAULT_sRGB;  /* A good guess for a PC monitor
-                              in a dimly lit room */
+                                           in a dimly lit room */
       screen_gamma = PNG_GAMMA_MAC_18 or 1.0; /* Good guesses for Mac systems */
    }
 

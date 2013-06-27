@@ -4147,6 +4147,9 @@ Version 1.5.17rc03 [June 25, 2013]
     as parameters for png_set_gamma().  These have been available since
     libpng-1.5.4.
 
+Version 1.5.17 [June 27, 2013]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
