@@ -1,5 +1,5 @@
 
-Libpng 1.6.3beta09 - June 26, 2013
+Libpng 1.6.3beta09 - June 27, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -105,10 +105,12 @@ Version 1.6.3beta07 [June 8, 2013]
 Version 1.6.3beta08 [June 18, 2013]
   Revised libpng.3 so that "doclifter" can process it.
 
-Version 1.6.3beta09 [June 26, 2013]
+Version 1.6.3beta09 [June 27, 2013]
   Revised example.c to illustrate use of PNG_DEFAULT_sRGB and PNG_GAMMA_MAC_18
     as parameters for png_set_gamma().  These have been available since
     libpng-1.5.4.
+  Revised contrib/tools/png-fix-too-far-back.c to check all compressed chunks
+    known to libpng.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
