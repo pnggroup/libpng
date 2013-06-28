@@ -1,4 +1,4 @@
-/* png-fix-too-far-back.c
+/* pngfix.c
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
@@ -23,9 +23,9 @@
 #ifdef __GNUC__
    /* This is used to fix the error:
     *
-    * png-fix-too-far-back.c:
+    * pngfix.c:
     * In function 'zlib_advance':
-    * png-fix-too-far-back.c:181:13: error: assuming signed overflow does not
+    * pngfix.c:181:13: error: assuming signed overflow does not
     *   occur when simplifying conditional to constant [-Werror=strict-overflow]
     */
 #  define FIX_GCC volatile
@@ -34,7 +34,7 @@
 #  error not tested
 #endif
 
-#define PROGRAM_NAME "png-fix-too-far-back"
+#define PROGRAM_NAME "pngfix"
 
 /* Define the following to use this program against your installed libpng,
  * rather than the one being built here:
@@ -46,14 +46,14 @@
 #endif
 
 #if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
-#  error "png-fix-too-far-back will not work with libpng prior to 1.6.3"
+#  error "pngfix will not work with libpng prior to 1.6.3"
 #endif
 
 #ifdef PNG_READ_SUPPORTED
 #include <zlib.h>
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
-#  error "png-fix-too-far-back not supported in this libpng version"
+#  error "pngfix not supported in this libpng version"
 #endif
 
 #if PNG_ZLIB_VERNUM >= 0x1240
@@ -3897,7 +3897,7 @@ int
 main(void)
 {
    fprintf(stderr,
-      "png-fix-too-far-back needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
+      "pngfix needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
       PNG_ZLIB_VERNUM);
    return 77;
 }
@@ -3908,7 +3908,7 @@ main(void)
 int
 main(void)
 {
-   fprintf(stderr, "png-fix-too-far-back does not work without read support\n");
+   fprintf(stderr, "pngfix does not work without read support\n");
    return 77;
 }
 #endif /* PNG_READ_SUPPORTED */
