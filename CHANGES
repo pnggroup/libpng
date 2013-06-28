@@ -4596,6 +4596,8 @@ Version 1.6.3beta09 [June 27, 2013]
   Renamed contrib/tools/png-fix-too-far-back.c to pngfix.c and revised it
     to check all compressed chunks known to libpng.
 
+Version 1.6.3beta10 [June 28, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
