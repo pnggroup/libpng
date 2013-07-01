@@ -10,7 +10,8 @@
 # with suffix ".png" replaced (by default) with "_pngzop.png"
 
 # Requires zopfli, pngcrush (version 1.7.56 or later), zpipe (from the
-# zlib-1.2.7 distribution, in the "examples" directory), and "mkdir -p",
+# zlib-1.2.7 distribution, in the "examples" directory), pngfix (from the
+# libpng-1.6.3 or later distribution), and "mkdir -p",
 # along with these programs that should have been installed along with
 # this "pngzop" script:
 #
@@ -24,8 +25,6 @@
 
 # Input: *.png
 # Output: *_pngzop.png
-
-# To do: Adjust zlib CMF to reflect actual windowBits required.
 
 brute=
 directory=.
@@ -69,7 +68,14 @@ esac
 
 case x$extension in
   x)
-    extension=_pngzop.png
+    case x$brute in
+       xtrue)
+         extension=_bzop.png
+         ;;
+       *)
+         extension=_pzop.png
+         ;;
+       esac
     ;;
   *)
     ;;
@@ -80,7 +86,7 @@ case x$brute in
       for x in $*
       do
         root=`echo $x | sed -e s/.png$//`
-        pngzop_get_ihdr.exe < $x > ${directory}/${root}${extension}
+        pngzop_get_ihdr.exe < $x > ${root}_pz.png
 
         # Generate trial PNGs with filter none, 4 PNG filters, and adaptive
         # filter
@@ -136,9 +142,13 @@ s/[^ 	]*[	 ]*\
         fi
         done
 
-        pngzop_zlib_to_idat.exe < $smallest >> ${directory}/${root}${extension}
+        pngzop_zlib_to_idat.exe < $smallest >> ${root}_pz.png
         rm -f ${root}_f?.idat.zlib
-        pngzop_get_iend.exe < $x >> ${directory}/${root}${extension}
+        pngzop_get_iend.exe < $x >> ${root}_pz.png
+
+        # Optimize the CMF bytes
+        pngfix -o --quiet --out=${directory}/${root}${extension} ${root}_pz.png
+        rm ${root}_pz.png
 
       done
     ;;
@@ -147,8 +157,7 @@ s/[^ 	]*[	 ]*\
     for x in $*
     do
       root=`echo $x | sed -e s/.png$//`
-      pngzop_get_ihdr.exe < $x > ${directory}/${root}${extension}
-      rm -f ${root}_L9.png
+      pngzop_get_ihdr.exe < $x > ${root}_pz.png
 
       # Do pngcrush level 9 with none, 4 filters, and adaptive filtering, and
       # select the smallest.
@@ -162,9 +171,14 @@ s/[^ 	]*[	 ]*\
 
       # Recompress with zopfli and write it on output.
       zopfli --i25 --zlib -c ${root}_L9.idat |
-        pngzop_zlib_to_idat.exe >> ${directory}/${root}${extension}
+        pngzop_zlib_to_idat.exe >> ${root}_pz.png
       rm ${root}_L9.idat
-      pngzop_get_iend.exe < $x >> ${directory}/${root}${extension}
+      pngzop_get_iend.exe < $x >> ${root}_pz.png
+
+      # Optimize the CMF bytes
+      pngfix -o --quiet --out=${directory}/${root}${extension} ${root}_pz.png
+      rm ${root}_pz.png
+
       shift
     done
     ;;
