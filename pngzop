@@ -9,9 +9,9 @@
 # recompresses them with zopfli, and embeds them in a new set of PNG files
 # with suffix ".png" replaced (by default) with "_pngzop.png"
 
-# Requires zopfli, pngcrush (version 1.7.56 or later), zpipe (from the
-# zlib-1.2.7 distribution, in the "examples" directory), pngfix (from the
-# libpng-1.6.3 or later distribution), and "mkdir -p",
+# Requires zopfli, pngcrush (version 1.7.65 or later), zpipe (from the
+# zlib-1.2.7 or later distribution, in the "examples" directory), pngfix
+# (from the libpng-1.6.3 or later distribution), and "mkdir -p",
 # along with these programs that should have been installed along with
 # this "pngzop" script:
 #
@@ -21,18 +21,22 @@
 #        pngzop_zlib_to_idat.exe
 
 # Usage:
-# pngzop [-b|--brute] [-d|--directory dir] [-e|--extension ext] *.png
+# pngzop [-b|--blacken] [-d|--directory dir] [-e|--extension ext] *.png
+#        (to overwrite the input, use "-ext png")
 
 # Input: *.png
 # Output: *_pngzop.png
 
-brute=
+blacken=
 directory=.
 extension=
 
 for x in $*
 do
 case $1 in
+  -b|--blacken)
+    blacken="-blacken"
+    shift;;
   -d|--directory)
     shift
     directory=$1
@@ -74,13 +78,17 @@ esac
 for x in $*
 do
   root=`echo $x | sed -e s/.png$//`
-  pngzop_get_ihdr.exe < $x > ${root}_pz.png
+
+  # prepass to reduce and possibly blacken
+  pngcrush -q -m 1 -force -reduce $blacken $x ${root}_temp.png
+
+  pngzop_get_ihdr.exe < ${root}_temp.png > ${root}_pz.png
 
   # Generate trial PNGs with filter none, 4 PNG filters, and adaptive
   # filter
   for f in 0 1 2 3 4 5
   do
-    pngcrush -q -m 1 -f $f -force $x ${root}_f$f.png &
+    pngcrush -q -m 1 -f $f -force ${root}_temp.png ${root}_f$f.png &
   done
   wait
 
@@ -132,9 +140,9 @@ s/[^ 	]*[	 ]*\
 
   pngzop_zlib_to_idat.exe < $smallest >> ${root}_pz.png
   rm -f ${root}_f?.idat.zlib
-  pngzop_get_iend.exe < $x >> ${root}_pz.png
+  pngzop_get_iend.exe < ${root}_temp.png >> ${root}_pz.png
 
-  # Optimize the CMF bytes
+  # Optimize the CMF bytes and put the result in desired destination.
   pngfix -o --quiet --out=${directory}/${root}${extension} ${root}_pz.png
   rm ${root}_pz.png
 
