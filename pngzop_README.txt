@@ -1,9 +1,77 @@
-
 /*
   This is the pngzop branch of the "pmt" tree.
   Code for supporting the "zopfli" compression method
   in PNG files will appear here.
 
-  Eventually this collection of scripts will be incorporated
+  Eventually this collection of scripts might be incorporated
   into pngcrush.
+
+  Copyright 2013 by Glenn Randers-Pehrson
+  Released under the pngcrush license (which is equivalent to the libpng
+  license plus required UCITA disclaimers). See DISCLAIMERS and LICENSE below.
+
+  Usage:
+  pngzop [-b|--blacken] [-d|--directory dir] [-e|--extension ext] *.png
+
+  Input: *.png
+  Output (default): *_pngzop.png (to overwrite the input, use "-ext png")
+
+  Pngzop does the following:
+
+    1. Preprocesses the input file(s) with pngcrush -reduce
+       (and optionally -blacken to clean up "dirty" transparent pixels)
+
+    2. Uses pngcrush to write 6 test files, with 5 PNG filters and adaptive
+       filtering.
+
+    3. Extracts the IDAT contents from each of the 6 files.
+
+    4. Recompresses the IDAT contents with zopfli (25 iterations).
+
+    5. Reassembles the PNG file using the smallest of the zopfli-compressed
+       results.
+
+    6. Postprocesses the PNG file with "pngfix" to optimize the windowBits
+       field, to minimize memory use during later decompression.
+
+  Pngzop requires zopfli, pngcrush (version 1.7.65 or later), zpipe (from the
+  "examples" directory of the zlib-1.2.7 or later distribution,), pngfix
+  (from the libpng-1.6.3 or later distribution), and "mkdir -p",
+  along with these programs that should have been installed from their "C"
+  sources along with this "pngzop" script:
+ 
+         pngzop_get_ihdr.exe
+         pngzop_get_idat.exe
+         pngzop_get_iend.exe
+         pngzop_zlib_to_idat.exe
+
+  DISCLAIMERS:
+ 
+  The pngcrush computer program is supplied "AS IS".  The Author disclaims all
+  warranties, expressed or implied, including, without limitation, the
+  warranties of merchantability and of fitness for any purpose.  The
+  Author assumes no liability for direct, indirect, incidental, special,
+  exemplary, or consequential damages, which may result from the use of
+  the computer program, even if advised of the possibility of such damage.
+  There is no warranty against interference with your enjoyment of the
+  computer program or against infringement.  There is no warranty that my
+  efforts or the computer program will fulfill any of your particular purposes
+  or needs.  This computer program is provided with all faults, and the entire
+  risk of satisfactory quality, performance, accuracy, and effort is with
+  the user.
+ 
+  LICENSE:
+ 
+  Permission is hereby irrevocably granted to everyone to use, copy, modify,
+  and distribute this source code, or portions hereof, or executable programs
+  compiled from it, for any purpose, without payment of any fee, subject to
+  the following restrictions:
+ 
+  1. The origin of this source code must not be misrepresented.
+ 
+  2. Altered versions must be plainly marked as such and must not be
+     misrepresented as being the original source.
+ 
+  3. This Copyright notice, disclaimer, and license may not be removed
+     or altered from any source or altered source distribution.
 */
