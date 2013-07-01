@@ -33,9 +33,6 @@ extension=
 for x in $*
 do
 case $1 in
-  -b|--brute)
-    brute=true
-    shift;;
   -d|--directory)
     shift
     directory=$1
@@ -68,119 +65,77 @@ esac
 
 case x$extension in
   x)
-    case x$brute in
-       xtrue)
-         extension=_bzop.png
-         ;;
-       *)
-         extension=_pzop.png
-         ;;
-       esac
+    extension=_pngzop.png
     ;;
   *)
     ;;
 esac
 
-case x$brute in
-  xtrue)
-      for x in $*
-      do
-        root=`echo $x | sed -e s/.png$//`
-        pngzop_get_ihdr.exe < $x > ${root}_pz.png
+for x in $*
+do
+  root=`echo $x | sed -e s/.png$//`
+  pngzop_get_ihdr.exe < $x > ${root}_pz.png
 
-        # Generate trial PNGs with filter none, 4 PNG filters, and adaptive
-        # filter
-        for f in 0 1 2 3 4 5
-        do
-          pngcrush -q -m 1 -f $f -force $x ${root}_f$f.png &
-        done
-        wait
+  # Generate trial PNGs with filter none, 4 PNG filters, and adaptive
+  # filter
+  for f in 0 1 2 3 4 5
+  do
+    pngcrush -q -m 1 -f $f -force $x ${root}_f$f.png &
+  done
+  wait
 
-        # Extract and decompress the zlib datastream from the concatenated
-        # IDAT chunks.
-        for f in 0 1 2 3 4 5
-        do
-          pngzop_get_idat.exe < ${root}_f$f.png | zpipe -d > ${root}_f$f.idat &
-        done
-        wait
-        rm -f ${root}_f?.png
+  # Extract and decompress the zlib datastream from the concatenated
+  # IDAT chunks.
+  for f in 0 1 2 3 4 5
+  do
+    pngzop_get_idat.exe < ${root}_f$f.png | zpipe -d > ${root}_f$f.idat &
+  done
+  wait
+  rm -f ${root}_f?.png
 
-        # Recompress the IDAT data using zopfli
-        for f in 0 1 2 3 4 5
-        do
-          zopfli --i25 --zlib ${root}_f$f.idat &
-        done
-        wait
-        rm -f ${root}_f?.idat
+  # Recompress the IDAT data using zopfli
+  for f in 0 1 2 3 4 5
+  do
+    zopfli --i25 --zlib ${root}_f$f.idat &
+  done
+  wait
+  rm -f ${root}_f?.idat
 
-        # Copy the smallest result to file.zlib
+  # Copy the smallest result to file.zlib
 
-        file=${root}_f0.idat.zlib
-        smallest=$file
-        smallsize=`ls -l $file | sed -e "
+  file=${root}_f0.idat.zlib
+  smallest=$file
+  smallsize=`ls -l $file | sed -e "
 s/[^ 	]*[	 ]*\
 [^ 	]*[	 ]*\
 [^ 	]*[	 ]*\
 [^ 	]*[	 ]*\
 //" -e "s/[ 	].*//"`
 
-        for f in 1 2 3 4 5
-        do
+  for f in 1 2 3 4 5
+  do
 
-        file=${root}_f$f.idat.zlib
+  file=${root}_f$f.idat.zlib
 
-        size=`ls -l $file | sed -e "
+  size=`ls -l $file | sed -e "
 s/[^ 	]*[	 ]*\
 [^ 	]*[	 ]*\
 [^ 	]*[	 ]*\
 [^ 	]*[	 ]*\
 //" -e "s/[ 	].*//"`
 
-        if [ $smallsize -gt $size 	] ; then
-        smallest=$file
-        smallsize=$size
-        fi
-        done
+  if [ $smallsize -gt $size 	] ; then
+  smallest=$file
+  smallsize=$size
+  fi
+  done
 
-        pngzop_zlib_to_idat.exe < $smallest >> ${root}_pz.png
-        rm -f ${root}_f?.idat.zlib
-        pngzop_get_iend.exe < $x >> ${root}_pz.png
+  pngzop_zlib_to_idat.exe < $smallest >> ${root}_pz.png
+  rm -f ${root}_f?.idat.zlib
+  pngzop_get_iend.exe < $x >> ${root}_pz.png
 
-        # Optimize the CMF bytes
-        pngfix -o --quiet --out=${directory}/${root}${extension} ${root}_pz.png
-        rm ${root}_pz.png
+  # Optimize the CMF bytes
+  pngfix -o --quiet --out=${directory}/${root}${extension} ${root}_pz.png
+  rm ${root}_pz.png
 
-      done
-    ;;
-
-  x)
-    for x in $*
-    do
-      root=`echo $x | sed -e s/.png$//`
-      pngzop_get_ihdr.exe < $x > ${root}_pz.png
-
-      # Do pngcrush level 9 with none, 4 filters, and adaptive filtering, and
-      # select the smallest.
-      pngcrush -q -m 113 -m 114 -m 115 -m 116 -m 117 -m 118 \
-         -force $x ${root}_L9.png
-
-      # Extract and decompress the zlib datastream from the concatenated
-      # IDAT chunks.
-      pngzop_get_idat.exe < ${root}_L9.png | zpipe -d > ${root}_L9.idat
-      rm ${root}_L9.png
-
-      # Recompress with zopfli and write it on output.
-      zopfli --i25 --zlib -c ${root}_L9.idat |
-        pngzop_zlib_to_idat.exe >> ${root}_pz.png
-      rm ${root}_L9.idat
-      pngzop_get_iend.exe < $x >> ${root}_pz.png
-
-      # Optimize the CMF bytes
-      pngfix -o --quiet --out=${directory}/${root}${extension} ${root}_pz.png
-      rm ${root}_pz.png
-
-      shift
-    done
-    ;;
-
-esac
+done
