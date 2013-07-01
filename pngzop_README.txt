@@ -14,7 +14,7 @@
   pngzop [-b|--blacken] [-d|--directory dir] [-e|--extension ext] *.png
 
   Input: *.png
-  Output (default): *_pngzop.png (to overwrite the input, use "-e png")
+  Output (default): *_pngzop.png (to overwrite the input, use "-e .png")
 
   Pngzop does the following:
 
