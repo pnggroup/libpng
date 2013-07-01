@@ -22,7 +22,7 @@
 
 # Usage:
 # pngzop [-b|--blacken] [-d|--directory dir] [-e|--extension ext] *.png
-#        (to overwrite the input, use "-ext png")
+#        (to overwrite the input, use "-e png")
 
 # Input: *.png
 # Output: *_pngzop.png
