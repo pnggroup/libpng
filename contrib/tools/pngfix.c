@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.3 [(PENDING RELEASE)]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -73,40 +73,12 @@
 #  define png_aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
 
-/* Chunk tags (copied from pngpriv.h) */
-#define PNG_32b(b,s) ((png_uint_32)(b) << (s))
-#define PNG_CHUNK(b1,b2,b3,b4) \
-   (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
-
-#define png_IHDR PNG_CHUNK( 73,  72,  68,  82)
-#define png_IDAT PNG_CHUNK( 73,  68,  65,  84)
-#define png_IEND PNG_CHUNK( 73,  69,  78,  68)
-#define png_PLTE PNG_CHUNK( 80,  76,  84,  69)
-#define png_bKGD PNG_CHUNK( 98,  75,  71,  68)
-#define png_cHRM PNG_CHUNK( 99,  72,  82,  77)
-#define png_gAMA PNG_CHUNK(103,  65,  77,  65)
-#define png_hIST PNG_CHUNK(104,  73,  83,  84)
-#define png_iCCP PNG_CHUNK(105,  67,  67,  80)
-#define png_iTXt PNG_CHUNK(105,  84,  88, 116)
-#define png_oFFs PNG_CHUNK(111,  70,  70, 115)
-#define png_pCAL PNG_CHUNK(112,  67,  65,  76)
-#define png_sCAL PNG_CHUNK(115,  67,  65,  76)
-#define png_pHYs PNG_CHUNK(112,  72,  89, 115)
-#define png_sBIT PNG_CHUNK(115,  66,  73,  84)
-#define png_sPLT PNG_CHUNK(115,  80,  76,  84)
-#define png_sRGB PNG_CHUNK(115,  82,  71,  66)
-#define png_sTER PNG_CHUNK(115,  84,  69,  82)
-#define png_tEXt PNG_CHUNK(116,  69,  88, 116)
-#define png_tIME PNG_CHUNK(116,  73,  77,  69)
-#define png_tRNS PNG_CHUNK(116,  82,  78,  83)
-#define png_zTXt PNG_CHUNK(122,  84,  88, 116)
-
 /* The 8 byte signature as a pair of 32 bit quantities */
-#define sig1 PNG_CHUNK(137,  80,  78,  71)
-#define sig2 PNG_CHUNK( 13,  10,  26,  10)
+#define sig1 PNG_U32(137,  80,  78,  71)
+#define sig2 PNG_U32( 13,  10,  26,  10)
 
 /* Is the chunk critical? */
-#define CRITICAL(chunk) (((chunk) & PNG_CHUNK(32,0,0,0)) == 0)
+#define CRITICAL(chunk) (((chunk) & PNG_U32(32,0,0,0)) == 0)
 
 /********************************* UTILITIES **********************************/
 /* UNREACHED is a value to cause an assert to fail. Because of the way the
@@ -540,19 +512,19 @@ chunk_type_valid(png_uint_32 c)
     * 8-bit unit must be in the range 65-90 to be valid.  So bit 5
     * must be zero, bit 6 must be set and bit 7 zero.
     */
-   c &= ~PNG_CHUNK(32,32,0,32);
+   c &= ~PNG_U32(32,32,0,32);
    t = (c & ~0x1f1f1f1f) ^ 0x40404040;
 
    /* Subtract 65 for each 8 bit quantity, this must not overflow
     * and each byte must then be in the range 0-25.
     */
-   c -= PNG_CHUNK(65,65,65,65);
+   c -= PNG_U32(65,65,65,65);
    t |=c ;
 
    /* Subtract 26, handling the overflow which should set the top
     * three bits of each byte.
     */
-   c -= PNG_CHUNK(25,25,25,26);
+   c -= PNG_U32(25,25,25,26);
    t |= ~c;
 
    return (t & 0xe0e0e0e0) == 0;
