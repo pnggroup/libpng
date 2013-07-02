@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.3beta10 - June 28, 2013
+ libpng version 1.6.3beta10 - July 2, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.3beta10 - June 28, 2013
+ libpng versions 0.97, January 1998, through 1.6.3beta10 - July 2, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4026,8 +4026,11 @@ as warnings.
 
     png_set_benign_errors (png_ptr, int allowed);
 
-    allowed: 0: (default) treat png_benign_error() an error.
+    allowed: 0: treat png_benign_error() as an error.
              1: treat png_benign_error() as a warning.
+
+As of libpng-1.6.0, the default condition is to treat benign errors as
+warnings while reading and as errors while writing.
 
 Custom chunks
 
@@ -5019,6 +5022,9 @@ is allowed to appear in images with any color type.
 The library now issues an error if the application attempts to set a
 transform after it calls png_read_update_info().
 
+The default condition for benign_errors is now to treat benign errors as
+warnings while reading and as errors while writing.
+
 The library now issues a warning if both background processing and RGB to
 gray are used when gamma correction happens. As with previous versions of
 the library the results are numerically very incorrect in this case.
@@ -5212,7 +5218,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-June 28, 2013
+July 2, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

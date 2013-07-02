@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "June 28, 2013"
+.TH LIBPNG 3 "July 2, 2013"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.3beta10
 .SH SYNOPSIS
@@ -504,7 +504,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.3beta10 - June 28, 2013
+ libpng version 1.6.3beta10 - July 2, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -515,7 +515,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.3beta10 - June 28, 2013
+ libpng versions 0.97, January 1998, through 1.6.3beta10 - July 2, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4530,8 +4530,11 @@ as warnings.
 
     png_set_benign_errors (png_ptr, int allowed);
 
-    allowed: 0: (default) treat png_benign_error() an error.
+    allowed: 0: treat png_benign_error() as an error.
              1: treat png_benign_error() as a warning.
+
+As of libpng-1.6.0, the default condition is to treat benign errors as
+warnings while reading and as errors while writing.
 
 .SS Custom chunks
 
@@ -5524,6 +5527,9 @@ is allowed to appear in images with any color type.
 The library now issues an error if the application attempts to set a
 transform after it calls png_read_update_info().
 
+The default condition for benign_errors is now to treat benign errors as
+warnings while reading and as errors while writing.
+
 The library now issues a warning if both background processing and RGB to
 gray are used when gamma correction happens. As with previous versions of
 the library the results are numerically very incorrect in this case.
@@ -5717,7 +5723,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-June 28, 2013
+July 2, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -5994,7 +6000,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.3beta10 - June 28, 2013:
+Libpng version 1.6.3beta10 - July 2, 2013:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6017,7 +6023,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.3beta10, June 28, 2013, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.3beta10, July 2, 2013, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6116,7 +6122,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-June 28, 2013
+July 2, 2013
 
 .\" end of man page
 
