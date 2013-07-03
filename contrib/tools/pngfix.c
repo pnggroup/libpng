@@ -73,15 +73,13 @@
 #  define png_aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
 
+#if PNG_LIBPNG_VER < 10700
 /* Chunk tags (copied from pngpriv.h) */
 #define PNG_32b(b,s) ((png_uint_32)(b) << (s))
 #define PNG_U32(b1,b2,b3,b4) \
    (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
 
-/* Constants for known chunk types.
- *
- * Copied from ../../pngpriv.h.
- */
+/* Constants for known chunk types. */
 #define png_IDAT PNG_U32( 73,  68,  65,  84)
 #define png_IEND PNG_U32( 73,  69,  78,  68)
 #define png_IHDR PNG_U32( 73,  72,  68,  82)
@@ -108,6 +106,7 @@
 #define png_tIME PNG_U32(116,  73,  77,  69)
 #define png_tRNS PNG_U32(116,  82,  78,  83)
 #define png_zTXt PNG_U32(122,  84,  88, 116)
+#endif
 
 /* The 8 byte signature as a pair of 32 bit quantities */
 #define sig1 PNG_U32(137,  80,  78,  71)
@@ -3791,7 +3790,7 @@ usage(const char *prog)
 "          OPT: The zlib stream window bits value could be improved (and was).",
 "          SKP: The chunk was skipped because of a zlib issue (zlib-rc) with",
 "               explanation 'message'",
-"          ERR: The read of the file was aborted. The parameters explain why.",
+"          ERR: The read of the file was aborted.  The parameters explain why.",
 "$3 status:     For 'ERR' the accumulate status code from 'EXIT CODES' above.",
 "               This is printed as a 2 digit hexadecimal value",
 "   comp-level: The recorded compression level (FLEVEL) of a zlib stream",

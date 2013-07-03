@@ -4606,6 +4606,7 @@ Version 1.6.3beta10 [July 3, 2013]
     been clarified, with --strip=transform now stripping the bKGD chunk,
     which was stripped previously with --strip=unused.
   Added all documented chunk types to pngpriv.h
+  Unified pngfix.c source with libpng17.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
