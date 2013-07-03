@@ -340,6 +340,7 @@ Version 1.7.0beta16 [July 3, 2013]
   Updated documentation to show default behavior of benign errors correctly.
   Added perfect hash code generation for lists of PNG chunks. This is
     a work in progress; checked in for use in pngfix.c
+  Ported ARM no-read patch from libpng16.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

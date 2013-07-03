@@ -20,6 +20,7 @@
 .section .note.GNU-stack,"",%progbits /* mark stack as non-executable */
 #endif
 
+#ifdef PNG_READ_SUPPORTED
 #if PNG_ARM_NEON_OPT > 0
 
 #ifdef __ELF__
@@ -233,3 +234,4 @@ func    png_read_filter_row_paeth3_neon, export=1
         pop             {r4,pc}
 endfunc
 #endif /* PNG_ARM_NEON_OPT > 0 */
+#endif /* PNG_READ_SUPPORTED */
