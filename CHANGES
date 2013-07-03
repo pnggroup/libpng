@@ -4599,6 +4599,13 @@ Version 1.6.3beta09 [June 27, 2013]
 Version 1.6.3beta10 [July 3, 2013]
   Updated documentation to show default behavior of benign errors correctly.
   Only compile ARM code when PNG_READ_SUPPORTED is defined.
+  Fixed undefined behavior in contrib/tools/pngfix.c and added new strip
+    option. pngfix relied on undefined behavior and even a simple change from
+    gcc to g++ caused it to fail.  The new strip option 'unsafe' has been
+    implemented and is the default if --max is given.  Option names have
+    been clarified, with --strip=transform now stripping the bKGD chunk,
+    which was stripped previously with --strip=unused.
+  Added all documented chunk types to pngpriv.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

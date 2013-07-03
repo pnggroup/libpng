@@ -670,37 +670,64 @@
  * architectures where (int) is only 16 bits.
  */
 #define PNG_32b(b,s) ((png_uint_32)(b) << (s))
-#define PNG_CHUNK(b1,b2,b3,b4) \
+#define PNG_U32(b1,b2,b3,b4) \
    (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
 
-#define png_IHDR PNG_CHUNK( 73,  72,  68,  82)
-#define png_IDAT PNG_CHUNK( 73,  68,  65,  84)
-#define png_IEND PNG_CHUNK( 73,  69,  78,  68)
-#define png_PLTE PNG_CHUNK( 80,  76,  84,  69)
-#define png_bKGD PNG_CHUNK( 98,  75,  71,  68)
-#define png_cHRM PNG_CHUNK( 99,  72,  82,  77)
-#define png_gAMA PNG_CHUNK(103,  65,  77,  65)
-#define png_hIST PNG_CHUNK(104,  73,  83,  84)
-#define png_iCCP PNG_CHUNK(105,  67,  67,  80)
-#define png_iTXt PNG_CHUNK(105,  84,  88, 116)
-#define png_oFFs PNG_CHUNK(111,  70,  70, 115)
-#define png_pCAL PNG_CHUNK(112,  67,  65,  76)
-#define png_sCAL PNG_CHUNK(115,  67,  65,  76)
-#define png_pHYs PNG_CHUNK(112,  72,  89, 115)
-#define png_sBIT PNG_CHUNK(115,  66,  73,  84)
-#define png_sPLT PNG_CHUNK(115,  80,  76,  84)
-#define png_sRGB PNG_CHUNK(115,  82,  71,  66)
-#define png_sTER PNG_CHUNK(115,  84,  69,  82)
-#define png_tEXt PNG_CHUNK(116,  69,  88, 116)
-#define png_tIME PNG_CHUNK(116,  73,  77,  69)
-#define png_tRNS PNG_CHUNK(116,  82,  78,  83)
-#define png_zTXt PNG_CHUNK(122,  84,  88, 116)
+/* Constants for known chunk types.
+ *
+ * MAINTAINERS: If you need to add a chunk, define the name here.
+ * For historical reasons these constants have the form png_<name>; i.e.
+ * the prefix is lower case.  Please use decimal values as the parameters to
+ * match the ISO PNG specification and to avoid relying on the C locale
+ * interpretation of character values.  Please keep the list sorted.
+ *
+ * Notice that PNG_U32 is used to define a 32-bit value for the 4 byte chunk
+ * type.  In fact the specification does not express chunk types this way,
+ * however using a 32-bit value means that the chunk type can be read from the
+ * stream using exactly the same code as used for a 32-bit unsigned value and
+ * can be examined far more efficiently (using one arithmetic compare).
+ *
+ * Prior to 1.5.6 the chunk type constants were expressed as C strings.  The
+ * libpng API still uses strings for 'unknown' chunks and a macro,
+ * PNG_STRING_FROM_CHUNK, allows a string to be generated if required.  Notice
+ * that for portable code numeric values must still be used; the string "IHDR"
+ * is not portable and neither is PNG_U32('I', 'H', 'D', 'R').
+ *
+ * In 1.7.0 the definitions will be made public in png.h to avoid having to
+ * duplicate the same definitions in application code.
+ */
+#define png_IDAT PNG_U32( 73,  68,  65,  84)
+#define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
+#define png_PLTE PNG_U32( 80,  76,  84,  69)
+#define png_bKGD PNG_U32( 98,  75,  71,  68)
+#define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
+#define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_gIFg PNG_U32(103,  73,  70, 103)
+#define png_gIFt PNG_U32(103,  73,  70, 116) /* deprecated */
+#define png_gIFx PNG_U32(103,  73,  70, 120)
+#define png_hIST PNG_U32(104,  73,  83,  84)
+#define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_iTXt PNG_U32(105,  84,  88, 116)
+#define png_oFFs PNG_U32(111,  70,  70, 115)
+#define png_pCAL PNG_U32(112,  67,  65,  76)
+#define png_pHYs PNG_U32(112,  72,  89, 115)
+#define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
+#define png_sPLT PNG_U32(115,  80,  76,  84)
+#define png_sRGB PNG_U32(115,  82,  71,  66)
+#define png_sTER PNG_U32(115,  84,  69,  82)
+#define png_tEXt PNG_U32(116,  69,  88, 116)
+#define png_tIME PNG_U32(116,  73,  77,  69)
+#define png_tRNS PNG_U32(116,  82,  78,  83)
+#define png_zTXt PNG_U32(122,  84,  88, 116)
 
 /* The following will work on (signed char*) strings, whereas the get_uint_32
  * macro will fail on top-bit-set values because of the sign extension.
  */
 #define PNG_CHUNK_FROM_STRING(s)\
-   PNG_CHUNK(0xff&(s)[0], 0xff&(s)[1], 0xff&(s)[2], 0xff&(s)[3])
+   PNG_U32(0xff&(s)[0], 0xff&(s)[1], 0xff&(s)[2], 0xff&(s)[3])
 
 /* This uses (char), not (png_byte) to avoid warnings on systems where (char) is
  * signed and the argument is a (char[])  This macro will fail miserably on

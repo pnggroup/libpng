@@ -75,38 +75,49 @@
 
 /* Chunk tags (copied from pngpriv.h) */
 #define PNG_32b(b,s) ((png_uint_32)(b) << (s))
-#define PNG_CHUNK(b1,b2,b3,b4) \
+#define PNG_U32(b1,b2,b3,b4) \
    (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
 
-#define png_IHDR PNG_CHUNK( 73,  72,  68,  82)
-#define png_IDAT PNG_CHUNK( 73,  68,  65,  84)
-#define png_IEND PNG_CHUNK( 73,  69,  78,  68)
-#define png_PLTE PNG_CHUNK( 80,  76,  84,  69)
-#define png_bKGD PNG_CHUNK( 98,  75,  71,  68)
-#define png_cHRM PNG_CHUNK( 99,  72,  82,  77)
-#define png_gAMA PNG_CHUNK(103,  65,  77,  65)
-#define png_hIST PNG_CHUNK(104,  73,  83,  84)
-#define png_iCCP PNG_CHUNK(105,  67,  67,  80)
-#define png_iTXt PNG_CHUNK(105,  84,  88, 116)
-#define png_oFFs PNG_CHUNK(111,  70,  70, 115)
-#define png_pCAL PNG_CHUNK(112,  67,  65,  76)
-#define png_sCAL PNG_CHUNK(115,  67,  65,  76)
-#define png_pHYs PNG_CHUNK(112,  72,  89, 115)
-#define png_sBIT PNG_CHUNK(115,  66,  73,  84)
-#define png_sPLT PNG_CHUNK(115,  80,  76,  84)
-#define png_sRGB PNG_CHUNK(115,  82,  71,  66)
-#define png_sTER PNG_CHUNK(115,  84,  69,  82)
-#define png_tEXt PNG_CHUNK(116,  69,  88, 116)
-#define png_tIME PNG_CHUNK(116,  73,  77,  69)
-#define png_tRNS PNG_CHUNK(116,  82,  78,  83)
-#define png_zTXt PNG_CHUNK(122,  84,  88, 116)
+/* Constants for known chunk types.
+ *
+ * Copied from ../../pngpriv.h.
+ */
+#define png_IDAT PNG_U32( 73,  68,  65,  84)
+#define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
+#define png_PLTE PNG_U32( 80,  76,  84,  69)
+#define png_bKGD PNG_U32( 98,  75,  71,  68)
+#define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
+#define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_gIFg PNG_U32(103,  73,  70, 103)
+#define png_gIFt PNG_U32(103,  73,  70, 116) /* deprecated */
+#define png_gIFx PNG_U32(103,  73,  70, 120)
+#define png_hIST PNG_U32(104,  73,  83,  84)
+#define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_iTXt PNG_U32(105,  84,  88, 116)
+#define png_oFFs PNG_U32(111,  70,  70, 115)
+#define png_pCAL PNG_U32(112,  67,  65,  76)
+#define png_pHYs PNG_U32(112,  72,  89, 115)
+#define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
+#define png_sPLT PNG_U32(115,  80,  76,  84)
+#define png_sRGB PNG_U32(115,  82,  71,  66)
+#define png_sTER PNG_U32(115,  84,  69,  82)
+#define png_tEXt PNG_U32(116,  69,  88, 116)
+#define png_tIME PNG_U32(116,  73,  77,  69)
+#define png_tRNS PNG_U32(116,  82,  78,  83)
+#define png_zTXt PNG_U32(122,  84,  88, 116)
 
 /* The 8 byte signature as a pair of 32 bit quantities */
-#define sig1 PNG_CHUNK(137,  80,  78,  71)
-#define sig2 PNG_CHUNK( 13,  10,  26,  10)
+#define sig1 PNG_U32(137,  80,  78,  71)
+#define sig2 PNG_U32( 13,  10,  26,  10)
 
 /* Is the chunk critical? */
-#define CRITICAL(chunk) (((chunk) & PNG_CHUNK(32,0,0,0)) == 0)
+#define CRITICAL(chunk) (((chunk) & PNG_U32(32,0,0,0)) == 0)
+
+/* Is it safe to copy? */
+#define SAFE_TO_COPY(chunk) (((chunk) & PNG_U32(0,0,0,32)) != 0)
 
 /********************************* UTILITIES **********************************/
 /* UNREACHED is a value to cause an assert to fail. Because of the way the
@@ -540,19 +551,19 @@ chunk_type_valid(png_uint_32 c)
     * 8-bit unit must be in the range 65-90 to be valid.  So bit 5
     * must be zero, bit 6 must be set and bit 7 zero.
     */
-   c &= ~PNG_CHUNK(32,32,0,32);
+   c &= ~PNG_U32(32,32,0,32);
    t = (c & ~0x1f1f1f1f) ^ 0x40404040;
 
    /* Subtract 65 for each 8 bit quantity, this must not overflow
     * and each byte must then be in the range 0-25.
     */
-   c -= PNG_CHUNK(65,65,65,65);
+   c -= PNG_U32(65,65,65,65);
    t |=c ;
 
    /* Subtract 26, handling the overflow which should set the top
     * three bits of each byte.
     */
-   c -= PNG_CHUNK(25,25,25,26);
+   c -= PNG_U32(25,25,25,26);
    t |= ~c;
 
    return (t & 0xe0e0e0e0) == 0;
@@ -654,9 +665,11 @@ struct global
    unsigned int   skip          :3; /* Non-critical chunks to skip */
 #     define SKIP_NONE      0
 #     define SKIP_BAD_CRC   1    /* Chunks with a bad CRC */
-#     define SKIP_NON_IMAGE 2    /* Chunks not used by libpng */
-#     define SKIP_COLOR     3    /* Everything but tRNS, sBIT, gAMA and sRGB */
-#     define SKIP_ALL       4    /* Everything but tRNS */
+#     define SKIP_UNSAFE    2    /* Chunks not safe to copy */
+#     define SKIP_UNUSED    3    /* Chunks not used by libpng */
+#     define SKIP_TRANSFORM 4    /* Chunks only used in transforms */
+#     define SKIP_COLOR     5    /* Everything but tRNS, sBIT, gAMA and sRGB */
+#     define SKIP_ALL       6    /* Everything but tRNS and sBIT */
 
    png_uint_32    idat_max;         /* 0 to perform no re-chunking */
 
@@ -705,6 +718,80 @@ global_init(struct global *global)
    global->status_code   = 0;
 
    IDAT_list_init(&global->idat_cache);
+}
+
+static int
+skip_chunk_type(const struct global *global, png_uint_32 type)
+   /* Return true if this chunk is to be skipped according to the --strip
+    * option.  This code needs to recognize all known ancillary chunks in order
+    * to handle the --strip=unsafe option.
+    */
+{
+   /* Never strip critical chunks: */
+   if (CRITICAL(type))
+      return 0;
+
+   switch (type)
+   {
+      /* Chunks that are treated as, effectively, critical because they affect
+       * correct interpretation of the pixel values:
+       */
+      case png_tRNS: case png_sBIT:
+         return 0;
+
+      /* Chunks that specify gamma encoding which should therefore only be
+       * removed the the user insists:
+       */
+      case png_gAMA: case png_sRGB:
+         if (global->skip >= SKIP_ALL)
+            return 1;
+         return 0;
+
+      /* Chunks that affect color interpretation - not used by libpng and rarely
+       * used by applications, but technically still required for correct
+       * interpretation of the image data:
+       */
+      case png_cHRM: case png_iCCP:
+         if (global->skip >= SKIP_COLOR)
+            return 1;
+         return 0;
+
+      /* Other chunks that are used by libpng in image transformations (as
+       * opposed to known chunks that have get/set APIs but are not otherwise
+       * used.)
+       */
+      case png_bKGD:
+         if (global->skip >= SKIP_TRANSFORM)
+            return 1;
+         return 0;
+
+      /* All other chunks that libpng knows about and affect neither image
+       * interpretation nor libpng transforms - chunks that are effectively
+       * unused by libpng even though libpng might recognize and store them.
+       */
+      case png_fRAc: case png_gIFg: case png_gIFt: case png_gIFx: case png_hIST:
+      case png_iTXt: case png_oFFs: case png_pCAL: case png_pHYs: case png_sCAL:
+      case png_sPLT: case png_sTER: case png_tEXt: case png_tIME: case png_zTXt:
+         if (global->skip >= SKIP_UNUSED)
+            return 1;
+         return 0;
+
+      /* Chunks that libpng does not know about (notice that this depends on the
+       * list above including all known chunks!)  The decision here depends on
+       * whether the safe-to-copy bit is set in the chunk type.
+       */
+      default:
+         if (SAFE_TO_COPY(type))
+         {
+            if (global->skip >= SKIP_UNUSED) /* as above */
+               return 1;
+         }
+
+         else if (global->skip >= SKIP_UNSAFE)
+            return 1;
+
+         return 0;
+   }
 }
 
 /* PER-FILE CONTROL STRUCTURE */
@@ -2672,7 +2759,6 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
     */
 {
    const png_uint_32 type = file->type;
-   int critical = CRITICAL(type);
 
    if (file->global->verbose > 1)
    {
@@ -2700,7 +2786,7 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
          type_message(file, type, "bad CRC");
 
       /* This will cause an IEND with a bad CRC to stop */
-      else if (critical)
+      else if (CRITICAL(type))
          stop(file, READ_ERROR_CODE, "bad CRC in critical chunk");
 
       else
@@ -2716,32 +2802,8 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
     * ancillary chunks (and not tRNS, which should probably have been a critical
     * chunk.)
     */
-   if (!critical)
-   {
-      unsigned int skip = file->global->skip;
-
-      /* SKIP_BAD_CRC was handled above: */
-      if (skip > SKIP_BAD_CRC) switch (type)
-      {
-         case png_tRNS: case png_sBIT: /* always handle this */
-            break;
-
-         case png_gAMA: case png_sRGB:
-            if (skip >= SKIP_ALL)
-               goto skip_chunk;
-            break;
-
-         case png_cHRM: case png_iCCP:
-            if (skip >= SKIP_COLOR)
-               goto skip_chunk;
-            break;
-
-         default:
-            if (skip >= SKIP_NON_IMAGE)
-               goto skip_chunk;
-            break;
-      }
-   }
+   if (skip_chunk_type(file->global, type))
+      goto skip_chunk;
 
    /* The chunk may still be skipped if problems are detected in the LZ data,
     * however the LZ data check requires a chunk.  Handle this by instantiating
@@ -2884,6 +2946,7 @@ sync_stream(struct file *file)
 
    /* Return to the start of the chunk data */
    file_setpos(file, &file->data_pos);
+   file->read_count = 8;
 
    if (read_4(file, &file_crc) == 4) /* else completely truncated */
    {
@@ -3109,10 +3172,10 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
       assert(file->read_count == 0);
       assert((file->status_code & TRUNCATED) == 0);
 
-      file->read_count = read_4(file, &file->length);
+      (void)read_4(file, &file->length);
 
       if (file->read_count == 4)
-         file->read_count += read_4(file, &file->type);
+         (void)read_4(file, &file->type);
 
       if (file->read_count < 8)
       {
@@ -3595,22 +3658,40 @@ usage(const char *prog)
 "      the file.",
 "    --optimize (-o):",
 "      Find the smallest deflate window size for the compressed data.",
-"    --strip=[none|crc|unused|color|all]:",
-"        none:   Retain all chunks.",
+"    --strip=[none|crc|unsafe|unused|transform|color|all]:",
+"        none (default):   Retain all chunks.",
 "        crc:    Remove chunks with a bad CRC.",
-"        unused: Remove chunks not used by libpng.",
-"        color:  unused+iCCP and cHRM.",
+"        unsafe: Remove chunks that may be unsafe to retain if the image data",
+"                is modified.  This is set automatically if --max is given but",
+"                may be cancelled by a later --strip=none.",
+"        unused: Remove chunks not used by libpng when decoding an image.",
+"                This retains any chunks that might be used by libpng image",
+"                transformations.",
+"        transform: unused+bKGD.",
+"        color:  transform+iCCP and cHRM.",
 "        all:    color+gAMA and sRGB.",
-"      The chunks used by libpng are IHDR, PLTE, IEND, tRNS, sBIT plus the",
-"      colorspace chunks (sRGB, iCCP, gAMA and cHRM).",
+"      Only ancillary chunks are ever removed.  In addition the tRNS and sBIT",
+"      chunks are never removed as they affect exact interpretation of the",
+"      image pixel values.  The following known chunks are treated specially",
+"      by the above options:",
+"        gAMA, sRGB [all]: These specify the gamma encoding used for the pixel",
+"            values.",
+"        cHRM, iCCP [color]: These specify how colors are encoded.  iCCP also",
+"            specifies the exact encoding of a pixel value however in practice",
+"            most programs will ignore it.",
+"        bKGD [transform]: This is used by libpng transforms."
 "    --max=<number>:",
 "      Use IDAT chunks sized <number>.  If no number is given the the IDAT",
 "      chunks will be the maximum size permitted; 2^31-1 bytes.  If the option",
-"      is ommited the original chunk sizes will not be changed.",
+"      is omitted the original chunk sizes will not be changed.  When the",
+"      option is given --strip=unsafe is set automatically, this may be",
+"      cancelled if you know that all unknown unsafe-to-copy chunks really are",
+"      safe to copy across an IDAT size change.  This is true of all chunks",
+"      that have ever been formally proposed as PNG extensions.",
 "  MESSAGES",
 "      By default the program only outputs summaries for each file.",
 "    --quiet (-q):",
-"      Do not output the summaries except for files which cannot be read, with",
+"      Do not output the summaries except for files which cannot be read. With",
 "      two --quiets these are not output either.",
 "    --errors (-e):",
 "      Output errors from libpng and the program (except too-far-back).",
@@ -3698,7 +3779,7 @@ usage(const char *prog)
 "     chunk SKP comp-level file-bits zlib-rc compressed message file",
 "     chunk ??? comp-level file-bits ok-bits compressed uncompress file",
 0,
-"  The varrious fields are",
+"  The various fields are",
 0,
 "$1 chunk:      The chunk type of a chunk in the file or 'HEAD' if a problem",
 "               is reported by libpng at the start of the IDAT stream.",
@@ -3710,9 +3791,9 @@ usage(const char *prog)
 "          OPT: The zlib stream window bits value could be improved (and was).",
 "          SKP: The chunk was skipped because of a zlib issue (zlib-rc) with",
 "               explanation 'message'",
-"          ERR: The read of the file was aborted, the parameters explain why.",
-"$3 status:     For 'ERR' the accumulate status code from 'EXIT CODES' above,",
-"               this is printed as a 2 digit hexadecimal value",
+"          ERR: The read of the file was aborted. The parameters explain why.",
+"$3 status:     For 'ERR' the accumulate status code from 'EXIT CODES' above.",
+"               This is printed as a 2 digit hexadecimal value",
 "   comp-level: The recorded compression level (FLEVEL) of a zlib stream",
 "               expressed as a string {supfast,stdfast,default,maximum}",
 "$4 code:       The file exit code; where stop was called, as a fairly terse",
@@ -3723,7 +3804,7 @@ usage(const char *prog)
 "   ok-bits:    The smallest zlib window bits value that works.",
 "$6 write-errno:A system errno value from a write translated by strerror(3).",
 "   compressed: The count of compressed bytes in the zlib stream, when the",
-"               reason is 'SKP' this is a count of the bytes read from the",
+"               reason is 'SKP'; this is a count of the bytes read from the",
 "               stream when the fatal error was encountered.",
 "$7 message:    An error message (spaces replaced by _, as in all parameters),",
 "   uncompress: The count of bytes from uncompressing the zlib stream; this",
@@ -3769,10 +3850,20 @@ main(int argc, const char **argv)
       }
 
       else if (strncmp(*argv, "--max=", 6) == 0)
+      {
          global.idat_max = (png_uint_32)atol(6+*argv);
 
+         if (global.skip < SKIP_UNSAFE)
+            global.skip = SKIP_UNSAFE;
+      }
+
       else if (strcmp(*argv, "--max") == 0)
+      {
          global.idat_max = 0x7fffffff;
+
+         if (global.skip < SKIP_UNSAFE)
+            global.skip = SKIP_UNSAFE;
+      }
 
       else if (strcmp(*argv, "--optimize") == 0 || strcmp(*argv, "-o") == 0)
          global.optimize_zlib = 1;
@@ -3792,8 +3883,14 @@ main(int argc, const char **argv)
       else if (strcmp(*argv, "--strip=crc") == 0)
          global.skip = SKIP_BAD_CRC;
 
+      else if (strcmp(*argv, "--strip=unsafe") == 0)
+         global.skip = SKIP_UNSAFE;
+
       else if (strcmp(*argv, "--strip=unused") == 0)
-         global.skip = SKIP_NON_IMAGE;
+         global.skip = SKIP_UNUSED;
+
+      else if (strcmp(*argv, "--strip=transform") == 0)
+         global.skip = SKIP_TRANSFORM;
 
       else if (strcmp(*argv, "--strip=color") == 0)
          global.skip = SKIP_COLOR;
