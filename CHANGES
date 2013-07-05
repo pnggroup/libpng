@@ -4631,6 +4631,8 @@ Version 1.7.0beta16 [July 5, 2013]
   Ported ARM no-read patch from libpng16.
   Ported pngfix.c patches from libpng16.
 
+Version 1.7.0beta17 [July 5, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
