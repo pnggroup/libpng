@@ -3,7 +3,8 @@
 # pngzop
 
 # Copyright 2013 by Glenn Randers-Pehrson
-# Released under the pngcrush license (equivalent to the libpng license)
+# Released under the pngcrush license (which is equivalent to the zlib
+# license plus UCITA disclaimers).
 
 # Extracts the concatenated data from the IDAT chunks in a set of PNG files,
 # recompresses them with zopfli, and embeds them in a new set of PNG files

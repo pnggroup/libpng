@@ -7,8 +7,8 @@
   into pngcrush.
 
   Copyright 2013 by Glenn Randers-Pehrson
-  Released under the pngcrush license (which is equivalent to the libpng
-  license plus required UCITA disclaimers). See DISCLAIMERS and LICENSE below.
+  Released under the pngcrush license (which is equivalent to the zlib
+  license plus UCITA disclaimers). See DISCLAIMERS and LICENSE below.
 
   Usage:
   pngzop [-b|--blacken] [-d|--directory dir] [-e|--extension ext] *.png
@@ -34,9 +34,9 @@
     6. Postprocesses the PNG file with "pngfix" to optimize the windowBits
        field, to minimize memory use during later decompression.
 
-  Pngzop requires zopfli, pngcrush (version 1.7.65 or later), zpipe (from the
-  "examples" directory of the zlib-1.2.7 or later distribution,), pngfix
-  (from the libpng-1.6.3 or later distribution), and "mkdir -p",
+  Pngzop requires zopfli, pngcrush (version 1.7.65 or later), zpipe (from
+  the "examples" directory of the zlib-1.2.7 or later distribution),
+  pngfix (from the libpng-1.6.3 or later distribution), and "mkdir -p",
   along with these programs that should have been installed from their "C"
   sources along with this "pngzop" script:
  
@@ -47,25 +47,25 @@
 
   DISCLAIMERS:
  
-  The pngcrush computer program is supplied "AS IS".  The Author disclaims all
+  The pngzop software is supplied "AS IS".  The Author disclaims all
   warranties, expressed or implied, including, without limitation, the
   warranties of merchantability and of fitness for any purpose.  The
   Author assumes no liability for direct, indirect, incidental, special,
   exemplary, or consequential damages, which may result from the use of
-  the computer program, even if advised of the possibility of such damage.
+  the pngzop software, even if advised of the possibility of such damage.
   There is no warranty against interference with your enjoyment of the
-  computer program or against infringement.  There is no warranty that my
-  efforts or the computer program will fulfill any of your particular purposes
-  or needs.  This computer program is provided with all faults, and the entire
-  risk of satisfactory quality, performance, accuracy, and effort is with
-  the user.
+  computer software or against infringement.  There is no warranty that
+  the Author's efforts or the computer software will fulfill any of your
+  particular purposes or needs.  This computer software is provided with
+  all faults, and the entire risk of satisfactory quality, performance,
+  accuracy, and effort is with the user.
  
   LICENSE:
  
-  Permission is hereby irrevocably granted to everyone to use, copy, modify,
-  and distribute this source code, or portions hereof, or executable programs
-  compiled from it, for any purpose, without payment of any fee, subject to
-  the following restrictions:
+  Permission is hereby irrevocably granted to everyone to use, copy,
+  modify, and distribute this source code, or portions hereof, or
+  executable programs compiled from it, for any purpose, without payment
+  of any fee, subject to the following restrictions:
  
   1. The origin of this source code must not be misrepresented.
  
