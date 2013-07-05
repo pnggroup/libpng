@@ -1,8 +1,8 @@
 
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
- * Copyright (c) 2012 Glenn Randers-Pehrson
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
+ * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -75,7 +75,7 @@ typedef png_byte *png_const_bytep;
 #  define png_const_structp png_structp
 #endif
 
-/* Types of chunks not know to libpng */
+/* Types of chunks not known to libpng */
 #define png_vpAg PNG_U32(118, 112, 65, 103)
 
 /* Chunk information */
