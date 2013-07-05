@@ -1,5 +1,5 @@
 
-Libpng 1.6.3beta10 - July 3, 2013
+Libpng 1.6.3beta10 - July 5, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -112,7 +112,7 @@ Version 1.6.3beta09 [June 27, 2013]
   Renamed contrib/tools/png-fix-too-far-back.c to pngfix.c and revised it
     to check all compressed chunks known to libpng.
 
-Version 1.6.3beta10 [July 3, 2013]
+Version 1.6.3beta10 [July 5, 2013]
   Updated documentation to show default behavior of benign errors correctly.
   Only compile ARM code when PNG_READ_SUPPORTED is defined.
   Fixed undefined behavior in contrib/tools/pngfix.c and added new strip
