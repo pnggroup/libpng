@@ -4608,6 +4608,9 @@ Version 1.6.3beta10 [July 5, 2013]
   Added all documented chunk types to pngpriv.h
   Unified pngfix.c source with libpng17.
 
+Version 1.6.3rc01 [July 11, 2013]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
