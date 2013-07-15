@@ -3694,7 +3694,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
             for (i = 0; i < row_info->width; i++)
             {
-               png_byte v[8]; /* SAFE; pixel_bytes does not exceed 64 */
+               png_byte v[8]; /* SAFE; pixel_depth does not exceed 64 */
                int j;
 
                memcpy(v, sp, pixel_bytes);
