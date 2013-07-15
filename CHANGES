@@ -4047,7 +4047,9 @@ Version 1.6.0beta17 [March 10, 2012]
   Deflate/inflate was reworked to move common zlib calls into single
     functions [rw]util.c.  A new shared keyword check routine was also added
     and the 'zbuf' is no longer allocated on progressive read.  It is now
-    possible to call png_inflate() incrementally.
+    possible to call png_inflate() incrementally.  A warning is no longer
+    issued if the language tag or translated keyword in the iTXt chunk
+    has zero length.
   If benign errors are disabled use maximum window on ancilliary inflate.
     This works round a bug introduced in 1.5.4 where compressed ancillary
     chunks could end up with a too-small windowBits value in the deflate
@@ -4610,6 +4612,11 @@ Version 1.6.3beta10 [July 5, 2013]
 
 Version 1.6.3rc01 [July 11, 2013]
   No changes.
+
+Version 1.6.3rc02 [July 15, 2013]
+  Revised manual about changes in iTXt chunk handling made in libpng-1.6.0.
+  Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
+    may be erroneously issued by code-checking applications.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
