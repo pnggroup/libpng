@@ -34,7 +34,7 @@
     6. Postprocesses the PNG file with "pngfix" to optimize the windowBits
        field, to minimize memory use during later decompression.
 
-  Pngzop requires zopfli, pngcrush (version 1.7.65 or later), zpipe (from
+  Pngzop requires zopfli, pngcrush (version 1.7.66 or later), zpipe (from
   the "examples" directory of the zlib-1.2.7 or later distribution),
   pngfix (from the libpng-1.6.3 or later distribution), and "mkdir -p",
   along with these programs that should have been installed from their "C"

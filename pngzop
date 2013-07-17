@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# pngzop
+# pngzop version 1.0.2
 
 # Copyright 2013 by Glenn Randers-Pehrson
 # Released under the pngcrush license (which is equivalent to the zlib
@@ -10,7 +10,7 @@
 # recompresses them with zopfli, and embeds them in a new set of PNG files
 # with suffix ".png" replaced (by default) with "_pngzop.png"
 
-# Requires zopfli, pngcrush (version 1.7.65 or later), zpipe (from the
+# Requires zopfli, pngcrush (version 1.7.66 or later), zpipe (from the
 # zlib-1.2.7 or later distribution, in the "examples" directory), pngfix
 # (from the libpng-1.6.3 or later distribution), and "mkdir -p",
 # along with these programs that should have been installed along with
@@ -27,6 +27,15 @@
 
 # Input: *.png
 # Output: *_pngzop.png
+
+# Check pngcrush version
+PCMIN=1766
+PCVER=`pngcrush 2>&1 | head -2 | tail -1 | sed -e "s/.* //"`
+PCTEST=`echo $PCVER | sed -e "s/\.//g"`
+if [ $PCTEST -lt $PCMIN ] ; then
+     echo Pngcrush version is $PCVER but version 1.7.66 or later is required.
+     exit
+fi
 
 # Get temporary directory; use TMPDIR if defined, otherwise /tmp
 case x${TMPDIR} in
