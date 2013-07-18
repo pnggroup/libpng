@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "April 25, 2013"
+.TH LIBPNG 3 "July 18, 2013"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.2
+libpng \- Portable Network Graphics (PNG) Reference Library 1.6.3
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -504,7 +504,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.2 - April 25, 2013
+ libpng version 1.6.3 - July 18, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -515,7 +515,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.2 - April 25, 2013
+ libpng versions 0.97, January 1998, through 1.6.3 - July 18, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -554,9 +554,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 .SH I. Introduction
 
 This file describes how to use and modify the PNG reference library
-(known as libpng) for your own use.  There are five sections to this
-file: introduction, structures, reading, writing, and modification and
-configuration notes for various special platforms.  In addition to this
+(known as libpng) for your own use.  In addition to this
 file, example.c is a good starting point for using the library, as
 it is heavily commented and should include everything most people
 will need.  We assume that libpng is already installed; see the
@@ -2795,7 +2793,7 @@ For a more compact example of reading a PNG image, see the file example.c.
 
 .SS Reading PNG files progressively
 
-The progressive reader is slightly different then the non-progressive
+The progressive reader is slightly different from the non-progressive
 reader.  Instead of calling png_read_info(), png_read_rows(), and
 png_read_end(), you make one call to png_process_data(), which calls
 callbacks when it has the info, a row, or the end of the image.  You
@@ -3597,13 +3595,47 @@ a writeable buffer of at least 29 bytes.
 
 .SS Writing unknown chunks
 
-You can use the png_set_unknown_chunks function to queue up chunks
-for writing.  You give it a chunk name, raw data, and a size; that's
-all there is to it.  The chunks will be written by the next following
-png_write_info_before_PLTE, png_write_info, or png_write_end function.
-Any chunks previously read into the info structure's unknown-chunk
-list will also be written out in a sequence that satisfies the PNG
-specification's ordering rules.
+You can use the png_set_unknown_chunks function to queue up private chunks
+for writing.  You give it a chunk name, location, raw data, and a size.  You
+also must use png_set_keep_unknown_chunks() to ensure that libpng will
+handle them.  That's all there is to it.  The chunks will be written by the
+next following png_write_info_before_PLTE, png_write_info, or png_write_end
+function, depending upon the specified location.  Any chunks previously
+read into the info structure's unknown-chunk list will also be written out
+in a sequence that satisfies the PNG specification's ordering rules.
+
+Here is an example of writing two private chunks, prVt and miNE:
+
+    #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
+    /* Set unknown chunk data */
+    png_unknown_chunk unk_chunk[2];
+    strcpy((char *) unk_chunk[0].name, "prVt";
+    unk_chunk[0].data = (unsigned char *) "PRIVATE DATA";
+    unk_chunk[0].size = strlen(unk_chunk[0].data)+1;
+    unk_chunk[0].location = PNG_HAVE_IHDR;
+    strcpy((char *) unk_chunk[1].name, "miNE";
+    unk_chunk[1].data = (unsigned char *) "MY CHUNK DATA";
+    unk_chunk[1].size = strlen(unk_chunk[0].data)+1;
+    unk_chunk[1].location = PNG_AFTER_IDAT;
+    png_set_unknown_chunks(write_ptr, write_info_ptr,
+        unk_chunk, 2);
+    /* Needed because miNE is not safe-to-copy */
+    png_set_keep_unknown_chunks(png, PNG_HANDLE_CHUNK_ALWAYS,
+       (png_bytep) "miNE", 1);
+    # if PNG_LIBPNG_VER < 10600
+      /* Deal with unknown chunk location bug in 1.5.x and earlier */
+      png_set_unknown_chunk_location(png, info, 0, PNG_HAVE_IHDR);
+      png_set_unknown_chunk_location(png, info, 1, PNG_AFTER_IDAT);
+    # endif
+    # if PNG_LIBPNG_VER < 10500
+      /* PNG_AFTER_IDAT writes two copies of the chunk prior to libpng-1.5.0,
+       * one before IDAT and another after IDAT, so don't use it; only use
+       * PNG_HAVE_IHDR location.  This call resets the location previously
+       * set by assignment and png_set_unknown_chunk_location() for chunk 1.
+       */
+      png_set_unknown_chunk_location(png, info, 1, PNG_HAVE_IHDR);
+    # endif
+    #endif
 
 .SS The high-level write interface
 
@@ -4498,8 +4530,11 @@ as warnings.
 
     png_set_benign_errors (png_ptr, int allowed);
 
-    allowed: 0: (default) treat png_benign_error() an error.
+    allowed: 0: treat png_benign_error() as an error.
              1: treat png_benign_error() as a warning.
+
+As of libpng-1.6.0, the default condition is to treat benign errors as
+warnings while reading and as errors while writing.
 
 .SS Custom chunks
 
@@ -4772,12 +4807,12 @@ the message, "message" is the formatted string to be printed,
 and p1 and p2 are parameters that are to be embedded in the string
 according to printf-style formatting directives.  For example,
 
-   png_debug1(2, "foo=%d\n", foo);
+   png_debug1(2, "foo=%d", foo);
 
 is expanded to
 
    if (PNG_DEBUG > 2)
-      fprintf(PNG_DEBUG_FILE, "foo=%d\n", foo);
+      fprintf(PNG_DEBUG_FILE, "foo=%d\en", foo);
 
 When PNG_DEBUG is defined but is zero, the macros aren't defined, but you
 can still use PNG_DEBUG to control your own debugging:
@@ -5452,9 +5487,9 @@ symbols, using the PNG_PREFIX macro.
 
 We no longer include string.h in png.h.  The include statement has been moved
 to pngpriv.h, where it is not accessible by applications.  Applications that
-need access to information in string.h must add an '#include "string.h"'
+need access to information in string.h must add an '#include <string.h>'
 directive.  It does not matter whether this is placed prior to or after
-the '"#include png.h"' directive.
+the '#include "png.h"' directive.
 
 The following API are now DEPRECATED:
    png_info_init_3()
@@ -5489,8 +5524,15 @@ even if the image only contains gray pixels, only RGB profiles may appear
 in images with color type 2, 3, or 6, is now enforced.  The sRGB chunk
 is allowed to appear in images with any color type.
 
+Prior to libpng-1.6.0 a warning would be issued if the iTXt chunk contained
+an empty language field or an empty translated keyword.  Both of these
+are allowed by the PNG specification, so these warnings are no longer issued.
+
 The library now issues an error if the application attempts to set a
 transform after it calls png_read_update_info().
+
+The default condition for benign_errors is now to treat benign errors as
+warnings while reading and as errors while writing.
 
 The library now issues a warning if both background processing and RGB to
 gray are used when gamma correction happens. As with previous versions of
@@ -5507,6 +5549,21 @@ it possible to skip IDAT chunks in the sequential reader.
 The machine-generated configure files are no longer included in branches
 libpng16 and later of the GIT repository.  They continue to be included
 in the tarball releases, however.
+
+Libpng-1.6.0 and later use the CMF bytes at the beginning of the IDAT stream
+to set the size of the sliding window for reading instead of using the default
+32-kbyte sliding window size.  It was discovered that there are hundreds of PNG
+files in the wild that have incorrect CMF bytes that cause libpng to now issue
+a "too far back" error and reject the file.  Libpng-1.6.3 provides a way to
+revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
+32-kbyte sliding window), and provides a tool
+(contrib/tools/png-fix-too-far-back) for optimizing the CMF bytes
+correctly.
+
+Libpng-1.6.0 and libpng-1.6.1 wrote uncompressed iTXt chunks with the wrong
+length, which resulted in PNG files that cannot be read beyond the bad iTXt
+chunk.  This error was fixed in libpng-1.6.3, and a tool (called
+contrib/tools/png-fix-itxt) has been added to the libpng distribution.
 
 .SH XIII.  Detecting libpng
 
@@ -5670,13 +5727,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-April 25, 2013
+July 18, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.2 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.3 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -5890,6 +5947,9 @@ the first widely used release:
  1.6.2beta01         16    10602  16.so.16.2[.0]
  1.6.2rc01-06        16    10602  16.so.16.2[.0]
  1.6.2               16    10602  16.so.16.2[.0]
+ 1.6.3beta01-11      16    10603  16.so.16.3[.0]
+ 1.6.3rc01           16    10603  16.so.16.3[.0]
+ 1.6.3               16    10603  16.so.16.3[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -5946,7 +6006,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.2 - April 25, 2013:
+Libpng version 1.6.3 - July 18, 2013:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5969,7 +6029,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.2, April 25, 2013, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.3, July 18, 2013, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6068,7 +6128,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-April 25, 2013
+July 18, 2013
 
 .\" end of man page
 

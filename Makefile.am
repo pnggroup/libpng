@@ -9,6 +9,9 @@ ACLOCAL_AMFLAGS = -I scripts
 # test programs - run on make check, make distcheck
 check_PROGRAMS= pngtest pngunknown pngstest pngvalid
 
+# Utilities - installed
+bin_PROGRAMS= pngfix png-fix-itxt
+
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
@@ -20,6 +23,11 @@ pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngunknown_SOURCES = contrib/libtests/pngunknown.c
 pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+pngfix_SOURCES = contrib/tools/pngfix.c
+pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
+png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
@@ -180,14 +188,15 @@ endif
 $(srcdir)/scripts/pnglibconf.h.prebuilt:
 	@echo "Attempting to build $@" >&2
 	@echo "This is a machine generated file, but if you want to make" >&2
-	@echo "a new one simply make 'scripts/pnglibconf.out' and copy that" >&2
+	@echo "a new one simply make 'scripts/pnglibconf.out', copy that" >&2
+	@echo "AND set PNG_ZLIB_VERNUM to 0 (you MUST do this)" >&2
 	@exit 1
 
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-contrib/libtests/pngstest.o contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
-contrib/libtests/pngunknown.o: pnglibconf.h
+pngstest.o pngvalid.o pngtest.o pngunknown.o timepng.o: pnglibconf.h
+pngfix.o png-fix-itxt.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from

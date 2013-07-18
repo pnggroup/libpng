@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Last changed in libpng 1.6.3 [July 18, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -86,6 +86,46 @@
 #  ifndef PNG_USER_DLLFNAME_POSTFIX
 #    define PNG_USER_DLLFNAME_POSTFIX "Cb"
 #  endif
+#endif
+
+/* Compile time options.
+ * =====================
+ * In a multi-arch build the compiler may compile the code several times for the
+ * same object module, producing different binaries for different architectures.
+ * When this happens configure-time setting of the target host options cannot be
+ * done and this interferes with the handling of the ARM NEON optimizations, and
+ * possibly other similar optimizations.  Put additional tests here; in general
+ * this is needed when the same option can be changed at both compile time and
+ * run time depending on the target OS (i.e. iOS vs Android.)
+ *
+ * NOTE: symbol prefixing does not pass $(CFLAGS) to the preprocessor, because
+ * this is not possible with certain compilers (Oracle SUN OS CC), as a result
+ * it is necessary to ensure that all extern functions that *might* be used
+ * regardless of $(CFLAGS) get declared in this file.  The test on __ARM_NEON__
+ * below is one example of this behavior because it is controlled by the
+ * presence or not of -mfpu=neon on the GCC command line, it is possible to do
+ * this in $(CC), e.g. "CC=gcc -mfpu=neon", but people who build libpng rarely
+ * do this.
+ */
+#ifndef PNG_ARM_NEON_OPT
+   /* ARM NEON optimizations are being controlled by the compiler settings,
+    * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
+    * with GCC) then the compiler will define __ARM_NEON__ and we can rely
+    * unconditionally on NEON instructions not crashing, otherwise we must
+    * disable use of NEON instructions:
+    */
+#  ifdef __ARM_NEON__
+#     define PNG_ARM_NEON_OPT 2
+#  else
+#     define PNG_ARM_NEON_OPT 0
+#  endif
+#endif
+
+#if PNG_ARM_NEON_OPT > 0
+   /* NEON optimizations are to be at least considered by libpng, so enable the
+    * callbacks to do this.
+    */
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
 #endif
 
 /* Is this a build of a DLL where compilation of the object modules requires
@@ -630,37 +670,64 @@
  * architectures where (int) is only 16 bits.
  */
 #define PNG_32b(b,s) ((png_uint_32)(b) << (s))
-#define PNG_CHUNK(b1,b2,b3,b4) \
+#define PNG_U32(b1,b2,b3,b4) \
    (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
 
-#define png_IHDR PNG_CHUNK( 73,  72,  68,  82)
-#define png_IDAT PNG_CHUNK( 73,  68,  65,  84)
-#define png_IEND PNG_CHUNK( 73,  69,  78,  68)
-#define png_PLTE PNG_CHUNK( 80,  76,  84,  69)
-#define png_bKGD PNG_CHUNK( 98,  75,  71,  68)
-#define png_cHRM PNG_CHUNK( 99,  72,  82,  77)
-#define png_gAMA PNG_CHUNK(103,  65,  77,  65)
-#define png_hIST PNG_CHUNK(104,  73,  83,  84)
-#define png_iCCP PNG_CHUNK(105,  67,  67,  80)
-#define png_iTXt PNG_CHUNK(105,  84,  88, 116)
-#define png_oFFs PNG_CHUNK(111,  70,  70, 115)
-#define png_pCAL PNG_CHUNK(112,  67,  65,  76)
-#define png_sCAL PNG_CHUNK(115,  67,  65,  76)
-#define png_pHYs PNG_CHUNK(112,  72,  89, 115)
-#define png_sBIT PNG_CHUNK(115,  66,  73,  84)
-#define png_sPLT PNG_CHUNK(115,  80,  76,  84)
-#define png_sRGB PNG_CHUNK(115,  82,  71,  66)
-#define png_sTER PNG_CHUNK(115,  84,  69,  82)
-#define png_tEXt PNG_CHUNK(116,  69,  88, 116)
-#define png_tIME PNG_CHUNK(116,  73,  77,  69)
-#define png_tRNS PNG_CHUNK(116,  82,  78,  83)
-#define png_zTXt PNG_CHUNK(122,  84,  88, 116)
+/* Constants for known chunk types.
+ *
+ * MAINTAINERS: If you need to add a chunk, define the name here.
+ * For historical reasons these constants have the form png_<name>; i.e.
+ * the prefix is lower case.  Please use decimal values as the parameters to
+ * match the ISO PNG specification and to avoid relying on the C locale
+ * interpretation of character values.  Please keep the list sorted.
+ *
+ * Notice that PNG_U32 is used to define a 32-bit value for the 4 byte chunk
+ * type.  In fact the specification does not express chunk types this way,
+ * however using a 32-bit value means that the chunk type can be read from the
+ * stream using exactly the same code as used for a 32-bit unsigned value and
+ * can be examined far more efficiently (using one arithmetic compare).
+ *
+ * Prior to 1.5.6 the chunk type constants were expressed as C strings.  The
+ * libpng API still uses strings for 'unknown' chunks and a macro,
+ * PNG_STRING_FROM_CHUNK, allows a string to be generated if required.  Notice
+ * that for portable code numeric values must still be used; the string "IHDR"
+ * is not portable and neither is PNG_U32('I', 'H', 'D', 'R').
+ *
+ * In 1.7.0 the definitions will be made public in png.h to avoid having to
+ * duplicate the same definitions in application code.
+ */
+#define png_IDAT PNG_U32( 73,  68,  65,  84)
+#define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
+#define png_PLTE PNG_U32( 80,  76,  84,  69)
+#define png_bKGD PNG_U32( 98,  75,  71,  68)
+#define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
+#define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_gIFg PNG_U32(103,  73,  70, 103)
+#define png_gIFt PNG_U32(103,  73,  70, 116) /* deprecated */
+#define png_gIFx PNG_U32(103,  73,  70, 120)
+#define png_hIST PNG_U32(104,  73,  83,  84)
+#define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_iTXt PNG_U32(105,  84,  88, 116)
+#define png_oFFs PNG_U32(111,  70,  70, 115)
+#define png_pCAL PNG_U32(112,  67,  65,  76)
+#define png_pHYs PNG_U32(112,  72,  89, 115)
+#define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
+#define png_sPLT PNG_U32(115,  80,  76,  84)
+#define png_sRGB PNG_U32(115,  82,  71,  66)
+#define png_sTER PNG_U32(115,  84,  69,  82)
+#define png_tEXt PNG_U32(116,  69,  88, 116)
+#define png_tIME PNG_U32(116,  73,  77,  69)
+#define png_tRNS PNG_U32(116,  82,  78,  83)
+#define png_zTXt PNG_U32(122,  84,  88, 116)
 
 /* The following will work on (signed char*) strings, whereas the get_uint_32
  * macro will fail on top-bit-set values because of the sign extension.
  */
 #define PNG_CHUNK_FROM_STRING(s)\
-   PNG_CHUNK(0xff&(s)[0], 0xff&(s)[1], 0xff&(s)[2], 0xff&(s)[3])
+   PNG_U32(0xff&(s)[0], 0xff&(s)[1], 0xff&(s)[2], 0xff&(s)[3])
 
 /* This uses (char), not (png_byte) to avoid warnings on systems where (char) is
  * signed and the argument is a (char[])  This macro will fail miserably on
@@ -693,6 +760,24 @@
 
 #include "pngstruct.h"
 #include "pnginfo.h"
+
+/* Validate the include paths - the include path used to generate pnglibconf.h
+ * must match that used in the build, or we must be using pnglibconf.h.prebuilt:
+ */
+#if PNG_ZLIB_VERNUM != 0 && PNG_ZLIB_VERNUM != ZLIB_VERNUM
+#  error ZLIB_VERNUM != PNG_ZLIB_VERNUM \
+      "-I (include path) error: see the notes in pngpriv.h"
+   /* This means that when pnglibconf.h was built the copy of zlib.h that it
+    * used is not the same as the one being used here.  Because the build of
+    * libpng makes decisions to use inflateInit2 and inflateReset2 based on the
+    * zlib version number and because this affects handling of certain broken
+    * PNG files the -I directives must match.
+    *
+    * The most likely explanation is that you passed a -I in CFLAGS, this will
+    * not work; all the preprocessor directories and in particular all the -I
+    * directives must be in CPPFLAGS.
+    */
+#endif
 
 /* This is used for 16 bit gamma tables -- only the top level pointers are
  * const; this could be changed:
@@ -1891,14 +1976,22 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 
 #endif /* SIMPLIFIED READ/WRITE */
 
+/* These are initialization functions for hardware specific PNG filter
+ * optimizations; list these here then select the appropriate one at compile
+ * time using the macro PNG_FILTER_OPTIMIZATIONS.  If the macro is not defined
+ * the generic code is used.
+ */
 #ifdef PNG_FILTER_OPTIMIZATIONS
 PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr,
-    unsigned int bpp), PNG_EMPTY);
-   /* This is the initialization function for hardware specific optimizations,
-    * one implementation (for ARM NEON machines) is contained in
-    * arm/filter_neon.c.  It need not be defined - the generic code will be used
-    * if not.
+   unsigned int bpp), PNG_EMPTY);
+   /* Just declare the optimization that will be used */
+#else
+   /* List *all* the possible optimizations here - this branch is required if
+    * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
+    * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
     */
+PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
+   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
 /* Maintainer: Put new private prototypes here ^ */

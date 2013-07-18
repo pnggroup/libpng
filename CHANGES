@@ -4047,7 +4047,9 @@ Version 1.6.0beta17 [March 10, 2012]
   Deflate/inflate was reworked to move common zlib calls into single
     functions [rw]util.c.  A new shared keyword check routine was also added
     and the 'zbuf' is no longer allocated on progressive read.  It is now
-    possible to call png_inflate() incrementally.
+    possible to call png_inflate() incrementally.  A warning is no longer
+    issued if the language tag or translated keyword in the iTXt chunk
+    has zero length.
   If benign errors are disabled use maximum window on ancilliary inflate.
     This works round a bug introduced in 1.5.4 where compressed ancillary
     chunks could end up with a too-small windowBits value in the deflate
@@ -4485,6 +4487,7 @@ Version 1.6.2beta01 [April 14, 2013]
   Corrected a misplaced closing bracket in contrib/libtests/pngvalid.c
     (Flavio Medeiros).
   Corrected length written to uncompressed iTXt chunks (Samuli Suominen).
+    Bug was introduced in libpng-1.6.0.
 
 Version 1.6.2rc01 [April 18, 2013]
   Added contrib/tools/fixitxt.c, to repair the erroneous iTXt chunk length
@@ -4505,6 +4508,115 @@ Version 1.6.2rc06 [April 24, 2013]
     1.6.3beta01.
 
 Version 1.6.2 [April 25, 2013]
+  No changes.
+
+Version 1.6.3beta01 [April 25, 2013]
+  Revised stack marking in arm/filter_neon.S and configure.ac.
+  Ensure that NEON filter stuff is completely disabled when switched 'off'.
+    Previously the ARM NEON specific files were still built if the option
+    was switched 'off' as opposed to being explicitly disabled.
+
+Version 1.6.3beta02 [April 26, 2013]
+  Test for 'arm*' not just 'arm' in the host_cpu configure variable.
+  Rebuilt the configure scripts.
+
+Version 1.6.3beta03 [April 30, 2013]
+  Expanded manual paragraph about writing private chunks, particularly
+    the need to call png_set_keep_unknown_chunks() when writing them.
+  Avoid dereferencing NULL pointer possibly returned from
+     png_create_write_struct() (Andrew Church).
+
+Version 1.6.3beta05 [May 9, 2013]
+  Calculate our own zlib windowBits when decoding rather than trusting the
+    CMF bytes in the PNG datastream.
+  Added an option to force maximum window size for inflating, which was
+    the behavior of libpng15 and earlier.
+  Added png-fix-itxt and png-fix-too-far-back to the built programs and
+    removed warnings from the source code and timepng that are revealed as
+    a result.
+  Detect wrong libpng versions linked to png-fix-too-far-back, which currently
+    only works with libpng versions that can be made to reliably fail when
+    the deflate data contains an out-of-window reference.  This means only
+    1.6 and later.
+  Fixed gnu issues: g++ needs a static_cast, gcc 4.4.7 has a broken warning
+    message which it is easier to work round than ignore.
+  Updated contrib/pngminus/pnm2png.c (Paul Stewart):
+    Check for EOF
+    Ignore "#" delimited comments in input file to pnm2png.c.
+    Fixed whitespace handling
+    Added a call to png_set_packing()
+    Initialize dimension values so if sscanf fails at least we have known
+      invalid values.
+  Attempt to detect configuration issues with png-fix-too-far-back, which
+    requires both the correct libpng and the correct zlib to function
+    correctly.
+  Check ZLIB_VERNUM for mismatches, enclose #error in quotes
+  Added information in the documentation about problems with and fixes for
+    the bad CRC and bad iTXt chunk situations.
+
+Version 1.6.3beta06 [May 12, 2013]
+  Allow contrib/pngminus/pnm2png.c to compile without WRITE_INVERT and
+    WRITE_PACK supported (writes error message that it can't read P1 or
+    P4 PBM files).
+  Improved png-fix-too-far-back usage message, added --suffix option.
+  Revised contrib/pngminim/*/makefile to generate pnglibconf.h with the
+    right zlib header files.
+  Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
+
+Version 1.6.3beta07 [June 8, 2013]
+  Removed a redundant test in png_set_IHDR().
+  Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
+  Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
+  Enclose the prototypes for the simplified write API in
+    #ifdef PNG_STDIO_SUPPORTED/#endif
+  Make ARM NEON support work at compile time (not just configure time).
+    This moves the test on __ARM_NEON__ into pngconf.h to avoid issues when
+    using a compiler that compiles for multiple architectures at one time.
+  Removed PNG_FILTER_OPTIMIZATIONS and PNG_ARM_NEON_SUPPORTED from
+    pnglibconf.h, allowing more of the decisions to be made internally
+    (pngpriv.h) during the compile.  Without this, symbol prefixing is broken
+    under certain circumstances on ARM platforms.  Now only the API parts of
+    the optimizations ('check' vs 'api') are exposed in the public header files
+    except that the new setting PNG_ARM_NEON_OPT documents how libpng makes the
+    decision about whether or not to use the optimizations.
+  Protect symbol prefixing against CC/CPPFLAGS/CFLAGS useage.
+    Previous iOS/Xcode fixes for the ARM NEON optimizations moved the test
+    on __ARM_NEON__ from configure time to compile time.  This breaks symbol
+    prefixing because the definition of the special png_init_filter_functions
+    call was hidden at configure time if the relevant compiler arguments are
+    passed in CFLAGS as opposed to CC.  This change attempts to avoid all
+    the confusion that would result by declaring the init function even when
+    it is not used, so that it will always get prefixed.
+
+Version 1.6.3beta08 [June 18, 2013]
+  Revised libpng.3 so that "doclifter" can process it.
+
+Version 1.6.3beta09 [June 27, 2013]
+  Revised example.c to illustrate use of PNG_DEFAULT_sRGB and PNG_GAMMA_MAC_18
+    as parameters for png_set_gamma().  These have been available since
+    libpng-1.5.4.
+  Renamed contrib/tools/png-fix-too-far-back.c to pngfix.c and revised it
+    to check all compressed chunks known to libpng.
+
+Version 1.6.3beta10 [July 5, 2013]
+  Updated documentation to show default behavior of benign errors correctly.
+  Only compile ARM code when PNG_READ_SUPPORTED is defined.
+  Fixed undefined behavior in contrib/tools/pngfix.c and added new strip
+    option. pngfix relied on undefined behavior and even a simple change from
+    gcc to g++ caused it to fail.  The new strip option 'unsafe' has been
+    implemented and is the default if --max is given.  Option names have
+    been clarified, with --strip=transform now stripping the bKGD chunk,
+    which was stripped previously with --strip=unused.
+  Added all documented chunk types to pngpriv.h
+  Unified pngfix.c source with libpng17.
+
+Version 1.6.3rc01 [July 11, 2013]
+  No changes.
+
+Version 1.6.3 [July 18, 2013]
+  Revised manual about changes in iTXt chunk handling made in libpng-1.6.0.
+  Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
+    may be erroneously issued by code-checking applications.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

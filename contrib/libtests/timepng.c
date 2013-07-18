@@ -252,7 +252,7 @@ int main(int argc, char **argv)
 
          while (fgets(filename, FILENAME_MAX+1, stdin))
          {
-            int len = strlen(filename);
+            size_t len = strlen(filename);
 
             if (filename[len-1] == '\n')
             {

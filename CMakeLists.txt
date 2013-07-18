@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (C) 2007-2011 Glenn Randers-Pehrson
+# Copyright (C) 2007-2013 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -9,33 +9,14 @@
 cmake_minimum_required(VERSION 2.4.4)
 set(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
 
-if(UNIX AND NOT DEFINED CMAKE_BUILD_TYPE)
-  if(CMAKE_MAJOR_VERSION EQUAL 2 AND CMAKE_MINOR_VERSION EQUAL 4)
-    # workaround CMake 2.4.x bug
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are:
-           None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used)
-           Debug
-           Release
-           RelWithDebInfo
-           MinSizeRel.")
-  else()
-    set(CMAKE_BUILD_TYPE "RelWithDebInfo" CACHE STRING
-        "Choose the type of build, options are:
-           None(CMAKE_CXX_FLAGS or CMAKE_C_FLAGS used)
-           Debug
-           Release
-           RelWithDebInfo
-           MinSizeRel.")
-  endif()
-endif()
+set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
 
 project(libpng C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 2)
+set(PNGLIB_RELEASE 3)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -271,7 +252,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.2
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.3
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)

@@ -119,7 +119,7 @@ logunsupported = 1
 #
 # If you create a private DLL you need to define the following
 # macros in the file 'pngusr.h' and set -DPNG_USER_CONFIG for
-# compilation (i.e. in CFLAGS.)
+# compilation (i.e. in CPPFLAGS.)
 # #define PNG_USER_PRIVATEBUILD \
 #     <Describes by whom and why this version of the DLL was built>
 #  e.g. #define PNG_USER_PRIVATEBUILD "Build by MyCompany for xyz reasons."
@@ -158,12 +158,6 @@ logunsupported = 1
 @#  endif
 @#endif
 
-# This changes the default for the ARM NEON optimizations according to
-# __ARM_NEON__
-@#ifdef __ARM_NEON__
-@#  define PNG_ARM_NEON_SUPPORTED
-@#endif
-
 # IN DEVELOPMENT
 # These are currently experimental features; define them if you want (NOTE:
 # experimental options must be disabled before they are defined in this file!)
@@ -199,28 +193,38 @@ setting PREFIX
 
 setting DEFAULT_READ_MACROS default 1
 
-# This setting allows a hardware or configuration specific filter optimization
-# function to be specified, the argument is the name of the filter initializaion
-# function to use.
-
-setting FILTER_OPTIMIZATIONS
-
 # Implementation specific control of the optimizations, enabled by those
 # hardware or software options that need it (typically when run-time choices
 # must be made by the user)
 option SET_OPTION disabled
 
-# These options are specific to the ARM NEON hardware optimizations:
+# These options are specific to the ARM NEON hardware optimizations.  At present
+# these optimizations depend on GCC specific pre-processing of an assembler (.S)
+# file so they probably won't work with other compilers.
 #
-# ARM_NEON: the optimization itself
-# ARM_NEON_API: allow the optimization to be switched on with png_set_hardware
-# ARM_NEON_CHECK: compile a run-time check to see if Neon extensions are
-#                 supported, this is poorly supported and deprectated - use the
-#                 png_set_hardware API.
-option ARM_NEON disabled,
-   sets FILTER_OPTIMIZATIONS png_init_filter_functions_neon
-option ARM_NEON_API disabled enables SET_OPTION ARM_NEON
-option ARM_NEON_CHECK disabled enables ARM_NEON
+# ARM_NEON_OPT: unset: check at compile time (__ARM_NEON__ must be defined by
+#                      the compiler, typically as a result of specifying
+#                      CC="gcc -mfpu=neon".)
+#                   0: disable (even if the CPU has a NEON FPU.)
+#                   1: check at run time (via ARM_NEON_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mfpu=neon to GCC in CC)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as -mfpu=neon will achieve the same
+#           effect as well as applying NEON optimizations to the rest of the
+#           libpng code.
+#           NOTE: any setting other than '0' requires ALIGNED_MEMORY
+# ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
+#                 with png_set_option
+# ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
+#                 extensions are supported, this is poorly supported and
+#                 deprectated - use the png_set_option API.
+setting ARM_NEON_OPT
+option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
+   sets ARM_NEON_OPT 1
+option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
+   sets ARM_NEON_OPT 1
 
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib, it describes the input
@@ -238,6 +242,7 @@ option ARM_NEON_CHECK disabled enables ARM_NEON
 setting Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
 setting Z_DEFAULT_STRATEGY default @Z_FILTERED
 setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
+setting ZLIB_VERNUM default @ZLIB_VERNUM
 
 setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
 setting TEXT_Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
@@ -399,7 +404,7 @@ option SAFE_LIMITS enables USER_LIMITS disabled
 # to libpng 1.6; the new interfaces in 1.6 will take several years to become
 # popular.
 
-option READ enables READ_INTERLACING
+option READ enables READ_INTERLACING SET_OPTION
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
