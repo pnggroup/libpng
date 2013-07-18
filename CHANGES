@@ -4613,7 +4613,7 @@ Version 1.6.3beta10 [July 5, 2013]
 Version 1.6.3rc01 [July 11, 2013]
   No changes.
 
-Version 1.6.3rc02 [July 15, 2013]
+Version 1.6.3 [July 18, 2013]
   Revised manual about changes in iTXt chunk handling made in libpng-1.6.0.
   Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
     may be erroneously issued by code-checking applications.

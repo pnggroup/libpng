@@ -1,47 +1,39 @@
 
-Libpng 1.6.3rc02 - July 15, 2013
+Libpng 1.6.3 - July 18, 2013
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.3rc02.tar.xz (LZMA-compressed, recommended)
-   1.6.3rc02.tar.gz
+   libpng-1.6.3.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.3.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp163r02.7z  (LZMA-compressed, recommended)
-   lp163r02.zip
+   lpng163.7z  (LZMA-compressed, recommended)
+   lpng163.zip
 
 Other information:
 
-   1.6.3rc02-README.txt
-   1.6.3rc02-LICENSE.txt
+   libpng-1.6.3-README.txt
+   libpng-1.6.3-LICENSE.txt
 
 Changes since the last public release (1.6.2):
 
-Version 1.6.3beta01 [April 25, 2013]
   Revised stack marking in arm/filter_neon.S and configure.ac.
   Ensure that NEON filter stuff is completely disabled when switched 'off'.
     Previously the ARM NEON specific files were still built if the option
     was switched 'off' as opposed to being explicitly disabled.
-
-Version 1.6.3beta02 [April 26, 2013]
   Test for 'arm*' not just 'arm' in the host_cpu configure variable.
   Rebuilt the configure scripts.
-
-Version 1.6.3beta03 [April 30, 2013]
   Expanded manual paragraph about writing private chunks, particularly
     the need to call png_set_keep_unknown_chunks() when writing them.
   Avoid dereferencing NULL pointer possibly returned from
      png_create_write_struct() (Andrew Church).
-
-Version 1.6.3beta05 [May 9, 2013]
   Calculate our own zlib windowBits when decoding rather than trusting the
     CMF bytes in the PNG datastream.
   Added an option to force maximum window size for inflating, which was
@@ -68,16 +60,12 @@ Version 1.6.3beta05 [May 9, 2013]
   Check ZLIB_VERNUM for mismatches, enclose #error in quotes
   Added information in the documentation about problems with and fixes for
     the bad CRC and bad iTXt chunk situations.
-
-Version 1.6.3beta06 [May 12, 2013]
   Allow contrib/pngminus/pnm2png.c to compile without WRITE_INVERT and
     WRITE_PACK supported (writes error message that it can't read P1 or
   Improved png-fix-too-far-back usage message, added --suffix option.
   Revised contrib/pngminim/*/makefile to generate pnglibconf.h with the
     right zlib header files.
   Separated CPPFLAGS and CFLAGS in contrib/pngminim/*/makefile
-
-Version 1.6.3beta07 [June 8, 2013]
   Removed a redundant test in png_set_IHDR().
   Added set(CMAKE_CONFIGURATION_TYPES ...) to CMakeLists.txt (Andrew Hundt)
   Deleted set(CMAKE_BUILD_TYPE) block from CMakeLists.txt
@@ -101,18 +89,12 @@ Version 1.6.3beta07 [June 8, 2013]
     passed in CFLAGS as opposed to CC.  This change attempts to avoid all
     the confusion that would result by declaring the init function even when
     it is not used, so that it will always get prefixed.
-
-Version 1.6.3beta08 [June 18, 2013]
   Revised libpng.3 so that "doclifter" can process it.
-
-Version 1.6.3beta09 [June 27, 2013]
   Revised example.c to illustrate use of PNG_DEFAULT_sRGB and PNG_GAMMA_MAC_18
     as parameters for png_set_gamma().  These have been available since
     libpng-1.5.4.
   Renamed contrib/tools/png-fix-too-far-back.c to pngfix.c and revised it
     to check all compressed chunks known to libpng.
-
-Version 1.6.3beta10 [July 5, 2013]
   Updated documentation to show default behavior of benign errors correctly.
   Only compile ARM code when PNG_READ_SUPPORTED is defined.
   Fixed undefined behavior in contrib/tools/pngfix.c and added new strip
@@ -123,11 +105,6 @@ Version 1.6.3beta10 [July 5, 2013]
     which was stripped previously with --strip=unused.
   Added all documented chunk types to pngpriv.h
   Unified pngfix.c source with libpng17.
-
-Version 1.6.3rc01 [July 11, 2013]
-  No changes.
-
-Version 1.6.3rc02 [July 15, 2013]
   Revised manual about changes in iTXt chunk handling made in libpng-1.6.0.
   Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
     may be erroneously issued by code-checking applications.
