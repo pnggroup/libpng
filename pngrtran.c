@@ -1357,12 +1357,18 @@ png_init_palette_transformations(png_structrp png_ptr)
 
       /* Ignore if all the entries are opaque (unlikely!) */
       for (i=0; i<png_ptr->num_trans; ++i)
+      {
          if (png_ptr->trans_alpha[i] == 255)
             continue;
          else if (png_ptr->trans_alpha[i] == 0)
             input_has_transparency = 1;
          else
+         {
+            input_has_transparency = 1;
             input_has_alpha = 1;
+            break;
+         }
+      }
    }
 
    /* If no alpha we can optimize. */
