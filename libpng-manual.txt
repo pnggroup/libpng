@@ -1,6 +1,6 @@
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.18beta01 - June 29, 2013
+ libpng version 1.5.18beta01 - August 6, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.18beta01 - June 29, 2013
+ libpng versions 0.97, January 1998, through 1.5.18beta01 - August 6, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -707,7 +707,7 @@ situations:
                      system expects data with no gamma encoding.
 
 You would use the linear (unencoded) value if you need to process the pixel
-values further because this avoids the need to decode and reencode each
+values further because this avoids the need to decode and re-encode each
 component value whenever arithmetic is performed.  A lot of graphics software
 uses linear values for this reason, often with higher precision component values
 to preserve overall accuracy.
@@ -2248,7 +2248,7 @@ For a more compact example of reading a PNG image, see the file example.c.
 
 Reading PNG files progressively
 
-The progressive reader is slightly different then the non-progressive
+The progressive reader is slightly different from the non-progressive
 reader.  Instead of calling png_read_info(), png_read_rows(), and
 png_read_end(), you make one call to png_process_data(), which calls
 callbacks when it has the info, a row, or the end of the image.  You
@@ -4171,7 +4171,7 @@ it has not been well tested and doesn't actually "dither".
 The code was not
 removed, however, and could be enabled by building libpng with
 PNG_READ_DITHER_SUPPORTED defined.  In libpng-1.4.2, this support
-was reenabled, but the function was renamed png_set_quantize() to
+was re-enabled, but the function was renamed png_set_quantize() to
 reflect more accurately what it actually does.  At the same time,
 the PNG_DITHER_[RED,GREEN_BLUE]_BITS macros were also renamed to
 PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS, and PNG_READ_DITHER_SUPPORTED
@@ -4655,7 +4655,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-June 29, 2013
+August 6, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
