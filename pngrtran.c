@@ -1884,31 +1884,34 @@ png_init_read_transformations(png_structrp png_ptr)
        * the number of significant bits is 0 then no shift is done (this is an
        * error condition which is silently ignored.)
        */
-      if (shift > 0 && shift < 8) for (i=0; i<istop; ++i)
-      {
-         int component = png_ptr->palette[i].red;
+      if (shift > 0 && shift < 8)
+         for (i=0; i<istop; ++i)
+         {
+            int component = png_ptr->palette[i].red;
 
-         component >>= shift;
-         png_ptr->palette[i].red = (png_byte)component;
-      }
+            component >>= shift;
+            png_ptr->palette[i].red = (png_byte)component;
+         }
 
       shift = 8 - png_ptr->sig_bit.green;
-      if (shift > 0 && shift < 8) for (i=0; i<istop; ++i)
-      {
-         int component = png_ptr->palette[i].green;
+      if (shift > 0 && shift < 8)
+         for (i=0; i<istop; ++i)
+         {
+            int component = png_ptr->palette[i].green;
 
-         component >>= shift;
-         png_ptr->palette[i].green = (png_byte)component;
-      }
+            component >>= shift;
+            png_ptr->palette[i].green = (png_byte)component;
+         }
 
       shift = 8 - png_ptr->sig_bit.blue;
-      if (shift > 0 && shift < 8) for (i=0; i<istop; ++i)
-      {
-         int component = png_ptr->palette[i].blue;
+      if (shift > 0 && shift < 8)
+         for (i=0; i<istop; ++i)
+         {
+            int component = png_ptr->palette[i].blue;
 
-         component >>= shift;
-         png_ptr->palette[i].blue = (png_byte)component;
-      }
+            component >>= shift;
+            png_ptr->palette[i].blue = (png_byte)component;
+         }
    }
 #endif  /* PNG_READ_SHIFT_SUPPORTED */
 }
