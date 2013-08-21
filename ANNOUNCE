@@ -1,5 +1,5 @@
 
-Libpng 1.6.4beta01 - August 21, 2013
+Libpng 1.6.4beta02 - August 21, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.4beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.4beta01.tar.gz
+   1.6.4beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.4beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp164b01.7z  (LZMA-compressed, recommended)
-   lp164b01.zip
+   lp164b02.7z  (LZMA-compressed, recommended)
+   lp164b02.zip
 
 Other information:
 
-   1.6.4beta01-README.txt
-   1.6.4beta01-LICENSE.txt
+   1.6.4beta02-README.txt
+   1.6.4beta02-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.3):
@@ -30,6 +30,8 @@ Version 1.6.4beta01 [August 21, 2013]
   Added information about png_set_options() to the manual.
   Delay calling png_init_filter_functions() until a row with nonzero filter
     is found.
+
+Version 1.6.4beta02 [August 21, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
