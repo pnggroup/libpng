@@ -4618,7 +4618,9 @@ Version 1.6.3 [July 18, 2013]
   Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
     may be erroneously issued by code-checking applications.
 
-Version 1.6.4beta01 [July 21, 2013]
+Version 1.6.4beta01 [August 21, 2013]
+  Delay calling png_init_filter_functions() until a row with nonzero filter
+    is found.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

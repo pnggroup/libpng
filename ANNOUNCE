@@ -1,5 +1,5 @@
 
-Libpng 1.6.4beta01 - July 21, 2013
+Libpng 1.6.4beta01 - August 21, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,9 @@ Other information:
 
 Changes since the last public release (1.6.3):
 
-Version 1.6.4beta01 [July 21, 2013]
+Version 1.6.4beta01 [August 21, 2013]
+  Delay calling png_init_filter_functions() until a row with nonzero filter
+    is found.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
