@@ -4619,6 +4619,7 @@ Version 1.6.3 [July 18, 2013]
     may be erroneously issued by code-checking applications.
 
 Version 1.6.4beta01 [August 21, 2013]
+  Added information about png_set_options() to the manual.
   Delay calling png_init_filter_functions() until a row with nonzero filter
     is found.
 

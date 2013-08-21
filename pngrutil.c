@@ -3880,7 +3880,8 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
 
 static void
 png_init_filter_functions(png_structrp pp)
-   /* This function is called once for every PNG image to set the
+   /* This function is called once for every PNG image (except for PNG images
+    * that only use PNG_FILTER_VALUE_NONE for all rows) to set the
     * implementations required to reverse the filtering of PNG rows.  Reversing
     * the filter is the first transformation performed on the row data.  It is
     * performed in place, therefore an implementation can be selected based on

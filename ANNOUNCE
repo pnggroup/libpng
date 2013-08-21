@@ -27,6 +27,7 @@ Other information:
 Changes since the last public release (1.6.3):
 
 Version 1.6.4beta01 [August 21, 2013]
+  Added information about png_set_options() to the manual.
   Delay calling png_init_filter_functions() until a row with nonzero filter
     is found.
 
