@@ -4150,7 +4150,9 @@ Version 1.5.17rc03 [June 25, 2013]
 Version 1.5.17 [June 27, 2013]
   No changes.
 
-Version 1.5.18beta01 [June 29, 2013]
+Version 1.5.18beta01 [August 21, 2013]
+  Delay calling png_init_filter_functions() until a row with nonzero filter
+    is found.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
