@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta17 - July 15, 2013
+Libpng 1.7.0beta17 - August 21, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -22,6 +22,7 @@ Other information:
 
    1.7.0beta17-README.txt
    1.7.0beta17-LICENSE.txt
+   Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -343,10 +344,12 @@ Version 1.7.0beta16 [July 5, 2013]
   Ported ARM no-read patch from libpng16.
   Ported pngfix.c patches from libpng16.
 
-Version 1.7.0beta17 [July 15, 2013]
+Version 1.7.0beta17 [August 21, 2013]
   Revised manual about changes in iTXt chunk handling made in libpng-1.6.0.
   Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
     may be erroneously issued by code-checking applications.
+  Delay calling png_init_filter_functions() until a row with nonzero filter
+    is found.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
