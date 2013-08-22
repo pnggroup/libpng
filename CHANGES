@@ -4633,10 +4633,11 @@ Version 1.7.0beta16 [July 5, 2013]
   Ported ARM no-read patch from libpng16.
   Ported pngfix.c patches from libpng16.
 
-Version 1.7.0beta17 [August 21, 2013]
+Version 1.7.0beta17 [August 22, 2013]
   Revised manual about changes in iTXt chunk handling made in libpng-1.6.0.
   Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
     may be erroneously issued by code-checking applications.
+  Added information about png_set_options() to the manual.
   Delay calling png_init_filter_functions() until a row with nonzero filter
     is found.
 
