@@ -768,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.4beta02 - August 21, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.6.4beta02 - August 30, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.4beta02 - August 21, 2013\
+      return "libpng version 1.6.4beta02 - August 30, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -855,7 +855,7 @@ png_handle_as_unknown(png_const_structrp png_ptr, png_const_bytep chunk_name)
    return PNG_HANDLE_CHUNK_AS_DEFAULT;
 }
 
-#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 int /* PRIVATE */
 png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
 {
@@ -864,7 +864,7 @@ png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
    PNG_CSTRING_FROM_CHUNK(chunk_string, chunk_name);
    return png_handle_as_unknown(png_ptr, chunk_string);
 }
-#endif /* READ_UNKNOWN_CHUNKS */
+#endif /* HANDLE_AS_UNKNOWN */
 #endif /* SET_UNKNOWN_CHUNKS */
 
 #ifdef PNG_READ_SUPPORTED
