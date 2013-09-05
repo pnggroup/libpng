@@ -4628,7 +4628,8 @@ Version 1.6.4beta02 [August 30, 2013]
     prototype, definition, and usage.  Made it depend on
     PNG_HANDLE_AS_UNKNOWN_SUPPORTED everywhere.
 
-Version 1.6.4beta03 [August 30, 2013]
+Version 1.6.4rc01 [September 5, 2013]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
