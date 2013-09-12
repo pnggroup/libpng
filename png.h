@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.4rc01 - September 5, 2013
+ * libpng version 1.6.4 - September 12, 2013
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.4rc01 - September 5, 2013: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.4 - September 12, 2013: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -180,6 +180,7 @@
  *    1.6.3                   16    10603  16.so.16.3[.0]
  *    1.6.4beta01-02          16    10604  16.so.16.4[.0]
  *    1.6.4rc01               16    10604  16.so.16.4[.0]
+ *    1.6.4                   16    10604  16.so.16.4[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -211,7 +212,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.4rc01, September 5, 2013, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.4, September 12, 2013, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -323,13 +324,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    September 5, 2013
+ *    September 12, 2013
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.6.4rc01 are Y2K compliant.  It is my belief that
+ *    upward through 1.6.4 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -389,9 +390,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.4rc01"
+#define PNG_LIBPNG_VER_STRING "1.6.4"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.4rc01 - September 5, 2013\n"
+     " libpng version 1.6.4 - September 12, 2013\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -405,7 +406,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  01
+#define PNG_LIBPNG_VER_BUILD  0
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -422,7 +423,7 @@
 #define PNG_LIBPNG_BUILD_SPECIAL 32 /* Cannot be OR'ed with
                                        PNG_LIBPNG_BUILD_PRIVATE */
 
-#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_RC
+#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_STABLE
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -535,7 +536,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_4rc01;
+typedef char* png_libpng_version_1_6_4;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
