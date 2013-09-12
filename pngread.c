@@ -3285,7 +3285,7 @@ png_image_read_background(png_voidp argument)
 
       case 8:
          /* 8-bit sRGB gray values with an alpha channel; the alpha channel is
-          * to be removed by composing on a backgroundi: either the row if
+          * to be removed by composing on a background: either the row if
           * display->background is NULL or display->background->green if not.
           * Unlike the code above ALPHA_OPTIMIZED has *not* been done.
           */

@@ -1,9 +1,9 @@
 
-Makefiles for  libpng version 1.6.3 - July 18, 2013
+Makefiles for  libpng version 1.6.4 - September 12, 2013
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng16.so.16.1.6.3)
+                       (gcc, creates libpng16.so.16.1.6.4)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -20,7 +20,7 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
  makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       (gcc, creates libpng16.so.16.1.6.3)
+                       (gcc, creates libpng16.so.16.1.6.4)
  makefile.freebsd  =>  FreeBSD makefile
  makefile.gcc      =>  Generic gcc makefile
  makefile.hpgcc    =>  HPUX makefile using gcc
@@ -35,12 +35,12 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires libpng.def)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng16.so.16.1.6.3)
+                       creates libpng16.so.16.1.6.4)
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng16.so.16.1.6.3)
+                       creates libpng16.so.16.1.6.4)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng16.so.16.1.6.3)
+                       creates libpng16.so.16.1.6.4)
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile

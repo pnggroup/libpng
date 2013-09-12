@@ -4618,6 +4618,22 @@ Version 1.6.3 [July 18, 2013]
   Added "/* SAFE */" comments in pngrutil.c and pngrtran.c where warnings
     may be erroneously issued by code-checking applications.
 
+Version 1.6.4beta01 [August 21, 2013]
+  Added information about png_set_options() to the manual.
+  Delay calling png_init_filter_functions() until a row with nonzero filter
+    is found.
+
+Version 1.6.4beta02 [August 30, 2013]
+  Fixed inconsistent conditional compilation of png_chunk_unknown_handling()
+    prototype, definition, and usage.  Made it depend on
+    PNG_HANDLE_AS_UNKNOWN_SUPPORTED everywhere.
+
+Version 1.6.4rc01 [September 5, 2013]
+  No changes.
+
+Version 1.6.4 [September 12, 2013]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

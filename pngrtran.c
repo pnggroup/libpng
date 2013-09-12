@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Last changed in libpng 1.6.4 [September 12, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1116,12 +1116,18 @@ png_init_palette_transformations(png_structrp png_ptr)
 
       /* Ignore if all the entries are opaque (unlikely!) */
       for (i=0; i<png_ptr->num_trans; ++i)
+      {
          if (png_ptr->trans_alpha[i] == 255)
             continue;
          else if (png_ptr->trans_alpha[i] == 0)
             input_has_transparency = 1;
          else
+         {
+            input_has_transparency = 1;
             input_has_alpha = 1;
+            break;
+         }
+      }
    }
 
    /* If no alpha we can optimize. */
@@ -1878,31 +1884,34 @@ png_init_read_transformations(png_structrp png_ptr)
        * the number of significant bits is 0 then no shift is done (this is an
        * error condition which is silently ignored.)
        */
-      if (shift > 0 && shift < 8) for (i=0; i<istop; ++i)
-      {
-         int component = png_ptr->palette[i].red;
+      if (shift > 0 && shift < 8)
+         for (i=0; i<istop; ++i)
+         {
+            int component = png_ptr->palette[i].red;
 
-         component >>= shift;
-         png_ptr->palette[i].red = (png_byte)component;
-      }
+            component >>= shift;
+            png_ptr->palette[i].red = (png_byte)component;
+         }
 
       shift = 8 - png_ptr->sig_bit.green;
-      if (shift > 0 && shift < 8) for (i=0; i<istop; ++i)
-      {
-         int component = png_ptr->palette[i].green;
+      if (shift > 0 && shift < 8)
+         for (i=0; i<istop; ++i)
+         {
+            int component = png_ptr->palette[i].green;
 
-         component >>= shift;
-         png_ptr->palette[i].green = (png_byte)component;
-      }
+            component >>= shift;
+            png_ptr->palette[i].green = (png_byte)component;
+         }
 
       shift = 8 - png_ptr->sig_bit.blue;
-      if (shift > 0 && shift < 8) for (i=0; i<istop; ++i)
-      {
-         int component = png_ptr->palette[i].blue;
+      if (shift > 0 && shift < 8)
+         for (i=0; i<istop; ++i)
+         {
+            int component = png_ptr->palette[i].blue;
 
-         component >>= shift;
-         png_ptr->palette[i].blue = (png_byte)component;
-      }
+            component >>= shift;
+            png_ptr->palette[i].blue = (png_byte)component;
+         }
    }
 #endif  /* PNG_READ_SHIFT_SUPPORTED */
 }
