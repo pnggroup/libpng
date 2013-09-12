@@ -1,35 +1,32 @@
 
-Libpng 1.6.4 - September 12, 2013
+Libpng 1.6.5beta01 - September 12, 2013
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.4.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.4.tar.gz
+   1.6.5beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.5beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng164.7z  (LZMA-compressed, recommended)
-   lpng164.zip
+   lp165b01.7z  (LZMA-compressed, recommended)
+   lp165b01.zip
 
 Other information:
 
-   libpng-1.6.4-README.txt
-   libpng-1.6.4-LICENSE.txt
+   1.6.5beta01-README.txt
+   1.6.5beta01-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
-Changes since the last public release (1.6.3):
-  Added information about png_set_options() to the manual.
-  Delay calling png_init_filter_functions() until a row with nonzero filter
-    is found.
-  Fixed inconsistent conditional compilation of png_chunk_unknown_handling()
-    prototype, definition, and usage.  Made it depend on
-    PNG_HANDLE_AS_UNKNOWN_SUPPORTED everywhere.
+Changes since the last public release (1.6.4):
+
+   No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
