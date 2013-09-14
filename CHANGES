@@ -4634,7 +4634,8 @@ Version 1.6.4rc01 [September 5, 2013]
 Version 1.6.4 [September 12, 2013]
   No changes.
 
-Version 1.6.5beta01 [September 12, 2013]
+Version 1.6.5 [September 14, 2013]
+  Removed two stray lines of code from arm/arm_init.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

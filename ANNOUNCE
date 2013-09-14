@@ -1,27 +1,26 @@
 
-Libpng 1.6.5beta01 - September 12, 2013
+Libpng 1.6.5 - September 14, 2013
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.5beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.5beta01.tar.gz
+   libpng-1.6.5.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.5.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp165b01.7z  (LZMA-compressed, recommended)
-   lp165b01.zip
+   lpng165.7z  (LZMA-compressed, recommended)
+   lpng165.zip
 
 Other information:
 
-   1.6.5beta01-README.txt
-   1.6.5beta01-LICENSE.txt
+   libpng-1.6.5-README.txt
+   libpng-1.6.5-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.4):
