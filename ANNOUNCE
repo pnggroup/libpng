@@ -1,31 +1,32 @@
 
-Libpng 1.6.6 - September 16, 2013
+Libpng 1.6.7beta01 - September 16, 2013
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.6.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.6.tar.gz
+   1.6.7beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.7beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng166.7z  (LZMA-compressed, recommended)
-   lpng166.zip
+   lp167b01.7z  (LZMA-compressed, recommended)
+   lp167b01.zip
 
 Other information:
 
-   libpng-1.6.6-README.txt
-   libpng-1.6.6-LICENSE.txt
+   1.6.7beta01-README.txt
+   1.6.7beta01-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
-Changes since the last public release (1.6.5):
+Changes since the last public release (1.6.6):
 
-  Removed two stray lines of code from arm/arm_init.c, again.
+Version 1.6.7 [September 16, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
