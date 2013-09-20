@@ -27,8 +27,8 @@ Other information:
 Changes since the last public release (1.6.6):
 
 Version 1.6.7 [September 20, 2013]
-  Reverted the change to unknown handling #defines; the change breaks 'NOREAD'
-    builds.
+  Added #ifdef PNG_READ_SUPPORTED/endif around the png_chunk_unknown_handling()
+    function.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

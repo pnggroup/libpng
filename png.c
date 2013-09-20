@@ -855,7 +855,8 @@ png_handle_as_unknown(png_const_structrp png_ptr, png_const_bytep chunk_name)
    return PNG_HANDLE_CHUNK_AS_DEFAULT;
 }
 
-#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_READ_SUPPORTED
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 int /* PRIVATE */
 png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
 {
@@ -864,7 +865,8 @@ png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
    PNG_CSTRING_FROM_CHUNK(chunk_string, chunk_name);
    return png_handle_as_unknown(png_ptr, chunk_string);
 }
-#endif /* READ_UNKNOWN_CHUNKS */
+#endif /* HANDLE_AS_UNKNOWN */
+#endif /* READ_SUPPORTED */
 #endif /* SET_UNKNOWN_CHUNKS */
 
 #ifdef PNG_READ_SUPPORTED
