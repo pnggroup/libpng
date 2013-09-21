@@ -1422,7 +1422,7 @@ PNG_INTERNAL_FUNCTION(void,png_handle_zTXt,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_structrp png_ptr,
     png_uint_32 chunk_name),PNG_EMPTY);
 
-#ifdef PNG_READ_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length, int keep),PNG_EMPTY);
    /* This is the function that gets called for unknown chunks.  The 'keep'
@@ -1431,14 +1431,15 @@ PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     * just skips the chunk or errors out if it is critical.
     */
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) ||\
+   defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
 PNG_INTERNAL_FUNCTION(int,png_chunk_unknown_handling,
     (png_const_structrp png_ptr, png_uint_32 chunk_name),PNG_EMPTY);
    /* Exactly as the API png_handle_as_unknown() except that the argument is a
     * 32-bit chunk name, not a string.
     */
-#endif /* PNG_HANDLE_AS_UNKNOWN_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ_UNKNOWN_CHUNKS || HANDLE_AS_UNKNOWN */
+#endif /* PNG_SET_UNKNOWN_CHUNKS_SUPPORTED */
 
 /* Handle the transformations for reading and writing */
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED

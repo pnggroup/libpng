@@ -4637,12 +4637,16 @@ Version 1.6.4 [September 12, 2013]
 Version 1.6.5 [September 14, 2013]
   Removed two stray lines of code from arm/arm_init.c.
 
-Version 1.6.6 [September 20, 2013]
+Version 1.6.6 [September 21, 2013]
   Removed two stray lines of code from arm/arm_init.c, again.
 
-Version 1.6.7beta01 [September 20, 2013]
-  Added #ifdef PNG_READ_SUPPORTED/endif around the png_chunk_unknown_handling()
-    function.
+Version 1.6.7beta01 [September 21, 2013]
+  Revised unknown chunk code to correct several bugs in the NO_SAVE_/NO_WRITE
+    combination
+  Allow HANDLE_AS_UNKNOWN to work when other options are configured off. Also
+    fixed the pngminim makefiles to work when $(MAKEFLAGS) contains stuff
+    which terminates the make options (as by default in recent versions of
+    Gentoo).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
