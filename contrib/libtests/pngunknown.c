@@ -87,6 +87,52 @@ typedef png_byte *png_const_bytep;
 #  define png_const_structp png_structp
 #endif
 
+#if PNG_LIBPNG_VER < 10700
+   /* Copied from libpng 1.7.0 png.h */
+#define PNG_u2(b1, b2) (((unsigned int)(b1) << 8) + (b2))
+
+#define PNG_U16(b1, b2) ((png_uint_16)PNG_u2(b1, b2))
+#define PNG_U32(b1, b2, b3, b4)\
+   (((png_uint_32)PNG_u2(b1, b2) << 16) + PNG_u2(b3, b4))
+
+/* Constants for known chunk types.
+ */
+#define png_IDAT PNG_U32( 73,  68,  65,  84)
+#define png_IEND PNG_U32( 73,  69,  78,  68)
+#define png_IHDR PNG_U32( 73,  72,  68,  82)
+#define png_PLTE PNG_U32( 80,  76,  84,  69)
+#define png_bKGD PNG_U32( 98,  75,  71,  68)
+#define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
+#define png_gAMA PNG_U32(103,  65,  77,  65)
+#define png_gIFg PNG_U32(103,  73,  70, 103)
+#define png_gIFt PNG_U32(103,  73,  70, 116) /* deprecated */
+#define png_gIFx PNG_U32(103,  73,  70, 120)
+#define png_hIST PNG_U32(104,  73,  83,  84)
+#define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_iTXt PNG_U32(105,  84,  88, 116)
+#define png_oFFs PNG_U32(111,  70,  70, 115)
+#define png_pCAL PNG_U32(112,  67,  65,  76)
+#define png_pHYs PNG_U32(112,  72,  89, 115)
+#define png_sBIT PNG_U32(115,  66,  73,  84)
+#define png_sCAL PNG_U32(115,  67,  65,  76)
+#define png_sPLT PNG_U32(115,  80,  76,  84)
+#define png_sRGB PNG_U32(115,  82,  71,  66)
+#define png_sTER PNG_U32(115,  84,  69,  82)
+#define png_tEXt PNG_U32(116,  69,  88, 116)
+#define png_tIME PNG_U32(116,  73,  77,  69)
+#define png_tRNS PNG_U32(116,  82,  78,  83)
+#define png_zTXt PNG_U32(122,  84,  88, 116)
+
+/* Test on flag values as defined in the spec (section 5.4): */
+#define PNG_CHUNK_ANCILLARY(c)    (1 & ((c) >> 29))
+#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
+#define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
+#define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
+#define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
+
+#endif /* PNG_LIBPNG_VER < 10700 */
+
 #ifdef __cplusplus
 #  define this not_the_cpp_this
 #  define new not_the_cpp_new
@@ -106,41 +152,8 @@ typedef png_byte *png_const_bytep;
 #  endif
 #endif
 
-/* Copied from pngpriv.h */
-#define PNG_32b(b,s) ((png_uint_32)(b) << (s))
-#define PNG_CHUNK(b1,b2,b3,b4) \
-   (PNG_32b(b1,24) | PNG_32b(b2,16) | PNG_32b(b3,8) | PNG_32b(b4,0))
-
-#define png_IHDR PNG_CHUNK( 73,  72,  68,  82)
-#define png_IDAT PNG_CHUNK( 73,  68,  65,  84)
-#define png_IEND PNG_CHUNK( 73,  69,  78,  68)
-#define png_PLTE PNG_CHUNK( 80,  76,  84,  69)
-#define png_bKGD PNG_CHUNK( 98,  75,  71,  68)
-#define png_cHRM PNG_CHUNK( 99,  72,  82,  77)
-#define png_gAMA PNG_CHUNK(103,  65,  77,  65)
-#define png_hIST PNG_CHUNK(104,  73,  83,  84)
-#define png_iCCP PNG_CHUNK(105,  67,  67,  80)
-#define png_iTXt PNG_CHUNK(105,  84,  88, 116)
-#define png_oFFs PNG_CHUNK(111,  70,  70, 115)
-#define png_pCAL PNG_CHUNK(112,  67,  65,  76)
-#define png_sCAL PNG_CHUNK(115,  67,  65,  76)
-#define png_pHYs PNG_CHUNK(112,  72,  89, 115)
-#define png_sBIT PNG_CHUNK(115,  66,  73,  84)
-#define png_sPLT PNG_CHUNK(115,  80,  76,  84)
-#define png_sRGB PNG_CHUNK(115,  82,  71,  66)
-#define png_sTER PNG_CHUNK(115,  84,  69,  82)
-#define png_tEXt PNG_CHUNK(116,  69,  88, 116)
-#define png_tIME PNG_CHUNK(116,  73,  77,  69)
-#define png_tRNS PNG_CHUNK(116,  82,  78,  83)
-#define png_zTXt PNG_CHUNK(122,  84,  88, 116)
-#define png_vpAg PNG_CHUNK('v', 'p', 'A', 'g')
-
-/* Test on flag values as defined in the spec (section 5.4): */
-#define PNG_CHUNK_ANCILLARY(c )   (1 & ((c) >> 29))
-#define PNG_CHUNK_CRITICAL(c)     (!PNG_CHUNK_ANCILLARY(c))
-#define PNG_CHUNK_PRIVATE(c)      (1 & ((c) >> 21))
-#define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
-#define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
+/* Types of chunks not known to libpng */
+#define png_vpAg PNG_U32(118, 112, 65, 103)
 
 /* Chunk information */
 #define PNG_INFO_tEXt 0x10000000U
@@ -347,14 +360,14 @@ find_by_flag(png_uint_32 flag)
 static int
 ancillary(const char *name)
 {
-   return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
+   return PNG_CHUNK_ANCILLARY(PNG_U32(name[0], name[1], name[2], name[3]));
 }
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 static int
 ancillaryb(const png_byte *name)
 {
-   return PNG_CHUNK_ANCILLARY(PNG_CHUNK(name[0], name[1], name[2], name[3]));
+   return PNG_CHUNK_ANCILLARY(PNG_U32(name[0], name[1], name[2], name[3]));
 }
 #endif
 
@@ -401,9 +414,6 @@ clean_display(display *d)
          d->test);
       exit(1);
    }
-
-   /* Invalidate the test */
-   d->test = init;
 }
 
 PNG_FUNCTION(void, display_exit, (display *d), static PNG_NORETURN)
@@ -846,7 +856,7 @@ check_error(display *d, png_uint_32 flags, const char *message)
 
 static void
 check_handling(display *d, int def, png_uint_32 chunks, png_uint_32 known,
-   png_uint_32 unknown, const char *position)
+   png_uint_32 unknown, const char *position, int set_callback)
 {
    while (chunks)
    {
@@ -855,6 +865,13 @@ check_handling(display *d, int def, png_uint_32 chunks, png_uint_32 known,
       int keep = chunk_info[i].keep;
       const char *type;
       const char *errorx = NULL;
+
+#     ifdef PNG_READ_USER_CHUNKS_SUPPORTED
+         const char *callback = (set_callback ? ",callback" : "");
+#     else
+#        define callback ""
+         UNUSED(set_callback)
+#     endif
 
       if (chunk_info[i].unknown)
       {
@@ -953,8 +970,8 @@ check_handling(display *d, int def, png_uint_32 chunks, png_uint_32 known,
       if (errorx != NULL)
       {
          ++(d->error_count);
-         fprintf(stderr, "%s(%s): %s %s %s: %s\n",
-            d->file, d->test, type, chunk_info[i].name, position, errorx);
+         fprintf(stderr, "%s(%s%s): %s %s %s: %s\n", d->file, d->test, callback,
+            type, chunk_info[i].name, position, errorx);
       }
 
       chunks &= ~flag;
@@ -1007,9 +1024,9 @@ perform_one_test(FILE *fp, int argc, const char **argv,
     * it or not.
     */
    check_handling(d, def, flags[0][0] | flags[0][1], flags[1][0], flags[1][1],
-      "before IDAT");
+      "before IDAT", set_callback);
    check_handling(d, def, flags[0][2] | flags[0][3], flags[1][2], flags[1][3],
-      "after IDAT");
+      "after IDAT", set_callback);
 }
 
 static void
