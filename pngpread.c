@@ -240,7 +240,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
             return;
 
       if (png_ptr->mode & PNG_AFTER_IDAT)
-         png_benign_error(png_ptr, "Too many IDATs found");
+         png_benign_error(png_ptr, "Too many IDATs found[p]");
    }
 
    if (chunk_name == png_IHDR)

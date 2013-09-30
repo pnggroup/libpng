@@ -4651,6 +4651,8 @@ Version 1.7.0beta19 [September 30, 2013]
     builds.
   Fixed default behavior of ARM_NEON_API. If the ARM NEON API option is
     compiled without the CHECK option it defaulted to on, not off.
+  Catch up with recent libpng16 changes; unknown handling and spelling
+    corrections
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

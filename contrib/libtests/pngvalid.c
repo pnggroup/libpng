@@ -6030,7 +6030,7 @@ transform_test(png_modifier *pmIn, PNG_CONST png_uint_32 idIn,
 
    Catch(fault)
    {
-      modifier_reset((png_modifier*)fault);
+      modifier_reset(voidcast(png_modifier*,(void*)fault));
    }
 }
 
@@ -8874,7 +8874,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
    }
 
    Catch(fault)
-      modifier_reset((png_modifier*)fault);
+      modifier_reset(voidcast(png_modifier*,(void*)fault));
 }
 
 static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
