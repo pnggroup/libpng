@@ -1391,11 +1391,13 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 
-#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
-   png_free_data(read_ptr, read_info_ptr, PNG_FREE_UNKN, -1);
-#endif
-#ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
-   png_free_data(write_ptr, write_info_ptr, PNG_FREE_UNKN, -1);
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+#  ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+      png_free_data(read_ptr, read_info_ptr, PNG_FREE_UNKN, -1);
+#  endif
+#  ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
+      png_free_data(write_ptr, write_info_ptr, PNG_FREE_UNKN, -1);
+#  endif
 #endif
 
    pngtest_debug("Reading and writing end_info data");
