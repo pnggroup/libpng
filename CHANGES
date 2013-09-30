@@ -4637,16 +4637,28 @@ Version 1.6.4 [September 12, 2013]
 Version 1.6.5 [September 14, 2013]
   Removed two stray lines of code from arm/arm_init.c.
 
-Version 1.6.6 [September 21, 2013]
+Version 1.6.6 [September 30, 2013]
   Removed two stray lines of code from arm/arm_init.c, again.
 
-Version 1.6.7beta01 [September 21, 2013]
+Version 1.6.7beta01 [September 30, 2013]
   Revised unknown chunk code to correct several bugs in the NO_SAVE_/NO_WRITE
     combination
   Allow HANDLE_AS_UNKNOWN to work when other options are configured off. Also
     fixed the pngminim makefiles to work when $(MAKEFLAGS) contains stuff
     which terminates the make options (as by default in recent versions of
     Gentoo).
+  Avoid up-cast warnings in pngvalid.c. On ARM the alignment requirements of
+    png_modifier are greater than that of png_store and as a consequence
+    compilation of pngvalid.c results in a warning about increased alignment
+    requirements because of the bare cast to (png_modifier*). The code is safe,
+    because the pointer is known to point to a stack allocated png_modifier,
+    but this change avoids the warning.
+  Fixed default behavior of ARM_NEON_API. If the ARM NEON API option was
+    compiled without the CHECK option it defaulted to on, not off.
+  Check user callback behavior in pngunknown.c. Previous versions compiled
+    if SAVE_UNKNOWN was not available but did nothing since the callback
+    was never implemented.
+  Merged pngunknown.c with 1.7 version and back ported 1.7 improvements/fixes
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1287,7 +1287,9 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
+#ifdef PNG_sRGB_SUPPORTED
    (void)png_colorspace_set_sRGB(png_ptr, &png_ptr->colorspace, intent);
+#endif
    png_colorspace_sync(png_ptr, info_ptr);
 }
 #endif /* PNG_READ_sRGB_SUPPORTED */
