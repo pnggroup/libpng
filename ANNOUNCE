@@ -1,5 +1,5 @@
 
-Libpng 1.6.7beta01 - September 30, 2013
+Libpng 1.6.7beta02 - October 2, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,24 +9,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.7beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.7beta01.tar.gz
+   1.6.7beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.7beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp167b01.7z  (LZMA-compressed, recommended)
-   lp167b01.zip
+   lp167b02.7z  (LZMA-compressed, recommended)
+   lp167b02.zip
 
 Other information:
 
-   1.6.7beta01-README.txt
-   1.6.7beta01-LICENSE.txt
+   1.6.7beta02-README.txt
+   1.6.7beta02-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.6):
 
-Version 1.6.7 [September 30, 2013]
+Version 1.6.7beta01 [September 30, 2013]
   Revised unknown chunk code to correct several bugs in the NO_SAVE_/NO_WRITE
     combination
   Allow HANDLE_AS_UNKNOWN to work when other options are configured off. Also
@@ -45,6 +45,8 @@ Version 1.6.7 [September 30, 2013]
     if SAVE_UNKNOWN was not available but did nothing since the callback
     was never implemented.
   Merged pngunknown.c with 1.7 version and back ported 1.7 improvements/fixes
+
+Version 1.6.7beta02 [October 2, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

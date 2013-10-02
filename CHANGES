@@ -4637,7 +4637,7 @@ Version 1.6.4 [September 12, 2013]
 Version 1.6.5 [September 14, 2013]
   Removed two stray lines of code from arm/arm_init.c.
 
-Version 1.6.6 [September 30, 2013]
+Version 1.6.6 [September 16, 2013]
   Removed two stray lines of code from arm/arm_init.c, again.
 
 Version 1.6.7beta01 [September 30, 2013]
@@ -4659,6 +4659,8 @@ Version 1.6.7beta01 [September 30, 2013]
     if SAVE_UNKNOWN was not available but did nothing since the callback
     was never implemented.
   Merged pngunknown.c with 1.7 version and back ported 1.7 improvements/fixes
+
+Version 1.6.7beta02 [October 2, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
