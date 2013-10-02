@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta19 - September 30, 2013
+Libpng 1.7.0beta20 - October 2, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta19.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta19.tar.gz
+   1.7.0beta20.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta20.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b19.7z  (LZMA-compressed, recommended)
-   lp170b19.zip
+   lp170b20.7z  (LZMA-compressed, recommended)
+   lp170b20.zip
 
 Other information:
 
-   1.7.0beta19-README.txt
-   1.7.0beta19-LICENSE.txt
+   1.7.0beta20-README.txt
+   1.7.0beta20-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -371,6 +371,8 @@ Version 1.7.0beta19 [September 30, 2013]
     safe, because the pointer is known to point to a stack allocated
     png_modifier, but this change avoids the warning.
   Fixed some grammatical changes and updated the png chunks list.
+
+Version 1.7.0beta20 [October 2, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

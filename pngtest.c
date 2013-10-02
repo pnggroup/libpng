@@ -1966,4 +1966,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_7_0beta19 Your_png_h_is_not_version_1_7_0beta19;
+typedef png_libpng_version_1_7_0beta20 Your_png_h_is_not_version_1_7_0beta20;

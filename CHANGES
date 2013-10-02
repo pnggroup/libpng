@@ -4661,6 +4661,8 @@ Version 1.7.0beta19 [September 30, 2013]
     png_modifier, but this change avoids the warning.
   Fixed some grammatical changes and updated the png chunks list.
 
+Version 1.7.0beta20 [October 2, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
