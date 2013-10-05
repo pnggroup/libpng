@@ -4660,7 +4660,22 @@ Version 1.6.7beta01 [September 30, 2013]
     was never implemented.
   Merged pngunknown.c with 1.7 version and back ported 1.7 improvements/fixes
 
-Version 1.6.7beta02 [October 2, 2013]
+Version 1.6.7beta02 [October 5, 2013]
+  Made changes for compatibility with automake 1.14:
+    1) Added the 'compile' program to the list of programs that must be cleaned
+       in autogen.sh
+    2) Added 'subdir-objects' which causes .c files in sub-directories to be
+       compiled such that the corresponding .o files are also in the
+       sub-directory.  This is because automake 1.14 warns that the
+       current behavior of compiling to the top level directory may be removed
+       in the future.
+    3) Updated dependencies on pnglibconf.h to match the new .o locations and
+       added all the files in contrib/libtests and contrib/tools that depend
+       on pnglibconf.h
+    4) Added 'BUILD_SOURCES = pnglibconf.h'; this is the automake recommended
+       way of handling the dependencies of sources that are machine generated;
+       unfortunately it only works if the user does 'make all' or 'make check',
+       so the dependencies (3) are still required.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

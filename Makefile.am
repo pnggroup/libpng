@@ -12,6 +12,16 @@ check_PROGRAMS= pngtest pngunknown pngstest pngvalid
 # Utilities - installed
 bin_PROGRAMS= pngfix png-fix-itxt
 
+# This ensures that pnglibconf.h gets built at the start of 'make all' or
+# 'make check', but it does not add dependencies to the individual programs,
+# this is done below.
+#
+# IMPORTANT: always add the object modules of new programs to the list below
+# because otherwise the sequence 'configure; make new-program' will *sometimes*
+# result in the installed (system) pnglibconf.h being used and the result is
+# always wrong and always very confusing.
+BUILT_SOURCES = pnglibconf.h
+
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
@@ -194,9 +204,21 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
-# 'make test' is the first thing the user does.)
-pngstest.o pngvalid.o pngtest.o pngunknown.o timepng.o: pnglibconf.h
-pngfix.o png-fix-itxt.o: pnglibconf.h
+# 'make test' is the first thing the user does.)  Only files which include
+# one of the png source files (typically png.h or pngpriv.h) need to be listed
+# here:
+pngtest.o: pnglibconf.h
+
+contrib/libtests/makepng.o: pnglibconf.h
+contrib/libtests/pngstest.o: pnglibconf.h
+contrib/libtests/pngunknown.o: pnglibconf.h
+contrib/libtests/pngvalid.o: pnglibconf.h
+contrib/libtests/readpng.o: pnglibconf.h
+contrib/libtests/tarith.o: pnglibconf.h
+contrib/libtests/timepng.o: pnglibconf.h
+
+contrib/tools/makesRGB.o: pnglibconf.h
+contrib/tools/pngfix.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
