@@ -4676,6 +4676,9 @@ Version 1.6.7beta02 [October 5, 2013]
        way of handling the dependencies of sources that are machine generated;
        unfortunately it only works if the user does 'make all' or 'make check',
        so the dependencies (3) are still required.
+  Cleaned up (char*) casts of zlib messages. The latest version of the Intel C
+    compiler complains about casting a string literal as (char*), so copied the
+    treatment of z_const from the library code into pngfix.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

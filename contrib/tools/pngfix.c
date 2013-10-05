@@ -50,7 +50,30 @@
 #endif
 
 #ifdef PNG_READ_SUPPORTED
+/* zlib.h defines the structure z_stream, an instance of which is included
+ * in this structure and is required for decompressing the LZ compressed
+ * data in PNG files.
+ */
+#ifndef ZLIB_CONST
+   /* We must ensure that zlib uses 'const' in declarations. */
+#  define ZLIB_CONST
+#endif
 #include <zlib.h>
+#ifdef const
+   /* zlib.h sometimes #defines const to nothing, undo this. */
+#  undef const
+#endif
+
+/* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
+ * with older builds.
+ */
+#if ZLIB_VERNUM < 0x1260
+#  define PNGZ_MSG_CAST(s) png_constcast(char*,s)
+#  define PNGZ_INPUT_CAST(b) png_constcast(png_bytep,b)
+#else
+#  define PNGZ_MSG_CAST(s) (s)
+#  define PNGZ_INPUT_CAST(b) (b)
+#endif
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
 #  error "pngfix not supported in this libpng version"
@@ -2636,7 +2659,7 @@ zlib_check(struct file *file, png_uint_32 offset)
 
          case ZLIB_OK:
             /* Truncated stream; unrecoverable, gets converted to ZLIB_FATAL */
-            zlib.z.msg = png_constcast(char*, "[truncated]");
+            zlib.z.msg = PNGZ_MSG_CAST("[truncated]");
             zlib_message(&zlib, 0/*expected*/);
             /* FALL THROUGH */
 
@@ -2675,7 +2698,7 @@ zlib_check(struct file *file, png_uint_32 offset)
 
                      /* Output the error that wasn't output before: */
                      if (zlib.z.msg == NULL)
-                        zlib.z.msg = png_constcast(char*,
+                        zlib.z.msg = PNGZ_MSG_CAST(
                            "invalid distance too far back");
                      zlib_message(&zlib, 0/*stream error*/);
                      zlib_end(&zlib);
