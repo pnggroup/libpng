@@ -866,13 +866,6 @@ check_handling(display *d, int def, png_uint_32 chunks, png_uint_32 known,
       const char *type;
       const char *errorx = NULL;
 
-#     ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-         const char *callback = (set_callback ? ",callback" : "");
-#     else
-#        define callback ""
-         UNUSED(set_callback)
-#     endif
-
       if (chunk_info[i].unknown)
       {
          if (keep == PNG_HANDLE_CHUNK_AS_DEFAULT)
@@ -970,7 +963,8 @@ check_handling(display *d, int def, png_uint_32 chunks, png_uint_32 known,
       if (errorx != NULL)
       {
          ++(d->error_count);
-         fprintf(stderr, "%s(%s%s): %s %s %s: %s\n", d->file, d->test, callback,
+         fprintf(stderr, "%s(%s%s): %s %s %s: %s\n", d->file, d->test,
+            set_callback ? ",callback" : "",
             type, chunk_info[i].name, position, errorx);
       }
 
