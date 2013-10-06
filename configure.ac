@@ -27,7 +27,7 @@ AC_CONFIG_MACRO_DIR([scripts])
 # dist-xz requires automake 1.11 or later
 # 1.12.2 fixes a security issue in 1.11.2 and 1.12.1
 # 1.13 is required for parallel tests
-AM_INIT_AUTOMAKE([1.13 foreign dist-xz color-tests silent-rules])
+AM_INIT_AUTOMAKE([1.13 foreign dist-xz color-tests silent-rules subdir-objects])
 # The following line causes --disable-maintainer-mode to be the default to
 # configure, this is necessary because libpng distributions cannot rely on the
 # time stamps of the autotools generated files being correct
