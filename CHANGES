@@ -4660,7 +4660,7 @@ Version 1.6.7beta01 [September 30, 2013]
     was never implemented.
   Merged pngunknown.c with 1.7 version and back ported 1.7 improvements/fixes
 
-Version 1.6.7beta02 [October 6, 2013]
+Version 1.6.7beta02 [October 12, 2013]
   Made changes for compatibility with automake 1.14:
     1) Added the 'compile' program to the list of programs that must be cleaned
        in autogen.sh
