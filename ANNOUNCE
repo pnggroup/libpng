@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta20 - October 13, 2013
+Libpng 1.7.0beta21 - October 13, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta20.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta20.tar.gz
+   1.7.0beta21.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta21.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b20.7z  (LZMA-compressed, recommended)
-   lp170b20.zip
+   lp170b21.7z  (LZMA-compressed, recommended)
+   lp170b21.zip
 
 Other information:
 
-   1.7.0beta20-README.txt
-   1.7.0beta20-LICENSE.txt
+   1.7.0beta21-README.txt
+   1.7.0beta21-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -397,6 +397,8 @@ Version 1.7.0beta20 [October 13, 2013]
     condition ? string-literal : string-literal).
   Make autogen.sh work with automake 1.13 as well as 1.14. Do this by always
     removing the 1.14 'compile' script but never checking for it.
+
+Version 1.7.0beta21 [October 13, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
