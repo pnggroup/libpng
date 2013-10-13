@@ -4686,6 +4686,8 @@ Version 1.6.7beta02 [October 12, 2013]
   Make autogen.sh work with automake 1.13 as well as 1.14. Do this by always
     removing the 1.14 'compile' script but never checking for it.
 
+Version 1.6.7beta03 [October 13, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
