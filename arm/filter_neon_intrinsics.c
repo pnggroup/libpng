@@ -1,9 +1,11 @@
 
-/* filter_neon.c - NEON optimised filter functions
+/* filter_neon_intrinsics.c - NEON optimised filter functions
  *
  * Copyright (c) 2013 Glenn Randers-Pehrson
- * Written by James Yu <james.yu@linaro.org>. Oct.2013.
+ * Written by James Yu <james.yu at linaro.org>, October 2013.
  * Based on filter_neon.S, written by Mans Rullgard, 2011.
+ *
+ * Last changed in libpng 1.6.7 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
