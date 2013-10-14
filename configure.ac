@@ -248,26 +248,18 @@ AC_ARG_ENABLE([arm-neon],
                    [Disable ARM Neon optimizations])
          # Prevent inclusion of the assembler files below:
          enable_arm_neon=no;;
-      check)
+      check|check-intrinsics)
          AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
                    [Check for ARM Neon support at run-time]);;
-      check-intrinsics)
-         AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
-                   [Check for ARM Neon support at run-time]);;
-         ;;
-      api)
+      api|api-intrinsics)
          AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
                    [Turn on ARM Neon optimizations at run-time]);;
-      api-intrinsics)
-         ;;
-      yes|on)
+      yes|on|yes-intrinsics|on-intrinsics)
          AC_DEFINE([PNG_ARM_NEON_OPT], [2],
                    [Enable ARM Neon optimizations])
          AC_MSG_WARN([--enable-arm-neon: please specify 'check' or 'api', if]
             [you want the optimizations unconditionally pass -mfpu=neon]
             [to the compiler.]);;
-      yes-intrinsics|on-intrinsics)
-         ;;
       *)
          AC_MSG_ERROR([--enable-arm-neon=${enable_arm_neon}: invalid value])
    esac])
