@@ -251,15 +251,23 @@ AC_ARG_ENABLE([arm-neon],
       check)
          AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
                    [Check for ARM Neon support at run-time]);;
+      check-intrinsics)
+         AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
+                   [Check for ARM Neon support at run-time]);;
+         ;;
       api)
          AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
                    [Turn on ARM Neon optimizations at run-time]);;
+      api-intrinsics)
+         ;;
       yes|on)
          AC_DEFINE([PNG_ARM_NEON_OPT], [2],
                    [Enable ARM Neon optimizations])
          AC_MSG_WARN([--enable-arm-neon: please specify 'check' or 'api', if]
             [you want the optimizations unconditionally pass -mfpu=neon]
             [to the compiler.]);;
+      yes-intrinsics|on-intrinsics)
+         ;;
       *)
          AC_MSG_ERROR([--enable-arm-neon=${enable_arm_neon}: invalid value])
    esac])
@@ -274,6 +282,12 @@ AM_CONDITIONAL([PNG_ARM_NEON],
       arm*) :;;
       *)    test "$enable_arm_neon" != '';;
     esac])
+
+AM_CONDITIONAL([PNG_ARM_NEON_INTRINSICS],
+   [test "$enable_arm_neon" = 'yes-intrinsics' 
+      -o "$enable_arm_neon" = 'on-intrinsics'
+      -o "$enable_arm_neon" = 'check-intrinsics'
+      -o "$enable_arm_neon" = 'api-intrinsics'])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 
