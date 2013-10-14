@@ -275,11 +275,15 @@ AM_CONDITIONAL([PNG_ARM_NEON],
       *)    test "$enable_arm_neon" != '';;
     esac])
 
+case "$enable_arm_neon" in
+    *-intrinsics)
+       use_arm_intrinsics='yes';;
+    *)
+       use_arm_intrinsics='no';;
+esac
+
 AM_CONDITIONAL([PNG_ARM_NEON_INTRINSICS],
-   [test "$enable_arm_neon" = 'yes-intrinsics' 
-      -o "$enable_arm_neon" = 'on-intrinsics'
-      -o "$enable_arm_neon" = 'check-intrinsics'
-      -o "$enable_arm_neon" = 'api-intrinsics'])
+   [test "$use_arm_intrinsics" = 'yes'])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 
