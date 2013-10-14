@@ -10,8 +10,12 @@
  * and license in png.h
  */
 
-#include <arm_neon.h>
 #include "pngpriv.h"
+
+#ifdef PNG_READ_SUPPORTED
+#if PNG_ARM_NEON_OPT > 0
+
+#include <arm_neon.h>
 
 void
 png_read_filter_row_up_neon(png_row_infop row_info, png_bytep row,
@@ -308,3 +312,5 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
+#endif /* PNG_ARM_NEON_OPT > 0 */
+#endif /* PNG_READ_SUPPORTED */
