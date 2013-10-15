@@ -81,12 +81,12 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
 
 if PNG_ARM_NEON
-if PNG_ARM_NEON_INTRINSICS
-  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/filter_neon_intrinsics.c
-else
-  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
+  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c \
+  if PNG_ARM_NEON_INTRINSICS
+        arm/filter_neon_intrinsics.c
+  else
 	arm/filter_neon.S
-endif
+  endif
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
