@@ -248,13 +248,13 @@ AC_ARG_ENABLE([arm-neon],
                    [Disable ARM Neon optimizations])
          # Prevent inclusion of the assembler files below:
          enable_arm_neon=no;;
-      check|check-intrinsics)
+      check)
          AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
                    [Check for ARM Neon support at run-time]);;
-      api|api-intrinsics)
+      api)
          AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
                    [Turn on ARM Neon optimizations at run-time]);;
-      yes|on|yes-intrinsics|on-intrinsics)
+      yes|on)
          AC_DEFINE([PNG_ARM_NEON_OPT], [2],
                    [Enable ARM Neon optimizations])
          AC_MSG_WARN([--enable-arm-neon: please specify 'check' or 'api', if]
@@ -274,16 +274,6 @@ AM_CONDITIONAL([PNG_ARM_NEON],
       arm*) :;;
       *)    test "$enable_arm_neon" != '';;
     esac])
-
-case "$enable_arm_neon" in
-    *-intrinsics)
-       use_arm_intrinsics='yes';;
-    *)
-       use_arm_intrinsics='no';;
-esac
-
-AM_CONDITIONAL([PNG_ARM_NEON_INTRINSICS],
-   [test "$use_arm_intrinsics" = 'yes'])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 
