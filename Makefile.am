@@ -324,3 +324,8 @@ uninstall-hook:
 	rm -f '$(DESTDIR)$(libdir)/libpng.sl'
 	rm -f '$(DESTDIR)$(libdir)/libpng.dylib'
 	rm -f '$(DESTDIR)$(libdir)/libpng.dll.a'
+
+# The following addition ensures that 'make all' always builds the test programs
+# too.  It used to, but some change either in libpng or configure stopped this
+# working.
+all-am: $(check_PROGRAMS)

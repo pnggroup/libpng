@@ -2945,6 +2945,12 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
  * height of 16 rows.  The width and height are stored in the FILEID and, being
  * non-zero, indicate a size file.
  *
+ * Because the PNG filter code is typically the largest CPU consumer within
+ * libpng itself there is a tendency to attempt to optimize it.  This results in
+ * special case code which needs to be validated.  To cause this to happen the
+ * 'size' images are made to use each possible filter, in so far as this is
+ * possible for smaller images.
+ *
  * For palette image (colour type 3) multiple transform images are stored with
  * the same bit depth to allow testing of more colour combinations -
  * particularly important for testing the gamma code because libpng uses a
@@ -3660,6 +3666,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
+         int nfilter = PNG_FILTER_VALUE_LAST;
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -3713,7 +3720,22 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
                      continue;
                }
 
-               /* Only get to here if the row has some pixels in it. */
+               /* Only get to here if the row has some pixels in it, set the
+                * filters to 'all' for the very first row and thereafter to a
+                * single filter.  It isn't well documented, but png_set_filter
+                * does accept a filter number (per the spec) as well as a bit
+                * mask.
+                *
+                * The apparent wackiness of decrementing nfilter rather than
+                * incrementing is so that Paeth gets used in all images bigger
+                * than 1 row - it's the tricky one.
+                */
+               png_set_filter(pp, 0/*method*/,
+                  nfilter >= PNG_FILTER_VALUE_LAST ? PNG_ALL_FILTERS : nfilter);
+
+               if (nfilter-- == 0)
+                  nfilter = PNG_FILTER_VALUE_LAST-1;
+
                png_write_row(pp, row);
             }
          }
