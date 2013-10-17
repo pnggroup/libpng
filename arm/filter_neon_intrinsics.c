@@ -46,7 +46,7 @@ png_read_filter_row_up_neon(png_row_infop row_info, png_bytep row,
    png_bytep rp_stop = row + row_info->rowbytes;
    png_const_bytep pp = prev_row;
 
-   for (; rp != rp_stop; rp += 16, pp += 16)
+   for (; rp < rp_stop; rp += 16, pp += 16)
    {
       uint8x16_t qrp, qpp;
 
@@ -71,7 +71,7 @@ png_read_filter_row_sub3_neon(png_row_infop row_info, png_bytep row,
    uint8x8x4_t vdest;
    vdest.val[3] = vdup_n_u8(0);
 
-   for (; rp != rp_stop;)
+   for (; rp < rp_stop;)
    {
       uint8x8_t vtmp1, vtmp2;
       uint32x2_t *temp_pointer;
@@ -112,7 +112,7 @@ png_read_filter_row_sub4_neon(png_row_infop row_info, png_bytep row,
    uint8x8x4_t vdest;
    vdest.val[3] = vdup_n_u8(0);
 
-   for (; rp != rp_stop; rp += 16)
+   for (; rp < rp_stop; rp += 16)
    {
       uint32x2x4_t vtmp = vld4_u32(png_ptr(uint32_t,rp));
       uint8x8x4_t *vrpt = png_ptr(uint8x8x4_t,&vtmp);
@@ -147,7 +147,7 @@ png_read_filter_row_avg3_neon(png_row_infop row_info, png_bytep row,
    vrpt = png_ptr(uint8x8x2_t,&vtmp);
    vrp = *vrpt;
 
-   for (; rp != rp_stop; pp += 12)
+   for (; rp < rp_stop; pp += 12)
    {
       uint8x8_t vtmp1, vtmp2, vtmp3;
 
@@ -206,7 +206,7 @@ png_read_filter_row_avg4_neon(png_row_infop row_info, png_bytep row,
    uint8x8x4_t vdest;
    vdest.val[3] = vdup_n_u8(0);
 
-   for (; rp != rp_stop; rp += 16, pp += 16)
+   for (; rp < rp_stop; rp += 16, pp += 16)
    {
       uint32x2x4_t vtmp;
       uint8x8x4_t *vrpt, *vppt;
@@ -279,7 +279,7 @@ png_read_filter_row_paeth3_neon(png_row_infop row_info, png_bytep row,
    vrpt = png_ptr(uint8x8x2_t,&vtmp);
    vrp = *vrpt;
 
-   for (; rp != rp_stop; pp += 12)
+   for (; rp < rp_stop; pp += 12)
    {
       uint8x8x2_t *vppt;
       uint8x8x2_t vpp;
@@ -338,7 +338,7 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
    uint8x8x4_t vdest;
    vdest.val[3] = vdup_n_u8(0);
 
-   for (; rp != rp_stop; rp += 16, pp += 16)
+   for (; rp < rp_stop; rp += 16, pp += 16)
    {
       uint32x2x4_t vtmp;
       uint8x8x4_t *vrpt, *vppt;
