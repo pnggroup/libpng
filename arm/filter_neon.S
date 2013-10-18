@@ -22,9 +22,10 @@
 
 /* Assembler NEON support - only works for 32-bit ARM (i.e. it does not work for
  * ARM64).  The code in arm/filter_neon_intrinsics.c supports ARM64, however it
- * only works if -mfpu=neon is specified on the GCC command line.
+ * only works if -mfpu=neon is specified on the GCC command line.  See pngpriv.h
+ * for the logic which sets PNG_USE_ARM_NEON_ASM:
  */
-#ifndef __ARM_NEON__ /* else use arm/filter_neon_intrinsics.c */
+#ifdef PNG_USE_ARM_NEON_ASM /* else use arm/filter_neon_intrinsics.c */
 
 #ifdef PNG_READ_SUPPORTED
 #if PNG_ARM_NEON_OPT > 0
@@ -241,4 +242,4 @@ func    png_read_filter_row_paeth3_neon, export=1
 endfunc
 #endif /* PNG_ARM_NEON_OPT > 0 */
 #endif /* PNG_READ_SUPPORTED */
-#endif /* !__ARM_NEON__ */
+#endif /* PNG_USE_ARM_NEON_ASM */

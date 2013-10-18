@@ -128,6 +128,30 @@
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
 #endif
 
+#ifndef PNG_USE_ARM_NEON_ASM
+   /* By default the 'intrinsics' code in arm/filter_neon_intrinsics.c is used
+    * if possible - if __ARM_NEON__ is set and the compiler version is not known
+    * to be broken.  ASM code can be forced by -DPNG_USE_ARM_NEON_ASM on the
+    * command line.
+    */
+#  ifndef __ARM_NEON__
+      /* The 'intrinsics' code simply won't compile without this -mfpu=neon: */
+#     define PNG_USE_ARM_NEON_ASM
+#  endif
+#endif
+
+   /* Put compiler specific checks below: */
+#ifndef PNG_USE_ARM_NEON_ASM
+#  ifdef __GNUC__
+      /* GCC 4.5.4 NEON support is known to be broken.  4.6.3 is known to work,
+       * so if this *is* GCC, or G++, look for a version >4.5
+       */
+#     if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)
+#        define PNG_USE_ARM_NEON_ASM
+#     endif
+#  endif
+#endif
+
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
  * so PNG_BUILD_DLL must be set.
