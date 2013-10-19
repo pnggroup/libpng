@@ -1,5 +1,5 @@
 
-Libpng 1.6.7beta03 - October 19, 2013
+Libpng 1.6.7beta04 - October 19, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.7beta03.tar.xz (LZMA-compressed, recommended)
-   1.6.7beta03.tar.gz
+   1.6.7beta04.tar.xz (LZMA-compressed, recommended)
+   1.6.7beta04.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp167b03.7z  (LZMA-compressed, recommended)
-   lp167b03.zip
+   lp167b04.7z  (LZMA-compressed, recommended)
+   lp167b04.zip
 
 Other information:
 
-   1.6.7beta03-README.txt
-   1.6.7beta03-LICENSE.txt
+   1.6.7beta04-README.txt
+   1.6.7beta04-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.6):
@@ -80,6 +80,8 @@ Version 1.6.7beta03 [October 19, 2013]
     manage, limited by the number of rows.
   Cleaned up ARM NEON compilation handling. The tests are now in pngpriv.h
     and detect the broken GCC compilers.
+
+Version 1.6.7beta04 [October 19, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

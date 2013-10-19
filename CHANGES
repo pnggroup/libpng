@@ -4695,6 +4695,8 @@ Version 1.6.7beta03 [October 19, 2013]
   Cleaned up ARM NEON compilation handling. The tests are now in pngpriv.h
     and detect the broken GCC compilers.
 
+Version 1.6.7beta04 [October 19, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
