@@ -4688,8 +4688,7 @@ Version 1.6.7beta02 [October 12, 2013]
 
 Version 1.6.7beta03 [October 19, 2013]
   Added ARMv8 support (James Yu <james.yu at linaro.org>).  Added file
-    arm/filter_neon_intrinsics.c; enable with configuration flag
-    PNG_ARM_NEON_INTRINSICS.
+    arm/filter_neon_intrinsics.c; enable with -mfpu=neon.
   Revised pngvalid to generate size images with as many filters as it can
     manage, limited by the number of rows.
   Cleaned up ARM NEON compilation handling. The tests are now in pngpriv.h
