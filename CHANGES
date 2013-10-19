@@ -4686,7 +4686,7 @@ Version 1.6.7beta02 [October 12, 2013]
   Make autogen.sh work with automake 1.13 as well as 1.14. Do this by always
     removing the 1.14 'compile' script but never checking for it.
 
-Version 1.6.7beta03 [October 18, 2013]
+Version 1.6.7beta03 [October 19, 2013]
   Added ARMv8 support (James Yu <james.yu at linaro.org>).  Added file
     arm/filter_neon_intrinsics.c; enable with configuration flag
     PNG_ARM_NEON_INTRINSICS.
