@@ -4694,7 +4694,11 @@ Version 1.6.7beta03 [October 19, 2013]
   Cleaned up ARM NEON compilation handling. The tests are now in pngpriv.h
     and detect the broken GCC compilers.
 
-Version 1.6.7beta04 [October 19, 2013]
+Version 1.6.7beta04 [October 24, 2013]
+  Allow clang derived from older GCC versions to use ARM intrinsics. This
+    causes all clang builds that use -mfpu=neon to use the intrinsics code,
+    not the assembler code.  This has only been tested on iOS 7. It may be
+    necessary to exclude some earlier clang versions but this seems unlikely.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

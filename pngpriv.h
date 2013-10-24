@@ -142,14 +142,19 @@
 
    /* Put compiler specific checks below: */
 #ifndef PNG_USE_ARM_NEON_ASM
-#  ifdef __GNUC__
+#  if defined(__clang__)
+      /* At present it is unknown by the libpng developers which versions of
+       * clang support the intrinsics, however some or perhaps all versions
+       * do not work with the assembler so this may be irrelevant.
+       */
+#  elif defined(__GNUC__)
       /* GCC 4.5.4 NEON support is known to be broken.  4.6.3 is known to work,
        * so if this *is* GCC, or G++, look for a version >4.5
        */
 #     if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)
 #        define PNG_USE_ARM_NEON_ASM
 #     endif
-#  endif
+#  endif /* __GNUC__ */
 #endif
 
 /* Is this a build of a DLL where compilation of the object modules requires
