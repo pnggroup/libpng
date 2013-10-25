@@ -15,7 +15,7 @@
 #include "pngpriv.h"
 
 /* This code requires -mfpu=neon on the command line: */
-#ifndef PNG_USE_ARM_NEON_ASM /* else use arm/filter_neon.S */
+#if PNG_ARM_NEON_IMPLEMENTATION == 1 /* intrinsics code */
 
 #include <arm_neon.h>
 
@@ -369,4 +369,4 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
 
 #endif /* PNG_ARM_NEON_OPT > 0 */
 #endif /* PNG_READ_SUPPORTED */
-#endif /* !PNG_USE_ARM_NEON_ASM */
+#endif /* PNG_ARM_NEON_IMPLEMENTATION == 1 (intrinsics) */

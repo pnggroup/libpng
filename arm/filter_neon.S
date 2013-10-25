@@ -25,7 +25,7 @@
  * only works if -mfpu=neon is specified on the GCC command line.  See pngpriv.h
  * for the logic which sets PNG_USE_ARM_NEON_ASM:
  */
-#ifdef PNG_USE_ARM_NEON_ASM /* else use arm/filter_neon_intrinsics.c */
+#if PNG_ARM_NEON_IMPLEMENTATION == 2 /* hand-coded assembler */
 
 #ifdef PNG_READ_SUPPORTED
 #if PNG_ARM_NEON_OPT > 0
@@ -242,4 +242,4 @@ func    png_read_filter_row_paeth3_neon, export=1
 endfunc
 #endif /* PNG_ARM_NEON_OPT > 0 */
 #endif /* PNG_READ_SUPPORTED */
-#endif /* PNG_USE_ARM_NEON_ASM */
+#endif /* PNG_ARM_NEON_IMPLEMENTATION == 2 (assembler) */
