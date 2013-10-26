@@ -4704,6 +4704,8 @@ Version 1.6.7beta04 [October 26, 2013]
     PNG_ARM_NEON_IMPLEMENTATION to the correct value (2 or 1).  This macro
     undefined by default and the build type is selected in pngpriv.h.
 
+Version 1.6.7beta05 [October 26, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
