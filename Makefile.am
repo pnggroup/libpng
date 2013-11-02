@@ -82,7 +82,7 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 
 if PNG_ARM_NEON
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
-	arm/filter_neon.S
+	arm/filter_neon.S arm/filter_neon_intrinsics.c
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
@@ -326,3 +326,8 @@ uninstall-hook:
 	rm -f '$(DESTDIR)$(libdir)/libpng.sl'
 	rm -f '$(DESTDIR)$(libdir)/libpng.dylib'
 	rm -f '$(DESTDIR)$(libdir)/libpng.dll.a'
+
+# The following addition ensures that 'make all' always builds the test programs
+# too.  It used to, but some change either in libpng or configure stopped this
+# working.
+all-am: $(check_PROGRAMS)

@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta21 - October 13, 2013
+Libpng 1.7.0beta21 - November 2, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -398,7 +398,20 @@ Version 1.7.0beta20 [October 13, 2013]
   Make autogen.sh work with automake 1.13 as well as 1.14. Do this by always
     removing the 1.14 'compile' script but never checking for it.
 
-Version 1.7.0beta21 [October 13, 2013]
+Version 1.7.0beta21 [November 2, 2013]
+  Added ARMv8 support (James Yu <james.yu at linaro.org>).  Added file
+    arm/filter_neon_intrinsics.c; enable with -mfpu=neon.
+  Revised pngvalid to generate size images with as many filters as it can
+    manage, limited by the number of rows.
+  Cleaned up ARM NEON compilation handling. The tests are now in pngpriv.h
+    and detect the broken GCC compilers.
+  Allow clang derived from older GCC versions to use ARM intrinsics. This
+    causes all clang builds that use -mfpu=neon to use the intrinsics code,
+    not the assembler code.  This has only been tested on iOS 7. It may be
+    necessary to exclude some earlier clang versions but this seems unlikely.
+  Changed NEON implementation selection mechanism. This allows assembler
+    or intrinsics to be turned on at compile time during the build by defining
+    PNG_ARM_NEON_IMPLEMENTATION to the correct value (2 or 1).  This macro
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
