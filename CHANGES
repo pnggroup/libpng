@@ -4705,6 +4705,9 @@ Version 1.6.7beta04 [October 26, 2013]
     is undefined by default and the build type is selected in pngpriv.h.
 
 Version 1.6.7rc01 [November 2, 2013]
+  No changes.
+
+Version 1.6.7rc02 [November 2, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
