@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.3 [July 18, 2013]
+ * Last changed in libpng 1.6.7 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -157,11 +157,11 @@
 #              define PNG_ARM_NEON_IMPLEMENTATION 2
 #           endif /* no GNUC support */
 #        endif /* __GNUC__ */
-#     else /* !__ARM_NEON__ */
+#     else /* !defined __ARM_NEON__ */
          /* The 'intrinsics' code simply won't compile without this -mfpu=neon:
           */
 #        define PNG_ARM_NEON_IMPLEMENTATION 2
-#     endif /* !__ARM_NEON */
+#     endif /* __ARM_NEON__ */
 #  endif /* !defined PNG_ARM_NEON_IMPLEMENTATION */
 
 #  ifndef PNG_ARM_NEON_IMPLEMENTATION
