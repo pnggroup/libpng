@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta21 - November 2, 2013
+Libpng 1.7.0beta22 - November 2, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta21.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta21.tar.gz
+   1.7.0beta22.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta22.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b21.7z  (LZMA-compressed, recommended)
-   lp170b21.zip
+   lp170b22.7z  (LZMA-compressed, recommended)
+   lp170b22.zip
 
 Other information:
 
-   1.7.0beta21-README.txt
-   1.7.0beta21-LICENSE.txt
+   1.7.0beta22-README.txt
+   1.7.0beta22-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -412,6 +412,8 @@ Version 1.7.0beta21 [November 2, 2013]
   Changed NEON implementation selection mechanism. This allows assembler
     or intrinsics to be turned on at compile time during the build by defining
     PNG_ARM_NEON_IMPLEMENTATION to the correct value (2 or 1).  This macro
+
+Version 1.7.0beta22 [November 2, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
