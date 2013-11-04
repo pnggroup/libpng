@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 #include <errno.h>
 #include <assert.h>
 
@@ -908,10 +909,10 @@ emit_string(const char *str, FILE *out)
     */
 {
    for (; *str; ++str)
-      if (isgraph(*str))
+      if (isgraph(UCHAR_MAX & *str))
          putc(*str, out);
 
-      else if (isspace(*str))
+      else if (isspace(UCHAR_MAX & *str))
          putc('_', out);
    
       else

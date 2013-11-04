@@ -12,7 +12,7 @@
  * and license in png.h
  */
 
-#include "pngpriv.h"
+#include "../pngpriv.h"
 
 /* This code requires -mfpu=neon on the command line: */
 #if PNG_ARM_NEON_IMPLEMENTATION == 1 /* intrinsics code */
