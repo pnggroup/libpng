@@ -412,6 +412,7 @@ Version 1.7.0beta21 [November 2, 2013]
   Changed NEON implementation selection mechanism. This allows assembler
     or intrinsics to be turned on at compile time during the build by defining
     PNG_ARM_NEON_IMPLEMENTATION to the correct value (2 or 1).  This macro
+    is undefined by default and the build type is selected in pngpriv.h.
 
 Version 1.7.0beta22 [November 2, 2013]
 
