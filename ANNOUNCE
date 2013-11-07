@@ -1,5 +1,5 @@
 
-Libpng 1.6.7rc02 - November 4, 2013
+Libpng 1.6.7rc02 - November 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -93,7 +93,7 @@ Version 1.6.7beta04 [October 26, 2013]
 Version 1.6.7rc01 [November 2, 2013]
   No changes.
 
-Version 1.6.7rc02 [November 4, 2013]
+Version 1.6.7rc02 [November 7, 2013]
   Fixed #include in filter_neon_intrinsics.c and ctype macros. The ctype char
     checking macros take an unsigned char argument, not a signed char.
 
