@@ -4711,6 +4711,8 @@ Version 1.6.7rc02 [November 7, 2013]
   Fixed #include in filter_neon_intrinsics.c and ctype macros. The ctype char
     checking macros take an unsigned char argument, not a signed char.
 
+Version 1.6.7rc03 [November 7, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
