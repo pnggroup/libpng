@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta22 - November 4, 2013
+Libpng 1.7.0beta22 - November 7, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -414,7 +414,7 @@ Version 1.7.0beta21 [November 2, 2013]
     PNG_ARM_NEON_IMPLEMENTATION to the correct value (2 or 1).  This macro
     is undefined by default and the build type is selected in pngpriv.h.
 
-Version 1.7.0beta22 [November 4, 2013]
+Version 1.7.0beta22 [November 7, 2013]
   Fixed #include in filter_neon_intrinsics.c and ctype macros. The ctype char
     checking macros take an unsigned char argument, not a signed char.
 
