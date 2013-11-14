@@ -99,12 +99,12 @@ $(PNGCONF): $(PNGSRC)/scripts/pnglibconf.mak $(ZH)\
 	$(PNGSRC)/scripts/pnglibconf.dfa \
 	$(PNGSRC)/scripts/options.awk pngusr.h pngusr.dfa
 	$(RM) pnglibconf.h pnglibconf.dfn
-	$(MAKE) $(MAKEFLAGS) -f $(PNGSRC)/scripts/pnglibconf.mak\
+	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf.mak $(MAKEFLAGS)\
 	    srcdir=$(PNGSRC) CPPFLAGS="-DPNG_USER_CONFIG -I."\
 	    DFA_XTRA="pngusr.dfa" $@
 
 clean:
-	$(MAKE) $(MAKEFLAGS) -f $(PNGSRC)/scripts/pnglibconf.mak\
+	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf.mak $(MAKEFLAGS)\
 	    srcdir=$(PNGSRC) clean
 	$(RM) pnm2pngm$(O)
 	$(RM) pnm2pngm$(E)

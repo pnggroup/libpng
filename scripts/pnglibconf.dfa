@@ -753,6 +753,13 @@ option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS, STORE_UNKNOWN_CHUNKS
 # chunks, the callback can either handle the chunk entirely itself or request
 # that libpng store the chunk for later retrieval via png_get_unknown_chunks.
 #
+# NOTE: If STORE_UNKNOWN_CHUNKS is not enabled (which is the default if
+# both SAVE_UNKNOWN_CHUNKS and WRITE_UNKNOWN_CHUNKS are disabled) then a
+# 0 result from the callback will be ignored because no support for saving
+# unknown chunks has been compiled in.  The normal symptom is that your app
+# fails to compile because png_get_unknown_chunks is no longer defined in png.h.
+# If you encounter this issue simply enable STORE_UNKNOWN_CHUNKS in your build.
+#
 # Note that there is no 'WRITE_USER_CHUNKS' so the USER_CHUNKS option is always
 # the same as READ_USER_CHUNKS at present
 option READ_USER_CHUNKS requires READ, UNKNOWN_CHUNKS
@@ -834,7 +841,7 @@ option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
 # Simplified API options (added at libpng-1.6.0)
 # Read:
 option SIMPLIFIED_READ,
-   requires SEQUENTIAL_READ READ_TRANSFORMS, SETJMP, BENIGN_ERRORS READ_GAMMA,
+   requires SEQUENTIAL_READ, READ_TRANSFORMS, SETJMP, BENIGN_ERRORS READ_GAMMA,
    enables READ_EXPAND, READ_16BIT READ_EXPAND_16, READ_SCALE_16_TO_8,
       READ_RGB_TO_GRAY, READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA,
       READ_FILLER, READ_SWAP

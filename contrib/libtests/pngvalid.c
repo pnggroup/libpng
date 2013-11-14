@@ -616,7 +616,12 @@ typedef struct png_store
    unsigned int       validated :1;   /* used as a temporary flag */
    int                nerrors;
    int                nwarnings;
-   char               test[128]; /* Name of test */
+   int                noptions;       /* number of options below: */
+   struct {
+      unsigned char   option;         /* option number, 0..30 */
+      unsigned char   setting;        /* setting (unset,invalid,on,off) */
+   }                  options[16];
+   char               test[128];      /* Name of test */
    char               error[256];
 
    /* Read fields */
@@ -717,6 +722,7 @@ store_init(png_store* ps)
    ps->new.prev = NULL;
    ps->palette = NULL;
    ps->npalette = 0;
+   ps->noptions = 0;
 }
 
 static void
@@ -1518,6 +1524,16 @@ set_store_for_write(png_store *ps, png_infopp ppi,
 
       png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
 
+#     ifdef PNG_SET_OPTION_SUPPORTED
+         {
+            int opt;
+            for (opt=0; opt<ps->noptions; ++opt)
+               if (png_set_option(ps->pwrite, ps->options[opt].option,
+                  ps->options[opt].setting) == PNG_OPTION_INVALID)
+                  png_error(ps->pwrite, "png option invalid");
+         }
+#     endif
+
       if (ppi != NULL)
          *ppi = ps->piwrite = png_create_info_struct(ps->pwrite);
    }
@@ -1581,14 +1597,14 @@ store_read_set(png_store *ps, png_uint_32 id)
       pf = pf->next;
    }
 
-      {
+   {
       size_t pos;
       char msg[FILE_NAME_SIZE+64];
 
       pos = standard_name_from_id(msg, sizeof msg, 0, id);
       pos = safecat(msg, sizeof msg, pos, ": file not found");
       png_error(ps->pread, msg);
-      }
+   }
 }
 
 /* The main interface for reading a saved file - pass the id number of the file
@@ -1632,6 +1648,16 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
 
       Throw ps;
    }
+
+#  ifdef PNG_SET_OPTION_SUPPORTED
+      {
+         int opt;
+         for (opt=0; opt<ps->noptions; ++opt)
+            if (png_set_option(ps->pread, ps->options[opt].option,
+               ps->options[opt].setting) == PNG_OPTION_INVALID)
+                  png_error(ps->pread, "png option invalid");
+      }
+#  endif
 
    store_read_set(ps, id);
 
@@ -2919,6 +2945,12 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
  * height of 16 rows.  The width and height are stored in the FILEID and, being
  * non-zero, indicate a size file.
  *
+ * Because the PNG filter code is typically the largest CPU consumer within
+ * libpng itself there is a tendency to attempt to optimize it.  This results in
+ * special case code which needs to be validated.  To cause this to happen the
+ * 'size' images are made to use each possible filter, in so far as this is
+ * possible for smaller images.
+ *
  * For palette image (colour type 3) multiple transform images are stored with
  * the same bit depth to allow testing of more colour combinations -
  * particularly important for testing the gamma code because libpng uses a
@@ -3634,6 +3666,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
+         int nfilter = PNG_FILTER_VALUE_LAST;
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -3687,7 +3720,22 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
                      continue;
                }
 
-               /* Only get to here if the row has some pixels in it. */
+               /* Only get to here if the row has some pixels in it, set the
+                * filters to 'all' for the very first row and thereafter to a
+                * single filter.  It isn't well documented, but png_set_filter
+                * does accept a filter number (per the spec) as well as a bit
+                * mask.
+                *
+                * The apparent wackiness of decrementing nfilter rather than
+                * incrementing is so that Paeth gets used in all images bigger
+                * than 1 row - it's the tricky one.
+                */
+               png_set_filter(pp, 0/*method*/,
+                  nfilter >= PNG_FILTER_VALUE_LAST ? PNG_ALL_FILTERS : nfilter);
+
+               if (nfilter-- == 0)
+                  nfilter = PNG_FILTER_VALUE_LAST-1;
+
                png_write_row(pp, row);
             }
          }
@@ -5988,7 +6036,7 @@ transform_test(png_modifier *pmIn, PNG_CONST png_uint_32 idIn,
 
    Catch(fault)
    {
-      modifier_reset((png_modifier*)fault);
+      modifier_reset(voidcast(png_modifier*,(void*)fault));
    }
 }
 
@@ -7122,7 +7170,7 @@ transform_enable(PNG_CONST char *name)
    {
       fprintf(stderr, "pngvalid: --transform-enable=%s: unknown transform\n",
          name);
-      exit(1);
+      exit(99);
    }
 }
 
@@ -7144,7 +7192,7 @@ transform_disable(PNG_CONST char *name)
 
    fprintf(stderr, "pngvalid: --transform-disable=%s: unknown transform\n",
       name);
-   exit(1);
+   exit(99);
 }
 
 static void
@@ -8692,7 +8740,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
    }
 
    Catch(fault)
-      modifier_reset((png_modifier*)fault);
+      modifier_reset(voidcast(png_modifier*,(void*)fault));
 }
 
 static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
@@ -9448,7 +9496,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_START_ROW(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       m = PNG_PASS_START_COL(pass);
@@ -9456,7 +9504,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_START_COL(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       m = PNG_PASS_ROW_SHIFT(pass);
@@ -9464,7 +9512,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_ROW_SHIFT(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       m = PNG_PASS_COL_SHIFT(pass);
@@ -9472,7 +9520,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_COL_SHIFT(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       /* Macros that depend on the image or sub-image height too:
@@ -9493,7 +9541,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_ROW_FROM_PASS_ROW(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_COL_FROM_PASS_COL(v, pass);
@@ -9502,7 +9550,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_COL_FROM_PASS_COL(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_ROW_IN_INTERLACE_PASS(v, pass);
@@ -9511,7 +9559,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_ROW_IN_INTERLACE_PASS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_COL_IN_INTERLACE_PASS(v, pass);
@@ -9520,7 +9568,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_COL_IN_INTERLACE_PASS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          /* Then the base 1 stuff: */
@@ -9531,7 +9579,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_PASS_ROWS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_PASS_COLS(v, pass);
@@ -9540,7 +9588,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_PASS_COLS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          /* Move to the next v - the stepping algorithm starts skipping
@@ -9944,7 +9992,7 @@ int main(int argc, char **argv)
          else
          {
             fprintf(stderr, "pngvalid: %s: unknown 'max' option\n", *argv);
-            exit(1);
+            exit(99);
          }
 
          catmore = 1;
@@ -9956,10 +10004,51 @@ int main(int argc, char **argv)
       else if (strcmp(*argv, "--log16") == 0)
          --argc, pm.log16 = atof(*++argv), catmore = 1;
 
+#ifdef PNG_SET_OPTION_SUPPORTED
+      else if (strncmp(*argv, "--option=", 9) == 0)
+      {
+         /* Syntax of the argument is <option>:{on|off} */
+         const char *arg = 9+*argv;
+         unsigned char option=0, setting=0;
+
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+         if (strncmp(arg, "arm-neon:", 9) == 0)
+            option = PNG_ARM_NEON, arg += 9;
+
+         else
+#endif
+         if (strncmp(arg, "max-inflate-window:", 19) == 0)
+            option = PNG_MAXIMUM_INFLATE_WINDOW, arg += 19;
+
+         else
+         {
+            fprintf(stderr, "pngvalid: %s: %s: unknown option\n", *argv, arg);
+            exit(99);
+         }
+
+         if (strcmp(arg, "off") == 0)
+            setting = PNG_OPTION_OFF;
+
+         else if (strcmp(arg, "on") == 0)
+            setting = PNG_OPTION_ON;
+
+         else
+         {
+            fprintf(stderr,
+               "pngvalid: %s: %s: unknown setting (use 'on' or 'off')\n",
+               *argv, arg);
+            exit(99);
+         }
+
+         pm.this.options[pm.this.noptions].option = option;
+         pm.this.options[pm.this.noptions++].setting = setting;
+      }
+#endif /* PNG_SET_OPTION_SUPPORTED */
+
       else
       {
          fprintf(stderr, "pngvalid: %s: unknown argument\n", *argv);
-         exit(1);
+         exit(99);
       }
 
       if (catmore) /* consumed an extra *argv */
