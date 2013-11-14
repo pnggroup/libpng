@@ -184,7 +184,8 @@
  *    1.6.5                   16    10605  16.so.16.5[.0]
  *    1.6.6                   16    10606  16.so.16.6[.0]
  *    1.6.7beta01-04          16    10607  16.so.16.7[.0]
- *    1.6.7rc01-03            16    10607  16.so.16.7[.0]
+ *    1.6.7rc01-02            16    10607  16.so.16.7[.0]
+ *    1.6.7                   16    10607  16.so.16.7[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
