@@ -1,32 +1,30 @@
 
-Libpng 1.6.7rc03 - November 7, 2013
+Libpng 1.6.7 - November 14, 2013
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.7rc03.tar.xz (LZMA-compressed, recommended)
-   1.6.7rc03.tar.gz
+   libpng-1.6.7.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.7.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp167r03.7z  (LZMA-compressed, recommended)
-   lp167r03.zip
+   lpng167.7z  (LZMA-compressed, recommended)
+   lpng167.zip
 
 Other information:
 
-   1.6.7rc03-README.txt
-   1.6.7rc03-LICENSE.txt
+   libpng-1.6.7-README.txt
+   libpng-1.6.7-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.6):
 
-Version 1.6.7beta01 [September 30, 2013]
   Revised unknown chunk code to correct several bugs in the NO_SAVE_/NO_WRITE
     combination
   Allow HANDLE_AS_UNKNOWN to work when other options are configured off. Also
@@ -45,8 +43,6 @@ Version 1.6.7beta01 [September 30, 2013]
     if SAVE_UNKNOWN was not available but did nothing since the callback
     was never implemented.
   Merged pngunknown.c with 1.7 version and back ported 1.7 improvements/fixes
-
-Version 1.6.7beta02 [October 12, 2013]
   Made changes for compatibility with automake 1.14:
     1) Added the 'compile' program to the list of programs that must be cleaned
        in autogen.sh
@@ -71,16 +67,12 @@ Version 1.6.7beta02 [October 12, 2013]
     condition ? string-literal : string-literal).
   Make autogen.sh work with automake 1.13 as well as 1.14. Do this by always
     removing the 1.14 'compile' script but never checking for it.
-
-Version 1.6.7beta03 [October 19, 2013]
   Added ARMv8 support (James Yu <james.yu at linaro.org>).  Added file
     arm/filter_neon_intrinsics.c; enable with -mfpu=neon.
   Revised pngvalid to generate size images with as many filters as it can
     manage, limited by the number of rows.
   Cleaned up ARM NEON compilation handling. The tests are now in pngpriv.h
     and detect the broken GCC compilers.
-
-Version 1.6.7beta04 [October 26, 2013]
   Allow clang derived from older GCC versions to use ARM intrinsics. This
     causes all clang builds that use -mfpu=neon to use the intrinsics code,
     not the assembler code.  This has only been tested on iOS 7. It may be
@@ -89,15 +81,8 @@ Version 1.6.7beta04 [October 26, 2013]
     or intrinsics to be turned on at compile time during the build by defining
     PNG_ARM_NEON_IMPLEMENTATION to the correct value (2 or 1).  This macro
     is undefined by default and the build type is selected in pngpriv.h.
-
-Version 1.6.7rc01 [November 2, 2013]
-  No changes.
-
-Version 1.6.7rc02 [November 7, 2013]
   Fixed #include in filter_neon_intrinsics.c and ctype macros. The ctype char
     checking macros take an unsigned char argument, not a signed char.
-
-Version 1.6.7rc03 [November 7, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
