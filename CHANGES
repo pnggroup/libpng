@@ -4713,7 +4713,8 @@ Version 1.6.7rc02 [November 7, 2013]
 
 Version 1.6.7 [November 14, 2013]
 
-Version 1.6.8beta01 [November 14, 2013]
+Version 1.6.8beta01 [November 17, 2013]
+  Added #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED/#endif in pngpread.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
