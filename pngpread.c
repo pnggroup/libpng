@@ -185,7 +185,7 @@ void /* PRIVATE */
 png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_uint_32 chunk_name;
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
    int keep; /* unknown handling method */
 #endif
 
@@ -271,7 +271,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       png_push_have_end(png_ptr, info_ptr);
    }
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
    else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)) != 0)
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -285,8 +285,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       if (chunk_name == png_PLTE)
          png_ptr->mode |= PNG_HAVE_PLTE;
    }
-
 #endif
+
    else if (chunk_name == png_PLTE)
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
