@@ -4719,6 +4719,7 @@ Version 1.6.8beta01 [November 18, 2013]
     what is in pngpriv.h.
   Moved prototype for png_handle_unknown() in pngpriv.h outside of
     the #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED/#endif block.
+  Added "-Wall" to CFLAGS in contrib/pngminim/*/makefile
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
