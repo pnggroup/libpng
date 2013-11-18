@@ -31,7 +31,7 @@ XLIB = -L/usr/X11R6/lib -lX11
 LIBS = $(XLIB) -lm                      #platforms that need libm
 
 CPPFLAGS=-I. $(XINC) -DPNG_USER_CONFIG -DNO_GZCOMPRESS -DZ_SOLO -DNO_GZIP
-CFLAGS=-O1
+CFLAGS=-O1 -Wall
 
 C=.c
 O=.o
