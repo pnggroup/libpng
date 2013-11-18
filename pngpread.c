@@ -530,7 +530,6 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    }
 #endif
 
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    else
    {
       if (png_ptr->push_length + 4 > png_ptr->buffer_size)
@@ -538,10 +537,11 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
          png_push_save_buffer(png_ptr);
          return;
       }
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
       png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length,
          PNG_HANDLE_CHUNK_AS_DEFAULT);
-   }
 #endif
+   }
 
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
 }
