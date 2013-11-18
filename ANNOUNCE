@@ -1,5 +1,5 @@
 
-Libpng 1.6.8beta01 - November 17, 2013
+Libpng 1.6.8beta01 - November 18, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,8 +26,12 @@ Other information:
 
 Changes since the last public release (1.6.7):
 
-Version 1.6.8beta01 [November 17, 2013]
-  Added #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED/#endif in pngpread.c
+Version 1.6.8beta01 [November 18, 2013]
+  Changed #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpread.c to
+    #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED to be consistent with
+    what is in pngpriv.h.
+  Moved prototype for png_handle_unknown() in pngpriv.h outside of
+    the #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED/#endif block.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
