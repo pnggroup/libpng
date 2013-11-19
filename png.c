@@ -768,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.8beta01 - November 14, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.6.8beta01 - November 19, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.8beta01 - November 14, 2013\
+      return "libpng version 1.6.8beta01 - November 19, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3268,27 +3268,29 @@ png_gamma_significant(png_fixed_point gamma_val)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
+#  ifdef PNG_16BIT_SUPPORTED
 /* A local convenience routine. */
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
 {
    /* The required result is 1/a * 1/b; the following preserves accuracy. */
-#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+#    ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    double r = a * 1E-5;
    r *= b;
    r = floor(r+.5);
 
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
-#else
+#    else
    png_fixed_point res;
 
    if (png_muldiv(&res, a, b, 100000))
       return res;
-#endif
+#    endif
 
    return 0; /* overflow */
 }
+#  endif /* 16BIT */
 
 /* The inverse of the above. */
 png_fixed_point
@@ -3593,6 +3595,7 @@ png_exp8bit(png_fixed_point lg2)
    return (png_byte)((x + 0x7fffffU) >> 24);
 }
 
+#ifdef PNG_16BIT_SUPPORTED
 static png_uint_16
 png_exp16bit(png_fixed_point lg2)
 {
@@ -3603,6 +3606,7 @@ png_exp16bit(png_fixed_point lg2)
    x -= x >> 16;
    return (png_uint_16)((x + 32767U) >> 16);
 }
+#endif /* 16BIT */
 #endif /* FLOATING_ARITHMETIC */
 
 png_byte
@@ -3628,6 +3632,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
    return (png_byte)value;
 }
 
+#ifdef PNG_16BIT_SUPPORTED
 png_uint_16
 png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
 {
@@ -3650,6 +3655,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
 
    return (png_uint_16)value;
 }
+#endif /* 16BIT */
 
 /* This does the right thing based on the bit_depth field of the
  * png_struct, interpreting values as 8-bit or 16-bit.  While the result
@@ -3663,10 +3669,16 @@ png_gamma_correct(png_structrp png_ptr, unsigned int value,
    if (png_ptr->bit_depth == 8)
       return png_gamma_8bit_correct(value, gamma_val);
 
+#ifdef PNG_16BIT_SUPPORTED
    else
       return png_gamma_16bit_correct(value, gamma_val);
+#else
+      /* should not reach this */
+      return 0;
+#endif /* 16BIT */
 }
 
+#ifdef PNG_16BIT_SUPPORTED
 /* Internal function to build a single 16-bit table - the table consists of
  * 'num' 256 entry subtables, where 'num' is determined by 'shift' - the amount
  * to shift the input values right (or 16-number_of_signifiant_bits).
@@ -3805,6 +3817,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
       last++;
    }
 }
+#endif /* 16BIT */
 
 /* Build a single 8-bit table: same as the 16-bit case but much simpler (and
  * typically much faster).  Note that libpng currently does no sBIT processing
@@ -3833,6 +3846,7 @@ png_destroy_gamma_table(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->gamma_table);
    png_ptr->gamma_table = NULL;
 
+#ifdef PNG_16BIT_SUPPORTED
    if (png_ptr->gamma_16_table != NULL)
    {
       int i;
@@ -3844,6 +3858,7 @@ png_destroy_gamma_table(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->gamma_16_table);
    png_ptr->gamma_16_table = NULL;
    }
+#endif /* 16BIT */
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
@@ -3853,6 +3868,7 @@ png_destroy_gamma_table(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->gamma_to_1);
    png_ptr->gamma_to_1 = NULL;
 
+#ifdef PNG_16BIT_SUPPORTED
    if (png_ptr->gamma_16_from_1 != NULL)
    {
       int i;
@@ -3875,6 +3891,7 @@ png_destroy_gamma_table(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->gamma_16_to_1);
    png_ptr->gamma_16_to_1 = NULL;
    }
+#endif /* 16BIT */
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
 }
 
@@ -3920,6 +3937,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
      }
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
   }
+#ifdef PNG_16BIT_SUPPORTED
   else
   {
      png_byte shift, sig_bit;
@@ -3976,24 +3994,20 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 
      png_ptr->gamma_shift = shift;
 
-#ifdef PNG_16BIT_SUPPORTED
      /* NOTE: prior to 1.5.4 this test used to include PNG_BACKGROUND (now
       * PNG_COMPOSE).  This effectively smashed the background calculation for
       * 16-bit output because the 8-bit table assumes the result will be reduced
       * to 8 bits.
       */
      if (png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8))
-#endif
          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_product2(png_ptr->colorspace.gamma,
          png_ptr->screen_gamma) : PNG_FP_1);
 
-#ifdef PNG_16BIT_SUPPORTED
      else
          png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->colorspace.gamma,
          png_ptr->screen_gamma) : PNG_FP_1);
-#endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
@@ -4013,6 +4027,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
      }
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
   }
+#endif /* 16BIT */
 }
 #endif /* READ_GAMMA */
 

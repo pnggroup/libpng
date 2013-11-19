@@ -33,6 +33,7 @@ Version 1.6.8beta01 [November 19, 2013]
   Moved prototype for png_handle_unknown() in pngpriv.h outside of
     the #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED/#endif block.
   Added "-Wall" to CFLAGS in contrib/pngminim/*/makefile
+  Conditionally compile some unused functions reported by -Wall in pngminim.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
