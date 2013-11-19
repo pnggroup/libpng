@@ -1218,7 +1218,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_finish_IDAT,(png_structrp png_ptr),
 PNG_INTERNAL_FUNCTION(void,png_read_finish_row,(png_structrp png_ptr),
    PNG_EMPTY);
    /* Finish a row while reading, dealing with interlacing passes, etc. */
-#endif
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 /* Initialize the row buffers, etc. */
 PNG_INTERNAL_FUNCTION(void,png_read_start_row,(png_structrp png_ptr),PNG_EMPTY);
@@ -1472,16 +1472,14 @@ PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     * just skips the chunk or errors out if it is critical.
     */
 
-#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) ||\
-   defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+    defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
 PNG_INTERNAL_FUNCTION(int,png_chunk_unknown_handling,
     (png_const_structrp png_ptr, png_uint_32 chunk_name),PNG_EMPTY);
    /* Exactly as the API png_handle_as_unknown() except that the argument is a
     * 32-bit chunk name, not a string.
     */
 #endif /* READ_UNKNOWN_CHUNKS || HANDLE_AS_UNKNOWN */
-#endif /* PNG_SET_UNKNOWN_CHUNKS_SUPPORTED */
 
 /* Handle the transformations for reading and writing */
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
