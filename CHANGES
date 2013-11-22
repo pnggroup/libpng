@@ -4724,6 +4724,7 @@ Version 1.6.8beta01 [November 22, 2013]
     complex dependencies in scripts/pnglibconf.dfa. This change adds
     contrib/conftest/*.dfa files that can be used in automatic build
     scripts to ensure that these configurations continue to build.
+  Enabled WRITE_INVERT and WRITE_PACK in contrib/pngminim/encoder.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
