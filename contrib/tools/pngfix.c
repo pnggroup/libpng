@@ -50,7 +50,7 @@
 #  error "pngfix will not work with libpng prior to 1.6.3"
 #endif
 
-#ifdef PNG_READ_SUPPORTED
+#if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED)
 /* zlib.h defines the structure z_stream, an instance of which is included
  * in this structure and is required for decompressing the LZ compressed
  * data in PNG files.
@@ -141,6 +141,11 @@
 
 /* Is it safe to copy? */
 #define SAFE_TO_COPY(chunk) (((chunk) & PNG_U32(0,0,0,32)) != 0)
+
+/* Fix ups for builds with limited read support */
+#ifndef PNG_ERROR_TEXT_SUPPORTED
+#  define png_error(a,b) png_err(a)
+#endif
 
 /********************************* UTILITIES **********************************/
 /* UNREACHED is a value to cause an assert to fail. Because of the way the
@@ -3644,7 +3649,7 @@ read_png(struct control *control)
    return rc;
 }
 
-static void
+static int
 one_file(struct global *global, const char *file_name, const char *out_name)
 {
    int rc;
@@ -3663,6 +3668,8 @@ one_file(struct global *global, const char *file_name, const char *out_name)
       rc = read_png(&control);
 
    rc |= control_end(&control);
+
+   return rc;
 }
 
 static void
@@ -4031,4 +4038,4 @@ main(void)
    fprintf(stderr, "pngfix does not work without read support\n");
    return 77;
 }
-#endif /* PNG_READ_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED && PNG_EASY_ACCESS_SUPPORTED */
