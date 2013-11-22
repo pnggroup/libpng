@@ -4713,11 +4713,17 @@ Version 1.6.7rc02 [November 7, 2013]
 
 Version 1.6.7 [November 14, 2013]
 
-Version 1.6.8beta01 [November 19, 2013]
+Version 1.6.8beta01 [November 22, 2013]
   Moved prototype for png_handle_unknown() in pngpriv.h outside of
     the #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED/#endif block.
   Added "-Wall" to CFLAGS in contrib/pngminim/*/makefile
-  Conditionally compile some unused functions reported by -Wall in pngminim.
+  Conditionally compile some unused functions reported by -Wall in
+    pngminim.
+  Fixed 'minimal' builds. Various obviously useful minimal configurations
+    don't build because of missing contrib/libtests test programs and overly
+    complex dependencies in scripts/pnglibconf.dfa. This change adds
+    contrib/conftest/*.dfa files that can be used in automatic build
+    scripts to ensure that these configurations continue to build.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
