@@ -258,6 +258,10 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     */
 #  ifdef PNG_USER_MEM_SUPPORTED
       png_set_mem_fn(&create_struct, mem_ptr, malloc_fn, free_fn);
+#  else
+      PNG_UNUSED(mem_ptr)
+      PNG_UNUSED(malloc_fn)
+      PNG_UNUSED(free_fn)
 #  endif
 
    /* (*error_fn) can return control to the caller after the error_ptr is set,
@@ -691,13 +695,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta23 - November 7, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta23 - November 22, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta23 - November 7, 2013\
+      return "libpng version 1.7.0beta23 - November 22, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3008,10 +3012,14 @@ png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 
    /* Overflow */
    png_fixed_error(png_ptr, text);
+
+#  ifndef PNG_ERROR_TEXT_SUPPORTED
+   PNG_UNUSED(text)
+#  endif
 }
 #endif
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) || \
+#if defined(PNG_GAMMA_SUPPORTED) || defined(PNG_COLORSPACE_SUPPORTED) ||\
     defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* muldiv functions */
 /* This API takes signed arguments and rounds the result to the nearest

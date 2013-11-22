@@ -149,9 +149,15 @@
     * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
     * with GCC) then the compiler will define __ARM_NEON__ and we can rely
     * unconditionally on NEON instructions not crashing, otherwise we must
-    * disable use of NEON instructions:
+    * disable use of NEON instructions.
+    *
+    * NOTE: at present these optimizations depend on 'ALIGNED_MEMORY', so they
+    * can only be turned on automatically if that is supported too.  If
+    * PNG_ARM_NEON_OPT is set in CPPFLAGS (to >0) then arm/arm_init.c will fail
+    * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
+    * off.
     */
-#  ifdef __ARM_NEON__
+#  if defined(__ARM_NEON__) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 #     define PNG_ARM_NEON_OPT 2
 #  else
 #     define PNG_ARM_NEON_OPT 0
@@ -1130,7 +1136,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_finish_IDAT,(png_structrp png_ptr),
 PNG_INTERNAL_FUNCTION(void,png_read_finish_row,(png_structrp png_ptr),
    PNG_EMPTY);
    /* Finish a row while reading, dealing with interlacing passes, etc. */
-#endif
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 /* Initialize the row buffers, etc. */
 PNG_INTERNAL_FUNCTION(void,png_read_start_row,(png_structrp png_ptr),PNG_EMPTY);
@@ -1810,7 +1816,7 @@ PNG_INTERNAL_FUNCTION(int,png_check_fp_string,(png_const_charp string,
    png_size_t size),PNG_EMPTY);
 #endif /* pCAL || sCAL */
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
+#if defined(PNG_GAMMA_SUPPORTED) ||\
     defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* Added at libpng version 1.5.0 */
 /* This is a utility to provide a*times/div (rounded) and indicate

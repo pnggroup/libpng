@@ -73,9 +73,10 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
     * to implement a user memory handler.  This checks to be sure it isn't
     * called with big numbers.
     */
-#ifdef PNG_USER_MEM_SUPPORTED
+#ifndef PNG_USER_MEM_SUPPORTED
    PNG_UNUSED(png_ptr)
 #endif
+
    if (size > 0 && size <= PNG_SIZE_MAX
 #     ifdef PNG_MAX_MALLOC_64K
          && size <= 65536U
@@ -95,6 +96,8 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
       return NULL;
 }
 
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
+   defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED)
 /* This is really here only to work round a spurious warning in GCC 4.6 and 4.7
  * that arises because of the checks in png_realloc_array that are repeated in
  * png_malloc_array.
@@ -165,6 +168,7 @@ png_realloc_array,(png_structrp png_ptr, png_const_voidp old_array,
 
    return NULL; /* error */
 }
+#endif /* TEXT || sPLT || STORE_UNKNOWN_CHUNKS */
 
 /* Various functions that have different error handling are derived from this.
  * png_malloc always exists, but if PNG_USER_MEM_SUPPORTED is defined a separate

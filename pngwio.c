@@ -149,6 +149,8 @@ png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
 #  else
    png_ptr->output_flush_fn = output_flush_fn;
 #  endif
+#else
+   PNG_UNUSED(output_flush_fn)
 #endif /* PNG_WRITE_FLUSH_SUPPORTED */
 
 #ifdef PNG_READ_SUPPORTED

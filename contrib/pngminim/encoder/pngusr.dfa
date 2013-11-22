@@ -14,6 +14,10 @@ everything = off
 
 option WRITE on
 
+# These 2 options are required if you need to read PBM (P1 or P4) files.
+option WRITE_INVERT on
+option WRITE_PACK on
+
 # You must choose fixed or floating point arithmetic:
 # option FLOATING_POINT on
 
