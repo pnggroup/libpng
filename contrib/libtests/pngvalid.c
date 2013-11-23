@@ -1953,11 +1953,9 @@ typedef struct png_modifier
 } png_modifier;
 
 /* This returns true if the test should be stopped now because it has already
- * failed and it is running silently.  It is not static simply to avoid having
- * to special case it on all the #ifdefs on which it depends.
- */
-extern int fail(png_modifier *pm);
-/*static*/ int fail(png_modifier *pm)
+ * failed and it is running silently.
+  */
+static int fail(png_modifier *pm)
 {
    return !pm->log && !pm->this.verbose && (pm->this.nerrors > 0 ||
        (pm->this.treat_warnings_as_errors && pm->this.nwarnings > 0));
@@ -10267,6 +10265,9 @@ int main(int argc, char **argv)
       }
    }
 
+   /* This is required because some very minimal configurations do not use it:
+    */
+   UNUSED(fail)
    return 0;
 }
 #else /* write or low level APIs not supported */
