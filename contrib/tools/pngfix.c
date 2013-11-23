@@ -3336,6 +3336,8 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
             /* FALL THROUGH */
 
          default:
+            assert(chunk != NULL);
+
             /* NOTE: the arithmetic below overflows and gives a large positive
              * png_uint_32 value until the whole chunk data has been written.
              */
