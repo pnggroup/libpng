@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
- * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.8 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -3336,6 +3336,8 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
             /* FALL THROUGH */
 
          default:
+            assert(chunk != NULL);
+
             /* NOTE: the arithmetic below overflows and gives a large positive
              * png_uint_32 value until the whole chunk data has been written.
              */
