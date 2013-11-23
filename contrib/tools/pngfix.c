@@ -3323,6 +3323,8 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
 
             else
             {
+               assert(chunk != NULL);
+
                /* Set up for write, notice that repositioning the input stream
                 * is only necessary if something is to be read from it.  Also
                 * notice that for the IDAT stream this must only happen once -
