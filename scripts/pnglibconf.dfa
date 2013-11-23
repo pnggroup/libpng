@@ -864,7 +864,7 @@ option READ_CHECK_FOR_INVALID_INDEX requires READ disabled
 option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE disabled
 
 # added at libpng-1.5.15
-option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX, WRITE_GET_PALETTE_MAX
+option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX WRITE_GET_PALETTE_MAX
 option READ_GET_PALETTE_MAX requires READ_CHECK_FOR_INVALID_INDEX disabled
 option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
 
@@ -892,6 +892,9 @@ option SIMPLIFIED_READ,
 #  and are enabled by default.  This should work the same way in practice.
 option SIMPLIFIED_READ_AFIRST enables FORMAT_AFIRST,
    requires SIMPLIFIED_READ READ_SWAP_ALPHA
+
+option SIMPLIFIED_READ_BGR enables FORMAT_BGR,
+   requires SIMPLIFIED_READ READ_BGR
 
 # Write:
 option SIMPLIFIED_WRITE,
