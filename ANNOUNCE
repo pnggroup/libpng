@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta23 - November 24, 2013
+Libpng 1.7.0beta24 - November 24, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta23.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta23.tar.gz
+   1.7.0beta24.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta24.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b23.7z  (LZMA-compressed, recommended)
-   lp170b23.zip
+   lp170b24.7z  (LZMA-compressed, recommended)
+   lp170b24.zip
 
 Other information:
 
-   1.7.0beta23-README.txt
-   1.7.0beta23-LICENSE.txt
+   1.7.0beta24-README.txt
+   1.7.0beta24-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -431,6 +431,8 @@ Version 1.7.0beta23 [November 24, 2013]
     contrib/conftest/*.dfa files that can be used in automatic build
     scripts to ensure that these configurations continue to build.
   Enabled WRITE_INVERT and WRITE_PACK in contrib/pngminim/encoder.
+
+Version 1.7.0beta24 [November 24, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

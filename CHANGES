@@ -4721,6 +4721,8 @@ Version 1.7.0beta23 [November 24, 2013]
     scripts to ensure that these configurations continue to build.
   Enabled WRITE_INVERT and WRITE_PACK in contrib/pngminim/encoder.
 
+Version 1.7.0beta24 [November 24, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
