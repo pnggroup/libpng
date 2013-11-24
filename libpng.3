@@ -5556,18 +5556,19 @@ The machine-generated configure files are no longer included in branches
 libpng16 and later of the GIT repository.  They continue to be included
 in the tarball releases, however.
 
-Libpng-1.6.0 and later use the CMF bytes at the beginning of the IDAT stream
-to set the size of the sliding window for reading instead of using the default
-32-kbyte sliding window size.  It was discovered that there are hundreds of PNG
-files in the wild that have incorrect CMF bytes that cause libpng to now issue
-a "too far back" error and reject the file.  Libpng-1.6.3 provides a way to
-revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
+Libpng-1.6.0 through 1.6.2 used the CMF bytes at the beginning of the IDAT
+stream to set the size of the sliding window for reading instead of using the
+default 32-kbyte sliding window size.  It was discovered that there are
+hundreds of PNG files in the wild that have incorrect CMF bytes that caused
+libpng to issue a "too far back" error and reject the file.  Libpng-1.6.3 and
+later calculate their own safe CMF from the image dimensions, provide a way
+to revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
 32-kbyte sliding window), by using
 
     png_set_option(png_ptr, PNG_MAXIMUM_INFLATE_WINDOW,
         PNG_OPTION_ON);
 
-and provides a tool (contrib/tools/pngfix) for optimizing the CMF bytes
+and provide a tool (contrib/tools/pngfix) for optimizing the CMF bytes
 correctly.
 
 Libpng-1.6.0 and libpng-1.6.1 wrote uncompressed iTXt chunks with the wrong
