@@ -4707,7 +4707,7 @@ Version 1.7.0beta22 [November 7, 2013]
   Fixed #include in filter_neon_intrinsics.c and ctype macros. The ctype char
     checking macros take an unsigned char argument, not a signed char.
 
-Version 1.7.0beta23 [November 22, 2013]
+Version 1.7.0beta23 [November 24, 2013]
   Changed #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpread.c to
     #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED to be consistent with
     what is in pngpriv.h.
