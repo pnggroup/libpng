@@ -4713,7 +4713,7 @@ Version 1.6.7rc02 [November 7, 2013]
 
 Version 1.6.7 [November 14, 2013]
 
-Version 1.6.8beta01 [November 23, 2013]
+Version 1.6.8beta01 [November 24, 2013]
   Moved prototype for png_handle_unknown() in pngpriv.h outside of
     the #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED/#endif block.
   Added "-Wall" to CFLAGS in contrib/pngminim/*/makefile
