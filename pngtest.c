@@ -115,6 +115,7 @@ static int relaxed = 0;
 static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
 static int error_count = 0; /* count calls to png_error */
 static int warning_count = 0; /* count calls to png_warning */
+static int wrote_question = 0;
 
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
@@ -1574,8 +1575,6 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 #ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
    {
-      int wrote_question = 0;
-
       for (;;)
       {
          png_size_t num_in, num_out;
