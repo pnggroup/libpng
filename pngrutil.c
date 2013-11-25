@@ -3794,7 +3794,6 @@ png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
       /* Calculate the current pixel in a, and move the previous row pixel to c
        * for the next time round the loop
        */
-      c = b;
       a += *row;
       *row++ = (png_byte)a;
    }

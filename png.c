@@ -201,6 +201,7 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
          pos = png_safecat(m, (sizeof m), pos, user_png_ver);
          pos = png_safecat(m, (sizeof m), pos, " but running with ");
          pos = png_safecat(m, (sizeof m), pos, png_libpng_ver);
+         PNG_UNUSED(pos)
 
          png_warning(png_ptr, m);
 #endif
@@ -695,13 +696,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta24 - November 24, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta24 - November 25, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta24 - November 24, 2013\
+      return "libpng version 1.7.0beta24 - November 25, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1634,6 +1635,7 @@ png_icc_profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
 #  endif
    /* The 'reason' is an arbitrary message, allow +79 maximum 195 */
    pos = png_safecat(message, (sizeof message), pos, reason);
+   PNG_UNUSED(pos)
 
    /* This is recoverable, but make it unconditionally an app_error on write to
     * avoid writing invalid ICC profiles into PNG files.  (I.e.  we handle them
