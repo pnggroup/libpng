@@ -4721,16 +4721,18 @@ Version 1.6.8beta01 [November 24, 2013]
   Conditionally compile some unused functions reported by -Wall in
     pngminim.
   Fixed 'minimal' builds. Various obviously useful minimal configurations
-    don't build because of missing contrib/libtests test programs and overly
-    complex dependencies in scripts/pnglibconf.dfa. This change adds
-    contrib/conftest/*.dfa files that can be used in automatic build
+    don't build because of missing contrib/libtests test programs and
+    overly complex dependencies in scripts/pnglibconf.dfa. This change
+    adds contrib/conftest/*.dfa files that can be used in automatic build
     scripts to ensure that these configurations continue to build.
   Enabled WRITE_INVERT and WRITE_PACK in contrib/pngminim/encoder.
   Fixed pngvalid 'fail' function declaration on the Intel C Compiler.
     This reverts to the previous 'static' implementation and works round
     the 'unused static function' warning by using PNG_UNUSED().
 
-Version 1.6.8beta02 [November 24, 2013]
+Version 1.6.8beta02 [November 25, 2013]
+  Removed or marked PNG_UNUSED some harmless "dead assignments" reported
+    by clang scan-build.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

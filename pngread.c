@@ -2811,7 +2811,6 @@ png_image_read_and_map(png_voidp argument)
          break;
 
       default:
-         passes = 0;
          png_error(png_ptr, "unknown interlace type");
    }
 
@@ -3130,7 +3129,6 @@ png_image_read_composite(png_voidp argument)
          break;
 
       default:
-         passes = 0;
          png_error(png_ptr, "unknown interlace type");
    }
 
@@ -3279,7 +3277,6 @@ png_image_read_background(png_voidp argument)
          break;
 
       default:
-         passes = 0;
          png_error(png_ptr, "unknown interlace type");
    }
 
