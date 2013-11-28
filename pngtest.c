@@ -570,7 +570,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            png_free_default(png_ptr, pinfo);
+            if (pinfo)
+               free(pinfo);
             pinfo = NULL;
             break;
          }
@@ -589,7 +590,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    if (verbose)
       printf("Freeing %p\n", ptr);
 
-   png_free_default(png_ptr, ptr);
+   if (ptr)
+      free(ptr);
    ptr = NULL;
 }
 #endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
