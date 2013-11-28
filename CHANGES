@@ -2889,7 +2889,9 @@ version 1.4.13beta03 [June 18, 2013]
   Removed a redundant test from png_set_IHDR().
   Revised libpng.3 so that "doclifter" can process it.
 
-version 1.4.13beta04 [June 18, 2013]
+version 1.4.13beta04 [November 28, 2013]
+  Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
+    among compilers.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

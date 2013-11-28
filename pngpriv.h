@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.13beta04 - June 18, 2013
+ * libpng version 1.4.13beta04 - November 28, 2013
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -886,7 +886,7 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 #      define png_debug(l,m) \
        { \
        int num_tabs=l; \
-       fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
+       fprintf(PNG_DEBUG_FILE,"%s" m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":"")))); \
        }
 #    endif
@@ -894,7 +894,7 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 #      define png_debug1(l,m,p1) \
        { \
        int num_tabs=l; \
-       fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
+       fprintf(PNG_DEBUG_FILE,"%s" m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))),p1); \
        }
 #    endif
@@ -902,7 +902,7 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 #      define png_debug2(l,m,p1,p2) \
        { \
        int num_tabs=l; \
-       fprintf(PNG_DEBUG_FILE,"%s"m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
+       fprintf(PNG_DEBUG_FILE,"%s" m PNG_STRING_NEWLINE,(num_tabs==1 ? "\t" : \
          (num_tabs==2 ? "\t\t":(num_tabs>2 ? "\t\t\t":""))),p1,p2); \
        }
 #    endif
