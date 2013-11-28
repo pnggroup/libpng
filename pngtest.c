@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Last changed in libpng 1.6.8 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -574,7 +574,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            png_free_default(png_ptr, pinfo);
+            if (pinfo)
+               free(pinfo);
             pinfo = NULL;
             break;
          }
@@ -593,7 +594,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    if (verbose)
       printf("Freeing %p\n", ptr);
 
-   png_free_default(png_ptr, ptr);
+   if (ptr)
+      free(ptr);
    ptr = NULL;
 }
 #endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */

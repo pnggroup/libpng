@@ -47,7 +47,8 @@ Version 1.6.8beta01 [November 28, 2013]
 Version 1.6.8beta02 [November 28, 2013]
   Removed or marked PNG_UNUSED some harmless "dead assignments" reported
     by clang scan-build.
-  Changed tabs to 3 spaces in png_debug macros and changed '"%s"m' to '"%s" m'
+  Changed tabs to 3 spaces in png_debug macros and changed '"%s"m'
+    to '"%s" m' to improve portability among compilers.
   Changed png_free_default() to free() in pngtest.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
