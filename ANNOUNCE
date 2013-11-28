@@ -1,5 +1,5 @@
 
-Libpng 1.6.8beta02 - November 25, 2013
+Libpng 1.6.8beta02 - November 28, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.6.7):
 
-Version 1.6.8beta01 [November 25, 2013]
+Version 1.6.8beta01 [November 28, 2013]
   Changed #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpread.c to
     #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED to be consistent with
     what is in pngpriv.h.
@@ -44,9 +44,11 @@ Version 1.6.8beta01 [November 25, 2013]
     This reverts to the previous 'static' implementation and works round
     the 'unused static function' warning by using PNG_UNUSED().
 
-Version 1.6.8beta02 [November 25, 2013]
+Version 1.6.8beta02 [November 28, 2013]
   Removed or marked PNG_UNUSED some harmless "dead assignments" reported
     by clang scan-build.
+  Changed tabs to 3 spaces in png_debug macros and changed '"%s"m' to '"%s" m'
+  Changed png_free_default() to free() in pngtest.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
