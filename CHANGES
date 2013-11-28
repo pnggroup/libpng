@@ -4154,7 +4154,9 @@ Version 1.5.18beta01 [August 21, 2013]
   Delay calling png_init_filter_functions() until a row with nonzero filter
     is found.
 
-Version 1.5.18beta02 [August 21, 2013]
+Version 1.5.18beta02 [November 28, 2013]
+  Changed tabs to 3 spaces in png_debug macros and changed '"%s"m'
+    to '"%s" m' to improve portability among compilers.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
