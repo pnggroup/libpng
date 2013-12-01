@@ -115,9 +115,6 @@ static int relaxed = 0;
 static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
 static int error_count = 0; /* count calls to png_error */
 static int warning_count = 0; /* count calls to png_warning */
-#ifdef PNG_WRITE_SUPPORTED
-static int wrote_question = 0;
-#endif
 
 #ifdef __TURBOC__
 #include <mem.h>
@@ -1585,6 +1582,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       for (;;)
       {
+         static int wrote_question = 0;
          png_size_t num_in, num_out;
          char inbuf[256], outbuf[256];
 
