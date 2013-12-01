@@ -1575,7 +1575,7 @@ chunk_end(struct chunk **chunk_var)
 }
 
 static void
-chunk_init(struct chunk *chunk, struct file *file)
+chunk_init(struct chunk * const chunk, struct file * const file)
    /* When a chunk is initialized the file length/type/pos are copied into the
     * corresponding chunk fields and the new chunk is registered in the file
     * structure.  There can only be one chunk at a time.
@@ -1784,7 +1784,7 @@ IDAT_end(struct IDAT **idat_var)
 }
 
 static void
-IDAT_init(struct IDAT *idat, struct file *file)
+IDAT_init(struct IDAT * const idat, struct file * const file)
    /* When the chunk is png_IDAT instantiate an IDAT control structure in place
     * of a chunk control structure.  The IDAT will instantiate a chunk control
     * structure using the file alloc routine.
@@ -3545,22 +3545,14 @@ allocate(struct file *file, int allocate_idat)
 
    if (allocate_idat)
    {
-      struct IDAT *idat;
-
       assert(file->idat == NULL);
-      idat = &control->idat;
-      IDAT_init(idat, file);
-      file->idat = idat;
+      IDAT_init(&control->idat, file);
    }
 
    else /* chunk */
    {
-      struct chunk *chunk;
-
       assert(file->chunk == NULL);
-      chunk = &control->chunk;
-      chunk_init(chunk, file);
-      file->chunk = chunk;
+      chunk_init(&control->chunk, file);
    }
 }
 
