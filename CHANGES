@@ -4737,7 +4737,7 @@ Version 1.6.8beta02 [November 30, 2013]
     to '"%s" m' to improve portability among compilers.
   Changed png_free_default() to free() in pngtest.c
 
-Version 1.6.8beta03 [December 1, 2013]
+Version 1.6.8rc01 [December 12, 2013]
   Tidied up pngfix inits and fixed pngtest no-write builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

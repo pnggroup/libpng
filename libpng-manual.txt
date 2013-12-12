@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.8beta03 - November 30, 2013
+ libpng version 1.6.8rc01 - December 12, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.8beta03 - November 30, 2013
+ libpng versions 0.97, January 1998, through 1.6.8rc01 - December 12, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4622,11 +4622,11 @@ XI.  Changes to Libpng from version 1.4.x to 1.5.x
 From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
-Checking for invalid palette index on read or write was added at libpng
-1.5.10.  When an invalid index is found, libpng issues a benign error.
-This is enabled by default because this condition is an error according
-to the PNG specification, Clause 11.3.2, but the error can be ignored in
-each png_ptr with
+Checking for invalid palette index on write was added at libpng
+1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
+a benign error.  This is enabled by default because this condition is an
+error according to the PNG specification, Clause 11.3.2, but the error can
+be ignored in each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 
@@ -5233,13 +5233,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-November 30, 2013
+December 12, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.8beta03 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.8rc01 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
