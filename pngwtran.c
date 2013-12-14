@@ -21,7 +21,7 @@
  * row_info bit depth should be 8 (one pixel per byte).  The channels
  * should be 1 (this only happens on grayscale and paletted images).
  */
-void /* PRIVATE */
+static void
 png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
 {
    png_debug(1, "in png_do_pack");
@@ -166,7 +166,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
  * would pass 3 as bit_depth, and this routine would translate the
  * data to 0 to 15.
  */
-void /* PRIVATE */
+static void
 png_do_shift(png_row_infop row_info, png_bytep row,
     png_const_color_8p bit_depth)
 {
@@ -305,7 +305,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
 #endif
 
 #ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
-void /* PRIVATE */
+static void
 png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_swap_alpha");
@@ -399,7 +399,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
 #endif
 
 #ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
-void /* PRIVATE */
+static void
 png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_write_invert_alpha");
