@@ -4740,6 +4740,12 @@ Version 1.6.8beta02 [November 30, 2013]
 Version 1.6.8rc01 [December 12, 2013]
   Tidied up pngfix inits and fixed pngtest no-write builds.
 
+Version 1.6.8rc02 [December 14, 2013]
+  Handle zero-length PLTE chunk or NULL palette with png_error()
+    instead of png_chunk_report(), which by default issues a warning
+    rather than an error, leading to later reading from a NULL pointer
+    (png_ptr->palette) in png_do_expand_palette().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
