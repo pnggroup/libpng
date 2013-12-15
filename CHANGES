@@ -4750,6 +4750,8 @@ Version 1.7.0beta24 [December 15, 2013]
     rather than an error, leading to later reading from a NULL pointer
     (png_ptr->palette) in png_do_expand_palette().
 
+Version 1.7.0beta25 [December 15, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

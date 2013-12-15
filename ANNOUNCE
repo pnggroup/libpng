@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta24 - December 15, 2013
+Libpng 1.7.0beta25 - December 15, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta24.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta24.tar.gz
+   1.7.0beta25.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta25.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b24.7z  (LZMA-compressed, recommended)
-   lp170b24.zip
+   lp170b25.7z  (LZMA-compressed, recommended)
+   lp170b25.zip
 
 Other information:
 
-   1.7.0beta24-README.txt
-   1.7.0beta24-LICENSE.txt
+   1.7.0beta25-README.txt
+   1.7.0beta25-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -460,6 +460,8 @@ Version 1.7.0beta24 [December 15, 2013]
     instead of png_chunk_report(), which by default issues a warning
     rather than an error, leading to later reading from a NULL pointer
     (png_ptr->palette) in png_do_expand_palette().
+
+Version 1.7.0beta25 [December 15, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
