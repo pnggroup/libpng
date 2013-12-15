@@ -4726,7 +4726,7 @@ Version 1.7.0beta23 [November 24, 2013]
     This reverts to the previous 'static' implementation and works round
     the 'unused static function' warning by using PNG_UNUSED().
 
-Version 1.7.0beta24 [December 14, 2013]
+Version 1.7.0beta24 [December 15, 2013]
   Removed or marked PNG_UNUSED some harmless "dead assignments" reported
     by clang scan-build.
   Changed tabs to 3 spaces in png_debug macros and changed '"%s"m'
@@ -4745,6 +4745,10 @@ Version 1.7.0beta24 [December 14, 2013]
     segment of the DLL by 1208 bytes, about 0.6%. It also simplifies
     maintenance by removing the declarations from pngpriv.h and allowing
     easier changes to the internal interfaces.
+  Handle zero-length PLTE chunk or NULL palette with png_error()
+    instead of png_chunk_report(), which by default issues a warning
+    rather than an error, leading to later reading from a NULL pointer
+    (png_ptr->palette) in png_do_expand_palette().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
