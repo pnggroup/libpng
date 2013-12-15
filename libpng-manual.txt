@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta24 - November 24, 2013
+ libpng version 1.7.0beta24 - December 15, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta24 - November 24, 2013
+ libpng versions 0.97, January 1998, through 1.7.0beta24 - December 15, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -3117,6 +3117,19 @@ Here is an example of writing two private chunks, prVt and miNE:
     /* Needed because miNE is not safe-to-copy */
     png_set_keep_unknown_chunks(png, PNG_HANDLE_CHUNK_ALWAYS,
        (png_bytep) "miNE", 1);
+    # if PNG_LIBPNG_VER < 10600
+      /* Deal with unknown chunk location bug in 1.5.x and earlier */
+      png_set_unknown_chunk_location(png, info, 0, PNG_HAVE_IHDR);
+      png_set_unknown_chunk_location(png, info, 1, PNG_AFTER_IDAT);
+    # endif
+    # if PNG_LIBPNG_VER < 10500
+      /* PNG_AFTER_IDAT writes two copies of the chunk prior to libpng-1.5.0,
+       * one before IDAT and another after IDAT, so don't use it; only use
+       * PNG_HAVE_IHDR location.  This call resets the location previously
+       * set by assignment and png_set_unknown_chunk_location() for chunk 1.
+       */
+      png_set_unknown_chunk_location(png, info, 1, PNG_HAVE_IHDR);
+    # endif
     #endif
 
 The high-level write interface
@@ -4608,11 +4621,11 @@ XI.  Changes to Libpng from version 1.4.x to 1.5.x
 From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
-Checking for invalid palette index on read or write was added at libpng
-1.5.10.  When an invalid index is found, libpng issues a benign error.
-This is enabled by default because this condition is an error according
-to the PNG specification, Clause 11.3.2, but the error can be ignored in
-each png_ptr with
+Checking for invalid palette index on write was added at libpng
+1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
+a benign error.  This is enabled by default because this condition is an
+error according to the PNG specification, Clause 11.3.2, but the error can
+be ignored in each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 
@@ -5235,7 +5248,8 @@ left parenthesis that follows it:
        y[i] = a(x) + (int)b;
 
 We prefer #ifdef and #ifndef to #if defined() and #if !defined()
-when there is only one macro being tested.
+when there is only one macro being tested.  We always use parentheses
+with "defined".
 
 We prefer to express integers that are used as bit masks in hex format,
 with an even number of lower-case hex digits (e.g., 0x00, 0xff, 0x0100).
@@ -5251,7 +5265,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-November 24, 2013
+December 15, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
