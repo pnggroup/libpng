@@ -294,12 +294,16 @@ option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 option MNG_FEATURES
 
 # Arithmetic options, the first is the big switch that chooses between internal
-# floating and fixed point arithmetic implementations - it does not affect any
+# floating and fixed point arithmetic implementations - it does not affect an
 # APIs.  The second two (the _POINT settings) switch off individual APIs.
+#
+# Prior to libpng 1.6.8 one of the API (_POINT) variants had to be selected.  At
+# 1.6.8 this restriction has been removed; the simplified API can be used
+# without enabling any of the low level fixed/floating APIs.
 
 option FLOATING_ARITHMETIC
-option FLOATING_POINT enables ok_math
-option FIXED_POINT enables ok_math
+option FLOATING_POINT
+option FIXED_POINT
 
 # The following is always on (defined empty)
 
@@ -435,7 +439,7 @@ option READ_TRANSFORMS requires READ
 # If you handle gamma issues outside libpng then you do not need the libpng
 # gamma processing; and it is an enormous waste of space.  You just need to
 # remove the use of libpng APIs that depend on it.
-option READ_GAMMA requires READ_TRANSFORMS, READ_gAMA
+option READ_GAMMA requires READ_TRANSFORMS, READ_gAMA, READ_sRGB
 
 option READ_ALPHA_MODE requires READ_TRANSFORMS, READ_GAMMA
 option READ_BACKGROUND requires READ_TRANSFORMS, READ_STRIP_ALPHA, READ_GAMMA
@@ -448,7 +452,7 @@ option READ_INVERT_ALPHA requires READ_TRANSFORMS
 option READ_INVERT requires READ_TRANSFORMS
 option READ_PACK requires READ_TRANSFORMS
 option READ_PACKSWAP requires READ_TRANSFORMS
-option READ_RGB_TO_GRAY requires READ_TRANSFORMS, READ_GAMMA
+option READ_RGB_TO_GRAY requires READ_TRANSFORMS, READ_GAMMA enables COLORSPACE
 option READ_SCALE_16_TO_8 requires READ_TRANSFORMS
 option READ_SHIFT requires READ_TRANSFORMS
 option READ_STRIP_16_TO_8 requires READ_TRANSFORMS
@@ -805,13 +809,13 @@ option SAVE_INT_32 disabled
 option WRITE_OPTIMIZE_CMF requires WRITE
 
 option READ_COMPRESSED_TEXT disabled
-option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
 option READ_COMPRESSED_TEXT enables READ_TEXT
 
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
+option WRITE_cHRM enables SAVE_INT_32
 
 option WRITE_COMPRESSED_TEXT disabled
 option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
@@ -839,30 +843,44 @@ option READ_GET_PALETTE_MAX requires READ_CHECK_FOR_INVALID_INDEX disabled
 option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
 
 # Simplified API options (added at libpng-1.6.0)
+#  In libpng 1.6.8 the handling of these options was changed to used 'requires'
+#  throughout, so that disabling some of the low level support always disables
+#  the base simplified read/write API.  This much simplifies the handling and
+#  makes 'everything = off' work in a more intuitive way.  It eliminates a
+#  previously reported feature that APIs previously enabled by the simplified
+#  API couldn't be turned off without explicitly turning off the simplified
+#  APIs.
+#
 # Read:
 option SIMPLIFIED_READ,
-   requires SEQUENTIAL_READ, READ_TRANSFORMS, SETJMP, BENIGN_ERRORS READ_GAMMA,
-   enables READ_EXPAND, READ_16BIT READ_EXPAND_16, READ_SCALE_16_TO_8,
-      READ_RGB_TO_GRAY, READ_ALPHA_MODE READ_BACKGROUND READ_STRIP_ALPHA,
-      READ_FILLER, READ_SWAP
+   requires SEQUENTIAL_READ, READ_TRANSFORMS, SETJMP, BENIGN_ERRORS,
+      READ_EXPAND, READ_16BIT, READ_EXPAND_16, READ_SCALE_16_TO_8,
+      READ_RGB_TO_GRAY, READ_ALPHA_MODE, READ_BACKGROUND, READ_STRIP_ALPHA,
+      READ_FILLER, READ_SWAP, READ_PACK, READ_GRAY_TO_RGB, READ_GAMMA,
+      READ_tRNS, READ_bKGD, READ_gAMA, READ_cHRM, READ_sRGB, READ_sBIT
 
-option SIMPLIFIED_READ_AFIRST requires SIMPLIFIED_READ disabled
-option READ_SWAP_ALPHA enables SIMPLIFIED_READ_AFIRST
+# AFIRST and BGR read options:
+#  Prior to libpng 1.6.8 these were disabled but switched on if the low level
+#  libpng routines that do the swaps were enabled.  This worked but was
+#  confusing.  In libpng 1.6.8 the options were changed to simple 'requires'
+#  and are enabled by default.  This should work the same way in practice.
+option SIMPLIFIED_READ_AFIRST enables FORMAT_AFIRST,
+   requires SIMPLIFIED_READ READ_SWAP_ALPHA
 
-option SIMPLIFIED_READ_BGR requires SIMPLIFIED_READ disabled
-option READ_BGR enables SIMPLIFIED_READ_BGR
+option SIMPLIFIED_READ_BGR enables FORMAT_BGR,
+   requires SIMPLIFIED_READ READ_BGR
 
 # Write:
 option SIMPLIFIED_WRITE,
-   requires WRITE STDIO, SETJMP,
-   enables WRITE_SWAP WRITE_gAMA, WRITE_sRGB WRITE_cHRM
+   requires WRITE STDIO, SETJMP, WRITE_SWAP, WRITE_PACK,
+      WRITE_tRNS, WRITE_gAMA, WRITE_sRGB, WRITE_cHRM
 
-option SIMPLIFIED_WRITE_AFIRST requires SIMPLIFIED_WRITE disabled
-option WRITE_SWAP_ALPHA enables SIMPLIFIED_WRITE_AFIRST
+option SIMPLIFIED_WRITE_AFIRST enables FORMAT_AFIRST,
+   requires SIMPLIFIED_WRITE WRITE_SWAP_ALPHA
 
-option SIMPLIFIED_WRITE_BGR requires SIMPLIFIED_WRITE disabled
-option WRITE_BGR enables SIMPLIFIED_WRITE_BGR
+option SIMPLIFIED_WRITE_BGR enables FORMAT_BGR,
+   requires SIMPLIFIED_WRITE WRITE_BGR
 
 # Formats:
-option FORMAT_AFIRST if SIMPLIFIED_READ_AFIRST, SIMPLIFIED_WRITE_AFIRST
-option FORMAT_BGR if SIMPLIFIED_READ_BGR, SIMPLIFIED_WRITE_BGR
+option FORMAT_AFIRST disabled
+option FORMAT_BGR disabled

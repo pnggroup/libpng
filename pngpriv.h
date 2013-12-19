@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.7 [November 14, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -112,9 +112,15 @@
     * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
     * with GCC) then the compiler will define __ARM_NEON__ and we can rely
     * unconditionally on NEON instructions not crashing, otherwise we must
-    * disable use of NEON instructions:
+    * disable use of NEON instructions.
+    *
+    * NOTE: at present these optimizations depend on 'ALIGNED_MEMORY', so they
+    * can only be turned on automatically if that is supported too.  If
+    * PNG_ARM_NEON_OPT is set in CPPFLAGS (to >0) then arm/arm_init.c will fail
+    * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
+    * off.
     */
-#  ifdef __ARM_NEON__
+#  if defined(__ARM_NEON__) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 #     define PNG_ARM_NEON_OPT 2
 #  else
 #     define PNG_ARM_NEON_OPT 0
@@ -1218,7 +1224,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_finish_IDAT,(png_structrp png_ptr),
 PNG_INTERNAL_FUNCTION(void,png_read_finish_row,(png_structrp png_ptr),
    PNG_EMPTY);
    /* Finish a row while reading, dealing with interlacing passes, etc. */
-#endif
+#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 /* Initialize the row buffers, etc. */
 PNG_INTERNAL_FUNCTION(void,png_read_start_row,(png_structrp png_ptr),PNG_EMPTY);
@@ -1464,7 +1470,6 @@ PNG_INTERNAL_FUNCTION(void,png_handle_zTXt,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_structrp png_ptr,
     png_uint_32 chunk_name),PNG_EMPTY);
 
-#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length, int keep),PNG_EMPTY);
    /* This is the function that gets called for unknown chunks.  The 'keep'
@@ -1474,14 +1479,13 @@ PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     */
 
 #if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) ||\
-   defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
+    defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
 PNG_INTERNAL_FUNCTION(int,png_chunk_unknown_handling,
     (png_const_structrp png_ptr, png_uint_32 chunk_name),PNG_EMPTY);
    /* Exactly as the API png_handle_as_unknown() except that the argument is a
     * 32-bit chunk name, not a string.
     */
 #endif /* READ_UNKNOWN_CHUNKS || HANDLE_AS_UNKNOWN */
-#endif /* PNG_SET_UNKNOWN_CHUNKS_SUPPORTED */
 
 /* Handle the transformations for reading and writing */
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
@@ -1900,7 +1904,7 @@ PNG_INTERNAL_FUNCTION(int,png_check_fp_string,(png_const_charp string,
    png_size_t size),PNG_EMPTY);
 #endif /* pCAL || sCAL */
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) ||\
+#if defined(PNG_GAMMA_SUPPORTED) ||\
     defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* Added at libpng version 1.5.0 */
 /* This is a utility to provide a*times/div (rounded) and indicate

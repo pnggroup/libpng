@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1638,14 +1638,16 @@ png_write_image_16bit(png_voidp argument)
 
    if (image->format & PNG_FORMAT_FLAG_ALPHA)
    {
-      if (image->format & PNG_FORMAT_FLAG_AFIRST)
-      {
-         aindex = -1;
-         ++input_row; /* To point to the first component */
-         ++output_row;
-      }
+#     ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
+         if (image->format & PNG_FORMAT_FLAG_AFIRST)
+         {
+            aindex = -1;
+            ++input_row; /* To point to the first component */
+            ++output_row;
+         }
 
-      else
+         else
+#     endif
          aindex = channels;
    }
 
@@ -1794,14 +1796,16 @@ png_write_image_8bit(png_voidp argument)
       png_bytep row_end;
       int aindex;
 
-      if (image->format & PNG_FORMAT_FLAG_AFIRST)
-      {
-         aindex = -1;
-         ++input_row; /* To point to the first component */
-         ++output_row;
-      }
+#     ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
+         if (image->format & PNG_FORMAT_FLAG_AFIRST)
+         {
+            aindex = -1;
+            ++input_row; /* To point to the first component */
+            ++output_row;
+         }
 
-      else
+         else
+#     endif
          aindex = channels;
 
       /* Use row_end in place of a loop counter: */
@@ -1881,7 +1885,8 @@ png_image_set_PLTE(png_image_write_control *display)
    const png_uint_32 format = image->format;
    const int channels = PNG_IMAGE_SAMPLE_CHANNELS(format);
 
-#  ifdef PNG_FORMAT_BGR_SUPPORTED
+#  if defined(PNG_FORMAT_BGR_SUPPORTED) &&\
+      defined(PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED)
       const int afirst = (format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
          (format & PNG_FORMAT_FLAG_ALPHA) != 0;
 #  else

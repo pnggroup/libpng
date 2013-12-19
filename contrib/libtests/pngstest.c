@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -517,14 +517,23 @@ static void format_default(format_list *pf, int redundant)
 
       for (f=0; f<FORMAT_COUNT; ++f)
       {
-         /* Eliminate redundant settings. */
-         /* BGR is meaningless if no color: */
-         if ((f & PNG_FORMAT_FLAG_COLOR) == 0 && (f & PNG_FORMAT_FLAG_BGR) != 0)
+         /* Eliminate redundant and unsupported settings. */
+#        ifdef PNG_FORMAT_BGR_SUPPORTED
+            /* BGR is meaningless if no color: */
+            if ((f & PNG_FORMAT_FLAG_COLOR) == 0 &&
+               (f & PNG_FORMAT_FLAG_BGR) != 0)
+#        else
+            if ((f & 0x10U/*HACK: fixed value*/) != 0)
+#        endif
             continue;
 
          /* AFIRST is meaningless if no alpha: */
-         if ((f & PNG_FORMAT_FLAG_ALPHA) == 0 &&
-            (f & PNG_FORMAT_FLAG_AFIRST) != 0)
+#        ifdef PNG_FORMAT_AFIRST_SUPPORTED
+            if ((f & PNG_FORMAT_FLAG_ALPHA) == 0 &&
+               (f & PNG_FORMAT_FLAG_AFIRST) != 0)
+#        else
+            if ((f & 0x20U/*HACK: fixed value*/) != 0)
+#        endif
             continue;
 
          format_set(pf, f);
@@ -786,6 +795,7 @@ gp_ga8(Pixel *p, png_const_voidp pb)
    p->a = pp[1];
 }
 
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
 gp_ag8(Pixel *p, png_const_voidp pb)
 {
@@ -794,6 +804,7 @@ gp_ag8(Pixel *p, png_const_voidp pb)
    p->r = p->g = p->b = pp[1];
    p->a = pp[0];
 }
+#endif
 
 static void
 gp_rgb8(Pixel *p, png_const_voidp pb)
@@ -806,6 +817,7 @@ gp_rgb8(Pixel *p, png_const_voidp pb)
    p->a = 255;
 }
 
+#ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
 gp_bgr8(Pixel *p, png_const_voidp pb)
 {
@@ -816,6 +828,7 @@ gp_bgr8(Pixel *p, png_const_voidp pb)
    p->b = pp[0];
    p->a = 255;
 }
+#endif
 
 static void
 gp_rgba8(Pixel *p, png_const_voidp pb)
@@ -828,6 +841,7 @@ gp_rgba8(Pixel *p, png_const_voidp pb)
    p->a = pp[3];
 }
 
+#ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
 gp_bgra8(Pixel *p, png_const_voidp pb)
 {
@@ -838,7 +852,9 @@ gp_bgra8(Pixel *p, png_const_voidp pb)
    p->b = pp[0];
    p->a = pp[3];
 }
+#endif
 
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
 gp_argb8(Pixel *p, png_const_voidp pb)
 {
@@ -849,7 +865,9 @@ gp_argb8(Pixel *p, png_const_voidp pb)
    p->b = pp[3];
    p->a = pp[0];
 }
+#endif
 
+#if defined(PNG_FORMAT_AFIRST_SUPPORTED) && defined(PNG_FORMAT_BGR_SUPPORTED)
 static void
 gp_abgr8(Pixel *p, png_const_voidp pb)
 {
@@ -860,6 +878,7 @@ gp_abgr8(Pixel *p, png_const_voidp pb)
    p->b = pp[1];
    p->a = pp[0];
 }
+#endif
 
 static void
 gp_g16(Pixel *p, png_const_voidp pb)
@@ -879,6 +898,7 @@ gp_ga16(Pixel *p, png_const_voidp pb)
    p->a = pp[1];
 }
 
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
 gp_ag16(Pixel *p, png_const_voidp pb)
 {
@@ -887,6 +907,7 @@ gp_ag16(Pixel *p, png_const_voidp pb)
    p->r = p->g = p->b = pp[1];
    p->a = pp[0];
 }
+#endif
 
 static void
 gp_rgb16(Pixel *p, png_const_voidp pb)
@@ -899,6 +920,7 @@ gp_rgb16(Pixel *p, png_const_voidp pb)
    p->a = 65535;
 }
 
+#ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
 gp_bgr16(Pixel *p, png_const_voidp pb)
 {
@@ -909,6 +931,7 @@ gp_bgr16(Pixel *p, png_const_voidp pb)
    p->b = pp[0];
    p->a = 65535;
 }
+#endif
 
 static void
 gp_rgba16(Pixel *p, png_const_voidp pb)
@@ -921,6 +944,7 @@ gp_rgba16(Pixel *p, png_const_voidp pb)
    p->a = pp[3];
 }
 
+#ifdef PNG_FORMAT_BGR_SUPPORTED
 static void
 gp_bgra16(Pixel *p, png_const_voidp pb)
 {
@@ -931,7 +955,9 @@ gp_bgra16(Pixel *p, png_const_voidp pb)
    p->b = pp[0];
    p->a = pp[3];
 }
+#endif
 
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
 static void
 gp_argb16(Pixel *p, png_const_voidp pb)
 {
@@ -942,7 +968,9 @@ gp_argb16(Pixel *p, png_const_voidp pb)
    p->b = pp[3];
    p->a = pp[0];
 }
+#endif
 
+#if defined(PNG_FORMAT_AFIRST_SUPPORTED) && defined(PNG_FORMAT_BGR_SUPPORTED)
 static void
 gp_abgr16(Pixel *p, png_const_voidp pb)
 {
@@ -953,6 +981,7 @@ gp_abgr16(Pixel *p, png_const_voidp pb)
    p->b = pp[1];
    p->a = pp[0];
 }
+#endif
 
 /* Given a format, return the correct one of the above functions. */
 static void (*
@@ -966,29 +995,35 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
    {
       if (format & PNG_FORMAT_FLAG_COLOR)
       {
-         if (format & PNG_FORMAT_FLAG_BGR)
-         {
-            if (format & PNG_FORMAT_FLAG_ALPHA)
+#        ifdef PNG_FORMAT_BGR_SUPPORTED
+            if (format & PNG_FORMAT_FLAG_BGR)
             {
-               if (format & PNG_FORMAT_FLAG_AFIRST)
-                  return gp_abgr16;
+               if (format & PNG_FORMAT_FLAG_ALPHA)
+               {
+#                 ifdef PNG_FORMAT_AFIRST_SUPPORTED
+                     if (format & PNG_FORMAT_FLAG_AFIRST)
+                        return gp_abgr16;
+
+                     else
+#                 endif
+                     return gp_bgra16;
+               }
 
                else
-                  return gp_bgra16;
+                  return gp_bgr16;
             }
 
             else
-               return gp_bgr16;
-         }
-
-         else
+#        endif
          {
             if (format & PNG_FORMAT_FLAG_ALPHA)
             {
-               if (format & PNG_FORMAT_FLAG_AFIRST)
-                  return gp_argb16;
+#              ifdef PNG_FORMAT_AFIRST_SUPPORTED
+                  if (format & PNG_FORMAT_FLAG_AFIRST)
+                     return gp_argb16;
 
-               else
+                  else
+#              endif
                   return gp_rgba16;
             }
 
@@ -1001,10 +1036,12 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
       {
          if (format & PNG_FORMAT_FLAG_ALPHA)
          {
-            if (format & PNG_FORMAT_FLAG_AFIRST)
-               return gp_ag16;
+#           ifdef PNG_FORMAT_AFIRST_SUPPORTED
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+                  return gp_ag16;
 
-            else
+               else
+#           endif
                return gp_ga16;
          }
 
@@ -1017,29 +1054,35 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
    {
       if (format & PNG_FORMAT_FLAG_COLOR)
       {
-         if (format & PNG_FORMAT_FLAG_BGR)
-         {
-            if (format & PNG_FORMAT_FLAG_ALPHA)
+#        ifdef PNG_FORMAT_BGR_SUPPORTED
+            if (format & PNG_FORMAT_FLAG_BGR)
             {
-               if (format & PNG_FORMAT_FLAG_AFIRST)
-                  return gp_abgr8;
+               if (format & PNG_FORMAT_FLAG_ALPHA)
+               {
+#                 ifdef PNG_FORMAT_AFIRST_SUPPORTED
+                     if (format & PNG_FORMAT_FLAG_AFIRST)
+                        return gp_abgr8;
+
+                     else
+#                 endif
+                     return gp_bgra8;
+               }
 
                else
-                  return gp_bgra8;
+                  return gp_bgr8;
             }
 
             else
-               return gp_bgr8;
-         }
-
-         else
+#        endif
          {
             if (format & PNG_FORMAT_FLAG_ALPHA)
             {
-               if (format & PNG_FORMAT_FLAG_AFIRST)
-                  return gp_argb8;
+#              ifdef PNG_FORMAT_AFIRST_SUPPORTED
+                  if (format & PNG_FORMAT_FLAG_AFIRST)
+                     return gp_argb8;
 
-               else
+                  else
+#              endif
                   return gp_rgba8;
             }
 
@@ -1052,10 +1095,12 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
       {
          if (format & PNG_FORMAT_FLAG_ALPHA)
          {
-            if (format & PNG_FORMAT_FLAG_AFIRST)
-               return gp_ag8;
+#           ifdef PNG_FORMAT_AFIRST_SUPPORTED
+               if (format & PNG_FORMAT_FLAG_AFIRST)
+                  return gp_ag8;
 
-            else
+               else
+#           endif
                return gp_ga8;
          }
 
@@ -2618,13 +2663,15 @@ component_loc(png_byte loc[4], png_uint_32 format)
 
       loc[2] = 1;
 
-      if (format & PNG_FORMAT_FLAG_BGR)
-      {
-         loc[1] = 2;
-         loc[3] = 0;
-      }
+#     ifdef PNG_FORMAT_BGR_SUPPORTED
+         if (format & PNG_FORMAT_FLAG_BGR)
+         {
+            loc[1] = 2;
+            loc[3] = 0;
+         }
 
-      else
+         else
+#     endif
       {
          loc[1] = 0;
          loc[3] = 2;
@@ -2639,15 +2686,17 @@ component_loc(png_byte loc[4], png_uint_32 format)
 
    if (format & PNG_FORMAT_FLAG_ALPHA)
    {
-      if (format & PNG_FORMAT_FLAG_AFIRST)
-      {
-         loc[0] = 0;
-         ++loc[1];
-         ++loc[2];
-         ++loc[3];
-      }
+#     ifdef PNG_FORMAT_AFIRST_SUPPORTED
+         if (format & PNG_FORMAT_FLAG_AFIRST)
+         {
+            loc[0] = 0;
+            ++loc[1];
+            ++loc[2];
+            ++loc[3];
+         }
 
-      else
+         else
+#     endif
          loc[0] = channels;
 
       ++channels;
@@ -3017,17 +3066,25 @@ read_file(Image *image, png_uint_32 format, png_const_colorp background)
          return logerror(image, "memory init: ", image->file_name, "");
    }
 
-   else if (image->input_file != NULL)
-   {
-      if (!png_image_begin_read_from_stdio(&image->image, image->input_file))
-         return logerror(image, "stdio init: ", image->file_name, "");
-   }
+#  ifdef PNG_STDIO_SUPPORTED
+      else if (image->input_file != NULL)
+      {
+         if (!png_image_begin_read_from_stdio(&image->image, image->input_file))
+            return logerror(image, "stdio init: ", image->file_name, "");
+      }
 
-   else
-   {
-      if (!png_image_begin_read_from_file(&image->image, image->file_name))
-         return logerror(image, "file init: ", image->file_name, "");
-   }
+      else
+      {
+         if (!png_image_begin_read_from_file(&image->image, image->file_name))
+            return logerror(image, "file init: ", image->file_name, "");
+      }
+#  else
+      else
+      {
+         return logerror(image, "unsupported file/stdio init: ",
+            image->file_name, "");
+      }
+#  endif
 
    /* This must be set after the begin_read call: */
    if (image->opts & sRGB_16BIT)
@@ -3466,11 +3523,19 @@ main(int argc, char **argv)
          memset(gpc_error_via_linear, 0, sizeof gpc_error_via_linear);
       }
       else if (strcmp(arg, "--file") == 0)
-         opts |= READ_FILE;
+#        ifdef PNG_STDIO_SUPPORTED
+            opts |= READ_FILE;
+#        else
+            return 77; /* skipped: no support */
+#        endif
       else if (strcmp(arg, "--memory") == 0)
          opts &= ~READ_FILE;
       else if (strcmp(arg, "--stdio") == 0)
-         opts |= USE_STDIO;
+#        ifdef PNG_STDIO_SUPPORTED
+            opts |= USE_STDIO;
+#        else
+            return 77; /* skipped: no support */
+#        endif
       else if (strcmp(arg, "--name") == 0)
          opts &= ~USE_STDIO;
       else if (strcmp(arg, "--verbose") == 0)

@@ -282,7 +282,7 @@ $1 == "option" && NF >= 2{
       for (i=istart; i<=NF; ++i) {
          val=$(i)
          sub(/,$/,"",val)
-         if (val == "on" || val == "off" || val == "disabled") {
+         if (val == "on" || val == "off" || val == "disabled" || val =="enabled") {
             key = ""
             if (onoff != val) {
                # on or off can zap disabled or enabled:
@@ -687,9 +687,11 @@ END{
          }
 
          # if
+         have_ifs = 0
          nreqs = split(iffs[i], r)
          print "#undef PNG_no_if" >out
          if (nreqs > 0) {
+            have_ifs = 1
             print "/* if" iffs[i], "*/" >out
             print "#define PNG_no_if 1" >out
             for (j=1; j<=nreqs; ++j) {
@@ -727,7 +729,10 @@ END{
 
          print "#   ifndef PNG_" i "_SUPPORTED /*!command line*/" >out
          print "#    ifdef PNG_not_enabled /*!enabled*/" >out
-         if (option[i] == "off" || option[i] == "disabled" && everything != "on" || option[i] == "enabled" && everything == "off") {
+         # 'have_ifs' here means that everything = "off" still allows an 'if' on
+         # an otherwise enabled option to turn it on; otherwise the 'if'
+         # handling is effectively disabled by 'everything = off'
+         if (option[i] == "off" || option[i] == "disabled" && everything != "on" || option[i] == "enabled" && everything == "off" && !have_ifs) {
             print "#      undef PNG_on /*default off*/" >out
          } else {
             print "#      ifdef PNG_NO_" i >out

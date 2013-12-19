@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.4 [August 21, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1942,6 +1942,9 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
 
          info_ptr->bit_depth = 8;
          info_ptr->num_trans = 0;
+
+         if (png_ptr->palette == NULL)
+            png_error (png_ptr, "Palette is NULL in indexed image");
       }
       else
       {

@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.2 [April 25, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -573,7 +573,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            png_free_default(png_ptr, pinfo);
+            if (pinfo)
+               free(pinfo);
             pinfo = NULL;
             break;
          }
@@ -592,7 +593,8 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    if (verbose)
       printf("Freeing %p\n", ptr);
 
-   png_free_default(png_ptr, ptr);
+   if (ptr)
+      free(ptr);
    ptr = NULL;
 }
 #endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
@@ -1578,13 +1580,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 #ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
    {
-      int wrote_question = 0;
-
       for (;;)
       {
+         static int wrote_question = 0;
          png_size_t num_in, num_out;
          char inbuf[256], outbuf[256];
-
 
          num_in = fread(inbuf, 1, sizeof inbuf, fpin);
          num_out = fread(outbuf, 1, sizeof outbuf, fpout);
@@ -1970,4 +1970,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_7 Your_png_h_is_not_version_1_6_7;
+typedef png_libpng_version_1_6_8 Your_png_h_is_not_version_1_6_8;

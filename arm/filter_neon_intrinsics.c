@@ -5,7 +5,7 @@
  * Written by James Yu <james.yu at linaro.org>, October 2013.
  * Based on filter_neon.S, written by Mans Rullgard, 2011.
  *
- * Last changed in libpng 1.6.7 [November 14, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -15,7 +15,7 @@
 #include "../pngpriv.h"
 
 /* This code requires -mfpu=neon on the command line: */
-#if PNG_ARM_NEON_IMPLEMENTATION == 1 /* intrinsics code */
+#if PNG_ARM_NEON_IMPLEMENTATION == 1 /* intrinsics code from pngpriv.h */
 
 #include <arm_neon.h>
 

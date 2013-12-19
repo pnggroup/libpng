@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.3 [July 18, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -50,7 +50,7 @@
 #  error "pngfix will not work with libpng prior to 1.6.3"
 #endif
 
-#ifdef PNG_READ_SUPPORTED
+#if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED)
 /* zlib.h defines the structure z_stream, an instance of which is included
  * in this structure and is required for decompressing the LZ compressed
  * data in PNG files.
@@ -141,6 +141,11 @@
 
 /* Is it safe to copy? */
 #define SAFE_TO_COPY(chunk) (((chunk) & PNG_U32(0,0,0,32)) != 0)
+
+/* Fix ups for builds with limited read support */
+#ifndef PNG_ERROR_TEXT_SUPPORTED
+#  define png_error(a,b) png_err(a)
+#endif
 
 /********************************* UTILITIES **********************************/
 /* UNREACHED is a value to cause an assert to fail. Because of the way the
@@ -1570,7 +1575,7 @@ chunk_end(struct chunk **chunk_var)
 }
 
 static void
-chunk_init(struct chunk *chunk, struct file *file)
+chunk_init(struct chunk * const chunk, struct file * const file)
    /* When a chunk is initialized the file length/type/pos are copied into the
     * corresponding chunk fields and the new chunk is registered in the file
     * structure.  There can only be one chunk at a time.
@@ -1779,7 +1784,7 @@ IDAT_end(struct IDAT **idat_var)
 }
 
 static void
-IDAT_init(struct IDAT *idat, struct file *file)
+IDAT_init(struct IDAT * const idat, struct file * const file)
    /* When the chunk is png_IDAT instantiate an IDAT control structure in place
     * of a chunk control structure.  The IDAT will instantiate a chunk control
     * structure using the file alloc routine.
@@ -3318,6 +3323,8 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
 
             else
             {
+               assert(chunk != NULL);
+
                /* Set up for write, notice that repositioning the input stream
                 * is only necessary if something is to be read from it.  Also
                 * notice that for the IDAT stream this must only happen once -
@@ -3331,6 +3338,8 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
             /* FALL THROUGH */
 
          default:
+            assert(chunk != NULL);
+
             /* NOTE: the arithmetic below overflows and gives a large positive
              * png_uint_32 value until the whole chunk data has been written.
              */
@@ -3536,22 +3545,14 @@ allocate(struct file *file, int allocate_idat)
 
    if (allocate_idat)
    {
-      struct IDAT *idat;
-
       assert(file->idat == NULL);
-      idat = &control->idat;
-      IDAT_init(idat, file);
-      file->idat = idat;
+      IDAT_init(&control->idat, file);
    }
 
    else /* chunk */
    {
-      struct chunk *chunk;
-
       assert(file->chunk == NULL);
-      chunk = &control->chunk;
-      chunk_init(chunk, file);
-      file->chunk = chunk;
+      chunk_init(&control->chunk, file);
    }
 }
 
@@ -3644,7 +3645,7 @@ read_png(struct control *control)
    return rc;
 }
 
-static void
+static int
 one_file(struct global *global, const char *file_name, const char *out_name)
 {
    int rc;
@@ -3663,6 +3664,8 @@ one_file(struct global *global, const char *file_name, const char *out_name)
       rc = read_png(&control);
 
    rc |= control_end(&control);
+
+   return rc;
 }
 
 static void
@@ -4031,4 +4034,4 @@ main(void)
    fprintf(stderr, "pngfix does not work without read support\n");
    return 77;
 }
-#endif /* PNG_READ_SUPPORTED */
+#endif /* PNG_READ_SUPPORTED && PNG_EASY_ACCESS_SUPPORTED */

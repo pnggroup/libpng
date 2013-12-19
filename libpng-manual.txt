@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.7 - November 14, 2013
+ libpng version 1.6.8 - December 19, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.7 - November 14, 2013
+ libpng versions 0.97, January 1998, through 1.6.8 - December 19, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4622,11 +4622,11 @@ XI.  Changes to Libpng from version 1.4.x to 1.5.x
 From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
-Checking for invalid palette index on read or write was added at libpng
-1.5.10.  When an invalid index is found, libpng issues a benign error.
-This is enabled by default because this condition is an error according
-to the PNG specification, Clause 11.3.2, but the error can be ignored in
-each png_ptr with
+Checking for invalid palette index on write was added at libpng
+1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
+a benign error.  This is enabled by default because this condition is an
+error according to the PNG specification, Clause 11.3.2, but the error can
+be ignored in each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 
@@ -5051,18 +5051,19 @@ The machine-generated configure files are no longer included in branches
 libpng16 and later of the GIT repository.  They continue to be included
 in the tarball releases, however.
 
-Libpng-1.6.0 and later use the CMF bytes at the beginning of the IDAT stream
-to set the size of the sliding window for reading instead of using the default
-32-kbyte sliding window size.  It was discovered that there are hundreds of PNG
-files in the wild that have incorrect CMF bytes that cause libpng to now issue
-a "too far back" error and reject the file.  Libpng-1.6.3 provides a way to
-revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
+Libpng-1.6.0 through 1.6.2 used the CMF bytes at the beginning of the IDAT
+stream to set the size of the sliding window for reading instead of using the
+default 32-kbyte sliding window size.  It was discovered that there are
+hundreds of PNG files in the wild that have incorrect CMF bytes that caused
+libpng to issue a "too far back" error and reject the file.  Libpng-1.6.3 and
+later calculate their own safe CMF from the image dimensions, provide a way
+to revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
 32-kbyte sliding window), by using
 
     png_set_option(png_ptr, PNG_MAXIMUM_INFLATE_WINDOW,
         PNG_OPTION_ON);
 
-and provides a tool (contrib/tools/pngfix) for optimizing the CMF bytes
+and provide a tool (contrib/tools/pngfix) for optimizing the CMF bytes
 correctly.
 
 Libpng-1.6.0 and libpng-1.6.1 wrote uncompressed iTXt chunks with the wrong
@@ -5232,13 +5233,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-November 14, 2013
+December 19, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.7 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.8 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer

@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -43,7 +43,10 @@
 #  include "../../png.h"
 #endif
 
-#ifdef PNG_WRITE_SUPPORTED /* else pngvalid can do nothing */
+/* pngvalid requires write support and one of the fixed or floating point APIs.
+ */
+#if defined(PNG_WRITE_SUPPORTED) &&\
+   (defined(PNG_FIXED_POINT_SUPPORTED) || defined(PNG_FLOATING_POINT_SUPPORTED))
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the PNG_CONST. */
@@ -104,6 +107,11 @@ typedef png_byte *png_const_bytep;
 #  else
 #     define UNUSED(param)
 #  endif
+#endif
+
+/* Fixups for various minimal builds */
+#ifndef PNG_ERROR_TEXT_SUPPORTED
+#  define png_error(a,b) png_err(a)
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
@@ -1263,6 +1271,7 @@ store_current_palette(png_store *ps, int *npalette)
 #endif /* PNG_READ_SUPPORTED */
 
 /***************************** MEMORY MANAGEMENT*** ***************************/
+#ifdef PNG_USER_MEM_SUPPORTED
 /* A store_memory is simply the header for an allocated block of memory.  The
  * pointer returned to libpng is just after the end of the header block, the
  * allocated memory is followed by a second copy of the 'mark'.
@@ -1463,6 +1472,7 @@ store_free(png_structp ppIn, png_voidp memory)
    this->next = NULL;
    store_memory_free(pp, pool, this);
 }
+#endif /* PNG_USER_MEM_SUPPORTED */
 
 /* Setup functions. */
 /* Cleanup when aborting a write or after storing the new file. */
@@ -1488,7 +1498,9 @@ store_write_reset(png_store *ps)
    /* And make sure that all the memory has been freed - this will output
     * spurious errors in the case of memory corruption above, but this is safe.
     */
-   store_pool_delete(ps, &ps->write_memory_pool);
+#  ifdef PNG_USER_MEM_SUPPORTED
+      store_pool_delete(ps, &ps->write_memory_pool);
+#  endif
 
    store_freenew(ps);
 }
@@ -1512,15 +1524,19 @@ set_store_for_write(png_store *ps, png_infopp ppi,
       store_write_reset(ps);
       safecat(ps->wname, sizeof ps->wname, 0, name);
 
-      /* Don't do the slow memory checks if doing a speed test. */
-      if (ps->speed)
+      /* Don't do the slow memory checks if doing a speed test, also if user
+       * memory is not supported we can't do it anyway.
+       */
+#     ifdef PNG_USER_MEM_SUPPORTED
+         if (!ps->speed)
+            ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
+               ps, store_error, store_warning, &ps->write_memory_pool,
+               store_malloc, store_free);
+
+         else
+#     endif
          ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING,
             ps, store_error, store_warning);
-
-      else
-         ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
-            ps, store_error, store_warning, &ps->write_memory_pool,
-            store_malloc, store_free);
 
       png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
 
@@ -1569,8 +1585,10 @@ store_read_reset(png_store *ps)
       }
 #  endif
 
-   /* Always do this to be safe. */
-   store_pool_delete(ps, &ps->read_memory_pool);
+#  ifdef PNG_USER_MEM_SUPPORTED
+      /* Always do this to be safe. */
+      store_pool_delete(ps, &ps->read_memory_pool);
+#  endif
 
    ps->current = NULL;
    ps->next = NULL;
@@ -1630,14 +1648,16 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
     * However, given that store_error works correctly in these circumstances
     * we don't ever expect NULL in this program.
     */
-   if (ps->speed)
-      ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
-          store_error, store_warning);
+#  ifdef PNG_USER_MEM_SUPPORTED
+      if (!ps->speed)
+         ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
+             store_error, store_warning, &ps->read_memory_pool, store_malloc,
+             store_free);
 
-   else
-      ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
-          store_error, store_warning, &ps->read_memory_pool, store_malloc,
-          store_free);
+      else
+#  endif
+   ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps, store_error,
+      store_warning);
 
    if (ps->pread == NULL)
    {
@@ -1934,7 +1954,7 @@ typedef struct png_modifier
 
 /* This returns true if the test should be stopped now because it has already
  * failed and it is running silently.
- */
+  */
 static int fail(png_modifier *pm)
 {
    return !pm->log && !pm->this.verbose && (pm->this.nerrors > 0 ||
@@ -3109,8 +3129,10 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
       for (; i<256; ++i)
          tRNS[i] = 24;
 
-      if (j > 0)
-         png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
+#     ifdef PNG_WRITE_tRNS_SUPPORTED
+         if (j > 0)
+            png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
+#     endif
    }
 }
 
@@ -3356,6 +3378,13 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
  */
 #define DEPTH(bd) ((png_byte)(1U << (bd)))
 
+/* This is just a helper for compiling on minimal systems with no write
+ * interlacing support.
+ */
+#ifndef PNG_WRITE_INTERLACING_SUPPORTED
+#  define png_set_interlace_handling(a) (1)
+#endif
+
 /* Make a standardized image given a an image colour type, bit depth and
  * interlace type.  The standard images have a very restricted range of
  * rows and heights and are used for testing transforms rather than image
@@ -3509,8 +3538,12 @@ make_transform_images(png_store *ps)
    {
       int interlace_type;
 
-      for (interlace_type = PNG_INTERLACE_NONE;
-           interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+         for (interlace_type = PNG_INTERLACE_NONE;
+              interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     else
+         interlace_type = PNG_INTERLACE_NONE;
+#     endif
       {
          char name[FILE_NAME_SIZE];
 
@@ -3666,7 +3699,9 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
-         int nfilter = PNG_FILTER_VALUE_LAST;
+#        ifdef PNG_WRITE_FILTER_SUPPORTED
+            int nfilter = PNG_FILTER_VALUE_LAST;
+#        endif
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -3720,6 +3755,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
                      continue;
                }
 
+#           ifdef PNG_WRITE_FILTER_SUPPORTED
                /* Only get to here if the row has some pixels in it, set the
                 * filters to 'all' for the very first row and thereafter to a
                 * single filter.  It isn't well documented, but png_set_filter
@@ -3735,6 +3771,7 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
 
                if (nfilter-- == 0)
                   nfilter = PNG_FILTER_VALUE_LAST-1;
+#           endif
 
                png_write_row(pp, row);
             }
@@ -3802,8 +3839,10 @@ make_size(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type, int bdlo,
                width, height, 0);
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_NONE,
                width, height, 1);
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 0);
+#        endif
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 1);
          }
@@ -3998,8 +4037,12 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
    {
       int interlace_type;
 
-      for (interlace_type = PNG_INTERLACE_NONE;
-           interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+         for (interlace_type = PNG_INTERLACE_NONE;
+              interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     else
+         interlace_type = PNG_INTERLACE_NONE;
+#     endif
       {
          unsigned int test;
          char name[FILE_NAME_SIZE];
@@ -4020,7 +4063,7 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
 
    return 1; /* keep going */
 }
-#endif
+#endif /* PNG_WARNINGS_SUPPORTED */
 
 static void
 perform_error_test(png_modifier *pm)
@@ -10222,12 +10265,16 @@ int main(int argc, char **argv)
       }
    }
 
+   /* This is required because some very minimal configurations do not use it:
+    */
+   UNUSED(fail)
    return 0;
 }
-#else /* write not supported */
+#else /* write or low level APIs not supported */
 int main(void)
 {
-   fprintf(stderr, "pngvalid: no write support in libpng, all tests skipped\n");
+   fprintf(stderr,
+      "pngvalid: no low level write support in libpng, all tests skipped\n");
    /* So the test is skipped: */
    return 77;
 }
