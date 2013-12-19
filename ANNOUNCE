@@ -27,6 +27,12 @@ Other information:
 Changes since the last public release (1.6.8):
 
 Version 1.6.9beta01 [December 19, 2013]
+  Bookkeeping: Moved functions around (no changes). Moved transform
+    function definitions before the place where they are called so that
+    they can be masde static. Move the intrapixel functions and the
+    grayscale palette builder out of the png?tran.c files. The latter
+    isn't a transform function and is no longer used internally, and the
+    former MNG specific functions are better placed in pngread/pngwrite.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

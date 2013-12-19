@@ -1556,13 +1556,6 @@ PNG_INTERNAL_FUNCTION(void,png_push_read_iTXt,(png_structrp png_ptr,
 
 #endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
 
-#ifdef PNG_MNG_FEATURES_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_read_intrapixel,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_do_write_intrapixel,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
 /* Added at libpng version 1.6.0 */
 #ifdef PNG_GAMMA_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_colorspace_set_gamma,(png_const_structrp png_ptr,

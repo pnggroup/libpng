@@ -480,6 +480,7 @@ option INCH_CONVERSIONS
 = INCH_CONVERSIONS INCH_CONVERSIONS
 
 # API to build a grayscale palette
+# NOTE: this is not used internally by libpng at present.
 
 option BUILD_GRAYSCALE_PALETTE
 
