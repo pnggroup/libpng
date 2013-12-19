@@ -1,57 +1,32 @@
 
-Libpng 1.6.8 - December 19, 2013
+Libpng 1.6.9beta01 - December 19, 2013
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.8.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.8.tar.gz
+   1.6.9beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.9beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng168.7z  (LZMA-compressed, recommended)
-   lpng168.zip
+   lp169b01.7z  (LZMA-compressed, recommended)
+   lp169b01.zip
 
 Other information:
 
-   libpng-1.6.8-README.txt
-   libpng-1.6.8-LICENSE.txt
+   1.6.9beta01-README.txt
+   1.6.9beta01-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
-Changes since the last public release (1.6.7):
-  Changed #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED in pngpread.c to
-    #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED to be consistent with
-    what is in pngpriv.h.
-  Moved prototype for png_handle_unknown() in pngpriv.h outside of
-    the #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED/#endif block.
-  Added "-Wall" to CFLAGS in contrib/pngminim/*/makefile
-  Conditionally compile some unused functions reported by -Wall in
-    pngminim.
-  Fixed 'minimal' builds. Various obviously useful minimal configurations
-    don't build because of missing contrib/libtests test programs and
-    overly complex dependencies in scripts/pnglibconf.dfa. This change
-    adds contrib/conftest/*.dfa files that can be used in automatic build
-    scripts to ensure that these configurations continue to build.
-  Enabled WRITE_INVERT and WRITE_PACK in contrib/pngminim/encoder.
-  Fixed pngvalid 'fail' function declaration on the Intel C Compiler.
-    This reverts to the previous 'static' implementation and works round
-    the 'unused static function' warning by using PNG_UNUSED().
-  Removed or marked PNG_UNUSED some harmless "dead assignments" reported
-    by clang scan-build.
-  Changed tabs to 3 spaces in png_debug macros and changed '"%s"m'
-    to '"%s" m' to improve portability among compilers.
-  Changed png_free_default() to free() in pngtest.c
-  Tidied up pngfix inits and fixed pngtest no-write builds.
-  Handle zero-length PLTE chunk or NULL palette with png_error()
-    instead of png_chunk_report(), which by default issues a warning
-    rather than an error, leading to later reading from a NULL pointer
-    (png_ptr->palette) in png_do_expand_palette(). This is CVE-2013-6954
-    and VU#650142.
+Changes since the last public release (1.6.8):
+
+Version 1.6.9beta01 [December 19, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
