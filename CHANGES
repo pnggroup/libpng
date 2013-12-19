@@ -4757,6 +4757,12 @@ Version 1.6.9beta01 [December 19, 2013]
     grayscale palette builder out of the png?tran.c files. The latter
     isn't a transform function and is no longer used internally, and the
     former MNG specific functions are better placed in pngread/pngwrite.c
+  Made transform implementation functions static. This makes the internal
+    functions called by png_do_{read|write}_transformations static. On an
+    x86-64 DLL build (Gentoo Linux) this reduces the size of the text
+    segment of the DLL by 1208 bytes, about 0.6%. It also simplifies
+    maintenance by removing the declarations from pngpriv.h and allowing
+    easier changes to the internal interfaces.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

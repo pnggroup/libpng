@@ -1235,32 +1235,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_transform_info,(png_structrp png_ptr,
     png_inforp info_ptr),PNG_EMPTY);
 #endif
 
-/* These are the functions that do the transformations */
-#ifdef PNG_READ_FILLER_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_read_filler,(png_row_infop row_info,
-    png_bytep row, png_uint_32 filler, png_uint_32 flags),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_read_swap_alpha,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_write_swap_alpha,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_read_invert_alpha,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_write_invert_alpha,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
+/* Shared transform functions, defined in pngtran.c */
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
 PNG_INTERNAL_FUNCTION(void,png_do_strip_channel,(png_row_infop row_info,
@@ -1280,93 +1255,13 @@ PNG_INTERNAL_FUNCTION(void,png_do_packswap,(png_row_infop row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-PNG_INTERNAL_FUNCTION(int,png_do_rgb_to_gray,(png_structrp png_ptr,
-    png_row_infop row_info, png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_gray_to_rgb,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_PACK_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_unpack,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_SHIFT_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_unshift,(png_row_infop row_info,
-    png_bytep row, png_const_color_8p sig_bits),PNG_EMPTY);
-#endif
-
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
 PNG_INTERNAL_FUNCTION(void,png_do_invert,(png_row_infop row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 
-#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_scale_16_to_8,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_chop,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_QUANTIZE_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_quantize,(png_row_infop row_info,
-    png_bytep row, png_const_bytep palette_lookup,
-    png_const_bytep quantize_lookup),PNG_EMPTY);
-
-#  ifdef PNG_CORRECT_PALETTE_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_correct_palette,(png_structrp png_ptr,
-    png_colorp palette, int num_palette),PNG_EMPTY);
-#  endif
-#endif
-
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 PNG_INTERNAL_FUNCTION(void,png_do_bgr,(png_row_infop row_info,
-    png_bytep row),PNG_EMPTY);
-#endif
-
-#ifdef PNG_WRITE_PACK_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_pack,(png_row_infop row_info,
-   png_bytep row, png_uint_32 bit_depth),PNG_EMPTY);
-#endif
-
-#ifdef PNG_WRITE_SHIFT_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_shift,(png_row_infop row_info,
-    png_bytep row, png_const_color_8p bit_depth),PNG_EMPTY);
-#endif
-
-#if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
-    defined(PNG_READ_ALPHA_MODE_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_do_compose,(png_row_infop row_info,
-    png_bytep row, png_structrp png_ptr),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_GAMMA_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_gamma,(png_row_infop row_info,
-    png_bytep row, png_structrp png_ptr),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_encode_alpha,(png_row_infop row_info,
-   png_bytep row, png_structrp png_ptr),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_EXPAND_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_expand_palette,(png_row_infop row_info,
-    png_bytep row, png_const_colorp palette, png_const_bytep trans,
-    int num_trans),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_do_expand,(png_row_infop row_info,
-    png_bytep row, png_const_color_16p trans_color),PNG_EMPTY);
-#endif
-
-#ifdef PNG_READ_EXPAND_16_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_do_expand_16,(png_row_infop row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 

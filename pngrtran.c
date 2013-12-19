@@ -2130,7 +2130,7 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
  * the numbers 0 or 1.  If you would rather they contain 0 and 255, use
  * png_do_shift() after this.
  */
-void /* PRIVATE */
+static void
 png_do_unpack(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_unpack");
@@ -2228,7 +2228,7 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
  * a row of bit depth 8, but only 5 are significant, this will shift
  * the values back to 0 through 31.
  */
-void /* PRIVATE */
+static void
 png_do_unshift(png_row_infop row_info, png_bytep row,
     png_const_color_8p sig_bits)
 {
@@ -2367,7 +2367,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
 /* Scale rows of bit depth 16 down to 8 accurately */
-void /* PRIVATE */
+static void
 png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_scale_16_to_8");
@@ -2425,7 +2425,7 @@ png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
 #endif
 
 #ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
-void /* PRIVATE */
+static void
 /* Simply discard the low byte.  This was the default behavior prior
  * to libpng-1.5.4.
  */
@@ -2453,7 +2453,7 @@ png_do_chop(png_row_infop row_info, png_bytep row)
 #endif
 
 #ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
-void /* PRIVATE */
+static void
 png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_read_swap_alpha");
@@ -2550,7 +2550,7 @@ png_do_read_swap_alpha(png_row_infop row_info, png_bytep row)
 #endif
 
 #ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
-void /* PRIVATE */
+static void
 png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 {
    png_uint_32 row_width;
@@ -2652,7 +2652,7 @@ png_do_read_invert_alpha(png_row_infop row_info, png_bytep row)
 
 #ifdef PNG_READ_FILLER_SUPPORTED
 /* Add filler channel if we have RGB color */
-void /* PRIVATE */
+static void
 png_do_read_filler(png_row_infop row_info, png_bytep row,
     png_uint_32 filler, png_uint_32 flags)
 {
@@ -2839,7 +2839,7 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
 /* Expand grayscale files to RGB, with or without alpha */
-void /* PRIVATE */
+static void
 png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
 {
    png_uint_32 i;
@@ -2978,7 +2978,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  *  calculated to make the sum 32768.  This will result in different rounding
  *  to that used above.
  */
-int /* PRIVATE */
+static int
 png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
 
 {
@@ -3179,7 +3179,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
  * "background" is already in the screen gamma, while "background_1" is
  * at a gamma of 1.0.  Paletted files have already been taken care of.
  */
-void /* PRIVATE */
+static void
 png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 {
 #ifdef PNG_READ_GAMMA_SUPPORTED
@@ -3919,7 +3919,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
  * is 16, use gamma_16_table and gamma_shift.  Build these with
  * build_gamma_table().
  */
-void /* PRIVATE */
+static void
 png_do_gamma(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 {
    png_const_bytep gamma_table = png_ptr->gamma_table;
@@ -4120,7 +4120,7 @@ png_do_gamma(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
  * linear.)  Called only with color types that have an alpha channel.  Needs the
  * from_1 tables.
  */
-void /* PRIVATE */
+static void
 png_do_encode_alpha(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 {
    png_uint_32 row_width = row_info->width;
@@ -4186,7 +4186,7 @@ png_do_encode_alpha(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
 /* Expands a palette row to an RGB or RGBA row depending
  * upon whether you supply trans and num_trans.
  */
-void /* PRIVATE */
+static void
 png_do_expand_palette(png_row_infop row_info, png_bytep row,
    png_const_colorp palette, png_const_bytep trans_alpha, int num_trans)
 {
@@ -4339,7 +4339,7 @@ png_do_expand_palette(png_row_infop row_info, png_bytep row,
 /* If the bit depth < 8, it is expanded to 8.  Also, if the already
  * expanded transparency value is supplied, an alpha channel is built.
  */
-void /* PRIVATE */
+static void
 png_do_expand(png_row_infop row_info, png_bytep row,
     png_const_color_16p trans_color)
 {
@@ -4569,7 +4569,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 /* If the bit depth is 8 and the color type is not a palette type expand the
  * whole row to 16 bits.  Has no effect otherwise.
  */
-void /* PRIVATE */
+static void
 png_do_expand_16(png_row_infop row_info, png_bytep row)
 {
    if (row_info->bit_depth == 8 &&
@@ -4597,7 +4597,7 @@ png_do_expand_16(png_row_infop row_info, png_bytep row)
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
-void /* PRIVATE */
+static void
 png_do_quantize(png_row_infop row_info, png_bytep row,
     png_const_bytep palette_lookup, png_const_bytep quantize_lookup)
 {
