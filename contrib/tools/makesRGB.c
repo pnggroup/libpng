@@ -1,8 +1,8 @@
 /* makesRGB.c -- build sRGB-to-linear and linear-to-sRGB conversion tables
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.0 [February 14, 2013]
  *
- * COPYRIGHT: Written by John Cunningham Bowler, 2012.
+ * COPYRIGHT: Written by John Cunningham Bowler, 2013.
  * To the extent possible under law, the author has waived all copyright and
  * related or neighboring rights to this work.  This work is published from:
  * United States.

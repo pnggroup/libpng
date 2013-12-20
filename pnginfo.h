@@ -1,11 +1,11 @@
 
 /* pnginfo.h - header file for PNG reference library
  *
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.0 [January 6, 2011]
+ * Last changed in libpng 1.6.1 [March 28, 2013]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -223,13 +223,17 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
+
+   /* The type of this field is limited by the type of 
+    * png_struct::user_chunk_cache_max, else overflow can occur.
+    */
    int                unknown_chunks_num;
 #endif
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Data on sPLT chunks (there may be more than one). */
    png_sPLT_tp splt_palettes;
-   int         splt_palettes_num;
+   int         splt_palettes_num; /* Match type returned by png_get API */
 #endif
 
 #ifdef PNG_sCAL_SUPPORTED
