@@ -1,7 +1,7 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.6.8 [December 19, 2013]
+ * Last changed in libpng 1.6.9 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1134,7 +1134,7 @@ png_init_palette_transformations(png_structrp png_ptr)
    if (!input_has_alpha)
    {
       /* Any alpha means background and associative alpha processing is
-       * required, however if the alpha is 0 or 1 throughout OPTIIMIZE_ALPHA
+       * required, however if the alpha is 0 or 1 throughout OPTIMIZE_ALPHA
        * and ENCODE_ALPHA are irrelevant.
        */
       png_ptr->transformations &= ~PNG_ENCODE_ALPHA;
@@ -1199,7 +1199,7 @@ png_init_rgb_transformations(png_structrp png_ptr)
    if (!input_has_alpha)
    {
       /* Any alpha means background and associative alpha processing is
-       * required, however if the alpha is 0 or 1 throughout OPTIIMIZE_ALPHA
+       * required, however if the alpha is 0 or 1 throughout OPTIMIZE_ALPHA
        * and ENCODE_ALPHA are irrelevant.
        */
 #     ifdef PNG_READ_ALPHA_MODE_SUPPORTED

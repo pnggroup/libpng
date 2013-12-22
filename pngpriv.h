@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.8 [December 19, 2013]
+ * Last changed in libpng 1.6.9 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -135,7 +135,7 @@
 
    /* By default the 'intrinsics' code in arm/filter_neon_intrinsics.c is used
     * if possible - if __ARM_NEON__ is set and the compiler version is not known
-    * to be broken.  This is control by PNG_ARM_NEON_IMPLEMENTATION which can
+    * to be broken.  This is controlled by PNG_ARM_NEON_IMPLEMENTATION which can
     * be:
     *
     *    1  The intrinsics code (the default with __ARM_NEON__)
