@@ -36,7 +36,7 @@ Version 1.5.18beta02 [December 26, 2013]
   Added "-Wall" to CFLAGS in contrib/pngminim/*/makefile
   Conditionally compile some unused functions reported by -Wall in
     pngminim.
-  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.59(2013)
+  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
 Version 1.5.18beta03 [December 26, 2013]
