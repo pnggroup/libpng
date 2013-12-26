@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.5.15 [March 28, 2013]
+ * Last changed in libpng 1.5.18 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1571,13 +1571,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 #ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
    {
-      int wrote_question = 0;
-
       for (;;)
       {
+         static int wrote_question = 0;
          png_size_t num_in, num_out;
          char inbuf[256], outbuf[256];
-
 
          num_in = fread(inbuf, 1, sizeof inbuf, fpin);
          num_out = fread(outbuf, 1, sizeof outbuf, fpout);

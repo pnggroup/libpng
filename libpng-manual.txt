@@ -1,6 +1,6 @@
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.18beta02 - August 21, 2013
+ libpng version 1.5.18beta02 - December 26, 2013
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.18beta02 - August 21, 2013
+ libpng versions 0.97, January 1998, through 1.5.18beta02 - December 26, 2013
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4184,15 +4184,24 @@ X.  Changes to Libpng from version 1.4.x to 1.5.x
 From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
 
-Checking for invalid palette index on read or write was added at libpng
-1.5.10.  When an invalid index is found, libpng issues a benign error.
-This is enabled by default but can be disabled in each png_ptr with
+Checking for invalid palette index on write was added at libpng
+1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
+a benign error.  This is enabled by default because this condition is an
+error according to the PNG specification, Clause 11.3.2, but the error can
+be ignored in each png_ptr with
 
    png_set_check_for_invalid_index(png_ptr, allowed);
 
       allowed  - one of
-                 0: disable
-                 1: enable
+                 0: disable benign error (accept the
+                    invalid data without warning).
+                 1: enable benign error (treat the
+                    invalid data as an error or a
+                    warning).
+
+If the error is ignored, or if png_benign_error() treats it as a warning,
+any invalid pixels are decoded as opaque black by the decoder and written
+as-is by the encoder.
 
 Retrieving the maximum palette index found was added at libpng-1.5.15.
 This statement must appear after png_read_png() or png_read_image() while
@@ -4214,9 +4223,10 @@ members of the main libpng control structures, png_struct and png_info,
 deprecated in earlier versions of libpng, has been completely removed from
 libpng 1.5.
 
-We no longer include zlib.h in png.h.  Applications that need access
-to information in zlib.h will need to add the '#include "zlib.h"'
-directive.  It does not matter whether it is placed prior to or after
+We no longer include zlib.h in png.h.  The include statement has been moved
+to pngstruct.h, where it is not accessible by applications. Applications that
+need access to information in zlib.h will need to add the '#include "zlib.h"'
+directive.  It does not matter whether this is placed prior to or after
 the '"#include png.h"' directive.
 
 The png_sprintf(), png_strcpy(), and png_strncpy() macros are no longer used
@@ -4658,7 +4668,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-August 21, 2013
+December 26, 2013
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
