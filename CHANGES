@@ -4767,6 +4767,8 @@ Version 1.6.9beta01 [December 26, 2013]
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.59(2013)
     in the tar distributions.
 
+Version 1.6.9beta02 [December 26, 2013]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
