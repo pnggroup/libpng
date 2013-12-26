@@ -4764,7 +4764,7 @@ Version 1.6.9beta01 [December 26, 2013]
     segment of the DLL by 1208 bytes, about 0.6%. It also simplifies
     maintenance by removing the declarations from pngpriv.h and allowing
     easier changes to the internal interfaces.
-  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.59(2013)
+  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
 Version 1.6.9beta02 [December 26, 2013]
