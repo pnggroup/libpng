@@ -172,7 +172,7 @@
 
    /* By default the 'intrinsics' code in arm/filter_neon_intrinsics.c is used
     * if possible - if __ARM_NEON__ is set and the compiler version is not known
-    * to be broken.  This is control by PNG_ARM_NEON_IMPLEMENTATION which can
+    * to be broken.  This is controlled by PNG_ARM_NEON_IMPLEMENTATION which can
     * be:
     *
     *    1  The intrinsics code (the default with __ARM_NEON__)

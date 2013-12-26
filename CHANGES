@@ -4749,10 +4749,13 @@ Version 1.7.0beta24 [December 15, 2013]
     instead of png_chunk_report(), which by default issues a warning
     rather than an error, leading to later reading from a NULL pointer
     (png_ptr->palette) in png_do_expand_palette(). This is CVE-2013-6954
-    and VU#650142.
+    and VU#650142.  Libpng-1.6.1 through 1.6.7 and libpng-1.7.0beta03
+    through 1.7.0beta23 are vulnerable.  Libpng-1.6.0 and earlier do not
+    have the bug.
 
-Version 1.7.0beta25 [December 20, 2013]
+Version 1.7.0beta25 [December 26, 2013]
   Merged files with version 1.6.8 that have not changed since then.
+  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
