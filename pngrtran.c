@@ -1113,7 +1113,7 @@ png_init_palette_transformations(png_structp png_ptr)
    if (!input_has_alpha)
    {
       /* Any alpha means background and associative alpha processing is
-       * required, however if the alpha is 0 or 1 throughout OPTIIMIZE_ALPHA
+       * required, however if the alpha is 0 or 1 throughout OPTIMIZE_ALPHA
        * and ENCODE_ALPHA are irrelevant.
        */
       png_ptr->transformations &= ~PNG_ENCODE_ALPHA;
@@ -1178,7 +1178,7 @@ png_init_rgb_transformations(png_structp png_ptr)
    if (!input_has_alpha)
    {
       /* Any alpha means background and associative alpha processing is
-       * required, however if the alpha is 0 or 1 throughout OPTIIMIZE_ALPHA
+       * required, however if the alpha is 0 or 1 throughout OPTIMIZE_ALPHA
        * and ENCODE_ALPHA are irrelevant.
        */
 #     ifdef PNG_READ_ALPHA_MODE_SUPPORTED
