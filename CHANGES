@@ -4745,12 +4745,13 @@ Version 1.6.8rc02 [December 14, 2013]
     instead of png_chunk_report(), which by default issues a warning
     rather than an error, leading to later reading from a NULL pointer
     (png_ptr->palette) in png_do_expand_palette(). This is CVE-2013-6954
-    and VU#650142.
+    and VU#650142.  Libpng-1.6.1 through 1.6.7 are vulnerable.
+    Libpng-1.6.0 and earlier do not have this bug.
 
 Version 1.6.8 [December 19, 2013]
   No changes.
 
-Version 1.6.9beta01 [December 22, 2013]
+Version 1.6.9beta01 [December 26, 2013]
   Bookkeeping: Moved functions around (no changes). Moved transform
     function definitions before the place where they are called so that
     they can be masde static. Move the intrapixel functions and the
@@ -4763,7 +4764,7 @@ Version 1.6.9beta01 [December 22, 2013]
     segment of the DLL by 1208 bytes, about 0.6%. It also simplifies
     maintenance by removing the declarations from pngpriv.h and allowing
     easier changes to the internal interfaces.
-  Rebuilt configure scripts with automake-1.14 and autoconf-2.59(2013)
+  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.59(2013)
     in the tar distributions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

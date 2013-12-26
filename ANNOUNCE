@@ -1,5 +1,5 @@
 
-Libpng 1.6.9beta01 - December 22, 2013
+Libpng 1.6.9beta01 - December 26, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.6.8):
 
-Version 1.6.9beta01 [December 22, 2013]
+Version 1.6.9beta01 [December 26, 2013]
   Bookkeeping: Moved functions around (no changes). Moved transform
     function definitions before the place where they are called so that
     they can be masde static. Move the intrapixel functions and the
@@ -39,7 +39,7 @@ Version 1.6.9beta01 [December 22, 2013]
     segment of the DLL by 1208 bytes, about 0.6%. It also simplifies
     maintenance by removing the declarations from pngpriv.h and allowing
     easier changes to the internal interfaces.
-  Rebuilt configure scripts with automake-1.14 and autoconf-2.59(2013)
+  Rebuilt configure scripts with automake-1.14.1 and autoconf-2.59(2013)
     in the tar distributions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
