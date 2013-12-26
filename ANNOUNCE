@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta25 - December 26, 2013
+Libpng 1.7.0beta26 - December 26, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta25.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta25.tar.gz
+   1.7.0beta26.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta26.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b25.7z  (LZMA-compressed, recommended)
-   lp170b25.zip
+   lp170b26.7z  (LZMA-compressed, recommended)
+   lp170b26.zip
 
 Other information:
 
-   1.7.0beta25-README.txt
-   1.7.0beta25-LICENSE.txt
+   1.7.0beta26-README.txt
+   1.7.0beta26-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -467,6 +467,8 @@ Version 1.7.0beta24 [December 15, 2013]
 Version 1.7.0beta25 [December 26, 2013]
   Merged files with version 1.6.8 that have not changed since then.
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
+
+Version 1.7.0beta26 [December 26, 2013]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
