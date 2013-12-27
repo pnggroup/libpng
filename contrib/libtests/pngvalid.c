@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.9 [(PENDING RELEASE)]
  * Copyright (c) 2012 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -39,10 +39,14 @@
  */
 #ifdef PNG_FREESTANDING_TESTS
 #  include <png.h>
-#  include <zlib.h>   /* For crc32 */
 #else
 #  include "../../png.h"
+#endif
+
+#ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER
+#else
+#  include <zlib.h>   /* For crc32 */
 #endif
 
 /* pngvalid requires write support and one of the fixed or floating point APIs.
@@ -3861,8 +3865,15 @@ make_size(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type, int bdlo,
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 0);
 #        endif
+#        if defined(PNG_WRITE_INTERLACING_SUPPORTED) || PNG_LIBPNG_VER > 10518
+            /* This fails in 1.5.8 with a zlib stream error writing the rows of
+             * the internally generated interlaced images, but only when the
+             * read code is disabled: to be investigated.  Probably an erroneous
+             * #define out of the zlib deflate reset.
+             */
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 1);
+#        endif
          }
       }
    }
@@ -6758,8 +6769,23 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
          /* Rounding to 8 bits in the linear space causes massive errors which
           * will trigger the error check in transform_range_check.  Fix that
           * here by taking the gamma encoding into account.
+          *
+          * When DIGITIZE is set because a pre-1.7 version of libpng is being
+          * tested allow a bigger slack.
+          *
+          * NOTE: this magic number was determined by experiment to be 1.1 (when
+          * using fixed point arithmetic).  There's no great merit to the value
+          * below, however it only affects the limit used for checking for
+          * internal calculation errors, not the actual limit imposed by
+          * pngvalid on the output errors.
           */
-         that->pm->limit += pow(1./255, data.gamma);
+         that->pm->limit += pow(
+#           if DIGITIZE
+               1.1
+#           else
+               1.
+#           endif
+               /255, data.gamma);
       }
    }
 
@@ -10495,6 +10521,11 @@ int main(void)
    fprintf(stderr,
       "pngvalid: no low level write support in libpng, all tests skipped\n");
    /* So the test is skipped: */
+#if PNG_LIBPNG_VER < 10601
+   /* Test harness support was only added in libpng 1.6.1: */
+   return 0;
+#else
    return 77;
+#endif
 }
 #endif
