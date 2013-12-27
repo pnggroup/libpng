@@ -471,6 +471,7 @@ Version 1.7.0beta25 [December 26, 2013]
 Version 1.7.0beta26 [December 27, 2013]
   Added libpng 1.5 checks to pngvalid.c
   Merged with 1.5 and 1.6 changes to create a single pngvalid.c
+  Added dSIG to chunk list in png.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
