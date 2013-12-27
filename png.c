@@ -658,13 +658,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.18beta03 - December 26, 2013" PNG_STRING_NEWLINE \
+     "libpng version 1.5.18beta03 - December 27, 2013" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2013 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.18beta03 - December 26, 2013\
+      return "libpng version 1.5.18beta03 - December 27, 2013\
       Copyright (c) 1998-2013 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2529,6 +2529,7 @@ png_gamma_significant(png_fixed_point gamma_val)
        gamma_val > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED;
 }
 
+#ifdef PNG_16BIT_SUPPORTED
 /* Internal function to build a single 16-bit table - the table consists of
  * 'num' 256-entry subtables, where 'num' is determined by 'shift' - the amount
  * to shift the input values right (or 16-number_of_signifiant_bits).
@@ -2601,6 +2602,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
       }
    }
 }
+#endif
 
 /* NOTE: this function expects the *inverse* of the overall gamma transformation
  * required.

@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.15 [March 28, 2013]
+ * Last changed in libpng 1.6.8 [December 19, 2013]
  * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -43,7 +43,10 @@
 #  include "../../png.h"
 #endif
 
-#ifdef PNG_WRITE_SUPPORTED /* else pngvalid can do nothing */
+/* pngvalid requires write support and one of the fixed or floating point APIs.
+ */
+#if defined(PNG_WRITE_SUPPORTED) &&\
+   (defined(PNG_FIXED_POINT_SUPPORTED) || defined(PNG_FLOATING_POINT_SUPPORTED))
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the PNG_CONST. */
@@ -104,6 +107,11 @@ typedef png_byte *png_const_bytep;
 #  else
 #     define UNUSED(param)
 #  endif
+#endif
+
+/* Fixups for various minimal builds */
+#ifndef PNG_ERROR_TEXT_SUPPORTED
+#  define png_error(a,b) png_err(a)
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
@@ -616,7 +624,12 @@ typedef struct png_store
    unsigned int       validated :1;   /* used as a temporary flag */
    int                nerrors;
    int                nwarnings;
-   char               test[128]; /* Name of test */
+   int                noptions;       /* number of options below: */
+   struct {
+      unsigned char   option;         /* option number, 0..30 */
+      unsigned char   setting;        /* setting (unset,invalid,on,off) */
+   }                  options[16];
+   char               test[128];      /* Name of test */
    char               error[256];
 
    /* Read fields */
@@ -717,6 +730,7 @@ store_init(png_store* ps)
    ps->new.prev = NULL;
    ps->palette = NULL;
    ps->npalette = 0;
+   ps->noptions = 0;
 }
 
 static void
@@ -1257,6 +1271,7 @@ store_current_palette(png_store *ps, int *npalette)
 #endif /* PNG_READ_SUPPORTED */
 
 /***************************** MEMORY MANAGEMENT*** ***************************/
+#ifdef PNG_USER_MEM_SUPPORTED
 /* A store_memory is simply the header for an allocated block of memory.  The
  * pointer returned to libpng is just after the end of the header block, the
  * allocated memory is followed by a second copy of the 'mark'.
@@ -1457,6 +1472,7 @@ store_free(png_structp ppIn, png_voidp memory)
    this->next = NULL;
    store_memory_free(pp, pool, this);
 }
+#endif /* PNG_USER_MEM_SUPPORTED */
 
 /* Setup functions. */
 /* Cleanup when aborting a write or after storing the new file. */
@@ -1482,7 +1498,9 @@ store_write_reset(png_store *ps)
    /* And make sure that all the memory has been freed - this will output
     * spurious errors in the case of memory corruption above, but this is safe.
     */
-   store_pool_delete(ps, &ps->write_memory_pool);
+#  ifdef PNG_USER_MEM_SUPPORTED
+      store_pool_delete(ps, &ps->write_memory_pool);
+#  endif
 
    store_freenew(ps);
 }
@@ -1506,17 +1524,31 @@ set_store_for_write(png_store *ps, png_infopp ppi,
       store_write_reset(ps);
       safecat(ps->wname, sizeof ps->wname, 0, name);
 
-      /* Don't do the slow memory checks if doing a speed test. */
-      if (ps->speed)
+      /* Don't do the slow memory checks if doing a speed test, also if user
+       * memory is not supported we can't do it anyway.
+       */
+#     ifdef PNG_USER_MEM_SUPPORTED
+         if (!ps->speed)
+            ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
+               ps, store_error, store_warning, &ps->write_memory_pool,
+               store_malloc, store_free);
+
+         else
+#     endif
          ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING,
             ps, store_error, store_warning);
 
-      else
-         ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
-            ps, store_error, store_warning, &ps->write_memory_pool,
-            store_malloc, store_free);
-
       png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
+
+#     ifdef PNG_SET_OPTION_SUPPORTED
+         {
+            int opt;
+            for (opt=0; opt<ps->noptions; ++opt)
+               if (png_set_option(ps->pwrite, ps->options[opt].option,
+                  ps->options[opt].setting) == PNG_OPTION_INVALID)
+                  png_error(ps->pwrite, "png option invalid");
+         }
+#     endif
 
       if (ppi != NULL)
          *ppi = ps->piwrite = png_create_info_struct(ps->pwrite);
@@ -1553,8 +1585,10 @@ store_read_reset(png_store *ps)
       }
 #  endif
 
-   /* Always do this to be safe. */
-   store_pool_delete(ps, &ps->read_memory_pool);
+#  ifdef PNG_USER_MEM_SUPPORTED
+      /* Always do this to be safe. */
+      store_pool_delete(ps, &ps->read_memory_pool);
+#  endif
 
    ps->current = NULL;
    ps->next = NULL;
@@ -1581,14 +1615,14 @@ store_read_set(png_store *ps, png_uint_32 id)
       pf = pf->next;
    }
 
-      {
+   {
       size_t pos;
       char msg[FILE_NAME_SIZE+64];
 
       pos = standard_name_from_id(msg, sizeof msg, 0, id);
       pos = safecat(msg, sizeof msg, pos, ": file not found");
       png_error(ps->pread, msg);
-      }
+   }
 }
 
 /* The main interface for reading a saved file - pass the id number of the file
@@ -1614,14 +1648,16 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
     * However, given that store_error works correctly in these circumstances
     * we don't ever expect NULL in this program.
     */
-   if (ps->speed)
-      ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps,
-          store_error, store_warning);
+#  ifdef PNG_USER_MEM_SUPPORTED
+      if (!ps->speed)
+         ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
+             store_error, store_warning, &ps->read_memory_pool, store_malloc,
+             store_free);
 
-   else
-      ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
-          store_error, store_warning, &ps->read_memory_pool, store_malloc,
-          store_free);
+      else
+#  endif
+   ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps, store_error,
+      store_warning);
 
    if (ps->pread == NULL)
    {
@@ -1632,6 +1668,16 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
 
       Throw ps;
    }
+
+#  ifdef PNG_SET_OPTION_SUPPORTED
+      {
+         int opt;
+         for (opt=0; opt<ps->noptions; ++opt)
+            if (png_set_option(ps->pread, ps->options[opt].option,
+               ps->options[opt].setting) == PNG_OPTION_INVALID)
+                  png_error(ps->pread, "png option invalid");
+      }
+#  endif
 
    store_read_set(ps, id);
 
@@ -1908,7 +1954,7 @@ typedef struct png_modifier
 
 /* This returns true if the test should be stopped now because it has already
  * failed and it is running silently.
- */
+  */
 static int fail(png_modifier *pm)
 {
    return !pm->log && !pm->this.verbose && (pm->this.nerrors > 0 ||
@@ -2919,6 +2965,12 @@ sbit_modification_init(sbit_modification *me, png_modifier *pm, png_byte sbit)
  * height of 16 rows.  The width and height are stored in the FILEID and, being
  * non-zero, indicate a size file.
  *
+ * Because the PNG filter code is typically the largest CPU consumer within
+ * libpng itself there is a tendency to attempt to optimize it.  This results in
+ * special case code which needs to be validated.  To cause this to happen the
+ * 'size' images are made to use each possible filter, in so far as this is
+ * possible for smaller images.
+ *
  * For palette image (colour type 3) multiple transform images are stored with
  * the same bit depth to allow testing of more colour combinations -
  * particularly important for testing the gamma code because libpng uses a
@@ -3077,8 +3129,10 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
       for (; i<256; ++i)
          tRNS[i] = 24;
 
-      if (j > 0)
-         png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
+#     ifdef PNG_WRITE_tRNS_SUPPORTED
+         if (j > 0)
+            png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
+#     endif
    }
 }
 
@@ -3324,6 +3378,13 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
  */
 #define DEPTH(bd) ((png_byte)(1U << (bd)))
 
+/* This is just a helper for compiling on minimal systems with no write
+ * interlacing support.
+ */
+#ifndef PNG_WRITE_INTERLACING_SUPPORTED
+#  define png_set_interlace_handling(a) (1)
+#endif
+
 /* Make a standardized image given a an image colour type, bit depth and
  * interlace type.  The standard images have a very restricted range of
  * rows and heights and are used for testing transforms rather than image
@@ -3357,7 +3418,7 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
 #ifdef PNG_TEXT_SUPPORTED
-#  if defined (NG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED)
+#  if defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED)
 #     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_zTXt
 #  else
 #     define TEXT_COMPRESSION PNG_TEXT_COMPRESSION_NONE
@@ -3477,8 +3538,12 @@ make_transform_images(png_store *ps)
    {
       int interlace_type;
 
-      for (interlace_type = PNG_INTERLACE_NONE;
-           interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+         for (interlace_type = PNG_INTERLACE_NONE;
+              interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     else
+         interlace_type = PNG_INTERLACE_NONE;
+#     endif
       {
          char name[FILE_NAME_SIZE];
 
@@ -3634,6 +3699,9 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
+#        ifdef PNG_WRITE_FILTER_SUPPORTED
+            int nfilter = PNG_FILTER_VALUE_LAST;
+#        endif
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -3687,7 +3755,24 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
                      continue;
                }
 
-               /* Only get to here if the row has some pixels in it. */
+#           ifdef PNG_WRITE_FILTER_SUPPORTED
+               /* Only get to here if the row has some pixels in it, set the
+                * filters to 'all' for the very first row and thereafter to a
+                * single filter.  It isn't well documented, but png_set_filter
+                * does accept a filter number (per the spec) as well as a bit
+                * mask.
+                *
+                * The apparent wackiness of decrementing nfilter rather than
+                * incrementing is so that Paeth gets used in all images bigger
+                * than 1 row - it's the tricky one.
+                */
+               png_set_filter(pp, 0/*method*/,
+                  nfilter >= PNG_FILTER_VALUE_LAST ? PNG_ALL_FILTERS : nfilter);
+
+               if (nfilter-- == 0)
+                  nfilter = PNG_FILTER_VALUE_LAST-1;
+#           endif
+
                png_write_row(pp, row);
             }
          }
@@ -3754,10 +3839,19 @@ make_size(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type, int bdlo,
                width, height, 0);
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_NONE,
                width, height, 1);
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 0);
+#        endif
+#        if defined(PNG_WRITE_INTERLACING_SUPPORTED) || PNG_LIBPNG_VER > 10518
+            /* This fails in 1.5.8 with a zlib stream error writing the rows of
+             * the internally generated interlaced images, but only when the
+             * read code is disabled: to be investigated.  Probably an erroneous
+             * #define out of the zlib deflate reset.
+             */
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 1);
+#        endif
          }
       }
    }
@@ -3950,8 +4044,12 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
    {
       int interlace_type;
 
-      for (interlace_type = PNG_INTERLACE_NONE;
-           interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+         for (interlace_type = PNG_INTERLACE_NONE;
+              interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+#     else
+         interlace_type = PNG_INTERLACE_NONE;
+#     endif
       {
          unsigned int test;
          char name[FILE_NAME_SIZE];
@@ -3972,7 +4070,7 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
 
    return 1; /* keep going */
 }
-#endif
+#endif /* PNG_WARNINGS_SUPPORTED */
 
 static void
 perform_error_test(png_modifier *pm)
@@ -4758,7 +4856,7 @@ standard_check_text(png_const_structp pp, png_const_textp tp,
 
 static void
 standard_text_validate(standard_display *dp, png_const_structp pp,
-   png_const_infop pi, int check_end)
+   png_infop pi, int check_end)
 {
    png_textp tp = NULL;
    png_uint_32 num_text = png_get_text(pp, pi, &tp, NULL);
@@ -5995,7 +6093,7 @@ transform_test(png_modifier *pmIn, PNG_CONST png_uint_32 idIn,
 
    Catch(fault)
    {
-      modifier_reset((png_modifier*)fault);
+      modifier_reset(voidcast(png_modifier*,(void*)fault));
    }
 }
 
@@ -7129,7 +7227,7 @@ transform_enable(PNG_CONST char *name)
    {
       fprintf(stderr, "pngvalid: --transform-enable=%s: unknown transform\n",
          name);
-      exit(1);
+      exit(99);
    }
 }
 
@@ -7151,7 +7249,7 @@ transform_disable(PNG_CONST char *name)
 
    fprintf(stderr, "pngvalid: --transform-disable=%s: unknown transform\n",
       name);
-   exit(1);
+   exit(99);
 }
 
 static void
@@ -8699,7 +8797,7 @@ gamma_test(png_modifier *pmIn, PNG_CONST png_byte colour_typeIn,
    }
 
    Catch(fault)
-      modifier_reset((png_modifier*)fault);
+      modifier_reset(voidcast(png_modifier*,(void*)fault));
 }
 
 static void gamma_threshold_test(png_modifier *pm, png_byte colour_type,
@@ -9455,7 +9553,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_START_ROW(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       m = PNG_PASS_START_COL(pass);
@@ -9463,7 +9561,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_START_COL(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       m = PNG_PASS_ROW_SHIFT(pass);
@@ -9471,7 +9569,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_ROW_SHIFT(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       m = PNG_PASS_COL_SHIFT(pass);
@@ -9479,7 +9577,7 @@ perform_interlace_macro_validation(void)
       if (m != f)
       {
          fprintf(stderr, "PNG_PASS_COL_SHIFT(%d) = %u != %x\n", pass, m, f);
-         exit(1);
+         exit(99);
       }
 
       /* Macros that depend on the image or sub-image height too:
@@ -9500,7 +9598,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_ROW_FROM_PASS_ROW(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_COL_FROM_PASS_COL(v, pass);
@@ -9509,7 +9607,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_COL_FROM_PASS_COL(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_ROW_IN_INTERLACE_PASS(v, pass);
@@ -9518,7 +9616,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_ROW_IN_INTERLACE_PASS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_COL_IN_INTERLACE_PASS(v, pass);
@@ -9527,7 +9625,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_COL_IN_INTERLACE_PASS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          /* Then the base 1 stuff: */
@@ -9538,7 +9636,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_PASS_ROWS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          m = PNG_PASS_COLS(v, pass);
@@ -9547,7 +9645,7 @@ perform_interlace_macro_validation(void)
          {
             fprintf(stderr, "PNG_PASS_COLS(%u, %d) = %u != %x\n",
                v, pass, m, f);
-            exit(1);
+            exit(99);
          }
 
          /* Move to the next v - the stepping algorithm starts skipping
@@ -9951,7 +10049,7 @@ int main(int argc, char **argv)
          else
          {
             fprintf(stderr, "pngvalid: %s: unknown 'max' option\n", *argv);
-            exit(1);
+            exit(99);
          }
 
          catmore = 1;
@@ -9963,10 +10061,51 @@ int main(int argc, char **argv)
       else if (strcmp(*argv, "--log16") == 0)
          --argc, pm.log16 = atof(*++argv), catmore = 1;
 
+#ifdef PNG_SET_OPTION_SUPPORTED
+      else if (strncmp(*argv, "--option=", 9) == 0)
+      {
+         /* Syntax of the argument is <option>:{on|off} */
+         const char *arg = 9+*argv;
+         unsigned char option=0, setting=0;
+
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+         if (strncmp(arg, "arm-neon:", 9) == 0)
+            option = PNG_ARM_NEON, arg += 9;
+
+         else
+#endif
+         if (strncmp(arg, "max-inflate-window:", 19) == 0)
+            option = PNG_MAXIMUM_INFLATE_WINDOW, arg += 19;
+
+         else
+         {
+            fprintf(stderr, "pngvalid: %s: %s: unknown option\n", *argv, arg);
+            exit(99);
+         }
+
+         if (strcmp(arg, "off") == 0)
+            setting = PNG_OPTION_OFF;
+
+         else if (strcmp(arg, "on") == 0)
+            setting = PNG_OPTION_ON;
+
+         else
+         {
+            fprintf(stderr,
+               "pngvalid: %s: %s: unknown setting (use 'on' or 'off')\n",
+               *argv, arg);
+            exit(99);
+         }
+
+         pm.this.options[pm.this.noptions].option = option;
+         pm.this.options[pm.this.noptions++].setting = setting;
+      }
+#endif /* PNG_SET_OPTION_SUPPORTED */
+
       else
       {
          fprintf(stderr, "pngvalid: %s: unknown argument\n", *argv);
-         exit(1);
+         exit(99);
       }
 
       if (catmore) /* consumed an extra *argv */
@@ -10140,12 +10279,22 @@ int main(int argc, char **argv)
       }
    }
 
+   /* This is required because some very minimal configurations do not use it:
+    */
+   UNUSED(fail)
    return 0;
 }
-#else /* write not supported */
+#else /* write or low level APIs not supported */
 int main(void)
 {
-   fprintf(stderr, "pngvalid: no write support in libpng, all tests skipped\n");
+   fprintf(stderr,
+      "pngvalid: no low level write support in libpng, all tests skipped\n");
+   /* So the test is skipped: */
+#if PNG_LIBPNG_VER < 10601
+   /* Test harness support was only added in libpng 1.6.1: */
    return 0;
+#else
+   return 77;
+#endif
 }
 #endif

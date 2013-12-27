@@ -315,6 +315,7 @@ png_zlib_release(png_structp png_ptr)
 
       if (ret != Z_OK)
       {
+#ifdef PNG_WARNINGS_SUPPORTED
          png_const_charp err;
          PNG_WARNING_PARAMETERS(p)
 
@@ -349,6 +350,7 @@ png_zlib_release(png_structp png_ptr)
 
          png_formatted_warning(png_ptr, p,
             "zlib failed to reset compressor: @1(@2): @3");
+#endif
       }
    }
 

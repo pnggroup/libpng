@@ -62,46 +62,6 @@
 #  endif
 #endif
 
-/* Compile time options.
- * =====================
- * In a multi-arch build the compiler may compile the code several times for the
- * same object module, producing different binaries for different architectures.
- * When this happens configure-time setting of the target host options cannot be
- * done and this interferes with the handling of the ARM NEON optimizations, and
- * possibly other similar optimizations.  Put additional tests here; in general
- * this is needed when the same option can be changed at both compile time and
- * run time depending on the target OS (i.e. iOS vs Android.)
- *
- * NOTE: symbol prefixing does not pass $(CFLAGS) to the preprocessor, because
- * this is not possible with certain compilers (Oracle SUN OS CC), as a result
- * it is necessary to ensure that all extern functions that *might* be used
- * regardless of $(CFLAGS) get declared in this file.  The test on __ARM_NEON__
- * below is one example of this behavior because it is controlled by the
- * presence or not of -mfpu=neon on the GCC command line, it is possible to do
- * this in $(CC), e.g. "CC=gcc -mfpu=neon", but people who build libpng rarely
- * do this.
- */
-#ifndef PNG_ARM_NEON_OPT
-   /* ARM NEON optimizations are being controlled by the compiler settings,
-    * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
-    * with GCC) then the compiler will define __ARM_NEON__ and we can rely
-    * unconditionally on NEON instructions not crashing, otherwise we must
-    * disable use of NEON instructions:
-    */
-#  ifdef __ARM_NEON__
-#     define PNG_ARM_NEON_OPT 2
-#  else
-#     define PNG_ARM_NEON_OPT 0
-#  endif
-#endif
-
-#if PNG_ARM_NEON_OPT > 0
-   /* NEON optimizations are to be at least considered by libpng, so enable the
-    * callbacks to do this.
-    */
-#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
-#endif
-
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
  * so PNG_BUILD_DLL must be set.
@@ -171,6 +131,53 @@
 /* pngconf.h does not set PNG_DLL_EXPORT unless it is required, so: */
 #ifndef PNG_DLL_EXPORT
 #  define PNG_DLL_EXPORT
+#endif
+
+/* Compile time options.
+ * =====================
+ * In a multi-arch build the compiler may compile the code several times for the
+ * same object module, producing different binaries for different architectures.
+ * When this happens configure-time setting of the target host options cannot be
+ * done and this interferes with the handling of the ARM NEON optimizations, and
+ * possibly other similar optimizations.  Put additional tests here; in general
+ * this is needed when the same option can be changed at both compile time and
+ * run time depending on the target OS (i.e. iOS vs Android.)
+ *
+ * NOTE: symbol prefixing does not pass $(CFLAGS) to the preprocessor, because
+ * this is not possible with certain compilers (Oracle SUN OS CC), as a result
+ * it is necessary to ensure that all extern functions that *might* be used
+ * regardless of $(CFLAGS) get declared in this file.  The test on __ARM_NEON__
+ * below is one example of this behavior because it is controlled by the
+ * presence or not of -mfpu=neon on the GCC command line, it is possible to do
+ * this in $(CC), e.g. "CC=gcc -mfpu=neon", but people who build libpng rarely
+ * do this.
+ */
+#ifndef PNG_ARM_NEON_OPT
+   /* ARM NEON optimizations are being controlled by the compiler settings,
+    * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
+    * with GCC) then the compiler will define __ARM_NEON__ and we can rely
+    * unconditionally on NEON instructions not crashing, otherwise we must
+    * disable use of NEON instructions.
+    *
+    * NOTE: at present these optimizations depend on 'ALIGNED_MEMORY', so they
+    * can only be turned on automatically if that is supported too.  If
+    * PNG_ARM_NEON_OPT is set in CPPFLAGS (to >0) then arm/arm_init.c will fail
+    * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
+    * off.
+    */
+#  if defined(__ARM_NEON__) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#     define PNG_ARM_NEON_OPT 2
+#  else
+#     define PNG_ARM_NEON_OPT 0
+#  endif
+#endif
+
+
+#if PNG_ARM_NEON_OPT > 0
+   /* NEON optimizations are to be at least considered by libpng, so enable the
+    * callbacks to do this.
+    */
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
 #endif
 
 /* SECURITY and SAFETY:
