@@ -4171,6 +4171,7 @@ Version 1.5.18beta03 [December 27, 2013]
     however one write-only test is currently disabled because it does not
     work; possibly because of failures to reset or initialize the deflate
     stream correctly in write-only cases.
+  Merged libpng-1.7 changes and created a single pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
