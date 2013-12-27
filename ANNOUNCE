@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta26 - December 26, 2013
+Libpng 1.7.0beta26 - December 27, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -468,7 +468,8 @@ Version 1.7.0beta25 [December 26, 2013]
   Merged files with version 1.6.8 that have not changed since then.
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
 
-Version 1.7.0beta26 [December 26, 2013]
+Version 1.7.0beta26 [December 27, 2013]
+  Added libpng 1.5 checks to pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
