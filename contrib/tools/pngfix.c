@@ -32,7 +32,6 @@
 #  define FIX_GCC volatile
 #else
 #  define FIX_GCC
-#  error not tested
 #endif
 
 #define PROGRAM_NAME "pngfix"
