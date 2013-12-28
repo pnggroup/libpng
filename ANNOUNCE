@@ -473,6 +473,7 @@ Version 1.7.0beta26 [December 28, 2013]
   Merged with 1.5 and 1.6 changes to create a single pngvalid.c
   Added dSIG to chunk list in png.h
   Removed #error macro from contrib/tools/pngfix.c (Thomas Klausner).
+  Merged pngrio.c, pngtrans.c, and pngwio.c with libpng-1.6.9
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
