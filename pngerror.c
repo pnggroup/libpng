@@ -761,7 +761,12 @@ png_longjmp,(png_const_structrp png_ptr, int val),PNG_NORETURN)
       png_ptr->longjmp_fn(*png_ptr->jmp_buf_ptr, val);
 #endif
 
-   /* Here if not setjmp support or if png_ptr is null. */
+   /* If control reaches this point, png_longjmp() must not return. The only
+    * choice is to terminate the whole process (or maybe the thread); to do
+    * this the ANSI-C abort() function is used unless a different method is 
+    * implemented by overriding the default configuration setting for
+    * PNG_ABORT().
+    */
    PNG_ABORT();
 }
 

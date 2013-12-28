@@ -4773,6 +4773,7 @@ Version 1.6.9beta02 [December 28, 2013]
   Merged with pngvalid.c from libpng-1.7 changes to create a single
     pngvalid.c
   Removed #error macro from contrib/tools/pngfix.c (Thomas Klausner).
+  Merged pngrio.c, pngtrans.c, pngwio.c, and pngerror.c with libpng-1.7.0
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
