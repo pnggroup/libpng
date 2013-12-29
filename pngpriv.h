@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.5.17 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.18 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -572,7 +572,7 @@
 #define PNG_FLAG_STRIP_ERROR_NUMBERS      0x40000
 #define PNG_FLAG_STRIP_ERROR_TEXT         0x80000
 #define PNG_FLAG_MALLOC_NULL_MEM_OK       0x100000
-                                  /*      0x200000  unused */
+#define PNG_FLAG_ZSTREAM_PROGRESSIVE      0x200000
                                   /*      0x400000  unused */
 #define PNG_FLAG_BENIGN_ERRORS_WARN       0x800000  /* Added to libpng-1.4.0 */
 #define PNG_FLAG_ZTXT_CUSTOM_STRATEGY    0x1000000  /* 5 lines added */

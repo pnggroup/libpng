@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.5.11 [June 14, 2012]
+ * Last changed in libpng 1.5.18 [(PENDING RELEASE)]
  * Copyright (c) 1998-2012 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -896,6 +896,12 @@ png_process_IDAT_data(png_structp png_ptr, png_bytep buffer,
        * for why this doesn't happen at present with zlib 1.2.5).
        */
       ret = inflate(&png_ptr->zstream, Z_SYNC_FLUSH);
+
+      /* Hack, added in 1.5.18: the progressive reader does not reset
+       * png_ptr->zstream, so any attempt to use it after the last IDAT fails
+       * (silently).  This allows the read code to do the reset when required.
+       */
+      png_ptr->flags |= PNG_FLAG_ZSTREAM_PROGRESSIVE;
 
       /* Check for any failure before proceeding. */
       if (ret != Z_OK && ret != Z_STREAM_END)

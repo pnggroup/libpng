@@ -4163,8 +4163,8 @@ Version 1.5.18beta02 [December 26, 2013]
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
-Version 1.5.18beta03 [December 27, 2013]
-  Fixed 'unused' warnings and mergeed with libpng16 pngvalid.
+Version 1.5.18beta03 [December 29, 2013]
+  Fixed 'unused' warnings and merged with libpng16 pngvalid.
     Various warnings revealed by configurations added to the tested
     configurations in libpng 1.6 need corresponding fixes in libpng 1.5.
     This takes the libpng 1.6 pngvalid.c and adds it back to libpng 1.5,
@@ -4172,6 +4172,9 @@ Version 1.5.18beta03 [December 27, 2013]
     work; possibly because of failures to reset or initialize the deflate
     stream correctly in write-only cases.
   Merged libpng-1.7 changes and created a single pngvalid.c
+  Merged pngvalid and pngtest from libpng-1.5; made compressed chunks
+    after IDAT work with the progressive read code (this is a minor and
+    somewhat ugly fix-up; the proper fix is in 1.6).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

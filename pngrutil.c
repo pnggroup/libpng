@@ -282,6 +282,17 @@ png_inflate(png_structp png_ptr, png_bytep data, png_size_t size,
 {
    png_size_t count = 0;
 
+   /* HACK: added in libpng 1.5.18: the progressive reader always leaves
+    * png_ptr->zstream in a non-reset state.  This causes a reset if it needs to
+    * be used again.  This only copes with that one specific error; see libpng
+    * 1.6 for a better solution.
+    */
+   if ((png_ptr->flags & PNG_FLAG_ZSTREAM_PROGRESSIVE) != 0)
+   {
+      (void)inflateReset(&png_ptr->zstream);
+      png_ptr->flags &= ~PNG_FLAG_ZSTREAM_PROGRESSIVE;
+   }
+
    /* zlib can't necessarily handle more than 65535 bytes at once (i.e. it can't
     * even necessarily handle 65536 bytes) because the type uInt is "16 bits or
     * more".  Consequently it is necessary to chunk the input to zlib.  This
