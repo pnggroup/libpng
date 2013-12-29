@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.9 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.18 [(PENDING RELEASE)]
  * Copyright (c) 2013 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -47,6 +47,15 @@
 #  include PNG_ZLIB_HEADER
 #else
 #  include <zlib.h>   /* For crc32 */
+#endif
+
+/* 1.6.1 added support for the configure test harness, which uses 77 to indicate
+ * a skipped test, in earlier versions we need to succeed on a skipped test, so:
+ */
+#if PNG_LIBPNG_VER < 10601
+#  define SKIP 0
+#else
+#  define SKIP 77
 #endif
 
 /* pngvalid requires write support and one of the fixed or floating point APIs.
@@ -3401,10 +3410,28 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
 #define DEPTH(bd) ((png_byte)(1U << (bd)))
 
 /* This is just a helper for compiling on minimal systems with no write
- * interlacing support.
+ * interlacing support.  If there is no write interlacing we can't generate test
+ * cases with interlace:
  */
-#ifndef PNG_WRITE_INTERLACING_SUPPORTED
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#  define INTERLACE_LAST PNG_INTERLACE_LAST
+#  define check_interlace_type(type) ((void)(type))
+#else
+#  define INTERLACE_LAST (PNG_INTERLACE_NONE+1)
 #  define png_set_interlace_handling(a) (1)
+
+static void
+check_interlace_type(int PNG_CONST interlace_type)
+{
+   if (interlace_type != PNG_INTERLACE_NONE)
+   {
+      /* This is an internal error - --interlace tests should be skipped, not
+       * attempted.
+       */
+      fprintf(stderr, "pngvalid: no interlace support\n");
+      exit(99);
+   }
+}
 #endif
 
 /* Make a standardized image given a an image colour type, bit depth and
@@ -3419,6 +3446,8 @@ make_transform_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
     int interlace_type, png_const_charp name)
 {
    context(ps, fault);
+
+   check_interlace_type(interlace_type);
 
    Try
    {
@@ -3560,12 +3589,8 @@ make_transform_images(png_store *ps)
    {
       int interlace_type;
 
-#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         for (interlace_type = PNG_INTERLACE_NONE;
-              interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
-#     else
-         interlace_type = PNG_INTERLACE_NONE;
-#     endif
+      for (interlace_type = PNG_INTERLACE_NONE;
+           interlace_type < INTERLACE_LAST; ++interlace_type)
       {
          char name[FILE_NAME_SIZE];
 
@@ -3654,6 +3679,12 @@ make_size_image(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type,
     int PNG_CONST do_interlace)
 {
    context(ps, fault);
+
+   /* At present libpng does not support the write of an interlaced image unless
+    * PNG_WRITE_INTERLACING_SUPPORTED, even with do_interlace so the code here
+    * does the pixel interlace itself, so:
+    */
+   check_interlace_type(interlace_type);
 
    Try
    {
@@ -3864,13 +3895,6 @@ make_size(png_store* PNG_CONST ps, png_byte PNG_CONST colour_type, int bdlo,
 #        ifdef PNG_WRITE_INTERLACING_SUPPORTED
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 0);
-#        endif
-#        if defined(PNG_WRITE_INTERLACING_SUPPORTED) || PNG_LIBPNG_VER > 10518
-            /* This fails in 1.5.8 with a zlib stream error writing the rows of
-             * the internally generated interlaced images, but only when the
-             * read code is disabled: to be investigated.  Probably an erroneous
-             * #define out of the zlib deflate reset.
-             */
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 1);
 #        endif
@@ -3963,6 +3987,8 @@ make_error(png_store* volatile psIn, png_byte PNG_CONST colour_type,
    png_store * volatile ps = psIn;
 
    context(ps, fault);
+
+   check_interlace_type(interlace_type);
 
    Try
    {
@@ -4066,12 +4092,8 @@ make_errors(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
    {
       int interlace_type;
 
-#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         for (interlace_type = PNG_INTERLACE_NONE;
-              interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
-#     else
-         interlace_type = PNG_INTERLACE_NONE;
-#     endif
+      for (interlace_type = PNG_INTERLACE_NONE;
+           interlace_type < INTERLACE_LAST; ++interlace_type)
       {
          unsigned int test;
          char name[FILE_NAME_SIZE];
@@ -4269,6 +4291,7 @@ standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
       dp->red_sBIT = dp->blue_sBIT = dp->green_sBIT = dp->alpha_sBIT =
          dp->bit_depth;
    dp->interlace_type = INTERLACE_FROM_ID(id);
+   check_interlace_type(dp->interlace_type);
    dp->id = id;
    /* All the rest are filled in after the read_info: */
    dp->w = 0;
@@ -4887,7 +4910,7 @@ standard_text_validate(standard_display *dp, png_const_structp pp,
    {
       standard_check_text(pp, tp, "image name", dp->ps->current->name);
 
-      /* This exists because prior to 1.6 the progressive reader left the
+      /* This exists because prior to 1.5.18 the progressive reader left the
        * png_struct z_stream unreset at the end of the image, so subsequent
        * attempts to use it simply returns Z_STREAM_END.
        */
@@ -4996,7 +5019,7 @@ standard_end(png_structp ppIn, png_infop pi)
     * interlaced images.
     */
    standard_text_validate(dp, pp, pi,
-      PNG_LIBPNG_VER >= 10600/*check_end: see comments above*/);
+      PNG_LIBPNG_VER >= 10518/*check_end: see comments above*/);
    standard_image_validate(dp, pp, 0, -1);
 }
 
@@ -5098,7 +5121,7 @@ test_standard(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
       int interlace_type;
 
       for (interlace_type = PNG_INTERLACE_NONE;
-           interlace_type < PNG_INTERLACE_LAST; ++interlace_type)
+           interlace_type < INTERLACE_LAST; ++interlace_type)
       {
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             interlace_type, 0, 0, 0), 0/*do_interlace*/, pm->use_update_info);
@@ -5173,6 +5196,7 @@ test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
          if (fail(pm))
             return 0;
 
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/,
             pm->use_update_info);
@@ -5186,6 +5210,7 @@ test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
 
          if (fail(pm))
             return 0;
+#     endif
 
          /* Now validate the interlaced read side - do_interlace true,
           * in the progressive case this does actually make a difference
@@ -5198,12 +5223,14 @@ test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
          if (fail(pm))
             return 0;
 
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 1/*do_interlace*/,
             pm->use_update_info);
 
          if (fail(pm))
             return 0;
+#     endif
       }
    }
 
@@ -9251,6 +9278,28 @@ static void gamma_composition_test(png_modifier *pm,
       r = random_32();
       background.blue = (png_uint_16)r;
       background.gray = (png_uint_16)(r >> 16);
+
+      /* In earlier libpng versions, those where DIGITIZE is set, any background
+       * gamma correction in the expand16 case was done using 8-bit gamma
+       * correction tables, resulting in larger errors.  To cope with those
+       * cases use a 16-bit background value which will handle this gamma
+       * correction.
+       */
+#     if DIGITIZE
+         if (expand_16 && (do_background == PNG_BACKGROUND_GAMMA_UNIQUE ||
+                           do_background == PNG_BACKGROUND_GAMMA_FILE) &&
+            fabs(bg*screen_gamma-1) > PNG_GAMMA_THRESHOLD)
+         {
+            /* The background values will be looked up in an 8-bit table to do
+             * the gamma correction, so only select values which are an exact
+             * match for the 8-bit table entries:
+             */
+            background.red = (png_uint_16)((background.red >> 8) * 257);
+            background.green = (png_uint_16)((background.green >> 8) * 257);
+            background.blue = (png_uint_16)((background.blue >> 8) * 257);
+            background.gray = (png_uint_16)((background.gray >> 8) * 257);
+         }
+#     endif
    }
 
    else /* 8 bit colors */
@@ -10222,7 +10271,14 @@ int main(int argc, char **argv)
          ++pm.use_update_info; /* Can call multiple times */
 
       else if (strcmp(*argv, "--interlace") == 0)
-         pm.interlace_type = PNG_INTERLACE_ADAM7;
+      {
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
+            pm.interlace_type = PNG_INTERLACE_ADAM7;
+#        else
+            fprintf(stderr, "pngvalid: no write interlace support\n");
+            return SKIP;
+#        endif
+      }
 
       else if (strcmp(*argv, "--use-input-precision") == 0)
          pm.use_input_precision = 1U;
@@ -10521,11 +10577,6 @@ int main(void)
    fprintf(stderr,
       "pngvalid: no low level write support in libpng, all tests skipped\n");
    /* So the test is skipped: */
-#if PNG_LIBPNG_VER < 10601
-   /* Test harness support was only added in libpng 1.6.1: */
-   return 0;
-#else
-   return 77;
-#endif
+   return SKIP;
 }
 #endif

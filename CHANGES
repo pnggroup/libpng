@@ -4767,13 +4767,15 @@ Version 1.6.9beta01 [December 26, 2013]
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
-Version 1.6.9beta02 [December 28, 2013]
+Version 1.6.9beta02 [December 29, 2013]
   Added checks for libpng 1.5 to pngvalid.c.  This supports the use of
     this version of pngvalid in libpng 1.5
   Merged with pngvalid.c from libpng-1.7 changes to create a single
     pngvalid.c
   Removed #error macro from contrib/tools/pngfix.c (Thomas Klausner).
   Merged pngrio.c, pngtrans.c, pngwio.c, and pngerror.c with libpng-1.7.0
+  Merged libpng-1.7.0 changes to make no-interlace configurations work
+    with test programs.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
