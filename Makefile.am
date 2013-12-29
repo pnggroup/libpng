@@ -132,7 +132,7 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # The following is necessary to ensure that the local pnglibconf.h is used, not
 # an installed one (this can happen immediately after on a clean system if
 # 'make test' is the first thing the user does.)
-contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
+pngvalid.o pngtest.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
@@ -230,3 +230,8 @@ uninstall-hook:
 	rm -f '$(DESTDIR)$(libdir)/libpng.sl'
 	rm -f '$(DESTDIR)$(libdir)/libpng.dylib'
 	rm -f '$(DESTDIR)$(libdir)/libpng.dll.a'
+
+# The following addition ensures that 'make all' always builds the test programs
+# too.  It used to, but some change either in libpng or configure stopped this
+# working.
+all-am: $(check_PROGRAMS)

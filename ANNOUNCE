@@ -51,6 +51,11 @@ Version 1.5.18beta03 [December 29, 2013]
   Merged pngvalid and pngtest from libpng-1.5; made compressed chunks
     after IDAT work with the progressive read code (this is a minor and
     somewhat ugly fix-up; the proper fix is in 1.6).
+ The 'make all-am' command no longer builds $(check_PROGRAMS), leading
+   to a lack of checks on cross-builds such as ARM.  Makefile.am also
+   requires correct dependencies for the check programs on pnglibconf.h
+   otherwise parallel builds on fast machines can sometimes pick up the
+   system pnglibconf.h.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
