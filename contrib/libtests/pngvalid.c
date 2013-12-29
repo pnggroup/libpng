@@ -10361,10 +10361,12 @@ int main(int argc, char **argv)
 
          else
 #endif
+#ifdef PNG_MAXIMUM_INFLATE_WINDOW
          if (strncmp(arg, "max-inflate-window:", 19) == 0)
             option = PNG_MAXIMUM_INFLATE_WINDOW, arg += 19;
 
          else
+#endif
          {
             fprintf(stderr, "pngvalid: %s: %s: unknown option\n", *argv, arg);
             exit(99);

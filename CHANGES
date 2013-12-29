@@ -4776,6 +4776,9 @@ Version 1.6.9beta02 [December 29, 2013]
   Merged pngrio.c, pngtrans.c, pngwio.c, and pngerror.c with libpng-1.7.0
   Merged libpng-1.7.0 changes to make no-interlace configurations work
     with test programs.
+  Revised pngvalid.c to support libpng 1.5, which does not support the
+    PNG_MAXIMUM_INFLATE_WINDOW option, so #define it out when appropriate in
+    pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
