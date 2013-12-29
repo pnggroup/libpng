@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta26 - December 28, 2013
+Libpng 1.7.0beta26 - December 29, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -468,12 +468,15 @@ Version 1.7.0beta25 [December 26, 2013]
   Merged files with version 1.6.8 that have not changed since then.
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
 
-Version 1.7.0beta26 [December 28, 2013]
+Version 1.7.0beta26 [December 29, 2013]
   Added libpng 1.5 checks to pngvalid.c
   Merged with 1.5 and 1.6 changes to create a single pngvalid.c
   Added dSIG to chunk list in png.h
   Removed #error macro from contrib/tools/pngfix.c (Thomas Klausner).
   Merged pngrio.c, pngtrans.c, and pngwio.c with libpng-1.6.9
+  Fixed test programs for interlace options. Made pngvalid.c and
+    pngtest.c work correctly when READ_INTERLACING and/or WRITE_INTERLACING
+    are switched off.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
