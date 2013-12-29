@@ -477,6 +477,9 @@ Version 1.7.0beta26 [December 29, 2013]
   Fixed test programs for interlace options. Made pngvalid.c and
     pngtest.c work correctly when READ_INTERLACING and/or WRITE_INTERLACING
     are switched off.
+  Changed pngvalid.c to support libpng 1.5, which does not support
+    the PNG_MAXIMUM_INFLATE_WINDOW option, so #define it out when
+    appropriate in pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
