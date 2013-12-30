@@ -1,5 +1,5 @@
 
-Libpng 1.6.9beta02 - December 29, 2013
+Libpng 1.6.9beta02 - December 30, 2013
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,7 +42,7 @@ Version 1.6.9beta01 [December 26, 2013]
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
-Version 1.6.9beta02 [December 29, 2013]
+Version 1.6.9beta02 [December 30, 2013]
   Added checks for libpng 1.5 to pngvalid.c.  This supports the use of
     this version of pngvalid in libpng 1.5
   Merged with pngvalid.c from libpng-1.7 changes to create a single
@@ -54,6 +54,11 @@ Version 1.6.9beta02 [December 29, 2013]
   Revised pngvalid.c to support libpng 1.5, which does not support the
     PNG_MAXIMUM_INFLATE_WINDOW option, so #define it out when appropriate in
     pngvalid.c
+  Allow unversioned links created on install to be disabled in configure.
+    In configure builds 'make install' changes/adds links like png.h
+    and libpng.a to point to the newly installed, versioned, files (e.g.
+    libpng17/png.h and libpng17.a). Three new configure options and some
+    rearrangement of Makefile.am allow creation of these links to be disabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
