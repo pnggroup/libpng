@@ -137,12 +137,20 @@ AC_CHECK_FUNCS([memset memcpy strncpy],,
 
 # floor and ceil are required for FLOATING_POINT, but they can be turned off on
 # the configure command line (and they are independent.)  Default is to 'on'
-AC_ARG_ENABLE([floating-point],[Enable floating point APIs],,
-              [enable_floating_point=yes])
-AC_ARG_ENABLE([fixed-point],[Enable fixed point APIs],,
-              [enable_fixed_point=yes])
-AC_ARG_ENABLE([floating-arithmetic],[Use floating point arithmetic internally],,
-              [enable_floating_arithmetic=yes])
+AC_ARG_ENABLE([floating-point],
+   AS_HELP_STRING([[[--enabled-floating-point]]],
+      [Enable floating point APIs (default: yes)]),,
+   [enable_floating_point=yes])
+
+AC_ARG_ENABLE([fixed-point],
+   AS_HELP_STRING([[[--enable-fixed-point]]],
+      [Enable fixed point APIs (default: yes)]),,
+   [enable_fixed_point=yes])
+
+AC_ARG_ENABLE([floating-arithmetic],
+   AS_HELP_STRING([[[--enable-floating-arithmetic]]],
+      [Use floating point arithmetic internally (default: yes)]),,
+   [enable_floating_arithmetic=yes])
 
 # Check for a requirement for math library support
 if test "$enable_floating_arithmetic" = yes
@@ -333,6 +341,45 @@ AC_ARG_WITH(libpng-prefix,
       AC_SUBST([PNG_PREFIX], [${withval}])
     fi])
 AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
+
+# Control over what links are made for installed files.  Versioned files are
+# always installed, when the following options are turned on corresponding
+# unversioned links are also created (normally as symbolic links):
+AC_ARG_ENABLE([unversioned-links],
+   AS_HELP_STRING([[[--enable-unversioned-links]]],
+      [Installed libpng header files are placed in a versioned subdirectory]
+      [and installed libpng library (including DLL) files are versioned.]
+      [If this option is enabled unversioned links will be created pointing to]
+      [the corresponding installed files.  If you use libpng.pc or]
+      [libpng-config for all builds you do not need these links, but if you]
+      [compile programs directly they will typically #include <png.h> and]
+      [link with -lpng; in that case you need the links.]
+      [The links can be installed manually using 'make install-header-links']
+      [and 'make install-library-links' and can be removed using the]
+      [corresponding uninstall- targets.  If you do enable this option every]
+      [libpng 'make install' will recreate the links to point to the just]
+      [installed version of libpng.  The default is to create the links;]
+      [use --disable-unversioned-links to change this]))
+
+# The AM_CONDITIONAL test is written so that the default is enabled;
+# --disable-unversioned-links must be given to turn the option off.
+AM_CONDITIONAL([DO_INSTALL_LINKS],[test "$enable_unversioned_links" != "no"])
+
+AC_ARG_ENABLE([unversioned-libpng-pc],
+   AS_HELP_STRING([[[--enable-unversioned-libpng-pc]]],
+      [Install the configuration file 'libpng.pc' as a link to the versioned]
+      [version.  This is done by default - use --disable-unversioned-libpng-pc]
+      [to change this.]))
+AM_CONDITIONAL([DO_INSTALL_LIBPNG_PC],
+   [test "$enable_unversioned_libpng_pc" != "no"])
+
+AC_ARG_ENABLE([unversioned-libpng-config],
+   AS_HELP_STRING([[[--enable-unversioned-libpng-config]]],
+      [Install the configuration file 'libpng-config' as a link to the]
+      [versioned version.  This is done by default - use]
+      [--disable-unversioned-libpng-config to change this.]))
+AM_CONDITIONAL([DO_INSTALL_LIBPNG_CONFIG],
+   [test "$enable_unversioned_libpng_config" != "no"])
 
 # HOST SPECIFIC OPTIONS
 # =====================
