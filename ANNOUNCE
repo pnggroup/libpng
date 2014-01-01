@@ -1,5 +1,5 @@
 
-Libpng 1.6.9beta02 - December 30, 2013
+Libpng 1.6.9beta02 - January 1, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -42,7 +42,7 @@ Version 1.6.9beta01 [December 26, 2013]
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
-Version 1.6.9beta02 [December 30, 2013]
+Version 1.6.9beta02 [January 1, 2014]
   Added checks for libpng 1.5 to pngvalid.c.  This supports the use of
     this version of pngvalid in libpng 1.5
   Merged with pngvalid.c from libpng-1.7 changes to create a single
