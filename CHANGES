@@ -2792,6 +2792,8 @@ version 1.2.51beta03 [January 1, 2014]
     among compilers.
   Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
 
+version 1.2.51beta04 [January 1, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
