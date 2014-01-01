@@ -52,6 +52,7 @@ version 1.4.13beta04 [January 1, 2014]
     among compilers.
 
 version 1.4.13beta05 [January 1, 2014]
+  Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
