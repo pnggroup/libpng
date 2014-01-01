@@ -1,5 +1,5 @@
 
-Libpng 1.4.13beta04 - November 28, 2013
+Libpng 1.4.13beta04 - January 1, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -47,7 +47,7 @@ version 1.4.13beta03 [June 18, 2013]
   Removed a redundant test from png_set_IHDR().
   Revised libpng.3 so that "doclifter" can process it.
 
-version 1.4.13beta04 [November 28, 2013]
+version 1.4.13beta04 [January 1, 2014]
   Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
     among compilers.
 
