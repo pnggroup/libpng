@@ -4163,7 +4163,7 @@ Version 1.5.18beta02 [December 26, 2013]
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
 
-Version 1.5.18beta03 [December 30, 2013]
+Version 1.5.18beta03 [January 1, 2014]
   Fixed 'unused' warnings and merged with libpng16 pngvalid.
     Various warnings revealed by configurations added to the tested
     configurations in libpng 1.6 need corresponding fixes in libpng 1.5.

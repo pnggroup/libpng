@@ -637,6 +637,12 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 PNG_ARM_NEON_FALSE
 PNG_ARM_NEON_TRUE
+DO_INSTALL_LIBPNG_CONFIG_FALSE
+DO_INSTALL_LIBPNG_CONFIG_TRUE
+DO_INSTALL_LIBPNG_PC_FALSE
+DO_INSTALL_LIBPNG_PC_TRUE
+DO_INSTALL_LINKS_FALSE
+DO_INSTALL_LINKS_TRUE
 binconfigs
 pkgconfigdir
 PNGLIB_RELEASE
@@ -789,6 +795,9 @@ enable_libtool_lock
 with_zlib_prefix
 with_pkgconfigdir
 with_binconfigs
+enable_unversioned_links
+enable_unversioned_libpng_pc
+enable_unversioned_libpng_config
 enable_arm_neon
 '
       ac_precious_vars='build_alias
@@ -1434,6 +1443,34 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --enable-unversioned-links
+                          Installed libpng header files are placed in a
+                          versioned subdirectory and installed libpng library
+                          (including DLL) files are versioned. If this option
+                          is enabled unversioned links will be created
+                          pointing to the corresponding installed files. If
+                          you use libpng.pc or libpng-config for all builds
+                          you do not need these links, but if you compile
+                          programs directly they will typically #include
+                          <png.h> and link with -lpng; in that case you need
+                          the links. The links can be installed manually using
+                          'make install-header-links' and 'make
+                          install-library-links' and can be removed using the
+                          corresponding uninstall- targets. If you do enable
+                          this option every libpng 'make install' will
+                          recreate the links to point to the just installed
+                          version of libpng. The default is to create the
+                          links; use --disable-unversioned-links to change
+                          this
+  --enable-unversioned-libpng-pc
+                          Install the configuration file 'libpng.pc' as a link
+                          to the versioned version. This is done by default -
+                          use --disable-unversioned-libpng-pc to change this.
+  --enable-unversioned-libpng-config
+                          Install the configuration file 'libpng-config' as a
+                          link to the versioned version. This is done by
+                          default - use --disable-unversioned-libpng-config to
+                          change this.
   --enable-arm-neon     Enable ARM NEON optimizations: =no/off, check, api,
                           yes/on: no/off: disable the optimizations; check:
                           use internal checking code (deprecated and poorly
@@ -12913,6 +12950,54 @@ fi
 
 
 
+# Control over what links are made for installed files.  Versioned files are
+# always installed, when the following options are turned on corresponding
+# unversioned links are also created (normally as symbolic links):
+# Check whether --enable-unversioned-links was given.
+if test "${enable_unversioned_links+set}" = set; then :
+  enableval=$enable_unversioned_links;
+fi
+
+
+# The AM_CONDITIONAL test is written so that the default is enabled;
+# --disable-unversioned-links must be given to turn the option off.
+ if test "$enable_unversioned_links" != "no"; then
+  DO_INSTALL_LINKS_TRUE=
+  DO_INSTALL_LINKS_FALSE='#'
+else
+  DO_INSTALL_LINKS_TRUE='#'
+  DO_INSTALL_LINKS_FALSE=
+fi
+
+
+# Check whether --enable-unversioned-libpng-pc was given.
+if test "${enable_unversioned_libpng_pc+set}" = set; then :
+  enableval=$enable_unversioned_libpng_pc;
+fi
+
+ if test "$enable_unversioned_libpng_pc" != "no"; then
+  DO_INSTALL_LIBPNG_PC_TRUE=
+  DO_INSTALL_LIBPNG_PC_FALSE='#'
+else
+  DO_INSTALL_LIBPNG_PC_TRUE='#'
+  DO_INSTALL_LIBPNG_PC_FALSE=
+fi
+
+
+# Check whether --enable-unversioned-libpng-config was given.
+if test "${enable_unversioned_libpng_config+set}" = set; then :
+  enableval=$enable_unversioned_libpng_config;
+fi
+
+ if test "$enable_unversioned_libpng_config" != "no"; then
+  DO_INSTALL_LIBPNG_CONFIG_TRUE=
+  DO_INSTALL_LIBPNG_CONFIG_FALSE='#'
+else
+  DO_INSTALL_LIBPNG_CONFIG_TRUE='#'
+  DO_INSTALL_LIBPNG_CONFIG_FALSE=
+fi
+
+
 # HOST SPECIFIC OPTIONS
 # =====================
 #
@@ -13128,6 +13213,18 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_LD_VERSION_SCRIPT_TRUE}" && test -z "${HAVE_LD_VERSION_SCRIPT_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LD_VERSION_SCRIPT\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${DO_INSTALL_LINKS_TRUE}" && test -z "${DO_INSTALL_LINKS_FALSE}"; then
+  as_fn_error $? "conditional \"DO_INSTALL_LINKS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${DO_INSTALL_LIBPNG_PC_TRUE}" && test -z "${DO_INSTALL_LIBPNG_PC_FALSE}"; then
+  as_fn_error $? "conditional \"DO_INSTALL_LIBPNG_PC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${DO_INSTALL_LIBPNG_CONFIG_TRUE}" && test -z "${DO_INSTALL_LIBPNG_CONFIG_FALSE}"; then
+  as_fn_error $? "conditional \"DO_INSTALL_LIBPNG_CONFIG\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PNG_ARM_NEON_TRUE}" && test -z "${PNG_ARM_NEON_FALSE}"; then
