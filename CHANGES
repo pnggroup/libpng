@@ -4785,6 +4785,8 @@ Version 1.6.9beta02 [January 1, 2014]
     libpng17/png.h and libpng17.a). Three new configure options and some
     rearrangement of Makefile.am allow creation of these links to be disabled.
 
+Version 1.6.9beta03 [January 1, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
