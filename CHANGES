@@ -2893,6 +2893,8 @@ version 1.4.13beta04 [January 1, 2014]
   Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
     among compilers.
 
+version 1.4.13beta05 [January 1, 2014]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
