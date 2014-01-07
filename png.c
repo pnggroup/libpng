@@ -2479,7 +2479,8 @@ png_check_IHDR(png_const_structrp png_ptr,
                  - 1        /* filter byte */
                  - 7*8      /* rounding of width to multiple of 8 pixels */
                  - 8)       /* extra max_pixel_depth pad */
-      png_warning(png_ptr, "Width is too large for libpng to process pixels");
+      png_warning(png_ptr,
+          "Width may be too large for libpng to process pixels");
 
    /* Check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
