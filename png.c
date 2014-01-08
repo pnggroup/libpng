@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.9beta03 - January 7, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.9beta03 - January 8, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.9beta03 - January 7, 2014\
+      return "libpng version 1.6.9beta03 - January 8, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2473,7 +2473,7 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-   if (width > (PNG_UINT_32_MAX
+   if (error == 0 && width > (PNG_UINT_32_MAX
                  >> 3)      /* 8-byte RGBA pixels */
                  - 48       /* bigrowbuf hack */
                  - 1        /* filter byte */
