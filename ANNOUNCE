@@ -1,5 +1,5 @@
 
-Libpng 1.6.9beta03 - January 1, 2014
+Libpng 1.6.9beta03 - January 10, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -60,7 +60,9 @@ Version 1.6.9beta02 [January 1, 2014]
     libpng17/png.h and libpng17.a). Three new configure options and some
     rearrangement of Makefile.am allow creation of these links to be disabled.
 
-Version 1.6.9beta03 [January 1, 2014]
+Version 1.6.9beta03 [January 10, 2014]
+  Revised png_check_IHDR() to use PNG_SIZE_MAX instead of PNG_UINT_32_MAX
+    in the test for potential overflow in PNG_ROWBYTES.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
