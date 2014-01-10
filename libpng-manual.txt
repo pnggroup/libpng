@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.9beta03 - January 1, 2014
+ libpng version 1.6.9beta03 - January 10, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.9beta03 - January 1, 2014
+ libpng versions 0.97, January 1998, through 1.6.9beta03 - January 10, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2013 Glenn Randers-Pehrson
 
@@ -4621,6 +4621,7 @@ XI.  Changes to Libpng from version 1.4.x to 1.5.x
 
 From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
 function) incorrectly returned a value of type png_uint_32.
+The incorrect macro was removed from libpng-1.4.5.
 
 Checking for invalid palette index on write was added at libpng
 1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
@@ -4745,11 +4746,6 @@ reset by pngusr.h or by explicit settings on the compiler command line.
 These settings may produce compiler warnings or errors in 1.5.0 because
 of macro redefinition.
 
-From libpng-1.4.0 until 1.4.4, the png_get_uint_16 macro (but not the
-function) incorrectly returned a value of type png_uint_32.  libpng 1.5.0
-is consistent with the implementation in 1.4.5 and 1.2.x (where the macro
-did not exist.)
-
 Applications can now choose whether to use these macros or to call the
 corresponding function by defining PNG_USE_READ_MACROS or
 PNG_NO_USE_READ_MACROS before including png.h.  Notice that this is
@@ -4767,7 +4763,10 @@ option was off by default, and slightly inaccurate scaling occurred.
 This option can no longer be turned off, and the choice of accurate
 or inaccurate 16-to-8 scaling is by using the new png_set_scale_16_to_8()
 API for accurate scaling or the old png_set_strip_16_to_8() API for simple
-chopping.
+chopping.  In libpng-1.5.4, the PNG_READ_16_TO_8_ACCURATE_SCALE_SUPPORTED
+macro became PNG_READ_SCALE_16_TO_8_SUPPORTED, and the PNG_READ_16_TO_8
+macro became PNG_READ_STRIP_16_TO_8_SUPPORTED, to enable the two
+png_set_*_16_to_8() functions separately.
 
 Prior to libpng-1.5.4, the png_set_user_limits() function could only be
 used to reduce the width and height limits from the value of
@@ -5233,7 +5232,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-January 1, 2014
+January 10, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
