@@ -1,5 +1,5 @@
 
-Libpng 1.2.51beta04 - January 10, 2014
+Libpng 1.2.51beta05 - January 10, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.51beta04.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51beta04.tar.gz
-   libpng-1.2.51beta04.tar.bz2
+   libpng-1.2.51beta05.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51beta05.tar.gz
+   libpng-1.2.51beta05.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.51beta04-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51beta04-no-config.tar.gz
-   libpng-1.2.51beta04-no-config.tar.bz2
+   libpng-1.2.51beta05-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51beta05-no-config.tar.gz
+   libpng-1.2.51beta05-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1251b04.zip
-   lp1251b04.7z
-   lp1251b04.tar.bz2
+   lp1251b05.zip
+   lp1251b05.7z
+   lp1251b05.tar.bz2
 
 Project files
 
-   libpng-1.2.51beta04-project-netware.zip
-   libpng-1.2.51beta04-project-wince.zip
+   libpng-1.2.51beta05-project-netware.zip
+   libpng-1.2.51beta05-project-wince.zip
 
 Other information:
 
-   libpng-1.2.51beta04-README.txt
-   libpng-1.2.51beta04-KNOWNBUGS.txt
-   libpng-1.2.51beta04-LICENSE.txt
-   libpng-1.2.51beta04-Y2K-compliance.txt
-   libpng-1.2.51beta04-[previous version]-diff.txt
+   libpng-1.2.51beta05-README.txt
+   libpng-1.2.51beta05-KNOWNBUGS.txt
+   libpng-1.2.51beta05-LICENSE.txt
+   libpng-1.2.51beta05-Y2K-compliance.txt
+   libpng-1.2.51beta05-[previous version]-diff.txt
 
 Changes since the last public release (1.2.50):
 
@@ -59,6 +59,8 @@ version 1.2.51beta03 [January 1, 2014]
 
 version 1.2.51beta04 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
+
+version 1.2.51beta05 [January 10, 2014]
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

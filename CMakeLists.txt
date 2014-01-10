@@ -215,7 +215,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/libpng-config.in
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(${PNG_LIB_NAME} PROPERTIES
-#   VERSION 0.${PNGLIB_RELEASE}.1.2.51beta04
+#   VERSION 0.${PNGLIB_RELEASE}.1.2.51beta05
     VERSION 0.${PNGLIB_RELEASE}.0
     SOVERSION 0
     CLEAN_DIRECT_OUTPUT 1)
