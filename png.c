@@ -547,13 +547,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.13beta05 - January 1, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.4.13beta05 - January 10, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2010 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.13beta05 - January 1, 2014\
+      return ((png_charp) "libpng version 1.4.13beta05 - January 10, 2014\
       Copyright (c) 1998-2010 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -823,13 +823,16 @@ png_check_IHDR(png_structp png_ptr,
       error = 1;
    }
 
-   if ( width > (PNG_UINT_32_MAX
+   /* Check for potential overflow in PNG_ROWBYTES calculation */
+   if (error == 0 && width > (PNG_SIZE_MAX
                  >> 3)      /* 8-byte RGBA pixels */
                  - 64       /* bigrowbuf hack */
                  - 1        /* filter byte */
                  - 7*8      /* rounding of width to multiple of 8 pixels */
-                 - 8)       /* extra max_pixel_depth pad */
-      png_warning(png_ptr, "Width is too large for libpng to process pixels");
+                 - 8        /* extra max_pixel_depth pad */
+                 - error)   /* to prevent always-false compiler warning */
+      png_warning(png_ptr,
+          "Width may be too large for libpng to process pixels");
 
    /* Check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&

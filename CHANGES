@@ -2893,8 +2893,10 @@ version 1.4.13beta04 [January 1, 2014]
   Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
     among compilers.
 
-version 1.4.13beta05 [January 1, 2014]
+version 1.4.13beta05 [January 10, 2014]
   Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
+  Revised png_check_IHDR() to use PNG_SIZE_MAX instead of PNG_UINT_32_MAX
+    in the test for potential overflow in PNG_ROWBYTES.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
