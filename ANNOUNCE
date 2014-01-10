@@ -1,5 +1,5 @@
 
-Libpng 1.2.51beta04 - January 1, 2014
+Libpng 1.2.51beta04 - January 10, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -57,7 +57,8 @@ version 1.2.51beta03 [January 1, 2014]
     among compilers.
   Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
 
-version 1.2.51beta04 [January 1, 2014]
+version 1.2.51beta04 [January 10, 2014]
+  Removed potentially misleading warning from png_check_IHDR().
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
