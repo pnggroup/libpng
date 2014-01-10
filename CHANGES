@@ -4788,6 +4788,8 @@ Version 1.6.9beta02 [January 1, 2014]
 Version 1.6.9beta03 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
 
+Version 1.6.9beta04 [January 10, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
