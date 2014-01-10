@@ -2473,17 +2473,6 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-   /* Check for potential overflow in PNG_ROWBYTES calculation */
-   if (error == 0 &&  width > (PNG_SIZE_MAX
-                 >> 3)      /* 8-byte RGBA pixels */
-                 - 48       /* bigrowbuf hack */
-                 - 1        /* filter byte */
-                 - 7*8      /* rounding of width to multiple of 8 pixels */
-                 - 8        /* extra max_pixel_depth pad */
-                 - error)   /* to prevent always-false compiler warning */
-      png_warning(png_ptr,
-          "Width may be too large for libpng to process pixels");
-
    /* Check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
        bit_depth != 8 && bit_depth != 16)
