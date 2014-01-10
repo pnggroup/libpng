@@ -486,7 +486,7 @@ Version 1.7.0beta26 [January 1, 2014]
     libpng17/png.h and libpng17.a). Three new configure options and some
     rearrangement of Makefile.am allow creation of these links to be disabled.
 
-Version 1.7.0beta27 [January 10, 2013]
+Version 1.7.0beta27 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
 
 Version 1.7.0beta28 [January 10, 2014]
