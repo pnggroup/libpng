@@ -34,6 +34,9 @@ CPPFLAGS+=-I${.CURDIR}
 
 CLEANFILES+=pngtest.o pngtest pnglibconf.h
 
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
 	cp scripts/pnglibconf.h.prebuilt $@

@@ -48,7 +48,8 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
-CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops \
+CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
+CFLAGS= -W -Wall -O3 -funroll-loops \
 	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
 
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng15 -lz -lm
@@ -81,6 +82,9 @@ OBJS =  png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 OBJSDLL = $(OBJS:.o=.pic.o)
 
 .SUFFIXES:      .c .o .pic.o
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 .c.pic.o:
 	$(CC) -c $(CFLAGS) -fPIC -o $@ $*.c
@@ -196,14 +200,14 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) -I$(ZLIBINC) \
+	$(CC) -I$(DI) $(CPPFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) -Wl, -rpath,$(DL) -Wl,-rpath,$(ZLIBLIB) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) -I$(ZLIBINC) \
+	$(CC) $(CPPFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`

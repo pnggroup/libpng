@@ -40,8 +40,8 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 
 # On BeOS, -O1 is actually better than -O3.  This is a known bug but it's
 # still here in R4.5
-CFLAGS=-I$(ZLIBINC) -W -Wall -O1 -funroll-loops \
-	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
+CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
+CFLAGS=-W -Wall -O1 -funroll-loops $(ALIGN) # $(WARNMORE) -g
 # LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng -lz
 LDFLAGS=-L. -Wl,-soname=$(LIBSOMAJ) -L$(ZLIBLIB) -lz
 
@@ -75,6 +75,9 @@ OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 OBJSDLL = $(OBJS)
 
 .SUFFIXES:      .c .o
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
@@ -176,14 +179,14 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) $(CFLAGS) \
+	$(CC) -I$(DI) $(CPPFLAGS) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) -Wl,-rpath $(ZLIBLIB):$(DL) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) $(CFLAGS) \
+	$(CC) $(CPPFLAGS) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`

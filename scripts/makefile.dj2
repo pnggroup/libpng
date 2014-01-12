@@ -13,7 +13,8 @@ INCPATH=$(prefix)/include
 LIBPATH=$(prefix)/lib
 
 CC=gcc
-CFLAGS=-I../zlib -O -DPNG_NO_SNPRINTF
+CPPFLAGS=-I../zlib -DPNG_NO_SNPRINTF
+CFLAGS=-O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 RANLIB=ranlib
@@ -21,6 +22,9 @@ RANLIB=ranlib
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o pngwtran.o \
 	pngmem.o pngerror.o pngpread.o
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 all: libpng.a pngtest
 

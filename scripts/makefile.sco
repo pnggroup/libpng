@@ -37,7 +37,8 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
-CFLAGS= -dy -belf -I$(ZLIBINC) -O3
+CPPFLAGS=-I$(ZLIBINC)
+CFLAGS= -dy -belf -O3
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz -lm
 
 INCPATH=$(prefix)/include
@@ -68,8 +69,11 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 .SUFFIXES:      .c .o .pic.o
 
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -KPIC -o $@ $*.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -KPIC -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
@@ -175,14 +179,14 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) $(CFLAGS) \
+	$(CC) -I$(DI) $(CPPFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) $(CFLAGS) \
+	$(CC) $(CPPFLAGS) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`

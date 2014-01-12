@@ -37,8 +37,9 @@ RANLIB=ranlib
 RM_F=/bin/rm -f
 ARCH=-arch ppc -arch i386 -arch x86_64
 
-# CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops
-CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops $(ARCH)
+CPPFLAGS=-I$(ZLIBINC)
+# CFLAGS=-W -Wall -O3 -funroll-loops
+CFLAGS=-W -Wall -O -funroll-loops $(ARCH)
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng15 -lz $(ARCH)
 
 INCPATH=$(prefix)/include
@@ -69,8 +70,11 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 
 .SUFFIXES:      .c .o .pic.o
 
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+
 .c.pic.o:
-	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -fno-common -o $@ $*.c
 
 all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
@@ -105,7 +109,7 @@ $(LIBSOMAJ): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
 	 -current_version 15 -compatibility_version 15 \
- 	 $(ARCH) -o $(LIBSOMAJ) \
+	 $(ARCH) -o $(LIBSOMAJ) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 pngtest: pngtest.o $(LIBSO)
@@ -176,14 +180,14 @@ install: install-static install-shared install-man install-config
 test-dd:
 	echo
 	echo Testing installed dynamic shared library in $(DL).
-	$(CC) -I$(DI) -I$(ZLIBINC) \
+	$(CC) -I$(DI) $(CPPFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(DL) -L$(ZLIBLIB) \
 	   -o pngtestd `$(BINPATH)/$(LIBNAME)-config --ldflags`
 	./pngtestd pngtest.png
 
 test-installed:
-	$(CC) $(CFLAGS) \
+	$(CC) $(CPPFLAGS) $(CFLAGS) \
 	   `$(BINPATH)/$(LIBNAME)-config --cflags` pngtest.c \
 	   -L$(ZLIBLIB) \
 	   -o pngtesti `$(BINPATH)/$(LIBNAME)-config --ldflags`

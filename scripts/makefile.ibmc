@@ -23,7 +23,8 @@ LD = ilink
 AR = ilib
 RM = del
 
-CFLAGS = -I$(ZLIBINC) -Mc -O2 -W3
+CPPFLAGS = -I$(ZLIBINC)
+CFLAGS = -Mc -O2 -W3
 LDFLAGS =
 
 # File extensions
@@ -39,6 +40,9 @@ OBJS = png$(O) pngerror$(O) pngget$(O) pngmem$(O) pngpread$(O) \
 LIBS = libpng$(A) $(ZLIBLIB)/zlib$(A)
 
 # Targets
+.c$(O):
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+
 all: libpng$(A) pngtest$(E)
 
 # see scripts/pnglibconf.mak for more options

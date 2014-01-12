@@ -43,7 +43,8 @@ LDEBUG=$(LDEBUG) -N
 # -d  merge duplicate strings
 # -k- turn off standard stack frame
 # -w  display all warnings
-CFLAGS=-I$(ZLIB_DIR) -O2 -d -k- -w $(TARGET_CPU) $(CDEBUG)
+CPPFLAGS=-I$(ZLIB_DIR)
+CFLAGS=-O2 -d -k- -w $(TARGET_CPU) $(CDEBUG)
 
 # -M  generate map file
 LDFLAGS=-L$(ZLIB_DIR) -M $(LDEBUG)
@@ -89,10 +90,11 @@ LIBNAME=libpng.lib
 # Braces let make "batch" calls to the compiler,
 # 2 calls instead of 12; space is important.
 .c.obj:
-	$(CC) $(CFLAGS) -c {$*.c }
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c {$*.c }
 
 .c.exe:
-	$(CC) $(CFLAGS) $(LDFLAGS) $*.c $(LIBNAME) zlib.lib $(NOEHLIB)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $*.c \
+	  $(LIBNAME) zlib.lib $(NOEHLIB)
 
 .obj.exe:
 	$(LD) $(LDFLAGS) $*.obj $(LIBNAME) zlib.lib $(NOEHLIB)

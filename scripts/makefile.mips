@@ -22,7 +22,8 @@ LIBPATH=$(prefix)/lib
 DESTDIR=
 
 CC=cc
-CFLAGS=-I../zlib -O -systype sysv -DSYSV -w -Dmips
+CPPFLAGS=-I../zlib -DSYSV -Dmips
+CFLAGS=-O -systype sysv -w
 #CFLAGS=-O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
@@ -32,6 +33,9 @@ RANLIB=echo
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
 	pngwtran.o pngmem.o pngerror.o pngpread.o
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 all: libpng.a pngtest
 
