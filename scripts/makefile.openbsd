@@ -28,8 +28,11 @@ NOPROFILE= Yes
 CLEANFILES+= pngtest.o pngtest pnglibconf.h
 
 MAN=	libpng.3 libpngpf.3 png.5
-DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
-       libpng-manual.txt
+DOCS=	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
+	libpng-manual.txt
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
