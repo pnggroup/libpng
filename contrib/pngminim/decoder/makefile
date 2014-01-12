@@ -82,7 +82,7 @@ OBJS    = $(PROGOBJS) $(PNGOBJS) $(ZOBJS)
 
 # note: dependencies do not work on implicit rule lines
 .c$(O):
-	$(CC) $(CPPFLAGS) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 # dependencies
 
