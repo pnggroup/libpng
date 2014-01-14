@@ -412,7 +412,7 @@
 #        ifndef PNG_RESTRICT
 #          define PNG_RESTRICT __restrict
 #        endif
-#      endif /* __GNUC__ > 3.1 */
+#      endif /* __GNUC__.__GNUC_MINOR__ > 3.0 */
 #    endif /* __GNUC__ >= 3 */
 
 #  elif defined(_MSC_VER)  && (_MSC_VER >= 1300)
