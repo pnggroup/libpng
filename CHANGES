@@ -4782,6 +4782,8 @@ Version 1.7.0beta28 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin).
   Added clang attribute support (Cosmin).
 
+Version 1.7.0beta29 [January 20, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
