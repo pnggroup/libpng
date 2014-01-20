@@ -1,0 +1,9 @@
+56c56,57
+< ABI=
+---
+> ABI =
+> CPPFLAGS =
+76c77
+< 	$(CC) -c $(CFLAGS) $<
+---
+> 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<

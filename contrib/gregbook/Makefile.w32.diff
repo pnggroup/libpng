@@ -1,0 +1,9 @@
+56c56,57
+< CFLAGS = -nologo -O -W3 $(INCS) $(cvars)
+---
+> CPPFLAGS = $(INCS)
+> CFLAGS = -nologo -O -W3 $(cvars)
+79c80
+< 	$(CC) -c $(CFLAGS) $<
+---
+> 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
