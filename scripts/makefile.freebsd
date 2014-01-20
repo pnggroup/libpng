@@ -1,4 +1,5 @@
 # makefile for libpng under FreeBSD
+# Copyright (C) 2014 Glenn Randers-Pehrson and Andrey A. Chernov
 # Copyright (C) 2002, 2007, 2009 Glenn Randers-Pehrson and Andrey A. Chernov
 #
 # This code is released under the libpng license.

@@ -1,5 +1,5 @@
 
-Libpng 1.5.18beta05 - January 12, 2014
+Libpng 1.5.18beta05 - January 20, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -67,7 +67,7 @@ Version 1.5.18beta03 [January 1, 2014]
 Version 1.5.18beta04 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
 
-Version 1.5.18beta05 [January 12, 2014]
+Version 1.5.18beta05 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
