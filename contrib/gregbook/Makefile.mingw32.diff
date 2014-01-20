@@ -1,0 +1,13 @@
+50c50,51
+< CFLAGS = -O -Wall $(INCS) $(MINGW_CCFLAGS)
+---
+> CPPFLAGS = $(INCS)
+> CFLAGS = -O -Wall $(MINGW_CCFLAGS)
+88c89
+< 	$(CC) -c $(CFLAGS) $<
+---
+> 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+91c92
+< 	$(CC) -c $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<
+---
+> 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -DPNG_BUILD_DLL -o $@ $<

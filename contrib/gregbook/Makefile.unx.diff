@@ -1,0 +1,9 @@
+67c67,68
+< CFLAGS = -O -Wall $(INCS) -DFEATURE_LOOP
+---
+> CPPFLAGS = $(INCS) -DFEATURE_LOOP
+> CFLAGS = -O -Wall
+95c96
+< 	$(CC) -c $(CFLAGS) $<
+---
+> 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
