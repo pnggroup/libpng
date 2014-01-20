@@ -1,7 +1,7 @@
 # makefile for SCO OSr5  ELF and Unixware 7 with Native cc
 # Contributed by Mike Hopkirk (hops@sco.com) modified from Makefile.lnx
 #   force ELF build dynamic linking, SONAME setting in lib and RPATH in app
-# Copyright (C) 2002, 2006, 2010-2011 Glenn Randers-Pehrson
+# Copyright (C) 2002, 2006, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 1998 Greg Roelofs
 # Copyright (C) 1996, 1997 Andreas Dilger
 #

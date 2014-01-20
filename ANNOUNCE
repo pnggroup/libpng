@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta28 - January 14, 2014
+Libpng 1.7.0beta28 - January 20, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -489,7 +489,7 @@ Version 1.7.0beta26 [January 1, 2014]
 Version 1.7.0beta27 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
 
-Version 1.7.0beta28 [January 14, 2014]
+Version 1.7.0beta28 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin).
   Added clang attribute support (Cosmin).
 
