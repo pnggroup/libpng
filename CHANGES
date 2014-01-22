@@ -2795,7 +2795,8 @@ version 1.2.51beta03 [January 1, 2014]
 version 1.2.51beta04 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
 
-version 1.2.51beta05 [January 10, 2014]
+version 1.2.51beta05 [January 22, 2014]
+  Quiet set-but-not-used warnings in pngset.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
