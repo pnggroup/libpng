@@ -1,5 +1,5 @@
 
-Libpng 1.4.13beta06 - January 10, 2014
+Libpng 1.4.13beta06 - January 22, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,7 +55,8 @@ version 1.4.13beta05 [January 10, 2014]
   Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
   Removed potentially misleading warning from png_check_IHDR().
 
-version 1.4.13beta06 [January 10, 2014]
+version 1.4.13beta06 [January 22, 2014]
+  Quiet set-but-not-used warnings in pngset.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
