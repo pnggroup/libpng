@@ -2798,6 +2798,9 @@ version 1.2.51beta04 [January 10, 2014]
 version 1.2.51beta05 [January 22, 2014]
   Quiet set-but-not-used warnings in pngset.c
 
+version 1.2.51rc01 [January 28, 2014]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
