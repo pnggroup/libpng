@@ -4194,6 +4194,8 @@ Version 1.5.18beta04 [January 10, 2014]
 Version 1.5.18beta05 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin)
 
+Version 1.5.18rc01 [January 28, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
