@@ -1,5 +1,5 @@
 
-Libpng 1.4.13beta06 - January 22, 2014
+Libpng 1.4.13rc01 - January 28, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.13beta06.tar.xz (LZMA-compressed, recommended)
-   1.4.13beta06.tar.gz
-   1.4.13beta06.tar.bz2
+   1.4.13rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.13rc01.tar.gz
+   1.4.13rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1413b06.7z (LZMA-compressed, recommended)
-   lp1413b06.zip
+   lp1413r01.7z (LZMA-compressed, recommended)
+   lp1413r01.zip
 
 Other information:
 
-   1.4.13beta06-README.txt
-   1.4.13beta06-LICENSE.txt
+   1.4.13rc01-README.txt
+   1.4.13rc01-LICENSE.txt
 
 Changes since the last public release (1.4.11):
 
@@ -57,6 +57,9 @@ version 1.4.13beta05 [January 10, 2014]
 
 version 1.4.13beta06 [January 22, 2014]
   Quiet set-but-not-used warnings in pngset.c
+
+version 1.4.13rc01 [January 28, 2014]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
