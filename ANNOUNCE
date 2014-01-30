@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta29 - January 30, 2014
+Libpng 1.7.0beta30 - January 30, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta29.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta29.tar.gz
+   1.7.0beta30.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta30.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b29.7z  (LZMA-compressed, recommended)
-   lp170b29.zip
+   lp170b30.7z  (LZMA-compressed, recommended)
+   lp170b30.zip
 
 Other information:
 
-   1.7.0beta29-README.txt
-   1.7.0beta29-LICENSE.txt
+   1.7.0beta30-README.txt
+   1.7.0beta30-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -495,6 +495,8 @@ Version 1.7.0beta28 [January 20, 2014]
 
 Version 1.7.0beta29 [January 30, 2014]
   Quiet an uninitialized memory warning from VS2013 in png_get_png().
+
+Version 1.7.0beta30 [January 30, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

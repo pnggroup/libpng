@@ -4785,6 +4785,8 @@ Version 1.7.0beta28 [January 20, 2014]
 Version 1.7.0beta29 [January 30, 2014]
   Quiet an uninitialized memory warning from VS2013 in png_get_png().
 
+Version 1.7.0beta30 [January 30, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
