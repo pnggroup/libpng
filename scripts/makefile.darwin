@@ -22,7 +22,7 @@ ZLIBINC=../zlib
 # Library name:
 LIBNAME = libpng12
 PNGMAJ = 12
-PNGMIN = 1.2.51rc01
+PNGMIN = 1.2.51rc02
 PNGVER = $(PNGMAJ).$(PNGMIN)
 
 # Shared library names:
