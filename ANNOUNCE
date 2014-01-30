@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta29 - January 20, 2014
+Libpng 1.7.0beta29 - January 30, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -493,7 +493,8 @@ Version 1.7.0beta28 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin).
   Added clang attribute support (Cosmin).
 
-Version 1.7.0beta29 [January 20, 2014]
+Version 1.7.0beta29 [January 30, 2014]
+  Quiet an uninitialized memory warning from VS2013 in png_get_png().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
