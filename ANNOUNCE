@@ -1,5 +1,5 @@
 
-Libpng 1.2.51rc01 - January 28, 2014
+Libpng 1.2.51rc02 - January 30, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.51rc01.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51rc01.tar.gz
-   libpng-1.2.51rc01.tar.bz2
+   libpng-1.2.51rc02.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51rc02.tar.gz
+   libpng-1.2.51rc02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.51rc01-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51rc01-no-config.tar.gz
-   libpng-1.2.51rc01-no-config.tar.bz2
+   libpng-1.2.51rc02-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51rc02-no-config.tar.gz
+   libpng-1.2.51rc02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1251r01.zip
-   lp1251r01.7z
-   lp1251r01.tar.bz2
+   lp1251r02.zip
+   lp1251r02.7z
+   lp1251r02.tar.bz2
 
 Project files
 
-   libpng-1.2.51rc01-project-netware.zip
-   libpng-1.2.51rc01-project-wince.zip
+   libpng-1.2.51rc02-project-netware.zip
+   libpng-1.2.51rc02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.51rc01-README.txt
-   libpng-1.2.51rc01-KNOWNBUGS.txt
-   libpng-1.2.51rc01-LICENSE.txt
-   libpng-1.2.51rc01-Y2K-compliance.txt
-   libpng-1.2.51rc01-[previous version]-diff.txt
+   libpng-1.2.51rc02-README.txt
+   libpng-1.2.51rc02-KNOWNBUGS.txt
+   libpng-1.2.51rc02-LICENSE.txt
+   libpng-1.2.51rc02-Y2K-compliance.txt
+   libpng-1.2.51rc02-[previous version]-diff.txt
 
 Changes since the last public release (1.2.50):
 
@@ -65,6 +65,9 @@ version 1.2.51beta05 [January 22, 2014]
 
 version 1.2.51rc01 [January 28, 2014]
   No changes.
+
+version 1.2.51rc02 [January 30, 2014]
+  Quiet an uninitialized memory warning from VC2013 in png_get_png().
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
