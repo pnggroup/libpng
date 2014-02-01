@@ -4789,7 +4789,7 @@ Version 1.7.0beta30 [February 1, 2014]
   Fixed a large number of instances where PNGCBAPI was omitted from
     function definitions.
   Added pngimage test program for png_read_png and png_write_png. This
-    is a work-in-progress, no tests are run automatically at present and
+    is a work-in-progress; no tests are run automatically at present and
     the program by virtue of exhaustively testing all the transforms is
     very slow.
 
