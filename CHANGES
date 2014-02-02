@@ -4785,7 +4785,7 @@ Version 1.7.0beta28 [January 20, 2014]
 Version 1.7.0beta29 [January 30, 2014]
   Quiet an uninitialized memory warning from VS2013 in png_get_png().
 
-Version 1.7.0beta30 [February 1, 2014]
+Version 1.7.0beta30 [February 2, 2014]
   Fixed a large number of instances where PNGCBAPI was omitted from
     function definitions.
   Added pngimage test program for png_read_png and png_write_png. This
