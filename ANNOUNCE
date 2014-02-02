@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta30 - February 2, 2014
+Libpng 1.7.0beta31 - February 2, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,19 +9,19 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta30.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta30.tar.gz
+   1.7.0beta31.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta31.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b30.7z  (LZMA-compressed, recommended)
-   lp170b30.zip
+   lp170b31.7z  (LZMA-compressed, recommended)
+   lp170b31.zip
 
 Other information:
 
-   1.7.0beta30-README.txt
-   1.7.0beta30-LICENSE.txt
+   1.7.0beta31-README.txt
+   1.7.0beta31-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.0):
@@ -503,6 +503,8 @@ Version 1.7.0beta30 [February 2, 2014]
     is a work-in-progress; no tests are run automatically at present and
     the program by virtue of exhaustively testing all the transforms is
     very slow.
+
+Version 1.7.0beta31 [February 2, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

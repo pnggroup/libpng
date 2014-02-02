@@ -4793,6 +4793,8 @@ Version 1.7.0beta30 [February 2, 2014]
     the program by virtue of exhaustively testing all the transforms is
     very slow.
 
+Version 1.7.0beta31 [February 2, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
