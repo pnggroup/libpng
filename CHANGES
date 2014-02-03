@@ -2804,6 +2804,12 @@ version 1.2.51rc01 [January 28, 2014]
 version 1.2.51rc02 [January 30, 2014]
   Quiet an uninitialized memory warning from VC2013 in png_get_png().
 
+version 1.2.51rc03 [February 3, 2014]
+  Quiet unused variable warnings from clang by porting PNG_UNUSED() from 1.4.6.
+
+version 1.0.61 and 1.2.51 [February 3, 2014]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

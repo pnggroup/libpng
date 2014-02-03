@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.2.51rc02 - January 30, 2014
+ * libpng version 1.2.51rc03 - February 3, 2014
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -85,6 +85,18 @@
 #  define PNG_WARN_UNINITIALIZED_ROW 1
 #endif
 /* End of material added at libpng-1.2.19/1.2.21 */
+
+/* Added at libpng-1.2.51 (ported from 1.4.6) */
+#ifndef PNG_UNUSED
+/* Unused formal parameter warnings are silenced using the following macro
+ * which is expected to have no bad effects on performance (optimizing
+ * compilers will probably remove it entirely).  Note that if you replace
+ * it with something other than whitespace, you must include the terminating
+ * semicolon.
+ */
+#  define PNG_UNUSED(param) (void)param;
+#endif
+/* End of material added to libpng-1.4.6 */
 
 /* This is the size of the compression buffer, and thus the size of
  * an IDAT chunk.  Make this whatever size you feel is best for your

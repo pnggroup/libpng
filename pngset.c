@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.2.51 [January 30, 2014]
+ * Last changed in libpng 1.2.51 [February 3, 2014]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1187,7 +1187,7 @@ png_set_asm_flags (png_structp png_ptr, png_uint_32 asm_flags)
 /* Obsolete as of libpng-1.2.20 and will be removed from libpng-1.4.0 */
     if (png_ptr != NULL)
     png_ptr->asm_flags = 0;
-    asm_flags = asm_flags; /* Quiet the compiler */
+    PNG_UNUSED(asm_flags) /* Quiet the compiler */
 }
 
 /* This function was added to libpng 1.2.0 */
@@ -1200,8 +1200,8 @@ png_set_mmx_thresholds (png_structp png_ptr,
     if (png_ptr == NULL)
        return;
     /* Quiet the compiler */
-    mmx_bitdepth_threshold = mmx_bitdepth_threshold;
-    mmx_rowbytes_threshold = mmx_rowbytes_threshold;
+    PNG_UNUSED(mmx_bitdepth_threshold)
+    PNG_UNUSED(mmx_rowbytes_threshold)
 }
 #endif /* ?PNG_ASSEMBLER_CODE_SUPPORTED */
 

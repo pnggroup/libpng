@@ -1,5 +1,5 @@
 
-Libpng 1.2.51rc02 - January 30, 2014
+Libpng 1.2.51rc03 - February 3, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,36 +9,36 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.51rc02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51rc02.tar.gz
-   libpng-1.2.51rc02.tar.bz2
+   libpng-1.2.51rc03.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51rc03.tar.gz
+   libpng-1.2.51rc03.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.51rc02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51rc02-no-config.tar.gz
-   libpng-1.2.51rc02-no-config.tar.bz2
+   libpng-1.2.51rc03-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51rc03-no-config.tar.gz
+   libpng-1.2.51rc03-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1251r02.zip
-   lp1251r02.7z
-   lp1251r02.tar.bz2
+   lp1251r03.zip
+   lp1251r03.7z
+   lp1251r03.tar.bz2
 
 Project files
 
-   libpng-1.2.51rc02-project-netware.zip
-   libpng-1.2.51rc02-project-wince.zip
+   libpng-1.2.51rc03-project-netware.zip
+   libpng-1.2.51rc03-project-wince.zip
 
 Other information:
 
-   libpng-1.2.51rc02-README.txt
-   libpng-1.2.51rc02-KNOWNBUGS.txt
-   libpng-1.2.51rc02-LICENSE.txt
-   libpng-1.2.51rc02-Y2K-compliance.txt
-   libpng-1.2.51rc02-[previous version]-diff.txt
+   libpng-1.2.51rc03-README.txt
+   libpng-1.2.51rc03-KNOWNBUGS.txt
+   libpng-1.2.51rc03-LICENSE.txt
+   libpng-1.2.51rc03-Y2K-compliance.txt
+   libpng-1.2.51rc03-[previous version]-diff.txt
 
 Changes since the last public release (1.2.50):
 
@@ -68,6 +68,12 @@ version 1.2.51rc01 [January 28, 2014]
 
 version 1.2.51rc02 [January 30, 2014]
   Quiet an uninitialized memory warning from VC2013 in png_get_png().
+
+version 1.2.51rc03 [February 3, 2014]
+  Quiet unused variable warnings from clang by porting PNG_UNUSED() from 1.4.6.
+
+version 1.0.61 and 1.2.51 [February 3, 2014]
+  No changes.
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

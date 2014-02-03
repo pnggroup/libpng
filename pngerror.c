@@ -300,7 +300,7 @@ png_default_error(png_structp png_ptr, png_const_charp error_message)
    /* Here if not setjmp support or if png_ptr is null. */
    PNG_ABORT();
 #ifndef PNG_CONSOLE_IO_SUPPORTED
-   error_message = error_message; /* Make compiler happy */
+   PNG_UNUSED(error_message) /* Make compiler happy */
 #endif
 }
 
@@ -346,9 +346,9 @@ png_default_warning(png_structp png_ptr, png_const_charp warning_message)
      fprintf(stderr, PNG_STRING_NEWLINE);
    }
 #else
-   warning_message = warning_message; /* Make compiler happy */
+   PNG_UNUSED(warning_message) /* Make compiler happy */
 #endif
-   png_ptr = png_ptr; /* Make compiler happy */
+   PNG_UNUSED(png_ptr) /* Make compiler happy */
 }
 #endif /* PNG_WARNINGS_SUPPORTED */
 
