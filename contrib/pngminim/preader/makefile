@@ -23,7 +23,7 @@ XLIB = -L/usr/X11R6/lib -lX11
 #LIBS = $(XLIB)
 LIBS = $(XLIB) -lm                      #platforms that need libm
 
-CFLAGS=-DPNG_USER_CONFIG -DNO_GZCOMPRESS -DNO_GZIP \
+CFLAGS=-DPNG_USER_CONFIG -DNO_GZCOMPRESS -DNO_GZIP -DZ_SOLO \
        -DdeflateParams\(a,b,c\)=Z_OK -I. $(XINC) -O1
 
 C=.c

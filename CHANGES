@@ -2808,6 +2808,9 @@ version 1.2.51rc03 [February 3, 2014]
   Quiet unused variable warnings from clang by porting PNG_UNUSED() from
     libpng-1.4.6.
 
+version 1.2.51rc04 [February 3, 2014]
+  Added -DZ_SOLO to CFLAGS in contrib/pngminim/*/makefile
+
 version 1.0.61 and 1.2.51 [February 3, 2014]
   No changes.
 
