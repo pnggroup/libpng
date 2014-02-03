@@ -1,9 +1,9 @@
 libpng.txt - A description on how to use and modify libpng
 
- libpng version 1.2.51rc02 - January 30, 2014
+ libpng version 1.2.51rc03 - February 3, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
- Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
  This document is released under the libpng license.
  For conditions of distribution and use, see the disclaimer
@@ -11,9 +11,9 @@ libpng.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.2.51rc02 - January 30, 2014
+ libpng versions 0.97, January 1998, through 1.2.51rc03 - February 3, 2014
  Updated and distributed by Glenn Randers-Pehrson
- Copyright (c) 1998-2009 Glenn Randers-Pehrson
+ Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
  libpng 1.0 beta 6  version 0.96 May 28, 1997
  Updated and distributed by Andreas Dilger
@@ -878,7 +878,7 @@ things.
 As of libpng version 1.2.9, png_set_expand_gray_1_2_4_to_8() was
 added.  It expands the sample depth without changing tRNS to alpha.
 
-As of libpng version 1.2.51rc02, not all possible expansions are supported.
+As of libpng version 1.2.51rc03, not all possible expansions are supported.
 
 In the following table, the 01 means grayscale with depth<8, 31 means
 indexed with depth<8, other numerals represent the color type, "T" means
@@ -2927,6 +2927,9 @@ png_set_error_fn(), which is essentially the same function, but with a new
 name to force compilation errors with applications that try to use the old
 method.
 
+Support for the sCAL, iCCP, iTXt, and sPLT chunks was added at libpng-1.0.6;
+however, iTXt support was not enabled by default.
+
 Starting with version 1.0.7, you can find out which version of the library
 you are using at run-time:
 
@@ -3179,13 +3182,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIII. Y2K Compliance in libpng
 
-January 30, 2014
+February 3, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.2.51rc02 are Y2K compliant.  It is my belief that earlier
+upward through 1.2.51rc03 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has three year fields.  One is a 2-byte unsigned integer that
