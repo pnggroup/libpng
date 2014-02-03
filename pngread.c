@@ -1501,7 +1501,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
    png_read_end(png_ptr, info_ptr);
 
    PNG_UNUSED(transforms) /* Quiet compiler warnings */
-   PNG_UNUSED(params);
+   PNG_UNUSED(params)
 
 }
 #endif /* PNG_INFO_IMAGE_SUPPORTED */
