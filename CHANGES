@@ -4810,7 +4810,9 @@ Version 1.7.0beta31 [February 5, 2014]
     application errors or crashes.  Such chunks are now skipped (with
     chunk_benign_error).
   Restored a line, "c = b;", that was inadvertently deleted from the
-    PAETH filtering code from libpng-1.7.0beta24/pngrutil.c. 
+    PAETH filtering code from libpng-1.7.0beta24/pngrutil.c. Deleted
+    the other instance of "c = b;" which is the one that triggered a
+    scan-build warning.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
