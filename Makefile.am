@@ -62,7 +62,8 @@ TESTS =\
    tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
    tests/pngstest-error tests/pngunknown-IDAT\
    tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
-   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg
+   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
+   tests/pngimage-quick tests/pngimage-full
 
 # These tests are expected, and required, to fail:
 XFAIL_TESTS = tests/pngstest-error

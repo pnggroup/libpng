@@ -1506,12 +1506,12 @@ png_init_read_transformations(png_structrp png_ptr)
     * 12) PNG_EXPAND_16
     * 13) PNG_GRAY_TO_RGB iff PNG_FLAG_BACKGROUND_IS_GRAY
     * 14) PNG_INVERT_MONO
-    * 15) PNG_SHIFT
-    * 16) PNG_PACK
-    * 17) PNG_BGR
-    * 18) PNG_PACKSWAP
-    * 19) PNG_FILLER (includes PNG_ADD_ALPHA)
-    * 20) PNG_INVERT_ALPHA
+    * 15) PNG_INVERT_ALPHA
+    * 16) PNG_SHIFT
+    * 17) PNG_PACK
+    * 18) PNG_BGR
+    * 19) PNG_PACKSWAP
+    * 20) PNG_FILLER (includes PNG_ADD_ALPHA)
     * 21) PNG_SWAP_ALPHA
     * 22) PNG_SWAP_BYTES
     * 23) PNG_USER_TRANSFORM [must be last]
@@ -4802,6 +4802,11 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       png_do_invert(row_info, png_ptr->row_buf + 1);
 #endif
 
+#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
+   if (png_ptr->transformations & PNG_INVERT_ALPHA)
+      png_do_read_invert_alpha(row_info, png_ptr->row_buf + 1);
+#endif
+
 #ifdef PNG_READ_SHIFT_SUPPORTED
    if (png_ptr->transformations & PNG_SHIFT)
       png_do_unshift(row_info, png_ptr->row_buf + 1,
@@ -4834,11 +4839,6 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
    if (png_ptr->transformations & PNG_FILLER)
       png_do_read_filler(row_info, png_ptr->row_buf + 1,
           (png_uint_32)png_ptr->filler, png_ptr->flags);
-#endif
-
-#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
-   if (png_ptr->transformations & PNG_INVERT_ALPHA)
-      png_do_read_invert_alpha(row_info, png_ptr->row_buf + 1);
 #endif
 
 #ifdef PNG_READ_SWAP_ALPHA_SUPPORTED

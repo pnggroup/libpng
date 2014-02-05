@@ -4798,6 +4798,12 @@ Version 1.7.0beta31 [February 5, 2014]
     upon PNG_READ_SUPPORTED and PNG_WRITE_SUPPORTED.
   Removed dependence on !PNG_READ_EXPAND_SUPPORTED for calling
     png_set_packing() in png_read_png().
+  Completed full working pngimage test program and added two test scripts.
+  Fixed combination of ~alpha with shift. On read invert alpha, processing
+    occurred after shift processing, which causes the final values to be
+    outside the range that should be produced by the shift. Reversing the
+    order on read makes the two transforms work together correctly and mirrors
+    the order used on write.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
