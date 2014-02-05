@@ -520,6 +520,8 @@ Version 1.7.0beta31 [February 5, 2014]
     the read code to return an invalid sBIT chunk, which might lead to
     application errors or crashes.  Such chunks are now skipped (with
     chunk_benign_error).
+  Restored a line, "c = b;", that was inadvertently deleted from the
+    PAETH filtering code from libpng-1.7.0beta24/pngrutil.c. 
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

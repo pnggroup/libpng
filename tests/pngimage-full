@@ -1,4 +1,2 @@
 #!/bin/sh
-# does not work
-# exec ./pngimage --exhaustive --log "${srcdir}/contrib/pngsuite/"*.png
-exit 77
+exec ./pngimage --exhaustive --log "${srcdir}/contrib/pngsuite/"*.png
