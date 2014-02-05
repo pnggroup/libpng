@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.9 [January 30, 2014]
+ * Last changed in libpng 1.6.9 [February 6, 2014]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -55,7 +55,7 @@
 /* Reversible transforms */
 #define RW_TRANSFORMS (READ_TRANSFORMS & WRITE_TRANSFORMS)
 
-/* All transforms: this is a safety feature, examine png.h and set it to the
+/* All transforms: this is a safety feature; examine png.h and set it to the
  * mask that should correspond to all the transforms.
  */
 #define ALL_TRANSFORMS 0xffff
@@ -69,13 +69,13 @@
  * write the result is the original PNG data that would have would have been
  * read if no transform were applied.
  *
- * The execption is _SHIFT, which destroys the low order bits marked as not
+ * The exception is _SHIFT, which destroys the low order bits marked as not
  * significant in a PNG with the sBIT chunk.
  *
  * The following table lists, for each transform, the conditions under which it
  * is expected to do anything.  Conditions are defined as follows:
  *
- * 1) Color mask bits required - simply a mask to AND with color_type, one of
+ * 1) Color mask bits required - simply a mask to AND with color_type; one of
  *    these must be present for the transform to fire, except that 0 means
  *    'always'.
  * 2) Color mask bits which must be absent - another mask - none of these must
@@ -175,7 +175,7 @@ static struct transform_info
        */
    T(GRAY_TO_RGB,         NONE, P,   X,  ALL,  R),
       /* The 'palette' side effect mentioned above; a bit bogus but this is the
-       * way thelibpng code works.
+       * way the libpng code works.
        */
    T(EXPAND_16,           NONE, X,   X,  PAL,  R),
       /* expands images to 16-bits per component, as a side effect expands
@@ -737,7 +737,7 @@ read_png(struct display *dp, struct buffer *bp, const char *operation,
    png_structp pp;
    png_infop   ip;
 
-   /* This cleans out any previouos read and sets operation and transforms to
+   /* This cleans out any previous read and sets operation and transforms to
     * empty.
     */
    display_clean_read(dp);
@@ -806,7 +806,7 @@ update_display(struct display *dp)
 
    dp->original_rowbytes = png_get_rowbytes(pp, ip);
    if (dp->original_rowbytes == 0)
-      display_log(dp, LIBPNG_BUG, "png_get_rowbyts returned 0");
+      display_log(dp, LIBPNG_BUG, "png_get_rowbytes returned 0");
 
    dp->chunks = png_get_valid(pp, ip, 0xffffffff);
    if ((dp->chunks & PNG_INFO_IDAT) == 0) /* set by png_read_png */
@@ -850,7 +850,7 @@ update_display(struct display *dp)
       }
 
       /* Some transforms appear multiple times in the table; the 'active' status
-       * is the logical or of these and the inactive status must be adjusted to
+       * is the logical OR of these and the inactive status must be adjusted to
        * take this into account.
        */
       inactive &= ~active;
@@ -909,7 +909,7 @@ compare_read(struct display *dp, int applied_transforms)
    rowbytes = png_get_rowbytes(dp->read_pp, dp->read_ip);
 
    /* NOTE: on 64-bit systems this may trash the top bits of rowbytes,
-    * this could lead to weird error messages.
+    * which could lead to weird error messages.
     */
    if (rowbytes != dp->original_rowbytes)
       display_log(dp, APP_ERROR, "PNG rowbytes changed from %lu to %lu",
@@ -1018,10 +1018,9 @@ compare_read(struct display *dp, int applied_transforms)
 
             for (b=0; 8*b<bpp; ++b)
             {
-               /* libpng should catch this, if not there is a security issue
+               /* libpng should catch this; if not there is a security issue
                 * because an app (like this one) may overflow an array. In fact
-                * libpng doesn't catch this at present. In fact libpng doesn't
-                * catch this at present.
+                * libpng doesn't catch this at present.
                 */
                if (sig_bits[b] == 0 || sig_bits[b] > bit_depth/*!palette*/)
                   display_log(dp, LIBPNG_BUG,
@@ -1032,7 +1031,7 @@ compare_read(struct display *dp, int applied_transforms)
 
          if (bpp < 8 && bpp != bit_depth)
          {
-            /* sanity check; this is a grayscale PNG, something is wrong in the
+            /* sanity check; this is a grayscale PNG; something is wrong in the
              * code above.
              */
             display_log(dp, INTERNAL_ERROR, "invalid bpp %u for bit_depth %u",
@@ -1083,7 +1082,7 @@ compare_read(struct display *dp, int applied_transforms)
                break;
          }
 
-         /* Convert bpp to bytes, this gives '1' for low-bit depth grayscale,
+         /* Convert bpp to bytes; this gives '1' for low-bit depth grayscale,
           * where there are multiple pixels per byte.
           */
          bpp = (bpp+7) >> 3;
@@ -1281,7 +1280,7 @@ test_one_file(struct display *dp, const char *filename)
    display_cache_file(dp, filename);
    update_display(dp);
 
-   /* First test: if there are options which should be ignored for this file
+   /* First test: if there are options that should be ignored for this file
     * verify that they really are ignored.
     */
    if (dp->ignored_transforms != 0)
@@ -1307,7 +1306,7 @@ test_one_file(struct display *dp, const char *filename)
 #endif
 
    /* Third test: the active options.  Test each in turn, or, with the
-    * EXHAUSTIVE option test all possible combinations.
+    * EXHAUSTIVE option, test all possible combinations.
     */
    {
       /* Use unsigned int here because the code below to increment through all
@@ -1331,9 +1330,9 @@ test_one_file(struct display *dp, const char *filename)
           * this isn't done - it just seems like a waste of time and it would
           * require two sets of read png_struct/png_info.
           *
-          * If there were no irreverisble transformatons then if we write it out
-          * and read it back in again (without the reversible transforms) we
-          * should get back to the place where we started.
+          * If there were no irreversible transformations then if we write it
+          * out and read it back in again (without the reversible transforms)
+          * we should get back to the place where we started.
           */
 #ifdef PNG_WRITE_SUPPORTED
          if ((current & WRITE_TRANSFORMS) == current)
@@ -1380,7 +1379,7 @@ test_one_file(struct display *dp, const char *filename)
                   goto combo;
 
                ++next;
-            }  /* skip known bad combos if the relevant option is set, skip
+            }  /* skip known bad combos if the relevant option is set; skip
                 * combos involving known bad single transforms in all cases.
                 */
             while (  (next & READ_TRANSFORMS) <= current
@@ -1406,7 +1405,7 @@ test_one_file(struct display *dp, const char *filename)
 combo:
       if (dp->options & FIND_BAD_COMBOS)
       {
-         /* bad_combos identifies the combos that occur in all failing cases,
+         /* bad_combos identifies the combos that occur in all failing cases;
           * bad_combo_list identifies transforms that do not prevent the
           * failure.
           */
