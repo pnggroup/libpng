@@ -515,6 +515,11 @@ Version 1.7.0beta31 [February 5, 2014]
     outside the range that should be produced by the shift. Reversing the
     order on read makes the two transforms work together correctly and mirrors
     the order used on write.
+  Do not read invalid sBIT chunks. Previously libpng only checked sBIT
+    values on write, so a malicious PNG writer could therefore cause
+    the read code to return an invalid sBIT chunk, which might lead to
+    application errors or crashes.  Such chunks are now skipped (with
+    chunk_benign_error).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
