@@ -4200,6 +4200,9 @@ Version 1.5.18rc01 [January 28, 2014]
 Version 1.5.18rc02 [January 30, 2014]
   Quiet an uninitialized memory warning from VC2013 in png_get_png().
 
+Version 1.5.18 [February 6, 2014]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
