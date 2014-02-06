@@ -2520,10 +2520,14 @@ PNG_EXPORT(177, void, png_set_invalid, (png_const_structrp png_ptr,
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 /* The "params" pointer is currently not used and is for future expansion. */
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 PNG_EXPORT(178, void, png_read_png, (png_structrp png_ptr, png_inforp info_ptr,
     int transforms, png_voidp params));
+#endif
+#ifdef PNG_WRITE_SUPPORTED
 PNG_EXPORT(179, void, png_write_png, (png_structrp png_ptr, png_inforp info_ptr,
     int transforms, png_voidp params));
+#endif
 #endif
 
 PNG_EXPORT(180, png_const_charp, png_get_copyright,
