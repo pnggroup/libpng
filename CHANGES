@@ -4793,7 +4793,7 @@ Version 1.7.0beta30 [February 2, 2014]
     the program by virtue of exhaustively testing all the transforms is
     very slow.
 
-Version 1.7.0beta31 [February 5, 2014]
+Version 1.7.0beta31 [February 6, 2014]
   Make png_read_png() and png_write_png() prototypes in png.h depend
     upon PNG_READ_SUPPORTED and PNG_WRITE_SUPPORTED.
   Removed dependence on !PNG_READ_EXPAND_SUPPORTED for calling
@@ -4813,6 +4813,14 @@ Version 1.7.0beta31 [February 5, 2014]
     PAETH filtering code from libpng-1.7.0beta24/pngrutil.c. Deleted
     the other instance of "c = b;" which is the one that triggered a
     scan-build warning.
+  Support builds with unsupported PNG_TRANSFORM_* values.  All of the
+    PNG_TRANSFORM_* values are always defined in png.h and, because they
+    are used for both read and write in some cases, it is not reliable
+    to #if out ones that are totally unsupported. This change adds error
+    detection in png_read_image() and png_write_image() to do a
+    png_app_error() if the app requests something that cannot be done
+    and it adds corresponding code to pngimage.c to handle such options
+    by not attempting to test them.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
