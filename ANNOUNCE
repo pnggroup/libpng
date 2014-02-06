@@ -1,32 +1,29 @@
 
-Libpng 1.6.9rc02 - January 30, 2014
+Libpng 1.6.9 - February 6, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.9rc02.tar.xz (LZMA-compressed, recommended)
-   1.6.9rc02.tar.gz
+   libpng-1.6.9.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.9.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp169r02.7z  (LZMA-compressed, recommended)
-   lp169r02.zip
+   lpng169.7z  (LZMA-compressed, recommended)
+   lpng169.zip
 
 Other information:
 
-   1.6.9rc02-README.txt
-   1.6.9rc02-LICENSE.txt
+   libpng-1.6.9-README.txt
+   libpng-1.6.9-LICENSE.txt
    Gnupg/*.asc (PGP armored detached signatures)
 
 Changes since the last public release (1.6.8):
-
-Version 1.6.9beta01 [December 26, 2013]
   Bookkeeping: Moved functions around (no changes). Moved transform
     function definitions before the place where they are called so that
     they can be masde static. Move the intrapixel functions and the
@@ -41,8 +38,6 @@ Version 1.6.9beta01 [December 26, 2013]
     easier changes to the internal interfaces.
   Rebuilt configure scripts with automake-1.14.1 and autoconf-2.69
     in the tar distributions.
-
-Version 1.6.9beta02 [January 1, 2014]
   Added checks for libpng 1.5 to pngvalid.c.  This supports the use of
     this version of pngvalid in libpng 1.5
   Merged with pngvalid.c from libpng-1.7 changes to create a single
@@ -59,18 +54,9 @@ Version 1.6.9beta02 [January 1, 2014]
     and libpng.a to point to the newly installed, versioned, files (e.g.
     libpng17/png.h and libpng17.a). Three new configure options and some
     rearrangement of Makefile.am allow creation of these links to be disabled.
-
-Version 1.6.9beta03 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
-
-Version 1.6.9beta04 [January 20, 2014]
   Updated scripts/makefile.* to use CPPFLAGS (Cosmin).
   Added clang attribute support (Cosmin).
-
-Version 1.6.9rc01 [January 28, 2014]
-  No changes.
-
-Version 1.6.9rc02 [January 30, 2014]
   Quiet an uninitialized memory warning from VC2013 in png_get_png().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
