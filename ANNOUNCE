@@ -1,83 +1,65 @@
 
-Libpng 1.2.51rc04 - February 3, 2014
+Libpng 1.2.51 - February 6, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.51rc04.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51rc04.tar.gz
-   libpng-1.2.51rc04.tar.bz2
+   libpng-1.2.51.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51.tar.gz
+   libpng-1.2.51.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.51rc04-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.51rc04-no-config.tar.gz
-   libpng-1.2.51rc04-no-config.tar.bz2
+   libpng-1.2.51-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.51-no-config.tar.gz
+   libpng-1.2.51-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1251r04.zip
-   lp1251r04.7z
-   lp1251r04.tar.bz2
+   lpng1251.zip
+   lpng1251.7z
+   lpng1251.tar.bz2
 
 Project files
 
-   libpng-1.2.51rc04-project-netware.zip
-   libpng-1.2.51rc04-project-wince.zip
+   libpng-1.2.51-project-netware.zip
+   libpng-1.2.51-project-wince.zip
 
 Other information:
 
-   libpng-1.2.51rc04-README.txt
-   libpng-1.2.51rc04-KNOWNBUGS.txt
-   libpng-1.2.51rc04-LICENSE.txt
-   libpng-1.2.51rc04-Y2K-compliance.txt
-   libpng-1.2.51rc04-[previous version]-diff.txt
+   libpng-1.2.51-README.txt
+   libpng-1.2.51-KNOWNBUGS.txt
+   libpng-1.2.51-LICENSE.txt
+   libpng-1.2.51-Y2K-compliance.txt
+   libpng-1.2.51-[previous version]-diff.txt
 
 Changes since the last public release (1.2.50):
 
-version 1.2.51beta01 [January 22, 2013]
+version 1.2.51 [February 6, 2014]
+
+version 1.0.61 and 1.2.51 [February 6, 2014]
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
-
-version 1.2.51beta02 [June 13, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Revised libpng.3 so that "doclifter" can process it.
-
-version 1.2.51beta03 [January 1, 2014]
   Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
     among compilers.
   Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
-
-version 1.2.51beta04 [January 10, 2014]
   Removed potentially misleading warning from png_check_IHDR().
-
-version 1.2.51beta05 [January 22, 2014]
   Quiet set-but-not-used warnings in pngset.c
-
-version 1.2.51rc01 [January 28, 2014]
-  No changes.
-
-version 1.2.51rc02 [January 30, 2014]
   Quiet an uninitialized memory warning from VC2013 in png_get_png().
-
-version 1.2.51rc03 [February 3, 2014]
   Quiet unused variable warnings from clang by porting PNG_UNUSED() from
     libpng-1.4.6.
-
-version 1.2.51rc04 [February 3, 2014]
   Added -DZ_SOLO to CFLAGS in contrib/pngminim/*/makefile
-
-version 1.0.61 and 1.2.51 [February 3, 2014]
-  No changes.
+  Added an #ifdef PNG_FIXED_POINT_SUPPORTED/#endif in pngset.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -2811,8 +2811,8 @@ version 1.2.51rc03 [February 3, 2014]
 version 1.2.51rc04 [February 3, 2014]
   Added -DZ_SOLO to CFLAGS in contrib/pngminim/*/makefile
 
-version 1.0.61 and 1.2.51 [February 3, 2014]
-  No changes.
+version 1.0.61 and 1.2.51 [February 6, 2014]
+  Added an #ifdef PNG_FIXED_POINT_SUPPORTED/#endif in pngset.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
