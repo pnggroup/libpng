@@ -18,20 +18,20 @@ AC_PREREQ(2.59)
 
 dnl Version number stuff here:
 
-AC_INIT([libpng], [1.0.60], [png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng], [1.0.61], [png-mng-implement@lists.sourceforge.net])
 AM_INIT_AUTOMAKE
 dnl stop configure from automagically running automake
 AM_MAINTAINER_MODE
 
-PNGLIB_VERSION=1.0.60
+PNGLIB_VERSION=1.0.61
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=0
-PNGLIB_RELEASE=60
+PNGLIB_RELEASE=61
 
 dnl End of version number stuff
 
 AC_CONFIG_SRCDIR([pngget.c])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
 AC_PROG_CC
