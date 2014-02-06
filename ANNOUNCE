@@ -1,45 +1,34 @@
 
-Libpng 1.4.13 - February 6, 2014
+Libpng 1.4.14beta01 - February 6, 2014
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.4.13.tar.xz (LZMA-compressed, recommended)
-   libpng-1.4.13.tar.gz
-   libpng-1.4.13.tar.bz2
+   1.4.14beta01.tar.xz (LZMA-compressed, recommended)
+   1.4.14beta01.tar.gz
+   1.4.14beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1413.7z (LZMA-compressed, recommended)
-   lpng1413.zip
+   lp1414b01.7z (LZMA-compressed, recommended)
+   lp1414b01.zip
 
 Other information:
 
-   libpng-1.4.13-README.txt
-   libpng-1.4.13-LICENSE.txt
+   1.4.14beta01-README.txt
+   1.4.14beta01-LICENSE.txt
+   libpng-1.4.14beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.4.12):
+Changes since the last public release (1.4.13):
 
-  Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
-  Removed references to png_zalloc() and png_zfree() from the manual.
-  Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
-  Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
-    in configure.ac
-  Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
-  Avoid a possible memory leak in contrib/gregbook/readpng.c
-  Removed a redundant test from png_set_IHDR().
-  Revised libpng.3 so that "doclifter" can process it.
-  Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
-    among compilers.
-  Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
-  Removed potentially misleading warning from png_check_IHDR().
-  Quiet set-but-not-used warnings in pngset.c
-  Quiet an uninitialized memory warning from VC2013 in png_get_png().
+version 1.4.14beta01 [February 6, 2014]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
