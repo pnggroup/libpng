@@ -22,7 +22,7 @@ Other information:
 
    1.6.10beta01-README.txt
    1.6.10beta01-LICENSE.txt
-   Gnupg/*.asc (PGP armored detached signatures)
+   libpng-1.6.10beta01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.9):
 
