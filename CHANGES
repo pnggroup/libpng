@@ -4822,6 +4822,8 @@ Version 1.7.0beta31 [February 6, 2014]
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
 
+Version 1.7.0beta32 [February 6, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
