@@ -1,67 +1,44 @@
 
-Libpng 1.4.13rc02 - January 30, 2014
+Libpng 1.4.13 - February 6, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.13rc02.tar.xz (LZMA-compressed, recommended)
-   1.4.13rc02.tar.gz
-   1.4.13rc02.tar.bz2
+   libpng-1.4.13.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.13.tar.gz
+   libpng-1.4.13.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1413r02.7z (LZMA-compressed, recommended)
-   lp1413r02.zip
+   lpng1413.7z (LZMA-compressed, recommended)
+   lpng1413.zip
 
 Other information:
 
-   1.4.13rc02-README.txt
-   1.4.13rc02-LICENSE.txt
+   libpng-1.4.13-README.txt
+   libpng-1.4.13-LICENSE.txt
 
-Changes since the last public release (1.4.11):
+Changes since the last public release (1.4.12):
 
-version 1.4.12 [July 10, 2012]
-  Added two images to contrib/pngsuite (1-bit and 2-bit transparent grayscale),
-    and renamed three whose names were inconsistent with those in
-    pngsuite/README.txt.
-  Changed "a+w" to "u+w" in Makefile.in to fix CVE-2012-3386.
-
-version 1.4.13beta01 [January 1, 2013]
   Do not compile PNG_DEPRECATED, PNG_ALLOC and PNG_PRIVATE when __GNUC__ < 3.
   Removed references to png_zalloc() and png_zfree() from the manual.
   Ignore, with a warning, out-of-range value of num_trans in png_set_tRNS().
-
-version 1.4.13beta02 [January 22, 2013]
   Replaced AM_CONFIG_HEADER(config.h) with AC_CONFIG_HEADERS([config.h])
     in configure.ac
   Changed default value of PNG_USER_CACHE_MAX from 0 to 32767 in pngconf.h.
-
-version 1.4.13beta03 [June 18, 2013]
   Avoid a possible memory leak in contrib/gregbook/readpng.c
   Removed a redundant test from png_set_IHDR().
   Revised libpng.3 so that "doclifter" can process it.
-
-version 1.4.13beta04 [January 1, 2014]
   Changed '"%s"m' to '"%s" m' in png_debug macros to improve portability
     among compilers.
-
-version 1.4.13beta05 [January 10, 2014]
   Rebuilt the configure scripts with autoconf-2.69 and automake-1.14.1
   Removed potentially misleading warning from png_check_IHDR().
-
-version 1.4.13beta06 [January 22, 2014]
   Quiet set-but-not-used warnings in pngset.c
-
-version 1.4.13rc01 [January 28, 2014]
-  No changes.
-
-version 1.4.13rc02 [January 30, 2014]
   Quiet an uninitialized memory warning from VC2013 in png_get_png().
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
