@@ -36,30 +36,7 @@
 #  include <setjmp.h> /* because png.h did *not* include this */
 #endif
 
-#if defined(PNG_INFO_IMAGE_SUPPORTED) && defined(PNG_READ_SUPPORTED)
-/* Valid transformations to perform on read: */
-#define READ_TRANSFORMS (PNG_TRANSFORM_STRIP_16|PNG_TRANSFORM_STRIP_ALPHA|\
-   PNG_TRANSFORM_PACKING|PNG_TRANSFORM_PACKSWAP|PNG_TRANSFORM_EXPAND|\
-   PNG_TRANSFORM_INVERT_MONO|PNG_TRANSFORM_SHIFT|PNG_TRANSFORM_BGR|\
-   PNG_TRANSFORM_SWAP_ALPHA|PNG_TRANSFORM_SWAP_ENDIAN|\
-   PNG_TRANSFORM_INVERT_ALPHA|PNG_TRANSFORM_GRAY_TO_RGB|\
-   PNG_TRANSFORM_EXPAND_16|PNG_TRANSFORM_SCALE_16)
-
-/* Valid transformations to perform on write: */
-#define WRITE_TRANSFORMS (PNG_TRANSFORM_PACKING|PNG_TRANSFORM_PACKSWAP|\
-   PNG_TRANSFORM_INVERT_MONO|PNG_TRANSFORM_SHIFT|PNG_TRANSFORM_BGR|\
-   PNG_TRANSFORM_SWAP_ALPHA|PNG_TRANSFORM_SWAP_ENDIAN|\
-   PNG_TRANSFORM_INVERT_ALPHA|PNG_TRANSFORM_STRIP_FILLER|\
-   PNG_TRANSFORM_STRIP_FILLER_BEFORE|PNG_TRANSFORM_STRIP_FILLER_AFTER)
-
-/* Reversible transforms */
-#define RW_TRANSFORMS (READ_TRANSFORMS & WRITE_TRANSFORMS)
-
-/* All transforms: this is a safety feature; examine png.h and set it to the
- * mask that should correspond to all the transforms.
- */
-#define ALL_TRANSFORMS 0xffff
-
+#if defined(PNG_INFO_IMAGE_SUPPORTED) && defined(PNG_SEQUENTIAL_READ_SUPPORTED)
 /* If a transform is valid on both read and write this implies that if the
  * transform is applied to read it must also be applied on write to produce
  * meaningful data.  This is because these transforms when performed on read
@@ -119,21 +96,44 @@ static struct transform_info
    png_byte    tested; /* the transform was tested somewhere */
 } transform_info[] =
 {
+   /* List ALL the PNG_TRANSFORM_ macros here.  Check for support using the READ
+    * macros; even if the transform is supported on write it cannot be tested
+    * without the read support.
+    */
 #  define T(name,chunk,cm_required,cm_absent,bd,when)\
    {  #name, PNG_TRANSFORM_ ## name, CHUNK_ ## chunk,\
       COLOR_MASK_ ## cm_required, COLOR_MASK_ ## cm_absent, BD_ ## bd,\
       TRANSFORM_ ## when, 0/*!tested*/ }
 
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
    T(STRIP_16,            NONE, X,   X,   16,  R),
       /* drops the bottom 8 bits when bit depth is 16 */
+#endif
+#ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
    T(STRIP_ALPHA,         NONE, A,   X,  ALL,  R),
       /* removes the alpha channel if present */
-   T(PACKING,             NONE, X,   X,  LOW, RW),
+#endif
+#ifdef PNG_WRITE_PACK_SUPPORTED
+#  define TRANSFORM_RW_PACK TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_PACK TRANSFORM_R
+#endif
+#ifdef PNG_READ_PACK_SUPPORTED
+   T(PACKING,             NONE, X,   X,  LOW, RW_PACK),
       /* unpacks low-bit-depth components into 1 byte per component on read,
        * reverses this on write.
        */
-   T(PACKSWAP,            NONE, X,   X,  LOW, RW),
+#endif
+#ifdef PNG_WRITE_PACKSWAP_SUPPORTED
+#  define TRANSFORM_RW_PACKSWAP TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_PACKSWAP TRANSFORM_R
+#endif
+#ifdef PNG_READ_PACKSWAP_SUPPORTED
+   T(PACKSWAP,            NONE, X,   X,  LOW, RW_PACKSWAP),
       /* reverses the order of low-bit-depth components packed into a byte */
+#endif
+#ifdef PNG_READ_EXPAND_SUPPORTED
    T(EXPAND,              NONE, P,   X,  ALL,  R),
       /* expands PLTE PNG files to RGB (no tRNS) or RGBA (tRNS) *
        * Note that the 'EXPAND' transform does lots of different things: */
@@ -141,24 +141,68 @@ static struct transform_info
       /* expands grayscale PNG files to RGB, or RGBA */
    T(EXPAND,              tRNS, X,   A,  ALL,  R),
       /* expands the tRNS chunk in files without alpha */
-   T(INVERT_MONO,         NONE, X,   C,  ALL, RW),
+#endif
+#ifdef PNG_WRITE_INVERT_SUPPORTED
+#  define TRANSFORM_RW_INVERT TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_INVERT TRANSFORM_R
+#endif
+#ifdef PNG_READ_INVERT_SUPPORTED
+   T(INVERT_MONO,         NONE, X,   C,  ALL, RW_INVERT),
       /* converts gray-scale components to 1..0 from 0..1 */
-   T(SHIFT,               sBIT, X,   X,  ALL, RW),
+#endif
+#ifdef PNG_WRITE_SHIFT_SUPPORTED
+#  define TRANSFORM_RW_SHIFT TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_SHIFT TRANSFORM_R
+#endif
+#ifdef PNG_READ_SHIFT_SUPPORTED
+   T(SHIFT,               sBIT, X,   X,  ALL, RW_SHIFT),
       /* reduces component values to the original range based on the sBIT chunk,
        * this is only partially reversible - the low bits are lost and cannot be
        * recovered on write.  In fact write code replicates the bits to generate
        * new low-order bits.
        */
-   T(BGR,                 NONE, C,   P, TRUE, RW),
+#endif
+#ifdef PNG_WRITE_BGR_SUPPORTED
+#  define TRANSFORM_RW_BGR TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_BGR TRANSFORM_R
+#endif
+#ifdef PNG_READ_BGR_SUPPORTED
+   T(BGR,                 NONE, C,   P, TRUE, RW_BGR),
       /* reverses the rgb component values of true-color pixels */
-   T(SWAP_ALPHA,          NONE, A,   X, TRUE, RW),
+#endif
+#ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
+#  define TRANSFORM_RW_SWAP_ALPHA TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_SWAP_ALPHA TRANSFORM_R
+#endif
+#ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
+   T(SWAP_ALPHA,          NONE, A,   X, TRUE, RW_SWAP_ALPHA),
       /* swaps the alpha channel of RGBA or GA pixels to the front - ARGB or
        * AG, on write reverses the process.
        */
-   T(SWAP_ENDIAN,         NONE, X,   P,   16, RW),
+#endif
+#ifdef PNG_WRITE_SWAP_SUPPORTED
+#  define TRANSFORM_RW_SWAP TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_SWAP TRANSFORM_R
+#endif
+#ifdef PNG_READ_SWAP_SUPPORTED
+   T(SWAP_ENDIAN,         NONE, X,   P,   16, RW_SWAP),
       /* byte-swaps 16-bit component values */
-   T(INVERT_ALPHA,        NONE, A,   X, TRUE, RW),
+#endif
+#ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
+#  define TRANSFORM_RW_INVERT_ALPHA TRANSFORM_RW
+#else
+#  define TRANSFORM_RW_INVERT_ALPHA TRANSFORM_R
+#endif
+#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
+   T(INVERT_ALPHA,        NONE, A,   X, TRUE, RW_INVERT_ALPHA),
       /* converts an alpha channel from 0..1 to 1..0 */
+#endif
+#ifdef PNG_WRITE_FILLER_SUPPORTED
    T(STRIP_FILLER_BEFORE, NONE, A,   P, TRUE,  W), /* 'A' for a filler! */
       /* on write skips a leading filler channel; testing requires data with a
        * filler channel so this is produced from RGBA or GA images by removing
@@ -166,6 +210,8 @@ static struct transform_info
        */
    T(STRIP_FILLER_AFTER,  NONE, A,   P, TRUE,  W),
       /* on write strips a trailing filler channel */
+#endif
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
    T(GRAY_TO_RGB,         NONE, X,   C,  ALL,  R),
       /* expands grayscale images to RGB, also causes the palette part of
        * 'EXPAND' to happen.  Low bit depth grayscale images are expanded to
@@ -177,6 +223,8 @@ static struct transform_info
       /* The 'palette' side effect mentioned above; a bit bogus but this is the
        * way the libpng code works.
        */
+#endif
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
    T(EXPAND_16,           NONE, X,   X,  PAL,  R),
       /* expands images to 16-bits per component, as a side effect expands
        * palette images to RGB and expands the tRNS chunk if present, so it can
@@ -186,8 +234,11 @@ static struct transform_info
       /* side effect of EXPAND_16 - expands the tRNS chunk in an RGB or G 16-bit
        * image.
        */
+#endif
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
    T(SCALE_16,            NONE, X,   X,   16,  R)
       /* scales 16-bit components to 8-bits. */
+#endif
 
 #undef T
 };
@@ -252,21 +303,20 @@ transform_name(int t)
    return "invalid transform";
 }
 
+/* Variables calculated by validate_T below and used to record all the supported
+ * transforms.  Need (unsigned int) here because of the places where these
+ * values are used (unsigned compares in the 'exhaustive' iterator.)
+ */
+static unsigned int read_transforms, write_transforms, rw_transforms;
+
 static void
 validate_T(void)
-   /* Validate the above table - this is done mainly to ensure that all the
-    * transforms are being tested.
-    */
+   /* Validate the above table - this just builds the above values */
 {
    unsigned int i;
-   int read_transforms = 0;
-   int write_transforms = 0;
-   int all_transforms = 0;
 
    for (i=0; i<TTABLE_SIZE; ++i)
    {
-      all_transforms |= transform_info[i].transform;
-
       if (transform_info[i].when & TRANSFORM_R)
          read_transforms |= transform_info[i].transform;
 
@@ -274,13 +324,10 @@ validate_T(void)
          write_transforms |= transform_info[i].transform;
    }
 
-   if (read_transforms != READ_TRANSFORMS ||
-      write_transforms != WRITE_TRANSFORMS ||
-      all_transforms != ALL_TRANSFORMS)
-   {
-      fprintf(stderr, "pngimage: transform_info incorrect\n");
-      exit(99); /* internal test error */
-   }
+   /* Reversible transforms are those which are supported on both read and
+    * write.
+    */
+   rw_transforms = read_transforms & write_transforms;
 }
 
 /* FILE DATA HANDLING
@@ -1335,7 +1382,7 @@ test_one_file(struct display *dp, const char *filename)
           * we should get back to the place where we started.
           */
 #ifdef PNG_WRITE_SUPPORTED
-         if ((current & WRITE_TRANSFORMS) == current)
+         if ((current & write_transforms) == current)
          {
             /* All transforms reversible: write the PNG with the transformations
              * reversed, then read it back in with no transformations.  The
@@ -1375,19 +1422,19 @@ test_one_file(struct display *dp, const char *filename)
 
             do
             {
-               if (next == READ_TRANSFORMS) /* Everything tested */
+               if (next == read_transforms) /* Everything tested */
                   goto combo;
 
                ++next;
             }  /* skip known bad combos if the relevant option is set; skip
                 * combos involving known bad single transforms in all cases.
                 */
-            while (  (next & READ_TRANSFORMS) <= current
+            while (  (next & read_transforms) <= current
                   || (next & active) == 0 /* skip cases that do nothing */
                   || (next & bad_transforms) != 0
                   || skip_transform(dp, next));
 
-            assert((next & READ_TRANSFORMS) == next);
+            assert((next & read_transforms) == next);
             current = next;
          }
 
@@ -1412,7 +1459,7 @@ combo:
          if (bad_combo != ~0U)
             printf("%s[0x%x]: PROBLEM: 0x%x[0x%x] ANTIDOTE: 0x%x\n",
                dp->filename, active, bad_combo, bad_combo_list,
-               RW_TRANSFORMS & ~bad_combo_list);
+               rw_transforms & ~bad_combo_list);
 
          else
             printf("%s: no %sbad combos found\n", dp->filename,
