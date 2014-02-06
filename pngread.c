@@ -1,8 +1,8 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.6.8 [December 19, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.9 [February 6, 2014]
+ * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -305,6 +305,72 @@ png_start_read_image(png_structrp png_ptr)
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_MNG_FEATURES_SUPPORTED
+/* Undoes intrapixel differencing,
+ * NOTE: this is apparently only supported in the 'sequential' reader.
+ */
+static void
+png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
+{
+   png_debug(1, "in png_do_read_intrapixel");
+
+   if (
+       (row_info->color_type & PNG_COLOR_MASK_COLOR))
+   {
+      int bytes_per_pixel;
+      png_uint_32 row_width = row_info->width;
+
+      if (row_info->bit_depth == 8)
+      {
+         png_bytep rp;
+         png_uint_32 i;
+
+         if (row_info->color_type == PNG_COLOR_TYPE_RGB)
+            bytes_per_pixel = 3;
+
+         else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+            bytes_per_pixel = 4;
+
+         else
+            return;
+
+         for (i = 0, rp = row; i < row_width; i++, rp += bytes_per_pixel)
+         {
+            *(rp) = (png_byte)((256 + *rp + *(rp + 1)) & 0xff);
+            *(rp+2) = (png_byte)((256 + *(rp + 2) + *(rp + 1)) & 0xff);
+         }
+      }
+      else if (row_info->bit_depth == 16)
+      {
+         png_bytep rp;
+         png_uint_32 i;
+
+         if (row_info->color_type == PNG_COLOR_TYPE_RGB)
+            bytes_per_pixel = 6;
+
+         else if (row_info->color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+            bytes_per_pixel = 8;
+
+         else
+            return;
+
+         for (i = 0, rp = row; i < row_width; i++, rp += bytes_per_pixel)
+         {
+            png_uint_32 s0   = (*(rp    ) << 8) | *(rp + 1);
+            png_uint_32 s1   = (*(rp + 2) << 8) | *(rp + 3);
+            png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
+            png_uint_32 red  = (s0 + s1 + 65536) & 0xffff;
+            png_uint_32 blue = (s2 + s1 + 65536) & 0xffff;
+            *(rp    ) = (png_byte)((red >> 8) & 0xff);
+            *(rp + 1) = (png_byte)(red & 0xff);
+            *(rp + 4) = (png_byte)((blue >> 8) & 0xff);
+            *(rp + 5) = (png_byte)(blue & 0xff);
+         }
+      }
+   }
+}
+#endif /* PNG_MNG_FEATURES_SUPPORTED */
+
 void PNGAPI
 png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
 {
@@ -488,7 +554,6 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
       png_do_read_intrapixel(&row_info, png_ptr->row_buf + 1);
    }
 #endif
-
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
    if (png_ptr->transformations)
@@ -1004,7 +1069,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
    if (transforms & PNG_TRANSFORM_EXPAND)
       if ((png_ptr->bit_depth < 8) ||
           (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ||
-          (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS)))
+          (info_ptr->valid & PNG_INFO_tRNS))
          png_set_expand(png_ptr);
 #endif
 
@@ -1023,14 +1088,8 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
     * [0,65535] to the original [0,7] or [0,31], or whatever range the
     * colors were originally in:
     */
-   if ((transforms & PNG_TRANSFORM_SHIFT)
-       && png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT))
-   {
-      png_color_8p sig_bit;
-
-      png_get_sBIT(png_ptr, info_ptr, &sig_bit);
-      png_set_shift(png_ptr, sig_bit);
-   }
+   if ((transforms & PNG_TRANSFORM_SHIFT) && (info_ptr->valid & PNG_INFO_sBIT))
+      png_set_shift(png_ptr, &info_ptr->sig_bit);
 #endif
 
 #ifdef PNG_READ_BGR_SUPPORTED

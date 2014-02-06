@@ -2,7 +2,7 @@
 # make obj && make depend && make && make test
 # make includes && make install
 # Copyright (C) 2002 Patrick R.L. Welche
-# Copyright (C) 2007, 2009 Glenn Randers-Pehrson
+# Copyright (C) 2007, 2009, 2014 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -17,7 +17,7 @@ INCSDIR=${LOCALBASE}/include/libpng16
 
 LIB=	png16
 SHLIB_MAJOR=	0
-SHLIB_MINOR=	1.6.8
+SHLIB_MINOR=	1.6.9
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c
@@ -33,6 +33,9 @@ CPPFLAGS+=-I${.CURDIR}
 # .endif
 
 CLEANFILES+=pngtest.o pngtest pnglibconf.h
+
+.c.o:
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt

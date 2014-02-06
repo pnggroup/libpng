@@ -1,8 +1,8 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.8 [December 19, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.9 [February 6, 2014]
+ * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -45,6 +45,11 @@
 
 /* Known chunks that exist in pngtest.png must be supported or pngtest will fail
  * simply as a result of re-ordering them.  This may be fixed in 1.7
+ *
+ * pngtest allocates a single row buffer for each row and overwrites it,
+ * therefore if the write side doesn't support the writing of interlaced images
+ * nothing can be done for an interlaced image (and the code below will fail
+ * horribly trying to write extra data after writing garbage).
  */
 #if defined PNG_READ_SUPPORTED && /* else nothing can be done */\
    defined PNG_READ_bKGD_SUPPORTED &&\
@@ -58,9 +63,15 @@
    defined PNG_READ_sRGB_SUPPORTED &&\
    defined PNG_READ_tEXt_SUPPORTED &&\
    defined PNG_READ_tIME_SUPPORTED &&\
-   defined PNG_READ_zTXt_SUPPORTED
+   defined PNG_READ_zTXt_SUPPORTED &&\
+   defined PNG_WRITE_INTERLACING_SUPPORTED
 
-#include "zlib.h"
+#ifdef PNG_ZLIB_HEADER
+#  include PNG_ZLIB_HEADER /* defined by pnglibconf.h from 1.7 */
+#else
+#  include "zlib.h"
+#endif
+
 /* Copied from pngpriv.h but only used in error messages below. */
 #ifndef PNG_ZBUF_SIZE
 #  define PNG_ZBUF_SIZE 8192
@@ -115,10 +126,6 @@ static int relaxed = 0;
 static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
 static int error_count = 0; /* count calls to png_error */
 static int warning_count = 0; /* count calls to png_warning */
-
-#ifdef __TURBOC__
-#include <mem.h>
-#endif
 
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
@@ -725,18 +732,18 @@ static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
 static void
 write_sTER_chunk(png_structp write_ptr)
 {
-   png_byte png_sTER[5] = {115,  84,  69,  82, '\0'};
+   png_byte sTER[5] = {115,  84,  69,  82, '\0'};
 
    if (verbose)
       fprintf(STDERR, "\n stereo mode = %d\n", user_chunk_data.sTER_mode);
 
-   png_write_chunk(write_ptr, png_sTER, &user_chunk_data.sTER_mode, 1);
+   png_write_chunk(write_ptr, sTER, &user_chunk_data.sTER_mode, 1);
 }
 
 static void
 write_vpAg_chunk(png_structp write_ptr)
 {
-   png_byte png_vpAg[5] = {118, 112,  65, 103, '\0'};
+   png_byte vpAg[5] = {118, 112,  65, 103, '\0'};
 
    png_byte vpag_chunk_data[9];
 
@@ -749,7 +756,7 @@ write_vpAg_chunk(png_structp write_ptr)
    png_save_uint_32(vpag_chunk_data, user_chunk_data.vpAg_width);
    png_save_uint_32(vpag_chunk_data + 4, user_chunk_data.vpAg_height);
    vpag_chunk_data[8] = user_chunk_data.vpAg_units;
-   png_write_chunk(write_ptr, png_vpAg, vpag_chunk_data, 9);
+   png_write_chunk(write_ptr, vpAg, vpag_chunk_data, 9);
 }
 
 static void
@@ -830,6 +837,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_structp write_ptr;
    png_infop write_info_ptr;
    png_infop write_end_info_ptr;
+   int interlace_preserved = 1;
 #else
    png_structp write_ptr = NULL;
    png_infop write_info_ptr = NULL;
@@ -838,7 +846,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_bytep row_buf;
    png_uint_32 y;
    png_uint_32 width, height;
-   int num_pass, pass;
+   int num_pass = 1, pass;
    int bit_depth, color_type;
 
    row_buf = NULL;
@@ -1044,10 +1052,26 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
           &color_type, &interlace_type, &compression_type, &filter_type))
       {
          png_set_IHDR(write_ptr, write_info_ptr, width, height, bit_depth,
-#ifdef PNG_WRITE_INTERLACING_SUPPORTED
             color_type, interlace_type, compression_type, filter_type);
-#else
-            color_type, PNG_INTERLACE_NONE, compression_type, filter_type);
+#ifndef PNG_READ_INTERLACING_SUPPORTED
+         /* num_pass will not be set below, set it here if the image is
+          * interlaced: what happens is that write interlacing is *not* turned
+          * on an the partial interlaced rows are written directly.
+          */
+         switch (interlace_type)
+         {
+            case PNG_INTERLACE_NONE:
+               num_pass = 1;
+               break;
+
+            case PNG_INTERLACE_ADAM7:
+               num_pass = 7;
+                break;
+
+            default:
+                png_error(read_ptr, "invalid interlace type");
+                /*NOT REACHED*/
+         }
 #endif
       }
    }
@@ -1340,14 +1364,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif /* SINGLE_ROWBUF_ALLOC */
    pngtest_debug("Writing row data");
 
-#if defined(PNG_READ_INTERLACING_SUPPORTED) || \
-  defined(PNG_WRITE_INTERLACING_SUPPORTED)
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    num_pass = png_set_interlace_handling(read_ptr);
-#  ifdef PNG_WRITE_SUPPORTED
-   png_set_interlace_handling(write_ptr);
-#  endif
-#else
-   num_pass = 1;
+   if (png_set_interlace_handling(write_ptr) != num_pass)
+      png_error(write_ptr, "png_set_interlace_handling: inconsistent num_pass");
 #endif
 
 #ifdef PNGTEST_TIMING
@@ -1579,6 +1599,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 
 #ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
+   if (interlace_preserved) /* else the files will be changed */
    {
       for (;;)
       {
@@ -1965,9 +1986,9 @@ main(void)
    fprintf(STDERR,
       " test ignored because libpng was not built with read support\n");
    /* And skip this test */
-   return 77;
+   return PNG_LIBPNG_VER < 10600 ? 0 : 77;
 }
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_8 Your_png_h_is_not_version_1_6_8;
+typedef png_libpng_version_1_6_9 Your_png_h_is_not_version_1_6_9;

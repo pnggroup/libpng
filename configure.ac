@@ -18,7 +18,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.8],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.9],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -39,10 +39,10 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.8
+PNGLIB_VERSION=1.6.9
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
-PNGLIB_RELEASE=8
+PNGLIB_RELEASE=9
 
 dnl End of version number stuff
 
@@ -225,6 +225,45 @@ AC_ARG_WITH(libpng-prefix,
       AC_SUBST([PNG_PREFIX], [${withval}])
     fi])
 AM_CONDITIONAL([DO_PNG_PREFIX], [test "${with_libpng_prefix:-no}" != "no"])
+
+# Control over what links are made for installed files.  Versioned files are
+# always installed, when the following options are turned on corresponding
+# unversioned links are also created (normally as symbolic links):
+AC_ARG_ENABLE([unversioned-links],
+   AS_HELP_STRING([[[--enable-unversioned-links]]],
+      [Installed libpng header files are placed in a versioned subdirectory]
+      [and installed libpng library (including DLL) files are versioned.]
+      [If this option is enabled unversioned links will be created pointing to]
+      [the corresponding installed files.  If you use libpng.pc or]
+      [libpng-config for all builds you do not need these links, but if you]
+      [compile programs directly they will typically #include <png.h> and]
+      [link with -lpng; in that case you need the links.]
+      [The links can be installed manually using 'make install-header-links']
+      [and 'make install-library-links' and can be removed using the]
+      [corresponding uninstall- targets.  If you do enable this option every]
+      [libpng 'make install' will recreate the links to point to the just]
+      [installed version of libpng.  The default is to create the links;]
+      [use --disable-unversioned-links to change this]))
+
+# The AM_CONDITIONAL test is written so that the default is enabled;
+# --disable-unversioned-links must be given to turn the option off.
+AM_CONDITIONAL([DO_INSTALL_LINKS],[test "$enable_unversioned_links" != "no"])
+
+AC_ARG_ENABLE([unversioned-libpng-pc],
+   AS_HELP_STRING([[[--enable-unversioned-libpng-pc]]],
+      [Install the configuration file 'libpng.pc' as a link to the versioned]
+      [version.  This is done by default - use --disable-unversioned-libpng-pc]
+      [to change this.]))
+AM_CONDITIONAL([DO_INSTALL_LIBPNG_PC],
+   [test "$enable_unversioned_libpng_pc" != "no"])
+
+AC_ARG_ENABLE([unversioned-libpng-config],
+   AS_HELP_STRING([[[--enable-unversioned-libpng-config]]],
+      [Install the configuration file 'libpng-config' as a link to the]
+      [versioned version.  This is done by default - use]
+      [--disable-unversioned-libpng-config to change this.]))
+AM_CONDITIONAL([DO_INSTALL_LIBPNG_CONFIG],
+   [test "$enable_unversioned_libpng_config" != "no"])
 
 # HOST SPECIFIC OPTIONS
 # =====================

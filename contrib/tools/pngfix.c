@@ -1,8 +1,8 @@
 /* pngfix.c
  *
- * Copyright (c) 2013 John Cunningham Bowler
+ * Copyright (c) 2014 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.8 [December 19, 2013]
+ * Last changed in libpng 1.6.9 [February 6, 2014]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -32,7 +32,6 @@
 #  define FIX_GCC volatile
 #else
 #  define FIX_GCC
-#  error not tested
 #endif
 
 #define PROGRAM_NAME "pngfix"

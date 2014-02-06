@@ -21,7 +21,7 @@
 
 /* libpng row pointers are not necessarily aligned to any particular boundary,
  * however this code will only work with appropriate alignment.  arm/arm_init.c
- * checks for this (and will not compile unless it is done), this code uses
+ * checks for this (and will not compile unless it is done). This code uses
  * variants of png_aligncast to avoid compiler warnings.
  */
 #define png_ptr(type,pointer) png_aligncast(type *,pointer)
