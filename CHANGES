@@ -2814,6 +2814,8 @@ version 1.2.51rc04 [February 3, 2014]
 version 1.0.61 and 1.2.51 [February 6, 2014]
   Added an #ifdef PNG_FIXED_POINT_SUPPORTED/#endif in pngset.c
 
+version 1.2.52beta01 [February 6, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
