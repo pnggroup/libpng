@@ -1,5 +1,5 @@
 
-Libpng 1.6.10beta01 - February 9, 2014
+Libpng 1.6.10beta02 - February 9, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.10beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.10beta01.tar.gz
+   1.6.10beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.10beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1610b01.7z  (LZMA-compressed, recommended)
-   lp1610b01.zip
+   lp1610b02.7z  (LZMA-compressed, recommended)
+   lp1610b02.zip
 
 Other information:
 
-   1.6.10beta01-README.txt
-   1.6.10beta01-LICENSE.txt
-   libpng-1.6.10beta01-*.asc (armored detached GPG signatures)
+   1.6.10beta02-README.txt
+   1.6.10beta02-LICENSE.txt
+   libpng-1.6.10beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.9):
 
@@ -54,6 +54,8 @@ Version 1.6.10beta01 [February 9, 2014]
     png_app_error() if the app requests something that cannot be done
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
+
+Version 1.6.10beta02 [February 9, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
