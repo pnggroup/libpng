@@ -4800,7 +4800,7 @@ Version 1.6.9rc02 [January 30, 2014]
 
 Version 1.6.9 [February 6, 2014]
 
-Version 1.6.10beta01 [February 6, 2014]
+Version 1.6.10beta01 [February 9, 2014]
   Backported changes from libpng-1.7.0beta30 and beta31:
   Fixed a large number of instances where PNGCBAPI was omitted from
     function definitions.
