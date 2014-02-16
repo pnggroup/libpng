@@ -31,7 +31,7 @@ png_have_neon(png_structp png_ptr)
       /* This is a simple state machine which reads the input byte-by-byte until
        * it gets a match on the 'neon' feature or reaches the end of the stream.
        */
-      static const char ch_feature[] = { 70, 69, 65, 84, 85, 82, 69 };
+      static const char ch_feature[] = { 70, 69, 65, 84, 85, 82, 69, 83 };
       static const char ch_neon[] = { 78, 69, 79, 78 };
 
       enum
@@ -66,7 +66,7 @@ png_have_neon(png_structp png_ptr)
 
             case Feature:
                /* Match 'FEATURE', ASCII case insensitive. */
-               if ((ch & ~0x40) == ch_feature[counter])
+               if ((ch & ~0x20) == ch_feature[counter])
                {
                   if (++counter == (sizeof ch_feature))
                      state = Colon;
@@ -114,7 +114,7 @@ png_have_neon(png_structp png_ptr)
 
             case Neon:
                /* Look for 'neon' tag */
-               if ((ch & ~0x40) == ch_neon[counter])
+               if ((ch & ~0x20) == ch_neon[counter])
                {
                   if (++counter == (sizeof ch_neon))
                      state = HaveNeon;
