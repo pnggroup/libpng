@@ -4754,7 +4754,7 @@ Version 1.6.8 [December 19, 2013]
 Version 1.6.9beta01 [December 26, 2013]
   Bookkeeping: Moved functions around (no changes). Moved transform
     function definitions before the place where they are called so that
-    they can be masde static. Move the intrapixel functions and the
+    they can be made static. Move the intrapixel functions and the
     grayscale palette builder out of the png?tran.c files. The latter
     isn't a transform function and is no longer used internally, and the
     former MNG specific functions are better placed in pngread/pngwrite.c
@@ -4829,7 +4829,10 @@ Version 1.6.10beta01 [February 9, 2014]
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
 
-Version 1.6.10beta02 [February 9, 2014]
+Version 1.6.10beta02 [February 16, 2014]
+  Moved redefines of png_error(), png_warning(), png_chunk_error(),
+    and png_chunk_warning() from pngpriv.h to png.h to make them visible
+    to libpng-calling applications.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
