@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.18 [%RDATE%]
+ * Last changed in libpng 1.5.18 [February 6, 2014]
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -120,11 +120,6 @@ typedef png_byte *png_const_bytep;
 #  else
 #     define UNUSED(param)
 #  endif
-#endif
-
-/* Fixups for various minimal builds */
-#ifndef PNG_ERROR_TEXT_SUPPORTED
-#  define png_error(a,b) png_err(a)
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
