@@ -122,11 +122,6 @@ typedef png_byte *png_const_bytep;
 #  endif
 #endif
 
-/* Fixups for various minimal builds */
-#ifndef PNG_ERROR_TEXT_SUPPORTED
-#  define png_error(a,b) png_err(a)
-#endif
-
 /***************************** EXCEPTION HANDLING *****************************/
 #ifdef PNG_FREESTANDING_TESTS
 #  include <cexcept.h>
