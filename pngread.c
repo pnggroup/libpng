@@ -781,11 +781,14 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       png_uint_32 length = png_read_chunk_header(png_ptr);
       png_uint_32 chunk_name = png_ptr->chunk_name;
 
-      if (chunk_name == png_IHDR)
+      if (chunk_name == png_IEND)
+         png_handle_IEND(png_ptr, info_ptr, length);
+
+      else if (chunk_name == png_IHDR)
          png_handle_IHDR(png_ptr, info_ptr, length);
 
-      else if (chunk_name == png_IEND)
-         png_handle_IEND(png_ptr, info_ptr, length);
+      else if (info_ptr == NULL)
+         png_crc_finish(png_ptr, length);
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
       else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)) != 0)

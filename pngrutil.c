@@ -1415,7 +1415,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                               (sizeof local_buffer), &length,
                               profile + (sizeof profile_header), &size, 0);
 
-                           /* Still expect a a buffer error because we expect
+                           /* Still expect a buffer error because we expect
                             * there to be some tag data!
                             */
                            if (size == 0)
