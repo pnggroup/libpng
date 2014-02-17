@@ -1,5 +1,5 @@
 
-Libpng 1.6.10beta02 - February 16, 2014
+Libpng 1.6.10beta02 - February 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,7 +55,7 @@ Version 1.6.10beta01 [February 9, 2014]
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
 
-Version 1.6.10beta02 [February 16, 2014]
+Version 1.6.10beta02 [February 17, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
@@ -66,6 +66,10 @@ Version 1.6.10beta02 [February 16, 2014]
     compile and link on Android by using /proc/cpuinfo, and the old linux code
     is in contrib/arm-neon/linux-auxv.c.  The new code avoids POSIX and Linux
     dependencies apart from opening /proc/cpuinfo and is C90 compliant.
+  Check for info_ptr == NULL early in png_read_end() so we don't need to
+    run all the png_handle_*() and depend on them to return if info_ptr == NULL.
+    This improves the performance of png_read_end(png_ptr, NULL) and makes
+    it more robust against future programming errors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
