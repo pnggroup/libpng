@@ -1,12 +1,10 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * For conditions of distribution and use, see copyright notice in png.h
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
- *
- * Last changed in libpng 1.5.18 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -299,8 +297,6 @@
 #ifdef PNG_WARNINGS_SUPPORTED
 #  define PNG_WARNING_PARAMETERS(p) png_warning_parameters p;
 #else
-#  define png_warning(s1,s2) ((void)(s1))
-#  define png_chunk_warning(s1,s2) ((void)(s1))
 #  define png_warning_parameter(p,number,string) ((void)0)
 #  define png_warning_parameter_unsigned(p,number,format,value) ((void)0)
 #  define png_warning_parameter_signed(p,number,format,value) ((void)0)
@@ -308,8 +304,6 @@
 #  define PNG_WARNING_PARAMETERS(p)
 #endif
 #ifndef PNG_ERROR_TEXT_SUPPORTED
-#  define png_error(s1,s2) png_err(s1)
-#  define png_chunk_error(s1,s2) png_err(s1)
 #  define png_fixed_error(s1,s2) png_err(s1)
 #endif
 
