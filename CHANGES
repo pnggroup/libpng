@@ -4829,7 +4829,7 @@ Version 1.6.10beta01 [February 9, 2014]
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
 
-Version 1.6.10beta02 [February 17, 2014]
+Version 1.6.10beta02 [February 20, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
@@ -4844,6 +4844,8 @@ Version 1.6.10beta02 [February 17, 2014]
     run all the png_handle_*() and depend on them to return if info_ptr == NULL.
     This improves the performance of png_read_end(png_ptr, NULL) and makes
     it more robust against future programming errors.
+  Check for __has_extension before using it in pngconf.h, to
+    support older Clang versions (Jeremy Sequoia).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
