@@ -79,7 +79,8 @@ Version 1.6.10beta02 [February 23, 2014]
   Added png_ptr->process_mode = PNG_READ_IDAT_MODE in png_push_read_chunk
     after recognizing the IDAT chunk, which avoids an infinite loop while
     reading a datastream whose first IDAT chunk is of zero-length.
-  Don't recognize known sRGB profiles as sRGB if they have been hacked.
+  Don't recognize known sRGB profiles as sRGB if they have been hacked,
+    but don't reject them and don't issue a copyright violation warning.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
