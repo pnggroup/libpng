@@ -1216,7 +1216,7 @@ png_set_rgb_to_gray()).
 
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
 
-    file_srgb_intent - the rendering intent (PNG_INFO_sRGB)
+    srgb_intent -    the rendering intent (PNG_INFO_sRGB)
                      The presence of the sRGB chunk
                      means that the pixel data is in the
                      sRGB color space.  This chunk also
@@ -2166,10 +2166,15 @@ how pngvalid.c does it.
 Finishing a sequential read
 
 After you are finished reading the image through the
-low-level interface, you can finish reading the file.  If you are
-interested in comments or time, which may be stored either before or
-after the image data, you should pass the separate png_info struct if
-you want to keep the comments from before and after the image
+low-level interface, you can finish reading the file.
+
+If you want to use a different crc action for handling CRC errors in
+chunks after the image data, you can call png_set_crc_action()
+again at this point.
+
+If you are interested in comments or time, which may be stored either
+before or after the image data, you should pass the separate png_info
+struct if you want to keep the comments from before and after the image
 separate.
 
     png_infop end_info = png_create_info_struct(png_ptr);
@@ -2185,6 +2190,9 @@ separate.
 
 If you are not interested, you should still call png_read_end()
 but you can pass NULL, avoiding the need to create an end_info structure.
+If you do this, libpng will not process any chunks after IDAT other than
+skipping over them and perhaps (depending on whether you have called
+png_set_crc_action) checking their CRCs while looking for the IEND chunk.
 
    png_read_end(png_ptr, (png_infop)NULL);
 
