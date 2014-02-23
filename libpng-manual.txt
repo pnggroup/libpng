@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta32 - February 6, 2014
+ libpng version 1.7.0beta32 - February 23, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta32 - February 6, 2014
+ libpng versions 0.97, January 1998, through 1.7.0beta32 - February 23, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -2165,10 +2165,15 @@ how pngvalid.c does it.
 Finishing a sequential read
 
 After you are finished reading the image through the
-low-level interface, you can finish reading the file.  If you are
-interested in comments or time, which may be stored either before or
-after the image data, you should pass the separate png_info struct if
-you want to keep the comments from before and after the image
+low-level interface, you can finish reading the file.
+
+If you want to use a different crc action for handling CRC errors in
+chunks after the image data, you can call png_set_crc_action()
+again at this point.
+
+If you are interested in comments or time, which may be stored either
+before or after the image data, you should pass the separate png_info
+struct if you want to keep the comments from before and after the image
 separate.
 
     png_infop end_info = png_create_info_struct(png_ptr);
@@ -2184,6 +2189,9 @@ separate.
 
 If you are not interested, you should still call png_read_end()
 but you can pass NULL, avoiding the need to create an end_info structure.
+If you do this, libpng will not process any chunks after IDAT other than
+skipping over them and perhaps (depending on whether you have called
+png_set_crc_action) checking their CRCs while looking for the IEND chunk.
 
    png_read_end(png_ptr, (png_infop)NULL);
 
@@ -2459,7 +2467,7 @@ png_infop info_ptr;
         png_progressive_combine_row(png_ptr, old_row,
           new_row);
 
-    /* where old_row is what was displayed for
+    /* where old_row is what was displayed
        previously for the row.  Note that the first
        pass (pass == 0, really) will completely cover
        the old row, so the rows do not have to be
@@ -5270,7 +5278,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-February 6, 2014
+February 23, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
