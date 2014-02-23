@@ -4841,6 +4841,9 @@ Version 1.7.0beta32 [February 23, 2014]
     support older Clang versions (Jeremy Sequoia).
   Use a user warning handler in contrib/gregbook/readpng2.c instead of default,
     so warnings will be put on stderr even if libpng has CONSOLE_IO disabled.
+  Added png_ptr->process_mode = PNG_READ_IDAT_MODE in png_push_read_chunk
+    after recognizing the IDAT chunk, which avoids an infinite loop while
+    reading a datastream whose first IDAT chunk is of zero-length.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
