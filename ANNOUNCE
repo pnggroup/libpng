@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta32 - February 20, 2014
+Libpng 1.7.0beta32 - February 23, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -533,7 +533,7 @@ Version 1.7.0beta31 [February 6, 2014]
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
 
-Version 1.7.0beta32 [February 20, 2014]
+Version 1.7.0beta32 [February 23, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
@@ -550,6 +550,8 @@ Version 1.7.0beta32 [February 20, 2014]
     it more robust against future programming errors.
   Check for __has_extension before using it in pngconf.h, to
     support older Clang versions (Jeremy Sequoia).
+  Use a user warning handler in contrib/gregbook/readpng2.c instead of default,
+    so warnings will be put on stderr even if libpng has CONSOLE_IO disabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
