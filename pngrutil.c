@@ -228,7 +228,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
 
       else
       {
-         png_chunk_benign_error(png_ptr, "CRC error");
+         png_chunk_error(png_ptr, "CRC error");
          return (0);
       }
 
@@ -322,6 +322,8 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
          {
 #ifdef PNG_ERROR_TEXT_SUPPORTED
              png_chunk_error(png_ptr, "insufficient memory to read chunk");
+#else
+             png_err(png_ptr);
 #endif
          }
       }

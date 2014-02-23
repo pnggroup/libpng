@@ -4829,7 +4829,7 @@ Version 1.6.10beta01 [February 9, 2014]
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
 
-Version 1.6.10beta02 [February 21, 2014]
+Version 1.6.10beta02 [February 23, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
@@ -4848,7 +4848,11 @@ Version 1.6.10beta02 [February 21, 2014]
     support older Clang versions (Jeremy Sequoia).
   Treat CRC error handling with png_set_crc_action(), instead of with
     png_set_benign_errors(), which has been the case since libpng-1.6.0beta18.
-  Use a user warning handler in contrib/gregbook/readpng2.c instead of default.
+  Use a user warning handler in contrib/gregbook/readpng2.c instead of default,
+    so warnings will be put on stderr even if libpng has CONSOLE_IO disabled.
+  Added png_ptr->process_mode = PNG_READ_IDAT_MODE in png_push_read_chunk
+    after recognizing the IDAT chunk, which avoids an infinite loop while
+    reading a datastream whose first IDAT chunk is of zero-length.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
