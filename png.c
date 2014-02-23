@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.10beta02 - February 9, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.10beta02 - February 23, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.10beta02 - February 9, 2014\
+      return "libpng version 1.6.10beta02 - February 23, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2295,15 +2295,14 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
             }
          }
 
-#        if PNG_sRGB_PROFILE_CHECKS > 0
-            /* The signature matched, but the profile had been changed in some
-             * way.  This is an apparent violation of the ICC terms of use and,
-             * anyway, probably indicates a data error or uninformed hacking.
-             */
-            if (png_sRGB_checks[i].have_md5)
-               png_benign_error(png_ptr,
-                  "copyright violation: edited ICC profile ignored");
-#        endif
+         /* The signature matched, but the profile had been changed in some
+          * way.  This probably indicates a data error or uninformed hacking.
+          * Fall through to "no match".
+          */
+         png_chunk_report(png_ptr,
+             "Not recognizing known sRGB profile that has been edited", 
+             PNG_CHUNK_WARNING);
+         break;
       }
    }
 
