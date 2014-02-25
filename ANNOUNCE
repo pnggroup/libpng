@@ -1,5 +1,5 @@
 
-Libpng 1.6.10beta03 - February 23, 2014
+Libpng 1.6.10beta03 - February 25, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -82,7 +82,9 @@ Version 1.6.10beta02 [February 23, 2014]
   Don't recognize known sRGB profiles as sRGB if they have been hacked,
     but don't reject them and don't issue a copyright violation warning.
 
-Version 1.6.10beta03 [February 23, 2014]
+Version 1.6.10beta03 [February 25, 2014]
+  Moved some documentation from png.h to libpng.3 and libpng-manual.txt
+  Minor editing of contrib/arm-neon/README and contrib/examples/*.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
