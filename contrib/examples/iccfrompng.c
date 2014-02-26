@@ -6,9 +6,9 @@
  * United States.
  *
  * Extract any icc profiles found in the given PNG files.  This is a simple
- * example of a program which extracts information from the header of a PNG file
+ * example of a program that extracts information from the header of a PNG file
  * without processing the image.  Notice that some header information may occur
- * after the image data, textual data and comments are an example; the approach
+ * after the image data. Textual data and comments are an example; the approach
  * in this file won't work reliably for such data because it only looks for the
  * information in the section of the file that preceeds the image data.
  *

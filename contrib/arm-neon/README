@@ -7,7 +7,7 @@ operating system support.  (The information is not available in user mode.)
 HOW TO USE THIS
 ---------------
 
-This directory contains C code fragments which can be included in arm/arm_init.c
+This directory contains C code fragments that can be included in arm/arm_init.c
 by setting the macro PNG_ARM_NEON_FILE to the file name in "" or <> at build
 time.  This setting is not recorded in pnglibconf.h and can be changed simply by
 rebuilding arm/arm_init.o with the required macro definition.
@@ -66,8 +66,8 @@ You may send contributions of new implementations to
 png-mng-implement@sourceforge.net.  Please write code in strict C90 C where
 possible.  Obviously OS dependencies are to be expected.  If you submit code you
 must have the authors permission and it must have a license that is acceptable
-to the current maintainer; in particular that license must permit
-redistribution.
+to the current maintainer; in particular that license must permit modification
+and redistribution.
 
 Please try to make the contribution a single file and give the file a clear and
 unambiguous name that identifies the target OS.  If multiple files really are

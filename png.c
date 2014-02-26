@@ -2211,7 +2211,6 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
          png_chunk_report(png_ptr,
              "Not recognizing known sRGB profile that has been edited", 
              PNG_CHUNK_WARNING);
-         break;
 # endif
       }
    }
