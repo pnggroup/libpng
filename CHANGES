@@ -4850,6 +4850,8 @@ Version 1.7.0beta32 [February 26, 2014]
   Minor editing of contrib/arm-neon/README and contrib/examples/*.c
   Moved some documentation from png.h to libpng.3 and libpng-manual.txt
 
+Version 1.7.0beta33 [February 26, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
