@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.10beta04 - February 25, 2014
+ libpng version 1.6.10beta04 - February 27, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.10beta04 - February 25, 2014
+ libpng versions 0.97, January 1998, through 1.6.10beta04 - February 27, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -274,10 +274,10 @@ This method of building a customized pnglibconf.h is illustrated in
 contrib/pngminim/*.  See the "$(PNGCONF):" target in the makefile and
 pngusr.dfa in these directories.
 
-C. Configuration using PNG_USR_CONFIG
+C. Configuration using PNG_USER_CONFIG
 
-If -DPNG_USR_CONFIG is added to the CFLAGS when pnglibconf.h is built the file
-pngusr.h will automatically be included before the options in
+If -DPNG_USER_CONFIG is added to the CPPFLAGS when pnglibconf.h is built,
+the file pngusr.h will automatically be included before the options in
 scripts/pnglibconf.dfa are processed.  Your pngusr.h file should contain only
 macro definitions turning features on or off or setting settings.
 
@@ -5117,7 +5117,7 @@ pngconf.h no longer includes pngusr.h, therefore pngusr.h is ignored after the
 build of pnglibconf.h and it is never included in an application build.
 
 The rarely used alternative of adding a list of feature macros to the
-CFLAGS setting in the build also still works; however, the macros will be
+CPPFLAGS setting in the build also still works; however, the macros will be
 copied to pnglibconf.h and this may produce macro redefinition warnings
 when the individual C files are compiled.
 
@@ -5414,7 +5414,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 25, 2014
+February 27, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

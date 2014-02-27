@@ -164,7 +164,7 @@ logunsupported = 1
 
 # NONE
 
-# Note that PNG_USR_CONFIG only has an effect when building
+# Note that PNG_USER_CONFIG only has an effect when building
 # pnglibconf.h
 
 setting USER_CONFIG
