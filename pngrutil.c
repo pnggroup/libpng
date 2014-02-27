@@ -59,7 +59,11 @@ png_get_uint_32)(png_const_bytep buf)
    return PNG_U32(buf[0], buf[1], buf[2], buf[3]);
 }
 
-/* Grab a signed 32-bit integer from a buffer in big-endian format. */
+/* Grab a signed 32-bit integer from a buffer in big-endian format.  The
+ * data is stored in the PNG file in two's complement format and there
+ * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
+ * the following code does a two's complement to native conversion.
+ */
 png_int_32 (PNGAPI
 png_get_int_32)(png_const_bytep buf)
 {
@@ -206,10 +210,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
       }
 
       else
-      {
-         png_chunk_benign_error(png_ptr, "CRC error");
-         return (0);
-      }
+         png_chunk_error(png_ptr, "CRC error");
 
       return (1);
    }
@@ -293,16 +294,11 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
       else if (warn < 2) /* else silent */
       {
-#ifdef PNG_WARNINGS_SUPPORTED
          if (warn)
              png_chunk_warning(png_ptr, "insufficient memory to read chunk");
+
          else
-#endif
-         {
-#ifdef PNG_ERROR_TEXT_SUPPORTED
              png_chunk_error(png_ptr, "insufficient memory to read chunk");
-#endif
-         }
       }
    }
 
@@ -965,15 +961,10 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (!(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_USE))
       {
          if (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)
-         {
-            png_chunk_benign_error(png_ptr, "CRC error");
-         }
+            return;
 
          else
-         {
-            png_chunk_warning(png_ptr, "CRC error");
-            return;
-         }
+            png_chunk_error(png_ptr, "CRC error");
       }
 
       /* Otherwise, we (optionally) emit a warning and use the chunk. */
@@ -2815,7 +2806,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
                /* Use the default handling, note that if there is per-chunk
                 * handling specified it has already been set into 'keep'.
                 *
-                * NOTE: this is an API change in 1.7.0, prior to 1.7.0 libpng
+                * NOTE: this is an API change in 1.7.0. Prior to 1.7.0 libpng
                 * would force keep to PNG_HANDLE_CHUNK_IF_SAFE at this point,
                 * and 1.6.0 would issue a warning if this caused a default of
                 * discarding the chunk to be changed.

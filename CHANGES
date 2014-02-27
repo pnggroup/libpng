@@ -4855,6 +4855,8 @@ Version 1.7.0beta33 [February 27, 2014]
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
 
 Version 1.7.0beta34 [February 27, 2014]
+  Treat CRC error handling with png_set_crc_action(), instead of with
+    png_set_benign_errors(), which has been the case since libpng-1.6.0beta18.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
