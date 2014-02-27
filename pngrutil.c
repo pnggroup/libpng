@@ -227,10 +227,7 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
       }
 
       else
-      {
          png_chunk_error(png_ptr, "CRC error");
-         return (0);
-      }
 
       return (1);
    }
