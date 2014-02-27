@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta33 - February 26, 2014
+Libpng 1.7.0beta33 - February 27, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -561,7 +561,9 @@ Version 1.7.0beta32 [February 26, 2014]
   Minor editing of contrib/arm-neon/README and contrib/examples/*.c
   Moved some documentation from png.h to libpng.3 and libpng-manual.txt
 
-Version 1.7.0beta33 [February 26, 2014]
+Version 1.7.0beta33 [February 27, 2014]
+  Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
+    and PNG_USR_CONFIG -> PNG_USER_CONFIG).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
