@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta33 - February 27, 2014
+Libpng 1.7.0beta34 - February 27, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta33.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta33.tar.gz
+   1.7.0beta34.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta34.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b33.7z  (LZMA-compressed, recommended)
-   lp170b33.zip
+   lp170b34.7z  (LZMA-compressed, recommended)
+   lp170b34.zip
 
 Other information:
 
-   1.7.0beta33-README.txt
-   1.7.0beta33-LICENSE.txt
-   libpng-1.7.0beta33-*.asc (armored detached GPG signatures)
+   1.7.0beta34-README.txt
+   1.7.0beta34-LICENSE.txt
+   libpng-1.7.0beta34-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -564,6 +564,8 @@ Version 1.7.0beta32 [February 26, 2014]
 Version 1.7.0beta33 [February 27, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
+
+Version 1.7.0beta34 [February 27, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
