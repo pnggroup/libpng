@@ -10,6 +10,7 @@ Add "grayscale->palette" transformation and "palette->grayscale" detection.
 Improved dithering.
 Multi-lingual error and warning message support.
 Complete sRGB transformation (presently it simply uses gamma=0.45455).
+Make profile checking optional via a png_set_something() call.
 Man pages for function calls.
 Better documentation.
 Better filter selection
