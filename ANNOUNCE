@@ -1,5 +1,5 @@
 
-Libpng 1.6.10rc02 - February 27, 2014
+Libpng 1.6.10rc02 - February 28, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -90,6 +90,8 @@ Version 1.6.10beta03 [February 25, 2014]
 Version 1.6.10rc01 [February 27, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
+
+Version 1.6.10rc02 [February 28, 2014]
   Removed unreachable return statement after png_chunk_error()
     in pngrutil.c
 
