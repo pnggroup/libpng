@@ -1,5 +1,5 @@
 
-Libpng 1.5.19beta01 - February 27, 2014
+Libpng 1.5.19beta02 - February 28, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,30 +9,32 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.19beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.19beta01.tar.gz
-   1.5.19beta01.tar.bz2
+   1.5.19beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.19beta02.tar.gz
+   1.5.19beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1519b01.7z  (LZMA-compressed, recommended)
-   lp1519b01.zip
+   lp1519b02.7z  (LZMA-compressed, recommended)
+   lp1519b02.zip
 
 Other information:
 
-   1.5.19beta01-README.txt
-   1.5.19beta01-LICENSE.txt
-   libpng-1.5.19beta01-*.asc (armored detached GPG signatures)
+   1.5.19beta02-README.txt
+   1.5.19beta02-LICENSE.txt
+   libpng-1.5.19beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.18):
 
-Version 1.5.19beta01 [February 27, 2014]
+Version 1.5.19beta01 [February 26, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
+
+Version 1.5.19beta02 [February 28, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
