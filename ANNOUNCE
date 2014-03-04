@@ -1,5 +1,5 @@
 
-Libpng 1.6.10rc03 - March 4, 2014
+Libpng 1.6.10rc04 - March 4, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.10rc03.tar.xz (LZMA-compressed, recommended)
-   1.6.10rc03.tar.gz
+   1.6.10rc04.tar.xz (LZMA-compressed, recommended)
+   1.6.10rc04.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1610r03.7z  (LZMA-compressed, recommended)
-   lp1610r03.zip
+   lp1610r04.7z  (LZMA-compressed, recommended)
+   lp1610r04.zip
 
 Other information:
 
-   1.6.10rc03-README.txt
-   1.6.10rc03-LICENSE.txt
-   libpng-1.6.10rc03-*.asc (armored detached GPG signatures)
+   1.6.10rc04-README.txt
+   1.6.10rc04-LICENSE.txt
+   libpng-1.6.10rc04-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.9):
 
@@ -91,12 +91,14 @@ Version 1.6.10rc01 [February 27, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
 
-Version 1.6.10rc02 [February 28, 2013]
+Version 1.6.10rc02 [February 28, 2014]
   Removed unreachable return statement after png_chunk_error()
     in pngrutil.c
 
 Version 1.6.10rc03 [March 4, 2014]
   Un-deprecated png_data_freer().
+
+Version 1.6.10rc04 [March 4, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
