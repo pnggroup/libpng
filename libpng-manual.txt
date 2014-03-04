@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.10rc02 - February 27, 2014
+ libpng version 1.6.10rc03 - March 4, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.10rc02 - February 27, 2014
+ libpng versions 0.97, January 1998, through 1.6.10rc03 - March 4, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5174,7 +5174,6 @@ The following API are now DEPRECATED:
    png_info_init_3()
    png_convert_to_rfc1123() which has been replaced
      with png_convert_to_rfc1123_buffer()
-   png_data_freer()
    png_malloc_default()
    png_free_default()
    png_reset_zstream()
@@ -5414,13 +5413,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 27, 2014
+March 4, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.10rc02 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.10rc03 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer

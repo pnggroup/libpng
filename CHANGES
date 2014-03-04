@@ -4865,9 +4865,12 @@ Version 1.6.10rc01 [February 27, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
 
-Version 1.6.10rc02 [February 28, 2014]
+Version 1.6.10rc02 [February 28, 2013]
   Removed unreachable return statement after png_chunk_error()
     in pngrutil.c
+
+Version 1.6.10rc03 [March 4, 2014]
+  Un-deprecated png_data_freer().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
