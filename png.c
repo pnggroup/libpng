@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.10rc04 - March 4, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.10rc04 - March 5, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.10rc04 - March 4, 2014\
+      return "libpng version 1.6.10rc04 - March 5, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1742,7 +1742,8 @@ is_ICC_signature_char(png_alloc_size_t it)
       (it >= 97 && it <= 122);
 }
 
-static int is_ICC_signature(png_alloc_size_t it)
+static int
+is_ICC_signature(png_alloc_size_t it)
 {
    return is_ICC_signature_char(it >> 24) /* checks all the top bits */ &&
       is_ICC_signature_char((it >> 16) & 0xff) &&
