@@ -668,8 +668,7 @@ set_location(png_structp png_ptr, struct user_chunk_data *data, int what)
 }
 
 static int PNGCBAPI
-read_user_chunk_callback(png_struct *png_ptr,
-   png_unknown_chunkp chunk)
+read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
 {
    struct user_chunk_data *my_user_chunk_data =
       (struct user_chunk_data*)png_get_user_chunk_ptr(png_ptr);
