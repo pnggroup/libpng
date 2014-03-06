@@ -1,8 +1,8 @@
 
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Last changed in libpng 1.6.0 [February 14, 2013]
- * Copyright (c) 2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -439,7 +439,7 @@ display_rc(const display *d, int strict)
 }
 
 /* libpng error and warning callbacks */
-PNG_FUNCTION(void, error, (png_structp png_ptr, const char *message),
+PNG_FUNCTION(void, (PNGCBAPI error), (png_structp png_ptr, const char *message),
    static PNG_NORETURN)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
@@ -448,7 +448,7 @@ PNG_FUNCTION(void, error, (png_structp png_ptr, const char *message),
    display_exit(d);
 }
 
-static void
+static void PNGCBAPI
 warning(png_structp png_ptr, const char *message)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
@@ -490,7 +490,7 @@ get_valid(display *d, png_infop info_ptr)
 }
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
-static int
+static int PNGCBAPI
 read_callback(png_structp pp, png_unknown_chunkp pc)
 {
    /* This function mimics the behavior of png_set_keep_unknown_chunks by

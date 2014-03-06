@@ -69,6 +69,7 @@ static void readpng2_row_callback(png_structp png_ptr, png_bytep new_row,
                                  png_uint_32 row_num, int pass);
 static void readpng2_end_callback(png_structp png_ptr, png_infop info_ptr);
 static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg);
+static void readpng2_warning_handler(png_structp png_ptr, png_const_charp msg);
 
 
 
@@ -104,7 +105,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
     /* could also replace libpng warning-handler (final NULL), but no need: */
 
     png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, mainprog_ptr,
-      readpng2_error_handler, NULL);
+      readpng2_error_handler, readpng2_warning_handler);
     if (!png_ptr)
         return 4;   /* out of memory */
 
@@ -467,7 +468,11 @@ void readpng2_cleanup(mainprog_info *mainprog_ptr)
 }
 
 
-
+static void readpng2_warning_handler(png_structp png_ptr, png_const_charp msg)
+{
+    fprintf(stderr, "readpng2 libpng warning: %s\n", msg);
+    fflush(stderr);
+}
 
 
 static void readpng2_error_handler(png_structp png_ptr, png_const_charp msg)

@@ -667,8 +667,8 @@ set_location(png_structp png_ptr, struct user_chunk_data *data, int what)
    return 1; /* handled */
 }
 
-static int PNGCBAPI read_user_chunk_callback(png_struct *png_ptr,
-   png_unknown_chunkp chunk)
+static int PNGCBAPI
+read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
 {
    struct user_chunk_data *my_user_chunk_data =
       (struct user_chunk_data*)png_get_user_chunk_ptr(png_ptr);
@@ -1991,4 +1991,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_9 Your_png_h_is_not_version_1_6_9;
+typedef png_libpng_version_1_6_10 Your_png_h_is_not_version_1_6_10;

@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.18 [February 6, 2014]
+ * Last changed in libpng 1.6.10 [March 6, 2014]
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -120,11 +120,6 @@ typedef png_byte *png_const_bytep;
 #  else
 #     define UNUSED(param)
 #  endif
-#endif
-
-/* Fixups for various minimal builds */
-#ifndef PNG_ERROR_TEXT_SUPPORTED
-#  define png_error(a,b) png_err(a)
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
@@ -926,7 +921,7 @@ internal_error(png_store *ps, png_const_charp message)
 #endif /* PNG_READ_SUPPORTED */
 
 /* Functions to use as PNG callbacks. */
-static void
+static void PNGCBAPI
 store_error(png_structp ppIn, png_const_charp message) /* PNG_NORETURN */
 {
    png_const_structp pp = ppIn;
@@ -942,7 +937,7 @@ store_error(png_structp ppIn, png_const_charp message) /* PNG_NORETURN */
    }
 }
 
-static void
+static void PNGCBAPI
 store_warning(png_structp ppIn, png_const_charp message)
 {
    png_const_structp pp = ppIn;
@@ -1093,7 +1088,7 @@ store_image_check(PNG_CONST png_store* ps, png_const_structp pp, int iImage)
 }
 #endif /* PNG_READ_SUPPORTED */
 
-static void
+static void PNGCBAPI
 store_write(png_structp ppIn, png_bytep pb, png_size_t st)
 {
    png_const_structp pp = ppIn;
@@ -1121,7 +1116,7 @@ store_write(png_structp ppIn, png_bytep pb, png_size_t st)
    }
 }
 
-static void
+static void PNGCBAPI
 store_flush(png_structp ppIn)
 {
    UNUSED(ppIn) /*DOES NOTHING*/
@@ -1215,7 +1210,7 @@ store_read_imp(png_store *ps, png_bytep pb, png_size_t st)
    }
 }
 
-static void
+static void PNGCBAPI
 store_read(png_structp ppIn, png_bytep pb, png_size_t st)
 {
    png_const_structp pp = ppIn;
@@ -1408,7 +1403,7 @@ store_pool_delete(png_store *ps, store_pool *pool)
 }
 
 /* The memory callbacks: */
-static png_voidp
+static png_voidp PNGCBAPI
 store_malloc(png_structp ppIn, png_alloc_size_t cb)
 {
    png_const_structp pp = ppIn;
@@ -1457,7 +1452,7 @@ store_malloc(png_structp ppIn, png_alloc_size_t cb)
    return new;
 }
 
-static void
+static void PNGCBAPI
 store_free(png_structp ppIn, png_voidp memory)
 {
    png_const_structp pp = ppIn;
@@ -2676,7 +2671,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
 }
 
 /* The callback: */
-static void
+static void PNGCBAPI
 modifier_read(png_structp ppIn, png_bytep pb, png_size_t st)
 {
    png_const_structp pp = ppIn;
@@ -4680,7 +4675,7 @@ standard_info_imp(standard_display *dp, png_structp pp, png_infop pi,
    standard_info_part2(dp, pp, pi, nImages);
 }
 
-static void
+static void PNGCBAPI
 standard_info(png_structp pp, png_infop pi)
 {
    standard_display *dp = voidcast(standard_display*,
@@ -4692,7 +4687,7 @@ standard_info(png_structp pp, png_infop pi)
    standard_info_imp(dp, pp, pi, 1 /*only one image*/);
 }
 
-static void
+static void PNGCBAPI
 progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
 {
    png_const_structp pp = ppIn;
@@ -5006,7 +5001,7 @@ standard_image_validate(standard_display *dp, png_const_structp pp, int iImage,
    dp->ps->validated = 1;
 }
 
-static void
+static void PNGCBAPI
 standard_end(png_structp ppIn, png_infop pi)
 {
    png_const_structp pp = ppIn;
@@ -5841,7 +5836,7 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    }
 }
 
-static void
+static void PNGCBAPI
 transform_info(png_structp pp, png_infop pi)
 {
    transform_info_imp(voidcast(transform_display*, png_get_progressive_ptr(pp)),
@@ -6048,7 +6043,7 @@ transform_image_validate(transform_display *dp, png_const_structp pp,
    dp->this.ps->validated = 1;
 }
 
-static void
+static void PNGCBAPI
 transform_end(png_structp ppIn, png_infop pi)
 {
    png_const_structp pp = ppIn;
@@ -7865,7 +7860,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
    standard_info_part2(&dp->this, pp, pi, 1 /*images*/);
 }
 
-static void
+static void PNGCBAPI
 gamma_info(png_structp pp, png_infop pi)
 {
    gamma_info_imp(voidcast(gamma_display*, png_get_progressive_ptr(pp)), pp,
@@ -8829,7 +8824,7 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
    dp->this.ps->validated = 1;
 }
 
-static void
+static void PNGCBAPI
 gamma_end(png_structp ppIn, png_infop pi)
 {
    png_const_structp pp = ppIn;

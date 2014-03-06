@@ -164,7 +164,7 @@ logunsupported = 1
 
 # NONE
 
-# Note that PNG_USR_CONFIG only has an effect when building
+# Note that PNG_USER_CONFIG only has an effect when building
 # pnglibconf.h
 
 setting USER_CONFIG
@@ -578,8 +578,9 @@ option GAMMA disabled
 option COLORSPACE enables GAMMA disabled
 
 # When an ICC profile is read, or png_set, it will be checked for a match
-# against known sRGB profiles if the sRGB handling is enabled.  This
-# setting controls how much work is done during the check:
+# against known sRGB profiles if the sRGB handling is enabled.  The
+# PNG_sRGB_PROFILE_CHECKS setting controls how much work is done during the
+# check:
 #
 # 0: Just validate the profile MD5 signature if present, otherwise use
 #    the checks in option 1.

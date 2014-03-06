@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.9 - February 6, 2014
+ libpng version 1.6.10 - March 6, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.9 - February 6, 2014
+ libpng versions 0.97, January 1998, through 1.6.10 - March 6, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -274,10 +274,10 @@ This method of building a customized pnglibconf.h is illustrated in
 contrib/pngminim/*.  See the "$(PNGCONF):" target in the makefile and
 pngusr.dfa in these directories.
 
-C. Configuration using PNG_USR_CONFIG
+C. Configuration using PNG_USER_CONFIG
 
-If -DPNG_USR_CONFIG is added to the CFLAGS when pnglibconf.h is built the file
-pngusr.h will automatically be included before the options in
+If -DPNG_USER_CONFIG is added to the CPPFLAGS when pnglibconf.h is built,
+the file pngusr.h will automatically be included before the options in
 scripts/pnglibconf.dfa are processed.  Your pngusr.h file should contain only
 macro definitions turning features on or off or setting settings.
 
@@ -712,12 +712,12 @@ value.  You can also specify a default encoding for the PNG file in
 case the required information is missing from the file.  By default libpng
 assumes that the PNG data matches your system, to keep this default call:
 
-   png_set_gamma(png_ptr, screen_gamma, 1/screen_gamma/*file gamma*/);
+   png_set_gamma(png_ptr, screen_gamma, output_gamma);
 
 or you can use the fixed point equivalent:
 
    png_set_gamma_fixed(png_ptr, PNG_FP_1*screen_gamma,
-      PNG_FP_1/screen_gamma);
+      PNG_FP_1*output_gamma);
 
 If you don't know the gamma for your system it is probably 2.2 - a good
 approximation to the IEC standard for display systems (sRGB).  If images are
@@ -745,6 +745,70 @@ component value whenever arithmetic is performed.  A lot of graphics software
 uses linear values for this reason, often with higher precision component values
 to preserve overall accuracy.
 
+
+The output_gamma value expresses how to decode the output values, not how
+they are encoded.  The values used correspond to the normal numbers used to
+describe the overall gamma of a computer display system; for example 2.2 for
+an sRGB conformant system.  The values are scaled by 100000 in the _fixed
+version of the API (so 220000 for sRGB.)
+
+The inverse of the value is always used to provide a default for the PNG file
+encoding if it has no gAMA chunk and if png_set_gamma() has not been called
+to override the PNG gamma information.
+
+When the ALPHA_OPTIMIZED mode is selected the output gamma is used to encode
+opaque pixels however pixels with lower alpha values are not encoded,
+regardless of the output gamma setting.
+
+When the standard Porter Duff handling is requested with mode 1 the output
+encoding is set to be linear and the output_gamma value is only relevant
+as a default for input data that has no gamma information.  The linear output
+encoding will be overridden if png_set_gamma() is called - the results may be
+highly unexpected!
+
+The following numbers are derived from the sRGB standard and the research
+behind it.  sRGB is defined to be approximated by a PNG gAMA chunk value of
+0.45455 (1/2.2) for PNG.  The value implicitly includes any viewing
+correction required to take account of any differences in the color
+environment of the original scene and the intended display environment; the
+value expresses how to *decode* the image for display, not how the original
+data was *encoded*.
+
+sRGB provides a peg for the PNG standard by defining a viewing environment.
+sRGB itself, and earlier TV standards, actually use a more complex transform
+(a linear portion then a gamma 2.4 power law) than PNG can express.  (PNG is
+limited to simple power laws.)  By saying that an image for direct display on
+an sRGB conformant system should be stored with a gAMA chunk value of 45455
+(11.3.3.2 and 11.3.3.5 of the ISO PNG specification) the PNG specification
+makes it possible to derive values for other display systems and
+environments.
+
+The Mac value is deduced from the sRGB based on an assumption that the actual
+extra viewing correction used in early Mac display systems was implemented as
+a power 1.45 lookup table.
+
+Any system where a programmable lookup table is used or where the behavior of
+the final display device characteristics can be changed requires system
+specific code to obtain the current characteristic.  However this can be
+difficult and most PNG gamma correction only requires an approximate value.
+
+By default, if png_set_alpha_mode() is not called, libpng assumes that all
+values are unencoded, linear, values and that the output device also has a
+linear characteristic.  This is only very rarely correct - it is invariably
+better to call png_set_alpha_mode() with PNG_DEFAULT_sRGB than rely on the
+default if you don't know what the right answer is!
+
+The special value PNG_GAMMA_MAC_18 indicates an older Mac system (pre Mac OS
+10.6) which used a correction table to implement a somewhat lower gamma on an
+otherwise sRGB system.
+
+Both these values are reserved (not simple gamma values) in order to allow
+more precise correction internally in the future.
+
+NOTE: the values can be passed to either the fixed or floating
+point APIs, but the floating point API will also accept floating point
+values.
+
 The second thing you may need to tell libpng about is how your system handles
 alpha channel information.  Some, but not all, PNG files contain an alpha
 channel.  To display these files correctly you need to compose the data onto a
@@ -769,11 +833,11 @@ by png_set_alpha_mode().
 
 The mode is as follows:
 
-    PNG_ALPHA_PNG: The data is encoded according to the PNG specification.  Red,
-green and blue, or gray, components are gamma encoded color
-values and are not premultiplied by the alpha value.  The
-alpha value is a linear measure of the contribution of the
-pixel to the corresponding final output pixel.
+    PNG_ALPHA_PNG: The data is encoded according to the PNG
+specification.  Red, green and blue, or gray, components are
+gamma encoded color values and are not premultiplied by the
+alpha value.  The alpha value is a linear measure of the
+contribution of the pixel to the corresponding final output pixel.
 
 You should normally use this format if you intend to perform
 color correction on the color values; most, maybe all, color
@@ -790,11 +854,35 @@ be used!
 
 The remaining modes assume you don't need to do any further color correction or
 that if you do, your color correction software knows all about alpha (it
-probably doesn't!)
+probably doesn't!).  They 'associate' the alpha with the color information by
+storing color channel values that have been scaled by the alpha.  The
+advantage is that the color channels can be resampled (the image can be
+scaled) in this form.  The disadvantage is that normal practice is to store
+linear, not (gamma) encoded, values and this requires 16-bit channels for
+still images rather than the 8-bit channels that are just about sufficient if
+gamma encoding is used.  In addition all non-transparent pixel values,
+including completely opaque ones, must be gamma encoded to produce the final
+image.  These are the 'STANDARD', 'ASSOCIATED' or 'PREMULTIPLIED' modes
+described below (the latter being the two common names for associated alpha
+color channels). Note that PNG files always contain non-associated color
+channels; png_set_alpha_mode() with one of the modes causes the decoder to
+convert the pixels to an associated form before returning them to your
+application. 
 
-    PNG_ALPHA_STANDARD:  The data libpng produces
-is encoded in the standard way
-assumed by most correctly written graphics software.
+Since it is not necessary to perform arithmetic on opaque color values so
+long as they are not to be resampled and are in the final color space it is
+possible to optimize the handling of alpha by storing the opaque pixels in
+the PNG format (adjusted for the output color space) while storing partially
+opaque pixels in the standard, linear, format.  The accuracy required for
+standard alpha composition is relatively low, because the pixels are
+isolated, therefore typically the accuracy loss in storing 8-bit linear
+values is acceptable.  (This is not true if the alpha channel is used to
+simulate transparency over large areas - use 16 bits or the PNG mode in
+this case!)  This is the 'OPTIMIZED' mode.  For this mode a pixel is
+treated as opaque only if the alpha value is equal to the maximum value.
+
+    PNG_ALPHA_STANDARD:  The data libpng produces is encoded in the
+standard way assumed by most correctly written graphics software.
 The gamma encoding will be removed by libpng and the
 linear component values will be pre-multiplied by the
 alpha channel.
@@ -823,9 +911,8 @@ dynamic range.  To avoid problems, and if your software
 supports it, use png_set_expand_16() to force all
 components to 16 bits.
 
-    PNG_ALPHA_OPTIMIZED: This mode is the same
-as PNG_ALPHA_STANDARD except that
-completely opaque pixels are gamma encoded according to
+    PNG_ALPHA_OPTIMIZED: This mode is the same as PNG_ALPHA_STANDARD
+except that completely opaque pixels are gamma encoded according to
 the screen_gamma value.  Pixels with alpha less than 1.0
 will still have linear components.
 
@@ -844,18 +931,16 @@ representation of non-opaque pixels are irrelevant.
 You can also try this format if your software is broken;
 it might look better.
 
-    PNG_ALPHA_BROKEN: This is PNG_ALPHA_STANDARD;
-however, all component values,
-including the alpha channel are gamma encoded.  This is
-an appropriate format to try if your software, or more
-likely hardware, is totally broken, i.e., if it performs
-linear arithmetic directly on gamma encoded values.
-
-In most cases of broken software or hardware the bug in the final display
-manifests as a subtle halo around composited parts of the image.  You may not
-even perceive this as a halo; the composited part of the image may simply appear
-separate from the background, as though it had been cut out of paper and pasted
-on afterward.
+    PNG_ALPHA_BROKEN: This is PNG_ALPHA_STANDARD; however, all component
+values, including the alpha channel are gamma encoded.  This is
+broken because, in practice, no implementation that uses this choice
+correctly undoes the encoding before handling alpha composition.  Use this
+choice only if other serious errors in the software or hardware you use
+mandate it.  In most cases of broken software or hardware the bug in the
+final display manifests as a subtle halo around composited parts of the
+image.  You may not even perceive this as a halo; the composited part of
+the image may simply appear separate from the background, as though it had
+been cut out of paper and pasted on afterward.
 
 If you don't have to deal with bugs in software or hardware, or if you can fix
 them, there are three recommended ways of using png_set_alpha_mode():
@@ -885,6 +970,89 @@ lose the ability to scale the image or perform other linear arithmetic.
 All you can do is compose the result onto a matching output.  Since this
 mode is libpng-specific you also need to write your own composition
 software.
+
+The following are examples of calls to png_set_alpha_mode to achieve the
+required overall gamma correction and, where necessary, alpha
+premultiplication.
+
+    png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_DEFAULT_sRGB);
+
+This is the default libpng handling of the alpha channel - it is not
+pre-multiplied into the color components.  In addition the call states
+that the output is for a sRGB system and causes all PNG files without gAMA
+chunks to be assumed to be encoded using sRGB.
+
+    png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_GAMMA_MAC);
+
+In this case the output is assumed to be something like an sRGB conformant
+display preceeded by a power-law lookup table of power 1.45.  This is how
+early Mac systems behaved.
+
+    png_set_alpha_mode(pp, PNG_ALPHA_STANDARD, PNG_GAMMA_LINEAR);
+
+This is the classic Jim Blinn approach and will work in academic
+environments where everything is done by the book.  It has the shortcoming
+of assuming that input PNG data with no gamma information is linear - this
+is unlikely to be correct unless the PNG files where generated locally.
+Most of the time the output precision will be so low as to show
+significant banding in dark areas of the image.
+
+    png_set_expand_16(pp);
+    png_set_alpha_mode(pp, PNG_ALPHA_STANDARD, PNG_DEFAULT_sRGB);
+
+This is a somewhat more realistic Jim Blinn inspired approach.  PNG files
+are assumed to have the sRGB encoding if not marked with a gamma value and
+the output is always 16 bits per component.  This permits accurate scaling
+and processing of the data.  If you know that your input PNG files were
+generated locally you might need to replace PNG_DEFAULT_sRGB with the
+correct value for your system.
+
+    png_set_alpha_mode(pp, PNG_ALPHA_OPTIMIZED, PNG_DEFAULT_sRGB);
+
+If you just need to composite the PNG image onto an existing background
+and if you control the code that does this you can use the optimization
+setting.  In this case you just copy completely opaque pixels to the
+output.  For pixels that are not completely transparent (you just skip
+those) you do the composition math using png_composite or png_composite_16
+below then encode the resultant 8-bit or 16-bit values to match the output
+encoding.
+
+    Other cases
+
+If neither the PNG nor the standard linear encoding work for you because
+of the software or hardware you use then you have a big problem.  The PNG
+case will probably result in halos around the image.  The linear encoding
+will probably result in a washed out, too bright, image (it's actually too
+contrasty.)  Try the ALPHA_OPTIMIZED mode above - this will probably
+substantially reduce the halos.  Alternatively try:
+
+    png_set_alpha_mode(pp, PNG_ALPHA_BROKEN, PNG_DEFAULT_sRGB);
+
+This option will also reduce the halos, but there will be slight dark
+halos round the opaque parts of the image where the background is light.
+In the OPTIMIZED mode the halos will be light halos where the background
+is dark.  Take your pick - the halos are unavoidable unless you can get
+your hardware/software fixed!  (The OPTIMIZED approach is slightly
+faster.)
+
+When the default gamma of PNG files doesn't match the output gamma.
+If you have PNG files with no gamma information png_set_alpha_mode allows
+you to provide a default gamma, but it also sets the ouput gamma to the
+matching value.  If you know your PNG files have a gamma that doesn't
+match the output you can take advantage of the fact that
+png_set_alpha_mode always sets the output gamma but only sets the PNG
+default if it is not already set:
+
+    png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_DEFAULT_sRGB);
+    png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_GAMMA_MAC);
+
+The first call sets both the default and the output gamma values, the
+second call overrides the output gamma without changing the default.  This
+is easier than achieving the same effect with png_set_gamma.  You must use
+PNG_ALPHA_PNG for the first call - internal checking in png_set_alpha will
+fire if more than one call to png_set_alpha_mode and png_set_background is
+made in the same read operation, however multiple calls with PNG_ALPHA_PNG
+are ignored.
 
 If you don't need, or can't handle, the alpha channel you can call
 png_set_background() to remove it by compositing against a fixed color.  Don't
@@ -1216,7 +1384,7 @@ png_set_rgb_to_gray()).
 
     png_get_sRGB(png_ptr, info_ptr, &srgb_intent);
 
-    file_srgb_intent - the rendering intent (PNG_INFO_sRGB)
+    srgb_intent -    the rendering intent (PNG_INFO_sRGB)
                      The presence of the sRGB chunk
                      means that the pixel data is in the
                      sRGB color space.  This chunk also
@@ -2166,10 +2334,15 @@ how pngvalid.c does it.
 Finishing a sequential read
 
 After you are finished reading the image through the
-low-level interface, you can finish reading the file.  If you are
-interested in comments or time, which may be stored either before or
-after the image data, you should pass the separate png_info struct if
-you want to keep the comments from before and after the image
+low-level interface, you can finish reading the file.
+
+If you want to use a different crc action for handling CRC errors in
+chunks after the image data, you can call png_set_crc_action()
+again at this point.
+
+If you are interested in comments or time, which may be stored either
+before or after the image data, you should pass the separate png_info
+struct if you want to keep the comments from before and after the image
 separate.
 
     png_infop end_info = png_create_info_struct(png_ptr);
@@ -2185,6 +2358,9 @@ separate.
 
 If you are not interested, you should still call png_read_end()
 but you can pass NULL, avoiding the need to create an end_info structure.
+If you do this, libpng will not process any chunks after IDAT other than
+skipping over them and perhaps (depending on whether you have called
+png_set_crc_action) checking their CRCs while looking for the IEND chunk.
 
    png_read_end(png_ptr, (png_infop)NULL);
 
@@ -4941,7 +5117,7 @@ pngconf.h no longer includes pngusr.h, therefore pngusr.h is ignored after the
 build of pnglibconf.h and it is never included in an application build.
 
 The rarely used alternative of adding a list of feature macros to the
-CFLAGS setting in the build also still works; however, the macros will be
+CPPFLAGS setting in the build also still works; however, the macros will be
 copied to pnglibconf.h and this may produce macro redefinition warnings
 when the individual C files are compiled.
 
@@ -4998,7 +5174,6 @@ The following API are now DEPRECATED:
    png_info_init_3()
    png_convert_to_rfc1123() which has been replaced
      with png_convert_to_rfc1123_buffer()
-   png_data_freer()
    png_malloc_default()
    png_free_default()
    png_reset_zstream()
@@ -5174,6 +5349,9 @@ exported functions are marked with PNGAPI:
     body;
  }
 
+The return type and decorations are placed on a separate line
+ahead of the function name, as illustrated above.
+
 The prototypes for all exported functions appear in png.h,
 above the comment that says
 
@@ -5238,13 +5416,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 6, 2014
+March 6, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.9 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.10 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
