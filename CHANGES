@@ -4872,7 +4872,7 @@ Version 1.6.10rc02 [February 28, 2014]
 Version 1.6.10rc03 [March 4, 2014]
   Un-deprecated png_data_freer().
 
-Version 1.6.10rc04 [March 4, 2014]
+Version 1.6.10 [March 6, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

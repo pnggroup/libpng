@@ -1,32 +1,29 @@
 
-Libpng 1.6.10rc04 - March 4, 2014
+Libpng 1.6.10 - March 6, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.10rc04.tar.xz (LZMA-compressed, recommended)
-   1.6.10rc04.tar.gz
+   libpng-1.6.10.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.10.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1610r04.7z  (LZMA-compressed, recommended)
-   lp1610r04.zip
+   lpng1610.7z  (LZMA-compressed, recommended)
+   lpng1610.zip
 
 Other information:
 
-   1.6.10rc04-README.txt
-   1.6.10rc04-LICENSE.txt
-   libpng-1.6.10rc04-*.asc (armored detached GPG signatures)
+   libpng-1.6.10-README.txt
+   libpng-1.6.10-LICENSE.txt
+   libpng-1.6.10-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.9):
-
-Version 1.6.10beta01 [February 9, 2014]
   Backported changes from libpng-1.7.0beta30 and beta31:
   Fixed a large number of instances where PNGCBAPI was omitted from
     function definitions.
@@ -54,8 +51,6 @@ Version 1.6.10beta01 [February 9, 2014]
     png_app_error() if the app requests something that cannot be done
     and it adds corresponding code to pngimage.c to handle such options
     by not attempting to test them.
-
-Version 1.6.10beta02 [February 23, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
@@ -82,23 +77,11 @@ Version 1.6.10beta02 [February 23, 2014]
     This fixes CERT VU#684412 and CVE-2014-0333.
   Don't recognize known sRGB profiles as sRGB if they have been hacked,
     but don't reject them and don't issue a copyright violation warning.
-
-Version 1.6.10beta03 [February 25, 2014]
   Moved some documentation from png.h to libpng.3 and libpng-manual.txt
   Minor editing of contrib/arm-neon/README and contrib/examples/*.c
-
-Version 1.6.10rc01 [February 27, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
-
-Version 1.6.10rc02 [February 28, 2014]
-  Removed unreachable return statement after png_chunk_error()
-    in pngrutil.c
-
-Version 1.6.10rc03 [March 4, 2014]
   Un-deprecated png_data_freer().
-
-Version 1.6.10rc04 [March 4, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
