@@ -305,10 +305,6 @@ option FLOATING_ARITHMETIC
 option FLOATING_POINT
 option FIXED_POINT
 
-# The following is always on (defined empty)
-
-setting CALLOC_SUPPORTED default
-
 # This protects us against compilers that run on a windowing system
 # and thus don't have or would rather us not use the stdio types:
 # stdin, stdout, and stderr.  The only one currently used is stderr
