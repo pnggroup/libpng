@@ -2,7 +2,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng version 1.7.0beta34 - February 27, 2014 */
+/* Libpng version 1.7.0beta34 - March 7, 2014 */
 
 /* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
 
@@ -186,7 +186,6 @@
 /* settings */
 #define PNG_ABORT { (abort()); }
 #define PNG_API_RULE 0
-#define PNG_CALLOC_SUPPORTED
 #define PNG_COST_SHIFT 3
 #define PNG_DEFAULT_READ_MACROS 1
 #define PNG_GAMMA_THRESHOLD_FIXED 5000
