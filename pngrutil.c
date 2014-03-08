@@ -248,7 +248,7 @@ png_crc_error(png_structrp png_ptr)
    /* The chunk CRC must be serialized in a single I/O call. */
    png_read_data(png_ptr, crc_bytes, 4);
 
-   if (need_crc)
+   if (need_crc != 0)
    {
       crc = png_get_uint_32(crc_bytes);
       return ((int)(crc != png_ptr->crc));
@@ -294,7 +294,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
       else if (warn < 2) /* else silent */
       {
-         if (warn)
+         if (warn != 0)
              png_chunk_warning(png_ptr, "insufficient memory to read chunk");
 
          else
@@ -620,7 +620,7 @@ png_decompress_chunk(png_structrp png_ptr,
                   {
                      if (new_size == *newlength)
                      {
-                        if (terminate)
+                        if (terminate != 0)
                            text[prefix_size + *newlength] = 0;
 
                         if (prefix_size > 0)
@@ -1543,7 +1543,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       errmsg = "too many profiles";
 
    /* Failure: the reason is in 'errmsg' */
-   if (!finished)
+   if (finished == 0)
       png_crc_finish(png_ptr, length);
 
    png_ptr->colorspace.flags |= PNG_COLORSPACE_INVALID;
@@ -2660,7 +2660,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
          buffer[uncompressed_length+prefix_length] = 0;
 
-         if (compressed)
+         if (compressed != 0)
             text.compression = PNG_ITXT_COMPRESSION_NONE;
 
          else
@@ -3237,7 +3237,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          }
 
          /* Work out the bytes to copy. */
-         if (display)
+         if (display != 0)
          {
             /* When doing the 'block' algorithm the pixel in the pass gets
              * replicated to adjacent pixels.  This is why the even (0,2,4,6)

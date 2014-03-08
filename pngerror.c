@@ -195,7 +195,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
           * drop the decimal point.  If the number is a true zero handle that
           * here.
           */
-         if (output)
+         if (output != 0)
             *--end = '.';
          else if (number == 0) /* and !output */
             *--end = '0';
@@ -949,7 +949,7 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
    saved_error_buf = image->opaque->error_buf;
    result = setjmp(safe_jmpbuf) == 0;
 
-   if (result)
+   if (result != 0)
    {
 
       image->opaque->error_buf = safe_jmpbuf;
@@ -959,7 +959,7 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
    image->opaque->error_buf = saved_error_buf;
 
    /* And do the cleanup prior to any failure return. */
-   if (!result)
+   if (result == 0)
       png_image_free(image);
 
    return result;

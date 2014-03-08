@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta34 - February 27, 2014
+ libpng version 1.7.0beta34 - March 8, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta34 - February 27, 2014
+ libpng versions 0.97, January 1998, through 1.7.0beta34 - March 8, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -277,8 +277,8 @@ pngusr.dfa in these directories.
 
 C. Configuration using PNG_USER_CONFIG
 
-If -DPNG_USER_CONFIG is added to the CPPFLAGS when pnglibconf.h is built the file
-pngusr.h will automatically be included before the options in
+If -DPNG_USER_CONFIG is added to the CPPFLAGS when pnglibconf.h is built,
+the file pngusr.h will automatically be included before the options in
 scripts/pnglibconf.dfa are processed.  Your pngusr.h file should contain only
 macro definitions turning features on or off or setting settings.
 
@@ -428,7 +428,7 @@ an end_info structure.
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
 you can compile libpng with PNG_NO_SETJMP, in which case
-errors will result in a call to PNG_ABORT() which defaults to abort().
+errors will result in a call to PNG_ABORT which defaults to abort().
 
 You can #define PNG_ABORT to a function or other C code that does something
 more useful than abort(), as long as your function does not
@@ -1160,7 +1160,7 @@ where row_pointers is an array of pointers to the pixel data for each row:
 If you know your image size and pixel size ahead of time, you can allocate
 row_pointers prior to calling png_read_png() with
 
-   if (height > PNG_UINT_32_MAX/(sizeof (png_byte))
+   if (height > PNG_UINT_32_MAX/(sizeof (png_byte)))
       png_error (png_ptr,
           "Image is too tall to process in memory");
 
@@ -2741,8 +2741,7 @@ you can compile libpng with PNG_NO_SETJMP, in which case
 errors will result in a call to PNG_ABORT which defaults to abort().
 
 You can #define PNG_ABORT to a function or other C code that does something
-more useful than abort(), as long as your function does not
-return.
+more useful than abort(), as long as your function does not return.
 
 Checking for invalid palette index on write was added at libpng
 1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
@@ -5173,7 +5172,6 @@ The following API are now DEPRECATED:
    png_info_init_3()
    png_convert_to_rfc1123() which has been replaced
      with png_convert_to_rfc1123_buffer()
-   png_data_freer()
    png_malloc_default()
    png_free_default()
    png_reset_zstream()
@@ -5382,6 +5380,9 @@ exported functions are marked with PNGAPI:
     body;
  }
 
+The return type and decorations are placed on a separate line
+ahead of the function name, as illustrated above.
+
 The prototypes for all exported functions appear in png.h,
 above the comment that says
 
@@ -5438,6 +5439,9 @@ with an even number of lower-case hex digits (e.g., 0x00, 0xff, 0x0100).
 We prefer to use underscores in variable names rather than camelCase, except
 for a few type names that we inherit from zlib.h.
 
+We prefer "if (something != 0)" and "if (something == 0)"
+over "if (something)" and if "(!something)", respectively.
+
 We do not use the TAB character for indentation in the C sources.
 
 Lines do not exceed 80 characters.
@@ -5446,7 +5450,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-February 27, 2014
+March 8, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

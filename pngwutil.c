@@ -699,7 +699,7 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
       if ((ch > 32 && ch <= 126) || (ch >= 161 /*&& ch <= 255*/))
          *new_key++ = ch, ++key_len, space = 0;
 
-      else if (!space)
+      else if (space == 0)
       {
          /* A space or an invalid character when one wasn't seen immediately
           * before; output just a space.
@@ -711,14 +711,14 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
             bad_character = ch;
       }
 
-      else if (!bad_character)
+      else if (bad_character == 0)
          bad_character = ch; /* just skip it, record the first error */
    }
 
    if (key_len > 0 && space) /* trailing space */
    {
       --key_len, --new_key;
-      if (!bad_character)
+      if (bad_character == 0)
          bad_character = 32;
    }
 
@@ -732,7 +732,7 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
    if (*key) /* keyword too long */
       png_warning(png_ptr, "keyword truncated");
 
-   else if (bad_character)
+   else if (bad_character != 0)
    {
       PNG_WARNING_PARAMETERS(p)
 
@@ -898,7 +898,7 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
    /* Write the chunk */
    png_write_complete_chunk(png_ptr, png_IHDR, buf, (png_size_t)13);
 
-   if (!(png_ptr->do_filter))
+   if ((png_ptr->do_filter) == PNG_NO_FILTERS)
    {
       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE ||
           png_ptr->bit_depth < 8)
@@ -1612,7 +1612,7 @@ png_write_tEXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
     */
    png_write_chunk_data(png_ptr, new_key, key_len + 1);
 
-   if (text_len)
+   if (text_len != 0)
       png_write_chunk_data(png_ptr, (png_const_bytep)text, text_len);
 
    png_write_chunk_end(png_ptr);
@@ -1738,7 +1738,7 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
 
    png_text_compress_init(&comp, (png_const_bytep)text, strlen(text));
 
-   if (compression)
+   if (compression != 0)
    {
       if (png_text_compress(png_ptr, png_iTXt, &comp, prefix_len) != Z_OK)
          png_error(png_ptr, png_ptr->zstream.msg);
@@ -1761,7 +1761,7 @@ png_write_iTXt(png_structrp png_ptr, int compression, png_const_charp key,
 
    png_write_chunk_data(png_ptr, (png_const_bytep)lang_key, lang_key_len);
 
-   if (compression)
+   if (compression != 0)
       png_write_compressed_data_out(png_ptr, &comp);
 
    else

@@ -146,7 +146,7 @@ png_set_background_fixed(png_structrp png_ptr,
    png_ptr->background_gamma = background_gamma;
    png_ptr->background_gamma_type = (png_byte)(background_gamma_code);
 
-   if (need_expand)
+   if (need_expand != 0)
       png_ptr->flags |= PNG_FLAG_BACKGROUND_EXPAND;
 
    else
@@ -230,7 +230,7 @@ translate_gamma_flags(png_structrp png_ptr, png_fixed_point output_gamma,
 #     else
          PNG_UNUSED(png_ptr)
 #     endif
-      if (is_screen)
+      if (is_screen != 0)
          output_gamma = PNG_GAMMA_sRGB;
       else
          output_gamma = PNG_GAMMA_sRGB_INVERSE;
@@ -239,7 +239,7 @@ translate_gamma_flags(png_structrp png_ptr, png_fixed_point output_gamma,
    else if (output_gamma == PNG_GAMMA_MAC_18 ||
       output_gamma == PNG_FP_1 / PNG_GAMMA_MAC_18)
    {
-      if (is_screen)
+      if (is_screen != 0)
          output_gamma = PNG_GAMMA_MAC_OLD;
       else
          output_gamma = PNG_GAMMA_MAC_INVERSE;
@@ -361,7 +361,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
    /* Finally, if pre-multiplying, set the background fields to achieve the
     * desired result.
     */
-   if (compose)
+   if (compose != 0)
    {
       /* And obtain alpha pre-multiplication by composing on black: */
       memset(&png_ptr->background, 0, (sizeof png_ptr->background));
@@ -418,7 +418,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
    png_ptr->transformations |= PNG_QUANTIZE;
 
-   if (!full_quantize)
+   if (full_quantize == 0)
    {
       int i;
 
@@ -473,12 +473,12 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
                }
             }
 
-            if (done)
+            if (done != 0)
                break;
          }
 
          /* Swap the palette around, and set up a table, if necessary */
-         if (full_quantize)
+         if (full_quantize != 0)
          {
             int j = num_palette;
 
@@ -661,7 +661,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
                         num_new_palette--;
                         palette[png_ptr->index_to_palette[j]]
                             = palette[num_new_palette];
-                        if (!full_quantize)
+                        if (full_quantize == 0)
                         {
                            int k;
 
@@ -729,7 +729,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
    }
    png_ptr->num_palette = (png_uint_16)num_palette;
 
-   if (full_quantize)
+   if (full_quantize != 0)
    {
       int i;
       png_bytep distance;
@@ -1181,7 +1181,7 @@ png_init_background_transformations(png_structrp png_ptr)
     * does not necessarily match the output the application gets, fix that and
     * the color type here:
     */
-   if (!expand)
+   if (expand == 0)
    {
       /* The background bit_depth and color_type need correcting */
       if ((transform & PNG_EXPAND) != 0)
@@ -1372,7 +1372,7 @@ png_init_palette_transformations(png_structrp png_ptr)
    }
 
    /* If no alpha we can optimize. */
-   if (!input_has_alpha)
+   if (input_has_alpha == 0)
    {
       /* Any alpha means background and associative alpha processing is
        * required, however if the alpha is 0 or 1 throughout OPTIMIZE_ALPHA
@@ -1381,7 +1381,7 @@ png_init_palette_transformations(png_structrp png_ptr)
       png_ptr->transformations &= ~PNG_ENCODE_ALPHA;
       png_ptr->flags &= ~PNG_FLAG_OPTIMIZE_ALPHA;
 
-      if (!input_has_transparency)
+      if (input_has_transparency == 0)
          png_ptr->transformations &= ~PNG_COMPOSE;
    }
 }
@@ -1397,7 +1397,7 @@ png_init_rgb_transformations(png_structrp png_ptr)
    int input_has_transparency = png_ptr->num_trans > 0;
 
    /* If no alpha we can optimize. */
-   if (!input_has_alpha)
+   if (input_has_alpha == 0)
    {
       /* Any alpha means background and associative alpha processing is
        * required, however if the alpha is 0 or 1 throughout OPTIMIZE_ALPHA
@@ -1408,7 +1408,7 @@ png_init_rgb_transformations(png_structrp png_ptr)
          png_ptr->flags &= ~PNG_FLAG_OPTIMIZE_ALPHA;
 #     endif
 
-      if (!input_has_transparency)
+      if (input_has_transparency == 0)
          png_ptr->transformations &= ~PNG_COMPOSE;
    }
 }
@@ -1479,7 +1479,7 @@ png_init_read_transformations(png_structrp png_ptr)
        * the code immediately below if the transform can be handled outside the
        * row loop.
        */
-      if (gamma_correction)
+      if (gamma_correction != 0)
          png_ptr->transformations |= PNG_GAMMA;
 
       else
@@ -2015,7 +2015,7 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    png_ptr->info_rowbytes = info_ptr->rowbytes;
 
 #ifndef PNG_READ_EXPAND_SUPPORTED
-   if (png_ptr)
+   if (png_ptr != NULL)
       return;
 #endif
 }
@@ -2174,7 +2174,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
                have_shift = 1;
          }
 
-         if (!have_shift)
+         if (have_shift == 0)
             return;
       }
 
@@ -2936,7 +2936,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                   *(dp++) = (png_byte)red;
                }
 
-               if (have_alpha)
+               if (have_alpha != 0)
                   *(dp++) = *(sp++);
             }
          }
@@ -2962,7 +2962,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                else
                   *(dp++) = red;
 
-               if (have_alpha)
+               if (have_alpha != 0)
                   *(dp++) = *(sp++);
             }
          }
@@ -3012,7 +3012,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                *(dp++) = (png_byte)((w>>8) & 0xff);
                *(dp++) = (png_byte)(w & 0xff);
 
-               if (have_alpha)
+               if (have_alpha != 0)
                {
                   *(dp++) = *(sp++);
                   *(dp++) = *(sp++);
@@ -3045,7 +3045,7 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                *(dp++) = (png_byte)((gray16>>8) & 0xff);
                *(dp++) = (png_byte)(gray16 & 0xff);
 
-               if (have_alpha)
+               if (have_alpha != 0)
                {
                   *(dp++) = *(sp++);
                   *(dp++) = *(sp++);
@@ -3111,7 +3111,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         *sp = (png_byte)(tmp & 0xff);
                      }
 
-                     if (!bit_shift)
+                     if (bit_shift == 0)
                      {
                         bit_shift = 7;
                         sp++;
@@ -3150,7 +3150,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                            *sp = (png_byte)(tmp & 0xff);
                         }
 
-                        if (!bit_shift)
+                        if (bit_shift == 0)
                         {
                            bit_shift = 6;
                            sp++;
@@ -3176,7 +3176,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                            *sp = (png_byte)(tmp & 0xff);
                         }
 
-                        if (!bit_shift)
+                        if (bit_shift == 0)
                         {
                            bit_shift = 6;
                            sp++;
@@ -3216,7 +3216,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                            *sp = (png_byte)(tmp & 0xff);
                         }
 
-                        if (!bit_shift)
+                        if (bit_shift == 0)
                         {
                            bit_shift = 4;
                            sp++;
@@ -3242,7 +3242,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                            *sp = (png_byte)(tmp & 0xff);
                         }
 
-                        if (!bit_shift)
+                        if (bit_shift == 0)
                         {
                            bit_shift = 4;
                            sp++;
@@ -3491,7 +3491,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         png_composite_16(w, v, 257*a,
                            png_ptr->background_1.gray);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_from_1[(w+add)>>shift];
 
                         else /* alpha pixels linear and approximate */
@@ -3553,7 +3553,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         g = gamma_16_to_1[((sp[0]<<8)+sp[1]+add) >> shift];
                         png_composite_16(v, g, a, png_ptr->background_1.gray);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_16_from_1[(v+add) >> shift];
 
                         else
@@ -3631,7 +3631,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         png_composite_16(w, v, alpha,
                            png_ptr->background_1.red);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_from_1[(w+add)>>shift];
                         
                         else
@@ -3643,7 +3643,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         png_composite_16(w, v, alpha,
                            png_ptr->background_1.green);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_from_1[(w+add)>>shift];
                         
                         else
@@ -3655,7 +3655,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         png_composite_16(w, v, alpha,
                            png_ptr->background_1.blue);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_from_1[(w+add)>>shift];
                         
                         else
@@ -3743,7 +3743,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[((sp[0]<<8)+sp[1]+add) >> shift];
                         png_composite_16(w, v, a, png_ptr->background_1.red);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_16_from_1[(w+add) >> shift];
 
                         *sp = (png_byte)((w >> 8) & 0xff);
@@ -3752,7 +3752,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[((sp[2]<<8)+sp[3]+add) >> shift];
                         png_composite_16(w, v, a, png_ptr->background_1.green);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_16_from_1[(w+add) >> shift];
 
                         *(sp + 2) = (png_byte)((w >> 8) & 0xff);
@@ -3761,7 +3761,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[((sp[4]<<8)+sp[5]+add) >> shift];
                         png_composite_16(w, v, a, png_ptr->background_1.blue);
 
-                        if (!optimize)
+                        if (optimize == 0)
                            w = gamma_16_from_1[(w+add) >> shift];
 
                         *(sp + 4) = (png_byte)((w >> 8) & 0xff);
@@ -4658,7 +4658,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
           png_do_rgb_to_gray(png_ptr, row_info,
               png_ptr->row_buf + 1);
 
-      if (rgb_error)
+      if (rgb_error != 0)
       {
          png_ptr->rgb_to_gray_status=1;
          if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==

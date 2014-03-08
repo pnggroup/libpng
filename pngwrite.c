@@ -832,7 +832,7 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    {
       png_do_write_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass);
       /* This should always get caught above, but still ... */
-      if (!(row_info.width))
+      if (row_info.width == 0)
       {
          png_write_finish_row(png_ptr);
          return;
@@ -2163,7 +2163,7 @@ png_image_write_main(png_voidp argument)
     * write an interlaced image.
     */
 
-   if (write_16bit)
+   if (write_16bit != 0)
    {
       /* The gamma here is 1.0 (linear) and the cHRM chunk matches sRGB. */
       png_set_gAMA_fixed(png_ptr, info_ptr, PNG_GAMMA_LINEAR);
@@ -2195,7 +2195,7 @@ png_image_write_main(png_voidp argument)
     *
     * First check for a little endian system if writing 16 bit files.
     */
-   if (write_16bit)
+   if (write_16bit != 0)
    {
       PNG_CONST png_uint_16 le = 0x0001;
 
@@ -2236,7 +2236,7 @@ png_image_write_main(png_voidp argument)
       png_const_bytep row = png_voidcast(png_const_bytep, display->buffer);
       ptrdiff_t row_bytes = display->row_stride;
 
-      if (linear)
+      if (linear != 0)
          row_bytes *= (sizeof (png_uint_16));
 
       if (row_bytes < 0)
@@ -2269,7 +2269,7 @@ png_image_write_main(png_voidp argument)
       int result;
 
       display->local_row = row;
-      if (write_16bit)
+      if (write_16bit != 0)
          result = png_safe_execute(image, png_write_image_16bit, display);
       else
          result = png_safe_execute(image, png_write_image_8bit, display);
@@ -2278,7 +2278,7 @@ png_image_write_main(png_voidp argument)
       png_free(png_ptr, row);
 
       /* Skip the 'write_end' on error: */
-      if (!result)
+      if (result == 0)
          return 0;
    }
 

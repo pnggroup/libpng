@@ -970,7 +970,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_set_packswap(png_ptr);
 
    /* Turn on interlace handling if you are not using png_write_image() */
-   if (interlacing)
+   if (interlacing != 0)
       number_passes = png_set_interlace_handling(png_ptr);
 
    else

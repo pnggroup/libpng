@@ -638,7 +638,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
       png_colorspace_sync_info(png_ptr, info_ptr);
 
       /* Don't do any of the copying if the profile was bad, or inconsistent. */
-      if (!result)
+      if (result == 0)
          return;
 
       /* But do write the gAMA and cHRM chunks from the profile. */
@@ -687,7 +687,7 @@ png_set_text(png_structrp png_ptr, png_inforp info_ptr,
    int ret;
    ret = png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
 
-   if (ret)
+   if (ret != 0)
       png_error(png_ptr, "Insufficient memory to store text");
 }
 
@@ -857,7 +857,7 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
          textp->text = textp->key + key_len + 1;
       }
 
-      if (text_length)
+      if (text_length != 0)
          memcpy(textp->text, text_ptr[i].text, text_length);
 
       *(textp->text + text_length) = '\0';
@@ -1397,7 +1397,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
     * required because add_one_chunk above doesn't extend the list if the 'keep'
     * parameter is the default.
     */
-   if (keep)
+   if (keep != 0)
    {
       new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
           5 * (num_chunks + old_num_chunks)));
@@ -1493,7 +1493,7 @@ png_set_rows(png_const_structrp png_ptr, png_inforp info_ptr,
 
    info_ptr->row_pointers = row_pointers;
 
-   if (row_pointers)
+   if (row_pointers != NULL)
       info_ptr->valid |= PNG_INFO_IDAT;
 }
 #endif
@@ -1607,7 +1607,7 @@ png_set_benign_errors(png_structrp png_ptr, int allowed)
     * is the default behavior if png_set_benign_errors() is not called).
     */
 
-   if (allowed)
+   if (allowed != 0)
       png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN |
          PNG_FLAG_APP_WARNINGS_WARN | PNG_FLAG_APP_ERRORS_WARN;
 

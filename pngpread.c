@@ -49,7 +49,7 @@ png_process_data_pause(png_structrp png_ptr, int save)
       /* It's easiest for the caller if we do the save, then the caller doesn't
        * have to supply the same data again:
        */
-      if (save)
+      if (save != 0)
          png_push_save_buffer(png_ptr);
       else
       {
