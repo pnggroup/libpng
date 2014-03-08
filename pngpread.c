@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.6.10 [March 6, 1014]]
+ * Last changed in libpng 1.6.11 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -49,7 +49,7 @@ png_process_data_pause(png_structrp png_ptr, int save)
       /* It's easiest for the caller if we do the save, then the caller doesn't
        * have to supply the same data again:
        */
-      if (save)
+      if (save != 0)
          png_push_save_buffer(png_ptr);
       else
       {

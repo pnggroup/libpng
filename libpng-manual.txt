@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.11beta01 - March 7, 2014
+ libpng version 1.6.11beta01 - March 8, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.11beta01 - March 7, 2014
+ libpng versions 0.97, January 1998, through 1.6.11beta01 - March 8, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5408,6 +5408,9 @@ with an even number of lower-case hex digits (e.g., 0x00, 0xff, 0x0100).
 We prefer to use underscores in variable names rather than camelCase, except
 for a few type names that we inherit from zlib.h.
 
+We prefer "if (something != 0)" and "if (something == 0)"
+over "if (something)" and if "(!something)", respectively.
+
 We do not use the TAB character for indentation in the C sources.
 
 Lines do not exceed 80 characters.
@@ -5416,7 +5419,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-March 7, 2014
+March 8, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

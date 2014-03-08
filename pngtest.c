@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.9 [February 6, 2014]
+ * Last changed in libpng 1.6.11 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -359,7 +359,7 @@ pngtest_check_io_state(png_structp png_ptr, png_size_t data_length,
    default:
       err = 1;  /* uninitialized */
    }
-   if (err)
+   if (err != 0)
       png_error(png_ptr, "Bad I/O state or buffer size");
 }
 #endif
@@ -540,7 +540,7 @@ PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
       /* Make sure the caller isn't assuming zeroed memory. */
       memset(pinfo->pointer, 0xdd, pinfo->size);
 
-      if (verbose)
+      if (verbose != 0)
          printf("png_malloc %lu bytes at %p\n", (unsigned long)size,
             pinfo->pointer);
 
@@ -580,7 +580,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            if (pinfo)
+            if (pinfo != NULL)
                free(pinfo);
             pinfo = NULL;
             break;
@@ -597,10 +597,10 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    }
 
    /* Finally free the data. */
-   if (verbose)
+   if (verbose != 0)
       printf("Freeing %p\n", ptr);
 
-   if (ptr)
+   if (ptr != NULL)
       free(ptr);
    ptr = NULL;
 }
@@ -734,7 +734,7 @@ write_sTER_chunk(png_structp write_ptr)
 {
    png_byte sTER[5] = {115,  84,  69,  82, '\0'};
 
-   if (verbose)
+   if (verbose != 0)
       fprintf(STDERR, "\n stereo mode = %d\n", user_chunk_data.sTER_mode);
 
    png_write_chunk(write_ptr, sTER, &user_chunk_data.sTER_mode, 1);
@@ -747,7 +747,7 @@ write_vpAg_chunk(png_structp write_ptr)
 
    png_byte vpag_chunk_data[9];
 
-   if (verbose)
+   if (verbose != 0)
       fprintf(STDERR, " vpAg = %lu x %lu, units = %d\n",
         (unsigned long)user_chunk_data.vpAg_width,
         (unsigned long)user_chunk_data.vpAg_height,
@@ -938,7 +938,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 
-   if (strict)
+   if (strict != 0)
    {
       /* Treat png_benign_error() as errors on read */
       png_set_benign_errors(read_ptr, 0);
@@ -954,7 +954,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
        */
    }
 
-   else if (relaxed)
+   else if (relaxed != 0)
    {
       /* Allow application (pngtest) errors and warnings to pass */
       png_set_benign_errors(read_ptr, 1);
@@ -1254,7 +1254,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
          pngtest_check_text_support(read_ptr, text_ptr, num_text);
 
-         if (verbose)
+         if (verbose != 0)
          {
             int i;
 
@@ -1320,7 +1320,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       int num_unknowns = png_get_unknown_chunks(read_ptr, read_info_ptr,
          &unknowns);
 
-      if (num_unknowns)
+      if (num_unknowns != 0)
       {
          png_set_unknown_chunks(write_ptr, write_info_ptr, unknowns,
            num_unknowns);
@@ -1436,7 +1436,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
          pngtest_check_text_support(read_ptr, text_ptr, num_text);
 
-         if (verbose)
+         if (verbose != 0)
          {
             int i;
 
@@ -1480,7 +1480,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       int num_unknowns = png_get_unknown_chunks(read_ptr, end_info_ptr,
          &unknowns);
 
-      if (num_unknowns)
+      if (num_unknowns != 0)
       {
          png_set_unknown_chunks(write_ptr, write_end_info_ptr, unknowns,
            num_unknowns);
@@ -1521,7 +1521,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 
 #ifdef PNG_EASY_ACCESS_SUPPORTED
-   if (verbose)
+   if (verbose != 0)
    {
       png_uint_32 iwidth, iheight;
       iwidth = png_get_image_width(write_ptr, write_info_ptr);
@@ -1599,7 +1599,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 
 #ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
-   if (interlace_preserved) /* else the files will be changed */
+   if (interlace_preserved != 0) /* else the files will be changed */
    {
       for (;;)
       {
@@ -1638,7 +1638,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
               return (0);
          }
 
-         if (!num_in)
+         if (num_in == 0)
             break;
 
          if (memcmp(inbuf, outbuf, num_in))
@@ -1795,7 +1795,7 @@ main(int argc, char *argv[])
      exit(1);
    }
 
-   if (multiple)
+   if (multiple != 0)
    {
       int i;
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
