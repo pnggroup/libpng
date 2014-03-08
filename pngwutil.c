@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.5.18 [February 6, 2014]
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -825,7 +825,7 @@ png_write_IHDR(png_structp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->zstream.zfree = png_zfree;
    png_ptr->zstream.opaque = (voidpf)png_ptr;
 
-   if (!(png_ptr->do_filter))
+   if ((png_ptr->do_filter) == PNG_NO_FILTERS)
    {
       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE ||
           png_ptr->bit_depth < 8)
@@ -1149,7 +1149,7 @@ png_write_iCCP(png_structp png_ptr, png_const_charp name, int compression_type,
       profile_len = embedded_profile_len;
    }
 
-   if (profile_len)
+   if (profile_len != 0)
       profile_len = png_text_compress(png_ptr, profile,
           (png_size_t)profile_len, PNG_COMPRESSION_TYPE_BASE, &comp);
 
@@ -1162,7 +1162,7 @@ png_write_iCCP(png_structp png_ptr, png_const_charp name, int compression_type,
    png_write_chunk_data(png_ptr, (png_bytep)new_name,
        (png_size_t)(name_len + 2));
 
-   if (profile_len)
+   if (profile_len != 0)
    {
       png_write_compressed_data_out(png_ptr, &comp, profile_len);
    }
@@ -1620,7 +1620,7 @@ png_check_keyword(png_structp png_ptr, png_const_charp key, png_charpp new_key)
       }
    }
    *dp = '\0';
-   if (kwarn)
+   if (kwarn != 0)
       png_warning(png_ptr, "extra interior spaces removed from keyword");
 
    if (key_len == 0)
@@ -1672,7 +1672,7 @@ png_write_tEXt(png_structp png_ptr, png_const_charp key, png_const_charp text,
    png_write_chunk_data(png_ptr, (png_bytep)new_key,
        (png_size_t)(key_len + 1));
 
-   if (text_len)
+   if (text_len != 0)
       png_write_chunk_data(png_ptr, (png_const_bytep)text,
           (png_size_t)text_len);
 

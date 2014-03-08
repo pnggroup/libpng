@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.18 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -174,7 +174,7 @@ png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
 int
 png_user_version_check(png_structp png_ptr, png_const_charp user_png_ver)
 {
-   if (user_png_ver)
+   if (user_png_ver != NULL)
    {
       int i = 0;
 
@@ -658,13 +658,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.19beta02 - February 28, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.5.19beta02 - March 8, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.19beta02 - February 28, 2014\
+      return "libpng version 1.5.19beta02 - March 8, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1485,7 +1485,7 @@ png_pow10(int power)
       }
       while (power > 0);
 
-      if (recip) d = 1/d;
+      if (recip != 0) d = 1/d;
    }
    /* else power is 0 and d is 1 */
 
@@ -2003,7 +2003,7 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
             if (s00 >= (D >> 1))
                ++result;
 
-            if (negative)
+            if (negative != 0)
                result = -result;
 
             /* Check for overflow. */
@@ -2570,7 +2570,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
                double d = floor(65535*pow(ig/(double)max, gamma_val*.00001)+.5);
                sub_table[j] = (png_uint_16)d;
 #           else
-               if (shift)
+               if (shift != 0)
                   ig = (ig * 65535U + max_by_2)/max;
 
                sub_table[j] = png_gamma_16bit_correct(ig, gamma_val);
@@ -2586,7 +2586,7 @@ png_build_16bit_table(png_structp png_ptr, png_uint_16pp *ptable,
          {
             png_uint_32 ig = (j << (8-shift)) + i;
 
-            if (shift)
+            if (shift != 0)
                ig = (ig * 65535U + max_by_2)/max;
 
             sub_table[j] = (png_uint_16)ig;

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.5.18 [February 6, 2014]
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -209,7 +209,7 @@ png_crc_finish(png_structp png_ptr, png_uint_32 skip)
       png_crc_read(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
    }
 
-   if (i)
+   if (i != 0)
    {
       png_crc_read(png_ptr, png_ptr->zbuf, i);
    }
@@ -265,7 +265,7 @@ png_crc_error(png_structp png_ptr)
    /* The chunk CRC must be serialized in a single I/O call. */
    png_read_data(png_ptr, crc_bytes, 4);
 
-   if (need_crc)
+   if (need_crc != 0)
    {
       crc = png_get_uint_32(crc_bytes);
       return ((int)(crc != png_ptr->crc));
@@ -1318,7 +1318,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* Compression_type should always be zero */
    compression_type = *profile++;
 
-   if (compression_type)
+   if (compression_type != 0)
    {
       png_warning(png_ptr, "Ignoring nonzero compression type in iCCP chunk");
       compression_type = 0x00;  /* Reset it to zero (libpng-1.0.6 through 1.0.8
@@ -2318,7 +2318,7 @@ png_handle_tEXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_ptr->chunkdata = NULL;
    png_free(png_ptr, text_ptr);
 
-   if (ret)
+   if (ret != 0)
       png_warning(png_ptr, "Insufficient memory to process text chunk");
 }
 #endif
@@ -2448,7 +2448,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
 
-   if (ret)
+   if (ret != 0)
       png_error(png_ptr, "Insufficient memory to store zTXt chunk");
 }
 #endif
@@ -2628,7 +2628,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    png_free(png_ptr, png_ptr->chunkdata);
    png_ptr->chunkdata = NULL;
 
-   if (ret)
+   if (ret != 0)
       png_error(png_ptr, "Insufficient memory to store iTXt chunk");
 }
 #endif
@@ -3068,7 +3068,7 @@ png_combine_row(png_structp png_ptr, png_bytep dp, int display)
          }
 
          /* Work out the bytes to copy. */
-         if (display)
+         if (display != 0)
          {
             /* When doing the 'block' algorithm the pixel in the pass gets
              * replicated to adjacent pixels.  This is why the even (0,2,4,6)

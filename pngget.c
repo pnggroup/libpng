@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.5.15 [March 28, 2013]
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -652,7 +652,7 @@ png_get_gAMA(png_const_structp png_ptr, png_const_infop info_ptr,
    png_fixed_point igamma;
    png_uint_32 ok = png_get_gAMA_fixed(png_ptr, info_ptr, &igamma);
 
-   if (ok)
+   if (ok != 0)
       *file_gamma = png_float(png_ptr, igamma, "png_get_gAMA");
 
    return ok;

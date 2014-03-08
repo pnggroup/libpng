@@ -1,8 +1,8 @@
 
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Last changed in libpng 1.5.14 [January 24, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -193,7 +193,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
           * drop the decimal point.  If the number is a true zero handle that
           * here.
           */
-         if (output)
+         if (output != 0)
             *--end = '.';
          else if (number == 0) /* and !output */
             *--end = '0';

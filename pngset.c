@@ -1,8 +1,8 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.17 [June 27, 2013]
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.19 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -662,7 +662,7 @@ png_set_text(png_structp png_ptr, png_infop info_ptr, png_const_textp text_ptr,
    int ret;
    ret = png_set_text_2(png_ptr, info_ptr, text_ptr, num_text);
 
-   if (ret)
+   if (ret != 0)
       png_error(png_ptr, "Insufficient memory to store text");
 }
 
@@ -838,7 +838,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
          textp->text = textp->key + key_len + 1;
       }
 
-      if (text_length)
+      if (text_length != 0)
          png_memcpy(textp->text, text_ptr[i].text,
              (png_size_t)(text_length));
 
@@ -1223,7 +1223,7 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
 
    info_ptr->row_pointers = row_pointers;
 
-   if (row_pointers)
+   if (row_pointers != NULL)
       info_ptr->valid |= PNG_INFO_IDAT;
 }
 #endif
@@ -1287,7 +1287,7 @@ void PNGAPI
 png_set_chunk_cache_max (png_structp png_ptr,
    png_uint_32 user_chunk_cache_max)
 {
-    if (png_ptr)
+    if (png_ptr != NULL)
        png_ptr->user_chunk_cache_max = user_chunk_cache_max;
 }
 
@@ -1296,7 +1296,7 @@ void PNGAPI
 png_set_chunk_malloc_max (png_structp png_ptr,
     png_alloc_size_t user_chunk_malloc_max)
 {
-   if (png_ptr)
+   if (png_ptr != NULL)
       png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
 }
 #endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
@@ -1308,7 +1308,7 @@ png_set_benign_errors(png_structp png_ptr, int allowed)
 {
    png_debug(1, "in png_set_benign_errors");
 
-   if (allowed)
+   if (allowed != 0)
       png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
 
    else
@@ -1325,7 +1325,7 @@ png_set_check_for_invalid_index(png_structp png_ptr, int allowed)
 {
    png_debug(1, "in png_set_check_for_invalid_index");
 
-   if (allowed)
+   if (allowed != 0)
       png_ptr->num_palette_max = 0;
 
    else

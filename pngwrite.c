@@ -521,7 +521,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    /* Initialize zbuf - compression buffer */
    png_ptr->zbuf_size = PNG_ZBUF_SIZE;
 
-   if (!png_cleanup_needed)
+   if (png_cleanup_needed == 0)
    {
       png_ptr->zbuf = (png_bytep)png_malloc_warn(png_ptr,
           png_ptr->zbuf_size);
@@ -529,7 +529,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
          png_cleanup_needed = 1;
    }
 
-   if (png_cleanup_needed)
+   if (png_cleanup_needed != 0)
    {
        /* Clean up PNG structure and deallocate any memory. */
        png_free(png_ptr, png_ptr->zbuf);
@@ -765,7 +765,7 @@ png_write_row(png_structp png_ptr, png_const_bytep row)
    {
       png_do_write_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass);
       /* This should always get caught above, but still ... */
-      if (!(row_info.width))
+      if (row_info.width == 0)
       {
          png_write_finish_row(png_ptr);
          return;
@@ -865,7 +865,7 @@ png_write_flush(png_structp png_ptr)
             png_error(png_ptr, "zlib error");
       }
 
-      if (!(png_ptr->zstream.avail_out))
+      if ((png_ptr->zstream.avail_out) == 0)
       {
          /* Write the IDAT and reset the zlib output buffer */
          png_write_IDAT(png_ptr, png_ptr->zbuf, png_ptr->zbuf_size);
