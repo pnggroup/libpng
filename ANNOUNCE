@@ -1,5 +1,5 @@
 
-Libpng 1.6.11beta01 - March 8, 2014
+Libpng 1.6.11beta01 - March 9, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,8 +26,9 @@ Other information:
 
 Changes since the last public release (1.6.10):
 
-Version 1.6.11beta01 [March 8, 2014]
+Version 1.6.11beta01 [March 9, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
+  Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
