@@ -4875,9 +4875,10 @@ Version 1.6.10rc03 [March 4, 2014]
 Version 1.6.10 [March 6, 2014]
   No changes.
 
-Version 1.6.11beta01 [March 9, 2014]
+Version 1.6.11beta01 [March 16, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
+  Moved configuration information from the manual to the INSTALL file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

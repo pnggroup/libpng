@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "March 8, 2014"
+.TH LIBPNG 3 "March 16, 2014"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.11beta01
 .SH SYNOPSIS
@@ -504,7 +504,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.11beta01 - March 8, 2014
+ libpng version 1.6.11beta01 - March 16, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -515,7 +515,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.11beta01 - March 8, 2014
+ libpng versions 0.97, January 1998, through 1.6.11beta01 - March 16, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -558,7 +558,7 @@ This file describes how to use and modify the PNG reference library
 file, example.c is a good starting point for using the library, as
 it is heavily commented and should include everything most people
 will need.  We assume that libpng is already installed; see the
-INSTALL file for instructions on how to install libpng.
+INSTALL file for instructions on how to configure and install libpng.
 
 For examples of libpng usage, see the files "example.c", "pngtest.c",
 and the files in the "contrib" directory, all of which are included in
@@ -4297,8 +4297,9 @@ and matches the 8-bit format expected by typical display devices.
 The color/gray channels are not scaled (pre-multiplied) by the alpha
 channel and are suitable for passing to color management software.
 
-  b) As a value in the range 0..65535, contained in a 2-byte integer.  All
-channels can be converted to the original value by dividing by 65535; all
+  b) As a value in the range 0..65535, contained in a 2-byte integer, in
+the native byte order of the platform on which the application is running.
+All channels can be converted to the original value by dividing by 65535; all
 channels are linear.  Color channels use the RGB encoding (RGB end-points) of
 the sRGB specification.  This encoding is identified by the
 PNG_FORMAT_FLAG_LINEAR flag below.
@@ -4365,7 +4366,9 @@ First the single byte formats:
 Then the linear 2-byte formats.  When naming these "Y" is used to
 indicate a luminance (gray) channel.  The component order within the pixel
 is always the same - there is no provision for swapping the order of the
-components in the linear format.
+components in the linear format.  The components are 16-bit integers in
+the native byte order for your platform, and there is no provision for
+swapping the bytes to a different endian condition.
 
    PNG_FORMAT_LINEAR_Y PNG_FORMAT_FLAG_LINEAR
    PNG_FORMAT_LINEAR_Y_ALPHA
@@ -4430,7 +4433,7 @@ First the information about the samples.
     *
     * png_byte colormap[PNG_IMAGE_MAXIMUM_COLORMAP_COMPONENTS(sRGB_fmt)];
     *
-    * Alternatively use the PNG_IMAGE_COLORMAP_SIZE macro below to use the
+    * Alternatively, use the PNG_IMAGE_COLORMAP_SIZE macro below to use the
     * information from one of the png_image_begin_read_ APIs and dynamically
     * allocate the required memory.
     */
@@ -4459,9 +4462,16 @@ Information about the whole row, or whole image
    row.  For a color-mapped image this is the minimum number of bytes in a
    row.
 
+   If you need the stride measured in bytes, row_stride_bytes is
+   PNG_IMAGE_ROW_STRIDE(image) * PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)
+   plus any padding bytes that your application might need, for example
+   to start the next row on a 4-byte boundary.
+
   PNG_IMAGE_BUFFER_SIZE(image, row_stride)
     Returns the size, in bytes, of an image buffer given a png_image and a row
-    stride - the number of components to leave space for in each row.
+    stride - the number of components to leave space for in each row.  This
+    macro takes care of multiplying row_stride by PNG_IMAGE_PIXEL_COMONENT_SIZE
+    when the image has 2-byte components.
 
   PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB == 0x01
     This indicates the the RGB values of the in-memory bitmap do not
@@ -4590,14 +4600,11 @@ clears the newly allocated memory to zero; note that png_calloc(png_ptr, size)
 is not the same as the calloc(number, size) function provided by stdlib.h.
 There is limited support for certain systems with segmented memory
 architectures and the types of pointers declared by png.h match this; you
-will have to use appropriate pointers in your application.  Since it is
-unlikely that the method of handling memory allocation on a platform
-will change between applications, these functions must be modified in
-the library at compile time.  If you prefer to use a different method
-of allocating and freeing data, you can use png_create_read_struct_2() or
-png_create_write_struct_2() to register your own functions as described
-above.  These functions also provide a void pointer that can be retrieved
-via
+will have to use appropriate pointers in your application.  If you prefer
+to use a different method of allocating and freeing data, you can use
+png_create_read_struct_2() or png_create_write_struct_2() to register your
+own functions as described above.  These functions also provide a void
+pointer that can be retrieved via
 
     mem_ptr=png_get_mem_ptr(png_ptr);
 
@@ -4740,29 +4747,6 @@ the simpler ones to get an idea of how they work.  Try to find a similar
 transformation to the one you want to add and copy off of it.  More details
 can be found in the comments inside the code itself.
 
-.SS Configuring for 16-bit platforms
-
-You will want to look into zconf.h to tell zlib (and thus libpng) that
-it cannot allocate more then 64K at a time.  Even if you can, the memory
-won't be accessible.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
-
-.SS Configuring for DOS
-
-For DOS users who only have access to the lower 640K, you will
-have to limit zlib's memory usage via a png_set_compression_mem_level()
-call.  See zlib.h or zconf.h in the zlib library for more information.
-
-.SS Configuring for Medium Model
-
-Libpng's support for medium model has been tested on most of the popular
-compilers.  Make sure MAXSEG_64K gets defined, USE_FAR_KEYWORD gets
-defined, and FAR gets defined to far in pngconf.h, and you should be
-all set.  Everything in the library (except for zlib's structure) is
-expecting far data.  You must use the typedefs with the p or pp on
-the end for pointers (or at least look at them and be careful).  Make
-note that the rows of data are defined as png_bytepp, which is
-an "unsigned char far * far *".
-
 .SS Configuring for gui/windowing platforms:
 
 You will need to write new error and warning functions that use the GUI
@@ -4771,19 +4755,6 @@ warning functions at the time that png_create_*_struct() is called,
 in order to have them available during the structure initialization.
 They can be changed later via png_set_error_fn().  On some compilers,
 you may also have to change the memory allocators (png_malloc, etc.).
-
-.SS Configuring for compiler xxx:
-
-All includes for libpng are in pngconf.h.  If you need to add, change
-or delete an include, this is the place to do it.
-The includes that are not needed outside libpng are placed in pngpriv.h,
-which is only used by the routines inside libpng itself.
-The files in libpng proper only include pngpriv.h and png.h, which
-%14%in turn includes pngconf.h.
-in turn includes pngconf.h and, as of libpng-1.5.0, pnglibconf.h.
-As of libpng-1.5.0, pngpriv.h also includes three other private header
-files, pngstruct.h, pnginfo.h, and pngdebug.h, which contain material
-that previously appeared in the public headers.
 
 .SS Configuring zlib:
 
@@ -4924,46 +4895,6 @@ Note that the numbers above were invented purely for this example and
 are given only to help explain the function usage.  Little testing has
 been done to find optimum values for either the costs or the weights.
 
-.SS Removing unwanted object code
-
-There are a bunch of #define's in pngconf.h that control what parts of
-libpng are compiled.  All the defines end in _SUPPORTED.  If you are
-never going to use a capability, you can change the #define to #undef
-before recompiling libpng and save yourself code and data space, or
-you can turn off individual capabilities with defines that begin with
-PNG_NO_.
-
-In libpng-1.5.0 and later, the #define's are in pnglibconf.h instead.
-
-You can also turn all of the transforms and ancillary chunk capabilities
-off en masse with compiler directives that define
-PNG_NO_READ[or WRITE]_TRANSFORMS, or PNG_NO_READ[or WRITE]_ANCILLARY_CHUNKS,
-or all four,
-along with directives to turn on any of the capabilities that you do
-want.  The PNG_NO_READ[or WRITE]_TRANSFORMS directives disable the extra
-transformations but still leave the library fully capable of reading
-and writing PNG files with all known public chunks. Use of the
-PNG_NO_READ[or WRITE]_ANCILLARY_CHUNKS directive produces a library
-that is incapable of reading or writing ancillary chunks.  If you are
-not using the progressive reading capability, you can turn that off
-with PNG_NO_PROGRESSIVE_READ (don't confuse this with the INTERLACING
-capability, which you'll still have).
-
-All the reading and writing specific code are in separate files, so the
-linker should only grab the files it needs.  However, if you want to
-make sure, or if you are building a stand alone library, all the
-reading files start with "pngr" and all the writing files start with "pngw".
-The files that don't match either (like png.c, pngtrans.c, etc.)
-are used for both reading and writing, and always need to be included.
-The progressive reader is in pngpread.c
-
-If you are creating or distributing a dynamically linked library (a .so
-or DLL file), you should not remove or disable any parts of the library,
-as this will cause applications linked with different versions of the
-library to fail if they call functions not available in your library.
-The size of the library itself should not be an issue, because only
-those sections that are actually used will be loaded into memory.
-
 .SS Requesting debug printout
 
 The macro definition PNG_DEBUG can be used to request debugging
@@ -5000,17 +4931,6 @@ can still use PNG_DEBUG to control your own debugging:
 When PNG_DEBUG = 1, the macros are defined, but only png_debug statements
 having level = 0 will be printed.  There aren't any such statements in
 this version of libpng, but if you insert some they will be printed.
-
-.SS Prepending a prefix to exported symbols
-
-Starting with libpng-1.6.0, you can configure libpng (when using the
-"configure" script) to prefix all exported symbols by means of the
-configuration option "\-\-with\-libpng\-prefix=FOO_", where FOO_ can be any
-string beginning with a letter and containing only uppercase
-and lowercase letters, digits, and the underscore (i.e., a C language
-identifier).  This creates a set of macros in pnglibconf.h, so this is
-transparent to applications; their function calls get transformed by
-the macros to use the modified names.
 
 .SH VII.  MNG support
 
@@ -5478,172 +5398,6 @@ limits are now
 The png_set_option() function (and the "options" member of the png struct) was
 added to libpng-1.5.15.
 
-B. Changes to the build and configuration of libpng
-
-Details of internal changes to the library code can be found in the CHANGES
-file and in the GIT repository logs.  These will be of no concern to the vast
-majority of library users or builders; however, the few who configure libpng
-to a non-default feature set may need to change how this is done.
-
-There should be no need for library builders to alter build scripts if
-these use the distributed build support - configure or the makefiles -
-however, users of the makefiles may care to update their build scripts
-to build pnglibconf.h where the corresponding makefile does not do so.
-
-Building libpng with a non-default configuration has changed completely.
-The old method using pngusr.h should still work correctly even though the
-way pngusr.h is used in the build has been changed; however, library
-builders will probably want to examine the changes to take advantage of
-new capabilities and to simplify their build system.
-
-B.1 Specific changes to library configuration capabilities
-
-The library now supports a complete fixed point implementation and can
-thus be used on systems that have no floating point support or very
-limited or slow support.  Previously gamma correction, an essential part
-of complete PNG support, required reasonably fast floating point.
-
-As part of this the choice of internal implementation has been made
-independent of the choice of fixed versus floating point APIs and all the
-missing fixed point APIs have been implemented.
-
-The exact mechanism used to control attributes of API functions has
-changed.  A single set of operating system independent macro definitions
-is used and operating system specific directives are defined in
-pnglibconf.h
-
-As part of this the mechanism used to choose procedure call standards on
-those systems that allow a choice has been changed.  At present this only
-affects certain Microsoft (DOS, Windows) and IBM (OS/2) operating systems
-running on Intel processors.  As before, PNGAPI is defined where required
-to control the exported API functions; however, two new macros, PNGCBAPI
-and PNGCAPI, are used instead for callback functions (PNGCBAPI) and
-(PNGCAPI) for functions that must match a C library prototype (currently
-only png_longjmp_ptr, which must match the C longjmp function.)  The new
-approach is documented in pngconf.h
-
-Despite these changes, libpng 1.5.0 only supports the native C function
-calling standard on those platforms tested so far (__cdecl on Microsoft
-Windows).  This is because the support requirements for alternative
-calling conventions seem to no longer exist.  Developers who find it
-necessary to set PNG_API_RULE to 1 should advise the mailing list
-(png-mng-implement) of this and library builders who use Openwatcom and
-therefore set PNG_API_RULE to 2 should also contact the mailing list.
-
-A new test program, pngvalid, is provided in addition to pngtest.
-pngvalid validates the arithmetic accuracy of the gamma correction
-calculations and includes a number of validations of the file format.
-A subset of the full range of tests is run when "make check" is done
-(in the 'configure' build.)  pngvalid also allows total allocated memory
-usage to be evaluated and performs additional memory overwrite validation.
-
-Many changes to individual feature macros have been made. The following
-are the changes most likely to be noticed by library builders who
-configure libpng:
-
-1) All feature macros now have consistent naming:
-
-#define PNG_NO_feature turns the feature off
-#define PNG_feature_SUPPORTED turns the feature on
-
-pnglibconf.h contains one line for each feature macro which is either:
-
-#define PNG_feature_SUPPORTED
-
-if the feature is supported or:
-
-/*#undef PNG_feature_SUPPORTED*/
-
-if it is not.  Library code consistently checks for the 'SUPPORTED' macro.
-It does not, and libpng applications should not, check for the 'NO' macro
-which will not normally be defined even if the feature is not supported.
-The 'NO' macros are only used internally for setting or not setting the
-corresponding 'SUPPORTED' macros.
-
-Compatibility with the old names is provided as follows:
-
-PNG_INCH_CONVERSIONS turns on PNG_INCH_CONVERSIONS_SUPPORTED
-
-And the following definitions disable the corresponding feature:
-
-PNG_SETJMP_NOT_SUPPORTED disables SETJMP
-PNG_READ_TRANSFORMS_NOT_SUPPORTED disables READ_TRANSFORMS
-PNG_NO_READ_COMPOSITED_NODIV disables READ_COMPOSITE_NODIV
-PNG_WRITE_TRANSFORMS_NOT_SUPPORTED disables WRITE_TRANSFORMS
-PNG_READ_ANCILLARY_CHUNKS_NOT_SUPPORTED disables READ_ANCILLARY_CHUNKS
-PNG_WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED disables WRITE_ANCILLARY_CHUNKS
-
-Library builders should remove use of the above, inconsistent, names.
-
-2) Warning and error message formatting was previously conditional on
-the STDIO feature. The library has been changed to use the
-CONSOLE_IO feature instead. This means that if CONSOLE_IO is disabled
-the library no longer uses the printf(3) functions, even though the
-default read/write implementations use (FILE) style stdio.h functions.
-
-3) Three feature macros now control the fixed/floating point decisions:
-
-PNG_FLOATING_POINT_SUPPORTED enables the floating point APIs
-
-PNG_FIXED_POINT_SUPPORTED enables the fixed point APIs; however, in
-practice these are normally required internally anyway (because the PNG
-file format is fixed point), therefore in most cases PNG_NO_FIXED_POINT
-merely stops the function from being exported.
-
-PNG_FLOATING_ARITHMETIC_SUPPORTED chooses between the internal floating
-point implementation or the fixed point one.  Typically the fixed point
-implementation is larger and slower than the floating point implementation
-on a system that supports floating point; however, it may be faster on a
-system which lacks floating point hardware and therefore uses a software
-emulation.
-
-4) Added PNG_{READ,WRITE}_INT_FUNCTIONS_SUPPORTED.  This allows the
-functions to read and write ints to be disabled independently of
-PNG_USE_READ_MACROS, which allows libpng to be built with the functions
-even though the default is to use the macros - this allows applications
-to choose at app buildtime whether or not to use macros (previously
-impossible because the functions weren't in the default build.)
-
-B.2 Changes to the configuration mechanism
-
-Prior to libpng-1.5.0 library builders who needed to configure libpng
-had either to modify the exported pngconf.h header file to add system
-specific configuration or had to write feature selection macros into
-pngusr.h and cause this to be included into pngconf.h by defining
-PNG_USER_CONFIG. The latter mechanism had the disadvantage that an
-application built without PNG_USER_CONFIG defined would see the
-unmodified, default, libpng API and thus would probably fail to link.
-
-These mechanisms still work in the configure build and in any makefile
-build that builds pnglibconf.h, although the feature selection macros
-have changed somewhat as described above.  In 1.5.0, however, pngusr.h is
-processed only once, when the exported header file pnglibconf.h is built.
-pngconf.h no longer includes pngusr.h, therefore pngusr.h is ignored after the
-build of pnglibconf.h and it is never included in an application build.
-
-The rarely used alternative of adding a list of feature macros to the
-CPPFLAGS setting in the build also still works; however, the macros will be
-copied to pnglibconf.h and this may produce macro redefinition warnings
-when the individual C files are compiled.
-
-All configuration now only works if pnglibconf.h is built from
-scripts/pnglibconf.dfa.  This requires the program awk.  Brian Kernighan
-(the original author of awk) maintains C source code of that awk and this
-and all known later implementations (often called by subtly different
-names - nawk and gawk for example) are adequate to build pnglibconf.h.
-The Sun Microsystems (now Oracle) program 'awk' is an earlier version
-and does not work; this may also apply to other systems that have a
-functioning awk called 'nawk'.
-
-Configuration options are now documented in scripts/pnglibconf.dfa.  This
-file also includes dependency information that ensures a configuration is
-consistent; that is, if a feature is switched off dependent features are
-also removed.  As a recommended alternative to using feature macros in
-pngusr.h a system builder may also define equivalent options in pngusr.dfa
-(or, indeed, any file) and add that to the configuration by setting
-DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
-how to do this, and a case where pngusr.h is still required.
-
 .SH XII.  Changes to Libpng from version 1.5.x to 1.6.x
 
 A "simplified API" has been added (see documentation in png.h and a simple
@@ -5924,7 +5678,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-March 8, 2014
+March 16, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6221,7 +5975,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.11beta01 - March 8, 2014:
+Libpng version 1.6.11beta01 - March 16, 2014:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6244,7 +5998,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.11beta01, March 8, 2014, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.11beta01, March 16, 2014, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6343,7 +6097,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-March 8, 2014
+March 16, 2014
 
 .\" end of man page
 
