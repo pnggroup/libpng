@@ -4210,8 +4210,9 @@ Version 1.5.19beta01 [February 26, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
 
-Version 1.5.19beta02 [March 8, 2014]
+Version 1.5.19beta02 [March 17, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
+  Moved configuration information from the manual to the INSTALL file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
