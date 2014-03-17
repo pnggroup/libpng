@@ -95,8 +95,8 @@ If you want to use "cmake" (see www.cmake.org), type
 V. Directory structure
 
 You can rename the directories that you downloaded (they
-might be called "libpng-x.y.z" or "libpngNN" and "zlib-1.2.7"
-or "zlib127") so that you have directories called "zlib" and "libpng".
+might be called "libpng-x.y.z" or "libpngNN" and "zlib-1.2.8"
+or "zlib128") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
@@ -282,15 +282,6 @@ builders will probably want to examine the changes to take advantage of
 new capabilities and to simplify their build system.
 
 A. Specific changes to library configuration capabilities
-
-The library now supports a complete fixed point implementation and can
-thus be used on systems that have no floating point support or very
-limited or slow support.  Previously gamma correction, an essential part
-of complete PNG support, required reasonably fast floating point.
-
-As part of this the choice of internal implementation has been made
-independent of the choice of fixed versus floating point APIs and all the
-missing fixed point APIs have been implemented.
 
 The exact mechanism used to control attributes of API functions has
 changed.  A single set of operating system independent macro definitions

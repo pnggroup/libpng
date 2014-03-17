@@ -5398,6 +5398,18 @@ limits are now
 The png_set_option() function (and the "options" member of the png struct) was
 added to libpng-1.5.15.
 
+The library now supports a complete fixed point implementation and can
+thus be used on systems that have no floating point support or very
+limited or slow support.  Previously gamma correction, an essential part
+of complete PNG support, required reasonably fast floating point.
+
+As part of this the choice of internal implementation has been made
+independent of the choice of fixed versus floating point APIs and all the
+missing fixed point APIs have been implemented.
+
+The exact mechanism used to control attributes of API functions has
+changed, as described in the INSTALL file.
+
 A new test program, pngvalid, is provided in addition to pngtest.
 pngvalid validates the arithmetic accuracy of the gamma correction
 calculations and includes a number of validations of the file format.
