@@ -432,6 +432,7 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
 
    /* Write end of PNG file */
    png_write_IEND(png_ptr);
+
    /* This flush, added in libpng-1.0.8, removed from libpng-1.0.9beta03,
     * and restored again in libpng-1.2.30, may cause some applications that
     * do not set png_ptr->output_flush_fn to crash.  If your application
@@ -479,7 +480,7 @@ png_create_write_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 {
 #ifndef PNG_USER_MEM_SUPPORTED
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
-      error_fn, warn_fn, NULL, NULL, NULL);
+       error_fn, warn_fn, NULL, NULL, NULL);
 #else
    return png_create_write_struct_2(user_png_ver, error_ptr, error_fn,
        warn_fn, NULL, NULL, NULL);
@@ -492,7 +493,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
 {
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
-      error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
+       error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
 #endif /* PNG_USER_MEM_SUPPORTED */
    if (png_ptr != NULL)
    {
@@ -525,10 +526,10 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
        * applications that must not fail to write at all costs!
        */
 #ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
-      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
       /* In stable builds only warn if an application error can be completely
        * handled.
        */
+      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
 #endif
 
       /* App warnings are warnings in release (or release candidate) builds but

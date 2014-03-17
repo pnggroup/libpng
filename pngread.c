@@ -3317,11 +3317,11 @@ png_image_read_composite(png_voidp argument)
  * PNG_COMPOSITE
  * PNG_GAMMA
  *
- * This is a work-round for the fact that both the PNG_RGB_TO_GRAY and
+ * This is a work-around for the fact that both the PNG_RGB_TO_GRAY and
  * PNG_COMPOSITE code performs gamma correction, so we get double gamma
- * correction.  The fix-up is to prevent the PNG_COMPOSITE operation happening
- * inside libpng, so this routine sees an 8 or 16-bit gray+alpha row and handles
- * the removal or pre-multiplication of the alpha channel.
+ * correction.  The fix-up is to prevent the PNG_COMPOSITE operation from
+ * happening inside libpng, so this routine sees an 8 or 16-bit gray+alpha
+ * row and handles the removal or pre-multiplication of the alpha channel.
  */
 static int
 png_image_read_background(png_voidp argument)
