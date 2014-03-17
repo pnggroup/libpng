@@ -6776,14 +6776,13 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
           *  conversion adds another +/-2 in the 16-bit case and
           *  +/-(1<<(15-PNG_MAX_GAMMA_8)) in the 8-bit case.
           */
-         that->pm->limit += pow(
 #           if PNG_MAX_GAMMA_8 < 14
-               (that->this.bit_depth == 16 ? 8. :
-                  6. + (1<<(15-PNG_MAX_GAMMA_8)))
+         that->pm->limit += pow((that->this.bit_depth == 16 ? 8. :
+                  6. + (1<<(15-PNG_MAX_GAMMA_8)))/65535, data.gamma);
 #           else
-               8.
+         that->pm->limit += pow((that->this.bit_depth == 16 ? 8. :
+                  8. + (1<<(15-PNG_MAX_GAMMA_8)))/65535, data.gamma);
 #           endif
-               /65535, data.gamma);
       }
 
       else
@@ -6801,13 +6800,11 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
           * internal calculation errors, not the actual limit imposed by
           * pngvalid on the output errors.
           */
-         that->pm->limit += pow(
 #           if DIGITIZE
-               1.1
+         that->pm->limit += pow(1.1 /255, data.gamma);
 #           else
-               1.
+         that->pm->limit += pow(1.0 /255, data.gamma);
 #           endif
-               /255, data.gamma);
       }
    }
 
