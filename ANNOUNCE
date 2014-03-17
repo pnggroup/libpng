@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta34 - March 9, 2014
+Libpng 1.7.0beta34 - March 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -565,11 +565,12 @@ Version 1.7.0beta33 [February 27, 2014]
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
 
-Version 1.7.0beta34 [March 9, 2014]
+Version 1.7.0beta34 [March 17, 2014]
   Treat CRC error handling with png_set_crc_action(), instead of with
     png_set_benign_errors(), which has been the case since libpng-1.6.0beta18.
   Use "if (value != 0)" instead of "if (value)" consistently.
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
+  Moved configuration information from the manual to the INSTALL file.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
