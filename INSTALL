@@ -395,6 +395,20 @@ pngusr.h a system builder may also define equivalent options in pngusr.dfa
 (or, indeed, any file) and add that to the configuration by setting
 DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
 how to do this, and a case where pngusr.h is still required.
+
+Configuring libpng for multiprocessing
+
+Libpng uses setjmp()/longjmp() for error handling.  Unfortunately setjmp()
+is known to be not thread-safe on some platforms and we don't know of
+any platform where it is guaranteed to be thread-safe.  Therefore, if
+your application is going to be using multiple threads, you should
+configure libpng with PNG_NO_SETJMP in your pngusr.dfa file, with
+-DPNG_NO_SETJMP on your compile line, or with
+
+  #undef PNG_SETJMP_SUPPORTED
+
+in your pnglibconf.h or pngusr.h.
+
 Other sources of information about libpng:
 
 Further information can be found in the README and libpng-manual.txt
