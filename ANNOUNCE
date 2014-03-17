@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta34 - March 17, 2014
+Libpng 1.7.0beta35 - March 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta34.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta34.tar.gz
+   1.7.0beta35.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta35.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b34.7z  (LZMA-compressed, recommended)
-   lp170b34.zip
+   lp170b35.7z  (LZMA-compressed, recommended)
+   lp170b35.zip
 
 Other information:
 
-   1.7.0beta34-README.txt
-   1.7.0beta34-LICENSE.txt
-   libpng-1.7.0beta34-*.asc (armored detached GPG signatures)
+   1.7.0beta35-README.txt
+   1.7.0beta35-LICENSE.txt
+   libpng-1.7.0beta35-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -571,6 +571,8 @@ Version 1.7.0beta34 [March 17, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
   Moved configuration information from the manual to the INSTALL file.
+
+Version 1.7.0beta35 [March 17, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
