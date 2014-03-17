@@ -4214,6 +4214,8 @@ Version 1.5.19beta02 [March 17, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
   Moved configuration information from the manual to the INSTALL file.
 
+Version 1.5.19beta03 [March 17, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
