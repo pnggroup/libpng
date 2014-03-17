@@ -12,10 +12,10 @@ Contents
  VII. Building with makefiles
 VIII. Configuring libpng for 16-bit platforms
   IX. Configuring for DOS
-  X. Configuring for Medium Model
+   X. Configuring for Medium Model
   XI. Prepending a prefix to exported symbols
  XII. Configuring for compiler xxx:
-XIII Removing unwanted object code
+XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
   XV. Configuring libpng for multiprocessing
  XVI. Other sources of information about libpng:

@@ -22,7 +22,7 @@
 /* WARNING: it is strongly recommended that you do not build libpng with
  * run-time checks for CPU features if at all possible.  In the case of the ARM
  * NEON instructions there is no processor-specific way of detecting the
- * presense of the required support, therefore run-time detectioon is extremely
+ * presence of the required support, therefore run-time detection is extremely
  * OS specific.
  *
  * You may set the macro PNG_ARM_NEON_FILE to the file name of file containing

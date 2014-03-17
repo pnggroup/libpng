@@ -145,8 +145,8 @@ config.sub configure depcomp install-sh ltmain.sh missing
 PNG_COPTS = @PNG_COPTS@
 AM_CFLAGS = ${PNG_COPTS}
 
-# DFNCPP is normally just CPP - the C preprocessor - but on Solaris and maybe
-# other operating systems (NeXT?) the C preprocessor selected by configure
+# DFNCPP is normally just "CPP -E" - the C preprocessor - but on Solaris and
+# maybe other operating systems (NeXT?) the C preprocessor selected by configure
 # checks input tokens for validity - effectively it performs part of the ANSI-C
 # parsing - and therefore fails with the .df files.  configure.ac has special
 # checks for this and sets DFNCPP appropriately.

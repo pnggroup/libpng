@@ -79,7 +79,7 @@ fi
 
 # This is a remnant of the old cc -E validation, where it may have been
 # necessary to use a different preprocessor for .dfn files
-DFNCPP="$CPP"
+DFNCPP="$CPP -E"
 AC_SUBST(DFNCPP)
 
 # -Werror cannot be passed to GCC in CFLAGS because configure will fail (it
@@ -294,7 +294,7 @@ AM_CONDITIONAL(HAVE_LD_VERSION_SCRIPT, test "$have_ld_version_script" = "yes")
 if test "$have_ld_version_script" = "yes"; then
     AC_MSG_CHECKING([for symbol prefix])
     SYMBOL_PREFIX=`echo "PREFIX=__USER_LABEL_PREFIX__" \
-                  | ${CPP-${CC-gcc} -E} - 2>&1 \
+                  | ${DFNCPP-${CC-gcc -E}} - 2>&1 \
                   | ${EGREP-grep} "^PREFIX=" \
                   | ${SED-sed} -e "s:^PREFIX=::" -e "s:__USER_LABEL_PREFIX__::"`
     AC_SUBST(SYMBOL_PREFIX)
