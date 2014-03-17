@@ -4880,6 +4880,8 @@ Version 1.6.11beta01 [March 17, 2014]
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
   Moved configuration information from the manual to the INSTALL file.
 
+Version 1.6.11beta02 [March 17, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

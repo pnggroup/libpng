@@ -1,5 +1,5 @@
 
-Libpng 1.6.11beta01 - March 17, 2014
+Libpng 1.6.11beta02 - March 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.11beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.11beta01.tar.gz
+   1.6.11beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.11beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1611b01.7z  (LZMA-compressed, recommended)
-   lp1611b01.zip
+   lp1611b02.7z  (LZMA-compressed, recommended)
+   lp1611b02.zip
 
 Other information:
 
-   1.6.11beta01-README.txt
-   1.6.11beta01-LICENSE.txt
-   libpng-1.6.11beta01-*.asc (armored detached GPG signatures)
+   1.6.11beta02-README.txt
+   1.6.11beta02-LICENSE.txt
+   libpng-1.6.11beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.10):
 
@@ -30,6 +30,8 @@ Version 1.6.11beta01 [March 17, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
   Moved configuration information from the manual to the INSTALL file.
+
+Version 1.6.11beta02 [March 17, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
