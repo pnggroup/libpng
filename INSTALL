@@ -52,6 +52,7 @@ III. Using scripts/makefile*
 Instead, you can use one of the custom-built makefiles in the
 "scripts" directory
 
+    cp scripts/pnglibconf.h.prebuilt pnglibconf.h
     cp scripts/makefile.system makefile
     make test
     make install
@@ -155,7 +156,9 @@ Copy the file (or files) that you need from the
 scripts directory into this directory, for example
 
    MSDOS example: copy scripts\makefile.msc makefile
-   UNIX example:    cp scripts/makefile.std makefile
+                  copy scripts\pnglibconf.h.prebuilt pnglibconf.h
+   UNIX example:  cp scripts/makefile.std makefile
+                  cp scripts/pnglibconf.h.prebuilt pnglibconf.h
 
 Read the makefile to see if you need to change any source or
 target directories to match your preferences.
