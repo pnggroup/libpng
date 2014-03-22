@@ -58,6 +58,10 @@ CFLAGS=-O2 -Z -X- -w -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
 # -M  generate map file
 LDFLAGS=-M -L$(ZLIB_DIR) $(MODEL_ARG) $(LDEBUG)
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 ## Variables
 
 OBJS = \
@@ -111,8 +115,8 @@ LIBNAME=libpng$(MODEL).lib
 
 all: libpng pngtest
 
-# try !inlude scripts\pnglibconf.mak for more options
-pnglibconf.h: scripts\pnglibconf.h.prebuilt
+# try !include scripts\pnglibconf.mak for more options
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $< $@
 
 libpng: $(LIBNAME)

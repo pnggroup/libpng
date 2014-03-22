@@ -39,6 +39,9 @@ Version 1.6.11beta02 [March 22, 2014]
   $(CP) is now used alongside $(RM_F).  Also, use 'copy' instead
     of 'cp' where applicable, and applied other minor makefile changes.
   Don't warn about invalid dimensions exceeding user limits.
+  Allow an easy replacement of the default pre-built configuration
+    header with a custom header, via the make PNGLIBCONF_H_PREBUILT
+    macro.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
