@@ -38,6 +38,10 @@ LD=link
 LDFLAGS=/SUBSYSTEM:CONSOLE /NOLOGO
 CP=cp
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 O=.obj
 
 OBJS=png$(O) pngset$(O) pngget$(O) pngrutil$(O) pngtrans$(O) pngwutil$(O) \
@@ -46,8 +50,7 @@ pngrtran$(O) pngwtran$(O) pngrio$(O) pngwio$(O)
 
 all: test
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $< $@
 
 png$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h

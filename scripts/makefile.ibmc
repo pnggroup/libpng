@@ -28,6 +28,10 @@ CPPFLAGS = -I$(ZLIBINC)
 CFLAGS = -Mc -O2 -W3
 LDFLAGS =
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 # File extensions
 O=.obj
 A=.lib
@@ -46,8 +50,7 @@ LIBS = libpng$(A) $(ZLIBLIB)/zlib$(A)
 
 all: libpng$(A) pngtest$(E)
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $< $@
 
 libpng$(A): $(OBJS)

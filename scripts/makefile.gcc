@@ -30,6 +30,10 @@ LIBS = -lz -lm
 # File extensions
 EXEEXT =
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 # Variables
 OBJS =  png.o pngerror.o pngget.o pngmem.o pngpread.o \
 	pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \
@@ -38,8 +42,7 @@ OBJS =  png.o pngerror.o pngget.o pngmem.o pngpread.o \
 # Targets
 all: static
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $< $@
 
 .c.o:
