@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.11beta02 - March 17, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.11beta02 - March 22, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.11beta02 - March 17, 2014\
+      return "libpng version 1.6.11beta02 - March 22, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2435,44 +2435,45 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image width is zero in IHDR");
       error = 1;
    }
+   else if (width > PNG_UINT_31_MAX)
+   {
+      png_warning(png_ptr, "Invalid image width in IHDR");
+      error = 1;
+   }
+   else
+   {
+#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
+      if (width > png_ptr->user_width_max)
+#     else
+      if (width > PNG_USER_WIDTH_MAX)
+#     endif
+      {
+         png_warning(png_ptr, "Image width exceeds user limit in IHDR");
+         error = 1;
+      }
+   }
 
    if (height == 0)
    {
       png_warning(png_ptr, "Image height is zero in IHDR");
       error = 1;
    }
-
-#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (width > png_ptr->user_width_max)
-
-#  else
-   if (width > PNG_USER_WIDTH_MAX)
-#  endif
-   {
-      png_warning(png_ptr, "Image width exceeds user limit in IHDR");
-      error = 1;
-   }
-
-#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (height > png_ptr->user_height_max)
-#  else
-   if (height > PNG_USER_HEIGHT_MAX)
-#  endif
-   {
-      png_warning(png_ptr, "Image height exceeds user limit in IHDR");
-      error = 1;
-   }
-
-   if (width > PNG_UINT_31_MAX)
-   {
-      png_warning(png_ptr, "Invalid image width in IHDR");
-      error = 1;
-   }
-
-   if (height > PNG_UINT_31_MAX)
+   else if (height > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image height in IHDR");
       error = 1;
+   }
+   else
+   {
+#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
+      if (height > png_ptr->user_height_max)
+#     else
+      if (height > PNG_USER_HEIGHT_MAX)
+#     endif
+      {
+         png_warning(png_ptr, "Image height exceeds user limit in IHDR");
+         error = 1;
+      }
    }
 
    /* Check other values */
