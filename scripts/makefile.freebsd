@@ -39,6 +39,10 @@ DPADD+=		${LIBM} ${LIBZ}
 CPPFLAGS+=	-I. -I${ZLIBINC}
 CFLAGS+=	-W -Wall
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT= scripts/pnglibconf.h.prebuilt
+
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c
@@ -55,8 +59,7 @@ CLEANFILES= pngtest pngtest.o pngout.png
 test: pngtest
 	./pngtest
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	cp $< $@
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO

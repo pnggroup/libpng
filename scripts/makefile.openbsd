@@ -31,11 +31,14 @@ MAN=	libpng.3 libpngpf.3 png.5
 DOCS=	ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO \
 	libpng-manual.txt
 
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT= scripts/pnglibconf.h.prebuilt
+
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	cp $< $@
 
 pngtest.o:	pngtest.c
