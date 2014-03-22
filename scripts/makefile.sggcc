@@ -22,6 +22,7 @@ CC=gcc
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
 RANLIB=echo
+CP=cp
 RM_F=/bin/rm -f
 
 # Where make install puts libpng.a, libpng16.so, and libpng16/png.h
@@ -82,7 +83,7 @@ all: libpng.a pngtest shared libpng.pc libpng-config
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)

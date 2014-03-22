@@ -32,6 +32,7 @@ AR_RC = ar rc
 MKDIR_P = mkdir
 LN_SF = ln -sf
 RANLIB = ranlib
+CP = cp
 RM_F = rm -f
 AWK = awk
 SED = sed

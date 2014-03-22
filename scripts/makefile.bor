@@ -12,10 +12,11 @@
 ## Where zlib.h, zconf.h and zlib_MODEL.lib are
 ZLIB_DIR=..\zlib
 
-## Compiler, linker and lib stuff
+## Compiler, linker, librarian and other tools
 CC=bcc
 LD=bcc
 LIB=tlib
+CP=copy
 
 !ifndef MODEL
 MODEL=l
@@ -112,7 +113,7 @@ all: libpng pngtest
 
 # try !inlude scripts\pnglibconf.mak for more options
 pnglibconf.h: scripts\pnglibconf.h.prebuilt
-	copy scripts\pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 libpng: $(LIBNAME)
 

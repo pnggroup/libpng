@@ -36,6 +36,7 @@ CPPFLAGS=-I$(ZLIBINC)
 CFLAGS=-O2 -G$(CPU)$(CALLING) -Qip -Qunroll4 -nologo
 LD=link
 LDFLAGS=/SUBSYSTEM:CONSOLE /NOLOGO
+CP=cp
 
 O=.obj
 
@@ -47,7 +48,7 @@ all: test
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 png$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 	$(CC) $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)

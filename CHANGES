@@ -4885,6 +4885,8 @@ Version 1.6.11beta02 [March 22, 2014]
     they were handled improperly by Portland Group's PGI-14.1 - PGI-14.3
     when using its "__builtin_pow()" function.
   Silence 'unused parameter' build warnings (Cosmin).
+  $(CP) is now used alongside $(RM_F).  Also, use 'copy' instead
+    of 'cp' where applicable, and applied other minor makefile changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

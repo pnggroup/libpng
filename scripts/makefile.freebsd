@@ -13,7 +13,7 @@ LIB=		png
 SHLIB_MAJOR=	${SHLIB_VER}
 SHLIB_MINOR=	0
 NO_PROFILE=	YES
-NO_OBJ=          YES
+NO_OBJ=		YES
 
 # where make install puts libpng.a and png.h
 DESTDIR=	${PREFIX}
@@ -57,7 +57,7 @@ test: pngtest
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	cp $< $@
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
