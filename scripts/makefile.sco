@@ -25,6 +25,7 @@ AR_RC=ar rc
 MKDIR_P=mkdir
 LN_SF=ln -f -s
 RANLIB=echo
+CP=cp
 RM_F=/bin/rm -f
 
 # where make install puts libpng.a, $(OLDSO)*, and png.h
@@ -79,7 +80,7 @@ all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)

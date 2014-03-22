@@ -39,7 +39,7 @@ CLEANFILES+=pngtest.o pngtest pnglibconf.h
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	cp $< $@
 
 pngtest.o:	pngtest.c
 	${CC} -c ${CPPFLAGS} ${CFLAGS} ${.ALLSRC} -o ${.TARGET}

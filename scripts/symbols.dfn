@@ -11,9 +11,9 @@
 
 /* NOTE: making 'symbols.chk' checks both that the exported
  * symbols in the library don't change and (implicitly) that
- * scripts/pnglibconf.h.prebuilt is as expected.  If scripts/pnglibconf.h.prebuilt
- * is remade using scripts/pnglibconf.dfa then this checks the
- * .dfa file too.
+ * scripts/pnglibconf.h.prebuilt is as expected.
+ * If scripts/pnglibconf.h.prebuilt is remade using
+ * scripts/pnglibconf.dfa then this checks the .dfa file too.
  */
 
 #define PNG_EXPORTA(ordinal, type, name, args, attributes)\

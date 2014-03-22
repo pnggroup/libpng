@@ -21,6 +21,7 @@ ZLIBLIB = ../zlib
 CC = icc
 LD = ilink
 AR = ilib
+CP = copy
 RM = del
 
 CPPFLAGS = -I$(ZLIBINC)
@@ -47,7 +48,7 @@ all: libpng$(A) pngtest$(E)
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 libpng$(A): $(OBJS)
 	$(AR) -out:$@ $(OBJS)
