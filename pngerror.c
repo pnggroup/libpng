@@ -765,6 +765,9 @@ png_longjmp,(png_const_structrp png_ptr, int val),PNG_NORETURN)
 #ifdef PNG_SETJMP_SUPPORTED
    if (png_ptr && png_ptr->longjmp_fn && png_ptr->jmp_buf_ptr)
       png_ptr->longjmp_fn(*png_ptr->jmp_buf_ptr, val);
+#else
+   PNG_UNUSED(png_ptr)
+   PNG_UNUSED(val)
 #endif
 
    /* If control reaches this point, png_longjmp() must not return. The only

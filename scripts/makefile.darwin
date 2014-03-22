@@ -34,6 +34,7 @@ AR_RC=ar rc
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
 RANLIB=ranlib
+CP=cp
 RM_F=/bin/rm -f
 ARCH=-arch ppc -arch i386 -arch x86_64
 
@@ -80,7 +81,7 @@ all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)

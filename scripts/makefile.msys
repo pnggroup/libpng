@@ -37,6 +37,7 @@ CC = gcc
 LD = $(CC)
 AR_RC = ar rcs
 RANLIB = ranlib
+CP = cp
 RM_F = rm -rf
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
@@ -83,7 +84,7 @@ all: static shared
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<

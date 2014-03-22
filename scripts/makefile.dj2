@@ -19,6 +19,9 @@ LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 RANLIB=ranlib
 
+CP=cp
+RM_F=rm -f
+
 OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
 	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o pngwtran.o \
 	pngmem.o pngerror.o pngpread.o
@@ -30,7 +33,7 @@ all: libpng.a pngtest
 
 # see scripts/pnglibconf.mak for more options
 pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+	$(CP) $< $@
 
 libpng.a: $(OBJS)
 	ar rc $@  $(OBJS)
@@ -43,7 +46,7 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 clean:
-	rm -f *.o libpng.a pngtest pngout.png pnglibconf.h
+	$(RM_F) *.o libpng.a pngtest pngout.png pnglibconf.h
 
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
