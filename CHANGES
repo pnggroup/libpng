@@ -4880,7 +4880,7 @@ Version 1.6.11beta01 [March 17, 2014]
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
   Moved configuration information from the manual to the INSTALL file.
 
-Version 1.6.11beta02 [March 22, 2014]
+Version 1.6.11beta02 [March 25, 2014]
   Removed #if/#else/#endif from inside two pow() calls in pngvalid.c because
     they were handled improperly by Portland Group's PGI-14.1 - PGI-14.3
     when using its "__builtin_pow()" function.

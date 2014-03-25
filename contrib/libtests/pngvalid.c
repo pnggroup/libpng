@@ -386,9 +386,9 @@ next_format(png_bytep colour_type, png_bytep bit_depth,
 
    /* Palette images are restricted to 8 bit depth */
    if (*bit_depth <= 8
-#     ifdef DO_16BIT
+#ifdef DO_16BIT
          || (*colour_type != 3 && *bit_depth <= 16)
-#     endif
+#endif
       )
       return 1;
 
@@ -3155,10 +3155,10 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
       for (; i<256; ++i)
          tRNS[i] = 24;
 
-#     ifdef PNG_WRITE_tRNS_SUPPORTED
+#  ifdef PNG_WRITE_tRNS_SUPPORTED
          if (j > 0)
             png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
-#     endif
+#  endif
    }
 }
 
@@ -6777,13 +6777,13 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
           *  +/-(1<<(15-PNG_MAX_GAMMA_8)) in the 8-bit case.
           */
          that->pm->limit +=
-#           if PNG_MAX_GAMMA_8 < 14
-             pow((that->this.bit_depth == 16 ? 8. :
-                  6. + (1<<(15-PNG_MAX_GAMMA_8)))/65535, data.gamma);
-#           else
-             pow((that->this.bit_depth == 16 ? 8. :
-                  8. + (1<<(15-PNG_MAX_GAMMA_8)))/65535, data.gamma);
-#           endif
+#        if PNG_MAX_GAMMA_8 < 14
+               pow((that->this.bit_depth == 16 ?
+                  8. : 6. + (1<<(15-PNG_MAX_GAMMA_8)))/65535, data.gamma);
+#        else
+               pow((that->this.bit_depth == 16 ?
+                  8. : 8. + (1<<(15-PNG_MAX_GAMMA_8)))/65535, data.gamma);
+#        endif
       }
 
       else
@@ -6802,11 +6802,11 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
           * pngvalid on the output errors.
           */
          that->pm->limit +=
-#           if DIGITIZE
+#        if DIGITIZE
              pow(1.1 /255, data.gamma);
-#           else
+#        else
              pow(1.0 /255, data.gamma);
-#           endif
+#        endif
       }
    }
 
