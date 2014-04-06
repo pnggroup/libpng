@@ -4228,6 +4228,8 @@ Version 1.5.19beta03 [April 6, 2014]
   Fixed a typo in pngrutil.c, introduced in libpng-1.5.6, that interferes
     with "blocky" expansion of sub-8-bit interlaced PNG files.
 
+Version 1.5.19beta04 [April 6, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
