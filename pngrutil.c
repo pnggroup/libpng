@@ -3153,7 +3153,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 #        define S_MASKS(d,s) { S_MASK(0,d,s), S_MASK(1,d,s), S_MASK(2,d,s),\
             S_MASK(3,d,s), S_MASK(4,d,s), S_MASK(5,d,s) }
 
-#        define B_MASKS(d,s) { B_MASK(1,d,s), S_MASK(3,d,s), S_MASK(5,d,s) }
+#        define B_MASKS(d,s) { B_MASK(1,d,s), B_MASK(3,d,s), B_MASK(5,d,s) }
 
 #        define DEPTH_INDEX(d) ((d)==1?0:((d)==2?1:2))
 
@@ -3192,7 +3192,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 #endif /* !PNG_USE_COMPILE_TIME_MASKS */
 
          /* Use the appropriate mask to copy the required bits.  In some cases
-          * the byte mask will be 0 or 0xff, optimize these cases.  row_width is
+          * the byte mask will be 0 or 0xff; optimize these cases.  row_width is
           * the number of pixels, but the code copies bytes, so it is necessary
           * to special case the end.
           */
