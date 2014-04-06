@@ -979,15 +979,15 @@ png_push_process_row(png_structrp png_ptr)
 
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-   /* Blow up interlaced rows to full size */
+   /* Expand interlaced rows to full size */
    if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
          png_do_read_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass,
             png_ptr->transformations);
 
-    switch (png_ptr->pass)
-    {
+      switch (png_ptr->pass)
+      {
          case 0:
          {
             int i;

@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "March 25, 2014"
+.TH LIBPNG 3 "April 6, 2014"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.11beta03
+libpng \- Portable Network Graphics (PNG) Reference Library 1.6.11beta02
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -504,7 +504,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.11beta03 - March 25, 2014
+ libpng version 1.6.11beta02 - April 6, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -515,7 +515,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.11beta03 - March 25, 2014
+ libpng versions 0.97, January 1998, through 1.6.11beta02 - April 6, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5260,8 +5260,6 @@ does not account for any palette index used by ancillary chunks such as the
 bKGD chunk; you must check those separately to determine the maximum
 palette index actually used.
 
-A. Changes that affect users of libpng
-
 There are no substantial API changes between the non-deprecated parts of
 the 1.4.5 API and the 1.5.0 API; however, the ability to directly access
 members of the main libpng control structures, png_struct and png_info,
@@ -5633,7 +5631,8 @@ mailing list, or directly to glennrp.
 
 .SH XV. Coding style
 
-Our coding style is similar to the "Allman" style, with curly
+Our coding style is similar to the "Allman" style
+(See http://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
 braces on separate lines:
 
     if (condition)
@@ -5766,13 +5765,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-March 25, 2014
+April 6, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.11beta03 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.11beta02 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -6006,7 +6005,7 @@ the first widely used release:
  1.6.10beta01-03     16    10610  16.so.16.10[.0]
  1.6.10rc01-03       16    10610  16.so.16.10[.0]
  1.6.10              16    10610  16.so.16.10[.0]
- 1.6.11beta01-03     16    10611  16.so.16.11[.0]
+ 1.6.11beta01-02     16    10611  16.so.16.11[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -6063,7 +6062,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.11beta03 - March 25, 2014:
+Libpng version 1.6.11beta02 - April 6, 2014:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6086,7 +6085,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.11beta03, March 25, 2014, are
+libpng versions 1.2.6, August 15, 2004, through 1.6.11beta02, April 6, 2014, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6185,7 +6184,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-March 25, 2014
+April 6, 2014
 
 .\" end of man page
 
