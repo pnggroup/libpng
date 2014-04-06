@@ -46,7 +46,7 @@ $(AR) libpng.lib r $(OBJS)
 $(OBJS): pngpriv.h png.h pngconf.h pnglibconf.h pnginfo.h pngstruct.h pngdebug.h
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-COPY scripts/pnglibconf.h.prebuilt TO pnglibconf.h
+COPY $(PNGLIBCONF_H_PREBUILT) TO pnglibconf.h
 
 pngtest: pngtest.o libpng.lib
 $(LN) <WITH <
