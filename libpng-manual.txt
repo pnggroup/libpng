@@ -1,6 +1,6 @@
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.19beta03 - March 17, 2014
+ libpng version 1.5.19beta03 - April 6, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.19beta03 - March 17, 2014
+ libpng versions 0.97, January 1998, through 1.5.19beta03 - April 6, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -3689,6 +3689,8 @@ zlib.h for more information on what these mean.
 
     png_set_compression_method(png_ptr, method);
 
+This controls the size of the IDAT chunks (default 8192):
+
     png_set_compression_buffer_size(png_ptr, size);
 
 As of libpng version 1.5.4, additional APIs became
@@ -4150,8 +4152,6 @@ does not account for any palette index used by ancillary chunks such as the
 bKGD chunk; you must check those separately to determine the maximum
 palette index actually used.
 
-A. Changes that affect users of libpng
-
 There are no substantial API changes between the non-deprecated parts of
 the 1.4.5 API and the 1.5.0 API; however, the ability to directly access
 members of the main libpng control structures, png_struct and png_info,
@@ -4411,7 +4411,8 @@ mailing list, or directly to glennrp.
 
 XIII. Coding style
 
-Our coding style is similar to the "Allman" style, with curly
+Our coding style is similar to the "Allman" style
+(See http://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
 braces on separate lines:
 
     if (condition)
@@ -4530,7 +4531,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-March 17, 2014
+April 6, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
