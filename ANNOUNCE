@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta35 - April 6, 2014
+Libpng 1.7.0beta35 - April 10, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -112,7 +112,9 @@ Version 1.7.0alpha07 [January 10, 2013]
     programs to generate and test a PNG which should have the problem.
 
 Version 1.7.0alpha08 [January 17, 2013]
-  Corrected previous attempt at overflow detection in png_set_unknown_chunks().
+  Corrected previous attempt at overflow detection in png_set_unknown_chunks()
+  (CVE-2013-7353).  Added overflow detection in png_set_sPLT() and
+  png_set_text_2() (CVE-2013-7354).
 
 Version 1.7.0alpha09 [January 21, 2013]
   Pulled changes to multi-chunk handling from libpng-1.6.0beta40.
@@ -572,7 +574,7 @@ Version 1.7.0beta34 [March 17, 2014]
   Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
   Moved configuration information from the manual to the INSTALL file.
 
-Version 1.7.0beta35 [April 6, 2014]
+Version 1.7.0beta35 [April 10, 2014]
   Removed #if/#else/#endif from inside two pow() calls in pngvalid.c because
     they were handled improperly by Portland Group's PGI-14.1 - PGI-14.3
     when using its "__builtin_pow()" function.
