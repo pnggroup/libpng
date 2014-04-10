@@ -3969,7 +3969,7 @@ Version 1.5.14beta07 [January 6, 2012]
 
 Version 1.5.14beta08 [January 10, 2013]
   Check validity of "num_unknowns" parameter of png_set_unknown_chunks()
-    (Bug report from yuris).
+    (Bug report from yuris; later assigned CVE-2013-7353).
 
 Version 1.5.14rc01 [January 17, 2013]
   No changes.
@@ -3979,7 +3979,7 @@ Version 1.5.14rc02 [January 17, 2013]
 
 Version 1.5.14rc03 [January 18, 2013]
   Check the validity of the "nentries" parameter of png_set_sPLT() and the
-  "num_text" parameter of png_set_text_2().
+  "num_text" parameter of png_set_text_2() (CVE-2013-7354).
 
 Version 1.5.14 [January 24, 2013]
   Removed an obsolete line from the manual.
@@ -4226,9 +4226,9 @@ Version 1.5.19beta03 [April 6, 2014]
     header with a custom header, via the make PNGLIBCONF_H_PREBUILT
     macro.
   Fixed a typo in pngrutil.c, introduced in libpng-1.5.6, that interferes
-    with "blocky" expansion of sub-8-bit interlaced PNG files.
+    with "blocky" expansion of sub-8-bit interlaced PNG files (Eric Huss).
 
-Version 1.5.19beta04 [April 6, 2014]
+Version 1.5.19beta04 [April 10, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
