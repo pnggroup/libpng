@@ -4345,8 +4345,9 @@ Version 1.6.0beta37 [January 10, 2013]
     programs to generate and test a PNG which should have the problem.
 
 Version 1.6.0beta39 [January 19, 2013]
-  Again corrected attempt at overflow detection in png_set_unknown_chunks().
-  Added overflow detection in png_set_sPLT() and png_set_text_2().
+  Again corrected attempt at overflow detection in png_set_unknown_chunks()
+  (CVE-2013-7353).  Added overflow detection in png_set_sPLT() and
+  png_set_text_2() (CVE-2013-7354).
 
 Version 1.6.0beta40 [January 20, 2013]
   Use consistent handling of overflows in text, sPLT and unknown png_set_* APIs
@@ -4895,8 +4896,9 @@ Version 1.6.11beta02 [April 6, 2014]
 Version 1.6.11beta03 [April 6, 2014]
   Fixed a typo in pngrutil.c, introduced in libpng-1.5.6, that interferes
     with "blocky" expansion of sub-8-bit interlaced PNG files (Eric Huss).
+  Optionally use  __builtin_bswap16() in png_do_swap().
 
-Version 1.6.11beta04 [April 6, 2014]
+Version 1.6.11beta04 [April 10, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
