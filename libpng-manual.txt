@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.11beta04 - April 6, 2014
+ libpng version 1.6.11beta04 - April 13, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.11beta04 - April 6, 2014
+ libpng versions 0.97, January 1998, through 1.6.11beta04 - April 13, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5076,16 +5076,16 @@ Libpng-1.6.0 through 1.6.2 used the CMF bytes at the beginning of the IDAT
 stream to set the size of the sliding window for reading instead of using the
 default 32-kbyte sliding window size.  It was discovered that there are
 hundreds of PNG files in the wild that have incorrect CMF bytes that caused
-libpng to issue a "too far back" error and reject the file.  Libpng-1.6.3 and
-later calculate their own safe CMF from the image dimensions, provide a way
-to revert to the libpng-1.5.x behavior (ignoring the CMF bytes and using a
-32-kbyte sliding window), by using
+zlib to issue the "invalid distance too far back" error and reject the file.
+Libpng-1.6.3 and later calculate their own safe CMF from the image dimensions,
+provide a way to revert to the libpng-1.5.x behavior (ignoring the CMF bytes
+and using a 32-kbyte sliding window), by using
 
     png_set_option(png_ptr, PNG_MAXIMUM_INFLATE_WINDOW,
         PNG_OPTION_ON);
 
-and provide a tool (contrib/tools/pngfix) for optimizing the CMF bytes
-correctly.
+and provide a tool (contrib/tools/pngfix) for rewriting a PNG file while
+optimizing the CMF bytes in its IDAT chunk correctly.
 
 Libpng-1.6.0 and libpng-1.6.1 wrote uncompressed iTXt chunks with the wrong
 length, which resulted in PNG files that cannot be read beyond the bad iTXt
@@ -5261,7 +5261,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-April 6, 2014
+April 13, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
