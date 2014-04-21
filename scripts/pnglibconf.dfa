@@ -578,6 +578,8 @@ option COLORSPACE enables GAMMA disabled
 # PNG_sRGB_PROFILE_CHECKS setting controls how much work is done during the
 # check:
 #
+# -1: Don't do any sRGB profile checking.
+#
 # 0: Just validate the profile MD5 signature if present, otherwise use
 #    the checks in option 1.
 #
