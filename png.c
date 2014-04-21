@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.11beta04 - April 13, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.11beta04 - April 21, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.11beta04 - April 13, 2014\
+      return "libpng version 1.6.11beta04 - April 21, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2136,7 +2136,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 1; /* success, maybe with warnings */
 }
 
-#ifdef PNG_sRGB_SUPPORTED
+#if defined(PNG_sRGB_SUPPORTED) && PNG_sRGB_PROFILE_CHECKS >= 0
 /* Information about the known ICC sRGB profiles */
 static const struct
 {
@@ -2321,7 +2321,9 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
    /* Is this profile one of the known ICC sRGB profiles?  If it is, just set
     * the sRGB information.
     */
+#if PNG_sRGB_PROFILE_CHECKS >= 0
    if (png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler))
+#endif
       (void)png_colorspace_set_sRGB(png_ptr, colorspace,
          (int)/*already checked*/png_get_uint_32(profile+64));
 }
