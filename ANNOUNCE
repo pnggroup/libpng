@@ -1,5 +1,5 @@
 
-Libpng 1.6.11beta05 - April 21, 2014
+Libpng 1.6.11beta05 - April 24, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -55,7 +55,8 @@ Version 1.6.11beta04 [April 19, 2014]
     when png_combine_row is not used or not built,
   Allow PNG_sRGB_PROFILE_CHECKING = (-1) to mean no sRGB profile checking.
 
-Version 1.6.11beta05 [April 21, 2014]
+Version 1.6.11beta05 [April 24, 2014]
+  Do not reject ICC V2 profiles that lack padding.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

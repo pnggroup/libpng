@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.11beta05 - April 21, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.11beta05 - April 24, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.11beta05 - April 21, 2014\
+      return "libpng version 1.6.11beta05 - April 24, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1906,10 +1906,6 @@ png_icc_check_length(png_const_structrp png_ptr, png_colorspacerp colorspace,
       return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
          "too short");
 
-   if (profile_length & 3)
-      return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
-         "invalid length");
-
    return 1;
 }
 
@@ -1929,6 +1925,11 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    if (temp != profile_length)
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "length does not match profile");
+
+   temp = (png_uint_32) (*(profile+8));
+   if (temp > 3 && (profile_length & 3))
+      return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
+         "invalid length");
 
    temp = png_get_uint_32(profile+128); /* tag count: 12 bytes/tag */
    if (temp > 357913930 || /* (2^32-4-132)/12: maximum possible tag count */
@@ -2044,7 +2045,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
             "invalid embedded Abstract ICC profile");
 
       case 0x6C696E6B: /* 'link' */
-         /* DeviceLink profiles cannnot be interpreted in a non-device specific
+         /* DeviceLink profiles cannot be interpreted in a non-device specific
           * fashion, if an app uses the AToB0Tag in the profile the results are
           * undefined unless the result is sent to the intended device,
           * therefore a DeviceLink profile should not be found embedded in a
@@ -2055,7 +2056,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
 
       case 0x6E6D636C: /* 'nmcl' */
          /* A NamedColor profile is also device specific, however it doesn't
-          * contain an AToB0 tag that is open to misintrepretation.  Almost
+          * contain an AToB0 tag that is open to misinterpretation.  Almost
           * certainly it will fail the tests below.
           */
          (void)png_icc_profile_error(png_ptr, NULL, name, temp,
