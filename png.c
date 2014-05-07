@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.11beta06 - April 26, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.11beta06 - May 7, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.11beta06 - April 26, 2014\
+      return "libpng version 1.6.11beta06 - May 7, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2211,11 +2211,18 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
     * by sRGB (but maybe defined by a later ICC specification) the read of
     * the profile will fail at that point.
     */
+
+   /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
+   if (((png_ptr->options >> PNG_SKIP_sRGB_CHECK_PROFILE) & 3) ==
+               PNG_OPTION_ON)
+   return 0;
+
    png_uint_32 length = 0;
    png_uint_32 intent = 0x10000; /* invalid */
 #if PNG_sRGB_PROFILE_CHECKS > 1
    uLong crc = 0; /* the value for 0 length data */
 #endif
+
    unsigned int i;
 
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
