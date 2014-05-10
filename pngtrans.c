@@ -328,6 +328,9 @@ png_do_swap(png_row_infop row_info, png_bytep row)
       for (i = 0; i < istop; i++, rp += 2)
       {
 #ifdef PNG_BUILTIN_BSWAP16_SUPPORTED
+         /* Feature added to libpng-1.6.11 for testing purposes, not
+          * enabled by default.
+          */
          *(png_uint_16*)rp = __builtin_bswap16(*(png_uint_16*)rp);
 #else
          png_byte t = *rp;
