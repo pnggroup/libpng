@@ -580,19 +580,19 @@ option COLORSPACE enables GAMMA disabled
 #
 # -1: Don't do any sRGB profile checking.
 #
-# 0: Just validate the profile MD5 signature if present, otherwise use
-#    the checks in option 1.
+#  0: Just validate the profile MD5 signature if present, otherwise use
+#     the checks in option 1.
 #
-# 1: Additionally check the length, intent and adler32 checksum of the
-#    actual data.   If enabled this will reject known profiles that have
-#    had the rendering intent in the header changed as well as other edits
-#    done without updating the checksum.  See the discussion below.
+#  1: Additionally check the length, intent and adler32 checksum of the
+#     actual data.   If enabled this will reject known profiles that have
+#     had the rendering intent in the header changed as well as other edits
+#     done without updating the checksum.  See the discussion below.
 #
-# 2: Additionally checksum all the data using the ethernet CRC32 algorithm.
-#    This makes it more difficult to fake profiles and makes it less likely
-#    to get a false positive on profiles with no signature, but is probably
-#    just a waste of time since all currently approved ICC sRGB profiles have
-#    a secure MD5 signature.
+#  2: Additionally checksum all the data using the ethernet CRC32 algorithm.
+#     This makes it more difficult to fake profiles and makes it less likely
+#     to get a false positive on profiles with no signature, but is probably
+#     just a waste of time since all currently approved ICC sRGB profiles have
+#     a secure MD5 signature.
 #
 # The rendering intent.  An ICC profile stores an intended rendering intent,
 # but does not include the value in the signature.  The intent is documented

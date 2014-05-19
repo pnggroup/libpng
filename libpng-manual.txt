@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.11beta06 - May 10, 2014
+ libpng version 1.6.11beta06 - May 19, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.11beta06 - May 10, 2014
+ libpng versions 0.97, January 1998, through 1.6.11beta06 - May 19, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5042,8 +5042,10 @@ very old broken Microsoft/HP 3144-byte sRGB profile.  Starting with
 libpng-1.6.11, recognizing and checking sRGB profiles can be avoided by
 means of
 
-    png_set_option(ping, PNG_SKIP_sRGB_CHECK_PROFILE,
-        PNG_OPTION_ON);
+    #ifdef PNG_SKIP_sRGB_CHECK_PROFILE
+       png_set_option(ping, PNG_SKIP_sRGB_CHECK_PROFILE,
+           PNG_OPTION_ON);
+    #endif
 
 It's not a good idea to do this if you are using the "simplified API",
 which needs to be able to recognize an sRGB profile conveyed via the iCCP
@@ -5273,7 +5275,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-May 10, 2014
+May 19, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

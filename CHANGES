@@ -4913,7 +4913,7 @@ Version 1.6.11beta05 [April 26, 2014]
     "Not recognizing known sRGB profile that has been edited" warning for
     ICC V2 profiles that lack the MD5 signature in the profile header.
 
-Version 1.6.11beta06 [May 10, 2014]
+Version 1.6.11beta06 [May 19, 2014]
   Added PNG_SKIP_sRGB_CHECK_PROFILE choice for png_set_option().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
