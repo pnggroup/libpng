@@ -17,12 +17,6 @@
  */
 
 #define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-	PNG_DFN "@" name "@ @@" ordinal "@"
-#define PNG_REMOVED(ordinal, type, name, args, attributes)\
-	PNG_DFN "; @" name "@ @@" ordinal "@"
-#define PNG_EXPORT_LAST_ORDINAL(ordinal)\
-
-#define PNG_EXPORTA(ordinal, type, name, args, attributes)\
         PNG_DFN "@" name "@ @@" ordinal "@"
 #define PNG_REMOVED(ordinal, type, name, args, attributes)\
         PNG_DFN "; @" name "@ @@" ordinal "@"
