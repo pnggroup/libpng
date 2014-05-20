@@ -4916,6 +4916,8 @@ Version 1.6.11beta05 [April 26, 2014]
 Version 1.6.11beta06 [May 19, 2014]
   Added PNG_SKIP_sRGB_CHECK_PROFILE choice for png_set_option().
 
+Version 1.6.11beta07 [May 20, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
