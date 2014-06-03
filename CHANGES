@@ -4919,6 +4919,9 @@ Version 1.6.11beta06 [May 19, 2014]
 Version 1.6.11rc01 [May 27, 2014]
   No changes.
 
+Version 1.6.11rc02 [June 3, 2014]
+  Test ZLIB_VERNUM instead of PNG_ZLIB_VERNUM in contrib/tools/pngfix.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
