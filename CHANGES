@@ -4885,13 +4885,13 @@ Version 1.6.11beta02 [April 6, 2014]
   Removed #if/#else/#endif from inside two pow() calls in pngvalid.c because
     they were handled improperly by Portland Group's PGI-14.1 - PGI-14.3
     when using its "__builtin_pow()" function.
-  Silence 'unused parameter' build warnings (Cosmin).
-  $(CP) is now used alongside $(RM_F).  Also, use 'copy' instead
-    of 'cp' where applicable, and applied other minor makefile changes.
-  Don't warn about invalid dimensions exceeding user limits.
+  Silence 'unused parameter' build warnings (Cosmin Truta).
+  $(CP) is now used alongside $(RM_F).  Also, use 'copy' instead of 'cp'
+    where applicable, and applied other minor makefile changes (Cosmin).
+  Don't warn about invalid dimensions exceeding user limits (Cosmin).
   Allow an easy replacement of the default pre-built configuration
     header with a custom header, via the make PNGLIBCONF_H_PREBUILT
-    macro.
+    macro (Cosmin).
 
 Version 1.6.11beta03 [April 6, 2014]
   Fixed a typo in pngrutil.c, introduced in libpng-1.5.6, that interferes
@@ -4921,6 +4921,9 @@ Version 1.6.11rc01 [May 27, 2014]
 
 Version 1.6.11rc02 [June 3, 2014]
   Test ZLIB_VERNUM instead of PNG_ZLIB_VERNUM in contrib/tools/pngfix.c
+
+Version 1.6.11 [June 5, 2014]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
