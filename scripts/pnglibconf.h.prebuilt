@@ -1,10 +1,10 @@
-/* libpng 1.6.10 STANDARD API DEFINITION */
+/* libpng 1.6.11 STANDARD API DEFINITION */
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng version 1.6.10 - March 6, 2014 */
+/* Libpng version 1.6.11 - June 5, 2014 */
 
-/* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
+/* Copyright (c) 1998-2014 Glenn Randers-Pehrson */
 
 /* This code is released under the libpng license. */
 /* For conditions of distribution and use, see the disclaimer */
@@ -187,7 +187,6 @@
 /* end of options */
 /* settings */
 #define PNG_API_RULE 0
-#define PNG_CALLOC_SUPPORTED
 #define PNG_COST_SHIFT 3
 #define PNG_DEFAULT_READ_MACROS 1
 #define PNG_GAMMA_THRESHOLD_FIXED 5000

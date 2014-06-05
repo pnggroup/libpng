@@ -79,7 +79,7 @@
 #  error "pngfix not supported in this libpng version"
 #endif
 
-#if PNG_ZLIB_VERNUM >= 0x1240
+#if ZLIB_VERNUM >= 0x1240
 
 /* Copied from pngpriv.h */
 #ifdef __cplusplus
@@ -4014,16 +4014,16 @@ main(int argc, const char **argv)
    return global_end(&global);
 }
 
-#else /* PNG_ZLIB_VERNUM < 0x1240 */
+#else /* ZLIB_VERNUM < 0x1240 */
 int
 main(void)
 {
    fprintf(stderr,
       "pngfix needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
-      PNG_ZLIB_VERNUM);
+      ZLIB_VERNUM);
    return 77;
 }
-#endif /* PNG_ZLIB_VERNUM */
+#endif /* ZLIB_VERNUM */
 
 #else /* No read support */
 

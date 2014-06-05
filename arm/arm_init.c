@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.10 [June 5, 2014]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -22,7 +22,7 @@
 /* WARNING: it is strongly recommended that you do not build libpng with
  * run-time checks for CPU features if at all possible.  In the case of the ARM
  * NEON instructions there is no processor-specific way of detecting the
- * presense of the required support, therefore run-time detectioon is extremely
+ * presence of the required support, therefore run-time detection is extremely
  * OS specific.
  *
  * You may set the macro PNG_ARM_NEON_FILE to the file name of file containing

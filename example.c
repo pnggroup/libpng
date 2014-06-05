@@ -2,8 +2,8 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.6.3 [July 18, 2013]
- * Maintained 1998-2013 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Maintained 1998-2014 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  * To the extent possible under law, the authors have waived
@@ -970,7 +970,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_set_packswap(png_ptr);
 
    /* Turn on interlace handling if you are not using png_write_image() */
-   if (interlacing)
+   if (interlacing != 0)
       number_passes = png_set_interlace_handling(png_ptr);
 
    else

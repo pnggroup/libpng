@@ -305,10 +305,6 @@ option FLOATING_ARITHMETIC
 option FLOATING_POINT
 option FIXED_POINT
 
-# The following is always on (defined empty)
-
-setting CALLOC_SUPPORTED default
-
 # This protects us against compilers that run on a windowing system
 # and thus don't have or would rather us not use the stdio types:
 # stdin, stdout, and stderr.  The only one currently used is stderr
@@ -582,19 +578,21 @@ option COLORSPACE enables GAMMA disabled
 # PNG_sRGB_PROFILE_CHECKS setting controls how much work is done during the
 # check:
 #
-# 0: Just validate the profile MD5 signature if present, otherwise use
-#    the checks in option 1.
+# -1: Don't do any sRGB profile checking.
 #
-# 1: Additionally check the length, intent and adler32 checksum of the
-#    actual data.   If enabled this will reject known profiles that have
-#    had the rendering intent in the header changed as well as other edits
-#    done without updating the checksum.  See the discussion below.
+#  0: Just validate the profile MD5 signature if present, otherwise use
+#     the checks in option 1.
 #
-# 2: Additionally checksum all the data using the ethernet CRC32 algorithm.
-#    This makes it more difficult to fake profiles and makes it less likely
-#    to get a false positive on profiles with no signature, but is probably
-#    just a waste of time since all currently approved ICC sRGB profiles have
-#    a secure MD5 signature.
+#  1: Additionally check the length, intent and adler32 checksum of the
+#     actual data.   If enabled this will reject known profiles that have
+#     had the rendering intent in the header changed as well as other edits
+#     done without updating the checksum.  See the discussion below.
+#
+#  2: Additionally checksum all the data using the ethernet CRC32 algorithm.
+#     This makes it more difficult to fake profiles and makes it less likely
+#     to get a false positive on profiles with no signature, but is probably
+#     just a waste of time since all currently approved ICC sRGB profiles have
+#     a secure MD5 signature.
 #
 # The rendering intent.  An ICC profile stores an intended rendering intent,
 # but does not include the value in the signature.  The intent is documented

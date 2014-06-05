@@ -12,6 +12,12 @@ CC=tcc
 LD=tcc
 LIB=tlib
 LDFLAGS=-m$(MODEL) -L..\zlib
+CP=copy
+
+# Pre-built configuration
+# See scripts/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+
 O=.obj
 E=.exe
 
@@ -25,9 +31,8 @@ OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
 
 all: libpng$(MODEL).lib pngtest$(E)
 
-# see scripts/pnglibconf.mak for more options
-pnglibconf.h: scripts/pnglibconf.h.prebuilt
-	cp scripts/pnglibconf.h.prebuilt $@
+pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
+	$(CP) $< $@
 
 pngtest: pngtest$(E)
 
