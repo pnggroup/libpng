@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.11 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.12 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2212,11 +2212,6 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
     * the profile will fail at that point.
     */
 
-   /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
-   if (((png_ptr->options >> PNG_SKIP_sRGB_CHECK_PROFILE) & 3) ==
-               PNG_OPTION_ON)
-   return 0;
-
    png_uint_32 length = 0;
    png_uint_32 intent = 0x10000; /* invalid */
 #if PNG_sRGB_PROFILE_CHECKS > 1
@@ -2224,6 +2219,11 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 #endif
 
    unsigned int i;
+
+   /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
+   if (((png_ptr->options >> PNG_SKIP_sRGB_CHECK_PROFILE) & 3) ==
+               PNG_OPTION_ON)
+      return 0;
 
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
    {

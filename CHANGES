@@ -4926,6 +4926,8 @@ Version 1.6.11 [June 5, 2014]
   No changes.
 
 Version 1.6.12beta01 [June 6, 2014]
+  Relocated new code from 1.6.11beta06 in png.c to a point after the
+    declarations (Max Stepin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
