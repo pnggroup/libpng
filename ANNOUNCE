@@ -1,5 +1,5 @@
 
-Libpng 1.6.12beta01 - June 6, 2014
+Libpng 1.6.12rc01 - June 6, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,24 +9,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.12beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.12beta01.tar.gz
+   1.6.12rc01.tar.xz (LZMA-compressed, recommended)
+   1.6.12rc01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1612b01.7z  (LZMA-compressed, recommended)
-   lp1612b01.zip
+   lp1612r01.7z  (LZMA-compressed, recommended)
+   lp1612r01.zip
 
 Other information:
 
-   1.6.12beta01-README.txt
-   1.6.12beta01-LICENSE.txt
-   libpng-1.6.12beta01-*.asc (armored detached GPG signatures)
+   1.6.12rc01-README.txt
+   1.6.12rc01-LICENSE.txt
+   libpng-1.6.12rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.11):
 
-Version 1.6.12beta01 [June 6, 2014]
+Version 1.6.12rc01 [June 6, 2014]
   Relocated new code from 1.6.11beta06 in png.c to a point after the
     declarations (Max Stepin).
 
