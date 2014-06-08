@@ -4937,6 +4937,8 @@ Version 1.6.12rc03 [June 8, 2014]
   Ensure "__has_attribute()" macro exists before trying to use it with
     old clang compilers (MacPorts Ticket #43939).
 
+Version 1.6.12rc04 [June 8, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
