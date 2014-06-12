@@ -1,35 +1,32 @@
 
-Libpng 1.6.12 - June 12, 2014
+Libpng 1.6.13beta01 - June 12, 2014
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.12.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.12.tar.gz
+   1.6.13beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.13beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1612.7z  (LZMA-compressed, recommended)
-   lpng1612.zip
+   lp1613b01.7z  (LZMA-compressed, recommended)
+   lp1613b01.zip
 
 Other information:
 
-   libpng-1.6.12-README.txt
-   libpng-1.6.12-LICENSE.txt
-   libpng-1.6.12-*.asc (armored detached GPG signatures)
+   1.6.13beta01-README.txt
+   1.6.13beta01-LICENSE.txt
+   libpng-1.6.13beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.11):
-  Relocated new code from 1.6.11 in png.c to a point after the
-    declarations (Max Stepin).
-  Changed file permissions of contrib/tools/intgamma.sh,
-    test-driver, and compile from 0644 to 0755 (Cosmin).
-  Ensure "__has_attribute()" macro exists before trying to use it with
-    old clang compilers (MacPorts Ticket #43939).
+Changes since the last public release (1.6.13):
+
+Version 1.6.13beta01 [June 12, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
