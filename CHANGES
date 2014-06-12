@@ -4925,6 +4925,21 @@ Version 1.6.11rc02 [June 3, 2014]
 Version 1.6.11 [June 5, 2014]
   No changes.
 
+Version 1.6.12rc01 [June 6, 2014]
+  Relocated new code from 1.6.11beta06 in png.c to a point after the
+    declarations (Max Stepin).
+
+Version 1.6.12rc02 [June 7, 2014]
+  Changed file permissions of contrib/tools/intgamma.sh,
+    test-driver, and compile from 0644 to 0755 (Cosmin).
+
+Version 1.6.12rc03 [June 8, 2014]
+  Ensure "__has_attribute()" macro exists before trying to use it with
+    old clang compilers (MacPorts Ticket #43939).
+
+Version 1.6.12 [June 12, 2014]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

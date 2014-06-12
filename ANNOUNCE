@@ -1,5 +1,5 @@
 
-Libpng 1.6.11 - June 5, 2014
+Libpng 1.6.12 - June 12, 2014
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,51 +8,28 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.11.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.11.tar.gz
+   libpng-1.6.12.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.12.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1611.7z  (LZMA-compressed, recommended)
-   lpng1611.zip
+   lpng1612.7z  (LZMA-compressed, recommended)
+   lpng1612.zip
 
 Other information:
 
-   libpng-1.6.11-README.txt
-   libpng-1.6.11-LICENSE.txt
-   libpng-1.6.11-*.asc (armored detached GPG signatures)
+   libpng-1.6.12-README.txt
+   libpng-1.6.12-LICENSE.txt
+   libpng-1.6.12-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.10):
-
-  Use "if (value != 0)" instead of "if (value)" consistently.
-  Changed ZlibSrcDir from 1.2.5 to 1.2.8 in projects/vstudio.
-  Moved configuration information from the manual to the INSTALL file.
-  Removed #if/#else/#endif from inside two pow() calls in pngvalid.c because
-    they were handled improperly by Portland Group's PGI-14.1 - PGI-14.3
-    when using its "__builtin_pow()" function.
-  Silence 'unused parameter' build warnings (Cosmin Truta).
-  $(CP) is now used alongside $(RM_F).  Also, use 'copy' instead of 'cp'
-    where applicable, and applied other minor makefile changes (Cosmin).
-  Don't warn about invalid dimensions exceeding user limits (Cosmin).
-  Allow an easy replacement of the default pre-built configuration
-    header with a custom header, via the make PNGLIBCONF_H_PREBUILT
-    macro (Cosmin).
-  Fixed a typo in pngrutil.c, introduced in libpng-1.5.6, that interferes
-    with "blocky" expansion of sub-8-bit interlaced PNG files (Eric Huss).
-  Made progressive reading of interlaced images consistent with the
-    behavior of the sequential reader and consistent with the manual, by
-    moving some code out of the PNG_READ_INTERLACING_SUPPORTED blocks. The
-    row_callback now receives the proper pass number and unexpanded rows, when
-    png_combine_row() isn't built or used, and png_set_interlace_handling()
-    is not called.
-  Allow PNG_sRGB_PROFILE_CHECKING = (-1) to mean no sRGB profile checking.
-  Do not reject ICC V2 profiles that lack padding (Kai-Uwe Behrmann).
-  Relocated closing bracket of the sRGB profile test loop to avoid getting
-    "Not recognizing known sRGB profile that has been edited" warning for
-    ICC V2 profiles that lack the MD5 signature in the profile header.
-  Added PNG_SKIP_sRGB_CHECK_PROFILE choice for png_set_option().
-  Test ZLIB_VERNUM instead of PNG_ZLIB_VERNUM in contrib/tools/pngfix.c
+Changes since the last public release (1.6.11):
+  Relocated new code from 1.6.11 in png.c to a point after the
+    declarations (Max Stepin).
+  Changed file permissions of contrib/tools/intgamma.sh,
+    test-driver, and compile from 0644 to 0755 (Cosmin).
+  Ensure "__has_attribute()" macro exists before trying to use it with
+    old clang compilers (MacPorts Ticket #43939).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
