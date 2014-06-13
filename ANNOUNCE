@@ -31,6 +31,7 @@ Version 1.6.13beta01 [June 13, 2014]
     contrib/pngminus/*.c
   Added "(void) png_ptr;" where needed in contrib/gregbook to quiet
     compiler complaints about unused pointers.
+  Split a long output string in contrib/gregbook/rpng2-x.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
