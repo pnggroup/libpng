@@ -4940,7 +4940,9 @@ Version 1.6.12rc03 [June 8, 2014]
 Version 1.6.12 [June 12, 2014]
   No changes.
 
-Version 1.6.13beta01 [June 12, 2014]
+Version 1.6.13beta01 [June 13, 2014]
+  Quieted -Wsign-compare and -Wclobber compiler warnings in
+    contrib/pngminus/*.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
