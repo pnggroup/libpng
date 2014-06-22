@@ -1,5 +1,5 @@
 
-Libpng 1.6.13beta01 - June 13, 2014
+Libpng 1.6.13beta01 - June 22, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,12 +26,14 @@ Other information:
 
 Changes since the last public release (1.6.13):
 
-Version 1.6.13beta01 [June 13, 2014]
+Version 1.6.13beta01 [June 22, 2014]
   Quieted -Wsign-compare and -Wclobber compiler warnings in
     contrib/pngminus/*.c
   Added "(void) png_ptr;" where needed in contrib/gregbook to quiet
     compiler complaints about unused pointers.
   Split a long output string in contrib/gregbook/rpng2-x.c.
+  Added "PNG_SET_OPTION" requirement for sRGB chunk support to pnglibconf.dfa,
+    Needed for write-only support (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
