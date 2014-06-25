@@ -4940,7 +4940,7 @@ Version 1.6.12rc03 [June 8, 2014]
 Version 1.6.12 [June 12, 2014]
   No changes.
 
-Version 1.6.13beta01 [June 24, 2014]
+Version 1.6.13beta01 [June 25, 2014]
   Quieted -Wsign-compare and -Wclobber compiler warnings in
     contrib/pngminus/*.c
   Added "(void) png_ptr;" where needed in contrib/gregbook to quiet
@@ -4949,7 +4949,8 @@ Version 1.6.13beta01 [June 24, 2014]
   Added "PNG_SET_OPTION" requirement for sRGB chunk support to pnglibconf.dfa,
     Needed for write-only support (John Bowler).
   Changed "if defined(__ARM_NEON__)" to
-    "if defined(__ARM_NEON__) || defined(__ARM_NEON)" (James Wu).
+    "if (defined(__ARM_NEON__) || defined(__ARM_NEON))" (James Wu).
+  Fixed clang no-warning builds: png_digit was defined but never used.
     
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
