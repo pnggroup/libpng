@@ -4952,6 +4952,8 @@ Version 1.6.13beta01 [July 4, 2014]
     "if (defined(__ARM_NEON__) || defined(__ARM_NEON))" (James Wu).
   Fixed clang no-warning builds: png_digit was defined but never used.
     
+Version 1.6.13beta02 [July 4, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
