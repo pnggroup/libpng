@@ -750,6 +750,7 @@ int main(int argc, char **argv)
     rpng2_x_cleanup();
 
     (void)argc; /* Unused */
+
     return 0;
 }
 

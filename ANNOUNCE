@@ -1,5 +1,5 @@
 
-Libpng 1.6.13beta01 - June 25, 2014
+Libpng 1.6.13beta01 - July 4, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.6.13):
 
-Version 1.6.13beta01 [June 25, 2014]
+Version 1.6.13beta01 [July 4, 2014]
   Quieted -Wsign-compare and -Wclobber compiler warnings in
     contrib/pngminus/*.c
   Added "(void) png_ptr;" where needed in contrib/gregbook to quiet
