@@ -23,7 +23,7 @@ CP = copy
 RM = del
 
 # Pre-built configuration
-# See scripts/pnglibconf.mak for more options
+# See scripts\pnglibconf.mak for more options
 PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
 
 # File extensions

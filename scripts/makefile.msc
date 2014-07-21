@@ -20,7 +20,7 @@ CP=copy
 O=.obj
 
 # Pre-built configuration
-# See scripts/pnglibconf.mak for more options
+# See scripts\pnglibconf.mak for more options
 PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
 
 #uncomment next to put error messages in a file
