@@ -4958,6 +4958,8 @@ Version 1.6.13beta02 [July 21, 2014]
     Also fixed makefile.bc32, makefile.bor, makefile.msc, makefile.intel, and
     makefile.tc3 similarly.
 
+Version 1.6.13beta03 [July 21, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
