@@ -16,7 +16,7 @@ CP=copy
 
 # Pre-built configuration
 # See scripts/pnglibconf.mak for more options
-PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
 
 O=.obj
 E=.exe

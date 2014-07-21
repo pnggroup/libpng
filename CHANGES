@@ -1,4 +1,4 @@
-#if 0
+
 CHANGES - changes for libpng
 
 Version 0.2
@@ -4952,7 +4952,11 @@ Version 1.6.13beta01 [July 4, 2014]
     "if (defined(__ARM_NEON__) || defined(__ARM_NEON))" (James Wu).
   Fixed clang no-warning builds: png_digit was defined but never used.
     
-Version 1.6.13beta02 [July 4, 2014]
+Version 1.6.13beta02 [July 21, 2014]
+  Fixed an incorrect separator ("/" should be "\") in scripts/makefile.vcwin32
+    (bug report from Wolfgang S. Kechel).  Bug was introduced in libpng-1.6.11.
+    Also fixed makefile.bc32, makefile.bor, makefile.msc, makefile.intel, and
+    makefile.tc3 similarly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
@@ -4961,4 +4965,3 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
-#endif
