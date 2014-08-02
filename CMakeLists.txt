@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (C) 2007-2013 Glenn Randers-Pehrson
+# Copyright (C) 2007-2014 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer

@@ -1,4 +1,4 @@
-Libpng 1.6.13beta03 - July 30, 2014
+Libpng 1.6.13beta03 - August 2, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,19 +43,11 @@ Version 1.6.13beta02 [July 21, 2014]
     Also fixed makefile.bc32, makefile.bor, makefile.msc, makefile.intel, and
     makefile.tc3 similarly.
 
-Version 1.6.13beta03 [July 30, 2014]
-  Removed scripts/makefile.elf.  It has not worked since libpng-1.5.0beta14
+Version 1.6.13beta03 [August 2, 2014]
+  Removed scripts/makefile.elf. It has not worked since libpng-1.5.0beta14
     due to elimination of the PNG_FUNCTION_EXPORT definition from pngconf.h.
   Ensure that CMakeLists.txt makes the target "lib" directory before making
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
-(subscription required; visit
-https://lists.sourceforge.net/lists/listinfo/png-mng-implement
-to subscribe)
-or to glennrp at users.sourceforge.net
-
-Glenn R-P
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

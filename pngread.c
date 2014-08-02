@@ -945,7 +945,7 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) &&\
+#if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) && \
    defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free(png_ptr, png_ptr->unknown_chunk.data);
 #endif
@@ -1220,7 +1220,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
 #  define P_LINEAR8 4 /* 8-bit linear: only from a file value */
 
 /* Color-map processing: after libpng has run on the PNG image further
- * processing may be needed to conver the data to color-map indices.
+ * processing may be needed to convert the data to color-map indices.
  */
 #define PNG_CMAP_NONE      0
 #define PNG_CMAP_GA        1 /* Process GA data to a color-map with alpha */
