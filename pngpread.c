@@ -1291,7 +1291,7 @@ png_progressive_combine_row (png_structp png_ptr, png_bytep old_row,
     * it must be png_ptr->row_buf+1
     */
    if (new_row != NULL)
-      png_combine_row(png_ptr, old_row, 1/*display*/);
+      png_combine_row(png_ptr, old_row, 1/*blocky display*/);
 }
 #endif /* PNG_READ_INTERLACING_SUPPORTED */
 
