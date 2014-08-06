@@ -59,8 +59,8 @@ CFLAGS=-O2 -Z -X- -w -$(TARGET_CPU) $(MODEL_ARG) $(CDEBUG)
 LDFLAGS=-M -L$(ZLIB_DIR) $(MODEL_ARG) $(LDEBUG)
 
 # Pre-built configuration
-# See scripts/pnglibconf.mak for more options
-PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+# See scripts\pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
 
 ## Variables
 

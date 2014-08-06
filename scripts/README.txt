@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.7.0beta35 - March 22, 2014
+Makefiles for  libpng version 1.7.0beta35 - August 6, 2014
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
@@ -19,8 +19,6 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.darwin   =>  Darwin makefile, can use on MacosX
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
- makefile.elf      =>  Linux/ELF makefile symbol versioning,
-                       (gcc, creates libpng17.so.17.1.7.0beta35)
  makefile.freebsd  =>  FreeBSD makefile
  makefile.gcc      =>  Generic gcc makefile
  makefile.hpgcc    =>  HPUX makefile using gcc

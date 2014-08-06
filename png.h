@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta35 - March 17, 2014
+ * libpng version 1.7.0beta35 - August 6, 2014
  * Copyright (c) 1998-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta35 - March 17, 2014: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta35 - August 6, 2014: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -200,7 +200,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta35, March 17, 2014, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta35, August 6, 2014, are
  * Copyright (c) 2004, 2006-2013 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -312,7 +312,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 17, 2014
+ *    August 6, 2014
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -371,7 +371,9 @@
 /* This is not the place to learn how to use libpng. The file libpng-manual.txt
  * describes how to use libpng, and the file example.c summarizes it
  * with some code on which to build.  This file is useful for looking
- * at the actual function definitions and structure components.
+ * at the actual function definitions and structure components.  If that
+ * file has been stripped from your copy of libpng, you can find it at
+ * <http://www.libpng.org/pub/png/libpng-manual.txt>
  *
  * If you just need to read a PNG file and don't want to read the documentation
  * skip to the end of this file and read the section entitled 'simplified API'.
@@ -380,7 +382,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta35"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta35 - March 17, 2014\n"
+     " libpng version 1.7.0beta35 - August 6, 2014\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
