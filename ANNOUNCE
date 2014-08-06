@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta35 - August 6, 2014
+Libpng 1.7.0beta36 - August 6, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta35.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta35.tar.gz
+   1.7.0beta36.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta36.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b35.7z  (LZMA-compressed, recommended)
-   lp170b35.zip
+   lp170b36.7z  (LZMA-compressed, recommended)
+   lp170b36.zip
 
 Other information:
 
-   1.7.0beta35-README.txt
-   1.7.0beta35-LICENSE.txt
-   libpng-1.7.0beta35-*.asc (armored detached GPG signatures)
+   1.7.0beta36-README.txt
+   1.7.0beta36-LICENSE.txt
+   libpng-1.7.0beta36-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -592,6 +592,8 @@ Version 1.7.0beta35 [August 6, 2014]
     definitions from pngconf.h.
   Ensure that CMakeLists.txt makes the target "lib" directory before making
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
+
+Version 1.7.0beta36 [August 6, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
