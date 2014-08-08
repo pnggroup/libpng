@@ -1,4 +1,4 @@
-Libpng 1.6.13beta04 - August 4, 2014
+Libpng 1.6.13beta04 - August 8, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -50,7 +50,12 @@ Version 1.6.13beta03 [August 3, 2014]
   Ensure that CMakeLists.txt makes the target "lib" directory before making
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
 
-Version 1.6.13beta04 [August 4, 2014]
+Version 1.6.13beta04 [August 8, 2014]
+  Added opinion about the ECCN (Export Control Classification Number) for
+    libpng being EAR99 to README
+  Eliminated use of "$<" in makefiles, when copying $PNGLIBCONF_H_PREBUILT.
+    This does not work on some versions of make; bug introduced in libpng
+    version 1.6.11.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

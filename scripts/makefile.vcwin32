@@ -42,7 +42,7 @@ OBJS  = $(OBJS1) $(OBJS2) $(OBJS3)
 all: libpng.lib
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-       $(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 png$(O): png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $*.c $(ERRFILE)

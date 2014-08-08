@@ -51,7 +51,7 @@ LIBS = libpng$(A) $(ZLIBLIB)/zlib$(A)
 all: libpng$(A) pngtest$(E)
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng$(A): $(OBJS)
 	$(AR) -out:$@ $(OBJS)

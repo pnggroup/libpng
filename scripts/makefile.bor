@@ -117,7 +117,7 @@ all: libpng pngtest
 
 # try !include scripts\pnglibconf.mak for more options
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng: $(LIBNAME)
 

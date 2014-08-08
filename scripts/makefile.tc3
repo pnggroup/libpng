@@ -32,7 +32,7 @@ OBJSL3 = +pngwrite$(O) +pngrtran$(O) +pngwtran$(O) +pngrio$(O) +pngwio$(O)
 all: libpng$(MODEL).lib pngtest$(E)
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 pngtest: pngtest$(E)
 
