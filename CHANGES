@@ -4881,8 +4881,11 @@ Version 1.7.0beta35 [August 6, 2014]
     definitions from pngconf.h.
   Ensure that CMakeLists.txt makes the target "lib" directory before making
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
+  Added opinion that the ECCN (Export Control Classification Number) for
+    libpng is EAR99 to the README file.
 
 Version 1.7.0beta36 [August 6, 2014]
+  Updated scripts/makefiles from libpng-1.6.13beta04.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

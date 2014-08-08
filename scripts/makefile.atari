@@ -49,7 +49,7 @@ $(LBR): $(OBJS)
 $(OBJS): pngpriv.h png.h pngconf.h pnglibconf.h pnginfo.h pngstruct.h pngdebug.h
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	cp $< $@
+	cp $(PNGLIBCONF_H_PREBUILT) $@
 
 pngtest.ttp: pngtest.o $(LBR)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o$@ pngtest.o

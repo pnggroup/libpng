@@ -60,7 +60,7 @@ test: pngtest
 	./pngtest
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	cp $< $@
+	cp $(PNGLIBCONF_H_PREBUILT) $@
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:

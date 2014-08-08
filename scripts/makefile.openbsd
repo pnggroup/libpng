@@ -39,7 +39,7 @@ PNGLIBCONF_H_PREBUILT= scripts/pnglibconf.h.prebuilt
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	cp $< $@
+	cp $(PNGLIBCONF_H_PREBUILT) $@
 
 pngtest.o:	pngtest.c
 	${CC} ${CPPFLAGS} ${CFLAGS} -c ${.ALLSRC} -o ${.TARGET}

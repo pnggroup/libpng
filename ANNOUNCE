@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta36 - August 6, 2014
+Libpng 1.7.0beta36 - August 8, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -592,8 +592,10 @@ Version 1.7.0beta35 [August 6, 2014]
     definitions from pngconf.h.
   Ensure that CMakeLists.txt makes the target "lib" directory before making
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
+    libpng is EAR99 to the README file.
 
-Version 1.7.0beta36 [August 6, 2014]
+Version 1.7.0beta36 [August 8, 2014]
+  Updated scripts/makefiles from libpng-1.6.13beta04.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
