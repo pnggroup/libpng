@@ -1,5 +1,5 @@
 
-Libpng 1.5.19beta05 - August 5, 2014
+Libpng 1.5.19beta05 - August 8, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -57,7 +57,10 @@ Version 1.5.19beta04 [August 4, 2014]
     due to elimination of the PNG_FUNCTION_EXPORT and PNG_DATA_EXPORT
     definitions from pngconf.h.
 
-Version 1.5.19beta05 [August 5, 2014]
+Version 1.5.19beta05 [August 8, 2014]
+  Eliminated use of "$<" in makefiles, when copying $PNGLIBCONF_H_PREBUILT.
+    This does not work on some versions of make; bug introduced in libpng
+    version 1.5.19beta03.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

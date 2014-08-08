@@ -51,8 +51,8 @@ CFLAGS=-O2 -d -k- -w $(TARGET_CPU) $(CDEBUG)
 LDFLAGS=-L$(ZLIB_DIR) -M $(LDEBUG)
 
 # Pre-built configuration
-# See scripts/pnglibconf.mak for more options
-PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+# See scripts\pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
 
 ## Variables
 OBJS = \
@@ -117,7 +117,7 @@ test: pngtest.exe
 ## Minor Targets
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 png.obj: png.c png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngerror.obj: pngerror.c png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
