@@ -1,5 +1,5 @@
 
-Libpng 1.5.19beta05 - August 8, 2014
+Libpng 1.5.19beta06 - August 8, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.19beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.19beta05.tar.gz
-   1.5.19beta05.tar.bz2
+   1.5.19beta06.tar.xz (LZMA-compressed, recommended)
+   1.5.19beta06.tar.gz
+   1.5.19beta06.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1519b05.7z  (LZMA-compressed, recommended)
-   lp1519b05.zip
+   lp1519b06.7z  (LZMA-compressed, recommended)
+   lp1519b06.zip
 
 Other information:
 
-   1.5.19beta05-README.txt
-   1.5.19beta05-LICENSE.txt
-   libpng-1.5.19beta05-*.asc (armored detached GPG signatures)
+   1.5.19beta06-README.txt
+   1.5.19beta06-LICENSE.txt
+   libpng-1.5.19beta06-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.18):
 
@@ -61,6 +61,8 @@ Version 1.5.19beta05 [August 8, 2014]
   Eliminated use of "$<" in makefiles, when copying $PNGLIBCONF_H_PREBUILT.
     This does not work on some versions of make; bug introduced in libpng
     version 1.5.19beta03.
+
+Version 1.5.19beta06 [August 8, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

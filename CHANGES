@@ -4238,6 +4238,8 @@ Version 1.5.19beta05 [August 8, 2014]
     This does not work on some versions of make; bug introduced in libpng
     version 1.5.19beta03.
 
+Version 1.5.19beta06 [August 8, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
