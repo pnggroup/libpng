@@ -4229,16 +4229,19 @@ Version 1.5.19beta03 [April 6, 2014]
     with "blocky" expansion of sub-8-bit interlaced PNG files (Eric Huss).
 
 Version 1.5.19beta04 [August 4, 2014]
-  Removed scripts/makefile.elf.  It has not worked since libpng-1.5.0beta14
+  Removed scripts/makefile.elf. It has not worked since libpng-1.5.0beta14
     due to elimination of the PNG_FUNCTION_EXPORT and PNG_DATA_EXPORT
     definitions from pngconf.h.
 
 Version 1.5.19beta05 [August 8, 2014]
-  Eliminated use of "$<" in makefiles, when copying $PNGLIBCONF_H_PREBUILT.
-    This does not work on some versions of make; bug introduced in libpng
-    version 1.5.19beta03.
+  Added opinion that the ECCN (Export Control Classification Number) for
+    libpng is EAR99 to the README file.
+  Eliminated use of "$<" in makefile explicit rules, when copying
+    $PNGLIBCONF_H_PREBUILT.  This does not work on some versions of make;
+    bug introduced in libpng version 1.5.19beta03.
 
-Version 1.5.19beta06 [August 8, 2014]
+Version 1.5.19rc01 [August 14, 2014]
+  Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

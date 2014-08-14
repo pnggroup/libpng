@@ -1,5 +1,5 @@
 
-Libpng 1.5.19beta06 - August 8, 2014
+Libpng 1.5.19rc01 - August 14, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.19beta06.tar.xz (LZMA-compressed, recommended)
-   1.5.19beta06.tar.gz
-   1.5.19beta06.tar.bz2
+   1.5.19rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.19rc01.tar.gz
+   1.5.19rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1519b06.7z  (LZMA-compressed, recommended)
-   lp1519b06.zip
+   lp1519r01.7z  (LZMA-compressed, recommended)
+   lp1519r01.zip
 
 Other information:
 
-   1.5.19beta06-README.txt
-   1.5.19beta06-LICENSE.txt
-   libpng-1.5.19beta06-*.asc (armored detached GPG signatures)
+   1.5.19rc01-README.txt
+   1.5.19rc01-LICENSE.txt
+   libpng-1.5.19rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.18):
 
@@ -53,16 +53,19 @@ Version 1.5.19beta03 [April 6, 2014]
     with "blocky" expansion of sub-8-bit interlaced PNG files (Eric Huss).
 
 Version 1.5.19beta04 [August 4, 2014]
-  Removed scripts/makefile.elf.  It has not worked since libpng-1.5.0beta14
+  Removed scripts/makefile.elf. It has not worked since libpng-1.5.0beta14
     due to elimination of the PNG_FUNCTION_EXPORT and PNG_DATA_EXPORT
     definitions from pngconf.h.
 
 Version 1.5.19beta05 [August 8, 2014]
-  Eliminated use of "$<" in makefiles, when copying $PNGLIBCONF_H_PREBUILT.
-    This does not work on some versions of make; bug introduced in libpng
-    version 1.5.19beta03.
+  Added opinion that the ECCN (Export Control Classification Number) for
+    libpng is EAR99 to the README file.
+  Eliminated use of "$<" in makefile explicit rules, when copying
+    $PNGLIBCONF_H_PREBUILT.  This does not work on some versions of make;
+    bug introduced in libpng version 1.5.19beta03.
 
-Version 1.5.19beta06 [August 8, 2014]
+Version 1.5.19rc01 [August 14, 2014]
+  Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
