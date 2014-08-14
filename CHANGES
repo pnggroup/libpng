@@ -4966,13 +4966,14 @@ Version 1.6.13beta03 [August 3, 2014]
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
 
 Version 1.6.13beta04 [August 8, 2014]
-  Added opinion about the ECCN (Export Control Classification Number) for
-    libpng being EAR99 to README
-  Eliminated use of "$<" in makefiles, when copying $PNGLIBCONF_H_PREBUILT.
-    This does not work on some versions of make; bug introduced in libpng
-    version 1.6.11.
+  Added opinion that the ECCN (Export Control Classification Number) for
+    libpng is EAR99 to the README file.
+  Eliminated use of "$<" in makefile explicit rules, when copying
+    $PNGLIBCONF_H_PREBUILT.  This does not work on some versions of make;
+    bug introduced in libpng version 1.6.11.
 
-Version 1.6.13beta05 [August 8, 2014]
+Version 1.6.13rc01 [August 14, 2014]
+  Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

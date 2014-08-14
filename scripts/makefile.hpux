@@ -104,7 +104,7 @@ libpng-config:
 	( cat scripts/libpng-config-head.in; \
 	echo prefix=\"$(prefix)\"; \
 	echo I_opts=\"-I$(INCPATH)/$(LIBNAME)\"; \
-	echo ccopts=\"-Ae +DA1.1 +DS2.0\"; \
+	echo ccopts=\"-O -Ae +DA1.1 +DS2.0\"; \
 	echo L_opts=\"-L$(LIBPATH)\"; \
 	echo libs=\"-lpng16 -lz -lm\"; \
 	cat scripts/libpng-config-body.in ) > libpng-config
