@@ -1,31 +1,29 @@
-Libpng 1.6.13rc02 - August 14, 2014
+Libpng 1.6.13 - August 21, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.13rc02.tar.xz (LZMA-compressed, recommended)
-   1.6.13rc02.tar.gz
+   libpng-1.6.13.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.13.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1613r02.7z  (LZMA-compressed, recommended)
-   lp1613r02.zip
+   lpng1613.7z  (LZMA-compressed, recommended)
+   lpng1613.zip
 
 Other information:
 
-   1.6.13rc02-README.txt
-   1.6.13rc02-LICENSE.txt
-   libpng-1.6.13rc02-*.asc (armored detached GPG signatures)
+   libpng-1.6.13-README.txt
+   libpng-1.6.13-LICENSE.txt
+   libpng-1.6.13-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.13):
+Changes since the last public release (1.6.12):
 
-Version 1.6.13beta01 [July 4, 2014]
   Quieted -Wsign-compare and -Wclobber compiler warnings in
     contrib/pngminus/*.c
   Added "(void) png_ptr;" where needed in contrib/gregbook to quiet
@@ -36,31 +34,21 @@ Version 1.6.13beta01 [July 4, 2014]
   Changed "if defined(__ARM_NEON__)" to
     "if (defined(__ARM_NEON__) || defined(__ARM_NEON))" (James Wu).
   Fixed clang no-warning builds: png_digit was defined but never used.
-    
-Version 1.6.13beta02 [July 21, 2014]
   Fixed an incorrect separator ("/" should be "\") in scripts/makefile.vcwin32
     (bug report from Wolfgang S. Kechel).  Bug was introduced in libpng-1.6.11.
     Also fixed makefile.bc32, makefile.bor, makefile.msc, makefile.intel, and
     makefile.tc3 similarly.
-
-Version 1.6.13beta03 [August 3, 2014]
   Removed scripts/makefile.elf. It has not worked since libpng-1.5.0beta14
     due to elimination of the PNG_FUNCTION_EXPORT and PNG_DATA_EXPORT
     definitions from pngconf.h.
   Ensure that CMakeLists.txt makes the target "lib" directory before making
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
-
-Version 1.6.13beta04 [August 8, 2014]
   Added opinion that the ECCN (Export Control Classification Number) for
     libpng is EAR99 to the README file.
   Eliminated use of "$<" in makefile explicit rules, when copying
     $PNGLIBCONF_H_PREBUILT.  This does not work on some versions of make;
     bug introduced in libpng version 1.6.11.
-
-Version 1.6.13rc01 [August 14, 2014]
   Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
-
-Version 1.6.13rc02 [August 14, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
