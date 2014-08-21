@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.12 - June 12, 2014
+ libpng version 1.6.13 - August 21, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.12 - June 12, 2014
+ libpng versions 0.97, January 1998, through 1.6.13 - August 21, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5042,7 +5042,8 @@ very old broken Microsoft/HP 3144-byte sRGB profile.  Starting with
 libpng-1.6.11, recognizing and checking sRGB profiles can be avoided by
 means of
 
-    #ifdef PNG_SKIP_sRGB_CHECK_PROFILE
+    #if defined(PNG_SKIP_sRGB_CHECK_PROFILE) && \
+        defined(PNG_SET_OPTION_SUPPORTED)
        png_set_option(png_ptr, PNG_SKIP_sRGB_CHECK_PROFILE,
            PNG_OPTION_ON);
     #endif
@@ -5055,8 +5056,8 @@ The PNG spec requirement that only grayscale profiles may appear in images
 with color type 0 or 4 and that even if the image only contains gray pixels,
 only RGB profiles may appear in images with color type 2, 3, or 6, is now
 enforced.  The sRGB chunk is allowed to appear in images with any color type
-and is interpreted by libpng to convey a one-tracer-curve profile or a
-three-tracer-curve profile as appropriate.
+and is interpreted by libpng to convey a one-tracer-curve gray profile or a
+three-tracer-curve RGB profile as appropriate.
 
 Prior to libpng-1.6.0 a warning would be issued if the iTXt chunk contained
 an empty language field or an empty translated keyword.  Both of these
@@ -5275,13 +5276,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-June 12, 2014
+August 21, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.12 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.13 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer

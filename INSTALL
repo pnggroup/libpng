@@ -28,7 +28,9 @@ On Unix/Linux and similar systems, you can simply type
     make check
     make install
 
-and ignore the rest of this document.
+and ignore the rest of this document.  "/path" is the path to the directory
+where you want to install the libpng "lib", "include", and "bin"
+subdirectories.
 
 II. Rebuilding the configure scripts
 
@@ -64,8 +66,8 @@ Or you can use one of the "projects" in the "projects" directory.
 
 Before installing libpng, you must first install zlib, if it
 is not already on your system.  zlib can usually be found
-wherever you got libpng.  zlib can be placed in another directory,
-at the same level as libpng.
+wherever you got libpng; otherwise go to http://zlib.net.  You can place
+zlib in in the same directory as libpng or in another directory.
 
 If your system already has a preinstalled zlib you will still need
 to have access to the zlib.h and zconf.h include files that
@@ -92,6 +94,10 @@ If you want to use "cmake" (see www.cmake.org), type
    cmake . -DCMAKE_INSTALL_PREFIX=/path
    make
    make install
+
+As when using the simple configure method described above, "/path" points to
+the installation directory where you want to put the libpng "lib", "include",
+and "bin" subdirectories.
 
 V. Directory structure
 
@@ -322,9 +328,10 @@ unmodified, default, libpng API and thus would probably fail to link.
 These mechanisms still work in the configure build and in any makefile
 build that builds pnglibconf.h, although the feature selection macros
 have changed somewhat as described above.  In 1.5.0, however, pngusr.h is
-processed only once, when the exported header file pnglibconf.h is built.
-pngconf.h no longer includes pngusr.h, therefore pngusr.h is ignored after the
-build of pnglibconf.h and it is never included in an application build.
+processed only once, at the time the exported header file pnglibconf.h is
+built.  pngconf.h no longer includes pngusr.h; therefore, pngusr.h is ignored
+after the build of pnglibconf.h and it is never included in an application
+build.
 
 The rarely used alternative of adding a list of feature macros to the
 CPPFLAGS setting in the build also still works; however, the macros will be
@@ -347,7 +354,7 @@ also removed.  As a recommended alternative to using feature macros in
 pngusr.h a system builder may also define equivalent options in pngusr.dfa
 (or, indeed, any file) and add that to the configuration by setting
 DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
-how to do this, and a case where pngusr.h is still required.
+how to do this, and illustrate a case where pngusr.h is still required.
 
 XV. Configuring libpng for multiprocessing
 

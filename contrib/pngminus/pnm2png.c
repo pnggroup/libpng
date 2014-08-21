@@ -50,7 +50,8 @@
 
 int  main (int argc, char *argv[]);
 void usage ();
-BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, BOOL alpha);
+BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
+    BOOL alpha);
 void get_token(FILE *pnm_file, char *token);
 png_uint_32 get_data (FILE *pnm_file, int depth);
 png_uint_32 get_value (FILE *pnm_file, int depth);
@@ -176,7 +177,8 @@ void usage()
   fprintf (stderr, "   or:  ... | pnm2png [options]\n");
   fprintf (stderr, "Options:\n");
   fprintf (stderr, "   -i[nterlace]   write png-file with interlacing on\n");
-  fprintf (stderr, "   -a[lpha] <file>.pgm read PNG alpha channel as pgm-file\n");
+  fprintf (stderr,
+      "   -a[lpha] <file>.pgm read PNG alpha channel as pgm-file\n");
   fprintf (stderr, "   -h | -?  print this help-information\n");
 }
 
@@ -184,27 +186,28 @@ void usage()
  *  pnm2png
  */
 
-BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, BOOL alpha)
+BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
+     BOOL alpha)
 {
   png_struct    *png_ptr = NULL;
   png_info      *info_ptr = NULL;
   png_byte      *png_pixels = NULL;
   png_byte      **row_pointers = NULL;
   png_byte      *pix_ptr = NULL;
-  png_uint_32   row_bytes;
+  volatile png_uint_32   row_bytes;
 
   char          type_token[16];
   char          width_token[16];
   char          height_token[16];
   char          maxval_token[16];
-  int           color_type;
+  volatile int           color_type;
   unsigned long   ul_width=0, ul_alpha_width=0;
   unsigned long   ul_height=0, ul_alpha_height=0;
   unsigned long   ul_maxval=0;
-  png_uint_32   width, alpha_width;
-  png_uint_32   height, alpha_height;
+  volatile png_uint_32   width, height;
+  volatile png_uint_32   alpha_width, alpha_height;
   png_uint_32   maxval;
-  int           bit_depth = 0;
+  volatile int           bit_depth = 0;
   int           channels;
   int           alpha_depth = 0;
   int           alpha_present;
@@ -367,23 +370,24 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
     /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
-  if ((png_pixels = (png_byte *) malloc (row_bytes * height * sizeof (png_byte))) == NULL)
+  if ((png_pixels = (png_byte *)
+     malloc (row_bytes * height * sizeof (png_byte))) == NULL)
     return FALSE;
 
   /* read data from PNM file */
   pix_ptr = png_pixels;
 
-  for (row = 0; row < height; row++)
+  for (row = 0; row < (int) height; row++)
   {
 #if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
     if (packed_bitmap) {
-      for (i = 0; i < row_bytes; i++)
+      for (i = 0; i < (int) row_bytes; i++)
         /* png supports this format natively so no conversion is needed */
         *pix_ptr++ = get_data (pnm_file, 8);
     } else
 #endif
     {
-      for (col = 0; col < width; col++)
+      for (col = 0; col < (int) width; col++)
       {
         for (i = 0; i < (channels - alpha_present); i++)
         {
@@ -462,7 +466,8 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   /* if needed we will allocate memory for an new array of row-pointers */
   if (row_pointers == (unsigned char**) NULL)
   {
-    if ((row_pointers = (png_byte **) malloc (height * sizeof (png_bytep))) == NULL)
+    if ((row_pointers = (png_byte **)
+        malloc (height * sizeof (png_bytep))) == NULL)
     {
       png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
       return FALSE;
@@ -470,13 +475,13 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace, 
   }
 
   /* set the individual row_pointers to point at the correct offsets */
-  for (i = 0; i < (height); i++)
+  for (i = 0; i < (int) height; i++)
     row_pointers[i] = png_pixels + i * row_bytes;
 
   /* write out the entire image data in one call */
   png_write_image (png_ptr, row_pointers);
 
-  /* write the additional chuncks to the PNG file (not really needed) */
+  /* write the additional chunks to the PNG file (not really needed) */
   png_write_end (png_ptr, info_ptr);
 
   /* clean up after the write, and free any memory allocated */

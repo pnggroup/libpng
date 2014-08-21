@@ -41,7 +41,11 @@
               unexpected-EOF and file-read-error cases; fixed Trace() cut-and-
               paste bugs
     - 2.03:  deleted runtime MMX-enabling/disabling and obsolete -mmx* options
+    - 2.04:  Added "void(foo);" statements to quiet pedantic compiler warnings
+             about unused variables (GR-P)
 
+  TO DO:
+             use nanosleep() instead of usleep(), which is obsolete/deprecated.
   ---------------------------------------------------------------------------
 
       Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
@@ -95,9 +99,12 @@
 
 #define PROGNAME  "rpng2-x"
 #define LONGNAME  "Progressive PNG Viewer for X"
-#define VERSION   "2.03 of 25 February 2010"
+#define VERSION   "2.04 of 15 June 2014"
 #define RESNAME   "rpng2"       /* our X resource application name */
 #define RESCLASS  "Rpng"       /* our X resource class name */
+
+/* This is temporary until the code is rewritten to use nanosleep(). */
+#define usleep(x) sleep(((x)+499999)/1000000)
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -456,39 +463,46 @@ int main(int argc, char **argv)
         fprintf(stderr, "\n%s %s:  %s\n\n", PROGNAME, VERSION, appname);
         readpng2_version_info();
         fprintf(stderr, "\n"
-          "Usage:  %s [-display xdpy] [-gamma exp] [-bgcolor bg | -bgpat pat]\n"
+          "Usage:   ");
+        fprintf(stderr,
+          "%s [-display xdpy] [-gamma exp] [-bgcolor bg | -bgpat pat]\n"
+          "        %*s [-usleep dur | -timing] [-pause]\n",
+          PROGNAME, (int)strlen(PROGNAME), " ");
+        fprintf(stderr,
 #ifdef FEATURE_LOOP
-          "        %*s [-usleep dur | -timing] [-pause] [-loop [sec]] file.png\n\n"
-#else
-          "        %*s [-usleep dur | -timing] [-pause] file.png\n\n"
+          "        [-loop [sec]]"
 #endif
+          " file.png\n\n");
+        fprintf(stderr,
           "    xdpy\tname of the target X display (e.g., ``hostname:0'')\n"
           "    exp \ttransfer-function exponent (``gamma'') of the display\n"
           "\t\t  system in floating-point format (e.g., ``%.1f''); equal\n"
-          "\t\t  to the product of the lookup-table exponent (varies)\n"
+          "\t\t  to the product of the lookup-table exponent (varies)\n",
+          default_display_exponent);
+        fprintf(stderr,
           "\t\t  and the CRT exponent (usually 2.2); must be positive\n"
           "    bg  \tdesired background color in 7-character hex RGB format\n"
           "\t\t  (e.g., ``#ff7700'' for orange:  same as HTML colors);\n"
           "\t\t  used with transparent images; overrides -bgpat\n"
           "    pat \tdesired background pattern number (0-%d); used with\n"
-          "\t\t  transparent images; overrides -bgcolor\n"
+          "\t\t  transparent images; overrides -bgcolor\n",
+          num_bgpat-1);
 #ifdef FEATURE_LOOP
+        fprintf(stderr, 
           "    -loop\tloops through background images after initial display\n"
           "\t\t  is complete (depends on -bgpat)\n"
-          "    sec \tseconds to display each background image (default = 2)\n"
+          "    sec \tseconds to display each background image (default = 2)\n");
 #endif
+        fprintf(stderr, 
           "    dur \tduration in microseconds to wait after displaying each\n"
           "\t\t  row (for demo purposes)\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"
           "\t\t  download of image (~36 Kbps)\n"
           "    -pause\tpauses after displaying each pass until mouse clicked\n"
           "\nPress Q, Esc or mouse button 1 (within image window, after image\n"
-          "is displayed) to quit.\n"
-          "\n", PROGNAME,
-          (int)strlen(PROGNAME), " ", default_display_exponent, num_bgpat-1);
+          "is displayed) to quit.\n");
         exit(1);
     }
-
 
     if (!(infile = fopen(filename, "rb"))) {
         fprintf(stderr, PROGNAME ":  can't open PNG file [%s]\n", filename);
@@ -734,6 +748,8 @@ int main(int argc, char **argv)
 
     Trace((stderr, "about to call rpng2_x_cleanup()\n"))
     rpng2_x_cleanup();
+
+    (void)argc; /* Unused */
 
     return 0;
 }
@@ -1825,6 +1841,9 @@ static void rpng2_x_redisplay_image(ulg startcol, ulg startrow,
           (int)lastrow, rpng2_info.width, rpng2_info.height-lastrow);
         XFlush(display);
     }
+
+    (void)startcol;
+    (void)width;
 
 } /* end function rpng2_x_redisplay_image() */
 

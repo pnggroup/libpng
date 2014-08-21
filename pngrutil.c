@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.11 [June 12, 2014]
+ * Last changed in libpng 1.6.11 [June 5, 2014]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1319,9 +1319,9 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * chunk is just ignored, so does not invalidate the color space.  An
     * alternative is to set the 'invalid' flags at the start of this routine
     * and only clear them in they were not set before and all the tests pass.
-    * The minimum 'deflate' stream is assumed to be just the 2 byte header and 4
-    * byte checksum.  The keyword must be one character and there is a
-    * terminator (0) byte and the compression method.
+    * The minimum 'deflate' stream is assumed to be just the 2 byte header and
+    * 4 byte checksum.  The keyword must be at least one character and there is
+    * a terminator (0) byte and the compression method.
     */
    if (length < 9)
    {
@@ -2640,7 +2640,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       /* prefix_length should now be at the trailing '\0' of the translated
        * keyword, but it may already be over the end.  None of this arithmetic
        * can overflow because chunks are at most 2^31 bytes long, but on 16-bit
-       * systems the available allocaton may overflow.
+       * systems the available allocation may overflow.
        */
       ++prefix_length;
 

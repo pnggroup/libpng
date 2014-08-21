@@ -43,7 +43,7 @@ OBJS =  png.o pngerror.o pngget.o pngmem.o pngpread.o \
 all: static
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<

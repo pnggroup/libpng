@@ -11,7 +11,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	16
-SHLIB_MINOR=	1.6.12
+SHLIB_MINOR=	1.6.13
 
 LIB=	png
 SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
@@ -39,7 +39,7 @@ PNGLIBCONF_H_PREBUILT= scripts/pnglibconf.h.prebuilt
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	cp $< $@
+	cp $(PNGLIBCONF_H_PREBUILT) $@
 
 pngtest.o:	pngtest.c
 	${CC} ${CPPFLAGS} ${CFLAGS} -c ${.ALLSRC} -o ${.TARGET}

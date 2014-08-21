@@ -10,7 +10,7 @@
 # Library name:
 LIBNAME = libpng16
 PNGMAJ = 16
-RELEASE = 12
+RELEASE = 13
 
 # Shared library names:
 LIBSO=$(LIBNAME).so
@@ -97,7 +97,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 all: libpng.a $(LIBSO) pngtest pngtest-static libpng.pc libpng-config
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
 	$(AR_RC) $@ $(OBJS)

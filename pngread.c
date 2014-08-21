@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.6.11 [June 12, 2014]
+ * Last changed in libpng 1.6.11 [June 5, 2014]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -945,7 +945,7 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->save_buffer);
 #endif
 
-#if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) &&\
+#if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) && \
    defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free(png_ptr, png_ptr->unknown_chunk.data);
 #endif
@@ -1220,7 +1220,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
 #  define P_LINEAR8 4 /* 8-bit linear: only from a file value */
 
 /* Color-map processing: after libpng has run on the PNG image further
- * processing may be needed to conver the data to color-map indicies.
+ * processing may be needed to convert the data to color-map indices.
  */
 #define PNG_CMAP_NONE      0
 #define PNG_CMAP_GA        1 /* Process GA data to a color-map with alpha */
@@ -2187,7 +2187,7 @@ png_image_read_colormap(png_voidp argument)
             data_encoding = P_FILE;
 
             /* The rows from libpng, while technically gray values, are now also
-             * color-map indicies; however, they may need to be expanded to 1
+             * color-map indices; however, they may need to be expanded to 1
              * byte per pixel.  This is what png_set_packing does (i.e., it
              * unpacks the bit values into bytes.)
              */
@@ -2273,8 +2273,8 @@ png_image_read_colormap(png_voidp argument)
                 * 8-bit GA and it has to be processing to single byte color-map
                 * values.  Entry 254 is replaced by either a completely
                 * transparent entry or by the background color at full
-                * precision (and the background color is not a simple gray leve
-                * in this case.)
+                * precision (and the background color is not a simple gray
+                * level in this case.)
                 */
                expand_tRNS = 1;
                output_processing = PNG_CMAP_TRANS;
@@ -2752,7 +2752,7 @@ png_image_read_colormap(png_voidp argument)
                num_trans = 0;
 
             output_processing = PNG_CMAP_NONE;
-            data_encoding = P_FILE; /* Don't change from color-map indicies */
+            data_encoding = P_FILE; /* Don't change from color-map indices */
             cmap_entries = png_ptr->num_palette;
             if (cmap_entries > 256)
                cmap_entries = 256;
@@ -2792,7 +2792,7 @@ png_image_read_colormap(png_voidp argument)
                      i < num_trans ? trans[i] : 255U, P_FILE/*8-bit*/);
             }
 
-            /* The PNG data may have indicies packed in fewer than 8 bits, it
+            /* The PNG data may have indices packed in fewer than 8 bits, it
              * must be expanded if so.
              */
             if (png_ptr->bit_depth < 8)

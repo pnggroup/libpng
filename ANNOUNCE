@@ -1,5 +1,4 @@
-
-Libpng 1.6.12 - June 12, 2014
+Libpng 1.6.13 - August 21, 2014
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -8,28 +7,48 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.12.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.12.tar.gz
+   libpng-1.6.13.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.13.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1612.7z  (LZMA-compressed, recommended)
-   lpng1612.zip
+   lpng1613.7z  (LZMA-compressed, recommended)
+   lpng1613.zip
 
 Other information:
 
-   libpng-1.6.12-README.txt
-   libpng-1.6.12-LICENSE.txt
-   libpng-1.6.12-*.asc (armored detached GPG signatures)
+   libpng-1.6.13-README.txt
+   libpng-1.6.13-LICENSE.txt
+   libpng-1.6.13-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.11):
-  Relocated new code from 1.6.11 in png.c to a point after the
-    declarations (Max Stepin).
-  Changed file permissions of contrib/tools/intgamma.sh,
-    test-driver, and compile from 0644 to 0755 (Cosmin).
-  Ensure "__has_attribute()" macro exists before trying to use it with
-    old clang compilers (MacPorts Ticket #43939).
+Changes since the last public release (1.6.12):
+
+  Quieted -Wsign-compare and -Wclobber compiler warnings in
+    contrib/pngminus/*.c
+  Added "(void) png_ptr;" where needed in contrib/gregbook to quiet
+    compiler complaints about unused pointers.
+  Split a long output string in contrib/gregbook/rpng2-x.c.
+  Added "PNG_SET_OPTION" requirement for sRGB chunk support to pnglibconf.dfa,
+    Needed for write-only support (John Bowler).
+  Changed "if defined(__ARM_NEON__)" to
+    "if (defined(__ARM_NEON__) || defined(__ARM_NEON))" (James Wu).
+  Fixed clang no-warning builds: png_digit was defined but never used.
+  Fixed an incorrect separator ("/" should be "\") in scripts/makefile.vcwin32
+    (bug report from Wolfgang S. Kechel).  Bug was introduced in libpng-1.6.11.
+    Also fixed makefile.bc32, makefile.bor, makefile.msc, makefile.intel, and
+    makefile.tc3 similarly.
+  Removed scripts/makefile.elf. It has not worked since libpng-1.5.0beta14
+    due to elimination of the PNG_FUNCTION_EXPORT and PNG_DATA_EXPORT
+    definitions from pngconf.h.
+  Ensure that CMakeLists.txt makes the target "lib" directory before making
+    symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
+  Added opinion that the ECCN (Export Control Classification Number) for
+    libpng is EAR99 to the README file.
+  Eliminated use of "$<" in makefile explicit rules, when copying
+    $PNGLIBCONF_H_PREBUILT.  This does not work on some versions of make;
+    bug introduced in libpng version 1.6.11.
+  Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
@@ -38,4 +57,3 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
-#endif

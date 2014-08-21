@@ -18,7 +18,7 @@ exec_prefix=$(prefix)
 # Library name:
 LIBNAME = libpng16
 PNGMAJ = 16
-RELEASE = 12
+RELEASE = 13
 
 # Shared library names:
 LIBSO=$(LIBNAME).dll
@@ -87,7 +87,7 @@ OBJS =  png.o pngerror.o pngget.o pngmem.o pngpread.o \
 all: static shared
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $< $@
+	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<

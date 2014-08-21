@@ -17,7 +17,7 @@ INCSDIR=${LOCALBASE}/include
 
 LIB=	png
 SHLIB_MAJOR=	16
-SHLIB_MINOR=	1.6.12
+SHLIB_MINOR=	1.6.13
 SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
 	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
 	pngwtran.c pngmem.c pngerror.c pngpread.c
@@ -42,7 +42,7 @@ CLEANFILES+=pngtest.o pngtest pnglibconf.h
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	cp $< $@
+	cp $(PNGLIBCONF_H_PREBUILT) $@
 
 pngtest.o:	pngtest.c
 	${CC} -c ${CPPFLAGS} ${CFLAGS} ${.ALLSRC} -o ${.TARGET}
