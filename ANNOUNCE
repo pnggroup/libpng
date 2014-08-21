@@ -1,44 +1,37 @@
 
-Libpng 1.5.19rc02 - August 14, 2014
+Libpng 1.5.19 - August 21, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.19rc02.tar.xz (LZMA-compressed, recommended)
-   1.5.19rc02.tar.gz
-   1.5.19rc02.tar.bz2
+   libpng-1.5.19.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.19.tar.gz
+   libpng-1.5.19.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1519r02.7z  (LZMA-compressed, recommended)
-   lp1519r02.zip
+   lpng1519.7z  (LZMA-compressed, recommended)
+   lpng1519.zip
 
 Other information:
 
-   1.5.19rc02-README.txt
-   1.5.19rc02-LICENSE.txt
-   libpng-1.5.19rc02-*.asc (armored detached GPG signatures)
+   libpng-1.5.19-README.txt
+   libpng-1.5.19-LICENSE.txt
+   libpng-1.5.19-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.18):
-
-Version 1.5.19beta01 [February 26, 2014]
   Moved redefines of png_error(), png_warning(), png_chunk_error(),
     and png_chunk_warning() from pngpriv.h to png.h to make them visible
     to libpng-calling applications.
   Fixed typos in the manual and in scripts/pnglibconf.dfa (CFLAGS -> CPPFLAGS
     and PNG_USR_CONFIG -> PNG_USER_CONFIG).
-
-Version 1.5.19beta02 [March 17, 2014]
   Use "if (value != 0)" instead of "if (value)" consistently.
   Moved configuration information from the manual to the INSTALL file.
-
-Version 1.5.19beta03 [April 6, 2014]
   Removed #if/#else/#endif from inside two pow() calls in pngvalid.c because
     they were handled improperly by Portland Group's PGI-14.1 - PGI-14.3
     when using its "__builtin_pow()" function.
@@ -46,28 +39,18 @@ Version 1.5.19beta03 [April 6, 2014]
   $(CP) is now used alongside $(RM_F).  Also, use 'copy' instead
     of 'cp' where applicable, and applied other minor makefile changes.
   Don't warn about invalid dimensions exceeding user limits.
-  Allow an easy replacement of the default pre-built configuration
-    header with a custom header, via the make PNGLIBCONF_H_PREBUILT
-    macro.
   Fixed a typo in pngrutil.c, introduced in libpng-1.5.6, that interferes
     with "blocky" expansion of sub-8-bit interlaced PNG files (Eric Huss).
-
-Version 1.5.19beta04 [August 4, 2014]
   Removed scripts/makefile.elf. It has not worked since libpng-1.5.0beta14
     due to elimination of the PNG_FUNCTION_EXPORT and PNG_DATA_EXPORT
     definitions from pngconf.h.
-
-Version 1.5.19beta05 [August 8, 2014]
+  Allow an easy replacement of the default pre-built configuration
+    header with a custom header, via the make PNGLIBCONF_H_PREBUILT
+    macro.
   Added opinion that the ECCN (Export Control Classification Number) for
     libpng is EAR99 to the README file.
-  Eliminated use of "$<" in makefile explicit rules, when copying
-    $PNGLIBCONF_H_PREBUILT.  This does not work on some versions of make;
-    bug introduced in libpng version 1.5.19beta03.
-
-Version 1.5.19rc01 [August 14, 2014]
   Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
-
-Version 1.5.19rc02 [August 14, 2014]
+  Added PNG_UNUSED(png_ptr) and PNG_UNUSED(val) in png_longjmp() (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

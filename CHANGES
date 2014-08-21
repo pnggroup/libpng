@@ -4243,7 +4243,8 @@ Version 1.5.19beta05 [August 8, 2014]
 Version 1.5.19rc01 [August 14, 2014]
   Made "ccopts" agree with "CFLAGS" in scripts/makefile.hp* and makefile.*sunu
 
-Version 1.5.19rc02 [August 14, 2014]
+Version 1.5.19 [August 21, 2014]
+  Added PNG_UNUSED(png_ptr) and PNG_UNUSED(val) in png_longjmp() (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
