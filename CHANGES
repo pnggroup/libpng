@@ -4979,6 +4979,7 @@ Version 1.6.13 [August 21, 2014]
   No changes.
 
 Version 1.6.14beta01 [August 21, 2014]
+  Guard usage of png_ptr->options with #ifdef PNG_SET_OPTION_SUPPORTED.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
