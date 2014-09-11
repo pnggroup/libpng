@@ -4978,11 +4978,10 @@ Version 1.6.13rc01 [August 14, 2014]
 Version 1.6.13 [August 21, 2014]
   No changes.
 
-Version 1.6.14beta01 [September 10, 2014]
+Version 1.6.14beta01 [September 11, 2014]
   Guard usage of png_ptr->options with #ifdef PNG_SET_OPTION_SUPPORTED.
-  Add #ifdef PNG_SETJMP_SUPPORTED where needed in contrib/tools/pngfix.c
-    to allow "make all" to complete without setjmp support (bug report
-    by Claudio Fontana)
+  Add #include <setjmp.h> to contrib/tools/pngfix.c to allow "make" to
+    complete without setjmp support (bug report by Claudio Fontana)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
