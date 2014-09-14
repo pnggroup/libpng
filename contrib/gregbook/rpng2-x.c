@@ -103,9 +103,6 @@
 #define RESNAME   "rpng2"       /* our X resource application name */
 #define RESCLASS  "Rpng"       /* our X resource class name */
 
-/* This is temporary until the code is rewritten to use nanosleep(). */
-#define usleep(x) sleep(((x)+499999)/1000000)
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -117,6 +114,11 @@
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
 #include <X11/keysym.h>   /* defines XK_* macros */
+
+/* This is temporary until the code is rewritten to use nanosleep(). */
+#ifndef usleep
+#  define usleep(x) sleep(((x)+499999)/1000000)
+#endif
 
 #ifdef VMS
 #  include <unistd.h>

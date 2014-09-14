@@ -4986,6 +4986,8 @@ Version 1.6.14beta01 [September 14, 2014]
   Add "#include <setjmp.h>" to contrib/tools/pngfix.c (John Bowler)
 
 Version 1.6.14beta02 [September 14, 2014]
+  Define usleep() in contrib/gregbook/rpng2-x.c if not already defined
+    in unistd.h; fixes error introduced in libpng-1.6.13.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
