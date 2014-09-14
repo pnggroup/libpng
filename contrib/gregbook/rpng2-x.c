@@ -115,8 +115,15 @@
 #include <X11/Xos.h>
 #include <X11/keysym.h>   /* defines XK_* macros */
 
-/* This is temporary until the code is rewritten to use nanosleep(). */
-#ifndef usleep
+#if _POSIX_C_SOURCE >= 199309L /* have nanosleep() */
+# undef usleep
+# define usleep(usec) {        \
+   struct timespec ts;         \
+   ts.tv_nsec = (usec) * 1000; \
+   nanosleep(&ts, NULL); }
+#  endif
+
+#ifndef usleep /* have neither nanosleep() nor usleep() */
 #  define usleep(x) sleep(((x)+499999)/1000000)
 #endif
 
