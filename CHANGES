@@ -4985,6 +4985,8 @@ Version 1.6.14beta01 [September 14, 2014]
     Claudio Fontana)
   Add "#include <setjmp.h>" to contrib/tools/pngfix.c (John Bowler)
 
+Version 1.6.14beta02 [September 14, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
