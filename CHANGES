@@ -4978,7 +4978,7 @@ Version 1.6.13rc01 [August 14, 2014]
 Version 1.6.13 [August 21, 2014]
   No changes.
 
-Version 1.6.14beta01 [September 11, 2014]
+Version 1.6.14beta01 [September 14, 2014]
   Guard usage of png_ptr->options with #ifdef PNG_SET_OPTION_SUPPORTED.
   Do not build contrib/tools/pngfix.c when PNG_SETJMP_NOT_SUPPORTED,
     to allow "make" to complete without setjmp support (bug report by

@@ -1,4 +1,4 @@
-Libpng 1.6.14beta01 - September 11, 2014
+Libpng 1.6.14beta01 - September 14, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,7 +25,7 @@ Other information:
 
 Changes since the last public release (1.6.13):
 
-Version 1.6.14beta01 [September 11, 2014]
+Version 1.6.14beta01 [September 14, 2014]
   Guard usage of png_ptr->options with #ifdef PNG_SET_OPTION_SUPPORTED.
   Do not build contrib/tools/pngfix.c when PNG_SETJMP_NOT_SUPPORTED,
     to allow "make" to complete without setjmp support (bug report by
