@@ -43,6 +43,9 @@ Version 1.6.14beta02 [September 18, 2014]
     at users.sourceforge.net").
 
 Version 1.6.14beta03 [September 18, 2014]
+  Define FE_DIVBYZERO, FE_INVALID, and FE_OVERFLOW in pngvalid.c if not
+    already defined.  Revert floating point exception handling to version
+    1.6.14beta01 behavior.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
