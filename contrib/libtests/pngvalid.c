@@ -30,10 +30,6 @@
 #  include <config.h>
 #endif
 
-#ifdef HAVE_FEENABLEEXCEPT /* from config.h, if included */
-#  include <fenv.h>
-#endif
-
 /* Define the following to use this test against your installed libpng, rather
  * than the one being built here:
  */
@@ -42,6 +38,13 @@
 #else
 #  include "../../png.h"
 #endif
+
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+# ifdef HAVE_FEENABLEEXCEPT /* from config.h, if included */
+#   include <fenv.h>
+# endif
+#endif
+
 
 #ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER
@@ -9976,9 +9979,11 @@ static void signal_handler(int signum)
          pos = safecat(msg, sizeof msg, pos, "abort");
          break;
 
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
       case SIGFPE:
          pos = safecat(msg, sizeof msg, pos, "floating point exception");
          break;
+#endif
 
       case SIGILL:
          pos = safecat(msg, sizeof msg, pos, "illegal instruction");
@@ -10044,18 +10049,21 @@ int main(int argc, char **argv)
 
    /* Add appropriate signal handlers, just the ANSI specified ones: */
    signal(SIGABRT, signal_handler);
-   signal(SIGFPE, signal_handler);
    signal(SIGILL, signal_handler);
    signal(SIGINT, signal_handler);
    signal(SIGSEGV, signal_handler);
    signal(SIGTERM, signal_handler);
 
-#ifdef HAVE_FEENABLEEXCEPT
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+   signal(SIGFPE, signal_handler);
+
+# ifdef HAVE_FEENABLEEXCEPT
    /* Only required to enable FP exceptions on platforms where they start off
     * disabled; this is not necessary but if it is not done pngvalid will likely
     * end up ignoring FP conditions that other platforms fault.
     */
    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+# endif
 #endif
 
    modifier_init(&pm);

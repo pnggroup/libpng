@@ -1,4 +1,4 @@
-Libpng 1.6.14beta02 - September 14, 2014
+Libpng 1.6.14beta02 - September 18, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -32,12 +32,15 @@ Version 1.6.14beta01 [September 14, 2014]
     Claudio Fontana)
   Add "#include <setjmp.h>" to contrib/tools/pngfix.c (John Bowler)
 
-Version 1.6.14beta02 [September 14, 2014]
+Version 1.6.14beta02 [September 18, 2014]
   Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
     because usleep() is deprecated.
   Define usleep() in contrib/gregbook/rpng2-x.c if not already defined
     in unistd.h and nanosleep() is not available; fixes error introduced
     in libpng-1.6.13.
+  Disable floating point exception handling in pngvalid.c when
+    PNG_FLOATING_ARITHMETIC is not supported (bug report by "zootus
+    at users.sourceforge.net").
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
