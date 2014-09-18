@@ -4995,6 +4995,8 @@ Version 1.6.14beta02 [September 18, 2014]
     PNG_FLOATING_ARITHMETIC is not supported (bug report by "zootus
     at users.sourceforge.net").
 
+Version 1.6.14beta03 [September 18, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
