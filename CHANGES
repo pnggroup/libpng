@@ -5000,6 +5000,8 @@ Version 1.6.14beta03 [September 19, 2014]
     already defined.  Revert floating point exception handling in pngvalid.c
     to version 1.6.14beta01 behavior.
 
+Version 1.6.14beta04 [September 19, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
