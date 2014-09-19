@@ -4995,10 +4995,10 @@ Version 1.6.14beta02 [September 18, 2014]
     PNG_FLOATING_ARITHMETIC is not supported (bug report by "zootus
     at users.sourceforge.net").
 
-Version 1.6.14beta03 [September 18, 2014]
+Version 1.6.14beta03 [September 19, 2014]
   Define FE_DIVBYZERO, FE_INVALID, and FE_OVERFLOW in pngvalid.c if not
-    already defined.  Revert floating point exception handling to version
-    1.6.14beta01 behavior.
+    already defined.  Revert floating point exception handling in pngvalid.c
+    to version 1.6.14beta01 behavior.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

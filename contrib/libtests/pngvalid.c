@@ -35,13 +35,13 @@
 #endif
 
 #ifndef FE_DIVBYZERO
-#define FE_DIVBYZERO 0
+#  define FE_DIVBYZERO 0
 #endif
 #ifndef FE_INVALID
-#define FE_INVALID 0
+#  define FE_INVALID 0
 #endif
 #ifndef FE_OVERFLOW
-#define FE_OVERFLOW 0
+#  define FE_OVERFLOW 0
 #endif
 
 /* Define the following to use this test against your installed libpng, rather
