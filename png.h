@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.14beta04 - September 19, 2014
+ * libpng version 1.6.14beta04 - September 20, 2014
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.14beta04 - September 19, 2014: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.14beta04 - September 20, 2014: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -235,7 +235,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.14beta04, September 19, 2014, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.14beta04, September 20, 2014, are
  * Copyright (c) 2004, 2006-2014 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -347,7 +347,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    September 19, 2014
+ *    September 20, 2014
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -417,7 +417,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.14beta04"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.14beta04 - September 19, 2014\n"
+     " libpng version 1.6.14beta04 - September 20, 2014\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2746,6 +2746,8 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 #  endif
 #endif
 
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) || \
+    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /*******************************************************************************
  *  SIMPLIFIED API
  *******************************************************************************
@@ -2817,7 +2819,7 @@ typedef struct
 #  define PNG_IMAGE_WARNING 1
 #  define PNG_IMAGE_ERROR 2
    /*
-    * The result is a two bit code such that a value more than 1 indicates
+    * The result is a two-bit code such that a value more than 1 indicates
     * a failure in the API just called:
     *
     *    0 - no warning or error
@@ -3198,6 +3200,7 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
 /*******************************************************************************
  *  END OF SIMPLIFIED API
  ******************************************************************************/
+#endif /* PNG_SIMPLIFIED_{READ|WRITE}_SUPPORTED */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 PNG_EXPORT(242, void, png_set_check_for_invalid_index,
@@ -3245,19 +3248,18 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structp png_ptr,
 
 PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
    int onoff));
-#endif
+#endif /* PNG_SET_OPTION_SUPPORTED */
 
 /*******************************************************************************
  *  END OF HARDWARE AND SOFTWARE OPTIONS
  ******************************************************************************/
 
-/* Maintainer: Put new public prototypes here ^, in libpng.3, and project
- * defs, scripts/pnglibconf.h, and scripts/pnglibconf.h.prebuilt
+/* Maintainer: Put new public prototypes here ^, in libpng.3, in project
+ * defs, and in scripts/symbols.def.
  */
 
 /* The last ordinal number (this is the *last* one already used; the next
- * one to use is one more than this.)  Maintainer, remember to add an entry to
- * scripts/symbols.def as well.
+ * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
   PNG_EXPORT_LAST_ORDINAL(244);

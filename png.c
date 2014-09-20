@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.12 [June 12, 2014]
+ * Last changed in libpng 1.6.14 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.14beta04 - September 19, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.14beta04 - September 20, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.14beta04 - September 19, 2014\
+      return "libpng version 1.6.14beta04 - September 20, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -4183,8 +4183,7 @@ const png_uint_16 png_sRGB_table[256] =
    57105,57646,58190,58737,59287,59840,60396,60955,
    61517,62082,62650,63221,63795,64372,64952,65535
 };
-
-#endif /* simplified read only */
+#endif /* PNG_SIMPLIFIED_READ_SUPPORTED */
 
 /* The base/delta tables are required for both read and write (but currently
  * only the simplified versions.)
