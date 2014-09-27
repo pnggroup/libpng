@@ -696,7 +696,7 @@ static png_uint_32
 random_32(void)
 {
 
-   for(;;)
+   for (;;)
    {
       png_byte mark[4];
       png_uint_32 result;
