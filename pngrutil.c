@@ -501,7 +501,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
           * end of the output buffer.
           */
          ret = inflate(&png_ptr->zstream, avail_out > 0 ? Z_NO_FLUSH :
-            (finish ? Z_FINISH : Z_SYNC_FLUSH));
+             (finish ? Z_FINISH : Z_SYNC_FLUSH));
       } while (ret == Z_OK);
 
       /* For safety kill the local buffer pointer now */
@@ -996,7 +996,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     */
 #ifdef PNG_READ_tRNS_SUPPORTED
    if (png_ptr->num_trans > 0 ||
-      (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS) != 0))
+       (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS) != 0))
    {
       /* Cancel this because otherwise it would be used if the transforms
        * require it.  Don't cancel the 'valid' flag because this would prevent
@@ -1304,9 +1304,9 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * chunk is just ignored, so does not invalidate the color space.  An
     * alternative is to set the 'invalid' flags at the start of this routine
     * and only clear them in they were not set before and all the tests pass.
-    * The minimum 'deflate' stream is assumed to be just the 2 byte header and 4
-    * byte checksum.  The keyword must be one character and there is a
-    * terminator (0) byte and the compression method.
+    * The minimum 'deflate' stream is assumed to be just the 2 byte header and
+    * 4 byte checksum.  The keyword must be at least one character and there is
+    * a terminator (0) byte and the compression method.
     */
    if (length < 9)
    {
@@ -1581,7 +1581,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          /* Warn the first time */
-         png_chunk_benign_error(png_ptr, "chunk cache full");
+         png_chunk_benign_error(png_ptr, "no space in chunk cache");
          png_crc_finish(png_ptr, length);
          return;
       }
@@ -2371,7 +2371,7 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "chunk cache full");
+         png_chunk_benign_error(png_ptr, "no space in chunk cache");
          return;
       }
    }
@@ -2450,7 +2450,7 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "chunk cache full");
+         png_chunk_benign_error(png_ptr, "no space in chunk cache");
          return;
       }
    }
@@ -2559,7 +2559,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (--png_ptr->user_chunk_cache_max == 1)
       {
          png_crc_finish(png_ptr, length);
-         png_chunk_benign_error(png_ptr, "chunk cache full");
+         png_chunk_benign_error(png_ptr, "no space in chunk cache");
          return;
       }
    }
@@ -2628,7 +2628,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       /* prefix_length should now be at the trailing '\0' of the translated
        * keyword, but it may already be over the end.  None of this arithmetic
        * can overflow because chunks are at most 2^31 bytes long, but on 16-bit
-       * systems the available allocaton may overflow.
+       * systems the available allocation may overflow.
        */
       ++prefix_length;
 
@@ -2660,7 +2660,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
          buffer[uncompressed_length+prefix_length] = 0;
 
-         if (compressed != 0)
+         if (compressed == 0)
             text.compression = PNG_ITXT_COMPRESSION_NONE;
 
          else
@@ -2884,7 +2884,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
          {
             case 2:
                png_ptr->user_chunk_cache_max = 1;
-               png_chunk_benign_error(png_ptr, "chunk cache full");
+               png_chunk_benign_error(png_ptr, "no space in chunk cache");
                /* FALL THROUGH */
             case 1:
                /* NOTE: prior to 1.6.0 this case resulted in an unknown critical
@@ -3165,7 +3165,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 #endif /* !PNG_USE_COMPILE_TIME_MASKS */
 
          /* Use the appropriate mask to copy the required bits.  In some cases
-          * the byte mask will be 0 or 0xff, optimize these cases.  row_width is
+          * the byte mask will be 0 or 0xff; optimize these cases.  row_width is
           * the number of pixels, but the code copies bytes, so it is necessary
           * to special case the end.
           */
@@ -3304,7 +3304,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                /* This can only be the RGB case, so each copy is exactly one
                 * pixel and it is not necessary to check for a partial copy.
                 */
-               for(;;)
+               for (;;)
                {
                   dp[0] = sp[0], dp[1] = sp[1], dp[2] = sp[2];
 

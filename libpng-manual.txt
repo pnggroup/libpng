@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta36 - August 6, 2014
+ libpng version 1.7.0beta36 - September 27, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta36 - August 6, 2014
+ libpng versions 0.97, January 1998, through 1.7.0beta36 - September 27, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -5036,11 +5036,27 @@ Error detection in some chunks has improved; in particular the iCCP chunk
 reader now does pretty complete validation of the basic format.  Some bad
 profiles that were previously accepted are now accepted with a warning or
 rejected, depending upon the png_set_benign_errors() setting, in particular the
-very old broken Microsoft/HP 3144-byte sRGB profile.  The PNG spec requirement
-that only grayscale profiles may appear in images with color type 0 or 4 and
-that even if the image only contains gray pixels, only RGB profiles may appear
-in images with color type 2, 3, or 6, is now enforced.  The sRGB chunk
-is allowed to appear in images with any color type.
+very old broken Microsoft/HP 3144-byte sRGB profile.  Starting with
+libpng-1.6.11, recognizing and checking sRGB profiles can be avoided by
+means of
+
+    #if defined(PNG_SKIP_sRGB_CHECK_PROFILE) && \
+        defined(PNG_SET_OPTION_SUPPORTED)
+       png_set_option(png_ptr, PNG_SKIP_sRGB_CHECK_PROFILE,
+           PNG_OPTION_ON);
+    #endif
+
+It's not a good idea to do this if you are using the "simplified API",
+which needs to be able to recognize an sRGB profile conveyed via the iCCP
+chunk.
+
+The PNG spec requirement that only grayscale profiles may appear in images
+with color type 0 or 4 and that even if the image only contains gray pixels,
+only RGB profiles may appear in images with color type 2, 3, or 6, is now
+enforced.  The sRGB chunk is allowed to appear in images with any color type
+and is interpreted by libpng to convey a one-tracer-curve gray profile or a
+three-tracer-curve RGB profile as appropriate.
+
 
 Prior to libpng-1.6.0 a warning would be issued if the iTXt chunk contained
 an empty language field or an empty translated keyword.  Both of these
@@ -5239,11 +5255,14 @@ We mark all non-exported functions with "/* PRIVATE */"":
  }
 
 The prototypes for non-exported functions (except for those in
-pngtest) appear in
-pngpriv.h
-above the comment that says
+pngtest) appear in pngpriv.h above the comment that says
 
   /* Maintainer: Put new private prototypes here ^ */
+
+To avoid polluting the global namespace, the names of all exported
+functions and variables begin with "png_", and all publicly visible C
+preprocessor macros begin with "PNG".  We request that applications that
+use libpng *not* begin any of their own symbols with either of these strings.
 
 We put a space after the "sizeof" operator and we omit the
 optional parentheses around its argument when the argument
@@ -5256,10 +5275,8 @@ sizeof operator, with its argument, in parentheses:
 Prior to libpng-1.6.0 we used a "png_sizeof()" macro, formatted as
 though it were a function.
 
-To avoid polluting the global namespace, the names of all exported
-functions and variables begin with "png_", and all publicly visible C
-preprocessor macros begin with "PNG".  We request that applications that
-use libpng *not* begin any of their own symbols with either of these strings.
+Control keywords if, for, while, and switch are always followed by a space
+to distinguish them from function calls, which have no trailing space. 
 
 We put a space after each comma and after each semicolon
 in "for" statements, and we put spaces before and after each
@@ -5292,7 +5309,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-August 6, 2014
+September 27, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
