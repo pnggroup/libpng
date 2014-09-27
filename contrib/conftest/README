@@ -16,6 +16,9 @@ directory it is very unlikely that it will be tested before a minor release!
 You can use these .dfa files as the basis of new configurations.  Files in this
 directory should not have any use restrictions or restrictive licenses.
 
+This directory is not included in the .zip and .7z distributions, which do
+not contain 'configure' scripts.
+
 DOCUMENTATION
 =============
 

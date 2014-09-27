@@ -4884,7 +4884,7 @@ Version 1.7.0beta35 [August 6, 2014]
   Added opinion that the ECCN (Export Control Classification Number) for
     libpng is EAR99 to the README file.
 
-Version 1.7.0beta36 [August 6, 2014]
+Version 1.7.0beta36 [September 27, 2014]
   Updated scripts/makefiles from libpng-1.6.13beta04.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
