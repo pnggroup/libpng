@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta36 - September 27, 2014
+Libpng 1.7.0beta37 - September 27, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta36.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta36.tar.gz
+   1.7.0beta37.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta37.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b36.7z  (LZMA-compressed, recommended)
-   lp170b36.zip
+   lp170b37.7z  (LZMA-compressed, recommended)
+   lp170b37.zip
 
 Other information:
 
-   1.7.0beta36-README.txt
-   1.7.0beta36-LICENSE.txt
-   libpng-1.7.0beta36-*.asc (armored detached GPG signatures)
+   1.7.0beta37-README.txt
+   1.7.0beta37-LICENSE.txt
+   libpng-1.7.0beta37-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -594,9 +594,12 @@ Version 1.7.0beta35 [August 6, 2014]
     symbolic link into it (SourceForge bug report #226 by Rolf Timmermans).
   Added opinion that the ECCN (Export Control Classification Number) for
     libpng is EAR99 to the README file.
-  Updated scripts/makefiles from libpng-1.6.13beta04.
 
 Version 1.7.0beta36 [September 27, 2014]
+  Updated scripts/makefiles from libpng-1.6.13beta04.
+  Minor updates to pngrutil.c and the manual from libpng-1.6.14beta04.
+
+Version 1.7.0beta37 [September 27, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

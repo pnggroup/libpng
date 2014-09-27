@@ -4886,6 +4886,9 @@ Version 1.7.0beta35 [August 6, 2014]
 
 Version 1.7.0beta36 [September 27, 2014]
   Updated scripts/makefiles from libpng-1.6.13beta04.
+  Minor updates to pngrutil.c and the manual from libpng-1.6.14beta04.
+
+Version 1.7.0beta37 [September 27, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
