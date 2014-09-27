@@ -4430,7 +4430,7 @@ Version 1.6.1beta05 [March 1, 2013]
 Version 1.6.1beta06 [March 4, 2013]
   Better documentation of unknown handling API interactions.
   Corrected Android builds and corrected libpng.vers with symbol
-    prefixing This adds an API to set optimization options externally,
+    prefixing. This adds an API to set optimization options externally,
     providing an alternative and general solution for the non-portable
     run-time tests used by the ARM Neon code.  It also makes those tests
     compile and link on Android.
@@ -5000,7 +5000,9 @@ Version 1.6.14beta03 [September 19, 2014]
     already defined.  Revert floating point exception handling in pngvalid.c
     to version 1.6.14beta01 behavior.
 
-Version 1.6.14beta04 [September 19, 2014]
+Version 1.6.14beta04 [September 27, 2014]
+  Fixed incorrect handling of the iTXt compression flag in pngrutil.c
+    (bug report by Shunsaku Hirata).  Bug was introduced in libpng-1.6.0.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

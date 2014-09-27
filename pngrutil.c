@@ -2671,7 +2671,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
          buffer[uncompressed_length+prefix_length] = 0;
 
-         if (compressed != 0)
+         if (compressed == 0)
             text.compression = PNG_ITXT_COMPRESSION_NONE;
 
          else
@@ -3330,7 +3330,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                /* This can only be the RGB case, so each copy is exactly one
                 * pixel and it is not necessary to check for a partial copy.
                 */
-               for(;;)
+               for (;;)
                {
                   dp[0] = sp[0], dp[1] = sp[1], dp[2] = sp[2];
 

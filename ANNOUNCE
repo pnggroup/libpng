@@ -1,4 +1,4 @@
-Libpng 1.6.14beta04 - September 19, 2014
+Libpng 1.6.14beta04 - September 27, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -47,7 +47,9 @@ Version 1.6.14beta03 [September 19, 2014]
     already defined.  Revert floating point exception handling in pngvalid.c
     to version 1.6.14beta01 behavior.
 
-Version 1.6.14beta04 [September 19, 2014]
+Version 1.6.14beta04 [September 27, 2014]
+  Fixed incorrect handling of the iTXt compression flag in pngrutil.c
+    (bug report by Shunsaku Hirata).  Bug was introduced in libpng-1.6.0.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
