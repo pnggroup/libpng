@@ -5004,6 +5004,8 @@ Version 1.6.14beta04 [September 27, 2014]
   Fixed incorrect handling of the iTXt compression flag in pngrutil.c
     (bug report by Shunsaku Hirata).  Bug was introduced in libpng-1.6.0.
 
+Version 1.6.14beta05 [September 27, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
