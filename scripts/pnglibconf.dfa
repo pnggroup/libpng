@@ -8,7 +8,7 @@ com pnglibconf.h - library build configuration
 com
 version
 com
-com Copyright (c) 1998-2013 Glenn Randers-Pehrson
+com Copyright (c) 1998-2014 Glenn Randers-Pehrson
 com
 com This code is released under the libpng license.
 com For conditions of distribution and use, see the disclaimer
@@ -197,7 +197,7 @@ setting API_RULE default 0
 setting PREFIX
 
 # This says that a prefix has been added to zlib API function names; at present
-# it is informational, the builder of zlib must ensure that zlib.h contains the
+# it is informational. The builder of zlib must ensure that zlib.h contains the
 # appropriate renames
 
 setting ZLIB_PREFIX
@@ -211,9 +211,9 @@ setting ZLIB_PREFIX
 # the exported header files - so it was quite important to use "zlib.h" to
 # ensure that applications always got the zlib.h from the same directory as
 # png.h.
-
 setting ZLIB_HEADER default <zlib.h>
-# include the file too, so that the defaults below are known
+
+# Include the zlib header too, so that the defaults below are known
 @#  include <zlib.h>
 
 # Implementation specific control of the optimizations, enabled by those
@@ -600,22 +600,25 @@ option GAMMA disabled
 option COLORSPACE enables GAMMA disabled
 
 # When an ICC profile is read, or png_set, it will be checked for a match
-# against known sRGB profiles if the sRGB handling is enabled.  This
-# setting controls how much work is done during the check:
+# against known sRGB profiles if the sRGB handling is enabled.  The
+# PNG_sRGB_PROFILE_CHECKS setting controls how much work is done during the
+# check:
 #
-# 0: Just validate the profile MD5 signature if present, otherwise use
-#    the checks in option 1.
+# -1: Don't do any sRGB profile checking.
 #
-# 1: Additionally check the length, intent and adler32 checksum of the
-#    actual data.   If enabled this will reject known profiles that have
-#    had the rendering intent in the header changed as well as other edits
-#    done without updating the checksum.  See the discussion below.
+#  0: Just validate the profile MD5 signature if present, otherwise use
+#     the checks in option 1.
 #
-# 2: Additionally checksum all the data using the ethernet CRC32 algorithm.
-#    This makes it more difficult to fake profiles and makes it less likely
-#    to get a false positive on profiles with no signature, but is probably
-#    just a waste of time since all currently approved ICC sRGB profiles have
-#    a secure MD5 signature.
+#  1: Additionally check the length, intent and adler32 checksum of the
+#     actual data.   If enabled this will reject known profiles that have
+#     had the rendering intent in the header changed as well as other edits
+#     done without updating the checksum.  See the discussion below.
+#
+#  2: Additionally checksum all the data using the ethernet CRC32 algorithm.
+#     This makes it more difficult to fake profiles and makes it less likely
+#     to get a false positive on profiles with no signature, but is probably
+#     just a waste of time since all currently approved ICC sRGB profiles have
+#     a secure MD5 signature.
 #
 # The rendering intent.  An ICC profile stores an intended rendering intent,
 # but does not include the value in the signature.  The intent is documented
@@ -744,7 +747,7 @@ chunk pHYs
 chunk sBIT
 chunk sCAL
 chunk sPLT
-chunk sRGB enables COLORSPACE, GAMMA
+chunk sRGB enables COLORSPACE, GAMMA, SET_OPTION
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS
@@ -857,8 +860,8 @@ option INFO_IMAGE
 
 option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
 option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
-option READ_CHECK_FOR_INVALID_INDEX requires READ disabled
-option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE disabled
+option READ_CHECK_FOR_INVALID_INDEX requires READ, CHECK_FOR_INVALID_INDEX
+option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE, CHECK_FOR_INVALID_INDEX
 
 # added at libpng-1.5.15
 option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX WRITE_GET_PALETTE_MAX

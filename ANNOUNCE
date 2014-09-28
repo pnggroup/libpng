@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta37 - September 27, 2014
+Libpng 1.7.0beta37 - September 28, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -599,7 +599,8 @@ Version 1.7.0beta36 [September 27, 2014]
   Updated scripts/makefiles from libpng-1.6.13beta04.
   Minor updates to pngrutil.c and the manual from libpng-1.6.14beta04.
 
-Version 1.7.0beta37 [September 27, 2014]
+Version 1.7.0beta37 [September 28, 2014]
+  Merged scripts/*, pngvalid.c and pngfix.c with libpng-1.6.14beta04.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
