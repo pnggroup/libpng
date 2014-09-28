@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.14 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -49,6 +49,9 @@
 #  error "pngfix will not work with libpng prior to 1.6.3"
 #endif
 
+#ifdef PNG_SETJMP_SUPPORTED
+#include <setjmp.h>
+
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED)
 /* zlib.h defines the structure z_stream, an instance of which is included
  * in this structure and is required for decompressing the LZ compressed
@@ -79,7 +82,7 @@
 #  error "pngfix not supported in this libpng version"
 #endif
 
-#if PNG_ZLIB_VERNUM >= 0x1240
+#if ZLIB_VERNUM >= 0x1240
 
 /* Copied from pngpriv.h */
 #ifdef __cplusplus
@@ -4014,16 +4017,16 @@ main(int argc, const char **argv)
    return global_end(&global);
 }
 
-#else /* PNG_ZLIB_VERNUM < 0x1240 */
+#else /* ZLIB_VERNUM < 0x1240 */
 int
 main(void)
 {
    fprintf(stderr,
       "pngfix needs libpng with a zlib >=1.2.4 (not 0x%x)\n",
-      PNG_ZLIB_VERNUM);
+      ZLIB_VERNUM);
    return 77;
 }
-#endif /* PNG_ZLIB_VERNUM */
+#endif /* ZLIB_VERNUM */
 
 #else /* No read support */
 
@@ -4034,3 +4037,12 @@ main(void)
    return 77;
 }
 #endif /* PNG_READ_SUPPORTED && PNG_EASY_ACCESS_SUPPORTED */
+#else /* No setjmp support */
+int
+main(void)
+{
+   fprintf(stderr, "pngfix does not work without setjmp support\n");
+   return 77;
+}
+#endif /* PNG_SETJMP_SUPPORTED */
+
