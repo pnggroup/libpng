@@ -4891,6 +4891,8 @@ Version 1.7.0beta36 [September 27, 2014]
 Version 1.7.0beta37 [September 28, 2014]
   Merged scripts/*, pngvalid.c and pngfix.c with libpng-1.6.14beta04.
 
+Version 1.7.0beta38 [September 28, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
