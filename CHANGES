@@ -5007,6 +5007,8 @@ Version 1.6.14beta04 [September 27, 2014]
 Version 1.6.14beta05 [October 1, 2014]
   Added "option READ_iCCP enables READ_COMPRESSED_TEXT" to pnglibconf.dfa
 
+Version 1.6.14beta06 [October 1, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
