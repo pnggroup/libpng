@@ -1,4 +1,4 @@
-Libpng 1.6.14beta05 - September 27, 2014
+Libpng 1.6.14beta05 - October 1, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -51,7 +51,8 @@ Version 1.6.14beta04 [September 27, 2014]
   Fixed incorrect handling of the iTXt compression flag in pngrutil.c
     (bug report by Shunsaku Hirata).  Bug was introduced in libpng-1.6.0.
 
-Version 1.6.14beta05 [September 27, 2014]
+Version 1.6.14beta05 [October 1, 2014]
+  Added "option READ_iCCP enables READ_COMPRESSED_TEXT" to pnglibconf.dfa
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
