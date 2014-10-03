@@ -5009,6 +5009,8 @@ Version 1.6.14beta05 [October 1, 2014]
 
 Version 1.6.14beta06 [October 3, 2014]
   Removed unused "text_len" parameter from private function png_write_zTXt().
+  Conditionally compile some code in png_deflate_claim(), when
+    PNG_WARNINGS_SUPPORTED and PNG_ERROR_TEXT_SUPPORTED are disabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

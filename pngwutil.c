@@ -297,6 +297,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 {
    if (png_ptr->zowner != 0)
    {
+#     if defined(PNG_WARNINGS_SUPPORTED) || defined(PNG_ERROR_TEXT_SUPPORTED)
       char msg[64];
 
       PNG_STRING_FROM_CHUNK(msg, owner);
@@ -308,6 +309,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
        * are minimal.
        */
       (void)png_safecat(msg, (sizeof msg), 10, " using zstream");
+#     endif
 #     if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
          png_warning(png_ptr, msg);
 
