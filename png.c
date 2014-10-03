@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.14beta06 - October 1, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.14beta06 - October 3, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.14beta06 - October 1, 2014\
+      return "libpng version 1.6.14beta06 - October 3, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3571,8 +3571,8 @@ png_log16bit(png_uint_32 x)
  * each case only the low 16 bits are relevant - the fraction - since the
  * integer bits (the top 4) simply determine a shift.
  *
- * The worst case is the 16-bit distinction between 65535 and 65534, this
- * requires perhaps spurious accuracty in the decoding of the logarithm to
+ * The worst case is the 16-bit distinction between 65535 and 65534. This
+ * requires perhaps spurious accuracy in the decoding of the logarithm to
  * distinguish log2(65535/65534.5) - 10^-5 or 17 bits.  There is little chance
  * of getting this accuracy in practice.
  *
@@ -3660,7 +3660,7 @@ png_exp8bit(png_fixed_point lg2)
    /* Get a 32-bit value: */
    png_uint_32 x = png_exp(lg2);
 
-   /* Convert the 32-bit value to 0..255 by multiplying by 256-1, note that the
+   /* Convert the 32-bit value to 0..255 by multiplying by 256-1. Note that the
     * second, rounding, step can't overflow because of the first, subtraction,
     * step.
     */
@@ -3842,7 +3842,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
 
    /* 'num' is the number of tables and also the number of low bits of low
     * bits of the input 16-bit value used to select a table.  Each table is
-    * itself index by the high 8 bits of the value.
+    * itself indexed by the high 8 bits of the value.
     */
    for (i = 0; i < num; i++)
       table[i] = (png_uint_16p)png_malloc(png_ptr,
@@ -3894,7 +3894,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
 
 /* Build a single 8-bit table: same as the 16-bit case but much simpler (and
  * typically much faster).  Note that libpng currently does no sBIT processing
- * (apparently contrary to the spec) so a 256 entry table is always generated.
+ * (apparently contrary to the spec) so a 256-entry table is always generated.
  */
 static void
 png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
@@ -4035,7 +4035,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
       * Where 'iv' is the input color value and 'ov' is the output value -
       * pow(iv, gamma).
       *
-      * Thus the gamma table consists of up to 256 256 entry tables.  The table
+      * Thus the gamma table consists of up to 256 256-entry tables.  The table
       * is selected by the (8-gamma_shift) most significant of the low 8 bits of
       * the color value then indexed by the upper 8 bits:
       *
@@ -4143,7 +4143,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
  *
  *    error: -0.513727 - 0.607759, 308 (0.469978%) of readings inexact
  *
- * In all cases the inexact readings are off by one.
+ * In all cases the inexact readings are only off by one.
  */
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
