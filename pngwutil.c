@@ -1621,14 +1621,13 @@ png_write_tEXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
 /* Write a compressed text chunk */
 void /* PRIVATE */
 png_write_zTXt(png_structrp png_ptr, png_const_charp key, png_const_charp text,
-    png_size_t text_len, int compression)
+    int compression)
 {
    png_uint_32 key_len;
    png_byte new_key[81];
    compression_state comp;
 
    png_debug(1, "in png_write_zTXt");
-   PNG_UNUSED(text_len) /* Always use strlen */
 
    if (compression == PNG_TEXT_COMPRESSION_NONE)
    {

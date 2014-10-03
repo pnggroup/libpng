@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Last changed in libpng 1.6.14 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -305,8 +305,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 #ifdef PNG_WRITE_zTXt_SUPPORTED
          /* Write compressed chunk */
          png_write_zTXt(png_ptr, info_ptr->text[i].key,
-             info_ptr->text[i].text, 0,
-             info_ptr->text[i].compression);
+             info_ptr->text[i].text, info_ptr->text[i].compression);
 #else
          png_warning(png_ptr, "Unable to write compressed text");
 #endif
@@ -399,8 +398,7 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_WRITE_zTXt_SUPPORTED
             /* Write compressed chunk */
             png_write_zTXt(png_ptr, info_ptr->text[i].key,
-                info_ptr->text[i].text, 0,
-                info_ptr->text[i].compression);
+                info_ptr->text[i].text, info_ptr->text[i].compression);
 #else
             png_warning(png_ptr, "Unable to write compressed text");
 #endif
