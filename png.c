@@ -696,13 +696,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta38 - September 28, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta38 - October 4, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta38 - September 28, 2014\
+      return "libpng version 1.7.0beta38 - October 4, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3474,8 +3474,8 @@ png_log16bit(png_uint_32 x)
  * each case only the low 16 bits are relevant - the fraction - since the
  * integer bits (the top 4) simply determine a shift.
  *
- * The worst case is the 16-bit distinction between 65535 and 65534, this
- * requires perhaps spurious accuracty in the decoding of the logarithm to
+ * The worst case is the 16-bit distinction between 65535 and 65534. This
+ * requires perhaps spurious accuracy in the decoding of the logarithm to
  * distinguish log2(65535/65534.5) - 10^-5 or 17 bits.  There is little chance
  * of getting this accuracy in practice.
  *
@@ -3563,7 +3563,7 @@ png_exp8bit(png_fixed_point lg2)
    /* Get a 32-bit value: */
    png_uint_32 x = png_exp(lg2);
 
-   /* Convert the 32-bit value to 0..255 by multiplying by 256-1, note that the
+   /* Convert the 32-bit value to 0..255 by multiplying by 256-1. Note that the
     * second, rounding, step can't overflow because of the first, subtraction,
     * step.
     */
@@ -4165,7 +4165,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
  *
  *    error: -0.513727 - 0.607759, 308 (0.469978%) of readings inexact
  *
- * In all cases the inexact readings are off by one.
+ * In all cases the inexact readings are only off by one.
  */
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED

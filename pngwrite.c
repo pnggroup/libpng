@@ -310,8 +310,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 #ifdef PNG_WRITE_zTXt_SUPPORTED
          /* Write compressed chunk */
          png_write_zTXt(png_ptr, info_ptr->text[i].key,
-             info_ptr->text[i].text, 0,
-             info_ptr->text[i].compression);
+             info_ptr->text[i].text, info_ptr->text[i].compression);
 #else
          png_warning(png_ptr, "Unable to write compressed text");
 #endif
@@ -404,8 +403,7 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_WRITE_zTXt_SUPPORTED
             /* Write compressed chunk */
             png_write_zTXt(png_ptr, info_ptr->text[i].key,
-                info_ptr->text[i].text, 0,
-                info_ptr->text[i].compression);
+                info_ptr->text[i].text, info_ptr->text[i].compression);
 #else
             png_warning(png_ptr, "Unable to write compressed text");
 #endif
