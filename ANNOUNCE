@@ -59,6 +59,8 @@ Version 1.6.14beta06 [October 4, 2014]
   Conditionally compile some code in png_deflate_claim(), when
     PNG_WARNINGS_SUPPORTED and PNG_ERROR_TEXT_SUPPORTED are disabled.
   Replaced repeated code in pngpread.c with PNG_PUSH_SAVE_BUFFER_IF_FULL.
+  Added "chunk iTXt enables TEXT" and "chunk zTXt enables TEXT"
+    to pnglibconf.dfa.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

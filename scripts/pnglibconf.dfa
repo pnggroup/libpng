@@ -732,7 +732,7 @@ chunk cHRM enables COLORSPACE
 chunk gAMA enables GAMMA
 chunk hIST
 chunk iCCP enables COLORSPACE, GAMMA
-chunk iTXt
+chunk iTXt enables TEXT
 chunk oFFs
 chunk pCAL
 chunk pHYs
@@ -743,7 +743,7 @@ chunk sRGB enables COLORSPACE, GAMMA, SET_OPTION
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS
-chunk zTXt
+chunk zTXt enables TEXT
 
 # This only affects support of the optional PLTE chunk in RGB and RGBA
 # images.  Notice that READ_ANCILLARY_CHUNKS therefore disables part
@@ -830,7 +830,6 @@ option READ_COMPRESSED_TEXT disabled
 option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
-option READ_COMPRESSED_TEXT enables READ_TEXT
 
 option WRITE_oFFs enables SAVE_INT_32
 option WRITE_pCAL enables SAVE_INT_32
