@@ -5015,6 +5015,8 @@ Version 1.6.14beta06 [October 5, 2014]
   Added "chunk iTXt enables TEXT" and "chunk zTXt enables TEXT"
     to pnglibconf.dfa.
 
+Version 1.6.14beta07 [October 5, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

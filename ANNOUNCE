@@ -1,4 +1,4 @@
-Libpng 1.6.14beta06 - October 5, 2014
+Libpng 1.6.14beta07 - October 5, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.14beta06.tar.xz (LZMA-compressed, recommended)
-   1.6.14beta06.tar.gz
+   1.6.14beta07.tar.xz (LZMA-compressed, recommended)
+   1.6.14beta07.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1614b06.7z  (LZMA-compressed, recommended)
-   lp1614b06.zip
+   lp1614b07.7z  (LZMA-compressed, recommended)
+   lp1614b07.zip
 
 Other information:
 
-   1.6.14beta06-README.txt
-   1.6.14beta06-LICENSE.txt
-   libpng-1.6.14beta06-*.asc (armored detached GPG signatures)
+   1.6.14beta07-README.txt
+   1.6.14beta07-LICENSE.txt
+   libpng-1.6.14beta07-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.13):
 
@@ -61,6 +61,8 @@ Version 1.6.14beta06 [October 5, 2014]
   Replaced repeated code in pngpread.c with PNG_PUSH_SAVE_BUFFER_IF_FULL.
   Added "chunk iTXt enables TEXT" and "chunk zTXt enables TEXT"
     to pnglibconf.dfa.
+
+Version 1.6.14beta07 [October 5, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
