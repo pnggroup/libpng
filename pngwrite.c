@@ -292,11 +292,14 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
              info_ptr->text[i].lang,
              info_ptr->text[i].lang_key,
              info_ptr->text[i].text);
+         /* Mark this chunk as written */
+         if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_NONE)
+            info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
+         else
+            info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
 #else
-          png_warning(png_ptr, "Unable to write international text");
+         png_warning(png_ptr, "Unable to write international text");
 #endif
-          /* Mark this chunk as written */
-          info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
       }
 
       /* If we want a compressed text chunk */
@@ -306,11 +309,11 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
          /* Write compressed chunk */
          png_write_zTXt(png_ptr, info_ptr->text[i].key,
              info_ptr->text[i].text, info_ptr->text[i].compression);
+         /* Mark this chunk as written */
+         info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
 #else
          png_warning(png_ptr, "Unable to write compressed text");
 #endif
-         /* Mark this chunk as written */
-         info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
       }
 
       else if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_NONE)
