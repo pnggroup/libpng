@@ -839,7 +839,6 @@ option WRITE_COMPRESSED_TEXT disabled
 option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
 option WRITE_iTXt enables WRITE_COMPRESSED_TEXT
 option WRITE_zTXt enables WRITE_COMPRESSED_TEXT
-option WRITE_COMPRESSED_TEXT enables WRITE_TEXT
 
 # Turn this off to disable png_read_png() and png_write_png() and
 # leave the row_pointers member out of the info structure.
