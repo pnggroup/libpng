@@ -932,7 +932,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     */
 
    /* Once we write out the header, the compression type on the text
-    * chunks gets changed to PNG_TEXT_COMPRESSION_NONE_WR or
+    * chunk gets changed to PNG_TEXT_COMPRESSION_NONE_WR or
     * PNG_TEXT_COMPRESSION_zTXt_WR, so it doesn't get written out again
     * at the end.
     */
