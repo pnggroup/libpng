@@ -1,4 +1,4 @@
-Libpng 1.6.14beta07 - October 5, 2014
+Libpng 1.6.14beta07 - October 7, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -64,7 +64,7 @@ Version 1.6.14beta06 [October 5, 2014]
   Removed "option READ_COMPRESSED_TEXT enables READ_TEXT" from pnglibconf.dfa,
     to make it possible to configure a libpng that supports iCCP but not TEXT.
 
-Version 1.6.14beta07 [October 5, 2014]
+Version 1.6.14beta07 [October 7, 2014]
   Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
   Only mark text chunks as written after successfully writing them.
 

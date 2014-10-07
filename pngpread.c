@@ -29,7 +29,7 @@
 #define PNG_PUSH_SAVE_BUFFER_IF_FULL \
 if (png_ptr->push_length + 4 > png_ptr->buffer_size) \
    { png_push_save_buffer(png_ptr); return; }
-#define PNG_PUSH_SAVE_BUFFER_IF_LT_N(N) \
+#define PNG_PUSH_SAVE_BUFFER_IF_LT(N) \
 if (png_ptr->buffer_size < N) \
    { png_push_save_buffer(png_ptr); return; }
 
@@ -207,7 +207,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       png_byte chunk_length[4];
       png_byte chunk_tag[4];
 
-      PNG_PUSH_SAVE_BUFFER_IF_LT_N(8)
+      PNG_PUSH_SAVE_BUFFER_IF_LT(8)
       png_push_fill_buffer(png_ptr, chunk_length, 4);
       png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
@@ -496,7 +496,7 @@ png_push_crc_finish(png_structrp png_ptr)
    }
    if (!png_ptr->skip_length)
    {
-      PNG_PUSH_SAVE_BUFFER_IF_LT_N(4)
+      PNG_PUSH_SAVE_BUFFER_IF_LT(4)
       png_crc_finish(png_ptr, 0);
       png_ptr->process_mode = PNG_READ_CHUNK_MODE;
    }
@@ -621,7 +621,7 @@ png_push_read_IDAT(png_structrp png_ptr)
       png_byte chunk_tag[4];
 
       /* TODO: this code can be commoned up with the same code in push_read */
-      PNG_PUSH_SAVE_BUFFER_IF_LT_N(8)
+      PNG_PUSH_SAVE_BUFFER_IF_LT(8)
       png_push_fill_buffer(png_ptr, chunk_length, 4);
       png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
@@ -696,7 +696,7 @@ png_push_read_IDAT(png_structrp png_ptr)
    }
    if (!png_ptr->idat_size)
    {
-      PNG_PUSH_SAVE_BUFFER_IF_LT_N(4)
+      PNG_PUSH_SAVE_BUFFER_IF_LT(4)
       png_crc_finish(png_ptr, 0);
       png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
       png_ptr->mode |= PNG_AFTER_IDAT;
