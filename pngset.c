@@ -1578,7 +1578,7 @@ png_set_benign_errors(png_structrp png_ptr, int allowed)
     * It is possible for an indexed (color-type==3) PNG file to contain
     * pixels with invalid (out-of-range) indexes if the PLTE chunk has
     * fewer entries than the image's bit-depth would allow. We recover
-    * from this gracefully by filling any incomplete palette with zeroes
+    * from this gracefully by filling any incomplete palette with zeros
     * (opaque black).  By default, when this occurs libpng will issue
     * a benign error.  This API can be used to override that behavior.
     */
