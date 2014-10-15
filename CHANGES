@@ -5021,7 +5021,7 @@ Version 1.6.14beta07 [October 7, 2014]
   Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
   Only mark text chunks as written after successfully writing them.
 
-Version 1.6.14rc01 [October 23, 2014]
+Version 1.6.14rc01 [October 15, 2014]
   Fixed some typos in comments.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
