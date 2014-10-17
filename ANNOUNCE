@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta38 - October 17, 2014
+Libpng 1.7.0beta39 - October 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta38.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta38.tar.gz
+   1.7.0beta39.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta39.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b38.7z  (LZMA-compressed, recommended)
-   lp170b38.zip
+   lp170b39.7z  (LZMA-compressed, recommended)
+   lp170b39.zip
 
 Other information:
 
-   1.7.0beta38-README.txt
-   1.7.0beta38-LICENSE.txt
-   libpng-1.7.0beta38-*.asc (armored detached GPG signatures)
+   1.7.0beta39-README.txt
+   1.7.0beta39-LICENSE.txt
+   libpng-1.7.0beta39-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -616,6 +616,8 @@ Version 1.7.0beta38 [October 17, 2014]
     to make it possible to configure a libpng that supports iCCP but not TEXT.
   Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
   Only mark text chunks as written after successfully writing them.
+
+Version 1.7.0beta39 [October 17, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
