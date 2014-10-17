@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta38 - October 5, 2014
+Libpng 1.7.0beta38 - October 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -597,12 +597,14 @@ Version 1.7.0beta35 [August 6, 2014]
 
 Version 1.7.0beta36 [September 27, 2014]
   Updated scripts/makefiles from libpng-1.6.13beta04.
-  Minor updates to pngrutil.c and the manual from libpng-1.6.14beta04.
+  Minor updates to the manual from libpng-1.6.14beta04.
+  Fixed incorrect handling of the iTXt compression flag in pngrutil.c
+    (bug report by Shunsaku Hirata).  Bug was introduced in libpng-1.6.0.
 
 Version 1.7.0beta37 [September 28, 2014]
   Merged scripts/*, pngvalid.c and pngfix.c with libpng-1.6.14beta04.
 
-Version 1.7.0beta38 [October 5, 2014]
+Version 1.7.0beta38 [October 17, 2014]
   Added "option READ_iCCP enables READ_COMPRESSED_TEXT" to pnglibconf.dfa
   Removed unused "text_len" parameter from private function png_write_zTXt().
   Conditionally compile some code in png_deflate_claim(), when
