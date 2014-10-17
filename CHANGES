@@ -5024,6 +5024,10 @@ Version 1.6.14beta07 [October 7, 2014]
 Version 1.6.14rc01 [October 15, 2014]
   Fixed some typos in comments.
 
+Version 1.6.14rc02 [October 17, 2014]
+  Changed png_convert_to_rfc_1123() to png_convert_to_rfc_1123_buffer()
+    in the manual, to reflect the change made in libpng-1.6.0.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
