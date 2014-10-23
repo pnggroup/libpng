@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.14 [October 23, 2014]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -48,6 +48,9 @@
 #if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
 #  error "pngfix will not work with libpng prior to 1.6.3"
 #endif
+
+#ifdef PNG_SETJMP_SUPPORTED
+#include <setjmp.h>
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED)
 /* zlib.h defines the structure z_stream, an instance of which is included
@@ -4034,3 +4037,12 @@ main(void)
    return 77;
 }
 #endif /* PNG_READ_SUPPORTED && PNG_EASY_ACCESS_SUPPORTED */
+#else /* No setjmp support */
+int
+main(void)
+{
+   fprintf(stderr, "pngfix does not work without setjmp support\n");
+   return 77;
+}
+#endif /* PNG_SETJMP_SUPPORTED */
+

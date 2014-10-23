@@ -333,7 +333,7 @@ built.  pngconf.h no longer includes pngusr.h; therefore, pngusr.h is ignored
 after the build of pnglibconf.h and it is never included in an application
 build.
 
-The rarely used alternative of adding a list of feature macros to the
+The formerly used alternative of adding a list of feature macros to the
 CPPFLAGS setting in the build also still works; however, the macros will be
 copied to pnglibconf.h and this may produce macro redefinition warnings
 when the individual C files are compiled.
@@ -349,12 +349,19 @@ functioning awk called 'nawk'.
 
 Configuration options are now documented in scripts/pnglibconf.dfa.  This
 file also includes dependency information that ensures a configuration is
-consistent; that is, if a feature is switched off dependent features are
-also removed.  As a recommended alternative to using feature macros in
+consistent; that is, if a feature is switched off, dependent features are
+also switched off.  As a recommended alternative to using feature macros in
 pngusr.h a system builder may also define equivalent options in pngusr.dfa
 (or, indeed, any file) and add that to the configuration by setting
 DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
-how to do this, and illustrate a case where pngusr.h is still required.
+how to do this, and also illustrate a case where pngusr.h is still required.
+
+After you have built libpng, the definitions that were recorded in
+pnglibconf.h are available to your application (pnglibconf.h is included
+in png.h and gets installed alongside png.h and pngconf.h in your
+$PREFIX/include directory).  Do not edit pnglibconf.h after you have built
+libpng, because than the settings would not accurately reflect the settings
+that were used to build libpng.
 
 XV. Configuring libpng for multiprocessing
 

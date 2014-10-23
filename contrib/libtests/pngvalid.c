@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.14 [October 23, 2014]
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -32,6 +32,16 @@
 
 #ifdef HAVE_FEENABLEEXCEPT /* from config.h, if included */
 #  include <fenv.h>
+#endif
+
+#ifndef FE_DIVBYZERO
+#  define FE_DIVBYZERO 0
+#endif
+#ifndef FE_INVALID
+#  define FE_INVALID 0
+#endif
+#ifndef FE_OVERFLOW
+#  define FE_OVERFLOW 0
 #endif
 
 /* Define the following to use this test against your installed libpng, rather
@@ -686,7 +696,7 @@ static png_uint_32
 random_32(void)
 {
 
-   for(;;)
+   for (;;)
    {
       png_byte mark[4];
       png_uint_32 result;

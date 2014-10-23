@@ -188,13 +188,13 @@ int main(int argc, const char **argv)
  *
  * Don't repeatedly convert between the 8-bit and 16-bit forms.  There is
  * significant data loss when 16-bit data is converted to the 8-bit encoding and
- * the current libpng implementation of convertion to 16-bit is also
+ * the current libpng implementation of conversion to 16-bit is also
  * significantly lossy.  The latter will be fixed in the future, but the former
  * is unavoidable - the 8-bit format just doesn't have enough resolution.
  */
 
 /* If your program needs more information from the PNG data it reads, or if you
- * need to do more complex transformations, or minimise transformations, on the
+ * need to do more complex transformations, or minimize transformations, on the
  * data you read, then you must use one of the several lower level libpng
  * interfaces.
  *
@@ -932,7 +932,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     */
 
    /* Once we write out the header, the compression type on the text
-    * chunks gets changed to PNG_TEXT_COMPRESSION_NONE_WR or
+    * chunk gets changed to PNG_TEXT_COMPRESSION_NONE_WR or
     * PNG_TEXT_COMPRESSION_zTXt_WR, so it doesn't get written out again
     * at the end.
     */

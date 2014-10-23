@@ -646,7 +646,7 @@ set_location(png_structp png_ptr, struct user_chunk_data *data, int what)
    if ((data->location[0] & what) || (data->location[1] & what))
       return 0; /* already have one of these */
 
-   /* Find where we are (the code below zeros info_ptr to indicate that the
+   /* Find where we are (the code below zeroes info_ptr to indicate that the
     * chunks before the first IDAT have been read.)
     */
    if (data->info_ptr == NULL) /* after IDAT */
@@ -1991,4 +1991,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_13 Your_png_h_is_not_version_1_6_13;
+typedef png_libpng_version_1_6_14 Your_png_h_is_not_version_1_6_14;

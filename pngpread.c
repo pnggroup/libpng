@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Last changed in libpng 1.6.14 [October 23, 2014]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -26,6 +26,13 @@
 #define PNG_READ_iTXt_MODE  7
 #define PNG_ERROR_MODE      8
 
+#define PNG_PUSH_SAVE_BUFFER_IF_FULL \
+if (png_ptr->push_length + 4 > png_ptr->buffer_size) \
+   { png_push_save_buffer(png_ptr); return; }
+#define PNG_PUSH_SAVE_BUFFER_IF_LT(N) \
+if (png_ptr->buffer_size < N) \
+   { png_push_save_buffer(png_ptr); return; }
+
 void PNGAPI
 png_process_data(png_structrp png_ptr, png_inforp info_ptr,
     png_bytep buffer, png_size_t buffer_size)
@@ -46,7 +53,7 @@ png_process_data_pause(png_structrp png_ptr, int save)
 {
    if (png_ptr != NULL)
    {
-      /* It's easiest for the caller if we do the save, then the caller doesn't
+      /* It's easiest for the caller if we do the save; then the caller doesn't
        * have to supply the same data again:
        */
       if (save != 0)
@@ -189,10 +196,10 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    int keep; /* unknown handling method */
 #endif
 
-   /* First we make sure we have enough data for the 4 byte chunk name
-    * and the 4 byte chunk length before proceeding with decoding the
+   /* First we make sure we have enough data for the 4-byte chunk name
+    * and the 4-byte chunk length before proceeding with decoding the
     * chunk data.  To fully decode each of these chunks, we also make
-    * sure we have enough data in the buffer for the 4 byte CRC at the
+    * sure we have enough data in the buffer for the 4-byte CRC at the
     * end of every chunk (except IDAT, which is handled separately).
     */
    if (!(png_ptr->mode & PNG_HAVE_CHUNK_HEADER))
@@ -200,12 +207,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       png_byte chunk_length[4];
       png_byte chunk_tag[4];
 
-      if (png_ptr->buffer_size < 8)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_LT(8)
       png_push_fill_buffer(png_ptr, chunk_length, 4);
       png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
@@ -249,23 +251,13 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       if (png_ptr->push_length != 13)
          png_error(png_ptr, "Invalid IHDR length");
 
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_IHDR(png_ptr, info_ptr, png_ptr->push_length);
    }
 
    else if (chunk_name == png_IEND)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_IEND(png_ptr, info_ptr, png_ptr->push_length);
 
       png_ptr->process_mode = PNG_READ_DONE_MODE;
@@ -275,12 +267,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    else if ((keep = png_chunk_unknown_handling(png_ptr, chunk_name)) != 0)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length, keep);
 
       if (chunk_name == png_PLTE)
@@ -290,11 +277,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
    else if (chunk_name == png_PLTE)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_PLTE(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -313,12 +296,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_gAMA_SUPPORTED
    else if (png_ptr->chunk_name == png_gAMA)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_gAMA(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -326,12 +304,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_sBIT_SUPPORTED
    else if (png_ptr->chunk_name == png_sBIT)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_sBIT(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -339,12 +312,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_cHRM_SUPPORTED
    else if (png_ptr->chunk_name == png_cHRM)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_cHRM(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -352,12 +320,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_sRGB_SUPPORTED
    else if (chunk_name == png_sRGB)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_sRGB(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -365,12 +328,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_iCCP_SUPPORTED
    else if (png_ptr->chunk_name == png_iCCP)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_iCCP(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -378,12 +336,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_sPLT_SUPPORTED
    else if (chunk_name == png_sPLT)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_sPLT(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -391,12 +344,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_tRNS_SUPPORTED
    else if (chunk_name == png_tRNS)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_tRNS(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -404,12 +352,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_bKGD_SUPPORTED
    else if (chunk_name == png_bKGD)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_bKGD(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -417,12 +360,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_hIST_SUPPORTED
    else if (chunk_name == png_hIST)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_hIST(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -430,12 +368,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_pHYs_SUPPORTED
    else if (chunk_name == png_pHYs)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_pHYs(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -443,12 +376,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_oFFs_SUPPORTED
    else if (chunk_name == png_oFFs)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_oFFs(png_ptr, info_ptr, png_ptr->push_length);
    }
 #endif
@@ -456,12 +384,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_pCAL_SUPPORTED
    else if (chunk_name == png_pCAL)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_pCAL(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -469,12 +392,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_sCAL_SUPPORTED
    else if (chunk_name == png_sCAL)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_sCAL(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -482,12 +400,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_tIME_SUPPORTED
    else if (chunk_name == png_tIME)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_tIME(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -495,12 +408,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_tEXt_SUPPORTED
    else if (chunk_name == png_tEXt)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_tEXt(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -508,12 +416,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_zTXt_SUPPORTED
    else if (chunk_name == png_zTXt)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_zTXt(png_ptr, info_ptr, png_ptr->push_length);
    }
 
@@ -521,23 +424,14 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_iTXt_SUPPORTED
    else if (chunk_name == png_iTXt)
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_iTXt(png_ptr, info_ptr, png_ptr->push_length);
    }
 #endif
 
    else
    {
-      if (png_ptr->push_length + 4 > png_ptr->buffer_size)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
       png_handle_unknown(png_ptr, info_ptr, png_ptr->push_length,
          PNG_HANDLE_CHUNK_AS_DEFAULT);
    }
@@ -602,12 +496,7 @@ png_push_crc_finish(png_structrp png_ptr)
    }
    if (!png_ptr->skip_length)
    {
-      if (png_ptr->buffer_size < 4)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_LT(4)
       png_crc_finish(png_ptr, 0);
       png_ptr->process_mode = PNG_READ_CHUNK_MODE;
    }
@@ -732,12 +621,7 @@ png_push_read_IDAT(png_structrp png_ptr)
       png_byte chunk_tag[4];
 
       /* TODO: this code can be commoned up with the same code in push_read */
-      if (png_ptr->buffer_size < 8)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_LT(8)
       png_push_fill_buffer(png_ptr, chunk_length, 4);
       png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
       png_reset_crc(png_ptr);
@@ -812,12 +696,7 @@ png_push_read_IDAT(png_structrp png_ptr)
    }
    if (!png_ptr->idat_size)
    {
-      if (png_ptr->buffer_size < 4)
-      {
-         png_push_save_buffer(png_ptr);
-         return;
-      }
-
+      PNG_PUSH_SAVE_BUFFER_IF_LT(4)
       png_crc_finish(png_ptr, 0);
       png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
       png_ptr->mode |= PNG_AFTER_IDAT;
