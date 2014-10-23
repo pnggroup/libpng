@@ -5030,7 +5030,8 @@ Version 1.6.14rc02 [October 17, 2014]
   Updated README file to explain that direct access to the png_struct
     and info_struct members has not been permitted since libpng-1.5.0.
 
-Version 1.6.14rc03 [October 17, 2014]
+Version 1.6.14 [October 23, 2014]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
