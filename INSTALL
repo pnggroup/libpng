@@ -13,7 +13,7 @@ Contents
 VIII. Configuring libpng for 16-bit platforms
   IX. Configuring for DOS
    X. Configuring for Medium Model
-  XI. Prepending a prefix to exported symbols
+  XI. Omitted
  XII. Configuring for compiler xxx:
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
@@ -204,16 +204,7 @@ the end for pointers (or at least look at them and be careful).  Make
 note that the rows of data are defined as png_bytepp, which is
 an "unsigned char far * far *".
 
-XI. Prepending a prefix to exported symbols
-
-Starting with libpng-1.6.0, you can configure libpng (when using the
-"configure" script) to prefix all exported symbols by means of the
-configuration option "--with-libpng-prefix=FOO_", where FOO_ can be any
-string beginning with a letter and containing only uppercase
-and lowercase letters, digits, and the underscore (i.e., a C language
-identifier).  This creates a set of macros in pnglibconf.h, so this is
-transparent to applications; their function calls get transformed by
-the macros to use the modified names.
+XI. Omitted
 
 XII. Configuring for compiler xxx:
 
