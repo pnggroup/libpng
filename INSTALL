@@ -13,12 +13,12 @@ Contents
 VIII. Configuring libpng for 16-bit platforms
   IX. Configuring for DOS
    X. Configuring for Medium Model
-  XI. Omitted
+  XI. Prepending a prefix to exported symbols
  XII. Configuring for compiler xxx:
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
   XV. Configuring libpng for multiprocessing
- XVI. Other sources of information about libpng:
+ XVI. Other sources of information about libpng
 
 I. Simple installation
 
@@ -28,7 +28,14 @@ On Unix/Linux and similar systems, you can simply type
     make check
     make install
 
-and ignore the rest of this document.
+and ignore the rest of this document.  "/path" is the path to the directory
+where you want to install the libpng "lib", "include", and "bin"
+subdirectories.
+
+Note that "configure" is only included in the "*.tar" distributions and not
+in the "*.zip" or "*.7z" distributions. If you downloaded one of those
+distributions, see "Building with project files" or "Building with makefiles",
+below.
 
 II. Rebuilding the configure scripts
 
@@ -64,8 +71,8 @@ Or you can use one of the "projects" in the "projects" directory.
 
 Before installing libpng, you must first install zlib, if it
 is not already on your system.  zlib can usually be found
-wherever you got libpng.  zlib can be placed in another directory,
-at the same level as libpng.
+wherever you got libpng; otherwise go to http://zlib.net.  You can place
+zlib in in the same directory as libpng or in another directory.
 
 If your system already has a preinstalled zlib you will still need
 to have access to the zlib.h and zconf.h include files that
@@ -93,6 +100,10 @@ If you want to use "cmake" (see www.cmake.org), type
    make
    make install
 
+As when using the simple configure method described above, "/path" points to
+the installation directory where you want to put the libpng "lib", "include",
+and "bin" subdirectories.
+
 V. Directory structure
 
 You can rename the directories that you downloaded (they
@@ -105,8 +116,7 @@ Your directory structure should look like this:
       libpng  (this directory)
           INSTALL (this file)
           README
-          *.h
-          *.c
+          *.h, *.c  => libpng source files
           CMakeLists.txt    =>  "cmake" script
           configuration files:
              configure.ac, configure, Makefile.am, Makefile.in,
@@ -114,15 +124,9 @@ Your directory structure should look like this:
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
-             gregbook
-             libtests
-             pngminim
-             pngminus
-             pngsuite
-             visupng
+             gregbook, libtests, pngminim, pngminus, pngsuite, visupng
           projects
-             visualc71
-             vstudio
+             cbuilder5, owatcom, visualc71, vstudio, xcode
           scripts
              makefile.*
              *.def (module definition files)
@@ -130,11 +134,7 @@ Your directory structure should look like this:
           pngtest.png
           etc.
       zlib
-          README
-          *.h
-          *.c
-          contrib
-          etc.
+          README, *.h, *.c contrib, etc.
 
 If the line endings in the files look funny, you may wish to get the other
 distribution of libpng.  It is available in both tar.gz (UNIX style line
@@ -143,7 +143,7 @@ endings) and zip (DOS style line endings) formats.
 VI. Building with project files
 
 If you are building libpng with MSVC, you can enter the
-libpng projects\visualc6 or visualc71 directory and follow the instructions
+libpng projects\visualc71 or vstudio directory and follow the instructions
 in README.txt.
 
 Otherwise enter the zlib directory and follow the instructions in zlib/README,
@@ -204,7 +204,16 @@ the end for pointers (or at least look at them and be careful).  Make
 note that the rows of data are defined as png_bytepp, which is
 an "unsigned char far * far *".
 
-XI. Omitted.
+XI. Prepending a prefix to exported symbols
+
+Starting with libpng-1.6.0, you can configure libpng (when using the
+"configure" script) to prefix all exported symbols by means of the
+configuration option "--with-libpng-prefix=FOO_", where FOO_ can be any
+string beginning with a letter and containing only uppercase
+and lowercase letters, digits, and the underscore (i.e., a C language
+identifier).  This creates a set of macros in pnglibconf.h, so this is
+transparent to applications; their function calls get transformed by
+the macros to use the modified names.
 
 XII. Configuring for compiler xxx:
 
@@ -313,11 +322,12 @@ unmodified, default, libpng API and thus would probably fail to link.
 These mechanisms still work in the configure build and in any makefile
 build that builds pnglibconf.h, although the feature selection macros
 have changed somewhat as described above.  In 1.5.0, however, pngusr.h is
-processed only once, when the exported header file pnglibconf.h is built.
-pngconf.h no longer includes pngusr.h, therefore pngusr.h is ignored after the
-build of pnglibconf.h and it is never included in an application build.
+processed only once, at the time the exported header file pnglibconf.h is
+built.  pngconf.h no longer includes pngusr.h; therefore, pngusr.h is ignored
+after the build of pnglibconf.h and it is never included in an application
+build.
 
-The rarely used alternative of adding a list of feature macros to the
+The formerly used alternative of adding a list of feature macros to the
 CPPFLAGS setting in the build also still works; however, the macros will be
 copied to pnglibconf.h and this may produce macro redefinition warnings
 when the individual C files are compiled.
@@ -333,12 +343,19 @@ functioning awk called 'nawk'.
 
 Configuration options are now documented in scripts/pnglibconf.dfa.  This
 file also includes dependency information that ensures a configuration is
-consistent; that is, if a feature is switched off dependent features are
-also removed.  As a recommended alternative to using feature macros in
+consistent; that is, if a feature is switched off, dependent features are
+also switched off.  As a recommended alternative to using feature macros in
 pngusr.h a system builder may also define equivalent options in pngusr.dfa
 (or, indeed, any file) and add that to the configuration by setting
 DFA_XTRA to the file name.  The makefiles in contrib/pngminim illustrate
-how to do this, and a case where pngusr.h is still required.
+how to do this, and also illustrate a case where pngusr.h is still required.
+
+After you have built libpng, the definitions that were recorded in
+pnglibconf.h are available to your application (pnglibconf.h is included
+in png.h and gets installed alongside png.h and pngconf.h in your
+$PREFIX/include directory).  Do not edit pnglibconf.h after you have built
+libpng, because than the settings would not accurately reflect the settings
+that were used to build libpng.
 
 XV. Configuring libpng for multiprocessing
 
