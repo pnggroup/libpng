@@ -18,7 +18,7 @@ VIII. Configuring libpng for 16-bit platforms
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
   XV. Configuring libpng for multiprocessing
- XVI. Other sources of information about libpng:
+ XVI. Other sources of information about libpng
 
 I. Simple installation
 
@@ -30,7 +30,10 @@ On Unix/Linux and similar systems, you can simply type
 
 and ignore the rest of this document.  "/path" is the path to the directory
 where you want to install the libpng "lib", "include", and "bin"
-subdirectories.
+subdirectories.  Note that "configure" is only included in the "*.tar"
+distributions and not in the "*.zip" or "*.7z" distributions. If you
+downloaded one of those distributions, see "Building with makefiles",
+below.
 
 II. Rebuilding the configure scripts
 
@@ -120,15 +123,10 @@ Your directory structure should look like this:
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
-             gregbook
-             libtests
-             pngminim
-             pngminus
-             pngsuite
-             visupng
+             arm-neon, conftest, examples, gregbook, libtests, pngminim,
+             pngminus, pngsuite, tools, visupng
           projects
-             visualc71
-             vstudio
+             cbuilder5, visualc71, owatcom, vstudio, xcode
           scripts
              makefile.*
              *.def (module definition files)
@@ -149,7 +147,7 @@ endings) and zip (DOS style line endings) formats.
 VI. Building with project files
 
 If you are building libpng with MSVC, you can enter the
-libpng projects\visualc6 or visualc71 directory and follow the instructions
+libpng projects\visualc6 or vstudio directory and follow the instructions
 in README.txt.
 
 Otherwise enter the zlib directory and follow the instructions in zlib/README,
