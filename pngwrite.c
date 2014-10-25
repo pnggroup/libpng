@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.6.14 [October 23, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2135,9 +2135,11 @@ png_image_write_main(png_voidp argument)
    png_uint_32 format = image->format;
 
    int colormap = (format & PNG_FORMAT_FLAG_COLORMAP) != 0;
-   int linear = !colormap && (format & PNG_FORMAT_FLAG_LINEAR) != 0; /* input */
-   int alpha = !colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0;
-   int write_16bit = linear && !colormap && !display->convert_to_8bit;
+   /* input */
+   int linear = (colormap == 0) && (format & PNG_FORMAT_FLAG_LINEAR) != 0;
+   int alpha = (colormap == 0) && (format & PNG_FORMAT_FLAG_ALPHA) != 0;
+   int write_16bit = (linear != 0 ) && (colormap == 0) &&
+       (display->convert_to_8bit == 0);
 
 #  ifdef PNG_BENIGN_ERRORS_SUPPORTED
       /* Make sure we error out on any bad situation */
@@ -2224,7 +2226,7 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
       if (format & PNG_FORMAT_FLAG_BGR)
       {
-         if (!colormap && (format & PNG_FORMAT_FLAG_COLOR) != 0)
+         if (colormap == 0 && (format & PNG_FORMAT_FLAG_COLOR) != 0)
             png_set_bgr(png_ptr);
          format &= ~PNG_FORMAT_FLAG_BGR;
       }
@@ -2233,7 +2235,7 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
       if (format & PNG_FORMAT_FLAG_AFIRST)
       {
-         if (!colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0)
+         if (colormap == 0 && (format & PNG_FORMAT_FLAG_ALPHA) != 0)
             png_set_swap_alpha(png_ptr);
          format &= ~PNG_FORMAT_FLAG_AFIRST;
       }
@@ -2280,7 +2282,8 @@ png_image_write_main(png_voidp argument)
     * before it is written.  This only applies when the input is 16-bit and
     * either there is an alpha channel or it is converted to 8-bit.
     */
-   if ((linear && alpha) || (!colormap && display->convert_to_8bit))
+   if ((linear != 0 && alpha != 0 ) ||
+       (colormap == 0 && display->convert_to_8bit != 0))
    {
       png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
          png_get_rowbytes(png_ptr, info_ptr)));

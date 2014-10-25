@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.14 [October 23, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -773,13 +773,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.15beta01 - October 23, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.15beta01 - October 25, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.15beta01 - October 23, 2014\
+      return "libpng version 1.6.15beta01 - October 25, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3277,7 +3277,8 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
                result = -result;
 
             /* Check for overflow. */
-            if ((negative && result <= 0) || (!negative && result >= 0))
+            if ((negative != 0 && result <= 0) ||
+                (negative == 0 && result >= 0))
             {
                *res = result;
                return 1;

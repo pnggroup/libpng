@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.14 [October 23, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2643,10 +2643,10 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
        */
       ++prefix_length;
 
-      if (!compressed && prefix_length <= length)
+      if (compressed == 0 && prefix_length <= length)
          uncompressed_length = length - prefix_length;
 
-      else if (compressed && prefix_length < length)
+      else if (compressed != 0 && prefix_length < length)
       {
          uncompressed_length = PNG_SIZE_MAX;
 
@@ -2954,7 +2954,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 #endif /* !PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
 
    /* Check for unhandled critical chunks */
-   if (!handled && PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
+   if (handled == 0 && PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
       png_chunk_error(png_ptr, "unhandled critical chunk");
 }
 

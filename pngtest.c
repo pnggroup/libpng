@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1780,10 +1780,11 @@ main(int argc, char *argv[])
       }
    }
 
-   if (!multiple && argc == 3 + verbose)
+   if (multiple == 0 && argc == 3 + verbose)
      outname = argv[2 + verbose];
 
-   if ((!multiple && argc > 3 + verbose) || (multiple && argc < 2))
+   if ((multiple == 0 && argc > 3 + verbose) ||
+       (multiple != 0 && argc < 2))
    {
      fprintf(STDERR,
        "usage: %s [infile.png] [outfile.png]\n\t%s -m {infile.png}\n",
