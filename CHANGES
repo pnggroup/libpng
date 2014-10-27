@@ -5033,8 +5033,9 @@ Version 1.6.14rc02 [October 17, 2014]
 Version 1.6.14 [October 23, 2014]
   No changes.
 
-Version 1.6.15beta01 [October 25, 2014]
+Version 1.6.15beta01 [October 27, 2014]
   Changed "if (!x)" to "if (x == 0)" and "if (x)" to "if (x !== 0)"
+  Simplified png_free_data().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

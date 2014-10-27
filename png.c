@@ -451,25 +451,24 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_TEXT_SUPPORTED
    /* Free text item num or (if num == -1) all text items */
-   if ((mask & PNG_FREE_TEXT) & info_ptr->free_me)
+   if (info_ptr->text && ((mask & PNG_FREE_TEXT) & info_ptr->free_me))
    {
       if (num != -1)
       {
-         if (info_ptr->text && info_ptr->text[num].key)
-         {
-            png_free(png_ptr, info_ptr->text[num].key);
-            info_ptr->text[num].key = NULL;
-         }
+         png_free(png_ptr, info_ptr->text[num].key);
+         info_ptr->text[num].key = NULL;
       }
 
       else
       {
          int i;
+
          for (i = 0; i < info_ptr->num_text; i++)
-             png_free_data(png_ptr, info_ptr, PNG_FREE_TEXT, i);
+            png_free(png_ptr, info_ptr->text[i].key);
+
          png_free(png_ptr, info_ptr->text);
          info_ptr->text = NULL;
-         info_ptr->num_text=0;
+         info_ptr->num_text = 0;
       }
    }
 #endif
@@ -504,14 +503,14 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       png_free(png_ptr, info_ptr->pcal_units);
       info_ptr->pcal_purpose = NULL;
       info_ptr->pcal_units = NULL;
+
       if (info_ptr->pcal_params != NULL)
          {
-            unsigned int i;
+            int i;
+
             for (i = 0; i < info_ptr->pcal_nparams; i++)
-            {
                png_free(png_ptr, info_ptr->pcal_params[i]);
-               info_ptr->pcal_params[i] = NULL;
-            }
+
             png_free(png_ptr, info_ptr->pcal_params);
             info_ptr->pcal_params = NULL;
          }
@@ -533,17 +532,14 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Free a given sPLT entry, or (if num == -1) all sPLT entries */
-   if ((mask & PNG_FREE_SPLT) & info_ptr->free_me)
+   if (info_ptr->splt_palettes && ((mask & PNG_FREE_SPLT) & info_ptr->free_me))
    {
       if (num != -1)
       {
-         if (info_ptr->splt_palettes)
-         {
-            png_free(png_ptr, info_ptr->splt_palettes[num].name);
-            png_free(png_ptr, info_ptr->splt_palettes[num].entries);
-            info_ptr->splt_palettes[num].name = NULL;
-            info_ptr->splt_palettes[num].entries = NULL;
-         }
+         png_free(png_ptr, info_ptr->splt_palettes[num].name);
+         png_free(png_ptr, info_ptr->splt_palettes[num].entries);
+         info_ptr->splt_palettes[num].name = NULL;
+         info_ptr->splt_palettes[num].entries = NULL;
       }
 
       else
@@ -551,8 +547,12 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
          if (info_ptr->splt_palettes_num)
          {
             int i;
+
             for (i = 0; i < info_ptr->splt_palettes_num; i++)
-               png_free_data(png_ptr, info_ptr, PNG_FREE_SPLT, (int)i);
+            {
+               png_free(png_ptr, info_ptr->splt_palettes[i].name);
+               png_free(png_ptr, info_ptr->splt_palettes[i].entries);
+            }
 
             png_free(png_ptr, info_ptr->splt_palettes);
             info_ptr->splt_palettes = NULL;
@@ -564,15 +564,12 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 #endif
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
-   if ((mask & PNG_FREE_UNKN) & info_ptr->free_me)
+   if (info_ptr->unknown_chunks && ((mask & PNG_FREE_UNKN) & info_ptr->free_me))
    {
       if (num != -1)
       {
-          if (info_ptr->unknown_chunks)
-          {
-             png_free(png_ptr, info_ptr->unknown_chunks[num].data);
-             info_ptr->unknown_chunks[num].data = NULL;
-          }
+          png_free(png_ptr, info_ptr->unknown_chunks[num].data);
+          info_ptr->unknown_chunks[num].data = NULL;
       }
 
       else
@@ -582,7 +579,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
          if (info_ptr->unknown_chunks_num)
          {
             for (i = 0; i < info_ptr->unknown_chunks_num; i++)
-               png_free_data(png_ptr, info_ptr, PNG_FREE_UNKN, (int)i);
+               png_free(png_ptr, info_ptr->unknown_chunks[i].data);
 
             png_free(png_ptr, info_ptr->unknown_chunks);
             info_ptr->unknown_chunks = NULL;
@@ -619,10 +616,8 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       {
          png_uint_32 row;
          for (row = 0; row < info_ptr->height; row++)
-         {
             png_free(png_ptr, info_ptr->row_pointers[row]);
-            info_ptr->row_pointers[row] = NULL;
-         }
+
          png_free(png_ptr, info_ptr->row_pointers);
          info_ptr->row_pointers = NULL;
       }
@@ -773,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.15beta01 - October 25, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.15beta01 - October 27, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.15beta01 - October 25, 2014\
+      return "libpng version 1.6.15beta01 - October 27, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
