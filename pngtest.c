@@ -588,7 +588,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 
          if (pinfo->next == NULL)
          {
-            fprintf(STDERR, "Pointer %x not found\n", (unsigned int)ptr);
+            fprintf(STDERR, "Pointer %p not found\n", ptr);
             break;
          }
 
@@ -1382,11 +1382,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
 #ifndef SINGLE_ROWBUF_ALLOC
          pngtest_debug2("Allocating row buffer (pass %d, y = %u)...", pass, y);
+
          row_buf = (png_bytep)png_malloc(read_ptr,
             png_get_rowbytes(read_ptr, read_info_ptr));
 
-         pngtest_debug2("\t0x%08lx (%u bytes)", (unsigned long)row_buf,
-            png_get_rowbytes(read_ptr, read_info_ptr));
+         pngtest_debug2("\t0x%08lx (%lu bytes)", (unsigned long)row_buf,
+            (unsigned long)png_get_rowbytes(read_ptr, read_info_ptr));
 
 #endif /* !SINGLE_ROWBUF_ALLOC */
          png_read_rows(read_ptr, (png_bytepp)&row_buf, NULL, 1);
@@ -1806,6 +1807,9 @@ main(int argc, char *argv[])
       {
          int kerror;
          fprintf(STDERR, "\n Testing %s:", argv[i]);
+#if PNG_DEBUG > 0
+         fprintf(STDERR, "\n");
+#endif
          kerror = test_one_file(argv[i], outname);
          if (kerror == 0)
          {
@@ -1851,9 +1855,9 @@ main(int argc, char *argv[])
 
             while (pinfo != NULL)
             {
-               fprintf(STDERR, " %lu bytes at %x\n",
+               fprintf(STDERR, " %lu bytes at %p\n",
                  (unsigned long)pinfo->size,
-                 (unsigned int)pinfo->pointer);
+                 pinfo->pointer);
                pinfo = pinfo->next;
             }
          }
@@ -1887,7 +1891,12 @@ main(int argc, char *argv[])
             status_dots_requested = 0;
 
          if (i == 0 || verbose == 1 || ierror != 0)
+         {
             fprintf(STDERR, "\n Testing %s:", inname);
+#if PNG_DEBUG > 0
+            fprintf(STDERR, "\n");
+#endif
+         }
 
          kerror = test_one_file(inname, outname);
 
@@ -1920,7 +1929,12 @@ main(int argc, char *argv[])
          else
          {
             if (verbose == 0 && i != 2)
+            {
                fprintf(STDERR, "\n Testing %s:", inname);
+#if PNG_DEBUG > 0
+               fprintf(STDERR, "\n");
+#endif
+            }
 
             fprintf(STDERR, " FAIL\n");
             ierror += kerror;
@@ -1939,8 +1953,8 @@ main(int argc, char *argv[])
 
              while (pinfo != NULL)
              {
-                fprintf(STDERR, " %lu bytes at %x\n",
-                   (unsigned long)pinfo->size, (unsigned int)pinfo->pointer);
+                fprintf(STDERR, " %lu bytes at %p\n",
+                   (unsigned long)pinfo->size, pinfo->pointer);
                 pinfo = pinfo->next;
              }
           }
