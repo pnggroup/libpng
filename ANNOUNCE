@@ -1,4 +1,4 @@
-Libpng 1.6.15beta01 - October 27, 2014
+Libpng 1.6.15beta01 - October 29, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,9 +25,10 @@ Other information:
 
 Changes since the last public release (1.6.14):
 
-Version 1.6.15beta01 [October 27, 2014]
+Version 1.6.15beta01 [October 29, 2014]
   Changed "if (!x)" to "if (x == 0)" and "if (x)" to "if (x !== 0)"
   Simplified png_free_data().
+  Added missing "ptr = NULL" after some instances of png_free().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

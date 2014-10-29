@@ -670,6 +670,7 @@ png_decompress_chunk(png_structrp png_ptr,
                    * success)
                    */
                   png_free(png_ptr, text);
+                  text = NULL;
 
                   /* This really is very benign, but it's still an error because
                    * the extra space may otherwise be used as a Trojan Horse.

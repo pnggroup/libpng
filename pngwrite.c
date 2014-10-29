@@ -933,12 +933,18 @@ png_write_destroy(png_structrp png_ptr)
    /* Free our memory.  png_free checks NULL for us. */
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
    png_free(png_ptr, png_ptr->row_buf);
+   png_ptr->row_buf = NULL;
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);
    png_free(png_ptr, png_ptr->sub_row);
    png_free(png_ptr, png_ptr->up_row);
    png_free(png_ptr, png_ptr->avg_row);
    png_free(png_ptr, png_ptr->paeth_row);
+   png_ptr->prev_row = NULL;
+   png_ptr->sub_row = NULL;
+   png_ptr->up_row = NULL;
+   png_ptr->avg_row = NULL;
+   png_ptr->paeth_row = NULL;
 #endif
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -946,10 +952,13 @@ png_write_destroy(png_structrp png_ptr)
    png_reset_filter_heuristics(png_ptr);
    png_free(png_ptr, png_ptr->filter_costs);
    png_free(png_ptr, png_ptr->inv_filter_costs);
+   png_ptr->filter_costs = NULL;
+   png_ptr->inv_filter_costs = NULL;
 #endif
 
 #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
    png_free(png_ptr, png_ptr->chunk_list);
+   png_ptr->chunk_list = NULL;
 #endif
 
    /* The error handling and memory handling information is left intact at this

@@ -1,7 +1,7 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -922,22 +922,33 @@ png_read_destroy(png_structrp png_ptr)
 #endif
 
    png_free(png_ptr, png_ptr->big_row_buf);
+   png_ptr->big_row_buf = NULL;
    png_free(png_ptr, png_ptr->big_prev_row);
+   png_ptr->big_prev_row = NULL;
    png_free(png_ptr, png_ptr->read_buffer);
+   png_ptr->read_buffer = NULL;
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
    png_free(png_ptr, png_ptr->palette_lookup);
+   png_ptr->palette_lookup = NULL;
    png_free(png_ptr, png_ptr->quantize_index);
+   png_ptr->quantize_index = NULL;
 #endif
 
    if (png_ptr->free_me & PNG_FREE_PLTE)
+   {
       png_zfree(png_ptr, png_ptr->palette);
+      png_ptr->palette = NULL;
+   }
    png_ptr->free_me &= ~PNG_FREE_PLTE;
 
 #if defined(PNG_tRNS_SUPPORTED) || \
     defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    if (png_ptr->free_me & PNG_FREE_TRNS)
+   {
       png_free(png_ptr, png_ptr->trans_alpha);
+      png_ptr->trans_alpha = NULL;
+   }
    png_ptr->free_me &= ~PNG_FREE_TRNS;
 #endif
 
@@ -945,15 +956,18 @@ png_read_destroy(png_structrp png_ptr)
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
    png_free(png_ptr, png_ptr->save_buffer);
+   png_ptr->save_buffer = NULL;
 #endif
 
 #if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) && \
    defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED)
    png_free(png_ptr, png_ptr->unknown_chunk.data);
+   png_ptr->unknown_chunk.data = NULL;
 #endif
 
 #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
    png_free(png_ptr, png_ptr->chunk_list);
+   png_ptr->chunk_list = NULL;
 #endif
 
    /* NOTE: the 'setjmp' buffer may still be allocated and the memory and error
