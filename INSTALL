@@ -394,7 +394,7 @@ CFLAGS="-Wall -O -funroll-loops \
 --with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
 
 You can alternatively specify --includedir=/usr/include, /usr/local/include,
-/usr/include/libpng%NN%, or whatever.
+/usr/include/libpng16, or whatever.
 
 If you find that the configure script is out-of-date or is not supporting
 your platform properly, try running autogen.sh to regenerate "configure",

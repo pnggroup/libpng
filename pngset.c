@@ -661,6 +661,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    if (new_iccp_profile == NULL)
    {
       png_free(png_ptr, new_iccp_name);
+      new_iccp_name = NULL;
       png_benign_error(png_ptr,
           "Insufficient memory to process iCCP profile");
       return;
@@ -1041,6 +1042,7 @@ png_set_sPLT(png_const_structrp png_ptr,
       if (np->entries == NULL)
       {
          png_free(png_ptr, np->name);
+         np->name = NULL;
          break;
       }
 
