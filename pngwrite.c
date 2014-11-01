@@ -1613,8 +1613,8 @@ png_write_png(png_structrp png_ptr, png_inforp info_ptr,
     * RGB, note that the code expects the input color type to be G or RGB; no
     * alpha channel.
     */
-   if (transforms & (PNG_TRANSFORM_STRIP_FILLER_AFTER|
-      PNG_TRANSFORM_STRIP_FILLER_BEFORE) != 0)
+   if ((transforms & (PNG_TRANSFORM_STRIP_FILLER_AFTER|
+      PNG_TRANSFORM_STRIP_FILLER_BEFORE)) != 0)
    {
 #ifdef PNG_WRITE_FILLER_SUPPORTED
       if ((transforms & PNG_TRANSFORM_STRIP_FILLER_AFTER) != 0)
