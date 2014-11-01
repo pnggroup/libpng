@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -100,7 +100,7 @@ png_set_interlace_handling(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_interlace handling");
 
-   if (png_ptr && png_ptr->interlaced)
+   if (png_ptr != 0 && png_ptr->interlaced != 0)
    {
       png_ptr->transformations |= PNG_INTERLACE;
       return (7);
@@ -127,7 +127,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
    /* In libpng 1.6 it is possible to determine whether this is a read or write
     * operation and therefore to do more checking here for a valid call.
     */
-   if (png_ptr->mode & PNG_IS_READ_STRUCT)
+   if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
    {
 #     ifdef PNG_READ_FILLER_SUPPORTED
          /* On read png_set_filler is always valid, regardless of the base PNG
@@ -210,7 +210,7 @@ png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 
    png_set_filler(png_ptr, filler, filler_loc);
    /* The above may fail to do anything. */
-   if (png_ptr->transformations & PNG_FILLER)
+   if ((png_ptr->transformations & PNG_FILLER) != 0)
       png_ptr->transformations |= PNG_ADD_ALPHA;
 }
 
@@ -605,7 +605,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 {
    png_debug(1, "in png_do_bgr");
 
-   if ((row_info->color_type & PNG_COLOR_MASK_COLOR))
+   if ((row_info->color_type & PNG_COLOR_MASK_COLOR) != 0)
    {
       png_uint_32 row_width = row_info->width;
       if (row_info->bit_depth == 8)

@@ -283,7 +283,8 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
        png_uint_32 n, nstop;
        int channel;
        int color_channels = row_info->channels;
-       if (row_info->color_type > 3)color_channels--;
+       if (row_info->color_type > 3)
+          color_channels--;
 
        for (n = 0, nstop=row_info->width; n<nstop; n++)
        {
@@ -643,7 +644,7 @@ set_location(png_structp png_ptr, struct user_chunk_data *data, int what)
 {
    int location;
 
-   if ((data->location[0] & what) || (data->location[1] & what))
+   if ((data->location[0] & what) != 0 || (data->location[1] & what) != 0)
       return 0; /* already have one of these */
 
    /* Find where we are (the code below zeroes info_ptr to indicate that the
@@ -652,7 +653,7 @@ set_location(png_structp png_ptr, struct user_chunk_data *data, int what)
    if (data->info_ptr == NULL) /* after IDAT */
       location = what | after_IDAT;
 
-   else if (png_get_valid(png_ptr, data->info_ptr, PNG_INFO_PLTE))
+   else if (png_get_valid(png_ptr, data->info_ptr, PNG_INFO_PLTE) != 0)
       location = what | before_IDAT;
 
    else
@@ -699,7 +700,7 @@ read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
          if (chunk->data[0] != 0 && chunk->data[0] != 1)
             return (-1);  /* Invalid mode */
 
-         if (set_location(png_ptr, my_user_chunk_data, have_sTER))
+         if (set_location(png_ptr, my_user_chunk_data, have_sTER) != 0)
          {
             my_user_chunk_data->sTER_mode=chunk->data[0];
             return (1);
@@ -718,7 +719,7 @@ read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
    if (chunk->size != 9)
       return (-1); /* Error return */
 
-   if (!set_location(png_ptr, my_user_chunk_data, have_vpAg))
+   if (set_location(png_ptr, my_user_chunk_data, have_vpAg) == 0)
       return (0);  /* duplicate vpAg */
 
    my_user_chunk_data->vpAg_width = png_get_uint_31(png_ptr, chunk->data);
@@ -1049,7 +1050,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       int interlace_type, compression_type, filter_type;
 
       if (png_get_IHDR(read_ptr, read_info_ptr, &width, &height, &bit_depth,
-          &color_type, &interlace_type, &compression_type, &filter_type))
+          &color_type, &interlace_type, &compression_type, &filter_type) != 0)
       {
          png_set_IHDR(write_ptr, write_info_ptr, width, height, bit_depth,
             color_type, interlace_type, compression_type, filter_type);
@@ -1082,7 +1083,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          blue_y;
 
       if (png_get_cHRM_fixed(read_ptr, read_info_ptr, &white_x, &white_y,
-         &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y))
+         &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y) != 0)
       {
          png_set_cHRM_fixed(write_ptr, write_info_ptr, white_x, white_y, red_x,
             red_y, green_x, green_y, blue_x, blue_y);
@@ -1093,7 +1094,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_fixed_point gamma;
 
-      if (png_get_gAMA_fixed(read_ptr, read_info_ptr, &gamma))
+      if (png_get_gAMA_fixed(read_ptr, read_info_ptr, &gamma) != 0)
          png_set_gAMA_fixed(write_ptr, write_info_ptr, gamma);
    }
 #endif
@@ -1105,7 +1106,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          blue_y;
 
       if (png_get_cHRM(read_ptr, read_info_ptr, &white_x, &white_y, &red_x,
-         &red_y, &green_x, &green_y, &blue_x, &blue_y))
+         &red_y, &green_x, &green_y, &blue_x, &blue_y) != 0)
       {
          png_set_cHRM(write_ptr, write_info_ptr, white_x, white_y, red_x,
             red_y, green_x, green_y, blue_x, blue_y);
@@ -1116,7 +1117,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       double gamma;
 
-      if (png_get_gAMA(read_ptr, read_info_ptr, &gamma))
+      if (png_get_gAMA(read_ptr, read_info_ptr, &gamma) != 0)
          png_set_gAMA(write_ptr, write_info_ptr, gamma);
    }
 #endif
@@ -1130,7 +1131,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       int compression_type;
 
       if (png_get_iCCP(read_ptr, read_info_ptr, &name, &compression_type,
-                      &profile, &proflen))
+                      &profile, &proflen) != 0)
       {
          png_set_iCCP(write_ptr, write_info_ptr, name, compression_type,
                       profile, proflen);
@@ -1141,7 +1142,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       int intent;
 
-      if (png_get_sRGB(read_ptr, read_info_ptr, &intent))
+      if (png_get_sRGB(read_ptr, read_info_ptr, &intent) != 0)
          png_set_sRGB(write_ptr, write_info_ptr, intent);
    }
 #endif
@@ -1149,14 +1150,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_colorp palette;
       int num_palette;
 
-      if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette))
+      if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette) != 0)
          png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
    }
 #ifdef PNG_bKGD_SUPPORTED
    {
       png_color_16p background;
 
-      if (png_get_bKGD(read_ptr, read_info_ptr, &background))
+      if (png_get_bKGD(read_ptr, read_info_ptr, &background) != 0)
       {
          png_set_bKGD(write_ptr, write_info_ptr, background);
       }
@@ -1166,7 +1167,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_uint_16p hist;
 
-      if (png_get_hIST(read_ptr, read_info_ptr, &hist))
+      if (png_get_hIST(read_ptr, read_info_ptr, &hist) != 0)
          png_set_hIST(write_ptr, write_info_ptr, hist);
    }
 #endif
@@ -1176,7 +1177,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       int unit_type;
 
       if (png_get_oFFs(read_ptr, read_info_ptr, &offset_x, &offset_y,
-          &unit_type))
+          &unit_type) != 0)
       {
          png_set_oFFs(write_ptr, write_info_ptr, offset_x, offset_y, unit_type);
       }
@@ -1190,7 +1191,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       int type, nparams;
 
       if (png_get_pCAL(read_ptr, read_info_ptr, &purpose, &X0, &X1, &type,
-         &nparams, &units, &params))
+         &nparams, &units, &params) != 0)
       {
          png_set_pCAL(write_ptr, write_info_ptr, purpose, X0, X1, type,
             nparams, units, params);
@@ -1202,7 +1203,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_uint_32 res_x, res_y;
       int unit_type;
 
-      if (png_get_pHYs(read_ptr, read_info_ptr, &res_x, &res_y, &unit_type))
+      if (png_get_pHYs(read_ptr, read_info_ptr, &res_x, &res_y,
+          &unit_type) != 0)
          png_set_pHYs(write_ptr, write_info_ptr, res_x, res_y, unit_type);
    }
 #endif
@@ -1210,7 +1212,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_color_8p sig_bit;
 
-      if (png_get_sBIT(read_ptr, read_info_ptr, &sig_bit))
+      if (png_get_sBIT(read_ptr, read_info_ptr, &sig_bit) != 0)
          png_set_sBIT(write_ptr, write_info_ptr, sig_bit);
    }
 #endif
@@ -1222,7 +1224,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       double scal_width, scal_height;
 
       if (png_get_sCAL(read_ptr, read_info_ptr, &unit, &scal_width,
-         &scal_height))
+         &scal_height) != 0)
       {
          png_set_sCAL(write_ptr, write_info_ptr, unit, scal_width, scal_height);
       }
@@ -1234,7 +1236,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_charp scal_width, scal_height;
 
       if (png_get_sCAL_s(read_ptr, read_info_ptr, &unit, &scal_width,
-          &scal_height))
+          &scal_height) != 0)
       {
          png_set_sCAL_s(write_ptr, write_info_ptr, unit, scal_width,
              scal_height);
@@ -1274,11 +1276,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_timep mod_time;
 
-      if (png_get_tIME(read_ptr, read_info_ptr, &mod_time))
+      if (png_get_tIME(read_ptr, read_info_ptr, &mod_time) != 0)
       {
          png_set_tIME(write_ptr, write_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         if (png_convert_to_rfc1123_buffer(tIME_string, mod_time))
+         if (png_convert_to_rfc1123_buffer(tIME_string, mod_time) != 0)
             tIME_string[(sizeof tIME_string) - 1] = '\0';
 
          else
@@ -1299,7 +1301,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_color_16p trans_color;
 
       if (png_get_tRNS(read_ptr, read_info_ptr, &trans_alpha, &num_trans,
-         &trans_color))
+         &trans_color) != 0)
       {
          int sample_max = (1 << bit_depth);
          /* libpng doesn't reject a tRNS chunk with out-of-range samples */
@@ -1457,11 +1459,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    {
       png_timep mod_time;
 
-      if (png_get_tIME(read_ptr, end_info_ptr, &mod_time))
+      if (png_get_tIME(read_ptr, end_info_ptr, &mod_time) != 0)
       {
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         if (png_convert_to_rfc1123_buffer(tIME_string, mod_time))
+         if (png_convert_to_rfc1123_buffer(tIME_string, mod_time) != 0)
             tIME_string[(sizeof tIME_string) - 1] = '\0';
 
          else
@@ -1824,7 +1826,7 @@ main(int argc, char *argv[])
 #endif
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
             for (k = 0; k<256; k++)
-               if (filters_used[k])
+               if (filters_used[k] != 0)
                   fprintf(STDERR, " Filter %d was used %lu times\n",
                      k, (unsigned long)filters_used[k]);
 #endif
@@ -1915,7 +1917,7 @@ main(int argc, char *argv[])
 #endif
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
                 for (k = 0; k<256; k++)
-                   if (filters_used[k])
+                   if (filters_used[k] != 0)
                       fprintf(STDERR, " Filter %d was used %lu times\n",
                          k, (unsigned long)filters_used[k]);
 #endif

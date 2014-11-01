@@ -115,7 +115,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 {
    int need_crc = 1;
 
-   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
+   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) != 0)
    {
       if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
           (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
@@ -124,7 +124,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 
    else /* critical */
    {
-      if (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE)
+      if ((png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE) != 0)
          need_crc = 0;
    }
 
@@ -133,7 +133,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
     * following cast is safe.  'uInt' may be no more than 16 bits, so it is
     * necessary to perform a loop here.
     */
-   if (need_crc && length > 0)
+   if (need_crc != 0 && length > 0)
    {
       uLong crc = png_ptr->crc; /* Should never issue a warning */
 
@@ -179,7 +179,7 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
    else
       png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
 
-   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
+   if ((png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH) != 0)
    {
      /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
       * we must recompile any applications that use any older library version.
@@ -289,7 +289,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 #  endif
          /* Call the general version checker (shared with read and write code):
           */
-         if (png_user_version_check(&create_struct, user_png_ver))
+         if (png_user_version_check(&create_struct, user_png_ver) != 0)
          {
             png_structrp png_ptr = png_voidcast(png_structrp,
                png_malloc_warn(&create_struct, (sizeof *png_ptr)));
@@ -451,7 +451,8 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_TEXT_SUPPORTED
    /* Free text item num or (if num == -1) all text items */
-   if (info_ptr->text && ((mask & PNG_FREE_TEXT) & info_ptr->free_me))
+   if (info_ptr->text != 0 &&
+       ((mask & PNG_FREE_TEXT) & info_ptr->free_me) != 0)
    {
       if (num != -1)
       {
@@ -475,7 +476,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_tRNS_SUPPORTED
    /* Free any tRNS entry */
-   if ((mask & PNG_FREE_TRNS) & info_ptr->free_me)
+   if (((mask & PNG_FREE_TRNS) & info_ptr->free_me) != 0)
    {
       png_free(png_ptr, info_ptr->trans_alpha);
       info_ptr->trans_alpha = NULL;
@@ -485,7 +486,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_sCAL_SUPPORTED
    /* Free any sCAL entry */
-   if ((mask & PNG_FREE_SCAL) & info_ptr->free_me)
+   if (((mask & PNG_FREE_SCAL) & info_ptr->free_me) != 0)
    {
       png_free(png_ptr, info_ptr->scal_s_width);
       png_free(png_ptr, info_ptr->scal_s_height);
@@ -497,7 +498,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_pCAL_SUPPORTED
    /* Free any pCAL entry */
-   if ((mask & PNG_FREE_PCAL) & info_ptr->free_me)
+   if (((mask & PNG_FREE_PCAL) & info_ptr->free_me) != 0)
    {
       png_free(png_ptr, info_ptr->pcal_purpose);
       png_free(png_ptr, info_ptr->pcal_units);
@@ -520,7 +521,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_iCCP_SUPPORTED
    /* Free any profile entry */
-   if ((mask & PNG_FREE_ICCP) & info_ptr->free_me)
+   if (((mask & PNG_FREE_ICCP) & info_ptr->free_me) != 0)
    {
       png_free(png_ptr, info_ptr->iccp_name);
       png_free(png_ptr, info_ptr->iccp_profile);
@@ -532,7 +533,8 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_sPLT_SUPPORTED
    /* Free a given sPLT entry, or (if num == -1) all sPLT entries */
-   if (info_ptr->splt_palettes && ((mask & PNG_FREE_SPLT) & info_ptr->free_me))
+   if (info_ptr->splt_palettes != 0 &&
+       ((mask & PNG_FREE_SPLT) & info_ptr->free_me) != 0)
    {
       if (num != -1)
       {
@@ -544,7 +546,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
       else
       {
-         if (info_ptr->splt_palettes_num)
+         if (info_ptr->splt_palettes_num != 0)
          {
             int i;
 
@@ -564,7 +566,8 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 #endif
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
-   if (info_ptr->unknown_chunks && ((mask & PNG_FREE_UNKN) & info_ptr->free_me))
+   if (info_ptr->unknown_chunks != 0 &&
+       ((mask & PNG_FREE_UNKN) & info_ptr->free_me) != 0)
    {
       if (num != -1)
       {
@@ -576,7 +579,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       {
          int i;
 
-         if (info_ptr->unknown_chunks_num)
+         if (info_ptr->unknown_chunks_num != 0)
          {
             for (i = 0; i < info_ptr->unknown_chunks_num; i++)
                png_free(png_ptr, info_ptr->unknown_chunks[i].data);
@@ -591,7 +594,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_hIST_SUPPORTED
    /* Free any hIST entry */
-   if ((mask & PNG_FREE_HIST)  & info_ptr->free_me)
+   if (((mask & PNG_FREE_HIST) & info_ptr->free_me) != 0)
    {
       png_free(png_ptr, info_ptr->hist);
       info_ptr->hist = NULL;
@@ -600,7 +603,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 #endif
 
    /* Free any PLTE entry that was internally allocated */
-   if ((mask & PNG_FREE_PLTE) & info_ptr->free_me)
+   if (((mask & PNG_FREE_PLTE) & info_ptr->free_me) != 0)
    {
       png_free(png_ptr, info_ptr->palette);
       info_ptr->palette = NULL;
@@ -610,9 +613,9 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
 #ifdef PNG_INFO_IMAGE_SUPPORTED
    /* Free any image bits attached to the info structure */
-   if ((mask & PNG_FREE_ROWS) & info_ptr->free_me)
+   if (((mask & PNG_FREE_ROWS) & info_ptr->free_me) != 0)
    {
-      if (info_ptr->row_pointers)
+      if (info_ptr->row_pointers != 0)
       {
          png_uint_32 row;
          for (row = 0; row < info_ptr->height; row++)
@@ -745,7 +748,7 @@ png_convert_to_rfc1123(png_structrp png_ptr, png_const_timep ptime)
    if (png_ptr != NULL)
    {
       /* The only failure above if png_ptr != NULL is from an invalid ptime */
-      if (!png_convert_to_rfc1123_buffer(png_ptr->time_buffer, ptime))
+      if (png_convert_to_rfc1123_buffer(png_ptr->time_buffer, ptime) == 0)
          png_warning(png_ptr, "Ignoring invalid time value");
 
       else
@@ -768,13 +771,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.15beta02 - October 29, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.15beta02 - November 1, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.15beta02 - October 29, 2014\
+      return "libpng version 1.6.15beta02 - November 1, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -899,7 +902,7 @@ png_handle_as_unknown(png_const_structrp png_ptr, png_const_bytep chunk_name)
    {
       p -= 5;
 
-      if (!memcmp(chunk_name, p, 4))
+      if (memcmp(chunk_name, p, 4) == 0)
          return p[4];
    }
    while (p > p_end);
@@ -1041,8 +1044,8 @@ png_colorspace_check_gamma(png_const_structrp png_ptr,
    png_fixed_point gtest;
 
    if ((colorspace->flags & PNG_COLORSPACE_HAVE_GAMMA) != 0 &&
-      (!png_muldiv(&gtest, colorspace->gamma, PNG_FP_1, gAMA) ||
-      png_gamma_significant(gtest)))
+      (png_muldiv(&gtest, colorspace->gamma, PNG_FP_1, gAMA) == 0  ||
+      png_gamma_significant(gtest) != 0))
    {
       /* Either this is an sRGB image, in which case the calculated gamma
        * approximation should match, or this is an image with a profile and the
@@ -1097,12 +1100,13 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
 #  endif
 
    /* Do nothing if the colorspace is already invalid */
-   else if (colorspace->flags & PNG_COLORSPACE_INVALID)
+   else if ((colorspace->flags & PNG_COLORSPACE_INVALID) != 0)
       return;
 
    else
    {
-      if (png_colorspace_check_gamma(png_ptr, colorspace, gAMA, 1/*from gAMA*/))
+      if (png_colorspace_check_gamma(png_ptr, colorspace, gAMA,
+          1/*from gAMA*/) != 0)
       {
          /* Store this gamma value. */
          colorspace->gamma = gAMA;
@@ -1126,7 +1130,7 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
 void /* PRIVATE */
 png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
 {
-   if (info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID)
+   if ((info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) != 0)
    {
       /* Everything is invalid */
       info_ptr->valid &= ~(PNG_INFO_gAMA|PNG_INFO_cHRM|PNG_INFO_sRGB|
@@ -1147,20 +1151,20 @@ png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
           * it; this allows a PNG to contain a profile which matches sRGB and
           * yet still have that profile retrievable by the application.
           */
-         if (info_ptr->colorspace.flags & PNG_COLORSPACE_MATCHES_sRGB)
+         if ((info_ptr->colorspace.flags & PNG_COLORSPACE_MATCHES_sRGB) != 0)
             info_ptr->valid |= PNG_INFO_sRGB;
 
          else
             info_ptr->valid &= ~PNG_INFO_sRGB;
 
-         if (info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS)
+         if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
             info_ptr->valid |= PNG_INFO_cHRM;
 
          else
             info_ptr->valid &= ~PNG_INFO_cHRM;
 #     endif
 
-      if (info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA)
+      if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA) != 0)
          info_ptr->valid |= PNG_INFO_gAMA;
 
       else
@@ -1193,22 +1197,28 @@ png_xy_from_XYZ(png_xy *xy, const png_XYZ *XYZ)
    png_int_32 d, dwhite, whiteX, whiteY;
 
    d = XYZ->red_X + XYZ->red_Y + XYZ->red_Z;
-   if (!png_muldiv(&xy->redx, XYZ->red_X, PNG_FP_1, d)) return 1;
-   if (!png_muldiv(&xy->redy, XYZ->red_Y, PNG_FP_1, d)) return 1;
+   if (png_muldiv(&xy->redx, XYZ->red_X, PNG_FP_1, d) == 0)
+      return 1;
+   if (png_muldiv(&xy->redy, XYZ->red_Y, PNG_FP_1, d) == 0)
+      return 1;
    dwhite = d;
    whiteX = XYZ->red_X;
    whiteY = XYZ->red_Y;
 
    d = XYZ->green_X + XYZ->green_Y + XYZ->green_Z;
-   if (!png_muldiv(&xy->greenx, XYZ->green_X, PNG_FP_1, d)) return 1;
-   if (!png_muldiv(&xy->greeny, XYZ->green_Y, PNG_FP_1, d)) return 1;
+   if (png_muldiv(&xy->greenx, XYZ->green_X, PNG_FP_1, d) == 0)
+      return 1;
+   if (png_muldiv(&xy->greeny, XYZ->green_Y, PNG_FP_1, d) == 0)
+      return 1;
    dwhite += d;
    whiteX += XYZ->green_X;
    whiteY += XYZ->green_Y;
 
    d = XYZ->blue_X + XYZ->blue_Y + XYZ->blue_Z;
-   if (!png_muldiv(&xy->bluex, XYZ->blue_X, PNG_FP_1, d)) return 1;
-   if (!png_muldiv(&xy->bluey, XYZ->blue_Y, PNG_FP_1, d)) return 1;
+   if (png_muldiv(&xy->bluex, XYZ->blue_X, PNG_FP_1, d) == 0)
+      return 1;
+   if (png_muldiv(&xy->bluey, XYZ->blue_Y, PNG_FP_1, d) == 0)
+      return 1;
    dwhite += d;
    whiteX += XYZ->blue_X;
    whiteY += XYZ->blue_Y;
@@ -1216,8 +1226,10 @@ png_xy_from_XYZ(png_xy *xy, const png_XYZ *XYZ)
    /* The reference white is simply the sum of the end-point (X,Y,Z) vectors,
     * thus:
     */
-   if (!png_muldiv(&xy->whitex, whiteX, PNG_FP_1, dwhite)) return 1;
-   if (!png_muldiv(&xy->whitey, whiteY, PNG_FP_1, dwhite)) return 1;
+   if (png_muldiv(&xy->whitex, whiteX, PNG_FP_1, dwhite) == 0)
+      return 1;
+   if (png_muldiv(&xy->whitey, whiteY, PNG_FP_1, dwhite) == 0)
+      return 1;
 
    return 0;
 }
@@ -1420,16 +1432,16 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
    /* By the argument, above overflow should be impossible here. The return
     * value of 2 indicates an internal error to the caller.
     */
-   if (!png_muldiv(&left, xy->greenx-xy->bluex, xy->redy - xy->bluey, 7))
+   if (png_muldiv(&left, xy->greenx-xy->bluex, xy->redy - xy->bluey, 7) == 0)
       return 2;
-   if (!png_muldiv(&right, xy->greeny-xy->bluey, xy->redx - xy->bluex, 7))
+   if (png_muldiv(&right, xy->greeny-xy->bluey, xy->redx - xy->bluex, 7) == 0)
       return 2;
    denominator = left - right;
 
    /* Now find the red numerator. */
-   if (!png_muldiv(&left, xy->greenx-xy->bluex, xy->whitey-xy->bluey, 7))
+   if (png_muldiv(&left, xy->greenx-xy->bluex, xy->whitey-xy->bluey, 7) == 0)
       return 2;
-   if (!png_muldiv(&right, xy->greeny-xy->bluey, xy->whitex-xy->bluex, 7))
+   if (png_muldiv(&right, xy->greeny-xy->bluey, xy->whitex-xy->bluex, 7) == 0)
       return 2;
 
    /* Overflow is possible here and it indicates an extreme set of PNG cHRM
@@ -1437,16 +1449,16 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
     * scale value because this allows us to delay the multiplication of white-y
     * into the denominator, which tends to produce a small number.
     */
-   if (!png_muldiv(&red_inverse, xy->whitey, denominator, left-right) ||
+   if (png_muldiv(&red_inverse, xy->whitey, denominator, left-right) == 0 ||
        red_inverse <= xy->whitey /* r+g+b scales = white scale */)
       return 1;
 
    /* Similarly for green_inverse: */
-   if (!png_muldiv(&left, xy->redy-xy->bluey, xy->whitex-xy->bluex, 7))
+   if (png_muldiv(&left, xy->redy-xy->bluey, xy->whitex-xy->bluex, 7) == 0)
       return 2;
-   if (!png_muldiv(&right, xy->redx-xy->bluex, xy->whitey-xy->bluey, 7))
+   if (png_muldiv(&right, xy->redx-xy->bluex, xy->whitey-xy->bluey, 7) == 0)
       return 2;
-   if (!png_muldiv(&green_inverse, xy->whitey, denominator, left-right) ||
+   if (png_muldiv(&green_inverse, xy->whitey, denominator, left-right) == 0 ||
        green_inverse <= xy->whitey)
       return 1;
 
@@ -1454,29 +1466,34 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
     * can still produce 0 for extreme cHRM values.
     */
    blue_scale = png_reciprocal(xy->whitey) - png_reciprocal(red_inverse) -
-      png_reciprocal(green_inverse);
-   if (blue_scale <= 0) return 1;
+       png_reciprocal(green_inverse);
+   if (blue_scale <= 0)
+      return 1;
 
 
    /* And fill in the png_XYZ: */
-   if (!png_muldiv(&XYZ->red_X, xy->redx, PNG_FP_1, red_inverse)) return 1;
-   if (!png_muldiv(&XYZ->red_Y, xy->redy, PNG_FP_1, red_inverse)) return 1;
-   if (!png_muldiv(&XYZ->red_Z, PNG_FP_1 - xy->redx - xy->redy, PNG_FP_1,
-      red_inverse))
+   if (png_muldiv(&XYZ->red_X, xy->redx, PNG_FP_1, red_inverse) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->red_Y, xy->redy, PNG_FP_1, red_inverse) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->red_Z, PNG_FP_1 - xy->redx - xy->redy, PNG_FP_1,
+       red_inverse) == 0)
       return 1;
 
-   if (!png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse))
+   if (png_muldiv(&XYZ->green_X, xy->greenx, PNG_FP_1, green_inverse) == 0)
       return 1;
-   if (!png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse))
+   if (png_muldiv(&XYZ->green_Y, xy->greeny, PNG_FP_1, green_inverse) == 0)
       return 1;
-   if (!png_muldiv(&XYZ->green_Z, PNG_FP_1 - xy->greenx - xy->greeny, PNG_FP_1,
-      green_inverse))
+   if (png_muldiv(&XYZ->green_Z, PNG_FP_1 - xy->greenx - xy->greeny, PNG_FP_1,
+       green_inverse) == 0)
       return 1;
 
-   if (!png_muldiv(&XYZ->blue_X, xy->bluex, blue_scale, PNG_FP_1)) return 1;
-   if (!png_muldiv(&XYZ->blue_Y, xy->bluey, blue_scale, PNG_FP_1)) return 1;
-   if (!png_muldiv(&XYZ->blue_Z, PNG_FP_1 - xy->bluex - xy->bluey, blue_scale,
-      PNG_FP_1))
+   if (png_muldiv(&XYZ->blue_X, xy->bluex, blue_scale, PNG_FP_1) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->blue_Y, xy->bluey, blue_scale, PNG_FP_1) == 0)
+      return 1;
+   if (png_muldiv(&XYZ->blue_Z, PNG_FP_1 - xy->bluex - xy->bluey, blue_scale,
+       PNG_FP_1) == 0)
       return 1;
 
    return 0; /*success*/
@@ -1498,24 +1515,35 @@ png_XYZ_normalize(png_XYZ *XYZ)
     * safe.
     */
    Y = XYZ->red_Y;
-   if (0x7fffffff - Y < XYZ->green_X) return 1;
+   if (0x7fffffff - Y < XYZ->green_X)
+      return 1;
    Y += XYZ->green_Y;
-   if (0x7fffffff - Y < XYZ->blue_X) return 1;
+   if (0x7fffffff - Y < XYZ->blue_X)
+      return 1;
    Y += XYZ->blue_Y;
 
    if (Y != PNG_FP_1)
    {
-      if (!png_muldiv(&XYZ->red_X, XYZ->red_X, PNG_FP_1, Y)) return 1;
-      if (!png_muldiv(&XYZ->red_Y, XYZ->red_Y, PNG_FP_1, Y)) return 1;
-      if (!png_muldiv(&XYZ->red_Z, XYZ->red_Z, PNG_FP_1, Y)) return 1;
+      if (png_muldiv(&XYZ->red_X, XYZ->red_X, PNG_FP_1, Y) == 0)
+         return 1;
+      if (png_muldiv(&XYZ->red_Y, XYZ->red_Y, PNG_FP_1, Y) == 0)
+         return 1;
+      if (png_muldiv(&XYZ->red_Z, XYZ->red_Z, PNG_FP_1, Y) == 0)
+         return 1;
 
-      if (!png_muldiv(&XYZ->green_X, XYZ->green_X, PNG_FP_1, Y)) return 1;
-      if (!png_muldiv(&XYZ->green_Y, XYZ->green_Y, PNG_FP_1, Y)) return 1;
-      if (!png_muldiv(&XYZ->green_Z, XYZ->green_Z, PNG_FP_1, Y)) return 1;
+      if (png_muldiv(&XYZ->green_X, XYZ->green_X, PNG_FP_1, Y) == 0)
+         return 1;
+      if (png_muldiv(&XYZ->green_Y, XYZ->green_Y, PNG_FP_1, Y) == 0)
+         return 1;
+      if (png_muldiv(&XYZ->green_Z, XYZ->green_Z, PNG_FP_1, Y) == 0)
+         return 1;
 
-      if (!png_muldiv(&XYZ->blue_X, XYZ->blue_X, PNG_FP_1, Y)) return 1;
-      if (!png_muldiv(&XYZ->blue_Y, XYZ->blue_Y, PNG_FP_1, Y)) return 1;
-      if (!png_muldiv(&XYZ->blue_Z, XYZ->blue_Z, PNG_FP_1, Y)) return 1;
+      if (png_muldiv(&XYZ->blue_X, XYZ->blue_X, PNG_FP_1, Y) == 0)
+         return 1;
+      if (png_muldiv(&XYZ->blue_Y, XYZ->blue_Y, PNG_FP_1, Y) == 0)
+         return 1;
+      if (png_muldiv(&XYZ->blue_Z, XYZ->blue_Z, PNG_FP_1, Y) == 0)
+         return 1;
    }
 
    return 0;
@@ -1525,14 +1553,16 @@ static int
 png_colorspace_endpoints_match(const png_xy *xy1, const png_xy *xy2, int delta)
 {
    /* Allow an error of +/-0.01 (absolute value) on each chromaticity */
-   return !(PNG_OUT_OF_RANGE(xy1->whitex, xy2->whitex,delta) ||
-      PNG_OUT_OF_RANGE(xy1->whitey, xy2->whitey,delta) ||
-      PNG_OUT_OF_RANGE(xy1->redx,   xy2->redx,  delta) ||
-      PNG_OUT_OF_RANGE(xy1->redy,   xy2->redy,  delta) ||
-      PNG_OUT_OF_RANGE(xy1->greenx, xy2->greenx,delta) ||
-      PNG_OUT_OF_RANGE(xy1->greeny, xy2->greeny,delta) ||
-      PNG_OUT_OF_RANGE(xy1->bluex,  xy2->bluex, delta) ||
-      PNG_OUT_OF_RANGE(xy1->bluey,  xy2->bluey, delta));
+   if (PNG_OUT_OF_RANGE(xy1->whitex, xy2->whitex,delta) ||
+       PNG_OUT_OF_RANGE(xy1->whitey, xy2->whitey,delta) ||
+       PNG_OUT_OF_RANGE(xy1->redx,   xy2->redx,  delta) ||
+       PNG_OUT_OF_RANGE(xy1->redy,   xy2->redy,  delta) ||
+       PNG_OUT_OF_RANGE(xy1->greenx, xy2->greenx,delta) ||
+       PNG_OUT_OF_RANGE(xy1->greeny, xy2->greeny,delta) ||
+       PNG_OUT_OF_RANGE(xy1->bluex,  xy2->bluex, delta) ||
+       PNG_OUT_OF_RANGE(xy1->bluey,  xy2->bluey, delta))
+      return 0;
+   return 1;
 }
 
 /* Added in libpng-1.6.0, a different check for the validity of a set of cHRM
@@ -1553,13 +1583,15 @@ png_colorspace_check_xy(png_XYZ *XYZ, const png_xy *xy)
 
    /* As a side-effect this routine also returns the XYZ endpoints. */
    result = png_XYZ_from_xy(XYZ, xy);
-   if (result != 0) return result;
+   if (result != 0)
+      return result;
 
    result = png_xy_from_XYZ(&xy_test, XYZ);
-   if (result != 0) return result;
+   if (result != 0)
+      return result;
 
    if (png_colorspace_endpoints_match(xy, &xy_test,
-      5/*actually, the math is pretty accurate*/))
+       5/*actually, the math is pretty accurate*/) != 0)
       return 0;
 
    /* Too much slip */
@@ -1576,10 +1608,12 @@ png_colorspace_check_XYZ(png_xy *xy, png_XYZ *XYZ)
    png_XYZ XYZtemp;
 
    result = png_XYZ_normalize(XYZ);
-   if (result != 0) return result;
+   if (result != 0)
+      return result;
 
    result = png_xy_from_XYZ(xy, XYZ);
-   if (result != 0) return result;
+   if (result != 0)
+      return result;
 
    XYZtemp = *XYZ;
    return png_colorspace_check_xy(&XYZtemp, xy);
@@ -1612,7 +1646,8 @@ png_colorspace_set_xy_and_XYZ(png_const_structrp png_ptr,
       /* The end points must be reasonably close to any we already have.  The
        * following allows an error of up to +/-.001
        */
-      if (!png_colorspace_endpoints_match(xy, &colorspace->end_points_xy, 100))
+      if (png_colorspace_endpoints_match(xy, &colorspace->end_points_xy,
+          100) == 0)
       {
          colorspace->flags |= PNG_COLORSPACE_INVALID;
          png_benign_error(png_ptr, "inconsistent chromaticities");
@@ -1631,7 +1666,7 @@ png_colorspace_set_xy_and_XYZ(png_const_structrp png_ptr,
    /* The end points are normally quoted to two decimal digits, so allow +/-0.01
     * on this test.
     */
-   if (png_colorspace_endpoints_match(xy, &sRGB_xy, 1000))
+   if (png_colorspace_endpoints_match(xy, &sRGB_xy, 1000) != 0)
       colorspace->flags |= PNG_COLORSPACE_ENDPOINTS_MATCH_sRGB;
 
    else
@@ -1759,7 +1794,7 @@ png_icc_profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    pos = png_safecat(message, (sizeof message), 0, "profile '"); /* 9 chars */
    pos = png_safecat(message, pos+79, pos, name); /* Truncate to 79 chars */
    pos = png_safecat(message, (sizeof message), pos, "': "); /* +2 = 90 */
-   if (is_ICC_signature(value))
+   if (is_ICC_signature(value) != 0)
    {
       /* So 'value' is at most 4 bytes and the following cast is safe */
       png_icc_tag_name(message+pos, (png_uint_32)value);
@@ -1820,7 +1855,7 @@ png_colorspace_set_sRGB(png_const_structrp png_ptr, png_colorspacerp colorspace,
    };
 
    /* Do nothing if the colorspace is already invalidated. */
-   if (colorspace->flags & PNG_COLORSPACE_INVALID)
+   if ((colorspace->flags & PNG_COLORSPACE_INVALID) != 0)
       return 0;
 
    /* Check the intent, then check for existing settings.  It is valid for the
@@ -1999,13 +2034,13 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    switch (temp)
    {
       case 0x52474220: /* 'RGB ' */
-         if (!(color_type & PNG_COLOR_MASK_COLOR))
+         if ((color_type & PNG_COLOR_MASK_COLOR) == 0)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "RGB color space not permitted on grayscale PNG");
          break;
 
       case 0x47524159: /* 'GRAY' */
-         if (color_type & PNG_COLOR_MASK_COLOR)
+         if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "Gray color space not permitted on RGB PNG");
          break;
@@ -2233,7 +2268,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
           * are not used by default if there is an MD5!)
           */
 #        if PNG_sRGB_PROFILE_CHECKS == 0
-            if (png_sRGB_checks[i].have_md5)
+            if (png_sRGB_checks[i].have_md5 != 0)
                return 1+png_sRGB_checks[i].is_broken;
 #        endif
 
@@ -2273,7 +2308,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
                   if (crc == png_sRGB_checks[i].crc)
 #              endif
                {
-                  if (png_sRGB_checks[i].is_broken)
+                  if (png_sRGB_checks[i].is_broken != 0)
                   {
                      /* These profiles are known to have bad data that may cause
                       * problems if they are used, therefore attempt to
@@ -2288,7 +2323,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
                    * the profile is perfectly valid, but it would be nice if
                    * people used the up-to-date ones.
                    */
-                  else if (!png_sRGB_checks[i].have_md5)
+                  else if (png_sRGB_checks[i].have_md5 == 0)
                   {
                      png_chunk_report(png_ptr, "out-of-date sRGB profile with"
                         " no signature",
@@ -2326,7 +2361,7 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
     * the sRGB information.
     */
 #if PNG_sRGB_PROFILE_CHECKS >= 0
-   if (png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler))
+   if (png_compare_ICC_profile_with_sRGB(png_ptr, profile, adler) != 0)
 #endif
       (void)png_colorspace_set_sRGB(png_ptr, colorspace,
          (int)/*already checked*/png_get_uint_32(profile+64));
@@ -2338,14 +2373,14 @@ png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_uint_32 profile_length, png_const_bytep profile,
    int color_type)
 {
-   if (colorspace->flags & PNG_COLORSPACE_INVALID)
+   if ((colorspace->flags & PNG_COLORSPACE_INVALID) != 0)
       return 0;
 
-   if (png_icc_check_length(png_ptr, colorspace, name, profile_length) &&
-      png_icc_check_header(png_ptr, colorspace, name, profile_length, profile,
-         color_type) &&
-      png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
-         profile))
+   if (png_icc_check_length(png_ptr, colorspace, name, profile_length) != 0 &&
+       png_icc_check_header(png_ptr, colorspace, name, profile_length, profile,
+          color_type) != 0 &&
+       png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
+          profile) != 0)
    {
 #     ifdef PNG_sRGB_SUPPORTED
          /* If no sRGB support, don't try storing sRGB information */
@@ -2364,7 +2399,7 @@ void /* PRIVATE */
 png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 {
    /* Set the rgb_to_gray coefficients from the colorspace. */
-   if (!png_ptr->rgb_to_gray_coefficients_set &&
+   if (png_ptr->rgb_to_gray_coefficients_set == 0 &&
       (png_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
    {
       /* png_set_background has not been called, get the coefficients from the Y
@@ -2528,13 +2563,13 @@ png_check_IHDR(png_const_structrp png_ptr,
     * 4. The filter_method is 64 and
     * 5. The color_type is RGB or RGBA
     */
-   if ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) &&
-       png_ptr->mng_features_permitted)
+   if ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) != 0 &&
+       png_ptr->mng_features_permitted != 0)
       png_warning(png_ptr, "MNG features are not allowed in a PNG datastream");
 
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
-      if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+      if (!((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) != 0 &&
           (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
           ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
           (color_type == PNG_COLOR_TYPE_RGB ||
@@ -2544,7 +2579,7 @@ png_check_IHDR(png_const_structrp png_ptr,
          error = 1;
       }
 
-      if (png_ptr->mode & PNG_HAVE_PNG_SIGNATURE)
+      if ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) != 0)
       {
          png_warning(png_ptr, "Invalid filter method in IHDR");
          error = 1;
@@ -2604,7 +2639,7 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
       switch ((state & PNG_FP_STATE) + (type & PNG_FP_SAW_ANY))
       {
       case PNG_FP_INTEGER + PNG_FP_SAW_SIGN:
-         if (state & PNG_FP_SAW_ANY)
+         if ((state & PNG_FP_SAW_ANY) != 0)
             goto PNG_FP_End; /* not a part of the number */
 
          png_fp_add(state, type);
@@ -2612,10 +2647,10 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
 
       case PNG_FP_INTEGER + PNG_FP_SAW_DOT:
          /* Ok as trailer, ok as lead of fraction. */
-         if (state & PNG_FP_SAW_DOT) /* two dots */
+         if ((state & PNG_FP_SAW_DOT) != 0) /* two dots */
             goto PNG_FP_End;
 
-         else if (state & PNG_FP_SAW_DIGIT) /* trailing dot? */
+         else if ((state & PNG_FP_SAW_DIGIT) != 0) /* trailing dot? */
             png_fp_add(state, type);
 
          else
@@ -2624,7 +2659,7 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
          break;
 
       case PNG_FP_INTEGER + PNG_FP_SAW_DIGIT:
-         if (state & PNG_FP_SAW_DOT) /* delayed fraction */
+         if ((state & PNG_FP_SAW_DOT) != 0) /* delayed fraction */
             png_fp_set(state, PNG_FP_FRACTION | PNG_FP_SAW_DOT);
 
          png_fp_add(state, type | PNG_FP_WAS_VALID);
@@ -2662,7 +2697,7 @@ png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
          break;
 
       case PNG_FP_EXPONENT + PNG_FP_SAW_SIGN:
-         if (state & PNG_FP_SAW_ANY)
+         if ((state & PNG_FP_SAW_ANY) != 0)
             goto PNG_FP_End; /* not a part of the number */
 
          png_fp_add(state, PNG_FP_SAW_SIGN);
@@ -2705,7 +2740,7 @@ png_check_fp_string(png_const_charp string, png_size_t size)
    int        state=0;
    png_size_t char_index=0;
 
-   if (png_check_fp_number(string, size, &state, &char_index) &&
+   if (png_check_fp_number(string, size, &state, &char_index) != 0 &&
       (char_index == size || string[char_index] == 0))
       return state /* must be non-zero - see above */;
 
@@ -2959,8 +2994,9 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
 
                   if (exp_b10 != (-1))
                   {
-                     if (exp_b10 == 0) *ascii++ = 46, --size; /* counted
-                                                                 above */
+                     if (exp_b10 == 0)
+                        *ascii++ = 46, --size; /* counted above */
+
                      --exp_b10;
                   }
                   *ascii++ = (char)(48 + (int)d), ++cdigits;
@@ -3297,7 +3333,7 @@ png_muldiv_warn(png_const_structrp png_ptr, png_fixed_point a, png_int_32 times,
 {
    png_fixed_point result;
 
-   if (png_muldiv(&result, a, times, divisor))
+   if (png_muldiv(&result, a, times, divisor) != 0)
       return result;
 
    png_warning(png_ptr, "fixed point overflow ignored");
@@ -3318,7 +3354,7 @@ png_reciprocal(png_fixed_point a)
 #else
    png_fixed_point res;
 
-   if (png_muldiv(&res, 100000, 100000, a))
+   if (png_muldiv(&res, 100000, 100000, a) != 0)
       return res;
 #endif
 
@@ -3353,7 +3389,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 #    else
    png_fixed_point res;
 
-   if (png_muldiv(&res, a, b, 100000))
+   if (png_muldiv(&res, a, b, 100000) != 0)
       return res;
 #    endif
 
@@ -3690,7 +3726,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
          png_int_32 lg2 = png_log8bit(value);
          png_fixed_point res;
 
-         if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1))
+         if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1) != 0)
             return png_exp8bit(res);
 
          /* Overflow. */
@@ -3714,7 +3750,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
          png_int_32 lg2 = png_log16bit(value);
          png_fixed_point res;
 
-         if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1))
+         if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1) != 0)
             return png_exp16bit(res);
 
          /* Overflow. */
@@ -3777,7 +3813,7 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
       /* The 'threshold' test is repeated here because it can arise for one of
        * the 16-bit tables even if the others don't hit it.
        */
-      if (png_gamma_significant(gamma_val))
+      if (png_gamma_significant(gamma_val) != 0)
       {
          /* The old code would overflow at the end and this would cause the
           * 'pow' function to return a result >1, resulting in an
@@ -3899,11 +3935,13 @@ png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
    unsigned int i;
    png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);
 
-   if (png_gamma_significant(gamma_val)) for (i=0; i<256; i++)
-      table[i] = png_gamma_8bit_correct(i, gamma_val);
+   if (png_gamma_significant(gamma_val) != 0)
+      for (i=0; i<256; i++)
+         table[i] = png_gamma_8bit_correct(i, gamma_val);
 
-   else for (i=0; i<256; ++i)
-      table[i] = (png_byte)i;
+   else
+      for (i=0; i<256; ++i)
+         table[i] = (png_byte)i;
 }
 
 /* Used from png_read_destroy and below to release the memory used by the gamma
@@ -3995,7 +4033,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-     if (png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY))
+     if ((png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY)) != 0)
      {
         png_build_8bit_table(png_ptr, &png_ptr->gamma_to_1,
             png_reciprocal(png_ptr->colorspace.gamma));
@@ -4011,7 +4049,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
   {
      png_byte shift, sig_bit;
 
-     if (png_ptr->color_type & PNG_COLOR_MASK_COLOR)
+     if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
      {
         sig_bit = png_ptr->sig_bit.red;
 
@@ -4048,7 +4086,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
      else
         shift = 0; /* keep all 16 bits */
 
-     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8))
+     if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) != 0)
      {
         /* PNG_MAX_GAMMA_8 is the number of bits to keep - effectively
          * the significant bits in the *input* when the output will
@@ -4068,7 +4106,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
       * 16-bit output because the 8-bit table assumes the result will be reduced
       * to 8 bits.
       */
-     if (png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8))
+     if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) != 0)
          png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
          png_ptr->screen_gamma > 0 ? png_product2(png_ptr->colorspace.gamma,
          png_ptr->screen_gamma) : PNG_FP_1);
@@ -4081,7 +4119,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
-     if (png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY))
+     if ((png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY)) != 0)
      {
         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
             png_reciprocal(png_ptr->colorspace.gamma));
@@ -4307,7 +4345,7 @@ png_image_free_function(png_voidp argument)
 
    /* First free any data held in the control structure. */
 #  ifdef PNG_STDIO_SUPPORTED
-      if (cp->owned_file)
+      if (cp->owned_file != 0)
       {
          FILE *fp = png_voidcast(FILE*, cp->png_ptr->io_ptr);
          cp->owned_file = 0;
@@ -4331,7 +4369,7 @@ png_image_free_function(png_voidp argument)
    png_free(c.png_ptr, cp);
 
    /* Then the structures, calling the correct API. */
-   if (c.for_write)
+   if (c.for_write != 0)
    {
 #     ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
          png_destroy_write_struct(&c.png_ptr, &c.info_ptr);

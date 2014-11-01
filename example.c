@@ -2,7 +2,7 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.6.11 [June 5, 2014]
+ * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
  * Maintained 1998-2014 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -52,7 +52,7 @@ int main(int argc, const char **argv)
       image.version = PNG_IMAGE_VERSION;
 
       /* The first argument is the file to read: */
-      if (png_image_begin_read_from_file(&image, argv[1]))
+      if (png_image_begin_read_from_file(&image, argv[1]) != 0)
       {
          png_bytep buffer;
 
@@ -97,7 +97,7 @@ int main(int argc, const char **argv)
           */
          if (buffer != NULL &&
             png_image_finish_read(&image, NULL/*background*/, buffer,
-               0/*row_stride*/, NULL/*colormap*/))
+               0/*row_stride*/, NULL/*colormap*/) != 0)
          {
             /* Now write the image out to the second argument.  In the write
              * call 'convert_to_8bit' allows 16-bit data to be squashed down to
@@ -105,7 +105,7 @@ int main(int argc, const char **argv)
              * to the 8-bit format.
              */
             if (png_image_write_to_file(&image, argv[2], 0/*convert_to_8bit*/,
-               buffer, 0/*row_stride*/, NULL/*colormap*/))
+               buffer, 0/*row_stride*/, NULL/*colormap*/) != 0)
             {
                /* The image has been written successfully. */
                exit(0);
@@ -405,7 +405,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    /* Expand paletted or RGB images with transparency to full alpha channels
     * so the data will be available as RGBA quartets.
     */
-   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
+   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS) != 0)
       png_set_tRNS_to_alpha(png_ptr);
 
    /* Set the background color to draw transparent and alpha images over.
@@ -417,7 +417,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
 
    png_color_16 my_background, *image_background;
 
-   if (png_get_bKGD(png_ptr, info_ptr, &image_background))
+   if (png_get_bKGD(png_ptr, info_ptr, &image_background) != 0)
       png_set_background(png_ptr, image_background,
                          PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
    else
@@ -454,12 +454,12 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
 
    int intent;
 
-   if (png_get_sRGB(png_ptr, info_ptr, &intent))
+   if (png_get_sRGB(png_ptr, info_ptr, &intent) != 0)
       png_set_gamma(png_ptr, screen_gamma, PNG_DEFAULT_sRGB);
    else
    {
       double image_gamma;
-      if (png_get_gAMA(png_ptr, info_ptr, &image_gamma))
+      if (png_get_gAMA(png_ptr, info_ptr, &image_gamma) != 0)
          png_set_gamma(png_ptr, screen_gamma, image_gamma);
       else
          png_set_gamma(png_ptr, screen_gamma, 0.45455);
@@ -469,7 +469,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    /* Quantize RGB files down to 8 bit palette or reduce palettes
     * to the number of colors available on your screen.
     */
-   if (color_type & PNG_COLOR_MASK_COLOR)
+   if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
    {
       int num_palette;
       png_colorp palette;
@@ -484,7 +484,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
             MAX_SCREEN_COLORS, NULL, 0);
       }
       /* This reduces the image to the palette supplied in the file */
-      else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette))
+      else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette) != 0)
       {
          png_uint_16p histogram = NULL;
 
@@ -503,7 +503,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
     * [0,65535] to the original [0,7] or [0,31], or whatever range the
     * colors were originally in:
     */
-   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT))
+   if (png_get_valid(png_ptr, info_ptr, PNG_INFO_sBIT) != 0)
    {
       png_color_8p sig_bit_p;
 
@@ -512,7 +512,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    }
 
    /* Flip the RGB pixels to BGR (or RGBA to BGRA) */
-   if (color_type & PNG_COLOR_MASK_COLOR)
+   if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
       png_set_bgr(png_ptr);
 
    /* Swap the RGBA or GA data to ARGB or AG (or BGRA to ABGR) */
