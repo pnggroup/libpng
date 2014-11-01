@@ -1,4 +1,4 @@
-README for libpng version 1.7.0beta39 - October 17, 2014 (shared library 17.0)
+README for libpng version 1.7.0beta39 - November 1, 2014 (shared library 17.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -23,7 +23,7 @@ earlier versions if you are using a shared library.  The type of the
 png_uint_32, which will affect shared-library applications that use
 this function.
 
-To avoid problems with changes to the internals of png_info_struct,
+To avoid problems with changes to the internals of png info_struct,
 new APIs have been made available in 0.95 to avoid direct application
 access to info_ptr.  These functions are the png_set_<chunk> and
 png_get_<chunk> functions.  These functions should be used when
@@ -190,7 +190,7 @@ Files in this distribution:
        pngminus         =>  Simple pnm2png and png2pnm programs
        pngsuite         =>  Test images
        tools            =>  Various tools
-       visupng      =>  Contains a MSVC workspace for VisualPng
+       visupng          =>  Contains a MSVC workspace for VisualPng
       projects      =>  Contains project files and workspaces for
                         building a DLL
        owatcom          =>  Contains a WATCOM project for building libpng
