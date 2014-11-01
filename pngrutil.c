@@ -220,8 +220,8 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
    if (png_crc_error(png_ptr) != 0)
    {
       if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) != 0 ?
-          !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) :
-          (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
+          (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) == 0 :
+          (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE) != 0)
       {
          png_chunk_warning(png_ptr, "CRC error");
       }

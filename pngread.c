@@ -126,7 +126,7 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
          png_ptr->mode |= PNG_HAVE_IDAT;
       }
 
-      else if (png_ptr->mode & PNG_HAVE_IDAT)
+      else if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
          png_ptr->mode |= PNG_AFTER_IDAT;
 
       /* This should be a binary subdivision search or a hash for
@@ -315,7 +315,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
    png_debug(1, "in png_do_read_intrapixel");
 
    if (
-       (row_info->color_type & PNG_COLOR_MASK_COLOR))
+       (row_info->color_type & PNG_COLOR_MASK_COLOR) != 0)
    {
       int bytes_per_pixel;
       png_uint_32 row_width = row_info->width;
@@ -401,38 +401,38 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
    {
    /* Check for transforms that have been set but were defined out */
 #if defined(PNG_WRITE_INVERT_SUPPORTED) && !defined(PNG_READ_INVERT_SUPPORTED)
-   if (png_ptr->transformations & PNG_INVERT_MONO)
+   if ((png_ptr->transformations & PNG_INVERT_MONO) != 0)
       png_warning(png_ptr, "PNG_READ_INVERT_SUPPORTED is not defined");
 #endif
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED) && !defined(PNG_READ_FILLER_SUPPORTED)
-   if (png_ptr->transformations & PNG_FILLER)
+   if ((png_ptr->transformations & PNG_FILLER) != 0)
       png_warning(png_ptr, "PNG_READ_FILLER_SUPPORTED is not defined");
 #endif
 
 #if defined(PNG_WRITE_PACKSWAP_SUPPORTED) && \
     !defined(PNG_READ_PACKSWAP_SUPPORTED)
-   if (png_ptr->transformations & PNG_PACKSWAP)
+   if ((png_ptr->transformations & PNG_PACKSWAP) != 0)
       png_warning(png_ptr, "PNG_READ_PACKSWAP_SUPPORTED is not defined");
 #endif
 
 #if defined(PNG_WRITE_PACK_SUPPORTED) && !defined(PNG_READ_PACK_SUPPORTED)
-   if (png_ptr->transformations & PNG_PACK)
+   if ((png_ptr->transformations & PNG_PACK) != 0)
       png_warning(png_ptr, "PNG_READ_PACK_SUPPORTED is not defined");
 #endif
 
 #if defined(PNG_WRITE_SHIFT_SUPPORTED) && !defined(PNG_READ_SHIFT_SUPPORTED)
-   if (png_ptr->transformations & PNG_SHIFT)
+   if ((png_ptr->transformations & PNG_SHIFT) != 0)
       png_warning(png_ptr, "PNG_READ_SHIFT_SUPPORTED is not defined");
 #endif
 
 #if defined(PNG_WRITE_BGR_SUPPORTED) && !defined(PNG_READ_BGR_SUPPORTED)
-   if (png_ptr->transformations & PNG_BGR)
+   if ((png_ptr->transformations & PNG_BGR) != 0)
       png_warning(png_ptr, "PNG_READ_BGR_SUPPORTED is not defined");
 #endif
 
 #if defined(PNG_WRITE_SWAP_SUPPORTED) && !defined(PNG_READ_SWAP_SUPPORTED)
-   if (png_ptr->transformations & PNG_SWAP_BYTES)
+   if ((png_ptr->transformations & PNG_SWAP_BYTES) != 0)
       png_warning(png_ptr, "PNG_READ_SWAP_SUPPORTED is not defined");
 #endif
    }
@@ -445,7 +445,8 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
     * untransformed) and, because of the libpng API for interlaced images, this
     * means we must transform before de-interlacing.
     */
-   if (png_ptr->interlaced && (png_ptr->transformations & PNG_INTERLACE))
+   if (png_ptr->interlaced != 0 &&
+       (png_ptr->transformations & PNG_INTERLACE) != 0)
    {
       switch (png_ptr->pass)
       {
@@ -549,7 +550,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
    memcpy(png_ptr->prev_row, png_ptr->row_buf, row_info.rowbytes + 1);
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
-   if ((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) &&
+   if ((png_ptr->mng_features_permitted & PNG_FLAG_MNG_FILTER_64) != 0 &&
        (png_ptr->filter_type == PNG_INTRAPIXEL_DIFFERENCING))
    {
       /* Intrapixel differencing */
@@ -575,8 +576,8 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Expand interlaced rows to full size */
-   if (png_ptr->interlaced &&
-      (png_ptr->transformations & PNG_INTERLACE))
+   if (png_ptr->interlaced != 0 &&
+      (png_ptr->transformations & PNG_INTERLACE) != 0)
    {
       if (png_ptr->pass < 6)
          png_do_read_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass,
@@ -707,7 +708,8 @@ png_read_image(png_structrp png_ptr, png_bytepp image)
    }
    else
    {
-      if (png_ptr->interlaced && !(png_ptr->transformations & PNG_INTERLACE))
+      if (png_ptr->interlaced != 0 &&
+          (png_ptr->transformations & PNG_INTERLACE) == 0)
       {
          /* Caller called png_start_read_image or png_read_update_info without
           * first turning on the PNG_INTERLACE transform.  We can fix this here,
@@ -909,7 +911,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
       else
          png_handle_unknown(png_ptr, info_ptr, length,
             PNG_HANDLE_CHUNK_AS_DEFAULT);
-   } while (!(png_ptr->mode & PNG_HAVE_IEND));
+   } while ((png_ptr->mode & PNG_HAVE_IEND) == 0);
 }
 #endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
 
@@ -1734,7 +1736,7 @@ png_create_colormap_entry(png_image_read_control *display,
    png_uint_32 alpha, int encoding)
 {
    png_imagep image = display->image;
-   const int output_encoding = (image->format & PNG_FORMAT_FLAG_LINEAR) ?
+   const int output_encoding = (image->format & PNG_FORMAT_FLAG_LINEAR) != 0 ?
       P_LINEAR : P_sRGB;
    const int convert_to_Y = (image->format & PNG_FORMAT_FLAG_COLOR) == 0 &&
       (red != green || green != blue);
@@ -1850,7 +1852,7 @@ png_create_colormap_entry(png_image_read_control *display,
 #        define afirst 0
 #     endif
 #     ifdef PNG_FORMAT_BGR_SUPPORTED
-         const int bgr = (image->format & PNG_FORMAT_FLAG_BGR) ? 2 : 0;
+         const int bgr = (image->format & PNG_FORMAT_FLAG_BGR) != 0 ? 2 : 0;
 #     else
 #        define bgr 0
 #     endif
@@ -2062,7 +2064,7 @@ png_image_read_colormap(png_voidp argument)
 
    const png_structrp png_ptr = image->opaque->png_ptr;
    const png_uint_32 output_format = image->format;
-   const int output_encoding = (output_format & PNG_FORMAT_FLAG_LINEAR) ?
+   const int output_encoding = (output_format & PNG_FORMAT_FLAG_LINEAR) != 0 ?
       P_LINEAR : P_sRGB;
 
    unsigned int cmap_entries;
@@ -3243,7 +3245,8 @@ png_image_read_composite(png_voidp argument)
       png_uint_32  height = image->height;
       png_uint_32  width = image->width;
       ptrdiff_t    step_row = display->row_bytes;
-      unsigned int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+      unsigned int channels =
+         (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
       int pass;
 
       for (pass = 0; pass < passes; ++pass)
@@ -3542,7 +3545,7 @@ png_image_read_background(png_voidp argument)
 
 #           ifdef PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
                if (preserve_alpha != 0 &&
-                   (image->format & PNG_FORMAT_FLAG_AFIRST))
+                   (image->format & PNG_FORMAT_FLAG_AFIRST) != 0)
                   swap_alpha = 1;
 #           endif
 

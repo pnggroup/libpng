@@ -1634,14 +1634,15 @@ png_colorspace_set_xy_and_XYZ(png_const_structrp png_ptr,
    png_colorspacerp colorspace, const png_xy *xy, const png_XYZ *XYZ,
    int preferred)
 {
-   if (colorspace->flags & PNG_COLORSPACE_INVALID)
+   if ((colorspace->flags & PNG_COLORSPACE_INVALID) != 0)
       return 0;
 
    /* The consistency check is performed on the chromaticities; this factors out
     * variations because of the normalization (or not) of the end point Y
     * values.
     */
-   if (preferred < 2 && (colorspace->flags & PNG_COLORSPACE_HAVE_ENDPOINTS))
+   if (preferred < 2 &&
+       (colorspace->flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
    {
       /* The end points must be reasonably close to any we already have.  The
        * following allows an error of up to +/-.001

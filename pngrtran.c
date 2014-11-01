@@ -4838,7 +4838,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
        */
        !((png_ptr->transformations & PNG_COMPOSE) &&
        ((png_ptr->num_trans != 0) ||
-       (png_ptr->color_type & PNG_COLOR_MASK_ALPHA))) &&
+       (png_ptr->color_type & PNG_COLOR_MASK_ALPHA) != 0)) &&
 #endif
       /* Because png_init_read_transformations transforms the palette, unless
        * RGB_TO_GRAY will do the transform.

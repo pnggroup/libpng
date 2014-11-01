@@ -1750,7 +1750,7 @@ png_write_image_16bit(png_voidp argument)
       display->first_row);
    png_uint_16p output_row = png_voidcast(png_uint_16p, display->local_row);
    png_uint_16p row_end;
-   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
    int aindex = 0;
    png_uint_32 y = image->height;
 
@@ -1907,7 +1907,7 @@ png_write_image_8bit(png_voidp argument)
       display->first_row);
    png_bytep output_row = png_voidcast(png_bytep, display->local_row);
    png_uint_32 y = image->height;
-   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
 
    if ((image->format & PNG_FORMAT_FLAG_ALPHA) != 0)
    {
@@ -2012,7 +2012,7 @@ png_image_set_PLTE(png_image_write_control *display)
 #  endif
 
 #  ifdef PNG_FORMAT_BGR_SUPPORTED
-      const int bgr = (format & PNG_FORMAT_FLAG_BGR) ? 2 : 0;
+      const int bgr = (format & PNG_FORMAT_FLAG_BGR) != 0 ? 2 : 0;
 #  else
 #     define bgr 0
 #  endif

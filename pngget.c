@@ -182,7 +182,8 @@ png_get_pixel_aspect_ratio(png_const_structrp png_ptr, png_const_inforp
    info_ptr)
 {
 #ifdef PNG_READ_pHYs_SUPPORTED
-   if (png_ptr != NULL && info_ptr != NULL && (info_ptr->valid & PNG_INFO_pHYs))
+   if (png_ptr != NULL && info_ptr != NULL &&
+       (info_ptr->valid & PNG_INFO_pHYs) != 0)
    {
       png_debug1(1, "in %s retrieval function", "png_get_aspect_ratio");
 

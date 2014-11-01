@@ -232,7 +232,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
          png_error(png_ptr, "Missing IHDR before IDAT");
 
       else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-          !(png_ptr->mode & PNG_HAVE_PLTE))
+          (png_ptr->mode & PNG_HAVE_PLTE) == 0)
          png_error(png_ptr, "Missing PLTE before IDAT");
 
       png_ptr->mode |= PNG_HAVE_IDAT;
