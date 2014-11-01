@@ -4906,8 +4906,8 @@ Version 1.7.0beta38 [October 17, 2014]
   Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
   Only mark text chunks as written after successfully writing them.
 
-Version 1.7.0beta39 [October 26, 2014]
-  Changed "if (!x)" to "if (x == 0)" and "if (x)" to "if (x !== 0)"
+Version 1.7.0beta39 [November 1, 2014]
+  Ported cosmetic changes from libpng-1.6.15beta02.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

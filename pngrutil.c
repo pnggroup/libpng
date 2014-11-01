@@ -203,8 +203,8 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
    if (png_crc_error(png_ptr))
    {
       if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) ?
-          !(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) :
-          (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE))
+          (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) == 0:
+          (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE) != 0)
       {
          png_chunk_warning(png_ptr, "CRC error");
       }
@@ -2632,10 +2632,10 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
        */
       ++prefix_length;
 
-      if (compressed == 0 && prefix_length <= length)
+      if (!compressed && prefix_length <= length)
          uncompressed_length = length - prefix_length;
 
-      else if (compressed != 0 && prefix_length < length)
+      else if (compressed && prefix_length < length)
       {
          uncompressed_length = PNG_SIZE_MAX;
 
@@ -2928,7 +2928,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 #endif /* !PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
 
    /* Check for unhandled critical chunks */
-   if (handled == 0 && PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
+   if (!handled && PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
       png_chunk_error(png_ptr, "unhandled critical chunk");
 }
 
