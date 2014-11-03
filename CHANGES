@@ -5041,7 +5041,8 @@ Version 1.6.15beta01 [October 29, 2014]
 Version 1.6.15beta02 [November 1, 2014]
   Changed remaining "if (!x)" to "if (x == 0)" and "if (x)" to "if (x !== 0)"
 
-Version 1.6.15beta03 [November 1, 2014]
+Version 1.6.15beta03 [November 3, 2014]
+  Added PNG_USE_ARM_NEON configuration flag (Marcin Juszkiewicz).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
