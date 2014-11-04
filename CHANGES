@@ -5044,7 +5044,9 @@ Version 1.6.15beta02 [November 1, 2014]
 Version 1.6.15beta03 [November 3, 2014]
   Added PNG_USE_ARM_NEON configuration flag (Marcin Juszkiewicz).
 
-Version 1.6.15beta04 [November 3, 2014]
+Version 1.6.15beta04 [November 4, 2014]
+  Removed new PNG_USE_ARM_NEON configuration flag and made a one-line
+    revision to configure.ac to support ARM on aarch64 instead (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

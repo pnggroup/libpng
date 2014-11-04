@@ -6,7 +6,7 @@
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.15 [(PENDING RELEASE)]]
+ * Last changed in libpng 1.6.10 [March 6, 1014]]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -123,8 +123,8 @@
     * Note that gcc-4.9 defines __ARM_NEON instead of __ARM_NEON__, so we
     * check both variants.
     */
-#  if defined(PNG_USE_ARM_NEON) && (defined(__ARM_NEON__) || \
-     defined(__ARM_NEON)) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#  if (defined(__ARM_NEON__) || defined(__ARM_NEON)) && \
+   defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 #     define PNG_ARM_NEON_OPT 2
 #  else
 #     define PNG_ARM_NEON_OPT 0
