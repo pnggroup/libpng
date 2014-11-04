@@ -426,7 +426,7 @@ AC_ARG_ENABLE([arm-neon],
 AM_CONDITIONAL([PNG_ARM_NEON],
    [test "$enable_arm_neon" != 'no' &&
     case "$host_cpu" in
-      arm*) :;;
+      arm*|aarch64*) :;;
       *)    test "$enable_arm_neon" != '';;
     esac])
 
