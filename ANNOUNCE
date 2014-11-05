@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta40 - November 4, 2014
+Libpng 1.7.0beta40 - November 5, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -620,9 +620,13 @@ Version 1.7.0beta38 [October 17, 2014]
 Version 1.7.0beta39 [November 1, 2014]
   Ported cosmetic changes from libpng-1.6.15beta02.
 
-Version 1.7.0beta40 [November 4, 2014]
+Version 1.7.0beta40 [November 5, 2014]
   Made a one-line revision to configure.ac to support ARM on aarch64
     (bug report by Marcin Juszkiewicz, fix by John Bowler).
+  Use png_get_libpng_ver(NULL) instead of PNG_LIBPNG_VER_STRING in
+    example.c, pngtest.c, and applications in the contrib directory.
+  Avoid out-of-bounds memory access in png_user_version_check().
+  Simplified and future-proofed png_user_version_check().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
