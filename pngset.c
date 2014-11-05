@@ -1329,7 +1329,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       };
 
       chunk_list = chunks_to_ignore;
-      num_chunks = (sizeof chunks_to_ignore)/5;
+      num_chunks = (unsigned int)/*SAFE*/(sizeof chunks_to_ignore)/5U;
    }
 
    else /* num_chunks_in > 0 */

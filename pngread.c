@@ -1619,7 +1619,7 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
 
        /* But do not ignore image data handling chunks */
        png_set_keep_unknown_chunks(png_ptr, PNG_HANDLE_CHUNK_AS_DEFAULT,
-         chunks_to_process, (sizeof chunks_to_process)/5);
+         chunks_to_process, (int)/*SAFE*/(sizeof chunks_to_process)/5);
     }
 }
 

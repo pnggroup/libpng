@@ -45,6 +45,21 @@ Version 1.6.15beta05 [November 5, 2014]
     example.c, pngtest.c, and applications in the contrib directory.
   Avoid out-of-bounds memory access in png_user_version_check().
   Simplified and future-proofed png_user_version_check().
+  Fixed GCC unsigned int->float warnings. Various versions of GCC
+    seem to generate warnings when an unsigned value is implicitly
+    converted to double. This is probably a GCC bug but this change
+    avoids the issue by explicitly converting to (int) where safe.
+  Free all allocated memory in pngimage. The file buffer cache was left
+    allocated at the end of the program, harmless but it causes memory
+    leak reports from clang.
+  Fixed array size calculations to avoid warnings. At various points
+    in the code the number of elements in an array is calculated using
+    sizeof.  This generates a compile time constant of type (size_t) which
+    is then typically assigned to an (unsigned int) or (int). Some versions
+    of GCC on 64-bit systems warn about the apparent narrowing, even though
+    the same compiler does apparently generate the correct, in-range,
+    numeric constant.  This adds appropriate, safe, casts to make the
+    warnings go away.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
