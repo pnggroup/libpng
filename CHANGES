@@ -5057,6 +5057,9 @@ Version 1.6.15beta05 [November 5, 2014]
     seem to generate warnings when an unsigned value is implicitly
     converted to double. This is probably a GCC bug but this change
     avoids the issue by explicitly converting to (int) where safe.
+  Free all allocated memory in pngimage. The file buffer cache was left
+    allocated at the end of the program, harmless but it causes memory
+    leak reports from clang.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
