@@ -5051,6 +5051,7 @@ Version 1.6.15beta04 [November 4, 2014]
 Version 1.6.15beta05 [November 5, 2014]
   Use png_get_libpng_ver(NULL) instead of PNG_LIBPNG_VER_STRING in
     example.c, pngtest.c, and applications in the contrib directory.
+  Avoid out-of-bounds memory access in png_user_version_check().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

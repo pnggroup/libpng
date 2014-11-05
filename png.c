@@ -167,13 +167,14 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
 {
    if (user_png_ver != NULL)
    {
-      int i = 0;
+      int i = -1;
 
       do
       {
+         i++;
          if (user_png_ver[i] != png_libpng_ver[i])
             png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-      } while (png_libpng_ver[i++]);
+      } while (png_libpng_ver[i] != 0 && user_png_ver[i] != 0);
    }
 
    else
@@ -771,13 +772,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.15beta05 - November 4, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.15beta05 - November 5, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.15beta05 - November 4, 2014\
+      return "libpng version 1.6.15beta05 - November 5, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
