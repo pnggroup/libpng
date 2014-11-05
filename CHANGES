@@ -5053,6 +5053,10 @@ Version 1.6.15beta05 [November 5, 2014]
     example.c, pngtest.c, and applications in the contrib directory.
   Avoid out-of-bounds memory access in png_user_version_check().
   Simplified and future-proofed png_user_version_check().
+  Fixed GCC unsigned int->float warnings. Various versions of GCC
+    seem to generate warnings when an unsigned value is implicitly
+    converted to double. This is probably a GCC bug but this change
+    avoids the issue by explicitly converting to (int) where safe.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
