@@ -161,7 +161,7 @@ int main(int argc, const char **argv)
           * writes error messages to stderr.  Creating the png_struct is a
           * little tricky; just copy the following code.
           */
-         png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+         png_structp png_ptr = png_create_read_struct(png_get_libpng_ver(NULL),
             NULL, NULL, NULL);
 
          if (png_ptr != NULL)

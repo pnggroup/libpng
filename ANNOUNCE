@@ -1,4 +1,4 @@
-Libpng 1.6.15beta05 - November 4, 2014
+Libpng 1.6.15beta05 - November 5, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -40,7 +40,9 @@ Version 1.6.15beta04 [November 4, 2014]
   Removed new PNG_USE_ARM_NEON configuration flag and made a one-line
     revision to configure.ac to support ARM on aarch64 instead (John Bowler).
 
-Version 1.6.15beta05 [November 4, 2014]
+Version 1.6.15beta05 [November 5, 2014]
+  Use png_get_libpng_ver(NULL) instead of PNG_LIBPNG_VER_STRING in
+    example.c, pngtest.c, and applications in the contrib directory.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

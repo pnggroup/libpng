@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.15beta05 - November 4, 2014
+ libpng version 1.6.15beta05 - November 5, 2014
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.15beta05 - November 4, 2014
+ libpng versions 0.97, January 1998, through 1.6.15beta05 - November 5, 2014
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -372,7 +372,7 @@ The structure allocation functions quietly return NULL if they fail to
 create the structure, so your application should check for that.
 
     png_structp png_ptr = png_create_read_struct
-        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+        (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
 
     if (!png_ptr)
@@ -392,7 +392,7 @@ use a libpng that was built with PNG_USER_MEM_SUPPORTED defined, and use
 png_create_read_struct_2() instead of png_create_read_struct():
 
     png_structp png_ptr = png_create_read_struct_2
-        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+        (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn, (png_voidp)
         user_mem_ptr, user_malloc_fn, user_free_fn);
 
@@ -2486,7 +2486,7 @@ png_infop info_ptr;
  initialize_png_reader()
  {
     png_ptr = png_create_read_struct
-        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+        (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
          user_error_fn, user_warning_fn);
 
     if (!png_ptr)
@@ -2694,7 +2694,7 @@ both "png_ptr"; you can call them anything you like, such as
 "read_ptr" and "write_ptr".  Look at pngtest.c, for example.
 
     png_structp png_ptr = png_create_write_struct
-       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+       (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
 
     if (!png_ptr)
@@ -2713,7 +2713,7 @@ define PNG_USER_MEM_SUPPORTED and use
 png_create_write_struct_2() instead of png_create_write_struct():
 
     png_structp png_ptr = png_create_write_struct_2
-       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
+       (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn, (png_voidp)
         user_mem_ptr, user_malloc_fn, user_free_fn);
 
@@ -5277,7 +5277,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-November 4, 2014
+November 5, 2014
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

@@ -3580,7 +3580,7 @@ read_png(struct control *control)
    volatile png_bytep row = NULL, display = NULL;
    volatile int rc;
 
-   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, control,
+   png_ptr = png_create_read_struct(png_get_libpng_ver(NULL), control,
       error_handler, warning_handler);
 
    if (png_ptr == NULL)

@@ -104,7 +104,7 @@ int readpng2_init(mainprog_info *mainprog_ptr)
 
     /* could also replace libpng warning-handler (final NULL), but no need: */
 
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, mainprog_ptr,
+    png_ptr = png_create_read_struct(png_get_libpng_ver(NULL), mainprog_ptr,
       readpng2_error_handler, readpng2_warning_handler);
     if (!png_ptr)
         return 4;   /* out of memory */

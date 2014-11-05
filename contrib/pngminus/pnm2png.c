@@ -425,7 +425,8 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   } /* end for row */
 
   /* prepare the standard PNG structures */
-  png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  png_ptr = png_create_write_struct (png_get_libpng_ver(NULL), NULL, NULL,
+      NULL);
   if (!png_ptr)
   {
     return FALSE;

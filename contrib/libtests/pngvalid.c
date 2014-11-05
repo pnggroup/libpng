@@ -1552,13 +1552,13 @@ set_store_for_write(png_store *ps, png_infopp ppi,
        */
 #     ifdef PNG_USER_MEM_SUPPORTED
          if (!ps->speed)
-            ps->pwrite = png_create_write_struct_2(PNG_LIBPNG_VER_STRING,
+            ps->pwrite = png_create_write_struct_2(png_get_libpng_ver(NULL),
                ps, store_error, store_warning, &ps->write_memory_pool,
                store_malloc, store_free);
 
          else
 #     endif
-         ps->pwrite = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+         ps->pwrite = png_create_write_struct(png_get_libpng_ver(NULL),
             ps, store_error, store_warning);
 
       png_set_write_fn(ps->pwrite, ps, store_write, store_flush);
@@ -1673,13 +1673,13 @@ set_store_for_read(png_store *ps, png_infopp ppi, png_uint_32 id,
     */
 #  ifdef PNG_USER_MEM_SUPPORTED
       if (!ps->speed)
-         ps->pread = png_create_read_struct_2(PNG_LIBPNG_VER_STRING, ps,
+         ps->pread = png_create_read_struct_2(png_get_libpng_ver(NULL), ps,
              store_error, store_warning, &ps->read_memory_pool, store_malloc,
              store_free);
 
       else
 #  endif
-   ps->pread = png_create_read_struct(PNG_LIBPNG_VER_STRING, ps, store_error,
+   ps->pread = png_create_read_struct(png_get_libpng_ver(NULL), ps, store_error,
       store_warning);
 
    if (ps->pread == NULL)

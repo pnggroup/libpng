@@ -556,7 +556,7 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
    volatile png_fixed_point gamma, chunk_insert * volatile insert,
    unsigned int filters, unsigned int *colors)
 {
-   png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+   png_structp png_ptr = png_create_write_struct(png_get_libpng_ver(NULL),
       name, makepng_error, makepng_warning);
    volatile png_infop info_ptr = NULL;
    volatile png_bytep row = NULL;
