@@ -165,33 +165,30 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 int
 png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
 {
+     /* Libpng versions 1.0.0 and later are binary compatible if the version
+      * string matches through the second '.'; we must recompile any
+      * applications that use any older library version.
+      */
+
    if (user_png_ver != NULL)
    {
       int i = -1;
+      int found_dots = 0;
 
       do
       {
          i++;
          if (user_png_ver[i] != png_libpng_ver[i])
             png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-      } while (png_libpng_ver[i] != 0 && user_png_ver[i] != 0);
+         if (user_png_ver[i] == '.')
+            found_dots++;
+      } while (found_dots < 2 && png_libpng_ver[i] != 0 && user_png_ver[i] != 0);
    }
 
    else
       png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
 
    if ((png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH) != 0)
-   {
-     /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
-      * we must recompile any applications that use any older library version.
-      * For versions after libpng 1.0, we will be compatible, so we need
-      * only check the first and third digits (note that when we reach version
-      * 1.10 we will need to check the fourth symbol, namely user_png_ver[3]).
-      */
-      if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
-          (user_png_ver[0] == '1' && (user_png_ver[2] != png_libpng_ver[2] ||
-          user_png_ver[3] != png_libpng_ver[3])) ||
-          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
       {
 #ifdef PNG_WARNINGS_SUPPORTED
          size_t pos = 0;
@@ -213,7 +210,6 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
 
          return 0;
       }
-   }
 
    /* Success return. */
    return 1;
