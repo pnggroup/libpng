@@ -869,11 +869,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    pngtest_debug("Allocating read and write structures");
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    read_ptr =
-      png_create_read_struct_2(png_get_libpng_ver(NULL), NULL,
+      png_create_read_struct_2(PNG_LIBPNG_VER_STRING, NULL,
       NULL, NULL, NULL, png_debug_malloc, png_debug_free);
 #else
    read_ptr =
-      png_create_read_struct(png_get_libpng_ver(NULL), NULL, NULL, NULL);
+      png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
    png_set_error_fn(read_ptr, &error_parameters, pngtest_error,
       pngtest_warning);
@@ -881,11 +881,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_WRITE_SUPPORTED
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
    write_ptr =
-      png_create_write_struct_2(png_get_libpng_ver(NULL), NULL,
+      png_create_write_struct_2(PNG_LIBPNG_VER_STRING, NULL,
       NULL, NULL, NULL, png_debug_malloc, png_debug_free);
 #else
    write_ptr =
-      png_create_write_struct(png_get_libpng_ver(NULL), NULL, NULL, NULL);
+      png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 #endif
    png_set_error_fn(write_ptr, &error_parameters, pngtest_error,
       pngtest_warning);

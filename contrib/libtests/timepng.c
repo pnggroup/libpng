@@ -37,7 +37,7 @@
 
 static int read_png(FILE *fp)
 {
-   png_structp png_ptr = png_create_read_struct(png_get_libpng_ver(NULL),0,0,0);
+   png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,0);
    png_infop info_ptr = NULL;
    png_bytep row = NULL, display = NULL;
 

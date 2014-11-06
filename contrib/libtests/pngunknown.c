@@ -651,7 +651,7 @@ check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/,
    /* Some of these errors are permanently fatal and cause an exit here, others
     * are per-test and cause an error return.
     */
-   d->png_ptr = png_create_read_struct(png_get_libpng_ver(NULL), d, error,
+   d->png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, d, error,
       warning);
    if (d->png_ptr == NULL)
    {

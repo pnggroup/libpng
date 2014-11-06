@@ -876,7 +876,7 @@ The structure allocation functions quietly return NULL if they fail to
 create the structure, so your application should check for that.
 
     png_structp png_ptr = png_create_read_struct
-        (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
+        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
 
     if (!png_ptr)
@@ -896,7 +896,7 @@ use a libpng that was built with PNG_USER_MEM_SUPPORTED defined, and use
 png_create_read_struct_2() instead of png_create_read_struct():
 
     png_structp png_ptr = png_create_read_struct_2
-        (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
+        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn, (png_voidp)
         user_mem_ptr, user_malloc_fn, user_free_fn);
 
@@ -2990,7 +2990,7 @@ png_infop info_ptr;
  initialize_png_reader()
  {
     png_ptr = png_create_read_struct
-        (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
+        (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
          user_error_fn, user_warning_fn);
 
     if (!png_ptr)
@@ -3198,7 +3198,7 @@ both "png_ptr"; you can call them anything you like, such as
 "read_ptr" and "write_ptr".  Look at pngtest.c, for example.
 
     png_structp png_ptr = png_create_write_struct
-       (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
+       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn);
 
     if (!png_ptr)
@@ -3217,7 +3217,7 @@ define PNG_USER_MEM_SUPPORTED and use
 png_create_write_struct_2() instead of png_create_write_struct():
 
     png_structp png_ptr = png_create_write_struct_2
-       (png_get_libpng_ver(NULL), (png_voidp)user_error_ptr,
+       (PNG_LIBPNG_VER_STRING, (png_voidp)user_error_ptr,
         user_error_fn, user_warning_fn, (png_voidp)
         user_mem_ptr, user_malloc_fn, user_free_fn);
 

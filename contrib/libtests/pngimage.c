@@ -826,7 +826,7 @@ read_png(struct display *dp, struct buffer *bp, const char *operation,
       dp->transforms = transforms;
    }
 
-   dp->read_pp = pp = png_create_read_struct(png_get_libpng_ver(NULL), dp,
+   dp->read_pp = pp = png_create_read_struct(PNG_LIBPNG_VER_STRING, dp,
       display_error, display_warning);
    if (pp == NULL)
       display_log(dp, LIBPNG_ERROR, "failed to create read struct");
@@ -1271,7 +1271,7 @@ write_png(struct display *dp, png_infop ip, int transforms)
    dp->operation = "write";
    dp->transforms = transforms;
 
-   dp->write_pp = png_create_write_struct(png_get_libpng_ver(NULL), dp,
+   dp->write_pp = png_create_write_struct(PNG_LIBPNG_VER_STRING, dp,
       display_error, display_warning);
 
    if (dp->write_pp == NULL)
