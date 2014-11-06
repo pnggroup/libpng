@@ -1,12 +1,11 @@
-README for libpng version 1.5.20beta01 - August 21, 2014 (shared library 15.0)
+README for libpng version 1.5.20beta01 - November 6, 2014 (shared library 15.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
 
-Libpng comes in several distribution formats.  Get libpng-*.tar.gz,
-libpng-*.tar.xz or libpng-*.tar.bz2 if you want UNIX-style line endings
-in the text files, or lpng*.7z or lpng*.zip if you want DOS-style line
-endings.
+Libpng comes in several distribution formats.  Get libpng-*.tar.gz or
+libpng-*.tar.xz or if you want UNIX-style line endings in the text files,
+or lpng*.7z or lpng*.zip if you want DOS-style line endings.
 
 Version 0.89 was the first official release of libpng.  Don't let the
 fact that it's the first release fool you.  The libpng library has been in
@@ -24,18 +23,25 @@ earlier versions if you are using a shared library.  The type of the
 png_uint_32, which will affect shared-library applications that use
 this function.
 
-To avoid problems with changes to the internals of png_info_struct,
+To avoid problems with changes to the internals of the png info_struct,
 new APIs have been made available in 0.95 to avoid direct application
 access to info_ptr.  These functions are the png_set_<chunk> and
 png_get_<chunk> functions.  These functions should be used when
 accessing/storing the info_struct data, rather than manipulating it
 directly, to avoid such problems in the future.
 
-It is important to note that the APIs do not make current programs
+It is important to note that the APIs did not make current programs
 that access the info struct directly incompatible with the new
-library.  However, it is strongly suggested that new programs use
-the new APIs (as shown in example.c and pngtest.c), and older programs
-be converted to the new format, to facilitate upgrades in the future.
+library, through libpng-1.2.x.  In libpng-1.4.x, which was meant to
+be a transitional release, members of the png_struct and the
+info_struct can still be accessed, but the compiler will issue a
+warning about deprecated usage.  Since libpng-1.5.0, direct access
+to these structs is not allowed, and the definitions of the structs
+reside in private pngstruct.h and pnginfo.h header files that are not
+accessible to applications.  It is strongly suggested that new
+programs use the new APIs (as shown in example.c and pngtest.c), and
+older programs be converted to the new format, to facilitate upgrades
+in the future.
 ****
 
 Additions since 0.90 include the ability to compile libpng as a
@@ -177,7 +183,7 @@ Files in this distribution:
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",
                             O'Reilly, 1999
-       libtests         =>  Contains the pngvalid.c test program
+       libtests         =>  Test programs
        pngminim         =>  Minimal decoder, encoder, and progressive decoder
                             programs demonstrating use of pngusr.dfa
        pngminus         =>  Simple pnm2png and png2pnm programs
