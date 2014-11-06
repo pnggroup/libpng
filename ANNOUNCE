@@ -1,5 +1,5 @@
 
-Libpng 1.2.52beta01 - February 6, 2014
+Libpng 1.2.52beta01 - November 6, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,7 +43,9 @@ Other information:
 
 Changes since the last public release (1.2.51):
 
-version 1.2.52beta01 [February 6, 2014]
+version 1.2.52beta01 [November 6, 2014]
+  Avoid out-of-bounds memory access while checking version string in
+    pngread.c and pngwrite.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
