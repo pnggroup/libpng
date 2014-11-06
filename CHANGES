@@ -4246,6 +4246,12 @@ Version 1.5.19rc01 [August 14, 2014]
 Version 1.5.19 [August 21, 2014]
   Added PNG_UNUSED(png_ptr) and PNG_UNUSED(val) in png_longjmp() (Cosmin).
 
+Version 1.5.20beta01 [November 6, 2014]
+  Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
+  Only mark text chunks as written after successfully writing them.
+  Avoid out-of-bounds memory access in png_user_version_check().
+  Simplified and future-proofed png_user_version_check().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

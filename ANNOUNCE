@@ -1,5 +1,5 @@
 
-Libpng 1.5.20beta01 - August 21, 2014
+Libpng 1.5.20beta01 - November 6, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,7 +27,11 @@ Other information:
 
 Changes since the last public release (1.5.19):
 
-Version 1.5.20 [August 21, 2014]
+Version 1.5.20beta01 [November 6, 2014]
+  Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
+  Only mark text chunks as written after successfully writing them.
+  Avoid out-of-bounds memory access in png_user_version_check().
+  Simplified and future-proofed png_user_version_check().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

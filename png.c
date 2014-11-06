@@ -174,49 +174,51 @@ png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
 int
 png_user_version_check(png_structp png_ptr, png_const_charp user_png_ver)
 {
+     /* Libpng versions 1.0.0 and later are binary compatible if the version
+      * string matches through the second '.'; we must recompile any
+      * applications that use any older library version.
+      */
+
    if (user_png_ver != NULL)
    {
-      int i = 0;
+      int i = -1;
+      int found_dots = 0;
 
       do
       {
-         if (user_png_ver[i] != png_libpng_ver[i])
+         i++;
+         if (user_png_ver[i] != PNG_LIBPNG_VER_STRING[i])
             png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-      } while (png_libpng_ver[i++]);
+         if (user_png_ver[i] == '.')
+            found_dots++;
+      } while (found_dots < 2 && user_png_ver[i] != 0 &&
+            PNG_LIBPNG_VER_STRING[i] != 0);
    }
 
    else
       png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
 
-   if (png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH)
+   if ((png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH) != 0)
    {
-     /* Libpng 0.90 and later are binary incompatible with libpng 0.89, so
-      * we must recompile any applications that use any older library version.
-      * For versions after libpng 1.0, we will be compatible, so we need
-      * only check the first digit.
-      */
-      if (user_png_ver == NULL || user_png_ver[0] != png_libpng_ver[0] ||
-          (user_png_ver[0] == '1' && user_png_ver[2] != png_libpng_ver[2]) ||
-          (user_png_ver[0] == '0' && user_png_ver[2] < '9'))
-      {
 #ifdef PNG_WARNINGS_SUPPORTED
-         size_t pos = 0;
-         char m[128];
+      size_t pos = 0;
+      char m[128];
 
-         pos = png_safecat(m, sizeof m, pos, "Application built with libpng-");
-         pos = png_safecat(m, sizeof m, pos, user_png_ver);
-         pos = png_safecat(m, sizeof m, pos, " but running with ");
-         pos = png_safecat(m, sizeof m, pos, png_libpng_ver);
+      pos = png_safecat(m, (sizeof m), pos,
+          "Application built with libpng-");
+      pos = png_safecat(m, (sizeof m), pos, user_png_ver);
+      pos = png_safecat(m, (sizeof m), pos, " but running with ");
+      pos = png_safecat(m, (sizeof m), pos, PNG_LIBPNG_VER_STRING);
+      PNG_UNUSED(pos)
 
-         png_warning(png_ptr, m);
+      png_warning(png_ptr, m);
 #endif
 
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-         png_ptr->flags = 0;
+      png_ptr->flags = 0;
 #endif
 
-         return 0;
-      }
+      return 0;
    }
 
    /* Success return. */
@@ -658,13 +660,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.20beta01 - August 21, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.5.20beta01 - November 6, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.20beta01 - August 21, 2014\
+      return "libpng version 1.5.20beta01 - November 6, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
