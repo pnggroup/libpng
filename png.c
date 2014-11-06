@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta40 - November 5, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta40 - November 6, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta40 - November 5, 2014\
+      return "libpng version 1.7.0beta40 - November 6, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3621,7 +3621,31 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
    if (value > 0 && value < 255)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-         double r = floor(255*pow(value/255.,gamma_val*.00001)+.5);
+         /* 'value' is unsigned, ANSI-C90 requires the compiler to correctly
+          * convert this to a floating point value.  This includes values that
+          * would overflow if 'value' were to be converted to 'int'.
+          *
+          * Apparently GCC, however, does an intermediate convertion to (int)
+          * on some (ARM) but not all (x86) platforms, possibly because of
+          * hardware FP limitations.  (E.g. if the hardware convertion always
+          * assumes the integer register contains a signed value.)  This results
+          * in ANSI-C undefined behavior for large values.
+          *
+          * Other implementations on the same machine might actually be ANSI-C90
+          * conformant and therefore compile spurious extra code for the large
+          * values.
+          *
+          * We can be reasonably sure that an unsigned to float convertion
+          * won't be faster than an int to float one.  Therefore this code
+          * assumes responsibility for the undefined behavior, which it knows
+          * can't happen because of the check above.
+          *
+          * Note the argument to this routine is an (unsigned int) because, on
+          * 16-bit platforms, it is assigned a value which might be out of
+          * range for an (int); that would result in undefined behavior in the
+          * caller if the *argument* ('value') were to be declared (int).
+          */
+         double r = floor(255*pow((int)/*SAFE*/value/255.,gamma_val*.00001)+.5);
          return (png_byte)r;
 #     else
          png_int_32 lg2 = png_log8bit(value);
@@ -3644,7 +3668,13 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
    if (value > 0 && value < 65535)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-         double r = floor(65535*pow(value/65535.,gamma_val*.00001)+.5);
+         /* The same (unsigned int)->(double) constraints apply here as above,
+          * however in this case the (unsigned int) to (int) convertion can
+          * overflow on an ANSI-C90 compliant system so the cast needs to ensure
+          * that this is not possible.
+          */
+         double r = floor(65535.*pow((png_int_32)value/65535.,
+                     gamma_val*.00001)+.5);
          return (png_uint_16)r;
 #     else
          png_int_32 lg2 = png_log16bit(value);
