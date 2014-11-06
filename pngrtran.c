@@ -1373,6 +1373,9 @@ png_do_read_transformations(png_structp png_ptr)
    {
       if (png_ptr->row_info.color_type == PNG_COLOR_TYPE_PALETTE)
       {
+         if (png_ptr->palette == NULL)
+            png_error (png_ptr, "Palette is NULL in indexed image");
+
          png_do_expand_palette(&(png_ptr->row_info), png_ptr->row_buf + 1,
             png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
       }
