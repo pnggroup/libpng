@@ -3725,9 +3725,9 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
           * convert this to a floating point value.  This includes values that
           * would overflow if 'value' were to be converted to 'int'.
           *
-          * Apparently GCC, however, does an intermediate convertion to (int)
+          * Apparently GCC, however, does an intermediate conversion to (int)
           * on some (ARM) but not all (x86) platforms, possibly because of
-          * hardware FP limitations.  (E.g. if the hardware convertion always
+          * hardware FP limitations.  (E.g. if the hardware conversion always
           * assumes the integer register contains a signed value.)  This results
           * in ANSI-C undefined behavior for large values.
           *
@@ -3735,7 +3735,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
           * conformant and therefore compile spurious extra code for the large
           * values.
           *
-          * We can be reasonably sure that an unsigned to float convertion
+          * We can be reasonably sure that an unsigned to float conversion
           * won't be faster than an int to float one.  Therefore this code
           * assumes responsibility for the undefined behavior, which it knows
           * can't happen because of the check above.
@@ -3770,7 +3770,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
          /* The same (unsigned int)->(double) constraints apply here as above,
-          * however in this case the (unsigned int) to (int) convertion can
+          * however in this case the (unsigned int) to (int) conversion can
           * overflow on an ANSI-C90 compliant system so the cast needs to ensure
           * that this is not possible.
           */

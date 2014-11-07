@@ -1177,7 +1177,7 @@ PNG_EXPORT(24, void, png_convert_from_struct_tm, (png_timep ptime,
 
 /* Convert from time_t to png_time.  Uses gmtime() */
 PNG_EXPORT(25, void, png_convert_from_time_t, (png_timep ptime, time_t ttime));
-#endif /* PNG_CONVERT_tIME_SUPPORTED */
+#endif /* CONVERT_tIME */
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
 /* Expand data to 24-bit RGB, or 8-bit grayscale, with alpha if available. */
@@ -1383,7 +1383,7 @@ PNG_EXPORT(39, void, png_set_filler, (png_structrp png_ptr, png_uint_32 filler,
 /* Add an alpha byte to 8-bit Gray or 24-bit RGB images. */
 PNG_EXPORT(40, void, png_set_add_alpha, (png_structrp png_ptr,
     png_uint_32 filler, int flags));
-#endif /* PNG_READ_FILLER_SUPPORTED || PNG_WRITE_FILLER_SUPPORTED */
+#endif /* READ_FILLER || WRITE_FILLER */
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* Swap bytes in 16-bit depth files. */
@@ -1647,7 +1647,7 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
     (png_structrp png_ptr, int heuristic_method, int num_weights,
     png_const_fixed_point_p filter_weights,
     png_const_fixed_point_p filter_costs))
-#endif /*  PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
+#endif /* WRITE_WEIGHTED_FILTER */
 
 /* Heuristic used for row filter selection.  These defines should NOT be
  * changed.
@@ -1703,7 +1703,7 @@ PNG_EXPORT(225, void, png_set_text_compression_window_bits,
 
 PNG_EXPORT(226, void, png_set_text_compression_method, (png_structrp png_ptr,
     int method));
-#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
+#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 
 /* These next functions are called for input/output, memory, and error
  * handling.  They are in the file pngrio.c, pngwio.c, and pngerror.c,
@@ -1870,7 +1870,7 @@ PNG_EXPORT(220, png_uint_32, png_process_data_skip, (png_structrp));
  */
 PNG_EXPORT(93, void, png_progressive_combine_row, (png_const_structrp png_ptr,
     png_bytep old_row, png_const_bytep new_row));
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PROGRESSIVE_READ */
 
 PNG_EXPORTA(94, png_voidp, png_malloc, (png_const_structrp png_ptr,
     png_alloc_size_t size), PNG_ALLOCATED);
@@ -2071,7 +2071,7 @@ PNG_EXPORT(128, png_int_32, png_get_x_offset_microns,
 PNG_EXPORT(129, png_int_32, png_get_y_offset_microns,
     (png_const_structrp png_ptr, png_const_inforp info_ptr));
 
-#endif /* PNG_EASY_ACCESS_SUPPORTED */
+#endif /* EASY_ACCESS */
 
 #ifdef PNG_READ_SUPPORTED
 /* Returns pointer to signature string read from PNG header */
@@ -2323,7 +2323,7 @@ PNG_FIXED_EXPORT(213, void, png_set_sCAL_fixed, (png_const_structrp png_ptr,
 PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
     png_inforp info_ptr, int unit,
     png_const_charp swidth, png_const_charp sheight));
-#endif /* PNG_sCAL_SUPPORTED */
+#endif /* sCAL */
 
 #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
 /* Provide the default handling for all unknown chunks or, optionally, for
@@ -2551,8 +2551,8 @@ PNG_FIXED_EXPORT(212, png_fixed_point, png_get_y_offset_inches_fixed,
 PNG_EXPORT(198, png_uint_32, png_get_pHYs_dpi, (png_const_structrp png_ptr,
     png_const_inforp info_ptr, png_uint_32 *res_x, png_uint_32 *res_y,
     int *unit_type));
-#  endif /* PNG_pHYs_SUPPORTED */
-#endif  /* PNG_INCH_CONVERSIONS_SUPPORTED */
+#  endif /* pHYs */
+#endif  /* INCH_CONVERSIONS */
 
 /* Added in libpng-1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
@@ -2575,7 +2575,7 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
 #  define PNG_IO_CHUNK_CRC   0x0080   /* currently at the chunk crc */
 #  define PNG_IO_MASK_OP     0x000f   /* current operation: reading/writing */
 #  define PNG_IO_MASK_LOC    0x00f0   /* current location: sig/hdr/data/crc */
-#endif /* ?PNG_IO_STATE_SUPPORTED */
+#endif /* IO_STATE */
 
 /* Interlace support.  The following macros are always defined so that if
  * libpng interlace handling is turned off the macros may be used to handle
@@ -2679,7 +2679,7 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
      (composite) = (png_uint_16)(((png_uint_32)(fg) * (png_uint_32)(alpha) + \
      (png_uint_32)(bg)*(png_uint_32)(65535 - (png_uint_32)(alpha)) +         \
      32767) / 65535)
-#endif /* PNG_READ_COMPOSITE_NODIV_SUPPORTED */
+#endif /* READ_COMPOSITE_NODIV */
 
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
 PNG_EXPORT(201, png_uint_32, png_get_uint_32, (png_const_bytep buf));
@@ -3107,7 +3107,7 @@ PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
 PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
    FILE* file));
    /* The PNG header is read from the stdio FILE object. */
-#endif /* PNG_STDIO_SUPPORTED */
+#endif /* STDIO */
 
 PNG_EXPORT(236, int, png_image_begin_read_from_memory, (png_imagep image,
    png_const_voidp memory, png_size_t size));
@@ -3152,7 +3152,7 @@ PNG_EXPORT(238, void, png_image_free, (png_imagep image));
    /* Free any data allocated by libpng in image->opaque, setting the pointer to
     * NULL.  May be called at any time after the structure is initialized.
     */
-#endif /* PNG_SIMPLIFIED_READ_SUPPORTED */
+#endif /* SIMPLIFIED_READ */
 
 #ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
 #ifdef PNG_STDIO_SUPPORTED
@@ -3198,12 +3198,12 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  *
  * Note that the write API does not support interlacing or sub-8-bit pixels.
  */
-#endif /* PNG_STDIO_SUPPORTED */
-#endif /* PNG_SIMPLIFIED_WRITE_SUPPORTED */
+#endif /* STDIO */
+#endif /* SIMPLIFIED_WRITE */
 /*******************************************************************************
  *  END OF SIMPLIFIED API
  ******************************************************************************/
-#endif /* PNG_SIMPLIFIED_{READ|WRITE}_SUPPORTED */
+#endif /* SIMPLIFIED_{READ|WRITE} */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 PNG_EXPORT(242, void, png_set_check_for_invalid_index,
@@ -3251,7 +3251,7 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structp png_ptr,
 
 PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
    int onoff));
-#endif /* PNG_SET_OPTION_SUPPORTED */
+#endif /* SET_OPTION */
 
 /*******************************************************************************
  *  END OF HARDWARE AND SOFTWARE OPTIONS

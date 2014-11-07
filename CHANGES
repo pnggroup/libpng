@@ -5079,6 +5079,7 @@ Version 1.6.15beta07 [November 7, 2014]
     needed by png_reciprocal2().
   Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
     png_do_swap().
+  Changed all "#endif /* PNG_FEATURE_SUPPORTED */" to "#endif /* FEATURE */"
 
 Version 1.6.15beta08 [November 7, 2014]
 
