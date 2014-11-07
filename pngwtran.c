@@ -538,8 +538,10 @@ png_do_write_transformations(png_structrp png_ptr, png_row_infop row_info)
 #endif
 
 #ifdef PNG_WRITE_SWAP_SUPPORTED
+#  ifdef PNG_16BIT_SUPPORTED
    if ((png_ptr->transformations & PNG_SWAP_BYTES) != 0)
       png_do_swap(row_info, png_ptr->row_buf + 1);
+#  endif
 #endif
 
 #ifdef PNG_WRITE_SHIFT_SUPPORTED

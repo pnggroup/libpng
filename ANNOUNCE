@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta41 - November 6, 2014
+Libpng 1.7.0beta41 - November 7, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -643,7 +643,11 @@ Version 1.7.0beta40 [November 6, 2014]
     numeric constant.  This adds appropriate, safe, casts to make the
     warnings go away.
 
-Version 1.7.0beta41 [November 6, 2014]
+Version 1.7.0beta41 [November 7, 2014]
+  Removed #ifdef PNG_16BIT_SUPPORTED/#endif around png_product2(); it is
+    needed by png_reciprocal2().
+  Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
+    png_do_swap().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
