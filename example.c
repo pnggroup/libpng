@@ -494,7 +494,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
                         max_screen_colors, histogram, 0);
       }
    }
-#endif /* READ_QUANTIZE /
+#endif /* READ_QUANTIZE */
 
    /* Invert monochrome files to have 0 as white and 1 as black */
    png_set_invert_mono(png_ptr);
