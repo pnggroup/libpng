@@ -2920,7 +2920,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
       png_free(png_ptr, png_ptr->unknown_chunk.data);
    png_ptr->unknown_chunk.data = NULL;
 
-#else /* !PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
+#else /* !READ_UNKNOWN_CHUNKS */
    /* There is no support to read an unknown chunk, so just skip it. */
    png_crc_finish(png_ptr, length);
    PNG_UNUSED(info_ptr)
@@ -3156,7 +3156,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
             ((display)?display_mask[png][DEPTH_INDEX(depth)][pass>>1]:\
                row_mask[png][DEPTH_INDEX(depth)][pass])
 
-#else /* !PNG_USE_COMPILE_TIME_MASKS */
+#else /* !USE_COMPILE_TIME_MASKS */
          /* This is the runtime alternative: it seems unlikely that this will
           * ever be either smaller or faster than the compile time approach.
           */

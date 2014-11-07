@@ -800,7 +800,7 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
          else
             lang_key_len = 0;
       }
-#  else /* PNG_iTXt_SUPPORTED */
+#  else /* iTXt */
       {
          png_chunk_report(png_ptr, "iTXt chunk not supported",
             PNG_CHUNK_WRITE_ERROR);

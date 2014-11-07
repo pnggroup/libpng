@@ -781,7 +781,7 @@ write_chunks(png_structp write_ptr, int location)
    }
 }
 #endif /* WRITE */
-#else /* !PNG_READ_USER_CHUNKS_SUPPORTED */
+#else /* !READ_USER_CHUNKS */
 #  define write_chunks(pp,loc) ((void)0)
 #endif
 /* END of code to demonstrate user chunk support */
@@ -2008,4 +2008,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_7_0beta41 Your_png_h_is_not_version_1_7_0beta41;
+typedef png_libpng_version_1_7_0beta42 Your_png_h_is_not_version_1_7_0beta42;
