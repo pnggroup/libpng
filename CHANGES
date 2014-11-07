@@ -5080,6 +5080,8 @@ Version 1.6.15beta07 [November 7, 2014]
   Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
     png_do_swap().
 
+Version 1.6.15beta08 [November 7, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
