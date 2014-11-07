@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_7_0beta41 Your_png_h_is_not_version_1_7_0beta41;
+typedef png_libpng_version_1_7_0beta42 Your_png_h_is_not_version_1_7_0beta42;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta41 - November 7, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta42 - November 7, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta41 - November 7, 2014\
+      return "libpng version 1.7.0beta42 - November 7, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3627,9 +3627,9 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
           * convert this to a floating point value.  This includes values that
           * would overflow if 'value' were to be converted to 'int'.
           *
-          * Apparently GCC, however, does an intermediate convertion to (int)
+          * Apparently GCC, however, does an intermediate conversion to (int)
           * on some (ARM) but not all (x86) platforms, possibly because of
-          * hardware FP limitations.  (E.g. if the hardware convertion always
+          * hardware FP limitations.  (E.g. if the hardware conversion always
           * assumes the integer register contains a signed value.)  This results
           * in ANSI-C undefined behavior for large values.
           *
@@ -3637,7 +3637,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
           * conformant and therefore compile spurious extra code for the large
           * values.
           *
-          * We can be reasonably sure that an unsigned to float convertion
+          * We can be reasonably sure that an unsigned to float conversion
           * won't be faster than an int to float one.  Therefore this code
           * assumes responsibility for the undefined behavior, which it knows
           * can't happen because of the check above.
@@ -3671,7 +3671,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
    {
 #     ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
          /* The same (unsigned int)->(double) constraints apply here as above,
-          * however in this case the (unsigned int) to (int) convertion can
+          * however in this case the (unsigned int) to (int) conversion can
           * overflow on an ANSI-C90 compliant system so the cast needs to ensure
           * that this is not possible.
           */
