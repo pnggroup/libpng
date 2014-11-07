@@ -130,9 +130,9 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
       png_fixed(png_ptr, blue_Y, "cHRM Red Y"),
       png_fixed(png_ptr, blue_Z, "cHRM Red Z"));
 }
-#  endif /* PNG_FLOATING_POINT_SUPPORTED */
+#  endif /* FLOATING_POINT */
 
-#endif /* PNG_cHRM_SUPPORTED */
+#endif /* cHRM */
 
 #ifdef PNG_gAMA_SUPPORTED
 void PNGFAPI
@@ -1069,7 +1069,7 @@ png_set_sPLT(png_const_structrp png_ptr,
    if (nentries > 0)
       png_chunk_report(png_ptr, "sPLT out of memory", PNG_CHUNK_WRITE_ERROR);
 }
-#endif /* PNG_sPLT_SUPPORTED */
+#endif /* sPLT */
 
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 static png_byte
@@ -1562,7 +1562,7 @@ png_set_chunk_malloc_max (png_structrp png_ptr,
    if (png_ptr != NULL)
       png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
 }
-#endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
+#endif /* ?SET_USER_LIMITS */
 
 
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
@@ -1585,7 +1585,7 @@ png_set_benign_errors(png_structrp png_ptr, int allowed)
       png_ptr->flags &= ~(PNG_FLAG_BENIGN_ERRORS_WARN |
          PNG_FLAG_APP_WARNINGS_WARN | PNG_FLAG_APP_ERRORS_WARN);
 }
-#endif /* PNG_BENIGN_ERRORS_SUPPORTED */
+#endif /* BENIGN_ERRORS */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Whether to report invalid palette index; added at libng-1.5.10.
@@ -1608,4 +1608,4 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
       png_ptr->num_palette_max = -1;
 }
 #endif
-#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
+#endif /* READ || WRITE */

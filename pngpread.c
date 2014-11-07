@@ -1165,4 +1165,4 @@ png_get_progressive_ptr(png_const_structrp png_ptr)
 
    return png_ptr->io_ptr;
 }
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PROGRESSIVE_READ */

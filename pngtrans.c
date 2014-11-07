@@ -478,7 +478,7 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
          *rp = table[*rp];
    }
 }
-#endif /* PNG_READ_PACKSWAP_SUPPORTED or PNG_WRITE_PACKSWAP_SUPPORTED */
+#endif /* PACKSWAP || WRITE_PACKSWAP */
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
@@ -675,7 +675,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 #endif
    }
 }
-#endif /* PNG_READ_BGR_SUPPORTED or PNG_WRITE_BGR_SUPPORTED */
+#endif /* READ_BGR || WRITE_BGR */
 
 #if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
     defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
@@ -778,7 +778,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
       }
    }
 }
-#endif /* PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED */
+#endif /* CHECK_FOR_INVALID_INDEX */
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
@@ -844,7 +844,6 @@ png_get_current_pass_number(png_const_structrp png_ptr)
       return png_ptr->pass;
    return 8; /* invalid */
 }
-#endif /* PNG_USER_TRANSFORM_INFO_SUPPORTED */
-#endif /* PNG_READ_USER_TRANSFORM_SUPPORTED ||
-          PNG_WRITE_USER_TRANSFORM_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
+#endif /* USER_TRANSFORM_INFO */
+#endif /* READ_USER_TRANSFORM || WRITE_USER_TRANSFORM */
+#endif /* READ || WRITE */

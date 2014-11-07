@@ -311,7 +311,7 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
        }
     }
 }
-#endif /* PNG_WRITE_USER_TRANSFORM_SUPPORTED */
+#endif /* WRITE_USER_TRANSFORM */
 
 #ifndef PNG_STDIO_SUPPORTED
 /* START of code to validate stdio-free compilation */
@@ -420,7 +420,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
    pngtest_check_io_state(png_ptr, length, PNG_IO_WRITING);
 #endif
 }
-#endif /* !PNG_STDIO_SUPPORTED */
+#endif /* !STDIO */
 
 /* This function is called when there is a warning, but the library thinks
  * it can continue anyway.  Replacement functions don't have to do anything
@@ -605,7 +605,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
       free(ptr);
    ptr = NULL;
 }
-#endif /* PNG_USER_MEM_SUPPORTED && PNG_DEBUG */
+#endif /* USER_MEM && DEBUG */
 /* END of code to test memory allocation/deallocation */
 
 
@@ -780,8 +780,8 @@ write_chunks(png_structp write_ptr, int location)
          write_vpAg_chunk(write_ptr);
    }
 }
-#endif /* PNG_WRITE_SUPPORTED */
-#else /* !PNG_READ_USER_CHUNKS_SUPPORTED */
+#endif /* WRITE */
+#else /* !READ_USER_CHUNKS */
 #  define write_chunks(pp,loc) ((void)0)
 #endif
 /* END of code to demonstrate user chunk support */
@@ -1290,7 +1290,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          }
 
          tIME_chunk_present++;
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif /* TIME_RFC1123 */
       }
    }
 #endif
@@ -1406,7 +1406,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          t_encode += (t_stop - t_start);
          t_start = t_stop;
 #endif
-#endif /* PNG_WRITE_SUPPORTED */
+#endif /* WRITE */
 
 #ifndef SINGLE_ROWBUF_ALLOC
          pngtest_debug2("Freeing row buffer (pass %d, y = %u)", pass, y);
@@ -1473,7 +1473,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          }
 
          tIME_chunk_present++;
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif /* TIME_RFC1123 */
       }
    }
 #endif
@@ -1678,7 +1678,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          }
       }
    }
-#endif /* PNG_WRITE_SUPPORTED */
+#endif /* WRITE */
 
    FCLOSE(fpin);
    FCLOSE(fpout);
@@ -1835,7 +1835,7 @@ main(int argc, char *argv[])
             fprintf(STDERR, " tIME = %s\n", tIME_string);
 
          tIME_chunk_present = 0;
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif /* TIME_RFC1123 */
          }
 
          else
@@ -1924,7 +1924,7 @@ main(int argc, char *argv[])
 #ifdef PNG_TIME_RFC1123_SUPPORTED
              if (tIME_chunk_present != 0)
                 fprintf(STDERR, " tIME = %s\n", tIME_string);
-#endif /* PNG_TIME_RFC1123_SUPPORTED */
+#endif /* TIME_RFC1123 */
             }
          }
 

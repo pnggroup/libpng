@@ -65,7 +65,7 @@ png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
    return ((int)(memcmp(&sig[start], &png_signature[start], num_to_check)));
 }
 
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Function to allocate memory for zlib */
@@ -631,7 +631,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
    info_ptr->free_me &= ~mask;
 }
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+#endif /* READ || WRITE */
 
 /* This function returns a pointer to the io_ptr associated with the user
  * functions.  The application should free any memory associated with this
@@ -756,9 +756,9 @@ png_convert_to_rfc1123(png_structrp png_ptr, png_const_timep ptime)
    return NULL;
 }
 #     endif
-#  endif /* PNG_TIME_RFC1123_SUPPORTED */
+#  endif /* TIME_RFC1123 */
 
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+#endif /* READ || WRITE */
 
 png_const_charp PNGAPI
 png_get_copyright(png_const_structrp png_ptr)
@@ -937,7 +937,7 @@ png_reset_zstream(png_structrp png_ptr)
    /* WARNING: this resets the window bits to the maximum! */
    return (inflateReset(&png_ptr->zstream));
 }
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
 
 /* This function was added to libpng-1.0.7 */
 png_uint_32 PNGAPI
@@ -2365,7 +2365,7 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
       (void)png_colorspace_set_sRGB(png_ptr, colorspace,
          (int)/*already checked*/png_get_uint_32(profile+64));
 }
-#endif /* PNG_READ_sRGB_SUPPORTED */
+#endif /* READ_sRGB */
 
 int /* PRIVATE */
 png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
@@ -2745,7 +2745,7 @@ png_check_fp_string(png_const_charp string, png_size_t size)
 
    return 0; /* i.e. fail */
 }
-#endif /* pCAL or sCAL */
+#endif /* pCAL || sCAL */
 
 #ifdef PNG_sCAL_SUPPORTED
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -3394,7 +3394,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 
    return 0; /* overflow */
 }
-#endif /* PNG_16BIT_SUPPORTED) || !PNG_FLOATING_ARITHMETIC_SUPPORTED */
+#endif /* 16BIT || !FLOATING_ARITHMETIC */
 
 /* The inverse of the above. */
 png_fixed_point
@@ -4257,7 +4257,7 @@ const png_uint_16 png_sRGB_table[256] =
    57105,57646,58190,58737,59287,59840,60396,60955,
    61517,62082,62650,63221,63795,64372,64952,65535
 };
-#endif /* PNG_SIMPLIFIED_READ_SUPPORTED */
+#endif /* SIMPLIFIED_READ */
 
 /* The base/delta tables are required for both read and write (but currently
  * only the simplified versions.)
@@ -4457,4 +4457,4 @@ png_image_error(png_imagep image, png_const_charp error_message)
 }
 
 #endif /* SIMPLIFIED READ/WRITE */
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+#endif /* READ || WRITE */

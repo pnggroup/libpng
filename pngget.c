@@ -455,12 +455,12 @@ png_get_pHYs_dpi(png_const_structrp png_ptr, png_const_inforp info_ptr,
 
    return (retval);
 }
-#endif /* PNG_pHYs_SUPPORTED */
-#endif  /* PNG_INCH_CONVERSIONS_SUPPORTED */
+#endif /* pHYs */
+#endif  /* INCH_CONVERSIONS */
 
 /* png_get_channels really belongs in here, too, but it's been around longer */
 
-#endif  /* PNG_EASY_ACCESS_SUPPORTED */
+#endif  /* EASY_ACCESS */
 
 
 png_byte PNGAPI
@@ -1180,7 +1180,7 @@ png_get_chunk_malloc_max (png_const_structrp png_ptr)
 {
    return (png_ptr ? png_ptr->user_chunk_malloc_max : 0);
 }
-#endif /* ?PNG_SET_USER_LIMITS_SUPPORTED */
+#endif /* SET_USER_LIMITS */
 
 /* These functions were added to libpng 1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
@@ -1195,7 +1195,7 @@ png_get_io_chunk_type (png_const_structrp png_ptr)
 {
    return png_ptr->chunk_name;
 }
-#endif /* ?PNG_IO_STATE_SUPPORTED */
+#endif /* IO_STATE */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 #  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
@@ -1210,4 +1210,4 @@ png_get_palette_max(png_const_structp png_ptr, png_const_infop info_ptr)
 #  endif
 #endif
 
-#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
+#endif /* READ || WRITE */

@@ -286,7 +286,7 @@ optimize_cmf(png_bytep data, png_alloc_size_t data_size)
       }
    }
 }
-#endif /* PNG_WRITE_OPTIMIZE_CMF_SUPPORTED */
+#endif /* WRITE_OPTIMIZE_CMF */
 
 /* Initialize the compressor for the appropriate type of compression. */
 static int
@@ -663,7 +663,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
    if (output_len > 0)
       png_error(png_ptr, "error writing ancillary chunked compressed data");
 }
-#endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
+#endif /* WRITE_COMPRESSED_TEXT */
 
 #if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
     defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
@@ -743,11 +743,11 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
 
       png_formatted_warning(png_ptr, p, "keyword \"@1\": bad character '0x@2'");
    }
-#endif /* PNG_WARNINGS_SUPPORTED */
+#endif /* WARNINGS */
 
    return key_len;
 }
-#endif
+#endif /* WRITE_TEXT || WRITE_pCAL || WRITE_iCCP || WRITE_sPLT */
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
  * information.  Note that the rest of this code depends upon this
@@ -2015,7 +2015,7 @@ png_write_start_row(png_structrp png_ptr)
          png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
       }
    }
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
+#endif /* WRITE_FILTER */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* If interlaced, we need to set up width and height of pass */
@@ -2905,7 +2905,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
          pc = (p + pc) < 0 ? -(p + pc) : p + pc;
 #endif
          p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
-#else /* PNG_SLOW_PAETH */
+#else /* SLOW_PAETH */
          p = a + b - c;
          pa = abs(p - a);
          pb = abs(p - b);
@@ -2919,7 +2919,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
          else
             p = c;
-#endif /* PNG_SLOW_PAETH */
+#endif /* SLOW_PAETH */
 
          v = *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
 
@@ -2968,7 +2968,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
          best_row = png_ptr->paeth_row;
       }
    }
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
+#endif /* WRITE_FILTER */
 
    /* Do the actual writing of the filtered row data from the chosen filter. */
    png_write_filtered_row(png_ptr, best_row, row_info->rowbytes+1);
@@ -2988,7 +2988,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_ptr->prev_filters[j] = best_row[0];
    }
 #endif
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
+#endif /* WRITE_FILTER */
 }
 
 
@@ -3024,6 +3024,6 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
    {
       png_write_flush(png_ptr);
    }
-#endif
+#endif /* WRITE_FLUSH */
 }
-#endif /* PNG_WRITE_SUPPORTED */
+#endif /* WRITE */

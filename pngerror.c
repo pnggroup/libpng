@@ -27,7 +27,7 @@ static PNG_FUNCTION(void, png_default_error,PNGARG((png_const_structrp png_ptr,
 static void /* PRIVATE */
 png_default_warning PNGARG((png_const_structrp png_ptr,
    png_const_charp warning_message));
-#endif /* PNG_WARNINGS_SUPPORTED */
+#endif /* WARNINGS */
 
 /* This function is called whenever there is a fatal error.  This function
  * should not be changed.  If there is a need to handle errors differently,
@@ -103,7 +103,7 @@ png_err,(png_const_structrp png_ptr),PNG_NORETURN)
       use the default handler, which will not return. */
    png_default_error(png_ptr, "");
 }
-#endif /* PNG_ERROR_TEXT_SUPPORTED */
+#endif /* ERROR_TEXT */
 
 /* Utility to safely appends strings to a buffer.  This never errors out so
  * error checking is not required in the caller.
@@ -355,7 +355,7 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
     */
    png_warning(png_ptr, msg);
 }
-#endif /* PNG_WARNINGS_SUPPORTED */
+#endif /* WARNINGS */
 
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
 void PNGAPI
@@ -473,7 +473,7 @@ png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
       buffer[iout] = '\0';
    }
 }
-#endif /* PNG_WARNINGS_SUPPORTED || PNG_ERROR_TEXT_SUPPORTED */
+#endif /* WARNINGS || ERROR_TEXT */
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
 PNG_FUNCTION(void,PNGAPI
@@ -490,7 +490,7 @@ png_chunk_error,(png_const_structrp png_ptr, png_const_charp error_message),
       png_error(png_ptr, msg);
    }
 }
-#endif /* PNG_READ_SUPPORTED && PNG_ERROR_TEXT_SUPPORTED */
+#endif /* READ && ERROR_TEXT */
 
 #ifdef PNG_WARNINGS_SUPPORTED
 void PNGAPI
@@ -506,7 +506,7 @@ png_chunk_warning(png_const_structrp png_ptr, png_const_charp warning_message)
       png_warning(png_ptr, msg);
    }
 }
-#endif /* PNG_WARNINGS_SUPPORTED */
+#endif /* WARNINGS */
 
 #ifdef PNG_READ_SUPPORTED
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
@@ -525,7 +525,7 @@ png_chunk_benign_error(png_const_structrp png_ptr, png_const_charp
 #  endif
 }
 #endif
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
 
 void /* PRIVATE */
 png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
@@ -824,7 +824,7 @@ png_default_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 #endif
    PNG_UNUSED(png_ptr) /* Make compiler happy */
 }
-#endif /* PNG_WARNINGS_SUPPORTED */
+#endif /* WARNINGS */
 
 /* This function is called when the application wants to use another method
  * of handling errors and warnings.  Note that the error function MUST NOT
@@ -959,5 +959,5 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
 
    return result;
 }
-#endif /* SIMPLIFIED READ/WRITE */
-#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
+#endif /* SIMPLIFIED READ || SIMPLIFIED_WRITE */
+#endif /* READ || WRITE */

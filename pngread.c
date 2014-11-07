@@ -44,7 +44,7 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 {
    png_structp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
       error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
-#endif /* PNG_USER_MEM_SUPPORTED */
+#endif /* USER_MEM */
 
    if (png_ptr != NULL)
    {
@@ -252,7 +252,7 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
             PNG_HANDLE_CHUNK_AS_DEFAULT);
    }
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 /* Optional call to update the users info_ptr structure */
 void PNGAPI
@@ -302,7 +302,7 @@ png_start_read_image(png_structrp png_ptr)
             "png_start_read_image/png_read_update_info: duplicate call");
    }
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 #ifdef PNG_MNG_FEATURES_SUPPORTED
@@ -369,7 +369,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
       }
    }
 }
-#endif /* PNG_MNG_FEATURES_SUPPORTED */
+#endif /* MNG_FEATURES */
 
 void PNGAPI
 png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
@@ -436,7 +436,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
       png_warning(png_ptr, "PNG_READ_SWAP_SUPPORTED is not defined");
 #endif
    }
-#endif /* PNG_WARNINGS_SUPPORTED */
+#endif /* WARNINGS */
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* If interlaced and we do not need a new row, combine row and return.
@@ -605,7 +605,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
       (*(png_ptr->read_row_fn))(png_ptr, png_ptr->row_number, png_ptr->pass);
 
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read one or more rows of image data.  If the image is interlaced,
@@ -672,7 +672,7 @@ png_read_rows(png_structrp png_ptr, png_bytepp row,
          dp++;
       }
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the entire image.  If the image has an alpha channel or a tRNS
@@ -746,7 +746,7 @@ png_read_image(png_structrp png_ptr, png_bytepp image)
       }
    }
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 /* Read the end of the PNG file.  Will not read past the end of the
@@ -913,7 +913,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
             PNG_HANDLE_CHUNK_AS_DEFAULT);
    } while ((png_ptr->mode & PNG_HAVE_IEND) == 0);
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 /* Free all memory used in the read struct */
 static void
@@ -1221,8 +1221,8 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr,
 
    PNG_UNUSED(params)
 }
-#endif /* PNG_INFO_IMAGE_SUPPORTED */
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* INFO_IMAGE */
+#endif /* SEQUENTIAL_READ */
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 /* SIMPLIFIED READ
@@ -1508,7 +1508,7 @@ png_image_begin_read_from_file(png_imagep image, const char *file_name)
 
    return 0;
 }
-#endif /* PNG_STDIO_SUPPORTED */
+#endif /* STDIO */
 
 static void PNGCBAPI
 png_image_memory_read(png_structp png_ptr, png_bytep out, png_size_t need)
@@ -1626,7 +1626,7 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
 #  define PNG_SKIP_CHUNKS(p) png_image_skip_unused_chunks(p)
 #else
 #  define PNG_SKIP_CHUNKS(p) ((void)0)
-#endif /* PNG_HANDLE_AS_UNKNOWN_SUPPORTED */
+#endif /* HANDLE_AS_UNKNOWN */
 
 /* The following macro gives the exact rounded answer for all values in the
  * range 0..255 (it actually divides by 51.2, but the rounding still generates
@@ -4117,5 +4117,5 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
    return 0;
 }
 
-#endif /* PNG_SIMPLIFIED_READ_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED */
+#endif /* SIMPLIFIED_READ */
+#endif /* READ */

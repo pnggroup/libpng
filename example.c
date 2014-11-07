@@ -494,7 +494,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
                         max_screen_colors, histogram, 0);
       }
    }
-#endif /* PNG_READ_QUANTIZE_SUPPORTED */
+#endif /* READ_QUANTIZE /
 
    /* Invert monochrome files to have 0 as white and 1 as black */
    png_set_invert_mono(png_ptr);
@@ -532,7 +532,7 @@ void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
    number_passes = png_set_interlace_handling(png_ptr);
 #else
    number_passes = 1;
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 
 
    /* Optional call to gamma correct and add the background to the palette
@@ -744,7 +744,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
     * to pass the current row as new_row, and the function will combine
     * the old row and the new row.
     */
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 }
 
 end_callback(png_structp png_ptr, png_infop info)
