@@ -5074,7 +5074,11 @@ Version 1.6.15beta06 [November 6, 2014]
     in the manual, example.c, pngtest.c, and applications in the contrib
     directory.  It was incorrect advice.
 
-Version 1.6.15beta07 [November 6, 2014]
+Version 1.6.15beta07 [November 7, 2014]
+  Removed #ifdef PNG_16BIT_SUPPORTED/#endif around png_product2(); it is
+    needed by png_reciprocal2().
+  Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
+    png_do_swap().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

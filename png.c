@@ -769,13 +769,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.15beta07 - November 6, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.15beta07 - November 7, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.15beta07 - November 6, 2014\
+      return "libpng version 1.6.15beta07 - November 7, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3372,7 +3372,7 @@ png_gamma_significant(png_fixed_point gamma_val)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-#  ifdef PNG_16BIT_SUPPORTED
+#if defined(PNG_16BIT_SUPPORTED) || !defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
 /* A local convenience routine. */
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
@@ -3394,7 +3394,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 
    return 0; /* overflow */
 }
-#  endif /* 16BIT */
+#endif /* PNG_16BIT_SUPPORTED) || !PNG_FLOATING_ARITHMETIC_SUPPORTED */
 
 /* The inverse of the above. */
 png_fixed_point
@@ -3546,6 +3546,7 @@ png_log8bit(unsigned int x)
  * Zero  (257):      0
  * End   (258):  23499
  */
+#ifdef PNG_16BIT_SUPPORTED
 static png_int_32
 png_log16bit(png_uint_32 x)
 {
@@ -3596,6 +3597,7 @@ png_log16bit(png_uint_32 x)
    /* Safe, because the result can't have more than 20 bits: */
    return (png_int_32)((lg2 + 2048) >> 12);
 }
+#endif /* 16BIT */
 
 /* The 'exp()' case must invert the above, taking a 20-bit fixed point
  * logarithmic value and returning a 16 or 8-bit number as appropriate.  In
