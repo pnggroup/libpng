@@ -117,4 +117,4 @@ png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
    png_ptr->output_flush_fn = NULL;
 #endif
 }
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */

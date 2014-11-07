@@ -353,7 +353,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = save[1];
             }
          }
-#endif /* PNG_WRITE_16BIT_SUPPORTED */
+#endif /* WRITE_16BIT */
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
@@ -392,7 +392,7 @@ png_do_write_swap_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = save[1];
             }
          }
-#endif /* PNG_WRITE_16BIT_SUPPORTED */
+#endif /* WRITE_16BIT */
       }
    }
 }
@@ -449,7 +449,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = (png_byte)(255 - *(sp++));
             }
          }
-#endif /* PNG_WRITE_16BIT_SUPPORTED */
+#endif /* WRITE_16BIT */
       }
 
       else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
@@ -487,7 +487,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = (png_byte)(255 - *(sp++));
             }
          }
-#endif /* PNG_WRITE_16BIT_SUPPORTED */
+#endif /* WRITE_16BIT */
       }
    }
 }
@@ -570,5 +570,5 @@ png_do_write_transformations(png_structrp png_ptr, png_row_infop row_info)
       png_do_invert(row_info, png_ptr->row_buf + 1);
 #endif
 }
-#endif /* PNG_WRITE_TRANSFORMS_SUPPORTED */
-#endif /* PNG_WRITE_SUPPORTED */
+#endif /* WRITE_TRANSFORMS */
+#endif /* WRITE */

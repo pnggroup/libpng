@@ -644,8 +644,6 @@ Version 1.7.0beta40 [November 6, 2014]
     warnings go away.
 
 Version 1.7.0beta41 [November 7, 2014]
-  Removed #ifdef PNG_16BIT_SUPPORTED/#endif around png_product2(); it is
-    needed by png_reciprocal2().
   Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
     png_do_swap().
 

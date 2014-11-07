@@ -791,7 +791,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       png_free(png_ptr, distance);
    }
 }
-#endif /* PNG_READ_QUANTIZE_SUPPORTED */
+#endif /* READ_QUANTIZE */
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
 void PNGFAPI
@@ -912,7 +912,7 @@ png_set_tRNS_to_alpha(png_structrp png_ptr)
 
    png_ptr->transformations |= (PNG_EXPAND | PNG_EXPAND_tRNS);
 }
-#endif /* defined(PNG_READ_EXPAND_SUPPORTED) */
+#endif /* READ_EXPAND */
 
 #ifdef PNG_READ_EXPAND_16_SUPPORTED
 /* Expand to 16-bit channels, expand the tRNS chunk too (because otherwise
@@ -1695,7 +1695,7 @@ png_init_read_transformations(png_structrp png_ptr)
 
       else
       /* Transformation does not include PNG_BACKGROUND */
-#endif /* PNG_READ_BACKGROUND_SUPPORTED */
+#endif /* READ_BACKGROUND */
       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
          /* RGB_TO_GRAY needs to have non-gamma-corrected values! */
@@ -1725,7 +1725,7 @@ png_init_read_transformations(png_structrp png_ptr)
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    else
 #endif
-#endif /* PNG_READ_GAMMA_SUPPORTED */
+#endif /* READ_GAMMA */
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
    /* No GAMMA transformation (see the hanging else 4 lines above) */
@@ -1764,7 +1764,7 @@ png_init_read_transformations(png_structrp png_ptr)
 
       png_ptr->transformations &= ~PNG_COMPOSE;
    }
-#endif /* PNG_READ_BACKGROUND_SUPPORTED */
+#endif /* READ_BACKGROUND */
 
 #ifdef PNG_READ_SHIFT_SUPPORTED
    if ((png_ptr->transformations & PNG_SHIFT) != 0 &&
@@ -1810,7 +1810,7 @@ png_init_read_transformations(png_structrp png_ptr)
             png_ptr->palette[i].blue = (png_byte)component;
          }
    }
-#endif  /* PNG_READ_SHIFT_SUPPORTED */
+#endif  /* READ_SHIFT */
 }
 
 /* Modify the info structure to reflect the transformations.  The
@@ -1915,7 +1915,7 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
             CONFIGURATION ERROR: you must enable at least one 16 to 8 method
 #        endif
 #    endif
-#endif /* !READ_16BIT_SUPPORTED */
+#endif /* !READ_16BIT */
    }
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
@@ -3826,7 +3826,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
       }
    }
 }
-#endif /* PNG_READ_BACKGROUND_SUPPORTED || PNG_READ_ALPHA_MODE_SUPPORTED */
+#endif /* READ_BACKGROUND || READ_ALPHA_MODE */
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
 /* Gamma correct the image, avoiding the alpha channel.  Make sure
@@ -4586,7 +4586,7 @@ png_do_quantize(png_row_infop row_info, png_bytep row,
       }
    }
 }
-#endif /* PNG_READ_QUANTIZE_SUPPORTED */
+#endif /* READ_QUANTIZE */
 
 /* Transform the row.  The order of transformations is significant,
  * and is very touchy.  If you add a transformation, take care to
@@ -4781,7 +4781,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       if (row_info->rowbytes == 0)
          png_error(png_ptr, "png_do_quantize returned rowbytes=0");
    }
-#endif /* PNG_READ_QUANTIZE_SUPPORTED */
+#endif /* READ_QUANTIZE */
 
 #ifdef PNG_READ_EXPAND_16_SUPPORTED
    /* Do the expansion now, after all the arithmetic has been done.  Notice
@@ -4884,5 +4884,5 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
    }
 #endif
 }
-#endif /* PNG_READ_TRANSFORMS_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ_TRANSFORMS */
+#endif /* READ */

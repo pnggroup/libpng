@@ -151,7 +151,7 @@ png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
 #  endif
 #else
    PNG_UNUSED(output_flush_fn)
-#endif /* PNG_WRITE_FLUSH_SUPPORTED */
+#endif /* WRITE_FLUSH */
 
 #ifdef PNG_READ_SUPPORTED
    /* It is an error to read while writing a png file */
@@ -165,4 +165,4 @@ png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
    }
 #endif
 }
-#endif /* PNG_WRITE_SUPPORTED */
+#endif /* WRITE */

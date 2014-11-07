@@ -65,7 +65,7 @@ png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
    return ((int)(memcmp(&sig[start], &png_signature[start], num_to_check)));
 }
 
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Function to allocate memory for zlib */
@@ -576,7 +576,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
    info_ptr->free_me &= ~mask;
 }
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+#endif /* READ || WRITE */
 
 /* This function returns a pointer to the io_ptr associated with the user
  * functions.  The application should free any memory associated with this
@@ -680,7 +680,7 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 }
 #  endif /* PNG_TIME_RFC1123_SUPPORTED */
 
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+#endif /* READ || WRITE */
 
 png_const_charp PNGAPI
 png_get_copyright(png_const_structrp png_ptr)
@@ -2261,7 +2261,7 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
       (void)png_colorspace_set_sRGB(png_ptr, colorspace,
          (int)/*already checked*/png_get_uint_32(profile+64));
 }
-#endif /* PNG_READ_sRGB_SUPPORTED */
+#endif /* READ_sRGB */
 
 int /* PRIVATE */
 png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
@@ -3276,8 +3276,8 @@ png_gamma_significant(png_fixed_point gamma_val)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
+#ifndef PNG_FLOATING_ARITHMETIC_SUPPORTED
 /* A local convenience routine. */
-#if defined(PNG_16BIT_SUPPORTED) || !defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
 {
@@ -3298,7 +3298,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 
    return 0; /* overflow */
 }
-#endif /* PNG_16BIT_SUPPORTED || !PNG_FLOATING_ARITHMETIC_SUPPORTED */
+#endif
 
 /* The inverse of the above. */
 png_fixed_point
@@ -4470,4 +4470,4 @@ png_image_error(png_imagep image, png_const_charp error_message)
 }
 
 #endif /* SIMPLIFIED READ/WRITE */
-#endif /* defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED) */
+#endif /* REA) || WRITE */

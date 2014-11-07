@@ -225,7 +225,7 @@ png_free(png_const_structrp png_ptr, png_voidp ptr)
       png_ptr->free_fn(png_constcast(png_structrp,png_ptr), ptr);
 
    else
-#endif /* PNG_USER_MEM_SUPPORTED */
+#endif /* USER_MEM */
       free(ptr);
 }
 
@@ -257,5 +257,5 @@ png_get_mem_ptr(png_const_structrp png_ptr)
 
    return png_ptr->mem_ptr;
 }
-#endif /* PNG_USER_MEM_SUPPORTED */
-#endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
+#endif /* USER_MEM */
+#endif /* READ || WRITE */

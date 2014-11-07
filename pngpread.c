@@ -1106,7 +1106,7 @@ png_read_push_finish_row(png_structrp png_ptr)
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 }
 
 void /* PRIVATE */
@@ -1146,7 +1146,7 @@ png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
    if (new_row != NULL)
       png_combine_row(png_ptr, old_row, 1/*blocky display*/);
 }
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 
 void PNGAPI
 png_set_progressive_read_fn(png_structrp png_ptr, png_voidp progressive_ptr,
@@ -1171,4 +1171,4 @@ png_get_progressive_ptr(png_const_structrp png_ptr)
 
    return png_ptr->io_ptr;
 }
-#endif /* PNG_PROGRESSIVE_READ_SUPPORTED */
+#endif /* PROGRESSIVE_READ */

@@ -69,7 +69,7 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
       }
    }
 }
-#endif /* PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED */
+#endif /* WRITE_UNKNOWN_CHUNKS */
 
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
@@ -501,7 +501,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 {
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
       error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
-#endif /* PNG_USER_MEM_SUPPORTED */
+#endif /* USER_MEM */
 
    if (png_ptr != NULL)
    {
@@ -526,7 +526,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
       png_ptr->zlib_text_mem_level = 8;
       png_ptr->zlib_text_window_bits = 15;
       png_ptr->zlib_text_method = 8;
-#endif /* PNG_WRITE_COMPRESSED_TEXT_SUPPORTED */
+#endif /* WRITE_COMPRESSED_TEXT */
 
       /* This is a highly dubious configuration option; by default it is off,
        * but it may be appropriate for private builds that are testing
@@ -676,10 +676,10 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
             *(rp + 5) = (png_byte)(blue & 0xff);
          }
       }
-#endif /* PNG_WRITE_16BIT_SUPPORTED */
+#endif /* WRITE_16BIT */
    }
 }
-#endif /* PNG_MNG_FEATURES_SUPPORTED */
+#endif /* MNG_FEATURES */
 
 /* Called by user to write a row of image data */
 void PNGAPI
@@ -920,7 +920,7 @@ png_write_flush(png_structrp png_ptr)
    png_ptr->flush_rows = 0;
    png_flush(png_ptr);
 }
-#endif /* PNG_WRITE_FLUSH_SUPPORTED */
+#endif /* WRITE_FLUSH */
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
 static void png_reset_filter_heuristics(png_structrp png_ptr);/* forward decl */
@@ -1352,7 +1352,7 @@ png_set_filter_heuristics_fixed(png_structrp png_ptr, int heuristic_method,
    }
 }
 #endif /* FIXED_POINT */
-#endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
+#endif /* WRITE_WEIGHTED_FILTER */
 
 void PNGAPI
 png_set_compression_level(png_structrp png_ptr, int level)
@@ -1509,7 +1509,7 @@ png_set_text_compression_method(png_structrp png_ptr, int method)
 
    png_ptr->zlib_text_method = method;
 }
-#endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
+#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 /* end of API added to libpng-1.5.4 */
 
 void PNGAPI
@@ -2430,6 +2430,6 @@ png_image_write_to_file(png_imagep image, const char *file_name,
    else
       return 0;
 }
-#endif /* PNG_STDIO_SUPPORTED */
+#endif /* STDIO */
 #endif /* SIMPLIFIED_WRITE */
-#endif /* PNG_WRITE_SUPPORTED */
+#endif /* WRITE */

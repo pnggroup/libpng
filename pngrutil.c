@@ -76,7 +76,7 @@ png_get_uint_16)(png_const_bytep buf)
 {
    return PNG_U16(buf[0], buf[1]);
 }
-#endif /* PNG_READ_INT_FUNCTIONS_SUPPORTED */
+#endif /* READ_INT_FUNCTIONS */
 
 /* This is an exported function however its error handling is too harsh for most
  * internal use.  For example if it were used for reading the chunk parameters
@@ -304,7 +304,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
    return buffer;
 }
-#endif /* PNG_READ_iCCP|iTXt|pCAL|sCAL|sPLT|tEXt|zTXt|SEQUENTIAL_READ */
+#endif /* READ_iCCP|iTXt|pCAL|sCAL|sPLT|tEXt|zTXt|SEQUENTIAL_READ */
 
 /* png_inflate_claim: claim the zstream for some nefarious purpose that involves
  * decompression.  Returns Z_OK on success, else a zlib error code.  It checks
@@ -701,7 +701,7 @@ png_decompress_chunk(png_structrp png_ptr,
       return Z_MEM_ERROR;
    }
 }
-#endif /* PNG_READ_COMPRESSED_TEXT_SUPPORTED */
+#endif /* READ_COMPRESSED_TEXT */
 
 #ifdef PNG_READ_iCCP_SUPPORTED
 /* Perform a partial read and decompress, producing 'avail_out' bytes and
@@ -1278,7 +1278,7 @@ png_handle_sRGB(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    (void)png_colorspace_set_sRGB(png_ptr, &png_ptr->colorspace, intent);
    png_colorspace_sync(png_ptr, info_ptr);
 }
-#endif /* PNG_READ_sRGB_SUPPORTED */
+#endif /* READ_sRGB */
 
 #ifdef PNG_READ_iCCP_SUPPORTED
 void /* PRIVATE */
@@ -1551,7 +1551,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (errmsg != NULL) /* else already output */
       png_chunk_benign_error(png_ptr, errmsg);
 }
-#endif /* PNG_READ_iCCP_SUPPORTED */
+#endif /* READ_iCCP */
 
 #ifdef PNG_READ_sPLT_SUPPORTED
 void /* PRIVATE */
@@ -1729,7 +1729,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    png_free(png_ptr, new_palette.entries);
 }
-#endif /* PNG_READ_sPLT_SUPPORTED */
+#endif /* READ_sPLT */
 
 #ifdef PNG_READ_tRNS_SUPPORTED
 void /* PRIVATE */
@@ -2744,7 +2744,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       return 1;
    }
 }
-#endif /* PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
+#endif /* READ_UNKNOWN_CHUNKS */
 
 /* Handle an unknown, or known but disabled, chunk */
 void /* PRIVATE */
@@ -2925,7 +2925,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
    png_crc_finish(png_ptr, length);
    PNG_UNUSED(info_ptr)
    PNG_UNUSED(keep)
-#endif /* !PNG_READ_UNKNOWN_CHUNKS_SUPPORTED */
+#endif /* !READ_UNKNOWN_CHUNKS */
 
    /* Check for unhandled critical chunks */
    if (!handled && PNG_CHUNK_CRITICAL(png_ptr->chunk_name))
@@ -3162,7 +3162,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
           */
 #        define MASK(pass,depth,display,png)\
             ((display)?B_MASK(pass,depth,png):S_MASK(pass,depth,png))
-#endif /* !PNG_USE_COMPILE_TIME_MASKS */
+#endif /* !USE_COMPILE_TIME_MASKS */
 
          /* Use the appropriate mask to copy the required bits.  In some cases
           * the byte mask will be 0 or 0xff; optimize these cases.  row_width is
@@ -3413,7 +3413,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      return;
                   }
                }
-#endif /* PNG_ALIGN_ code */
+#endif /* ALIGN_ code */
 
                /* The true default - use a memcpy: */
                for (;;)
@@ -3693,7 +3693,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
    PNG_UNUSED(transformations)  /* Silence compiler warning */
 #endif
 }
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 
 static void
 png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
@@ -4101,7 +4101,7 @@ png_read_finish_row(png_structrp png_ptr)
 
    /* Offset to next interlace block in the y direction */
    static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 
    png_debug(1, "in png_read_finish_row");
    png_ptr->row_number++;
@@ -4146,12 +4146,12 @@ png_read_finish_row(png_structrp png_ptr)
       if (png_ptr->pass < 7)
          return;
    }
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
 
    /* Here after at the end of the last row of the last pass. */
    png_read_finish_IDAT(png_ptr);
 }
-#endif /* PNG_SEQUENTIAL_READ_SUPPORTED */
+#endif /* SEQUENTIAL_READ */
 
 void /* PRIVATE */
 png_read_start_row(png_structrp png_ptr)
@@ -4197,7 +4197,7 @@ png_read_start_row(png_structrp png_ptr)
    }
 
    else
-#endif /* PNG_READ_INTERLACING_SUPPORTED */
+#endif /* READ_INTERLACING */
    {
       png_ptr->num_rows = png_ptr->height;
       png_ptr->iwidth = png_ptr->width;
@@ -4447,4 +4447,4 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
    png_ptr->flags |= PNG_FLAG_ROW_INIT;
 }
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
