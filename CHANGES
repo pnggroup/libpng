@@ -5081,7 +5081,7 @@ Version 1.6.15beta07 [November 7, 2014]
     png_do_swap().
   Changed all "#endif /* PNG_FEATURE_SUPPORTED */" to "#endif /* FEATURE */"
 
-Version 1.6.15beta08 [November 7, 2014]
+Version 1.6.15beta08 [November 8, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
