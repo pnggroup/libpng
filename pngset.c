@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.19 [August 21, 2014]
+ * Last changed in libpng 1.5.20 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -671,6 +671,7 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
     png_const_textp text_ptr, int num_text)
 {
    int i;
+   size_t element_size;
 
    png_debug1(1, "in %lx storage function", png_ptr == NULL ? "unexpected" :
       (unsigned long)png_ptr->chunk_name);
@@ -682,11 +683,12 @@ png_set_text_2(png_structp png_ptr, png_infop info_ptr,
     * to hold all of the incoming text_ptr objects.
     */
 
+   element_size=png_sizeof(png_text);
    if (num_text < 0 ||
        num_text > INT_MAX - info_ptr->num_text - 8 ||
        (unsigned int)/*SAFE*/(num_text +/*SAFE*/
        info_ptr->num_text + 8) >=
-       PNG_SIZE_MAX/png_sizeof(png_text))
+       PNG_SIZE_MAX/element_size)
    {
       png_warning(png_ptr, "too many text chunks");
       return(0);
@@ -967,15 +969,17 @@ png_set_sPLT(png_structp png_ptr,
 {
    png_sPLT_tp np;
    int i;
+   size_t element_size;
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
+   element_size = PNG_SIZE_MAX/png_sizeof(png_sPLT_t);
    if (nentries < 0 ||
        nentries > INT_MAX-info_ptr->splt_palettes_num ||
        (unsigned int)/*SAFE*/(nentries +/*SAFE*/
        info_ptr->splt_palettes_num) >=
-       PNG_SIZE_MAX/png_sizeof(png_sPLT_t))
+       PNG_SIZE_MAX/element_size)
       np=NULL;
 
    else
@@ -1046,15 +1050,17 @@ png_set_unknown_chunks(png_structp png_ptr,
 {
    png_unknown_chunkp np;
    int i;
+   size_t element_size;
 
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns == 0)
       return;
 
+   element_size = PNG_SIZE_MAX/png_sizeof(png_unknown_chunk);
    if (num_unknowns < 0 ||
        num_unknowns > INT_MAX-info_ptr->unknown_chunks_num ||
        (unsigned int)/*SAFE*/(num_unknowns +/*SAFE*/
        info_ptr->unknown_chunks_num) >=
-       PNG_SIZE_MAX/png_sizeof(png_unknown_chunk))
+       PNG_SIZE_MAX/element_size)
       np=NULL;
 
    else

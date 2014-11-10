@@ -4252,6 +4252,10 @@ Version 1.5.20beta01 [November 6, 2014]
   Avoid out-of-bounds memory access in png_user_version_check().
   Simplified and future-proofed png_user_version_check().
 
+Version 1.5.20beta02 [November 10, 2014]
+  Quieted three "comparison is always false due to limited range" compiler
+    warnings in pngset.c
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
