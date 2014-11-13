@@ -2913,6 +2913,8 @@ version 1.4.14beta01 [November 6, 2014]
   Avoid out-of-bounds memory access in png_user_version_check().
   Simplified and future-proofed png_user_version_check().
 
+version 1.4.14rc01 [November 13, 2014]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
