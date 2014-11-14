@@ -5087,8 +5087,8 @@ Version 1.6.15beta08 [November 8, 2014]
 Version 1.6.15rc01 [November 13, 2014]
 
 Version 1.6.15rc02 [November 14, 2014]
-  The macros passed in the command line to Borland make are ignored if
-    similarly-named macros are already defined in makefiles. This behavior
+  The macros passed in the command line to Borland make were ignored if
+    similarly-named macros were already defined in makefiles. This behavior
     is different from POSIX make and other make programs.  Surround the
     macro definitions with ifndef guards (Cosmin).
 
