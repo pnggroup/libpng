@@ -52,7 +52,9 @@ LDFLAGS=-L$(ZLIB_DIR) -M $(LDEBUG)
 
 # Pre-built configuration
 # See scripts\pnglibconf.mak for more options
+!ifndef PNGLIBCONF_H_PREBUILT
 PNGLIBCONF_H_PREBUILT = scripts\pnglibconf.h.prebuilt
+!endif
 
 ## Variables
 OBJS = \
