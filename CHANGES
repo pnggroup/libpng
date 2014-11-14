@@ -4258,6 +4258,12 @@ Version 1.5.20beta02 [November 10, 2014]
 
 Version 1.5.20rc01 [November 13, 2014]
 
+Version 1.5.20rc02 [November 14, 2014]
+  The macros passed in the command line to Borland make are ignored if
+    similarly-named macros are already defined in makefiles. This behavior
+    is different from POSIX make and other make programs.  Surround the
+    macro definitions with ifndef guards (Cosmin).
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
