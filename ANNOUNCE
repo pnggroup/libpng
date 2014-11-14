@@ -44,6 +44,8 @@ Version 1.5.20rc02 [November 14, 2014]
     similarly-named macros are already defined in makefiles. This behavior
     is different from POSIX make and other make programs.  Surround the
     macro definitions with ifndef guards (Cosmin).
+  Use memcpy instead of CopyMemory in the definition of png_memcpy.
+    The Borland C++ build breaks otherwise (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -418,7 +418,7 @@
 #    define CVT_PTR_NOCHECK(ptr) (ptr)
 #    define png_strlen  lstrlenA
 #    define png_memcmp  memcmp
-#    define png_memcpy  CopyMemory
+#    define png_memcpy  memcpy
 #    define png_memset  memset
 #  else
 #    define CVT_PTR(ptr)         (ptr)
