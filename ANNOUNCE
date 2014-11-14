@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta42 - November 7, 2014
+Libpng 1.7.0beta42 - November 14, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -648,7 +648,11 @@ Version 1.7.0beta41 [November 7, 2014]
     png_do_swap().
   Changed all "#endif /* PNG_FEATURE_SUPPORTED */" to "#endif /* FEATURE */"
 
-Version 1.7.0beta42 [November 7, 2014]
+Version 1.7.0beta42 [November 14, 2014]
+  The macros passed in the command line to Borland make were ignored if
+    similarly-named macros were already defined in makefiles. This behavior
+    is different from POSIX make and other make programs.  Surround the
+    macro definitions with ifndef guards (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
