@@ -1,5 +1,5 @@
 
-Libpng 1.5.20rc02 - November 14, 2014
+Libpng 1.5.20rc03 - November 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.20rc02.tar.xz (LZMA-compressed, recommended)
-   1.5.20rc02.tar.gz
-   1.5.20rc02.tar.bz2
+   1.5.20rc03.tar.xz (LZMA-compressed, recommended)
+   1.5.20rc03.tar.gz
+   1.5.20rc03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1520r02.7z  (LZMA-compressed, recommended)
-   lp1520r02.zip
+   lp1520r03.7z  (LZMA-compressed, recommended)
+   lp1520r03.zip
 
 Other information:
 
-   1.5.20rc02-README.txt
-   1.5.20rc02-LICENSE.txt
-   libpng-1.5.20rc02-*.asc (armored detached GPG signatures)
+   1.5.20rc03-README.txt
+   1.5.20rc03-LICENSE.txt
+   libpng-1.5.20rc03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.19):
 
@@ -39,13 +39,17 @@ Version 1.5.20beta02 [November 10, 2014]
 
 Version 1.5.20rc01 [November 13, 2014]
 
-Version 1.5.20rc02 [November 14, 2014]
-  The macros passed in the command line to Borland make are ignored if
-    similarly-named macros are already defined in makefiles. This behavior
+Version 1.5.20rc02 [November 14, 2014]]
+  The macros passed in the command line to Borland make were ignored if
+    similarly-named macros were already defined in makefiles. This behavior
     is different from POSIX make and other make programs.  Surround the
     macro definitions with ifndef guards (Cosmin).
   Use memcpy instead of CopyMemory in the definition of png_memcpy.
     The Borland C++ build breaks otherwise (Cosmin).
+
+Version 1.5.20rc03 [November 17, 2014]
+  Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32
+  Removed the obsolete $ARCH variable from scripts/makefile.darwin.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -4258,13 +4258,17 @@ Version 1.5.20beta02 [November 10, 2014]
 
 Version 1.5.20rc01 [November 13, 2014]
 
-Version 1.5.20rc02 [November 14, 2014]
+Version 1.5.20rc02 [November 14, 2014]]
   The macros passed in the command line to Borland make were ignored if
     similarly-named macros were already defined in makefiles. This behavior
     is different from POSIX make and other make programs.  Surround the
     macro definitions with ifndef guards (Cosmin).
   Use memcpy instead of CopyMemory in the definition of png_memcpy.
     The Borland C++ build breaks otherwise (Cosmin).
+
+Version 1.5.20rc03 [November 17, 2014]
+  Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32
+  Removed the obsolete $ARCH variable from scripts/makefile.darwin.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
