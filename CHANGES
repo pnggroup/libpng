@@ -4944,6 +4944,8 @@ Version 1.7.0beta42 [November 17, 2014]
     macro definitions with ifndef guards (Cosmin).
   Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32.
   Removed the obsolete $ARCH variable from scripts/makefile.darwin.
+  Merged clang no-warning fix from libpng-1.6.13: png_digit was defined
+    but never used in pngerror.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
