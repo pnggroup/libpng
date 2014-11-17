@@ -36,12 +36,11 @@ LN_SF=ln -sf
 RANLIB=ranlib
 CP=cp
 RM_F=/bin/rm -f
-ARCH=-arch ppc -arch i386 -arch x86_64
 
 CPPFLAGS=-I$(ZLIBINC)
 # CFLAGS=-W -Wall -O3 -funroll-loops
-CFLAGS=-W -Wall -O -funroll-loops $(ARCH)
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz $(ARCH)
+CFLAGS=-W -Wall -O -funroll-loops
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib
@@ -113,7 +112,7 @@ $(LIBSOMAJ): $(OBJSDLL)
 	$(CC) -dynamiclib \
 	 -install_name $(LIBPATH)/$(LIBSOMAJ) \
 	 -current_version 16 -compatibility_version 16 \
-	 $(ARCH) -o $(LIBSOMAJ) \
+	 -o $(LIBSOMAJ) \
 	 $(OBJSDLL) -L$(ZLIBLIB) -lz
 
 pngtest: pngtest.o $(LIBSO)

@@ -5092,6 +5092,10 @@ Version 1.6.15rc02 [November 14, 2014]
     is different from POSIX make and other make programs.  Surround the
     macro definitions with ifndef guards (Cosmin).
 
+Version 1.6.15rc03 [November 16, 2014]
+  Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32.
+  Removed the obsolete $ARCH variable from scripts/makefile.darwin.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
