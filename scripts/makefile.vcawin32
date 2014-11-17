@@ -16,7 +16,7 @@
 CC = cl
 LD = link
 AR = lib
-CFLAGS  = -nologo -DPNG_USE_PNGVCRD -MD -O2 -W3 -I..\zlib
+CFLAGS  = -nologo -D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS -DPNG_USE_PNGVCRD -MD -O2 -W3 -I..\zlib
 LDFLAGS = -nologo
 ARFLAGS = -nologo
 RM = del
