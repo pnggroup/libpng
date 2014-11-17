@@ -1,5 +1,5 @@
 
-Libpng 1.4.14rc01 - November 13, 2014
+Libpng 1.4.14rc02 - November 17, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.14rc01.tar.xz (LZMA-compressed, recommended)
-   1.4.14rc01.tar.gz
-   1.4.14rc01.tar.bz2
+   1.4.14rc02.tar.xz (LZMA-compressed, recommended)
+   1.4.14rc02.tar.gz
+   1.4.14rc02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1414r01.7z (LZMA-compressed, recommended)
-   lp1414r01.zip
+   lp1414r02.7z (LZMA-compressed, recommended)
+   lp1414r02.zip
 
 Other information:
 
-   1.4.14rc01-README.txt
-   1.4.14rc01-LICENSE.txt
-   libpng-1.4.14rc01-*.asc (armored detached GPG signatures)
+   1.4.14rc02-README.txt
+   1.4.14rc02-LICENSE.txt
+   libpng-1.4.14rc02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.13):
 
@@ -32,6 +32,10 @@ version 1.4.14beta01 [November 6, 2014]
   Simplified and future-proofed png_user_version_check().
 
 version 1.4.14rc01 [November 13, 2014]
+  No changes.
+
+version 1.4.14rc02 [November 17, 2014]
+  Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
