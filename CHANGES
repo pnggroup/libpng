@@ -4937,7 +4937,7 @@ Version 1.7.0beta41 [November 7, 2014]
     png_do_swap().
   Changed all "#endif /* PNG_FEATURE_SUPPORTED */" to "#endif /* FEATURE */"
 
-Version 1.7.0beta42 [November 17, 2014]
+Version 1.7.0beta42 [November 20, 2014]
   The macros passed in the command line to Borland make were ignored if
     similarly-named macros were already defined in makefiles. This behavior
     is different from POSIX make and other make programs.  Surround the

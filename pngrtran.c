@@ -91,7 +91,8 @@ png_set_crc_action(png_structrp png_ptr, int crit_action, int ancil_action)
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 /* Is it OK to set a transformation now?  Only if png_start_read_image or
  * png_read_update_info have not been called.  It is not necessary for the IHDR
- * to have been read in all cases, the parameter allows for this check too.
+ * to have been read in all cases; the need_IHDR parameter allows for this
+ * check too.
  */
 static int
 png_rtran_ok(png_structrp png_ptr, int need_IHDR)
@@ -957,7 +958,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
    if (png_rtran_ok(png_ptr, 1) == 0)
       return;
 
-   switch(error_action)
+   switch (error_action)
    {
       case PNG_ERROR_ACTION_NONE:
          png_ptr->transformations |= PNG_RGB_TO_GRAY;
@@ -996,7 +997,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
          png_uint_16 red_int, green_int;
 
          /* NOTE: this calculation does not round, but this behavior is retained
-          * for consistency, the inaccuracy is very small.  The code here always
+          * for consistency; the inaccuracy is very small.  The code here always
           * overwrites the coefficients, regardless of whether they have been
           * defaulted or set already.
           */
@@ -1488,7 +1489,7 @@ png_init_read_transformations(png_structrp png_ptr)
 #endif
 
    /* Certain transformations have the effect of preventing other
-    * transformations that happen afterward in png_do_read_transformations,
+    * transformations that happen afterward in png_do_read_transformations;
     * resolve the interdependencies here.  From the code of
     * png_do_read_transformations the order is:
     *
