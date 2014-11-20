@@ -1,48 +1,33 @@
-Libpng 1.6.15rc03 - November 17, 2014
+Libpng 1.6.15 - November 20, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.15rc03.tar.xz (LZMA-compressed, recommended)
-   1.6.15rc03.tar.gz
+   libpng-1.6.15.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.15.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1615r03.7z  (LZMA-compressed, recommended)
-   lp1615r03.zip
+   lpng1615.7z  (LZMA-compressed, recommended)
+   lpng1615.zip
 
 Other information:
 
-   1.6.15rc03-README.txt
-   1.6.15rc03-LICENSE.txt
-   libpng-1.6.15rc03-*.asc (armored detached GPG signatures)
+   libpng-1.6.15-README.txt
+   libpng-1.6.15-LICENSE.txt
+   libpng-1.6.15-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.14):
-
-Version 1.6.15beta01 [October 29, 2014]
   Changed "if (!x)" to "if (x == 0)" and "if (x)" to "if (x != 0)"
   Simplified png_free_data().
   Added missing "ptr = NULL" after some instances of png_free().
-
-Version 1.6.15beta02 [November 1, 2014]
-  Changed remaining "if (!x)" to "if (x == 0)" and "if (x)" to "if (x != 0)"
-
-Version 1.6.15beta03 [November 3, 2014]
-  Added PNG_USE_ARM_NEON configuration flag (Marcin Juszkiewicz).
-
-Version 1.6.15beta04 [November 4, 2014]
-  Removed new PNG_USE_ARM_NEON configuration flag and made a one-line
-    revision to configure.ac to support ARM on aarch64 instead (John Bowler).
-
-Version 1.6.15beta05 [November 5, 2014]
-  Use png_get_libpng_ver(NULL) instead of PNG_LIBPNG_VER_STRING in
-    example.c, pngtest.c, and applications in the contrib directory.
+  Made a one-line revision to configure.ac to support ARM on aarch64
+    (bug report by Marcin Juszkiewicz, fix by John Bowler).
   Avoid out-of-bounds memory access in png_user_version_check().
   Simplified and future-proofed png_user_version_check().
   Fixed GCC unsigned int->float warnings. Various versions of GCC
@@ -60,31 +45,15 @@ Version 1.6.15beta05 [November 5, 2014]
     the same compiler does apparently generate the correct, in-range,
     numeric constant.  This adds appropriate, safe, casts to make the
     warnings go away.
-
-Version 1.6.15beta06 [November 6, 2014]
-  Reverted use png_get_libpng_ver(NULL) instead of PNG_LIBPNG_VER_STRING
-    in the manual, example.c, pngtest.c, and applications in the contrib
-    directory.  It was incorrect advice.
-
-Version 1.6.15beta07 [November 7, 2014]
   Removed #ifdef PNG_16BIT_SUPPORTED/#endif around png_product2(); it is
     needed by png_reciprocal2().
   Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
     png_do_swap().
   Changed all "#endif /* PNG_FEATURE_SUPPORTED */" to "#endif /* FEATURE */"
-
-Version 1.6.15beta08 [November 8, 2014]
-  More housecleaning in *.h
-
-Version 1.6.15rc01 [November 13, 2014]
-
-Version 1.6.15rc02 [November 14, 2014]
   The macros passed in the command line to Borland make were ignored if
     similarly-named macros were already defined in makefiles. This behavior
     is different from POSIX make and other make programs.  Surround the
     macro definitions with ifndef guards (Cosmin).
-
-Version 1.6.15rc03 [November 16, 2014]
   Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32.
   Removed the obsolete $ARCH variable from scripts/makefile.darwin.
 

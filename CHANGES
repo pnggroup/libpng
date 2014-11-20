@@ -5096,6 +5096,8 @@ Version 1.6.15rc03 [November 16, 2014]
   Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32.
   Removed the obsolete $ARCH variable from scripts/makefile.darwin.
 
+Version 1.6.15 [November 20, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
