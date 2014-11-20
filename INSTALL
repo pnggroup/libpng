@@ -18,7 +18,7 @@ VIII. Configuring libpng for 16-bit platforms
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
   XV. Configuring libpng for multiprocessing
- XVI. Other sources of information about libpng:
+ XVI. Other sources of information about libpng
 
 I. Simple installation
 
@@ -31,6 +31,15 @@ On Unix/Linux and similar systems, you can simply type
 and ignore the rest of this document.  "/path" is the path to the directory
 where you want to install the libpng "lib", "include", and "bin"
 subdirectories.
+
+If you downloaded a GIT clone, you will need to run ./autogen.sh before
+running ./configure, to create "configure" and "Makefile.in" which are
+not included in the GIT repository.
+
+Note that "configure" is only included in the "*.tar" distributions and not
+in the "*.zip" or "*.7z" distributions. If you downloaded one of those
+distributions, see "Building with project files" or "Building with makefiles",
+below.
 
 II. Rebuilding the configure scripts
 
@@ -111,8 +120,7 @@ Your directory structure should look like this:
       libpng  (this directory)
           INSTALL (this file)
           README
-          *.h
-          *.c
+          *.h, *.c  => libpng source files
           CMakeLists.txt    =>  "cmake" script
           configuration files:
              configure.ac, configure, Makefile.am, Makefile.in,
@@ -120,15 +128,10 @@ Your directory structure should look like this:
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
-             gregbook
-             libtests
-             pngminim
-             pngminus
-             pngsuite
-             visupng
+             arm-neon, conftest, examples, gregbook, libtests, pngminim,
+             pngminus, pngsuite, tools, visupng
           projects
-             visualc71
-             vstudio
+             cbuilder5, owatcom, visualc71, vstudio, xcode
           scripts
              makefile.*
              *.def (module definition files)
@@ -136,11 +139,7 @@ Your directory structure should look like this:
           pngtest.png
           etc.
       zlib
-          README
-          *.h
-          *.c
-          contrib
-          etc.
+          README, *.h, *.c contrib, etc.
 
 If the line endings in the files look funny, you may wish to get the other
 distribution of libpng.  It is available in both tar.gz (UNIX style line
@@ -149,7 +148,7 @@ endings) and zip (DOS style line endings) formats.
 VI. Building with project files
 
 If you are building libpng with MSVC, you can enter the
-libpng projects\visualc6 or visualc71 directory and follow the instructions
+libpng projects\visualc71 or vstudio directory and follow the instructions
 in README.txt.
 
 Otherwise enter the zlib directory and follow the instructions in zlib/README,
@@ -395,7 +394,7 @@ CFLAGS="-Wall -O -funroll-loops \
 --with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
 
 You can alternatively specify --includedir=/usr/include, /usr/local/include,
-/usr/include/libpng%NN%, or whatever.
+/usr/include/libpng16, or whatever.
 
 If you find that the configure script is out-of-date or is not supporting
 your platform properly, try running autogen.sh to regenerate "configure",

@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by John Bowler, 2014.
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.15 [November 20, 2014]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -152,8 +152,10 @@ png_have_neon(png_structp png_ptr)
       }
    }
 
+#ifdef PNG_WARNINGS_SUPPORTED
    else
       png_warning(png_ptr, "/proc/cpuinfo open failed");
+#endif
 
    return 0;
 }

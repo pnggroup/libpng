@@ -221,7 +221,7 @@ option SET_OPTION disabled
 # ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
 #                 with png_set_option
 # ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
-#                 extensions are supported, this is poorly supported and
+#                 extensions are supported. This is poorly supported and
 #                 deprectated - use the png_set_option API.
 setting ARM_NEON_OPT
 option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,

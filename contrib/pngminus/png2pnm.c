@@ -223,7 +223,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
 
   /* create png and info structures */
 
-  png_ptr = png_create_read_struct (PNG_LIBPNG_VER_STRING,
+  png_ptr = png_create_read_struct (png_get_libpng_ver(NULL),
     NULL, NULL, NULL);
   if (!png_ptr)
     return FALSE;   /* out of memory */
