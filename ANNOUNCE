@@ -1,56 +1,48 @@
 
-Libpng 1.2.52rc02 - November 17, 2014
+Libpng 1.2.52 - November 20, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.52rc02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.52rc02.tar.gz
-   libpng-1.2.52rc02.tar.bz2
+   libpng-1.2.52.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.52.tar.gz
+   libpng-1.2.52.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.52rc02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.52rc02-no-config.tar.gz
-   libpng-1.2.52rc02-no-config.tar.bz2
+   libpng-1.2.52-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.52-no-config.tar.gz
+   libpng-1.2.52-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1252r02.zip
-   lp1252r02.7z
-   lp1252r02.tar.bz2
+   lpng1252.zip
+   lpng1252.7z
+   lpng1252.tar.bz2
 
 Project files
 
-   libpng-1.2.52rc02-project-netware.zip
-   libpng-1.2.52rc02-project-wince.zip
+   libpng-1.2.52-project-netware.zip
+   libpng-1.2.52-project-wince.zip
 
 Other information:
 
-   libpng-1.2.52rc02-README.txt
-   libpng-1.2.52rc02-KNOWNBUGS.txt
-   libpng-1.2.52rc02-LICENSE.txt
-   libpng-1.2.52rc02-Y2K-compliance.txt
-   libpng-1.2.52rc02-[previous version]-diff.txt
-   libpng-1.2.52rc02-*.asc (armored detached GPG signatures)
+   libpng-1.2.52-README.txt
+   libpng-1.2.52-KNOWNBUGS.txt
+   libpng-1.2.52-LICENSE.txt
+   libpng-1.2.52-Y2K-compliance.txt
+   libpng-1.2.52-[previous version]-diff.txt
+   libpng-1.2.52-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.51):
-
-version 1.2.52beta01 [November 6, 2014]
   Avoid out-of-bounds memory access while checking version string in
     pngread.c and pngwrite.c
-
-version 1.2.52rc01 [November 13, 2014]
-  No changes.
-
-version 1.2.52rc02 [November 17, 2014]
   Added "-D_CRT_SECURE_NO_DEPRECATE -D_CRT_SECURE_NO_WARNINGS" to
     CFLAGS in scripts/makefile.vcwin32
 
