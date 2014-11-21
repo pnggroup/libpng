@@ -5097,6 +5097,10 @@ Version 1.6.15rc03 [November 16, 2014]
   Removed the obsolete $ARCH variable from scripts/makefile.darwin.
 
 Version 1.6.15 [November 20, 2014]
+  No changes.
+
+Version 1.6.16beta01 [November 21, 2014]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
