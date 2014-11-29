@@ -5099,8 +5099,9 @@ Version 1.6.15rc03 [November 16, 2014]
 Version 1.6.15 [November 20, 2014]
   No changes.
 
-Version 1.6.16beta01 [November 21, 2014]
-  No changes.
+Version 1.6.16beta01 [November 29, 2014]
+  Added ".align 2" to arm/filter_neon.S to support old GAS assemblers that
+    don't do alignment correctly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

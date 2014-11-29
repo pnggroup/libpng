@@ -368,5 +368,5 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
 }
 
 #endif /* PNG_ARM_NEON_OPT > 0 */
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
 #endif /* PNG_ARM_NEON_IMPLEMENTATION == 1 (intrinsics) */
