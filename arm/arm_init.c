@@ -130,4 +130,4 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
    }
 }
 #endif /* PNG_ARM_NEON_OPT > 0 */
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
