@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by Mans Rullgard, 2011.
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.16 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -17,6 +17,7 @@
 #include "../pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
+
 #if PNG_ARM_NEON_OPT > 0
 #ifdef PNG_ARM_NEON_CHECK_SUPPORTED /* Do run-time checks */
 /* WARNING: it is strongly recommended that you do not build libpng with
