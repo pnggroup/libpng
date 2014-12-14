@@ -240,7 +240,7 @@ endif
 .dfn.out:
 	rm -f $@ $*.c $*.tf[12]
 	test -d scripts || mkdir scripts || test -d scripts
-	echo '#include "$<"' >$*.c
+	cp "$<" $*.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
 	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $*.c > $*.tf1
 	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
