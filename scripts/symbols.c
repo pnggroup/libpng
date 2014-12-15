@@ -1,8 +1,8 @@
 
-/* symbols.dfn - find all exported symbols
+/* symbols.c - find all exported symbols
  *
- * Last changed in libpng version 1.5.0 [January 6, 2011]
- * Copyright (c) 1998-2011 Glenn Randers-Pehrson
+ * Last changed in libpng version 1.6.16 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -26,8 +26,8 @@
 /* Read the defaults, but use scripts/pnglibconf.h.prebuilt; the 'standard'
  * header file.
  */
-#include "scripts/pnglibconf.h.prebuilt"
-#include "png.h"
+#include "pnglibconf.h.prebuilt"
+#include "../png.h"
 
 /* Some things are turned off by default.  Turn these things
  * on here (by hand) to get the APIs they expose and validate
@@ -45,7 +45,7 @@
 #define PNG_SET_OPTION_SUPPORTED
 
 #undef PNG_H
-#include "png.h"
+#include "../png.h"
 
 /* Finally there are a couple of places where option support
  * actually changes the APIs revealed using a #if/#else/#endif
@@ -55,4 +55,4 @@
 #undef  PNG_ERROR_TEXT_SUPPORTED     /* Exposes unsupported APIs */
 
 #undef PNG_H
-#include "png.h"
+#include "../png.h"

@@ -1,4 +1,4 @@
-Libpng 1.6.16beta02 - December 14, 2014
+Libpng 1.6.16beta02 - December 15, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -31,7 +31,9 @@ Version 1.6.16beta01 [December 14, 2014]
   Revised Makefile.am and scripts/symbols.dfn to work with MinGW/MSYS
     (Bob Friesenhahn).
 
-Version 1.6.16beta02 [December 14, 2014]
+Version 1.6.16beta02 [December 15, 2014]
+  Revised Makefile.am and scripts/*.dfn again to work with MinGW/MSYS
+    (renamed scripts/*.dfn to scripts/*.c) (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

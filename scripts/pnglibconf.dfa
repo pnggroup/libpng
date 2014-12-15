@@ -303,7 +303,7 @@ option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 option MNG_FEATURES
 
 # Arithmetic options, the first is the big switch that chooses between internal
-# floating and fixed point arithmetic implementations - it does not affect an
+# floating and fixed point arithmetic implementations - it does not affect any
 # APIs.  The second two (the _POINT settings) switch off individual APIs.
 #
 # Prior to libpng 1.6.8 one of the API (_POINT) variants had to be selected.  At

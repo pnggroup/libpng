@@ -1,7 +1,7 @@
-/* def.dfn - define format of libpng.def
+/* def.c - define format of libpng.def
  *
- * Last changed in libpng version 1.5.7 [December 15, 2011]
- * Copyright (c) 2010-2011 Glenn Randers-Pehrson
+ * Last changed in libpng version 1.6.16 [(PENDING RELEASE)]
+ * Copyright (c) 2010-2014 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
