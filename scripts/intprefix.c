@@ -2,7 +2,7 @@
 /* intprefix.c - generate an unprefixed internal symbol list
  *
  * Last changed in libpng version 1.6.16 [(PENDING RELEASE)]
- * Copyright (c) 2012-2014 Glenn Randers-Pehrson
+ * Copyright (c) 2013-2014 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
