@@ -28,6 +28,8 @@ Other information:
 Changes since the last public release (1.5.20):
 
 Version 1.5.20beta01 [November 6, 2014]
+  Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;
+    renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
