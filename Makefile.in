@@ -505,7 +505,7 @@ EXTRA_DIST = \
 	$(TESTS) \
 	CMakeLists.txt example.c libpng-manual.txt
 
-SCRIPT_CLEANFILES = scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
+SCRIPT_CLEANFILES = scripts/*.out scripts/*.chk scripts/pnglibconf.c
 CLEANFILES = dfn.c dfn?.out *.out.? scripts/*.out.? pngout.png \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
@@ -515,7 +515,7 @@ CLEANFILES = dfn.c dfn?.out *.out.? scripts/*.out.? pngout.png \
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
 
-SUFFIXES = .chk .dfn .out
+SUFFIXES = .chk .out
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from
@@ -535,7 +535,7 @@ all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .chk .dfn .out .S .c .lo .o .obj
+.SUFFIXES: .chk .out .S .c .lo .o .obj
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -1559,17 +1559,18 @@ $(srcdir)/scripts/pnglibconf.h.prebuilt:
 # 'make test' is the first thing the user does.)
 contrib/libtests/pngvalid.o pngtest.o: pnglibconf.h
 
-.dfn.out:
-	rm -f $@ $@.c $@.?
+.c.out:
+	rm -f $@ $*.tf[12]
 	test -d scripts || mkdir scripts || test -d scripts
-	echo '#include "$<"' >$@.c
-	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) @LIBPNG_DEFINES@\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $@.c > $@.1
-	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$@.2" $@.1 1>&2
-	mv $@.2 $@
+	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $< > $*.tf1
+	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
+	rm -f $*.tf1
+	mv $*.tf2 $@
 
-# The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
+# The .c file for pnglibconf.h is machine generated
+pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
+
 	rm -f $@ pnglibconf.pre $@.?
 	$(AWK) -f ${srcdir}/scripts/options.awk out="pnglibconf.pre"\
 	    version=search ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
@@ -1587,7 +1588,7 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 
 # used on demand to regenerate the standard header, CPPFLAGS should
 # be empty - no non-standard defines
-scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
+scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ dfn?.out
 	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\

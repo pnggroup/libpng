@@ -12904,7 +12904,7 @@ if test "$have_ld_version_script" = "yes"; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for symbol prefix" >&5
 $as_echo_n "checking for symbol prefix... " >&6; }
     SYMBOL_PREFIX=`echo "PREFIX=__USER_LABEL_PREFIX__" \
-                  | ${CPP-${CC-gcc} -E} - 2>&1 \
+                  | ${DFNCPP-${CC-gcc} -E} - 2>&1 \
                   | ${EGREP-grep} "^PREFIX=" \
                   | ${SED-sed} -e "s:^PREFIX=::" -e "s:__USER_LABEL_PREFIX__::"`
 
