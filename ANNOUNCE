@@ -1,44 +1,33 @@
 
-Libpng 1.5.20 - November 20, 2014
+Libpng 1.5.21beta01 - December 15, 2014
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.20.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.20.tar.gz
-   libpng-1.5.20.tar.bz2
+   1.5.21beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.21beta01.tar.gz
+   1.5.21beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1520.7z  (LZMA-compressed, recommended)
-   lpng1520.zip
+   lp1521b01.7z  (LZMA-compressed, recommended)
+   lp1521b01.zip
 
 Other information:
 
-   libpng-1.5.20-README.txt
-   libpng-1.5.20-LICENSE.txt
-   libpng-1.5.20-*.asc (armored detached GPG signatures)
+   1.5.21beta01-README.txt
+   1.5.21beta01-LICENSE.txt
+   libpng-1.5.21beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.5.19):
-  Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
-  Only mark text chunks as written after successfully writing them.
-  Avoid out-of-bounds memory access in png_user_version_check().
-  Simplified and future-proofed png_user_version_check().
-  Quieted three "comparison is always false due to limited range" compiler
-    warnings in pngset.c
-  The macros passed in the command line to Borland make were ignored if
-    similarly-named macros were already defined in makefiles. This behavior
-    is different from POSIX make and other make programs.  Surround the
-    macro definitions with ifndef guards (Cosmin).
-  Use memcpy instead of CopyMemory in the definition of png_memcpy.
-    The Borland C++ build breaks otherwise (Cosmin).
-  Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32
-  Removed the obsolete $ARCH variable from scripts/makefile.darwin.
+Changes since the last public release (1.5.20):
+
+Version 1.5.20beta01 [November 6, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
