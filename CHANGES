@@ -4947,11 +4947,12 @@ Version 1.7.0beta42 [November 20, 2014]
   Merged clang no-warning fix from libpng-1.6.13: png_digit was defined
     but never used in pngerror.c.
 
-Version 1.7.0beta43 [December 15, 2014]
+Version 1.7.0beta43 [December 17, 2014]
   Added ".align 2" to arm/filter_neon.S to support old GAS assemblers that
     don't do alignment correctly.
   Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;
     renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
+  Quiet a "comparison always true" warning in pngstest.c (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
