@@ -5109,7 +5109,8 @@ Version 1.6.16beta02 [December 15, 2014]
   Revised Makefile.am and scripts/*.dfn again to work with MinGW/MSYS;
     renamed scripts/*.dfn to scripts/*.c (John Bowler).
 
-Version 1.6.16beta03 [December 15, 2014]
+Version 1.6.16beta03 [December 17, 2014]
+  Quiet a "comparison always true" warning in pngstest.c (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
