@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta43 - December 17, 2014
+Libpng 1.7.0beta43 - December 18, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -658,7 +658,7 @@ Version 1.7.0beta42 [November 20, 2014]
   Merged clang no-warning fix from libpng-1.6.13: png_digit was defined
     but never used in pngerror.c.
 
-Version 1.7.0beta43 [December 17, 2014]
+Version 1.7.0beta43 [December 18, 2014]
   Added ".align 2" to arm/filter_neon.S to support old GAS assemblers that
     don't do alignment correctly.
   Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;

@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta43 - November 21, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta43 - December 18, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta43 - November 21, 2014\
+      return "libpng version 1.7.0beta43 - December 18, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -982,7 +982,7 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_fixed_point gAMA)
 {
    /* Changed in libpng-1.5.4 to limit the values to ensure overflow can't
-    * occur.  Since the fixed point representation is assymetrical it is
+    * occur.  Since the fixed point representation is asymetrical it is
     * possible for 1/gamma to overflow the limit of 21474 and this means the
     * gamma value must be at least 5/100000 and hence at most 20000.0.  For
     * safety the limits here are a little narrower.  The values are 0.00016 to
@@ -1723,7 +1723,7 @@ png_icc_profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    PNG_UNUSED(pos)
 
    /* This is recoverable, but make it unconditionally an app_error on write to
-    * avoid writing invalid ICC profiles into PNG files.  (I.e.  we handle them
+    * avoid writing invalid ICC profiles into PNG files (i.e., we handle them
     * on read, with a warning, but on write unless the app turns off
     * application errors the PNG won't be written.)
     */
