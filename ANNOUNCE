@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta43 - December 18, 2014
+Libpng 1.7.0beta44 - December 18, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta43.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta43.tar.gz
+   1.7.0beta44.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta44.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b43.7z  (LZMA-compressed, recommended)
-   lp170b43.zip
+   lp170b44.7z  (LZMA-compressed, recommended)
+   lp170b44.zip
 
 Other information:
 
-   1.7.0beta43-README.txt
-   1.7.0beta43-LICENSE.txt
-   libpng-1.7.0beta43-*.asc (armored detached GPG signatures)
+   1.7.0beta44-README.txt
+   1.7.0beta44-LICENSE.txt
+   libpng-1.7.0beta44-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -664,6 +664,8 @@ Version 1.7.0beta43 [December 18, 2014]
   Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;
     renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
   Quiet a "comparison always true" warning in pngstest.c (John Bowler).
+
+Version 1.7.0beta44 [December 18, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
