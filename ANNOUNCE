@@ -1,4 +1,4 @@
-Libpng 1.6.16rc01 - December 21, 2014
+Libpng 1.6.16rc02 - December 21, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.16rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.16rc01.tar.gz
+   1.6.16rc02.tar.xz (LZMA-compressed, recommended)
+   1.6.16rc02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1616r01.7z  (LZMA-compressed, recommended)
-   lp1616r01.zip
+   lp1616r02.7z  (LZMA-compressed, recommended)
+   lp1616r02.zip
 
 Other information:
 
-   1.6.16rc01-README.txt
-   1.6.16rc01-LICENSE.txt
-   libpng-1.6.16rc01-*.asc (armored detached GPG signatures)
+   1.6.16rc02-README.txt
+   1.6.16rc02-LICENSE.txt
+   libpng-1.6.16rc02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.15):
 
@@ -41,6 +41,9 @@ Version 1.6.16beta03 [December 21, 2014]
 Version 1.6.16rc01 [December 21, 2014]
   Restored a test on width that was removed from png.c at libpng-1.6.9
     (Bug report by Alex Eubanks).
+
+Version 1.6.16rc02 [December 21, 2014]
+  Undid the update to pngrutil.c in 1.6.16rc01.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
