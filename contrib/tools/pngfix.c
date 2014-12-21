@@ -8,8 +8,8 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * Tool to check and fix the zlib inflate 'too far back' problem, see the usage
- * message for more information.
+ * Tool to check and fix the zlib inflate 'too far back' problem.
+ * See the usage message for more information.
  */
 #include <stdlib.h>
 #include <stdio.h>
