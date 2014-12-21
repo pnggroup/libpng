@@ -5119,6 +5119,9 @@ Version 1.6.16rc01 [December 21, 2014]
 Version 1.6.16rc02 [December 21, 2014]
   Undid the update to pngrutil.c in 1.6.16rc01.
 
+Version 1.6.16rc03 [December 21, 2014]
+  Fixed an overflow in png_combine_row with very wide interlaced images.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -3003,7 +3003,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 {
    unsigned int pixel_depth = png_ptr->transformed_pixel_depth;
    png_const_bytep sp = png_ptr->row_buf + 1;
-   png_uint_32 row_width = png_ptr->width;
+   png_alloc_size_t row_width = png_ptr->width;
    unsigned int pass = png_ptr->pass;
    png_bytep end_ptr = 0;
    png_byte end_byte = 0;
@@ -3278,7 +3278,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 
             /* But don't allow this number to exceed the actual row width. */
             if (bytes_to_copy > row_width)
-               bytes_to_copy = row_width;
+               bytes_to_copy = (unsigned int)/*SAFE*/row_width;
          }
 
          else /* normal row; Adam7 only ever gives us one pixel to copy. */
@@ -3458,7 +3458,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                   dp += bytes_to_jump;
                   row_width -= bytes_to_jump;
                   if (bytes_to_copy > row_width)
-                     bytes_to_copy = row_width;
+                     bytes_to_copy = (unsigned int)/*SAFE*/row_width;
                }
          }
 
