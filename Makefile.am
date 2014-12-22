@@ -129,7 +129,7 @@ EXTRA_DIST= \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 
-SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.dfn
+SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.c
 
 CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
@@ -152,7 +152,7 @@ AM_CFLAGS = ${PNG_COPTS}
 # checks for this and sets DFNCPP appropriately.
 DFNCPP = @DFNCPP@
 
-SUFFIXES = .chk .dfn .out
+SUFFIXES = .chk .out
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -237,18 +237,17 @@ if DO_PNG_PREFIX
 SYMBOL_CFLAGS += -DPNG_PREFIX='@PNG_PREFIX@'
 endif
 
-.dfn.out:
-	rm -f $@ $*.c $*.tf[12]
+.c.out:
+	rm -f $@ $*.tf[12]
 	test -d scripts || mkdir scripts || test -d scripts
-	echo '#include "$<"' >$*.c
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $*.c > $*.tf1
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $< > $*.tf1
 	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
-	rm -f $*.c $*.tf1
+	rm -f $*.tf1
 	mv $*.tf2 $@
 
-# The .dfn file for pnglibconf.h is machine generated
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
+# The .c file for pnglibconf.h is machine generated
+pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
 	rm -f $@ $*.tf[45]
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf4 version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
@@ -268,7 +267,7 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 
 # used on demand to regenerate the standard header, CPPFLAGS should
 # be empty - no non-standard defines
-scripts/pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
+scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ pnglibconf.tf[67]
 	test -z "$(CPPFLAGS)"
 	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\

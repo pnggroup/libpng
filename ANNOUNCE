@@ -1,4 +1,4 @@
-Libpng 1.6.15 - November 20, 2014
+Libpng 1.6.16 - December 22, 2014
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -7,55 +7,30 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.15.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.15.tar.gz
+   libpng-1.6.16.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.16.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1615.7z  (LZMA-compressed, recommended)
-   lpng1615.zip
+   lpng1616.7z  (LZMA-compressed, recommended)
+   lpng1616.zip
 
 Other information:
 
-   libpng-1.6.15-README.txt
-   libpng-1.6.15-LICENSE.txt
-   libpng-1.6.15-*.asc (armored detached GPG signatures)
+   libpng-1.6.16-README.txt
+   libpng-1.6.16-LICENSE.txt
+   libpng-1.6.16-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.14):
-  Changed "if (!x)" to "if (x == 0)" and "if (x)" to "if (x != 0)"
-  Simplified png_free_data().
-  Added missing "ptr = NULL" after some instances of png_free().
-  Made a one-line revision to configure.ac to support ARM on aarch64
-    (bug report by Marcin Juszkiewicz, fix by John Bowler).
-  Avoid out-of-bounds memory access in png_user_version_check().
-  Simplified and future-proofed png_user_version_check().
-  Fixed GCC unsigned int->float warnings. Various versions of GCC
-    seem to generate warnings when an unsigned value is implicitly
-    converted to double. This is probably a GCC bug but this change
-    avoids the issue by explicitly converting to (int) where safe.
-  Free all allocated memory in pngimage. The file buffer cache was left
-    allocated at the end of the program, harmless but it causes memory
-    leak reports from clang.
-  Fixed array size calculations to avoid warnings. At various points
-    in the code the number of elements in an array is calculated using
-    sizeof.  This generates a compile time constant of type (size_t) which
-    is then typically assigned to an (unsigned int) or (int). Some versions
-    of GCC on 64-bit systems warn about the apparent narrowing, even though
-    the same compiler does apparently generate the correct, in-range,
-    numeric constant.  This adds appropriate, safe, casts to make the
-    warnings go away.
-  Removed #ifdef PNG_16BIT_SUPPORTED/#endif around png_product2(); it is
-    needed by png_reciprocal2().
-  Added #ifdef PNG_16BIT_SUPPORTED/#endif around png_log16bit() and
-    png_do_swap().
-  Changed all "#endif /* PNG_FEATURE_SUPPORTED */" to "#endif /* FEATURE */"
-  The macros passed in the command line to Borland make were ignored if
-    similarly-named macros were already defined in makefiles. This behavior
-    is different from POSIX make and other make programs.  Surround the
-    macro definitions with ifndef guards (Cosmin).
-  Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32.
-  Removed the obsolete $ARCH variable from scripts/makefile.darwin.
+Changes since the last public release (1.6.15):
+  Added ".align 2" to arm/filter_neon.S to support old GAS assemblers that
+    don't do alignment correctly.
+  Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;
+    renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
+  Quiet a "comparison always true" warning in pngstest.c (John Bowler).
+  Restored a test on width that was removed from png.c at libpng-1.6.9
+    (Bug report by Alex Eubanks).
+  Fixed an overflow in png_combine_row with very wide interlaced images.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
