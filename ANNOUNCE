@@ -1,45 +1,34 @@
 
-Libpng 1.5.21rc03 - December 21, 2014
+Libpng 1.5.21 - December 22, 2014
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.21rc03.tar.xz (LZMA-compressed, recommended)
-   1.5.21rc03.tar.gz
-   1.5.21rc03.tar.bz2
+   libpng-1.5.21.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.21.tar.gz
+   libpng-1.5.21.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1521r03.7z  (LZMA-compressed, recommended)
-   lp1521r03.zip
+   lpng1521.7z  (LZMA-compressed, recommended)
+   lpng1521.zip
 
 Other information:
 
-   1.5.21rc03-README.txt
-   1.5.21rc03-LICENSE.txt
-   libpng-1.5.21rc03-*.asc (armored detached GPG signatures)
+   libpng-1.5.21-README.txt
+   libpng-1.5.21-LICENSE.txt
+   libpng-1.5.21-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.20):
-
-Version 1.5.21beta01 [December 14, 2014]
   Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;
     renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
-
-Version 1.5.21rc01 [December 21, 2014]
   Restored a test on width that was removed from png.c at libpng-1.6.9
     (Bug report by Alex Eubanks).
-
-Version 1.5.21rc02 [December 21, 2014]
-  Undid the update to pngrutil.c in 1.5.21rc01.
-
-Version 1.5.21rc03 [December 21, 2014]
-  Fixed an overflow in png_combine_row with very wide interlaced images.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

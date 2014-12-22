@@ -4287,6 +4287,9 @@ Version 1.5.21rc02 [December 21, 2014]
 Version 1.5.21rc03 [December 21, 2014]
   Fixed an overflow in png_combine_row with very wide interlaced images.
 
+Version 1.5.21 [December 22, 2014]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
