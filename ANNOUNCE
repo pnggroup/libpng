@@ -1,34 +1,33 @@
 
-Libpng 1.5.21 - December 22, 2014
+Libpng 1.5.22beta01 - December 22, 2014
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.21.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.21.tar.gz
-   libpng-1.5.21.tar.bz2
+   1.5.22beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.22beta01.tar.gz
+   1.5.22beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1521.7z  (LZMA-compressed, recommended)
-   lpng1521.zip
+   lp1522b01.7z  (LZMA-compressed, recommended)
+   lp1522b01.zip
 
 Other information:
 
-   libpng-1.5.21-README.txt
-   libpng-1.5.21-LICENSE.txt
-   libpng-1.5.21-*.asc (armored detached GPG signatures)
+   1.5.22beta01-README.txt
+   1.5.22beta01-LICENSE.txt
+   libpng-1.5.22beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.5.20):
-  Revised Makefile.am and scripts/*.dfn to work with MinGW/MSYS;
-    renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
-  Restored a test on width that was removed from png.c at libpng-1.6.9
-    (Bug report by Alex Eubanks).
+Changes since the last public release (1.5.21):
+
+Version 1.5.22beta01 [December 22, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
