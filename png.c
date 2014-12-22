@@ -691,13 +691,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta44 - December 18, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta44 - December 22, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta44 - December 18, 2014\
+      return "libpng version 1.7.0beta44 - December 22, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1231,7 +1231,7 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
     * (1/white-y), so we can immediately see that as white-y approaches 0 the
     * accuracy inherent in the cHRM chunk drops off substantially.
     *
-    * libpng arithmetic: a simple invertion of the above equations
+    * libpng arithmetic: a simple inversion of the above equations
     * ------------------------------------------------------------
     *
     *    white_scale = 1/white-y
@@ -2357,6 +2357,17 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 
 #endif /* COLORSPACE */
 
+#ifdef __GNUC__
+/* This exists solely to work round a warning from GNU C. */
+static int /* PRIVATE */
+png_gt(size_t a, size_t b)
+{
+    return a > b;
+}
+#else
+#   define png_gt(a,b) ((a) > (b))
+#endif
+
 void /* PRIVATE */
 png_check_IHDR(png_const_structrp png_ptr,
    png_uint_32 width, png_uint_32 height, int bit_depth,
@@ -2374,6 +2385,27 @@ png_check_IHDR(png_const_structrp png_ptr,
    else if (width > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image width in IHDR");
+      error = 1;
+   }
+   else if (png_gt(width,
+                   (PNG_SIZE_MAX >> 3) /* 8-byte RGBA pixels */
+                   - 48                /* big_row_buf hack */
+                   - 1                 /* filter byte */
+                   - 7*8               /* rounding width to multiple of 8 pix */
+                   - 8))               /* extra max_pixel_depth pad */
+   {
+      /* The size of the row must be within the limits of this architecture.
+       * Because the read code can perform arbitrary transformations the
+       * maximum size is checked here.  Because the code in png_read_start_row
+       * adds extra space "for safety's sake" in several places a conservative
+       * limit is used here.
+       *
+       * NOTE: it would be far better to check the size that is actually used,
+       * but the effect in the real world is minor and the changes are more
+       * extensive, therefore much more dangerous and much more difficult to
+       * write in a way that avoids compiler warnings.
+       */
+      png_warning(png_ptr, "Image width is too large for this architecture");
       error = 1;
    }
    else
