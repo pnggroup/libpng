@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta44 - December 22, 2014
+Libpng 1.7.0beta44 - December 23, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -665,11 +665,12 @@ Version 1.7.0beta43 [December 18, 2014]
     renamed scripts/*.dfn to scripts/*.c (Bob Friesenhahn and John Bowler).
   Quiet a "comparison always true" warning in pngstest.c (John Bowler).
 
-Version 1.7.0beta44 [December 22, 2014]
+Version 1.7.0beta44 [December 23, 2014]
   Restored a test on width that was removed from png.c at libpng-1.6.9
     (Bug report by Alex Eubanks).
   Fixed an overflow in png_combine_row with very wide interlaced images.
   Corrected the width limit calculation in png_check_IHDR().
+  Removed extraneous handling of PNG_SAFE_LIMITS_SUPPORTED from pngconf.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
