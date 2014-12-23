@@ -769,13 +769,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17beta01 - December 22, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.6.17beta01 - December 23, 2014" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17beta01 - December 22, 2014\
+      return "libpng version 1.6.17beta01 - December 23, 2014\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2492,12 +2492,12 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-   else if (png_gt(width,
-                   (PNG_SIZE_MAX >> 3) /* 8-byte RGBA pixels */
-                   - 48                /* big_row_buf hack */
-                   - 1                 /* filter byte */
-                   - 7*8               /* rounding width to multiple of 8 pix */
-                   - 8))               /* extra max_pixel_depth pad */
+   else if (png_gt(((width + 7) & (~7)),
+       ((PNG_SIZE_MAX
+           - 48        /* big_row_buf hack */
+           - 1)        /* filter byte */
+           / 8)        /* 8-byte RGBA pixels */
+           - 1))       /* extra max_pixel_depth pad */
    {
       /* The size of the row must be within the limits of this architecture.
        * Because the read code can perform arbitrary transformations the
