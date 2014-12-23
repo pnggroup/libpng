@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta44 - December 23, 2014
+Libpng 1.7.0beta45 - December 23, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta44.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta44.tar.gz
+   1.7.0beta45.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta45.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b44.7z  (LZMA-compressed, recommended)
-   lp170b44.zip
+   lp170b45.7z  (LZMA-compressed, recommended)
+   lp170b45.zip
 
 Other information:
 
-   1.7.0beta44-README.txt
-   1.7.0beta44-LICENSE.txt
-   libpng-1.7.0beta44-*.asc (armored detached GPG signatures)
+   1.7.0beta45-README.txt
+   1.7.0beta45-LICENSE.txt
+   libpng-1.7.0beta45-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -671,6 +671,8 @@ Version 1.7.0beta44 [December 23, 2014]
   Fixed an overflow in png_combine_row with very wide interlaced images.
   Corrected the width limit calculation in png_check_IHDR().
   Removed extraneous handling of PNG_SAFE_LIMITS_SUPPORTED from pngconf.h
+
+Version 1.7.0beta45 [December 23, 2014]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
