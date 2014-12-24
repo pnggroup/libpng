@@ -4961,7 +4961,11 @@ Version 1.7.0beta44 [December 23, 2014]
   Corrected the width limit calculation in png_check_IHDR().
   Removed extraneous handling of PNG_SAFE_LIMITS_SUPPORTED from pngconf.h
 
-Version 1.7.0beta45 [December 23, 2014]
+Version 1.7.0beta45 [December 24, 2014]
+  Eliminated the PNG_SAFE_LIMITS macro and set default limits in
+    pnglibconf.dfa, that can be reset by the user at build time or run time.
+    This provides a more robust defense against DOS and as-yet undiscovered
+    overflows.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

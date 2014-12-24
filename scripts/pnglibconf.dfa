@@ -381,10 +381,11 @@ option IO_STATE
 
 option USER_LIMITS requires READ
 
-# If these settings are *not* set libpng will not limit the size of
-# images or the size of data in ancilliary chunks.  This does lead to
-# security issues if PNG files come from untrusted sources.  Settings have the
-# following interpretations:
+# The default settings given below for the limits mean that libpng will not
+# limit the size of images or the size of data in ancilliary chunks beyond the
+# specification or implementation limits.  This does lead to security issues if
+# PNG files come from untrusted sources.  Settings have the following
+# interpretations:
 #
 # USER_WIDTH_MAX: maximum width of an image that will be read
 # USER_HEIGHT_MAX: maximum height
@@ -393,17 +394,10 @@ option USER_LIMITS requires READ
 #
 # Only chunks that are variable in number are counted towards the
 # USER_CHUNK_CACHE_MAX limit
-setting USER_WIDTH_MAX
-setting USER_HEIGHT_MAX
-setting USER_CHUNK_CACHE_MAX
-setting USER_CHUNK_MALLOC_MAX
-
-# To default all these settings to values that are large but probably
-# safe turn the SAFE_LIMITS option on; this will cause the value in
-# pngpriv.h to be used.  Individual values can also be set, simply set
-# them in pngusr.dfa with '@#define PNG_setting value' lines.
-option SAFE_LIMITS enables USER_LIMITS disabled
-= SAFE_LIMITS SAFE_LIMITS
+setting USER_WIDTH_MAX default         640000 /* PNG max is 0x7fffffff */
+setting USER_HEIGHT_MAX default        640000 /* PNG max is 0x7fffffff */
+setting USER_CHUNK_CACHE_MAX default      128 /* Use 0 for unlimited */
+setting USER_CHUNK_MALLOC_MAX default 8000000 /* Use 0 for unlimited */
 
 # If this option is enabled APIs to set the above limits at run time are added;
 # without this the hardwired (compile time) limits will be used.

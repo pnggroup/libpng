@@ -347,42 +347,13 @@
 
 /* SECURITY and SAFETY:
  *
- * By default libpng is built without any internal limits on image size,
- * individual heap (png_malloc) allocations or the total amount of memory used.
- * If PNG_SAFE_LIMITS_SUPPORTED is defined, however, the limits below are used
- * (unless individually overridden).  These limits are believed to be fairly
- * safe, but builders of secure systems should verify the values against the
- * real system capabilities.
+ * libpng is built with support for certain internal limits on both individual
+ * items and totals.  These are documented in scripts/pnglibconf.dfa of the
+ * source and recorded in the machine generated header file pnglibconf.h.
+ * By default there are no limits, however if the macro PNG_SAFE_LIMITS is
+ * set when the library is built a different, system specific, lower set of
+ * limits will be used.
  */
-#ifdef PNG_SAFE_LIMITS_SUPPORTED
-   /* 'safe' limits */
-#  ifndef PNG_USER_WIDTH_MAX
-#     define PNG_USER_WIDTH_MAX 1000000L
-#  endif
-#  ifndef PNG_USER_HEIGHT_MAX
-#     define PNG_USER_HEIGHT_MAX 1000000L
-#  endif
-#  ifndef PNG_USER_CHUNK_CACHE_MAX
-#     define PNG_USER_CHUNK_CACHE_MAX 128
-#  endif
-#  ifndef PNG_USER_CHUNK_MALLOC_MAX
-#     define PNG_USER_CHUNK_MALLOC_MAX 8000000L
-#  endif
-#else
-   /* values for no limits */
-#  ifndef PNG_USER_WIDTH_MAX
-#     define PNG_USER_WIDTH_MAX 0x7fffffffL
-#  endif
-#  ifndef PNG_USER_HEIGHT_MAX
-#     define PNG_USER_HEIGHT_MAX 0x7fffffffL
-#  endif
-#  ifndef PNG_USER_CHUNK_CACHE_MAX
-#     define PNG_USER_CHUNK_CACHE_MAX 0
-#  endif
-#  ifndef PNG_USER_CHUNK_MALLOC_MAX
-#     define PNG_USER_CHUNK_MALLOC_MAX 0
-#  endif
-#endif
 
 /* Moved to pngpriv.h at libpng-1.5.0 */
 /* NOTE: some of these may have been used in external applications as
