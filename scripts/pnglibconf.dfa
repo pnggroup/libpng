@@ -381,11 +381,10 @@ option IO_STATE
 
 option USER_LIMITS requires READ
 
-# The default settings given below for the limits mean that libpng will not
-# limit the size of images or the size of data in ancilliary chunks beyond the
-# specification or implementation limits.  This does lead to security issues if
-# PNG files come from untrusted sources.  Settings have the following
-# interpretations:
+# The default settings given below for the limits mean that libpng will
+# limit the size of images or the size of data in ancilliary chunks to less
+# than the specification or implementation limits. Settings have the
+# following interpretations:
 #
 # USER_WIDTH_MAX: maximum width of an image that will be read
 # USER_HEIGHT_MAX: maximum height

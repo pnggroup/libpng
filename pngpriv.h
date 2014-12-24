@@ -347,17 +347,9 @@
 
 /* SECURITY and SAFETY:
  *
- * libpng is built with support for certain internal limits on both individual
- * items and totals.  These are documented in scripts/pnglibconf.dfa of the
+ * libpng is built with support for internal limits on image dimensions and
+ * memory usage.  These are documented in scripts/pnglibconf.dfa of the
  * source and recorded in the machine generated header file pnglibconf.h.
- * By default there are no limits, however if the macro PNG_SAFE_LIMITS is
- * set when the library is built a different, system specific, lower set of
- * limits will be used.
- */
-
-/* Moved to pngpriv.h at libpng-1.5.0 */
-/* NOTE: some of these may have been used in external applications as
- * these definitions were exposed in pngconf.h prior to 1.5.
  */
 
 /* If you are running on a machine where you cannot allocate more
