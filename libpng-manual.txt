@@ -648,7 +648,7 @@ User limits
 The PNG specification allows the width and height of an image to be as
 large as 2^31-1 (0x7fffffff), or about 2.147 billion rows and columns.
 Since very few applications really need to process such large images,
-we have imposed an arbitrary 640000 limit on rows and columns.
+we have imposed an arbitrary 1,000,000 limit on rows and columns.
 Larger images will be rejected immediately with a png_error() call. If
 you wish to change this limit, you can use
 
@@ -5111,11 +5111,11 @@ and safe limits are used by default (users who need larger limits
 can still override them at compile time or run time, as described above).
 
 The new limits are
-                                default
-   png_user_width_max           640,000
-   png_user_height_max          640,000
-   png_user_chunk_cache_max         128
-   png_user_chunk_malloc_max  8,000,000
+                                default   spec limit
+   png_user_width_max         1,000,000  2,147,483,647
+   png_user_height_max        1,000,000  2,147,483,647
+   png_user_chunk_cache_max         128  unlimited
+   png_user_chunk_malloc_max  8,000,000  unlimited
 
 XIII.  Changes to Libpng from version 1.6.x to 1.7.x
 
