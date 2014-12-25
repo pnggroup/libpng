@@ -5125,9 +5125,11 @@ Version 1.6.16rc03 [December 21, 2014]
 Version 1.6.16 [December 22, 2014]
   No changes.
 
-Version 1.6.17beta01 [December 23, 2014]
+Version 1.6.17beta01 [December 25, 2014]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
+  Removed user limits from pngfix. Also pass NULL pointers to
+    png_read_row to skip the unnecessary row de-interlace stuff.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
