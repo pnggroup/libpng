@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.14 [October 23, 2014]
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
