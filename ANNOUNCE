@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta45 - December 24, 2014
+Libpng 1.7.0beta45 - December 28, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -672,13 +672,14 @@ Version 1.7.0beta44 [December 23, 2014]
   Corrected the width limit calculation in png_check_IHDR().
   Removed extraneous handling of PNG_SAFE_LIMITS_SUPPORTED from pngconf.h
 
-Version 1.7.0beta45 [December 24, 2014]
+Version 1.7.0beta45 [December 28, 2014]
   Eliminated the PNG_SAFE_LIMITS macro and restored the 1-million-column
     and 1-million-row default limits in pnglibconf.dfa, that can be reset
     by the user at build time or run time.  This provides a more robust
     defense against DOS and as-yet undiscovered overflows.
   Removed user limits from pngfix. Also pass NULL pointers to
     png_read_row to skip the unnecessary row de-interlace stuff.
+  Added testing of png_set_packing() to pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
