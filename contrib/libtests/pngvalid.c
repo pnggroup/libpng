@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.14 [October 23, 2014]
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
  * Copyright (c) 2014 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -5560,6 +5560,7 @@ typedef struct transform_display
    /* Local variables */
    png_byte output_colour_type;
    png_byte output_bit_depth;
+   png_byte unpacked;
 
    /* Modifications (not necessarily used.) */
    gama_modification gama_mod;
@@ -5724,6 +5725,7 @@ transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
    /* Local variable fields */
    dp->output_colour_type = 255; /* invalid */
    dp->output_bit_depth = 255;  /* invalid */
+   dp->unpacked = 0; /* not unpacked */
 }
 
 static void
@@ -5785,7 +5787,8 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    }
 
    /* Use a test pixel to check that the output agrees with what we expect -
-    * this avoids running the whole test if the output is unexpected.
+    * this avoids running the whole test if the output is unexpected.  This also
+    * checks for internal errors.
     */
    {
       image_pixel test_pixel;
@@ -5831,22 +5834,41 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
       }
 
       /* If both bit depth and colour type are correct check the sample depth.
-       * I believe these are both internal errors.
        */
-      if (test_pixel.colour_type == PNG_COLOR_TYPE_PALETTE)
-      {
-         if (test_pixel.sample_depth != 8) /* oops - internal error! */
-            png_error(pp, "pngvalid: internal: palette sample depth not 8");
-      }
-      else if (test_pixel.sample_depth != dp->output_bit_depth)
+      if (test_pixel.colour_type == PNG_COLOR_TYPE_PALETTE &&
+          test_pixel.sample_depth != 8) /* oops - internal error! */
+         png_error(pp, "pngvalid: internal: palette sample depth not 8");
+      else if (dp->unpacked && test_pixel.bit_depth != 8)
+         png_error(pp, "pngvalid: internal: bad unpacked pixel depth");
+      else if (!dp->unpacked && test_pixel.colour_type != PNG_COLOR_TYPE_PALETTE
+              && test_pixel.bit_depth != test_pixel.sample_depth)
       {
          char message[128];
          size_t pos = safecat(message, sizeof message, 0,
             "internal: sample depth ");
 
+         /* Because unless something has set 'unpacked' or the image is palette
+          * mapped we expect the transform to keep sample depth and bit depth
+          * the same.
+          */
+         pos = safecatn(message, sizeof message, pos, test_pixel.sample_depth);
+         pos = safecat(message, sizeof message, pos, " expected ");
+         pos = safecatn(message, sizeof message, pos, test_pixel.bit_depth);
+
+         png_error(pp, message);
+      }
+      else if (test_pixel.bit_depth != dp->output_bit_depth)
+      {
+         /* This could be a libpng error too; libpng has not produced what we
+          * expect for the output bit depth.
+          */
+         char message[128];
+         size_t pos = safecat(message, sizeof message, 0,
+            "internal: bit depth ");
+
          pos = safecatn(message, sizeof message, pos, dp->output_bit_depth);
          pos = safecat(message, sizeof message, pos, " expected ");
-         pos = safecatn(message, sizeof message, pos, test_pixel.sample_depth);
+         pos = safecatn(message, sizeof message, pos, test_pixel.bit_depth);
 
          png_error(pp, message);
       }
@@ -7397,6 +7419,130 @@ IT(background);
 #define PT ITSTRUCT(background)
 #endif /* PNG_READ_BACKGROUND_SUPPORTED */
 
+/* png_set_quantize(png_structp, png_colorp palette, int num_palette,
+ *    int maximum_colors, png_const_uint_16p histogram, int full_quantize)
+ *
+ * Very difficult to validate this!
+ */
+/*NOTE: TBD NYI */
+
+/* The data layout transforms are handled by swapping our own channel data,
+ * necessarily these need to happen at the end of the transform list because the
+ * semantic of the channels changes after these are executed.  Some of these,
+ * like set_shift and set_packing, can't be done at present because they change
+ * the layout of the data at the sub-sample level so sample() won't get the
+ * right answer.
+ */
+/* png_set_invert_alpha */
+/*NOTE: TBD NYI */
+
+/* png_set_bgr */
+/*NOTE: TBD NYI */
+
+/* png_set_swap_alpha */
+/*NOTE: TBD NYI */
+
+/* png_set_swap */
+/*NOTE: TBD NYI */
+
+/* png_set_filler, (png_structp png_ptr, png_uint_32 filler, int flags)); */
+/*NOTE: TBD NYI */
+
+/* png_set_add_alpha, (png_structp png_ptr, png_uint_32 filler, int flags)); */
+/*NOTE: TBD NYI */
+
+/* png_set_packing */
+#ifdef PNG_READ_PACK_SUPPORTED
+/* Use 1 byte per pixel in 1, 2, or 4-bit depth files.
+ *
+ *  png_set_packing(png_structrp png_ptr)
+ *
+ * This should only affect grayscale and palette images with less than 8 bits
+ * per pixel.
+ */
+static void
+image_transform_png_set_packing_set(PNG_CONST image_transform *this,
+    transform_display *that, png_structp pp, png_infop pi)
+{
+   png_set_packing(pp);
+   that->unpacked = 1;
+   this->next->set(this->next, that, pp, pi);
+}
+
+static void
+image_transform_png_set_packing_mod(PNG_CONST image_transform *this,
+    image_pixel *that, png_const_structp pp,
+    PNG_CONST transform_display *display)
+{
+   /* The general expand case depends on what the colour type is,
+    * low bit-depth pixel values are unpacked into bytes without
+    * scaling, so sample_depth is not changed.
+    */
+   if (that->bit_depth < 8) /* grayscale or palette */
+      that->bit_depth = 8;
+
+   this->next->mod(this->next, that, pp, display);
+}
+
+static int
+image_transform_png_set_packing_add(image_transform *this,
+    PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
+{
+   UNUSED(colour_type)
+
+   this->next = *that;
+   *that = this;
+
+   /* Nothing should happen unless the bit depth is less than 8: */
+   return bit_depth < 8;
+}
+
+IT(packing);
+#undef PT
+#define PT ITSTRUCT(packing)
+
+#endif /* PNG_READ_PACK_SUPPORTED */
+
+/* png_set_packswap */
+/*NOTE: TBD NYI */
+
+/* png_set_invert_mono */
+/*NOTE: TBD NYI */
+
+/* png_set_shift(png_structp, png_const_color_8p true_bits) */
+/*NOTE: TBD NYI */
+
+#ifdef THIS_IS_THE_PROFORMA
+static void
+image_transform_png_set_@_set(PNG_CONST image_transform *this,
+    transform_display *that, png_structp pp, png_infop pi)
+{
+   png_set_@(pp);
+   this->next->set(this->next, that, pp, pi);
+}
+
+static void
+image_transform_png_set_@_mod(PNG_CONST image_transform *this,
+    image_pixel *that, png_const_structp pp,
+    PNG_CONST transform_display *display)
+{
+   this->next->mod(this->next, that, pp, display);
+}
+
+static int
+image_transform_png_set_@_add(image_transform *this,
+    PNG_CONST image_transform **that, png_byte colour_type, png_byte bit_depth)
+{
+   this->next = *that;
+   *that = this;
+
+   return 1;
+}
+
+IT(@);
+#endif
+
+
 /* This may just be 'end' if all the transforms are disabled! */
 static image_transform *PNG_CONST image_transform_first = &PT;
 
@@ -7573,83 +7719,6 @@ image_transform_add(PNG_CONST image_transform **this, unsigned int max,
          return 0;
    }
 }
-
-#ifdef THIS_IS_THE_PROFORMA
-static void
-image_transform_png_set_@_set(PNG_CONST image_transform *this,
-    transform_display *that, png_structp pp, png_infop pi)
-{
-   png_set_@(pp);
-   this->next->set(this->next, that, pp, pi);
-}
-
-static void
-image_transform_png_set_@_mod(PNG_CONST image_transform *this,
-    image_pixel *that, png_const_structp pp,
-    PNG_CONST transform_display *display)
-{
-   this->next->mod(this->next, that, pp, display);
-}
-
-static int
-image_transform_png_set_@_add(image_transform *this,
-    PNG_CONST image_transform **that, char *name, size_t sizeof_name,
-    size_t *pos, png_byte colour_type, png_byte bit_depth)
-{
-   this->next = *that;
-   *that = this;
-
-   *pos = safecat(name, sizeof_name, *pos, " +@");
-
-   return 1;
-}
-
-IT(@);
-#endif
-
-/* png_set_quantize(png_structp, png_colorp palette, int num_palette,
- *    int maximum_colors, png_const_uint_16p histogram, int full_quantize)
- *
- * Very difficult to validate this!
- */
-/*NOTE: TBD NYI */
-
-/* The data layout transforms are handled by swapping our own channel data,
- * necessarily these need to happen at the end of the transform list because the
- * semantic of the channels changes after these are executed.  Some of these,
- * like set_shift and set_packing, can't be done at present because they change
- * the layout of the data at the sub-sample level so sample() won't get the
- * right answer.
- */
-/* png_set_invert_alpha */
-/*NOTE: TBD NYI */
-
-/* png_set_bgr */
-/*NOTE: TBD NYI */
-
-/* png_set_swap_alpha */
-/*NOTE: TBD NYI */
-
-/* png_set_swap */
-/*NOTE: TBD NYI */
-
-/* png_set_filler, (png_structp png_ptr, png_uint_32 filler, int flags)); */
-/*NOTE: TBD NYI */
-
-/* png_set_add_alpha, (png_structp png_ptr, png_uint_32 filler, int flags)); */
-/*NOTE: TBD NYI */
-
-/* png_set_packing */
-/*NOTE: TBD NYI */
-
-/* png_set_packswap */
-/*NOTE: TBD NYI */
-
-/* png_set_invert_mono */
-/*NOTE: TBD NYI */
-
-/* png_set_shift(png_structp, png_const_color_8p true_bits) */
-/*NOTE: TBD NYI */
 
 static void
 perform_transform_test(png_modifier *pm)
