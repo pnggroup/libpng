@@ -4970,6 +4970,8 @@ Version 1.7.0beta45 [December 28, 2014]
     png_read_row to skip the unnecessary row de-interlace stuff.
   Added testing of png_set_packing() to pngvalid.c
 
+Version 1.7.0beta46 [December 28, 2014]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
