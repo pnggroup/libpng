@@ -1,4 +1,4 @@
-Libpng 1.6.17beta01 - December 28, 2014
+Libpng 1.6.17beta01 - December 29, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,12 +25,14 @@ Other information:
 
 Changes since the last public release (1.6.16):
 
-Version 1.6.17beta01 [December 28, 2014]
+Version 1.6.17beta01 [December 29, 2014]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
   Removed user limits from pngfix. Also pass NULL pointers to
     png_read_row to skip the unnecessary row de-interlace stuff.
   Added testing of png_set_packing() to pngvalid.c
+  Regenerated configure scripts in the *.tar distributions with libtool-2.4.4
+  Fixed byte order in 2-byte filler, in png_do_read_filler().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -5125,12 +5125,14 @@ Version 1.6.16rc03 [December 21, 2014]
 Version 1.6.16 [December 22, 2014]
   No changes.
 
-Version 1.6.17beta01 [December 28, 2014]
+Version 1.6.17beta01 [December 29, 2014]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
   Removed user limits from pngfix. Also pass NULL pointers to
     png_read_row to skip the unnecessary row de-interlace stuff.
   Added testing of png_set_packing() to pngvalid.c
+  Regenerated configure scripts in the *.tar distributions with libtool-2.4.4
+  Fixed byte order in 2-byte filler, in png_do_read_filler().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
