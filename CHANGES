@@ -4290,7 +4290,8 @@ Version 1.5.21rc03 [December 21, 2014]
 Version 1.5.21 [December 22, 2014]
   No changes.
 
-Version 1.5.22beta01 [December 22, 2014]
+Version 1.5.22beta01 [December 29, 2014]
+  Regenerated configure scripts with libtool-2.4.4
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

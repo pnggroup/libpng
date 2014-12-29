@@ -1,5 +1,5 @@
 
-Libpng 1.5.22beta01 - December 22, 2014
+Libpng 1.5.22beta01 - December 29, 2014
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,7 +27,8 @@ Other information:
 
 Changes since the last public release (1.5.21):
 
-Version 1.5.22beta01 [December 22, 2014]
+Version 1.5.22beta01 [December 29, 2014]
+  Regenerated configure scripts with libtool-2.4.4
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
