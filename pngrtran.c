@@ -2613,13 +2613,13 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             png_bytep dp = sp  + (png_size_t)row_width * 2;
             for (i = 1; i < row_width; i++)
             {
-               *(--dp) = hi_filler;
                *(--dp) = lo_filler;
+               *(--dp) = hi_filler;
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
             }
-            *(--dp) = hi_filler;
             *(--dp) = lo_filler;
+            *(--dp) = hi_filler;
             row_info->channels = 2;
             row_info->pixel_depth = 32;
             row_info->rowbytes = row_width * 4;
@@ -2634,8 +2634,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             {
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
-               *(--dp) = hi_filler;
                *(--dp) = lo_filler;
+               *(--dp) = hi_filler;
             }
             row_info->channels = 2;
             row_info->pixel_depth = 32;
@@ -2694,8 +2694,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
             png_bytep dp = sp  + (png_size_t)row_width * 2;
             for (i = 1; i < row_width; i++)
             {
-               *(--dp) = hi_filler;
                *(--dp) = lo_filler;
+               *(--dp) = hi_filler;
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
@@ -2703,8 +2703,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
             }
-            *(--dp) = hi_filler;
             *(--dp) = lo_filler;
+            *(--dp) = hi_filler;
             row_info->channels = 4;
             row_info->pixel_depth = 64;
             row_info->rowbytes = row_width * 8;
@@ -2723,8 +2723,8 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
                *(--dp) = *(--sp);
-               *(--dp) = hi_filler;
                *(--dp) = lo_filler;
+               *(--dp) = hi_filler;
             }
 
             row_info->channels = 4;
