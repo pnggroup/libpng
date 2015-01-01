@@ -2,7 +2,7 @@
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1625,7 +1625,7 @@ png_init_read_transformations(png_structrp png_ptr)
       png_build_gamma_tables(png_ptr, png_ptr->bit_depth);
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
-      if (png_ptr->transformations & PNG_COMPOSE)
+      if ((png_ptr->transformations & PNG_COMPOSE) != 0)
       {
          /* Issue a warning about this combination: because RGB_TO_GRAY is
           * optimized to do the gamma transform if present yet do_background has

@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.6.15 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.15 [November 20, 2014]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -478,7 +478,7 @@ png_do_packswap(png_row_infop row_info, png_bytep row)
          *rp = table[*rp];
    }
 }
-#endif /* READ_PACKSWAP or WRITE_PACKSWAP */
+#endif /* PACKSWAP || WRITE_PACKSWAP */
 
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
@@ -675,7 +675,7 @@ png_do_bgr(png_row_infop row_info, png_bytep row)
 #endif
    }
 }
-#endif /* READ_BGR or WRITE_BGR */
+#endif /* READ_BGR || WRITE_BGR */
 
 #if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
     defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
@@ -845,6 +845,5 @@ png_get_current_pass_number(png_const_structrp png_ptr)
    return 8; /* invalid */
 }
 #endif /* USER_TRANSFORM_INFO */
-#endif /* READ_USER_TRANSFORM ||
-          PNG_WRITE_USER_TRANSFORM_SUPPORTED */
+#endif /* READ_USER_TRANSFORM || WRITE_USER_TRANSFORM */
 #endif /* READ || WRITE */

@@ -60,10 +60,10 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-dnl libtool/libtoolize; version 2.4.2 is the tested version, this or any
+dnl libtool/libtoolize; version 2.4.4 is the tested version, this or any
 dnl compatible later version may be used
 LT_INIT([win32-dll])
-LT_PREREQ([2.4.2])
+LT_PREREQ([2.4.4])
 
 # Some awks crash when confronted with pnglibconf.dfa, do a test run now
 # to make sure this doesn't happen

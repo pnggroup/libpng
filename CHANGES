@@ -4970,7 +4970,7 @@ Version 1.7.0beta45 [December 28, 2014]
     png_read_row to skip the unnecessary row de-interlace stuff.
   Added testing of png_set_packing() to pngvalid.c
 
-Version 1.7.0beta46 [December 29, 2014]
+Version 1.7.0beta46 [January 1, 2015]
   Regenerated configure scripts in the tar distributions with libtool-2.4.4
   Implement previously untested cases of libpng transforms in pngvalid.c
   Fixed byte order in 2-byte filler, in png_do_read_filler().
