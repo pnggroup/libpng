@@ -5125,7 +5125,7 @@ Version 1.6.16rc03 [December 21, 2014]
 Version 1.6.16 [December 22, 2014]
   No changes.
 
-Version 1.6.17beta01 [December 29, 2014]
+Version 1.6.17beta01 [January 1, 2015]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
   Removed user limits from pngfix. Also pass NULL pointers to

@@ -1,6 +1,6 @@
 /* pngfix.c
  *
- * Copyright (c) 2014 John Cunningham Bowler
+ * Copyright (c) 2014-2015 John Cunningham Bowler
  *
  * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
  *

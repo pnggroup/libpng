@@ -4444,8 +4444,11 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_debug1(3, "height = %u,", png_ptr->height);
    png_debug1(3, "iwidth = %u,", png_ptr->iwidth);
    png_debug1(3, "num_rows = %u,", png_ptr->num_rows);
-   png_debug1(3, "rowbytes = %lu,", (unsigned long)png_ptr->rowbytes);
-   png_debug1(3, "irowbytes = %lu",
+   png_debug1(3, "row_bytes = %lu,", (unsigned long)row_bytes);
+   png_debug1(3, "png_ptr->rowbytes = %lu,", (unsigned long)png_ptr->rowbytes);
+   png_debug1(3, "png_ptr->info_rowbytes = %lu,",
+       (unsigned long)png_ptr->info_rowbytes);
+   png_debug1(3, "PNG_ROWBYTES = %lu",
        (unsigned long)PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1);
 
    /* The sequential reader needs a buffer for IDAT, but the progressive reader
