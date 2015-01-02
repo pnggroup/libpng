@@ -5641,6 +5641,10 @@ semicolon in your definition, e.g.,
     #  endif
     #endif
 
+The png_get_IHDR() function now allows users to supply NULL for any
+argument in which they aren't interested.  Previously, the width, height,
+bit_depth, and color_type arguments were not allowed to be NULL.
+
 The 8-bit compose and rgb_to_grayscale operations were made more accurate.
 While these did not introduce API incompatibility, there may be differences
 in unit test results.
