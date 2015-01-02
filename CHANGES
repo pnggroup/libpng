@@ -4976,6 +4976,8 @@ Version 1.7.0beta46 [January 2, 2015]
   Fixed byte order in 2-byte filler, in png_do_read_filler().
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
 
+Version 1.7.0beta47 [January 2, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

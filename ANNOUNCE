@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta46 - January 2, 2015
+Libpng 1.7.0beta47 - January 2, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta46.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta46.tar.gz
+   1.7.0beta47.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta47.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b46.7z  (LZMA-compressed, recommended)
-   lp170b46.zip
+   lp170b47.7z  (LZMA-compressed, recommended)
+   lp170b47.zip
 
 Other information:
 
-   1.7.0beta46-README.txt
-   1.7.0beta46-LICENSE.txt
-   libpng-1.7.0beta46-*.asc (armored detached GPG signatures)
+   1.7.0beta47-README.txt
+   1.7.0beta47-LICENSE.txt
+   libpng-1.7.0beta47-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -686,6 +686,8 @@ Version 1.7.0beta46 [January 2, 2015]
   Implement previously untested cases of libpng transforms in pngvalid.c
   Fixed byte order in 2-byte filler, in png_do_read_filler().
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
+
+Version 1.7.0beta47 [January 2, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
