@@ -989,7 +989,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
       if (trans_color != NULL && info_ptr->bit_depth < 16)
       {
-         png_uint_16 sample_max = (1 << info_ptr->bit_depth) - 1;
+         unsigned int sample_max = (1U << info_ptr->bit_depth) - 1U;
 
          if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
              trans_color->gray <= sample_max) ||
