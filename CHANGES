@@ -5114,18 +5114,19 @@ Version 1.6.16beta03 [December 21, 2014]
 
 Version 1.6.16rc01 [December 21, 2014]
   Restored a test on width that was removed from png.c at libpng-1.6.9
-    (Bug report by Alex Eubanks).
+    (Bug report by Alex Eubanks, CVE-2015-0973).
 
 Version 1.6.16rc02 [December 21, 2014]
   Undid the update to pngrutil.c in 1.6.16rc01.
 
 Version 1.6.16rc03 [December 21, 2014]
-  Fixed an overflow in png_combine_row with very wide interlaced images.
+  Fixed an overflow in png_combine_row() with very wide interlaced images
+    (Bug report and fix by John Bowler, CVE-2014-9495).
 
 Version 1.6.16 [December 22, 2014]
   No changes.
 
-Version 1.6.17beta01 [January 1, 2015]
+Version 1.6.17beta01 [January 11, 2015]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
   Removed user limits from pngfix. Also pass NULL pointers to
