@@ -4956,8 +4956,9 @@ Version 1.7.0beta43 [December 18, 2014]
 
 Version 1.7.0beta44 [December 23, 2014]
   Restored a test on width that was removed from png.c at libpng-1.6.9
-    (Bug report by Alex Eubanks, CVE-2014-9495).
-  Fixed an overflow in png_combine_row with very wide interlaced images.
+    (Bug report by Alex Eubanks, CVE-2015-0973).
+  Fixed an overflow in png_combine_row() with very wide interlaced images
+    (Bug report and fix by John Bowler, CVE-2014-9475).
   Corrected the width limit calculation in png_check_IHDR().
   Removed extraneous handling of PNG_SAFE_LIMITS_SUPPORTED from pngconf.h
 
@@ -4976,7 +4977,7 @@ Version 1.7.0beta46 [January 2, 2015]
   Fixed byte order in 2-byte filler, in png_do_read_filler().
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
 
-Version 1.7.0beta47 [January 8, 2015]
+Version 1.7.0beta47 [January 11, 2015]
   Made the check for out-of-range values in png_set_tRNS() work on
     16-bit platforms.
 
