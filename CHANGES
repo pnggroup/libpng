@@ -4977,9 +4977,9 @@ Version 1.7.0beta46 [January 2, 2015]
   Fixed byte order in 2-byte filler, in png_do_read_filler().
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
 
-Version 1.7.0beta47 [January 11, 2015]
-  Made the check for out-of-range values in png_set_tRNS() work on
-    16-bit platforms.
+Version 1.7.0beta47 [January 13, 2015]
+  Made the check for out-of-range values in png_set_tRNS() detect
+    values that are exactly 2^bit_depth, and work on 16-bit platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
