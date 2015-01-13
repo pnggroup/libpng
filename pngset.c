@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.5.20 [November 20, 2014]
+ * Last changed in libpng 1.5.22 [(PENDING RELEASE)]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -926,16 +926,19 @@ png_set_tRNS(png_structp png_ptr, png_infop info_ptr,
 
    if (trans_color != NULL)
    {
-      int sample_max = (1 << info_ptr->bit_depth);
+      if (info_ptr->bit_depth < 16)
+      {
+         unsigned int sample_max = (1U << info_ptr->bit_depth) - 1U;
 
-      if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
-          (int)trans_color->gray > sample_max) ||
-          (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
-          ((int)trans_color->red > sample_max ||
-          (int)trans_color->green > sample_max ||
-          (int)trans_color->blue > sample_max)))
-         png_warning(png_ptr,
-            "tRNS chunk has out-of-range samples for bit_depth");
+         if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+             trans_color->gray > sample_max) ||
+             (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+             (trans_color->red > sample_max ||
+             trans_color->green > sample_max ||
+             trans_color->blue > sample_max)))
+           png_warning(png_ptr,
+              "tRNS chunk has out-of-range samples for bit_depth");
+      }
 
       png_memcpy(&(info_ptr->trans_color), trans_color,
          png_sizeof(png_color_16));
