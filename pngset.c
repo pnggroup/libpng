@@ -945,21 +945,24 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
    if (trans_color != NULL)
    {
-      int sample_max = (1 << info_ptr->bit_depth);
+      if (info_ptr->bit_depth < 16)
+      {
+         unsigned int sample_max = (1U << info_ptr->bit_depth) - 1U;
 
-      if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
-          trans_color->gray > sample_max) ||
-          (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
-          (trans_color->red > sample_max ||
-          trans_color->green > sample_max ||
-          trans_color->blue > sample_max)))
-         png_warning(png_ptr,
-            "tRNS chunk has out-of-range samples for bit_depth");
-
-      info_ptr->trans_color = *trans_color;
+         if ((info_ptr->color_type == PNG_COLOR_TYPE_GRAY &&
+             trans_color->gray > sample_max) ||
+             (info_ptr->color_type == PNG_COLOR_TYPE_RGB &&
+             (trans_color->red > sample_max ||
+             trans_color->green > sample_max ||
+             trans_color->blue > sample_max)))
+           png_warning(png_ptr,
+              "tRNS chunk has out-of-range samples for bit_depth");
+      }
 
       if (num_trans == 0)
          num_trans = 1;
+
+      info_ptr->trans_color = *trans_color;
    }
 
    info_ptr->num_trans = (png_uint_16)num_trans;

@@ -5126,7 +5126,7 @@ Version 1.6.16rc03 [December 21, 2014]
 Version 1.6.16 [December 22, 2014]
   No changes.
 
-Version 1.6.17beta01 [January 11, 2015]
+Version 1.6.17beta01 [January 13, 2015]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
   Removed user limits from pngfix. Also pass NULL pointers to
@@ -5135,6 +5135,8 @@ Version 1.6.17beta01 [January 11, 2015]
   Regenerated configure scripts in the *.tar distributions with libtool-2.4.4
   Implement previously untested cases of libpng transforms in pngvalid.c
   Fixed byte order in 2-byte filler, in png_do_read_filler().
+  Made the check for out-of-range values in png_set_tRNS() detect
+    values that are exactly 2^bit_depth, and work on 16-bit platforms.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
