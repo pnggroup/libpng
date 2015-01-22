@@ -2920,6 +2920,9 @@ version 1.4.14rc02 [November 17, 2014]
   Added "-D_CRT_SECURE_NO_WARNINGS" to CFLAGS in scripts/makefile.vcwin32
 
 version 1.4.14 [November 20, 2014]
+  No changes.
+
+version 1.4.15beta01 [%RDATE%]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
