@@ -1,5 +1,5 @@
 
-Libpng 1.4.15beta01 - January 22, 2015
+Libpng 1.4.15beta01 - January 27, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,7 +27,7 @@ Other information:
 
 Changes since the last public release (1.4.14):
 
-version 1.4.15beta01 [January 22, 2015]
+version 1.4.15beta01 [January 27, 2015]
   Restored test for maximum allowed image width that was removed from
     libpng-1.4.13 (fixes CVE-2014-9495 and CVE-2015-0973).
 
