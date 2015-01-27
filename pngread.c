@@ -1,8 +1,8 @@
 
 /* pngread.c - read a PNG file
  *
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -814,8 +814,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
          /* Zero length IDATs are legal after the last IDAT has been
           * read, but not after other chunks have been read.
           */
-         if ((length > 0) ||
-             (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT) != 0)
+         if ((length > 0) || (png_ptr->mode & PNG_HAVE_CHUNK_AFTER_IDAT) != 0)
             png_benign_error(png_ptr, "Too many IDATs found");
 
          png_crc_finish(png_ptr, length);
@@ -3246,7 +3245,7 @@ png_image_read_composite(png_voidp argument)
       png_uint_32  width = image->width;
       ptrdiff_t    step_row = display->row_bytes;
       unsigned int channels =
-         (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
+          (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
       int pass;
 
       for (pass = 0; pass < passes; ++pass)

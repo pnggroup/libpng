@@ -2,11 +2,11 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
- * Last changed in libpng 1.6.10 [March 6, 1014]]
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -582,13 +582,13 @@
 #define PNG_RGB_TO_GRAY_WARN  0x400000
 #define PNG_RGB_TO_GRAY       0x600000 /* two bits, RGB_TO_GRAY_ERR|WARN */
 #define PNG_ENCODE_ALPHA      0x800000 /* Added to libpng-1.5.4 */
-#define PNG_ADD_ALPHA         0x1000000 /* Added to libpng-1.2.7 */
-#define PNG_EXPAND_tRNS       0x2000000 /* Added to libpng-1.2.9 */
-#define PNG_SCALE_16_TO_8     0x4000000 /* Added to libpng-1.5.4 */
-                       /*   0x8000000 unused */
-                       /*  0x10000000 unused */
-                       /*  0x20000000 unused */
-                       /*  0x40000000 unused */
+#define PNG_ADD_ALPHA        0x1000000 /* Added to libpng-1.2.7 */
+#define PNG_EXPAND_tRNS      0x2000000 /* Added to libpng-1.2.9 */
+#define PNG_SCALE_16_TO_8    0x4000000 /* Added to libpng-1.5.4 */
+                       /*    0x8000000 unused */
+                       /*   0x10000000 unused */
+                       /*   0x20000000 unused */
+                       /*   0x40000000 unused */
 /* Flags for png_create_struct */
 #define PNG_STRUCT_PNG   0x0001
 #define PNG_STRUCT_INFO  0x0002
@@ -910,7 +910,7 @@ PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_base,(png_const_structrp png_ptr,
 #if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
    defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED)
 /* Internal array allocator, outputs no error or warning messages on failure,
- * just returns NULL.  
+ * just returns NULL.
  */
 PNG_INTERNAL_FUNCTION(png_voidp,png_malloc_array,(png_const_structrp png_ptr,
    int nelements, size_t element_size),PNG_ALLOCATED);

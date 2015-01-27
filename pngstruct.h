@@ -101,7 +101,7 @@ typedef struct png_XYZ
 #endif /* COLORSPACE */
 
 #if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
-/* A colorspace is all the above plus, potentially, profile information,
+/* A colorspace is all the above plus, potentially, profile information;
  * however at present libpng does not use the profile internally so it is only
  * stored in the png_info struct (if iCCP is supported.)  The rendering intent
  * is retained here and is checked.
