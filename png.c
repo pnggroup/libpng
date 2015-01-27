@@ -1,8 +1,8 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.16 [December 22, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -140,8 +140,10 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
       do
       {
          uInt safe_length = (uInt)length;
+#ifndef __COVERITY__
          if (safe_length == 0)
             safe_length = (uInt)-1; /* evil, but safe */
+#endif
 
          crc = crc32(crc, ptr, safe_length);
 
@@ -476,9 +478,10 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    /* Free any tRNS entry */
    if (((mask & PNG_FREE_TRNS) & info_ptr->free_me) != 0)
    {
+      info_ptr->valid &= ~PNG_INFO_tRNS;
       png_free(png_ptr, info_ptr->trans_alpha);
       info_ptr->trans_alpha = NULL;
-      info_ptr->valid &= ~PNG_INFO_tRNS;
+      info_ptr->num_trans = 0;
    }
 #endif
 
@@ -666,7 +669,7 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
 }
 #  endif
 
-#ifdef PNG_SAVE_INT_32_SUPPORTED
+#  ifdef PNG_SAVE_INT_32_SUPPORTED
 /* The png_save_int_32 function assumes integers are stored in two's
  * complement format.  If this isn't the case, then this routine needs to
  * be modified to write data in two's complement format.  Note that,
@@ -681,7 +684,7 @@ png_save_int_32(png_bytep buf, png_int_32 i)
    buf[2] = (png_byte)((i >> 8) & 0xff);
    buf[3] = (png_byte)(i & 0xff);
 }
-#endif
+#  endif
 
 #  ifdef PNG_TIME_RFC1123_SUPPORTED
 /* Convert the supplied time into an RFC 1123 string suitable for use in
@@ -734,7 +737,7 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
    return 1;
 }
 
-#     if PNG_LIBPNG_VER < 10700
+#    if PNG_LIBPNG_VER < 10700
 /* To do: remove the following from libpng-1.7 */
 /* Original API that uses a private buffer in png_struct.
  * Deprecated because it causes png_struct to carry a spurious temporary
@@ -755,7 +758,7 @@ png_convert_to_rfc1123(png_structrp png_ptr, png_const_timep ptime)
 
    return NULL;
 }
-#     endif
+#    endif /* LIBPNG_VER < 10700 */
 #  endif /* TIME_RFC1123 */
 
 #endif /* READ || WRITE */
@@ -769,13 +772,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17beta01 - January 1, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.17beta01 - January 27, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17beta01 - January 1, 2015\
+      return "libpng version 1.6.17beta01 - January 27, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2324,8 +2327,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
                    */
                   else if (png_sRGB_checks[i].have_md5 == 0)
                   {
-                     png_chunk_report(png_ptr, "out-of-date sRGB profile with"
-                        " no signature",
+                     png_chunk_report(png_ptr,
+                        "out-of-date sRGB profile with no signature",
                         PNG_CHUNK_WARNING);
                   }
 
@@ -2338,8 +2341,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
           * way.  This probably indicates a data error or uninformed hacking.
           * Fall through to "no match".
           */
-         png_chunk_report(png_ptr, "Not recognizing known sRGB profile that"
-             " has been edited", 
+         png_chunk_report(png_ptr,
+             "Not recognizing known sRGB profile that has been edited", 
              PNG_CHUNK_WARNING);
          break;
 # endif
@@ -2486,13 +2489,14 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image width is zero in IHDR");
       error = 1;
    }
-   else if (width > PNG_UINT_31_MAX)
+
+   if (width > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image width in IHDR");
       error = 1;
    }
 
-   else if (png_gt(((width + 7) & (~7)),
+   if (png_gt(((width + 7) & (~7)),
        ((PNG_SIZE_MAX
            - 48        /* big_row_buf hack */
            - 1)        /* filter byte */
@@ -2513,17 +2517,15 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image width is too large for this architecture");
       error = 1;
    }
-   else
+
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (width > png_ptr->user_width_max)
+#else
+   if (width > PNG_USER_WIDTH_MAX)
+#endif
    {
-#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
-      if (width > png_ptr->user_width_max)
-#     else
-      if (width > PNG_USER_WIDTH_MAX)
-#     endif
-      {
-         png_warning(png_ptr, "Image width exceeds user limit in IHDR");
-         error = 1;
-      }
+      png_warning(png_ptr, "Image width exceeds user limit in IHDR");
+      error = 1;
    }
 
    if (height == 0)
@@ -2531,22 +2533,21 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image height is zero in IHDR");
       error = 1;
    }
-   else if (height > PNG_UINT_31_MAX)
+
+   if (height > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image height in IHDR");
       error = 1;
    }
-   else
+
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (height > png_ptr->user_height_max)
+#else
+   if (height > PNG_USER_HEIGHT_MAX)
+#endif
    {
-#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
-      if (height > png_ptr->user_height_max)
-#     else
-      if (height > PNG_USER_HEIGHT_MAX)
-#     endif
-      {
-         png_warning(png_ptr, "Image height exceeds user limit in IHDR");
-         error = 1;
-      }
+      png_warning(png_ptr, "Image height exceeds user limit in IHDR");
+      error = 1;
    }
 
    /* Check other values */
@@ -2585,7 +2586,7 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-#  ifdef PNG_MNG_FEATURES_SUPPORTED
+#ifdef PNG_MNG_FEATURES_SUPPORTED
    /* Accept filter_method 64 (intrapixel differencing) only if
     * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
     * 2. Libpng did not read a PNG signature (this filter_method is only
@@ -2618,13 +2619,13 @@ png_check_IHDR(png_const_structrp png_ptr,
       }
    }
 
-#  else
+#else
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
       png_warning(png_ptr, "Unknown filter method in IHDR");
       error = 1;
    }
-#  endif
+#endif
 
    if (error == 1)
       png_error(png_ptr, "Invalid IHDR data");
@@ -3206,7 +3207,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
    png_error(png_ptr, "ASCII conversion buffer too small");
 }
 #   endif /* FIXED_POINT */
-#endif /* READ_SCAL */
+#endif /* SCAL */
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
    !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
@@ -3224,7 +3225,7 @@ png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
       png_fixed_error(png_ptr, text);
 
 #  ifndef PNG_ERROR_TEXT_SUPPORTED
-      PNG_UNUSED(text)
+   PNG_UNUSED(text)
 #  endif
 
    return (png_fixed_point)r;

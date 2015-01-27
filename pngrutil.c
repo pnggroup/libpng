@@ -1515,8 +1515,10 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                  else if (size > 0)
                                     errmsg = "truncated";
 
+#ifndef __COVERITY__
                                  else
                                     errmsg = png_ptr->zstream.msg;
+#endif
                               }
 
                               /* else png_icc_check_tag_table output an error */
