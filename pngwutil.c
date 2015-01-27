@@ -1432,7 +1432,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       {
          /* This is an error which can only be reliably detected late. */
          png_app_error(png_ptr,
-            "Invalid number of transparent colors specified");
+             "Invalid number of transparent colors specified");
          return;
       }
 
@@ -2348,7 +2348,8 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
  * been specified by the application, and then writes the row out with the
  * chosen filter.
  */
-static void png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
+static void /* PRIVATE */
+png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
    png_size_t row_bytes);
 
 #define PNG_MAXSUM (((png_uint_32)(-1)) >> 1)
@@ -3059,6 +3060,6 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
    {
       png_write_flush(png_ptr);
    }
-#endif
+#endif /* WRITE_FLUSH */
 }
 #endif /* WRITE */

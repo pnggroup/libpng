@@ -1142,21 +1142,21 @@ png_get_compression_buffer_size(png_const_structrp png_ptr)
    if (png_ptr == NULL)
       return 0;
 
-#  ifdef PNG_WRITE_SUPPORTED
+#ifdef PNG_WRITE_SUPPORTED
       if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
-#  endif
+#endif
    {
-#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
          return png_ptr->IDAT_read_size;
-#     else
+#else
          return PNG_IDAT_READ_SIZE;
-#     endif
+#endif
    }
 
-#  ifdef PNG_WRITE_SUPPORTED
+#ifdef PNG_WRITE_SUPPORTED
       else
          return png_ptr->zbuffer_size;
-#  endif
+#endif
 }
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
@@ -1187,7 +1187,7 @@ png_get_chunk_malloc_max (png_const_structrp png_ptr)
 {
    return (png_ptr ? png_ptr->user_chunk_malloc_max : 0);
 }
-#endif /* ?SET_USER_LIMITS */
+#endif /* SET_USER_LIMITS */
 
 /* These functions were added to libpng 1.4.0 */
 #ifdef PNG_IO_STATE_SUPPORTED
@@ -1202,7 +1202,7 @@ png_get_io_chunk_type (png_const_structrp png_ptr)
 {
    return png_ptr->chunk_name;
 }
-#endif /* ?IO_STATE */
+#endif /* IO_STATE */
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 #  ifdef PNG_GET_PALETTE_MAX_SUPPORTED

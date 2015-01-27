@@ -1099,7 +1099,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
           */
          png_write_alloc_filter_row_buffers(png_ptr, filters);
       }
-#  endif /* PNG_WRITE_FILTER_SUPPORTED */
+#  endif /* WRITE_FILTER */
 
    /* Finally store the value.
     * TODO: this field could probably be removed if neither READ nor

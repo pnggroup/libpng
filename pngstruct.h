@@ -103,7 +103,7 @@ typedef struct png_XYZ
 #endif /* COLORSPACE */
 
 #if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
-/* A colorspace is all the above plus, potentially, profile information,
+/* A colorspace is all the above plus, potentially, profile information;
  * however at present libpng does not use the profile internally so it is only
  * stored in the png_info struct (if iCCP is supported.)  The rendering intent
  * is retained here and is checked.
@@ -147,14 +147,14 @@ typedef const png_colorspace * PNG_RESTRICT png_const_colorspacerp;
 struct png_struct_def
 {
    /* Rearranged in libpng 1.7 to attempt to lessen padding; in general
-    * (char), (short), (int) and pointer types are kept separate, however
+    * (char), (short), (int) and pointer types are kept separate; however
     * associated members under the control of the same #define are still
     * together.
     */
 #ifdef PNG_SETJMP_SUPPORTED
    /* jmp_buf can have very high alignment requirements on some systems, so put
     * it first (the other setjmp members are later as they are infrequently
-    * accesed.)
+    * accessed.)
     */
    jmp_buf jmp_buf_local;
 #endif
@@ -247,7 +247,7 @@ struct png_struct_def
     */
    png_colorspace   colorspace;
 #endif
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    png_uint_32 user_width_max;        /* Maximum width on read */
@@ -428,7 +428,7 @@ struct png_struct_def
    png_uint_16p gamma_16_from_1; /* converts from 1.0 to screen */
    png_uint_16p gamma_16_to_1;   /* converts from file to 1.0 */
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
-#endif /* PNG_READ_GAMMA_SUPPORTED */
+#endif /* READ_GAMMA */
 
 #if defined(PNG_READ_tRNS_SUPPORTED) || \
    defined(PNG_READ_BACKGROUND_SUPPORTED) || \
