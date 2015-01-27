@@ -841,7 +841,7 @@ png_set_gamma(png_structrp png_ptr, double scrn_gamma, double file_gamma)
    png_set_gamma_fixed(png_ptr, convert_gamma_value(png_ptr, scrn_gamma),
       convert_gamma_value(png_ptr, file_gamma));
 }
-#  endif /* FLOATING_POINT_SUPPORTED */
+#  endif /* FLOATING_POINT */
 #endif /* READ_GAMMA */
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
@@ -1663,20 +1663,24 @@ png_init_read_transformations(png_structrp png_ptr)
                      unsigned int shift = png_ptr->gamma_shift;
                      unsigned int add = (shift > 0 ? 1U<<(shift-1) : 0);
 
-                     v = png_ptr->gamma_to_1[palette[i].red];
-                     png_composite_16(w, v, alpha, back_1.red);
-                     palette[i].red = png_ptr->gamma_from_1[(w+add)>>shift];
+                     if (png_ptr->gamma_to_1 != NULL)
+                     {
+                        v = png_ptr->gamma_to_1[palette[i].red];
+                        png_composite_16(w, v, alpha, back_1.red);
+                        palette[i].red = png_ptr->gamma_from_1[(w+add)>>shift];
 
-                     v = png_ptr->gamma_to_1[palette[i].green];
-                     png_composite_16(w, v, alpha, back_1.green);
-                     palette[i].green = png_ptr->gamma_from_1[(w+add)>>shift];
+                        v = png_ptr->gamma_to_1[palette[i].green];
+                        png_composite_16(w, v, alpha, back_1.green);
+                        palette[i].green =
+                           png_ptr->gamma_from_1[(w+add)>>shift];
 
-                     v = png_ptr->gamma_to_1[palette[i].blue];
-                     png_composite_16(w, v, alpha, back_1.blue);
-                     palette[i].blue = png_ptr->gamma_from_1[(w+add)>>shift];
+                        v = png_ptr->gamma_to_1[palette[i].blue];
+                        png_composite_16(w, v, alpha, back_1.blue);
+                        palette[i].blue = png_ptr->gamma_from_1[(w+add)>>shift];
+                     }
                   }
                }
-               else
+               else if (png_ptr->gamma_table != NULL)
                {
                   palette[i].red = png_ptr->gamma_table[palette[i].red];
                   palette[i].green = png_ptr->gamma_table[palette[i].green];
@@ -1712,11 +1716,14 @@ png_init_read_transformations(png_structrp png_ptr)
          /* NOTE: there are other transformations that should probably be in
           * here too.
           */
-         for (i = 0; i < num_palette; i++)
+         if (png_ptr->gamma_table != NULL)
          {
-            palette[i].red = png_ptr->gamma_table[palette[i].red];
-            palette[i].green = png_ptr->gamma_table[palette[i].green];
-            palette[i].blue = png_ptr->gamma_table[palette[i].blue];
+            for (i = 0; i < num_palette; i++)
+            {
+               palette[i].red = png_ptr->gamma_table[palette[i].red];
+               palette[i].green = png_ptr->gamma_table[palette[i].green];
+               palette[i].blue = png_ptr->gamma_table[palette[i].blue];
+            }
          }
 
          /* Done the gamma correction. */
@@ -2985,9 +2992,17 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
             {
                png_uint_16 red, green, blue, w;
 
+#if 0 /* Coverity doesn't like this */
                red   = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
                green = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
                blue  = (png_uint_16)(((*(sp))<<8) | *(sp + 1)); sp += 2;
+#else
+               png_byte hi,lo;
+
+               hi=*(sp)++; lo=*(sp)++; red   = (png_uint_16)((hi << 8) | (lo));
+               hi=*(sp)++; lo=*(sp)++; green = (png_uint_16)((hi << 8) | (lo));
+               hi=*(sp)++; lo=*(sp)++; blue  = (png_uint_16)((hi << 8) | (lo));
+#endif
 
                if (red == green && red == blue)
                {

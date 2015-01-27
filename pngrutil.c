@@ -1834,7 +1834,8 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
        &(png_ptr->trans_color));
 
-   png_ptr->trans_alpha = info_ptr->trans_alpha;
+   if (info_ptr != NULL)
+      png_ptr->trans_alpha = info_ptr->trans_alpha;
 }
 #endif
 
