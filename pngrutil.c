@@ -1499,8 +1499,10 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                  else if (size > 0)
                                     errmsg = "truncated";
 
+#ifndef __COVERITY__
                                  else
                                     errmsg = png_ptr->zstream.msg;
+#endif
                               }
 
                               /* else png_icc_check_tag_table output an error */
@@ -2829,7 +2831,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
       else
          /* Use the SAVE_UNKNOWN_CHUNKS code or skip the chunk */
-#  endif /* PNG_READ_USER_CHUNKS_SUPPORTED */
+#  endif /* READ_USER_CHUNKS */
 
 #  ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
       {
@@ -2896,7 +2898,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
                --(png_ptr->user_chunk_cache_max);
                /* FALL THROUGH */
             case 0: /* no limit */
-#     endif /* PNG_USER_LIMITS_SUPPORTED */
+#     endif /* USER_LIMITS */
                /* Here when the limit isn't reached or when limits are compiled
                 * out; store the chunk.
                 */

@@ -140,8 +140,10 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
       do
       {
          uInt safe_length = (uInt)length;
+#ifndef __COVERITY__
          if (safe_length == 0)
             safe_length = (uInt)-1; /* evil, but safe */
+#endif
 
          crc = crc32(crc, ptr, safe_length);
 
@@ -611,7 +613,7 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
 }
 #  endif
 
-#ifdef PNG_SAVE_INT_32_SUPPORTED
+#  ifdef PNG_SAVE_INT_32_SUPPORTED
 /* The png_save_int_32 function assumes integers are stored in two's
  * complement format.  If this isn't the case, then this routine needs to
  * be modified to write data in two's complement format.  Note that,
@@ -626,7 +628,7 @@ png_save_int_32(png_bytep buf, png_int_32 i)
    buf[2] = (png_byte)((i >> 8) & 0xff);
    buf[3] = (png_byte)(i & 0xff);
 }
-#endif
+#  endif
 
 #  ifdef PNG_TIME_RFC1123_SUPPORTED
 /* Convert the supplied time into an RFC 1123 string suitable for use in
@@ -678,7 +680,7 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 
    return 1;
 }
-#  endif /* PNG_TIME_RFC1123_SUPPORTED */
+#  endif /* TIME_RFC1123 */
 
 #endif /* READ || WRITE */
 
@@ -691,13 +693,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta47 - January 2, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta47 - January 27, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta47 - January 2, 2015\
+      return "libpng version 1.7.0beta47 - January 27, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1678,7 +1680,8 @@ is_ICC_signature_char(png_alloc_size_t it)
       (it >= 97 && it <= 122);
 }
 
-static int is_ICC_signature(png_alloc_size_t it)
+static int
+is_ICC_signature(png_alloc_size_t it)
 {
    return is_ICC_signature_char(it >> 24) /* checks all the top bits */ &&
       is_ICC_signature_char((it >> 16) & 0xff) &&
@@ -1742,7 +1745,7 @@ png_colorspace_set_sRGB(png_const_structrp png_ptr, png_colorspacerp colorspace,
    /* sRGB sets known gamma, end points and (from the chunk) intent. */
    /* IMPORTANT: these are not necessarily the values found in an ICC profile
     * because ICC profiles store values adapted to a D50 environment; it is
-    * expected that the ICC profile mediaWhitePointTag will be D50, see the
+    * expected that the ICC profile mediaWhitePointTag will be D50; see the
     * checks and code elsewhere to understand this better.
     *
     * These XYZ values, which are accurate to 5dp, produce rgb to gray
@@ -1979,7 +1982,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
             "invalid embedded Abstract ICC profile");
 
       case 0x6C696E6B: /* 'link' */
-         /* DeviceLink profiles cannnot be interpreted in a non-device specific
+         /* DeviceLink profiles cannot be interpreted in a non-device specific
           * fashion, if an app uses the AToB0Tag in the profile the results are
           * undefined unless the result is sent to the intended device,
           * therefore a DeviceLink profile should not be found embedded in a
@@ -1990,7 +1993,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
 
       case 0x6E6D636C: /* 'nmcl' */
          /* A NamedColor profile is also device specific, however it doesn't
-          * contain an AToB0 tag that is open to misintrepretation.  Almost
+          * contain an AToB0 tag that is open to misinterpretation.  Almost
           * certainly it will fail the tests below.
           */
          (void)png_icc_profile_error(png_ptr, NULL, name, temp,
@@ -2071,7 +2074,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 1; /* success, maybe with warnings */
 }
 
-#ifdef PNG_sRGB_SUPPORTED
+#if defined(PNG_sRGB_SUPPORTED) && PNG_sRGB_PROFILE_CHECKS >= 0
 /* Information about the known ICC sRGB profiles */
 static const struct
 {
@@ -2152,6 +2155,13 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 #endif
    unsigned int i;
 
+#ifdef PNG_SET_OPTION_SUPPORTED
+   /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
+   if (((png_ptr->options >> PNG_SKIP_sRGB_CHECK_PROFILE) & 3) ==
+               PNG_OPTION_ON)
+      return 0;
+#endif
+
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
    {
       if (png_get_uint_32(profile+84) == png_sRGB_checks[i].md5[0] &&
@@ -2229,7 +2239,6 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
                   return 1+png_sRGB_checks[i].is_broken;
                }
             }
-         }
 
 # if PNG_sRGB_PROFILE_CHECKS > 0
          /* The signature matched, but the profile had been changed in some
@@ -2239,7 +2248,9 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
          png_chunk_report(png_ptr,
              "Not recognizing known sRGB profile that has been edited", 
              PNG_CHUNK_WARNING);
+         break;
 # endif
+         }
       }
    }
 
@@ -2382,12 +2393,14 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image width is zero in IHDR");
       error = 1;
    }
-   else if (width > PNG_UINT_31_MAX)
+
+   if (width > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image width in IHDR");
       error = 1;
    }
-   else if (png_gt(((width + 7) & (~7)),
+
+   if (png_gt(((width + 7) & (~7)),
        ((PNG_SIZE_MAX
            - 48        /* big_row_buf hack */
            - 1)        /* filter byte */
@@ -2408,17 +2421,15 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image width is too large for this architecture");
       error = 1;
    }
-   else
+
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (width > png_ptr->user_width_max)
+#else
+   if (width > PNG_USER_WIDTH_MAX)
+#endif
    {
-#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
-      if (width > png_ptr->user_width_max)
-#     else
-      if (width > PNG_USER_WIDTH_MAX)
-#     endif
-      {
-         png_warning(png_ptr, "Image width exceeds user limit in IHDR");
-         error = 1;
-      }
+      png_warning(png_ptr, "Image width exceeds user limit in IHDR");
+      error = 1;
    }
 
    if (height == 0)
@@ -2426,22 +2437,21 @@ png_check_IHDR(png_const_structrp png_ptr,
       png_warning(png_ptr, "Image height is zero in IHDR");
       error = 1;
    }
-   else if (height > PNG_UINT_31_MAX)
+
+   if (height > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image height in IHDR");
       error = 1;
    }
-   else
+
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (height > png_ptr->user_height_max)
+#else
+   if (height > PNG_USER_HEIGHT_MAX)
+#endif
    {
-#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
-      if (height > png_ptr->user_height_max)
-#     else
-      if (height > PNG_USER_HEIGHT_MAX)
-#     endif
-      {
-         png_warning(png_ptr, "Image height exceeds user limit in IHDR");
-         error = 1;
-      }
+      png_warning(png_ptr, "Image height exceeds user limit in IHDR");
+      error = 1;
    }
 
    /* Check other values */
@@ -2480,7 +2490,7 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-#  ifdef PNG_MNG_FEATURES_SUPPORTED
+#ifdef PNG_MNG_FEATURES_SUPPORTED
    /* Accept filter_method 64 (intrapixel differencing) only if
     * 1. Libpng was compiled with PNG_MNG_FEATURES_SUPPORTED and
     * 2. Libpng did not read a PNG signature (this filter_method is only
@@ -2513,13 +2523,13 @@ png_check_IHDR(png_const_structrp png_ptr,
       }
    }
 
-#  else
+#else
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
       png_warning(png_ptr, "Unknown filter method in IHDR");
       error = 1;
    }
-#  endif
+#endif
 
    if (error == 1)
       png_error(png_ptr, "Invalid IHDR data");
@@ -2673,7 +2683,7 @@ png_check_fp_string(png_const_charp string, png_size_t size)
 
    return 0; /* i.e. fail */
 }
-#endif /* pCAL or sCAL */
+#endif /* pCAL || sCAL */
 
 #ifdef PNG_sCAL_SUPPORTED
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -4302,7 +4312,7 @@ const png_uint_16 png_sRGB_table[256] =
    61517,62082,62650,63221,63795,64372,64952,65535
 };
 
-#endif /* simplified read only */
+#endif /* SIMPLIFIED_READ */
 
 /* The base/delta tables are required for both read and write (but currently
  * only the simplified versions.)
@@ -4502,4 +4512,4 @@ png_image_error(png_imagep image, png_const_charp error_message)
 }
 
 #endif /* SIMPLIFIED READ/WRITE */
-#endif /* REA) || WRITE */
+#endif /* READ || WRITE */

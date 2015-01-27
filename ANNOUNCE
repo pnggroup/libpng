@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta47 - January 13, 2015
+Libpng 1.7.0beta47 - January 27, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -688,9 +688,14 @@ Version 1.7.0beta46 [January 2, 2015]
   Fixed byte order in 2-byte filler, in png_do_read_filler().
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
 
-Version 1.7.0beta47 [January 13, 2015]
+Version 1.7.0beta47 [January 27, 2015]
   Made the check for out-of-range values in png_set_tRNS() detect
     values that are exactly 2^bit_depth, and work on 16-bit platforms.
+  Added PNG_SKIP_sRGB_CHECK_PROFILE choice for png_set_option().
+  Report all IHDR errors before exiting png_check_IHDR().
+  Merged some parts of libpng-1.6.17beta01 and libpng-1.7.0beta47.
+  Added #ifndef __COVERITY__ where needed in png.c, pngrutil.c and
+    pngset.c to avoid warnings about dead code.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
