@@ -1,8 +1,8 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.5.21 [December 22, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.22 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -2549,20 +2549,23 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
     * compression type]".  The compression flag shall be 0 (no compression) or
     * 1 (compressed with method 0 - deflate.)
     */
-   if (comp_flag != 0 && comp_flag != 1)
+   if (comp_flag/*compressed*/ != 0)
    {
-      png_warning(png_ptr, "invalid iTXt compression flag");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
-   }
+     if (comp_flag != 1)
+     {
+        png_warning(png_ptr, "invalid iTXt compression flag");
+        png_free(png_ptr, png_ptr->chunkdata);
+        png_ptr->chunkdata = NULL;
+        return;
+     }
 
-   if (comp_flag/*compressed*/ && comp_type != 0)
-   {
-      png_warning(png_ptr, "unknown iTXt compression type");
-      png_free(png_ptr, png_ptr->chunkdata);
-      png_ptr->chunkdata = NULL;
-      return;
+     if (comp_type != 0)
+     {
+        png_warning(png_ptr, "unknown iTXt compression type");
+        png_free(png_ptr, png_ptr->chunkdata);
+        png_ptr->chunkdata = NULL;
+        return;
+     }
    }
 
    for (lang_key = lang; *lang_key; lang_key++)

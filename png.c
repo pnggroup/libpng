@@ -1,8 +1,8 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.21 [December 22, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.22 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -149,9 +149,10 @@ png_calculate_crc(png_structp png_ptr, png_const_bytep ptr, png_size_t length)
       do
       {
          uInt safeLength = (uInt)length;
+#ifndef __COVERITY__
          if (safeLength == 0)
             safeLength = (uInt)-1; /* evil, but safe */
-
+#endif
          crc = crc32(crc, ptr, safeLength);
 
          /* The following should never issue compiler warnings, if they do the
@@ -660,13 +661,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.22beta01 - December 22, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.5.22beta01 - January 28, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2014 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.22beta01 - December 22, 2014\
+      return "libpng version 1.5.22beta01 - January 28, 2015\
       Copyright (c) 1998-2014 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2081,17 +2082,20 @@ png_muldiv_warn(png_structp png_ptr, png_fixed_point a, png_int_32 times,
 png_fixed_point
 png_reciprocal(png_fixed_point a)
 {
+   if (a != 0)
+   {
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-   double r = floor(1E10/a+.5);
+     double r = floor(1E10/a+.5);
 
-   if (r <= 2147483647. && r >= -2147483648.)
-      return (png_fixed_point)r;
+     if (r <= 2147483647. && r >= -2147483648.)
+        return (png_fixed_point)r;
 #else
-   png_fixed_point res;
+     png_fixed_point res;
 
-   if (png_muldiv(&res, 100000, 100000, a))
-      return res;
+     if (png_muldiv(&res, 100000, 100000, a))
+        return res;
 #endif
+   }
 
    return 0; /* error/overflow */
 }
@@ -2126,23 +2130,26 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
 {
    /* The required result is 1/a * 1/b; the following preserves accuracy. */
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-   double r = 1E15/a;
-   r /= b;
-   r = floor(r+.5);
+   if (a != 0 && b != 0)
+   {
+      double r = 1E15/a;
+      r /= b;
+      r = floor(r+.5);
 
-   if (r <= 2147483647. && r >= -2147483648.)
-      return (png_fixed_point)r;
+      if (r <= 2147483647. && r >= -2147483648.)
+         return (png_fixed_point)r;
 #else
-   /* This may overflow because the range of png_fixed_point isn't symmetric,
-    * but this API is only used for the product of file and screen gamma so it
-    * doesn't matter that the smallest number it can produce is 1/21474, not
-    * 1/100000
-    */
-   png_fixed_point res = png_product2(a, b);
+      /* This may overflow because the range of png_fixed_point isn't
+       * symmetric, but this API is only used for the product of file and
+       * screen gamma so it doesn't matter that the smallest number it can
+       * produce is 1/21474, not 1/100000
+       */
+      png_fixed_point res = png_product2(a, b);
 
-   if (res != 0)
-      return png_reciprocal(res);
+      if (res != 0)
+         return png_reciprocal(res);
 #endif
+   }
 
    return 0; /* overflow */
 }

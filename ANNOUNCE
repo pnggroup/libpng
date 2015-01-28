@@ -1,5 +1,5 @@
 
-Libpng 1.5.22beta01 - January 13, 2015
+Libpng 1.5.22beta01 - January 28, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,10 +27,11 @@ Other information:
 
 Changes since the last public release (1.5.21):
 
-Version 1.5.22beta01 [January 13, 2015]
+Version 1.5.22beta01 [January 28, 2015]
   Regenerated configure scripts with libtool-2.4.4
   Made the check for out-of-range values in png_set_tRNS() detect
     values that are exactly 2^bit_depth, and work on 16-bit platforms.
+  Quieted some warnings from Coverity-scan.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
