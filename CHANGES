@@ -5126,7 +5126,7 @@ Version 1.6.16rc03 [December 21, 2014]
 Version 1.6.16 [December 22, 2014]
   No changes.
 
-Version 1.6.17beta01 [January 27, 2015]
+Version 1.6.17beta01 [January 29, 2015]
   Removed duplicate PNG_SAFE_LIMITS_SUPPORTED handling from pngconf.h
   Corrected the width limit calculation in png_check_IHDR().
   Removed user limits from pngfix. Also pass NULL pointers to
@@ -5140,6 +5140,8 @@ Version 1.6.17beta01 [January 27, 2015]
   Merged some parts of libpng-1.6.17beta01 and libpng-1.7.0beta47.
   Added #ifndef __COVERITY__ where needed in png.c, pngrutil.c and
     pngset.c to avoid warnings about dead code.
+
+Version 1.6.17beta02 [January 29, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
