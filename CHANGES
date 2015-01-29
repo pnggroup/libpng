@@ -4291,11 +4291,13 @@ Version 1.5.21rc03 [December 21, 2014]
 Version 1.5.21 [December 22, 2014]
   No changes.
 
-Version 1.5.22beta01 [January 28, 2015]
+Version 1.5.22beta01 [January 29, 2015]
   Regenerated configure scripts with libtool-2.4.4
   Made the check for out-of-range values in png_set_tRNS() detect
     values that are exactly 2^bit_depth, and work on 16-bit platforms.
   Quieted some warnings from Coverity-scan.
+
+Version 1.5.22beta02 [January 29, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
