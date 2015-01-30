@@ -1,8 +1,8 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.4.13 [February 6, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.15 [%RDATE%]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -150,7 +150,7 @@ png_set_gAMA_fixed(png_structp png_ptr, png_infop info_ptr, png_fixed_point
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (int_gamma > (png_fixed_point)PNG_UINT_31_MAX)
+   if (int_gamma >= (png_fixed_point)PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Limiting gamma to 21474.83");
       png_gamma=PNG_UINT_31_MAX;
