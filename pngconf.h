@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version %VER% - %DATE%
+ * libpng version 1.4.15beta02 - January 30, 2015
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -59,7 +59,7 @@
  *        distinguish your DLL from those of the official release. These
  *        correspond to the trailing letters that come after the version
  *        number and must match your private DLL name>
- *  e.g. // private DLL "libpng%NN%gx.dll"
+ *  e.g. // private DLL "libpng14gx.dll"
  *       #define PNG_USER_DLLFNAME_POSTFIX "gx"
  *
  * The following macros are also at your disposal if you want to complete the
@@ -352,8 +352,7 @@
 #endif
 
 /* Enough people need this for various reasons to include it here */
-%12-%#if !defined(MACOS) && !defined(RISCOS) && !defined(_WIN32_WCE)
-%14+%#if !defined(MACOS) && !defined(RISCOS)
+#if !defined(MACOS) && !defined(RISCOS)
 #  include <sys/types.h>
 #endif
 
@@ -500,46 +499,12 @@
  * 1.4.0)
  */
 
-%12-%/* The following support, added after version 1.0.0, can be turned off
-%12-% * here en masse by defining PNG_LEGACY_SUPPORTED in case you need binary
-%12-% * compatibility with old applications that require the length of
-%12-% * png_struct and png_info to remain unchanged.
-%12-% */
-%12-%
-%12-%#ifdef PNG_LEGACY_SUPPORTED
-%12-%#  define PNG_NO_FREE_ME
-%12-%#  define PNG_NO_READ_UNKNOWN_CHUNKS
-%12-%#  define PNG_NO_WRITE_UNKNOWN_CHUNKS
-%12-%#  define PNG_NO_HANDLE_AS_UNKNOWN
-%12-%#  define PNG_NO_READ_USER_CHUNKS
-%12-%#  define PNG_NO_READ_iCCP
-%12-%#  define PNG_NO_WRITE_iCCP
-%12-%#  define PNG_NO_READ_iTXt
-%12-%#  define PNG_NO_WRITE_iTXt
-%12-%#  define PNG_NO_READ_sCAL
-%12-%#  define PNG_NO_WRITE_sCAL
-%12-%#  define PNG_NO_READ_sPLT
-%12-%#  define PNG_NO_WRITE_sPLT
-%12-%#  define PNG_NO_INFO_IMAGE
-%12-%#  define PNG_NO_READ_RGB_TO_GRAY
-%12-%#  define PNG_NO_READ_USER_TRANSFORM
-%12-%#  define PNG_NO_WRITE_USER_TRANSFORM
-%12-%#  define PNG_NO_USER_MEM
-%12-%#  define PNG_NO_READ_EMPTY_PLTE
-%12-%#  define PNG_NO_MNG_FEATURES
-%12-%#  define PNG_NO_FIXED_POINT_SUPPORTED
-%12-%#endif
-%12-%
 /* Ignore attempt to turn off both floating and fixed point support */
 #if !defined(PNG_FLOATING_POINT_SUPPORTED) || \
     !defined(PNG_NO_FIXED_POINT_SUPPORTED)
 #  define PNG_FIXED_POINT_SUPPORTED
 #endif
 
-%12-%#ifndef PNG_NO_FREE_ME
-%12-%#  define PNG_FREE_ME_SUPPORTED
-%12-%#endif
-%12-%
 #ifdef PNG_READ_SUPPORTED
 
 /* PNG_READ_TRANSFORMS_NOT_SUPPORTED is deprecated. */
@@ -707,10 +672,7 @@
 
 #endif /* PNG_WRITE_SUPPORTED */
 
-%14+%#define PNG_NO_ERROR_NUMBERS
-%12-%#ifndef PNG_NO_ERROR_NUMBERS
-%12-%#  define PNG_ERROR_NUMBERS_SUPPORTED
-%12-%#endif
+#define PNG_NO_ERROR_NUMBERS
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
@@ -792,23 +754,23 @@
 #  define PNG_USER_CHUNK_MALLOC_MAX 0
 #endif
 
-%14+%/* Added at libpng-1.4.0 */
-%14+%#if !defined(PNG_NO_IO_STATE) && !defined(PNG_IO_STATE_SUPPORTED)
-%14+%#  define PNG_IO_STATE_SUPPORTED
-%14+%#endif
-%14+%
-%14+%#ifndef PNG_LITERAL_SHARP
-%14+%#  define PNG_LITERAL_SHARP 0x23
-%14+%#endif
-%14+%#ifndef PNG_LITERAL_LEFT_SQUARE_BRACKET
-%14+%#  define PNG_LITERAL_LEFT_SQUARE_BRACKET 0x5b
-%14+%#endif
-%14+%#ifndef PNG_LITERAL_RIGHT_SQUARE_BRACKET
-%14+%#  define PNG_LITERAL_RIGHT_SQUARE_BRACKET 0x5d
-%14+%#endif
-%14+%#ifndef PNG_STRING_NEWLINE
-%14+%#define PNG_STRING_NEWLINE "\n"
-%14+%#endif
+/* Added at libpng-1.4.0 */
+#if !defined(PNG_NO_IO_STATE) && !defined(PNG_IO_STATE_SUPPORTED)
+#  define PNG_IO_STATE_SUPPORTED
+#endif
+
+#ifndef PNG_LITERAL_SHARP
+#  define PNG_LITERAL_SHARP 0x23
+#endif
+#ifndef PNG_LITERAL_LEFT_SQUARE_BRACKET
+#  define PNG_LITERAL_LEFT_SQUARE_BRACKET 0x5b
+#endif
+#ifndef PNG_LITERAL_RIGHT_SQUARE_BRACKET
+#  define PNG_LITERAL_RIGHT_SQUARE_BRACKET 0x5d
+#endif
+#ifndef PNG_STRING_NEWLINE
+#define PNG_STRING_NEWLINE "\n"
+#endif
 
 /* These are currently experimental features, define them if you want */
 
@@ -829,9 +791,9 @@
 #endif
 */
 
-%14+%#if !defined(PNG_NO_USE_READ_MACROS) && !defined(PNG_USE_READ_MACROS)
-%14+%#  define PNG_USE_READ_MACROS
-%14+%#endif
+#if !defined(PNG_NO_USE_READ_MACROS) && !defined(PNG_USE_READ_MACROS)
+#  define PNG_USE_READ_MACROS
+#endif
 
 /* Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING */
 
@@ -840,13 +802,6 @@
 #  define PNG_POINTER_INDEXING_SUPPORTED
 #endif
 
-%12-%/* These functions are turned off by default, as they will be phased
-%12-% * out.
-%12-% */
-%12-%/*
-%12-%#define  PNG_USELESS_TESTS_SUPPORTED
-%12-%#define  PNG_CORRECT_PALETTE_SUPPORTED
-%12-%*/
 
 /* Any chunks you are not interested in, you can undef here.  The
  * ones that allocate memory may be expecially important (hIST,
@@ -1184,8 +1139,7 @@ typedef unsigned char png_byte;
 #define png_sizeof(x) (sizeof (x))
 
 /* The following is needed for medium model support.  It cannot be in the
-%12-% * PNG_INTERNAL section.  Needs modification for other compilers besides
-%14+% * pngpriv.h header.  Needs modification for other compilers besides
+ * pngpriv.h header.  Needs modification for other compilers besides
  * MSC.  Model independent support declares all arrays and pointers to be
  * large using the far keyword.  The zlib version used must also support
  * model independent data.  As of version zlib 1.0.4, the necessary changes
@@ -1260,11 +1214,7 @@ typedef char            FAR * png_charp;
 typedef png_fixed_point FAR * png_fixed_point_p;
 
 #ifndef PNG_NO_STDIO
-%12-%#  ifdef _WIN32_WCE
-%12-%typedef HANDLE                png_FILE_p;
-%12-%#  else
 typedef FILE                * png_FILE_p;
-%12-%#  endif
 #endif
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
@@ -1420,8 +1370,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
  * Added at libpng-1.2.41.
  */
 
-%12-%#ifdef PNG_PEDANTIC_WARNINGS
-%14+%#ifndef PNG_NO_PEDANTIC_WARNINGS
+#ifndef PNG_NO_PEDANTIC_WARNINGS
 #  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
 #    define PNG_PEDANTIC_WARNINGS_SUPPORTED
 #  endif

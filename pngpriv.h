@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version %VER% - %DATE%
+ * libpng version 1.4.15beta02 - January 30, 2015
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -163,12 +163,9 @@
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
 #define PNG_FLAG_CRC_CRITICAL_USE         0x0400
 #define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-%14+%                                /*        0x1000  unused */
-%14+%                                /*        0x2000  unused */
-%14+%                                /*        0x4000  unused */
-%12-%#define PNG_FLAG_FREE_PLTE                0x1000
-%12-%#define PNG_FLAG_FREE_TRNS                0x2000
-%12-%#define PNG_FLAG_FREE_HIST                0x4000
+                                /*        0x1000  unused */
+                                /*        0x2000  unused */
+                                /*        0x4000  unused */
 #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000L
 #define PNG_FLAG_KEEP_UNSAFE_CHUNKS       0x10000L
 #define PNG_FLAG_LIBRARY_MISMATCH         0x20000L
@@ -628,14 +625,14 @@ PNG_EXTERN void png_do_shift PNGARG((png_row_infop row_info, png_bytep row,
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
 #ifdef PNG_READ_GAMMA_SUPPORTED
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
-   png_color_16p %TV%, png_color_16p background,
+   png_color_16p trans_color, png_color_16p background,
    png_color_16p background_1,
    png_bytep gamma_table, png_bytep gamma_from_1, png_bytep gamma_to_1,
    png_uint_16pp gamma_16, png_uint_16pp gamma_16_from_1,
    png_uint_16pp gamma_16_to_1, int gamma_shift));
 #else
 PNG_EXTERN void png_do_background PNGARG((png_row_infop row_info, png_bytep row,
-   png_color_16p %TV%, png_color_16p background));
+   png_color_16p trans_color, png_color_16p background));
 #endif
 #endif
 
@@ -828,8 +825,7 @@ PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
 
 #ifdef PNG_cHRM_SUPPORTED
 #ifdef PNG_CHECK_cHRM_SUPPORTED
-%12-%/* Added at libpng version 1.2.34 */
-%14+%/* Added at libpng version 1.2.34 and 1.4.0 */
+/* Added at libpng version 1.2.34 and 1.4.0 */
 PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
    unsigned long *hi_product, unsigned long *lo_product));
 #endif
