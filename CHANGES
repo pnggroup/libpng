@@ -2833,6 +2833,7 @@ version 1.2.53beta01 [RDATE%]
     potentially too large for the architecture, in case the calling
     application has overridden the default 1,000,000-column limit
     (fixes CVE-2014-9495 and CVE-2015-0973).
+  Quieted some harmless warnings from Coverity-scan.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
