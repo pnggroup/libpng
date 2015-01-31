@@ -44,6 +44,10 @@ Other information:
 Changes since the last public release (1.2.52):
 
 version 1.2.53beta01 [RDATE%]
+  Issue a png_error() instead of a png_warning() when width is
+    potentially too large for the architecture, in case the calling
+    application has overridden the default 1,000,000-column limit
+    (fixes CVE-2014-9495 and CVE-2015-0973).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

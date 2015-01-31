@@ -263,7 +263,10 @@ png_set_IHDR(png_structp png_ptr, png_infop info_ptr,
                  - 1        /* filter byte */
                  - 7*8      /* rounding of width to multiple of 8 pixels */
                  - 8)       /* extra max_pixel_depth pad */
+   {
       info_ptr->rowbytes = (png_size_t)0;
+      png_error(png_ptr, "Image width is too large for this architecture");
+   }
    else
       info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, width);
 }
