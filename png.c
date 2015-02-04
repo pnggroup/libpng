@@ -217,6 +217,7 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
    /* Success return. */
    return 1;
 }
+
 /* Generic function to create a png_struct for either read or write - this
  * contains the common initialization.
  */
@@ -693,13 +694,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta48 - January 29, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta48 - February 4, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta48 - January 29, 2015\
+      return "libpng version 1.7.0beta48 - February 4, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2074,7 +2075,8 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 1; /* success, maybe with warnings */
 }
 
-#if defined(PNG_sRGB_SUPPORTED) && PNG_sRGB_PROFILE_CHECKS >= 0
+#ifdef PNG_sRGB_SUPPORTED
+#if PNG_sRGB_PROFILE_CHECKS >= 0
 /* Information about the known ICC sRGB profiles */
 static const struct
 {
@@ -2256,9 +2258,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 
    return 0; /* no match */
 }
-#endif
+#endif /* PNG_sRGB_PROFILE_CHECKS >= 0 */
 
-#ifdef PNG_sRGB_SUPPORTED
 void /* PRIVATE */
 png_icc_set_sRGB(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_bytep profile, uLong adler)
@@ -2272,7 +2273,7 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
       (void)png_colorspace_set_sRGB(png_ptr, colorspace,
          (int)/*already checked*/png_get_uint_32(profile+64));
 }
-#endif /* READ_sRGB */
+#endif /* sRGB */
 
 int /* PRIVATE */
 png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
@@ -2364,7 +2365,7 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
          png_error(png_ptr, "internal error handling cHRM->XYZ");
    }
 }
-#endif
+#endif /* READ_RGB_TO_GRAY */
 
 #endif /* COLORSPACE */
 
@@ -3318,7 +3319,7 @@ png_gamma_significant(png_fixed_point gamma_val)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-#ifndef PNG_FLOATING_ARITHMETIC_SUPPORTED
+#if defined(PNG_16BIT_SUPPORTED) || !defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
 /* A local convenience routine. */
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
@@ -3340,7 +3341,7 @@ png_product2(png_fixed_point a, png_fixed_point b)
 
    return 0; /* overflow */
 }
-#endif
+#endif /* 16BIT || !FLOATING_ARITHMETIC */
 
 /* The inverse of the above. */
 png_fixed_point
