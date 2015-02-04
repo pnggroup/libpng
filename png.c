@@ -772,13 +772,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17beta02 - January 29, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.17beta02 - February 4, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17beta02 - January 29, 2015\
+      return "libpng version 1.6.17beta02 - February 4, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -949,8 +949,6 @@ png_access_version_number(void)
    /* Version of *.c files used when building libpng */
    return((png_uint_32)PNG_LIBPNG_VER);
 }
-
-
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Ensure that png_ptr->zstream.msg holds some appropriate error message string.
@@ -1184,7 +1182,7 @@ png_colorspace_sync(png_const_structrp png_ptr, png_inforp info_ptr)
    png_colorspace_sync_info(png_ptr, info_ptr);
 }
 #endif
-#endif
+#endif /* GAMMA */
 
 #ifdef PNG_COLORSPACE_SUPPORTED
 /* Added at libpng-1.5.5 to support read and write of true CIEXYZ values for
@@ -2169,7 +2167,8 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 1; /* success, maybe with warnings */
 }
 
-#if defined(PNG_sRGB_SUPPORTED) && PNG_sRGB_PROFILE_CHECKS >= 0
+#ifdef PNG_sRGB_SUPPORTED
+#if PNG_sRGB_PROFILE_CHECKS >= 0
 /* Information about the known ICC sRGB profiles */
 static const struct
 {
@@ -2352,9 +2351,8 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 
    return 0; /* no match */
 }
-#endif
+#endif /* PNG_sRGB_PROFILE_CHECKS >= 0 */
 
-#ifdef PNG_sRGB_SUPPORTED
 void /* PRIVATE */
 png_icc_set_sRGB(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_bytep profile, uLong adler)
@@ -2368,7 +2366,7 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
       (void)png_colorspace_set_sRGB(png_ptr, colorspace,
          (int)/*already checked*/png_get_uint_32(profile+64));
 }
-#endif /* READ_sRGB */
+#endif /* sRGB */
 
 int /* PRIVATE */
 png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
@@ -2460,7 +2458,7 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
          png_error(png_ptr, "internal error handling cHRM->XYZ");
    }
 }
-#endif
+#endif /* READ_RGB_TO_GRAY */
 
 #endif /* COLORSPACE */
 
@@ -3412,19 +3410,19 @@ static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
 {
    /* The required result is 1/a * 1/b; the following preserves accuracy. */
-#    ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    double r = a * 1E-5;
    r *= b;
    r = floor(r+.5);
 
    if (r <= 2147483647. && r >= -2147483648.)
       return (png_fixed_point)r;
-#    else
+#else
    png_fixed_point res;
 
    if (png_muldiv(&res, a, b, 100000) != 0)
       return res;
-#    endif
+#endif
 
    return 0; /* overflow */
 }
