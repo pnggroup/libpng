@@ -1,5 +1,5 @@
 
-Libpng 1.4.15beta02 - January 30, 2015
+Libpng 1.4.15rc01 - February 5, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.15beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.15beta02.tar.gz
-   1.4.15beta02.tar.bz2
+   1.4.15rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.15rc01.tar.gz
+   1.4.15rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1415b02.7z (LZMA-compressed, recommended)
-   lp1415b02.zip
+   lp1415r01.7z (LZMA-compressed, recommended)
+   lp1415r01.zip
 
 Other information:
 
-   1.4.15beta02-README.txt
-   1.4.15beta02-LICENSE.txt
-   libpng-1.4.15beta02-*.asc (armored detached GPG signatures)
+   1.4.15rc01-README.txt
+   1.4.15rc01-LICENSE.txt
+   libpng-1.4.15rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.14):
 
@@ -33,6 +33,9 @@ version 1.4.15beta01 [January 27, 2015]
 
 version 1.4.15beta02 [January 30, 2015]
   Quieted some harmless warnings from Coverity-scan.
+
+version 1.4.15rc01 [February 5, 2015]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

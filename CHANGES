@@ -2929,6 +2929,9 @@ version 1.4.15beta01 [January 27, 2015]
 version 1.4.15beta02 [January 30, 2015]
   Quieted some harmless warnings from Coverity-scan.
 
+version 1.4.15rc01 [February 5, 2015]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
