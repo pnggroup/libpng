@@ -1,8 +1,8 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.10 [March 8, 2012]
- * Copyright (c) 1998-2012 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.15 [%RDATE%]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -73,9 +73,8 @@ png_get_uint_16)(png_bytep buf)
     * on 32 bit systems.  (Pre-ANSI systems did not make integers smaller
     * than 16 bits either.)
     */
-   unsigned int val =
-       ((unsigned int)(*buf) << 8) +
-       ((unsigned int)(*(buf + 1)));
+   unsigned int val = ((unsigned int)((*(buf     )) & 0xff) << 8) +
+                      ((unsigned int)((*(buf +  1)) & 0xff)     );
 
    return (png_uint_16)val;
 }
@@ -332,12 +331,15 @@ png_inflate(png_structp png_ptr, const png_byte *data, png_size_t size,
 
             png_snprintf(umsg, sizeof umsg, msg, png_ptr->chunk_name);
             msg = umsg;
+            png_warning(png_ptr, msg);
 #else
             msg = "Damaged compressed datastream in chunk other than IDAT";
 #endif
          }
 
+#ifndef PNG_STDIO_SUPPORTED
          png_warning(png_ptr, msg);
+#endif
       }
 
       /* 0 means an error - notice that this code simple ignores
@@ -1171,10 +1173,10 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* Check the profile_size recorded in the first 32 bits of the ICC profile */
    pC = (png_bytep)(png_ptr->chunkdata + prefix_length);
-   profile_size = ((*(pC    ))<<24) |
-                  ((*(pC + 1))<<16) |
-                  ((*(pC + 2))<< 8) |
-                  ((*(pC + 3))    );
+   profile_size = (((*(pC    )) & 0xff) << 24) |
+                  (((*(pC + 1)) & 0xff) << 16) |
+                  (((*(pC + 2)) & 0xff) <<  8) |
+                  (((*(pC + 3)) & 0xff)      );
 
    if (profile_size < profile_length)
       profile_length = profile_size;
