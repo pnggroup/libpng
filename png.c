@@ -17,7 +17,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_4_15rc01 Your_png_h_is_not_version_1_4_15rc01;
+typedef version_1_4_15rc02 Your_png_h_is_not_version_1_4_15rc02;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -74,12 +74,16 @@ voidpf /* PRIVATE */
 png_zalloc(voidpf png_ptr, uInt items, uInt size)
 {
    png_voidp ptr;
-   png_structp p=(png_structp)png_ptr;
-   png_uint_32 save_flags=p->flags;
+   png_structp p;
+   png_uint_32 save_flags;
    png_alloc_size_t num_bytes;
 
    if (png_ptr == NULL)
       return (NULL);
+
+   p=(png_structp)png_ptr;
+   save_flags=p->flags;
+
    if (items > PNG_UINT_32_MAX/size)
    {
      png_warning (p, "Potential overflow in png_zalloc()");
@@ -547,13 +551,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.4.15rc01 - February 5, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.4.15rc02 - February 6, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.4.15rc01 - February 5, 2015\
+      return ((png_charp) "libpng version 1.4.15rc02 - February 6, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");
@@ -721,14 +725,14 @@ png_check_cHRM_fixed(png_structp png_ptr,
         "Ignoring attempt to set negative chromaticity value");
       ret = 0;
    }
-   if (white_x > (png_fixed_point) PNG_UINT_31_MAX ||
-       white_y > (png_fixed_point) PNG_UINT_31_MAX ||
-         red_x > (png_fixed_point) PNG_UINT_31_MAX ||
-         red_y > (png_fixed_point) PNG_UINT_31_MAX ||
-       green_x > (png_fixed_point) PNG_UINT_31_MAX ||
-       green_y > (png_fixed_point) PNG_UINT_31_MAX ||
-        blue_x > (png_fixed_point) PNG_UINT_31_MAX ||
-        blue_y > (png_fixed_point) PNG_UINT_31_MAX )
+   if (white_x >= (png_fixed_point) PNG_UINT_31_MAX ||
+       white_y >= (png_fixed_point) PNG_UINT_31_MAX ||
+         red_x >= (png_fixed_point) PNG_UINT_31_MAX ||
+         red_y >= (png_fixed_point) PNG_UINT_31_MAX ||
+       green_x >= (png_fixed_point) PNG_UINT_31_MAX ||
+       green_y >= (png_fixed_point) PNG_UINT_31_MAX ||
+        blue_x >= (png_fixed_point) PNG_UINT_31_MAX ||
+        blue_y >= (png_fixed_point) PNG_UINT_31_MAX )
    {
       png_warning(png_ptr,
         "Ignoring attempt to set chromaticity value exceeding 21474.83");
