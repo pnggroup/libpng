@@ -2830,7 +2830,7 @@ version 1.0.62 and 1.2.52 [November 20, 2014]
 
 version 1.2.53beta01 [omitted]
 
-version 1.2.53beta02 [%RDATE%]
+version 1.2.53beta02 [February 6, 2015]
   Issue a png_error() instead of a png_warning() when width is
     potentially too large for the architecture, in case the calling
     application has overridden the default 1,000,000-column limit

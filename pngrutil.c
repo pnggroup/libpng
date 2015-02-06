@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.53 [%RDATE%]
+ * Last changed in libpng 1.2.53 [February 6, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -57,10 +57,10 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
    png_uint_32 i = png_get_uint_32(buf);
 #else
    /* Avoid an extra function call by inlining the result. */
-   png_uint_32 i = ((png_uint_32)(*buf) << 24) +
-      ((png_uint_32)(*(buf + 1)) << 16) +
-      ((png_uint_32)(*(buf + 2)) << 8) +
-      ((png_uint_32)(*(buf + 3))     );
+   png_uint_32 i = ((png_uint_32)((*(buf    )) & 0xff) << 24) +
+                   ((png_uint_32)((*(buf + 1)) & 0xff) << 16) +
+                   ((png_uint_32)((*(buf + 2)) & 0xff) <<  8) +
+                   ((png_uint_32)((*(buf + 3)) & 0xff)      );
 #endif
    if (i > PNG_UINT_31_MAX)
      png_error(png_ptr, "PNG unsigned integer out of range.");
@@ -71,10 +71,10 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
 png_uint_32 PNGAPI
 png_get_uint_32(png_bytep buf)
 {
-   png_uint_32 i = ((png_uint_32)(*buf) << 24) +
-      ((png_uint_32)(*(buf + 1)) << 16) +
-      ((png_uint_32)(*(buf + 2)) << 8) +
-      (png_uint_32)(*(buf + 3));
+   png_uint_32 i = ((png_uint_32)((*(buf    )) & 0xff) << 24) +
+                   ((png_uint_32)((*(buf + 1)) & 0xff) << 16) +
+                   ((png_uint_32)((*(buf + 2)) & 0xff) <<  8) +
+                   ((png_uint_32)((*(buf + 3)) & 0xff)      );
 
    return (i);
 }
@@ -86,10 +86,10 @@ png_get_uint_32(png_bytep buf)
 png_int_32 PNGAPI
 png_get_int_32(png_bytep buf)
 {
-   png_int_32 i = ((png_int_32)(*buf) << 24) +
-      ((png_int_32)(*(buf + 1)) << 16) +
-      ((png_int_32)(*(buf + 2)) << 8) +
-      (png_int_32)(*(buf + 3));
+   png_int_32 i = ((png_int_32)((*(buf    )) & 0xff) << 24) +
+                  ((png_int_32)((*(buf + 1)) & 0xff) << 16) +
+                  ((png_int_32)((*(buf + 2)) & 0xff) <<  8) +
+                  ((png_int_32)((*(buf + 3)) & 0xff)      );
 
    return (i);
 }
@@ -98,8 +98,8 @@ png_get_int_32(png_bytep buf)
 png_uint_16 PNGAPI
 png_get_uint_16(png_bytep buf)
 {
-   png_uint_16 i = (png_uint_16)(((png_uint_16)(*buf) << 8) +
-      (png_uint_16)(*(buf + 1)));
+   png_uint_16 i = ((png_uint_16)((*(buf     )) & 0xff) << 8) +
+                   ((png_uint_16)((*(buf +  1)) & 0xff)     );
 
    return (i);
 }
