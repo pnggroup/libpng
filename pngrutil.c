@@ -63,7 +63,7 @@ png_get_uint_31(png_structp png_ptr, png_bytep buf)
                    ((png_uint_32)((*(buf + 3)) & 0xff)      );
 #endif
    if (i > PNG_UINT_31_MAX)
-     png_error(png_ptr, "PNG unsigned integer out of range.");
+      png_error(png_ptr, "PNG unsigned integer out of range.");
    return (i);
 }
 #ifndef PNG_READ_BIG_ENDIAN_SUPPORTED
