@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.17beta02 - January 29, 2015
+ libpng version 1.6.17beta02 - February 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.17beta02 - January 29, 2015
+ libpng versions 0.97, January 1998, through 1.6.17beta02 - February 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -344,21 +344,22 @@ then only check the bytes (if any) that your program didn't read.
 to replace them with custom functions.  See the discussion under
 Customizing libpng.
 
-
     FILE *fp = fopen(file_name, "rb");
     if (!fp)
     {
        return (ERROR);
     }
 
-    fread(header, 1, number, fp);
-    is_png = !png_sig_cmp(header, 0, number);
+    if (fread(header, 1, number, fp) != number)
+    {
+       return (ERROR);
+    }
 
+    is_png = !png_sig_cmp(header, 0, number);
     if (!is_png)
     {
        return (NOT_PNG);
     }
-
 
 Next, png_struct and png_info need to be allocated and initialized.  In
 order to ensure that the size of these structures is correct even with a
@@ -5274,7 +5275,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-January 29, 2015
+February 7, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
