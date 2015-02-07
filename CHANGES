@@ -5141,7 +5141,9 @@ Version 1.6.17beta01 [January 29, 2015]
   Added #ifndef __COVERITY__ where needed in png.c, pngrutil.c and
     pngset.c to avoid warnings about dead code.
 
-Version 1.6.17beta02 [January 29, 2015]
+Version 1.6.17beta02 [February 7, 2015]
+  Work around one more Coverity-scan dead-code warning.
+  Do not build png_product2() when it is unused.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

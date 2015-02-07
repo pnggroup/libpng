@@ -1,8 +1,8 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -377,7 +377,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    io_ptr = png_get_io_ptr(png_ptr);
    if (io_ptr != NULL)
    {
-      check = fread(data, 1, length, (png_FILE_p)io_ptr);
+      check = fread(data, (sizeof (png_byte)), length, (png_FILE_p)io_ptr);
    }
 
    if (check != length)
@@ -1610,8 +1610,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_size_t num_in, num_out;
          char inbuf[256], outbuf[256];
 
-         num_in = fread(inbuf, 1, sizeof inbuf, fpin);
-         num_out = fread(outbuf, 1, sizeof outbuf, fpout);
+         num_in = fread(inbuf, 1, (sizeof inbuf), fpin);
+         num_out = fread(outbuf, 1, (sizeof outbuf), fpout);
 
          if (num_in != num_out)
          {

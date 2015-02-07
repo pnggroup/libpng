@@ -3087,10 +3087,11 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                png_uint_16 red, green, blue, w;
+               png_byte hi,lo;
 
-               red   = (png_uint_16)(((*(sp)) << 8) | *(sp + 1)); sp += 2;
-               green = (png_uint_16)(((*(sp)) << 8) | *(sp + 1)); sp += 2;
-               blue  = (png_uint_16)(((*(sp)) << 8) | *(sp + 1)); sp += 2;
+               hi=*(sp)++; lo=*(sp)++; red   = (png_uint_16)((hi << 8) | (lo));
+               hi=*(sp)++; lo=*(sp)++; green = (png_uint_16)((hi << 8) | (lo));
+               hi=*(sp)++; lo=*(sp)++; blue  = (png_uint_16)((hi << 8) | (lo));
 
                if (red == green && red == blue)
                {
@@ -3138,10 +3139,11 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
             for (i = 0; i < row_width; i++)
             {
                png_uint_16 red, green, blue, gray16;
+               png_byte hi,lo;
 
-               red   = (png_uint_16)(((*(sp)) << 8) | *(sp + 1)); sp += 2;
-               green = (png_uint_16)(((*(sp)) << 8) | *(sp + 1)); sp += 2;
-               blue  = (png_uint_16)(((*(sp)) << 8) | *(sp + 1)); sp += 2;
+               hi=*(sp)++; lo=*(sp)++; red   = (png_uint_16)((hi << 8) | (lo));
+               hi=*(sp)++; lo=*(sp)++; green = (png_uint_16)((hi << 8) | (lo));
+               hi=*(sp)++; lo=*(sp)++; blue  = (png_uint_16)((hi << 8) | (lo));
 
                if (red != green || red != blue)
                   rgb_error |= 1;
