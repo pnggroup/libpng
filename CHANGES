@@ -5145,6 +5145,8 @@ Version 1.6.17beta02 [February 7, 2015]
   Work around one more Coverity-scan dead-code warning.
   Do not build png_product2() when it is unused.
 
+Version 1.6.17beta03 [February 7, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
