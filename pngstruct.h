@@ -345,13 +345,8 @@ struct png_struct_def
    /* This is somewhat excessive, there is no obvious reason on write to
     * allocate a buffer for each possible filtered row, only for the one being
     * tested and the current best.
-    *
-    * TODO: fix this
     */
-   png_bytep sub_row;         /* buffer to save "sub" row when filtering */
-   png_bytep up_row;          /* buffer to save "up" row when filtering */
-   png_bytep avg_row;         /* buffer to save "avg" row when filtering */
-   png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
+   png_bytep try_row;         /* buffer to save trial row when filtering */
 #endif
 
    /* UNKNOWN CHUNK HANDLING */

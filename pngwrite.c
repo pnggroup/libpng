@@ -942,15 +942,9 @@ png_write_destroy(png_structrp png_ptr)
    png_ptr->row_buf = NULL;
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);
-   png_free(png_ptr, png_ptr->sub_row);
-   png_free(png_ptr, png_ptr->up_row);
-   png_free(png_ptr, png_ptr->avg_row);
-   png_free(png_ptr, png_ptr->paeth_row);
+   png_free(png_ptr, png_ptr->try_row);
    png_ptr->prev_row = NULL;
-   png_ptr->sub_row = NULL;
-   png_ptr->up_row = NULL;
-   png_ptr->avg_row = NULL;
-   png_ptr->paeth_row = NULL;
+   png_ptr->try_row = NULL;
 #endif
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -1065,8 +1059,8 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
        * it is too late to start using the filters that need it, since we
        * will be missing the data in the previous row.  If an application
        * wants to start and stop using particular filters during compression,
-       * it should start out with all of the filters, and then add and
-       * remove them after the start of compression.
+       * it should start out with all of the filters, and then remove them
+       * or add them back after the start of compression.
        *
        * NOTE: this is a nasty constraint on the code, because it means that the
        * prev_row buffer must be maintained even if there are currently no

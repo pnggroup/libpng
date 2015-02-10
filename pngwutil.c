@@ -1943,7 +1943,7 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
 #ifdef PNG_WRITE_FILTER_SUPPORTED
 void /* PRIVATE */
 png_write_alloc_filter_row_buffers(png_structrp png_ptr, int filters)
-   /* Allocate row buffers for any filters that need them, this is also called
+   /* Allocate row buffers for any filters that need them. This is also called
     * from png_set_filter if the filters are changed during write to ensure that
     * the required buffers exist.  png_set_filter ensures that up/avg/paeth are
     * only set if png_ptr->prev_row is allocated.
@@ -1954,29 +1954,10 @@ png_write_alloc_filter_row_buffers(png_structrp png_ptr, int filters)
     */
    png_alloc_size_t buf_size = png_ptr->rowbytes + 1;
 
-   if ((filters & PNG_FILTER_SUB) != 0 && png_ptr->sub_row == NULL)
+   if (((filters & (PNG_FILTER_SUB | PNG_FILTER_UP | PNG_FILTER_AVG |
+       PNG_FILTER_PAETH)) != 0) && png_ptr->try_row == NULL)
    {
-      png_ptr->sub_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
-      png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
-   }
-
-   if ((filters & PNG_FILTER_UP) != 0 && png_ptr->up_row == NULL)
-   {
-      png_ptr->up_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
-      png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
-   }
-
-   if ((filters & PNG_FILTER_AVG) != 0 && png_ptr->avg_row == NULL)
-   {
-      png_ptr->avg_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
-      png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
-   }
-
-   if ((filters & PNG_FILTER_PAETH) != 0 && png_ptr->paeth_row == NULL)
-   {
-      png_ptr->paeth_row = png_voidcast(png_bytep, png_malloc(png_ptr,
-         buf_size));
-      png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
+      png_ptr->try_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
    }
 }
 #endif /* WRITE_FILTER */
@@ -2352,17 +2333,117 @@ static void /* PRIVATE */
 png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
    png_size_t row_bytes);
 
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+static void /* PRIVATE */
+png_setup_sub_row(png_structrp png_ptr, png_uint_32 bpp,
+    png_bytep row_buf, png_size_t row_bytes)
+{
+   png_bytep rp, dp, lp;
+   png_size_t i;
+
+   for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1; i < bpp;
+        i++, rp++, dp++)
+   {
+      *dp = *rp;
+   }
+
+   for (lp = row_buf + 1; i < row_bytes;
+      i++, rp++, lp++, dp++)
+   {
+      *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
+   }
+}
+
+static void /* PRIVATE */
+png_setup_up_row(png_structrp png_ptr, png_bytep row_buf, png_size_t row_bytes)
+{
+   png_bytep rp, dp, pp;
+   png_size_t i;
+
+   for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1,
+       pp = png_ptr->prev_row + 1; i < row_bytes;
+       i++, rp++, pp++, dp++)
+   {
+      *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
+   }
+}
+
+static void /* PRIVATE */
+png_setup_avg_row(png_structrp png_ptr,png_uint_32 bpp,
+     png_bytep row_buf, png_size_t row_bytes)
+{
+   png_bytep rp, dp, pp, lp;
+   png_uint_32 i;
+
+   for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1,
+        pp = png_ptr->prev_row + 1; i < bpp; i++)
+   {
+      *dp++ = (png_byte)(((int)*rp++ - ((int)*pp++ / 2)) & 0xff);
+   }
+
+   for (lp = row_buf + 1; i < row_bytes; i++)
+   {
+      *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
+              & 0xff);
+   }
+}
+
+static void /* PRIVATE */
+png_setup_paeth_row(png_structrp png_ptr,png_uint_32 bpp,
+    png_bytep row_buf, png_size_t row_bytes)
+{
+   png_bytep rp, dp, pp, cp, lp;
+   png_size_t i;
+
+   for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1,
+       pp = png_ptr->prev_row + 1; i < bpp; i++)
+   {
+      *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
+   }
+
+   for (lp = row_buf + 1, cp = png_ptr->prev_row + 1; i < row_bytes; i++)
+   {
+      int a, b, c, pa, pb, pc, p;
+
+      b = *pp++;
+      c = *cp++;
+      a = *lp++;
+
+      p = b - c;
+      pc = a - c;
+
+#ifdef PNG_USE_ABS
+      pa = abs(p);
+      pb = abs(pc);
+      pc = abs(p + pc);
+#else
+      pa = p < 0 ? -p : p;
+      pb = pc < 0 ? -pc : pc;
+      pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+#endif
+
+      p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
+
+      *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
+   }
+}
+
 #define PNG_MAXSUM (((png_uint_32)(-1)) >> 1)
 #define PNG_HISHIFT 10
 #define PNG_LOMASK ((png_uint_32)0xffffL)
 #define PNG_HIMASK ((png_uint_32)(~PNG_LOMASK >> PNG_HISHIFT))
+#endif /* WRITE_FILTER */
+
 void /* PRIVATE */
 png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 {
-   png_bytep best_row;
-#ifdef PNG_WRITE_FILTER_SUPPORTED
+#ifndef PNG_WRITE_FILTER_SUPPORTED
+   png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
+#else
    png_bytep prev_row, row_buf;
    png_uint_32 mins, bpp;
+   png_byte best_filter_value = PNG_FILTER_VALUE_NONE;
+   png_byte last_tested_row_value = PNG_FILTER_VALUE_NONE;
    png_byte filter_to_do = png_ptr->do_filter;
    png_size_t row_bytes = row_info->rowbytes;
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -2383,10 +2464,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    bpp = (row_info->pixel_depth + 7) >> 3;
 
    prev_row = png_ptr->prev_row;
-#endif
-   best_row = png_ptr->row_buf;
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-   row_buf = best_row;
+   row_buf = png_ptr->row_buf;
    mins = PNG_MAXSUM;
 
    /* The prediction method we use is to find which method provides the
@@ -2475,22 +2553,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_SUB)
    /* It's the only filter so no testing is needed */
    {
-      png_bytep rp, lp, dp;
-      png_size_t i;
-
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->sub_row + 1; i < bpp;
-           i++, rp++, dp++)
-      {
-         *dp = *rp;
-      }
-
-      for (lp = row_buf + 1; i < row_bytes;
-         i++, rp++, lp++, dp++)
-      {
-         *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
-      }
-
-      best_row = png_ptr->sub_row;
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
+      last_tested_row_value = PNG_FILTER_VALUE_SUB;
+      png_setup_sub_row(png_ptr, bpp, row_buf, row_bytes); 
+      best_filter_value = PNG_FILTER_VALUE_SUB;
    }
 
    else if ((filter_to_do & PNG_FILTER_SUB) != 0)
@@ -2538,7 +2604,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       }
 #endif
 
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->sub_row + 1; i < bpp;
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1; i < bpp;
            i++, rp++, dp++)
       {
          v = *dp = *rp;
@@ -2594,24 +2660,17 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       if (sum < mins)
       {
          mins = sum;
-         best_row = png_ptr->sub_row;
+         best_filter_value = PNG_FILTER_VALUE_SUB;
       }
    }
 
    /* Up filter */
    if (filter_to_do == PNG_FILTER_UP)
    {
-      png_bytep rp, dp, pp;
-      png_size_t i;
-
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->up_row + 1,
-          pp = prev_row + 1; i < row_bytes;
-          i++, rp++, pp++, dp++)
-      {
-         *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
-      }
-
-      best_row = png_ptr->up_row;
+      last_tested_row_value = PNG_FILTER_VALUE_UP;
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
+      png_setup_up_row(png_ptr, row_buf, row_bytes);
+      best_filter_value = PNG_FILTER_VALUE_UP;
    }
 
    else if ((filter_to_do & PNG_FILTER_UP) != 0)
@@ -2656,7 +2715,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       }
 #endif
 
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->up_row + 1,
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1,
           pp = prev_row + 1; i < row_bytes; i++)
       {
          v = *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
@@ -2704,28 +2763,17 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       if (sum < mins)
       {
          mins = sum;
-         best_row = png_ptr->up_row;
+         best_filter_value = PNG_FILTER_VALUE_UP;
       }
    }
 
    /* Avg filter */
    if (filter_to_do == PNG_FILTER_AVG)
    {
-      png_bytep rp, dp, pp, lp;
-      png_uint_32 i;
-
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->avg_row + 1,
-           pp = prev_row + 1; i < bpp; i++)
-      {
-         *dp++ = (png_byte)(((int)*rp++ - ((int)*pp++ / 2)) & 0xff);
-      }
-
-      for (lp = row_buf + 1; i < row_bytes; i++)
-      {
-         *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
-                 & 0xff);
-      }
-      best_row = png_ptr->avg_row;
+      last_tested_row_value = PNG_FILTER_VALUE_AVG;
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
+      png_setup_avg_row(png_ptr, bpp, row_buf, row_bytes);
+      best_filter_value = PNG_FILTER_VALUE_AVG;
    }
 
    else if ((filter_to_do & PNG_FILTER_AVG) != 0)
@@ -2769,7 +2817,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       }
 #endif
 
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->avg_row + 1,
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1,
            pp = prev_row + 1; i < bpp; i++)
       {
          v = *dp++ = (png_byte)(((int)*rp++ - ((int)*pp++ / 2)) & 0xff);
@@ -2825,48 +2873,17 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       if (sum < mins)
       {
          mins = sum;
-         best_row = png_ptr->avg_row;
+         best_filter_value = PNG_FILTER_VALUE_AVG;
       }
    }
 
    /* Paeth filter */
    if ((filter_to_do == PNG_FILTER_PAETH) != 0)
    {
-      png_bytep rp, dp, pp, cp, lp;
-      png_size_t i;
-
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->paeth_row + 1,
-          pp = prev_row + 1; i < bpp; i++)
-      {
-         *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
-      }
-
-      for (lp = row_buf + 1, cp = prev_row + 1; i < row_bytes; i++)
-      {
-         int a, b, c, pa, pb, pc, p;
-
-         b = *pp++;
-         c = *cp++;
-         a = *lp++;
-
-         p = b - c;
-         pc = a - c;
-
-#ifdef PNG_USE_ABS
-         pa = abs(p);
-         pb = abs(pc);
-         pc = abs(p + pc);
-#else
-         pa = p < 0 ? -p : p;
-         pb = pc < 0 ? -pc : pc;
-         pc = (p + pc) < 0 ? -(p + pc) : p + pc;
-#endif
-
-         p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
-
-         *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
-      }
-      best_row = png_ptr->paeth_row;
+      last_tested_row_value = PNG_FILTER_VALUE_PAETH;
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
+      png_setup_paeth_row(png_ptr, bpp, row_buf, row_bytes);
+      best_filter_value = PNG_FILTER_VALUE_PAETH;
    }
 
    else if ((filter_to_do & PNG_FILTER_PAETH) != 0)
@@ -2910,7 +2927,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       }
 #endif
 
-      for (i = 0, rp = row_buf + 1, dp = png_ptr->paeth_row + 1,
+      for (i = 0, rp = row_buf + 1, dp = png_ptr->try_row + 1,
           pp = prev_row + 1; i < bpp; i++)
       {
          v = *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
@@ -2999,15 +3016,38 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
       if (sum < mins)
       {
-         best_row = png_ptr->paeth_row;
+         best_filter_value = PNG_FILTER_VALUE_PAETH;
       }
    }
-#endif /* WRITE_FILTER */
 
    /* Do the actual writing of the filtered row data from the chosen filter. */
-   png_write_filtered_row(png_ptr, best_row, row_info->rowbytes+1);
+   if (best_filter_value == PNG_FILTER_VALUE_NONE)
+      png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
 
-#ifdef PNG_WRITE_FILTER_SUPPORTED
+   else
+   {
+      png_ptr->try_row[0] = best_filter_value;
+
+      if (best_filter_value != last_tested_row_value)
+      {
+         /* TO DO: make this redundant code into functions? */
+         if (best_filter_value == PNG_FILTER_VALUE_SUB)
+           png_setup_sub_row(png_ptr, bpp, row_buf, row_bytes); 
+
+         if (best_filter_value == PNG_FILTER_VALUE_UP)
+           png_setup_up_row(png_ptr, row_buf, row_bytes); 
+
+         if (best_filter_value == PNG_FILTER_VALUE_AVG)
+           png_setup_avg_row(png_ptr, bpp, row_buf, row_bytes); 
+
+         if (best_filter_value == PNG_FILTER_VALUE_PAETH)
+           png_setup_paeth_row(png_ptr, bpp, row_buf, row_bytes); 
+
+      }
+
+      png_write_filtered_row(png_ptr, png_ptr->try_row, row_info->rowbytes+1);
+   }
+
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    /* Save the type of filter we picked this time for future calculations */
    if (png_ptr->num_prev_filters > 0)
@@ -3019,9 +3059,9 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
          png_ptr->prev_filters[j] = png_ptr->prev_filters[j - 1];
       }
 
-      png_ptr->prev_filters[j] = best_row[0];
+      png_ptr->prev_filters[j] = best_filter_value;
    }
-#endif
+#endif /* WRITE_WEIGHTED_FILTER */
 #endif /* WRITE_FILTER */
 }
 
