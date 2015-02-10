@@ -1748,6 +1748,7 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
  * for PNG images, and do considerably fewer caclulations.  In the future,
  * these values may not correspond directly to the zlib compression levels.
  */
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 PNG_EXPORT(69, void, png_set_compression_level, (png_structrp png_ptr,
     int level));
 
@@ -1765,6 +1766,7 @@ PNG_EXPORT(72, void, png_set_compression_window_bits, (png_structrp png_ptr,
 
 PNG_EXPORT(73, void, png_set_compression_method, (png_structrp png_ptr,
     int method));
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
 /* Also set zlib parameters for compressing non-IDAT chunks */
