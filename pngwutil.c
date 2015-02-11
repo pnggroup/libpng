@@ -2335,8 +2335,8 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
 static png_size_t /* PRIVATE */
-png_setup_sub_row(png_structrp png_ptr, png_uint_32 bpp,
-    png_size_t row_bytes, png_size_t lmins)
+png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
+    const png_size_t row_bytes, const png_size_t lmins)
 {
    png_bytep rp, dp, lp;
    png_size_t i;
@@ -2373,7 +2373,8 @@ png_setup_sub_row(png_structrp png_ptr, png_uint_32 bpp,
 }
 
 static png_size_t /* PRIVATE */
-png_setup_up_row(png_structrp png_ptr, png_size_t row_bytes, png_size_t lmins)
+png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
+    const png_size_t lmins)
 {
    png_bytep rp, dp, pp;
    png_size_t i;
@@ -2403,8 +2404,8 @@ png_setup_up_row(png_structrp png_ptr, png_size_t row_bytes, png_size_t lmins)
 }
 
 static png_size_t /* PRIVATE */
-png_setup_avg_row(png_structrp png_ptr,png_uint_32 bpp,
-     png_size_t row_bytes, png_size_t lmins)
+png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
+      const png_size_t row_bytes, const png_size_t lmins)
 {
    png_bytep rp, dp, pp, lp;
    png_uint_32 i;
@@ -2442,8 +2443,8 @@ png_setup_avg_row(png_structrp png_ptr,png_uint_32 bpp,
 }
 
 static png_size_t /* PRIVATE */
-png_setup_paeth_row(png_structrp png_ptr,png_uint_32 bpp,
-    png_size_t row_bytes, png_size_t lmins)
+png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
+    const png_size_t row_bytes, const png_size_t lmins)
 {
    png_bytep rp, dp, pp, cp, lp;
    png_size_t i;
