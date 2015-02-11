@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta49 - February 10, 2015
+Libpng 1.7.0beta49 - February 11, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -701,10 +701,11 @@ Version 1.7.0beta48 [February 7, 2015]
   Work around one more Coverity-scan dead-code warning.
   Do not build png_product2() when it is unused.
 
-Version 1.7.0beta49 [February 10, 2015]
+Version 1.7.0beta49 [February 11, 2015]
   Combined sub_row, up_row, avg_row, and paeth_row buffers into a
     single try_row buffer.
   Added PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED macro, on by default.
+  Consolidated redundant code in pngwutil.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
