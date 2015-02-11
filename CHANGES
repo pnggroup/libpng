@@ -4997,6 +4997,8 @@ Version 1.7.0beta49 [February 11, 2015]
   Consolidated redundant code in pngwutil.c
   Deal with integer overflow of sum in pngwutil.c
 
+Version 1.7.0beta50 [February 11, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
