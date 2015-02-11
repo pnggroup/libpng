@@ -3030,7 +3030,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
       if (best_filter_value != last_tested_row_value)
       {
-         /* TO DO: make this redundant code into functions? */
          if (best_filter_value == PNG_FILTER_VALUE_SUB)
            png_setup_sub_row(png_ptr, bpp, row_buf, row_bytes); 
 
@@ -3042,7 +3041,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
          if (best_filter_value == PNG_FILTER_VALUE_PAETH)
            png_setup_paeth_row(png_ptr, bpp, row_buf, row_bytes); 
-
       }
 
       png_write_filtered_row(png_ptr, png_ptr->try_row, row_info->rowbytes+1);

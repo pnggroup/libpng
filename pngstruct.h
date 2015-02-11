@@ -342,10 +342,6 @@ struct png_struct_def
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
-   /* This is somewhat excessive, there is no obvious reason on write to
-    * allocate a buffer for each possible filtered row, only for the one being
-    * tested and the current best.
-    */
    png_bytep try_row;         /* buffer to save trial row when filtering */
 #endif
 
