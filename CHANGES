@@ -4995,6 +4995,7 @@ Version 1.7.0beta49 [February 11, 2015]
     single try_row buffer.
   Added PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED macro, on by default.
   Consolidated redundant code in pngwutil.c
+  Deal with integer overflow of sum in pngwutil.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
