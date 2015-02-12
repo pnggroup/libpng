@@ -2837,6 +2837,9 @@ version 1.2.53beta02 [February 6, 2015]
     (fixes CVE-2014-9495 and CVE-2015-0973).
   Quieted some harmless warnings from Coverity-scan.
 
+version 1.2.53rc01 [February 12, 2015]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

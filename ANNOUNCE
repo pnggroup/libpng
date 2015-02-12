@@ -1,5 +1,5 @@
 
-Libpng 1.2.53beta02 - February 6, 2015
+Libpng 1.2.53rc01 - February 12, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.53beta02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.53beta02.tar.gz
-   libpng-1.2.53beta02.tar.bz2
+   libpng-1.2.53rc01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.53rc01.tar.gz
+   libpng-1.2.53rc01.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.53beta02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.53beta02-no-config.tar.gz
-   libpng-1.2.53beta02-no-config.tar.bz2
+   libpng-1.2.53rc01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.53rc01-no-config.tar.gz
+   libpng-1.2.53rc01-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1253b02.zip
-   lp1253b02.7z
-   lp1253b02.tar.bz2
+   lp1253r01.zip
+   lp1253r01.7z
+   lp1253r01.tar.bz2
 
 Project files
 
-   libpng-1.2.53beta02-project-netware.zip
-   libpng-1.2.53beta02-project-wince.zip
+   libpng-1.2.53rc01-project-netware.zip
+   libpng-1.2.53rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.53beta02-README.txt
-   libpng-1.2.53beta02-KNOWNBUGS.txt
-   libpng-1.2.53beta02-LICENSE.txt
-   libpng-1.2.53beta02-Y2K-compliance.txt
-   libpng-1.2.53beta02-[previous version]-diff.txt
-   libpng-1.2.53beta02-*.asc (armored detached GPG signatures)
+   libpng-1.2.53rc01-README.txt
+   libpng-1.2.53rc01-KNOWNBUGS.txt
+   libpng-1.2.53rc01-LICENSE.txt
+   libpng-1.2.53rc01-Y2K-compliance.txt
+   libpng-1.2.53rc01-[previous version]-diff.txt
+   libpng-1.2.53rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.52):
 
@@ -51,6 +51,9 @@ version 1.2.53beta02 [February 6, 2015]
     application has overridden the default 1,000,000-column limit
     (fixes CVE-2014-9495 and CVE-2015-0973).
   Quieted some harmless warnings from Coverity-scan.
+
+version 1.2.53rc01 [February 12, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
