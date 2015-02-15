@@ -5003,6 +5003,8 @@ Version 1.7.0beta50 [February 15, 2015]
     being tested, a second tst_row buffer.  This improves CPU speed
     over that achieved by libpng-1.7.0beta49.
 
+Version 1.7.0beta51 [February 15, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

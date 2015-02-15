@@ -2594,7 +2594,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
     * that has been chosen, as it doesn't actually do anything to the data.
     */
    best_row = png_ptr->row_buf;
-   png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
    if ((filter_to_do & PNG_FILTER_NONE) != 0 && filter_to_do != PNG_FILTER_NONE)
    {
@@ -2648,7 +2647,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       }
 #endif
       mins = sum;
-      best_row = png_ptr->row_buf;
    }
 
    /* Sub filter */
