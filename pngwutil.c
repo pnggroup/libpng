@@ -2360,6 +2360,8 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    png_size_t sum = 0;
    int v;
 
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
+
    for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1; i < bpp;
         i++, rp++, dp++)
    {
@@ -2397,6 +2399,8 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
    png_size_t sum = 0;
    int v;
 
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
+
    for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1,
        pp = png_ptr->prev_row + 1; i < row_bytes;
        i++, rp++, pp++, dp++)
@@ -2427,6 +2431,8 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
    png_uint_32 i;
    png_size_t sum = 0;
    int v;
+
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
 
    for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1,
         pp = png_ptr->prev_row + 1; i < bpp; i++)
@@ -2466,6 +2472,8 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
    png_size_t i;
    png_size_t sum = 0;
    int v;
+
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
 
    for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1,
        pp = png_ptr->prev_row + 1; i < bpp; i++)
@@ -2586,6 +2594,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
     * that has been chosen, as it doesn't actually do anything to the data.
     */
    best_row = png_ptr->row_buf;
+   png_ptr->row_buf[0] = PNG_FILTER_VALUE_NONE;
 
    if ((filter_to_do & PNG_FILTER_NONE) != 0 && filter_to_do != PNG_FILTER_NONE)
    {
@@ -2594,7 +2603,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_size_t i;
       int v;
 
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_NONE;
       for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
       {
          v = *rp;
@@ -2647,7 +2655,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_SUB)
    /* It's the only filter so no testing is needed */
    {
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
       (void) png_setup_sub_row(png_ptr, bpp, row_bytes, mins); 
       best_row = png_ptr->try_row;
    }
@@ -2656,8 +2663,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    {
       png_size_t sum;
       png_size_t lmins = mins;
-
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       /* We temporarily increase the "minimum sum" by the factor we
@@ -2748,7 +2753,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Up filter */
    if (filter_to_do == PNG_FILTER_UP)
    {
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
       (void) png_setup_up_row(png_ptr, row_bytes, mins);
       best_row = png_ptr->try_row;
    }
@@ -2757,8 +2761,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    {
       png_size_t sum;
       png_size_t lmins = mins;
-
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
@@ -2845,7 +2847,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Avg filter */
    if (filter_to_do == PNG_FILTER_AVG)
    {
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
       (void) png_setup_avg_row(png_ptr, bpp, row_bytes, mins);
       best_row = png_ptr->try_row;
    }
@@ -2855,7 +2856,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_size_t sum;
       png_size_t lmins = mins;
 
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
@@ -2941,7 +2941,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Paeth filter */
    if ((filter_to_do == PNG_FILTER_PAETH) != 0)
    {
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
       (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, mins);
       best_row = png_ptr->try_row;
    }
@@ -2951,7 +2950,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_size_t sum;
       png_size_t lmins = mins;
 
-      png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
       {
