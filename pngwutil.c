@@ -1957,7 +1957,24 @@ png_write_alloc_filter_row_buffers(png_structrp png_ptr, int filters)
    if (((filters & (PNG_FILTER_SUB | PNG_FILTER_UP | PNG_FILTER_AVG |
        PNG_FILTER_PAETH)) != 0) && png_ptr->try_row == NULL)
    {
+      int num_filters = 0;
+
       png_ptr->try_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
+
+      if (filters & PNG_FILTER_SUB)
+         num_filters++;
+
+      if (filters & PNG_FILTER_UP)
+         num_filters++;
+
+      if (filters & PNG_FILTER_AVG)
+         num_filters++;
+
+      if (filters & PNG_FILTER_PAETH)
+         num_filters++;
+
+      if (num_filters > 1)
+         png_ptr->tst_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
    }
 }
 #endif /* WRITE_FILTER */
@@ -2353,20 +2370,19 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    for (lp = png_ptr->row_buf + 1; i < row_bytes;
       i++, rp++, lp++, dp++)
    {
+      png_size_t old_sum = sum;
+
       v = *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
+      sum += (v < 128) ? v : 256 - v;
 
-      if (lmins != PNG_SIZE_MAX)
+      if (sum < old_sum) /* overflow happened */
       {
-        png_size_t old_sum = sum;
-       
-        sum += (v < 128) ? v : 256 - v;
-
-        if (sum < old_sum) /* overflow happened */
-          return (PNG_SIZE_MAX - 1);
-
-        if (sum > lmins)  /* We are already worse, don't continue. */
-          break;
+         sum = PNG_SIZE_MAX - 1;
+         break;
       }
+
+      if (sum > lmins)  /* We are already worse, don't continue. */
+        break;
    }
 
    return (sum);
@@ -2385,19 +2401,19 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
        pp = png_ptr->prev_row + 1; i < row_bytes;
        i++, rp++, pp++, dp++)
    {
+      png_size_t old_sum = sum;
+
       v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
-      if (lmins != PNG_SIZE_MAX)
+      sum += (v < 128) ? v : 256 - v;
+
+      if (sum < old_sum) /* overflow happened */
       {
-        png_size_t old_sum = sum;
-
-        sum += (v < 128) ? v : 256 - v;
-
-        if (sum < old_sum) /* overflow happened */
-          return (PNG_SIZE_MAX - 1);
-
-        if (sum > lmins)  /* We are already worse, don't continue. */
-          break;
+         sum = PNG_SIZE_MAX - 1;
+         break;
       }
+
+      if (sum > lmins)  /* We are already worse, don't continue. */
+        break;
    }
 
    return (sum);
@@ -2422,21 +2438,21 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
 
    for (lp = png_ptr->row_buf + 1; i < row_bytes; i++)
    {
+      png_size_t old_sum = sum;
+
       v = *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
           & 0xff);
 
-      if (lmins != PNG_SIZE_MAX)
+      sum += (v < 128) ? v : 256 - v;
+
+      if (sum < old_sum) /* overflow happened */
       {
-        png_size_t old_sum = sum;
-
-        sum += (v < 128) ? v : 256 - v;
-
-        if (sum < old_sum) /* overflow happened */
-          return (PNG_SIZE_MAX - 1);
-
-        if (sum > lmins)  /* We are already worse, don't continue. */
-          break;
+         sum = PNG_SIZE_MAX - 1;
+         break;
       }
+
+      if (sum > lmins)  /* We are already worse, don't continue. */
+        break;
    }
 
    return (sum);
@@ -2463,6 +2479,7 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
         i++)
    {
       int a, b, c, pa, pb, pc, p;
+      png_size_t old_sum = sum;
 
       b = *pp++;
       c = *cp++;
@@ -2485,18 +2502,16 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
 
       v = *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
 
-      if (lmins != PNG_SIZE_MAX)
+      sum += (v < 128) ? v : 256 - v;
+
+      if (sum < old_sum) /* overflow happened */
       {
-        png_size_t old_sum = sum;
-
-        sum += (v < 128) ? v : 256 - v;
-
-        if (sum < old_sum) /* overflow happened */
-          return (PNG_SIZE_MAX - 1);
-
-        if (sum > lmins)  /* We are already worse, don't continue. */
-          break;
+         sum = PNG_SIZE_MAX - 1;
+         break;
       }
+
+      if (sum > lmins)  /* We are already worse, don't continue. */
+        break;
    }
 
    return (sum);
@@ -2516,9 +2531,9 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 #ifndef PNG_WRITE_FILTER_SUPPORTED
    png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
 #else
-   png_byte best_filter_value = PNG_FILTER_VALUE_NONE;
    png_byte filter_to_do = png_ptr->do_filter;
    png_bytep row_buf;
+   png_bytep best_row;
    png_uint_32 bpp;
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    int num_p_filters = png_ptr->num_prev_filters;
@@ -2570,6 +2585,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* We don't need to test the 'no filter' case if this is the only filter
     * that has been chosen, as it doesn't actually do anything to the data.
     */
+   best_row = png_ptr->row_buf;
+
    if ((filter_to_do & PNG_FILTER_NONE) != 0 && filter_to_do != PNG_FILTER_NONE)
    {
       png_bytep rp;
@@ -2623,6 +2640,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       }
 #endif
       mins = sum;
+      best_row = png_ptr->row_buf;
    }
 
    /* Sub filter */
@@ -2630,8 +2648,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* It's the only filter so no testing is needed */
    {
       png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
-      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX); 
-      best_filter_value = PNG_FILTER_VALUE_SUB;
+      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, mins); 
+      best_row = png_ptr->try_row;
    }
 
    else if ((filter_to_do & PNG_FILTER_SUB) != 0)
@@ -2718,7 +2736,12 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       if (sum < mins)
       {
          mins = sum;
-         best_filter_value = PNG_FILTER_VALUE_SUB;
+         best_row = png_ptr->try_row;
+         if (png_ptr->tst_row != NULL)
+         {
+            png_ptr->try_row = png_ptr->tst_row;
+            png_ptr->tst_row = best_row;
+         }
       }
    }
 
@@ -2726,8 +2749,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_UP)
    {
       png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
-      (void) png_setup_up_row(png_ptr, row_bytes, PNG_SIZE_MAX);
-      best_filter_value = PNG_FILTER_VALUE_UP;
+      (void) png_setup_up_row(png_ptr, row_bytes, mins);
+      best_row = png_ptr->try_row;
    }
 
    else if ((filter_to_do & PNG_FILTER_UP) != 0)
@@ -2810,7 +2833,12 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       if (sum < mins)
       {
          mins = sum;
-         best_filter_value = PNG_FILTER_VALUE_UP;
+         best_row = png_ptr->try_row;
+         if (png_ptr->tst_row != NULL)
+         {
+            png_ptr->try_row = png_ptr->tst_row;
+            png_ptr->tst_row = best_row;
+         }
       }
    }
 
@@ -2818,8 +2846,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_AVG)
    {
       png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
-      (void) png_setup_avg_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
-      best_filter_value = PNG_FILTER_VALUE_AVG;
+      (void) png_setup_avg_row(png_ptr, bpp, row_bytes, mins);
+      best_row = png_ptr->try_row;
    }
 
    else if ((filter_to_do & PNG_FILTER_AVG) != 0)
@@ -2901,7 +2929,12 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       if (sum < mins)
       {
          mins = sum;
-         best_filter_value = PNG_FILTER_VALUE_AVG;
+         best_row = png_ptr->try_row;
+         if (png_ptr->tst_row != NULL)
+         {
+            png_ptr->try_row = png_ptr->tst_row;
+            png_ptr->tst_row = best_row;
+         }
       }
    }
 
@@ -2909,8 +2942,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if ((filter_to_do == PNG_FILTER_PAETH) != 0)
    {
       png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
-      (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
-      best_filter_value = PNG_FILTER_VALUE_PAETH;
+      (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, mins);
+      best_row = png_ptr->try_row;
    }
 
    else if ((filter_to_do & PNG_FILTER_PAETH) != 0)
@@ -2991,35 +3024,18 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
       if (sum < mins)
       {
-         best_filter_value = PNG_FILTER_VALUE_PAETH;
+         mins = sum;
+         best_row = png_ptr->try_row;
+         if (png_ptr->tst_row != NULL)
+         {
+            png_ptr->try_row = png_ptr->tst_row;
+            png_ptr->tst_row = best_row;
+         }
       }
    }
 
    /* Do the actual writing of the filtered row data from the chosen filter. */
-   if (best_filter_value == PNG_FILTER_VALUE_NONE)
-      png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
-
-   else
-   {
-      if (best_filter_value != png_ptr->try_row[0])
-      {
-         png_ptr->try_row[0] = best_filter_value;
-
-         if (best_filter_value == PNG_FILTER_VALUE_SUB)
-           (void) png_setup_sub_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX); 
-
-         if (best_filter_value == PNG_FILTER_VALUE_UP)
-           (void) png_setup_up_row(png_ptr, row_bytes, PNG_SIZE_MAX); 
-
-         if (best_filter_value == PNG_FILTER_VALUE_AVG)
-           (void) png_setup_avg_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
-
-         if (best_filter_value == PNG_FILTER_VALUE_PAETH)
-           (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
-      }
-
-      png_write_filtered_row(png_ptr, png_ptr->try_row, row_info->rowbytes+1);
-   }
+   png_write_filtered_row(png_ptr, best_row, row_info->rowbytes+1);
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
    /* Save the type of filter we picked this time for future calculations */
@@ -3032,7 +3048,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
          png_ptr->prev_filters[j] = png_ptr->prev_filters[j - 1];
       }
 
-      png_ptr->prev_filters[j] = best_filter_value;
+      png_ptr->prev_filters[j] = best_row[0];
    }
 #endif /* WRITE_WEIGHTED_FILTER */
 #endif /* WRITE_FILTER */

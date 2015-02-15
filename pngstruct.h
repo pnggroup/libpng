@@ -341,8 +341,9 @@ struct png_struct_def
    size_t    big_row_buf_size; /* Actual size of both */
 #endif
 
-#ifdef PNG_WRITE_SUPPORTED
-   png_bytep try_row;         /* buffer to save trial row when filtering */
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+   png_bytep try_row;    /* buffer to save trial row when filtering */
+   png_bytep tst_row;    /* buffer to save best trial row when filtering */
 #endif
 
    /* UNKNOWN CHUNK HANDLING */

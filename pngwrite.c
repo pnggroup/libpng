@@ -943,8 +943,10 @@ png_write_destroy(png_structrp png_ptr)
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);
    png_free(png_ptr, png_ptr->try_row);
+   png_free(png_ptr, png_ptr->tst_row);
    png_ptr->prev_row = NULL;
    png_ptr->try_row = NULL;
+   png_ptr->tst_row = NULL;
 #endif
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED

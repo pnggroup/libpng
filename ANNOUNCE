@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta50 - February 11, 2015
+Libpng 1.7.0beta50 - February 15, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -708,7 +708,11 @@ Version 1.7.0beta49 [February 11, 2015]
   Consolidated redundant code in pngwutil.c
   Deal with integer overflow of sum in pngwutil.c
 
-Version 1.7.0beta50 [February 11, 2015]
+Version 1.7.0beta50 [February 15, 2015]
+  Combined sub_row, up_row, avg_row, and paeth_row buffers into a
+    single try_row buffer and in cases where two or more of those are
+    being tested, a second tst_row buffer.  This improves CPU speed
+    over that achieved by libpng-1.7.0beta49.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
