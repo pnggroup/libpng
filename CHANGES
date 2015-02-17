@@ -5011,6 +5011,8 @@ Version 1.7.0beta51 [February 17, 2015]
     with a method that prevents overflow and does not increase cpu usage
     significantly.
 
+Version 1.7.0beta52 [February 17, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
