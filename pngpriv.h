@@ -188,36 +188,6 @@
  * real system capabilities.
  */
 
-#ifdef PNG_SAFE_LIMITS_SUPPORTED
-   /* 'safe' limits */
-#  ifndef PNG_USER_WIDTH_MAX
-#     define PNG_USER_WIDTH_MAX 1000000
-#  endif
-#  ifndef PNG_USER_HEIGHT_MAX
-#     define PNG_USER_HEIGHT_MAX 1000000
-#  endif
-#  ifndef PNG_USER_CHUNK_CACHE_MAX
-#     define PNG_USER_CHUNK_CACHE_MAX 128
-#  endif
-#  ifndef PNG_USER_CHUNK_MALLOC_MAX
-#     define PNG_USER_CHUNK_MALLOC_MAX 8000000
-#  endif
-#else
-   /* values for no limits */
-#  ifndef PNG_USER_WIDTH_MAX
-#     define PNG_USER_WIDTH_MAX 0x7fffffff
-#  endif
-#  ifndef PNG_USER_HEIGHT_MAX
-#     define PNG_USER_HEIGHT_MAX 0x7fffffff
-#  endif
-#  ifndef PNG_USER_CHUNK_CACHE_MAX
-#     define PNG_USER_CHUNK_CACHE_MAX 0
-#  endif
-#  ifndef PNG_USER_CHUNK_MALLOC_MAX
-#     define PNG_USER_CHUNK_MALLOC_MAX 0
-#  endif
-#endif
-
 /* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
  * script.  We may need it here to get the correct configuration on things
  * like limits.
@@ -228,9 +198,11 @@
 #  endif
 #endif
 
-/* Moved to pngpriv.h at libpng-1.5.0 */
-/* NOTE: some of these may have been used in external applications as
- * these definitions were exposed in pngconf.h prior to 1.5.
+/* SECURITY and SAFETY:
+ *
+ * libpng is built with support for internal limits on image dimensions and
+ * memory usage.  These are documented in scripts/pnglibconf.dfa of the
+ * source and recorded in the machine generated header file pnglibconf.h.
  */
 
 /* If you are running on a machine where you cannot allocate more
@@ -247,6 +219,11 @@
 #if defined(MAXSEG_64K) && !defined(PNG_MAX_MALLOC_64K)
 #  define PNG_MAX_MALLOC_64K
 #endif
+
+/* Moved to pngpriv.h at libpng-1.5.0 */
+/* NOTE: some of these may have been used in external applications as
+ * these definitions were exposed in pngconf.h prior to 1.5.
+ */
 
 #ifndef PNG_UNUSED
 /* Unused formal parameter warnings are silenced using the following macro

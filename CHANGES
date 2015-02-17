@@ -4297,7 +4297,13 @@ Version 1.5.22beta01 [January 29, 2015]
     values that are exactly 2^bit_depth, and work on 16-bit platforms.
   Quieted some warnings from Coverity-scan.
 
-Version 1.5.22beta02 [January 29, 2015]
+Version 1.5.22beta02 [February 17, 2015]
+  Merged pngtest.c with libpng-1.6.17/pngtest.c
+  Display user limits in the output from pngtest.
+  Eliminated the PNG_SAFE_LIMITS macro and restored the 1-million-column
+    and 1-million-row default limits in pnglibconf.dfa, that can be reset
+    by the user at build time or run time.  This provides a more robust
+    defense against DOS and as-yet undiscovered overflows.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
