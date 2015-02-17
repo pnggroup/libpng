@@ -1974,7 +1974,8 @@ png_write_alloc_filter_row_buffers(png_structrp png_ptr, int filters)
          num_filters++;
 
       if (num_filters > 1)
-         png_ptr->tst_row = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));
+         png_ptr->tst_row = png_voidcast(png_bytep,
+             png_malloc(png_ptr, buf_size));
    }
 }
 #endif /* WRITE_FILTER */
@@ -2372,16 +2373,8 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    for (lp = png_ptr->row_buf + 1; i < row_bytes;
       i++, rp++, lp++, dp++)
    {
-      png_size_t old_sum = sum;
-
       v = *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
       sum += (v < 128) ? v : 256 - v;
-
-      if (sum < old_sum) /* overflow happened */
-      {
-         sum = PNG_SIZE_MAX - 1;
-         break;
-      }
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2405,16 +2398,8 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
        pp = png_ptr->prev_row + 1; i < row_bytes;
        i++, rp++, pp++, dp++)
    {
-      png_size_t old_sum = sum;
-
       v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
       sum += (v < 128) ? v : 256 - v;
-
-      if (sum < old_sum) /* overflow happened */
-      {
-         sum = PNG_SIZE_MAX - 1;
-         break;
-      }
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2444,18 +2429,10 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
 
    for (lp = png_ptr->row_buf + 1; i < row_bytes; i++)
    {
-      png_size_t old_sum = sum;
-
       v = *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
           & 0xff);
 
       sum += (v < 128) ? v : 256 - v;
-
-      if (sum < old_sum) /* overflow happened */
-      {
-         sum = PNG_SIZE_MAX - 1;
-         break;
-      }
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2487,7 +2464,6 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
         i++)
    {
       int a, b, c, pa, pb, pc, p;
-      png_size_t old_sum = sum;
 
       b = *pp++;
       c = *cp++;
@@ -2512,12 +2488,6 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
 
       sum += (v < 128) ? v : 256 - v;
 
-      if (sum < old_sum) /* overflow happened */
-      {
-         sum = PNG_SIZE_MAX - 1;
-         break;
-      }
-
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
    }
@@ -2525,12 +2495,54 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
    return (sum);
 }
 
-#define PNG_MAXSUM (((png_uint_32)(-1)) >> 1)
+
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+
+#define PNG_MAXSUM (((png_uint_32)(-1)) >> 1)
 #define PNG_HISHIFT 10
 #define PNG_LOMASK ((png_uint_32)0xffffL)
 #define PNG_HIMASK ((png_uint_32)(~PNG_LOMASK >> PNG_HISHIFT))
+
+static png_size_t /* PRIVATE */
+png_increase_lmins(png_structrp png_ptr, png_size_t lmins)
+{
+   /* We temporarily increase the "minimum sum" by the factor we
+    * would reduce the sum of this filter, so that we can do the
+    * early exit comparison without scaling the sum each time.
+    */
+   int j;
+   png_uint_32 lmhi, lmlo;
+   lmlo = lmins & PNG_LOMASK;
+   lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
+
+   for (j = 0; j < png_ptr->num_prev_filters; j++)
+   {
+      if (png_ptr->prev_filters[j] == png_ptr->try_row[0])
+      {
+         lmlo = (lmlo * png_ptr->inv_filter_weights[j]) >>
+             PNG_WEIGHT_SHIFT;
+
+         lmhi = (lmhi * png_ptr->inv_filter_weights[j]) >>
+             PNG_WEIGHT_SHIFT;
+      }
+   }
+
+   lmlo = (lmlo * png_ptr->inv_filter_costs[png_ptr->try_row[0]]) >>
+       PNG_COST_SHIFT;
+
+   lmhi = (lmhi * png_ptr->inv_filter_costs[png_ptr->try_row[0]]) >>
+       PNG_COST_SHIFT;
+
+   if (lmhi > PNG_HIMASK)
+      lmins = PNG_MAXSUM;
+
+   else
+      lmins = (lmhi << PNG_HISHIFT) + lmlo;
+
+   return (lmins);
+}
 #endif /* WRITE_WEIGHTED_FILTER */
+
 #endif /* WRITE_FILTER */
 
 void /* PRIVATE */
@@ -2563,7 +2575,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    bpp = (row_info->pixel_depth + 7) >> 3;
 
    row_buf = png_ptr->row_buf;
-   mins = PNG_SIZE_MAX;
+   mins = PNG_SIZE_MAX - 256/* so we can detect potential overflow of the
+                               running sum */;
 
    /* The prediction method we use is to find which method provides the
     * smallest value when summing the absolute values of the distances
@@ -2595,18 +2608,13 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
     */
    best_row = png_ptr->row_buf;
 
+
    if ((filter_to_do & PNG_FILTER_NONE) != 0 && filter_to_do != PNG_FILTER_NONE)
    {
       png_bytep rp;
       png_size_t sum = 0;
       png_size_t i;
       int v;
-
-      for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
-      {
-         v = *rp;
-         sum += (v < 128) ? v : 256 - v;
-      }
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
@@ -2646,6 +2654,28 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
             sum = (sumhi << PNG_HISHIFT) + sumlo;
       }
 #endif
+
+      if (PNG_SIZE_MAX/128 <= row_bytes)
+      {
+         for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
+         {
+            /* Check for overflow */
+            if (sum > PNG_SIZE_MAX/128 - 256)
+               break;
+
+            v = *rp;
+            sum += (v < 128) ? v : 256 - v;
+         }
+      }
+      else /* Overflow is not possible */
+      {
+         for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
+         {
+            v = *rp;
+            sum += (v < 128) ? v : 256 - v;
+         }
+      }
+
       mins = sum;
    }
 
@@ -2661,43 +2691,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    {
       png_size_t sum;
       png_size_t lmins = mins;
-
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-      /* We temporarily increase the "minimum sum" by the factor we
-       * would reduce the sum of this filter, so that we can do the
-       * early exit comparison without scaling the sum each time.
-       */
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-      {
-         int j;
-         png_uint_32 lmhi, lmlo;
-         lmlo = lmins & PNG_LOMASK;
-         lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
-
-         for (j = 0; j < num_p_filters; j++)
-         {
-            if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_SUB)
-            {
-               lmlo = (lmlo * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-
-               lmhi = (lmhi * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-            }
-         }
-
-         lmlo = (lmlo * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_SUB]) >>
-             PNG_COST_SHIFT;
-
-         lmhi = (lmhi * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_SUB]) >>
-             PNG_COST_SHIFT;
-
-         if (lmhi > PNG_HIMASK)
-            lmins = PNG_MAXSUM;
-
-         else
-            lmins = (lmhi << PNG_HISHIFT) + lmlo;
-      }
+         lmins = png_increase_lmins(png_ptr, lmins);
 #endif
 
       sum = png_setup_sub_row(png_ptr, bpp, row_bytes, lmins); 
@@ -2759,39 +2756,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    {
       png_size_t sum;
       png_size_t lmins = mins;
-
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-      {
-         int j;
-         png_uint_32 lmhi, lmlo;
-         lmlo = lmins & PNG_LOMASK;
-         lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
-
-         for (j = 0; j < num_p_filters; j++)
-         {
-            if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_UP)
-            {
-               lmlo = (lmlo * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-
-               lmhi = (lmhi * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-            }
-         }
-
-         lmlo = (lmlo * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_UP]) >>
-             PNG_COST_SHIFT;
-
-         lmhi = (lmhi * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_UP]) >>
-             PNG_COST_SHIFT;
-
-         if (lmhi > PNG_HIMASK)
-            lmins = PNG_MAXSUM;
-
-         else
-            lmins = (lmhi << PNG_HISHIFT) + lmlo;
-      }
+         lmins = png_increase_lmins(png_ptr, lmins);
 #endif
 
       sum = png_setup_up_row(png_ptr, row_bytes, lmins); 
@@ -2853,39 +2821,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    {
       png_size_t sum;
       png_size_t lmins = mins;
-
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-      {
-         int j;
-         png_uint_32 lmhi, lmlo;
-         lmlo = lmins & PNG_LOMASK;
-         lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
-
-         for (j = 0; j < num_p_filters; j++)
-         {
-            if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_AVG)
-            {
-               lmlo = (lmlo * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-
-               lmhi = (lmhi * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-            }
-         }
-
-         lmlo = (lmlo * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_AVG]) >>
-             PNG_COST_SHIFT;
-
-         lmhi = (lmhi * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_AVG]) >>
-             PNG_COST_SHIFT;
-
-         if (lmhi > PNG_HIMASK)
-            lmins = PNG_MAXSUM;
-
-         else
-            lmins = (lmhi << PNG_HISHIFT) + lmlo;
-      }
+         lmins = png_increase_lmins(png_ptr, lmins);
 #endif
 
       sum= png_setup_avg_row(png_ptr, bpp, row_bytes, lmins);
@@ -2947,39 +2886,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    {
       png_size_t sum;
       png_size_t lmins = mins;
-
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+      png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
       if (png_ptr->heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-      {
-         int j;
-         png_uint_32 lmhi, lmlo;
-         lmlo = lmins & PNG_LOMASK;
-         lmhi = (lmins >> PNG_HISHIFT) & PNG_HIMASK;
-
-         for (j = 0; j < num_p_filters; j++)
-         {
-            if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_PAETH)
-            {
-               lmlo = (lmlo * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-
-               lmhi = (lmhi * png_ptr->inv_filter_weights[j]) >>
-                   PNG_WEIGHT_SHIFT;
-            }
-         }
-
-         lmlo = (lmlo * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_PAETH]) >>
-             PNG_COST_SHIFT;
-
-         lmhi = (lmhi * png_ptr->inv_filter_costs[PNG_FILTER_VALUE_PAETH]) >>
-             PNG_COST_SHIFT;
-
-         if (lmhi > PNG_HIMASK)
-            lmins = PNG_MAXSUM;
-
-         else
-            lmins = (lmhi << PNG_HISHIFT) + lmlo;
-      }
+         lmins = png_increase_lmins(png_ptr, lmins);
 #endif
 
       sum = png_setup_paeth_row(png_ptr, bpp, row_bytes, lmins);
