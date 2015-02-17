@@ -4305,6 +4305,8 @@ Version 1.5.22beta02 [February 17, 2015]
     by the user at build time or run time.  This provides a more robust
     defense against DOS and as-yet undiscovered overflows.
 
+Version 1.5.22beta03 [February 17, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
