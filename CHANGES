@@ -5145,7 +5145,12 @@ Version 1.6.17beta02 [February 7, 2015]
   Work around one more Coverity-scan dead-code warning.
   Do not build png_product2() when it is unused.
 
-Version 1.6.17beta03 [February 7, 2015]
+Version 1.6.17beta03 [February 17, 2015]
+  Display user limits in the output from pngtest.
+  Eliminated the PNG_SAFE_LIMITS macro and restored the 1-million-column
+    and 1-million-row default limits in pnglibconf.dfa, that can be reset
+    by the user at build time or run time.  This provides a more robust
+    defense against DOS and as-yet undiscovered overflows.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

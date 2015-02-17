@@ -377,7 +377,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    io_ptr = png_get_io_ptr(png_ptr);
    if (io_ptr != NULL)
    {
-      check = fread(data, (sizeof (png_byte)), length, (png_FILE_p)io_ptr);
+      check = fread(data, 1, length, (png_FILE_p)io_ptr);
    }
 
    if (check != length)
@@ -1610,8 +1610,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_size_t num_in, num_out;
          char inbuf[256], outbuf[256];
 
-         num_in = fread(inbuf, 1, (sizeof inbuf), fpin);
-         num_out = fread(outbuf, 1, (sizeof outbuf), fpout);
+         num_in = fread(inbuf, 1, sizeof inbuf, fpin);
+         num_out = fread(outbuf, 1, sizeof outbuf, fpout);
 
          if (num_in != num_out)
          {
@@ -1700,6 +1700,8 @@ main(int argc, char *argv[])
 {
    int multiple = 0;
    int ierror = 0;
+
+   png_structp dummy_ptr;
 
    fprintf(STDERR, "\n Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
@@ -1993,6 +1995,24 @@ main(int argc, char *argv[])
 
    else
       fprintf(STDERR, " libpng FAILS test\n");
+
+   dummy_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+   fprintf(STDERR, " Default limits:\n");
+   fprintf(STDERR, "  width_max  = %lu\n",
+      (unsigned long) png_get_user_width_max(dummy_ptr));
+   fprintf(STDERR, "  height_max = %lu\n",
+      (unsigned long) png_get_user_height_max(dummy_ptr));
+   if (png_get_chunk_cache_max(dummy_ptr) == 0)
+      fprintf(STDERR, "  cache_max  = unlimited\n");
+   else
+      fprintf(STDERR, "  cache_max  = %lu\n",
+         (unsigned long) png_get_chunk_cache_max(dummy_ptr));
+   if (png_get_chunk_malloc_max(dummy_ptr) == 0)
+      fprintf(STDERR, "  malloc_max = unlimited\n");
+   else
+      fprintf(STDERR, "  malloc_max = %lu\n",
+         (unsigned long) png_get_chunk_malloc_max(dummy_ptr));
+   png_destroy_read_struct(&dummy_ptr, NULL, NULL);
 
    return (int)(ierror != 0);
 }
