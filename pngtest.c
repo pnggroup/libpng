@@ -1,8 +1,8 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1701,6 +1701,8 @@ main(int argc, char *argv[])
    int multiple = 0;
    int ierror = 0;
 
+   png_structp dummy_ptr;
+
    fprintf(STDERR, "\n Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
    fprintf(STDERR, "%s", png_get_copyright(NULL));
@@ -1993,6 +1995,24 @@ main(int argc, char *argv[])
 
    else
       fprintf(STDERR, " libpng FAILS test\n");
+
+   dummy_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+   fprintf(STDERR, " Default limits:\n");
+   fprintf(STDERR, "  width_max  = %lu\n",
+      (unsigned long) png_get_user_width_max(dummy_ptr));
+   fprintf(STDERR, "  height_max = %lu\n",
+      (unsigned long) png_get_user_height_max(dummy_ptr));
+   if (png_get_chunk_cache_max(dummy_ptr) == 0)
+      fprintf(STDERR, "  cache_max  = unlimited\n");
+   else
+      fprintf(STDERR, "  cache_max  = %lu\n",
+         (unsigned long) png_get_chunk_cache_max(dummy_ptr));
+   if (png_get_chunk_malloc_max(dummy_ptr) == 0)
+      fprintf(STDERR, "  malloc_max = unlimited\n");
+   else
+      fprintf(STDERR, "  malloc_max = %lu\n",
+         (unsigned long) png_get_chunk_malloc_max(dummy_ptr));
+   png_destroy_read_struct(&dummy_ptr, NULL, NULL);
 
    return (int)(ierror != 0);
 }

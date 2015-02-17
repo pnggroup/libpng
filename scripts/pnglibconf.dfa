@@ -395,7 +395,7 @@ option USER_LIMITS requires READ
 # USER_CHUNK_CACHE_MAX limit
 setting USER_WIDTH_MAX default        1000000 /* Use 0x7fffffff for unlimited */
 setting USER_HEIGHT_MAX default       1000000 /* Use 0x7fffffff for unlimited */
-setting USER_CHUNK_CACHE_MAX default      128 /* Use 0 for unlimited */
+setting USER_CHUNK_CACHE_MAX default     1000 /* Use 0 for unlimited */
 setting USER_CHUNK_MALLOC_MAX default 8000000 /* Use 0 for unlimited */
 
 # If this option is enabled APIs to set the above limits at run time are added;

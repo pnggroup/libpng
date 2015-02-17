@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta51 - February 15, 2015
+Libpng 1.7.0beta51 - February 17, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -714,7 +714,13 @@ Version 1.7.0beta50 [February 15, 2015]
     being tested, a second tst_row buffer.  This improves CPU speed
     over that achieved by libpng-1.7.0beta49.
 
-Version 1.7.0beta51 [February 15, 2015]
+Version 1.7.0beta51 [February 17, 2015]
+  Combined similar parts of png_write_find_filter() into a png_increase_lmins()
+    function.
+  Display user limits in the output from pngtest.
+  Replaced test for harmless integer overflow (wraparound) in pngwutil.c
+    with a method that prevents overflow and does not increase cpu usage
+    significantly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
