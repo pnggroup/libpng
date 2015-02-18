@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta52 - February 17, 2015
+ libpng version 1.7.0beta52 - February 18, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta52 - February 17, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta52 - February 18, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -433,6 +433,10 @@ errors will result in a call to PNG_ABORT which defaults to abort().
 You can #define PNG_ABORT to a function or other C code that does something
 more useful than abort(), as long as your function does not
 return.
+
+If you do this, you cannot #define PNG_SIMPLIFIED_READ_SUPPORTED or
+PNG_SIMPLIFIED_WRITE_SUPPORTED, because the simplified API requires
+setjmp() support.
 
 Now you need to set up the input code.  The default for libpng is to
 use the C function fread().  If you use this, you will need to pass a
@@ -1181,7 +1185,13 @@ row_pointers prior to calling png_read_png() with
    png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 Alternatively you could allocate your image in one big block and define
-row_pointers[i] to point into the proper places in your block.
+row_pointers[i] to point into the proper places in your block. Allocate
+extra memory after the last row to leave working room for reading the
+entire row if you are doing reductions such as 16-to-8 or rgb-to-gray.
+In the worst case, reducing 16-bit RGBA to 8-bit gray, you'd need to
+allocate seven extra rows worth of memory (you don't need extra memory
+for any but the last row, because for other rows the working space just
+overlaps the next row(s).
 
 If you use png_set_rows(), the application is responsible for freeing
 row_pointers (and row_pointers[i], if they were separately allocated).
@@ -5325,7 +5335,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-February 17, 2015
+February 18, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
