@@ -1767,13 +1767,13 @@ in until png_read_end() has read the chunk data following the image.
                      the PNG datastream is embedded in
                      a MNG-1.0 datastream)
 
-    Any or all of color_tye, bit_depth, interlace_type,
-    compression_type, or filter_method can be NULL if you
-    are not interested in their values.
+    Any of width, height, color_type, bit_depth,
+    interlace_type, compression_type, or filter_method can
+    be NULL if you are not interested in their values.
 
     Note that png_get_IHDR() returns png_uint_32 data into
     the application's width and height variables.
-    This is an unsafe situation if these are 16-bit
+    This is an unsafe situation if these are not png_uint_32
     variables, or if they are 32-bit variables on a 64-bit
     platform.  In such situations, the png_get_image_width()
     and png_get_image_height() functions described below are
@@ -5537,8 +5537,8 @@ where "rp" indicates a "restricted pointer".
 Error detection in some chunks has improved; in particular the iCCP chunk
 reader now does pretty complete validation of the basic format.  Some bad
 profiles that were previously accepted are now accepted with a warning or
-rejected, depending upon the png_set_benign_errors() setting, in particular the
-very old broken Microsoft/HP 3144-byte sRGB profile.  Starting with
+rejected, depending upon the png_set_benign_errors() setting, in particular
+the very old broken Microsoft/HP 3144-byte sRGB profile.  Starting with
 libpng-1.6.11, recognizing and checking sRGB profiles can be avoided by
 means of
 
@@ -5549,7 +5549,7 @@ means of
     #endif
 
 It's not a good idea to do this if you are using the "simplified API",
-which needs to be able to recognize an sRGB profile conveyed via the iCCP
+which needs to be able to recognize sRGB profiles conveyed via the iCCP
 chunk.
 
 The PNG spec requirement that only grayscale profiles may appear in images
