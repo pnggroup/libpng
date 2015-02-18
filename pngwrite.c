@@ -1372,6 +1372,7 @@ png_set_filter_heuristics_fixed(png_structrp png_ptr, int heuristic_method,
 #endif /* FIXED_POINT */
 #endif /* WRITE_WEIGHTED_FILTER */
 
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 void PNGAPI
 png_set_compression_level(png_structrp png_ptr, int level)
 {
@@ -1454,6 +1455,7 @@ png_set_compression_method(png_structrp png_ptr, int method)
 
    png_ptr->zlib_method = method;
 }
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 /* The following were added to libpng-1.5.4 */
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED

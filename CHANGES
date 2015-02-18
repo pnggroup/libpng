@@ -5152,7 +5152,8 @@ Version 1.6.17beta03 [February 17, 2015]
     by the user at build time or run time.  This provides a more robust
     defense against DOS and as-yet undiscovered overflows.
 
-Version 1.6.17beta04 [February 17, 2015]
+Version 1.6.17beta04 [February 18, 2015]
+  Added PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED macro, on by default.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
