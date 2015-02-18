@@ -1,8 +1,8 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -799,14 +799,20 @@ png_get_IHDR(png_const_structrp png_ptr, png_const_inforp info_ptr,
 {
    png_debug1(1, "in %s retrieval function", "IHDR");
 
-   if (png_ptr == NULL || info_ptr == NULL || width == NULL ||
-       height == NULL || bit_depth == NULL || color_type == NULL)
+   if (png_ptr == NULL || info_ptr == NULL)
       return (0);
 
-   *width = info_ptr->width;
-   *height = info_ptr->height;
-   *bit_depth = info_ptr->bit_depth;
-   *color_type = info_ptr->color_type;
+   if (width != NULL)
+       *width = info_ptr->width;
+
+   if (height != NULL)
+       *height = info_ptr->height;
+
+   if (bit_depth != NULL)
+       *bit_depth = info_ptr->bit_depth;
+
+   if (color_type != NULL)
+       *color_type = info_ptr->color_type;
 
    if (compression_type != NULL)
       *compression_type = info_ptr->compression_type;

@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.17beta04 - February 17, 2015
+ libpng version 1.6.17beta04 - February 18, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.17beta04 - February 17, 2015
+ libpng versions 0.97, January 1998, through 1.6.17beta04 - February 18, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -1265,13 +1265,13 @@ in until png_read_end() has read the chunk data following the image.
                      the PNG datastream is embedded in
                      a MNG-1.0 datastream)
 
-    Any or all of interlace_type, compression_type, or
-    filter_method can be NULL if you are
-    not interested in their values.
+    Any of width, height, color_type, bit_depth,
+    interlace_type, compression_type, or filter_method can
+    be NULL if you are not interested in their values.
 
     Note that png_get_IHDR() returns 32-bit data into
     the application's width and height variables.
-    This is an unsafe situation if these are 16-bit
+    This is an unsafe situation if these are not png_uint_32
     variables.  In such situations, the
     png_get_image_width() and png_get_image_height()
     functions described below are safer.
@@ -5046,7 +5046,7 @@ means of
            PNG_OPTION_ON);
     #endif
 
-It's not a good idea to do this if you are using the new "simplified API",
+It's not a good idea to do this if you are using the "simplified API",
 which needs to be able to recognize sRGB profiles conveyed via the iCCP
 chunk.
 
@@ -5275,7 +5275,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-February 17, 2015
+February 18, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

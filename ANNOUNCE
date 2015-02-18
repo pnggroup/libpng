@@ -53,6 +53,7 @@ Version 1.6.17beta03 [February 17, 2015]
 
 Version 1.6.17beta04 [February 18, 2015]
   Added PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED macro, on by default.
+  Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
