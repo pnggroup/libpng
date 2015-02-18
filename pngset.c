@@ -1237,6 +1237,7 @@ png_set_rows(png_structp png_ptr, png_infop info_ptr, png_bytepp row_pointers)
 }
 #endif
 
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 void PNGAPI
 png_set_compression_buffer_size(png_structp png_ptr, png_size_t size)
 {
@@ -1264,6 +1265,7 @@ png_set_compression_buffer_size(png_structp png_ptr, png_size_t size)
     png_ptr->zstream.avail_out = 0;
     png_ptr->zstream.avail_in = 0;
 }
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 void PNGAPI
 png_set_invalid(png_structp png_ptr, png_infop info_ptr, int mask)
