@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.22beta03 - February 17, 2015
+ * libpng version 1.5.22beta03 - February 18, 2015
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.22beta03 - February 17, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.22beta03 - February 18, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -237,7 +237,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.22beta03, February 17, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.22beta03, February 18, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -349,7 +349,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 17, 2015
+ *    February 18, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -418,7 +418,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.22beta03"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.22beta03 - February 17, 2015\n"
+     " libpng version 1.5.22beta03 - February 18, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1050,11 +1050,13 @@ PNG_EXPORTA(5, png_structp, png_create_write_struct,
     png_error_ptr warn_fn),
     PNG_ALLOCATED);
 
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 PNG_EXPORT(6, png_size_t, png_get_compression_buffer_size,
     (png_const_structp png_ptr));
 
 PNG_EXPORT(7, void, png_set_compression_buffer_size, (png_structp png_ptr,
     png_size_t size));
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 /* Moved from pngconf.h in 1.4.0 and modified to ensure setjmp/longjmp
  * match up.
@@ -1720,6 +1722,7 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
  * for PNG images, and do considerably fewer caclulations.  In the future,
  * these values may not correspond directly to the zlib compression levels.
  */
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 PNG_EXPORT(69, void, png_set_compression_level,
     (png_structp png_ptr, int level));
 
@@ -1737,7 +1740,7 @@ PNG_EXPORT(72, void, png_set_compression_window_bits, (png_structp png_ptr,
 
 PNG_EXPORT(73, void, png_set_compression_method, (png_structp png_ptr,
     int method));
-#endif
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
 /* Also set zlib parameters for compressing non-IDAT chunks */
@@ -1759,6 +1762,7 @@ PNG_EXPORT(225, void, png_set_text_compression_window_bits, (png_structp
 PNG_EXPORT(226, void, png_set_text_compression_method, (png_structp png_ptr,
     int method));
 #endif /* PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED */
+#endif /* WRITE */
 
 /* These next functions are called for input/output, memory, and error
  * handling.  They are in the file pngrio.c, pngwio.c, and pngerror.c,
