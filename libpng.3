@@ -1679,13 +1679,10 @@ row_pointers prior to calling png_read_png() with
    png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 Alternatively you could allocate your image in one big block and define
-row_pointers[i] to point into the proper places in your block. Allocate
-extra memory after the last row to leave working room for reading the
-entire row if you are doing reductions such as 16-to-8 or rgb-to-gray.
-In the worst case, reducing 16-bit RGBA to 8-bit gray, you'd need to
-allocate seven extra rows worth of memory (you don't need extra memory
-for any but the last row, because for other rows the working space just
-overlaps the next row(s).
+row_pointers[i] to point into the proper places in your block.  If
+you do this, be sure to call png_read_update_info() described below,
+to update the "rowbytes" value to account for any transformations that
+change the number of bytes per row before you use it to allocate your block.
 
 If you use png_set_rows(), the application is responsible for freeing
 row_pointers (and row_pointers[i], if they were separately allocated).

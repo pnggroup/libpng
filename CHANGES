@@ -5011,7 +5011,11 @@ Version 1.7.0beta51 [February 17, 2015]
     with a method that prevents overflow and does not increase cpu usage
     significantly.
 
-Version 1.7.0beta52 [February 17, 2015]
+Version 1.7.0beta52 [February 18, 2015]
+  Added information about setjmp/simplified API interaction in the
+    manual page and INSTALL file. Added information about using
+    row_pointers with a single height*width*bpp allocated block
+    to the manual page.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
