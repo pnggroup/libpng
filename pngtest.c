@@ -1456,6 +1456,8 @@ main(int argc, char *argv[])
    int multiple = 0;
    int ierror = 0;
 
+   png_structp dummy_ptr;
+
    fprintf(STDERR, "\n Testing libpng version %s\n", PNG_LIBPNG_VER_STRING);
    fprintf(STDERR, "   with zlib   version %s\n", ZLIB_VERSION);
    fprintf(STDERR, "%s", png_get_copyright(NULL));
@@ -1698,8 +1700,27 @@ main(int argc, char *argv[])
       fprintf(STDERR, " libpng passes test\n");
    else
       fprintf(STDERR, " libpng FAILS test\n");
+
+   dummy_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+   fprintf(STDERR, " Default limits:\n");
+   fprintf(STDERR, "  width_max  = %lu\n",
+      (unsigned long) png_get_user_width_max(dummy_ptr));
+   fprintf(STDERR, "  height_max = %lu\n",
+      (unsigned long) png_get_user_height_max(dummy_ptr));
+   if (PNG_USER_CHUNK_CACHE_MAX == 0)
+      fprintf(STDERR, "  cache_max  = unlimited\n");
+   else
+      fprintf(STDERR, "  cache_max  = %lu\n",
+         (unsigned long) PNG_USER_CHUNK_CACHE_MAX);
+   if (PNG_USER_CHUNK_MALLOC_MAX == 0)
+      fprintf(STDERR, "  malloc_max = unlimited\n");
+   else
+      fprintf(STDERR, "  malloc_max = %lu\n",
+         (unsigned long) PNG_USER_CHUNK_MALLOC_MAX);
+   png_destroy_read_struct(&dummy_ptr, NULL, NULL);
+
    return (int)(ierror != 0);
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_53rc01 your_png_h_is_not_version_1_2_53rc01;
+typedef version_1_2_53rc02 your_png_h_is_not_version_1_2_53rc02;

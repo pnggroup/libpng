@@ -2840,6 +2840,14 @@ version 1.2.53beta02 [February 6, 2015]
 version 1.2.53rc01 [February 12, 2015]
   No changes.
 
+version 1.2.53rc02 [February 21, 2015]
+  Display user limits in the output from pngtest.
+  Changed PNG_USER_CHUNK_MALLOC_MAX from unlimited to 8,000,000.
+    This can only be changed at library-build time.  It only
+    affects the maximum memory that can be allocated to an
+    ancillary chunk; it does not limit the size of IDAT
+    data, which is instead limited by PNG_USER_WIDTH_MAX.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
