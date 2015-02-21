@@ -424,6 +424,7 @@ option USER_TRANSFORM_INFO if READ_USER_TRANSFORM WRITE_USER_TRANSFORM
 # This enables API to set compression parameters for compressing
 # non-IDAT chunks (zTXt, iTXt, iCCP, and unknown chunks).  This feature
 # was added at libpng-1.5.3.
+option WRITE_CUSTOMIZE_COMPRESSION requires WRITE
 option WRITE_CUSTOMIZE_ZTXT_COMPRESSION requires WRITE
 
 # Any chunks you are not interested in, you can undef here.  The
