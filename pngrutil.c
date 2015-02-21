@@ -2,7 +2,7 @@
 /* pngrutil.c - utilities to read a PNG file
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1316,7 +1316,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    /* If a colorspace error has already been output skip this chunk */
-   if (png_ptr->colorspace.flags & PNG_COLORSPACE_INVALID)
+   if ((png_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) != 0)
    {
       png_crc_finish(png_ptr, length);
       return;
