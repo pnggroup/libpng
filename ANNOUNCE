@@ -1,34 +1,35 @@
 
-Libpng 1.4.15 - February 12, 2015
+Libpng 1.4.16beta01 - February 21, 2015
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.4.15.tar.xz (LZMA-compressed, recommended)
-   libpng-1.4.15.tar.gz
-   libpng-1.4.15.tar.bz2
+   1.4.16beta01.tar.xz (LZMA-compressed, recommended)
+   1.4.16beta01.tar.gz
+   1.4.16beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1415.7z (LZMA-compressed, recommended)
-   lpng1415.zip
+   lp1416b01.7z (LZMA-compressed, recommended)
+   lp1416b01.zip
 
 Other information:
 
-   libpng-1.4.15-README.txt
-   libpng-1.4.15-LICENSE.txt
-   libpng-1.4.15-*.asc (armored detached GPG signatures)
+   1.4.16beta01-README.txt
+   1.4.16beta01-LICENSE.txt
+   libpng-1.4.16beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.4.14):
+Changes since the last public release (1.4.15):
 
-  Restored test for maximum allowed image width that was removed from
-    libpng-1.4.13 (fixes CVE-2014-9495 and CVE-2015-0973).
-  Quieted some harmless warnings from Coverity-scan.
+version 1.4.16beta01 [February 21, 2015]
+  Display user limits in the output from pngtest.
+  Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
