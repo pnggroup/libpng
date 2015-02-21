@@ -2847,6 +2847,7 @@ version 1.2.53rc02 [February 21, 2015]
     affects the maximum memory that can be allocated to an
     ancillary chunk; it does not limit the size of IDAT
     data, which is instead limited by PNG_USER_WIDTH_MAX.
+  Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
