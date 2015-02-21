@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta52 - February 21, 2015
+Libpng 1.7.0beta53 - February 21, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta52.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta52.tar.gz
+   1.7.0beta53.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta53.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b52.7z  (LZMA-compressed, recommended)
-   lp170b52.zip
+   lp170b53.7z  (LZMA-compressed, recommended)
+   lp170b53.zip
 
 Other information:
 
-   1.7.0beta52-README.txt
-   1.7.0beta52-LICENSE.txt
-   libpng-1.7.0beta52-*.asc (armored detached GPG signatures)
+   1.7.0beta53-README.txt
+   1.7.0beta53-LICENSE.txt
+   libpng-1.7.0beta53-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -727,6 +727,8 @@ Version 1.7.0beta52 [February 21, 2015]
     manual page and INSTALL file. Added information about using
     row_pointers with a single height*width*bpp allocated block
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
+
+Version 1.7.0beta53 [February 21, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
