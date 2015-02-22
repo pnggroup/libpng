@@ -694,13 +694,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta53 - February 21, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta53 - February 22, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta53 - February 21, 2015\
+      return "libpng version 1.7.0beta53 - February 22, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3319,7 +3319,6 @@ png_gamma_significant(png_fixed_point gamma_val)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-#ifdef PNG_16BIT_SUPPORTED
 #ifndef PNG_FLOATING_ARITHMETIC_SUPPORTED
 /* A local convenience routine. */
 static png_fixed_point
@@ -3334,13 +3333,11 @@ png_product2(png_fixed_point a, png_fixed_point b)
    return 0; /* overflow */
 }
 #endif /* FLOATING_ARITHMETIC */
-#endif /* 16BIT */
 
 /* The inverse of the above. */
 png_fixed_point
 png_reciprocal2(png_fixed_point a, png_fixed_point b)
 {
-#ifdef PNG_16BIT_SUPPORTED
    /* The required result is 1/a * 1/b; the following preserves accuracy. */
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    if (a != 0 && b != 0)
@@ -3363,7 +3360,6 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
    if (res != 0)
       return png_reciprocal(res);
 #endif
-#endif /* 16BIT */
 
    return 0; /* overflow */
 }
