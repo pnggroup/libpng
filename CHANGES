@@ -5157,7 +5157,7 @@ Version 1.6.17beta04 [February 21, 2015]
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
-Version 1.6.17beta05 [February 21, 2015]
+Version 1.6.17beta05 [February 23, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
