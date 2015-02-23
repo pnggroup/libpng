@@ -5018,7 +5018,7 @@ Version 1.7.0beta52 [February 21, 2015]
     to the manual page.
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
-Version 1.7.0beta53 [February 22, 2015]
+Version 1.7.0beta53 [February 23, 2015]
   Restored compiling of png_reciprocal2 with PNG_NO_16BIT.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

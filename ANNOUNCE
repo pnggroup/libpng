@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta53 - February 22, 2015
+Libpng 1.7.0beta53 - February 23, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -728,7 +728,7 @@ Version 1.7.0beta52 [February 21, 2015]
     row_pointers with a single height*width*bpp allocated block
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
-Version 1.7.0beta53 [February 22, 2015]
+Version 1.7.0beta53 [February 23, 2015]
   Restored compiling of png_reciprocal2 with PNG_NO_16BIT.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
