@@ -2289,7 +2289,9 @@ png_image_write_main(png_voidp argument)
        * it about 50 times.  The speed-up in pngstest was about 10-20% of the
        * total (user) time on a heavily loaded system.
        */
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
       png_set_compression_level(png_ptr, 3);
+#endif
    }
 
    /* Check for the cases that currently require a pre-transform on the row
