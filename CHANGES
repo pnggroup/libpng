@@ -2940,7 +2940,7 @@ version 1.4.15 [February 12, 2015]
 
 version 1.4.16beta01 [February 21, 2015]
   Display user limits in the output from pngtest.
-  Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
+  Rebuilt configure scripts with automake-1.15 and libtool-2.4.6.
 
 version 1.4.16beta02 [February 25, 2015]
   Changed default PNG_USER_CHUNK_MALLOC_MAX from 0 to 8,000,000.
