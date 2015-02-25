@@ -5021,6 +5021,8 @@ Version 1.7.0beta52 [February 21, 2015]
 Version 1.7.0beta53 [February 23, 2015]
   Restored compiling of png_reciprocal2 with PNG_NO_16BIT.
 
+Version 1.7.0beta54 [February 25, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta53 - February 23, 2015
+Libpng 1.7.0beta54 - February 25, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta53.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta53.tar.gz
+   1.7.0beta54.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta54.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b53.7z  (LZMA-compressed, recommended)
-   lp170b53.zip
+   lp170b54.7z  (LZMA-compressed, recommended)
+   lp170b54.zip
 
 Other information:
 
-   1.7.0beta53-README.txt
-   1.7.0beta53-LICENSE.txt
-   libpng-1.7.0beta53-*.asc (armored detached GPG signatures)
+   1.7.0beta54-README.txt
+   1.7.0beta54-LICENSE.txt
+   libpng-1.7.0beta54-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -730,6 +730,8 @@ Version 1.7.0beta52 [February 21, 2015]
 
 Version 1.7.0beta53 [February 23, 2015]
   Restored compiling of png_reciprocal2 with PNG_NO_16BIT.
+
+Version 1.7.0beta54 [February 25, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
