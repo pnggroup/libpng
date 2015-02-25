@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.16beta01 - February 21, 2015
+ * libpng version 1.4.16beta02 - February 25, 2015
  * For conditions of distribution and use, see copyright notice in png.h
  * Copyright (c) 1998-2011 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -751,7 +751,7 @@
 
 /* Added at libpng-1.2.43 */
 #ifndef PNG_USER_CHUNK_MALLOC_MAX
-#  define PNG_USER_CHUNK_MALLOC_MAX 0
+#  define PNG_USER_CHUNK_MALLOC_MAX 8000000
 #endif
 
 /* Added at libpng-1.4.0 */

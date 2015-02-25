@@ -1,5 +1,5 @@
 
-Libpng 1.4.16beta01 - February 21, 2015
+Libpng 1.4.16beta02 - February 25, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,27 +9,30 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.16beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.16beta01.tar.gz
-   1.4.16beta01.tar.bz2
+   1.4.16beta02.tar.xz (LZMA-compressed, recommended)
+   1.4.16beta02.tar.gz
+   1.4.16beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1416b01.7z (LZMA-compressed, recommended)
-   lp1416b01.zip
+   lp1416b02.7z (LZMA-compressed, recommended)
+   lp1416b02.zip
 
 Other information:
 
-   1.4.16beta01-README.txt
-   1.4.16beta01-LICENSE.txt
-   libpng-1.4.16beta01-*.asc (armored detached GPG signatures)
+   1.4.16beta02-README.txt
+   1.4.16beta02-LICENSE.txt
+   libpng-1.4.16beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.15):
 
 version 1.4.16beta01 [February 21, 2015]
   Display user limits in the output from pngtest.
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
+
+version 1.4.16beta02 [February 25, 2015]
+  Changed default PNG_USER_CHUNK_MALLOC_MAX from 0 to 8,000,000.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
