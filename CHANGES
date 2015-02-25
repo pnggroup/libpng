@@ -4310,8 +4310,10 @@ Version 1.5.22beta03 [February 21, 2015]
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
-Version 1.5.22beta04 [February 24, 2015]
+Version 1.5.22beta04 [February 25, 2015]
   Relocated a misplaced "}" in png_reciprocal2().
+
+Version 1.5.22beta05 [February 25, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

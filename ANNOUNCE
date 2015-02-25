@@ -1,5 +1,5 @@
 
-Libpng 1.5.22beta04 - February 24, 2015
+Libpng 1.5.22beta05 - February 25, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.22beta04.tar.xz (LZMA-compressed, recommended)
-   1.5.22beta04.tar.gz
-   1.5.22beta04.tar.bz2
+   1.5.22beta05.tar.xz (LZMA-compressed, recommended)
+   1.5.22beta05.tar.gz
+   1.5.22beta05.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1522b04.7z  (LZMA-compressed, recommended)
-   lp1522b04.zip
+   lp1522b05.7z  (LZMA-compressed, recommended)
+   lp1522b05.zip
 
 Other information:
 
-   1.5.22beta04-README.txt
-   1.5.22beta04-LICENSE.txt
-   libpng-1.5.22beta04-*.asc (armored detached GPG signatures)
+   1.5.22beta05-README.txt
+   1.5.22beta05-LICENSE.txt
+   libpng-1.5.22beta05-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.21):
 
@@ -46,8 +46,10 @@ Version 1.5.22beta03 [February 21, 2015]
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
-Version 1.5.22beta04 [February 24, 2015]
+Version 1.5.22beta04 [February 25, 2015]
   Relocated a misplaced "}" in png_reciprocal2().
+
+Version 1.5.22beta05 [February 25, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
