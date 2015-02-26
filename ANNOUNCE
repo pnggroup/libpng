@@ -1,61 +1,52 @@
 
-Libpng 1.2.53rc03 - February 21, 2015
+Libpng 1.2.53 - February 26, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.53rc03.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.53rc03.tar.gz
-   libpng-1.2.53rc03.tar.bz2
+   libpng-1.2.53.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.53.tar.gz
+   libpng-1.2.53.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.53rc03-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.53rc03-no-config.tar.gz
-   libpng-1.2.53rc03-no-config.tar.bz2
+   libpng-1.2.53-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.53-no-config.tar.gz
+   libpng-1.2.53-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1253r03.zip
-   lp1253r03.7z
-   lp1253r03.tar.bz2
+   lpng1253.zip
+   lpng1253.7z
+   lpng1253.tar.bz2
 
 Project files
 
-   libpng-1.2.53rc03-project-netware.zip
-   libpng-1.2.53rc03-project-wince.zip
+   libpng-1.2.53-project-netware.zip
+   libpng-1.2.53-project-wince.zip
 
 Other information:
 
-   libpng-1.2.53rc03-README.txt
-   libpng-1.2.53rc03-KNOWNBUGS.txt
-   libpng-1.2.53rc03-LICENSE.txt
-   libpng-1.2.53rc03-Y2K-compliance.txt
-   libpng-1.2.53rc03-[previous version]-diff.txt
-   libpng-1.2.53rc03-*.asc (armored detached GPG signatures)
+   libpng-1.2.53-README.txt
+   libpng-1.2.53-KNOWNBUGS.txt
+   libpng-1.2.53-LICENSE.txt
+   libpng-1.2.53-Y2K-compliance.txt
+   libpng-1.2.53-[previous version]-diff.txt
+   libpng-1.2.53-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.52):
 
-version 1.2.53beta01 [omitted]
-
-version 1.2.53beta02 [February 6, 2015]
   Issue a png_error() instead of a png_warning() when width is
     potentially too large for the architecture, in case the calling
     application has overridden the default 1,000,000-column limit
     (fixes CVE-2014-9495 and CVE-2015-0973).
   Quieted some harmless warnings from Coverity-scan.
-
-version 1.2.53rc01 [February 12, 2015]
-  No changes.
-
-version 1.2.53rc02 [February 21, 2015]
   Display user limits in the output from pngtest.
   Changed PNG_USER_CHUNK_MALLOC_MAX from unlimited to 8,000,000.
     This can only be changed at library-build time.  It only
@@ -63,8 +54,6 @@ version 1.2.53rc02 [February 21, 2015]
     ancillary chunk; it does not limit the size of IDAT
     data, which is instead limited by PNG_USER_WIDTH_MAX.
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
-
-version 1.2.53rc03 [February 21, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

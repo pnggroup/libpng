@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.53 [February 21, 2015]
+ * Last changed in libpng 1.2.53 [February 26, 2015]
  * Copyright (c) 1998-2014 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1703,10 +1703,17 @@ main(int argc, char *argv[])
 
    dummy_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
    fprintf(STDERR, " Default limits:\n");
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
    fprintf(STDERR, "  width_max  = %lu\n",
       (unsigned long) png_get_user_width_max(dummy_ptr));
    fprintf(STDERR, "  height_max = %lu\n",
       (unsigned long) png_get_user_height_max(dummy_ptr));
+#else
+   fprintf(STDERR, "  width_max  = %lu\n",
+      (unsigned long) PNG_USER_WIDTH_MAX);
+   fprintf(STDERR, "  height_max = %lu\n",
+      (unsigned long) PNG_USER_HEIGHT_MAX);
+#endif /* PNG_SET_USER_LIMITS_SUPPORTED */
    if (PNG_USER_CHUNK_CACHE_MAX == 0)
       fprintf(STDERR, "  cache_max  = unlimited\n");
    else
@@ -1723,4 +1730,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_2_53rc03 your_png_h_is_not_version_1_2_53rc03;
+typedef version_1_2_53 your_png_h_is_not_version_1_2_53;
