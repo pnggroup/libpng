@@ -2814,7 +2814,32 @@ version 1.2.52rc02 [November 17, 2014]
   Added "-D_CRT_SECURE_NO_DEPRECATE" to CFLAGS in scripts/makefile.vcwin32
     and scripts/makefile.vcawin32.
 
-version 1.0.62 and 1.2.52 [February 6, 2014]
+version 1.0.62 and 1.2.52 [November 20, 2014]
+  No changes.
+
+version 1.2.53beta01 [omitted]
+
+version 1.2.53beta02 [February 6, 2015]
+  Issue a png_error() instead of a png_warning() when width is
+    potentially too large for the architecture, in case the calling
+    application has overridden the default 1,000,000-column limit
+    (fixes CVE-2014-9495 and CVE-2015-0973).
+  Quieted some harmless warnings from Coverity-scan.
+
+version 1.2.53rc01 [February 12, 2015]
+  No changes.
+
+version 1.2.53rc02 [February 21, 2015]
+  Display user limits in the output from pngtest.
+  Changed PNG_USER_CHUNK_MALLOC_MAX from unlimited to 8,000,000.
+    This can only be changed at library-build time.  It only
+    affects the maximum memory that can be allocated to an
+    ancillary chunk; it does not limit the size of IDAT
+    data, which is instead limited by PNG_USER_WIDTH_MAX.
+  Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
+
+versions 1.0.63 and 1.2.53 [February 6, 2014]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

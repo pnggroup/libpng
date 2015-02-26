@@ -1,8 +1,8 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.2.43 [February 25, 2010]
- * Copyright (c) 1998-2010 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.53 [February 6, 2014]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -254,7 +254,7 @@ png_text_compress(png_structp png_ptr,
                old_ptr = comp->output_ptr;
                comp->output_ptr = (png_charpp)png_malloc(png_ptr,
                   (png_uint_32)
-                  (comp->max_output_ptr * png_sizeof(png_charpp)));
+                  (comp->max_output_ptr * png_sizeof(png_charp)));
                png_memcpy(comp->output_ptr, old_ptr, old_max
                   * png_sizeof(png_charp));
                png_free(png_ptr, old_ptr);
@@ -1759,6 +1759,7 @@ void /* PRIVATE */
 png_write_start_row(png_structp png_ptr)
 {
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#ifndef PNG_USE_GLOBAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1772,6 +1773,7 @@ png_write_start_row(png_structp png_ptr)
 
    /* Offset to next interlace block in the y direction */
    int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+#endif
 #endif
 
    png_size_t buf_size;
@@ -1857,6 +1859,7 @@ void /* PRIVATE */
 png_write_finish_row(png_structp png_ptr)
 {
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#ifndef PNG_USE_GLOBAL_ARRAYS
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1870,6 +1873,7 @@ png_write_finish_row(png_structp png_ptr)
 
    /* Offset to next interlace block in the y direction */
    int png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+#endif
 #endif
 
    int ret;
@@ -1976,11 +1980,13 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 {
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
+#ifndef PNG_USE_GLOBAL_ARRAYS
    /* Start of interlace block */
    int png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* Offset to next interlace block */
    int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+#endif
 
    png_debug(1, "in png_do_write_interlace");
 

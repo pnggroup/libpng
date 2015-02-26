@@ -1,8 +1,8 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.0.62 - February 6, 2014
- * Copyright (c) 1998-2013 Glenn Randers-Pehrson
+ * libpng version 1.0.63 - February 6, 2014
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -887,7 +887,7 @@
 
 /* Added at libpng-1.2.43 */
 #ifndef PNG_USER_CHUNK_MALLOC_MAX
-#  define PNG_USER_CHUNK_MALLOC_MAX 0
+#  define PNG_USER_CHUNK_MALLOC_MAX 8000000
 #endif
 
 #ifndef PNG_LITERAL_SHARP
