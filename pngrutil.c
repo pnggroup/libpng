@@ -3850,7 +3850,7 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
    while (row < rp_end)
    {
       int a = *row + *prev_row++;
-      *row++ = (png_byte)a;
+      *row++ = (png_byte)(a&0xFF);
    }
 
    /* Remainder */
@@ -3881,7 +3881,7 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
       if (pc < pa) a = c;
 
       a += *row;
-      *row++ = (png_byte)a;
+      *row++ = (png_byte)(a&0xFF);
    }
 }
 

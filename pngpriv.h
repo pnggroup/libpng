@@ -748,8 +748,8 @@
  * systems where (char) is more than 8 bits.
  */
 #define PNG_STRING_FROM_CHUNK(s,c)\
-   (void)(((char*)(s))[0]=(char)((c)>>24), ((char*)(s))[1]=(char)((c)>>16),\
-   ((char*)(s))[2]=(char)((c)>>8), ((char*)(s))[3]=(char)((c)))
+   (void)(((char*)(s))[0]=(char)(((c)>>24)&0xFF), ((char*)(s))[1]=(char)(((c)>>16)&0xFF),\
+   ((char*)(s))[2]=(char)(((c)>>8)&0xFF), ((char*)(s))[3]=(char)((c&0xFF)))
 
 /* Do the same but terminate with a null character. */
 #define PNG_CSTRING_FROM_CHUNK(s,c)\
