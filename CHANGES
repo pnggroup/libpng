@@ -5021,7 +5021,12 @@ Version 1.7.0beta52 [February 21, 2015]
 Version 1.7.0beta53 [February 23, 2015]
   Restored compiling of png_reciprocal2 with PNG_NO_16BIT.
 
-Version 1.7.0beta54 [February 25, 2015]
+Version 1.7.0beta54 [February 28, 2015]
+  Moved png_set_filter() prototype into a PNG_WRITE_SUPPORTED block
+    of png.h.
+  Conditionally compile a small amount of code in pngwutil.c
+  Avoid runtime checks when converting integer to png_byte with
+    Visual Studio (Sergey Kosarevsky)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

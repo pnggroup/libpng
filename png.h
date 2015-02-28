@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta54 - February 25, 2015
+ * libpng version 1.7.0beta54 - February 28, 2015
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta54 - February 25, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta54 - February 28, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -200,7 +200,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta54, February 25, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta54, February 28, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -312,7 +312,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 25, 2015
+ *    February 28, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -382,7 +382,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta54"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta54 - February 25, 2015\n"
+     " libpng version 1.7.0beta54 - February 28, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -590,8 +590,10 @@
  * systems where (char) is more than 8 bits.
  */
 #define PNG_STRING_FROM_CHUNK(s,c)\
-   (void)(((char*)(s))[0]=(char)((c)>>24), ((char*)(s))[1]=(char)((c)>>16),\
-   ((char*)(s))[2]=(char)((c)>>8), ((char*)(s))[3]=(char)((c)))
+   (void)(((char*)(s))[0]=(char)(((c)>>24) & 0xff), \
+   ((char*)(s))[1]=(char)(((c)>>16) & 0xff),\
+   ((char*)(s))[2]=(char)(((c)>>8) & 0xff), \
+   ((char*)(s))[3]=(char)((c & 0xff)))
 
 /* Do the same but terminate with a null character. */
 #define PNG_CSTRING_FROM_CHUNK(s,c)\
@@ -1658,11 +1660,13 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  * header file (zlib.h) for an explination of the compression functions.
  */
 
+#ifdef PNG_WRITE_SUPPORTED
 /* Set the filtering method(s) used by libpng.  Currently, the only valid
  * value for "method" is 0.
  */
 PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
     int filters));
+#endif /* WRITE */
 
 /* Filter values (not flags) - used in pngwrite.c, pngwutil.c for now.
  * These defines match the values in the PNG specification.
@@ -1694,6 +1698,7 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
 #define PNG_ALL_FILTERS    (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP | \
    PNG_FILTER_AVG | PNG_FILTER_PAETH)
 
+#ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* EXPERIMENTAL */
 /* The "heuristic_method" is given by one of the PNG_FILTER_HEURISTIC_
  * defines, either the default (minimum-sum-of-absolute-differences), or
@@ -1740,7 +1745,6 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
 #define PNG_FILTER_HEURISTIC_WEIGHTED   2  /* Experimental feature */
 #define PNG_FILTER_HEURISTIC_LAST       3  /* Not a valid value */
 
-#ifdef PNG_WRITE_SUPPORTED
 /* Set the library compression level.  Currently, valid values range from
  * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
  * (0 - no compression, 9 - "maximal" compression).  Note that tests have
