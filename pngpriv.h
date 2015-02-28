@@ -741,15 +741,17 @@
  * macro will fail on top-bit-set values because of the sign extension.
  */
 #define PNG_CHUNK_FROM_STRING(s)\
-   PNG_U32(0xff&(s)[0], 0xff&(s)[1], 0xff&(s)[2], 0xff&(s)[3])
+   PNG_U32(0xff & (s)[0], 0xff & (s)[1], 0xff & (s)[2], 0xff & (s)[3])
 
 /* This uses (char), not (png_byte) to avoid warnings on systems where (char) is
  * signed and the argument is a (char[])  This macro will fail miserably on
  * systems where (char) is more than 8 bits.
  */
 #define PNG_STRING_FROM_CHUNK(s,c)\
-   (void)(((char*)(s))[0]=(char)(((c)>>24)&0xFF), ((char*)(s))[1]=(char)(((c)>>16)&0xFF),\
-   ((char*)(s))[2]=(char)(((c)>>8)&0xFF), ((char*)(s))[3]=(char)((c&0xFF)))
+   (void)(((char*)(s))[0]=(char)(((c)>>24) & 0xff), \
+   ((char*)(s))[1]=(char)(((c)>>16) & 0xff),\
+   ((char*)(s))[2]=(char)(((c)>>8) & 0xff), \
+   ((char*)(s))[3]=(char)((c & 0xff)))
 
 /* Do the same but terminate with a null character. */
 #define PNG_CSTRING_FROM_CHUNK(s,c)\
@@ -811,8 +813,9 @@ PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_table, [256]);
 PNG_INTERNAL_DATA(const png_uint_16, png_sRGB_base, [512]);
 PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
 
-#define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
-   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
+#define PNG_sRGB_FROM_LINEAR(linear) \
+  ((png_byte)(0xff & ((png_sRGB_base[(linear)>>15] \
+   + ((((linear) & 0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)))
    /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
     * encoded value with maximum error 0.646365.  Note that the input is not a
     * 16-bit value; it has been multiplied by 255! */

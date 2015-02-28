@@ -34,7 +34,7 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
-   png_ptr->sig_bytes = (png_byte)(num_bytes < 0 ? 0 : num_bytes);
+   png_ptr->sig_bytes = (png_byte)((num_bytes < 0 ? 0 : num_bytes) & 0xff);
 }
 
 /* Checks whether the supplied bytes match the PNG signature.  We allow
@@ -772,13 +772,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17beta06 - February 25, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.17beta06 - February 28, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17beta06 - February 25, 2015\
+      return "libpng version 1.6.17beta06 - February 28, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -875,9 +875,9 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 
    for (i = 0, v = 0; i < num_palette; i++, v += color_inc)
    {
-      palette[i].red = (png_byte)v;
-      palette[i].green = (png_byte)v;
-      palette[i].blue = (png_byte)v;
+      palette[i].red = (png_byte)(v & 0xff);
+      palette[i].green = (png_byte)(v & 0xff);
+      palette[i].blue = (png_byte)(v & 0xff);
    }
 }
 #endif
@@ -3733,7 +3733,7 @@ png_exp8bit(png_fixed_point lg2)
     * step.
     */
    x -= x >> 8;
-   return (png_byte)((x + 0x7fffffU) >> 24);
+   return (png_byte)(((x + 0x7fffffU) >> 24) & 0xff);
 }
 
 #ifdef PNG_16BIT_SUPPORTED
@@ -3794,7 +3794,7 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
 #     endif
    }
 
-   return (png_byte)value;
+   return (png_byte)(value & 0xff);
 }
 
 #ifdef PNG_16BIT_SUPPORTED
@@ -4016,7 +4016,7 @@ png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
 
    else
       for (i=0; i<256; ++i)
-         table[i] = (png_byte)i;
+         table[i] = (png_byte)(i & 0xff);
 }
 
 /* Used from png_read_destroy and below to release the memory used by the gamma
@@ -4156,7 +4156,8 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
       *
       */
      if (sig_bit > 0 && sig_bit < 16U)
-        shift = (png_byte)(16U - sig_bit); /* shift == insignificant bits */
+        /* shift == insignificant bits */
+        shift = (png_byte)((16U - sig_bit) & 0xff);
 
      else
         shift = 0; /* keep all 16 bits */
@@ -4225,7 +4226,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
       int setting = (2 + (onoff != 0)) << option;
       int current = png_ptr->options;
 
-      png_ptr->options = (png_byte)((current & ~mask) | setting);
+      png_ptr->options = (png_byte)(((current & ~mask) | setting) & 0xff);
 
       return (current & mask) >> option;
    }

@@ -278,10 +278,10 @@ optimize_cmf(png_bytep data, png_alloc_size_t data_size)
 
             z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
 
-            data[0] = (png_byte)z_cmf;
+            data[0] = (png_byte)(z_cmf & 0xff);
             tmp = data[1] & 0xe0;
             tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
-            data[1] = (png_byte)tmp;
+            data[1] = (png_byte)(tmp & 0xff);
          }
       }
    }
@@ -871,18 +871,18 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
    interlace_type=PNG_INTERLACE_NONE;
 #endif
 
-   /* Save the relevent information */
-   png_ptr->bit_depth = (png_byte)bit_depth;
-   png_ptr->color_type = (png_byte)color_type;
-   png_ptr->interlaced = (png_byte)interlace_type;
+   /* Save the relevant information */
+   png_ptr->bit_depth = (png_byte)(bit_depth & 0xff);
+   png_ptr->color_type = (png_byte)(color_type & 0xff);
+   png_ptr->interlaced = (png_byte)(interlace_type & 0xff);
 #ifdef PNG_MNG_FEATURES_SUPPORTED
-   png_ptr->filter_type = (png_byte)filter_type;
+   png_ptr->filter_type = (png_byte)(filter_type & 0xff);
 #endif
-   png_ptr->compression_type = (png_byte)compression_type;
+   png_ptr->compression_type = (png_byte)(compression_type & 0xff);
    png_ptr->width = width;
    png_ptr->height = height;
 
-   png_ptr->pixel_depth = (png_byte)(bit_depth * png_ptr->channels);
+   png_ptr->pixel_depth = (png_byte)((bit_depth * png_ptr->channels) & 0xff);
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, width);
    /* Set the usr info, so any transformations can modify it */
    png_ptr->usr_width = png_ptr->width;
@@ -892,11 +892,11 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
    /* Pack the header information into the buffer */
    png_save_uint_32(buf, width);
    png_save_uint_32(buf + 4, height);
-   buf[8] = (png_byte)bit_depth;
-   buf[9] = (png_byte)color_type;
-   buf[10] = (png_byte)compression_type;
-   buf[11] = (png_byte)filter_type;
-   buf[12] = (png_byte)interlace_type;
+   buf[8] = (png_byte)(bit_depth & 0xff);
+   buf[9] = (png_byte)(color_type & 0xff);
+   buf[10] = (png_byte)(compression_type & 0xff);
+   buf[11] = (png_byte)(filter_type & 0xff);
+   buf[12] = (png_byte)(interlace_type & 0xff);
 
    /* Write the chunk */
    png_write_complete_chunk(png_ptr, png_IHDR, buf, (png_size_t)13);
@@ -1181,7 +1181,7 @@ png_write_sRGB(png_structrp png_ptr, int srgb_intent)
       png_warning(png_ptr,
           "Invalid sRGB rendering intent specified");
 
-   buf[0]=(png_byte)srgb_intent;
+   buf[0]=(png_byte)(srgb_intent & 0xff);
    png_write_complete_chunk(png_ptr, png_sRGB, buf, (png_size_t)1);
 }
 #endif
@@ -1285,10 +1285,10 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
    {
       if (spalette->depth == 8)
       {
-         entrybuf[0] = (png_byte)ep->red;
-         entrybuf[1] = (png_byte)ep->green;
-         entrybuf[2] = (png_byte)ep->blue;
-         entrybuf[3] = (png_byte)ep->alpha;
+         entrybuf[0] = (png_byte)(ep->red & 0xff);
+         entrybuf[1] = (png_byte)(ep->green & 0xff);
+         entrybuf[2] = (png_byte)(ep->blue & 0xff);
+         entrybuf[3] = (png_byte)(ep->alpha & 0xff);
          png_save_uint_16(entrybuf + 4, ep->frequency);
       }
 
@@ -1309,10 +1309,10 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
    {
       if (spalette->depth == 8)
       {
-         entrybuf[0] = (png_byte)ep[i].red;
-         entrybuf[1] = (png_byte)ep[i].green;
-         entrybuf[2] = (png_byte)ep[i].blue;
-         entrybuf[3] = (png_byte)ep[i].alpha;
+         entrybuf[0] = (png_byte)(ep[i].red & 0xff);
+         entrybuf[1] = (png_byte)(ep[i].green & 0xff);
+         entrybuf[2] = (png_byte)(ep[i].blue & 0xff);
+         entrybuf[3] = (png_byte)(ep[i].alpha & 0xff);
          png_save_uint_16(entrybuf + 4, ep[i].frequency);
       }
 
@@ -1348,8 +1348,8 @@ png_write_sBIT(png_structrp png_ptr, png_const_color_8p sbit, int color_type)
    {
       png_byte maxbits;
 
-      maxbits = (png_byte)(color_type==PNG_COLOR_TYPE_PALETTE ? 8 :
-          png_ptr->usr_bit_depth);
+      maxbits = color_type==PNG_COLOR_TYPE_PALETTE ? 8 :
+         (png_byte)(png_ptr->usr_bit_depth & 0xff);
 
       if (sbit->red == 0 || sbit->red > maxbits ||
           sbit->green == 0 || sbit->green > maxbits ||
@@ -1786,7 +1786,7 @@ png_write_oFFs(png_structrp png_ptr, png_int_32 x_offset, png_int_32 y_offset,
 
    png_save_int_32(buf, x_offset);
    png_save_int_32(buf + 4, y_offset);
-   buf[8] = (png_byte)unit_type;
+   buf[8] = (png_byte)(unit_type & 0xff);
 
    png_write_complete_chunk(png_ptr, png_oFFs, buf, (png_size_t)9);
 }
@@ -1841,8 +1841,8 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
    png_write_chunk_data(png_ptr, new_purpose, purpose_len);
    png_save_int_32(buf, X0);
    png_save_int_32(buf + 4, X1);
-   buf[8] = (png_byte)type;
-   buf[9] = (png_byte)nparams;
+   buf[8] = (png_byte)(type & 0xff);
+   buf[9] = (png_byte)(nparams & 0xff);
    png_write_chunk_data(png_ptr, buf, (png_size_t)10);
    png_write_chunk_data(png_ptr, (png_const_bytep)units, (png_size_t)units_len);
 
@@ -1877,7 +1877,7 @@ png_write_sCAL_s(png_structrp png_ptr, int unit, png_const_charp width,
       return;
    }
 
-   buf[0] = (png_byte)unit;
+   buf[0] = (png_byte)(unit & 0xff);
    memcpy(buf + 1, width, wlen + 1);      /* Append the '\0' here */
    memcpy(buf + wlen + 2, height, hlen);  /* Do NOT append the '\0' here */
 
@@ -1902,7 +1902,7 @@ png_write_pHYs(png_structrp png_ptr, png_uint_32 x_pixels_per_unit,
 
    png_save_uint_32(buf, x_pixels_per_unit);
    png_save_uint_32(buf + 4, y_pixels_per_unit);
-   buf[8] = (png_byte)unit_type;
+   buf[8] = (png_byte)(unit_type & 0xff);
 
    png_write_complete_chunk(png_ptr, png_pHYs, buf, (png_size_t)9);
 }
@@ -1968,7 +1968,7 @@ png_write_start_row(png_structrp png_ptr)
 
    /* 1.5.6: added to allow checking in the row write code. */
    png_ptr->transformed_pixel_depth = png_ptr->pixel_depth;
-   png_ptr->maximum_pixel_depth = (png_byte)usr_pixel_depth;
+   png_ptr->maximum_pixel_depth = (png_byte)(usr_pixel_depth & 0xff);
 
    /* Set up row buffer */
    png_ptr->row_buf = (png_bytep)png_malloc(png_ptr, buf_size);
@@ -2180,7 +2180,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                if (shift == 0)
                {
                   shift = 7;
-                  *dp++ = (png_byte)d;
+                  *dp++ = (png_byte)(d & 0xff);
                   d = 0;
                }
 
@@ -2189,7 +2189,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
 
             }
             if (shift != 7)
-               *dp = (png_byte)d;
+               *dp = (png_byte)(d & 0xff);
 
             break;
          }
@@ -2218,7 +2218,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                if (shift == 0)
                {
                   shift = 6;
-                  *dp++ = (png_byte)d;
+                  *dp++ = (png_byte)(d & 0xff);
                   d = 0;
                }
 
@@ -2226,7 +2226,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                   shift -= 2;
             }
             if (shift != 6)
-               *dp = (png_byte)d;
+               *dp = (png_byte)(d & 0xff);
 
             break;
          }
@@ -2254,7 +2254,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                if (shift == 0)
                {
                   shift = 4;
-                  *dp++ = (png_byte)d;
+                  *dp++ = (png_byte)(d & 0xff);
                   d = 0;
                }
 
@@ -2262,7 +2262,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
                   shift -= 4;
             }
             if (shift != 4)
-               *dp = (png_byte)d;
+               *dp = (png_byte)(d & 0xff);
 
             break;
          }
@@ -2688,8 +2688,8 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
       for (lp = row_buf + 1; i < row_bytes; i++)
       {
-         *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
-                 & 0xff);
+         *dp++ =
+             (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2)) & 0xff);
       }
       best_row = png_ptr->avg_row;
    }

@@ -219,7 +219,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
          int j;
          for (j = 0; j<(int)info_ptr->num_trans; j++)
             info_ptr->trans_alpha[j] =
-               (png_byte)(255 - info_ptr->trans_alpha[j]);
+               (png_byte)((255 - info_ptr->trans_alpha[j]) & 0xff);
       }
 #endif
       png_write_tRNS(png_ptr, info_ptr->trans_alpha, &(info_ptr->trans_color),
@@ -457,11 +457,11 @@ png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
    png_debug(1, "in png_convert_from_struct_tm");
 
    ptime->year = (png_uint_16)(1900 + ttime->tm_year);
-   ptime->month = (png_byte)(ttime->tm_mon + 1);
-   ptime->day = (png_byte)ttime->tm_mday;
-   ptime->hour = (png_byte)ttime->tm_hour;
-   ptime->minute = (png_byte)ttime->tm_min;
-   ptime->second = (png_byte)ttime->tm_sec;
+   ptime->month = (png_byte)((ttime->tm_mon + 1) & 0xff);
+   ptime->day = (png_byte)(ttime->tm_mday & 0xff);
+   ptime->hour = (png_byte)(ttime->tm_hour & 0xff);
+   ptime->minute = (png_byte)(ttime->tm_min & 0xff);
+   ptime->second = (png_byte)(ttime->tm_sec & 0xff);
 }
 
 void PNGAPI
@@ -811,7 +811,8 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    row_info.width = png_ptr->usr_width;
    row_info.channels = png_ptr->usr_channels;
    row_info.bit_depth = png_ptr->usr_bit_depth;
-   row_info.pixel_depth = (png_byte)(row_info.bit_depth * row_info.channels);
+   row_info.pixel_depth =
+       (png_byte)(0xff & (row_info.bit_depth * row_info.channels));
    row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
 
    png_debug1(3, "row_info->color_type = %d", row_info.color_type);
@@ -1037,7 +1038,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
             png_ptr->do_filter = PNG_FILTER_PAETH; break;
 
          default:
-            png_ptr->do_filter = (png_byte)filters; break;
+            png_ptr->do_filter = (png_byte)(filters & 0xff); break;
 #else
          default:
             png_app_error(png_ptr, "Unknown row filter for method 0");
@@ -1070,8 +1071,8 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
             if (png_ptr->prev_row == NULL)
             {
                png_warning(png_ptr, "Can't add Up filter after starting");
-               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
-                   ~PNG_FILTER_UP);
+               png_ptr->do_filter =
+                  (png_byte)((png_ptr->do_filter & ~PNG_FILTER_UP) & 0xff);
             }
 
             else
@@ -1088,8 +1089,8 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
             if (png_ptr->prev_row == NULL)
             {
                png_warning(png_ptr, "Can't add Average filter after starting");
-               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
-                   ~PNG_FILTER_AVG);
+               png_ptr->do_filter =
+                   (png_byte)((png_ptr->do_filter & ~PNG_FILTER_AVG) & 0xff);
             }
 
             else
@@ -1106,7 +1107,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
             if (png_ptr->prev_row == NULL)
             {
                png_warning(png_ptr, "Can't add Paeth filter after starting");
-               png_ptr->do_filter &= (png_byte)(~PNG_FILTER_PAETH);
+               png_ptr->do_filter &= (png_byte)((~PNG_FILTER_PAETH) & 0xff);
             }
 
             else
@@ -1210,7 +1211,7 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
          }
 
          /* Safe to set this now */
-         png_ptr->num_prev_filters = (png_byte)num_weights;
+         png_ptr->num_prev_filters = (png_byte)(num_weights & 0xff);
       }
 
       /* If, in the future, there are other filter methods, this would
@@ -1890,7 +1891,7 @@ png_unpremultiply(png_uint_32 component, png_uint_32 alpha,
          component *= 255;
 
       /* Convert the component to sRGB. */
-      return (png_byte)PNG_sRGB_FROM_LINEAR(component);
+      return (png_byte)(PNG_sRGB_FROM_LINEAR(component) & 0xff);
    }
 
    else
@@ -1939,7 +1940,7 @@ png_write_image_8bit(png_voidp argument)
          while (out_ptr < row_end)
          {
             png_uint_16 alpha = in_ptr[aindex];
-            png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
+            png_byte alphabyte = (png_byte)(PNG_DIV257(alpha) & 0xff);
             png_uint_32 reciprocal = 0;
             int c;
 
@@ -1982,7 +1983,7 @@ png_write_image_8bit(png_voidp argument)
             png_uint_32 component = *in_ptr++;
 
             component *= 255;
-            *out_ptr++ = (png_byte)PNG_sRGB_FROM_LINEAR(component);
+            *out_ptr++ = (png_byte)(PNG_sRGB_FROM_LINEAR(component) & 0xff);
          }
 
          png_write_row(png_ptr, output_row);
@@ -2041,23 +2042,23 @@ png_image_set_PLTE(png_image_write_control *display)
          {
             if (channels >= 3) /* RGB */
             {
-               palette[i].blue = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
-                  entry[(2 ^ bgr)]);
-               palette[i].green = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
-                  entry[1]);
-               palette[i].red = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
-                  entry[bgr]);
+               palette[i].blue = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
+                  entry[(2 ^ bgr)]));
+               palette[i].green = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
+                  entry[1]));
+               palette[i].red = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
+                  entry[bgr]));
             }
 
             else /* Gray */
                palette[i].blue = palette[i].red = palette[i].green =
-                  (png_byte)PNG_sRGB_FROM_LINEAR(255 * *entry);
+                  (png_byte)(PNG_sRGB_FROM_LINEAR((255 * *entry)) & 0xff);
          }
 
          else /* alpha */
          {
             png_uint_16 alpha = entry[afirst ? 0 : channels-1];
-            png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
+            png_byte alphabyte = (png_byte)(PNG_DIV257(alpha) & 0xff);
             png_uint_32 reciprocal = 0;
 
             /* Calculate a reciprocal, as in the png_write_image_8bit code above

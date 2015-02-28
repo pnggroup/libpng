@@ -56,14 +56,14 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
                else
                {
                   mask = 0x80;
-                  *dp = (png_byte)v;
+                  *dp = (png_byte)(v & 0xff);
                   dp++;
                   v = 0;
                }
             }
 
             if (mask != 0x80)
-               *dp = (png_byte)v;
+               *dp = (png_byte)(v & 0xff);
 
             break;
          }
@@ -90,7 +90,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
                if (shift == 0)
                {
                   shift = 6;
-                  *dp = (png_byte)v;
+                  *dp = (png_byte)(v & 0xff);
                   dp++;
                   v = 0;
                }
@@ -102,7 +102,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             }
 
             if (shift != 6)
-               *dp = (png_byte)v;
+               *dp = (png_byte)(v & 0xff);
 
             break;
          }
@@ -129,7 +129,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
                if (shift == 0)
                {
                   shift = 4;
-                  *dp = (png_byte)v;
+                  *dp = (png_byte)(v & 0xff);
                   dp++;
                   v = 0;
                }
@@ -141,7 +141,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             }
 
             if (shift != 4)
-               *dp = (png_byte)v;
+               *dp = (png_byte)(v & 0xff);
 
             break;
          }
@@ -150,8 +150,9 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             break;
       }
 
-      row_info->bit_depth = (png_byte)bit_depth;
-      row_info->pixel_depth = (png_byte)(bit_depth * row_info->channels);
+      row_info->bit_depth = (png_byte)(bit_depth & 0xff);
+      row_info->pixel_depth =
+          (png_byte)((bit_depth * row_info->channels) & 0xff);
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
           row_info->width);
    }
@@ -422,7 +423,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = *(sp++);
                */
                sp+=3; dp = sp;
-               *(dp++) = (png_byte)(255 - *(sp++));
+               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
             }
          }
 
@@ -445,8 +446,8 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = *(sp++);
                */
                sp+=6; dp = sp;
-               *(dp++) = (png_byte)(255 - *(sp++));
-               *(dp++) = (png_byte)(255 - *(sp++));
+               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
+               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
             }
          }
 #endif /* WRITE_16BIT */
@@ -464,7 +465,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0, sp = dp = row; i < row_width; i++)
             {
                *(dp++) = *(sp++);
-               *(dp++) = (png_byte)(255 - *(sp++));
+               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
             }
          }
 
@@ -483,8 +484,8 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = *(sp++);
                */
                sp+=2; dp = sp;
-               *(dp++) = (png_byte)(255 - *(sp++));
-               *(dp++) = (png_byte)(255 - *(sp++));
+               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
+               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
             }
          }
 #endif /* WRITE_16BIT */

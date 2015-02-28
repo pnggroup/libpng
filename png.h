@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.17beta06, February 25, 2015
+ * libpng version 1.6.17beta06, February 28, 2015
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -11,7 +11,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.17beta06, February 25, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.17beta06, February 28, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -244,7 +244,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.17beta06, February 25, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.17beta06, February 28, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -356,7 +356,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    February 25, 2015
+ *    February 28, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -426,7 +426,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.17beta06"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.17beta06 - February 25, 2015\n"
+     " libpng version 1.6.17beta06 - February 28, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -1579,6 +1579,7 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
 #define PNG_CRC_QUIET_USE     4  /* quiet/use data      quiet/use data    */
 #define PNG_CRC_NO_CHANGE     5  /* use current value   use current value */
 
+#ifdef PNG_WRITE_SUPPORTED
 /* These functions give the user control over the scan-line filtering in
  * libpng and the compression methods used by zlib.  These functions are
  * mainly useful for testing, as the defaults should work with most users.
@@ -1663,7 +1664,6 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
 #define PNG_FILTER_HEURISTIC_WEIGHTED   2  /* Experimental feature */
 #define PNG_FILTER_HEURISTIC_LAST       3  /* Not a valid value */
 
-#ifdef PNG_WRITE_SUPPORTED
 /* Set the library compression level.  Currently, valid values range from
  * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
  * (0 - no compression, 9 - "maximal" compression).  Note that tests have
@@ -2667,26 +2667,28 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
            * (png_uint_16)(alpha)                         \
            + (png_uint_16)(bg)*(png_uint_16)(255          \
            - (png_uint_16)(alpha)) + 128);                \
-       (composite) = (png_byte)((temp + (temp >> 8)) >> 8); }
+       (composite) = (png_byte)(((temp + (temp >> 8)) >> 8) & 0xff); }
 
 #  define png_composite_16(composite, fg, alpha, bg)       \
      { png_uint_32 temp = (png_uint_32)((png_uint_32)(fg)  \
            * (png_uint_32)(alpha)                          \
            + (png_uint_32)(bg)*(65535                      \
            - (png_uint_32)(alpha)) + 32768);               \
-       (composite) = (png_uint_16)((temp + (temp >> 16)) >> 16); }
+       (composite) = (png_uint_16)(0xffff & ((temp + (temp >> 16)) >> 16)); }
 
 #else  /* Standard method using integer division */
 
-#  define png_composite(composite, fg, alpha, bg)                          \
-     (composite) = (png_byte)(((png_uint_16)(fg) * (png_uint_16)(alpha) +  \
-     (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) +       \
-     127) / 255)
+#  define png_composite(composite, fg, alpha, bg)                        \
+     (composite) =                                                       \
+         (png_byte)(0xff & (((png_uint_16)(fg) * (png_uint_16)(alpha) +  \
+         (png_uint_16)(bg) * (png_uint_16)(255 - (png_uint_16)(alpha)) + \
+         127) / 255))
 
 #  define png_composite_16(composite, fg, alpha, bg)                         \
-     (composite) = (png_uint_16)(((png_uint_32)(fg) * (png_uint_32)(alpha) + \
-     (png_uint_32)(bg)*(png_uint_32)(65535 - (png_uint_32)(alpha)) +         \
-     32767) / 65535)
+     (composite) =                                                           \
+         (png_uint_16)(0xffff & (((png_uint_32)(fg) * (png_uint_32)(alpha) + \
+         (png_uint_32)(bg)*(png_uint_32)(65535 - (png_uint_32)(alpha)) +     \
+         32767) / 65535))
 #endif /* READ_COMPOSITE_NODIV */
 
 #ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
