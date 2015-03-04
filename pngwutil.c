@@ -334,6 +334,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 
       if (owner == png_IDAT)
       {
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
          if ((png_ptr->flags & PNG_FLAG_ZLIB_CUSTOM_STRATEGY) != 0)
             strategy = png_ptr->zlib_strategy;
 
@@ -341,6 +342,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
             strategy = PNG_Z_DEFAULT_STRATEGY;
 
          else
+#endif
             strategy = PNG_Z_DEFAULT_NOFILTER_STRATEGY;
       }
 
