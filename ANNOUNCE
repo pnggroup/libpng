@@ -1,5 +1,5 @@
 
-Libpng 1.5.22beta05 - February 25, 2015
+Libpng 1.5.22rc01 - March 4, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.22beta05.tar.xz (LZMA-compressed, recommended)
-   1.5.22beta05.tar.gz
-   1.5.22beta05.tar.bz2
+   1.5.22rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.22rc01.tar.gz
+   1.5.22rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1522b05.7z  (LZMA-compressed, recommended)
-   lp1522b05.zip
+   lp1522r01.7z  (LZMA-compressed, recommended)
+   lp1522r01.zip
 
 Other information:
 
-   1.5.22beta05-README.txt
-   1.5.22beta05-LICENSE.txt
-   libpng-1.5.22beta05-*.asc (armored detached GPG signatures)
+   1.5.22rc01-README.txt
+   1.5.22rc01-LICENSE.txt
+   libpng-1.5.22rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.21):
 
@@ -49,7 +49,8 @@ Version 1.5.22beta03 [February 21, 2015]
 Version 1.5.22beta04 [February 25, 2015]
   Relocated a misplaced "}" in png_reciprocal2().
 
-Version 1.5.22beta05 [February 25, 2015]
+Version 1.5.22rc01 [March 4, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

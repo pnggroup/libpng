@@ -4313,7 +4313,8 @@ Version 1.5.22beta03 [February 21, 2015]
 Version 1.5.22beta04 [February 25, 2015]
   Relocated a misplaced "}" in png_reciprocal2().
 
-Version 1.5.22beta05 [February 25, 2015]
+Version 1.5.22rc01 [March 4, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
