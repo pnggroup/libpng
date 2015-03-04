@@ -224,7 +224,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 
          for (j = 0; j<jend; ++j)
             info_ptr->trans_alpha[j] =
-               (png_byte)(255 - info_ptr->trans_alpha[j]);
+               (png_byte)((255 - info_ptr->trans_alpha[j]) & 0xff);
       }
 #endif
       png_write_tRNS(png_ptr, info_ptr->trans_alpha, &(info_ptr->trans_color),
@@ -461,11 +461,11 @@ png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
    png_debug(1, "in png_convert_from_struct_tm");
 
    ptime->year = (png_uint_16)(1900 + ttime->tm_year);
-   ptime->month = (png_byte)(ttime->tm_mon + 1);
-   ptime->day = (png_byte)ttime->tm_mday;
-   ptime->hour = (png_byte)ttime->tm_hour;
-   ptime->minute = (png_byte)ttime->tm_min;
-   ptime->second = (png_byte)ttime->tm_sec;
+   ptime->month = (png_byte)((ttime->tm_mon + 1) & 0xff);
+   ptime->day = (png_byte)(ttime->tm_mday & 0xff);
+   ptime->hour = (png_byte)(ttime->tm_hour & 0xff);
+   ptime->minute = (png_byte)(ttime->tm_min & 0xff);
+   ptime->second = (png_byte)(ttime->tm_sec & 0xff);
 }
 
 void PNGAPI
@@ -487,7 +487,7 @@ png_create_write_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 {
 #ifndef PNG_USER_MEM_SUPPORTED
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
-      error_fn, warn_fn, NULL, NULL, NULL);
+       error_fn, warn_fn, NULL, NULL, NULL);
 #else
    return png_create_write_struct_2(user_png_ver, error_ptr, error_fn,
        warn_fn, NULL, NULL, NULL);
@@ -500,7 +500,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
 {
    png_structrp png_ptr = png_create_png_struct(user_png_ver, error_ptr,
-      error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
+       error_fn, warn_fn, mem_ptr, malloc_fn, free_fn);
 #endif /* USER_MEM */
 
    if (png_ptr != NULL)
@@ -534,17 +534,17 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
        * applications that must not fail to write at all costs!
        */
 #ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
-      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
       /* In stable builds only warn if an application error can be completely
        * handled.
        */
+      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
 #endif
 
       /* App warnings are warnings in release (or release candidate) builds but
        * are errors during development.
        */
 #if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
-         png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
+      png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
 #endif
 
       /* TODO: delay this, it can be done in png_init_io() (if the app doesn't
@@ -816,7 +816,8 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    row_info.width = png_ptr->usr_width;
    row_info.channels = png_ptr->usr_channels;
    row_info.bit_depth = png_ptr->usr_bit_depth;
-   row_info.pixel_depth = (png_byte)(row_info.bit_depth * row_info.channels);
+   row_info.pixel_depth =
+       (png_byte)(0xff & (row_info.bit_depth * row_info.channels));
    row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
 
    png_debug1(3, "row_info->color_type = %d", row_info.color_type);
@@ -1188,7 +1189,7 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
          }
 
          /* Safe to set this now */
-         png_ptr->num_prev_filters = (png_byte)num_weights;
+         png_ptr->num_prev_filters = (png_byte)(num_weights & 0xff);
       }
 
       /* If, in the future, there are other filter methods, this would
@@ -1396,8 +1397,8 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
    if (png_ptr == NULL)
       return;
 
-   /* Prior to 1.6.0 this would warn but then set the window_bits value, this
-    * meant that negative window bits values could be selected which would cause
+   /* Prior to 1.6.0 this would warn but then set the window_bits value. This
+    * meant that negative window bits values could be selected that would cause
     * libpng to write a non-standard PNG file with raw deflate or gzip
     * compressed IDAT or ancillary chunks.  Such files can be read and there is
     * no warning on read, so this seems like a very bad idea.
@@ -1730,7 +1731,7 @@ png_write_image_16bit(png_voidp argument)
       display->first_row);
    png_uint_16p output_row = png_voidcast(png_uint_16p, display->local_row);
    png_uint_16p row_end;
-   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
    int aindex = 0;
    png_uint_32 y = image->height;
 
@@ -1868,7 +1869,7 @@ png_unpremultiply(png_uint_32 component, png_uint_32 alpha,
          component *= 255;
 
       /* Convert the component to sRGB. */
-      return (png_byte)PNG_sRGB_FROM_LINEAR(component);
+      return (png_byte)(PNG_sRGB_FROM_LINEAR(component) & 0xff);
    }
 
    else
@@ -1887,7 +1888,7 @@ png_write_image_8bit(png_voidp argument)
       display->first_row);
    png_bytep output_row = png_voidcast(png_bytep, display->local_row);
    png_uint_32 y = image->height;
-   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) ? 3 : 1;
+   const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
 
    if ((image->format & PNG_FORMAT_FLAG_ALPHA) != 0)
    {
@@ -1917,7 +1918,7 @@ png_write_image_8bit(png_voidp argument)
          while (out_ptr < row_end)
          {
             png_uint_16 alpha = in_ptr[aindex];
-            png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
+            png_byte alphabyte = (png_byte)(PNG_DIV257(alpha) & 0xff);
             png_uint_32 reciprocal = 0;
             int c;
 
@@ -1960,7 +1961,7 @@ png_write_image_8bit(png_voidp argument)
             png_uint_32 component = *in_ptr++;
 
             component *= 255;
-            *out_ptr++ = (png_byte)PNG_sRGB_FROM_LINEAR(component);
+            *out_ptr++ = (png_byte)(PNG_sRGB_FROM_LINEAR(component) & 0xff);
          }
 
          png_write_row(png_ptr, output_row);
@@ -1992,7 +1993,7 @@ png_image_set_PLTE(png_image_write_control *display)
 #  endif
 
 #  ifdef PNG_FORMAT_BGR_SUPPORTED
-      const int bgr = (format & PNG_FORMAT_FLAG_BGR) ? 2 : 0;
+      const int bgr = (format & PNG_FORMAT_FLAG_BGR) != 0 ? 2 : 0;
 #  else
 #     define bgr 0
 #  endif
@@ -2019,23 +2020,23 @@ png_image_set_PLTE(png_image_write_control *display)
          {
             if (channels >= 3) /* RGB */
             {
-               palette[i].blue = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
-                  entry[(2 ^ bgr)]);
-               palette[i].green = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
-                  entry[1]);
-               palette[i].red = (png_byte)PNG_sRGB_FROM_LINEAR(255 *
-                  entry[bgr]);
+               palette[i].blue = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
+                  entry[(2 ^ bgr)]));
+               palette[i].green = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
+                  entry[1]));
+               palette[i].red = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
+                  entry[bgr]));
             }
 
             else /* Gray */
                palette[i].blue = palette[i].red = palette[i].green =
-                  (png_byte)PNG_sRGB_FROM_LINEAR(255 * *entry);
+                  (png_byte)(PNG_sRGB_FROM_LINEAR((255 * *entry)) & 0xff);
          }
 
          else /* alpha */
          {
             png_uint_16 alpha = entry[afirst ? 0 : channels-1];
-            png_byte alphabyte = (png_byte)PNG_DIV257(alpha);
+            png_byte alphabyte = (png_byte)(PNG_DIV257(alpha) & 0xff);
             png_uint_32 reciprocal = 0;
 
             /* Calculate a reciprocal, as in the png_write_image_8bit code above
@@ -2127,10 +2128,11 @@ png_image_write_main(png_voidp argument)
    png_inforp info_ptr = image->opaque->info_ptr;
    png_uint_32 format = image->format;
 
-   int colormap = (format & PNG_FORMAT_FLAG_COLORMAP) != 0;
-   int linear = !colormap && (format & PNG_FORMAT_FLAG_LINEAR) != 0; /* input */
-   int alpha = !colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0;
-   int write_16bit = linear && !colormap && !display->convert_to_8bit;
+   /* The following four ints are actually booleans */
+   int colormap = (format & PNG_FORMAT_FLAG_COLORMAP);
+   int linear = !colormap && (format & PNG_FORMAT_FLAG_LINEAR); /* input */
+   int alpha = !colormap && (format & PNG_FORMAT_FLAG_ALPHA);
+   int write_16bit = linear && !colormap && (display->convert_to_8bit == 0);
 
 #  ifdef PNG_BENIGN_ERRORS_SUPPORTED
       /* Make sure we error out on any bad situation */
@@ -2217,7 +2219,7 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
       if ((format & PNG_FORMAT_FLAG_BGR) != 0)
       {
-         if (!colormap && (format & PNG_FORMAT_FLAG_COLOR) != 0)
+         if (colormap == 0 && (format & PNG_FORMAT_FLAG_COLOR) != 0)
             png_set_bgr(png_ptr);
          format &= ~PNG_FORMAT_FLAG_BGR;
       }
@@ -2226,7 +2228,7 @@ png_image_write_main(png_voidp argument)
 #  ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
       if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
       {
-         if (!colormap && (format & PNG_FORMAT_FLAG_ALPHA) != 0)
+         if (colormap == 0 && (format & PNG_FORMAT_FLAG_ALPHA) != 0)
             png_set_swap_alpha(png_ptr);
          format &= ~PNG_FORMAT_FLAG_AFIRST;
       }
@@ -2275,7 +2277,8 @@ png_image_write_main(png_voidp argument)
     * before it is written.  This only applies when the input is 16-bit and
     * either there is an alpha channel or it is converted to 8-bit.
     */
-   if ((linear && alpha) || (!colormap && display->convert_to_8bit))
+   if ((linear != 0 && alpha != 0 ) ||
+       (colormap == 0 && display->convert_to_8bit != 0))
    {
       png_bytep row = png_voidcast(png_bytep, png_malloc(png_ptr,
          png_get_rowbytes(png_ptr, info_ptr)));
