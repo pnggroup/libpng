@@ -1051,8 +1051,8 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
        * it is too late to start using the filters that need it, since we
        * will be missing the data in the previous row.  If an application
        * wants to start and stop using particular filters during compression,
-       * it should start out with all of the filters, and then add and
-       * remove them after the start of compression.
+       * it should start out with all of the filters, and then remove them
+       * or add them back after the start of compression.
        */
       if (png_ptr->row_buf != NULL)
       {
@@ -1419,8 +1419,8 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
    if (png_ptr == NULL)
       return;
 
-   /* Prior to 1.6.0 this would warn but then set the window_bits value, this
-    * meant that negative window bits values could be selected which would cause
+   /* Prior to 1.6.0 this would warn but then set the window_bits value. This
+    * meant that negative window bits values could be selected that would cause
     * libpng to write a non-standard PNG file with raw deflate or gzip
     * compressed IDAT or ancillary chunks.  Such files can be read and there is
     * no warning on read, so this seems like a very bad idea.

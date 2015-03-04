@@ -5166,7 +5166,8 @@ Version 1.6.17beta06 [February 27, 2015]
   Avoid runtime checks when converting integer to png_byte with
     Visual Studio (Sergey Kosarevsky)
 
-Version 1.6.17beta07 [February 28, 2015]
+Version 1.6.17rc01 [March 4, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
