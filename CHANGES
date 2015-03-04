@@ -2945,7 +2945,8 @@ version 1.4.16beta01 [February 21, 2015]
 version 1.4.16beta02 [February 25, 2015]
   Changed default PNG_USER_CHUNK_MALLOC_MAX from 0 to 8,000,000.
 
-version 1.4.16beta03 [February 25, 2015]
+version 1.4.16rc01 [March 4, 2015]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
