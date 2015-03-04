@@ -1,8 +1,8 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -273,7 +273,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i++)
       {
-         *rp = (png_byte)(~(*rp));
+         *rp = (png_byte)((~(*rp)) & 0xff);
          rp++;
       }
    }
@@ -287,7 +287,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i += 2)
       {
-         *rp = (png_byte)(~(*rp));
+         *rp = (png_byte)((~(*rp)) & 0xff);
          rp += 2;
       }
    }
@@ -302,8 +302,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
 
       for (i = 0; i < istop; i += 4)
       {
-         *rp = (png_byte)(~(*rp));
-         *(rp + 1) = (png_byte)(~(*(rp + 1)));
+         *rp = (png_byte)((~(*rp)) & 0xff);
+         *(rp + 1) = (png_byte)((~(*(rp + 1))) & 0xff);
          rp += 4;
       }
    }
@@ -803,8 +803,9 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp
 #endif
 
    png_ptr->user_transform_ptr = user_transform_ptr;
-   png_ptr->user_transform_depth = (png_byte)user_transform_depth;
-   png_ptr->user_transform_channels = (png_byte)user_transform_channels;
+   png_ptr->user_transform_depth = (png_byte)(user_transform_depth & 0xff);
+   png_ptr->user_transform_channels =
+       (png_byte)(user_transform_channels & 0xff);
 }
 #endif
 

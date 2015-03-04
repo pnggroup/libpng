@@ -145,7 +145,7 @@ png_set_background_fixed(png_structrp png_ptr,
 
    png_ptr->background = *background_color;
    png_ptr->background_gamma = background_gamma;
-   png_ptr->background_gamma_type = (png_byte)(background_gamma_code);
+   png_ptr->background_gamma_type = (png_byte)(0xff & background_gamma_code);
 
    if (need_expand != 0)
       png_ptr->flags |= PNG_FLAG_BACKGROUND_EXPAND;
@@ -1928,14 +1928,14 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
    if ((png_ptr->transformations & PNG_GRAY_TO_RGB) != 0)
-      info_ptr->color_type = (png_byte)(info_ptr->color_type |
-         PNG_COLOR_MASK_COLOR);
+      info_ptr->color_type = (png_byte)(0xff & (info_ptr->color_type |
+         PNG_COLOR_MASK_COLOR));
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
    if ((png_ptr->transformations & PNG_RGB_TO_GRAY) != 0)
-      info_ptr->color_type = (png_byte)(info_ptr->color_type &
-         ~PNG_COLOR_MASK_COLOR);
+      info_ptr->color_type = (png_byte)(0xff & (info_ptr->color_type &
+         ~PNG_COLOR_MASK_COLOR));
 #endif
 
 #ifdef PNG_READ_QUANTIZE_SUPPORTED
@@ -1977,8 +1977,8 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
    if ((png_ptr->transformations & PNG_STRIP_ALPHA) != 0)
    {
-      info_ptr->color_type = (png_byte)(info_ptr->color_type &
-         ~PNG_COLOR_MASK_ALPHA);
+      info_ptr->color_type = (png_byte)(0xff & (info_ptr->color_type &
+         ~PNG_COLOR_MASK_ALPHA));
       info_ptr->num_trans = 0;
    }
 #endif
@@ -2011,8 +2011,8 @@ defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    }
 #endif
 
-   info_ptr->pixel_depth = (png_byte)(info_ptr->channels *
-       info_ptr->bit_depth);
+   info_ptr->pixel_depth = (png_byte)(0xff & (info_ptr->channels *
+       info_ptr->bit_depth));
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, info_ptr->width);
 
@@ -2123,7 +2123,7 @@ png_do_unpack(png_row_infop row_info, png_bytep row)
             break;
       }
       row_info->bit_depth = 8;
-      row_info->pixel_depth = (png_byte)(8 * row_info->channels);
+      row_info->pixel_depth = (png_byte)(0xff & (8 * row_info->channels));
       row_info->rowbytes = row_width * row_info->channels;
    }
 }
