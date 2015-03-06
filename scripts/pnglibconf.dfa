@@ -367,11 +367,13 @@ option USER_LIMITS requires READ
 # USER_CHUNK_CACHE_MAX: maximum number of chunks to be cached
 #
 # Only chunks that are variable in number are counted towards the
-# USER_CHUNK_CACHE_MAX limit
-setting USER_WIDTH_MAX default        1000000 /* Use 0x7fffffff for unlimited */
-setting USER_HEIGHT_MAX default       1000000 /* Use 0x7fffffff for unlimited */
-setting USER_CHUNK_CACHE_MAX default     1000 /* Use 0 for unlimited */
-setting USER_CHUNK_MALLOC_MAX default 8000000 /* Use 0 for unlimited */
+# Use 0x7fffffff for unlimited
+setting USER_WIDTH_MAX default        1000000
+setting USER_HEIGHT_MAX default       1000000
+
+# Use 0 for unlimited
+setting USER_CHUNK_CACHE_MAX default     1000
+setting USER_CHUNK_MALLOC_MAX default 8000000
 
 # If this option is enabled APIs to set the above limits at run time are added;
 # without this the hardwired (compile time) limits will be used.
