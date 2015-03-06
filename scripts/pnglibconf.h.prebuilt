@@ -1,7 +1,7 @@
-/* 1.5.22rc01 STANDARD API DEFINITION */
+/* 1.5.22rc02 STANDARD API DEFINITION */
 /* pnglibconf.h - library build configuration */
 
-/* libpng version 1.5.22rc01 - March 4, 2015 */
+/* libpng version 1.5.22rc02 - March 6, 2015 */
 
 /* Copyright (c) 1998-2013 Glenn Randers-Pehrson */
 
@@ -180,10 +180,10 @@
 #define PNG_QUANTIZE_BLUE_BITS 5
 #define PNG_QUANTIZE_GREEN_BITS 5
 #define PNG_QUANTIZE_RED_BITS 5
-#define PNG_USER_CHUNK_CACHE_MAX 1000 /* Use 0 for unlimited */
-#define PNG_USER_CHUNK_MALLOC_MAX 8000000 /* Use 0 for unlimited */
-#define PNG_USER_HEIGHT_MAX 1000000 /* Use 0x7fffffff for unlimited */
-#define PNG_USER_WIDTH_MAX 1000000 /* Use 0x7fffffff for unlimited */
+#define PNG_USER_CHUNK_CACHE_MAX 1000
+#define PNG_USER_CHUNK_MALLOC_MAX 8000000
+#define PNG_USER_HEIGHT_MAX 1000000
+#define PNG_USER_WIDTH_MAX 1000000
 #define PNG_WEIGHT_SHIFT 8
 #define PNG_ZBUF_SIZE 8192
 #define PNG_sCAL_PRECISION 5
