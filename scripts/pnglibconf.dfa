@@ -367,6 +367,7 @@ option USER_LIMITS requires READ
 # USER_CHUNK_CACHE_MAX: maximum number of chunks to be cached
 #
 # Only chunks that are variable in number are counted towards the
+
 # Use 0x7fffffff for unlimited
 setting USER_WIDTH_MAX default        1000000
 setting USER_HEIGHT_MAX default       1000000
@@ -645,7 +646,7 @@ setting QUANTIZE_BLUE_BITS default 5
 # are only interested in 8 bits anyway.  Increasing this value
 # results in more memory being used, and more pow() functions
 # being called to fill in the gamma tables.  Don't set this value
-# less then 8, and even that may not work (I haven't tested it).
+# less than 8, and even that may not work (I haven't tested it).
 
 setting MAX_GAMMA_8 default 11
 

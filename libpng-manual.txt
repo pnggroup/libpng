@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.17rc02 - March 6, 2015
+ libpng version 1.6.17rc02 - March 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.17rc02 - March 6, 2015
+ libpng versions 0.97, January 1998, through 1.6.17rc02 - March 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -2547,7 +2547,7 @@ png_infop info_ptr;
        64K.  The library seems to run fine with sizes
        of 4K. Although you can give it much less if
        necessary (I assume you can give it chunks of
-       1 byte, I haven't tried less then 256 bytes
+       1 byte, I haven't tried less than 256 bytes
        yet).  When this function returns, you may
        want to display any rows that were generated
        in the row callback if you don't already do
@@ -5275,7 +5275,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-March 6, 2015
+March 7, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
