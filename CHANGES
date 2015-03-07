@@ -5029,9 +5029,11 @@ Version 1.7.0beta54 [March 4, 2015]
     Visual Studio (Sergey Kosarevsky)
   Merged pngwrite.c with libpng-1.6.17beta06/pngwrite.c
 
-Version 1.7.0beta55 [March 6, 2015]
+Version 1.7.0beta55 [March 7, 2015]
   Removed some comments that the configure script did not handle
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
+  Stopped a potential memory leak in png_set_unknown_chunks(). Breaks
+    tests/pngunknown-sAPI so it's temporarily marked SKIP.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
