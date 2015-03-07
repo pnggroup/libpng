@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.17rc02, March 6, 2015
+ * libpng version 1.6.17rc02, March 7, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.17rc02, March 6, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.17rc02, March 7, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -246,7 +246,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.6.17rc02, March 6, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.6.17rc02, March 7, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -358,7 +358,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 6, 2015
+ *    March 7, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -428,7 +428,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.17rc02"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.17rc02 - March 6, 2015\n"
+     " libpng version 1.6.17rc02 - March 7, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -1824,7 +1824,7 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
  *
  * The integer return from the callback function is interpreted thus:
  *
- * negative: An error occured, png_chunk_error will be called.
+ * negative: An error occurred; png_chunk_error will be called.
  *     zero: The chunk was not handled, the chunk will be saved. A critical
  *           chunk will cause an error at this point unless it is to be saved.
  * positive: The chunk was handled, libpng will ignore/discard it.

@@ -2808,7 +2808,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
                &png_ptr->unknown_chunk);
 
             /* ret is:
-             * negative: An error occured, png_chunk_error will be called.
+             * negative: An error occurred; png_chunk_error will be called.
              *     zero: The chunk was not handled, the chunk will be discarded
              *           unless png_set_keep_unknown_chunks has been used to set
              *           a 'keep' behavior for this particular chunk, in which
