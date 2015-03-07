@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "March 4, 2015"
+.TH LIBPNG 3 "March 7, 2015"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0beta55
 .SH SYNOPSIS
@@ -494,7 +494,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta55 - March 4, 2015
+ libpng version 1.7.0beta55 - March 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -505,7 +505,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta55 - March 4, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta55 - March 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -831,7 +831,7 @@ prediction.
 
 If you are intending to keep the file pointer open for use in libpng,
 you must ensure you don't read more than 8 bytes from the beginning
-of the file, and you also have to make a call to png_set_sig_bytes_read()
+of the file, and you also have to make a call to png_set_sig_bytes()
 with the number of bytes you read from the beginning.  Libpng will
 then only check the bytes (if any) that your program didn't read.
 
@@ -2497,7 +2497,7 @@ value when you call it in this position:
       png_set_gamma(png_ptr, screen_gamma, 0.45455);
 
 If you need to reduce an RGB file to a paletted file, or if a paletted
-file has more entries then will fit on your screen, png_set_quantize()
+file has more entries than will fit on your screen, png_set_quantize()
 will do that.  Note that this is a simple match quantization that merely
 finds the closest color available.  This should work fairly well with
 optimized palettes, but fairly badly with linear color cubes.  If you
@@ -3050,7 +3050,7 @@ png_infop info_ptr;
        64K.  The library seems to run fine with sizes
        of 4K. Although you can give it much less if
        necessary (I assume you can give it chunks of
-       1 byte, I haven't tried less then 256 bytes
+       1 byte, I haven't tried less than 256 bytes
        yet).  When this function returns, you may
        want to display any rows that were generated
        in the row callback if you don't already do
@@ -5826,7 +5826,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVII. Y2K Compliance in libpng
 
-March 4, 2015
+March 7, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6037,7 +6037,54 @@ the first widely used release:
  1.5.7beta01-05      15    10507  15.so.15.7[.0]
  1.5.7rc01-03        15    10507  15.so.15.7[.0]
  1.5.7               15    10507  15.so.15.7[.0]
- 1.6.0beta01-37      16    10600  16.so.16.0[.0]
+ 1.6.0beta01-40      16    10600  16.so.16.0[.0]
+ 1.6.0rc01-08        16    10600  16.so.16.0[.0]
+ 1.6.0               16    10600  16.so.16.0[.0]
+ 1.6.1beta01-09      16    10601  16.so.16.1[.0]
+ 1.6.1rc01           16    10601  16.so.16.1[.0]
+ 1.6.1               16    10601  16.so.16.1[.0]
+ 1.6.2beta01         16    10602  16.so.16.2[.0]
+ 1.6.2rc01-06        16    10602  16.so.16.2[.0]
+ 1.6.2               16    10602  16.so.16.2[.0]
+ 1.6.3beta01-11      16    10603  16.so.16.3[.0]
+ 1.6.3rc01           16    10603  16.so.16.3[.0]
+ 1.6.3               16    10603  16.so.16.3[.0]
+ 1.6.4beta01-02      16    10604  16.so.16.4[.0]
+ 1.6.4rc01           16    10604  16.so.16.4[.0]
+ 1.6.4               16    10604  16.so.16.4[.0]
+ 1.6.5               16    10605  16.so.16.5[.0]
+ 1.6.6               16    10606  16.so.16.6[.0]
+ 1.6.7beta01-04      16    10607  16.so.16.7[.0]
+ 1.6.7rc01-03        16    10607  16.so.16.7[.0]
+ 1.6.7               16    10607  16.so.16.7[.0]
+ 1.6.8beta01-02      16    10608  16.so.16.8[.0]
+ 1.6.8rc01-02        16    10608  16.so.16.8[.0]
+ 1.6.8               16    10608  16.so.16.8[.0]
+ 1.6.9beta01-04      16    10609  16.so.16.9[.0]
+ 1.6.9rc01-02        16    10609  16.so.16.9[.0]
+ 1.6.9               16    10609  16.so.16.9[.0]
+ 1.6.10beta01-03     16    10610  16.so.16.10[.0]
+ 1.6.10rc01-03       16    10610  16.so.16.10[.0]
+ 1.6.10              16    10610  16.so.16.10[.0]
+ 1.6.11beta01-06     16    10611  16.so.16.11[.0]
+ 1.6.11rc01-02       16    10611  16.so.16.11[.0]
+ 1.6.11              16    10611  16.so.16.11[.0]
+ 1.6.12rc01-03       16    10612  16.so.16.12[.0]
+ 1.6.12              16    10612  16.so.16.12[.0]
+ 1.6.13beta01-04     16    10613  16.so.16.13[.0]
+ 1.6.13rc01-02       16    10613  16.so.16.13[.0]
+ 1.6.13              16    10613  16.so.16.13[.0]
+ 1.6.14beta01-07     16    10614  16.so.16.14[.0]
+ 1.6.14rc01-02       16    10614  16.so.16.14[.0]
+ 1.6.14              16    10614  16.so.16.14[.0]
+ 1.6.15beta01-08     16    10615  16.so.16.15[.0]
+ 1.6.15rc01-03       16    10615  16.so.16.15[.0]
+ 1.6.15              16    10615  16.so.16.15[.0]
+ 1.6.16beta01-03     16    10616  16.so.16.16[.0]
+ 1.6.16rc01-02       16    10616  16.so.16.16[.0]
+ 1.6.16              16    10616  16.so.16.16[.0]
+ 1.6.17beta01-06     16    10617  16.so.16.17[.0]
+ 1.6.17rc01          16    10617  16.so.16.17[.0]
  1.7.0alpha01-10     17    10700  17.so.17.0[.0]
  1.7.0beta01-55      17    10700  17.so.17.0[.0]
 
@@ -6096,7 +6143,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.7.0beta55 - March 4, 2015:
+Libpng version 1.7.0beta55 - March 7, 2015:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6119,7 +6166,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.7.0beta55, March 4, 2015, are
+libpng versions 1.2.6, August 15, 2004, through 1.7.0beta55, March 7, 2015, are
 Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
@@ -6218,7 +6265,7 @@ certification mark of the Open Source Initiative.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-March 4, 2015
+March 7, 2015
 
 .\" end of man page
 

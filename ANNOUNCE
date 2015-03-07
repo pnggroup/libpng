@@ -744,6 +744,7 @@ Version 1.7.0beta55 [March 7, 2015]
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
   Stopped a potential memory leak in png_set_unknown_chunks(). Breaks
     tests/pngunknown-sAPI so it's temporarily marked SKIP.
+  Spelling fixes ("then", "occured") reported by Lauri Nurmi.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

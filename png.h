@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta55, March 4, 2015
+ * libpng version 1.7.0beta55, March 7, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta55, March 4, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.7.0beta55, March 7, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -167,7 +167,54 @@
  *    1.5.7beta01-05          15    10507  15.so.15.7[.0]
  *    1.5.7rc01-03            15    10507  15.so.15.7[.0]
  *    1.5.7                   15    10507  15.so.15.7[.0]
- *    1.6.0beta01-37          16    10600  16.so.16.0[.0]
+ *    1.6.0beta01-40          16    10600  16.so.16.0[.0]
+ *    1.6.0rc01-08            16    10600  16.so.16.0[.0]
+ *    1.6.0                   16    10600  16.so.16.0[.0]
+ *    1.6.1beta01-09          16    10601  16.so.16.1[.0]
+ *    1.6.1rc01               16    10601  16.so.16.1[.0]
+ *    1.6.1                   16    10601  16.so.16.1[.0]
+ *    1.6.2beta01             16    10602  16.so.16.2[.0]
+ *    1.6.2rc01-06            16    10602  16.so.16.2[.0]
+ *    1.6.2                   16    10602  16.so.16.2[.0]
+ *    1.6.3beta01-11          16    10603  16.so.16.3[.0]
+ *    1.6.3rc01               16    10603  16.so.16.3[.0]
+ *    1.6.3                   16    10603  16.so.16.3[.0]
+ *    1.6.4beta01-02          16    10604  16.so.16.4[.0]
+ *    1.6.4rc01               16    10604  16.so.16.4[.0]
+ *    1.6.4                   16    10604  16.so.16.4[.0]
+ *    1.6.5                   16    10605  16.so.16.5[.0]
+ *    1.6.6                   16    10606  16.so.16.6[.0]
+ *    1.6.7beta01-04          16    10607  16.so.16.7[.0]
+ *    1.6.7rc01-03            16    10607  16.so.16.7[.0]
+ *    1.6.7                   16    10607  16.so.16.7[.0]
+ *    1.6.8beta01-02          16    10608  16.so.16.8[.0]
+ *    1.6.8rc01-02            16    10608  16.so.16.8[.0]
+ *    1.6.8                   16    10608  16.so.16.8[.0]
+ *    1.6.9beta01-04          16    10609  16.so.16.9[.0]
+ *    1.6.9rc01-02            16    10609  16.so.16.9[.0]
+ *    1.6.9                   16    10609  16.so.16.9[.0]
+ *    1.6.10beta01-03         16    10610  16.so.16.10[.0]
+ *    1.6.10rc01-03           16    10610  16.so.16.10[.0]
+ *    1.6.10                  16    10610  16.so.16.10[.0]
+ *    1.6.11beta01-06         16    10611  16.so.16.11[.0]
+ *    1.6.11rc01-02           16    10611  16.so.16.11[.0]
+ *    1.6.11                  16    10611  16.so.16.11[.0]
+ *    1.6.12rc01-03           16    10612  16.so.16.12[.0]
+ *    1.6.12                  16    10612  16.so.16.12[.0]
+ *    1.6.13beta01-04         16    10613  16.so.16.13[.0]
+ *    1.6.13rc01-02           16    10613  16.so.16.13[.0]
+ *    1.6.13                  16    10613  16.so.16.13[.0]
+ *    1.6.14beta01-07         16    10614  16.so.16.14[.0]
+ *    1.6.14rc01-02           16    10614  16.so.16.14[.0]
+ *    1.6.14                  16    10614  16.so.16.14[.0]
+ *    1.6.15beta01-08         16    10615  16.so.16.15[.0]
+ *    1.6.15rc01-03           16    10615  16.so.16.15[.0]
+ *    1.6.15                  16    10615  16.so.16.15[.0]
+ *    1.6.16beta01-03         16    10616  16.so.16.16[.0]
+ *    1.6.16rc01-02           16    10616  16.so.16.16[.0]
+ *    1.6.16                  16    10616  16.so.16.16[.0]
+ *    1.6.17beta01-06         16    10617  16.so.16.17[.0]
+ *    1.6.17rc01              16    10617  16.so.16.17[.0]
  *    1.7.0alpha01-10         17    10700  17.so.17.0[.0]
  *    1.7.0beta01-55          17    10700  17.so.17.0[.0]
  *
@@ -201,7 +248,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta55, March 4, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta55, March 7, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -313,7 +360,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 4, 2015
+ *    March 7, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -383,7 +430,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta55"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta55 - March 4, 2015\n"
+     " libpng version 1.7.0beta55 - March 7, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -1904,7 +1951,7 @@ PNG_EXPORT(218, png_byte, png_get_current_pass_number, (png_const_structrp));
  *
  * The integer return from the callback function is interpreted thus:
  *
- * negative: An error occured, png_chunk_error will be called.
+ * negative: An error occurred; png_chunk_error will be called.
  *     zero: The chunk was not handled, the default unknown handling is used
  *           (even if this was a chunk that would otherwise be known.)
  *           NOTE: prior to libpng 1.7 handling values of
