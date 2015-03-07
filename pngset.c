@@ -1180,6 +1180,17 @@ png_set_unknown_chunks(png_const_structrp png_ptr,
       return;
    }
 
+   if ((np->location & (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT)) == 0)
+   {
+      png_free(png_ptr, np);
+      np = NULL;
+      png_chunk_report(png_ptr,
+          "invalid chunk location in png_set_unknown_chunks",
+          PNG_CHUNK_WRITE_ERROR);
+
+      return;
+   }
+
    png_free(png_ptr, info_ptr->unknown_chunks);
    info_ptr->unknown_chunks = np; /* safe because it is initialized */
    info_ptr->free_me |= PNG_FREE_UNKN;
@@ -1254,7 +1265,7 @@ png_set_unknown_chunk_location(png_const_structrp png_ptr, png_inforp info_ptr,
          check_location(png_ptr, location);
    }
 }
-#endif
+#endif /* STORE_UNKNOWN_CHUNKS */
 
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
