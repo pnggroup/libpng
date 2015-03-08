@@ -1,4 +1,4 @@
-Libpng 1.6.17rc02 - March 7, 2015
+Libpng 1.6.17rc02 - March 8, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -68,11 +68,9 @@ Version 1.6.17beta06 [February 27, 2015]
 Version 1.6.17rc01 [March 4, 2015]
   No changes.
 
-Version 1.6.17rc02 [March 7, 2015]
+Version 1.6.17rc02 [March 8, 2015]
   Removed some comments that the configure script did not handle
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
-  Stopped a potential memory leak in png_set_unknown_chunks(). Breaks
-    tests/pngunknown-sAPI so it's temporarily marked SKIP.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
