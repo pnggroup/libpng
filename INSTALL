@@ -189,7 +189,7 @@ run "make install".
 VIII. Configuring libpng for 16-bit platforms
 
 You will want to look into zconf.h to tell zlib (and thus libpng) that
-it cannot allocate more then 64K at a time.  Even if you can, the memory
+it cannot allocate more than 64K at a time.  Even if you can, the memory
 won't be accessible.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
 
 IX. Configuring for DOS

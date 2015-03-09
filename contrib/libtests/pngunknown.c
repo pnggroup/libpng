@@ -1242,4 +1242,4 @@ main(void)
    /* So the test is skipped: */
    return 77;
 }
-#endif /* SET_UNKNOWN_CHUNKS && READ*/
+#endif /* SET_UNKNOWN_CHUNKS && READ */
