@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta55 - March 8, 2015
+Libpng 1.7.0beta55 - March 9, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -739,10 +739,12 @@ Version 1.7.0beta54 [March 4, 2015]
     Visual Studio (Sergey Kosarevsky)
   Merged pngwrite.c with libpng-1.6.17beta06/pngwrite.c
 
-Version 1.7.0beta55 [March 8, 2015]
+Version 1.7.0beta55 [March 9, 2015]
   Removed some comments that the configure script did not handle
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
   Spelling fixes ("then", "occured") reported by Lauri Nurmi.
+  Added more error reporting in png_default_read_data().
+  Merged png_free_data() with libpng-1.6.17rc02.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

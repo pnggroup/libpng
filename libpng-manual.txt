@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta55 - March 7, 2015
+ libpng version 1.7.0beta55 - March 9, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta55 - March 7, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta55 - March 9, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5040,6 +5040,10 @@ The signatures of many exported functions were changed, such that
    png_infop became png_inforp or png_const_inforp
 where "rp" indicates a "restricted pointer".
 
+The support for FAR/far types has been eliminated and the definition of
+png_alloc_size_t is now controlled by a flag so that 'small size_t' systems
+can select it if necessary.
+
 Error detection in some chunks has improved; in particular the iCCP chunk
 reader now does pretty complete validation of the basic format.  Some bad
 profiles that were previously accepted are now accepted with a warning or
@@ -5332,7 +5336,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-March 7, 2015
+March 9, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
