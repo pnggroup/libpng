@@ -500,7 +500,7 @@ setting QUANTIZE_BLUE_BITS default 5
 # are only interested in 8 bits anyway.  Increasing this value
 # results in more memory being used, and more pow() functions
 # being called to fill in the gamma tables.  Don't set this value
-# less then 8, and even that may not work (I haven't tested it).
+# less than 8, and even that may not work (I haven't tested it).
 
 setting MAX_GAMMA_8 default 11
 
