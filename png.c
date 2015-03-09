@@ -547,20 +547,17 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
 
       else
       {
-         if (info_ptr->splt_palettes_num != 0)
+         int i;
+
+         for (i = 0; i < info_ptr->splt_palettes_num; i++)
          {
-            int i;
-
-            for (i = 0; i < info_ptr->splt_palettes_num; i++)
-            {
-               png_free(png_ptr, info_ptr->splt_palettes[i].name);
-               png_free(png_ptr, info_ptr->splt_palettes[i].entries);
-            }
-
-            png_free(png_ptr, info_ptr->splt_palettes);
-            info_ptr->splt_palettes = NULL;
-            info_ptr->splt_palettes_num = 0;
+            png_free(png_ptr, info_ptr->splt_palettes[i].name);
+            png_free(png_ptr, info_ptr->splt_palettes[i].entries);
          }
+
+         png_free(png_ptr, info_ptr->splt_palettes);
+         info_ptr->splt_palettes = NULL;
+         info_ptr->splt_palettes_num = 0;
          info_ptr->valid &= ~PNG_INFO_sPLT;
       }
    }
@@ -580,15 +577,12 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       {
          int i;
 
-         if (info_ptr->unknown_chunks_num != 0)
-         {
-            for (i = 0; i < info_ptr->unknown_chunks_num; i++)
-               png_free(png_ptr, info_ptr->unknown_chunks[i].data);
+         for (i = 0; i < info_ptr->unknown_chunks_num; i++)
+            png_free(png_ptr, info_ptr->unknown_chunks[i].data);
 
-            png_free(png_ptr, info_ptr->unknown_chunks);
-            info_ptr->unknown_chunks = NULL;
-            info_ptr->unknown_chunks_num = 0;
-         }
+         png_free(png_ptr, info_ptr->unknown_chunks);
+         info_ptr->unknown_chunks = NULL;
+         info_ptr->unknown_chunks_num = 0;
       }
    }
 #endif
@@ -772,13 +766,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17rc02 - March 7, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.17rc02 - March 9, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17rc02 - March 7, 2015\
+      return "libpng version 1.6.17rc02 - March 9, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
