@@ -5036,6 +5036,8 @@ Version 1.7.0beta55 [March 9, 2015]
   Added more error reporting in png_default_read_data().
   Merged png_free_data() with libpng-1.6.17rc02.
 
+Version 1.7.0beta56 [March 9, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
