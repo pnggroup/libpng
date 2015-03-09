@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_17rc02 Your_png_h_is_not_version_1_6_17rc02;
+typedef png_libpng_version_1_7_0beta55 Your_png_h_is_not_version_1_7_0beta55;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -34,7 +34,7 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
-   png_ptr->sig_bytes = (png_byte)((num_bytes < 0 ? 0 : num_bytes) & 0xff);
+   png_ptr->sig_bytes = (png_byte)(num_bytes < 0 ? 0 : num_bytes);
 }
 
 /* Checks whether the supplied bytes match the PNG signature.  We allow
@@ -237,22 +237,21 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     */
    memset(&create_struct, 0, (sizeof create_struct));
 
-   /* Added at libpng-1.2.6 */
-#  ifdef PNG_USER_LIMITS_SUPPORTED
+   /* These limits are only used on read at present, and if READ is not turned
+    * on neither will USER_LIMITS be.  The width/height and chunk malloc limits
+    * are constants, so if they cannot be set they don't get defined in
+    * png_struct, the user_chunk_cache limits is a down-counter, when it reaches
+    * 1 no more chunks will be handled.  0 means unlimited, consequently the
+    * limit is 1 more than the number of chunks that will be handled.
+    */
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
       create_struct.user_width_max = PNG_USER_WIDTH_MAX;
       create_struct.user_height_max = PNG_USER_HEIGHT_MAX;
-
-#     ifdef PNG_USER_CHUNK_CACHE_MAX
-         /* Added at libpng-1.2.43 and 1.4.0 */
-         create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
-#     endif
-
-#     ifdef PNG_USER_CHUNK_MALLOC_MAX
-         /* Added at libpng-1.2.43 and 1.4.1, required only for read but exists
-          * in png_struct regardless.
-          */
-         create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
-#     endif
+      create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
+#  endif
+#  ifdef PNG_USER_LIMITS_SUPPORTED
+      /* Must exist even if the initial value is constant */
+      create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
 #  endif
 
    /* The following two API calls simply set fields in png_struct, so it is safe
@@ -384,60 +383,6 @@ png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
       memset(info_ptr, 0, (sizeof *info_ptr));
       png_free(png_ptr, info_ptr);
    }
-}
-
-/* Initialize the info structure.  This is now an internal function (0.89)
- * and applications using it are urged to use png_create_info_struct()
- * instead.  Use deprecated in 1.6.0, internal use removed (used internally it
- * is just a memset).
- *
- * NOTE: it is almost inconceivable that this API is used because it bypasses
- * the user-memory mechanism and the user error handling/warning mechanisms in
- * those cases where it does anything other than a memset.
- */
-PNG_FUNCTION(void,PNGAPI
-png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
-   PNG_DEPRECATED)
-{
-   png_inforp info_ptr = *ptr_ptr;
-
-   png_debug(1, "in png_info_init_3");
-
-   if (info_ptr == NULL)
-      return;
-
-   if ((sizeof (png_info)) > png_info_struct_size)
-   {
-      *ptr_ptr = NULL;
-      /* The following line is why this API should not be used: */
-      free(info_ptr);
-      info_ptr = png_voidcast(png_inforp, png_malloc_base(NULL,
-         (sizeof *info_ptr)));
-      *ptr_ptr = info_ptr;
-   }
-
-   /* Set everything to 0 */
-   memset(info_ptr, 0, (sizeof *info_ptr));
-}
-
-/* The following API is not called internally */
-void PNGAPI
-png_data_freer(png_const_structrp png_ptr, png_inforp info_ptr,
-   int freer, png_uint_32 mask)
-{
-   png_debug(1, "in png_data_freer");
-
-   if (png_ptr == NULL || info_ptr == NULL)
-      return;
-
-   if (freer == PNG_DESTROY_WILL_FREE_DATA)
-      info_ptr->free_me |= mask;
-
-   else if (freer == PNG_USER_WILL_FREE_DATA)
-      info_ptr->free_me &= ~mask;
-
-   else
-      png_error(png_ptr, "Unknown freer parameter in png_data_freer");
 }
 
 void PNGAPI
@@ -730,29 +675,6 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 
    return 1;
 }
-
-#    if PNG_LIBPNG_VER < 10700
-/* To do: remove the following from libpng-1.7 */
-/* Original API that uses a private buffer in png_struct.
- * Deprecated because it causes png_struct to carry a spurious temporary
- * buffer (png_struct::time_buffer), better to have the caller pass this in.
- */
-png_const_charp PNGAPI
-png_convert_to_rfc1123(png_structrp png_ptr, png_const_timep ptime)
-{
-   if (png_ptr != NULL)
-   {
-      /* The only failure above if png_ptr != NULL is from an invalid ptime */
-      if (png_convert_to_rfc1123_buffer(png_ptr->time_buffer, ptime) == 0)
-         png_warning(png_ptr, "Ignoring invalid time value");
-
-      else
-         return png_ptr->time_buffer;
-   }
-
-   return NULL;
-}
-#    endif /* LIBPNG_VER < 10700 */
 #  endif /* TIME_RFC1123 */
 
 #endif /* READ || WRITE */
@@ -766,13 +688,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17rc02 - March 9, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta55 - March 9, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17rc02 - March 9, 2015\
+      return "libpng version 1.7.0beta55 - March 9, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -869,9 +791,9 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 
    for (i = 0, v = 0; i < num_palette; i++, v += color_inc)
    {
-      palette[i].red = (png_byte)(v & 0xff);
-      palette[i].green = (png_byte)(v & 0xff);
-      palette[i].blue = (png_byte)(v & 0xff);
+      palette[i].red = (png_byte)v;
+      palette[i].green = (png_byte)v;
+      palette[i].blue = (png_byte)v;
    }
 }
 #endif
@@ -922,19 +844,6 @@ png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
 }
 #endif /* READ_UNKNOWN_CHUNKS || HANDLE_AS_UNKNOWN */
 #endif /* SET_UNKNOWN_CHUNKS */
-
-#ifdef PNG_READ_SUPPORTED
-/* This function, added to libpng-1.0.6g, is untested. */
-int PNGAPI
-png_reset_zstream(png_structrp png_ptr)
-{
-   if (png_ptr == NULL)
-      return Z_STREAM_ERROR;
-
-   /* WARNING: this resets the window bits to the maximum! */
-   return (inflateReset(&png_ptr->zstream));
-}
-#endif /* READ */
 
 /* This function was added to libpng-1.0.7 */
 png_uint_32 PNGAPI
@@ -1176,7 +1085,7 @@ png_colorspace_sync(png_const_structrp png_ptr, png_inforp info_ptr)
    png_colorspace_sync_info(png_ptr, info_ptr);
 }
 #endif
-#endif /* GAMMA */
+#endif
 
 #ifdef PNG_COLORSPACE_SUPPORTED
 /* Added at libpng-1.5.5 to support read and write of true CIEXYZ values for
@@ -1930,6 +1839,10 @@ png_icc_check_length(png_const_structrp png_ptr, png_colorspacerp colorspace,
       return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
          "too short");
 
+   if (profile_length & 3)
+      return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
+         "invalid length");
+
    return 1;
 }
 
@@ -1949,11 +1862,6 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    if (temp != profile_length)
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "length does not match profile");
-
-   temp = (png_uint_32) (*(profile+8));
-   if (temp > 3 && (profile_length & 3))
-      return png_icc_profile_error(png_ptr, colorspace, name, profile_length,
-         "invalid length");
 
    temp = png_get_uint_32(profile+128); /* tag count: 12 bytes/tag */
    if (temp > 357913930 || /* (2^32-4-132)/12: maximum possible tag count */
@@ -2236,7 +2144,6 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
     * by sRGB (but maybe defined by a later ICC specification) the read of
     * the profile will fail at that point.
     */
-
    png_uint_32 length = 0;
    png_uint_32 intent = 0x10000; /* invalid */
 #if PNG_sRGB_PROFILE_CHECKS > 1
@@ -2393,7 +2300,7 @@ void /* PRIVATE */
 png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 {
    /* Set the rgb_to_gray coefficients from the colorspace. */
-   if (png_ptr->rgb_to_gray_coefficients_set == 0 &&
+   if ((png_ptr->colorspace.flags & PNG_COLORSPACE_RGB_TO_GRAY_SET) == 0 &&
       (png_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
    {
       /* png_set_background has not been called, get the coefficients from the Y
@@ -3201,26 +3108,34 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
 #   endif /* FIXED_POINT */
 #endif /* SCAL */
 
-#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
-   !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
+#if !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && (\
+   defined(PNG_FLOATING_POINT_SUPPORTED) && \
    (defined(PNG_gAMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED) || \
    defined(PNG_sCAL_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)) || \
-   (defined(PNG_sCAL_SUPPORTED) && \
-   defined(PNG_FLOATING_ARITHMETIC_SUPPORTED))
+   (defined(PNG_FLOATING_ARITHMETIC_SUPPORTED) &&\
+   defined(PNG_sCAL_SUPPORTED)))
 png_fixed_point
 png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 {
-   double r = floor(100000 * fp + .5);
+   if (fp < 0)
+   {
+      if (fp > -21474.836485)
+         return (png_fixed_point)(100000*fp - .5);
+   }
 
-   if (r > 2147483647. || r < -2147483648.)
-      png_fixed_error(png_ptr, text);
+   else
+   {
+      if (fp < 21474.836475)
+         return (png_fixed_point)(100000*fp + .5);
+   }
+
+   /* Overflow */
+   png_fixed_error(png_ptr, text);
 
 #  ifndef PNG_ERROR_TEXT_SUPPORTED
    PNG_UNUSED(text)
 #  endif
-
-   return (png_fixed_point)r;
 }
 #endif
 
@@ -3398,29 +3313,20 @@ png_gamma_significant(png_fixed_point gamma_val)
 #endif
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-#ifdef PNG_16BIT_SUPPORTED
+#ifndef PNG_FLOATING_ARITHMETIC_SUPPORTED
 /* A local convenience routine. */
 static png_fixed_point
 png_product2(png_fixed_point a, png_fixed_point b)
 {
    /* The required result is 1/a * 1/b; the following preserves accuracy. */
-#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-   double r = a * 1E-5;
-   r *= b;
-   r = floor(r+.5);
-
-   if (r <= 2147483647. && r >= -2147483648.)
-      return (png_fixed_point)r;
-#else
    png_fixed_point res;
 
    if (png_muldiv(&res, a, b, 100000) != 0)
       return res;
-#endif
 
    return 0; /* overflow */
 }
-#endif /* 16BIT */
+#endif /* FLOATING_ARITHMETIC */
 
 /* The inverse of the above. */
 png_fixed_point
@@ -3438,10 +3344,10 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
          return (png_fixed_point)r;
    }
 #else
-   /* This may overflow because the range of png_fixed_point isn't symmetric,
-    * but this API is only used for the product of file and screen gamma so it
-    * doesn't matter that the smallest number it can produce is 1/21474, not
-    * 1/100000
+   /* This may overflow because the range of png_fixed_point isn't
+    * symmetric, but this API is only used for the product of file and
+    * screen gamma so it doesn't matter that the smallest number it can
+    * produce is 1/21474, not 1/100000
     */
    png_fixed_point res = png_product2(a, b);
 
@@ -3727,10 +3633,9 @@ png_exp8bit(png_fixed_point lg2)
     * step.
     */
    x -= x >> 8;
-   return (png_byte)(((x + 0x7fffffU) >> 24) & 0xff);
+   return (png_byte)((x + 0x7fffffU) >> 24);
 }
 
-#ifdef PNG_16BIT_SUPPORTED
 static png_uint_16
 png_exp16bit(png_fixed_point lg2)
 {
@@ -3741,7 +3646,6 @@ png_exp16bit(png_fixed_point lg2)
    x -= x >> 16;
    return (png_uint_16)((x + 32767U) >> 16);
 }
-#endif /* 16BIT */
 #endif /* FLOATING_ARITHMETIC */
 
 png_byte
@@ -3788,10 +3692,9 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
 #     endif
    }
 
-   return (png_byte)(value & 0xff);
+   return (png_byte)value;
 }
 
-#ifdef PNG_16BIT_SUPPORTED
 png_uint_16
 png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
 {
@@ -3803,7 +3706,7 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
           * overflow on an ANSI-C90 compliant system so the cast needs to ensure
           * that this is not possible.
           */
-         double r = floor(65535*pow((png_int_32)value/65535.,
+         double r = floor(65535.*pow((png_int_32)value/65535.,
                      gamma_val*.00001)+.5);
          return (png_uint_16)r;
 #     else
@@ -3820,7 +3723,6 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
 
    return (png_uint_16)value;
 }
-#endif /* 16BIT */
 
 /* This does the right thing based on the bit_depth field of the
  * png_struct, interpreting values as 8-bit or 16-bit.  While the result
@@ -3834,183 +3736,336 @@ png_gamma_correct(png_structrp png_ptr, unsigned int value,
    if (png_ptr->bit_depth == 8)
       return png_gamma_8bit_correct(value, gamma_val);
 
-#ifdef PNG_16BIT_SUPPORTED
    else
       return png_gamma_16bit_correct(value, gamma_val);
-#else
-      /* should not reach this */
-      return 0;
-#endif /* 16BIT */
 }
 
-#ifdef PNG_16BIT_SUPPORTED
-/* Internal function to build a single 16-bit table - the table consists of
- * 'num' 256 entry subtables, where 'num' is determined by 'shift' - the amount
- * to shift the input values right (or 16-number_of_signifiant_bits).
- *
- * The caller is responsible for ensuring that the table gets cleaned up on
- * png_error (i.e. if one of the mallocs below fails) - i.e. the *table argument
- * should be somewhere that will be cleaned.
- */
-static void
-png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
-   PNG_CONST unsigned int shift, PNG_CONST png_fixed_point gamma_val)
+#define PNG_GAMMA_TABLE_8       0 /* 8-bit entries in png_byte */
+#define PNG_GAMMA_TABLE_8_IN_16 1 /* 8-bit entries * 257 in png_uint_16 */
+#define PNG_GAMMA_TABLE_16      2 /* 16-bit entries in png_uint_16 */
+
+typedef struct
 {
-   /* Various values derived from 'shift': */
-   PNG_CONST unsigned int num = 1U << (8U - shift);
-#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-   /* CSE the division and work round wacky GCC warnings (see the comments
-    * in png_gamma_8bit_correct for where these come from.)
+   png_fixed_point gamma;
+   png_uint_32     mult;
+   unsigned int    add;
+   unsigned int    shift;  /* input value is (i * mult + add) >> shift */
+   int             output; /* One of the above values */
+   int             adjust; /* Divide or multiple output by 257 */
+   png_voidp       table;  /* Lookup table */
+}  gamma_table_data;
+
+static unsigned int
+write_gamma_table_entry(const gamma_table_data *data, png_uint_32 i)
+   /* Calculate and write a single entry into table[i], the value of the entry
+    * written is returned.
     */
-   PNG_CONST double fmax = 1./(((png_int_32)1 << (16U - shift))-1);
-#endif
-   PNG_CONST unsigned int max = (1U << (16U - shift))-1U;
-   PNG_CONST unsigned int max_by_2 = 1U << (15U-shift);
-   unsigned int i;
-
-   png_uint_16pp table = *ptable =
-       (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
-
-   for (i = 0; i < num; i++)
-   {
-      png_uint_16p sub_table = table[i] =
-          (png_uint_16p)png_malloc(png_ptr, 256 * (sizeof (png_uint_16)));
-
-      /* The 'threshold' test is repeated here because it can arise for one of
-       * the 16-bit tables even if the others don't hit it.
-       */
-      if (png_gamma_significant(gamma_val) != 0)
-      {
-         /* The old code would overflow at the end and this would cause the
-          * 'pow' function to return a result >1, resulting in an
-          * arithmetic error.  This code follows the spec exactly; ig is
-          * the recovered input sample, it always has 8-16 bits.
-          *
-          * We want input * 65535/max, rounded, the arithmetic fits in 32
-          * bits (unsigned) so long as max <= 32767.
-          */
-         unsigned int j;
-         for (j = 0; j < 256; j++)
-         {
-            png_uint_32 ig = (j << (8-shift)) + i;
-#           ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-               /* Inline the 'max' scaling operation: */
-               /* See png_gamma_8bit_correct for why the cast to (int) is
-                * required here.
-                */
-               double d = floor(65535.*pow(ig*fmax, gamma_val*.00001)+.5);
-               sub_table[j] = (png_uint_16)d;
-#           else
-               if (shift != 0)
-                  ig = (ig * 65535U + max_by_2)/max;
-
-               sub_table[j] = png_gamma_16bit_correct(ig, gamma_val);
-#           endif
-         }
-      }
-      else
-      {
-         /* We must still build a table, but do it the fast way. */
-         unsigned int j;
-
-         for (j = 0; j < 256; j++)
-         {
-            png_uint_32 ig = (j << (8-shift)) + i;
-
-            if (shift != 0)
-               ig = (ig * 65535U + max_by_2)/max;
-
-            sub_table[j] = (png_uint_16)ig;
-         }
-      }
-   }
-}
-
-/* NOTE: this function expects the *inverse* of the overall gamma transformation
- * required.
- */
-static void
-png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
-   PNG_CONST unsigned int shift, PNG_CONST png_fixed_point gamma_val)
 {
-   PNG_CONST unsigned int num = 1U << (8U - shift);
-   PNG_CONST unsigned int max = (1U << (16U - shift))-1U;
-   unsigned int i;
-   png_uint_32 last;
-
-   png_uint_16pp table = *ptable =
-       (png_uint_16pp)png_calloc(png_ptr, num * (sizeof (png_uint_16p)));
-
-   /* 'num' is the number of tables and also the number of low bits of low
-    * bits of the input 16-bit value used to select a table.  Each table is
-    * itself indexed by the high 8 bits of the value.
+   png_uint_32 in = (i * data->mult + data->add) >> data->shift;
+   unsigned int out;
+   
+   /* If the output is TABLE_8 with no adjust, or the output is not with an
+    * adjust, use 8-bit correction.
     */
-   for (i = 0; i < num; i++)
-      table[i] = (png_uint_16p)png_malloc(png_ptr,
-          256 * (sizeof (png_uint_16)));
-
-   /* 'gamma_val' is set to the reciprocal of the value calculated above, so
-    * pow(out,g) is an *input* value.  'last' is the last input value set.
-    *
-    * In the loop 'i' is used to find output values.  Since the output is
-    * 8-bit there are only 256 possible values.  The tables are set up to
-    * select the closest possible output value for each input by finding
-    * the input value at the boundary between each pair of output values
-    * and filling the table up to that boundary with the lower output
-    * value.
-    *
-    * The boundary values are 0.5,1.5..253.5,254.5.  Since these are 9-bit
-    * values the code below uses a 16-bit value in i; the values start at
-    * 128.5 (for 0.5) and step by 257, for a total of 254 values (the last
-    * entries are filled with 255).  Start i at 128 and fill all 'last'
-    * table entries <= 'max'
-    */
-   last = 0;
-   for (i = 0; i < 255; ++i) /* 8-bit output value */
+   if ((data->output == PNG_GAMMA_TABLE_8) != (data->adjust != 0))
    {
-      /* Find the corresponding maximum input value */
-      png_uint_16 out = (png_uint_16)(i * 257U); /* 16-bit output value */
+      out = png_gamma_8bit_correct((unsigned int)in, data->gamma);
 
-      /* Find the boundary value in 16 bits: */
-      png_uint_32 bound = png_gamma_16bit_correct(out+128U, gamma_val);
-
-      /* Adjust (round) to (16-shift) bits: */
-      bound = (bound * max + 32768U)/65535U + 1U;
-
-      while (last < bound)
-      {
-         table[last & (0xffU >> shift)][last >> (8U - shift)] = out;
-         last++;
-      }
+      if (data->adjust != 0)
+         out *= 257U;
    }
 
-   /* And fill in the final entries. */
-   while (last < (num << 8))
+   else /* 16-bit correction */
    {
-      table[last & (0xff >> shift)][last >> (8U - shift)] = 65535U;
-      last++;
+      out = png_gamma_16bit_correct((unsigned int)in, data->gamma);
+
+      if (data->adjust != 0)
+         out = PNG_DIV257(out);
    }
-}
-#endif /* 16BIT */
 
-/* Build a single 8-bit table: same as the 16-bit case but much simpler (and
- * typically much faster).  Note that libpng currently does no sBIT processing
- * (apparently contrary to the spec) so a 256-entry table is always generated.
- */
-static void
-png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
-   PNG_CONST png_fixed_point gamma_val)
-{
-   unsigned int i;
-   png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);
-
-   if (png_gamma_significant(gamma_val) != 0)
-      for (i=0; i<256; i++)
-         table[i] = png_gamma_8bit_correct(i, gamma_val);
+   if (data->output == PNG_GAMMA_TABLE_8)
+      ((png_bytep)data->table)[i] = (png_byte)out;
 
    else
-      for (i=0; i<256; ++i)
-         table[i] = (png_byte)(i & 0xff);
+      ((png_uint_16p)data->table)[i] = (png_uint_16)out;
+
+   return out;
+}
+
+static void
+write_gamma_table(const gamma_table_data *data, png_uint_32 lo,
+   unsigned int loval, png_uint_32 hi, unsigned int hival)
+   /* Fill in gamma table entries between lo and hi, exclusive.  The entries at
+    * table[lo] and table[hi] have already been written, the intervening entries
+    * are written.
+    */
+{
+   if (hi > lo+1) /* Else nothing to fill in */
+   {
+      if (hival == loval)
+      {
+         /* All intervening entries must be the same. */
+         if (data->output == PNG_GAMMA_TABLE_8)
+         {
+            png_bytep table8 = ((png_bytep)data->table);
+
+            while (++lo < hi)
+               table8[lo] = (png_byte)loval;
+         }
+
+         else
+         {
+            png_uint_16p table16 = ((png_uint_16p)data->table);
+
+            while (++lo < hi)
+               table16[lo] = (png_uint_16)loval;
+         }
+      }
+
+      else
+      {
+         png_uint_32 mid = (lo+hi) >> 1;
+         unsigned int midval = write_gamma_table_entry(data, mid);
+
+         /* The algorithm used is to divide the entries to be written in half
+          * and fill in the middle.  For all practical tables with significant
+          * gamma this will result in a performance gain because the expensive
+          * gamma correction arithmetic is avoided for some entries.
+          */
+         write_gamma_table(data, lo, loval, mid, midval);
+         write_gamma_table(data, mid, midval, hi, hival);
+      }
+   }
+}
+
+static void *
+png_build_gamma_table(png_structrp png_ptr, png_fixed_point gamma_val,
+   int output/*as above*/, int input_depth, int use_shift)
+   /* Build a gamma lookup table to encode input_depth bit input values.
+    * The table will have 2^input_depth entries plus an extra one if use_shift
+    * is specified.  With shift the table is accessed:
+    *
+    *    table[(original-value + rounding) >> shift]
+    *
+    * And an extra entry exists to accomodate overflow of original-value on
+    * rounding.  If use_shift is not specified the table is accessed with an
+    * input_depth bit value and the original values must have been correctly
+    * scaled to this range (not using a shift!)
+    *
+    * Each table entry contains input-value^gamma_val rounded to the output
+    * precision.  This is 8 bit precision unless output is specified as
+    * PNG_GAMMA_TABLE_16, in which case it is 16-bit precision.  For
+    * PNG_GAMMA_TABLE_8_IN_16 the 8-bit value is scaled to 16-bits by
+    * multiplying by 257.
+    */
+{
+   png_uint_32 size;
+   unsigned int hival;
+   gamma_table_data data;
+
+   /* If use_shift is true or if the input or output is not 8-bit the gamma
+    * correction will use the 16-bit correction code.  This requires a value in
+    * the range 0..65535.  For use_shift the value is simply:
+    *
+    *    input << shift
+    *
+    * For the scaling case the value is:
+    *
+    *    round(input * 65535 / ((1<<input_depth)-1)
+    *
+    * Both these expressions can be rewritten as:
+    *
+    *    (input * mult + add) >> shift;
+    *
+    * With 'mult' and 'add' chosen to minimize the error for all input values
+    * in the range 0..((1<<input_depth)-1).  The following table does this for
+    * the scaling case.  In fact all the answers are except except for the
+    * 13-bit case, where the maximum error (from the exact value) is 0.500183.
+    *
+    * This table can be produced using the code in contrib/tools/scale.c
+    */
+   static const struct
+   {
+      png_uint_32 mult;
+      png_uint_16 add;
+      png_byte    shift;
+   }  multadd65535[16] =
+   {
+      {      65535,     0,  0 }, /* 65535/1 */
+      {      21845,     0,  0 }, /* 65535/3 */
+      {      37449,     0,  2 }, /* 65535/7 */
+      {       4369,     0,  0 }, /* 65535/15 */
+      {      33825,     0,  4 }, /* 65535/31 */
+      {     266301,   121,  8 }, /* 65535/63 */
+      {    1056817,   970, 11 }, /* 65535/127 */
+      {        257,     0,  0 }, /* 65535/255 */
+      {     262653,  1020, 11 }, /* 65535/511 */
+      {    1049585,  8165, 14 }, /* 65535/1023 */
+      {    2098145, 31774, 16 }, /* 65535/2047 */
+      {      65551,  2055, 12 }, /* 65535/4095 */
+      {      65543,  4100, 13 }, /* 65535/8191 ERROR: .5+0.000183128*/
+      {      65539,  8193, 14 }, /* 65535/16383 */
+      {      32769,     0, 14 }, /* 65535/32767 */
+      {          1,     0,  0 }  /* 65535/65535 */
+#  if 0 /* inverse */
+      {      1,         0, 15 }, /* 1/65535 */
+      {      3,     32769, 16 }, /* 3/65535 */
+      {  28673, 134188470, 28 }, /* 7/65535 */
+      {     15,     32775, 16 }, /* 15/65535 */
+      {  31745,  33522654, 26 }, /* 31/65535 */
+      {  64513,  33552693, 26 }, /* 63/65535 */
+      {  65025,  16776620, 25 }, /* 127/65535 */
+      {    255,     32895, 16 }, /* 255/65535 */
+      {  65409,   4194134, 23 }, /* 511/65535 */
+      {  65473,   2097037, 22 }, /* 1023/65535 */
+      {  65505,   1048544, 21 }, /* 2047/65535 */
+      {  65521,    524167, 20 }, /* 4095/65535 */
+      {  65529,    262136, 19 }, /* 8191/65535 */
+      {  65533,    131065, 18 }, /* 16383/65535 */
+      {      1,         0,  1 }, /* 32767/65535 */
+      {      1,         0,  0 }  /* 65535/65535 */
+#  endif
+   };
+
+   /* When both the input and output are 8-bit (i.e. the output is not
+    * PNG_GAMMA_TABLE_16 and the input_depth is <9) the 8-bit gamma correction
+    * code can be used, it is slightly faster.  This requires values scaled to
+    * 255, not 65535:
+    */
+   static const struct
+   {
+      png_uint_16 mult;
+      png_byte    add;
+      png_byte    shift;
+   }  multadd255[8] =
+   {
+      { 255,    0,  0 }, /* 255/1 */
+      {  85,    0,  0 }, /* 255/3 */
+      {  73,    0,  1 }, /* 255/7 */
+      {  17,    0,  0 }, /* 255/15 */
+      { 527,   23,  6 }, /* 255/31 */
+      { 259,   33,  6 }, /* 255/63 */
+      { 129,    0,  6 }, /* 255/127 */
+      {   1,    0,  0 }  /* 255/255 */
+#  if 0 /* inverse */
+      {   1,    0,  7 }, /* 1/255 */
+      {   3,  129,  8 }, /* 3/255 */
+      { 225, 4060, 13 }, /* 7/255 */
+      {  15,  135,  8 }, /* 15/255 */
+      { 249, 1014, 11 }, /* 31/255 */
+      { 253,  505, 10 }, /* 63/255 */
+      {   1,    0,  1 }, /* 127/255 */
+      {   1,    0,  0 }  /* 255/255 */
+#  endif
+   };
+
+   /* Basic table size, increased by one below in the use_shift case where the
+    * input is rounded.
+    */
+   size = 1U << input_depth;
+   data.gamma = gamma_val;
+   data.output = output;
+
+   if (output < PNG_GAMMA_TABLE_16 && input_depth <= 8)
+   {
+      /* The 8-bit correction can only be used if both input and output have no
+       * more than 8 bits of precision.
+       */
+      data.adjust = output > PNG_GAMMA_TABLE_8;
+
+      if (use_shift != 0)
+      {
+         /* The multiplier does the shift: */
+         data.mult = 1U << (8-input_depth);
+         data.add = 0;
+         data.shift = 0;
+         if (input_depth < 8) ++size;
+      }
+
+      else
+      {
+         data.mult = multadd255[input_depth-1].mult;
+         data.add = multadd255[input_depth-1].add;
+         data.shift = multadd255[input_depth-1].shift;
+      }
+   }
+
+   else
+   {
+      /* 16-bit correction is used for cases where input or output require more
+       * than 8 bits.
+       */
+      data.adjust = output == PNG_GAMMA_TABLE_8;
+
+      if (use_shift != 0)
+      {
+         data.mult = 1U << (16-input_depth);
+         data.add = 0;
+         data.shift = 0;
+         if (input_depth < 16) ++size;
+      }
+
+      else
+      {
+         data.mult = multadd65535[input_depth-1].mult;
+         data.add = multadd65535[input_depth-1].add;
+         data.shift = multadd65535[input_depth-1].shift;
+      }
+   }
+
+   if (output == PNG_GAMMA_TABLE_8)
+   {
+      data.table = png_malloc(png_ptr, size * sizeof (png_byte));
+      ((png_bytep)data.table)[0] = 0;
+      hival = ((png_bytep)data.table)[size-1] = 255;
+   }
+
+   else
+   {
+      /* Output is 16 bits, although it may only have 8 bits of precision */
+      data.table = png_malloc(png_ptr, size * sizeof (png_uint_16));
+      ((png_uint_16p)data.table)[0] = 0;
+      hival = ((png_uint_16p)data.table)[size-1] = 65535;
+   }
+
+   if (png_gamma_significant(gamma_val) != 0)
+      write_gamma_table(&data, 0, 0, size-1, hival);
+
+   else /* gamma_val not significant */
+   {
+      if (output == PNG_GAMMA_TABLE_8)
+      {
+         png_uint_32 i;
+         png_bytep table8 = ((png_bytep)data.table);
+
+         if (data.adjust)
+            for (i=1; i<size-1; ++i)
+               table8[i] = (png_byte)PNG_DIV257((i * data.mult + data.add) >>
+                  data.shift);
+
+         else
+            for (i=1; i<size-1; ++i)
+               table8[i] = (png_byte)((i * data.mult + data.add) >> data.shift);
+      }
+
+      else
+      {
+         png_uint_32 i;
+         png_uint_16p table16 = ((png_uint_16p)data.table);
+
+         if (data.adjust)
+            for (i=1; i<size-1; ++i)
+               table16[i] = (png_uint_16)(((i * data.mult + data.add) >>
+                  data.shift) * 257U);
+
+         else
+            for (i=1; i<size-1; ++i)
+               table16[i] = (png_uint_16)((i * data.mult + data.add) >>
+                  data.shift);
+      }
+   }
+
+   return data.table;
 }
 
 /* Used from png_read_destroy and below to release the memory used by the gamma
@@ -4022,19 +4077,8 @@ png_destroy_gamma_table(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->gamma_table);
    png_ptr->gamma_table = NULL;
 
-#ifdef PNG_16BIT_SUPPORTED
-   if (png_ptr->gamma_16_table != NULL)
-   {
-      int i;
-      int istop = (1 << (8 - png_ptr->gamma_shift));
-      for (i = 0; i < istop; i++)
-      {
-         png_free(png_ptr, png_ptr->gamma_16_table[i]);
-      }
    png_free(png_ptr, png_ptr->gamma_16_table);
    png_ptr->gamma_16_table = NULL;
-   }
-#endif /* 16BIT */
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
@@ -4044,30 +4088,10 @@ png_destroy_gamma_table(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->gamma_to_1);
    png_ptr->gamma_to_1 = NULL;
 
-#ifdef PNG_16BIT_SUPPORTED
-   if (png_ptr->gamma_16_from_1 != NULL)
-   {
-      int i;
-      int istop = (1 << (8 - png_ptr->gamma_shift));
-      for (i = 0; i < istop; i++)
-      {
-         png_free(png_ptr, png_ptr->gamma_16_from_1[i]);
-      }
    png_free(png_ptr, png_ptr->gamma_16_from_1);
    png_ptr->gamma_16_from_1 = NULL;
-   }
-   if (png_ptr->gamma_16_to_1 != NULL)
-   {
-      int i;
-      int istop = (1 << (8 - png_ptr->gamma_shift));
-      for (i = 0; i < istop; i++)
-      {
-         png_free(png_ptr, png_ptr->gamma_16_to_1[i]);
-      }
    png_free(png_ptr, png_ptr->gamma_16_to_1);
    png_ptr->gamma_16_to_1 = NULL;
-   }
-#endif /* 16BIT */
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
 }
 
@@ -4077,7 +4101,7 @@ png_destroy_gamma_table(png_structrp png_ptr)
  * we don't need to allocate > 64K chunks for a full 16-bit table.
  */
 void /* PRIVATE */
-png_build_gamma_table(png_structrp png_ptr, int bit_depth)
+png_build_gamma_tables(png_structrp png_ptr, int bit_depth)
 {
   png_debug(1, "in png_build_gamma_table");
 
@@ -4095,28 +4119,44 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 
   if (bit_depth <= 8)
   {
-     png_build_8bit_table(png_ptr, &png_ptr->gamma_table,
-         png_ptr->screen_gamma > 0 ?  png_reciprocal2(png_ptr->colorspace.gamma,
-         png_ptr->screen_gamma) : PNG_FP_1);
+     png_ptr->gamma_table = png_voidcast(png_bytep, png_build_gamma_table(
+         png_ptr, png_ptr->screen_gamma > 0 ?
+         png_reciprocal2(png_ptr->colorspace.gamma, png_ptr->screen_gamma) :
+         PNG_FP_1, PNG_GAMMA_TABLE_8, 8/*input depth*/, 0/*scale*/));
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
      if ((png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY)) != 0)
      {
-        png_build_8bit_table(png_ptr, &png_ptr->gamma_to_1,
-            png_reciprocal(png_ptr->colorspace.gamma));
+        /* This sets the accuracy of 8-bit composition and the 8-bit RGB to gray
+         * conversion - PNG_MAX_GAMMA_8 (the number of bits in the sixteen bit
+         * value that are considered significant.)
+         */
+        png_ptr->gamma_to_1 = png_voidcast(png_uint_16p, png_build_gamma_table(
+            png_ptr, png_reciprocal(png_ptr->colorspace.gamma),
+            PNG_GAMMA_TABLE_16, 8/*input depth*/, 0/*scale*/));
 
-        png_build_8bit_table(png_ptr, &png_ptr->gamma_from_1,
-            png_ptr->screen_gamma > 0 ?  png_reciprocal(png_ptr->screen_gamma) :
-            png_ptr->colorspace.gamma/* Probably doing rgb_to_gray */);
+        png_ptr->gamma_from_1 = png_voidcast(png_bytep, png_build_gamma_table(
+            png_ptr, png_ptr->screen_gamma > 0 ?
+            png_reciprocal(png_ptr->screen_gamma) :
+            png_ptr->colorspace.gamma/* Probably doing rgb_to_gray */,
+            PNG_GAMMA_TABLE_8, PNG_MAX_GAMMA_8/*input depth*/, 1/*shift*/));
+
+        png_ptr->gamma_shift = 16-PNG_MAX_GAMMA_8;
      }
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
   }
-#ifdef PNG_16BIT_SUPPORTED
   else
   {
      png_byte shift, sig_bit;
+     int table_type;
+
+#    ifdef PNG_16BIT_SUPPORTED
+         table_type = PNG_GAMMA_TABLE_16;
+#    else
+         table_type = PNG_GAMMA_TABLE_8_IN_16;
+#    endif
 
      if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0)
      {
@@ -4131,27 +4171,8 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
      else
         sig_bit = png_ptr->sig_bit.gray;
 
-     /* 16-bit gamma code uses this equation:
-      *
-      *   ov = table[(iv & 0xff) >> gamma_shift][iv >> 8]
-      *
-      * Where 'iv' is the input color value and 'ov' is the output value -
-      * pow(iv, gamma).
-      *
-      * Thus the gamma table consists of up to 256 256-entry tables.  The table
-      * is selected by the (8-gamma_shift) most significant of the low 8 bits of
-      * the color value then indexed by the upper 8 bits:
-      *
-      *   table[low bits][high 8 bits]
-      *
-      * So the table 'n' corresponds to all those 'iv' of:
-      *
-      *   <all high 8-bit values><n << gamma_shift>..<(n+1 << gamma_shift)-1>
-      *
-      */
      if (sig_bit > 0 && sig_bit < 16U)
-        /* shift == insignificant bits */
-        shift = (png_byte)((16U - sig_bit) & 0xff);
+        shift = (png_byte)(16U - sig_bit); /* shift == insignificant bits */
 
      else
         shift = 0; /* keep all 16 bits */
@@ -4160,55 +4181,47 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
      {
         /* PNG_MAX_GAMMA_8 is the number of bits to keep - effectively
          * the significant bits in the *input* when the output will
-         * eventually be 8 bits.  By default it is 11.
+         * eventually be 8 bits.
          */
         if (shift < (16U - PNG_MAX_GAMMA_8))
            shift = (16U - PNG_MAX_GAMMA_8);
-     }
 
-     if (shift > 8U)
-        shift = 8U; /* Guarantees at least one table! */
+        table_type = PNG_GAMMA_TABLE_8_IN_16;
+     }
 
      png_ptr->gamma_shift = shift;
 
-     /* NOTE: prior to 1.5.4 this test used to include PNG_BACKGROUND (now
-      * PNG_COMPOSE).  This effectively smashed the background calculation for
-      * 16-bit output because the 8-bit table assumes the result will be reduced
-      * to 8 bits.
-      */
-     if ((png_ptr->transformations & (PNG_16_TO_8 | PNG_SCALE_16_TO_8)) != 0)
-         png_build_16to8_table(png_ptr, &png_ptr->gamma_16_table, shift,
-         png_ptr->screen_gamma > 0 ? png_product2(png_ptr->colorspace.gamma,
-         png_ptr->screen_gamma) : PNG_FP_1);
-
-     else
-         png_build_16bit_table(png_ptr, &png_ptr->gamma_16_table, shift,
-         png_ptr->screen_gamma > 0 ? png_reciprocal2(png_ptr->colorspace.gamma,
-         png_ptr->screen_gamma) : PNG_FP_1);
+     png_ptr->gamma_16_table = png_voidcast(png_uint_16p, png_build_gamma_table(
+         png_ptr, png_ptr->screen_gamma > 0 ? png_reciprocal2(
+         png_ptr->colorspace.gamma, png_ptr->screen_gamma) : PNG_FP_1,
+         table_type, (16-shift)/*input depth*/, 1/*shift*/));
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) || \
    defined(PNG_READ_ALPHA_MODE_SUPPORTED) || \
    defined(PNG_READ_RGB_TO_GRAY_SUPPORTED)
      if ((png_ptr->transformations & (PNG_COMPOSE | PNG_RGB_TO_GRAY)) != 0)
      {
-        png_build_16bit_table(png_ptr, &png_ptr->gamma_16_to_1, shift,
-            png_reciprocal(png_ptr->colorspace.gamma));
+        png_ptr->gamma_16_to_1 = png_voidcast(png_uint_16p,
+            png_build_gamma_table(png_ptr,
+            png_reciprocal(png_ptr->colorspace.gamma), PNG_GAMMA_TABLE_16,
+            (16-shift)/*input depth*/, 1/*shift*/));
 
         /* Notice that the '16 from 1' table should be full precision, however
          * the lookup on this table still uses gamma_shift, so it can't be.
          * TODO: fix this.
          */
-        png_build_16bit_table(png_ptr, &png_ptr->gamma_16_from_1, shift,
-            png_ptr->screen_gamma > 0 ? png_reciprocal(png_ptr->screen_gamma) :
-            png_ptr->colorspace.gamma/* Probably doing rgb_to_gray */);
+        png_ptr->gamma_16_from_1 = png_voidcast(png_uint_16p,
+            png_build_gamma_table(png_ptr, png_ptr->screen_gamma > 0 ?
+            png_reciprocal(png_ptr->screen_gamma) :
+            png_ptr->colorspace.gamma/* Probably doing rgb_to_gray */,
+            PNG_GAMMA_TABLE_16, (16-shift)/*input depth*/, 1/*shift*/));
      }
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
   }
-#endif /* 16BIT */
 }
 #endif /* READ_GAMMA */
 
-/* HARDWARE OR SOFTWARE OPTION SUPPORT */
+/* HARDWARE OPTION SUPPORT */
 #ifdef PNG_SET_OPTION_SUPPORTED
 int PNGAPI
 png_set_option(png_structrp png_ptr, int option, int onoff)
@@ -4220,7 +4233,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
       int setting = (2 + (onoff != 0)) << option;
       int current = png_ptr->options;
 
-      png_ptr->options = (png_byte)(((current & ~mask) | setting) & 0xff);
+      png_ptr->options = (png_byte)((current & ~mask) | setting);
 
       return (current & mask) >> option;
    }
@@ -4287,6 +4300,7 @@ const png_uint_16 png_sRGB_table[256] =
    57105,57646,58190,58737,59287,59840,60396,60955,
    61517,62082,62650,63221,63795,64372,64952,65535
 };
+
 #endif /* SIMPLIFIED_READ */
 
 /* The base/delta tables are required for both read and write (but currently

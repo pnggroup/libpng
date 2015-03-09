@@ -1,6 +1,6 @@
 .TH LIBPNG 3 "March 9, 2015"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17rc02
+libpng \- Portable Network Graphics (PNG) Reference Library 1.7.0beta55
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -23,7 +23,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17rc02
 
 \fBvoid png_convert_from_time_t (png_timep \fP\fIptime\fP\fB, time_t \fIttime\fP\fB);\fP
 
-\fBpng_charp png_convert_to_rfc1123 (png_structp \fP\fIpng_ptr\fP\fB, png_timep \fIptime\fP\fB);\fP
+\fBpng_charp png_convert_to_rfc1123_buffer (png_structp \fP\fIpng_ptr\fP\fB, char \fP\fIout[29]\fP\fB, png_timep \fIptime\fP\fB);\fP
 
 \fBpng_infop png_create_info_struct (png_structp \fIpng_ptr\fP\fB);\fP
 
@@ -34,8 +34,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17rc02
 \fBpng_structp png_create_write_struct (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fIwarn_fn\fP\fB);\fP
 
 \fBpng_structp png_create_write_struct_2 (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fP\fIwarn_fn\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
-
-\fBvoid png_data_freer (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fP\fIfreer\fP\fB, png_uint_32 \fImask)\fP\fB);\fP
 
 \fBvoid png_destroy_info_struct (png_structp \fP\fIpng_ptr\fP\fB, png_infopp \fIinfo_ptr_ptr\fP\fB);\fP
 
@@ -50,8 +48,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17rc02
 \fBvoid png_free (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
 
 \fBvoid png_free_chunk_list (png_structp \fIpng_ptr\fP\fB);\fP
-
-\fBvoid png_free_default (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fIptr\fP\fB);\fP
 
 \fBvoid png_free_data (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, int \fInum\fP\fB);\fP
 
@@ -229,15 +225,11 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17rc02
 
 \fBint png_image_write_to_stdio (png_imagep \fP\fIimage\fP\fB, FILE \fP\fI*file\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap)\fP\fB);\fP
 
-\fBvoid png_info_init_3 (png_infopp \fP\fIinfo_ptr\fP\fB, png_size_t \fIpng_info_struct_size\fP\fB);\fP
-
 \fBvoid png_init_io (png_structp \fP\fIpng_ptr\fP\fB, FILE \fI*fp\fP\fB);\fP
 
 \fBvoid png_longjmp (png_structp \fP\fIpng_ptr\fP\fB, int \fIval\fP\fB);\fP
 
 \fBpng_voidp png_malloc (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
-
-\fBpng_voidp png_malloc_default (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
 \fBpng_voidp png_malloc_warn (png_structp \fP\fIpng_ptr\fP\fB, png_alloc_size_t \fIsize\fP\fB);\fP
 
@@ -264,8 +256,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17rc02
 \fBvoid png_read_rows (png_structp \fP\fIpng_ptr\fP\fB, png_bytepp \fP\fIrow\fP\fB, png_bytepp \fP\fIdisplay_row\fP\fB, png_uint_32 \fInum_rows\fP\fB);\fP
 
 \fBvoid png_read_update_info (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fIinfo_ptr\fP\fB);\fP
-
-\fBint png_reset_zstream (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fBvoid png_save_int_32 (png_bytep \fP\fIbuf\fP\fB, png_int_32 \fIi\fP\fB);\fP
 
@@ -504,7 +494,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.17rc02 - March 9, 2015
+ libpng version 1.7.0beta55 - March 9, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -515,15 +505,15 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.17rc02 - March 9, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta55 - March 9, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
- libpng 1.0 beta 6 - version 0.96 - May 28, 1997
+ libpng 1.0 beta 6  version 0.96 May 28, 1997
  Updated and distributed by Andreas Dilger
  Copyright (c) 1996, 1997 Andreas Dilger
 
- libpng 1.0 beta 2 - version 0.88 - January 26, 1996
+ libpng 1.0 beta 2 - version 0.88  January 26, 1996
  For conditions of distribution and use, see copyright
  notice in png.h. Copyright (c) 1995, 1996 Guy Eric
  Schalnat, Group 42, Inc.
@@ -546,10 +536,11 @@ libpng-manual.txt - A description on how to use and modify libpng
     X. Changes to Libpng from version 1.0.x/1.2.x to 1.4.x
    XI. Changes to Libpng from version 1.4.x to 1.5.x
   XII. Changes to Libpng from version 1.5.x to 1.6.x
- XIII. Detecting libpng
-  XIV. Source code repository
-   XV. Coding style
-  XVI. Y2K Compliance in libpng
+ XIII. Changes to Libpng from version 1.6.x to 1.7.x
+  XIV. Detecting libpng
+   XV. Source code repository
+  XVI. Coding style
+ XVII. Y2K Compliance in libpng
 
 .SH I. Introduction
 
@@ -848,22 +839,21 @@ then only check the bytes (if any) that your program didn't read.
 to replace them with custom functions.  See the discussion under
 Customizing libpng.
 
+
     FILE *fp = fopen(file_name, "rb");
     if (!fp)
     {
        return (ERROR);
     }
 
-    if (fread(header, 1, number, fp) != number)
-    {
-       return (ERROR);
-    }
-
+    fread(header, 1, number, fp);
     is_png = !png_sig_cmp(header, 0, number);
+
     if (!is_png)
     {
        return (NOT_PNG);
     }
+
 
 Next, png_struct and png_info need to be allocated and initialized.  In
 order to ensure that the size of these structures is correct even with a
@@ -932,11 +922,15 @@ an end_info structure.
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
 you can compile libpng with PNG_NO_SETJMP, in which case
-errors will result in a call to PNG_ABORT() which defaults to abort().
+errors will result in a call to PNG_ABORT which defaults to abort().
 
-You can #define PNG_ABORT() to a function that does something
+You can #define PNG_ABORT to a function or other C code that does something
 more useful than abort(), as long as your function does not
 return.
+
+If you do this, you cannot #define PNG_SIMPLIFIED_READ_SUPPORTED or
+PNG_SIMPLIFIED_WRITE_SUPPORTED, because the simplified API requires
+setjmp() support.
 
 Now you need to set up the input code.  The default for libpng is to
 use the C function fread().  If you use this, you will need to pass a
@@ -1029,15 +1023,15 @@ you can retrieve with
 
     png_get_user_chunk_ptr(png_ptr);
 
-If you call the png_set_read_user_chunk_fn() function, then all unknown
-chunks which the callback does not handle will be saved when read.  You can
-cause them to be discarded by returning '1' ("handled") instead of '0'.  This
-behavior will change in libpng 1.7 and the default handling set by the
-png_set_keep_unknown_chunks() function, described below, will be used when the
-callback returns 0.  If you want the existing behavior you should set the global
-default to PNG_HANDLE_CHUNK_IF_SAFE now; this is compatible with all current
-versions of libpng and with 1.7.  Libpng 1.6 issues a warning if you keep the
-default, or PNG_HANDLE_CHUNK_NEVER, and the callback returns 0.
+If you call the png_set_read_user_chunk_fn() function, then all unknown chunks
+will be passed to your callback when read.  You can cause known chunks to be
+passed in as well by using png_set_keep_unknown_chunks (see below) - this will
+prevent the normal libpng handling of those known chunks.
+
+If your callback returns 0 the default unknown handling will be used (see
+below).  This is new behavior in libpng 1.7, prior to 1.7 it was not possible to
+discard a chunk; PNG_HANDLE_CHUNK_IF_SAFE was forced.  Libpng 1.6.0 issues a
+warning when this was done.
 
 At this point, you can set up a callback function that will be
 called after each row has been read, which you can use to control
@@ -1136,10 +1130,8 @@ callback function:
     ...
 
     #if defined(PNG_UNKNOWN_CHUNKS_SUPPORTED)
-      /* ignore all unknown chunks
-       * (use global setting "2" for libpng16 and earlier):
-       */
-      png_set_keep_unknown_chunks(read_ptr, 2, NULL, 0);
+      /* ignore all unknown chunks: */
+      png_set_keep_unknown_chunks(read_ptr, 1, NULL, 0);
 
       /* except for vpAg: */
       png_set_keep_unknown_chunks(read_ptr, 2, vpAg, 1);
@@ -1153,12 +1145,15 @@ callback function:
 
 The PNG specification allows the width and height of an image to be as
 large as 2^(31\-1 (0x7fffffff), or about 2.147 billion rows and columns.
+Since very few applications really need to process such large images,
+we have imposed an arbitrary 1,000,000 limit on rows and columns.
 Larger images will be rejected immediately with a png_error() call. If
-you wish to change these limits, you can use
+you wish to change this limit, you can use
 
    png_set_user_limits(png_ptr, width_max, height_max);
 
-to set your own limits (libpng may reject some very wide images
+to set your own limits, or use width_max = height_max = 0x7fffffffL
+to allow all valid dimensions (libpng may reject some very large images
 anyway because of potential buffer overflow conditions).
 
 You should put this statement after you create the PNG structure and
@@ -1684,7 +1679,10 @@ row_pointers prior to calling png_read_png() with
    png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 Alternatively you could allocate your image in one big block and define
-row_pointers[i] to point into the proper places in your block.
+row_pointers[i] to point into the proper places in your block.  If
+you do this, be sure to call png_read_update_info() described below,
+to update the "rowbytes" value to account for any transformations that
+change the number of bytes per row before you use it to allocate your block.
 
 If you use png_set_rows(), the application is responsible for freeing
 row_pointers (and row_pointers[i], if they were separately allocated).
@@ -1773,12 +1771,13 @@ in until png_read_end() has read the chunk data following the image.
     interlace_type, compression_type, or filter_method can
     be NULL if you are not interested in their values.
 
-    Note that png_get_IHDR() returns 32-bit data into
+    Note that png_get_IHDR() returns png_uint_32 data into
     the application's width and height variables.
     This is an unsafe situation if these are not png_uint_32
-    variables.  In such situations, the
-    png_get_image_width() and png_get_image_height()
-    functions described below are safer.
+    variables, or if they are 32-bit variables on a 64-bit
+    platform.  In such situations, the png_get_image_width()
+    and png_get_image_height() functions described below are
+    safer.
 
     width            = png_get_image_width(png_ptr,
                          info_ptr);
@@ -3241,11 +3240,10 @@ section below for more information on the libpng error handling.
 
 If you would rather avoid the complexity of setjmp/longjmp issues,
 you can compile libpng with PNG_NO_SETJMP, in which case
-errors will result in a call to PNG_ABORT() which defaults to abort().
+errors will result in a call to PNG_ABORT which defaults to abort().
 
-You can #define PNG_ABORT() to a function that does something
-more useful than abort(), as long as your function does not
-return.
+You can #define PNG_ABORT to a function or other C code that does something
+more useful than abort(), as long as your function does not return.
 
 Checking for invalid palette index on write was added at libpng
 1.5.10.  If a pixel contains an invalid (out-of-range) index libpng issues
@@ -3763,7 +3761,7 @@ tEXt chunk use RFC 1123 format dates (e.g. "22 May 1997 18:07:10 GMT"),
 although this isn't a requirement.  Unlike the tIME chunk, the
 "Creation Time" tEXt chunk is not expected to be automatically changed
 by the software.  To facilitate the use of RFC 1123 dates, a function
-png_convert_to_rfc1123_buffer(buffer, png_timep) is provided to
+png_convert_to_rfc1123_buffer(png_ptr, buffer, png_timep) is provided to
 convert from PNG time to an RFC 1123 format string.  The caller must provide
 a writeable buffer of at least 29 bytes.
 
@@ -4663,7 +4661,7 @@ Error handling in libpng is done through png_error() and png_warning().
 Errors handled through png_error() are fatal, meaning that png_error()
 should never return to its caller.  Currently, this is handled via
 setjmp() and longjmp() (unless you have compiled libpng with
-PNG_NO_SETJMP, in which case it is handled via PNG_ABORT()),
+PNG_NO_SETJMP, in which case it is handled via PNG_ABORT),
 but you could change this to do things like exit() if you should wish,
 as long as your function does not return.
 
@@ -5565,6 +5563,7 @@ enforced.  The sRGB chunk is allowed to appear in images with any color type
 and is interpreted by libpng to convey a one-tracer-curve gray profile or a
 three-tracer-curve RGB profile as appropriate.
 
+
 Prior to libpng-1.6.0 a warning would be issued if the iTXt chunk contained
 an empty language field or an empty translated keyword.  Both of these
 are allowed by the PNG specification, so these warnings are no longer issued.
@@ -5613,7 +5612,55 @@ length, which resulted in PNG files that cannot be read beyond the bad iTXt
 chunk.  This error was fixed in libpng-1.6.3, and a tool (called
 contrib/tools/png-fix-itxt) has been added to the libpng distribution.
 
-.SH XIII.  Detecting libpng
+Starting with libpng-1.6.17, the PNG_SAFE_LIMITS macro was eliminated
+and safe limits are used by default (users who need larger limits
+can still override them at compile time or run time, as described above).
+
+The new limits are
+                                default   spec limit
+   png_user_width_max         1,000,000  2,147,483,647
+   png_user_height_max        1,000,000  2,147,483,647
+   png_user_chunk_cache_max         128  unlimited
+   png_user_chunk_malloc_max  8,000,000  unlimited
+
+.SH XIII.  Changes to Libpng from version 1.6.x to 1.7.x
+
+Some functions that were deprecated in libpng-1.6.0 were removed:
+    png_reset_zstream(),
+    png_info_init_3(),
+    png_data_freer() and its associated flags,
+    png_malloc_default(),
+    and png_free_default().
+
+The PNG_ABORT() macro was changed to PNG_ABORT, and the default is now
+"abort()" for all platforms (previously it was "ExitProcess(0)" on
+Windows platforms).  Starting with libpng-1.7.0 you have to define
+PNG_ABORT instead of PNG_ABORT(), and you must include a terminating
+semicolon in your definition, e.g.,
+
+    #if PNGCRUSH_LIBPNG_VER >= 10700
+    #  ifdef _WINDOWS_
+    #    define PNG_ABORT ExitProcess(0);
+    #  else
+    #    define PNG_ABORT abort();
+    #  endif
+    #else
+    #  ifdef _WINDOWS_
+    #    define PNG_ABORT() ExitProcess(0)
+    #  else
+    #    define PNG_ABORT() abort()
+    #  endif
+    #endif
+
+The png_get_IHDR() function now allows users to supply NULL for any
+argument in which they aren't interested.  Previously, the width, height,
+bit_depth, and color_type arguments were not allowed to be NULL.
+
+The 8-bit compose and rgb_to_grayscale operations were made more accurate.
+While these did not introduce API incompatibility, there may be differences
+in unit test results.
+
+.SH XIV.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
 changed, and is unaffected by conditional compilation macros.  It is the
@@ -5646,7 +5693,7 @@ simple verbal discriptions of bug fixes, reported either to the
 SourceForge bug tracker, to the png-mng-implement at lists.sf.net
 mailing list, or directly to glennrp.
 
-.SH XV. Coding style
+.SH XVI. Coding style
 
 Our coding style is similar to the "Allman" style
 (See http://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
@@ -5781,7 +5828,7 @@ Lines do not exceed 80 characters.
 
 Other rules can be inferred by inspecting the libpng source.
 
-.SH XVI. Y2K Compliance in libpng
+.SH XVII. Y2K Compliance in libpng
 
 March 9, 2015
 
@@ -5789,7 +5836,7 @@ Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.17rc02 are Y2K compliant.  It is my belief that earlier
+upward through 1.7.0beta55 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -5805,9 +5852,8 @@ in libpng-1.6.x and will be removed from libpng-1.7.0.
 
 There are seven time-related functions:
 
-    png_convert_to_rfc_1123_buffer() in png.c
-      (formerly png_convert_to_rfc_1152() in error, and
-      also formerly png_convert_to_rfc_1123())
+    png_convert_to_rfc_1123() in png.c
+      (formerly png_convert_to_rfc_1152() in error)
     png_convert_from_struct_tm() in pngwrite.c, called
       in pngwrite.c
     png_convert_from_time_t() in pngwrite.c
@@ -6013,7 +6059,7 @@ the first widely used release:
  1.6.5               16    10605  16.so.16.5[.0]
  1.6.6               16    10606  16.so.16.6[.0]
  1.6.7beta01-04      16    10607  16.so.16.7[.0]
- 1.6.7rc01-02        16    10607  16.so.16.7[.0]
+ 1.6.7rc01-03        16    10607  16.so.16.7[.0]
  1.6.7               16    10607  16.so.16.7[.0]
  1.6.8beta01-02      16    10608  16.so.16.8[.0]
  1.6.8rc01-02        16    10608  16.so.16.8[.0]
@@ -6027,7 +6073,7 @@ the first widely used release:
  1.6.11beta01-06     16    10611  16.so.16.11[.0]
  1.6.11rc01-02       16    10611  16.so.16.11[.0]
  1.6.11              16    10611  16.so.16.11[.0]
- 1.6.12rc01          16    10612  16.so.16.12[.0]
+ 1.6.12rc01-03       16    10612  16.so.16.12[.0]
  1.6.12              16    10612  16.so.16.12[.0]
  1.6.13beta01-04     16    10613  16.so.16.13[.0]
  1.6.13rc01-02       16    10613  16.so.16.13[.0]
@@ -6042,7 +6088,9 @@ the first widely used release:
  1.6.16rc01-02       16    10616  16.so.16.16[.0]
  1.6.16              16    10616  16.so.16.16[.0]
  1.6.17beta01-06     16    10617  16.so.16.17[.0]
- 1.6.17rc01-02       16    10617  16.so.16.17[.0]
+ 1.6.17rc01          16    10617  16.so.16.17[.0]
+ 1.7.0alpha01-10     17    10700  17.so.17.0[.0]
+ 1.7.0beta01-55      17    10700  17.so.17.0[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -6099,7 +6147,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.17rc02 - March 9, 2015:
+Libpng version 1.7.0beta55 - March 9, 2015:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6122,8 +6170,8 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.17rc02, March 9, 2015, are
-Copyright (c) 2004,2006-2014 Glenn Randers-Pehrson, and are
+libpng versions 1.2.6, August 15, 2004, through 1.7.0beta55, March 9, 2015, are
+Copyright (c) 2004,2006-2007 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.2.5
 with the following individual added to the list of Contributing Authors
 

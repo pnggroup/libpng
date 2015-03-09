@@ -2138,7 +2138,7 @@ zlib_end(struct zlib *zlib)
           *
           * z-rc is the zlib failure code; message is the error message with
           * spaces replaced by '-'.  The compressed byte count indicates where
-          * in the zlib stream the error occured.
+          * in the zlib stream the error occurred.
           */
          type_name(zlib->chunk->chunk_type, stdout);
          printf(" SKP %s %d %s ", zlib_flevel(zlib), zlib->file_bits,
@@ -3757,7 +3757,7 @@ usage(const char *prog)
 "  non-zero code is returned).",
 "    0x10: The file could not be read, even with corrections.",
 "    0x20: The output file could not be written.",
-"    0x40: An unexpected, potentially internal, error occured.",
+"    0x40: An unexpected, potentially internal, error occurred.",
 "  If the command line arguments are incorrect the program exits with exit",
 "  255.  Some older operating systems only support 7-bit exit codes, on those",
 "  systems it is suggested that this program is first tested by supplying",
