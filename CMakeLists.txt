@@ -30,8 +30,7 @@ if(NOT WIN32)
     PATHS /usr/lib /usr/local/lib
   )
   if(NOT M_LIBRARY)
-    message(STATUS
-      "math library 'libm' not found - floating point support disabled")
+    message(STATUS "math lib 'libm' not found; floating point support disabled")
   endif()
 else()
   # not needed on windows
@@ -39,30 +38,14 @@ else()
 endif()
 
 # COMMAND LINE OPTIONS
-if(DEFINED PNG_SHARED)
-  option(PNG_SHARED "Build shared lib" ${PNG_SHARED})
-else()
-  option(PNG_SHARED "Build shared lib" ON)
-endif()
-if(DEFINED PNG_STATIC)
-  option(PNG_STATIC "Build static lib" ${PNG_STATIC})
-else()
-  option(PNG_STATIC "Build static lib" ON)
-endif()
-if(DEFINED PNG_FRAMEWORK)
-  option(PNG_FRAMEWORK "Build OS X framework" ${PNG_FRAMEWORK})
-else()
-  option(PNG_FRAMEWORK "Build OS X framework" OFF)
-endif()
-if(DEFINED PNG_TESTS)
-  option(PNG_TESTS  "Build libpng tests" ${PNG_TESTS})
-else()
-  option(PNG_TESTS  "Build libpng tests" ON)
-endif()
+option(PNG_SHARED "Build shared lib" ON)
+option(PNG_STATIC "Build static lib" ON)
+option(PNG_TESTS  "Build libpng tests" ON)
 
 # Many more configuration options could be added here
-option(PNG_DEBUG         "Build with debug output" OFF)
-option(PNGARG            "Disable ANSI-C prototypes" OFF)
+option(PNG_FRAMEWORK "Build OS X framework" OFF)
+option(PNG_DEBUG     "Build with debug output" OFF)
+option(PNGARG        "Disable ANSI-C prototypes" OFF)
 
 # SET LIBNAME
 set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
