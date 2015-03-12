@@ -5178,6 +5178,8 @@ Version 1.6.17rc03 [March 12, 2015]
   Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
     for consistency, and remove some useless tests (Alexey Petruchik).
 
+Version 1.6.17rc04 [March 12, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
