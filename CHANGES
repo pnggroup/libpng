@@ -5174,6 +5174,10 @@ Version 1.6.17rc02 [March 9, 2015]
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
   Free the unknown_chunks structure even when it contains no data.
 
+Version 1.6.17rc03 [March 12, 2015]
+  Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
+    for consistency, and remove some useless tests (Alexey Petruchik).
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
