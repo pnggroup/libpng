@@ -4316,10 +4316,14 @@ Version 1.5.22beta04 [February 25, 2015]
 Version 1.5.22rc01 [March 4, 2015]
   No changes.
 
-Version 1.5.22rc02 [March 9, 2015]
+Version 1.5.22rc02 [March 9, 2014]
   Removed some comments that the configure script did not handle
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
   Merged png_free_data() with libpng-1.6.17
+
+Version 1.5.22rc03 [March 12, 2015]
+  Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
+    for consistency, and remove some useless tests (Alexey Petruchik).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
