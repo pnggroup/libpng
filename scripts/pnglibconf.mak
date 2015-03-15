@@ -49,6 +49,6 @@ pnglibconf.dfn: $(srcdir)/scripts/pnglibconf.dfa $(srcdir)/scripts/options.awk $
 	$(MOVE) pnglibconf.tmp $@
 
 clean-pnglibconf:
-	$(DELETE) pnglibconf.h
+	$(DELETE) pnglibconf.h pnglibconf.c pnglibconf.out
 
 clean: clean-pnglibconf
