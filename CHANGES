@@ -5178,7 +5178,9 @@ Version 1.6.17rc03 [March 12, 2015]
   Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
     for consistency, and remove some useless tests (Alexey Petruchik).
 
-Version 1.6.17rc04 [March 12, 2015]
+Version 1.6.17rc04 [March 15, 2015]
+  Remove pnglibconf.h, pnglibconf.c, and pnglibconf.out instead of
+    pnglibconf.* in "make clean" (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

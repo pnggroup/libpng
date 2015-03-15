@@ -106,7 +106,8 @@ install: libpng.a pnglibconf.h
 	chmod 644 $(DESTDIR)$(LIBPATH)/libpng.a
 
 clean:
-	$(RM_F) *.o libpng.a pngtest pngout.png pnglibconf.*
+	$(RM_F) *.o libpng.a pngtest pngout.png pnglibconf.h pnglibconf.c \
+	pnglibconf.out
 
 DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
 writelock:
