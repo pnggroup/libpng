@@ -1348,8 +1348,8 @@ png_write_sBIT(png_structrp png_ptr, png_const_color_8p sbit, int color_type)
    {
       png_byte maxbits;
 
-      maxbits = color_type==PNG_COLOR_TYPE_PALETTE ? 8 :
-         (png_byte)(png_ptr->usr_bit_depth & 0xff);
+      maxbits = (png_byte)((color_type==PNG_COLOR_TYPE_PALETTE ? 8 :
+          png_ptr->usr_bit_depth) & 0xff);
 
       if (sbit->red == 0 || sbit->red > maxbits ||
           sbit->green == 0 || sbit->green > maxbits ||
