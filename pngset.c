@@ -977,7 +977,7 @@ png_set_sPLT(png_structp png_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   element_size = PNG_SIZE_MAX/png_sizeof(png_sPLT_t);
+   element_size = png_sizeof(png_sPLT_t);
    if (nentries < 0 ||
        nentries > INT_MAX-info_ptr->splt_palettes_num ||
        (unsigned int)/*SAFE*/(nentries +/*SAFE*/
@@ -1058,7 +1058,7 @@ png_set_unknown_chunks(png_structp png_ptr,
    if (png_ptr == NULL || info_ptr == NULL || num_unknowns == 0)
       return;
 
-   element_size = PNG_SIZE_MAX/png_sizeof(png_unknown_chunk);
+   element_size = png_sizeof(png_unknown_chunk);
    if (num_unknowns < 0 ||
        num_unknowns > INT_MAX-info_ptr->unknown_chunks_num ||
        (unsigned int)/*SAFE*/(num_unknowns +/*SAFE*/
