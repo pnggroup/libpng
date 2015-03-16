@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.22rc04, March 12, 2015
+ * libpng version 1.5.22rc04, March 16, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.22rc04, March 12, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.22rc04, March 16, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -207,7 +207,7 @@
  *    1.5.21rc01-03           15    10521  15.so.15.21[.0]
  *    1.5.21                  15    10521  15.so.15.21[.0]
  *    1.5.22beta01-04         15    10522  15.so.15.22[.0]
- *    1.5.22rc01-02           15    10522  15.so.15.22[.0]
+ *    1.5.22rc01-04           15    10522  15.so.15.22[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -239,7 +239,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.22rc04, March 12, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.22rc04, March 16, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -351,7 +351,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 12, 2015
+ *    March 16, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -420,7 +420,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.22rc04"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.22rc04 - March 12, 2015\n"
+     " libpng version 1.5.22rc04 - March 16, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
