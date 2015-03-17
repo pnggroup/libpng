@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta57 - March 15, 2015
+Libpng 1.7.0beta57 - March 17, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -750,8 +750,12 @@ Version 1.7.0beta56 [March 11, 2015]
   Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
     for consistency, and remove some useless tests (Alexey Petruchik).
 
-Version 1.7.0beta57 [March 15, 2015]
-  Remove pnglibconf.h, not pnglibconf.* in "make clean" (Cosmin).
+Version 1.7.0beta57 [March 17, 2015]
+  Remove pnglibconf.h, pnglibconf.c, and pnglibconf.out instead of
+    pnglibconf.* in "make clean" (Cosmin).
+  Fix bug in calculation of maxbits, in png_write_sBIT, introduced
+    in libpng-1.6.17beta01 (John Bowler).
+  Revert change to png_default_read_data() made in libpng-1.7.0beta55.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

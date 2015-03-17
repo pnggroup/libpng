@@ -49,42 +49,18 @@ png_read_data(png_structrp png_ptr, png_bytep data, png_size_t length)
 void PNGCBAPI
 png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
 {
-   png_FILE_p io_ptr;
+   png_size_t check;
 
-   io_ptr = png_get_io_ptr(png_ptr);
+   if (png_ptr == NULL)
+      return;
 
-   if (length == 0)
-      png_error(png_ptr, "Read Error: invalid length requested");
-
-   clearerr(io_ptr);
-
-   if (fileno(io_ptr) == -1)
-      png_error(png_ptr, "Read Error: invalid io_ptr");
-
-   /*
-    * fread() returns 0 on error, so it is OK to store this in a png_size_t
+   /* fread() returns 0 on error, so it is OK to store this in a png_size_t
     * instead of an int, which is what fread() actually returns.
     */
-   if ((png_size_t)fread((void *)data, sizeof (png_byte), length,
-        io_ptr) != length)
-   {
-      clearerr(io_ptr);
-      png_error(png_ptr, "Read Error: invalid length returned");
-   }
+   check = fread(data, 1, length, png_voidcast(png_FILE_p, png_ptr->io_ptr));
 
-   if (ferror(io_ptr))
-   {
-      clearerr(io_ptr);
-      png_error(png_ptr, "Read Error: error returned by fread()");
-   }
-
-   if (feof(io_ptr))
-   {
-      clearerr(io_ptr);
-      png_error(png_ptr, "Read Error: unexpected end of file");
-   }
-
-   clearerr(io_ptr);
+   if (check != length)
+      png_error(png_ptr, "Read Error");
 }
 #endif
 
