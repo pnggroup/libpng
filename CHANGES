@@ -5186,6 +5186,8 @@ Version 1.6.17rc04 [March 16, 2015]
   Fix bug in calculation of maxbits, in png_write_sBIT, introduced
     in libpng-1.6.17beta01 (John Bowler).
 
+Version 1.6.17rc05 [March 17, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
