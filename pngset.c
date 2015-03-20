@@ -17,6 +17,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngset
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 

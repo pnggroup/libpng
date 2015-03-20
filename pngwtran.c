@@ -12,6 +12,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngwtran
 
 #ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED

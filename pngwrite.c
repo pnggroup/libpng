@@ -15,6 +15,7 @@
 #if defined(PNG_SIMPLIFIED_WRITE_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 #  include <errno.h>
 #endif
+#define PNG_SRC_FILE PNG_SRC_FILE_pngwrite
 
 #ifdef PNG_WRITE_SUPPORTED
 

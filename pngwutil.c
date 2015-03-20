@@ -12,6 +12,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngwutil
 
 #ifdef PNG_WRITE_SUPPORTED
 
@@ -662,8 +663,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
    }
 
    /* This is an internal error; 'next' must have been NULL! */
-   if (output_len > 0)
-      png_error(png_ptr, "error writing ancillary chunked compressed data");
+   assert(output_len == 0);
 }
 #endif /* WRITE_COMPRESSED_TEXT */
 
@@ -1204,8 +1204,7 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name,
    /* These are all internal problems: the profile should have been checked
     * before when it was stored.
     */
-   if (profile == NULL)
-      png_error(png_ptr, "No profile for iCCP chunk"); /* internal error */
+   assert(profile != NULL);
 
    profile_len = png_get_uint_32(profile);
 

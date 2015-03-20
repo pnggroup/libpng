@@ -17,6 +17,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngerror
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 
@@ -129,6 +130,7 @@ png_safecat(png_charp buffer, size_t bufsize, size_t pos,
  * and end pointer (which should point just *beyond* the end of the buffer!)
  * Returns the pointer to the start of the formatted string.
  */
+#define PNG_HAVE_FORMAT_NUMBER /* for the code below */
 png_charp
 png_format_number(png_const_charp start, png_charp end, int format,
    png_alloc_size_t number)
@@ -647,9 +649,9 @@ png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
             /* This is an internal error in libpng: somehow we have been left
              * with a stack allocated jmp_buf when the application regained
              * control.  It's always possible to fix this up, but for the moment
-             * this is a png_error because that makes it easy to detect.
+             * this is an assert because that makes it easy to detect.
              */
-            png_error(png_ptr, "Libpng jmp_buf still allocated");
+            impossible("Libpng jmp_buf still allocated");
             /* png_ptr->jmp_buf_ptr = &png_ptr->jmp_buf_local; */
          }
       }
@@ -970,4 +972,175 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
    return result;
 }
 #endif /* SIMPLIFIED READ || SIMPLIFIED_WRITE */
+
+/* Asserts: minimal code in 'STABLE' builds to return control to the
+ * application, more verbose code followed by abort for all other builds to
+ * ensure that internal errors are detected.
+ *
+ * The code always produces a message if it is possible, regardless of the
+ * setting of PNG_ERROR_TEXT_SUPPORTED, except that in stable builds
+ * PNG_ERROR_TEXT_SUPPORTED is honoured.  See pngpriv.h for the calculation of
+ * the two control macros PNG_ASSERT_ERROR (don't abort; stable build or rc) and
+ * PNG_ASSERT_TEXT (output text.)
+ */
+#if PNG_ASSERT_TEXT
+#  ifdef PNG_HAVE_FORMAT_NUMBER
+static size_t
+png_assert_number(png_charp buffer, size_t bufsize, size_t pos,
+   unsigned int number, int format)
+{
+   char numbuf[PNG_NUMBER_BUFFER_SIZE];
+   return png_safecat(buffer, bufsize, pos,
+      png_format_number(numbuf, numbuf + sizeof numbuf, format, number));
+}
+#  define assert_number(a,b,c,d,e) png_assert_number(a,b,c,d,e)
+#  else /* !HAVE_FORMAT_NUMBER */
+static size_t
+png_assert_number(png_charp buffer, size_t bufsize, size_t pos,
+   unsigned int number)
+{
+   /* binhex it; highly non-portable, assumes the ASCII character set, but
+    * if warnings are turned off then it is unlikely the text will get read
+    * anyway.  This binhex variant is (48+val), where 'val' is the next 6
+    * bits of the number, so it starts as '0' (for 0) and ends at 'I' for
+    * 63.  The number is wrapped in {}, so 0 comes out as '{}' and 9 comes
+    * out as '{9}' and so on.
+    */
+   char numbuf[32];
+   int i = sizeof numbuf;
+
+   numbuf[--i] = 0;
+   numbuf[--i] = '}';
+
+   do
+   {
+      if (number > 0)
+         numbuf[--i] = (char)/*SAFE*/((number & 63) + 48), number >>= 6;
+      else
+      {
+         numbuf[--i] = '{';
+         break;
+      }
+   }
+   while (i > 0);
+
+   return png_safecat(buffer, bufsize, pos, numbuf+i);
+}
+#  define assert_number(a,b,c,d,e) png_assert_number(a,b,c,d)
+#endif /* !HAVE_FORMAT_NUMBER */
+#endif /* ASSERT_TEXT */
+
+#if PNG_ASSERT_ERROR
+PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
+        unsigned int position), PNG_NORETURN)
+#else
+PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
+        png_const_charp condition, unsigned int position), PNG_NORETURN)
+#endif
+{
+#  if PNG_ASSERT_TEXT
+      /* Format the 'position' number and output:
+       *
+       *  " libpng version <version> - <date>\n"
+       *  "  translated __DATE__ __TIME__\n"
+       *  "  <file>, <line>: assert 'condition' failed"
+       *
+       * In the STABLE versions the output is the same for the first two lines
+       * but the last line becomes:
+       *
+       *  "  <position>: assert failed"
+       *
+       * If there is no number formatting the numbers just get replaced by
+       * some binhex (see the utility above).
+       */
+      size_t pos;
+      char   buffer[256];
+
+      pos = png_safecat(buffer, sizeof buffer, 0, PNG_HEADER_VERSION_STRING);
+      pos = png_safecat(buffer, sizeof buffer, pos,
+         "  translated " __DATE__ " " __TIME__ "\n  ");
+#     if PNG_ASSERT_ERROR /* no 'condition' parameter: minimal text */
+         pos = assert_number(buffer, sizeof buffer, pos, position,
+            PNG_NUMBER_FORMAT_x);
+         pos = png_safecat(buffer, sizeof buffer, pos, ": assert failed");
+#     else /* !STABLE */
+         /* Break down 'position' into a file name and a line number: */
+         {
+#            define PNG_apply(f) { #f "\0", PNG_SRC_FILE_ ## f },
+#            define PNG_end      { "", PNG_SRC_FILE_LAST }
+             static struct {
+                 char         filename[28]; /* GCC checks this size */
+                 unsigned int base;
+             } fileinfo[] = { PNG_FILES };
+#            undef PNG_apply
+#            undef PNG_end
+
+             unsigned int i;
+             png_const_charp filename;
+
+             /* Do 'nfiles' this way to avoid problems with g++ where it whines
+              * about (size_t) being larger than (int), even though this is a
+              * compile time constant:
+              */
+#            define nfiles ((sizeof fileinfo)/(sizeof (fileinfo[0])))
+             for (i=0; i < nfiles && position > fileinfo[i].base; ++i) {}
+
+             if (i == 0 || i > nfiles)
+                 filename = "UNKNOWN";
+             else
+             {
+                 filename = fileinfo[i-1].filename;
+                 position -= fileinfo[i-1].base;
+             }
+#            undef nfiles
+
+             pos = png_safecat(buffer, sizeof buffer, pos, filename);
+             pos = png_safecat(buffer, sizeof buffer, pos, ".c, ");
+             pos = assert_number(buffer, sizeof buffer, pos, position,
+                PNG_NUMBER_FORMAT_u);
+         }
+
+         pos = png_safecat(buffer, sizeof buffer, pos, ": assert '");
+         pos = png_safecat(buffer, sizeof buffer, pos, condition);
+         pos = png_safecat(buffer, sizeof buffer, pos, "' failed");
+#     endif /* !STABLE */
+#  else /* !ASSERT_TEXT */
+      PNG_UNUSED(position)
+#     if !PNG_ASSERT_ERROR
+         PNG_UNUSED(condition)
+#     endif
+#  endif /* HAVE_ASSERT_TEXT */
+
+   /* Now in STABLE do a png_error, but in other builds output the message
+    * (if possible) then abort (PNG_ABORT).
+    */
+#  if PNG_ASSERT_ERROR
+      png_error(png_ptr, buffer/*only if ERROR_TEXT*/);
+#  else /* !ASSERT_ERROR */
+      /* Use the app warning message mechanism is possible, this is an inline
+       * expansion of png_warning without the extra formatting of the message
+       * that png_default_warning does and with the case !WARNINGS && CONSOLE_IO
+       * implemented.
+       *
+       * Note that it is possible that neither WARNINGS nor CONSOLE_IO are
+       * supported; in that case no text will be output (and PNG_ASSERT_TEXT
+       * will be false.)
+       */
+#     ifdef PNG_WARNINGS_SUPPORTED
+         if (png_ptr != NULL && png_ptr->warning_fn != NULL)
+            png_ptr->warning_fn(png_constcast(png_structrp,png_ptr), buffer);
+#        ifdef PNG_CONSOLE_IO_SUPPORTED
+            else
+#        endif
+#     else
+         PNG_UNUSED(png_ptr)
+#     endif
+#     ifdef PNG_CONSOLE_IO_SUPPORTED
+         fprintf(stderr, "%s\n", buffer);
+#     endif
+
+      PNG_ABORT
+#  endif /* ASSERT_ERROR */
+}
+
 #endif /* READ || WRITE */

@@ -17,6 +17,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngrtran
 
 #ifdef PNG_READ_SUPPORTED
 
@@ -1271,11 +1272,8 @@ png_init_background_transformations(png_structrp png_ptr)
        * than the libpng required depth scale the values back to the 8-bit
        * range, the test below verifies that this is correct.
        */
-      if (bit_depth > required_bit_depth)
-      {
-         if (bit_depth != 16 || required_bit_depth != 8)
-            png_error(png_ptr, "internal error handling background depth");
-      }
+      assert(bit_depth <= required_bit_depth ||
+              (bit_depth == 16 && required_bit_depth == 8));
 
       if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
       {

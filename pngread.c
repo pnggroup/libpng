@@ -18,6 +18,7 @@
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
 #  include <errno.h>
 #endif
+#define PNG_SRC_FILE PNG_SRC_FILE_pngread
 
 #ifdef PNG_READ_SUPPORTED
 
@@ -1684,8 +1685,8 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
          break;
 
       default:
-         png_error(display->image->opaque->png_ptr,
-            "unexpected encoding (internal error)");
+         png_impossiblepp(display->image->opaque->png_ptr,
+            "unexpected encoding");
          break;
    }
 
@@ -1840,7 +1841,7 @@ png_create_colormap_entry(png_image_read_control *display,
    }
 
    if (encoding != output_encoding)
-      png_error(image->opaque->png_ptr, "bad encoding (internal error)");
+      png_impossiblepp(image->opaque->png_ptr, "bad encoding");
 
    /* Store the value. */
    {
@@ -2847,7 +2848,7 @@ png_image_read_colormap(png_voidp argument)
    switch (data_encoding)
    {
       default:
-         png_error(png_ptr, "bad data option (internal error)");
+         impossible("bad data option");
          break;
 
       case P_sRGB:
@@ -2861,8 +2862,7 @@ png_image_read_colormap(png_voidp argument)
          break;
    }
 
-   if (cmap_entries > 256 || cmap_entries > image->colormap_entries)
-      png_error(png_ptr, "color map overflow (BAD internal error)");
+   assert(cmap_entries <= 256 && cmap_entries <= image->colormap_entries);
 
    image->colormap_entries = cmap_entries;
 
@@ -2896,10 +2896,10 @@ png_image_read_colormap(png_voidp argument)
          break;
 
       default:
-         png_error(png_ptr, "bad processing option (internal error)");
+         impossible("bad processing option");
 
       bad_background:
-         png_error(png_ptr, "bad background index (internal error)");
+         impossible("bad background index");
    }
 
    display->colormap_processing = output_processing;
@@ -3172,7 +3172,7 @@ png_image_read_colormapped(png_voidp argument)
 
       default:
       bad_output:
-         png_error(png_ptr, "bad color-map processing (internal error)");
+         impossible("bad color-map processing");
    }
 
    /* Now read the rows.  Do this here if it is possible to read directly into
@@ -3957,8 +3957,8 @@ png_image_read_direct(png_voidp argument)
          }
       }
 
-      else if (do_local_compose != 0) /* internal error */
-         png_error(png_ptr, "png_image_read: alpha channel lost");
+      else
+         assert(do_local_compose == 0 /* else alpha channel lost */);
 
       if (info_ptr->bit_depth == 16)
          info_format |= PNG_FORMAT_FLAG_LINEAR;
@@ -3987,8 +3987,7 @@ png_image_read_direct(png_voidp argument)
 #     endif
 
       /* This is actually an internal error. */
-      if (info_format != format)
-         png_error(png_ptr, "png_read_image: invalid transformations");
+      assert(info_format == format /* else unimplemented transformations */);
    }
 
    /* Now read the rows.  If do_local_compose is set then it is necessary to use

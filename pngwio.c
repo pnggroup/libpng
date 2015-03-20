@@ -19,6 +19,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngwio
 
 #ifdef PNG_WRITE_SUPPORTED
 

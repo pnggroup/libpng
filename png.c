@@ -12,6 +12,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_png
 
 /* Generate a compiler error if there is an old png.h in the search path. */
 typedef png_libpng_version_1_7_0beta58 Your_png_h_is_not_version_1_7_0beta58;
@@ -688,13 +689,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta58 - March 17, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta58 - March 20, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta58 - March 17, 2015\
+      return "libpng version 1.7.0beta58 - March 20, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1610,7 +1611,7 @@ png_colorspace_set_chromaticities(png_const_structrp png_ptr,
           * want error reports so for the moment it is an error.
           */
          colorspace->flags |= PNG_COLORSPACE_INVALID;
-         png_error(png_ptr, "internal error checking chromaticities");
+         impossible("error checking chromaticities");
          break;
    }
 
@@ -1638,7 +1639,7 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
 
       default:
          colorspace->flags |= PNG_COLORSPACE_INVALID;
-         png_error(png_ptr, "internal error checking chromaticities");
+         impossible("error checking chromaticities");
          break;
    }
 
@@ -2341,8 +2342,7 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 
          /* Check for an internal error. */
          if (r+g+b != 32768)
-            png_error(png_ptr,
-               "internal error handling cHRM coefficients");
+            impossible("error handling cHRM coefficients");
 
          else
          {
@@ -2356,7 +2356,7 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
        * bug is fixed.
        */
       else
-         png_error(png_ptr, "internal error handling cHRM->XYZ");
+         impossible("error handling cHRM->XYZ");
    }
 }
 #endif /* READ_RGB_TO_GRAY */

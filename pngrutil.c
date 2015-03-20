@@ -15,6 +15,7 @@
  */
 
 #include "pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_pngrutil
 
 #ifdef PNG_READ_SUPPORTED
 

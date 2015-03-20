@@ -15,6 +15,7 @@
 #define _POSIX_SOURCE 1
 
 #include "../pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_arm_arm_init
 
 #ifdef PNG_READ_SUPPORTED
 

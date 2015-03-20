@@ -332,16 +332,115 @@
 #  define PNG_DLL_EXPORT
 #endif
 
-/* asserts are turned off in release code, but are in even in release candidates
- * because often system builders only check future libpng releases when a
- * release candidate is available.
+/* The assert mechanism results in a minimal png_error in released versions
+ * ('STABLE' versions) and a more descriptive abort in all other cases.
+ * The macros rely on the naming convention throughout this code - png_ptr
+ * exists and is of type png_const_structrp or a compatible type - and the
+ * presence in each file of a uniquely defined macro PNG_SRC_FILE; a number
+ * indicating which file this is (this is to save space in released versions).
+ *
+ * 'assert' is intended to look like the ANSI-C <assert.h> macro; note that this
+ * is legal ANSI-C code because ANSI-C only reserves 'assert' if <assert.h> is
+ * included.  Doing it this way allows <assert.h> to be used if the ANSI-C
+ * behavior is preferred in the future.
+ *
+ * PNG_SRC_LINE is the position of the assert macro.  There are currently 15
+ * main source files (4 bits) and the biggest (pngrtran.c) has more than 4095
+ * lines (12 bits), but to ensure the number will fit into 16-bits in the
+ * future and to allow hardware files to use assert the encoding is a bit-wise
+ * encoding based on the current number of lines.
+ *
+ * The following works out the value for two numeric #defines:
+ *
+ *   PNG_ASSERT_ERROR: Set to 1 if asserts should png_error (or png_err) rather
+ *                     than abort.  The png_error text is the minimal (file
+ *                     location) text in this case, if it is produced.  This
+ *                     flag indicates a STABLE (or RC) build.
+ *   PNG_ASSERT_TEXT:  Set to 1 if assert text should be produced, either the
+ *                     minimal text or, if PNG_ASSERT_ERROR is 0, the more
+ *                     verbose text including the 'condition' string.  This
+ *                     value depends on whether the build supports an
+ *                     appropriate way of outputing the message.
+ *
+ * Note that these are not configurable: this is just the assert code, there's
+ * no reason to allow configuration of these options.
  */
-#if PNG_LIBPNG_BUILD_BASE_TYPE == PNG_LIBPNG_BUILD_STABLE
-#  define NDEBUG
+#define PNG_ASSERT_ERROR (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
+#define PNG_ASSERT_TEXT (PNG_ASSERT_ERROR ?\
+         (defined PNG_ERROR_TEXT_SUPPORTED) :\
+         (defined PNG_WARNINGS_SUPPORTED) || (defined PNG_CONSOLE_IO_SUPPORTED))
+
+#define PNG_SRC_LINE (PNG_SRC_FILE + __LINE__)
+
+/* png_assertpp and png_impossiblepp are macros to make the correct call to the
+ * png_assert function; these macros do not assume that the png_structp is
+ * called png_ptr.
+ */
+#if PNG_ASSERT_ERROR
+#  define png_assertpp(pp, cond)\
+      do\
+         if (!(cond)) png_assert(pp, PNG_SRC_LINE);\
+      while (0)
+#  define png_impossiblepp(pp, reason) png_assert(pp, PNG_SRC_LINE)
+#else
+#  define png_assertpp(pp, cond)\
+      do\
+         if (!(cond)) png_assert(pp, #cond, PNG_SRC_LINE);\
+      while (0)
+#  define png_impossiblepp(pp, reason) png_assert(pp, reason, PNG_SRC_LINE)
 #endif
-#ifndef PNG_VERSION_INFO_ONLY
-#  include <assert.h>
-#endif
+
+#define assert(cond) png_assertpp(png_ptr, cond)
+#define impossible(cond) png_impossiblepp(png_ptr, cond)
+
+/* The defines for PNG_SRC_FILE: */
+#define PNG_SRC_FILE_(f,lines) PNG_SRC_FILE_ ## f + lines
+
+#define PNG_SRC_FILE_png      0
+#define PNG_SRC_FILE_pngerror (PNG_SRC_FILE_png      +8192)
+#define PNG_SRC_FILE_pngget   (PNG_SRC_FILE_pngerror +2048)
+#define PNG_SRC_FILE_pngmem   (PNG_SRC_FILE_pngget   +2048)
+#define PNG_SRC_FILE_pngpread (PNG_SRC_FILE_pngmem   +1024)
+#define PNG_SRC_FILE_pngread  (PNG_SRC_FILE_pngpread +2048)
+#define PNG_SRC_FILE_pngrio   (PNG_SRC_FILE_pngread  +8192)
+#define PNG_SRC_FILE_pngrtran (PNG_SRC_FILE_pngrio   +1024)
+#define PNG_SRC_FILE_pngrutil (PNG_SRC_FILE_pngrtran +8192)
+#define PNG_SRC_FILE_pngset   (PNG_SRC_FILE_pngrutil +8192)
+#define PNG_SRC_FILE_pngtrans (PNG_SRC_FILE_pngset   +2048)
+#define PNG_SRC_FILE_pngwio   (PNG_SRC_FILE_pngtrans +2048)
+#define PNG_SRC_FILE_pngwrite (PNG_SRC_FILE_pngwio   +1024)
+#define PNG_SRC_FILE_pngwtran (PNG_SRC_FILE_pngwrite +4096)
+#define PNG_SRC_FILE_pngwutil (PNG_SRC_FILE_pngwtran +1024)
+
+#define PNG_SRC_FILE_arm_arm_init (PNG_SRC_FILE_pngwutil +4096)
+#define PNG_SRC_FILE_arm_filter_neon_intrinsics\
+             (PNG_SRC_FILE_arm_arm_init +1024)
+
+/* Add new files by changing the following line: */
+#define PNG_SRC_FILE_LAST (PNG_SRC_FILE_arm_filter_neon_intrinsics +1024)
+
+/* The following #define must list the files in exactly the same order as
+ * the above.
+ */
+#define PNG_FILES\
+   PNG_apply(png)\
+   PNG_apply(pngerror)\
+   PNG_apply(pngget)\
+   PNG_apply(pngmem)\
+   PNG_apply(pngpread)\
+   PNG_apply(pngread)\
+   PNG_apply(pngrio)\
+   PNG_apply(pngrtran)\
+   PNG_apply(pngrutil)\
+   PNG_apply(pngset)\
+   PNG_apply(pngtrans)\
+   PNG_apply(pngwio)\
+   PNG_apply(pngwrite)\
+   PNG_apply(pngwtran)\
+   PNG_apply(pngwutil)\
+   PNG_apply(arm_arm_init)\
+   PNG_apply(arm_filter_neon_intrinsics)\
+   PNG_end
 
 /* SECURITY and SAFETY:
  *
@@ -727,6 +826,14 @@ extern "C" {
  *
  * All of these functions must be declared with PNG_INTERNAL_FUNCTION.
  */
+/* Assert handling */
+#if PNG_ASSERT_ERROR
+PNG_INTERNAL_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
+      unsigned int position), PNG_NORETURN);
+#else
+PNG_INTERNAL_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
+      png_const_charp condition, unsigned int position), PNG_NORETURN);
+#endif
 
 /* Zlib support */
 #define PNG_UNEXPECTED_ZLIB_RETURN (-7)

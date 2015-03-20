@@ -13,6 +13,7 @@
  */
 
 #include "../pngpriv.h"
+#define PNG_SRC_FILE PNG_SRC_FILE_arm_filter_neon_intrinsics
 
 #ifdef PNG_READ_SUPPORTED
 
