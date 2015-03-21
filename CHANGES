@@ -5193,6 +5193,8 @@ Version 1.6.17rc05 [March 21, 2015]
   Reverted "& 0xff" additions of version 1.6.17beta01. Libpng passes
     the Coverity scan without them.
 
+Version 1.6.17rc06 [March 21, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
