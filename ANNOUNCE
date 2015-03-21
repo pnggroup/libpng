@@ -759,6 +759,7 @@ Version 1.7.0beta57 [March 16, 2015]
 
 Version 1.7.0beta58 [March 21, 2015]
   Implemented assert support and usage.
+  Made assert (and impossible) removeable by defining NDEBUG.
   Remove pnglibconf.dfn and pnglibconf.pre with "make clean".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

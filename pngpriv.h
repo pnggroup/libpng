@@ -332,6 +332,7 @@
 #  define PNG_DLL_EXPORT
 #endif
 
+#ifndef NDEBUG
 /* The assert mechanism results in a minimal png_error in released versions
  * ('STABLE' versions) and a more descriptive abort in all other cases.
  * The macros rely on the naming convention throughout this code - png_ptr
@@ -441,6 +442,28 @@
    PNG_apply(arm_arm_init)\
    PNG_apply(arm_filter_neon_intrinsics)\
    PNG_end
+#else
+# define assert(cond)
+# define impossible(cond)
+# define png_impossiblepp(pp, cond)
+# define PNG_SRC_FILE_png
+# define PNG_SRC_FILE_pngerror
+# define PNG_SRC_FILE_pngget
+# define PNG_SRC_FILE_pngmem
+# define PNG_SRC_FILE_pngpread
+# define PNG_SRC_FILE_pngread
+# define PNG_SRC_FILE_pngrio
+# define PNG_SRC_FILE_pngrtran
+# define PNG_SRC_FILE_pngrutil
+# define PNG_SRC_FILE_pngset
+# define PNG_SRC_FILE_pngtrans
+# define PNG_SRC_FILE_pngwio
+# define PNG_SRC_FILE_pngwrite
+# define PNG_SRC_FILE_pngwtran
+# define PNG_SRC_FILE_pngwutil
+# define PNG_SRC_FILE_arm_arm_init
+# define PNG_SRC_FILE_arm_filter_neon_intrinsics
+#endif /* NDEBUG */
 
 /* SECURITY and SAFETY:
  *
