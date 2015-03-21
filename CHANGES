@@ -5194,6 +5194,7 @@ Version 1.6.17rc05 [March 21, 2015]
     the Coverity scan without them.
 
 Version 1.6.17rc06 [March 21, 2015]
+  Remove pnglibconf.dfn and pnglibconf.pre with "make clean".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

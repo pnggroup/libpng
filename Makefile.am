@@ -134,7 +134,7 @@ SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk
 CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
 	check.new pnglibconf.h pngprefix.h symbols.new pngtest-log.txt \
-	pnglibconf.out pnglibconf.c \
+	pnglibconf.out pnglibconf.c pnglibconf.pre pnglibconf.dfn \
 	$(SCRIPT_CLEANFILES)
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
