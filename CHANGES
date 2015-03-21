@@ -5047,8 +5047,9 @@ Version 1.7.0beta57 [March 16, 2015]
     in libpng-1.6.17beta01 (John Bowler).
   Revert change to png_default_read_data() made in libpng-1.7.0beta55.
 
-Version 1.7.0beta58 [March 20, 2015]
+Version 1.7.0beta58 [March 21, 2015]
   Implemented assert support and usage.
+  Remove pnglibconf.dfn and pnglibconf.pre with "make clean".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
