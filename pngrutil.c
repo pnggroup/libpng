@@ -822,13 +822,13 @@ png_handle_IHDR(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    /* Set internal variables */
    png_ptr->width = width;
    png_ptr->height = height;
-   png_ptr->bit_depth = (png_byte)(bit_depth & 0xff);
-   png_ptr->interlaced = (png_byte)(interlace_type & 0xff);
-   png_ptr->color_type = (png_byte)(color_type & 0xff);
+   png_ptr->bit_depth = (png_byte)bit_depth;
+   png_ptr->interlaced = (png_byte)interlace_type;
+   png_ptr->color_type = (png_byte)color_type;
 #ifdef PNG_MNG_FEATURES_SUPPORTED
-   png_ptr->filter_type = (png_byte)(filter_type & 0xff);
+   png_ptr->filter_type = (png_byte)filter_type;
 #endif
-   png_ptr->compression_type = (png_byte)(compression_type & 0xff);
+   png_ptr->compression_type = (png_byte)compression_type;
 
    /* Find number of channels */
    switch (png_ptr->color_type)
@@ -853,8 +853,7 @@ png_handle_IHDR(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    /* Set up other useful info */
-   png_ptr->pixel_depth =
-       (png_byte)(0xff & (png_ptr->bit_depth * png_ptr->channels));
+   png_ptr->pixel_depth = (png_byte)(png_ptr->bit_depth * png_ptr->channels);
    png_ptr->rowbytes = PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->width);
    png_debug1(3, "bit_depth = %d", png_ptr->bit_depth);
    png_debug1(3, "channels = %d", png_ptr->channels);
@@ -2732,8 +2731,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       /* The following is safe because of the PNG_SIZE_MAX init above */
       png_ptr->unknown_chunk.size = (png_size_t)length/*SAFE*/;
       /* 'mode' is a flag array, only the bottom four bits matter here */
-      png_ptr->unknown_chunk.location =
-          (png_byte)(0xff & png_ptr->mode/*SAFE*/);
+      png_ptr->unknown_chunk.location = (png_byte)png_ptr->mode/*SAFE*/;
 
       if (length == 0)
          png_ptr->unknown_chunk.data = NULL;
@@ -3230,7 +3228,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
             if (m != 0) /* something to copy */
             {
                if (m != 0xff)
-                  *dp = (png_byte)(((*dp & ~m) | (*sp & m)) & 0xff);
+                  *dp = (png_byte)((*dp & ~m) | (*sp & m));
                else
                   *dp = *sp;
             }
@@ -3482,8 +3480,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 
    /* Restore the overwritten bits from the last byte if necessary. */
    if (end_ptr != NULL)
-      *end_ptr =
-          (png_byte)(0xff & ((end_byte & end_mask) | (*end_ptr & ~end_mask)));
+      *end_ptr = (png_byte)((end_byte & end_mask) | (*end_ptr & ~end_mask));
 }
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
@@ -3777,14 +3774,16 @@ png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
 
    for (i = 0; i < bpp; i++)
    {
-      *rp = (png_byte)(((int)(*rp) + ((int)(*pp++) / 2 )) & 0xff);
+      *rp = (png_byte)(((int)(*rp) +
+         ((int)(*pp++) / 2 )) & 0xff);
 
       rp++;
    }
 
    for (i = 0; i < istop; i++)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+      *rp = (png_byte)(((int)(*rp) +
+         (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
 
       rp++;
    }
@@ -3800,7 +3799,7 @@ png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
    /* First pixel/byte */
    c = *prev_row++;
    a = *row + c;
-   *row++ = (png_byte)(a & 0xff);
+   *row++ = (png_byte)a;
 
    /* Remainder */
    while (row < rp_end)
@@ -3834,7 +3833,7 @@ png_read_filter_row_paeth_1byte_pixel(png_row_infop row_info, png_bytep row,
        */
       c = b;
       a += *row;
-      *row++ = (png_byte)(a & 0xff);
+      *row++ = (png_byte)a;
    }
 }
 
@@ -3851,7 +3850,7 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
    while (row < rp_end)
    {
       int a = *row + *prev_row++;
-      *row++ = (png_byte)(a & 0xff);
+      *row++ = (png_byte)a;
    }
 
    /* Remainder */
@@ -3882,7 +3881,7 @@ png_read_filter_row_paeth_multibyte_pixel(png_row_infop row_info, png_bytep row,
       if (pc < pa) a = c;
 
       a += *row;
-      *row++ = (png_byte)(a & 0xff);
+      *row++ = (png_byte)a;
    }
 }
 
@@ -4375,7 +4374,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    /* This value is stored in png_struct and double checked in the row read
     * code.
     */
-   png_ptr->maximum_pixel_depth = (png_byte)(max_pixel_depth & 0xff);
+   png_ptr->maximum_pixel_depth = (png_byte)max_pixel_depth;
    png_ptr->transformed_pixel_depth = 0; /* calculated on demand */
 
    /* Align the width on the next larger 8 pixels.  Mainly used
@@ -4447,11 +4446,8 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    png_debug1(3, "height = %u,", png_ptr->height);
    png_debug1(3, "iwidth = %u,", png_ptr->iwidth);
    png_debug1(3, "num_rows = %u,", png_ptr->num_rows);
-   png_debug1(3, "row_bytes = %lu,", (unsigned long)row_bytes);
-   png_debug1(3, "png_ptr->rowbytes = %lu,", (unsigned long)png_ptr->rowbytes);
-   png_debug1(3, "png_ptr->info_rowbytes = %lu,",
-       (unsigned long)png_ptr->info_rowbytes);
-   png_debug1(3, "PNG_ROWBYTES = %lu",
+   png_debug1(3, "rowbytes = %lu,", (unsigned long)png_ptr->rowbytes);
+   png_debug1(3, "irowbytes = %lu",
        (unsigned long)PNG_ROWBYTES(png_ptr->pixel_depth, png_ptr->iwidth) + 1);
 
    /* The sequential reader needs a buffer for IDAT, but the progressive reader

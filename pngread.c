@@ -2052,7 +2052,7 @@ make_rgb_colormap(png_image_read_control *display)
 
 /* Return a palette index to the above palette given three 8-bit sRGB values. */
 #define PNG_RGB_INDEX(r,g,b) \
-   ((png_byte)(0xff & (6 * (6 * PNG_DIV51(r) + PNG_DIV51(g)) + PNG_DIV51(b))))
+   ((png_byte)(6 * (6 * PNG_DIV51(r) + PNG_DIV51(g)) + PNG_DIV51(b)))
 
 static int
 png_image_read_colormap(png_voidp argument)
@@ -3025,8 +3025,7 @@ png_image_read_and_map(png_voidp argument)
                         *outrow = gray;
 
                      else
-                        *outrow =
-                            (png_byte)(0xff & (PNG_CMAP_TRANS_BACKGROUND+1));
+                        *outrow = (png_byte)(PNG_CMAP_TRANS_BACKGROUND+1);
                   }
                   break;
 

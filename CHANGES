@@ -5186,10 +5186,12 @@ Version 1.6.17rc04 [March 16, 2015]
   Fix bug in calculation of maxbits, in png_write_sBIT, introduced
     in libpng-1.6.17beta01 (John Bowler).
 
-Version 1.6.17rc05 [March 18, 2015]
+Version 1.6.17rc05 [March 21, 2015]
   Define PNG_FILTER_* and PNG_FILTER_VALUE_* in png.h even when WRITE
     is not supported (John Bowler).  This fixes an error introduced in
     libpng-1.6.17beta06.
+  Reverted "& 0xff" additions of version 1.6.17beta01. Libpng passes
+    the Coverity scan without them.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

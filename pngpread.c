@@ -168,7 +168,7 @@ png_push_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 
    png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]),
        num_to_check);
-   png_ptr->sig_bytes = (png_byte)((png_ptr->sig_bytes + num_to_check) & 0xff);
+   png_ptr->sig_bytes = (png_byte)(png_ptr->sig_bytes + num_to_check);
 
    if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
    {
