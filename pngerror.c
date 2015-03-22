@@ -649,7 +649,7 @@ png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
             /* This is an internal error in libpng: somehow we have been left
              * with a stack allocated jmp_buf when the application regained
              * control.  It's always possible to fix this up, but for the moment
-             * this is an assert because that makes it easy to detect.
+             * this is an affirm because that makes it easy to detect.
              */
             impossible("Libpng jmp_buf still allocated");
             /* png_ptr->jmp_buf_ptr = &png_ptr->jmp_buf_local; */
@@ -980,23 +980,23 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
  * The code always produces a message if it is possible, regardless of the
  * setting of PNG_ERROR_TEXT_SUPPORTED, except that in stable builds
  * PNG_ERROR_TEXT_SUPPORTED is honoured.  See pngpriv.h for the calculation of
- * the two control macros PNG_ASSERT_ERROR (don't abort; stable build or rc) and
- * PNG_ASSERT_TEXT (output text.)
+ * the two control macros PNG_AFFIRM_ERROR (don't abort; stable build or rc) and
+ * PNG_AFFIRM_TEXT (output text.)
  */
-#if PNG_ASSERT_TEXT
+#if PNG_AFFIRM_TEXT
 #  ifdef PNG_HAVE_FORMAT_NUMBER
 static size_t
-png_assert_number(png_charp buffer, size_t bufsize, size_t pos,
+png_affirm_number(png_charp buffer, size_t bufsize, size_t pos,
    unsigned int number, int format)
 {
    char numbuf[PNG_NUMBER_BUFFER_SIZE];
    return png_safecat(buffer, bufsize, pos,
       png_format_number(numbuf, numbuf + sizeof numbuf, format, number));
 }
-#  define assert_number(a,b,c,d,e) png_assert_number(a,b,c,d,e)
+#  define affirm_number(a,b,c,d,e) png_affirm_number(a,b,c,d,e)
 #  else /* !HAVE_FORMAT_NUMBER */
 static size_t
-png_assert_number(png_charp buffer, size_t bufsize, size_t pos,
+png_affirm_number(png_charp buffer, size_t bufsize, size_t pos,
    unsigned int number)
 {
    /* binhex it; highly non-portable, assumes the ASCII character set, but
@@ -1026,29 +1026,29 @@ png_assert_number(png_charp buffer, size_t bufsize, size_t pos,
 
    return png_safecat(buffer, bufsize, pos, numbuf+i);
 }
-#  define assert_number(a,b,c,d,e) png_assert_number(a,b,c,d)
+#  define affirm_number(a,b,c,d,e) png_affirm_number(a,b,c,d)
 #endif /* !HAVE_FORMAT_NUMBER */
-#endif /* ASSERT_TEXT */
+#endif /* AFFIRM_TEXT */
 
-#if PNG_ASSERT_ERROR
-PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
+#if PNG_AFFIRM_ERROR
+PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
         unsigned int position), PNG_NORETURN)
 #else
-PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
+PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
         png_const_charp condition, unsigned int position), PNG_NORETURN)
 #endif
 {
-#  if PNG_ASSERT_TEXT
+#  if PNG_AFFIRM_TEXT
       /* Format the 'position' number and output:
        *
        *  " libpng version <version> - <date>\n"
        *  "  translated __DATE__ __TIME__\n"
-       *  "  <file>, <line>: assert 'condition' failed"
+       *  "  <file>, <line>: affirm 'condition' failed"
        *
        * In the STABLE versions the output is the same for the first two lines
        * but the last line becomes:
        *
-       *  "  <position>: assert failed"
+       *  "  <position>: affirm failed"
        *
        * If there is no number formatting the numbers just get replaced by
        * some binhex (see the utility above).
@@ -1059,10 +1059,10 @@ PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
       pos = png_safecat(buffer, sizeof buffer, 0, PNG_HEADER_VERSION_STRING);
       pos = png_safecat(buffer, sizeof buffer, pos,
          "  translated " __DATE__ " " __TIME__ "\n  ");
-#     if PNG_ASSERT_ERROR /* no 'condition' parameter: minimal text */
-         pos = assert_number(buffer, sizeof buffer, pos, position,
+#     if PNG_AFFIRM_ERROR /* no 'condition' parameter: minimal text */
+         pos = affirm_number(buffer, sizeof buffer, pos, position,
             PNG_NUMBER_FORMAT_x);
-         pos = png_safecat(buffer, sizeof buffer, pos, ": assert failed");
+         pos = png_safecat(buffer, sizeof buffer, pos, ": affirm failed");
 #     else /* !STABLE */
          /* Break down 'position' into a file name and a line number: */
          {
@@ -1096,34 +1096,34 @@ PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
 
              pos = png_safecat(buffer, sizeof buffer, pos, filename);
              pos = png_safecat(buffer, sizeof buffer, pos, ".c, ");
-             pos = assert_number(buffer, sizeof buffer, pos, position,
+             pos = affirm_number(buffer, sizeof buffer, pos, position,
                 PNG_NUMBER_FORMAT_u);
          }
 
-         pos = png_safecat(buffer, sizeof buffer, pos, ": assert '");
+         pos = png_safecat(buffer, sizeof buffer, pos, ": affirm '");
          pos = png_safecat(buffer, sizeof buffer, pos, condition);
          pos = png_safecat(buffer, sizeof buffer, pos, "' failed");
 #     endif /* !STABLE */
-#  else /* !ASSERT_TEXT */
+#  else /* !AFFIRM_TEXT */
       PNG_UNUSED(position)
-#     if !PNG_ASSERT_ERROR
+#     if !PNG_AFFIRM_ERROR
          PNG_UNUSED(condition)
 #     endif
-#  endif /* HAVE_ASSERT_TEXT */
+#  endif /* AFFIRM_TEXT */
 
    /* Now in STABLE do a png_error, but in other builds output the message
     * (if possible) then abort (PNG_ABORT).
     */
-#  if PNG_ASSERT_ERROR
+#  if PNG_AFFIRM_ERROR
       png_error(png_ptr, buffer/*only if ERROR_TEXT*/);
-#  else /* !ASSERT_ERROR */
+#  else /* !AFFIRM_ERROR */
       /* Use the app warning message mechanism is possible, this is an inline
        * expansion of png_warning without the extra formatting of the message
        * that png_default_warning does and with the case !WARNINGS && CONSOLE_IO
        * implemented.
        *
        * Note that it is possible that neither WARNINGS nor CONSOLE_IO are
-       * supported; in that case no text will be output (and PNG_ASSERT_TEXT
+       * supported; in that case no text will be output (and PNG_AFFIRM_TEXT
        * will be false.)
        */
 #     ifdef PNG_WARNINGS_SUPPORTED
@@ -1140,7 +1140,7 @@ PNG_FUNCTION(void, png_assert,(png_const_structrp png_ptr,
 #     endif
 
       PNG_ABORT
-#  endif /* ASSERT_ERROR */
+#  endif /* AFFIRM_ERROR */
 }
 
 #endif /* READ || WRITE */

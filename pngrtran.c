@@ -1272,7 +1272,7 @@ png_init_background_transformations(png_structrp png_ptr)
        * than the libpng required depth scale the values back to the 8-bit
        * range, the test below verifies that this is correct.
        */
-      assert(bit_depth <= required_bit_depth ||
+      affirm(bit_depth <= required_bit_depth ||
               (bit_depth == 16 && required_bit_depth == 8));
 
       if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
@@ -2195,7 +2195,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
          case 2:
          /* Must be 2bpp gray */
-         /* assert(channels == 1 && shift[0] == 1) */
+         /* affirm(channels == 1 && shift[0] == 1) */
          {
             png_bytep bp = row;
             png_bytep bp_end = bp + row_info->rowbytes;
@@ -2210,7 +2210,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
 
          case 4:
          /* Must be 4bpp gray */
-         /* assert(channels == 1) */
+         /* affirm(channels == 1) */
          {
             png_bytep bp = row;
             png_bytep bp_end = bp + row_info->rowbytes;

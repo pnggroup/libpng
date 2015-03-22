@@ -120,7 +120,7 @@ PNG_FUNCTION(png_voidp /* PRIVATE */,
 png_malloc_array,(png_const_structrp png_ptr, int nelements,
    size_t element_size),PNG_ALLOCATED)
 {
-   assert(nelements > 0 && element_size > 0);
+   affirm(nelements > 0 && element_size > 0);
    return png_malloc_array_checked(png_ptr, nelements, element_size);
 }
 
@@ -129,7 +129,7 @@ png_realloc_array,(png_structrp png_ptr, png_const_voidp old_array,
    int old_elements, int add_elements, size_t element_size),PNG_ALLOCATED)
 {
    /* These are internal errors: */
-   assert(add_elements > 0 && element_size > 0 && old_elements >= 0 &&
+   affirm(add_elements > 0 && element_size > 0 && old_elements >= 0 &&
       (old_array != NULL || old_elements == 0));
 
    /* Check for overflow on the elements count (so the caller does not have to

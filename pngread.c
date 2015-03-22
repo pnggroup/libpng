@@ -2862,7 +2862,7 @@ png_image_read_colormap(png_voidp argument)
          break;
    }
 
-   assert(cmap_entries <= 256 && cmap_entries <= image->colormap_entries);
+   affirm(cmap_entries <= 256 && cmap_entries <= image->colormap_entries);
 
    image->colormap_entries = cmap_entries;
 
@@ -3958,7 +3958,7 @@ png_image_read_direct(png_voidp argument)
       }
 
       else
-         assert(do_local_compose == 0 /* else alpha channel lost */);
+         affirm(do_local_compose == 0 /* else alpha channel lost */);
 
       if (info_ptr->bit_depth == 16)
          info_format |= PNG_FORMAT_FLAG_LINEAR;
@@ -3987,7 +3987,7 @@ png_image_read_direct(png_voidp argument)
 #     endif
 
       /* This is actually an internal error. */
-      assert(info_format == format /* else unimplemented transformations */);
+      affirm(info_format == format /* else unimplemented transformations */);
    }
 
    /* Now read the rows.  If do_local_compose is set then it is necessary to use

@@ -712,7 +712,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
    png_size_t buffer_length)
 {
    /* The caller checks for a non-zero buffer length. */
-   assert(buffer_length > 0 && buffer != NULL);
+   affirm(buffer_length > 0 && buffer != NULL);
 
    /* This routine must process all the data it has been given
     * before returning, calling the row callback as required to

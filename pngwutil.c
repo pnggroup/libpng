@@ -663,7 +663,7 @@ png_write_compressed_data_out(png_structrp png_ptr, compression_state *comp)
    }
 
    /* This is an internal error; 'next' must have been NULL! */
-   assert(output_len == 0);
+   affirm(output_len == 0);
 }
 #endif /* WRITE_COMPRESSED_TEXT */
 
@@ -1204,7 +1204,7 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name,
    /* These are all internal problems: the profile should have been checked
     * before when it was stored.
     */
-   assert(profile != NULL);
+   affirm(profile != NULL);
 
    profile_len = png_get_uint_32(profile);
 
