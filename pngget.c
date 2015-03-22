@@ -1117,7 +1117,7 @@ png_get_unknown_chunks(png_const_structrp png_ptr, png_inforp info_ptr,
       return info_ptr->unknown_chunks_num;
    }
 
-   return (0);
+   return 0;
 }
 #endif
 
@@ -1125,7 +1125,9 @@ png_get_unknown_chunks(png_const_structrp png_ptr, png_inforp info_ptr,
 png_byte PNGAPI
 png_get_rgb_to_gray_status (png_const_structrp png_ptr)
 {
-   return (png_byte)((png_ptr ? png_ptr->rgb_to_gray_status : 0) & 0xff);
+   if (png_ptr)
+      return png_ptr->rgb_to_gray_status;
+   return 0;
 }
 #endif
 
@@ -1133,7 +1135,9 @@ png_get_rgb_to_gray_status (png_const_structrp png_ptr)
 png_voidp PNGAPI
 png_get_user_chunk_ptr(png_const_structrp png_ptr)
 {
-   return (png_ptr ? png_ptr->user_chunk_ptr : NULL);
+   if (png_ptr)
+      return png_ptr->user_chunk_ptr;
+   return NULL;
 }
 #endif
 

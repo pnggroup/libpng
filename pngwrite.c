@@ -225,7 +225,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 
          for (j = 0; j<jend; ++j)
             info_ptr->trans_alpha[j] =
-               (png_byte)((255 - info_ptr->trans_alpha[j]) & 0xff);
+               png_check_byte(png_ptr, 255 - info_ptr->trans_alpha[j]);
       }
 #endif
       png_write_tRNS(png_ptr, info_ptr->trans_alpha, &(info_ptr->trans_color),
@@ -462,11 +462,11 @@ png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
    png_debug(1, "in png_convert_from_struct_tm");
 
    ptime->year = (png_uint_16)(1900 + ttime->tm_year);
-   ptime->month = (png_byte)((ttime->tm_mon + 1) & 0xff);
-   ptime->day = (png_byte)(ttime->tm_mday & 0xff);
-   ptime->hour = (png_byte)(ttime->tm_hour & 0xff);
-   ptime->minute = (png_byte)(ttime->tm_min & 0xff);
-   ptime->second = (png_byte)(ttime->tm_sec & 0xff);
+   ptime->month = png_check_byte(0/*TODO: fixme*/, ttime->tm_mon + 1);
+   ptime->day = png_check_byte(0/*TODO: fixme*/, ttime->tm_mday);
+   ptime->hour = png_check_byte(0/*TODO: fixme*/, ttime->tm_hour);
+   ptime->minute = png_check_byte(0/*TODO: fixme*/, ttime->tm_min);
+   ptime->second = png_check_byte(0/*TODO: fixme*/, ttime->tm_sec);
 }
 
 void PNGAPI
@@ -669,12 +669,12 @@ png_do_write_intrapixel(png_row_infop row_info, png_bytep row)
             png_uint_32 s0   = (*(rp    ) << 8) | *(rp + 1);
             png_uint_32 s1   = (*(rp + 2) << 8) | *(rp + 3);
             png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
-            png_uint_32 red  = (png_uint_32)((s0 - s1) & 0xffffL);
-            png_uint_32 blue = (png_uint_32)((s2 - s1) & 0xffffL);
-            *(rp    ) = (png_byte)((red >> 8) & 0xff);
-            *(rp + 1) = (png_byte)(red & 0xff);
-            *(rp + 4) = (png_byte)((blue >> 8) & 0xff);
-            *(rp + 5) = (png_byte)(blue & 0xff);
+            png_uint_32 red  = (s0 - s1) & 0xffff;
+            png_uint_32 blue = (s2 - s1) & 0xffff;
+            *(rp    ) = png_check_byte(0/*TODO: fixme*/, red >> 8);
+            *(rp + 1) = PNG_BYTE(red);
+            *(rp + 4) = png_check_byte(0/*TODO: fixme*/, blue >> 8);
+            *(rp + 5) = PNG_BYTE(blue);
          }
       }
 #endif /* WRITE_16BIT */
@@ -818,7 +818,7 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    row_info.channels = png_ptr->usr_channels;
    row_info.bit_depth = png_ptr->usr_bit_depth;
    row_info.pixel_depth =
-       (png_byte)(0xff & (row_info.bit_depth * row_info.channels));
+       png_check_byte(png_ptr, row_info.bit_depth * row_info.channels);
    row_info.rowbytes = PNG_ROWBYTES(row_info.pixel_depth, row_info.width);
 
    png_debug1(3, "row_info->color_type = %d", row_info.color_type);
@@ -1103,7 +1103,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
     * TODO: this field could probably be removed if neither READ nor
     * WRITE_FILTER are supported.
     */
-   png_ptr->do_filter = (png_byte)filters; /* SAFE: checked above */
+   png_ptr->do_filter = png_check_byte(png_ptr, filters);
 }
 
 /* This allows us to influence the way in which libpng chooses the "best"
@@ -1190,7 +1190,7 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
          }
 
          /* Safe to set this now */
-         png_ptr->num_prev_filters = (png_byte)(num_weights & 0xff);
+         png_ptr->num_prev_filters = png_check_byte(png_ptr, num_weights);
       }
 
       /* If, in the future, there are other filter methods, this would
@@ -1833,8 +1833,8 @@ png_write_image_16bit(png_voidp argument)
 #define UNP_RECIPROCAL(alpha) ((((0xffff*0xff)<<7)+(alpha>>1))/alpha)
 
 static png_byte
-png_unpremultiply(png_uint_32 component, png_uint_32 alpha,
-   png_uint_32 reciprocal/*from the above macro*/)
+png_unpremultiply(png_const_structrp png_ptr, png_uint_32 component,
+   png_uint_32 alpha, png_uint_32 reciprocal/*from the above macro*/)
 {
    /* The following gives 1.0 for an alpha of 0, which is fine, otherwise if 0/0
     * is represented as some other value there is more likely to be a
@@ -1870,11 +1870,13 @@ png_unpremultiply(png_uint_32 component, png_uint_32 alpha,
          component *= 255;
 
       /* Convert the component to sRGB. */
-      return (png_byte)(PNG_sRGB_FROM_LINEAR(component) & 0xff);
+      return PNG_sRGB_FROM_LINEAR(png_ptr, component);
    }
 
    else
       return 0;
+
+   PNG_UNUSEDRC(png_ptr)
 }
 
 static int
@@ -1919,7 +1921,7 @@ png_write_image_8bit(png_voidp argument)
          while (out_ptr < row_end)
          {
             png_uint_16 alpha = in_ptr[aindex];
-            png_byte alphabyte = (png_byte)(PNG_DIV257(alpha) & 0xff);
+            png_byte alphabyte = png_check_byte(png_ptr, PNG_DIV257(alpha));
             png_uint_32 reciprocal = 0;
             int c;
 
@@ -1931,7 +1933,8 @@ png_write_image_8bit(png_voidp argument)
 
             c = channels;
             do /* always at least one channel */
-               *out_ptr++ = png_unpremultiply(*in_ptr++, alpha, reciprocal);
+               *out_ptr++ = png_unpremultiply(png_ptr, *in_ptr++, alpha,
+                  reciprocal);
             while (--c > 0);
 
             /* Skip to next component (skip the intervening alpha channel) */
@@ -1962,7 +1965,7 @@ png_write_image_8bit(png_voidp argument)
             png_uint_32 component = *in_ptr++;
 
             component *= 255;
-            *out_ptr++ = (png_byte)(PNG_sRGB_FROM_LINEAR(component) & 0xff);
+            *out_ptr++ = PNG_sRGB_FROM_LINEAR(png_ptr, component);
          }
 
          png_write_row(png_ptr, output_row);
@@ -2021,23 +2024,25 @@ png_image_set_PLTE(png_image_write_control *display)
          {
             if (channels >= 3) /* RGB */
             {
-               palette[i].blue = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
-                  entry[(2 ^ bgr)]));
-               palette[i].green = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
-                  entry[1]));
-               palette[i].red = (png_byte)(0xff & PNG_sRGB_FROM_LINEAR(255 *
-                  entry[bgr]));
+               palette[i].blue = PNG_sRGB_FROM_LINEAR(
+                  display->image->opaque->png_ptr, 255 * entry[(2 ^ bgr)]);
+               palette[i].green = PNG_sRGB_FROM_LINEAR(
+                  display->image->opaque->png_ptr, 255 * entry[1]);
+               palette[i].red = PNG_sRGB_FROM_LINEAR(
+                  display->image->opaque->png_ptr, 255 * entry[bgr]);
             }
 
             else /* Gray */
                palette[i].blue = palette[i].red = palette[i].green =
-                  (png_byte)(PNG_sRGB_FROM_LINEAR((255 * *entry)) & 0xff);
+                  PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr,
+                     255 * *entry);
          }
 
          else /* alpha */
          {
             png_uint_16 alpha = entry[afirst ? 0 : channels-1];
-            png_byte alphabyte = (png_byte)(PNG_DIV257(alpha) & 0xff);
+            png_byte alphabyte = png_check_byte(
+               display->image->opaque->png_ptr, PNG_DIV257(alpha));
             png_uint_32 reciprocal = 0;
 
             /* Calculate a reciprocal, as in the png_write_image_8bit code above
@@ -2053,17 +2058,21 @@ png_image_set_PLTE(png_image_write_control *display)
 
             if (channels >= 3) /* RGB */
             {
-               palette[i].blue = png_unpremultiply(entry[afirst + (2 ^ bgr)],
+               palette[i].blue = png_unpremultiply(
+                  display->image->opaque->png_ptr, entry[afirst + (2 ^ bgr)],
                   alpha, reciprocal);
-               palette[i].green = png_unpremultiply(entry[afirst + 1], alpha,
+               palette[i].green = png_unpremultiply(
+                  display->image->opaque->png_ptr, entry[afirst + 1], alpha,
                   reciprocal);
-               palette[i].red = png_unpremultiply(entry[afirst + bgr], alpha,
+               palette[i].red = png_unpremultiply(
+                  display->image->opaque->png_ptr, entry[afirst + bgr], alpha,
                   reciprocal);
             }
 
             else /* gray */
                palette[i].blue = palette[i].red = palette[i].green =
-                  png_unpremultiply(entry[afirst], alpha, reciprocal);
+                  png_unpremultiply(display->image->opaque->png_ptr,
+                     entry[afirst], alpha, reciprocal);
          }
       }
 

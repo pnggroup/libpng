@@ -17,6 +17,21 @@
 #ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
 
+/* This is here because png_row_info doesn't contain a png_ptr, so at present
+ * the transform routines can't signal an error.  Instead we pass '0' as
+ * as png_ptr to png_check_byte in the non-release cases and do a hard cast
+ * in release.
+ *
+ * TODO: fix this.
+ */
+#ifdef PNG_RANGE_CHECK_SUPPORTED
+#  define CB(b) png_check_byte(0, b)
+#  define CU(u) png_check_u16(0, u)
+#else
+#  define CB(b) ((png_byte)(b))
+#  define CU(u) ((png_uint_16)(u))
+#endif
+
 #ifdef PNG_WRITE_PACK_SUPPORTED
 /* Pack pixels into bytes.  Pass the true bit depth in bit_depth.  The
  * row_info bit depth should be 8 (one pixel per byte).  The channels
@@ -57,14 +72,14 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
                else
                {
                   mask = 0x80;
-                  *dp = (png_byte)(v & 0xff);
+                  *dp = CB(v);
                   dp++;
                   v = 0;
                }
             }
 
             if (mask != 0x80)
-               *dp = (png_byte)(v & 0xff);
+               *dp = CB(v);
 
             break;
          }
@@ -85,13 +100,13 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             {
                png_byte value;
 
-               value = (png_byte)(*sp & 0x03);
+               value = PNG_BYTE(*sp & 0x03);
                v |= (value << shift);
 
                if (shift == 0)
                {
                   shift = 6;
-                  *dp = (png_byte)(v & 0xff);
+                  *dp = CB(v);
                   dp++;
                   v = 0;
                }
@@ -103,7 +118,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             }
 
             if (shift != 6)
-               *dp = (png_byte)(v & 0xff);
+               *dp = CB(v);
 
             break;
          }
@@ -124,13 +139,13 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             {
                png_byte value;
 
-               value = (png_byte)(*sp & 0x0f);
+               value = PNG_BYTE(*sp & 0x0f);
                v |= (value << shift);
 
                if (shift == 0)
                {
                   shift = 4;
-                  *dp = (png_byte)(v & 0xff);
+                  *dp = CB(v);
                   dp++;
                   v = 0;
                }
@@ -142,7 +157,7 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             }
 
             if (shift != 4)
-               *dp = (png_byte)(v & 0xff);
+               *dp = CB(v);
 
             break;
          }
@@ -151,9 +166,8 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
             break;
       }
 
-      row_info->bit_depth = (png_byte)(bit_depth & 0xff);
-      row_info->pixel_depth =
-          (png_byte)((bit_depth * row_info->channels) & 0xff);
+      row_info->bit_depth = CB(bit_depth);
+      row_info->pixel_depth = CB(bit_depth * row_info->channels);
       row_info->rowbytes = PNG_ROWBYTES(row_info->pixel_depth,
           row_info->width);
    }
@@ -242,7 +256,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
                   out |= (v >> (-j)) & mask;
             }
 
-            *bp = (png_byte)(out & 0xff);
+            *bp = CB(out);
          }
       }
 
@@ -271,7 +285,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
                   out |= v >> (-j);
             }
 
-            *bp = (png_byte)(out & 0xff);
+            *bp = CB(out);
          }
       }
 
@@ -298,8 +312,8 @@ png_do_shift(png_row_infop row_info, png_bytep row,
                else
                   value |= v >> (-j);
             }
-            *bp++ = (png_byte)((value >> 8) & 0xff);
-            *bp++ = (png_byte)(value & 0xff);
+            *bp++ = CB(value >> 8);
+            *bp++ = PNG_BYTE(value);
          }
       }
    }
@@ -424,7 +438,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = *(sp++);
                */
                sp+=3; dp = sp;
-               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
+               *(dp++) = CB(255 - *(sp++));
             }
          }
 
@@ -447,8 +461,8 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = *(sp++);
                */
                sp+=6; dp = sp;
-               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
-               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
+               *(dp++) = CB(255 - *(sp++));
+               *(dp++) = CB(255 - *(sp++));
             }
          }
 #endif /* WRITE_16BIT */
@@ -466,7 +480,7 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
             for (i = 0, sp = dp = row; i < row_width; i++)
             {
                *(dp++) = *(sp++);
-               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
+               *(dp++) = CB(255 - *(sp++));
             }
          }
 
@@ -485,8 +499,8 @@ png_do_write_invert_alpha(png_row_infop row_info, png_bytep row)
                *(dp++) = *(sp++);
                */
                sp+=2; dp = sp;
-               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
-               *(dp++) = (png_byte)((255 - *(sp++)) & 0xff);
+               *(dp++) = CB(255 - *(sp++));
+               *(dp++) = CB(255 - *(sp++));
             }
          }
 #endif /* WRITE_16BIT */

@@ -454,7 +454,7 @@ png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
 
       else
       {
-         buffer[iout++] = (char)c;
+         buffer[iout++] = png_check_char(png_ptr, c);
       }
    }
 
@@ -1143,4 +1143,56 @@ PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
 #  endif /* AFFIRM_ERROR */
 }
 
+#ifdef PNG_RANGE_CHECK_SUPPORTED
+/* The character/byte checking APIs, these do their own calls to png_assert
+ * because the caller provides the position.
+ */
+char /* PRIVATE */
+png_char_affirm(png_const_structrp png_ptr, unsigned int position, int c)
+{
+   if (c >= CHAR_MIN && c <= CHAR_MAX)
+       return (char)/*SAFE*/c;
+
+#  if PNG_AFFIRM_ERROR
+      /* testing in RC: no condition */
+      png_affirm(png_ptr, position);
+#  else
+      png_affirm(png_ptr, "(char) range", position);
+#  endif
+}
+
+png_byte /* PRIVATE */
+png_byte_affirm(png_const_structrp png_ptr, unsigned int position, int b)
+{
+   /* For the type png_byte the limits.h values are ignored and we check
+    * against the values PNG expects to store in a byte:
+    */
+   if (b >= 0 && b <= 255)
+       return (png_byte)/*SAFE*/b;
+
+#  if PNG_AFFIRM_ERROR
+      /* testing in RC: no condition */
+      png_affirm(png_ptr, position);
+#  else
+      png_affirm(png_ptr, "PNG byte range", position);
+#  endif
+}
+
+#if INT_MAX >= 65535
+png_uint_16 /* PRIVATE */
+png_u16_affirm(png_const_structrp png_ptr, unsigned int position, int b)
+{
+   /* Check against the PNG 16-bit limit, as with png_byte. */
+   if (b >= 0 && b <= 65535)
+       return (png_uint_16)/*SAFE*/b;
+
+#  if PNG_AFFIRM_ERROR
+      /* testing in RC: no condition */
+      png_affirm(png_ptr, position);
+#  else
+      png_affirm(png_ptr, "PNG 16-bit range", position);
+#  endif
+}
+#endif /* INT_MAX >= 65535 */
+#endif /* RANGE_CHECK */
 #endif /* READ || WRITE */

@@ -337,6 +337,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 
          for (i = 0, rp = row; i < row_width; i++, rp += bytes_per_pixel)
          {
+            /* TODO: explain the +256 */
             *(rp) = (png_byte)((256 + *rp + *(rp + 1)) & 0xff);
             *(rp+2) = (png_byte)((256 + *(rp + 2) + *(rp + 1)) & 0xff);
          }
@@ -360,6 +361,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
             png_uint_32 s0   = (*(rp    ) << 8) | *(rp + 1);
             png_uint_32 s1   = (*(rp + 2) << 8) | *(rp + 3);
             png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
+            /* TODO: explain the +65536 */
             png_uint_32 red  = (s0 + s1 + 65536) & 0xffff;
             png_uint_32 blue = (s2 + s1 + 65536) & 0xffff;
             *(rp    ) = (png_byte)((red >> 8) & 0xff);
@@ -1670,7 +1672,8 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
    switch (encoding)
    {
       case P_FILE:
-         value = png_gamma_16bit_correct(value*257, display->gamma_to_linear);
+         value = png_gamma_16bit_correct(display->image->opaque->png_ptr,
+            value*257, display->gamma_to_linear);
          break;
 
       case P_sRGB:
@@ -1722,7 +1725,7 @@ png_colormap_compose(png_image_read_control *display,
    }
 
    else /* P_sRGB */
-      f = PNG_sRGB_FROM_LINEAR(f);
+      f = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, f);
 
    return f;
 }
@@ -1762,9 +1765,9 @@ png_create_colormap_entry(png_image_read_control *display,
    {
       png_fixed_point g = display->gamma_to_linear;
 
-      red = png_gamma_16bit_correct(red*257, g);
-      green = png_gamma_16bit_correct(green*257, g);
-      blue = png_gamma_16bit_correct(blue*257, g);
+      red = png_gamma_16bit_correct(image->opaque->png_ptr, red*257, g);
+      green = png_gamma_16bit_correct(image->opaque->png_ptr, green*257, g);
+      blue = png_gamma_16bit_correct(image->opaque->png_ptr, blue*257, g);
 
       if (convert_to_Y != 0 || output_encoding == P_LINEAR)
       {
@@ -1774,9 +1777,9 @@ png_create_colormap_entry(png_image_read_control *display,
 
       else
       {
-         red = PNG_sRGB_FROM_LINEAR(red * 255);
-         green = PNG_sRGB_FROM_LINEAR(green * 255);
-         blue = PNG_sRGB_FROM_LINEAR(blue * 255);
+         red = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, red * 255);
+         green = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, green * 255);
+         blue = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, blue * 255);
          encoding = P_sRGB;
       }
    }
@@ -1794,7 +1797,7 @@ png_create_colormap_entry(png_image_read_control *display,
    }
 
    else if (encoding == P_sRGB &&
-       (convert_to_Y  != 0 || output_encoding == P_LINEAR))
+       (convert_to_Y != 0 || output_encoding == P_LINEAR))
    {
       /* The values are 8-bit sRGB values, but must be converted to 16-bit
        * linear.
@@ -1812,8 +1815,7 @@ png_create_colormap_entry(png_image_read_control *display,
       if (convert_to_Y != 0)
       {
          /* NOTE: these values are copied from png_do_rgb_to_gray */
-         png_uint_32 y = (png_uint_32)6968 * red  + (png_uint_32)23434 * green +
-            (png_uint_32)2366 * blue;
+         png_uint_32 y = 6968 * red  + 23434 * green + 2366 * blue;
 
          if (output_encoding == P_LINEAR)
             y = (y + 16384) >> 15;
@@ -1823,7 +1825,8 @@ png_create_colormap_entry(png_image_read_control *display,
             /* y is scaled by 32768, we need it scaled by 255: */
             y = (y + 128) >> 8;
             y *= 255;
-            y = PNG_sRGB_FROM_LINEAR((y + 64) >> 7);
+            y = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, (y + 64) >> 7);
+            alpha = PNG_DIV257(alpha);
             encoding = P_sRGB;
          }
 
@@ -1832,9 +1835,10 @@ png_create_colormap_entry(png_image_read_control *display,
 
       else if (output_encoding == P_sRGB)
       {
-         red = PNG_sRGB_FROM_LINEAR(red * 255);
-         green = PNG_sRGB_FROM_LINEAR(green * 255);
-         blue = PNG_sRGB_FROM_LINEAR(blue * 255);
+         red = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, red * 255);
+         green = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, green * 255);
+         blue = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr,
+            blue * 255);
          alpha = PNG_DIV257(alpha);
          encoding = P_sRGB;
       }
@@ -1870,7 +1874,8 @@ png_create_colormap_entry(png_image_read_control *display,
          switch (PNG_IMAGE_SAMPLE_CHANNELS(image->format))
          {
             case 4:
-               entry[afirst ? 0 : 3] = (png_uint_16)alpha;
+               entry[afirst ? 0 : 3] = png_check_u16(image->opaque->png_ptr,
+                  alpha);
                /* FALL THROUGH */
 
             case 3:
@@ -1886,13 +1891,14 @@ png_create_colormap_entry(png_image_read_control *display,
                   else
                      red = green = blue = 0;
                }
-               entry[afirst + (2 ^ bgr)] = (png_uint_16)blue;
-               entry[afirst + 1] = (png_uint_16)green;
-               entry[afirst + bgr] = (png_uint_16)red;
+               entry[afirst + (2 ^ bgr)] = png_check_u16(image->opaque->png_ptr,
+                  blue);
+               entry[afirst + 1] = png_check_u16(image->opaque->png_ptr, green);
+               entry[afirst + bgr] = png_check_u16(image->opaque->png_ptr, red);
                break;
 
             case 2:
-               entry[1 ^ afirst] = (png_uint_16)alpha;
+               entry[1 ^ afirst] = png_check_u16(image->opaque->png_ptr, alpha);
                /* FALL THROUGH */
 
             case 1:
@@ -1904,7 +1910,7 @@ png_create_colormap_entry(png_image_read_control *display,
                   else
                      green = 0;
                }
-               entry[afirst] = (png_uint_16)green;
+               entry[afirst] = png_check_u16(image->opaque->png_ptr, green);
                break;
 
             default:
@@ -1918,20 +1924,29 @@ png_create_colormap_entry(png_image_read_control *display,
 
          entry += ip * PNG_IMAGE_SAMPLE_CHANNELS(image->format);
 
+         png_affirmpp(image->opaque->png_ptr, output_encoding == P_sRGB);
+
          switch (PNG_IMAGE_SAMPLE_CHANNELS(image->format))
          {
             case 4:
-               entry[afirst ? 0 : 3] = (png_byte)alpha;
+               entry[afirst ? 0 : 3] = png_check_byte(image->opaque->png_ptr,
+                  alpha);
+
             case 3:
-               entry[afirst + (2 ^ bgr)] = (png_byte)blue;
-               entry[afirst + 1] = (png_byte)green;
-               entry[afirst + bgr] = (png_byte)red;
+               entry[afirst + (2 ^ bgr)] = png_check_byte(
+                  image->opaque->png_ptr, blue);
+               entry[afirst + 1] = png_check_byte(image->opaque->png_ptr,
+                  green);
+               entry[afirst + bgr] = png_check_byte(image->opaque->png_ptr,
+                  red);
                break;
 
             case 2:
-               entry[1 ^ afirst] = (png_byte)alpha;
+               entry[1 ^ afirst] = png_check_byte(image->opaque->png_ptr,
+                  alpha);
+
             case 1:
-               entry[afirst] = (png_byte)green;
+               entry[afirst] = png_check_byte(image->opaque->png_ptr, green);
                break;
 
             default:
@@ -2053,7 +2068,8 @@ make_rgb_colormap(png_image_read_control *display)
 
 /* Return a palette index to the above palette given three 8-bit sRGB values. */
 #define PNG_RGB_INDEX(r,g,b) \
-   ((png_byte)(0xff & (6 * (6 * PNG_DIV51(r) + PNG_DIV51(g)) + PNG_DIV51(b))))
+   (png_check_byte(image->opaque->png_ptr,\
+                   6 * (6 * PNG_DIV51(r) + PNG_DIV51(g)) + PNG_DIV51(b)))
 
 static int
 png_image_read_colormap(png_voidp argument)
@@ -2260,7 +2276,7 @@ png_image_read_colormap(png_voidp argument)
 
                      if (output_encoding == P_LINEAR)
                      {
-                        gray = PNG_sRGB_FROM_LINEAR(gray * 255);
+                        gray = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, gray * 255);
 
                         /* And make sure the corresponding palette entry
                          * matches.
@@ -2375,7 +2391,7 @@ png_image_read_colormap(png_voidp argument)
 
                if (output_encoding == P_LINEAR)
                {
-                  gray = PNG_sRGB_FROM_LINEAR(gray * 255);
+                  gray = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, gray * 255);
 
                   /* And make sure the corresponding palette entry matches. */
                   png_create_colormap_entry(display, gray, back_g, back_g,
@@ -2463,9 +2479,9 @@ png_image_read_colormap(png_voidp argument)
                      png_uint_32 gray = png_sRGB_table[g*51] * alpha;
 
                      png_create_colormap_entry(display, i++,
-                        PNG_sRGB_FROM_LINEAR(gray + back_rx),
-                        PNG_sRGB_FROM_LINEAR(gray + back_gx),
-                        PNG_sRGB_FROM_LINEAR(gray + back_bx), 255, P_sRGB);
+                        PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, gray + back_rx),
+                        PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, gray + back_gx),
+                        PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, gray + back_bx), 255, P_sRGB);
                   }
                }
 
@@ -2566,7 +2582,8 @@ png_image_read_colormap(png_voidp argument)
                      if (output_encoding == P_sRGB)
                         gray = png_sRGB_table[gray]; /* now P_LINEAR */
 
-                     gray = PNG_DIV257(png_gamma_16bit_correct(gray,
+                     gray = PNG_DIV257(png_gamma_16bit_correct(
+                        image->opaque->png_ptr, gray,
                         png_ptr->colorspace.gamma)); /* now P_FILE */
 
                      /* And make sure the corresponding palette entry contains
@@ -2578,7 +2595,7 @@ png_image_read_colormap(png_voidp argument)
 
                   else if (output_encoding == P_LINEAR)
                   {
-                     gray = PNG_sRGB_FROM_LINEAR(gray * 255);
+                     gray = PNG_sRGB_FROM_LINEAR(image->opaque->png_ptr, gray * 255);
 
                      /* And make sure the corresponding palette entry matches.
                       */
@@ -2685,9 +2702,9 @@ png_image_read_colormap(png_voidp argument)
 
                   if (output_encoding == P_LINEAR)
                   {
-                     r = PNG_sRGB_FROM_LINEAR(back_r * 255);
-                     g = PNG_sRGB_FROM_LINEAR(back_g * 255);
-                     b = PNG_sRGB_FROM_LINEAR(back_b * 255);
+                     r = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, back_r * 255);
+                     g = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, back_g * 255);
+                     b = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, back_b * 255);
                   }
 
                   else
@@ -3008,7 +3025,7 @@ png_image_read_and_map(png_voidp argument)
                         entry = 226 + 6 * PNG_DIV51(alpha) + PNG_DIV51(gray);
                      }
 
-                     *outrow = (png_byte)entry;
+                     *outrow = png_check_byte(image->opaque->png_ptr, entry);
                   }
                   break;
 
@@ -3025,8 +3042,7 @@ png_image_read_and_map(png_voidp argument)
                         *outrow = gray;
 
                      else
-                        *outrow =
-                            (png_byte)(0xff & (PNG_CMAP_TRANS_BACKGROUND+1));
+                        *outrow = PNG_CMAP_TRANS_BACKGROUND+1;
                   }
                   break;
 
@@ -3081,7 +3097,7 @@ png_image_read_and_map(png_voidp argument)
                         if (inrow[0] & 0x80) back_i += 1; /* blue */
                         if (inrow[0] & 0x40) back_i += 1;
 
-                        *outrow = (png_byte)back_i;
+                        *outrow = png_check_byte(image->opaque->png_ptr, back_i);
                      }
 
                      inrow += 4;
@@ -3329,10 +3345,10 @@ png_image_read_composite(png_voidp argument)
                          * therefore appropriate for the sRGB to linear
                          * conversion table.
                          */
-                        component = PNG_sRGB_FROM_LINEAR(component);
+                        component = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, component);
                      }
 
-                     outrow[c] = (png_byte)component;
+                     outrow[c] = png_check_byte(image->opaque->png_ptr, component);
                   }
                }
 
@@ -3481,10 +3497,11 @@ png_image_read_background(png_voidp argument)
                               component = png_sRGB_table[component] * alpha;
                               component += png_sRGB_table[outrow[0]] *
                                  (255-alpha);
-                              component = PNG_sRGB_FROM_LINEAR(component);
+                              component = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, component);
                            }
 
-                           outrow[0] = (png_byte)component;
+                           outrow[0] = png_check_byte(image->opaque->png_ptr,
+                              component);
                         }
 
                         inrow += 2; /* gray and alpha channel */
@@ -3521,10 +3538,11 @@ png_image_read_background(png_voidp argument)
                            {
                               component = png_sRGB_table[component] * alpha;
                               component += background * (255-alpha);
-                              component = PNG_sRGB_FROM_LINEAR(component);
+                              component = PNG_sRGB_FROM_LINEAR(display->image->opaque->png_ptr, component);
                            }
 
-                           outrow[0] = (png_byte)component;
+                           outrow[0] = png_check_byte(image->opaque->png_ptr,
+                              component);
                         }
 
                         else

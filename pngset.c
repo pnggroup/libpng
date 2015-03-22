@@ -217,11 +217,11 @@ png_set_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
 
    info_ptr->width = width;
    info_ptr->height = height;
-   info_ptr->bit_depth = (png_byte)bit_depth;
-   info_ptr->color_type = (png_byte)color_type;
-   info_ptr->compression_type = (png_byte)compression_type;
-   info_ptr->filter_type = (png_byte)filter_type;
-   info_ptr->interlace_type = (png_byte)interlace_type;
+   info_ptr->bit_depth = png_check_byte(png_ptr, bit_depth);
+   info_ptr->color_type = png_check_byte(png_ptr, color_type);
+   info_ptr->compression_type = png_check_byte(png_ptr, compression_type);
+   info_ptr->filter_type = png_check_byte(png_ptr, filter_type);
+   info_ptr->interlace_type = png_check_byte(png_ptr, interlace_type);
 
    png_check_IHDR (png_ptr, info_ptr->width, info_ptr->height,
        info_ptr->bit_depth, info_ptr->color_type, info_ptr->interlace_type,
@@ -239,7 +239,8 @@ png_set_IHDR(png_const_structrp png_ptr, png_inforp info_ptr,
    if ((info_ptr->color_type & PNG_COLOR_MASK_ALPHA) != 0)
       info_ptr->channels++;
 
-   info_ptr->pixel_depth = (png_byte)(info_ptr->channels * info_ptr->bit_depth);
+   info_ptr->pixel_depth = png_check_byte(png_ptr, info_ptr->channels *
+           info_ptr->bit_depth);
 
    info_ptr->rowbytes = PNG_ROWBYTES(info_ptr->pixel_depth, width);
 }
@@ -256,7 +257,7 @@ png_set_oFFs(png_const_structrp png_ptr, png_inforp info_ptr,
 
    info_ptr->x_offset = offset_x;
    info_ptr->y_offset = offset_y;
-   info_ptr->offset_unit_type = (png_byte)unit_type;
+   info_ptr->offset_unit_type = png_check_byte(png_ptr, unit_type);
    info_ptr->valid |= PNG_INFO_oFFs;
 }
 #endif
@@ -312,8 +313,8 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    png_debug(3, "storing X0, X1, type, and nparams in info");
    info_ptr->pcal_X0 = X0;
    info_ptr->pcal_X1 = X1;
-   info_ptr->pcal_type = (png_byte)type;
-   info_ptr->pcal_nparams = (png_byte)nparams;
+   info_ptr->pcal_type = png_check_byte(png_ptr, type);
+   info_ptr->pcal_nparams = png_check_byte(png_ptr, nparams);
 
    length = strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)",
@@ -392,7 +393,7 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
        sheight[0] == 45 /* '-' */ || !png_check_fp_string(sheight, lengthh))
       png_error(png_ptr, "Invalid sCAL height");
 
-   info_ptr->scal_unit = (png_byte)unit;
+   info_ptr->scal_unit = png_check_byte(png_ptr, unit);
 
    ++lengthw;
 
@@ -505,7 +506,7 @@ png_set_pHYs(png_const_structrp png_ptr, png_inforp info_ptr,
 
    info_ptr->x_pixels_per_unit = res_x;
    info_ptr->y_pixels_per_unit = res_y;
-   info_ptr->phys_unit_type = (png_byte)unit_type;
+   info_ptr->phys_unit_type = png_check_byte(png_ptr, unit_type);
    info_ptr->valid |= PNG_INFO_pHYs;
 }
 #endif
@@ -1140,7 +1141,7 @@ check_location(png_const_structrp png_ptr, int location)
       png_app_warning(png_ptr,
          "png_set_unknown_chunks now expects a valid location");
       /* Use the old behavior */
-      location = (png_byte)(png_ptr->mode &
+      location = png_check_byte(png_ptr, png_ptr->mode &
          (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT));
    }
 
@@ -1159,7 +1160,7 @@ check_location(png_const_structrp png_ptr, int location)
    /* The cast is safe because 'location' is a bit mask and only the low four
     * bits are significant.
     */
-   return (png_byte)location;
+   return png_check_byte(png_ptr, location);
 }
 
 void PNGAPI
@@ -1309,7 +1310,8 @@ png_permit_mng_features (png_structrp png_ptr, png_uint_32 mng_features)
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 static unsigned int
-add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
+add_one_chunk(png_const_structrp png_ptr, png_bytep list, unsigned int count,
+   png_const_bytep add, int keep)
 {
    unsigned int i;
 
@@ -1320,7 +1322,7 @@ add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
    {
       if (memcmp(list, add, 4) == 0)
       {
-         list[4] = (png_byte)keep;
+         list[4] = png_check_byte(png_ptr, keep);
 
          return count;
       }
@@ -1330,10 +1332,11 @@ add_one_chunk(png_bytep list, unsigned int count, png_const_bytep add, int keep)
    {
       ++count;
       memcpy(list, add, 4);
-      list[4] = (png_byte)keep;
+      list[4] = png_check_byte(png_ptr, keep);
    }
 
    return count;
+   PNG_UNUSEDRC(png_ptr)
 }
 
 void PNGAPI
@@ -1451,7 +1454,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
 
       for (i=0; i<num_chunks; ++i)
       {
-         old_num_chunks = add_one_chunk(new_list, old_num_chunks,
+         old_num_chunks = add_one_chunk(png_ptr, new_list, old_num_chunks,
             chunk_list+5*i, keep);
       }
 

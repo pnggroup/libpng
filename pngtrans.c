@@ -273,10 +273,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       png_size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i++)
-      {
-         *rp = (png_byte)((~(*rp)) & 0xff);
-         rp++;
-      }
+         *rp++ ^= 0xff;
    }
 
    else if (row_info->color_type == PNG_COLOR_TYPE_GRAY_ALPHA &&
@@ -287,10 +284,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       png_size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 2)
-      {
-         *rp = (png_byte)((~(*rp)) & 0xff);
-         rp += 2;
-      }
+         *rp ^= 0xff, rp += 2;
    }
 
 #ifdef PNG_16BIT_SUPPORTED
@@ -302,11 +296,7 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       png_size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 4)
-      {
-         *rp = (png_byte)((~(*rp)) & 0xff);
-         *(rp + 1) = (png_byte)((~(*(rp + 1))) & 0xff);
-         rp += 4;
-      }
+         *rp++ ^= 0xff, *rp++ ^= 0xff, rp += 2;
    }
 #endif
 }
@@ -804,9 +794,10 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp
 #endif
 
    png_ptr->user_transform_ptr = user_transform_ptr;
-   png_ptr->user_transform_depth = (png_byte)(user_transform_depth & 0xff);
-   png_ptr->user_transform_channels =
-       (png_byte)(user_transform_channels & 0xff);
+   png_ptr->user_transform_depth = png_check_byte(png_ptr,
+      user_transform_depth);
+   png_ptr->user_transform_channels = png_check_byte(png_ptr,
+      user_transform_channels);
 }
 #endif
 

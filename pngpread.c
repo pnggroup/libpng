@@ -159,17 +159,16 @@ png_process_some_data(png_structrp png_ptr, png_inforp info_ptr)
 void /* PRIVATE */
 png_push_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 {
-   png_size_t num_checked = png_ptr->sig_bytes, /* SAFE, does not exceed 8 */ 
-             num_to_check = 8 - num_checked;
+   unsigned int num_checked = png_ptr->sig_bytes;
+   unsigned int num_to_check = 8 - num_checked;
 
    if (png_ptr->buffer_size < num_to_check)
-   {
-      num_to_check = png_ptr->buffer_size;
-   }
+      num_to_check = (int)/*SAFE*/png_ptr->buffer_size;
 
    png_push_fill_buffer(png_ptr, &(info_ptr->signature[num_checked]),
        num_to_check);
-   png_ptr->sig_bytes = (png_byte)((png_ptr->sig_bytes + num_to_check) & 0xff);
+   png_ptr->sig_bytes = png_check_byte(png_ptr,
+       png_ptr->sig_bytes + num_to_check);
 
    if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check))
    {

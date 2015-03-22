@@ -35,7 +35,7 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
    if (num_bytes > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
-   png_ptr->sig_bytes = (png_byte)(num_bytes < 0 ? 0 : num_bytes);
+   png_ptr->sig_bytes = png_check_byte(png_ptr, num_bytes < 0 ? 0 : num_bytes);
 }
 
 /* Checks whether the supplied bytes match the PNG signature.  We allow
@@ -753,9 +753,9 @@ void PNGAPI
 png_build_grayscale_palette(int bit_depth, png_colorp palette)
 {
    int num_palette;
-   int color_inc;
+   png_byte color_inc;
    int i;
-   int v;
+   png_byte v;
 
    png_debug(1, "in png_do_build_grayscale_palette");
 
@@ -790,12 +790,8 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
          break;
    }
 
-   for (i = 0, v = 0; i < num_palette; i++, v += color_inc)
-   {
-      palette[i].red = (png_byte)v;
-      palette[i].green = (png_byte)v;
-      palette[i].blue = (png_byte)v;
-   }
+   for (i = 0, v = 0; i < num_palette; ++i, v = PNG_BYTE(v+color_inc))
+      palette[i].red = palette[i].green = palette[i].blue = v;
 }
 #endif
 
@@ -1653,7 +1649,7 @@ png_icc_tag_char(png_uint_32 byte)
 {
    byte &= 0xff;
    if (byte >= 32 && byte <= 126)
-      return (char)byte;
+      return (char)/*SAFE*/byte;
    else
       return '?';
 }
@@ -2931,7 +2927,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
 
                      --exp_b10;
                   }
-                  *ascii++ = (char)(48 + (int)d), ++cdigits;
+                  *ascii++ = png_check_char(png_ptr, 48 + (int)d), ++cdigits;
                }
             }
             while (cdigits+czero-clead < (int)precision && fp > DBL_MIN);
@@ -2941,7 +2937,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
             /* Check for an exponent, if we don't need one we are
              * done and just need to terminate the string.  At
              * this point exp_b10==(-1) is effectively if flag - it got
-             * to '-1' because of the decrement after outputing
+             * to '-1' because of the decrement after outputting
              * the decimal point above (the exponent required is
              * *not* -1!)
              */
@@ -2949,7 +2945,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
             {
                /* The following only happens if we didn't output the
                 * leading zeros above for negative exponent, so this
-                * doest add to the digit requirement.  Note that the
+                * doesn't add to the digit requirement.  Note that the
                 * two zeros here can only be output if the two leading
                 * zeros were *not* output, so this doesn't increase
                 * the output count.
@@ -2994,7 +2990,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
 
                while (uexp_b10 > 0)
                {
-                  exponent[cdigits++] = (char)(48 + uexp_b10 % 10);
+                  exponent[cdigits++] = (char)/*SAFE*/(48 + uexp_b10 % 10);
                   uexp_b10 /= 10;
                }
             }
@@ -3064,7 +3060,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
             /* Split the low digit off num: */
             unsigned int tmp = num/10;
             num -= tmp*10;
-            digits[ndigits++] = (char)(48 + num);
+            digits[ndigits++] = png_check_char(png_ptr, 48 + num);
             /* Record the first non-zero digit, note that this is a number
              * starting at 1, it's not actually the array index.
              */
@@ -3623,7 +3619,7 @@ png_exp(png_fixed_point x)
 }
 
 static png_byte
-png_exp8bit(png_fixed_point lg2)
+png_exp8bit(png_const_structrp png_ptr, png_fixed_point lg2)
 {
    /* Get a 32-bit value: */
    png_uint_32 x = png_exp(lg2);
@@ -3633,11 +3629,12 @@ png_exp8bit(png_fixed_point lg2)
     * step.
     */
    x -= x >> 8;
-   return (png_byte)((x + 0x7fffffU) >> 24);
+   return png_check_byte(png_ptr, (x + 0x7fffffU) >> 24);
+   PNG_UNUSEDRC(png_ptr)
 }
 
 static png_uint_16
-png_exp16bit(png_fixed_point lg2)
+png_exp16bit(png_const_structrp png_ptr, png_fixed_point lg2)
 {
    /* Get a 32-bit value: */
    png_uint_32 x = png_exp(lg2);
@@ -3645,11 +3642,13 @@ png_exp16bit(png_fixed_point lg2)
    /* Convert the 32-bit value to 0..65535 by multiplying by 65536-1: */
    x -= x >> 16;
    return (png_uint_16)((x + 32767U) >> 16);
+   PNG_UNUSED(png_ptr)
 }
 #endif /* FLOATING_ARITHMETIC */
 
 png_byte
-png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
+png_gamma_8bit_correct(png_const_structrp png_ptr, png_uint_32 value,
+   png_fixed_point gamma_val)
 {
    if (value > 0 && value < 255)
    {
@@ -3679,24 +3678,27 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
           * caller if the *argument* ('value') were to be declared (int).
           */
          double r = floor(255*pow((int)/*SAFE*/value/255.,gamma_val*.00001)+.5);
-         return (png_byte)r;
+         if (r >= 0 && r <= 255)
+             return (png_byte)/*SAFE*/r;
 #     else
          png_int_32 lg2 = png_log8bit(value);
          png_fixed_point res;
 
          if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1) != 0)
-            return png_exp8bit(res);
-
-         /* Overflow. */
-         value = 0;
+            return png_exp8bit(png_ptr, res);
 #     endif
+
+      /* Overflow. */
+      png_warning(png_ptr, "8-bit gamma overflow");
+      return 0;
    }
 
-   return (png_byte)value;
+   return png_check_byte(png_ptr, value);
 }
 
 png_uint_16
-png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
+png_gamma_16bit_correct(png_const_structrp png_ptr, png_uint_32 value,
+   png_fixed_point gamma_val)
 {
    if (value > 0 && value < 65535)
    {
@@ -3708,36 +3710,22 @@ png_gamma_16bit_correct(unsigned int value, png_fixed_point gamma_val)
           */
          double r = floor(65535.*pow((png_int_32)value/65535.,
                      gamma_val*.00001)+.5);
-         return (png_uint_16)r;
+         if (r >= 0 && r <= 65535)
+             return (png_uint_16)/*SAFE*/r;
 #     else
          png_int_32 lg2 = png_log16bit(value);
          png_fixed_point res;
 
          if (png_muldiv(&res, gamma_val, lg2, PNG_FP_1) != 0)
-            return png_exp16bit(res);
-
-         /* Overflow. */
-         value = 0;
+            return png_exp16bit(png_ptr, res);
 #     endif
+
+      /* Overflow. */
+      png_warning(png_ptr, "16-bit gamma overflow");
+      return 0;
    }
 
-   return (png_uint_16)value;
-}
-
-/* This does the right thing based on the bit_depth field of the
- * png_struct, interpreting values as 8-bit or 16-bit.  While the result
- * is nominally a 16-bit value if bit depth is 8 then the result is
- * 8-bit (as are the arguments.)
- */
-png_uint_16 /* PRIVATE */
-png_gamma_correct(png_structrp png_ptr, unsigned int value,
-    png_fixed_point gamma_val)
-{
-   if (png_ptr->bit_depth == 8)
-      return png_gamma_8bit_correct(value, gamma_val);
-
-   else
-      return png_gamma_16bit_correct(value, gamma_val);
+   return png_check_u16(png_ptr, value);
 }
 
 #define PNG_GAMMA_TABLE_8       0 /* 8-bit entries in png_byte */
@@ -3756,7 +3744,8 @@ typedef struct
 }  gamma_table_data;
 
 static unsigned int
-write_gamma_table_entry(const gamma_table_data *data, png_uint_32 i)
+write_gamma_table_entry(png_const_structrp png_ptr,
+   const gamma_table_data *data, png_uint_32 i)
    /* Calculate and write a single entry into table[i], the value of the entry
     * written is returned.
     */
@@ -3769,7 +3758,7 @@ write_gamma_table_entry(const gamma_table_data *data, png_uint_32 i)
     */
    if ((data->output == PNG_GAMMA_TABLE_8) != (data->adjust != 0))
    {
-      out = png_gamma_8bit_correct((unsigned int)in, data->gamma);
+      out = png_gamma_8bit_correct(png_ptr, in, data->gamma);
 
       if (data->adjust != 0)
          out *= 257U;
@@ -3777,24 +3766,25 @@ write_gamma_table_entry(const gamma_table_data *data, png_uint_32 i)
 
    else /* 16-bit correction */
    {
-      out = png_gamma_16bit_correct((unsigned int)in, data->gamma);
+      out = png_gamma_16bit_correct(png_ptr, in, data->gamma);
 
       if (data->adjust != 0)
          out = PNG_DIV257(out);
    }
 
+   PNG_UNUSEDRC(png_ptr)
    if (data->output == PNG_GAMMA_TABLE_8)
-      ((png_bytep)data->table)[i] = (png_byte)out;
+      png_upcast(png_bytep, data->table)[i] = png_check_byte(png_ptr, out);
 
    else
-      ((png_uint_16p)data->table)[i] = (png_uint_16)out;
+      png_upcast(png_uint_16p, data->table)[i] = png_check_u16(png_ptr, out);
 
    return out;
 }
 
 static void
-write_gamma_table(const gamma_table_data *data, png_uint_32 lo,
-   unsigned int loval, png_uint_32 hi, unsigned int hival)
+write_gamma_table(png_const_structrp png_ptr, const gamma_table_data *data,
+   png_uint_32 lo, unsigned int loval, png_uint_32 hi, unsigned int hival)
    /* Fill in gamma table entries between lo and hi, exclusive.  The entries at
     * table[lo] and table[hi] have already been written, the intervening entries
     * are written.
@@ -3807,15 +3797,15 @@ write_gamma_table(const gamma_table_data *data, png_uint_32 lo,
          /* All intervening entries must be the same. */
          if (data->output == PNG_GAMMA_TABLE_8)
          {
-            png_bytep table8 = ((png_bytep)data->table);
+            png_bytep table8 = png_voidcast(png_bytep, data->table);
 
             while (++lo < hi)
-               table8[lo] = (png_byte)loval;
+               table8[lo] = png_check_byte(png_ptr, loval);
          }
 
          else
          {
-            png_uint_16p table16 = ((png_uint_16p)data->table);
+            png_uint_16p table16 = png_voidcast(png_uint_16p, data->table);
 
             while (++lo < hi)
                table16[lo] = (png_uint_16)loval;
@@ -3825,15 +3815,15 @@ write_gamma_table(const gamma_table_data *data, png_uint_32 lo,
       else
       {
          png_uint_32 mid = (lo+hi) >> 1;
-         unsigned int midval = write_gamma_table_entry(data, mid);
+         unsigned int midval = write_gamma_table_entry(png_ptr, data, mid);
 
          /* The algorithm used is to divide the entries to be written in half
           * and fill in the middle.  For all practical tables with significant
           * gamma this will result in a performance gain because the expensive
           * gamma correction arithmetic is avoided for some entries.
           */
-         write_gamma_table(data, lo, loval, mid, midval);
-         write_gamma_table(data, mid, midval, hi, hival);
+         write_gamma_table(png_ptr, data, lo, loval, mid, midval);
+         write_gamma_table(png_ptr, data, mid, midval, hi, hival);
       }
    }
 }
@@ -4029,7 +4019,7 @@ png_build_gamma_table(png_structrp png_ptr, png_fixed_point gamma_val,
    }
 
    if (png_gamma_significant(gamma_val) != 0)
-      write_gamma_table(&data, 0, 0, size-1, hival);
+      write_gamma_table(png_ptr, &data, 0, 0, size-1, hival);
 
    else /* gamma_val not significant */
    {
@@ -4040,28 +4030,29 @@ png_build_gamma_table(png_structrp png_ptr, png_fixed_point gamma_val,
 
          if (data.adjust)
             for (i=1; i<size-1; ++i)
-               table8[i] = (png_byte)PNG_DIV257((i * data.mult + data.add) >>
-                  data.shift);
+               table8[i] = png_check_byte(png_ptr,
+                  PNG_DIV257((i * data.mult + data.add) >> data.shift));
 
          else
             for (i=1; i<size-1; ++i)
-               table8[i] = (png_byte)((i * data.mult + data.add) >> data.shift);
+               table8[i] = png_check_byte(png_ptr,
+                  (i * data.mult + data.add) >> data.shift);
       }
 
       else
       {
          png_uint_32 i;
-         png_uint_16p table16 = ((png_uint_16p)data.table);
+         png_uint_16p table16 = (png_uint_16p)data.table;
 
          if (data.adjust)
             for (i=1; i<size-1; ++i)
-               table16[i] = (png_uint_16)(((i * data.mult + data.add) >>
-                  data.shift) * 257U);
+               table16[i] = png_check_u16(png_ptr,
+                  ((i * data.mult + data.add) >> data.shift) * 257U);
 
          else
             for (i=1; i<size-1; ++i)
-               table16[i] = (png_uint_16)((i * data.mult + data.add) >>
-                  data.shift);
+               table16[i] = png_check_u16(png_ptr,
+                  (i * data.mult + data.add) >> data.shift);
       }
    }
 
@@ -4171,8 +4162,9 @@ png_build_gamma_tables(png_structrp png_ptr, int bit_depth)
      else
         sig_bit = png_ptr->sig_bit.gray;
 
+     /* shift == insignificant bits */
      if (sig_bit > 0 && sig_bit < 16U)
-        shift = (png_byte)(16U - sig_bit); /* shift == insignificant bits */
+        shift = png_check_byte(png_ptr, 16U - sig_bit);
 
      else
         shift = 0; /* keep all 16 bits */
@@ -4233,7 +4225,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
       int setting = (2 + (onoff != 0)) << option;
       int current = png_ptr->options;
 
-      png_ptr->options = (png_byte)((current & ~mask) | setting);
+      png_ptr->options = png_check_byte(png_ptr, (current & ~mask) | setting);
 
       return (current & mask) >> option;
    }
