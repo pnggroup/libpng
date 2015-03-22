@@ -765,6 +765,14 @@ Version 1.7.0beta58 [March 22, 2015]
     and short assignments. Simply ignore the error in release builds
     (a truncated value will be used without warning). Controlled by
     PNG_RANGE_CHECK_SUPPORTED.
+  Improved some overflow handling. PNG_RELEASE_BUILD replaces tests
+    where the code depended on the build base type and can be defined on
+    the command line, allowing testing in beta builds.  Overflows previously
+    handled by png_warning in png.c have been changed to use new
+    macros/affirm functions so that beta builds will abort on overflow and
+    release builds will quietly ignore it.  This avoids release builds
+    producing warnings that are of no use to end users.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

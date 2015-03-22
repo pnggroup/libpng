@@ -80,7 +80,7 @@ png_zalloc,(voidpf png_ptr, uInt items, uInt size),PNG_ALLOCATED)
 
    if (items >= (~(png_alloc_size_t)0)/size)
    {
-      png_warning (png_voidcast(png_structrp, png_ptr),
+      png_warning(png_voidcast(png_structrp, png_ptr),
          "Potential overflow in png_zalloc()");
       return NULL;
    }
@@ -3272,8 +3272,9 @@ png_muldiv_warn(png_const_structrp png_ptr, png_fixed_point a, png_int_32 times,
    if (png_muldiv(&result, a, times, divisor) != 0)
       return result;
 
-   png_warning(png_ptr, "fixed point overflow ignored");
+   handled("fixed point overflow");
    return 0;
+   PNG_UNUSED(png_ptr) /* Only used in non-release builds */
 }
 #endif
 
@@ -3689,11 +3690,12 @@ png_gamma_8bit_correct(png_const_structrp png_ptr, png_uint_32 value,
 #     endif
 
       /* Overflow. */
-      png_warning(png_ptr, "8-bit gamma overflow");
+      handled("8-bit gamma overflow");
       return 0;
    }
 
    return png_check_byte(png_ptr, value);
+   PNG_UNUSED(png_ptr) /* Only used in non-release builds */
 }
 
 png_uint_16
@@ -3721,11 +3723,12 @@ png_gamma_16bit_correct(png_const_structrp png_ptr, png_uint_32 value,
 #     endif
 
       /* Overflow. */
-      png_warning(png_ptr, "16-bit gamma overflow");
+      handled("16-bit gamma overflow");
       return 0;
    }
 
    return png_check_u16(png_ptr, value);
+   PNG_UNUSED(png_ptr) /* Only used in non-release builds */
 }
 
 #define PNG_GAMMA_TABLE_8       0 /* 8-bit entries in png_byte */

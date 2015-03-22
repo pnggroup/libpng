@@ -980,8 +980,8 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
  * The code always produces a message if it is possible, regardless of the
  * setting of PNG_ERROR_TEXT_SUPPORTED, except that in stable builds
  * PNG_ERROR_TEXT_SUPPORTED is honoured.  See pngpriv.h for the calculation of
- * the two control macros PNG_AFFIRM_ERROR (don't abort; stable build or rc) and
- * PNG_AFFIRM_TEXT (output text.)
+ * the two control macros PNG_RELEASE_BUILD (don't abort; stable build or rc)
+ * and PNG_AFFIRM_TEXT (output text.)
  */
 #if PNG_AFFIRM_TEXT
 #  ifdef PNG_HAVE_FORMAT_NUMBER
@@ -1028,9 +1028,94 @@ png_affirm_number(png_charp buffer, size_t bufsize, size_t pos,
 }
 #  define affirm_number(a,b,c,d,e) png_affirm_number(a,b,c,d)
 #endif /* !HAVE_FORMAT_NUMBER */
+
+#if PNG_RELEASE_BUILD
+#  define affirm_text(b, c, p)\
+      do {\
+         (affirm_text)(b, sizeof b, (p));\
+      } while (0)
+
+static void
+(affirm_text)(png_charp buffer, size_t bufsize, unsigned int position)
+#else
+#  define affirm_text(b, c, p)\
+      do {\
+         (affirm_text)(b, sizeof b, (c), (p));\
+      } while (0)
+
+static void
+(affirm_text)(png_charp buffer, size_t bufsize, png_const_charp condition,
+   unsigned int position)
+#endif
+{
+  /* Format the 'position' number and output:
+   *
+   *  "<file>, <line>: affirm 'condition' failed\n"
+   *  " libpng version <version> - <date>\n"
+   *  " translated __DATE__ __TIME__"
+   *
+   * In the STABLE versions the output is the same for the last two lines
+   * but the first line becomes:
+   *
+   *  "<position>: affirm failed"
+   *
+   * If there is no number formatting the numbers just get replaced by
+   * some binhex (see the utility above).
+   */
+  size_t pos = 0;
+
+# if PNG_RELEASE_BUILD /* no 'condition' parameter: minimal text */
+     pos = affirm_number(buffer, bufsize, pos, position, PNG_NUMBER_FORMAT_x);
+     pos = png_safecat(buffer, bufsize, pos, ": affirm failed");
+# else /* !STABLE */
+     /* Break down 'position' into a file name and a line number: */
+     {
+#        define PNG_apply(f) { #f "\0", PNG_SRC_FILE_ ## f },
+#        define PNG_end      { "", PNG_SRC_FILE_LAST }
+         static struct {
+             char         filename[28]; /* GCC checks this size */
+             unsigned int base;
+         } fileinfo[] = { PNG_FILES };
+#        undef PNG_apply
+#        undef PNG_end
+
+         unsigned int i;
+         png_const_charp filename;
+
+         /* Do 'nfiles' this way to avoid problems with g++ where it whines
+          * about (size_t) being larger than (int), even though this is a
+          * compile time constant:
+          */
+#        define nfiles ((sizeof fileinfo)/(sizeof (fileinfo[0])))
+         for (i=0; i < nfiles && position > fileinfo[i].base; ++i) {}
+
+         if (i == 0 || i > nfiles)
+             filename = "UNKNOWN";
+         else
+         {
+             filename = fileinfo[i-1].filename;
+             position -= fileinfo[i-1].base;
+         }
+#        undef nfiles
+
+         pos = png_safecat(buffer, bufsize, pos, filename);
+         pos = png_safecat(buffer, bufsize, pos, ".c, ");
+         pos = affirm_number(buffer, bufsize, pos, position,
+            PNG_NUMBER_FORMAT_u);
+     }
+
+     pos = png_safecat(buffer, bufsize, pos, ": affirm '");
+     pos = png_safecat(buffer, bufsize, pos, condition);
+     pos = png_safecat(buffer, bufsize, pos, "' failed\n");
+# endif /* !STABLE */
+
+  pos = png_safecat(buffer, bufsize, pos, PNG_HEADER_VERSION_STRING);
+  pos = png_safecat(buffer, bufsize, pos,
+     "  translated " __DATE__ " " __TIME__);
+}
 #endif /* AFFIRM_TEXT */
 
-#if PNG_AFFIRM_ERROR
+#if PNG_RELEASE_BUILD
 PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
         unsigned int position), PNG_NORETURN)
 #else
@@ -1039,74 +1124,12 @@ PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
 #endif
 {
 #  if PNG_AFFIRM_TEXT
-      /* Format the 'position' number and output:
-       *
-       *  " libpng version <version> - <date>\n"
-       *  "  translated __DATE__ __TIME__\n"
-       *  "  <file>, <line>: affirm 'condition' failed"
-       *
-       * In the STABLE versions the output is the same for the first two lines
-       * but the last line becomes:
-       *
-       *  "  <position>: affirm failed"
-       *
-       * If there is no number formatting the numbers just get replaced by
-       * some binhex (see the utility above).
-       */
-      size_t pos;
-      char   buffer[256];
+      char   buffer[512];
 
-      pos = png_safecat(buffer, sizeof buffer, 0, PNG_HEADER_VERSION_STRING);
-      pos = png_safecat(buffer, sizeof buffer, pos,
-         "  translated " __DATE__ " " __TIME__ "\n  ");
-#     if PNG_AFFIRM_ERROR /* no 'condition' parameter: minimal text */
-         pos = affirm_number(buffer, sizeof buffer, pos, position,
-            PNG_NUMBER_FORMAT_x);
-         pos = png_safecat(buffer, sizeof buffer, pos, ": affirm failed");
-#     else /* !STABLE */
-         /* Break down 'position' into a file name and a line number: */
-         {
-#            define PNG_apply(f) { #f "\0", PNG_SRC_FILE_ ## f },
-#            define PNG_end      { "", PNG_SRC_FILE_LAST }
-             static struct {
-                 char         filename[28]; /* GCC checks this size */
-                 unsigned int base;
-             } fileinfo[] = { PNG_FILES };
-#            undef PNG_apply
-#            undef PNG_end
-
-             unsigned int i;
-             png_const_charp filename;
-
-             /* Do 'nfiles' this way to avoid problems with g++ where it whines
-              * about (size_t) being larger than (int), even though this is a
-              * compile time constant:
-              */
-#            define nfiles ((sizeof fileinfo)/(sizeof (fileinfo[0])))
-             for (i=0; i < nfiles && position > fileinfo[i].base; ++i) {}
-
-             if (i == 0 || i > nfiles)
-                 filename = "UNKNOWN";
-             else
-             {
-                 filename = fileinfo[i-1].filename;
-                 position -= fileinfo[i-1].base;
-             }
-#            undef nfiles
-
-             pos = png_safecat(buffer, sizeof buffer, pos, filename);
-             pos = png_safecat(buffer, sizeof buffer, pos, ".c, ");
-             pos = affirm_number(buffer, sizeof buffer, pos, position,
-                PNG_NUMBER_FORMAT_u);
-         }
-
-         pos = png_safecat(buffer, sizeof buffer, pos, ": affirm '");
-         pos = png_safecat(buffer, sizeof buffer, pos, condition);
-         pos = png_safecat(buffer, sizeof buffer, pos, "' failed");
-#     endif /* !STABLE */
+      affirm_text(buffer, condition, position);
 #  else /* !AFFIRM_TEXT */
       PNG_UNUSED(position)
-#     if !PNG_AFFIRM_ERROR
+#     if !PNG_RELEASE_BUILD
          PNG_UNUSED(condition)
 #     endif
 #  endif /* AFFIRM_TEXT */
@@ -1114,29 +1137,27 @@ PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
    /* Now in STABLE do a png_error, but in other builds output the message
     * (if possible) then abort (PNG_ABORT).
     */
-#  if PNG_AFFIRM_ERROR
-      png_error(png_ptr, buffer/*only if ERROR_TEXT*/);
+#  if PNG_RELEASE_BUILD
+      png_error(png_ptr, buffer/*macro parameter used only if ERROR_TEXT*/);
 #  else /* !AFFIRM_ERROR */
-      /* Use the app warning message mechanism is possible, this is an inline
-       * expansion of png_warning without the extra formatting of the message
-       * that png_default_warning does and with the case !WARNINGS && CONSOLE_IO
-       * implemented.
+      /* Use console IO if possible; this is because there is no guarantee that
+       * the app 'warning' will output anything.  For certain the simplified
+       * API implementation just copies the message (truncated) to the image
+       * message buffer, which makes debugging much more difficult.
        *
        * Note that it is possible that neither WARNINGS nor CONSOLE_IO are
        * supported; in that case no text will be output (and PNG_AFFIRM_TEXT
        * will be false.)
        */
-#     ifdef PNG_WARNINGS_SUPPORTED
-         if (png_ptr != NULL && png_ptr->warning_fn != NULL)
-            png_ptr->warning_fn(png_constcast(png_structrp,png_ptr), buffer);
-#        ifdef PNG_CONSOLE_IO_SUPPORTED
-            else
-#        endif
-#     else
-         PNG_UNUSED(png_ptr)
-#     endif
 #     ifdef PNG_CONSOLE_IO_SUPPORTED
          fprintf(stderr, "%s\n", buffer);
+         PNG_UNUSED(png_ptr)
+#     elif defined PNG_WARNINGS_SUPPORTED
+         if (png_ptr != NULL && png_ptr->warning_fn != NULL)
+            png_ptr->warning_fn(png_constcast(png_structrp, png_ptr), buffer);
+         /* else no way to output the text */
+#     else
+         PNG_UNUSED(png_ptr)
 #     endif
 
       PNG_ABORT
@@ -1153,7 +1174,7 @@ png_char_affirm(png_const_structrp png_ptr, unsigned int position, int c)
    if (c >= CHAR_MIN && c <= CHAR_MAX)
        return (char)/*SAFE*/c;
 
-#  if PNG_AFFIRM_ERROR
+#  if PNG_RELEASE_BUILD
       /* testing in RC: no condition */
       png_affirm(png_ptr, position);
 #  else
@@ -1170,7 +1191,7 @@ png_byte_affirm(png_const_structrp png_ptr, unsigned int position, int b)
    if (b >= 0 && b <= 255)
        return (png_byte)/*SAFE*/b;
 
-#  if PNG_AFFIRM_ERROR
+#  if PNG_RELEASE_BUILD
       /* testing in RC: no condition */
       png_affirm(png_ptr, position);
 #  else
@@ -1186,7 +1207,7 @@ png_u16_affirm(png_const_structrp png_ptr, unsigned int position, int b)
    if (b >= 0 && b <= 65535)
        return (png_uint_16)/*SAFE*/b;
 
-#  if PNG_AFFIRM_ERROR
+#  if PNG_RELEASE_BUILD
       /* testing in RC: no condition */
       png_affirm(png_ptr, position);
 #  else
@@ -1194,5 +1215,32 @@ png_u16_affirm(png_const_structrp png_ptr, unsigned int position, int b)
 #  endif
 }
 #endif /* INT_MAX >= 65535 */
+
+void /* PRIVATE */
+png_handled_affirm(png_const_structrp png_ptr, png_const_charp message,
+   unsigned int position)
+{
+#  if PNG_RELEASE_BUILD
+      /* testing in RC: we want to return control to the caller, so do not
+       * use png_affirm.
+       */
+      char   buffer[512];
+
+      affirm_text(buffer, message, position);
+
+#     ifdef PNG_CONSOLE_IO_SUPPORTED
+         fprintf(stderr, "%s\n", buffer);
+#     elif defined PNG_WARNINGS_SUPPORTED
+         if (png_ptr != NULL && png_ptr->warning_fn != NULL)
+            png_ptr->warning_fn(png_constcast(png_structrp, png_ptr), buffer);
+         /* else no way to output the text */
+#     else
+         PNG_UNUSED(png_ptr)
+#     endif
+#  else
+      png_affirm(png_ptr, message, position);
+#  endif
+}
+
 #endif /* RANGE_CHECK */
 #endif /* READ || WRITE */

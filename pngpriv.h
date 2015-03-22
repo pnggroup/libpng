@@ -332,6 +332,15 @@
 #  define PNG_DLL_EXPORT
 #endif
 
+/* This is a global switch to set the compilation for an installed system
+ * (a release build).  It can be set for testing debug builds to ensure that
+ * they will compile when the build type is switched to RC or STABLE, the
+ * default is just to use PNG_LIBPNG_BUILD_BASE_TYPE.
+ */
+#ifndef PNG_RELEASE_BUILD
+#  define PNG_RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
+#endif
+
 /* The affirm mechanism results in a minimal png_error in released versions
  * ('STABLE' versions) and a more descriptive abort in all other cases.
  * The macros rely on the naming convention throughout this code - png_ptr
@@ -351,21 +360,20 @@
  *
  * The following works out the value for two numeric #defines:
  *
- *   PNG_AFFIRM_ERROR: Set to 1 if affirm should png_error (or png_err) rather
+ *  PNG_RELEASE_BUILD: Set to 1 if affirm should png_error (or png_err) rather
  *                     than abort.  The png_error text is the minimal (file
  *                     location) text in this case, if it is produced.  This
  *                     flag indicates a STABLE (or RC) build.
- *   PNG_AFFIRM_TEXT:  Set to 1 if affirm text should be produced, either the
- *                     minimal text or, if PNG_AFFIRM_ERROR is 0, the more
+ *  PNG_AFFIRM_TEXT:   Set to 1 if affirm text should be produced, either the
+ *                     minimal text or, if PNG_RELEASE_BUILD is 0, the more
  *                     verbose text including the 'condition' string.  This
  *                     value depends on whether the build supports an
- *                     appropriate way of outputing the message.
+ *                     appropriate way of outputting the message.
  *
- * Note that these are not configurable: this is just the affirm code, there's
+ * Note that these are not configurable: this is just the affirm code; there's
  * no reason to allow configuration of these options.
  */
-#define PNG_AFFIRM_ERROR (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
-#define PNG_AFFIRM_TEXT (PNG_AFFIRM_ERROR ?\
+#define PNG_AFFIRM_TEXT (PNG_RELEASE_BUILD ?\
          (defined PNG_ERROR_TEXT_SUPPORTED) :\
          (defined PNG_WARNINGS_SUPPORTED) || (defined PNG_CONSOLE_IO_SUPPORTED))
 
@@ -375,7 +383,7 @@
  * png_affirm function; these macros do not assume that the png_structp is
  * called png_ptr.
  */
-#if PNG_AFFIRM_ERROR
+#if PNG_RELEASE_BUILD
 #  define png_affirmpp(pp, cond)\
       do\
          if (!(cond)) png_affirm(pp, PNG_SRC_LINE);\
@@ -441,6 +449,53 @@
    PNG_apply(arm_filter_neon_intrinsics)\
    PNG_end
 
+/* GCC complains about assignments of an (int) expression to a (char) even when
+ * it can readily determine that the value is in range.  This makes arithmetic
+ * on (char) or (png_byte) values tedious.  The warning is not issued by
+ * default, but libpng coding rules require no warnings leading to excessive,
+ * ridiculous and dangerous expressions of the form:
+ *
+ *     <char> = (char)(expression & 0xff)
+ *
+ * They are dangerous because they hide the warning, which might actually be
+ * valid, and therefore merely enable introduction of undetected overflows when
+ * code is modified.
+ *
+ * The following macros exist to reliably detect any overflow in non-release
+ * builds.  The theory here is that we really want to know about overflows, not
+ * merely hide a basically flawed compiler warning by throwing unnecessary casts
+ * into the code.  The warnings disappear in RC builds so that the released
+ * (STABLE) version just assigns the value (with, possibly, a warning if someone
+ * turns on the -Wconversion GCC warning.)
+ *
+ * Doing it this way ensures that the code meets two very important aims:
+ *
+ * 1) Overflows are detected in pre-release tests; previously versions of libpng
+ *    have been released that really did have overflows in the RGB calculations.
+ * 2) In release builds GCC specific operations, which may reduce the ability
+ *    of other compilers and even GCC to optimize the code, are avoided.
+ *
+ * There is one important extra consequence for pre-release code; it is
+ * performing a lot of checks in pixel arithmetic that the release code won't
+ * perform.  As a consequence a build time option, RANGE_CHECK, is provided
+ * to allow the checks to be turned off in pre-release when building for
+ * performance testing.  This is a standard "_SUPPORTED" option except that it
+ * cannot be set in the system configuration (pnglibconf.h, pnglibconf.dfa).
+ *
+ * A separate macro PNG_BYTE() is provided to safely convert an unsigned value
+ * to the PNG byte range 0..255.  This handles the fact that, technically,
+ * an ANSI-C (unsigned char), hence a (png_byte), may be able to store values
+ * outside this range.  Note that if you are building on a system where this is
+ * true libpng is almost certainly going to produce errors; it has never been
+ * tested on such a system.  For the moment pngconf.h ensures that this will
+ * not happen.
+ */
+#if !PNG_RELEASE_BUILD
+#  ifndef PNG_NO_RANGE_CHECK /* Turn off even in pre-release */
+#     define PNG_RANGE_CHECK_SUPPORTED
+#  endif
+#endif
+
 /* SECURITY and SAFETY:
  *
  * libpng is built with support for internal limits on image dimensions and
@@ -471,6 +526,15 @@
  * semicolon.
  */
 #  define PNG_UNUSED(param) (void)param;
+#endif
+
+/* This is a convenience for parameters which are not used in release
+ * builds.
+ */
+#if PNG_RELEASE_BUILD
+#  define PNG_UNUSEDRC(param) (void)param;
+#else
+#  define PNG_UNUSEDRC(param)
 #endif
 
 /* Just a little check that someone hasn't tried to define something
@@ -505,6 +569,7 @@
  */
 #ifdef __cplusplus
 #  define png_voidcast(type, value) static_cast<type>(value)
+#  define png_upcast(type, value) static_cast<type>(value)
 #  define png_constcast(type, value) const_cast<type>(value)
 #  define png_aligncast(type, value) \
    static_cast<type>(static_cast<void*>(value))
@@ -512,6 +577,7 @@
    static_cast<type>(static_cast<const void*>(value))
 #else
 #  define png_voidcast(type, value) (value)
+#  define png_upcast(type, value) ((type)(value))
 #  define png_constcast(type, value) ((type)(value))
 #  define png_aligncast(type, value) ((void*)(value))
 #  define png_aligncastconst(type, value) ((const void*)(value))
@@ -693,8 +759,9 @@
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* See below for the definitions of the tables used in these macros */
-#define PNG_sRGB_FROM_LINEAR(linear) ((png_byte)((png_sRGB_base[(linear)>>15] +\
-   ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8))
+#define PNG_sRGB_FROM_LINEAR(pp, linear) png_check_byte(pp,\
+   (png_sRGB_base[(linear)>>15] +\
+    ((((linear)&0x7fff)*png_sRGB_delta[(linear)>>15])>>12)) >> 8)
    /* Given a value 'linear' in the range 0..255*65535 calculate the 8-bit sRGB
     * encoded value with maximum error 0.646365.  Note that the input is not a
     * 16-bit value; it has been multiplied by 255! */
@@ -826,13 +893,71 @@ extern "C" {
  * All of these functions must be declared with PNG_INTERNAL_FUNCTION.
  */
 /* Assert handling */
-#if PNG_AFFIRM_ERROR
+#if PNG_RELEASE_BUILD
 PNG_INTERNAL_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
       unsigned int position), PNG_NORETURN);
 #else
 PNG_INTERNAL_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
       png_const_charp condition, unsigned int position), PNG_NORETURN);
 #endif
+
+/* Character/byte range checking. */
+#ifdef PNG_RANGE_CHECK_SUPPORTED
+PNG_INTERNAL_FUNCTION(char, png_char_affirm,(png_const_structrp png_ptr,
+      unsigned int position, int c), PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(png_byte, png_byte_affirm,(png_const_structrp png_ptr,
+      unsigned int position, int b), PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void, png_handled_affirm,(png_const_structrp png_ptr,
+      png_const_charp message, unsigned int position), PNG_EMPTY);
+   /* This is not marked PNG_NORETURN because in PNG_RELEASE_BUILD it will
+    * disappear and control will pass through it.
+    */
+
+#if INT_MAX >= 65535
+PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
+      unsigned int position, int u), PNG_EMPTY);
+#  define png_check_u16(pp, u) (png_u16_affirm((pp), PNG_SRC_LINE, (u)))
+#else
+   /* (int) cannot hold a (png_uint_16) so the above function just won't
+    * compile correctly, for the moment just do this:
+    */
+#  define png_check_u16(pp, u) (u)
+#endif
+
+#  define png_check_char(pp, c) (png_char_affirm((pp), PNG_SRC_LINE, (c)))
+#  define png_check_byte(pp, b) (png_byte_affirm((pp), PNG_SRC_LINE, (b)))
+#  define PNG_BYTE(b) ((png_byte)((b) & 0xff))
+#  define png_handled(pp, m)   (png_handled_affirm((pp), (m), PNG_SRC_LINE))
+#elif !(defined PNG_REMOVE_CASTS)
+#  define png_check_char(pp, c) ((char)(c))
+#  define png_check_byte(pp, b) ((png_byte)(b))
+#  define png_check_u16(pp, u)  ((png_uint_16)(u))
+#  define png_handled(pp, m)   ((void)0)
+#  define PNG_BYTE(b) ((png_byte)((b) & 0xff))
+#else
+   /* This is somewhat trust-me-it-works: if PNG_REMOVE_CASTS is defined then
+    * the casts, which might otherwise change the values, are completely
+    * removed.  Use this to test your compiler to see if it makes *any*
+    * difference (code size or speed.)  Currently NOT SUPPORTED.
+    *
+    * It also makes the png_byte macro not do anything either (fine if UCHAR_MAX
+    * is exactly 255.)
+    */
+#  define png_check_char(pp, c) (c)
+#  define png_check_byte(pp, b) (b)
+#  define png_check_u16(pp, u)  (u)
+#  define png_handled(pp, m)   ((void)0)
+#  define PNG_BYTE(b) (b)
+#endif
+
+/* Utility macro to mark a handled error condition ; when control reaches this
+ * there has been an arithmetic overflow but it is being handled.  Use the
+ * png_check_ macros above where control should leave the code for
+ * safety/security reasons.
+ */
+#define handled(m) png_handled(png_ptr, (m))
 
 /* Zlib support */
 #define PNG_UNEXPECTED_ZLIB_RETURN (-7)
@@ -1821,12 +1946,12 @@ PNG_INTERNAL_FUNCTION(int,png_gamma_significant,(png_fixed_point gamma_value),
  * While the input is an 'unsigned' value it must actually be the
  * correct bit value - 0..255 or 0..65535 as required.
  */
-PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_correct,(png_structrp png_ptr,
-   unsigned int value, png_fixed_point gamma_value),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_16bit_correct,(unsigned int value,
-   png_fixed_point gamma_value),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(png_byte,png_gamma_8bit_correct,(unsigned int value,
-   png_fixed_point gamma_value),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_16bit_correct,(
+   png_const_structrp png_ptr, png_uint_32 value, png_fixed_point gamma_value),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(png_byte,png_gamma_8bit_correct,(
+   png_const_structrp png_ptr, png_uint_32 value, png_fixed_point gamma_value),
+   PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_destroy_gamma_table,(png_structrp png_ptr),
    PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_build_gamma_tables,(png_structrp png_ptr,
