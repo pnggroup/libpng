@@ -2357,7 +2357,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row,
                if (++channel >= channels)
                   channel = 0;
                *bp++ = (png_byte)(value >> 8);
-               *bp++ = (png_byte)(value & 0xff);
+               *bp++ = (png_byte)value;
             }
             break;
          }
@@ -2662,9 +2662,9 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
    png_uint_32 row_width = row_info->width;
 
 #ifdef PNG_READ_16BIT_SUPPORTED
-   png_byte hi_filler = (png_byte)((filler>>8) & 0xff);
+   png_byte hi_filler = (png_byte)(filler>>8);
 #endif
-   png_byte lo_filler = (png_byte)(filler & 0xff);
+   png_byte lo_filler = (png_byte)filler;
 
    png_debug(1, "in png_do_read_filler");
 
@@ -3105,16 +3105,16 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
 
                else
                {
-                  png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red&0xff)
+                  png_uint_16 red_1   = png_ptr->gamma_16_to_1[(red & 0xff)
                       >> png_ptr->gamma_shift][red>>8];
                   png_uint_16 green_1 =
-                      png_ptr->gamma_16_to_1[(green&0xff) >>
+                      png_ptr->gamma_16_to_1[(green & 0xff) >>
                       png_ptr->gamma_shift][green>>8];
-                  png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue&0xff)
+                  png_uint_16 blue_1  = png_ptr->gamma_16_to_1[(blue & 0xff)
                       >> png_ptr->gamma_shift][blue>>8];
                   png_uint_16 gray16  = (png_uint_16)((rc*red_1 + gc*green_1
                       + bc*blue_1 + 16384)>>15);
-                  w = png_ptr->gamma_16_from_1[(gray16&0xff) >>
+                  w = png_ptr->gamma_16_from_1[(gray16 & 0xff) >>
                       png_ptr->gamma_shift][gray16 >> 8];
                   rgb_error |= 1;
                }
@@ -3669,7 +3669,8 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if (optimize != 0)
                            w = v;
                         else
-                           w = gamma_16_from_1[(v&0xff) >> gamma_shift][v >> 8];
+                           w = gamma_16_from_1[(v & 0xff) >>
+                               gamma_shift][v >> 8];
                         *sp = (png_byte)((w >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(w & 0xff);
                      }
@@ -3833,7 +3834,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 1) >> gamma_shift][*sp];
                         png_composite_16(w, v, a, png_ptr->background_1.red);
                         if (optimize == 0)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
+                           w = gamma_16_from_1[((w & 0xff) >> gamma_shift)][w >>
                                 8];
                         *sp = (png_byte)((w >> 8) & 0xff);
                         *(sp + 1) = (png_byte)(w & 0xff);
@@ -3841,7 +3842,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 3) >> gamma_shift][*(sp + 2)];
                         png_composite_16(w, v, a, png_ptr->background_1.green);
                         if (optimize == 0)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
+                           w = gamma_16_from_1[((w & 0xff) >> gamma_shift)][w >>
                                 8];
 
                         *(sp + 2) = (png_byte)((w >> 8) & 0xff);
@@ -3850,7 +3851,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         v = gamma_16_to_1[*(sp + 5) >> gamma_shift][*(sp + 4)];
                         png_composite_16(w, v, a, png_ptr->background_1.blue);
                         if (optimize == 0)
-                           w = gamma_16_from_1[((w&0xff) >> gamma_shift)][w >>
+                           w = gamma_16_from_1[((w & 0xff) >> gamma_shift)][w >>
                                 8];
 
                         *(sp + 4) = (png_byte)((w >> 8) & 0xff);

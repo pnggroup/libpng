@@ -766,13 +766,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.17rc06 - March 21, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.17rc06 - March 23, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.17rc06 - March 21, 2015\
+      return "libpng version 1.6.17rc06 - March 23, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -3034,7 +3034,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
             /* Check for an exponent, if we don't need one we are
              * done and just need to terminate the string.  At
              * this point exp_b10==(-1) is effectively if flag - it got
-             * to '-1' because of the decrement after outputing
+             * to '-1' because of the decrement after outputting
              * the decimal point above (the exponent required is
              * *not* -1!)
              */
@@ -3042,7 +3042,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
             {
                /* The following only happens if we didn't output the
                 * leading zeros above for negative exponent, so this
-                * doest add to the digit requirement.  Note that the
+                * doesn't add to the digit requirement.  Note that the
                 * two zeros here can only be output if the two leading
                 * zeros were *not* output, so this doesn't increase
                 * the output count.
