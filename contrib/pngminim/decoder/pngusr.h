@@ -18,6 +18,7 @@
  * affect the API (so are not recorded in pnglibconf.h)
  */
 
+#define PNG_RELEASE_BUILD 1
 #define PNG_ALIGN_TYPE PNG_ALIGN_NONE
 
 #endif /* MINRDPNGCONF_H */

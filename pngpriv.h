@@ -338,7 +338,7 @@
  * default is just to use PNG_LIBPNG_BUILD_BASE_TYPE.  Set this in CPPFLAGS
  * with either:
  *
- *   -DPNG_RELEASE_BUILD   Turns on the release compile path
+ *   -DPNG_RELEASE_BUILD=1 Turns on the release compile path
  *   -DPNG_RELEASE_BUILD=0 Turns it off
  */
 #ifndef PNG_RELEASE_BUILD
