@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta58 - March 22, 2015
+ libpng version 1.7.0beta58 - March 23, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta58 - March 22, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta58 - March 23, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5166,9 +5166,10 @@ The 8-bit compose and rgb_to_grayscale operations were made more accurate.
 While these did not introduce API incompatibility, there may be differences
 in unit test results.
 
-Internal "affirm()" and "impossible()" macros were added. These are
-similar to the ANSI-C "assert()" macro but they are not affected by NDEBUG,
-and they are private and not visible to or usable by libpng applications.
+Internal "affirm()" and "impossible()" macros were added, along with
+some internal supporting macros and functions. These are similar to the
+ANSI-C "assert()" macro but they are not affected by NDEBUG, and they are
+private (not visible to nor usable by libpng applications).
 
 XIV.  Detecting libpng
 
@@ -5340,7 +5341,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-March 22, 2015
+March 23, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
