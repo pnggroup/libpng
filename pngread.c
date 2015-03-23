@@ -1823,6 +1823,7 @@ png_create_colormap_entry(png_image_read_control *display,
             y = (y + 128) >> 8;
             y *= 255;
             y = PNG_sRGB_FROM_LINEAR((y + 64) >> 7);
+            alpha = PNG_DIV257(alpha);
             encoding = P_sRGB;
          }
 

@@ -5193,8 +5193,14 @@ Version 1.6.17rc05 [March 21, 2015]
   Reverted "& 0xff" additions of version 1.6.17beta01. Libpng passes
     the Coverity scan without them.
 
-Version 1.6.17rc06 [March 21, 2015]
+Version 1.6.17rc06 [March 23, 2015]
   Remove pnglibconf.dfn and pnglibconf.pre with "make clean".
+  Reformatted some "&0xff" instances to "& 0xff".
+  Fixed simplified 8-bit-linear to sRGB alpha. The calculated alpha
+    value was wrong.  It's not clear if this affected the final stored
+    value; in the obvious code path the upper and lower 8-bits of the
+    alpha value were identical and the alpha was truncated to 8-bits
+    rather than dividing by 257 (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
