@@ -911,7 +911,7 @@ extern "C" {
  *
  * All of these functions must be declared with PNG_INTERNAL_FUNCTION.
  */
-/* Assert handling */
+/* Affirm handling */
 PNG_INTERNAL_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
     param_deb(png_const_charp condition) unsigned int position), PNG_NORETURN);
 

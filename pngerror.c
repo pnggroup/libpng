@@ -1151,7 +1151,7 @@ PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
 }
 
 #ifdef PNG_RANGE_CHECK_SUPPORTED
-/* The character/byte checking APIs. These do their own calls to png_assert
+/* The character/byte checking APIs. These do their own calls to png_affirm
  * because the caller provides the position.
  */
 char /* PRIVATE */

@@ -5848,8 +5848,9 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    /* If png_set_filler is in action then fake the output color type to include
     * an alpha channel where appropriate.
     */
-   if (dp->output_bit_depth >= 8 && (dp->output_colour_type == PNG_COLOR_TYPE_RGB ||
-       dp->output_colour_type == PNG_COLOR_TYPE_GRAY) && dp->this.filler)
+   if (dp->output_bit_depth >= 8 &&
+       (dp->output_colour_type == PNG_COLOR_TYPE_RGB ||
+        dp->output_colour_type == PNG_COLOR_TYPE_GRAY) && dp->this.filler)
        dp->output_colour_type |= 4;
 
    /* Validate the combination of colour type and bit depth that we are getting
