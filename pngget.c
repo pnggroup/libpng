@@ -366,14 +366,25 @@ png_get_y_pixels_per_inch(png_const_structrp png_ptr, png_const_inforp info_ptr)
 
 #ifdef PNG_FIXED_POINT_SUPPORTED
 static png_fixed_point
-png_fixed_inches_from_microns(png_const_structrp png_ptr, png_int_32 microns)
+png_fixed_inches_from_microns(png_const_structrp png_ptr,
+   png_int_32 microns)
 {
    /* Convert from metres * 1,000,000 to inches * 100,000, meters to
     * inches is simply *(100/2.54), so we want *(10/2.54) == 500/127.
     * Notice that this can overflow - a warning is output and 0 is
     * returned.
     */
-   return png_muldiv_warn(png_ptr, microns, 500, 127);
+   png_fixed_point result;
+
+   if (png_muldiv(&result, microns, 500, 127) != 0)
+      return result;
+
+   /* TODO: review this, png_error might be better. */
+   png_warning(png_ptr, "inch to microns overflow");
+   return 0;
+#  ifndef PNG_WARNINGS_SUPPORTED
+      PNG_UNUSED(png_ptr)
+#  endif
 }
 
 png_fixed_point PNGAPI
@@ -383,9 +394,7 @@ png_get_x_offset_inches_fixed(png_const_structrp png_ptr,
    return png_fixed_inches_from_microns(png_ptr,
        png_get_x_offset_microns(png_ptr, info_ptr));
 }
-#endif
 
-#ifdef PNG_FIXED_POINT_SUPPORTED
 png_fixed_point PNGAPI
 png_get_y_offset_inches_fixed(png_const_structrp png_ptr,
     png_const_inforp info_ptr)
@@ -393,7 +402,7 @@ png_get_y_offset_inches_fixed(png_const_structrp png_ptr,
    return png_fixed_inches_from_microns(png_ptr,
        png_get_y_offset_microns(png_ptr, info_ptr));
 }
-#endif
+#endif /* FIXED_POINT */
 
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 float PNGAPI

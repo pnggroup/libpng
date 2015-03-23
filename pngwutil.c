@@ -957,7 +957,7 @@ png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
       return;
    }
 
-   png_ptr->num_palette = (png_uint_16)num_pal;
+   png_ptr->num_palette = png_check_u16(png_ptr, num_pal);
    png_debug1(3, "num_palette = %d", png_ptr->num_palette);
 
    png_write_chunk_header(png_ptr, png_PLTE, (png_uint_32)(num_pal * 3));

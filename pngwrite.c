@@ -461,7 +461,7 @@ png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
 {
    png_debug(1, "in png_convert_from_struct_tm");
 
-   ptime->year = (png_uint_16)(1900 + ttime->tm_year);
+   ptime->year = png_check_u16(0/*TODO: fixme*/, 1900 + ttime->tm_year);
    ptime->month = png_check_byte(0/*TODO: fixme*/, ttime->tm_mon + 1);
    ptime->day = png_check_byte(0/*TODO: fixme*/, ttime->tm_mday);
    ptime->hour = png_check_byte(0/*TODO: fixme*/, ttime->tm_hour);
@@ -1231,6 +1231,20 @@ png_init_filter_heuristics(png_structrp png_ptr, int heuristic_method,
 
 /* Provide floating and fixed point APIs */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
+static png_uint_16
+u16_from_fp(png_const_structrp png_ptr, int position, double fp)
+{
+    /* Utility: given a double make sure it fits into a PNG 16-bit unsigned
+     * value.
+     */
+    if (fp >= 0 && fp < 65536)
+        return (png_uint_16)/*SAFE*/fp;
+
+    png_affirm(png_ptr, param_deb("fp to u16 overflow") position);
+}
+
+#define u16_from_fp(pp, fp) (u16_from_fp((pp), PNG_SRC_LINE, (fp)))
+
 void PNGAPI
 png_set_filter_heuristics(png_structrp png_ptr, int heuristic_method,
     int num_weights, png_const_doublep filter_weights,
@@ -1259,10 +1273,10 @@ png_set_filter_heuristics(png_structrp png_ptr, int heuristic_method,
          else
          {
             png_ptr->inv_filter_weights[i] =
-                (png_uint_16)(PNG_WEIGHT_FACTOR*filter_weights[i]+.5);
+                u16_from_fp(png_ptr, PNG_WEIGHT_FACTOR*filter_weights[i]+.5);
 
             png_ptr->filter_weights[i] =
-                (png_uint_16)(PNG_WEIGHT_FACTOR/filter_weights[i]+.5);
+                u16_from_fp(png_ptr, PNG_WEIGHT_FACTOR/filter_weights[i]+.5);
          }
       }
 
@@ -1276,10 +1290,10 @@ png_set_filter_heuristics(png_structrp png_ptr, int heuristic_method,
       for (i = 0; i < PNG_FILTER_VALUE_LAST; i++) if (filter_costs[i] >= 1.0)
       {
          png_ptr->inv_filter_costs[i] =
-             (png_uint_16)(PNG_COST_FACTOR / filter_costs[i] + .5);
+             u16_from_fp(png_ptr, PNG_COST_FACTOR / filter_costs[i] + .5);
 
          png_ptr->filter_costs[i] =
-             (png_uint_16)(PNG_COST_FACTOR * filter_costs[i] + .5);
+             u16_from_fp(png_ptr, PNG_COST_FACTOR * filter_costs[i] + .5);
       }
    }
 }
@@ -1313,11 +1327,12 @@ png_set_filter_heuristics_fixed(png_structrp png_ptr, int heuristic_method,
 
          else
          {
-            png_ptr->inv_filter_weights[i] = (png_uint_16)
-               ((PNG_WEIGHT_FACTOR*filter_weights[i]+PNG_FP_HALF)/PNG_FP_1);
+            png_ptr->inv_filter_weights[i] = png_check_u16(png_ptr,
+               (PNG_WEIGHT_FACTOR*filter_weights[i]+PNG_FP_HALF)/PNG_FP_1);
 
-            png_ptr->filter_weights[i] = (png_uint_16)((PNG_WEIGHT_FACTOR*
-               PNG_FP_1+(filter_weights[i]/2))/filter_weights[i]);
+            png_ptr->filter_weights[i] = png_check_u16(png_ptr,
+               (PNG_WEIGHT_FACTOR*PNG_FP_1+(filter_weights[i]/2))/
+                  filter_weights[i]);
          }
       }
 
@@ -1340,12 +1355,12 @@ png_set_filter_heuristics_fixed(png_structrp png_ptr, int heuristic_method,
          tmp = PNG_COST_FACTOR*PNG_FP_1 + (filter_costs[i]/2);
          tmp /= filter_costs[i];
 
-         png_ptr->inv_filter_costs[i] = (png_uint_16)tmp;
+         png_ptr->inv_filter_costs[i] = png_check_u16(png_ptr, tmp);
 
          tmp = PNG_COST_FACTOR * filter_costs[i] + PNG_FP_HALF;
          tmp /= PNG_FP_1;
 
-         png_ptr->filter_costs[i] = (png_uint_16)tmp;
+         png_ptr->filter_costs[i] = png_check_u16(png_ptr, tmp);
       }
    }
 }
@@ -1803,7 +1818,7 @@ png_write_image_16bit(png_voidp argument)
             {
                png_uint_32 calc = component * reciprocal;
                calc += 16384; /* round to nearest */
-               component = (png_uint_16)(calc >> 15);
+               component = png_check_u16(png_ptr, calc >> 15);
             }
 
             *out_ptr++ = component;

@@ -1029,28 +1029,13 @@ png_affirm_number(png_charp buffer, size_t bufsize, size_t pos,
 #  define affirm_number(a,b,c,d,e) png_affirm_number(a,b,c,d)
 #endif /* !HAVE_FORMAT_NUMBER */
 
-#if PNG_RELEASE_BUILD
-#  define affirm_text(b, c, p)\
-      do {\
-         (affirm_text)(b, sizeof b, (p));\
-      } while (0)
-
 static void
-(affirm_text)(png_charp buffer, size_t bufsize, unsigned int position)
-#else
-#  define affirm_text(b, c, p)\
-      do {\
-         (affirm_text)(b, sizeof b, (c), (p));\
-      } while (0)
-
-static void
-(affirm_text)(png_charp buffer, size_t bufsize, png_const_charp condition,
-   unsigned int position)
-#endif
+affirm_text(png_charp buffer, size_t bufsize,
+   param_deb(png_const_charp condition) unsigned int position)
 {
   /* Format the 'position' number and output:
    *
-   *  "<file>, <line>: affirm 'condition' failed\n"
+   *  "<file> <line>: affirm 'condition' failed\n"
    *  " libpng version <version> - <date>\n"
    *  " translated __DATE__ __TIME__"
    *
@@ -1099,7 +1084,7 @@ static void
 #        undef nfiles
 
          pos = png_safecat(buffer, bufsize, pos, filename);
-         pos = png_safecat(buffer, bufsize, pos, ".c, ");
+         pos = png_safecat(buffer, bufsize, pos, ".c ");
          pos = affirm_number(buffer, bufsize, pos, position,
             PNG_NUMBER_FORMAT_u);
      }
@@ -1111,17 +1096,18 @@ static void
 
   pos = png_safecat(buffer, bufsize, pos, PNG_HEADER_VERSION_STRING);
   pos = png_safecat(buffer, bufsize, pos,
-     "  translated " __DATE__ " " __TIME__);
+     " translated " __DATE__ " " __TIME__);
 }
+
+#define affirm_text(b, c, p)\
+   do {\
+      (affirm_text)(b, sizeof b, param_deb(c) (p));\
+   } while (0)
+
 #endif /* AFFIRM_TEXT */
 
-#if PNG_RELEASE_BUILD
 PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
-        unsigned int position), PNG_NORETURN)
-#else
-PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
-        png_const_charp condition, unsigned int position), PNG_NORETURN)
-#endif
+   param_deb(png_const_charp condition) unsigned int position), PNG_NORETURN)
 {
 #  if PNG_AFFIRM_TEXT
       char   buffer[512];
@@ -1165,7 +1151,7 @@ PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
 }
 
 #ifdef PNG_RANGE_CHECK_SUPPORTED
-/* The character/byte checking APIs, these do their own calls to png_assert
+/* The character/byte checking APIs. These do their own calls to png_assert
  * because the caller provides the position.
  */
 char /* PRIVATE */
@@ -1174,12 +1160,7 @@ png_char_affirm(png_const_structrp png_ptr, unsigned int position, int c)
    if (c >= CHAR_MIN && c <= CHAR_MAX)
        return (char)/*SAFE*/c;
 
-#  if PNG_RELEASE_BUILD
-      /* testing in RC: no condition */
-      png_affirm(png_ptr, position);
-#  else
-      png_affirm(png_ptr, "(char) range", position);
-#  endif
+   png_affirm(png_ptr, param_deb("(char) range") position);
 }
 
 png_byte /* PRIVATE */
@@ -1191,12 +1172,7 @@ png_byte_affirm(png_const_structrp png_ptr, unsigned int position, int b)
    if (b >= 0 && b <= 255)
        return (png_byte)/*SAFE*/b;
 
-#  if PNG_RELEASE_BUILD
-      /* testing in RC: no condition */
-      png_affirm(png_ptr, position);
-#  else
-      png_affirm(png_ptr, "PNG byte range", position);
-#  endif
+   png_affirm(png_ptr, param_deb("PNG byte range") position);
 }
 
 #if INT_MAX >= 65535
@@ -1207,12 +1183,7 @@ png_u16_affirm(png_const_structrp png_ptr, unsigned int position, int b)
    if (b >= 0 && b <= 65535)
        return (png_uint_16)/*SAFE*/b;
 
-#  if PNG_RELEASE_BUILD
-      /* testing in RC: no condition */
-      png_affirm(png_ptr, position);
-#  else
-      png_affirm(png_ptr, "PNG 16-bit range", position);
-#  endif
+   png_affirm(png_ptr, param_deb("PNG 16-bit range") position);
 }
 #endif /* INT_MAX >= 65535 */
 

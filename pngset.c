@@ -563,7 +563,8 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
    if (num_palette > 0)
       memcpy(png_ptr->palette, palette, num_palette * (sizeof (png_color)));
    info_ptr->palette = png_ptr->palette;
-   info_ptr->num_palette = png_ptr->num_palette = (png_uint_16)num_palette;
+   info_ptr->num_palette = png_ptr->num_palette =
+      png_check_u16(png_ptr, num_palette);
 
    info_ptr->free_me |= PNG_FREE_PLTE;
 
@@ -988,7 +989,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
          memcpy(info_ptr->trans_alpha, trans_alpha,
             (unsigned)/*SAFE*/num_trans);
          info_ptr->valid |= PNG_INFO_tRNS;
-         info_ptr->num_trans = (png_uint_16)num_trans; /* SAFE */
+         info_ptr->num_trans = png_check_u16(png_ptr, num_trans);
       }
    }
 

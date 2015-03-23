@@ -5047,7 +5047,7 @@ Version 1.7.0beta57 [March 16, 2015]
     in libpng-1.6.17beta01 (John Bowler).
   Revert change to png_default_read_data() made in libpng-1.7.0beta55.
 
-Version 1.7.0beta58 [March 22, 2015]
+Version 1.7.0beta58 [March 23, 2015]
   Implemented affirm() support and usage.
   Remove pnglibconf.dfn and pnglibconf.pre with "make clean".
   Added byte, short and other overflow checking
@@ -5062,6 +5062,12 @@ Version 1.7.0beta58 [March 22, 2015]
     macros/affirm functions so that beta builds will abort on overflow and
     release builds will quietly ignore it.  This avoids release builds
     producing warnings that are of no use to end users.
+  Check (png_uint_16) casts for overflow. Also removed png_muldiv_warn,
+    added RELEASE/!RELEASE convenience macros. png_muldiv_warn was used in
+    only one place, and the overflow condition is a genuine warning not
+    an internal error.  Four macros allow code or function parameters to be
+    condition on RELEASE (or not) builds and tidy up the #ifdef handling of
+    functions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

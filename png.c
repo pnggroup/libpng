@@ -689,13 +689,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta58 - March 22, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta58 - March 23, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta58 - March 22, 2015\
+      return "libpng version 1.7.0beta58 - March 23, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1798,7 +1798,7 @@ png_colorspace_set_sRGB(png_const_structrp png_ptr, png_colorspacerp colorspace,
       2/*from sRGB*/);
 
    /* intent: bugs in GCC force 'int' to be used as the parameter type. */
-   colorspace->rendering_intent = (png_uint_16)intent;
+   colorspace->rendering_intent = png_check_u16(png_ptr, intent);
    colorspace->flags |= PNG_COLORSPACE_HAVE_INTENT;
 
    /* endpoints */
@@ -2342,8 +2342,8 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 
          else
          {
-            png_ptr->rgb_to_gray_red_coeff   = (png_uint_16)r;
-            png_ptr->rgb_to_gray_green_coeff = (png_uint_16)g;
+            png_ptr->rgb_to_gray_red_coeff   = png_check_u16(png_ptr, r);
+            png_ptr->rgb_to_gray_green_coeff = png_check_u16(png_ptr, g);
          }
       }
 
@@ -3259,25 +3259,6 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 }
 #endif /* READ_GAMMA || INCH_CONVERSIONS */
 
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
-/* The following is for when the caller doesn't much care about the
- * result.
- */
-png_fixed_point
-png_muldiv_warn(png_const_structrp png_ptr, png_fixed_point a, png_int_32 times,
-    png_int_32 divisor)
-{
-   png_fixed_point result;
-
-   if (png_muldiv(&result, a, times, divisor) != 0)
-      return result;
-
-   handled("fixed point overflow");
-   return 0;
-   PNG_UNUSED(png_ptr) /* Only used in non-release builds */
-}
-#endif
-
 #ifdef PNG_GAMMA_SUPPORTED /* more fixed point functions for gamma */
 /* Calculate a reciprocal, return 0 on div-by-zero or overflow. */
 png_fixed_point
@@ -3642,8 +3623,8 @@ png_exp16bit(png_const_structrp png_ptr, png_fixed_point lg2)
 
    /* Convert the 32-bit value to 0..65535 by multiplying by 65536-1: */
    x -= x >> 16;
-   return (png_uint_16)((x + 32767U) >> 16);
-   PNG_UNUSED(png_ptr)
+   return png_check_u16(png_ptr, (x + 32767U) >> 16);
+   PNG_UNUSEDRC(png_ptr)
 }
 #endif /* FLOATING_ARITHMETIC */
 
@@ -3811,7 +3792,7 @@ write_gamma_table(png_const_structrp png_ptr, const gamma_table_data *data,
             png_uint_16p table16 = png_voidcast(png_uint_16p, data->table);
 
             while (++lo < hi)
-               table16[lo] = (png_uint_16)loval;
+               table16[lo] = png_check_u16(png_ptr, loval);
          }
       }
 

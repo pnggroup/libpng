@@ -1812,7 +1812,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       }
 
       png_crc_read(png_ptr, readbuf, length);
-      png_ptr->num_trans = (png_uint_16)length;
+      png_ptr->num_trans = png_check_u16(png_ptr, length);
    }
 
    else
@@ -1907,9 +1907,11 @@ png_handle_bKGD(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
             return;
          }
 
-         background.red = (png_uint_16)png_ptr->palette[buf[0]].red;
-         background.green = (png_uint_16)png_ptr->palette[buf[0]].green;
-         background.blue = (png_uint_16)png_ptr->palette[buf[0]].blue;
+         background.red = png_check_u16(png_ptr, png_ptr->palette[buf[0]].red);
+         background.green =
+            png_check_u16(png_ptr, png_ptr->palette[buf[0]].green);
+         background.blue =
+            png_check_u16(png_ptr, png_ptr->palette[buf[0]].blue);
       }
 
       else

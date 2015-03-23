@@ -335,10 +335,30 @@
 /* This is a global switch to set the compilation for an installed system
  * (a release build).  It can be set for testing debug builds to ensure that
  * they will compile when the build type is switched to RC or STABLE, the
- * default is just to use PNG_LIBPNG_BUILD_BASE_TYPE.
+ * default is just to use PNG_LIBPNG_BUILD_BASE_TYPE.  Set this in CPPFLAGS
+ * with either:
+ *
+ *   -DPNG_RELEASE_BUILD   Turns on the release compile path
+ *   -DPNG_RELEASE_BUILD=0 Turns it off
  */
 #ifndef PNG_RELEASE_BUILD
 #  define PNG_RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
+#endif
+
+/* General purpose macros avoid the need to out #if PNG_RELEASE_BUILD
+ * macro blocks around function declarations and definitions when the
+ * parameter number varies.  Using these results in slightly cleaner code.
+ */
+#if PNG_RELEASE_BUILD
+#  define only_rel(text) text
+#  define only_deb(text)
+#  define param_rel(param) param,
+#  define param_deb(param)
+#else
+#  define only_rel(text)
+#  define only_deb(text) text
+#  define param_rel(param)
+#  define param_deb(param) param,
 #endif
 
 /* The affirm mechanism results in a minimal png_error in released versions
@@ -354,8 +374,8 @@
  *
  * PNG_SRC_LINE is the position of the affirm macro.  There are currently 15
  * main source files (4 bits) and the biggest (pngrtran.c) has more than 4095
- * lines (12 bits), but to ensure the number will fit into 16-bits in the
- * future and to allow hardware files to use affirm the encoding is a bit-wise
+ * lines (12 bits).  However, to ensure the number will fit into 16-bits in the
+ * future and to allow hardware files to use affirm, the encoding is a bit-wise
  * encoding based on the current number of lines.
  *
  * The following works out the value for two numeric #defines:
@@ -489,6 +509,9 @@
  * true libpng is almost certainly going to produce errors; it has never been
  * tested on such a system.  For the moment pngconf.h ensures that this will
  * not happen.
+ *
+ * PNG_UINT_16 does the same thing for a 16-bit value passed in an (int) or
+ * (png_uint_32) (where checking is not expected.)
  */
 #if !PNG_RELEASE_BUILD
 #  ifndef PNG_NO_RANGE_CHECK /* Turn off even in pre-release */
@@ -531,11 +554,7 @@
 /* This is a convenience for parameters which are not used in release
  * builds.
  */
-#if PNG_RELEASE_BUILD
-#  define PNG_UNUSEDRC(param) (void)param;
-#else
-#  define PNG_UNUSEDRC(param)
-#endif
+#define PNG_UNUSEDRC(param) only_rel(PNG_UNUSED(param))
 
 /* Just a little check that someone hasn't tried to define something
  * contradictory.
@@ -893,13 +912,8 @@ extern "C" {
  * All of these functions must be declared with PNG_INTERNAL_FUNCTION.
  */
 /* Assert handling */
-#if PNG_RELEASE_BUILD
 PNG_INTERNAL_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
-      unsigned int position), PNG_NORETURN);
-#else
-PNG_INTERNAL_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
-      png_const_charp condition, unsigned int position), PNG_NORETURN);
-#endif
+    param_deb(png_const_charp condition) unsigned int position), PNG_NORETURN);
 
 /* Character/byte range checking. */
 #ifdef PNG_RANGE_CHECK_SUPPORTED
@@ -928,28 +942,32 @@ PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
 
 #  define png_check_char(pp, c) (png_char_affirm((pp), PNG_SRC_LINE, (c)))
 #  define png_check_byte(pp, b) (png_byte_affirm((pp), PNG_SRC_LINE, (b)))
-#  define PNG_BYTE(b) ((png_byte)((b) & 0xff))
-#  define png_handled(pp, m)   (png_handled_affirm((pp), (m), PNG_SRC_LINE))
+#  define PNG_BYTE(b)           ((png_byte)((b) & 0xff))
+#  define PNG_UINT_16(u)        ((png_uint_16)((u) & 0xffff))
+#  define png_handled(pp, m)    (png_handled_affirm((pp), (m), PNG_SRC_LINE))
 #elif !(defined PNG_REMOVE_CASTS)
 #  define png_check_char(pp, c) ((char)(c))
 #  define png_check_byte(pp, b) ((png_byte)(b))
 #  define png_check_u16(pp, u)  ((png_uint_16)(u))
-#  define png_handled(pp, m)   ((void)0)
-#  define PNG_BYTE(b) ((png_byte)((b) & 0xff))
+#  define png_handled(pp, m)    ((void)0)
+#  define PNG_BYTE(b)           ((png_byte)((b) & 0xff))
+#  define PNG_UINT_16(u)        ((png_uint_16)((u) & 0xffff))
 #else
    /* This is somewhat trust-me-it-works: if PNG_REMOVE_CASTS is defined then
     * the casts, which might otherwise change the values, are completely
     * removed.  Use this to test your compiler to see if it makes *any*
     * difference (code size or speed.)  Currently NOT SUPPORTED.
     *
-    * It also makes the png_byte macro not do anything either (fine if UCHAR_MAX
-    * is exactly 255.)
+    * It also makes the PNG_BYTE and PNG_UINT_16 macros do nothing either
+    * NOTE: this seems safe at present but might lead to unexpected results
+    * if someone writes code to depend on the truncation.
     */
 #  define png_check_char(pp, c) (c)
 #  define png_check_byte(pp, b) (b)
 #  define png_check_u16(pp, u)  (u)
-#  define png_handled(pp, m)   ((void)0)
-#  define PNG_BYTE(b) (b)
+#  define png_handled(pp, m)    ((void)0)
+#  define PNG_BYTE(b)           (b)
+#  define PNG_UINT_16(b)        (u)
 #endif
 
 /* Utility macro to mark a handled error condition ; when control reaches this
@@ -1907,13 +1925,6 @@ PNG_INTERNAL_FUNCTION(int,png_check_fp_string,(png_const_charp string,
  */
 PNG_INTERNAL_FUNCTION(int,png_muldiv,(png_fixed_point_p res, png_fixed_point a,
    png_int_32 multiplied_by, png_int_32 divided_by),PNG_EMPTY);
-#endif
-
-#if defined(PNG_READ_GAMMA_SUPPORTED) || defined(PNG_INCH_CONVERSIONS_SUPPORTED)
-/* Same deal, but issue a warning on overflow and return 0. */
-PNG_INTERNAL_FUNCTION(png_fixed_point,png_muldiv_warn,
-   (png_const_structrp png_ptr, png_fixed_point a, png_int_32 multiplied_by,
-   png_int_32 divided_by),PNG_EMPTY);
 #endif
 
 #ifdef PNG_GAMMA_SUPPORTED

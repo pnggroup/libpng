@@ -139,7 +139,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
           * NOTE: usr_channels is not used by the read code!  (This has led to
           * confusion in the past.)  The filler is only used in the read code.
           */
-         png_ptr->filler = (png_uint_16)filler;
+         png_ptr->filler = PNG_UINT_16(filler); /* Max bit depth is 16 */
 #     else
          png_app_error(png_ptr, "png_set_filler not supported on read");
          PNG_UNUSED(filler) /* not used in the write case */
