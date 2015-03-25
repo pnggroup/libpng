@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta58 - March 23, 2015
+Libpng 1.7.0beta59 - March 25, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta58.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta58.tar.gz
+   1.7.0beta59.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta59.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b58.7z  (LZMA-compressed, recommended)
-   lp170b58.zip
+   lp170b59.7z  (LZMA-compressed, recommended)
+   lp170b59.zip
 
 Other information:
 
-   1.7.0beta58-README.txt
-   1.7.0beta58-LICENSE.txt
-   libpng-1.7.0beta58-*.asc (armored detached GPG signatures)
+   1.7.0beta59-README.txt
+   1.7.0beta59-LICENSE.txt
+   libpng-1.7.0beta59-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -757,11 +757,11 @@ Version 1.7.0beta57 [March 16, 2015]
     in libpng-1.6.17beta01 (John Bowler).
   Revert change to png_default_read_data() made in libpng-1.7.0beta55.
 
-Version 1.7.0beta58 [March 23, 2015]
+Version 1.7.0beta58 [March 25, 2015]
   Implemented affirm() support and usage.
   Remove pnglibconf.dfn and pnglibconf.pre with "make clean".
   Added byte, short and other overflow checking
-  Added 'assert' based overflow checking for debug builds for char
+  Added 'affirm' based overflow checking for debug builds for char
     and short assignments. Simply ignore the error in release builds
     (a truncated value will be used without warning). Controlled by
     PNG_RANGE_CHECK_SUPPORTED.

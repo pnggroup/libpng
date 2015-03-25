@@ -348,7 +348,7 @@
 #  define PNG_RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
 #endif
 
-/* General purpose macros avoid the need to out #if PNG_RELEASE_BUILD
+/* General purpose macros avoid the need to put #if PNG_RELEASE_BUILD
  * macro blocks around function declarations and definitions when the
  * parameter number varies.  Using these results in slightly cleaner code.
  */
