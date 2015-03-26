@@ -17,7 +17,7 @@ VIII. Configuring libpng for 16-bit platforms
  XII. Configuring for compiler xxx:
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
-  XV. Configuring libpng for multiprocessing
+  XV. Setjmp/longjmp issues
  XVI. Other sources of information about libpng
 
 I. Simple installation
@@ -189,7 +189,7 @@ run "make install".
 VIII. Configuring libpng for 16-bit platforms
 
 You will want to look into zconf.h to tell zlib (and thus libpng) that
-it cannot allocate more then 64K at a time.  Even if you can, the memory
+it cannot allocate more than 64K at a time.  Even if you can, the memory
 won't be accessible.  So limit zlib and libpng to 64K by defining MAXSEG_64K.
 
 IX. Configuring for DOS
@@ -362,7 +362,7 @@ $PREFIX/include directory).  Do not edit pnglibconf.h after you have built
 libpng, because than the settings would not accurately reflect the settings
 that were used to build libpng.
 
-XV. Configuring libpng for multiprocessing
+XV. Setjmp/longjmp issues
 
 Libpng uses setjmp()/longjmp() for error handling.  Unfortunately setjmp()
 is known to be not thread-safe on some platforms and we don't know of
@@ -374,6 +374,11 @@ configure libpng with PNG_NO_SETJMP in your pngusr.dfa file, with
   #undef PNG_SETJMP_SUPPORTED
 
 in your pnglibconf.h or pngusr.h.
+
+Starting with libpng-1.6.0, the library included a "simplified API".
+This requires setjmp/longjmp, so you must either build the library
+with PNG_SETJMP_SUPPORTED defined, or with PNG_SIMPLIFIED_READ_SUPPORTED
+and PNG_SIMPLIFIED_WRITE_SUPPORTED undefined.
 
 XVI. Other sources of information about libpng:
 

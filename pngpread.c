@@ -1,8 +1,8 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.17 [March 26, 2015]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -726,7 +726,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
     * or the stream marked as finished.
     */
    while (png_ptr->zstream.avail_in > 0 &&
-      !(png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED))
+      (png_ptr->flags & PNG_FLAG_ZSTREAM_ENDED) == 0)
    {
       int ret;
 
@@ -1036,6 +1036,7 @@ png_push_process_row(png_structrp png_ptr)
       }
    }
    else
+#endif
    {
       png_push_have_row(png_ptr, png_ptr->row_buf + 1);
       png_read_push_finish_row(png_ptr);
@@ -1045,6 +1046,7 @@ png_push_process_row(png_structrp png_ptr)
 void /* PRIVATE */
 png_read_push_finish_row(png_structrp png_ptr)
 {
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
@@ -1069,6 +1071,7 @@ png_read_push_finish_row(png_structrp png_ptr)
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    if (png_ptr->interlaced != 0)
    {
       png_ptr->row_number = 0;
@@ -1103,6 +1106,7 @@ png_read_push_finish_row(png_structrp png_ptr)
 
       } while (png_ptr->iwidth == 0 || png_ptr->num_rows == 0);
    }
+#endif /* READ_INTERLACING */
 }
 
 void /* PRIVATE */
@@ -1127,6 +1131,7 @@ png_push_have_row(png_structrp png_ptr, png_bytep row)
          (int)png_ptr->pass);
 }
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
 void PNGAPI
 png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
     png_const_bytep new_row)
@@ -1141,6 +1146,7 @@ png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
    if (new_row != NULL)
       png_combine_row(png_ptr, old_row, 1/*blocky display*/);
 }
+#endif /* READ_INTERLACING */
 
 void PNGAPI
 png_set_progressive_read_fn(png_structrp png_ptr, png_voidp progressive_ptr,

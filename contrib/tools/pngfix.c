@@ -1,8 +1,8 @@
 /* pngfix.c
  *
- * Copyright (c) 2014 John Cunningham Bowler
+ * Copyright (c) 2014-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.14 [October 23, 2014]
+ * Last changed in libpng 1.6.17 [March 26, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -2138,7 +2138,7 @@ zlib_end(struct zlib *zlib)
           *
           * z-rc is the zlib failure code; message is the error message with
           * spaces replaced by '-'.  The compressed byte count indicates where
-          * in the zlib stream the error occured.
+          * in the zlib stream the error occurred.
           */
          type_name(zlib->chunk->chunk_type, stdout);
          printf(" SKP %s %d %s ", zlib_flevel(zlib), zlib->file_bits,
@@ -3577,10 +3577,9 @@ read_png(struct control *control)
 {
    png_structp png_ptr;
    png_infop info_ptr = NULL;
-   volatile png_bytep row = NULL, display = NULL;
    volatile int rc;
 
-   png_ptr = png_create_read_struct(png_get_libpng_ver(NULL), control,
+   png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, control,
       error_handler, warning_handler);
 
    if (png_ptr == NULL)
@@ -3594,6 +3593,16 @@ read_png(struct control *control)
    rc = setjmp(control->file.jmpbuf);
    if (rc == 0)
    {
+#     ifdef PNG_SET_USER_LIMITS_SUPPORTED
+         /* Remove any limits on the size of PNG files that can be read,
+          * without this we may reject files based on built-in safety
+          * limits.
+          */
+         png_set_user_limits(png_ptr, 0x7fffffff, 0x7fffffff);
+         png_set_chunk_cache_max(png_ptr, 0);
+         png_set_chunk_malloc_max(png_ptr, 0);
+#     endif
+
       png_set_read_fn(png_ptr, control, read_callback);
 
       info_ptr = png_create_info_struct(png_ptr);
@@ -3606,32 +3615,22 @@ read_png(struct control *control)
       png_read_info(png_ptr, info_ptr);
 
       {
-         png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+        png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
+        int passes = png_set_interlace_handling(png_ptr);
+        int pass;
 
-         row = png_voidcast(png_byte*, malloc(rowbytes));
-         display = png_voidcast(png_byte*, malloc(rowbytes));
+        png_start_read_image(png_ptr);
 
-         if (row == NULL || display == NULL)
-            png_error(png_ptr, "OOM allocating row buffers");
+        for (pass = 0; pass < passes; ++pass)
+        {
+           png_uint_32 y = height;
 
-         {
-            png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
-            int passes = png_set_interlace_handling(png_ptr);
-            int pass;
-
-            png_start_read_image(png_ptr);
-
-            for (pass = 0; pass < passes; ++pass)
-            {
-               png_uint_32 y = height;
-
-               /* NOTE: this trashes the row each time; interlace handling won't
-                * work, but this avoids memory thrashing for speed testing.
-                */
-               while (y-- > 0)
-                  png_read_row(png_ptr, row, display);
-            }
-         }
+           /* NOTE: this skips asking libpng to return either version of
+            * the image row, but libpng still reads the rows.
+            */
+           while (y-- > 0)
+              png_read_row(png_ptr, NULL, NULL);
+        }
       }
 
       if (control->file.global->verbose)
@@ -3642,8 +3641,6 @@ read_png(struct control *control)
    }
 
    png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-   if (row != NULL) free(row);
-   if (display != NULL) free(display);
    return rc;
 }
 
@@ -3705,21 +3702,21 @@ usage(const char *prog)
 "        gAMA, sRGB [all]: These specify the gamma encoding used for the pixel",
 "            values.",
 "        cHRM, iCCP [color]: These specify how colors are encoded.  iCCP also",
-"            specifies the exact encoding of a pixel value however in practice",
-"            most programs will ignore it.",
+"            specifies the exact encoding of a pixel value; however, in",
+"            practice most programs will ignore it.",
 "        bKGD [transform]: This is used by libpng transforms."
 "    --max=<number>:",
 "      Use IDAT chunks sized <number>.  If no number is given the the IDAT",
 "      chunks will be the maximum size permitted; 2^31-1 bytes.  If the option",
 "      is omitted the original chunk sizes will not be changed.  When the",
-"      option is given --strip=unsafe is set automatically, this may be",
+"      option is given --strip=unsafe is set automatically. This may be",
 "      cancelled if you know that all unknown unsafe-to-copy chunks really are",
 "      safe to copy across an IDAT size change.  This is true of all chunks",
 "      that have ever been formally proposed as PNG extensions.",
 "  MESSAGES",
 "      By default the program only outputs summaries for each file.",
 "    --quiet (-q):",
-"      Do not output the summaries except for files which cannot be read. With",
+"      Do not output the summaries except for files that cannot be read. With",
 "      two --quiets these are not output either.",
 "    --errors (-e):",
 "      Output errors from libpng and the program (except too-far-back).",
@@ -3752,7 +3749,7 @@ usage(const char *prog)
 "  the following codes.  Notice that the results for each file are combined",
 "  together - check one file at a time to get a meaningful error code!",
 "    0x01: The zlib too-far-back error existed in at least one chunk.",
-"    0x02: At least once chunk had a CRC error.",
+"    0x02: At least one chunk had a CRC error.",
 "    0x04: A chunk length was incorrect.",
 "    0x08: The file was truncated.",
 "  Errors less than 16 are potentially recoverable, for a single file if the",
@@ -3760,7 +3757,7 @@ usage(const char *prog)
 "  non-zero code is returned).",
 "    0x10: The file could not be read, even with corrections.",
 "    0x20: The output file could not be written.",
-"    0x40: An unexpected, potentially internal, error occured.",
+"    0x40: An unexpected, potentially internal, error occurred.",
 "  If the command line arguments are incorrect the program exits with exit",
 "  255.  Some older operating systems only support 7-bit exit codes, on those",
 "  systems it is suggested that this program is first tested by supplying",
@@ -3820,7 +3817,7 @@ usage(const char *prog)
 "          SKP: The chunk was skipped because of a zlib issue (zlib-rc) with",
 "               explanation 'message'",
 "          ERR: The read of the file was aborted.  The parameters explain why.",
-"$3 status:     For 'ERR' the accumulate status code from 'EXIT CODES' above.",
+"$3 status:     For 'ERR' the accumulated status code from 'EXIT CODES' above.",
 "               This is printed as a 2 digit hexadecimal value",
 "   comp-level: The recorded compression level (FLEVEL) of a zlib stream",
 "               expressed as a string {supfast,stdfast,default,maximum}",

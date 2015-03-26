@@ -129,11 +129,12 @@ EXTRA_DIST= \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 
-SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.c
+SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk
 
 CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
-	check.new pnglibconf.* pngprefix.h symbols.new pngtest-log.txt \
+	check.new pnglibconf.h pngprefix.h symbols.new pngtest-log.txt \
+	pnglibconf.out pnglibconf.c pnglibconf.pre pnglibconf.dfn \
 	$(SCRIPT_CLEANFILES)
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
