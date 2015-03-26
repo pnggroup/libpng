@@ -5202,6 +5202,9 @@ Version 1.6.17rc06 [March 23, 2015]
     alpha value were identical and the alpha was truncated to 8-bits
     rather than dividing by 257 (John Bowler).
 
+Version 1.6.17 [March 26, 2015]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
