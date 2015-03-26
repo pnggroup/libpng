@@ -1,53 +1,31 @@
 
-Libpng 1.5.22 - March 26, 2015
+Libpng 1.5.23beta01 - March 26, 2015
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.22.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.22.tar.gz
-   libpng-1.5.22.tar.bz2
+   1.5.23beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.23beta01.tar.gz
+   1.5.23beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1522.7z  (LZMA-compressed, recommended)
-   lpng1522.zip
+   lp1523b01.7z  (LZMA-compressed, recommended)
+   lp1523b01.zip
 
 Other information:
 
-   libpng-1.5.22-README.txt
-   libpng-1.5.22-LICENSE.txt
-   libpng-1.5.22-*.asc (armored detached GPG signatures)
+   1.5.23beta01-README.txt
+   1.5.23beta01-LICENSE.txt
+   libpng-1.5.23beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.5.21):
-
-  Regenerated configure scripts with libtool-2.4.4
-  Made the check for out-of-range values in png_set_tRNS() detect
-    values that are exactly 2^bit_depth, and work on 16-bit platforms.
-  Quieted some warnings from Coverity-scan.
-  Merged pngtest.c with libpng-1.6.17/pngtest.c
-  Display user limits in the output from pngtest.
-  Eliminated the PNG_SAFE_LIMITS macro and restored the 1-million-column
-    and 1-million-row default limits in pnglibconf.dfa, that can be reset
-    by the user at build time or run time.  This provides a more robust
-    defense against DOS and as-yet undiscovered overflows.
-  Added PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED macro, on by default.
-  Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
-  Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
-  Removed some comments that the configure script did not handle
-    properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
-  Merged png_free_data() with libpng-1.6.17
-  Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
-    for consistency, and remove some useless tests (Alexey Petruchik).
-  Remove pnglibconf.h, pnglibconf.c, and pnglibconf.out instead of
-    pnglibconf.* in "make clean" (Cosmin).
-  Fix incorrect calculation of maximum number of unknown chunks or
-    sPLT chunks to be stored (John Bowler).
+Changes since the last public release (1.5.22):
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
