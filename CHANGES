@@ -4331,7 +4331,8 @@ Version 1.5.22rc04 [March 16, 2015]
   Fix incorrect calculation of maximum number of unknown chunks or
     sPLT chunks to be stored (John Bowler).
 
-Version 1.5.22rc05 [March 17, 2015]
+Version 1.5.22 [March 26, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

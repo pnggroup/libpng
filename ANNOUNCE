@@ -1,73 +1,53 @@
 
-Libpng 1.5.22rc05 - March 17, 2015
+Libpng 1.5.22 - March 26, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.22rc05.tar.xz (LZMA-compressed, recommended)
-   1.5.22rc05.tar.gz
-   1.5.22rc05.tar.bz2
+   libpng-1.5.22.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.22.tar.gz
+   libpng-1.5.22.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1522r05.7z  (LZMA-compressed, recommended)
-   lp1522r05.zip
+   lpng1522.7z  (LZMA-compressed, recommended)
+   lpng1522.zip
 
 Other information:
 
-   1.5.22rc05-README.txt
-   1.5.22rc05-LICENSE.txt
-   libpng-1.5.22rc05-*.asc (armored detached GPG signatures)
+   libpng-1.5.22-README.txt
+   libpng-1.5.22-LICENSE.txt
+   libpng-1.5.22-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.21):
 
-Version 1.5.22beta01 [January 29, 2015]
   Regenerated configure scripts with libtool-2.4.4
   Made the check for out-of-range values in png_set_tRNS() detect
     values that are exactly 2^bit_depth, and work on 16-bit platforms.
   Quieted some warnings from Coverity-scan.
-
-Version 1.5.22beta02 [February 17, 2015]
   Merged pngtest.c with libpng-1.6.17/pngtest.c
   Display user limits in the output from pngtest.
   Eliminated the PNG_SAFE_LIMITS macro and restored the 1-million-column
     and 1-million-row default limits in pnglibconf.dfa, that can be reset
     by the user at build time or run time.  This provides a more robust
     defense against DOS and as-yet undiscovered overflows.
-
-Version 1.5.22beta03 [February 21, 2015]
   Added PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED macro, on by default.
   Allow user to call png_get_IHDR() with NULL arguments (Reuben Hawkins).
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
-
-Version 1.5.22beta04 [February 25, 2015]
-  Relocated a misplaced "}" in png_reciprocal2().
-
-Version 1.5.22rc01 [March 4, 2015]
-  No changes.
-
-Version 1.5.22rc02 [March 9, 2015]
   Removed some comments that the configure script did not handle
     properly from scripts/pnglibconf.dfa and pnglibconf.h.prebuilt.
   Merged png_free_data() with libpng-1.6.17
-
-Version 1.5.22rc03 [March 12, 2015]
   Updated CMakeLists.txt to add OSX framework, change YES/NO to ON/OFF
     for consistency, and remove some useless tests (Alexey Petruchik).
-
-Version 1.5.22rc04 [March 16, 2015]
   Remove pnglibconf.h, pnglibconf.c, and pnglibconf.out instead of
     pnglibconf.* in "make clean" (Cosmin).
   Fix incorrect calculation of maximum number of unknown chunks or
     sPLT chunks to be stored (John Bowler).
-
-Version 1.5.22rc05 [March 17, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

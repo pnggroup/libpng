@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.5.22 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.22 [March 26, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_5_22rc05 Your_png_h_is_not_version_1_5_22rc05;
+typedef png_libpng_version_1_5_22 Your_png_h_is_not_version_1_5_22;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -648,13 +648,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.22rc05 - March 17, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.5.22 - March 26, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.22rc05 - March 17, 2015\
+      return "libpng version 1.5.22 - March 26, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1741,7 +1741,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
             /* Check for an exponent, if we don't need one we are
              * done and just need to terminate the string.  At
              * this point exp_b10==(-1) is effectively if flag - it got
-             * to '-1' because of the decrement after outputing
+             * to '-1' because of the decrement after outputting
              * the decimal point above (the exponent required is
              * *not* -1!)
              */
@@ -1749,7 +1749,7 @@ png_ascii_from_fp(png_structp png_ptr, png_charp ascii, png_size_t size,
             {
                /* The following only happens if we didn't output the
                 * leading zeros above for negative exponent, so this
-                * doest add to the digit requirement.  Note that the
+                * doesn't add to the digit requirement.  Note that the
                 * two zeros here can only be output if the two leading
                 * zeros were *not* output, so this doesn't increase
                 * the output count.
