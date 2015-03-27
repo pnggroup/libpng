@@ -575,7 +575,7 @@ png_decompress_chunk(png_structrp png_ptr,
     */
    png_alloc_size_t limit = PNG_SIZE_MAX;
 
-# ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+# ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (png_ptr->user_chunk_malloc_max > 0 &&
        png_ptr->user_chunk_malloc_max < limit)
       limit = png_ptr->user_chunk_malloc_max;
@@ -2715,7 +2715,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
       png_ptr->unknown_chunk.data = NULL;
    }
 
-#  ifdef PNG_SET_CHUNK_MALLOC_LIMIT_SUPPORTED
+#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
       if (png_ptr->user_chunk_malloc_max > 0 &&
           png_ptr->user_chunk_malloc_max < limit)
          limit = png_ptr->user_chunk_malloc_max;

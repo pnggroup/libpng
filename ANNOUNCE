@@ -1,4 +1,4 @@
-Libpng 1.6.18beta01 - March 26, 2015
+Libpng 1.6.18beta01 - March 27, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,6 +25,10 @@ Other information:
 
 Changes since the last public release (1.6.17):
 
+Version 1.6.18beta01 [March 27, 2015]
+  Removed PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED macros.  They
+    have been combined with PNG_SET_USER_LIMITS_SUPPORTED (resolves
+    bug report by Andrew Church).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

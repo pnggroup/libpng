@@ -5205,7 +5205,10 @@ Version 1.6.17rc06 [March 23, 2015]
 Version 1.6.17 [March 26, 2015]
   No changes.
 
-Version 1.6.18beta01 [March 26, 2015]
+Version 1.6.18beta01 [March 27, 2015]
+  Removed PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED macros.  They
+    have been combined with PNG_SET_USER_LIMITS_SUPPORTED (resolves
+    bug report by Andrew Church).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
