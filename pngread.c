@@ -948,15 +948,12 @@ png_read_destroy(png_structrp png_ptr)
    }
    png_ptr->free_me &= ~PNG_FREE_PLTE;
 
-#if defined(PNG_tRNS_SUPPORTED) || \
-    defined(PNG_READ_EXPAND_SUPPORTED) || defined(PNG_READ_BACKGROUND_SUPPORTED)
    if ((png_ptr->free_me & PNG_FREE_TRNS) != 0)
    {
       png_free(png_ptr, png_ptr->trans_alpha);
       png_ptr->trans_alpha = NULL;
    }
    png_ptr->free_me &= ~PNG_FREE_TRNS;
-#endif
 
    inflateEnd(&png_ptr->zstream);
 

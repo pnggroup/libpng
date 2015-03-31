@@ -882,7 +882,12 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    /* Check for out-of-range palette index */
    if (row_info.color_type == PNG_COLOR_TYPE_PALETTE &&
        png_ptr->num_palette_max >= 0)
-      png_do_check_palette_indexes(png_ptr, &row_info);
+   {
+      png_transform_control display;
+
+      png_init_transform_control(png_ptr, &display, &row_info);
+      png_do_check_palette_indexes(png_ptr, &display);
+   }
 #endif
 
    /* Find a filter if necessary, filter the row and write it out. */

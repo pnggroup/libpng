@@ -4179,7 +4179,7 @@ png_read_start_row(png_structrp png_ptr)
    static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 #endif
 
-   int max_pixel_depth;
+   unsigned int max_pixel_depth;
    png_size_t row_bytes;
 
    png_debug(1, "in png_read_start_row");
@@ -4344,7 +4344,7 @@ png_read_start_row(png_structrp png_ptr)
 defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
    {
-      int user_pixel_depth = png_ptr->user_transform_depth *
+      unsigned int user_pixel_depth = png_ptr->user_transform_depth *
          png_ptr->user_transform_channels;
 
       if (user_pixel_depth > max_pixel_depth)
@@ -4355,7 +4355,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
    /* This value is stored in png_struct and double checked in the row read
     * code.
     */
-   png_ptr->maximum_pixel_depth = png_check_byte(png_ptr, max_pixel_depth);
+   png_ptr->maximum_pixel_depth = max_pixel_depth;
    png_ptr->transformed_pixel_depth = 0; /* calculated on demand */
 
    /* Align the width on the next larger 8 pixels.  Mainly used

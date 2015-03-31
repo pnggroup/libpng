@@ -165,11 +165,16 @@ struct png_struct_def
     * and faster.
     */
    png_colorp  palette;        /* palette from the input file */
+   png_bytep   trans_alpha;    /* alpha values for paletted files */
+
    size_t      rowbytes;       /* size of row in bytes */
    size_t      info_rowbytes;  /* cache of updated row bytes */
    png_uint_32 width;          /* width of image in pixels */
    png_uint_32 height;         /* height of image in pixels */
    png_uint_32 num_rows;       /* number of rows in current pass */
+   /* TODO: usr_width is used in write, iwidth is used in read, the two fields
+    * could be made one.
+    */
    png_uint_32 usr_width;      /* width of row at start of write */
    png_uint_32 iwidth;         /* width of current interlaced row in pixels */
    png_uint_32 row_number;     /* current row in interlace pass */
@@ -181,7 +186,7 @@ struct png_struct_def
    png_uint_32 zowner;         /* ID (chunk type) of zstream owner, 0 if none */
    png_uint_32 free_me;        /* items libpng is responsible for freeing */
 
-   int         maximum_pixel_depth; /* pixel depth used for the row buffers */
+   unsigned int maximum_pixel_depth; /* pixel depth used for the row buffers */
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
    int         num_palette_max;     /* maximum palette index found in IDAT */
 #endif
@@ -420,12 +425,6 @@ struct png_struct_def
    png_uint_16p gamma_16_to_1;   /* converts from file to 1.0 */
 #endif /* READ_BACKGROUND || READ_ALPHA_MODE || RGB_TO_GRAY */
 #endif /* READ_GAMMA */
-
-#if defined(PNG_READ_tRNS_SUPPORTED) || \
-   defined(PNG_READ_BACKGROUND_SUPPORTED) || \
-   defined(PNG_READ_EXPAND_SUPPORTED)
-   png_bytep trans_alpha;           /* alpha values for paletted files */
-#endif
 
    /* Integer values */
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\

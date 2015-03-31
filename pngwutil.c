@@ -2006,7 +2006,7 @@ png_write_start_row(png_structrp png_ptr)
 #endif
 
    png_alloc_size_t buf_size;
-   int usr_pixel_depth;
+   unsigned int usr_pixel_depth;
 
    png_debug(1, "in png_write_start_row");
 
@@ -2018,7 +2018,7 @@ png_write_start_row(png_structrp png_ptr)
 
    /* 1.5.6: added to allow checking in the row write code. */
    png_ptr->transformed_pixel_depth = png_ptr->pixel_depth;
-   png_ptr->maximum_pixel_depth = png_check_byte(png_ptr, usr_pixel_depth);
+   png_ptr->maximum_pixel_depth = usr_pixel_depth;
 
    /* Set up row buffer */
    png_ptr->row_buf = png_voidcast(png_bytep, png_malloc(png_ptr, buf_size));

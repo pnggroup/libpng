@@ -395,6 +395,15 @@
  *
  * Note that these are not configurable: this is just the affirm code; there's
  * no reason to allow configuration of these options.
+ *
+ * 'debug' is a version of 'affirm' that is completely removed from RELEASE
+ * builds.  This is used when either an unexpected condition is completely
+ * handled or when it can't be handled even by png_error, for example after a
+ * memory overwrite.
+ *
+ * UNTESTED is used to mark code that has not been tested; it causes an assert
+ * if the code is executed and (therefore) tested.  UNTESTED should not remain
+ * in release candidate code.
  */
 #define PNG_AFFIRM_TEXT (PNG_RELEASE_BUILD ?\
          (defined PNG_ERROR_TEXT_SUPPORTED) :\
@@ -412,12 +421,21 @@
          if (!(cond)) png_affirm(pp, PNG_SRC_LINE);\
       while (0)
 #  define png_impossiblepp(pp, reason) png_affirm(pp, PNG_SRC_LINE)
+
+#  define debug(cond) do {} while (0)
+#  if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
+     /* Make sure there are no 'UNTESTED' macros in released code: */
+#    define UNTESTED libpng untested code
+#  endif
 #else
 #  define png_affirmpp(pp, cond)\
       do\
          if (!(cond)) png_affirm(pp, #cond, PNG_SRC_LINE);\
       while (0)
 #  define png_impossiblepp(pp, reason) png_affirm(pp, reason, PNG_SRC_LINE)
+
+#  define debug(cond) png_affirmpp(png_ptr, cond)
+#  define UNTESTED png_affirm(png_ptr, "untested code", PNG_SRC_LINE);
 #endif
 
 #define affirm(cond) png_affirmpp(png_ptr, cond)
@@ -909,6 +927,54 @@ PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
 extern "C" {
 #endif /* __cplusplus */
 
+#if defined (PNG_READ_TRANSFORMS_SUPPORTED) ||\
+    defined (PNG_WRITE_TRANSFORMS_SUPPORTED)
+/* Transform support.  Prior to 1.7.0 the internal transform routines (not the
+ * APIs) took a png_row_infop, like the user transform function, but without
+ * the png_ptr because it was never used.  In 1.7.0 a separate internal
+ * structure is used in place of this to allow both future development to
+ * change the structure.
+ *
+ * The values in this structure will normally be changed by transformation
+ * implementations.
+ */
+typedef struct
+{
+   png_const_structrp png_ptr;   /* png_struct for error handling and some
+                                  * transform parameters.
+                                  */
+   png_uint_32        width;     /* width of row */
+   unsigned int       channels;  /* number of channels (1, 2, 3, or 4) */
+   unsigned int       bit_depth; /* bit depth of row */
+   unsigned int       flags;     /* As below */
+#  define PNG_INDEXED          1 /* Indexed/palette PNG */
+#  define PNG_RGB_SWAPPED      2 /* as in the PNG_BGR transformation */
+#  define PNG_FILLER_IN_ALPHA  4 /* 'alpha' channel is really just a filler */
+#  define PNG_ALPHA_SWAPPED    8 /* Alpha is in the first channel */
+#  define PNG_ALPHA_INVERTED  16 /* Alpha values inverted */
+#  define PNG_INVERTED        32 /* grayscale channel inverted */
+#  define PNG_BITS_SHIFTED    64 /* Channels not in range 1..(bit_depth-1) */
+#  define PNG_BYTE_SWAPPED   128 /* 'swab', i.e. pairs of bytes swapped */
+#  define PNG_PIXEL_SWAPPED  256 /* pixels swapped within bytes */
+#  define PNG_BAD_INDEX      512 /* Bad palette image index */
+} png_transform_control, *png_transform_controlp;
+
+/* Validation: channels and bit_depth can be set to anything required by
+ * the transform, but the result may not be encodable in PNG.  PNG_USURPED
+ * must be set in this case.  This macro detects the detectably unrepresentable
+ * case channels case.
+ *
+ * Channels: must be 1 when PNG_INDEXED is set, must be 1-4 otherwise, so:
+ *
+ *    (channels-1) <= (((flags & PNG_INDEXED)-1) & 3)
+ */
+#define PNG_VALID_CHANNELS(ri)\
+   (((ri)->channels-1) <= ((((ri)->flags & PNG_INDEXED)-1) & 3))
+
+typedef const png_transform_control *png_const_transform_controlp;
+typedef const png_row_info *png_const_row_infop;
+#endif /* TRANSFORMS */
+
 /* Internal functions; these are not exported from a DLL however because they
  * are used within several of the C source files they have to be C extern.
  *
@@ -1364,30 +1430,30 @@ PNG_INTERNAL_FUNCTION(void,png_read_transform_info,(png_structrp png_ptr,
 /* Shared transform functions, defined in pngtran.c */
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_do_strip_channel,(png_row_infop row_info,
-    png_bytep row, int at_start),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_do_strip_channel,(
+    png_transform_controlp row_info, png_bytep row, int at_start),PNG_EMPTY);
 #endif
 
 #ifdef PNG_16BIT_SUPPORTED
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_do_swap,(png_row_infop row_info,
+PNG_INTERNAL_FUNCTION(void,png_do_swap,(png_transform_controlp row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 #endif
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED) || \
     defined(PNG_WRITE_PACKSWAP_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_do_packswap,(png_row_infop row_info,
+PNG_INTERNAL_FUNCTION(void,png_do_packswap,(png_transform_controlp row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_do_invert,(png_row_infop row_info,
+PNG_INTERNAL_FUNCTION(void,png_do_invert,(png_transform_controlp row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
-PNG_INTERNAL_FUNCTION(void,png_do_bgr,(png_row_infop row_info,
+PNG_INTERNAL_FUNCTION(void,png_do_bgr,(png_transform_controlp row_info,
     png_bytep row),PNG_EMPTY);
 #endif
 
@@ -1509,6 +1575,24 @@ PNG_INTERNAL_FUNCTION(int,png_chunk_unknown_handling,
 #endif /* READ_UNKNOWN_CHUNKS || HANDLE_AS_UNKNOWN */
 
 /* Handle the transformations for reading and writing */
+#if defined(PNG_READ_TRANSFORMS_SUPPORTED) ||\
+    defined(PNG_WRITE_TRANSFORMS_SUPPORTED)
+/* Utility functions: */
+PNG_INTERNAL_FUNCTION(void,png_init_transform_control,(
+   png_const_structrp png_ptr, png_transform_controlp out,
+   png_const_row_infop in),
+   PNG_EMPTY);
+
+/* This function exists to ensure that overflow cannot happen even if there
+ * are bugs in the transforms or calculation of maximum_pixel_depth.
+ */
+PNG_INTERNAL_FUNCTION(size_t,png_transform_rowbytes,(
+   png_const_transform_controlp row_info),PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void,png_end_transform_control,(png_row_infop out,
+   png_const_transform_controlp in), PNG_EMPTY);
+#endif /* TRANSFORMS */
+
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_do_read_transformations,(png_structrp png_ptr,
    png_row_infop row_info),PNG_EMPTY);
@@ -1668,7 +1752,7 @@ PNG_INTERNAL_FUNCTION(void,png_check_IHDR,(png_const_structrp png_ptr,
 #if defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED) || \
     defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
 PNG_INTERNAL_FUNCTION(void,png_do_check_palette_indexes,
-   (png_structrp png_ptr, png_row_infop row_info),PNG_EMPTY);
+   (png_structrp png_ptr, png_transform_controlp row_info),PNG_EMPTY);
 #endif
 
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)

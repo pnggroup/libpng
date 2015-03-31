@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta59 - March 25, 2015
+Libpng 1.7.0beta59 - March 31, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -779,6 +779,17 @@ Version 1.7.0beta58 [March 25, 2015]
     condition on RELEASE (or not) builds and tidy up the #ifdef handling of
     functions.
 
+Version 1.7.0beta59 [March 31, 2015]
+  Transformed rewrite: changed row_info, added checks. This introduces an
+    internal struct (png_transform_control) to replace row_info and uses
+    that to implement affirms correctly.  The change also adds checks on
+    the rowbytes calculation and additional checks on most transform
+    implementations.
+  Added png_uint_16 range checking, pngvalid tRNS, fixed png_uint_16:
+    review of previous checks, removal of some where SAFE. pngvalid: add
+    testing of tRNS for better code coverage pngvalid: correct rgb-to-gray
+    error calculations. Code coverage is still incomplete: see /*UNTESTED*/
+    in pngrtran.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
