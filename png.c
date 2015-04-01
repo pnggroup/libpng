@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.17 [March 26, 2015]
+ * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2276,7 +2276,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 
          /* Length *and* intent must match */
          if (length == png_sRGB_checks[i].length &&
-            intent == png_sRGB_checks[i].intent)
+            intent == (png_uint_32) png_sRGB_checks[i].intent)
          {
             /* Now calculate the adler32 if not done already. */
             if (adler == 0)

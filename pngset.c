@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.6.17 [March 26, 2015]
+ * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -673,7 +673,6 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    if (new_iccp_profile == NULL)
    {
       png_free(png_ptr, new_iccp_name);
-      new_iccp_name = NULL;
       png_benign_error(png_ptr,
           "Insufficient memory to process iCCP profile");
 
@@ -1522,6 +1521,9 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
          }
 
 #ifndef __COVERITY__
+         /* Some compilers complain that this is always false.  However, it
+          * can be true when integer overflow happens.
+          */
          if (size > ZLIB_IO_MAX)
          {
             png_warning(png_ptr,

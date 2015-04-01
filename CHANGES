@@ -5211,9 +5211,12 @@ Version 1.6.18beta01 [April 01, 2015]
     bug report by Andrew Church).
   Fixed rgb_to_gray checks and added tRNS checks to pngvalid.c.  This
     fixes some arithmetic errors that caused some tests to fail on
-    some 32-bit platforms.
+    some 32-bit platforms (Bug reports by Peter Breitenlohner [i686]
+    and Petr Gajdos [i586]).
 
 Version 1.6.18beta02 [April 1, 2015]
+  Suppressed some warnings from the Borland C++ 5.5.1/5.82 compiler
+    (Bug report by Viktor Szaka'ts).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
