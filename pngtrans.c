@@ -683,7 +683,7 @@ png_do_check_palette_indexes(png_structrp png_ptr,
              */
             for (; rp > png_ptr->row_buf; rp--)
             {
-              if (*rp >> padding != 0)
+              if ((*rp >> padding) != 0)
                  png_ptr->num_palette_max = 1;
               padding = 0;
             }

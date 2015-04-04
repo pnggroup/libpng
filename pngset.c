@@ -677,7 +677,6 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    if (new_iccp_profile == NULL)
    {
       png_free(png_ptr, new_iccp_name);
-      new_iccp_name = NULL;
       png_benign_error(png_ptr,
           "Insufficient memory to process iCCP profile");
 
@@ -1562,6 +1561,9 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
          }
 
 #ifndef __COVERITY__
+         /* Some compilers complain that this is always false.  However, it
+          * can be true when integer overflow happens.
+          */
          if (size > ZLIB_IO_MAX)
          {
             png_warning(png_ptr,

@@ -1803,7 +1803,8 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
          return;
       }
 
-      if (length > png_ptr->num_palette || length > PNG_MAX_PALETTE_LENGTH ||
+      if (length > png_ptr->num_palette ||
+         length > (unsigned int) PNG_MAX_PALETTE_LENGTH ||
          length == 0)
       {
          png_crc_finish(png_ptr, length);
