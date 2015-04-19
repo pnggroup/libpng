@@ -5069,7 +5069,7 @@ Version 1.7.0beta58 [March 25, 2015]
     condition on RELEASE (or not) builds and tidy up the #ifdef handling of
     functions.
 
-Version 1.7.0beta59 [April 4, 2015]
+Version 1.7.0beta59 [April 19, 2015]
   Transformed rewrite: changed row_info, added checks. This introduces an
     internal struct (png_transform_control) to replace row_info and uses
     that to implement affirms correctly.  The change also adds checks on
