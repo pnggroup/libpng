@@ -5218,6 +5218,8 @@ Version 1.6.18beta02 [April 26, 2015]
   Suppressed some warnings from the Borland C++ 5.5.1/5.82 compiler
     (Bug report by Viktor Szaka'ts).
 
+Version 1.6.18beta03 [April 26, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
