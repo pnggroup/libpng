@@ -5141,7 +5141,7 @@ Version 1.6.17beta01 [January 29, 2015]
   Added #ifndef __COVERITY__ where needed in png.c, pngrutil.c and
     pngset.c to avoid warnings about dead code.
   Added "& 0xff" to many instances of expressions that are typecast
-    to (png_byte), to avoid Coverity gripes.
+    to (png_byte), to avoid Coverity warnings.
 
 Version 1.6.17beta02 [February 7, 2015]
   Work around one more Coverity-scan dead-code warning.
@@ -5205,7 +5205,7 @@ Version 1.6.17rc06 [March 23, 2015]
 Version 1.6.17 [March 26, 2015]
   No changes.
 
-Version 1.6.18beta01 [April 01, 2015]
+Version 1.6.18beta01 [April 1, 2015]
   Removed PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED macros.  They
     have been combined with PNG_SET_USER_LIMITS_SUPPORTED (resolves
     bug report by Andrew Church).
@@ -5214,7 +5214,7 @@ Version 1.6.18beta01 [April 01, 2015]
     some 32-bit platforms (Bug reports by Peter Breitenlohner [i686]
     and Petr Gajdos [i586]).
 
-Version 1.6.18beta02 [April 1, 2015]
+Version 1.6.18beta02 [April 26, 2015]
   Suppressed some warnings from the Borland C++ 5.5.1/5.82 compiler
     (Bug report by Viktor Szaka'ts).
 
