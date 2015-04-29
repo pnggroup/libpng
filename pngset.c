@@ -709,7 +709,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 {
    int i;
 
-   png_debug1(1, "in %lx storage function", png_ptr == NULL ? "unexpected" :
+   png_debug1(1, "in %lx storage function", png_ptr == NULL ? 0xabadca11 :
       (unsigned long)png_ptr->chunk_name);
 
    if (png_ptr == NULL || info_ptr == NULL || num_text <= 0 || text_ptr == NULL)
