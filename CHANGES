@@ -4334,9 +4334,11 @@ Version 1.5.22rc04 [March 16, 2015]
 Version 1.5.22 [March 26, 2015]
   No changes.
 
-Version 1.5.23beta01 [March 27, 2015]
+Version 1.5.23beta01 [April 29, 2015]
   Removed unused PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED definitions
     from pnglibconf.h.prebuilt (Andrew Church).
+  Replaced "unexpected" with an integer in pngset.c where a long was
+    expected, to avoid a compiler warning when PNG_DEBUG > 1.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
