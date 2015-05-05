@@ -5218,11 +5218,12 @@ Version 1.6.18beta02 [April 26, 2015]
   Suppressed some warnings from the Borland C++ 5.5.1/5.82 compiler
     (Bug report by Viktor Szaka'ts).
 
-Version 1.6.18beta03 [May 3, 2015]
+Version 1.6.18beta03 [May 5, 2015]
   Replaced "unexpected" with an integer (0xabadca11) in pngset.c
     where a long was expected, to avoid a compiler warning when PNG_DEBUG > 1.
   Added contrib/examples/simpleover.c, to demonstrate how to handle
     alpha compositing of multiple images, using the "simplified API"
+    and an example PNG generation tool, contrib/examples/genpng.c
     (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

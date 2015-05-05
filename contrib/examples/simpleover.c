@@ -210,6 +210,7 @@ create_sprite(struct sprite *sprite, int *argc, const char ***argv)
          png_image image;
 
          image.version = PNG_IMAGE_VERSION;
+         image.opaque = NULL;
 
          if (png_image_begin_read_from_file(&image, (*argv)[0]))
          {
@@ -540,6 +541,8 @@ int main(int argc, const char **argv)
       }
 
       image.version = PNG_IMAGE_VERSION;
+      image.opaque = NULL;
+
       if (png_image_begin_read_from_file(&image, argv[1]))
       {
          png_bytep buffer;
