@@ -11,8 +11,8 @@
  * combine the alpha channels and corresponding data.
  *
  * Finally read an output (background) PNG using the 24-bit RGB format (the
- * PNG will be composited on green (0x00ff00) by default if it has an alpha
- * channel) and apply the intermediate image generated above to specified
+ * PNG will be composited on green (#00ff00) by default if it has an alpha
+ * channel), and apply the intermediate image generated above to specified
  * locations in the image.
  *
  * The command line has the general format:
@@ -21,7 +21,7 @@
  *        {--sprite=width,height,name {[--at=x,y] {sprite.png}}}
  *        {--add=name {x,y}}
  *
- * The --sprite and --add options may occur multiple times, they are executed
+ * The --sprite and --add options may occur multiple times. They are executed
  * in order.  --add may refer to any sprite already read.
  *
  * This code is intended to show how to composite multiple images together
@@ -107,8 +107,8 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
     */
 
 
-   /* Check for an x or y offset that pushes the image beyond the right or
-    * bottom of the sprite:
+   /* Check for an x or y offset that pushes any part of the image beyond the
+    * right or bottom of the sprite:
     */
    if ((y_offset < 0 || (unsigned)/*SAFE*/y_offset < sprite->height) &&
        (x_offset < 0 || (unsigned)/*SAFE*/x_offset < sprite->width))
@@ -153,7 +153,7 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
                    *
                    * This is exact (and does not overflow) for all values of
                    * x in the range 0..65535*65535.  (Note that the calculation
-                   * produces the closest integer, the maximum error is <0.5).
+                   * produces the closest integer; the maximum error is <0.5).
                    */
                   png_uint_32 tmp;
 
@@ -185,8 +185,8 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
 static int 
 create_sprite(struct sprite *sprite, int *argc, const char ***argv)
 {
-   /* Read the arguments and create this sprite, the sprite buffer has already
-    * been allocated.  This reads the input PNGs one by one in linear format,
+   /* Read the arguments and create this sprite. The sprite buffer has already
+    * been allocated. This reads the input PNGs one by one in linear format,
     * composes them onto the sprite buffer (the code in the function above)
     * then saves the result, converting it on the fly to PNG RGBA 8-bit format.
     */
@@ -226,8 +226,8 @@ create_sprite(struct sprite *sprite, int *argc, const char ***argv)
                   0/*row_stride*/,
                   NULL/*colormap for PNG_FORMAT_FLAG_COLORMAP*/))
                {
-                  /* This is the place were the Porter-Duff 'Over' operator
-                   * needs to be done by this code.  In fact any image
+                  /* This is the place where the Porter-Duff 'Over' operator
+                   * needs to be done by this code.  In fact, any image
                    * processing required can be done here; the data is in
                    * the correct format (linear, 16-bit) and source and
                    * destination are in memory.
@@ -270,7 +270,7 @@ create_sprite(struct sprite *sprite, int *argc, const char ***argv)
       }
    }
 
-   /* All the sprite operations have completed successfully, save the RGBA
+   /* All the sprite operations have completed successfully. Save the RGBA
     * buffer as a PNG using the simplified write API.
     */
    sprite->file = tmpfile();
@@ -291,7 +291,7 @@ create_sprite(struct sprite *sprite, int *argc, const char ***argv)
       if (png_image_write_to_stdio(&save, sprite->file, 1/*convert_to_8_bit*/,
           sprite->buffer, 0/*row_stride*/, NULL/*colormap*/))
       {
-         /* Success, the buffer is no longer needed: */
+         /* Success; the buffer is no longer needed: */
          free(sprite->buffer);
          sprite->buffer = NULL;
          return 1; /* ok */
@@ -313,7 +313,7 @@ static int
 add_sprite(png_imagep output, png_bytep out_buf, struct sprite *sprite,
    int *argc, const char ***argv)
 {
-   /* Given a --add argument naming this sprite perform the operations listed
+   /* Given a --add argument naming this sprite, perform the operations listed
     * in the following arguments.  The arguments are expected to have the form
     * (x,y), which is just an offset at which to add the sprite to the
     * output.
@@ -423,14 +423,14 @@ simpleover_process(png_imagep output, png_bytep out_buf, int argc,
                if (sprites[nsprites].name[0] == 0)
                   sprintf(sprites[nsprites].name, "sprite-%d", nsprites+1);
 
-               /* Allocate a buffer for the sprite, calculate the buffer
+               /* Allocate a buffer for the sprite and calculate the buffer
                 * size:
                 */
                buf_size = sizeof (png_uint_16 [4]);
                buf_size *= sprites[nsprites].width;
                buf_size *= sprites[nsprites].height;
 
-               /* This can overflow a (size_t), check for this: */
+               /* This can overflow a (size_t); check for this: */
                tmp = buf_size;
                tmp /= sprites[nsprites].width;
                tmp /= sprites[nsprites].height;
@@ -488,7 +488,7 @@ simpleover_process(png_imagep output, png_bytep out_buf, int argc,
             if (strcmp(sprites[isprite].name, name) == 0)
             {
                if (!add_sprite(output, out_buf, sprites+isprite, &argc, &argv))
-                  goto out; /* error in addspite */
+                  goto out; /* error in addsprite */
 
                break; 
             }
@@ -553,7 +553,7 @@ int main(int argc, const char **argv)
 
          if (buffer != NULL)
          {
-            png_color background = {0, 0xff, 0}; /* green (aka "lime") */
+            png_color background = {0, 0xff, 0}; /* fully saturated green */
 
             if (png_image_finish_read(&image, &background, buffer,
                0/*row_stride*/, NULL/*colormap for PNG_FORMAT_FLAG_COLORMAP */))
@@ -619,7 +619,7 @@ int main(int argc, const char **argv)
          "simpleover: usage: simpleover background.png [output.png]\n"
          "  Output 'background.png' as a 24-bit RGB PNG file in 'output.png'\n"
          "   or, if not given, stdout.  'background.png' will be composited\n"
-         "   on green.\n"
+         "   on fully saturated green.\n"
          "\n"
          "  Optionally, before output, process additional PNG files:\n"
          "\n"
