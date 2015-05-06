@@ -65,7 +65,7 @@ int main(void) {
       unsigned int x = 0;
 
       do {
-         unsigned int t = x + (x >> 16) + /*(x >> 31)*/ + r;
+         unsigned int t = x + (x >> 16) /*+ (x >> 31)*/ + r;
          double v = x, errtest;
 
          if (t < x) {

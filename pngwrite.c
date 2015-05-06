@@ -216,8 +216,13 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
       if ((png_ptr->transformations & PNG_INVERT_ALPHA) != 0 &&
           info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-         int j;
-         for (j = 0; j<(int)info_ptr->num_trans; j++)
+         int j, jend;
+
+         jend = info_ptr->num_trans;
+         if (jend > PNG_MAX_PALETTE_LENGTH)
+            jend = PNG_MAX_PALETTE_LENGTH;
+
+         for (j = 0; j<jend; ++j)
             info_ptr->trans_alpha[j] =
                (png_byte)(255 - info_ptr->trans_alpha[j]);
       }
