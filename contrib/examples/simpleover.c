@@ -60,12 +60,12 @@ struct sprite {
 int main(void) {
    double err = 0;
    unsigned int xerr = 0;
-   unsigned int r = 32768;
+   unsigned int r = 32769;
    {
       unsigned int x = 0;
 
       do {
-         unsigned int t = x + (x >> 16) + (x >> 31) + r;
+         unsigned int t = x + (x >> 16) + /*(x >> 31)*/ + r;
          double v = x, errtest;
 
          if (t < x) {
@@ -149,7 +149,7 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
                    * of the input alpha (1-alpha). A division is required but
                    * it is by the constant 65535.  Approximate this as:
                    *
-                   *     (x + (x >> 16) + (x >> 31) + 32768) >> 16;
+                   *     (x + (x >> 16) + 32769) >> 16;
                    *
                    * This is exact (and does not overflow) for all values of
                    * x in the range 0..65535*65535.  (Note that the calculation
@@ -159,7 +159,7 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
 
 #                 define compose(c)\
                      tmp = out_pixel[c] * in_alpha;\
-                     tmp = (tmp + (tmp >> 16) + (tmp >> 31) + 32768) >> 16;\
+                     tmp = (tmp + (tmp >> 16) + 32769) >> 16;\
                      out_pixel[c] = tmp + in_pixel[c]
 
                   /* The following is very vectorizable... */
@@ -488,7 +488,7 @@ simpleover_process(png_imagep output, png_bytep out_buf, int argc,
             if (strcmp(sprites[isprite].name, name) == 0)
             {
                if (!add_sprite(output, out_buf, sprites+isprite, &argc, &argv))
-                  goto out; /* error in addsprite */
+                  goto out; /* error in add_sprite */
 
                break; 
             }
