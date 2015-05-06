@@ -5226,6 +5226,8 @@ Version 1.6.18beta03 [May 6, 2015]
     and an example PNG generation tool, contrib/examples/genpng.c
     (John Bowler).
 
+Version 1.6.18beta04 [May 6, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
