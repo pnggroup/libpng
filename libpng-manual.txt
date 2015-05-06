@@ -4065,10 +4065,11 @@ a 16-bit linear encoded PNG file is written.
 
 With all APIs row_stride is handled as in the read APIs - it is the spacing
 from one row to the next in component sized units (float) and if negative
-indicates a bottom-up row layout in the buffer.
+indicates a bottom-up row layout in the buffer.  If you pass zero, libpng will
+calculate the row_stride for you from the width and number of channels.
 
 Note that the write API does not support interlacing, sub-8-bit pixels,
-and indexed (paletted) images.
+indexed (paletted) images, or most ancillary chunks.
 
 VI. Modifying/Customizing libpng
 

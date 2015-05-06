@@ -3211,9 +3211,11 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  *
  * With all APIs row_stride is handled as in the read APIs - it is the spacing
  * from one row to the next in component sized units (1 or 2 bytes) and if
- * negative indicates a bottom-up row layout in the buffer.
+ * negative indicates a bottom-up row layout in the buffer.  If row_stride is zero,
+ * libpng will calculate it for you from the image width and number of channels.
  *
- * Note that the write API does not support interlacing or sub-8-bit pixels.
+ * Note that the write API does not support interlacing, sub-8-bit pixels, indexed
+ * PNG (color_type 3) or most ancillary chunks.
  */
 #endif /* STDIO */
 #endif /* SIMPLIFIED_WRITE */
