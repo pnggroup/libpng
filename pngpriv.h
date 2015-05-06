@@ -374,6 +374,12 @@
 
 /* The affirm mechanism results in a minimal png_error in released versions
  * ('STABLE' versions) and a more descriptive abort in all other cases.
+ *
+ * The PNG_RELEASE_BUILD macro, defined above, controls the behavior of
+ * 'affirm': if set to 1 affirm will call png_error (or png_err) rather than
+ * abort.  The png_error text is the minimal (file location) text in this case,
+ * if it is produced. This flag indicates a STABLE (or RC) build.
+ *
  * The macros rely on the naming convention throughout this code - png_ptr
  * exists and is of type png_const_structrp or a compatible type - and the
  * presence in each file of a uniquely defined macro PNG_SRC_FILE; a number
@@ -389,21 +395,6 @@
  * future and to allow hardware files to use affirm, the encoding is a bit-wise
  * encoding based on the current number of lines.
  *
- * The following works out the value for two numeric #defines:
- *
- *  PNG_RELEASE_BUILD: Set to 1 if affirm should png_error (or png_err) rather
- *                     than abort.  The png_error text is the minimal (file
- *                     location) text in this case, if it is produced.  This
- *                     flag indicates a STABLE (or RC) build.
- *  PNG_AFFIRM_TEXT:   Set to 1 if affirm text should be produced, either the
- *                     minimal text or, if PNG_RELEASE_BUILD is 0, the more
- *                     verbose text including the 'condition' string.  This
- *                     value depends on whether the build supports an
- *                     appropriate way of outputting the message.
- *
- * Note that these are not configurable: this is just the affirm code; there's
- * no reason to allow configuration of these options.
- *
  * 'debug' is a version of 'affirm' that is completely removed from RELEASE
  * builds.  This is used when either an unexpected condition is completely
  * handled or when it can't be handled even by png_error, for example after a
@@ -412,6 +403,15 @@
  * UNTESTED is used to mark code that has not been tested; it causes an assert
  * if the code is executed and (therefore) tested.  UNTESTED should not remain
  * in release candidate code.
+ *
+ * PNG_AFFIRM_TEXT is set to 1 if affirm text should be produced, either
+ * the minimal text or, if PNG_RELEASE_BUILD is 0, the more verbose text
+ * including the 'condition' string.  This value depends on whether the
+ * build supports an appropriate way of outputting the message.
+ *
+ * Note that PNG_AFFIRM_TEXT is not configurable but is worked out here: this
+ * is just the affirm code; * there's no reason to allow configuration of this
+ * option.
  */
 #define PNG_AFFIRM_TEXT (PNG_RELEASE_BUILD ?\
          (defined PNG_ERROR_TEXT_SUPPORTED) :\
@@ -1045,7 +1045,7 @@ PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
 #  define png_handled(pp, m)    ((void)0)
 #  define PNG_BYTE(b)           (b)
 #  define PNG_UINT_16(b)        (u)
-#endif
+#endif /* RANGE_CHECK */
 
 /* Utility macro to mark a handled error condition ; when control reaches this
  * there has been an arithmetic overflow but it is being handled.  Use the
