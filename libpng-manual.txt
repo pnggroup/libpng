@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.18beta04 - May 6, 2015
+ libpng version 1.6.18beta04 - May 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.18beta04 - May 6, 2015
+ libpng versions 0.97, January 1998, through 1.6.18beta04 - May 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5110,6 +5110,23 @@ length, which resulted in PNG files that cannot be read beyond the bad iTXt
 chunk.  This error was fixed in libpng-1.6.3, and a tool (called
 contrib/tools/png-fix-itxt) has been added to the libpng distribution.
 
+Starting with libpng-1.6.17, the PNG_SAFE_LIMITS macro was eliminated
+and safe limits are used by default (users who need larger limits
+can still override them at compile time or run time, as described above).
+
+The new limits are
+                                default   spec limit
+   png_user_width_max         1,000,000  2,147,483,647
+   png_user_height_max        1,000,000  2,147,483,647
+   png_user_chunk_cache_max         128  unlimited
+   png_user_chunk_malloc_max  8,000,000  unlimited
+
+Starting with libpng-1.6.18, a PNG_RELEASE_BUILD macro was added, which allows
+library builders to control compilation for an installed system (a release build).
+It can be set for testing debug or beta builds to ensure that they will compile
+when the build type is switched to RC or STABLE. In essence this overrides the
+PNG_LIBPNG_BUILD_BASE_TYPE definition which is not directly user controllable.
+
 XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
@@ -5280,7 +5297,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-May 6, 2015
+May 7, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
