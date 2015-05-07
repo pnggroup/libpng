@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta61 - May 6, 2015
+ libpng version 1.7.0beta61 - May 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta61 - May 6, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta61 - May 7, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5069,7 +5069,6 @@ enforced.  The sRGB chunk is allowed to appear in images with any color type
 and is interpreted by libpng to convey a one-tracer-curve gray profile or a
 three-tracer-curve RGB profile as appropriate.
 
-
 Prior to libpng-1.6.0 a warning would be issued if the iTXt chunk contained
 an empty language field or an empty translated keyword.  Both of these
 are allowed by the PNG specification, so these warnings are no longer issued.
@@ -5128,6 +5127,12 @@ The new limits are
    png_user_height_max        1,000,000  2,147,483,647
    png_user_chunk_cache_max         128  unlimited
    png_user_chunk_malloc_max  8,000,000  unlimited
+
+Starting with libpng-1.6.18, a PNG_RELEASE_BUILD macro was added, which allows
+library builders to control compilation for an installed system (a release build).
+It can be set for testing debug or beta builds to ensure that they will compile
+when the build type is switched to RC or STABLE. In essence this overrides the
+PNG_LIBPNG_BUILD_BASE_TYPE definition which is not directly user controllable.
 
 XIII.  Changes to Libpng from version 1.6.x to 1.7.x
 
@@ -5341,7 +5346,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVII. Y2K Compliance in libpng
 
-May 6, 2015
+May 7, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
