@@ -300,6 +300,22 @@
 #  define PNG_DLL_EXPORT
 #endif
 
+/* This is a global switch to set the compilation for an installed system
+ * (a release build).  It can be set for testing debug builds to ensure that
+ * they will compile when the build type is switched to RC or STABLE, the
+ * default is just to use PNG_LIBPNG_BUILD_BASE_TYPE.  Set this in CPPFLAGS
+ * with either:
+ *
+ *   -DPNG_RELEASE_BUILD Turns on the release compile path
+ *   -DPNG_RELEASE_BUILD=0 Turns it off
+ * or in your pngusr.h with
+ *   #define PNG_RELEASE_BUILD=1 Turns on the release compile path
+ *   #define PNG_RELEASE_BUILD=0 Turns it off
+ */
+#ifndef PNG_RELEASE_BUILD
+#  define PNG_RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
+#endif
+
 /* SECURITY and SAFETY:
  *
  * libpng is built with support for internal limits on image dimensions and

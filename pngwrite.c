@@ -543,7 +543,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
       /* App warnings are warnings in release (or release candidate) builds but
        * are errors during development.
        */
-#if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
+#if PNG_RELEASE_BUILD
       png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
 #endif
 

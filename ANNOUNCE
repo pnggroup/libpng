@@ -1,4 +1,4 @@
-Libpng 1.6.18beta04 - May 6, 2015
+Libpng 1.6.18beta04 - May 7, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -46,7 +46,9 @@ Version 1.6.18beta03 [May 6, 2015]
     and an example PNG generation tool, contrib/examples/genpng.c
     (John Bowler).
 
-Version 1.6.18beta04 [May 6, 2015]
+Version 1.6.18beta04 [May 7, 2015]
+  PNG_RELEASE_BUILD replaces tests where the code depended on the build base
+    type and can be defined on the command line, allowing testing in beta builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

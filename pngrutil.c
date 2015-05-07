@@ -341,7 +341,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
        * are minimal.
        */
       (void)png_safecat(msg, (sizeof msg), 4, " using zstream");
-#if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
+#if PNG_RELEASE_BUILD
       png_chunk_warning(png_ptr, msg);
       png_ptr->zowner = 0;
 #else

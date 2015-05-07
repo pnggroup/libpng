@@ -63,7 +63,7 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
          /* In stable builds only warn if an application error can be completely
           * handled.
           */
-#        if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
+#        if PNG_RELEASE_BUILD
             png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
 #        endif
 #     endif
