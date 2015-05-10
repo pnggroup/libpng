@@ -1,5 +1,5 @@
 
-Libpng 1.5.23beta01 - April 29, 2015
+Libpng 1.5.23beta01 - May 10, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,11 +27,14 @@ Other information:
 
 Changes since the last public release (1.5.22):
 
-Version 1.5.23beta01 [April 29, 2015]
+Version 1.5.23beta01 [May 10, 2015]
   Removed unused PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED definitions
     from pnglibconf.h.prebuilt (Andrew Church).
   Replaced "unexpected" with an integer in pngset.c where a long was
     expected, to avoid a compiler warning when PNG_DEBUG > 1.
+  Fix typecast in a png_debug2() statement in png_set_text_2() to
+    avoid a compiler warning in PNG_DEBUG builds.
+  Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

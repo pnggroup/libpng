@@ -564,6 +564,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    }
 
    /* Unlink the element from the list. */
+   if (pinformation != NULL)
    {
       memory_infop *ppinfo = &pinformation;
 
@@ -580,8 +581,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            if (pinfo != NULL)
-               free(pinfo);
+            free(pinfo);
             pinfo = NULL;
             break;
          }
@@ -1463,8 +1463,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_tIME(write_ptr, write_end_info_ptr, mod_time);
 #ifdef PNG_TIME_RFC1123_SUPPORTED
          /* We have to use memcpy instead of "=" because the string
-            pointed to by png_convert_to_rfc1123() gets free'ed before
-            we use it */
+          * pointed to by png_convert_to_rfc1123() gets free'ed before
+          * we use it.
+          */
          memcpy(tIME_string,
                 png_convert_to_rfc1123(read_ptr, mod_time),
                 png_sizeof(tIME_string));
