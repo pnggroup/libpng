@@ -2853,6 +2853,10 @@ versions 1.0.63 and 1.2.53 [February 26, 2015]
   No changes.
 
 version 1.2.54beta01 [May 9, 2015]
+  Fixed typecast in a png_debug2() statement in png_set_text_2() to
+    avoid a compiler warning in PNG_DEBUG builds.
+  Fixed printf formats in pngtest.c to avoid compiler warnings and a
+    Coverity warning in PNG_DEBUG builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
