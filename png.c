@@ -101,7 +101,7 @@ png_zfree(voidpf png_ptr, voidpf ptr)
 void /* PRIVATE */
 png_reset_crc(png_structrp png_ptr)
 {
-   /* The cast is safe because the crc is a 32 bit value. */
+   /* The cast is safe because the crc is a 32-bit value. */
    png_ptr->crc = (png_uint_32)crc32(0, Z_NULL, 0);
 }
 
@@ -129,7 +129,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
    }
 
    /* 'uLong' is defined in zlib.h as unsigned long; this means that on some
-    * systems it is a 64 bit value.  crc32, however, returns 32 bits so the
+    * systems it is a 64-bit value.  crc32, however, returns 32 bits so the
     * following cast is safe.  'uInt' may be no more than 16 bits, so it is
     * necessary to perform a loop here.
     */
@@ -275,7 +275,9 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #  ifdef PNG_SETJMP_SUPPORTED
       if (!setjmp(create_jmp_buf))
+#  endif
       {
+#  ifdef PNG_SETJMP_SUPPORTED
          /* Temporarily fake out the longjmp information until we have
           * successfully completed this function.  This only works if we have
           * setjmp() support compiled in, but it is safe - this stuff should
@@ -284,8 +286,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
          create_struct.jmp_buf_ptr = &create_jmp_buf;
          create_struct.jmp_buf_size = 0; /*stack allocation*/
          create_struct.longjmp_fn = longjmp;
-#  else
-      {
 #  endif
          /* Call the general version checker (shared with read and write code):
           */
@@ -766,13 +766,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.18beta04 - May 6, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.18beta04 - May 9, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.18beta04 - May 6, 2015\
+      return "libpng version 1.6.18beta04 - May 9, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -4236,7 +4236,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
  * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
  * specification (see the article at http://en.wikipedia.org/wiki/SRGB)
  * is used, not the gamma=1/2.2 approximation use elsewhere in libpng.
- * The sRGB to linear table is exact (to the nearest 16 bit linear fraction).
+ * The sRGB to linear table is exact (to the nearest 16-bit linear fraction).
  * The inverse (linear to sRGB) table has accuracies as follows:
  *
  * For all possible (255*65535+1) input values:
