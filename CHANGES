@@ -1,11 +1,14 @@
-
+#if 0
 CHANGES - changes for libpng
 
-Version 0.2
+version 0.1 [March 29, 1995]
+  initial work-in-progress release
+
+version 0.2 [April 1, 1995]
   added reader into png.h
   fixed small problems in stub file
 
-Version 0.3
+version 0.3 [April 8, 1995]
   added pull reader
   split up pngwrite.c to several files
   added pnglib.txt
@@ -14,9 +17,9 @@ Version 0.3
   fixed some bugs in writer
   interfaced with zlib 0.5
   added K&R support
-  added check for 64 KB blocks for 16-bit machines
+  added check for 64 KB blocks for 16 bit machines
 
-Version 0.4
+version 0.4 [April 26, 1995]
   cleaned up code and commented code
   simplified time handling into png_time
   created png_color_16 and png_color_8 to handle color needs
@@ -27,28 +30,29 @@ Version 0.4
   cleaned up zTXt reader and writer (using zlib's Reset functions)
   split transformations into pngrtran.c and pngwtran.c
 
-Version 0.5
+version 0.5 [April 30, 1995]
   interfaced with zlib 0.8
   fixed many reading and writing bugs
   saved using 3 spaces instead of tabs
 
-Version 0.6
+version 0.6 [May 1, 1995]
+  first beta release
   added png_large_malloc() and png_large_free()
   added png_size_t
   cleaned up some compiler warnings
   added png_start_read_image()
 
-Version 0.7
+version 0.7 [June 24, 1995]
   cleaned up lots of bugs
   finished dithering and other stuff
   added test program
   changed name from pnglib to libpng
 
-Version 0.71 [June, 1995]
+version 0.71 [June 26, 1995]
   changed pngtest.png for zlib 0.93
   fixed error in libpng.txt and example.c
 
-Version 0.8
+version 0.8 [August 20, 1995]
   cleaned up some bugs
   added png_set_filler()
   split up pngstub.c into pngmem.c, pngio.c, and pngerror.c
@@ -1449,8 +1453,9 @@ Version 1.2.6beta4 [July 28, 2004]
   Use png_malloc instead of png_zalloc to allocate the pallete.
 
 Version 1.0.16rc1 and 1.2.6rc1 [August 4, 2004]
-  Fixed buffer overflow vulnerability in png_handle_tRNS()
-  Fixed integer arithmetic overflow vulnerability in png_read_png().
+  Fixed buffer overflow vulnerability (CVE-2004-0597) in png_handle_tRNS().
+  Fixed NULL dereference vulnerability (CVE-2004-0598) in png_handle_iCCP().
+  Fixed integer overflow vulnerability (CVE-2004-0599) in png_read_png().
   Fixed some harmless bugs in png_handle_sBIT, etc, that would cause
     duplicate chunk types to go undetected.
   Fixed some timestamps in the -config version
@@ -5226,11 +5231,12 @@ Version 1.6.18beta03 [May 6, 2015]
     and an example PNG generation tool, contrib/examples/genpng.c
     (John Bowler).
 
-Version 1.6.18beta04 [May 9, 2015]
+Version 1.6.18beta04 [May 20, 2015]
   PNG_RELEASE_BUILD replaces tests where the code depended on the build base
     type and can be defined on the command line, allowing testing in beta
     builds (John Bowler).
-  Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c
+  Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
+  Avoid a harmless potential integer overflow in png_XYZ_from_xy().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
@@ -5239,3 +5245,4 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
+#endif

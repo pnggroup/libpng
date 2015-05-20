@@ -1,4 +1,4 @@
-Libpng 1.6.18beta04 - May 9, 2015
+Libpng 1.6.18beta04 - May 20, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -46,11 +46,12 @@ Version 1.6.18beta03 [May 6, 2015]
     and an example PNG generation tool, contrib/examples/genpng.c
     (John Bowler).
 
-Version 1.6.18beta04 [May 9, 2015]
+Version 1.6.18beta04 [May 20, 2015]
   PNG_RELEASE_BUILD replaces tests where the code depended on the build base
     type and can be defined on the command line, allowing testing in beta
     builds (John Bowler).
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c
+  Avoid a harmless potential integer overflow in png_XYZ_from_xy().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
