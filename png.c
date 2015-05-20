@@ -275,7 +275,9 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #  ifdef PNG_SETJMP_SUPPORTED
       if (!setjmp(create_jmp_buf))
+#  endif
       {
+#  ifdef PNG_SETJMP_SUPPORTED
          /* Temporarily fake out the longjmp information until we have
           * successfully completed this function.  This only works if we have
           * setjmp() support compiled in, but it is safe - this stuff should
@@ -284,8 +286,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
          create_struct.jmp_buf_ptr = &create_jmp_buf;
          create_struct.jmp_buf_size = 0; /*stack allocation*/
          create_struct.longjmp_fn = longjmp;
-#  else
-      {
 #  endif
          /* Call the general version checker (shared with read and write code):
           */
@@ -689,13 +689,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta61 - May 6, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta61 - May 20, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta61 - May 6, 2015\
+      return "libpng version 1.7.0beta61 - May 20, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1141,16 +1141,17 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
 
    /* Check xy and, implicitly, z.  Note that wide gamut color spaces typically
     * have end points with 0 tristimulus values (these are impossible end
-    * points, but they are used to cover the possible colors.)
+    * points, but they are used to cover the possible colors).  We check
+    * xy->whitey against 5, not 0, to avoid a possible integer overflow.
     */
-   if (xy->redx < 0 || xy->redx > PNG_FP_1) return 1;
-   if (xy->redy < 0 || xy->redy > PNG_FP_1-xy->redx) return 1;
+   if (xy->redx   < 0 || xy->redx > PNG_FP_1) return 1;
+   if (xy->redy   < 0 || xy->redy > PNG_FP_1-xy->redx) return 1;
    if (xy->greenx < 0 || xy->greenx > PNG_FP_1) return 1;
    if (xy->greeny < 0 || xy->greeny > PNG_FP_1-xy->greenx) return 1;
-   if (xy->bluex < 0 || xy->bluex > PNG_FP_1) return 1;
-   if (xy->bluey < 0 || xy->bluey > PNG_FP_1-xy->bluex) return 1;
+   if (xy->bluex  < 0 || xy->bluex > PNG_FP_1) return 1;
+   if (xy->bluey  < 0 || xy->bluey > PNG_FP_1-xy->bluex) return 1;
    if (xy->whitex < 0 || xy->whitex > PNG_FP_1) return 1;
-   if (xy->whitey < 0 || xy->whitey > PNG_FP_1-xy->whitex) return 1;
+   if (xy->whitey < 5 || xy->whitey > PNG_FP_1-xy->whitex) return 1;
 
    /* The reverse calculation is more difficult because the original tristimulus
     * value had 9 independent values (red,green,blue)x(X,Y,Z) however only 8
@@ -3827,7 +3828,7 @@ png_build_gamma_table(png_structrp png_ptr, png_fixed_point gamma_val,
     * scaled to this range (not using a shift!)
     *
     * Each table entry contains input-value^gamma_val rounded to the output
-    * precision.  This is 8 bit precision unless output is specified as
+    * precision.  This is 8-bit precision unless output is specified as
     * PNG_GAMMA_TABLE_16, in which case it is 16-bit precision.  For
     * PNG_GAMMA_TABLE_8_IN_16 the 8-bit value is scaled to 16-bits by
     * multiplying by 257.
@@ -4225,7 +4226,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
  * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
  * specification (see the article at http://en.wikipedia.org/wiki/SRGB)
  * is used, not the gamma=1/2.2 approximation use elsewhere in libpng.
- * The sRGB to linear table is exact (to the nearest 16 bit linear fraction).
+ * The sRGB to linear table is exact (to the nearest 16-bit linear fraction).
  * The inverse (linear to sRGB) table has accuracies as follows:
  *
  * For all possible (255*65535+1) input values:
