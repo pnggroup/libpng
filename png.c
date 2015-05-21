@@ -648,13 +648,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.23beta01 - March 26, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.5.23beta01 - May 21, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.23beta01 - March 26, 2015\
+      return "libpng version 1.5.23beta01 - May 21, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -885,7 +885,8 @@ int png_XYZ_from_xy(png_XYZ *XYZ, png_xy xy)
 
    /* Check xy and, implicitly, z.  Note that wide gamut color spaces typically
     * have end points with 0 tristimulus values (these are impossible end
-    * points, but they are used to cover the possible colors.)
+    * points, but they are used to cover the possible colors).  We check
+    * xy.whitey against 5, not 0, to avoid a possible integer overflow.
     */
    if (xy.redx < 0 || xy.redx > PNG_FP_1) return 1;
    if (xy.redy < 0 || xy.redy > PNG_FP_1-xy.redx) return 1;
@@ -894,7 +895,7 @@ int png_XYZ_from_xy(png_XYZ *XYZ, png_xy xy)
    if (xy.bluex < 0 || xy.bluex > PNG_FP_1) return 1;
    if (xy.bluey < 0 || xy.bluey > PNG_FP_1-xy.bluex) return 1;
    if (xy.whitex < 0 || xy.whitex > PNG_FP_1) return 1;
-   if (xy.whitey < 0 || xy.whitey > PNG_FP_1-xy.whitex) return 1;
+   if (xy.whitey < 5 || xy.whitey > PNG_FP_1-xy.whitex) return 1;
 
    /* The reverse calculation is more difficult because the original tristimulus
     * value had 9 independent values (red,green,blue)x(X,Y,Z) however only 8
