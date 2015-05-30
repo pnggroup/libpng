@@ -942,15 +942,11 @@ png_write_destroy(png_structrp png_ptr)
    png_ptr->row_buf = NULL;
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);
-   png_free(png_ptr, png_ptr->sub_row);
-   png_free(png_ptr, png_ptr->up_row);
-   png_free(png_ptr, png_ptr->avg_row);
-   png_free(png_ptr, png_ptr->paeth_row);
+   png_free(png_ptr, png_ptr->try_row);
+   png_free(png_ptr, png_ptr->tst_row);
    png_ptr->prev_row = NULL;
-   png_ptr->sub_row = NULL;
-   png_ptr->up_row = NULL;
-   png_ptr->avg_row = NULL;
-   png_ptr->paeth_row = NULL;
+   png_ptr->try_row = NULL;
+   png_ptr->tst_row = NULL;
 #endif
 
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
@@ -1057,75 +1053,67 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
        * wants to start and stop using particular filters during compression,
        * it should start out with all of the filters, and then remove them
        * or add them back after the start of compression.
+       *
+       * NOTE: this is a nasty constraint on the code, because it means that the
+       * prev_row buffer must be maintained even if there are currently no
+       * 'prev_row' requiring filters active.
        */
       if (png_ptr->row_buf != NULL)
       {
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-         if ((png_ptr->do_filter & PNG_FILTER_SUB) != 0 &&
-             png_ptr->sub_row == NULL)
+         int num_filters;
+         png_alloc_size_t buf_size;
+
+         /* Repeat the checks in png_write_start_row; 1 pixel high or wide
+          * images cannot benefit from certain filters.  If this isn't done here
+          * the check below will fire on 1 pixel high images.
+          */
+         if (png_ptr->height == 1)
+            filters &= ~(PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+
+         if (png_ptr->width == 1)
+            filters &= ~(PNG_FILTER_SUB|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+
+         if ((filters & (PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH)) != 0
+            && png_ptr->prev_row == NULL)
          {
-            png_ptr->sub_row = (png_bytep)png_malloc(png_ptr,
-                (png_ptr->rowbytes + 1));
-            png_ptr->sub_row[0] = PNG_FILTER_VALUE_SUB;
+            /* This is the error case, however it is benign - the previous row
+             * is not available so the filter can't be used.  Just warn here.
+             */
+            png_app_warning(png_ptr,
+               "png_set_filter: UP/AVG/PAETH cannot be added after start");
+            filters &= ~(PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
          }
 
-         if ((png_ptr->do_filter & PNG_FILTER_UP) != 0 &&
-              png_ptr->up_row == NULL)
+         num_filters = 0;
+
+         if (filters & PNG_FILTER_SUB)
+            num_filters++;
+
+         if (filters & PNG_FILTER_UP)
+            num_filters++;
+
+         if (filters & PNG_FILTER_AVG)
+            num_filters++;
+
+         if (filters & PNG_FILTER_PAETH)
+            num_filters++;
+
+         /* Allocate needed row buffers if they have not already been
+          * allocated.
+          */
+         buf_size = PNG_ROWBYTES(png_ptr->usr_channels * png_ptr->usr_bit_depth,
+             png_ptr->width) + 1;
+
+         if (png_ptr->try_row == NULL)
+            png_ptr->try_row = png_malloc(png_ptr, buf_size);
+
+         if (num_filters > 1)
          {
-            if (png_ptr->prev_row == NULL)
-            {
-               png_warning(png_ptr, "Can't add Up filter after starting");
-               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
-                   ~PNG_FILTER_UP);
-            }
-
-            else
-            {
-               png_ptr->up_row = (png_bytep)png_malloc(png_ptr,
-                   (png_ptr->rowbytes + 1));
-               png_ptr->up_row[0] = PNG_FILTER_VALUE_UP;
-            }
+            if (png_ptr->tst_row == NULL)
+               png_ptr->tst_row = png_malloc(png_ptr, buf_size);
          }
-
-         if ((png_ptr->do_filter & PNG_FILTER_AVG) != 0 &&
-              png_ptr->avg_row == NULL)
-         {
-            if (png_ptr->prev_row == NULL)
-            {
-               png_warning(png_ptr, "Can't add Average filter after starting");
-               png_ptr->do_filter = (png_byte)(png_ptr->do_filter &
-                   ~PNG_FILTER_AVG);
-            }
-
-            else
-            {
-               png_ptr->avg_row = (png_bytep)png_malloc(png_ptr,
-                   (png_ptr->rowbytes + 1));
-               png_ptr->avg_row[0] = PNG_FILTER_VALUE_AVG;
-            }
-         }
-
-         if ((png_ptr->do_filter & PNG_FILTER_PAETH) != 0 &&
-             png_ptr->paeth_row == NULL)
-         {
-            if (png_ptr->prev_row == NULL)
-            {
-               png_warning(png_ptr, "Can't add Paeth filter after starting");
-               png_ptr->do_filter &= (png_byte)(~PNG_FILTER_PAETH);
-            }
-
-            else
-            {
-               png_ptr->paeth_row = (png_bytep)png_malloc(png_ptr,
-                   (png_ptr->rowbytes + 1));
-               png_ptr->paeth_row[0] = PNG_FILTER_VALUE_PAETH;
-            }
-         }
-
-         if (png_ptr->do_filter == PNG_NO_FILTERS)
-#endif /* WRITE_FILTER */
-            png_ptr->do_filter = PNG_FILTER_NONE;
       }
+      png_ptr->do_filter = (png_byte)filters;
    }
    else
       png_error(png_ptr, "Unknown custom filter method");

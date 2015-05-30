@@ -219,16 +219,18 @@ struct png_struct_def
    png_uint_32 row_number;    /* current row in interlace pass */
    png_uint_32 chunk_name;    /* PNG_CHUNK() id of current chunk */
    png_bytep prev_row;        /* buffer to save previous (unfiltered) row.
-                               * This is a pointer into big_prev_row
+                               * While reading this is a pointer into
+                               * big_prev_row; while writing it is separately
+                               * allocated if needed.
                                */
    png_bytep row_buf;         /* buffer to save current (unfiltered) row.
-                               * This is a pointer into big_row_buf
+                               * While reading, this is a pointer into
+                               * big_row_buf; while writing it is separately
+                               * allocated.
                                */
-#ifdef PNG_WRITE_SUPPORTED
-   png_bytep sub_row;         /* buffer to save "sub" row when filtering */
-   png_bytep up_row;          /* buffer to save "up" row when filtering */
-   png_bytep avg_row;         /* buffer to save "avg" row when filtering */
-   png_bytep paeth_row;       /* buffer to save "Paeth" row when filtering */
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+   png_bytep try_row;    /* buffer to save trial row when filtering */
+   png_bytep tst_row;    /* buffer to save best trial row when filtering */
 #endif
    png_size_t info_rowbytes;  /* Added in 1.5.4: cache of updated row bytes */
 
