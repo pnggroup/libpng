@@ -2841,7 +2841,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
          for (j = 0; j < num_p_filters; j++)
          {
-            if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_NONE)
+            if (png_ptr->prev_filters[j] == PNG_FILTER_VALUE_AVG)
             {
                sumlo = (sumlo * png_ptr->filter_weights[j]) >>
                    PNG_WEIGHT_SHIFT;

@@ -241,8 +241,8 @@ option SET_OPTION disabled
 # ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
 #                 with png_set_option
 # ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
-#                 extensions are supported, this is poorly supported and
-#                 deprectated - use the png_set_option API.
+#                 extensions are supported. This is poorly supported and
+#                 deprecated - use the png_set_option API.
 setting ARM_NEON_OPT
 option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
    sets ARM_NEON_OPT 1
@@ -672,7 +672,7 @@ setting QUANTIZE_BLUE_BITS default 5
 # are only interested in 8 bits anyway.  Increasing this value
 # results in more memory being used, and more pow() functions
 # being called to fill in the gamma tables.  Don't set this value
-# less then 8, and even that may not work (I haven't tested it).
+# less than 8, and even that may not work (I haven't tested it).
 
 setting MAX_GAMMA_8 default 11
 

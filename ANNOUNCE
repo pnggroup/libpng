@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta61 - May 20, 2015
+Libpng 1.7.0beta61 - May 31, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -799,9 +799,14 @@ Version 1.7.0beta60 [May 6, 2015]
   Replaced "unexpected" with an integer (0xabadca11) in pngset.c
     where a long was expected, to avoid a compiler warning when PNG_DEBUG > 1.
 
-Version 1.7.0beta61 [May 20, 2015]
+Version 1.7.0beta61 [May 31, 2015]
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c
-  Avoid a harmless potential integer overflow in png_XYZ_from_xy().
+  Avoid a harmless potential integer overflow in png_XYZ_from_xy() (Bug
+    report from Christopher Ferris).
+  Changed png_voidcast(), etc., to voidcast(), etc., in contrib/tools/pngfix.c
+    to avoid confusion with the libpng private macros.
+  Fixed old cut&paste bug in the weighted filter selection code in
+    pngwutil.c, introduced in libpng-0.95, March 1997.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

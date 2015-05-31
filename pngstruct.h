@@ -330,15 +330,23 @@ struct png_struct_def
     *
     * Members that hold pointers to the decompressed image rows.
     */
-   png_bytep row_buf;  /* buffer for the current (unfiltered) row */
+   png_bytep row_buf;         /* buffer to save current (unfiltered) row.
+                               * While reading, this is a pointer into
+                               * big_row_buf; while writing it is separately
+                               * allocated.
+                               */
 #if defined(PNG_WRITE_FILTER_SUPPORTED) || defined(PNG_READ_SUPPORTED)
-   png_bytep prev_row; /* buffer to save the previous (unfiltered) row */
+   png_bytep prev_row;        /* buffer to save previous (unfiltered) row.
+                               * While reading this is a pointer into
+                               * big_prev_row; while writing it is separately
+                               * allocated if needed.
+                               */
 #endif
 
 #ifdef PNG_READ_SUPPORTED
    /* The row_buf and prev_row pointers are misaligned so that the start of the
     * row - after the filter byte - is aligned, the 'big_' pointers record the
-    * original allocated pointer.
+    * original allocated pointer.  These are only used while reading.
     */
    png_bytep big_row_buf;
    png_bytep big_prev_row;
