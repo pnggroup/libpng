@@ -4892,6 +4892,8 @@ size.
 Note that the numbers above were invented purely for this example and
 are given only to help explain the function usage.  Little testing has
 been done to find optimum values for either the costs or the weights.
+This feature was removed from libpng-1.7.0 and later, because
+we are not aware of anyone actually testing it.
 
 .SS Requesting debug printout
 
@@ -5636,6 +5638,11 @@ Some functions that were deprecated in libpng-1.6.0 were removed:
     png_data_freer() and its associated flags,
     png_malloc_default(),
     and png_free_default().
+
+These apparently unused experimental functions have been deprecated
+and the code within them, except for the APIs, has been removed.
+    png_set_filter_heuristics()
+    and png_set_filter_heuristics_fixed()
 
 The PNG_ABORT() macro was changed to PNG_ABORT, and the default is now
 "abort()" for all platforms (previously it was "ExitProcess(0)" on
