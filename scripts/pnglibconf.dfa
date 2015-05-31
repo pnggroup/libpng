@@ -222,7 +222,7 @@ option SET_OPTION disabled
 #                 with png_set_option
 # ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
 #                 extensions are supported. This is poorly supported and
-#                 deprectated - use the png_set_option API.
+#                 deprecated - use the png_set_option API.
 setting ARM_NEON_OPT
 option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
    sets ARM_NEON_OPT 1
