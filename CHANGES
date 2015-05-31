@@ -5247,6 +5247,8 @@ Version 1.6.18beta05 [May 31, 2015]
   Fixed old cut&paste bug in the weighted filter selection code in
     pngwutil.c, introduced in libpng-0.95, March 1997.
 
+Version 1.6.18beta06 [May 31, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
