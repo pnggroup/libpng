@@ -5244,6 +5244,8 @@ Version 1.6.18beta05 [May 31, 2015]
     sub_row, up_row, avg_row, and paeth_row into try_row and tst_row.
   Changed png_voidcast(), etc., to voidcast(), etc., in contrib/tools/pngfix.c
     to avoid confusion with the libpng private macros.
+  Fixed old cut&paste bug in the weighted filter selection code in
+    pngwutil.c, introduced in libpng-0.95, March 1997.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
