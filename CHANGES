@@ -5239,9 +5239,11 @@ Version 1.6.18beta04 [May 20, 2015]
   Avoid a harmless potential integer overflow in png_XYZ_from_xy() (Bug
     report from Christopher Ferris).
 
-Version 1.6.18beta05 [May 30, 2015]
+Version 1.6.18beta05 [May 31, 2015]
   Backport filter selection code from libpng-1.7.0beta51, to combine
     sub_row, up_row, avg_row, and paeth_row into try_row and tst_row.
+  Changed png_voidcast(), etc., to voidcast(), etc., in contrib/tools/pngfix.c
+    to avoid confusion with the libpng private macros.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
