@@ -1747,46 +1747,18 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
    PNG_FILTER_AVG | PNG_FILTER_PAETH)
 
 #ifdef PNG_WRITE_SUPPORTED
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* EXPERIMENTAL */
-/* The "heuristic_method" is given by one of the PNG_FILTER_HEURISTIC_
- * defines, either the default (minimum-sum-of-absolute-differences), or
- * the experimental method (weighted-minimum-sum-of-absolute-differences).
- *
- * Weights are factors >= 1.0, indicating how important it is to keep the
- * filter type consistent between rows.  Larger numbers mean the current
- * filter is that many times as likely to be the same as the "num_weights"
- * previous filters.  This is cumulative for each previous row with a weight.
- * There needs to be "num_weights" values in "filter_weights", or it can be
- * NULL if the weights aren't being specified.  Weights have no influence on
- * the selection of the first row filter.  Well chosen weights can (in theory)
- * improve the compression for a given image.
- *
- * Costs are factors >= 1.0 indicating the relative decoding costs of a
- * filter type.  Higher costs indicate more decoding expense, and are
- * therefore less likely to be selected over a filter with lower computational
- * costs.  There needs to be a value in "filter_costs" for each valid filter
- * type (given by PNG_FILTER_VALUE_LAST), or it can be NULL if you aren't
- * setting the costs.  Costs try to improve the speed of decompression without
- * unduly increasing the compressed image size.
- *
- * A negative weight or cost indicates the default value is to be used, and
- * values in the range [0.0, 1.0) indicate the value is to remain unchanged.
- * The default values for both weights and costs are currently 1.0, but may
- * change if good general weighting/cost heuristics can be found.  If both
- * the weights and costs are set to 1.0, this degenerates the WEIGHTED method
- * to the UNWEIGHTED method, but with added encoding time/computation.
- */
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
 PNG_FP_EXPORT(68, void, png_set_filter_heuristics, (png_structrp png_ptr,
     int heuristic_method, int num_weights, png_const_doublep filter_weights,
-    png_const_doublep filter_costs))
+    png_const_doublep filter_costs) PNG_DEPRECATED)
 PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
     (png_structrp png_ptr, int heuristic_method, int num_weights,
     png_const_fixed_point_p filter_weights,
-    png_const_fixed_point_p filter_costs))
+    png_const_fixed_point_p filter_costs) PNG_DEPRECATED)
 #endif /*  WRITE_WEIGHTED_FILTER */
 
 /* Heuristic used for row filter selection.  These defines should NOT be
- * changed.
+ * changed.  As of libpng-1.7.0beta62, these are no longer used.
  */
 #define PNG_FILTER_HEURISTIC_DEFAULT    0  /* Currently "UNWEIGHTED" */
 #define PNG_FILTER_HEURISTIC_UNWEIGHTED 1  /* Used by libpng < 0.95 */
