@@ -1,4 +1,4 @@
-Libpng 1.6.18beta06 - May 31, 2015
+Libpng 1.6.18beta06 - June 1, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -62,7 +62,12 @@ Version 1.6.18beta05 [May 31, 2015]
   Fixed old cut&paste bug in the weighted filter selection code in
     pngwutil.c, introduced in libpng-0.95, March 1997.
 
-Version 1.6.18beta06 [May 31, 2015]
+Version 1.6.18beta06 [June 1, 2015]
+  Removed WRITE_WEIGHTED_FILTERED code, to save a few kbytes of the
+    compiled library size. It never worked properly and as far as we can
+    tell, no one uses it. The png_set_filter_heuristics() and
+    png_set_filter_heuristics_fixed() APIs are retained but deprecated
+    and do nothing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
