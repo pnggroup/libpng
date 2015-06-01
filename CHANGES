@@ -5254,6 +5254,8 @@ Version 1.6.18beta06 [June 1, 2015]
     png_set_filter_heuristics_fixed() APIs are retained but deprecated
     and do nothing.
 
+Version 1.6.18beta07 [June 1, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
