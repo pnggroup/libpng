@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.23beta01, May 21, 2015
+ * libpng version 1.5.23beta02, June 1, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.23beta01, May 21, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.5.23beta02, June 1, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -209,7 +209,7 @@
  *    1.5.22beta01-04         15    10522  15.so.15.22[.0]
  *    1.5.22rc01-04           15    10522  15.so.15.22[.0]
  *    1.5.22                  15    10522  15.so.15.22[.0]
- *    1.5.23beta01            15    10523  15.so.15.23[.0]
+ *    1.5.23beta01-02         15    10523  15.so.15.23[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -241,7 +241,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.5.23beta01, May 21, 2015, are
+ * libpng versions 1.2.6, August 15, 2004, through 1.5.23beta02, June 1, 2015, are
  * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.2.5
  * with the following individual added to the list of Contributing Authors:
@@ -353,13 +353,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    May 21, 2015
+ *    June 1, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.5.23beta01 are Y2K compliant.  It is my belief that
+ *    upward through 1.5.23beta02 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -420,9 +420,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.5.23beta01"
+#define PNG_LIBPNG_VER_STRING "1.5.23beta02"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.23beta01 - May 21, 2015\n"
+     " libpng version 1.5.23beta02 - June 1, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -436,7 +436,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  01
+#define PNG_LIBPNG_VER_BUILD  02
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -583,7 +583,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_5_23beta01;
+typedef char* png_libpng_version_1_5_23beta02;
 
 /* Three color definitions.  The order of the red, green, and blue, (and the
  * exact size) is not important, although the size of the fields need to
@@ -1672,35 +1672,7 @@ PNG_EXPORT(67, void, png_set_filter,
 #define PNG_FILTER_VALUE_PAETH 4
 #define PNG_FILTER_VALUE_LAST  5
 
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* EXPERIMENTAL */
-/* The "heuristic_method" is given by one of the PNG_FILTER_HEURISTIC_
- * defines, either the default (minimum-sum-of-absolute-differences), or
- * the experimental method (weighted-minimum-sum-of-absolute-differences).
- *
- * Weights are factors >= 1.0, indicating how important it is to keep the
- * filter type consistent between rows.  Larger numbers mean the current
- * filter is that many times as likely to be the same as the "num_weights"
- * previous filters.  This is cumulative for each previous row with a weight.
- * There needs to be "num_weights" values in "filter_weights", or it can be
- * NULL if the weights aren't being specified.  Weights have no influence on
- * the selection of the first row filter.  Well chosen weights can (in theory)
- * improve the compression for a given image.
- *
- * Costs are factors >= 1.0 indicating the relative decoding costs of a
- * filter type.  Higher costs indicate more decoding expense, and are
- * therefore less likely to be selected over a filter with lower computational
- * costs.  There needs to be a value in "filter_costs" for each valid filter
- * type (given by PNG_FILTER_VALUE_LAST), or it can be NULL if you aren't
- * setting the costs.  Costs try to improve the speed of decompression without
- * unduly increasing the compressed image size.
- *
- * A negative weight or cost indicates the default value is to be used, and
- * values in the range [0.0, 1.0) indicate the value is to remain unchanged.
- * The default values for both weights and costs are currently 1.0, but may
- * change if good general weighting/cost heuristics can be found.  If both
- * the weights and costs are set to 1.0, this degenerates the WEIGHTED method
- * to the UNWEIGHTED method, but with added encoding time/computation.
- */
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
 PNG_FP_EXPORT(68, void, png_set_filter_heuristics, (png_structp png_ptr,
     int heuristic_method, int num_weights, png_const_doublep filter_weights,
     png_const_doublep filter_costs))
