@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta62 - May 31, 2015
+Libpng 1.7.0beta63 - June 1, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta62.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta62.tar.gz
+   1.7.0beta63.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta63.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b62.7z  (LZMA-compressed, recommended)
-   lp170b62.zip
+   lp170b63.7z  (LZMA-compressed, recommended)
+   lp170b63.zip
 
 Other information:
 
-   1.7.0beta62-README.txt
-   1.7.0beta62-LICENSE.txt
-   libpng-1.7.0beta62-*.asc (armored detached GPG signatures)
+   1.7.0beta63-README.txt
+   1.7.0beta63-LICENSE.txt
+   libpng-1.7.0beta63-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -808,11 +808,13 @@ Version 1.7.0beta61 [May 31, 2015]
   Fixed old cut&paste bug in the weighted filter selection code in
     pngwutil.c, introduced in libpng-0.95, March 1997.
 
-Version 1.7.0beta62 [May 31, 2015]
+Version 1.7.0beta62 [June 1, 2015]
   Removed WRITE_WEIGHTED_FILTERED code, to save a few kbytes of the
     compiled library size. It never worked properly and as far as we can
     tell, no one uses it. The png_set_filter_heuristics() and
     png_set_filter_heuristics_fixed(). APIs are retained but deprecated.
+
+Version 1.7.0beta63 [June 1, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
