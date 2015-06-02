@@ -457,11 +457,6 @@ png_create_write_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
        warn_fn, NULL, NULL, NULL));
 }
 
-/* Alternate initialize png_ptr structure, and allocate any memory needed */
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-static void png_reset_filter_heuristics(png_structp png_ptr); /* forward decl */
-#endif
-
 PNG_FUNCTION(png_structp,PNGAPI
 png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
@@ -546,10 +541,6 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    }
 
    png_set_write_fn(png_ptr, NULL, NULL, NULL);
-
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-   png_reset_filter_heuristics(png_ptr);
-#endif
 
    return (png_ptr);
 }
@@ -985,13 +976,6 @@ png_write_destroy(png_structp png_ptr)
    png_free(png_ptr, png_ptr->paeth_row);
 #endif
 
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-   /* Use this to save a little code space, it doesn't free the filter_costs */
-   png_reset_filter_heuristics(png_ptr);
-   png_free(png_ptr, png_ptr->filter_costs);
-   png_free(png_ptr, png_ptr->inv_filter_costs);
-#endif
-
 #ifdef PNG_SETJMP_SUPPORTED
    /* Reset structure */
    png_memcpy(tmp_jmp, png_ptr->longjmp_buffer, png_sizeof(jmp_buf));
@@ -1157,122 +1141,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
  * filtered data going to zlib more consistent, hopefully resulting in
  * better compression.
  */
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED      /* GRR 970116 */
-/* Convenience reset API. */
-static void
-png_reset_filter_heuristics(png_structp png_ptr)
-{
-   /* Clear out any old values in the 'weights' - this must be done because if
-    * the app calls set_filter_heuristics multiple times with different
-    * 'num_weights' values we would otherwise potentially have wrong sized
-    * arrays.
-    */
-   png_ptr->num_prev_filters = 0;
-   png_ptr->heuristic_method = PNG_FILTER_HEURISTIC_UNWEIGHTED;
-   if (png_ptr->prev_filters != NULL)
-   {
-      png_bytep old = png_ptr->prev_filters;
-      png_ptr->prev_filters = NULL;
-      png_free(png_ptr, old);
-   }
-   if (png_ptr->filter_weights != NULL)
-   {
-      png_uint_16p old = png_ptr->filter_weights;
-      png_ptr->filter_weights = NULL;
-      png_free(png_ptr, old);
-   }
-
-   if (png_ptr->inv_filter_weights != NULL)
-   {
-      png_uint_16p old = png_ptr->inv_filter_weights;
-      png_ptr->inv_filter_weights = NULL;
-      png_free(png_ptr, old);
-   }
-
-   /* Leave the filter_costs - this array is fixed size. */
-}
-
-static int
-png_init_filter_heuristics(png_structp png_ptr, int heuristic_method,
-   int num_weights)
-{
-   if (png_ptr == NULL)
-      return 0;
-
-   /* Clear out the arrays */
-   png_reset_filter_heuristics(png_ptr);
-
-   /* Check arguments; the 'reset' function makes the correct settings for the
-    * unweighted case, but we must handle the weight case by initializing the
-    * arrays for the caller.
-    */
-   if (heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-   {
-      int i;
-
-      if (num_weights > 0)
-      {
-         png_ptr->prev_filters = (png_bytep)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_byte) * num_weights));
-
-         /* To make sure that the weighting starts out fairly */
-         for (i = 0; i < num_weights; i++)
-         {
-            png_ptr->prev_filters[i] = 255;
-         }
-
-         png_ptr->filter_weights = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
-
-         png_ptr->inv_filter_weights = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * num_weights));
-
-         for (i = 0; i < num_weights; i++)
-         {
-            png_ptr->inv_filter_weights[i] =
-            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
-         }
-
-         /* Safe to set this now */
-         png_ptr->num_prev_filters = (png_byte)num_weights;
-      }
-
-      /* If, in the future, there are other filter methods, this would
-       * need to be based on png_ptr->filter.
-       */
-      if (png_ptr->filter_costs == NULL)
-      {
-         png_ptr->filter_costs = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
-
-         png_ptr->inv_filter_costs = (png_uint_16p)png_malloc(png_ptr,
-             (png_uint_32)(png_sizeof(png_uint_16) * PNG_FILTER_VALUE_LAST));
-      }
-
-      for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
-      {
-         png_ptr->inv_filter_costs[i] =
-         png_ptr->filter_costs[i] = PNG_COST_FACTOR;
-      }
-
-      /* All the arrays are inited, safe to set this: */
-      png_ptr->heuristic_method = PNG_FILTER_HEURISTIC_WEIGHTED;
-
-      /* Return the 'ok' code. */
-      return 1;
-   }
-   else if (heuristic_method == PNG_FILTER_HEURISTIC_DEFAULT ||
-      heuristic_method == PNG_FILTER_HEURISTIC_UNWEIGHTED)
-   {
-      return 1;
-   }
-   else
-   {
-      png_warning(png_ptr, "Unknown filter heuristic method");
-      return 0;
-   }
-}
-
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
 /* Provide floating and fixed point APIs */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
@@ -1280,52 +1149,11 @@ png_set_filter_heuristics(png_structp png_ptr, int heuristic_method,
     int num_weights, png_const_doublep filter_weights,
     png_const_doublep filter_costs)
 {
-   png_debug(1, "in png_set_filter_heuristics");
-
-   /* The internal API allocates all the arrays and ensures that the elements of
-    * those arrays are set to the default value.
-    */
-   if (!png_init_filter_heuristics(png_ptr, heuristic_method, num_weights))
-      return;
-
-   /* If using the weighted method copy in the weights. */
-   if (heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-   {
-      int i;
-      for (i = 0; i < num_weights; i++)
-      {
-         if (filter_weights[i] <= 0.0)
-         {
-            png_ptr->inv_filter_weights[i] =
-            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
-         }
-
-         else
-         {
-            png_ptr->inv_filter_weights[i] =
-                (png_uint_16)(PNG_WEIGHT_FACTOR*filter_weights[i]+.5);
-
-            png_ptr->filter_weights[i] =
-                (png_uint_16)(PNG_WEIGHT_FACTOR/filter_weights[i]+.5);
-         }
-      }
-
-      /* Here is where we set the relative costs of the different filters.  We
-       * should take the desired compression level into account when setting
-       * the costs, so that Paeth, for instance, has a high relative cost at low
-       * compression levels, while it has a lower relative cost at higher
-       * compression settings.  The filter types are in order of increasing
-       * relative cost, so it would be possible to do this with an algorithm.
-       */
-      for (i = 0; i < PNG_FILTER_VALUE_LAST; i++) if (filter_costs[i] >= 1.0)
-      {
-         png_ptr->inv_filter_costs[i] =
-             (png_uint_16)(PNG_COST_FACTOR / filter_costs[i] + .5);
-
-         png_ptr->filter_costs[i] =
-             (png_uint_16)(PNG_COST_FACTOR * filter_costs[i] + .5);
-      }
-   }
+   PNG_UNUSED(png_ptr)
+   PNG_UNUSED(heuristic_method)
+   PNG_UNUSED(num_weights)
+   PNG_UNUSED(filter_weights)
+   PNG_UNUSED(filter_costs)
 }
 #endif /* FLOATING_POINT */
 
@@ -1335,66 +1163,14 @@ png_set_filter_heuristics_fixed(png_structp png_ptr, int heuristic_method,
     int num_weights, png_const_fixed_point_p filter_weights,
     png_const_fixed_point_p filter_costs)
 {
-   png_debug(1, "in png_set_filter_heuristics_fixed");
-
-   /* The internal API allocates all the arrays and ensures that the elements of
-    * those arrays are set to the default value.
-    */
-   if (!png_init_filter_heuristics(png_ptr, heuristic_method, num_weights))
-      return;
-
-   /* If using the weighted method copy in the weights. */
-   if (heuristic_method == PNG_FILTER_HEURISTIC_WEIGHTED)
-   {
-      int i;
-      for (i = 0; i < num_weights; i++)
-      {
-         if (filter_weights[i] <= 0)
-         {
-            png_ptr->inv_filter_weights[i] =
-            png_ptr->filter_weights[i] = PNG_WEIGHT_FACTOR;
-         }
-
-         else
-         {
-            png_ptr->inv_filter_weights[i] = (png_uint_16)
-               ((PNG_WEIGHT_FACTOR*filter_weights[i]+PNG_FP_HALF)/PNG_FP_1);
-
-            png_ptr->filter_weights[i] = (png_uint_16)((PNG_WEIGHT_FACTOR*
-               PNG_FP_1+(filter_weights[i]/2))/filter_weights[i]);
-         }
-      }
-
-      /* Here is where we set the relative costs of the different filters.  We
-       * should take the desired compression level into account when setting
-       * the costs, so that Paeth, for instance, has a high relative cost at low
-       * compression levels, while it has a lower relative cost at higher
-       * compression settings.  The filter types are in order of increasing
-       * relative cost, so it would be possible to do this with an algorithm.
-       */
-      for (i = 0; i < PNG_FILTER_VALUE_LAST; i++)
-         if (filter_costs[i] >= PNG_FP_1)
-      {
-         png_uint_32 tmp;
-
-         /* Use a 32 bit unsigned temporary here because otherwise the
-          * intermediate value will be a 32 bit *signed* integer (ANSI rules)
-          * and this will get the wrong answer on division.
-          */
-         tmp = PNG_COST_FACTOR*PNG_FP_1 + (filter_costs[i]/2);
-         tmp /= filter_costs[i];
-
-         png_ptr->inv_filter_costs[i] = (png_uint_16)tmp;
-
-         tmp = PNG_COST_FACTOR * filter_costs[i] + PNG_FP_HALF;
-         tmp /= PNG_FP_1;
-
-         png_ptr->filter_costs[i] = (png_uint_16)tmp;
-      }
-   }
+   PNG_UNUSED(png_ptr)
+   PNG_UNUSED(heuristic_method)
+   PNG_UNUSED(num_weights)
+   PNG_UNUSED(filter_weights)
+   PNG_UNUSED(filter_costs)
 }
 #endif /* FIXED_POINT */
-#endif /* PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
+#endif /* WRITE_WEIGHTED_FILTER */
 
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 void PNGAPI

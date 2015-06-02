@@ -1,5 +1,5 @@
 
-Libpng 1.5.23beta01 - May 21, 2015
+Libpng 1.5.23beta02 - June 1, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.23beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.23beta01.tar.gz
-   1.5.23beta01.tar.bz2
+   1.5.23beta02.tar.xz (LZMA-compressed, recommended)
+   1.5.23beta02.tar.gz
+   1.5.23beta02.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1523b01.7z  (LZMA-compressed, recommended)
-   lp1523b01.zip
+   lp1523b02.7z  (LZMA-compressed, recommended)
+   lp1523b02.zip
 
 Other information:
 
-   1.5.23beta01-README.txt
-   1.5.23beta01-LICENSE.txt
-   libpng-1.5.23beta01-*.asc (armored detached GPG signatures)
+   1.5.23beta02-README.txt
+   1.5.23beta02-LICENSE.txt
+   libpng-1.5.23beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.22):
 
@@ -37,6 +37,13 @@ Version 1.5.23beta01 [May 21, 2015]
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
   Avoid a harmless potential integer overflow in png_XYZ_from_xy() (Bug
     report from Christopher Ferris).
+
+Version 1.5.23beta02 [June 1, 2015]
+  Removed WRITE_WEIGHTED_FILTERED code, to save a few kbytes of the
+    compiled library size. It never worked properly and as far as we can
+    tell, no one uses it. The png_set_filter_heuristics() and
+    png_set_filter_heuristics_fixed() APIs are retained but deprecated
+    and do nothing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
