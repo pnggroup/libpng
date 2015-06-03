@@ -19,7 +19,6 @@
 #define PNG_READ_SIG_MODE   0
 #define PNG_READ_CHUNK_MODE 1
 #define PNG_READ_IDAT_MODE  2
-#define PNG_SKIP_MODE       3
 #define PNG_READ_tEXt_MODE  4
 #define PNG_READ_zTXt_MODE  5
 #define PNG_READ_DONE_MODE  6
@@ -78,32 +77,14 @@ png_process_data_pause(png_structrp png_ptr, int save)
 png_uint_32 PNGAPI
 png_process_data_skip(png_structrp png_ptr)
 {
-   png_uint_32 remaining = 0;
-
-   if (png_ptr != NULL && png_ptr->process_mode == PNG_SKIP_MODE &&
-      png_ptr->skip_length > 0)
-   {
-      /* At the end of png_process_data the buffer size must be 0 (see the loop
-       * above) so we can detect a broken call here:
-       */
-      if (png_ptr->buffer_size != 0)
-         png_error(png_ptr,
-            "png_process_data_skip called inside png_process_data");
-
-      /* If is impossible for there to be a saved buffer at this point -
-       * otherwise we could not be in SKIP mode.  This will also happen if
-       * png_process_skip is called inside png_process_data (but only very
-       * rarely.)
-       */
-      if (png_ptr->save_buffer_size != 0)
-         png_error(png_ptr, "png_process_data_skip called with saved data");
-
-      remaining = png_ptr->skip_length;
-      png_ptr->skip_length = 0;
-      png_ptr->process_mode = PNG_READ_CHUNK_MODE;
-   }
-
-   return remaining;
+    /* TODO: Deprecate and remove this API.
+     * Somewhere the implementation of this seems to have been lost,
+     * or abandoned.  It was only to support some internal back-door access
+     * to png_struct) in libpng-1.4.x.
+     */
+   png_app_warning(png_ptr,
+"png_process_data_skip is not implemented in any current version of libpng");
+   return 0;
 }
 
 /* What we do with the incoming data depends on what we were previously
@@ -132,12 +113,6 @@ png_process_some_data(png_structrp png_ptr, png_inforp info_ptr)
       case PNG_READ_IDAT_MODE:
       {
          png_push_read_IDAT(png_ptr);
-         break;
-      }
-
-      case PNG_SKIP_MODE:
-      {
-         png_push_crc_finish(png_ptr);
          break;
       }
 
@@ -437,69 +412,6 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    }
 
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
-}
-
-void /* PRIVATE */
-png_push_crc_skip(png_structrp png_ptr, png_uint_32 skip)
-{
-   png_ptr->process_mode = PNG_SKIP_MODE;
-   png_ptr->skip_length = skip;
-}
-
-void /* PRIVATE */
-png_push_crc_finish(png_structrp png_ptr)
-{
-   if (png_ptr->skip_length != 0 && png_ptr->save_buffer_size != 0)
-   {
-      png_size_t save_size = png_ptr->save_buffer_size;
-      png_uint_32 skip_length = png_ptr->skip_length;
-
-      /* We want the smaller of 'skip_length' and 'save_buffer_size', but
-       * they are of different types and we don't know which variable has the
-       * fewest bits.  Carefully select the smaller and cast it to the type of
-       * the larger - this cannot overflow.  Do not cast in the following test
-       * - it will break on either 16 or 64 bit platforms.
-       */
-      if (skip_length < save_size)
-         save_size = (png_size_t)skip_length;
-
-      else
-         skip_length = (png_uint_32)save_size;
-
-      png_calculate_crc(png_ptr, png_ptr->save_buffer_ptr, save_size);
-
-      png_ptr->skip_length -= skip_length;
-      png_ptr->buffer_size -= save_size;
-      png_ptr->save_buffer_size -= save_size;
-      png_ptr->save_buffer_ptr += save_size;
-   }
-   if (png_ptr->skip_length != 0 && png_ptr->current_buffer_size != 0)
-   {
-      png_size_t save_size = png_ptr->current_buffer_size;
-      png_uint_32 skip_length = png_ptr->skip_length;
-
-      /* We want the smaller of 'skip_length' and 'current_buffer_size', here,
-       * the same problem exists as above and the same solution.
-       */
-      if (skip_length < save_size)
-         save_size = (png_size_t)skip_length;
-
-      else
-         skip_length = (png_uint_32)save_size;
-
-      png_calculate_crc(png_ptr, png_ptr->current_buffer_ptr, save_size);
-
-      png_ptr->skip_length -= skip_length;
-      png_ptr->buffer_size -= save_size;
-      png_ptr->current_buffer_size -= save_size;
-      png_ptr->current_buffer_ptr += save_size;
-   }
-   if (png_ptr->skip_length == 0)
-   {
-      PNG_PUSH_SAVE_BUFFER_IF_LT(4)
-      png_crc_finish(png_ptr, 0);
-      png_ptr->process_mode = PNG_READ_CHUNK_MODE;
-   }
 }
 
 void PNGCBAPI
