@@ -1,8 +1,8 @@
 
 /* png-fix-itxt version 1.0.0
  *
- * Copyright 2013 Glenn Randers-Pehrson
- * Last changed in libpng 1.6.3 [July 18, 2013]
+ * Copyright 2015 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -57,10 +57,10 @@ for (;;)
  {
    /* Read the length */
    unsigned long length; /* must be 32 bits! */
-   c=GETBREAK; buf[0] = c; length  = c; length <<= 8;
-   c=GETBREAK; buf[1] = c; length += c; length <<= 8;
-   c=GETBREAK; buf[2] = c; length += c; length <<= 8;
-   c=GETBREAK; buf[3] = c; length += c;
+   c=GETBREAK; buf[0] = c; length  = (c % 0xff); length <<= 8;
+   c=GETBREAK; buf[1] = c; length += (c % 0xff); length <<= 8;
+   c=GETBREAK; buf[2] = c; length += (c % 0xff); length <<= 8;
+   c=GETBREAK; buf[3] = c; length += (c % 0xff);
 
    /* Read the chunkname */
    c=GETBREAK; buf[4] = c;
@@ -109,9 +109,9 @@ for (;;)
       }
 
       /* Update length bytes */
-      buf[0] = (unsigned char)((length << 24) & 0xff);
-      buf[1] = (unsigned char)((length << 16) & 0xff);
-      buf[2] = (unsigned char)((length <<  8) & 0xff);
+      buf[0] = (unsigned char)((length >> 24) & 0xff);
+      buf[1] = (unsigned char)((length >> 16) & 0xff);
+      buf[2] = (unsigned char)((length >>  8) & 0xff);
       buf[3] = (unsigned char)((length      ) & 0xff);
 
       /* Write the fixed iTXt chunk (length, name, data, crc) */

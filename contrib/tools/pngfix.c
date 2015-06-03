@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -3853,6 +3853,7 @@ usage(const char *prog)
 int
 main(int argc, const char **argv)
 {
+   char temp_name[FILENAME_MAX+1];
    const char *  prog = *argv;
    const char *  outfile = NULL;
    const char *  suffix = NULL;
@@ -3955,7 +3956,6 @@ main(int argc, const char **argv)
       else
       {
          size_t outlen = strlen(*argv);
-         char temp_name[FILENAME_MAX+1];
 
          if (outfile == NULL) /* else this takes precedence */
          {

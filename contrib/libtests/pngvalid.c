@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.17 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
  * Copyright (c) 2014-2015 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -1319,7 +1319,10 @@ store_current_palette(png_store *ps, int *npalette)
     * operation.)
     */
    if (ps->current == NULL)
+   {
       store_log(ps, ps->pread, "no current stream for palette", 1);
+      return NULL;
+   }
 
    /* The result may be null if there is no palette. */
    *npalette = ps->current->npalette;
