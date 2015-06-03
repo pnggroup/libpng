@@ -1093,12 +1093,14 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
              png_ptr->width) + 1;
 
          if (png_ptr->try_row == NULL)
-            png_ptr->try_row = png_malloc(png_ptr, buf_size);
+            png_ptr->try_row = png_voidcast(png_bytep,
+               png_malloc(png_ptr, buf_size));
 
          if (num_filters > 1)
          {
             if (png_ptr->tst_row == NULL)
-               png_ptr->tst_row = png_malloc(png_ptr, buf_size);
+               png_ptr->tst_row = png_voidcast(png_bytep,
+                  png_malloc(png_ptr, buf_size));
          }
       }
       png_ptr->do_filter = (png_byte)filters;

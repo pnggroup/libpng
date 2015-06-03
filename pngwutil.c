@@ -2021,7 +2021,8 @@ png_write_start_row(png_structrp png_ptr)
     * filters.
     */
    if ((filters & (PNG_FILTER_AVG | PNG_FILTER_UP | PNG_FILTER_PAETH)) != 0)
-      png_ptr->prev_row = png_calloc(png_ptr, buf_size);
+      png_ptr->prev_row = png_voidcast(png_bytep,
+         png_calloc(png_ptr, buf_size));
 #endif /* WRITE_FILTER */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED

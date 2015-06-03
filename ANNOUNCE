@@ -79,7 +79,7 @@ Version 1.6.18beta07 [June 3, 2015]
     variables in the Try macro needs to be volatile to prevent value
     being lost over the setjmp (John Bowler).
   Fixed NO_WRITE_FILTER and -Wconversion build breaks (John Bowler).
-
+  Fix g++ build breaks (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
