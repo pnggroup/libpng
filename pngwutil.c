@@ -1962,7 +1962,7 @@ png_write_start_row(png_structrp png_ptr)
    int usr_pixel_depth;
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
-   int filters;
+   png_byte filters;
 #endif
 
    png_debug(1, "in png_write_start_row");
@@ -1983,10 +1983,10 @@ png_write_start_row(png_structrp png_ptr)
    filters = png_ptr->do_filter;
 
    if (png_ptr->height == 1)
-      filters &= ~(PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+      filters &= 0xff & ~(PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
 
    if (png_ptr->width == 1)
-      filters &= ~(PNG_FILTER_SUB|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+      filters &= 0xff & ~(PNG_FILTER_SUB|PNG_FILTER_AVG|PNG_FILTER_PAETH);
 
    if (filters == 0)
       filters = PNG_FILTER_NONE;

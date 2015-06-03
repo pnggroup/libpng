@@ -1032,6 +1032,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
 #endif /* WRITE_FILTER */
       }
 
+#ifdef PNG_WRITE_FILTER_SUPPORTED
       /* If we have allocated the row_buf, this means we have already started
        * with the image and we should have allocated all of the filter buffers
        * that have been selected.  If prev_row isn't already allocated, then
@@ -1101,20 +1102,14 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
          }
       }
       png_ptr->do_filter = (png_byte)filters;
+#endif
    }
    else
       png_error(png_ptr, "Unknown custom filter method");
 }
 
-/* This allows us to influence the way in which libpng chooses the "best"
- * filter for the current scanline.  While the "minimum-sum-of-absolute-
- * differences metric is relatively fast and effective, there is some
- * question as to whether it can be improved upon by trying to keep the
- * filtered data going to zlib more consistent, hopefully resulting in
- * better compression.
- */
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED      /* GRR 970116 */
-/* Provide floating and fixed point APIs (DEPRECATED) */
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
+/* Provide floating and fixed point APIs */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 void PNGAPI
 png_set_filter_heuristics(png_structrp png_ptr, int heuristic_method,
