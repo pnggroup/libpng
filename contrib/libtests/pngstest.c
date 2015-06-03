@@ -1,9 +1,9 @@
 /*-
  * pngstest.c
  *
- * Copyright (c) 2013-2014 John Cunningham Bowler
+ * Copyright (c) 2013-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.16 [December 22, 2014]
+ * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -615,7 +615,7 @@ freeimage(Image *image)
 
    if (image->tmpfile_name[0] != 0 && (image->opts & KEEP_TMPFILES) == 0)
    {
-      remove(image->tmpfile_name);
+      (void)remove(image->tmpfile_name);
       image->tmpfile_name[0] = 0;
    }
 }
@@ -2828,7 +2828,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
 
             else if (y >= b->image.colormap_entries)
             {
-               if ((a->opts & ACCUMULATE) == 0)
+               if ((b->opts & ACCUMULATE) == 0)
                   {
                   char pindex[9];
                   sprintf(pindex, "%lu[%lu]", (unsigned long)y,
@@ -3175,7 +3175,9 @@ read_one_file(Image *image)
 
                if (cb > 0)
                {
+#ifndef __COVERITY__
                   if ((unsigned long int)cb <= (size_t)~(size_t)0)
+#endif
                   {
                      png_bytep b = voidcast(png_bytep, malloc((size_t)cb));
 
@@ -3588,7 +3590,7 @@ main(int argc, char **argv)
             }
 
             /* Safe: checked above */
-            strcpy(tmpf, argv[c]);
+            strncpy(tmpf, argv[c], sizeof (tmpf)-1);
          }
 
          else

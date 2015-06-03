@@ -5265,6 +5265,9 @@ Version 1.6.18beta07 [June 3, 2015]
     being lost over the setjmp (John Bowler).
   Fixed NO_WRITE_FILTER and -Wconversion build breaks (John Bowler).
   Fix g++ build breaks (John Bowler).
+  Quieted Coverity issues in pngfix.c, png-fix-itxt.c, pngvalid.c,
+    pngstest.c, and pngimage.c. Most seem harmless, but png-fix-itxt
+    would only work with iTXt chunks with length 255 or less.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
