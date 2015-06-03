@@ -1317,9 +1317,6 @@ PNG_EXTERN void png_push_read_chunk PNGARG((png_structp png_ptr,
 PNG_EXTERN void png_push_read_sig PNGARG((png_structp png_ptr,
     png_infop info_ptr));
 PNG_EXTERN void png_push_check_crc PNGARG((png_structp png_ptr));
-PNG_EXTERN void png_push_crc_skip PNGARG((png_structp png_ptr,
-    png_uint_32 length));
-PNG_EXTERN void png_push_crc_finish PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_push_save_buffer PNGARG((png_structp png_ptr));
 PNG_EXTERN void png_push_restore_buffer PNGARG((png_structp png_ptr,
     png_bytep buffer, png_size_t buffer_length));
