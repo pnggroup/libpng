@@ -71,7 +71,8 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          case 2:
          {
             png_bytep sp, dp;
-            int shift, v;
+            unsigned int shift;
+            int v;
             png_uint_32 i;
             png_uint_32 row_width = row_info->width;
 
@@ -110,7 +111,8 @@ png_do_pack(png_row_infop row_info, png_bytep row, png_uint_32 bit_depth)
          case 4:
          {
             png_bytep sp, dp;
-            int shift, v;
+            unsigned int shift;
+            int v;
             png_uint_32 i;
             png_uint_32 row_width = row_info->width;
 

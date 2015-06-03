@@ -5260,6 +5260,9 @@ Version 1.6.18beta07 [June 3, 2015]
     to support back-door modification of png_struct in libpng-1.4.x
     but was apparently never tested (because it does nothing and cannot
     do anything).
+  Fixed cexcept.h in which GCC 5 now reports that one of the auto
+    variables in the Try macro needs to be volatile to prevent value
+    being lost over the setjmp.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

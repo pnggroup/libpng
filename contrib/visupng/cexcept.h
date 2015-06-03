@@ -210,7 +210,7 @@ struct exception_context { \
 
 #define Try \
   { \
-    jmp_buf *exception__prev, exception__env; \
+    jmp_buf * volatile exception__prev, exception__env; \
     exception__prev = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \

@@ -766,13 +766,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.18beta07 - June 1, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.6.18beta07 - June 3, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.18beta07 - June 1, 2015\
+      return "libpng version 1.6.18beta07 - June 3, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2844,7 +2844,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
 
       if (fp >= DBL_MIN && fp <= DBL_MAX)
       {
-         int exp_b10;       /* A base 10 exponent */
+         int exp_b10;   /* A base 10 exponent */
          double base;   /* 10^exp_b10 */
 
          /* First extract a base 10 exponent of the number,
@@ -2892,7 +2892,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
           */
 
          {
-            int czero, clead, cdigits;
+            unsigned int czero, clead, cdigits;
             char exponent[10];
 
             /* Allow up to two leading zeros - this will not lengthen
@@ -2922,7 +2922,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
                 * of the loop don't break the number into parts so
                 * that the final digit is rounded.
                 */
-               if (cdigits+czero-clead+1 < (int)precision)
+               if (cdigits+czero+1 < precision+clead)
                   fp = modf(fp, &d);
 
                else
@@ -3028,7 +3028,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
                   *ascii++ = (char)(48 + (int)d), ++cdigits;
                }
             }
-            while (cdigits+czero-clead < (int)precision && fp > DBL_MIN);
+            while (cdigits+czero < precision+clead && fp > DBL_MIN);
 
             /* The total output count (max) is now 4+precision */
 
@@ -3096,7 +3096,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
             /* Need another size check here for the exponent digits, so
              * this need not be considered above.
              */
-            if ((int)size > cdigits)
+            if (size > cdigits)
             {
                while (cdigits > 0) *ascii++ = exponent[--cdigits];
 

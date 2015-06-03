@@ -4097,7 +4097,7 @@ make_error(png_store* volatile psIn, png_byte PNG_CONST colour_type,
 
    Try
    {
-      png_structp pp;
+      volatile png_structp pp;
       png_infop pi;
 
       pp = set_store_for_write(ps, &pi, name);
