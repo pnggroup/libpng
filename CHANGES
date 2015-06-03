@@ -4350,12 +4350,13 @@ Version 1.5.23beta01 [May 21, 2015]
   Avoid a harmless potential integer overflow in png_XYZ_from_xy() (Bug
     report from Christopher Ferris).
 
-Version 1.5.23beta02 [June 1, 2015]
+Version 1.5.23beta02 [June 2, 2015]
   Removed WRITE_WEIGHTED_FILTERED code, to save a few kbytes of the
     compiled library size. It never worked properly and as far as we can
     tell, no one uses it. The png_set_filter_heuristics() and
     png_set_filter_heuristics_fixed() APIs are retained but deprecated
     and do nothing.
+  Quieted Coverity issues in pngvalid.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

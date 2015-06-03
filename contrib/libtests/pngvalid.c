@@ -1275,7 +1275,10 @@ store_current_palette(png_store *ps, int *npalette)
     * operation.)
     */
    if (ps->current == NULL)
+   {
       store_log(ps, ps->pread, "no current stream for palette", 1);
+      return NULL;
+   }
 
    /* The result may be null if there is no palette. */
    *npalette = ps->current->npalette;
@@ -5667,7 +5670,7 @@ image_transform_mod_end(PNG_CONST image_transform *this, image_pixel *that,
    else
    {
       that->alpha = scale; /* opaque */
-      that->alpha = 1;     /* Override this. */
+      that->alphaf = 1;    /* Override this. */
       that->alphae = 0;    /* It's exact ;-) */
    }
 }
