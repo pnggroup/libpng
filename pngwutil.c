@@ -2195,7 +2195,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
          {
             png_bytep sp;
             png_bytep dp;
-            int shift;
+            unsigned int shift;
             int d;
             int value;
             png_uint_32 i;
@@ -2233,7 +2233,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
          {
             png_bytep sp;
             png_bytep dp;
-            int shift;
+            unsigned int shift;
             int d;
             int value;
             png_uint_32 i;
@@ -2270,7 +2270,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
          {
             png_bytep sp;
             png_bytep dp;
-            int shift;
+            unsigned int shift;
             int d;
             int value;
             png_uint_32 i;

@@ -57,10 +57,10 @@ for (;;)
  {
    /* Read the length */
    unsigned long length; /* must be 32 bits! */
-   c=GETBREAK; buf[0] = c; length  = (c % 0xff); length <<= 8;
-   c=GETBREAK; buf[1] = c; length += (c % 0xff); length <<= 8;
-   c=GETBREAK; buf[2] = c; length += (c % 0xff); length <<= 8;
-   c=GETBREAK; buf[3] = c; length += (c % 0xff);
+   c=GETBREAK; buf[0] = c; length  = (c & 0xff); length <<= 8;
+   c=GETBREAK; buf[1] = c; length += (c & 0xff); length <<= 8;
+   c=GETBREAK; buf[2] = c; length += (c & 0xff); length <<= 8;
+   c=GETBREAK; buf[3] = c; length += (c & 0xff);
 
    /* Read the chunkname */
    c=GETBREAK; buf[4] = c;

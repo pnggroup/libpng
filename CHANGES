@@ -5109,10 +5109,13 @@ Version 1.7.0beta62 [June 1, 2015]
     far as we can tell, no one uses it. The png_set_filter_heuristics() and
     png_set_filter_heuristics_fixed() APIs are retained but deprecated.
 
-Version 1.7.0beta63 [June 3, 2015]
+Version 1.7.0beta63 [June 4, 2015]
   Quieted Coverity issues in pngfix.c, png-fix-itxt.c, pngvalid.c,
     pngstest.c, and pngimage.c. Most seem harmless, but png-fix-itxt
     would only work with iTXt chunks with length 255 or less.
+  Fixed cexcept.h in which GCC 5 reported that one of the auto
+    variables in the Try macro needs to be volatile to prevent value
+    being lost over the setjmp, and fixed g++ build breaks (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
