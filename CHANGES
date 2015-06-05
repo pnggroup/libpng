@@ -5123,6 +5123,14 @@ Version 1.7.0beta63 [June 5, 2015]
     API in pngread.c but that is because of a long-standing libpng bug,
     namely that the gamma corrected palette is no produced by
     png_read_update_info (John Bowler).
+  Completed AArch64 support. The previous change to recognize __ARM_NEON
+    didn't touch all the required preprocessor lines. This change removes
+    support for __ARM_NEON__ completely and makes this consistent.
+
+This change ensures that only compilers which are tracking ARM Ltd
+specifications will turn the NEON code on, since the code is turned on
+automatically for AArch64 this seems much safer than trying to track all teh
+bugs in all the versions of GCC.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
