@@ -935,54 +935,6 @@ PNG_INTERNAL_DATA(const png_byte, png_sRGB_delta, [512]);
 extern "C" {
 #endif /* __cplusplus */
 
-#if defined (PNG_READ_TRANSFORMS_SUPPORTED) ||\
-    defined (PNG_WRITE_TRANSFORMS_SUPPORTED)
-/* Transform support.  Prior to 1.7.0 the internal transform routines (not the
- * APIs) took a png_row_infop, like the user transform function, but without
- * the png_ptr because it was never used.  In 1.7.0 a separate internal
- * structure is used in place of this to allow both future development to
- * change the structure.
- *
- * The values in this structure will normally be changed by transformation
- * implementations.
- */
-typedef struct
-{
-   png_const_structrp png_ptr;   /* png_struct for error handling and some
-                                  * transform parameters.
-                                  */
-   png_uint_32        width;     /* width of row */
-   unsigned int       channels;  /* number of channels (1, 2, 3, or 4) */
-   unsigned int       bit_depth; /* bit depth of row */
-   unsigned int       flags;     /* As below */
-#  define PNG_INDEXED          1 /* Indexed/palette PNG */
-#  define PNG_RGB_SWAPPED      2 /* as in the PNG_BGR transformation */
-#  define PNG_FILLER_IN_ALPHA  4 /* 'alpha' channel is really just a filler */
-#  define PNG_ALPHA_SWAPPED    8 /* Alpha is in the first channel */
-#  define PNG_ALPHA_INVERTED  16 /* Alpha values inverted */
-#  define PNG_INVERTED        32 /* grayscale channel inverted */
-#  define PNG_BITS_SHIFTED    64 /* Channels not in range 1..(bit_depth-1) */
-#  define PNG_BYTE_SWAPPED   128 /* 'swab', i.e. pairs of bytes swapped */
-#  define PNG_PIXEL_SWAPPED  256 /* pixels swapped within bytes */
-#  define PNG_BAD_INDEX      512 /* Bad palette image index */
-} png_transform_control, *png_transform_controlp;
-
-/* Validation: channels and bit_depth can be set to anything required by
- * the transform, but the result may not be encodable in PNG.  PNG_USURPED
- * must be set in this case.  This macro detects the detectably unrepresentable
- * case channels case.
- *
- * Channels: must be 1 when PNG_INDEXED is set, must be 1-4 otherwise, so:
- *
- *    (channels-1) <= (((flags & PNG_INDEXED)-1) & 3)
- */
-#define PNG_VALID_CHANNELS(ri)\
-   (((ri)->channels-1) <= ((((ri)->flags & PNG_INDEXED)-1) & 3))
-
-typedef const png_transform_control *png_const_transform_controlp;
-typedef const png_row_info *png_const_row_infop;
-#endif /* TRANSFORMS */
-
 /* Internal functions; these are not exported from a DLL however because they
  * are used within several of the C source files they have to be C extern.
  *
@@ -1435,6 +1387,64 @@ PNG_INTERNAL_FUNCTION(void,png_read_transform_info,(png_structrp png_ptr,
     png_inforp info_ptr),PNG_EMPTY);
 #endif
 
+#if defined(PNG_READ_TRANSFORMS_SUPPORTED) ||\
+    defined(PNG_WRITE_TRANSFORMS_SUPPORTED)
+/***************************** READ and WRITE TRANSFORMS ***********************
+ * These structures are used in pngrtran.c, pngwtran.c and pngtrans.c to hold
+ * information about transforms in progress.  This mechanism was introduced in
+ * libpng 1.7.0 to ensure reliable transform code and to fix multiple bugs in
+ * the pre-1.7 transform handling.
+ *
+ * Prior to 1.7.0 the internal transform routines took a png_row_infop, like the
+ * user transform function, but without the png_ptr because it was never used.
+ * In 1.7.0 a separate internal structure is used in place of this to allow both
+ * future development to change the structure.
+ *
+ * The values in this structure will normally be changed by transformation
+ * implementations.
+ ***************************** READ and WRITE TRANSFORMS **********************/
+typedef struct
+{
+   png_const_structrp png_ptr;   /* png_struct for error handling and some
+                                  * transform parameters.
+                                  */
+   png_uint_32        width;     /* width of row */
+   unsigned int       channels;  /* number of channels (1, 2, 3, or 4) */
+   unsigned int       bit_depth; /* bit depth of row */
+   unsigned int       priority;  /* priority of the previous transform (see the
+                                  * explanation below for png_transform). */
+#  ifdef PNG_READ_GAMMA_SUPPORTED
+      png_fixed_point gamma;     /* Actual gamma of the row data */
+      png_fixed_point gamma_out; /* Expected final gamma after gamma encoding */
+#  endif
+   unsigned int       flags;     /* As below */
+#  define PNG_INDEXED          1 /* Indexed/palette PNG */
+#  define PNG_RGB_SWAPPED      2 /* as in the PNG_BGR transformation */
+#  define PNG_FILLER_IN_ALPHA  4 /* 'alpha' channel is really just a filler */
+#  define PNG_ALPHA_SWAPPED    8 /* Alpha is in the first channel */
+#  define PNG_ALPHA_INVERTED  16 /* Alpha values inverted */
+#  define PNG_INVERTED        32 /* grayscale channel inverted */
+#  define PNG_BITS_SHIFTED    64 /* Channels not in range 1..(bit_depth-1) */
+#  define PNG_BYTE_SWAPPED   128 /* 'swab', i.e. pairs of bytes swapped */
+#  define PNG_PIXEL_SWAPPED  256 /* pixels swapped within bytes */
+#  define PNG_BAD_INDEX      512 /* Bad palette image index */
+} png_transform_control, *png_transform_controlp;
+
+/* Validation: channels and bit_depth can be set to anything required by
+ * the transform, but the result may not be encodable in PNG.  PNG_USURPED
+ * must be set in this case.  This macro detects the detectably unrepresentable
+ * case channels case.
+ *
+ * Channels: must be 1 when PNG_INDEXED is set, must be 1-4 otherwise, so:
+ *
+ *    (channels-1) <= (((flags & PNG_INDEXED)-1) & 3)
+ */
+#define PNG_VALID_CHANNELS(ri)\
+   (((ri)->channels-1) <= ((((ri)->flags & PNG_INDEXED)-1) & 3))
+
+typedef const png_transform_control *png_const_transform_controlp;
+typedef const png_row_info *png_const_row_infop;
+
 /* Shared transform functions, defined in pngtran.c */
 #if defined(PNG_WRITE_FILLER_SUPPORTED) || \
     defined(PNG_READ_STRIP_ALPHA_SUPPORTED)
@@ -1464,6 +1474,7 @@ PNG_INTERNAL_FUNCTION(void,png_do_invert,(png_transform_controlp row_info,
 PNG_INTERNAL_FUNCTION(void,png_do_bgr,(png_transform_controlp row_info,
     png_bytep row),PNG_EMPTY);
 #endif
+#endif /* READ_TRANSFORMS || WRITE_TRANSFORMS */
 
 /* The following decodes the appropriate chunks, and does error correction,
  * then calls the appropriate callback for the chunk if it is valid.
@@ -2030,15 +2041,6 @@ PNG_INTERNAL_FUNCTION(int,png_muldiv,(png_fixed_point_p res, png_fixed_point a,
 PNG_INTERNAL_FUNCTION(png_fixed_point,png_reciprocal,(png_fixed_point a),
    PNG_EMPTY);
 
-#ifdef PNG_READ_GAMMA_SUPPORTED
-/* The same but gives a reciprocal of the product of two fixed point
- * values.  Accuracy is suitable for gamma calculations but this is
- * not exact - use png_muldiv for that.  Only required at present on read.
- */
-PNG_INTERNAL_FUNCTION(png_fixed_point,png_reciprocal2,(png_fixed_point a,
-   png_fixed_point b),PNG_EMPTY);
-#endif
-
 /* Return true if the gamma value is significantly different from 1.0 */
 PNG_INTERNAL_FUNCTION(int,png_gamma_significant,(png_fixed_point gamma_value),
    PNG_EMPTY);
@@ -2055,13 +2057,8 @@ PNG_INTERNAL_FUNCTION(int,png_gamma_significant,(png_fixed_point gamma_value),
 PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_16bit_correct,(
    png_const_structrp png_ptr, png_uint_32 value, png_fixed_point gamma_value),
    PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(png_byte,png_gamma_8bit_correct,(
-   png_const_structrp png_ptr, png_uint_32 value, png_fixed_point gamma_value),
-   PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_destroy_gamma_table,(png_structrp png_ptr),
    PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_build_gamma_tables,(png_structrp png_ptr,
-   int bit_depth),PNG_EMPTY);
 #endif
 
 /* SIMPLIFIED READ/WRITE SUPPORT */
