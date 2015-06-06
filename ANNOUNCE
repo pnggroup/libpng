@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta63 - June 5, 2015
+Libpng 1.7.0beta63 - June 6, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -814,7 +814,7 @@ Version 1.7.0beta62 [June 1, 2015]
     far as we can tell, no one uses it. The png_set_filter_heuristics() and
     png_set_filter_heuristics_fixed() APIs are retained but deprecated.
 
-Version 1.7.0beta63 [June 5, 2015]
+Version 1.7.0beta63 [June 6, 2015]
   Quieted Coverity issues in pngfix.c, png-fix-itxt.c, pngvalid.c,
     pngstest.c, and pngimage.c. Most seem harmless, but png-fix-itxt
     would only work with iTXt chunks with length 255 or less.
@@ -831,6 +831,9 @@ Version 1.7.0beta63 [June 5, 2015]
   Completed AArch64 support. The previous change to recognize __ARM_NEON
     didn't touch all the required preprocessor lines. This change removes
     support for __ARM_NEON__ completely and makes this consistent.
+  Added #ifdef's to contrib/examples programs so people don't try
+    to compile them without the minimum required support enabled
+    (suggested by Flavio Medeiros).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

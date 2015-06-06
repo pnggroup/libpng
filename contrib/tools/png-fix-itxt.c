@@ -57,16 +57,16 @@ for (;;)
  {
    /* Read the length */
    unsigned long length; /* must be 32 bits! */
-   c=GETBREAK; buf[0] = c; length  = (c & 0xff); length <<= 8;
-   c=GETBREAK; buf[1] = c; length += (c & 0xff); length <<= 8;
-   c=GETBREAK; buf[2] = c; length += (c & 0xff); length <<= 8;
-   c=GETBREAK; buf[3] = c; length += (c & 0xff);
+   c=GETBREAK; buf[0] = c & 0xff; length  = (c & 0xff); length <<= 8;
+   c=GETBREAK; buf[1] = c & 0xff; length += (c & 0xff); length <<= 8;
+   c=GETBREAK; buf[2] = c & 0xff; length += (c & 0xff); length <<= 8;
+   c=GETBREAK; buf[3] = c & 0xff; length += (c & 0xff);
 
    /* Read the chunkname */
-   c=GETBREAK; buf[4] = c;
-   c=GETBREAK; buf[5] = c;
-   c=GETBREAK; buf[6] = c;
-   c=GETBREAK; buf[7] = c;
+   c=GETBREAK; buf[4] = c & 0xff;
+   c=GETBREAK; buf[5] = c & 0xff;
+   c=GETBREAK; buf[6] = c & 0xff;
+   c=GETBREAK; buf[7] = c & 0xff;
 
 
    /* The iTXt chunk type expressed as integers is (105, 84, 88, 116) */
@@ -81,7 +81,7 @@ for (;;)
       /* Copy the data bytes */
       for (i=8; i < length + 12; i++)
       {
-         c=GETBREAK; buf[i] = c;
+         c=GETBREAK; buf[i] = c & 0xff;
       }
 
       /* Calculate the CRC */
@@ -102,7 +102,7 @@ for (;;)
            break;
 
         c=GETBREAK;
-        buf[length+11]=c;
+        buf[length+11] = c & 0xff;
 
         /* Update the CRC */
         crc = crc32(crc, buf+7+length, 1);
@@ -129,7 +129,7 @@ for (;;)
       for (i=8; i< length+12; i++)
       {
          c=GETBREAK;
-         putchar(c);
+         putchar((c & 0xff));
       }
 
       if (inchar == EOF)
