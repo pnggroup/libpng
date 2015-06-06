@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta63 - June 6, 2015
+Libpng 1.7.0beta64 - June 6, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta63.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta63.tar.gz
+   1.7.0beta64.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta64.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b63.7z  (LZMA-compressed, recommended)
-   lp170b63.zip
+   lp170b64.7z  (LZMA-compressed, recommended)
+   lp170b64.zip
 
 Other information:
 
-   1.7.0beta63-README.txt
-   1.7.0beta63-LICENSE.txt
-   libpng-1.7.0beta63-*.asc (armored detached GPG signatures)
+   1.7.0beta64-README.txt
+   1.7.0beta64-LICENSE.txt
+   libpng-1.7.0beta64-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -834,6 +834,8 @@ Version 1.7.0beta63 [June 6, 2015]
   Added #ifdef's to contrib/examples programs so people don't try
     to compile them without the minimum required support enabled
     (suggested by Flavio Medeiros).
+
+Version 1.7.0beta64 [June 6, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
