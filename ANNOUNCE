@@ -1,4 +1,4 @@
-Libpng 1.6.18beta07 - June 3, 2015
+Libpng 1.6.18beta07 - June 6, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -69,7 +69,7 @@ Version 1.6.18beta06 [June 1, 2015]
     png_set_filter_heuristics_fixed() APIs are retained but deprecated
     and do nothing.
 
-Version 1.6.18beta07 [June 3, 2015]
+Version 1.6.18beta07 [June 6, 2015]
   Removed non-working progressive reader 'skip' function. This
     function has apparently never been used. It was implemented
     to support back-door modification of png_struct in libpng-1.4.x
@@ -80,9 +80,12 @@ Version 1.6.18beta07 [June 3, 2015]
     being lost over the setjmp (John Bowler).
   Fixed NO_WRITE_FILTER and -Wconversion build breaks (John Bowler).
   Fix g++ build breaks (John Bowler).
-  Quieted Coverity issues in pngfix.c, png-fix-itxt.c, pngvalid.c,
+  Quieted some Coverity issues in pngfix.c, png-fix-itxt.c, pngvalid.c,
     pngstest.c, and pngimage.c. Most seem harmless, but png-fix-itxt
     would only work with iTXt chunks with length 255 or less.
+  Added #ifdef's to contrib/examples programs so people don't try
+    to compile them without the minimum required support enabled
+    (suggested by Flavio Medeiros).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

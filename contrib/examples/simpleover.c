@@ -44,6 +44,8 @@
  */
 #include "../../png.h"
 
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+
 #define sprite_name_chars 15
 struct sprite {
    FILE         *file;
@@ -643,3 +645,4 @@ int main(int argc, const char **argv)
 
    return result;
 }
+#endif /* SIMPLIFIED_READ */

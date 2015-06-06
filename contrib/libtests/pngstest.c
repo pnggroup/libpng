@@ -3245,7 +3245,8 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
    if (image->opts & USE_STDIO)
    {
-      FILE *f = tmpfile();
+      char tmpfile[] = "pngstest-XXXXXX";
+      FILE *f = fopen(mktemp(tmpfile),"w+");
 
       if (f != NULL)
       {
