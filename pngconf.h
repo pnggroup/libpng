@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.7.0beta63, June 1, 2015
+ * libpng version 1.7.0beta63, June 6, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -216,6 +216,7 @@
 #      define PNGAPI _stdcall
 #    endif
 #  endif /* compiler/api */
+
   /* NOTE: PNGCBAPI always defaults to PNGCAPI. */
 
 #  if defined(PNGAPI) && !defined(PNG_USER_PRIVATEBUILD)
@@ -363,6 +364,7 @@
 #    ifndef PNG_RESTRICT
 #      define PNG_RESTRICT __restrict
 #    endif
+
 #  elif defined(__GNUC__)
 #    ifndef PNG_USE_RESULT
 #      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
