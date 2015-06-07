@@ -5130,7 +5130,12 @@ Version 1.7.0beta63 [June 6, 2015]
     to compile them without the minimum required support enabled
     (suggested by Flavio Medeiros).
 
-Version 1.7.0beta64 [June 6, 2015]
+Version 1.7.0beta64 [June 7, 2015]
+  Removed non-working progressive reader 'skip' function. This
+    function has apparently never been used. It was implemented
+    to support back-door modification of png_struct in libpng-1.4.x
+    but (because it does nothing and cannot do anything) was apparently
+    never tested (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
