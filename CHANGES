@@ -5278,6 +5278,7 @@ Version 1.6.18beta08 [June 10, 2015]
     unsigned char in contrib/tools/png-fix-itxt.c). To use the "secure"
     file handling, define PNG_USE_MKSTEMP, otherwise "tmpfile()" will
     be used.
+  Removed some unused WEIGHTED_FILTER macros from png.h and pngstruct.h
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

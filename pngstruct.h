@@ -348,17 +348,7 @@ struct png_struct_def
    png_bytep quantize_index; /* index translation for palette files */
 #endif
 
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-   png_byte heuristic_method;        /* heuristic for row filter selection */
-   png_byte num_prev_filters;        /* number of weights for previous rows */
-   png_bytep prev_filters;           /* filter type(s) of previous row(s) */
-   png_uint_16p filter_weights;      /* weight(s) for previous line(s) */
-   png_uint_16p inv_filter_weights;  /* 1/weight(s) for previous line(s) */
-   png_uint_16p filter_costs;        /* relative filter calculation cost */
-   png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
-#endif
-
-   /* Options */
+/* Options */
 #ifdef PNG_SET_OPTION_SUPPORTED
    png_byte options;           /* On/off state (up to 4 options) */
 #endif
