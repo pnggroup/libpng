@@ -34,8 +34,9 @@
 
 #define MAX_LENGTH 500000
 
-#define GETBREAK ((unsigned char)(inchar=getchar())); if (inchar == EOF) break
-
+#define GETBREAK inchar=getchar(); \
+                 c=(inchar & 0xff);\
+                 if (inchar != (int) c) break
 int
 main(void)
 {
@@ -48,25 +49,25 @@ main(void)
 /* Skip 8-byte signature */
    for (i=8; i; i--)
    {
-      c=GETBREAK;
+      GETBREAK;
       putchar(c);
    }
 
-if (inchar != EOF)
+if (inchar == (int) c) /* !EOF */
 for (;;)
  {
    /* Read the length */
    unsigned long length; /* must be 32 bits! */
-   c=GETBREAK; buf[0] = c & 0xff; length  = (c & 0xff); length <<= 8;
-   c=GETBREAK; buf[1] = c & 0xff; length += (c & 0xff); length <<= 8;
-   c=GETBREAK; buf[2] = c & 0xff; length += (c & 0xff); length <<= 8;
-   c=GETBREAK; buf[3] = c & 0xff; length += (c & 0xff);
+   GETBREAK; buf[0] = c; length  = c; length <<= 8;
+   GETBREAK; buf[1] = c; length += c; length <<= 8;
+   GETBREAK; buf[2] = c; length += c; length <<= 8;
+   GETBREAK; buf[3] = c; length += c;
 
    /* Read the chunkname */
-   c=GETBREAK; buf[4] = c & 0xff;
-   c=GETBREAK; buf[5] = c & 0xff;
-   c=GETBREAK; buf[6] = c & 0xff;
-   c=GETBREAK; buf[7] = c & 0xff;
+   GETBREAK; buf[4] = c;
+   GETBREAK; buf[5] = c;
+   GETBREAK; buf[6] = c;
+   GETBREAK; buf[7] = c;
 
 
    /* The iTXt chunk type expressed as integers is (105, 84, 88, 116) */
@@ -81,8 +82,11 @@ for (;;)
       /* Copy the data bytes */
       for (i=8; i < length + 12; i++)
       {
-         c=GETBREAK; buf[i] = c & 0xff;
+         GETBREAK; buf[i] = c;
       }
+
+      if (inchar != (int) c) /* EOF */
+         break;
 
       /* Calculate the CRC */
       crc = crc32(crc, buf+4, (uInt)length+4);
@@ -101,12 +105,15 @@ for (;;)
         if (length >= MAX_LENGTH-12)
            break;
 
-        c=GETBREAK;
-        buf[length+11] = c & 0xff;
+        GETBREAK;
+        buf[length+11] = c;
 
         /* Update the CRC */
         crc = crc32(crc, buf+7+length, 1);
       }
+
+      if (inchar != (int) c) /* EOF */
+         break;
 
       /* Update length bytes */
       buf[0] = (unsigned char)((length >> 24) & 0xff);
@@ -121,6 +128,9 @@ for (;;)
 
    else
    {
+      if (inchar != (int) c) /* EOF */
+         break;
+
       /* Copy bytes that were already read (length and chunk name) */
       for (i=0; i<8; i++)
          putchar(buf[i]);
@@ -128,11 +138,11 @@ for (;;)
       /* Copy data bytes and CRC */
       for (i=8; i< length+12; i++)
       {
-         c=GETBREAK;
-         putchar((c & 0xff));
+         GETBREAK;
+         putchar(c);
       }
 
-      if (inchar == EOF)
+      if (inchar != (int) c) /* EOF */
       {
          break;
       }
@@ -142,7 +152,7 @@ for (;;)
          break;
    }
 
-   if (inchar == EOF)
+   if (inchar != (int) c) /* EOF */
       break;
 
    if (buf[4] == 73 && buf[5] == 69 && buf[6] == 78 && buf[7] == 68)
