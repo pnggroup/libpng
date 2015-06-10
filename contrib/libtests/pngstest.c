@@ -3245,9 +3245,23 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
    if (image->opts & USE_STDIO)
    {
+#ifndef PNG_USE_MKSTEMP
+      FILE *f = tmpfile();
+#else
+      /* Experimental. Coverity says tmpfile() is insecure because it
+       * generates predictable names.
+       */
       char tmpfile[] = "pngstest-XXXXXX";
-      FILE *f = fopen(mktemp(tmpfile),"w+");
-
+      int filedes;
+      FILE *f;
+      umask(0600);
+      filedes = mkstemp(tmpfile);
+      if (filedes >= 0)
+        f = fdopen(filedes,"w+");
+      else
+        f = NULL;
+#endif
+      
       if (f != NULL)
       {
          if (png_image_write_to_stdio(&image->image, f, convert_to_8bit,
