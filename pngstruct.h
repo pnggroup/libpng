@@ -307,16 +307,6 @@ struct png_struct_def
    png_uint_32   flush_rows; /* number of rows written since last flush */
 #endif
 
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-   png_bytep    prev_filters;        /* filter type(s) of previous row(s) */
-   png_uint_16p filter_weights;      /* weight(s) for previous line(s) */
-   png_uint_16p inv_filter_weights;  /* 1/weight(s) for previous line(s) */
-   png_uint_16p filter_costs;        /* relative filter calculation cost */
-   png_uint_16p inv_filter_costs;    /* 1/relative filter calculation cost */
-   png_byte     heuristic_method;    /* heuristic for row filter selection */
-   png_byte     num_prev_filters;    /* number of weights for previous rows */
-#endif
-
 #ifdef PNG_WRITE_SUPPORTED
    png_byte     usr_bit_depth;       /* bit depth of users row */
    png_byte     usr_channels;        /* channels at start of write */
