@@ -3250,16 +3250,34 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 #else
       /* Experimental. Coverity says tmpfile() is insecure because it
        * generates predictable names.
+       *
+       * It is possible to satisfy Coverity by using mkstemp(); however,
+       * any platform supporting mkstemp() undoubtedly has a secure tmpfile()
+       * implementation as well, and doesn't need the fix.  Note that
+       * the fix won't work on platforms that don't support mkstemp().
+       *
+       * https://www.securecoding.cert.org/confluence/display/c/
+       * FIO21-C.+Do+not+create+temporary+files+in+shared+directories
+       * says that most historic implementations of tmpfile() provide
+       * only a limited number of possible temporary file names
+       * (usually 26) before file names are recycled. That article also
+       * provides a secure solution that unfortunately depends upon mkstemp().
        */
       char tmpfile[] = "pngstest-XXXXXX";
       int filedes;
       FILE *f;
-      umask(0600);
+      umask(0177);
       filedes = mkstemp(tmpfile);
-      if (filedes >= 0)
-        f = fdopen(filedes,"w+");
-      else
+      if (filedes < 0)
         f = NULL;
+      else
+      {
+        f = fdopen(filedes,"w+");
+        /* Hide the filename immediately and ensure that the file does
+         * not exist after the program ends
+         */
+        (void) unlink(tmpfile);
+      }
 #endif
       
       if (f != NULL)
