@@ -77,11 +77,11 @@ png_process_data_pause(png_structrp png_ptr, int save)
 png_uint_32 PNGAPI
 png_process_data_skip(png_structrp png_ptr)
 {
-    /* TODO: Deprecate and remove this API.
-     * Somewhere the implementation of this seems to have been lost,
-     * or abandoned.  It was only to support some internal back-door access
-     * to png_struct) in libpng-1.4.x.
-     */
+  /* TODO: Deprecate and remove this API.
+   * Somewhere the implementation of this seems to have been lost,
+   * or abandoned.  It was only to support some internal back-door access
+   * to png_struct) in libpng-1.4.x.
+   */
    png_app_warning(png_ptr,
 "png_process_data_skip is not implemented in any current version of libpng");
    return 0;
@@ -134,7 +134,7 @@ void /* PRIVATE */
 png_push_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_size_t num_checked = png_ptr->sig_bytes, /* SAFE, does not exceed 8 */ 
-             num_to_check = 8 - num_checked;
+       num_to_check = 8 - num_checked;
 
    if (png_ptr->buffer_size < num_to_check)
    {
@@ -606,6 +606,7 @@ png_push_read_IDAT(png_structrp png_ptr)
       png_ptr->current_buffer_size -= save_size;
       png_ptr->current_buffer_ptr += save_size;
    }
+
    if (png_ptr->idat_size == 0)
    {
       PNG_PUSH_SAVE_BUFFER_IF_LT(4)

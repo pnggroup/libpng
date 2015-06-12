@@ -243,15 +243,15 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
       create_struct.user_height_max = PNG_USER_HEIGHT_MAX;
 
 #     ifdef PNG_USER_CHUNK_CACHE_MAX
-         /* Added at libpng-1.2.43 and 1.4.0 */
-         create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
+      /* Added at libpng-1.2.43 and 1.4.0 */
+      create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
 #     endif
 
 #     ifdef PNG_USER_CHUNK_MALLOC_MAX
-         /* Added at libpng-1.2.43 and 1.4.1, required only for read but exists
-          * in png_struct regardless.
-          */
-         create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
+      /* Added at libpng-1.2.43 and 1.4.1, required only for read but exists
+       * in png_struct regardless.
+       */
+      create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
 #     endif
 #  endif
 
@@ -304,10 +304,10 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
                create_struct.zstream.opaque = png_ptr;
 
 #              ifdef PNG_SETJMP_SUPPORTED
-                  /* Eliminate the local error handling: */
-                  create_struct.jmp_buf_ptr = NULL;
-                  create_struct.jmp_buf_size = 0;
-                  create_struct.longjmp_fn = 0;
+               /* Eliminate the local error handling: */
+               create_struct.jmp_buf_ptr = NULL;
+               create_struct.jmp_buf_size = 0;
+               create_struct.longjmp_fn = 0;
 #              endif
 
                *png_ptr = create_struct;
@@ -766,13 +766,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.6.18beta08 - June 6, 2015" PNG_STRING_NEWLINE \
-     "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
-     "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
-     "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
-     PNG_STRING_NEWLINE;
+      "libpng version 1.6.18beta08 - June 11, 2015" PNG_STRING_NEWLINE \
+      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
+      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
+      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
+      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.6.18beta08 - June 6, 2015\
+   return "libpng version 1.6.18beta08 - June 11, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -811,9 +811,9 @@ png_get_header_version(png_const_structrp png_ptr)
 #ifdef __STDC__
    return PNG_HEADER_VERSION_STRING
 #  ifndef PNG_READ_SUPPORTED
-   "     (NO READ SUPPORT)"
+      " (NO READ SUPPORT)"
 #  endif
-   PNG_STRING_NEWLINE;
+      PNG_STRING_NEWLINE;
 #else
    return PNG_HEADER_VERSION_STRING;
 #endif
@@ -1086,10 +1086,10 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
       errmsg = "gamma value out of range";
 
 #  ifdef PNG_READ_gAMA_SUPPORTED
-      /* Allow the application to set the gamma value more than once */
-      else if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
-         (colorspace->flags & PNG_COLORSPACE_FROM_gAMA) != 0)
-         errmsg = "duplicate";
+   /* Allow the application to set the gamma value more than once */
+   else if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
+      (colorspace->flags & PNG_COLORSPACE_FROM_gAMA) != 0)
+      errmsg = "duplicate";
 #  endif
 
    /* Do nothing if the colorspace is already invalid */
@@ -1130,31 +1130,31 @@ png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
          PNG_INFO_iCCP);
 
 #     ifdef PNG_COLORSPACE_SUPPORTED
-         /* Clean up the iCCP profile now if it won't be used. */
-         png_free_data(png_ptr, info_ptr, PNG_FREE_ICCP, -1/*not used*/);
+      /* Clean up the iCCP profile now if it won't be used. */
+      png_free_data(png_ptr, info_ptr, PNG_FREE_ICCP, -1/*not used*/);
 #     else
-         PNG_UNUSED(png_ptr)
+      PNG_UNUSED(png_ptr)
 #     endif
    }
 
    else
    {
 #     ifdef PNG_COLORSPACE_SUPPORTED
-         /* Leave the INFO_iCCP flag set if the pngset.c code has already set
-          * it; this allows a PNG to contain a profile which matches sRGB and
-          * yet still have that profile retrievable by the application.
-          */
-         if ((info_ptr->colorspace.flags & PNG_COLORSPACE_MATCHES_sRGB) != 0)
-            info_ptr->valid |= PNG_INFO_sRGB;
+      /* Leave the INFO_iCCP flag set if the pngset.c code has already set
+       * it; this allows a PNG to contain a profile which matches sRGB and
+       * yet still have that profile retrievable by the application.
+       */
+      if ((info_ptr->colorspace.flags & PNG_COLORSPACE_MATCHES_sRGB) != 0)
+         info_ptr->valid |= PNG_INFO_sRGB;
 
-         else
-            info_ptr->valid &= ~PNG_INFO_sRGB;
+      else
+         info_ptr->valid &= ~PNG_INFO_sRGB;
 
-         if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
-            info_ptr->valid |= PNG_INFO_cHRM;
+      if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
+         info_ptr->valid |= PNG_INFO_cHRM;
 
-         else
-            info_ptr->valid &= ~PNG_INFO_cHRM;
+      else
+         info_ptr->valid &= ~PNG_INFO_cHRM;
 #     endif
 
       if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA) != 0)
