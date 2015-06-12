@@ -78,10 +78,10 @@ png_process_data_pause(png_structrp png_ptr, int save)
 png_uint_32 PNGAPI
 png_process_data_skip(png_structrp png_ptr)
 {
-    /* TODO: somewhere the implementation of this seems to have been lost,
-     * or abandoned.  It was only to support some internal snooping done by
-     * Mozilla (i.e. back-door access to png_struct) in 1.4; apparently they
-     * must have stopped doing it.
+    /* TODO: Deprecate and remove this API.
+     * Somewhere the implementation of this seems to have been lost,
+     * or abandoned.  It was only to support some internal back-door access
+     * to png_struct) in libpng-1.4.x.
      */
    png_app_warning(png_ptr,
 "png_process_data_skip is not implemented in any current version of libpng");
