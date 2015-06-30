@@ -4359,6 +4359,8 @@ Version 1.5.23beta02 [June 30, 2015]
   Quieted Coverity issues in pngvalid.c.
   Removed non-working progressive reader 'skip' function.
 
+Version 1.5.23beta03 [June 30, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
