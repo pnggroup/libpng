@@ -5280,6 +5280,8 @@ Version 1.6.18beta08 [June 30, 2015]
     be used.
   Removed some unused WEIGHTED_FILTER macros from png.h and pngstruct.h
 
+Version 1.6.18beta09 [June 30, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
