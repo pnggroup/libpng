@@ -79,6 +79,8 @@
  */
 #include "../../png.h"
 
+#if defined(PNG_SIMPLIFIED_WRITE_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)
+
 static const struct color
 {
    const char *name;
@@ -862,3 +864,4 @@ main(int argc, const char **argv)
 
    return 1;
 }
+#endif /* SIMPLIFIED_WRITE && STDIO */

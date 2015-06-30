@@ -1,4 +1,4 @@
-Libpng 1.6.18beta08 - June 10, 2015
+Libpng 1.6.18beta08 - June 30, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -87,7 +87,7 @@ Version 1.6.18beta07 [June 6, 2015]
     to compile them without the minimum required support enabled
     (suggested by Flavio Medeiros).
 
-Version 1.6.18beta08 [June 10, 2015]
+Version 1.6.18beta08 [June 30, 2015]
   Eliminated the final two Coverity defects (insecure temporary file
     handling in contrib/libtests/pngstest.c; possible overflow of
     unsigned char in contrib/tools/png-fix-itxt.c). To use the "secure"

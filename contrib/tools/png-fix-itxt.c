@@ -34,8 +34,9 @@
 
 #define MAX_LENGTH 500000
 
+/* Read one character (inchar), also return octet (c), break if EOF */
 #define GETBREAK inchar=getchar(); \
-                 c=(inchar & 0xff);\
+                 c=(inchar & 0xffU);\
                  if (inchar != (int) c) break
 int
 main(void)
@@ -94,10 +95,10 @@ for (;;)
       for (;;)
       {
         /* Check the CRC */
-        if (((crc >> 24) & 0xff) == buf[length+8] &&
-            ((crc >> 16) & 0xff) == buf[length+9] &&
-            ((crc >>  8) & 0xff) == buf[length+10] &&
-            ((crc      ) & 0xff) == buf[length+11])
+        if (((crc >> 24) & 0xffU) == buf[length+8] &&
+            ((crc >> 16) & 0xffU) == buf[length+9] &&
+            ((crc >>  8) & 0xffU) == buf[length+10] &&
+            ((crc      ) & 0xffU) == buf[length+11])
            break;
 
         length++;
@@ -116,10 +117,10 @@ for (;;)
          break;
 
       /* Update length bytes */
-      buf[0] = (unsigned char)((length >> 24) & 0xff);
-      buf[1] = (unsigned char)((length >> 16) & 0xff);
-      buf[2] = (unsigned char)((length >>  8) & 0xff);
-      buf[3] = (unsigned char)((length      ) & 0xff);
+      buf[0] = (unsigned char)((length >> 24) & 0xffU);
+      buf[1] = (unsigned char)((length >> 16) & 0xffU);
+      buf[2] = (unsigned char)((length >>  8) & 0xffU);
+      buf[3] = (unsigned char)((length      ) & 0xffU);
 
       /* Write the fixed iTXt chunk (length, name, data, crc) */
       for (i=0; i<length+12; i++)
