@@ -34,85 +34,87 @@ png_write_info_before_PLTE(png_structp png_ptr, png_infop info_ptr)
 
    if (!(png_ptr->mode & PNG_WROTE_INFO_BEFORE_PLTE))
    {
-   /* Write PNG signature */
-   png_write_sig(png_ptr);
+      /* Write PNG signature */
+      png_write_sig(png_ptr);
 
 #ifdef PNG_MNG_FEATURES_SUPPORTED
-   if ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) && \
-       (png_ptr->mng_features_permitted))
-   {
-      png_warning(png_ptr, "MNG features are not allowed in a PNG datastream");
-      png_ptr->mng_features_permitted = 0;
-   }
+      if ((png_ptr->mode&PNG_HAVE_PNG_SIGNATURE) && \
+          (png_ptr->mng_features_permitted))
+      {
+         png_warning(png_ptr,
+             "MNG features are not allowed in a PNG datastream");
+         png_ptr->mng_features_permitted = 0;
+      }
 #endif
 
-   /* Write IHDR information. */
-   png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
-       info_ptr->bit_depth, info_ptr->color_type, info_ptr->compression_type,
-       info_ptr->filter_type,
+      /* Write IHDR information. */
+      png_write_IHDR(png_ptr, info_ptr->width, info_ptr->height,
+          info_ptr->bit_depth, info_ptr->color_type,
+          info_ptr->compression_type, info_ptr->filter_type,
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
-       info_ptr->interlace_type);
+          info_ptr->interlace_type
 #else
-       0);
+          0
 #endif
-   /* The rest of these check to see if the valid field has the appropriate
-    * flag set, and if it does, writes the chunk.
-    */
+          );
+      /* The rest of these check to see if the valid field has the appropriate
+       * flag set, and if it does, writes the chunk.
+       */
 #ifdef PNG_WRITE_gAMA_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_gAMA)
-      png_write_gAMA_fixed(png_ptr, info_ptr->gamma);
+      if (info_ptr->valid & PNG_INFO_gAMA)
+         png_write_gAMA_fixed(png_ptr, info_ptr->gamma);
 #endif
 #ifdef PNG_WRITE_sRGB_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_sRGB)
-      png_write_sRGB(png_ptr, (int)info_ptr->srgb_intent);
+      if (info_ptr->valid & PNG_INFO_sRGB)
+         png_write_sRGB(png_ptr, (int)info_ptr->srgb_intent);
 #endif
 
 #ifdef PNG_WRITE_iCCP_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_iCCP)
-      png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
-          (png_charp)info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
+      if (info_ptr->valid & PNG_INFO_iCCP)
+         png_write_iCCP(png_ptr, info_ptr->iccp_name, PNG_COMPRESSION_TYPE_BASE,
+             (png_charp)info_ptr->iccp_profile, (int)info_ptr->iccp_proflen);
 #endif
 #ifdef PNG_WRITE_sBIT_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_sBIT)
-      png_write_sBIT(png_ptr, &(info_ptr->sig_bit), info_ptr->color_type);
+      if (info_ptr->valid & PNG_INFO_sBIT)
+         png_write_sBIT(png_ptr, &(info_ptr->sig_bit), info_ptr->color_type);
 #endif
 #ifdef PNG_WRITE_cHRM_SUPPORTED
-   if (info_ptr->valid & PNG_INFO_cHRM)
-      png_write_cHRM_fixed(png_ptr,
-          info_ptr->x_white, info_ptr->y_white,
-          info_ptr->x_red, info_ptr->y_red,
-          info_ptr->x_green, info_ptr->y_green,
-          info_ptr->x_blue, info_ptr->y_blue);
+      if (info_ptr->valid & PNG_INFO_cHRM)
+         png_write_cHRM_fixed(png_ptr,
+             info_ptr->x_white, info_ptr->y_white,
+             info_ptr->x_red, info_ptr->y_red,
+             info_ptr->x_green, info_ptr->y_green,
+             info_ptr->x_blue, info_ptr->y_blue);
 #endif
 
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
-   if (info_ptr->unknown_chunks_num)
-   {
-      png_unknown_chunk *up;
-
-      png_debug(5, "writing extra chunks");
-
-      for (up = info_ptr->unknown_chunks;
-           up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
-           up++)
+      if (info_ptr->unknown_chunks_num)
       {
-         int keep = png_handle_as_unknown(png_ptr, up->name);
+         png_unknown_chunk *up;
 
-         if (keep != PNG_HANDLE_CHUNK_NEVER &&
-             up->location &&
-             !(up->location & PNG_HAVE_PLTE) &&
-             !(up->location & PNG_HAVE_IDAT) &&
-             !(up->location & PNG_AFTER_IDAT) &&
-             ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
-             (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
+         png_debug(5, "writing extra chunks");
+
+         for (up = info_ptr->unknown_chunks;
+              up < info_ptr->unknown_chunks + info_ptr->unknown_chunks_num;
+              up++)
          {
-            if (up->size == 0)
-               png_warning(png_ptr, "Writing zero-length unknown chunk");
+            int keep = png_handle_as_unknown(png_ptr, up->name);
 
-            png_write_chunk(png_ptr, up->name, up->data, up->size);
+            if (keep != PNG_HANDLE_CHUNK_NEVER &&
+                up->location &&
+                !(up->location & PNG_HAVE_PLTE) &&
+                !(up->location & PNG_HAVE_IDAT) &&
+                !(up->location & PNG_AFTER_IDAT) &&
+                ((up->name[3] & 0x20) || keep == PNG_HANDLE_CHUNK_ALWAYS ||
+                (png_ptr->flags & PNG_FLAG_KEEP_UNSAFE_CHUNKS)))
+            {
+               if (up->size == 0)
+                  png_warning(png_ptr, "Writing zero-length unknown chunk");
+
+               png_write_chunk(png_ptr, up->name, up->data, up->size);
+            }
          }
       }
-   }
 #endif
       png_ptr->mode |= PNG_WROTE_INFO_BEFORE_PLTE;
    }
@@ -498,13 +500,12 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
  */
 #ifdef USE_FAR_KEYWORD
    if (setjmp(tmp_jmpbuf))
+      png_memcpy(png_jmpbuf(png_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
+   PNG_ABORT();
 #else
    if (setjmp(png_jmpbuf(png_ptr))) /* sets longjmp to match setjmp */
-#endif
-#ifdef USE_FAR_KEYWORD
-   png_memcpy(png_jmpbuf(png_ptr), tmp_jmpbuf, png_sizeof(jmp_buf));
-#endif
       PNG_ABORT();
+#endif
 #endif
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -1066,6 +1067,7 @@ png_set_filter(png_structp png_ptr, int method, int filters)
        */
       if (png_ptr->row_buf != NULL)
       {
+         png_ptr->do_filter = PNG_FILTER_NONE;
 #ifdef PNG_WRITE_FILTER_SUPPORTED
          if ((png_ptr->do_filter & PNG_FILTER_SUB) && png_ptr->sub_row == NULL)
          {
@@ -1126,8 +1128,8 @@ png_set_filter(png_structp png_ptr, int method, int filters)
          }
 
          if (png_ptr->do_filter == PNG_NO_FILTERS)
-#endif /* PNG_WRITE_FILTER_SUPPORTED */
             png_ptr->do_filter = PNG_FILTER_NONE;
+#endif /* PNG_WRITE_FILTER_SUPPORTED */
       }
    }
    else
@@ -1309,10 +1311,10 @@ png_set_text_compression_window_bits(png_structp png_ptr, int window_bits)
 #ifndef WBITS_8_OK
    /* Avoid libpng bug with 256-byte windows */
    if (window_bits == 8)
-      {
-        png_warning(png_ptr, "Text compression window is being reset to 512");
-        window_bits = 9;
-      }
+   {
+      png_warning(png_ptr, "Text compression window is being reset to 512");
+      window_bits = 9;
+   }
 
 #endif
    png_ptr->flags |= PNG_FLAG_ZTXT_CUSTOM_WINDOW_BITS;

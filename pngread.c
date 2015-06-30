@@ -559,7 +559,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
       if (ret == Z_STREAM_END)
       {
          if (png_ptr->zstream.avail_out || png_ptr->zstream.avail_in ||
-            png_ptr->idat_size)
+             png_ptr->idat_size)
             png_benign_error(png_ptr, "Extra compressed data");
          png_ptr->mode |= PNG_AFTER_IDAT;
          png_ptr->flags |= PNG_FLAG_ZLIB_FINISHED;
@@ -617,7 +617,7 @@ png_read_row(png_structp png_ptr, png_bytep row, png_bytep dsp_row)
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Blow up interlaced rows to full size */
    if (png_ptr->interlaced &&
-      (png_ptr->transformations & PNG_INTERLACE))
+       (png_ptr->transformations & PNG_INTERLACE))
    {
       if (png_ptr->pass < 6)
          png_do_read_interlace(&row_info, png_ptr->row_buf + 1, png_ptr->pass,
@@ -1119,9 +1119,8 @@ png_set_read_status_fn(png_structp png_ptr, png_read_status_ptr read_row_fn)
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 #ifdef PNG_INFO_IMAGE_SUPPORTED
 void PNGAPI
-png_read_png(png_structp png_ptr, png_infop info_ptr,
-                           int transforms,
-                           voidp params)
+png_read_png(png_structp png_ptr, png_infop info_ptr, int transforms,
+    voidp params)
 {
    int row;
 
@@ -1281,7 +1280,7 @@ png_read_png(png_structp png_ptr, png_infop info_ptr,
 
       for (row = 0; row < (int)info_ptr->height; row++)
          info_ptr->row_pointers[row] = (png_bytep)png_malloc(png_ptr,
-            png_get_rowbytes(png_ptr, info_ptr));
+             png_get_rowbytes(png_ptr, info_ptr));
    }
 
    png_read_image(png_ptr, info_ptr->row_pointers);
