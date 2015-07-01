@@ -37,7 +37,7 @@
 /* Read one character (inchar), also return octet (c), break if EOF */
 #define GETBREAK inchar=getchar(); \
                  c=(inchar & 0xffU);\
-                 if (inchar != (int) c) break
+                 if (inchar != c) break
 int
 main(void)
 {
@@ -54,7 +54,7 @@ main(void)
       putchar(c);
    }
 
-if (inchar == (int) c) /* !EOF */
+if (inchar == c) /* !EOF */
 for (;;)
  {
    /* Read the length */
@@ -86,7 +86,7 @@ for (;;)
          GETBREAK; buf[i] = c;
       }
 
-      if (inchar != (int) c) /* EOF */
+      if (inchar != c) /* EOF */
          break;
 
       /* Calculate the CRC */
@@ -113,7 +113,7 @@ for (;;)
         crc = crc32(crc, buf+7+length, 1);
       }
 
-      if (inchar != (int) c) /* EOF */
+      if (inchar != c) /* EOF */
          break;
 
       /* Update length bytes */
@@ -129,7 +129,7 @@ for (;;)
 
    else
    {
-      if (inchar != (int) c) /* EOF */
+      if (inchar != c) /* EOF */
          break;
 
       /* Copy bytes that were already read (length and chunk name) */
@@ -143,7 +143,7 @@ for (;;)
          putchar(c);
       }
 
-      if (inchar != (int) c) /* EOF */
+      if (inchar != c) /* EOF */
       {
          break;
       }
@@ -153,7 +153,7 @@ for (;;)
          break;
    }
 
-   if (inchar != (int) c) /* EOF */
+   if (inchar != c) /* EOF */
       break;
 
    if (buf[4] == 73 && buf[5] == 69 && buf[6] == 78 && buf[7] == 68)

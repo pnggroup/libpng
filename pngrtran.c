@@ -4460,7 +4460,7 @@ png_do_expand(png_row_infop row_info, png_bytep row,
 
                for (i = 0; i < row_width; i++)
                {
-                  if ((*sp & 0xff) == gray)
+                  if ((*sp & 0xffU) == gray)
                      *dp-- = 0;
 
                   else
@@ -4478,8 +4478,8 @@ png_do_expand(png_row_infop row_info, png_bytep row,
                dp = row + (row_info->rowbytes << 1) - 1;
                for (i = 0; i < row_width; i++)
                {
-                  if ((*(sp - 1) & 0xff) == gray_high &&
-                      (*(sp) & 0xff) == gray_low)
+                  if ((*(sp - 1) & 0xffU) == gray_high &&
+                      (*(sp) & 0xffU) == gray_low)
                   {
                      *dp-- = 0;
                      *dp-- = 0;
