@@ -5280,9 +5280,12 @@ Version 1.6.18beta08 [June 30, 2015]
     be used.
   Removed some unused WEIGHTED_FILTER macros from png.h and pngstruct.h
 
-Version 1.6.18beta09 [July 1, 2015]
+Version 1.6.18beta09 [July 3, 2015]
   Removed some useless typecasts from contrib/tools/png-fix-itxt.c
   Fixed a new signed-unsigned comparison in pngrtran.c (Max Stepin).
+  Replaced arbitrary use of 'extern' with #define PNG_LINKAGE_*.  To
+    preserve API compatibility, the new defines all default to "extern"
+    (requested by Jan Nijtmans).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

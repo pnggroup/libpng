@@ -249,6 +249,17 @@ setting Z_DEFAULT_STRATEGY default @Z_FILTERED
 setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
 setting ZLIB_VERNUM default @ZLIB_VERNUM
 
+# Linkage of:
+#
+#  API:      libpng API functions
+#  CALLBACK: internal non-file-local callbacks
+#  FUNCTION: internal non-file-local functions
+#  DATA:     internal non-file-local (const) data
+setting LINKAGE_API default extern
+setting LINKAGE_CALLBACK default extern
+setting LINKAGE_FUNCTION default extern
+setting LINKAGE_DATA default extern
+
 setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
 setting TEXT_Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
 
