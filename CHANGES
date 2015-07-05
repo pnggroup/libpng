@@ -5287,6 +5287,8 @@ Version 1.6.18beta09 [July 5, 2015]
     preserve API compatibility, the new defines all default to "extern"
     (requested by Jan Nijtmans).
 
+Version 1.6.18beta10 [July 5, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
