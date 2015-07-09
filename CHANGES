@@ -4360,7 +4360,7 @@ Version 1.5.23beta02 [June 30, 2015]
   Quieted Coverity issues in pngvalid.c.
   Removed non-working progressive reader 'skip' function.
 
-Version 1.5.23beta03 [July 9, 2015]
+Version 1.5.23rc01 [July 9, 2015]
   Belatedly added Mans Rullgard to the list of Contributing Authors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

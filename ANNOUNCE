@@ -1,5 +1,5 @@
 
-Libpng 1.5.23beta03 - July 9, 2015
+Libpng 1.5.23rc01 - July 9, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.23beta03.tar.xz (LZMA-compressed, recommended)
-   1.5.23beta03.tar.gz
-   1.5.23beta03.tar.bz2
+   1.5.23rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.23rc01.tar.gz
+   1.5.23rc01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1523b03.7z  (LZMA-compressed, recommended)
-   lp1523b03.zip
+   lp1523r01.7z  (LZMA-compressed, recommended)
+   lp1523r01.zip
 
 Other information:
 
-   1.5.23beta03-README.txt
-   1.5.23beta03-LICENSE.txt
-   libpng-1.5.23beta03-*.asc (armored detached GPG signatures)
+   1.5.23rc01-README.txt
+   1.5.23rc01-LICENSE.txt
+   libpng-1.5.23rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.22):
 
@@ -47,7 +47,7 @@ Version 1.5.23beta02 [June 30, 2015]
   Quieted Coverity issues in pngvalid.c.
   Removed non-working progressive reader 'skip' function.
 
-Version 1.5.23beta03 [July 9, 2015]
+Version 1.5.23rc01 [July 9, 2015]
   Belatedly added Mans Rullgard to the list of Contributing Authors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
