@@ -5291,7 +5291,7 @@ Version 1.6.18beta09 [July 5, 2015]
     preserve API compatibility, the new defines all default to "extern"
     (requested by Jan Nijtmans).
 
-Version 1.6.18beta10 [July 9, 2015]
+Version 1.6.18rc01 [July 9, 2015]
   Belatedly added Mans Rullgard and James Yu to the list of Contributing
     Authors.
 
