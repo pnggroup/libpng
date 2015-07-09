@@ -95,7 +95,7 @@ Version 0.88 [January, 1996]
   cleaned up documentation
   added callbacks for read/write and warning/error functions
 
-Version 0.89 [July, 1996]
+Version 0.89 [June 5, 1996]
   Added new initialization API to make libpng work better with shared libs
     we now have png_create_read_struct(), png_create_write_struct(),
     png_create_info_struct(), png_destroy_read_struct(), and
@@ -121,6 +121,9 @@ Version 0.89 [July, 1996]
     into a binary when only reading or writing functionality is used
   New pngtest image also has interlacing and zTXt
   Updated documentation to reflect new API
+
+Version 0.89c [June 17, 1996]
+  Bug fixes.
 
 Version 0.90 [January, 1997]
   Made CRC errors/warnings on critical and ancillary chunks configurable
@@ -495,7 +498,7 @@ Version 1.0.3d [September 4, 1999]
   Added new png_expand functions to scripts/pngdef.pas and pngos2.def
   Added a demo read_user_transform_fn that examines the row filters in pngtest.c
 
-Version 1.0.4 [September 24, 1999]
+Version 1.0.4 [September 24, 1999, not distributed publicly]
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
   Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
   Made several minor corrections to pngtest.c
@@ -522,6 +525,7 @@ Version 1.0.4c [October 1, 1999]
   Added a "png_check_version" function in png.c and pngtest.c that will generate
     a helpful compiler error if an old png.h is found in the search path.
   Changed type of png_user_transform_depth|channels from int to png_byte.
+  Added "Libpng is OSI Certified Open Source Software" statement to png.h
 
 Version 1.0.4d [October 6, 1999]
   Changed 0.45 to 0.45455 in png_set_sRGB()
@@ -5287,7 +5291,9 @@ Version 1.6.18beta09 [July 5, 2015]
     preserve API compatibility, the new defines all default to "extern"
     (requested by Jan Nijtmans).
 
-Version 1.6.18beta10 [July 5, 2015]
+Version 1.6.18beta10 [July 9, 2015]
+  Belatedly added Mans Rullgard and James Yu to the list of Contributing
+    Authors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
