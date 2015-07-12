@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.18rc01, July 9, 2015
+ * libpng version 1.6.18rc02, July 12, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.18rc01, July 9, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.18rc02, July 12, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -217,7 +217,7 @@
  *    1.6.17rc01-06           16    10617  16.so.16.17[.0]
  *    1.6.17                  16    10617  16.so.16.17[.0]
  *    1.6.18beta01-09         16    10618  16.so.16.18[.0]
- *    1.6.18rc01              16    10618  16.so.16.18[.0]
+ *    1.6.18rc01-02           16    10618  16.so.16.18[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -249,7 +249,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.6.18rc01, July 9, 2015, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.18rc02, July 12, 2015, are
  * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
@@ -271,17 +271,17 @@
  *    the user.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson, and are
- * distributed according to the same disclaimer and license as libpng-0.96,
- * with the following individuals added to the list of Contributing Authors:
+ * Copyright (c) 1998-2000 Glenn Randers-Pehrson, and are distributed according
+ * to the same disclaimer and license as libpng-0.96, with the following
+ * individuals added to the list of Contributing Authors:
  *
  *    Tom Lane
  *    Glenn Randers-Pehrson
  *    Willem van Schaik
  *
  * libpng versions 0.89, June 1996, through 0.96, May 1997, are
- * Copyright (c) 1996, 1997 Andreas Dilger
- * Distributed according to the same disclaimer and license as libpng-0.88,
+ * Copyright (c) 1996-1997 Andreas Dilger, and are
+ * distributed according to the same disclaimer and license as libpng-0.88,
  * with the following individuals added to the list of Contributing Authors:
  *
  *    John Bowler
@@ -292,7 +292,7 @@
  *    Tom Tanner
  *
  * libpng versions 0.5, May 1995, through 0.88, January 1996, are
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -320,8 +320,8 @@
  *   2. Altered versions must be plainly marked as such and must not
  *      be misrepresented as being the original source.
  *
- *   3. This Copyright notice may not be removed or altered from
- *      any source or altered source distribution.
+ *   3. This Copyright notice may not be removed or altered from any
+ *      source or altered source distribution.
  *
  * The Contributing Authors and Group 42, Inc. specifically permit, without
  * fee, and encourage the use of this source code as a component to
@@ -334,7 +334,7 @@
  * A "png_get_copyright" function is available, for convenient use in "about"
  * boxes and the like:
  *
- *     printf("%s", png_get_copyright(NULL));
+ *    printf("%s", png_get_copyright(NULL));
  *
  * Also, the PNG logo (in PNG format, of course) is supplied in the
  * files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
@@ -358,13 +358,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 9, 2015
+ *    July 12, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.6.18rc01 are Y2K compliant.  It is my belief that
+ *    upward through 1.6.18rc02 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -426,9 +426,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.18rc01"
+#define PNG_LIBPNG_VER_STRING "1.6.18rc02"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.18rc01 - July 9, 2015\n"
+     " libpng version 1.6.18rc02 - July 12, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -442,7 +442,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  01
+#define PNG_LIBPNG_VER_BUILD  02
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -572,7 +572,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_18rc01;
+typedef char* png_libpng_version_1_6_18rc02;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *

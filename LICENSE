@@ -10,10 +10,10 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000, through 1.6.18rc01, July 9, 2015, are
+libpng versions 1.0.7, July 1, 2000, through 1.6.18rc02, July 12, 2015, are
 Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.0.6
-with the following individuals added to the list of Contributing Authors
+with the following individuals added to the list of Contributing Authors:
 
    Simon-Pierre Cadieux
    Eric S. Raymond
@@ -32,7 +32,7 @@ and with the following additions to the disclaimer:
    the user.
 
 libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
-Copyright (c) 1998, 1999 Glenn Randers-Pehrson, and are distributed according
+Copyright (c) 1998-2000 Glenn Randers-Pehrson, and are distributed according
 to the same disclaimer and license as libpng-0.96, with the following
 individuals added to the list of Contributing Authors:
 
@@ -42,7 +42,7 @@ individuals added to the list of Contributing Authors:
 
 libpng versions 0.89, June 1996, through 0.96, May 1997, are
 Copyright (c) 1996-1997 Andreas Dilger, and are
-distributed according to the same disclaimer and license as libpng-0.90,
+distributed according to the same disclaimer and license as libpng-0.88,
 with the following individuals added to the list of Contributing Authors:
 
    John Bowler
@@ -76,13 +76,13 @@ Permission is hereby granted to use, copy, modify, and distribute this
 source code, or portions hereof, for any purpose, without fee, subject
 to the following restrictions:
 
-1. The origin of this source code must not be misrepresented.
+  1. The origin of this source code must not be misrepresented.
 
-2. Altered versions must be plainly marked as such and must not
-   be misrepresented as being the original source.
+  2. Altered versions must be plainly marked as such and must not
+     be misrepresented as being the original source.
 
-3. This Copyright notice may not be removed or altered from any
-   source or altered source distribution.
+  3. This Copyright notice may not be removed or altered from any
+     source or altered source distribution.
 
 The Contributing Authors and Group 42, Inc. specifically permit, without
 fee, and encourage the use of this source code as a component to
@@ -93,7 +93,7 @@ appreciated.
 A "png_get_copyright" function is available, for convenient use in "about"
 boxes and the like:
 
-   printf("%s",png_get_copyright(NULL));
+   printf("%s", png_get_copyright(NULL));
 
 Also, the PNG logo (in PNG format, of course) is supplied in the
 files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
@@ -104,4 +104,4 @@ the additional disclaimers inserted at version 1.0.7.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-July 9, 2015
+July 12, 2015

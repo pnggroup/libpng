@@ -5294,6 +5294,8 @@ Version 1.6.18beta09 [July 5, 2015]
 Version 1.6.18rc01 [July 9, 2015]
   Belatedly added Mans Rullgard and James Yu to the list of Contributing
     Authors.
+
+Version 1.6.18rc02 [July 12, 2015]
   Restored unused WEIGHTED_FILTER macros removed at libpng-1.6.18beta08
     to png.h to avoid compatibility warnings.
 

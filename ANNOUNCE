@@ -1,4 +1,4 @@
-Libpng 1.6.18rc01 - July 9, 2015
+Libpng 1.6.18rc02 - July 12, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.18rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.18rc01.tar.gz
+   1.6.18rc02.tar.xz (LZMA-compressed, recommended)
+   1.6.18rc02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1618r01.7z  (LZMA-compressed, recommended)
-   lp1618r01.zip
+   lp1618r02.7z  (LZMA-compressed, recommended)
+   lp1618r02.zip
 
 Other information:
 
-   1.6.18rc01-README.txt
-   1.6.18rc01-LICENSE.txt
-   libpng-1.6.18rc01-*.asc (armored detached GPG signatures)
+   1.6.18rc02-README.txt
+   1.6.18rc02-LICENSE.txt
+   libpng-1.6.18rc02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.17):
 
@@ -105,6 +105,10 @@ Version 1.6.18beta09 [July 5, 2015]
 Version 1.6.18rc01 [July 9, 2015]
   Belatedly added Mans Rullgard and James Yu to the list of Contributing
     Authors.
+
+Version 1.6.18rc02 [July 12, 2015]
+  Restored unused WEIGHTED_FILTER macros removed at libpng-1.6.18beta08
+    to png.h to avoid compatibility warnings.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
