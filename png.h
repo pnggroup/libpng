@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.54beta01, May 9, 2015
+ * libpng version 1.2.54beta01, July 13, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.54beta01, May 9, 2015: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.54beta01, July 13, 2015: Glenn
  *  See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -330,20 +330,14 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.2.54beta01, May 9, 2015, are
- * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
- * distributed according to the same disclaimer and license as libpng-1.2.5
- * with the following individual added to the list of Contributing Authors:
- *
- *    Cosmin Truta
- *
- * libpng versions 1.0.7, July 1, 2000, through 1.2.5, October 3, 2002, are
- * Copyright (c) 2000-2002 Glenn Randers-Pehrson, and are
+ * libpng versions 1.0.7, July 1, 2000, through 1.2.54beta01, July 13, 2015, are
+ * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
  *
  *    Simon-Pierre Cadieux
  *    Eric S. Raymond
+ *    Cosmin Truta
  *    Gilles Vollant
  *
  * and with the following additions to the disclaimer:
@@ -356,17 +350,17 @@
  *    the user.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson, and are
- * distributed according to the same disclaimer and license as libpng-0.96,
- * with the following individuals added to the list of Contributing Authors:
+ * Copyright (c) 1998-2000 Glenn Randers-Pehrson, and are distributed according
+ * to the same disclaimer and license as libpng-0.96, with the following
+ * individuals added to the list of Contributing Authors:
  *
  *    Tom Lane
  *    Glenn Randers-Pehrson
  *    Willem van Schaik
  *
  * libpng versions 0.89, June 1996, through 0.96, May 1997, are
- * Copyright (c) 1996, 1997 Andreas Dilger
- * Distributed according to the same disclaimer and license as libpng-0.88,
+ * Copyright (c) 1996-1997 Andreas Dilger, and are
+ * distributed according to the same disclaimer and license as libpng-0.88,
  * with the following individuals added to the list of Contributing Authors:
  *
  *    John Bowler
@@ -377,7 +371,7 @@
  *    Tom Tanner
  *
  * libpng versions 0.5, May 1995, through 0.88, January 1996, are
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -400,13 +394,13 @@
  * source code, or portions hereof, for any purpose, without fee, subject
  * to the following restrictions:
  *
- * 1. The origin of this source code must not be misrepresented.
+ *   1. The origin of this source code must not be misrepresented.
  *
- * 2. Altered versions must be plainly marked as such and
- * must not be misrepresented as being the original source.
+ *   2. Altered versions must be plainly marked as such and must not
+ *      be misrepresented as being the original source.
  *
- * 3. This Copyright notice may not be removed or altered from
- *    any source or altered source distribution.
+ *   3. This Copyright notice may not be removed or altered from any
+ *      source or altered source distribution.
  *
  * The Contributing Authors and Group 42, Inc. specifically permit, without
  * fee, and encourage the use of this source code as a component to
@@ -419,15 +413,16 @@
  * A "png_get_copyright" function is available, for convenient use in "about"
  * boxes and the like:
  *
- * printf("%s",png_get_copyright(NULL));
+ *    printf("%s", png_get_copyright(NULL));
  *
  * Also, the PNG logo (in PNG format, of course) is supplied in the
  * files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
  */
 
 /*
- * Libpng is OSI Certified Open Source Software.  OSI Certified is a
- * certification mark of the Open Source Initiative.
+ * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
+ * a certification mark of the Open Source Initiative. OSI has not addressed
+ * the additional disclaimers inserted at version 1.0.7.
  */
 
 /*
@@ -442,7 +437,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    May 9, 2015
+ *    July 13, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -506,7 +501,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.2.54beta01"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.54beta01 - May 9, 2015\n"
+   " libpng version 1.2.54beta01 - July 13, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -1460,16 +1455,6 @@ struct png_struct_def
    png_uint_16p hist PNG_DEPSTRUCT;                /* histogram */
 #endif
 
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
-   png_byte heuristic_method PNG_DEPSTRUCT;        /* heuristic for row filter selection */
-   png_byte num_prev_filters PNG_DEPSTRUCT;        /* number of weights for previous rows */
-   png_bytep prev_filters PNG_DEPSTRUCT;           /* filter type(s) of previous row(s) */
-   png_uint_16p filter_weights PNG_DEPSTRUCT;      /* weight(s) for previous line(s) */
-   png_uint_16p inv_filter_weights PNG_DEPSTRUCT;  /* 1/weight(s) for previous line(s) */
-   png_uint_16p filter_costs PNG_DEPSTRUCT;        /* relative filter calculation cost */
-   png_uint_16p inv_filter_costs PNG_DEPSTRUCT;    /* 1/relative filter calculation cost */
-#endif
-
 #ifdef PNG_TIME_RFC1123_SUPPORTED
    png_charp time_buffer PNG_DEPSTRUCT;            /* String to hold RFC 1123 time text */
 #endif
@@ -1985,35 +1970,7 @@ extern PNG_EXPORT(void,png_set_filter) PNGARG((png_structp png_ptr, int method,
 #define PNG_FILTER_VALUE_PAETH 4
 #define PNG_FILTER_VALUE_LAST  5
 
-#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED) /* EXPERIMENTAL */
-/* The "heuristic_method" is given by one of the PNG_FILTER_HEURISTIC_
- * defines, either the default (minimum-sum-of-absolute-differences), or
- * the experimental method (weighted-minimum-sum-of-absolute-differences).
- *
- * Weights are factors >= 1.0, indicating how important it is to keep the
- * filter type consistent between rows.  Larger numbers mean the current
- * filter is that many times as likely to be the same as the "num_weights"
- * previous filters.  This is cumulative for each previous row with a weight.
- * There needs to be "num_weights" values in "filter_weights", or it can be
- * NULL if the weights aren't being specified.  Weights have no influence on
- * the selection of the first row filter.  Well chosen weights can (in theory)
- * improve the compression for a given image.
- *
- * Costs are factors >= 1.0 indicating the relative decoding costs of a
- * filter type.  Higher costs indicate more decoding expense, and are
- * therefore less likely to be selected over a filter with lower computational
- * costs.  There needs to be a value in "filter_costs" for each valid filter
- * type (given by PNG_FILTER_VALUE_LAST), or it can be NULL if you aren't
- * setting the costs.  Costs try to improve the speed of decompression without
- * unduly increasing the compressed image size.
- *
- * A negative weight or cost indicates the default value is to be used, and
- * values in the range [0.0, 1.0) indicate the value is to remain unchanged.
- * The default values for both weights and costs are currently 1.0, but may
- * change if good general weighting/cost heuristics can be found.  If both
- * the weights and costs are set to 1.0, this degenerates the WEIGHTED method
- * to the UNWEIGHTED method, but with added encoding time/computation.
- */
+#if defined(PNG_WRITE_WEIGHTED_FILTER_SUPPORTED) /* DEPRECATED */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 extern PNG_EXPORT(void,png_set_filter_heuristics) PNGARG((png_structp png_ptr,
    int heuristic_method, int num_weights, png_doublep filter_weights,
@@ -2021,9 +1978,7 @@ extern PNG_EXPORT(void,png_set_filter_heuristics) PNGARG((png_structp png_ptr,
 #endif
 #endif /*  PNG_WRITE_WEIGHTED_FILTER_SUPPORTED */
 
-/* Heuristic used for row filter selection.  These defines should NOT be
- * changed.
- */
+/* The following are no longer used and will be removed from libpng-1.7: */
 #define PNG_FILTER_HEURISTIC_DEFAULT    0  /* Currently "UNWEIGHTED" */
 #define PNG_FILTER_HEURISTIC_UNWEIGHTED 1  /* Used by libpng < 0.95 */
 #define PNG_FILTER_HEURISTIC_WEIGHTED   2  /* Experimental feature */
