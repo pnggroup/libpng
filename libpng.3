@@ -119,6 +119,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.18rc03
 
 \fBpng_byte png_get_libpng_ver (png_const_structp \fIpng_ptr\fP\fB);\fP
 
+\fBint png_get_palette_max(png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
+
 \fBpng_voidp png_get_mem_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fBpng_uint_32 png_get_oFFs (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fI*offset_x\fP\fB, png_uint_32 \fP\fI*offset_y\fP\fB, int \fI*unit_type\fP\fB);\fP
@@ -368,6 +370,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.18rc03
 \fBvoid png_set_mem_fn (png_structp \fP\fIpng_ptr\fP\fB, png_voidp \fP\fImem_ptr\fP\fB, png_malloc_ptr \fP\fImalloc_fn\fP\fB, png_free_ptr \fIfree_fn\fP\fB);\fP
 
 \fBvoid png_set_oFFs (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fIoffset_x\fP\fB, png_uint_32 \fP\fIoffset_y\fP\fB, int \fIunit_type\fP\fB);\fP
+
+\fBint png_set_option(png_structrp \fP\fIpng_ptr\fP\fB, int \fP\fIoption\fP\fB, int \fIonoff\fP\fB);\fP
 
 \fBvoid png_set_packing (png_structp \fIpng_ptr\fP\fB);\fP
 
