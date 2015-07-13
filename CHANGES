@@ -5296,8 +5296,10 @@ Version 1.6.18rc01 [July 9, 2015]
     Authors.
 
 Version 1.6.18rc02 [July 12, 2015]
-  Restored unused WEIGHTED_FILTER macros removed at libpng-1.6.18beta08
+  Restored unused FILTER_HEURISTIC macros removed at libpng-1.6.18beta08
     to png.h to avoid compatibility warnings.
+
+Version 1.6.18rc03 [July 13, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
