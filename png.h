@@ -1632,6 +1632,12 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
     png_const_fixed_point_p filter_costs))
 #endif /* WRITE_WEIGHTED_FILTER */
 
+/* The following are no longer used and will be removed from libpng-1.7: */
+#define PNG_FILTER_HEURISTIC_DEFAULT    0  /* Currently "UNWEIGHTED" */
+#define PNG_FILTER_HEURISTIC_UNWEIGHTED 1  /* Used by libpng < 0.95 */
+#define PNG_FILTER_HEURISTIC_WEIGHTED   2  /* Experimental feature */
+#define PNG_FILTER_HEURISTIC_LAST       3  /* Not a valid value */
+
 /* Set the library compression level.  Currently, valid values range from
  * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
  * (0 - no compression, 9 - "maximal" compression).  Note that tests have
