@@ -1,9 +1,9 @@
 /*-
  * pngstest.c
  *
- * Copyright (c) 2013-2014 John Cunningham Bowler
+ * Copyright (c) 2013-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.16 [December 22, 2014]
+ * Last changed in libpng 1.6.18 [July 23, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -615,7 +615,7 @@ freeimage(Image *image)
 
    if (image->tmpfile_name[0] != 0 && (image->opts & KEEP_TMPFILES) == 0)
    {
-      remove(image->tmpfile_name);
+      (void)remove(image->tmpfile_name);
       image->tmpfile_name[0] = 0;
    }
 }
@@ -2828,7 +2828,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
 
             else if (y >= b->image.colormap_entries)
             {
-               if ((a->opts & ACCUMULATE) == 0)
+               if ((b->opts & ACCUMULATE) == 0)
                   {
                   char pindex[9];
                   sprintf(pindex, "%lu[%lu]", (unsigned long)y,
@@ -3175,7 +3175,9 @@ read_one_file(Image *image)
 
                if (cb > 0)
                {
+#ifndef __COVERITY__
                   if ((unsigned long int)cb <= (size_t)~(size_t)0)
+#endif
                   {
                      png_bytep b = voidcast(png_bytep, malloc((size_t)cb));
 
@@ -3243,8 +3245,41 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
    if (image->opts & USE_STDIO)
    {
+#ifndef PNG_USE_MKSTEMP
       FILE *f = tmpfile();
-
+#else
+      /* Experimental. Coverity says tmpfile() is insecure because it
+       * generates predictable names.
+       *
+       * It is possible to satisfy Coverity by using mkstemp(); however,
+       * any platform supporting mkstemp() undoubtedly has a secure tmpfile()
+       * implementation as well, and doesn't need the fix.  Note that
+       * the fix won't work on platforms that don't support mkstemp().
+       *
+       * https://www.securecoding.cert.org/confluence/display/c/
+       * FIO21-C.+Do+not+create+temporary+files+in+shared+directories
+       * says that most historic implementations of tmpfile() provide
+       * only a limited number of possible temporary file names
+       * (usually 26) before file names are recycled. That article also
+       * provides a secure solution that unfortunately depends upon mkstemp().
+       */
+      char tmpfile[] = "pngstest-XXXXXX";
+      int filedes;
+      FILE *f;
+      umask(0177);
+      filedes = mkstemp(tmpfile);
+      if (filedes < 0)
+        f = NULL;
+      else
+      {
+        f = fdopen(filedes,"w+");
+        /* Hide the filename immediately and ensure that the file does
+         * not exist after the program ends
+         */
+        (void) unlink(tmpfile);
+      }
+#endif
+      
       if (f != NULL)
       {
          if (png_image_write_to_stdio(&image->image, f, convert_to_8bit,
@@ -3588,7 +3623,7 @@ main(int argc, char **argv)
             }
 
             /* Safe: checked above */
-            strcpy(tmpf, argv[c]);
+            strncpy(tmpf, argv[c], sizeof (tmpf)-1);
          }
 
          else

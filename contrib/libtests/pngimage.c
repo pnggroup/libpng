@@ -1,8 +1,8 @@
 /* pngimage.c
  *
- * Copyright (c) 2014 John Cunningham Bowler
+ * Copyright (c) 2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.10 [March 6, 2014]
+ * Last changed in libpng 1.6.18 [July 23, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -1120,8 +1120,8 @@ compare_read(struct display *dp, int applied_transforms)
          {
             int b;
 
-            case 16: /* Two bytes per component, bit-endian */
-               for (b = (bpp >> 4); b > 0; )
+            case 16: /* Two bytes per component, big-endian */
+               for (b = (bpp >> 4); b > 0; --b)
                {
                   unsigned int sig = (unsigned int)(0xffff0000 >> sig_bits[b]);
 

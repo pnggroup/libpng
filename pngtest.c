@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.17 [March 26, 2015]
+ * Last changed in libpng 1.6.18 [July 23, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -565,6 +565,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    }
 
    /* Unlink the element from the list. */
+   if (pinformation != NULL)
    {
       memory_infop *ppinfo = &pinformation;
 
@@ -581,8 +582,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
-            if (pinfo != NULL)
-               free(pinfo);
+            free(pinfo);
             pinfo = NULL;
             break;
          }
@@ -1833,10 +1833,10 @@ main(int argc, char *argv[])
                      k, (unsigned long)filters_used[k]);
 #endif
 #ifdef PNG_TIME_RFC1123_SUPPORTED
-         if (tIME_chunk_present != 0)
-            fprintf(STDERR, " tIME = %s\n", tIME_string);
+            if (tIME_chunk_present != 0)
+               fprintf(STDERR, " tIME = %s\n", tIME_string);
 
-         tIME_chunk_present = 0;
+            tIME_chunk_present = 0;
 #endif /* TIME_RFC1123 */
          }
 
@@ -2028,4 +2028,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_17 Your_png_h_is_not_version_1_6_17;
+typedef png_libpng_version_1_6_18 Your_png_h_is_not_version_1_6_18;

@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "March 26, 2015"
+.TH LIBPNG 3 "July 23, 2015"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17
+libpng \- Portable Network Graphics (PNG) Reference Library 1.6.18
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -118,6 +118,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17
 \fBpng_uint_32 png_get_io_state (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fBpng_byte png_get_libpng_ver (png_const_structp \fIpng_ptr\fP\fB);\fP
+
+\fBint png_get_palette_max(png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fIinfo_ptr\fP\fB);\fP
 
 \fBpng_voidp png_get_mem_ptr (png_const_structp \fIpng_ptr\fP\fB);\fP
 
@@ -369,6 +371,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.17
 
 \fBvoid png_set_oFFs (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fIoffset_x\fP\fB, png_uint_32 \fP\fIoffset_y\fP\fB, int \fIunit_type\fP\fB);\fP
 
+\fBint png_set_option(png_structrp \fP\fIpng_ptr\fP\fB, int \fP\fIoption\fP\fB, int \fIonoff\fP\fB);\fP
+
 \fBvoid png_set_packing (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fBvoid png_set_packswap (png_structp \fIpng_ptr\fP\fB);\fP
@@ -504,7 +508,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.17 - March 26, 2015
+ libpng version 1.6.18 - July 23, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -515,7 +519,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.17 - March 26, 2015
+ libpng versions 0.97, January 1998, through 1.6.18 - July 23, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -4569,10 +4573,11 @@ a 16-bit linear encoded PNG file is written.
 
 With all APIs row_stride is handled as in the read APIs - it is the spacing
 from one row to the next in component sized units (float) and if negative
-indicates a bottom-up row layout in the buffer.
+indicates a bottom-up row layout in the buffer.  If you pass zero, libpng will
+calculate the row_stride for you from the width and number of channels.
 
 Note that the write API does not support interlacing, sub-8-bit pixels,
-and indexed (paletted) images.
+indexed (paletted) images, or most ancillary chunks.
 
 .SH VI. Modifying/Customizing libpng
 
@@ -4859,41 +4864,6 @@ is called for the first time.)
               datastream.  This parameter must be the
               same as the value of filter_method used
               in png_set_IHDR().
-
-It is also possible to influence how libpng chooses from among the
-available filters.  This is done in one or both of two ways - by
-telling it how important it is to keep the same filter for successive
-rows, and by telling it the relative computational costs of the filters.
-
-    double weights[3] = {1.5, 1.3, 1.1},
-       costs[PNG_FILTER_VALUE_LAST] =
-       {1.0, 1.3, 1.3, 1.5, 1.7};
-
-    png_set_filter_heuristics(png_ptr,
-       PNG_FILTER_HEURISTIC_WEIGHTED, 3,
-       weights, costs);
-
-The weights are multiplying factors that indicate to libpng that the
-row filter should be the same for successive rows unless another row filter
-is that many times better than the previous filter.  In the above example,
-if the previous 3 filters were SUB, SUB, NONE, the SUB filter could have a
-"sum of absolute differences" 1.5 x 1.3 times higher than other filters
-and still be chosen, while the NONE filter could have a sum 1.1 times
-higher than other filters and still be chosen.  Unspecified weights are
-taken to be 1.0, and the specified weights should probably be declining
-like those above in order to emphasize recent filters over older filters.
-
-The filter costs specify for each filter type a relative decoding cost
-to be considered when selecting row filters.  This means that filters
-with higher costs are less likely to be chosen over filters with lower
-costs, unless their "sum of absolute differences" is that much smaller.
-The costs do not necessarily reflect the exact computational speeds of
-the various filters, since this would unduly influence the final image
-size.
-
-Note that the numbers above were invented purely for this example and
-are given only to help explain the function usage.  Little testing has
-been done to find optimum values for either the costs or the weights.
 
 .SS Requesting debug printout
 
@@ -5613,6 +5583,23 @@ length, which resulted in PNG files that cannot be read beyond the bad iTXt
 chunk.  This error was fixed in libpng-1.6.3, and a tool (called
 contrib/tools/png-fix-itxt) has been added to the libpng distribution.
 
+Starting with libpng-1.6.17, the PNG_SAFE_LIMITS macro was eliminated
+and safe limits are used by default (users who need larger limits
+can still override them at compile time or run time, as described above).
+
+The new limits are
+                                default   spec limit
+   png_user_width_max         1,000,000  2,147,483,647
+   png_user_height_max        1,000,000  2,147,483,647
+   png_user_chunk_cache_max         128  unlimited
+   png_user_chunk_malloc_max  8,000,000  unlimited
+
+Starting with libpng-1.6.18, a PNG_RELEASE_BUILD macro was added, which allows
+library builders to control compilation for an installed system (a release build).
+It can be set for testing debug or beta builds to ensure that they will compile
+when the build type is switched to RC or STABLE. In essence this overrides the
+PNG_LIBPNG_BUILD_BASE_TYPE definition which is not directly user controllable.
+
 .SH XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
@@ -5783,13 +5770,13 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-March 26, 2015
+July 23, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.17 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.18 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -6044,6 +6031,9 @@ the first widely used release:
  1.6.17beta01-06     16    10617  16.so.16.17[.0]
  1.6.17rc01-06       16    10617  16.so.16.17[.0]
  1.6.17              16    10617  16.so.16.17[.0]
+ 1.6.18beta01-09     16    10618  16.so.16.18[.0]
+ 1.6.18rc01-03       16    10618  16.so.16.18[.0]
+ 1.6.18              16    10618  16.so.16.18[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -6100,7 +6090,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.17 - March 26, 2015:
+Libpng version 1.6.18 - July 23, 2015:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6123,44 +6113,39 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.2.6, August 15, 2004, through 1.6.17, March 26, 2015, are
-Copyright (c) 2004,2006-2015 Glenn Randers-Pehrson, and are
-distributed according to the same disclaimer and license as libpng-1.2.5
-with the following individual added to the list of Contributing Authors
-
-   Cosmin Truta
-
-libpng versions 1.0.7, July 1, 2000, through 1.2.5 - October 3, 2002, are
-Copyright (c) 2000-2002 Glenn Randers-Pehrson, and are
+libpng versions 1.0.7, July 1, 2000, through 1.6.18, July 23, 2015, are
+Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.0.6
-with the following individuals added to the list of Contributing Authors
+with the following individuals added to the list of Contributing Authors:
 
    Simon-Pierre Cadieux
    Eric S. Raymond
+   Mans Rullgard
+   Cosmin Truta
    Gilles Vollant
+   James Yu
 
 and with the following additions to the disclaimer:
 
-   There is no warranty against interference with your
-   enjoyment of the library or against infringement.
-   There is no warranty that our efforts or the library
-   will fulfill any of your particular purposes or needs.
-   This library is provided with all faults, and the entire
-   risk of satisfactory quality, performance, accuracy, and
-   effort is with the user.
+   There is no warranty against interference with your enjoyment of the
+   library or against infringement.  There is no warranty that our
+   efforts or the library will fulfill any of your particular purposes
+   or needs.  This library is provided with all faults, and the entire
+   risk of satisfactory quality, performance, accuracy, and effort is with
+   the user.
 
 libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
-Copyright (c) 1998, 1999 Glenn Randers-Pehrson
-Distributed according to the same disclaimer and license as libpng-0.96,
-with the following individuals added to the list of Contributing Authors:
+Copyright (c) 1998-2000 Glenn Randers-Pehrson, and are distributed according
+to the same disclaimer and license as libpng-0.96, with the following
+individuals added to the list of Contributing Authors:
 
    Tom Lane
    Glenn Randers-Pehrson
    Willem van Schaik
 
 libpng versions 0.89, June 1996, through 0.96, May 1997, are
-Copyright (c) 1996, 1997 Andreas Dilger
-Distributed according to the same disclaimer and license as libpng-0.88,
+Copyright (c) 1996-1997 Andreas Dilger, and are
+distributed according to the same disclaimer and license as libpng-0.88,
 with the following individuals added to the list of Contributing Authors:
 
    John Bowler
@@ -6171,7 +6156,7 @@ with the following individuals added to the list of Contributing Authors:
    Tom Tanner
 
 libpng versions 0.5, May 1995, through 0.88, January 1996, are
-Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
 
 For the purposes of this copyright and license, "Contributing Authors"
 is defined as the following set of individuals:
@@ -6194,13 +6179,13 @@ Permission is hereby granted to use, copy, modify, and distribute this
 source code, or portions hereof, for any purpose, without fee, subject
 to the following restrictions:
 
-1. The origin of this source code must not be misrepresented.
+  1. The origin of this source code must not be misrepresented.
 
-2. Altered versions must be plainly marked as such and
-   must not be misrepresented as being the original source.
+  2. Altered versions must be plainly marked as such and must not
+     be misrepresented as being the original source.
 
-3. This Copyright notice may not be removed or altered from
-   any source or altered source distribution.
+  3. This Copyright notice may not be removed or altered from any
+     source or altered source distribution.
 
 The Contributing Authors and Group 42, Inc. specifically permit, without
 fee, and encourage the use of this source code as a component to
@@ -6208,21 +6193,21 @@ supporting the PNG file format in commercial products.  If you use this
 source code in a product, acknowledgment is not required but would be
 appreciated.
 
-
 A "png_get_copyright" function is available, for convenient use in "about"
 boxes and the like:
 
-   printf("%s",png_get_copyright(NULL));
+   printf("%s", png_get_copyright(NULL));
 
 Also, the PNG logo (in PNG format, of course) is supplied in the
 files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
-Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is a
-certification mark of the Open Source Initiative.
+Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
+a certification mark of the Open Source Initiative. OSI has not addressed
+the additional disclaimers inserted at version 1.0.7.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-March 26, 2015
+July 23, 2015
 
 .\" end of man page
 

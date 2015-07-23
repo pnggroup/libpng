@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.17 [March 26, 2015]
+ * Last changed in libpng 1.6.18 [July 23, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -71,8 +71,8 @@
  * with older builds.
  */
 #if ZLIB_VERNUM < 0x1260
-#  define PNGZ_MSG_CAST(s) png_constcast(char*,s)
-#  define PNGZ_INPUT_CAST(b) png_constcast(png_bytep,b)
+#  define PNGZ_MSG_CAST(s) constcast(char*,s)
+#  define PNGZ_INPUT_CAST(b) constcast(png_bytep,b)
 #else
 #  define PNGZ_MSG_CAST(s) (s)
 #  define PNGZ_INPUT_CAST(b) (b)
@@ -86,17 +86,17 @@
 
 /* Copied from pngpriv.h */
 #ifdef __cplusplus
-#  define png_voidcast(type, value) static_cast<type>(value)
-#  define png_constcast(type, value) const_cast<type>(value)
-#  define png_aligncast(type, value) \
+#  define voidcast(type, value) static_cast<type>(value)
+#  define constcast(type, value) const_cast<type>(value)
+#  define aligncast(type, value) \
    static_cast<type>(static_cast<void*>(value))
-#  define png_aligncastconst(type, value) \
+#  define aligncastconst(type, value) \
    static_cast<type>(static_cast<const void*>(value))
 #else
-#  define png_voidcast(type, value) (value)
-#  define png_constcast(type, value) ((type)(value))
-#  define png_aligncast(type, value) ((void*)(value))
-#  define png_aligncastconst(type, value) ((const void*)(value))
+#  define voidcast(type, value) (value)
+#  define constcast(type, value) ((type)(value))
+#  define aligncast(type, value) ((void*)(value))
+#  define aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
 
 #if PNG_LIBPNG_VER < 10700
@@ -446,7 +446,7 @@ static void
 make_random_bytes(png_uint_32* seed, void* pv, size_t size)
 {
    png_uint_32 u0 = seed[0], u1 = seed[1];
-   png_bytep bytes = png_voidcast(png_bytep, pv);
+   png_bytep bytes = voidcast(png_bytep, pv);
 
    /* There are thirty-three bits; the next bit in the sequence is bit-33 XOR
     * bit-20.  The top 1 bit is in u1, the bottom 32 are in u0.
@@ -668,7 +668,7 @@ IDAT_list_extend(struct IDAT_list *tail)
       if (length < tail->length) /* arithmetic overflow */
          length = tail->length;
             
-      next = png_voidcast(IDAT_list*, malloc(IDAT_list_size(NULL, length)));
+      next = voidcast(IDAT_list*, malloc(IDAT_list_size(NULL, length)));
       CLEAR(*next);
 
       /* The caller must handle this: */
@@ -3535,7 +3535,7 @@ get_control(png_const_structrp png_ptr)
    /* This just returns the (file*).  The chunk and idat control structures
     * don't always exist.
     */
-   struct control *control = png_voidcast(struct control*,
+   struct control *control = voidcast(struct control*,
       png_get_error_ptr(png_ptr));
    return &control->file;
 }
@@ -3543,7 +3543,7 @@ get_control(png_const_structrp png_ptr)
 static void
 allocate(struct file *file, int allocate_idat)
 {
-   struct control *control = png_voidcast(struct control*, file->alloc_ptr);
+   struct control *control = voidcast(struct control*, file->alloc_ptr);
 
    if (allocate_idat)
    {
@@ -3853,6 +3853,7 @@ usage(const char *prog)
 int
 main(int argc, const char **argv)
 {
+   char temp_name[FILENAME_MAX+1];
    const char *  prog = *argv;
    const char *  outfile = NULL;
    const char *  suffix = NULL;
@@ -3955,7 +3956,6 @@ main(int argc, const char **argv)
       else
       {
          size_t outlen = strlen(*argv);
-         char temp_name[FILENAME_MAX+1];
 
          if (outfile == NULL) /* else this takes precedence */
          {
