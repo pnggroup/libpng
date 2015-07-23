@@ -1,33 +1,30 @@
 
-Libpng 1.5.23rc03 - July 13, 2015
+Libpng 1.5.23 - July 23, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.23rc03.tar.xz (LZMA-compressed, recommended)
-   1.5.23rc03.tar.gz
-   1.5.23rc03.tar.bz2
+   libpng-1.5.23.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.23.tar.gz
+   libpng-1.5.23.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1523r03.7z  (LZMA-compressed, recommended)
-   lp1523r03.zip
+   lpng1523.7z  (LZMA-compressed, recommended)
+   lpng1523.zip
 
 Other information:
 
-   1.5.23rc03-README.txt
-   1.5.23rc03-LICENSE.txt
-   libpng-1.5.23rc03-*.asc (armored detached GPG signatures)
+   libpng-1.5.23-README.txt
+   libpng-1.5.23-LICENSE.txt
+   libpng-1.5.23-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.22):
-
-Version 1.5.23beta01 [May 21, 2015]
   Removed unused PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED definitions
     from pnglibconf.h.prebuilt (Andrew Church).
   Replaced "unexpected" with an integer in pngset.c where a long was
@@ -37,8 +34,6 @@ Version 1.5.23beta01 [May 21, 2015]
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
   Avoid a harmless potential integer overflow in png_XYZ_from_xy() (Bug
     report from Christopher Ferris).
-
-Version 1.5.23beta02 [June 30, 2015]
   Removed WRITE_WEIGHTED_FILTERED code, to save a few kbytes of the
     compiled library size. It never worked properly and as far as we can
     tell, no one uses it. The png_set_filter_heuristics() and
@@ -46,15 +41,7 @@ Version 1.5.23beta02 [June 30, 2015]
     and do nothing.
   Quieted Coverity issues in pngvalid.c.
   Removed non-working progressive reader 'skip' function.
-
-Version 1.5.23rc01 [July 9, 2015]
   Belatedly added Mans Rullgard to the list of Contributing Authors.
-
-Version 1.5.23rc02 [July 12, 2015]
-  Restored unused FILTER_HEURISTIC macros removed at libpng-1.5.23beta02
-    to png.h to avoid compatibility warnings.
-
-Version 1.5.23rc03 [July 13, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
