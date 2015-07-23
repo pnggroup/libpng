@@ -1,7 +1,7 @@
 
 /* pngwrite.c - general routines to write a PNG file
  *
- * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.18 [July 23, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -125,7 +125,7 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
        * Under certain circumstances the colorspace can be invalidated without
        * syncing the info_struct 'valid' flags; this happens if libpng detects
        * an error and calls png_error while the color space is being set, yet
-       * the * application continues writing the PNG.  So check the 'invalid'
+       * the application continues writing the PNG.  So check the 'invalid'
        * flag here too.
        */
 #ifdef PNG_GAMMA_SUPPORTED
