@@ -1,47 +1,33 @@
 
-Libpng 1.5.23 - July 23, 2015
+Libpng 1.5.24beta01 - July 24, 2015
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.23.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.23.tar.gz
-   libpng-1.5.23.tar.bz2
+   1.5.24beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.24beta01.tar.gz
+   1.5.24beta01.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1523.7z  (LZMA-compressed, recommended)
-   lpng1523.zip
+   lp1524b01.7z  (LZMA-compressed, recommended)
+   lp1524b01.zip
 
 Other information:
 
-   libpng-1.5.23-README.txt
-   libpng-1.5.23-LICENSE.txt
-   libpng-1.5.23-*.asc (armored detached GPG signatures)
+   1.5.24beta01-README.txt
+   1.5.24beta01-LICENSE.txt
+   libpng-1.5.24beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.5.22):
-  Removed unused PNG_SET_CHUNK_[CACHE|MALLOC]_LIMIT_SUPPORTED definitions
-    from pnglibconf.h.prebuilt (Andrew Church).
-  Replaced "unexpected" with an integer in pngset.c where a long was
-    expected, to avoid a compiler warning when PNG_DEBUG > 1.
-  Fix typecast in a png_debug2() statement in png_set_text_2() to
-    avoid a compiler warning in PNG_DEBUG builds.
-  Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
-  Avoid a harmless potential integer overflow in png_XYZ_from_xy() (Bug
-    report from Christopher Ferris).
-  Removed WRITE_WEIGHTED_FILTERED code, to save a few kbytes of the
-    compiled library size. It never worked properly and as far as we can
-    tell, no one uses it. The png_set_filter_heuristics() and
-    png_set_filter_heuristics_fixed() APIs are retained but deprecated
-    and do nothing.
-  Quieted Coverity issues in pngvalid.c.
-  Removed non-working progressive reader 'skip' function.
-  Belatedly added Mans Rullgard to the list of Contributing Authors.
+Changes since the last public release (1.5.23):
+
+Version 1.5.24beta01 [July 24, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
