@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.19beta01, July 24, 2015
+ * libpng version 1.6.19beta01, July 25, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.19beta01, July 24, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.19beta01, July 25, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -251,7 +251,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta01, July 24, 2015, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta01, July 25, 2015, are
  * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
@@ -360,7 +360,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 24, 2015
+ *    July 25, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -430,7 +430,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.19beta01"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.19beta01 - July 24, 2015\n"
+     " libpng version 1.6.19beta01 - July 25, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2882,7 +2882,7 @@ typedef struct
  * called to read or write the color-map and set the format correctly for the
  * image data.  Do not set the PNG_FORMAT_FLAG_COLORMAP bit directly!
  *
- * NOTE: libpng can be built with particular features disabled, if you see
+ * NOTE: libpng can be built with particular features disabled. If you see
  * compiler errors because the definition of one of the following flags has been
  * compiled out it is because libpng does not have the required support.  It is
  * possible, however, for the libpng configuration to enable the format on just
@@ -2894,7 +2894,7 @@ typedef struct
  */
 #define PNG_FORMAT_FLAG_ALPHA    0x01U /* format with an alpha channel */
 #define PNG_FORMAT_FLAG_COLOR    0x02U /* color format: otherwise grayscale */
-#define PNG_FORMAT_FLAG_LINEAR   0x04U /* 2 byte channels else 1 byte */
+#define PNG_FORMAT_FLAG_LINEAR   0x04U /* 2-byte channels else 1-byte */
 #define PNG_FORMAT_FLAG_COLORMAP 0x08U /* image data is color-mapped */
 
 #ifdef PNG_FORMAT_BGR_SUPPORTED
