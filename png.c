@@ -413,6 +413,8 @@ png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
       free(info_ptr);
       info_ptr = png_voidcast(png_inforp, png_malloc_base(NULL,
          (sizeof *info_ptr)));
+      if (info_ptr == NULL)
+         return;
       *ptr_ptr = info_ptr;
    }
 
@@ -766,13 +768,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.19beta01 - July 24, 2015" PNG_STRING_NEWLINE \
+      "libpng version 1.6.19beta01 - July 25, 2015" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.19beta01 - July 24, 2015\
+   return "libpng version 1.6.19beta01 - July 25, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
