@@ -3847,12 +3847,12 @@ appropriate "_SUPPORTED" macro, one of:
 
    PNG_SIMPLIFIED_{READ,WRITE}_{BGR,AFIRST}_SUPPORTED
 
-   PNG_FORMAT_FLAG_ALPHA    0x01 format with an alpha channel
-   PNG_FORMAT_FLAG_COLOR    0x02 color format: otherwise grayscale
-   PNG_FORMAT_FLAG_LINEAR   0x04 2-byte channels else 1-byte
-   PNG_FORMAT_FLAG_COLORMAP 0x08 image data is color-mapped
-   PNG_FORMAT_FLAG_BGR      0x10 BGR colors, else order is RGB
-   PNG_FORMAT_FLAG_AFIRST   0x20 alpha channel comes first
+   PNG_FORMAT_FLAG_ALPHA    format with an alpha channel
+   PNG_FORMAT_FLAG_COLOR    color format: otherwise grayscale
+   PNG_FORMAT_FLAG_LINEAR   2-byte channels else 1-byte
+   PNG_FORMAT_FLAG_COLORMAP image data is color-mapped
+   PNG_FORMAT_FLAG_BGR      BGR colors, else order is RGB
+   PNG_FORMAT_FLAG_AFIRST   alpha channel comes first
 
 Supported formats are as follows.  Future versions of libpng may support more
 formats; for compatibility with older versions simply check if the format
@@ -3861,15 +3861,15 @@ of the components of the pixels of the image.
 
 First the single byte (sRGB) formats:
 
-   PNG_FORMAT_GRAY 0
-   PNG_FORMAT_GA   PNG_FORMAT_FLAG_ALPHA
-   PNG_FORMAT_AG   (PNG_FORMAT_GA|PNG_FORMAT_FLAG_AFIRST)
-   PNG_FORMAT_RGB  PNG_FORMAT_FLAG_COLOR
-   PNG_FORMAT_BGR  (PNG_FORMAT_FLAG_COLOR|PNG_FORMAT_FLAG_BGR)
-   PNG_FORMAT_RGBA (PNG_FORMAT_RGB|PNG_FORMAT_FLAG_ALPHA)
-   PNG_FORMAT_ARGB (PNG_FORMAT_RGBA|PNG_FORMAT_FLAG_AFIRST)
-   PNG_FORMAT_BGRA (PNG_FORMAT_BGR|PNG_FORMAT_FLAG_ALPHA)
-   PNG_FORMAT_ABGR (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_AFIRST)
+   PNG_FORMAT_GRAY
+   PNG_FORMAT_GA
+   PNG_FORMAT_AG
+   PNG_FORMAT_RGB
+   PNG_FORMAT_BGR
+   PNG_FORMAT_RGBA
+   PNG_FORMAT_ARGB
+   PNG_FORMAT_BGRA
+   PNG_FORMAT_ABGR
 
 Then the linear 2-byte formats.  When naming these "Y" is used to
 indicate a luminance (gray) channel.  The component order within the pixel
@@ -3878,26 +3878,22 @@ components in the linear format.  The components are 16-bit integers in
 the native byte order for your platform, and there is no provision for
 swapping the bytes to a different endian condition.
 
-   PNG_FORMAT_LINEAR_Y  PNG_FORMAT_FLAG_LINEAR
+   PNG_FORMAT_LINEAR_Y
    PNG_FORMAT_LINEAR_Y_ALPHA
-      (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_ALPHA)
    PNG_FORMAT_LINEAR_RGB
-      (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR)
    PNG_FORMAT_LINEAR_RGB_ALPHA
-      (PNG_FORMAT_FLAG_LINEAR|PNG_FORMAT_FLAG_COLOR|
-      PNG_FORMAT_FLAG_ALPHA)
 
 With color-mapped formats the image data is one byte for each pixel. The byte
 is an index into the color-map which is formatted as above.  To obtain a
 color-mapped format it is sufficient just to add the PNG_FOMAT_FLAG_COLORMAP
 to one of the above definitions, or you can use one of the definitions below.
 
-#define PNG_FORMAT_RGB_COLORMAP  (PNG_FORMAT_RGB|PNG_FORMAT_FLAG_COLORMAP)
-#define PNG_FORMAT_BGR_COLORMAP  (PNG_FORMAT_BGR|PNG_FORMAT_FLAG_COLORMAP)
-#define PNG_FORMAT_RGBA_COLORMAP (PNG_FORMAT_RGBA|PNG_FORMAT_FLAG_COLORMAP)
-#define PNG_FORMAT_ARGB_COLORMAP (PNG_FORMAT_ARGB|PNG_FORMAT_FLAG_COLORMAP)
-#define PNG_FORMAT_BGRA_COLORMAP (PNG_FORMAT_BGRA|PNG_FORMAT_FLAG_COLORMAP)
-#define PNG_FORMAT_ABGR_COLORMAP (PNG_FORMAT_ABGR|PNG_FORMAT_FLAG_COLORMAP)
+   PNG_FORMAT_RGB_COLORMAP
+   PNG_FORMAT_BGR_COLORMAP
+   PNG_FORMAT_RGBA_COLORMAP
+   PNG_FORMAT_ARGB_COLORMAP
+   PNG_FORMAT_BGRA_COLORMAP
+   PNG_FORMAT_ABGR_COLORMAP
 
 PNG_IMAGE macros
 
@@ -3942,13 +3938,11 @@ they can be used in #if tests.
 
   PNG_IMAGE_COLORMAP_SIZE(fmt)
    The size of the color-map required by the format; this is the size of the
-   color-map buffer passed to the png_image_{read,write}_colormap APIs, it is
+   color-map buffer passed to the png_image_{read,write}_colormap APIs. It is
    a fixed number determined by the format so can easily be allocated on the
    stack if necessary.
 
 Corresponding information about the pixels
-
-  PNG_IMAGE_PIXEL_(test,fmt)
 
   PNG_IMAGE_PIXEL_CHANNELS(fmt)
    The number of separate channels (components) in a pixel; 1 for a
