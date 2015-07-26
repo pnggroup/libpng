@@ -5145,6 +5145,8 @@ Version 1.7.0beta64 [July 26, 2015]
   Removed some unused WEIGHTED_FILTER macros from png.h and pngstruct.h
   Rearranged png.h to put the major sections in the same order as
     in libpng16.
+  Belatedly added Mans Rullgard and James Yu to the list of Contributing
+    Authors.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
