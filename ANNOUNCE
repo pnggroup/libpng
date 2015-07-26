@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta64 - June 10, 2015
+Libpng 1.7.0beta64 - July 26, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -835,7 +835,7 @@ Version 1.7.0beta63 [June 6, 2015]
     to compile them without the minimum required support enabled
     (suggested by Flavio Medeiros).
 
-Version 1.7.0beta64 [June 10, 2015]
+Version 1.7.0beta64 [July 26, 2015]
   Removed non-working progressive reader 'skip' function. This
     function has apparently never been used. It was implemented
     to support back-door modification of png_struct in libpng-1.4.x
@@ -847,6 +847,8 @@ Version 1.7.0beta64 [June 10, 2015]
     file handling, define PNG_USE_MKSTEMP, otherwise "tmpfile()" will
     be used.
   Removed some unused WEIGHTED_FILTER macros from png.h and pngstruct.h
+  Rearranged png.h to put the major sections in the same order as
+    in libpng16.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

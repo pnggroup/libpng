@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta64, June 10, 2015
+ * libpng version 1.7.0beta64, July 26, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -11,8 +11,8 @@
  *
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
- *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta64, June 10, 2015: Glenn
+ *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
+ *   libpng versions 0.97, January 1998, through 1.7.0beta64, July 26, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -214,7 +214,11 @@
  *    1.6.16rc01-02           16    10616  16.so.16.16[.0]
  *    1.6.16                  16    10616  16.so.16.16[.0]
  *    1.6.17beta01-06         16    10617  16.so.16.17[.0]
- *    1.6.17rc01              16    10617  16.so.16.17[.0]
+ *    1.6.17rc01-06           16    10617  16.so.16.17[.0]
+ *    1.6.17                  16    10617  16.so.16.17[.0]
+ *    1.6.18beta01-09         16    10618  16.so.16.18[.0]
+ *    1.6.18rc01-03           16    10618  16.so.16.18[.0]
+ *    1.6.18                  16    10618  16.so.16.18[.0]
  *    1.7.0alpha01-10         17    10700  17.so.17.0[.0]
  *    1.7.0beta01-64          17    10700  17.so.17.0[.0]
  *
@@ -248,21 +252,16 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.2.6, August 15, 2004, through 1.7.0beta64, June 10, 2015, are
- * Copyright (c) 2004, 2006-2015 Glenn Randers-Pehrson, and are
- * distributed according to the same disclaimer and license as libpng-1.2.5
- * with the following individual added to the list of Contributing Authors:
- *
- *    Cosmin Truta
- *
- * libpng versions 1.0.7, July 1, 2000, through 1.2.5, October 3, 2002, are
- * Copyright (c) 2000-2002 Glenn Randers-Pehrson, and are
+ * libpng versions 1.0.7, July 1, 2000, through 1.7.0beta64, July 26, 2015, are
+ * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
  *
  *    Simon-Pierre Cadieux
- *    Eric S. Raymond
+ *    Mans Rullgard
+ *    Cosmin Truta
  *    Gilles Vollant
+ *    James Yu
  *
  * and with the following additions to the disclaimer:
  *
@@ -274,17 +273,18 @@
  *    the user.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
- * Copyright (c) 1998, 1999, 2000 Glenn Randers-Pehrson, and are
- * distributed according to the same disclaimer and license as libpng-0.96,
- * with the following individuals added to the list of Contributing Authors:
+ * Copyright (c) 1998-2000 Glenn Randers-Pehrson, and are distributed according
+ * to the same disclaimer and license as libpng-0.96, with the following
+ * individuals added to the list of Contributing Authors:
  *
  *    Tom Lane
  *    Glenn Randers-Pehrson
+ *    Eric S. Raymond
  *    Willem van Schaik
  *
  * libpng versions 0.89, June 1996, through 0.96, May 1997, are
- * Copyright (c) 1996, 1997 Andreas Dilger
- * Distributed according to the same disclaimer and license as libpng-0.88,
+ * Copyright (c) 1996-1997 Andreas Dilger, and are
+ * distributed according to the same disclaimer and license as libpng-0.88,
  * with the following individuals added to the list of Contributing Authors:
  *
  *    John Bowler
@@ -295,7 +295,7 @@
  *    Tom Tanner
  *
  * libpng versions 0.5, May 1995, through 0.88, January 1996, are
- * Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
  * For the purposes of this copyright and license, "Contributing Authors"
  * is defined as the following set of individuals:
@@ -323,8 +323,8 @@
  *   2. Altered versions must be plainly marked as such and must not
  *      be misrepresented as being the original source.
  *
- *   3. This Copyright notice may not be removed or altered from
- *      any source or altered source distribution.
+ *   3. This Copyright notice may not be removed or altered from any
+ *      source or altered source distribution.
  *
  * The Contributing Authors and Group 42, Inc. specifically permit, without
  * fee, and encourage the use of this source code as a component to
@@ -337,15 +337,16 @@
  * A "png_get_copyright" function is available, for convenient use in "about"
  * boxes and the like:
  *
- *     printf("%s", png_get_copyright(NULL));
+ *    printf("%s", png_get_copyright(NULL));
  *
  * Also, the PNG logo (in PNG format, of course) is supplied in the
  * files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
  */
 
 /*
- * Libpng is OSI Certified Open Source Software.  OSI Certified is a
- * certification mark of the Open Source Initiative.
+ * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
+ * a certification mark of the Open Source Initiative. OSI has not addressed
+ * the additional disclaimers inserted at version 1.0.7.
  */
 
 /*
@@ -360,7 +361,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    June 10, 2015
+ *    July 26, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -430,7 +431,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta64"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta64 - June 10, 2015\n"
+     " libpng version 1.7.0beta64 - July 26, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -529,6 +530,7 @@
  *    definitions.
  * 4. Exported library functions.
  * 5. Simplified API.
+ * 6. Implementation options
  *
  * The library source code has additional files (principally pngpriv.h) that
  * allow configuration of the library.
@@ -2856,53 +2858,6 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structrp png_ptr,
 #endif /* CHECK_FOR_INVALID_INDEX */
 
 /*******************************************************************************
- *  IMPLEMENTATION OPTIONS
- *******************************************************************************
- *
- * Support for arbitrary implementation-specific optimizations.  The API allows
- * particular options to be turned on or off.  'Option' is the number of the
- * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
- * by the PNG_OPTION_ defines below.
- *
- * HARDWARE: normally hardware capabilites, such as the Intel SSE instructions,
- *           are detected at run time, however sometimes it may be impossible
- *           to do this in user mode, in which case it is necessary to discover
- *           the capabilities in an OS specific way.  Such capabilities are
- *           listed here when libpng has support for them and must be turned
- *           ON by the application if present.
- *
- * SOFTWARE: sometimes software optimizations actually result in performance
- *           decrease on some architectures or systems, or with some sets of
- *           PNG images.  'Software' options allow such optimizations to be
- *           selected at run time.
- */
-#ifdef PNG_SET_OPTION_SUPPORTED
-#ifdef PNG_ARM_NEON_API_SUPPORTED
-#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
-#endif
-#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#define PNG_OPTION_NEXT  6 /* Next option - numbers must be even */
-
-/* Return values: NOTE: there are four values and 'off' is *not* zero */
-#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
-#define PNG_OPTION_INVALID 1 /* Option number out of range */
-#define PNG_OPTION_OFF     2
-#define PNG_OPTION_ON      3
-
-PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
-   int onoff));
-#endif
-
-/*******************************************************************************
- *  END OF HARDWARE OPTIONS
- ******************************************************************************/
-
-/* Maintainer: Put new public prototypes here ^, in libpng.3, and project
- * defs
- */
-
-/*******************************************************************************
  *  Section 5: SIMPLIFIED API
  *******************************************************************************
  *
@@ -3354,6 +3309,54 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
 /*******************************************************************************
  *  END OF SIMPLIFIED API
  ******************************************************************************/
+
+/*******************************************************************************
+ * Section 6: IMPLEMENTATION OPTIONS
+ *******************************************************************************
+ *
+ * Support for arbitrary implementation-specific optimizations.  The API allows
+ * particular options to be turned on or off.  'Option' is the number of the
+ * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
+ * by the PNG_OPTION_ defines below.
+ *
+ * HARDWARE: normally hardware capabilites, such as the Intel SSE instructions,
+ *           are detected at run time, however sometimes it may be impossible
+ *           to do this in user mode, in which case it is necessary to discover
+ *           the capabilities in an OS specific way.  Such capabilities are
+ *           listed here when libpng has support for them and must be turned
+ *           ON by the application if present.
+ *
+ * SOFTWARE: sometimes software optimizations actually result in performance
+ *           decrease on some architectures or systems, or with some sets of
+ *           PNG images.  'Software' options allow such optimizations to be
+ *           selected at run time.
+ */
+#ifdef PNG_SET_OPTION_SUPPORTED
+#ifdef PNG_ARM_NEON_API_SUPPORTED
+#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
+#endif
+#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
+#define PNG_OPTION_NEXT  6 /* Next option - numbers must be even */
+
+/* Return values: NOTE: there are four values and 'off' is *not* zero */
+#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
+#define PNG_OPTION_INVALID 1 /* Option number out of range */
+#define PNG_OPTION_OFF     2
+#define PNG_OPTION_ON      3
+
+PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
+   int onoff));
+#endif
+
+/*******************************************************************************
+ *  END OF HARDWARE OPTIONS
+ ******************************************************************************/
+
+/* Maintainer: Put new public prototypes here ^, in libpng.3, and project
+ * defs
+ */
+
 
 /* The last ordinal number (this is the *last* one already used; the next
  * one to use is one more than this.)  Maintainer, remember to add an entry to
