@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.19beta01, July 25, 2015
+ * libpng version 1.6.19beta01, July 26, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.19beta01, July 25, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.19beta01, July 26, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -219,7 +219,7 @@
  *    1.6.18beta01-09         16    10618  16.so.16.18[.0]
  *    1.6.18rc01-03           16    10618  16.so.16.18[.0]
  *    1.6.18                  16    10618  16.so.16.18[.0]
- *    1.6.18beta01            16    10619  16.so.16.19[.0]
+ *    1.6.19beta01            16    10619  16.so.16.19[.0]
  *
  *   Henceforth the source version will match the shared-library major
  *   and minor numbers; the shared-library major version number will be
@@ -251,7 +251,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta01, July 25, 2015, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta01, July 26, 2015, are
  * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
@@ -360,7 +360,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 25, 2015
+ *    July 26, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -430,7 +430,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.19beta01"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.19beta01 - July 25, 2015\n"
+     " libpng version 1.6.19beta01 - July 26, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -526,17 +526,22 @@ extern "C" {
 
 /* This file is arranged in several sections:
  *
- * 1. Any configuration options that can be specified by for the application
+ * 1. [omitted]
+ * 2. Any configuration options that can be specified by for the application
  *    code when it is built.  (Build time configuration is in pnglibconf.h)
- * 2. Type definitions (base types are defined in pngconf.h), structure
+ * 3. Type definitions (base types are defined in pngconf.h), structure
  *    definitions.
- * 3. Exported library functions.
- * 4. Simplified API.
+ * 4. Exported library functions.
+ * 5. Simplified API.
+ * 6. Implementation options.
  *
  * The library source code has additional files (principally pngpriv.h) that
  * allow configuration of the library.
  */
-/* Section 1: run time configuration
+
+/* Section 1: [omitted] */
+
+/* Section 2: run time configuration
  * See pnglibconf.h for build time configuration
  *
  * Run time configuration allows the application to choose between
@@ -566,7 +571,7 @@ extern "C" {
  * Otherwise the calls are mapped to png_error.
  */
 
-/* Section 2: type definitions, including structures and compile time
+/* Section 3: type definitions, including structures and compile time
  * constants.
  * See pngconf.h for base types that vary by machine/system
  */
@@ -1011,7 +1016,7 @@ typedef PNG_CALLBACK(png_voidp, *png_malloc_ptr, (png_structp,
     png_alloc_size_t));
 typedef PNG_CALLBACK(void, *png_free_ptr, (png_structp, png_voidp));
 
-/* Section 3: exported functions
+/* Section 4: exported functions
  * Here are the function definitions most commonly used.  This is not
  * the place to find out how to use libpng.  See libpng-manual.txt for the
  * full explanation, see example.c for the summary.  This just provides
@@ -2735,10 +2740,17 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 #  endif
 #endif
 
-#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) || \
-    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+PNG_EXPORT(242, void, png_set_check_for_invalid_index,
+    (png_structrp png_ptr, int allowed));
+#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+PNG_EXPORT(243, int, png_get_palette_max, (png_const_structp png_ptr,
+    png_const_infop info_ptr));
+#  endif
+#endif /* CHECK_FOR_INVALID_INDEX */
+
 /*******************************************************************************
- *  SIMPLIFIED API
+ * Section 5: SIMPLIFIED API
  *******************************************************************************
  *
  * Please read the documentation in libpng-manual.txt (TODO: write said
@@ -2783,6 +2795,9 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
  * when it is being read or defines the in-memory format of an image that you
  * need to write:
  */
+#if defined(PNG_SIMPLIFIED_READ_SUPPORTED) || \
+    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
+
 #define PNG_IMAGE_VERSION 1
 
 typedef struct png_control *png_controlp;
@@ -3194,17 +3209,8 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  ******************************************************************************/
 #endif /* SIMPLIFIED_{READ|WRITE} */
 
-#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-PNG_EXPORT(242, void, png_set_check_for_invalid_index,
-    (png_structrp png_ptr, int allowed));
-#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
-PNG_EXPORT(243, int, png_get_palette_max, (png_const_structp png_ptr,
-    png_const_infop info_ptr));
-#  endif
-#endif /* CHECK_FOR_INVALID_INDEX */
-
 /*******************************************************************************
- *  IMPLEMENTATION OPTIONS
+ * Section 6: IMPLEMENTATION OPTIONS
  *******************************************************************************
  *
  * Support for arbitrary implementation-specific optimizations.  The API allows
