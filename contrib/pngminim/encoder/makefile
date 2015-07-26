@@ -81,7 +81,7 @@ OBJS    = $(PROGOBJS) $(PNGOBJS) $(ZOBJS)
 # implicit make rules -------------------------------------------------------
 
 .c$(O):
-	$(CC) $(CPPFLAGS) -c $(CFLAGS) $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
 
 # dependencies
 
