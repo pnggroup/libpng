@@ -5305,12 +5305,17 @@ Version 1.6.18rc03 [July 15, 2015]
 Version 1.6.18 [July 23, 2015]
   No changes.
 
-Version 1.6.19beta01 [July 26, 2015]
+Version 1.6.19beta01 [July 29, 2015]
   Updated obsolete information about the simplified API macros in the
     manual pages (Bug report by Arc Riley).
   Avoid potentially dereferencing NULL info_ptr in png_info_init_3().
   Rearranged png.h to put the major sections in the same order as
     in libpng17.
+  Eliminated unused PNG_COST_SHIFT, PNG_WEIGHT_SHIFT, PNG_COST_FACTOR, and
+    PNG_WEIGHT_FACTOR macros.
+  Suppressed some warnings from the Borland C++ 5.5.1/5.82 compiler
+    (Bug report by Viktor Szaka'ts).  Several warnings remain and are
+    unavoidable, where we test for overflow.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
