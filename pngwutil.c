@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.6.18 [July 23, 2015]
+ * Last changed in libpng 1.6.19 [(PENDING RELEASE)]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2651,7 +2651,6 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 
       if (sum < mins)
       {
-         mins = sum;
          best_row = png_ptr->try_row;
          if (png_ptr->tst_row != NULL)
          {
