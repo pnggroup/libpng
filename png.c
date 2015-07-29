@@ -2279,7 +2279,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
          }
 
          /* Length *and* intent must match */
-         if (length == png_sRGB_checks[i].length &&
+         if (length == (png_uint_32) png_sRGB_checks[i].length &&
             intent == (png_uint_32) png_sRGB_checks[i].intent)
          {
             /* Now calculate the adler32 if not done already. */
@@ -3147,7 +3147,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
 
       /* Avoid overflow here on the minimum integer. */
       if (fp < 0)
-         *ascii++ = 45, --size, num = -fp;
+         *ascii++ = 45, num = -fp;
       else
          num = fp;
 
