@@ -3,6 +3,7 @@
  *  copyright (C) 1999 by Willem van Schaik <willem@schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
+ *  version 1.1 - 2015.07.29 - Fixed leaks (Glenn Randers-Pehrson)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -200,17 +201,17 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   char          width_token[16];
   char          height_token[16];
   char          maxval_token[16];
-  volatile int           color_type;
+  volatile int    color_type=1;
   unsigned long   ul_width=0, ul_alpha_width=0;
   unsigned long   ul_height=0, ul_alpha_height=0;
   unsigned long   ul_maxval=0;
-  volatile png_uint_32   width, height;
-  volatile png_uint_32   alpha_width, alpha_height;
+  volatile png_uint_32   width=0, height=0;
+  volatile png_uint_32   alpha_width=0, alpha_height=0;
   png_uint_32   maxval;
   volatile int           bit_depth = 0;
-  int           channels;
+  int           channels=0;
   int           alpha_depth = 0;
-  int           alpha_present;
+  int           alpha_present=0;
   int           row, col;
   BOOL          raw, alpha_raw = FALSE;
 #if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
@@ -356,8 +357,10 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
     channels = 3;
   else if (color_type == PNG_COLOR_TYPE_RGB_ALPHA)
     channels = 4;
+#if 0
   else
-    channels = 0; /* should not happen */
+    channels = 0; /* cannot happen */
+#endif
 
   alpha_present = (channels - 1) % 2;
 
@@ -429,12 +432,16 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
       NULL);
   if (!png_ptr)
   {
+    free (png_pixels);
+    png_pixels = NULL;
     return FALSE;
   }
   info_ptr = png_create_info_struct (png_ptr);
   if (!info_ptr)
   {
     png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
+    free (png_pixels);
+    png_pixels = NULL;
     return FALSE;
   }
 
@@ -449,7 +456,9 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   /* setjmp() must be called in every function that calls a PNG-reading libpng function */
   if (setjmp (png_jmpbuf(png_ptr)))
   {
-    png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
+    png_destroy_write_struct (&png_ptr, &info_ptr);
+    free (png_pixels);
+    png_pixels = NULL;
     return FALSE;
   }
 
@@ -470,7 +479,9 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
     if ((row_pointers = (png_byte **)
         malloc (height * sizeof (png_bytep))) == NULL)
     {
-      png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
+      png_destroy_write_struct (&png_ptr, &info_ptr);
+      free (png_pixels);
+      png_pixels = NULL;
       return FALSE;
     }
   }
@@ -486,7 +497,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   png_write_end (png_ptr, info_ptr);
 
   /* clean up after the write, and free any memory allocated */
-  png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
+  png_destroy_write_struct (&png_ptr, &info_ptr);
 
   if (row_pointers != (unsigned char**) NULL)
     free (row_pointers);
