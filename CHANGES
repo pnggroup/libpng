@@ -5148,7 +5148,11 @@ Version 1.7.0beta64 [July 26, 2015]
   Belatedly added Mans Rullgard and James Yu to the list of Contributing
     Authors.
 
-Version 1.7.0beta65 [July 26, 2015]
+Version 1.7.0beta65 [July 30, 2015]
+  Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
+    because usleep() is deprecated (port from libpng16).
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
