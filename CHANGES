@@ -2866,6 +2866,9 @@ version 1.2.54beta01 [July 30, 2015]
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
   Removed WRITE_WEIGHTED_FILTERED code.
   Avoid potentially dereferencing NULL info_ptr in png_info_init_3().
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
+    because usleep() is deprecated (port from libpng16).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
