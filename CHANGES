@@ -5305,7 +5305,7 @@ Version 1.6.18rc03 [July 15, 2015]
 Version 1.6.18 [July 23, 2015]
   No changes.
 
-Version 1.6.19beta01 [July 29, 2015]
+Version 1.6.19beta01 [July 30, 2015]
   Updated obsolete information about the simplified API macros in the
     manual pages (Bug report by Arc Riley).
   Avoid potentially dereferencing NULL info_ptr in png_info_init_3().
@@ -5318,6 +5318,8 @@ Version 1.6.19beta01 [July 29, 2015]
     unavoidable, where we test for overflow.
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
+
+Version 1.6.19beta02 [July 30, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
