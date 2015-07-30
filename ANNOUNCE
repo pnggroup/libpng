@@ -37,6 +37,8 @@ Version 1.6.19beta01 [July 29, 2015]
   Suppressed some warnings from the Borland C++ 5.5.1/5.82 compiler
     (Bug report by Viktor Szaka'ts).  Several warnings remain and are
     unavoidable, where we test for overflow.
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
