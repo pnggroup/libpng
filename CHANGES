@@ -4373,7 +4373,12 @@ Version 1.5.23rc03 [July 15, 2015]
 Version 1.5.23 [July 23, 2015]
   No changes.
 
-Version 1.5.24beta01 [July 24, 2015]
+Version 1.5.24beta01 [July 30, 2015]
+  Avoid potentially dereferencing NULL info_ptr in png_info_init_3().
+  Eliminated unused PNG_COST_SHIFT, PNG_WEIGHT_SHIFT, PNG_COST_FACTOR, and
+    PNG_WEIGHT_FACTOR macros.
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
