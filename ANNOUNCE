@@ -1,5 +1,5 @@
 
-Libpng 1.4.17beta01 - May 15, 2015
+Libpng 1.4.17beta01 - July 30, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,12 +27,18 @@ Other information:
 
 Changes since the last public release (1.4.16):
 
-version 1.4.17beta01 [May 15, 2015]
+version 1.4.17beta01 [July 30, 2015]
   Fix typecast in a png_debug2() statement in png_set_text_2() to
     avoid a compiler warning in PNG_DEBUG builds.
   Avoid Coverity issues 80855, 80856, and 80857 (PRINTF_ARG_MISMATCH)
     in pngtest.c PNG_DEBUG builds.
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
+  Removed WRITE_WEIGHTED_FILTERED code.
+  Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7+
+  Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
+    because usleep() is deprecated (port from libpng16).
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

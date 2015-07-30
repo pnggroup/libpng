@@ -469,7 +469,7 @@ version 1.0.3d [September 4, 1999]
   Added new png_expand functions to scripts/pngdef.pas and pngos2.def
   Added a demo read_user_transform_fn that examines the row filters in pngtest.c
 
-version 1.0.4 [September 24, 1999]
+Version 1.0.4 [September 24, 1999, not distributed publicly]
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
   Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
   Made several minor corrections to pngtest.c
@@ -493,6 +493,7 @@ version 1.0.4c [October 1, 1999]
   Added a "png_check_version" function in png.c and pngtest.c that will generate
     a helpful compiler error if an old png.h is found in the search path.
   Changed type of png_user_transform_depth|channels from int to png_byte.
+  Added "Libpng is OSI Certified Open Source Software" statement to png.h
 version 1.0.4d [October 6, 1999]
   Changed 0.45 to 0.45455 in png_set_sRGB()
   Removed unused PLTE entries from pngnow.png
@@ -2956,12 +2957,18 @@ version 1.4.16rc01 [March 4, 2015]
 version 1.4.16 [March 19, 2015]
   No changes.
 
-version 1.4.17beta01 [May 15, 2015]
+version 1.4.17beta01 [July 30, 2015]
   Fix typecast in a png_debug2() statement in png_set_text_2() to
     avoid a compiler warning in PNG_DEBUG builds.
   Avoid Coverity issues 80855, 80856, and 80857 (PRINTF_ARG_MISMATCH)
     in pngtest.c PNG_DEBUG builds.
   Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
+  Removed WRITE_WEIGHTED_FILTERED code.
+  Added -DZ_SOLO to contrib/pngminim/*/makefile to work with zlib-1.2.7+
+  Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
+    because usleep() is deprecated (port from libpng16).
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
