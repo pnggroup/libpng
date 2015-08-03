@@ -5319,7 +5319,10 @@ Version 1.6.19beta01 [July 30, 2015]
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
-Version 1.6.19beta02 [July 30, 2015]
+Version 1.6.19beta02 [August 3, 2015]
+  Moved config.h.in~ from the "libpng_autotools_files" list to the
+    "libpng_autotools_extra" list in autogen.sh because it was causing a
+    false positive for missing files (bug report by Robert C. Seacord).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
