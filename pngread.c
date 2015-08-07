@@ -3630,8 +3630,10 @@ png_image_read_background(png_voidp argument)
          }
          break;
 
+#ifdef PNG_DEBUG
       default:
          png_error(png_ptr, "unexpected bit depth");
+#endif
    }
 
    return 1;
