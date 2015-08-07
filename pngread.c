@@ -1686,7 +1686,6 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
       default:
          png_error(display->image->opaque->png_ptr,
             "unexpected encoding (internal error)");
-         break;
    }
 
    return value;
@@ -2847,10 +2846,6 @@ png_image_read_colormap(png_voidp argument)
 
    switch (data_encoding)
    {
-      default:
-         png_error(png_ptr, "bad data option (internal error)");
-         break;
-
       case P_sRGB:
          /* Change to 8-bit sRGB */
          png_set_alpha_mode_fixed(png_ptr, PNG_ALPHA_PNG, PNG_GAMMA_sRGB);
@@ -2860,6 +2855,9 @@ png_image_read_colormap(png_voidp argument)
          if (png_ptr->bit_depth > 8)
             png_set_scale_16(png_ptr);
          break;
+
+      default:
+         png_error(png_ptr, "bad data option (internal error)");
    }
 
    if (cmap_entries > 256 || cmap_entries > image->colormap_entries)
@@ -3410,10 +3408,6 @@ png_image_read_background(png_voidp argument)
     */
    switch (info_ptr->bit_depth)
    {
-      default:
-         png_error(png_ptr, "unexpected bit depth");
-         break;
-
       case 8:
          /* 8-bit sRGB gray values with an alpha channel; the alpha channel is
           * to be removed by composing on a background: either the row if
@@ -3631,6 +3625,9 @@ png_image_read_background(png_voidp argument)
             }
          }
          break;
+
+      default:
+         png_error(png_ptr, "unexpected bit depth");
    }
 
    return 1;
