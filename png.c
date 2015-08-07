@@ -1706,7 +1706,6 @@ png_colorspace_set_chromaticities(png_const_structrp png_ptr,
           */
          colorspace->flags |= PNG_COLORSPACE_INVALID;
          png_error(png_ptr, "internal error checking chromaticities");
-         break;
    }
 
    return 0; /* failed */
@@ -1734,7 +1733,6 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
       default:
          colorspace->flags |= PNG_COLORSPACE_INVALID;
          png_error(png_ptr, "internal error checking chromaticities");
-         break;
    }
 
    return 0; /* failed */
