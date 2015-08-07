@@ -976,7 +976,6 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
 
       default:
          png_error(png_ptr, "invalid error action to rgb_to_gray");
-         break;
    }
 
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
