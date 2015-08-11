@@ -62,7 +62,7 @@ The PNG-1.0 specification is available as RFC 2083
 W3C Recommendation <http://www.w3.org/TR/REC-png-961001>.
 
 Some additional chunks are described in the special-purpose public chunks
-documents at <http://www.libpng.org/pub/png/documents/>.
+documents at <http://www.libpng.org/pub/png/spec/register/>
 
 Other information
 about PNG, and the latest version of libpng, can be found at the PNG home
@@ -84,7 +84,7 @@ majority of the needs of its users.
 
 Libpng uses zlib for its compression and decompression of PNG files.
 Further information about zlib, and the latest version of zlib, can
-be found at the zlib home page, <http://www.info-zip.org/pub/infozip/zlib/>.
+be found at the zlib home page, <http://zlib.net/>.
 The zlib compression utility is a general purpose utility that is
 useful for more than PNG files, and can be used without libpng.
 See the documentation delivered with zlib for more details.
@@ -1068,9 +1068,11 @@ the normalized graylevel is computed:
     int bw = 65536 - (rw + gw);
     gray = (rw*red + gw*green + bw*blue)/65536;
 
-The default values approximate those recommended in the Charles
-Poynton's Color FAQ, <http://www.inforamp.net/~poynton/>
-Copyright (c) 1998-01-04 Charles Poynton <poynton at inforamp.net>
+The defaults correspond to the ITU-R recommendation 709, and also the sRGB
+color space, as recommended in the Charles Poynton's Colour FAQ,
+Copyright (c) 2006-11-28 Charles Poynton, in section 9:
+
+<http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC9>
 
     Y = 0.212671 * R + 0.715160 * G + 0.072169 * B
 
