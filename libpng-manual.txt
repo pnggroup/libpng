@@ -79,7 +79,7 @@ The PNG-1.0 specification is available as RFC 2083
 W3C Recommendation <http://www.w3.org/TR/REC-png-961001>.
 
 Some additional chunks are described in the special-purpose public chunks
-documents at <http://www.libpng.org/pub/png/documents/>.
+documents at <http://www.libpng.org/pub/png/spec/register/>
 
 Other information
 about PNG, and the latest version of libpng, can be found at the PNG home
@@ -101,7 +101,7 @@ majority of the needs of its users.
 
 Libpng uses zlib for its compression and decompression of PNG files.
 Further information about zlib, and the latest version of zlib, can
-be found at the zlib home page, <http://www.info-zip.org/pub/infozip/zlib/>.
+be found at the zlib home page, <http://zlib.net/>.
 The zlib compression utility is a general purpose utility that is
 useful for more than PNG files, and can be used without libpng.
 See the documentation delivered with zlib for more details.
@@ -1918,9 +1918,9 @@ data for sBIT, regardless of the error_action setting.
 The default values come from the PNG file cHRM chunk if present; otherwise, the
 defaults correspond to the ITU-R recommendation 709, and also the sRGB color
 space, as recommended in the Charles Poynton's Colour FAQ,
-<http://www.poynton.com/>, in section 9:
+Copyright (c) 2006-11-28 Charles Poynton, in section 9:
 
-   <http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC9>
+<http://www.poynton.com/notes/colour_and_gamma/ColorFAQ.html#RTFToC9>
 
     Y = 0.2126 * R + 0.7152 * G + 0.0722 * B
 
