@@ -179,7 +179,7 @@ png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
    if (png_ptr == NULL)
       return;
 
-   /* On 64 bit architectures 'length' may not fit in a png_uint_32. */
+   /* On 64-bit architectures 'length' may not fit in a png_uint_32. */
    if (length > PNG_UINT_31_MAX)
       png_error(png_ptr, "length exceeds PNG maximum");
 
@@ -1444,7 +1444,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
 
    else if (color_type == PNG_COLOR_TYPE_GRAY)
    {
-      /* One 16 bit value */
+      /* One 16-bit value */
       if (tran->gray >= (1 << png_ptr->bit_depth))
       {
          png_app_warning(png_ptr,
@@ -1459,7 +1459,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
 
    else if (color_type == PNG_COLOR_TYPE_RGB)
    {
-      /* Three 16 bit values */
+      /* Three 16-bit values */
       png_save_uint_16(buf, tran->red);
       png_save_uint_16(buf + 2, tran->green);
       png_save_uint_16(buf + 4, tran->blue);

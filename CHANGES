@@ -5319,12 +5319,14 @@ Version 1.6.19beta01 [July 30, 2015]
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
-Version 1.6.19beta02 [August 7, 2015]
+Version 1.6.19beta02 [August 14, 2015]
   Moved config.h.in~ from the "libpng_autotools_files" list to the
     "libpng_autotools_extra" list in autogen.sh because it was causing a
     false positive for missing files (bug report by Robert C. Seacord).
   Removed unreachable "break" statements in png.c, pngread.c, and pngrtran.c
     to suppress clang warnings (Bug report by Viktor Szakats).
+  Fixed some bad links in the man page.
+  Change "n bit" to "n-bit" in comments.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -361,9 +361,9 @@ standard_name_from_id(char *buffer, size_t bufsize, size_t pos, png_uint_32 id)
       WIDTH_FROM_ID(id), HEIGHT_FROM_ID(id), DO_INTERLACE_FROM_ID(id));
 }
 
-/* Convenience API and defines to list valid formats.  Note that 16 bit read and
- * write support is required to do 16 bit read tests (we must be able to make a
- * 16 bit image to test!)
+/* Convenience API and defines to list valid formats.  Note that 16-bit read and
+ * write support is required to do 16-bit read tests (we must be able to make a
+ * 16-bit image to test!)
  */
 #ifdef PNG_WRITE_16BIT_SUPPORTED
 #  define WRITE_BDHI 4
@@ -416,7 +416,7 @@ next_format(png_bytep colour_type, png_bytep bit_depth,
 
    *bit_depth = (png_byte)(*bit_depth << 1);
 
-   /* Palette images are restricted to 8 bit depth */
+   /* Palette images are restricted to 8-bit depth */
    if (*bit_depth <= 8
 #ifdef DO_16BIT
          || (*colour_type != 3 && *bit_depth <= 16)
@@ -723,7 +723,7 @@ store_pool_mark(png_bytep mark)
 }
 
 #ifdef PNG_READ_SUPPORTED
-/* Use this for random 32 bit values; this function makes sure the result is
+/* Use this for random 32-bit values; this function makes sure the result is
  * non-zero.
  */
 static png_uint_32
@@ -1950,7 +1950,7 @@ typedef struct png_modifier
    double                   log8;     /* Absolute error in 8 bits to log */
    double                   log16;    /* Absolute error in 16 bits to log */
 
-   /* Logged 8 and 16 bit errors ('output' values): */
+   /* Logged 8-bit and 16-bit errors ('output' values): */
    double                   error_gray_2;
    double                   error_gray_4;
    double                   error_gray_8;
@@ -2110,10 +2110,10 @@ modifier_init(png_modifier *pm)
 /* If pm->calculations_use_input_precision is set then operations will happen
  * with the precision of the input, not the precision of the output depth.
  *
- * If pm->assume_16_bit_calculations is set then even 8 bit calculations use 16
- * bit precision.  This only affects those of the following limits that pertain
- * to a calculation - not a digitization operation - unless the following API is
- * called directly.
+ * If pm->assume_16_bit_calculations is set then even 8-bit calculations use
+ * 16-bit precision.  This only affects those of the following limits that
+ * pertain to a calculation - not a digitization operation - unless the
+ * following API is called directly.
  */
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 #if DIGITIZE
@@ -2184,8 +2184,8 @@ static double pcerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 /* Output error - the error in the encoded value.  This is determined by the
  * digitization of the output so can be +/-0.5 in the actual output value.  In
  * the expand_16 case with the current code in libpng the expand happens after
- * all the calculations are done in 8 bit arithmetic, so even though the output
- * depth is 16 the output error is determined by the 8 bit calculation.
+ * all the calculations are done in 8-bit arithmetic, so even though the output
+ * depth is 16 the output error is determined by the 8-bit calculation.
  *
  * This limit is not determined by the bit depth of internal calculations.
  *
@@ -2194,9 +2194,9 @@ static double pcerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
  */
 static double outerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
-   /* There is a serious error in the 2 and 4 bit grayscale transform because
+   /* There is a serious error in the 2- and 4-bit grayscale transform because
     * the gamma table value (8 bits) is simply shifted, not rounded, so the
-    * error in 4 bit grayscale gamma is up to the value below.  This is a hack
+    * error in 4-bit grayscale gamma is up to the value below.  This is a hack
     * to allow pngvalid to succeed:
     *
     * TODO: fix this in libpng
@@ -2226,7 +2226,7 @@ static double outerr(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
  */
 static double outlog(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 {
-   /* The command line parameters are either 8 bit (0..255) or 16 bit (0..65535)
+   /* The command line parameters are either 8-bit (0..255) or 16-bit (0..65535)
     * and so must be adjusted for low bit depth grayscale:
     */
    if (out_depth <= 8)
@@ -2259,7 +2259,7 @@ static double outlog(PNG_CONST png_modifier *pm, int in_depth, int out_depth)
 
 /* This complements the above by providing the appropriate quantization for the
  * final value.  Normally this would just be quantization to an integral value,
- * but in the 8 bit calculation case it's actually quantization to a multiple of
+ * but in the 8-bit calculation case it's actually quantization to a multiple of
  * 257!
  */
 static int output_quantization_factor(PNG_CONST png_modifier *pm, int in_depth,
@@ -2357,7 +2357,7 @@ safecat_current_encoding(char *buffer, size_t bufsize, size_t pos,
  * 1) Nothing (no color space, no gamma).
  * 2) Just a gamma value from the gamma array (including 1.0)
  * 3) A color space from the encodings array with the corresponding gamma.
- * 4) The same, but with gamma 1.0 (only really useful with 16 bit calculations)
+ * 4) The same, but with gamma 1.0 (only really useful with 16-bit calculations)
  *
  * The iterator selects these in turn, the randomizer selects one at random,
  * which is used depends on the setting of the 'test_exhaustive' flag.  Notice
@@ -2470,7 +2470,7 @@ modifier_set_encoding(png_modifier *pm)
          if (i >= pm->nencodings)
          {
             i %= pm->nencodings;
-            pm->current_gamma = 1; /* Linear, only in the 16 bit case */
+            pm->current_gamma = 1; /* Linear, only in the 16-bit case */
          }
 
          else
@@ -2517,7 +2517,7 @@ modifier_crc(png_bytep buffer)
     */
    uInt datalen = png_get_uint_32(buffer);
    uLong crc = crc32(0, buffer+4, datalen+4);
-   /* The cast to png_uint_32 is safe because a crc32 is always a 32 bit value.
+   /* The cast to png_uint_32 is safe because a crc32 is always a 32-bit value.
     */
    png_save_uint_32(buffer+datalen+8, (png_uint_32)crc);
 }
@@ -2763,7 +2763,7 @@ modifier_progressive_read(png_modifier *pm, png_structp pp, png_infop pi)
 
    /* This is another Horowitz and Hill random noise generator.  In this case
     * the aim is to stress the progressive reader with truly horrible variable
-    * buffer sizes in the range 1..500, so a sequence of 9 bit random numbers
+    * buffer sizes in the range 1..500, so a sequence of 9-bit random numbers
     * is generated.  We could probably just count from 1 to 32767 and get as
     * good a result.
     */
@@ -3420,8 +3420,8 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          return;
 
       case 16:
-         /* Generate all 65536 pixel values in order, which includes the 8 bit
-          * GA case as well as the 16 bit G case.
+         /* Generate all 65536 pixel values in order, which includes the 8-bit
+          * GA case as well as the 16-bit G case.
           */
          while (i<128)
          {
@@ -3482,7 +3482,7 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
          return;
 
       case 64:
-         /* As above in the 32 bit case. */
+         /* As above in the 32-bit case. */
          while (i<128)
          {
             png_uint_32 t = v++;
@@ -5282,7 +5282,7 @@ test_size(png_modifier* PNG_CONST pm, png_byte PNG_CONST colour_type,
 {
    /* Run the tests on each combination.
     *
-    * NOTE: on my 32 bit x86 each of the following blocks takes
+    * NOTE: on my 32-bit x86 each of the following blocks takes
     * a total of 3.5 seconds if done across every combo of bit depth
     * width and height.  This is a waste of time in practice, hence the
     * hinc and winc stuff:
@@ -6162,9 +6162,9 @@ transform_image_validate(transform_display *dp, png_const_structp pp,
 
       memset(out_palette, 0x5e, sizeof out_palette);
 
-      /* use-input-precision means assume that if the input has 8 bit (or less)
-       * samples and the output has 16 bit samples the calculations will be done
-       * with 8 bit precision, not 16.
+      /* use-input-precision means assume that if the input has 8-bit (or less)
+       * samples and the output has 16-bit samples the calculations will be done
+       * with 8-bit precision, not 16.
        */
       if (in_ct == PNG_COLOR_TYPE_PALETTE || in_bd < 16)
          in_sample_depth = 8;
@@ -6175,7 +6175,7 @@ transform_image_validate(transform_display *dp, png_const_structp pp,
          !dp->pm->calculations_use_input_precision)
          digitization_error = .5;
 
-      /* Else calculations are at 8 bit precision, and the output actually
+      /* Else calculations are at 8-bit precision, and the output actually
        * consists of scaled 8-bit values, so scale .5 in 8 bits to the 16 bits:
        */
       else
@@ -7063,7 +7063,7 @@ image_transform_png_set_rgb_to_gray_ini(PNG_CONST image_transform *this,
    else
    {
       /* With no gamma correction a large error comes from the truncation of the
-       * calculation in the 8 bit case, allow for that here.
+       * calculation in the 8-bit case, allow for that here.
        */
       if (that->this.bit_depth != 16 && !pm->assume_16_bit_calculations)
          that->pm->limit += 4E-3;
@@ -7301,7 +7301,7 @@ image_transform_png_set_rgb_to_gray_mod(PNG_CONST image_transform *this,
           * coefficients add up to 32768 can cause a larger rounding error.
           *
           * The only time when rounding doesn't occur in 1.5.5 and later is when
-          * the non-gamma code path is used for less than 16 bit data.
+          * the non-gamma code path is used for less than 16-bit data.
           */
          gray = r * data.red_coefficient + g * data.green_coefficient +
             b * data.blue_coefficient;
@@ -8572,7 +8572,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
 #        ifdef PNG_READ_16_TO_8_SUPPORTED
             png_set_strip_16(pp);
 #        else
-            png_error(pp, "scale16 (16 to 8 bit conversion) not supported");
+            png_error(pp, "scale16 (16-bit to 8-bit conversion) not supported");
 #        endif
 #     endif
 
@@ -8580,7 +8580,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
 #     ifdef PNG_READ_EXPAND_16_SUPPORTED
          png_set_expand_16(pp);
 #     else
-         png_error(pp, "expand16 (8 to 16 bit conversion) not supported");
+         png_error(pp, "expand16 (8-bit to 16-bit conversion) not supported");
 #     endif
 
    if (dp->do_background >= ALPHA_MODE_OFFSET)
@@ -9075,7 +9075,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
          /* If 'compose' is true the composition was done in linear space using
           * integer arithmetic.  This introduces an extra error of +/- 0.5 (at
           * least) in the integer space used.  'maxcalc' records this, taking
-          * into account the possibility that even for 16 bit output 8 bit space
+          * into account the possibility that even for 16-bit output 8-bit space
           * may have been used.
           */
          if (compose && tmp < vi->maxcalc) tmp = vi->maxcalc;
@@ -9251,7 +9251,7 @@ gamma_component_validate(PNG_CONST char *name, PNG_CONST validate_info *vi,
                         if (encoded_error < vi->outlog)
                            return i;
 
-                        pass = "within 8 bit limits:\n";
+                        pass = "within 8-bit limits:\n";
                      }
                   }
 #              endif
@@ -9993,8 +9993,8 @@ static void perform_gamma_sbit_tests(png_modifier *pm)
    }
 }
 
-/* Note that this requires a 16 bit source image but produces 8 bit output, so
- * we only need the 16bit write support, but the 16 bit images are only
+/* Note that this requires a 16-bit source image but produces 8-bit output, so
+ * we only need the 16bit write support, but the 16-bit images are only
  * generated if DO_16BIT is defined.
  */
 #ifdef DO_16BIT
@@ -10051,7 +10051,7 @@ static void perform_gamma_scale16_tests(png_modifier *pm)
       }
    }
 }
-#endif /* 16 to 8 bit conversion */
+#endif /* 16-bit to 8-bit conversion */
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\
    defined(PNG_READ_ALPHA_MODE_SUPPORTED)
@@ -10113,7 +10113,7 @@ static void gamma_composition_test(png_modifier *pm,
    }
 
    /* Use random background values - the background is always presented in the
-    * output space (8 or 16 bit components).
+    * output space (8-bit or 16-bit components).
     */
    if (expand_16 || bit_depth == 16)
    {
@@ -10148,7 +10148,7 @@ static void gamma_composition_test(png_modifier *pm,
 #     endif
    }
 
-   else /* 8 bit colors */
+   else /* 8-bit colors */
    {
       png_uint_32 r = random_32();
 
@@ -10278,16 +10278,16 @@ summarize_gamma_errors(png_modifier *pm, png_const_charp who, int low_bit_depth,
 
    if (low_bit_depth)
    {
-      print_one(" 2 bit gray: ", pm->error_gray_2);
-      print_one(" 4 bit gray: ", pm->error_gray_4);
-      print_one(" 8 bit gray: ", pm->error_gray_8);
-      print_one(" 8 bit color:", pm->error_color_8);
+      print_one(" 2-bit gray: ", pm->error_gray_2);
+      print_one(" 4-bit gray: ", pm->error_gray_4);
+      print_one(" 8-bit gray: ", pm->error_gray_8);
+      print_one(" 8-bit color:", pm->error_color_8);
       if (indexed)
          print_one(" indexed:    ", pm->error_indexed);
    }
 
-   print_one("16 bit gray: ", pm->error_gray_16);
-   print_one("16 bit color:", pm->error_color_16);
+   print_one("16-bit gray: ", pm->error_gray_16);
+   print_one("16-bit color:", pm->error_color_16);
 
    fflush(stdout);
 }
@@ -10325,10 +10325,10 @@ perform_gamma_test(png_modifier *pm, int summary)
          printf("value (always an integer) and the ideal value from the\n");
          printf("libpng specification (typically not an integer).\n\n");
 
-         printf("Expect this value to be less than .5 for 8 bit formats,\n");
+         printf("Expect this value to be less than .5 for 8-bit formats,\n");
          printf("less than 1 for formats with fewer than 8 bits and a small\n");
-         printf("number (typically less than 5) for the 16 bit formats.\n");
-         printf("For performance reasons the value for 16 bit formats\n");
+         printf("number (typically less than 5) for the 16-bit formats.\n");
+         printf("For performance reasons the value for 16-bit formats\n");
          printf("increases when the image file includes an sBIT chunk.\n");
          fflush(stdout);
       }
@@ -10366,16 +10366,16 @@ perform_gamma_test(png_modifier *pm, int summary)
 #ifdef DO_16BIT /* Should be READ_16BIT_SUPPORTED */
    if (pm->test_gamma_scale16)
    {
-      /* The 16 to 8 bit strip operations: */
+      /* The 16-bit to 8-bit strip operations: */
       init_gamma_errors(pm);
       perform_gamma_scale16_tests(pm);
 
       if (summary)
       {
          fflush(stderr);
-         printf("\nGamma correction with 16 to 8 bit reduction:\n");
-         printf(" 16 bit gray:  %.5f\n", pm->error_gray_16);
-         printf(" 16 bit color: %.5f\n", pm->error_color_16);
+         printf("\nGamma correction with 16-bit to 8-bit reduction:\n");
+         printf(" 16-bit gray:  %.5f\n", pm->error_gray_16);
+         printf(" 16-bit color: %.5f\n", pm->error_color_16);
          fflush(stdout);
       }
 
@@ -10395,7 +10395,7 @@ perform_gamma_test(png_modifier *pm, int summary)
       if (pm->test_gamma_expand16)
       {
          pm->calculations_use_input_precision = 1;
-         pm->maxout8 = .499; /* because the 16 bit background is smashed */
+         pm->maxout8 = .499; /* because the 16-bit background is smashed */
       }
       perform_gamma_composition_tests(pm, PNG_BACKGROUND_GAMMA_UNIQUE,
          pm->test_gamma_expand16);
@@ -10949,7 +10949,7 @@ int main(int argc, char **argv)
     */
    pm.assume_16_bit_calculations = PNG_LIBPNG_VER >= 10700;
 
-   /* Currently 16 bit expansion happens at the end of the pipeline, so the
+   /* Currently 16-bit expansion happens at the end of the pipeline, so the
     * calculations are done in the input bit depth not the output.
     *
     * TODO: fix this
@@ -10992,8 +10992,8 @@ int main(int argc, char **argv)
    /* Some default values (set the behavior for 'make check' here).
     * These values simply control the maximum error permitted in the gamma
     * transformations.  The practial limits for human perception are described
-    * below (the setting for maxpc16), however for 8 bit encodings it isn't
-    * possible to meet the accepted capabilities of human vision - i.e. 8 bit
+    * below (the setting for maxpc16), however for 8-bit encodings it isn't
+    * possible to meet the accepted capabilities of human vision - i.e. 8-bit
     * images can never be good enough, regardless of encoding.
     */
    pm.maxout8 = .1;     /* Arithmetic error in *encoded* value */
@@ -11009,8 +11009,8 @@ int main(int argc, char **argv)
     * perceive light level differences of 1% over a 100:1 range, so we need to
     * maintain 1 in 10000 accuracy (in linear light space), which is what the
     * following guarantees.  It also allows significantly higher errors at
-    * higher 16 bit values, which is important for performance.  The actual
-    * maximum 16 bit error is about +/-1.9 in the fixed point implementation but
+    * higher 16-bit values, which is important for performance.  The actual
+    * maximum 16-bit error is about +/-1.9 in the fixed point implementation but
     * this is only allowed for values >38149 by the following:
     */
    pm.maxpc16 = .005;   /* I.e., 1/200% - 1/20000 */

@@ -665,7 +665,7 @@
 /* The fixed point conversion performs range checking and evaluates
  * its argument multiple times, so must be used with care.  The
  * range checking uses the PNG specification values for a signed
- * 32 bit fixed point value except that the values are deliberately
+ * 32-bit fixed point value except that the values are deliberately
  * rounded-to-zero to an integral value - 21474 (21474.83 is roughly
  * (2^31-1) * 100000). 's' is a string that describes the value being
  * converted.
@@ -812,7 +812,7 @@
     */
 #endif
 
-/* This is used for 16 bit gamma tables -- only the top level pointers are
+/* This is used for 16-bit gamma tables -- only the top level pointers are
  * const; this could be changed:
  */
 typedef const png_uint_16p * png_const_uint_16pp;

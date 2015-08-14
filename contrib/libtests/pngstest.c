@@ -2154,7 +2154,7 @@ typedef struct
    int          in_opaque;   /* Value of input alpha that is opaque */
    int          is_palette;  /* Sample values come from the palette */
    int          accumulate;  /* Accumlate component errors (don't log) */
-   int          output_8bit; /* Output is 8 bit (else 16 bit) */
+   int          output_8bit; /* Output is 8-bit (else 16-bit) */
 
    void (*in_gp)(Pixel*, png_const_voidp);
    void (*out_gp)(Pixel*, png_const_voidp);

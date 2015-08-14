@@ -134,7 +134,7 @@
 #define png_zTXt PNG_U32(122,  84,  88, 116)
 #endif
 
-/* The 8 byte signature as a pair of 32 bit quantities */
+/* The 8-byte signature as a pair of 32-bit quantities */
 #define sig1 PNG_U32(137,  80,  78,  71)
 #define sig2 PNG_U32( 13,  10,  26,  10)
 
@@ -156,7 +156,7 @@
  */
 #define UNREACHED 0
 
-/* 80-bit number handling - a PNG image can be up to (2^31-1)x(2^31-1) 8 byte
+/* 80-bit number handling - a PNG image can be up to (2^31-1)x(2^31-1) 8-byte
  * (16-bit RGBA) pixels in size; that's less than 2^65 bytes or 2^68 bits, so
  * arithmetic of 80-bit numbers is sufficient.  This representation uses an
  * arbitrary length array of png_uint_16 digits (0..65535).  The representation
@@ -584,7 +584,7 @@ chunk_type_valid(png_uint_32 c)
    c &= ~PNG_U32(32,32,0,32);
    t = (c & ~0x1f1f1f1f) ^ 0x40404040;
 
-   /* Subtract 65 for each 8 bit quantity, this must not overflow
+   /* Subtract 65 for each 8-bit quantity, this must not overflow
     * and each byte must then be in the range 0-25.
     */
    c -= PNG_U32(65,65,65,65);

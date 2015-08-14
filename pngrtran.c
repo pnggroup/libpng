@@ -1996,7 +1996,7 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
 #     endif
 
 #  else
-      /* No 16 bit support: force chopping 16-bit input down to 8, in this case
+      /* No 16-bit support: force chopping 16-bit input down to 8, in this case
        * the app program can chose if both APIs are available by setting the
        * correct scaling to use.
        */
@@ -2381,8 +2381,8 @@ png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
 
       while (sp < ep)
       {
-         /* The input is an array of 16 bit components, these must be scaled to
-          * 8 bits each.  For a 16 bit value V the required value (from the PNG
+         /* The input is an array of 16-bit components, these must be scaled to
+          * 8 bits each.  For a 16-bit value V the required value (from the PNG
           * specification) is:
           *
           *    (V * 255) / 65535
@@ -2403,7 +2403,7 @@ png_do_scale_16_to_8(png_row_infop row_info, png_bytep row)
           *
           * The approximate differs from the exact answer only when (vlo-vhi) is
           * 128; it then gives a correction of +1 when the exact correction is
-          * 0.  This gives 128 errors.  The exact answer (correct for all 16 bit
+          * 0.  This gives 128 errors.  The exact answer (correct for all 16-bit
           * input values) is:
           *
           *    error = (vlo-vhi+128)*65535 >> 24;
@@ -3147,9 +3147,9 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
                if (red != green || red != blue)
                   rgb_error |= 1;
 
-               /* From 1.5.5 in the 16 bit case do the accurate conversion even
+               /* From 1.5.5 in the 16-bit case do the accurate conversion even
                 * in the 'fast' case - this is because this is where the code
-                * ends up when handling linear 16 bit data.
+                * ends up when handling linear 16-bit data.
                 */
                gray16  = (png_uint_16)((rc*red + gc*green + bc*blue + 16384) >>
                   15);

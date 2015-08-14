@@ -1422,7 +1422,7 @@ png_write_png(png_structrp png_ptr, png_inforp info_ptr,
       png_app_error(png_ptr, "PNG_TRANSFORM_SWAP_ENDIAN not supported");
 #endif
 
-   /* Swap bits of 1, 2, 4 bit packed pixel formats */
+   /* Swap bits of 1-bit, 2-bit, 4-bit packed pixel formats */
    if ((transforms & PNG_TRANSFORM_PACKSWAP) != 0)
 #ifdef PNG_WRITE_PACKSWAP_SUPPORTED
       png_set_packswap(png_ptr);
@@ -1998,7 +1998,7 @@ png_image_write_main(png_voidp argument)
    /* Now set up the data transformations (*after* the header is written),
     * remove the handled transformations from the 'format' flags for checking.
     *
-    * First check for a little endian system if writing 16 bit files.
+    * First check for a little endian system if writing 16-bit files.
     */
    if (write_16bit != 0)
    {
