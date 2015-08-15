@@ -24,7 +24,7 @@ typedef png_libpng_version_1_6_19beta02 Your_png_h_is_not_version_1_6_19beta02;
 
 #ifdef PNG_READ_SUPPORTED
 void PNGAPI
-png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
+png_set_sig_bytes(png_structrp png_ptr, png_size_t num_bytes)
 {
    png_debug(1, "in png_set_sig_bytes");
 
@@ -834,8 +834,8 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 {
    int num_palette;
    int color_inc;
-   int i;
-   int v;
+   png_size_t i;
+   unsigned int v;
 
    png_debug(1, "in png_do_build_grayscale_palette");
 
