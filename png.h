@@ -880,22 +880,22 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
  * data in the info_struct to be written into the output file.  The values
  * of the PNG_INFO_<chunk> defines should NOT be changed.
  */
-#define PNG_INFO_gAMA 0x0001
-#define PNG_INFO_sBIT 0x0002
-#define PNG_INFO_cHRM 0x0004
-#define PNG_INFO_PLTE 0x0008
-#define PNG_INFO_tRNS 0x0010
-#define PNG_INFO_bKGD 0x0020
-#define PNG_INFO_hIST 0x0040
-#define PNG_INFO_pHYs 0x0080
-#define PNG_INFO_oFFs 0x0100
-#define PNG_INFO_tIME 0x0200
-#define PNG_INFO_pCAL 0x0400
-#define PNG_INFO_sRGB 0x0800   /* GR-P, 0.96a */
-#define PNG_INFO_iCCP 0x1000   /* ESR, 1.0.6 */
-#define PNG_INFO_sPLT 0x2000   /* ESR, 1.0.6 */
-#define PNG_INFO_sCAL 0x4000   /* ESR, 1.0.6 */
-#define PNG_INFO_IDAT 0x8000   /* ESR, 1.0.6 */
+#define PNG_INFO_gAMA 0x0001U
+#define PNG_INFO_sBIT 0x0002U
+#define PNG_INFO_cHRM 0x0004U
+#define PNG_INFO_PLTE 0x0008U
+#define PNG_INFO_tRNS 0x0010U
+#define PNG_INFO_bKGD 0x0020U
+#define PNG_INFO_hIST 0x0040U
+#define PNG_INFO_pHYs 0x0080U
+#define PNG_INFO_oFFs 0x0100U
+#define PNG_INFO_tIME 0x0200U
+#define PNG_INFO_pCAL 0x0400U
+#define PNG_INFO_sRGB 0x0800U   /* GR-P, 0.96a */
+#define PNG_INFO_iCCP 0x1000U   /* ESR, 1.0.6 */
+#define PNG_INFO_sPLT 0x2000U   /* ESR, 1.0.6 */
+#define PNG_INFO_sCAL 0x4000U   /* ESR, 1.0.6 */
+#define PNG_INFO_IDAT 0x8000U   /* ESR, 1.0.6 */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -1051,7 +1051,7 @@ PNG_EXPORT(1, png_uint_32, png_access_version_number, (void));
 /* Tell lib we have already handled the first <num_bytes> magic bytes.
  * Handling more than 8 bytes from the beginning of the file is an error.
  */
-PNG_EXPORT(2, void, png_set_sig_bytes, (png_structrp png_ptr, int num_bytes));
+PNG_EXPORT(2, void, png_set_sig_bytes, (png_structrp png_ptr, png_size_t num_bytes));
 
 /* Check sig[start] through sig[start + num_to_check - 1] to see if it's a
  * PNG file.  Returns zero if the supplied bytes match the 8-byte PNG
@@ -1893,21 +1893,21 @@ PNG_EXPORT(99, void, png_data_freer, (png_const_structrp png_ptr,
 #define PNG_SET_WILL_FREE_DATA 1
 #define PNG_USER_WILL_FREE_DATA 2
 /* Flags for png_ptr->free_me and info_ptr->free_me */
-#define PNG_FREE_HIST 0x0008
-#define PNG_FREE_ICCP 0x0010
-#define PNG_FREE_SPLT 0x0020
-#define PNG_FREE_ROWS 0x0040
-#define PNG_FREE_PCAL 0x0080
-#define PNG_FREE_SCAL 0x0100
+#define PNG_FREE_HIST 0x0008U
+#define PNG_FREE_ICCP 0x0010U
+#define PNG_FREE_SPLT 0x0020U
+#define PNG_FREE_ROWS 0x0040U
+#define PNG_FREE_PCAL 0x0080U
+#define PNG_FREE_SCAL 0x0100U
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
 #  define PNG_FREE_UNKN 0x0200
 #endif
-/*      PNG_FREE_LIST 0x0400    removed in 1.6.0 because it is ignored */
-#define PNG_FREE_PLTE 0x1000
-#define PNG_FREE_TRNS 0x2000
-#define PNG_FREE_TEXT 0x4000
-#define PNG_FREE_ALL  0x7fff
-#define PNG_FREE_MUL  0x4220 /* PNG_FREE_SPLT|PNG_FREE_TEXT|PNG_FREE_UNKN */
+/*      PNG_FREE_LIST 0x0400U    removed in 1.6.0 because it is ignored */
+#define PNG_FREE_PLTE 0x1000U
+#define PNG_FREE_TRNS 0x2000U
+#define PNG_FREE_TEXT 0x4000U
+#define PNG_FREE_ALL  0x7fffU
+#define PNG_FREE_MUL  0x4220U /* PNG_FREE_SPLT|PNG_FREE_TEXT|PNG_FREE_UNKN */
 
 #ifdef PNG_USER_MEM_SUPPORTED
 PNG_EXPORTA(100, png_voidp, png_malloc_default, (png_const_structrp png_ptr,
