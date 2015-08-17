@@ -88,7 +88,7 @@ png_get_int_32)(png_const_bytep buf)
    if ((uval & 0x80000000UL) == 0) /* non-negative */
       return uval;
 
-   uval = (uval ^ (png_uint_32)0xffffffffUL) + 1;  /* 2's complement: -x = ~x+1 */
+   uval = (uval ^ 0xffffffffU) + 1;  /* 2's complement: -x = ~x+1 */
    return -(png_int_32)uval;
 }
 
