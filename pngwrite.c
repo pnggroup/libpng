@@ -1570,7 +1570,7 @@ png_write_image_16bit(png_voidp argument)
           * is only initialized when required.
           */
          if (alpha > 0 && alpha < 65535)
-            reciprocal = ((0xffffUL<<15)+(alpha>>1))/alpha;
+            reciprocal = ((0xffffU<<15)+(alpha>>1))/alpha;
 
          c = channels;
          do /* always at least one channel */
@@ -1621,7 +1621,7 @@ png_write_image_16bit(png_voidp argument)
  * calculation can be done to 15 bits of accuracy; however, the output needs to
  * be scaled in the range 0..255*65535, so include that scaling here.
  */
-#   define UNP_RECIPROCAL(alpha) ((((0xffffUL*0xffU)<<7)+(alpha>>1))/alpha)
+#   define UNP_RECIPROCAL(alpha) ((((0xffffU*0xffU)<<7)+(alpha>>1))/alpha)
 
 static png_byte
 png_unpremultiply(png_uint_32 component, png_uint_32 alpha,
@@ -1836,7 +1836,7 @@ png_image_set_PLTE(png_image_write_control *display)
              * divided by 128 (i.e. asr 7).
              */
             if (alphabyte > 0 && alphabyte < 255)
-               reciprocal = (((0xffffUL*0xffU)<<7)+(alpha>>1))/alpha;
+               reciprocal = (((0xffffU*0xffU)<<7)+(alpha>>1))/alpha;
 
             tRNS[i] = alphabyte;
             if (alphabyte < 255)
