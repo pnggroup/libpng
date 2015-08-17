@@ -1512,10 +1512,10 @@ png_XYZ_normalize(png_XYZ *XYZ)
     * safe.
     */
    Y = XYZ->red_Y;
-   if (0x7fffffff - Y < XYZ->green_X)
+   if (0x7fffffffL - Y < XYZ->green_X)
       return 1;
    Y += XYZ->green_Y;
-   if (0x7fffffff - Y < XYZ->blue_X)
+   if (0x7fffffffL - Y < XYZ->blue_X)
       return 1;
    Y += XYZ->blue_Y;
 
@@ -3673,10 +3673,10 @@ for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
 static png_uint_32
 png_exp(png_fixed_point x)
 {
-   if (x > 0 && x <= 0xfffff) /* Else overflow or zero (underflow) */
+   if (x > 0 && x <= 0xfffffUL) /* Else overflow or zero (underflow) */
    {
       /* Obtain a 4-bit approximation */
-      png_uint_32 e = png_32bit_exp[(x >> 12) & 0xf];
+      png_uint_32 e = png_32bit_exp[(x >> 12) & 0x0f];
 
       /* Incorporate the low 12 bits - these decrease the returned value by
        * multiplying by a number less than 1 if the bit is set.  The multiplier
@@ -3729,7 +3729,7 @@ png_exp8bit(png_fixed_point lg2)
     * step.
     */
    x -= x >> 8;
-   return (png_byte)(((x + 0x7fffff) >> 24) & 0xff);
+   return (png_byte)(((x + 0x7fffffUL) >> 24) & 0xff);
 }
 
 #ifdef PNG_16BIT_SUPPORTED

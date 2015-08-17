@@ -3803,12 +3803,13 @@ Version 1.6.0beta01 [December 15, 2011]
     (the other two required headers aren't used).  Non-ANSI systems that don't
     have stddef.h or limits.h will have to provide an appropriate fake
     containing the relevant types and #defines.
-  The use of FAR/far has been eliminated and the definition of png_alloc_size_t
-    is now controlled by a flag so that 'small size_t' systems can select it
-    if necessary.  Libpng 1.6 may not currently work on such systems -- it
-    seems likely that it will ask 'malloc' for more than 65535 bytes with any
-    image that has a sufficiently large row size (rather than simply failing
-    to read such images).
+  Dropped support for 16-bit platforms. The use of FAR/far has been eliminated
+    and the definition of png_alloc_size_t is now controlled by a flag so
+    that 'small size_t' systems can select it if necessary.  Libpng 1.6 may
+    not currently work on such systems -- it seems likely that it will
+    ask 'malloc' for more than 65535 bytes with any image that has a
+    sufficiently large row size (rather than simply failing to read such
+    images).
   New tools directory containing tools used to generate libpng code.
   Fixed race conditions in parallel make builds. With higher degrees of
     parallelism during 'make' the use of the same temporary file names such

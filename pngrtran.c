@@ -3314,7 +3314,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == png_ptr->trans_color.gray)
                         {
-                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
+                           unsigned int tmp = *sp & (0x0f0f >> (4 - shift));
                            tmp |= png_ptr->background.gray << shift;
                            *sp = (png_byte)(tmp & 0xff);
                         }
@@ -3324,7 +3324,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                            unsigned int p = (*sp >> shift) & 0x0f;
                            unsigned int g = (gamma_table[p | (p << 4)] >> 4) &
                               0x0f;
-                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
+                           unsigned int tmp = *sp & (0x0f0f >> (4 - shift));
                            tmp |= g << shift;
                            *sp = (png_byte)(tmp & 0xff);
                         }
@@ -3350,7 +3350,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         if ((png_uint_16)((*sp >> shift) & 0x0f)
                             == png_ptr->trans_color.gray)
                         {
-                           unsigned int tmp = *sp & (0xf0f >> (4 - shift));
+                           unsigned int tmp = *sp & (0x0f0f >> (4 - shift));
                            tmp |= png_ptr->background.gray << shift;
                            *sp = (png_byte)(tmp & 0xff);
                         }

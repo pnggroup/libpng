@@ -5554,9 +5554,9 @@ The signatures of many exported functions were changed, such that
    png_infop became png_inforp or png_const_inforp
 where "rp" indicates a "restricted pointer".
 
-The support for FAR/far types has been eliminated and the definition of
-png_alloc_size_t is now controlled by a flag so that 'small size_t' systems
-can select it if necessary.
+Dropped support for 16-bit platforms. The support for FAR/far types has
+been eliminated and the definition of png_alloc_size_t is now controlled
+by a flag so that 'small size_t' systems can select it if necessary.
 
 Error detection in some chunks has improved; in particular the iCCP chunk
 reader now does pretty complete validation of the basic format.  Some bad
