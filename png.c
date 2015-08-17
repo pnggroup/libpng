@@ -1743,7 +1743,7 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
 static char
 png_icc_tag_char(png_uint_32 byte)
 {
-   byte &= 0xff;
+   byte &= 0xffU;
    if (byte >= 32 && byte <= 126)
       return (char)byte;
    else
@@ -1991,7 +1991,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * data.)
     */
    temp = png_get_uint_32(profile+36); /* signature 'ascp' */
-   if (temp != 0x61637370)
+   if (temp != 0x61637370UL)
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "invalid signature");
 
@@ -2029,13 +2029,13 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    temp = png_get_uint_32(profile+16); /* data colour space field */
    switch (temp)
    {
-      case 0x52474220: /* 'RGB ' */
+      case 0x52474220UL: /* 'RGB ' */
          if ((color_type & PNG_COLOR_MASK_COLOR) == 0)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "RGB color space not permitted on grayscale PNG");
          break;
 
-      case 0x47524159: /* 'GRAY' */
+      case 0x47524159UL: /* 'GRAY' */
          if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "Gray color space not permitted on RGB PNG");
@@ -2058,19 +2058,19 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    temp = png_get_uint_32(profile+12); /* profile/device class */
    switch (temp)
    {
-      case 0x73636E72: /* 'scnr' */
-      case 0x6D6E7472: /* 'mntr' */
-      case 0x70727472: /* 'prtr' */
-      case 0x73706163: /* 'spac' */
+      case 0x73636e72UL: /* 'scnr' */
+      case 0x6d6e7472UL: /* 'mntr' */
+      case 0x70727472UL: /* 'prtr' */
+      case 0x73706163UL: /* 'spac' */
          /* All supported */
          break;
 
-      case 0x61627374: /* 'abst' */
+      case 0x61627374UL: /* 'abst' */
          /* May not be embedded in an image */
          return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "invalid embedded Abstract ICC profile");
 
-      case 0x6C696E6B: /* 'link' */
+      case 0x6c696e6bUL: /* 'link' */
          /* DeviceLink profiles cannot be interpreted in a non-device specific
           * fashion, if an app uses the AToB0Tag in the profile the results are
           * undefined unless the result is sent to the intended device,
@@ -2080,7 +2080,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
          return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "unexpected DeviceLink ICC profile class");
 
-      case 0x6E6D636C: /* 'nmcl' */
+      case 0x6e6d636cUL: /* 'nmcl' */
          /* A NamedColor profile is also device specific, however it doesn't
           * contain an AToB0 tag that is open to misinterpretation.  Almost
           * certainly it will fail the tests below.
@@ -2106,8 +2106,8 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    temp = png_get_uint_32(profile+20);
    switch (temp)
    {
-      case 0x58595A20: /* 'XYZ ' */
-      case 0x4C616220: /* 'Lab ' */
+      case 0x58595a20UL: /* 'XYZ ' */
+      case 0x4c616220UL: /* 'Lab ' */
          break;
 
       default:
@@ -2184,22 +2184,22 @@ static const struct
     * all four ICC sRGB profiles from www.color.org.
     */
    /* adler32, crc32, MD5[4], intent, date, length, file-name */
-   PNG_ICC_CHECKSUM(0x0a3fd9f6, 0x3b8772b9,
-      PNG_MD5(0x29f83dde, 0xaff255ae, 0x7842fae4, 0xca83390d), 0, 0,
+   PNG_ICC_CHECKSUM(0x0a3fd9f6UL, 0x3b8772b9UL,
+      PNG_MD5(0x29f83ddeUL, 0xaff255aeUL, 0x7842fae4UL, 0xca83390dUL), 0, 0,
       "2009/03/27 21:36:31", 3048, "sRGB_IEC61966-2-1_black_scaled.icc")
 
    /* ICC sRGB v2 perceptual no black-compensation: */
-   PNG_ICC_CHECKSUM(0x4909e5e1, 0x427ebb21,
-      PNG_MD5(0xc95bd637, 0xe95d8a3b, 0x0df38f99, 0xc1320389), 1, 0,
+   PNG_ICC_CHECKSUM(0x4909e5e1UL, 0x427ebb21UL,
+      PNG_MD5(0xc95bd637UL, 0xe95d8a3bUL, 0x0df38f99UL, 0xc1320389UL), 1, 0,
       "2009/03/27 21:37:45", 3052, "sRGB_IEC61966-2-1_no_black_scaling.icc")
 
-   PNG_ICC_CHECKSUM(0xfd2144a1, 0x306fd8ae,
-      PNG_MD5(0xfc663378, 0x37e2886b, 0xfd72e983, 0x8228f1b8), 0, 0,
+   PNG_ICC_CHECKSUM(0xfd2144a1UL, 0x306fd8aeUL,
+      PNG_MD5(0xfc663378UL, 0x37e2886bUL, 0xfd72e983UL, 0x8228f1b8UL), 0, 0,
       "2009/08/10 17:28:01", 60988, "sRGB_v4_ICC_preference_displayclass.icc")
 
    /* ICC sRGB v4 perceptual */
-   PNG_ICC_CHECKSUM(0x209c35d2, 0xbbef7812,
-      PNG_MD5(0x34562abf, 0x994ccd06, 0x6d2c5721, 0xd0d68c5d), 0, 0,
+   PNG_ICC_CHECKSUM(0x209c35d2UL, 0xbbef7812UL,
+      PNG_MD5(0x34562abfUL, 0x994ccd06UL, 0x6d2c5721UL, 0xd0d68c5dUL), 0, 0,
       "2007/07/25 00:05:37", 60960, "sRGB_v4_ICC_preference.icc")
 
    /* The following profiles have no known MD5 checksum. If there is a match
@@ -2207,8 +2207,8 @@ static const struct
     * a warning is produced.  The first two of these profiles have a 'cprt' tag
     * which suggests that they were also made by Hewlett Packard.
     */
-   PNG_ICC_CHECKSUM(0xa054d762, 0x5d5129ce,
-      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 0,
+   PNG_ICC_CHECKSUM(0xa054d762UL, 0x5d5129ceUL,
+      PNG_MD5(0x00000000UL, 0x00000000UL, 0x00000000UL, 0x00000000UL), 1, 0,
       "2004/07/21 18:57:42", 3024, "sRGB_IEC61966-2-1_noBPC.icc")
 
    /* This is a 'mntr' (display) profile with a mediaWhitePointTag that does not
@@ -2218,12 +2218,14 @@ static const struct
     * the previous profile except for the mediaWhitePointTag error and a missing
     * chromaticAdaptationTag.
     */
-   PNG_ICC_CHECKSUM(0xf784f3fb, 0x182ea552,
-      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 1/*broken*/,
+   PNG_ICC_CHECKSUM(0xf784f3fbUL, 0x182ea552UL,
+      PNG_MD5(0x00000000UL, 0x00000000UL, 0x00000000UL, 0x00000000UL),
+      0, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 perceptual")
 
-   PNG_ICC_CHECKSUM(0x0398f3fc, 0xf29e526d,
-      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 1/*broken*/,
+   PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
+      PNG_MD5(0x00000000UL, 0x00000000UL, 0x00000000UL, 0x00000000UL),
+      1, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };
 
@@ -2240,7 +2242,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
     */
 
    png_uint_32 length = 0;
-   png_uint_32 intent = 0x10000; /* invalid */
+   png_uint_32 intent = 0x10000UL; /* invalid */
 #if PNG_sRGB_PROFILE_CHECKS > 1
    uLong crc = 0; /* the value for 0 length data */
 #endif
@@ -3149,7 +3151,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
       else
          num = fp;
 
-      if (num <= 0x80000000) /* else overflowed */
+      if (num <= 0x80000000UL) /* else overflowed */
       {
          unsigned int ndigits = 0, first = 16 /* flag value */;
          char digits[10];

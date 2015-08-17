@@ -3143,7 +3143,8 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
           * cases the result needs replicating, for the 4-bpp case the above
           * generates a full 32 bits.
           */
-#        define MASK_EXPAND(m,d) ((m)*((d)==1?0x01010101:((d)==2?0x00010001:1)))
+#        define MASK_EXPAND(m,d) \
+            ((m)*((d)==1?0x01010101UL:((d)==2?0x00010001UL:1)))
 
 #        define S_MASK(p,d,s) MASK_EXPAND(S_MASKx(p,0,d,s) + S_MASKx(p,1,d,s) +\
             S_MASKx(p,2,d,s) + S_MASKx(p,3,d,s) + S_MASKx(p,4,d,s) +\

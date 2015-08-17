@@ -237,7 +237,7 @@ png_image_size(png_structrp png_ptr)
    }
 
    else
-      return 0xffffffff;
+      return 0xffffffffUL;
 }
 
 #ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
