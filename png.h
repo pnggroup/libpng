@@ -895,7 +895,9 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_iCCP 0x1000   /* ESR, 1.0.6 */
 #define PNG_INFO_sPLT 0x2000   /* ESR, 1.0.6 */
 #define PNG_INFO_sCAL 0x4000   /* ESR, 1.0.6 */
+#if INT_MAX >= 0x8000 /* else this might break */
 #define PNG_INFO_IDAT 0x8000   /* ESR, 1.0.6 */
+#endif
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -999,7 +1001,9 @@ PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)), typedef);
 #define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
 /* Added to libpng-1.5.4 */
 #define PNG_TRANSFORM_EXPAND_16     0x4000      /* read only */
+#if INT_MAX >= 0x8000 /* else this might break */
 #define PNG_TRANSFORM_SCALE_16      0x8000      /* read only */
+#endif
 
 /* Flags for MNG supported features */
 #define PNG_FLAG_MNG_EMPTY_PLTE     0x01

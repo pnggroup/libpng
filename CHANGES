@@ -5328,6 +5328,13 @@ Version 1.6.19beta02 [August 17, 2015]
   Fixed some bad links in the man page.
   Changed "n bit" to "n-bit" in comments.
   Changed 0xnnnn constants to 0xnnnnUL.
+  Added signed/unsigned 16-bit safety net. This removes the dubious
+    0x8000 flag definitions on 16-bit systems. They aren't supported
+    yet the defs *probably* work, however it seems much safer to do this
+    and be advised if anyone, contrary to advice, is building libpng 1.6
+    on a 16-bit system. It also adds back various switch default clauses
+    for GCC; GCC errors out if they are not present (with an appropriately
+    high level of warnings).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

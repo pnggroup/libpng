@@ -1683,7 +1683,7 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
          value *= 257;
          break;
 
-#ifdef PNG_DEBUG
+#ifdef __GNUC__
       default:
          png_error(display->image->opaque->png_ptr,
             "unexpected encoding (internal error)");
@@ -2858,7 +2858,7 @@ png_image_read_colormap(png_voidp argument)
             png_set_scale_16(png_ptr);
          break;
 
-#ifdef PNG_DEBUG
+#ifdef __GNUC__
       default:
          png_error(png_ptr, "bad data option (internal error)");
 #endif
@@ -3630,7 +3630,7 @@ png_image_read_background(png_voidp argument)
          }
          break;
 
-#ifdef PNG_DEBUG
+#ifdef __GNUC__
       default:
          png_error(png_ptr, "unexpected bit depth");
 #endif
