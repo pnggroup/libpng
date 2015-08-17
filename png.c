@@ -769,13 +769,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.19beta02 - August 14, 2015" PNG_STRING_NEWLINE \
+      "libpng version 1.6.19beta02 - August 17, 2015" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.19beta02 - August 14, 2015\
+   return "libpng version 1.6.19beta02 - August 17, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1967,7 +1967,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * 16 bits.
     */
    temp = png_get_uint_32(profile+64);
-   if (temp >= 0xffff) /* The ICC limit */
+   if (temp >= 0xffffUL) /* The ICC limit */
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "invalid rendering intent");
 
@@ -3283,15 +3283,15 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          /* Following can't overflow because the arguments only
           * have 31 bits each, however the result may be 32 bits.
           */
-         s16 = (A >> 16) * (T & 0xffff) +
-                           (A & 0xffff) * (T >> 16);
+         s16 = (A >> 16) * (T & 0xffffUL) +
+                           (A & 0xffffUL) * (T >> 16);
          /* Can't overflow because the a*times bit is only 30
           * bits at most.
           */
          s32 = (A >> 16) * (T >> 16) + (s16 >> 16);
-         s00 = (A & 0xffff) * (T & 0xffff);
+         s00 = (A & 0xffffUL) * (T & 0xffffUL);
 
-         s16 = (s16 & 0xffff) << 16;
+         s16 = (s16 & 0xffffUL) << 16;
          s00 += s16;
 
          if (s00 < s16)
@@ -3584,19 +3584,19 @@ png_log16bit(png_uint_32 x)
    unsigned int lg2 = 0;
 
    /* As above, but now the input has 16 bits. */
-   if ((x &= 0xffff) == 0)
+   if ((x &= 0xffffUL) == 0)
       return -1;
 
-   if ((x & 0xff00) == 0)
+   if ((x & 0xff00UL) == 0)
       lg2  = 8, x <<= 8;
 
-   if ((x & 0xf000) == 0)
+   if ((x & 0xf000UL) == 0)
       lg2 += 4, x <<= 4;
 
-   if ((x & 0xc000) == 0)
+   if ((x & 0xc000UL) == 0)
       lg2 += 2, x <<= 2;
 
-   if ((x & 0x8000) == 0)
+   if ((x & 0x8000UL) == 0)
       lg2 += 1, x <<= 1;
 
    /* Calculate the base logarithm from the top 8 bits as a 28-bit fractional
@@ -3729,7 +3729,7 @@ png_exp8bit(png_fixed_point lg2)
     * step.
     */
    x -= x >> 8;
-   return (png_byte)(((x + 0x7fffffU) >> 24) & 0xff);
+   return (png_byte)(((x + 0x7fffff) >> 24) & 0xff);
 }
 
 #ifdef PNG_16BIT_SUPPORTED
@@ -3989,7 +3989,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
    /* And fill in the final entries. */
    while (last < (num << 8))
    {
-      table[last & (0xff >> shift)][last >> (8U - shift)] = 65535U;
+      table[last & (0xffU >> shift)][last >> (8U - shift)] = 65535U;
       last++;
    }
 }

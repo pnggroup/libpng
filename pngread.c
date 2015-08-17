@@ -359,8 +359,8 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
             png_uint_32 s0   = (*(rp    ) << 8) | *(rp + 1);
             png_uint_32 s1   = (*(rp + 2) << 8) | *(rp + 3);
             png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
-            png_uint_32 red  = (s0 + s1 + 65536) & 0xffff;
-            png_uint_32 blue = (s2 + s1 + 65536) & 0xffff;
+            png_uint_32 red  = (s0 + s1 + 65536) & 0xffffUL;
+            png_uint_32 blue = (s2 + s1 + 65536) & 0xffffUL;
             *(rp    ) = (png_byte)((red >> 8) & 0xff);
             *(rp + 1) = (png_byte)(red & 0xff);
             *(rp + 4) = (png_byte)((blue >> 8) & 0xff);

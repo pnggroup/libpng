@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "August 11, 2015"
+.TH LIBPNG 3 "August 17, 2015"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.19beta02
 .SH SYNOPSIS
@@ -508,7 +508,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.19beta02 - August 11, 2015
+ libpng version 1.6.19beta02 - August 17, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -519,7 +519,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.19beta02 - August 11, 2015
+ libpng versions 0.97, January 1998, through 1.6.19beta02 - August 17, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -1158,6 +1158,7 @@ callback function:
 
 The PNG specification allows the width and height of an image to be as
 large as 2^(31\-1 (0x7fffffff), or about 2.147 billion rows and columns.
+For safety, libpng imposes a default limit of 1 million rows and columns.
 Larger images will be rejected immediately with a png_error() call. If
 you wish to change these limits, you can use
 
@@ -1178,8 +1179,11 @@ If you need to retrieve the limits that are being applied, use
    height_max = png_get_user_height_max(png_ptr);
 
 The PNG specification sets no limit on the number of ancillary chunks
-allowed in a PNG datastream.  You can impose a limit on the total number
-of sPLT, tEXt, iTXt, zTXt, and unknown chunks that will be stored, with
+allowed in a PNG datastream.  By default, libpng imposes a limit of
+a total of 1000 sPLT, tEXt, iTXt, zTXt, and unknown chunks to be stored.
+If you have set up both info_ptr and end_info_ptr, the limit applies
+separately to each.  You can change the limit on the total number of such
+chunks that will be stored, with
 
    png_set_chunk_cache_max(png_ptr, user_chunk_cache_max);
 
@@ -1187,8 +1191,9 @@ where 0x7fffffffL means unlimited.  You can retrieve this limit with
 
    chunk_cache_max = png_get_chunk_cache_max(png_ptr);
 
-You can also set a limit on the amount of memory that a compressed chunk
-other than IDAT can occupy, with
+Libpng imposes a limit of 8 Megabytes (8,000,000 bytes) on the amount of
+memory that a compressed chunk other than IDAT can occupy, when decompressed.
+You can change this limit with
 
    png_set_chunk_malloc_max(png_ptr, user_chunk_malloc_max);
 
@@ -5796,10 +5801,12 @@ We prefer #ifdef and #ifndef to #if defined() and #if !defined()
 when there is only one macro being tested.  We always use parentheses
 with "defined".
 
-We prefer to express integers that are used as bit masks in hex format,
-with an even number of lower-case hex digits (e.g., 0x00, 0xff, 0x0100).
+We express integer constants that are used as bit masks in hex format,
+with an even number of lower-case hex digits, and to make them unsigned
+(e.g., 0x00U, 0xffU, 0x0100U) and long if they are greater than 0x7fff
+(e.g., 0xffffUL).
 
-We prefer to use underscores in variable names rather than camelCase, except
+We prefer to use underscores rather than camelCase in names, except
 for a few type names that we inherit from zlib.h.
 
 We prefer "if (something != 0)" and "if (something == 0)"
@@ -5813,7 +5820,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 .SH XVI. Y2K Compliance in libpng
 
-August 11, 2015
+August 17, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
@@ -6134,7 +6141,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.19beta02 - August 11, 2015:
+Libpng version 1.6.19beta02 - August 17, 2015:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6157,7 +6164,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000, through 1.6.19beta02, August 11, 2015, are
+libpng versions 1.0.7, July 1, 2000, through 1.6.19beta02, August 17, 2015, are
 Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
 distributed according to the same disclaimer and license as libpng-1.0.6
 with the following individuals added to the list of Contributing Authors:
@@ -6251,7 +6258,7 @@ the additional disclaimers inserted at version 1.0.7.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-August 11, 2015
+August 17, 2015
 
 .\" end of man page
 
