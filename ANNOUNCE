@@ -1,4 +1,4 @@
-Libpng 1.6.19beta02 - August 17, 2015
+Libpng 1.6.19beta02 - August 18, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -40,7 +40,7 @@ Version 1.6.19beta01 [July 30, 2015]
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
-Version 1.6.19beta02 [August 17, 2015]
+Version 1.6.19beta02 [August 18, 2015]
   Moved config.h.in~ from the "libpng_autotools_files" list to the
     "libpng_autotools_extra" list in autogen.sh because it was causing a
     false positive for missing files (bug report by Robert C. Seacord).
@@ -48,7 +48,6 @@ Version 1.6.19beta02 [August 17, 2015]
     to suppress clang warnings (Bug report by Viktor Szakats).
   Fixed some bad links in the man page.
   Changed "n bit" to "n-bit" in comments.
-  Changed 0xnnnn constants to 0xnnnnUL.
   Added signed/unsigned 16-bit safety net. This removes the dubious
     0x8000 flag definitions on 16-bit systems. They aren't supported
     yet the defs *probably* work, however it seems much safer to do this

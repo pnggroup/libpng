@@ -85,10 +85,10 @@ png_int_32 (PNGAPI
 png_get_int_32)(png_const_bytep buf)
 {
    png_uint_32 uval = png_get_uint_32(buf);
-   if ((uval & 0x80000000UL) == 0) /* non-negative */
+   if ((uval & 0x80000000) == 0) /* non-negative */
       return uval;
 
-   uval = (uval ^ 0xffffffffU) + 1;  /* 2's complement: -x = ~x+1 */
+   uval = (uval ^ 0xffffffff) + 1;  /* 2's complement: -x = ~x+1 */
    return -(png_int_32)uval;
 }
 
@@ -3120,10 +3120,10 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 #           define PNG_LSR(x,s) ((x)>>(s))
 #           define PNG_LSL(x,s) ((x)<<(s))
 #        endif
-#        define S_COPY(p,x) (((p)<4 ? PNG_LSR(0x80088822UL,(3-(p))*8+(7-(x))) :\
-           PNG_LSR(0xaa55ff00UL,(7-(p))*8+(7-(x)))) & 1)
-#        define B_COPY(p,x) (((p)<4 ? PNG_LSR(0xff0fff33UL,(3-(p))*8+(7-(x))) :\
-           PNG_LSR(0xff55ff00UL,(7-(p))*8+(7-(x)))) & 1)
+#        define S_COPY(p,x) (((p)<4 ? PNG_LSR(0x80088822,(3-(p))*8+(7-(x))) :\
+           PNG_LSR(0xaa55ff00,(7-(p))*8+(7-(x)))) & 1)
+#        define B_COPY(p,x) (((p)<4 ? PNG_LSR(0xff0fff33,(3-(p))*8+(7-(x))) :\
+           PNG_LSR(0xff55ff00,(7-(p))*8+(7-(x)))) & 1)
 
          /* Return a mask for pass 'p' pixel 'x' at depth 'd'.  The mask is
           * little endian - the first pixel is at bit 0 - however the extra
@@ -3143,8 +3143,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
           * cases the result needs replicating, for the 4-bpp case the above
           * generates a full 32 bits.
           */
-#        define MASK_EXPAND(m,d) \
-            ((m)*((d)==1?0x01010101UL:((d)==2?0x00010001UL:1)))
+#        define MASK_EXPAND(m,d) ((m)*((d)==1?0x01010101:((d)==2?0x00010001:1)))
 
 #        define S_MASK(p,d,s) MASK_EXPAND(S_MASKx(p,0,d,s) + S_MASKx(p,1,d,s) +\
             S_MASKx(p,2,d,s) + S_MASKx(p,3,d,s) + S_MASKx(p,4,d,s) +\

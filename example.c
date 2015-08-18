@@ -271,7 +271,7 @@ void read_png(char *file_name)  /* We need to open the file */
 {
    png_structp png_ptr;
    png_infop info_ptr;
-   unsigned int sig_read = 0;
+   int sig_read = 0;
    png_uint_32 width, height;
    int bit_depth, color_type, interlace_type;
    FILE *fp;
@@ -280,7 +280,7 @@ void read_png(char *file_name)  /* We need to open the file */
       return (ERROR);
 
 #else no_open_file /* prototype 2 */
-void read_png(FILE *fp, unsigned int sig_read)  /* File is already open */
+void read_png(FILE *fp, int sig_read)  /* File is already open */
 {
    png_structp png_ptr;
    png_infop info_ptr;

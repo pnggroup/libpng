@@ -769,13 +769,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.19beta02 - August 17, 2015" PNG_STRING_NEWLINE \
+      "libpng version 1.6.19beta02 - August 18, 2015" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.19beta02 - August 17, 2015\
+   return "libpng version 1.6.19beta02 - August 18, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -1512,10 +1512,10 @@ png_XYZ_normalize(png_XYZ *XYZ)
     * safe.
     */
    Y = XYZ->red_Y;
-   if (0x7fffffffL - Y < XYZ->green_X)
+   if (0x7fffffff - Y < XYZ->green_X)
       return 1;
    Y += XYZ->green_Y;
-   if (0x7fffffffL - Y < XYZ->blue_X)
+   if (0x7fffffff - Y < XYZ->blue_X)
       return 1;
    Y += XYZ->blue_Y;
 
@@ -1743,7 +1743,7 @@ png_colorspace_set_endpoints(png_const_structrp png_ptr,
 static char
 png_icc_tag_char(png_uint_32 byte)
 {
-   byte &= 0xffU;
+   byte &= 0xff;
    if (byte >= 32 && byte <= 126)
       return (char)byte;
    else
@@ -1967,7 +1967,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * 16 bits.
     */
    temp = png_get_uint_32(profile+64);
-   if (temp >= 0xffffUL) /* The ICC limit */
+   if (temp >= 0xffff) /* The ICC limit */
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "invalid rendering intent");
 
@@ -1991,7 +1991,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
     * data.)
     */
    temp = png_get_uint_32(profile+36); /* signature 'ascp' */
-   if (temp != 0x61637370UL)
+   if (temp != 0x61637370)
       return png_icc_profile_error(png_ptr, colorspace, name, temp,
          "invalid signature");
 
@@ -2029,13 +2029,13 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    temp = png_get_uint_32(profile+16); /* data colour space field */
    switch (temp)
    {
-      case 0x52474220UL: /* 'RGB ' */
+      case 0x52474220: /* 'RGB ' */
          if ((color_type & PNG_COLOR_MASK_COLOR) == 0)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "RGB color space not permitted on grayscale PNG");
          break;
 
-      case 0x47524159UL: /* 'GRAY' */
+      case 0x47524159: /* 'GRAY' */
          if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "Gray color space not permitted on RGB PNG");
@@ -2058,19 +2058,19 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    temp = png_get_uint_32(profile+12); /* profile/device class */
    switch (temp)
    {
-      case 0x73636e72UL: /* 'scnr' */
-      case 0x6d6e7472UL: /* 'mntr' */
-      case 0x70727472UL: /* 'prtr' */
-      case 0x73706163UL: /* 'spac' */
+      case 0x73636e72: /* 'scnr' */
+      case 0x6d6e7472: /* 'mntr' */
+      case 0x70727472: /* 'prtr' */
+      case 0x73706163: /* 'spac' */
          /* All supported */
          break;
 
-      case 0x61627374UL: /* 'abst' */
+      case 0x61627374: /* 'abst' */
          /* May not be embedded in an image */
          return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "invalid embedded Abstract ICC profile");
 
-      case 0x6c696e6bUL: /* 'link' */
+      case 0x6c696e6b: /* 'link' */
          /* DeviceLink profiles cannot be interpreted in a non-device specific
           * fashion, if an app uses the AToB0Tag in the profile the results are
           * undefined unless the result is sent to the intended device,
@@ -2080,7 +2080,7 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
          return png_icc_profile_error(png_ptr, colorspace, name, temp,
             "unexpected DeviceLink ICC profile class");
 
-      case 0x6e6d636cUL: /* 'nmcl' */
+      case 0x6e6d636c: /* 'nmcl' */
          /* A NamedColor profile is also device specific, however it doesn't
           * contain an AToB0 tag that is open to misinterpretation.  Almost
           * certainly it will fail the tests below.
@@ -2106,8 +2106,8 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    temp = png_get_uint_32(profile+20);
    switch (temp)
    {
-      case 0x58595a20UL: /* 'XYZ ' */
-      case 0x4c616220UL: /* 'Lab ' */
+      case 0x58595a20: /* 'XYZ ' */
+      case 0x4c616220: /* 'Lab ' */
          break;
 
       default:
@@ -2184,22 +2184,22 @@ static const struct
     * all four ICC sRGB profiles from www.color.org.
     */
    /* adler32, crc32, MD5[4], intent, date, length, file-name */
-   PNG_ICC_CHECKSUM(0x0a3fd9f6UL, 0x3b8772b9UL,
-      PNG_MD5(0x29f83ddeUL, 0xaff255aeUL, 0x7842fae4UL, 0xca83390dUL), 0, 0,
+   PNG_ICC_CHECKSUM(0x0a3fd9f6, 0x3b8772b9,
+      PNG_MD5(0x29f83dde, 0xaff255ae, 0x7842fae4, 0xca83390d), 0, 0,
       "2009/03/27 21:36:31", 3048, "sRGB_IEC61966-2-1_black_scaled.icc")
 
    /* ICC sRGB v2 perceptual no black-compensation: */
-   PNG_ICC_CHECKSUM(0x4909e5e1UL, 0x427ebb21UL,
-      PNG_MD5(0xc95bd637UL, 0xe95d8a3bUL, 0x0df38f99UL, 0xc1320389UL), 1, 0,
+   PNG_ICC_CHECKSUM(0x4909e5e1, 0x427ebb21,
+      PNG_MD5(0xc95bd637, 0xe95d8a3b, 0x0df38f99, 0xc1320389), 1, 0,
       "2009/03/27 21:37:45", 3052, "sRGB_IEC61966-2-1_no_black_scaling.icc")
 
-   PNG_ICC_CHECKSUM(0xfd2144a1UL, 0x306fd8aeUL,
-      PNG_MD5(0xfc663378UL, 0x37e2886bUL, 0xfd72e983UL, 0x8228f1b8UL), 0, 0,
+   PNG_ICC_CHECKSUM(0xfd2144a1, 0x306fd8ae,
+      PNG_MD5(0xfc663378, 0x37e2886b, 0xfd72e983, 0x8228f1b8), 0, 0,
       "2009/08/10 17:28:01", 60988, "sRGB_v4_ICC_preference_displayclass.icc")
 
    /* ICC sRGB v4 perceptual */
-   PNG_ICC_CHECKSUM(0x209c35d2UL, 0xbbef7812UL,
-      PNG_MD5(0x34562abfUL, 0x994ccd06UL, 0x6d2c5721UL, 0xd0d68c5dUL), 0, 0,
+   PNG_ICC_CHECKSUM(0x209c35d2, 0xbbef7812,
+      PNG_MD5(0x34562abf, 0x994ccd06, 0x6d2c5721, 0xd0d68c5d), 0, 0,
       "2007/07/25 00:05:37", 60960, "sRGB_v4_ICC_preference.icc")
 
    /* The following profiles have no known MD5 checksum. If there is a match
@@ -2207,8 +2207,8 @@ static const struct
     * a warning is produced.  The first two of these profiles have a 'cprt' tag
     * which suggests that they were also made by Hewlett Packard.
     */
-   PNG_ICC_CHECKSUM(0xa054d762UL, 0x5d5129ceUL,
-      PNG_MD5(0x00000000UL, 0x00000000UL, 0x00000000UL, 0x00000000UL), 1, 0,
+   PNG_ICC_CHECKSUM(0xa054d762, 0x5d5129ce,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 0,
       "2004/07/21 18:57:42", 3024, "sRGB_IEC61966-2-1_noBPC.icc")
 
    /* This is a 'mntr' (display) profile with a mediaWhitePointTag that does not
@@ -2218,14 +2218,12 @@ static const struct
     * the previous profile except for the mediaWhitePointTag error and a missing
     * chromaticAdaptationTag.
     */
-   PNG_ICC_CHECKSUM(0xf784f3fbUL, 0x182ea552UL,
-      PNG_MD5(0x00000000UL, 0x00000000UL, 0x00000000UL, 0x00000000UL),
-      0, 1/*broken*/,
+   PNG_ICC_CHECKSUM(0xf784f3fb, 0x182ea552,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 perceptual")
 
-   PNG_ICC_CHECKSUM(0x0398f3fcUL, 0xf29e526dUL,
-      PNG_MD5(0x00000000UL, 0x00000000UL, 0x00000000UL, 0x00000000UL),
-      1, 1/*broken*/,
+   PNG_ICC_CHECKSUM(0x0398f3fc, 0xf29e526d,
+      PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 1/*broken*/,
       "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };
 
@@ -2242,7 +2240,7 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
     */
 
    png_uint_32 length = 0;
-   png_uint_32 intent = 0x10000UL; /* invalid */
+   png_uint_32 intent = 0x10000; /* invalid */
 #if PNG_sRGB_PROFILE_CHECKS > 1
    uLong crc = 0; /* the value for 0 length data */
 #endif
@@ -3151,7 +3149,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
       else
          num = fp;
 
-      if (num <= 0x80000000UL) /* else overflowed */
+      if (num <= 0x80000000) /* else overflowed */
       {
          unsigned int ndigits = 0, first = 16 /* flag value */;
          char digits[10];
@@ -3285,15 +3283,15 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
          /* Following can't overflow because the arguments only
           * have 31 bits each, however the result may be 32 bits.
           */
-         s16 = (A >> 16) * (T & 0xffffUL) +
-                           (A & 0xffffUL) * (T >> 16);
+         s16 = (A >> 16) * (T & 0xffff) +
+                           (A & 0xffff) * (T >> 16);
          /* Can't overflow because the a*times bit is only 30
           * bits at most.
           */
          s32 = (A >> 16) * (T >> 16) + (s16 >> 16);
-         s00 = (A & 0xffffUL) * (T & 0xffffUL);
+         s00 = (A & 0xffff) * (T & 0xffff);
 
-         s16 = (s16 & 0xffffUL) << 16;
+         s16 = (s16 & 0xffff) << 16;
          s00 += s16;
 
          if (s00 < s16)
@@ -3586,19 +3584,19 @@ png_log16bit(png_uint_32 x)
    unsigned int lg2 = 0;
 
    /* As above, but now the input has 16 bits. */
-   if ((x &= 0xffffUL) == 0)
+   if ((x &= 0xffff) == 0)
       return -1;
 
-   if ((x & 0xff00UL) == 0)
+   if ((x & 0xff00) == 0)
       lg2  = 8, x <<= 8;
 
-   if ((x & 0xf000UL) == 0)
+   if ((x & 0xf000) == 0)
       lg2 += 4, x <<= 4;
 
-   if ((x & 0xc000UL) == 0)
+   if ((x & 0xc000) == 0)
       lg2 += 2, x <<= 2;
 
-   if ((x & 0x8000UL) == 0)
+   if ((x & 0x8000) == 0)
       lg2 += 1, x <<= 1;
 
    /* Calculate the base logarithm from the top 8 bits as a 28-bit fractional
@@ -3675,7 +3673,7 @@ for (i=11;i>=0;--i){ print i, " ", (1 - e(-(2^i)/65536*l(2))) * 2^(32-i), "\n"}
 static png_uint_32
 png_exp(png_fixed_point x)
 {
-   if (x > 0 && x <= 0xfffffUL) /* Else overflow or zero (underflow) */
+   if (x > 0 && x <= 0xfffff) /* Else overflow or zero (underflow) */
    {
       /* Obtain a 4-bit approximation */
       png_uint_32 e = png_32bit_exp[(x >> 12) & 0x0f];
@@ -3731,7 +3729,7 @@ png_exp8bit(png_fixed_point lg2)
     * step.
     */
    x -= x >> 8;
-   return (png_byte)(((x + 0x7fffffUL) >> 24) & 0xff);
+   return (png_byte)(((x + 0x7fffffU) >> 24) & 0xff);
 }
 
 #ifdef PNG_16BIT_SUPPORTED
@@ -3991,7 +3989,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
    /* And fill in the final entries. */
    while (last < (num << 8))
    {
-      table[last & (0xffU >> shift)][last >> (8U - shift)] = 65535U;
+      table[last & (0xff >> shift)][last >> (8U - shift)] = 65535U;
       last++;
    }
 }

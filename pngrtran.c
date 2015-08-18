@@ -3642,7 +3642,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      png_uint_16 a = (png_uint_16)(((*(sp + 2)) << 8)
                          + *(sp + 3));
 
-                     if (a == (png_uint_16)0xffffL)
+                     if (a == (png_uint_16)0xffff)
                      {
                         png_uint_16 v;
 
@@ -3691,7 +3691,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         *(sp + 1) = (png_byte)(png_ptr->background.gray & 0xff);
                      }
 
-                     else if (a < 0xffffL)
+                     else if (a < 0xffff)
                      {
                         png_uint_16 g, v;
 
@@ -3795,7 +3795,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                      png_uint_16 a = (png_uint_16)(((png_uint_16)(*(sp + 6))
                          << 8) + (png_uint_16)(*(sp + 7)));
 
-                     if (a == (png_uint_16)0xffffL)
+                     if (a == (png_uint_16)0xffff)
                      {
                         png_uint_16 v;
 
@@ -3881,7 +3881,7 @@ png_do_compose(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
                         *(sp + 5) = (png_byte)(png_ptr->background.blue & 0xff);
                      }
 
-                     else if (a < 0xffffL)
+                     else if (a < 0xffff)
                      {
                         png_uint_16 v;
 

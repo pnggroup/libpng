@@ -709,7 +709,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 {
    int i;
 
-   png_debug1(1, "in %lx storage function", png_ptr == NULL ? 0xabadca11UL :
+   png_debug1(1, "in %lx storage function", png_ptr == NULL ? 0xabadca11U :
       (unsigned long)png_ptr->chunk_name);
 
    if (png_ptr == NULL || info_ptr == NULL || num_text <= 0 || text_ptr == NULL)
@@ -1568,7 +1568,7 @@ png_set_user_limits (png_structrp png_ptr, png_uint_32 user_width_max,
 {
    /* Images with dimensions larger than these limits will be
     * rejected by png_set_IHDR().  To accept any PNG datastream
-    * regardless of dimensions, set both limits to 0x7ffffffUL.
+    * regardless of dimensions, set both limits to 0x7ffffff.
     */
    if (png_ptr == NULL)
       return;
