@@ -26,15 +26,17 @@ typedef png_libpng_version_1_6_19beta02 Your_png_h_is_not_version_1_6_19beta02;
 void PNGAPI
 png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
 {
+   unsigned int nb = (unsigned int)num_bytes;
+
    png_debug(1, "in png_set_sig_bytes");
 
    if (png_ptr == NULL)
       return;
 
-   if (num_bytes > 8)
+   if (nb > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
-   png_ptr->sig_bytes = (png_byte)((num_bytes < 0 ? 0 : num_bytes) & 0xff);
+   png_ptr->sig_bytes = (png_byte)nb;
 }
 
 /* Checks whether the supplied bytes match the PNG signature.  We allow

@@ -55,6 +55,8 @@ Version 1.6.19beta02 [August 18, 2015]
     on a 16-bit system. It also adds back various switch default clauses
     for GCC; GCC errors out if they are not present (with an appropriately
     high level of warnings).
+  Safely convert num_bytes to a png_byte in png_set_sig_bytes() (Robert
+    Seacord).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
