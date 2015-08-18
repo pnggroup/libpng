@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.19beta02 - August 17, 2015
+ libpng version 1.6.19beta02 - August 18, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.19beta02 - August 17, 2015
+ libpng versions 0.97, January 1998, through 1.6.19beta02 - August 18, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5140,6 +5140,10 @@ It can be set for testing debug or beta builds to ensure that they will compile
 when the build type is switched to RC or STABLE. In essence this overrides the
 PNG_LIBPNG_BUILD_BASE_TYPE definition which is not directly user controllable.
 
+Starting with libpng-1.6.19, it is an error to call png_set_sig_bytes()
+with a negative number.  Previously, a negative value was silently converted
+to zero.
+
 XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
@@ -5312,7 +5316,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-August 17, 2015
+August 18, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
