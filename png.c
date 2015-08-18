@@ -26,15 +26,20 @@ typedef png_libpng_version_1_5_24beta01 Your_png_h_is_not_version_1_5_24beta01;
 void PNGAPI
 png_set_sig_bytes(png_structp png_ptr, int num_bytes)
 {
+   unsigned int nb = (unsigned int)num_bytes;
+
    png_debug(1, "in png_set_sig_bytes");
 
    if (png_ptr == NULL)
       return;
 
-   if (num_bytes > 8)
+   if (num_bytes < 0)
+      nb = 0;
+
+   if (nb > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
-   png_ptr->sig_bytes = (png_byte)(num_bytes < 0 ? 0 : num_bytes);
+   png_ptr->sig_bytes = (png_byte)nb;
 }
 
 /* Checks whether the supplied bytes match the PNG signature.  We allow
@@ -306,6 +311,8 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
       png_destroy_struct(info_ptr);
       info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO);
       *ptr_ptr = info_ptr;
+      if (info_ptr == NULL)
+         return;
    }
 
    /* Set everything to 0 */
@@ -648,13 +655,13 @@ png_get_copyright(png_const_structp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.5.24beta01 - July 24, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.5.24beta01 - August 18, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.5.24beta01 - July 24, 2015\
+      return "libpng version 1.5.24beta01 - August 18, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
