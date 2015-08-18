@@ -374,8 +374,8 @@
 #  define param_deb(param) param,
 #endif
 
-/* The affirm mechanism results in a minimal png_error in released versions
- * ('STABLE' versions) and a more descriptive abort in all other cases.
+/* The affirm mechanism results in a minimal png_error() in released versions
+ * ('STABLE' versions) and a more descriptive PNG_ABORT in all other cases.
  *
  * The PNG_RELEASE_BUILD macro, defined above, controls the behavior of
  * 'affirm': if set to 1 affirm will call png_error (or png_err) rather than
@@ -412,7 +412,7 @@
  * build supports an appropriate way of outputting the message.
  *
  * Note that PNG_AFFIRM_TEXT is not configurable but is worked out here: this
- * is just the affirm code; * there's no reason to allow configuration of this
+ * is just the affirm code; there's no reason to allow configuration of this
  * option.
  */
 #define PNG_AFFIRM_TEXT (PNG_RELEASE_BUILD ?\

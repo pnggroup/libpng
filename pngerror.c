@@ -973,13 +973,13 @@ png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
 }
 #endif /* SIMPLIFIED READ || SIMPLIFIED_WRITE */
 
-/* Asserts: minimal code in 'STABLE' builds to return control to the
- * application, more verbose code followed by abort for all other builds to
- * ensure that internal errors are detected.
+/* Affirms: minimal code in 'STABLE' builds to return control to the
+ * application via png_error(), more verbose code followed by PNG_ABORT for
+ * all other builds to ensure that internal errors are detected.
  *
  * The code always produces a message if it is possible, regardless of the
  * setting of PNG_ERROR_TEXT_SUPPORTED, except that in stable builds
- * PNG_ERROR_TEXT_SUPPORTED is honoured.  See pngpriv.h for the calculation of
+ * PNG_ERROR_TEXT_SUPPORTED is honored.  See pngpriv.h for the calculation of
  * the two control macros PNG_RELEASE_BUILD (don't abort; stable build or rc)
  * and PNG_AFFIRM_TEXT (output text.)
  */
