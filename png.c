@@ -33,6 +33,9 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
    if (png_ptr == NULL)
       return;
 
+   if (num_bytes < 0)
+      nb = 0;
+
    if (nb > 8)
       png_error(png_ptr, "Too many bytes for PNG signature");
 
