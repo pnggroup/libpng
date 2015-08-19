@@ -5320,7 +5320,7 @@ Version 1.6.19beta01 [July 30, 2015]
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
 
-Version 1.6.19beta02 [August 18, 2015]
+Version 1.6.19beta02 [August 19, 2015]
   Moved config.h.in~ from the "libpng_autotools_files" list to the
     "libpng_autotools_extra" list in autogen.sh because it was causing a
     false positive for missing files (bug report by Robert C. Seacord).
@@ -5337,6 +5337,12 @@ Version 1.6.19beta02 [August 18, 2015]
     high level of warnings).
   Safely convert num_bytes to a png_byte in png_set_sig_bytes() (Robert
     Seacord).
+  Fixed the recently reported 1's complement security issue by replacing
+    the value that is illegal in the PNG spec, in both signed and unsigned
+    values, with 0. Illegal unsigned values (anything greater than or equal
+    to  0x80000000) can still pass through, but since these are not illegal
+    in ANSI-C (unlike 0x80000000 in the signed case) the checking that
+    occurs later can catch them (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

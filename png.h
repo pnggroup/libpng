@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.19beta02, August 18, 2015
+ * libpng version 1.6.19beta02, August 19, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.19beta02, August 18, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.19beta02, August 19, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -251,7 +251,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta02, August 18, 2015, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta02, August 19, 2015, are
  * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
@@ -360,7 +360,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    August 18, 2015
+ *    August 19, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -430,7 +430,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.19beta02"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.19beta02 - August 18, 2015\n"
+     " libpng version 1.6.19beta02 - August 19, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2724,7 +2724,7 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 
 #  define PNG_get_int_32(buf) \
      ((png_int_32)((*(buf) & 0x80) \
-      ? -((png_int_32)((png_get_uint_32(buf) ^ 0xffffffffL) + 1)) \
+      ? -((png_int_32)(((png_get_uint_32(buf)^0xffffffffU)+1U)&0x7fffffffU)) \
       : (png_int_32)png_get_uint_32(buf)))
 
    /* If PNG_PREFIX is defined the same thing as below happens in pnglibconf.h,
