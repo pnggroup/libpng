@@ -7566,7 +7566,7 @@ image_transform_png_set_background_set(PNG_CONST image_transform *this,
    RANDOMIZE(random_bytes);
 
    /* Read the random value, for colour type 3 the background colour is actually
-    * expressed as a 24bit rgb, not an index.
+    * expressed as a 24-bit rgb, not an index.
     */
    colour_type = that->this.colour_type;
    if (colour_type == 3)
@@ -9994,7 +9994,7 @@ static void perform_gamma_sbit_tests(png_modifier *pm)
 }
 
 /* Note that this requires a 16-bit source image but produces 8-bit output, so
- * we only need the 16bit write support, but the 16-bit images are only
+ * we only need the 16-bit write support, but the 16-bit images are only
  * generated if DO_16BIT is defined.
  */
 #ifdef DO_16BIT
