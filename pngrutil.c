@@ -41,8 +41,13 @@ png_uint_32 (PNGAPI
 png_get_uint_32)(png_bytep buf)
 {
    png_uint_32 uval = png_get_uint_32(buf);
-   if ((uval & 0x80000000L) == 0) /* non-negative */
-      return uval;
+   if ((uval & 0x80000000) == 0) /* no overflow */
+       return -(png_int_32)uval;
+   /* The following has to be safe; this function only gets called on PNG data
+    * and if we get here that data is invalid.  0 is the most safe value and
+    * if not then an attacker would surely just generate a PNG with 0 instead.
+    */
+   return 0;
 
    uval = (uval ^ 0xffffffffL) + 1;  /* 2's complement: -x = ~x+1 */
    return -(png_int_32)uval;
