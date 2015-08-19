@@ -5344,6 +5344,8 @@ Version 1.6.19beta02 [August 19, 2015]
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
 
+Version 1.6.19beta03 [August 19, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
