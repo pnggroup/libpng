@@ -4421,7 +4421,7 @@ Version 1.6.1beta02 [February 19, 2013]
 
 Version 1.6.1beta03 [February 22, 2013]
   Fixed ALIGNED_MEMORY support.
-  Allow run-time ARM NEON checking to be disabled. A new configure option:
+  Added a new configure option:
     --enable-arm-neon=always will stop the run-time checks. New checks
     within arm/arm_init.c will cause the code not to be compiled unless
     __ARM_NEON__ is set. This should make it fail safe (if someone asks
@@ -4440,10 +4440,11 @@ Version 1.6.1beta05 [March 1, 2013]
 Version 1.6.1beta06 [March 4, 2013]
   Better documentation of unknown handling API interactions.
   Corrected Android builds and corrected libpng.vers with symbol
-    prefixing. This adds an API to set optimization options externally,
-    providing an alternative and general solution for the non-portable
-    run-time tests used by the ARM Neon code.  It also makes those tests
+    prefixing.  It also makes those tests
     compile and link on Android.
+  Added an API png_set_option() to set optimization options externally,
+    providing an alternative and general solution for the non-portable
+    run-time tests used by the ARM Neon code, using the PNG_ARM_NEON option.
   The order of settings vs options in pnglibconf.h is reversed to allow
     settings to depend on options and options can now set (or override) the
     defaults for settings.
@@ -4541,7 +4542,8 @@ Version 1.6.3beta05 [May 9, 2013]
   Calculate our own zlib windowBits when decoding rather than trusting the
     CMF bytes in the PNG datastream.
   Added an option to force maximum window size for inflating, which was
-    the behavior of libpng15 and earlier.
+    the behavior of libpng15 and earlier, via a new PNG_MAXIMUM_INFLATE_WINDOW
+    option for png_set_options().
   Added png-fix-itxt and png-fix-too-far-back to the built programs and
     removed warnings from the source code and timepng that are revealed as
     a result.
@@ -5344,7 +5346,8 @@ Version 1.6.19beta02 [August 19, 2015]
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
 
-Version 1.6.19beta03 [August 19, 2015]
+Version 1.6.19beta03 [August 21, 2015]
+  Fixed png_save_int_32 when int is not 2's complement (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
