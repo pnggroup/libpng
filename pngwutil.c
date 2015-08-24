@@ -23,10 +23,13 @@
 void PNGAPI
 png_save_uint_32(png_bytep buf, png_uint_32 i)
 {
-   buf[0] = (png_byte)(i >> 24);
-   buf[1] = (png_byte)(i >> 16);
-   buf[2] = (png_byte)(i >> 8);
-   buf[3] = (png_byte)(i     );
+  buf[3] = i % 256;
+  i = i / 256;
+  buf[2] = i % 256;
+  i = i / 256;
+  buf[1] = i % 256;
+  i = i / 256;
+  buf[0] = i % 256;
 }
 
 /* Place a 16-bit number into a buffer in PNG byte order.
@@ -36,8 +39,8 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
 void PNGAPI
 png_save_uint_16(png_bytep buf, unsigned int i)
 {
-   buf[0] = (png_byte)(i >> 8);
-   buf[1] = (png_byte)(i     );
+  buf[0] = (png_byte)((i >> 8) & 0xff);
+   buf[1] = (png_byte)(i & 0xff);
 }
 #endif
 
