@@ -424,7 +424,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    /* Free any tRNS entry */
    if (((mask & PNG_FREE_TRNS) & info_ptr->free_me) != 0)
    {
-      info_ptr->valid &= ~PNG_INFO_tRNS;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_tRNS);
       png_free(png_ptr, info_ptr->trans_alpha);
       info_ptr->trans_alpha = NULL;
       info_ptr->num_trans = 0;
@@ -439,7 +439,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       png_free(png_ptr, info_ptr->scal_s_height);
       info_ptr->scal_s_width = NULL;
       info_ptr->scal_s_height = NULL;
-      info_ptr->valid &= ~PNG_INFO_sCAL;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_sCAL);
    }
 #endif
 
@@ -462,7 +462,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
             png_free(png_ptr, info_ptr->pcal_params);
             info_ptr->pcal_params = NULL;
          }
-      info_ptr->valid &= ~PNG_INFO_pCAL;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_pCAL);
    }
 #endif
 
@@ -474,7 +474,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
       png_free(png_ptr, info_ptr->iccp_profile);
       info_ptr->iccp_name = NULL;
       info_ptr->iccp_profile = NULL;
-      info_ptr->valid &= ~PNG_INFO_iCCP;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_iCCP);
    }
 #endif
 
@@ -504,7 +504,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
          png_free(png_ptr, info_ptr->splt_palettes);
          info_ptr->splt_palettes = NULL;
          info_ptr->splt_palettes_num = 0;
-         info_ptr->valid &= ~PNG_INFO_sPLT;
+         info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_sPLT);
       }
    }
 #endif
@@ -539,7 +539,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    {
       png_free(png_ptr, info_ptr->hist);
       info_ptr->hist = NULL;
-      info_ptr->valid &= ~PNG_INFO_hIST;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_hIST);
    }
 #endif
 
@@ -548,7 +548,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    {
       png_free(png_ptr, info_ptr->palette);
       info_ptr->palette = NULL;
-      info_ptr->valid &= ~PNG_INFO_PLTE;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_PLTE);
       info_ptr->num_palette = 0;
    }
 
@@ -565,12 +565,12 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
          png_free(png_ptr, info_ptr->row_pointers);
          info_ptr->row_pointers = NULL;
       }
-      info_ptr->valid &= ~PNG_INFO_IDAT;
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_IDAT);
    }
 #endif
 
    if (num != -1)
-      mask &= ~PNG_FREE_MUL;
+      mask &= PNG_BIC_MASK(PNG_FREE_MUL);
 
    info_ptr->free_me &= ~mask;
 }
@@ -605,26 +605,31 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
    if (png_ptr == NULL)
       return;
 
-   png_ptr->io_ptr = (png_voidp)fp;
-}
-#  endif
+   if (png_ptr->rw_data_fn == NULL)
+   {
+#     ifdef PNG_READ_SUPPORTED
+         if (png_ptr->read_struct)
+            png_set_read_fn(png_ptr, fp, png_default_read_data);
+#        ifdef PNG_WRITE_SUPPORTED
+            else
+#        endif /* WRITE */
+#     endif /* READ */
+#     ifdef PNG_WRITE_SUPPORTED
+         if (!png_ptr->read_struct)
+            png_set_write_fn(png_ptr, fp, png_default_write_data,
+#              ifdef PNG_WRITE_FLUSH_SUPPORTED
+                  png_default_flush
+#              else
+                  NULL
+#              endif
+               );
+#     endif /* WRITE */
+   }
 
-#  ifdef PNG_SAVE_INT_32_SUPPORTED
-/* The png_save_int_32 function assumes integers are stored in two's
- * complement format.  If this isn't the case, then this routine needs to
- * be modified to write data in two's complement format.  Note that,
- * the following works correctly even if png_int_32 has more than 32 bits
- * (compare the more complex code required on read for sign extension.)
- */
-void PNGAPI
-png_save_int_32(png_bytep buf, png_int_32 i)
-{
-   buf[0] = (png_byte)((i >> 24) & 0xff);
-   buf[1] = (png_byte)((i >> 16) & 0xff);
-   buf[2] = (png_byte)((i >> 8) & 0xff);
-   buf[3] = (png_byte)(i & 0xff);
+   else
+      png_ptr->io_ptr = fp;
 }
-#  endif
+#  endif /* STDIO */
 
 #  ifdef PNG_TIME_RFC1123_SUPPORTED
 /* Convert the supplied time into an RFC 1123 string suitable for use in
@@ -828,18 +833,6 @@ png_handle_as_unknown(png_const_structrp png_ptr, png_const_bytep chunk_name)
     */
    return PNG_HANDLE_CHUNK_AS_DEFAULT;
 }
-
-#if defined(PNG_READ_UNKNOWN_CHUNKS_SUPPORTED) ||\
-   defined(PNG_HANDLE_AS_UNKNOWN_SUPPORTED)
-int /* PRIVATE */
-png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
-{
-   png_byte chunk_string[5];
-
-   PNG_CSTRING_FROM_CHUNK(chunk_string, chunk_name);
-   return png_handle_as_unknown(png_ptr, chunk_string);
-}
-#endif /* READ_UNKNOWN_CHUNKS || HANDLE_AS_UNKNOWN */
 #endif /* SET_UNKNOWN_CHUNKS */
 
 /* This function was added to libpng-1.0.7 */
@@ -938,13 +931,19 @@ png_colorspace_check_gamma(png_const_structrp png_ptr,
     *    0: the new gamma value is the libpng estimate for an ICC profile
     *    1: the new gamma value comes from a gAMA chunk
     *    2: the new gamma value comes from an sRGB chunk
+    *
+    * API CHANGE: libpng 1.7.0: prior to 1.7 the check below used the build-time
+    * constant PNG_GAMMA_THRESHOLD_FIXED and the results would therefore depend
+    * on a parameter that was intended for tuning the READ_GAMMA support.  In
+    * 1.7 a fixed value of +/-1% is used instead; this reflects the fact that
+    * gamma values are rarely quoted to more than 2 decimal digits of precision.
     */
 {
    png_fixed_point gtest;
 
    if ((colorspace->flags & PNG_COLORSPACE_HAVE_GAMMA) != 0 &&
       (png_muldiv(&gtest, colorspace->gamma, PNG_FP_1, gAMA) == 0  ||
-      png_gamma_significant(gtest) != 0))
+       gtest < PNG_FP_1 - 1000 || gtest > PNG_FP_1 + 1000))
    {
       /* Either this is an sRGB image, in which case the calculated gamma
        * approximation should match, or this is an image with a profile and the
@@ -986,16 +985,28 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
     * In 1.6.0 this test replaces the ones in pngrutil.c, in the gAMA chunk
     * handling code, which only required the value to be >0.
     */
-   png_const_charp errmsg;
+#  define ERRMSG (defined PNG_TRANSFORM_MECH_SUPPORTED) &&\
+                 (defined PNG_ERROR_TEXT_SUPPORTED)
+#  if ERRMSG
+      png_const_charp errmsg;
+#  endif
 
    if (gAMA < 16 || gAMA > 625000000)
-      errmsg = "gamma value out of range";
+   {
+#     if ERRMSG
+         errmsg = "gamma value out of range";
+#     endif
+   }
 
 #  ifdef PNG_READ_gAMA_SUPPORTED
       /* Allow the application to set the gamma value more than once */
-      else if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
+      else if (png_ptr->read_struct &&
          (colorspace->flags & PNG_COLORSPACE_FROM_gAMA) != 0)
+      {
+#     if ERRMSG
          errmsg = "duplicate";
+#     endif
+      }
 #  endif
 
    /* Do nothing if the colorspace is already invalid */
@@ -1022,6 +1033,7 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
    }
 
    /* Error exit - errmsg has been set. */
+#  undef ERRMSG
    colorspace->flags |= PNG_COLORSPACE_INVALID;
    png_chunk_report(png_ptr, errmsg, PNG_CHUNK_WRITE_ERROR);
 }
@@ -1032,7 +1044,7 @@ png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
    if ((info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) != 0)
    {
       /* Everything is invalid */
-      info_ptr->valid &= ~(PNG_INFO_gAMA|PNG_INFO_cHRM|PNG_INFO_sRGB|
+      info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_gAMA|PNG_INFO_cHRM|PNG_INFO_sRGB|
          PNG_INFO_iCCP);
 
 #     ifdef PNG_COLORSPACE_SUPPORTED
@@ -1054,20 +1066,20 @@ png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
             info_ptr->valid |= PNG_INFO_sRGB;
 
          else
-            info_ptr->valid &= ~PNG_INFO_sRGB;
+            info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_sRGB);
 
          if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
             info_ptr->valid |= PNG_INFO_cHRM;
 
          else
-            info_ptr->valid &= ~PNG_INFO_cHRM;
+            info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_cHRM);
 #     endif
 
       if ((info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_GAMMA) != 0)
          info_ptr->valid |= PNG_INFO_gAMA;
 
       else
-         info_ptr->valid &= ~PNG_INFO_gAMA;
+         info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_gAMA);
    }
 }
 
@@ -1085,6 +1097,25 @@ png_colorspace_sync(png_const_structrp png_ptr, png_inforp info_ptr)
 #endif
 
 #ifdef PNG_COLORSPACE_SUPPORTED
+/* Calculate a reciprocal, return 0 on div-by-zero or overflow. */
+static png_fixed_point
+png_reciprocal(png_fixed_point a)
+{
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+   double r = floor(1E10/a+.5);
+
+   if (r <= 2147483647. && r >= -2147483648.)
+      return (png_fixed_point)r;
+#else
+   png_fixed_point res;
+
+   if (png_muldiv(&res, PNG_FP_1, PNG_FP_1, a) != 0)
+      return res;
+#endif
+
+   return 0; /* error/overflow */
+}
+
 /* Added at libpng-1.5.5 to support read and write of true CIEXYZ values for
  * cHRM, as opposed to using chromaticities.  These internal APIs return
  * non-zero on a parameter error.  The X, Y and Z values are required to be
@@ -1847,7 +1878,7 @@ png_icc_check_length(png_const_structrp png_ptr, png_colorspacerp colorspace,
 int /* PRIVATE */
 png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_uint_32 profile_length,
-   png_const_bytep profile/* first 132 bytes only */, int color_type)
+   png_const_bytep profile/* first 132 bytes only */, int is_color)
 {
    png_uint_32 temp;
 
@@ -1934,13 +1965,13 @@ png_icc_check_header(png_const_structrp png_ptr, png_colorspacerp colorspace,
    switch (temp)
    {
       case 0x52474220: /* 'RGB ' */
-         if ((color_type & PNG_COLOR_MASK_COLOR) == 0)
+         if (!is_color)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "RGB color space not permitted on grayscale PNG");
          break;
 
       case 0x47524159: /* 'GRAY' */
-         if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
+         if (is_color)
             return png_icc_profile_error(png_ptr, colorspace, name, temp,
                "Gray color space not permitted on RGB PNG");
          break;
@@ -2270,14 +2301,14 @@ png_icc_set_sRGB(png_const_structrp png_ptr,
 int /* PRIVATE */
 png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
    png_const_charp name, png_uint_32 profile_length, png_const_bytep profile,
-   int color_type)
+   int is_color)
 {
    if ((colorspace->flags & PNG_COLORSPACE_INVALID) != 0)
       return 0;
 
    if (png_icc_check_length(png_ptr, colorspace, name, profile_length) != 0 &&
        png_icc_check_header(png_ptr, colorspace, name, profile_length, profile,
-          color_type) != 0 &&
+          is_color) != 0 &&
        png_icc_check_tag_table(png_ptr, colorspace, name, profile_length,
           profile) != 0)
    {
@@ -2292,84 +2323,40 @@ png_colorspace_set_ICC(png_const_structrp png_ptr, png_colorspacerp colorspace,
    return 0;
 }
 #endif /* iCCP */
-
-#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-void /* PRIVATE */
-png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
-{
-   /* Set the rgb_to_gray coefficients from the colorspace. */
-   if ((png_ptr->colorspace.flags & PNG_COLORSPACE_RGB_TO_GRAY_SET) == 0 &&
-      (png_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
-   {
-      /* png_set_background has not been called, get the coefficients from the Y
-       * values of the colorspace colorants.
-       */
-      png_fixed_point r = png_ptr->colorspace.end_points_XYZ.red_Y;
-      png_fixed_point g = png_ptr->colorspace.end_points_XYZ.green_Y;
-      png_fixed_point b = png_ptr->colorspace.end_points_XYZ.blue_Y;
-      png_fixed_point total = r+g+b;
-
-      if (total > 0 &&
-         r >= 0 && png_muldiv(&r, r, 32768, total) && r >= 0 && r <= 32768 &&
-         g >= 0 && png_muldiv(&g, g, 32768, total) && g >= 0 && g <= 32768 &&
-         b >= 0 && png_muldiv(&b, b, 32768, total) && b >= 0 && b <= 32768 &&
-         r+g+b <= 32769)
-      {
-         /* We allow 0 coefficients here.  r+g+b may be 32769 if two or
-          * all of the coefficients were rounded up.  Handle this by
-          * reducing the *largest* coefficient by 1; this matches the
-          * approach used for the default coefficients in pngrtran.c
-          */
-         int add = 0;
-
-         if (r+g+b > 32768)
-            add = -1;
-         else if (r+g+b < 32768)
-            add = 1;
-
-         if (add != 0)
-         {
-            if (g >= r && g >= b)
-               g += add;
-            else if (r >= g && r >= b)
-               r += add;
-            else
-               b += add;
-         }
-
-         /* Check for an internal error. */
-         if (r+g+b != 32768)
-            impossible("error handling cHRM coefficients");
-
-         else
-         {
-            png_ptr->rgb_to_gray_red_coeff   = png_check_u16(png_ptr, r);
-            png_ptr->rgb_to_gray_green_coeff = png_check_u16(png_ptr, g);
-         }
-      }
-
-      /* This is a png_error at present even though it could be ignored -
-       * it should never happen, but it is important that if it does, the
-       * bug is fixed.
-       */
-      else
-         impossible("error handling cHRM->XYZ");
-   }
-}
-#endif /* READ_RGB_TO_GRAY */
-
 #endif /* COLORSPACE */
 
-#ifdef __GNUC__
-/* This exists solely to work round a warning from GNU C. */
-static int /* PRIVATE */
-png_gt(size_t a, size_t b)
+png_alloc_size_t /* PRIVATE */
+png_calc_rowbytes(png_const_structrp png_ptr, unsigned int pixel_depth,
+   png_uint_32 row_width)
 {
-    return a > b;
+   png_alloc_size_t rowbytes = row_width;
+
+   /* Carefully calculate the row buffer size. */
+   if (pixel_depth > 8)
+   {
+      if ((pixel_depth & 7) != 0)
+         png_error(png_ptr, "unsupported pixel byte size");
+
+      pixel_depth >>= 3; /* Now in bytes */
+
+      if (rowbytes > PNG_SIZE_MAX/pixel_depth)
+         png_error(png_ptr, "image row exceeds system limits");
+
+      rowbytes *= pixel_depth;
+   }
+
+   else /* Less than 1 byte per pixel */ switch (pixel_depth)
+   {
+      case 1:  rowbytes += 7; rowbytes >>= 3; break;
+      case 2:  rowbytes += 3; rowbytes >>= 2; break;
+      case 4:  rowbytes += 1; rowbytes >>= 1; break;
+      case 8:  break;
+      default:
+         png_error(png_ptr, "unsupported pixel bit size");
+   }
+
+   return rowbytes;
 }
-#else
-#   define png_gt(a,b) ((a) > (b))
-#endif
 
 void /* PRIVATE */
 png_check_IHDR(png_const_structrp png_ptr,
@@ -2389,28 +2376,6 @@ png_check_IHDR(png_const_structrp png_ptr,
    if (width > PNG_UINT_31_MAX)
    {
       png_warning(png_ptr, "Invalid image width in IHDR");
-      error = 1;
-   }
-
-   if (png_gt(((width + 7) & (~7)),
-       ((PNG_SIZE_MAX
-           - 48        /* big_row_buf hack */
-           - 1)        /* filter byte */
-           / 8)        /* 8-byte RGBA pixels */
-           - 1))       /* extra max_pixel_depth pad */
-   {
-      /* The size of the row must be within the limits of this architecture.
-       * Because the read code can perform arbitrary transformations the
-       * maximum size is checked here.  Because the code in png_read_start_row
-       * adds extra space "for safety's sake" in several places a conservative
-       * limit is used here.
-       *
-       * NOTE: it would be far better to check the size that is actually used,
-       * but the effect in the real world is minor and the changes are more
-       * extensive, therefore much more dangerous and much more difficult to
-       * write in a way that avoids compiler warnings.
-       */
-      png_warning(png_ptr, "Image width is too large for this architecture");
       error = 1;
    }
 
@@ -2502,9 +2467,9 @@ png_check_IHDR(png_const_structrp png_ptr,
           (filter_type == PNG_INTRAPIXEL_DIFFERENCING) &&
           ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) == 0) &&
           (color_type == PNG_COLOR_TYPE_RGB ||
-          color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
+           color_type == PNG_COLOR_TYPE_RGB_ALPHA)))
       {
-         png_warning(png_ptr, "Unknown filter method in IHDR");
+         png_warning(png_ptr, "Invalid filter method in IHDR");
          error = 1;
       }
 
@@ -2515,16 +2480,23 @@ png_check_IHDR(png_const_structrp png_ptr,
       }
    }
 
-#else
+#else /* !MNG_FEATURES */
    if (filter_type != PNG_FILTER_TYPE_BASE)
    {
       png_warning(png_ptr, "Unknown filter method in IHDR");
       error = 1;
    }
-#endif
+#endif /* !MNG_FEATURES */
 
    if (error == 1)
       png_error(png_ptr, "Invalid IHDR data");
+
+   /* Finally, if the IHDR data is correct, check it against the system
+    * limits (NOTE: this need not be done; the IDAT handling code repeats the
+    * check in both read and write.)
+    */
+   (void)png_calc_rowbytes(png_ptr,
+      PNG_COLOR_TYPE_CHANNELS(color_type) * bit_depth, width);
 }
 
 #if defined(PNG_sCAL_SUPPORTED) || defined(PNG_pCAL_SUPPORTED)
@@ -3260,37 +3232,6 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 }
 #endif /* GAMMA || INCH_CONVERSIONS */
 
-#ifdef PNG_GAMMA_SUPPORTED /* more fixed point functions for gamma */
-/* Calculate a reciprocal, return 0 on div-by-zero or overflow. */
-png_fixed_point
-png_reciprocal(png_fixed_point a)
-{
-#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
-   double r = floor(1E10/a+.5);
-
-   if (r <= 2147483647. && r >= -2147483648.)
-      return (png_fixed_point)r;
-#else
-   png_fixed_point res;
-
-   if (png_muldiv(&res, 100000, 100000, a) != 0)
-      return res;
-#endif
-
-   return 0; /* error/overflow */
-}
-
-/* This is the shared test on whether a gamma value is 'significant' - whether
- * it is worth doing gamma correction.
- */
-int /* PRIVATE */
-png_gamma_significant(png_fixed_point gamma_val)
-{
-   return gamma_val < PNG_FP_1 - PNG_GAMMA_THRESHOLD_FIXED ||
-       gamma_val > PNG_FP_1 + PNG_GAMMA_THRESHOLD_FIXED;
-}
-#endif
-
 /* HARDWARE OPTION SUPPORT */
 #ifdef PNG_SET_OPTION_SUPPORTED
 int PNGAPI
@@ -3299,9 +3240,9 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
    if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
       (option & 1) == 0)
    {
-      int mask = 3 << option;
-      int setting = (2 + (onoff != 0)) << option;
-      int current = png_ptr->options;
+      unsigned int mask = 3U << option;
+      unsigned int setting = (2U + (onoff != 0)) << option;
+      unsigned int current = png_ptr->options;
 
       png_ptr->options = png_check_byte(png_ptr, (current & ~mask) | setting);
 
@@ -3310,7 +3251,48 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
 
    return PNG_OPTION_INVALID;
 }
-#endif
+#endif /* SET_OPTION */
+
+/* SOFTWARE SETTING SUPPORT */
+#ifdef PNG_SETTING_SUPPORTED
+png_int_32 PNGAPI
+png_setting(png_structrp png_ptr, int setting, png_int_32 value)
+{
+   switch (setting)
+   {
+#     ifdef PNG_READ_GAMMA_SUPPORTED
+         case PNG_GAMMA_MINIMUM:
+            if (value < 0 || value > 0xFFFF)
+               value = PNG_GAMMA_THRESHOLD_FIXED;
+            {
+               png_int_32 old = png_ptr->gamma_threshold;
+               png_ptr->gamma_threshold = PNG_UINT_16(value);
+               return old;
+            }
+            break;
+
+#if 0 /*NYI*/
+         case PNG_GAMMA_ACCURACY:
+            if (value < 0 || value > 1600)
+               value = PNG_DEFAULT_GAMMA_ACCURACY;
+            {
+               png_int_32 old = png_ptr->gamma_accuracy;
+               png_ptr->gamma_accuracy = value;
+               return old;
+            }
+            break;
+#endif /*NYI*/
+#     endif /* READ_GAMMA */
+
+      default:
+         break;
+   }
+
+   PNG_UNUSED(png_ptr)
+   PNG_UNUSED(value)
+   return PNG_UNSUPPORTED_SETTING;
+}
+#endif /* SETTING */
 
 /* sRGB support */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
@@ -3501,13 +3483,13 @@ png_image_free_function(png_voidp argument)
 #  ifdef PNG_STDIO_SUPPORTED
       if (cp->owned_file != 0)
       {
-         FILE *fp = png_voidcast(FILE*, cp->png_ptr->io_ptr);
+         FILE *fp = png_voidcast(FILE*, png_get_io_ptr(cp->png_ptr));
          cp->owned_file = 0;
 
          /* Ignore errors here. */
          if (fp != NULL)
          {
-            cp->png_ptr->io_ptr = NULL;
+            png_init_io(cp->png_ptr, NULL);
             (void)fclose(fp);
          }
       }
@@ -3570,5 +3552,34 @@ png_image_error(png_imagep image, png_const_charp error_message)
    return 0;
 }
 
+#ifdef PNG_STDIO_SUPPORTED
+typedef struct
+{
+   png_structrp png_ptr;
+   png_FILE_p   fp;
+}
+png_image_init_io_struct;
+
+static int
+image_init_io(png_voidp display)
+{
+   png_image_init_io_struct *p =
+      png_voidcast(png_image_init_io_struct*, display);
+
+   png_init_io(p->png_ptr, p->fp);
+   return 1;
+}
+
+int /* PRIVATE */
+png_image_init_io(png_imagep image, png_FILE_p fp)
+{
+   png_image_init_io_struct s;
+
+   s.png_ptr = image->opaque->png_ptr;
+   s.fp = fp;
+
+   return png_safe_execute(image, image_init_io, &s);
+}
+#endif /* STDIO */
 #endif /* SIMPLIFIED READ/WRITE */
 #endif /* READ || WRITE */

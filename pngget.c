@@ -27,16 +27,18 @@ png_get_valid(png_const_structrp png_ptr, png_const_inforp info_ptr,
    return(0);
 }
 
-png_size_t PNGAPI
+png_alloc_size_t PNGAPI
 png_get_rowbytes(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
-      return(info_ptr->rowbytes);
+      return png_calc_rowbytes(png_ptr,
+         PNG_FORMAT_CHANNELS(info_ptr->format) * info_ptr->bit_depth,
+         info_ptr->width);
 
-   return(0);
+   return 0;
 }
 
-#ifdef PNG_INFO_IMAGE_SUPPORTED
+#ifdef PNG_READ_PNG_SUPPORTED
 png_bytepp PNGAPI
 png_get_rows(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
@@ -80,7 +82,8 @@ png_byte PNGAPI
 png_get_color_type(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
-      return info_ptr->color_type;
+      return png_check_byte(png_ptr,
+            PNG_COLOR_TYPE_FROM_FORMAT(info_ptr->format));
 
    return (0);
 }
@@ -317,7 +320,7 @@ png_get_y_offset_pixels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 static png_uint_32
 ppi_from_ppm(png_uint_32 ppm)
 {
-#if 0
+#if 0 /*NOT USED*/
    /* The conversion is *(2.54/100), in binary (32 digits):
     * .00000110100000001001110101001001
     */
@@ -477,7 +480,7 @@ png_byte PNGAPI
 png_get_channels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
-      return(info_ptr->channels);
+      return png_check_byte(png_ptr, PNG_FORMAT_CHANNELS(info_ptr->format));
 
    return (0);
 }
@@ -822,7 +825,7 @@ png_get_IHDR(png_const_structrp png_ptr, png_const_inforp info_ptr,
        *bit_depth = info_ptr->bit_depth;
 
    if (color_type != NULL)
-       *color_type = info_ptr->color_type;
+       *color_type = PNG_COLOR_TYPE_FROM_FORMAT(info_ptr->format);
 
    if (compression_type != NULL)
       *compression_type = info_ptr->compression_type;
@@ -833,16 +836,7 @@ png_get_IHDR(png_const_structrp png_ptr, png_const_inforp info_ptr,
    if (interlace_type != NULL)
       *interlace_type = info_ptr->interlace_type;
 
-   /* This is redundant if we can be sure that the info_ptr values were all
-    * assigned in png_set_IHDR().  We do the check anyhow in case an
-    * application has ignored our advice not to mess with the members
-    * of info_ptr directly.
-    */
-   png_check_IHDR(png_ptr, info_ptr->width, info_ptr->height,
-       info_ptr->bit_depth, info_ptr->color_type, info_ptr->interlace_type,
-       info_ptr->compression_type, info_ptr->filter_type);
-
-   return (1);
+   return 1;
 }
 
 #ifdef PNG_oFFs_SUPPORTED
@@ -1080,7 +1074,7 @@ png_get_tRNS(png_const_structrp png_ptr, png_inforp info_ptr,
    {
       png_debug1(1, "in %s retrieval function", "tRNS");
 
-      if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      if ((info_ptr->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
       {
          if (trans_alpha != NULL)
          {
@@ -1092,7 +1086,7 @@ png_get_tRNS(png_const_structrp png_ptr, png_inforp info_ptr,
             *trans_color = &(info_ptr->trans_color);
       }
 
-      else /* if (info_ptr->color_type != PNG_COLOR_TYPE_PALETTE) */
+      else /* if (info_ptr->format not colormapped */
       {
          if (trans_color != NULL)
          {
@@ -1132,7 +1126,7 @@ png_get_unknown_chunks(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 png_byte PNGAPI
-png_get_rgb_to_gray_status (png_const_structrp png_ptr)
+png_get_rgb_to_gray_status(png_const_structrp png_ptr)
 {
    if (png_ptr)
       return png_ptr->rgb_to_gray_status;
@@ -1157,7 +1151,7 @@ png_get_compression_buffer_size(png_const_structrp png_ptr)
       return 0;
 
 #ifdef PNG_WRITE_SUPPORTED
-      if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
+      if (png_ptr->read_struct)
 #endif
    {
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
@@ -1217,18 +1211,4 @@ png_get_io_chunk_type (png_const_structrp png_ptr)
    return png_ptr->chunk_name;
 }
 #endif /* IO_STATE */
-
-#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
-int PNGAPI
-png_get_palette_max(png_const_structrp png_ptr, png_const_inforp info_ptr)
-{
-   if (png_ptr != NULL && info_ptr != NULL)
-      return png_ptr->num_palette_max;
-
-   return (-1);
-}
-#  endif
-#endif
-
 #endif /* READ || WRITE */

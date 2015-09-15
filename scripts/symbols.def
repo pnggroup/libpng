@@ -204,7 +204,6 @@ EXPORTS
  png_get_int_32 @203
  png_get_uint_31 @204
  png_save_uint_32 @205
- png_save_int_32 @206
  png_save_uint_16 @207
  png_set_gamma_fixed @208
  png_set_filter_heuristics_fixed @209
@@ -243,3 +242,7 @@ EXPORTS
  png_set_check_for_invalid_index @242
  png_get_palette_max @243
  png_set_option @244
+ png_memory_format @245
+ png_memory_channel_depth @246
+ png_memory_gamma @247
+ png_setting @248

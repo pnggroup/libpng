@@ -1,0 +1,10 @@
+# To just this extension either copy the 'sinclude' line and the setting of
+# libpng_automake_extensions into contrib/extensions.am or link/copy the whole
+# file there.  Do the same with the associated file extensions.am
+#
+# Include the ARM NEON extension:
+sinclude([contrib/neon/neon.ac])
+#
+# If any of the extensions require automake support (this is likely) automake
+# must include the file contrib/extensions.am
+libpng_automake_extensions="yes"

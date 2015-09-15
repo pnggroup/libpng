@@ -27,7 +27,8 @@ AC_CONFIG_MACRO_DIR([scripts])
 # dist-xz requires automake 1.11 or later
 # 1.12.2 fixes a security issue in 1.11.2 and 1.12.1
 # 1.13 is required for parallel tests
-AM_INIT_AUTOMAKE([1.13 foreign dist-xz color-tests silent-rules subdir-objects])
+# 1.14.1 is required for %reldir% support
+AM_INIT_AUTOMAKE([1.14.1 foreign dist-xz color-tests silent-rules subdir-objects])
 # The following line causes --disable-maintainer-mode to be the default to
 # configure, this is necessary because libpng distributions cannot rely on the
 # time stamps of the autotools generated files being correct
@@ -381,54 +382,11 @@ AC_ARG_ENABLE([unversioned-libpng-config],
 AM_CONDITIONAL([DO_INSTALL_LIBPNG_CONFIG],
    [test "$enable_unversioned_libpng_config" != "no"])
 
-# HOST SPECIFIC OPTIONS
-# =====================
-#
-# ARM
-# ===
-#
-# ARM NEON (SIMD) support.
-
-AC_ARG_ENABLE([arm-neon],
-   AS_HELP_STRING([[[--enable-arm-neon]]],
-      [Enable ARM NEON optimizations: =no/off, check, api, yes/on:]
-      [no/off: disable the optimizations; check: use internal checking code]
-      [(deprecated and poorly supported); api: disable by default, enable by]
-      [a call to png_set_option; yes/on: turn on unconditionally.]
-      [If not specified: determined by the compiler.]),
-   [case "$enableval" in
-      no|off)
-         # disable the default enabling on __ARM_NEON__ systems:
-         AC_DEFINE([PNG_ARM_NEON_OPT], [0],
-                   [Disable ARM Neon optimizations])
-         # Prevent inclusion of the assembler files below:
-         enable_arm_neon=no;;
-      check)
-         AC_DEFINE([PNG_ARM_NEON_CHECK_SUPPORTED], [],
-                   [Check for ARM Neon support at run-time]);;
-      api)
-         AC_DEFINE([PNG_ARM_NEON_API_SUPPORTED], [],
-                   [Turn on ARM Neon optimizations at run-time]);;
-      yes|on)
-         AC_DEFINE([PNG_ARM_NEON_OPT], [2],
-                   [Enable ARM Neon optimizations])
-         AC_MSG_WARN([--enable-arm-neon: please specify 'check' or 'api', if]
-            [you want the optimizations unconditionally pass -mfpu=neon]
-            [to the compiler.]);;
-      *)
-         AC_MSG_ERROR([--enable-arm-neon=${enable_arm_neon}: invalid value])
-   esac])
-
-# Add ARM specific files to all builds where the host_cpu is arm ('arm*') or
-# where ARM optimizations were explicitly requested (this allows a fallback if a
-# future host CPU does not match 'arm*')
-
-AM_CONDITIONAL([PNG_ARM_NEON],
-   [test "$enable_arm_neon" != 'no' &&
-    case "$host_cpu" in
-      arm*|aarch64*) :;;
-      *)    test "$enable_arm_neon" != '';;
-    esac])
+# EXTENSIONS
+# Configure (and all other) support for extensions is included when autoconf is
+# run by virtue of the existence (or not) of the following file:
+sinclude([contrib/extensions.ac])
+AM_CONDITIONAL([LIBPNG_EXTENSIONS],[test -n "$libpng_automake_extensions"])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

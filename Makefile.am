@@ -84,9 +84,12 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
 	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
 
-if PNG_ARM_NEON
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
-	arm/filter_neon.S arm/filter_neon_intrinsics.c
+# Include libpng extensions, if appropriate.  This uses a Makefile.am fragment,
+# pre-set things that might be changed by addition:
+AM_CPPFLAGS =
+DFA_EXTENSION = 
+if LIBPNG_EXTENSIONS
+include $(top_srcdir)/contrib/extensions.am
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
@@ -244,17 +247,17 @@ endif
 	rm -f $@ $*.tf[12]
 	test -d scripts || mkdir scripts || test -d scripts
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
-	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $< > $*.tf1
+	    $(AM_CPPFLAGS) $(CPPFLAGS) $(SYMBOL_CFLAGS) $< > $*.tf1
 	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
 	rm -f $*.tf1
 	mv $*.tf2 $@
 
 # The .c file for pnglibconf.h is machine generated
-pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
+pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_EXTENSION) $(DFA_XTRA)
 	rm -f $@ $*.tf[45]
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf4 version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
-	    ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
+	    $(DFA_EXTENSION) ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf5 $*.tf4 1>&2
 	rm $*.tf4
 	mv $*.tf5 $@
@@ -272,8 +275,8 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 # be empty - no non-standard defines
 scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ pnglibconf.tf[67]
-	test -z "$(CPPFLAGS)"
-	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
+	test -z "$(CPPFLAGS)" -a -z "$(AM_CPPFLAGS)"
+	echo "com libpng @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
 	$(AWK) -f ${srcdir}/scripts/options.awk out=pnglibconf.tf6\
 	    logunsupported=1 version=search ${srcdir}/pngconf.h -\
 	    ${srcdir}/scripts/pnglibconf.dfa 1>&2

@@ -14,7 +14,7 @@
  * definitions (or not) of PNG_ARM_NEON_OPT and PNG_ARM_NEON_IMPLEMENTATION.
  */
 #define PNG_VERSION_INFO_ONLY
-#include "../pngpriv.h"
+#include "../../pngpriv.h"
 
 #if defined(__linux__) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits /* mark stack as non-executable */

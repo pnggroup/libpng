@@ -48,7 +48,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # and chunk, should not be used in this file because they force the
 # relevant options on or off.
 
-#----------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 
 # The following setting, option and chunk values can all be changed
 # while building libpng:
@@ -64,35 +64,10 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #   decoding but does change the libpng API because some chunks
 #   will be ignored.
 #
-# There are three ways of disabling features, in no particular order:
+# There are three ways of disabling features, in order of power:
 #
-# 1) Create 'pngusr.h', enter the required private build information
-# detailed below and #define PNG_NO_<option> for each option you
-# don't want in that file in that file.  You can also turn on options
-# using PNG_<option>_SUPPORTED.  When you have finished rerun
-# configure and rebuild pnglibconf.h file with -DPNG_USER_CONFIG:
-#
-#  make clean
-#  CPPFLAGS='-DPNG_USER_CONFIG' ./configure
-#  make pnglibconf.h
-#
-# pngusr.h is only used during the creation of pnglibconf.h, but it
-# is safer to ensure that -DPNG_USER_CONFIG is specified throughout
-# the build by changing the CPPFLAGS passed to the initial ./configure
-#
-# 2) Add definitions of the settings you want to change to
-# CPPFLAGS; for example:
-#
-#   -DPNG_DEFAULT_READ_MACROS=0
-#
-# (This would change the default to *not* use read macros.)  Be
-# very careful to change only settings that don't alter the API
-# because this approach bypasses the private build checking.  You
-# can also change settings from pngpriv.h (read pngpriv.h) safely
-# without API changes.  Do that in the same way.
-#
-# 3) Write a new '.dfa' file (say 'pngusr.dfa') and in this file
-# provide override values for setting entries and turn option or
+# 1) Write a new '.dfa' file (say 'user.dfa') and in this file
+# provide override values for setting entries and turn options or
 # chunk values explicitly 'on' or 'off':
 #
 #    setting FOO default VALUE
@@ -104,9 +79,90 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 # Look at the builds below contrib/pngminim for some extreme examples
 # of how this can be used.
 #
-# Don't edit this file unless you are contributing a patch to
-# libpng and need new or modified options/settings.
-#----------------------------------------------------------------------
+# When you set an option 'off' it will be off; if this is impossible you
+# will get an error when you build pnglibconf.h.  If you just want to
+# set something off or on if it can be use 'disabled' or 'enabled' instead.
+#
+# The distributed file "user.dfa" is already included in a configure build
+# and you can edit this in place if you are prepared to modify the source.
+#
+# 2) Create 'pngusr.h', enter the required private build information
+# detailed below and #define PNG_NO_<option> for each option you
+# want disabled.  You can also enable options using PNG_<option>_SUPPORTED.
+# When you have finished rerun configure and rebuild pnglibconf.h file with
+# -DPNG_USER_CONFIG:
+#
+#  make clean
+#  CPPFLAGS='-DPNG_USER_CONFIG' ./configure
+#  make pnglibconf.h
+#
+# pngusr.h is only used during the creation of pnglibconf.h, but it
+# is safer to ensure that -DPNG_USER_CONFIG is specified throughout
+# the build by changing the CPPFLAGS passed to the initial ./configure
+#
+# 3) Add definitions of the settings you want to change to
+# CPPFLAGS; for example:
+#
+#   -DPNG_DEFAULT_READ_MACROS=0
+#   -DPNG_NO_WRITE
+#   -DPNG_NO_GET_PALETTE_MAX -DPNG_READ_GET_PALETTE_MAX_SUPPORTED=
+#
+# As with #defines in pngusr.h these macro settings 'disable' or 'enable' and
+# option and they get frozen in pnglibconf.h; read pnglibconf.h to see what
+# (if anything) changed.
+#
+# IMPORTANT: when you pass this to the C compiler:
+#
+#  -DPNG_foo_SUPPORTED
+#
+# it is the same as this #define:
+#
+#  #define PNG_foo_SUPPORTED 1
+#
+# HOWEVER the macro will be recorded in pnglibconf.h as:
+#
+#  #define PNG_foo_SUPPORTED
+#
+# To avoid confusion use -DPNG_foo_SUPPORTED= on the command line, which does
+# the same thing as the #define.
+# 
+# SUMMARY:
+#  These lines/macro settings are equivalent:
+#
+#  To 'enable' an option; it will be on if its dependencies are satisfied
+#
+#     -DPNG_foo_SUPPORTED=        on the CC command line
+#     #define PNG_foo_SUPPORTED   in pngusr.h
+#     option foo enabled          in user.dfa
+#
+#  To 'disable' an option; it will be off unless something below enables it:
+#
+#     -DPNG_NO_foo                on the CC command line
+#     #define PNG_NO_foo          in pngusr.h
+#     option foo disabled         in user.dfa
+#
+#  To force an option on; the build of pnglibconf.h will fail if it has
+#  unsatisfied dependencies:
+#
+#     option foo on               in user.dfa
+#
+#  To force an option off; there is no way to turn it back on, the build of
+#  pnglibconf.h will fail if it is required:
+#
+#     option foo off              in user.dfa
+#
+# If you want to start with everything 'off' and just turn things on that are
+# required (the recommended approach to building a minimal libpng) use user.dfa
+# and start with:
+#
+#     everything off              in user.dfa
+#
+# This actually *disables* all the options so that they can be enabled either
+# explicitly or as required by other options.
+#
+# Don't edit this file unless you are contributing a patch to # libpng
+# and need new or modified options/settings.
+#-------------------------------------------------------------------------------
 
 # The following causes commented out #undef lines to be written to
 # pnglibconf.h; this can be stopped by logunsupported=0 in a later
@@ -171,11 +227,19 @@ logunsupported = 1
 
 # NONE
 
-# Note that PNG_USER_CONFIG only has an effect when building
-# pnglibconf.h
-
+# Settings for private builds.  The following two are required:
+#
+# 1) USER_PRIVATEBUILD: set to the name of the legal entity holding the
+#    copyright to the changes (even if the changes are only a local
+#    configuration!)
+#
+# 2) USER_BUG_REPORTS: set to the email to which bug reports relating to this
+#    private configuration should be sent.
+#
+# Note that PNG_USER_CONFIG only has an effect when building pnglibconf.h
 setting USER_CONFIG
 setting USER_PRIVATEBUILD
+setting USER_BUG_REPORTS
 setting USER_DLLFNAME_POSTFIX
 setting USER_VERSIONINFO_COMMENTS
 setting USER_VERSIONINFO_COMPANYNAME
@@ -221,33 +285,12 @@ setting ZLIB_HEADER default <zlib.h>
 # must be made by the user)
 option SET_OPTION disabled
 
-# These options are specific to the ARM NEON hardware optimizations.  At present
-# these optimizations depend on GCC specific pre-processing of an assembler (.S)
-# file so they probably won't work with other compilers.
-#
-# ARM_NEON_OPT: unset: check at compile time (__ARM_NEON__ must be defined by
-#                      the compiler, typically as a result of specifying
-#                      CC="gcc -mfpu=neon".)
-#                   0: disable (even if the CPU has a NEON FPU.)
-#                   1: check at run time (via ARM_NEON_{API,CHECK})
-#                   2: switch on unconditionally (inadvisable - instead pass
-#                      -mfpu=neon to GCC in CC)
-#           When building libpng avoid using any setting other than '0'; '1' is
-#           set automatically when either 'API' or 'CHECK' are configured in,
-#           '2' should not be necessary as -mfpu=neon will achieve the same
-#           effect as well as applying NEON optimizations to the rest of the
-#           libpng code.
-#           NOTE: any setting other than '0' requires ALIGNED_MEMORY
-# ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
-#                 with png_set_option
-# ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
-#                 extensions are supported. This is poorly supported and
-#                 deprecated - use the png_set_option API.
-setting ARM_NEON_OPT
-option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-   sets ARM_NEON_OPT 1
-option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
-   sets ARM_NEON_OPT 1
+# Run-time setting of parameters, enabled as required below
+option SETTING disabled
+
+# To support hardware specific optimizations libpng can include a hardware
+# specific header at build time, this setting records the included header:
+setting EXTENSION_HEADER
 
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib. It describes the input
@@ -325,7 +368,11 @@ option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 
 # Generic options - affect both read and write.
 
-option MNG_FEATURES
+# If you want this you need to switch on either the read or write transform
+# mechanism, otherwise nothing will happen.
+option MNG_FEATURES disabled enables TRANSFORM_MECH
+option MNG_READ_FEATURES enables MNG_FEATURES
+option MNG_WRITE_FEATURES enables MNG_FEATURES
 
 # Arithmetic options, the first is the big switch that chooses between internal
 # floating and fixed point arithmetic implementations - it does not affect any
@@ -412,6 +459,14 @@ option SET_USER_LIMITS requires USER_LIMITS
 # conformant, however the library that results is still non-standard.
 # See the comments above about how to change options and settings.
 
+# READ/WRITE tranform support
+# 
+# The internal TRANSFORM_MECH options are used to turn on (or off) the required
+# support code for the read and write transforms.  They are off by default,
+# switching them on is not a good idea.  Switching them off will cause the build
+# to fail if anything is left in which depends on the transform support.
+option TRANSFORM_MECH disabled
+
 # READ options
 #
 # WARNING: in libpng 1.5 maintained configuration compatibility with earlier
@@ -427,7 +482,7 @@ option SET_USER_LIMITS requires USER_LIMITS
 # to libpng 1.6; the new interfaces in 1.6 will take several years to become
 # popular.
 
-option READ enables READ_INTERLACING SET_OPTION
+option READ enables SET_OPTION
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
@@ -438,10 +493,10 @@ option READ enables READ_INTERLACING SET_OPTION
 
 option READ_16BIT requires READ enables 16BIT
 
-option READ_QUANTIZE requires READ
-
 option READ_TRANSFORMS requires READ
 = NO_READ_TRANSFORMS READ_TRANSFORMS_NOT_SUPPORTED
+
+option READ_QUANTIZE requires READ_TRANSFORMS enables TRANFORM_MECH
 
 # Read gamma handling.  Gamma processing is a core part of libpng and many of
 # the capabilities are dependent on libpng performing gamma correction.
@@ -458,37 +513,50 @@ option READ_TRANSFORMS requires READ
 # If you handle gamma issues outside libpng then you do not need the libpng
 # gamma processing; and it is an enormous waste of space.  You just need to
 # remove the use of libpng APIs that depend on it.
-option READ_GAMMA requires READ_TRANSFORMS, READ_gAMA, READ_sRGB
+option READ_GAMMA requires READ_TRANSFORMS, READ_gAMA, READ_sRGB,
+   enables TRANSFORM_MECH, READ_SCALE_16_TO_8, READ_EXPAND, SETTING
 
-option READ_ALPHA_MODE requires READ_TRANSFORMS, READ_GAMMA
-option READ_BACKGROUND requires READ_TRANSFORMS, READ_STRIP_ALPHA, READ_GAMMA
-option READ_BGR requires READ_TRANSFORMS
-option READ_EXPAND_16 requires READ_TRANSFORMS, READ_16BIT, READ_EXPAND
-option READ_EXPAND requires READ_TRANSFORMS
-option READ_FILLER requires READ_TRANSFORMS
-option READ_GRAY_TO_RGB requires READ_TRANSFORMS
-option READ_INVERT_ALPHA requires READ_TRANSFORMS
-option READ_INVERT requires READ_TRANSFORMS
-option READ_PACK requires READ_TRANSFORMS
-option READ_PACKSWAP requires READ_TRANSFORMS
-option READ_RGB_TO_GRAY requires READ_TRANSFORMS, READ_GAMMA enables COLORSPACE
-option READ_SCALE_16_TO_8 requires READ_TRANSFORMS
-option READ_SHIFT requires READ_TRANSFORMS
-option READ_STRIP_16_TO_8 requires READ_TRANSFORMS
-option READ_STRIP_ALPHA requires READ_TRANSFORMS
-option READ_SWAP_ALPHA requires READ_TRANSFORMS
-option READ_SWAP requires READ_TRANSFORMS, READ_16BIT
-option READ_USER_TRANSFORM requires READ_TRANSFORMS
+option READ_ALPHA_MODE requires READ_TRANSFORMS, READ_GAMMA, READ_BACKGROUND
+option READ_BACKGROUND requires READ_TRANSFORMS, READ_STRIP_ALPHA, READ_GAMMA,
+   READ_tRNS enables TRANSFORM_MECH
+option READ_BGR requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_EXPAND_16 requires READ_TRANSFORMS, READ_16BIT, READ_EXPAND,
+   enables TRANSFORM_MECH
+option READ_EXPAND requires READ_TRANSFORMS, READ_tRNS enables TRANSFORM_MECH
+option READ_FILLER requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_GRAY_TO_RGB requires READ_TRANSFORMS, READ_EXPAND,
+   enables TRANSFORM_MECH
+option READ_INVERT_ALPHA requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_INVERT requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_PACK requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_PACKSWAP requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_RGB_TO_GRAY requires READ_TRANSFORMS, READ_GAMMA,
+   enables COLORSPACE, TRANSFORM_MECH, READ_SCALE_16_TO_8
+option READ_SCALE_16_TO_8 requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_SHIFT requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_STRIP_16_TO_8 requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_STRIP_ALPHA requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_SWAP_ALPHA requires READ_TRANSFORMS enables TRANSFORM_MECH
+option READ_SWAP requires READ_TRANSFORMS, READ_16BIT enables TRANSFORM_MECH
+option READ_USER_TRANSFORM requires READ_TRANSFORMS enables TRANSFORM_MECH
 
+# You can define PNG_NO_PROGRESSIVE_READ if you don't do progressive reading.
 option PROGRESSIVE_READ requires READ
 option SEQUENTIAL_READ requires READ
 
-# You can define PNG_NO_PROGRESSIVE_READ if you don't do progressive reading.
-# This is not talking about interlacing capability!  You'll still have
-# interlacing unless you turn off the following which is required
-# for PNG-compliant decoders.  (In other words, do not do this - in
-# fact it can't be disabled from the command line!)
-#option READ_INTERLACING requires READ
+# Added to 1.7.0: png_read_image now requires the deinterlace code
+option READ_IMAGE requires SEQUENTIAL_READ READ_DEINTERLACE
+
+# This is not talking about reading interlaced PNG files, it is talking about
+# libpng support to 'widen' the interlaced passes to the full row width.  If
+# you take the rows libpng provides and expand them yourself you do not need
+# this code.
+#
+# READ_INTERLACING is for backward compatibility with older version of libpng;
+# applications had to use this to see if they needed to do their own interlace
+# handling.
+option READ_INTERLACING disabled
+option READ_DEINTERLACE requires READ enables READ_INTERLACING
 
 option READ_COMPOSITE_NODIV requires READ
 = NO_READ_COMPOSITE_NODIV NO_READ_COMPOSITED_NODIV
@@ -514,25 +582,22 @@ option WRITE_16BIT requires WRITE enables 16BIT
 option WRITE_TRANSFORMS requires WRITE
 = NO_WRITE_TRANSFORMS WRITE_TRANSFORMS_NOT_SUPPORTED
 
-option WRITE_SHIFT requires WRITE_TRANSFORMS
-option WRITE_PACK requires WRITE_TRANSFORMS
-option WRITE_BGR requires WRITE_TRANSFORMS
-option WRITE_SWAP requires WRITE_TRANSFORMS, WRITE_16BIT
-option WRITE_PACKSWAP requires WRITE_TRANSFORMS
-option WRITE_INVERT requires WRITE_TRANSFORMS
-option WRITE_FILLER requires WRITE_TRANSFORMS
-option WRITE_SWAP_ALPHA requires WRITE_TRANSFORMS
+option WRITE_SHIFT requires WRITE_TRANSFORMS enables TRANSFORM_MECH
+option WRITE_PACK requires WRITE_TRANSFORMS enables TRANSFORM_MECH
+option WRITE_BGR requires WRITE_TRANSFORMS enables TRANSFORM_MECH
+option WRITE_SWAP requires WRITE_TRANSFORMS, WRITE_16BIT enables TRANSFORM_MECH
+option WRITE_PACKSWAP requires WRITE_TRANSFORMS enables TRANSFORM_MECH
+option WRITE_INVERT requires WRITE_TRANSFORMS enables TRANSFORM_MECH
+option WRITE_FILLER requires WRITE_TRANSFORMS enables TRANSFORM_MECH
+option WRITE_SWAP_ALPHA requires WRITE_TRANSFORMS enables TRANSFORM_MECH
 option WRITE_INVERT_ALPHA requires WRITE_TRANSFORMS
-option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS
+option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS enables TRANSFORM_MECH
 
 # This is not required for PNG-compliant encoders, but can cause
 # trouble if left undefined
+option WRITE_INTERLACING requires WRITE enables TRANSFORM_MECH
 
-option WRITE_INTERLACING requires WRITE
-
-# The following depends, internally, on WEIGHT_SHIFT and COST_SHIFT
-# where are set below.
-
+# The following is no longer implemented:
 option WRITE_WEIGHTED_FILTER requires WRITE
 
 option WRITE_FLUSH requires WRITE
@@ -568,9 +633,9 @@ option WRITE_ANCILLARY_CHUNKS requires WRITE
 = NO_WRITE_ANCILLARY_CHUNKS WRITE_ANCILLARY_CHUNKS_NOT_SUPPORTED
 
 # These options disable *all* the text chunks if turned off
-
-option READ_TEXT requires READ_ANCILLARY_CHUNKS enables TEXT
-option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
+option TEXT disabled
+option READ_TEXT requires READ_ANCILLARY_CHUNKS enables TEXT disabled
+option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT disabled
 
 # Moved to pnglibconf.h at libpng-1.5.0
 # Feature support: in 1.4 this was in pngconf.h, but the following
@@ -647,11 +712,6 @@ setting sRGB_PROFILE_CHECKS default 2
 
 option ALIGNED_MEMORY
 
-# Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
-# See png[wr]util.c, normally this should always be *on*
-
-option POINTER_INDEXING
-
 # Other defines for things like memory and the like can go here.
 
 # BUILD TIME SETTINGS
@@ -668,25 +728,68 @@ setting QUANTIZE_RED_BITS default 5
 setting QUANTIZE_GREEN_BITS default 5
 setting QUANTIZE_BLUE_BITS default 5
 
-# This controls how fine the gamma correction becomes when you
-# are only interested in 8 bits anyway.  Increasing this value
-# results in more memory being used, and more pow() functions
-# being called to fill in the gamma tables.  Don't set this value
-# less than 8, and even that may not work (I haven't tested it).
+# LEGACY: this used to control the precision of 16-bit gamma operations when the
+# output was only 8 bits.  It is left in for background compatibility but it
+# does nothing.
 
 setting MAX_GAMMA_8 default 11
 
-# This controls how much a difference in gamma we can tolerate before
-# we actually start doing gamma conversion, it's a fixed point value,
-# so the default below is 0.05, meaning libpng ignores corrections in
-# the range 0.95 to 1.05
+# This controls how much a difference in gamma libpng will ignore; if a gamma
+# convertion is greater than this it will be done, if less it will be skipped.
+#
+# Prior to 1.7.0 this value was somewhat large; 5%.  In 1.7.0 it has been set to
+# 1%.  The logic for this is that human vision can perceive about a 1% change in
+# luminance, so if a user were to compare an image with the correct gamma
+# correction against the libpng output we would want libpng to be within 1% of
+# the correct values for all pixel values x, [0..1], so:
+#
+#             x
+#      --------------- = 1.01
+#      x^(1+threshold)
+#
+#      x^-threshold = 1.01
+#      -threshold.log(x) = log(1.01)
+#
+#                  log(1.01)
+#      threshold = ---------
+#                   -log(x)
+#
+# The threshold goes down as 'x' goes down.  For linear 16-bit values the
+# threshold is under 0.1% for the smallest value (1/65535), for linear 8-bit
+# values it is under 1%.  It gets considerably smaller for gamma encoded values.
+#
+# However it is pointless to place demands on one part of the pipeline that
+# other parts cannot meet.  The 1.7 pipeline uses 16-bit linear arithmetic,
+# therefore 1% resolution is only met with a pixel value (x) of 100/65535.  The
+# corresponding value of 'threshold' is 0.15%, hence:
 
-setting GAMMA_THRESHOLD_FIXED default 5000
+setting GAMMA_THRESHOLD_FIXED default 153
 
-# Scaling factor for filter heuristic weighting calculations
+# Internally libpng 1.7 uses a gamma table lookup to cache results.  Because the
+# LUT is excessively large for 16-bit linear values the algorithm uses a
+# partitioned table (in fact it's a classic floating point LUT) to achieve a
+# given accuracy in the calculations.  Each table has 2^b entries, where b is
+# the number of bits of the value used to index the LUT.  The table is indexed
+# by the high bits [2..2+b] (where '1' is the highest bit) of the value, so the
+# accuracy in the linear case is (worst case) 1/(1+1/2^b).
+#
+# IN FACT a 'b' of 6 is almost certainly adequate; accuracy of 1/64, HOWEVER,
+# received wisdom is that 1% accuracy is required (show me a paper that proves
+# this by experiment; the only information I have found suggests to me that 1/60
+# is the peak possible for a typical human being.)
+#
+# The default table size is controlled by the following option, this is the
+# number of bits in the table for *linear* input multiplied by 100, so the
+# default is 6.65 and 2^6.65 is just over 100, giving the desired .5% accuracy
+# in the linear domain.  When the input is not linear an appropriate adjustment
+# is made by dividing the value by the encoding gamma; much more accuracy is
+# required from the gamma encoded input to give +/-.5% accuracy in the linear
+# domain.  Note that the default exceeds the accuracy of 8-bit gamma encoded
+# values, but that is because 8-bit gamma encoded values are not sufficiently
+# accurate to represent the 1% over 100:1 range assumed for human vision
+# (9-bits to represent 463 values, are required).
 
-setting WEIGHT_SHIFT default 8
-setting COST_SHIFT default 3
+setting DEFAULT_GAMMA_ACCURACY default 665
 
 # Precision to use when converting a floating point value to a PNG
 # extension format string in an sCAL chunk (only relevant if the
@@ -738,7 +841,7 @@ chunk cHRM enables COLORSPACE
 chunk gAMA enables GAMMA
 chunk hIST
 chunk iCCP enables COLORSPACE, GAMMA
-chunk iTXt enables TEXT
+chunk iTXt
 chunk oFFs
 chunk pCAL
 chunk pHYs
@@ -746,10 +849,18 @@ chunk sBIT
 chunk sCAL
 chunk sPLT
 chunk sRGB enables COLORSPACE, GAMMA, SET_OPTION
-chunk tEXt requires TEXT
+chunk tEXt
 chunk tIME
 chunk tRNS
-chunk zTXt enables TEXT
+chunk zTXt
+
+# Text handling; add enable options to the read/write possibilities:
+option READ_tEXt enables READ_TEXT
+option READ_zTXt enables READ_TEXT
+option READ_iTXt enables READ_TEXT
+option WRITE_tEXt enables WRITE_TEXT
+option WRITE_zTXt enables WRITE_TEXT
+option WRITE_iTXt enables WRITE_TEXT
 
 # This only affects support of the optional PLTE chunk in RGB and RGBA
 # images.  Notice that READ_ANCILLARY_CHUNKS therefore disables part
@@ -768,14 +879,14 @@ option UNKNOWN_CHUNKS
 # otherwise they are skipped.  If the write option is turned on unknown chunks
 # set by png_set_unknown_chunks will be written otherwise it is an error to call
 # that API on a write struct.
-option WRITE_UNKNOWN_CHUNKS requires WRITE requires UNKNOWN_CHUNKS
+option WRITE_UNKNOWN_CHUNKS requires WRITE UNKNOWN_CHUNKS
 option WRITE_UNKNOWN_CHUNKS enables STORE_UNKNOWN_CHUNKS
 
 # The first way to read user chunks is to have libpng save them for a later call
 # to png_get_unknown_chunks, the application must call
 # png_set_keep_unknown_chunks to cause this to actually happen (see png.h)
-option SAVE_UNKNOWN_CHUNKS requires READ requires SET_UNKNOWN_CHUNKS
-option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS, STORE_UNKNOWN_CHUNKS
+option SAVE_UNKNOWN_CHUNKS requires READ SET_UNKNOWN_CHUNKS HANDLE_AS_UNKNOWN
+option SAVE_UNKNOWN_CHUNKS enables READ_UNKNOWN_CHUNKS STORE_UNKNOWN_CHUNKS
 
 # The second approach is to use an application provided callback to process the
 # chunks, the callback can either handle the chunk entirely itself or request
@@ -807,11 +918,11 @@ option READ_USER_CHUNKS enables READ_UNKNOWN_CHUNKS, USER_CHUNKS
 # This option no longer affects the write code.  It can be safely disabled and
 # will prevent applications stopping libpng reading known chunks.
 option SET_UNKNOWN_CHUNKS requires UNKNOWN_CHUNKS
-option HANDLE_AS_UNKNOWN requires SET_UNKNOWN_CHUNKS
+option HANDLE_AS_UNKNOWN requires SET_UNKNOWN_CHUNKS READ
 
 # The following options are derived from the above and should not be turned on
 # explicitly.
-option READ_UNKNOWN_CHUNKS requires UNKNOWN_CHUNKS disabled
+option READ_UNKNOWN_CHUNKS requires READ UNKNOWN_CHUNKS disabled
 option STORE_UNKNOWN_CHUNKS requires UNKNOWN_CHUNKS disabled
 
 option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
@@ -823,11 +934,6 @@ option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 
 option WRITE_FILTER requires WRITE
 
-option SAVE_INT_32 disabled
-# png_save_int_32 is required internally for writing the ancillary chunks oFFs
-# and pCAL and for both reading and writing iCCP (for the generation/checking of
-# the corresponding cHRM/gAMA chunks) if full ICC is supported.
-
 # added at libpng-1.5.4
 
 option WRITE_OPTIMIZE_CMF requires WRITE
@@ -837,10 +943,6 @@ option READ_iCCP enables READ_COMPRESSED_TEXT
 option READ_iTXt enables READ_COMPRESSED_TEXT
 option READ_zTXt enables READ_COMPRESSED_TEXT
 
-option WRITE_oFFs enables SAVE_INT_32
-option WRITE_pCAL enables SAVE_INT_32
-option WRITE_cHRM enables SAVE_INT_32
-
 option WRITE_COMPRESSED_TEXT disabled
 option WRITE_iCCP enables WRITE_COMPRESSED_TEXT
 option WRITE_iTXt enables WRITE_COMPRESSED_TEXT
@@ -849,21 +951,35 @@ option WRITE_zTXt enables WRITE_COMPRESSED_TEXT
 # Turn this off to disable png_read_png() and png_write_png() and
 # leave the row_pointers member out of the info structure.
 
-option INFO_IMAGE
+option INFO_IMAGE disabled
+option READ_PNG requires SEQUENTIAL_READ READ_TRANSFORMS enables INFO_IMAGE
+option WRITE_PNG requires WRITE WRITE_TRANSFORMS enables INFO_IMAGE
 
-# added at libpng-1.5.10
-# Turn this off to disable warning about invalid palette index and
-# leave the num_palette_max member out of the png structure.
+# There are four options here, two each for read and write.  By default they are
+# all switched on.
+#
+# 1) {READ,WRITE}_CHECK_FOR_INVALID_INDEX: checks PNG colormap data on read or
+#    write to ensure it does not contain out-of-range palette index values.
+#    Disabled by -DPNG_NO_CHECK_FOR_INVALID_INDEX
+#
+# 2) {READ,WRITE}_GET_PALETTE_MAX: returns the largest pixel value in a
+#    color mapped PNG.  Disbaled by -DPNG_NO_GET_PALETTE_MAX
+#
+# All of this stuff can be removed by "option PALETTE_MAX off" but using
+# -DPNG_NO_ defines on the command line just sets the relevant option to
+# "disabled", so if you want to *disable* just READ_CHECK_FOR_INVALID_INDEX (for
+# example) you need both -DPNG_NO_CHECK_FOR_INVALID_INDEX *and*
+# -DPNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
+option PALETTE_MAX disabled enables TRANSFORM_MECH
 
-option CHECK_FOR_INVALID_INDEX enables READ_CHECK_FOR_INVALID_INDEX
-option CHECK_FOR_INVALID_INDEX enables WRITE_CHECK_FOR_INVALID_INDEX
-option READ_CHECK_FOR_INVALID_INDEX requires READ, CHECK_FOR_INVALID_INDEX
-option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE, CHECK_FOR_INVALID_INDEX
+option CHECK_FOR_INVALID_INDEX,
+   enables READ_CHECK_FOR_INVALID_INDEX WRITE_CHECK_FOR_INVALID_INDEX
+option READ_CHECK_FOR_INVALID_INDEX requires READ disabled enables PALETTE_MAX
+option WRITE_CHECK_FOR_INVALID_INDEX requires WRITE disabled enables PALETTE_MAX
 
-# added at libpng-1.5.15
 option GET_PALETTE_MAX enables READ_GET_PALETTE_MAX WRITE_GET_PALETTE_MAX
-option READ_GET_PALETTE_MAX requires READ_CHECK_FOR_INVALID_INDEX disabled
-option WRITE_GET_PALETTE_MAX requires WRITE_CHECK_FOR_INVALID_INDEX disabled
+option READ_GET_PALETTE_MAX requires READ disabled enables PALETTE_MAX
+option WRITE_GET_PALETTE_MAX requires WRITE disabled enables PALETTE_MAX
 
 # Simplified API options (added at libpng-1.6.0)
 #  In libpng 1.6.8 the handling of these options was changed to used 'requires'
@@ -880,7 +996,8 @@ option SIMPLIFIED_READ,
       READ_EXPAND, READ_16BIT, READ_EXPAND_16, READ_SCALE_16_TO_8,
       READ_RGB_TO_GRAY, READ_ALPHA_MODE, READ_BACKGROUND, READ_STRIP_ALPHA,
       READ_FILLER, READ_SWAP, READ_PACK, READ_GRAY_TO_RGB, READ_GAMMA,
-      READ_tRNS, READ_bKGD, READ_gAMA, READ_cHRM, READ_sRGB, READ_sBIT
+      READ_tRNS, READ_bKGD, READ_gAMA, READ_cHRM, READ_sRGB, READ_sBIT,
+      READ_DEINTERLACE
 
 # AFIRST and BGR read options:
 #  Prior to libpng 1.6.8 these were disabled but switched on if the low level

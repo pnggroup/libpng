@@ -1,0 +1,7 @@
+# CONTRIBUTED EXTENSIONS
+#
+# Please read the file "contrib/extensions.ac" before making changes to this
+# file.
+#
+# Include the ARM NEON extension:
+#include %reldir%/neon/neon.am

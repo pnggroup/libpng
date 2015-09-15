@@ -34,11 +34,11 @@ png_read_data(png_structrp png_ptr, png_bytep data, png_size_t length)
 {
    png_debug1(4, "reading %d bytes", (int)length);
 
-   if (png_ptr->read_data_fn != NULL)
-      (*(png_ptr->read_data_fn))(png_ptr, data, length);
+   if (png_ptr->rw_data_fn != NULL)
+      png_ptr->rw_data_fn(png_ptr, data, length);
 
    else
-      png_error(png_ptr, "Call to NULL read function");
+      png_app_error(png_ptr, "No read function");
 }
 
 #ifdef PNG_STDIO_SUPPORTED
@@ -63,7 +63,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
    if (check != length)
       png_error(png_ptr, "Read Error");
 }
-#endif
+#endif /* STDIO */
 
 /* This function allows the application to supply a new input function
  * for libpng if standard C streams aren't being used.
@@ -91,31 +91,19 @@ png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
    if (png_ptr == NULL)
       return;
 
-   png_ptr->io_ptr = io_ptr;
-
-#ifdef PNG_STDIO_SUPPORTED
-   if (read_data_fn != NULL)
-      png_ptr->read_data_fn = read_data_fn;
-
-   else
-      png_ptr->read_data_fn = png_default_read_data;
-#else
-   png_ptr->read_data_fn = read_data_fn;
-#endif
-
-#ifdef PNG_WRITE_SUPPORTED
-   /* It is an error to write to a read device */
-   if (png_ptr->write_data_fn != NULL)
+   if (!png_ptr->read_struct)
    {
-      png_ptr->write_data_fn = NULL;
-      png_warning(png_ptr,
-          "Can't set both read_data_fn and write_data_fn in the"
-          " same structure");
+      png_app_error(png_ptr, "cannot set a read function on a write struct");
+      return;
    }
-#endif
 
-#ifdef PNG_WRITE_FLUSH_SUPPORTED
-   png_ptr->output_flush_fn = NULL;
-#endif
+   if (read_data_fn == NULL)
+   {
+      png_app_error(png_ptr, "API change: png_set_read_fn requires a function");
+      return;
+   }
+
+   png_ptr->io_ptr = io_ptr;
+   png_ptr->rw_data_fn = read_data_fn;
 }
 #endif /* READ */

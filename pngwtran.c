@@ -14,523 +14,365 @@
 #include "pngpriv.h"
 #define PNG_SRC_FILE PNG_SRC_FILE_pngwtran
 
-#ifdef PNG_WRITE_SUPPORTED
-#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
-
-#ifdef PNG_WRITE_PACK_SUPPORTED
-/* Pack pixels into bytes.  Get the true bit depth from png_ptr.  The
- * row_info bit depth should be 8 (one pixel per byte).  The channels
- * should be 1 (this only happens on grayscale and paletted images).
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
+/* Pick out the correct pixels for the interlace pass.
+ * The basic idea here is to go through the row with a source
+ * pointer and a destination pointer (sp and dp), and copy the
+ * correct pixels for the pass.  As the row gets compacted,
+ * sp will always be >= dp, so we should never overwrite anything.
+ * See the default: case for the easiest code to understand.
  */
 static void
-png_do_pack(png_transform_controlp row_info, png_bytep row)
+png_do_write_interlace_lbd(png_transformp *transform, png_transform_controlp tc)
 {
-   png_debug(1, "in png_do_pack");
+   const png_const_structrp png_ptr = tc->png_ptr;
+   const unsigned int pass = png_ptr->pass;
+   const png_uint_32 row_width = tc->width;
+   const png_uint_32 output_width = PNG_PASS_COLS(row_width, pass);
+   png_uint_32 i = PNG_PASS_START_COL(pass);
 
-#  define png_ptr row_info->png_ptr
 
-   /* The comment suggests the following must be true.
-    * TODO: test this.
+   png_debug(1, "in png_do_write_interlace");
+   debug(!tc->init);
+
+   /* The data can be used in place (tc->sp) if the width isn't changed or
+    * the first pixel in the output is the first in the input and there is
+    * only one pixel in the output; this covers the last pass (PNG pass 7,
+    * libpng 6) and PNG passes 1, 3 and 5 with narrow images.
     */
-   affirm(row_info->bit_depth == 8 && row_info->channels == 1);
+   tc->width = output_width;
 
+   if (row_width != output_width && (output_width != 1 || i > 0))
    {
-      switch (png_ptr->bit_depth)
+      /* For passes before the last the pixels must be picked from the input
+       * row (tc->sp) and placed into the output row (tc->dp).
+       */
+      png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
+      png_bytep dp = png_voidcast(png_bytep, tc->dp);
+      const unsigned int inc = PNG_PASS_COL_OFFSET(pass);
+      unsigned int B = (*transform)->args & 0x3; /* 0, 1 or 2 */
+
+      /* The row data will be moved, so do this now before 'dp' is advanced:
+       */
+      tc->sp = dp;
+
+      /* For pixels less than one byte wide the correct pixels have to be
+       * extracted from the input bytes.  Because we are reading data in
+       * the application memory format we cannot rely on the PNG big
+       * endian order.  Notice that this was apparently broken before
+       * 1.7.0.
+       *
+       * In libpng 1.7.0 libpng uses a classic bit-pump to optimize the
+       * extraction.  In all passes before the last (6/7) no two pixels
+       * are adjacent in the input, so we are always extracting 1 bit.
+       * At present the code uses an 8-bit buffer to avoid coding for
+       * different byte sexes, but this could easily be changed.
+       *
+       * 'i' is the bit-index of bit in the input (sp[]), so,
+       * considering the 1-bit per pixel case, sp[i>>3] is the byte
+       * and the bit is bit (i&7) (0 lowest) on swapped (little endian)
+       * data or 7-(i&7) on PNG default (big-endian) data.
+       *
+       * Define these macros, where:
+       *
+       *    B: the log2 bit depth (0, 1, 2 for 1bpp, 2bpp or 4bpp) of
+       *       the data; this should be a constant.
+       *   sp: the source pointer (sp) (a png_const_bytep)
+       *    i: the pixel index in the input (png_uint_32)
+       *    j: the bit index in the output (unsigned int)
+       *
+       * Unlike 'i', 'j' is interpreted directly; for LSB bytes it counts
+       * up, for MSB it counts down.
+       *
+       * NOTE: this could all be expanded to eliminate the code below by
+       * the time honoured copy'n'paste into three separate functions.  This
+       * might be worth doing in the future.
+       */
+#     define PIXEL_MASK     ((1U << (1<<B))-1U)
+#     define BIT_MASK       ((1U << (3-(B)))-1U) /* within a byte */
+#     define SP_BYTE        (sp[i>>(3-(B))]) /* byte to use */
+#     define SP_OFFSET_LSB  ((BIT_MASK &  i) << (B))
+#     define SP_OFFSET_MSB  ((BIT_MASK & ~i) << (B))
+#     define SP_PIXEL(sex)  ((SP_BYTE >> SP_OFFSET_ ## sex) & PIXEL_MASK)
       {
-         case 1:
-         {
-            png_const_bytep ep = row + png_transform_rowbytes(row_info);
-            png_bytep dp = row;
-            unsigned int mask = 0x80, v = 0;
+         unsigned int j;
+         unsigned int d;
 
-            while (row < ep)
-            {
-               if (*row++ != 0)
-                  v |= mask;
-
-               mask >>= 1;
-
-               if (mask == 0)
-               {
-                  mask = 0x80;
-                  *dp++ = (png_byte)/*SAFE*/v;
-                  v = 0;
-               }
+#        ifdef PNG_WRITE_PACKSWAP_SUPPORTED
+            if (tc->format & PNG_FORMAT_FLAG_SWAPPED)
+               for (j = 0, d = 0; i < row_width; i += inc)
+            {  /* little-endian */
+               d |= SP_PIXEL(LSB) << j;
+               j += 1<<B;
+               if (j == 8) *dp++ = png_check_byte(png_ptr, d), j = 0, d = 0;
             }
 
-            if (mask != 0x80)
-               *dp++ = (png_byte)/*SAFE*/v;
-
-            row_info->bit_depth = 1;
-            break;
+            else
+#        endif /* WRITE_PACKSWAP */
+         for (j = 8, d = 0; i < row_width; i += inc)
+         {  /* big-endian */
+            j -= 1<<B;
+            d |= SP_PIXEL(MSB) << j;
+            if (j == 0) *dp++ = png_check_byte(png_ptr, d), j = 8, d = 0;
          }
 
-         case 2:
-         {
-            png_const_bytep ep = row + png_transform_rowbytes(row_info);
-            png_bytep dp = row;
-            unsigned int shift = 8, v = 0;
+         /* The end condition: if j is not 0 the last byte was not
+          * written:
+          */
+         if (j != 0) *dp = png_check_byte(png_ptr, d);
+      }
+#     undef PIXEL_MASK
+#     undef BIT_MASK
+#     undef SP_BYTE
+#     undef SP_OFFSET_MSB
+#     undef SP_OFFSET_LSB
+#     undef SP_PIXEL
+   }
 
-            while (row < ep)
-            {
-               shift -= 2;
-               v |= (*row++ & 0x3) << shift;
+   /* The transform is removed on the last pass.  It can be removed earlier
+    * in other cases if the row width (the image width) is only 1, however
+    * this does not seem worth the overhead to check; PNG pass 5(4) happens
+    * if there are just three rows.
+    */
+   else /* the source can be used in place */ if (pass == 6)
+      (*transform)->fn = NULL; /* remove me to caller */
+}
 
-               if (shift == 0)
-               {
-                  shift = 8;
-                  *dp++ = png_check_byte(png_ptr, v);
-                  v = 0;
-               }
-            }
+static void
+png_do_write_interlace_byte(png_transformp *transform,
+   png_transform_controlp tc)
+{
+   const png_const_structrp png_ptr = tc->png_ptr;
+   const unsigned int pass = png_ptr->pass;
+   const png_uint_32 row_width = tc->width;
+   const png_uint_32 output_width = PNG_PASS_COLS(row_width, pass);
+   png_uint_32 i = PNG_PASS_START_COL(pass);
 
-            if (shift != 8)
-               *dp++ = png_check_byte(png_ptr, v);
+   png_debug(1, "in png_do_write_interlace");
+   debug(!tc->init);
 
-            row_info->bit_depth = 2;
+   /* The data can be used in place (tc->sp) if the width isn't changed or
+    * the first pixel in the output is the first in the input and there is
+    * only one pixel in the output; this covers the last pass (PNG pass 7,
+    * libpng 6) and PNG passes 1, 3 and 5 with narrow images.
+    */
+   tc->width = output_width;
+
+   if (row_width != output_width && (output_width != 1 || i > 0))
+   {
+      /* For passes before the last the pixels must be picked from the input
+       * row (tc->sp) and placed into the output row (tc->dp).
+       */
+      png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
+      png_bytep dp = png_voidcast(png_bytep, tc->dp);
+      const unsigned int inc = PNG_PASS_COL_OFFSET(pass);
+      unsigned int cbytes = (*transform)->args;
+
+      /* The row data will be moved, so do this now before 'dp' is advanced:
+       */
+      tc->sp = dp;
+
+      /* Loop through the input copying each pixel to the correct place
+       * in the output.  Note that the loop may be executed 0 times if
+       * this is called on a narrow image that does not contain this
+       * pass.
+       */
+      for (sp += i * cbytes; i < row_width;
+           i += inc, sp += inc * cbytes, dp += cbytes)
+         if (dp != sp) /* cannot happen in practice */
+            memcpy(dp, sp, cbytes);
+   }
+
+   /* The transform is removed on the last pass.  It can be removed earlier
+    * in other cases if the row width (the image width) is only 1, however
+    * this does not seem worth the overhead to check; PNG pass 5(4) happens
+    * if there are just three rows.
+    */
+   else /* the source can be used in place */ if (pass == 6)
+      (*transform)->fn = NULL; /* remove me to caller */
+}
+
+static void
+png_init_write_interlace(png_transformp *transform, png_transform_controlp tc)
+{
+#  define png_ptr (tc->png_ptr)
+
+   png_debug(1, "in png_do_write_interlace");
+   debug(tc->init);
+
+   /* Do nothing on PNG_TC_INIT_FORMAT because we don't change the format, bit
+    * depth or gamma of the data.
+    */
+   if (tc->init == PNG_TC_INIT_FINAL)
+   {
+      png_transformp tf = *transform;
+      unsigned int pixel_depth = PNG_TC_PIXEL_DEPTH(*tc);
+      png_uint_16 B = 0;
+
+      switch (pixel_depth)
+      {
+         case 4: /* B == 2 */
+            ++B;
+            /* FALL THROUGH */
+         case 2: /* B == 1 */
+            ++B;
+            /* FALL THROUGH */
+         case 1: /* B == 0 */
+            /* This is the low bit depth case: */
+            tf->args = B;
+            tf->fn = png_do_write_interlace_lbd;
             break;
-         }
-
-         case 4:
-         {
-            png_const_bytep ep = row + png_transform_rowbytes(row_info);
-            png_bytep dp = row;
-            unsigned int shift = 8, v = 0;
-
-            while (row < ep)
-            {
-               shift -= 4;
-               v |= ((*row++ & 0xf) << shift);
-
-               if (shift == 0)
-               {
-                  shift = 8;
-                  *dp++ = png_check_byte(png_ptr, v);
-                  v = 0;
-               }
-            }
-
-            if (shift != 8)
-               *dp++ = png_check_byte(png_ptr, v);
-
-            row_info->bit_depth = 4;
-            break;
-         }
 
          default:
+            affirm((pixel_depth & 7) == 0);
+            pixel_depth >>= 3;
+            affirm(pixel_depth > 0 && pixel_depth <= 8);
+            tf->args = pixel_depth & 0xf;
+            tf->fn = png_do_write_interlace_byte;
             break;
       }
    }
 #  undef png_ptr
 }
-#endif
 
-#ifdef PNG_WRITE_SHIFT_SUPPORTED
-/* Shift pixel values to take advantage of whole range.  Pass the
- * true number of bits in bit_depth.  The row should be packed
- * according to row_info->bit_depth.  Thus, if you had a row of
- * bit depth 4, but the pixels only had values from 0 to 7, you
- * would pass 3 as bit_depth, and this routine would translate the
- * data to 0 to 15.
- *
- * NOTE: this is horrible complexity for no value.  Once people suggested they
- * were selling 16-bit displays with 5:6:5 bits spread R:G:B but so far as I
- * could determine these displays produced intermediate grey (uncolored) colors,
- * which is impossible with a true 5:6:5, so most likely 5:6:5 was marketing.
- */
-static void
-png_do_shift(png_transform_controlp row_info, png_bytep row)
-{
-   png_debug(1, "in png_do_shift");
-
-#  define png_ptr row_info->png_ptr
-
-   if (!(row_info->flags & PNG_INDEXED) && (row_info->channels-1) <= 3)
-   {
-      png_const_color_8p bit_depth = &png_ptr->shift;
-      int shift_start[4], shift_dec[4];
-      int channels = 0;
-
-      if (row_info->channels == 3 || row_info->channels == 4)
-      {
-         shift_start[channels] = row_info->bit_depth - bit_depth->red;
-         shift_dec[channels] = bit_depth->red;
-         channels++;
-
-         shift_start[channels] = row_info->bit_depth - bit_depth->green;
-         shift_dec[channels] = bit_depth->green;
-         channels++;
-
-         shift_start[channels] = row_info->bit_depth - bit_depth->blue;
-         shift_dec[channels] = bit_depth->blue;
-         channels++;
-      }
-
-      else /* 1 or 2 channels */
-      {
-         shift_start[channels] = row_info->bit_depth - bit_depth->gray;
-         shift_dec[channels] = bit_depth->gray;
-         channels++;
-      }
-
-      if (row_info->channels == 2 || row_info->channels == 4)
-      {
-         shift_start[channels] = row_info->bit_depth - bit_depth->alpha;
-         shift_dec[channels] = bit_depth->alpha;
-         channels++;
-      }
-
-      /* With low res depths, could only be grayscale, so one channel */
-      if (row_info->bit_depth < 8)
-      {
-         png_bytep bp = row;
-         png_size_t i;
-         unsigned int mask;
-         size_t row_bytes = png_transform_rowbytes(row_info);
-
-         affirm(row_info->channels == 1);
-
-         if (bit_depth->gray == 1 && row_info->bit_depth == 2)
-            mask = 0x55;
-
-         else if (row_info->bit_depth == 4 && bit_depth->gray == 3)
-            mask = 0x11;
-
-         else
-            mask = 0xff;
-
-         for (i = 0; i < row_bytes; i++, bp++)
-         {
-            int j;
-            unsigned int v, out;
-
-            v = *bp;
-            out = 0;
-
-            for (j = shift_start[0]; j > -shift_dec[0]; j -= shift_dec[0])
-            {
-               if (j > 0)
-                  out |= v << j;
-
-               else
-                  out |= (v >> (-j)) & mask;
-            }
-
-            *bp = png_check_byte(png_ptr, out);
-         }
-      }
-
-      else if (row_info->bit_depth == 8)
-      {
-         png_bytep bp = row;
-         png_uint_32 i;
-         png_uint_32 istop = channels * row_info->width;
-
-         for (i = 0; i < istop; i++, bp++)
-         {
-
-            const unsigned int c = i%channels;
-            int j;
-            unsigned int v, out;
-
-            v = *bp;
-            out = 0;
-
-            for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
-            {
-               if (j > 0)
-                  out |= v << j;
-
-               else
-                  out |= v >> (-j);
-            }
-
-            *bp = png_check_byte(png_ptr, out);
-         }
-      }
-
-      else
-      {
-         png_bytep bp;
-         png_uint_32 i;
-         png_uint_32 istop = channels * row_info->width;
-
-         for (bp = row, i = 0; i < istop; i++)
-         {
-            const unsigned int c = i%channels;
-            int j;
-            unsigned int value, v;
-
-            v = png_get_uint_16(bp);
-            value = 0;
-
-            for (j = shift_start[c]; j > -shift_dec[c]; j -= shift_dec[c])
-            {
-               if (j > 0)
-                  value |= v << j;
-
-               else
-                  value |= v >> (-j);
-            }
-            *bp++ = png_check_byte(png_ptr, value >> 8);
-            *bp++ = PNG_BYTE(value);
-         }
-      }
-   }
-
-#  undef png_ptr
-}
-#endif
-
-#ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
-static void
-png_do_write_swap_alpha(png_transform_controlp row_info, png_bytep row)
-{
-   png_debug(1, "in png_do_write_swap_alpha");
-
-#  define png_ptr row_info->png_ptr
-   {
-      if (row_info->channels == 4)
-      {
-         if (row_info->bit_depth == 8)
-         {
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 4;
-
-            /* This converts from ARGB to RGBA */
-            while (row <= ep)
-            {
-               png_byte save = row[0];
-               row[0] = row[1];
-               row[1] = row[2];
-               row[2] = row[3];
-               row[3] = save;
-               row += 4;
-            }
-
-            debug(row == ep+4);
-         }
-
-#ifdef PNG_WRITE_16BIT_SUPPORTED
-         else if (row_info->bit_depth == 16)
-         {
-            /* This converts from AARRGGBB to RRGGBBAA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 8;
-
-            while (row <= ep)
-            {
-               png_byte s0 = row[0];
-               png_byte s1 = row[1];
-               memmove(row, row+2, 6);
-               row[6] = s0;
-               row[7] = s1;
-               row += 8;
-            }
-
-            debug(row == ep+8);
-         }
-#endif /* WRITE_16BIT */
-      }
-
-      else if (row_info->channels == 2)
-      {
-         if (row_info->bit_depth == 8)
-         {
-            /* This converts from AG to GA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 2;
-
-            /* This converts from ARGB to RGBA */
-            while (row <= ep)
-            {
-               png_byte save = *row;
-               *row = row[1], ++row;
-               *row++ = save;
-            }
-
-            debug(row == ep+2);
-         }
-
-#ifdef PNG_WRITE_16BIT_SUPPORTED
-         else
-         {
-            /* This converts from AAGG to GGAA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 4;
-
-            while (row <= ep)
-            {
-               png_byte save = row[0];
-               row[0] = row[2];
-               row[2] = save;
-
-               save = row[1];
-               row[1] = row[3];
-               row[3] = save;
-
-               row += 4;
-            }
-
-            debug(row == ep+4);
-         }
-#endif /* WRITE_16BIT */
-      }
-   }
-
-#  undef png_ptr
-}
-#endif
-
-#ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
-static void
-png_do_write_invert_alpha(png_transform_controlp row_info, png_bytep row)
-{
-   png_debug(1, "in png_do_write_invert_alpha");
-
-#  define png_ptr row_info->png_ptr
-   {
-      if (row_info->channels == 4)
-      {
-         if (row_info->bit_depth == 8)
-         {
-            /* This inverts the alpha channel in RGBA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 1;
-
-            row += 3; /* alpha channel */
-            while (row <= ep)
-               *row ^= 0xff, row += 4;
-         }
-
-#ifdef PNG_WRITE_16BIT_SUPPORTED
-         else if (row_info->bit_depth == 16)
-         {
-            /* This inverts the alpha channel in RRGGBBAA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 2;
-
-            row += 6;
-
-            while (row <= ep)
-               row[0] ^= 0xff, row[1] ^= 0xff, row += 8;
-         }
-#endif /* WRITE_16BIT */
-      }
-
-      else if (row_info->channels == 2)
-      {
-         if (row_info->bit_depth == 8)
-         {
-            /* This inverts the alpha channel in GA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 1;
-
-            ++row;
-
-            while (row <= ep)
-               *row ^= 0xff, row += 2;
-         }
-
-#ifdef PNG_WRITE_16BIT_SUPPORTED
-         else
-         {
-            /* This inverts the alpha channel in GGAA */
-            png_const_bytep ep = row + png_transform_rowbytes(row_info) - 2;
-
-            row += 2;
-
-            while (row <= ep)
-               row[0] ^= 0xff, row[1] ^= 0xff, row += 4;
-         }
-#endif /* WRITE_16BIT */
-      }
-   }
-#  undef png_ptr
-}
-#endif
-
-/* Transform the data according to the user's wishes.  The order of
- * transformations is significant.
- */
 void /* PRIVATE */
-png_do_write_transformations(png_structrp png_ptr, png_row_infop row_info_in)
+png_set_write_interlace(png_structrp png_ptr)
 {
-   png_transform_control display;
-
-   png_debug(1, "in png_do_write_transformations");
-
-   if (png_ptr == NULL)
-      return;
-
-#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
-   if ((png_ptr->transformations & PNG_USER_TRANSFORM) != 0)
-      if (png_ptr->write_user_transform_fn != NULL)
-         (*(png_ptr->write_user_transform_fn)) /* User write transform
-                                                 function */
-             (png_ptr,  /* png_ptr */
-              row_info_in,  /* row_info: */
-                /*  png_uint_32 width;       width of row */
-                /*  png_size_t rowbytes;     number of bytes in row */
-                /*  png_byte color_type;     color type of pixels */
-                /*  png_byte bit_depth;      bit depth of samples */
-                /*  png_byte channels;       number of channels (1-4) */
-                /*  png_byte pixel_depth;    bits per pixel (depth*channels) */
-             png_ptr->row_buf + 1);      /* start of pixel data for row */
-#endif
-
-   png_init_transform_control(png_ptr, &display, row_info_in);
-
-#ifdef PNG_WRITE_FILLER_SUPPORTED
-   if ((png_ptr->transformations & PNG_FILLER) != 0)
-      png_do_strip_channel(&display, png_ptr->row_buf + 1,
-         !(png_ptr->flags & PNG_FLAG_FILLER_AFTER));
-#endif
-
-#ifdef PNG_WRITE_PACKSWAP_SUPPORTED
-   if ((png_ptr->transformations & PNG_PACKSWAP) != 0)
-      png_do_packswap(&display, png_ptr->row_buf + 1);
-#endif
+   /* This is checked in the caller: */
+   debug(png_ptr->interlaced == PNG_INTERLACE_ADAM7);
+   png_add_transform(png_ptr, 0, png_init_write_interlace, PNG_TR_INTERLACE);
+}
+#endif /* WRITE_INTERLACING */
 
 #ifdef PNG_WRITE_PACK_SUPPORTED
-   if ((png_ptr->transformations & PNG_PACK) != 0)
-      png_do_pack(&display, png_ptr->row_buf + 1);
-#endif
+/* Pack pixels into bytes. */
+static void
+png_do_write_pack(png_transformp *transform, png_transform_controlp tc)
+{
+   png_alloc_size_t rowbytes = PNG_TC_ROWBYTES(*tc);
+   png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
+   png_const_bytep ep = png_upcast(png_const_bytep, tc->sp) + rowbytes;
+   png_bytep dp = png_voidcast(png_bytep, tc->dp);
 
-#ifdef PNG_WRITE_SWAP_SUPPORTED
-#  ifdef PNG_16BIT_SUPPORTED
-   if ((png_ptr->transformations & PNG_SWAP_BYTES) != 0)
-      png_do_swap(&display, png_ptr->row_buf + 1);
-#  endif
-#endif
+   png_debug(1, "in png_do_pack");
 
-#ifdef PNG_WRITE_SHIFT_SUPPORTED
-   if ((png_ptr->transformations & PNG_SHIFT) != 0)
-      png_do_shift(&display, png_ptr->row_buf + 1);
-#endif
+#  define png_ptr tc->png_ptr
 
-#ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
-   if ((png_ptr->transformations & PNG_SWAP_ALPHA) != 0)
-      png_do_write_swap_alpha(&display, png_ptr->row_buf + 1);
-#endif
+   switch ((*transform)->args)
+   {
+      case 1:
+      {
+         unsigned int mask = 0x80, v = 0;
 
-#ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
-   if ((png_ptr->transformations & PNG_INVERT_ALPHA) != 0)
-      png_do_write_invert_alpha(&display, png_ptr->row_buf + 1);
-#endif
+         while (sp < ep)
+         {
+            if (*sp++ != 0)
+               v |= mask;
 
-#ifdef PNG_WRITE_BGR_SUPPORTED
-   if ((png_ptr->transformations & PNG_BGR) != 0)
-      png_do_bgr(&display, png_ptr->row_buf + 1);
-#endif
+            mask >>= 1;
 
-#ifdef PNG_WRITE_INVERT_SUPPORTED
-   if ((png_ptr->transformations & PNG_INVERT_MONO) != 0)
-      png_do_invert(&display, png_ptr->row_buf + 1);
-#endif
+            if (mask == 0)
+            {
+               mask = 0x80;
+               *dp++ = PNG_BYTE(v);
+               v = 0;
+            }
+         }
 
-   /* Clear the flags; they are irrelevant because the write code is
-    * reversing transformations to get PNG data but the shared transformation
-    * code assumes input PNG data.  Only PNG_INDEXED is required.
-    */
-   if ((display.flags & PNG_BAD_INDEX) != 0)
-      png_error(png_ptr, "palette data has out of range index");
+         if (mask != 0x80)
+            *dp++ = PNG_BYTE(v);
+         break;
+      }
 
-   display.flags &= PNG_INDEXED;
-   png_end_transform_control(row_info_in, &display);
+      case 2:
+      {
+         unsigned int shift = 8, v = 0;
+
+         while (sp < ep)
+         {
+            shift -= 2;
+            v |= (*sp++ & 0x3) << shift;
+
+            if (shift == 0)
+            {
+               shift = 8;
+               *dp++ = PNG_BYTE(v);
+               v = 0;
+            }
+         }
+
+         if (shift != 8)
+            *dp++ = PNG_BYTE(v);
+         break;
+      }
+
+      case 4:
+      {
+         unsigned int shift = 8, v = 0;
+
+         while (sp < ep)
+         {
+            shift -= 4;
+            v |= ((*sp++ & 0xf) << shift);
+
+            if (shift == 0)
+            {
+               shift = 8;
+               *dp++ = PNG_BYTE(v);
+               v = 0;
+            }
+         }
+
+         if (shift != 8)
+            *dp++ = PNG_BYTE(v);
+         break;
+      }
+
+      default:
+         impossible("bit depth");
+   }
+
+   if ((tc->format & PNG_FORMAT_FLAG_COLORMAP) == 0 &&
+       --(tc->range) == 0)
+      tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_RANGE);
+
+   tc->bit_depth = (*transform)->args;
+   tc->sp = tc->dp;
+#  undef png_ptr
 }
-#endif /* WRITE_TRANSFORMS */
-#endif /* WRITE */
+
+void /* PRIVATE */
+png_init_write_pack(png_transformp *transform, png_transform_controlp tc)
+{
+#  define png_ptr tc->png_ptr
+   debug(tc->init);
+#  undef png_ptr
+
+   /* The init routine is called *forward* so the transform control we get has
+    * the required bit depth and the transform routine will increase it to 8
+    * bits per channel.  The code doesn't really care how many channels there
+    * are, but the only way to get a channel depth of less than 8 is to have
+    * just one channel.
+    */
+   if (tc->bit_depth < 8) /* else no packing/unpacking */
+   {
+      if (tc->init == PNG_TC_INIT_FINAL)
+      {
+         (*transform)->fn = png_do_write_pack;
+         /* Record this for the backwards run: */
+         (*transform)->args = tc->bit_depth & 0xf;
+      }
+
+      if ((tc->format & PNG_FORMAT_FLAG_COLORMAP) == 0)
+      {
+         tc->range++;
+         tc->format |= PNG_FORMAT_FLAG_RANGE; /* forwards: backwards cancels */
+      }
+
+      tc->bit_depth = 8;
+   }
+
+   else /* the transform is not applicable */
+      (*transform)->fn = NULL;
+}
+#endif /* WRITE_PACK */

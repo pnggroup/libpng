@@ -1,0 +1,5 @@
+# To just this extension either copy the 'include' line into
+# contrib/extensions.am or link/copy the whole file there.  Do the same with the
+# associated file extensions.ac
+# Include the ARM NEON extension:
+include %reldir%/neon/neon.am

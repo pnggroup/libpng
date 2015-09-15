@@ -366,8 +366,7 @@ png_benign_error(png_const_structrp png_ptr, png_const_charp error_message)
    if ((png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN) != 0)
    {
 #     ifdef PNG_READ_SUPPORTED
-         if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
-            png_ptr->chunk_name != 0)
+         if (png_ptr->read_struct && png_ptr->chunk_name != 0)
             png_chunk_warning(png_ptr, error_message);
          else
 #     endif
@@ -377,8 +376,7 @@ png_benign_error(png_const_structrp png_ptr, png_const_charp error_message)
    else
    {
 #     ifdef PNG_READ_SUPPORTED
-         if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0 &&
-            png_ptr->chunk_name != 0)
+         if (png_ptr->read_struct && png_ptr->chunk_name != 0)
             png_chunk_error(png_ptr, error_message);
          else
 #     endif
@@ -421,10 +419,14 @@ png_app_error(png_const_structrp png_ptr, png_const_charp error_message)
 #if defined(PNG_WARNINGS_SUPPORTED) || \
    (defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED))
 /* These utilities are used internally to build an error message that relates
- * to the current chunk.  The chunk name comes from png_ptr->chunk_name,
- * which is used to prefix the message.  The message is limited in length
- * to 63 bytes. The name characters are output as hex digits wrapped in []
- * if the character is invalid.
+ * to the current chunk.  The chunk name comes from png_ptr->chunk_name unless
+ * png_ptr->zowner is set in which case that is used in preference.  This is
+ * used to prefix the message.  The message is limited in length to 63 bytes.
+ * The name characters are output as hex digits wrapped in [] if the character
+ * is invalid.
+ *
+ * Using 'zowner' means that IDAT errors at the end of the IDAT stream are still
+ * reported as from the IDAT chunks.
  */
 #define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
 static PNG_CONST char png_digit[16] = {
@@ -436,8 +438,11 @@ static void /* PRIVATE */
 png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
     error_message)
 {
-   png_uint_32 chunk_name = png_ptr->chunk_name;
+   png_uint_32 chunk_name = png_ptr->zowner;
    int iout = 0, ishift = 24;
+
+   if (chunk_name == 0)
+      chunk_name = png_ptr->chunk_name;
 
    while (ishift >= 0)
    {
@@ -530,17 +535,14 @@ png_chunk_benign_error(png_const_structrp png_ptr, png_const_charp
 #endif /* READ */
 
 void /* PRIVATE */
-png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
+(png_chunk_report)(png_const_structrp png_ptr, png_const_charp message,
+   int error)
 {
-#  ifndef PNG_WARNINGS_SUPPORTED
-      PNG_UNUSED(message)
-#  endif
-
    /* This is always supported, but for just read or just write it
     * unconditionally does the right thing.
     */
 #  if defined(PNG_READ_SUPPORTED) && defined(PNG_WRITE_SUPPORTED)
-      if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
+      if (png_ptr->read_struct)
 #  endif
 
 #  ifdef PNG_READ_SUPPORTED
@@ -548,13 +550,16 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
          if (error < PNG_CHUNK_ERROR)
             png_chunk_warning(png_ptr, message);
 
-         else
+         else if (error < PNG_CHUNK_FATAL)
             png_chunk_benign_error(png_ptr, message);
+
+         else
+            png_chunk_error(png_ptr, message);
       }
 #  endif
 
 #  if defined(PNG_READ_SUPPORTED) && defined(PNG_WRITE_SUPPORTED)
-      else if ((png_ptr->mode & PNG_IS_READ_STRUCT) == 0)
+      else if (!png_ptr->read_struct)
 #  endif
 
 #  ifdef PNG_WRITE_SUPPORTED
@@ -562,9 +567,16 @@ png_chunk_report(png_const_structrp png_ptr, png_const_charp message, int error)
          if (error < PNG_CHUNK_WRITE_ERROR)
             png_app_warning(png_ptr, message);
 
-         else
+         else if (error < PNG_CHUNK_FATAL)
             png_app_error(png_ptr, message);
+
+         else
+            png_error(png_ptr, message);
       }
+#  endif
+
+#  ifndef PNG_ERROR_TEXT_SUPPORTED
+      PNG_UNUSED(message)
 #  endif
 }
 
@@ -881,7 +893,7 @@ png_set_strip_error_numbers(png_structrp png_ptr, png_uint_32 strip_mode)
    if (png_ptr != NULL)
    {
       png_ptr->flags &=
-         ((~(PNG_FLAG_STRIP_ERROR_NUMBERS |
+         ((PNG_BIC_MASK(PNG_FLAG_STRIP_ERROR_NUMBERS |
          PNG_FLAG_STRIP_ERROR_TEXT))&strip_mode);
    }
 }
@@ -1106,8 +1118,8 @@ affirm_text(png_charp buffer, size_t bufsize,
 
 #endif /* AFFIRM_TEXT */
 
-PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
-   param_deb(png_const_charp condition) unsigned int position), PNG_NORETURN)
+PNG_FUNCTION(void,png_affirm,(png_const_structrp png_ptr,
+   param_deb(png_const_charp condition) unsigned int position),PNG_NORETURN)
 {
 #  if PNG_AFFIRM_TEXT
       char   buffer[512];
@@ -1154,6 +1166,17 @@ PNG_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
 /* The character/byte checking APIs. These do their own calls to png_affirm
  * because the caller provides the position.
  */
+unsigned int /* PRIVATE */
+png_bit_affirm(png_const_structrp png_ptr, unsigned int position,
+   unsigned int u, unsigned int bits)
+{
+   /* The following avoids overflow errors even if 'bits' is 16 or 32: */
+   if (u <= (1U << bits)-1U)
+       return u;
+
+   png_affirm(png_ptr, param_deb("(bit field) range") position);
+}
+
 char /* PRIVATE */
 png_char_affirm(png_const_structrp png_ptr, unsigned int position, int c)
 {
