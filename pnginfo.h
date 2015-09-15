@@ -11,7 +11,7 @@
  * and license in png.h
  */
 
- /* png_info is a structure that holds the information in a PNG file so
+/* png_info is a structure that holds the information in a PNG file so
  * that the application can find out the characteristics of the image.
  * If you are reading the file, this structure will tell you what is
  * in the PNG file.  If you are writing the file, fill in the information
@@ -57,24 +57,16 @@ struct png_info_def
    /* The following are necessary for every PNG file */
    png_uint_32 width;  /* width of image in pixels (from IHDR) */
    png_uint_32 height; /* height of image in pixels (from IHDR) */
-   png_uint_32 valid;  /* valid chunk data (see PNG_INFO_ below) */
-   png_size_t rowbytes; /* bytes needed to hold an untransformed row */
+   unsigned int valid;  /* valid chunk data (see PNG_INFO_ in png.h) */
    png_colorp palette;      /* array of color values (valid & PNG_INFO_PLTE) */
-   png_uint_16 num_palette; /* number of color entries in "palette" (PLTE) */
-   png_uint_16 num_trans;   /* number of transparent palette color (tRNS) */
-   png_byte bit_depth;      /* 1, 2, 4, 8, or 16 bits/channel (from IHDR) */
-   png_byte color_type;     /* see PNG_COLOR_TYPE_ below (from IHDR) */
+   unsigned int num_palette:9; /* number of color entries in "palette" (PLTE) */
+   unsigned int num_trans:9;   /* number of transparent palette color (tRNS) */
+   unsigned int bit_depth:6;   /* 1, 2, 4, 8, 16 or 32 bits/channel */
+   unsigned int format:PNG_RF_BITS; /* row format; see png_struct.h */
    /* The following three should have been named *_method not *_type */
    png_byte compression_type; /* must be PNG_COMPRESSION_TYPE_BASE (IHDR) */
    png_byte filter_type;    /* must be PNG_FILTER_TYPE_BASE (from IHDR) */
    png_byte interlace_type; /* One of PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
-
-   /* The following are set by png_set_IHDR, called from the application on
-    * write, but the are never actually used by the write code.
-    */
-   png_byte channels;       /* number of data channels per pixel (1, 2, 3, 4) */
-   png_byte pixel_depth;    /* number of bits per pixel */
-   png_byte spare_byte;     /* to align the data, and for future use */
 
 #ifdef PNG_READ_SUPPORTED
    /* This is never set during write */
