@@ -1,0 +1,27 @@
+# contrib/neon/neon.am
+#
+# This is an automake fragment included by the top-level Makefile.am if
+# contrib/neon/neon.ac is included in configure 
+#
+# It builds the source files in this directory into ARM hardware support for
+# libpng.
+#
+if PNG_ARM_NEON
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += %D%/arm_init.c\
+	%D%/filter_neon.S %D%/filter_neon_intrinsics.c
+
+DFA_EXTENSION += ${srcdir}/%D%/neon.dfa
+
+# This causes pngpriv.h to include the named header.  It is VERY important to
+# understand that this MUST be defined and the header MUST define internal
+# 'extern' functions with PNG_INTERNAL_FUNCTION.  This allows vendors to use
+# static library builds of libpng without clashing with the installed system
+# libpng; see the libpng-prefix option in configure.ac  The value of this
+# #define is included in pnglibconf.h
+#
+# NOTE: you must include the double quotes in the value and you must therefore
+# support the whole thing with single quotes.  If you need to use <> for a
+# header be aware that if you miss out the single quotes you will create a
+# random file.
+AM_CPPFLAGS += -DPNG_EXTENSION_HEADER='"%D%/neon.h"'
+endif

@@ -1,0 +1,41 @@
+# contrib/arm/neon.dfa
+#
+# This is a dfa fragment that is added to DFA_HARDWARE in Makefile.am and
+# consequently is inserted after scripts/pnglibconf.dfa to define extra,
+# hardware, options.
+#
+# The following are required in any fragment to record the copyright holder of
+# the *changes* and the appropriate email for bug reports.  Note that the
+# copyright here is just for the specific configuration; additional files may
+# have additional and/or different copyrights.
+#
+# Later settings (e.g. in user.dfa) will override these settings.
+#
+setting USER_PRIVATEBUILD default "John Bowler"
+setting USER_BUG_REPORTS default "jbowler@acm.org"
+#
+# These options are specific to the ARM NEON hardware optimizations.  At present
+# these optimizations depend on GCC specific pre-processing of an assembler (.S)
+# file so they probably won't work with other compilers.
+#
+# ARM_NEON_OPT: unset: check at compile time (__ARM_NEON__ must be defined by
+#                      the compiler, typically as a result of specifying
+#                      CC="gcc -mfpu=neon".)
+#                   0: disable (even if the CPU has a NEON FPU.)
+#                   1: check at run time (via ARM_NEON_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mfpu=neon to GCC in CC)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as -mfpu=neon will achieve the same
+#           effect as well as applying NEON optimizations to the rest of the
+#           libpng code.
+#           NOTE: any setting other than '0' requires ALIGNED_MEMORY
+# ARM_NEON_API:   (PNG_ARM_NEON == 1) allow the optimization to be switched on
+#                 with png_set_option
+# ARM_NEON_CHECK: (PNG_ARM_NEON == 1) compile a run-time check to see if Neon
+#                 extensions are supported. This is poorly supported and
+#                 deprecated - use the png_set_option API.
+setting ARM_NEON_OPT
+option ARM_NEON_API disabled enables SET_OPTION sets ARM_NEON_OPT 1
+option ARM_NEON_CHECK disabled sets ARM_NEON_OPT 1

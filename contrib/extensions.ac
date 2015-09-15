@@ -1,0 +1,16 @@
+# CONTRIBUTED EXTENSIONS
+#
+# The following extensions are part of a standard libpng distribution.  They are
+# not supported parts of libpng and they are not necessarily released under the
+# same license as libpng.  Please consult the relevant directory for copyright
+# and support information before uncommenting any of the lines below.
+#
+# After you change this file you MUST re-run "autoreconf" to regenerate the
+# configure script, otherwise the change may have no effect.
+#
+# Include the ARM NEON extension:
+#sinclude([contrib/neon/neon.ac])
+#
+# If any of the extensions require automake support (this is likely) automake
+# must include the file contrib/extensions.am
+#libpng_automake_extensions="yes"
