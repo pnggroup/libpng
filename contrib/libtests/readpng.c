@@ -31,6 +31,13 @@
 #  include "../../png.h"
 #endif
 
+#if PNG_LIBPNG_VER < 10700
+   /* READ_INTERLACING was used instead of READ_DEINTERLACE. */
+#  ifdef PNG_READ_INTERLACING_SUPPORTED
+#     define PNG_READ_DEINTERLACE_SUPPORTED
+#  endif
+#endif
+
 static int
 read_png(FILE *fp)
 {

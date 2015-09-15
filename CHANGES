@@ -5158,6 +5158,15 @@ Version 1.7.0beta65 [September 15, 2015]
     "libpng_autotools_extra" list in autogen.sh because it was causing a
     false positive for missing files (bug report by Robert C. Seacord).
   Fixed some bad links in the man page.
+  Renamed the arm subdirectory to contrib/neon.
+  Made minor fixes to the test scripts:
+    pngimage: add --list-combos pngunknown: add --strict to catch warnings
+    pngvalid-standard: remove the spurious --progressive read (compare with
+    pngvalid-progressive-standard!) (John Bowler).
+  Implemented a new chunk parse implementation that can be shared. It
+    is currently shared by the progressive reader and the sequential one
+    (but not yet by the writer) (John Bowler).
+  Implemented shared transform handling that is used throughout (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
