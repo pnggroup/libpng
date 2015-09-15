@@ -31,6 +31,13 @@
 #  include "../../png.h"
 #endif
 
+#if PNG_LIBPNG_VER < 10700
+   /* READ_INTERLACING was used instead of READ_DEINTERLACE. */
+#  ifdef PNG_READ_INTERLACING_SUPPORTED
+#     define PNG_READ_DEINTERLACE_SUPPORTED
+#  endif
+#endif
+
 static int
 read_png(FILE *fp)
 {
@@ -70,7 +77,12 @@ read_png(FILE *fp)
 
       {
          png_uint_32 height = png_get_image_height(png_ptr, info_ptr);
-         int passes = png_set_interlace_handling(png_ptr);
+#        ifdef PNG_READ_DEINTERLACE_SUPPORTED
+            int passes = png_set_interlace_handling(png_ptr);
+#        else
+            int passes = png_get_interlace_type(png_ptr, info_ptr) == 
+               PNG_INTERLACE_ADAM7 ? PNG_INTERLACE_ADAM7_PASSES : 1;
+#        endif
          int pass;
 
          png_start_read_image(png_ptr);
@@ -78,6 +90,11 @@ read_png(FILE *fp)
          for (pass = 0; pass < passes; ++pass)
          {
             png_uint_32 y = height;
+
+#           ifndef PNG_READ_DEINTERLACE_SUPPORTED
+               if (passes == PNG_INTERLACE_ADAM7_PASSES)
+                  y = PNG_PASS_ROWS(y, pass);
+#           endif
 
             /* NOTE: this trashes the row each time; interlace handling won't
              * work, but this avoids memory thrashing for speed testing.
