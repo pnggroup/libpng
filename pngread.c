@@ -174,7 +174,8 @@ png_read_chunk_header(png_structrp png_ptr)
    png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(buf+4);
 
    png_debug2(0, "Reading %lx chunk, length = %lu",
-       (unsigned long)png_ptr->chunk_name, (unsigned long)length);
+       (unsigned long)png_ptr->chunk_name,
+       (unsigned long)png_ptr->chunk_length);
 
    /* Reset the crc and run it over the chunk name. */
    png_reset_crc(png_ptr);
