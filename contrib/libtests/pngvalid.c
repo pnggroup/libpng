@@ -5408,7 +5408,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
 
 #     ifdef PNG_READ_DEINTERLACE_SUPPORTED
 #     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         /* Test both togeher: */
+         /* Test both together: */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/,
             pm->use_update_info);
@@ -6601,8 +6601,8 @@ image_transform_png_set_tRNS_to_alpha_add(image_transform *this,
 
    /* We don't know yet whether there will be a tRNS chunk, but we know that
     * this transformation should do nothing if there already is an alpha
-    * channel.  In addition, afte the bug fix in 1.7.0, there is no longer any
-    * action on a palette image.
+    * channel.  In addition, after the bug fix in 1.7.0, there is no longer
+    * any action on a palette image.
     */
    return
 #  if PNG_LIBPNG_VER >= 10700
