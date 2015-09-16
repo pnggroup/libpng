@@ -1,4 +1,12 @@
-/* PNG CHUNK DESCRIPTIONS.
+
+/* pngchunk.h - PNG chunk descriptions
+ *
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
+ * Copyright (c) 2015 Glenn Randers-Pehrson
+ *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
  *
  * If this list is changed in any way scripts/chunkhash.c must be rebuilt and
  * run to regenerate the lookup functions for the tables described from this

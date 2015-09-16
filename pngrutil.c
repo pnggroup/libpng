@@ -2706,7 +2706,7 @@ png_known_chunks[] =
 #define after_PLTE   (after_start+PNG_HAVE_PLTE)  /* NOTE: PLTE optional */
 #define after_IDAT   (after_PLTE+PNG_AFTER_IDAT)  /* NOTE: PLTE optional */
 
-/* See scripts/chunkdesc.h for how this works: */
+/* See pngchunk.h for how this works: */
 #define PNG_CHUNK_END(n, c1, c2, c3, c4, before, after)\
    { png_handle_ ## n, png_ ##n, before, after }
 #define PNG_CHUNK(n, c1, c2, c3, c4, before, after)\
@@ -2714,7 +2714,7 @@ png_known_chunks[] =
 #define PNG_CHUNK_BEGIN(n, c1, c2, c3, c4, before, after)\
    PNG_CHUNK_END(n, c1, c2, c3, c4, before, after),
 {
-#  include "scripts/chunkdesc.h"
+#  include "pngchunk.h"
 };
 #undef PNG_CHUNK_START
 #undef PNG_CHUNK
@@ -2723,7 +2723,7 @@ png_known_chunks[] =
 #define C_KNOWN ((sizeof png_known_chunks)/(sizeof png_known_chunks[0]))
 
 /* See: scripts/chunkhash.c for code to generate this.  This reads the same
- * description file (scripts/chunkdesc.h) as is included above.  Whenever
+ * description file (pngchunk.h) as is included above.  Whenever
  * that file is changed chunkhash needs to be re-run to generate the lines
  * following this comment.
  *
