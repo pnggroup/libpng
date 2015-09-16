@@ -19,7 +19,7 @@ png_known_chunks[] =
 #define PNG_CHUNK_BEGIN(n, c1, c2, c3, c4, before, after)\
    PNG_CHUNK_END(n, c1, c2, c3, c4, before, after),
 {
-#  include "chunkdesc.h"
+#  include "../pngchunk.h"
 };
 
 #define C_KNOWN ((sizeof png_known_chunks)/(sizeof png_known_chunks[0]))
