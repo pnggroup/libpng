@@ -2452,16 +2452,12 @@ png_do_gamma8_up(png_transformp *transform, png_transform_controlp tc)
          bits -= bit_depth;
          ob = ob | (inb << bits);
          if (bits == 0U)
-            bits = 8U, *dp++ = PNG_BYTE(ob);
-         else
-            bits -= bit_depth;
+            bits = 8U, *dp++ = PNG_BYTE(ob), ob = 0U;
       }
       while (sp < ep);
 
       if (bits < 8U)
          *dp++ = PNG_BYTE(ob);
-
-      UNTESTED
    }
 
    else /* 8-bit --> 8-bit */
@@ -2539,8 +2535,9 @@ png_do_gamma16_up(png_transformp *transform, png_transform_controlp tc)
    tc->bit_depth = bit_depth;
    tc->gamma = tr->to_gamma;
 
-   /* Handle the <8 bit output case differently because there can be no alpha
-    * channel.
+   /* Handle the <8 bit output case differently, the input cannot be color (at
+    * present) and, if there is an alpha channel, then it is for the
+    * low-bit-depth gray input case and we expect the alpha to be transparent.
     */
    if (bit_depth < 8U)
    {
@@ -2548,30 +2545,73 @@ png_do_gamma16_up(png_transformp *transform, png_transform_controlp tc)
       unsigned int bits = 8U;
       unsigned int ob = 0U;
 
-      debug((shifts >> 4) == 1U && shift < 16U);
-      debug(!tr->encode_alpha && !tr->optimize_alpha);
-      affirm(PNG_TC_CHANNELS(*tc) == 1U);
+      affirm((tc->format & PNG_FORMAT_FLAG_COLOR) == 0U);
 
-      do
+      if ((tc->format & PNG_FORMAT_FLAG_ALPHA) == 0U)
       {
-         unsigned int inb = *sp++ << 8; /* high bits first */
-         inb = png_gamma_nxmbit_correct(
-            (inb + *sp++) >> shift, correct, 16U-shift, bit_depth);
+         debug((shifts >> 4) == 1U && shift < 16U);
+         debug(!tr->encode_alpha && !tr->optimize_alpha);
 
-         bits -= bit_depth;
-         ob = ob | (inb << bits);
-         if (bits == 0U)
-            bits = 8U, *dp++ = PNG_BYTE(ob);
-         else
+         do
+         {
+            unsigned int inb = *sp++ << 8; /* high bits first */
+            inb = png_gamma_nxmbit_correct(
+               (inb + *sp++) >> shift, correct, 16U-shift, bit_depth);
+
             bits -= bit_depth;
+            ob = ob | (inb << bits);
+            if (bits == 0U)
+               bits = 8U, *dp++ = PNG_BYTE(ob), ob = 0U;
+         }
+         while (sp < ep);
+
+         UNTESTED
       }
-      while (sp < ep);
+
+      else /* low bit GA intermediate format */
+      {
+         debug((shifts >> 8) == 1U && shift < 16U);
+         debug(!tr->encode_alpha && !tr->optimize_alpha);
+         debug(tc->transparent_alpha);
+
+         /* Gray is first then the alpha component, the alpha component is just
+          * mapped to 0 or 1.
+          */
+         do
+         {
+            unsigned int gray = *sp++ << 8; /* high bits first */
+            unsigned int alpha;
+            gray += *sp++;
+
+            alpha = (*sp++ << 8);
+            alpha += *sp++;
+
+            if (alpha == 0U)
+               gray = 0U; /* will be replaced later */
+
+            else
+            {
+               gray = png_gamma_nxmbit_correct(gray >> shift, correct,
+                     16U-shift, bit_depth);
+               debug(alpha == 65535U);
+               alpha = (1U << bit_depth)-1U;
+            }
+
+            bits -= bit_depth;
+            ob = ob | (gray << bits);
+            bits -= bit_depth;
+            ob = ob | (alpha << bits);
+
+            if (bits == 0U)
+               bits = 8U, *dp++ = PNG_BYTE(ob), ob = 0U;
+         }
+         while (sp < ep-2U);
+      }
 
       if (bits < 8U)
          *dp++ = PNG_BYTE(ob);
 
       debug(sp == ep+1U);
-      UNTESTED
    }
 
    else
@@ -2901,14 +2941,28 @@ png_do_scale16_up(png_transformp *transform, png_transform_controlp tc)
    affirm(tr->shifts != 0U/*uninitialized*/);
 
    /* This is exactly the same as above but without the gamma correction and
-    * without the 8-bit target support.  There can only be one channel:
+    * without the 8-bit target support.  The code handles one or two channels,
+    * but the result is not a PNG format unless the number of channels is just
+    * 1 (grayscale).
+    *
+    * For multi-channel low bit depth the channels are packed into bytes using
+    * the standard PNG big-endian packing.
     */
-   affirm(PNG_TC_CHANNELS(*tc) == 1U);
+   affirm((tc->format & PNG_FORMAT_FLAG_COLOR) == 0);
+   /* The alpha shift is actually ignored; at present we only get here with an
+    * alpha channel if it is to be removed for transparent alpha processing.
+    */
+   debug(tc->format & PNG_FORMAT_FLAG_ALPHA ?
+         (tr->shifts >> 8) == 1U : (tr->shifts >> 4) == 1U);
+   debug(tc->transparent_alpha);
 
    tc->sp = dp;
    /* This is a pure scaling operation so sBIT is not invalidated or altered. */
    tc->bit_depth = bit_depth;
 
+   /* TODO: maybe do this properly and use the alpha shift, but only the top bit
+    * matters.
+    */
    {
       const unsigned int shift = tr->shifts & 0xFU;
       const png_uint_32 factor = tr->channel_scale[0];
@@ -2925,16 +2979,12 @@ png_do_scale16_up(png_transformp *transform, png_transform_controlp tc)
          bits -= bit_depth;
          ob = ob | (inb << bits);
          if (bits == 0U)
-            bits = 8U, *dp++ = PNG_BYTE(ob);
-         else
-            bits -= bit_depth;
+            bits = 8U, *dp++ = PNG_BYTE(ob), ob = 0U;
       }
       while (sp < ep);
 
       if (bits < 8U)
          *dp++ = PNG_BYTE(ob);
-
-      UNTESTED
    }
 #  undef png_ptr
 }
@@ -3368,7 +3418,6 @@ png_init_gamma(png_transformp *transform, png_transform_controlp tc)
             (void)init_gamma_sBIT(tr, tc);
             tr->tr.fn = png_do_scale16_up;
             tc->bit_depth = tr->to_bit_depth;
-            UNTESTED
          }
       }
 
@@ -4176,11 +4225,13 @@ gamma_correct_background(png_transform_background *tr,
 
    /* The background is assumed to be full precision; there is no sBIT
     * information for it.  The convertion converts from the current depth and
-    * gamma of the background to that in the transform control.
+    * gamma of the background to that in the transform control.  It uses the
+    * full 16-bit precision when considering the gamma values even though this
+    * is probably spurious.
     */
    if (correction != 0 && (tr->background_gamma == 0 ||
        png_gamma_equal(png_ptr, tr->background_gamma, correction, &correction,
-          bdback)))
+          16U)))
       correction = 0; /* no correction! */
 
    if (tr->background_is_gray)
@@ -4197,9 +4248,8 @@ gamma_correct_background(png_transform_background *tr,
          correction, bdrow);
    }
 
-   if (correction != 0)
-      tr->background_gamma = tc->gamma;
-
+   /* Regardless of whether there was a correction set the background gamma: */
+   tr->background_gamma = tc->gamma;
    tr->background_bit_depth = png_check_bits(png_ptr, bdrow, 5U);
 #  undef png_ptr
 }
@@ -4211,7 +4261,7 @@ fill_background_pixel(png_transform_background *tr, png_transform_controlp tc)
    /* Fill in 'background_pixel' if the appropriate sequence of bytes for the
     * format given in the transform control.
     */
-   const unsigned int bdtc = tc->bit_depth;
+   unsigned int bdtc = tc->bit_depth;
 
    /* If necessary adjust the background pixel to the current row format (it is
     * important to do this as late as possible to avoid spurious
@@ -4225,8 +4275,15 @@ fill_background_pixel(png_transform_background *tr, png_transform_controlp tc)
 
       /* 'g' now has enough bits for the destination, note that in the case of
        * low bit depth gray this causes the pixel to be replicated through the
-       * written byte.  Fill all six bytes:
+       * written byte.  Fill all six bytes with the replicated background:
        */
+      while (bdtc < 8U)
+      {
+         g &= (1U << bdtc) - 1U; /* use only the low bits */
+         g |= g << bdtc;
+         bdtc <<= 1;
+      }
+
       memset(tr->background_pixel, PNG_BYTE(g), 6U);
       if (bdtc == 16U)
          tr->background_pixel[0] = tr->background_pixel[2] =
@@ -4409,9 +4466,6 @@ png_do_set_row(png_transformp *transform, png_transform_controlp tc)
 
    tc->sp = dp;
    memset(dp, (*transform)->args >> 24, PNG_TC_ROWBYTES(*tc));
-#  define png_ptr (tc->png_ptr)
-   UNTESTED
-#  undef png_ptr
 }
 
 static void
@@ -4431,8 +4485,9 @@ png_do_replace_tRNS_lbd(png_transformp *transform, png_transform_controlp tc)
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc);
-   const unsigned int transparent_pixel = tr->transparent_pixel[0];
-   const unsigned int background_pixel = tr->background_pixel[0];
+   const unsigned int copy = sp != dp;
+   const png_byte transparent_pixel = tr->transparent_pixel[0];
+   const png_byte background_pixel = tr->background_pixel[0];
 
    /* We expect opaque and transparent pixels to be interleaved but with long
     * sequences of each.
@@ -4470,19 +4525,28 @@ png_do_replace_tRNS_lbd(png_transformp *transform, png_transform_controlp tc)
     */
    if (tc->bit_depth == 4U)
    {
+      /* For the moment the algorithm isn't used; there are only two pixels in
+       * each byte so it is likely to be quicker to check as below:
+       */
       do
       {
-         unsigned int b = *sp++;
-         unsigned int m = b;
+         const png_byte b = *sp++;
+         const unsigned int m = b ^ transparent_pixel;
 
-         m ^= transparent_pixel;         /* Set transparent pixels to 0 */
-         m = 0x88U & ((m - 0x11U) & ~m); /* Top bit set for transparent pixel */
-         m |= m >> 1;                    /* Set all four bits */
-         m |= m >> 2;
+         if (m == 0U) /* both transparent */
+            *dp = background_pixel;
 
-         *dp++ = PNG_BYTE((b & ~m) | (background_pixel & m));
+         else if ((m & 0xF0U) == 0U) /* first transparent */
+            *dp = PNG_BYTE((background_pixel & 0xF0U) | (b & 0x0FU));
+
+         else if ((m & 0x0FU) == 0U) /* second transparent */
+            *dp = PNG_BYTE((background_pixel & 0x0FU) | (b & 0xF0U));
+
+         else if (copy) /* neither transparent */
+            *dp = b;
+
+         ++dp;
       } while (sp < ep);
-      UNTESTED
    }
 
    else
@@ -4491,19 +4555,31 @@ png_do_replace_tRNS_lbd(png_transformp *transform, png_transform_controlp tc)
 
       do
       {
-         unsigned int b = *sp++;
-         unsigned int m = b;
+         const png_byte b = *sp++;
+         const unsigned int m = b ^ transparent_pixel;
 
-         m ^= transparent_pixel;         /* Set transparent pixels to 0 */
-         m = 0xCCU & ((m - 0x55U) & ~m); /* Top bit set for transparent pixel */
-         m |= m >> 1;                    /* Set both bits */
+         if (m == 0U) /* transparent */
+            *dp = background_pixel;
 
-         *dp++ = PNG_BYTE((b & ~m) | (background_pixel & m));
+         else if (0xAAU & ((m - 0x55U) & ~m))
+         {
+            /* One or more pixels transparent */
+            const unsigned int mask =
+               (m & 0xC0U ? 0xC0U : 0U) |
+               (m & 0x30U ? 0x30U : 0U) |
+               (m & 0x0CU ? 0x0CU : 0U) |
+               (m & 0x03U ? 0x03U : 0U);
+
+            *dp = PNG_BYTE((b & mask) | (background_pixel & ~mask));
+         }
+
+         else if (copy) /* no transparent pixels */
+            *dp = b;
+
+         ++dp;
       } while (sp < ep);
-      UNTESTED
    }
 
-   UNTESTED
 #  undef png_ptr
 }
 
@@ -4569,6 +4645,76 @@ png_do_background_with_transparent_GA16(png_transformp *transform,
    } while (sp < ep);
 
    debug(sp == ep+3U);
+#  undef png_ptr
+}
+
+static void
+png_do_background_with_transparent_GAlbd(png_transformp *transform,
+   png_transform_controlp tc)
+   /* This is the low-bit-depth gray case, the input is 1, 2 or 4-bit per
+    * channel gray-alpha.
+    */
+{
+#  define png_ptr (tc->png_ptr)
+   png_transform_background *tr =
+      png_transform_cast(png_transform_background, *transform);
+   png_bytep dp = png_voidcast(png_bytep, tc->dp);
+   png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
+   const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc);
+   const unsigned int bit_depth = tc->bit_depth;
+   const unsigned int mask = (1U << bit_depth) - 1U;
+   const unsigned int back = tr->background_pixel[0] & mask;
+   unsigned int opos, ob, inb;
+
+   debug(bit_depth < 8U && tc->format == PNG_FORMAT_GA && tr->ntrans == 1U);
+   tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
+   tc->sp = dp;
+
+   ob = 0U;   /* output byte */
+   opos = 0U; /* bit index of previous output pixel (counts down) */
+   inb = 0U;  /* quiet a GCC 4.8.5 warning */
+
+   for (;;)
+   {
+      /* The output is half the size of the input, so we need a new input byte
+       * for every 4 bits of output:
+       */
+      if (opos == 0U || opos == 4U)
+      {
+         if (sp >= ep)
+            break;
+
+         inb = *sp++;
+      }
+
+      /* Move to the next *output* pixel, this wraps when bits is 0U: */
+      opos = (opos - bit_depth) & 0x7U;
+
+      /* Extract the whole input pixel to the low bits of a temporary: */
+      {
+         unsigned int pixel = inb >> ((opos*2U) & 0x7U);
+
+         /* The alpha channel is second, check for a value of 0: */
+         if ((pixel & mask)/* A component*/ == 0U)
+            pixel = back;
+
+         else
+         {
+            debug((pixel & mask) == mask);
+            pixel = (pixel >> bit_depth) & mask; /* G component */
+         }
+
+         ob |= pixel << opos;
+      }
+
+      if (opos == 0U)
+         *dp++ = PNG_BYTE(ob), ob = 0U;
+   }
+
+   if (opos != 0U)
+      *dp++ = PNG_BYTE(ob);
+
+   debug(sp == ep);
 #  undef png_ptr
 }
 
@@ -4662,11 +4808,11 @@ png_init_background_transparent(png_transformp *transform,
       if (tc->bit_depth == 8U)
          tr->tr.fn = png_do_background_with_transparent_GA8;
 
-      else
-      {
-         debug(tc->bit_depth == 16U);
+      else if (tc->bit_depth == 16U)
          tr->tr.fn = png_do_background_with_transparent_GA16;
-      }
+
+      else /* low-bit-depth gray with alpha (not a PNG format!) */
+         tr->tr.fn = png_do_background_with_transparent_GAlbd;
    }
 
    else /* color */
@@ -5070,7 +5216,14 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
          /* tRNS will be expanded, or handled */
          tc->invalid_info |= PNG_INFO_tRNS;
          if (!tr->compose_background)
+         {
             tc->format |= PNG_FORMAT_FLAG_ALPHA;
+            /* And in this case, only, because we are adding an alpha channel we
+             * need to have a channel depth of at least 8:
+             */
+            if (tc->bit_depth < 8U)
+               tc->bit_depth = 8U;
+         }
       }
 
       else /* no transparent pixels to change */
@@ -5147,6 +5300,7 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
             /* TODO: it may be impossible to get here! */
             affirm(tc->transparent_alpha);
             /* This init routine does the sBIT handling: */
+            UNTESTED
             png_init_background_transparent(transform, tc);
             UNTESTED
          }
@@ -5176,13 +5330,14 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
              *
              * NOTE: for palette images this test happens in the caching
              * operation, so the answer is still correct.
+             *
+             * NOTE: for low bit depth gray both 'transparent_pixel' and
+             * 'background_pixel' have been expanded to fill a byte, so this
+             * works.
              */
             if (memcmp(tr->transparent_pixel, tr->background_pixel, tr->ntrans)
                 == 0)
-            {
                tr->tr.fn = NULL;
-               UNTESTED
-            }
 
             /* Then the processing function depends on the pixel size: */
             else if (tr->ntrans > 1U)
@@ -5204,14 +5359,10 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
                args |= PNG_INFO_tRNS | PNG_INFO_sRGB;
                tr->tr.args = args;
                tr->tr.fn = png_do_set_row;
-               UNTESTED
             }
 
             else
-            {
                tr->tr.fn = png_do_replace_tRNS_lbd;
-               UNTESTED
-            }
 
             tc->invalid_info |= PNG_INFO_tRNS | PNG_INFO_sBIT;
             tc->sBIT_R = tc->sBIT_G = tc->sBIT_B = tc->sBIT_A =
@@ -6061,8 +6212,8 @@ make_cache(png_structp png_ptr, png_cache_paramsp cp, unsigned int max_depth)
    /* At present the cache is just a byte lookup table.  We need the original
     * pixel depth to work out how big the working buffer needs to be.
     */
-   unsigned int ipd = PNG_TC_PIXEL_DEPTH(cp->tstart);
-   unsigned int opd = PNG_TC_PIXEL_DEPTH(cp->tend);
+   const unsigned int ipd = PNG_TC_PIXEL_DEPTH(cp->tstart);
+   const unsigned int opd = PNG_TC_PIXEL_DEPTH(cp->tend);
    unsigned int order; /* records position of start transform */
    unsigned int width; /* width of cache in pixels */
    png_tc_channel_data save; /* Record of the final channel info */
@@ -6075,6 +6226,7 @@ make_cache(png_structp png_ptr, png_cache_paramsp cp, unsigned int max_depth)
 
    debug(cp->tend.init == PNG_TC_INIT_FINAL);
    affirm(opd <= 64 && max_depth <= 64); /* or the cache is not big enough */
+   affirm(ipd == opd || (opd & 0x7U) == 0);
 
    if ((cp->tstart.format & PNG_FORMAT_FLAG_COLORMAP) != 0)
       width = setup_palette_cache(png_ptr, cache.b8);
@@ -6243,8 +6395,6 @@ make_cache(png_structp png_ptr, png_cache_paramsp cp, unsigned int max_depth)
        * opd.
        */
       png_transform_fn fn;
-
-      affirm((opd & 7U) == 0); /* must be whole bytes */
 
 #     define C(ipd,opd) ((ipd) + 8*(opd))
       switch (C(ipd,opd))

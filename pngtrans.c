@@ -399,7 +399,7 @@ png_push_transform(png_structrp png_ptr, size_t size, png_transform_fn fn,
       }
       while (tr != NULL && tr->order == old_order);
 
-      affirm(tr->order > old_order);
+      affirm(tr == NULL || tr->order > old_order);
    }
 
    *transform = png_add_transform(png_ptr, size, fn, order);
