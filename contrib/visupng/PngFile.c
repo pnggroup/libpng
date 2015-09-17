@@ -136,7 +136,7 @@ BOOL PngLoadImage (PTSTR pstrFileName, png_byte **ppbImageData,
 
     /* create the two png(-info) structures */
 
-    png_ptr = png_create_read_struct(png_get_libpng_ver(NULL), NULL,
+    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
     if (!png_ptr)
     {
@@ -313,7 +313,7 @@ BOOL PngSaveImage (PTSTR pstrFileName, png_byte *pDiData,
 
     /* prepare the standard PNG structures */
 
-    png_ptr = png_create_write_struct(png_get_libpng_ver(NULL), NULL,
+    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL,
       (png_error_ptr)png_cexcept_error, (png_error_ptr)NULL);
     if (!png_ptr)
     {

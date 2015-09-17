@@ -1,12 +1,11 @@
 /*===
-cexcept.h 2.0.1 (2008-Jul-19-Sat, modified 2015-Jun-03-Mon)
+cexcept.h 2.0.1 (2008-Jul-19-Sat)
 http://www.nicemice.net/cexcept/
 Adam M. Costello
 http://www.nicemice.net/amc/
 
 An interface for exception-handling in ANSI C (C89 and subsequent ISO
-standards), developed jointly with Cosmin Truta.  Revised by John Bowler,
-June 2015, to declare exception_env and exception_prev "volatile".
+standards), developed jointly with Cosmin Truta.
 
     Copyright (c) 2000-2008 Adam M. Costello and Cosmin Truta.
     This software may be modified only if its author and version
@@ -211,7 +210,7 @@ struct exception_context { \
 
 #define Try \
   { \
-    jmp_buf * volatile exception__prev, exception__env; \
+    jmp_buf *exception__prev, exception__env; \
     exception__prev = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \

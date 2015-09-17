@@ -107,7 +107,7 @@ typedef struct chunk_insert
    png_charp            parameters[1];
 } chunk_insert;
 
-static int
+static unsigned int
 channels_of_type(int color_type)
 {
    if (color_type & PNG_COLOR_MASK_PALETTE)
@@ -128,7 +128,7 @@ channels_of_type(int color_type)
    }
 }
 
-static int
+static unsigned int
 pixel_depth_of_type(int color_type, int bit_depth)
 {
    return channels_of_type(color_type) * bit_depth;
@@ -682,7 +682,11 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
       png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, filters);
 
       {
-         int passes = png_set_interlace_handling(png_ptr);
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
+            int passes = png_set_interlace_handling(png_ptr);
+#        else /* !WRITE_INTERLACING */
+            int passes = 1;
+#        endif /* !WRITE_INTERLACING */
          int pass;
          png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
