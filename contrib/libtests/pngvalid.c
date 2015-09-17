@@ -5408,7 +5408,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
 
 #     ifdef PNG_READ_DEINTERLACE_SUPPORTED
 #     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         /* Test both togeher: */
+         /* Test both together: */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/,
             pm->use_update_info);
@@ -5661,10 +5661,13 @@ image_pixel_convert_PLTE(image_pixel *this)
 /* Add an alpha channel; this will import the tRNS information because tRNS is
  * not valid in an alpha image.  The bit depth will invariably be set to at
  * least 8 prior to 1.7.0.  Palette images will be converted to alpha (using
- * the above API).
+ * the above API).  With png_set_background the alpha channel is never expanded
+ * but this routine is used by pngvalid to simplify code; 'for_background'
+ * records this.
  */
 static void
-image_pixel_add_alpha(image_pixel *this, const standard_display *display)
+image_pixel_add_alpha(image_pixel *this, const standard_display *display,
+   int for_background)
 {
    if (this->colour_type == PNG_COLOR_TYPE_PALETTE)
       image_pixel_convert_PLTE(this);
@@ -5674,7 +5677,7 @@ image_pixel_add_alpha(image_pixel *this, const standard_display *display)
       if (this->colour_type == PNG_COLOR_TYPE_GRAY)
       {
 #        if PNG_LIBPNG_VER < 10700
-            if (this->bit_depth < 8)
+            if (!for_background && this->bit_depth < 8)
                this->bit_depth = this->sample_depth = 8;
 #        endif
 
@@ -5684,7 +5687,7 @@ image_pixel_add_alpha(image_pixel *this, const standard_display *display)
              * tRNS chunk to expand at this point.
              */
 #           if PNG_LIBPNG_VER >= 10700
-               if (this->bit_depth < 8)
+               if (!for_background && this->bit_depth < 8)
                   this->bit_depth = this->sample_depth = 8;
 #           endif
 
@@ -6574,7 +6577,7 @@ image_transform_png_set_tRNS_to_alpha_mod(const image_transform *this,
          if (that->colour_type != PNG_COLOR_TYPE_PALETTE &&
              (that->colour_type & PNG_COLOR_MASK_ALPHA) == 0)
 #     endif
-      image_pixel_add_alpha(that, &display->this);
+      image_pixel_add_alpha(that, &display->this, 0/*!for background*/);
 
 #if PNG_LIBPNG_VER < 10700
    /* LIBPNG BUG: otherwise libpng still expands to 8 bits! */
@@ -6601,8 +6604,8 @@ image_transform_png_set_tRNS_to_alpha_add(image_transform *this,
 
    /* We don't know yet whether there will be a tRNS chunk, but we know that
     * this transformation should do nothing if there already is an alpha
-    * channel.  In addition, afte the bug fix in 1.7.0, there is no longer any
-    * action on a palette image.
+    * channel.  In addition, after the bug fix in 1.7.0, there is no longer
+    * any action on a palette image.
     */
    return
 #  if PNG_LIBPNG_VER >= 10700
@@ -6638,7 +6641,7 @@ image_transform_png_set_gray_to_rgb_mod(const image_transform *this,
     * doesn't do this, so we don't either.
     */
    if ((that->colour_type & PNG_COLOR_MASK_COLOR) == 0 && that->have_tRNS)
-      image_pixel_add_alpha(that, &display->this);
+      image_pixel_add_alpha(that, &display->this, 0/*!for background*/);
 
    /* Simply expand the bit depth and alter the colour type as required. */
    if (that->colour_type == PNG_COLOR_TYPE_GRAY)
@@ -6702,7 +6705,7 @@ image_transform_png_set_expand_mod(const image_transform *this,
       that->sample_depth = that->bit_depth = 8;
 
    if (that->have_tRNS)
-      image_pixel_add_alpha(that, &display->this);
+      image_pixel_add_alpha(that, &display->this, 0/*!for background*/);
 
    this->next->mod(this->next, that, pp, display);
 }
@@ -6812,7 +6815,7 @@ image_transform_png_set_expand_16_mod(const image_transform *this,
       image_pixel_convert_PLTE(that);
 
    if (that->have_tRNS)
-      image_pixel_add_alpha(that, &display->this);
+      image_pixel_add_alpha(that, &display->this, 0/*!for background*/);
 
    if (that->bit_depth < 16)
       that->sample_depth = that->bit_depth = 16;
@@ -7755,7 +7758,7 @@ image_transform_png_set_background_mod(const image_transform *this,
 {
    /* Check for tRNS first: */
    if (that->have_tRNS && that->colour_type != PNG_COLOR_TYPE_PALETTE)
-      image_pixel_add_alpha(that, &display->this);
+      image_pixel_add_alpha(that, &display->this, 1/*for background*/);
 
    /* This is only necessary if the alpha value is less than 1. */
    if (that->alphaf < 1)
@@ -11109,9 +11112,9 @@ int main(int argc, char **argv)
 #  endif
    pm.test_lbg = 0;
    pm.test_lbg_gamma_threshold = 1;
-   pm.test_lbg_gamma_transform = 0/*PNG_LIBPNG_VER >= 10700*/;
+   pm.test_lbg_gamma_transform = PNG_LIBPNG_VER >= 10600;
    pm.test_lbg_gamma_sbit = 1;
-   pm.test_lbg_gamma_composition = 0;
+   pm.test_lbg_gamma_composition = PNG_LIBPNG_VER >= 10700;
 
    /* And the test encodings */
    pm.encodings = test_encodings;
