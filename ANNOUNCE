@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta65 - September 15, 2015
+Libpng 1.7.0beta65 - September 16, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -852,7 +852,7 @@ Version 1.7.0beta64 [July 26, 2015]
   Belatedly added Mans Rullgard and James Yu to the list of Contributing
     Authors.
 
-Version 1.7.0beta65 [September 15, 2015]
+Version 1.7.0beta65 [September 16, 2015]
   Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
     because usleep() is deprecated (port from libpng16).
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
@@ -861,6 +861,15 @@ Version 1.7.0beta65 [September 15, 2015]
     "libpng_autotools_extra" list in autogen.sh because it was causing a
     false positive for missing files (bug report by Robert C. Seacord).
   Fixed some bad links in the man page.
+  Renamed the arm subdirectory to contrib/neon.
+  Made minor fixes to the test scripts:
+    pngimage: add --list-combos pngunknown: add --strict to catch warnings
+    pngvalid-standard: remove the spurious --progressive read (compare with
+    pngvalid-progressive-standard!) (John Bowler).
+  Implemented a new chunk parse implementation that can be shared. It
+    is currently shared by the progressive reader and the sequential one
+    (but not yet by the writer) (John Bowler).
+  Implemented shared transform handling that is used throughout (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

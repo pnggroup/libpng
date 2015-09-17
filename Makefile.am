@@ -82,7 +82,8 @@ lib_LTLIBRARIES=libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c pngrutil.c\
 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
-	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
+	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngchunk.h \
+	pngusr.dfa
 
 # Include libpng extensions, if appropriate.  This uses a Makefile.am fragment,
 # pre-set things that might be changed by addition:
@@ -285,7 +286,7 @@ scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm pnglibconf.tf6
 	mv pnglibconf.tf7 $@
 
-$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
+$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h pngchunk.h \
 	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h pngprefix.h
 
 test: check-am
