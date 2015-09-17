@@ -5168,6 +5168,17 @@ Version 1.7.0beta65 [September 16, 2015]
     (but not yet by the writer) (John Bowler).
   Implemented shared transform handling that is used throughout (John Bowler).
 
+Version 1.7.0beta66 [September 17, 2015]
+  Enabled the low-bit-depth gray tests that were disabled in prior versions
+    of libpng because of problems that should have been fixed by the recent
+    changes to libpng17. Enabling the tests revealed bugs in those changes
+    which are now corrected.
+  Replaced the memcpy of png_transform_background with a structure copy
+    which is safer since it doesn't depend on knowing the first member to
+    be copied, also the copies are improved to copy the transform args too;
+    not required at present but it may prevent a bug being introduced in
+    the future.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
