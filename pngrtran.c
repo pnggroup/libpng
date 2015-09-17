@@ -4049,19 +4049,22 @@ png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
 typedef struct
 {
    png_transform     tr;
-   png_color_16      background;     /* MUST COME FIRST */
-   unsigned int      need_expand :1; /* Background matches format of this PNG */
-   unsigned int      rgb_to_gray :1; /* RGB-to-gray transform found */
-   unsigned int      compose_background   :1; /* png_set_background */
-   unsigned int      associate_alpha      :1;
-   unsigned int      encode_alpha         :1;
-   unsigned int      optimize_alpha       :1;
-   unsigned int      background_is_gray   :1; /* Background color is gray */
-   unsigned int      background_bit_depth :5; /* bit depth, 1..16 */
-   unsigned int      ntrans               :3; /* 1..6 bytes */
-   png_byte          transparent_pixel[6];
-   png_byte          background_pixel[6];
-   png_fixed_point   background_gamma;
+   struct
+   {
+      png_color_16      background;
+      unsigned int      need_expand :1; /* Background matches format of PNG */
+      unsigned int      rgb_to_gray :1; /* RGB-to-gray transform found */
+      unsigned int      compose_background   :1; /* png_set_background */
+      unsigned int      associate_alpha      :1;
+      unsigned int      encode_alpha         :1;
+      unsigned int      optimize_alpha       :1;
+      unsigned int      background_is_gray   :1; /* Background color is gray */
+      unsigned int      background_bit_depth :5; /* bit depth, 1..16 */
+      unsigned int      ntrans               :3; /* 1..6 bytes */
+      png_byte          transparent_pixel[6];
+      png_byte          background_pixel[6];
+      png_fixed_point   background_gamma;
+   }  st; /* to allow the whole state to be copied reliably */
 }  png_transform_background;
 
 static void
@@ -4074,9 +4077,9 @@ resolve_background_color(png_transform_background *tr,
     * special case is when need_expand is set and the PNG has palette format,
     * then (and only then) the background value is a palette index.
     */
-   if (tr->need_expand && tc->palette)
+   if (tr->st.need_expand && tc->palette)
    {
-      unsigned int i = tr->background.index;
+      unsigned int i = tr->st.background.index;
       png_byte r, g, b;
 
       if (i >= png_ptr->num_palette)
@@ -4086,24 +4089,24 @@ resolve_background_color(png_transform_background *tr,
          return;
       }
 
-      tr->background_bit_depth = 8U;
+      tr->st.background_bit_depth = 8U;
       r = png_ptr->palette[i].red;
       g = png_ptr->palette[i].green;
       b = png_ptr->palette[i].blue;
 
       if (r == g && g == b)
       {
-         tr->background_is_gray = 1U;
-         tr->background.gray = g;
+         tr->st.background_is_gray = 1U;
+         tr->st.background.gray = g;
          UNTESTED
       }
 
       else
       {
-         tr->background_is_gray = 0U;
-         tr->background.red = r;
-         tr->background.green = g;
-         tr->background.blue = b;
+         tr->st.background_is_gray = 0U;
+         tr->st.background.red = r;
+         tr->st.background.green = g;
+         tr->st.background.blue = b;
          UNTESTED
       }
    }
@@ -4116,10 +4119,10 @@ resolve_background_color(png_transform_background *tr,
       /* First work out the bit depth and whether or not to use the RGB
        * fields of the background.
        */
-      if (tr->need_expand)
+      if (tr->st.need_expand)
       {
          affirm(!(tc->format & PNG_FORMAT_FLAG_COLORMAP));
-         tr->background_bit_depth =
+         tr->st.background_bit_depth =
             png_check_bits(png_ptr, png_ptr->bit_depth, 5U);
          use_rgb = (png_ptr->color_type & PNG_COLOR_MASK_COLOR) != 0;
       }
@@ -4131,10 +4134,10 @@ resolve_background_color(png_transform_background *tr,
           * COLORMAP PNG  and png_set_quantize.
           */
          if ((png_ptr->row_format & PNG_FORMAT_FLAG_COLORMAP) != 0)
-            tr->background_bit_depth = 8U;
+            tr->st.background_bit_depth = 8U;
 
          else
-            tr->background_bit_depth =
+            tr->st.background_bit_depth =
                png_check_bits(png_ptr, png_ptr->row_bit_depth, 5U);
 
          use_rgb = (png_ptr->row_format & PNG_FORMAT_FLAG_COLOR) != 0;
@@ -4144,35 +4147,35 @@ resolve_background_color(png_transform_background *tr,
        * the high bits here (at present no warning is produced if they are
        * set.)
        */
-      mask = png_check_u16(png_ptr, (1U << tr->background_bit_depth)-1U);
+      mask = png_check_u16(png_ptr, (1U << tr->st.background_bit_depth)-1U);
 
       if (use_rgb)
       {
          png_uint_16 r, g, b;
 
-         r = tr->background.red & mask;
-         g = tr->background.green & mask;
-         b = tr->background.blue & mask;
+         r = tr->st.background.red & mask;
+         g = tr->st.background.green & mask;
+         b = tr->st.background.blue & mask;
 
          if (r == g && g == b)
          {
-            tr->background_is_gray = 1U;
-            tr->background.gray = g;
+            tr->st.background_is_gray = 1U;
+            tr->st.background.gray = g;
          }
 
          else
          {
-            tr->background_is_gray = 0U;
-            tr->background.red = r;
-            tr->background.green = g;
-            tr->background.blue = b;
+            tr->st.background_is_gray = 0U;
+            tr->st.background.red = r;
+            tr->st.background.green = g;
+            tr->st.background.blue = b;
          }
       }
 
       else /* gray */
       {
-         tr->background_is_gray = 1U;
-         tr->background.gray = tr->background.gray & mask;
+         tr->st.background_is_gray = 1U;
+         tr->st.background.gray = tr->st.background.gray & mask;
       }
    }
 }
@@ -4213,7 +4216,7 @@ gamma_correct_background(png_transform_background *tr,
 {
 #  define png_ptr (tc->png_ptr)
    png_fixed_point correction = tc->gamma;
-   const unsigned int bdback = tr->background_bit_depth;
+   const unsigned int bdback = tr->st.background_bit_depth;
    const unsigned int bdrow = tc->bit_depth;
 
    /* This is harmless if it fails but it will damage the output pixels - they
@@ -4221,7 +4224,7 @@ gamma_correct_background(png_transform_background *tr,
     * used.
     */
    debug(bdback <= bdrow);
-   debug(tr->background_is_gray || (bdrow >= 8U && bdback >= 8U));
+   debug(tr->st.background_is_gray || (bdrow >= 8U && bdback >= 8U));
 
    /* The background is assumed to be full precision; there is no sBIT
     * information for it.  The convertion converts from the current depth and
@@ -4229,28 +4232,28 @@ gamma_correct_background(png_transform_background *tr,
     * full 16-bit precision when considering the gamma values even though this
     * is probably spurious.
     */
-   if (correction != 0 && (tr->background_gamma == 0 ||
-       png_gamma_equal(png_ptr, tr->background_gamma, correction, &correction,
-          16U)))
+   if (correction != 0 && (tr->st.background_gamma == 0 ||
+       png_gamma_equal(png_ptr, tr->st.background_gamma, correction,
+          &correction, 16U)))
       correction = 0; /* no correction! */
 
-   if (tr->background_is_gray)
-      gamma_correct_background_component(png_ptr, &tr->background.gray, bdback,
-         correction, bdrow);
+   if (tr->st.background_is_gray)
+      gamma_correct_background_component(png_ptr, &tr->st.background.gray,
+            bdback, correction, bdrow);
 
    else
    {
-      gamma_correct_background_component(png_ptr, &tr->background.red, bdback,
-         correction, bdrow);
-      gamma_correct_background_component(png_ptr, &tr->background.green, bdback,
-         correction, bdrow);
-      gamma_correct_background_component(png_ptr, &tr->background.blue, bdback,
-         correction, bdrow);
+      gamma_correct_background_component(png_ptr, &tr->st.background.red,
+            bdback, correction, bdrow);
+      gamma_correct_background_component(png_ptr, &tr->st.background.green,
+            bdback, correction, bdrow);
+      gamma_correct_background_component(png_ptr, &tr->st.background.blue,
+            bdback, correction, bdrow);
    }
 
    /* Regardless of whether there was a correction set the background gamma: */
-   tr->background_gamma = tc->gamma;
-   tr->background_bit_depth = png_check_bits(png_ptr, bdrow, 5U);
+   tr->st.background_gamma = tc->gamma;
+   tr->st.background_bit_depth = png_check_bits(png_ptr, bdrow, 5U);
 #  undef png_ptr
 }
 
@@ -4269,9 +4272,9 @@ fill_background_pixel(png_transform_background *tr, png_transform_controlp tc)
     */
    gamma_correct_background(tr, tc);
 
-   if (tr->background_is_gray)
+   if (tr->st.background_is_gray)
    {
-      unsigned int g = tr->background.gray;
+      unsigned int g = tr->st.background.gray;
 
       /* 'g' now has enough bits for the destination, note that in the case of
        * low bit depth gray this causes the pixel to be replicated through the
@@ -4284,40 +4287,40 @@ fill_background_pixel(png_transform_background *tr, png_transform_controlp tc)
          bdtc <<= 1;
       }
 
-      memset(tr->background_pixel, PNG_BYTE(g), 6U);
+      memset(tr->st.background_pixel, PNG_BYTE(g), 6U);
       if (bdtc == 16U)
-         tr->background_pixel[0] = tr->background_pixel[2] =
-            tr->background_pixel[4] = PNG_BYTE(g >> 8);
+         tr->st.background_pixel[0] = tr->st.background_pixel[2] =
+            tr->st.background_pixel[4] = PNG_BYTE(g >> 8);
       /* Must not include the alpha channel here: */
-      tr->ntrans = png_check_bits(png_ptr,
+      tr->st.ntrans = png_check_bits(png_ptr,
          ((tc->format & PNG_FORMAT_FLAG_COLOR)+1U) << (bdtc == 16U), 3U);
    }
 
    else
    {
-      unsigned int r = tr->background.red;
-      unsigned int g = tr->background.green;
-      unsigned int b = tr->background.blue;
+      unsigned int r = tr->st.background.red;
+      unsigned int g = tr->st.background.green;
+      unsigned int b = tr->st.background.blue;
 
       debug((tc->format & PNG_FORMAT_FLAG_COLOR) != 0);
 
       switch (bdtc)
       {
          case 8U:
-            tr->background_pixel[0] = PNG_BYTE(r);
-            tr->background_pixel[1] = PNG_BYTE(g);
-            tr->background_pixel[2] = PNG_BYTE(b);
-            tr->ntrans = 3U;
+            tr->st.background_pixel[0] = PNG_BYTE(r);
+            tr->st.background_pixel[1] = PNG_BYTE(g);
+            tr->st.background_pixel[2] = PNG_BYTE(b);
+            tr->st.ntrans = 3U;
             break;
 
          case 16U:
-            tr->background_pixel[0] = PNG_BYTE(r>>8);
-            tr->background_pixel[1] = PNG_BYTE(r);
-            tr->background_pixel[2] = PNG_BYTE(g>>8);
-            tr->background_pixel[3] = PNG_BYTE(g);
-            tr->background_pixel[4] = PNG_BYTE(b>>8);
-            tr->background_pixel[5] = PNG_BYTE(b);
-            tr->ntrans = 6U;
+            tr->st.background_pixel[0] = PNG_BYTE(r>>8);
+            tr->st.background_pixel[1] = PNG_BYTE(r);
+            tr->st.background_pixel[2] = PNG_BYTE(g>>8);
+            tr->st.background_pixel[3] = PNG_BYTE(g);
+            tr->st.background_pixel[4] = PNG_BYTE(b>>8);
+            tr->st.background_pixel[5] = PNG_BYTE(b);
+            tr->st.ntrans = 6U;
             break;
 
          default:
@@ -4337,7 +4340,7 @@ png_do_replace_tRNS_multi(png_transformp *transform, png_transform_controlp tc)
    png_transform_background *tr =
       png_transform_cast(png_transform_background, *transform);
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
-   const unsigned int cbytes = tr->ntrans;
+   const unsigned int cbytes = tr->st.ntrans;
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - cbytes/*safety*/;
    const int copy = dp != sp;
@@ -4361,7 +4364,7 @@ png_do_replace_tRNS_multi(png_transformp *transform, png_transform_controlp tc)
       /* Find a transparent pixel, or the end: */
       do
       {
-         if (memcmp(sp, tr->transparent_pixel, cbytes) == 0) /* transparent */
+         if (memcmp(sp, tr->st.transparent_pixel, cbytes) == 0) /*transparent*/
             break;
          sp += cbytes;
       }
@@ -4383,11 +4386,11 @@ png_do_replace_tRNS_multi(png_transformp *transform, png_transform_controlp tc)
        */
       if (sp <= ep) do
       {
-         memcpy(dp, tr->background_pixel, cbytes);
+         memcpy(dp, tr->st.background_pixel, cbytes);
          sp += cbytes;
          dp += cbytes;
       }
-      while (sp <= ep && memcmp(sp, tr->transparent_pixel, cbytes) == 0);
+      while (sp <= ep && memcmp(sp, tr->st.transparent_pixel, cbytes) == 0);
    } while (sp <= ep);
 
    debug(sp == ep+cbytes);
@@ -4405,14 +4408,14 @@ png_do_replace_tRNS_8(png_transformp *transform, png_transform_controlp tc)
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_alloc_size_t row_bytes = tc->width;
    const int copy = dp != sp;
-   const int transparent_pixel = tr->transparent_pixel[0];
-   const int background_pixel = tr->background_pixel[0];
+   const int transparent_pixel = tr->st.transparent_pixel[0];
+   const int background_pixel = tr->st.background_pixel[0];
 
    /* We expect opaque and transparent pixels to be interleaved but with long
     * sequences of each.
     */
    debug(!(tc->format & PNG_FORMAT_FLAG_ALPHA) &&
-         PNG_TC_PIXEL_DEPTH(*tc) == 8 && tr->ntrans == 1);
+         PNG_TC_PIXEL_DEPTH(*tc) == 8 && tr->st.ntrans == 1);
    tc->invalid_info |= PNG_INFO_tRNS;
    tc->sp = dp;
 
@@ -4486,14 +4489,14 @@ png_do_replace_tRNS_lbd(png_transformp *transform, png_transform_controlp tc)
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc);
    const unsigned int copy = sp != dp;
-   const png_byte transparent_pixel = tr->transparent_pixel[0];
-   const png_byte background_pixel = tr->background_pixel[0];
+   const png_byte transparent_pixel = tr->st.transparent_pixel[0];
+   const png_byte background_pixel = tr->st.background_pixel[0];
 
    /* We expect opaque and transparent pixels to be interleaved but with long
     * sequences of each.
     */
    debug(!(tc->format & PNG_FORMAT_FLAG_ALPHA) &&
-         PNG_TC_PIXEL_DEPTH(*tc) < 8 && tr->ntrans == 1);
+         PNG_TC_PIXEL_DEPTH(*tc) < 8 && tr->st.ntrans == 1);
    tc->sp = dp;
 
    /* Now search for a byte that contains the transparent pixel
@@ -4593,13 +4596,13 @@ png_do_background_with_transparent_GA8(png_transformp *transform,
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - 1U/*safety*/;
-   const png_byte background_pixel = tr->background_pixel[0];
+   const png_byte background_pixel = tr->st.background_pixel[0];
 
    /* Because this is an alpha format and we are removing the alpha channel we
     * can copy up.
     */
    debug(tc->bit_depth == 8U && tc->format == PNG_FORMAT_GA &&
-         tr->ntrans == 1U);
+         tr->st.ntrans == 1U);
    tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
    tc->sp = dp;
 
@@ -4628,14 +4631,14 @@ png_do_background_with_transparent_GA16(png_transformp *transform,
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - 3U/*safety*/;
 
    debug(tc->bit_depth == 16U && tc->format == PNG_FORMAT_GA &&
-         tr->ntrans == 2U);
+         tr->st.ntrans == 2U);
    tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
    tc->sp = dp;
 
    do
    {
       if (sp[2] == 0U && sp[3] == 0U) /* transparent */
-         dp[0] = tr->background_pixel[0], dp[1] = tr->background_pixel[1];
+         dp[0] = tr->st.background_pixel[0], dp[1] = tr->st.background_pixel[1];
 
       else
          dp[0] = sp[0], dp[1] = sp[1];
@@ -4663,10 +4666,10 @@ png_do_background_with_transparent_GAlbd(png_transformp *transform,
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc);
    const unsigned int bit_depth = tc->bit_depth;
    const unsigned int mask = (1U << bit_depth) - 1U;
-   const unsigned int back = tr->background_pixel[0] & mask;
+   const unsigned int back = tr->st.background_pixel[0] & mask;
    unsigned int opos, ob, inb;
 
-   debug(bit_depth < 8U && tc->format == PNG_FORMAT_GA && tr->ntrans == 1U);
+   debug(bit_depth < 8U && tc->format == PNG_FORMAT_GA && tr->st.ntrans == 1U);
    tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
    tc->sp = dp;
 
@@ -4730,14 +4733,14 @@ png_do_background_with_transparent_RGBA8(png_transformp *transform,
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - 3U/*safety*/;
 
    debug(tc->bit_depth == 8U && tc->format == PNG_FORMAT_RGBA &&
-         tr->ntrans == 3U);
+         tr->st.ntrans == 3U);
    tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
    tc->sp = dp;
 
    do
    {
       if (sp[3] == 0U) /* transparent */
-         memcpy(dp, tr->background_pixel, 3U);
+         memcpy(dp, tr->st.background_pixel, 3U);
 
       else
          memmove(dp, sp, 3U);
@@ -4762,14 +4765,14 @@ png_do_background_with_transparent_RGBA16(png_transformp *transform,
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - 7U/*safety*/;
 
    debug(tc->bit_depth == 16U && tc->format == PNG_FORMAT_RGBA &&
-         tr->ntrans == 6U);
+         tr->st.ntrans == 6U);
    tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
    tc->sp = dp;
 
    do
    {
       if (sp[6] == 0U && sp[7] == 0U) /* transparent */
-         memcpy(dp, tr->background_pixel, 6U);
+         memcpy(dp, tr->st.background_pixel, 6U);
 
       else
          memmove(dp, sp, 6U);
@@ -4859,13 +4862,14 @@ png_do_background_alpha_GA(png_transformp *transform, png_transform_controlp tc)
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - 3U/*safety*/;
-   const unsigned int background = tr->background.gray;
+   const unsigned int background = tr->st.background.gray;
    const int copy = (sp != dp);
-   const int compose = tr->compose_background;
+   const int compose = tr->st.compose_background;
 
    affirm(tc->bit_depth == 16U && tc->format == PNG_FORMAT_GA &&
-          tr->background_bit_depth == 16U &&
-          (tr->background_gamma == tc->gamma || tr->background_gamma == 0));
+         tr->st.background_bit_depth == 16U &&
+         (tr->st.background_gamma == tc->gamma ||
+          tr->st.background_gamma == 0));
 
    tc->sp = tc->dp; /* nothing else changes */
 
@@ -4928,15 +4932,16 @@ png_do_background_alpha_RGBA(png_transformp *transform,
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    const png_const_bytep ep = sp + PNG_TC_ROWBYTES(*tc) - 7U/*safety*/;
-   const unsigned int bred = tr->background.red;
-   const unsigned int bgreen = tr->background.green;
-   const unsigned int bblue = tr->background.blue;
+   const unsigned int bred = tr->st.background.red;
+   const unsigned int bgreen = tr->st.background.green;
+   const unsigned int bblue = tr->st.background.blue;
    const int copy = (sp != dp);
-   const int compose = tr->compose_background;
+   const int compose = tr->st.compose_background;
 
    affirm(tc->bit_depth == 16U && tc->format == PNG_FORMAT_RGBA &&
-          tr->background_bit_depth == 16U &&
-          (tr->background_gamma == tc->gamma || tr->background_gamma == 0));
+         tr->st.background_bit_depth == 16U &&
+         (tr->st.background_gamma == tc->gamma ||
+          tr->st.background_gamma == 0));
 
    tc->sp = tc->dp; /* nothing else changes */
 
@@ -5013,11 +5018,11 @@ png_init_background_alpha_end(png_transformp *transform,
    debug(tc->gamma == 0 ||
          !png_gamma_significant(png_ptr, tc->gamma, tc_sBIT(tc)));
 
-   /* tr->background_is_gray was filled in by resolve_background_color and
+   /* tr->st.background_is_gray was filled in by resolve_background_color and
     * records if either the background was a gray value or it was a color
     * value with all the channels equal.
     */
-   if (!tr->background_is_gray && !(tc->format & PNG_FORMAT_FLAG_COLOR))
+   if (!tr->st.background_is_gray && !(tc->format & PNG_FORMAT_FLAG_COLOR))
    {
 #     ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
          /* Color background with gray data: this happens when there is a
@@ -5041,7 +5046,7 @@ png_init_background_alpha_end(png_transformp *transform,
     * This only happens with background composition, otherwise the
     * transparent pixels are already 0 and nothing needs to be done.
     */
-   if (tr->compose_background)
+   if (tr->st.compose_background)
    {
       /* The transparent pixel handling happens *after* the data has been
        * re-encoded to the output gamma:
@@ -5052,11 +5057,11 @@ png_init_background_alpha_end(png_transformp *transform,
                png_init_background_transparent, PNG_TR_GAMMA_ENCODE+0xF0U));
 
       /* Copy the current state into the new png_transform_background: */
-      memcpy(&tr_alpha->background, &tr->background,
-         (sizeof *tr) - offsetof(png_transform_background, background));
+      tr_alpha->st = tr->st;
+      tr_alpha->tr.args = tr->tr.args;
    }
 
-   /* Now it is possible to overwrite tr->background with the linear version.
+   /* Now it is possible to overwrite tr->st.background with the linear version.
     */
    gamma_correct_background(tr, tc);
 
@@ -5075,14 +5080,14 @@ png_init_background_alpha_end(png_transformp *transform,
           * gray to RGB transform missing and we need it to happen before
           * this point!
           */
-         affirm(tr->background_is_gray);
+         affirm(tr->st.background_is_gray);
          tr->tr.fn = png_do_background_alpha_GA;
          break;
 
       case PNG_FORMAT_RGBA:
-         if (tr->background_is_gray)
-            tr->background.blue = tr->background.green = tr->background.red =
-               tr->background.gray;
+         if (tr->st.background_is_gray)
+            tr->st.background.blue = tr->st.background.green =
+               tr->st.background.red = tr->st.background.gray;
          tr->tr.fn = png_do_background_alpha_RGBA;
          break;
 
@@ -5127,8 +5132,8 @@ png_init_background_alpha(png_transformp *transform, png_transform_controlp tc)
        * be set here.  Notice that in C++ terms we are very friendly with
        * png_transform_gamma.
        */
-      tr_end->encode_alpha = tr->encode_alpha;
-      tr_end->optimize_alpha = tr->optimize_alpha;
+      tr_end->encode_alpha = tr->st.encode_alpha;
+      tr_end->optimize_alpha = tr->st.optimize_alpha;
    }
 
    {
@@ -5181,10 +5186,11 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
       /* Background composition removes the alpha channel, so the other
        * operations become irrelevant:
        */
-      if (tr->compose_background)
-         tr->associate_alpha = tr->encode_alpha = tr->optimize_alpha = 0U;
+      if (tr->st.compose_background)
+         tr->st.associate_alpha = tr->st.encode_alpha = tr->st.optimize_alpha =
+            0U;
 
-      else if (!tr->associate_alpha)
+      else if (!tr->st.associate_alpha)
       {
          /* There is nothing to do, delete the whole transform. */
          tr->tr.fn = NULL;
@@ -5200,13 +5206,13 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
        * inserted between this one and an rgb-to-gray transform, so we can find
        * out if rgb-to-gray has been requested:
        */
-      tr->rgb_to_gray = tr->tr.next != NULL &&
+      tr->st.rgb_to_gray = tr->tr.next != NULL &&
          tr->tr.next->order == PNG_TR_RGB_TO_GRAY;
 
       if ((tc->format & PNG_FORMAT_FLAG_ALPHA) != 0)
       {
          /* Associated alpha does not strip the alpha channel! */
-         if (tr->compose_background)
+         if (tr->st.compose_background)
             tc->format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_ALPHA);
       }
 
@@ -5215,7 +5221,7 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
       {
          /* tRNS will be expanded, or handled */
          tc->invalid_info |= PNG_INFO_tRNS;
-         if (!tr->compose_background)
+         if (!tr->st.compose_background)
          {
             tc->format |= PNG_FORMAT_FLAG_ALPHA;
             /* And in this case, only, because we are adding an alpha channel we
@@ -5244,18 +5250,18 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
        * was in the PNG and no gamma information has been provided by
        * png_set_gamma or png_set_alpha_mode.
        */
-      switch (tr->background_gamma)
+      switch (tr->st.background_gamma)
       {
          case PNG_BACKGROUND_GAMMA_FILE:
             /* png_init_transform_control has already found the file gamma,
              * and because this is the first arithmetic transformation
              * nothing has changed it.
              */
-            tr->background_gamma = tc->gamma;
+            tr->st.background_gamma = tc->gamma;
             break;
 
          case PNG_BACKGROUND_GAMMA_SCREEN:
-            tr->background_gamma = png_ptr->row_gamma;
+            tr->st.background_gamma = png_ptr->row_gamma;
             break;
 
          default:
@@ -5279,11 +5285,11 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
        * following gray-to-RGB transform and the now gray image must be
        * composited on a color background.
        */
-      if (tr->compose_background /* alpha channel stripped */ &&
-          (tr->background_is_gray ||
-           ((tc->format & PNG_FORMAT_FLAG_COLOR) != 0 && !tr->rgb_to_gray))
+      if (tr->st.compose_background /* alpha channel stripped */ &&
+          (tr->st.background_is_gray ||
+           ((tc->format & PNG_FORMAT_FLAG_COLOR) != 0 && !tr->st.rgb_to_gray))
             /* color compatible */ &&
-          tc->bit_depth >= tr->background_bit_depth
+          tc->bit_depth >= tr->st.background_bit_depth
             /* bit depth compatible */ &&
           (tc->transparent_alpha ||
            (!tc->palette && png_ptr->num_trans == 1 &&
@@ -5321,8 +5327,8 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
             debug(PNG_PIXEL_DEPTH(*png_ptr) == PNG_TC_PIXEL_DEPTH(*tc));
 
             /* The transparent_pixel value needs to be filled in. */
-            affirm(tr->ntrans ==
-               fill_transparent_pixel(png_ptr, tr->transparent_pixel));
+            affirm(tr->st.ntrans ==
+               fill_transparent_pixel(png_ptr, tr->st.transparent_pixel));
 
             /* The whole operation is a no-op if the transparent pixel and the
              * background pixel match, even in the associated alpha case where
@@ -5335,12 +5341,12 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
              * 'background_pixel' have been expanded to fill a byte, so this
              * works.
              */
-            if (memcmp(tr->transparent_pixel, tr->background_pixel, tr->ntrans)
-                == 0)
+            if (memcmp(tr->st.transparent_pixel, tr->st.background_pixel,
+                     tr->st.ntrans) == 0)
                tr->tr.fn = NULL;
 
             /* Then the processing function depends on the pixel size: */
-            else if (tr->ntrans > 1U)
+            else if (tr->st.ntrans > 1U)
                tr->tr.fn = png_do_replace_tRNS_multi;
 
             else if (tc->bit_depth == 8U)
@@ -5353,7 +5359,7 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
                 * bits are replaced by '1' or all the '1' bits are replaced by
                 * '0':
                 */
-               png_uint_32 args = tr->background_pixel[0];
+               png_uint_32 args = tr->st.background_pixel[0];
 
                args <<= 24;
                args |= PNG_INFO_tRNS | PNG_INFO_sRGB;
@@ -5388,8 +5394,8 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
                   png_init_background_alpha, PNG_TR_COMPOSE_ALPHA));
 
          /* Copy the current state into the new png_transform_background: */
-         memcpy(&tr_alpha->background, &tr->background,
-            (sizeof *tr) - offsetof(png_transform_background, background));
+         tr_alpha->st = tr->st;
+         tr_alpha->tr.args = tr->tr.args;
 
          /* The rest of the init occurs later; this transform is no longer
           * needed.
@@ -5401,7 +5407,7 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
           * invalidate tRNS.
           */
          tc->expand_tRNS = 1U;
-         if (tr->compose_background)
+         if (tr->st.compose_background)
             tc->strip_alpha = 0U;
 
          /* And push the expand: */
@@ -5433,20 +5439,20 @@ png_set_background_fixed(png_structrp png_ptr,
          /* This silently overwrites the information if png_set_background is
           * called more than once.
           */
-         tr->background = *background_color;
-         tr->need_expand = need_expand != 0;
-         tr->compose_background = 1U; /* png_set_background called */
+         tr->st.background = *background_color;
+         tr->st.need_expand = need_expand != 0;
+         tr->st.compose_background = 1U; /* png_set_background called */
          switch (background_gamma_code)
          {
             case PNG_BACKGROUND_GAMMA_SCREEN:
             case PNG_BACKGROUND_GAMMA_FILE:
-               tr->background_gamma = background_gamma_code;
+               tr->st.background_gamma = background_gamma_code;
                break;
 
             case PNG_BACKGROUND_GAMMA_UNIQUE:
                if (background_gamma >= 16 && background_gamma <= 625000000)
                {
-                  tr->background_gamma = background_gamma;
+                  tr->st.background_gamma = background_gamma;
                   break;
                }
 
@@ -5454,7 +5460,7 @@ png_set_background_fixed(png_structrp png_ptr,
                /* FALL THROUGH */
             default:
                png_app_error(png_ptr, "invalid gamma information");
-               tr->background_gamma = (need_expand ?
+               tr->st.background_gamma = (need_expand ?
                   PNG_BACKGROUND_GAMMA_FILE : PNG_BACKGROUND_GAMMA_SCREEN);
                break;
          }
@@ -5547,32 +5553,32 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
                    * is the only mode that doesn't interfere with what
                    * png_set_background does.
                    */
-                  tr->associate_alpha = 0U;
-                  tr_gamma->encode_alpha = tr->encode_alpha = 0U;
-                  tr_gamma->optimize_alpha = tr->optimize_alpha = 0U;
+                  tr->st.associate_alpha = 0U;
+                  tr_gamma->encode_alpha = tr->st.encode_alpha = 0U;
+                  tr_gamma->optimize_alpha = tr->st.optimize_alpha = 0U;
                   break;
 
                case PNG_ALPHA_ASSOCIATED: /* color channels premultiplied */
-                  tr->associate_alpha = 1U;
-                  tr_gamma->encode_alpha = tr->encode_alpha = 0U;
-                  tr_gamma->optimize_alpha = tr->optimize_alpha = 0U;
+                  tr->st.associate_alpha = 1U;
+                  tr_gamma->encode_alpha = tr->st.encode_alpha = 0U;
+                  tr_gamma->optimize_alpha = tr->st.optimize_alpha = 0U;
                   break;
 
                case PNG_ALPHA_OPTIMIZED:
                   /* associated with opaque pixels having the given gamma and
                    * non-opaque pixels being linear.
                    */
-                  tr->associate_alpha = 1U;
-                  tr_gamma->encode_alpha = tr->encode_alpha = 0U;
-                  tr_gamma->optimize_alpha = tr->optimize_alpha = 1U;
+                  tr->st.associate_alpha = 1U;
+                  tr_gamma->encode_alpha = tr->st.encode_alpha = 0U;
+                  tr_gamma->optimize_alpha = tr->st.optimize_alpha = 1U;
                   /* output_gamma records the encoding of opaque pixels! */
                   break;
 
                case PNG_ALPHA_BROKEN:
                   /* associated+non-linear+alpha encoded */
-                  tr->associate_alpha = 1U;
-                  tr_gamma->encode_alpha = tr->encode_alpha = 1U;
-                  tr_gamma->optimize_alpha = tr->optimize_alpha = 0U;
+                  tr->st.associate_alpha = 1U;
+                  tr_gamma->encode_alpha = tr->st.encode_alpha = 1U;
+                  tr_gamma->optimize_alpha = tr->st.optimize_alpha = 0U;
                   break;
 
                default:
