@@ -3329,8 +3329,11 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                switch (pixel_depth)
                {
                   case 1: spixel_rep &=  1; spixel_rep |= spixel_rep << 1;
+                          /*FALL THROUGH*/
                   case 2: spixel_rep &=  3; spixel_rep |= spixel_rep << 2;
+                          /*FALL THROUGH*/
                   case 4: spixel_rep &= 15; spixel_rep |= spixel_rep << 4;
+                          /*FALL THROUGH*/
                   default:
                      break;
                }
@@ -3420,8 +3423,11 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                switch (pixel_depth)
                {
                   case 1: spixel_rep &=  1; spixel_rep |= spixel_rep << 1;
+                          /*FALL THROUGH*/
                   case 2: spixel_rep &=  3; spixel_rep |= spixel_rep << 2;
+                          /*FALL THROUGH*/
                   case 4: spixel_rep &= 15; spixel_rep |= spixel_rep << 4;
+                          /*FALL THROUGH*/
                   default:
                      break;
                }
@@ -4023,7 +4029,8 @@ png_read_process_IDAT(png_structrp png_ptr)
           * once at the start:
           */
          png_ptr->zstream.next_out = png_ptr->row_buffer;
-         state = need_row_bytes;
+         /* state = need_row_bytes; [not used below] */
+         /* FALL THROUGH */
 
       case need_row_bytes:
          {
@@ -4140,7 +4147,7 @@ png_read_process_IDAT(png_structrp png_ptr)
             }
          } /* need_row_bytes */
 
-         state = need_filter_byte;
+         state = need_filter_byte; /* as opposed to 'start_of_pass' */
          /* FALL THROUGH */
 
       case need_filter_byte: /* for the next row */
@@ -4376,11 +4383,11 @@ png_read_finish_IDAT(png_structrp png_ptr)
    if (!png_ptr->zstream_ended)
    {
       int end_of_IDAT = png_ptr->zstream.avail_in == 0;
-      png_byte b;
-      png_alloc_size_t cb = png_inflate_IDAT(png_ptr, 2/*finish*/, &b, 1);
+      png_byte b[1];
+      png_alloc_size_t cb = png_inflate_IDAT(png_ptr, 2/*finish*/, b, 1);
 
       debug(png_ptr->zstream.avail_out == 1-cb &&
-            png_ptr->zstream.next_out == cb + &b);
+            png_ptr->zstream.next_out == cb + b);
 
       /* As above, for safety do this: */
       png_ptr->zstream.next_out = NULL;
@@ -4426,7 +4433,7 @@ png_read_finish_IDAT(png_structrp png_ptr)
       /* In fact we expect this to always succeed, so it is a good idea to
        * catch it in pre-release builds:
        */
-      debug(ret == Z_OK);
+      debug_handled(ret == Z_OK);
 
       if (ret != Z_OK)
       {

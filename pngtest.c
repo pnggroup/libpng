@@ -852,7 +852,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_bytep row_buf;
    png_uint_32 y;
    png_uint_32 width, height;
-   int num_pass = 1, pass;
+   volatile int num_passes;
+   int pass;
    int bit_depth, color_type;
 
    row_buf = NULL;
@@ -1052,18 +1053,17 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       {
          png_set_IHDR(write_ptr, write_info_ptr, width, height, bit_depth,
             color_type, interlace_type, compression_type, filter_type);
-         /* num_pass will not be set below, set it here if the image is
-          * interlaced: what happens is that write interlacing is *not* turned
-          * on an the partial interlaced rows are written directly.
+         /* num_passes may not be available below if interlace support is not
+          * provided by libpng for both read and write.
           */
          switch (interlace_type)
          {
             case PNG_INTERLACE_NONE:
-               num_pass = 1;
+               num_passes = 1;
                break;
 
             case PNG_INTERLACE_ADAM7:
-               num_pass = 7;
+               num_passes = 7;
                 break;
 
             default:
@@ -1364,9 +1364,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 #if defined(PNG_READ_DEINTERLACE_SUPPORTED) &&\
    defined(PNG_WRITE_INTERLACING_SUPPORTED)
-   num_pass = png_set_interlace_handling(read_ptr);
-   if (png_set_interlace_handling(write_ptr) != num_pass)
-      png_error(write_ptr, "png_set_interlace_handling: inconsistent num_pass");
+   /* Both must be defined for libpng to be able to handle the interlace,
+    * otherwise it gets handled below by simply reading and writing the passes
+    * directly.
+    */
+   if (png_set_interlace_handling(read_ptr) != num_passes)
+      png_error(write_ptr,
+            "png_set_interlace_handling(read): wrong pass count ");
+   if (png_set_interlace_handling(write_ptr) != num_passes)
+      png_error(write_ptr,
+            "png_set_interlace_handling(write): wrong pass count ");
 #endif
 
 #ifdef PNGTEST_TIMING
@@ -1374,7 +1381,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    t_misc += (t_stop - t_start);
    t_start = t_stop;
 #endif
-   for (pass = 0; pass < num_pass; pass++)
+   for (pass = 0; pass < num_passes; pass++)
    {
       pngtest_debug1("Writing row data for pass %d", pass);
       for (y = 0; y < height; y++)
