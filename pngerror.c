@@ -1162,6 +1162,34 @@ PNG_FUNCTION(void,png_affirm,(png_const_structrp png_ptr,
 #  endif /* AFFIRM_ERROR */
 }
 
+#if !PNG_RELEASE_BUILD
+void /* PRIVATE */
+png_handled_affirm(png_const_structrp png_ptr, png_const_charp message,
+   unsigned int position)
+{
+#  if PNG_RELEASE_BUILD
+      /* testing in RC: we want to return control to the caller, so do not
+       * use png_affirm.
+       */
+      char   buffer[512];
+
+      affirm_text(buffer, message, position);
+
+#     ifdef PNG_CONSOLE_IO_SUPPORTED
+         fprintf(stderr, "%s\n", buffer);
+#     elif defined PNG_WARNINGS_SUPPORTED
+         if (png_ptr != NULL && png_ptr->warning_fn != NULL)
+            png_ptr->warning_fn(png_constcast(png_structrp, png_ptr), buffer);
+         /* else no way to output the text */
+#     else
+         PNG_UNUSED(png_ptr)
+#     endif
+#  else
+      png_affirm(png_ptr, message, position);
+#  endif
+}
+#endif /* !RELEASE_BUILD */
+
 #ifdef PNG_RANGE_CHECK_SUPPORTED
 /* The character/byte checking APIs. These do their own calls to png_affirm
  * because the caller provides the position.
@@ -1209,32 +1237,5 @@ png_u16_affirm(png_const_structrp png_ptr, unsigned int position, int b)
    png_affirm(png_ptr, param_deb("PNG 16-bit range") position);
 }
 #endif /* INT_MAX >= 65535 */
-
-void /* PRIVATE */
-png_handled_affirm(png_const_structrp png_ptr, png_const_charp message,
-   unsigned int position)
-{
-#  if PNG_RELEASE_BUILD
-      /* testing in RC: we want to return control to the caller, so do not
-       * use png_affirm.
-       */
-      char   buffer[512];
-
-      affirm_text(buffer, message, position);
-
-#     ifdef PNG_CONSOLE_IO_SUPPORTED
-         fprintf(stderr, "%s\n", buffer);
-#     elif defined PNG_WARNINGS_SUPPORTED
-         if (png_ptr != NULL && png_ptr->warning_fn != NULL)
-            png_ptr->warning_fn(png_constcast(png_structrp, png_ptr), buffer);
-         /* else no way to output the text */
-#     else
-         PNG_UNUSED(png_ptr)
-#     endif
-#  else
-      png_affirm(png_ptr, message, position);
-#  endif
-}
-
 #endif /* RANGE_CHECK */
 #endif /* READ || WRITE */

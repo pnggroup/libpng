@@ -334,9 +334,11 @@
       while (0)
 #  define png_affirmexp(pp, cond)\
       ((cond) ? (void)0 : png_affirm(pp, PNG_SRC_LINE))
+#  define png_handled(pp, m) ((void)0)
 #  define png_impossiblepp(pp, reason) png_affirm(pp, PNG_SRC_LINE)
 
 #  define debug(cond) do {} while (0)
+#  define debug_handled(cond) do {} while (0)
 #  if PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC
      /* Make sure there are no 'UNTESTED' macros in released code: */
 #    define UNTESTED libpng untested code
@@ -349,15 +351,21 @@
       while (0)
 #  define png_affirmexp(pp, cond)\
       ((cond) ? (void)0 : png_affirm(pp, #cond, PNG_SRC_LINE))
+#  define png_handled(pp, m) (png_handled_affirm((pp), (m), PNG_SRC_LINE))
 #  define png_impossiblepp(pp, reason) png_affirm(pp, reason, PNG_SRC_LINE)
 
 #  define debug(cond) png_affirmpp(png_ptr, cond)
+#  define debug_handled(cond)\
+      do\
+         if (!(cond)) png_handled(png_ptr, #cond);\
+      while (0)
 #  define UNTESTED png_affirm(png_ptr, "untested code", PNG_SRC_LINE);
 #  define NOT_REACHED png_affirm(png_ptr, "NOT REACHED", PNG_SRC_LINE)
 #endif
 
 #define affirm(cond) png_affirmpp(png_ptr, cond)
 #define affirmexp(cond) png_affirmexp(png_ptr, cond)
+#define handled(m) png_handled(png_ptr, (m))
 #define impossible(cond) png_impossiblepp(png_ptr, cond)
 #define implies(a, b) debug(!(a) || (b))
 
@@ -770,6 +778,14 @@ extern "C" {
 PNG_INTERNAL_FUNCTION(void, png_affirm,(png_const_structrp png_ptr,
     param_deb(png_const_charp condition) unsigned int position), PNG_NORETURN);
 
+#if !PNG_RELEASE_BUILD
+PNG_INTERNAL_FUNCTION(void, png_handled_affirm,(png_const_structrp png_ptr,
+      png_const_charp message, unsigned int position), PNG_EMPTY);
+   /* This is not marked PNG_NORETURN because in PNG_RELEASE_BUILD it will
+    * disappear and control will pass through it.
+    */
+#endif /* !RELEASE_BUILD */
+
 /* Character/byte range checking. */
 /* GCC complains about assignments of an (int) expression to a (char) even when
  * it can readily determine that the value is in range.  This makes arithmetic
@@ -831,12 +847,6 @@ PNG_INTERNAL_FUNCTION(char, png_char_affirm,(png_const_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(png_byte, png_byte_affirm,(png_const_structrp png_ptr,
       unsigned int position, int b), PNG_EMPTY);
 
-PNG_INTERNAL_FUNCTION(void, png_handled_affirm,(png_const_structrp png_ptr,
-      png_const_charp message, unsigned int position), PNG_EMPTY);
-   /* This is not marked PNG_NORETURN because in PNG_RELEASE_BUILD it will
-    * disappear and control will pass through it.
-    */
-
 #if INT_MAX >= 65535
 PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
       unsigned int position, int u), PNG_EMPTY);
@@ -854,13 +864,11 @@ PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
 #  define png_check_byte(pp, b) (png_byte_affirm((pp), PNG_SRC_LINE, (b)))
 #  define PNG_BYTE(b)           ((png_byte)((b) & 0xFFU))
 #  define PNG_UINT_16(u)        ((png_uint_16)((u) & 0xFFFFU))
-#  define png_handled(pp, m)    (png_handled_affirm((pp), (m), PNG_SRC_LINE))
 #elif !(defined PNG_REMOVE_CASTS)
 #  define png_check_bits(pp, u, bits) (((1U<<(bits))-1U) & (u))
 #  define png_check_char(pp, c) ((char)(c))
 #  define png_check_byte(pp, b) ((png_byte)(b))
 #  define png_check_u16(pp, u)  ((png_uint_16)(u))
-#  define png_handled(pp, m)    ((void)0)
 #  define PNG_BYTE(b)           ((png_byte)((b) & 0xFFU))
 #  define PNG_UINT_16(u)        ((png_uint_16)((u) & 0xFFFFU))
 #else
@@ -877,17 +885,9 @@ PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
 #  define png_check_char(pp, c) (c)
 #  define png_check_byte(pp, b) (b)
 #  define png_check_u16(pp, u)  (u)
-#  define png_handled(pp, m)    ((void)0)
 #  define PNG_BYTE(b)           (b)
 #  define PNG_UINT_16(u)        (u)
 #endif /* RANGE_CHECK */
-
-/* Utility macro to mark a handled error condition ; when control reaches this
- * there has been an arithmetic overflow but it is being handled.  Use the
- * png_check_ macros above where control should leave the code for
- * safety/security reasons.
- */
-#define handled(m) png_handled(png_ptr, (m))
 
 /* Safe calculation of a rowbytes value; does a png_error if the system limits
  * are exceeded.

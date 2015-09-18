@@ -1534,8 +1534,8 @@ png_do_byte_ops_down(png_transformp *transform, png_transform_controlp tc)
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
    png_alloc_size_t dest_rowbytes;
 
-   debug(tc->bit_depth == 8 || tc->bit_depth == 16);
-   debug((tc->format & PNG_FORMAT_FLAG_COLORMAP) == 0);
+   debug(tc->bit_depth == 8U || tc->bit_depth == 16U);
+   debug((tc->format & PNG_FORMAT_FLAG_COLORMAP) == 0U);
 
    tc->sp = tc->dp;
    tc->format = tr->format;
@@ -1552,24 +1552,30 @@ png_do_byte_ops_down(png_transformp *transform, png_transform_controlp tc)
       unsigned int size, hwm, i;
       png_byte output[32];
 
+      /* This catches an empty codes array, which would cause all the input to
+       * be skipped and, potentially, a garbage output[] to be written (once) to
+       * *dp.
+       */
+      affirm((codes & 0xFU) >= 4U);
+
       /* Align the writes to a 16-byte multiple from the start of the
        * destination buffer:
        */
       size = dest_rowbytes & 0xFU;
-      if (size == 0) size = 16;
-      i = size+16;
+      if (size == 0U) size = 16U;
+      i = size+16U;
       sp -= sp_advance; /* Move 1 pixel back */
-      hwm = 0;
+      hwm = 0U;
 
       for (;;)
       {
-         unsigned int next_code = code & 0xf;
+         unsigned int next_code = code & 0xFU;
 
-         if (next_code >= 8)
-            output[--i] = sp[next_code-8];
+         if (next_code >= 8U)
+            output[--i] = sp[next_code-8U];
 
-         else if (next_code >= 4)
-            output[--i] = tr->filler[next_code - 4];
+         else if (next_code >= 4U)
+            output[--i] = tr->filler[next_code - 4U];
 
          else /* end code */
          {
@@ -1593,8 +1599,8 @@ png_do_byte_ops_down(png_transformp *transform, png_transform_controlp tc)
             dp -= size;
             hwm ^= 0x10U; /* == i+16 mod 32 */
             memcpy(dp, output + hwm, size);
-            size = 16;
-            if (i == 0) i = 32;
+            size = 16U;
+            if (i == 0U) i = 32U;
          }
       }
 
@@ -1602,7 +1608,7 @@ png_do_byte_ops_down(png_transformp *transform, png_transform_controlp tc)
        * against 'hwm' before and, because of the alignment, i will always be
        * either 16 or 32:
        */
-      debug((i == 16 || i == 32) & (((i & 0x10U)^0x10U) == hwm));
+      debug((i == 16U || i == 32U) & (((i & 0x10U)^0x10U) == hwm));
       debug(sp+sp_advance == ep);
 
       /* At the end the bytes i..(hwm-1) need to be written, with the proviso
@@ -1612,24 +1618,26 @@ png_do_byte_ops_down(png_transformp *transform, png_transform_controlp tc)
        * bytes will be written (hwm == 0, i == 32) or 16 bytes need to be
        * written.
        */
-      if (size < 16)
+      if (size < 16U)
       {
-         debug(i == 16);
+         debug(i == 16U);
          dp -= size;
          memcpy(dp, output + i, size);
       }
 
       else /* size == 16 */
       {
+         debug(size == 16U);
+
          /* Write i..(hwm-1); 16 or 32 bytes, however if 32 bytes are written
           * they are contiguous and i==0.
           *
           * hwm is 0 or 16, i is 16 or 32, swap 0 and 32:
           */
-         if (hwm == 0) hwm = 32;
-         if (i == 32) i = 0;
+         if (hwm == 0U) hwm = 32U;
+         if (i == 32U) i = 0U;
          affirm(i < hwm);
-         debug(hwm == i+16 || (i == 0 && hwm == 32));
+         debug(hwm == i+16U || (i == 0U && hwm == 32U));
 
          hwm -= i;
          dp -= hwm;

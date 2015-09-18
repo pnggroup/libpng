@@ -1506,7 +1506,7 @@ png_gamma_significant(png_const_structrp png_ptr, png_fixed_point gamma_val,
    };
 
    /* Handle out of range values in release by doing the gamma correction: */
-   debug(sbits > 0U && sbits <= 16U);
+   debug_handled(sbits > 0U && sbits <= 16U);
    if (sbits == 0U || sbits > 16U)
       return 1;
 
