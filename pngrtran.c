@@ -897,10 +897,8 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
 
       /* This helps avoid cluttering the code up with #ifdefs: */
 #     define check_tRNS if (do_alpha) *--dp = (pixel != gray) * 255U;
-#     define UNTESTED_tRNS if (do_alpha) UNTESTED
 #  else /* !READ_tRNS */
 #     define check_tRNS
-#     define UNTESTED_tRNS
 #  endif /* READ_tRNS */
 
    dp += PNG_TC_ROWBYTES(*tc); /* pre-decremented below */
@@ -4986,10 +4984,7 @@ png_do_background_alpha_RGBA(png_transformp *transform,
 
          case 65535U: /* opaque */
             if (copy)
-            {
                memcpy(dp, sp, 8U);
-               UNTESTED
-            }
             break;
       }
 
@@ -5303,12 +5298,9 @@ png_init_background(png_transformp *transform, png_transform_controlp tc)
           */
          if ((tc->format & PNG_FORMAT_FLAG_ALPHA) != 0)
          {
-            /* TODO: it may be impossible to get here! */
             affirm(tc->transparent_alpha);
             /* This init routine does the sBIT handling: */
-            UNTESTED
             png_init_background_transparent(transform, tc);
-            UNTESTED
          }
 
          else if (!tc->palette && png_ptr->num_trans == 1 &&

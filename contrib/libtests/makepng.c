@@ -82,6 +82,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <errno.h>
+#include <stdint.h>
 
 #if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
@@ -95,6 +96,23 @@
 #else
 #  include "../../png.h"
 #endif
+
+/* Work round for GCC complaints about casting a (double) function result to
+ * an unsigned:
+ */
+static unsigned int
+flooru(double d)
+{
+   d = floor(d);
+   return (unsigned int)d;
+}
+
+static png_byte
+floorb(double d)
+{
+   d = floor(d);
+   return (png_byte)d;
+}
 
 /* This structure is used for inserting extra chunks (the --insert argument, not
  * documented above.)
@@ -217,7 +235,8 @@ generate_palette(png_colorp palette, png_bytep trans, int bit_depth,
          else
          {
             unsigned int size = 1U << (bit_depth/2); /* 2, 4 or 16 */
-            unsigned int x, y, ip;
+            unsigned int x, y;
+            volatile unsigned int ip = 0;
 
             for (x=0; x<size; ++x) for (y=0; y<size; ++y)
             {
@@ -281,7 +300,7 @@ set_value(png_bytep row, size_t rowbytes, png_uint_32 x, unsigned int bit_depth,
                exit(1);
 
             case 16:
-               value = (unsigned int)floor(65535*pow(value/65535.,conv)+.5);
+               value = flooru(65535*pow(value/65535.,conv)+.5);
                *row++ = (png_byte)(value >> 8);
                *row = (png_byte)value;
                return;
@@ -625,7 +644,7 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
             gamma_table[0] = 0;
 
             for (i=1; i<255; ++i)
-               gamma_table[i] = (png_byte)floor(pow(i/255.,conv) * 255 + .5);
+               gamma_table[i] = floorb(pow(i/255.,conv) * 255 + .5);
 
             gamma_table[255] = 255;
          }
@@ -831,7 +850,7 @@ static png_size_t
 load_fake(png_charp param, png_bytepp profile)
 {
    char *endptr = NULL;
-   unsigned long long int size = strtoull(param, &endptr, 0/*base*/);
+   uint64_t size = strtoull(param, &endptr, 0/*base*/);
 
    /* The 'fake' format is <number>*[string] */
    if (endptr != NULL && *endptr == '*')

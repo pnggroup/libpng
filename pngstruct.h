@@ -55,7 +55,11 @@
  * even improve performance on some systems (and degrade it on others.)
  */
 #ifndef ZLIB_IO_MAX
-#  define ZLIB_IO_MAX ((uInt)-1)
+#  ifdef __COVERITY__
+#     define ZLIB_IO_MAX ((uInt)255U) /* else COVERITY whines */
+#  else
+#     define ZLIB_IO_MAX ((uInt)-1)
+#  endif /* COVERITY */
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED

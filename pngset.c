@@ -1537,7 +1537,7 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
          png_ptr->IDAT_read_size = (png_uint_32)size; /* checked above */
          return;
       }
-#  endif
+#  endif /* SEQUENTIAL_READ */
 
 #  ifdef PNG_WRITE_SUPPORTED
       if (!png_ptr->read_struct)
@@ -1550,9 +1550,8 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
             return;
          }
 
-#ifndef __COVERITY__
-         /* Some compilers complain that this is always false.  However, it
-          * can be true when integer overflow happens.
+         /* NOTE: size is limited to 0..PNG_UINT_31_MAX (2^31-1) at this point,
+          * however ZLIB_IO_MAX may be smaller (for example on a 16-bit system).
           */
          if (size > ZLIB_IO_MAX)
          {
@@ -1560,7 +1559,6 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
                "Compression buffer size limited to system maximum");
             size = ZLIB_IO_MAX; /* must fit */
          }
-#endif
 
          if (size < 6)
          {
@@ -1579,7 +1577,7 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
             png_ptr->zbuffer_size = (uInt)size;
          }
       }
-#  endif
+#  endif /* WRITE */
 }
 
 void PNGAPI

@@ -1071,6 +1071,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
                 /*NOT REACHED*/
          }
       }
+
+      else
+         png_error(read_ptr, "png_get_IHDR failed");
    }
 #ifdef PNG_FIXED_POINT_SUPPORTED
 #ifdef PNG_cHRM_SUPPORTED

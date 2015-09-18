@@ -2109,14 +2109,11 @@ png_image_read_colormap(png_voidp argument)
                      output_processing = PNG_CMAP_NONE;
                      break;
                   }
-#ifdef __COVERITY__
-                 /* Coverity claims that output_encoding cannot be 2 (P_LINEAR)
-                  * here.
-                  */
-                  back_alpha = 255;
-#else
-                  back_alpha = output_encoding == P_LINEAR ? 65535 : 255;
-#endif
+                  /* Coverity claims that output_encoding cannot be 2 (P_LINEAR)
+                   * here.
+                   */
+                  affirm(output_encoding != P_LINEAR);
+                  back_alpha = 255U;
                }
 
                /* output_processing means that the libpng-processed row will be
@@ -2238,17 +2235,13 @@ png_image_read_colormap(png_voidp argument)
 
                /* NOTE: this preserves the full precision of the application
                 * background color.
+                *
+                * Coverity claims that output_encoding cannot be 2 (P_LINEAR)
                 */
+               affirm(output_encoding != P_LINEAR);
                background_index = i;
                png_create_colormap_entry(display, i++, back_r, back_g, back_b,
-#ifdef __COVERITY__
-                 /* Coverity claims that output_encoding cannot be 2 (P_LINEAR)
-                  * here.
-                  */ 255U,
-#else
-                  output_encoding == P_LINEAR ? 65535U : 255U,
-#endif
-                  output_encoding);
+                   255U, output_encoding);
 
                /* For non-opaque input composite on the sRGB background - this
                 * requires inverting the encoding for each component.  The input
