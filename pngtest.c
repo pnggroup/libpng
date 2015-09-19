@@ -1064,11 +1064,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
             case PNG_INTERLACE_ADAM7:
                num_passes = 7;
-                break;
+               break;
 
             default:
-                png_error(read_ptr, "invalid interlace type");
-                /*NOT REACHED*/
+               png_error(read_ptr, "invalid interlace type");
+               /*NOT REACHED*/
          }
       }
 
