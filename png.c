@@ -140,10 +140,16 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
 
       do
       {
-         uInt safe_length = (uInt)length;
+         uInt safe_length;
 
-         if (safe_length == 0)
+         /* TODO: this uses ZLIB_IO_MAX which may be #defined to less than the
+          * maximum of a uInt, is this the best thing to do?
+          */
+         if (length > ZLIB_IO_MAX)
             safe_length = ZLIB_IO_MAX;
+
+         else
+            safe_length = (uInt)/*SAFE*/length;
 
          crc = crc32(crc, ptr, safe_length);
 
