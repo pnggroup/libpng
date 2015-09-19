@@ -48,22 +48,17 @@ case "$1" in
       # Comments below indicate cases known to be required and not duplicated
       # in other (required) cases; the aim is to get a minimal set that gives
       # the maxium code coverage.
-      mpg none gray 16
-      mpg none gray-alpha 16
-      mpg none gray-alpha 8 # required
-      mpg none palette 8
-      mpg none rgb-alpha 8
-      mpg 1.8 gray 2
-      mpg 1.8 palette 2 # required
-      mpg 1.8 palette 4 # required
-      mpg 1.8 palette 8
-      mpg linear palette 8
-      mpg linear rgb-alpha 16
-      mpg sRGB gray-alpha 8
-      mpg sRGB palette 1 # required
-      mpg sRGB palette 8
-      mpg sRGB rgb-alpha 16 # required pngread.c:2422 untested
-      mpg sRGB rgb-alpha 8;;
+      mpg none gray-alpha 8 # required: code coverage, sRGB opaque component
+      mpg none palette 8 # required: basic palette read
+      mpg 1.8 gray 2 # required: tests gamma threshold code
+      mpg 1.8 palette 2 # required: code coverage
+      mpg 1.8 palette 4 # required: code coverage
+      mpg 1.8 palette 8 # error limits only
+      mpg linear palette 8 # error limits only
+      mpg linear rgb-alpha 16 # error limits only
+      mpg sRGB palette 1 # required: code coverage
+      mpg sRGB rgb-alpha 16 # required: code coverage: pngread.c:2422 untested
+      :;;
 
    *)
       echo "$0 $1: unknown argument, usage:" >&2
