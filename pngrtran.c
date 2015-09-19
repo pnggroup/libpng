@@ -1479,6 +1479,16 @@ static int
 png_gamma_significant(png_const_structrp png_ptr, png_fixed_point gamma_val,
    unsigned int sbits)
 {
+#if 0
+   /* This seems to be wrong.  The issue is that when the app asks for a higher
+    * bit depth output than the input has significant bits it causes gamma
+    * correction to be skipped (this was the intent) however there's no
+    * particular guarantee that the app won't go on to do further gamma
+    * processing - pngstest does this - and this messes up the results
+    * completely.
+    *
+    * TODO: work out how to optimize this correctly.
+    */
    /* The following table lists the threshold as a difference from PNG_FP_1 at
     * which the gamma correction will make a change to at least an 'sbits'
     * value.  There is no entry for 1 bit values; gamma correction is never
@@ -1517,6 +1527,15 @@ png_gamma_significant(png_const_structrp png_ptr, png_fixed_point gamma_val,
 
    else if (gamma_val > PNG_FP_1 + gamma_threshold_by_sbit[sbits-2U][1U])
       return gamma_val > PNG_FP_1 + png_ptr->gamma_threshold;
+#else /* FIXUP */
+   if (gamma_val < PNG_FP_1)
+      return gamma_val < PNG_FP_1 - png_ptr->gamma_threshold;
+
+   else if (gamma_val > PNG_FP_1)
+      return gamma_val > PNG_FP_1 + png_ptr->gamma_threshold;
+
+   PNG_UNUSED(sbits)
+#endif /* FIXUP */
 
    return 0; /* not significant */
 }
@@ -3298,11 +3317,14 @@ png_init_gamma(png_transformp *transform, png_transform_controlp tc)
        *    necessary.
        * 3) Neither is required; the transform can be eliminated.
        *
-       * First default the bit depth if it is not already set.
+       * First default the bit depth if it is not already set.  Note that if the
+       * output is a palette then 'row_bit_depth' refers to the palette size and
+       * 8U must be used here.  tc->palette is irrelevant; it only tells us that
+       * the data came from a palette.
        */
       if (tr->to_bit_depth == 0)
       {
-         if (tc->palette) /* caching a palette */
+         if ((png_ptr->row_format & PNG_FORMAT_FLAG_COLORMAP) != 0U)
             tr->to_bit_depth = 8U;
 
          else
