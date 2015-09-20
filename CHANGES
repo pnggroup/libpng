@@ -5347,7 +5347,7 @@ Version 1.6.19beta02 [August 19, 2015]
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
 
-Version 1.6.19beta03 [September 19, 2015]
+Version 1.6.19beta03 [September 20, 2015]
   Fixed png_save_int_32 when int is not 2's complement (John Bowler).
   Updated libpng16 with all the recent test changes from libpng17,
     including changes to pngvalid.c to ensure that the original,
@@ -5360,6 +5360,12 @@ Version 1.6.19beta03 [September 19, 2015]
     turn on progresive-read. There is a separate test which does
     that. (John Bowler)
   Also made some signed/unsigned fixes.
+  Make pngstest error limits version specific. Splitting the machine
+    generated error structs out to a file allows the values to be updated
+    without changing pngstest.c itself. Since libpng 1.6 and 1.7 have
+    slightly different error limits this simplifies maintenance. The
+    makepngs.sh script has also been updated to more accurately reflect
+    current problems in libpng 1.7 (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
