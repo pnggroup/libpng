@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.18 [July 23, 2015]
+ * Last changed in libpng 1.6.19 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -3576,6 +3576,10 @@ main(int argc, char **argv)
       printf("/* contrib/libtests/pngstest-errors.h\n");
       printf(" *\n");
       printf(" * BUILT USING:" PNG_HEADER_VERSION_STRING);
+      printf(" *\n");
+      printf(" * This code is released under the libpng license.\n");
+      printf(" * For conditions of distribution and use, see the disclaimer\n");
+      printf(" * and license in png.h\n");
       printf(" *\n");
       printf(" * THIS IS A MACHINE GENERATED FILE: do not edit it directly!\n");
       printf(" * Instead run:\n");
