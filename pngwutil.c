@@ -1140,7 +1140,12 @@ png_save_int_31(png_structrp png_ptr, png_bytep buf, png_int_32 i)
     * actually makes this error impossible, but this is safe.
     */
 {
+#ifndef __COVERITY__
    if (i >= 0 && i <= 0x7FFFFFFF)
+#else
+   /* Supress bogus Coverity complaint */
+   if (i >= 0)
+#endif
    {
       png_save_uint_32(buf, (png_uint_32)/*SAFE*/i);
       return 1;

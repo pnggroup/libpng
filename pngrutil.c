@@ -4159,8 +4159,10 @@ png_read_process_IDAT(png_structrp png_ptr)
             /* This can be temporary; it verifies the invariants on how
              * png_inflate_IDAT updates the {next,avail}_out fields:
              */
+#ifndef __COVERITY__  /* Suppress bogus Coverity complaint */
             debug(png_ptr->zstream.avail_out == 1-cb &&
                   png_ptr->zstream.next_out == cb + &png_ptr->next_filter);
+#endif
 
             /* next_out points into png_struct, for security do this: */
             png_ptr->zstream.next_out = NULL;

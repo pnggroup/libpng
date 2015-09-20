@@ -5199,6 +5199,7 @@ Version 1.7.0beta66 [September 20, 2015]
     correction introduced significant errors if the app subsequently
     did further corrections, only shown by using files with gAMA 1/1.52 in
     pngstest (John Bowler).
+  Suppressed bogus Coverity issues in pngrutil.c and pngwutil.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
