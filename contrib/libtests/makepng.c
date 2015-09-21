@@ -1,8 +1,7 @@
-/* makepng.c
- *
- * Copyright:
- */
-#define COPYRIGHT "Copyright \302\251 2013,2015 John Cunningham Bowler"
+/* makepng.c */
+#define _ISOC99_SOURCE
+/* Copyright: */
+#define COPYRIGHT "\251 2013,2015 John Cunningham Bowler"
 /*
  * Last changed in libpng 1.7.0 [September 20, 2015]
  *
@@ -12,8 +11,8 @@
  *
  * Make a test PNG image.  The arguments are as follows:
  *
- *  makepng [--sRGB|--linear|--1.8] [--color=<color>] color-type bit-depth \
- *      [file-name]
+ *    makepng [--sRGB|--linear|--1.8] [--tRNS] [--nofilters] \
+ *       color-type bit-depth [file-name]
  *
  * The color-type may be numeric (and must match the numbers used by the PNG
  * specification) or one of the format names listed below.  The bit-depth is the
@@ -41,8 +40,8 @@
  * 4 channels: linear combinations of, from the top-left corner clockwise,
  *    transparent, red, green, blue.
  *
- * For color-mapped images a four channel color-map is used and the PNG file has
- * a tRNS chunk, as follows:
+ * For color-mapped images a four channel color-map is used and if --tRNS is
+ * given the PNG file has a tRNS chunk, as follows:
  *
  * 1-bit: entry 0 is transparent-red, entry 1 is opaque-white
  * 2-bit: entry 0: transparent-green
@@ -55,6 +54,9 @@
  * The palette always has 2^bit-depth entries and the tRNS chunk one fewer.  The
  * image is the 1-channel diamond, but using palette index, not luminosity.
  *
+ * For formats other than color-mapped ones if --tRNS is specified a tRNS chunk
+ * is generated with all channels equal to the low bits of 0x0101.
+ *
  * Image size is determined by the final pixel depth in bits, i.e. channels x
  * bit-depth, as follows:
  *
@@ -62,20 +64,64 @@
  * 16 bits:           256x256
  * More than 16 bits: 1024x1024
  *
- * Row filtering is turned off (the 'none' filter is used on every row) and the
- * images are not interlaced.
+ * Row filtering is the libpng default but may be turned off (the 'none' filter
+ * is used on every row) with the --nofilters option.
+ *
+ * The images are not interlaced.
+ *
+ * If file-name is given then the PNG is written to that file, else it is
+ * written to stdout.  Notice that stdout is not supported on systems where, by
+ * default, it assumes text output; this program makes no attempt to change the
+ * text mode of stdout!
+ *
+ *    makepng --color=<color> ...
  *
  * If --color is given then the whole image has that color, color-mapped images
  * will have exactly one palette entry and all image files with be 16x16 in
  * size.  The color value is 1 to 4 decimal numbers as appropriate for the color
  * type.
  *
- * If file-name is given then the PNG is written to that file, else it is
- * written to stdout.  Notice that stdout is not supported on systems where, by
- * default, it assumes text output; this program makes no attempt to change the
- * text mode of stdout!
+ *    makepng --small ...
+ *
+ * If --small is given the images are no larger than required to include every
+ * possible pixel value for the format.
+ *
+ * For formats with pixels 8 bits or fewer in size the images consist of a
+ * single row with 2^pixel-depth pixels, one of every possible value.
+ *
+ * For formats with 16-bit pixels a 256x256 image is generated containing every
+ * possible pixel value.
+ *
+ * For larger pixel sizes a 256x256 image is generated where the first row
+ * consists of each pixel that has identical byte values throughout the pixel
+ * followed by rows where the byte values differ within the pixel.
+ *
+ * In all cases the pixel values are arranged in such a way that the SUB and UP
+ * filters give byte sequences for maximal zlib compression.  By default (if
+ * --nofilters is not given) the SUB filter is used on the first row and the UP
+ * filter on all following rows.
+ *
+ * The --small option is meant to provide good test-case coverage, however the
+ * images are not easy to examine visually.  Without the --small option the
+ * images contain identical color values; the pixel values are adjusted
+ * according to the gamma encoding with no gamma encoding being interpreted as
+ * sRGB.
+ *
+ * LICENSING
+ * =========
+ *
+ * This code is copyright of the authors, see the COPYRIGHT define above.  The
+ * code is licensed as above, using the libpng license.  The code generates
+ * images which are solely the product of the code; the options choose which of
+ * the many possibilities to generate.  The images that result (but not the code
+ * which generates them) are licensed as defined here:
+ *
+ * IMPORTANT: the COPYRIGHT #define must contain ISO-Latin-1 characters, the
+ * IMAGE_LICENSING #define must contain UTF-8 characters.  The 'copyright'
+ * symbol 0xA9U (\251) in ISO-Latin-1 encoding and 0xC20xA9 (\302\251) in UTF-8.
  */
-#define _ISOC99_SOURCE /* for strtoull */
+#define IMAGE_LICENSING "Dedicated to the public domain per Create Commons "\
+    "license \"CC0 1.0\"; https://creativecommons.org/publicdomain/zero/"
 
 #include <stddef.h> /* for offsetof */
 #include <stdlib.h>
@@ -720,7 +766,7 @@ makepng_error(png_structp png_ptr, png_const_charp message)
 static int /* 0 on success, else an error code */
 write_png(const char **name, FILE *fp, int color_type, int bit_depth,
    volatile png_fixed_point gamma, chunk_insert * volatile insert,
-   unsigned int filters, unsigned int *colors, int small)
+   unsigned int filters, unsigned int *colors, int small, int tRNS)
 {
    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
       name, makepng_error, makepng_warning);
@@ -844,12 +890,24 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
          npalette = generate_palette(palette, trans, bit_depth, gamma_table,
             colors);
          png_set_PLTE(png_ptr, info_ptr, palette, npalette);
-         png_set_tRNS(png_ptr, info_ptr, trans, npalette-1,
-            NULL/*transparent color*/);
+
+         if (tRNS)
+            png_set_tRNS(png_ptr, info_ptr, trans, npalette-1,
+               NULL/*transparent color*/);
 
          /* Reset gamma_table to prevent the image rows being changed */
          for (npalette=0; npalette<256; ++npalette)
             gamma_table[npalette] = (png_byte)npalette;
+      }
+
+      else if (tRNS)
+      {
+         png_color_16 col;
+
+         col.red = col.green = col.blue = col.gray =
+            0x0101U & ((1U<<bit_depth)-1U);
+         col.index = 0U;
+         png_set_tRNS(png_ptr, info_ptr, NULL/*trans*/, 1U, &col);
       }
 
       if (gamma == PNG_DEFAULT_sRGB)
@@ -1451,13 +1509,55 @@ strstash(png_const_charp foo)
    /* The program indicates a memory allocation error by crashing, this is by
     * design.
     */
-   png_charp bar = malloc(strlen(foo)+1);
-   return strcpy(bar, foo);
+   if (foo != NULL)
+   {
+      png_charp bar = malloc(strlen(foo)+1);
+      return strcpy(bar, foo);
+   }
+
+   return NULL;
+}
+
+static png_charp
+strstash_list(const png_const_charp *text)
+{
+   size_t foo = 0;
+   png_charp result, bar;
+   const png_const_charp *line = text;
+
+   while (*line != NULL)
+      foo += strlen(*line++);
+
+   result = bar = malloc(foo+1);
+
+   line = text;
+   while (*line != NULL)
+   {
+      foo = strlen(*line);
+      memcpy(bar, *line++, foo);
+      bar += foo;
+   }
+
+   *bar = 0;
+   return result;
 }
 
 /* These are used to insert Copyright and Licence fields, they allow the text to
  * have \n unlike the --insert option.
  */
+static chunk_insert *
+add_tEXt(const char *key, const png_const_charp *text)
+{
+   static char what[5] = { 116, 69, 88, 116, 0 };
+   png_charp parameter_list[3];
+
+   parameter_list[0] = strstash(key);
+   parameter_list[1] = strstash_list(text);
+   parameter_list[2] = NULL;
+
+   return make_insert(what, insert_tEXt, 2, parameter_list);
+}
+
 static chunk_insert *
 add_iTXt(const char *key, const char *language, const char *language_key,
       const png_const_charp *text)
@@ -1468,28 +1568,7 @@ add_iTXt(const char *key, const char *language, const char *language_key,
    parameter_list[0] = strstash(key);
    parameter_list[1] = strstash(language);
    parameter_list[2] = strstash(language_key);
-
-   {
-      size_t foo = 0;
-      png_charp bar;
-      const png_const_charp *line = text;
-
-      while (*line != NULL)
-         foo += strlen(*line++);
-
-      parameter_list[3] = bar = malloc(foo+1);
-
-      line = text;
-      while (*line != NULL)
-      {
-         foo = strlen(*line);
-         memcpy(bar, *line++, foo);
-         bar += foo;
-      }
-
-      *bar = 0;
-   }
-
+   parameter_list[3] = strstash_list(text);
    parameter_list[4] = NULL;
 
    return make_insert(what, insert_iTXt, 4, parameter_list);
@@ -1545,6 +1624,7 @@ main(int argc, char **argv)
    int color_type = 8; /* invalid */
    int bit_depth = 32; /* invalid */
    int small = 0; /* make full size images */
+   int tRNS = 0; /* don't output a tRNS chunk */
    unsigned int colors[5];
    unsigned int filters = PNG_ALL_FILTERS;
    png_fixed_point gamma = 0; /* not set */
@@ -1560,6 +1640,12 @@ main(int argc, char **argv)
       if (strcmp(arg, "--small") == 0)
       {
          small = 1;
+         continue;
+      }
+
+      if (strcmp(arg, "--tRNS") == 0)
+      {
+         tRNS = 1;
          continue;
       }
 
@@ -1759,150 +1845,25 @@ main(int argc, char **argv)
    {
       static png_const_charp copyright[] =
       {
-         COPYRIGHT,
+         COPYRIGHT, /* ISO-Latin-1 */
          NULL
       };
-      chunk_insert *new_insert = add_iTXt("Copyright", "en", "Copyright",
-            copyright);
+      static png_const_charp licensing[] =
+      {
+         IMAGE_LICENSING, /* UTF-8 */
+         NULL
+      };
 
+      chunk_insert *new_insert;
+      
+      new_insert = add_tEXt("Copyright", copyright);
       if (new_insert != NULL)
       {
          *insert_ptr = new_insert;
          insert_ptr = &new_insert->next;
       }
 
-      {
-         static png_const_charp text[] =
-         {
-            "Statement of Purpose\n",
-            "\n",
-            "The laws of most jurisdictions throughout the world\n",
-            "automatically confer exclusive Copyright and Related Rights\n",
-            "(defined below) upon the creator and subsequent owner(s)\n",
-            "(each and all, an \"owner\") of an original work of\n",
-            "authorship and/or a database (each, a \"Work\").\n",
-            "\n",
-            "Certain owners wish to permanently relinquish those rights\n",
-            "to a Work for the purpose of contributing to a commons of\n",
-            "creative, cultural and scientific works (\"Commons\") that\n",
-            "the public can reliably and without fear of later claims\n",
-            "of infringement build upon, modify, incorporate in other\n",
-            "works, reuse and redistribute as freely as possible in any\n",
-            "form whatsoever and for any purposes, including without\n",
-            "limitation commercial purposes. These owners may contribute\n",
-            "to the Commons to promote the ideal of a free culture and\n",
-            "the further production of creative, cultural and scientific\n",
-            "works, or to gain reputation or greater distribution for\n",
-            "their Work in part through the use and efforts of others.\n",
-            "\n",
-            "For these and/or other purposes and motivations, and\n",
-            "without any expectation of additional consideration or\n",
-            "compensation, the person associating CC0 with a Work (the\n",
-            "\"Affirmer\"), to the extent that he or she is an owner\n",
-            "of Copyright and Related Rights in the Work, voluntarily\n",
-            "elects to apply CC0 to the Work and publicly distribute\n",
-            "the Work under its terms, with knowledge of his or her\n",
-            "Copyright and Related Rights in the Work and the meaning\n",
-            "and intended legal effect of CC0 on those rights.\n",
-            "\n",
-            "1. Copyright and Related Rights. A Work made available\n",
-            "under CC0 may be protected by copyright and related\n",
-            "or neighboring rights (\"Copyright and Related\n",
-            "Rights\"). Copyright and Related Rights include, but are\n",
-            "not limited to, the following:\n",
-            "\n",
-            "the right to reproduce, adapt, distribute, perform,\n",
-            "display, communicate, and translate a Work; moral rights\n",
-            "retained by the original author(s) and/or performer(s);\n",
-            "publicity and privacy rights pertaining to a person's image\n",
-            "or likeness depicted in a Work; rights protecting against\n",
-            "unfair competition in regards to a Work, subject to the\n",
-            "limitations in paragraph 4(a), below; rights protecting the\n",
-            "extraction, dissemination, use and reuse of data in a Work;\n",
-            "database rights (such as those arising under Directive\n",
-            "96/9/EC of the European Parliament and of the Council of\n",
-            "11 March 1996 on the legal protection of databases, and\n",
-            "under any national implementation thereof, including any\n",
-            "amended or successor version of such directive); and other\n",
-            "similar, equivalent or corresponding rights throughout the\n",
-            "world based on applicable law or treaty, and any national\n",
-            "implementations thereof.  2. Waiver. To the greatest extent\n",
-            "permitted by, but not in contravention of, applicable law,\n",
-            "Affirmer hereby overtly, fully, permanently, irrevocably\n",
-            "and unconditionally waives, abandons, and surrenders all\n",
-            "of Affirmer's Copyright and Related Rights and associated\n",
-            "claims and causes of action, whether now known or unknown\n",
-            "(including existing as well as future claims and causes\n",
-            "of action), in the Work (i) in all territories worldwide,\n",
-            "(ii) for the maximum duration provided by applicable law\n",
-            "or treaty (including future time extensions), (iii) in any\n",
-            "current or future medium and for any number of copies,\n",
-            "and (iv) for any purpose whatsoever, including without\n",
-            "limitation commercial, advertising or promotional purposes\n",
-            "(the \"Waiver\"). Affirmer makes the Waiver for the benefit\n",
-            "of each member of the public at large and to the detriment\n",
-            "of Affirmer's heirs and successors, fully intending that\n",
-            "such Waiver shall not be subject to revocation, rescission,\n",
-            "cancellation, termination, or any other legal or equitable\n",
-            "action to disrupt the quiet enjoyment of the Work by the\n",
-            "public as contemplated by Affirmer's express Statement\n",
-            "of Purpose.\n",
-            "\n",
-            "3. Public License Fallback. Should any part of the Waiver\n",
-            "for any reason be judged legally invalid or ineffective\n",
-            "under applicable law, then the Waiver shall be preserved to\n",
-            "the maximum extent permitted taking into account Affirmer's\n",
-            "express Statement of Purpose. In addition, to the extent\n",
-            "the Waiver is so judged Affirmer hereby grants to each\n",
-            "affected person a royalty-free, non transferable, non\n",
-            "sublicensable, non exclusive, irrevocable and unconditional\n",
-            "license to exercise Affirmer's Copyright and Related\n",
-            "Rights in the Work (i) in all territories worldwide, (ii)\n",
-            "for the maximum duration provided by applicable law or\n",
-            "treaty (including future time extensions), (iii) in any\n",
-            "current or future medium and for any number of copies,\n",
-            "and (iv) for any purpose whatsoever, including without\n",
-            "limitation commercial, advertising or promotional purposes\n",
-            "(the \"License\"). The License shall be deemed effective as\n",
-            "of the date CC0 was applied by Affirmer to the Work. Should\n",
-            "any part of the License for any reason be judged legally\n",
-            "invalid or ineffective under applicable law, such partial\n",
-            "invalidity or ineffectiveness shall not invalidate the\n",
-            "remainder of the License, and in such case Affirmer hereby\n",
-            "affirms that he or she will not (i) exercise any of his or\n",
-            "her remaining Copyright and Related Rights in the Work or\n",
-            "(ii) assert any associated claims and causes of action with\n",
-            "respect to the Work, in either case contrary to Affirmer's\n",
-            "express Statement of Purpose.\n",
-            "\n",
-            "4. Limitations and Disclaimers.\n",
-            "\n",
-            "No trademark or patent rights held by Affirmer are waived,\n",
-            "abandoned, surrendered, licensed or otherwise affected by\n",
-            "this document.  Affirmer offers the Work as-is and makes no\n",
-            "representations or warranties of any kind concerning the\n",
-            "Work, express, implied, statutory or otherwise, including\n",
-            "without limitation warranties of title, merchantability,\n",
-            "fitness for a particular purpose, non infringement, or\n",
-            "the absence of latent or other defects, accuracy, or the\n",
-            "present or absence of errors, whether or not discoverable,\n",
-            "all to the greatest extent permissible under applicable\n",
-            "law.  Affirmer disclaims responsibility for clearing\n",
-            "rights of other persons that may apply to the Work or any\n",
-            "use thereof, including without limitation any person's\n",
-            "Copyright and Related Rights in the Work. Further, Affirmer\n",
-            "disclaims responsibility for obtaining any necessary\n",
-            "consents, permissions or other rights required for any use\n",
-            "of the Work.  Affirmer understands and acknowledges that\n",
-            "Creative Commons is not a party to this document and has\n",
-            "no duty or obligation with respect to this CC0 or use of\n",
-            "the Work.\n",
-            NULL
-         };
-
-         new_insert = add_iTXt("Licence", "en-us", "License", text);
-      }
-
+      new_insert = add_iTXt("Licensing", "en", NULL, licensing);
       if (new_insert != NULL)
       {
          *insert_ptr = new_insert;
@@ -1912,7 +1873,7 @@ main(int argc, char **argv)
 
    {
       int ret = write_png(&file_name, fp, color_type, bit_depth, gamma,
-         head_insert, filters, colors, small);
+         head_insert, filters, colors, small, tRNS);
 
       if (ret != 0 && file_name != NULL)
          remove(file_name);

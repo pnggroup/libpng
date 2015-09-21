@@ -22,6 +22,15 @@ mpg(){
    fi
 }
 
+mptrans(){
+   if test "$1" = "none"
+   then
+      mp "--tRNS" "-tRNS" "$2" "$3"
+   else
+      mp "--tRNS --$1" "-$1-tRNS" "$2" "$3"
+   fi
+}
+
 case "$1" in
    --small)
       opts="--small";;&
@@ -34,16 +43,22 @@ case "$1" in
             for b in 1 2 4
             do
                mpg "$g" "$c" "$b"
+               mptrans "$g" "$c" "$b"
             done
          done
 
          mpg "$g" palette 8
+         mptrans "$g" palette 8
 
-         for c in gray gray-alpha rgb rgb-alpha
+         for b in 8 16
          do
-            for b in 8 16
+            for c in gray gray-alpha rgb rgb-alpha
             do
                mpg "$g" "$c" "$b"
+            done
+            for c in gray rgb
+            do
+               mptrans "$g" "$c" "$b"
             done
          done
       done;;
