@@ -1,8 +1,10 @@
 /* makepng.c
  *
- * Copyright (c) 2013 John Cunningham Bowler
- *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Copyright:
+ */
+#define COPYRIGHT "Copyright \302\251 2013,2015 John Cunningham Bowler"
+/*
+ * Last changed in libpng 1.7.0 [September 20, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -82,6 +84,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <errno.h>
+#include <assert.h>
 #include <stdint.h>
 
 #if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
@@ -96,6 +99,8 @@
 #else
 #  include "../../png.h"
 #endif
+
+#include <zlib.h>
 
 /* Work round for GCC complaints about casting a (double) function result to
  * an unsigned:
@@ -153,7 +158,8 @@ pixel_depth_of_type(int color_type, int bit_depth)
 }
 
 static unsigned int
-image_size_of_type(int color_type, int bit_depth, unsigned int *colors)
+image_size_of_type(int color_type, int bit_depth, unsigned int *colors,
+   int small)
 {
    if (*colors)
       return 16;
@@ -162,7 +168,16 @@ image_size_of_type(int color_type, int bit_depth, unsigned int *colors)
    {
       int pixel_depth = pixel_depth_of_type(color_type, bit_depth);
 
-      if (pixel_depth < 8)
+      if (small)
+      {
+         if (pixel_depth <= 8) /* there will be one row */
+            return 1 << pixel_depth;
+
+         else
+            return 256;
+      }
+
+      else if (pixel_depth < 8)
          return 64;
 
       else if (pixel_depth > 16)
@@ -325,15 +340,145 @@ set_value(png_bytep row, size_t rowbytes, png_uint_32 x, unsigned int bit_depth,
    }
 }
 
-static void
+static int /* filter mask for row */
 generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
    int bit_depth, png_const_bytep gamma_table, double conv,
-   unsigned int *colors)
+   unsigned int *colors, int small)
 {
-   png_uint_32 size_max = image_size_of_type(color_type, bit_depth, colors)-1;
+   int filters = 0; /* file *MASK*, 0 means the default, not NONE */
+   png_uint_32 size_max = 
+      image_size_of_type(color_type, bit_depth, colors, small)-1;
    png_uint_32 depth_max = (1U << bit_depth)-1; /* up to 65536 */
 
-   if (colors[0] == 0) switch (channels_of_type(color_type))
+   if (colors[0] == 0) if (small)
+   {
+      unsigned int pixel_depth = pixel_depth_of_type(color_type, bit_depth);
+
+      /* For pixel depths less than 16 generate a single row containing all the
+       * possible pixel values.  For 16 generate all 65536 byte pair
+       * combinations in a 256x256 pixel array.
+       */
+      switch (pixel_depth)
+      {
+         case 1:
+            assert(y == 0 && rowbytes == 1 && size_max == 1);
+            row[0] = 0x6CU; /* binary: 01101100, only top 2 bits used */
+            filters = PNG_FILTER_NONE;
+            break;
+
+         case 2:
+            assert(y == 0 && rowbytes == 1 && size_max == 3);
+            row[0] = 0x1BU; /* binary 00011011, all bits used */
+            filters = PNG_FILTER_NONE;
+            break;
+
+         case 4:
+            assert(y == 0 && rowbytes == 8 && size_max == 15);
+            row[0] = 0x01U;
+            row[1] = 0x23U; /* SUB gives 0x22U for all following bytes */
+            row[2] = 0x45U;
+            row[3] = 0x67U;
+            row[4] = 0x89U;
+            row[5] = 0xABU;
+            row[6] = 0xCDU;
+            row[7] = 0xEFU;
+            filters = PNG_FILTER_SUB;
+            break;
+
+         case 8:
+            /* The row will have all the pixel values in order starting with
+             * '1', the SUB filter will change every byte into '1' (including
+             * the last, which generates pixel value '0').  Since the SUB filter
+             * has value 1 this should result in maximum compression.
+             */
+            assert(y == 0 && rowbytes == 256 && size_max == 255);
+            for (;;)
+            {
+               row[size_max] = 0xFFU & (size_max+1);
+               if (size_max == 0)
+                  break;
+               --size_max;
+            }
+            filters = PNG_FILTER_SUB;
+            break;
+
+         case 16:
+            /* Rows are generated such that each row has a constant difference
+             * between the first and second byte of each pixel and so that the
+             * difference increases by 1 at each row.  The rows start with the
+             * first byte value of 0 and the value increases to 255 across the
+             * row.
+             *
+             * The difference starts at 1, so the first row is:
+             *
+             *     0 1 1 2 2 3 3 4 ... 254 255 255 0
+             *
+             * This means that running the SUB filter on the first row produces:
+             *
+             *   [SUB==1] 0 1 0 1 0 1...
+             *
+             * Then the difference is 2 on the next row, giving:
+             *
+             *    0 2 1 3 2 4 3 5 ... 254 0 255 1
+             *
+             * When the UP filter is run on this libpng produces:
+             *
+             *   [UP ==2] 0 1 0 1 0 1...
+             *
+             * And so on for all the remain rows to the final two * rows:
+             *
+             *    row 254: 0 255 1 0 2 1 3 2 4 3 ... 254 253 255 254
+             *    row 255: 0   0 1 1 2 2 3 3 4 4 ... 254 254 255 255
+             */
+            assert(rowbytes == 512 && size_max == 255);
+            for (;;)
+            {
+               row[2*size_max  ] = 0xFFU & size_max;
+               row[2*size_max+1] = 0xFFU & (size_max+y+1);
+               if (size_max == 0)
+                  break;
+               --size_max;
+            }
+            filters = (y == 0 ? PNG_FILTER_SUB : PNG_FILTER_UP);
+            break;
+
+         case 24:
+         case 32:
+         case 48:
+         case 64:
+            /* The rows are filled by an alogorithm similar to the above, in the
+             * first row pixel bytes are all equal, increasing from 0 by 1 for
+             * each pixel.  In the second row the bytes within a pixel are
+             * incremented 1,3,5,7,... from the previous row byte.  Using an odd
+             * number ensures all the possible byte values are used.
+             */
+            assert(size_max == 255 && rowbytes == 256*(pixel_depth>>3));
+            pixel_depth >>= 3; /* now in bytes */
+            while (rowbytes > 0)
+            {
+               const size_t pixel_index = --rowbytes/pixel_depth;
+
+               if (y == 0)
+                  row[rowbytes] = 0xFFU & pixel_index;
+
+               else
+               {
+                  const size_t byte_offset =
+                     rowbytes - pixel_index * pixel_depth;
+
+                  row[rowbytes] =
+                     0xFFU & (pixel_index + (byte_offset * 2*y) + 1);
+               }
+            }
+            filters = (y == 0 ? PNG_FILTER_SUB : PNG_FILTER_UP);
+            break;
+
+         default:
+            assert(0/*NOT REACHED*/);
+      }
+   }
+      
+   else switch (channels_of_type(color_type))
    {
    /* 1 channel: a square image with a diamond, the least luminous colors are on
     *    the edge of the image, the most luminous in the center.
@@ -545,6 +690,8 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
          colors[0], channels_of_type(color_type));
       exit(1);
    }
+
+   return filters;
 }
 
 
@@ -573,7 +720,7 @@ makepng_error(png_structp png_ptr, png_const_charp message)
 static int /* 0 on success, else an error code */
 write_png(const char **name, FILE *fp, int color_type, int bit_depth,
    volatile png_fixed_point gamma, chunk_insert * volatile insert,
-   unsigned int filters, unsigned int *colors)
+   unsigned int filters, unsigned int *colors, int small)
 {
    png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
       name, makepng_error, makepng_warning);
@@ -600,6 +747,15 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
 
    /* Allow benign errors so that we can write PNGs with errors */
    png_set_benign_errors(png_ptr, 1/*allowed*/);
+
+   /* Max out the text compression level in an attempt to make the license
+    * small.   If --small then do the same for the IDAT.
+    */
+   if (small)
+      png_set_compression_level(png_ptr, Z_BEST_COMPRESSION);
+
+   png_set_text_compression_level(png_ptr, Z_BEST_COMPRESSION);
+
    png_init_io(png_ptr, fp);
 
    info_ptr = png_create_info_struct(png_ptr);
@@ -607,10 +763,36 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
       png_error(png_ptr, "OOM allocating info structure");
 
    {
-      unsigned int size = image_size_of_type(color_type, bit_depth, colors);
+      const unsigned int size =
+         image_size_of_type(color_type, bit_depth, colors, small);
+      unsigned int ysize;
       png_fixed_point real_gamma = 45455; /* For sRGB */
       png_byte gamma_table[256];
       double conv;
+
+      /* Normally images are square, but with 'small' we want to simply generate
+       * all the pixel values, or all that we reasonably can:
+       */
+      if (small)
+      {
+         const unsigned int pixel_depth =
+            pixel_depth_of_type(color_type, bit_depth);
+
+         if (pixel_depth <= 8U)
+         {
+            assert(size == (1U<<pixel_depth));
+            ysize = 1U;
+         }
+
+         else
+         {
+            assert(size == 256U);
+            ysize = 256U;
+         }
+      }
+
+      else
+         ysize = size;
 
       /* This function uses the libpng values used on read to carry extra
        * information about the gamma:
@@ -650,7 +832,7 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
          }
       }
 
-      png_set_IHDR(png_ptr, info_ptr, size, size, bit_depth, color_type,
+      png_set_IHDR(png_ptr, info_ptr, size, ysize, bit_depth, color_type,
          PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
       if (color_type & PNG_COLOR_MASK_PALETTE)
@@ -718,10 +900,15 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
          {
             unsigned int y;
 
-            for (y=0; y<size; ++y)
+            for (y=0; y<ysize; ++y)
             {
-               generate_row(row, rowbytes, y, color_type, bit_depth,
-                  gamma_table, conv, colors);
+               unsigned int row_filters =
+                  generate_row(row, rowbytes, y, color_type, bit_depth,
+                        gamma_table, conv, colors, small);
+
+               if (row_filters != 0 && filters == PNG_ALL_FILTERS)
+                  png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, row_filters);
+
                png_write_row(png_ptr, row);
             }
          }
@@ -1085,7 +1272,8 @@ insert_iTXt(png_structp png_ptr, png_infop info_ptr, int nparams,
 }
 
 static void
-insert_hIST(png_structp png_ptr, png_infop info_ptr, int nparams, png_charpp params)
+insert_hIST(png_structp png_ptr, png_infop info_ptr, int nparams,
+      png_charpp params)
 {
    int i;
    png_uint_16 freq[256];
@@ -1254,6 +1442,59 @@ find_insert(png_const_charp what, png_charp param)
    return NULL;
 }
 
+/* This is necessary because libpng expects writeable strings for things like
+ * text chunks (maybe this should be fixed...)
+ */
+static png_charp
+strstash(png_const_charp foo)
+{
+   /* The program indicates a memory allocation error by crashing, this is by
+    * design.
+    */
+   png_charp bar = malloc(strlen(foo)+1);
+   return strcpy(bar, foo);
+}
+
+/* These are used to insert Copyright and Licence fields, they allow the text to
+ * have \n unlike the --insert option.
+ */
+static chunk_insert *
+add_iTXt(const char *key, const char *language, const char *language_key,
+      const png_const_charp *text)
+{
+   static char what[5] = { 105, 84, 88, 116, 0 };
+   png_charp parameter_list[5];
+
+   parameter_list[0] = strstash(key);
+   parameter_list[1] = strstash(language);
+   parameter_list[2] = strstash(language_key);
+
+   {
+      size_t foo = 0;
+      png_charp bar;
+      const png_const_charp *line = text;
+
+      while (*line != NULL)
+         foo += strlen(*line++);
+
+      parameter_list[3] = bar = malloc(foo+1);
+
+      line = text;
+      while (*line != NULL)
+      {
+         foo = strlen(*line);
+         memcpy(bar, *line++, foo);
+         bar += foo;
+      }
+
+      *bar = 0;
+   }
+
+   parameter_list[4] = NULL;
+
+   return make_insert(what, insert_iTXt, 4, parameter_list);
+}
+
 /* This is a not-very-good parser for a sequence of numbers (including 0).  It
  * doesn't accept some apparently valid things, but it accepts all the sensible
  * combinations.
@@ -1303,6 +1544,7 @@ main(int argc, char **argv)
    const char *file_name = NULL;
    int color_type = 8; /* invalid */
    int bit_depth = 32; /* invalid */
+   int small = 0; /* make full size images */
    unsigned int colors[5];
    unsigned int filters = PNG_ALL_FILTERS;
    png_fixed_point gamma = 0; /* not set */
@@ -1314,6 +1556,12 @@ main(int argc, char **argv)
    while (--argc > 0)
    {
       char *arg = *++argv;
+
+      if (strcmp(arg, "--small") == 0)
+      {
+         small = 1;
+         continue;
+      }
 
       if (strcmp(arg, "--sRGB") == 0)
       {
@@ -1455,9 +1703,10 @@ main(int argc, char **argv)
 
    if (color_type == 8 || bit_depth == 32)
    {
-      fprintf(stderr, "usage: makepng [--sRGB|--linear|--1.8] "
+      fprintf(stderr, "usage: makepng [--small] [--sRGB|--linear|--1.8] "
          "[--color=...] color-type bit-depth [file-name]\n"
-         "  Make a test PNG file, by default writes to stdout.\n");
+         "  Make a test PNG file, by default writes to stdout.\n"
+         "  Other options are available, UTSL.\n");
       exit(1);
    }
 
@@ -1476,10 +1725,19 @@ main(int argc, char **argv)
          }
    }
 
+   /* small and colors are incomparible (will probably crash if both are used at
+    * the same time!)
+    */
+   if (small && colors[0] != 0)
+   {
+      fprintf(stderr, "makepng: --color --small: only one at a time!\n");
+      exit(1);
+   }
+
    /* Restrict the filters for more speed to those we know are used for the
     * generated images.
     */
-   if (filters == PNG_ALL_FILTERS)
+   if (filters == PNG_ALL_FILTERS && !small/*small provides defaults*/)
    {
       if ((color_type & PNG_COLOR_MASK_PALETTE) != 0 || bit_depth < 8)
          filters = PNG_FILTER_NONE;
@@ -1497,9 +1755,164 @@ main(int argc, char **argv)
          filters &= ~PNG_FILTER_NONE;
    }
 
+   /* Insert standard copyright and licence text. */
+   {
+      static png_const_charp copyright[] =
+      {
+         COPYRIGHT,
+         NULL
+      };
+      chunk_insert *new_insert = add_iTXt("Copyright", "en", "Copyright",
+            copyright);
+
+      if (new_insert != NULL)
+      {
+         *insert_ptr = new_insert;
+         insert_ptr = &new_insert->next;
+      }
+
+      {
+         static png_const_charp text[] =
+         {
+            "Statement of Purpose\n",
+            "\n",
+            "The laws of most jurisdictions throughout the world\n",
+            "automatically confer exclusive Copyright and Related Rights\n",
+            "(defined below) upon the creator and subsequent owner(s)\n",
+            "(each and all, an \"owner\") of an original work of\n",
+            "authorship and/or a database (each, a \"Work\").\n",
+            "\n",
+            "Certain owners wish to permanently relinquish those rights\n",
+            "to a Work for the purpose of contributing to a commons of\n",
+            "creative, cultural and scientific works (\"Commons\") that\n",
+            "the public can reliably and without fear of later claims\n",
+            "of infringement build upon, modify, incorporate in other\n",
+            "works, reuse and redistribute as freely as possible in any\n",
+            "form whatsoever and for any purposes, including without\n",
+            "limitation commercial purposes. These owners may contribute\n",
+            "to the Commons to promote the ideal of a free culture and\n",
+            "the further production of creative, cultural and scientific\n",
+            "works, or to gain reputation or greater distribution for\n",
+            "their Work in part through the use and efforts of others.\n",
+            "\n",
+            "For these and/or other purposes and motivations, and\n",
+            "without any expectation of additional consideration or\n",
+            "compensation, the person associating CC0 with a Work (the\n",
+            "\"Affirmer\"), to the extent that he or she is an owner\n",
+            "of Copyright and Related Rights in the Work, voluntarily\n",
+            "elects to apply CC0 to the Work and publicly distribute\n",
+            "the Work under its terms, with knowledge of his or her\n",
+            "Copyright and Related Rights in the Work and the meaning\n",
+            "and intended legal effect of CC0 on those rights.\n",
+            "\n",
+            "1. Copyright and Related Rights. A Work made available\n",
+            "under CC0 may be protected by copyright and related\n",
+            "or neighboring rights (\"Copyright and Related\n",
+            "Rights\"). Copyright and Related Rights include, but are\n",
+            "not limited to, the following:\n",
+            "\n",
+            "the right to reproduce, adapt, distribute, perform,\n",
+            "display, communicate, and translate a Work; moral rights\n",
+            "retained by the original author(s) and/or performer(s);\n",
+            "publicity and privacy rights pertaining to a person's image\n",
+            "or likeness depicted in a Work; rights protecting against\n",
+            "unfair competition in regards to a Work, subject to the\n",
+            "limitations in paragraph 4(a), below; rights protecting the\n",
+            "extraction, dissemination, use and reuse of data in a Work;\n",
+            "database rights (such as those arising under Directive\n",
+            "96/9/EC of the European Parliament and of the Council of\n",
+            "11 March 1996 on the legal protection of databases, and\n",
+            "under any national implementation thereof, including any\n",
+            "amended or successor version of such directive); and other\n",
+            "similar, equivalent or corresponding rights throughout the\n",
+            "world based on applicable law or treaty, and any national\n",
+            "implementations thereof.  2. Waiver. To the greatest extent\n",
+            "permitted by, but not in contravention of, applicable law,\n",
+            "Affirmer hereby overtly, fully, permanently, irrevocably\n",
+            "and unconditionally waives, abandons, and surrenders all\n",
+            "of Affirmer's Copyright and Related Rights and associated\n",
+            "claims and causes of action, whether now known or unknown\n",
+            "(including existing as well as future claims and causes\n",
+            "of action), in the Work (i) in all territories worldwide,\n",
+            "(ii) for the maximum duration provided by applicable law\n",
+            "or treaty (including future time extensions), (iii) in any\n",
+            "current or future medium and for any number of copies,\n",
+            "and (iv) for any purpose whatsoever, including without\n",
+            "limitation commercial, advertising or promotional purposes\n",
+            "(the \"Waiver\"). Affirmer makes the Waiver for the benefit\n",
+            "of each member of the public at large and to the detriment\n",
+            "of Affirmer's heirs and successors, fully intending that\n",
+            "such Waiver shall not be subject to revocation, rescission,\n",
+            "cancellation, termination, or any other legal or equitable\n",
+            "action to disrupt the quiet enjoyment of the Work by the\n",
+            "public as contemplated by Affirmer's express Statement\n",
+            "of Purpose.\n",
+            "\n",
+            "3. Public License Fallback. Should any part of the Waiver\n",
+            "for any reason be judged legally invalid or ineffective\n",
+            "under applicable law, then the Waiver shall be preserved to\n",
+            "the maximum extent permitted taking into account Affirmer's\n",
+            "express Statement of Purpose. In addition, to the extent\n",
+            "the Waiver is so judged Affirmer hereby grants to each\n",
+            "affected person a royalty-free, non transferable, non\n",
+            "sublicensable, non exclusive, irrevocable and unconditional\n",
+            "license to exercise Affirmer's Copyright and Related\n",
+            "Rights in the Work (i) in all territories worldwide, (ii)\n",
+            "for the maximum duration provided by applicable law or\n",
+            "treaty (including future time extensions), (iii) in any\n",
+            "current or future medium and for any number of copies,\n",
+            "and (iv) for any purpose whatsoever, including without\n",
+            "limitation commercial, advertising or promotional purposes\n",
+            "(the \"License\"). The License shall be deemed effective as\n",
+            "of the date CC0 was applied by Affirmer to the Work. Should\n",
+            "any part of the License for any reason be judged legally\n",
+            "invalid or ineffective under applicable law, such partial\n",
+            "invalidity or ineffectiveness shall not invalidate the\n",
+            "remainder of the License, and in such case Affirmer hereby\n",
+            "affirms that he or she will not (i) exercise any of his or\n",
+            "her remaining Copyright and Related Rights in the Work or\n",
+            "(ii) assert any associated claims and causes of action with\n",
+            "respect to the Work, in either case contrary to Affirmer's\n",
+            "express Statement of Purpose.\n",
+            "\n",
+            "4. Limitations and Disclaimers.\n",
+            "\n",
+            "No trademark or patent rights held by Affirmer are waived,\n",
+            "abandoned, surrendered, licensed or otherwise affected by\n",
+            "this document.  Affirmer offers the Work as-is and makes no\n",
+            "representations or warranties of any kind concerning the\n",
+            "Work, express, implied, statutory or otherwise, including\n",
+            "without limitation warranties of title, merchantability,\n",
+            "fitness for a particular purpose, non infringement, or\n",
+            "the absence of latent or other defects, accuracy, or the\n",
+            "present or absence of errors, whether or not discoverable,\n",
+            "all to the greatest extent permissible under applicable\n",
+            "law.  Affirmer disclaims responsibility for clearing\n",
+            "rights of other persons that may apply to the Work or any\n",
+            "use thereof, including without limitation any person's\n",
+            "Copyright and Related Rights in the Work. Further, Affirmer\n",
+            "disclaims responsibility for obtaining any necessary\n",
+            "consents, permissions or other rights required for any use\n",
+            "of the Work.  Affirmer understands and acknowledges that\n",
+            "Creative Commons is not a party to this document and has\n",
+            "no duty or obligation with respect to this CC0 or use of\n",
+            "the Work.\n",
+            NULL
+         };
+
+         new_insert = add_iTXt("Licence", "en-us", "License", text);
+      }
+
+      if (new_insert != NULL)
+      {
+         *insert_ptr = new_insert;
+         insert_ptr = &new_insert->next;
+      }
+   }
+
    {
       int ret = write_png(&file_name, fp, color_type, bit_depth, gamma,
-         head_insert, filters, colors);
+         head_insert, filters, colors, small);
 
       if (ret != 0 && file_name != NULL)
          remove(file_name);
