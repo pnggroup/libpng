@@ -756,7 +756,7 @@ png_read_destroy(png_structrp png_ptr)
    if (png_ptr->zstream.state != NULL)
    {
       int ret = inflateEnd(&png_ptr->zstream);
-      
+
       if (ret != Z_OK)
       {
          png_zstream_error(png_ptr, ret);
@@ -1081,7 +1081,7 @@ typedef struct
    png_voidp       first_row;
    ptrdiff_t       row_bytes;           /* step between rows */
    int             file_encoding;       /* E_ values above */
-   png_fixed_point gamma_to_linear;     /* For P_FILE, reciprocal of gamma */
+   png_fixed_point file_to_sRGB;        /* Cached correction factor */
    int             colormap_processing; /* PNG_CMAP_ values above */
 } png_image_read_control;
 
@@ -1445,20 +1445,15 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
 static void
 set_file_encoding(png_image_read_control *display)
 {
+   /* First test for an encoding close to linear: */
    if (png_need_gamma_correction(display->image->opaque->png_ptr,
             0/*PNG gamma*/, 0/*not sRGB*/))
    {
       png_fixed_point g = display->image->opaque->png_ptr->colorspace.gamma;
 
+      /* Now look for one close to sRGB: */
       if (png_gamma_not_sRGB(g))
-      {
          display->file_encoding = P_FILE;
-         /* Record the reciprocal of 'g', the colorspace gamma.  If this
-          * overflows just store FP_1.
-          */
-         if (!png_muldiv(&display->gamma_to_linear, PNG_FP_1, PNG_FP_1, g))
-            display->gamma_to_linear = PNG_FP_1;
-      }
 
       else
          display->file_encoding = P_sRGB;
@@ -1466,6 +1461,96 @@ set_file_encoding(png_image_read_control *display)
 
    else
       display->file_encoding = P_LINEAR8;
+}
+
+/* For colormap entries we end up doing the gamma correction here and the
+ * following routines are provided to separate out the code.  In all cases the
+ * input value is in the range 0..255 and is encoded P_FILE with the gamma value
+ * stored in the png_struct colorspace.
+ */
+static void
+init_correct(png_const_structrp png_ptr, png_fixed_point *correct)
+{
+   /* Record the convertion necessary to get from the encoding values to
+    * sRGB.  If this overflows just store FP_1.
+    *
+    * NOTE: this code used to store, and use, a convertion factor to
+    * linear then use the sRGB encoding tables to get back to sRGB, but
+    * this smashes the low values; the ones which fall in the linear part
+    * of the sRGB transfer function.
+    *
+    * The new version of this code assumes an encoding which is neither
+    * linear nor sRGB is a power law transform of the sRGB curve, not
+    * linear values.  This is somewhat at odds with a precise reading of
+    * the PNG spec, but given that we are trying to produce sRGB values
+    * here it is most likely to be correct.
+    */
+   affirm(png_ptr->colorspace.gamma > 0);
+
+   if (!png_muldiv(correct, PNG_GAMMA_sRGB_INVERSE, PNG_FP_1,
+            png_ptr->colorspace.gamma))
+      *correct = PNG_FP_1;
+}
+
+static png_uint_32
+convert_to_sRGB(png_image_read_control *display, png_uint_32 value)
+{
+   /* Converts an 8-bit value from P_FILE to P_sRGB */
+   png_const_structrp png_ptr = display->image->opaque->png_ptr;
+
+   affirm(value <= 255U);
+
+   if (display->file_to_sRGB == 0)
+      init_correct(png_ptr, &display->file_to_sRGB);
+
+   /* Now simply apply this correction factor and scale back to 8 bits. */
+   if (display->file_to_sRGB != PNG_FP_1)
+      value = PNG_DIV257(
+         png_gamma_16bit_correct(png_ptr, value*257U, display->file_to_sRGB));
+
+   return value;
+}
+
+static png_uint_32
+convert_to_linear(png_image_read_control *display, png_uint_32 value)
+{
+   /* Converts an 8-bit value from P_FILE to 16-bit P_LINEAR */
+   png_const_structrp png_ptr = display->image->opaque->png_ptr;
+
+   affirm(value <= 255U);
+
+   if (display->file_to_sRGB == 0)
+      init_correct(png_ptr, &display->file_to_sRGB);
+
+   /* Use this correct to get a 16-bit sRGB value: */
+   value *= 257U;
+
+   if (display->file_to_sRGB != PNG_FP_1)
+      value = png_gamma_16bit_correct(png_ptr, value, display->file_to_sRGB);
+
+   /* Now convert this back to linear, using the correct transfer function. */
+   if (value <= 2650U /* 65535 * 0.04045 */)
+   {
+      /* We want to divide a 12-bit number by 12.92, do this by scaling to 32
+       * bits then dividing by 2^24, with rounding:
+       */
+      value = (value * 1298546U + 649273U) >> 24;
+   }
+
+   else
+   {
+      /* Calculate for v in the range 0.04045..1.0 calculate:
+       *
+       *    ((v + 0.055)/1.055)^2.4
+       *
+       * the gamma correction function needs a 16-bit value:
+       */
+      value *= 62119U;
+      value += 223904831U+32768U; /* cannot overflow; test with 65535 */
+      value = png_gamma_16bit_correct(png_ptr, value >> 16, 240000);
+   }
+
+   return value;
 }
 
 static unsigned int
@@ -1483,8 +1568,7 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
    switch (encoding)
    {
       case P_FILE:
-         value = png_gamma_16bit_correct(display->image->opaque->png_ptr,
-            value*257, display->gamma_to_linear);
+         value = convert_to_linear(display, value);
          break;
 
       case P_sRGB:
@@ -1567,31 +1651,26 @@ png_create_colormap_entry(png_image_read_control *display,
       if (display->file_encoding == P_NOTSET)
          set_file_encoding(display);
 
-      /* Note that the cached value may be P_FILE too, but if it is then the
-       * gamma_to_linear member has been set.
-       */
+      /* Note that the cached value may be P_FILE too. */
       encoding = display->file_encoding;
    }
 
    if (encoding == P_FILE)
    {
-      png_fixed_point g = display->gamma_to_linear;
-
-      red = png_gamma_16bit_correct(png_ptr, red*257, g);
-      green = png_gamma_16bit_correct(png_ptr, green*257, g);
-      blue = png_gamma_16bit_correct(png_ptr, blue*257, g);
-
       if (convert_to_Y != 0 || output_encoding == P_LINEAR)
       {
+         red = convert_to_linear(display, red);
+         green = convert_to_linear(display, green);
+         blue = convert_to_linear(display, blue);
          alpha *= 257;
          encoding = P_LINEAR;
       }
 
       else
       {
-         red = PNG_sRGB_FROM_LINEAR(png_ptr, red * 255);
-         green = PNG_sRGB_FROM_LINEAR(png_ptr, green * 255);
-         blue = PNG_sRGB_FROM_LINEAR(png_ptr, blue * 255);
+         red = convert_to_sRGB(display, red);
+         green = convert_to_sRGB(display, green);
+         blue = convert_to_sRGB(display, blue);
          encoding = P_sRGB;
       }
    }
@@ -1960,7 +2039,12 @@ png_image_read_colormap(png_voidp argument)
       else
          png_ptr->colorspace.gamma = PNG_GAMMA_sRGB_INVERSE;
 
-      png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
+      /* Make sure libpng doesn't ignore the setting: */
+      if (png_ptr->colorspace.flags & PNG_COLORSPACE_INVALID)
+         png_ptr->colorspace.flags = PNG_COLORSPACE_HAVE_GAMMA;
+
+      else
+         png_ptr->colorspace.flags |= PNG_COLORSPACE_HAVE_GAMMA;
    }
 
    /* Decide what to do based on the PNG color type of the input data.  The

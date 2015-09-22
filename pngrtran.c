@@ -4926,10 +4926,7 @@ png_do_background_alpha_GA(png_transformp *transform, png_transform_controlp tc)
 
          case 65535U: /* opaque */
             if (copy)
-            {
                memcpy(dp, sp, 4U);
-               UNTESTED
-            }
             break;
       }
 
