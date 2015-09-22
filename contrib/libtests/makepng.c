@@ -485,7 +485,10 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
                   break;
                --size_max;
             }
-            filters = (y == 0 ? PNG_FILTER_SUB : PNG_FILTER_UP);
+            /* The first row must include PNG_FILTER_UP so that libpng knows we
+             * need to keep it for the following row:
+             */
+            filters = (y == 0 ? PNG_FILTER_SUB+PNG_FILTER_UP : PNG_FILTER_UP);
             break;
 
          case 24:
@@ -516,7 +519,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
                      0xFFU & (pixel_index + (byte_offset * 2*y) + 1);
                }
             }
-            filters = (y == 0 ? PNG_FILTER_SUB : PNG_FILTER_UP);
+            filters = (y == 0 ? PNG_FILTER_SUB+PNG_FILTER_UP : PNG_FILTER_UP);
             break;
 
          default:
