@@ -120,8 +120,8 @@
  * IMAGE_LICENSING #define must contain UTF-8 characters.  The 'copyright'
  * symbol 0xA9U (\251) in ISO-Latin-1 encoding and 0xC20xA9 (\302\251) in UTF-8.
  */
-#define IMAGE_LICENSING "Dedicated to the public domain per Create Commons "\
-    "license \"CC0 1.0\"; https://creativecommons.org/publicdomain/zero/"
+#define IMAGE_LICENSING "Dedicated to the public domain per Creative Commons "\
+    "license \"CC0 1.0\"; https://creativecommons.org/publicdomain/zero/1.0/"
 
 #include <stddef.h> /* for offsetof */
 #include <stdlib.h>
