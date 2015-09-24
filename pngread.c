@@ -3860,7 +3860,7 @@ png_image_read_direct(png_voidp argument)
 #           endif
                where = PNG_FILLER_AFTER;
 
-            png_set_add_alpha(png_ptr, filler, where);
+            png_set_add_alpha_16(png_ptr, filler, where);
          }
 
          /* This stops the (irrelevant) call to swap_alpha below. */

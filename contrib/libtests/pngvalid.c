@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.24 [(PENDING RELEASE)]
  * Copyright (c) 2014-2015 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -3578,7 +3578,7 @@ check_interlace_type(int const interlace_type)
 #define CAN_WRITE_INTERLACE\
    PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
 
-/* Make a standardized image given a an image colour type, bit depth and
+/* Make a standardized image given an image colour type, bit depth and
  * interlace type.  The standard images have a very restricted range of
  * rows and heights and are used for testing transforms rather than image
  * layout details.  See make_size_images below for a way to make images
@@ -8039,7 +8039,7 @@ image_transform_png_set_filler_set(const image_transform *this,
    RANDOMIZE(data.filler);
    data.flags = random_choice();
 
-   png_set_filler(pp, data.filler, data.flags);
+   png_set_filler_16(pp, data.filler, data.flags);
 
    /* The standard display handling stuff also needs to know that
     * there is a filler, so set that here.
@@ -8112,7 +8112,7 @@ image_transform_png_set_add_alpha_set(const image_transform *this,
    RANDOMIZE(data.filler);
    data.flags = random_choice();
 
-   png_set_add_alpha(pp, data.filler, data.flags);
+   png_set_add_alpha_16(pp, data.filler, data.flags);
    this->next->set(this->next, that, pp, pi);
 }
 

@@ -2660,10 +2660,17 @@ png_do_read_filler(png_row_infop row_info, png_bytep row,
    png_uint_32 i;
    png_uint_32 row_width = row_info->width;
 
+   png_byte lo_filler = (png_byte)filler;
+
 #ifdef PNG_READ_16BIT_SUPPORTED
    png_byte hi_filler = (png_byte)(filler>>8);
+   if (((flags & PNG_FLAG_FILLER_16) == 0) && row_info->bit_depth == 16)
+   {
+      /* filler bytes were read in the wrong order prior to libpng-1.5.24 */
+      lo_filler = hi_filler;
+      hi_filler = (png_byte)filler;
+   }
 #endif
-   png_byte lo_filler = (png_byte)filler;
 
    png_debug(1, "in png_do_read_filler");
 

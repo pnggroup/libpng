@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.19beta03 - August 19, 2015
+ libpng version 1.6.19beta03 - September 24, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.19beta03 - August 19, 2015
+ libpng versions 0.97, January 1998, through 1.6.19beta03 - September 24, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -1685,17 +1685,21 @@ described below.
 Data will be decoded into the supplied row buffers packed into bytes
 unless the library has been told to transform it into another format.
 For example, 4 bit/pixel paletted or grayscale data will be returned
-2 pixels/byte with the leftmost pixel in the high-order bits of the
-byte, unless png_set_packing() is called.  8-bit RGB data will be stored
-in RGB RGB RGB format unless png_set_filler() or png_set_add_alpha()
+2 pixels/byte with the leftmost pixel in the high-order bits of the byte,
+unless png_set_packing() is called.  8-bit RGB data will be stored
+in RGB RGB RGB format unless png_set_filler_16() or png_set_add_alpha_16()
 is called to insert filler bytes, either before or after each RGB triplet.
+
 16-bit RGB data will be returned RRGGBB RRGGBB, with the most significant
 byte of the color value first, unless png_set_scale_16() is called to
-transform it to regular RGB RGB triplets, or png_set_filler() or
-png_set_add alpha() is called to insert filler bytes, either before or
-after each RRGGBB triplet.  Similarly, 8-bit or 16-bit grayscale data can
-be modified with png_set_filler(), png_set_add_alpha(), png_set_strip_16(),
-or png_set_scale_16().
+transform it to regular RGB RGB triplets, or png_set_filler_16() or
+png_set_add alpha_16() is called to insert trwo filler bytes, either before
+or after each RRGGBB triplet.  Similarly, 8-bit or 16-bit grayscale data
+can be modified with png_set_filler_16(), png_set_add_alpha_16(),
+png_set_strip_16(), or png_set_scale_16().  Note that png_set_filler_16()
+and png_set_add_alpha_16(), which can be used with either 8-bit or 16-bit
+images have replaced the png_set_filler() and png_set_add_alpha() functions,
+which only work properly with 8-bit data.
 
 The following code transforms grayscale images of less than 8 to 8 bits,
 changes paletted images to RGB, and adds a full alpha channel if there is
@@ -1785,7 +1789,7 @@ Within the matrix,
      "-" means the transformation is not supported.
      "." means nothing is necessary (a tRNS chunk can just be ignored).
      "t" means the transformation is obtained by png_set_tRNS.
-     "A" means the transformation is obtained by png_set_add_alpha().
+     "A" means the transformation is obtained by png_set_add_alpha_16().
      "X" means the transformation is obtained by png_set_expand().
      "1" means the transformation is obtained by
          png_set_expand_gray_1_2_4_to_8() (and by png_set_expand()
@@ -1848,24 +1852,26 @@ PNG files store RGB pixels packed into 3 or 6 bytes. This code expands them
 into 4 or 8 bytes for windowing systems that need them in this format:
 
     if (color_type == PNG_COLOR_TYPE_RGB)
-       png_set_filler(png_ptr, filler, PNG_FILLER_BEFORE);
+       png_set_filler_16(png_ptr, filler, PNG_FILLER_BEFORE);
 
-where "filler" is the 8 or 16-bit number to fill with, and the location is
-either PNG_FILLER_BEFORE or PNG_FILLER_AFTER, depending upon whether
+where "filler" is the 8-bit or 16-bit number to fill with, and the location
+is either PNG_FILLER_BEFORE or PNG_FILLER_AFTER, depending upon whether
 you want the filler before the RGB or after.  This transformation
 does not affect images that already have full alpha channels.  To add an
-opaque alpha channel, use filler=0xff or 0xffff and PNG_FILLER_AFTER which
+opaque alpha channel, use filler=0xffff and PNG_FILLER_AFTER which
 will generate RGBA pixels.
 
-Note that png_set_filler() does not change the color type.  If you want
+Note that png_set_filler_16() does not change the color type.  If you want
 to do that, you can add a true alpha channel with
 
     if (color_type == PNG_COLOR_TYPE_RGB ||
        color_type == PNG_COLOR_TYPE_GRAY)
-       png_set_add_alpha(png_ptr, filler, PNG_FILLER_AFTER);
+       png_set_add_alpha_16(png_ptr, filler, PNG_FILLER_AFTER);
 
 where "filler" contains the alpha value to assign to each pixel.
-This function was added in libpng-1.2.7.
+The png_set_alpha() function was added in libpng-1.2.7 and the
+png_set_alpha_16() function, which can be used for either 8-bit or
+16-bit images, was added in libpng-1.5.24.
 
 If you are reading an image with an alpha channel, and you need the
 data as ARGB instead of the normal PNG format RGBA:
@@ -4904,7 +4910,13 @@ limits are now
    png_user_chunk_malloc_max 0 (unlimited) 8,000,000
 
 The png_set_option() function (and the "options" member of the png struct) was
-added to libpng-1.5.15.
+added to libpng-1.5.15, with option PNG_ARM_NEON.
+
+The png_set_filler_16() and png_set_add_alpha_16() functions were added
+at libpng-1.5.24 and libpng-1.6.19.  These replace the png_set_filler(() and
+the png_set_add_alpha() functions, which did not work properly with 16-bit
+images.  The new functions can be used with either 8-bit or 16-bit images,
+while the old functions are still available for use only with 8-bit images.
 
 The library now supports a complete fixed point implementation and can
 thus be used on systems that have no floating point support or very
@@ -5312,7 +5324,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-August 19, 2015
+September 24, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.

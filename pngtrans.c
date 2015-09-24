@@ -119,7 +119,17 @@ png_set_interlace_handling(png_structrp png_ptr)
 void PNGAPI
 png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 {
-   png_debug(1, "in png_set_filler");
+   if (png_ptr == NULL)
+      return;
+   png_set_filler_16(png_ptr, filler, filler_loc);
+   png_ptr->flags &= ~PNG_FLAG_FILLER_16; /* Wrong byte order */
+}
+
+/* Added to libpng-1.5.24 */
+void PNGAPI
+png_set_filler_16(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
+{
+   png_debug(1, "in png_set_filler_16");
 
    if (png_ptr == NULL)
       return;
@@ -139,6 +149,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
           * confusion in the past.)  The filler is only used in the read code.
           */
          png_ptr->filler = (png_uint_16)filler;
+         png_ptr->flags |= PNG_FLAG_FILLER_16; /* Correct byte order */
 #     else
          png_app_error(png_ptr, "png_set_filler not supported on read");
          PNG_UNUSED(filler) /* not used in the write case */
@@ -203,12 +214,23 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 void PNGAPI
 png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 {
+   if (png_ptr == NULL)
+      return;
+
+   png_set_add_alpha_16(png_ptr, filler, filler_loc);
+   png_ptr->flags &= ~PNG_FLAG_FILLER_16; /* Wrong byte order */
+}
+
+/* Added to libpng-1.5.24 */
+void PNGAPI
+png_set_add_alpha_16(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
+{
    png_debug(1, "in png_set_add_alpha");
 
    if (png_ptr == NULL)
       return;
 
-   png_set_filler(png_ptr, filler, filler_loc);
+   png_set_filler_16(png_ptr, filler, filler_loc);
    /* The above may fail to do anything. */
    if ((png_ptr->transformations & PNG_FILLER) != 0)
       png_ptr->transformations |= PNG_ADD_ALPHA;
