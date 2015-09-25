@@ -51,9 +51,9 @@ TESTS =\
    tests/pngvalid-gamma-expand16-background\
    tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
    tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
-   tests/pngvalid-progressive-interlace-size\
+   tests/pngvalid-progressive-size\
    tests/pngvalid-progressive-interlace-standard\
-   tests/pngvalid-progressive-interlace-transform\
+   tests/pngvalid-transform\
    tests/pngvalid-progressive-standard tests/pngvalid-standard\
    tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
    tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
