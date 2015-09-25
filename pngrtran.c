@@ -6048,7 +6048,7 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
       cp->tend.dp = cache.b8;
 
       check_depth =
-         png_run_this_transform_list_forwards(&cp->tend, cp->start, cp->end);
+         png_run_this_transform_list_forwards(&cp->tend, cp->start, *cp->end);
 
       /* If we get here these two things must be true or there are been some
        * buggy difference of opinion between the INIT code and the actual run:
@@ -6308,7 +6308,7 @@ make_cache(png_structp png_ptr, png_cache_paramsp cp, unsigned int max_depth)
 
    {
       unsigned int check_depth =
-         png_run_this_transform_list_forwards(&cp->tend, cp->start, cp->end);
+         png_run_this_transform_list_forwards(&cp->tend, cp->start, *cp->end);
 
       /* This must not change: */
       affirm(PNG_TC_PIXEL_DEPTH(cp->tend) == opd && check_depth == max_depth);
@@ -6590,7 +6590,7 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
     */
 {
    png_transformp *list = &png_ptr->transform_list;
-   unsigned int max_depth = 0U;
+   unsigned int max_depth;
    png_cache_params cp;
 
    /* PNG color-mapped data must be handled here so that the palette is updated
@@ -6610,6 +6610,7 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
    cp.end = cp.start = list;
    cp.tend = cp.tstart = *tc;
    init_caching(png_ptr, &cp);
+   max_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
 
    while (*cp.end != NULL)
    {
@@ -6660,7 +6661,9 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
     */
    if (cp.tend.caching)
    {
+      png_transformp tr = *cp.end;
       handle_cache(png_ptr, &cp, max_depth);
+      affirm(tr == *cp.end);
       max_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
    }
 

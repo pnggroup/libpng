@@ -458,7 +458,7 @@ run_transform_list_forwards(png_transform_controlp tc, png_transformp *start,
    /* Called from the init code and below, the caller must initialize 'tc' */
 {
    png_const_structp png_ptr = tc->png_ptr;
-   unsigned int max_depth = 0;
+   unsigned int max_depth = PNG_TC_PIXEL_DEPTH(*tc);
 
    /* Caller guarantees that *start is non-NULL */
    debug(*start != NULL);
@@ -494,9 +494,9 @@ run_transform_list_forwards(png_transform_controlp tc, png_transformp *start,
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 unsigned int /* PRIVATE */
 png_run_this_transform_list_forwards(png_transform_controlp tc,
-   png_transformp *start, png_transformp *end)
+   png_transformp *start, png_transformp end)
 {
-   return run_transform_list_forwards(tc, start, *end);
+   return run_transform_list_forwards(tc, start, end);
 }
 #endif /* READ_TRANSFORMS */
 
@@ -504,18 +504,11 @@ png_run_this_transform_list_forwards(png_transform_controlp tc,
 unsigned int /* PRIVATE */
 png_run_transform_list_forwards(png_structp png_ptr, png_transform_controlp tc)
 {
-   unsigned int max_depth = PNG_PIXEL_DEPTH(*png_ptr);
-
    if (png_ptr->transform_list != NULL)
-   {
-      unsigned int depth =
-         run_transform_list_forwards(tc, &png_ptr->transform_list, NULL);
+      return run_transform_list_forwards(tc, &png_ptr->transform_list, NULL);
 
-      if (depth > max_depth)
-         max_depth = depth;
-   }
-
-   return max_depth;
+   else
+      return PNG_PIXEL_DEPTH(*png_ptr);
 }
 #endif /* READ */
 
@@ -2284,6 +2277,36 @@ png_init_byte_ops(png_transformp *transform, png_transform_controlp tc)
 #endif /* SWAP poo */
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+static void
+png_init_rgb_to_gray_byte_ops(png_transformp *transform, 
+   png_transform_controlp tc)
+{
+   /* This just delay initializes the function; all the transform initialization
+    * has been done below.
+    */
+   (*transform)->fn = png_do_byte_ops_up;
+
+   /*  If this happens on a row do the transform immediately: */
+   if (!tc->init)
+      png_do_byte_ops_up(transform, tc);
+
+   else
+   {
+      /* This doing the init - update the row information here */
+#     define png_ptr (tc->png_ptr)
+      png_transform_byte_op *tr =
+         png_transform_cast(png_transform_byte_op, *transform);
+
+      debug(tc->bit_depth == 8U || tc->bit_depth == 16U);
+      debug((tc->format & PNG_FORMAT_FLAG_COLORMAP) == 0U &&
+            (tc->format & PNG_FORMAT_FLAG_COLOR) != 0U);
+
+      tc->format = tr->format;
+      tc->bit_depth = tr->bit_depth;
+#     undef png_ptr
+   }
+}
+
 void /* PRIVATE */
 png_add_rgb_to_gray_byte_ops(png_structrp png_ptr, png_transform_controlp tc,
    unsigned int index, unsigned int order)
@@ -2294,7 +2317,7 @@ png_add_rgb_to_gray_byte_ops(png_structrp png_ptr, png_transform_controlp tc,
 {
    png_transform_byte_op *tr = png_transform_cast(png_transform_byte_op,
       png_add_transform(png_ptr, sizeof (png_transform_byte_op),
-         png_do_byte_ops_up, order));
+         png_init_rgb_to_gray_byte_ops, order));
 
    affirm((tc->format & (PNG_FORMAT_FLAG_COLOR+PNG_FORMAT_FLAG_COLORMAP)) ==
             PNG_FORMAT_FLAG_COLOR &&
@@ -2305,11 +2328,8 @@ png_add_rgb_to_gray_byte_ops(png_structrp png_ptr, png_transform_controlp tc,
 
    /* For 1 byte channel [index] plus, maybe, alpha: */
    if (tc->bit_depth == 8)
-   {
       tr->codes = 8U + index +
          ((tc->format & PNG_FORMAT_FLAG_ALPHA) != 0 ? (8U+3U) << 4 : 0U);
-      UNTESTED
-   }
 
    else
    {
@@ -2320,7 +2340,6 @@ png_add_rgb_to_gray_byte_ops(png_structrp png_ptr, png_transform_controlp tc,
       tr->codes = (8U + index) + ((9U + index) << 4) +
          ((tc->format & PNG_FORMAT_FLAG_ALPHA) != 0 ?
             ((8U+6U) + ((9U+6U) << 4)) << 8 : 0U);
-      UNTESTED
    }
 }
 #endif /* READ_RGB_TO_GRAY */

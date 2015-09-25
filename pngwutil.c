@@ -1427,8 +1427,6 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
                   inverted_alpha.u32[i] = ~inverted_alpha.u32[i];
 
                trans_alpha = inverted_alpha.b8;
-
-               UNTESTED
             }
 #        endif /* WRITE_INVERT_ALPHA */
 

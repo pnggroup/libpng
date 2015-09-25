@@ -1193,10 +1193,10 @@ PNG_INTERNAL_FUNCTION(void,png_init_transform_control,(
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 PNG_INTERNAL_FUNCTION(unsigned int,png_run_this_transform_list_forwards,
-   (png_transform_controlp tc, png_transformp *start, png_transformp *end),
+   (png_transform_controlp tc, png_transformp *start, png_transformp end),
    PNG_EMPTY);
    /* Used by the transform cache code to run a sub-list, from *start to the
-    * transform containing *end.
+    * transform end.
     */
 #endif /* READ_TRANSFORMS */
 
