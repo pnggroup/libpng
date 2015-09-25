@@ -5357,7 +5357,7 @@ Version 1.6.19beta03 [September 25, 2015]
     UNKNOWN_CHUNKS; a bug revealed by changes in libpng 1.7. More
     tests contain the --strict option to detect warnings and the
     pngvalid-standard test has been corrected so that it does not
-    turn on progresive-read. There is a separate test which does
+    turn on progressive-read. There is a separate test which does
     that. (John Bowler)
   Also made some signed/unsigned fixes.
   Make pngstest error limits version specific. Splitting the machine
@@ -5366,6 +5366,14 @@ Version 1.6.19beta03 [September 25, 2015]
     slightly different error limits this simplifies maintenance. The
     makepngs.sh script has also been updated to more accurately reflect
     current problems in libpng 1.7 (John Bowler).
+  Incorporated new test PNG files into make check.  tests/pngstest-*
+    are changed so that the new test files are divided into 8 groups by
+    gamma and alpha channel.  These tests have considerably better code
+    and pixel-value coverage than contrib/pngsuite; however,coverage is
+    still incomplete (John Bowler).
+  Removed the '--strict' in 1.6 because of the double-gamma-correction
+    warning, updated pngstest-errors.h for the errors detected with the
+    new contrib/testspngs PNG test files (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
