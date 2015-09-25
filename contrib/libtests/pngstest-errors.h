@@ -2,6 +2,10 @@
  *
  * BUILT USING: libpng version 1.7.0beta66 - September 18, 2015
  *
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
  * THIS IS A MACHINE GENERATED FILE: do not edit it directly!
  * Instead run:
  *
