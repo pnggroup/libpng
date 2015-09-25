@@ -55,18 +55,12 @@ TESTS =\
    tests/pngvalid-progressive-interlace-standard\
    tests/pngvalid-progressive-interlace-transform\
    tests/pngvalid-progressive-standard tests/pngvalid-standard\
-   tests/pngstest-0g01 tests/pngstest-0g02 tests/pngstest-0g04\
-   tests/pngstest-0g08 tests/pngstest-0g16 tests/pngstest-2c08\
-   tests/pngstest-2c16 tests/pngstest-3p01 tests/pngstest-3p02\
-   tests/pngstest-3p04 tests/pngstest-3p08 tests/pngstest-4a08\
-   tests/pngstest-4a16 tests/pngstest-6a08 tests/pngstest-6a16\
-   tests/pngstest-error tests/pngunknown-IDAT\
+   tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
+   tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
+   tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
    tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
    tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
    tests/pngimage-quick tests/pngimage-full
-
-# These tests are expected, and required, to fail:
-XFAIL_TESTS = tests/pngstest-error
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
