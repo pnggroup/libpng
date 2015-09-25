@@ -10960,6 +10960,11 @@ static const color_encoding test_encodings[] =
 /*red:  */ { 0.716500716779386, 0.258728243040113, 0.000000000000000 },
 /*green:*/ { 0.101020574397477, 0.724682314948566, 0.051211818965388 },
 /*blue: */ { 0.146774385252705, 0.016589442011321, 0.773892783545073} },
+/* Fake encoding which selects just the green channel */
+/*gamma:*/ { 1.45/2.2, /* the 'Mac' gamma */
+/*red:  */ { 0.716500716779386, 0.000000000000000, 0.000000000000000 },
+/*green:*/ { 0.101020574397477, 1.000000000000000, 0.051211818965388 },
+/*blue: */ { 0.146774385252705, 0.000000000000000, 0.773892783545073} },
 };
 
 /* signal handler
@@ -11110,7 +11115,7 @@ int main(int argc, char **argv)
 #  ifdef PNG_WRITE_tRNS_SUPPORTED
       pm.test_tRNS = 1;
 #  endif
-   pm.test_lbg = 0;
+   pm.test_lbg = PNG_LIBPNG_VER >= 10600;
    pm.test_lbg_gamma_threshold = 1;
    pm.test_lbg_gamma_transform = PNG_LIBPNG_VER >= 10600;
    pm.test_lbg_gamma_sbit = 1;
