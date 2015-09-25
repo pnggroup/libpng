@@ -776,7 +776,7 @@ fill_transparent_pixel(png_const_structrp png_ptr, png_byte *trans)
 #ifdef PNG_READ_EXPAND_SUPPORTED
 /* Flags for png_init_expand */
 #define PNG_EXPAND_PALETTE  1U /* palette images only, includes tRNS */
-#define PNG_EXPAND_LBP_GRAY 2U /* grayscale low-bit depth only */
+#define PNG_EXPAND_LBD_GRAY 2U /* grayscale low-bit depth only */
 #define PNG_EXPAND_tRNS     4U /* non-palette images only */
 
 /* This struct is only required for tRNS matching, but it is convenient to
@@ -1053,7 +1053,7 @@ png_init_expand(png_transformp *transform, png_transform_controlp tc)
       debug(tc->init);
 
       if (bit_depth >= 8U)
-         args &= PNG_BIC_MASK(PNG_EXPAND_LBP_GRAY);
+         args &= PNG_BIC_MASK(PNG_EXPAND_LBD_GRAY);
 
 #     ifdef PNG_READ_tRNS_SUPPORTED
          if (png_ptr->num_trans == 0U ||
@@ -1066,7 +1066,7 @@ png_init_expand(png_transformp *transform, png_transform_controlp tc)
 
       switch (args)
       {
-         case PNG_EXPAND_LBP_GRAY:
+         case PNG_EXPAND_LBD_GRAY:
             tc->bit_depth = 8U;
             tc->invalid_info |= PNG_INFO_tRNS;
 
@@ -1075,7 +1075,7 @@ png_init_expand(png_transformp *transform, png_transform_controlp tc)
             break;
 
 #     ifdef PNG_READ_tRNS_SUPPORTED
-         case PNG_EXPAND_LBP_GRAY + PNG_EXPAND_tRNS:
+         case PNG_EXPAND_LBD_GRAY + PNG_EXPAND_tRNS:
             tc->bit_depth = 8U;
             tc->format |= PNG_FORMAT_FLAG_ALPHA;
             tc->invalid_info |= PNG_INFO_tRNS;
@@ -1131,7 +1131,7 @@ png_set_expand_gray_1_2_4_to_8(png_structrp png_ptr)
 {
    if (png_ptr != NULL)
       png_add_transform(png_ptr, sizeof (png_expand), png_init_expand,
-         PNG_TR_EXPAND)->args |= PNG_EXPAND_LBP_GRAY;
+         PNG_TR_EXPAND)->args |= PNG_EXPAND_LBD_GRAY;
 }
 
 /* Expand paletted images to 8-bit RGB or, if there is a tRNS chunk, RGBA.
@@ -1189,9 +1189,12 @@ png_init_alpha(png_transformp *transform, png_transform_controlp tc)
             required = 1;
             tc->expand_tRNS = 1U;
 
+            /* This happens as a result of an explicit API call to
+             * png_set_tRNS_to_alpha, so expand low-bit-depth gray too:
+             */
             if (tc->init == PNG_TC_INIT_FORMAT)
                png_add_transform(png_ptr, sizeof (png_expand), png_init_expand,
-                  PNG_TR_EXPAND)->args |= PNG_EXPAND_tRNS;
+                  PNG_TR_EXPAND)->args |= PNG_EXPAND_tRNS + PNG_EXPAND_LBD_GRAY;
          }
 
          else
@@ -2221,7 +2224,7 @@ push_gamma_expand(png_transformp *transform, png_transform_controlp tc,
    affirm(tc->init == PNG_TC_INIT_FINAL);
 
    if (tc->bit_depth < 8U) /* low bit gray: expand to 8 bits */
-      expand = PNG_EXPAND_LBP_GRAY;
+      expand = PNG_EXPAND_LBD_GRAY;
 
    /* Gamma correction invalidates tRNS, so if it is being expanded and
     * alpha is not being stripped expand it now.
