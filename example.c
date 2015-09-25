@@ -522,7 +522,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    png_set_swap(png_ptr);
 
    /* Add filler (or alpha) byte (before/after each RGB triplet) */
-   png_set_filler_16(png_ptr, 0xffff, PNG_FILLER_AFTER);
+   png_set_filler(png_ptr, 0xffff, PNG_FILLER_AFTER);
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Turn on interlace handling.  REQUIRED if you are not using
@@ -958,7 +958,7 @@ void write_png(char *file_name /* , ... other image information ... */)
    /* Get rid of filler (OR ALPHA) bytes, pack XRGB/RGBX/ARGB/RGBA into
     * RGB (4 channels -> 3 channels). The second parameter is not used.
     */
-   png_set_filler_16(png_ptr, 0, PNG_FILLER_BEFORE);
+   png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 
    /* Flip BGR pixels to RGB */
    png_set_bgr(png_ptr);

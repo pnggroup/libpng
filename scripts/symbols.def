@@ -249,5 +249,3 @@ EXPORTS
  png_set_check_for_invalid_index @242
  png_get_palette_max @243
  png_set_option @244
- png_set_filler_16 @245
- png_set_add_alpha_16 @246

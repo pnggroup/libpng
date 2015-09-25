@@ -1396,11 +1396,11 @@ png_write_png(png_structrp png_ptr, png_inforp info_ptr,
                 "PNG_TRANSFORM_STRIP_FILLER: BEFORE+AFTER not supported");
 
          /* Continue if ignored - this is the pre-1.6.10 behavior */
-         png_set_filler_16(png_ptr, 0, PNG_FILLER_AFTER);
+         png_set_filler(png_ptr, 0, PNG_FILLER_AFTER);
       }
 
       else if ((transforms & PNG_TRANSFORM_STRIP_FILLER_BEFORE) != 0)
-         png_set_filler_16(png_ptr, 0, PNG_FILLER_BEFORE);
+         png_set_filler(png_ptr, 0, PNG_FILLER_BEFORE);
 #else
       png_app_error(png_ptr, "PNG_TRANSFORM_STRIP_FILLER not supported");
 #endif

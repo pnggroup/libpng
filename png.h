@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.19beta03, September 24, 2015
+ * libpng version 1.6.19beta03, September 25, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.19beta03, September 24, 2015: Glenn
+ *   libpng versions 0.97, January 1998, through 1.6.19beta03, September 25, 2015: Glenn
  *   See also "Contributing Authors", below.
  *
  * Note about libpng version numbers:
@@ -251,7 +251,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta03, September 24, 2015, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.19beta03, September 25, 2015, are
  * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, and are
  * distributed according to the same disclaimer and license as libpng-1.0.6
  * with the following individuals added to the list of Contributing Authors:
@@ -360,7 +360,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    September 24, 2015
+ *    September 25, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -430,7 +430,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.19beta03"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.6.19beta03 - September 24, 2015\n"
+     " libpng version 1.6.19beta03 - September 25, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -1393,20 +1393,14 @@ PNG_EXPORT(38, void, png_set_invert_alpha, (png_structrp png_ptr));
 #endif
 
 #if defined(PNG_READ_FILLER_SUPPORTED) || defined(PNG_WRITE_FILLER_SUPPORTED)
-/* Add a filler byte to 8-bit Gray or 24-bit RGB images. */
+/* Add a filler byte to 8-bit or 16-bit Gray or 24-bit or 48-bit RGB images. */
 PNG_EXPORT(39, void, png_set_filler, (png_structrp png_ptr, png_uint_32 filler,
     int flags));
-/* Add a filler byte to 8-bit or 16-bit Gray or 24-bit or 48-bit RGB images. */
-PNG_EXPORT(245, void, png_set_filler_16, (png_structrp png_ptr,
-    png_uint_32 filler, int flags));
 /* The values of the PNG_FILLER_ defines should NOT be changed */
 #  define PNG_FILLER_BEFORE 0
 #  define PNG_FILLER_AFTER 1
-/* Add an alpha byte to 8-bit Gray or 24-bit RGB images. */
-PNG_EXPORT(40, void, png_set_add_alpha, (png_structrp png_ptr,
-    png_uint_32 filler, int flags));
 /* Add an alpha byte to 8-bit or 16-bit Gray or 24-bit or 48-bit RGB images. */
-PNG_EXPORT(246, void, png_set_add_alpha_16, (png_structrp png_ptr,
+PNG_EXPORT(40, void, png_set_add_alpha, (png_structrp png_ptr,
     png_uint_32 filler, int flags));
 #endif /* READ_FILLER || WRITE_FILLER */
 
@@ -3270,7 +3264,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(246);
+  PNG_EXPORT_LAST_ORDINAL(244);
 #endif
 
 #ifdef __cplusplus

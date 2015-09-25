@@ -599,7 +599,6 @@
 #define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000 /* Added to libpng-1.4.0 */
 #define PNG_FLAG_APP_WARNINGS_WARN      0x200000 /* Added to libpng-1.6.0 */
 #define PNG_FLAG_APP_ERRORS_WARN        0x400000 /* Added to libpng-1.6.0 */
-#define PNG_FLAG_FILLER_16              0x800000 /* old filler byte order */
                                   /*    0x800000    unused */
                                   /*   0x1000000    unused */
                                   /*   0x2000000    unused */

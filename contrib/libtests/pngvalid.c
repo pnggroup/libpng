@@ -8039,7 +8039,7 @@ image_transform_png_set_filler_set(const image_transform *this,
    RANDOMIZE(data.filler);
    data.flags = random_choice();
 
-   png_set_filler_16(pp, data.filler, data.flags);
+   png_set_filler(pp, data.filler, data.flags);
 
    /* The standard display handling stuff also needs to know that
     * there is a filler, so set that here.
@@ -8112,7 +8112,7 @@ image_transform_png_set_add_alpha_set(const image_transform *this,
    RANDOMIZE(data.filler);
    data.flags = random_choice();
 
-   png_set_add_alpha_16(pp, data.filler, data.flags);
+   png_set_add_alpha(pp, data.filler, data.flags);
    this->next->set(this->next, that, pp, pi);
 }
 

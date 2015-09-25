@@ -5347,7 +5347,7 @@ Version 1.6.19beta02 [August 19, 2015]
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
 
-Version 1.6.19beta03 [September 24, 2015]
+Version 1.6.19beta03 [September 25, 2015]
   Fixed png_save_int_32 when int is not 2's complement (John Bowler).
   Updated libpng16 with all the recent test changes from libpng17,
     including changes to pngvalid.c to ensure that the original,
@@ -5366,11 +5366,6 @@ Version 1.6.19beta03 [September 24, 2015]
     slightly different error limits this simplifies maintenance. The
     makepngs.sh script has also been updated to more accurately reflect
     current problems in libpng 1.7 (John Bowler).
-  Reverted the fix of byte order in png_do_read_filler() with 16-bit
-    input that was made in version 1.6.17beta01, to preserve legacy
-    behavior even though it was incorrect.  Instead, added new API
-    png_set_filter_16() and png_set_add_alpha_16() that set a flag to
-    make png_do_read_filter() interpret the filler bytes properly.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
