@@ -15,10 +15,22 @@
 # ones that extend the code-coverage of libpng from the existing test files in
 # contrib/pngsuite.
 test -n "$MAKEPNG" || MAKEPNG=./makepng
+if test "$1" = "-v"
+then
+   verbose=1
+   shift
+else
+   verbose=
+fi
+what="$1"
+shift
+cmdline="$@"
 opts=
 
 mp(){
-   ${MAKEPNG} $opts $1 "$3" "$4" "$3-$4$2.png"
+   test -n "$verbose" &&
+      echo ${MAKEPNG} $opts $cmdline $1 "$3" "$4" "$3-$4$2.png"
+   ${MAKEPNG} $opts $cmdline $1 "$3" "$4" "$3-$4$2.png"
 }
 
 mpg(){
@@ -39,7 +51,7 @@ mptrans(){
    fi
 }
 
-case "$1" in
+case "$what" in
    --small)
       opts="--small";;&
 
