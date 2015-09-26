@@ -36,6 +36,7 @@ option FLOATING_ARITHMETIC off
 option SETJMP on
 option STDIO on
 option READ_EXPAND on
+option READ_IMAGE on
 option READ_DEINTERLACE on
 option READ_STRIP_16_TO_8 on
 option USER_LIMITS on
