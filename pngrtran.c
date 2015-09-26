@@ -867,10 +867,12 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
    const png_const_bytep ep = dp;
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    const unsigned int bit_depth = tc->bit_depth;
+#  ifdef PNG_READ_sBIT_SUPPORTED
    unsigned int insignificant_bits = 0U;
+#  endif /* READ_sBIT */
 #  ifdef PNG_READ_tRNS_SUPPORTED
-      unsigned int gray = 0xffffU; /* doesn't match anything */
-      unsigned int do_alpha = 0U;
+   unsigned int gray = 0xffffU; /* doesn't match anything */
+   unsigned int do_alpha = 0U;
 #  endif /* READ_tRNS */
 
    sp += PNG_TC_ROWBYTES(*tc); /* last byte +1 */
@@ -941,6 +943,7 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
 
                check_tRNS
 
+#  ifdef PNG_READ_sBIT_SUPPORTED
                /* 'sig_bits' must be 1 or 2 leaving insignificant_bits 0 or
                 * 1.  This may look silly but it allows a compact representation
                 * of 1 bit gray + 1 bit alpha (transparency):
@@ -952,6 +955,7 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
                }
 
                else
+#  endif
                   *--dp = PNG_BYTE(pixel * 85U);
 
                if (dp <= ep) break;
@@ -967,7 +971,9 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
       {
          unsigned int shift = 7U & -(tc->width << 2)/*overflow ok*/;
          unsigned int s = *--sp;
+#  ifdef PNG_READ_sBIT_SUPPORTED
          const unsigned int div = (1U << (4U-insignificant_bits)) - 1U;
+#  endif
 
          for (;;)
          {
@@ -977,9 +983,11 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
 
                check_tRNS
 
-               /* insignifcant_bits may be 0, 1, 2 or 3, requiring a multiply by
-                * 17, 255/7, 85 or 255.  Since this operation is always cached
-                * we don't much care about the time to do the divide below.
+#  ifdef PNG_READ_sBIT_SUPPORTED
+               /* insignificant_bits may be 0, 1, 2 or 3, requiring a multiply
+                * by 17, 255/7, 85 or 255.  Since this operation is always
+                * cached we don't much care about the time to do the divide
+                * below.
                 */
                if (insignificant_bits)
                {
@@ -988,6 +996,7 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
                }
 
                else
+#  endif
                   pixel *= 17U;
 
                *--dp = PNG_BYTE(pixel);
