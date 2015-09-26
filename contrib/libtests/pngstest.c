@@ -3577,6 +3577,10 @@ main(int argc, char **argv)
       printf(" *\n");
       printf(" * BUILT USING:" PNG_HEADER_VERSION_STRING);
       printf(" *\n");
+      printf(" * This code is released under the libpng license.\n");
+      printf(" * For conditions of distribution and use, see the disclaimer\n");
+      printf(" * and license in png.h\n");
+      printf(" *\n");
       printf(" * THIS IS A MACHINE GENERATED FILE: do not edit it directly!\n");
       printf(" * Instead run:\n");
       printf(" *\n");
