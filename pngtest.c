@@ -1057,7 +1057,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifndef PNG_READ_INTERLACING_SUPPORTED
          /* num_pass will not be set below, set it here if the image is
           * interlaced: what happens is that write interlacing is *not* turned
-          * on an the partial interlaced rows are written directly.
+          * on and the partial interlaced rows are written directly.
           */
          switch (interlace_type)
          {

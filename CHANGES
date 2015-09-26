@@ -5347,7 +5347,7 @@ Version 1.6.19beta02 [August 19, 2015]
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
 
-Version 1.6.19beta03 [September 25, 2015]
+Version 1.6.19beta03 [September 26, 2015]
   Fixed png_save_int_32 when int is not 2's complement (John Bowler).
   Updated libpng16 with all the recent test changes from libpng17,
     including changes to pngvalid.c to ensure that the original,
