@@ -2029,13 +2029,13 @@ PNG_INTERNAL_FUNCTION(int,png_muldiv,(png_fixed_point_p res, png_fixed_point a,
 /* Internal fixed point gamma correction.  These APIs are called as
  * required to convert single values - they don't need to be fast,
  * they are not used when processing image pixel values.
- *
- * While the input is an 'unsigned' value it must actually be the
- * correct bit value - 0..255 or 0..65535 as required.
  */
-PNG_INTERNAL_FUNCTION(png_uint_16,png_gamma_16bit_correct,
-   (png_const_structrp png_ptr, png_uint_32 value, png_fixed_point gamma_value),
-   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(unsigned int,png_gamma_nxmbit_correct,
+   (unsigned int value, png_fixed_point gamma_val, unsigned int n/*input bits*/,
+    unsigned int m/*output bits */),PNG_EMPTY);
+   /* In this case the value must have 'n' bits and the output will have 'm'
+    * bits.
+    */
 
 /* Internal check function to saw if the gamma of the PNG data is far enough
  * from the given screen gamma to require gamma correction (only needed for a

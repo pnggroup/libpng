@@ -1361,6 +1361,60 @@ insert_hIST(png_structp png_ptr, png_infop info_ptr, int nparams,
    png_set_hIST(png_ptr, info_ptr, freq);
 }
 
+static png_byte
+bval(png_charp param)
+{
+   char *endptr = NULL;
+   unsigned long int l = strtoul(param, &endptr, 0/*base*/);
+
+   if (param[0] && *endptr == 0 && l <= 255)
+      return (png_byte)l;
+
+   else
+   {
+      fprintf(stderr, "sBIT: invalid sBIT value '%s'\n", param);
+      exit(1);
+   }
+}
+
+static void
+insert_sBIT(png_structp png_ptr, png_infop info_ptr, int nparams,
+      png_charpp params)
+{
+   const int ct = png_get_color_type(png_ptr, info_ptr);
+   const int c = channels_of_type(ct);
+   png_color_8 sBIT;
+
+   if (nparams != c)
+   {
+      fprintf(stderr, "sBIT: expected parameter count %d, not %d\n", c,
+            nparams);
+      exit(1);
+   }
+
+   if (ct & PNG_COLOR_MASK_COLOR)
+   {
+      sBIT.red = bval(params[0]);
+      sBIT.green = bval(params[1]);
+      sBIT.blue = bval(params[2]);
+      sBIT.gray = 42;
+   }
+
+   else
+   {
+      sBIT.red = sBIT.green = sBIT.blue = 42;
+      sBIT.gray = bval(params[0]);
+   }
+
+   if (ct & PNG_COLOR_MASK_ALPHA)
+      sBIT.alpha = bval(params[nparams-1]);
+
+   else
+      sBIT.alpha = 42;
+
+   png_set_sBIT(png_ptr, info_ptr, &sBIT);
+}
+
 #if 0
 static void
 insert_sPLT(png_structp png_ptr, png_infop info_ptr, int nparams, png_charpp params)
@@ -1486,6 +1540,11 @@ find_insert(png_const_charp what, png_charp param)
       case CHUNK(104,73,83,84):  /* hIST */
          if (nparams <= 256)
             return make_insert(what, insert_hIST, nparams, parameter_list);
+         break;
+
+      case CHUNK(115,66,73,84): /* sBIT */
+         if (nparams <= 4)
+            return make_insert(what, insert_sBIT, nparams, parameter_list);
          break;
 
 #if 0
