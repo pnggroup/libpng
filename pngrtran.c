@@ -882,10 +882,7 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
       if (bit_depth > 1U /* irrelevant for bit depth 1 */ &&
           !(tc->invalid_info & PNG_INFO_sBIT) &&
           tc->sBIT_G > 0U/*SAFETY*/ && tc->sBIT_G < bit_depth)
-      {
          insignificant_bits = bit_depth - tc->sBIT_G;
-         UNTESTED
-      }
 #  endif /* READ_sBIT */
 
 #  ifdef PNG_READ_tRNS_SUPPORTED
@@ -949,10 +946,7 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
                 * of 1 bit gray + 1 bit alpha (transparency):
                 */
                if (insignificant_bits /* only 1 bit significant */)
-               {
                   *--dp = PNG_BYTE((pixel >> 1) * 255U);
-                  UNTESTED
-               }
 
                else
 #  endif
@@ -990,10 +984,7 @@ png_do_expand_lbd_gray(png_transformp *transform, png_transform_controlp tc)
                 * below.
                 */
                if (insignificant_bits)
-               {
                   pixel = ((pixel>>insignificant_bits) * 255U + (div>>1)) / div;
-                  UNTESTED
-               }
 
                else
 #  endif
@@ -2142,10 +2133,10 @@ png_gamma_8bit_correct(unsigned int value, png_fixed_point gamma_val)
 }
 #endif /* UNUSED */
 
-/* libpng-1.7.0: this internal function converts an n-bit input value to an
+/* libpng-1.7.0: this private function converts an n-bit input value to an
  * m-bit output value.
  */
-static unsigned int
+unsigned int
 png_gamma_nxmbit_correct(unsigned int value, png_fixed_point gamma_val,
    unsigned int n/*input bits*/, unsigned int m/*output bits */)
 {
@@ -2185,21 +2176,6 @@ png_gamma_nxmbit_correct(unsigned int value, png_fixed_point gamma_val,
       }
    }
 }
-
-#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
-png_uint_16
-png_gamma_16bit_correct(png_const_structrp png_ptr, unsigned int value,
-   png_fixed_point gamma_val)
-{
-   /* This is a hook into this code for use by the simplified API (only) */
-   return png_check_u16(png_ptr,
-      png_gamma_nxmbit_correct(value, gamma_val, 16U, 16U));
-   PNG_UNUSED(png_ptr)
-}
-#endif /* SIMPLIFIED_READ */
-
-#undef png_gamma_16bit_correct /* circumvent the prefix handling */
-#define png_gamma_16bit_correct NOT_USED_HERE /* for checking */
 
 #if 0 /*UNUSED*/
 static unsigned int
@@ -4899,9 +4875,12 @@ png_do_background_alpha_GA(png_transformp *transform, png_transform_controlp tc)
    const int compose = tr->st.compose_background;
 
    affirm(tc->bit_depth == 16U && tc->format == PNG_FORMAT_GA &&
-         tr->st.background_bit_depth == 16U &&
-         (tr->st.background_gamma == tc->gamma ||
-          tr->st.background_gamma == 0));
+         tr->st.background_bit_depth == 16U);
+
+   /* If gamma transforms are eliminated this might fail: */
+   debug(tr->st.background_gamma == tc->gamma ||
+         tr->st.background_gamma == 0 ||
+         tc->sBIT_G == 1);
 
    tc->sp = tc->dp; /* nothing else changes */
 
@@ -4968,9 +4947,11 @@ png_do_background_alpha_RGBA(png_transformp *transform,
    const int compose = tr->st.compose_background;
 
    affirm(tc->bit_depth == 16U && tc->format == PNG_FORMAT_RGBA &&
-         tr->st.background_bit_depth == 16U &&
-         (tr->st.background_gamma == tc->gamma ||
-          tr->st.background_gamma == 0));
+         tr->st.background_bit_depth == 16U);
+
+   debug(tr->st.background_gamma == tc->gamma ||
+         tr->st.background_gamma == 0 ||
+         (tc->sBIT_R == 1 && tc->sBIT_G == 1 && tc->sBIT_B == 1));
 
    tc->sp = tc->dp; /* nothing else changes */
 

@@ -1949,7 +1949,7 @@ typedef struct png_modifier
    unsigned int              repeat :1;   /* Repeat this transform test. */
    unsigned int              test_uses_encoding :1;
 
-   /* Lowest sbit to test (libpng fails for sbit < 8) */
+   /* Lowest sbit to test (pre-1.7 libpng fails for sbit < 8) */
    png_byte                 sbitlow;
 
    /* Error control - these are the limits on errors accepted by the gamma tests
@@ -2036,7 +2036,7 @@ typedef struct png_modifier
    unsigned int             test_gamma_expand16 :1;
    unsigned int             test_exhaustive :1;
 
-   /* Whether or not to run the low-bit-depth grayscale tests.  This fail on
+   /* Whether or not to run the low-bit-depth grayscale tests.  This fails on
     * gamma images in some cases because of gross inaccuracies in the grayscale
     * gamma handling for low bit depth.
     */
@@ -11125,7 +11125,11 @@ int main(int argc, char **argv)
    pm.encodings = test_encodings;
    pm.nencodings = ARRAY_SIZE(test_encodings);
 
-   pm.sbitlow = 8U; /* because libpng doesn't do sBIT below 8! */
+#  if PNG_LIBPNG_VER < 10700
+      pm.sbitlow = 8U; /* because libpng doesn't do sBIT below 8! */
+#  else
+      pm.sbitlow = 1U;
+#  endif
 
    /* The following allows results to pass if they correspond to anything in the
     * transformed range [input-.5,input+.5]; this is is required because of the

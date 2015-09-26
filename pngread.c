@@ -1051,6 +1051,7 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr, int transforms,
 #  define P_LINEAR  2 /* 16-bit linear: not encoded, NOT pre-multiplied! */
 #  define P_FILE    3 /* 8-bit encoded to file gamma, not sRGB or linear */
 #  define P_LINEAR8 4 /* 8-bit linear: only from a file value */
+#  define P_FILE8   5 /* 8-bit encoded to file gamma but not significant bits */
 
 /* Color-map processing: after libpng has run on the PNG image further
  * processing may be needed to convert the data to color-map indices.
@@ -1083,6 +1084,7 @@ typedef struct
    int             file_encoding;       /* E_ values above */
    png_fixed_point file_to_sRGB;        /* Cached correction factor */
    int             colormap_processing; /* PNG_CMAP_ values above */
+   png_byte        sBIT[4];             /* Significant bits for channels */
 } png_image_read_control;
 
 /* Do all the *safe* initialization - 'safe' means that png_error won't be
@@ -1240,6 +1242,47 @@ png_image_read_header(png_voidp argument)
    }
 
    return 1;
+}
+
+static void
+png_image_get_sBIT(png_image_read_control *display)
+   /* Utility to cache the sBIT values.  This uses the information from the
+    * png_struct not png_info because it may be needed after the sBIT
+    * information in png_info has been invalidated.
+    */
+{
+   if (display->sBIT[0] == 0)
+   {
+      const png_const_structrp png_ptr = display->image->opaque->png_ptr;
+      const unsigned int color_type = png_ptr->color_type;
+      const png_byte bit_depth =
+         (color_type & PNG_COLOR_MASK_PALETTE) ? 8U : png_ptr->bit_depth;
+
+      memset(display->sBIT, bit_depth, sizeof display->sBIT);
+
+      if (color_type & PNG_COLOR_MASK_COLOR)
+      {
+         if (png_ptr->sig_bit.red > 0 && png_ptr->sig_bit.red < bit_depth)
+            display->sBIT[0] = png_ptr->sig_bit.red;
+         if (png_ptr->sig_bit.green > 0 && png_ptr->sig_bit.green < bit_depth)
+            display->sBIT[1] = png_ptr->sig_bit.green;
+         if (png_ptr->sig_bit.blue > 0 && png_ptr->sig_bit.blue < bit_depth)
+            display->sBIT[2] = png_ptr->sig_bit.blue;
+      }
+
+      else
+      {
+         if (png_ptr->sig_bit.gray > 0 && png_ptr->sig_bit.gray < bit_depth)
+            display->sBIT[2] = display->sBIT[1] = display->sBIT[0] =
+               png_ptr->sig_bit.gray;
+      }
+
+      if (color_type & PNG_COLOR_MASK_ALPHA)
+      {
+         if (png_ptr->sig_bit.alpha > 0 && png_ptr->sig_bit.alpha < bit_depth)
+            display->sBIT[3] = png_ptr->sig_bit.alpha;
+      }
+   }
 }
 
 #ifdef PNG_STDIO_SUPPORTED
@@ -1493,40 +1536,74 @@ init_correct(png_const_structrp png_ptr, png_fixed_point *correct)
 }
 
 static png_uint_32
-convert_to_sRGB(png_image_read_control *display, png_uint_32 value)
+update_for_sBIT(png_uint_32 value, unsigned int significant_bits,
+      unsigned int bit_depth)
+   /* Return a bit_depth value adjusted for the number of significant bits in
+    * the value.
+    */
+{
+   if (significant_bits < bit_depth)
+   {
+      value >>= bit_depth - significant_bits;
+      /* Now scale back to bit_depth, taking care not to overflow when 'value'
+       * is (1<<significant_bits)-1 by rounding *down* the rounding add below
+       * (so, e.g. rather than 2, 1 is used when significant bits is 2).
+       */
+      value = (value * ((1U<<bit_depth)-1U) + ((1U<<(significant_bits-1U))-1U))
+         / ((1U<<significant_bits)-1U);
+   }
+
+   return value;
+
+}
+
+static png_uint_32
+convert_to_sRGB(png_image_read_control *display, png_uint_32 value,
+   unsigned int significant_bits)
 {
    /* Converts an 8-bit value from P_FILE to P_sRGB */
    png_const_structrp png_ptr = display->image->opaque->png_ptr;
 
-   affirm(value <= 255U);
+   debug(value <= 255U && significant_bits <= 8U && significant_bits > 0U);
 
    if (display->file_to_sRGB == 0)
       init_correct(png_ptr, &display->file_to_sRGB);
 
    /* Now simply apply this correction factor and scale back to 8 bits. */
    if (display->file_to_sRGB != PNG_FP_1)
-      value = PNG_DIV257(
-         png_gamma_16bit_correct(png_ptr, value*257U, display->file_to_sRGB));
+      value = png_gamma_nxmbit_correct(value >> (8U-significant_bits),
+            display->file_to_sRGB, significant_bits, 8U);
+
+   else if (significant_bits < 8U)
+      value = update_for_sBIT(value, significant_bits, 8U);
 
    return value;
 }
 
 static png_uint_32
-convert_to_linear(png_image_read_control *display, png_uint_32 value)
+convert_to_linear(png_image_read_control *display, png_uint_32 value,
+      unsigned int significant_bits)
 {
    /* Converts an 8-bit value from P_FILE to 16-bit P_LINEAR */
    png_const_structrp png_ptr = display->image->opaque->png_ptr;
 
-   affirm(value <= 255U);
+   debug(value <= 255U && significant_bits <= 8U && significant_bits > 0U);
 
    if (display->file_to_sRGB == 0)
       init_correct(png_ptr, &display->file_to_sRGB);
 
-   /* Use this correct to get a 16-bit sRGB value: */
-   value *= 257U;
-
+   /* Use this correction to get a 16-bit sRGB value: */
    if (display->file_to_sRGB != PNG_FP_1)
-      value = png_gamma_16bit_correct(png_ptr, value, display->file_to_sRGB);
+      value = png_gamma_nxmbit_correct(value >> (8U-significant_bits),
+            display->file_to_sRGB, significant_bits, 16U);
+
+   else
+   {
+      value *= 257U;
+
+      if (significant_bits < 8U)
+         value = update_for_sBIT(value, significant_bits, 16U);
+   }
 
    /* Now convert this back to linear, using the correct transfer function. */
    if (value <= 2650U /* 65535 * 0.04045 */)
@@ -1547,17 +1624,20 @@ convert_to_linear(png_image_read_control *display, png_uint_32 value)
        */
       value *= 62119U;
       value += 223904831U+32768U; /* cannot overflow; test with 65535 */
-      value = png_gamma_16bit_correct(png_ptr, value >> 16, 240000);
+      value = png_gamma_nxmbit_correct(value >> 16, 240000, 16U, 16U);
    }
 
    return value;
 }
 
 static unsigned int
-decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
+decode_gamma(png_image_read_control *display, png_uint_32 value,
+      unsigned int significant_bits, int encoding)
 {
+   int do_sBIT = 0;
+
    if (encoding == P_FILE) /* double check */
-      encoding = display->file_encoding;
+      encoding = display->file_encoding, do_sBIT = 1;
 
    if (encoding == P_NOTSET) /* must be the file encoding */
    {
@@ -1568,18 +1648,26 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
    switch (encoding)
    {
       case P_FILE:
-         value = convert_to_linear(display, value);
+         /* This is a file value, so the sBIT, if any, needs to be used. */
+         value = convert_to_linear(display, value, significant_bits);
          break;
 
       case P_sRGB:
+         if (do_sBIT)
+            value = update_for_sBIT(value, significant_bits, 8U);
+
          value = png_sRGB_table[value];
          break;
 
       case P_LINEAR:
+         if (do_sBIT)
+            value = update_for_sBIT(value, significant_bits, 16U);
          break;
 
       case P_LINEAR8:
          value *= 257;
+         if (do_sBIT)
+            value = update_for_sBIT(value, significant_bits, 16U);
          break;
 
       default:
@@ -1593,7 +1681,8 @@ decode_gamma(png_image_read_control *display, png_uint_32 value, int encoding)
 
 static png_uint_32
 png_colormap_compose(png_image_read_control *display,
-   png_uint_32 foreground, int foreground_encoding, png_uint_32 alpha,
+   png_uint_32 foreground, unsigned int foreground_significant_bits,
+   int foreground_encoding, png_uint_32 alpha,
    png_uint_32 background, int encoding)
 {
    /* The file value is composed on the background, the background has the given
@@ -1601,8 +1690,9 @@ png_colormap_compose(png_image_read_control *display,
     * file and alpha are 8-bit values.  The (output) encoding will always be
     * P_LINEAR or P_sRGB.
     */
-   png_uint_32 f = decode_gamma(display, foreground, foreground_encoding);
-   png_uint_32 b = decode_gamma(display, background, encoding);
+   png_uint_32 f = decode_gamma(display, foreground,
+         foreground_significant_bits, foreground_encoding);
+   png_uint_32 b = decode_gamma(display, background, 0U/*UNUSED*/, encoding);
 
    /* The alpha is always an 8-bit value (it comes from the palette), the value
     * scaled by 255 is what PNG_sRGB_FROM_LINEAR requires.
@@ -1639,9 +1729,16 @@ png_create_colormap_entry(png_image_read_control *display,
       P_LINEAR : P_sRGB;
    const int convert_to_Y = (image->format & PNG_FORMAT_FLAG_COLOR) == 0 &&
       (red != green || green != blue);
+   int use_sBIT = encoding == P_FILE;
 
-   if (ip > 255)
-      png_error(png_ptr, "color-map index out of range");
+   affirm(ip <= 255);
+   implies(encoding != P_LINEAR, red <= 255U && green <= 255U && blue <= 255U
+         && display->sBIT[0] <= 8U && display->sBIT[1] <= 8U
+         && display->sBIT[2] <= 8U && display->sBIT[3] <= 8U);
+
+   /* This is a hack for the grayscale colormap below. */
+   if (encoding == P_FILE8)
+      encoding = P_FILE;
 
    /* Update the cache with whether the file gamma is significantly different
     * from sRGB.
@@ -1653,37 +1750,61 @@ png_create_colormap_entry(png_image_read_control *display,
 
       /* Note that the cached value may be P_FILE too. */
       encoding = display->file_encoding;
+      if (use_sBIT)
+         png_image_get_sBIT(display);
    }
 
    if (encoding == P_FILE)
    {
       if (convert_to_Y != 0 || output_encoding == P_LINEAR)
       {
-         red = convert_to_linear(display, red);
-         green = convert_to_linear(display, green);
-         blue = convert_to_linear(display, blue);
-         alpha *= 257;
+         red = convert_to_linear(display, red,
+               use_sBIT ? display->sBIT[0] : 8U);
+         green = convert_to_linear(display, green,
+               use_sBIT ? display->sBIT[1] : 8U);
+         blue = convert_to_linear(display, blue,
+               use_sBIT ? display->sBIT[2] : 8U);
+         alpha *= 257U;
+         if (use_sBIT)
+            alpha = update_for_sBIT(alpha, display->sBIT[3], 16U);
+
          encoding = P_LINEAR;
+         use_sBIT = 0;
       }
 
       else
       {
-         red = convert_to_sRGB(display, red);
-         green = convert_to_sRGB(display, green);
-         blue = convert_to_sRGB(display, blue);
+         red = convert_to_sRGB(display, red,
+               use_sBIT ? display->sBIT[0] : 8U);
+         green = convert_to_sRGB(display, green,
+               use_sBIT ? display->sBIT[1] : 8U);
+         blue = convert_to_sRGB(display, blue,
+               use_sBIT ? display->sBIT[2] : 8U);
+         if (use_sBIT)
+            alpha = update_for_sBIT(alpha, display->sBIT[3], 8U);
          encoding = P_sRGB;
+         use_sBIT = 0;
       }
    }
 
    else if (encoding == P_LINEAR8)
    {
-      /* This encoding occurs quite frequently in test cases because PngSuite
-       * includes a gAMA 1.0 chunk with most images.
+      /* This encoding corresponds to a colormap with linear RGB entries, this
+       * is not a very sensible encoding but it does happen with the PNGSuite
+       * test images.
        */
       red *= 257;
       green *= 257;
       blue *= 257;
       alpha *= 257;
+      if (use_sBIT)
+      {
+         red = update_for_sBIT(red, display->sBIT[0], 16U);
+         green = update_for_sBIT(green, display->sBIT[1], 16U);
+         blue = update_for_sBIT(blue, display->sBIT[2], 16U);
+         alpha = update_for_sBIT(alpha, display->sBIT[3], 16U);
+         use_sBIT = 0;
+      }
       encoding = P_LINEAR;
    }
 
@@ -1693,12 +1814,37 @@ png_create_colormap_entry(png_image_read_control *display,
       /* The values are 8-bit sRGB values, but must be converted to 16-bit
        * linear.
        */
-      red = png_sRGB_table[red];
-      green = png_sRGB_table[green];
-      blue = png_sRGB_table[blue];
-      alpha *= 257;
+      if (use_sBIT)
+      {
+         red = convert_to_linear(display, red, display->sBIT[0]);
+         green = convert_to_linear(display, green, display->sBIT[1]);
+         blue = convert_to_linear(display, blue, display->sBIT[2]);
+         alpha = update_for_sBIT(alpha * 257U, display->sBIT[3], 16U);
+         use_sBIT = 0;
+      }
+
+      else
+      {
+         red = png_sRGB_table[red];
+         green = png_sRGB_table[green];
+         blue = png_sRGB_table[blue];
+         alpha *= 257;
+      }
+
       encoding = P_LINEAR;
    }
+
+   else if (encoding == P_sRGB && use_sBIT)
+   {
+      debug(output_encoding == P_sRGB); /* P_LINEAR handled above */
+      red = update_for_sBIT(red, display->sBIT[0], 8U);
+      green = update_for_sBIT(green, display->sBIT[1], 8U);
+      blue = update_for_sBIT(blue, display->sBIT[2], 8U);
+      alpha = update_for_sBIT(alpha, display->sBIT[3], 8U);
+      use_sBIT = 0;
+   }
+
+   debug(!use_sBIT); /* it should have been handled above */
 
    /* This is set if the color isn't gray but the output is. */
    if (encoding == P_LINEAR)
@@ -1854,7 +2000,7 @@ make_gray_file_colormap(png_image_read_control *display)
    unsigned int i;
 
    for (i=0; i<256; ++i)
-      png_create_colormap_entry(display, i, i, i, i, 255, P_FILE);
+      png_create_colormap_entry(display, i, i, i, i, 255, P_FILE8);
 
    return i;
 }
@@ -2467,8 +2613,8 @@ png_image_read_colormap(png_voidp argument)
                      if (output_encoding == P_sRGB)
                         gray = png_sRGB_table[gray]; /* now P_LINEAR */
 
-                     gray = PNG_DIV257(png_gamma_16bit_correct(png_ptr, gray,
-                        png_ptr->colorspace.gamma)); /* now P_FILE */
+                     gray = png_gamma_nxmbit_correct(gray,
+                        png_ptr->colorspace.gamma, 16U, 8U);
 
                      /* And make sure the corresponding palette entry contains
                       * exactly the required sRGB value.
@@ -2625,12 +2771,12 @@ png_image_read_colormap(png_voidp argument)
                             */
                            for (b=0; b<256; b = (b << 1) | 0x7f)
                               png_create_colormap_entry(display, cmap_entries++,
-                                 png_colormap_compose(display, r, P_sRGB, 128,
-                                    back_r, output_encoding),
-                                 png_colormap_compose(display, g, P_sRGB, 128,
-                                    back_g, output_encoding),
-                                 png_colormap_compose(display, b, P_sRGB, 128,
-                                    back_b, output_encoding),
+                                 png_colormap_compose(display, r, 8U, P_sRGB,
+                                    128U, back_r, output_encoding),
+                                 png_colormap_compose(display, g, 8U, P_sRGB,
+                                    128U, back_g, output_encoding),
+                                 png_colormap_compose(display, b, 8U, P_sRGB,
+                                    128U, back_b, output_encoding),
                                  0/*unused*/, output_encoding);
                         }
                      }
@@ -2706,17 +2852,31 @@ png_image_read_colormap(png_voidp argument)
 
                   else
                   {
+                     unsigned int alpha;
+
                      /* Must compose the PNG file color in the color-map entry
                       * on the sRGB color in 'back'.
                       */
+                     png_image_get_sBIT(display);
+                     alpha = update_for_sBIT(trans[i], display->sBIT[3], 8U);
+
+                     /* Do the sBIT handling here because it only applies to the
+                      * values from the colormap, not the background.  Passing
+                      * output_encoding to png_create_colormap_entry prevents
+                      * this being duplicated.
+                      */
                      png_create_colormap_entry(display, i,
-                        png_colormap_compose(display, colormap[i].red, P_FILE,
-                           trans[i], back_r, output_encoding),
-                        png_colormap_compose(display, colormap[i].green, P_FILE,
-                           trans[i], back_g, output_encoding),
-                        png_colormap_compose(display, colormap[i].blue, P_FILE,
-                           trans[i], back_b, output_encoding),
-                        output_encoding == P_LINEAR ? trans[i] * 257U :
+                        png_colormap_compose(display, colormap[i].red,
+                           display->sBIT[0], P_FILE, alpha, back_r,
+                           output_encoding),
+                        png_colormap_compose(display, colormap[i].green,
+                           display->sBIT[1], P_FILE, alpha, back_g,
+                           output_encoding),
+                        png_colormap_compose(display, colormap[i].blue,
+                           display->sBIT[2], P_FILE, alpha, back_b,
+                           output_encoding),
+                        output_encoding == P_LINEAR ?
+                           update_for_sBIT(alpha*257U, display->sBIT[3], 16U) :
                            trans[i],
                         output_encoding);
                   }

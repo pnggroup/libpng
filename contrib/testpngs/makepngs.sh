@@ -15,10 +15,22 @@
 # ones that extend the code-coverage of libpng from the existing test files in
 # contrib/pngsuite.
 test -n "$MAKEPNG" || MAKEPNG=./makepng
+if test "$1" = "-v"
+then
+   verbose=1
+   shift
+else
+   verbose=
+fi
+what="$1"
+shift
+cmdline="$@"
 opts=
 
 mp(){
-   ${MAKEPNG} $opts $1 "$3" "$4" "$3-$4$2.png"
+   test -n "$verbose" &&
+      echo ${MAKEPNG} $opts $cmdline $1 "$3" "$4" "$3-$4$2.png"
+   ${MAKEPNG} $opts $cmdline $1 "$3" "$4" "$3-$4$2.png"
 }
 
 mpg(){
@@ -39,7 +51,7 @@ mptrans(){
    fi
 }
 
-case "$1" in
+case "$what" in
    --small)
       opts="--small";;&
 
@@ -72,19 +84,8 @@ case "$1" in
       done;;
 
    --coverage)
-      # Comments below indicate cases known to be required and not duplicated
-      # in other (required) cases; the aim is to get a minimal set that gives
-      # the maxium code coverage.
-      mpg none gray-alpha 8 # required: code coverage, sRGB opaque component
-      mpg none palette 8 # required: basic palette read
-      mpg 1.8 gray 2 # required: tests gamma threshold code
-      mpg 1.8 palette 2 # required: code coverage
-      mpg 1.8 palette 4 # required: code coverage
-      mpg 1.8 palette 8 # error limits only
-      mpg linear palette 8 # error limits only
-      mpg linear rgb-alpha 16 # error limits only
-      mpg sRGB palette 1 # required: code coverage
-      mpg sRGB rgb-alpha 16 # required: code coverage: pngread.c:2422 untested
+      # Extra images made to improve code coverage:
+      ${MAKEPNG} --insert sBIT 1 --tRNS gray 2 gray-2-sBIT-tRNS.png
       :;;
 
    *)
