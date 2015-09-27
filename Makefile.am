@@ -76,15 +76,11 @@ lib_LTLIBRARIES=libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 	pngget.c pngmem.c pngpread.c pngread.c pngrio.c pngrtran.c pngrutil.c\
 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
-	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngchunk.h \
-	pngusr.dfa
+	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
 
-# Include libpng extensions, if appropriate.  This uses a Makefile.am fragment,
-# pre-set things that might be changed by addition:
-AM_CPPFLAGS =
-DFA_EXTENSION = 
-if LIBPNG_EXTENSIONS
-include $(top_srcdir)/contrib/extensions.am
+if PNG_ARM_NEON
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
+	arm/filter_neon.S arm/filter_neon_intrinsics.c
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
@@ -127,12 +123,12 @@ EXTRA_DIST= \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 
-SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk scripts/pnglibconf.c
+SCRIPT_CLEANFILES=scripts/*.out scripts/*.chk
 
 CLEANFILES= *.tf? pngout.png libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc \
 	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config libpng.vers libpng.sym \
 	check.new pnglibconf.h pngprefix.h symbols.new pngtest-log.txt \
-	pnglibconf.out pnglibconf.c pnglibconf.dfn pnglibconf.pre \
+	pnglibconf.out pnglibconf.c pnglibconf.pre pnglibconf.dfn \
 	$(SCRIPT_CLEANFILES)
 
 MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
@@ -144,8 +140,8 @@ config.sub configure depcomp install-sh ltmain.sh missing
 PNG_COPTS = @PNG_COPTS@
 AM_CFLAGS = ${PNG_COPTS}
 
-# DFNCPP is normally just "CPP -E" - the C preprocessor - but on Solaris and
-# maybe other operating systems (NeXT?) the C preprocessor selected by configure
+# DFNCPP is normally just CPP - the C preprocessor - but on Solaris and maybe
+# other operating systems (NeXT?) the C preprocessor selected by configure
 # checks input tokens for validity - effectively it performs part of the ANSI-C
 # parsing - and therefore fails with the .df files.  configure.ac has special
 # checks for this and sets DFNCPP appropriately.
@@ -164,8 +160,6 @@ scripts/prefix.out: png.h pngconf.h pnglibconf.out
 scripts/symbols.out: png.h pngconf.h $(srcdir)/scripts/pnglibconf.h.prebuilt
 scripts/intprefix.out: pnglibconf.h
 
-pnglibconf.out: config.h
-
 libpng.sym: scripts/sym.out
 	rm -f $@
 	cp $? $@
@@ -177,7 +171,7 @@ if DO_PNG_PREFIX
 # Rename functions in scripts/prefix.out with a PNG_PREFIX prefix.
 # Rename macros in scripts/macro.lst from PNG_PREFIXpng_ to PNG_ (the actual
 # implementation of the macro).
-pnglibconf.h: pnglibconf.out scripts/prefix.out scripts/macro.lst config.h
+pnglibconf.h: pnglibconf.out scripts/prefix.out scripts/macro.lst
 	rm -f $@
 	$(AWK) 's==0 && NR>1{print prev}\
 	   s==0{prev=$$0}\
@@ -242,17 +236,17 @@ endif
 	rm -f $@ $*.tf[12]
 	test -d scripts || mkdir scripts || test -d scripts
 	$(DFNCPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES)\
-	    $(AM_CPPFLAGS) $(CPPFLAGS) $(SYMBOL_CFLAGS) $< > $*.tf1
+	    $(CPPFLAGS) $(SYMBOL_CFLAGS) $< > $*.tf1
 	$(AWK) -f "${srcdir}/scripts/dfn.awk" out="$*.tf2" $*.tf1 1>&2
 	rm -f $*.tf1
 	mv $*.tf2 $@
 
 # The .c file for pnglibconf.h is machine generated
-pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_EXTENSION) $(DFA_XTRA)
+pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
 	rm -f $@ $*.tf[45]
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf4 version=search\
 	    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
-	    $(DFA_EXTENSION) ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
+	    ${srcdir}/pngusr.dfa $(DFA_XTRA) 1>&2
 	$(AWK) -f ${srcdir}/scripts/options.awk out=$*.tf5 $*.tf4 1>&2
 	rm $*.tf4
 	mv $*.tf5 $@
@@ -270,8 +264,8 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 # be empty - no non-standard defines
 scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ pnglibconf.tf[67]
-	test -z "$(CPPFLAGS)" -a -z "$(AM_CPPFLAGS)"
-	echo "com libpng @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
+	test -z "$(CPPFLAGS)"
+	echo "com @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
 	$(AWK) -f ${srcdir}/scripts/options.awk out=pnglibconf.tf6\
 	    logunsupported=1 version=search ${srcdir}/pngconf.h -\
 	    ${srcdir}/scripts/pnglibconf.dfa 1>&2
@@ -280,7 +274,7 @@ scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm pnglibconf.tf6
 	mv pnglibconf.tf7 $@
 
-$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h pngchunk.h \
+$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_OBJECTS): png.h pngconf.h \
 	pnglibconf.h pngpriv.h pngdebug.h pnginfo.h pngstruct.h pngprefix.h
 
 test: check-am
