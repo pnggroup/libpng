@@ -5170,7 +5170,7 @@ Version 1.7.0beta65 [September 16, 2015]
     (but not yet by the writer) (John Bowler).
   Implemented shared transform handling that is used throughout (John Bowler).
 
-Version 1.7.0beta66 [September 25, 2015]
+Version 1.7.0beta66 [September 27, 2015]
   Enabled the low-bit-depth gray tests that were disabled in prior versions
     of libpng because of problems that should have been fixed by the recent
     changes to libpng17. Enabling the tests revealed bugs in those changes
@@ -5239,6 +5239,9 @@ Version 1.7.0beta66 [September 25, 2015]
     still incomplete (John Bowler).
   Fixed png_set_tRNS_to_alpha for low-bit-depth gray and enabled
     low-bit-depth gray tests in pngvalid (John Bowler).
+  Fixed sBIT handling in the low-bit-depth gray and pngstest cases,
+    extended sBIT handling to the colormap code in the simplified API
+    which is separately implemented in pngread.c (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
