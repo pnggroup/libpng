@@ -2025,7 +2025,7 @@ PNG_INTERNAL_FUNCTION(int,png_muldiv,(png_fixed_point_p res, png_fixed_point a,
    png_int_32 multiplied_by, png_int_32 divided_by),PNG_EMPTY);
 #endif /* GAMMA || INCH_CONVERSIONS || READ_pHYs */
 
-#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+#ifdef PNG_READ_GAMMA_SUPPORTED
 /* Internal fixed point gamma correction.  These APIs are called as
  * required to convert single values - they don't need to be fast,
  * they are not used when processing image pixel values.
@@ -2036,7 +2036,9 @@ PNG_INTERNAL_FUNCTION(unsigned int,png_gamma_nxmbit_correct,
    /* In this case the value must have 'n' bits and the output will have 'm'
     * bits.
     */
+#endif /* READ_GAMMA */
 
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
 /* Internal check function to saw if the gamma of the PNG data is far enough
  * from the given screen gamma to require gamma correction (only needed for a
  * bug work-round in the simplified API).
@@ -2044,7 +2046,7 @@ PNG_INTERNAL_FUNCTION(unsigned int,png_gamma_nxmbit_correct,
  */
 PNG_INTERNAL_FUNCTION(int,png_need_gamma_correction,(png_const_structrp png_ptr,
    png_fixed_point gamma, int sRGB_output),PNG_EMPTY);
-#endif /* SIMPLIFIED_READ && */
+#endif /* SIMPLIFIED_READ */
 
 /* This is a utility macro to say whether a gamma value is close enough to sRGB.
  * The test is now hardwired:
