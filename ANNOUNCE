@@ -1,4 +1,4 @@
-Libpng 1.6.19beta04 - September 26, 2015
+Libpng 1.6.19beta04 - September 27, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -92,7 +92,10 @@ Version 1.6.19beta03 [September 26, 2015]
     warning, updated pngstest-errors.h for the errors detected with the
     new contrib/testspngs PNG test files (John Bowler).
 
-Version 1.6.19beta04 [September 26, 2015]
+Version 1.6.19beta04 [September 27, 2015]
+  Worked around rgb-to-gray issues in libpng 1.6.  The previous
+    attempts to ignore the errors in the code aren't quite enough to
+    deal with the 'channel selection' encoding added to libpng 1.7; abort.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
