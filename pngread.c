@@ -1816,6 +1816,11 @@ png_create_colormap_entry(png_image_read_control *display,
        */
       if (use_sBIT)
       {
+#ifdef __COVERITY__
+         /* Coverity says red, green, blue might be 16-bit values */
+         png_affirmpp(png_ptr, red < 256 && green < 256 && blue < 256);
+#endif
+
          red = convert_to_linear(display, red, display->sBIT[0]);
          green = convert_to_linear(display, green, display->sBIT[1]);
          blue = convert_to_linear(display, blue, display->sBIT[2]);
