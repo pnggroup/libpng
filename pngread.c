@@ -1816,10 +1816,6 @@ png_create_colormap_entry(png_image_read_control *display,
        */
       if (use_sBIT)
       {
-#ifdef __COVERITY__
-         /* Coverity says red, green, blue might be 16-bit values */
-         png_affirmpp(png_ptr, red < 256 && green < 256 && blue < 256);
-#endif
 
          red = convert_to_linear(display, red, display->sBIT[0]);
          green = convert_to_linear(display, green, display->sBIT[1]);
@@ -2257,8 +2253,15 @@ png_image_read_colormap(png_voidp argument)
                 * supplied background color when it is used.
                 */
                else
+               {
+#ifdef __COVERITY__
+                  /* Coverity says back_r|g|b might be 16-bit values */
+                  png_affirmpp(png_ptr, back_r < 256 && back_g < 256 &&
+                     back_b < 256);
+#endif
                   png_create_colormap_entry(display, i, back_r, back_g, back_b,
                      back_alpha, output_encoding);
+               }
             }
 
             /* We need libpng to preserve the original encoding. */
@@ -2365,6 +2368,11 @@ png_image_read_colormap(png_voidp argument)
                /* And set (overwrite) color-map entry 254 to the actual
                 * background color at full precision.
                 */
+#ifdef __COVERITY__
+               /* Coverity says back_r|g|b might be 16-bit values */
+               png_affirmpp(png_ptr, back_r < 256 && back_g < 256 &&
+                   back_b < 256);
+#endif
                png_create_colormap_entry(display, 254, back_r, back_g, back_b,
                   back_alpha, output_encoding);
             }
