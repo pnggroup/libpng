@@ -5243,6 +5243,8 @@ Version 1.7.0beta66 [October 2, 2015]
     extended sBIT handling to the colormap code in the simplified API
     which is separately implemented in pngread.c (John Bowler).
 
+Version 1.7.0beta67 [October 2, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
