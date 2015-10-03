@@ -5375,11 +5375,16 @@ Version 1.6.19beta03 [September 26, 2015]
     warning, updated pngstest-errors.h for the errors detected with the
     new contrib/testspngs PNG test files (John Bowler).
 
-Version 1.6.19beta04 [September 27, 2015]
+Version 1.6.19beta04 [October 3, 2015]
   Worked around rgb-to-gray issues in libpng 1.6.  The previous
     attempts to ignore the errors in the code aren't quite enough to
     deal with the 'channel selection' encoding added to libpng 1.7; abort.
     pngvalid.c is changed to drop this encoding in prior versions.
+  Fixed 'pow' macros in pngvalid.c. It is legal for 'pow' to be a
+    macro, therefore the argument list cannot contain preprocessing
+    directives.  Make sure pow is a function where this happens. This is
+    a minimal safe fix, the issue only arises in non-performance-critical
+    code (bug report by Curtis Leach, fix by John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
