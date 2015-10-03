@@ -7158,7 +7158,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           *  conversion adds another +/-2 in the 16-bit case and
           *  +/-(1<<(15-PNG_MAX_GAMMA_8)) in the 8-bit case.
           */
-         that->pm->limit += pow(
+         that->pm->limit += (pow)(
 #           if PNG_MAX_GAMMA_8 < 14
                (that->this.bit_depth == 16 ? 8. :
                   6. + (1<<(15-PNG_MAX_GAMMA_8)))
@@ -7182,7 +7182,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           * affects the limit used for checking for internal calculation errors,
           * not the actual limit imposed by pngvalid on the output errors.
           */
-         that->pm->limit += pow(
+         that->pm->limit += (pow)(
 #        if DIGITIZE
             1.3
 #        else
