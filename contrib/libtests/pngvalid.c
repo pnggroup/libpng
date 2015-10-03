@@ -1949,7 +1949,7 @@ typedef struct png_modifier
    unsigned int              repeat :1;   /* Repeat this transform test. */
    unsigned int              test_uses_encoding :1;
 
-   /* Lowest sbit to test (libpng fails for sbit < 8) */
+   /* Lowest sbit to test (pre-1.7 libpng fails for sbit < 8) */
    png_byte                 sbitlow;
 
    /* Error control - these are the limits on errors accepted by the gamma tests
@@ -2036,7 +2036,7 @@ typedef struct png_modifier
    unsigned int             test_gamma_expand16 :1;
    unsigned int             test_exhaustive :1;
 
-   /* Whether or not to run the low-bit-depth grayscale tests.  This fail on
+   /* Whether or not to run the low-bit-depth grayscale tests.  This fails on
     * gamma images in some cases because of gross inaccuracies in the grayscale
     * gamma handling for low bit depth.
     */
@@ -3578,7 +3578,7 @@ check_interlace_type(int const interlace_type)
 #define CAN_WRITE_INTERLACE\
    PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
 
-/* Make a standardized image given a an image colour type, bit depth and
+/* Make a standardized image given an image colour type, bit depth and
  * interlace type.  The standard images have a very restricted range of
  * rows and heights and are used for testing transforms rather than image
  * layout details.  See make_size_images below for a way to make images
@@ -7158,7 +7158,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           *  conversion adds another +/-2 in the 16-bit case and
           *  +/-(1<<(15-PNG_MAX_GAMMA_8)) in the 8-bit case.
           */
-         that->pm->limit += pow(
+         that->pm->limit += (pow)(
 #           if PNG_MAX_GAMMA_8 < 14
                (that->this.bit_depth == 16 ? 8. :
                   6. + (1<<(15-PNG_MAX_GAMMA_8)))
@@ -7182,7 +7182,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           * affects the limit used for checking for internal calculation errors,
           * not the actual limit imposed by pngvalid on the output errors.
           */
-         that->pm->limit += pow(
+         that->pm->limit += (pow)(
 #        if DIGITIZE
             1.3
 #        else
@@ -10960,6 +10960,13 @@ static const color_encoding test_encodings[] =
 /*red:  */ { 0.716500716779386, 0.258728243040113, 0.000000000000000 },
 /*green:*/ { 0.101020574397477, 0.724682314948566, 0.051211818965388 },
 /*blue: */ { 0.146774385252705, 0.016589442011321, 0.773892783545073} },
+#if PNG_LIBPNG_VER >= 10700
+/* Fake encoding which selects just the green channel */
+/*gamma:*/ { 1.45/2.2, /* the 'Mac' gamma */
+/*red:  */ { 0.716500716779386, 0.000000000000000, 0.000000000000000 },
+/*green:*/ { 0.101020574397477, 1.000000000000000, 0.051211818965388 },
+/*blue: */ { 0.146774385252705, 0.000000000000000, 0.773892783545073} },
+#endif
 };
 
 /* signal handler
@@ -11110,7 +11117,7 @@ int main(int argc, char **argv)
 #  ifdef PNG_WRITE_tRNS_SUPPORTED
       pm.test_tRNS = 1;
 #  endif
-   pm.test_lbg = 0;
+   pm.test_lbg = PNG_LIBPNG_VER >= 10600;
    pm.test_lbg_gamma_threshold = 1;
    pm.test_lbg_gamma_transform = PNG_LIBPNG_VER >= 10600;
    pm.test_lbg_gamma_sbit = 1;
@@ -11120,7 +11127,11 @@ int main(int argc, char **argv)
    pm.encodings = test_encodings;
    pm.nencodings = ARRAY_SIZE(test_encodings);
 
-   pm.sbitlow = 8U; /* because libpng doesn't do sBIT below 8! */
+#  if PNG_LIBPNG_VER < 10700
+      pm.sbitlow = 8U; /* because libpng doesn't do sBIT below 8! */
+#  else
+      pm.sbitlow = 1U;
+#  endif
 
    /* The following allows results to pass if they correspond to anything in the
     * transformed range [input-.5,input+.5]; this is is required because of the
