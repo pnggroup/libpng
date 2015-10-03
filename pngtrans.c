@@ -1543,7 +1543,7 @@ png_do_byte_ops_down(png_transformp *transform, png_transform_controlp tc)
       const png_uint_32 codes = tr->codes;
       png_uint_32 code = codes;
       unsigned int size, hwm, i;
-      png_byte output[32];
+      png_byte output[32] = { 0 };
 
       /* This catches an empty codes array, which would cause all the input to
        * be skipped and, potentially, a garbage output[] to be written (once) to
