@@ -59,6 +59,7 @@
    defined PNG_READ_pHYs_SUPPORTED &&\
    defined PNG_READ_sBIT_SUPPORTED &&\
    defined PNG_READ_sCAL_SUPPORTED &&\
+   defined PNG_READ_sPLT_SUPPORTED &&\
    defined PNG_READ_sRGB_SUPPORTED &&\
    defined PNG_READ_tEXt_SUPPORTED &&\
    defined PNG_READ_tIME_SUPPORTED &&\
@@ -1075,6 +1076,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
       }
    }
+
 #ifdef PNG_FIXED_POINT_SUPPORTED
 #ifdef PNG_cHRM_SUPPORTED
    {
@@ -1089,6 +1091,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_gAMA_SUPPORTED
    {
       png_fixed_point gamma;
@@ -1097,6 +1100,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_gAMA_fixed(write_ptr, write_info_ptr, gamma);
    }
 #endif
+
 #else /* Use floating point versions */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 #ifdef PNG_cHRM_SUPPORTED
@@ -1112,6 +1116,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_gAMA_SUPPORTED
    {
       double gamma;
@@ -1122,6 +1127,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif /* Floating point */
 #endif /* Fixed point */
+
 #ifdef PNG_iCCP_SUPPORTED
    {
       png_charp name;
@@ -1137,6 +1143,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_sRGB_SUPPORTED
    {
       int intent;
@@ -1145,6 +1152,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_sRGB(write_ptr, write_info_ptr, intent);
    }
 #endif
+
    {
       png_colorp palette;
       int num_palette;
@@ -1152,6 +1160,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_PLTE(read_ptr, read_info_ptr, &palette, &num_palette) != 0)
          png_set_PLTE(write_ptr, write_info_ptr, palette, num_palette);
    }
+
 #ifdef PNG_bKGD_SUPPORTED
    {
       png_color_16p background;
@@ -1162,6 +1171,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_hIST_SUPPORTED
    {
       png_uint_16p hist;
@@ -1170,6 +1180,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_hIST(write_ptr, write_info_ptr, hist);
    }
 #endif
+
 #ifdef PNG_oFFs_SUPPORTED
    {
       png_int_32 offset_x, offset_y;
@@ -1182,6 +1193,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_pCAL_SUPPORTED
    {
       png_charp purpose, units;
@@ -1197,6 +1209,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_pHYs_SUPPORTED
    {
       png_uint_32 res_x, res_y;
@@ -1207,6 +1220,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_pHYs(write_ptr, write_info_ptr, res_x, res_y, unit_type);
    }
 #endif
+
 #ifdef PNG_sBIT_SUPPORTED
    {
       png_color_8p sig_bit;
@@ -1215,6 +1229,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          png_set_sBIT(write_ptr, write_info_ptr, sig_bit);
    }
 #endif
+
 #ifdef PNG_sCAL_SUPPORTED
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
    defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
@@ -1243,7 +1258,20 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    }
 #endif
 #endif
-#endif
+#endif /* sCAL */
+
+#ifdef PNG_sPLT_SUPPORTED
+   {
+       png_sPLT_tp entries;
+
+       int num_entries = (int) png_get_sPLT(read_ptr, read_info_ptr, &entries);
+       if (num_entries)
+       {
+           png_set_sPLT(write_ptr, write_info_ptr, entries, num_entries);
+       }
+   }
+#endif /* sPLT */
+
 #ifdef PNG_TEXT_SUPPORTED
    {
       png_textp text_ptr;
@@ -1271,6 +1299,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_tIME_SUPPORTED
    {
       png_timep mod_time;
@@ -1293,6 +1322,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_tRNS_SUPPORTED
    {
       png_bytep trans_alpha;
@@ -1315,6 +1345,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+
 #ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
    {
       png_unknown_chunkp unknowns;
