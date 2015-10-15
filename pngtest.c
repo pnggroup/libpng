@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.4.17 [August 19, 2015]
+ * Last changed in libpng 1.4.17 [October 15, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1095,6 +1095,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 #endif
+
+#ifdef PNG_sPLT_SUPPORTED
+   {
+       png_sPLT_tp entries;
+
+       int num_entries = (int) png_get_sPLT(read_ptr, read_info_ptr, &entries);
+       if (num_entries)
+       {
+           png_set_sPLT(write_ptr, write_info_ptr, entries, num_entries);
+       }
+   }
+#endif /* sPLT */
+
 #ifdef PNG_TEXT_SUPPORTED
    {
       png_textp text_ptr;
