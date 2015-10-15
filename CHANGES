@@ -5375,7 +5375,7 @@ Version 1.6.19beta03 [September 26, 2015]
     warning, updated pngstest-errors.h for the errors detected with the
     new contrib/testspngs PNG test files (John Bowler).
 
-Version 1.6.19beta04 [October 10, 2015]
+Version 1.6.19beta04 [October 15, 2015]
   Worked around rgb-to-gray issues in libpng 1.6.  The previous
     attempts to ignore the errors in the code aren't quite enough to
     deal with the 'channel selection' encoding added to libpng 1.7; abort.
