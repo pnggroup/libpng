@@ -4398,6 +4398,8 @@ Version 1.5.24beta02 [October 15, 2015]
   Merged pngvalid.c with version 1.6.19.
   Added sPLT support to pngtest.c
 
+Version 1.5.24beta03 [October 15, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
