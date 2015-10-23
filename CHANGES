@@ -5387,7 +5387,8 @@ Version 1.6.19beta04 [October 15, 2015]
     code (bug report by Curtis Leach, fix by John Bowler).
   Added sPLT support to pngtest.c
 
-Version 1.6.19beta05 [October 15, 2015]
+Version 1.6.19rc01 [October 23, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
