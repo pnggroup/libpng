@@ -1,5 +1,5 @@
 
-Libpng 1.2.54beta01 - July 30, 2015
+Libpng 1.2.54beta01 - October 23, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,7 +43,7 @@ Other information:
 
 Changes since the last public release (1.2.53):
 
-version 1.2.54beta01 [July 30, 2015]
+version 1.2.54beta01 [October 23, 2015]
   Fix typecast in a png_debug2() statement in png_set_text_2() to
     avoid a compiler warning in PNG_DEBUG builds.
   Fixed printf formats in pngtest.c to avoid compiler warnings and a
@@ -54,6 +54,8 @@ version 1.2.54beta01 [July 30, 2015]
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
     because usleep() is deprecated (port from libpng16).
+  Fixed some bad links in the man page.
+  Added a safety check in png_set_tIME() (Bug report from Qixue Xiao).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

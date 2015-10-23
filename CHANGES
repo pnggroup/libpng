@@ -993,6 +993,7 @@ version 1.2.0beta3 [May 17, 2001]
   Modified png_create_struct so it passes user mem_ptr to user memory allocator.
   Increased png_mng_features flag from png_byte to png_uint_32.
   Bumped shared-library (so-number) and dll-number to 3.
+version 1.0.12 [June 8, 2001]
 version 1.2.0beta4 [June 23, 2001]
   Check for missing profile length field in iCCP chunk and free chunk_data
      in case of truncated iCCP chunk.
@@ -1418,7 +1419,7 @@ version 1.2.8rc4 [November 29, 2004]
 version 1.2.8rc5 [November 29, 2004]
   Fixed new typo in scripts/pngw32.rc
 
-version 1.2.8 [December 3, 2004]
+version 1.0.18, 1.2.8 [December 3, 2004]
   Removed projects/visualc7, added projects/visualc71.
 
 version 1.2.9beta1 [February 21, 2006]
@@ -2858,7 +2859,7 @@ version 1.2.53rc02 [February 21, 2015]
 versions 1.0.63 and 1.2.53 [February 26, 2015]
   No changes.
 
-version 1.2.54beta01 [July 30, 2015]
+version 1.2.54beta01 [October 23, 2015]
   Fixed typecast in a png_debug2() statement in png_set_text_2() to
     avoid a compiler warning in PNG_DEBUG builds.
   Fixed printf formats in pngtest.c to avoid compiler warnings and a
@@ -2869,6 +2870,8 @@ version 1.2.54beta01 [July 30, 2015]
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
     because usleep() is deprecated (port from libpng16).
+  Fixed some bad links in the man page.
+  Added a safety check in png_set_tIME() (Bug report from Qixue Xiao).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
