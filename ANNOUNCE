@@ -1,5 +1,5 @@
 
-Libpng 1.2.54beta01 - October 23, 2015
+Libpng 1.2.54beta02 - October 23, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,37 +9,37 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.54beta01.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.54beta01.tar.gz
-   libpng-1.2.54beta01.tar.bz2
+   libpng-1.2.54beta02.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.54beta02.tar.gz
+   libpng-1.2.54beta02.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.54beta01-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.54beta01-no-config.tar.gz
-   libpng-1.2.54beta01-no-config.tar.bz2
+   libpng-1.2.54beta02-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.54beta02-no-config.tar.gz
+   libpng-1.2.54beta02-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1254b01.zip
-   lp1254b01.7z
-   lp1254b01.tar.bz2
+   lp1254b02.zip
+   lp1254b02.7z
+   lp1254b02.tar.bz2
 
 Project files
 
-   libpng-1.2.54beta01-project-netware.zip
-   libpng-1.2.54beta01-project-wince.zip
+   libpng-1.2.54beta02-project-netware.zip
+   libpng-1.2.54beta02-project-wince.zip
 
 Other information:
 
-   libpng-1.2.54beta01-README.txt
-   libpng-1.2.54beta01-KNOWNBUGS.txt
-   libpng-1.2.54beta01-LICENSE.txt
-   libpng-1.2.54beta01-Y2K-compliance.txt
-   libpng-1.2.54beta01-[previous version]-diff.txt
-   libpng-1.2.54beta01-*.asc (armored detached GPG signatures)
+   libpng-1.2.54beta02-README.txt
+   libpng-1.2.54beta02-KNOWNBUGS.txt
+   libpng-1.2.54beta02-LICENSE.txt
+   libpng-1.2.54beta02-Y2K-compliance.txt
+   libpng-1.2.54beta02-[previous version]-diff.txt
+   libpng-1.2.54beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.53):
 
@@ -56,6 +56,8 @@ version 1.2.54beta01 [October 23, 2015]
     because usleep() is deprecated (port from libpng16).
   Fixed some bad links in the man page.
   Added a safety check in png_set_tIME() (Bug report from Qixue Xiao).
+
+version 1.2.54beta02 [October 23, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
