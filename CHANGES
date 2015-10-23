@@ -2986,6 +2986,8 @@ version 1.4.17beta02 [October 15, 2015]
 version 1.4.17beta03 [October 23, 2015]
   Added a safety check in png_set_tIME() (Bug report from Qixue Xiao).
 
+version 1.4.17beta04 [October 23, 2015]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).

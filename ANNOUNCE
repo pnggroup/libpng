@@ -1,5 +1,5 @@
 
-Libpng 1.4.17beta03 - October 23, 2015
+Libpng 1.4.17beta04 - October 23, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.17beta03.tar.xz (LZMA-compressed, recommended)
-   1.4.17beta03.tar.gz
-   1.4.17beta03.tar.bz2
+   1.4.17beta04.tar.xz (LZMA-compressed, recommended)
+   1.4.17beta04.tar.gz
+   1.4.17beta04.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1417b03.7z (LZMA-compressed, recommended)
-   lp1417b03.zip
+   lp1417b04.7z (LZMA-compressed, recommended)
+   lp1417b04.zip
 
 Other information:
 
-   1.4.17beta03-README.txt
-   1.4.17beta03-LICENSE.txt
-   libpng-1.4.17beta03-*.asc (armored detached GPG signatures)
+   1.4.17beta04-README.txt
+   1.4.17beta04-LICENSE.txt
+   libpng-1.4.17beta04-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.16):
 
@@ -55,6 +55,8 @@ version 1.4.17beta02 [October 15, 2015]
 
 version 1.4.17beta03 [October 23, 2015]
   Added a safety check in png_set_tIME() (Bug report from Qixue Xiao).
+
+version 1.4.17beta04 [October 23, 2015]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
