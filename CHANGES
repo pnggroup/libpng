@@ -2874,7 +2874,8 @@ version 1.2.54beta01 [October 23, 2015]
   Added a safety check in png_set_tIME() (Fixes CVE-2015-7981, bug report
     from Qixue Xiao).
 
-version 1.2.54beta02 [October 27, 2015]
+version 1.2.54rc01 [October 28, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
