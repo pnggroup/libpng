@@ -3754,7 +3754,8 @@ Version 1.5.7beta04 [November 17, 2011]
 Version 1.5.7beta05 [November 25, 2011]
   Removed "zTXt" from warning in generic chunk decompression function.
   Validate time settings passed to pngset() and png_convert_to_rfc1123()
-    (Frank Busse).
+    (Frank Busse). Note: This prevented CVE-2015-7981 from affecting
+    libpng-1.5.7 and later.
   Added MINGW support to CMakeLists.txt
   Reject invalid compression flag or method when reading the iTXt chunk.
   Backed out 'simplified' API changes. The API seems too complex and there
@@ -4398,7 +4399,8 @@ Version 1.5.24beta02 [October 15, 2015]
   Merged pngvalid.c with version 1.6.19.
   Added sPLT support to pngtest.c
 
-Version 1.5.24beta03 [October 15, 2015]
+Version 1.5.24beta03 [October 29, 2015]
+  Prevent writing over-length PLTE chunk (Cosmin Truta).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

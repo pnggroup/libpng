@@ -1,6 +1,6 @@
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.24beta03 - October 15, 2015
+ libpng version 1.5.24beta03 - October 29, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.24beta03 - October 15, 2015
+ libpng versions 0.97, January 1998, through 1.5.24beta03 - October 29, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -4256,6 +4256,11 @@ limits are now
 The png_set_option() function (and the "options" member of the png struct) was
 added to libpng-1.5.15.
 
+Starting with libpng-1.5.24, attempting to write an over-length PLTE chunk
+is an error. Previously this requirement of the PNG specification was not
+enforced. Libpng continues to accept over-length PLTE chunks when reading,
+but does not make any use of the extra entries.
+
 The library now supports a complete fixed point implementation and can
 thus be used on systems that have no floating point support or very
 limited or slow support.  Previously gamma correction, an essential part
@@ -4501,7 +4506,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XIV. Y2K Compliance in libpng
 
-October 15, 2015
+October 29, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
