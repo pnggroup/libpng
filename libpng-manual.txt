@@ -5142,6 +5142,11 @@ It can be set for testing debug or beta builds to ensure that they will compile
 when the build type is switched to RC or STABLE. In essence this overrides the
 PNG_LIBPNG_BUILD_BASE_TYPE definition which is not directly user controllable.
 
+Starting with libpng-1.6.19, attempting to write an over-length PLTE chunk
+is an error. Previously this requirement of the PNG specification was not
+enforced. Libpng continues to accept over-length PLTE chunks when reading,
+but does not make any use of the extra entries.
+
 XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
