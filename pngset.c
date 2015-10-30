@@ -523,7 +523,7 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
    max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
       (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
 
-   if (num_palette < 0 || num_palette > max_palette_length)
+   if (num_palette < 0 || num_palette > (int) max_palette_length)
    {
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
          png_error(png_ptr, "Invalid palette length");

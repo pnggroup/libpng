@@ -107,7 +107,8 @@ Version 1.6.19rc01 [October 23, 2015]
   No changes.
 
 Version 1.6.19rc02 [October 30, 2015]
-  Prevent reading or writing over-length PLTE chunk (Cosmin Truta).
+  Prevent setting or writing over-length PLTE chunk (Cosmin Truta).
+  Silently truncate over-length PLTE chunk while reading.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

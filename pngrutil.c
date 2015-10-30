@@ -872,7 +872,7 @@ void /* PRIVATE */
 png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
    png_color palette[PNG_MAX_PALETTE_LENGTH];
-   int num, i;
+   int max_palette_length, num, i;
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_colorp pal_ptr;
 #endif
@@ -930,8 +930,18 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
+   max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
+      (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
+
    /* The cast is safe because 'length' is less than 3*PNG_MAX_PALETTE_LENGTH */
    num = (int)length / 3;
+
+   /* If the palette has 256 or fewer entries but is too large for the bit depth,
+    * we don't issue an error, to preserve the behavior of previous libpng versions.
+    * We silently truncate the unused extra palette entries here.
+    */
+   if (num > max_palette_length)
+     num = max_palette_length;
 
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
@@ -1002,9 +1012,6 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * confusing.
     *
     * Fix this by not sharing the palette in this way.
-    *
-    * Starting with libpng-1.6.19, png_set_PLTE() also issues a png_error() when
-    * it attempts to set a palette length that is too large for the bit depth.
     */
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 
