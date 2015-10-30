@@ -4406,6 +4406,7 @@ Version 1.5.24beta03 [October 30, 2015]
     a user transform.  This was safe; libpng overallocated buffer space
    (potentially by quite a lot; up to 4 times the amount required) but,
    from 1.5.4 on, resulted in a png_error (John Bowler).
+  Silently truncate over-length PLTE chunk while reading.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

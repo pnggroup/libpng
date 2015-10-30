@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.5.22 [March 26, 2015]
+ * Last changed in libpng 1.5.24 [(PENDING RELEASE)]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -611,7 +611,7 @@ void /* PRIVATE */
 png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_color palette[PNG_MAX_PALETTE_LENGTH];
-   int num, i;
+   int max_palette_length, num, i;
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_colorp pal_ptr;
 #endif
@@ -664,7 +664,19 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
    }
 
+   /* The cast is safe because 'length' is less than 3*PNG_MAX_PALETTE_LENGTH */
    num = (int)length / 3;
+
+   /* If the palette has 256 or fewer entries but is too large for the bit depth,
+    * we don't issue an error, to preserve the behavior of previous libpng versions.
+    * We silently truncate the unused extra palette entries here.
+    */
+
+   max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
+      (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
+
+   if (num > max_palette_length)
+     num = max_palette_length;
 
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
