@@ -1002,6 +1002,9 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * confusing.
     *
     * Fix this by not sharing the palette in this way.
+    *
+    * Starting with libpng-1.6.19, png_set_PLTE() also issues a png_error() when
+    * it attempts to set a palette length that is too large for the bit depth.
     */
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 

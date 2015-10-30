@@ -922,20 +922,20 @@ void /* PRIVATE */
 png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
     png_uint_32 num_pal)
 {
-   png_uint_32 max_num_pal, i;
+   png_uint_32 max_palette_length, i;
    png_const_colorp pal_ptr;
    png_byte buf[3];
 
    png_debug(1, "in png_write_PLTE");
 
-   max_num_pal = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
+   max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
       (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
 
    if ((
 #ifdef PNG_MNG_FEATURES_SUPPORTED
        (png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) == 0 &&
 #endif
-       num_pal == 0) || num_pal > max_num_pal)
+       num_pal == 0) || num_pal > max_palette_length)
    {
       if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
