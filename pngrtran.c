@@ -2056,10 +2056,10 @@ png_read_transform_info(png_structp png_ptr, png_infop info_ptr)
 defined(PNG_READ_USER_TRANSFORM_SUPPORTED)
    if (png_ptr->transformations & PNG_USER_TRANSFORM)
    {
-      if (info_ptr->bit_depth < png_ptr->user_transform_depth)
+      if (png_ptr->user_transform_depth)
          info_ptr->bit_depth = png_ptr->user_transform_depth;
 
-      if (info_ptr->channels < png_ptr->user_transform_channels)
+      if (png_ptr->user_transform_channels)
          info_ptr->channels = png_ptr->user_transform_channels;
    }
 #endif
