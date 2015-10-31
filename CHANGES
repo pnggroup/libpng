@@ -2994,6 +2994,8 @@ version 1.4.17rc02 [October 31, 2015]
   Prevent writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
 
+version 1.4.17rc03 [October 31, 2015]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
