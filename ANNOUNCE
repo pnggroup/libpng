@@ -57,8 +57,12 @@ version 1.4.17beta03 [October 23, 2015]
   Added a safety check in png_set_tIME() (Fixes CVE-2015-7981, bug report
     from Qixue Xiao).
 
-version 1.4.17rc01 [October 31, 2015]
+version 1.4.17rc01 [October 28, 2015]
   No changes.
+
+version 1.4.17rc02 [October 31, 2015]
+  Prevent writing over-length PLTE chunk (Cosmin Truta).
+  Silently truncate over-length PLTE chunk while reading.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
