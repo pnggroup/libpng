@@ -3586,6 +3586,11 @@ PNG_QUANTIZE_[RED,GREEN,BLUE]_BITS.
 
 We removed the trailing '.' from the warning and error messages.
 
+Starting with libpng-1.4.17, attempting to set an over-length PLTE chunk
+is an error. Previously this requirement of the PNG specification was not
+enforced, and the palette was always limited to 256 entries. An over-length
+PLTE chunk found in an input PNG is silently truncated.
+
 .SH X. Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
