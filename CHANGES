@@ -5391,9 +5391,14 @@ Version 1.6.19beta04 [October 15, 2015]
 Version 1.6.19rc01 [October 23, 2015]
   No changes.
 
-Version 1.6.19rc02 [October 30, 2015]
+Version 1.6.19rc02 [October 31, 2015]
   Prevent setting or writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
+  Libpng incorrectly calculated the output rowbytes when the application
+    decreased either the number of channels or the bit depth (or both) in
+    a user transform.  This was safe; libpng overallocated buffer space
+   (potentially by quite a lot; up to 4 times the amount required) but,
+   from 1.5.4 on, resulted in a png_error (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

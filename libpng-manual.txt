@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.19rc02 - October 30, 2015
+ libpng version 1.6.19rc02 - October 31, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.19rc02 - October 30, 2015
+ libpng versions 0.97, January 1998, through 1.6.19rc02 - October 31, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5144,7 +5144,8 @@ PNG_LIBPNG_BUILD_BASE_TYPE definition which is not directly user controllable.
 
 Starting with libpng-1.6.19, attempting to set an over-length PLTE chunk
 is an error. Previously this requirement of the PNG specification was not
-enforced, and the palette was always limited to 256 entries.
+enforced, and the palette was always limited to 256 entries. An over-length
+PLTE chunk found in an input PNG is silently truncated.
 
 XIII.  Detecting libpng
 
@@ -5318,7 +5319,7 @@ Other rules can be inferred by inspecting the libpng source.
 
 XVI. Y2K Compliance in libpng
 
-October 30, 2015
+October 31, 2015
 
 Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
