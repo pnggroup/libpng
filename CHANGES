@@ -2877,6 +2877,10 @@ version 1.2.54beta01 [October 23, 2015]
 version 1.2.54rc01 [October 28, 2015]
   No changes.
 
+version 1.2.54rc02 [October 31, 2015]
+  Prevent writing over-length PLTE chunk (Cosmin Truta).
+  Silently truncate over-length PLTE chunk while reading.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
