@@ -4399,7 +4399,7 @@ Version 1.5.24beta02 [October 15, 2015]
   Merged pngvalid.c with version 1.6.19.
   Added sPLT support to pngtest.c
 
-Version 1.5.24beta03 [October 30, 2015]
+Version 1.5.24beta03 [October 31, 2015]
   Prevent writing over-length PLTE chunk (Cosmin Truta).
   Libpng incorrectly calculated the output rowbytes when the application
     decreased either the number of channels or the bit depth (or both) in
