@@ -124,12 +124,12 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
       png_fixed(png_ptr, red_X, "cHRM Red X"),
       png_fixed(png_ptr, red_Y, "cHRM Red Y"),
       png_fixed(png_ptr, red_Z, "cHRM Red Z"),
-      png_fixed(png_ptr, green_X, "cHRM Red X"),
-      png_fixed(png_ptr, green_Y, "cHRM Red Y"),
-      png_fixed(png_ptr, green_Z, "cHRM Red Z"),
-      png_fixed(png_ptr, blue_X, "cHRM Red X"),
-      png_fixed(png_ptr, blue_Y, "cHRM Red Y"),
-      png_fixed(png_ptr, blue_Z, "cHRM Red Z"));
+      png_fixed(png_ptr, green_X, "cHRM Green X"),
+      png_fixed(png_ptr, green_Y, "cHRM Green Y"),
+      png_fixed(png_ptr, green_Z, "cHRM Green Z"),
+      png_fixed(png_ptr, blue_X, "cHRM Blue X"),
+      png_fixed(png_ptr, blue_Y, "cHRM Blue Y"),
+      png_fixed(png_ptr, blue_Z, "cHRM Blue Z"));
 }
 #  endif /* FLOATING_POINT */
 
@@ -502,12 +502,17 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
     png_const_colorp palette, int num_palette)
 {
 
+   png_uint_32 max_palette_length;
+
    png_debug1(1, "in %s storage function", "PLTE");
 
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   if (num_palette < 0 || num_palette > PNG_MAX_PALETTE_LENGTH)
+   max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
+      (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
+
+   if (num_palette < 0 || num_palette > (int) max_palette_length)
    {
       if ((info_ptr->format == PNG_FORMAT_FLAG_COLORMAP) != 0)
          png_chunk_error(png_ptr, "Invalid palette length");
@@ -537,8 +542,8 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
 
    /* Changed in libpng-1.2.1 to allocate PNG_MAX_PALETTE_LENGTH instead
-    * of num_palette entries, in case of an invalid PNG file that has
-    * too-large sample values.
+    * of num_palette entries, in case of an invalid PNG file or incorrect
+    * call to png_set_PLTE() with too-large sample values.
     */
    png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
