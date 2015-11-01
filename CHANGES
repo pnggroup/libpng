@@ -4408,6 +4408,9 @@ Version 1.5.24rc01 [October 31, 2015]
    from 1.5.4 on, resulted in a png_error (John Bowler).
   Silently truncate over-length PLTE chunk while reading.
 
+Version 1.5.24rc02 [November 1, 2015]
+  Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
