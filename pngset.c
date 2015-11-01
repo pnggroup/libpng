@@ -123,12 +123,12 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
       png_fixed(png_ptr, red_X, "cHRM Red X"),
       png_fixed(png_ptr, red_Y, "cHRM Red Y"),
       png_fixed(png_ptr, red_Z, "cHRM Red Z"),
-      png_fixed(png_ptr, green_X, "cHRM Red X"),
-      png_fixed(png_ptr, green_Y, "cHRM Red Y"),
-      png_fixed(png_ptr, green_Z, "cHRM Red Z"),
-      png_fixed(png_ptr, blue_X, "cHRM Red X"),
-      png_fixed(png_ptr, blue_Y, "cHRM Red Y"),
-      png_fixed(png_ptr, blue_Z, "cHRM Red Z"));
+      png_fixed(png_ptr, green_X, "cHRM Green X"),
+      png_fixed(png_ptr, green_Y, "cHRM Green Y"),
+      png_fixed(png_ptr, green_Z, "cHRM Green Z"),
+      png_fixed(png_ptr, blue_X, "cHRM Blue X"),
+      png_fixed(png_ptr, blue_Y, "cHRM Blue Y"),
+      png_fixed(png_ptr, blue_Z, "cHRM Blue Z"));
 }
 #  endif /* FLOATING_POINT */
 
