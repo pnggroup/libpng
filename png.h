@@ -11,316 +11,9 @@
  *
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
- *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
+ *  libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *  libpng versions 0.97, January 1998, through 1.2.54rc03, November 3, 2015: Glenn
  *  See also "Contributing Authors", below.
- *
- * Note about libpng version numbers:
- *
- *    Due to various miscommunications, unforeseen code incompatibilities
- *    and occasional factors outside the authors' control, version numbering
- *    on the library has not always been consistent and straightforward.
- *    The following table summarizes matters since version 0.89c, which was
- *    the first widely used release:
- *
- *    source                 png.h  png.h  shared-lib
- *    version                string   int  version
- *    -------                ------ -----  ----------
- *    0.89c "1.0 beta 3"     0.89      89  1.0.89
- *    0.90  "1.0 beta 4"     0.90      90  0.90  [should have been 2.0.90]
- *    0.95  "1.0 beta 5"     0.95      95  0.95  [should have been 2.0.95]
- *    0.96  "1.0 beta 6"     0.96      96  0.96  [should have been 2.0.96]
- *    0.97b "1.00.97 beta 7" 1.00.97   97  1.0.1 [should have been 2.0.97]
- *    0.97c                  0.97      97  2.0.97
- *    0.98                   0.98      98  2.0.98
- *    0.99                   0.99      98  2.0.99
- *    0.99a-m                0.99      99  2.0.99
- *    1.00                   1.00     100  2.1.0 [100 should be 10000]
- *    1.0.0      (from here on, the   100  2.1.0 [100 should be 10000]
- *    1.0.1       png.h string is   10001  2.1.0
- *    1.0.1a-e    identical to the  10002  from here on, the shared library
- *    1.0.2       source version)   10002  is 2.V where V is the source code
- *    1.0.2a-b                      10003  version, except as noted.
- *    1.0.3                         10003
- *    1.0.3a-d                      10004
- *    1.0.4                         10004
- *    1.0.4a-f                      10005
- *    1.0.5 (+ 2 patches)           10005
- *    1.0.5a-d                      10006
- *    1.0.5e-r                      10100 (not source compatible)
- *    1.0.5s-v                      10006 (not binary compatible)
- *    1.0.6 (+ 3 patches)           10006 (still binary incompatible)
- *    1.0.6d-f                      10007 (still binary incompatible)
- *    1.0.6g                        10007
- *    1.0.6h                        10007  10.6h (testing xy.z so-numbering)
- *    1.0.6i                        10007  10.6i
- *    1.0.6j                        10007  2.1.0.6j (incompatible with 1.0.0)
- *    1.0.7beta11-14        DLLNUM  10007  2.1.0.7beta11-14 (binary compatible)
- *    1.0.7beta15-18           1    10007  2.1.0.7beta15-18 (binary compatible)
- *    1.0.7rc1-2               1    10007  2.1.0.7rc1-2 (binary compatible)
- *    1.0.7                    1    10007  (still compatible)
- *    1.0.8beta1-4             1    10008  2.1.0.8beta1-4
- *    1.0.8rc1                 1    10008  2.1.0.8rc1
- *    1.0.8                    1    10008  2.1.0.8
- *    1.0.9beta1-6             1    10009  2.1.0.9beta1-6
- *    1.0.9rc1                 1    10009  2.1.0.9rc1
- *    1.0.9beta7-10            1    10009  2.1.0.9beta7-10
- *    1.0.9rc2                 1    10009  2.1.0.9rc2
- *    1.0.9                    1    10009  2.1.0.9
- *    1.0.10beta1              1    10010  2.1.0.10beta1
- *    1.0.10rc1                1    10010  2.1.0.10rc1
- *    1.0.10                   1    10010  2.1.0.10
- *    1.0.11beta1-3            1    10011  2.1.0.11beta1-3
- *    1.0.11rc1                1    10011  2.1.0.11rc1
- *    1.0.11                   1    10011  2.1.0.11
- *    1.0.12beta1-2            2    10012  2.1.0.12beta1-2
- *    1.0.12rc1                2    10012  2.1.0.12rc1
- *    1.0.12                   2    10012  2.1.0.12
- *    1.1.0a-f                 -    10100  2.1.1.0a-f (branch abandoned)
- *    1.2.0beta1-2             2    10200  2.1.2.0beta1-2
- *    1.2.0beta3-5             3    10200  3.1.2.0beta3-5
- *    1.2.0rc1                 3    10200  3.1.2.0rc1
- *    1.2.0                    3    10200  3.1.2.0
- *    1.2.1beta1-4             3    10201  3.1.2.1beta1-4
- *    1.2.1rc1-2               3    10201  3.1.2.1rc1-2
- *    1.2.1                    3    10201  3.1.2.1
- *    1.2.2beta1-6            12    10202  12.so.0.1.2.2beta1-6
- *    1.0.13beta1             10    10013  10.so.0.1.0.13beta1
- *    1.0.13rc1               10    10013  10.so.0.1.0.13rc1
- *    1.2.2rc1                12    10202  12.so.0.1.2.2rc1
- *    1.0.13                  10    10013  10.so.0.1.0.13
- *    1.2.2                   12    10202  12.so.0.1.2.2
- *    1.2.3rc1-6              12    10203  12.so.0.1.2.3rc1-6
- *    1.2.3                   12    10203  12.so.0.1.2.3
- *    1.2.4beta1-3            13    10204  12.so.0.1.2.4beta1-3
- *    1.0.14rc1               13    10014  10.so.0.1.0.14rc1
- *    1.2.4rc1                13    10204  12.so.0.1.2.4rc1
- *    1.0.14                  10    10014  10.so.0.1.0.14
- *    1.2.4                   13    10204  12.so.0.1.2.4
- *    1.2.5beta1-2            13    10205  12.so.0.1.2.5beta1-2
- *    1.0.15rc1-3             10    10015  10.so.0.1.0.15rc1-3
- *    1.2.5rc1-3              13    10205  12.so.0.1.2.5rc1-3
- *    1.0.15                  10    10015  10.so.0.1.0.15
- *    1.2.5                   13    10205  12.so.0.1.2.5
- *    1.2.6beta1-4            13    10206  12.so.0.1.2.6beta1-4
- *    1.0.16                  10    10016  10.so.0.1.0.16
- *    1.2.6                   13    10206  12.so.0.1.2.6
- *    1.2.7beta1-2            13    10207  12.so.0.1.2.7beta1-2
- *    1.0.17rc1               10    10017  10.so.0.1.0.17rc1
- *    1.2.7rc1                13    10207  12.so.0.1.2.7rc1
- *    1.0.17                  10    10017  10.so.0.1.0.17
- *    1.2.7                   13    10207  12.so.0.1.2.7
- *    1.2.8beta1-5            13    10208  12.so.0.1.2.8beta1-5
- *    1.0.18rc1-5             10    10018  10.so.0.1.0.18rc1-5
- *    1.2.8rc1-5              13    10208  12.so.0.1.2.8rc1-5
- *    1.0.18                  10    10018  10.so.0.1.0.18
- *    1.2.8                   13    10208  12.so.0.1.2.8
- *    1.2.9beta1-3            13    10209  12.so.0.1.2.9beta1-3
- *    1.2.9beta4-11           13    10209  12.so.0.9[.0]
- *    1.2.9rc1                13    10209  12.so.0.9[.0]
- *    1.2.9                   13    10209  12.so.0.9[.0]
- *    1.2.10beta1-8           13    10210  12.so.0.10[.0]
- *    1.2.10rc1-3             13    10210  12.so.0.10[.0]
- *    1.2.10                  13    10210  12.so.0.10[.0]
- *    1.2.11beta1-4           13    10211  12.so.0.11[.0]
- *    1.0.19rc1-5             10    10019  10.so.0.19[.0]
- *    1.2.11rc1-5             13    10211  12.so.0.11[.0]
- *    1.0.19                  10    10019  10.so.0.19[.0]
- *    1.2.11                  13    10211  12.so.0.11[.0]
- *    1.0.20                  10    10020  10.so.0.20[.0]
- *    1.2.12                  13    10212  12.so.0.12[.0]
- *    1.2.13beta1             13    10213  12.so.0.13[.0]
- *    1.0.21                  10    10021  10.so.0.21[.0]
- *    1.2.13                  13    10213  12.so.0.13[.0]
- *    1.2.14beta1-2           13    10214  12.so.0.14[.0]
- *    1.0.22rc1               10    10022  10.so.0.22[.0]
- *    1.2.14rc1               13    10214  12.so.0.14[.0]
- *    1.0.22                  10    10022  10.so.0.22[.0]
- *    1.2.14                  13    10214  12.so.0.14[.0]
- *    1.2.15beta1-6           13    10215  12.so.0.15[.0]
- *    1.0.23rc1-5             10    10023  10.so.0.23[.0]
- *    1.2.15rc1-5             13    10215  12.so.0.15[.0]
- *    1.0.23                  10    10023  10.so.0.23[.0]
- *    1.2.15                  13    10215  12.so.0.15[.0]
- *    1.2.16beta1-2           13    10216  12.so.0.16[.0]
- *    1.2.16rc1               13    10216  12.so.0.16[.0]
- *    1.0.24                  10    10024  10.so.0.24[.0]
- *    1.2.16                  13    10216  12.so.0.16[.0]
- *    1.2.17beta1-2           13    10217  12.so.0.17[.0]
- *    1.0.25rc1               10    10025  10.so.0.25[.0]
- *    1.2.17rc1-3             13    10217  12.so.0.17[.0]
- *    1.0.25                  10    10025  10.so.0.25[.0]
- *    1.2.17                  13    10217  12.so.0.17[.0]
- *    1.0.26                  10    10026  10.so.0.26[.0]
- *    1.2.18                  13    10218  12.so.0.18[.0]
- *    1.2.19beta1-31          13    10219  12.so.0.19[.0]
- *    1.0.27rc1-6             10    10027  10.so.0.27[.0]
- *    1.2.19rc1-6             13    10219  12.so.0.19[.0]
- *    1.0.27                  10    10027  10.so.0.27[.0]
- *    1.2.19                  13    10219  12.so.0.19[.0]
- *    1.2.20beta01-04         13    10220  12.so.0.20[.0]
- *    1.0.28rc1-6             10    10028  10.so.0.28[.0]
- *    1.2.20rc1-6             13    10220  12.so.0.20[.0]
- *    1.0.28                  10    10028  10.so.0.28[.0]
- *    1.2.20                  13    10220  12.so.0.20[.0]
- *    1.2.21beta1-2           13    10221  12.so.0.21[.0]
- *    1.2.21rc1-3             13    10221  12.so.0.21[.0]
- *    1.0.29                  10    10029  10.so.0.29[.0]
- *    1.2.21                  13    10221  12.so.0.21[.0]
- *    1.2.22beta1-4           13    10222  12.so.0.22[.0]
- *    1.0.30rc1               10    10030  10.so.0.30[.0]
- *    1.2.22rc1               13    10222  12.so.0.22[.0]
- *    1.0.30                  10    10030  10.so.0.30[.0]
- *    1.2.22                  13    10222  12.so.0.22[.0]
- *    1.2.23beta01-05         13    10223  12.so.0.23[.0]
- *    1.2.23rc01              13    10223  12.so.0.23[.0]
- *    1.2.23                  13    10223  12.so.0.23[.0]
- *    1.2.24beta01-02         13    10224  12.so.0.24[.0]
- *    1.2.24rc01              13    10224  12.so.0.24[.0]
- *    1.2.24                  13    10224  12.so.0.24[.0]
- *    1.2.25beta01-06         13    10225  12.so.0.25[.0]
- *    1.2.25rc01-02           13    10225  12.so.0.25[.0]
- *    1.0.31                  10    10031  10.so.0.31[.0]
- *    1.2.25                  13    10225  12.so.0.25[.0]
- *    1.2.26beta01-06         13    10226  12.so.0.26[.0]
- *    1.2.26rc01              13    10226  12.so.0.26[.0]
- *    1.2.26                  13    10226  12.so.0.26[.0]
- *    1.0.32                  10    10032  10.so.0.32[.0]
- *    1.2.27beta01-06         13    10227  12.so.0.27[.0]
- *    1.2.27rc01              13    10227  12.so.0.27[.0]
- *    1.0.33                  10    10033  10.so.0.33[.0]
- *    1.2.27                  13    10227  12.so.0.27[.0]
- *    1.0.34                  10    10034  10.so.0.34[.0]
- *    1.2.28                  13    10228  12.so.0.28[.0]
- *    1.2.29beta01-03         13    10229  12.so.0.29[.0]
- *    1.2.29rc01              13    10229  12.so.0.29[.0]
- *    1.0.35                  10    10035  10.so.0.35[.0]
- *    1.2.29                  13    10229  12.so.0.29[.0]
- *    1.0.37                  10    10037  10.so.0.37[.0]
- *    1.2.30beta01-04         13    10230  12.so.0.30[.0]
- *    1.0.38rc01-08           10    10038  10.so.0.38[.0]
- *    1.2.30rc01-08           13    10230  12.so.0.30[.0]
- *    1.0.38                  10    10038  10.so.0.38[.0]
- *    1.2.30                  13    10230  12.so.0.30[.0]
- *    1.0.39rc01-03           10    10039  10.so.0.39[.0]
- *    1.2.31rc01-03           13    10231  12.so.0.31[.0]
- *    1.0.39                  10    10039  10.so.0.39[.0]
- *    1.2.31                  13    10231  12.so.0.31[.0]
- *    1.2.32beta01-02         13    10232  12.so.0.32[.0]
- *    1.0.40rc01              10    10040  10.so.0.40[.0]
- *    1.2.32rc01              13    10232  12.so.0.32[.0]
- *    1.0.40                  10    10040  10.so.0.40[.0]
- *    1.2.32                  13    10232  12.so.0.32[.0]
- *    1.2.33beta01-02         13    10233  12.so.0.33[.0]
- *    1.2.33rc01-02           13    10233  12.so.0.33[.0]
- *    1.0.41rc01              10    10041  10.so.0.41[.0]
- *    1.2.33                  13    10233  12.so.0.33[.0]
- *    1.0.41                  10    10041  10.so.0.41[.0]
- *    1.2.34beta01-07         13    10234  12.so.0.34[.0]
- *    1.0.42rc01              10    10042  10.so.0.42[.0]
- *    1.2.34rc01              13    10234  12.so.0.34[.0]
- *    1.0.42                  10    10042  10.so.0.42[.0]
- *    1.2.34                  13    10234  12.so.0.34[.0]
- *    1.2.35beta01-03         13    10235  12.so.0.35[.0]
- *    1.0.43rc01-02           10    10043  10.so.0.43[.0]
- *    1.2.35rc01-02           13    10235  12.so.0.35[.0]
- *    1.0.43                  10    10043  10.so.0.43[.0]
- *    1.2.35                  13    10235  12.so.0.35[.0]
- *    1.2.36beta01-05         13    10236  12.so.0.36[.0]
- *    1.2.36rc01              13    10236  12.so.0.36[.0]
- *    1.0.44                  10    10044  10.so.0.44[.0]
- *    1.2.36                  13    10236  12.so.0.36[.0]
- *    1.2.37beta01-03         13    10237  12.so.0.37[.0]
- *    1.2.37rc01              13    10237  12.so.0.37[.0]
- *    1.2.37                  13    10237  12.so.0.37[.0]
- *    1.0.45                  10    10045  12.so.0.45[.0]
- *    1.0.46                  10    10046  10.so.0.46[.0]
- *    1.2.38beta01            13    10238  12.so.0.38[.0]
- *    1.2.38rc01-03           13    10238  12.so.0.38[.0]
- *    1.0.47                  10    10047  10.so.0.47[.0]
- *    1.2.38                  13    10238  12.so.0.38[.0]
- *    1.2.39beta01-05         13    10239  12.so.0.39[.0]
- *    1.2.39rc01              13    10239  12.so.0.39[.0]
- *    1.0.48                  10    10048  10.so.0.48[.0]
- *    1.2.39                  13    10239  12.so.0.39[.0]
- *    1.2.40beta01            13    10240  12.so.0.40[.0]
- *    1.2.40rc01              13    10240  12.so.0.40[.0]
- *    1.0.49                  10    10049  10.so.0.49[.0]
- *    1.2.40                  13    10240  12.so.0.40[.0]
- *    1.2.41beta01-18         13    10241  12.so.0.41[.0]
- *    1.0.51rc01              10    10051  10.so.0.51[.0]
- *    1.2.41rc01-03           13    10241  12.so.0.41[.0]
- *    1.0.51                  10    10051  10.so.0.51[.0]
- *    1.2.41                  13    10241  12.so.0.41[.0]
- *    1.2.42beta01-02         13    10242  12.so.0.42[.0]
- *    1.2.42rc01-05           13    10242  12.so.0.42[.0]
- *    1.0.52                  10    10052  10.so.0.52[.0]
- *    1.2.42                  13    10242  12.so.0.42[.0]
- *    1.2.43beta01-05         13    10243  12.so.0.43[.0]
- *    1.0.53rc01-02           10    10053  10.so.0.53[.0]
- *    1.2.43rc01-02           13    10243  12.so.0.43[.0]
- *    1.0.53                  10    10053  10.so.0.53[.0]
- *    1.2.43                  13    10243  12.so.0.43[.0]
- *    1.2.44beta01-03         13    10244  12.so.0.44[.0]
- *    1.2.44rc01-03           13    10244  12.so.0.44[.0]
- *    1.2.44                  13    10244  12.so.0.44[.0]
- *    1.2.45beta01-03         13    10245  12.so.0.45[.0]
- *    1.0.55rc01              10    10055  10.so.0.55[.0]
- *    1.2.45rc01              13    10245  12.so.0.45[.0]
- *    1.0.55                  10    10055  10.so.0.55[.0]
- *    1.2.45                  13    10245  12.so.0.45[.0]
- *    1.2.46rc01-02           13    10246  12.so.0.46[.0]
- *    1.0.56                  10    10056  10.so.0.56[.0]
- *    1.2.46                  13    10246  12.so.0.46[.0]
- *    1.2.47beta01            13    10247  12.so.0.47[.0]
- *    1.2.47rc01              13    10247  12.so.0.47[.0]
- *    1.0.57rc01              10    10057  10.so.0.57[.0]
- *    1.2.47                  13    10247  12.so.0.47[.0]
- *    1.0.57                  10    10057  10.so.0.57[.0]
- *    1.2.48beta01            13    10248  12.so.0.48[.0]
- *    1.2.48rc01-02           13    10248  12.so.0.48[.0]
- *    1.0.58                  10    10058  10.so.0.58[.0]
- *    1.2.48                  13    10248  12.so.0.48[.0]
- *    1.2.49rc01              13    10249  12.so.0.49[.0]
- *    1.0.59                  10    10059  10.so.0.59[.0]
- *    1.2.49                  13    10249  12.so.0.49[.0]
- *    1.0.60                  10    10060  10.so.0.60[.0]
- *    1.2.50                  13    10250  12.so.0.50[.0]
- *    1.2.51beta01-05         13    10251  12.so.0.51[.0]
- *    1.2.51rc01-04           13    10251  12.so.0.51[.0]
- *    1.0.61                  10    10061  10.so.0.61[.0]
- *    1.2.51                  13    10251  12.so.0.51[.0]
- *    1.2.52beta01            13    10252  12.so.0.52[.0]
- *    1.2.52rc01-02           13    10252  12.so.0.52[.0]
- *    1.0.62                  10    10062  10.so.0.62[.0]
- *    1.2.52                  13    10252  12.so.0.52[.0]
- *    1.2.53beta01-02         13    10253  12.so.0.53[.0]
- *    1.2.53rc01-03           13    10253  12.so.0.53[.0]
- *    1.0.63                  10    10063  10.so.0.63[.0]
- *    1.2.53                  13    10253  12.so.0.53[.0]
- *    1.2.54beta01            13    10254  12.so.0.54[.0]
- *    1.2.54rc01-02           13    10254  12.so.0.54[.0]
- *
- *    Henceforth the source version will match the shared-library major
- *    and minor numbers; the shared-library major version number will be
- *    used for changes in backward compatibility, as it is intended.  The
- *    PNG_LIBPNG_VER macro, which is not used within libpng but is available
- *    for applications, is an unsigned integer of the form xyyzz corresponding
- *    to the source version x.y.z (leading zeros in y and z).  Beta versions
- *    were given the previous public release number plus a letter, until
- *    version 1.0.6j; from then on they were given the upcoming public
- *    release number plus "betaNN" or "rcNN".
- *
- *    Binary incompatibility exists only when applications make direct access
- *    to the info_ptr or png_ptr members through png.h, and the compiled
- *    application is loaded with a different version of the library.
- *
- *    DLLNUM will change each time there are forward or backward changes
- *    in binary compatibility (e.g., when a new feature is added).
- *
- * See libpng.txt or libpng.3 for more information.  The PNG specification
- * is available as a W3C Recommendation and as an ISO Specification,
- * <http://www.w3.org/TR/2003/REC-PNG-20031110/
  */
 
 /*
@@ -437,6 +130,80 @@
  * possible without all of you.
  *
  * Thanks to Frank J. T. Wojcik for helping with the documentation.
+ */
+
+/* Note about libpng version numbers:
+ *
+ *    Due to various miscommunications, unforeseen code incompatibilities
+ *    and occasional factors outside the authors' control, version numbering
+ *    on the library has not always been consistent and straightforward.
+ *    The following table summarizes matters since version 0.89c, which was
+ *    the first widely used release:
+ *
+ *    source                 png.h  png.h  shared-lib
+ *    version                string   int  version
+ *    -------                ------ -----  ----------
+ *    0.89c "1.0 beta 3"     0.89      89  1.0.89
+ *    0.90  "1.0 beta 4"     0.90      90  0.90  [should have been 2.0.90]
+ *    0.95  "1.0 beta 5"     0.95      95  0.95  [should have been 2.0.95]
+ *    0.96  "1.0 beta 6"     0.96      96  0.96  [should have been 2.0.96]
+ *    0.97b "1.00.97 beta 7" 1.00.97   97  1.0.1 [should have been 2.0.97]
+ *    0.97c                  0.97      97  2.0.97
+ *    0.98                   0.98      98  2.0.98
+ *    0.99                   0.99      98  2.0.99
+ *    0.99a-m                0.99      99  2.0.99
+ *    1.00                   1.00     100  2.1.0 [100 should be 10000]
+ *    1.0.0      (from here on, the   100  2.1.0 [100 should be 10000]
+ *    1.0.1       png.h string is   10001  2.1.0
+ *    1.0.1a-e    identical to the  10002  from here on, the shared library
+ *    1.0.2       source version)   10002  is 2.V where V is the source code
+ *    1.0.2a-b                      10003  version, except as noted.
+ *    1.0.3                         10003
+ *    1.0.3a-d                      10004
+ *    1.0.4                         10004
+ *    1.0.4a-f                      10005
+ *    1.0.5 (+ 2 patches)           10005
+ *    1.0.5a-d                      10006
+ *    1.0.5e-r                      10100 (not source compatible)
+ *    1.0.5s-v                      10006 (not binary compatible)
+ *    1.0.6 (+ 3 patches)           10006 (still binary incompatible)
+ *    1.0.6d-f                      10007 (still binary incompatible)
+ *    1.0.6g                        10007
+ *    1.0.6h                        10007  10.6h (testing xy.z so-numbering)
+ *    1.0.6i                        10007  10.6i
+ *    1.0.6j                        10007  2.1.0.6j (incompatible with 1.0.0)
+ *    1.0.7beta11-14        DLLNUM  10007  2.1.0.7beta11-14 (binary compatible)
+ *    1.0.7beta15-18           1    10007  2.1.0.7beta15-18 (binary compatible)
+ *    1.0.7rc1-2               1    10007  2.1.0.7rc1-2 (binary compatible)
+ *    1.0.7                    1    10007  (still compatible)
+ *    ...
+ *    1.0.19                  10    10019  10.so.0.19[.0]
+ *    ...
+ *    1.0.64                  10    10064  10.so.0.64[.0]
+ *    ...
+ *    1.2.54beta01            13    10254  12.so.0.54[.0]
+ *    1.2.54rc01-02           13    10254  12.so.0.54[.0]
+ *
+ *    Henceforth the source version will match the shared-library major
+ *    and minor numbers; the shared-library major version number will be
+ *    used for changes in backward compatibility, as it is intended.  The
+ *    PNG_LIBPNG_VER macro, which is not used within libpng but is available
+ *    for applications, is an unsigned integer of the form xyyzz corresponding
+ *    to the source version x.y.z (leading zeros in y and z).  Beta versions
+ *    were given the previous public release number plus a letter, until
+ *    version 1.0.6j; from then on they were given the upcoming public
+ *    release number plus "betaNN" or "rcNN".
+ *
+ *    Binary incompatibility exists only when applications make direct access
+ *    to the info_ptr or png_ptr members through png.h, and the compiled
+ *    application is loaded with a different version of the library.
+ *
+ *    DLLNUM will change each time there are forward or backward changes
+ *    in binary compatibility (e.g., when a new feature is added).
+ *
+ * See libpng.txt or libpng.3 for more information.  The PNG specification
+ * is available as a W3C Recommendation and as an ISO Specification,
+ * <http://www.w3.org/TR/2003/REC-PNG-20031110/
  */
 
 /*
