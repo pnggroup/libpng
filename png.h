@@ -180,8 +180,10 @@
  *    ...
  *    1.0.19                  10    10019  10.so.0.19[.0]
  *    ...
+ *    1.2.53                  13    10253  12.so.0.53[.0]
+ *    ...
  *    1.5.24beta01-02         15    10524  15.so.15.24[.0]
- *    1.5.24rc01              15    10524  15.so.15.24[.0]
+ *    1.5.24rc01-02           15    10524  15.so.15.24[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
