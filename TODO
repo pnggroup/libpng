@@ -25,5 +25,6 @@ Investigate pre-incremented loop counters and other loop constructions.
 Add interpolated method of handling interlacing.
 Switch to the simpler zlib (zlib/libpng) license if legally possible.
 Extend pngvalid.c to validate more of the libpng transformations.
+Refactor preprocessor conditionals to compile entire statements
 
 */
