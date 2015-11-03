@@ -1,5 +1,5 @@
 
-Libpng 1.4.17rc03 - October 31, 2015
+Libpng 1.4.17rc03 - November 3, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -64,7 +64,11 @@ version 1.4.17rc02 [October 31, 2015]
   Prevent writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
 
-version 1.4.17rc03 [October 31, 2015]
+version 1.4.17rc03 [November 3, 2015]
+  Clarified COPYRIGHT information to state explicitly that versions
+    are derived from previous versions.
+  Removed much of the long list of previous versions from png.h and
+    libpng.3.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
