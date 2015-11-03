@@ -5400,6 +5400,9 @@ Version 1.6.19rc02 [October 31, 2015]
    (potentially by quite a lot; up to 4 times the amount required) but,
    from 1.5.4 on, resulted in a png_error (John Bowler).
 
+Version 1.6.19rc03 [November 3, 2015]
+  Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
