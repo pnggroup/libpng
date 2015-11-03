@@ -5402,6 +5402,10 @@ Version 1.6.19rc02 [October 31, 2015]
 
 Version 1.6.19rc03 [November 3, 2015]
   Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
+  Clarified COPYRIGHT information to state explicitly that versions
+    are derived from previous versions.
+  Removed much of the long list of previous versions from png.h and
+    libpng.3.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
