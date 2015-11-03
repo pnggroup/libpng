@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta67 - November 1, 2015
+Libpng 1.7.0beta67 - November 3, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -944,7 +944,7 @@ Version 1.7.0beta66 [October 2, 2015]
     extended sBIT handling to the colormap code in the simplified API
     which is separately implemented in pngread.c (John Bowler).
 
-Version 1.7.0beta67 [November 1, 2015]
+Version 1.7.0beta67 [November 3, 2015]
   Fixed 'pow' macros in pngvalid.c. It is legal for 'pow' to be a
     macro, therefore the argument list cannot contain preprocessing
     directives.  Make sure pow is a function where this happens. This is
@@ -953,6 +953,13 @@ Version 1.7.0beta67 [November 1, 2015]
   Added sPLT chunk support to pngtest.c
   Prevent setting or writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
+  Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
+  Clarified COPYRIGHT information to state explicitly that versions
+    are derived from previous versions.
+  Removed much of the long list of previous versions from png.h and
+    libpng.3.
+
+Version 1.7.0beta68 [November 3, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
