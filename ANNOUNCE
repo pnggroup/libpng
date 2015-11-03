@@ -1,5 +1,5 @@
 
-Libpng 1.5.24rc02 - November 1, 2015
+Libpng 1.5.24rc02 - November 3, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -61,8 +61,12 @@ Version 1.5.24rc01 [October 31, 2015]
    from 1.5.4 on, resulted in a png_error (John Bowler).
   Silently truncate over-length PLTE chunk while reading.
 
-Version 1.5.24rc02 [November 1, 2015]
+Version 1.5.24rc02 [November 3, 2015]
   Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
+  Clarified COPYRIGHT information to state explicitly that versions
+    are derived from previous versions.
+  Removed much of the long list of previous versions from png.h and
+    libpng.3.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
