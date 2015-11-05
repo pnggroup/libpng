@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.4.17rc03, November 3, 2015
+ * libpng version 1.4.17rc04, November 5, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.4.17rc03, November 3, 2015: Glenn
+ *  libpng versions 0.97, January 1998, through 1.4.17rc04, November 5, 2015: Glenn
  *  See also "Contributing Authors", below.
  */
 
@@ -24,7 +24,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.4.17rc03, November 3, 2015, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.4.17rc04, November 5, 2015, are
  * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -179,8 +179,7 @@
  *    ...
  *    1.0.19                  10    10019  10.so.0.19[.0]
  *    ...
- *    1.4.17beta01-03         14    10417  14.so.14.17[.0]
- *    1.4.17rc01-03           14    10417  14.so.14.17[.0]
+ *    1.4.17                  14    10417  14.so.14.17[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -208,13 +207,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 3, 2015
+ *    November 5, 2015
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.4.17rc03 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.4.17rc04 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -270,9 +269,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.4.17rc03"
+#define PNG_LIBPNG_VER_STRING "1.4.17rc04"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.4.17rc03 - November 3, 2015\n"
+   " libpng version 1.4.17rc04 - November 5, 2015\n"
 
 #define PNG_LIBPNG_VER_SONUM   14
 #define PNG_LIBPNG_VER_DLLNUM  14
@@ -285,7 +284,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  03
+#define PNG_LIBPNG_VER_BUILD  04
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -1379,7 +1378,7 @@ struct png_struct_def
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_4_17rc03;
+typedef png_structp version_1_4_17rc04;
 
 typedef png_struct FAR * FAR * png_structpp;
 
