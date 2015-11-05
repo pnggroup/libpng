@@ -975,7 +975,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif
    {
-      png_crc_finish(png_ptr, 0);
+      png_crc_finish(png_ptr, (int) length - num * 3);
    }
 
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
