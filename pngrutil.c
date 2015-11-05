@@ -868,10 +868,6 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
    }
 #endif
 
-   max_palette_length = (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE) ?
-      (1 << png_ptr->bit_depth) : PNG_MAX_PALETTE_LENGTH;
-
-
    if (length > 3*PNG_MAX_PALETTE_LENGTH || length % 3)
    {
       png_crc_finish(png_ptr, length);
@@ -889,8 +885,13 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
     * libpng versions. We silently truncate the unused extra palette entries
     * here.
     */
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      max_palette_length = (1 << png_ptr->bit_depth);
+   else
+      max_palette_length = PNG_MAX_PALETTE_LENGTH;
+
    if (num > max_palette_length)
-     num = max_palette_length;
+      num = max_palette_length;
 
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
    {
