@@ -5407,6 +5407,10 @@ Version 1.6.19rc03 [November 3, 2015]
   Removed much of the long list of previous versions from png.h and
     libpng.3.
 
+Version 1.6.19rc04 [November 5, 2015]
+  Fixed new bug with CRC error after reading an over-length palette
+    (bug report by Cosmin Truta).
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
