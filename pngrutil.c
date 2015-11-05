@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.54 [November 3, 2015]
+ * Last changed in libpng 1.2.54 [November 5, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -603,7 +603,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif
    {
-      png_crc_finish(png_ptr, 0);
+      png_crc_finish(png_ptr, (int) length - num * 3);
    }
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
