@@ -910,7 +910,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif
-      png_crc_finish(png_ptr, 0);
+      png_crc_finish(png_ptr, (int) length - num * 3);
 
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
