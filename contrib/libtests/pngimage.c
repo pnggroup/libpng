@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.18 [July 23, 2015]
+ * Last changed in libpng 1.6.19 [November 12, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -236,9 +236,11 @@ static struct transform_info
        */
 #endif
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
-   T(SCALE_16,            NONE, X,   X,   16,  R)
+   T(SCALE_16,            NONE, X,   X,   16,  R),
       /* scales 16-bit components to 8-bits. */
 #endif
+
+   { NULL /*name*/, 0, 0, 0, 0, 0, 0, 0/*!tested*/ }
 
 #undef T
 };
@@ -294,7 +296,7 @@ transform_name(int t)
 
    t &= -t; /* first set bit */
 
-   for (i=0; i<TTABLE_SIZE; ++i)
+   for (i=0; i<TTABLE_SIZE; ++i) if (transform_info[i].name != NULL)
    {
       if ((transform_info[i].transform & t) != 0)
          return transform_info[i].name;
@@ -315,7 +317,7 @@ validate_T(void)
 {
    unsigned int i;
 
-   for (i=0; i<TTABLE_SIZE; ++i)
+   for (i=0; i<TTABLE_SIZE; ++i) if (transform_info[i].name != NULL)
    {
       if (transform_info[i].when & TRANSFORM_R)
          read_transforms |= transform_info[i].transform;
@@ -505,6 +507,7 @@ typedef enum
 #define SKIP_BUGS       0x100 /* Skip over known bugs */
 #define LOG_SKIPPED     0x200 /* Log skipped bugs */
 #define FIND_BAD_COMBOS 0x400 /* Attempt to deduce bad combos */
+#define LIST_COMBOS     0x800 /* List combos by name */
 
 /* Result masks apply to the result bits in the 'results' field below; these
  * bits are simple 1U<<error_level.  A pass requires either nothing worse than
@@ -690,7 +693,35 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
          int tr = dp->transforms;
 
          if (is_combo(tr))
-            fprintf(stderr, "(0x%x)", tr);
+         {
+            if (dp->options & LIST_COMBOS)
+            {
+               int trx = tr;
+
+               fprintf(stderr, "(");
+               if (trx)
+               {
+                  int start = 0;
+
+                  while (trx)
+                  {
+                     int trz = trx & -trx;
+
+                     if (start) fprintf(stderr, "+");
+                     fprintf(stderr, "%s", transform_name(trz));
+                     start = 1;
+                     trx &= ~trz;
+                  }
+               }
+
+               else
+                  fprintf(stderr, "-");
+               fprintf(stderr, ")");
+            }
+
+            else
+               fprintf(stderr, "(0x%x)", tr);
+         }
 
          else
             fprintf(stderr, "(%s)", transform_name(tr));
@@ -910,7 +941,7 @@ update_display(struct display *dp)
       int bd = dp->bit_depth;
       unsigned int i;
 
-      for (i=0; i<TTABLE_SIZE; ++i)
+      for (i=0; i<TTABLE_SIZE; ++i) if (transform_info[i].name != NULL)
       {
          int transform = transform_info[i].transform;
 
@@ -935,9 +966,6 @@ update_display(struct display *dp)
 
       dp->active_transforms = active;
       dp->ignored_transforms = inactive; /* excluding write-only transforms */
-
-      if (active == 0)
-         display_log(dp, INTERNAL_ERROR, "bad transform table");
    }
 }
 
@@ -1587,6 +1615,12 @@ main(const int argc, const char * const * const argv)
 
       else if (strcmp(name, "--nofind-bad-combos") == 0)
          d.options &= ~FIND_BAD_COMBOS;
+
+      else if (strcmp(name, "--list-combos") == 0)
+         d.options |= LIST_COMBOS;
+
+      else if (strcmp(name, "--nolist-combos") == 0)
+         d.options &= ~LIST_COMBOS;
 
       else if (name[0] == '-' && name[1] == '-')
       {

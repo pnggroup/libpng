@@ -52,7 +52,10 @@
 #ifdef PNG_SETJMP_SUPPORTED
 #include <setjmp.h>
 
-#if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED)
+#if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED) &&\
+   (defined(PNG_READ_DEINTERLACE_SUPPORTED) ||\
+    defined(PNG_READ_INTERLACING_SUPPORTED))
+
 /* zlib.h defines the structure z_stream, an instance of which is included
  * in this structure and is required for decompressing the LZ compressed
  * data in PNG files.
@@ -134,7 +137,7 @@
 #define png_zTXt PNG_U32(122,  84,  88, 116)
 #endif
 
-/* The 8 byte signature as a pair of 32 bit quantities */
+/* The 8-byte signature as a pair of 32-bit quantities */
 #define sig1 PNG_U32(137,  80,  78,  71)
 #define sig2 PNG_U32( 13,  10,  26,  10)
 
@@ -156,7 +159,7 @@
  */
 #define UNREACHED 0
 
-/* 80-bit number handling - a PNG image can be up to (2^31-1)x(2^31-1) 8 byte
+/* 80-bit number handling - a PNG image can be up to (2^31-1)x(2^31-1) 8-byte
  * (16-bit RGBA) pixels in size; that's less than 2^65 bytes or 2^68 bits, so
  * arithmetic of 80-bit numbers is sufficient.  This representation uses an
  * arbitrary length array of png_uint_16 digits (0..65535).  The representation
@@ -584,7 +587,7 @@ chunk_type_valid(png_uint_32 c)
    c &= ~PNG_U32(32,32,0,32);
    t = (c & ~0x1f1f1f1f) ^ 0x40404040;
 
-   /* Subtract 65 for each 8 bit quantity, this must not overflow
+   /* Subtract 65 for each 8-bit quantity, this must not overflow
     * and each byte must then be in the range 0-25.
     */
    c -= PNG_U32(65,65,65,65);
@@ -667,7 +670,7 @@ IDAT_list_extend(struct IDAT_list *tail)
 
       if (length < tail->length) /* arithmetic overflow */
          length = tail->length;
-            
+
       next = voidcast(IDAT_list*, malloc(IDAT_list_size(NULL, length)));
       CLEAR(*next);
 
@@ -921,7 +924,7 @@ emit_string(const char *str, FILE *out)
 
       else if (isspace(UCHAR_MAX & *str))
          putc('_', out);
-   
+
       else
          fprintf(out, "\\%.3o", *str);
 }
@@ -1945,7 +1948,7 @@ process_IDAT(struct file *file)
       list->count = 0;
       file->idat->idat_list_tail = list;
    }
-   
+
    /* And fill in the next IDAT information buffer. */
    list->lengths[(list->count)++] = file->chunk->chunk_length;
 
@@ -2585,7 +2588,7 @@ zlib_run(struct zlib *zlib)
    {
       struct chunk *chunk = zlib->chunk;
       int rc;
-      
+
       assert(zlib->rewrite_offset < chunk->chunk_length);
 
       rc = zlib_advance(zlib, chunk->chunk_length - zlib->rewrite_offset);
@@ -4030,7 +4033,7 @@ main(void)
 int
 main(void)
 {
-   fprintf(stderr, "pngfix does not work without read support\n");
+   fprintf(stderr, "pngfix does not work without read deinterlace support\n");
    return 77;
 }
 #endif /* PNG_READ_SUPPORTED && PNG_EASY_ACCESS_SUPPORTED */

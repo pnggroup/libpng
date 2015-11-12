@@ -515,9 +515,7 @@ option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS
 
 option WRITE_INTERLACING requires WRITE
 
-# The following depends, internally, on WEIGHT_SHIFT and COST_SHIFT
-# where are set below.
-
+# Deprecated, will be removed.
 option WRITE_WEIGHTED_FILTER requires WRITE
 
 option WRITE_FLUSH requires WRITE
@@ -667,11 +665,6 @@ setting MAX_GAMMA_8 default 11
 # the range 0.95 to 1.05
 
 setting GAMMA_THRESHOLD_FIXED default 5000
-
-# Scaling factor for filter heuristic weighting calculations
-
-setting WEIGHT_SHIFT default 8
-setting COST_SHIFT default 3
 
 # Precision to use when converting a floating point value to a PNG
 # extension format string in an sCAL chunk (only relevant if the
