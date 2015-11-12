@@ -335,11 +335,13 @@ png_push_read_unknown(png_structrp png_ptr, png_inforp info_ptr)
    /* Now check the CRC, before attempting the unknown handling. */
    png_calculate_crc(png_ptr, buffer, chunk_length);
    png_crc_finish(png_ptr, 0);
+
 #  ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
-      png_handle_unknown(png_ptr, info_ptr, buffer);
+   png_handle_unknown(png_ptr, info_ptr, buffer);
 #  else /* !READ_UNKNOWN_CHUNKS */
-      PNG_UNUSED(info_ptr)
+   PNG_UNUSED(info_ptr)
 #  endif /* !READ_UNKNOWN_CHUNKS */
+
    png_ptr->process_mode = png_read_chunk_header;
 }
 
@@ -360,7 +362,7 @@ png_push_have_row(png_structrp png_ptr, png_bytep row)
           * one:
           */
 #        ifdef PNG_READ_DEINTERLACE_SUPPORTED
-            if (!png_ptr->do_interlace)
+         if (!png_ptr->do_interlace)
 #        endif
          {
             affirm(PNG_ROW_IN_INTERLACE_PASS(row_number, pass) && row != NULL);
@@ -528,13 +530,15 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
                 * is handling the de-interlace; when the app does it it only
                 * see the real rows.
                 */
+
 #              ifdef PNG_READ_DEINTERLACE_SUPPORTED
-                  if (png_ptr->do_interlace)
-                  {
-                     row_buffer = png_ptr->row_buffer;
-                     break;
-                  }
+               if (png_ptr->do_interlace)
+               {
+                  row_buffer = png_ptr->row_buffer;
+                  break;
+               }
 #              endif
+
                continue;
 
             case png_row_skip:
