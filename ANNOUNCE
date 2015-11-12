@@ -1,49 +1,47 @@
 
-Libpng 1.2.54rc04 - November 5, 2015
+Libpng 1.2.54 - November 12, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.54rc04.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.54rc04.tar.gz
-   libpng-1.2.54rc04.tar.bz2
+   libpng-1.2.54.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.54.tar.gz
+   libpng-1.2.54.tar.bz2
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.54rc04-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.54rc04-no-config.tar.gz
-   libpng-1.2.54rc04-no-config.tar.bz2
+   libpng-1.2.54-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.54-no-config.tar.gz
+   libpng-1.2.54-no-config.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1254r04.zip
-   lp1254r04.7z
-   lp1254r04.tar.bz2
+   lpng1254.zip
+   lpng1254.7z
+   lpng1254.tar.bz2
 
 Project files
 
-   libpng-1.2.54rc04-project-netware.zip
-   libpng-1.2.54rc04-project-wince.zip
+   libpng-1.2.54-project-netware.zip
+   libpng-1.2.54-project-wince.zip
 
 Other information:
 
-   libpng-1.2.54rc04-README.txt
-   libpng-1.2.54rc04-KNOWNBUGS.txt
-   libpng-1.2.54rc04-LICENSE.txt
-   libpng-1.2.54rc04-Y2K-compliance.txt
-   libpng-1.2.54rc04-[previous version]-diff.txt
-   libpng-1.2.54rc04-*.asc (armored detached GPG signatures)
+   libpng-1.2.54-README.txt
+   libpng-1.2.54-KNOWNBUGS.txt
+   libpng-1.2.54-LICENSE.txt
+   libpng-1.2.54-Y2K-compliance.txt
+   libpng-1.2.54-[previous version]-diff.txt
+   libpng-1.2.54-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.53):
 
-version 1.2.54beta01 [October 23, 2015]
   Fix typecast in a png_debug2() statement in png_set_text_2() to
     avoid a compiler warning in PNG_DEBUG builds.
   Fixed printf formats in pngtest.c to avoid compiler warnings and a
@@ -57,23 +55,12 @@ version 1.2.54beta01 [October 23, 2015]
   Fixed some bad links in the man page.
   Added a safety check in png_set_tIME() (Fixes CVE-2015-7981, bug report
     from Qixue Xiao).
-
-version 1.2.54rc01 [October 28, 2015]
-  No changes.
-
-version 1.2.54rc02 [October 31, 2015]
   Prevent writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
-
-version 1.2.54rc03 [November 3, 2015]
   Clarified COPYRIGHT information to state explicitly that versions
     are derived from previous versions.
   Removed much of the long list of previous versions from png.h and
     libpng.3.
-
-version 1.2.54rc04 [November 5, 2015]
-  Fixed new bug with CRC error after reading an over-length palette
-    (bug report by Cosmin Truta).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
