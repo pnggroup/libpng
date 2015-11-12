@@ -1,31 +1,28 @@
-Libpng 1.6.19rc04 - November 5, 2015
+Libpng 1.6.19 - November 12, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.19rc04.tar.xz (LZMA-compressed, recommended)
-   1.6.19rc04.tar.gz
+   libpng-1.6.19.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.19.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1619r04.7z  (LZMA-compressed, recommended)
-   lp1619r04.zip
+   lpng1619.7z  (LZMA-compressed, recommended)
+   lpng1619.zip
 
 Other information:
 
-   1.6.19rc04-README.txt
-   1.6.19rc04-LICENSE.txt
-   libpng-1.6.19rc04-*.asc (armored detached GPG signatures)
+   libpng-1.6.19-README.txt
+   libpng-1.6.19-LICENSE.txt
+   libpng-1.6.19-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.18):
-
-Version 1.6.19beta01 [July 30, 2015]
 
   Updated obsolete information about the simplified API macros in the
     manual pages (Bug report by Arc Riley).
@@ -39,8 +36,6 @@ Version 1.6.19beta01 [July 30, 2015]
     unavoidable, where we test for overflow.
   Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
   Fixed uninitialized variable in contrib/gregbook/rpng2-x.c
-
-Version 1.6.19beta02 [August 19, 2015]
   Moved config.h.in~ from the "libpng_autotools_files" list to the
     "libpng_autotools_extra" list in autogen.sh because it was causing a
     false positive for missing files (bug report by Robert C. Seacord).
@@ -63,8 +58,6 @@ Version 1.6.19beta02 [August 19, 2015]
     to  0x80000000) can still pass through, but since these are not illegal
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
-
-Version 1.6.19beta03 [September 26, 2015]
   Fixed png_save_int_32 when int is not 2's complement (John Bowler).
   Updated libpng16 with all the recent test changes from libpng17,
     including changes to pngvalid.c to ensure that the original,
@@ -91,8 +84,6 @@ Version 1.6.19beta03 [September 26, 2015]
   Removed the '--strict' in 1.6 because of the double-gamma-correction
     warning, updated pngstest-errors.h for the errors detected with the
     new contrib/testspngs PNG test files (John Bowler).
-
-Version 1.6.19beta04 [October 15, 2015]
   Worked around rgb-to-gray issues in libpng 1.6.  The previous
     attempts to ignore the errors in the code aren't quite enough to
     deal with the 'channel selection' encoding added to libpng 1.7; abort.
@@ -102,11 +93,6 @@ Version 1.6.19beta04 [October 15, 2015]
     a minimal safe fix, the issue only arises in non-performance-critical
     code (bug report by Curtis Leach, fix by John Bowler).
   Added sPLT support to pngtest.c
-
-Version 1.6.19rc01 [October 23, 2015]
-  No changes.
-
-Version 1.6.19rc02 [October 31, 2015]
   Prevent setting or writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
   Libpng incorrectly calculated the output rowbytes when the application
@@ -114,17 +100,11 @@ Version 1.6.19rc02 [October 31, 2015]
     a user transform.  This was safe; libpng overallocated buffer space
    (potentially by quite a lot; up to 4 times the amount required) but,
    from 1.5.4 on, resulted in a png_error (John Bowler).
-
-Version 1.6.19rc03 [November 3, 2015]
   Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
   Clarified COPYRIGHT information to state explicitly that versions
     are derived from previous versions.
   Removed much of the long list of previous versions from png.h and
     libpng.3.
-
-Version 1.6.19rc04 [November 5, 2015]
-  Fixed new bug with CRC error after reading an over-length palette
-    (bug report by Cosmin Truta).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
