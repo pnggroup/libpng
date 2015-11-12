@@ -1,34 +1,32 @@
 
-Libpng 1.4.17rc04 - November 5, 2015
+Libpng 1.4.17 - November 12, 2015
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.17rc04.tar.xz (LZMA-compressed, recommended)
-   1.4.17rc04.tar.gz
-   1.4.17rc04.tar.bz2
+   libpng-1.4.17.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.17.tar.gz
+   libpng-1.4.17.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1417r04.7z (LZMA-compressed, recommended)
-   lp1417r04.zip
+   lpng1417.7z (LZMA-compressed, recommended)
+   lpng1417.zip
 
 Other information:
 
-   1.4.17rc04-README.txt
-   1.4.17rc04-LICENSE.txt
-   libpng-1.4.17rc04-*.asc (armored detached GPG signatures)
+   libpng-1.4.17-README.txt
+   libpng-1.4.17-LICENSE.txt
+   libpng-1.4.17-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.16):
 
-version 1.4.17beta01 [August 19, 2015]
-  Fix typecast in a png_debug2() statement in png_set_text_2() to
+  Fixed typecast in a png_debug2() statement in png_set_text_2() to
     avoid a compiler warning in PNG_DEBUG builds.
   Avoid Coverity issues 80855, 80856, and 80857 (PRINTF_ARG_MISMATCH)
     in pngtest.c PNG_DEBUG builds.
@@ -48,31 +46,16 @@ version 1.4.17beta01 [August 19, 2015]
     to  0x80000000) can still pass through, but since these are not illegal
     in ANSI-C (unlike 0x80000000 in the signed case) the checking that
     occurs later can catch them (John Bowler).
-
-version 1.4.17beta02 [October 15, 2015]
   Fixed png_save_int_32 when int is not 2's complement (John Bowler).
   Added sPLT support to pngtest.c
-
-version 1.4.17beta03 [October 23, 2015]
   Added a safety check in png_set_tIME() (Fixes CVE-2015-7981, bug report
     from Qixue Xiao).
-
-version 1.4.17rc01 [October 28, 2015]
-  No changes.
-
-version 1.4.17rc02 [October 31, 2015]
   Prevent writing over-length PLTE chunk (Cosmin Truta).
   Silently truncate over-length PLTE chunk while reading.
-
-version 1.4.17rc03 [November 3, 2013]
   Clarified COPYRIGHT information to state explicitly that versions
     are derived from previous versions.
   Removed much of the long list of previous versions from png.h and
     libpng.3.
-
-version 1.4.17rc04 [November 5, 2013]
-  Fixed new bug with CRC error after reading an over-length palette
-    (bug report by Cosmin Truta).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

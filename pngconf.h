@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.4.17rc04, November 5, 2015
+ * libpng version 1.4.17, November 12, 2015
  *
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -1461,7 +1461,7 @@ typedef char            FAR * FAR * FAR * png_charppp;
 #    define png_strncpy lstrcpynA
 #    define png_strlen  lstrlenA
 #    define png_memcmp  memcmp
-#    define png_memcpy  CopyMemory
+#    define png_memcpy  memcpy
 #    define png_memset  memset
 #    define png_sprintf wsprintfA
 #  else
