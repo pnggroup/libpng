@@ -4419,10 +4419,12 @@ Version 1.5.24rc03 [omitted]
 
 Version 1.5.24rc04 [November 5, 2015]
   Fixed new bug with CRC error after reading an over-length palette
-    (bug report by Cosmin Truta).
+    (bug report by Cosmin Truta) (CVE-2015-8126).
 
 version 1.5.24 [November 12, 2015]
   Cleaned up coding style in png_handle_PLTE().
+
+version 1.5.25beta01 [(PENDING RELEASE)]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
