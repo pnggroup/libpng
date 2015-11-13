@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta68 - November 12, 2015
+Libpng 1.7.0beta69 - November 13, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta68.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta68.tar.gz
+   1.7.0beta69.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta69.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b68.7z  (LZMA-compressed, recommended)
-   lp170b68.zip
+   lp170b69.7z  (LZMA-compressed, recommended)
+   lp170b69.zip
 
 Other information:
 
-   1.7.0beta68-README.txt
-   1.7.0beta68-LICENSE.txt
-   libpng-1.7.0beta68-*.asc (armored detached GPG signatures)
+   1.7.0beta69-README.txt
+   1.7.0beta69-LICENSE.txt
+   libpng-1.7.0beta69-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -951,7 +951,8 @@ Version 1.7.0beta67 [November 3, 2015]
     a minimal safe fix, the issue only arises in non-performance-critical
     code (bug report by Curtis Leach, fix by John Bowler).
   Added sPLT chunk support to pngtest.c
-  Prevent setting or writing over-length PLTE chunk (Cosmin Truta).
+  Prevent setting or writing over-length PLTE chunk (bug report by
+    Cosmin Truta) (CVE-2015-8126).
   Silently truncate over-length PLTE chunk while reading.
   Fixed some inconsequential cut-and-paste typos in png_set_cHRM_XYZ_fixed().
   Clarified COPYRIGHT information to state explicitly that versions
@@ -959,7 +960,7 @@ Version 1.7.0beta67 [November 3, 2015]
   Removed much of the long list of previous versions from png.h and
     libpng.3.
 
-Version 1.7.0beta68 [November 12, 2015]
+Version 1.7.0beta68 [November 13, 2015]
   Fixed new bug with CRC error after reading an over-length palette
     (bug report by Cosmin Truta).
   Cleaned up coding style in png_handle_PLTE().
