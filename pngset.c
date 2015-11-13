@@ -1573,7 +1573,7 @@ png_set_user_limits (png_structrp png_ptr, png_uint_32 user_width_max,
 {
    /* Images with dimensions larger than these limits will be
     * rejected by png_set_IHDR().  To accept any PNG datastream
-    * regardless of dimensions, set both limits to 0x7ffffff.
+    * regardless of dimensions, set both limits to 0x7fffffff.
     */
    if (png_ptr == NULL)
       return;
