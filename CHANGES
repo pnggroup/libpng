@@ -3007,6 +3007,8 @@ version 1.4.17rc04 [November 5, 2015]
 version 1.4.17 [November 12, 2015]
   Cleaned up coding style in png_handle_PLTE().
 
+version 1.4.18beta01 [November 13, 2015]
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
