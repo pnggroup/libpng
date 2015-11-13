@@ -26,6 +26,8 @@ Other information:
 Changes since the last public release (1.6.19):
 
 Version 1.6.20beta01 [(PENDING RELEASE)]
+  Avoid potential pointer overflow in png_handle_sPLT() and
+    png_handle_pCAL() (Bug report by John Regehr).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
