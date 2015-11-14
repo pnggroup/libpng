@@ -1530,7 +1530,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr)
    ++entry_start;
 
    /* A sample depth should follow the separator, and we should be on it  */
-   if (entry_start > buffer + length - 2)
+   if (length < 2 || entry_start > buffer + length - 2)
    {
       png_chunk_benign_error(png_ptr, "malformed");
       return;
@@ -1948,7 +1948,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr)
    /* We need to have at least 12 bytes after the purpose string
     * in order to get the parameter information.
     */
-   if (endptr <= buf + 12)
+   if (png_ptr->chunk_length < 12 || endptr <= buf + 12)
    {
       png_chunk_benign_error(png_ptr, "invalid");
       return;
