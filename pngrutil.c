@@ -1114,7 +1114,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* There should be at least one zero (the compression type byte)
     * following the separator, and we should be on it
     */
-   if ( profile >= png_ptr->chunkdata + slength - 1)
+   if (slength < 1 ||  profile >= png_ptr->chunkdata + slength - 1)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
@@ -1242,7 +1242,7 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    ++entry_start;
 
    /* A sample depth should follow the separator, and we should be on it  */
-   if (entry_start > (png_bytep)png_ptr->chunkdata + slength - 2)
+   if (slength < 2 || entry_start > (png_bytep)png_ptr->chunkdata + slength - 2)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
@@ -1716,7 +1716,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* We need to have at least 12 bytes after the purpose string
       in order to get the parameter information. */
-   if (endptr <= buf + 12)
+   if (slength < 12 || endptr <= buf + 12)
    {
       png_warning(png_ptr, "Invalid pCAL data");
       png_free(png_ptr, png_ptr->chunkdata);
@@ -2172,7 +2172,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Empty loop */ ;
 
    /* zTXt must have some text after the chunkdataword */
-   if (text >= png_ptr->chunkdata + slength - 2)
+   if (slength < 2 || text >= png_ptr->chunkdata + slength - 2)
    {
       png_warning(png_ptr, "Truncated zTXt chunk");
       png_free(png_ptr, png_ptr->chunkdata);
@@ -2298,7 +2298,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
     * keyword
     */
 
-   if (lang >= png_ptr->chunkdata + slength - 3)
+   if (slength < 3 || lang >= png_ptr->chunkdata + slength - 3)
    {
       png_warning(png_ptr, "Truncated iTXt chunk");
       png_free(png_ptr, png_ptr->chunkdata);
