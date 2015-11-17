@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta69 - November 14, 2015
+Libpng 1.7.0beta69 - November 17, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -965,8 +965,8 @@ Version 1.7.0beta68 [November 12, 2015]
     (bug report by Cosmin Truta).
   Cleaned up coding style in png_handle_PLTE().
 
-Version 1.7.0beta69 [November 14, 2015]
-  Avoid potential pointer overflow in png_handle_sPLT() and
+Version 1.7.0beta69 [November 17, 2015]
+  Avoid potential pointer overflow/underflow in png_handle_sPLT() and
     png_handle_pCAL() (Bug report by John Regehr).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
