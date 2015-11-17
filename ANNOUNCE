@@ -1,4 +1,4 @@
-Libpng 1.6.20beta01 - November 13, 2015
+Libpng 1.6.20beta01 - November 17, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 Changes since the last public release (1.6.19):
 
 Version 1.6.20beta01 [(PENDING RELEASE)]
-  Avoid potential pointer overflow in png_handle_sPLT() and
+  Avoid potential pointer overflow/underflow in png_handle_sPLT() and
     png_handle_pCAL() (Bug report by John Regehr).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
