@@ -1530,7 +1530,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr)
    ++entry_start;
 
    /* A sample depth should follow the separator, and we should be on it  */
-   if (length < 2 || entry_start - buffer > length - 2)
+   if (length < 2 || entry_start > buffer + (length - 2U))
    {
       png_chunk_benign_error(png_ptr, "malformed");
       return;
