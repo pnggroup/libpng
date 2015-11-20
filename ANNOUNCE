@@ -1,5 +1,5 @@
 
-Libpng 1.2.55beta01 - November 14, 2015
+Libpng 1.2.55beta01 - November 20, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -43,7 +43,7 @@ Other information:
 
 Changes since the last public release (1.2.54):
 
-version 1.2.55beta01 [November 14, 2015]
+version 1.2.55beta01 [November 20, 2015]
   Avoid potential pointer overflow in png_handle_iTXt(), png_handle_zTXt(),
     png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
 
