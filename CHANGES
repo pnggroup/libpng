@@ -5414,9 +5414,11 @@ Version 1.6.19rc04 [November 5, 2015]
 Version 1.6.19 [November 12, 2015]
   Cleaned up coding style in png_handle_PLTE().
 
-Version 1.6.20beta01 [(PENDING RELEASE)]
+Version 1.6.20beta01 [November 20, 2015]
   Avoid potential pointer overflow/underflow in png_handle_sPLT() and
     png_handle_pCAL() (Bug report by John Regehr).
+
+Version 1.6.20beta02 [(PENDING RELEASE)]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
