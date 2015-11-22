@@ -189,7 +189,7 @@ png_read_chunk_header(png_structrp png_ptr)
 static void
 png_read_sequential_unknown(png_structrp png_ptr, png_inforp info_ptr)
 {
-#  ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
+#ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
    /* Read the data for an unknown chunk.  The read buffer is used: */
    png_bytep buffer = png_read_buffer(png_ptr, png_ptr->chunk_length,
       PNG_CHUNK_ANCILLARY(png_ptr->chunk_name)); /* error if critical */
@@ -202,10 +202,10 @@ png_read_sequential_unknown(png_structrp png_ptr, png_inforp info_ptr)
    }
 
    else /* out of memory on an ancillary chunk; skip the chunk */
-#  else /* !READ_UNKNOWN_CHUNKS */
+#else /* !READ_UNKNOWN_CHUNKS */
       /* or, no support for reading unknown chunks, so just skip it. */
       PNG_UNUSED(info_ptr)
-#  endif /* !READ_UNKNOWN_CHUNKS */
+#endif /* !READ_UNKNOWN_CHUNKS */
       png_crc_finish(png_ptr, png_ptr->chunk_length);
 }
 
@@ -267,12 +267,12 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
    /* The loop was ended by IDAT or IEND, but if an IEND was seen the read code
     * (png_handle_position in pngrutil.c) should have errored out, therefore:
     */
-#  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
       affirm(png_ptr->chunk_name == png_IDAT && ((png_ptr->known_unknown)&1U));
-#  else
+#else
       debug(png_ptr->chunk_name == png_IDAT);
       impossible("unknown IDAT");
-#  endif
+#endif
 
    /* And the code cannot have left it unread; it must have called one of the
     * handlers, so we are skipping IDAT.
@@ -431,10 +431,12 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
              * parameter to png_combine_row is true, meaning overwrite all the
              * pixels belong to this and *later* passes.
              */
-#           ifdef PNG_READ_DEINTERLACE_SUPPORTED
-               if (!png_ptr->do_interlace)
-#           endif
+#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+            if (!png_ptr->do_interlace)
                continue;
+#else
+            continue;
+#endif
 
          display_row:
             if (dsp_row != NULL)
@@ -446,10 +448,12 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
             /* row not in pass and no appropriate data; skip this row, nothing
              * more need be done, except the read_row_fn:
              */
-#           ifdef PNG_READ_DEINTERLACE_SUPPORTED
-               if (!png_ptr->do_interlace)
-#           endif
+#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+            if (!png_ptr->do_interlace)
                continue;
+#else
+            continue;
+#endif
 
          row_fn:
             if (png_ptr->read_row_fn != NULL)
@@ -613,7 +617,7 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
     *    png_struct::zstream_error if necessary.
     */
 #  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      if (!(png_ptr->known_unknown & 1U))
+   if (!(png_ptr->known_unknown & 1U))
 #  endif
    {
       if (png_ptr->zowner == png_IDAT)
@@ -667,18 +671,18 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
    }
 
 #  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-      else
-      {
-         /* IDAT is unknown, the chunk that terminated the loop must be an IDAT
-          * and it has been processed.  Get a new chunk header.
-          */
-         if (png_ptr->chunk_name == png_IDAT)
-            png_read_chunk_header(png_ptr);
+   else
+   {
+      /* IDAT is unknown, the chunk that terminated the loop must be an IDAT
+       * and it has been processed.  Get a new chunk header.
+       */
+      if (png_ptr->chunk_name == png_IDAT)
+         png_read_chunk_header(png_ptr);
 
-         else
-            png_app_error(png_ptr,
-                  "Missing call to png_read_info with unknown IDAT");
-      }
+      else
+         png_app_error(png_ptr,
+               "Missing call to png_read_info with unknown IDAT");
+   }
 #  endif
 
    if ((png_ptr->mode & PNG_HAVE_IEND) == 0) for (;;)
@@ -827,7 +831,7 @@ png_set_read_status_fn(png_structrp png_ptr, png_read_status_ptr read_row_fn)
 static int /* PRIVATE */
 png_gt(size_t a, size_t b)
 {
-    return a > b;
+   return a > b;
 }
 #else
 #   define png_gt(a,b) ((a) > (b))
@@ -919,11 +923,9 @@ png_read_png(png_structrp png_ptr, png_inforp info_ptr, int transforms,
       png_app_error(png_ptr, "PNG_TRANSFORM_EXPAND not supported");
 #endif
 
-   /* We don't handle background color or gamma transformation or quantizing.
-    */
+   /* We don't handle background color, gamma transformation, or quantizing. */
 
-   /* Invert monochrome files to have 0 as white and 1 as black
-    */
+   /* Invert monochrome files to have 0 as white and 1 as black */
    if ((transforms & PNG_TRANSFORM_INVERT_MONO) != 0)
 #ifdef PNG_READ_INVERT_SUPPORTED
       png_set_invert_mono(png_ptr);
@@ -2912,7 +2914,6 @@ png_image_read_colormap(png_voidp argument)
       default:
          png_error(png_ptr, "invalid PNG color type");
          /*NOT REACHED*/
-         break;
    }
 
    /* Now deal with the output processing */

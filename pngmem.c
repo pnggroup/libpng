@@ -81,11 +81,11 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
    /* Some compilers complain that this is always true.  However, it
     * can be false when integer overflow happens.
     */
-   if (size > 0 && size <= PNG_SIZE_MAX
-#     ifdef PNG_MAX_MALLOC_64K
-         && size <= 65536U
-#     endif
-      )
+#ifdef PNG_MAX_MALLOC_64K
+   if (size > 0 && size <= PNG_SIZE_MAX && size <= 65536U)
+#else
+   if (size > 0 && size <= PNG_SIZE_MAX)
+#endif
    {
 #ifdef PNG_USER_MEM_SUPPORTED
       if (png_ptr != NULL && png_ptr->malloc_fn != NULL)
@@ -226,8 +226,11 @@ png_free(png_const_structrp png_ptr, png_voidp ptr)
       png_ptr->free_fn(png_constcast(png_structrp,png_ptr), ptr);
 
    else
-#endif /* USER_MEM */
       free(ptr);
+#else
+   free(ptr);
+#endif /* USER_MEM */
+
 }
 
 #ifdef PNG_USER_MEM_SUPPORTED
