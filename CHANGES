@@ -4424,9 +4424,11 @@ Version 1.5.24rc04 [November 5, 2015]
 version 1.5.24 [November 12, 2015]
   Cleaned up coding style in png_handle_PLTE().
 
-version 1.5.25beta01 [(PENDING RELEASE)]
+version 1.5.25beta01 [November 20, 2015]
   Avoid potential pointer overflow in png_handle_iTXt(), png_handle_zTXt(),
     png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
+
+version 1.5.25beta02 [(PENDING RELEASE)]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
