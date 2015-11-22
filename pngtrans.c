@@ -834,38 +834,50 @@ png_init_row_info(png_structrp png_ptr)
 {
    unsigned int max_depth = PNG_PIXEL_DEPTH(*png_ptr);
 
-#  ifdef PNG_TRANSFORM_MECH_SUPPORTED
-      /* The palette index check stuff is *on* automatically.  To handle this
-       * add it here, if it is supported.
-       */
-#     ifdef PNG_PALETTE_MAX_SUPPORTED
-         /* The logic here is a little complex because of the plethora of
-          * #defines controlling this stuff.
-          */
-         if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE/* fast escape */ && (
-#           if defined (PNG_READ_GET_PALETTE_MAX_SUPPORTED) ||\
-               defined (PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED)
-               (png_ptr->read_struct
-#              ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-                  && !png_ptr->palette_index_check_disabled)
-#              endif /* READ_CHECK_FOR_INVALID_INDEX */
-#           else /* no READ support */
-               0
-#           endif /* READ checks */
-            ||
-#           if defined (PNG_WRITE_GET_PALETTE_MAX_SUPPORTED) ||\
-               defined (PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
-               (!png_ptr->read_struct
-#              ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
-                  && !png_ptr->palette_index_check_disabled)
-#              endif /* WRITE_CHECK_FOR_INVALID_INDEX */
-#           else /* no WRITE support */
-               0
-#           endif /* WRITE checks */
-            ))
-            png_add_transform(png_ptr, 0/*size*/, palette_max_init,
-               PNG_TR_CHECK_PALETTE);
+#ifdef PNG_TRANSFORM_MECH_SUPPORTED
+# ifdef PNG_PALETTE_MAX_SUPPORTED
+   /* The palette index check stuff is *on* automatically.  To handle this
+    * add it here, if it is supported.
+    *
+    * The logic here is a little complex because of the plethora of
+    * #defines controlling this stuff.
+    */
+#   undef PNG_READ_CHECK_PALETTE
+#   undef PNG_WRITE_CHECK_PALETTE
+
+#   if defined(PNG_READ_GET_PALETTE_MAX_SUPPORTED) ||\
+       defined(PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+#      ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
+#         define PNG_READ_CHECK_PALETTE \
+            (png_ptr->read_struct && !png_ptr->palette_index_check_disabled)
+#      else
+#        define PNG_READ_CHECK_PALETTE (png_ptr->read_struct)
 #     endif
+#   else /* no READ support */
+#     define PNG_READ_CHECK_PALETTE 0
+#   endif
+
+#   if defined(PNG_WRITE_GET_PALETTE_MAX_SUPPORTED) ||\
+       defined(PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
+#      ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
+#         define PNG_WRITE_CHECK_PALETTE \
+            (!png_ptr->read_struct && !png_ptr->palette_index_check_disabled)
+#      else
+#         define PNG_WRITE_CHECK_PALETTE (!png_ptr->read_struct)
+#      endif
+#   else /* no WRITE support */
+#      define PNG_WRITE_CHECK_PALETTE 0
+#   endif
+
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE/* fast escape */ &&
+       (PNG_READ_CHECK_PALETTE || PNG_WRITE_CHECK_PALETTE))
+   {
+      png_add_transform(png_ptr, 0/*size*/, palette_max_init,
+         PNG_TR_CHECK_PALETTE);
+   }
+#   undef PNG_READ_CHECK_PALETTE
+#   undef PNG_WRITE_CHECK_PALETTE
+# endif /* PALETTE_MAX */
 
       /* Application transforms may change the format of the data or, when
        * producing interlaced images, the number of pixels in a line.  This code
@@ -882,9 +894,9 @@ png_init_row_info(png_structrp png_ptr)
          affirm(tc.bit_depth <= 32);
          png_ptr->row_bit_depth = png_check_bits(png_ptr, tc.bit_depth, 6);
          png_ptr->row_range = png_check_bits(png_ptr, tc.range, 3);
-#        ifdef PNG_READ_GAMMA_SUPPORTED
-            png_ptr->row_gamma = tc.gamma;
-#        endif /* READ_GAMMA */
+# ifdef PNG_READ_GAMMA_SUPPORTED
+         png_ptr->row_gamma = tc.gamma;
+# endif /* READ_GAMMA */
 
          /* The above may have cancelled all the transforms in the list. */
          if (png_ptr->transform_list != NULL)
@@ -898,20 +910,20 @@ png_init_row_info(png_structrp png_ptr)
             if (depth > max_depth)
                 max_depth = depth;
 
-#           ifdef PNG_READ_TRANSFORMS_SUPPORTED
-               /* Set this now because it only gets resolved finally at this
-                * point.
-                */
-               png_ptr->invalid_info = tc.invalid_info;
-#           endif /* READ_TRANSFORMS */
+# ifdef PNG_READ_TRANSFORMS_SUPPORTED
+            /* Set this now because it only gets resolved finally at this
+             * point.
+             */
+            png_ptr->invalid_info = tc.invalid_info;
+# endif /* READ_TRANSFORMS */
 
             /* And check the transform fields: */
             affirm(png_ptr->row_format == tc.format &&
                png_ptr->row_range == tc.range &&
                png_ptr->row_bit_depth == tc.bit_depth);
-#           ifdef PNG_READ_GAMMA_SUPPORTED
-               affirm(png_ptr->row_gamma == tc.gamma);
-#           endif /* READ_GAMMA */
+# ifdef PNG_READ_GAMMA_SUPPORTED
+            affirm(png_ptr->row_gamma == tc.gamma);
+# endif /* READ_GAMMA */
          }
       }
 
@@ -922,15 +934,15 @@ png_init_row_info(png_structrp png_ptr)
          png_ptr->row_bit_depth = png_check_bits(png_ptr, png_ptr->bit_depth,
             6);
          png_ptr->row_range = 0;
-#        ifdef PNG_READ_GAMMA_SUPPORTED
-            if ((png_ptr->colorspace.flags &
-                  (PNG_COLORSPACE_INVALID|PNG_COLORSPACE_HAVE_GAMMA)) ==
-                 PNG_COLORSPACE_HAVE_GAMMA)
-               png_ptr->row_gamma = png_ptr->colorspace.gamma;
-#        endif /* READ_GAMMA */
-#        ifdef PNG_READ_TRANSFORMS_SUPPORTED
-            png_ptr->invalid_info = 0U;
-#        endif /* READ_TRANSFORMS */
+# ifdef PNG_READ_GAMMA_SUPPORTED
+         if ((png_ptr->colorspace.flags &
+             (PNG_COLORSPACE_INVALID|PNG_COLORSPACE_HAVE_GAMMA)) ==
+              PNG_COLORSPACE_HAVE_GAMMA)
+            png_ptr->row_gamma = png_ptr->colorspace.gamma;
+# endif /* READ_GAMMA */
+# ifdef PNG_READ_TRANSFORMS_SUPPORTED
+         png_ptr->invalid_info = 0U;
+# endif /* READ_TRANSFORMS */
       }
 
       /* 'max_depth' is now the maximum size of a pixel, including intermediate
@@ -938,7 +950,7 @@ png_init_row_info(png_structrp png_ptr)
        */
       affirm(max_depth <= 128);
       png_ptr->row_max_pixel = png_check_bits(png_ptr, max_depth, 8);
-#  endif /* TRANSFORM_MECH */
+#endif /* TRANSFORM_MECH */
 
    /* png_calc_rowbytes does a png_error on overflow.  This is how the libpng
     * code validates that there won't be overflows on future PNG_ROWBYTES

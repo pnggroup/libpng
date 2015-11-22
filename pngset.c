@@ -529,7 +529,7 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
        (png_ptr->mng_features_permitted & PNG_FLAG_MNG_EMPTY_PLTE) == 0))
       png_error(png_ptr, "Invalid palette");
 #else
-   if ((num_palette > 0 && palette == NULL) || (num_palette == 0))
+   if ((num_palette > 0 && palette == NULL) || num_palette == 0)
       png_error(png_ptr, "Invalid palette");
 #endif /* MNG_FEATURES */
 
