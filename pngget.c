@@ -1152,19 +1152,24 @@ png_get_compression_buffer_size(png_const_structrp png_ptr)
 
 #ifdef PNG_WRITE_SUPPORTED
    if (png_ptr->read_struct)
-#endif
    {
-#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+# ifdef PNG_SEQUENTIAL_READ_SUPPORTED
       return png_ptr->IDAT_read_size;
-#else
+# else
       return PNG_IDAT_READ_SIZE;
-#endif
+# endif
    }
 
-#ifdef PNG_WRITE_SUPPORTED
    else
       return png_ptr->zbuffer_size;
-#endif
+
+#else /* !WRITE */
+# ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+   return png_ptr->IDAT_read_size;
+# else
+   return PNG_IDAT_READ_SIZE;
+# endif
+#endif /* WRITE */
 }
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
