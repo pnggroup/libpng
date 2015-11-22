@@ -613,21 +613,20 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
    if (png_ptr->rw_data_fn == NULL)
    {
 #     ifdef PNG_READ_SUPPORTED
-         if (png_ptr->read_struct)
-            png_set_read_fn(png_ptr, fp, png_default_read_data);
+      if (png_ptr->read_struct)
+         png_set_read_fn(png_ptr, fp, png_default_read_data);
 #        ifdef PNG_WRITE_SUPPORTED
-            else
+      else
 #        endif /* WRITE */
 #     endif /* READ */
 #     ifdef PNG_WRITE_SUPPORTED
          if (!png_ptr->read_struct)
+#        ifdef PNG_WRITE_FLUSH_SUPPORTED
             png_set_write_fn(png_ptr, fp, png_default_write_data,
-#              ifdef PNG_WRITE_FLUSH_SUPPORTED
-                  png_default_flush
-#              else
-                  NULL
-#              endif
-               );
+                png_default_flush);
+#        else
+            png_set_write_fn(png_ptr, fp, png_default_write_data, NULL);
+#        endif
 #     endif /* WRITE */
    }
 
@@ -699,13 +698,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta69 - November 13, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta69 - November 22, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta69 - November 13, 2015\
+      return "libpng version 1.7.0beta69 - November 22, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -742,11 +741,11 @@ png_get_header_version(png_const_structrp png_ptr)
    /* Returns longer string containing both version and date */
    PNG_UNUSED(png_ptr)  /* Silence compiler warning about unused png_ptr */
 #ifdef __STDC__
-   return PNG_HEADER_VERSION_STRING
 #  ifndef PNG_READ_SUPPORTED
-   "     (NO READ SUPPORT)"
+   return PNG_HEADER_VERSION_STRING " (NO READ SUPPORT)" PNG_STRING_NEWLINE;
+#  else
+   return PNG_HEADER_VERSION_STRING PNG_STRING_NEWLINE;
 #  endif
-   PNG_STRING_NEWLINE;
 #else
    return PNG_HEADER_VERSION_STRING;
 #endif
@@ -2386,13 +2385,17 @@ png_check_IHDR(png_const_structrp png_ptr,
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (width > png_ptr->user_width_max)
-#else
-   if (width > PNG_USER_WIDTH_MAX)
-#endif
    {
       png_warning(png_ptr, "Image width exceeds user limit in IHDR");
       error = 1;
    }
+#else
+   if (width > PNG_USER_WIDTH_MAX)
+   {
+      png_warning(png_ptr, "Image width exceeds WIDTH_MAX in IHDR");
+      error = 1;
+   }
+#endif
 
    if (height == 0)
    {
@@ -2408,13 +2411,17 @@ png_check_IHDR(png_const_structrp png_ptr,
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
    if (height > png_ptr->user_height_max)
-#else
-   if (height > PNG_USER_HEIGHT_MAX)
-#endif
    {
       png_warning(png_ptr, "Image height exceeds user limit in IHDR");
       error = 1;
    }
+#else
+   if (height > PNG_USER_HEIGHT_MAX)
+   {
+      png_warning(png_ptr, "Image height exceeds HEIGHT_MAX in IHDR");
+      error = 1;
+   }
+#endif
 
    /* Check other values */
    if (bit_depth != 1 && bit_depth != 2 && bit_depth != 4 &&
