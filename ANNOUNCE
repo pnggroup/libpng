@@ -1004,6 +1004,10 @@ Version 1.7.0beta69 [November 23, 2015]
     detectable effect on overall performance figures of the test programs;
     these are probably dominated by memory allocations for the whole image
     within the test programs.
+  Now that the code works consistently so that these just switch off
+    the support for having libpng do the interlace/deinterlace, the old
+    names make more sense. Restoring them avoids cruft in the configuration
+    file and avoids an unnecessary version specific change.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
