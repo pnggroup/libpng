@@ -237,6 +237,19 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
       jmp_buf create_jmp_buf;
 #  endif
 
+   /* This is a compile-type only test to ensure that the build satisifies the
+    * contraints for the row buffer stack allocations.  A 'duplicate case
+    * statements' style of error means that one of the tests below failed:
+    */
+   switch (0)
+   {
+      case 0:
+      case PNG_ROW_BUFFER_SIZE >= PNG_MIN_ROW_BUFFER_SIZE: /*1*/
+      case 2*(PNG_ROW_BUFFER_SIZE <= PNG_MAX_ROW_BUFFER_SIZE): /*2*/
+      default:
+         break;
+   }
+
    /* This temporary stack-allocated structure is used to provide a place to
     * build enough context to allow the user provided memory allocator (if any)
     * to be called.
@@ -2360,6 +2373,99 @@ png_calc_rowbytes(png_const_structrp png_ptr, unsigned int pixel_depth,
    }
 
    return rowbytes;
+}
+
+unsigned int /*PRIVATE*/
+png_max_pixel_block(png_const_structrp png_ptr)
+{
+   /* Need the *smallest* pixel size that must occur in alignment units.  On
+    * read this is the PNG pixel depth because the read transforms cannot reduce
+    * the pixel size below the input size or 8-bits, whichever is smaller.
+    *
+    * On write the 'pack' transform can pack 8-bit pixels back to a lower bit
+    * depth, but the lowest bit depth is still given by the PNG pixel size.
+    */
+   const unsigned int pixel_depth = PNG_PIXEL_DEPTH(*png_ptr);
+   const unsigned int pixel_block = /* count of pixels in a block */
+      pixel_depth < 8U ?
+         PNG_ROW_BUFFER_BYTE_ALIGN * (8U/pixel_depth) :
+         PNG_ROW_BUFFER_BYTE_ALIGN; /* pixels may be any whole byte size */
+   /* The maximum block size in bits is MAX_PIXEL_DEPTH*pixel_block so work out
+    * the minimum number of pixel blocks that can fit in PNG_ROW_BUFFER_SIZE
+    * bytes and use this to calculate the maximum number of pixels:
+    */
+   return pixel_block *
+      ((8U*PNG_ROW_BUFFER_SIZE) / (png_ptr->row_max_pixel_depth*pixel_block));
+}
+
+void /* PRIVATE */
+png_copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
+   png_uint_32 x/*in INPUT*/, png_uint_32 width/*of INPUT*/,
+   unsigned int pixel_depth, int clear/*clear the final byte*/)
+   /* Copy the row in row_buffer; this is the non-interlaced copy used in both
+    * the read and write code.
+    */
+{
+   png_alloc_size_t cb;
+   unsigned int remaining; /* remaining bits in a partial byte */
+
+   /* Copy 'cb' pixels, but take care with the last byte because it may
+    * be partially written.  'x' must correspond to the start of a byte, check
+    * that too:
+    */
+   switch (pixel_depth)
+   {
+      case 1U: remaining =  width       & 7U;
+               debug((x & 7U) == 0U);
+               cb = width >> 3;
+               dp += x >> 3;
+               break;
+      case 2U: remaining = (width << 1) & 6U;
+               debug((x & 3U) == 0U);
+               cb = width >> 2;
+               dp += x >> 2;
+               break;
+      case 4U: remaining = (width << 2) & 4U;
+               debug((x & 1U) == 0U);
+               cb = width >> 1;
+               dp += x >> 1;
+               break;
+      case 8U: remaining = 0U;
+               cb = width;
+               dp += x;
+               break;
+      default: remaining = 0U;
+               cb = png_calc_rowbytes(png_ptr, pixel_depth, width);
+               dp += png_calc_rowbytes(png_ptr, pixel_depth, x);
+               break;
+   }
+
+   memcpy(dp, sp, cb);
+
+   if (remaining > 0U)
+   {
+      /* 'remaining' is the number of bits still to be copied.  Format may be
+       * little endian; bits to copy in the bottom of 's'.  Make 'remaining'
+       * into a mask of the bits to *preserve* in dp.
+       */
+      if ((png_ptr->row_format & PNG_FORMAT_FLAG_SWAPPED) == 0U)
+         remaining = 0xffU >> remaining;
+
+      else
+         remaining = 0xffU << remaining;
+
+      /* remaining is now the bits to *keep* from the destination byte, if
+       * 'clear' is true the source bytes aren't copied - this is for security
+       * reasons to avoid copying undefined bits at the end of a row.  If
+       * 'clear' is set the destination bits are not preserved, they are just
+       * set to 0.
+       */
+      if (clear)
+         dp[cb] = PNG_BYTE(sp[cb] & ~remaining);
+
+      else
+         dp[cb] = PNG_BYTE((sp[cb] & ~remaining) | (dp[cb] & remaining));
+   }
 }
 
 void /* PRIVATE */

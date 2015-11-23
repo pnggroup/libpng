@@ -425,11 +425,13 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
     *
     * Don't do this if the IDAT came from unknowns (TBD) or the app, above.
     *
-    * The check depends on the precise logic in png_write_finish_row.
+    * The check depends on the precise logic in png_write_row.
     */
-   else if (png_ptr->interlaced ? png_ptr->pass != PNG_INTERLACE_ADAM7_PASSES :
-         png_ptr->row_number != png_ptr->height)
+   else if (png_ptr->pass != 7U)
       png_app_error(png_ptr, "png_write_row not called to last row");
+
+   else
+      debug(png_ptr->row_number == 0U);
 
    /* See if user wants us to write information chunks */
    if (info_ptr != NULL)
@@ -597,7 +599,7 @@ png_write_image(png_structrp png_ptr, png_bytepp image)
 
    png_debug(1, "in png_write_image");
 
-#ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#ifdef PNG_WRITE_INTERLACE_SUPPORTED
    /* Initialize interlace handling.  If image is not interlaced,
     * this will set pass to 1
     */
@@ -624,280 +626,71 @@ png_write_image(png_structrp png_ptr, png_bytepp image)
    }
 }
 
-/* Called to advance to the next row.  A row may not have been output when
- * libpng handles the interlace passes because the app hands libpng every image
- * row for every pass.
- *
- * This function also writes the current row, if the pointer to the bytes is
- * non-NULL, and does so with the appropriate 'flush' argument to zlib.
- */
+#if defined(PNG_WRITE_INTERLACE_SUPPORTED) ||\
+    defined(PNG_WRITE_TRANSFORMS_SUPPORTED)
 static void
-png_write_finish_row(png_structrp png_ptr, png_byte filter_byte,
-   png_const_bytep row, png_alloc_size_t row_bytes)
+write_row_buffered(png_structrp png_ptr, png_const_bytep row,
+   int first_row_in_pass, int last_pass_row, int end_of_image,
+   void (*copy_fn)(png_const_structrp png_ptr, png_bytep row_buffer,
+      png_const_bytep row, png_uint_32 x, unsigned int count, unsigned int p),
+   unsigned int copy_parameter)
 {
-   const png_uint_32 height = png_ptr->height;
-   png_uint_32 row_number = png_ptr->row_number;
-   int flush = Z_NO_FLUSH;
+   unsigned int max_pixels = png_max_pixel_block(png_ptr);
+   const unsigned int pass = png_ptr->pass;
+   const png_uint_32 width = png_ptr->interlaced == PNG_INTERLACE_NONE ?
+      png_ptr->width : PNG_PASS_COLS(png_ptr->width, pass);
+   png_uint_32 x;
+   unsigned int filters;
+   png_byte prev_pixels[4*2*2]; /* 2 pixels up to 4 2-byte channels each */
 
-   png_debug(1, "in png_write_finish_row");
+   memset(prev_pixels, 0U, sizeof prev_pixels);
 
-   if (png_ptr->interlaced)
+   for (x = 0U, filters = 0U; x < width; x += max_pixels)
    {
-      unsigned int pass = png_ptr->pass;
+      int finish = 0;
 
-#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         if (png_ptr->do_interlace)
-         {
-            /* libpng is doing the de-interlace. */
-            /* Z_FINISH must be set on the last row present in the image, not
-             * the actual last row.
-             *
-             * NOTE: this means that the application need not call libpng all
-             * the way to the end of the image, but this is double checked
-             * below in png_write_end where png_ptr->pass is checked.
-             */
-            if (pass == PNG_LAST_PASS(png_ptr->width, height) &&
-                PNG_LAST_PASS_ROW(row_number, pass, height) &&
-                PNG_ROW_IN_INTERLACE_PASS(row_number, pass))
-               flush = Z_FINISH; /* end of image */
-
-            if (++row_number == height)
-            {
-               ++pass;
-               row_number = 0;
-               png_ptr->pass = pass & 0x7;
-            }
-         } /* libpng doing interlace */
-
-         else /* app is doing the interlacing */
-#     endif /* WRITE_INTERLACING */
-      /* The application has to hand us interlaced rows.  In this case
-       * row_number is the row number in the pass (this is not the
-       * behavior in the read code, where it is always the row number in
-       * the image.)
-       *
-       * Note that for any image row 0 of pass 0 is always present, so the
-       * check after the 'if' is not required at the start.
-       */
+      union
       {
-         affirm(row != NULL);
+         PNG_ROW_BUFFER_ALIGN_TYPE force_buffer_alignment;
+         png_byte buffer[PNG_ROW_BUFFER_SIZE];
+      }  pixel_buffer;
 
-         if (++row_number == PNG_PASS_ROWS(height, pass))
-         {
-            const png_uint_32 width = png_ptr->width;
+      if (max_pixels > width - x)
+         max_pixels = (unsigned int)/*SAFE*/(width - x);
 
-            /* Next pass, but it may not be present because of the width. */
-            row_number = 0;
+      if (end_of_image && x + max_pixels >= width)
+         finish = 1;
 
-            for (;;)
-            {
-               if (++pass == PNG_INTERLACE_ADAM7_PASSES)
-               {
-                  flush = Z_FINISH;
-                  break; /* end of image */
-               }
+      /* Copy a block of input pixels into the buffer, effecting the interlace
+       * on the way if required.  The argument is the number of pixels in the
+       * buffer, not the number handled from the input which will be larger in
+       * the interlaced case.
+       */
+      copy_fn(png_ptr, pixel_buffer.buffer, row, x, max_pixels, copy_parameter);
 
-               if (PNG_PASS_IN_IMAGE(width, height, pass))
-                  break;
-            }
-
-            png_ptr->pass = pass & 0x7;
-         } /* end of pass */
-      } /* app doing interlace */
-   } /* writing an interlaced PNG */
-
-   else /* PNG not interlaced */ if (++row_number == height)
-      flush = Z_FINISH;
-
-   png_ptr->row_number = row_number;
-
-   if (row != NULL)
-   {
-      png_compress_IDAT(png_ptr, &filter_byte, 1, Z_NO_FLUSH);
-      png_compress_IDAT(png_ptr, row, row_bytes, flush);
-
-#     ifdef PNG_WRITE_FLUSH_SUPPORTED
-         if (flush == Z_NO_FLUSH &&
-             ++png_ptr->flush_rows >= png_ptr->flush_dist &&
-             png_ptr->flush_dist > 0)
-            png_write_flush(png_ptr);
-#     endif /* WRITE_FLUSH */
-   }
-
-   /* The calculations above should ensure that Z_FINISH is set on the last row
-    * written, the following rows are empty pass rows, so the deflate stream
-    * should already have been closed:
-    */
-   else
-      affirm(flush == Z_NO_FLUSH || png_ptr->zowner == 0);
-}
-
-/* Called by user to write a row of image data */
-void PNGAPI
-png_write_row(png_structrp png_ptr, png_const_bytep row)
-{
-   png_uint_32 row_number, row_width;
-   unsigned int pass;
-#  ifdef PNG_WRITE_FILTER_SUPPORTED
-      int last_pass_row, first_pass_row;
-#  endif
-
-   if (png_ptr == NULL)
-      return;
-
-   png_debug2(1, "in png_write_row (row %u, pass %d)",
-      png_ptr->row_number, png_ptr->pass);
-
-   row_number = png_ptr->row_number;
-   row_width = png_ptr->width;
-   pass = png_ptr->pass;
-
-   /* Unlike the read code initialization happens automatically: */
-   if (row_number == 0 && pass == 0)
-   {
-      png_init_row_info(png_ptr); /* doesn't change row/pass/width */
-
-      /* If the app takes a png_info from a read operation and if the app has
-       * performed transforms on the data the png_info can contain IHDR
-       * information that cannot be represented in PNG.  The code that writes
-       * the IHDR takes the color type from the png_info::format.  The app adds
-       * transforms, before or after writing the IHDR, then the IHDR color_type
-       * stored in png_struct::color_type is used in png_init_row_info above to
-       * work out the actual row format.
-       *
-       * Prior to 1.7.0 this was not verified (there was no easy way to do so).
-       * Now we can check it here, however this is an:
-       *
-       * API CHANGE: in 1.7.0 an error may be flagged against bogus info_struct
-       * formats even though the app had removed them itself.  It's just a
-       * warning at present.
+      /* Now pixel_buffer[0..max_pixels-1] contains max_pixels pixels which may
+       * need to be transformed (the interlace has already been handled).
        */
 #     ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
-         /* The test is that either the row_format produced by the write
-          * transforms exactly matches that in the original info_struct::format
-          * or that the info_struct::format was a simple mapping of the
-          * color_type that ended up in the IHDR:
-          */
-         if (png_ptr->row_format != png_ptr->info_format &&
-             PNG_FORMAT_FROM_COLOR_TYPE(png_ptr->color_type) !=
-               png_ptr->info_format)
-            png_app_warning(png_ptr, "info_struct format does not match IHDR");
-#     endif /* WRITE_TRANSFORMS */
-   }
-
-   else if (row_number >= png_ptr->height || pass >= PNG_INTERLACE_ADAM7_PASSES)
-      png_error(png_ptr, "Too many calls to png_write_row");
-
-   /* If interlaced and not interested in row, return.  Note that the
-    * assumption here, as in the read code, is that if the app wants to write an
-    * interlaced image when libpng does not support WRITE_INTERLACING the app
-    * will only provide the rows actually in the pass.
-    */
-   if (png_ptr->interlaced)
-   {
-#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         if (png_ptr->do_interlace)
-         {
-            /* libpng is doing the de-interlace. */
-            if (!PNG_ROW_IN_INTERLACE_PASS(row_number, pass) ||
-                PNG_PASS_COLS(row_width, pass) == 0)
-            {
-               /* Not in the pass; advance to the next row.  Notice that because
-                * the app is expected to call us once for every image row in
-                * every pass it is sufficient to just add one to row_number
-                * here.
-                */
-               png_write_finish_row(png_ptr, 0, NULL, 0);
-               return;
-            }
-
-            /* Else: this row must be output, row_number is the row in the
-             * image.
-             */
-            last_pass_row =
-               PNG_LAST_PASS_ROW(row_number, pass, png_ptr->height);
-            first_pass_row = row_number == PNG_PASS_START_ROW(pass);
-            debug(row_number >= PNG_PASS_START_ROW(pass));
-         }
-
-         else /* app is doing the interlacing */
-#     endif /* WRITE_INTERLACING */
-      {
-         /* The interlaced rows come from the application and they have the
-          * correct width, row_number is the row number in the pass, not the
-          * number of the corresponding (expanded) image row.
-          */
-         row_width = PNG_PASS_COLS(row_width, pass);
-#        ifdef PNG_WRITE_FILTER_SUPPORTED
-            last_pass_row =
-               row_number+1 >= PNG_PASS_ROWS(png_ptr->height, pass);
-            first_pass_row = row_number == 0;
-#        endif /* WRITE_INTERLACING */
-      }
-   } /* writing an interlaced PNG */
-
-#  ifdef PNG_WRITE_FILTER_SUPPORTED
-      else /* not an interlaced PNG */
-      {
-         last_pass_row = row_number+1 >= png_ptr->height;
-         first_pass_row = row_number == 0;
-      }
-#  endif /* WRITE_INTERLACING */
-
-   /* 1.7.0: pretty much everything except the PNG row filter happens under the
-    * control of the transform code.
-    *
-    * png_struct::row_format is the *input* row format.  During the transforms
-    * the png_transform_control::{sp,dp} pointers are used in the normal fashion
-    * with dp initially set to png_struct::row_buffer.
-    *
-    * After the transforms if there is no filtering to be done (WRITE_FILTER is
-    * not supported) 'sp' is written directly; it may be png_struct::row_buffer
-    * or it may be the original 'row' parameter to this routine.  There is no
-    * need to save the transformed (PNG format) row.
-    *
-    * If there is filtering to be done then either the original row or
-    * png_transform_control::sp is filtered against the previous row, which is
-    * in png_struct::alt_buffer, the result is written with the appropriate
-    * filter byte and then the original row or png_transform_control::sp is
-    * saved to png_struct::alt_buffer.
-    *
-    * Thus there are four control flow possibilities depending on the pair of
-    * compile time flags [WRITE_TRANSFORM_MECH,WRITE_FILTER].  The simplest
-    * write code, which requires no internal buffer, arises when both are
-    * compiled out.  alt_buffer is only required if WRITE_FILTER is supported
-    * and row_buffer is required when either are supported.
-    */
-   {
-      png_byte filter_byte;
-      unsigned int output_bpp; /* bits per pixel */
-      png_const_bytep output_row;
-      png_alloc_size_t output_bytes;
-
-#     ifdef PNG_TRANSFORM_MECH_SUPPORTED
-         if (png_ptr->transform_list != NULL) /* else no transforms */
+         if (png_ptr->transform_list != NULL)
          {
             png_transform_control tc;
 
             /* The initial values are the memory format, this was worked out in 
-             * png_init_row_info above.
+             * png_init_row_info below.
              */
             memset(&tc, 0, sizeof tc);
             tc.png_ptr = png_ptr;
-            tc.sp = row;
-            tc.dp = png_ptr->row_buffer;
+            tc.sp = tc.dp = pixel_buffer.buffer;
 
-            if (tc.dp == NULL)
-               png_ptr->row_buffer = png_voidcast(png_bytep, tc.dp =
-                  png_malloc(png_ptr, png_ptr->row_allocated_bytes));
-
-            tc.width = row_width; /* width of interlaced row */
+            tc.width = max_pixels; /* width of block that we have */
             tc.format = png_ptr->row_format;
             tc.range = png_ptr->row_range;
             tc.bit_depth = png_ptr->row_bit_depth;
             /* tc.init == 0 */
             /* tc.caching: not used */
             /* tc.palette: not used */
+            debug(PNG_TC_PIXEL_DEPTH(tc) == png_ptr->row_input_pixel_depth);
 
             /* Run the list. */
             png_run_transform_list_backwards(png_ptr, &tc);
@@ -910,88 +703,394 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
             /* Now we must have the PNG format from the IHDR: */
             affirm(png_ptr->bit_depth == tc.bit_depth &&
                png_ptr->color_type == PNG_COLOR_TYPE_FROM_FORMAT(tc.format));
-
-            /* If libpng is handling the interlacing the row width must now
-             * match the width required for this pass.
-             */
-            affirm(tc.width == (!png_ptr->do_interlace ?
-               row_width : PNG_PASS_COLS(row_width, pass)));
-
-            row_width = tc.width;
-            output_row = png_voidcast(png_const_bytep, tc.sp);
          }
+#     endif /* WRITE_TRANSFORMS */
 
-         else /* no transforms */
-#     endif /* TRANSFORM_MECH */
-         output_row = row;
+      /* Call png_write_filter_row to write this block of data, the test on
+       * maxpixels says if this is the final block in the row, 'filters' is
+       * initialized when 0 is 0 then preserved here for later blocks:
+       */
+      filters = png_write_filter_row(png_ptr, prev_pixels, pixel_buffer.buffer,
+            x, max_pixels, first_row_in_pass, last_pass_row, filters, finish);
+   }
+}
+#endif /* WRITE { INTERLACING || TRANSFORMS } */
 
-      output_bpp = PNG_PIXEL_DEPTH(*png_ptr);
-      output_bytes = PNG_ROWBYTES(output_bpp, row_width);
+#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+static void
+copy_row(png_const_structrp png_ptr, png_bytep row_buffer,
+   png_const_bytep row, png_uint_32 x, unsigned int count,
+   unsigned int pixel_depth)
+{
+   /* Copy row[x..x+count] pixels to row_buffer. */
+   png_copy_row(png_ptr, row_buffer, row, x, count, pixel_depth, 1/*clear*/);
+}
+#endif /* WRITE_TRANSFORMS */
 
-#     ifdef PNG_WRITE_FILTER_SUPPORTED
+#ifdef PNG_WRITE_INTERLACE_SUPPORTED
+static void
+interlace_row_lbd(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
+   png_uint_32 x, unsigned int count, const unsigned int B)
+{
+   /* Pick out the correct pixels for the interlace pass.  The basic idea here
+    * is to go through the row with a source pointer and a destination pointer
+    * (sp and dp), and copy the correct pixels for the pass.  As the row gets
+    * compacted, sp will always be >= dp, so we should never overwrite anything.
+    * See the default: case for the easiest code to understand.
+    */
+   const unsigned int pass = png_ptr->pass;
+   png_uint_32 i = PNG_COL_FROM_PASS_COL(x, pass);
+   const unsigned int inc = PNG_PASS_COL_OFFSET(pass);
+
+   /* For pixels less than one byte wide the correct pixels have to be
+    * extracted from the input bytes.  Because we are reading data in
+    * the application memory format we cannot rely on the PNG big
+    * endian order.  Notice that this was apparently broken before
+    * 1.7.0.
+    *
+    * In libpng 1.7.0 libpng uses a classic bit-pump to optimize the
+    * extraction.  In all passes before the last (6/7) no two pixels
+    * are adjacent in the input, so we are always extracting 1 bit.
+    * At present the code uses an 8-bit buffer to avoid coding for
+    * different byte sexes, but this could easily be changed.
+    *
+    * 'i' is the bit-index of bit in the input (sp[]), so,
+    * considering the 1-bit per pixel case, sp[i>>3] is the byte
+    * and the bit is bit (i&7) (0 lowest) on swapped (little endian)
+    * data or 7-(i&7) on PNG default (big-endian) data.
+    *
+    * Define these macros, where:
+    *
+    *    B: the log2 bit depth (0, 1, 2 for 1bpp, 2bpp or 4bpp) of
+    *       the data; this should be a constant.
+    *   sp: the source pointer (sp) (a png_const_bytep)
+    *    i: the pixel index in the input (png_uint_32)
+    *    j: the bit index in the output (unsigned int)
+    *
+    * Unlike 'i', 'j' is interpreted directly; for LSB bytes it counts
+    * up, for MSB it counts down.
+    *
+    * NOTE: this could all be expanded to eliminate the code below by
+    * the time honoured copy'n'paste into three separate functions.  This
+    * might be worth doing in the future.
+    */
+#     define PIXEL_MASK     ((1U << (1<<B))-1U)
+#     define BIT_MASK       ((1U << (3-(B)))-1U) /* within a byte */
+#     define SP_BYTE        (sp[i>>(3-(B))]) /* byte to use */
+#     define SP_OFFSET_LSB  ((BIT_MASK &  i) << (B))
+#     define SP_OFFSET_MSB  ((BIT_MASK & ~i) << (B))
+#     define SP_PIXEL(sex)  ((SP_BYTE >> SP_OFFSET_ ## sex) & PIXEL_MASK)
+   {
+      unsigned int j;
+      unsigned int d;
+
+      /* The data is always in the PNG, big-endian, format: */
+      for (j = 8U, d = 0U; count > 0U; --count, i += inc)
+      {  /* big-endian */
+         j -= 1U<<B;
+         d |= SP_PIXEL(MSB) << j;
+         if (j == 0U) *dp++ = png_check_byte(png_ptr, d), j = 8U, d = 0U;
+      }
+
+      /* The end condition: if j is not 0 the last byte was not
+       * written:
+       */
+      if (j != 0U) *dp = png_check_byte(png_ptr, d);
+   }
+#     undef PIXEL_MASK
+#     undef BIT_MASK
+#     undef SP_BYTE
+#     undef SP_OFFSET_MSB
+#     undef SP_OFFSET_LSB
+#     undef SP_PIXEL
+}
+
+static void
+interlace_row_byte(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
+   png_uint_32 x, unsigned int count, unsigned int cbytes)
+{
+   const unsigned int pass = png_ptr->pass;
+   const unsigned int inc = PNG_PASS_COL_OFFSET(pass);
+
+   /* Loop through the input copying each pixel to the correct place
+    * in the output.  Note that the loop may be executed 0 times if
+    * this is called on a narrow image that does not contain this
+    * pass.
+    */
+   for (sp += PNG_COL_FROM_PASS_COL(x, pass) * cbytes; count > 0;
+        --count, sp += inc * cbytes, dp += cbytes)
+      memcpy(dp, sp, cbytes);
+}
+#endif /* WRITE_INTERLACE */
+
+static void
+write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
+      int first_row_in_pass, int last_pass_row, int end_of_image)
+{
+   /* Split the row into blocks of the appropriate size: */
+   const unsigned int input_depth = png_ptr->row_input_pixel_depth;
+   unsigned int max_pixels = png_max_pixel_block(png_ptr);
+   png_uint_32 max_bytes = max_pixels;
+   const unsigned int pass = png_ptr->pass;
+   const png_uint_32 width = png_ptr->interlaced == PNG_INTERLACE_NONE ?
+      png_ptr->width : PNG_PASS_COLS(png_ptr->width, pass);
+   png_uint_32 x;
+   unsigned int filters;
+   png_byte prev_pixels[4*2*2]; /* 2 pixels up to 4 2-byte channels each */
+
+   /* max_pixels is at most 16 bits, input_depth is at most 64, so the product
+    * always fits in 32 bits:
+    */
+   max_bytes *= input_depth; /* bits */
+   debug(input_depth <= 64 && (max_bytes & 7U) == 0U);
+   max_bytes >>= 3;
+
+   memset(prev_pixels, 0U, sizeof prev_pixels);
+
+   for (x = 0U, filters = 0U; x < width; x += max_pixels, row += max_bytes)
+   {
+      int finish = 0;
+
+      if (max_pixels > width - x)
+      {
+         max_bytes = width - x;
+         max_pixels = (unsigned int)/*SAFE*/max_bytes;
+         max_bytes = (max_bytes * input_depth + 7U) >> 3;
+      }
+
+      if (end_of_image && x + max_pixels >= width)
+         finish = 1;
+
+      filters = png_write_filter_row(png_ptr, prev_pixels, row, x, max_pixels,
+            first_row_in_pass, last_pass_row, filters, finish);
+   }
+}
+
+static void
+write_row_core(png_structrp png_ptr, png_const_bytep row,
+      int first_row_in_pass, int last_pass_row, int end_of_image)
+{
+#  ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+      if (png_ptr->transform_list != NULL)
+         write_row_buffered(png_ptr, row, first_row_in_pass, last_pass_row,
+               end_of_image, copy_row, png_ptr->row_input_pixel_depth);
+
+      else
+#  endif /* WRITE_TRANSFORMS */
+
+   /* If control reaches this point the intermediate buffer is not required and
+    * the input data can be used unmodified.
+    */
+   write_row_unbuffered(png_ptr, row, first_row_in_pass, last_pass_row,
+         end_of_image);
+}
+
+/* Write a single non-interlaced row. */
+static void
+write_row_non_interlaced(png_structrp png_ptr, png_const_bytep row)
+{
+   const png_uint_32 row_number = png_ptr->row_number+1U;
+   const int last_pass_row = row_number == png_ptr->height;
+
+   write_row_core(png_ptr, row, row_number == 1U, last_pass_row,
+         last_pass_row);
+
+   if (!last_pass_row)
+      png_ptr->row_number = row_number;
+
+   else
+   {
+      png_ptr->row_number = 0U;
+      png_ptr->pass = 7U;
+   }
+}
+
+/* Write a single interlaced row. */
+static void
+write_row_interlaced(png_structrp png_ptr, png_const_bytep row)
+{
+   /* row_number is the row in the pass.  The app must only call png_write_row
+    * the correct number of times.  'pass' is set to 7U at the end.
+    */
+   const png_uint_32 row_number = png_ptr->row_number+1U;
+   unsigned int pass = png_ptr->pass;
+   const int last_pass_row = row_number == PNG_PASS_ROWS(png_ptr->height, pass);
+
+   write_row_core(png_ptr, row, row_number == 1U, last_pass_row,
+      last_pass_row && pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height));
+
+   if (!last_pass_row)
+      png_ptr->row_number = row_number;
+
+   else
+   {
+      png_ptr->row_number = 0U;
+
+      do
+         ++pass;
+      while (pass < 7U &&
+             !PNG_PASS_IN_IMAGE(png_ptr->width, png_ptr->height, pass));
+
+      png_ptr->pass = 0x7U & pass;
+   }
+}
+
+#ifdef PNG_WRITE_INTERLACE_SUPPORTED
+/* Interlace a row then write it out. */
+static int
+interlace_row(png_structrp png_ptr, png_const_bytep row)
+{
+   /* row_number is in the image, it may not be in the pass and, likewise, the
+    * pass may not exist.
+    */
+   const png_uint_32 row_number = png_ptr->row_number; /* in image */
+   const unsigned int pass = png_ptr->pass;
+   const int write_row = png_ptr->width > PNG_PASS_START_COL(pass) &&
+                         PNG_ROW_IN_INTERLACE_PASS(row_number, pass);
+
+   if (write_row)
+   {
+      const int last_pass_row =
+         PNG_LAST_PASS_ROW(row_number, pass, png_ptr->height);
+
+      if (pass < 6)
+      {
+         /* Libpng is doing the interlacing and pixels need to be selected
+          * from the input row for this pass.
+          */
+         /* row interlacing uses either the log bit depth for low bit
+          * depth input or the byte count for 8bpp or bigger pixels.
+          */
+         const unsigned int input_depth = png_ptr->row_input_pixel_depth;
+         unsigned int B = 0; /* log2(input_depth) */
+         const int end_of_image = last_pass_row &&
+            pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height);
+
+         switch (input_depth)
          {
-            png_const_bytep unfiltered_row = output_row;
-            png_bytep alt_buffer = png_ptr->alt_buffer;
+            case 4U: /* B will be 2 */
+               ++B;
+               /*FALL THROUGH*/
+            case 2U: /* B will be 1 */
+               ++B;
+               /*FALL THROUGH*/
+            case 1U: /* B will be 0 */
+               write_row_buffered(png_ptr, row,
+                     row_number == PNG_PASS_START_ROW(pass), last_pass_row,
+                     end_of_image, interlace_row_lbd, B);
+               break;
 
-            /* If necessary find an appropriate filter and apply it to get the
-             * filtered row.  The function may return the original argument, it
-             * fills in 'filter_byte' appropriately.
-             */
-            if (png_ptr->next_filter != PNG_FILTER_NONE)
-               output_row = png_write_filter_row(png_ptr, output_row,
-                  first_pass_row, alt_buffer, output_bytes,
-                  (output_bpp+7)>>3 /* bytes per pixel */, &filter_byte);
-
-            else
-               filter_byte = PNG_FILTER_VALUE_NONE;
-
-            /* If the available filters require it, or ever did (as evidenced by
-             * the presence of 'alt_buffer', store the unfiltered row in
-             * alt_buffer.  Note that this does not happen on the last row of a
-             * pass, or the image.
-             */
-            if (!last_pass_row && (alt_buffer != NULL || (png_ptr->next_filter &
-                 (PNG_FILTER_UP+PNG_FILTER_AVG+PNG_FILTER_PAETH)) != 0))
-            {
-               if (unfiltered_row == row) /* Must be copied */
-               {
-                  if (alt_buffer == NULL)
-                     png_ptr->alt_buffer = alt_buffer = png_voidcast(png_bytep,
-                        png_malloc(png_ptr, png_ptr->row_allocated_bytes));
-
-                  memcpy(alt_buffer, unfiltered_row, output_bytes);
-               }
-
-               else /* Can be swapped */
-               {
-                  png_bytep tmp = png_ptr->row_buffer;
-
-                  affirm(unfiltered_row == tmp);
-                  png_ptr->row_buffer = alt_buffer; /* may be NULL */
-                  png_ptr->alt_buffer = tmp;
-               }
-            }
+            default: /* Parameter is the pixel size in bytes */
+               write_row_buffered(png_ptr, row, 
+                     row_number == PNG_PASS_START_ROW(pass), last_pass_row,
+                     end_of_image, interlace_row_byte, input_depth >> 3);
+               break;
          }
-#     else /* !WRITE_FILTER: no previous row to store */
-         filter_byte = PNG_FILTER_VALUE_NONE;
-#     endif /* !WRITE_FILTER */
+      }
 
-      png_write_finish_row(png_ptr, filter_byte, output_row, output_bytes);
+      else /* pass 6; no interlacing required */
+         write_row_core(png_ptr, row, row_number == 1U, last_pass_row,
+               last_pass_row);
    }
 
-   /* API CHANGE: 1.7.0: this is now called after png_struct::row_number and
-    * png_struct::pass have been updated and, at the end of the image, after the
-    * deflate stream has been closed.  The order of the call with respect to the
-    * flush operation has also changed.  The callback can't discover any of this
-    * unless it relies on the write callbacks to find the row data, and that was
-    * never predictable.
-    *
-    *
-    * TODO: API CHANGE: pass the row bytes to this function, it would be more
-    * useful.
-    */
-   if (png_ptr->write_row_fn != NULL)
-      (*(png_ptr->write_row_fn))(png_ptr, row_number, pass);
+   if (row_number+1U < png_ptr->height)
+      png_ptr->row_number = row_number+1U;
+
+   else
+   {
+      png_ptr->row_number = 0U;
+      png_ptr->pass = 0x7U & (pass+1U);
+   }
+
+   return write_row;
+}
+#endif /* WRITE_INTERLACE */
+
+/* Called by user to write a row of image data */
+void PNGAPI
+png_write_row(png_structrp png_ptr, png_const_bytep row)
+{
+   if (png_ptr != NULL)
+   {
+      const unsigned int pass = png_ptr->pass;
+      const png_uint_32 row_number = png_ptr->row_number;
+
+      /* Unlike the read code initialization happens automatically: */
+      if (row_number == 0 && pass == 0)
+      {
+         png_init_row_info(png_ptr); /* doesn't change row/pass/width */
+
+#        ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+            /* If the app takes a png_info from a read operation and if the app
+             * has performed transforms on the data the png_info can contain
+             * IHDR information that cannot be represented in PNG.  The code
+             * that writes the IHDR takes the color type from the
+             * png_info::format.  The app adds transforms, before or after
+             * writing the IHDR, then the IHDR color_type stored in
+             * png_struct::color_type is used in png_init_row_info above to work
+             * out the actual row format.
+             *
+             * Prior to 1.7.0 this was not verified (there was no easy way to do
+             * so).  Now we can check it here, however this is an:
+             *
+             * API CHANGE: in 1.7.0 an error may be flagged against bogus
+             * info_struct formats even though the app had removed them itself.
+             * It's just a warning at present.
+             *
+             * The test is that either the row_format produced by the write
+             * transforms exactly matches that in the original 
+             * info_struct::format or that the info_struct::format was a simple
+             * mapping of the color_type that ended up in the IHDR:
+             */
+            if (png_ptr->row_format != png_ptr->info_format &&
+                PNG_FORMAT_FROM_COLOR_TYPE(png_ptr->color_type) !=
+                  png_ptr->info_format)
+               png_app_warning(png_ptr,
+                     "info_struct format does not match IHDR");
+#        endif /* WRITE_TRANSFORMS */
+      }
+
+      else if (pass == 7U) /* too many calls; write already ended */
+      {
+         debug(png_ptr->row_number == 0U);
+         png_app_error(png_ptr, "Too many calls to png_write_row");
+         return;
+      }
+
+      /* Make sure there is a row to write: */
+      if (row == NULL)
+      {
+         png_app_error(png_ptr, "NULL row pointer to png_write_row");
+         return;
+      }
+
+      if (png_ptr->interlaced == PNG_INTERLACE_NONE)
+         write_row_non_interlaced(png_ptr, row);
+
+#     ifdef PNG_WRITE_INTERLACE_SUPPORTED
+         /* Optional: libpng does the interlacing, app passes every row of the
+          * image the required number of times.
+          */
+         else if (png_ptr->do_interlace != 0U)
+         {
+            if (!interlace_row(png_ptr, row))
+               return; /* row skipped; skip the write callback */
+         }
+#     endif
+
+      else /* app does the interlacing */
+         write_row_interlaced(png_ptr, row);
+
+      /* API CHANGE: 1.7.0: this is now called after png_struct::row_number and
+       * png_struct::pass have been updated and, at the end of the image, after
+       * the deflate stream has been closed.  The order of the call with respect
+       * to the flush operation has also changed.  The callback can't discover
+       * any of this unless it relies on the write callbacks to find the row
+       * data, and that was never predictable.
+       */
+      if (png_ptr->write_row_fn != NULL)
+         (*(png_ptr->write_row_fn))(png_ptr, row_number, pass);
+   } /* png_ptr != NULL */
 }
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
@@ -1050,15 +1149,6 @@ png_write_destroy(png_structrp png_ptr)
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
    png_free(png_ptr, png_ptr->row_buffer);
    png_ptr->row_buffer = NULL;
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-   png_free(png_ptr, png_ptr->alt_buffer);
-   png_ptr->alt_buffer = NULL;
-   png_free(png_ptr, png_ptr->write_row[0]);
-   png_ptr->write_row[0] = NULL;
-   png_free(png_ptr, png_ptr->write_row[1]);
-   png_ptr->write_row[1] = NULL;
-#endif
-
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
    png_transform_free(png_ptr, &png_ptr->transform_list);
 #endif
@@ -1100,249 +1190,6 @@ png_destroy_write_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr)
       }
    }
 }
-
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-/* Allow the application to select one or more row filters to use. */
-void PNGAPI
-png_set_filter(png_structrp png_ptr, int method, int filters)
-{
-   png_debug(1, "in png_set_filter");
-
-   if (png_ptr == NULL)
-      return;
-
-   if (png_ptr->read_struct)
-   {
-      png_app_error(png_ptr, "png_set_filter: cannot be used when reading");
-      return;
-   }
-
-   if (method != png_ptr->filter_method)
-   {
-      png_app_error(png_ptr, "png_set_filter: method does not match IHDR");
-      return;
-   }
-
-   /* PNG and MNG use the same base adaptive filter types: */
-   if (method != PNG_FILTER_TYPE_BASE && method != PNG_INTRAPIXEL_DIFFERENCING)
-   {
-      png_app_error(png_ptr, "png_set_filter: unsupported method");
-      return;
-   }
-
-   /* Notice that PNG_NO_FILTERS is 0 and passes this test; this is OK
-    * because filters then gets set to PNG_FILTER_NONE, as is required.
-    */
-   if (filters < PNG_FILTER_VALUE_LAST)
-      filters = 0x08 << filters;
-
-   else if ((filters & PNG_BIC_MASK(PNG_ALL_FILTERS)) != 0)
-   {
-      png_app_error(png_ptr, "png_set_filter: invalid filters mask/value");
-
-      /* Prior to 1.7.0 this ignored the error and just used the bits that are
-       * present, now it does nothing; this seems a lot safer.
-       */
-      return;
-   }
-
-   /* Finally store the value.  */
-   png_ptr->next_filter = PNG_BYTE(filters);
-}
-#endif /* WRITE_FILTER */
-
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED      /* GRR 970116 */
-/* Legacy API that weighted the filter metric by the number of times it had been
- * used before.
- */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-PNG_FUNCTION(void,PNGAPI
-png_set_filter_heuristics,(png_structrp png_ptr, int heuristic_method,
-    int num_weights, png_const_doublep filter_weights,
-    png_const_doublep filter_costs),PNG_DEPRECATED)
-{
-   png_app_warning(png_ptr, "weighted filter heuristics not implemented");
-   PNG_UNUSED(heuristic_method)
-   PNG_UNUSED(num_weights)
-   PNG_UNUSED(filter_weights)
-   PNG_UNUSED(filter_costs)
-}
-#endif /* FLOATING_POINT */
-
-#ifdef PNG_FIXED_POINT_SUPPORTED
-PNG_FUNCTION(void,PNGAPI
-png_set_filter_heuristics_fixed,(png_structrp png_ptr, int heuristic_method,
-    int num_weights, png_const_fixed_point_p filter_weights,
-    png_const_fixed_point_p filter_costs),PNG_DEPRECATED)
-{
-   png_app_warning(png_ptr, "weighted filter heuristics not implemented");
-   PNG_UNUSED(heuristic_method)
-   PNG_UNUSED(num_weights)
-   PNG_UNUSED(filter_weights)
-   PNG_UNUSED(filter_costs)
-}
-#endif /* FIXED_POINT */
-#endif /* WRITE_WEIGHTED_FILTER */
-
-#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
-void PNGAPI
-png_set_compression_level(png_structrp png_ptr, int level)
-{
-   png_debug(1, "in png_set_compression_level");
-
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->zlib_level = level;
-}
-
-void PNGAPI
-png_set_compression_mem_level(png_structrp png_ptr, int mem_level)
-{
-   png_debug(1, "in png_set_compression_mem_level");
-
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->zlib_mem_level = mem_level;
-}
-
-void PNGAPI
-png_set_compression_strategy(png_structrp png_ptr, int strategy)
-{
-   png_debug(1, "in png_set_compression_strategy");
-
-   if (png_ptr == NULL)
-      return;
-
-   /* The flag setting here prevents the libpng dynamic selection of strategy.
-    */
-   png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
-   png_ptr->zlib_strategy = strategy;
-}
-
-/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
- * smaller value of window_bits if it can do so safely.
- */
-void PNGAPI
-png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
-{
-   if (png_ptr == NULL)
-      return;
-
-   /* Prior to 1.6.0 this would warn but then set the window_bits value. This
-    * meant that negative window bits values could be selected that would cause
-    * libpng to write a non-standard PNG file with raw deflate or gzip
-    * compressed IDAT or ancillary chunks.  Such files can be read and there is
-    * no warning on read, so this seems like a very bad idea.
-    */
-   if (window_bits > 15)
-   {
-      png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
-      window_bits = 15;
-   }
-
-   else if (window_bits < 8)
-   {
-      png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
-      window_bits = 8;
-   }
-
-   png_ptr->zlib_window_bits = window_bits;
-}
-
-void PNGAPI
-png_set_compression_method(png_structrp png_ptr, int method)
-{
-   png_debug(1, "in png_set_compression_method");
-
-   if (png_ptr == NULL)
-      return;
-
-   /* This would produce an invalid PNG file if it worked, but it doesn't and
-    * deflate will fault it, so it is harmless to just warn here.
-    */
-   if (method != 8)
-      png_warning(png_ptr, "Only compression method 8 is supported by PNG");
-
-   png_ptr->zlib_method = method;
-}
-#endif /* WRITE_CUSTOMIZE_COMPRESSION */
-
-/* The following were added to libpng-1.5.4 */
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-void PNGAPI
-png_set_text_compression_level(png_structrp png_ptr, int level)
-{
-   png_debug(1, "in png_set_text_compression_level");
-
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->zlib_text_level = level;
-}
-
-void PNGAPI
-png_set_text_compression_mem_level(png_structrp png_ptr, int mem_level)
-{
-   png_debug(1, "in png_set_text_compression_mem_level");
-
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->zlib_text_mem_level = mem_level;
-}
-
-void PNGAPI
-png_set_text_compression_strategy(png_structrp png_ptr, int strategy)
-{
-   png_debug(1, "in png_set_text_compression_strategy");
-
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->zlib_text_strategy = strategy;
-}
-
-/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
- * smaller value of window_bits if it can do so safely.
- */
-void PNGAPI
-png_set_text_compression_window_bits(png_structrp png_ptr, int window_bits)
-{
-   if (png_ptr == NULL)
-      return;
-
-   if (window_bits > 15)
-   {
-      png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
-      window_bits = 15;
-   }
-
-   else if (window_bits < 8)
-   {
-      png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
-      window_bits = 8;
-   }
-
-   png_ptr->zlib_text_window_bits = window_bits;
-}
-
-void PNGAPI
-png_set_text_compression_method(png_structrp png_ptr, int method)
-{
-   png_debug(1, "in png_set_text_compression_method");
-
-   if (png_ptr == NULL)
-      return;
-
-   if (method != 8)
-      png_warning(png_ptr, "Only compression method 8 is supported by PNG");
-
-   png_ptr->zlib_text_method = method;
-}
-#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
-/* end of API added to libpng-1.5.4 */
 
 void PNGAPI
 png_set_write_status_fn(png_structrp png_ptr, png_write_status_ptr write_row_fn)

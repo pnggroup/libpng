@@ -335,13 +335,11 @@ png_push_read_unknown(png_structrp png_ptr, png_inforp info_ptr)
    /* Now check the CRC, before attempting the unknown handling. */
    png_calculate_crc(png_ptr, buffer, chunk_length);
    png_crc_finish(png_ptr, 0);
-
 #  ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
-   png_handle_unknown(png_ptr, info_ptr, buffer);
+      png_handle_unknown(png_ptr, info_ptr, buffer);
 #  else /* !READ_UNKNOWN_CHUNKS */
-   PNG_UNUSED(info_ptr)
+      PNG_UNUSED(info_ptr)
 #  endif /* !READ_UNKNOWN_CHUNKS */
-
    png_ptr->process_mode = png_read_chunk_header;
 }
 
@@ -362,7 +360,7 @@ png_push_have_row(png_structrp png_ptr, png_bytep row)
           * one:
           */
 #        ifdef PNG_READ_DEINTERLACE_SUPPORTED
-         if (!png_ptr->do_interlace)
+            if (!png_ptr->do_interlace)
 #        endif
          {
             affirm(PNG_ROW_IN_INTERLACE_PASS(row_number, pass) && row != NULL);
@@ -482,7 +480,8 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
       if (!png_ptr->zstream_eod)
       {
          png_bytep row_buffer = NULL;
-         png_row_op row_op = png_read_process_IDAT(png_ptr);
+         png_row_op row_op =
+            png_read_process_IDAT(png_ptr, NULL, NULL, 1/*save row*/);
 
          if (row_op != png_row_incomplete)
          {
@@ -517,28 +516,34 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
                 */
                affirm(buffer_lengthp != NULL || png_ptr->zstream_error);
 
-               /* png_struct::row_buffer contains a complete, transformed, row;
-                * this is processed in both 'sparkle' and 'block' mode.
+               /* png_struct::transformed_row contains a complete, transformed,
+                * row; this is processed in both 'sparkle' and 'block' mode.
                 */
-               row_buffer = png_ptr->row_buffer;
+#              ifdef PNG_TRANSFORM_MECH_SUPPORTED
+                  row_buffer = png_ptr->transformed_row;
+                  if (row_buffer == NULL)
+#              endif /* TRANSFORM_MECH */
+                  row_buffer = png_ptr->row_buffer;
                break;
 
             case png_row_repeat:
                /* row not in this pass, but the existing row in
-                * png_struct::row_buffer may be used, this is only required if
-                * the 'block' or 'rectangle' mode of display is done and libpng
-                * is handling the de-interlace; when the app does it it only
-                * see the real rows.
+                * png_struct::transformed_row may be used, this is only required
+                * if the 'block' or 'rectangle' mode of display is done and
+                * libpng is handling the de-interlace; when the app does it it
+                * only see the real rows.
                 */
-
 #              ifdef PNG_READ_DEINTERLACE_SUPPORTED
-               if (png_ptr->do_interlace)
-               {
-                  row_buffer = png_ptr->row_buffer;
-                  break;
-               }
+                  if (png_ptr->do_interlace)
+                  {
+#                    ifdef PNG_TRANSFORM_MECH_SUPPORTED
+                        row_buffer = png_ptr->transformed_row;
+                        if (row_buffer == NULL)
+#                    endif
+                        row_buffer = png_ptr->row_buffer;
+                     break;
+                  }
 #              endif
-
                continue;
 
             case png_row_skip:
@@ -832,23 +837,6 @@ png_process_data(png_structrp png_ptr, png_inforp info_ptr,
    while (png_ptr->buffer_size)
       png_process_some_data(png_ptr, info_ptr);
 }
-
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
-void PNGAPI
-png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
-    png_const_bytep new_row)
-{
-   if (png_ptr == NULL)
-      return;
-
-   /* new_row is a flag here - if it is NULL then the app callback was called
-    * from an empty row (see the calls to png_struct::row_fn above), otherwise
-    * it must be png_ptr->row_buffer
-    */
-   if (new_row != NULL)
-      png_combine_row(png_ptr, old_row, 1/*blocky display*/);
-}
-#endif /* READ_DEINTERLACE */
 
 void PNGAPI
 png_set_progressive_read_fn(png_structrp png_ptr, png_voidp progressive_ptr,

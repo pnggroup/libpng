@@ -3102,62 +3102,26 @@ png_handle_chunk(png_structrp png_ptr, png_inforp info_ptr)
    png_known_chunks[index].handle(png_ptr, info_ptr);
 }
 
-void /* PRIVATE */
-png_copy_row(png_const_structrp png_ptr, png_bytep dp)
-   /* Copy the row in row_buffer; this is the 'simple' case of png_combine_row
+static void
+copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
+   png_uint_32 x/*in INPUT*/, png_uint_32 width/*of INPUT*/, int clear)
+   /* Copy the row in row_buffer; this is the 'simple' case of combine_row
     * where no adjustment to the pixel spacing is required.
     */
 {
-   unsigned int pixel_depth =
-#  ifdef PNG_TRANSFORM_MECH_SUPPORTED
-      png_ptr->row_bit_depth * PNG_FORMAT_CHANNELS(png_ptr->row_format);
-#  else
-      PNG_PIXEL_DEPTH(*png_ptr);
-#  endif
-   png_alloc_size_t cb = png_ptr->width;
-   unsigned int remaining; /* remaining bits in a partial byte */
-
-   /* 1.7.0: png_combine_row used to copy data equal to the whole row even if
-    * the deinterlace transform had not been performed.  This must be an error
-    * and possibly a security issue:
-    */
-   if (png_ptr->interlaced)
-      cb = PNG_PASS_COLS(cb, png_ptr->pass);
-
-   /* Copy 'cb' pixels, but take care with the last byte because it may
-    * be partially written.
-    */
-   switch (pixel_depth)
-   {
-      case 1:  remaining =  cb       & 7U; cb >>= 3; break;
-      case 2:  remaining = (cb << 1) & 6U; cb >>= 2; break;
-      case 4:  remaining = (cb << 2) & 4U; cb >>= 1; break;
-      default: remaining = 0U;             cb *= pixel_depth >> 3; break;
-   }
-
-   memcpy(dp, png_ptr->row_buffer, cb);
-
-   if (remaining > 0)
-   {
-      /* 'remaining' is the number of bits still to be copied. */
-#     ifdef PNG_READ_PACKSWAP_SUPPORTED
-         /* Format may be little endian; bits to copy in the bottom of 's' */
-         if ((png_ptr->row_format & PNG_FORMAT_FLAG_SWAPPED) != 0)
-            remaining = 0xffU << remaining;
-
-         else
-#     endif /* READ_PACKSWAP */
-         remaining = 0xffU >> remaining;
-
-      /* remaining is now the bits to *keep* from the destination byte */
-      dp[cb] = png_check_byte(png_ptr,
-         (dp[cb] & remaining) | (png_ptr->row_buffer[cb] & ~remaining));
-   }
+   png_copy_row(png_ptr, dp, sp, x, width,
+#     ifdef PNG_TRANSFORM_MECH_SUPPORTED
+         png_ptr->row_bit_depth * PNG_FORMAT_CHANNELS(png_ptr->row_format),
+#     else
+         PNG_PIXEL_DEPTH(*png_ptr),
+#     endif
+      clear/*clear partial byte at end of row*/);
 }
 
 #ifdef PNG_READ_DEINTERLACE_SUPPORTED
-void /* PRIVATE */
-png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
+static void
+combine_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
+   png_uint_32 x/*in INPUT*/, png_uint_32 width/*of INPUT*/, int display)
    /* 1.7.0: API CHANGE: prior to 1.7.0 read de-interlace was done in two steps,
     * the first would expand a narrow pass by replicating pixels according to
     * the inter-pixel spacing of the pixels from the pass in the image.  It did
@@ -3172,16 +3136,16 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
     * the weird non-offseting of the start in the original
     * 'png_do_read_interlace'; the behavior was completely undocumented.
     *
-    * In 1.7.0 png_combine_row does all the work.  It expects a raw
-    * uncompressed, de-filtered, transformed row and it either copies it if:
+    * In 1.7.0 combine_row does all the work.  It expects a raw uncompressed,
+    * de-filtered, transformed row and it either copies it if:
     *
     * 1) It is not interlaced.
     * 2) libpng isn't handling the de-interlace.
     * 3) This is pass 7 (i.e. '6' using the libpng 0-based numbering).
     *
-    * The input data comes from png_struct:
+    * The input data comes from png_struct and sp:
     *
-    *    png_struct::row_buffer; the row data
+    *    sp[width(pixels)];      the row data from input[x(pixels)...]
     *    png_struct::pass;       the pass
     *    png_struct::row_number; the row number in the *image*
     *    png_struct::row_bit_depth,
@@ -3190,7 +3154,9 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
     *    png_struct::color_type; the pixel format otherwise
     *
     * The destination pointer (but not size) and how to handle intermediate
-    * passes are arguments to the API.  'display' is interpreted as:
+    * passes are arguments to the API.  The destination is the pointer to the
+    * entire row buffer, not just the part from output[x] on.  'display' is 
+    * interpreted as:
     *
     *    0: only overwrite destination pixels that will correspond to the source
     *       pixel in the final image.  'sparkle' mode.
@@ -3199,6 +3165,8 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
     *       from *later* passes.  'block' mode.
     */
 {
+   const unsigned int pass = png_ptr->pass;
+
    png_debug(1, "in png_combine_row");
 
    /* Factor out the copy case first, the 'display' argument is irrelevant in
@@ -3206,37 +3174,47 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
     */
    if (!png_ptr->do_interlace || png_ptr->pass == 6)
    {
-      png_copy_row(png_ptr, dp);
+      copy_row(png_ptr, dp, sp, x, width, 0/*do not clear*/);
       return;
    }
 
    else /* not a simple copy */
    {
-      unsigned int pixel_depth =
+      const unsigned int pixel_depth =
 #     ifdef PNG_TRANSFORM_MECH_SUPPORTED
          png_ptr->row_bit_depth * PNG_IMAGE_PIXEL_CHANNELS(png_ptr->row_format);
 #     else
          PNG_PIXEL_DEPTH(*png_ptr);
 #     endif
-      const unsigned int pass = png_ptr->pass;
-      png_const_bytep sp = png_ptr->row_buffer;
       png_uint_32 row_width = png_ptr->width; /* output width */
-      /* The first source pixel is written to PNG_PASS_START_COL of the
+      /* The first source pixel is written to PNG_COL_FROM_PASS of the
        * destination:
        */
-      unsigned int dstart = PNG_PASS_START_COL(pass); /* in pixels */
+      png_uint_32 dx = PNG_COL_FROM_PASS_COL(x, pass);
+      /* The corresponding offset within the 8x8 block: */
+      const unsigned int dstart = dx & 0x7U;
+      /* Find the first pixel written in any 8x8 block IN THIS PASS: */
+      const unsigned int pass_start = PNG_PASS_START_COL(pass);
       /* Subsequent pixels are written PNG_PASS_COL_OFFSET further on: */
-      unsigned int doffset = PNG_PASS_COL_OFFSET(pass); /* in pixels */
-      /* In 'block' mode when dstart is 0 (PNG passes 1,3,5,7) the same pixel is
-       * replicated doffset times, when dstart is non-zero (PNG passes 2,4,6) it
-       * is replicated dstart times.  For 'sparkle' mode only one copy of the
-       * pixel is written:
+      const unsigned int doffset = PNG_PASS_COL_OFFSET(pass);
+      /* In 'block' mode when PNG_PASS_START_COL(pass) is 0 (PNG passes 1,3,5,7)
+       * the same pixel is replicated doffset times, when PNG_PASS_START_COL is
+       * non-zero (PNG passes 2,4,6) it is replicated PNG_PASS_START_COL times.
+       * For 'sparkle' mode only one copy of the pixel is written:
        */
-      unsigned int drep = display ? (dstart ? dstart : doffset) : 1;
+      unsigned int drep = display ? (pass_start ? pass_start : doffset) : 1;
+
+      /* Standard check for byte alignment */
+      debug(((x * pixel_depth/*OVERFLOW OK*/) & 0x7U) == 0U);
 
       /* The caller should have excluded the narrow cases: */
-      affirm(row_width > dstart);
-      row_width -= dstart;
+      affirm(row_width > dx);
+      row_width -= dx;
+      /* Advance dp to the start of the 8x8 block containing the first pixel to
+       * write, adjust dx to be an offset within the block:
+       */
+      dp += png_calc_rowbytes(png_ptr, pixel_depth, dx & ~0x7U);
+      dx &= 0x7U;
 
       /* So each source pixel sp[i] is written to:
        *
@@ -3250,12 +3228,12 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
        *
        * Cherry pick the easy cases:
        */
-      if (pixel_depth > 8)
+      if (pixel_depth > 8U)
       {
-         affirm((pixel_depth & 7) == 0);
          /* Convert to bytes: */
-         pixel_depth >>= 3;
-         dp += dstart * pixel_depth;
+         const unsigned int pixel_bytes = pixel_depth >> 3;
+
+         dp += dstart * pixel_bytes;
 
          for (;;)
          {
@@ -3264,19 +3242,19 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
             if (drep > row_width)
                drep = row_width;
 
-            for (c=0; c<drep; ++c)
-               memcpy(dp, sp, pixel_depth), dp += pixel_depth;
+            for (c=0U; c<drep; ++c)
+               memcpy(dp, sp, pixel_bytes), dp += pixel_bytes;
 
             if (doffset >= row_width)
                break;
 
             row_width -= doffset;
-            dp += (doffset-drep) * pixel_depth;
-            sp += pixel_depth;
+            dp += (doffset-drep) * pixel_bytes;
+            sp += pixel_bytes;
          }
       }
 
-      else if (pixel_depth == 8)
+      else if (pixel_depth == 8U)
       {
          /* Optimize the common 1-byte per pixel case (typical case for palette
           * mapped images):
@@ -3303,13 +3281,13 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* Pixels are 1, 2 or 4 bits in size. */
          unsigned int spixel = *sp++;
          unsigned int dbrep = pixel_depth * drep;
-         unsigned int spos = 0;
+         unsigned int spos = 0U;
 #        ifdef PNG_READ_PACKSWAP_SUPPORTED
             const int lsb =
                (png_ptr->row_format & PNG_FORMAT_FLAG_SWAPPED) != 0;
 #        endif /* READ_PACKSWAP */
 
-         if (dbrep >= 8)
+         if (dbrep >= 8U)
          {
             /* brep must be greater than 1, the destination does not require
              * sub-byte addressing except, maybe, at the end.
@@ -3317,9 +3295,9 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
              * db is the count of bytes required to replicate the source pixel
              * drep times.
              */
-            affirm((dbrep & 7) == 0);
+            debug((dbrep & 7U) == 0U);
             dbrep >>= 3;
-            affirm((dstart * pixel_depth & 7) == 0);
+            debug((dstart * pixel_depth & 7U) == 0U);
             dp += (dstart * pixel_depth) >> 3;
 
             for (;;)
@@ -3332,18 +3310,17 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      spixel_rep >>= spos;
                   else
 #              endif /* READ_PACKSWAP */
-               spixel_rep >>= (8-pixel_depth)-spos;
+               spixel_rep >>= (8U-pixel_depth)-spos;
 
                switch (pixel_depth)
                {
-                  case 1: spixel_rep &=  1; spixel_rep |= spixel_rep << 1;
-                          /*FALL THROUGH*/
-                  case 2: spixel_rep &=  3; spixel_rep |= spixel_rep << 2;
-                          /*FALL THROUGH*/
-                  case 4: spixel_rep &= 15; spixel_rep |= spixel_rep << 4;
-                          /*FALL THROUGH*/
-                  default:
-                     break;
+                  case 1U: spixel_rep &=  1U; spixel_rep |= spixel_rep << 1;
+                           /*FALL THROUGH*/
+                  case 2U: spixel_rep &=  3U; spixel_rep |= spixel_rep << 2;
+                           /*FALL THROUGH*/
+                  case 4U: spixel_rep &= 15U; spixel_rep |= spixel_rep << 4;
+                           /*FALL THROUGH*/
+                  default: break;
                }
 
                /* This may leave some pixels unwritten when there is a partial
@@ -3364,7 +3341,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                   {
                      unsigned int mask;
 
-                     affirm(drep < 8);
+                     debug(drep < 8U);
                      dp += dbrep;
 
                      /* Set 'mask' to have 0's where *dp must be overwritten
@@ -3377,8 +3354,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 #                    endif /* READ_PACKSWAP */
                      mask = 0xff >> drep;
 
-                     *dp = png_check_byte(png_ptr,
-                        (*dp & mask) | (spixel_rep & ~mask));
+                     *dp = PNG_BYTE((*dp & mask) | (spixel_rep & ~mask));
                   }
 
                   break;
@@ -3387,8 +3363,8 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                row_width -= doffset;
                dp += (doffset * pixel_depth) >> 3;
                spos += pixel_depth;
-               if (spos == 8)
-                  spixel = *sp++, spos = 0;
+               if (spos == 8U)
+                  spixel = *sp++, spos = 0U;
             } /* for (;;) */
          } /* pixel_depth * drep >= 8 */
 
@@ -3397,15 +3373,15 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
             /* brep may be 1, pixel_depth may be 1, 2 or 4, dbrep is the number
              * of bits to set.
              */
+            unsigned int bstart = dstart * pixel_depth; /* in bits */
             unsigned int dpixel;
 
-            dstart *= pixel_depth;
-            dp += dstart >> 3;
-            dstart &= 7;
+            dp += bstart >> 3;
+            bstart &= 7U;
             dpixel = *dp;
 
             /* dpixel:  current *dp, being modified
-             * dstart:  bit offset within dpixel
+             * bstart:  bit offset within dpixel
              * drep:    pixel size to write (used as a check against row_width)
              * doffset: pixel step to next written destination
              *
@@ -3415,7 +3391,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
              *
              * Set dbrep to a mask for the bits to set:
              */
-            dbrep = (1<<dbrep)-1;
+            dbrep = (1U<<dbrep)-1U;
             for (;;)
             {
                /* Fill a byte with copies of the next pixel: */
@@ -3426,36 +3402,35 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                      spixel_rep >>= spos;
                   else
 #              endif /* READ_PACKSWAP */
-               spixel_rep >>= (8-pixel_depth)-spos;
+               spixel_rep >>= (8U-pixel_depth)-spos;
 
                switch (pixel_depth)
                {
-                  case 1: spixel_rep &=  1; spixel_rep |= spixel_rep << 1;
-                          /*FALL THROUGH*/
-                  case 2: spixel_rep &=  3; spixel_rep |= spixel_rep << 2;
-                          /*FALL THROUGH*/
-                  case 4: spixel_rep &= 15; spixel_rep |= spixel_rep << 4;
-                          /*FALL THROUGH*/
-                  default:
-                     break;
+                  case 1U: spixel_rep &=  1U; spixel_rep |= spixel_rep << 1;
+                           /*FALL THROUGH*/
+                  case 2U: spixel_rep &=  3U; spixel_rep |= spixel_rep << 2;
+                           /*FALL THROUGH*/
+                  case 4U: spixel_rep &= 15U; spixel_rep |= spixel_rep << 4;
+                           /*FALL THROUGH*/
+                  default: break;
                }
 
                /* This may leave some pixels unwritten when there is a partial
                 * byte write required at the end:
                 */
                if (drep > row_width)
-                  drep = row_width, dbrep = (1<<(pixel_depth*drep))-1;
+                  drep = row_width, dbrep = (1U<<(pixel_depth*drep))-1U;
 
                {
                   unsigned int mask;
 
-                  /* Mask dbrep bits at dstart: */
+                  /* Mask dbrep bits at bstart: */
 #                 ifdef PNG_READ_PACKSWAP_SUPPORTED
                      if (lsb)
-                        mask = dstart;
+                        mask = bstart;
                      else
 #                 endif /* READ_PACKSWAP */
-                  mask = (8-pixel_depth)-dstart;
+                  mask = (8U-pixel_depth)-bstart;
                   mask = dbrep << mask;
 
                   dpixel &= ~mask;
@@ -3464,105 +3439,140 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
 
                if (doffset >= row_width)
                {
-                  *dp = png_check_byte(png_ptr, dpixel);
+                  *dp = PNG_BYTE(dpixel);
                   break;
                }
 
                row_width -= doffset;
-               dstart += doffset * pixel_depth;
+               bstart += doffset * pixel_depth;
 
-               if (dstart >= 8)
+               if (bstart >= 8U)
                {
-                  *dp = png_check_byte(png_ptr, dpixel);
-                  dp += dstart >> 3;
-                  dstart &= 7;
+                  *dp = PNG_BYTE(dpixel);
+                  dp += bstart >> 3;
+                  bstart &= 7U;
                   dpixel = *dp;
                }
 
                spos += pixel_depth;
-               if (spos == 8)
-                  spixel = *sp++, spos = 0;
+               if (spos == 8U)
+                  spixel = *sp++, spos = 0U;
             } /* for (;;) */
          } /* pixel_depth * drep < 8 */
       } /* pixel_depth < 8 */
    } /* not a simple copy */
 }
-#endif /* READ_DEINTERLACE */
+
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+void PNGAPI
+png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
+    png_const_bytep new_row)
+{
+   /* new_row is a flag here - if it is NULL then the app callback was called
+    * from an empty row (see the calls to png_struct::row_fn above), otherwise
+    * it must be png_struct::transformed_row
+    */
+   if (png_ptr != NULL && new_row != NULL)
+   {
+      if (new_row != png_ptr->row_buffer
+#        ifdef PNG_TRANSFORM_MECH_SUPPORTED
+            && new_row != png_ptr->transformed_row
+#        endif /* TRANSFORM_MECH */
+         )
+         png_app_error(png_ptr, "invalid call to png_progressive_combine_row");
+      else
+      {
+         png_uint_32 width = png_ptr->width;
+
+         if (png_ptr->interlaced == PNG_INTERLACE_ADAM7)
+         {
+            const unsigned int pass = png_ptr->pass;
+            width = PNG_PASS_COLS(width, pass);
+         }
+
+         combine_row(png_ptr, old_row, new_row, 0U, width, 1/*blocky display*/);
+      }
+   }
+}
+#endif /* PROGRESSIVE_READ */
+#else /* !READ_DEINTERLACE */
+   /* No read deinterlace support, so 'combine' always reduces to 'copy', there
+    * is no 'display' argument:
+    */
+#  define combine_row(pp, dp, sp, x, w, display)\
+      copy_row(pp, dp, sp, x, w, 0/*!clear*/)
+#endif /* !READ_DEINTERLACE */
 
 static void
-png_read_filter_row_sub(png_alloc_size_t istop, unsigned int bpp,
-   png_bytep row, png_const_bytep prev_row)
+png_read_filter_row_sub(png_alloc_size_t row_bytes, unsigned int bpp,
+   png_bytep row, png_const_bytep prev_row, png_const_bytep prev_pixels)
 {
-   png_alloc_size_t i;
-   png_bytep rp = row + bpp;
+   while (row_bytes >= bpp)
+   {
+      unsigned int i;
+
+      for (i=0; i<bpp; ++i)
+         row[i] = PNG_BYTE(row[i] + prev_pixels[i]);
+
+      prev_pixels = row;
+      row += bpp;
+      row_bytes -= bpp;
+   }
 
    PNG_UNUSED(prev_row)
-
-   for (i = bpp; i < istop; i++)
-   {
-      *rp = PNG_BYTE(*rp + *(rp-bpp));
-      rp++;
-   }
 }
 
 static void
-png_read_filter_row_up(png_alloc_size_t istop, unsigned int bpp,
-   png_bytep row, png_const_bytep prev_row)
+png_read_filter_row_up(png_alloc_size_t row_bytes, unsigned int bpp,
+   png_bytep row, png_const_bytep prev_row, png_const_bytep prev_pixels)
 {
-   png_alloc_size_t i;
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
-
-   for (i = 0; i < istop; i++)
+   while (row_bytes > 0)
    {
-      *rp = PNG_BYTE(*rp + *pp++);
-      rp++;
+      *row = PNG_BYTE(*row + *prev_row);
+      ++row;
+      ++prev_row;
+      --row_bytes;
    }
 
    PNG_UNUSED(bpp)
+   PNG_UNUSED(prev_pixels)
 }
 
 static void
-png_read_filter_row_avg(png_alloc_size_t istop, unsigned int bpp,
-   png_bytep row, png_const_bytep prev_row)
+png_read_filter_row_avg(png_alloc_size_t row_bytes, unsigned int bpp,
+   png_bytep row, png_const_bytep prev_row, png_const_bytep prev_pixels)
 {
-   png_alloc_size_t i;
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
-
-   istop -= bpp;
-   for (i = 0; i < bpp; i++)
+   while (row_bytes >= bpp)
    {
-      *rp = PNG_BYTE(*rp + (*pp++ / 2));
-      rp++;
-   }
+      unsigned int i;
 
-   for (i = 0; i < istop; i++)
-   {
-      *rp = PNG_BYTE(*rp + (*pp++ + *(rp-bpp)) / 2);
+      for (i=0; i<bpp; ++i)
+         row[i] = PNG_BYTE(row[i] + (prev_pixels[i] + prev_row[i])/2U);
 
-      rp++;
+      prev_pixels = row;
+      row += bpp;
+      prev_row += bpp;
+      row_bytes -= bpp;
    }
 }
 
 static void
 png_read_filter_row_paeth_1byte_pixel(png_alloc_size_t row_bytes,
-   unsigned int bpp, png_bytep row, png_const_bytep prev_row)
+   unsigned int bpp, png_bytep row, png_const_bytep prev_row,
+   png_const_bytep prev_pixels)
 {
-   png_bytep rp_end = row + row_bytes;
-   int a, c;
+   png_const_bytep rp_end = row + row_bytes;
+   png_byte a, c;
 
-   /* First pixel/byte */
-   c = *prev_row++;
-   a = *row + c;
-   *row++ = (png_byte)a;
+   /* prev_pixels stores pixel a then c */
+   a = prev_pixels[0];
+   c = prev_pixels[1];
 
-   /* Remainder */
    while (row < rp_end)
    {
-      int b, pa, pb, pc, p;
+      png_byte b;
+      int pa, pb, pc, p;
 
-      a &= 0xff; /* From previous iteration or start */
       b = *prev_row++;
 
       p = b - c;
@@ -3588,8 +3598,8 @@ png_read_filter_row_paeth_1byte_pixel(png_alloc_size_t row_bytes,
        * for the next time round the loop
        */
       c = b;
-      a += *row;
-      *row++ = (png_byte)a;
+      a = 0xFFU & (a + *row);
+      *row++ = a;
    }
 
    PNG_UNUSED(bpp)
@@ -3597,28 +3607,20 @@ png_read_filter_row_paeth_1byte_pixel(png_alloc_size_t row_bytes,
 
 static void
 png_read_filter_row_paeth_multibyte_pixel(png_alloc_size_t row_bytes,
-   unsigned int bpp, png_bytep row, png_const_bytep prev_row)
+   unsigned int bpp, png_bytep row, png_const_bytep prev_row,
+   png_const_bytep prev_pixels)
 {
    png_bytep rp_end = row + bpp;
 
-   /* Process the first pixel in the row completely (this is the same as 'up'
-    * because there is only one candidate predictor for the first row).
-    */
+   /* 'a' and 'c' for the first pixel come from prev_pixels: */
    while (row < rp_end)
    {
-      int a = *row + *prev_row++;
-      *row++ = PNG_BYTE(a);
-   }
+      png_byte a, b, c;
+      int pa, pb, pc, p;
 
-   /* Remainder */
-   rp_end += row_bytes - bpp;
-
-   while (row < rp_end)
-   {
-      int a, b, c, pa, pb, pc, p;
-
-      c = *(prev_row - bpp);
-      a = *(row - bpp);
+      /* prev_pixels stores bpp bytes for 'a', the bpp for 'c': */
+      c = *(prev_pixels+bpp);
+      a = *prev_pixels++;
       b = *prev_row++;
 
       p = b - c;
@@ -3637,8 +3639,40 @@ png_read_filter_row_paeth_multibyte_pixel(png_alloc_size_t row_bytes,
       if (pb < pa) pa = pb, a = b;
       if (pc < pa) a = c;
 
-      a += *row;
-      *row++ = PNG_BYTE(a);
+      a = 0xFFU & (a + *row);
+      *row++ = a;
+   }
+
+   /* Remainder */
+   rp_end += row_bytes - bpp;
+
+   while (row < rp_end)
+   {
+      png_byte a, b, c;
+      int pa, pb, pc, p;
+
+      c = *(prev_row-bpp);
+      a = *(row-bpp);
+      b = *prev_row++;
+
+      p = b - c;
+      pc = a - c;
+
+#     ifdef PNG_USE_ABS
+         pa = abs(p);
+         pb = abs(pc);
+         pc = abs(p + pc);
+#     else
+         pa = p < 0 ? -p : p;
+         pb = pc < 0 ? -pc : pc;
+         pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+#     endif
+
+      if (pb < pa) pa = pb, a = b;
+      if (pc < pa) a = c;
+
+      a = 0xFFU & (a + *row);
+      *row++ = a;
    }
 }
 
@@ -3833,8 +3867,8 @@ png_read_start_IDAT(png_structrp png_ptr)
 
    /* Now allocate the row buffer and, if that succeeds, claim the zstream.
     */
-   png_ptr->row_buffer = png_voidcast(png_bytep,
-      png_malloc(png_ptr, png_ptr->row_allocated_bytes));
+   png_ptr->row_buffer = png_voidcast(png_bytep, png_malloc(png_ptr,
+      png_calc_rowbytes(png_ptr, PNG_PIXEL_DEPTH(*png_ptr), png_ptr->width)));
 
    if (png_inflate_claim(png_ptr, png_IDAT) != Z_OK)
       png_error(png_ptr, png_ptr->zstream.msg);
@@ -3864,28 +3898,78 @@ png_read_start_IDAT(png_structrp png_ptr)
  * preserved and preset at the next call to the function.
  *
  * The function may also call png_error if an unrecoverable error occurs.
+ *
+ * The caller passes in a callback function and parameter to be called when row
+ * data is available.  The callback is called repeatedly for each row to handle
+ * all the transformed row data.
  */
 png_row_op /*PRIVATE*/
-png_read_process_IDAT(png_structrp png_ptr)
+png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
+      png_bytep display_row, int save_row)
 {
-   png_uint_32 width = png_ptr->width;
+   /* Common sub-expressions.  These are all constant across the whole PNG, but
+    * are recalculated here each time because this is fast and it only happens
+    * once per row + once per block of input data.
+    */
+   const unsigned int max_pixels = png_max_pixel_block(png_ptr);
+   const unsigned int pixel_depth = png_ptr->row_input_pixel_depth;
+   /* The number of input bytes read each time (cannot overflow because it is
+    * limited by PNG_ROW_BUFFER_SIZE):
+    */
+   const unsigned int input_byte_count = (max_pixels * pixel_depth) / 8U;
+   const unsigned int bpp = (pixel_depth+0x7U)>>3;
+   const png_uint_32 width = png_ptr->width;
+   const unsigned int interlaced = png_ptr->interlaced != PNG_INTERLACE_NONE;
+
    png_uint_32 row_number = png_ptr->row_number;
    unsigned int pass = png_ptr->pass;
-   const unsigned int interlaced = png_ptr->interlaced != PNG_INTERLACE_NONE;
    enum anonymous {
-      start_of_pass    = 0U, /* at start of pass, no filter byte */
-      need_filter_byte = 1U, /* need the filter byte *after* this row */
+      start_of_row     = 0U, /* at the start of the row; read a filter byte */
       need_row_bytes   = 2U, /* reading the row */
-      processing_row   = 3U, /* control returned to caller to process the row */
-      start_read_row_bytes,  /* start read a row (internal) */
-      transform_row          /* transform an unfiltered row (internal) */
+      processing_row   = 3U  /* control returned to caller to process the row */
    } state = png_upcast(enum anonymous, png_ptr->row_state);
 
    /* The caller is responsible for calling png_read_start_IDAT: */
    affirm(png_ptr->zowner == png_IDAT);
 
+   /* Basic sanity checks: */
+   affirm(pixel_depth > 0U && pixel_depth <= 64U &&
+         input_byte_count <= PNG_ROW_BUFFER_SIZE &&
+         pixel_depth <= 8U*PNG_MAX_PIXEL_BYTES);
+
    for (;;) switch (state)
    {
+      png_alloc_size_t row_bytes_processed;
+      png_alloc_size_t bytes_read;  /* bytes in pixel_buffer */
+      png_uint_32      pass_width;
+      png_byte         row_filter;
+      union
+      {
+         PNG_ROW_BUFFER_ALIGN_TYPE force_buffer_alignment;
+         png_byte buffer[16U];
+      }  previous_pixels;
+      union
+      {
+         PNG_ROW_BUFFER_ALIGN_TYPE force_buffer_alignment;
+         png_byte buffer[PNG_ROW_BUFFER_SIZE];
+      }  pixel_buffer;
+
+      case need_row_bytes:
+         /* The above variables need to be restored: */
+         row_bytes_processed = png_ptr->row_bytes_read;
+         bytes_read = row_bytes_processed % input_byte_count;
+         row_bytes_processed -= bytes_read;
+
+         pass_width = width;
+         if (interlaced)
+            pass_width = PNG_PASS_COLS(pass_width, pass);
+
+         memcpy(pixel_buffer.buffer, png_ptr->scratch, bytes_read);
+         memcpy(previous_pixels.buffer, png_ptr->scratch+bytes_read, 2*bpp);
+         row_filter = png_ptr->scratch[bytes_read+2*bpp];
+
+         goto pixel_loop;
+
       case processing_row:
          /* When there was a previous row (not at the start of the image) the
           * row number needs to be updated and, possibly, the pass number.
@@ -3898,8 +3982,8 @@ png_read_process_IDAT(png_structrp png_ptr)
              * is always necessary to read the filter byte of the next row.
              */
             png_ptr->pass = ++pass & 0x7;
-            row_number = 0;
-         }
+            row_number = 0U;
+         } /* end of pass */
 
          png_ptr->row_number = row_number;
 
@@ -3909,15 +3993,13 @@ png_read_process_IDAT(png_structrp png_ptr)
           */
          if (interlaced)
          {
-            png_uint_32 pass_width = width;
-
             debug(pass <= 6);
 
             /* This macro cannot overflow because the PNG width (and height)
              * have already been checked to ensure that they are less than
              * 2^31 (i.e. they are 31-bit values, not 32-bit values.)
              */
-            pass_width = PNG_PASS_COLS(pass_width, pass);
+            pass_width = PNG_PASS_COLS(width, pass);
 
             /* On average most rows are skipped, so do this first: */
             if (pass_width == 0 ||
@@ -3978,369 +4060,337 @@ png_read_process_IDAT(png_structrp png_ptr)
                   (~((row) >> (3U-((pass) >> 1))) & ~(pass) & 0x1U)
 
                /* Hence: */
-               png_ptr->row_state = processing_row;
+               debug(png_ptr->row_state == processing_row);
                return pass_width == 0 || PNG_PASS_BLOCK_SKIP(pass,
                      row_number) ? png_row_skip : png_row_repeat;
             } /* skipped row */
 
-            /* processed; fall through to start_read_row_bytes unless this is
-             * the first row in this pass, in which case the filter byte has
-             * not been read.
-             */
-            if (row_number == PNG_PASS_START_ROW(pass))
-            {
-               state = start_of_pass;
-               continue;
-            }
+            /* processed; fall through to start_of_row */
          } /* interlaced */
 
-         else /* not interlaced */ if (row_number == 0)
-         {
-            /* On the first row it is necessary to read a filter byte: */
-            state = start_of_pass;
-            continue; /* get the filter byte */
-         }
-
          /* FALL THROUGH */
-
-      case start_read_row_bytes:
-         /* The row is always read into png_struct::row_buffer, however if the
-          * row filter (png_struct::next_filter) requires the previous row it
-          * is necessary to make sure that the read does not overwrite it (the
-          * previous row:)
-          */
-         if (png_ptr->next_filter > PNG_FILTER_VALUE_SUB &&
-             !png_ptr->prev_in_alt)
+      case start_of_row:
          {
-            /* Swap the buffers: */
-            png_bytep pb = png_ptr->alt_buffer;
-
-            /* Check this first before assignment, otherwise the same buffer
-             * will be stored in two members of png_struct and we will do a
-             * double free on an OOM in png_malloc:
-             */
-            if (pb == NULL)
-            {
-               pb = png_voidcast(png_bytep,
-                  png_malloc(png_ptr, png_ptr->row_allocated_bytes));
-               /* SECURITY: hide the heap contents: */
-               memset(pb, 0, png_ptr->row_allocated_bytes);
-            }
-
-            png_ptr->alt_buffer = png_ptr->row_buffer;
-            png_ptr->row_buffer = pb;
-            png_ptr->prev_in_alt = 1; /* until the filter has been undone */
-         }
-
-         /* Now png_ptr::zstream can be set, the code below sets avail_out each
-          * time, but next_out is used as a progress pointer so must be reset
-          * once at the start:
-          */
-         png_ptr->zstream.next_out = png_ptr->row_buffer;
-         /* state = need_row_bytes; [not used below] */
-         /* FALL THROUGH */
-
-      case need_row_bytes:
-         {
-            png_alloc_size_t row_bytes;
-            png_uint_32 pass_width = width;
-            int last_pass_row;
-            png_byte row_filter;
-
-            if (interlaced)
-               pass_width = PNG_PASS_COLS(pass_width, pass);
-
-            /* Find out how many bytes are expected for this row, this relies on
-             * color_type, bit_depth and png_ptr->width having been validated
-             * for potential overflow in png_read_start_IDAT:
-             */
-            row_bytes = PNG_ROWBYTES(PNG_PIXEL_DEPTH(*png_ptr), pass_width);
-
-            /* Check this every time, it's fast and safe: */
-            affirm(row_bytes <= png_ptr->row_allocated_bytes);
-
-            {  /* get expanded row bytes until the row is full */
-               png_alloc_size_t avail_out;
-               png_bytep next_out = png_ptr->zstream.next_out;
-
-               /* The affirm will fire if something tampers with next_out and
-                * sets it to somewhere other than row_buffer, or if it is not
-                * reset between passes or at the end of a row.
-                */
-               avail_out = next_out - png_ptr->row_buffer; /*unsigned*/
-               affirm(avail_out < row_bytes);
-               avail_out = row_bytes - avail_out; /* 1..row_bytes */
-
-               {  /* expand (deflate) the available IDAT input */
-                  int finish;
-                  png_alloc_size_t cb;
-
-                  {  /* calculate 'finish' and 'last_pass_row' */
-                     png_uint_32 height = png_ptr->height;
-
-                     /* last_pass_row indicates that this is the last row in
-                      * this pass and, therefore, that the filter byte for the
-                      * next row is irrelevant (or, indeed, may not be there if
-                      * this is the last pass.)  This is trival for
-                      * non-interlaced images and more complex for interlaced
-                      * ones.
-                      *
-                      * The test is optimized for the non-interlaced case.
-                      */
-                     last_pass_row = row_number+1 >= height || (interlaced &&
-                           PNG_LAST_PASS_ROW(row_number, pass, height));
-
-                     /* Set 'finish' if this is the last row in the last pass
-                      * of the image.
-                      */
-                     finish = last_pass_row && (!interlaced || pass >= 
-                        PNG_LAST_PASS(width, height));
-                  }  /* calculate 'finish' and 'last_pass_row' */
-
-                  cb = png_inflate_IDAT(png_ptr, finish, next_out, avail_out);
-
-                  if (cb < avail_out)
-                  {
-                     png_ptr->row_state = need_row_bytes;
-                     return png_row_incomplete;
-                  }
-               }  /* expand (inflate) the availble IDAT input */
-            }  /* get expanded row bytes until the row is full */
-
-            /* The row is now complete; the return immediately above ended this
-             * function call if insufficient IDAT data was available.
-             *
-             * At this point all the required information to process the row has
-             * been read from the input stream and the original, filtered, row
-             * data is held in png_struct::row_buffer.
-             *
-             * png_struct::next_filter must contain the filter for *this* row,
-             * use this to reverse the filter:
-             */
-            row_filter = png_ptr->next_filter;
-
-            if (row_filter > PNG_FILTER_VALUE_NONE)
-            {
-               const unsigned int bpp = (PNG_PIXEL_DEPTH(*png_ptr)+0x7)>>3;
-
-               /* This is checked in the read code below: */
-               debug(row_filter < PNG_FILTER_VALUE_LAST);
-
-               if (png_ptr->read_filter[0] == NULL)
-                  png_init_filter_functions(png_ptr, bpp);
-
-               /* If the filter code needs the previous row, it must have been
-                * saved previously:
-                */
-               affirm(row_filter <= PNG_FILTER_SUB ||
-                  (png_ptr->prev_in_alt && png_ptr->alt_buffer != NULL));
-
-               png_ptr->read_filter[row_filter-1](row_bytes, bpp,
-                  png_ptr->row_buffer, png_ptr->alt_buffer);
-            }
-
-            /* The row has been read and is now the 'previous' row for the
-             * next line, we need the next filter byte to determine whether
-             * this needs to be saved or can be overwritten if there are row
-             * transformations.
-             */
-            png_ptr->prev_in_alt = 0;
-
-            if (last_pass_row)
-            {
-               /* No next line, so no need to store this row: */
-               png_ptr->next_filter = PNG_FILTER_VALUE_NONE;
-               state = transform_row;
-               continue;
-            }
-         } /* need_row_bytes */
-
-         state = need_filter_byte; /* as opposed to 'start_of_pass' */
-         /* FALL THROUGH */
-
-      case need_filter_byte: /* for the next row */
-      case start_of_pass: /* so the first byte is for the upcoming row */
-         {  /* read filter byte */
-            png_byte row_filter;
-
-            /* This is the filter byte that precedes the *next* row, or, at
-             * start_of_pass, the first row:
+            /* Read the filter byte for the next row, previous_pixels is just
+             * used as a temporary buffer; it is reset below.
              */
             png_alloc_size_t cb = png_inflate_IDAT(png_ptr, 0/*finish*/,
-               &png_ptr->next_filter, 1);
+                  previous_pixels.buffer, 1U);
 
             /* This can be temporary; it verifies the invariants on how
              * png_inflate_IDAT updates the {next,avail}_out fields:
              */
 #ifndef __COVERITY__  /* Suppress bogus Coverity complaint */
             debug(png_ptr->zstream.avail_out == 1-cb &&
-                  png_ptr->zstream.next_out == cb + &png_ptr->next_filter);
+                  png_ptr->zstream.next_out == cb + previous_pixels.buffer);
 #endif
 
-            /* next_out points into png_struct, for security do this: */
+            /* next_out points to previous_pixels, for security do this: */
             png_ptr->zstream.next_out = NULL;
-            png_ptr->zstream.avail_out = 0;
+            png_ptr->zstream.avail_out = 0U;
 
             /* One byte, so we either got it or have to get more input data: */
-            if (cb != 1)
+            if (cb != 1U)
             {
-               affirm(cb == 0 && png_ptr->zstream.avail_in == 0);
-               png_ptr->row_state = state & 3U;
+               affirm(cb == 0U && png_ptr->zstream.avail_in == 0U);
+               png_ptr->row_state = start_of_row;
                return png_row_incomplete;
             }
+         }
 
-            /* Check the filter byte. */
-            row_filter = png_ptr->next_filter;
+         /* Check the filter byte. */
+         row_filter = previous_pixels.buffer[0];
+         if (row_filter >= PNG_FILTER_VALUE_LAST)
+            png_chunk_error(png_ptr, "invalid PNG filter");
 
-            if (row_filter >= PNG_FILTER_VALUE_LAST)
-               png_chunk_error(png_ptr, "invalid PNG filter");
+         /* These are needed for the filter check below: */
+         pass_width = width;
+         if (interlaced)
+            pass_width = PNG_PASS_COLS(pass_width, pass);
 
-            if (state == start_of_pass)
-            {
-               /* The filter is followed by the row data, but first check the
-                * filter byte; the spec requires that we invent an empty row
-                * if the first row of a pass requires it.
-                */
-               if (row_filter >= PNG_FILTER_VALUE_UP)
-               {
-                  /* x-0 == x, so do this optimization: */
-                  if (row_filter == PNG_FILTER_VALUE_UP)
-                     png_ptr->next_filter = PNG_FILTER_VALUE_NONE;
-
-                  /* The Paeth predictor is always the preceding (leftwards)
-                   * value, so this is the same as sub:
-                   */
-                  else if (row_filter == PNG_FILTER_VALUE_PAETH)
-                     png_ptr->next_filter = PNG_FILTER_VALUE_SUB;
-
-                  else /* PNG_FILTER_VALUE_AVG */
-                  {
-                     /* It would be possible to 'invent' a new filter that did
-                      * AVG using only the previous byte; it's 'SUB' of half the
-                      * preceding value, but this seems pointless.
-                      */
-                     png_bytep pb = png_ptr->alt_buffer;
-
-                     if (pb == NULL)
-                     {
-                        png_ptr->alt_buffer = pb = png_voidcast(png_bytep,
-                           png_malloc(png_ptr, png_ptr->row_allocated_bytes));
-                        /* SECURITY: hide the heap contents: */
-                        memset(pb, 0, png_ptr->row_allocated_bytes);
-                     }
-
-                     else
-                     {
-                        png_uint_32 pass_width = width;
-                        png_alloc_size_t row_bytes;
-
-                        if (interlaced)
-                           pass_width = PNG_PASS_COLS(pass_width, pass);
-
-                        /* Be safe here: this avoids a memory overwrite in a
-                         * place where we are relying on previously validated
-                         * values (NOTE: the row_bytes value may be truncated,
-                         * that's a safe bug!)
-                         */
-                        row_bytes = PNG_ROWBYTES(PNG_PIXEL_DEPTH(*png_ptr),
-                           pass_width);
-                        affirm(row_bytes <= png_ptr->row_allocated_bytes);
-
-                        /* Just zero the bytes that are needed; */
-                        memset(pb, 0, row_bytes);
-                     }
-
-                     png_ptr->prev_in_alt = 1;
-                  }
-               } /* silly first line filter */
-
-               /* Proceed to read the row bytes: */
-               state = start_read_row_bytes;
-               continue;
-            }  /* start_of_pass */
-            
-            /* else state == need_filter_byte:
-             * png_struct::next_filter is the filter byte for the next row.
-             */
-         }  /* read filter byte */
-
-      case transform_row:
-         /* The entire row has been read and png_struct::next_filter is the
-          * filter for the next line or PNG_FILTER_VALUE_NONE if there is no
-          * next line.  Do we have read transforms to perform?
+         /* The filter is followed by the row data, but first check the
+          * filter byte; the spec requires that we invent an empty row
+          * if the first row of a pass requires it.
           */
-#        ifdef PNG_TRANSFORM_MECH_SUPPORTED
-            if (png_ptr->transform_list != NULL)
+         if (row_number == 0) switch (row_filter)
+         {
+            case PNG_FILTER_VALUE_UP:
+               /* x-0 == x, so do this optimization: */
+               row_filter = PNG_FILTER_VALUE_NONE;
+               break;
+
+            case PNG_FILTER_VALUE_PAETH:
+               /* The Paeth predictor is always the preceding (leftwards)
+                * value, so this is the same as sub:
+                */
+               row_filter = PNG_FILTER_VALUE_SUB;
+               break;
+
+            case PNG_FILTER_VALUE_AVG:
+               /* It would be possible to 'invent' a new filter that did
+                * AVG using only the previous byte; it's 'SUB' of half the
+                * preceding value, but this seems pointless.  Zero out the
+                * row buffer to make AVG work.
+                *
+                * This is only required if 'pass' is >0, because on the first
+                * pass the code that allocated the row buffer zeroed it (for
+                * security reasons).
+                */
+               if (pass > 0)
+                  memset(png_ptr->row_buffer, 0U,
+                        PNG_ROWBYTES(pixel_depth, pass_width));
+               break;
+
+            default:
+               break;
+         } /* switch row_filter */
+
+         /* Always zero the 'previous pixel' out at the start of a row; this
+          * allows the filter code to ignore the row start.
+          */
+         memset(previous_pixels.buffer, 0U, sizeof previous_pixels.buffer);
+
+         row_bytes_processed = 0U;
+         bytes_read = 0U;
+
+      pixel_loop:
+         /* At this point the following must be set correctly:
+          *
+          *    row_bytes_processed: bytes processed so far
+          *    pass_width:          width of a row in this pass in pixels
+          *    pixel_depth:         depth in bits of a pixel
+          *    bytes_read:          count of filtered bytes in pixel_buffer
+          *    row_filter:          filter byte for this row
+          *    previous_pixels[0]:  pixel 'a' for the filter
+          *    previous_pixels[1]:  pixel 'c' for the filter
+          *    pixel_buffer[]:      bytes_read filtered bytes
+          *
+          * The code in the loop decompresses PNG_ROW_BUFFER_SIZE filterd pixels
+          * from the input, unfilters and transforms them, then saves them to
+          * png_struct::row_buffer[row_bytes_processed...].
+          */
+         { /* pixel loop */
+            const png_alloc_size_t row_bytes =
+               PNG_ROWBYTES(pixel_depth, pass_width);
+            png_bytep row_buffer = png_ptr->row_buffer + row_bytes_processed;
+            unsigned int pixels;
+            png_uint_32 x;
+
+            /* Sanity check for potential buffer overwrite: */
+            affirm(row_bytes > row_bytes_processed);
+
+            /* Work out the current pixel index of the pixel at the start of the
+             * row buffer:
+             */
+            switch (pixel_depth)
             {
-               unsigned int max_depth;
-               png_transform_control tc;
-
-               png_init_transform_control(&tc, png_ptr);
-
-               if (interlaced)
-                  tc.width = PNG_PASS_COLS(width, pass);
-               else
-                  tc.width = width;
-
-               tc.sp = tc.dp = png_ptr->row_buffer; /* assume overwrite ok */
-
-               /* Look at the filter for the *next* row, if it uses the previous
-                * row (this row) then row_buffer must be preserved.
-                */
-               if (png_ptr->next_filter > PNG_FILTER_VALUE_SUB)
-               {
-                  /* 'row_buffer' is the location of what will become the
-                   * *previous* row.  Depending on the transforms it may or may
-                   * not also be the transformed row.
-                   */
-                  tc.dp = png_ptr->alt_buffer; /* Transformed row */
-
-                  if (tc.dp == NULL)
-                  {
-                     /* Lazy allocation; this is where alt_buffer is
-                      * allocated if there *are* transforms to perform.
-                      */
-                     png_ptr->alt_buffer = png_voidcast(png_bytep, tc.dp =
-                        png_malloc(png_ptr, png_ptr->row_allocated_bytes));
-                  }
-               }
-
-               /* Run the list.  It is ok if it doesn't end up doing anything;
-                * this can happen with a lazy init, but that may mean that
-                * alt_buffer is allocated when it doesn't need to be.
-                */
-               max_depth = png_run_transform_list_forwards(png_ptr, &tc);
-
-               /* This is too late, a memory overwrite has already happened, but
-                * it may still prevent exploits:
-                */
-               affirm(max_depth <= png_ptr->row_max_pixel);
-
-               /* This check used to be performed in png_combine_row, above;
-                * do it here to detect the bug earlier on (this is quite common
-                * while making changes to the transform code!)
-                */
-               affirm(png_ptr->row_format == tc.format &&
-                  png_ptr->row_range == tc.range &&
-                  png_ptr->row_bit_depth == tc.bit_depth);
-#              ifdef PNG_READ_GAMMA_SUPPORTED
-                  affirm(png_ptr->row_gamma == tc.gamma);
-#              endif /* READ_GAMMA */
-
-               /* If the transformed data ended up in alt_buffer then swap it
-                * back to row_buffer; this allows the caller to always look in
-                * row_buffer for the output data.
-                */
-               if (tc.sp == png_ptr->alt_buffer)
-               {
-                  png_bytep pb = png_ptr->alt_buffer;
-
-                  png_ptr->alt_buffer = png_ptr->row_buffer;
-                  png_ptr->row_buffer = pb;
-                  png_ptr->prev_in_alt = 1; /* else it is in row_buffer */
-               }
+               case 1U: x = (png_uint_32)/*SAFE*/(row_bytes_processed << 3);
+                        break;
+               case 2U: x = (png_uint_32)/*SAFE*/(row_bytes_processed << 2);
+                        break;
+               case 4U: x = (png_uint_32)/*SAFE*/(row_bytes_processed << 1);
+                        break;
+               case 8U: x = (png_uint_32)/*SAFE*/row_bytes_processed;
+                        break;
+               default: x = (png_uint_32)/*SAFE*/(row_bytes_processed / bpp);
+                        debug(row_bytes_processed % bpp == 0U);
+                        break;
             }
-#        endif
+
+            for (pixels = max_pixels; x < pass_width; x += pixels)
+            {
+               if (pixels > pass_width - x)
+                  pixels = (unsigned int)/*SAFE*/(pass_width - x);
+
+               /* At the end of the image pass Z_FINISH to zlib to optimize the
+                * final read (very slightly, is this worth doing?)  To do this
+                * work out if we are at the end.
+                */
+               {
+                  const png_uint_32 height = png_ptr->height;
+
+                  /* last_pass_row indicates that this is the last row in this
+                   * pass (the test is optimized for the non-interlaced case):
+                   */
+                  const int last_pass_row = row_number+1 >= height ||
+                     (interlaced && PNG_LAST_PASS_ROW(row_number,pass,height));
+
+                  /* Set 'finish' if this is the last row in the last pass of
+                   * the image:
+                   */
+                  const int finish = last_pass_row && (!interlaced ||
+                        pass >= PNG_LAST_PASS(width, height));
+
+                  const png_alloc_size_t bytes_to_read =
+                     PNG_ROWBYTES(pixel_depth, pixels);
+
+                  png_alloc_size_t cb;
+                  
+                  affirm(bytes_to_read > bytes_read);
+                  cb = png_inflate_IDAT(png_ptr, finish,
+                        pixel_buffer.buffer + bytes_read,
+                        bytes_to_read - bytes_read);
+                  bytes_read += cb;
+
+                  if (bytes_read < bytes_to_read)
+                  {
+                     /* Fewer bytes were read than needed: we need to stash all
+                      * the information required at pixel_loop in png_struct so
+                      * that the need_row_bytes case can restore it when more
+                      * input is available.
+                      */
+                     debug(png_ptr->zstream.avail_in == 0U);
+                     png_ptr->zstream.next_out = NULL;
+                     png_ptr->zstream.avail_out = 0U;
+
+                     png_ptr->row_bytes_read = row_bytes_processed + bytes_read;
+                     memcpy(png_ptr->scratch, pixel_buffer.buffer, bytes_read);
+                     memcpy(png_ptr->scratch+bytes_read, previous_pixels.buffer,
+                           2*bpp);
+                     png_ptr->scratch[bytes_read+2*bpp] = row_filter;
+                     png_ptr->row_state = need_row_bytes;
+                     return png_row_incomplete;
+                  }
+
+                  debug(bytes_read == bytes_to_read);
+               } /* fill pixel_buffer */
+
+               /* The buffer is full or the row is complete but the calculation
+                * was done using the pixel count, so double check against the
+                * byte count here:
+                */
+               implies(bytes_read != input_byte_count,
+                  bytes_read == row_bytes - row_bytes_processed);
+
+               /* At this point all the required information to process the next
+                * block of pixels in the row has been read from the input stream
+                * and the original, filtered, row data is held in pixel_buffer.
+                *
+                * Because the buffer will be transformed after the unfilter
+                * operation we require whole pixels:
+                */
+               debug(bytes_read >= bpp && bytes_read % bpp == 0);
+
+               if (row_filter > PNG_FILTER_VALUE_NONE)
+               {
+                  /* This is checked in the read code above: */
+                  debug(row_filter < PNG_FILTER_VALUE_LAST);
+
+                  /* Lazy init of the read functions, which allows hand crafted
+                   * optimizations for 'bpp' (which does not change.)
+                   */
+                  if (png_ptr->read_filter[0] == NULL)
+                     png_init_filter_functions(png_ptr, bpp);
+
+                  /* Pixels 'a' then 'c' are in previous_pixels, pixel 'b' is in
+                   * row_buffer and pixel 'x' (filtered) is in pixel_buffer.
+                   */
+                  png_ptr->read_filter[row_filter-1](bytes_read, bpp,
+                     pixel_buffer.buffer, row_buffer, previous_pixels.buffer);
+               } /* do the filter */
+
+               /* Now pixel_buffer.buffer contains the *un*filtered bytes of the
+                * current row and row_buffer needs updating with these.  First
+                * preserve pixels 'a' and 'c' for the next time round the loop
+                * (if necessary).
+                */
+               if (bytes_read < row_bytes - row_bytes_processed)
+               {
+                  debug(bytes_read == input_byte_count);
+                  memcpy(previous_pixels.buffer/* pixel 'a' */,
+                        pixel_buffer.buffer + bytes_read - bpp, bpp);
+                  memcpy(previous_pixels.buffer+bpp/* pixel 'c' */,
+                        row_buffer + bytes_read - bpp, bpp);
+               }
+
+               /* Now overwrite the previous row pixels in row_buffer with the
+                * current row pixels:
+                */
+               memcpy(row_buffer, pixel_buffer.buffer, bytes_read);
+               row_buffer += bytes_read;
+               row_bytes_processed += bytes_read;
+               bytes_read = 0U; /* for next buffer */
+
+               /* Any transforms can now be performed along with any output
+                * handling (copy or interlace handling).
+                */
+#              ifdef PNG_TRANSFORM_MECH_SUPPORTED
+                  if (png_ptr->transform_list != NULL)
+                  {
+                     unsigned int max_depth;
+                     png_transform_control tc;
+
+                     png_init_transform_control(&tc, png_ptr);
+
+                     tc.width = pixels;
+                     tc.sp = tc.dp = pixel_buffer.buffer;
+
+                     /* Run the list.  It is ok if it doesn't end up doing
+                      * anything; this can happen with a lazy init.
+                      *
+                      * TODO: I don't think lazy inits happen any more, hence
+                      * the 'debug' below.
+                      */
+                     max_depth = png_run_transform_list_forwards(png_ptr, &tc);
+                     debug(png_ptr->transform_list != NULL);
+
+                     /* This is too late, a stack overwrite has already
+                      * happened, but it may still prevent exploits:
+                      */
+                     affirm(max_depth <= png_ptr->row_max_pixel_depth);
+
+                     /* It is very important that the transform produces the
+                      * same pixel format as the TC_INIT steps:
+                      */
+                     affirm(png_ptr->row_format == tc.format &&
+                        png_ptr->row_range == tc.range &&
+                        png_ptr->row_bit_depth == tc.bit_depth);
+#                    ifdef PNG_READ_GAMMA_SUPPORTED
+                        /* This sometimes fails at present when gamma
+                         * transforms are eliminated in PNG_TC_INIT_FINAL:
+                         */
+                        debug(png_ptr->row_gamma == tc.gamma);
+#                    endif /* READ_GAMMA */
+
+                     /* If the caller needs the row saved (for the progressive
+                      * read API) or if this PNG is interlaced and this row may
+                      * be required in a subsequent pass (any pass before the
+                      * last one) then it is stored in
+                      * png_struct::transformed_row, and that may need to be
+                      * allocated here.
+                      */
+#                    if defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
+                        defined(PNG_READ_DEINTERLACE_SUPPORTED)
+                        if (png_ptr->transform_list != NULL &&
+                            (save_row || (png_ptr->do_interlace && pass < 6U)))
+                        {
+                           if (png_ptr->transformed_row == NULL)
+                              png_ptr->transformed_row = png_voidcast(png_bytep,
+                                 png_malloc(png_ptr, png_calc_rowbytes(png_ptr,
+                                    png_ptr->row_bit_depth *
+                                       PNG_FORMAT_CHANNELS(png_ptr->row_format),
+                                    save_row ? width : (width+1U)>>1)));
+
+                           copy_row(png_ptr, png_ptr->transformed_row,
+                              pixel_buffer.buffer, x, pixels, 1/*clear*/);
+                        }
+#                    endif /* PROGRESSIVE_READ || READ_DEINTERLACE */
+                  } /* transform_list != NULL */
+#              endif /* TRANSFORM_MECH */
+
+               /* There are now 'pixels' possibly transformed pixels starting at
+                * row pixel x, where 'x' is an index in the interlaced row if
+                * interlacing is happening.  Handle this row.
+                */
+               if (transformed_row != NULL)
+                  combine_row(png_ptr, transformed_row, pixel_buffer.buffer,
+                        x, pixels, 0/*!display*/);
+
+               if (display_row != NULL)
+                  combine_row(png_ptr, display_row, pixel_buffer.buffer, x,
+                        pixels, 1/*display*/);
+            } /* for x < pass_width */
+         } /* pixel loop */
 
          png_ptr->row_state = processing_row;
          return png_row_process;
@@ -4348,6 +4398,29 @@ png_read_process_IDAT(png_structrp png_ptr)
       default:
          impossible("bad row state");
    } /* forever switch */
+
+   PNG_UNUSED(save_row); /* May not be used above */
+}
+
+void /* PRIVATE */
+png_read_free_row_buffers(png_structrp png_ptr)
+{
+   /* The transformed row only gets saved if needed: */
+#  if (defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
+       defined(PNG_READ_DEINTERLACE_SUPPORTED)) &&\
+      defined(PNG_TRANSFORM_MECH_SUPPORTED)
+      if (png_ptr->transformed_row != NULL)
+      {
+         png_free(png_ptr, png_ptr->transformed_row);
+         png_ptr->transformed_row = NULL;
+      }
+#  endif /* PROGRESSIVE_READ || READ_DEINTERLACE */
+
+   if (png_ptr->row_buffer != NULL)
+   {
+      png_free(png_ptr, png_ptr->row_buffer);
+      png_ptr->row_buffer = NULL;
+   }
 }
 
 /* Complete reading of the IDAT chunks.  This returns 0 if more data is to
@@ -4367,21 +4440,10 @@ png_read_finish_IDAT(png_structrp png_ptr)
       IDAT_truncated
    }  error = no_error;
 
-   /* Release row_buffer and alt_buffer first; they can use considerable
-    * amounts of memory.
+   /* Release the rowd buffers first; they can use considerable amounts of
+    * memory.
     */
-   if (png_ptr->row_buffer != NULL)
-   {
-      if (png_ptr->alt_buffer != NULL)
-      {
-         png_free(png_ptr, png_ptr->alt_buffer);
-         png_ptr->alt_buffer = NULL;
-      }
-
-      png_free(png_ptr, png_ptr->row_buffer);
-      png_ptr->row_buffer = NULL;
-      png_ptr->row_allocated_bytes = 0;
-   }
+   png_read_free_row_buffers(png_ptr);
 
    affirm(png_ptr->zowner == png_IDAT); /* else this should not be called */
 

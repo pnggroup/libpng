@@ -353,11 +353,6 @@ png_read_IDAT(png_structrp png_ptr)
    png_ptr->zstream.avail_in = IDAT_size;
 }
 
-#ifndef PNG_READ_DEINTERLACE_SUPPORTED
-   /* No png_combine_row; just copy the row bytes: */
-#  define png_combine_row(pp, pb, display) png_copy_row((pp), (pb))
-#endif
-
 void PNGAPI
 png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
    /* It is valid to call this API with both 'row' and 'dsp_row' NULL, all
@@ -406,60 +401,42 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
        * has PNG_AFTER_IDAT set, by either doing png_error or using 0 bytes for
        * the data (after issuing a warning.)
        */
-      switch (png_read_process_IDAT(png_ptr))
+      switch (png_read_process_IDAT(png_ptr, row, dsp_row, 0/*no save*/))
       {
          case png_row_incomplete:
             /* more IDAT data needed for row */
             debug(png_ptr->zstream.avail_in == 0);
             continue;
 
-         case png_row_process:
-            /* png_struct::row_buffer contains a complete, transformed, row;
-             * this is processed in both 'sparkle' and 'block' mode. The final
-             * parameter to png_combine_row is false, meaning only overwrite
-             * the pixels corresponding to this pass:
-             */
-            if (row != NULL)
-               png_combine_row(png_ptr, row, 0/*'sparkle'*/);
-
-            goto display_row; /* Skip the 'DEINT' check */
-
          case png_row_repeat:
-            /* row not in this pass, but the existing row in
-             * png_struct::row_buffer may be used, this is only done if the
-             * 'block' or 'rectangle' mode of display is required.  The final
-             * parameter to png_combine_row is true, meaning overwrite all the
-             * pixels belong to this and *later* passes.
+            /* row not in this pass, but the existing row in row_buffer or (if
+             * transforms are happening) png_struct::transformed_row is
+             * available from a previous row.
              */
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
-            if (!png_ptr->do_interlace)
-               continue;
-#else
-            continue;
-#endif
-
-         display_row:
-            if (dsp_row != NULL)
-               png_combine_row(png_ptr, dsp_row, 1/*'rectangle/block'*/);
-
-            goto row_fn; /* Skip the 'DEINT' check */
-
+            /* FALL THROUGH */
          case png_row_skip:
             /* row not in pass and no appropriate data; skip this row, nothing
-             * more need be done, except the read_row_fn:
+             * more need be done, except the read_row_fn and then only if libpng
+             * is doing the interlace handling (this is the historical
+             * behavior!)
              */
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
-            if (!png_ptr->do_interlace)
+#           ifdef PNG_READ_DEINTERLACE_SUPPORTED
+               if (!png_ptr->do_interlace) continue;
+#           else /* !do_interlace */
                continue;
-#else
-            continue;
-#endif
-
-         row_fn:
+#           endif /* !do_interlace */
+            /* FALL THROUGH */
+         case png_row_process:
+            /* png_read_process_IDAT has done everything we need, the only extra
+             * required is to call the application row callback.
+             */
             if (png_ptr->read_row_fn != NULL)
                png_ptr->read_row_fn(png_ptr, png_ptr->row_number,
                   png_ptr->pass);
-
+            /* And return now because the next row has been processed; so there
+             * is exactly one read_row_fn callback for each call to
+             * png_read_process_IDAT.
+             */
             return;
 
          default:
@@ -732,10 +709,8 @@ png_read_destroy(png_structrp png_ptr)
 {
    png_debug(1, "in png_read_destroy");
 
-   png_free(png_ptr, png_ptr->row_buffer);
-   png_ptr->row_buffer = NULL;
-   png_free(png_ptr, png_ptr->alt_buffer);
-   png_ptr->alt_buffer = NULL;
+   png_read_free_row_buffers(png_ptr);
+
    png_free(png_ptr, png_ptr->read_buffer);
    png_ptr->read_buffer = NULL;
 

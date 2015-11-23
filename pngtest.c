@@ -65,7 +65,7 @@
    defined PNG_READ_tEXt_SUPPORTED &&\
    defined PNG_READ_tIME_SUPPORTED &&\
    defined PNG_READ_zTXt_SUPPORTED &&\
-   defined PNG_WRITE_INTERLACING_SUPPORTED
+   defined PNG_WRITE_INTERLACE_SUPPORTED
 
 #ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER /* defined by pnglibconf.h from 1.7 */
@@ -844,12 +844,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_structp write_ptr;
    png_infop write_info_ptr;
    png_infop write_end_info_ptr;
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    int interlace_preserved = 1;
-#else
+#endif /* WRITE_FILTER */
+#else /* !WRITE */
    png_structp write_ptr = NULL;
    png_infop write_info_ptr = NULL;
    png_infop write_end_info_ptr = NULL;
-#endif
+#endif /* !WRITE */
    png_bytep row_buf;
    png_uint_32 y;
    png_uint_32 width, height;
@@ -1380,7 +1382,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    pngtest_debug("Writing row data");
 
 #if defined(PNG_READ_DEINTERLACE_SUPPORTED) &&\
-   defined(PNG_WRITE_INTERLACING_SUPPORTED)
+   defined(PNG_WRITE_INTERLACE_SUPPORTED)
    /* Both must be defined for libpng to be able to handle the interlace,
     * otherwise it gets handled below by simply reading and writing the passes
     * directly.
@@ -1622,7 +1624,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       return (1);
    }
 
-#ifdef PNG_WRITE_SUPPORTED /* else nothing was written */
+#if defined (PNG_WRITE_SUPPORTED) /* else nothing was written */ &&\
+    defined (PNG_WRITE_FILTER_SUPPORTED)
    if (interlace_preserved != 0) /* else the files will be changed */
    {
       for (;;)
@@ -1699,7 +1702,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          }
       }
    }
-#endif /* WRITE */
+#endif /* WRITE && WRITE_FILTER */
 
    FCLOSE(fpin);
    FCLOSE(fpout);

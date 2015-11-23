@@ -53,7 +53,7 @@ TESTS =\
    tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
    tests/pngvalid-progressive-size\
    tests/pngvalid-progressive-interlace-standard\
-   tests/pngvalid-transform\
+   tests/pngvalid-transform tests/pngvalid-interlace-transform\
    tests/pngvalid-progressive-standard tests/pngvalid-standard\
    tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
    tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\

@@ -446,15 +446,20 @@ struct png_struct_def
     * filter byte (which is in next_filter.)  All fields are only used during
     * IDAT processing and start of 0.
     */
-   png_bytep        row_buffer;          /* primary row buffer */
 #if defined(PNG_WRITE_FILTER_SUPPORTED) || defined(PNG_READ_SUPPORTED)
-   png_bytep        alt_buffer;          /* if two row buffers needed */
-#endif
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-   png_bytep        write_row[2];        /* Two rows to test filers */
-#endif
+   png_bytep        row_buffer;          /* primary row buffer */
+#endif /* WRITE_FILTER || READ */
+#if (defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
+     defined(PNG_READ_DEINTERLACE_SUPPORTED)) &&\
+    defined(PNG_TRANSFORM_MECH_SUPPORTED)
+   png_bytep        transformed_row;     /* pointer to the transformed row, if
+                                          * required.  May point to row_buffer.
+                                          */
+#endif /* (PROGRESSIVE_READ || READ_DEINTERLACE) && TRANSFORM_MECH */
 
-   png_alloc_size_t row_allocated_bytes; /* Total amount allocated */
+#ifdef PNG_READ_SUPPORTED
+   png_alloc_size_t row_bytes_read;   /* Total read in row */
+#endif /* READ */
 
    png_uint_32      row_number;       /* current row in pass */
 #ifdef PNG_READ_GAMMA_SUPPORTED
@@ -484,15 +489,33 @@ struct png_struct_def
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
    unsigned int read_started   :1; /* at least one call to png_read_row */
 #endif
+#if defined (PNG_READ_DEINTERLACE_SUPPORTED) ||\
+    defined (PNG_WRITE_INTERLACE_SUPPORTED)
    unsigned int do_interlace   :1; /* libpng handles the interlace */
+#  endif /* READ_DEINTERLACE, WRITE_INTERLACE */
    unsigned int pass           :3; /* current (interlace) pass (0 - 6) */
 
    /* The next two fields are just used by the IDAT process functions to store
     * the state of IDAT processing; they should not be altered or used by other
     * functions.
     */
-   unsigned int prev_in_alt    :1; /* previous row is stored in alt_buffer */
    unsigned int row_state      :2; /* state of row parsing (internal) */
+
+   /* The following fields are set by png_row_init to the pixel depths of the
+    * pixels at various states.  If transforms are not supported they will
+    * always be the same value:
+    *
+    *              READ               WRITE
+    * input:        PNG          From application
+    * output:  To application         PNG
+    * max:           Largest in transform
+    */
+   unsigned int row_input_pixel_depth  :8;
+   unsigned int row_output_pixel_depth :8;
+   unsigned int row_max_pixel_depth    :8;
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+   unsigned int filter_mask    :8; /* mask of filters to consider on write */
+#endif /* WRITE_FILTER */
 
 #  define PNG_RF_BITS 9 /* Number of bits required for the row format (below) */
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
@@ -528,9 +551,8 @@ struct png_struct_def
     *       alpha or gray) have been inverted.
     *     PNG_FORMAT_FLAG_INVALID           NOT STORED HERE
     */
-   unsigned int     row_max_pixel :8;    /* maximum pixel depth used */
 #ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
-   unsigned int     info_format:PNG_RF_BITS;
+   unsigned int info_format:PNG_RF_BITS;
       /* This field is used to validate the png_info used to write the
        * IHDR.  This is a new check in 1.7.0; previously it was possible to pass
        * a png_info from a png_read with the read tranform information in the
@@ -539,26 +561,19 @@ struct png_struct_def
        */
 #endif /* WRITE_TRANSFORMS */
 #ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
-   unsigned int     write_invert_alpha :1;
+   unsigned int write_invert_alpha :1;
       /* This indicates the png_set_invert_alpha was called, it is used by the
        * write code to implement the transform without needing to run the whole
        * transform mechanism on the PNG palette data.
        */
 #endif /* WRITE_INVERT_ALPHA */
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-   unsigned int     rgb_to_gray_status :1;
+   unsigned int rgb_to_gray_status :1;
       /* If set an RGB pixel was encountered by the RGB to gray transform
        * wherein !(r==g==b).
        */
 #endif /* RGB_TO_GRAY */
 #endif /* TRANFORM_MECH */
-
-#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_FILTER_SUPPORTED)
-   png_byte next_filter; /* Filter byte for upcoming row (read or
-                          * filters+masks to try (write, if WRITE_FILTER is
-                          * supported).
-                          */
-#endif
 
 #ifdef PNG_READ_SUPPORTED
    /* These, and IDAT_read_size below, control how much input and output (at
@@ -629,7 +644,8 @@ struct png_struct_def
     * un-filter function, this allows per-image and per-processor optimization.
     */
    void (*read_filter[PNG_FILTER_VALUE_LAST-1])(png_alloc_size_t row_bytes,
-      unsigned int bpp, png_bytep row, png_const_bytep prev_row);
+      unsigned int bpp, png_bytep row, png_const_bytep prev_row,
+      png_const_bytep prev_pixels);
 #endif /* READ */
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -749,5 +765,10 @@ struct png_struct_def
 #ifdef PNG_MNG_FEATURES_SUPPORTED
    unsigned int mng_features_permitted :3;
 #endif
+
+   /* SCRATCH buffers, used when control returns to the application or a read
+    * loop.
+    */
+   png_byte scratch[PNG_ROW_BUFFER_SIZE+16U];
 };
 #endif /* PNGSTRUCT_H */

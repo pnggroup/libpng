@@ -1463,7 +1463,7 @@ PNG_EXPORT(44, void, png_set_shift, (png_structrp png_ptr, png_const_color_8p
 #endif
 
 #if defined(PNG_READ_DEINTERLACE_SUPPORTED) || \
-    defined(PNG_WRITE_INTERLACING_SUPPORTED)
+    defined(PNG_WRITE_INTERLACE_SUPPORTED)
 /* Have the code handle the interlacing.  Returns the number of passes.
  * MUST be called before png_read_update_info or png_start_read_image,
  * otherwise it will not have the desired effect.  Note that it is still
@@ -1676,11 +1676,12 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
  *
  * The resultant argument fits in a single byte.
  */
-#define PNG_FILTER_NONE    (0x08 << PNG_FILTER_VALUE_NONE)
-#define PNG_FILTER_SUB     (0x08 << PNG_FILTER_VALUE_SUB)
-#define PNG_FILTER_UP      (0x08 << PNG_FILTER_VALUE_UP)
-#define PNG_FILTER_AVG     (0x08 << PNG_FILTER_VALUE_AVG)
-#define PNG_FILTER_PAETH   (0x08 << PNG_FILTER_VALUE_PAETH)
+#define PNG_FILTER_MASK(value) (0x08 << (value))
+#define PNG_FILTER_NONE        PNG_FILTER_MASK(PNG_FILTER_VALUE_NONE)
+#define PNG_FILTER_SUB         PNG_FILTER_MASK(PNG_FILTER_VALUE_SUB)
+#define PNG_FILTER_UP          PNG_FILTER_MASK(PNG_FILTER_VALUE_UP)
+#define PNG_FILTER_AVG         PNG_FILTER_MASK(PNG_FILTER_VALUE_AVG)
+#define PNG_FILTER_PAETH       PNG_FILTER_MASK(PNG_FILTER_VALUE_PAETH)
 
 /* Then two convenience values.  PNG_NO_FILTERS is the same as
  * PNG_FILTER_VALUE_NONE, but this is harmless because they mean the same thing.
@@ -2710,9 +2711,9 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
 
 /* A macro to find the last pass (in the range 0 to 6) given an image width and
  * height.  Then two macros two find whether a given image row or column which
- * is prsent in the pass is the last row or column in the pass.  Note that these
- * macros return 'true' for earlier rows or columns of the image that are *not*
- * in the pass.
+ * is present in the pass is the last row or column in the pass.  Note that
+ * these macros return 'true' for earlier rows or columns of the image that are
+ * *not* in the pass.
  */
 #define PNG_LAST_PASS(width, height) ((height) > 1 ? 6 : ((width) > 1 ? 5 : 0))
 #define PNG_LAST_PASS_ROW(y, pass, height)\

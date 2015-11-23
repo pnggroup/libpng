@@ -121,6 +121,10 @@ typedef png_byte *png_const_bytep;
 #  ifdef PNG_READ_INTERLACING_SUPPORTED
 #     define PNG_READ_DEINTERLACE_SUPPORTED
 #  endif
+   /* WRITE_INTERLACING was used instead of WRITE_INTERLACE. */
+#  ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#     define PNG_WRITE_INTERLACE_SUPPORTED
+#  endif
 #endif
 
 #include <float.h>  /* For floating point constants */
@@ -3545,17 +3549,18 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
  * interlacing support.  If there is no write interlacing we can't generate test
  * cases with interlace:
  */
-#ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#ifdef PNG_WRITE_INTERLACE_SUPPORTED
 #  define INTERLACE_LAST PNG_INTERLACE_LAST
 #  define check_interlace_type(type) ((void)(type))
 #  define set_write_interlace_handling(pp,type) png_set_interlace_handling(pp)
+#  define do_own_interlace 0
 #elif PNG_LIBPNG_VER < 10700
 #  define set_write_interlace_handling(pp,type) (1)
 static void
 check_interlace_type(int const interlace_type)
 {
    /* Prior to 1.7.0 libpng does not support the write of an interlaced image
-    * unless PNG_WRITE_INTERLACING_SUPPORTED, even with do_interlace so the
+    * unless PNG_WRITE_INTERLACE_SUPPORTED, even with do_interlace so the
     * code here does the pixel interlace itself, so:
     */
    if (interlace_type != PNG_INTERLACE_NONE)
@@ -3568,15 +3573,66 @@ check_interlace_type(int const interlace_type)
    }
 }
 #  define INTERLACE_LAST (PNG_INTERLACE_NONE+1)
+#  define do_own_interlace 0
 #else /* libpng 1.7+ */
 #  define set_write_interlace_handling(pp,type)\
       npasses_from_interlace_type(pp,type)
 #  define check_interlace_type(type) ((void)(type))
-#  define INTERLACE_LAST (PNG_INTERLACE_NONE+1)
-#endif /* WRITE_INTERLACING tests */
+#  define INTERLACE_LAST PNG_INTERLACE_LAST
+#  define do_own_interlace 1
+#endif /* WRITE_INTERLACE tests */
 
 #define CAN_WRITE_INTERLACE\
-   PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
+   PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACE_SUPPORTED
+
+/* The following two routines use the PNG interlace support macros from
+ * png.h to interlace or deinterlace rows.
+ */
+static void
+interlace_row(png_bytep buffer, png_const_bytep imageRow,
+   unsigned int pixel_size, png_uint_32 w, int pass)
+{
+   png_uint_32 xin, xout, xstep;
+
+   /* Note that this can, trivially, be optimized to a memcpy on pass 7, the
+    * code is presented this way to make it easier to understand.  In practice
+    * consult the code in the libpng source to see other ways of doing this.
+    *
+    * It is OK for buffer and imageRow to be identical, because 'xin' moves
+    * faster than 'xout' and we copy up.
+    */
+   xin = PNG_PASS_START_COL(pass);
+   xstep = 1U<<PNG_PASS_COL_SHIFT(pass);
+
+   for (xout=0; xin<w; xin+=xstep)
+   {
+      pixel_copy(buffer, xout, imageRow, xin, pixel_size);
+      ++xout;
+   }
+}
+
+#ifdef PNG_READ_SUPPORTED
+static void
+deinterlace_row(png_bytep buffer, png_const_bytep row,
+   unsigned int pixel_size, png_uint_32 w, int pass)
+{
+   /* The inverse of the above, 'row' is part of row 'y' of the output image,
+    * in 'buffer'.  The image is 'w' wide and this is pass 'pass', distribute
+    * the pixels of row into buffer and return the number written (to allow
+    * this to be checked).
+    */
+   png_uint_32 xin, xout, xstep;
+
+   xout = PNG_PASS_START_COL(pass);
+   xstep = 1U<<PNG_PASS_COL_SHIFT(pass);
+
+   for (xin=0; xout<w; xout+=xstep)
+   {
+      pixel_copy(buffer, xout, row, xin, pixel_size);
+      ++xin;
+   }
+}
+#endif /* PNG_READ_SUPPORTED */
 
 /* Make a standardized image given an image colour type, bit depth and
  * interlace type.  The standard images have a very restricted range of
@@ -3597,7 +3653,7 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
    {
       png_infop pi;
       png_structp pp = set_store_for_write(ps, &pi, name);
-      png_uint_32 h;
+      png_uint_32 h, w;
 
       /* In the event of a problem return control to the Catch statement below
        * to do the clean up - it is not possible to 'return' directly from a Try
@@ -3606,10 +3662,10 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
       if (pp == NULL)
          Throw ps;
 
+      w = transform_width(pp, colour_type, bit_depth);
       h = transform_height(pp, colour_type, bit_depth);
 
-      png_set_IHDR(pp, pi, transform_width(pp, colour_type, bit_depth), h,
-         bit_depth, colour_type, interlace_type,
+      png_set_IHDR(pp, pi, w, h, bit_depth, colour_type, interlace_type,
          PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
 #ifdef PNG_TEXT_SUPPORTED
@@ -3671,11 +3727,36 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
          {
             png_uint_32 y;
 
+            /* do_own_interlace is a pre-defined boolean (a #define) which is
+             * set if we have to work out the interlaced rows here.
+             */
             for (y=0; y<h; ++y)
             {
                png_byte buffer[TRANSFORM_ROWMAX];
 
                transform_row(pp, buffer, colour_type, bit_depth, y);
+
+#              if do_own_interlace
+                  /* If do_own_interlace *and* the image is interlaced we need a
+                   * reduced interlace row; this may be reduced to empty.
+                   */
+                  if (interlace_type == PNG_INTERLACE_ADAM7)
+                  {
+                     /* The row must not be written if it doesn't exist, notice
+                      * that there are two conditions here, either the row isn't
+                      * ever in the pass or the row would be but isn't wide
+                      * enough to contribute any pixels.  In fact the wPass test
+                      * can be used to skip the whole y loop in this case.
+                      */
+                     if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+                         PNG_PASS_COLS(w, pass) > 0)
+                        interlace_row(buffer, buffer,
+                              bit_size(pp, colour_type, bit_depth), w, pass);
+                     else
+                        continue;
+                  }
+#              endif /* do_own_interlace */
+
                png_write_row(pp, buffer);
             }
          }
@@ -3745,58 +3826,12 @@ make_transform_images(png_modifier *pm)
          char name[FILE_NAME_SIZE];
 
          standard_name(name, sizeof name, 0, colour_type, bit_depth,
-            palette_number, interlace_type, 0, 0, 0);
+            palette_number, interlace_type, 0, 0, do_own_interlace);
          make_transform_image(&pm->this, colour_type, bit_depth, palette_number,
             interlace_type, name);
       }
    }
 }
-
-/* The following two routines use the PNG interlace support macros from
- * png.h to interlace or deinterlace rows.
- */
-static void
-interlace_row(png_bytep buffer, png_const_bytep imageRow,
-   unsigned int pixel_size, png_uint_32 w, int pass)
-{
-   png_uint_32 xin, xout, xstep;
-
-   /* Note that this can, trivially, be optimized to a memcpy on pass 7, the
-    * code is presented this way to make it easier to understand.  In practice
-    * consult the code in the libpng source to see other ways of doing this.
-    */
-   xin = PNG_PASS_START_COL(pass);
-   xstep = 1U<<PNG_PASS_COL_SHIFT(pass);
-
-   for (xout=0; xin<w; xin+=xstep)
-   {
-      pixel_copy(buffer, xout, imageRow, xin, pixel_size);
-      ++xout;
-   }
-}
-
-#ifdef PNG_READ_SUPPORTED
-static void
-deinterlace_row(png_bytep buffer, png_const_bytep row,
-   unsigned int pixel_size, png_uint_32 w, int pass)
-{
-   /* The inverse of the above, 'row' is part of row 'y' of the output image,
-    * in 'buffer'.  The image is 'w' wide and this is pass 'pass', distribute
-    * the pixels of row into buffer and return the number written (to allow
-    * this to be checked).
-    */
-   png_uint_32 xin, xout, xstep;
-
-   xout = PNG_PASS_START_COL(pass);
-   xstep = 1U<<PNG_PASS_COL_SHIFT(pass);
-
-   for (xin=0; xout<w; xout+=xstep)
-   {
-      pixel_copy(buffer, xout, row, xin, pixel_size);
-      ++xin;
-   }
-}
-#endif /* PNG_READ_SUPPORTED */
 
 /* Build a single row for the 'size' test images; this fills in only the
  * first bit_width bits of the sample row.
@@ -4039,13 +4074,13 @@ make_size(png_store* const ps, png_byte const colour_type, int bdlo,
                width, height, 0);
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_NONE,
                width, height, 1);
-#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#        ifdef PNG_WRITE_INTERLACE_SUPPORTED
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 0);
 #        endif
 #        if CAN_WRITE_INTERLACE
             /* 1.7.0 removes the hack that prevented app write of an interlaced
-             * image if WRITE_INTERLACING was not supported
+             * image if WRITE_INTERLACE was not supported
              */
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 1);
@@ -4147,14 +4182,18 @@ make_error(png_store* const ps, png_byte const colour_type,
    {
       png_infop pi;
       const png_structp pp = set_store_for_write(ps, &pi, name);
+      png_uint_32 w, h;
       gnu_volatile(pp)
 
       if (pp == NULL)
          Throw ps;
 
-      png_set_IHDR(pp, pi, transform_width(pp, colour_type, bit_depth),
-         transform_height(pp, colour_type, bit_depth), bit_depth, colour_type,
-         interlace_type, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+      w = transform_width(pp, colour_type, bit_depth);
+      gnu_volatile(w)
+      h = transform_height(pp, colour_type, bit_depth);
+      gnu_volatile(h)
+      png_set_IHDR(pp, pi, w, h, bit_depth, colour_type, interlace_type,
+            PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
       if (colour_type == 3) /* palette */
          init_standard_palette(ps, pp, pi, 1U << bit_depth, 0/*do tRNS*/);
@@ -4206,7 +4245,6 @@ make_error(png_store* const ps, png_byte const colour_type,
 
       else
       {
-         png_uint_32 h = transform_height(pp, colour_type, bit_depth);
          int npasses = set_write_interlace_handling(pp, interlace_type);
          int pass;
 
@@ -4222,6 +4260,28 @@ make_error(png_store* const ps, png_byte const colour_type,
                png_byte buffer[TRANSFORM_ROWMAX];
 
                transform_row(pp, buffer, colour_type, bit_depth, y);
+
+#              if do_own_interlace
+                  /* If do_own_interlace *and* the image is interlaced we need a
+                   * reduced interlace row; this may be reduced to empty.
+                   */
+                  if (interlace_type == PNG_INTERLACE_ADAM7)
+                  {
+                     /* The row must not be written if it doesn't exist, notice
+                      * that there are two conditions here, either the row isn't
+                      * ever in the pass or the row would be but isn't wide
+                      * enough to contribute any pixels.  In fact the wPass test
+                      * can be used to skip the whole y loop in this case.
+                      */
+                     if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+                         PNG_PASS_COLS(w, pass) > 0)
+                        interlace_row(buffer, buffer,
+                              bit_size(pp, colour_type, bit_depth), w, pass);
+                     else
+                        continue;
+                  }
+#              endif /* do_own_interlace */
+
                png_write_row(pp, buffer);
             }
          }
@@ -4254,7 +4314,7 @@ make_errors(png_modifier* const pm, png_byte const colour_type,
          char name[FILE_NAME_SIZE];
 
          standard_name(name, sizeof name, 0, colour_type, 1<<bdlo, 0,
-            interlace_type, 0, 0, 0);
+            interlace_type, 0, 0, do_own_interlace);
 
          for (test=0; test<ARRAY_SIZE(error_test); ++test)
          {
@@ -5130,7 +5190,7 @@ standard_row_validate(standard_display *dp, png_const_structp pp,
          dp->bit_width)) != 0)
    {
       char msg[64];
-      sprintf(msg, "display  row[%lu][%d] changed from %.2x to %.2x",
+      sprintf(msg, "display row[%lu][%d] changed from %.2x to %.2x",
          (unsigned long)y, where-1, std[where-1],
          store_image_row(dp->ps, pp, iDisplay, y)[where-1]);
       png_error(pp, msg);
@@ -5396,7 +5456,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
 #     endif
 #     endif /* READ_DEINTERLACE */
 
-#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#     ifdef PNG_WRITE_INTERLACE_SUPPORTED
          /* Test the libpng write side against the pngvalid read side: */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 1/*do_interlace*/,
@@ -5407,7 +5467,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
 #     endif
 
 #     ifdef PNG_READ_DEINTERLACE_SUPPORTED
-#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+#     ifdef PNG_WRITE_INTERLACE_SUPPORTED
          /* Test both together: */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/,

@@ -339,13 +339,17 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
          if ((png_ptr->flags & PNG_FLAG_ZLIB_CUSTOM_STRATEGY) != 0)
             strategy = png_ptr->zlib_strategy;
-
-         else if (png_ptr->next_filter != PNG_FILTER_NONE)
-            strategy = PNG_Z_DEFAULT_STRATEGY;
-
          else
-#endif
-            strategy = PNG_Z_DEFAULT_NOFILTER_STRATEGY;
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
+
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+         if (png_ptr->filter_mask != PNG_FILTER_NONE)
+            strategy = PNG_Z_DEFAULT_STRATEGY;
+         else
+#endif /* WRITE_FILTER */
+
+         /* The default with no filters: */
+         strategy = PNG_Z_DEFAULT_NOFILTER_STRATEGY;
       }
 
       else
@@ -889,14 +893,14 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
 
 #  ifdef PNG_WRITE_FILTER_SUPPORTED
       /* TODO: review this setting */
-      if (png_ptr->next_filter == PNG_NO_FILTERS /* not yet set */)
+      if (png_ptr->filter_mask == PNG_NO_FILTERS /* not yet set */)
       {
          if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE ||
              png_ptr->bit_depth < 8)
-            png_ptr->next_filter = PNG_FILTER_NONE;
+            png_ptr->filter_mask = PNG_FILTER_NONE;
 
          else
-            png_ptr->next_filter = PNG_ALL_FILTERS;
+            png_ptr->filter_mask = PNG_ALL_FILTERS;
       }
 #  endif
 
@@ -1952,409 +1956,726 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
 }
 #endif
 
+static void
+write_filtered_row(png_structrp png_ptr, png_const_bytep filtered_row,
+   png_uint_32 row_bytes, png_byte filter /*if at start of row*/,
+   int end_of_image)
+{
+   /* This handles writing a row that has been filtered, or did not need to be
+    * filtered.  If the data row has a partial pixel it must have been handled
+    * correctly in the caller; filters generate a full 8 bits even if the pixel
+    * only has one significant bit!
+    */
+   debug(row_bytes > 0);
+
+   if (filter < PNG_FILTER_VALUE_LAST) /* start of row */
+   {
+      png_byte buffer[1];
+      
+      buffer[0] = filter;
+      png_compress_IDAT(png_ptr, buffer, 1U/*len*/, Z_NO_FLUSH);
+   }
+
+   png_compress_IDAT(png_ptr, filtered_row, row_bytes,
+         end_of_image ? Z_FINISH : Z_NO_FLUSH);
+}
+
+static void
+write_unfiltered_rowbits(png_structrp png_ptr, png_const_bytep filtered_row,
+   png_uint_32 row_bits, png_byte filter /*if at start of row*/,
+   int end_of_image)
+{
+   /* Same as above, but it correctly clears the unused bits in a partial
+    * byte.
+    */
+   const png_uint_32 row_bytes = row_bits >> 3;
+
+   debug(filter == PNG_FILTER_VALUE_NONE || filter == PNG_FILTER_VALUE_LAST);
+
+   if (row_bytes > 0U)
+   {
+      row_bits -= row_bytes << 3;
+      write_filtered_row(png_ptr, filtered_row, row_bytes, filter,
+            end_of_image && row_bits == 0U);
+      filter = PNG_FILTER_VALUE_LAST; /* written */
+   }
+
+   /* Handle a partial byte. */
+   if (row_bits > 0U)
+   {
+      png_byte buffer[1];
+
+      buffer[0] = PNG_BYTE(filtered_row[row_bytes] & ~(0xFFU >> row_bits));
+      write_filtered_row(png_ptr, buffer, 1U, filter, end_of_image);
+   }
+}
+
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+static void
+filter_block_singlebyte(png_alloc_size_t row_bytes, png_bytep sub_row,
+   png_bytep up_row, png_bytep avg_row, png_bytep paeth_row,
+   png_const_bytep row, png_const_bytep prev_row, png_bytep prev_pixels)
+{
+   /* Calculate rows for all four filters where the input has one byte per pixel
+    * (more accurately per filter-unit).
+    */
+   png_byte a = prev_pixels[0];
+   png_byte c = prev_pixels[1];
+
+   while (row_bytes-- > 0U)
+   {
+      const png_byte x = *row++;
+      const png_byte b = prev_row == NULL ? 0U : *prev_row++;
+
+      /* Calculate each filtered byte in turn: */
+      if (sub_row != NULL) *sub_row++ = 0xFFU & (x - a);
+      if (up_row != NULL) *up_row++ = 0xFFU & (x - b);
+      if (avg_row != NULL) *avg_row++ = 0xFFU & (x - (a+b)/2U);
+
+      /* Paeth is a little more difficult: */
+      if (paeth_row != NULL)
+      {
+         int pa = b-c;   /* a+b-c - a */
+         int pb = a-c;   /* a+b-c - b */
+         int pc = pa+pb; /* a+b-c - c = b-c + a-c */
+         png_byte p = a;
+
+         pa = abs(pa);
+         pb = abs(pb);
+         if (pa > pb) pa = pb, p = b;
+         if (pa > abs(pc)) p = c;
+
+         *paeth_row++ = 0xFFU & (x - p);
+      }
+
+      /* And set a and c for the next pixel: */
+      a = x;
+      c = b;
+   }
+
+   /* Store a and c for the next block: */
+   prev_pixels[0] = a;
+   prev_pixels[1] = c;
+}
+
+static void
+filter_block_multibyte(png_alloc_size_t row_bytes,
+   const unsigned int bpp, png_bytep sub_row, png_bytep up_row,
+   png_bytep avg_row, png_bytep paeth_row, png_const_bytep row,
+   png_const_bytep prev_row, png_bytep prev_pixels)
+{
+   /* Calculate rows for all four filters, the input is a block of bytes such
+    * that row_bytes is a multiple of bpp.  bpp can be 2, 3, 4, 6 or 8.
+    * prev_pixels will be updated to the last pixels processed.
+    */
+   while (row_bytes >= bpp)
+   {
+      unsigned int i;
+
+      for (i=0; i<bpp; ++i)
+      {
+         const png_byte a = prev_pixels[i];
+         const png_byte c = prev_pixels[i+bpp];
+         const png_byte b = prev_row == NULL ? 0U : *prev_row++;
+         const png_byte x = *row++;
+
+         /* Save for the next pixel: */
+         prev_pixels[i] = x;
+         prev_pixels[i+bpp] = b;
+
+         /* Calculate each filtered byte in turn: */
+         if (sub_row != NULL) *sub_row++ = 0xFFU & (x - a);
+         if (up_row != NULL) *up_row++ = 0xFFU & (x - b);
+         if (avg_row != NULL) *avg_row++ = 0xFFU & (x - (a+b)/2U);
+
+         /* Paeth is a little more difficult: */
+         if (paeth_row != NULL)
+         {
+            int pa = b-c;   /* a+b-c - a */
+            int pb = a-c;   /* a+b-c - b */
+            int pc = pa+pb; /* a+b-c - c = b-c + a-c */
+            png_byte p = a;
+
+            pa = abs(pa);
+            pb = abs(pb);
+            if (pa > pb) pa = pb, p = b;
+            if (pa > abs(pc)) p = c;
+
+            *paeth_row++ = 0xFFU & (x - p);
+         }
+      }
+
+      row_bytes -= i;
+   }
+}
+
+static void
+filter_row(png_structrp png_ptr, png_const_bytep prev_row,
+      png_bytep prev_pixels, png_const_bytep unfiltered_row,
+      const png_uint_32 row_bits, unsigned int bpp, unsigned int filters_to_try,
+      int start_of_row, int end_of_image)
+{
+   /* filters_to_try identifies a single filter and it is not PNG_FILTER_NONE.
+    */
+   png_uint_32 row_bytes = row_bits >> 3; /* complete bytes */
+   png_byte filter = PNG_FILTER_VALUE_LAST /* not at start */;
+   png_byte filtered_row[PNG_ROW_BUFFER_SIZE];
+
+   debug((row_bits % bpp) == 0U);
+
+   if (start_of_row) switch (filters_to_try)
+   {
+      case PNG_FILTER_SUB:   filter = PNG_FILTER_VALUE_SUB;   break;
+      case PNG_FILTER_UP:    filter = PNG_FILTER_VALUE_UP;    break;
+      case PNG_FILTER_AVG:   filter = PNG_FILTER_VALUE_AVG;   break;
+      case PNG_FILTER_PAETH: filter = PNG_FILTER_VALUE_PAETH; break;
+      default:
+         impossible("filter list");
+   }
+
+   if (bpp <= 8U)
+   {
+      /* There may be a partial byte at the end. */
+      if (row_bytes > 0)
+         filter_block_singlebyte(row_bytes,
+            filters_to_try & PNG_FILTER_SUB   ? filtered_row : NULL,
+            filters_to_try & PNG_FILTER_UP    ? filtered_row : NULL,
+            filters_to_try & PNG_FILTER_AVG   ? filtered_row : NULL,
+            filters_to_try & PNG_FILTER_PAETH ? filtered_row : NULL,
+            unfiltered_row, prev_row, prev_pixels);
+
+      /* The partial byte must be handled correctly here; both the previous row
+       * value and the current value need to have non-present bits cleared.
+       */
+      if ((row_bits & 7U) != 0)
+      {
+         const png_byte mask = PNG_BYTE(~(0xFFU >> (row_bits & 7U)));
+         png_byte buffer[2];
+
+         buffer[0] = unfiltered_row[row_bytes] & mask;
+
+         if (prev_row != NULL)
+            buffer[1U] = prev_row[row_bytes] & mask;
+
+         else
+            buffer[1U] = 0U;
+
+         filter_block_singlebyte(1U,
+            filters_to_try & PNG_FILTER_SUB   ? filtered_row+row_bytes : NULL,
+            filters_to_try & PNG_FILTER_UP    ? filtered_row+row_bytes : NULL,
+            filters_to_try & PNG_FILTER_AVG   ? filtered_row+row_bytes : NULL,
+            filters_to_try & PNG_FILTER_PAETH ? filtered_row+row_bytes : NULL,
+            buffer, buffer+1U, prev_pixels);
+
+         ++row_bytes; /* for write_filtered_row below */
+      }
+   }
+
+   else
+   {
+      debug((bpp & 7U) == 0U && row_bits == (row_bytes << 3));
+      filter_block_multibyte(row_bytes, bpp >> 3,
+            filters_to_try & PNG_FILTER_SUB   ? filtered_row : NULL,
+            filters_to_try & PNG_FILTER_UP    ? filtered_row : NULL,
+            filters_to_try & PNG_FILTER_AVG   ? filtered_row : NULL,
+            filters_to_try & PNG_FILTER_PAETH ? filtered_row : NULL,
+            unfiltered_row, prev_row, prev_pixels);
+   }
+
+   write_filtered_row(png_ptr, filtered_row, row_bytes, filter, end_of_image);
+}
+
+static void
+find_filter(png_structrp png_ptr, png_const_bytep prev_row,
+   png_bytep prev_pixels, png_const_bytep unfiltered_row,
+   png_uint_32 row_bits, unsigned int bpp, unsigned int filters_to_try,
+   int start_of_row, int end_of_image)
+{
+   /* filters_to_try identifies multiple filters, up to all five. */
+   /* TODO: reimplement this, currently this just selects the first filter */
+   filters_to_try &= -filters_to_try;
+   if (filters_to_try == PNG_FILTER_NONE)
+      write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
+            start_of_row ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST,
+            end_of_image);
+
+   else
+      filter_row(png_ptr, prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
+         filters_to_try & -filters_to_try, start_of_row, end_of_image);
+}
+
 /* This filters the row, chooses which filter to use, if it has not already
  * been specified by the application, and then writes the row out with the
  * chosen filter.
  */
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-static png_size_t /* PRIVATE */
-png_setup_sub_row(const int bpp/*BYTES per pixel*/,
-   const png_alloc_size_t row_bytes, const png_size_t lmins, png_const_bytep rp,
-   png_bytep dp)
+unsigned int /* PRIVATE */
+png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
+      png_const_bytep unfiltered_row, png_uint_32 x,
+      png_uint_32 width/*pixels*/, int first_row_in_pass, int last_pass_row,
+      unsigned int filters_to_try, int end_of_image)
 {
-   png_size_t sum = 0;
+   png_bytep prev_row = png_ptr->row_buffer;
+   const unsigned int bpp = png_ptr->row_output_pixel_depth;
+   const png_uint_32 row_bits = width * bpp;
 
-   /* Advance one pixel, or one byte, whichever is greater: */
+   /* These invariants are expected from the caller: */
+   affirm(width < 65536U && bpp <= 64U && row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
+
+   if (x == 0U) /* start of row */
    {
-      int i;
+      /* Delaying initialization of the filter stuff. */
+      if (png_ptr->filter_mask == 0U)
+         png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, PNG_ALL_FILTERS);
 
-      for (i = 0; i < bpp; i++, rp++, dp++)
+      /* Now work out the filters to try for this row: */
+      filters_to_try = png_ptr->filter_mask; /* else caller must preserve */
+
+      /* If this has a previous row filter in the set to try ensure the row
+       * buffer exists and ensure it is empty when first allocated and at
+       * the start of the pass.
+       */
+      if ((filters_to_try & (PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH))
+            != 0U)
       {
-         int v = *dp = *rp;
-         sum += (v < 128) ? v : 256 - v;
-      }
-   }
-
-   /* Do the 'sub' filter on the corresponding preceding byte: */
-   {
-      png_alloc_size_t i;
-
-      for (i = bpp; i < row_bytes; i++, rp++, dp++)
-      {
-         int v = *dp = PNG_BYTE(rp[0] - rp[-bpp]);
-
-         if (lmins)
+         if (prev_row == NULL)
          {
-            sum += (v < 128) ? v : 256 - v;
+            /* Just allocate for the total output row bytes; a three-row
+             * interlaced image requires less, but this is safe.
+             */
+            prev_row = png_voidcast(png_bytep, png_malloc(png_ptr,
+                     png_calc_rowbytes(png_ptr, bpp, png_ptr->width)));
+            png_ptr->row_buffer = prev_row;
 
-            if (sum > lmins)  /* We are already worse, don't continue. */
-              break;
+            /* If that buffer would have been required for this row issue an
+             * app warning and disable the filters that would have required
+             * the data.
+             */
+            if (!first_row_in_pass)
+            {
+               png_app_warning(png_ptr, "Previous row filters ignored");
+               /* And always turn off the filters, to prevent using
+                * uninitialized data.
+                */
+               filters_to_try &= PNG_BIC_MASK(
+                     PNG_FILTER_UP|PNG_FILTER_AVG|PNG_FILTER_PAETH);
+
+               if (filters_to_try == 0U)
+                  filters_to_try = PNG_FILTER_NONE;
+            }
          }
       }
-   }
 
-   return sum;
-}
-
-static png_size_t /* PRIVATE */
-png_setup_up_row(const png_alloc_size_t row_bytes, const png_size_t lmins,
-   png_const_bytep rp, png_const_bytep pp, png_bytep dp)
-{
-   png_alloc_size_t i;
-   png_size_t sum = 0;
-
-   for (i = 0; i < row_bytes; i++, rp++, pp++, dp++)
-   {
-      int v = *dp = PNG_BYTE(*rp - *pp);
-
-      if (lmins)
+      /* The filters are pre-calculated in png_set_filter, however if the
+       * image is interlaced some passes may still be too narrow or short to
+       * allow certain filters.  In any case the first row of the pass
+       * doesn't need to consider PAETH or UP (AVG is still different).
+       */
+      if (first_row_in_pass)
       {
-         sum += (v < 128) ? v : 256 - v;
-
-         if (sum > lmins)  /* We are already worse, don't continue. */
-           break;
-      }
-   }
-
-   return sum;
-}
-
-static png_size_t /* PRIVATE */
-png_setup_avg_row(const int bpp, const png_alloc_size_t row_bytes,
-   const png_size_t lmins, png_const_bytep rp, png_const_bytep pp, png_bytep dp)
-{
-   png_size_t sum = 0;
-
-   {
-      int i;
-
-      for (i = 0; i < bpp; i++, rp++, pp++, dp++)
-      {
-         unsigned int v = *dp = PNG_BYTE(*rp - *pp / 2);
-         sum += (v < 128) ? v : 256 - v;
-      }
-   }
-
-   {
-      png_alloc_size_t i;
-
-      for (i = bpp; i < row_bytes; i++, rp++, pp++, dp++)
-      {
-         unsigned int v = *dp = PNG_BYTE(rp[0] - (*pp + rp[-bpp]) / 2);
-
-         if (lmins)
+         if ((filters_to_try & PNG_FILTER_UP) != 0U)
          {
-            sum += (v < 128) ? v : 256 - v;
-
-            if (sum > lmins)  /* We are already worse, don't continue. */
-              break;
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
+            filters_to_try |= PNG_FILTER_NONE;
          }
-      }
-   }
 
-   return sum;
-}
+         if ((filters_to_try & PNG_FILTER_PAETH) != 0U)
+         {
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_PAETH);
+            filters_to_try |= PNG_FILTER_SUB/*equialent to PAETH here*/;
+         }
 
-static png_size_t /* PRIVATE */
-png_setup_paeth_row(const int bpp, const png_alloc_size_t row_bytes,
-   const png_size_t lmins, png_const_bytep rp, png_const_bytep pp, png_bytep dp)
-{
-   png_size_t sum = 0;
-
-   {
-      int i;
-
-      for (i = 0; i < bpp; i++, dp++, rp++, pp++)
-      {
-         int v = *dp = PNG_BYTE(*rp - *pp); /* UP for the first pixel */
-         sum += (v < 128) ? v : 256 - v;
-      }
-   }
-
-   {
-      png_alloc_size_t i;
-
-      for (i = bpp; i < row_bytes; i++, pp++, rp++, dp++)
-      {
-         int a, b, c, pa, pb, pc, p, v;
-
-         b = pp[0];
-         c = pp[-bpp];
-         a = rp[-bpp];
-
-         p = b - c;
-         pc = a - c;
-
-#ifdef PNG_USE_ABS
-         pa = abs(p);
-         pb = abs(pc);
-         pc = abs(p + pc);
-#else
-         pa = p < 0 ? -p : p;
-         pb = pc < 0 ? -pc : pc;
-         pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+#if 0
+         /* If this leaves the AVG filter it will be used on the first row
+          * this is handled in the filter implementation by setting prev_row
+          * to NULL below.
+          */
+#else /* DOESN'T WORK (problems in the read code?) */
+         if ((filters_to_try & PNG_FILTER_AVG) != 0U)
+         {
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_AVG);
+            filters_to_try |= PNG_FILTER_NONE;
+         }
 #endif
+      }
 
-         p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
-         v = *dp = PNG_BYTE(*rp - p);
-
-         if (lmins)
+      /* Check for a narrow image; the blocking will never return just one
+       * pixel at the start unless the pass is only one pixel wide, this test
+       * needs to happen after the one above on PAETH:
+       */
+      if (width == 1U)
+      {
+         if ((filters_to_try & PNG_FILTER_SUB) != 0U)
          {
-            sum += (v < 128) ? v : 256 - v;
-
-            if (sum > lmins)  /* We are already worse, don't continue. */
-              break;
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_SUB);
+            filters_to_try |= PNG_FILTER_NONE;
          }
       }
+   } /* start of row */
+
+   else if (prev_row != NULL)
+   {
+      /* Advance prev_row to the corresponding pixel above row[x], must use
+       * png_calc_rowbytes here otherwise the calculation using x might
+       * overflow.
+       */
+      debug(((x * bpp) & 7U) == 0U);
+      prev_row += png_calc_rowbytes(png_ptr, bpp, x);
    }
 
-   return sum;
+   /* Now choose the correct filter implementation according to the number of
+    * filters in the filters_to_try list.  The prev_row parameter is made NULL
+    * on the first row because it is uninitialized at that point.
+    */
+   if (filters_to_try == PNG_FILTER_NONE)
+      write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
+            x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST,
+            end_of_image);
+
+   else if ((filters_to_try & -filters_to_try) == filters_to_try) /* 1 filter */
+      filter_row(png_ptr, first_row_in_pass ? NULL : prev_row,
+            prev_pixels, unfiltered_row, row_bits, bpp, filters_to_try, x == 0,
+            end_of_image);
+
+   else
+      find_filter(png_ptr, first_row_in_pass ? NULL : prev_row,
+            prev_pixels, unfiltered_row, row_bits, bpp, filters_to_try, x == 0,
+            end_of_image);
+
+   /* Copy the current row into the previous row buffer, if available, unless
+    * this is the last row in the pass, when there is no point.  Note that
+    * prev_row may have garbage in a partial byte at the end.
+    */
+   if (prev_row != NULL && !last_pass_row)
+      memcpy(prev_row, unfiltered_row, (row_bits + 7U) >> 3);
+
+   return filters_to_try;
 }
 
-static png_bytep
-test_buffer(png_structrp png_ptr, png_const_bytep in_use)
-   /* Return an output row sized buffer from the two available, but never the
-    * one pointed to by 'in_use'.  Dynamically allocates buffers as required.
-    * The buffers are always big enough for a full output row because they are
-    * retained until the whole image has been written.
-    */
+/* Allow the application to select one or more row filters to use. */
+void PNGAPI
+png_set_filter(png_structrp png_ptr, int method, int filtersIn)
 {
-   int n = 0;
-   png_bytep p = png_ptr->write_row[n];
+   unsigned int filters;
 
-   debug(in_use != NULL);
+   png_debug(1, "in png_set_filter");
 
-   if (p == in_use)
-      p = png_ptr->write_row[++n];
+   if (png_ptr == NULL)
+      return;
 
-   if (p == NULL)
-      png_ptr->write_row[n] = p = png_voidcast(png_bytep, png_malloc(png_ptr,
-            PNG_ROWBYTES(PNG_PIXEL_DEPTH(*png_ptr), png_ptr->width)));
+   if (png_ptr->read_struct)
+   {
+      png_app_error(png_ptr, "png_set_filter: cannot be used when reading");
+      return;
+   }
 
-   return p;
+   if (method != png_ptr->filter_method)
+   {
+      png_app_error(png_ptr, "png_set_filter: method does not match IHDR");
+      return;
+   }
+
+   /* PNG and MNG use the same base adaptive filter types: */
+   if (method != PNG_FILTER_TYPE_BASE && method != PNG_INTRAPIXEL_DIFFERENCING)
+   {
+      png_app_error(png_ptr, "png_set_filter: unsupported method");
+      return;
+   }
+
+   /* Notice that PNG_NO_FILTERS is 0 and passes this test; this is OK
+    * because filters then gets set to PNG_FILTER_NONE, as is required.
+    */
+   if (filtersIn >= 0 && filtersIn < PNG_FILTER_VALUE_LAST)
+      filters = 8U << filtersIn;
+
+   else if ((filtersIn & PNG_BIC_MASK(PNG_ALL_FILTERS)) == 0)
+      filters = filtersIn & PNG_ALL_FILTERS;
+
+   else
+   {
+      png_app_error(png_ptr, "png_set_filter: invalid filters mask/value");
+
+      /* Prior to 1.7.0 this ignored the error and just used the bits that
+       * are present, now it does nothing; this seems a lot safer.
+       */
+      return;
+   }
+
+   /* New in 1.7.0: adjust the mask according to the image characteristics.
+    * This used to happen on every row, doing it here means that these checks
+    * happen only once every png_set_filter call, or once per image.
+    */
+   if (filters != PNG_FILTER_NONE)
+   {
+      /* Test to see if there are enough rows to allow previous-row filters to
+       * work.  Note that the AVG filter is still significant because it uses
+       * half the value of the previous pixel as the predictor, but it is
+       * ignored in this case.
+       */
+      if (png_ptr->height <= (png_ptr->interlaced == PNG_INTERLACE_NONE ? 1U :
+               (png_ptr->width == 1U ? 3U : 2U)))
+      {
+         /* Replace 'up' by the equivalent 'none': */
+         if ((filters & (PNG_FILTER_UP)) != 0)
+         {
+            filters &= PNG_BIC_MASK(PNG_FILTER_UP);
+            filters |= PNG_FILTER_NONE;
+         }
+
+         /* Replace 'paeth' by the equivalent 'sub': */
+         if ((filters & PNG_FILTER_PAETH) != 0)
+         {
+            filters &= PNG_BIC_MASK(PNG_FILTER_PAETH);
+            filters |= PNG_FILTER_SUB;
+         }
+
+         /* Remove 'avg' unless it is the only filter in which case 'none' is
+          * used.  (This chooses compression speed of very short images over a
+          * probably pointless compression option for a one line image; short
+          * images are common, the sub-case which benefits from AVG is not.
+          */
+         if ((filters & PNG_FILTER_AVG) != 0)
+         {
+            filters &= PNG_BIC_MASK(PNG_FILTER_AVG);
+            if (filters == 0U)
+               filters |= PNG_FILTER_NONE;
+         }
+      }
+
+      /* Also check for SUB on narrow images; it's equivalent to NONE on the
+       * first pixel.
+       */
+      if (png_ptr->width <= (png_ptr->interlaced == PNG_INTERLACE_NONE ? 1U :
+               (png_ptr->height == 1U ? 3U : 1U)))
+      {
+         if ((filters & PNG_FILTER_SUB) != 0)
+         {
+            filters &= PNG_BIC_MASK(PNG_FILTER_SUB);
+            filters |= PNG_FILTER_NONE;
+         }
+      }
+   }
+
+   debug(filters != 0U && (filters & PNG_BIC_MASK(PNG_ALL_FILTERS)) == 0U);
+
+   png_ptr->filter_mask = png_check_bits(png_ptr, filters, 8);
 }
-
-png_const_bytep /* PRIVATE */
-png_write_filter_row(png_structrp png_ptr, png_const_bytep row_buf,
-   int first_pass_row, png_const_bytep prev_row, png_alloc_size_t row_bytes,
-   unsigned int bpp, png_bytep filter_byte)
+#else /* !WRITE_FILTER */
+unsigned int /* PRIVATE */
+png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
+      png_const_bytep unfiltered_row, png_uint_32 x,
+      png_uint_32 width/*pixels*/, int first_row_in_pass, int last_pass_row,
+      unsigned int filters_to_try/*from previous call*/, int end_of_image)
 {
-   png_const_bytep best_row;
-   png_size_t mins;
-   unsigned int filter_to_do = png_ptr->next_filter;
-   png_byte best_filter;
+   const unsigned int bpp = png_ptr->row_output_pixel_depth;
+   png_uint_32 row_bits;
 
-   png_debug(1, "in png_write_find_filter");
+   row_bits = width;
+   row_bits *= bpp;
+   /* These invariants are expected from the caller: */
+   affirm(width < 65536U && bpp <= 64U && row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
 
-   /* API CHANGE: 1.7.0: previously it was possible to select AVG, PAETH and UP
-    * on the first row, but this complicates the code.  In practice with the
-    * default settings only AVG was tried because 'UP' is the same as 'NONE' and
-    * 'PAETH' is the same as 'SUB'
-    *
-    * There are two cases; the row at the start of pass and the case where
-    * the application set the filters so that libpng did not save the
-    * previous row.  The first case switches the filters, the second just
-    * clears them from the list.
-    */
-   if (first_pass_row)
-   {
-      if (filter_to_do & PNG_FILTER_UP) filter_to_do |= PNG_FILTER_NONE;
-      if (filter_to_do & PNG_FILTER_PAETH) filter_to_do |= PNG_FILTER_SUB;
-      /* AVG not handled */
-   }
+   write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
+         x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST, end_of_image);
 
-   if (first_pass_row || prev_row == NULL)
-      filter_to_do &=
-         PNG_BIC_MASK(PNG_FILTER_UP+PNG_FILTER_AVG+PNG_FILTER_PAETH);
+   return filters_to_try;
 
-   /* A second optimization is possible for narrow images.  If an interlaced
-    * image is 5-12 pixels wide pass 2 will have only one column.  1bpp
-    * grayscale images 8 pixels or less wide only have one byte per row (and the
-    * filter acts on the bytes for low bit depth images.)  1bpp grayscale
-    * interlaced images will only have 1 byte in early passes (1 and 2) when the
-    * image is 64 or fewer pixels wide.  In these cases the 'SUB' filter reduces
-    * to 'NONE'
-    */
-   if (row_bytes <= bpp && (filter_to_do & PNG_FILTER_SUB) != 0)
-   {
-      filter_to_do |= PNG_FILTER_NONE;
-      filter_to_do &= PNG_BIC_MASK(PNG_FILTER_SUB);
-   }
-
-   mins = PNG_SIZE_MAX - 256/* so we can detect potential overflow of the
-                               running sum */;
-
-   /* The prediction method we use is to find which method provides the
-    * smallest value when summing the absolute values of the distances
-    * from zero, using anything >= 128 as negative numbers.  This is known
-    * as the "minimum sum of absolute differences" heuristic.  Other
-    * heuristics are the "weighted minimum sum of absolute differences"
-    * (experimental and can in theory improve compression), and the "zlib
-    * predictive" method (not implemented yet), which does test compressions
-    * of lines using different filter methods, and then chooses the
-    * (series of) filter(s) that give minimum compressed data size (VERY
-    * computationally expensive).
-    *
-    * GRR 980525:  consider also
-    *
-    *   (1) minimum sum of absolute differences from running average (i.e.,
-    *       keep running sum of non-absolute differences & count of bytes)
-    *       [track dispersion, too?  restart average if dispersion too large?]
-    *
-    *  (1b) minimum sum of absolute differences from sliding average, probably
-    *       with window size <= deflate window (usually 32K)
-    *
-    *   (2) minimum sum of squared differences from zero or running average
-    *       (i.e., ~ root-mean-square approach)
-    */
-
-   /* We don't need to test the 'no filter' case if this is the only filter
-    * that has been chosen, as it doesn't actually do anything to the data.
-    */
-   if (filter_to_do <= PNG_FILTER_NONE) /* no filters to chose from */
-   {
-      *filter_byte = PNG_FILTER_VALUE_NONE;
-      return row_buf;
-   }
-
-   best_row = row_buf;
-   best_filter = PNG_FILTER_VALUE_NONE;
-
-   /* TODO: make this into a loop to avoid all the code replication */
-   if ((filter_to_do & PNG_FILTER_NONE) != 0)
-   {
-      png_const_bytep rp;
-      png_size_t sum = 0;
-      png_size_t i;
-      int v;
-
-      if (PNG_SIZE_MAX/128 <= row_bytes)
-      {
-         for (i = 0, rp = row_buf; i < row_bytes; i++, rp++)
-         {
-            /* Check for overflow */
-            if (sum > PNG_SIZE_MAX/128 - 256)
-               break;
-
-            v = *rp;
-            sum += (v < 128) ? v : 256 - v;
-         }
-      }
-      else /* Overflow is not possible */
-      {
-         for (i = 0, rp = row_buf; i < row_bytes; i++, rp++)
-         {
-            v = *rp;
-            sum += (v < 128) ? v : 256 - v;
-         }
-      }
-
-      mins = sum;
-   }
-
-   /* Sub filter */
-   if (filter_to_do == PNG_FILTER_SUB)
-   /* It's the only filter so no testing is needed */
-   {
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-      (void)png_setup_sub_row(bpp, row_bytes, 0, row_buf, tst_row);
-      best_row = tst_row;
-      best_filter = PNG_FILTER_VALUE_SUB;
-   }
-
-   else if ((filter_to_do & PNG_FILTER_SUB) != 0)
-   {
-      png_size_t sum;
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-
-      sum = png_setup_sub_row(bpp, row_bytes, mins, row_buf, tst_row);
-
-      if (sum < mins)
-      {
-         mins = sum;
-         best_row = tst_row;
-         best_filter = PNG_FILTER_VALUE_SUB;
-      }
-   }
-
-   /* Up filter */
-   if (filter_to_do == PNG_FILTER_UP)
-   {
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-      (void)png_setup_up_row(row_bytes, 0, row_buf, prev_row, tst_row);
-      best_row = tst_row;
-      best_filter = PNG_FILTER_VALUE_UP;
-   }
-
-   else if ((filter_to_do & PNG_FILTER_UP) != 0)
-   {
-      png_size_t sum;
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-
-      sum = png_setup_up_row(row_bytes, mins, row_buf, prev_row, tst_row);
-
-      if (sum < mins)
-      {
-         mins = sum;
-         best_row = tst_row;
-         best_filter = PNG_FILTER_VALUE_UP;
-      }
-   }
-
-   /* Avg filter */
-   if (filter_to_do == PNG_FILTER_AVG)
-   {
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-      (void)png_setup_avg_row(bpp, row_bytes, 0, row_buf, prev_row, tst_row);
-      best_row = tst_row;
-      best_filter = PNG_FILTER_VALUE_AVG;
-   }
-
-   else if ((filter_to_do & PNG_FILTER_AVG) != 0)
-   {
-      png_size_t sum;
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-
-      sum = png_setup_avg_row(bpp, row_bytes, mins, row_buf, prev_row,
-         tst_row);
-
-      if (sum < mins)
-      {
-         mins = sum;
-         best_row = tst_row;
-         best_filter = PNG_FILTER_VALUE_AVG;
-      }
-   }
-
-   /* Paeth filter */
-   if (filter_to_do == PNG_FILTER_PAETH)
-   {
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-      (void)png_setup_paeth_row(bpp, row_bytes, 0, row_buf, prev_row, tst_row);
-      best_row = tst_row;
-      best_filter = PNG_FILTER_VALUE_PAETH;
-   }
-
-   else if ((filter_to_do & PNG_FILTER_PAETH) != 0)
-   {
-      png_size_t sum;
-      png_bytep tst_row = test_buffer(png_ptr, best_row);
-
-      sum = png_setup_paeth_row(bpp, row_bytes, mins, row_buf, prev_row,
-         tst_row);
-
-      if (sum < mins)
-      {
-         mins = sum;
-         best_row = tst_row;
-         best_filter = PNG_FILTER_VALUE_PAETH;
-      }
-   }
-
-   /* Do the actual writing of the filtered row data from the chosen filter. */
-   affirm(best_filter < PNG_FILTER_VALUE_LAST);
-   *filter_byte = best_filter;
-   return best_row;
+   PNG_UNUSED(first_row_in_pass);
+   PNG_UNUSED(prev_pixels);
+   PNG_UNUSED(last_pass_row);
 }
-#endif /* WRITE_FILTER */
+#endif /* !WRITE_FILTER */
+
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED      /* GRR 970116 */
+/* Legacy API that weighted the filter metric by the number of times it had been
+ * used before.
+ */
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+PNG_FUNCTION(void,PNGAPI
+png_set_filter_heuristics,(png_structrp png_ptr, int heuristic_method,
+    int num_weights, png_const_doublep filter_weights,
+    png_const_doublep filter_costs),PNG_DEPRECATED)
+{
+   png_app_warning(png_ptr, "weighted filter heuristics not implemented");
+   PNG_UNUSED(heuristic_method)
+   PNG_UNUSED(num_weights)
+   PNG_UNUSED(filter_weights)
+   PNG_UNUSED(filter_costs)
+}
+#endif /* FLOATING_POINT */
+
+#ifdef PNG_FIXED_POINT_SUPPORTED
+PNG_FUNCTION(void,PNGAPI
+png_set_filter_heuristics_fixed,(png_structrp png_ptr, int heuristic_method,
+    int num_weights, png_const_fixed_point_p filter_weights,
+    png_const_fixed_point_p filter_costs),PNG_DEPRECATED)
+{
+   png_app_warning(png_ptr, "weighted filter heuristics not implemented");
+   PNG_UNUSED(heuristic_method)
+   PNG_UNUSED(num_weights)
+   PNG_UNUSED(filter_weights)
+   PNG_UNUSED(filter_costs)
+}
+#endif /* FIXED_POINT */
+#endif /* WRITE_WEIGHTED_FILTER */
+
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
+void PNGAPI
+png_set_compression_level(png_structrp png_ptr, int level)
+{
+   png_debug(1, "in png_set_compression_level");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->zlib_level = level;
+}
+
+void PNGAPI
+png_set_compression_mem_level(png_structrp png_ptr, int mem_level)
+{
+   png_debug(1, "in png_set_compression_mem_level");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->zlib_mem_level = mem_level;
+}
+
+void PNGAPI
+png_set_compression_strategy(png_structrp png_ptr, int strategy)
+{
+   png_debug(1, "in png_set_compression_strategy");
+
+   if (png_ptr == NULL)
+      return;
+
+   /* The flag setting here prevents the libpng dynamic selection of strategy.
+    */
+   png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
+   png_ptr->zlib_strategy = strategy;
+}
+
+/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
+ * smaller value of window_bits if it can do so safely.
+ */
+void PNGAPI
+png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
+{
+   if (png_ptr == NULL)
+      return;
+
+   /* Prior to 1.6.0 this would warn but then set the window_bits value. This
+    * meant that negative window bits values could be selected that would cause
+    * libpng to write a non-standard PNG file with raw deflate or gzip
+    * compressed IDAT or ancillary chunks.  Such files can be read and there is
+    * no warning on read, so this seems like a very bad idea.
+    */
+   if (window_bits > 15)
+   {
+      png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
+      window_bits = 15;
+   }
+
+   else if (window_bits < 8)
+   {
+      png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
+      window_bits = 8;
+   }
+
+   png_ptr->zlib_window_bits = window_bits;
+}
+
+void PNGAPI
+png_set_compression_method(png_structrp png_ptr, int method)
+{
+   png_debug(1, "in png_set_compression_method");
+
+   if (png_ptr == NULL)
+      return;
+
+   /* This would produce an invalid PNG file if it worked, but it doesn't and
+    * deflate will fault it, so it is harmless to just warn here.
+    */
+   if (method != 8)
+      png_warning(png_ptr, "Only compression method 8 is supported by PNG");
+
+   png_ptr->zlib_method = method;
+}
+#endif /* WRITE_CUSTOMIZE_COMPRESSION */
+
+/* The following were added to libpng-1.5.4 */
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+void PNGAPI
+png_set_text_compression_level(png_structrp png_ptr, int level)
+{
+   png_debug(1, "in png_set_text_compression_level");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->zlib_text_level = level;
+}
+
+void PNGAPI
+png_set_text_compression_mem_level(png_structrp png_ptr, int mem_level)
+{
+   png_debug(1, "in png_set_text_compression_mem_level");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->zlib_text_mem_level = mem_level;
+}
+
+void PNGAPI
+png_set_text_compression_strategy(png_structrp png_ptr, int strategy)
+{
+   png_debug(1, "in png_set_text_compression_strategy");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->zlib_text_strategy = strategy;
+}
+
+/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
+ * smaller value of window_bits if it can do so safely.
+ */
+void PNGAPI
+png_set_text_compression_window_bits(png_structrp png_ptr, int window_bits)
+{
+   if (png_ptr == NULL)
+      return;
+
+   if (window_bits > 15)
+   {
+      png_warning(png_ptr, "Only compression windows <= 32k supported by PNG");
+      window_bits = 15;
+   }
+
+   else if (window_bits < 8)
+   {
+      png_warning(png_ptr, "Only compression windows >= 256 supported by PNG");
+      window_bits = 8;
+   }
+
+   png_ptr->zlib_text_window_bits = window_bits;
+}
+
+void PNGAPI
+png_set_text_compression_method(png_structrp png_ptr, int method)
+{
+   png_debug(1, "in png_set_text_compression_method");
+
+   if (png_ptr == NULL)
+      return;
+
+   if (method != 8)
+      png_warning(png_ptr, "Only compression method 8 is supported by PNG");
+
+   png_ptr->zlib_text_method = method;
+}
+#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+/* end of API added to libpng-1.5.4 */
+
 #endif /* WRITE */

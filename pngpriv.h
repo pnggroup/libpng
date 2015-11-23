@@ -556,6 +556,47 @@
 #  define png_isaligned(ptr, type) 0
 #endif
 
+/* Buffer alignment control.  These #defines control how the buffers used during
+ * read are aligned and how big they are.
+ */
+#ifndef PNG_ROW_BUFFER_ALIGN_TYPE
+   /* The absolute minimum alignment for a row buffer is that required for
+    * png_uint_32 direct access.  The #define is of a legal C type that can be
+    * used as the type in the definition of the first member of a C union; give
+    * a typedef name if in doubt.
+    */
+#  define PNG_ROW_BUFFER_ALIGN_TYPE png_uint_32
+#endif /* !ROW_BUFFER_ALIGN_TYPE */
+#ifndef PNG_ROW_BUFFER_BYTE_ALIGN
+   /* This is the minimum size in bytes of the buffer used while processing
+    * parts of row.  Except at the end of the row pixels will always be
+    * processed in blocks such that the block size is a multiple of this number
+    */
+#  define PNG_ROW_BUFFER_BYTE_ALIGN\
+   ((unsigned int)/*SAFE*/(sizeof (PNG_ROW_BUFFER_ALIGN_TYPE)))
+#endif /* !ROW_BUFFER_BYTE_ALIGN */
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
+#  define PNG_MAX_PIXEL_BYTES 16U /* 4x32-bit channels */
+#else /* !READ_USER_TRANSFORM */
+#  define PNG_MAX_PIXEL_BYTES  8U /* 4x16-bit channels */
+#endif /* !READ_USER_TRANSFORM */
+/* PNG_ROW_BUFFER_SIZE is a compile time constant for the size of the row
+ * buffer.  The minimum size of 2048 bytes is intended to allow the buffer to
+ * hold a complete 256 entry color map of 64-bit (8-byte) pixels.  This is a
+ * requirement at some points of the colormap handling code.
+ *
+ * The maximum size is intended to allow (unsigned int) indexing of the buffer,
+ * it only affects systems with a 16-bit unsigned value where it limits the
+ * maximum to 4096 bytes.
+ */
+#define PNG_MIN_ROW_BUFFER_SIZE\
+   (PNG_MAX_PIXEL_BYTES * PNG_ROW_BUFFER_BYTE_ALIGN * 8U)
+#define PNG_MAX_ROW_BUFFER_SIZE ((UINT_MAX / 16U) + 1U)
+#ifndef PNG_ROW_BUFFER_SIZE
+#  define PNG_ROW_BUFFER_SIZE\
+   (PNG_MIN_ROW_BUFFER_SIZE < 2048U ? 2048U : PNG_MIN_ROW_BUFFER_SIZE)
+#endif /* ROW_BUFFER_SIZE */
+
 /* End of memory model/platform independent support */
 /* End of 1.5.0beta36 move from pngconf.h */
 
@@ -892,9 +933,23 @@ PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
 /* Safe calculation of a rowbytes value; does a png_error if the system limits
  * are exceeded.
  */
-png_alloc_size_t /* PRIVATE */
-png_calc_rowbytes(png_const_structrp png_ptr, unsigned int pixel_depth,
-   png_uint_32 row_width);
+PNG_INTERNAL_FUNCTION(png_alloc_size_t,png_calc_rowbytes,
+   (png_const_structrp png_ptr, unsigned int pixel_depth,
+    png_uint_32 row_width),PNG_EMPTY);
+
+/* Common code to calculate the maximum number of pixels to transform or filter
+ * at one time; controlled by PNG_ROW_BUFFER_SIZE above:
+ */
+PNG_INTERNAL_FUNCTION(unsigned int,png_max_pixel_block,
+      (png_const_structrp png_ptr),PNG_EMPTY);
+
+/* Copy the row in row_buffer; this is the non-interlaced copy used in both
+ * the read and write code.
+ */
+PNG_INTERNAL_FUNCTION(void, png_copy_row,(png_const_structrp png_ptr,
+   png_bytep dp, png_const_bytep sp, png_uint_32 x/*in INPUT*/,
+   png_uint_32 width/*of INPUT*/, unsigned int pixel_depth,
+   int clear/*clear the final byte*/),PNG_EMPTY);
 
 /* Zlib support */
 #define PNG_UNEXPECTED_ZLIB_RETURN (-7)
@@ -1149,33 +1204,21 @@ PNG_INTERNAL_FUNCTION(void,png_write_sCAL_s,(png_structrp png_ptr,
     int unit, png_const_charp width, png_const_charp height),PNG_EMPTY);
 #endif
 
-PNG_INTERNAL_FUNCTION(void,png_copy_row,(png_const_structrp png_ptr,
-   png_bytep dp),PNG_EMPTY);
-   /* Copy the row in row_buffer; this is the 'simple' case of png_combine_row
-    * where no adjustment to the pixel spacing is required.
-    */
-
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_combine_row,(png_const_structrp png_ptr,
-    png_bytep row, int display),PNG_EMPTY);
-#endif /* READ_DEINTERLACE */
-
-/* GRR TO DO (2.0 or whenever):  simplify other internal calling interfaces */
-
-#ifdef PNG_WRITE_INTERLACING_SUPPORTED
-/* Turn on write interlacing */
-PNG_INTERNAL_FUNCTION(void,png_set_write_interlace,(png_structrp),PNG_EMPTY);
-#endif
-
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-/* Choose the best filter to use and filter the row data returning a buffer to
- * the result and filling in 'filter_byte' appropriately.
+/* Choose the best filter to use and filter the row data then write it out.  If
+ * WRITE_FILTERING is not supported this just writes the data out with a zero
+ * (NONE) filter byte.
+ *
+ * This may be called multiple times per row, but calls must be in 'x' order;
+ * first a call with x 0 to mark the start of the row and, at the end, one with
+ * 'end_of_row' set (this can be done in the same function call if the whole row
+ * is passed.)
  */
-PNG_INTERNAL_FUNCTION(png_const_bytep,png_write_filter_row,
-   (png_structrp png_ptr, png_const_bytep unfiltered_row, int first_pass_row,
-    png_const_bytep previous_row, png_alloc_size_t rowbytes, unsigned int bpp,
-    png_bytep filter_byte),PNG_EMPTY);
-#endif
+PNG_INTERNAL_FUNCTION(unsigned int, png_write_filter_row,
+   (png_structrp png_ptr, png_bytep prev_pixels, png_const_bytep unfiltered_row,
+    png_uint_32 x, png_uint_32 width/*pixels*/, int first_row_in_pass,
+    int last_pass_row, unsigned int filters_to_try/*from previous call*/,
+    int end_of_image),
+   PNG_EMPTY);
 
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_transform_free,(png_const_structrp png_ptr,
@@ -1595,17 +1638,52 @@ typedef enum
    png_row_incomplete,
       /* more IDAT data needed for row */
    png_row_process,
-      /* png_struct::row_buffer contains a complete, transformed, row */
+      /* png_struct::row_buffer contains a complete row */
    png_row_repeat,
       /* row not in this pass, but the existing row may be used */
    png_row_skip
       /* row not in pass and no appropriate data; skip this row */
 }  png_row_op;
-PNG_INTERNAL_FUNCTION(png_row_op,png_read_process_IDAT,(png_structrp png_ptr),
-    PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(png_row_op,png_read_process_IDAT,(png_structrp png_ptr,
+      png_bytep transformed_row, png_bytep display_row, int save_row),
+      PNG_EMPTY);
    /* Process a block of IDAT data; the routine returns early if it has
     * obtained a row.  It is valid to call this routine with no input data;
-    * it will return PNG_ROW_INCOMPLETE if it needs input.
+    * it will return png_row_incomplete if it needs input.
+    *
+    * transformed_row: The transformed pixels of the input are written here.
+    *                  For interlaced images only the pixels in the pass will
+    *                  be written, the other pixels will not be touched.
+    *
+    * display_row:     The transformed pixels but replicated to that the entire
+    *                  buffer will have been initialized.  For passes after the
+    *                  first the pixels written are determined by the 'block'
+    *                  algorithm; only those *following* pixels which are
+    *                  written by *later* passes are written (with a copy of the
+    *                  pixel from the pass.)
+    *
+    * save_row:        A boolean which indicates that the row (unexpanded)
+    *                  should be saved in png_struct::transformed_row.  This can
+    *                  be used in a later call to png_combine_row.
+    *
+    * During reading the row is built up until png_row_process is returned.  At
+    * this point png_struct::row_buffer contains the original PNG row from the
+    * file and, if save_row was set, png_struct::transformed_row contains the
+    * row after the selected row transforms have been performed.  For interlaced
+    * images both are the width of the interlace pass.
+    *
+    * When png_row_repeat is returned the same is true, except that the buffers
+    * still contain the contents of the preceding row (the one where this
+    * funciton returned png_row_pricess).
+    *
+    * The row buffers should not be accessed if png_row_skip is returned; this
+    * row is not modified in the current pass.
+    */
+
+PNG_INTERNAL_FUNCTION(void,png_read_free_row_buffers,(png_structrp png_ptr),
+    PNG_EMPTY);
+   /* Free allocated row buffers; done as soon as possible to avoid carrying
+    * around all the memory for longer than necessary.
     */
 
 PNG_INTERNAL_FUNCTION(int,png_read_finish_IDAT,(png_structrp png_ptr),
@@ -1671,7 +1749,6 @@ PNG_INTERNAL_FUNCTION(void,png_handle_chunk,(png_structrp png_ptr,
     * png_handle_chunk (via the libpng read callback.)
     */
 
-/* Handle the transformations for reading and writing */
 PNG_INTERNAL_FUNCTION(void,png_init_row_info,(png_structrp png_ptr),PNG_EMPTY);
    /* Set the png_struct::row_ members from the PNG file information, running
     * transforms if required.

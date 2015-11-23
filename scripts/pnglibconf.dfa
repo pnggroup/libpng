@@ -593,9 +593,10 @@ option WRITE_SWAP_ALPHA requires WRITE_TRANSFORMS enables TRANSFORM_MECH
 option WRITE_INVERT_ALPHA requires WRITE_TRANSFORMS
 option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS enables TRANSFORM_MECH
 
-# This is not required for PNG-compliant encoders, but can cause
-# trouble if left undefined
-option WRITE_INTERLACING requires WRITE enables TRANSFORM_MECH
+# This just disables the code within libpng to implement image interlacing on
+# write; the app can still write interlaced images by doing it itself.
+option WRITE_INTERLACING disabled
+option WRITE_INTERLACE requires WRITE enables WRITE_INTERLACING
 
 # The following is no longer implemented:
 option WRITE_WEIGHTED_FILTER requires WRITE
