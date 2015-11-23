@@ -2174,7 +2174,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    /* We need to have at least 12 bytes after the purpose string
     * in order to get the parameter information.
     */
-   if (endptr - buf <= 12U)
+   if (endptr - buf <= 12)
    {
       png_chunk_benign_error(png_ptr, "invalid");
       return;
