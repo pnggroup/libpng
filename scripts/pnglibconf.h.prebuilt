@@ -2,7 +2,7 @@
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng version 1.7.0beta69 - November 13, 2015 */
+/* Libpng version 1.7.0beta69 - November 23, 2015 */
 
 /* Copyright (c) 1998-2015 Glenn Randers-Pehrson */
 
@@ -137,6 +137,7 @@
 #define PNG_WRITE_FILTER_SUPPORTED
 #define PNG_WRITE_FLUSH_SUPPORTED
 #define PNG_WRITE_GET_PALETTE_MAX_SUPPORTED
+#define PNG_WRITE_INTERLACE_SUPPORTED
 #define PNG_WRITE_INTERLACING_SUPPORTED
 #define PNG_WRITE_INT_FUNCTIONS_SUPPORTED
 #define PNG_WRITE_INVERT_ALPHA_SUPPORTED

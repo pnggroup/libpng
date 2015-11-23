@@ -964,7 +964,7 @@ option WRITE_PNG requires WRITE WRITE_TRANSFORMS enables INFO_IMAGE
 #    Disabled by -DPNG_NO_CHECK_FOR_INVALID_INDEX
 #
 # 2) {READ,WRITE}_GET_PALETTE_MAX: returns the largest pixel value in a
-#    color mapped PNG.  Disbaled by -DPNG_NO_GET_PALETTE_MAX
+#    color mapped PNG.  Disabled by -DPNG_NO_GET_PALETTE_MAX
 #
 # All of this stuff can be removed by "option PALETTE_MAX off" but using
 # -DPNG_NO_ defines on the command line just sets the relevant option to
