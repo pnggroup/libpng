@@ -4429,6 +4429,8 @@ version 1.5.25beta01 [November 20, 2015]
     png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
 
 version 1.5.25beta02 [(PENDING RELEASE)]
+  Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
+    not info_ptr.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
