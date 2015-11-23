@@ -3574,6 +3574,14 @@ check_interlace_type(int const interlace_type)
 #define CAN_WRITE_INTERLACE\
    PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
 
+/* Do the same thing for read interlacing; this controls whether read tests do
+ * their own de-interlace or use libpng.
+ */
+#ifdef PNG_READ_INTERLACING_SUPPORTED
+#  define do_read_interlace 0
+#else /* no libpng read interlace support */
+#  define do_read_interlace 1
+#endif
 /* The following two routines use the PNG interlace support macros from
  * png.h to interlace or deinterlace rows.
  */
@@ -4827,8 +4835,19 @@ standard_info_part1(standard_display *dp, png_structp pp, png_infop pi)
     * turning on interlace handling (if do_interlace is not set.)
     */
    dp->npasses = npasses_from_interlace_type(pp, dp->interlace_type);
-   if (!dp->do_interlace && dp->npasses != png_set_interlace_handling(pp))
-      png_error(pp, "validate: file changed interlace type");
+   if (!dp->do_interlace)
+   {
+#     ifdef PNG_READ_INTERLACING_SUPPORTED
+         if (dp->npasses != png_set_interlace_handling(pp))
+            png_error(pp, "validate: file changed interlace type");
+#     else /* !READ_INTERLACING */
+         /* This should never happen: the relevant tests (!do_interlace) should
+          * not be run.
+          */
+         if (dp->npasses > 1)
+            png_error(pp, "validate: no libpng interlace support");
+#     endif /* !READ_INTERLACING */
+   }
 
    /* Caller calls png_read_update_info or png_start_read_image now, then calls
     * part2.
@@ -5323,7 +5342,7 @@ test_standard(png_modifier* const pm, png_byte const colour_type,
            interlace_type < INTERLACE_LAST; ++interlace_type)
       {
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
-            interlace_type, 0, 0, 0), 0/*do_interlace*/, pm->use_update_info);
+            interlace_type, 0, 0, 0), do_read_interlace, pm->use_update_info);
 
          if (fail(pm))
             return 0;
@@ -6028,7 +6047,7 @@ transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
    memset(dp, 0, sizeof *dp);
 
    /* Standard fields */
-   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
+   standard_display_init(&dp->this, &pm->this, id, do_read_interlace,
       pm->use_update_info);
 
    /* Parameter fields */
@@ -8718,7 +8737,7 @@ gamma_display_init(gamma_display *dp, png_modifier *pm, png_uint_32 id,
     double background_gamma)
 {
    /* Standard fields */
-   standard_display_init(&dp->this, &pm->this, id, 0/*do_interlace*/,
+   standard_display_init(&dp->this, &pm->this, id, do_read_interlace,
       pm->use_update_info);
 
    /* Parameter fields */

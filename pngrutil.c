@@ -4362,7 +4362,11 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
 #                    if defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
                         defined(PNG_READ_INTERLACING_SUPPORTED)
                         if (png_ptr->transform_list != NULL &&
-                            (save_row || (png_ptr->do_interlace && pass < 6U)))
+                            (save_row
+#                            ifdef PNG_READ_INTERLACING_SUPPORTED
+                              || (png_ptr->do_interlace && pass < 6U)
+#                            endif /* READ_INTERLACING */
+                            ))
                         {
                            if (png_ptr->transformed_row == NULL)
                               png_ptr->transformed_row = png_voidcast(png_bytep,
