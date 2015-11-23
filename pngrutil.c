@@ -3118,7 +3118,7 @@ copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
       clear/*clear partial byte at end of row*/);
 }
 
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#ifdef PNG_READ_INTERLACING_SUPPORTED
 static void
 combine_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
    png_uint_32 x/*in INPUT*/, png_uint_32 width/*of INPUT*/, int display)
@@ -3495,13 +3495,13 @@ png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
    }
 }
 #endif /* PROGRESSIVE_READ */
-#else /* !READ_DEINTERLACE */
+#else /* !READ_INTERLACING */
    /* No read deinterlace support, so 'combine' always reduces to 'copy', there
     * is no 'display' argument:
     */
 #  define combine_row(pp, dp, sp, x, w, display)\
       copy_row(pp, dp, sp, x, w, 0/*!clear*/)
-#endif /* !READ_DEINTERLACE */
+#endif /* !READ_INTERLACING */
 
 static void
 png_read_filter_row_sub(png_alloc_size_t row_bytes, unsigned int bpp,
@@ -4360,7 +4360,7 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                       * allocated here.
                       */
 #                    if defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
-                        defined(PNG_READ_DEINTERLACE_SUPPORTED)
+                        defined(PNG_READ_INTERLACING_SUPPORTED)
                         if (png_ptr->transform_list != NULL &&
                             (save_row || (png_ptr->do_interlace && pass < 6U)))
                         {
@@ -4374,7 +4374,7 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                            copy_row(png_ptr, png_ptr->transformed_row,
                               pixel_buffer.buffer, x, pixels, 1/*clear*/);
                         }
-#                    endif /* PROGRESSIVE_READ || READ_DEINTERLACE */
+#                    endif /* PROGRESSIVE_READ || READ_INTERLACING */
                   } /* transform_list != NULL */
 #              endif /* TRANSFORM_MECH */
 
@@ -4407,14 +4407,14 @@ png_read_free_row_buffers(png_structrp png_ptr)
 {
    /* The transformed row only gets saved if needed: */
 #  if (defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
-       defined(PNG_READ_DEINTERLACE_SUPPORTED)) &&\
+       defined(PNG_READ_INTERLACING_SUPPORTED)) &&\
       defined(PNG_TRANSFORM_MECH_SUPPORTED)
       if (png_ptr->transformed_row != NULL)
       {
          png_free(png_ptr, png_ptr->transformed_row);
          png_ptr->transformed_row = NULL;
       }
-#  endif /* PROGRESSIVE_READ || READ_DEINTERLACE */
+#  endif /* PROGRESSIVE_READ || READ_INTERLACING */
 
    if (png_ptr->row_buffer != NULL)
    {

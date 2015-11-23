@@ -116,17 +116,6 @@ typedef png_byte *png_const_bytep;
 #  define png_const_structp png_structp
 #endif
 
-#if PNG_LIBPNG_VER < 10700
-   /* READ_INTERLACING was used instead of READ_DEINTERLACE. */
-#  ifdef PNG_READ_INTERLACING_SUPPORTED
-#     define PNG_READ_DEINTERLACE_SUPPORTED
-#  endif
-   /* WRITE_INTERLACING was used instead of WRITE_INTERLACE. */
-#  ifdef PNG_WRITE_INTERLACING_SUPPORTED
-#     define PNG_WRITE_INTERLACE_SUPPORTED
-#  endif
-#endif
-
 #include <float.h>  /* For floating point constants */
 #include <stdlib.h> /* For malloc */
 #include <string.h> /* For memcpy, memset */
@@ -3549,7 +3538,7 @@ transform_row(png_const_structp pp, png_byte buffer[TRANSFORM_ROWMAX],
  * interlacing support.  If there is no write interlacing we can't generate test
  * cases with interlace:
  */
-#ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
 #  define INTERLACE_LAST PNG_INTERLACE_LAST
 #  define check_interlace_type(type) ((void)(type))
 #  define set_write_interlace_handling(pp,type) png_set_interlace_handling(pp)
@@ -3560,7 +3549,7 @@ static void
 check_interlace_type(int const interlace_type)
 {
    /* Prior to 1.7.0 libpng does not support the write of an interlaced image
-    * unless PNG_WRITE_INTERLACE_SUPPORTED, even with do_interlace so the
+    * unless PNG_WRITE_INTERLACING_SUPPORTED, even with do_interlace so the
     * code here does the pixel interlace itself, so:
     */
    if (interlace_type != PNG_INTERLACE_NONE)
@@ -3580,10 +3569,10 @@ check_interlace_type(int const interlace_type)
 #  define check_interlace_type(type) ((void)(type))
 #  define INTERLACE_LAST PNG_INTERLACE_LAST
 #  define do_own_interlace 1
-#endif /* WRITE_INTERLACE tests */
+#endif /* WRITE_INTERLACING tests */
 
 #define CAN_WRITE_INTERLACE\
-   PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACE_SUPPORTED
+   PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
 
 /* The following two routines use the PNG interlace support macros from
  * png.h to interlace or deinterlace rows.
@@ -4074,7 +4063,7 @@ make_size(png_store* const ps, png_byte const colour_type, int bdlo,
                width, height, 0);
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_NONE,
                width, height, 1);
-#        ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
             make_size_image(ps, colour_type, DEPTH(bdlo), PNG_INTERLACE_ADAM7,
                width, height, 0);
 #        endif
@@ -4945,7 +4934,7 @@ progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
 
          if (pass != png_get_current_pass_number(pp))
             png_error(pp, "png_get_current_pass_number is broken");
-#endif
+#endif /* USER_TRANSFORM_INFO */
 
          y = PNG_ROW_FROM_PASS_ROW(y, pass);
       }
@@ -4957,19 +4946,19 @@ progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
       row = store_image_row(dp->ps, pp, 0, y);
 
       /* Combine the new row into the old: */
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#ifdef PNG_READ_INTERLACING_SUPPORTED
       if (dp->do_interlace)
-#endif
+#endif /* READ_INTERLACING */
       {
          if (dp->interlace_type == PNG_INTERLACE_ADAM7)
             deinterlace_row(row, new_row, dp->pixel_size, dp->w, pass);
          else
             row_copy(row, new_row, dp->pixel_size * dp->w);
       }
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#ifdef PNG_READ_INTERLACING_SUPPORTED
       else
          png_progressive_combine_row(pp, row, new_row);
-#endif /* PNG_READ_DEINTERLACE_SUPPORTED */
+#endif /* PNG_READ_INTERLACING_SUPPORTED */
    }
 
    else if (dp->interlace_type == PNG_INTERLACE_ADAM7 &&
@@ -5440,7 +5429,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
 
       for (h=1; h<=16; h+=hinc[bdlo]) for (w=1; w<=16; w+=winc[bdlo])
       {
-#     ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#     ifdef PNG_READ_INTERLACING_SUPPORTED
          /* Test with pngvalid generated interlaced images first; we have
           * already verify these are ok (unless pngvalid has self-consistent
           * read/write errors, which is unlikely), so this detects errors in the
@@ -5454,9 +5443,9 @@ test_size(png_modifier* const pm, png_byte const colour_type,
          if (fail(pm))
             return 0;
 #     endif
-#     endif /* READ_DEINTERLACE */
+#     endif /* READ_INTERLACING */
 
-#     ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
          /* Test the libpng write side against the pngvalid read side: */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 1/*do_interlace*/,
@@ -5466,8 +5455,8 @@ test_size(png_modifier* const pm, png_byte const colour_type,
             return 0;
 #     endif
 
-#     ifdef PNG_READ_DEINTERLACE_SUPPORTED
-#     ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#     ifdef PNG_READ_INTERLACING_SUPPORTED
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
          /* Test both together: */
          standard_test(&pm->this, FILEID(colour_type, DEPTH(bdlo), 0/*palette*/,
             PNG_INTERLACE_ADAM7, w, h, 0), 0/*do_interlace*/,
@@ -5476,7 +5465,7 @@ test_size(png_modifier* const pm, png_byte const colour_type,
          if (fail(pm))
             return 0;
 #     endif
-#     endif /* READ_DEINTERLACE */
+#     endif /* READ_INTERLACING */
       }
    }
 
@@ -11381,10 +11370,10 @@ int main(int argc, char **argv)
       {
 #        if CAN_WRITE_INTERLACE
             pm.interlace_type = PNG_INTERLACE_ADAM7;
-#        else
+#        else /* !CAN_WRITE_INTERLACE */
             fprintf(stderr, "pngvalid: no write interlace support\n");
             return SKIP;
-#        endif
+#        endif /* !CAN_WRITE_INTERLACE */
       }
 
       else if (strcmp(*argv, "--use-input-precision") == 0)

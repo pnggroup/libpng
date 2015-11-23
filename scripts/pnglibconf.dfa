@@ -545,18 +545,13 @@ option PROGRESSIVE_READ requires READ
 option SEQUENTIAL_READ requires READ
 
 # Added to 1.7.0: png_read_image now requires the deinterlace code
-option READ_IMAGE requires SEQUENTIAL_READ READ_DEINTERLACE
+option READ_IMAGE requires SEQUENTIAL_READ READ_INTERLACING
 
 # This is not talking about reading interlaced PNG files, it is talking about
 # libpng support to 'widen' the interlaced passes to the full row width.  If
 # you take the rows libpng provides and expand them yourself you do not need
 # this code.
-#
-# READ_INTERLACING is for backward compatibility with older version of libpng;
-# applications had to use this to see if they needed to do their own interlace
-# handling.
-option READ_INTERLACING disabled
-option READ_DEINTERLACE requires READ enables READ_INTERLACING
+option READ_INTERLACING requires READ
 
 option READ_COMPOSITE_NODIV requires READ
 = NO_READ_COMPOSITE_NODIV NO_READ_COMPOSITED_NODIV
@@ -595,8 +590,7 @@ option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS enables TRANSFORM_MECH
 
 # This just disables the code within libpng to implement image interlacing on
 # write; the app can still write interlaced images by doing it itself.
-option WRITE_INTERLACING disabled
-option WRITE_INTERLACE requires WRITE enables WRITE_INTERLACING
+option WRITE_INTERLACING requires WRITE
 
 # The following is no longer implemented:
 option WRITE_WEIGHTED_FILTER requires WRITE
@@ -998,7 +992,7 @@ option SIMPLIFIED_READ,
       READ_RGB_TO_GRAY, READ_ALPHA_MODE, READ_BACKGROUND, READ_STRIP_ALPHA,
       READ_FILLER, READ_SWAP, READ_PACK, READ_GRAY_TO_RGB, READ_GAMMA,
       READ_tRNS, READ_bKGD, READ_gAMA, READ_cHRM, READ_sRGB, READ_sBIT,
-      READ_DEINTERLACE
+      READ_INTERLACING
 
 # AFIRST and BGR read options:
 #  Prior to libpng 1.6.8 these were disabled but switched on if the low level

@@ -524,15 +524,15 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    /* Add filler (or alpha) byte (before/after each RGB triplet) */
    png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
 
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Turn on interlace handling.  REQUIRED if you are not using
     * png_read_image().  To see how to handle interlacing passes,
     * see the png_read_row() method below:
     */
    number_passes = png_set_interlace_handling(png_ptr);
-#else
+#else /* !READ_INTERLACING */
    number_passes = 1;
-#endif /* READ_DEINTERLACE */
+#endif /* !READ_INTERLACING */
 
 
    /* Optional call to gamma correct and add the background to the palette
@@ -715,7 +715,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
     */
    png_bytep old_row = ((png_bytep *)our_data)[row_num];
 
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#ifdef PNG_READ_INTERLACING_SUPPORTED
    /* If both rows are allocated then copy the new row
     * data to the corresponding row data.
     */
@@ -744,7 +744,7 @@ row_callback(png_structp png_ptr, png_bytep new_row,
     * to pass the current row as new_row, and the function will combine
     * the old row and the new row.
     */
-#endif /* READ_DEINTERLACE */
+#endif /* READ_INTERLACING */
 }
 
 end_callback(png_structp png_ptr, png_infop info)
