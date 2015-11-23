@@ -1147,8 +1147,10 @@ png_write_destroy(png_structrp png_ptr)
 
    /* Free our memory.  png_free checks NULL for us. */
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->row_buffer);
    png_ptr->row_buffer = NULL;
+#endif /* WRITE_FILTER */
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
    png_transform_free(png_ptr, &png_ptr->transform_list);
 #endif

@@ -2448,10 +2448,12 @@ png_copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
        * little endian; bits to copy in the bottom of 's'.  Make 'remaining'
        * into a mask of the bits to *preserve* in dp.
        */
-      if ((png_ptr->row_format & PNG_FORMAT_FLAG_SWAPPED) == 0U)
-         remaining = 0xffU >> remaining;
+#     ifdef PNG_TRANSFORM_MECH_SUPPORTED
+         if ((png_ptr->row_format & PNG_FORMAT_FLAG_SWAPPED) == 0U)
+            remaining = 0xffU >> remaining;
 
-      else
+         else
+#     endif /* TRANSFORM_MECH */
          remaining = 0xffU << remaining;
 
       /* remaining is now the bits to *keep* from the destination byte, if
