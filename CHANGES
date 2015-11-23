@@ -5271,6 +5271,39 @@ Version 1.7.0beta69 [November 23, 2015]
     by flaviommedeiros).
   Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
     not info_ptr.
+  Added pngvalid --transform --interlace test. This increases code
+    coverage by generating test cases with smaller length rows as a
+    result of the interlacing.  Without this packswap handling was
+    incompletely tested.
+  Fixed NO_WRITE_INTERLACE in pngvalid.c.  The support for writing
+    interlaced images directly from libpng 1.7 was unintentionally
+    disabled (INTERLACE_LAST was defined incorrectly, excluding the
+    interlaced images).  This obscured the fact that the transform and
+    error test case generators lacked the support for writing interlaced
+    images from libpng.
+  Transform rewrite: perform transforms in small chunks.  The intent
+    of this change is to reduce the memory footprint during transform
+    sequences by performing transforms in fixed (small) sized blocks of
+    pixels.  The change is incomplete; the filter code still works
+    row-by-row, so the whole tranform also works row-by-row. The intent
+    is to fix this so that everything works in small(ish) chunks.
+    At present the change has no discernable effect on pngvalid --speed
+    or pngstest with (e.g.) rgb-8-1.8.png; user time and (minor) page
+    faults are the same in old and new versions.  The same applies to
+    real-world 15MP PNG images; even on these the presence of the filter
+    code causes a cyclical progress through memory which will interfere
+    with any caching otherwise possible (useful word, 'otherwise'.) 
+  Read row buffer changes.  The read code now allocates one row buffer
+    of the size of the input PNG row and, only if required, one buffer of
+    the size of the output.  The output buffer is required for the
+    progressive reader (always) and for the sequential reader if libpng
+    is de-interlacing an image (because the output row is used multiple
+    times if png_read_row is called with a display row parameter.) This
+    should reduce memory utilization by libpng significantly, but it has no
+    detectable effect on overall performance figures of the test programs;
+    these are probably dominated by memory allocations for the whole image
+    within the test programs.
+
    
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
