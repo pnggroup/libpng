@@ -599,7 +599,7 @@ png_write_image(png_structrp png_ptr, png_bytepp image)
 
    png_debug(1, "in png_write_image");
 
-#ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
    /* Initialize interlace handling.  If image is not interlaced,
     * this will set pass to 1
     */
@@ -626,7 +626,7 @@ png_write_image(png_structrp png_ptr, png_bytepp image)
    }
 }
 
-#if defined(PNG_WRITE_INTERLACE_SUPPORTED) ||\
+#if defined(PNG_WRITE_INTERLACING_SUPPORTED) ||\
     defined(PNG_WRITE_TRANSFORMS_SUPPORTED)
 static void
 write_row_buffered(png_structrp png_ptr, png_const_bytep row,
@@ -727,7 +727,7 @@ copy_row(png_const_structrp png_ptr, png_bytep row_buffer,
 }
 #endif /* WRITE_TRANSFORMS */
 
-#ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
 static void
 interlace_row_lbd(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
    png_uint_32 x, unsigned int count, const unsigned int B)
@@ -821,7 +821,7 @@ interlace_row_byte(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
         --count, sp += inc * cbytes, dp += cbytes)
       memcpy(dp, sp, cbytes);
 }
-#endif /* WRITE_INTERLACE */
+#endif /* WRITE_INTERLACING */
 
 static void
 write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
@@ -935,7 +935,7 @@ write_row_interlaced(png_structrp png_ptr, png_const_bytep row)
    }
 }
 
-#ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
 /* Interlace a row then write it out. */
 static int
 interlace_row(png_structrp png_ptr, png_const_bytep row)
@@ -1004,7 +1004,7 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
 
    return write_row;
 }
-#endif /* WRITE_INTERLACE */
+#endif /* WRITE_INTERLACING */
 
 /* Called by user to write a row of image data */
 void PNGAPI
@@ -1067,7 +1067,7 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
       if (png_ptr->interlaced == PNG_INTERLACE_NONE)
          write_row_non_interlaced(png_ptr, row);
 
-#     ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
          /* Optional: libpng does the interlacing, app passes every row of the
           * image the required number of times.
           */
@@ -1147,8 +1147,10 @@ png_write_destroy(png_structrp png_ptr)
 
    /* Free our memory.  png_free checks NULL for us. */
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
+#ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->row_buffer);
    png_ptr->row_buffer = NULL;
+#endif /* WRITE_FILTER */
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
    png_transform_free(png_ptr, &png_ptr->transform_list);
 #endif

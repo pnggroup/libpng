@@ -978,8 +978,8 @@ png_init_row_info(png_structrp png_ptr)
       png_ptr->row_input_pixel_depth = png_depth;
 }
 
-#if defined(PNG_READ_DEINTERLACE_SUPPORTED) || \
-    defined(PNG_WRITE_INTERLACE_SUPPORTED)
+#if defined(PNG_READ_INTERLACING_SUPPORTED) || \
+    defined(PNG_WRITE_INTERLACING_SUPPORTED)
 int PNGAPI
 png_set_interlace_handling(png_structrp png_ptr)
 {
@@ -989,7 +989,7 @@ png_set_interlace_handling(png_structrp png_ptr)
    {
       if (png_ptr->read_struct)
       {
-#        ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#        ifdef PNG_READ_INTERLACING_SUPPORTED
             if (png_ptr->interlaced)
             {
                png_ptr->do_interlace = 1;
@@ -997,15 +997,15 @@ png_set_interlace_handling(png_structrp png_ptr)
             }
 
             return 1;
-#        else /* !READ_DEINTERLACE */
+#        else /* !READ_INTERLACING */
             png_app_error(png_ptr, "no de-interlace support");
             /* return 0 below */
-#        endif /* !READ_DEINTERLACE */
+#        endif /* !READ_INTERLACING */
       }
 
       else /* write */
       {
-#        ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
             if (png_ptr->interlaced)
             {
                png_ptr->do_interlace = 1;
@@ -1013,17 +1013,17 @@ png_set_interlace_handling(png_structrp png_ptr)
             }
 
             return 1;
-#        else /* !WRITE_INTERLACE */
+#        else /* !WRITE_INTERLACING */
             png_app_error(png_ptr, "no interlace support");
             /* return 0 below */
-#        endif /* !WRITE_INTERLACE */
+#        endif /* !WRITE_INTERLACING */
       }
    }
 
    /* API CHANGE: 1.7.0: returns 0 if called with a NULL png_ptr */
    return 0;
 }
-#endif /* READ_DEINTERLACE || WRITE_INTERLACE */
+#endif /* READ_INTERLACING || WRITE_INTERLACING */
 
 #ifdef PNG_MNG_READ_FEATURES_SUPPORTED
 /* Undoes intrapixel differencing, this is called immediately after the PNG

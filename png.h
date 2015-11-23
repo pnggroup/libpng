@@ -1462,8 +1462,8 @@ PNG_EXPORT(44, void, png_set_shift, (png_structrp png_ptr, png_const_color_8p
     true_bits));
 #endif
 
-#if defined(PNG_READ_DEINTERLACE_SUPPORTED) || \
-    defined(PNG_WRITE_INTERLACE_SUPPORTED)
+#if defined(PNG_READ_INTERLACING_SUPPORTED) || \
+    defined(PNG_WRITE_INTERLACING_SUPPORTED)
 /* Have the code handle the interlacing.  Returns the number of passes.
  * MUST be called before png_read_update_info or png_start_read_image,
  * otherwise it will not have the desired effect.  Note that it is still
@@ -1915,7 +1915,7 @@ PNG_EXPORT(219, size_t, png_process_data_pause, (png_structrp, int save));
  */
 PNG_EXPORT(220, png_uint_32, png_process_data_skip, (png_structrp));
 
-#ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#ifdef PNG_READ_INTERLACING_SUPPORTED
 /* Function that combines rows.  'new_row' is a flag that should come from
  * the callback and be non-NULL if anything needs to be done; the library
  * stores its own version of the new data internally and ignores the passed
@@ -1923,7 +1923,7 @@ PNG_EXPORT(220, png_uint_32, png_process_data_skip, (png_structrp));
  */
 PNG_EXPORT(93, void, png_progressive_combine_row, (png_const_structrp png_ptr,
     png_bytep old_row, png_const_bytep new_row));
-#endif /* READ_DEINTERLACE */
+#endif /* READ_INTERLACING */
 #endif /* PROGRESSIVE_READ */
 
 PNG_EXPORTA(94, png_voidp, png_malloc, (png_const_structrp png_ptr,

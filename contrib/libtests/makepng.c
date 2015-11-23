@@ -148,13 +148,6 @@
 
 #include <zlib.h>
 
-#if PNG_LIBPNG_VER < 10700
-   /* WRITE_INTERLACING was used instead of WRITE_INTERLACE prior to 1.7 */
-#  ifdef PNG_WRITE_INTERLACING_SUPPORTED
-#     define PNG_WRITE_INTERLACE_SUPPORTED
-#  endif
-#endif /* WRITE_INTERLACE check */
-
 /* Work round for GCC complaints about casting a (double) function result to
  * an unsigned:
  */
@@ -951,11 +944,11 @@ write_png(const char **name, FILE *fp, int color_type, int bit_depth,
       png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, filters);
 
       {
-#        ifdef PNG_WRITE_INTERLACE_SUPPORTED
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
             int passes = png_set_interlace_handling(png_ptr);
-#        else /* !WRITE_INTERLACE */
+#        else /* !WRITE_INTERLACING */
             int passes = 1;
-#        endif /* !WRITE_INTERLACE */
+#        endif /* !WRITE_INTERLACING */
          int pass;
          png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 

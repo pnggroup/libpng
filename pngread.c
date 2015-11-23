@@ -420,7 +420,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
              * is doing the interlace handling (this is the historical
              * behavior!)
              */
-#           ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#           ifdef PNG_READ_INTERLACING_SUPPORTED
                if (!png_ptr->do_interlace) continue;
 #           else /* !do_interlace */
                continue;

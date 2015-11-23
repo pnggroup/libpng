@@ -65,7 +65,7 @@
    defined PNG_READ_tEXt_SUPPORTED &&\
    defined PNG_READ_tIME_SUPPORTED &&\
    defined PNG_READ_zTXt_SUPPORTED &&\
-   defined PNG_WRITE_INTERLACE_SUPPORTED
+   defined PNG_WRITE_INTERLACING_SUPPORTED
 
 #ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER /* defined by pnglibconf.h from 1.7 */
@@ -1381,8 +1381,8 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif /* SINGLE_ROWBUF_ALLOC */
    pngtest_debug("Writing row data");
 
-#if defined(PNG_READ_DEINTERLACE_SUPPORTED) &&\
-   defined(PNG_WRITE_INTERLACE_SUPPORTED)
+#if defined(PNG_READ_INTERLACING_SUPPORTED) &&\
+   defined(PNG_WRITE_INTERLACING_SUPPORTED)
    /* Both must be defined for libpng to be able to handle the interlace,
     * otherwise it gets handled below by simply reading and writing the passes
     * directly.
@@ -1393,7 +1393,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    if (png_set_interlace_handling(write_ptr) != num_passes)
       png_error(write_ptr,
             "png_set_interlace_handling(write): wrong pass count ");
-#endif
+#endif /* R/W INTERLACING */
 
 #ifdef PNGTEST_TIMING
    t_stop = (float)clock();

@@ -450,12 +450,12 @@ struct png_struct_def
    png_bytep        row_buffer;          /* primary row buffer */
 #endif /* WRITE_FILTER || READ */
 #if (defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
-     defined(PNG_READ_DEINTERLACE_SUPPORTED)) &&\
+     defined(PNG_READ_INTERLACING_SUPPORTED)) &&\
     defined(PNG_TRANSFORM_MECH_SUPPORTED)
    png_bytep        transformed_row;     /* pointer to the transformed row, if
                                           * required.  May point to row_buffer.
                                           */
-#endif /* (PROGRESSIVE_READ || READ_DEINTERLACE) && TRANSFORM_MECH */
+#endif /* (PROGRESSIVE_READ || READ_INTERLACING) && TRANSFORM_MECH */
 
 #ifdef PNG_READ_SUPPORTED
    png_alloc_size_t row_bytes_read;   /* Total read in row */
@@ -489,10 +489,10 @@ struct png_struct_def
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
    unsigned int read_started   :1; /* at least one call to png_read_row */
 #endif
-#if defined (PNG_READ_DEINTERLACE_SUPPORTED) ||\
-    defined (PNG_WRITE_INTERLACE_SUPPORTED)
+#if defined (PNG_READ_INTERLACING_SUPPORTED) ||\
+    defined (PNG_WRITE_INTERLACING_SUPPORTED)
    unsigned int do_interlace   :1; /* libpng handles the interlace */
-#  endif /* READ_DEINTERLACE, WRITE_INTERLACE */
+#  endif /* R/W INTERLACING */
    unsigned int pass           :3; /* current (interlace) pass (0 - 6) */
 
    /* The next two fields are just used by the IDAT process functions to store

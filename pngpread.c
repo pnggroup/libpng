@@ -359,9 +359,9 @@ png_push_have_row(png_structrp png_ptr, png_bytep row)
           * the height of an interlaced image with just the rows up to this
           * one:
           */
-#        ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#        ifdef PNG_READ_INTERLACING_SUPPORTED
             if (!png_ptr->do_interlace)
-#        endif
+#        endif /* READ_INTERLACING */
          {
             affirm(PNG_ROW_IN_INTERLACE_PASS(row_number, pass) && row != NULL);
             row_number = PNG_PASS_ROWS(row_number+1, pass);
@@ -533,17 +533,17 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
                 * libpng is handling the de-interlace; when the app does it it
                 * only see the real rows.
                 */
-#              ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#              ifdef PNG_READ_INTERLACING_SUPPORTED
                   if (png_ptr->do_interlace)
                   {
 #                    ifdef PNG_TRANSFORM_MECH_SUPPORTED
                         row_buffer = png_ptr->transformed_row;
                         if (row_buffer == NULL)
-#                    endif
+#                    endif /* TRANSFORM_MECH */
                         row_buffer = png_ptr->row_buffer;
                      break;
                   }
-#              endif
+#              endif /* READ_INTERLACING */
                continue;
 
             case png_row_skip:
@@ -552,10 +552,10 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
                 * of 'NULL' to mean this row doesn't contribute to the output
                 * is historical and not documented;
                 */
-#              ifdef PNG_READ_DEINTERLACE_SUPPORTED
+#              ifdef PNG_READ_INTERLACING_SUPPORTED
                   if (png_ptr->do_interlace)
                      break;
-#              endif
+#              endif /* READ_INTERLACING */
                continue;
 
             default:
