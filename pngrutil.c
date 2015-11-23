@@ -1772,7 +1772,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* We need to have at least 12 bytes after the purpose string
       in order to get the parameter information. */
-   if (slength < 12U || endptr - buf <= 12U)
+   if (slength < 12U || endptr - buf <= 12)
    {
       png_warning(png_ptr, "Invalid pCAL data");
       png_free(png_ptr, png_ptr->chunkdata);
