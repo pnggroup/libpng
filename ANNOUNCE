@@ -1,4 +1,4 @@
-Libpng 1.6.20beta02 - November 22, 2015
+Libpng 1.6.20beta02 - November 23, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -30,6 +30,8 @@ Version 1.6.20beta01 [November 20, 2015]
     png_handle_pCAL() (Bug report by John Regehr).
 
 Version 1.6.20beta02 [(PENDING RELEASE)]
+  Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
+    not info_ptr.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
