@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta69 - November 23, 2015
+Libpng 1.7.0beta69 - November 24, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -965,7 +965,7 @@ Version 1.7.0beta68 [November 12, 2015]
     (bug report by Cosmin Truta).
   Cleaned up coding style in png_handle_PLTE().
 
-Version 1.7.0beta69 [November 23, 2015]
+Version 1.7.0beta69 [November 24, 2015]
   Avoid potential pointer overflow/underflow in png_handle_sPLT() and
     png_handle_pCAL() (Bug report by John Regehr).
   Avoid conditionally compiling parts of statements in png.c (suggested
@@ -1008,6 +1008,16 @@ Version 1.7.0beta69 [November 23, 2015]
     the support for having libpng do the interlace/deinterlace, the old
     names make more sense. Restoring them avoids cruft in the configuration
     file and avoids an unnecessary version specific change.
+  The reliance of png_read_png on interlace handling and some minor
+    issues in the test programs where they failed to correctly check for
+    interlace handling were exposed by the ability to write interlaced
+    images even if WRITE_INTERLACING is turned off.  This is fixed here.
+  Changed the detection of invalid application behavior (too many
+    calls to png_read_row) from an affirm to a png_app_error.
+  Fixed the PNG_MAX_GAMMA_8 handling and png_set_rgb_to_gray, which
+    had bugs which were likely to expose end cases of rgb-to-gray conversion
+    errors. This might possibly explain some of the machine math dependencies
+    we are seeing.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
