@@ -5317,6 +5317,8 @@ Version 1.7.0beta69 [November 24, 2015]
     had bugs which were likely to expose end cases of rgb-to-gray conversion
     errors. This might possibly explain some of the machine math dependencies
     we are seeing.
+  Temporarily disabled filter selection while writing, and temporarily
+    replaced pngtest.png accordingly.
    
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
