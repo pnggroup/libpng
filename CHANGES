@@ -5418,9 +5418,12 @@ Version 1.6.20beta01 [November 20, 2015]
   Avoid potential pointer overflow/underflow in png_handle_sPLT() and
     png_handle_pCAL() (Bug report by John Regehr).
 
-Version 1.6.20beta02 [(PENDING RELEASE)]
+Version 1.6.20beta02 [November 23, 2015]
   Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
     not info_ptr.
+
+Version 1.6.20beta03 [(PENDING RELEASE)]
+  Backported tests from libpng-1.7.0beta69.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
