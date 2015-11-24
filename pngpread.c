@@ -127,7 +127,7 @@ png_process_some_data(png_structp png_ptr, png_infop info_ptr)
 void /* PRIVATE */
 png_push_read_sig(png_structp png_ptr, png_infop info_ptr)
 {
-   png_size_t num_checked = png_ptr->sig_bytes, /* SAFE, does not exceed 8 */ 
+   png_size_t num_checked = png_ptr->sig_bytes, /* SAFE, does not exceed 8 */
        num_to_check = 8 - num_checked;
 
    if (png_ptr->buffer_size < num_to_check)

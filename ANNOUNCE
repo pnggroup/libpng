@@ -1,5 +1,5 @@
 
-Libpng 1.5.25beta02 - November 23, 2015
+Libpng 1.5.25beta03 - November 24, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,21 +9,21 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.25beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.25beta02.tar.gz
-   1.5.25beta02.tar.bz2
+   1.5.25beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.25beta03.tar.gz
+   1.5.25beta03.tar.bz2
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1525b02.7z  (LZMA-compressed, recommended)
-   lp1525b02.zip
+   lp1525b03.7z  (LZMA-compressed, recommended)
+   lp1525b03.zip
 
 Other information:
 
-   1.5.25beta02-README.txt
-   1.5.25beta02-LICENSE.txt
-   libpng-1.5.25beta02-*.asc (armored detached GPG signatures)
+   1.5.25beta03-README.txt
+   1.5.25beta03-LICENSE.txt
+   libpng-1.5.25beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.24):
 
@@ -31,9 +31,12 @@ version 1.5.25beta01 [November 20, 2015]
   Avoid potential pointer overflow in png_handle_iTXt(), png_handle_zTXt(),
     png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
 
-version 1.5.25beta02 [(PENDING RELEASE)]
+version 1.5.25beta02 [November 23, 2015]
   Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
     not info_ptr.
+
+version 1.5.25beta03 [(PENDING RELEASE)]
+  Backported tests from libpng-1.7.0beta69.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
