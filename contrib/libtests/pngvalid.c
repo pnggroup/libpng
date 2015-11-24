@@ -532,7 +532,8 @@ sample(png_const_bytep row, png_byte colour_type, png_byte bit_depth,
  */
 static void
 pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
-   png_const_bytep fromBuffer, png_uint_32 fromIndex, unsigned int pixelSize)
+   png_const_bytep fromBuffer, png_uint_32 fromIndex, unsigned int pixelSize,
+   int littleendian)
 {
    /* Assume we can multiply by 'size' without overflow because we are
     * just working in a single buffer.
@@ -542,15 +543,25 @@ pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
    if (pixelSize < 8) /* Sub-byte */
    {
       /* Mask to select the location of the copied pixel: */
-      unsigned int destMask = ((1U<<pixelSize)-1) << (8-pixelSize-(toIndex&7));
+      unsigned int destMask = ((1U<<pixelSize)-1) <<
+         (littleendian ? toIndex&7 : 8-pixelSize-(toIndex&7));
       /* The following read the entire pixels and clears the extra: */
       unsigned int destByte = toBuffer[toIndex >> 3] & ~destMask;
       unsigned int sourceByte = fromBuffer[fromIndex >> 3];
 
       /* Don't rely on << or >> supporting '0' here, just in case: */
       fromIndex &= 7;
-      if (fromIndex > 0) sourceByte <<= fromIndex;
-      if ((toIndex & 7) > 0) sourceByte >>= toIndex & 7;
+      if (littleendian)
+      {
+         if (fromIndex > 0) sourceByte >>= fromIndex;
+         if ((toIndex & 7) > 0) sourceByte <<= toIndex & 7;
+      }
+
+      else
+      {
+         if (fromIndex > 0) sourceByte <<= fromIndex;
+         if ((toIndex & 7) > 0) sourceByte >>= toIndex & 7;
+      }
 
       toBuffer[toIndex >> 3] = (png_byte)(destByte | (sourceByte & destMask));
    }
@@ -563,7 +574,8 @@ pixel_copy(png_bytep toBuffer, png_uint_32 toIndex,
  * bytes at the end.
  */
 static void
-row_copy(png_bytep toBuffer, png_const_bytep fromBuffer, unsigned int bitWidth)
+row_copy(png_bytep toBuffer, png_const_bytep fromBuffer, unsigned int bitWidth,
+      int littleendian)
 {
    memcpy(toBuffer, fromBuffer, bitWidth >> 3);
 
@@ -573,10 +585,10 @@ row_copy(png_bytep toBuffer, png_const_bytep fromBuffer, unsigned int bitWidth)
 
       toBuffer += bitWidth >> 3;
       fromBuffer += bitWidth >> 3;
-      /* The remaining bits are in the top of the byte, the mask is the bits to
-       * retain.
-       */
-      mask = 0xff >> (bitWidth & 7);
+      if (littleendian)
+         mask = 0xff << (bitWidth & 7);
+      else
+         mask = 0xff >> (bitWidth & 7);
       *toBuffer = (png_byte)((*toBuffer & mask) | (*fromBuffer & ~mask));
    }
 }
@@ -3587,7 +3599,7 @@ check_interlace_type(int const interlace_type)
  */
 static void
 interlace_row(png_bytep buffer, png_const_bytep imageRow,
-   unsigned int pixel_size, png_uint_32 w, int pass)
+   unsigned int pixel_size, png_uint_32 w, int pass, int littleendian)
 {
    png_uint_32 xin, xout, xstep;
 
@@ -3603,7 +3615,7 @@ interlace_row(png_bytep buffer, png_const_bytep imageRow,
 
    for (xout=0; xin<w; xin+=xstep)
    {
-      pixel_copy(buffer, xout, imageRow, xin, pixel_size);
+      pixel_copy(buffer, xout, imageRow, xin, pixel_size, littleendian);
       ++xout;
    }
 }
@@ -3611,7 +3623,7 @@ interlace_row(png_bytep buffer, png_const_bytep imageRow,
 #ifdef PNG_READ_SUPPORTED
 static void
 deinterlace_row(png_bytep buffer, png_const_bytep row,
-   unsigned int pixel_size, png_uint_32 w, int pass)
+   unsigned int pixel_size, png_uint_32 w, int pass, int littleendian)
 {
    /* The inverse of the above, 'row' is part of row 'y' of the output image,
     * in 'buffer'.  The image is 'w' wide and this is pass 'pass', distribute
@@ -3625,7 +3637,7 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
 
    for (xin=0; xout<w; xout+=xstep)
    {
-      pixel_copy(buffer, xout, row, xin, pixel_size);
+      pixel_copy(buffer, xout, row, xin, pixel_size, littleendian);
       ++xin;
    }
 }
@@ -3748,7 +3760,8 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
                      if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
                          PNG_PASS_COLS(w, pass) > 0)
                         interlace_row(buffer, buffer,
-                              bit_size(pp, colour_type, bit_depth), w, pass);
+                              bit_size(pp, colour_type, bit_depth), w, pass,
+                              0/*data always bigendian*/);
                      else
                         continue;
                   }
@@ -3980,7 +3993,8 @@ make_size_image(png_store* const ps, png_byte const colour_type,
                       * set unset things to 0).
                       */
                      memset(tempRow, 0xff, sizeof tempRow);
-                     interlace_row(tempRow, row, pixel_size, w, pass);
+                     interlace_row(tempRow, row, pixel_size, w, pass,
+                           0/*data always bigendian*/);
                      row = tempRow;
                   }
                   else
@@ -4163,7 +4177,7 @@ static const struct
        { sBIT0_error_fn, "sBIT(0): failed to detect error",
          PNG_LIBPNG_VER < 10700 },
 
-       { sBIT_error_fn, "sBIT(too big): failed to detect error", 
+       { sBIT_error_fn, "sBIT(too big): failed to detect error",
          PNG_LIBPNG_VER < 10700 },
     };
 
@@ -4273,7 +4287,8 @@ make_error(png_store* const ps, png_byte const colour_type,
                      if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
                          PNG_PASS_COLS(w, pass) > 0)
                         interlace_row(buffer, buffer,
-                              bit_size(pp, colour_type, bit_depth), w, pass);
+                              bit_size(pp, colour_type, bit_depth), w, pass,
+                              0/*data always bigendian*/);
                      else
                         continue;
                   }
@@ -4473,6 +4488,7 @@ typedef struct standard_display
    png_uint_32 bit_width;      /* Width of output row in bits */
    size_t      cbRow;          /* Bytes in a row of the output image */
    int         do_interlace;   /* Do interlacing internally */
+   int         littleendian;   /* App (row) data is little endian */
    int         is_transparent; /* Transparency information was present. */
    int         has_tRNS;       /* color type GRAY or RGB with a tRNS chunk. */
    int         speed;          /* Doing a speed test */
@@ -4515,6 +4531,7 @@ standard_display_init(standard_display *dp, png_store* ps, png_uint_32 id,
    dp->bit_width = 0;
    dp->cbRow = 0;
    dp->do_interlace = do_interlace;
+   dp->littleendian = 0;
    dp->is_transparent = 0;
    dp->speed = ps->speed;
    dp->use_update_info = use_update_info;
@@ -4970,9 +4987,10 @@ progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
 #endif /* READ_INTERLACING */
       {
          if (dp->interlace_type == PNG_INTERLACE_ADAM7)
-            deinterlace_row(row, new_row, dp->pixel_size, dp->w, pass);
+            deinterlace_row(row, new_row, dp->pixel_size, dp->w, pass,
+                  dp->littleendian);
          else
-            row_copy(row, new_row, dp->pixel_size * dp->w);
+            row_copy(row, new_row, dp->pixel_size * dp->w, dp->littleendian);
       }
 #ifdef PNG_READ_INTERLACING_SUPPORTED
       else
@@ -5030,11 +5048,11 @@ sequential_row(standard_display *dp, png_structp pp, png_infop pi,
 
                if (iImage >= 0)
                   deinterlace_row(store_image_row(ps, pp, iImage, y), row,
-                     dp->pixel_size, dp->w, pass);
+                     dp->pixel_size, dp->w, pass, dp->littleendian);
 
                if (iDisplay >= 0)
                   deinterlace_row(store_image_row(ps, pp, iDisplay, y), display,
-                     dp->pixel_size, dp->w, pass);
+                     dp->pixel_size, dp->w, pass, dp->littleendian);
             }
          }
          else
@@ -5871,6 +5889,7 @@ typedef struct transform_display
    /* Parameters */
    png_modifier*              pm;
    const image_transform* transform_list;
+   unsigned int max_gamma_8;
 
    /* Local variables */
    png_byte output_colour_type;
@@ -6053,6 +6072,7 @@ transform_display_init(transform_display *dp, png_modifier *pm, png_uint_32 id,
    /* Parameter fields */
    dp->pm = pm;
    dp->transform_list = transform_list;
+   dp->max_gamma_8 = 16;
 
    /* Local variable fields */
    dp->output_colour_type = 255; /* invalid */
@@ -6916,6 +6936,10 @@ image_transform_png_set_scale_16_set(const image_transform *this,
     transform_display *that, png_structp pp, png_infop pi)
 {
    png_set_scale_16(pp);
+#  if PNG_LIBPNG_VER < 10700
+      /* libpng will limit the gamma table size: */
+      that->max_gamma_8 = PNG_MAX_GAMMA_8;
+#  endif
    this->next->set(this->next, that, pp, pi);
 }
 
@@ -6960,6 +6984,10 @@ image_transform_png_set_strip_16_set(const image_transform *this,
     transform_display *that, png_structp pp, png_infop pi)
 {
    png_set_strip_16(pp);
+#  if PNG_LIBPNG_VER < 10700
+      /* libpng will limit the gamma table size: */
+      that->max_gamma_8 = PNG_MAX_GAMMA_8;
+#  endif
    this->next->set(this->next, that, pp, pi);
 }
 
@@ -7226,14 +7254,15 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           *  conversion adds another +/-2 in the 16-bit case and
           *  +/-(1<<(15-PNG_MAX_GAMMA_8)) in the 8-bit case.
           */
+#        if PNG_LIBPNG_VER < 10700
+            if (that->this.bit_depth < 16)
+               that->max_gamma_8 = PNG_MAX_GAMMA_8;
+#        endif
          that->pm->limit += pow(
-#           if PNG_MAX_GAMMA_8 < 14
-               (that->this.bit_depth == 16 ? 8. :
-                  6. + (1<<(15-PNG_MAX_GAMMA_8)))
-#           else
-               8.
-#           endif
-               /65535, data.gamma);
+            (that->this.bit_depth == 16 || that->max_gamma_8 > 14 ?
+               8. :
+               6. + (1<<(15-that->max_gamma_8))
+            )/65535, data.gamma);
       }
 
       else
@@ -7418,9 +7447,12 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
          const unsigned int sample_depth = that->sample_depth;
          const unsigned int calc_depth = (pm->assume_16_bit_calculations ? 16 :
             sample_depth);
-         const unsigned int gamma_depth = (sample_depth == 16 ?
-            PNG_MAX_GAMMA_8 :
-            (pm->assume_16_bit_calculations ? PNG_MAX_GAMMA_8 : sample_depth));
+         const unsigned int gamma_depth =
+            (sample_depth == 16 ?
+               display->max_gamma_8 :
+               (pm->assume_16_bit_calculations ?
+                  display->max_gamma_8 :
+                  sample_depth));
          int isgray;
          double r, g, b;
          double rlo, rhi, glo, ghi, blo, bhi, graylo, grayhi;
@@ -7457,7 +7489,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
          b = blo = bhi = that->bluef;
          blo -= that->bluee;
          blo = DD(blo, calc_depth, 1/*round*/);
-         bhi += that->greene;
+         bhi += that->bluee;
          bhi = DU(bhi, calc_depth, 1/*round*/);
 
          isgray = r==g && g==b;
@@ -7639,7 +7671,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
             const png_modifier *pm = display->pm;
             double in_qe = (that->sample_depth > 8 ? .5/65535 : .5/255);
             double out_qe = (that->sample_depth > 8 ? .5/65535 :
-               (pm->assume_16_bit_calculations ? .5/(1<<PNG_MAX_GAMMA_8) :
+               (pm->assume_16_bit_calculations ? .5/(1<<display->max_gamma_8) :
                .5/255));
             double rhi, ghi, bhi, grayhi;
             double g1 = 1/data.gamma;
@@ -8287,6 +8319,7 @@ image_transform_png_set_packswap_set(const image_transform *this,
     transform_display *that, png_structp pp, png_infop pi)
 {
    png_set_packswap(pp);
+   that->this.littleendian = 1;
    this->next->set(this->next, that, pp, pi);
 }
 
@@ -8769,7 +8802,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
    /* If requested strip 16 to 8 bits - this is handled automagically below
     * because the output bit depth is read from the library.  Note that there
     * are interactions with sBIT but, internally, libpng makes sbit at most
-    * PNG_MAX_GAMMA_8 when doing the following.
+    * PNG_MAX_GAMMA_8 prior to 1.7 when doing the following.
     */
    if (dp->scale16)
 #     ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
@@ -10210,7 +10243,11 @@ static void perform_gamma_scale16_tests(png_modifier *pm)
 #  ifndef PNG_MAX_GAMMA_8
 #     define PNG_MAX_GAMMA_8 11
 #  endif
-#  define SBIT_16_TO_8 PNG_MAX_GAMMA_8
+#  if defined PNG_MAX_GAMMA_8 || PNG_LIBPNG_VER < 10700
+#     define SBIT_16_TO_8 PNG_MAX_GAMMA_8
+#  else
+#     define SBIT_16_TO_8 16
+#  endif
    /* Include the alpha cases here. Note that sbit matches the internal value
     * used by the library - otherwise we will get spurious errors from the
     * internal sbit style approximation.
@@ -11223,7 +11260,11 @@ int main(int argc, char **argv)
    pm.maxout16 = .499;  /* Error in *encoded* value */
    pm.maxabs16 = .00005;/* 1/20000 */
    pm.maxcalc16 =1./65535;/* +/-1 in 16 bits for compose errors */
-   pm.maxcalcG = 1./((1<<PNG_MAX_GAMMA_8)-1);
+#  if PNG_LIBPNG_VER < 10700
+      pm.maxcalcG = 1./((1<<PNG_MAX_GAMMA_8)-1);
+#  else
+      pm.maxcalcG = 1./((1<<16)-1);
+#  endif
 
    /* NOTE: this is a reasonable perceptual limit. We assume that humans can
     * perceive light level differences of 1% over a 100:1 range, so we need to
