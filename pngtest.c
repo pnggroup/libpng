@@ -65,7 +65,7 @@
    defined PNG_READ_tEXt_SUPPORTED &&\
    defined PNG_READ_tIME_SUPPORTED &&\
    defined PNG_READ_zTXt_SUPPORTED &&\
-   defined PNG_WRITE_INTERLACING_SUPPORTED
+   (defined PNG_WRITE_INTERLACING_SUPPORTED || PNG_LIBPNG_VER >= 10700)
 
 #ifdef PNG_ZLIB_HEADER
 #  include PNG_ZLIB_HEADER /* defined by pnglibconf.h from 1.7 */
@@ -123,6 +123,22 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 #define PNG_tIME_STRING_LENGTH 29
 static int tIME_chunk_present = 0;
 static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
+
+#if PNG_LIBPNG_VER < 10619
+#define png_convert_to_rfc1123_buffer(ts, t) tIME_to_str(read_ptr, ts, t)
+
+static int
+tIME_to_str(png_structp png_ptr, png_charp ts, png_const_timep t)
+{
+    png_const_charp str = png_convert_to_rfc1123(png_ptr, t);
+
+    if (str == NULL)
+        return 0;
+
+    strcpy(ts, str);
+    return 1;
+}
+#endif /* older libpng */
 #endif
 
 static int verbose = 0;
@@ -795,7 +811,7 @@ write_chunks(png_structp write_ptr, int location)
  */
 #ifdef PNG_TEXT_SUPPORTED
 static void
-pngtest_check_text_support(png_const_structp png_ptr, png_textp text_ptr,
+pngtest_check_text_support(png_structp png_ptr, png_textp text_ptr,
    int num_text)
 {
    while (num_text > 0)
@@ -1393,7 +1409,9 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    if (png_set_interlace_handling(write_ptr) != num_passes)
       png_error(write_ptr,
             "png_set_interlace_handling(write): wrong pass count ");
-#endif /* R/W INTERLACING */
+#else /* png_set_interlace_handling not called on either read or write */
+#  define calc_pass_height
+#endif /* not using libpng interlace handling */
 
 #ifdef PNGTEST_TIMING
    t_stop = (float)clock();
@@ -1402,8 +1420,26 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
    for (pass = 0; pass < num_passes; pass++)
    {
+#     ifdef calc_pass_height
+         png_uint_32 pass_height;
+
+         if (num_passes == 7) /* interlaced */
+         {
+            if (PNG_PASS_COLS(width, pass) > 0)
+               pass_height = PNG_PASS_ROWS(height, pass);
+
+            else
+               pass_height = 0;
+         }
+
+         else /* not interlaced */
+            pass_height = height;
+#     else
+#        define pass_height height
+#     endif
+
       pngtest_debug1("Writing row data for pass %d", pass);
-      for (y = 0; y < height; y++)
+      for (y = 0; y < pass_height; y++)
       {
 #ifndef SINGLE_ROWBUF_ALLOC
          pngtest_debug2("Allocating row buffer (pass %d, y = %u)...", pass, y);
