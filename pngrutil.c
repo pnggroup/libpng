@@ -2472,7 +2472,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr)
 
 /******************************************************************************
  * UNKNOWN HANDLING LOGIC
- * 
+ *
  * There are three ways an unknown chunk may arise:
  *
  * 1) Chunks not in the spec.
@@ -2512,7 +2512,7 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr)
  *
  * In the read code PNG_READ_UNKNOWN_CHUNKS_SUPPORTED is set only if either (1)
  * or (2) or both are supported.
- *    
+ *
  *****************************************************************************/
 #ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
 static int
@@ -2742,10 +2742,10 @@ png_known_chunks[] =
  * the hashed name.
  */
 static const png_byte png_chunk_lut[64] =
-{   
-   10, 20,  7,  3,  0, 23,  8,  0,  0, 11, 24,  0,  0,  0,  0,  4, 
-   12,  0,  0,  0, 13,  0,  0,  0, 25,  0,  0,  0,  2,  0,  0,  0, 
-    0,  6, 17,  0, 15,  0,  5, 19, 26,  0,  0,  0, 18,  0,  0,  9, 
+{
+   10, 20,  7,  3,  0, 23,  8,  0,  0, 11, 24,  0,  0,  0,  0,  4,
+   12,  0,  0,  0, 13,  0,  0,  0, 25,  0,  0,  0,  2,  0,  0,  0,
+    0,  6, 17,  0, 15,  0,  5, 19, 26,  0,  0,  0, 18,  0,  0,  9,
     1,  0, 21,  0, 22, 14,  0,  0,  0,  0,  0,  0, 16,  0,  0,  0
 };
 
@@ -2802,7 +2802,7 @@ png_cache_known_unknown(png_structrp png_ptr, png_const_bytep add, int keep)
                       (keep == PNG_HANDLE_CHUNK_IF_SAFE &&
                        PNG_CHUNK_ANCILLARY(name)))
                      png_ptr->save_unknown |= 1U << i;
-                  
+
                   else /* PNG_HANDLE_CHUNK_NEVER || !SAFE */
                      png_ptr->save_unknown &= ~(1U << i);
 #              endif /* SAVE_UNKNOWN_CHUNKS */
@@ -2993,7 +2993,7 @@ png_find_chunk_op(png_structrp png_ptr)
 #        endif /* READ_USER_CHUNKS */
 
 #        ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
-            /* There is no per-chunk special handling set for this chunk 
+            /* There is no per-chunk special handling set for this chunk
              * (because of the test on known_unknown above) so only the
              * default unknown handling behavior matters.  We skip the chunk
              * if the behavior is 'NEVER' or 'DEFAULT'.  This is irrelevant
@@ -3155,7 +3155,7 @@ combine_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
     *
     * The destination pointer (but not size) and how to handle intermediate
     * passes are arguments to the API.  The destination is the pointer to the
-    * entire row buffer, not just the part from output[x] on.  'display' is 
+    * entire row buffer, not just the part from output[x] on.  'display' is
     * interpreted as:
     *
     *    0: only overwrite destination pixels that will correspond to the source
@@ -3304,7 +3304,7 @@ combine_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
             {
                /* Fill a byte with copies of the next pixel: */
                unsigned int spixel_rep = spixel;
-               
+
 #              ifdef PNG_READ_PACKSWAP_SUPPORTED
                   if (lsb)
                      spixel_rep >>= spos;
@@ -3396,7 +3396,7 @@ combine_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
             {
                /* Fill a byte with copies of the next pixel: */
                unsigned int spixel_rep = spixel;
-               
+
 #              ifdef PNG_READ_PACKSWAP_SUPPORTED
                   if (lsb)
                      spixel_rep >>= spos;
@@ -3760,8 +3760,8 @@ png_inflate_IDAT(png_structrp png_ptr, int finish,
             debug(png_ptr->zstream_ended);
 
             if (!finish) /* early end */
-               break; 
-            
+               break;
+
             if (output_size > 0) /* incomplete read */
             {
                if (finish == 2) /* looking for end; it has been found */
@@ -4225,7 +4225,7 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                      PNG_ROWBYTES(pixel_depth, pixels);
 
                   png_alloc_size_t cb;
-                  
+
                   affirm(bytes_to_read > bytes_read);
                   cb = png_inflate_IDAT(png_ptr, finish,
                         pixel_buffer.buffer + bytes_read,
@@ -4505,7 +4505,7 @@ png_read_finish_IDAT(png_structrp png_ptr)
     */
    {
       int ret = inflateEnd(&png_ptr->zstream);
-   
+
       /* In fact we expect this to always succeed, so it is a good idea to
        * catch it in pre-release builds:
        */

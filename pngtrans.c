@@ -2228,7 +2228,7 @@ png_init_byte_ops(png_transformp *transform, png_transform_controlp tc)
                {
                   unsigned int i = code_size;
                   png_uint_32 code = 0U;
-                  
+
                   while (i > 0U)
                   {
                      unsigned int next = codes[--i];
@@ -2256,7 +2256,7 @@ png_init_byte_ops(png_transformp *transform, png_transform_controlp tc)
                   {
                      unsigned int i = 0U;
                      png_uint_32 code = 0U;
-                     
+
                      while (i < code_size)
                      {
                         unsigned int next = codes[i++];
@@ -2295,7 +2295,7 @@ png_init_byte_ops(png_transformp *transform, png_transform_controlp tc)
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
 static void
-png_init_rgb_to_gray_byte_ops(png_transformp *transform, 
+png_init_rgb_to_gray_byte_ops(png_transformp *transform,
    png_transform_controlp tc)
 {
    /* This just delay initializes the function; all the transform initialization
@@ -2532,7 +2532,7 @@ set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc, int alpha)
                png_add_transform(png_ptr, sizeof (png_transform_byte_op),
                   png_init_byte_ops, PNG_TR_CHANNEL_POSTQ));
          png_uint_32 args = PNG_BO_FILLER;
-         
+
          if (filler_loc == PNG_FILLER_BEFORE)
             args |= PNG_BO_FILLER_FIRST;
 

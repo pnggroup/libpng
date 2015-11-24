@@ -387,7 +387,7 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
       return;
 
    if ((png_ptr->mode &
-         (PNG_HAVE_IHDR+PNG_HAVE_IDAT+PNG_AFTER_IDAT+PNG_HAVE_IEND)) != 
+         (PNG_HAVE_IHDR+PNG_HAVE_IDAT+PNG_AFTER_IDAT+PNG_HAVE_IEND)) !=
          (PNG_HAVE_IHDR+PNG_HAVE_IDAT+PNG_AFTER_IDAT))
    {
       /* Out of place png_write_end: */
@@ -676,7 +676,7 @@ write_row_buffered(png_structrp png_ptr, png_const_bytep row,
          {
             png_transform_control tc;
 
-            /* The initial values are the memory format, this was worked out in 
+            /* The initial values are the memory format, this was worked out in
              * png_init_row_info below.
              */
             memset(&tc, 0, sizeof tc);
@@ -981,7 +981,7 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
                break;
 
             default: /* Parameter is the pixel size in bytes */
-               write_row_buffered(png_ptr, row, 
+               write_row_buffered(png_ptr, row,
                      row_number == PNG_PASS_START_ROW(pass), last_pass_row,
                      end_of_image, interlace_row_byte, input_depth >> 3);
                break;
@@ -1038,7 +1038,7 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
              * It's just a warning at present.
              *
              * The test is that either the row_format produced by the write
-             * transforms exactly matches that in the original 
+             * transforms exactly matches that in the original
              * info_struct::format or that the info_struct::format was a simple
              * mapping of the color_type that ended up in the IHDR:
              */

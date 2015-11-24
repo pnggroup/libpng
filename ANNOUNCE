@@ -970,8 +970,9 @@ Version 1.7.0beta69 [November 24, 2015]
     png_handle_pCAL() (Bug report by John Regehr).
   Avoid conditionally compiling parts of statements in png.c (suggested
     by flaviommedeiros).
-  Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
-    not info_ptr.
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
   Added pngvalid --transform --interlace test. This increases code
     coverage by generating test cases with smaller length rows as a
     result of the interlacing.  Without this packswap handling was

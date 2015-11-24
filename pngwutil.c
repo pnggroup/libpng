@@ -1971,7 +1971,7 @@ write_filtered_row(png_structrp png_ptr, png_const_bytep filtered_row,
    if (filter < PNG_FILTER_VALUE_LAST) /* start of row */
    {
       png_byte buffer[1];
-      
+
       buffer[0] = filter;
       png_compress_IDAT(png_ptr, buffer, 1U/*len*/, Z_NO_FLUSH);
    }
