@@ -5319,6 +5319,8 @@ Version 1.7.0beta69 [November 24, 2015]
     we are seeing.
   Temporarily disabled filter selection while writing, and temporarily
     replaced pngtest.png accordingly.
+
+Version 1.7.0beta70 [November 24, 2015]
    
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

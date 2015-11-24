@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta69 - November 24, 2015
+Libpng 1.7.0beta70 - November 24, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta69.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta69.tar.gz
+   1.7.0beta70.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta70.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b69.7z  (LZMA-compressed, recommended)
-   lp170b69.zip
+   lp170b70.7z  (LZMA-compressed, recommended)
+   lp170b70.zip
 
 Other information:
 
-   1.7.0beta69-README.txt
-   1.7.0beta69-LICENSE.txt
-   libpng-1.7.0beta69-*.asc (armored detached GPG signatures)
+   1.7.0beta70-README.txt
+   1.7.0beta70-LICENSE.txt
+   libpng-1.7.0beta70-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1020,6 +1020,8 @@ Version 1.7.0beta69 [November 24, 2015]
     we are seeing.
   Temporarily disabled filter selection while writing, and temporarily
     replaced pngtest.png accordingly.
+
+Version 1.7.0beta70 [November 24, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
