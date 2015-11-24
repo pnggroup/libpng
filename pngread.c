@@ -370,9 +370,22 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
    /* Check the row number; if png_read_process_IDAT is called too many times
     * if issues an affirm, but, while this is appropriate for the progressive
     * reader, it is an app error if it happens here.
+    *
+    * Note that when the app does the interlace handling the last row will
+    * typically be before the last row in the image.
     */
-   if (png_ptr->read_started && png_ptr->row_number == png_ptr->height-1 &&
-       png_ptr->pass == (png_ptr->interlaced == PNG_INTERLACE_NONE ? 0 : 6))
+   if (png_ptr->read_started &&
+       png_ptr->interlaced == PNG_INTERLACE_NONE ?
+         png_ptr->row_number == png_ptr->height-1U : (
+#     ifdef PNG_READ_INTERLACING_SUPPORTED
+         png_ptr->do_interlace ?
+            png_ptr->pass == 6U && png_ptr->row_number == png_ptr->height-1U :
+#     endif /* READ_INTERLACING */
+            png_ptr->pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) &&
+               PNG_LAST_PASS_ROW(png_ptr->row_number, png_ptr->pass,
+                  png_ptr->height)
+         )
+      )
    {
       png_app_error(png_ptr, "Too many calls to png_read_row");
       return;
