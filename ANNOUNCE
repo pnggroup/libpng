@@ -39,7 +39,11 @@ Version 1.6.20beta03 [November 25, 2015]
  
 Version 1.6.20rc01 [November 25, 2015]
   Fixed an error in handling of bad zlib CMINFO field, found by American
-    Fuzzy Lop.
+    Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't immediately
+    fault a bad CMINFO field; instead a 'too far back' error happens later
+    (at least some times).  pngfix failed to limit CMINFO to the allowed
+    values but then assumed that window_bits was in range, triggering an
+    assert. The bug is mostly harmless; the file can't be fixed.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
