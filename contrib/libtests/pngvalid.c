@@ -276,7 +276,8 @@ make_four_random_bytes(png_uint_32* seed, png_bytep bytes)
    make_random_bytes(seed, bytes, 4);
 }
 
-#if defined PNG_READ_SUPPORTED || defined PNG_WRITE_tRNS_SUPPORTED
+#if defined PNG_READ_SUPPORTED || defined PNG_WRITE_tRNS_SUPPORTED ||\
+    defined PNG_WRITE_FILTER_SUPPORTED
 static void
 randomize(void *pv, size_t size)
 {
@@ -285,7 +286,7 @@ randomize(void *pv, size_t size)
 }
 
 #define RANDOMIZE(this) randomize(&(this), sizeof (this))
-#endif /* READ || WRITE_tRNS */
+#endif /* READ || WRITE_tRNS || WRITE_FILTER */
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 static unsigned int
@@ -309,8 +310,8 @@ random_choice(void)
 
    return x & 1;
 }
-#endif
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ_RGB_TO_GRAY || READ_FILLER */
+#endif /* READ_TRANSFORMS */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
  * simply records whether pngvalid did the interlace itself or whether it
@@ -3649,6 +3650,31 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
  * layout details.  See make_size_images below for a way to make images
  * that test odd sizes along with the libpng interlace handling.
  */
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+static void
+choose_random_filter(png_structp pp, int start)
+{
+   /* Choose filters randomly except that on the very first row ensure that
+    * there is at least one previous row filter.
+    */
+   int filters;
+
+   RANDOMIZE(filters);
+   filters &= PNG_ALL_FILTERS;
+
+   /* There may be no filters; skip the setting. */
+   if (filters != 0)
+   {
+      if (start && filters < PNG_FILTER_UP)
+         filters |= PNG_FILTER_UP;
+
+      png_set_filter(pp, 0/*method*/, filters);
+   }
+}
+#else /* !WRITE_FILTER */
+#  define choose_random_filter(pp, start) ((void)0)
+#endif /* !WRITE_FILTER */
+
 static void
 make_transform_image(png_store* const ps, png_byte const colour_type,
     png_byte const bit_depth, unsigned int palette_number,
@@ -3767,6 +3793,7 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
                   }
 #              endif /* do_own_interlace */
 
+               choose_random_filter(pp, pass == 0 && y == 0);
                png_write_row(pp, buffer);
             }
          }
@@ -3943,9 +3970,6 @@ make_size_image(png_store* const ps, png_byte const colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
-#        ifdef PNG_WRITE_FILTER_SUPPORTED
-            int nfilter = PNG_FILTER_VALUE_LAST;
-#        endif
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -4008,15 +4032,23 @@ make_size_image(png_store* const ps, png_byte const colour_type,
                 * does accept a filter number (per the spec) as well as a bit
                 * mask.
                 *
-                * The apparent wackiness of decrementing nfilter rather than
-                * incrementing is so that Paeth gets used in all images bigger
-                * than 1 row - it's the tricky one.
+                * The code now uses filters at random, except that on the first
+                * row of an image it ensures that a previous row filter is in
+                * the set so that libpng allocates the row buffer.
                 */
-               png_set_filter(pp, 0/*method*/,
-                  nfilter >= PNG_FILTER_VALUE_LAST ? PNG_ALL_FILTERS : nfilter);
+               {
+                  int filters;
+                  
+                  RANDOMIZE(filters);
+                  filters %= PNG_FILTER_VALUE_LAST;
+                  if (filters < 0) filters = -filters;
+                  filters = 8 << filters;
 
-               if (nfilter-- == 0)
-                  nfilter = PNG_FILTER_VALUE_LAST-1;
+                  if (pass == 0 && y == 0 && filters < PNG_FILTER_UP)
+                     filters |= PNG_FILTER_UP;
+
+                  png_set_filter(pp, 0/*method*/, filters);
+               }
 #           endif
 
                png_write_row(pp, row);

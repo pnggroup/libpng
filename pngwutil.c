@@ -2264,44 +2264,6 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             }
          }
       }
-
-      /* The filters are pre-calculated in png_set_filter, however if the
-       * image is interlaced some passes may still be too narrow or short to
-       * allow certain filters.  In any case the first row of the pass
-       * doesn't need to consider PAETH or UP (AVG is still different).
-       */
-      if (first_row_in_pass)
-      {
-         if ((filters_to_try & PNG_FILTER_UP) != 0U)
-         {
-            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
-            filters_to_try |= PNG_FILTER_NONE;
-         }
-
-         if ((filters_to_try & PNG_FILTER_PAETH) != 0U)
-         {
-            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_PAETH);
-            filters_to_try |= PNG_FILTER_SUB/*equialent to PAETH here*/;
-         }
-
-         /* If this leaves the AVG filter it will be used on the first row
-          * this is handled in the filter implementation by setting prev_row
-          * to NULL below.
-          */
-      }
-
-      /* Check for a narrow image; the blocking will never return just one
-       * pixel at the start unless the pass is only one pixel wide, this test
-       * needs to happen after the one above on PAETH:
-       */
-      if (width == 1U)
-      {
-         if ((filters_to_try & PNG_FILTER_SUB) != 0U)
-         {
-            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_SUB);
-            filters_to_try |= PNG_FILTER_NONE;
-         }
-      }
    } /* start of row */
 
    else if (prev_row != NULL)
@@ -2390,61 +2352,6 @@ png_set_filter(png_structrp png_ptr, int method, int filtersIn)
        * are present, now it does nothing; this seems a lot safer.
        */
       return;
-   }
-
-   /* New in 1.7.0: adjust the mask according to the image characteristics.
-    * This used to happen on every row, doing it here means that these checks
-    * happen only once every png_set_filter call, or once per image.
-    */
-   if (filters != PNG_FILTER_NONE)
-   {
-      /* Test to see if there are enough rows to allow previous-row filters to
-       * work.  Note that the AVG filter is still significant because it uses
-       * half the value of the previous pixel as the predictor, but it is
-       * ignored in this case.
-       */
-      if (png_ptr->height <= (png_ptr->interlaced == PNG_INTERLACE_NONE ? 1U :
-               (png_ptr->width == 1U ? 3U : 2U)))
-      {
-         /* Replace 'up' by the equivalent 'none': */
-         if ((filters & (PNG_FILTER_UP)) != 0)
-         {
-            filters &= PNG_BIC_MASK(PNG_FILTER_UP);
-            filters |= PNG_FILTER_NONE;
-         }
-
-         /* Replace 'paeth' by the equivalent 'sub': */
-         if ((filters & PNG_FILTER_PAETH) != 0)
-         {
-            filters &= PNG_BIC_MASK(PNG_FILTER_PAETH);
-            filters |= PNG_FILTER_SUB;
-         }
-
-         /* Remove 'avg' unless it is the only filter in which case 'none' is
-          * used.  (This chooses compression speed of very short images over a
-          * probably pointless compression option for a one line image; short
-          * images are common, the sub-case which benefits from AVG is not.
-          */
-         if ((filters & PNG_FILTER_AVG) != 0)
-         {
-            filters &= PNG_BIC_MASK(PNG_FILTER_AVG);
-            if (filters == 0U)
-               filters |= PNG_FILTER_NONE;
-         }
-      }
-
-      /* Also check for SUB on narrow images; it's equivalent to NONE on the
-       * first pixel.
-       */
-      if (png_ptr->width <= (png_ptr->interlaced == PNG_INTERLACE_NONE ? 1U :
-               (png_ptr->height == 1U ? 3U : 1U)))
-      {
-         if ((filters & PNG_FILTER_SUB) != 0)
-         {
-            filters &= PNG_BIC_MASK(PNG_FILTER_SUB);
-            filters |= PNG_FILTER_NONE;
-         }
-      }
    }
 
    debug(filters != 0U && (filters & PNG_BIC_MASK(PNG_ALL_FILTERS)) == 0U);
