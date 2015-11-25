@@ -375,7 +375,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
     * typically be before the last row in the image.
     */
    if (png_ptr->read_started &&
-       png_ptr->interlaced == PNG_INTERLACE_NONE ?
+       (png_ptr->interlaced == PNG_INTERLACE_NONE ?
          png_ptr->row_number == png_ptr->height-1U : (
 #     ifdef PNG_READ_INTERLACING_SUPPORTED
          png_ptr->do_interlace ?
@@ -385,7 +385,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
                PNG_LAST_PASS_ROW(png_ptr->row_number, png_ptr->pass,
                   png_ptr->height)
          )
-      )
+       ))
    {
       png_app_error(png_ptr, "Too many calls to png_read_row");
       return;
