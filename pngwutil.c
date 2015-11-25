@@ -2284,18 +2284,10 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             filters_to_try |= PNG_FILTER_SUB/*equialent to PAETH here*/;
          }
 
-#if 0
          /* If this leaves the AVG filter it will be used on the first row
           * this is handled in the filter implementation by setting prev_row
           * to NULL below.
           */
-#else /* DOESN'T WORK (problems in the read code?) */
-         if ((filters_to_try & PNG_FILTER_AVG) != 0U)
-         {
-            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_AVG);
-            filters_to_try |= PNG_FILTER_NONE;
-         }
-#endif
       }
 
       /* Check for a narrow image; the blocking will never return just one

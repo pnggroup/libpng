@@ -4111,8 +4111,10 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
          /* The filter is followed by the row data, but first check the
           * filter byte; the spec requires that we invent an empty row
           * if the first row of a pass requires it.
+          *
+          * Note that row_number is the image row.
           */
-         if (row_number == 0) switch (row_filter)
+         if (row_number == PNG_PASS_START_ROW(pass)) switch (row_filter)
          {
             case PNG_FILTER_VALUE_UP:
                /* x-0 == x, so do this optimization: */
@@ -4131,13 +4133,8 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                 * AVG using only the previous byte; it's 'SUB' of half the
                 * preceding value, but this seems pointless.  Zero out the
                 * row buffer to make AVG work.
-                *
-                * This is only required if 'pass' is >0, because on the first
-                * pass the code that allocated the row buffer zeroed it (for
-                * security reasons).
                 */
-               if (pass > 0)
-                  memset(png_ptr->row_buffer, 0U,
+               memset(png_ptr->row_buffer, 0U,
                         PNG_ROWBYTES(pixel_depth, pass_width));
                break;
 
