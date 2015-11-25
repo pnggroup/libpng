@@ -5419,11 +5419,16 @@ Version 1.6.20beta01 [November 20, 2015]
     png_handle_pCAL() (Bug report by John Regehr).
 
 Version 1.6.20beta02 [November 23, 2015]
-  Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
-    not info_ptr.
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
 
-Version 1.6.20beta03 [(PENDING RELEASE)]
+Version 1.6.20beta03 [November 24, 2015]
   Backported tests from libpng-1.7.0beta69.
+
+Version 1.6.20rc01 [November 25, 2015]
+  Fixed an error in handling of bad zlib CMINFO field, found by American
+    Fuzzy Lop.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
