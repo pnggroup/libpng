@@ -593,7 +593,7 @@ png_do_read_unpack(png_transformp *transform, png_transform_controlp tc)
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_const_bytep ep = png_voidcast(png_const_bytep, tc->dp);
    png_bytep dp = png_voidcast(png_bytep, tc->dp);
-   
+
    sp += PNG_TC_ROWBYTES(*tc) - 1; /* Start from end */
    dp += tc->width; /* output bit depth is 8 */
 
@@ -616,7 +616,7 @@ png_do_read_unpack(png_transformp *transform, png_transform_controlp tc)
             if (shift == 0U)
                --sp;
          }
-         
+
          debug(shift == 0U);
          break;
       }
@@ -1826,7 +1826,7 @@ png_log16bit(unsigned int x)
  *        D^g
  *   P = -----
  *       D^g-1
- *       
+ *
  *       (M x (D^g-1)) (1)
  *   R = (-----------)^(-)
  *       (    D^g    ) (g)
@@ -2159,7 +2159,7 @@ png_gamma_nxmbit_correct(unsigned int value, png_fixed_point gamma_val,
             r = floor(mout * pow(r, gamma_val*.00001)+.5);
             if (r < 1)
                return 0U;
-            
+
             else if (r >= mout)
                return mout;
 
@@ -3854,7 +3854,7 @@ png_init_rgb_to_gray(png_transformp *transform, png_transform_controlp tc)
             {
                png_transformp tr_expand = png_push_transform(png_ptr,
                   sizeof (png_expand), png_init_expand, transform, NULL);
-               
+
                debug(*transform == tr_expand);
                tr_expand->args |= PNG_EXPAND_tRNS;
                png_init_expand(transform, tc);
@@ -3869,7 +3869,7 @@ png_init_rgb_to_gray(png_transformp *transform, png_transform_controlp tc)
 
          {
             png_fixed_point red, green;
-            
+
             if (tr->coefficients_set)
             {
                red = tr->red_coefficient;

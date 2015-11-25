@@ -411,7 +411,7 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
     */
 {
    png_alloc_size_t buffer_length;
-   
+
    if (buffer_lengthp != NULL)
       buffer_length = *buffer_lengthp;
 
@@ -620,7 +620,7 @@ png_push_read_process_IDAT(png_structp png_ptr, png_bytep *bufferp,
          if (buffer_lengthp != NULL)
          {
             png_push_read_sync_zstream(png_ptr, bufferp, buffer_lengthp);
-         
+
             /* If the chunk_length is greater than 0 then there is extra data,
              * report this once.  Notice that for IDAT after the end of the
              * stream we keep coming to this point and doing the skip.

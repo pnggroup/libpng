@@ -325,7 +325,7 @@ typedef void (*png_transform_fn)(/* Function to implement a transform */
     *    and format as before.
     *
     *    In the write case the transforms are called in the reverse order and
-    *    the input bit depth and format should match the required values.  
+    *    the input bit depth and format should match the required values.
     *
     * It is valid during initialization for the transform function to push
     * another transform into the list in either the read or the write case if
