@@ -5321,7 +5321,15 @@ Version 1.7.0beta69 [November 24, 2015]
   Temporarily disabled filter selection while writing, and temporarily
     replaced pngtest.png accordingly.
 
-Version 1.7.0beta70 [November 24, 2015]
+Version 1.7.0beta70 [November 25, 2015]
+  Fixed a simple bracket problem that prevented reading non-interlaced
+    PNG files with height == 1.
+  The code failed to zero out the row buffer at the start of a pass where
+    the AVG filter is used because 'row_number' is not always zero (on
+    interlaced images) and, apparently, the assertion that the buffer had
+    been zeroed when allocated was not always correct for non-interlaced
+    images.  Revealed by pngvalid --size with a hack to make it always
+    use AVG.
    
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
