@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014-2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.18 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.20 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -53,7 +53,8 @@
 #include <setjmp.h>
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_EASY_ACCESS_SUPPORTED) &&\
-    defined(PNG_READ_INTERLACING_SUPPORTED)
+   (defined(PNG_READ_DEINTERLACE_SUPPORTED) ||\
+    defined(PNG_READ_INTERLACING_SUPPORTED))
 
 /* zlib.h defines the structure z_stream, an instance of which is included
  * in this structure and is required for decompressing the LZ compressed
@@ -136,7 +137,7 @@
 #define png_zTXt PNG_U32(122,  84,  88, 116)
 #endif
 
-/* The 8 byte signature as a pair of 32 bit quantities */
+/* The 8-byte signature as a pair of 32-bit quantities */
 #define sig1 PNG_U32(137,  80,  78,  71)
 #define sig2 PNG_U32( 13,  10,  26,  10)
 
@@ -158,7 +159,7 @@
  */
 #define UNREACHED 0
 
-/* 80-bit number handling - a PNG image can be up to (2^31-1)x(2^31-1) 8 byte
+/* 80-bit number handling - a PNG image can be up to (2^31-1)x(2^31-1) 8-byte
  * (16-bit RGBA) pixels in size; that's less than 2^65 bytes or 2^68 bits, so
  * arithmetic of 80-bit numbers is sufficient.  This representation uses an
  * arbitrary length array of png_uint_16 digits (0..65535).  The representation
@@ -586,7 +587,7 @@ chunk_type_valid(png_uint_32 c)
    c &= ~PNG_U32(32,32,0,32);
    t = (c & ~0x1f1f1f1f) ^ 0x40404040;
 
-   /* Subtract 65 for each 8 bit quantity, this must not overflow
+   /* Subtract 65 for each 8-bit quantity, this must not overflow
     * and each byte must then be in the range 0-25.
     */
    c -= PNG_U32(65,65,65,65);
@@ -669,7 +670,7 @@ IDAT_list_extend(struct IDAT_list *tail)
 
       if (length < tail->length) /* arithmetic overflow */
          length = tail->length;
-            
+
       next = voidcast(IDAT_list*, malloc(IDAT_list_size(NULL, length)));
       CLEAR(*next);
 
@@ -923,7 +924,7 @@ emit_string(const char *str, FILE *out)
 
       else if (isspace(UCHAR_MAX & *str))
          putc('_', out);
-   
+
       else
          fprintf(out, "\\%.3o", *str);
 }
@@ -1947,7 +1948,7 @@ process_IDAT(struct file *file)
       list->count = 0;
       file->idat->idat_list_tail = list;
    }
-   
+
    /* And fill in the next IDAT information buffer. */
    list->lengths[(list->count)++] = file->chunk->chunk_length;
 
@@ -2220,7 +2221,7 @@ zlib_init(struct zlib *zlib, struct IDAT *idat, struct chunk *chunk,
    /* These values are sticky across reset (in addition to the stuff in the
     * first block, which is actually constant.)
     */
-   zlib->file_bits = 16;
+   zlib->file_bits = 24;
    zlib->ok_bits = 16; /* unset */
    zlib->cksum = 0; /* set when a checksum error is detected */
 
@@ -2303,10 +2304,12 @@ zlib_advance(struct zlib *zlib, png_uint_32 nbytes)
                zlib->file_bits = file_bits;
 
                /* Check against the existing value - it may not need to be
-                * changed.
+                * changed.  Note that a bogus file_bits is allowed through once,
+                * to see if it works, but the window_bits value is set to 15,
+                * the maximum.
                 */
                if (new_bits == 0) /* no change */
-                  zlib->window_bits = file_bits;
+                  zlib->window_bits = ((file_bits > 15) ? 15 : file_bits);
 
                else if (new_bits != file_bits) /* rewrite required */
                   bIn = (png_byte)((bIn & 0xf) + ((new_bits-8) << 4));
@@ -2327,8 +2330,7 @@ zlib_advance(struct zlib *zlib, png_uint_32 nbytes)
                if (bIn != b2)
                {
                   /* If the first byte wasn't changed this indicates an error in
-                   * the checksum calculation; signal this by setting file_bits
-                   * (not window_bits) to 0.
+                   * the checksum calculation; signal this by setting 'cksum'.
                    */
                   if (zlib->file_bits == zlib->window_bits)
                      zlib->cksum = 1;
@@ -2587,7 +2589,7 @@ zlib_run(struct zlib *zlib)
    {
       struct chunk *chunk = zlib->chunk;
       int rc;
-      
+
       assert(zlib->rewrite_offset < chunk->chunk_length);
 
       rc = zlib_advance(zlib, chunk->chunk_length - zlib->rewrite_offset);
@@ -4044,3 +4046,4 @@ main(void)
    return 77;
 }
 #endif /* PNG_SETJMP_SUPPORTED */
+

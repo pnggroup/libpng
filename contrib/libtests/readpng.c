@@ -62,6 +62,7 @@ read_png(FILE *fp)
    {
       png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
+      /* Failure to initialize these is harmless */
       row = malloc(rowbytes);
       display = malloc(rowbytes);
 
@@ -73,7 +74,7 @@ read_png(FILE *fp)
 #        ifdef PNG_READ_INTERLACING_SUPPORTED
             int passes = png_set_interlace_handling(png_ptr);
 #        else /* !READ_INTERLACING */
-            int passes = png_get_interlace_type(png_ptr, info_ptr) == 
+            int passes = png_get_interlace_type(png_ptr, info_ptr) ==
                PNG_INTERLACE_ADAM7 ? PNG_INTERLACE_ADAM7_PASSES : 1;
 #        endif /* !READ_INTERLACING */
          int pass;
