@@ -1,7 +1,7 @@
 # contrib/neon/neon.am
 #
 # This is an automake fragment included by the top-level Makefile.am if
-# contrib/neon/neon.ac is included in configure 
+# contrib/neon/neon.ac is included in configure
 #
 # It builds the source files in this directory into ARM hardware support for
 # libpng.

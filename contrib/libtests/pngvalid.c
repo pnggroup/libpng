@@ -4038,7 +4038,7 @@ make_size_image(png_store* const ps, png_byte const colour_type,
                 */
                {
                   int filters;
-                  
+
                   RANDOMIZE(filters);
                   filters %= PNG_FILTER_VALUE_LAST;
                   if (filters < 0) filters = -filters;

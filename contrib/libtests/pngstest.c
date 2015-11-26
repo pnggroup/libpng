@@ -3130,7 +3130,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
         (void) unlink(tmpfile);
       }
 #endif
-      
+
       if (f != NULL)
       {
          if (png_image_write_to_stdio(&image->image, f, convert_to_8bit,
