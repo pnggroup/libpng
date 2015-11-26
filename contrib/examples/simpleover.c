@@ -136,7 +136,7 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
             /* This is the optimized Porter-Duff 'Over' operation, when the
              * input alpha is 0 the output is not changed.
              */
-            if (in_alpha > 0) 
+            if (in_alpha > 0)
             {
                png_uint_16 *out_pixel = sprite->buffer +
                   ((y+y_offset) * sprite->width + (x+x_offset))*4;
@@ -184,7 +184,7 @@ sprite_op(const struct sprite *sprite, int x_offset, int y_offset,
    }
 }
 
-static int 
+static int
 create_sprite(struct sprite *sprite, int *argc, const char ***argv)
 {
    /* Read the arguments and create this sprite. The sprite buffer has already
@@ -415,7 +415,7 @@ simpleover_process(png_imagep output, png_bytep out_buf, int argc,
             n = sscanf(argv[0], "--sprite=%u,%u,%" str(sprite_name_chars) "s%c",
                 &sprites[nsprites].width, &sprites[nsprites].height,
                 sprites[nsprites].name, &tombstone);
-            
+
             if ((n == 2 || n == 3) &&
                 sprites[nsprites].width > 0 && sprites[nsprites].height > 0)
             {
@@ -492,7 +492,7 @@ simpleover_process(png_imagep output, png_bytep out_buf, int argc,
                if (!add_sprite(output, out_buf, sprites+isprite, &argc, &argv))
                   goto out; /* error in add_sprite */
 
-               break; 
+               break;
             }
          }
 

@@ -5426,7 +5426,7 @@ Version 1.6.20beta02 [November 23, 2015]
 Version 1.6.20beta03 [November 24, 2015]
   Backported tests from libpng-1.7.0beta69.
 
-Version 1.6.20rc01 [November 25, 2015]
+Version 1.6.20rc01 [November 26, 2015]
   Fixed an error in handling of bad zlib CMINFO field, found by American
     Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't immediately
     fault a bad CMINFO field; instead a 'too far back' error happens later

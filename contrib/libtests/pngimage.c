@@ -948,7 +948,7 @@ update_display(struct display *dp)
 
          if ((transform_info[i].valid_chunks == 0 ||
                (transform_info[i].valid_chunks & chunks) != 0) &&
-            (transform_info[i].color_mask_required & ct) == 
+            (transform_info[i].color_mask_required & ct) ==
                transform_info[i].color_mask_required &&
             (transform_info[i].color_mask_absent & ct) == 0 &&
             (transform_info[i].bit_depths & bd) != 0 &&
@@ -1006,7 +1006,7 @@ compare_read(struct display *dp, int applied_transforms)
    {
       unsigned long chunks =
          png_get_valid(dp->read_pp, dp->read_ip, 0xffffffff);
-      
+
       if (chunks != dp->chunks)
          display_log(dp, APP_FAIL, "PNG chunks changed from 0x%lx to 0x%lx",
             (unsigned long)dp->chunks, chunks);

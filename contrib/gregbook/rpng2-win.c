@@ -33,7 +33,7 @@
     - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
               unexpected-EOF and file-read-error cases
     - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options
-    - 2.04:  
+    - 2.04:
              (GR-P)
 
   ---------------------------------------------------------------------------
