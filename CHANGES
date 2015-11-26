@@ -3012,8 +3012,12 @@ version 1.4.18beta01 [November 20, 2015]
     png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
 
 version 1.4.18beta02 [November 23, 2015]
-  Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
-    not info_ptr.
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
+
+version 1.4.18rc01 [November 26, 2015]
+  Discontinued distributing tar.bz2 archives.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

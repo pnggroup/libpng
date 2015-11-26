@@ -403,7 +403,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file, BOOL raw, BOOL a
             if (bit_depth == 16){
 	      dep_16 = (long) *pix_ptr++;
               fprintf (alpha_file, "%ld ", (dep_16 << 8) + (long) *pix_ptr++);
-	    }  
+	    }
             else
               fprintf (alpha_file, "%ld ", (long) *pix_ptr++);
         }

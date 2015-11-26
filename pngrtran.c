@@ -1726,7 +1726,7 @@ png_do_unshift(png_row_infop row_info, png_bytep row, png_color_8p sig_bits)
       switch (row_info->bit_depth)
       {
          default:
-            break; 
+            break;
 
          case 2:
          {

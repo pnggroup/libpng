@@ -302,23 +302,23 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam,
             {
                 if (strcmp (szImgPathName, "") == 0)
                     return 0;
-                
+
                 // load the image from file
-                
+
                 if (!LoadImageFile (hwnd, szImgPathName, &pbImage,
                         &cxImgSize, &cyImgSize, &cImgChannels, &bkgColor))
                     return 0;
-                
+
                 // invalidate the client area for later update
-                
+
                 InvalidateRect (hwnd, NULL, TRUE);
-                
+
                 // display the PNG into the DIBitmap
-                
+
                 DisplayImage (hwnd, &pDib, &pDiData, cxWinSize, cyWinSize,
                     pbImage, cxImgSize, cyImgSize, cImgChannels, bStretched);
             }
-            
+
             return 0;
 
         case IDM_FILE_PREVIOUS:
@@ -328,22 +328,22 @@ LRESULT CALLBACK WndProc (HWND hwnd, UINT message, WPARAM wParam,
             if (SearchPngList (pPngFileList, iPngFileCount, &iPngFileIndex,
                 szImgPathName, NULL))
             {
-                
+
                 if (strcmp (szImgPathName, "") == 0)
                     return 0;
-                
+
                 // load the image from file
-                
+
                 if (!LoadImageFile (hwnd, szImgPathName, &pbImage, &cxImgSize,
                     &cyImgSize, &cImgChannels, &bkgColor))
                     return 0;
-                
+
                 // invalidate the client area for later update
-                
+
                 InvalidateRect (hwnd, NULL, TRUE);
-                
+
                 // display the PNG into the DIBitmap
-                
+
                 DisplayImage (hwnd, &pDib, &pDiData, cxWinSize, cyWinSize,
                     pbImage, cxImgSize, cyImgSize, cImgChannels, bStretched);
             }
@@ -619,29 +619,29 @@ BOOL SearchPngList (
     if (FileCount > 0)
     {
         // get previous entry
-        
+
         if (pstrPrevName != NULL)
         {
             if (*pFileIndex > 0)
                 *pFileIndex -= 1;
             else
                 *pFileIndex = FileCount - 1;
-            
+
             strcpy (pstrPrevName, pFileList + (*pFileIndex * MAX_PATH));
         }
-        
+
         // get next entry
-        
+
         if (pstrNextName != NULL)
         {
             if (*pFileIndex < FileCount - 1)
                 *pFileIndex += 1;
             else
                 *pFileIndex = 0;
-            
+
             strcpy (pstrNextName, pFileList + (*pFileIndex * MAX_PATH));
         }
-        
+
         return TRUE;
     }
     else
