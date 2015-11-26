@@ -2898,9 +2898,13 @@ version 1.2.55beta01 [November 20, 2015]
   Avoid potential pointer overflow in png_handle_iTXt(), png_handle_zTXt(),
     png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
 
-version 1.2.55beta02 [%RDATE%]
-  Fixed bug recently introduced in png_set_PLTE() that uses png_ptr
-    not info_ptr.
+version 1.2.55beta02 [November 23, 2015]
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
+
+version 1.2.55rc01 [November 26, 2015]
+  Discontinued distributing tar.bz2 archives.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
