@@ -5330,6 +5330,12 @@ Version 1.7.0beta70 [November 25, 2015]
     been zeroed when allocated was not always correct for non-interlaced
     images.  Revealed by pngvalid --size with a hack to make it always
     use AVG.
+  Fixed an error in handling of bad zlib CMINFO field, found by American
+    Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't immediately
+    fault a bad CMINFO field; instead a 'too far back' error happens later
+    (at least some times).  pngfix failed to limit CMINFO to the allowed
+    values but then assumed that window_bits was in range, triggering an
+    assert. The bug is mostly harmless; the file can't be fixed.
    
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
