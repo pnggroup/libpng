@@ -64,14 +64,7 @@
 
 #ifdef PNG_WRITE_SUPPORTED
 /* The type of a compression buffer list used by the write code. */
-typedef struct png_compression_buffer
-{
-   struct png_compression_buffer *next;
-   png_byte                       output[1]; /* actually zbuf_size */
-} png_compression_buffer, *png_compression_bufferp;
-
-#define PNG_COMPRESSION_BUFFER_SIZE(pp)\
-   (offsetof(png_compression_buffer, output) + (pp)->zbuffer_size)
+typedef struct png_compression_buffer *png_compression_bufferp;
 #endif
 
 /* Colorspace support; structures used in png_struct, png_info and in internal
@@ -755,6 +748,7 @@ struct png_struct_def
     */
    png_uint_32  zowner;        /* ID (chunk type) of zstream owner, 0 if none */
    z_stream     zstream;       /* decompression structure */
+   unsigned int zstream_start:1; /* before first byte of stream */
    unsigned int zstream_ended:1; /* no more zlib output available */
    unsigned int zstream_error:1; /* zlib error message has been output */
    unsigned int zstream_eod  :1; /* all the required uncompressed data has been

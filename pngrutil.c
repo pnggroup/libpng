@@ -362,7 +362,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       else
       {
-         png_zstream_error(png_ptr, ret);
+         png_zstream_error(&png_ptr->zstream, ret);
          png_ptr->zstream_ended = 1;
       }
 
@@ -493,7 +493,7 @@ png_zlib_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
       if (ret != Z_BUF_ERROR)
          png_ptr->zstream_ended = 1;
 
-      png_zstream_error(png_ptr, ret);
+      png_zstream_error(&png_ptr->zstream, ret);
       return ret;
    }
 
@@ -667,14 +667,14 @@ png_decompress_chunk(png_structrp png_ptr,
                {
                   /* Out of memory allocating the buffer */
                   ret = Z_MEM_ERROR;
-                  png_zstream_error(png_ptr, Z_MEM_ERROR);
+                  png_zstream_error(&png_ptr->zstream, Z_MEM_ERROR);
                }
             }
 
             else
             {
                /* inflateReset failed, store the error message */
-               png_zstream_error(png_ptr, ret);
+               png_zstream_error(&png_ptr->zstream, ret);
 
                if (ret == Z_STREAM_END)
                   ret = PNG_UNEXPECTED_ZLIB_RETURN;
@@ -697,7 +697,7 @@ png_decompress_chunk(png_structrp png_ptr,
    else
    {
       /* Application/configuration limits exceeded */
-      png_zstream_error(png_ptr, Z_MEM_ERROR);
+      png_zstream_error(&png_ptr->zstream, Z_MEM_ERROR);
       return Z_MEM_ERROR;
    }
 }
@@ -758,7 +758,7 @@ png_inflate_read(png_structrp png_ptr, png_bytep read_buffer, uInt read_size,
       png_ptr->zstream.avail_out = 0; /* Should not be required, but is safe */
 
       /* Ensure the error message pointer is always set: */
-      png_zstream_error(png_ptr, ret);
+      png_zstream_error(&png_ptr->zstream, ret);
       return ret;
    }
 
@@ -4513,7 +4513,7 @@ png_read_finish_IDAT(png_structrp png_ptr)
          /* This is just a warning; it's safe, and the zstream_error flag is
           * not set.
           */
-         png_zstream_error(png_ptr, ret);
+         png_zstream_error(&png_ptr->zstream, ret);
          png_chunk_warning(png_ptr, png_ptr->zstream.msg);
       }
    }

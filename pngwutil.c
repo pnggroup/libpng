@@ -203,7 +203,7 @@ png_write_chunk(png_structrp png_ptr, png_const_bytep chunk_string,
  * point at which a lower LZ window size can be used.)
  */
 static png_alloc_size_t
-png_image_size(png_structrp png_ptr)
+png_image_size(png_const_structrp png_ptr)
 {
    /* Only return sizes up to the maximum of a png_uint_32; do this by limiting
     * the width and height used to 15 bits.
@@ -241,6 +241,16 @@ png_image_size(png_structrp png_ptr)
    else
       return 0xffffffffU;
 }
+
+/* The type of the compression buffer list (opaque outside this file) */
+typedef struct png_compression_buffer
+{
+   struct png_compression_buffer *next;
+   png_byte                       output[1]; /* actually zbuf_size */
+} png_compression_buffer;
+
+#define PNG_COMPRESSION_BUFFER_SIZE(pp)\
+   (offsetof(png_compression_buffer, output) + (pp)->zbuffer_size)
 
 #ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
    /* This is the code to hack the first two bytes of the deflate stream (the
@@ -407,7 +417,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 
          if (ret_end != Z_OK || png_ptr->zstream.state != NULL)
          {
-            png_zstream_error(png_ptr, ret_end);
+            png_zstream_error(&png_ptr->zstream, ret_end);
             png_warning(png_ptr, png_ptr->zstream.msg);
             png_ptr->zstream.state = NULL; /* zlib error recovery */
          }
@@ -438,7 +448,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
          png_ptr->zowner = owner;
 
       else
-         png_zstream_error(png_ptr, ret);
+         png_zstream_error(&png_ptr->zstream, ret);
 
       return ret;
    }
@@ -616,7 +626,7 @@ png_text_compress(png_structrp png_ptr, png_uint_32 chunk_name,
       }
 
       else
-         png_zstream_error(png_ptr, ret);
+         png_zstream_error(&png_ptr->zstream, ret);
 
       /* Reset zlib for another zTXt/iTXt or image data */
       png_ptr->zowner = 0;
@@ -965,162 +975,6 @@ png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
 
    png_write_chunk_end(png_ptr);
    png_ptr->mode |= PNG_HAVE_PLTE;
-}
-
-/* This is similar to png_text_compress, above, except that it does not require
- * all of the data at once and, instead of buffering the compressed result,
- * writes it as IDAT chunks.  Unlike png_text_compress it *can* png_error out
- * because it calls the write interface.  As a result it does its own error
- * reporting and does not return an error code.  In the event of error it will
- * just call png_error.  The input data length may exceed 32-bits.  The 'flush'
- * parameter is exactly the same as that to deflate, with the following
- * meanings:
- *
- * Z_NO_FLUSH: normal incremental output of compressed data
- * Z_SYNC_FLUSH: do a SYNC_FLUSH, used by png_write_flush
- * Z_FINISH: this is the end of the input, do a Z_FINISH and clean up
- *
- * The routine manages the acquire and release of the png_ptr->zstream by
- * checking and (at the end) clearing png_ptr->zowner; it does some sanity
- * checks on the 'mode' flags while doing this.
- */
-void /* PRIVATE */
-png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
-   png_alloc_size_t input_len, int flush)
-{
-   if (png_ptr->zowner != png_IDAT)
-   {
-      /* First time.   Ensure we have a temporary buffer for compression and
-       * trim the buffer list if it has more than one entry to free memory.
-       * If 'WRITE_COMPRESSED_TEXT' is not set the list will never have been
-       * created at this point, but the check here is quick and safe.
-       */
-      if (png_ptr->zbuffer_list == NULL)
-      {
-         png_ptr->zbuffer_list = png_voidcast(png_compression_bufferp,
-            png_malloc(png_ptr, PNG_COMPRESSION_BUFFER_SIZE(png_ptr)));
-         png_ptr->zbuffer_list->next = NULL;
-      }
-
-      else
-         png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list->next);
-
-      /* It is a terminal error if we can't claim the zstream. */
-      if (png_deflate_claim(png_ptr, png_IDAT, png_image_size(png_ptr)) != Z_OK)
-         png_error(png_ptr, png_ptr->zstream.msg);
-
-      /* The output state is maintained in png_ptr->zstream, so it must be
-       * initialized here after the claim.
-       */
-      png_ptr->zstream.next_out = png_ptr->zbuffer_list->output;
-      png_ptr->zstream.avail_out = png_ptr->zbuffer_size;
-   }
-
-   /* Now loop reading and writing until all the input is consumed or an error
-    * terminates the operation.  The _out values are maintained across calls to
-    * this function, but the input must be reset each time.
-    */
-   png_ptr->zstream.next_in = PNGZ_INPUT_CAST(input);
-   png_ptr->zstream.avail_in = 0; /* set below */
-   for (;;)
-   {
-      int ret;
-
-      /* INPUT: from the row data */
-      uInt avail = ZLIB_IO_MAX;
-
-      if (avail > input_len)
-         avail = (uInt)input_len; /* safe because of the check */
-
-      png_ptr->zstream.avail_in = avail;
-      input_len -= avail;
-
-      ret = deflate(&png_ptr->zstream, input_len > 0 ? Z_NO_FLUSH : flush);
-
-      /* Include as-yet unconsumed input */
-      input_len += png_ptr->zstream.avail_in;
-      png_ptr->zstream.avail_in = 0;
-
-      /* OUTPUT: write complete IDAT chunks when avail_out drops to zero. Note
-       * that these two zstream fields are preserved across the calls, therefore
-       * there is no need to set these up on entry to the loop.
-       */
-      if (png_ptr->zstream.avail_out == 0)
-      {
-         png_bytep data = png_ptr->zbuffer_list->output;
-         uInt size = png_ptr->zbuffer_size;
-
-         /* Write an IDAT containing the data then reset the buffer.  The
-          * first IDAT may need deflate header optimization.
-          */
-#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-            if ((png_ptr->mode & PNG_HAVE_IDAT) == 0 &&
-                png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
-               optimize_cmf(data, png_image_size(png_ptr));
-#endif
-
-         png_write_complete_chunk(png_ptr, png_IDAT, data, size);
-         png_ptr->mode |= PNG_HAVE_IDAT;
-
-         png_ptr->zstream.next_out = data;
-         png_ptr->zstream.avail_out = size;
-
-         /* For SYNC_FLUSH or FINISH it is essential to keep calling zlib with
-          * the same flush parameter until it has finished output, for NO_FLUSH
-          * it doesn't matter.
-          */
-         if (ret == Z_OK && flush != Z_NO_FLUSH)
-            continue;
-      }
-
-      /* The order of these checks doesn't matter much; it just affects which
-       * possible error might be detected if multiple things go wrong at once.
-       */
-      if (ret == Z_OK) /* most likely return code! */
-      {
-         /* If all the input has been consumed then just return.  If Z_FINISH
-          * was used as the flush parameter something has gone wrong if we get
-          * here.
-          */
-         if (input_len == 0)
-         {
-            if (flush == Z_FINISH)
-               png_error(png_ptr, "Z_OK on Z_FINISH with output space");
-
-            return;
-         }
-      }
-
-      else if (ret == Z_STREAM_END && flush == Z_FINISH)
-      {
-         /* This is the end of the IDAT data; any pending output must be
-          * flushed.  For small PNG files we may still be at the beginning.
-          */
-         png_bytep data = png_ptr->zbuffer_list->output;
-         uInt size = png_ptr->zbuffer_size - png_ptr->zstream.avail_out;
-
-#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-         if ((png_ptr->mode & PNG_HAVE_IDAT) == 0 &&
-             png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
-            optimize_cmf(data, png_image_size(png_ptr));
-#endif
-
-         png_write_complete_chunk(png_ptr, png_IDAT, data, size);
-         png_ptr->zstream.avail_out = 0;
-         png_ptr->zstream.next_out = NULL;
-         png_ptr->mode |= PNG_HAVE_IDAT | PNG_AFTER_IDAT;
-
-         png_ptr->zowner = 0; /* Release the stream */
-         return;
-      }
-
-      else
-      {
-         /* This is an error condition. */
-         png_zstream_error(png_ptr, ret);
-         png_error(png_ptr, png_ptr->zstream.msg);
-      }
-   }
 }
 
 /* Write an IEND chunk */
@@ -1956,9 +1810,195 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
 }
 #endif
 
+/* This is similar to png_text_compress, above, except that it does not require
+ * all of the data at once and, instead of buffering the compressed result,
+ * writes it as IDAT chunks.  Unlike png_text_compress it *can* png_error out
+ * because it calls the write interface.  As a result it does its own error
+ * reporting and does not return an error code.  In the event of error it will
+ * just call png_error.  The input data length may exceed 32-bits.  The 'flush'
+ * parameter is exactly the same as that to deflate, with the following
+ * meanings:
+ *
+ * Z_NO_FLUSH: normal incremental output of compressed data
+ * Z_SYNC_FLUSH: do a SYNC_FLUSH, used by png_write_flush
+ * Z_FINISH: this is the end of the input, do a Z_FINISH and clean up
+ *
+ * The routine manages the acquire and release of the png_ptr->zstream by
+ * checking and (at the end) clearing png_ptr->zowner; it does some sanity
+ * checks on the 'mode' flags while doing this.
+ */
+static void
+png_start_IDAT(png_structrp png_ptr)
+{
+   /* First time.   Ensure we have a temporary buffer for compression and
+    * trim the buffer list if it has more than one entry to free memory.
+    * If 'WRITE_COMPRESSED_TEXT' is not set the list will never have been
+    * created at this point, but the check here is quick and safe.
+    */
+   if (png_ptr->zbuffer_list == NULL)
+   {
+      png_ptr->zbuffer_list = png_voidcast(png_compression_bufferp,
+         png_malloc(png_ptr, PNG_COMPRESSION_BUFFER_SIZE(png_ptr)));
+      png_ptr->zbuffer_list->next = NULL;
+   }
+
+   else
+      png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list->next);
+
+   /* It is a terminal error if we can't claim the zstream. */
+   if (png_deflate_claim(png_ptr, png_IDAT, png_image_size(png_ptr)) != Z_OK)
+      png_error(png_ptr, png_ptr->zstream.msg);
+
+   /* The output state is maintained in png_ptr->zstream, so it must be
+    * initialized here after the claim.
+    */
+   png_ptr->zstream.next_out = png_ptr->zbuffer_list->output;
+   png_ptr->zstream.avail_out = png_ptr->zbuffer_size;
+}
+
+static void
+png_compress_IDAT(png_structrp png_ptr, z_stream *zstream,
+      png_const_bytep input, uInt input_len, int flush)
+{
+   /* Now loop reading and writing until all the input is consumed or an error
+    * terminates the operation.  The _out values are maintained across calls to
+    * this function, but the input must be reset each time.
+    */
+   zstream->next_in = PNGZ_INPUT_CAST(input);
+   zstream->avail_in = 0; /* set below */
+   for (;;)
+   {
+      int ret;
+
+      /* INPUT: from the row data */
+      zstream->avail_in = input_len;
+      input_len = 0;
+
+      ret = deflate(zstream, input_len > 0 ? Z_NO_FLUSH : flush);
+
+      /* Include as-yet unconsumed input */
+      input_len += zstream->avail_in;
+      zstream->avail_in = 0;
+
+      /* OUTPUT: write complete IDAT chunks when avail_out drops to zero. Note
+       * that these two zstream fields are preserved across the calls, therefore
+       * there is no need to set these up on entry to the loop.
+       */
+      if (zstream->avail_out == 0)
+      {
+         png_bytep data = png_ptr->zbuffer_list->output;
+         uInt size = png_ptr->zbuffer_size;
+
+         /* Write an IDAT containing the data then reset the buffer.  The
+          * first IDAT may need deflate header optimization.
+          */
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+            if ((png_ptr->mode & PNG_HAVE_IDAT) == 0 &&
+                png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
+               optimize_cmf(data, png_image_size(png_ptr));
+#endif
+
+         png_write_complete_chunk(png_ptr, png_IDAT, data, size);
+         png_ptr->mode |= PNG_HAVE_IDAT;
+
+         zstream->next_out = data;
+         zstream->avail_out = size;
+
+         /* For SYNC_FLUSH or FINISH it is essential to keep calling zlib with
+          * the same flush parameter until it has finished output, for NO_FLUSH
+          * it doesn't matter.
+          */
+         if (ret == Z_OK && flush != Z_NO_FLUSH)
+            continue;
+      }
+
+      /* The order of these checks doesn't matter much; it just affects which
+       * possible error might be detected if multiple things go wrong at once.
+       */
+      if (ret == Z_OK) /* most likely return code! */
+      {
+         /* If all the input has been consumed then just return.  If Z_FINISH
+          * was used as the flush parameter something has gone wrong if we get
+          * here.
+          */
+         if (input_len == 0)
+         {
+            if (flush == Z_FINISH)
+               png_error(png_ptr, "Z_OK on Z_FINISH with output space");
+
+            return;
+         }
+      }
+
+      else if (ret == Z_STREAM_END && flush == Z_FINISH)
+      {
+         /* This is the end of the IDAT data; any pending output must be
+          * flushed.  For small PNG files we may still be at the beginning.
+          */
+         png_bytep data = png_ptr->zbuffer_list->output;
+         uInt size = png_ptr->zbuffer_size - zstream->avail_out;
+
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+         if ((png_ptr->mode & PNG_HAVE_IDAT) == 0 &&
+             png_ptr->compression_type == PNG_COMPRESSION_TYPE_BASE)
+            optimize_cmf(data, png_image_size(png_ptr));
+#endif
+
+         png_write_complete_chunk(png_ptr, png_IDAT, data, size);
+         zstream->avail_out = 0;
+         zstream->next_out = NULL;
+         png_ptr->mode |= PNG_HAVE_IDAT | PNG_AFTER_IDAT;
+
+         png_ptr->zowner = 0; /* Release the stream */
+         return;
+      }
+
+      else
+      {
+         /* This is an error condition. */
+         png_zstream_error(zstream, ret);
+         png_error(png_ptr, zstream->msg);
+      }
+   }
+}
+
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+/* Set the automatic flush interval or 0 to turn flushing off */
+void PNGAPI
+png_set_flush(png_structrp png_ptr, int nrows)
+{
+   png_debug(1, "in png_set_flush");
+
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->flush_dist = (nrows < 0 ? 0 : nrows);
+}
+
+/* Flush the current output buffers now */
+void PNGAPI
+png_write_flush(png_structrp png_ptr)
+{
+   png_debug(1, "in png_write_flush");
+
+   if (png_ptr == NULL)
+      return;
+
+   /* Before the start of the IDAT and after the end of the image zowner will be
+    * something other than png_IDAT:
+    */
+   if (png_ptr->zowner == png_IDAT)
+   {
+      png_compress_IDAT(png_ptr, &png_ptr->zstream, NULL, 0, Z_SYNC_FLUSH);
+      png_ptr->flush_rows = 0;
+      png_flush(png_ptr);
+   }
+}
+#endif /* WRITE_FLUSH */
+
 static void
 write_filtered_row(png_structrp png_ptr, png_const_bytep filtered_row,
-   png_uint_32 row_bytes, png_byte filter /*if at start of row*/,
+   unsigned int row_bytes, png_byte filter /*if at start of row*/,
    int end_of_image)
 {
    /* This handles writing a row that has been filtered, or did not need to be
@@ -1967,22 +2007,24 @@ write_filtered_row(png_structrp png_ptr, png_const_bytep filtered_row,
     * only has one significant bit!
     */
    debug(row_bytes > 0);
+   affirm(row_bytes <= ZLIB_IO_MAX); /* I.e. it fits in a uInt */
 
    if (filter < PNG_FILTER_VALUE_LAST) /* start of row */
    {
       png_byte buffer[1];
 
       buffer[0] = filter;
-      png_compress_IDAT(png_ptr, buffer, 1U/*len*/, Z_NO_FLUSH);
+      png_compress_IDAT(png_ptr, &png_ptr->zstream, buffer, 1U/*len*/,
+            Z_NO_FLUSH);
    }
 
-   png_compress_IDAT(png_ptr, filtered_row, row_bytes,
+   png_compress_IDAT(png_ptr, &png_ptr->zstream, filtered_row, row_bytes,
          end_of_image ? Z_FINISH : Z_NO_FLUSH);
 }
 
 static void
 write_unfiltered_rowbits(png_structrp png_ptr, png_const_bytep filtered_row,
-   png_uint_32 row_bits, png_byte filter /*if at start of row*/,
+   unsigned int row_bits, png_byte filter /*if at start of row*/,
    int end_of_image)
 {
    /* Same as above, but it correctly clears the unused bits in a partial
@@ -2012,7 +2054,7 @@ write_unfiltered_rowbits(png_structrp png_ptr, png_const_bytep filtered_row,
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
 static void
-filter_block_singlebyte(png_alloc_size_t row_bytes, png_bytep sub_row,
+filter_block_singlebyte(unsigned int row_bytes, png_bytep sub_row,
    png_bytep up_row, png_bytep avg_row, png_bytep paeth_row,
    png_const_bytep row, png_const_bytep prev_row, png_bytep prev_pixels)
 {
@@ -2059,7 +2101,7 @@ filter_block_singlebyte(png_alloc_size_t row_bytes, png_bytep sub_row,
 }
 
 static void
-filter_block_multibyte(png_alloc_size_t row_bytes,
+filter_block_multibyte(unsigned int row_bytes,
    const unsigned int bpp, png_bytep sub_row, png_bytep up_row,
    png_bytep avg_row, png_bytep paeth_row, png_const_bytep row,
    png_const_bytep prev_row, png_bytep prev_pixels)
@@ -2112,12 +2154,12 @@ filter_block_multibyte(png_alloc_size_t row_bytes,
 static void
 filter_row(png_structrp png_ptr, png_const_bytep prev_row,
       png_bytep prev_pixels, png_const_bytep unfiltered_row,
-      const png_uint_32 row_bits, unsigned int bpp, unsigned int filters_to_try,
+      unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
       int start_of_row, int end_of_image)
 {
    /* filters_to_try identifies a single filter and it is not PNG_FILTER_NONE.
     */
-   png_uint_32 row_bytes = row_bits >> 3; /* complete bytes */
+   unsigned int row_bytes = row_bits >> 3; /* complete bytes */
    png_byte filter = PNG_FILTER_VALUE_LAST /* not at start */;
    png_byte filtered_row[PNG_ROW_BUFFER_SIZE];
 
@@ -2188,7 +2230,7 @@ filter_row(png_structrp png_ptr, png_const_bytep prev_row,
 static void
 find_filter(png_structrp png_ptr, png_const_bytep prev_row,
    png_bytep prev_pixels, png_const_bytep unfiltered_row,
-   png_uint_32 row_bits, unsigned int bpp, unsigned int filters_to_try,
+   unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
    int start_of_row, int end_of_image)
 {
    /* filters_to_try identifies multiple filters, up to all five. */
@@ -2211,15 +2253,20 @@ find_filter(png_structrp png_ptr, png_const_bytep prev_row,
 unsigned int /* PRIVATE */
 png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
       png_const_bytep unfiltered_row, png_uint_32 x,
-      png_uint_32 width/*pixels*/, int first_row_in_pass, int last_pass_row,
+      unsigned int width/*pixels*/, int first_row_in_pass, int last_pass_row,
       unsigned int filters_to_try, int end_of_image)
 {
    png_bytep prev_row = png_ptr->row_buffer;
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
-   const png_uint_32 row_bits = width * bpp;
+   const unsigned int row_bits = width * bpp;
 
    /* These invariants are expected from the caller: */
-   affirm(width < 65536U && bpp <= 64U && row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
+   affirm(width < 65536U && bpp <= 64U && width < 65536U/bpp &&
+         row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
+
+   /* Set up the IDAT zlib compression if not set up yet: */
+   if (png_ptr->zowner != png_IDAT)
+      png_start_IDAT(png_ptr);
 
    if (x == 0U) /* start of row */
    {
@@ -2263,6 +2310,23 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
                   filters_to_try = PNG_FILTER_NONE;
             }
          }
+      }
+
+      if (first_row_in_pass)
+      {
+         /* On the first row UP and NONE are the same, PAETH and SUB are the
+          * same, so if both members of a pair occur together eliminate the one
+          * that depends on the previous row.  This will avoid the filter
+          * selection code while allowing the app to ensure all the filters can
+          * be used (prev_row is allocated) on the first row.
+          */
+#        define match(mask) (filters_to_try & (mask)) == mask
+         if (match(PNG_FILTER_NONE+PNG_FILTER_UP))
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
+
+         if (match(PNG_FILTER_SUB+PNG_FILTER_PAETH))
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
+#        undef match
       }
    } /* start of row */
 
@@ -2362,7 +2426,7 @@ png_set_filter(png_structrp png_ptr, int method, int filtersIn)
 unsigned int /* PRIVATE */
 png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
       png_const_bytep unfiltered_row, png_uint_32 x,
-      png_uint_32 width/*pixels*/, int first_row_in_pass, int last_pass_row,
+      unsigned int width/*pixels*/, int first_row_in_pass, int last_pass_row,
       unsigned int filters_to_try/*from previous call*/, int end_of_image)
 {
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
@@ -2371,7 +2435,12 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
    row_bits = width;
    row_bits *= bpp;
    /* These invariants are expected from the caller: */
-   affirm(width < 65536U && bpp <= 64U && row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
+   affirm(width < 65536U && bpp <= 64U && width < 65536U/bpp &&
+         row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
+
+   /* Set up the IDAT zlib compression if not set up yet: */
+   if (png_ptr->zowner != png_IDAT)
+      png_start_IDAT(png_ptr);
 
    write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
          x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST, end_of_image);

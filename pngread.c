@@ -751,7 +751,7 @@ png_read_destroy(png_structrp png_ptr)
 
       if (ret != Z_OK)
       {
-         png_zstream_error(png_ptr, ret);
+         png_zstream_error(&png_ptr->zstream, ret);
          png_warning(png_ptr, png_ptr->zstream.msg);
       }
    }

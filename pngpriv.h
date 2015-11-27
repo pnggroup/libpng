@@ -953,7 +953,7 @@ PNG_INTERNAL_FUNCTION(void, png_copy_row,(png_const_structrp png_ptr,
 
 /* Zlib support */
 #define PNG_UNEXPECTED_ZLIB_RETURN (-7)
-PNG_INTERNAL_FUNCTION(void, png_zstream_error,(png_structrp png_ptr, int ret),
+PNG_INTERNAL_FUNCTION(void, png_zstream_error,(z_stream *zstream, int ret),
    PNG_EMPTY);
    /* Used by the zlib handling functions to ensure that z_stream::msg is always
     * set before they return.
@@ -1098,10 +1098,6 @@ PNG_INTERNAL_FUNCTION(void,png_write_IHDR,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_write_PLTE,(png_structrp png_ptr,
    png_const_colorp palette, unsigned int num_pal),PNG_EMPTY);
 
-PNG_INTERNAL_FUNCTION(void,png_compress_IDAT,(png_structrp png_ptr,
-   png_const_bytep row_data, png_alloc_size_t row_data_length, int flush),
-   PNG_EMPTY);
-
 PNG_INTERNAL_FUNCTION(void,png_write_IEND,(png_structrp png_ptr),PNG_EMPTY);
 
 #ifdef PNG_WRITE_gAMA_SUPPORTED
@@ -1215,7 +1211,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_sCAL_s,(png_structrp png_ptr,
  */
 PNG_INTERNAL_FUNCTION(unsigned int, png_write_filter_row,
    (png_structrp png_ptr, png_bytep prev_pixels, png_const_bytep unfiltered_row,
-    png_uint_32 x, png_uint_32 width/*pixels*/, int first_row_in_pass,
+    png_uint_32 x, unsigned int width/*pixels*/, int first_row_in_pass,
     int last_pass_row, unsigned int filters_to_try/*from previous call*/,
     int end_of_image),
    PNG_EMPTY);

@@ -1093,40 +1093,6 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
    } /* png_ptr != NULL */
 }
 
-#ifdef PNG_WRITE_FLUSH_SUPPORTED
-/* Set the automatic flush interval or 0 to turn flushing off */
-void PNGAPI
-png_set_flush(png_structrp png_ptr, int nrows)
-{
-   png_debug(1, "in png_set_flush");
-
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->flush_dist = (nrows < 0 ? 0 : nrows);
-}
-
-/* Flush the current output buffers now */
-void PNGAPI
-png_write_flush(png_structrp png_ptr)
-{
-   png_debug(1, "in png_write_flush");
-
-   if (png_ptr == NULL)
-      return;
-
-   /* Before the start of the IDAT and after the end of the image zowner will be
-    * something other than png_IDAT:
-    */
-   if (png_ptr->zowner == png_IDAT)
-   {
-      png_compress_IDAT(png_ptr, NULL, 0, Z_SYNC_FLUSH);
-      png_ptr->flush_rows = 0;
-      png_flush(png_ptr);
-   }
-}
-#endif /* WRITE_FLUSH */
-
 /* Free any memory used in png_ptr struct without freeing the struct itself. */
 static void
 png_write_destroy(png_structrp png_ptr)
@@ -1140,7 +1106,7 @@ png_write_destroy(png_structrp png_ptr)
 
       if (ret != Z_OK)
       {
-         png_zstream_error(png_ptr, ret);
+         png_zstream_error(&png_ptr->zstream, ret);
          png_warning(png_ptr, png_ptr->zstream.msg);
       }
    }
