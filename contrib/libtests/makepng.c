@@ -392,7 +392,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
    unsigned int *colors, int small)
 {
    int filters = 0; /* file *MASK*, 0 means the default, not NONE */
-   png_uint_32 size_max = 
+   png_uint_32 size_max =
       image_size_of_type(color_type, bit_depth, colors, small)-1;
    png_uint_32 depth_max = (1U << bit_depth)-1; /* up to 65536 */
 
@@ -526,7 +526,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
             assert(0/*NOT REACHED*/);
       }
    }
-      
+
    else switch (channels_of_type(color_type))
    {
    /* 1 channel: a square image with a diamond, the least luminous colors are on
@@ -1913,7 +1913,7 @@ main(int argc, char **argv)
       };
 
       chunk_insert *new_insert;
-      
+
       new_insert = add_tEXt("Copyright", copyright);
       if (new_insert != NULL)
       {

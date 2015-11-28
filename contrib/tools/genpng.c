@@ -324,7 +324,7 @@ alpha_calc(const struct arg *arg, double x, double y)
                {
                   double wx = bicubic[abs(dx)][0];
 
-                  if (wx != 0 && arg->inside_fn(arg, x+dx/16, y+dy/16)) 
+                  if (wx != 0 && arg->inside_fn(arg, x+dx/16, y+dy/16))
                      alphay += wx;
                }
 
@@ -565,7 +565,7 @@ line_check(double x, double y, double x1, double y1, double x2, double y2,
    /* The dot product is the distance down the line, the cross product is
     * the distance away from the line:
     *
-    *    distance = |cross| / sqrt(len2) 
+    *    distance = |cross| / sqrt(len2)
     */
    cross = x * ly - y * lx;
 
@@ -722,7 +722,7 @@ pixel(png_uint_16p p, struct arg *args, int nargs, double x, double y)
    /* 'a' may be negative or greater than 1; if it is, negative clamp the
     * pixel to 0 if >1 clamp r/g/b:
     */
-   if (a > 0) 
+   if (a > 0)
    {
       if (a > 1)
       {

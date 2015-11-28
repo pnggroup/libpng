@@ -8,7 +8,7 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * Usage:            
+ * Usage:
  *
  *     png-fix-itxt.exe < bad.png > good.png
  *
