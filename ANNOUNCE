@@ -1,4 +1,4 @@
-Libpng 1.6.20rc01 - November 26, 2015
+Libpng 1.6.20rc02 - November 29, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.20rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.20rc01.tar.gz
+   1.6.20rc02.tar.xz (LZMA-compressed, recommended)
+   1.6.20rc02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1620r01.7z  (LZMA-compressed, recommended)
-   lp1620r01.zip
+   /scratch/glennrp/Libpng16/lp1620r02.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng16/lp1620r02.zip
 
 Other information:
 
-   1.6.20rc01-README.txt
-   1.6.20rc01-LICENSE.txt
-   libpng-1.6.20rc01-*.asc (armored detached GPG signatures)
+   1.6.20rc02-README.txt
+   1.6.20rc02-LICENSE.txt
+   libpng-1.6.20rc02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.19):
 
@@ -34,16 +34,17 @@ Version 1.6.20beta02 [November 23, 2015]
     not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
     vulnerability.
 
-Version 1.6.20beta03 [November 26, 2015]
+Version 1.6.20beta03 [November 29, 2015]
   Backported tests from libpng-1.7.0beta69.
  
-Version 1.6.20rc01 [November 26, 2015]
-  Fixed an error in handling of bad zlib CMINFO field, found by American
-    Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't immediately
-    fault a bad CMINFO field; instead a 'too far back' error happens later
-    (at least some times).  pngfix failed to limit CMINFO to the allowed
-    values but then assumed that window_bits was in range, triggering an
-    assert. The bug is mostly harmless; the file can't be fixed.
+Version 1.6.20rc01 [November 29, 2015]
+  Fixed an error in handling of bad zlib CMINFO field in pngfix, found by
+    American Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't
+    immediately fault a bad CMINFO field; instead a 'too far back' error
+    happens later (at least some times).  pngfix failed to limit CMINFO to
+    the allowed values but then assumed that window_bits was in range,
+    triggering an assert. The bug is mostly harmless; the PNG file cannot
+    be fixed.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
