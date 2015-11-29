@@ -5426,7 +5426,7 @@ Version 1.6.20beta02 [November 23, 2015]
 Version 1.6.20beta03 [November 24, 2015]
   Backported tests from libpng-1.7.0beta69.
 
-Version 1.6.20rc01 [November 29, 2015]
+Version 1.6.20rc01 [November 26, 2015]
   Fixed an error in handling of bad zlib CMINFO field in pngfix, found by
     American Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't
     immediately fault a bad CMINFO field; instead a 'too far back' error
@@ -5434,6 +5434,14 @@ Version 1.6.20rc01 [November 29, 2015]
     the allowed values but then assumed that window_bits was in range,
     triggering an assert. The bug is mostly harmless; the PNG file cannot
     be fixed.
+
+Version 1.6.20rc02 [November 29, 2015]
+  In libpng 1.6 zlib initialization was changed to use the window size
+    in the zlib stream, not a fixed value. This causes some invalid images,
+    where CINFO is too large, to display 'correctly' if the rest of the
+    data is valid.  This provides a workaround for zlib versions where the
+    error arises (ones that support the API change to use the window size
+    in the stream).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
