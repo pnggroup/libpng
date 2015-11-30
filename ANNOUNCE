@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta70 - November 25, 2015
+Libpng 1.7.0beta70 - November 30, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -15,8 +15,8 @@ Source files with LF line endings (for Unix/Linux) and with a
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp170b70.7z  (LZMA-compressed, recommended)
-   lp170b70.zip
+   /scratch/glennrp/Libpng17/lp170b70.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b70.zip
 
 Other information:
 
@@ -1022,7 +1022,7 @@ Version 1.7.0beta69 [November 24, 2015]
   Temporarily disabled filter selection while writing, and temporarily
     replaced pngtest.png accordingly.
 
-Version 1.7.0beta70 [November 25, 2015]
+Version 1.7.0beta70 [November 30, 2015]
   Fixed a simple bracket problem that prevented reading non-interlaced
     PNG files with height == 1.
   The code failed to zero out the row buffer at the start of a pass where
@@ -1031,12 +1031,39 @@ Version 1.7.0beta70 [November 25, 2015]
     been zeroed when allocated was not always correct for non-interlaced
     images.  Revealed by pngvalid --size with a hack to make it always
     use AVG.
-  Fixed an error in handling of bad zlib CMINFO field, found by American
-    Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't immediately
-    fault a bad CMINFO field; instead a 'too far back' error happens later
-    (at least some times).  pngfix failed to limit CMINFO to the allowed
-    values but then assumed that window_bits was in range, triggering an
-    assert. The bug is mostly harmless; the file can't be fixed.
+  Fixed an error in handling of bad zlib CMINFO field in pngfix, found by
+    American Fuzzy Lop, reported by Brian Carpenter.  inflate() doesn't
+    immediately fault a bad CMINFO field; instead a 'too far back' error
+    happens later (at least some times).  pngfix failed to limit CMINFO to
+    the allowed values but then assumed that window_bits was in range,
+    triggering an assert. The bug is mostly harmless; the PNG file cannot
+    be fixed.
+  Test the 'size' images in the sequential reader. The existing test
+    case only uses the progressive reader which means that important parts of
+    the filter code never got tested.
+  Improved pngvalid coverage of filter combinations, remove the (new in 1.7)
+    code which disabled previous-row filters on the first row of an image in
+    some cases.
+  Removed all trailing spaces from source files in contrib
+  Moved code round and changed the filter write interfaces that took
+    png_uint_32 buffer pixel counts to unsigned int.  Also moved compression
+    code and definitions into pngwutil.c so that the compression code is
+    isolated from other definitions.
+  Unified the compression code so that inflate calls are localized to a common
+    routine.  Ground work for filter selection support. Minor API changes to
+    use void* not byte* for data parameters. Unification of some of the
+    compression code with the decompression code; IDAT_size replaces
+    IDAT_read_size and zbuffer_size, IDAT reading and writing is no longer
+    controlled by the size of the compression buffer.
+     
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe)
+or to glennrp at users.sourceforge.net
+
+Glenn R-P
+#endif
    
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
