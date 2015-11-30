@@ -112,7 +112,7 @@ png_reset_crc(png_structrp png_ptr)
  * trouble of calculating it.
  */
 void /* PRIVATE */
-png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
+png_calculate_crc(png_structrp png_ptr, png_const_voidp ptr, png_size_t length)
 {
    int need_crc = 1;
 
@@ -137,6 +137,7 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
    if (need_crc != 0 && length > 0)
    {
       uLong crc = png_ptr->crc; /* Should never issue a warning */
+      const Bytef* rptr = png_voidcast(const Bytef*,ptr);
 
       do
       {
@@ -151,19 +152,19 @@ png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
          else
             safe_length = (uInt)/*SAFE*/length;
 
-         crc = crc32(crc, ptr, safe_length);
+         crc = crc32(crc, PNGZ_INPUT_CAST(rptr), safe_length);
 
          /* The following should never issue compiler warnings; if they do the
           * target system has characteristics that will probably violate other
           * assumptions within the libpng code.
           */
-         ptr += safe_length;
+         rptr += safe_length;
          length -= safe_length;
       }
       while (length > 0);
 
       /* And the following is always safe because the crc is only 32 bits. */
-      png_ptr->crc = (png_uint_32)crc;
+      png_ptr->crc = 0xFFFFFFFFU & crc;
    }
 }
 

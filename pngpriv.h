@@ -458,9 +458,9 @@
 /* Just a little check that someone hasn't tried to define something
  * contradictory.
  */
-#if (PNG_ZBUF_SIZE > 65536L) && defined(PNG_MAX_MALLOC_64K)
+#if (PNG_ZBUF_SIZE > 32768) && defined(PNG_MAX_MALLOC_64K)
 #  undef PNG_ZBUF_SIZE
-#  define PNG_ZBUF_SIZE 65536L
+#  define PNG_ZBUF_SIZE 32768
 #endif
 
 /* If warnings or errors are turned off the code is disabled or redirected here.
@@ -1057,18 +1057,18 @@ PNG_INTERNAL_FUNCTION(void,png_reset_crc,(png_structrp png_ptr),PNG_EMPTY);
 
 /* Write the "data" buffer to whatever output you are using */
 PNG_INTERNAL_FUNCTION(void,png_write_data,(png_structrp png_ptr,
-    png_const_bytep data, png_size_t length),PNG_EMPTY);
+    png_const_voidp data, png_size_t length),PNG_EMPTY);
 
 /* Read and check the PNG file signature */
 PNG_INTERNAL_FUNCTION(void,png_read_sig,(png_structrp png_ptr,
    png_inforp info_ptr),PNG_EMPTY);
 
 /* Read data from whatever input you are using into the "data" buffer */
-PNG_INTERNAL_FUNCTION(void,png_read_data,(png_structrp png_ptr, png_bytep data,
+PNG_INTERNAL_FUNCTION(void,png_read_data,(png_structrp png_ptr, png_voidp data,
     png_size_t length),PNG_EMPTY);
 
 /* Read bytes into buf, and update png_ptr->crc */
-PNG_INTERNAL_FUNCTION(void,png_crc_read,(png_structrp png_ptr, png_bytep buf,
+PNG_INTERNAL_FUNCTION(void,png_crc_read,(png_structrp png_ptr, png_voidp buf,
     png_uint_32 length),PNG_EMPTY);
 
 /* Read "skip" bytes, read the file crc, and (optionally) verify png_ptr->crc */
@@ -1080,7 +1080,7 @@ PNG_INTERNAL_FUNCTION(int,png_crc_finish,(png_structrp png_ptr,
  * since this is the maximum buffer size we can specify.
  */
 PNG_INTERNAL_FUNCTION(void,png_calculate_crc,(png_structrp png_ptr,
-   png_const_bytep ptr, png_size_t length),PNG_EMPTY);
+   png_const_voidp ptr, png_size_t length),PNG_EMPTY);
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_flush,(png_structrp png_ptr),PNG_EMPTY);
@@ -1123,7 +1123,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_sRGB,(png_structrp png_ptr,
 
 #ifdef PNG_WRITE_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_iCCP,(png_structrp png_ptr,
-   png_const_charp name, png_const_bytep profile), PNG_EMPTY);
+   png_const_charp name, png_const_voidp profile), PNG_EMPTY);
    /* The profile must have been previously validated for correctness, the
     * length comes from the first four bytes.  Only the base, deflate,
     * compression is supported.
@@ -1259,7 +1259,7 @@ PNG_INTERNAL_FUNCTION(void,png_run_transform_list_backwards,
     */
 #endif /* WRITE */
 
-PNG_INTERNAL_FUNCTION(png_transformp,png_add_transform,(png_structrp png_ptr, 
+PNG_INTERNAL_FUNCTION(png_transformp,png_add_transform,(png_structrp png_ptr,
    size_t size, png_transform_fn fn, unsigned int order),PNG_EMPTY);
    /* Add a transform, using the information in 'order' to control the position
     * of the transform in the list, returning a pointer to the transform.  The
@@ -1506,7 +1506,7 @@ PNG_INTERNAL_FUNCTION(png_transformp,png_add_transform,(png_structrp png_ptr,
     *    PNG_RWTR_USER          PI W1
     */
 
-PNG_INTERNAL_FUNCTION(png_transformp,png_push_transform,(png_structrp png_ptr, 
+PNG_INTERNAL_FUNCTION(png_transformp,png_push_transform,(png_structrp png_ptr,
    size_t size, png_transform_fn fn, png_transformp *transform,
    png_transform_controlp tc),PNG_EMPTY);
    /* As png_add_transform except that the new transform is inserted ahead of

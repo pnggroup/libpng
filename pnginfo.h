@@ -97,7 +97,6 @@ struct png_info_def
    /* iCCP chunk data. */
    png_charp iccp_name;     /* profile name */
    png_bytep iccp_profile;  /* International Color Consortium profile data */
-   png_uint_32 iccp_proflen;  /* ICC profile data length */
 #endif
 
 #ifdef PNG_TEXT_SUPPORTED
@@ -215,7 +214,7 @@ defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* Storage for unknown chunks that the library doesn't recognize. */
    png_unknown_chunkp unknown_chunks;
 
-   /* The type of this field is limited by the type of 
+   /* The type of this field is limited by the type of
     * png_struct::user_chunk_cache_max, else overflow can occur.
     */
    int                unknown_chunks_num;

@@ -30,12 +30,12 @@
  * to read more than 64K on a 16 bit machine.
  */
 void /* PRIVATE */
-png_read_data(png_structrp png_ptr, png_bytep data, png_size_t length)
+png_read_data(png_structrp png_ptr, png_voidp data, png_size_t length)
 {
    png_debug1(4, "reading %d bytes", (int)length);
 
    if (png_ptr->rw_data_fn != NULL)
-      png_ptr->rw_data_fn(png_ptr, data, length);
+      png_ptr->rw_data_fn(png_ptr, png_voidcast(png_bytep,data), length);
 
    else
       png_app_error(png_ptr, "No read function");

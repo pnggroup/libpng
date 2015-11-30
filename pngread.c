@@ -123,7 +123,7 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
        * required (it will be zero in a write structure.)
        */
 #     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-         png_ptr->IDAT_read_size = PNG_IDAT_READ_SIZE;
+         png_ptr->IDAT_size = PNG_IDAT_READ_SIZE;
 #     endif /* SEQUENTIAL_READ */
 
 #     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
@@ -308,17 +308,17 @@ png_start_read_image(png_structrp png_ptr)
 static void
 png_read_IDAT(png_structrp png_ptr)
 {
-   /* Read more input data, up to png_struct::IDAT_read_size, stop at the
+   /* Read more input data, up to png_struct::IDAT_size, stop at the
     * end of the IDAT stream:
     */
    uInt IDAT_size = 0;
    png_bytep buffer =
-      png_read_buffer(png_ptr, png_ptr->IDAT_read_size, 0/*error*/);
+      png_read_buffer(png_ptr, png_ptr->IDAT_size, 0/*error*/);
 
    png_ptr->zstream.next_in = buffer;
 
    while (png_ptr->chunk_name == png_IDAT &&
-          IDAT_size < png_ptr->IDAT_read_size)
+          IDAT_size < png_ptr->IDAT_size)
    {
       png_uint_32 l = png_ptr->chunk_length;
 
@@ -336,10 +336,10 @@ png_read_IDAT(png_structrp png_ptr)
          l = png_ptr->chunk_length;
       }
 
-      /* Read from the IDAT chunk into the buffer, up to IDAT_read_size:
+      /* Read from the IDAT chunk into the buffer, up to png_struct::IDAT_size:
        */
-      if (l > png_ptr->IDAT_read_size - IDAT_size) /* SAFE: while check */
-         l = png_ptr->IDAT_read_size - IDAT_size;
+      if (l > png_ptr->IDAT_size - IDAT_size) /* SAFE: while check */
+         l = png_ptr->IDAT_size - IDAT_size;
 
       png_crc_read(png_ptr, buffer+IDAT_size, l);
       IDAT_size += /*SAFE*/l;

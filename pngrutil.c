@@ -129,7 +129,7 @@ png_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 
 /* Read data, and (optionally) run it through the CRC. */
 void /* PRIVATE */
-png_crc_read(png_structrp png_ptr, png_bytep buf, png_uint_32 length)
+png_crc_read(png_structrp png_ptr, png_voidp buf, png_uint_32 length)
 {
    if (png_ptr == NULL)
       return;
@@ -1382,8 +1382,6 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr)
                                        {
                                           memcpy(info_ptr->iccp_name, keyword,
                                              keyword_length+1);
-                                          info_ptr->iccp_proflen =
-                                             profile_length;
                                           info_ptr->iccp_profile = profile;
                                           png_ptr->read_buffer = NULL; /*steal*/
                                           info_ptr->free_me |= PNG_FREE_ICCP;

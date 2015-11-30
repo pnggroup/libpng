@@ -523,7 +523,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
       /* Set the zlib control values to defaults; they can be overridden by the
        * application after the struct has been created.
        */
-      png_ptr->zbuffer_size = PNG_ZBUF_SIZE;
+      png_ptr->IDAT_size = PNG_ZBUF_SIZE;
 
       /* The 'zlib_strategy' setting is irrelevant because png_default_claim in
        * pngwutil.c defaults it according to whether or not filters will be

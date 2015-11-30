@@ -569,15 +569,15 @@ struct png_struct_def
 #endif /* TRANFORM_MECH */
 
 #ifdef PNG_READ_SUPPORTED
-   /* These, and IDAT_read_size below, control how much input and output (at
-    * most) is available to zlib.
+   /* These, and IDAT_size below, control how much input and output (at most) is
+    * available to zlib during read decompression.
     */
    png_alloc_size_t read_buffer_size; /* current size of the buffer */
 #endif
 
-#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-   uInt IDAT_read_size;       /* limit on read buffer size for IDAT */
-#endif
+#if defined(PNG_SEQUENTIAL_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
+   uInt IDAT_size; /* limit on IDAT read and write IDAT size */
+#endif /* SEQUENTIAL_READ || WRITE */
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
    int zlib_text_level;       /* holds zlib compression level */
@@ -600,8 +600,10 @@ struct png_struct_def
    int zlib_set_mem_level;
    int zlib_set_strategy;
 
-   png_compression_bufferp zbuffer_list; /* Created on demand during write */
-   uInt                    zbuffer_size; /* size of the actual zlib buffer */
+   unsigned int             zbuffer_start; /* Bytes written from start */
+   png_uint_32              zbuffer_len;   /* Length of data in list */
+   png_compression_bufferp  zbuffer_list;  /* Created on demand during write */
+   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
 #endif
 
    /* ERROR HANDLING */

@@ -1150,8 +1150,8 @@ PNG_EXPORTA(12, png_structp, png_create_write_struct_2,
 PNG_EXPORT(13, void, png_write_sig, (png_structrp png_ptr));
 
 /* Write a PNG chunk - size, type, (optional) data, CRC. */
-PNG_EXPORT(14, void, png_write_chunk, (png_structrp png_ptr, png_const_bytep
-    chunk_name, png_const_bytep data, size_t length));
+PNG_EXPORT(14, void, png_write_chunk, (png_structrp png_ptr,
+    png_const_bytep chunk_name, png_const_voidp data, size_t length));
 
 /* Write the start of a PNG chunk - length and chunk name. */
 PNG_EXPORT(15, void, png_write_chunk_start, (png_structrp png_ptr,
@@ -1159,7 +1159,7 @@ PNG_EXPORT(15, void, png_write_chunk_start, (png_structrp png_ptr,
 
 /* Write the data of a PNG chunk started with png_write_chunk_start(). */
 PNG_EXPORT(16, void, png_write_chunk_data, (png_structrp png_ptr,
-    png_const_bytep data, size_t length));
+    png_const_voidp data, size_t length));
 
 /* Finish a chunk started with png_write_chunk_start() (includes CRC). */
 PNG_EXPORT(17, void, png_write_chunk_end, (png_structrp png_ptr));

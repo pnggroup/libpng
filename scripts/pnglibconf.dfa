@@ -792,19 +792,13 @@ setting DEFAULT_GAMMA_ACCURACY default 665
 
 setting sCAL_PRECISION default 5
 
-# This is the size of the compression buffer, and thus the size of
-# an IDAT chunk.  Make this whatever size you feel is best for your
-# machine.  One of these will be allocated per png_struct.  When this
-# is full, it writes the data to the disk, and does some other
-# calculations.  Making this an extremely small size may slow
-# the library down, but you may want to experiment to determine
-# where it becomes significant, if you are concerned with memory
-# usage.  Note that zlib allocates at least 32Kb also.  For readers,
-# this describes the size of the buffer available to read the data in.
-# Unless this gets smaller than the size of a row (compressed),
-# it should not make much difference how big this is.
+# This used to control the size of the IDAT chunks on write and the size of the
+# compression buffer used internally.  It now solely controls the size of the
+# written IDAT chunks.  It can be any (zlib) uInt value, however this amount of
+# data has to be buffered on write so it is recommended that a smaller size be
+# used unless saving the 12-byte chunk overhead is necessary.
 
-setting ZBUF_SIZE default 8192
+setting ZBUF_SIZE default 4096
 
 # This is the size of the decompression buffer used when counting or checking
 # the decompressed size of an LZ stream from a compressed ancilliary chunk; the
@@ -818,17 +812,17 @@ setting ZBUF_SIZE default 8192
 
 setting INFLATE_BUF_SIZE default 1024
 
-# This is the maximum amount of IDAT data that the sequential reader will
-# process at one time.  The setting does not affect the size of IDAT chunks
-# read, just the amount read at once.  Neither does it affect the progressive
-# reader, which processes just the amount of data the application gives it.
-# The sequential reader is currently unable to process more than one IDAT at
-# once - it has to read and process each one in turn.  There is no point setting
-# this to a value larger than the IDAT chunks typically encountered (it would
-# just waste memory) but there may be some point in reducing it below the value
-# of ZBUF_SIZE (the size of IDAT chunks written by libpng.)
+# This is the amount of IDAT data that the sequential reader will process at one
+# time.  The setting does not affect the size of IDAT chunks read, just the
+# amount read at once.  Neither does it affect the progressive reader, which
+# processes just the amount of data the application gives it.
+#
+# The sequential reader will read IDAT chunks up to this limit, or the end of
+# the chunks, before decompressing the next row.  The value should be chosen to
+# optimize the PNG data read speed, it has no significant effect on anything
+# else.
 
-setting IDAT_READ_SIZE default PNG_ZBUF_SIZE
+setting IDAT_READ_SIZE default 4096
 
 # Ancillary chunks
 chunk bKGD

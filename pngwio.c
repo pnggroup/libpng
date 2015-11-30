@@ -31,11 +31,16 @@
  */
 
 void /* PRIVATE */
-png_write_data(png_structrp png_ptr, png_const_bytep data, png_size_t length)
+png_write_data(png_structrp png_ptr, png_const_voidp data, png_size_t length)
 {
-   /* NOTE: write_data_fn must not change the buffer! */
+   /* NOTE: write_data_fn must not change the buffer!
+    * This cast is required because of the API; changing the type of the
+    * callback would require every app to change the callback and that change
+    * would have to be conditional on the libpng version.
+    */
    if (png_ptr->rw_data_fn != NULL )
-      png_ptr->rw_data_fn(png_ptr, png_constcast(png_bytep, data), length);
+      png_ptr->rw_data_fn(png_ptr,
+         png_constcast(png_bytep,png_voidcast(png_const_bytep,data)), length);
 
    else
       png_app_error(png_ptr, "No write function");

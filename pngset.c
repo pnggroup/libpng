@@ -676,7 +676,6 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_ICCP, 0);
 
-   info_ptr->iccp_proflen = proflen;
    info_ptr->iccp_name = new_iccp_name;
    info_ptr->iccp_profile = new_iccp_profile;
    info_ptr->free_me |= PNG_FREE_ICCP;
@@ -1531,59 +1530,15 @@ png_set_rows(png_const_structrp png_ptr, png_inforp info_ptr,
 void PNGAPI
 png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
 {
-    if (png_ptr == NULL)
-       return;
+   if (png_ptr == NULL)
+      return;
 
-    if (size == 0 || size > PNG_UINT_31_MAX)
-       png_error(png_ptr, "invalid compression buffer size");
+   if (size == 0 || size > PNG_UINT_31_MAX)
+      png_error(png_ptr, "invalid compression buffer size");
 
-#  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-      if (png_ptr->read_struct)
-      {
-         png_ptr->IDAT_read_size = (png_uint_32)size; /* checked above */
-         return;
-      }
-#  endif /* SEQUENTIAL_READ */
-
-#  ifdef PNG_WRITE_SUPPORTED
-      if (!png_ptr->read_struct)
-      {
-         if (png_ptr->zowner != 0)
-         {
-            png_warning(png_ptr,
-              "Compression buffer size cannot be changed because it is in use");
-
-            return;
-         }
-
-         /* NOTE: size is limited to 0..PNG_UINT_31_MAX (2^31-1) at this point,
-          * however ZLIB_IO_MAX may be smaller (for example on a 16-bit system).
-          */
-         if (size > ZLIB_IO_MAX)
-         {
-            png_warning(png_ptr,
-               "Compression buffer size limited to system maximum");
-            size = ZLIB_IO_MAX; /* must fit */
-         }
-
-         if (size < 6)
-         {
-            /* Deflate will potentially go into an infinite loop on a SYNC_FLUSH
-             * if this is permitted.
-             */
-            png_warning(png_ptr,
-               "Compression buffer size cannot be reduced below 6");
-
-            return;
-         }
-
-         if (png_ptr->zbuffer_size != size)
-         {
-            png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
-            png_ptr->zbuffer_size = (uInt)size;
-         }
-      }
-#  endif /* WRITE */
+#  if (defined PNG_SEQUENTIAL_READ_SUPPORTED) || defined PNG_WRITE_SUPPORTED
+      png_ptr->IDAT_size = (uInt)/*SAFE*/size;
+#  endif /* SEQUENTIAL_READ || WRITE */
 }
 
 void PNGAPI
