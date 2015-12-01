@@ -566,7 +566,7 @@ struct png_struct_def
        * wherein !(r==g==b).
        */
 #endif /* RGB_TO_GRAY */
-#endif /* TRANFORM_MECH */
+#endif /* TRANSFORM_MECH */
 
 #ifdef PNG_READ_SUPPORTED
    /* These, and IDAT_size below, control how much input and output (at most) is
@@ -599,12 +599,7 @@ struct png_struct_def
    int zlib_set_window_bits;
    int zlib_set_mem_level;
    int zlib_set_strategy;
-
-   unsigned int             zbuffer_start; /* Bytes written from start */
-   png_uint_32              zbuffer_len;   /* Length of data in list */
-   png_compression_bufferp  zbuffer_list;  /* Created on demand during write */
-   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
-#endif
+#endif /* WRITE */
 
    /* ERROR HANDLING */
 #ifdef PNG_SETJMP_SUPPORTED
@@ -748,14 +743,23 @@ struct png_struct_def
     * zlib expects a 'zstream' as the fundamental control structure, it allows
     * all the parameters to be passed as one pointer.
     */
-   png_uint_32  zowner;        /* ID (chunk type) of zstream owner, 0 if none */
    z_stream     zstream;       /* decompression structure */
-   unsigned int zstream_start:1; /* before first byte of stream */
-   unsigned int zstream_ended:1; /* no more zlib output available */
-   unsigned int zstream_error:1; /* zlib error message has been output */
+   png_uint_32  zowner;        /* ID (chunk type) of zstream owner, 0 if none */
+#  ifdef PNG_WRITE_SUPPORTED
+   png_compression_bufferp  zbuffer_list;  /* Created on demand during write */
+   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
+   png_uint_32              zbuffer_len;   /* Length of data in list */
+   unsigned int             zbuffer_start; /* Bytes written from start */
+#  endif /* WRITE */
+#  ifdef PNG_READ_SUPPORTED
+   unsigned int zstream_ended:1; /* no more zlib output available [read] */
+   unsigned int zstream_error:1; /* zlib error message has been output [read] */
+#  endif /* READ */
+#  ifdef PNG_PROGRESSIVE_READ_SUPPORTED
    unsigned int zstream_eod  :1; /* all the required uncompressed data has been
                                   * received; set by the zstream using code for
-                                  * its own purposes. */
+                                  * its own purposes. [progressive read] */
+#  endif /* PROGRESSIVE_READ */
 
    /* MNG SUPPORT */
 #ifdef PNG_MNG_FEATURES_SUPPORTED

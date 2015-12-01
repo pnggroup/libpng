@@ -125,7 +125,7 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #
 # To avoid confusion use -DPNG_foo_SUPPORTED= on the command line, which does
 # the same thing as the #define.
-# 
+#
 # SUMMARY:
 #  These lines/macro settings are equivalent:
 #
@@ -460,7 +460,7 @@ option SET_USER_LIMITS requires USER_LIMITS
 # See the comments above about how to change options and settings.
 
 # READ/WRITE tranform support
-# 
+#
 # The internal TRANSFORM_MECH options are used to turn on (or off) the required
 # support code for the read and write transforms.  They are off by default,
 # switching them on is not a good idea.  Switching them off will cause the build
@@ -496,7 +496,7 @@ option READ_16BIT requires READ enables 16BIT
 option READ_TRANSFORMS requires READ
 = NO_READ_TRANSFORMS READ_TRANSFORMS_NOT_SUPPORTED
 
-option READ_QUANTIZE requires READ_TRANSFORMS enables TRANFORM_MECH
+option READ_QUANTIZE requires READ_TRANSFORMS enables TRANSFORM_MECH
 
 # Read gamma handling.  Gamma processing is a core part of libpng and many of
 # the capabilities are dependent on libpng performing gamma correction.
