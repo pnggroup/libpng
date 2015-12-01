@@ -1057,6 +1057,19 @@ Version 1.7.0beta70 [December 1, 2015]
     controlled by the size of the compression buffer.
   Updated manual to require png_set_PLTE() to precede png_set_tRNS()
     and png_set_hIST() if either is present.
+  Removed the side-effect on the png_struct palette of calling png_set_PLTE()
+    or png_set_tRNS(). This is a quiet API change; it was previously possible
+    to alter the palette on a PNG image by using png_set_PLTE, but this was
+    unintended and inconsistent with the other png_set APIs.
+  Fixed a bug in palette index checking; png_struct::num_palette could, in
+    principle, get changed by the transformations (e.g. png_set_quantize)
+    and this would invalidate the check.  The palette checking init function
+    now makes a copy of png_struct::num_palette.
+  Fixed a bug in pngvalid error handling.  A png_error in png_write_info is
+    not continuable (a valid image cannot necessarily be written afterward)
+    because the png_error aborts the write of subsequent pre-IDAT chunks.
+    In particular an abort as a result of a bogus colorspace information
+   (gAMA, cHRM, sBIT etc) prevents the write of the PLTE chunk.
      
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
