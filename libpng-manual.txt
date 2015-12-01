@@ -2947,7 +2947,8 @@ Some of the more important parts of the png_info are:
 
 If you call png_set_IHDR(), the call must appear before any of the
 other png_set_*() functions, because they might require access to some of
-the IHDR settings.
+the IHDR settings.  The remaining png_set_*() functions can be called
+in any order.
 
 If you wish, you can reset the compression_type, interlace_type, or
 filter_method later by calling png_set_IHDR() again; if you do this, the
@@ -2959,12 +2960,6 @@ width, height, bit_depth, and color_type must be the same in each call.
     palette        - the palette for the file
                      (array of png_color)
     num_palette    - number of entries in the palette
-
-If you call png_set_PLTE(), the call must appear before either of
-png_set_tRNS() or png_set_hIST() appears, because they require access
-to the palette length.
-
-The remaining png_set_*() functions can be called in any order.
 
     png_set_gAMA(png_ptr, info_ptr, file_gamma);
     png_set_gAMA_fixed(png_ptr, info_ptr, int_file_gamma);
