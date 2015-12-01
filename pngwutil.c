@@ -1319,14 +1319,6 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
    if (color_type == PNG_COLOR_TYPE_PALETTE)
    {
       affirm(num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH);
-      if ((unsigned int)/*SAFE*/num_trans > png_ptr->num_palette)
-      {
-         /* This is an error which can only be reliably detected late. */
-         png_app_error(png_ptr,
-             "Invalid number of transparent colors specified");
-         return;
-      }
-
       {
 #        ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
             union

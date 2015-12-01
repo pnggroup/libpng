@@ -370,17 +370,18 @@ struct png_struct_def
     * the hope is that such processors will generate code that is both smaller
     * and faster.
     */
+#ifdef PNG_READ_SUPPORTED
    png_colorp  palette;        /* palette from the input file */
+#endif /* READ */
 #ifdef PNG_READ_tRNS_SUPPORTED
    png_bytep   trans_alpha;    /* alpha values for paletted files */
-#endif
+#endif /* READ_tRNS */
 
    png_uint_32 width;          /* width of image in pixels */
    png_uint_32 height;         /* height of image in pixels */
    png_uint_32 chunk_name;     /* PNG_CHUNK() id of current chunk */
    png_uint_32 chunk_length;   /* Length (possibly remaining) in said chunk. */
    png_uint_32 crc;            /* current chunk CRC value */
-   png_uint_32 free_me;        /* items libpng is responsible for freeing */
 
    unsigned int flags;                  /* flags (should be bit fields) */
    unsigned int mode                :6; /* where we are in the PNG file */
