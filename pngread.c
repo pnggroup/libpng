@@ -727,22 +727,20 @@ png_read_destroy(png_structrp png_ptr)
    png_free(png_ptr, png_ptr->read_buffer);
    png_ptr->read_buffer = NULL;
 
-   if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
+   if (png_ptr->palette != NULL)
    {
       png_free(png_ptr, png_ptr->palette);
       png_ptr->num_palette = 0;
       png_ptr->palette = NULL;
    }
-   png_ptr->free_me &= PNG_BIC_MASK(PNG_FREE_PLTE);
 
 #ifdef PNG_READ_tRNS_SUPPORTED
-   if ((png_ptr->free_me & PNG_FREE_TRNS) != 0)
+   if (png_ptr->trans_alpha != NULL)
    {
       png_free(png_ptr, png_ptr->trans_alpha);
       png_ptr->num_trans = 0;
       png_ptr->trans_alpha = NULL;
    }
-   png_ptr->free_me &= PNG_BIC_MASK(PNG_FREE_TRNS);
 #endif
 
    if (png_ptr->zstream.state != NULL)

@@ -243,7 +243,7 @@ $1 == "file" && NF >= 2{
 
 # option NAME ( (requires|enables|if) NAME* | on | off | disabled |
 #                sets SETTING VALUE+ )*
-#     
+#
 #   Declares an option 'NAME' and describes its default setting (disabled)
 #   and its relationship to other options.  The option is disabled
 #   unless *all* the options listed after 'requires' are set and at
