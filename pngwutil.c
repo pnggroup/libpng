@@ -2731,11 +2731,10 @@ png_set_filter(png_structrp png_ptr, int method, int filtersIn)
    png_ptr->filter_mask = png_check_bits(png_ptr, filters, 8);
 }
 #else /* !WRITE_FILTER */
-unsigned int /* PRIVATE */
+void /* PRIVATE */
 png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
       png_const_bytep unfiltered_row, png_uint_32 x,
-      unsigned int width/*pixels*/, int first_row_in_pass, int last_pass_row,
-      unsigned int filters_to_try/*from previous call*/, int end_of_image)
+      unsigned int width/*pixels*/, unsigned int row_info_flags)
 {
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
    png_uint_32 row_bits;
@@ -2751,13 +2750,10 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
       png_start_IDAT(png_ptr);
 
    write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
-         x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST, end_of_image);
+         x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST,
+         PNG_IDAT_END(row_info_flags));
 
-   return filters_to_try;
-
-   PNG_UNUSED(first_row_in_pass);
    PNG_UNUSED(prev_pixels);
-   PNG_UNUSED(last_pass_row);
 }
 #endif /* !WRITE_FILTER */
 
