@@ -751,6 +751,9 @@ struct png_struct_def
    png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
    png_uint_32              zbuffer_len;   /* Length of data in list */
    unsigned int             zbuffer_start; /* Bytes written from start */
+#     ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+         png_voidp          zbuffer_select;
+#     endif /* SELECT_FILTER_METHODICALLY */
 #  endif /* WRITE */
 #  ifdef PNG_READ_SUPPORTED
    unsigned int zstream_ended:1; /* no more zlib output available [read] */

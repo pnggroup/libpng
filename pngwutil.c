@@ -2375,16 +2375,16 @@ filter_row(png_structrp png_ptr, png_const_bytep prev_row,
 /* These two #defines simplify writing code that depends on one or the other of
  * the options being both supported and on:
  */
-#ifdef PNG_WRITE_OPTIMIZE_FILTER_SUPPORTED
-#  define optimize_filters\
-      (((png_ptr->options >> PNG_DISABLE_OPTIMIZE_FILTER)&3) != PNG_OPTION_ON)
+#ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+#  define methodical_option\
+      ((png_ptr->options >> PNG_SELECT_FILTER_METHODICALLY) & 3U)
 #else
-#  define optimize_filters 0
+#  define methodical_option PNG_OPTION_OFF
 #endif
 
-#ifdef PNG_WRITE_HEURISTIC_FILTER_SUPPORTED
-#  define heuristic_filters\
-      (((png_ptr->options >> PNG_DISABLE_HEURISTIC_FILTER)&3) != PNG_OPTION_ON)
+#ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
+#  define heuristic_option\
+      ((png_ptr->options >> PNG_SELECT_FILTER_HEURISTICALLY) & 3U)
 
 static unsigned int
 select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
@@ -2451,9 +2451,41 @@ select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
       return PNG_FILTER_MASK(best_filter);
    }
 }
-#else /* !WRITE_HEURISTIC_FILTER */
-#  define heuristic_filters 0
-#endif /* !WRITE_HEURISTIC_FILTER */
+#else /* !SELECT_FILTER_HEURISTICALLY */
+#  define heuristic_option PNG_OPTION_OFF
+#endif /* !SELECT_FILTER_HEURISTICALLY */
+
+#ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+static void
+select_filters_methodically_init(png_structrp png_ptr)
+{
+   affirm(png_ptr->zbuffer_select == NULL);
+}
+
+static int
+select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
+      png_bytep prev_pixels, png_const_bytep unfiltered_row,
+      unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
+      int end_of_image)
+{
+   const unsigned int row_bytes = (row_bits+7U) >> 3;
+   png_byte test_buffers[4][PNG_ROW_BUFFER_SIZE]; /* for each filter */
+
+   affirm(row_bytes <= PNG_ROW_BUFFER_SIZE);
+   debug((row_bits % bpp) == 0U);
+
+   filter_block(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
+         test_buffers[PNG_FILTER_VALUE_SUB-1U],
+         test_buffers[PNG_FILTER_VALUE_UP-1U],
+         test_buffers[PNG_FILTER_VALUE_AVG-1U],
+         test_buffers[PNG_FILTER_VALUE_PAETH-1U]);
+
+  write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
+        PNG_FILTER_VALUE_LAST, end_of_image);
+
+   return filters_to_try;
+}
+#endif /* SELECT_FILTER_METHODICALLY */
 
 /* This filters the row, chooses which filter to use, if it has not already
  * been specified by the application, and then writes the row out with the
@@ -2481,8 +2513,10 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
    {
       /* Delaying initialization of the filter stuff. */
       if (png_ptr->filter_mask == 0U)
-         png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, (optimize_filters ||
-                  heuristic_filters) ? PNG_ALL_FILTERS : PNG_NO_FILTERS);
+         png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE,
+                        (methodical_option != PNG_OPTION_OFF ||
+                         heuristic_option != PNG_OPTION_OFF) ?
+                        PNG_ALL_FILTERS : PNG_NO_FILTERS);
 
       /* Now work out the filters to try for this row: */
       filters_to_try = png_ptr->filter_mask; /* else caller must preserve */
@@ -2539,19 +2573,20 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
 #        undef match
       }
 
-      /* Is this a list of filters which can be simplified to a single filter?
-       * If there is no selection algorithm enabled do so now:
-       *
-       * (Errors in the logic here trigger the 'impossible' else below.)
+      /* If there is no selection algorithm enabled choose the first filter
+       * in the list, otherwise do algorithm-specific initialization.
        */
-#     ifdef PNG_WRITE_OPTIMIZE_FILTER_SUPPORTED
-         if (((png_ptr->options >> PNG_DISABLE_OPTIMIZE_FILTER) & 3) ==
-               PNG_OPTION_ON) /* optimize supported but disabled */
-#     endif /* WRITE_OPTIMIZE_FILTER */
-#     ifdef PNG_WRITE_HEURISTIC_FILTER_SUPPORTED
-         if (((png_ptr->options >> PNG_DISABLE_HEURISTIC_FILTER) & 3) ==
-               PNG_OPTION_ON) /* heuristic supported but disabled */
-#     endif /* WRITE_HEURISTIC_FILTER */
+#     ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+         if (methodical_option == PNG_OPTION_ON ||
+             (methodical_option != PNG_OPTION_OFF &&
+              heuristic_option != PNG_OPTION_ON))
+            select_filters_methodically_init(png_ptr);
+
+         else /* don't do methodical selection */
+#     endif /* SELECT_FILTER_METHODICALLY */
+#     ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
+         if (heuristic_option == PNG_OPTION_OFF) /* don't use heuristics */
+#     endif /* SELECT_FILTER_HEURISTICALLY */
       filters_to_try &= -filters_to_try;
    } /* start of row */
 
@@ -2579,25 +2614,24 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             prev_pixels, unfiltered_row, row_bits, bpp, filters_to_try, x == 0,
             end_of_image);
 
-#  ifdef PNG_WRITE_OPTIMIZE_FILTER_SUPPORTED
-#if 0
-      else if (((png_ptr->options >> PNG_DISABLE_OPTIMIZE_FILTER) & 3) !=
-            PNG_OPTION_ON) /* optimize supported and not disabled */
-         impossible("optimize filters NYI");
-#endif
-#  endif /* WRITE_OPTIMIZE_FITLER */
-#  ifdef PNG_WRITE_HEURISTIC_FILTER_SUPPORTED
+#  ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+      else if (png_ptr->zbuffer_select != NULL)
+         filters_to_try = select_filter_methodically(png_ptr,
+               first_row_in_pass ? NULL : prev_row, prev_pixels, unfiltered_row,
+               row_bits, bpp, filters_to_try, end_of_image);
+#  endif /* SELECT_FILTER_METHODICALLY */
+#  ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
       /* The heuristic must select a single filter based on the first block of
        * pixels:
        */
-      else if (((png_ptr->options >> PNG_DISABLE_HEURISTIC_FILTER) & 3) !=
-            PNG_OPTION_ON)
+      else
          filters_to_try = select_filter_heuristically(png_ptr,
                first_row_in_pass ? NULL : prev_row, prev_pixels, unfiltered_row,
                row_bits, bpp, filters_to_try, end_of_image);
-#  endif /* WRITE_HEURISTIC_FITLER */
-   else
-      impossible("bad filter select logic");
+#  else /* !SELECT_FILTER_HEURISTICALLY */
+      else
+         impossible("bad filter select logic");
+#  endif /* !SELECT_FILTER_HEURISTICALLY */
 
    /* Copy the current row into the previous row buffer, if available, unless
     * this is the last row in the pass, when there is no point.  Note that

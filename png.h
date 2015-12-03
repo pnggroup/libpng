@@ -1661,21 +1661,25 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  *    ignored if SUB is set; this is because these filter pairs are equivalent
  *    when there is no previous row.
  *
- * PNG_WRITE_OPTIMIZE_FITLER_SUPPORTED:
- * 2) If WRITE_OPTIMIZE_FILTER is supported and it has not been disabled by
- *    png_set_option(PNG_DISABLE_OPTIMIZE_FILTER, PNG_OPTION_ON) libpng tries
- *    all the filters in the list and selects the one which gives the shortest
- *    compressed row, favoring earlier filters.
+ * 2) PNG_SELECT_FILTER_METHODICALLY_SUPPORTED:
+ *    If SELECT_FILTER_METHODICALLY is 'on' libpng tries all the filters in the
+ *    list and selects the one which gives the shortest compressed row, favoring
+ *    earlier filters.
  *
- * PNG_WRITE_HEURISTIC_FITLER_SUPPORTED:
- * 3) If not (2) an WRITE_HEURISTIC_FILTER is supported and has not been
- *    disabled by png_set_option(PNG_DISABLE_HEURISTIC_FILTER, PNG_OPTION_ON)
- *    libpng tests the start of each row (a few thousand bytes at most) to see
- *    which filter is likely to produce best compression.
+ * 3) PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED:
+ *    If SELECT_FILTER_HEURISTICALLY is 'on' libpng tests the start of each row
+ *    (a few thousand bytes at most) to see which filter is likely to produce
+ *    best compression.
  *
  * 4) If neither (2) nor (3) libpng selects the first filter in the list (there
  *    is no warning that this will happen - check the #defines if you need to
  *    know.)
+ *
+ * The seletion options are turned 'on' using png_set_option(method,
+ * PNG_OPTION_ON) and turned off with PNG_OPTION_OFF.  If a selection method is
+ * turned off it will never be used, if neither option is turned on or off (i.e.
+ * if png_set_option is not called) the first supported option (2) or (3) will
+ * be used.
  *
  * If you intend to use 'previous row' filters in an image set either the UP or
  * PAETH filter before the first call to png_write_row, depending on whether you
@@ -1685,11 +1689,11 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  * preceding byte as a predictor and is not likely to have very good
  * performance.
  *
- * The WRITE_OPTIMIZE_FILTER option is slow and memory intensive, but it is
- * likely to produce the smallest PNG file.  Depending on the image data the
- * HEURISTIC option may improve results and has little overall effect on
- * compression speed, however it can sometimes produce larger files than not
- * using any filtering.
+ * The SELECT_FILTER_METHODICALLY option is slow and memory intensive, but it is
+ * almost certain to produce the smallest PNG file.  Depending on the image data
+ * the HEURISTIC option may improve results significantly over the NONE filter
+ * and it has little overall effect on compression speed, however it can
+ * sometimes produce larger files than not using any filtering.
  */
 PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
     int filters));
@@ -3491,8 +3495,8 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
 #define PNG_EXTENSIONS 0 /* BOTH: enable or disable extensions */
 #define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
 #define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#define PNG_DISABLE_HEURISTIC_FILTER 6 /* SOFTWARE: see png_set_filter */
-#define PNG_DISABLE_OPTIMIZE_FILTER  8 /* SOFTWARE: see png_set_filter */
+#define PNG_SELECT_FILTER_HEURISTICALLY 6 /* SOFTWARE: see png_set_filter */
+#define PNG_SELECT_FILTER_METHODICALLY 8 /* SOFTWARE: see png_set_filter */
 #define PNG_OPTION_NEXT  10 /* Next option - numbers must be even */
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
