@@ -5443,6 +5443,9 @@ Version 1.6.20rc02 [November 29, 2015]
     error arises (ones that support the API change to use the window size
     in the stream).
 
+Version 1.6.20 [December 3, 2015]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
