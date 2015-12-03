@@ -1070,6 +1070,8 @@ Version 1.7.0beta70 [December 3, 2015]
     because the png_error aborts the write of subsequent pre-IDAT chunks.
     In particular an abort as a result of a bogus colorspace information
    (gAMA, cHRM, sBIT etc) prevents the write of the PLTE chunk.
+
+Version 1.7.0beta71 [December 3, 2015]
      
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
