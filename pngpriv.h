@@ -959,12 +959,6 @@ PNG_INTERNAL_FUNCTION(void, png_zstream_error,(z_stream *zstream, int ret),
     * set before they return.
     */
 
-#ifdef PNG_WRITE_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_free_buffer_list,(png_structrp png_ptr,
-   png_compression_bufferp *list),PNG_EMPTY);
-   /* Free the buffer list used by the compressed write code. */
-#endif
-
 #if defined(PNG_FLOATING_POINT_SUPPORTED) && \
    !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
    (defined(PNG_gAMA_SUPPORTED) || defined(PNG_cHRM_SUPPORTED) || \
@@ -1206,14 +1200,30 @@ PNG_INTERNAL_FUNCTION(void,png_write_sCAL_s,(png_structrp png_ptr,
  *
  * This may be called multiple times per row, but calls must be in 'x' order;
  * first a call with x 0 to mark the start of the row and, at the end, one with
- * 'end_of_row' set (this can be done in the same function call if the whole row
- * is passed.)
+ * PNG_ROW_END set (this can be done in the same function call if the whole row
+ * is passed.)  The following flags are used internally to control pass
+ * filtering and deflate:
  */
-PNG_INTERNAL_FUNCTION(unsigned int, png_write_filter_row,
-   (png_structrp png_ptr, png_bytep prev_pixels, png_const_bytep unfiltered_row,
-    png_uint_32 x, unsigned int width/*pixels*/, int first_row_in_pass,
-    int last_pass_row, unsigned int filters_to_try/*from previous call*/,
-    int end_of_image),
+enum
+{
+   png_row_end        =0x1U, /* This is the last block in the row */
+   png_pass_first_row =0x2U, /* This is the first row in a pass */
+   png_pass_last_row  =0x4U, /* This is the last row in a pass */
+   png_pass_last      =0x8U  /* This is the last pass in the image */
+
+   /* A useful macro; return true if this is the last block of the last row in
+    * the image.
+    */
+#  define PNG_IDAT_END(f) (((f) & ~png_pass_first_row) == \
+      (png_row_end+png_pass_last_row+png_pass_last))
+};
+PNG_INTERNAL_FUNCTION(void, png_write_filter_row, (png_structrp png_ptr,
+    png_bytep prev_pixels, png_const_bytep unfiltered_row, png_uint_32 x,
+    unsigned int width/*pixels*/, unsigned int row_info_flags),
+   PNG_EMPTY);
+
+/* Release memory used by the deflate mechanism */
+PNG_INTERNAL_FUNCTION(void, png_deflate_destroy, (png_structrp png_ptr),
    PNG_EMPTY);
 
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED

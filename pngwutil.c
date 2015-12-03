@@ -458,7 +458,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 }
 
 /* Clean up (or trim) a linked list of compression buffers. */
-void /* PRIVATE */
+static void
 png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
 {
    png_compression_bufferp list = *listp;
@@ -476,6 +476,26 @@ png_free_buffer_list(png_structrp png_ptr, png_compression_bufferp *listp)
       }
       while (list != NULL);
    }
+}
+
+/* Release memory used by the deflate mechanism */
+void /* PRIVATE */
+png_deflate_destroy(png_structrp png_ptr)
+{
+   /* Free any memory zlib uses */
+   if (png_ptr->zstream.state != NULL)
+   {
+      int ret = deflateEnd(&png_ptr->zstream);
+
+      if (ret != Z_OK)
+      {
+         png_zstream_error(&png_ptr->zstream, ret);
+         png_warning(png_ptr, png_ptr->zstream.msg);
+      }
+   }
+
+   /* Free our memory.  png_free checks NULL for us. */
+   png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
 }
 
 /* Compress the given data given a compression buffer list.  The passed in
@@ -2140,7 +2160,7 @@ png_write_flush(png_structrp png_ptr)
 
 static void
 write_filtered_row(png_structrp png_ptr, png_const_voidp filtered_row,
-   unsigned int row_bytes, png_byte filter /*if at start of row*/,
+   unsigned int row_bytes, unsigned int filter /*if at start of row*/,
    int end_of_image)
 {
    /* This handles writing a row that has been filtered, or did not need to be
@@ -2155,7 +2175,7 @@ write_filtered_row(png_structrp png_ptr, png_const_voidp filtered_row,
    {
       png_byte buffer[1];
 
-      buffer[0] = filter;
+      buffer[0] = PNG_BYTE(filter);
       png_compress_IDAT(png_ptr, buffer, 1U/*len*/, Z_NO_FLUSH);
    }
 
@@ -2341,35 +2361,25 @@ filter_block(png_const_bytep prev_row, png_bytep prev_pixels,
 static void
 filter_row(png_structrp png_ptr, png_const_bytep prev_row,
       png_bytep prev_pixels, png_const_bytep unfiltered_row,
-      unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
+      unsigned int row_bits, unsigned int bpp, unsigned int filter,
       int start_of_row, int end_of_image)
 {
    /* filters_to_try identifies a single filter and it is not PNG_FILTER_NONE.
     */
-   png_byte filter = PNG_FILTER_VALUE_LAST /* not at start */;
    png_byte filtered_row[PNG_ROW_BUFFER_SIZE];
 
-   affirm((row_bits+7U) >> 3 <= PNG_ROW_BUFFER_SIZE);
+   affirm((row_bits+7U) >> 3 <= PNG_ROW_BUFFER_SIZE &&
+          filter >= PNG_FILTER_VALUE_SUB && filter <= PNG_FILTER_VALUE_PAETH);
    debug((row_bits % bpp) == 0U);
 
-   if (start_of_row) switch (filters_to_try)
-   {
-      case PNG_FILTER_SUB:   filter = PNG_FILTER_VALUE_SUB;   break;
-      case PNG_FILTER_UP:    filter = PNG_FILTER_VALUE_UP;    break;
-      case PNG_FILTER_AVG:   filter = PNG_FILTER_VALUE_AVG;   break;
-      case PNG_FILTER_PAETH: filter = PNG_FILTER_VALUE_PAETH; break;
-      default:
-         impossible("filter list");
-   }
-
    filter_block(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
-         filters_to_try & PNG_FILTER_SUB   ? filtered_row : NULL,
-         filters_to_try & PNG_FILTER_UP    ? filtered_row : NULL,
-         filters_to_try & PNG_FILTER_AVG   ? filtered_row : NULL,
-         filters_to_try & PNG_FILTER_PAETH ? filtered_row : NULL);
+         filter == PNG_FILTER_VALUE_SUB   ? filtered_row : NULL,
+         filter == PNG_FILTER_VALUE_UP    ? filtered_row : NULL,
+         filter == PNG_FILTER_VALUE_AVG   ? filtered_row : NULL,
+         filter == PNG_FILTER_VALUE_PAETH ? filtered_row : NULL);
 
-   write_filtered_row(png_ptr, filtered_row, (row_bits+7U)>>3, filter,
-         end_of_image);
+   write_filtered_row(png_ptr, filtered_row, (row_bits+7U)>>3,
+         start_of_row ? filter : PNG_FILTER_VALUE_LAST, end_of_image);
 }
 
 /* These two #defines simplify writing code that depends on one or the other of
@@ -2386,11 +2396,10 @@ filter_row(png_structrp png_ptr, png_const_bytep prev_row,
 #  define heuristic_option\
       ((png_ptr->options >> PNG_SELECT_FILTER_HEURISTICALLY) & 3U)
 
-static unsigned int
+static void
 select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
    png_bytep prev_pixels, png_const_bytep unfiltered_row,
-   unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
-   int end_of_image)
+   unsigned int row_bits, unsigned int bpp, int end_of_image)
 {
    const unsigned int row_bytes = (row_bits+7U) >> 3;
    png_byte test_buffers[4][PNG_ROW_BUFFER_SIZE]; /* for each filter */
@@ -2411,6 +2420,7 @@ select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
     * generated or we expect a count of average 8 per code.
     */
    {
+      unsigned int filters_to_try = png_ptr->zbuffer_filters;
       unsigned int filter_max = 257U;
       png_byte best_filter, test_filter;
       png_const_bytep best_row, test_row;
@@ -2437,6 +2447,9 @@ select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
             filter_max = count, best_filter = test_filter, best_row = test_row;
       }
 
+      /* Store the best filter found: */
+      png_ptr->zbuffer_filters = best_filter;
+
       /* Calling write_unfiltered_rowbits is necessary here to deal with the
        * clearly of a partial byte at the end.
        */
@@ -2447,8 +2460,6 @@ select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
       else
          write_filtered_row(png_ptr, best_row, row_bytes, best_filter,
                end_of_image);
-
-      return PNG_FILTER_MASK(best_filter);
    }
 }
 #else /* !SELECT_FILTER_HEURISTICALLY */
@@ -2462,11 +2473,10 @@ select_filters_methodically_init(png_structrp png_ptr)
    affirm(png_ptr->zbuffer_select == NULL);
 }
 
-static int
+static void
 select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
       png_bytep prev_pixels, png_const_bytep unfiltered_row,
-      unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
-      int end_of_image)
+      unsigned int row_bits, unsigned int bpp, int end_of_row, int end_of_image)
 {
    const unsigned int row_bytes = (row_bits+7U) >> 3;
    png_byte test_buffers[4][PNG_ROW_BUFFER_SIZE]; /* for each filter */
@@ -2482,8 +2492,7 @@ select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
 
   write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
         PNG_FILTER_VALUE_LAST, end_of_image);
-
-   return filters_to_try;
+  PNG_UNUSED(end_of_row)
 }
 #endif /* SELECT_FILTER_METHODICALLY */
 
@@ -2491,15 +2500,15 @@ select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
  * been specified by the application, and then writes the row out with the
  * chosen filter.
  */
-unsigned int /* PRIVATE */
+void /* PRIVATE */
 png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
       png_const_bytep unfiltered_row, png_uint_32 x,
-      unsigned int width/*pixels*/, int first_row_in_pass, int last_pass_row,
-      unsigned int filters_to_try, int end_of_image)
+      unsigned int width/*pixels*/, unsigned int row_info_flags)
 {
    png_bytep prev_row = png_ptr->row_buffer;
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
    const unsigned int row_bits = width * bpp;
+   unsigned int filters_to_try;
 
    /* These invariants are expected from the caller: */
    affirm(width < 65536U && bpp <= 64U && width < 65536U/bpp &&
@@ -2519,7 +2528,7 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
                         PNG_ALL_FILTERS : PNG_NO_FILTERS);
 
       /* Now work out the filters to try for this row: */
-      filters_to_try = png_ptr->filter_mask; /* else caller must preserve */
+      filters_to_try = png_ptr->filter_mask;
 
       /* If this has a previous row filter in the set to try ensure the row
        * buffer exists and ensure it is empty when first allocated and at
@@ -2541,7 +2550,7 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
              * app warning and disable the filters that would have required
              * the data.
              */
-            if (!first_row_in_pass)
+            if (!(row_info_flags & png_pass_first_row))
             {
                png_app_warning(png_ptr, "Previous row filters ignored");
                /* And always turn off the filters, to prevent using
@@ -2556,7 +2565,7 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
          }
       }
 
-      if (first_row_in_pass)
+      if ((row_info_flags & png_pass_first_row) != 0U)
       {
          /* On the first row UP and NONE are the same, PAETH and SUB are the
           * same, so if both members of a pair occur together eliminate the one
@@ -2569,7 +2578,7 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
 
          if (match(PNG_FILTER_SUB+PNG_FILTER_PAETH))
-            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
+            filters_to_try &= PNG_BIC_MASK(PNG_FILTER_PAETH);
 #        undef match
       }
 
@@ -2588,59 +2597,84 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
          if (heuristic_option == PNG_OPTION_OFF) /* don't use heuristics */
 #     endif /* SELECT_FILTER_HEURISTICALLY */
       filters_to_try &= -filters_to_try;
+
+      /* If there is just one bit set in filters_to_try convert it to the filter
+       * value and store that.
+       */
+      if ((filters_to_try & (filters_to_try-1U)) == 0U) switch (filters_to_try)
+      {
+         case PNG_FILTER_NONE:  filters_to_try = PNG_FILTER_VALUE_NONE;  break;
+         case PNG_FILTER_SUB:   filters_to_try = PNG_FILTER_VALUE_SUB;   break;
+         case PNG_FILTER_UP:    filters_to_try = PNG_FILTER_VALUE_UP;    break;
+         case PNG_FILTER_AVG:   filters_to_try = PNG_FILTER_VALUE_AVG;   break;
+         case PNG_FILTER_PAETH: filters_to_try = PNG_FILTER_VALUE_PAETH; break;
+         default:
+            impossible("bad filter mask");
+      }
+
+      png_ptr->zbuffer_filters = filters_to_try;
    } /* start of row */
 
-   else if (prev_row != NULL)
+   else
    {
-      /* Advance prev_row to the corresponding pixel above row[x], must use
-       * png_calc_rowbytes here otherwise the calculation using x might
-       * overflow.
-       */
-      debug(((x * bpp) & 7U) == 0U);
-      prev_row += png_calc_rowbytes(png_ptr, bpp, x);
+      if (prev_row != NULL)
+      {
+         /* Advance prev_row to the corresponding pixel above row[x], must use
+          * png_calc_rowbytes here otherwise the calculation using x might
+          * overflow.
+          */
+         debug(((x * bpp) & 7U) == 0U);
+         prev_row += png_calc_rowbytes(png_ptr, bpp, x);
+      }
+
+      filters_to_try = png_ptr->zbuffer_filters;
    }
 
    /* Now choose the correct filter implementation according to the number of
     * filters in the filters_to_try list.  The prev_row parameter is made NULL
     * on the first row because it is uninitialized at that point.
     */
-   if (filters_to_try == PNG_FILTER_NONE)
+   if (filters_to_try == PNG_FILTER_VALUE_NONE)
       write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
             x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST,
-            end_of_image);
+            PNG_IDAT_END(row_info_flags));
 
-   else if ((filters_to_try & -filters_to_try) == filters_to_try) /* 1 filter */
-      filter_row(png_ptr, first_row_in_pass ? NULL : prev_row,
-            prev_pixels, unfiltered_row, row_bits, bpp, filters_to_try, x == 0,
-            end_of_image);
+   else
+   {
+      png_const_bytep prev =
+         (row_info_flags & png_pass_first_row) ? NULL : prev_row;
 
-#  ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-      else if (png_ptr->zbuffer_select != NULL)
-         filters_to_try = select_filter_methodically(png_ptr,
-               first_row_in_pass ? NULL : prev_row, prev_pixels, unfiltered_row,
-               row_bits, bpp, filters_to_try, end_of_image);
-#  endif /* SELECT_FILTER_METHODICALLY */
-#  ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
-      /* The heuristic must select a single filter based on the first block of
-       * pixels:
-       */
-      else
-         filters_to_try = select_filter_heuristically(png_ptr,
-               first_row_in_pass ? NULL : prev_row, prev_pixels, unfiltered_row,
-               row_bits, bpp, filters_to_try, end_of_image);
-#  else /* !SELECT_FILTER_HEURISTICALLY */
-      else
-         impossible("bad filter select logic");
-#  endif /* !SELECT_FILTER_HEURISTICALLY */
+      /* Is just one bit set in 'filters_to_try'? */
+      if (filters_to_try < PNG_FILTER_MASK(0))
+         filter_row(png_ptr, prev, prev_pixels, unfiltered_row, row_bits, bpp,
+               filters_to_try, x == 0, PNG_IDAT_END(row_info_flags));
+
+#     ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+         else if (png_ptr->zbuffer_select != NULL)
+            select_filter_methodically(png_ptr, prev, prev_pixels,
+                  unfiltered_row, row_bits, bpp,
+                  (row_info_flags & png_row_end) != 0U,
+                  PNG_IDAT_END(row_info_flags));
+#     endif /* SELECT_FILTER_METHODICALLY */
+#     ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
+         /* The heuristic must select a single filter based on the first block
+          * of pixels; it updates zbuffer_filter to a single filter value.
+          */
+         else
+            select_filter_heuristically(png_ptr, prev, prev_pixels,
+                  unfiltered_row, row_bits, bpp, PNG_IDAT_END(row_info_flags));
+#     else /* !SELECT_FILTER_HEURISTICALLY */
+         else
+            impossible("bad filter select logic");
+#     endif /* !SELECT_FILTER_HEURISTICALLY */
+   }
 
    /* Copy the current row into the previous row buffer, if available, unless
     * this is the last row in the pass, when there is no point.  Note that
     * prev_row may have garbage in a partial byte at the end.
     */
-   if (prev_row != NULL && !last_pass_row)
+   if (prev_row != NULL && !(row_info_flags & png_pass_last_row))
       memcpy(prev_row, unfiltered_row, (row_bits + 7U) >> 3);
-
-   return filters_to_try;
 }
 
 /* Allow the application to select one or more row filters to use. */

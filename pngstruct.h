@@ -67,6 +67,11 @@
 typedef struct png_compression_buffer *png_compression_bufferp;
 #endif
 
+#ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
+/* Type of the data cache used when selecting filters methodicially */
+typedef struct png_filter_select *png_filter_selectp;
+#endif
+
 /* Colorspace support; structures used in png_struct, png_info and in internal
  * functions to hold and communicate information about the color space.
  *
@@ -751,8 +756,9 @@ struct png_struct_def
    png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
    png_uint_32              zbuffer_len;   /* Length of data in list */
    unsigned int             zbuffer_start; /* Bytes written from start */
+   unsigned int             zbuffer_filters;/*Filters for this row */
 #     ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-         png_voidp          zbuffer_select;
+         png_filter_selectp zbuffer_select;
 #     endif /* SELECT_FILTER_METHODICALLY */
 #  endif /* WRITE */
 #  ifdef PNG_READ_SUPPORTED

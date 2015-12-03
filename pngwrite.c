@@ -629,8 +629,8 @@ png_write_image(png_structrp png_ptr, png_bytepp image)
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED) ||\
     defined(PNG_WRITE_TRANSFORMS_SUPPORTED)
 static void
-write_row_buffered(png_structrp png_ptr, png_const_bytep row,
-   int first_row_in_pass, int last_pass_row, int end_of_image,
+write_row_buffered(png_structrp png_ptr,
+   png_const_bytep row, unsigned int row_info_flags,
    void (*copy_fn)(png_const_structrp png_ptr, png_bytep row_buffer,
       png_const_bytep row, png_uint_32 x, unsigned int count, unsigned int p),
    unsigned int copy_parameter)
@@ -640,15 +640,12 @@ write_row_buffered(png_structrp png_ptr, png_const_bytep row,
    const png_uint_32 width = png_ptr->interlaced == PNG_INTERLACE_NONE ?
       png_ptr->width : PNG_PASS_COLS(png_ptr->width, pass);
    png_uint_32 x;
-   unsigned int filters;
    png_byte prev_pixels[4*2*2]; /* 2 pixels up to 4 2-byte channels each */
 
    memset(prev_pixels, 0U, sizeof prev_pixels);
 
-   for (x = 0U, filters = 0U; x < width; x += max_pixels)
+   for (x = 0U; x < width; x += max_pixels)
    {
-      int finish = 0;
-
       union
       {
          PNG_ROW_BUFFER_ALIGN_TYPE force_buffer_alignment;
@@ -658,8 +655,9 @@ write_row_buffered(png_structrp png_ptr, png_const_bytep row,
       if (max_pixels > width - x)
          max_pixels = (unsigned int)/*SAFE*/(width - x);
 
-      if (end_of_image && x + max_pixels >= width)
-         finish = 1;
+      debug((row_info_flags & png_row_end) == 0U); /* must be set here at end */
+      if (x + max_pixels >= width)
+         row_info_flags |= png_row_end;
 
       /* Copy a block of input pixels into the buffer, effecting the interlace
        * on the way if required.  The argument is the number of pixels in the
@@ -707,11 +705,10 @@ write_row_buffered(png_structrp png_ptr, png_const_bytep row,
 #     endif /* WRITE_TRANSFORMS */
 
       /* Call png_write_filter_row to write this block of data, the test on
-       * maxpixels says if this is the final block in the row, 'filters' is
-       * initialized when 0 is 0 then preserved here for later blocks:
+       * maxpixels says if this is the final block in the row.
        */
-      filters = png_write_filter_row(png_ptr, prev_pixels, pixel_buffer.buffer,
-            x, max_pixels, first_row_in_pass, last_pass_row, filters, finish);
+      png_write_filter_row(png_ptr, prev_pixels, pixel_buffer.buffer, x,
+            max_pixels, row_info_flags);
    }
 }
 #endif /* WRITE { INTERLACING || TRANSFORMS } */
@@ -825,7 +822,7 @@ interlace_row_byte(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
 
 static void
 write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
-      int first_row_in_pass, int last_pass_row, int end_of_image)
+      unsigned int row_info_flags)
 {
    /* Split the row into blocks of the appropriate size: */
    const unsigned int input_depth = png_ptr->row_input_pixel_depth;
@@ -835,7 +832,6 @@ write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
    const png_uint_32 width = png_ptr->interlaced == PNG_INTERLACE_NONE ?
       png_ptr->width : PNG_PASS_COLS(png_ptr->width, pass);
    png_uint_32 x;
-   unsigned int filters;
    png_byte prev_pixels[4*2*2]; /* 2 pixels up to 4 2-byte channels each */
 
    /* max_pixels is at most 16 bits, input_depth is at most 64, so the product
@@ -847,10 +843,8 @@ write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
 
    memset(prev_pixels, 0U, sizeof prev_pixels);
 
-   for (x = 0U, filters = 0U; x < width; x += max_pixels, row += max_bytes)
+   for (x = 0U; x < width; x += max_pixels, row += max_bytes)
    {
-      int finish = 0;
-
       if (max_pixels > width - x)
       {
          max_bytes = width - x;
@@ -858,22 +852,23 @@ write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
          max_bytes = (max_bytes * input_depth + 7U) >> 3;
       }
 
-      if (end_of_image && x + max_pixels >= width)
-         finish = 1;
+      debug((row_info_flags & png_row_end) == 0U); /* must be set here at end */
+      if (x + max_pixels >= width)
+         row_info_flags |= png_row_end;
 
-      filters = png_write_filter_row(png_ptr, prev_pixels, row, x, max_pixels,
-            first_row_in_pass, last_pass_row, filters, finish);
+      png_write_filter_row(png_ptr, prev_pixels, row, x, max_pixels,
+            row_info_flags);
    }
 }
 
 static void
 write_row_core(png_structrp png_ptr, png_const_bytep row,
-      int first_row_in_pass, int last_pass_row, int end_of_image)
+      unsigned int row_info_flags)
 {
 #  ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
       if (png_ptr->transform_list != NULL)
-         write_row_buffered(png_ptr, row, first_row_in_pass, last_pass_row,
-               end_of_image, copy_row, png_ptr->row_input_pixel_depth);
+         write_row_buffered(png_ptr, row, row_info_flags,
+               copy_row, png_ptr->row_input_pixel_depth);
 
       else
 #  endif /* WRITE_TRANSFORMS */
@@ -881,8 +876,7 @@ write_row_core(png_structrp png_ptr, png_const_bytep row,
    /* If control reaches this point the intermediate buffer is not required and
     * the input data can be used unmodified.
     */
-   write_row_unbuffered(png_ptr, row, first_row_in_pass, last_pass_row,
-         end_of_image);
+   write_row_unbuffered(png_ptr, row, row_info_flags);
 }
 
 /* Write a single non-interlaced row. */
@@ -892,8 +886,11 @@ write_row_non_interlaced(png_structrp png_ptr, png_const_bytep row)
    const png_uint_32 row_number = png_ptr->row_number+1U;
    const int last_pass_row = row_number == png_ptr->height;
 
-   write_row_core(png_ptr, row, row_number == 1U, last_pass_row,
-         last_pass_row);
+   /* There is only one pass, so this is the last pass: */
+   write_row_core(png_ptr, row,
+         (row_number == 1U ? png_pass_first_row : 0U) |
+         (last_pass_row ? png_pass_last_row : 0U) |
+         png_pass_last);
 
    if (!last_pass_row)
       png_ptr->row_number = row_number;
@@ -910,14 +907,17 @@ static void
 write_row_interlaced(png_structrp png_ptr, png_const_bytep row)
 {
    /* row_number is the row in the pass.  The app must only call png_write_row
-    * the correct number of times.  'pass' is set to 7U at the end.
+    * the correct number of times.  'pass' is set to 7U after the end.
     */
    const png_uint_32 row_number = png_ptr->row_number+1U;
    unsigned int pass = png_ptr->pass;
    const int last_pass_row = row_number == PNG_PASS_ROWS(png_ptr->height, pass);
 
-   write_row_core(png_ptr, row, row_number == 1U, last_pass_row,
-      last_pass_row && pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height));
+   write_row_core(png_ptr, row,
+         (row_number == 1U ? png_pass_first_row : 0U) |
+         (last_pass_row ? png_pass_last_row : 0U) |
+         (pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) ?
+                                png_pass_last : 0U));
 
    if (!last_pass_row)
       png_ptr->row_number = row_number;
@@ -950,8 +950,13 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
 
    if (write_row)
    {
-      const int last_pass_row =
-         PNG_LAST_PASS_ROW(row_number, pass, png_ptr->height);
+      const unsigned int row_info_flags =
+         (row_number == PNG_PASS_START_ROW(pass) ?
+            png_pass_first_row : 0U) |
+         (PNG_LAST_PASS_ROW(row_number, pass, png_ptr->height) ?
+            png_pass_last_row : 0U) |
+         (pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) ?
+            png_pass_last : 0U);
 
       if (pass < 6)
       {
@@ -963,8 +968,6 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
           */
          const unsigned int input_depth = png_ptr->row_input_pixel_depth;
          unsigned int B = 0; /* log2(input_depth) */
-         const int end_of_image = last_pass_row &&
-            pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height);
 
          switch (input_depth)
          {
@@ -975,22 +978,19 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
                ++B;
                /*FALL THROUGH*/
             case 1U: /* B will be 0 */
-               write_row_buffered(png_ptr, row,
-                     row_number == PNG_PASS_START_ROW(pass), last_pass_row,
-                     end_of_image, interlace_row_lbd, B);
+               write_row_buffered(png_ptr, row, row_info_flags,
+                     interlace_row_lbd, B);
                break;
 
             default: /* Parameter is the pixel size in bytes */
-               write_row_buffered(png_ptr, row,
-                     row_number == PNG_PASS_START_ROW(pass), last_pass_row,
-                     end_of_image, interlace_row_byte, input_depth >> 3);
+               write_row_buffered(png_ptr, row, row_info_flags,
+                     interlace_row_byte, input_depth >> 3);
                break;
          }
       }
 
       else /* pass 6; no interlacing required */
-         write_row_core(png_ptr, row, row_number == 1U, last_pass_row,
-               last_pass_row);
+         write_row_core(png_ptr, row, row_info_flags);
    }
 
    if (row_number+1U < png_ptr->height)
@@ -1099,20 +1099,8 @@ png_write_destroy(png_structrp png_ptr)
 {
    png_debug(1, "in png_write_destroy");
 
-   /* Free any memory zlib uses */
-   if (png_ptr->zstream.state != NULL)
-   {
-      int ret = deflateEnd(&png_ptr->zstream);
+   png_deflate_destroy(png_ptr);
 
-      if (ret != Z_OK)
-      {
-         png_zstream_error(&png_ptr->zstream, ret);
-         png_warning(png_ptr, png_ptr->zstream.msg);
-      }
-   }
-
-   /* Free our memory.  png_free checks NULL for us. */
-   png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->row_buffer);
    png_ptr->row_buffer = NULL;
