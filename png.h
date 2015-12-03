@@ -1646,14 +1646,50 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  * The set of filters may be changed at any time, the new values will affect the
  * next row written.
  *
- * Prior to 1.7.0 it was only possible to add the filters that use the previous
- * row if at least one of them was selected at the start of the write.
- *
- * In 1.7.0 if a filter is added which causes the previous row to be required
- * (anywhere in the interlace pass after row 0) the use of the filter will be
- * delayed until the row after the next one.
+ * The first time a filter is selected which requires the previous row (UP, AVG
+ * or PAETH) retention of the previous row is switched on.  This means that if
+ * this is done after the first row in a pass the previous-row filter will not
+ * be considered until the row after the png_set_filter call.  libpng issues a
+ * warning (via png_warning) in this case.
  *
  * The 'method' must match that passed to png_set_IHDR; it cannot be changed.
+ *
+ * If multiple filters are enabled libpng will select one according to the
+ * following rules:
+ *
+ * 1) On the first row of a pass UP is ignored if NONE is set and PAETH is
+ *    ignored if SUB is set; this is because these filter pairs are equivalent
+ *    when there is no previous row.
+ *
+ * PNG_WRITE_OPTIMIZE_FITLER_SUPPORTED:
+ * 2) If WRITE_OPTIMIZE_FILTER is supported and it has not been disabled by
+ *    png_set_option(PNG_DISABLE_OPTIMIZE_FILTER, PNG_OPTION_ON) libpng tries
+ *    all the filters in the list and selects the one which gives the shortest
+ *    compressed row, favoring earlier filters.
+ *
+ * PNG_WRITE_HEURISTIC_FITLER_SUPPORTED:
+ * 3) If not (2) an WRITE_HEURISTIC_FILTER is supported and has not been
+ *    disabled by png_set_option(PNG_DISABLE_HEURISTIC_FILTER, PNG_OPTION_ON)
+ *    libpng tests the start of each row (a few thousand bytes at most) to see
+ *    which filter is likely to produce best compression.
+ *
+ * 4) If neither (2) nor (3) libpng selects the first filter in the list (there
+ *    is no warning that this will happen - check the #defines if you need to
+ *    know.)
+ *
+ * If you intend to use 'previous row' filters in an image set either the UP or
+ * PAETH filter before the first call to png_write_row, depending on whether you
+ * want to use NONE or SUB on the first row.
+ *
+ * You can also select AVG on the first row; it uses half the value of the
+ * preceding byte as a predictor and is not likely to have very good
+ * performance.
+ *
+ * The WRITE_OPTIMIZE_FILTER option is slow and memory intensive, but it is
+ * likely to produce the smallest PNG file.  Depending on the image data the
+ * HEURISTIC option may improve results and has little overall effect on
+ * compression speed, however it can sometimes produce larger files than not
+ * using any filtering.
  */
 PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
     int filters));
@@ -3455,7 +3491,9 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
 #define PNG_EXTENSIONS 0 /* BOTH: enable or disable extensions */
 #define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
 #define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#define PNG_OPTION_NEXT  6 /* Next option - numbers must be even */
+#define PNG_DISABLE_HEURISTIC_FILTER 6 /* SOFTWARE: see png_set_filter */
+#define PNG_DISABLE_OPTIMIZE_FILTER  8 /* SOFTWARE: see png_set_filter */
+#define PNG_OPTION_NEXT  10 /* Next option - numbers must be even */
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */

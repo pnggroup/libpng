@@ -2035,8 +2035,9 @@ typedef struct
 }  png_IDAT_compression_state;
 
 static int
-png_compress_IDAT_test(png_structrp png_ptr, png_IDAT_compression_state *state,
-      z_stream *zstream, png_const_voidp input, uInt input_len, int flush)
+png_compress_IDAT_test(png_structp png_ptr, z_stream *zstream,
+      png_compression_bufferp **ep, png_uint_32p output_lenp,
+      png_const_voidp input, uInt input_len, int flush)
 {
    png_uint_32 output_len = 0U;
    int ret;
@@ -2049,8 +2050,7 @@ png_compress_IDAT_test(png_structrp png_ptr, png_IDAT_compression_state *state,
     * parameter:
     */
    zstream->next_in = PNGZ_INPUT_CAST(png_voidcast(const Bytef*, input));
-   ret = png_compress(png_ptr, zstream, &state->zbuffer_end, input_len,
-         &output_len, flush);
+   ret = png_compress(png_ptr, zstream, ep, input_len, &output_len, flush);
    implies(ret == Z_OK || ret == Z_FINISH, zstream->avail_in == 0U);
    zstream->next_in = NULL;
    zstream->avail_in = 0U; /* safety */
@@ -2058,7 +2058,7 @@ png_compress_IDAT_test(png_structrp png_ptr, png_IDAT_compression_state *state,
    /* If IDAT_size is set to PNG_UINT_31_MAX the length will be larger, but
     * not enough to overflow a png_uint_32.
     */
-   state->zbuffer_len += output_len;
+   *output_lenp += output_len;
    return ret;
 
 }
@@ -2067,15 +2067,8 @@ static void
 png_compress_IDAT(png_structp png_ptr, png_const_voidp input, uInt input_len,
       int flush)
 {
-   png_IDAT_compression_state state;
-   int ret;
-
-   state.zbuffer_end  = png_ptr->zbuffer_end;
-   state.zbuffer_len  = png_ptr->zbuffer_len;
-   ret = png_compress_IDAT_test(png_ptr, &state, &png_ptr->zstream, input,
-         input_len, flush);
-   png_ptr->zbuffer_end  = state.zbuffer_end;
-   png_ptr->zbuffer_len  = state.zbuffer_len;
+   int ret = png_compress_IDAT_test(png_ptr, &png_ptr->zstream,
+         &png_ptr->zbuffer_end, &png_ptr->zbuffer_len, input, input_len, flush);
 
    /* Check the return code. */
    if (ret == Z_OK || ret == Z_STREAM_END)
@@ -2300,39 +2293,19 @@ filter_block_multibyte(unsigned int row_bytes,
 }
 
 static void
-filter_row(png_structrp png_ptr, png_const_bytep prev_row,
-      png_bytep prev_pixels, png_const_bytep unfiltered_row,
-      unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
-      int start_of_row, int end_of_image)
+filter_block(png_const_bytep prev_row, png_bytep prev_pixels,
+      png_const_bytep unfiltered_row, unsigned int row_bits,
+      const unsigned int bpp, png_bytep sub_row, png_bytep up_row,
+      png_bytep avg_row, png_bytep paeth_row)
 {
-   /* filters_to_try identifies a single filter and it is not PNG_FILTER_NONE.
-    */
-   unsigned int row_bytes = row_bits >> 3; /* complete bytes */
-   png_byte filter = PNG_FILTER_VALUE_LAST /* not at start */;
-   png_byte filtered_row[PNG_ROW_BUFFER_SIZE];
-
-   debug((row_bits % bpp) == 0U);
-
-   if (start_of_row) switch (filters_to_try)
-   {
-      case PNG_FILTER_SUB:   filter = PNG_FILTER_VALUE_SUB;   break;
-      case PNG_FILTER_UP:    filter = PNG_FILTER_VALUE_UP;    break;
-      case PNG_FILTER_AVG:   filter = PNG_FILTER_VALUE_AVG;   break;
-      case PNG_FILTER_PAETH: filter = PNG_FILTER_VALUE_PAETH; break;
-      default:
-         impossible("filter list");
-   }
+   const unsigned int row_bytes = row_bits >> 3; /* complete bytes */
 
    if (bpp <= 8U)
    {
       /* There may be a partial byte at the end. */
       if (row_bytes > 0)
-         filter_block_singlebyte(row_bytes,
-            filters_to_try & PNG_FILTER_SUB   ? filtered_row : NULL,
-            filters_to_try & PNG_FILTER_UP    ? filtered_row : NULL,
-            filters_to_try & PNG_FILTER_AVG   ? filtered_row : NULL,
-            filters_to_try & PNG_FILTER_PAETH ? filtered_row : NULL,
-            unfiltered_row, prev_row, prev_pixels);
+         filter_block_singlebyte(row_bytes, sub_row, up_row, avg_row, paeth_row,
+               unfiltered_row, prev_row, prev_pixels);
 
       /* The partial byte must be handled correctly here; both the previous row
        * value and the current value need to have non-present bits cleared.
@@ -2351,48 +2324,136 @@ filter_row(png_structrp png_ptr, png_const_bytep prev_row,
             buffer[1U] = 0U;
 
          filter_block_singlebyte(1U,
-            filters_to_try & PNG_FILTER_SUB   ? filtered_row+row_bytes : NULL,
-            filters_to_try & PNG_FILTER_UP    ? filtered_row+row_bytes : NULL,
-            filters_to_try & PNG_FILTER_AVG   ? filtered_row+row_bytes : NULL,
-            filters_to_try & PNG_FILTER_PAETH ? filtered_row+row_bytes : NULL,
-            buffer, buffer+1U, prev_pixels);
-
-         ++row_bytes; /* for write_filtered_row below */
+               sub_row == NULL ? NULL : sub_row+row_bytes,
+               up_row == NULL ? NULL : up_row+row_bytes,
+               avg_row == NULL ? NULL : avg_row+row_bytes,
+               paeth_row == NULL ? NULL : paeth_row+row_bytes,
+               buffer, buffer+1U, prev_pixels);
       }
    }
 
    else
-   {
-      debug((bpp & 7U) == 0U && row_bits == (row_bytes << 3));
       filter_block_multibyte(row_bytes, bpp >> 3,
-            filters_to_try & PNG_FILTER_SUB   ? filtered_row : NULL,
-            filters_to_try & PNG_FILTER_UP    ? filtered_row : NULL,
-            filters_to_try & PNG_FILTER_AVG   ? filtered_row : NULL,
-            filters_to_try & PNG_FILTER_PAETH ? filtered_row : NULL,
+            sub_row, up_row, avg_row, paeth_row,
             unfiltered_row, prev_row, prev_pixels);
-   }
-
-   write_filtered_row(png_ptr, filtered_row, row_bytes, filter, end_of_image);
 }
 
 static void
-find_filter(png_structrp png_ptr, png_const_bytep prev_row,
+filter_row(png_structrp png_ptr, png_const_bytep prev_row,
+      png_bytep prev_pixels, png_const_bytep unfiltered_row,
+      unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
+      int start_of_row, int end_of_image)
+{
+   /* filters_to_try identifies a single filter and it is not PNG_FILTER_NONE.
+    */
+   png_byte filter = PNG_FILTER_VALUE_LAST /* not at start */;
+   png_byte filtered_row[PNG_ROW_BUFFER_SIZE];
+
+   affirm((row_bits+7U) >> 3 <= PNG_ROW_BUFFER_SIZE);
+   debug((row_bits % bpp) == 0U);
+
+   if (start_of_row) switch (filters_to_try)
+   {
+      case PNG_FILTER_SUB:   filter = PNG_FILTER_VALUE_SUB;   break;
+      case PNG_FILTER_UP:    filter = PNG_FILTER_VALUE_UP;    break;
+      case PNG_FILTER_AVG:   filter = PNG_FILTER_VALUE_AVG;   break;
+      case PNG_FILTER_PAETH: filter = PNG_FILTER_VALUE_PAETH; break;
+      default:
+         impossible("filter list");
+   }
+
+   filter_block(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
+         filters_to_try & PNG_FILTER_SUB   ? filtered_row : NULL,
+         filters_to_try & PNG_FILTER_UP    ? filtered_row : NULL,
+         filters_to_try & PNG_FILTER_AVG   ? filtered_row : NULL,
+         filters_to_try & PNG_FILTER_PAETH ? filtered_row : NULL);
+
+   write_filtered_row(png_ptr, filtered_row, (row_bits+7U)>>3, filter,
+         end_of_image);
+}
+
+/* These two #defines simplify writing code that depends on one or the other of
+ * the options being both supported and on:
+ */
+#ifdef PNG_WRITE_OPTIMIZE_FILTER_SUPPORTED
+#  define optimize_filters\
+      (((png_ptr->options >> PNG_DISABLE_OPTIMIZE_FILTER)&3) != PNG_OPTION_ON)
+#else
+#  define optimize_filters 0
+#endif
+
+#ifdef PNG_WRITE_HEURISTIC_FILTER_SUPPORTED
+#  define heuristic_filters\
+      (((png_ptr->options >> PNG_DISABLE_HEURISTIC_FILTER)&3) != PNG_OPTION_ON)
+
+static unsigned int
+select_filter_heuristically(png_structrp png_ptr, png_const_bytep prev_row,
    png_bytep prev_pixels, png_const_bytep unfiltered_row,
    unsigned int row_bits, unsigned int bpp, unsigned int filters_to_try,
-   int start_of_row, int end_of_image)
+   int end_of_image)
 {
-   /* filters_to_try identifies multiple filters, up to all five. */
-   /* TODO: reimplement this, currently this just selects the first filter */
-   filters_to_try &= -filters_to_try;
-   if (filters_to_try == PNG_FILTER_NONE)
-      write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
-            start_of_row ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST,
-            end_of_image);
+   const unsigned int row_bytes = (row_bits+7U) >> 3;
+   png_byte test_buffers[4][PNG_ROW_BUFFER_SIZE]; /* for each filter */
 
-   else
-      filter_row(png_ptr, prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
-         filters_to_try & -filters_to_try, start_of_row, end_of_image);
+   affirm(row_bytes <= PNG_ROW_BUFFER_SIZE);
+   debug((row_bits % bpp) == 0U);
+
+   filter_block(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
+         test_buffers[PNG_FILTER_VALUE_SUB-1U],
+         test_buffers[PNG_FILTER_VALUE_UP-1U],
+         test_buffers[PNG_FILTER_VALUE_AVG-1U],
+         test_buffers[PNG_FILTER_VALUE_PAETH-1U]);
+
+   /* Now check each buffer and the original row to see which is best; this is
+    * the heuristic.  The test is on the number of separate code values in the
+    * buffer.  Since the buffer is either the full row or PNG_ROW_BUFFER_SIZE
+    * bytes (or slightly less for RGB) we either find the true number of codes
+    * generated or we expect a count of average 8 per code.
+    */
+   {
+      unsigned int filter_max = 257U;
+      png_byte best_filter, test_filter;
+      png_const_bytep best_row, test_row;
+
+      for (best_filter = test_filter = PNG_FILTER_VALUE_NONE,
+            best_row = test_row = unfiltered_row;
+           test_filter < PNG_FILTER_VALUE_LAST;
+           test_row = test_buffers[test_filter], ++test_filter)
+         if ((filters_to_try & PNG_FILTER_MASK(test_filter)) != 0U)
+      {
+         unsigned int count = 1U, x;
+         png_byte code[256];
+
+         memset(code, 0, sizeof code);
+         code[test_filter] = 1U;
+
+         for (x=0U; x < row_bytes; ++x)
+         {
+            const png_byte b = test_row[x];
+            if (code[b] == 0) code[b] = 1U, ++count;
+         }
+
+         if (count < filter_max)
+            filter_max = count, best_filter = test_filter, best_row = test_row;
+      }
+
+      /* Calling write_unfiltered_rowbits is necessary here to deal with the
+       * clearly of a partial byte at the end.
+       */
+      if (best_filter == PNG_FILTER_VALUE_NONE)
+         write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
+               PNG_FILTER_VALUE_NONE, end_of_image);
+
+      else
+         write_filtered_row(png_ptr, best_row, row_bytes, best_filter,
+               end_of_image);
+
+      return PNG_FILTER_MASK(best_filter);
+   }
 }
+#else /* !WRITE_HEURISTIC_FILTER */
+#  define heuristic_filters 0
+#endif /* !WRITE_HEURISTIC_FILTER */
 
 /* This filters the row, chooses which filter to use, if it has not already
  * been specified by the application, and then writes the row out with the
@@ -2420,7 +2481,8 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
    {
       /* Delaying initialization of the filter stuff. */
       if (png_ptr->filter_mask == 0U)
-         png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, PNG_ALL_FILTERS);
+         png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, (optimize_filters ||
+                  heuristic_filters) ? PNG_ALL_FILTERS : PNG_NO_FILTERS);
 
       /* Now work out the filters to try for this row: */
       filters_to_try = png_ptr->filter_mask; /* else caller must preserve */
@@ -2476,6 +2538,21 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             filters_to_try &= PNG_BIC_MASK(PNG_FILTER_UP);
 #        undef match
       }
+
+      /* Is this a list of filters which can be simplified to a single filter?
+       * If there is no selection algorithm enabled do so now:
+       *
+       * (Errors in the logic here trigger the 'impossible' else below.)
+       */
+#     ifdef PNG_WRITE_OPTIMIZE_FILTER_SUPPORTED
+         if (((png_ptr->options >> PNG_DISABLE_OPTIMIZE_FILTER) & 3) ==
+               PNG_OPTION_ON) /* optimize supported but disabled */
+#     endif /* WRITE_OPTIMIZE_FILTER */
+#     ifdef PNG_WRITE_HEURISTIC_FILTER_SUPPORTED
+         if (((png_ptr->options >> PNG_DISABLE_HEURISTIC_FILTER) & 3) ==
+               PNG_OPTION_ON) /* heuristic supported but disabled */
+#     endif /* WRITE_HEURISTIC_FILTER */
+      filters_to_try &= -filters_to_try;
    } /* start of row */
 
    else if (prev_row != NULL)
@@ -2502,10 +2579,25 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             prev_pixels, unfiltered_row, row_bits, bpp, filters_to_try, x == 0,
             end_of_image);
 
+#  ifdef PNG_WRITE_OPTIMIZE_FILTER_SUPPORTED
+#if 0
+      else if (((png_ptr->options >> PNG_DISABLE_OPTIMIZE_FILTER) & 3) !=
+            PNG_OPTION_ON) /* optimize supported and not disabled */
+         impossible("optimize filters NYI");
+#endif
+#  endif /* WRITE_OPTIMIZE_FITLER */
+#  ifdef PNG_WRITE_HEURISTIC_FILTER_SUPPORTED
+      /* The heuristic must select a single filter based on the first block of
+       * pixels:
+       */
+      else if (((png_ptr->options >> PNG_DISABLE_HEURISTIC_FILTER) & 3) !=
+            PNG_OPTION_ON)
+         filters_to_try = select_filter_heuristically(png_ptr,
+               first_row_in_pass ? NULL : prev_row, prev_pixels, unfiltered_row,
+               row_bits, bpp, filters_to_try, end_of_image);
+#  endif /* WRITE_HEURISTIC_FITLER */
    else
-      find_filter(png_ptr, first_row_in_pass ? NULL : prev_row,
-            prev_pixels, unfiltered_row, row_bits, bpp, filters_to_try, x == 0,
-            end_of_image);
+      impossible("bad filter select logic");
 
    /* Copy the current row into the previous row buffer, if available, unless
     * this is the last row in the pass, when there is no point.  Note that

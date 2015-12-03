@@ -921,7 +921,28 @@ option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 @#   define PNG_NO_CONVERT_tIME
 @#endif
 
+# Write filter options:
+#
+#  WRITE_FILTER
+#     Enables code to do PNG row filtering on write.  If not enabled rows will
+#     be written without filtering, the 'NONE' filter.  This enables the
+#     png_set_filter interface allowing the application to select the filter
+#     used for each row.
+#
+#  WRITE_HEURISTIC_FILTER
+#     Enables code to cause libpng to choose a filter from a set passed to
+#     png_set_filter.  Without this code libpng just chooses the first filter in
+#     the list if multiple are given.
+#
+#  WRITE_OPTIMIZE_FILTER
+#     Enables code to try all the filters in the list passed to png_set_filter
+#     and choose the one which results in the least number of compressed bytes
+#     added by the current row.
+#
+#  See png.h for more description of these options.
 option WRITE_FILTER requires WRITE
+option WRITE_HEURISTIC_FILTER requires WRITE_FILTER enables SET_OPTION
+option WRITE_OPTIMIZE_FILTER requires WRITE_FILTER enables SET_OPTION
 
 # added at libpng-1.5.4
 
