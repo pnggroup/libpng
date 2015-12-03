@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.2.53 [February 6, 2014]
+ * Last changed in libpng 1.2.54 [November 12, 2015]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -17,7 +17,7 @@
 #include "png.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_63 Your_png_h_is_not_version_1_0_63;
+typedef version_1_0_65 Your_png_h_is_not_version_1_0_65;
 
 /* Version information for C files.  This had better match the version
  * string defined in png.h.
@@ -332,6 +332,8 @@ png_info_init_3(png_infopp ptr_ptr, png_size_t png_info_struct_size)
       png_destroy_struct(info_ptr);
       info_ptr = (png_infop)png_create_struct(PNG_STRUCT_INFO);
       *ptr_ptr = info_ptr;
+      if (info_ptr == NULL)
+         return;
    }
 
    /* Set everything to 0 */
@@ -679,6 +681,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
 
    if (png_ptr == NULL)
       return (NULL);
+
    if (png_ptr->time_buffer == NULL)
    {
       png_ptr->time_buffer = (png_charp)png_malloc(png_ptr, (png_uint_32)(29*
@@ -689,7 +692,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
    {
       wchar_t time_buf[29];
       wsprintf(time_buf, TEXT("%d %S %d %02d:%02d:%02d +0000"),
-          ptime->day % 32, short_months[(ptime->month - 1) % 12],
+          ptime->day % 32, short_months[(ptime->month - 1U) % 12],
         ptime->year, ptime->hour % 24, ptime->minute % 60,
           ptime->second % 61);
       WideCharToMultiByte(CP_ACP, 0, time_buf, -1, png_ptr->time_buffer,
@@ -700,7 +703,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
    {
       char near_time_buf[29];
       png_snprintf6(near_time_buf, 29, "%d %s %d %02d:%02d:%02d +0000",
-          ptime->day % 32, short_months[(ptime->month - 1) % 12],
+          ptime->day % 32, short_months[(ptime->month - 1U) % 12],
           ptime->year, ptime->hour % 24, ptime->minute % 60,
           ptime->second % 61);
       png_memcpy(png_ptr->time_buffer, near_time_buf,
@@ -708,7 +711,7 @@ png_convert_to_rfc1123(png_structp png_ptr, png_timep ptime)
    }
 #else
    png_snprintf6(png_ptr->time_buffer, 29, "%d %s %d %02d:%02d:%02d +0000",
-       ptime->day % 32, short_months[(ptime->month - 1) % 12],
+       ptime->day % 32, short_months[(ptime->month - 1U) % 12],
        ptime->year, ptime->hour % 24, ptime->minute % 60,
        ptime->second % 61);
 #endif
@@ -728,13 +731,13 @@ png_get_copyright(png_structp png_ptr)
 #else
 #ifdef __STDC__
    return ((png_charp) PNG_STRING_NEWLINE \
-     "libpng version 1.0.63 - February 6, 2014" PNG_STRING_NEWLINE \
+     "libpng version 1.0.65 - December 3, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE);
 #else
-      return ((png_charp) "libpng version 1.0.63 - February 6, 2014\
+      return ((png_charp) "libpng version 1.0.65 - December 3, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.");

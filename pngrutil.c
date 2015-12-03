@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.2.53 [February 6, 2014]
+ * Last changed in libpng 1.2.55 [%RDATE%]
  * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -506,7 +506,7 @@ void /* PRIVATE */
 png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_color palette[PNG_MAX_PALETTE_LENGTH];
-   int num, i;
+   int max_palette_length, num, i;
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    png_colorp pal_ptr;
 #endif
@@ -558,7 +558,21 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       }
    }
 
+   /* The cast is safe because 'length' is less than 3*PNG_MAX_PALETTE_LENGTH */
    num = (int)length / 3;
+
+   /* If the palette has 256 or fewer entries but is too large for the bit
+    * depth, we don't issue an error, to preserve the behavior of previous
+    * libpng versions. We silently truncate the unused extra palette entries
+    * here.
+    */
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+      max_palette_length = (1 << png_ptr->bit_depth);
+   else
+      max_palette_length = PNG_MAX_PALETTE_LENGTH;
+
+   if (num > max_palette_length)
+      num = max_palette_length;
 
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
    for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
@@ -592,7 +606,7 @@ png_handle_PLTE(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif
    {
-      png_crc_finish(png_ptr, 0);
+      png_crc_finish(png_ptr, (int) length - num * 3);
    }
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
@@ -1100,7 +1114,7 @@ png_handle_iCCP(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    /* There should be at least one zero (the compression type byte)
     * following the separator, and we should be on it
     */
-   if ( profile >= png_ptr->chunkdata + slength - 1)
+   if (slength < 1U ||  profile >= png_ptr->chunkdata + slength - 1U)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
@@ -1228,7 +1242,8 @@ png_handle_sPLT(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
    ++entry_start;
 
    /* A sample depth should follow the separator, and we should be on it  */
-   if (entry_start > (png_bytep)png_ptr->chunkdata + slength - 2)
+   if (slength < 2U ||
+       entry_start > (png_bytep)png_ptr->chunkdata + slength - 2U)
    {
       png_free(png_ptr, png_ptr->chunkdata);
       png_ptr->chunkdata = NULL;
@@ -1702,7 +1717,7 @@ png_handle_pCAL(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 
    /* We need to have at least 12 bytes after the purpose string
       in order to get the parameter information. */
-   if (endptr <= buf + 12)
+   if (slength < 12U || endptr - buf <= 12)
    {
       png_warning(png_ptr, "Invalid pCAL data");
       png_free(png_ptr, png_ptr->chunkdata);
@@ -2158,7 +2173,7 @@ png_handle_zTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       /* Empty loop */ ;
 
    /* zTXt must have some text after the chunkdataword */
-   if (text >= png_ptr->chunkdata + slength - 2)
+   if (slength < 2U || text >= png_ptr->chunkdata + slength - 2U)
    {
       png_warning(png_ptr, "Truncated zTXt chunk");
       png_free(png_ptr, png_ptr->chunkdata);
@@ -2284,7 +2299,7 @@ png_handle_iTXt(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
     * keyword
     */
 
-   if (lang >= png_ptr->chunkdata + slength - 3)
+   if (slength < 3U || lang >= png_ptr->chunkdata + slength - 3U)
    {
       png_warning(png_ptr, "Truncated iTXt chunk");
       png_free(png_ptr, png_ptr->chunkdata);

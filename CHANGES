@@ -1,11 +1,14 @@
 #if 0
 CHANGES - changes for libpng
 
-version 0.2
+version 0.1 [March 29, 1995]
+  initial beta release
+
+version 0.2 [April 1, 1995]
   added reader into png.h
   fixed small problems in stub file
 
-version 0.3
+version 0.3 [April 8, 1995]
   added pull reader
   split up pngwrite.c to several files
   added pnglib.txt
@@ -16,7 +19,7 @@ version 0.3
   added K&R support
   added check for 64 KB blocks for 16 bit machines
 
-version 0.4
+version 0.4 [April 26, 1995]
   cleaned up code and commented code
   simplified time handling into png_time
   created png_color_16 and png_color_8 to handle color needs
@@ -27,28 +30,29 @@ version 0.4
   cleaned up zTXt reader and writer (using zlib's Reset functions)
   split transformations into pngrtran.c and pngwtran.c
 
-version 0.5
+version 0.5 [April 30, 1995]
   interfaced with zlib 0.8
   fixed many reading and writing bugs
   saved using 3 spaces instead of tabs
 
-version 0.6
+version 0.6 [May 1, 1995]
+  first beta release
   added png_large_malloc() and png_large_free()
   added png_size_t
   cleaned up some compiler warnings
   added png_start_read_image()
 
-version 0.7
+version 0.7 [June 24, 1995]
   cleaned up lots of bugs
   finished dithering and other stuff
   added test program
   changed name from pnglib to libpng
 
-version 0.71 [June, 1995]
+version 0.71 [June 26, 1995]
   changed pngtest.png for zlib 0.93
   fixed error in libpng.txt and example.c
 
-version 0.8
+version 0.8 [August 20, 1995]
   cleaned up some bugs
   added png_set_filler()
   split up pngstub.c into pngmem.c, pngio.c, and pngerror.c
@@ -465,7 +469,7 @@ version 1.0.3d [September 4, 1999]
   Added new png_expand functions to scripts/pngdef.pas and pngos2.def
   Added a demo read_user_transform_fn that examines the row filters in pngtest.c
 
-version 1.0.4 [September 24, 1999]
+Version 1.0.4 [September 24, 1999, not distributed publicly]
   Define PNG_ALWAYS_EXTERN in pngconf.h if __STDC__ is defined
   Delete #define PNG_INTERNAL and include "png.h" from pngasmrd.h
   Made several minor corrections to pngtest.c
@@ -489,6 +493,7 @@ version 1.0.4c [October 1, 1999]
   Added a "png_check_version" function in png.c and pngtest.c that will generate
     a helpful compiler error if an old png.h is found in the search path.
   Changed type of png_user_transform_depth|channels from int to png_byte.
+  Added "Libpng is OSI Certified Open Source Software" statement to png.h
 version 1.0.4d [October 6, 1999]
   Changed 0.45 to 0.45455 in png_set_sRGB()
   Removed unused PLTE entries from pngnow.png
@@ -984,6 +989,7 @@ version 1.2.0beta2 [May 7, 2001]
 version 1.2.0beta3 [May 17, 2001]
   Modified png_create_struct so it passes user mem_ptr to user memory allocator.
   Increased png_mng_features flag from png_byte to png_uint_32.
+version 1.0.12 [June 8, 2001]
 version 1.2.0beta4 [June 23, 2001]
   Check for missing profile length field in iCCP chunk and free chunk_data
      in case of truncated iCCP chunk.
@@ -1295,8 +1301,9 @@ version 1.2.6beta4 [July 28, 2004]
   Removed some redundancy with #ifdef/#endif in png_malloc_default().
   Use png_malloc instead of png_zalloc to allocate the pallete.
 version 1.0.16rc1 and 1.2.6rc1 [August 4, 2004]
-  Fixed buffer overflow vulnerability in png_handle_tRNS()
-  Fixed integer arithmetic overflow vulnerability in png_read_png().
+  Fixed buffer overflow vulnerability (CVE-2004-0597) in png_handle_tRNS().
+  Fixed NULL dereference vulnerability (CVE-2004-0598) in png_handle_iCCP().
+  Fixed integer overflow vulnerability (CVE-2004-0599) in png_read_png().
   Fixed some harmless bugs in png_handle_sBIT, etc, that would cause
     duplicate chunk types to go undetected.
   Fixed some timestamps in the -config version
@@ -1401,7 +1408,7 @@ version 1.2.8rc4 [November 29, 2004]
 version 1.2.8rc5 [November 29, 2004]
   Fixed new typo in scripts/pngw32.rc
 
-version 1.2.8 [December 3, 2004]
+version 1.0.18, 1.2.8 [December 3, 2004]
   Removed projects/visualc7, added projects/visualc71.
 
 version 1.2.9beta1 [February 21, 2006]
@@ -2838,8 +2845,58 @@ version 1.2.53rc02 [February 21, 2015]
     data, which is instead limited by PNG_USER_WIDTH_MAX.
   Rebuilt configure scripts with automake-1.15 and libtool-2.4.6
 
-versions 1.0.63 and 1.2.53 [February 6, 2014]
+versions 1.0.63 and 1.2.53 [February 26, 2015]
   No changes.
+
+version 1.2.54beta01 [October 23, 2015]
+  Fixed typecast in a png_debug2() statement in png_set_text_2() to
+    avoid a compiler warning in PNG_DEBUG builds.
+  Fixed printf formats in pngtest.c to avoid compiler warnings and a
+    Coverity warning in PNG_DEBUG builds.
+  Avoid Coverity issue 80858 (REVERSE NULL) in pngtest.c PNG_DEBUG builds.
+  Removed WRITE_WEIGHTED_FILTERED code.
+  Avoid potentially dereferencing NULL info_ptr in png_info_init_3().
+  Fixed potential leak of png_pixels in contrib/pngminus/pnm2png.c
+  Use nanosleep() instead of usleep() in contrib/gregbook/rpng2-x.c
+    because usleep() is deprecated (port from libpng16).
+  Fixed some bad links in the man page.
+  Added a safety check in png_set_tIME() (Fixes CVE-2015-7981, bug report
+    from Qixue Xiao).
+
+version 1.2.54rc01 [October 28, 2015]
+  No changes.
+
+version 1.2.54rc02 [October 31, 2015]
+  Prevent writing over-length PLTE chunk (Cosmin Truta).
+  Silently truncate over-length PLTE chunk while reading.
+
+version 1.2.54rc03 [November 3, 2015]
+  Clarified COPYRIGHT information to state explicitly that versions
+    are derived from previous versions.
+  Removed much of the long list of previous versions from png.h and
+    libpng.3.
+
+version 1.2.54rc04 [November 5, 2015]
+  Fixed new bug with CRC error after reading an over-length palette
+    (bug report by Cosmin Truta) (CVE-2015-8126).
+
+version 1.2.54 [November 12, 2015]
+  Cleaned up coding style in png_handle_PLTE().
+   
+version 1.2.55beta01 [November 20, 2015]
+  Avoid potential pointer overflow in png_handle_iTXt(), png_handle_zTXt(),
+    png_handle_sPLT(), and png_handle_pCAL() (Bug report by John Regehr).
+
+version 1.2.55beta02 [November 23, 2015]
+  Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
+    not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
+    vulnerability.
+
+version 1.2.55rc01 [November 26, 2015]
+  Discontinued distributing tar.bz2 archives.
+
+version 1.2.55 and 1.0.65 [December 3, 2015]
+  Discontinued distributing libpng-oldversion-newversion-diff.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

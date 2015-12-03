@@ -1,8 +1,8 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.2.53 [February 6, 2014]
- * Copyright (c) 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.54 [November 12, 2015]
+ * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -557,7 +557,7 @@ png_debug_malloc(png_structp png_ptr, png_uint_32 size)
       /* Make sure the caller isn't assuming zeroed memory. */
       png_memset(pinfo->pointer, 0xdd, pinfo->size);
       if (verbose)
-         printf("png_malloc %lu bytes at %x\n", (unsigned long)size,
+         printf("png_malloc %lu bytes at %p\n", (unsigned long)size,
             pinfo->pointer);
       return (png_voidp)(pinfo->pointer);
    }
@@ -578,6 +578,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
    }
 
    /* Unlink the element from the list. */
+   if (pinformation != NULL)
    {
       memory_infop FAR *ppinfo = &pinformation;
       for (;;)
@@ -598,7 +599,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
          }
          if (pinfo->next == NULL)
          {
-            fprintf(STDERR, "Pointer %x not found\n", (unsigned int)ptr);
+            fprintf(STDERR, "Pointer %p not found\n", ptr);
             break;
          }
          ppinfo = &pinfo->next;
@@ -607,7 +608,7 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
 
    /* Finally free the data. */
    if (verbose)
-      printf("Freeing %x\n", ptr);
+      printf("Freeing %p\n", ptr);
    png_free_default(png_ptr, ptr);
    ptr = NULL;
 }
@@ -1230,7 +1231,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       for (y = 0; y < height; y++)
       {
 #ifndef SINGLE_ROWBUF_ALLOC
-         png_debug2(0, "Allocating row buffer (pass %d, y = %ld)...", pass, y);
+         png_debug2(0, "Allocating row buffer (pass %d, y = %lu)...", pass, y);
          row_buf = (png_bytep)png_malloc(read_ptr,
             png_get_rowbytes(read_ptr, read_info_ptr));
          png_debug2(0, "0x%08lx (%ld bytes)", (unsigned long)row_buf,
@@ -1253,7 +1254,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif /* PNG_WRITE_SUPPORTED */
 
 #ifndef SINGLE_ROWBUF_ALLOC
-         png_debug2(0, "Freeing row buffer (pass %d, y = %ld)", pass, y);
+         png_debug2(0, "Freeing row buffer (pass %d, y = %lu)", pass, y);
          png_free(read_ptr, row_buf);
          row_buf = NULL;
 #endif /* !SINGLE_ROWBUF_ALLOC */
@@ -1586,9 +1587,9 @@ main(int argc, char *argv[])
                current_allocation);
             while (pinfo != NULL)
             {
-               fprintf(STDERR, " %lu bytes at %x\n",
+               fprintf(STDERR, " %lu bytes at %p\n",
                  (unsigned long)pinfo->size,
-                 (unsigned int) pinfo->pointer);
+                 pinfo->pointer);
                pinfo = pinfo->next;
             }
          }
@@ -1663,8 +1664,8 @@ main(int argc, char *argv[])
                 current_allocation);
              while (pinfo != NULL)
              {
-                fprintf(STDERR, " %lu bytes at %x\n",
-                   (unsigned long)pinfo->size, (unsigned int)pinfo->pointer);
+                fprintf(STDERR, " %lu bytes at %p\n",
+                   (unsigned long)pinfo->size, pinfo->pointer);
                 pinfo = pinfo->next;
              }
           }
@@ -1730,4 +1731,4 @@ main(int argc, char *argv[])
 }
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef version_1_0_63 your_png_h_is_not_version_1_0_63;
+typedef version_1_0_65 your_png_h_is_not_version_1_0_65;
