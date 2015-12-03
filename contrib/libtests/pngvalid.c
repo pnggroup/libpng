@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.25 [RDATE%]
+ * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  * Copyright (c) 2014-2015 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -4276,71 +4276,62 @@ make_error(png_store* const ps, png_byte const colour_type,
 #undef exception__env
 
       /* And clear these flags */
+      ps->expect_error = 0;
       ps->expect_warning = 0;
 
-      if (ps->expect_error)
-         ps->expect_error = 0;
+      /* Now write the whole image, just to make sure that the detected, or
+       * undetected, errro has not created problems inside libpng.
+       */
+      if (png_get_rowbytes(pp, pi) !=
+          transform_rowsize(pp, colour_type, bit_depth))
+         png_error(pp, "row size incorrect");
 
       else
       {
-         /* Now write the whole image, just to make sure that the detected, or
-          * undetected, errro has not created problems inside libpng.  This
-          * doesn't work if there was a png_error in png_write_info because that
-          * can abort before PLTE was written.
-          */
-         if (png_get_rowbytes(pp, pi) !=
-             transform_rowsize(pp, colour_type, bit_depth))
-            png_error(pp, "row size incorrect");
+         int npasses = set_write_interlace_handling(pp, interlace_type);
+         int pass;
 
-         else
+         if (npasses != npasses_from_interlace_type(pp, interlace_type))
+            png_error(pp, "write: png_set_interlace_handling failed");
+
+         for (pass=0; pass<npasses; ++pass)
          {
-            int npasses = set_write_interlace_handling(pp, interlace_type);
-            int pass;
+            png_uint_32 y;
 
-            if (npasses != npasses_from_interlace_type(pp, interlace_type))
-               png_error(pp, "write: png_set_interlace_handling failed");
-
-            for (pass=0; pass<npasses; ++pass)
+            for (y=0; y<h; ++y)
             {
-               png_uint_32 y;
+               png_byte buffer[TRANSFORM_ROWMAX];
 
-               for (y=0; y<h; ++y)
-               {
-                  png_byte buffer[TRANSFORM_ROWMAX];
+               transform_row(pp, buffer, colour_type, bit_depth, y);
 
-                  transform_row(pp, buffer, colour_type, bit_depth, y);
-
-#                 if do_own_interlace
-                     /* If do_own_interlace *and* the image is interlaced we
-                      * need a reduced interlace row; this may be reduced to
-                      * empty.
+#              if do_own_interlace
+                  /* If do_own_interlace *and* the image is interlaced we need a
+                   * reduced interlace row; this may be reduced to empty.
+                   */
+                  if (interlace_type == PNG_INTERLACE_ADAM7)
+                  {
+                     /* The row must not be written if it doesn't exist, notice
+                      * that there are two conditions here, either the row isn't
+                      * ever in the pass or the row would be but isn't wide
+                      * enough to contribute any pixels.  In fact the wPass test
+                      * can be used to skip the whole y loop in this case.
                       */
-                     if (interlace_type == PNG_INTERLACE_ADAM7)
-                     {
-                        /* The row must not be written if it doesn't exist,
-                         * notice that there are two conditions here, either the
-                         * row isn't ever in the pass or the row would be but
-                         * isn't wide enough to contribute any pixels.  In fact
-                         * the wPass test can be used to skip the whole y loop
-                         * in this case.
-                         */
-                        if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
-                            PNG_PASS_COLS(w, pass) > 0)
-                           interlace_row(buffer, buffer,
-                                 bit_size(pp, colour_type, bit_depth), w, pass,
-                                 0/*data always bigendian*/);
-                        else
-                           continue;
-                     }
-#                 endif /* do_own_interlace */
+                     if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+                         PNG_PASS_COLS(w, pass) > 0)
+                        interlace_row(buffer, buffer,
+                              bit_size(pp, colour_type, bit_depth), w, pass,
+                              0/*data always bigendian*/);
+                     else
+                        continue;
+                  }
+#              endif /* do_own_interlace */
 
-                  png_write_row(pp, buffer);
-               }
+               png_write_row(pp, buffer);
             }
-         } /* image writing */
-
-         png_write_end(pp, pi);
+         }
       }
+
+      png_write_end(pp, pi);
 
       /* The following deletes the file that was just written. */
       store_write_reset(ps);

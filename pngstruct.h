@@ -370,18 +370,17 @@ struct png_struct_def
     * the hope is that such processors will generate code that is both smaller
     * and faster.
     */
-#ifdef PNG_READ_SUPPORTED
    png_colorp  palette;        /* palette from the input file */
-#endif /* READ */
 #ifdef PNG_READ_tRNS_SUPPORTED
    png_bytep   trans_alpha;    /* alpha values for paletted files */
-#endif /* READ_tRNS */
+#endif
 
    png_uint_32 width;          /* width of image in pixels */
    png_uint_32 height;         /* height of image in pixels */
    png_uint_32 chunk_name;     /* PNG_CHUNK() id of current chunk */
    png_uint_32 chunk_length;   /* Length (possibly remaining) in said chunk. */
    png_uint_32 crc;            /* current chunk CRC value */
+   png_uint_32 free_me;        /* items libpng is responsible for freeing */
 
    unsigned int flags;                  /* flags (should be bit fields) */
    unsigned int mode                :6; /* where we are in the PNG file */
@@ -600,7 +599,12 @@ struct png_struct_def
    int zlib_set_window_bits;
    int zlib_set_mem_level;
    int zlib_set_strategy;
-#endif /* WRITE */
+
+   unsigned int             zbuffer_start; /* Bytes written from start */
+   png_uint_32              zbuffer_len;   /* Length of data in list */
+   png_compression_bufferp  zbuffer_list;  /* Created on demand during write */
+   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
+#endif
 
    /* ERROR HANDLING */
 #ifdef PNG_SETJMP_SUPPORTED
@@ -744,23 +748,14 @@ struct png_struct_def
     * zlib expects a 'zstream' as the fundamental control structure, it allows
     * all the parameters to be passed as one pointer.
     */
-   z_stream     zstream;       /* decompression structure */
    png_uint_32  zowner;        /* ID (chunk type) of zstream owner, 0 if none */
-#  ifdef PNG_WRITE_SUPPORTED
-   png_compression_bufferp  zbuffer_list;  /* Created on demand during write */
-   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
-   png_uint_32              zbuffer_len;   /* Length of data in list */
-   unsigned int             zbuffer_start; /* Bytes written from start */
-#  endif /* WRITE */
-#  ifdef PNG_READ_SUPPORTED
-   unsigned int zstream_ended:1; /* no more zlib output available [read] */
-   unsigned int zstream_error:1; /* zlib error message has been output [read] */
-#  endif /* READ */
-#  ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+   z_stream     zstream;       /* decompression structure */
+   unsigned int zstream_start:1; /* before first byte of stream */
+   unsigned int zstream_ended:1; /* no more zlib output available */
+   unsigned int zstream_error:1; /* zlib error message has been output */
    unsigned int zstream_eod  :1; /* all the required uncompressed data has been
                                   * received; set by the zstream using code for
-                                  * its own purposes. [progressive read] */
-#  endif /* PROGRESSIVE_READ */
+                                  * its own purposes. */
 
    /* MNG SUPPORT */
 #ifdef PNG_MNG_FEATURES_SUPPORTED

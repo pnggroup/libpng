@@ -849,7 +849,8 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_color palette[PNG_MAX_PALETTE_LENGTH];
    png_uint_32 length = png_ptr->chunk_length;
-   png_uint_32 max_palette_length, num, i;
+   int max_palette_length, num, i;
+   png_colorp pal_ptr;
 
    png_debug(1, "in png_handle_PLTE");
 
@@ -877,7 +878,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
    }
 
    /* The cast is safe because 'length' is less than 3*PNG_MAX_PALETTE_LENGTH */
-   num = length / 3U;
+   num = (int)length / 3;
 
    /* If the palette has 256 or fewer entries but is too large for the bit
     * depth, we don't issue an error, to preserve the behavior of previous
@@ -885,21 +886,21 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
     * here.
     */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-      max_palette_length = (1U << png_ptr->bit_depth);
+      max_palette_length = (1 << png_ptr->bit_depth);
    else
       max_palette_length = PNG_MAX_PALETTE_LENGTH;
 
    if (num > max_palette_length)
       num = max_palette_length;
 
-   for (i = 0; i < num; ++i)
+   for (i = 0, pal_ptr = palette; i < num; i++, pal_ptr++)
    {
       png_byte buf[3];
 
       png_crc_read(png_ptr, buf, 3);
-      palette[i].red = buf[0];
-      palette[i].green = buf[1];
-      palette[i].blue = buf[2];
+      pal_ptr->red = buf[0];
+      pal_ptr->green = buf[1];
+      pal_ptr->blue = buf[2];
    }
 
    /* If we actually need the PLTE chunk (ie for a paletted image), we do
@@ -910,7 +911,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
 #endif
-      png_crc_finish(png_ptr, length - num * 3U);
+      png_crc_finish(png_ptr, (int) length - num * 3);
 
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
@@ -941,15 +942,15 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
    }
 #endif /* READ_OPT_PLTE */
 
+   /* TODO: png_set_PLTE has the side effect of setting png_ptr->palette to its
+    * own copy of the palette.  This has the side effect that when png_start_row
+    * is called (this happens after any call to png_read_update_info) the
+    * info_ptr palette gets changed.  This is extremely unexpected and
+    * confusing.
+    *
+    * Fix this by not sharing the palette in this way.
+    */
    png_set_PLTE(png_ptr, info_ptr, palette, num);
-
-   /* Ok, make our own copy since the set succeeded: */
-   debug(png_ptr->palette == NULL); /* should only get set once */
-   png_ptr->palette = png_voidcast(png_colorp, png_malloc(png_ptr,
-         sizeof (png_color[PNG_MAX_PALETTE_LENGTH])));
-   memset(png_ptr->palette, 0xFFU, sizeof (png_color[PNG_MAX_PALETTE_LENGTH]));
-   memcpy(png_ptr->palette, info_ptr->palette, 3*num);
-   png_ptr->num_palette = info_ptr->num_palette;
 
    /* The three chunks, bKGD, hIST and tRNS *must* appear after PLTE and before
     * IDAT.  Prior to 1.6.0 this was not checked; instead the code merely
@@ -1605,12 +1606,9 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr)
 static void
 png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr)
 {
-   png_uint_32 num_trans;
    png_byte readbuf[PNG_MAX_PALETTE_LENGTH];
 
    png_debug(1, "in png_handle_tRNS");
-
-   png_ptr->num_trans = 0U; /* safety */
 
    if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS))
    {
@@ -1635,7 +1633,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr)
       }
 
       png_crc_read(png_ptr, buf, 2);
-      num_trans = 1U;
+      png_ptr->num_trans = 1;
       png_ptr->trans_color.gray = png_get_uint_16(buf);
    }
 
@@ -1650,7 +1648,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr)
       }
 
       png_crc_read(png_ptr, buf, 6);
-      num_trans = 1U;
+      png_ptr->num_trans = 1;
       png_ptr->trans_color.red = png_get_uint_16(buf);
       png_ptr->trans_color.green = png_get_uint_16(buf + 2);
       png_ptr->trans_color.blue = png_get_uint_16(buf + 4);
@@ -1658,18 +1656,21 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr)
 
    else if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
+      png_uint_32 length;
+
       /* png_find_chunk_op checks this: */
       debug(png_ptr->mode & PNG_HAVE_PLTE);
 
-      num_trans = png_ptr->chunk_length;
+      length = png_ptr->chunk_length;
 
-      if (num_trans > png_ptr->num_palette || num_trans == 0)
+      if (length > png_ptr->num_palette || length == 0)
       {
          png_handle_bad_length(png_ptr);
          return;
       }
 
-      png_crc_read(png_ptr, readbuf, num_trans);
+      png_crc_read(png_ptr, readbuf, length);
+      png_ptr->num_trans = length & 0x1FF;
    }
 
    else
@@ -1679,22 +1680,20 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr)
    }
 
    if (png_crc_finish(png_ptr, 0))
-      return;
-
-   /* Set it into the info_struct: */
-   png_set_tRNS(png_ptr, info_ptr, readbuf, num_trans, &png_ptr->trans_color);
-
-   /* Now make a copy of the buffer if one is required (palette images). */
-   debug(png_ptr->trans_alpha == NULL);
-   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
    {
-      png_ptr->trans_alpha = png_voidcast(png_bytep,
-            png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
-      memset(png_ptr->trans_alpha, 0xFFU, PNG_MAX_PALETTE_LENGTH);
-      memcpy(png_ptr->trans_alpha, info_ptr->trans_alpha, num_trans);
+      png_ptr->num_trans = 0;
+      return;
    }
 
-   png_ptr->num_trans = png_check_bits(png_ptr, num_trans, 9);
+   /* TODO: this is a horrible side effect in the palette case because the
+    * png_struct ends up with a pointer to the tRNS buffer owned by the
+    * png_info.  Fix this.
+    */
+   png_set_tRNS(png_ptr, info_ptr, readbuf, png_ptr->num_trans,
+       &(png_ptr->trans_color));
+
+   if (info_ptr != NULL)
+      png_ptr->trans_alpha = info_ptr->trans_alpha;
 }
 #else
 #  define png_handle_tRNS NULL

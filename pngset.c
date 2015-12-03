@@ -533,20 +533,30 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
       png_error(png_ptr, "Invalid palette");
 #endif /* MNG_FEATURES */
 
+   /* It may not actually be necessary to set png_ptr->palette here;
+    * we do it for backward compatibility with the way the png_handle_tRNS
+    * function used to do the allocation.
+    *
+    * 1.6.0: the above statement appears to be incorrect; something has to set
+    * the palette inside png_struct on read.
+    */
    png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
 
    /* Changed in libpng-1.2.1 to allocate PNG_MAX_PALETTE_LENGTH instead
     * of num_palette entries, in case of an invalid PNG file or incorrect
     * call to png_set_PLTE() with too-large sample values.
     */
-   info_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
+   png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
 
    if (num_palette > 0)
-      memcpy(info_ptr->palette, palette, num_palette * (sizeof (png_color)));
+      memcpy(png_ptr->palette, palette, num_palette * (sizeof (png_color)));
+   info_ptr->palette = png_ptr->palette;
+   info_ptr->num_palette = png_ptr->num_palette = png_check_bits(png_ptr,
+      num_palette, 9);
 
-   info_ptr->num_palette = png_check_bits(png_ptr, num_palette, 9);
    info_ptr->free_me |= PNG_FREE_PLTE;
+
    info_ptr->valid |= PNG_INFO_PLTE;
 }
 
@@ -952,11 +962,11 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
       /* Expect png_set_PLTE to happen before png_set_tRNS, so num_palette will
        * be set, but this is not a requirement of the API.
        */
-      if (info_ptr->num_palette)
-         max_num = info_ptr->num_palette;
+      if (png_ptr->num_palette)
+         max_num = png_ptr->num_palette;
 
       else
-         max_num = 1 << info_ptr->bit_depth;
+         max_num = 1 << png_ptr->bit_depth;
 
       if (num_trans > max_num)
       {

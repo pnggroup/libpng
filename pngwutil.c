@@ -1319,6 +1319,14 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
    if (color_type == PNG_COLOR_TYPE_PALETTE)
    {
       affirm(num_trans > 0 && num_trans <= PNG_MAX_PALETTE_LENGTH);
+      if ((unsigned int)/*SAFE*/num_trans > png_ptr->num_palette)
+      {
+         /* This is an error which can only be reliably detected late. */
+         png_app_error(png_ptr,
+             "Invalid number of transparent colors specified");
+         return;
+      }
+
       {
 #        ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
             union
@@ -1899,148 +1907,11 @@ png_start_IDAT(png_structrp png_ptr)
 }
 
 static void
-png_write_IDAT(png_structrp png_ptr, int end_of_image)
+png_compress_IDAT(png_structrp png_ptr, png_const_voidp input, uInt input_len,
+      int flush)
 {
-   png_compression_bufferp *listp = &png_ptr->zbuffer_list;
-   png_compression_bufferp list;
-   png_uint_32 output_len = png_ptr->zbuffer_len;
-   png_uint_32 start = png_ptr->zbuffer_start;
-   png_uint_32 size = png_ptr->IDAT_size;
-   const png_uint_32 min_size = (end_of_image ? 1U : size);
-
-   affirm(output_len >= min_size);
-
-   /* png_struct::zbuffer_end points to the pointer to the next (unused)
-    * compression buffer.  We don't need those blocks to produce output so
-    * free them now to save space.  This also ensures that *zbuffer_end is
-    * NULL so can be used to store the list head when wrapping the list.
-    */
-   png_free_buffer_list(png_ptr, png_ptr->zbuffer_end);
-
-   /* Write at least one chunk, of size 'size', write chunks until
-    * 'output_len' is less than 'min_size'.
-    */
-   list = *listp;
-
-   /* First, if this is the very first IDAT (PNG_HAVE_IDAT not set)
-    * optimize the CINFO field:
-    */
-#        ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-      if ((png_ptr->mode & PNG_HAVE_IDAT) == 0U)
-      {
-         affirm(start == 0U);
-         optimize_cmf(list->output, png_image_size(png_ptr));
-      }
-#        endif /* WRITE_OPTIMIZE_CMF */
-
-   do /* write chunks */
-   {
-      /* 'size' is the size of the chunk to write, limited to IDAT_size:
-       */
-      if (size > output_len) /* Z_FINISH */
-         size = output_len;
-
-      debug(size >= min_size);
-      png_write_chunk_header(png_ptr, png_IDAT, size);
-
-      do /* write the data of one chunk */
-      {
-         /* The chunk data may be split across multiple compression
-          * buffers.  This loop moves 'list' down the available
-          * compression buffers.
-          */
-         png_uint_32 avail = PNG_ROW_BUFFER_SIZE - start; /* in *list */
-
-         if (avail > output_len) /* valid bytes */
-            avail = output_len;
-
-         if (avail > size) /* bytes needed for chunk */
-            avail = size;
-
-         affirm(list != NULL && avail > 0U &&
-                start+avail <= PNG_ROW_BUFFER_SIZE);
-         png_write_chunk_data(png_ptr, list->output+start, avail);
-         output_len -= avail;
-         size -= avail;
-         start += avail;
-
-         if (start == PNG_ROW_BUFFER_SIZE)
-         {
-            /* End of the buffer.  If all the compressed data has been
-             * consumed (output_len == 0) this will set list to NULL
-             * because of the png_free_buffer_list call above.  At this
-             * point 'size' should be 0 too and the loop will terminate.
-             */
-            start = 0U;
-            listp = &list->next;
-            list = *listp; /* May be NULL at the end */
-         }
-      } while (size > 0);
-
-      png_write_chunk_end(png_ptr);
-      size = png_ptr->IDAT_size; /* For the next chunk */
-   } while (output_len >= min_size);
-
-   png_ptr->mode |= PNG_HAVE_IDAT;
-   png_ptr->zbuffer_len = output_len;
-
-   if (output_len > 0U) /* Still got stuff to write */
-   {
-      affirm(!end_of_image && list != NULL);
-
-      /* If any compression buffers have been completely written move them
-       * to the end of the list so that they can be re-used and move
-       * 'list' to the head:
-       */
-      if (listp != &png_ptr->zbuffer_list) /* list not at start */
-      {
-         debug(list != png_ptr->zbuffer_list /* obviously */ &&
-               listp != png_ptr->zbuffer_end /* because *end == NULL */);
-         *png_ptr->zbuffer_end = png_ptr->zbuffer_list;
-         *listp = NULL;
-         png_ptr->zbuffer_list = list;
-      }
-
-      /* 'list' is now at the start, so 'start' can be stored. */
-      png_ptr->zbuffer_start = start;
-      png_ptr->zbuffer_len = output_len;
-   }
-
-   else /* output_len == 0U; all compressed data has been written */
-   {
-      if (end_of_image)
-      {
-         png_ptr->zowner = 0U; /* release z_stream */
-         png_ptr->mode |= PNG_AFTER_IDAT;
-      }
-
-      /* Else: this is unlikely but possible; the compression code managed
-       * to exactly fill an IDAT chunk with the data for this block of row
-       * bytes so nothing is left in the buffer list.  Simply reset the
-       * output pointers to the start of the list.  This code is executed
-       * on Z_FINISH as well just to make the state safe.
-       */
-      png_ptr->zstream.next_out = NULL;
-      png_ptr->zstream.avail_out = 0U;
-      png_ptr->zbuffer_start = 0U;
-      png_ptr->zbuffer_len = 0U;
-      png_ptr->zbuffer_end = &png_ptr->zbuffer_list;
-   } /* output_len == 0 */
-}
-
-typedef struct
-{
-   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
-   png_uint_32              zbuffer_len;   /* Length of data in list */
-}  png_IDAT_compression_state;
-
-static int
-png_compress_IDAT_test(png_structrp png_ptr, png_IDAT_compression_state *state,
-      z_stream *zstream, png_const_voidp input, uInt input_len, int flush)
-{
-   png_uint_32 output_len = 0U;
    int ret;
-
+   
    /* The stream must have been claimed: */
    affirm(png_ptr->zowner == png_IDAT);
 
@@ -2048,34 +1919,22 @@ png_compress_IDAT_test(png_structrp png_ptr, png_IDAT_compression_state *state,
     * buffer list.  next_in must be set here, avail_in comes from the input_len
     * parameter:
     */
-   zstream->next_in = PNGZ_INPUT_CAST(png_voidcast(const Bytef*, input));
-   ret = png_compress(png_ptr, zstream, &state->zbuffer_end, input_len,
-         &output_len, flush);
-   implies(ret == Z_OK || ret == Z_FINISH, zstream->avail_in == 0U);
-   zstream->next_in = NULL;
-   zstream->avail_in = 0U; /* safety */
+   {
+      png_uint_32 output_len = 0U;
 
-   /* If IDAT_size is set to PNG_UINT_31_MAX the length will be larger, but
-    * not enough to overflow a png_uint_32.
-    */
-   state->zbuffer_len += output_len;
-   return ret;
+      png_ptr->zstream.next_in =
+         PNGZ_INPUT_CAST(png_voidcast(const Bytef*,input));
+      ret = png_compress(png_ptr, &png_ptr->zstream, &png_ptr->zbuffer_end,
+            input_len, &output_len, flush);
+      implies(ret == Z_OK || ret == Z_FINISH, png_ptr->zstream.avail_in == 0U);
+      png_ptr->zstream.next_in = NULL;
+      png_ptr->zstream.avail_in = 0U; /* safety */
 
-}
-
-static void
-png_compress_IDAT(png_structp png_ptr, png_const_voidp input, uInt input_len,
-      int flush)
-{
-   png_IDAT_compression_state state;
-   int ret;
-
-   state.zbuffer_end  = png_ptr->zbuffer_end;
-   state.zbuffer_len  = png_ptr->zbuffer_len;
-   ret = png_compress_IDAT_test(png_ptr, &state, &png_ptr->zstream, input,
-         input_len, flush);
-   png_ptr->zbuffer_end  = state.zbuffer_end;
-   png_ptr->zbuffer_len  = state.zbuffer_len;
+      /* If IDAT_size is set to PNG_UINT_31_MAX the length will be larger, but
+       * not enough to overflow a png_uint_32.
+       */
+      png_ptr->zbuffer_len += output_len;
+   }
 
    /* Check the return code. */
    if (ret == Z_OK || ret == Z_STREAM_END)
@@ -2097,7 +1956,133 @@ png_compress_IDAT(png_structp png_ptr, png_const_voidp input, uInt input_len,
        * written this function call is complete.
        */
       if (flush == Z_FINISH || png_ptr->zbuffer_len >= png_ptr->IDAT_size)
-         png_write_IDAT(png_ptr, flush == Z_FINISH);
+      {
+         png_compression_bufferp *listp = &png_ptr->zbuffer_list;
+         png_compression_bufferp list;
+         png_uint_32 output_len = png_ptr->zbuffer_len;
+         png_uint_32 start = png_ptr->zbuffer_start;
+         png_uint_32 size = png_ptr->IDAT_size;
+         const png_uint_32 min_size = (flush == Z_FINISH ? 1U : size);
+
+         affirm(output_len >= min_size);
+
+         /* png_struct::zbuffer_end points to the pointer to the next (unused)
+          * compression buffer.  We don't need those blocks to produce output so
+          * free them now to save space.  This also ensures that *zbuffer_end is
+          * NULL so can be used to store the list head when wrapping the list.
+          */
+         png_free_buffer_list(png_ptr, png_ptr->zbuffer_end);
+
+         /* Write at least one chunk, of size 'size', write chunks until
+          * 'output_len' is less than 'min_size'.
+          */
+         list = *listp;
+
+         /* First, if this is the very first IDAT (PNG_HAVE_IDAT not set)
+          * optimize the CINFO field:
+          */
+#        ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+            if ((png_ptr->mode & PNG_HAVE_IDAT) == 0U)
+            {
+               affirm(start == 0U);
+               optimize_cmf(list->output, png_image_size(png_ptr));
+            }
+#        endif /* WRITE_OPTIMIZE_CMF */
+
+         do /* write chunks */
+         {
+            /* 'size' is the size of the chunk to write, limited to IDAT_size:
+             */
+            if (size > output_len) /* Z_FINISH */
+               size = output_len;
+
+            debug(size >= min_size);
+            png_write_chunk_header(png_ptr, png_IDAT, size);
+
+            do /* write the data of one chunk */
+            {
+               /* The chunk data may be split across multiple compression
+                * buffers.  This loop moves 'list' down the available
+                * compression buffers.
+                */
+               png_uint_32 avail = PNG_ROW_BUFFER_SIZE - start; /* in *list */
+
+               if (avail > output_len) /* valid bytes */
+                  avail = output_len;
+
+               if (avail > size) /* bytes needed for chunk */
+                  avail = size;
+
+               affirm(list != NULL && avail > 0U &&
+                      start+avail <= PNG_ROW_BUFFER_SIZE);
+               png_write_chunk_data(png_ptr, list->output+start, avail);
+               output_len -= avail;
+               size -= avail;
+               start += avail;
+
+               if (start == PNG_ROW_BUFFER_SIZE)
+               {
+                  /* End of the buffer.  If all the compressed data has been
+                   * consumed (output_len == 0) this will set list to NULL
+                   * because of the png_free_buffer_list call above.  At this
+                   * point 'size' should be 0 too and the loop will terminate.
+                   */
+                  start = 0U;
+                  listp = &list->next;
+                  list = *listp; /* May be NULL at the end */
+               }
+            } while (size > 0);
+
+            png_write_chunk_end(png_ptr);
+            size = png_ptr->IDAT_size; /* For the next chunk */
+         } while (output_len >= min_size);
+
+         png_ptr->mode |= PNG_HAVE_IDAT;
+         png_ptr->zbuffer_len = output_len;
+
+         if (output_len > 0U) /* Still got stuff to write */
+         {
+            affirm(flush != Z_FINISH && list != NULL);
+
+            /* If any compression buffers have been completely written move them
+             * to the end of the list so that they can be re-used and move
+             * 'list' to the head:
+             */
+            if (listp != &png_ptr->zbuffer_list) /* list not at start */
+            {
+               debug(list != png_ptr->zbuffer_list /* obviously */ &&
+                     listp != png_ptr->zbuffer_end /* because *end == NULL */);
+               *png_ptr->zbuffer_end = png_ptr->zbuffer_list;
+               *listp = NULL;
+               png_ptr->zbuffer_list = list;
+            }
+
+            /* 'list' is now at the start, so 'start' can be stored. */
+            png_ptr->zbuffer_start = start;
+            png_ptr->zbuffer_len = output_len;
+         }
+
+         else /* output_len == 0U; all compressed data has been written */
+         {
+            if (flush == Z_FINISH) /* end of data */
+            {
+               png_ptr->zowner = 0U; /* release z_stream */
+               png_ptr->mode |= PNG_AFTER_IDAT;
+            }
+
+            /* Else: this is unlikely but possible; the compression code managed
+             * to exactly fill an IDAT chunk with the data for this block of row
+             * bytes so nothing is left in the buffer list.  Simply reset the
+             * output pointers to the start of the list.  This code is executed
+             * on Z_FINISH as well just to make the state safe.
+             */
+            png_ptr->zstream.next_out = NULL;
+            png_ptr->zstream.avail_out = 0U;
+            png_ptr->zbuffer_start = 0U;
+            png_ptr->zbuffer_len = 0U;
+            png_ptr->zbuffer_end = &png_ptr->zbuffer_list;
+         } /* output_len == 0 */
+      } /* flush == FINISH || png_ptr->zbuffer_len >= png_ptr->IDAT_size */
    }
 
    else /* ret != Z_OK && ret != Z_STREAM_END */

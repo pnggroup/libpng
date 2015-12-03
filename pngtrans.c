@@ -580,13 +580,12 @@ init_transform_mech(png_structrp png_ptr, png_transform_control *tc, int start)
 
 #ifdef PNG_PALETTE_MAX_SUPPORTED
 static int
-set_palette_max(png_structrp png_ptr, png_transformp tr, unsigned int max,
-      unsigned int format_max)
+set_palette_max(png_structrp png_ptr, png_transformp tr, unsigned int max)
    /* Called whenever a new maximum pixel value is found */
 {
    /* One of these must be true: */
 #  ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-      if (max >= tr->args && !png_ptr->palette_index_check_issued)
+      if (max >= png_ptr->num_palette && !png_ptr->palette_index_check_issued)
       {
 #        ifdef PNG_READ_SUPPORTED
 #           ifdef PNG_WRITE_SUPPORTED
@@ -605,7 +604,7 @@ set_palette_max(png_structrp png_ptr, png_transformp tr, unsigned int max,
       png_ptr->palette_index_max = png_check_bits(png_ptr, max, 9);
 #  endif
 
-   if (max == format_max)
+   if (max == (1U << png_ptr->bit_depth)-1U)
    {
       tr->fn = NULL; /* no point continuing once the max has been seen */
       return 1; /* stop */
@@ -634,7 +633,7 @@ palette_max_1bpp(png_transformp *tr, png_transform_controlp tc)
    }
 
    /* If the code reaches this point there is a set pixel */
-   (void)set_palette_max(tc->png_ptr, *tr, 1U, 1U);
+   (void)set_palette_max(tc->png_ptr, *tr, 1);
 }
 
 static void
@@ -691,7 +690,7 @@ palette_max_2bpp(png_transformp *tr, png_transform_controlp tc)
          continue;
 
       /* new_max is greater than max: */
-      if (set_palette_max(tc->png_ptr, *tr, new_max, 3U))
+      if (set_palette_max(tc->png_ptr, *tr, new_max))
          return;
 
       /* Record new_max: */
@@ -727,7 +726,7 @@ palette_max_4bpp(png_transformp *tr, png_transform_controlp tc)
 
    if (max > (*tr)->args)
    {
-      if (set_palette_max(tc->png_ptr, *tr, max, 15U))
+      if (set_palette_max(tc->png_ptr, *tr, max))
          return;
 
       (*tr)->args = max;
@@ -753,7 +752,7 @@ palette_max_8bpp(png_transformp *tr, png_transform_controlp tc)
 
    if (max > (*tr)->args)
    {
-      if (set_palette_max(tc->png_ptr, *tr, max, 255U))
+      if (set_palette_max(tc->png_ptr, *tr, max))
          return;
 
       (*tr)->args = max;
@@ -766,19 +765,13 @@ palette_max_init(png_transformp *tr, png_transform_controlp tc)
 #  define png_ptr (tc->png_ptr)
    if ((tc->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
    {
-      if (tc->init == PNG_TC_INIT_FINAL)
+      if (tc->init == PNG_TC_INIT_FINAL) switch (tc->bit_depth)
       {
-         /* Record the palette depth to check here: */
-         (*tr)->args = png_ptr->num_palette;
-
-         switch (tc->bit_depth)
-         {
-            case 1: (*tr)->fn = palette_max_1bpp; break;
-            case 2: (*tr)->fn = palette_max_2bpp; break;
-            case 4: (*tr)->fn = palette_max_4bpp; break;
-            case 8: (*tr)->fn = palette_max_8bpp; break;
-            default:impossible("palette bit depth");
-         }
+         case 1: (*tr)->fn = palette_max_1bpp; break;
+         case 2: (*tr)->fn = palette_max_2bpp; break;
+         case 4: (*tr)->fn = palette_max_4bpp; break;
+         case 8: (*tr)->fn = palette_max_8bpp; break;
+         default:impossible("palette bit depth");
       }
    }
 

@@ -5985,15 +5985,21 @@ setup_palette_cache(png_structp png_ptr, png_byte cache[8*256])
 static void
 png_remove_PLTE_and_tRNS(png_structrp png_ptr)
 {
-   if (png_ptr->palette != NULL)
+   if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
+   {
+      png_ptr->free_me &= PNG_BIC_MASK(PNG_FREE_PLTE);
       png_free(png_ptr, png_ptr->palette);
+   }
 
    png_ptr->palette = NULL;
    png_ptr->num_palette = 0;
 
 #  ifdef PNG_READ_tRNS_SUPPORTED
-      if (png_ptr->trans_alpha != NULL)
+      if ((png_ptr->free_me & PNG_FREE_TRNS) != 0)
+      {
+         png_ptr->free_me &= PNG_BIC_MASK(PNG_FREE_TRNS);
          png_free(png_ptr, png_ptr->trans_alpha);
+      }
 
       png_ptr->trans_alpha = NULL;
       png_ptr->num_trans = 0;
@@ -6096,10 +6102,13 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
     * entries were shifted or inverted.  This could be fixed, but it would
     * complicate the libpng API to expose the information.
     */
+   png_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
+       PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
+   png_ptr->free_me |= PNG_FREE_PLTE;
+
    /* Write the transformed palette: */
    {
-      png_colorp palette = png_voidcast(png_colorp, png_calloc(png_ptr,
-               sizeof (png_color[PNG_MAX_PALETTE_LENGTH])));
+      png_colorp  palette = png_ptr->palette;
       png_const_bytep p;
       const int is_color = (cp->tend.format & PNG_FORMAT_FLAG_COLOR) != 0;
       unsigned int i;
@@ -6108,10 +6117,6 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
          const int do_trans = (cp->tend.format & PNG_FORMAT_FLAG_ALPHA) != 0;
          png_byte trans_alpha[PNG_MAX_PALETTE_LENGTH];
 #     endif /* READ_tRNS */
-
-      memset(palette, 0xFFU, sizeof (png_color[PNG_MAX_PALETTE_LENGTH]));
-      png_free(png_ptr, png_ptr->palette);
-      png_ptr->palette = palette;
 
       for (i=0, p=cache.b8; i<cp->tend.width; ++i)
       {
@@ -6143,17 +6148,12 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
 #     ifdef PNG_READ_tRNS_SUPPORTED
          if (num_trans > 0)
          {
-            png_bytep tRNS = png_voidcast(png_bytep, png_malloc(png_ptr,
-                     PNG_MAX_PALETTE_LENGTH));
-
-            memset(tRNS, 0xFFU, PNG_MAX_PALETTE_LENGTH);
-
-            if (png_ptr->trans_alpha != NULL)
-               png_free(png_ptr, png_ptr->trans_alpha);
-
-            png_ptr->trans_alpha = tRNS;
-
-            memcpy(tRNS, trans_alpha, num_trans);
+            png_ptr->trans_alpha = png_voidcast(png_bytep, png_malloc(png_ptr,
+               PNG_MAX_PALETTE_LENGTH));
+            png_ptr->free_me |= PNG_FREE_TRNS;
+            memcpy(png_ptr->trans_alpha, trans_alpha, num_trans);
+            memset(png_ptr->trans_alpha+num_trans, 0xFFU,
+               PNG_MAX_PALETTE_LENGTH-num_trans);
             png_ptr->num_trans = png_check_bits(png_ptr, num_trans, 9);
          }
 #     endif /* READ_tRNS */
