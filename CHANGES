@@ -5354,8 +5354,6 @@ Version 1.7.0beta70 [December 1, 2015]
     compression code with the decompression code; IDAT_size replaces
     IDAT_read_size and zbuffer_size, IDAT reading and writing is no longer
     controlled by the size of the compression buffer.
-  Updated manual to require png_set_PLTE() to precede png_set_tRNS()
-    and png_set_hIST() if either is present.
   Separated png_compress_IDAT into write/compress, removed some
     trailing spaces and cleaned up pnglibconf.
   Removed the side-effect on the png_struct palette of calling png_set_PLTE()
