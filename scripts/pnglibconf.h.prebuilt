@@ -1,7 +1,8 @@
-/* libpng 1.7.0beta70 STANDARD API DEFINITION */
+/* libpng 1.7.0beta71 STANDARD API DEFINITION */
+
 /* pnglibconf.h - library build configuration */
 
-/* libpng version 1.7.0beta70, November 24, 2015 */
+/* Libpng version 1.7.0beta71, December 3, 2015 */
 
 /* Copyright (c) 1998-2015 Glenn Randers-Pehrson */
 
