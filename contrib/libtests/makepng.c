@@ -392,7 +392,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
    unsigned int *colors, int small)
 {
    int filters = 0; /* file *MASK*, 0 means the default, not NONE */
-   png_uint_32 size_max = 
+   png_uint_32 size_max =
       image_size_of_type(color_type, bit_depth, colors, small)-1;
    png_uint_32 depth_max = (1U << bit_depth)-1; /* up to 65536 */
 
@@ -526,7 +526,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
             assert(0/*NOT REACHED*/);
       }
    }
-      
+
    else switch (channels_of_type(color_type))
    {
    /* 1 channel: a square image with a diamond, the least luminous colors are on
@@ -1361,6 +1361,56 @@ insert_hIST(png_structp png_ptr, png_infop info_ptr, int nparams,
    png_set_hIST(png_ptr, info_ptr, freq);
 }
 
+static png_byte
+bval(png_const_structrp png_ptr, png_charp param, unsigned int maxval)
+{
+   char *endptr = NULL;
+   unsigned long int l = strtoul(param, &endptr, 0/*base*/);
+
+   if (param[0] && *endptr == 0 && l <= maxval)
+      return (png_byte)l;
+
+   else
+      png_error(png_ptr, "sBIT: invalid sBIT value");
+}
+
+static void
+insert_sBIT(png_structp png_ptr, png_infop info_ptr, int nparams,
+      png_charpp params)
+{
+   const int ct = png_get_color_type(png_ptr, info_ptr);
+   const int c = (ct & PNG_COLOR_MASK_COLOR ? 3 : 1) +
+      (ct & PNG_COLOR_MASK_ALPHA ? 1 : 0);
+   const unsigned int maxval =
+      ct & PNG_COLOR_MASK_PALETTE ? 8U : png_get_bit_depth(png_ptr, info_ptr);
+   png_color_8 sBIT;
+
+   if (nparams != c)
+      png_error(png_ptr, "sBIT: incorrect parameter count");
+
+   if (ct & PNG_COLOR_MASK_COLOR)
+   {
+      sBIT.red = bval(png_ptr, params[0], maxval);
+      sBIT.green = bval(png_ptr, params[1], maxval);
+      sBIT.blue = bval(png_ptr, params[2], maxval);
+      sBIT.gray = 42;
+   }
+
+   else
+   {
+      sBIT.red = sBIT.green = sBIT.blue = 42;
+      sBIT.gray = bval(png_ptr, params[0], maxval);
+   }
+
+   if (ct & PNG_COLOR_MASK_ALPHA)
+      sBIT.alpha = bval(png_ptr, params[nparams-1], maxval);
+
+   else
+      sBIT.alpha = 42;
+
+   png_set_sBIT(png_ptr, info_ptr, &sBIT);
+}
+
 #if 0
 static void
 insert_sPLT(png_structp png_ptr, png_infop info_ptr, int nparams, png_charpp params)
@@ -1486,6 +1536,11 @@ find_insert(png_const_charp what, png_charp param)
       case CHUNK(104,73,83,84):  /* hIST */
          if (nparams <= 256)
             return make_insert(what, insert_hIST, nparams, parameter_list);
+         break;
+
+      case CHUNK(115,66,73,84): /* sBIT */
+         if (nparams <= 4)
+            return make_insert(what, insert_sBIT, nparams, parameter_list);
          break;
 
 #if 0
@@ -1858,7 +1913,7 @@ main(int argc, char **argv)
       };
 
       chunk_insert *new_insert;
-      
+
       new_insert = add_tEXt("Copyright", copyright);
       if (new_insert != NULL)
       {

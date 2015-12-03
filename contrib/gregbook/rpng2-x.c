@@ -496,12 +496,12 @@ int main(int argc, char **argv)
           "\t\t  transparent images; overrides -bgcolor\n",
           num_bgpat-1);
 #ifdef FEATURE_LOOP
-        fprintf(stderr, 
+        fprintf(stderr,
           "    -loop\tloops through background images after initial display\n"
           "\t\t  is complete (depends on -bgpat)\n"
           "    sec \tseconds to display each background image (default = 2)\n");
 #endif
-        fprintf(stderr, 
+        fprintf(stderr,
           "    dur \tduration in microseconds to wait after displaying each\n"
           "\t\t  row (for demo purposes)\n"
           "    -timing\tenables delay for every block read, to simulate modem\n"

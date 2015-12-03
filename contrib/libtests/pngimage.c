@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2015 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.19 [November 12, 2015]
+ * Last changed in libpng 1.6.20 [December 3, 2015]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -36,7 +36,8 @@
 #  include <setjmp.h> /* because png.h did *not* include this */
 #endif
 
-#if defined(PNG_INFO_IMAGE_SUPPORTED) && defined(PNG_SEQUENTIAL_READ_SUPPORTED)
+#if defined(PNG_INFO_IMAGE_SUPPORTED) && defined(PNG_SEQUENTIAL_READ_SUPPORTED)\
+    && (defined(PNG_READ_PNG_SUPPORTED) || PNG_LIBPNG_VER < 10700)
 /* If a transform is valid on both read and write this implies that if the
  * transform is applied to read it must also be applied on write to produce
  * meaningful data.  This is because these transforms when performed on read
@@ -947,7 +948,7 @@ update_display(struct display *dp)
 
          if ((transform_info[i].valid_chunks == 0 ||
                (transform_info[i].valid_chunks & chunks) != 0) &&
-            (transform_info[i].color_mask_required & ct) == 
+            (transform_info[i].color_mask_required & ct) ==
                transform_info[i].color_mask_required &&
             (transform_info[i].color_mask_absent & ct) == 0 &&
             (transform_info[i].bit_depths & bd) != 0 &&
@@ -1005,7 +1006,7 @@ compare_read(struct display *dp, int applied_transforms)
    {
       unsigned long chunks =
          png_get_valid(dp->read_pp, dp->read_ip, 0xffffffff);
-      
+
       if (chunks != dp->chunks)
          display_log(dp, APP_FAIL, "PNG chunks changed from 0x%lx to 0x%lx",
             (unsigned long)dp->chunks, chunks);
@@ -1676,7 +1677,7 @@ main(const int argc, const char * const * const argv)
       return errors != 0;
    }
 }
-#else /* !PNG_INFO_IMAGE_SUPPORTED || !PNG_READ_SUPPORTED */
+#else /* !INFO_IMAGE || !SEQUENTIAL_READ || !READ_PNG*/
 int
 main(void)
 {
