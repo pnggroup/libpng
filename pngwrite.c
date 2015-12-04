@@ -888,8 +888,8 @@ write_row_non_interlaced(png_structrp png_ptr, png_const_bytep row)
 
    /* There is only one pass, so this is the last pass: */
    write_row_core(png_ptr, row,
-         (row_number == 1U ? png_pass_first_row : 0U) |
-         (last_pass_row ? png_pass_last_row : 0U) |
+         (row_number == 1U ? png_pass_first_row : 0) |
+         (last_pass_row ? png_pass_last_row : 0) |
          png_pass_last);
 
    if (!last_pass_row)
@@ -914,10 +914,10 @@ write_row_interlaced(png_structrp png_ptr, png_const_bytep row)
    const int last_pass_row = row_number == PNG_PASS_ROWS(png_ptr->height, pass);
 
    write_row_core(png_ptr, row,
-         (row_number == 1U ? png_pass_first_row : 0U) |
-         (last_pass_row ? png_pass_last_row : 0U) |
+         (row_number == 1U ? png_pass_first_row : 0) |
+         (last_pass_row ? png_pass_last_row : 0) |
          (pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) ?
-                                png_pass_last : 0U));
+                                png_pass_last : 0));
 
    if (!last_pass_row)
       png_ptr->row_number = row_number;
@@ -952,11 +952,11 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
    {
       const unsigned int row_info_flags =
          (row_number == PNG_PASS_START_ROW(pass) ?
-            png_pass_first_row : 0U) |
+            png_pass_first_row : 0) |
          (PNG_LAST_PASS_ROW(row_number, pass, png_ptr->height) ?
-            png_pass_last_row : 0U) |
+            png_pass_last_row : 0) |
          (pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) ?
-            png_pass_last : 0U);
+            png_pass_last : 0);
 
       if (pass < 6)
       {
