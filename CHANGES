@@ -5378,6 +5378,8 @@ Version 1.7.0beta71 [December 5, 2015]
   Re-applied some recent patches to libpng17beta70 that were
     accidentally lost while publishing the beta70 tar distribution.
 
+Version 1.7.0beta72 [December 5, 2015]
+
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)
