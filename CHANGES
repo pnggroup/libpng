@@ -5359,7 +5359,8 @@ Version 1.7.0beta70 [December 3, 2015]
   Removed the side-effect on the png_struct palette of calling png_set_PLTE()
     or png_set_tRNS(). This is a quiet API change; it was previously possible
     to alter the palette on a PNG image by using png_set_PLTE, but this was
-    unintended and inconsistent with the other png_set APIs.
+    unintended and inconsistent with the other png_set APIs. This fixes
+    CVE-2015-8472.
   Fixed a bug in palette index checking; png_struct::num_palette could, in
     principle, get changed by the transformations (e.g. png_set_quantize)
     and this would invalidate the check.  The palette checking init function
@@ -5370,9 +5371,13 @@ Version 1.7.0beta70 [December 3, 2015]
     In particular an abort as a result of a bogus colorspace information
    (gAMA, cHRM, sBIT etc) prevents the write of the PLTE chunk.
 
-Version 1.7.0beta71 [December 3, 2015]
-     
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+Version 1.7.0beta71 [December 5, 2015]
+  Implemented new filter selection heuristic.
+  Attempted to make the selection options more intuitive.
+  Fixed a build break in no-write-filters cases.
+  Re-applied some recent patches to libpng17beta70 that were
+    accidentally lost while publishing the beta70 tar distribution.
+
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)
