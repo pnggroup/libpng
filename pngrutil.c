@@ -3114,7 +3114,7 @@ copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
 #     else
          PNG_PIXEL_DEPTH(*png_ptr),
 #     endif
-      clear/*clear partial byte at end of row*/);
+      clear/*clear partial byte at end of row*/, 1/*sp -> dp[x]*/);
 }
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED

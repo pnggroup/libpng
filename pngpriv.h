@@ -943,13 +943,15 @@ PNG_INTERNAL_FUNCTION(png_alloc_size_t,png_calc_rowbytes,
 PNG_INTERNAL_FUNCTION(unsigned int,png_max_pixel_block,
       (png_const_structrp png_ptr),PNG_EMPTY);
 
-/* Copy the row in row_buffer; this is the non-interlaced copy used in both
- * the read and write code.
+/* Copy the row in row_buffer; this is the non-interlaced copy used in both the
+ * read and write code.  'x_in_dest' specifies whether the 'x' applies to
+ * the destination (sp->dp[x], x_in_dest tru) or the source (sp[x]->dp,
+ * x_in_dest false).
  */
 PNG_INTERNAL_FUNCTION(void, png_copy_row,(png_const_structrp png_ptr,
    png_bytep dp, png_const_bytep sp, png_uint_32 x/*in INPUT*/,
    png_uint_32 width/*of INPUT*/, unsigned int pixel_depth,
-   int clear/*clear the final byte*/),PNG_EMPTY);
+   int clear/*clear the final byte*/, int x_in_dest),PNG_EMPTY);
 
 /* Zlib support */
 #define PNG_UNEXPECTED_ZLIB_RETURN (-7)

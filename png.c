@@ -2402,12 +2402,14 @@ png_max_pixel_block(png_const_structrp png_ptr)
 void /* PRIVATE */
 png_copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
    png_uint_32 x/*in INPUT*/, png_uint_32 width/*of INPUT*/,
-   unsigned int pixel_depth, int clear/*clear the final byte*/)
+   unsigned int pixel_depth, int clear/*clear the final byte*/, int x_in_dest)
    /* Copy the row in row_buffer; this is the non-interlaced copy used in both
-    * the read and write code.
+    * the read and write code.  'x_in_dest' specifies whether the 'x' applies to
+    * the destination (sp->dp[x], x_in_dest tru) or the source (sp[x]->dp,
+    * x_in_dest false).
     */
 {
-   png_alloc_size_t cb;
+   png_alloc_size_t cb, offset;
    unsigned int remaining; /* remaining bits in a partial byte */
 
    /* Copy 'cb' pixels, but take care with the last byte because it may
@@ -2419,27 +2421,33 @@ png_copy_row(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
       case 1U: remaining =  width       & 7U;
                debug((x & 7U) == 0U);
                cb = width >> 3;
-               dp += x >> 3;
+               offset = x >> 3;
                break;
       case 2U: remaining = (width << 1) & 6U;
                debug((x & 3U) == 0U);
                cb = width >> 2;
-               dp += x >> 2;
+               offset = x >> 2;
                break;
       case 4U: remaining = (width << 2) & 4U;
                debug((x & 1U) == 0U);
                cb = width >> 1;
-               dp += x >> 1;
+               offset = x >> 1;
                break;
       case 8U: remaining = 0U;
                cb = width;
-               dp += x;
+               offset = x;
                break;
       default: remaining = 0U;
                cb = png_calc_rowbytes(png_ptr, pixel_depth, width);
-               dp += png_calc_rowbytes(png_ptr, pixel_depth, x);
+               offset = png_calc_rowbytes(png_ptr, pixel_depth, x);
                break;
    }
+
+   if (x_in_dest)
+      dp += offset;
+
+   else
+      sp += offset;
 
    memcpy(dp, sp, cb);
 

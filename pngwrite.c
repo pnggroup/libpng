@@ -720,7 +720,8 @@ copy_row(png_const_structrp png_ptr, png_bytep row_buffer,
    unsigned int pixel_depth)
 {
    /* Copy row[x..x+count] pixels to row_buffer. */
-   png_copy_row(png_ptr, row_buffer, row, x, count, pixel_depth, 1/*clear*/);
+   png_copy_row(png_ptr, row_buffer, row, x, count, pixel_depth, 1/*clear*/,
+         0/* x_in_dest; row[x]->row_buffer */);
 }
 #endif /* WRITE_TRANSFORMS */
 
