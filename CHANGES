@@ -5371,14 +5371,18 @@ Version 1.7.0beta70 [December 3, 2015]
     In particular an abort as a result of a bogus colorspace information
    (gAMA, cHRM, sBIT etc) prevents the write of the PLTE chunk.
 
-Version 1.7.0beta71 [December 5, 2015]
+Version 1.7.0beta71 [omitted]
+Version 1.7.0beta72 [December 7, 2015]
   Implemented new filter selection heuristic.
   Attempted to make the selection options more intuitive.
   Fixed a build break in no-write-filters cases.
-  Re-applied some recent patches to libpng17beta70 that were
+  Re-applied some recent patches to libpng-1.7.0beta70 that were
     accidentally lost while publishing the beta70 tar distribution.
-
-Version 1.7.0beta72 [December 5, 2015]
+  Fixed g++ builds, where enums (int), G++ objects (int) and (unsigned)
+    were being used together in ?:
+  Fixed stack smashing problem in write png_copy_row that was introduced
+    in libpng-1.7.0beta70.  This also resulted in PNG data with random
+     row bytes.
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
