@@ -1083,7 +1083,7 @@ Version 1.7.0beta72 [December 7, 2015]
     were being used together in ?:
   Fixed stack smashing problem in write png_copy_row that was introduced
     in libpng-1.7.0beta70.  This also resulted in PNG data with random
-     row bytes.
+    row bytes.
      
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
