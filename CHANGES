@@ -5384,6 +5384,8 @@ Version 1.7.0beta72 [December 7, 2015]
     in libpng-1.7.0beta70.  This also resulted in PNG data with random
     row bytes.
 
+Version 1.7.0beta73 [December 8, 2015]
+
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)

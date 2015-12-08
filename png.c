@@ -15,7 +15,7 @@
 #define PNG_SRC_FILE PNG_SRC_FILE_png
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_7_0beta72 Your_png_h_is_not_version_1_7_0beta72;
+typedef png_libpng_version_1_7_0beta73 Your_png_h_is_not_version_1_7_0beta73;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -712,13 +712,13 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta72 - December 7, 2015" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta73 - December 8, 2015" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta72 - December 7, 2015\
+      return "libpng version 1.7.0beta73 - December 8, 2015\
       Copyright (c) 1998-2015 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
