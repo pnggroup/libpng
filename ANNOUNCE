@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta73 - December 8, 2015
+Libpng 1.7.0beta73 - December 9, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1085,7 +1085,9 @@ Version 1.7.0beta72 [December 7, 2015]
     in libpng-1.7.0beta70.  This also resulted in PNG data with random
     row bytes.
 
-Version 1.7.0beta73 [December 8, 2015]
+Version 1.7.0beta73 [December 9, 2015]
+  Fixed a syntax error in tests/pngstest that some shells other than
+    bash could not parse (Bug report by Nelson Beebe).
      
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
