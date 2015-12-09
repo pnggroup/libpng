@@ -1285,7 +1285,7 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
    {
       png_warning(png_ptr, "trailing spaces removed from keyword");
 
-      while (*kp == ' ')
+      while (key_len && *kp == ' ')
       {
          *(kp--) = '\0';
          key_len--;
