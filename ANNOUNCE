@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta73 - December 11, 2015
+Libpng 1.7.0beta74 - December 11, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta73.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta73.tar.gz
+   1.7.0beta74.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta74.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b73.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b73.zip
+   /scratch/glennrp/Libpng17/lp170b74.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b74.zip
 
 Other information:
 
-   1.7.0beta73-README.txt
-   1.7.0beta73-LICENSE.txt
-   libpng-1.7.0beta73-*.asc (armored detached GPG signatures)
+   1.7.0beta74-README.txt
+   1.7.0beta74-LICENSE.txt
+   libpng-1.7.0beta74-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1092,6 +1092,8 @@ Version 1.7.0beta73 [December 11, 2015]
   Changed png_struct->options from png_byte to png_uint_32, to hold
     up to 16 2-bit options.
      
+Version 1.7.0beta74 [December 11, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

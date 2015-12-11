@@ -5390,6 +5390,8 @@ Version 1.7.0beta73 [December 11, 2015]
   Combined some redundant checks on info_ptr==NULL in png_handle_PLTE()
   Changed png_struct->options from png_byte to png_uint_32, to hold
     up to 16 2-bit options.
+     
+Version 1.7.0beta74 [December 11, 2015]
 
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
