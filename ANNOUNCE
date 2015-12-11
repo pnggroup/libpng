@@ -1,4 +1,4 @@
-Libpng 1.6.21beta01 - December 9, 2015
+Libpng 1.6.21beta01 - December 11, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,9 +25,9 @@ Other information:
 
 Changes since the last public release (1.6.20):
 
-Version 1.6.21beta01 [December 9, 2015]
-  Fixed a syntax error in tests/pngstest that some shells other than
-    bash could not parse (Bug report by Nelson Beebe).
+Version 1.6.21beta01 [December 11, 2015]
+  Fixed syntax "$(command)" in tests/pngstest that some shells other than
+    bash could not parse (Bug report by Nelson Beebe). Use `command` instead.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
