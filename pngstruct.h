@@ -422,7 +422,7 @@ struct png_struct_def
 
    /* Options */
 #ifdef PNG_SET_OPTION_SUPPORTED
-   png_byte options;          /* On/off state (up to 4 options) */
+   png_uint_32 options;          /* On/off state (up to 4 options) */
 #endif
 
 #ifdef PNG_READ_SUPPORTED
