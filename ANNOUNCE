@@ -1,5 +1,5 @@
 
-Libpng 1.5.26beta01 - December 9, 2015
+Libpng 1.5.26beta01 - December 11, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,9 +26,9 @@ Other information:
 
 Changes since the last public release (1.5.25):
 
-version 1.5.26 [December 9, 2015]
+version 1.5.26 [December 11, 2015]
   Fixed an out-of-range read in png_check_keyword() (Bug report from
-    Qixue Xiao).
+    Qixue Xiao, CVE-2015-8540).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
