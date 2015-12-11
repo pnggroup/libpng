@@ -853,6 +853,9 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 
    png_debug(1, "in png_handle_PLTE");
 
+   if (info_ptr == NULL)
+      return;
+
    if (!(png_ptr->color_type & PNG_COLOR_MASK_COLOR))
    {
       png_handle_error(png_ptr, "ignored in grayscale PNG");
@@ -962,28 +965,26 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
     */
 #ifdef PNG_READ_tRNS_SUPPORTED
    if (png_ptr->num_trans > 0 ||
-       (info_ptr != NULL && (info_ptr->valid & PNG_INFO_tRNS) != 0))
+       (info_ptr->valid & PNG_INFO_tRNS) != 0)
    {
       /* Cancel this because otherwise it would be used if the transforms
        * require it.  Don't cancel the 'valid' flag because this would prevent
        * detection of duplicate chunks.
        */
       png_ptr->num_trans = 0;
-
-      if (info_ptr != NULL)
-         info_ptr->num_trans = 0;
+      info_ptr->num_trans = 0;
 
       png_chunk_benign_error(png_ptr, "tRNS must be after");
    }
 #endif /* READ_tRNS */
 
 #ifdef PNG_READ_hIST_SUPPORTED
-   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_hIST) != 0)
+   if ((info_ptr->valid & PNG_INFO_hIST) != 0)
       png_chunk_benign_error(png_ptr, "hIST must be after");
 #endif /* READ_hIST */
 
 #ifdef PNG_READ_bKGD_SUPPORTED
-   if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_bKGD) != 0)
+   if ((info_ptr->valid & PNG_INFO_bKGD) != 0)
       png_chunk_benign_error(png_ptr, "bKGD must be after");
 #endif /* READ_bKGD */
 }
