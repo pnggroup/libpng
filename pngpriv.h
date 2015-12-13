@@ -2,7 +2,7 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
  * Last changed in libpng 1.5.23 [July 23, 2015]
- * Copyright (c) 1998-2015 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1755,6 +1755,9 @@ PNG_EXTERN void PNG_FILTER_OPTIMIZATIONS(png_structp png_ptr, unsigned int bpp);
 PNG_EXTERN void png_init_filter_functions_neon(png_structp png_ptr,
     unsigned int bpp);
 #endif
+
+PNG_EXTERN png_size_t png_check_keyword(png_structp png_ptr,
+    png_const_charp key, png_charpp new_key);
 
 /* Maintainer: Put new private prototypes here ^ */
 
