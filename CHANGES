@@ -3026,6 +3026,10 @@ version 1.4.19beta01 [December 11, 2015]
   Fixed an out-of-range read in png_check_keyword() (Bug report from
     Qixue Xiao, CVE-2015-8540).
 
+version 1.4.19beta02 [December 13, 2015]
+  Corrected copyright dates in source files.
+  Moved png_check_keyword() from pngwutil.c to pngset.c
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
