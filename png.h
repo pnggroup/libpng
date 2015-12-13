@@ -3067,8 +3067,8 @@ PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr, png_uint_16p hist,
    int num_hist)) PNG_PRIVATE;
 #endif
 
-#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
-    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_pCAL_SUPPORTED) || \
+    defined(PNG_iCCP_SUPPORTED) || defined(PNG_sPLT_SUPPORTED)
 PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
    png_charp key, png_charpp new_key)) PNG_PRIVATE;
 #endif
@@ -3538,9 +3538,6 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
 PNG_EXTERN png_voidp png_calloc PNGARG((png_structp png_ptr,
    png_uint_32 size));
 
-
-PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
-    png_charp key, png_charpp new_key)) PNG_PRIVATE;
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
