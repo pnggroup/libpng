@@ -2,7 +2,7 @@
 /* pngset.c - storage of image information into info struct
  *
  * Last changed in libpng 1.2.54 [November 12, 2015]
- * Copyright (c) 1998-2015 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1255,4 +1255,5 @@ png_set_benign_errors(png_structp png_ptr, int allowed)
 }
 #endif /* PNG_BENIGN_ERRORS_SUPPORTED */
 #endif /* ?PNG_1_0_X */
+
 #endif /* PNG_READ_SUPPORTED || PNG_WRITE_SUPPORTED */
