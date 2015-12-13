@@ -31,7 +31,9 @@ version 1.5.26beta01 [December 11, 2015]
     Qixue Xiao, CVE-2015-8540).
 
 version 1.5.26beta02 [December 13, 2015]
+  Corrected copyright dates in source files.
   Moved png_check_keyword() from pngwutil.c to pngset.c
+  Added keyword checks to pngset.c (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
