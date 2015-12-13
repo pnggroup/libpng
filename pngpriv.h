@@ -902,8 +902,8 @@ PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr,
 #endif
 
 /* Chunks that have keywords */
-#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
-    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_pCAL_SUPPORTED) || \
+    defined(PNG_iCCP_SUPPORTED) || defined(PNG_sPLT_SUPPORTED)
 PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
     png_const_charp key, png_charpp new_key));
 #endif
@@ -1755,9 +1755,6 @@ PNG_EXTERN void PNG_FILTER_OPTIMIZATIONS(png_structp png_ptr, unsigned int bpp);
 PNG_EXTERN void png_init_filter_functions_neon(png_structp png_ptr,
     unsigned int bpp);
 #endif
-
-PNG_EXTERN png_size_t png_check_keyword(png_structp png_ptr,
-    png_const_charp key, png_charpp new_key);
 
 /* Maintainer: Put new private prototypes here ^ */
 
