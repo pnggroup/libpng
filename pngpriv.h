@@ -417,8 +417,8 @@ PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr, png_uint_16p hist,
    int num_hist));
 #endif
 
-#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
-    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_pCAL_SUPPORTED) || \
+    defined(PNG_iCCP_SUPPORTED) || defined(PNG_sPLT_SUPPORTED)
 PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
    png_charp key, png_charpp new_key));
 #endif
@@ -955,9 +955,6 @@ PNG_EXTERN void *png_far_to_near PNGARG((png_structp png_ptr,png_voidp ptr,
 #ifndef png_debug2
 #define png_debug2(l, m, p1, p2)
 #endif
-
-PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
-    png_charp key, png_charpp new_key));
 
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
