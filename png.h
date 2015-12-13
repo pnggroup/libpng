@@ -3538,6 +3538,10 @@ PNG_EXTERN void png_check_IHDR PNGARG((png_structp png_ptr,
 PNG_EXTERN png_voidp png_calloc PNGARG((png_structp png_ptr,
    png_uint_32 size));
 
+
+PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
+    png_charp key, png_charpp new_key)) PNG_PRIVATE;
+
 /* Maintainer: Put new private prototypes here ^ and in libpngpf.3 */
 
 #endif /* PNG_INTERNAL */
