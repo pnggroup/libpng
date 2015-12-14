@@ -285,16 +285,47 @@ randomize(void *pv, size_t size)
    make_random_bytes(random_seed, pv, size);
 }
 
-#define RANDOMIZE(this) randomize(&(this), sizeof (this))
+#define R8(this) randomize(&(this), sizeof (this))
+
+static void r16(png_uint_16p p16, size_t count)
+{
+   size_t i;
+
+   for (i=0; i<count; ++i)
+   {
+      unsigned char b2[2];
+      randomize(b2, sizeof b2);
+      *p16++ = 0xFFFFU & ((b2[1] << 8) + b2[0]);
+   }
+}
+
+#define R16(this)\
+   r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
+
+static void r32(png_uint_32p p32, size_t count)
+{
+   size_t i;
+
+   for (i=0; i<count; ++i)
+   {
+      unsigned char b4[4];
+      randomize(b4, sizeof b4);
+      *p32++ = (b4[3] << 24) + (b4[2] << 16) + (b4[1] << 8) + b4[0];
+   }
+}
+
+#define R32(this)\
+   r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
+
 #endif /* READ || WRITE_tRNS || WRITE_FILTER */
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 static unsigned int
 random_mod(unsigned int max)
 {
-   unsigned int x;
+   png_uint_16 x;
 
-   RANDOMIZE(x);
+   R16(x);
 
    return x % max; /* 0 .. max-1 */
 }
@@ -306,7 +337,7 @@ random_choice(void)
 {
    unsigned char x;
 
-   RANDOMIZE(x);
+   R8(x);
 
    return x & 1;
 }
@@ -3279,12 +3310,14 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
    png_color_16 tRNS;
    const png_uint_16 mask = (png_uint_16)((1U << bit_depth)-1);
 
-   RANDOMIZE(tRNS);
+   R8(tRNS); /* makes unset fields random */
 
    if (colour_type & 2/*RGB*/)
    {
       if (bit_depth == 8)
       {
+         R16(tRNS.red);
+         R16(tRNS.green);
          tRNS.blue = tRNS.red ^ tRNS.green;
          tRNS.red &= mask;
          tRNS.green &= mask;
@@ -3293,13 +3326,17 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
 
       else /* bit_depth == 16 */
       {
+         R16(tRNS.red);
          tRNS.green = (png_uint_16)(tRNS.red * 257);
          tRNS.blue = (png_uint_16)(tRNS.green * 17);
       }
    }
 
    else
+   {
+      R16(tRNS.gray);
       tRNS.gray &= mask;
+   }
 
    png_set_tRNS(pp, pi, NULL, 0, &tRNS);
 }
@@ -3657,10 +3694,7 @@ choose_random_filter(png_structp pp, int start)
    /* Choose filters randomly except that on the very first row ensure that
     * there is at least one previous row filter.
     */
-   int filters;
-
-   RANDOMIZE(filters);
-   filters &= PNG_ALL_FILTERS;
+   int filters = PNG_ALL_FILTERS & random_mod(256U);
 
    /* There may be no filters; skip the setting. */
    if (filters != 0)
@@ -4037,14 +4071,10 @@ make_size_image(png_store* const ps, png_byte const colour_type,
                 * the set so that libpng allocates the row buffer.
                 */
                {
-                  int filters;
+                  int filters = 8 << random_mod(PNG_FILTER_VALUE_LAST);
 
-                  RANDOMIZE(filters);
-                  filters %= PNG_FILTER_VALUE_LAST;
-                  if (filters < 0) filters = -filters;
-                  filters = 8 << filters;
-
-                  if (pass == 0 && y == 0 && filters < PNG_FILTER_UP)
+                  if (pass == 0 && y == 0 &&
+                      (filters < PNG_FILTER_UP || w == 1U))
                      filters |= PNG_FILTER_UP;
 
                   png_set_filter(pp, 0/*method*/, filters);
@@ -7254,7 +7284,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
       png_uint_32 ru;
       double total;
 
-      RANDOMIZE(ru);
+      R32(ru);
       data.green_coefficient = total = (ru & 0xffff) / 65535.;
       ru >>= 16;
       data.red_coefficient = (1 - total) * (ru & 0xffff) / 65535.;
@@ -7843,7 +7873,7 @@ image_transform_png_set_background_set(const image_transform *this,
     * so we need to know what that is!  The background colour is stored in the
     * transform_display.
     */
-   RANDOMIZE(random_bytes);
+   R8(random_bytes);
 
    /* Read the random value, for colour type 3 the background colour is actually
     * expressed as a 24bit rgb, not an index.
@@ -7871,7 +7901,7 @@ image_transform_png_set_background_set(const image_transform *this,
    /* Extract the background colour from this image_pixel, but make sure the
     * unused fields of 'back' are garbage.
     */
-   RANDOMIZE(back);
+   R8(back);
 
    if (colour_type & PNG_COLOR_MASK_COLOR)
    {
@@ -8177,7 +8207,7 @@ image_transform_png_set_filler_set(const image_transform *this,
     * filler.  The 'filler' value has all 32 bits set, but only bit_depth
     * will be used.  At this point we don't know bit_depth.
     */
-   RANDOMIZE(data.filler);
+   R32(data.filler);
    data.flags = random_choice();
 
    png_set_filler(pp, data.filler, data.flags);
@@ -8250,7 +8280,7 @@ image_transform_png_set_add_alpha_set(const image_transform *this,
     * filler.  The 'filler' value has all 32 bits set, but only bit_depth
     * will be used.  At this point we don't know bit_depth.
     */
-   RANDOMIZE(data.filler);
+   R32(data.filler);
    data.flags = random_choice();
 
    png_set_add_alpha(pp, data.filler, data.flags);
