@@ -1,8 +1,8 @@
 
 /* pngset.c - storage of image information into info struct
  *
+ * Last changed in libpng 1.4.19 [December 14, 2015]
  * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
- * Copyright (c) 1998-2015 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -1187,8 +1187,8 @@ png_set_benign_errors(png_structp png_ptr, int allowed)
 }
 #endif /* PNG_BENIGN_ERRORS_SUPPORTED */
 
-#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_pCAL_SUPPORTED) || \
-    defined(PNG_iCCP_SUPPORTED) || defined(PNG_sPLT_SUPPORTED)
+#if defined(PNG_WRITE_TEXT_SUPPORTED) || defined(PNG_WRITE_pCAL_SUPPORTED) || \
+    defined(PNG_WRITE_iCCP_SUPPORTED) || defined(PNG_WRITE_sPLT_SUPPORTED)
 /* Check that the tEXt or zTXt keyword is valid per PNG 1.0 specification,
  * and if invalid, correct the keyword rather than discarding the entire
  * chunk.  The PNG 1.0 specification requires keywords 1-79 characters in
@@ -1316,5 +1316,5 @@ png_check_keyword(png_structp png_ptr, png_charp key, png_charpp new_key)
 
    return (key_len);
 }
-#endif /* TEXT || pCAL) || iCCP || sPLT */
+#endif /* WRITE_TEXT || WRITE_pCAL) || WRITE_iCCP || WRITE_sPLT */
 #endif /* READ || WRITE */

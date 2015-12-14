@@ -1,5 +1,5 @@
 
-Libpng 1.4.19beta02 - December 13, 2015
+Libpng 1.4.19rc01 - December 14, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.19beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.19beta02.tar.gz
+   1.4.19rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.19rc01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1419b02.7z (LZMA-compressed, recommended)
-   lp1419b02.zip
+   lp1419r01.7z (LZMA-compressed, recommended)
+   lp1419r01.zip
 
 Other information:
 
-   1.4.19beta02-README.txt
-   1.4.19beta02-LICENSE.txt
-   libpng-1.4.19beta02-*.asc (armored detached GPG signatures)
+   1.4.19rc01-README.txt
+   1.4.19rc01-LICENSE.txt
+   libpng-1.4.19rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.18):
 
@@ -30,7 +30,7 @@ version 1.4.19beta01 [December 11, 2015]
   Fixed an out-of-range read in png_check_keyword() (Bug report from
     Qixue Xiao, CVE-2015-8540).
 
-version 1.4.19beta02 [December 13, 2015]
+version 1.4.19rc01 [December 14, 2015]
   Corrected copyright dates in source files.
   Moved png_check_keyword() from pngwutil.c to pngset.c
 
