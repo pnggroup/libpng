@@ -5391,8 +5391,16 @@ Version 1.7.0beta73 [December 11, 2015]
   Changed png_struct->options from png_byte to png_uint_32, to hold
     up to 16 2-bit options.
      
-Version 1.7.0beta74 [December 11, 2015]
+Version 1.7.0beta74 [December 14, 2015]
+  Fixed copyright years in source files.
+  Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
+    in the BigEndian tests by not testing it, making the BE code the same 
+    as the LE version.
+  Fixes to pngvalid for various reduced build configurations (eliminate unused
+    statics) and a fix for the case in rgb_to_gray when the digitize option
+    reduces graylo to 0, producing a large error.
 
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)
