@@ -901,13 +901,6 @@ PNG_EXTERN void png_write_hIST PNGARG((png_structp png_ptr,
     png_const_uint_16p hist, int num_hist));
 #endif
 
-/* Chunks that have keywords */
-#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_pCAL_SUPPORTED) || \
-    defined(PNG_iCCP_SUPPORTED) || defined(PNG_sPLT_SUPPORTED)
-PNG_EXTERN png_size_t png_check_keyword PNGARG((png_structp png_ptr,
-    png_const_charp key, png_charpp new_key));
-#endif
-
 #ifdef PNG_WRITE_tEXt_SUPPORTED
 PNG_EXTERN void png_write_tEXt PNGARG((png_structp png_ptr, png_const_charp key,
     png_const_charp text, png_size_t text_len));
