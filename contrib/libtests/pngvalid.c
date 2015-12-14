@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.25 [(PENDING RELEASE)]
+ * Last changed in libpng 1.5.25 [RDATE%]
  * Copyright (c) 2014-2015 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -276,7 +276,8 @@ make_four_random_bytes(png_uint_32* seed, png_bytep bytes)
    make_random_bytes(seed, bytes, 4);
 }
 
-#if defined PNG_READ_SUPPORTED || defined PNG_WRITE_tRNS_SUPPORTED
+#if defined PNG_READ_SUPPORTED || defined PNG_WRITE_tRNS_SUPPORTED ||\
+    defined PNG_WRITE_FILTER_SUPPORTED
 static void
 randomize(void *pv, size_t size)
 {
@@ -285,7 +286,7 @@ randomize(void *pv, size_t size)
 }
 
 #define RANDOMIZE(this) randomize(&(this), sizeof (this))
-#endif /* READ || WRITE_tRNS */
+#endif /* READ || WRITE_tRNS || WRITE_FILTER */
 
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
 static unsigned int
@@ -309,8 +310,8 @@ random_choice(void)
 
    return x & 1;
 }
-#endif
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ_RGB_TO_GRAY || READ_FILLER */
+#endif /* READ_TRANSFORMS */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
  * simply records whether pngvalid did the interlace itself or whether it
@@ -3649,6 +3650,31 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
  * layout details.  See make_size_images below for a way to make images
  * that test odd sizes along with the libpng interlace handling.
  */
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+static void
+choose_random_filter(png_structp pp, int start)
+{
+   /* Choose filters randomly except that on the very first row ensure that
+    * there is at least one previous row filter.
+    */
+   int filters;
+
+   RANDOMIZE(filters);
+   filters &= PNG_ALL_FILTERS;
+
+   /* There may be no filters; skip the setting. */
+   if (filters != 0)
+   {
+      if (start && filters < PNG_FILTER_UP)
+         filters |= PNG_FILTER_UP;
+
+      png_set_filter(pp, 0/*method*/, filters);
+   }
+}
+#else /* !WRITE_FILTER */
+#  define choose_random_filter(pp, start) ((void)0)
+#endif /* !WRITE_FILTER */
+
 static void
 make_transform_image(png_store* const ps, png_byte const colour_type,
     png_byte const bit_depth, unsigned int palette_number,
@@ -3767,6 +3793,7 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
                   }
 #              endif /* do_own_interlace */
 
+               choose_random_filter(pp, pass == 0 && y == 0);
                png_write_row(pp, buffer);
             }
          }
@@ -3943,9 +3970,6 @@ make_size_image(png_store* const ps, png_byte const colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
-#        ifdef PNG_WRITE_FILTER_SUPPORTED
-            int nfilter = PNG_FILTER_VALUE_LAST;
-#        endif
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -4008,15 +4032,23 @@ make_size_image(png_store* const ps, png_byte const colour_type,
                 * does accept a filter number (per the spec) as well as a bit
                 * mask.
                 *
-                * The apparent wackiness of decrementing nfilter rather than
-                * incrementing is so that Paeth gets used in all images bigger
-                * than 1 row - it's the tricky one.
+                * The code now uses filters at random, except that on the first
+                * row of an image it ensures that a previous row filter is in
+                * the set so that libpng allocates the row buffer.
                 */
-               png_set_filter(pp, 0/*method*/,
-                  nfilter >= PNG_FILTER_VALUE_LAST ? PNG_ALL_FILTERS : nfilter);
+               {
+                  int filters;
 
-               if (nfilter-- == 0)
-                  nfilter = PNG_FILTER_VALUE_LAST-1;
+                  RANDOMIZE(filters);
+                  filters %= PNG_FILTER_VALUE_LAST;
+                  if (filters < 0) filters = -filters;
+                  filters = 8 << filters;
+
+                  if (pass == 0 && y == 0 && filters < PNG_FILTER_UP)
+                     filters |= PNG_FILTER_UP;
+
+                  png_set_filter(pp, 0/*method*/, filters);
+               }
 #           endif
 
                png_write_row(pp, row);
@@ -4244,62 +4276,71 @@ make_error(png_store* const ps, png_byte const colour_type,
 #undef exception__env
 
       /* And clear these flags */
-      ps->expect_error = 0;
       ps->expect_warning = 0;
 
-      /* Now write the whole image, just to make sure that the detected, or
-       * undetected, errro has not created problems inside libpng.
-       */
-      if (png_get_rowbytes(pp, pi) !=
-          transform_rowsize(pp, colour_type, bit_depth))
-         png_error(pp, "row size incorrect");
+      if (ps->expect_error)
+         ps->expect_error = 0;
 
       else
       {
-         int npasses = set_write_interlace_handling(pp, interlace_type);
-         int pass;
+         /* Now write the whole image, just to make sure that the detected, or
+          * undetected, errro has not created problems inside libpng.  This
+          * doesn't work if there was a png_error in png_write_info because that
+          * can abort before PLTE was written.
+          */
+         if (png_get_rowbytes(pp, pi) !=
+             transform_rowsize(pp, colour_type, bit_depth))
+            png_error(pp, "row size incorrect");
 
-         if (npasses != npasses_from_interlace_type(pp, interlace_type))
-            png_error(pp, "write: png_set_interlace_handling failed");
-
-         for (pass=0; pass<npasses; ++pass)
+         else
          {
-            png_uint_32 y;
+            int npasses = set_write_interlace_handling(pp, interlace_type);
+            int pass;
 
-            for (y=0; y<h; ++y)
+            if (npasses != npasses_from_interlace_type(pp, interlace_type))
+               png_error(pp, "write: png_set_interlace_handling failed");
+
+            for (pass=0; pass<npasses; ++pass)
             {
-               png_byte buffer[TRANSFORM_ROWMAX];
+               png_uint_32 y;
 
-               transform_row(pp, buffer, colour_type, bit_depth, y);
+               for (y=0; y<h; ++y)
+               {
+                  png_byte buffer[TRANSFORM_ROWMAX];
 
-#              if do_own_interlace
-                  /* If do_own_interlace *and* the image is interlaced we need a
-                   * reduced interlace row; this may be reduced to empty.
-                   */
-                  if (interlace_type == PNG_INTERLACE_ADAM7)
-                  {
-                     /* The row must not be written if it doesn't exist, notice
-                      * that there are two conditions here, either the row isn't
-                      * ever in the pass or the row would be but isn't wide
-                      * enough to contribute any pixels.  In fact the wPass test
-                      * can be used to skip the whole y loop in this case.
+                  transform_row(pp, buffer, colour_type, bit_depth, y);
+
+#                 if do_own_interlace
+                     /* If do_own_interlace *and* the image is interlaced we
+                      * need a reduced interlace row; this may be reduced to
+                      * empty.
                       */
-                     if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
-                         PNG_PASS_COLS(w, pass) > 0)
-                        interlace_row(buffer, buffer,
-                              bit_size(pp, colour_type, bit_depth), w, pass,
-                              0/*data always bigendian*/);
-                     else
-                        continue;
-                  }
-#              endif /* do_own_interlace */
+                     if (interlace_type == PNG_INTERLACE_ADAM7)
+                     {
+                        /* The row must not be written if it doesn't exist,
+                         * notice that there are two conditions here, either the
+                         * row isn't ever in the pass or the row would be but
+                         * isn't wide enough to contribute any pixels.  In fact
+                         * the wPass test can be used to skip the whole y loop
+                         * in this case.
+                         */
+                        if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+                            PNG_PASS_COLS(w, pass) > 0)
+                           interlace_row(buffer, buffer,
+                                 bit_size(pp, colour_type, bit_depth), w, pass,
+                                 0/*data always bigendian*/);
+                        else
+                           continue;
+                     }
+#                 endif /* do_own_interlace */
 
-               png_write_row(pp, buffer);
+                  png_write_row(pp, buffer);
+               }
             }
-         }
-      }
+         } /* image writing */
 
-      png_write_end(pp, pi);
+         png_write_end(pp, pi);
+      }
 
       /* The following deletes the file that was just written. */
       store_write_reset(ps);
