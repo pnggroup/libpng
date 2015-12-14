@@ -5475,6 +5475,10 @@ Version 1.6.21beta03 [December 18, 2015]
 Version 1.6.21rc01 [January 4, 2016]
   In projects/vstudio, combined readme.txt and WARNING into README.txt
 
+Version 1.6.21rc02 [January 6, 2016]
+  Relocated assert() in contrib/tools/pngfix.c, bug found by American
+    Fuzzy Lop, reported by Brian Carpenter.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
