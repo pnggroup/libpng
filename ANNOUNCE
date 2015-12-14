@@ -1,5 +1,5 @@
 
-Libpng 1.2.56beta02 - December 13, 2015
+Libpng 1.2.56rc01 - December 14, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,34 +9,34 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.56beta02.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.56beta02.tar.gz
+   libpng-1.2.56rc01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.56rc01.tar.gz
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.56beta02-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.56beta02-no-config.tar.gz
+   libpng-1.2.56rc01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.56rc01-no-config.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1256b02.zip
-   lp1256b02.7z
+   lp1256r01.zip
+   lp1256r01.7z
 
 Project files
 
-   libpng-1.2.56beta02-project-netware.zip
-   libpng-1.2.56beta02-project-wince.zip
+   libpng-1.2.56rc01-project-netware.zip
+   libpng-1.2.56rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.56beta02-README.txt
-   libpng-1.2.56beta02-KNOWNBUGS.txt
-   libpng-1.2.56beta02-LICENSE.txt
-   libpng-1.2.56beta02-Y2K-compliance.txt
-   libpng-1.2.56beta02-[previous version]-diff.txt
-   libpng-1.2.56beta02-*.asc (armored detached GPG signatures)
+   libpng-1.2.56rc01-README.txt
+   libpng-1.2.56rc01-KNOWNBUGS.txt
+   libpng-1.2.56rc01-LICENSE.txt
+   libpng-1.2.56rc01-Y2K-compliance.txt
+   libpng-1.2.56rc01-[previous version]-diff.txt
+   libpng-1.2.56rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.55):
 
@@ -44,8 +44,9 @@ Version 1.2.56beta01 [December 11, 2015]
   Fixed an out-of-range read in png_check_keyword() (Bug report from
     Qixue Xiao, CVE-2015-8540).
 
-Version 1.2.56rc01 [December 13, 2015]
+Version 1.2.56rc01 [December 14, 2015]
   Corrected copyright dates in source files.
+  Moved png_check_keyword() from pngwutil.c to pngset.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
