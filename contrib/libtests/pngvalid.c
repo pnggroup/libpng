@@ -302,6 +302,8 @@ static void r16(png_uint_16p p16, size_t count)
 #define R16(this)\
    r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
 
+#if defined PNG_READ_RGB_TO_GRAY_SUPPORTED ||\
+    defined PNG_READ_FILLER_SUPPORTED
 static void r32(png_uint_32p p32, size_t count)
 {
    size_t i;
@@ -316,10 +318,12 @@ static void r32(png_uint_32p p32, size_t count)
 
 #define R32(this)\
    r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
+#endif /* READ_FILLER || READ_RGB_TO_GRAY */
 
 #endif /* READ || WRITE_tRNS || WRITE_FILTER */
 
-#ifdef PNG_READ_TRANSFORMS_SUPPORTED
+#if defined PNG_READ_TRANSFORMS_SUPPORTED ||\
+    defined PNG_WRITE_FILTER_SUPPORTED
 static unsigned int
 random_mod(unsigned int max)
 {
@@ -329,6 +333,7 @@ random_mod(unsigned int max)
 
    return x % max; /* 0 .. max-1 */
 }
+#endif /* READ_TRANSFORMS || WRITE_FILTER */
 
 #if (defined PNG_READ_RGB_TO_GRAY_SUPPORTED) ||\
     (defined PNG_READ_FILLER_SUPPORTED)
@@ -342,7 +347,6 @@ random_choice(void)
    return x & 1;
 }
 #endif /* READ_RGB_TO_GRAY || READ_FILLER */
-#endif /* READ_TRANSFORMS */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
  * simply records whether pngvalid did the interlace itself or whether it
@@ -7662,25 +7666,32 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
 
          else
          {
-            err = fabs(grayhi-gray);
+            double err_check = err = fabs(grayhi-gray);
+            /* If graylo got reduced to 0 the errors escalate for low data.gamma
+             * values, so ignore that case when digitizing:
+             */
             if (fabs(gray - graylo) > err)
+            {
                err = fabs(graylo-gray);
+               if (graylo != 0)
+                  err_check = err;
+            }
 
             /* Check that this worked: */
-            if (err > pm->limit)
+            if (err_check > pm->limit)
             {
                size_t pos = 0;
                char buffer[128];
 
                pos = safecat(buffer, sizeof buffer, pos, "rgb_to_gray error ");
-               pos = safecatd(buffer, sizeof buffer, pos, err, 6);
+               pos = safecatd(buffer, sizeof buffer, pos, err_check, 6);
                pos = safecat(buffer, sizeof buffer, pos, " exceeds limit ");
                pos = safecatd(buffer, sizeof buffer, pos, pm->limit, 6);
                png_error(pp, buffer);
             }
          }
       }
-#  else  /* DIGITIZE */
+#  else  /* !DIGITIZE */
       {
          double r = that->redf;
          double re = that->rede;
