@@ -25,9 +25,11 @@ Other information:
 
 Changes since the last public release (1.6.20):
 
-Version 1.6.21beta01 [December 14, 2015]
+Version 1.6.21beta01 [December 11, 2015]
   Fixed syntax "$(command)" in tests/pngstest that some shells other than
     bash could not parse (Bug report by Nelson Beebe). Use `command` instead.
+
+Version 1.6.21beta02 [December 14, 2015]
   Moved png_check_keyword() from pngwutil.c to pngset.c
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
@@ -35,6 +37,8 @@ Version 1.6.21beta01 [December 14, 2015]
   Fixes to pngvalid for various reduced build configurations (eliminate unused
     statics) and a fix for the case in rgb_to_gray when the digitize option
     reduces graylo to 0, producing a large error.
+
+Version 1.6.21beta03 [December 14, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
