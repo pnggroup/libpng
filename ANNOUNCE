@@ -1,4 +1,4 @@
-Libpng 1.6.21beta02 - December 14, 2015
+Libpng 1.6.21beta03 - December 14, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.21beta02.tar.xz (LZMA-compressed, recommended)
-   1.6.21beta02.tar.gz
+   1.6.21beta03.tar.xz (LZMA-compressed, recommended)
+   1.6.21beta03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng16/lp1621b02.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng16/lp1621b02.zip
+   /scratch/glennrp/Libpng16/lp1621b03.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng16/lp1621b03.zip
 
 Other information:
 
-   1.6.21beta02-README.txt
-   1.6.21beta02-LICENSE.txt
-   libpng-1.6.21beta02-*.asc (armored detached GPG signatures)
+   1.6.21beta03-README.txt
+   1.6.21beta03-LICENSE.txt
+   libpng-1.6.21beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.20):
 
