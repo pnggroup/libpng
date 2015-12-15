@@ -116,6 +116,16 @@ typedef png_byte *png_const_bytep;
 #  define png_const_structp png_structp
 #endif
 
+#ifndef RELEASE_BUILD
+   /* RELEASE_BUILD is true for releases and release candidates: */
+#  define RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
+#endif
+#if RELEASE_BUILD
+#   define debugonly(something)
+#else /* !RELEASE_BUILD */
+#   define debugonly(something) something
+#endif /* !RELEASE_BUILD */
+
 #include <float.h>  /* For floating point constants */
 #include <stdlib.h> /* For malloc */
 #include <string.h> /* For memcpy, memset */
@@ -2010,6 +2020,8 @@ typedef struct png_modifier
     * internal check on pngvalid to ensure that the calculated error limits are
     * not ridiculous; without this it is too easy to make a mistake in pngvalid
     * that allows any value through.
+    *
+    * NOTE: this is not checked in release builds.
     */
    double                   limit;    /* limit on error values, normally 4E-3 */
 
@@ -6332,7 +6344,7 @@ transform_range_check(png_const_structp pp, unsigned int r, unsigned int g,
    unsigned int max = (1U<<sample_depth)-1;
    double in_min = ceil((in-err)*max - digitization_error);
    double in_max = floor((in+err)*max + digitization_error);
-   if (err > limit || !(out >= in_min && out <= in_max))
+   if (debugonly(err > limit ||) !(out >= in_min && out <= in_max))
    {
       char message[256];
       size_t pos;
@@ -7349,14 +7361,12 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           * When DIGITIZE is set because a pre-1.7 version of libpng is being
           * tested allow a bigger slack.
           *
-          * NOTE: this magic number was determined by experiment to be about
-          * 1.263.  There's no great merit to the value below, however it only
-          * affects the limit used for checking for internal calculation errors,
-          * not the actual limit imposed by pngvalid on the output errors.
+          * NOTE: this number only affects the internal limit check in pngvalid,
+          * it has no effect on the limits applied to the libpng values.
           */
          that->pm->limit += pow(
 #        if DIGITIZE
-            1.3
+            2.0
 #        else
             1.0
 #        endif
@@ -7518,7 +7528,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
       /* Image now has RGB channels... */
 #  if DIGITIZE
       {
-         const png_modifier *pm = display->pm;
+         png_modifier *pm = display->pm;
          const unsigned int sample_depth = that->sample_depth;
          const unsigned int calc_depth = (pm->assume_16_bit_calculations ? 16 :
             sample_depth);
@@ -7666,29 +7676,26 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
 
          else
          {
-            double err_check = err = fabs(grayhi-gray);
-            /* If graylo got reduced to 0 the errors escalate for low data.gamma
-             * values, so ignore that case when digitizing:
-             */
-            if (fabs(gray - graylo) > err)
-            {
-               err = fabs(graylo-gray);
-               if (graylo != 0)
-                  err_check = err;
-            }
+            err = fabs(grayhi-gray);
 
+            if (fabs(gray - graylo) > err)
+               err = fabs(graylo-gray);
+
+#if !RELEASE_BUILD
             /* Check that this worked: */
-            if (err_check > pm->limit)
+            if (err > pm->limit)
             {
                size_t pos = 0;
                char buffer[128];
 
                pos = safecat(buffer, sizeof buffer, pos, "rgb_to_gray error ");
-               pos = safecatd(buffer, sizeof buffer, pos, err_check, 6);
+               pos = safecatd(buffer, sizeof buffer, pos, err, 6);
                pos = safecat(buffer, sizeof buffer, pos, " exceeds limit ");
                pos = safecatd(buffer, sizeof buffer, pos, pm->limit, 6);
-               png_error(pp, buffer);
+               png_warning(pp, buffer);
+               pm->limit = err;
             }
+#endif /* !RELEASE_BUILD */
          }
       }
 #  else  /* !DIGITIZE */
@@ -7750,7 +7757,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
              * lookups in the calculation and each introduces a quantization
              * error defined by the table size.
              */
-            const png_modifier *pm = display->pm;
+            png_modifier *pm = display->pm;
             double in_qe = (that->sample_depth > 8 ? .5/65535 : .5/255);
             double out_qe = (that->sample_depth > 8 ? .5/65535 :
                (pm->assume_16_bit_calculations ? .5/(1<<display->max_gamma_8) :
@@ -7800,6 +7807,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
             else
                err -= in_qe;
 
+#if !RELEASE_BUILD
             /* Validate that the error is within limits (this has caused
              * problems before, it's much easier to detect them here.)
              */
@@ -7812,8 +7820,10 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
                pos = safecatd(buffer, sizeof buffer, pos, err, 6);
                pos = safecat(buffer, sizeof buffer, pos, " exceeds limit ");
                pos = safecatd(buffer, sizeof buffer, pos, pm->limit, 6);
-               png_error(pp, buffer);
+               png_warning(pp, buffer);
+               pm->limit = err;
             }
+#endif /* !RELEASE_BUILD */
          }
       }
 #  endif /* !DIGITIZE */
@@ -11378,6 +11388,9 @@ int main(int argc, char **argv)
 
       else if (strcmp(*argv, "-w") == 0 ||
                strcmp(*argv, "--strict") == 0)
+         pm.this.treat_warnings_as_errors = 1; /* NOTE: this is the default! */
+
+      else if (strcmp(*argv, "--nostrict") == 0)
          pm.this.treat_warnings_as_errors = 0;
 
       else if (strcmp(*argv, "--speed") == 0)
