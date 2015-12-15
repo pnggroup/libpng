@@ -1,4 +1,4 @@
-Libpng 1.6.21beta03 - December 14, 2015
+Libpng 1.6.21beta03 - December 15, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -38,7 +38,11 @@ Version 1.6.21beta02 [December 14, 2015]
     statics) and a fix for the case in rgb_to_gray when the digitize option
     reduces graylo to 0, producing a large error.
 
-Version 1.6.21beta03 [December 14, 2015]
+Version 1.6.21beta03 [December 15, 2015]
+  Widened the 'limit' check on the internally calculated error limits in
+    the 'DIGITIZE' case (the code used prior to 1.7 for rgb_to_gray error
+    checks) and changed the check to only operate in non-release builds
+   (base build type not RC or RELEASE.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
