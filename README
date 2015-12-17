@@ -1,4 +1,4 @@
-README for libpng version 1.0.65 - December 3, 2015 (shared library 10.0)
+README for libpng version 1.0.66 - December 17, 2015 (shared library 10.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -207,11 +207,11 @@ Files in this distribution:
        makefile.std     =>  Generic UNIX makefile (cc, creates static
                             libpng.a)
        makefile.elf     =>  Linux/ELF gcc makefile symbol versioning,
-                            creates libpng10.so.0.1.0.65)
+                            creates libpng10.so.0.1.0.66)
        makefile.linux   =>  Linux/ELF makefile (gcc, creates
-                            libpng10.so.0.1.0.65)
+                            libpng10.so.0.1.0.66)
        makefile.gcmmx   =>  Linux/ELF makefile (gcc, creates
-                            libpng10.so.0.1.0.65, previously
+                            libpng10.so.0.1.0.66, previously
                             used assembler code tuned for Intel MMX
                             platform)
        makefile.gcc     =>  Generic makefile (gcc, creates static
@@ -236,12 +236,12 @@ Files in this distribution:
        makefile.openbsd =>  OpenBSD makefile
        makefile.sgi     =>  Silicon Graphics IRIX (cc, creates static lib)
        makefile.sggcc   =>  Silicon Graphics
-                            (gcc, creates libpng10.so.0.1.0.65)
+                            (gcc, creates libpng10.so.0.1.0.66)
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng10.so.0.1.0.65)
+                            (gcc, creates libpng10.so.0.1.0.66)
        makefile.so9     =>  Solaris 9 makefile
-                            (gcc, creates libpng10.so.0.1.0.65)
+                            (gcc, creates libpng10.so.0.1.0.66)
        makefile.32sunu  =>  Sun Ultra 32-bit makefile
        makefile.64sunu  =>  Sun Ultra 64-bit makefile
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc

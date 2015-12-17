@@ -2890,13 +2890,24 @@ version 1.2.55beta01 [November 20, 2015]
 version 1.2.55beta02 [November 23, 2015]
   Fixed incorrect implementation of png_set_PLTE() that uses png_ptr
     not info_ptr, that left png_set_PLTE() open to the CVE-2015-8126
-    vulnerability.
+    vulnerability.  Fixes CVE-2015-8472.
 
 version 1.2.55rc01 [November 26, 2015]
   Discontinued distributing tar.bz2 archives.
 
-version 1.2.55 and 1.0.65 [December 3, 2015]
+version 1.2.55 and 1.0.65 [December 6, 2015]
   Discontinued distributing libpng-oldversion-newversion-diff.txt
+
+version 1.2.56beta01 [December 11, 2015]
+  Fixed an out-of-range read in png_check_keyword() (Bug report from
+    Qixue Xiao, CVE-2015-8540).
+
+version 1.2.56rc01 [December 14, 2015]
+  Corrected copyright dates in source files.
+  Moved png_check_keyword() from pngwutil.c to pngset.c
+
+version 1.2.56 [December 17, 2015]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
