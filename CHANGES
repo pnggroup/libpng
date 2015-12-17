@@ -3030,6 +3030,9 @@ version 1.4.19rc01 [December 14, 2015]
   Corrected copyright dates in source files.
   Moved png_check_keyword() from pngwutil.c to pngset.c
 
+version 1.4.19 [December 17, 2015]
+  No changes.
+
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement).
