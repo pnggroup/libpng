@@ -4451,6 +4451,9 @@ version 1.5.26rc01 [December 14, 2015]
   Moved png_check_keyword() from pngwutil.c to pngset.c
   Added keyword checks to pngset.c (John Bowler).
 
+version 1.5.26 [December 17, 2015]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
