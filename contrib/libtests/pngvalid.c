@@ -305,7 +305,7 @@ static void r16(png_uint_16p p16, size_t count)
    {
       unsigned char b2[2];
       randomize(b2, sizeof b2);
-      *p16++ = 0xFFFFU & ((b2[1] << 8) + b2[0]);
+      *p16++ = png_get_uint_16(b2);
    }
 }
 
@@ -322,7 +322,7 @@ static void r32(png_uint_32p p32, size_t count)
    {
       unsigned char b4[4];
       randomize(b4, sizeof b4);
-      *p32++ = (b4[3] << 24) + (b4[2] << 16) + (b4[1] << 8) + b4[0];
+      *p32++ = png_get_uint_32(b4);
    }
 }
 
