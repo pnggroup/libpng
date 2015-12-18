@@ -1111,6 +1111,16 @@ Version 1.7.0beta74 [December 18, 2015]
     David Drysdale as a result of reports from UBSAN in clang 3.8).
   This changes pngvalid to use BE random numbers; this used to produce
     errors but these should not be fixed as a result of the previous changes.
+  Implemented a prototype of filter selection. This rewrites the code
+    used previously in the heuristics to make it easier to debug and
+    introduces the 'methodical' method, which is intended to be an
+    expensive but reliable way of reducing image size. The code in this
+    commit does not work; the 'methodical' test for success does not take
+    account of data buffered inside zlib and, anyway, it changes the
+    results of pngtest so that the test fails.  This is just a checkpoint
+    of the current state
+  Disabled 'methodical' filter selection code. It is incomplete; it works
+    but does not do anything useful except, maybe, on really enormous images.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
