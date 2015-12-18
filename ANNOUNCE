@@ -27,7 +27,23 @@ Other information:
 Changes since the last public release (1.5.26):
 
 version 1.5.27beta01 [December 18, 2015]
-
+  Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
+    in the BigEndian tests by not testing it, making the BE code the same 
+    as the LE version.
+  Fixes to pngvalid for various reduced build configurations (eliminate unused
+    statics) and a fix for the case in rgb_to_gray when the digitize option
+    reduces graylo to 0, producing a large error.
+  Widened the 'limit' check on the internally calculated error limits in
+    the 'DIGITIZE' case (the code used prior to 1.7 for rgb_to_gray error
+    checks) and changed the check to only operate in non-release builds
+   (base build type not RC or RELEASE.)
+  Fixed undefined behavior in pngvalid.c, undefined because
+    (png_byte) << shift is undefined if it changes the signed bit
+    (because png_byte is promoted to int). The libpng exported functions
+    png_get_uint_32 and png_get_uint_16 handle this. (Bug reported by
+    David Drysdale as a result of reports from UBSAN in clang 3.8).
+  This changes pngvalid to use BE random numbers; this used to produce
+    errors but these should not be fixed as a result of the previous changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
