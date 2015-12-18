@@ -87,13 +87,17 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
    if (size > 0 && size <= PNG_SIZE_MAX)
 #endif
    {
+      png_voidp result;
+
 #ifdef PNG_USER_MEM_SUPPORTED
       if (png_ptr != NULL && png_ptr->malloc_fn != NULL)
-         return png_ptr->malloc_fn(png_constcast(png_structrp,png_ptr), size);
+         result = png_ptr->malloc_fn(png_constcast(png_structrp,png_ptr), size);
 
       else
 #endif
-         return malloc((size_t)size); /* checked for truncation above */
+         result = malloc((size_t)size); /* checked for truncation above */
+
+      return result;
    }
 
    else

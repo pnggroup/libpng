@@ -315,13 +315,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 
             if (png_ptr != NULL)
             {
-               /* png_ptr->zstream holds a back-pointer to the png_struct, so
-                * this can only be done now:
-                */
-               create_struct.zstream.zalloc = png_zalloc;
-               create_struct.zstream.zfree = png_zfree;
-               create_struct.zstream.opaque = png_ptr;
-
 #              ifdef PNG_SETJMP_SUPPORTED
                   /* Eliminate the local error handling: */
                   create_struct.jmp_buf_ptr = NULL;

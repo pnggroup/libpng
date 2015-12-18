@@ -325,6 +325,11 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 #        endif
 #     endif
 
+      /* Initialize the alloc/free callbacks every time: */
+      png_ptr->zstream.zalloc = png_zalloc;
+      png_ptr->zstream.zfree = png_zfree;
+      png_ptr->zstream.opaque = png_ptr;
+
       /* Set this for safety, just in case the previous owner left pointers to
        * memory allocations.
        */

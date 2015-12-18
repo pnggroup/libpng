@@ -63,13 +63,10 @@
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
-/* The type of a compression buffer list used by the write code. */
-typedef struct png_compression_buffer *png_compression_bufferp;
-#endif
-
-#ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-/* Type of the data cache used when selecting filters methodicially */
-typedef struct png_filter_select *png_filter_selectp;
+/* The write compression control (allocated on demand).
+ * TODO: use this for the read state too.
+ */
+typedef struct png_zlib_state *png_zlib_statep;
 #endif
 
 /* Colorspace support; structures used in png_struct, png_info and in internal
@@ -512,9 +509,6 @@ struct png_struct_def
    unsigned int row_input_pixel_depth  :8;
    unsigned int row_output_pixel_depth :8;
    unsigned int row_max_pixel_depth    :8;
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-   unsigned int filter_mask    :8; /* mask of filters to consider on write */
-#endif /* WRITE_FILTER */
 
 #  define PNG_RF_BITS 9 /* Number of bits required for the row format (below) */
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
@@ -585,28 +579,6 @@ struct png_struct_def
    uInt IDAT_size; /* limit on IDAT read and write IDAT size */
 #endif /* SEQUENTIAL_READ || WRITE */
 
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-   int zlib_text_level;       /* holds zlib compression level */
-   int zlib_text_method;      /* holds zlib compression method */
-   int zlib_text_window_bits; /* holds zlib compression window bits */
-   int zlib_text_mem_level;   /* holds zlib compression memory level */
-   int zlib_text_strategy;    /* holds zlib compression strategy */
-#endif
-
-#ifdef PNG_WRITE_SUPPORTED
-   int zlib_level;            /* holds zlib compression level */
-   int zlib_method;           /* holds zlib compression method */
-   int zlib_window_bits;      /* holds zlib compression window bits */
-   int zlib_mem_level;        /* holds zlib compression memory level */
-   int zlib_strategy;         /* holds zlib compression strategy */
-
-   int zlib_set_level;        /* Actual values set into the zstream on write */
-   int zlib_set_method;
-   int zlib_set_window_bits;
-   int zlib_set_mem_level;
-   int zlib_set_strategy;
-#endif /* WRITE */
-
    /* ERROR HANDLING */
 #ifdef PNG_SETJMP_SUPPORTED
    jmp_buf        *jmp_buf_ptr;   /* passed to longjmp_fn */
@@ -649,8 +621,6 @@ struct png_struct_def
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
    png_flush_ptr output_flush_fn; /* Function for flushing output */
-   png_uint_32   flush_dist; /* how many rows apart to flush, 0 - no flush */
-   png_uint_32   flush_rows; /* number of rows written since last flush */
 #endif
 
 #endif /* WRITE */
@@ -749,19 +719,12 @@ struct png_struct_def
     * zlib expects a 'zstream' as the fundamental control structure, it allows
     * all the parameters to be passed as one pointer.
     */
-   z_stream     zstream;       /* decompression structure */
-   png_uint_32  zowner;        /* ID (chunk type) of zstream owner, 0 if none */
+   png_uint_32     zowner;       /* ID (chunk type) of zlib owner, 0 if none */
 #  ifdef PNG_WRITE_SUPPORTED
-   png_compression_bufferp  zbuffer_list;  /* Created on demand during write */
-   png_compression_bufferp *zbuffer_end;   /* 'next' field of current buffer */
-   png_uint_32              zbuffer_len;   /* Length of data in list */
-   unsigned int             zbuffer_start; /* Bytes written from start */
-   unsigned int             zbuffer_filters;/*Filters for this row */
-#     ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-         png_filter_selectp zbuffer_select;
-#     endif /* SELECT_FILTER_METHODICALLY */
+   png_zlib_statep zlib_state;   /* State of zlib compression */
 #  endif /* WRITE */
 #  ifdef PNG_READ_SUPPORTED
+   z_stream     zstream;         /* decompression structure */
    unsigned int zstream_ended:1; /* no more zlib output available [read] */
    unsigned int zstream_error:1; /* zlib error message has been output [read] */
 #  endif /* READ */
@@ -779,6 +742,8 @@ struct png_struct_def
    /* SCRATCH buffers, used when control returns to the application or a read
     * loop.
     */
+#  ifdef PNG_READ_SUPPORTED
    png_byte scratch[PNG_ROW_BUFFER_SIZE+16U];
+#  endif /* READ */
 };
 #endif /* PNGSTRUCT_H */

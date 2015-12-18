@@ -620,7 +620,7 @@
  * TODO: change to bit fields.
  */
 #define PNG_FLAG_LIBRARY_MISMATCH         0x001U
-#define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x002U
+/*#define PNG_FLAG_ZLIB_CUSTOM_STRATEGY   0x002U NO LONGER USED */
 #define PNG_FLAG_CRC_ANCILLARY_USE        0x004U
 #define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x008U
 #define PNG_FLAG_CRC_CRITICAL_USE         0x010U
@@ -1225,7 +1225,7 @@ PNG_INTERNAL_FUNCTION(void, png_write_filter_row, (png_structrp png_ptr,
    PNG_EMPTY);
 
 /* Release memory used by the deflate mechanism */
-PNG_INTERNAL_FUNCTION(void, png_deflate_destroy, (png_structrp png_ptr),
+PNG_INTERNAL_FUNCTION(void, png_deflate_destroy, (png_structp png_ptr),
    PNG_EMPTY);
 
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
