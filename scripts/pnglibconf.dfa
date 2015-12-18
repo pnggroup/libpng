@@ -942,8 +942,7 @@ option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 #  See png.h for more description of these options.
 option WRITE_FILTER requires WRITE
 option SELECT_FILTER_HEURISTICALLY requires WRITE_FILTER enables SET_OPTION
-option SELECT_FILTER_METHODICALLY requires WRITE_FILTER enables SET_OPTION,
-   disabled
+option SELECT_FILTER_METHODICALLY requires WRITE_FILTER enables SET_OPTION
 
 # added at libpng-1.5.4
 
