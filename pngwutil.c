@@ -2160,6 +2160,12 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
       return;
    }
 
+   /* Duplicate tIME chunks are invalid; this works round a bug in png_write_png
+    * where it would write the tIME chunk once before and once after the IDAT.
+    */
+   if (png_ptr->wrote_tIME)
+      return;
+
    png_save_uint_16(buf, mod_time->year);
    buf[2] = mod_time->month;
    buf[3] = mod_time->day;
@@ -2168,6 +2174,7 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
    buf[6] = mod_time->second;
 
    png_write_complete_chunk(png_ptr, png_tIME, buf, (png_size_t)7);
+   png_ptr->wrote_tIME = 1U;
 }
 #endif
 
