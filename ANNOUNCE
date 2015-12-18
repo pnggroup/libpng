@@ -1,4 +1,4 @@
-Libpng 1.6.21beta03 - December 15, 2015
+Libpng 1.6.21beta03 - December 18, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -38,11 +38,18 @@ Version 1.6.21beta02 [December 14, 2015]
     statics) and a fix for the case in rgb_to_gray when the digitize option
     reduces graylo to 0, producing a large error.
 
-Version 1.6.21beta03 [December 15, 2015]
+Version 1.6.21beta03 [December 18, 2015]
   Widened the 'limit' check on the internally calculated error limits in
     the 'DIGITIZE' case (the code used prior to 1.7 for rgb_to_gray error
     checks) and changed the check to only operate in non-release builds
    (base build type not RC or RELEASE.)
+  Fixed undefined behavior in pngvalid.c, undefined because
+    (png_byte) << shift is undefined if it changes the signed bit
+    (because png_byte is promoted to int). The libpng exported functions
+    png_get_uint_32 and png_get_uint_16 handle this. (Bug reported by
+    David Drysdale as a result of reports from UBSAN in clang 3.8).
+  This changes pngvalid to use BE random numbers; this used to produce
+    errors but these should not be fixed as a result of the previous changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
