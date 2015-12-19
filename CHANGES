@@ -5423,6 +5423,8 @@ Version 1.7.0beta74 [December 19, 2015]
   Added .travis.yml configuration file to control Travis continuous
     integration testing (David Drysdale).
 
+Version 1.7.0beta75 [December 19, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
