@@ -5424,6 +5424,14 @@ Version 1.7.0beta74 [December 19, 2015]
     integration testing (David Drysdale).
 
 Version 1.7.0beta75 [December 19, 2015]
+  Fixed duplicate tIME chunk from png_write_png.
+  Added an example program, pngcp.c, that illustrates the problem when
+    used to copy pngtest.png (the result is an invalid PNG because the
+    tIME chunk is duplicated.)
+  Re-enabled 'methodical' filter selection code.
+  Added an accurate 'methodical' measure.
+  Fixed incorrect references to 'pngimage' in pngcp.
+  Fixed incorrect debug macro in release builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
