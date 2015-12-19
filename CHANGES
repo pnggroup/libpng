@@ -5391,7 +5391,7 @@ Version 1.7.0beta73 [December 11, 2015]
   Changed png_struct->options from png_byte to png_uint_32, to hold
     up to 16 2-bit options.
      
-Version 1.7.0beta74 [December 18, 2015]
+Version 1.7.0beta74 [December 19, 2015]
   Fixed copyright years in source files.
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
@@ -5420,6 +5420,8 @@ Version 1.7.0beta74 [December 18, 2015]
     of the current state
   Disabled 'methodical' filter selection code. It is incomplete; it works
     but does not do anything useful except, maybe, on really enormous images.
+  Added .travis.yml configuration file to control Travis continuous
+    integration testing (David Drysdale).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
