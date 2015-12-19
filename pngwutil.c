@@ -470,7 +470,7 @@ png_zlib_compress_init(png_structrp png_ptr, png_zlib_compressp pz)
 #define png_ptr png_voidcast(png_const_structrp, pz->zs.opaque)
 
 #if PNG_RELEASE_BUILD
-#  define png_zlib_compress_vaidate(pz) ((void)0)
+#  define png_zlib_compress_validate(pz, in_use) ((void)0)
 #else /* !RELEASE_BUILD */
 static void
 png_zlib_compress_validate(png_zlib_compressp pz, int in_use)
