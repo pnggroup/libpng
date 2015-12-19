@@ -163,7 +163,7 @@ get_dp(png_structp pp)
 
    if (dp == NULL)
    {
-      fprintf(stderr, "pngimage: internal error (no display)\n");
+      fprintf(stderr, "pngcp: internal error (no display)\n");
       exit(99); /* prevents a crash */
    }
 
@@ -196,16 +196,16 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
       {
          case INFORMATION:    lp = "information"; break;
          case LIBPNG_WARNING: lp = "warning(libpng)"; break;
-         case APP_WARNING:    lp = "warning(pngimage)"; break;
+         case APP_WARNING:    lp = "warning(pngcp)"; break;
          case APP_FAIL:       lp = "error(continuable)"; break;
          case LIBPNG_ERROR:   lp = "error(libpng)"; break;
          case LIBPNG_BUG:     lp = "bug(libpng)"; break;
-         case APP_ERROR:      lp = "error(pngimage)"; break;
+         case APP_ERROR:      lp = "error(pngcp)"; break;
          case USER_ERROR:     lp = "error(user)"; break;
 
          case INTERNAL_ERROR: /* anything unexpected is an internal error: */
          case VERBOSE: case WARNINGS: case ERRORS: case QUIET:
-         default:             lp = "bug(pngimage)"; break;
+         default:             lp = "bug(pngcp)"; break;
       }
 
       fprintf(stderr, "%s: %s: %s",
@@ -461,7 +461,7 @@ main(const int argc, const char * const * const argv)
 
       else if (name[0] == '-' && name[1] == '-')
       {
-         fprintf(stderr, "pngimage: %s: unknown option\n", name);
+         fprintf(stderr, "pngcp: %s: unknown option\n", name);
          return 99;
       }
 
@@ -504,7 +504,7 @@ main(const int argc, const char * const * const argv)
             {
                int j;
 
-               printf("%s: pngimage", pass ? "PASS" : "FAIL");
+               printf("%s: pngcp", pass ? "PASS" : "FAIL");
 
                for (j=1; j<option_end; ++j) if (j != ilog)
                   printf(" %s", argv[j]);

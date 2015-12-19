@@ -469,6 +469,56 @@ png_zlib_compress_init(png_structrp png_ptr, png_zlib_compressp pz)
  */
 #define png_ptr png_voidcast(png_const_structrp, pz->zs.opaque)
 
+#if PNG_RELEASE_BUILD
+#  define png_zlib_compress_vaidate(pz) ((void)0)
+#else /* !RELEASE_BUILD */
+static void
+png_zlib_compress_validate(png_zlib_compressp pz, int in_use)
+{
+   const uInt o_size = sizeof pz->list->output;
+
+   affirm(pz->end != NULL && (in_use || (pz->zs.next_in == NULL &&
+               pz->zs.avail_in == 0U && *pz->end == NULL)));
+
+   if (pz->overflow == 0U && pz->len == 0U && pz->start == 0U) /* empty */
+   {
+      affirm((pz->end == &pz->list->next && pz->zs.next_out == pz->list->output
+               && pz->zs.avail_out == o_size) ||
+             (pz->end == &pz->list && pz->zs.next_out == NULL
+               && pz->zs.avail_out == 0U));
+   }
+
+   else /* not empty */
+   {
+      png_compression_bufferp *ep = &pz->list, list;
+      png_uint_32 o, l;
+
+      affirm(*ep != NULL && pz->zs.next_out != NULL);
+
+      /* Check the list length: */
+      o = pz->overflow;
+      l = pz->len;
+      affirm((l & 0x80000000U) == 0U && (o & 0x80000000U) == 0U);
+
+      do
+      {
+         list = *ep;
+         l -= o_size;
+         if (l & 0x80000000U) --o, l &= 0x7FFFFFFFU;
+         ep = &list->next;
+      }
+      while (ep != pz->end);
+
+      l += pz->start;
+      l += pz->zs.avail_out;
+      if (l & 0x80000000U) ++o, l &= 0x7FFFFFFFU;
+
+      affirm(o == 0U && l == 0U && pz->zs.next_out >= list->output &&
+             pz->zs.next_out + pz->zs.avail_out == list->output + o_size);
+   }
+}
+#endif /* !RELEASE_BUILD */
+
 /* Destroy one zlib compress structure. */
 static void
 png_zlib_compress_destroy(png_zlib_compressp pz, int check)
@@ -479,7 +529,12 @@ png_zlib_compress_destroy(png_zlib_compressp pz, int check)
    if (png_ptr != NULL)
    {
       if (pz->zs.state != NULL)
+      {
+         if (check)
+            png_zlib_compress_validate(pz, 0/*in_use*/);
+
          png_deflateEnd(png_ptr, &pz->zs, check);
+      }
 
       pz->end = &pz->list; /* safety */
       png_free_compression_buffer(png_ptr, &pz->list);
@@ -493,6 +548,8 @@ static uInt
 png_zlib_compress_avail_out(png_zlib_compressp pz)
 {
    uInt avail_out = pz->zs.avail_out;
+
+   png_zlib_compress_validate(pz, 1/*in_use*/);
 
    if (avail_out == 0U)
    {
@@ -2257,6 +2314,7 @@ png_write_IDAT(png_structrp png_ptr, int flush)
     * pointer is NULL means that the end of the list can be easily detected.
     */
    affirm(ps != NULL && ps->s.end != NULL && *ps->s.end == NULL);
+   png_zlib_compress_validate(&png_ptr->zlib_state->s, 0/*in_use*/);
 
    /* Write IDAT chunks while either 'flush' is true or there are at
     * least png_ptr->IDAT_size bytes available to be written.
@@ -2277,7 +2335,7 @@ png_write_IDAT(png_structrp png_ptr, int flush)
             if (!flush)
                return;
 
-            if (avail == 0)
+            if (avail == 0U)
                break;
 
             len = avail;
@@ -2309,8 +2367,9 @@ png_write_IDAT(png_structrp png_ptr, int flush)
          }
 
          else /* not end of list */
-            debug(ps->s.zs.next_out < next->output ||
-                  ps->s.zs.next_out > next->output + sizeof next->output);
+            debug((ps->s.zs.next_out < next->output ||
+                   ps->s.zs.next_out > next->output + sizeof next->output) &&
+                  (ps->s.overflow > 0 || ps->s.len >= sizeof next->output));
 
          /* First, if this is the very first IDAT (PNG_HAVE_IDAT not set)
           * optimize the CINFO field:
@@ -2375,6 +2434,7 @@ png_write_IDAT(png_structrp png_ptr, int flush)
             affirm(ps->s.overflow > 0U);
             --ps->s.overflow;
             ps->s.len += 0x80000000U - written;
+            UNTESTED
          }
       }
       while (len > 0U);
@@ -2424,6 +2484,7 @@ png_compress_IDAT_data(png_const_structrp png_ptr, png_zlib_statep ps,
             (ret == Z_STREAM_END) == (flush == Z_FINISH));
       pz->zs.next_in = NULL;
       pz->zs.avail_in = 0U; /* safety */
+      png_zlib_compress_validate(pz, 0/*in_use*/);
 
       return ret;
    }
@@ -2983,9 +3044,10 @@ png_zlib_filter_revert(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
    png_zlib_compressp pz = &ps->filter[i];
 
    affirm(pz->zs.opaque != NULL);
+   png_zlib_compress_validate(pz, 0/*in_use*/);
 
    /* First merge the buffer lists. */
-   if (pz->overflow || pz->len > 0U)
+   if (pz->overflow > 0U || pz->len > 0U)
    {
       affirm(pz->list != NULL);
       debug(ps->s.end != NULL && *ps->s.end == NULL);
@@ -2995,8 +3057,9 @@ png_zlib_filter_revert(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
        * the main z_stream, if pz->zs.next_out still points into this buffer the
        * pointer must be updated to point to the old buffer.
        */
-      if (pz->start > 0U)
+      if (ps->s.zs.avail_out > 0U)
       {
+         affirm(ps->s.zs.avail_out + pz->start == sizeof ps->s.list->output);
          /* Copy everything after pz->start into the old buffer. */
          memcpy(ps->s.zs.next_out, pz->list->output + pz->start,
                ps->s.zs.avail_out);
@@ -3022,6 +3085,8 @@ png_zlib_filter_revert(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
          {
             debug(pz->overflow == 0U &&
                   pz->len + pz->start < (sizeof pz->list->output) &&
+                  pz->zs.next_out + pz->zs.avail_out ==
+                     pz->list->output + (sizeof pz->list->output) &&
                   ps->s.zs.avail_out > pz->zs.avail_out);
             pz->zs.next_out = ps->s.zs.next_out + ps->s.zs.avail_out -
                pz->zs.avail_out;
@@ -3030,6 +3095,8 @@ png_zlib_filter_revert(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
 
       else
       {
+         affirm(pz->start == 0U);
+
          /* Nothing to copy, the whole new list is appended to the existing one.
           */
          *ps->s.end = pz->list;
@@ -3059,11 +3126,11 @@ png_zlib_filter_revert(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
    {
       z_stream zs = ps->s.zs;
 
+      ps->s.zs = pz->zs;
+      png_zlib_compress_validate(&ps->s, 0/*in_use*/);
       zs.next_in = zs.next_out = NULL;
       zs.avail_in = zs.avail_out = 0U;
       zs.msg = PNGZ_MSG_CAST("invalid");
-
-      ps->s.zs = pz->zs;
       pz->zs = zs;
    }
 }
@@ -3137,6 +3204,113 @@ select_filter_methodically_init(png_structrp png_ptr,
    }
 }
 
+static int
+select_filter_methodically_better(png_structrp png_ptr, png_zlib_compressp pz,
+      png_uint_32p op/*high 32 bits*/, png_uint_32p lp/*low 31 bits*/,
+      Bytef *scratch_out, uInt avail_out, int flush)
+   /* Called at the end of a row for each filter being tested to work out if
+    * this filter is apparently producing better results than {*op,*lp}, which
+    * is preset to a number larger than any possible 63-bit value and then set,
+    * here, as required to {overflow,len} from a selected filter.
+    */
+{
+   /* The pre-check here is that the data already produced by the compression
+    * engine does not exceed the best count found so far:
+    */
+   png_uint_32 o = pz->overflow, l = pz->len;
+
+   png_zlib_compress_validate(pz, 0/*in_use*/);
+
+   if (o < *op || (o == *op && l < *lp))
+   {
+      /* But if the stream hasn't been flushed this proves nothing; test the
+       * pending output by using an appropriate flush:
+       */
+      if (flush == Z_NO_FLUSH)
+      {
+         int ret;
+         z_stream zs;
+
+         ret = deflateCopy(&zs, &pz->zs);
+
+         if (ret == Z_OK)
+         {
+            zs.next_in = NULL;
+            zs.avail_in = 0U;
+
+            /* Extract all the output from zlib by doing dummy deflates.  Note
+             * that all the flush possibilites give approximately the same
+             * result but PARTIAL, SYNC and FULL seem to be mildly better
+             * probably because they avoid the rounding and block overhead.
+             *
+             *    Z_PARTIAL_FLUSH 1
+             *    Z_SYNC_FLUSH    2
+             *    Z_FULL_FLUSH    3
+             *    Z_FINISH        4
+             *    Z_BLOCK         5
+             */
+            flush = Z_PARTIAL_FLUSH;
+
+            do
+            {
+               if (l & 0x80000000U)
+                  ++o, l &= 0x7FFFFFFFU;
+
+               zs.next_out = scratch_out;
+               zs.avail_out = avail_out;
+               l += avail_out;
+
+               ret = deflate(&zs, flush);
+            } while (ret == Z_OK && zs.avail_out == 0U);
+
+            if (ret == (flush == Z_FINISH ? Z_STREAM_END : Z_OK))
+            {
+               /* This cannot underflow because the check above is performed
+                * before adding 'avail_out' to l:
+                */
+               l -= zs.avail_out;
+               (void)deflateEnd(&zs);
+               png_zlib_compress_validate(pz, 0/*in_use*/);
+
+               if (l & 0x80000000U)
+                  ++o, l &= 0x7FFFFFFFU;
+
+               if (o < *op || (o == *op && l < *lp))
+               {
+                  *op = o;
+                  *lp = l;
+                  return 1;
+               }
+
+               /* No errors but the result was longer (this can't be the first
+                * filter.)
+                */
+               return 0;
+            }
+
+            else /* problem in deflate */
+               (void)deflateEnd(&zs);
+         }
+
+         /* We arrive here if there was an error somewhere inside zlib. */
+         png_zstream_error(&zs, ret);
+         png_warning(png_ptr, zs.msg);
+      }
+
+      else /* flush already performed */
+      {
+         *op = o;
+         *lp = l;
+         return 1;
+      }
+   }
+
+   /* This is the failure case, however if this is the first filter to be tested
+    * return success anyway, without resetting {op,lp}:
+    */
+   return *op == 0xFFFFFFFFU && *lp == 0xFFFFFFFFU;
+}
+
 static void
 select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
       png_bytep prev_pixels, png_const_bytep unfiltered_row,
@@ -3167,8 +3341,7 @@ select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
          {
             if (png_zlib_filter_compress(png_ptr, ps, filter,
                 filter == PNG_FILTER_VALUE_NONE ?
-                  unfiltered_row : test_buffers[filter-1],
-                row_bytes, flush))
+                  unfiltered_row : test_buffers[filter-1], row_bytes, flush))
                ok_filter = filter;
 
             else /* remove this filter from the test list: */
@@ -3188,15 +3361,10 @@ select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
          ok_filter = PNG_FILTER_VALUE_LAST;
 
          for (filter=0U; filter < PNG_FILTER_VALUE_LAST; ++filter)
-            if ((filters_to_try & PNG_FILTER_MASK(filter)) != 0U)
-               if (ps->filter[filter].overflow < o ||
-                   (ps->filter[filter].overflow == o &&
-                    ps->filter[filter].len < l))
-               {
-                  ok_filter = filter;
-                  o = ps->filter[filter].overflow;
-                  l = ps->filter[filter].len;
-               }
+            if ((filters_to_try & PNG_FILTER_MASK(filter)) != 0U &&
+                select_filter_methodically_better(png_ptr, &ps->filter[filter],
+                   &o, &l, test_buffers[0], sizeof test_buffers, flush))
+               ok_filter = filter;
       }
 
       /* Keep going if there is more than one filter left, otherwise, if there
