@@ -1,0 +1,99 @@
+language: c
+sudo: false
+cache:
+    directories:
+        - $HOME/.cache/pip
+        - $HOME/deps
+matrix:
+    include:
+        - os: linux
+          compiler: gcc
+          env: BUILD_TYPE=normal
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=normal
+        - os: linux
+          compiler: gcc
+          env: BUILD_TYPE=coverage
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=ubsan
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=asan
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=lsan
+        - os: linux
+          compiler: clang
+          env: BUILD_TYPE=msan
+        - os: osx
+          compiler: gcc
+          env: BUILD_TYPE=normal
+        - os: osx
+          compiler: clang
+          env: BUILD_TYPE=normal
+
+install:
+    - pip install --user 'requests[security]'
+    - pip install --user cpp-coveralls
+    - |
+        mkdir -p deps
+        pushd deps
+        export PREFIXDIR=`pwd`
+        if [ ! -f "libtool-2.4.6.tar.xz" ]; then
+             wget http://ftpmirror.gnu.org/libtool/libtool-2.4.6.tar.xz
+        fi
+        if [ ! -f "automake-1.15.tar.xz" ]; then
+             wget http://ftp.gnu.org/gnu/automake/automake-1.15.tar.xz
+        fi
+        if [ ! -d "libtool-2.4.6" ]; then
+             tar xf libtool-2.4.6.tar.xz
+             pushd libtool-2.4.6/
+             ./configure --prefix=$PREFIXDIR
+             make && make install
+             popd
+             cp $PREFIXDIR/bin/libtool $PREFIXDIR/bin/glibtool
+             cp $PREFIXDIR/bin/libtoolize $PREFIXDIR/bin/glibtoolize
+        fi
+        if [ ! -d "automake-1.15" ]; then
+             tar xf automake-1.15.tar.xz
+             pushd automake-1.15/
+             ./configure --prefix=$PREFIXDIR
+             make && make install
+             popd
+        fi
+        export PATH="$PREFIXDIR/bin:$PATH"
+        popd
+before_script:
+    - |
+        if [ "$BUILD_TYPE" = "coverage" ]; then
+             export CFLAGS="-fprofile-arcs -ftest-coverage"
+             export LDFLAGS="-fprofile-arcs -ftest-coverage"
+        fi
+    - |
+         if [ "$BUILD_TYPE" = "asan" ]; then
+             export CFLAGS=-fsanitize=address
+             export LDFLAGS=-fsanitize=address
+         fi
+    - |
+         if [ "$BUILD_TYPE" = "lsan" ]; then
+             export CFLAGS=-fsanitize=leak
+             export LDFLAGS=-fsanitize=leak
+         fi
+    - |
+         if [ "$BUILD_TYPE" = "msan" ]; then
+             export CFLAGS=-fsanitize=memory
+             export LDFLAGS=-fsanitize=memory
+         fi
+    - |
+         if [ "$BUILD_TYPE" = "ubsan" ]; then
+             export CFLAGS="-fsanitize=undefined -fno-sanitize-recover"
+             export LDFLAGS="-fsanitize=undefined"
+         fi
+script:
+    - ./autogen.sh && ./configure && make && make check
+    - |
+          if [ "$BUILD_TYPE" = "coverage" ]; then
+              cpp-coveralls --gcov-options '\-lp'
+          fi
