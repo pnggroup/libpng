@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta75 - December 21, 2015
+Libpng 1.7.0beta76 - December 25, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta75.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta75.tar.gz
+   1.7.0beta76.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta76.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b75.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b75.zip
+   /scratch/glennrp/Libpng17/lp170b76.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b76.zip
 
 Other information:
 
-   1.7.0beta75-README.txt
-   1.7.0beta75-LICENSE.txt
-   libpng-1.7.0beta75-*.asc (armored detached GPG signatures)
+   1.7.0beta76-README.txt
+   1.7.0beta76-LICENSE.txt
+   libpng-1.7.0beta76-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1138,6 +1138,8 @@ Version 1.7.0beta75 [December 21, 2015]
     with an error about member access within null pointer to
     struct; put the check that relies on pz->list being non-NULL
     second (David Drysdale).
+
+Version 1.7.0beta76 [December 25, 2015]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

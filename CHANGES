@@ -5438,6 +5438,8 @@ Version 1.7.0beta75 [December 21, 2015]
     struct; put the check that relies on pz->list being non-NULL
     second (David Drysdale).
 
+Version 1.7.0beta75 [December 25, 2015]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
