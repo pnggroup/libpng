@@ -1,9 +1,9 @@
 
 VisualStudio instructions
 
-libpng version 1.7.0beta76 - December 25, 2015
+libpng version 1.7.0beta76 - December 28, 2015
 
-Copyright (c) 1998-2010 Glenn Randers-Pehrson
+Copyright (c) 2010,2013,2015 Glenn Randers-Pehrson
 
 This code is released under the libpng license.
 For conditions of distribution and use, see the disclaimer
@@ -38,16 +38,17 @@ In particular the runtime library is the "MultiThreaded DLL" version.
 If you use Visual Studio defaults to build your application you will have no
 problems.
 
-If you don't use the Visual Studio defaults your application must still be built
-with the default runtime option (/MD).  If, for some reason, it is not then your
-application will crash inside libpng17.dll as soon as libpng tries to read
-from a file handle you pass in.
+If you don't use the Visual Studio defaults your application must still be
+built with the default runtime option (/MD).  If, for some reason, it is not
+then your application will crash inside libpng17.dll as soon as libpng
+tries to read from a file handle you pass in.
 
 If you do not want to use the DLL, for example for a very small application,
 the 'release library' configuration may be more appropriate.  This is built
 with a non-standard runtime library - the "MultiThreaded" version.  When you
 build your application it must be compiled with this option (/MT), otherwise
-it will not build (if you are lucky) or crash (if you are not.)
+it will not build (if you are lucky) or crash (if you are not.) See the
+WARNING file that is distributed along with this readme.txt.
 
 Stop reading here
 =================
