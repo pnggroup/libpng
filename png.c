@@ -3367,7 +3367,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
       unsigned int setting = (2U + (onoff != 0)) << option;
       unsigned int current = png_ptr->options;
 
-      png_ptr->options = png_check_byte(png_ptr, (current & ~mask) | setting);
+      png_ptr->options = (current & ~mask) | setting;
 
       return (current & mask) >> option;
    }
