@@ -5438,7 +5438,16 @@ Version 1.7.0beta75 [December 21, 2015]
     struct; put the check that relies on pz->list being non-NULL
     second (David Drysdale).
 
-Version 1.7.0beta75 [December 25, 2015]
+Version 1.7.0beta76 [December 29, 2015]
+  Corrected the options handling. Setting the new, higher, option
+    bits triggered the byte check (which is no longer necessary).
+  Added NULL pz->list test to png_zlib_compress_validate().  This seems
+    safer; in fact, a NULL dereference never happens because the test
+    ends up just doing arithmetic on NULL but it seems possible that the
+    undefined arithmetic can still happen if there is a bug elsewhere.
+  Added code to pngcp.c to iterate through the command line options when
+    non-list options have the 'all' parameter.  This is used to rapidly
+    test the effect of different zlib options.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
