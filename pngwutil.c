@@ -484,8 +484,9 @@ png_zlib_compress_validate(png_zlib_compressp pz, int in_use)
    {
       affirm((pz->end == &pz->list && pz->zs.next_out == NULL
               && pz->zs.avail_out == 0U) ||
-             (pz->end == &pz->list->next && pz->zs.next_out == pz->list->output
-              && pz->zs.avail_out == o_size));
+             (pz->list != NULL && pz->end == &pz->list->next &&
+              pz->zs.next_out == pz->list->output &&
+              pz->zs.avail_out == o_size));
    }
 
    else /* not empty */
