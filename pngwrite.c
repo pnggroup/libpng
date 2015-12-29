@@ -72,6 +72,75 @@ write_unknown_chunks(png_structrp png_ptr, png_const_inforp info_ptr,
 }
 #endif /* WRITE_UNKNOWN_CHUNKS */
 
+#ifdef PNG_WRITE_TEXT_SUPPORTED
+static void
+png_write_text(png_structrp png_ptr, png_const_inforp info_ptr, png_byte where)
+   /* Text chunk helper */
+{
+   int i;
+
+   /* Check to see if we need to write text chunks */
+   for (i = 0; i < info_ptr->num_text; i++)
+   {
+      png_debug2(2, "Writing text chunk %d, type %d", i,
+            info_ptr->text[i].compression);
+
+      /* Text chunks are written at info_ptr->text[i].location, skip the chunk
+       * if we are not writing at that location:
+       */
+      if ((info_ptr->text[i].location & where) == 0U)
+         continue;
+
+      switch (info_ptr->text[i].compression)
+      {
+         case PNG_ITXT_COMPRESSION_NONE:
+         case PNG_ITXT_COMPRESSION_zTXt:
+#           ifdef PNG_WRITE_iTXt_SUPPORTED
+               /* Write international chunk */
+               png_write_iTXt(png_ptr, info_ptr->text[i].compression,
+                     info_ptr->text[i].key, info_ptr->text[i].lang,
+                     info_ptr->text[i].lang_key, info_ptr->text[i].text);
+#           else /* !WRITE_iTXT */
+               png_app_error(png_ptr, "Unable to write international text");
+#           endif /* !WRITE_iTXT */
+            break;
+
+         case PNG_TEXT_COMPRESSION_zTXt:
+#           ifdef PNG_WRITE_zTXt_SUPPORTED
+               /* Write compressed chunk */
+               png_write_zTXt(png_ptr, info_ptr->text[i].key,
+                     info_ptr->text[i].text, info_ptr->text[i].compression);
+#           else /* !WRITE_zTXT */
+               png_app_error(png_ptr, "Unable to write compressed text");
+#           endif /* !WRITE_zTXT */
+            break;
+
+         case PNG_TEXT_COMPRESSION_NONE:
+#           ifdef PNG_WRITE_tEXt_SUPPORTED
+               /* Write uncompressed chunk */
+               png_write_tEXt(png_ptr, info_ptr->text[i].key,
+                     info_ptr->text[i].text, 0);
+#           else /* !WRITE_tEXt */
+               /* Can't get here TODO: why not? */
+               png_app_error(png_ptr, "Unable to write uncompressed text");
+#           endif /* !WRITE_tEXt */
+            break;
+
+         default:
+            /* This is an internal error because the libpng checking should
+             * never manage to set any 'compression' except the above values.
+             */
+            impossible("invalid text compression");
+      }
+
+      /* The chunk was written, record where.  This allows the location to have
+       * multiple bits set, the first successful write freezes the location.
+       */
+      info_ptr->text[i].location = where;
+   }
+}
+#endif /* WRITE_TEXT */
+
 /* Writes all the PNG information.  This is the suggested way to use the
  * library.  If you have a new chunk to add, make a function to write it,
  * and put it in the correct location here.  If you want the chunk written
@@ -138,6 +207,12 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
        * the application continues writing the PNG.  So check the 'invalid'
        * flag here too.
        */
+#     ifdef PNG_WRITE_tIME_SUPPORTED
+         if ((info_ptr->valid & PNG_INFO_tIME) != 0 &&
+             (info_ptr->time_location & PNG_HAVE_IHDR) != 0)
+            png_write_tIME(png_ptr, &(info_ptr->mod_time));
+#     endif /* WRITE_tIME */
+
 #     ifdef PNG_WRITE_gAMA_SUPPORTED /* enables GAMMA */
          if ((info_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) == 0 &&
              (info_ptr->colorspace.flags & PNG_COLORSPACE_FROM_gAMA) != 0 &&
@@ -194,6 +269,11 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
             png_write_cHRM_fixed(png_ptr, &info_ptr->colorspace.end_points_xy);
 #     endif /* WRITE_cHRM */
 
+#     ifdef PNG_WRITE_TEXT_SUPPORTED
+         if (info_ptr->num_text > 0)
+            png_write_text(png_ptr, info_ptr, PNG_HAVE_IHDR);
+#     endif /* WRITE_TEXT */
+
 #     ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
          /* The third arugment must encode only one bit, otherwise chunks will
           * be written twice because the test in write_unknown_chunks is
@@ -207,71 +287,6 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
       png_app_error(png_ptr,
             "png_write_info_before_PLTE called more than once");
 }
-
-#ifdef PNG_WRITE_TEXT_SUPPORTED
-static void
-png_write_text(png_structrp png_ptr, png_const_inforp info_ptr)
-   /* Text chunk helper */
-{
-   int i;
-
-   /* Check to see if we need to write text chunks */
-   for (i = 0; i < info_ptr->num_text; i++)
-   {
-      png_debug2(2, "Writing text chunk %d, type %d", i,
-            info_ptr->text[i].compression);
-
-      /* An internationalized chunk? */
-      if (info_ptr->text[i].compression > 0)
-      {
-#        ifdef PNG_WRITE_iTXt_SUPPORTED
-            /* Write international chunk */
-            png_write_iTXt(png_ptr, info_ptr->text[i].compression,
-                  info_ptr->text[i].key, info_ptr->text[i].lang,
-                  info_ptr->text[i].lang_key, info_ptr->text[i].text);
-#        else /* !WRITE_iTXT */
-            png_app_error(png_ptr, "Unable to write international text");
-#        endif /* !WRITE_iTXT */
-
-         /* Mark this chunk as written */
-         if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_NONE)
-             info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
-         else
-            info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
-      }
-
-      /* If we want a compressed text chunk */
-      else if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_zTXt)
-      {
-#        ifdef PNG_WRITE_zTXt_SUPPORTED
-            /* Write compressed chunk */
-            png_write_zTXt(png_ptr, info_ptr->text[i].key,
-                  info_ptr->text[i].text, info_ptr->text[i].compression);
-#        else /* !WRITE_zTXT */
-            png_app_error(png_ptr, "Unable to write compressed text");
-#        endif /* !WRITE_zTXT */
-
-         /* Mark this chunk as written */
-         info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_zTXt_WR;
-      }
-
-      else if (info_ptr->text[i].compression == PNG_TEXT_COMPRESSION_NONE)
-      {
-#        ifdef PNG_WRITE_tEXt_SUPPORTED
-            /* Write uncompressed chunk */
-            png_write_tEXt(png_ptr, info_ptr->text[i].key,
-                  info_ptr->text[i].text, 0);
-#        else /* !WRITE_tEXt */
-            /* Can't get here TODO: why not? */
-            png_app_error(png_ptr, "Unable to write uncompressed text");
-#        endif /* !WRITE_tEXt */
-
-         /* Mark this chunk as written */
-         info_ptr->text[i].compression = PNG_TEXT_COMPRESSION_NONE_WR;
-      }
-   }
-}
-#endif /* WRITE_TEXT */
 
 void PNGAPI
 png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
@@ -302,6 +317,11 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
    if ((png_ptr->mode & PNG_HAVE_PLTE) == 0 &&
        png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       png_error(png_ptr, "Valid palette required for paletted images");
+
+   /* But always set the mode flag because without this we don't know when to
+    * write the post-palette text or unknown chunks.
+    */
+   png_ptr->mode |= PNG_HAVE_PLTE;
 
 #  ifdef PNG_WRITE_tRNS_SUPPORTED
       if ((info_ptr->valid & PNG_INFO_tRNS) !=0)
@@ -349,7 +369,8 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 #  endif /* WRITE_pHYs */
 
 #  ifdef PNG_WRITE_tIME_SUPPORTED
-      if ((info_ptr->valid & PNG_INFO_tIME) != 0)
+      if ((info_ptr->valid & PNG_INFO_tIME) != 0 &&
+          (info_ptr->time_location & PNG_HAVE_PLTE) != 0)
          png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #  endif /* WRITE_tIME */
 
@@ -365,7 +386,7 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
 
 #  ifdef PNG_WRITE_TEXT_SUPPORTED
       if (info_ptr->num_text > 0)
-         png_write_text(png_ptr, info_ptr);
+         png_write_text(png_ptr, info_ptr, PNG_HAVE_PLTE);
 #  endif /* WRITE_TEXT */
 
 #  ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED
@@ -438,13 +459,14 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
    {
 #     ifdef PNG_WRITE_tIME_SUPPORTED
          /* Check to see if user has supplied a time chunk */
-         if ((info_ptr->valid & PNG_INFO_tIME) != 0)
+         if ((info_ptr->valid & PNG_INFO_tIME) != 0 &&
+             (info_ptr->time_location & PNG_AFTER_IDAT) != 0)
             png_write_tIME(png_ptr, &(info_ptr->mod_time));
 #     endif
 
 #     ifdef PNG_WRITE_TEXT_SUPPORTED
          if (info_ptr->num_text > 0)
-            png_write_text(png_ptr, info_ptr);
+            png_write_text(png_ptr, info_ptr, PNG_AFTER_IDAT);
 #     endif /* WRITE_TEXT */
 
 #     ifdef PNG_WRITE_UNKNOWN_CHUNKS_SUPPORTED

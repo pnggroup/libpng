@@ -118,6 +118,7 @@ struct png_info_def
     * modified.  See the png_time struct for the contents of this struct.
     */
    png_time mod_time;
+   png_byte time_location;
 #endif
 
 #ifdef PNG_sBIT_SUPPORTED

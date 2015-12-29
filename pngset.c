@@ -673,6 +673,77 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 #endif
 
+#if defined(PNG_TEXT_SUPPORTED) || defined(PNG_tIME_SUPPORTED)
+static png_byte
+get_location(png_const_structrp png_ptr)
+   /* Return the correct location flag for a chunk.  For a png_set_<chunk>
+    * called during read this is the current read location, for a
+    * png_set_<chunk> called during write it is the following write location
+    * (because the currents at the current location have already been written.)
+    * For a png_set_<chunk> called before read starts (none of the 'position'
+    * mode bits are set) the position is set to the start (PNG_HAVE_IHDR).  For
+    * a png_set_chunk> called before write starts PNG_HAVE_PLTE|PNG_AFTER_IDAT
+    * are set because we don't know whether this is the main png_info or the one
+    * for use after the IDAT from png_write_end.
+    *
+    * The latter behavior gives compatibility with the old behavior of
+    * png_set_text; it only wrote text chunks after the PLTE or IDAT and it just
+    * wrote them once.
+    */
+{
+   if ((png_ptr->mode & PNG_AFTER_IDAT) != 0U)
+      return PNG_AFTER_IDAT;
+
+   else if ((png_ptr->mode & PNG_HAVE_PLTE) != 0U)
+   {
+      /* In a write operation PNG_HAVE_PLTE is set when the chunks before the
+       * IDAT are written (in png_write_info), so the location needs to be after
+       * IDAT.  In a read the chunk was read after the PLTE but before the IDAT.
+       */
+      if (png_ptr->read_struct)
+         return PNG_HAVE_PLTE;
+
+      else /* write struct */
+         return PNG_AFTER_IDAT;
+   }
+
+   else if ((png_ptr->mode & PNG_HAVE_IHDR) != 0U)
+   {
+      /* For read this means the chunk is between the IHDR and any PLTE; there
+       * may be none but then there is no order to preserve.
+       *
+       * For write png_write_IHDR has been called and that means that the info
+       * before PLTE has been written, so the chunk goes after.
+       */
+      if (png_ptr->read_struct)
+         return PNG_HAVE_IHDR;
+
+      else /* write struct */
+         return PNG_HAVE_PLTE;
+   }
+
+   else if ((png_ptr->mode & PNG_HAVE_PNG_SIGNATURE) != 0U)
+   {
+      /* This should not happen on read, on write it means that the app has
+       * started writing so assume the text is meant to go before PLTE.
+       */
+      return PNG_HAVE_IHDR;
+   }
+
+   /* Either a png_set_<chunk> from the application during read before reading
+    * starts (so mode is 0) or the same for write.
+    */
+   else
+   {
+      if (png_ptr->read_struct)
+         return PNG_HAVE_IHDR;
+
+      else
+         return PNG_HAVE_PLTE|PNG_AFTER_IDAT;
+   }
+}
+#endif /* TEXT || tIME */
+
 #ifdef PNG_TEXT_SUPPORTED
 void PNGAPI
 png_set_text(png_structrp png_ptr, png_inforp info_ptr,
@@ -802,6 +873,12 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
       }
 #  endif
 
+      /* Record the location for posterity.  On the read side this just says
+       * where the chunk was (approximately).  On the write side it says how far
+       * through the write process libpng was before this API was called.
+       */
+      textp->location = get_location(png_ptr);
+
       if (text_ptr[i].text == NULL || text_ptr[i].text[0] == '\0')
       {
          text_length = 0;
@@ -919,9 +996,10 @@ png_set_tIME(png_const_structrp png_ptr, png_inforp info_ptr,
    }
 
    info_ptr->mod_time = *mod_time;
+   info_ptr->time_location = get_location(png_ptr);
    info_ptr->valid |= PNG_INFO_tIME;
 }
-#endif
+#endif /* tIME */
 
 #ifdef PNG_tRNS_SUPPORTED
 void PNGAPI

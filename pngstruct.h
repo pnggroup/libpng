@@ -400,9 +400,6 @@ struct png_struct_def
    unsigned int palette_index_check_disabled :1; /* defaults to 0, 'enabled' */
    unsigned int palette_index_check_issued :1;   /* error message output */
 #endif /* CHECK_FOR_INVALID_INDEX */
-#ifdef PNG_WRITE_tIME_SUPPORTED
-   unsigned int wrote_tIME :1; /* Stop writing of duplicate tIME chunks */
-#endif /* WRITE_tIME */
 #ifdef PNG_READ_tRNS_SUPPORTED
    png_color_16 trans_color;   /* transparent color for non-paletted files */
 #endif /* READ_tRNS */

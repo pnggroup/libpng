@@ -692,6 +692,16 @@ typedef png_sPLT_t * * png_sPLT_tpp;
  * PNG_TEXT_COMPRESSION_zTXt. Note that the "compression value" is not the
  * same as what appears in the PNG tEXt/zTXt/iTXt chunk's "compression flag"
  * which is always 0 or 1, or its "compression method" which is always 0.
+ *
+ * The location field (added in libpng 1.7.0) records where the text chunk was
+ * found when png_get_text is used.  When png_set_text is used the field in the
+ * structure passed in is ignored and, instead, the field is set to the current
+ * write position.
+ *
+ * Prior to 1.7.0 the write behavior was the same; the text fields were written
+ * (once) at the next write_info call, however the read mechanism did not record
+ * the chunk location so if an info_struct from read was passed to the write
+ * APIs the text chunks would all be written at the start (before PLTE).
  */
 typedef struct png_text_struct
 {
@@ -700,6 +710,7 @@ typedef struct png_text_struct
                               0: zTXt, deflate
                               1: iTXt, none
                               2: iTXt, deflate  */
+   png_byte  location;     /* before/after PLTE or after IDAT */
    png_charp key;          /* keyword, 1-79 character description of "text" */
    png_charp text;         /* comment, may be an empty string (ie "")
                               or a NULL pointer */
@@ -717,8 +728,14 @@ typedef png_text * * png_textpp;
 
 /* Supported compression types for text in PNG files (tEXt, and zTXt).
  * The values of the PNG_TEXT_COMPRESSION_ defines should NOT be changed. */
+#ifdef PNG_OLD_COMPRESSION_CODES_SUPPORTED
+   /* These values were used to prevent double write of text chunks in versions
+    * prior to 1.7.0.  They are never set now; if you need them #define the
+    * _SUPPORTED macro.
+    */
 #define PNG_TEXT_COMPRESSION_NONE_WR -3
 #define PNG_TEXT_COMPRESSION_zTXt_WR -2
+#endif /* OLD_COMPRESSION_CODES */
 #define PNG_TEXT_COMPRESSION_NONE    -1
 #define PNG_TEXT_COMPRESSION_zTXt     0
 #define PNG_ITXT_COMPRESSION_NONE     1
@@ -776,7 +793,7 @@ typedef const png_unknown_chunk * png_const_unknown_chunkp;
 typedef png_unknown_chunk * * png_unknown_chunkpp;
 #endif
 
-/* Flag values for the unknown chunk location byte. */
+/* Flag values for the chunk location byte. */
 #define PNG_HAVE_IHDR  0x01U
 #define PNG_HAVE_PLTE  0x02U
 #define PNG_AFTER_IDAT 0x08U
