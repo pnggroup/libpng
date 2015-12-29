@@ -1,5 +1,5 @@
 
-Libpng 1.5.27beta01 - December 18, 2015
+Libpng 1.5.27beta01 - December 29, 2015
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.5.26):
 
-version 1.5.27beta01 [December 18, 2015]
+version 1.5.27beta01 [December 29, 2015]
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
     as the LE version.
@@ -44,6 +44,7 @@ version 1.5.27beta01 [December 18, 2015]
     David Drysdale as a result of reports from UBSAN in clang 3.8).
   This changes pngvalid to use BE random numbers; this used to produce
     errors but these should not be fixed as a result of the previous changes.
+  In projects/vstudio, combined readme.txt and WARNING into README.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
