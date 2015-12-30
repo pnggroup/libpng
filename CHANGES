@@ -5438,7 +5438,7 @@ Version 1.7.0beta75 [December 21, 2015]
     struct; put the check that relies on pz->list being non-NULL
     second (David Drysdale).
 
-Version 1.7.0beta76 [December 29, 2015]
+Version 1.7.0beta76 [December 30, 2015]
   Corrected the options handling. Setting the new, higher, option
     bits triggered the byte check (which is no longer necessary).
   Added NULL pz->list test to png_zlib_compress_validate().  This seems
@@ -5448,6 +5448,22 @@ Version 1.7.0beta76 [December 29, 2015]
   Added code to pngcp.c to iterate through the command line options when
     non-list options have the 'all' parameter.  This is used to rapidly
     test the effect of different zlib options.
+  Revised the handling of tIME and text chunks on read to record the
+    location of the chunks relative to PLTE and IDAT.  Behavior on write
+    is unchanged except that if the position was recorded on read it will
+    be re-used.  This involves an ABI change to the png_text_struct; a
+    one byte location field is added (with the same meaning as the one
+    used to record unknown chunk location.) Because this field is only
+    used on read there is no API change unless a png_info from a libpng
+    read is passed to a subsequent libpng write (this did not work very
+    well before 1.7; the tIME chunk could get duplicated.) The new field
+    is ignored by png_set_text(), resetting it to the current position
+    in the read or write stream.  On write the position is set to the
+    next location to be written unless the write has not started (the
+    position is before the signature) in which case the location is set
+    to PNG_HAVE_PLTE|PNG_AFTER_IDAT.  When the chunk is written the
+    position is set to the actual write location (effectively the position
+    is frozen.)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

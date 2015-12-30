@@ -679,7 +679,7 @@ get_location(png_const_structrp png_ptr)
    /* Return the correct location flag for a chunk.  For a png_set_<chunk>
     * called during read this is the current read location, for a
     * png_set_<chunk> called during write it is the following write location
-    * (because the currents at the current location have already been written.)
+    * (because the chunks at the current location have already been written.)
     * For a png_set_<chunk> called before read starts (none of the 'position'
     * mode bits are set) the position is set to the start (PNG_HAVE_IHDR).  For
     * a png_set_chunk> called before write starts PNG_HAVE_PLTE|PNG_AFTER_IDAT

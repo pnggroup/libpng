@@ -134,7 +134,7 @@ png_write_text(png_structrp png_ptr, png_const_inforp info_ptr, png_byte where)
       }
 
       /* The chunk was written, record where.  This allows the location to have
-       * multiple bits set, the first successful write freezes the location.
+       * multiple bits set; the first successful write freezes the location.
        */
       info_ptr->text[i].location = where;
    }
