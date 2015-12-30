@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta76 - December 25, 2015
+ libpng version 1.7.0beta76 - December 30, 2015
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta76 - December 25, 2015
+ libpng versions 0.97, January 1998, through 1.7.0beta76 - December 30, 2015
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -1466,6 +1466,11 @@ png_set_rgb_to_gray()).
                            PNG_TEXT_COMPRESSION_zTXt
                            PNG_ITXT_COMPRESSION_NONE
                            PNG_ITXT_COMPRESSION_zTXt
+
+    text_ptr[i].location - location of chunk
+                           PNG_HAVE_IHDR
+                           PNG_HAVE_PLTE
+                           PNG_AFTER_IDAT
 
     text_ptr[i].key   - keyword for comment.  Must contain
                          1-79 characters.
@@ -3085,6 +3090,10 @@ width, height, bit_depth, and color_type must be the same in each call.
                            PNG_TEXT_COMPRESSION_zTXt
                            PNG_ITXT_COMPRESSION_NONE
                            PNG_ITXT_COMPRESSION_zTXt
+    text_ptr[i].location - location of chunk
+                           PNG_HAVE_IHDR
+                           PNG_HAVE_PLTE
+                           PNG_AFTER_IDAT
     text_ptr[i].key   - keyword for comment.  Must contain
                  1-79 characters.
     text_ptr[i].text  - text comments for current
@@ -5113,6 +5122,8 @@ These apparently unused experimental functions have been deprecated
 and the code within them, except for the APIs, has been removed.
     png_set_filter_heuristics()
     and png_set_filter_heuristics_fixed()
+
+A location byte was added to the png_text structure.
 
 The PNG_ABORT() macro was changed to PNG_ABORT, and the default is now
 "abort()" for all platforms (previously it was "ExitProcess(0)" on
