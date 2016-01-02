@@ -2,7 +2,7 @@
 /* pngchunk.h - PNG chunk descriptions
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- * Copyright (c) 2015 Glenn Randers-Pehrson
+ * Copyright (c) 2016 Glenn Randers-Pehrson
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

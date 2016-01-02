@@ -2,7 +2,7 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -277,7 +277,9 @@
 #endif
 
 /* The affirm mechanism results in a minimal png_error() in released versions
- * ('STABLE' versions) and a more descriptive PNG_ABORT in all other cases.
+ * ('STABLE' versions) and a more descriptive PNG_ABORT in all other cases,
+ * when the "condition" is false (zero).  If "condition" is true (nonzero),
+ * then the affirm mechanism does nothing.
  *
  * The PNG_RELEASE_BUILD macro, defined above, controls the behavior of
  * 'affirm': if set to 1 affirm will call png_error (or png_err) rather than
@@ -905,14 +907,14 @@ PNG_INTERNAL_FUNCTION(png_uint_16, png_u16_affirm,(png_const_structrp png_ptr,
 #  define png_check_byte(pp, b) (png_byte_affirm((pp), PNG_SRC_LINE, (b)))
 #  define PNG_BYTE(b)           ((png_byte)((b) & 0xFFU))
 #  define PNG_UINT_16(u)        ((png_uint_16)((u) & 0xFFFFU))
-#elif !(defined PNG_REMOVE_CASTS)
+#elif !(defined PNG_REMOVE_CASTS) /* && !RANGE_CHECK */
 #  define png_check_bits(pp, u, bits) (((1U<<(bits))-1U) & (u))
 #  define png_check_char(pp, c) ((char)(c))
 #  define png_check_byte(pp, b) ((png_byte)(b))
 #  define png_check_u16(pp, u)  ((png_uint_16)(u))
 #  define PNG_BYTE(b)           ((png_byte)((b) & 0xFFU))
 #  define PNG_UINT_16(u)        ((png_uint_16)((u) & 0xFFFFU))
-#else
+#else /* !RANGE_CHECK */
    /* This is somewhat trust-me-it-works: if PNG_REMOVE_CASTS is defined then
     * the casts, which might otherwise change the values, are completely
     * removed.  Use this to test your compiler to see if it makes *any*
