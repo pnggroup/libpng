@@ -6370,6 +6370,8 @@ transform_range_check(png_const_structp pp, unsigned int r, unsigned int g,
 
       png_error(pp, message);
    }
+
+   UNUSED(limit)
 }
 
 static void
