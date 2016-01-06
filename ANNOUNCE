@@ -57,6 +57,8 @@ Version 1.6.21rc01 [January 4, 2016]
 Version 1.6.21rc02 [January 6, 2016]
   Relocated assert() in contrib/tools/pngfix.c, bug found by American
     Fuzzy Lop, reported by Brian Carpenter.
+  Marked 'limit' UNUSED in transform_range_check().  This only affects
+    release builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
