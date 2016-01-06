@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta76 - December 30, 2015
+Libpng 1.7.0beta76 - January 6, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1139,7 +1139,7 @@ Version 1.7.0beta75 [December 21, 2015]
     struct; put the check that relies on pz->list being non-NULL
     second (David Drysdale).
 
-Version 1.7.0beta76 [December 30, 2015]
+Version 1.7.0beta76 [January 6, 2016]
   Corrected the options handling. Setting the new, higher, option
     bits triggered the byte check (which is no longer necessary).
   Added NULL pz->list test to png_zlib_compress_validate().  This seems
@@ -1165,6 +1165,10 @@ Version 1.7.0beta76 [December 30, 2015]
     to PNG_HAVE_PLTE|PNG_AFTER_IDAT.  When the chunk is written the
     position is set to the actual write location (effectively the position
     is frozen.)
+  Relocated assert() in contrib/tools/pngfix.c, bug found by American
+    Fuzzy Lop, reported by Brian Carpenter.
+  Marked 'limit' UNUSED in transform_range_check().  This only affects
+    release builds.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
