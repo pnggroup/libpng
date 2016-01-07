@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta76 - January 7, 2016
+Libpng 1.7.0beta77 - January 7, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta76.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta76.tar.gz
+   1.7.0beta77.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta77.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b76.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b76.zip
+   /scratch/glennrp/Libpng17/lp170b77.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b77.zip
 
 Other information:
 
-   1.7.0beta76-README.txt
-   1.7.0beta76-LICENSE.txt
-   libpng-1.7.0beta76-*.asc (armored detached GPG signatures)
+   1.7.0beta77-README.txt
+   1.7.0beta77-LICENSE.txt
+   libpng-1.7.0beta77-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1171,6 +1171,8 @@ Version 1.7.0beta76 [January 7, 2016]
     release builds.
   Fixed new Coverity defect, potential NULL dereference of "ps" in pngwutil.c
   Added temporary workaround for Coverity "Dead code" defect.
+
+Version 1.7.0beta77 [January 7, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
