@@ -1,6 +1,6 @@
 /* pngcp.c
  *
- * Copyright (c) 2015 John Cunningham Bowler
+ * Copyright (c) 2016 John Cunningham Bowler
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
  *
