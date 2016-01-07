@@ -2258,7 +2258,7 @@ png_start_IDAT(png_structrp png_ptr)
       /* Default both filter_mask and zlib_strategy here, now that png_ptr has
        * all the IHDR fields set.
        */
-      if (ps->filter_mask == PNG_NO_FILTERS/*unset*/)
+      if (ps && ps->filter_mask == PNG_NO_FILTERS/*unset*/)
       {
          /* If there is no filter selection algorithm enabled then the only
           * option is PNG_FILTER_NONE.
@@ -3257,7 +3257,12 @@ select_filter_methodically_better(png_structrp png_ptr, png_zlib_compressp pz,
                ret = deflate(&zs, flush);
             } while (ret == Z_OK && zs.avail_out == 0U);
 
+#if 0
+            /* TODO: fix this (Coverity issue Z_STREAM_END is dead code) */
             if (ret == (flush == Z_FINISH ? Z_STREAM_END : Z_OK))
+#else
+            if (ret == Z_OK)
+#endif /* 0 */
             {
                /* This cannot underflow because the check above is performed
                 * before adding 'avail_out' to l:
