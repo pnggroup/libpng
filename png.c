@@ -776,7 +776,6 @@ png_get_copyright(png_const_structrp png_ptr)
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
       "libpng version 1.6.21rc02 - January 7, 2016" PNG_STRING_NEWLINE \
-      "Copyright (c) 1998-2015 Glenn Randers-Pehrson" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
