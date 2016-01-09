@@ -2272,7 +2272,7 @@ png_start_IDAT(png_structrp png_ptr)
       }
 #  endif /* WRITE_FILTER */
 
-   if (ps->zlib_strategy == (-1)/*unset*/)
+   if (ps && ps->zlib_strategy == (-1)/*unset*/)
    {
 #     ifdef PNG_WRITE_FILTER_SUPPORTED
          if (ps->filter_mask != PNG_FILTER_NONE)

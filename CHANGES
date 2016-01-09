@@ -5471,7 +5471,8 @@ Version 1.7.0beta76 [January 7, 2016]
   Fixed new Coverity defect, potential NULL dereference of "ps" in pngwutil.c
   Added temporary workaround for Coverity "Dead code" defect.
 
-Version 1.7.0beta77 [January 7, 2016]
+Version 1.7.0beta77 [January 9, 2016]
+  Fixed new Coverity defect, another NULL dereference of "ps" in pngwutil.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
