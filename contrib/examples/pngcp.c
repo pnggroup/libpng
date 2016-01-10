@@ -20,6 +20,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
+#include <limits.h>
 #include <assert.h>
 
 #include <unistd.h>
@@ -90,6 +91,8 @@ typedef enum
 #define LOG             0x020 /* Log pass/fail to stdout */
 #define CONTINUE        0x040 /* Continue on APP_FAIL errors */
 #define SIZES           0x080 /* Report input and output sizes */
+#define SEARCH          0x100 /* Search IDAT compression options */
+#define NOWRITE         0x200 /* Do not write an output file */
 #define OPTION     0x80000000 /* Used for handling options */
 #define LIST       0x80000001 /* Used for handling options */
 
@@ -108,18 +111,18 @@ static const char all[] = "all";
 static const struct value_list
 {
    const char *name;  /* the command line name of the value */
-   const int   value; /* the actual value to use */
+   int         value; /* the actual value to use */
 }
 #if defined(PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED) ||\
     defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
 vl_strategy[] =
 {
-   /* This controls the order of search and also the default (which is huffman
-    * only compression):
+   /* This controls the order of search and also the default (which is RLE
+    * compression):
     */
-   { "fixed", Z_FIXED },
    { "huffman", Z_HUFFMAN_ONLY },
    { "RLE", Z_RLE },
+   { "fixed", Z_FIXED }, /* the remainder do window searchs */
    { "filtered", Z_FILTERED },
    { "default", Z_DEFAULT_STRATEGY },
    { all, 0 }
@@ -130,21 +133,24 @@ vl_level[] =
    { "none", Z_NO_COMPRESSION },
    { "speed", Z_BEST_SPEED },
    { "best", Z_BEST_COMPRESSION },
-   RANGE(0, 9),
+   { "0", Z_NO_COMPRESSION },
+   RANGE(1, 9), /* this deliberately excludes '0' */
    { all, 0 }
 },
-vl_windowBits[] =
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+vl_windowBits_text[] =
 {
    { "default", 15 },
    { "small", 9 },
    RANGE(8, 15),
    { all, 0 }
 },
+#endif /* text compression */
 vl_memLevel[] =
 {
    { "default", 8 },
    { "least", 1 },
-   RANGE(1, 9),
+   RANGE(2, 9), /* exclude 1: there seems to be a zlib bug */
    { all, 0 }
 },
 #endif /* WRITE_CUSTOMIZE_*COMPRESSION */
@@ -179,6 +185,17 @@ vl_select[] =
 #endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
 vl_on_off[] = { { "on", 1 }, { "off", 2 } };
 
+#ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
+static struct value_list
+vl_windowBits_IDAT[] =
+{
+   { "default", 15 },
+   { "small", 9 },
+   RANGE(8, 15), /* modified by set_windowBits_hi */
+   { all, 0 }
+};
+#endif /* IDAT compression */
+
 static const struct option
 {
    const char              *name;         /* name of the option */
@@ -197,11 +214,15 @@ static const struct option
    S(log,      LOG)
    S(continue, CONTINUE)
    S(sizes,    SIZES)
+   S(search,   SEARCH)
+   S(nowrite,  NOWRITE)
 #  undef S
 
    /* OPTION settings, these and LIST settings are read on demand */
+#  define VLNAME(name) vl_ ## name
+#  define VLSIZE(name) ((sizeof VLNAME(name))/(sizeof VLNAME(name)[0]))
 #  define VL(oname, name, type)\
-   { oname, type, (sizeof vl_ ## name)/(sizeof vl_ ## name[0]), vl_ ## name },
+   { oname, type, VLSIZE(name), VLNAME(name) },
 #  define VLO(oname, name) VL(oname, name, OPTION)
 
 #  ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
@@ -220,7 +241,8 @@ static const struct option
 
    VLC(strategy)
    VLC(level)
-   VLC(windowBits)
+   VLO("windowBits", windowBits_IDAT)
+   VLO("text-windowBits", windowBits_text)
    VLC(memLevel)
 
 #  undef VLO
@@ -240,6 +262,20 @@ static const struct option
 
 #define opt_count ((sizeof options)/(sizeof options[0]))
 
+static const char *
+cts(int ct)
+{
+   switch (ct)
+   {
+      case PNG_COLOR_TYPE_PALETTE:     return "P";
+      case PNG_COLOR_TYPE_GRAY:        return "G";
+      case PNG_COLOR_TYPE_GRAY_ALPHA:  return "GA";
+      case PNG_COLOR_TYPE_RGB:         return "RGB";
+      case PNG_COLOR_TYPE_RGB_ALPHA:   return "RGBA";
+      default:                         return "INVALID";
+   }
+}
+
 struct display
 {
    jmp_buf          error_return;      /* Where to go to on error */
@@ -248,12 +284,6 @@ struct display
    const char      *operation;         /* What is happening */
    const char      *filename;          /* The name of the original file */
    const char      *output_file;       /* The name of the output file */
-
-   /* Base file information */
-   png_uint_32      w;
-   png_uint_32      h;
-   int              bpp;
-   png_alloc_size_t size;
 
    /* Used on both read and write: */
    FILE            *fp;
@@ -266,9 +296,18 @@ struct display
    png_infop        ip;
 
    /* Used to write a new image (the original info_ptr is used) */
+#  define MAX_SIZE ((png_alloc_size_t)(-1))
    png_alloc_size_t write_size;
    png_alloc_size_t best_size;
    png_structp      write_pp;
+
+   /* Base file information */
+   png_alloc_size_t size;
+   png_uint_32      w;
+   png_uint_32      h;
+   int              bpp;
+   png_byte         ct;
+   int              no_warnings;       /* Do not output libpng warnings */
 
    /* Options handling */
    png_uint_32      results;           /* A mask of errors seen */
@@ -295,10 +334,15 @@ struct display
 #  define SL 8 /* stack limit */
    struct stack
    {
-      png_byte      opt;               /* The option being tested */
-      png_byte      entry;             /* The next value entry to be tested */
-      png_byte      end;               /* This is the last entry */
-      int           opt_string_end;    /* End of the option string in 'curr' */
+      png_alloc_size_t best_size;      /* Best so far for this option */
+      png_alloc_size_t lo_size;
+      png_alloc_size_t hi_size;
+      int              lo, hi;         /* For binary chop of a range */
+      int              best_val;       /* Best value found so far */
+      int              opt_string_end; /* End of the option string in 'curr' */
+      png_byte         opt;            /* The option being tested */
+      png_byte         entry;          /* The next value entry to be tested */
+      png_byte         end;            /* This is the last entry */
    }                stack[SL];         /* Stack of entries being tested */
    char             curr[32*SL];       /* current options being tested */
    char             best[32*SL];       /* best options */
@@ -481,6 +525,9 @@ optind(struct display *dp, const char *opt, size_t len)
    abort(); /* NOT REACHED */
 }
 
+/* This works for an option name (no quotes): */
+#define OPTIND(dp, name) optind(dp, #name, (sizeof #name)-1)
+
 static int
 getopt(struct display *dp, const char *opt, int *value)
 {
@@ -538,7 +585,7 @@ opt_list_end(struct display *dp, png_byte opt, png_byte entry)
 }
 
 static void
-push_opt(struct display *dp, unsigned int sp, png_byte opt)
+push_opt(struct display *dp, unsigned int sp, png_byte opt, int search)
    /* Push a new option onto the stack, initializing the new stack entry
     * appropriately; this does all the work of next_opt (setting end/nsp) for
     * the first entry in the list.
@@ -564,12 +611,35 @@ push_opt(struct display *dp, unsigned int sp, png_byte opt)
    while (entry > 0U);
 
    dp->tsp = sp+1U;
+   dp->stack[sp].best_size =
+      dp->stack[sp].lo_size =
+      dp->stack[sp].hi_size = MAX_SIZE;
+
+   if (search && entry_name == range_lo) /* search this range */
+   {
+      dp->stack[sp].lo = options[opt].values[entry].value;
+      /* check for a mal-formed RANGE above: */
+      assert(entry+1 < options[opt].value_count &&
+             options[opt].values[entry+1].name == range_hi);
+      dp->stack[sp].hi = options[opt].values[entry+1].value;
+   }
+
+   else
+   {
+      /* next_opt will just iterate over the range. */
+      dp->stack[sp].lo = INT_MAX;
+      dp->stack[sp].hi = INT_MIN; /* Prevent range chop */
+   }
+
    dp->stack[sp].opt = opt;
    dp->stack[sp].entry = entry;
-   dp->value[opt] = options[opt].values[entry].value;
+   dp->stack[sp].best_val = dp->value[opt] = options[opt].values[entry].value;
 
    set_opt_string(dp, sp);
 
+   /* This works for the search case too; if the range has only one entry 'end'
+    * will be marked here.
+    */
    if (opt_list_end(dp, opt, entry))
    {
       dp->stack[sp].end = 1;
@@ -593,6 +663,7 @@ next_opt(struct display *dp, unsigned int sp)
     * set dp->stack[s].end to true.
     */
 {
+   int search = 0;
    png_byte entry, opt;
    const char *entry_name;
 
@@ -609,7 +680,191 @@ next_opt(struct display *dp, unsigned int sp)
     * cases move to the next entry and load its value:
     */
    if (entry_name == range_lo) /* a range */
-      dp->value[opt]++;
+   {
+      /* A range can be iterated over or searched.  The default iteration option
+       * is indicated by hi < lo on the stack, otherwise the range being search
+       * is [lo..hi] (inclusive).
+       */
+      if (dp->stack[sp].lo > dp->stack[sp].hi)
+         dp->value[opt]++;
+
+      else
+      {
+         /* This is the best size found for this option value: */
+         png_alloc_size_t best_size = dp->stack[sp].best_size;
+         int lo = dp->stack[sp].lo;
+         int hi = dp->stack[sp].hi;
+         int val = dp->value[opt];
+
+         search = 1; /* end is determined here */
+         assert(best_size < MAX_SIZE);
+
+         if (val == lo)
+         {
+            /* Finding the best for the low end of the range: */
+            dp->stack[sp].lo_size = best_size;
+            assert(hi > val);
+
+            if (hi == val+1) /* only 2 entries */
+               dp->stack[sp].end = 1;
+
+            val = hi;
+         }
+
+         else if (val == hi)
+         {
+            dp->stack[sp].hi_size = best_size;
+            assert(val > lo+1); /* else 'end' set above */
+
+            if (val == lo+2) /* only three entries to test */
+               dp->stack[sp].end = 1;
+
+            val = (lo + val)/2;
+         }
+
+         else
+         {
+            png_alloc_size_t lo_size = dp->stack[sp].lo_size;
+            png_alloc_size_t hi_size = dp->stack[sp].hi_size;
+
+            /* lo and hi should have been tested. */
+            assert(lo_size < MAX_SIZE && hi_size < MAX_SIZE);
+
+            /* These cases arise with the 'probe' handling below when there is a
+             * dip or peak in the size curve.
+             */
+            if (val < lo) /* probing a new lo */
+            {
+               /* Swap lo and val: */
+               dp->stack[sp].lo = val;
+               dp->stack[sp].lo_size = best_size;
+               val = lo;
+               best_size = lo_size;
+               lo = dp->stack[sp].lo;
+               lo_size = dp->stack[sp].lo_size;
+            }
+
+            else if (val > hi) /* probing a new hi */
+            {
+               /* Swap hi and val: */
+               dp->stack[sp].hi = val;
+               dp->stack[sp].hi_size = best_size;
+               val = hi;
+               best_size = hi_size;
+               hi = dp->stack[sp].hi;
+               hi_size = dp->stack[sp].hi_size;
+            }
+
+            /* The following should be true or something got messed up above. */
+            assert(lo < val && val < hi);
+
+            /* If there are only four entries (lo, val, hi plus one more) just
+             * test the remaining entry.
+             */
+            if (hi == lo+3)
+            {
+               /* Because of the 'probe' code val can either be lo+1 or hi-1; we
+                * need to test the other.
+                */
+               val = lo + ((val == lo+1) ? 2 : 1);
+               assert(lo < val && val < hi);
+               dp->stack[sp].end = 1;
+            }
+
+            else
+            {
+               /* There are at least 2 entries still untested between lo and hi,
+                * i.e. hi >= lo+4.  'val' is the midpoint +/- 0.5
+                *
+                * Separate out the four easy cases when lo..val..hi are
+                * monotonically decreased or (more weird) increasing:
+                */
+               assert(hi > lo+3);
+
+               if (lo_size <= best_size && best_size <= hi_size)
+               {
+                  /* Select the low range; testing this first favours the low
+                   * range over the high range when everything comes out equal.
+                   * Because of the probing 'val' may be lo+1.  In that case end
+                   * the search and set 'val' to lo+2.
+                   */
+                  if (val == lo+1)
+                  {
+                     ++val;
+                     dp->stack[sp].end = 1;
+                  }
+
+                  else
+                  {
+                     dp->stack[sp].hi = hi = val;
+                     dp->stack[sp].hi_size = best_size;
+                     val = (lo + val) / 2;
+                  }
+               }
+
+               else if (lo_size >= best_size && best_size >= hi_size)
+               {
+                  /* Monotonically decreasing size; this is the expected case.
+                   * Select the high end of the range.  As above, val may be
+                   * hi-1.
+                   */
+                  if (val == hi-1)
+                  {
+                     --val;
+                     dp->stack[sp].end = 1;
+                  }
+
+                  else
+                  {
+                     dp->stack[sp].lo = lo = val;
+                     dp->stack[sp].lo_size = best_size;
+                     val = (val + hi) / 2;
+                  }
+               }
+
+               /* If both those tests failed 'best_size' is either greater than
+                * or less than both lo_size and hi_size.  There is a peak or dip
+                * in the curve of sizes from lo to hi and val is on the peak or
+                * dip.
+                *
+                * Because the ranges being searched as so small (level is 1..9,
+                * windowBits 8..15, memLevel 1..9) there will only be at most
+                * three untested values between lo..val and val..hi, so solve
+                * the problem by probing down from hi or up from lo, whichever
+                * is the higher.
+                *
+                * This is the place where 'val' is set to outside the range
+                * lo..hi, described as 'probing', though maybe 'narrowing' would
+                * be more accurate.
+                */
+               else if (lo_size <= hi_size) /* down from hi */
+               {
+                  dp->stack[sp].hi = val;
+                  dp->stack[sp].hi_size = best_size;
+                  val = --hi;
+               }
+
+               else /* up from low */
+               {
+                  dp->stack[sp].lo = val;
+                  dp->stack[sp].lo_size = best_size;
+                  val = ++lo;
+               }
+
+               /* lo and hi are still the true range limits, check for the end
+                * condition.
+                */
+               assert(hi > lo+1);
+               if (hi <= lo+2)
+                  dp->stack[sp].end = 1;
+            }
+         }
+
+         assert(val != dp->stack[sp].best_val); /* should be a new value */
+         dp->value[opt] = val;
+         dp->stack[sp].best_size = MAX_SIZE;
+      }
+   }
 
    else
    {
@@ -620,20 +875,109 @@ next_opt(struct display *dp, unsigned int sp)
 
    set_opt_string(dp, sp);
 
-   if (opt_list_end(dp, opt, entry)) /* end of list */
+   if (!search && opt_list_end(dp, opt, entry)) /* end of list */
       dp->stack[sp].end = 1;
 
-   else /* still active after all these tests */
+   else if (!dp->stack[sp].end) /* still active after all these tests */
       dp->nsp = dp->tsp;
 }
 
 static int
-getallopts(struct display *dp, const char *opt_str, int *value)
+compare_option(const struct display *dp, unsigned int sp)
+{
+   int opt = dp->stack[sp].opt;
+
+   /* If the best so far is numerically less than the current value the
+    * current set of options is invariably worse.
+    */
+   if (dp->stack[sp].best_val < dp->value[opt])
+      return -1;
+
+   /* Lists of options are searched out of numerical order (currently only
+    * strategy), so only return +1 here when a range is being searched.
+    */
+   else if (dp->stack[sp].best_val > dp->value[opt])
+   {
+      if (dp->stack[sp].lo <= dp->stack[sp].hi /*searching*/)
+         return 1;
+
+      else
+         return -1;
+   }
+
+   else
+      return 0; /* match; current value is the best one */
+}
+
+static int
+advance_opt(struct display *dp, png_byte opt, int search)
+{
+   unsigned int sp = dp->csp++; /* my stack entry */
+
+   assert(sp >= dp->nsp); /* nsp starts off zero */
+
+   /* If the entry was active in the previous run dp->stack[sp] is already
+    * set up and dp->tsp will be greater than sp, otherwise a new entry
+    * needs to be created.
+    *
+    * dp->nsp is handled this way:
+    *
+    * 1) When an option is pushed onto the stack dp->nsp and dp->tsp are
+    *    both set (by push_opt) to the next stack entry *unless* there is
+    *    only one entry in the new list, in which case dp->stack[sp].end
+    *    is set.
+    *
+    * 2) For the top stack entry next_opt is called.  The entry must be
+    *    active (dp->stack[sp].end is not set) and either 'nsp' or 'end'
+    *    will be updated as appropriate.
+    *
+    * 3) For lower stack entries nsp is set unless the stack entry is
+    *    already at the end.  This means that when all the higher entries
+    *    are popped this entry will be too.
+    */
+   if (sp >= dp->tsp)
+   {
+      push_opt(dp, sp, opt, search); /* This sets tsp to sp+1 */
+      return 1; /* initialized */
+   }
+
+   else
+   {
+      int ret = 0; /* unchanged */
+
+      /* An option that is already on the stack; update best_size and best_val
+       * if appropriate.  On the first run there are no previous values and
+       * dp->write_size will be MAX_SIZE, however on the first run dp->tsp
+       * starts off as 0.
+       */
+      assert(dp->write_size > 0U && dp->write_size < MAX_SIZE);
+
+      if (dp->stack[sp].best_size > dp->write_size ||
+          (dp->stack[sp].best_size == dp->write_size &&
+           compare_option(dp, sp) > 0))
+      {
+         dp->stack[sp].best_size = dp->write_size;
+         dp->stack[sp].best_val = dp->value[opt];
+      }
+
+      if (sp+1U >= dp->tsp)
+      {
+         next_opt(dp, sp);
+         ret = 1; /* advanced */
+      }
+
+      else if (!dp->stack[sp].end) /* Active, not at top of stack */
+         dp->nsp = sp+1U;
+
+      return ret; /* advanced || unchanged */
+   }
+}
+
+static int
+getallopts_(struct display *dp, const png_byte opt, int *value)
    /* Like getop but iterate over all the values if the option was set to "all".
     */
 {
-   const png_byte opt = optind(dp, opt_str, strlen(opt_str));
-
    if (dp->entry[opt]) /* option was set on command line */
    {
       /* Simple, single value, entries don't have a stack frame and have a fixed
@@ -641,39 +985,7 @@ getallopts(struct display *dp, const char *opt_str, int *value)
        * value (entry) selected from the command line is 'all':
        */
       if (options[opt].values[dp->entry[opt]-1].name == all)
-      {
-         unsigned int sp = dp->csp++; /* my stack entry */
-
-         assert(sp >= dp->nsp); /* nsp starts off zero */
-
-         /* If the entry was active in the previous run dp->stack[sp] is already
-          * set up and dp->tsp will be greater than sp, otherwise a new entry
-          * needs to be created.
-          *
-          * dp->nsp is handled this way:
-          *
-          * 1) When an option is pushed onto the stack dp->nsp and dp->tsp are
-          *    both set (by push_opt) to the next stack entry *unless* there is
-          *    only one entry in the new list, in which case dp->stack[sp].end
-          *    is set.
-          *
-          * 2) For the top stack entry next_opt is called.  The entry must be
-          *    active (dp->stack[sp].end is not set) and either 'nsp' or 'end'
-          *    will be updated as appropriate.
-          *
-          * 3) For lower stack entries nsp is set unless the stack entry is
-          *    already at the end.  This means that when all the higher entries
-          *    are popped this entry will be too.
-          */
-         if (sp >= dp->tsp)
-            push_opt(dp, sp, opt); /* This sets tsp to sp+1 */
-
-         else if (sp+1U >= dp->tsp)
-            next_opt(dp, sp);
-
-         else if (!dp->stack[sp].end) /* Active, not at top of stack */
-            dp->nsp = sp+1U;
-      }
+         (void)advance_opt(dp, opt, 0/*do not search; iterate*/);
 
       *value = dp->value[opt];
       return 1; /* set */
@@ -681,6 +993,67 @@ getallopts(struct display *dp, const char *opt_str, int *value)
 
    else
       return 0; /* not set */
+}
+
+static int
+getallopts(struct display *dp, const char *opt_str, int *value)
+{
+   return getallopts_(dp, optind(dp, opt_str, strlen(opt_str)), value);
+}
+
+static int
+getsearchopts(struct display *dp, const char *opt_str, int *value)
+   /* As above except that if the option was not set try a search */
+{
+   png_byte istrat;
+   const png_byte opt = optind(dp, opt_str, strlen(opt_str));
+
+   /* If it was set on the command line honour the setting, including 'all'
+    * which will override the built in search:
+    */
+   if (getallopts_(dp, opt, value))
+      return 1;
+
+   /* Otherwise decide what to do here. */
+   istrat = OPTIND(dp, strategy);
+
+   if (opt == OPTIND(dp, select))
+      dp->value[opt] = SELECT_METHODICALLY; /* should probably be all */
+
+   else if (opt == istrat) /* search all strategies */
+      (void)advance_opt(dp, opt, 0/*iterate*/);
+
+   else if (opt == OPTIND(dp, level))
+   {
+      /* Both RLE and HUFFMAN don't benefit from level increases */
+      if (dp->value[istrat] == Z_RLE || dp->value[istrat] == Z_HUFFMAN_ONLY)
+         dp->value[opt] = 1;
+
+      else /* fixed, filtered or default */
+         (void)advance_opt(dp, opt, 1/*search*/);
+   }
+
+   else if (opt == OPTIND(dp, windowBits))
+   {
+      /* Changing windowBits for strategies that do not search the window is
+       * pointless.  Use the minimum window bits for these.
+       */
+      if (dp->value[istrat] == Z_RLE || dp->value[istrat] == Z_HUFFMAN_ONLY)
+         dp->value[opt] = 8;
+
+      else /* fixed, filtered or default */
+         (void)advance_opt(dp, opt, 1/*search*/);
+   }
+
+   else if (opt == OPTIND(dp, memLevel))
+      dp->value[opt] = 9; /* fixed */
+
+   else /* something else */
+      return 0;
+
+   /* One of the above searched options: */
+   *value = dp->value[opt];
+   return 1;
 }
 
 static int
@@ -964,7 +1337,11 @@ makename(struct display *dp, const char *dir, const char *infile)
 static void PNGCBAPI
 display_warning(png_structp pp, png_const_charp warning)
 {
-   display_log(get_dp(pp), LIBPNG_WARNING, "%s", warning);
+   struct display *dp = get_dp(pp);
+
+   /* This is used to prevent repeated warnings while searching */
+   if (!dp->no_warnings)
+      display_log(get_dp(pp), LIBPNG_WARNING, "%s", warning);
 }
 
 static void PNGCBAPI
@@ -1010,9 +1387,9 @@ read_function(png_structp pp, png_bytep data, png_size_t size)
    else
    {
       if (feof(dp->fp))
-         display_log(dp, USER_ERROR, "PNG file truncated");
+         display_log(dp, LIBPNG_ERROR, "PNG file truncated");
       else
-         display_log(dp, USER_ERROR, "PNG file read failed (%s)",
+         display_log(dp, LIBPNG_ERROR, "PNG file read failed (%s)",
                strerror(errno));
    }
 }
@@ -1028,12 +1405,14 @@ read_png(struct display *dp, const char *filename)
    if (dp->read_pp == NULL)
       display_log(dp, LIBPNG_ERROR, "failed to create read struct");
 
+   png_set_benign_errors(dp->read_pp, 1/*allowed*/);
+
    /* The png_read_png API requires us to make the info struct, but it does the
     * call to png_read_info.
     */
    dp->ip = png_create_info_struct(dp->read_pp);
    if (dp->ip == NULL)
-      display_log(dp, LIBPNG_ERROR, "failed to create info struct");
+      png_error(dp->read_pp, "failed to create info struct");
 
    /* Set the IO handling */
    png_set_read_fn(dp->read_pp, dp, read_function);
@@ -1052,9 +1431,19 @@ read_png(struct display *dp, const char *filename)
    png_read_png(dp->read_pp, dp->ip, 0U/*transforms*/, NULL/*params*/);
    dp->w = png_get_image_width(dp->read_pp, dp->ip);
    dp->h = png_get_image_height(dp->read_pp, dp->ip);
+   dp->ct = png_get_color_type(dp->read_pp, dp->ip);
    dp->bpp = png_get_bit_depth(dp->read_pp, dp->ip) *
              png_get_channels(dp->read_pp, dp->ip);
-   dp->size = png_get_rowbytes(dp->read_pp, dp->ip) * dp->h; /* can overflow */
+   {
+      png_alloc_size_t rb = png_get_rowbytes(dp->read_pp, dp->ip);
+
+      /* The size calc can overflow. */
+      if (MAX_SIZE/rb < dp->h)
+         png_error(dp->read_pp, "image too large");
+
+      dp->size = rb * dp->h;
+   }
+
    display_clean_read(dp);
    dp->operation = "none";
 }
@@ -1062,23 +1451,29 @@ read_png(struct display *dp, const char *filename)
 static void
 display_start_write(struct display *dp, const char *filename)
 {
-   if (filename != NULL)
-   {
-      dp->output_file = filename;
-      dp->fp = fopen(filename, "wb");
-   }
+   assert(dp->fp == NULL);
+
+   if ((dp->options & NOWRITE) != 0)
+      dp->output_file = "<no write>";
 
    else
    {
-      dp->output_file = "<stdout>";
-      dp->fp = stdout;
+      if (filename != NULL)
+      {
+         dp->output_file = filename;
+         dp->fp = fopen(filename, "wb");
+      }
+
+      else
+      {
+         dp->output_file = "<stdout>";
+         dp->fp = stdout;
+      }
+
+      if (dp->fp == NULL)
+         display_log(dp, USER_ERROR, "%s: file open failed (%s)",
+               dp->output_file, strerror(errno));
    }
-
-   dp->write_size = 0U;
-
-   if (dp->fp == NULL)
-      display_log(dp, USER_ERROR, "%s: file open failed (%s)", dp->output_file,
-            strerror(errno));
 }
 
 static void PNGCBAPI
@@ -1086,8 +1481,15 @@ write_function(png_structp pp, png_bytep data, png_size_t size)
 {
    struct display *dp = get_dp(pp);
 
-   if (fwrite(data, size, 1U, dp->fp) == 1U)
+   /* The write fail is classed as a USER_ERROR, so --quiet does not turn it
+    * off, this seems more likely to be correct.
+    */
+   if (dp->fp == NULL || fwrite(data, size, 1U, dp->fp) == 1U)
+   {
       dp->write_size += size;
+      if (dp->write_size < size || dp->write_size == MAX_SIZE)
+         png_error(pp, "IDAT size overflow");
+   }
 
    else
       display_log(dp, USER_ERROR, "%s: PNG file write failed (%s)",
@@ -1103,6 +1505,18 @@ write_function(png_structp pp, png_bytep data, png_size_t size)
 
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 static void
+search_compression(struct display *dp)
+{
+   /* Like set_compression below but use a more restricted search than 'all' */
+   int val;
+
+#  define SET(name, func) if (getsearchopts(dp, #name, &val))\
+      png_set_compression_ ## func(dp->write_pp, val);
+   SET_COMPRESSION
+#  undef SET
+}
+
+static void
 set_compression(struct display *dp)
 {
    int val;
@@ -1113,7 +1527,8 @@ set_compression(struct display *dp)
 #  undef SET
 }
 #else
-#  define set_compression(dp, pp) ((void)0)
+#  define search_compression(dp) ((void)0)
+#  define set_compression(dp) ((void)0)
 #endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
@@ -1128,7 +1543,7 @@ set_text_compression(struct display *dp)
 #  undef SET
 }
 #else
-#  define set_text_compression(dp, pp) ((void)0)
+#  define set_text_compression(dp) ((void)0)
 #endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 
 static void
@@ -1141,8 +1556,9 @@ write_png(struct display *dp, const char *destname)
       display_error, display_warning);
 
    if (dp->write_pp == NULL)
-      display_log(dp, APP_ERROR, "failed to create write png_struct");
+      display_log(dp, LIBPNG_ERROR, "failed to create write png_struct");
 
+   png_set_benign_errors(dp->write_pp, 1/*allowed*/);
    png_set_write_fn(dp->write_pp, dp, write_function, NULL/*flush*/);
 
 #  ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
@@ -1159,7 +1575,10 @@ write_png(struct display *dp, const char *destname)
    /* compression outputs, IDAT and zTXt/iTXt: */
    dp->tsp = dp->nsp;
    dp->nsp = dp->csp = 0;
-   set_compression(dp);
+   if (dp->options & SEARCH)
+      search_compression(dp);
+   else
+      set_compression(dp);
    set_text_compression(dp);
 
    /* filter handling */
@@ -1192,15 +1611,17 @@ write_png(struct display *dp, const char *destname)
 #  endif /* WRITE_FILTER */
 
    /* This just uses the 'read' info_struct directly, it contains the image. */
+   dp->write_size = 0U;
    png_write_png(dp->write_pp, dp->ip, 0U/*transforms*/, NULL/*params*/);
 
    /* Make sure the file was written ok: */
+   if (dp->fp != NULL)
    {
       FILE *fp = dp->fp;
       dp->fp = NULL;
       if (fclose(fp))
-         display_log(dp, APP_ERROR, "%s: write failed (%s)", destname,
-               strerror(errno));
+         display_log(dp, APP_ERROR, "%s: write failed (%s)",
+               destname == NULL ? "stdout" : destname, strerror(errno));
    }
 
    /* Clean it on the way out - if control returns to the caller then the
@@ -1211,10 +1632,61 @@ write_png(struct display *dp, const char *destname)
 }
 
 static void
+set_windowBits_hi(struct display *dp)
+{
+   /* windowBits is in the range 8..15, but it is said that setting '8'
+    * prevents adequate search even if the image size is 256 bytes or less.
+    */
+   int wb = 15; /* for large images */
+   int i = VLSIZE(windowBits_IDAT);
+
+   while (wb > 9 && dp->size <= 1U<<(wb-1)) --wb;
+
+   while (--i >= 0) if (VLNAME(windowBits_IDAT)[i].name == range_hi) break;
+
+   assert(i > 0); /* vl_windowBits_IDAT always has a RANGE() */
+   VLNAME(windowBits_IDAT)[i].value = wb;
+}
+
+static int
+better_options(const struct display *dp)
+{
+   /* Are these options better than the best found so far?  Normally the
+    * options are tested in preference order, best first, however when doing a
+    * search operation on a range the range values are tested out of order.  In
+    * that case preferable options will get tested later.
+    *
+    * This function looks through the stack from the bottom up looking for an
+    * option that does not match the current best value.  When it finds one it
+    * checks to see if it is more or less desireable and returns true or false
+    * as appropriate.
+    *
+    * Notice that this means that the order options are pushed onto the stack
+    * conveys a priority; lower/earlier options are more important than later
+    * ones.
+    */
+   unsigned int sp;
+
+   for (sp=0; sp<dp->csp; ++sp)
+   {
+      int c = compare_option(dp, sp);
+
+      if (c < 0)
+         return 0; /* worse */
+
+      else if (c > 0)
+         return 1; /* better */
+   }
+
+   assert(0 && "unreached");
+}
+
+static void
 cp_one_file(struct display *dp, const char *filename, const char *destname)
 {
    dp->filename = filename;
    dp->operation = "read";
+   dp->no_warnings = 0;
 
    /* Read it then write it: */
    if (filename != NULL && access(filename, R_OK) != 0)
@@ -1225,6 +1697,9 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
 
    /* But 'destname' may be a directory. */
    dp->operation = "write";
+
+   /* Limit the upper end of the windowBits range for this file */
+   set_windowBits_hi(dp);
 
    if (destname != NULL) /* else stdout */
    {
@@ -1242,29 +1717,44 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
    dp->nsp = 0;
    dp->curr[0] = 0;
    dp->best[0] = 0; /* acts as a flag for the caller */
+   dp->best_size = MAX_SIZE;
    write_png(dp, destname);
 
    if (dp->nsp > 0) /* interating over lists */
    {
-      char tmpname[(sizeof dp->namebuf) + 4];
+      char *tmpname, tmpbuf[(sizeof dp->namebuf) + 4];
       assert(dp->curr[0] == ' ' && dp->tsp > 0);
+
+      /* Cancel warnings on subsequent writes */
+      dp->no_warnings = 1;
 
       /* Loop to find the best option, first initialize the 'best' fields: */
       strcpy(dp->best, dp->curr);
       dp->best_size = dp->write_size;
-      strcpy(tmpname, destname);
-      strcat(tmpname, ".tmp"); /* space for .tmp allocated above */
+
+      if (destname != NULL)
+      {
+         strcpy(tmpbuf, destname);
+         strcat(tmpbuf, ".tmp"); /* space for .tmp allocated above */
+         tmpname = tmpbuf;
+      }
+
+      else
+         tmpname = NULL; /* stdout */
 
       do
       {
          write_png(dp, tmpname);
 
-         /* And compare the sizes (theoretically this could overflow, in which
-          * case this program will need to be rewritten perhaps considerably).
+         /* And compare the sizes (the write function makes sure write_size
+          * doesn't overflow.)
           */
-         if (dp->write_size < dp->best_size)
+         assert(dp->csp > 0);
+
+         if (dp->write_size < dp->best_size ||
+             (dp->write_size == dp->best_size && better_options(dp)))
          {
-            if (rename(tmpname, destname) != 0)
+            if (destname != NULL && rename(tmpname, destname) != 0)
                display_log(dp, APP_ERROR, "rename %s %s failed (%s)", tmpname,
                      destname, strerror(errno));
 
@@ -1272,7 +1762,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
             dp->best_size = dp->write_size;
          }
 
-         else if (unlink(tmpname) != 0)
+         else if (tmpname != NULL && unlink(tmpname) != 0)
             display_log(dp, APP_WARNING, "unlink %s failed (%s)", tmpname,
                   strerror(errno));
       }
@@ -1363,20 +1853,18 @@ main(const int argc, const char * const * const argv)
                return 99;
          }
 
-         if (d.options & SIZES)
-            printf("%s [%ld x %ld %d bpp %lu bytes] 0x%lx %lu -> %lu\n",
+         if (d.best[0] != 0)
+            printf("%s [%ld x %ld %d bpp %s, %lu bytes] %lu -> %lu with '%s'\n",
                   infile, (unsigned long)d.w, (unsigned long)d.h, d.bpp,
-                  (unsigned long)d.size, (unsigned long)d.results,
+                  cts(d.ct), (unsigned long)d.size, (unsigned long)d.read_size,
+                  (unsigned long)d.best_size, d.best);
+
+         else if (d.options & SIZES)
+            printf("%s [%ld x %ld %d bpp %s, %lu bytes] 0x%lx %lu -> %lu\n",
+                  infile, (unsigned long)d.w, (unsigned long)d.h, d.bpp,
+                  cts(d.ct), (unsigned long)d.size, (unsigned long)d.results,
                   (unsigned long)d.read_size, (unsigned long)d.write_size);
 
-         /* This somewhat replicates the above information, but it seems better
-          * to do both.
-          */
-         if (d.best[0] != 0 && (error_level)(d.options & LEVEL_MASK) < QUIET)
-            printf("%s [%ld x %ld %d bpp %lu bytes] %lu -> %lu with '%s'\n",
-                  infile, (unsigned long)d.w, (unsigned long)d.h, d.bpp,
-                  (unsigned long)d.size, (unsigned long)d.read_size,
-                  (unsigned long)d.best_size, d.best);
 
          /* Here on any return, including failures, except user/internal issues
           */
