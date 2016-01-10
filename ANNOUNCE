@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta77 - January 9, 2016
+Libpng 1.7.0beta77 - January 10, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1172,8 +1172,20 @@ Version 1.7.0beta76 [January 7, 2016]
   Fixed new Coverity defect, potential NULL dereference of "ps" in pngwutil.c
   Added temporary workaround for Coverity "Dead code" defect.
 
-Version 1.7.0beta77 [January 9, 2016]
+Version 1.7.0beta77 [January 10, 2016]
   Fixed new Coverity defect, another NULL dereference of "ps" in pngwutil.c
+  Prevent the CMINFO optimization code from running twice on any PNG IDAT
+    stream longer than 2048 bytes; the second time could overwrite bytes
+    2048,2049, invalidating the output.
+  Fixed a (debug) checks that was slightly wrong (< when <= should have been
+    used) and this caused write to abort maybe 1 out of 2048 times.
+  Improved the contrib/examples/pngcp search mode.  This is still a
+    work-in-progress, but it seems fairly stable (if not exactly 100%
+    optimal).  pngcp now allows 'all' for some options which iterates
+    through all possible settings (this reliably produces the smallest
+    IDAT that libpng can produce with those settings.)  It also contains
+    a "--search" command line option that attempts to optimize this by
+    skipping pointless tests; it is close, most of the time, but not perfect.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
