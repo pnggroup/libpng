@@ -2363,7 +2363,8 @@ png_write_IDAT(png_structrp png_ptr, int flush)
          else /* not end of list */
             debug((ps->s.zs.next_out < next->output ||
                    ps->s.zs.next_out > next->output + sizeof next->output) &&
-                  (ps->s.overflow > 0 || ps->s.len >= sizeof next->output));
+                  (ps->s.overflow > 0 ||
+                   ps->s.start + ps->s.len >= sizeof next->output));
 
          /* First, if this is the very first IDAT (PNG_HAVE_IDAT not set)
           * optimize the CINFO field:
@@ -2419,7 +2420,6 @@ png_write_IDAT(png_structrp png_ptr, int flush)
             written = len;
             png_write_chunk_data(png_ptr, next->output+start, written);
             ps->s.start = (unsigned int)/*SAFE*/(start + written);
-            UNTESTED
          }
 
          /* 'written' bytes were written: */
