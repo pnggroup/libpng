@@ -1,12 +1,11 @@
 /* pngcp.c
  *
- * Copyright (c) 2016 John Cunningham Bowler
+ * COPYRIGHT: Written by John Cunningham Bowler, 2016.
+ * To the extent possible under law, the author has waived all copyright and
+ * related or neighboring rights to this work.  This work is published from:
+ * United States.
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- *
- * This code is released under the libpng license.
- * For conditions of distribution and use, see the disclaimer
- * and license in png.h
  *
  * This is a minimal example of copying a PNG without changes using the
  * png_read_png and png_write_png interfaces.
