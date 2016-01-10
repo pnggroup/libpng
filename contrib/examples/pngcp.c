@@ -126,6 +126,15 @@ vl_strategy[] =
    { "default", Z_DEFAULT_STRATEGY },
    { all, 0 }
 },
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+vl_windowBits_text[] =
+{
+   { "default", 15 },
+   { "small", 9 },
+   RANGE(8, 15),
+   { all, 0 }
+},
+#endif /* text compression */
 vl_level[] =
 {
    { "default", Z_DEFAULT_COMPRESSION /* this is -1 */ },
@@ -136,15 +145,6 @@ vl_level[] =
    RANGE(1, 9), /* this deliberately excludes '0' */
    { all, 0 }
 },
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-vl_windowBits_text[] =
-{
-   { "default", 15 },
-   { "small", 9 },
-   RANGE(8, 15),
-   { all, 0 }
-},
-#endif /* text compression */
 vl_memLevel[] =
 {
    { "default", 8 },
@@ -182,6 +182,12 @@ vl_select[] =
    { "both", SELECT_HEURISTICALLY|SELECT_METHODICALLY }
 },
 #endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
+vl_IDAT_size[] = /* for png_set_compression_buffer_size */
+{
+   { "default", 0x7FFFFFFF },
+   { "minimal", 1 },
+   RANGE(1, 0x7FFFFFFF)
+},
 vl_on_off[] = { { "on", 1 }, { "off", 2 } };
 
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
@@ -239,10 +245,11 @@ static const struct option
 #  define VLC(name) VLCIDAT(name) VLCzTXt(name)
 
    VLC(strategy)
-   VLC(level)
    VLO("windowBits", windowBits_IDAT)
    VLO("text-windowBits", windowBits_text)
+   VLC(level)
    VLC(memLevel)
+   VLO("IDAT-size", IDAT_size)
 
 #  undef VLO
 
@@ -1495,11 +1502,17 @@ write_function(png_structp pp, png_bytep data, png_size_t size)
             dp->output_file, strerror(errno));
 }
 
-/* Compression option, 'method' is never set: there is no choice */
+/* Compression option, 'method' is never set: there is no choice.
+ *
+ * IMPORTANT: the order of the entries in this macro determines the preference
+ * order when two different combos of two of these options produce an IDAT of
+ * the same size.  The logic here is to put the things that affect the decoding
+ * of the PNG image ahead of those that are relevant only to the encoding.
+ */
 #define SET_COMPRESSION\
    SET(strategy, strategy);\
-   SET(level, level);\
    SET(windowBits, window_bits);\
+   SET(level, level);\
    SET(memLevel, mem_level);
 
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
@@ -1579,6 +1592,15 @@ write_png(struct display *dp, const char *destname)
    else
       set_compression(dp);
    set_text_compression(dp);
+
+   {
+      int val;
+
+      /* The permitted range is 1..0x7FFFFFFF, so the cast is safe */
+      if (getopt(dp, "IDAT-size", &val))
+         png_set_compression_buffer_size(dp->write_pp,
+               (png_alloc_size_t)/*SAFE*/val);
+   }
 
    /* filter handling */
 #if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
