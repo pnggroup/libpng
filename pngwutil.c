@@ -2381,6 +2381,11 @@ png_write_IDAT(png_structrp png_ptr, int flush)
                debug((png_ptr->mode & PNG_HAVE_IDAT) != 0U);
 #        endif /* WRITE_OPTIMIZE_CMF */
 
+         /* Set this now to prevent the above happening again second time round
+          * the loop:
+          */
+         png_ptr->mode |= PNG_HAVE_IDAT;
+
          if (avail <= start+len)
          {
             /* Write all of this buffer: */
@@ -2434,7 +2439,6 @@ png_write_IDAT(png_structrp png_ptr, int flush)
       while (len > 0U);
 
       png_write_chunk_end(png_ptr);
-      png_ptr->mode |= PNG_HAVE_IDAT;
    }
 
    /* avail == 0 && flush */
@@ -3078,7 +3082,7 @@ png_zlib_filter_revert(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
                pz->zs.next_out <= pz->list->output + (sizeof pz->list->output))
          {
             debug(pz->overflow == 0U &&
-                  pz->len + pz->start < (sizeof pz->list->output) &&
+                  pz->len + pz->start <= (sizeof pz->list->output) &&
                   pz->zs.next_out + pz->zs.avail_out ==
                      pz->list->output + (sizeof pz->list->output) &&
                   ps->s.zs.avail_out > pz->zs.avail_out);
