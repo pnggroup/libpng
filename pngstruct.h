@@ -576,7 +576,7 @@ struct png_struct_def
 #endif
 
 #if defined(PNG_SEQUENTIAL_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-   uInt IDAT_size; /* limit on IDAT read and write IDAT size */
+   png_uint_32 IDAT_size;         /* limit on IDAT read and write IDAT size */
 #endif /* SEQUENTIAL_READ || WRITE */
 
    /* ERROR HANDLING */

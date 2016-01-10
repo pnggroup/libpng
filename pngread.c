@@ -308,17 +308,18 @@ png_start_read_image(png_structrp png_ptr)
 static void
 png_read_IDAT(png_structrp png_ptr)
 {
-   /* Read more input data, up to png_struct::IDAT_size, stop at the
-    * end of the IDAT stream:
+   /* Read more input data, up to png_struct::IDAT_size, stop at the end of the
+    * IDAT stream.  pngset.c checks png_struct::IDAT_size to ensure that it will
+    * fit in a uInt.
     */
+   const uInt buffer_size = (uInt)/*SAFE*/png_ptr->IDAT_size;
    uInt IDAT_size = 0;
    png_bytep buffer =
-      png_read_buffer(png_ptr, png_ptr->IDAT_size, 0/*error*/);
+      png_read_buffer(png_ptr, buffer_size, 0/*error*/);
 
    png_ptr->zstream.next_in = buffer;
 
-   while (png_ptr->chunk_name == png_IDAT &&
-          IDAT_size < png_ptr->IDAT_size)
+   while (png_ptr->chunk_name == png_IDAT && IDAT_size < buffer_size)
    {
       png_uint_32 l = png_ptr->chunk_length;
 
@@ -338,11 +339,11 @@ png_read_IDAT(png_structrp png_ptr)
 
       /* Read from the IDAT chunk into the buffer, up to png_struct::IDAT_size:
        */
-      if (l > png_ptr->IDAT_size - IDAT_size) /* SAFE: while check */
-         l = png_ptr->IDAT_size - IDAT_size;
+      if (l > buffer_size - IDAT_size) /* SAFE: while check */
+         l = buffer_size - IDAT_size;
 
       png_crc_read(png_ptr, buffer+IDAT_size, l);
-      IDAT_size += /*SAFE*/l;
+      IDAT_size += (uInt)/*SAFE*/l;
       png_ptr->chunk_length -= l;
    }
 
@@ -612,7 +613,15 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
    {
       if (png_ptr->zowner == png_IDAT)
       {
-         /* Normal case: read to the end of the IDAT chunks. */
+         /* Normal case: read to the end of the IDAT chunks.  In about
+          * 5/PNG_IDAT_READ_SIZE cases (typically that's 1:820) zlib will have
+          * returned all the image data but not read up to the end of the
+          * Adler32 because the end of the stream had not been read.  Make sure
+          * it gets read here:
+          */
+         if (png_ptr->zstream.avail_in == 0)
+            png_read_IDAT(png_ptr);
+
          while (!png_read_finish_IDAT(png_ptr)) {
             /* This will adjust zstream.next/avail_in appropriately and if
              * necessary read the next chunk.  After this avail_in may still

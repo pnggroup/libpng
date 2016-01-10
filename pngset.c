@@ -1596,16 +1596,17 @@ png_set_rows(png_const_structrp png_ptr, png_inforp info_ptr,
 #endif
 
 void PNGAPI
-png_set_compression_buffer_size(png_structrp png_ptr, png_size_t size)
+png_set_compression_buffer_size(png_structrp png_ptr, png_alloc_size_t size)
 {
    if (png_ptr == NULL)
       return;
 
-   if (size == 0 || size > PNG_UINT_31_MAX)
+   if (size == 0 ||
+       size > (png_ptr->read_struct ? ZLIB_IO_MAX : PNG_UINT_31_MAX))
       png_error(png_ptr, "invalid compression buffer size");
 
 #  if (defined PNG_SEQUENTIAL_READ_SUPPORTED) || defined PNG_WRITE_SUPPORTED
-      png_ptr->IDAT_size = (uInt)/*SAFE*/size;
+      png_ptr->IDAT_size = (png_uint_32)/*SAFE*/size;
 #  endif /* SEQUENTIAL_READ || WRITE */
 }
 

@@ -1113,11 +1113,21 @@ PNG_EXPORTA(5, png_structp, png_create_write_struct,
     png_error_ptr warn_fn),
     PNG_ALLOCATED);
 
-PNG_EXPORT(6, size_t, png_get_compression_buffer_size,
+/* These APIs control the sie of the buffer used when reading IDAT chunks in the
+ * sequential read code and the size of the IDAT chunks produced when writing.
+ * They have no effect on the progressive read code.  In both read and write
+ * cases it will be necessary to allocate at least this amount of buffer space.
+ * The default value is PNG_IDAT_READ_SIZE on read and PNG_ZBUF_SIZE on write.
+ *
+ * The valid range is 1..0x7FFFFFFF on write and 1..max(uInt) on read, where
+ * uInt is the type declared by zlib.h.  On write setting the largest value will
+ * typically cause the PNG image data to be written in one chunk; this gives the
+ * smallest PNG and has little or no effect on applications that read the PNG.
+ */
+PNG_EXPORT(6, png_alloc_size_t, png_get_compression_buffer_size,
     (png_const_structrp png_ptr));
-
 PNG_EXPORT(7, void, png_set_compression_buffer_size, (png_structrp png_ptr,
-    size_t size));
+    png_alloc_size_t size));
 
 /* Moved from pngconf.h in 1.4.0 and modified to ensure setjmp/longjmp
  * match up.
