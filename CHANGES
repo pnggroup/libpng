@@ -5471,7 +5471,7 @@ Version 1.7.0beta76 [January 7, 2016]
   Fixed new Coverity defect, potential NULL dereference of "ps" in pngwutil.c
   Added temporary workaround for Coverity "Dead code" defect.
 
-Version 1.7.0beta77 [January 10, 2016]
+Version 1.7.0beta77 [January 11, 2016]
   Fixed new Coverity defect, another NULL dereference of "ps" in pngwutil.c
   Prevent the CMINFO optimization code from running twice on any PNG IDAT
     stream longer than 2048 bytes; the second time could overwrite bytes
@@ -5485,6 +5485,20 @@ Version 1.7.0beta77 [January 10, 2016]
     IDAT that libpng can produce with those settings.)  It also contains
     a "--search" command line option that attempts to optimize this by
     skipping pointless tests; it is close, most of the time, but not perfect.
+  Fixed write problem with reduced size IDAT chunks.
+    png_set_compression_buffer_size would result in a spurious debug assert
+    if the compression buffer size was set to something other than a multiple
+    of PNG_ROW_BUFFER_SIZE; the debug test failed to add the buffer 'start'
+  The sequential read code failed to read to the end of the IDAT stream in
+    about 1 of 820 cases, resulting in a spurious warning.  The
+    png_set_compression_buffer_size API also would not work (or do bad things)
+    if the size of a zlib uInt was less than 32 bits.
+  Added pngcp IDAT size test and changed the order of the 'level'
+    and 'windowBits' searches to seach windowBits first; this favors
+    windowBits optimizations over compression level ones on the basis
+    that the latter should only affect the write code. This includes a
+    quiet API change to alter png_set_compression_buffer_size to use
+    a png_alloc_size_t, not png_size_t and implement the correct checks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
