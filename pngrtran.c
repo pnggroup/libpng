@@ -5998,6 +5998,8 @@ png_remove_PLTE_and_tRNS(png_structrp png_ptr)
       png_ptr->trans_alpha = NULL;
       png_ptr->num_trans = 0;
 #  endif /* READ_tRNS */
+
+   png_ptr->palette_updated = 1U;
 }
 
 static void
@@ -6164,7 +6166,11 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
     * first unprocessed transform.  The reset of the transform control loses the
     * gamma information as well, of course, as any information about the palette
     * and tRNS changes (such as the RANGE flags).
+    *
+    * The following ensures that png_read_update_info knows to update the
+    * palette in png_info (which is no longer shared).
     */
+   png_ptr->palette_updated = 1U;
 }
 
 /* These structure and the save/restore routines that follow it exist to save
@@ -6725,29 +6731,39 @@ png_read_transform_info(png_structrp png_ptr, png_inforp info_ptr)
           * but only if png_ptr has a new version, otherwise the invalid_info
           * settings from above can still invalidate the chunk.
           */
-         if (png_ptr->palette != info_ptr->palette)
+         if (png_ptr->palette_updated)
          {
-            png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
-            info_ptr->palette = png_ptr->palette;
-            info_ptr->num_palette = png_ptr->num_palette;
-            if (info_ptr->palette != NULL && info_ptr->num_palette > 0)
-               info_ptr->valid |= PNG_INFO_PLTE;
+            if (png_ptr->num_palette > 0)
+               png_set_PLTE(png_ptr, info_ptr, png_ptr->palette,
+                     png_ptr->num_palette);
+
+            else
+            {
+               png_free_data(png_ptr, info_ptr, PNG_FREE_PLTE, 0);
+               info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_PLTE);
+            }
 
 #           ifdef PNG_READ_tRNS
-               /* ONLY do this if the palette was changed above because, in
-                * fact, the tRNS data is not shared (yes, this is inconsistent,
-                * perhaps fix it?)
+               /* If the output format is not a palette format the tRNS
+                * information was a single color which is now invalid
+                * (probably), otherwise the array of tRNS values must be
+                * updated.
                 */
-               if ((info_ptr->format & PNG_FORMAT_FLAG_COLORMAP) != 0 &&
-                   png_ptr->trans_alpha != info_ptr->trans_alpha)
+               if ((info_ptr->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
                {
-                  png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-                  /* NOTE: it is shared now! */
-                  info_ptr->trans_alpha = png_ptr->trans_alpha;
-                  info_ptr->num_trans = png_ptr->num_trans;
-                  if (info_ptr->trans_alpha != NULL && info_ptr->num_trans > 0)
-                     info_ptr->valid |= PNG_INFO_tRNS;
+                  if (png_ptr->num_trans > 0)
+                     png_set_tRNS(png_ptr, info_ptr, png_ptr->trans_alpha,
+                           png_ptr->num_trans, NULL/*trans color*/);
+
+                  else
+                  {
+                     png_free_data(png_ptr, info_ptr, PNG_FREE_tRNS, 0);
+                     info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_tRNS);
+                  }
                }
+
+               else
+                  info_ptr->valid &= PNG_BIC_MASK(PNG_INFO_tRNS);
 #           endif /* READ_tRNS */
          }
 #     endif /* READ_TRANSFORMS */

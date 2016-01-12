@@ -469,7 +469,7 @@ struct png_struct_def
        * default: PNG_DEFAULT_GAMMA_ACCURACY (665)
        */
 #endif /* NYI */
-   png_uint_16      gamma_threshold;
+   png_uint_16  gamma_threshold;
       /* Gamma threshold value as a fixed-point value in the range 0..1; the
        * threshold at or below which gamma correction is skipped.  '0' forces
        * gamma correction even when there is none because the input and output
@@ -479,7 +479,8 @@ struct png_struct_def
        */
 #endif /* READ_GAMMA */
 #ifdef PNG_READ_TRANSFORMS_SUPPORTED
-   unsigned int     invalid_info;     /* PNG_INFO_* for invalidated chunks */
+   unsigned int invalid_info;      /* PNG_INFO_* for invalidated chunks */
+   unsigned int palette_updated:1; /* png_struct::palette changed */
 #endif /* READ_TRANSFORMS */
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED

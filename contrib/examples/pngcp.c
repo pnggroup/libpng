@@ -130,7 +130,7 @@ vl_strategy[] =
 vl_windowBits_text[] =
 {
    { "default", 15 },
-   { "small", 9 },
+   { "minimum", 8 },
    RANGE(8, 15),
    { all, 0 }
 },
@@ -147,9 +147,12 @@ vl_level[] =
 },
 vl_memLevel[] =
 {
-   { "default", 8 },
-   { "least", 1 },
-   RANGE(2, 9), /* exclude 1: there seems to be a zlib bug */
+   { "9", 9 }, /* zlib maximum */
+   { "1", 1 }, /* zlib minimum */
+   { "default", 8 }, /* zlib default */
+   { "2", 2 },
+   { "3", 3 }, /* for explicit testing */
+   RANGE(4, 9), /* exclude 3 and below: zlib bugs */
    { all, 0 }
 },
 #endif /* WRITE_CUSTOMIZE_*COMPRESSION */
@@ -1052,7 +1055,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    }
 
    else if (opt == OPTIND(dp, memLevel))
-      dp->value[opt] = 9; /* fixed */
+      (void)advance_opt(dp, opt, 1/*search*/);
 
    else /* something else */
       return 0;
