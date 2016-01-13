@@ -5481,6 +5481,9 @@ Version 1.6.21rc02 [January 7, 2016]
   Marked 'limit' UNUSED in transform_range_check().  This only affects
     release builds.
 
+Version 1.6.21rc03 [January 13, 2016]
+  Worked around a false-positive Coverity issue in pngvalid.c.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

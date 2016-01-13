@@ -309,8 +309,13 @@ static void r16(png_uint_16p p16, size_t count)
    }
 }
 
-#define R16(this)\
+#ifdef __COVERITY__
+#  define R16(this)\
+   r16(&(this), (sizeof (this))/2U/*(sizeof (png_uint_16))*/)
+#else
+#  define R16(this)\
    r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
+#endif
 
 #if defined PNG_READ_RGB_TO_GRAY_SUPPORTED ||\
     defined PNG_READ_FILLER_SUPPORTED
@@ -326,8 +331,14 @@ static void r32(png_uint_32p p32, size_t count)
    }
 }
 
-#define R32(this)\
+#ifdef __COVERITY__
+#  define R32(this)\
+   r32(&(this), (sizeof (this))/4U/*(sizeof (png_uint_32))*/)
+#else
+#  define R32(this)\
    r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
+#endif
+
 #endif /* READ_FILLER || READ_RGB_TO_GRAY */
 
 #endif /* READ || WRITE_tRNS || WRITE_FILTER */
