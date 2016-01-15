@@ -1,8 +1,8 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.5.25 [December 3, 2015]
- * Copyright (c) 2014-2015 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.21 [January 15, 2016]
+ * Copyright (c) 2014-2016 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -115,6 +115,16 @@ typedef png_byte *png_const_bytep;
     */
 #  define png_const_structp png_structp
 #endif
+
+#ifndef RELEASE_BUILD
+   /* RELEASE_BUILD is true for releases and release candidates: */
+#  define RELEASE_BUILD (PNG_LIBPNG_BUILD_BASE_TYPE >= PNG_LIBPNG_BUILD_RC)
+#endif
+#if RELEASE_BUILD
+#   define debugonly(something)
+#else /* !RELEASE_BUILD */
+#   define debugonly(something) something
+#endif /* !RELEASE_BUILD */
 
 #include <float.h>  /* For floating point constants */
 #include <stdlib.h> /* For malloc */
@@ -276,7 +286,8 @@ make_four_random_bytes(png_uint_32* seed, png_bytep bytes)
    make_random_bytes(seed, bytes, 4);
 }
 
-#if defined PNG_READ_SUPPORTED || defined PNG_WRITE_tRNS_SUPPORTED
+#if defined PNG_READ_SUPPORTED || defined PNG_WRITE_tRNS_SUPPORTED ||\
+    defined PNG_WRITE_FILTER_SUPPORTED
 static void
 randomize(void *pv, size_t size)
 {
@@ -284,19 +295,66 @@ randomize(void *pv, size_t size)
    make_random_bytes(random_seed, pv, size);
 }
 
-#define RANDOMIZE(this) randomize(&(this), sizeof (this))
-#endif /* READ || WRITE_tRNS */
+#define R8(this) randomize(&(this), sizeof (this))
 
-#ifdef PNG_READ_TRANSFORMS_SUPPORTED
+static void r16(png_uint_16p p16, size_t count)
+{
+   size_t i;
+
+   for (i=0; i<count; ++i)
+   {
+      unsigned char b2[2];
+      randomize(b2, sizeof b2);
+      *p16++ = png_get_uint_16(b2);
+   }
+}
+
+#ifdef __COVERITY__
+#  define R16(this)\
+   r16(&(this), (sizeof (this))/2U/*(sizeof (png_uint_16))*/)
+#else
+#  define R16(this)\
+   r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
+#endif
+
+#if defined PNG_READ_RGB_TO_GRAY_SUPPORTED ||\
+    defined PNG_READ_FILLER_SUPPORTED
+static void r32(png_uint_32p p32, size_t count)
+{
+   size_t i;
+
+   for (i=0; i<count; ++i)
+   {
+      unsigned char b4[4];
+      randomize(b4, sizeof b4);
+      *p32++ = png_get_uint_32(b4);
+   }
+}
+
+#ifdef __COVERITY__
+#  define R32(this)\
+   r32(&(this), (sizeof (this))/4U/*(sizeof (png_uint_32))*/)
+#else
+#  define R32(this)\
+   r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
+#endif
+
+#endif /* READ_FILLER || READ_RGB_TO_GRAY */
+
+#endif /* READ || WRITE_tRNS || WRITE_FILTER */
+
+#if defined PNG_READ_TRANSFORMS_SUPPORTED ||\
+    defined PNG_WRITE_FILTER_SUPPORTED
 static unsigned int
 random_mod(unsigned int max)
 {
-   unsigned int x;
+   png_uint_16 x;
 
-   RANDOMIZE(x);
+   R16(x);
 
    return x % max; /* 0 .. max-1 */
 }
+#endif /* READ_TRANSFORMS || WRITE_FILTER */
 
 #if (defined PNG_READ_RGB_TO_GRAY_SUPPORTED) ||\
     (defined PNG_READ_FILLER_SUPPORTED)
@@ -305,12 +363,11 @@ random_choice(void)
 {
    unsigned char x;
 
-   RANDOMIZE(x);
+   R8(x);
 
    return x & 1;
 }
-#endif
-#endif /* PNG_READ_SUPPORTED */
+#endif /* READ_RGB_TO_GRAY || READ_FILLER */
 
 /* A numeric ID based on PNG file characteristics.  The 'do_interlace' field
  * simply records whether pngvalid did the interlace itself or whether it
@@ -1974,6 +2031,8 @@ typedef struct png_modifier
     * internal check on pngvalid to ensure that the calculated error limits are
     * not ridiculous; without this it is too easy to make a mistake in pngvalid
     * that allows any value through.
+    *
+    * NOTE: this is not checked in release builds.
     */
    double                   limit;    /* limit on error values, normally 4E-3 */
 
@@ -3278,12 +3337,14 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
    png_color_16 tRNS;
    const png_uint_16 mask = (png_uint_16)((1U << bit_depth)-1);
 
-   RANDOMIZE(tRNS);
+   R8(tRNS); /* makes unset fields random */
 
    if (colour_type & 2/*RGB*/)
    {
       if (bit_depth == 8)
       {
+         R16(tRNS.red);
+         R16(tRNS.green);
          tRNS.blue = tRNS.red ^ tRNS.green;
          tRNS.red &= mask;
          tRNS.green &= mask;
@@ -3292,13 +3353,17 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
 
       else /* bit_depth == 16 */
       {
+         R16(tRNS.red);
          tRNS.green = (png_uint_16)(tRNS.red * 257);
          tRNS.blue = (png_uint_16)(tRNS.green * 17);
       }
    }
 
    else
+   {
+      R16(tRNS.gray);
       tRNS.gray &= mask;
+   }
 
    png_set_tRNS(pp, pi, NULL, 0, &tRNS);
 }
@@ -3649,6 +3714,28 @@ deinterlace_row(png_bytep buffer, png_const_bytep row,
  * layout details.  See make_size_images below for a way to make images
  * that test odd sizes along with the libpng interlace handling.
  */
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+static void
+choose_random_filter(png_structp pp, int start)
+{
+   /* Choose filters randomly except that on the very first row ensure that
+    * there is at least one previous row filter.
+    */
+   int filters = PNG_ALL_FILTERS & random_mod(256U);
+
+   /* There may be no filters; skip the setting. */
+   if (filters != 0)
+   {
+      if (start && filters < PNG_FILTER_UP)
+         filters |= PNG_FILTER_UP;
+
+      png_set_filter(pp, 0/*method*/, filters);
+   }
+}
+#else /* !WRITE_FILTER */
+#  define choose_random_filter(pp, start) ((void)0)
+#endif /* !WRITE_FILTER */
+
 static void
 make_transform_image(png_store* const ps, png_byte const colour_type,
     png_byte const bit_depth, unsigned int palette_number,
@@ -3767,6 +3854,7 @@ make_transform_image(png_store* const ps, png_byte const colour_type,
                   }
 #              endif /* do_own_interlace */
 
+               choose_random_filter(pp, pass == 0 && y == 0);
                png_write_row(pp, buffer);
             }
          }
@@ -3943,9 +4031,6 @@ make_size_image(png_store* const ps, png_byte const colour_type,
          int npasses = npasses_from_interlace_type(pp, interlace_type);
          png_uint_32 y;
          int pass;
-#        ifdef PNG_WRITE_FILTER_SUPPORTED
-            int nfilter = PNG_FILTER_VALUE_LAST;
-#        endif
          png_byte image[16][SIZE_ROWMAX];
 
          /* To help consistent error detection make the parts of this buffer
@@ -4008,15 +4093,19 @@ make_size_image(png_store* const ps, png_byte const colour_type,
                 * does accept a filter number (per the spec) as well as a bit
                 * mask.
                 *
-                * The apparent wackiness of decrementing nfilter rather than
-                * incrementing is so that Paeth gets used in all images bigger
-                * than 1 row - it's the tricky one.
+                * The code now uses filters at random, except that on the first
+                * row of an image it ensures that a previous row filter is in
+                * the set so that libpng allocates the row buffer.
                 */
-               png_set_filter(pp, 0/*method*/,
-                  nfilter >= PNG_FILTER_VALUE_LAST ? PNG_ALL_FILTERS : nfilter);
+               {
+                  int filters = 8 << random_mod(PNG_FILTER_VALUE_LAST);
 
-               if (nfilter-- == 0)
-                  nfilter = PNG_FILTER_VALUE_LAST-1;
+                  if (pass == 0 && y == 0 &&
+                      (filters < PNG_FILTER_UP || w == 1U))
+                     filters |= PNG_FILTER_UP;
+
+                  png_set_filter(pp, 0/*method*/, filters);
+               }
 #           endif
 
                png_write_row(pp, row);
@@ -4244,62 +4333,71 @@ make_error(png_store* const ps, png_byte const colour_type,
 #undef exception__env
 
       /* And clear these flags */
-      ps->expect_error = 0;
       ps->expect_warning = 0;
 
-      /* Now write the whole image, just to make sure that the detected, or
-       * undetected, errro has not created problems inside libpng.
-       */
-      if (png_get_rowbytes(pp, pi) !=
-          transform_rowsize(pp, colour_type, bit_depth))
-         png_error(pp, "row size incorrect");
+      if (ps->expect_error)
+         ps->expect_error = 0;
 
       else
       {
-         int npasses = set_write_interlace_handling(pp, interlace_type);
-         int pass;
+         /* Now write the whole image, just to make sure that the detected, or
+          * undetected, errro has not created problems inside libpng.  This
+          * doesn't work if there was a png_error in png_write_info because that
+          * can abort before PLTE was written.
+          */
+         if (png_get_rowbytes(pp, pi) !=
+             transform_rowsize(pp, colour_type, bit_depth))
+            png_error(pp, "row size incorrect");
 
-         if (npasses != npasses_from_interlace_type(pp, interlace_type))
-            png_error(pp, "write: png_set_interlace_handling failed");
-
-         for (pass=0; pass<npasses; ++pass)
+         else
          {
-            png_uint_32 y;
+            int npasses = set_write_interlace_handling(pp, interlace_type);
+            int pass;
 
-            for (y=0; y<h; ++y)
+            if (npasses != npasses_from_interlace_type(pp, interlace_type))
+               png_error(pp, "write: png_set_interlace_handling failed");
+
+            for (pass=0; pass<npasses; ++pass)
             {
-               png_byte buffer[TRANSFORM_ROWMAX];
+               png_uint_32 y;
 
-               transform_row(pp, buffer, colour_type, bit_depth, y);
+               for (y=0; y<h; ++y)
+               {
+                  png_byte buffer[TRANSFORM_ROWMAX];
 
-#              if do_own_interlace
-                  /* If do_own_interlace *and* the image is interlaced we need a
-                   * reduced interlace row; this may be reduced to empty.
-                   */
-                  if (interlace_type == PNG_INTERLACE_ADAM7)
-                  {
-                     /* The row must not be written if it doesn't exist, notice
-                      * that there are two conditions here, either the row isn't
-                      * ever in the pass or the row would be but isn't wide
-                      * enough to contribute any pixels.  In fact the wPass test
-                      * can be used to skip the whole y loop in this case.
+                  transform_row(pp, buffer, colour_type, bit_depth, y);
+
+#                 if do_own_interlace
+                     /* If do_own_interlace *and* the image is interlaced we
+                      * need a reduced interlace row; this may be reduced to
+                      * empty.
                       */
-                     if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
-                         PNG_PASS_COLS(w, pass) > 0)
-                        interlace_row(buffer, buffer,
-                              bit_size(pp, colour_type, bit_depth), w, pass,
-                              0/*data always bigendian*/);
-                     else
-                        continue;
-                  }
-#              endif /* do_own_interlace */
+                     if (interlace_type == PNG_INTERLACE_ADAM7)
+                     {
+                        /* The row must not be written if it doesn't exist,
+                         * notice that there are two conditions here, either the
+                         * row isn't ever in the pass or the row would be but
+                         * isn't wide enough to contribute any pixels.  In fact
+                         * the wPass test can be used to skip the whole y loop
+                         * in this case.
+                         */
+                        if (PNG_ROW_IN_INTERLACE_PASS(y, pass) &&
+                            PNG_PASS_COLS(w, pass) > 0)
+                           interlace_row(buffer, buffer,
+                                 bit_size(pp, colour_type, bit_depth), w, pass,
+                                 0/*data always bigendian*/);
+                        else
+                           continue;
+                     }
+#                 endif /* do_own_interlace */
 
-               png_write_row(pp, buffer);
+                  png_write_row(pp, buffer);
+               }
             }
-         }
-      }
+         } /* image writing */
 
-      png_write_end(pp, pi);
+         png_write_end(pp, pi);
+      }
 
       /* The following deletes the file that was just written. */
       store_write_reset(ps);
@@ -6257,7 +6355,7 @@ transform_range_check(png_const_structp pp, unsigned int r, unsigned int g,
    unsigned int max = (1U<<sample_depth)-1;
    double in_min = ceil((in-err)*max - digitization_error);
    double in_max = floor((in+err)*max + digitization_error);
-   if (err > limit || !(out >= in_min && out <= in_max))
+   if (debugonly(err > limit ||) !(out >= in_min && out <= in_max))
    {
       char message[256];
       size_t pos;
@@ -6283,6 +6381,8 @@ transform_range_check(png_const_structp pp, unsigned int r, unsigned int g,
 
       png_error(pp, message);
    }
+
+   UNUSED(limit)
 }
 
 static void
@@ -7213,7 +7313,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
       png_uint_32 ru;
       double total;
 
-      RANDOMIZE(ru);
+      R32(ru);
       data.green_coefficient = total = (ru & 0xffff) / 65535.;
       ru >>= 16;
       data.red_coefficient = (1 - total) * (ru & 0xffff) / 65535.;
@@ -7274,14 +7374,12 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           * When DIGITIZE is set because a pre-1.7 version of libpng is being
           * tested allow a bigger slack.
           *
-          * NOTE: this magic number was determined by experiment to be about
-          * 1.263.  There's no great merit to the value below, however it only
-          * affects the limit used for checking for internal calculation errors,
-          * not the actual limit imposed by pngvalid on the output errors.
+          * NOTE: this number only affects the internal limit check in pngvalid,
+          * it has no effect on the limits applied to the libpng values.
           */
          that->pm->limit += pow(
 #        if DIGITIZE
-            1.3
+            2.0
 #        else
             1.0
 #        endif
@@ -7443,7 +7541,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
       /* Image now has RGB channels... */
 #  if DIGITIZE
       {
-         const png_modifier *pm = display->pm;
+         png_modifier *pm = display->pm;
          const unsigned int sample_depth = that->sample_depth;
          const unsigned int calc_depth = (pm->assume_16_bit_calculations ? 16 :
             sample_depth);
@@ -7592,9 +7690,11 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
          else
          {
             err = fabs(grayhi-gray);
+
             if (fabs(gray - graylo) > err)
                err = fabs(graylo-gray);
 
+#if !RELEASE_BUILD
             /* Check that this worked: */
             if (err > pm->limit)
             {
@@ -7605,11 +7705,13 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
                pos = safecatd(buffer, sizeof buffer, pos, err, 6);
                pos = safecat(buffer, sizeof buffer, pos, " exceeds limit ");
                pos = safecatd(buffer, sizeof buffer, pos, pm->limit, 6);
-               png_error(pp, buffer);
+               png_warning(pp, buffer);
+               pm->limit = err;
             }
+#endif /* !RELEASE_BUILD */
          }
       }
-#  else  /* DIGITIZE */
+#  else  /* !DIGITIZE */
       {
          double r = that->redf;
          double re = that->rede;
@@ -7668,7 +7770,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
              * lookups in the calculation and each introduces a quantization
              * error defined by the table size.
              */
-            const png_modifier *pm = display->pm;
+            png_modifier *pm = display->pm;
             double in_qe = (that->sample_depth > 8 ? .5/65535 : .5/255);
             double out_qe = (that->sample_depth > 8 ? .5/65535 :
                (pm->assume_16_bit_calculations ? .5/(1<<display->max_gamma_8) :
@@ -7718,6 +7820,7 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
             else
                err -= in_qe;
 
+#if !RELEASE_BUILD
             /* Validate that the error is within limits (this has caused
              * problems before, it's much easier to detect them here.)
              */
@@ -7730,8 +7833,10 @@ image_transform_png_set_rgb_to_gray_mod(const image_transform *this,
                pos = safecatd(buffer, sizeof buffer, pos, err, 6);
                pos = safecat(buffer, sizeof buffer, pos, " exceeds limit ");
                pos = safecatd(buffer, sizeof buffer, pos, pm->limit, 6);
-               png_error(pp, buffer);
+               png_warning(pp, buffer);
+               pm->limit = err;
             }
+#endif /* !RELEASE_BUILD */
          }
       }
 #  endif /* !DIGITIZE */
@@ -7802,7 +7907,7 @@ image_transform_png_set_background_set(const image_transform *this,
     * so we need to know what that is!  The background colour is stored in the
     * transform_display.
     */
-   RANDOMIZE(random_bytes);
+   R8(random_bytes);
 
    /* Read the random value, for colour type 3 the background colour is actually
     * expressed as a 24bit rgb, not an index.
@@ -7830,7 +7935,7 @@ image_transform_png_set_background_set(const image_transform *this,
    /* Extract the background colour from this image_pixel, but make sure the
     * unused fields of 'back' are garbage.
     */
-   RANDOMIZE(back);
+   R8(back);
 
    if (colour_type & PNG_COLOR_MASK_COLOR)
    {
@@ -8136,7 +8241,7 @@ image_transform_png_set_filler_set(const image_transform *this,
     * filler.  The 'filler' value has all 32 bits set, but only bit_depth
     * will be used.  At this point we don't know bit_depth.
     */
-   RANDOMIZE(data.filler);
+   R32(data.filler);
    data.flags = random_choice();
 
    png_set_filler(pp, data.filler, data.flags);
@@ -8209,7 +8314,7 @@ image_transform_png_set_add_alpha_set(const image_transform *this,
     * filler.  The 'filler' value has all 32 bits set, but only bit_depth
     * will be used.  At this point we don't know bit_depth.
     */
-   RANDOMIZE(data.filler);
+   R32(data.filler);
    data.flags = random_choice();
 
    png_set_add_alpha(pp, data.filler, data.flags);
@@ -11296,6 +11401,9 @@ int main(int argc, char **argv)
 
       else if (strcmp(*argv, "-w") == 0 ||
                strcmp(*argv, "--strict") == 0)
+         pm.this.treat_warnings_as_errors = 1; /* NOTE: this is the default! */
+
+      else if (strcmp(*argv, "--nostrict") == 0)
          pm.this.treat_warnings_as_errors = 0;
 
       else if (strcmp(*argv, "--speed") == 0)

@@ -1,9 +1,9 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.20 - December 3, 2015
+ libpng version 1.6.21 - January 15, 2016
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
- Copyright (c) 1998-2015 Glenn Randers-Pehrson
+ Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
  This document is released under the libpng license.
  For conditions of distribution and use, see the disclaimer
@@ -11,9 +11,9 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.20 - December 3, 2015
+ libpng versions 0.97, January 1998, through 1.6.21 - January 15, 2016
  Updated and distributed by Glenn Randers-Pehrson
- Copyright (c) 1998-2015 Glenn Randers-Pehrson
+ Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
  libpng 1.0 beta 6 - version 0.96 - May 28, 1997
  Updated and distributed by Andreas Dilger
@@ -5078,6 +5078,10 @@ enforced.  The sRGB chunk is allowed to appear in images with any color type
 and is interpreted by libpng to convey a one-tracer-curve gray profile or a
 three-tracer-curve RGB profile as appropriate.
 
+Libpng 1.5.x erroneously used /MD for Debug DLL builds; if you used the debug
+builds in your app and you changed your app to use /MD you will need to
+change it back to /MDd for libpng 1.6.x.
+
 Prior to libpng-1.6.0 a warning would be issued if the iTXt chunk contained
 an empty language field or an empty translated keyword.  Both of these
 are allowed by the PNG specification, so these warnings are no longer issued.
@@ -5324,7 +5328,7 @@ Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.20 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.21 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer

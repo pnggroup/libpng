@@ -17,7 +17,7 @@ gamma="$1"
 shift
 alpha="$1"
 shift
-exec ./pngstest --tmpfile "${gamma}-${alpha}-" --log ${1+"$@"} $(
+exec ./pngstest --tmpfile "${gamma}-${alpha}-" --log ${1+"$@"} `
    for f in "${srcdir}/contrib/testpngs/"*.png
    do
       g=
@@ -49,4 +49,4 @@ exec ./pngstest --tmpfile "${gamma}-${alpha}-" --log ${1+"$@"} $(
             test "$alpha" = "opaque" -o "$alpha" = "none" && echo "$g";;
       esac
    done
-)
+`
