@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta77 - January 13, 2016
+Libpng 1.7.0beta77 - January 16, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1172,7 +1172,7 @@ Version 1.7.0beta76 [January 7, 2016]
   Fixed new Coverity defect, potential NULL dereference of "ps" in pngwutil.c
   Added temporary workaround for Coverity "Dead code" defect.
 
-Version 1.7.0beta77 [January 13, 2016]
+Version 1.7.0beta77 [January 16, 2016]
   Fixed new Coverity defect, another NULL dereference of "ps" in pngwutil.c
   Prevent the CMINFO optimization code from running twice on any PNG IDAT
     stream longer than 2048 bytes; the second time could overwrite bytes
