@@ -5513,6 +5513,8 @@ Version 1.7.0beta77 [January 16, 2016]
     than 1:1000.
   Worked around a false-positive Coverity issue in pngvalid.c.
 
+Version 1.7.0beta78 [January 16, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
