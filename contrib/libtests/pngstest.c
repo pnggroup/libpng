@@ -1,9 +1,9 @@
 /*-
  * pngstest.c
  *
- * Copyright (c) 2013-2015 John Cunningham Bowler
+ * Copyright (c) 2013-2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.19 [November 12, 2015]
+ * Last changed in libpng 1.6.22 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -3096,7 +3096,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
    if (image->opts & USE_STDIO)
    {
-#ifndef PNG_USE_MKSTEMP
+#ifndef __COVERITY__
       FILE *f = tmpfile();
 #else
       /* Experimental. Coverity says tmpfile() is insecure because it
