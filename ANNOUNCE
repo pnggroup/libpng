@@ -1,4 +1,4 @@
-Libpng 1.6.22beta01 - January 17, 2016
+Libpng 1.6.22beta01 - January 18, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,9 +25,11 @@ Other information:
 
 Changes since the last public release (1.6.21):
 
-Version 1.6.22beta01 [January 17, 2016]
+Version 1.6.22beta01 [January 18, 2016]
   Changed PNG_USE_MKSTEMP to __COVERITY__ to select alternate
     "tmpfile()" implementation in contrib/libtests/pngstest.c
+  Fixed NO_STDIO build of pngunknown.c to skip calling png_init_io()
+    if there is no stdio.h support.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
