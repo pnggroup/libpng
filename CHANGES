@@ -5484,9 +5484,11 @@ Version 1.6.21rc02 [January 7, 2016]
 Version 1.6.21 [January 15, 2016]
   Worked around a false-positive Coverity issue in pngvalid.c.
 
-Version 1.6.22beta01 [January 17, 2016]
+Version 1.6.22beta01 [January 18, 2016]
   Changed PNG_USE_MKSTEMP to __COVERITY__ to select alternate
     "tmpfile()" implementation in contrib/libtests/pngstest.c
+  Fixed NO_STDIO build of pngunknown.c to skip calling png_init_io()
+    if there is no stdio.h support.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
