@@ -34,6 +34,7 @@
  * these must be defined:
  */
 #if defined(PNG_SET_UNKNOWN_CHUNKS_SUPPORTED) &&\
+   defined(PNG_STDIO_SUPPORTED) &&\
    defined(PNG_READ_SUPPORTED)
 
 /* One of these must be defined to allow us to find out what happened.  It is
@@ -615,7 +616,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
 
    return flags;
 }
-#else
+#else /* SAVE_UNKNOWN_CHUNKS */
 static png_uint_32
 get_unknown(display *d, png_infop info_ptr, int after_IDAT)
    /* Otherwise this will return the cached values set by any user callback */
@@ -634,8 +635,8 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
        * a check to ensure the logic is correct.
        */
 #     error No store support and no user chunk support, this will not work
-#  endif
-#endif
+#  endif /* READ_USER_CHUNKS */
+#endif /* SAVE_UNKNOWN_CHUNKS */
 
 static int
 check(FILE *fp, int argc, const char **argv, png_uint_32p flags/*out*/,
