@@ -2889,12 +2889,19 @@ typedef struct
     * is the minimum 'row stride', the minimum count of components between each
     * row.  For a color-mapped image this is the minimum number of bytes in a
     * row.
+    *
+    * WARNING: this macro overflows for some images with more than one component
+    * and very large image widths.  libpng will refuse to process an image where
+    * this macro would overflow.
     */
 
 #define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
    (PNG_IMAGE_PIXEL_COMPONENT_SIZE((image).format)*(image).height*(row_stride))
    /* Return the size, in bytes, of an image buffer given a png_image and a row
     * stride - the number of components to leave space for in each row.
+    *
+    * WARNING: this macro overflows a 32-bit integer for some large PNG images,
+    * libpng will refuse to process an image where such an overflow would occur.
     */
 
 #define PNG_IMAGE_SIZE(image)\
@@ -3015,7 +3022,6 @@ PNG_EXPORT(238, void, png_image_free, (png_imagep image));
 #endif /* SIMPLIFIED_READ */
 
 #ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
-#ifdef PNG_STDIO_SUPPORTED
 /* WRITE APIS
  * ----------
  * For write you must initialize a png_image structure to describe the image to
@@ -3032,6 +3038,7 @@ PNG_EXPORT(238, void, png_image_free, (png_imagep image));
  *    values do not correspond to the colors in sRGB.
  * colormap_entries: set to the number of entries in the color-map (0 to 256)
  */
+#ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
 PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
    const char *file, int convert_to_8bit, const void *buffer,
    png_int_32 row_stride, const void *colormap));
@@ -3041,8 +3048,9 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
    int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
    const void *colormap));
    /* Write the image to the given (FILE*). */
+#endif /* SIMPLIFIED_WRITE_STDIO */
 
-/* With both write APIs if image is in one of the linear formats with 16-bit
+/* With all write APIs if image is in one of the linear formats with 16-bit
  * data then setting convert_to_8_bit will cause the output to be an 8-bit PNG
  * gamma encoded according to the sRGB specification, otherwise a 16-bit linear
  * encoded PNG file is written.
@@ -3054,13 +3062,102 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
  *
  * With all APIs row_stride is handled as in the read APIs - it is the spacing
  * from one row to the next in component sized units (1 or 2 bytes) and if
- * negative indicates a bottom-up row layout in the buffer.  If row_stride is zero,
- * libpng will calculate it for you from the image width and number of channels.
+ * negative indicates a bottom-up row layout in the buffer.  If row_stride is
+ * zero, libpng will calculate it for you from the image width and number of
+ * channels.
  *
- * Note that the write API does not support interlacing, sub-8-bit pixels, indexed
- * PNG (color_type 3) or most ancillary chunks.
+ * Note that the write API does not support interlacing, sub-8-bit pixels or
+ * st ancillary chunks.  If you need to write text chunks (e.g. for copyright
+ * notices) you need to use one of the other APIs.
  */
-#endif /* STDIO */
+
+PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
+   png_alloc_size_t * PNG_RESTRICT memory_bytes, int convert_to_8_bit,
+   const void *buffer, png_int_32 row_stride, const void *colormap));
+   /* Write the image to the given memory buffer.  The function both writes the
+    * whole PNG data stream to *memory and updates *memory_bytes with the count
+    * of bytes written.
+    *
+    * 'memory' may be NULL.  In this case *memory_bytes is not read however on
+    * success the number of bytes which would have been written will still be
+    * stored in *memory_bytes.  On failure *memory_bytes will contain 0.
+    *
+    * If 'memory' is not NULL it must point to memory[*memory_bytes] of
+    * writeable memory.
+    *
+    * If the function returns success memory[*memory_bytes] (if 'memory' is not
+    * NULL) contains the written PNG data.  *memory_bytes will always be less
+    * than or equal to the original value.
+    *
+    * If the function returns false and *memory_bytes was not changed an error
+    * occured during write.  If *memory_bytes was changed, or is not 0 if
+    * 'memory' was NULL, the write would have succeeded but for the memory
+    * buffer being too small.  *memory_bytes contains the required number of
+    * bytes and will be bigger that the original value.
+    */
+
+#define png_image_write_get_memory_size(image, size, convert_to_8_bit, buffer,\
+   row_stride, colormap)\
+   png_image_write_to_memory(&(image), 0, &(size), convert_to_8_bit, buffer,\
+         row_stride, colormap)
+   /* Return the amount of memory in 'size' required to compress this image.
+    * The png_image structure 'image' must be filled in as in the above
+    * function and must not be changed before the actual write call, the buffer
+    * and all other parameters must also be indentical to that in the final
+    * write call.  The 'size' variable need not be initialized.
+    *
+    * NOTE: the macro returns true/false, if false is returned 'size' will be
+    * set to zero and the write failed and probably will fail if tried again.
+    */
+
+/* You can pre-allocate the buffer by making sure it is of sufficient size
+ * regardless of the amount of compression achieved.  The buffer size will
+ * always be bigger than the original image and it will never be filled.  The
+ * following macros are provided to assist in allocating the buffer.
+ */
+#define PNG_IMAGE_DATA_SIZE(image) (PNG_IMAGE_SIZE(image)+(image).height)
+   /* The number of uncompressed bytes in the PNG byte encoding of the image;
+    * uncompressing the PNG IDAT data will give this number of bytes.
+    *
+    * NOTE: while PNG_IMAGE_SIZE cannot overflow for an image in memory this
+    * macro can because of the extra bytes used in the PNG byte encoding.  You
+    * need to avoid this macro if your image size approaches 2^30 in width or
+    * height.  The same goes for the remainder of these macros; they all produce
+    * bigger numbers than the actual in-memory image size.
+    */
+#ifndef PNG_ZLIB_MAX_SIZE
+#  define PNG_ZLIB_MAX_SIZE(b) ((b)+(((b)+7U)>>3)+(((b)+63U)>>6)+11U)
+   /* An upper bound on the number of compressed bytes given 'b' uncompressed
+    * bytes.  This is based on deflateBounds() in zlib; different
+    * implementations of zlib compression may conceivable produce more data so
+    * if your zlib implementation is not zlib itself redefine this macro
+    * appropriately.
+    */
+#endif
+
+#define PNG_IMAGE_COMPRESSED_SIZE_MAX(image)\
+   PNG_ZLIB_MAX_SIZE((png_alloc_size_t)PNG_IMAGE_DATA_SIZE(image))
+   /* An upper bound on the size of the data in the PNG IDAT chunks. */
+
+#define PNG_IMAGE_PNG_SIZE_MAX_(image, image_size)\
+   ((8U/*sig*/+25U/*IHDR*/+16U/*gAMA*/+44U/*cHRM*/+12U/*IEND*/+\
+    (((image).format&PNG_FORMAT_FLAG_COLORMAP)?/*colormap: PLTE, tRNS*/\
+     12U+PNG_IMAGE_COLORMAP_SIZE(image)/*PLTE+tRNS data*/+\
+     (((image).format&PNG_FORMAT_FLAG_ALPHA)?12U/*tRNS*/:0U):0U)+\
+    12U)+(12U*((image_size)/PNG_ZBUF_SIZE))/*IDAT*/+(image_size))
+   /* A helper for the following macro; if your compiler cannot handle the
+    * following macro use this one with the result of
+    * PNG_IMAGE_COMPRESSED_SIZE_MAX(image) as the second argument (most
+    * compilers should handle this just fine.)
+    */
+
+#define PNG_IMAGE_PNG_SIZE_MAX(image)\
+   PNG_IMAGE_PNG_SIZE_MAX_(image, PNG_IMAGE_COMPRESSED_SIZE_MAX(image))
+   /* An upper bound on the total length of the PNG data stream for 'image'.
+    * The result is of type png_alloc_size_t, on 32-bit systems this may
+    * overflow even though PNG_IMAGE_DATA_SIZE does not overflow; the write will
+    * run out of buffer space but return a corrected size which should work.
+    */
 #endif /* SIMPLIFIED_WRITE */
 /*******************************************************************************
  *  END OF SIMPLIFIED API
@@ -3118,7 +3215,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(244);
+  PNG_EXPORT_LAST_ORDINAL(245);
 #endif
 
 #ifdef __cplusplus
