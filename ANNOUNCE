@@ -30,6 +30,14 @@ Version 1.6.22beta01 [January 18, 2016]
     "tmpfile()" implementation in contrib/libtests/pngstest.c
   Fixed NO_STDIO build of pngunknown.c to skip calling png_init_io()
     if there is no stdio.h support.
+  Added an API and a number of assist macros to allow an application
+    that uses the simplified API write to bypass stdio and write
+    directly to memory.
+  Added some warnings (png.h) and some check code to detect *possible*
+    overflow in the ROW_STRIDE and simplified image SIZE macros.  This
+    disallows image width/height/format that *might* overflow.  This is
+    a quiet API change that limits in-memory image size (uncompressed) to
+    less than 4GByte and image row size (stride) to less than 2GByte.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
