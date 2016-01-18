@@ -249,3 +249,4 @@ EXPORTS
  png_set_check_for_invalid_index @242
  png_get_palette_max @243
  png_set_option @244
+ png_image_write_to_memory @245
