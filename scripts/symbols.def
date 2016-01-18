@@ -242,7 +242,8 @@ EXPORTS
  png_set_check_for_invalid_index @242
  png_get_palette_max @243
  png_set_option @244
- png_memory_format @245
- png_memory_channel_depth @246
- png_memory_gamma @247
- png_setting @248
+ png_image_write_to_memory @245
+ png_memory_format @246
+ png_memory_channel_depth @247
+ png_memory_gamma @248
+ png_setting @249

@@ -307,7 +307,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 }
 #endif /* unused */
 
-#define READ_FILE 1      /* else memory */
+#define USE_FILE 1       /* else memory */
 #define USE_STDIO 2      /* else use file name */
 #define STRICT 4         /* fail on warnings too */
 #define VERBOSE 8
@@ -320,7 +320,7 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 static void
 print_opts(png_uint_32 opts)
 {
-   if (opts & READ_FILE)
+   if (opts & USE_FILE)
       printf(" --file");
    if (opts & USE_STDIO)
       printf(" --stdio");
@@ -3008,14 +3008,14 @@ read_file(Image *image, png_uint_32 format, png_const_colorp background)
 static int
 read_one_file(Image *image)
 {
-   if (!(image->opts & READ_FILE) || (image->opts & USE_STDIO))
+   if (!(image->opts & USE_FILE) || (image->opts & USE_STDIO))
    {
       /* memory or stdio. */
       FILE *f = fopen(image->file_name, "rb");
 
       if (f != NULL)
       {
-         if (image->opts & READ_FILE)
+         if (image->opts & USE_FILE)
             image->input_file = f;
 
          else /* memory */
@@ -3096,6 +3096,7 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
    if (image->opts & USE_STDIO)
    {
+#ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
 #ifndef __COVERITY__
       FILE *f = tmpfile();
 #else
@@ -3158,10 +3159,14 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
       else
          return logerror(image, "tmpfile", ": open: ", strerror(errno));
+#else /* SIMPLIFIED_WRITE_STDIO */
+      return logerror(image, "tmpfile", ": open: unsupported", "");
+#endif /* SIMPLIFIED_WRITE_STDIO */
    }
 
-   else
+   else if (image->opts & USE_FILE)
    {
+#ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
       static int counter = 0;
       char name[32];
 
@@ -3181,6 +3186,48 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
 
       else
          return logerror(image, name, ": write failed", "");
+#else /* SIMPLIFIED_WRITE_STDIO */
+      return logerror(image, "stdio", ": open: unsupported", "");
+#endif /* SIMPLIFIED_WRITE_STDIO */
+   }
+
+   else /* use memory */
+   {
+      png_alloc_size_t size;
+
+      if (png_image_write_get_memory_size(image->image, size, convert_to_8bit,
+               image->buffer+16, (png_int_32)image->stride, image->colormap))
+      {
+         /* This is non-fatal: */
+         if (size > PNG_IMAGE_PNG_SIZE_MAX(image->image))
+            logerror(image, "memory", ": PNG_IMAGE_SIZE_MAX wrong", "");
+
+         initimage(output, image->opts, "memory", image->stride_extra);
+         output->input_memory = malloc(size);
+
+         if (output->input_memory != NULL)
+         {
+            output->input_memory_size = size;
+
+            if (png_image_write_to_memory(&image->image, output->input_memory,
+                  &output->input_memory_size, convert_to_8bit, image->buffer+16,
+                  (png_int_32)image->stride, image->colormap))
+            {
+               /* This is also non-fatal (maybe): */
+               if (size != output->input_memory_size)
+                  logerror(image, "memory", ": memory size wrong", "");
+            }
+
+            else
+               return logerror(image, "memory", ": write failed", "");
+         }
+
+         else
+            return logerror(image, "memory", ": out of memory", "");
+      }
+
+      else
+         return logerror(image, "memory", ": get size:", "");
    }
 
    /* 'output' has an initialized temporary image, read this back in and compare
@@ -3421,12 +3468,12 @@ main(int argc, char **argv)
       }
       else if (strcmp(arg, "--file") == 0)
 #        ifdef PNG_STDIO_SUPPORTED
-            opts |= READ_FILE;
+            opts |= USE_FILE;
 #        else
             return 77; /* skipped: no support */
 #        endif
       else if (strcmp(arg, "--memory") == 0)
-         opts &= ~READ_FILE;
+         opts &= ~USE_FILE;
       else if (strcmp(arg, "--stdio") == 0)
 #        ifdef PNG_STDIO_SUPPORTED
             opts |= USE_STDIO;
