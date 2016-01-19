@@ -1002,6 +1002,20 @@ perform_one_test(FILE *fp, int argc, const char **argv,
 
    def = check(fp, argc, argv, flags[1], d, set_callback);
 
+   /* If IDAT is being handled as unknown the image read is skipped and all the
+    * IDATs after the first end up in the end info struct, so in this case add
+    * IDAT to the list of unknowns.  (Do this after 'check' above sets the
+    * chunk_info 'keep' fields.)
+    *
+    * Note that the flag setting has to be in the 'known' field to avoid
+    * triggeriing the consistency check below and the flag must only be set if
+    * there are multiple IDATs, so if the check above did find an unknown IDAT
+    * after IDAT.
+    */
+   if (chunk_info[0/*IDAT*/].keep != PNG_HANDLE_CHUNK_AS_DEFAULT &&
+       (flags[1][3] & PNG_INFO_IDAT) != 0)
+      flags[0][2] |= PNG_INFO_IDAT;
+
    /* Chunks should either be known or unknown, never both and this should apply
     * whether the chunk is before or after the IDAT (actually, the app can
     * probably change this by swapping the handling after the image, but this
