@@ -1071,7 +1071,7 @@ typedef struct
    /* Arguments: */
    png_imagep image;
    png_voidp  buffer;
-   png_int_32 row_stride;
+   ptrdiff_t  row_stride;
    png_voidp  colormap;
    png_const_colorp background;
    /* Local variables: */
@@ -4128,7 +4128,7 @@ png_image_read_direct(png_voidp argument)
 
 int PNGAPI
 png_image_finish_read(png_imagep image, png_const_colorp background,
-   void *buffer, png_int_32 row_stride, void *colormap)
+   void *buffer, ptrdiff_t row_stride, void *colormap)
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
@@ -4138,13 +4138,18 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
        */
       const unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
-      if (image->width <= 0x7FFFFFFFU/channels) /* no overflow */
+      /* The test is slightly evil: it assumes that a signed pointer difference
+       * (ptrdiff_t) can hold a maximum value of half, rounded down, of the
+       * maximum of a (size_t).  This is almost certain to be true.
+       */
+      if (image->width <= (PNG_SIZE_MAX >> 1)/channels) /* no overflow */
       {
-         png_uint_32 check;
-         const png_uint_32 png_row_stride = image->width * channels;
+         png_alloc_size_t check;
+         const png_alloc_size_t png_row_stride =
+            (png_alloc_size_t)/*SAFE*/image->width * channels;
 
          if (row_stride == 0)
-            row_stride = (png_int_32)/*SAFE*/png_row_stride;
+            row_stride = (ptrdiff_t)png_row_stride;
 
          if (row_stride < 0)
             check = -row_stride;
@@ -4154,11 +4159,11 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
 
          if (image->opaque != NULL && buffer != NULL && check >= png_row_stride)
          {
-            /* Now check for overflow of the image buffer calculation; this
-             * limits the whole image size to 32 bits for API compatibility with
-             * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
+            /* Now check for overflow of the image buffer calculation; check for
+             * (size_t) overflow here.  This detects issues with the
+             * PNG_IMAGE_BUFFER_SIZE macro.
              */
-            if (image->height <= 0xFFFFFFFF/png_row_stride)
+            if (image->height <= PNG_SIZE_MAX/png_row_stride)
             {
                if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
                   (image->colormap_entries > 0 && colormap != NULL))

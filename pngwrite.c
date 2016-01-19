@@ -1329,7 +1329,7 @@ typedef struct
    /* Arguments: */
    png_imagep      image;
    png_const_voidp buffer;
-   png_int_32      row_stride;
+   ptrdiff_t       row_stride;
    png_const_voidp colormap;
    int             convert_to_8bit;
    /* Local variables: */
@@ -1781,13 +1781,18 @@ png_image_write_main(png_voidp argument)
    {
       const unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
-      if (image->width <= 0x7FFFFFFFU/channels) /* no overflow */
+      /* The test is slightly evil: it assumes that a signed pointer difference
+       * (ptrdiff_t) can hold a maximum value of half, rounded down, of the
+       * maximum of a (size_t).  This is almost certain to be true.
+       */
+      if (image->width <= (PNG_SIZE_MAX >> 1)/channels) /* no overflow */
       {
-         png_uint_32 check;
-         const png_uint_32 png_row_stride = image->width * channels;
+         png_alloc_size_t check;
+         const png_alloc_size_t png_row_stride =
+            (png_alloc_size_t)/*SAFE*/image->width * channels;
 
          if (display->row_stride == 0)
-            display->row_stride = (png_int_32)/*SAFE*/png_row_stride;
+            display->row_stride = (ptrdiff_t)png_row_stride;
 
          if (display->row_stride < 0)
             check = -display->row_stride;
@@ -1797,11 +1802,11 @@ png_image_write_main(png_voidp argument)
 
          if (check >= png_row_stride)
          {
-            /* Now check for overflow of the image buffer calculation; this
-             * limits the whole image size to 32 bits for API compatibility with
-             * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
+            /* Now check for overflow of the image buffer calculation; check for
+             * (size_t) overflow here.  This detects issues with the
+             * PNG_IMAGE_BUFFER_SIZE macro.
              */
-            if (image->height > 0xFFFFFFFF/png_row_stride)
+            if (image->height > PNG_SIZE_MAX/png_row_stride)
                png_error(image->opaque->png_ptr, "memory image too large");
          }
 
@@ -2042,7 +2047,7 @@ png_image_write_memory(png_voidp argument)
 int PNGAPI
 png_image_write_to_memory(png_imagep image, void *memory,
    png_alloc_size_t * PNG_RESTRICT memory_bytes, int convert_to_8bit,
-   const void *buffer, png_int_32 row_stride, const void *colormap)
+   const void *buffer, ptrdiff_t row_stride, const void *colormap)
 {
    /* Write the image to the given buffer, or count the bytes if it is NULL */
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
@@ -2108,7 +2113,7 @@ png_image_write_to_memory(png_imagep image, void *memory,
 #ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
 int PNGAPI
 png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
-   const void *buffer, png_int_32 row_stride, const void *colormap)
+   const void *buffer, ptrdiff_t row_stride, const void *colormap)
 {
    /* Write the image to the given (FILE*). */
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
@@ -2152,7 +2157,7 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
 
 int PNGAPI
 png_image_write_to_file(png_imagep image, const char *file_name,
-   int convert_to_8bit, const void *buffer, png_int_32 row_stride,
+   int convert_to_8bit, const void *buffer, ptrdiff_t row_stride,
    const void *colormap)
 {
    /* Write the image to the named file. */

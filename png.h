@@ -3312,15 +3312,17 @@ typedef struct
 
 /* Information about the whole row, or whole image */
 #define PNG_IMAGE_ROW_STRIDE(image)\
-   (PNG_IMAGE_PIXEL_CHANNELS((image).format) * (image).width)
+   (PNG_IMAGE_PIXEL_CHANNELS((image).format) * (png_alloc_size_t)(image).width)
    /* Return the total number of components in a single row of the image; this
     * is the minimum 'row stride', the minimum count of components between each
     * row.  For a color-mapped image this is the minimum number of bytes in a
     * row.
     *
-    * WARNING: this macro overflows for some images with more than one component
-    * and very large image widths.  libpng will refuse to process an image where
-    * this macro would overflow.
+    * WARNING: libpng 1.7: this macro now returns a png_alloc_size_t, previous
+    * versions returned a png_uint_32 and could overflow for images that fit in
+    * memory.  This macro can still overflow, but if it does the row will not
+    * fit in memory.  The simplified API functions detect this and refuse to
+    * handle the image.
     */
 
 #define PNG_IMAGE_BUFFER_SIZE(image, row_stride)\
@@ -3328,8 +3330,11 @@ typedef struct
    /* Return the size, in bytes, of an image buffer given a png_image and a row
     * stride - the number of components to leave space for in each row.
     *
-    * WARNING: this macro overflows a 32-bit integer for some large PNG images,
-    * libpng will refuse to process an image where such an overflow would occur.
+    * WARNING: This is the total size of the image, for large images it will
+    * overflow on a 32-bit system.  In libpng 1.7 (but not before) it returns a
+    * png_alloc_size_t which means that the result only overflows for
+    * ridiculously large PNG files.  libpng checks and will refuse to handle
+    * such data (the PNG is probably invalid.)
     */
 
 #define PNG_IMAGE_SIZE(image)\
@@ -3409,7 +3414,7 @@ PNG_EXPORT(236, int, png_image_begin_read_from_memory, (png_imagep image,
    /* The PNG header is read from the given memory buffer. */
 
 PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
-   png_const_colorp background, void *buffer, png_int_32 row_stride,
+   png_const_colorp background, void *buffer, ptrdiff_t row_stride,
    void *colormap));
    /* Finish reading the image into the supplied buffer and clean up the
     * png_image structure.
@@ -3469,11 +3474,11 @@ PNG_EXPORT(238, void, png_image_free, (png_imagep image));
 #ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
 PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
    const char *file, int convert_to_8bit, const void *buffer,
-   png_int_32 row_stride, const void *colormap));
+   ptrdiff_t row_stride, const void *colormap));
    /* Write the image to the named file. */
 
 PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
-   int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
+   int convert_to_8_bit, const void *buffer, ptrdiff_t row_stride,
    const void *colormap));
    /* Write the image to the given (FILE*). */
 #endif /* SIMPLIFIED_WRITE_STDIO */
@@ -3501,7 +3506,7 @@ PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
 
 PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
    png_alloc_size_t * PNG_RESTRICT memory_bytes, int convert_to_8_bit,
-   const void *buffer, png_int_32 row_stride, const void *colormap));
+   const void *buffer, ptrdiff_t row_stride, const void *colormap));
    /* Write the image to the given memory buffer.  The function both writes the
     * whole PNG data stream to *memory and updates *memory_bytes with the count
     * of bytes written.
@@ -3546,12 +3551,6 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #define PNG_IMAGE_DATA_SIZE(image) (PNG_IMAGE_SIZE(image)+(image).height)
    /* The number of uncompressed bytes in the PNG byte encoding of the image;
     * uncompressing the PNG IDAT data will give this number of bytes.
-    *
-    * NOTE: while PNG_IMAGE_SIZE cannot overflow for an image in memory this
-    * macro can because of the extra bytes used in the PNG byte encoding.  You
-    * need to avoid this macro if your image size approaches 2^30 in width or
-    * height.  The same goes for the remainder of these macros; they all produce
-    * bigger numbers than the actual in-memory image size.
     */
 #ifndef PNG_ZLIB_MAX_SIZE
 #  define PNG_ZLIB_MAX_SIZE(b) ((b)+(((b)+7U)>>3)+(((b)+63U)>>6)+11U)
@@ -3585,6 +3584,12 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
     * The result is of type png_alloc_size_t, on 32-bit systems this may
     * overflow even though PNG_IMAGE_DATA_SIZE does not overflow; the write will
     * run out of buffer space but return a corrected size which should work.
+    *
+    * NOTE: while PNG_IMAGE_SIZE cannot overflow for an image in memory this
+    * macro can because of the extra bytes used in the PNG byte encoding.  You
+    * need to avoid this macro if your image size approaches the limit of your
+    * system memory; typically the maximum value of size_t.  Use the above
+    * function call instead.
     */
 #endif /* SIMPLIFIED_WRITE */
 /*******************************************************************************
