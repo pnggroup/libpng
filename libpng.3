@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "January 16, 2016"
+.TH LIBPNG 3 "January 23, 2016"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.22beta01
 .SH SYNOPSIS
@@ -228,6 +228,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.22beta01
 \fBvoid png_image_free (png_imagep \fIimage\fP\fB);\fP
 
 \fBint png_image_write_to_file (png_imagep \fP\fIimage\fP\fB, const char \fP\fI*file\fP\fB, int \fP\fIconvert_to_8bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap\fP\fB);\fP
+
+\fBint png_image_write_to_memory (png_imagep \fP\fIimage\fP\fB, void \fP\fI*memory\fP\fB, png_alloc_size_t * PNG_RESTRICT \fP\fImemory_bytes\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, const void \fI*colormap)\fP\fB);\fP
 
 \fBint png_image_write_to_stdio (png_imagep \fP\fIimage\fP\fB, FILE \fP\fI*file\fP\fB, int \fP\fIconvert_to_8_bit\fP\fB, const void \fP\fI*buffer\fP\fB, png_int_32 \fP\fIrow_stride\fP\fB, void \fI*colormap)\fP\fB);\fP
 
@@ -508,7 +510,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.22beta01 - January 16, 2016
+ libpng version 1.6.22beta01 - January 23, 2016
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -519,7 +521,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.22beta01 - January 16, 2016
+ libpng versions 0.97, January 1998, through 1.6.22beta01 - January 23, 2016
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
@@ -4611,6 +4613,13 @@ be written:
 
       Write the image to the named file.
 
+   int png_image_write_to_memory (png_imagep image, void *memory,
+      png_alloc_size_t * PNG_RESTRICT memory_bytes,
+      int convert_to_8_bit, const void *buffer, ptrdiff_t row_stride,
+      const void *colormap));
+
+      Write the image to memory.
+
    int png_image_write_to_stdio(png_imagep image, FILE *file,
       int convert_to_8_bit, const void *buffer,
       png_int_32 row_stride, const void *colormap)
@@ -5523,6 +5532,7 @@ includes the following:
      png_image_free()
    write functions
      png_image_write_to_file()
+     png_image_write_to_memory()
      png_image_write_to_stdio()
 
 Starting with libpng-1.6.0, you can configure libpng to prefix all exported
@@ -5994,7 +6004,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.22beta01 - January 16, 2016:
+Libpng version 1.6.22beta01 - January 23, 2016:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6019,7 +6029,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000, through 1.6.22beta01, January 16, 2016, are
+libpng versions 1.0.7, July 1, 2000, through 1.6.22beta01, January 23, 2016, are
 Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -6118,7 +6128,7 @@ the additional disclaimers inserted at version 1.0.7.
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-January 16, 2016
+January 23, 2016
 
 .\" end of man page
 

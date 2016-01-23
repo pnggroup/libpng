@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.22beta01 - January 16, 2016
+ libpng version 1.6.22beta01 - January 23, 2016
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.22beta01 - January 16, 2016
+ libpng versions 0.97, January 1998, through 1.6.22beta01 - January 23, 2016
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
@@ -4103,6 +4103,13 @@ be written:
 
       Write the image to the named file.
 
+   int png_image_write_to_memory (png_imagep image, void *memory,
+      png_alloc_size_t * PNG_RESTRICT memory_bytes,
+      int convert_to_8_bit, const void *buffer, ptrdiff_t row_stride,
+      const void *colormap));
+
+      Write the image to memory.
+
    int png_image_write_to_stdio(png_imagep image, FILE *file,
       int convert_to_8_bit, const void *buffer,
       png_int_32 row_stride, const void *colormap)
@@ -5015,6 +5022,7 @@ includes the following:
      png_image_free()
    write functions
      png_image_write_to_file()
+     png_image_write_to_memory()
      png_image_write_to_stdio()
 
 Starting with libpng-1.6.0, you can configure libpng to prefix all exported
