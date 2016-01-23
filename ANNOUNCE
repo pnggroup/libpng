@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta78 - January 23, 2016
+Libpng 1.7.0beta79 - January 23, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta78.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta78.tar.gz
+   1.7.0beta79.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta79.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b78.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b78.zip
+   /scratch/glennrp/Libpng17/lp170b79.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b79.zip
 
 Other information:
 
-   1.7.0beta78-README.txt
-   1.7.0beta78-LICENSE.txt
-   libpng-1.7.0beta78-*.asc (armored detached GPG signatures)
+   1.7.0beta79-README.txt
+   1.7.0beta79-LICENSE.txt
+   libpng-1.7.0beta79-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1238,6 +1238,8 @@ Version 1.7.0beta78 [January 23, 2016]
     overflow are preserved but now accomodate images that require more than
     32 bits of address space when size_t/ptrdiff_t are 64 bit types.
   Revised workaround for false-positive Coverity issue in pngvalid.c.
+
+Version 1.7.0beta79 [January 23, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
