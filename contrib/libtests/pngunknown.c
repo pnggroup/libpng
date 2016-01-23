@@ -1008,7 +1008,7 @@ perform_one_test(FILE *fp, int argc, const char **argv,
     * chunk_info 'keep' fields.)
     *
     * Note that the flag setting has to be in the 'known' field to avoid
-    * triggeriing the consistency check below and the flag must only be set if
+    * triggering the consistency check below and the flag must only be set if
     * there are multiple IDATs, so if the check above did find an unknown IDAT
     * after IDAT.
     */
