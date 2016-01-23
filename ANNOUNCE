@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta78 - January 19, 2016
+Libpng 1.7.0beta78 - January 22, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1214,7 +1214,7 @@ Version 1.7.0beta77 [January 16, 2016]
     than 1:1000.
   Attempted to work around a false-positive Coverity issue in pngvalid.c.
 
-Version 1.7.0beta78 [January 19, 2016]
+Version 1.7.0beta78 [January 22, 2016]
   Changed PNG_USE_MKSTEMP to __COVERITY__ to select alternate
     "tmpfile()" implementation in contrib/libtests/pngstest.c
   Fixed NO_STDIO build of pngunknown.c to skip calling png_init_io()
@@ -1237,6 +1237,7 @@ Version 1.7.0beta78 [January 19, 2016]
     the ANSI-C90 defined type ptrdiff_t. The existing (1.6.22) checks for
     overflow are preserved but now accomodate images that require more than
     32 bits of address space when size_t/ptrdiff_t are 64 bit types.
+  Revised workaround for false-positive Coverity issue in pngvalid.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
