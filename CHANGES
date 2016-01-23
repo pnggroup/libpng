@@ -5484,7 +5484,7 @@ Version 1.6.21rc02 [January 7, 2016]
 Version 1.6.21 [January 15, 2016]
   Worked around a false-positive Coverity issue in pngvalid.c.
 
-Version 1.6.22beta01 [January 18, 2016]
+Version 1.6.22beta01 [January 22, 2016]
   Changed PNG_USE_MKSTEMP to __COVERITY__ to select alternate
     "tmpfile()" implementation in contrib/libtests/pngstest.c
   Fixed NO_STDIO build of pngunknown.c to skip calling png_init_io()
@@ -5497,6 +5497,7 @@ Version 1.6.22beta01 [January 18, 2016]
     disallows image width/height/format that *might* overflow.  This is
     a quiet API change that limits in-memory image size (uncompressed) to
     less than 4GByte and image row size (stride) to less than 2GByte.
+  Revised workaround for false-positive Coverity issue in pngvalid.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

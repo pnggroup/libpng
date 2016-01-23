@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.21 [January 15, 2016]
+ * Last changed in libpng 1.6.22 [(PENDING RELEASE)]
  * Copyright (c) 2014-2016 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -309,13 +309,8 @@ static void r16(png_uint_16p p16, size_t count)
    }
 }
 
-#ifdef __COVERITY__
-#  define R16(this)\
-   r16(&(this), (sizeof (this))/2U/*(sizeof (png_uint_16))*/)
-#else
-#  define R16(this)\
-   r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
-#endif
+#define R16(this) r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
+#define R16_1(this) r16(&(this), (size_t) 1U)
 
 #if defined PNG_READ_RGB_TO_GRAY_SUPPORTED ||\
     defined PNG_READ_FILLER_SUPPORTED
@@ -331,13 +326,8 @@ static void r32(png_uint_32p p32, size_t count)
    }
 }
 
-#ifdef __COVERITY__
-#  define R32(this)\
-   r32(&(this), (sizeof (this))/4U/*(sizeof (png_uint_32))*/)
-#else
-#  define R32(this)\
-   r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
-#endif
+#define R32(this) r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
+#define R32_1(this) r32(&(this), (size_t) 1U)
 
 #endif /* READ_FILLER || READ_RGB_TO_GRAY */
 
@@ -350,7 +340,7 @@ random_mod(unsigned int max)
 {
    png_uint_16 x;
 
-   R16(x);
+   R16_1(x);
 
    return x % max; /* 0 .. max-1 */
 }
@@ -7313,7 +7303,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
       png_uint_32 ru;
       double total;
 
-      R32(ru);
+      R32_1(ru);
       data.green_coefficient = total = (ru & 0xffff) / 65535.;
       ru >>= 16;
       data.red_coefficient = (1 - total) * (ru & 0xffff) / 65535.;
