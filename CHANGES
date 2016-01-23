@@ -5499,6 +5499,8 @@ Version 1.6.22beta01 [January 23, 2016]
     less than 4GByte and image row size (stride) to less than 2GByte.
   Revised workaround for false-positive Coverity issue in pngvalid.c.
 
+Version 1.6.22beta02 [January 23, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

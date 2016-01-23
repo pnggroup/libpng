@@ -1,4 +1,4 @@
-Libpng 1.6.22beta01 - January 23, 2016
+Libpng 1.6.22beta02 - January 23, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.22beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.22beta01.tar.gz
+   1.6.22beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.22beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng16/lp1622b01.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng16/lp1622b01.zip
+   /scratch/glennrp/Libpng16/lp1622b02.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng16/lp1622b02.zip
 
 Other information:
 
-   1.6.22beta01-README.txt
-   1.6.22beta01-LICENSE.txt
-   libpng-1.6.22beta01-*.asc (armored detached GPG signatures)
+   1.6.22beta02-README.txt
+   1.6.22beta02-LICENSE.txt
+   libpng-1.6.22beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.21):
 
@@ -39,6 +39,8 @@ Version 1.6.22beta01 [January 23, 2016]
     a quiet API change that limits in-memory image size (uncompressed) to
     less than 4GByte and image row size (stride) to less than 2GByte.
   Revised workaround for false-positive Coverity issue in pngvalid.c.
+
+Version 1.6.22beta02 [January 23, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
