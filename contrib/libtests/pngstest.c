@@ -26,6 +26,15 @@
 #  include <config.h>
 #endif
 
+/* 1.6.1 added support for the configure test harness, which uses 77 to indicate
+ * a skipped test, in earlier versions we need to succeed on a skipped test, so:
+ */
+#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
+#  define SKIP 77
+#else
+#  define SKIP 0
+#endif
+
 /* Define the following to use this test against your installed libpng, rather
  * than the one being built here:
  */
@@ -3470,7 +3479,7 @@ main(int argc, char **argv)
 #        ifdef PNG_STDIO_SUPPORTED
             opts |= USE_FILE;
 #        else
-            return 77; /* skipped: no support */
+            return SKIP; /* skipped: no support */
 #        endif
       else if (strcmp(arg, "--memory") == 0)
          opts &= ~USE_FILE;
@@ -3478,7 +3487,7 @@ main(int argc, char **argv)
 #        ifdef PNG_STDIO_SUPPORTED
             opts |= USE_STDIO;
 #        else
-            return 77; /* skipped: no support */
+            return SKIP; /* skipped: no support */
 #        endif
       else if (strcmp(arg, "--name") == 0)
          opts &= ~USE_STDIO;
@@ -3764,6 +3773,6 @@ int main(void)
 {
    fprintf(stderr, "pngstest: no read support in libpng, test skipped\n");
    /* So the test is skipped: */
-   return 77;
+   return SKIP;
 }
 #endif /* PNG_SIMPLIFIED_READ_SUPPORTED */

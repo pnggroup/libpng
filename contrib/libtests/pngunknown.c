@@ -30,6 +30,16 @@
 #  include "../../png.h"
 #endif
 
+/* 1.6.1 added support for the configure test harness, which uses 77 to indicate
+ * a skipped test, in earlier versions we need to succeed on a skipped test, so:
+ */
+#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
+#  define SKIP 77
+#else
+#  define SKIP 0
+#endif
+
+
 /* Since this program tests the ability to change the unknown chunk handling
  * these must be defined:
  */
@@ -1260,7 +1270,7 @@ main(void)
    fprintf(stderr,
       " test ignored: no support to find out about unknown chunks\n");
    /* So the test is skipped: */
-   return 77;
+   return SKIP;
 }
 #endif /* READ_USER_CHUNKS || SAVE_UNKNOWN_CHUNKS */
 
@@ -1271,6 +1281,6 @@ main(void)
    fprintf(stderr,
       " test ignored: no support to modify unknown chunk handling\n");
    /* So the test is skipped: */
-   return 77;
+   return SKIP;
 }
 #endif /* SET_UNKNOWN_CHUNKS && READ*/
