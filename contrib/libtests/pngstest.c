@@ -3209,7 +3209,11 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       {
          /* This is non-fatal: */
          if (size > PNG_IMAGE_PNG_SIZE_MAX(image->image))
+         {
             logerror(image, "memory", ": PNG_IMAGE_SIZE_MAX wrong", "");
+            if ((image->opts & STRICT) != 0)
+               return 0;
+         }
 
          initimage(output, image->opts, "memory", image->stride_extra);
          output->input_memory = malloc(size);
@@ -3224,7 +3228,12 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
             {
                /* This is also non-fatal (maybe): */
                if (size != output->input_memory_size)
+               {
                   logerror(image, "memory", ": memory size wrong", "");
+
+                  if ((image->opts & STRICT) != 0)
+                     return 0;
+               }
             }
 
             else

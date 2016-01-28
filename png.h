@@ -3142,8 +3142,9 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #define PNG_IMAGE_PNG_SIZE_MAX_(image, image_size)\
    ((8U/*sig*/+25U/*IHDR*/+16U/*gAMA*/+44U/*cHRM*/+12U/*IEND*/+\
     (((image).format&PNG_FORMAT_FLAG_COLORMAP)?/*colormap: PLTE, tRNS*/\
-     12U+PNG_IMAGE_COLORMAP_SIZE(image)/*PLTE+tRNS data*/+\
-     (((image).format&PNG_FORMAT_FLAG_ALPHA)?12U/*tRNS*/:0U):0U)+\
+     12U+3U*(image).colormap_entries/*PLTE data*/+\
+     (((image).format&PNG_FORMAT_FLAG_ALPHA)?\
+      12U/*tRNS*/+(image).colormap_entries:0U):0U)+\
     12U)+(12U*((image_size)/PNG_ZBUF_SIZE))/*IDAT*/+(image_size))
    /* A helper for the following macro; if your compiler cannot handle the
     * following macro use this one with the result of
