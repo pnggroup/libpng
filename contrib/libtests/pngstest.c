@@ -108,10 +108,18 @@ make_random_bytes(png_uint_32* seed, void* pv, size_t size)
    seed[1] = u1;
 }
 
+static png_uint_32 color_seed[2];
+
+static void
+reseed(void)
+{
+   color_seed[0] = 0x12345678U;
+   color_seed[1] = 0x9abcdefU;
+}
+
 static void
 random_color(png_colorp color)
 {
-   static png_uint_32 color_seed[2] = { 0x12345678, 0x9abcdef };
    make_random_bytes(color_seed, color, sizeof *color);
 }
 
@@ -325,6 +333,9 @@ compare_16bit(int v1, int v2, int error_limit, int multiple_algorithms)
 #define ACCUMULATE 64
 #define FAST_WRITE 128
 #define sRGB_16BIT 256
+#define NO_RESEED  512   /* do not reseed on each new file */
+#define GBG_ERROR 1024   /* do not ignore the gamma+background_rgb_to_gray
+                          * libpng warning. */
 
 static void
 print_opts(png_uint_32 opts)
@@ -333,8 +344,8 @@ print_opts(png_uint_32 opts)
       printf(" --file");
    if (opts & USE_STDIO)
       printf(" --stdio");
-   if (opts & STRICT)
-      printf(" --strict");
+   if (!(opts & STRICT))
+      printf(" --nostrict");
    if (opts & VERBOSE)
       printf(" --verbose");
    if (opts & KEEP_TMPFILES)
@@ -347,6 +358,12 @@ print_opts(png_uint_32 opts)
       printf(" --slow");
    if (opts & sRGB_16BIT)
       printf(" --sRGB-16bit");
+   if (opts & NO_RESEED)
+      printf(" --noreseed");
+#if PNG_LIBPNG_VER < 10700 /* else on by default */
+   if (opts & GBG_ERROR)
+      printf(" --fault-gbg-warning");
+#endif
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
@@ -750,8 +767,15 @@ checkopaque(Image *image)
       return logerror(image, image->file_name, ": opaque not NULL", "");
    }
 
-   else if (image->image.warning_or_error != 0 && (image->opts & STRICT) != 0)
-      return logerror(image, image->file_name, " --strict", "");
+   /* Separate out the gamma+background_rgb_to_gray warning because it may
+    * produce opaque component errors:
+    */
+   else if (image->image.warning_or_error != 0 &&
+            (strcmp(image->image.message,
+               "libpng does not support gamma+background+rgb_to_gray") == 0 ?
+                  (image->opts & GBG_ERROR) != 0 : (image->opts & STRICT) != 0))
+      return logerror(image, image->file_name, (image->opts & GBG_ERROR) != 0 ?
+                      " --fault-gbg-warning" : " --strict", "");
 
    else
       return 1;
@@ -3207,13 +3231,11 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
       if (png_image_write_get_memory_size(image->image, size, convert_to_8bit,
                image->buffer+16, (png_int_32)image->stride, image->colormap))
       {
-         /* This is non-fatal: */
+         /* This is non-fatal but ignoring it was causing serious problems in
+          * the macro to be ignored:
+          */
          if (size > PNG_IMAGE_PNG_SIZE_MAX(image->image))
-         {
-            logerror(image, "memory", ": PNG_IMAGE_SIZE_MAX wrong", "");
-            if ((image->opts & STRICT) != 0)
-               return 0;
-         }
+            return logerror(image, "memory", ": PNG_IMAGE_SIZE_MAX wrong", "");
 
          initimage(output, image->opts, "memory", image->stride_extra);
          output->input_memory = malloc(size);
@@ -3226,14 +3248,10 @@ write_one_file(Image *output, Image *image, int convert_to_8bit)
                   &output->input_memory_size, convert_to_8bit, image->buffer+16,
                   (png_int_32)image->stride, image->colormap))
             {
-               /* This is also non-fatal (maybe): */
+               /* This is also non-fatal but it safes safer to error out anyway:
+                */
                if (size != output->input_memory_size)
-               {
-                  logerror(image, "memory", ": memory size wrong", "");
-
-                  if ((image->opts & STRICT) != 0)
-                     return 0;
-               }
+                  return logerror(image, "memory", ": memory size wrong", "");
             }
 
             else
@@ -3421,6 +3439,8 @@ test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
    int result;
    Image image;
 
+   if (!(opts & NO_RESEED))
+      reseed(); /* ensure that the random numbers don't depend on file order */
    newimage(&image);
    initimage(&image, opts, file_name, stride_extra);
    result = read_one_file(&image);
@@ -3458,7 +3478,7 @@ test_one_file(const char *file_name, format_list *formats, png_uint_32 opts,
 int
 main(int argc, char **argv)
 {
-   png_uint_32 opts = FAST_WRITE;
+   png_uint_32 opts = FAST_WRITE | STRICT;
    format_list formats;
    const char *touch = NULL;
    int log_pass = 0;
@@ -3467,11 +3487,17 @@ main(int argc, char **argv)
    int retval = 0;
    int c;
 
+#if PNG_LIBPNG_VER >= 10700
+      /* This error should not exist in 1.7 or later: */
+      opts |= GBG_ERROR;
+#endif
+
    init_sRGB_to_d();
 #if 0
    init_error_via_linear();
 #endif
    format_init(&formats);
+   reseed(); /* initialize random number seeds */
 
    for (c=1; c<argc; ++c)
    {
@@ -3522,10 +3548,16 @@ main(int argc, char **argv)
          opts &= ~KEEP_GOING;
       else if (strcmp(arg, "--strict") == 0)
          opts |= STRICT;
+      else if (strcmp(arg, "--nostrict") == 0)
+         opts &= ~STRICT;
       else if (strcmp(arg, "--sRGB-16bit") == 0)
          opts |= sRGB_16BIT;
       else if (strcmp(arg, "--linear-16bit") == 0)
          opts &= ~sRGB_16BIT;
+      else if (strcmp(arg, "--noreseed") == 0)
+         opts |= NO_RESEED;
+      else if (strcmp(arg, "--fault-gbg-warning") == 0)
+         opts |= GBG_ERROR;
       else if (strcmp(arg, "--tmpfile") == 0)
       {
          if (c+1 < argc)
