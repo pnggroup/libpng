@@ -505,19 +505,20 @@ function(png_add_test)
 endfunction()
 
 if(PNG_TESTS AND PNG_SHARED)
+  # Find test PNG files by globbing, but sort lists to ensure
+  # consistency between different filesystems.
   file(GLOB PNGSUITE_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/*.png")
-
+  list(SORT PNGSUITE_PNGS)
   file(GLOB TEST_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/*.png")
+  list(SORT TEST_PNGS)
 
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
-  # does not work with msvc due to png_lib_ver issue
   add_executable(pngtest ${pngtest_sources})
   target_link_libraries(pngtest png)
 
   png_add_test(NAME pngtest COMMAND pngtest FILES "${PNGTEST_PNG}")
 
-  #
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid png)
 
@@ -598,6 +599,8 @@ if(PNG_TESTS AND PNG_SHARED)
           list(APPEND PNGSTEST_FILES "${test_png}")
         endif()
       endforeach()
+      # Should already be sorted, but sort anyway to be certain.
+      list(SORT PNGSTEST_FILES)
       png_add_test(NAME pngstest-${gamma_type}-${alpha_type}
                    COMMAND pngstest
                    OPTIONS --tmpfile "${gamma_type}-${alpha_type}-" --log
