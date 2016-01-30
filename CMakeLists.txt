@@ -1,6 +1,10 @@
 # CMakeLists.txt
 
-# Copyright (C) 2007-2015 Glenn Randers-Pehrson
+# Copyright (C) 2007,2009-2016 Glenn Randers-Pehrson
+# Written by Christian Ehrlicher, 2007
+# Revised by Roger Lowman, 2009-2010
+# Revised by Clifford Yapp, 2011-2012
+# Revised by Roger Leigh, 2016
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -551,6 +555,7 @@ if(PNG_TESTS AND PNG_SHARED)
   add_executable(pngstest ${pngstest_sources})
   target_link_libraries(pngstest png)
 
+  png_add_test(NAME pngstest-pngsuite COMMAND pngstest FILES ${PNGSUITE_PNGS})
   foreach(gamma_type 1.8 linear none sRGB)
     foreach(alpha_type none alpha)
       set(PNGSTEST_FILES)
