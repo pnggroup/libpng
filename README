@@ -1,4 +1,4 @@
-README for libpng version 1.7.0beta79 - January 23, 2016 (shared library 17.0)
+README for libpng version 1.7.0beta79 - January 30, 2016 (shared library 17.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -160,6 +160,7 @@ Files in this distribution:
       pngstruct.h   =>  png_struct declaration (private)
       pnginfo.h     =>  png_info struct declaration (private)
       pngdebug.h    =>  debugging macros (private)
+      pngchunk.h    =>  PNG chunk descriptions (private, new in libpng17)
       pngerror.c    =>  Error/warning message I/O functions
       pngget.c      =>  Functions for retrieving info from struct
       pngmem.c      =>  Memory handling functions
