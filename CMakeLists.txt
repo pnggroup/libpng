@@ -559,7 +559,6 @@ if(PNG_TESTS AND PNG_SHARED)
   add_executable(pngstest ${pngstest_sources})
   target_link_libraries(pngstest png)
 
-  png_add_test(NAME pngstest-pngsuite COMMAND pngstest FILES ${PNGSUITE_PNGS})
   foreach(gamma_type 1.8 linear none sRGB)
     foreach(alpha_type none alpha)
       set(PNGSTEST_FILES)
