@@ -1,4 +1,4 @@
-Libpng 1.6.22beta02 - January 29, 2016
+Libpng 1.6.22beta02 - January 30, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -40,13 +40,19 @@ Version 1.6.22beta01 [January 23, 2016]
     less than 4GByte and image row size (stride) to less than 2GByte.
   Revised workaround for false-positive Coverity issue in pngvalid.c.
 
-Version 1.6.22beta02 [January 29, 2016]
+Version 1.6.22beta02 [January 30, 2016]
   Only use exit(77) in configure builds.
   Corrected error in PNG_IMAGE_PNG_SIZE_MAX. This new macro underreported
     the palette size because it failed to take into account that the memory
     palette has to be expanded to full RGB when it is written to PNG.
   Updated CMakeLists.txt, added supporting scripts/gen*.cmake.in
     and test.cmake.in (Roger Leigh).
+  Relaxed limit checks on gamma values in pngrtran.c. As suggested in
+    the comments gamma values outside the range currently permitted
+    by png_set_alpha_mode are useful for HDR data encoding.  These values
+    are already permitted by png_set_gamma so it is reasonable caution to
+    extend the png_set_alpha_mode range as HDR imaging systems are starting
+    to emerge.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

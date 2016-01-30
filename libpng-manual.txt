@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.22beta02 - January 23, 2016
+ libpng version 1.6.22beta02 - January 30, 2016
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.22beta02 - January 23, 2016
+ libpng versions 0.97, January 1998, through 1.6.22beta02 - January 30, 2016
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
@@ -4782,7 +4782,8 @@ There are no substantial API changes between the non-deprecated parts of
 the 1.4.5 API and the 1.5.0 API; however, the ability to directly access
 members of the main libpng control structures, png_struct and png_info,
 deprecated in earlier versions of libpng, has been completely removed from
-libpng 1.5.
+libpng 1.5, and new private "pngstruct.h", "pnginfo.h", and "pngdebug.h"
+header files were created.
 
 We no longer include zlib.h in png.h.  The include statement has been moved
 to pngstruct.h, where it is not accessible by applications. Applications that
