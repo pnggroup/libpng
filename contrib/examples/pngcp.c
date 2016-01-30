@@ -103,8 +103,8 @@ typedef enum
 #define RESULT_RELAXED(r)  (((r) & ~((1U<<ERRORS)-1)) == 0)
 
 /* OPTION DEFINITIONS */
-static const char range_lo[] = "min";
-static const char range_hi[] = "max";
+static const char range_lo[] = "low";
+static const char range_hi[] = "high";
 static const char all[] = "all";
 #define RANGE(lo,hi) { range_lo, lo }, { range_hi, hi }
 static const struct value_list
@@ -129,9 +129,9 @@ vl_strategy[] =
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
 vl_windowBits_text[] =
 {
-   { "default", 15 },
+   { "default", MAX_WBITS/*from zlib*/ },
    { "minimum", 8 },
-   RANGE(8, 15),
+   RANGE(8, MAX_WBITS/*from zlib*/),
    { all, 0 }
 },
 #endif /* text compression */
@@ -147,12 +147,14 @@ vl_level[] =
 },
 vl_memLevel[] =
 {
-   { "9", 9 }, /* zlib maximum */
+   { "max", MAX_MEM_LEVEL }, /* zlib maximum */
    { "1", 1 }, /* zlib minimum */
    { "default", 8 }, /* zlib default */
    { "2", 2 },
-   { "3", 3 }, /* for explicit testing */
-   RANGE(4, 9), /* exclude 3 and below: zlib bugs */
+   { "3", 3 },
+   { "4", 4 },
+   { "5", 5 }, /* for explicit testing */
+   RANGE(6, MAX_MEM_LEVEL/*zlib*/), /* exclude 5 and below: zlib bugs */
    { all, 0 }
 },
 #endif /* WRITE_CUSTOMIZE_*COMPRESSION */
@@ -197,9 +199,9 @@ vl_on_off[] = { { "on", 1 }, { "off", 2 } };
 static struct value_list
 vl_windowBits_IDAT[] =
 {
-   { "default", 15 },
+   { "default", MAX_WBITS },
    { "small", 9 },
-   RANGE(8, 15), /* modified by set_windowBits_hi */
+   RANGE(8, MAX_WBITS), /* modified by set_windowBits_hi */
    { all, 0 }
 };
 #endif /* IDAT compression */
@@ -208,12 +210,13 @@ static const struct option
 {
    const char              *name;         /* name of the option */
    png_uint_32              opt;          /* an option, or OPTION or LIST */
+   png_byte                 search;       /* Search on --search */
    png_byte                 value_count;  /* length of the list of values: */
    const struct value_list *values;       /* values for OPTION or LIST */
 }  options[] =
 {
    /* struct display options, these are set when the command line is read */
-#  define S(n,v) { #n, v, 2, vl_on_off },
+#  define S(n,v) { #n, v, 0, 2, vl_on_off },
    S(verbose,  VERBOSE)
    S(warnings, WARNINGS)
    S(errors,   ERRORS)
@@ -229,18 +232,18 @@ static const struct option
    /* OPTION settings, these and LIST settings are read on demand */
 #  define VLNAME(name) vl_ ## name
 #  define VLSIZE(name) ((sizeof VLNAME(name))/(sizeof VLNAME(name)[0]))
-#  define VL(oname, name, type)\
-   { oname, type, VLSIZE(name), VLNAME(name) },
-#  define VLO(oname, name) VL(oname, name, OPTION)
+#  define VL(oname, name, type, search)\
+   { oname, type, search, VLSIZE(name), VLNAME(name) },
+#  define VLO(oname, name, search) VL(oname, name, OPTION, search)
 
 #  ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
-#     define VLCIDAT(name) VLO(#name, name)
+#     define VLCIDAT(name) VLO(#name, name, 1/*search*/)
 #  else
 #     define VLCIDAT(name)
 #  endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #  ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-#     define VLCzTXt(name) VLO("text-" #name, name)
+#     define VLCzTXt(name) VLO("text-" #name, name, 0/*search*/)
 #  else
 #     define VLCzTXt(name)
 #  endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
@@ -248,22 +251,22 @@ static const struct option
 #  define VLC(name) VLCIDAT(name) VLCzTXt(name)
 
    VLC(strategy)
-   VLO("windowBits", windowBits_IDAT)
-   VLO("text-windowBits", windowBits_text)
+   VLO("windowBits", windowBits_IDAT, 1)
+   VLO("text-windowBits", windowBits_text, 0)
    VLC(level)
    VLC(memLevel)
-   VLO("IDAT-size", IDAT_size)
+   VLO("IDAT-size", IDAT_size, 0)
 
 #  undef VLO
 
    /* LIST settings */
-#  define VLL(name) VL(#name, name, LIST)
+#  define VLL(name, search) VL(#name, name, LIST, search)
 #if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
     defined(PNG_SELECT_FILTER_METHODICALLY_SUPPORTED)
-   VLL(select)
+   VLL(select, 1)
 #endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
 #ifdef PNG_WRITE_FILTER_SUPPORTED
-   VLL(filter)
+   VLL(filter, 0)
 #endif /* WRITE_FILTER */
 #  undef VLL
 #  undef VL
@@ -303,6 +306,11 @@ struct display
    png_alloc_size_t read_size;
    png_structp      read_pp;
    png_infop        ip;
+#  if PNG_LIBPNG_VER < 10700
+      png_textp     text_ptr; /* stash of text chunks */
+      int           num_text;
+      int           text_stashed;
+#  endif /* pre 1.7 */
 
    /* Used to write a new image (the original info_ptr is used) */
 #  define MAX_SIZE ((png_alloc_size_t)(-1))
@@ -327,7 +335,7 @@ struct display
    int              value[opt_count];  /* Corresponding value */
 
    /* Compression exhaustive testing */
-   /* Temporary variables used only while testing a single collectiono of
+   /* Temporary variables used only while testing a single collection of
     * settings:
     */
    unsigned int     csp;               /* next stack entry to use */
@@ -339,6 +347,10 @@ struct display
    unsigned int     tsp;               /* nsp from the last run; this is the
                                         * index+1 of the highest active entry on
                                         * this run; this entry will be advanced.
+                                        */
+   int              opt_string_start;  /* Position in buffer for the first
+                                        * searched option; non-zero if earlier
+                                        * options were set on the command line.
                                         */
 #  define SL 8 /* stack limit */
    struct stack
@@ -375,6 +387,11 @@ display_init(struct display *dp)
    dp->read_pp = NULL;
    dp->ip = NULL;
    dp->write_pp = NULL;
+#  if PNG_LIBPNG_VER < 10700
+      dp->text_ptr = NULL;
+      dp->num_text = 0;
+      dp->text_stashed = 0;
+#  endif /* pre 1.7 */
 }
 
 static void
@@ -411,6 +428,19 @@ display_clean(struct display *dp)
    display_clean_read(dp);
    display_clean_write(dp);
    dp->output_file = NULL;
+
+#  if PNG_LIBPNG_VER < 10700
+      /* This is actually created and used by the write code, but only
+       * once; it has to be retained for subsequent writes of the same file.
+       */
+      if (dp->text_stashed)
+      {
+         dp->text_stashed = 0;
+         dp->num_text = 0;
+         free(dp->text_ptr);
+         dp->text_ptr = NULL;
+      }
+#  endif /* pre 1.7 */
 
    /* leave the filename for error detection */
    dp->results = 0; /* reset for next time */
@@ -500,6 +530,63 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
    }
 }
 
+#if PNG_LIBPNG_VER < 10700
+static void
+text_stash(struct display *dp)
+{
+   /* libpng 1.6 and earlier fixed a bug whereby text chunks were written
+    * multiple times by png_write_png; the issue was that png_write_png passed
+    * the same png_info to both png_write_info and png_write_end.  Rather than
+    * fixing it by recording the information in the png_struct, or by recording
+    * where to write the chunks, the fix made was to change the 'compression'
+    * field of the chunk to invalid values, rendering the png_info somewhat
+    * useless.
+    *
+    * The only fix for this given that we use the png_info more than once is to
+    * make a copy of the text chunks and png_set_text it each time.  This adds a
+    * text chunks, so they get replicated, but only the new set gets written
+    * each time.  This uses memory like crazy but there is no way to delete the
+    * useless chunks from the png_info.
+    *
+    * To make this slightly more efficient only the top level structure is
+    * copied; since the old strings are actually preserved (in 1.6 and earlier)
+    * this happens to work.
+    */
+   png_textp chunks = NULL;
+
+   dp->num_text = png_get_text(dp->write_pp, dp->ip, &chunks, NULL);
+
+   if (dp->num_text > 0)
+   {
+      dp->text_ptr = malloc(dp->num_text * sizeof *chunks);
+
+      if (dp->text_ptr == NULL)
+         display_log(dp, APP_ERROR, "text chunks: stash malloc failed");
+
+      else
+         memcpy(dp->text_ptr, chunks, dp->num_text * sizeof *chunks);
+   }
+
+   dp->text_stashed = 1; /* regardless of whether there are chunks or not */
+}
+
+#define text_stash(dp) if (!dp->text_stashed) text_stash(dp)
+
+static void
+text_restore(struct display *dp)
+{
+   /* libpng makes a copy, so this is fine: */
+   if (dp->text_ptr != NULL)
+      png_set_text(dp->write_pp, dp->ip, dp->text_ptr, dp->num_text);
+}
+
+#define text_restore(dp) if (dp->text_stashed) text_restore(dp)
+
+#else
+#define text_stash(dp) ((void)0)
+#define text_restore(dp) ((void)0)
+#endif /* pre 1.7 */
+
 /* OPTIONS:
  *
  * The command handles options of the forms:
@@ -552,19 +639,18 @@ getopt(struct display *dp, const char *opt, int *value)
       return 0;
 }
 
-static void
-set_opt_string(struct display *dp, unsigned int sp)
+static int
+set_opt_string_(struct display *dp, unsigned int sp, png_byte opt,
+      const char *entry_name)
    /* Add the appropriate option string to dp->curr. */
 {
    int offset, add;
-   png_byte opt = dp->stack[sp].opt;
-   const char *entry_name = options[opt].values[dp->stack[sp].entry].name;
 
    if (sp > 0)
       offset = dp->stack[sp-1].opt_string_end;
 
    else
-      offset = 0;
+      offset = dp->opt_string_start;
 
    if (entry_name == range_lo)
       add = sprintf(dp->curr+offset, " --%s=%d", options[opt].name,
@@ -577,7 +663,42 @@ set_opt_string(struct display *dp, unsigned int sp)
       display_log(dp, INTERNAL_ERROR, "sprintf failed");
 
    assert(offset+add < (int)/*SAFE*/sizeof dp->curr);
-   dp->stack[sp].opt_string_end = offset+add;
+   return offset+add;
+}
+
+static void
+set_opt_string(struct display *dp, unsigned int sp)
+   /* Add the appropriate option string to dp->curr. */
+{
+   dp->stack[sp].opt_string_end = set_opt_string_(dp, sp, dp->stack[sp].opt, 
+      options[dp->stack[sp].opt].values[dp->stack[sp].entry].name);
+}
+
+static void
+record_opt(struct display *dp, png_byte opt, const char *entry_name)
+   /* Record this option in dp->curr; called for an option not being searched,
+    * the caller passes in the name of the value, or range_lo to use the
+    * numerical value.
+    */
+{
+   const unsigned int sp = dp->csp; /* stack entry of next searched option */
+
+   if (sp >= dp->tsp)
+   {
+      /* At top of stack; add the opt string for this entry to the previous
+       * searched entry or the start of the dp->curr buffer if there is nothing
+       * on the stack yet (sp == 0).
+       */
+      const int offset = set_opt_string_(dp, sp, opt, entry_name);
+
+      if (sp > 0)
+         dp->stack[sp-1].opt_string_end = offset;
+
+      else
+         dp->opt_string_start = offset;
+   }
+
+   /* else do nothing: option already recorded */
 }
 
 static int
@@ -661,6 +782,12 @@ push_opt(struct display *dp, unsigned int sp, png_byte opt, int search)
       dp->stack[sp].end = 0;
       dp->nsp = dp->tsp;
    }
+
+   /* Do a lazy cache of the text chunks for libpng 1.6 and earlier; this is
+    * because they can only be written once(!) so if we are going to re-use the
+    * png_info we need a copy.
+    */
+   text_stash(dp);
 }
 
 static void
@@ -983,7 +1110,7 @@ advance_opt(struct display *dp, png_byte opt, int search)
 }
 
 static int
-getallopts_(struct display *dp, const png_byte opt, int *value)
+getallopts_(struct display *dp, const png_byte opt, int *value, int record)
    /* Like getop but iterate over all the values if the option was set to "all".
     */
 {
@@ -993,8 +1120,13 @@ getallopts_(struct display *dp, const png_byte opt, int *value)
        * value (it doesn't change once set on the command line).  Otherwise the
        * value (entry) selected from the command line is 'all':
        */
-      if (options[opt].values[dp->entry[opt]-1].name == all)
+      const char *entry_name = options[opt].values[dp->entry[opt]-1].name;
+
+      if (entry_name == all)
          (void)advance_opt(dp, opt, 0/*do not search; iterate*/);
+
+      else if (record)
+         record_opt(dp, opt, entry_name);
 
       *value = dp->value[opt];
       return 1; /* set */
@@ -1007,7 +1139,7 @@ getallopts_(struct display *dp, const png_byte opt, int *value)
 static int
 getallopts(struct display *dp, const char *opt_str, int *value)
 {
-   return getallopts_(dp, optind(dp, opt_str, strlen(opt_str)), value);
+   return getallopts_(dp, optind(dp, opt_str, strlen(opt_str)), value, 0);
 }
 
 static int
@@ -1016,21 +1148,35 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
 {
    png_byte istrat;
    const png_byte opt = optind(dp, opt_str, strlen(opt_str));
+   int record = options[opt].search;
+   const char *entry_name;
 
    /* If it was set on the command line honour the setting, including 'all'
     * which will override the built in search:
     */
-   if (getallopts_(dp, opt, value))
+   if (getallopts_(dp, opt, value, record))
       return 1;
+
+   else if (!record) /* not a search option */
+      return 0; /* unset and not searched */
 
    /* Otherwise decide what to do here. */
    istrat = OPTIND(dp, strategy);
+   entry_name = range_lo; /* record the value, not the name */
 
+#if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
+    defined(PNG_SELECT_FILTER_METHODICALLY_SUPPORTED)
    if (opt == OPTIND(dp, select))
+   {
       dp->value[opt] = SELECT_METHODICALLY; /* should probably be all */
+      entry_name = "methodically"; /* for the moment */
+   }
 
-   else if (opt == istrat) /* search all strategies */
-      (void)advance_opt(dp, opt, 0/*iterate*/);
+   else
+#endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
+
+   if (opt == istrat) /* search all strategies */
+      (void)advance_opt(dp, opt, 0/*iterate*/), record=0;
 
    else if (opt == OPTIND(dp, level))
    {
@@ -1039,26 +1185,40 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
          dp->value[opt] = 1;
 
       else /* fixed, filtered or default */
-         (void)advance_opt(dp, opt, 1/*search*/);
+         (void)advance_opt(dp, opt, 1/*search*/), record=0;
    }
 
    else if (opt == OPTIND(dp, windowBits))
    {
       /* Changing windowBits for strategies that do not search the window is
-       * pointless.  Use the minimum window bits for these.
+       * pointless.  Huffman-only does not search, RLE only searchs backwards
+       * one byte, so give that the maximum string length is 258, a windowBits
+       * of 9 is always sufficient.
        */
-      if (dp->value[istrat] == Z_RLE || dp->value[istrat] == Z_HUFFMAN_ONLY)
+      if (dp->value[istrat] == Z_HUFFMAN_ONLY)
          dp->value[opt] = 8;
 
+      else if (dp->value[istrat] == Z_RLE)
+         dp->value[opt] = 9;
+
       else /* fixed, filtered or default */
-         (void)advance_opt(dp, opt, 1/*search*/);
+         (void)advance_opt(dp, opt, 1/*search*/), record=0;
    }
 
    else if (opt == OPTIND(dp, memLevel))
-      (void)advance_opt(dp, opt, 1/*search*/);
+   {
+#     if 0
+         (void)advance_opt(dp, opt, 0/*all*/), record=0;
+#     else
+         dp->value[opt] = 9;
+#     endif
+   }
 
    else /* something else */
-      return 0;
+      assert(!"reached");
+
+   if (record)
+      record_opt(dp, opt, entry_name);
 
    /* One of the above searched options: */
    *value = dp->value[opt];
@@ -1253,7 +1413,7 @@ isdir(struct display *dp, const char *pathname)
 {
    if (pathname == NULL)
       return 0; /* stdout */
-   
+
    else if (pathname[0] == 0)
       return 1; /* empty string */
 
@@ -1576,6 +1736,12 @@ write_png(struct display *dp, const char *destname)
    png_set_benign_errors(dp->write_pp, 1/*allowed*/);
    png_set_write_fn(dp->write_pp, dp, write_function, NULL/*flush*/);
 
+   /* Restore the text chunks when using libpng 1.6 or less; this is a macro
+    * which expands to nothing in 1.7+  In earlier versions it tests
+    * dp->text_stashed, which is only set (below) *after* the first write.
+    */
+   text_restore(dp);
+
 #  ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
       png_set_keep_unknown_chunks(dp->write_pp, PNG_HANDLE_CHUNK_ALWAYS, NULL,
             0);
@@ -1661,7 +1827,7 @@ set_windowBits_hi(struct display *dp)
    /* windowBits is in the range 8..15, but it is said that setting '8'
     * prevents adequate search even if the image size is 256 bytes or less.
     */
-   int wb = 15; /* for large images */
+   int wb = MAX_WBITS; /* for large images */
    int i = VLSIZE(windowBits_IDAT);
 
    while (wb > 9 && dp->size <= 1U<<(wb-1)) --wb;
@@ -1739,10 +1905,15 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
    }
 
    dp->nsp = 0;
-   dp->curr[0] = 0;
-   dp->best[0] = 0; /* acts as a flag for the caller */
+   dp->curr[0] = 0; /* acts as a flag for the caller */
+   dp->opt_string_start = 0;
+   dp->best[0] = 0; /* safety */
    dp->best_size = MAX_SIZE;
    write_png(dp, destname);
+
+   /* Initialize the 'best' fields: */
+   strcpy(dp->best, dp->curr);
+   dp->best_size = dp->write_size;
 
    if (dp->nsp > 0) /* interating over lists */
    {
@@ -1752,10 +1923,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
       /* Cancel warnings on subsequent writes */
       dp->no_warnings = 1;
 
-      /* Loop to find the best option, first initialize the 'best' fields: */
-      strcpy(dp->best, dp->curr);
-      dp->best_size = dp->write_size;
-
+      /* Make a temporary name for the subsequent tests: */
       if (destname != NULL)
       {
          strcpy(tmpbuf, destname);
@@ -1766,6 +1934,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
       else
          tmpname = NULL; /* stdout */
 
+      /* Loop to find the best option. */
       do
       {
          write_png(dp, tmpname);
@@ -1862,6 +2031,7 @@ main(const int argc, const char * const * const argv)
       {
          const char *infile = NULL;
          const char *outfile = NULL;
+         int ret;
 
          if (i < argc)
          {
@@ -1870,14 +2040,17 @@ main(const int argc, const char * const * const argv)
                outfile = argv[argc-1];
          }
 
-         {
-            int ret = cppng(&d, infile, outfile);
+         ret = cppng(&d, infile, outfile);
 
+         if (ret)
+         {
             if (ret > QUIET) /* abort on user or internal error */
                return 99;
+
+            /* An error: the output is meaningless */
          }
 
-         if (d.best[0] != 0)
+         else if ((d.options & SEARCH) || d.best[0] != 0)
             printf("%s [%ld x %ld %d bpp %s, %lu bytes] %lu -> %lu with '%s'\n",
                   infile, (unsigned long)d.w, (unsigned long)d.h, d.bpp,
                   cts(d.ct), (unsigned long)d.size, (unsigned long)d.read_size,
