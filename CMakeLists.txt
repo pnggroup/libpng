@@ -522,7 +522,6 @@ if(PNG_TESTS AND PNG_SHARED)
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid png)
 
-  png_add_test(NAME pngvalid COMMAND pngvalid)
   png_add_test(NAME pngvalid-gamma-16-to-8
                COMMAND pngvalid OPTIONS --gamma-16-to-8)
   png_add_test(NAME pngvalid-gamma-alpha-mode
