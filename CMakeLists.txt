@@ -344,10 +344,6 @@ endif()
 set(libpng_sources
   ${libpng_public_hdrs}
   ${libpng_private_hdrs}
-  pngdebug.h
-  pnginfo.h
-  pngpriv.h
-  pngstruct.h
   png.c
   pngerror.c
   pngget.c
