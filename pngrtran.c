@@ -289,9 +289,12 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
     * is expected to be 1 or greater, but this range test allows for some
     * viewing correction values.  The intent is to weed out users of this API
     * who use the inverse of the gamma value accidentally!  Since some of these
-    * values are reasonable this may have to be changed.
+    * values are reasonable this may have to be changed:
+    *
+    * 1.6.x: changed from 0.07..3 to 0.01..100 (to accomodate the optimal 16-bit
+    * gamma of 36, and its reciprocal.)
     */
-   if (output_gamma < 70000 || output_gamma > 300000)
+   if (output_gamma < 1000 || output_gamma > 10000000)
       png_error(png_ptr, "output gamma out of expected range");
 
    /* The default file gamma is the inverse of the output gamma; the output
