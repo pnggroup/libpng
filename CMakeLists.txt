@@ -333,6 +333,7 @@ set(libpng_private_hdrs
   pnginfo.h
   pngstruct.h
   "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
+  pngchunk.h
 )
 if(AWK)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
@@ -340,10 +341,6 @@ endif()
 set(libpng_sources
   ${libpng_public_hdrs}
   ${libpng_private_hdrs}
-  pngdebug.h
-  pnginfo.h
-  pngpriv.h
-  pngstruct.h
   png.c
   pngerror.c
   pngget.c
