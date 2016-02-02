@@ -1198,6 +1198,11 @@ PNG_INTERNAL_FUNCTION(void,png_write_sCAL_s,(png_structrp png_ptr,
     int unit, png_const_charp width, png_const_charp height),PNG_EMPTY);
 #endif
 
+#ifdef PNG_WRITE_SUPPORTED
+/* Initialize the row compression mechanism. */
+PNG_INTERNAL_FUNCTION(void, png_write_start_IDAT, (png_structp png_ptr),
+   PNG_EMPTY);
+
 /* Choose the best filter to use and filter the row data then write it out.  If
  * WRITE_FILTERING is not supported this just writes the data out with a zero
  * (NONE) filter byte.
@@ -1229,6 +1234,7 @@ PNG_INTERNAL_FUNCTION(void, png_write_filter_row, (png_structrp png_ptr,
 /* Release memory used by the deflate mechanism */
 PNG_INTERNAL_FUNCTION(void, png_deflate_destroy, (png_structp png_ptr),
    PNG_EMPTY);
+#endif /* WRITE */
 
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_transform_free,(png_const_structrp png_ptr,

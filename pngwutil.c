@@ -242,57 +242,6 @@ png_image_size(png_const_structrp png_ptr)
       return 0xffffffffU;
 }
 
-#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-   /* This is the code to hack the first two bytes of the deflate stream (the
-    * deflate header) to correct the windowBits value to match the actual data
-    * size.  Note that the second argument is the *uncompressed* size but the
-    * first argument is the *compressed* data (and it must be deflate
-    * compressed.)
-    */
-static void
-optimize_cmf(png_const_structrp png_ptr, png_bytep data,
-      png_alloc_size_t data_size)
-{
-   /* Optimize the CMF field in the zlib stream.  The resultant zlib stream is
-    * still compliant to the stream specification.
-    */
-   if (data_size <= 16384) /* else windowBits must be 15 */
-   {
-      unsigned int z_cmf = data[0];  /* zlib compression method and flags */
-
-      if ((z_cmf & 0x0f) == 8 && (z_cmf & 0xf0) <= 0x70)
-      {
-         unsigned int z_cinfo;
-         unsigned int half_z_window_size;
-
-         z_cinfo = z_cmf >> 4;
-         half_z_window_size = 1U << (z_cinfo + 7);
-
-         if (data_size <= half_z_window_size) /* else no change */
-         {
-            unsigned int tmp;
-
-            do
-            {
-               half_z_window_size >>= 1;
-               --z_cinfo;
-            }
-            while (z_cinfo > 0 && data_size <= half_z_window_size);
-
-            z_cmf = (z_cmf & 0x0f) | (z_cinfo << 4);
-
-            data[0] = png_check_byte(png_ptr, z_cmf);
-            tmp = data[1] & 0xe0;
-            tmp += 0x1f - ((z_cmf << 8) + tmp) % 0x1f;
-            data[1] = png_check_byte(png_ptr, tmp);
-         }
-      }
-   }
-
-   PNG_UNUSED(png_ptr)
-}
-#endif /* WRITE_OPTIMIZE_CMF */
-
 /* Release memory used by the deflate mechanism */
 static void
 png_deflateEnd(png_const_structrp png_ptr, z_stream *zs, int check)
@@ -754,99 +703,45 @@ typedef struct png_zlib_state
    unsigned int filter_oom     :1; /* ran out of memory */
 #endif /* WRITE_FILTER */
 
-   /* Zlib parameters to be used for IDAT and (possibly) text/ICC profile
-    * compression.
-    */
-   int zlib_level;                   /* holds zlib compression level */
-   int zlib_method;                  /* holds zlib compression method */
-   int zlib_window_bits;             /* holds zlib compression window bits */
-   int zlib_mem_level;               /* holds zlib compression memory level */
-   int zlib_strategy;                /* holds zlib compression strategy */
-
-   /* The same, but these are the values actually set into the z_stream: */
-   int zlib_set_level;
-   int zlib_set_method;
-   int zlib_set_window_bits;
-   int zlib_set_mem_level;
-   int zlib_set_strategy;
-
-#  ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-      int zlib_text_level;       /* holds zlib compression level */
-      int zlib_text_method;      /* holds zlib compression method */
-      int zlib_text_window_bits; /* holds zlib compression window bits */
-      int zlib_text_mem_level;   /* holds zlib compression memory level */
-      int zlib_text_strategy;    /* holds zlib compression strategy */
-#  endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+   /* Compression settings: see below for how these are encoded. */
+   png_uint_32 pz_IDAT;    /* Settings for the image */
+   png_uint_32 pz_iCCP;    /* Settings for iCCP chunks */
+   png_uint_32 pz_text;    /* Settings for text chunks */
+   png_uint_32 pz_current; /* Last set settings */
 }  png_zlib_state;
 
-/* This returns the zlib compression state and has the side effect of
- * initializing it if it does not exist.
- */
-static png_zlib_statep
-png_get_zlib_state(png_structrp png_ptr)
+/* Create the zlib state: */
+static void
+png_create_zlib_state(png_structrp png_ptr)
 {
-   if (png_ptr != NULL)
-   {
-      png_zlib_state *ps = png_ptr->zlib_state;
+   png_zlib_statep ps = png_voidcast(png_zlib_state*,
+         png_malloc(png_ptr, sizeof *ps));
 
-      if (ps == NULL && !png_ptr->read_struct)
+   /* Clear to NULL/0: */
+   memset(ps, 0, sizeof *ps);
+
+   debug(png_ptr->zlib_state == NULL);
+   png_ptr->zlib_state = ps;
+   png_zlib_compress_init(png_ptr, &ps->s);
+
+#  ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
       {
-         png_ptr->zlib_state = ps = png_voidcast(png_zlib_state*,
-               png_malloc(png_ptr, sizeof *ps));
+         unsigned int i;
 
-         /* Clear to NULL/0: */
-         memset(ps, 0, sizeof *ps);
-
-         png_zlib_compress_init(png_ptr, &ps->s);
-
-#        ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-            {
-               unsigned int i;
-
-               for (i=0; i<PNG_FILTER_VALUE_LAST; ++i)
-                  ps->filter[i].zs.opaque = NULL;
-            }
-#        endif /* SELECT_FILTER_METHODICALLY */
-
-         ps->stash = NULL;
-
-#        ifdef PNG_WRITE_FLUSH_SUPPORTED
-            /* Set this to prevent flushing by making it larger than the number
-             * of rows in the largest interlaced PNG; PNG_UINT_31_MAX times
-             * (1/8+1/8+1/8+1/4+1/4+1/2+1/2); 1.875, or 15/8
-             */
-            ps->flush_dist = 0xEFFFFFFFU;
-            ps->flush_rows = 0U;
-#        endif /* WRITE_FLUSH */
-
-#        ifdef PNG_WRITE_FILTER_SUPPORTED
-            ps->filter_mask = PNG_NO_FILTERS; /* unset */
-            ps->filters = 0U;
-            ps->filter_oom = 0U;
-#        endif /* WRITE_FILTER */
-
-         /* Zlib parameters to be used for IDAT and (possibly) text/ICC profile
-          * compression.
-          */
-         ps->zlib_level = PNG_Z_DEFAULT_COMPRESSION;
-         ps->zlib_method = Z_DEFLATED;
-         ps->zlib_window_bits = 15; /* 8..15 permitted, 15 is the default */
-         ps->zlib_mem_level = 8; /* 1..9 permitted, 8 is the default */
-         ps->zlib_strategy = -1/*unset (invalid value)*/;
-
-#        ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
-            ps->zlib_text_level = PNG_TEXT_Z_DEFAULT_COMPRESSION;
-            ps->zlib_text_method = Z_DEFLATED;
-            ps->zlib_text_window_bits = 15;
-            ps->zlib_text_mem_level = 8;
-            ps->zlib_text_strategy = PNG_TEXT_Z_DEFAULT_STRATEGY;
-#        endif /* WRITE_COMPRESSED_TEXT */
+         for (i=0; i<PNG_FILTER_VALUE_LAST; ++i)
+            ps->filter[i].zs.opaque = NULL;
       }
+#  endif /* SELECT_FILTER_METHODICALLY */
 
-      return ps;
-   }
+   ps->stash = NULL;
 
-   return NULL;
+#  ifdef PNG_WRITE_FLUSH_SUPPORTED
+      /* Set this to prevent flushing by making it larger than the number
+       * of rows in the largest interlaced PNG; PNG_UINT_31_MAX times
+       * (1/8+1/8+1/8+1/4+1/4+1/2+1/2); 1.875, or 15/8
+       */
+      ps->flush_dist = 0xEFFFFFFFU;
+#  endif /* WRITE_FLUSH */
 }
 
 /* Internal API to clean up all the deflate related stuff, including the buffer
@@ -892,71 +787,244 @@ png_deflate_destroy(png_structrp png_ptr)
    }
 }
 
+/* Compression settings.
+ *
+ * These are stored packed into 16 bits to make comparison with the current
+ * setting quick.  The packing method uses four bits for each setting and
+ * reserves '0' for unset.
+ *
+ * ps_<setting>_base:   The lowest valid value (encoded as 1).
+ * ps_<setting>_max:    The highest valie value.
+ * ps_<setting>_pos:    The position in the range 0..3 (shift of 0..12).
+ */
+#define pz_level_base      (-1)
+#define pz_level_max         9
+#define pz_level_pos         0
+#define pz_windowBits_base   8
+#define pz_windowBits_max   15
+#define pz_windowBits_pos    1
+#define pz_memLevel_base     1
+#define pz_memLevel_max      9
+#define pz_memLevel_pos      2
+#define pz_strategy_base     0
+#define pz_strategy_max      4
+#define pz_strategy_pos      3
+
+#define pz_offset(name)     (pz_ ## name ## _base - 1)
+   /* setting_value == pz_offset(setting)+encoded_value */
+#define pz_min(name)        pz_ ## name ## _base
+#define pz_max(name)        pz_ ## name ## _max
+#define pz_shift(name)      (4 * pz_ ## name ## _pos)
+
+#define pz_bits(name,x)     ((int)(((x)>>pz_shift(name))&0xF))
+   /* the encoded value, or 0 if unset */
+
+/* Enquiries: */
+#define pz_isset(name,x)    (pz_bits(name,x) != 0)
+#define pz_value(name,x)    (pz_bits(name,x)+pz_offset(name))
+
+/* Assignments: */
+#define pz_clear(name,x)    ((x)&~(0xFU<<pz_shift(name)))
+#define pz_encode(name,v)   (((v)-pz_offset(name)) << pz_shift(name))
+#define pz_change(name,x,v) (pz_clear(name,x) | pz_encode(name, v))
+
+/* Direct use/modification: */
+#define pz_var(ps, type)       ((ps)->pz_ ## type)
+#define pz_get(ps, type, name, def)\
+   (pz_isset(name, pz_var(ps, type)) ? pz_value(name, pz_var(ps, type)) : (def))
+/* pz_assign checks for out-of-range values and clears the setting if these are
+ * given.  No warning or error is generated.
+ */
+#define pz_assign(ps, type, name, value)\
+   (pz_var(ps, type) = pz_clear(name, pz_var(ps, type)) |\
+    ((value) >= pz_min(name) && (value) <= pz_max(name) ?\
+     pz_encode(name, value) : 0))
+
+/* There is (as of zlib 1.2.8) a bug in the implementation of compression with a
+ * window size of 256 which zlib works round by resetting windowBits from 8 to 9
+ * whenever deflateInit2 is called with that value.  Fix this up here.
+ */
+static void
+fix_cinfo(png_zlib_statep ps, png_bytep data, png_alloc_size_t data_size)
+{
+   /* Do this if the data is 256 bytes or less and the CINFO field is '1',
+    * meaning windowBits of 8.  The first byte of the stream is the CMF value,
+    * CINFO is in the upper four bits.
+    *
+    * If zlib didn't futz with the value then it should match the value in
+    * pz_current; check this is debug.  (See below for why this works in the
+    * pz_default_settings call.)
+    */
+#  define png_ptr png_voidcast(png_const_structrp, ps->s.zs.opaque)
+   if (data_size <= 256U && data[0] == 0x18U &&
+       pz_get(ps, current, windowBits, 0) == 8 /* i.e. it was requested */)
+   {
+      unsigned int d1;
+
+      data[0] = 0x08U;
+      /* The header checksum must be fixed too.  The FCHECK (low 5 bits) make
+       * CMF.FLG a multiple of 31:
+       */
+      d1 = data[1] & 0xE0U; /* top three bits */
+      d1 += 31U - (0x0800U + d1) % 31U;
+      data[1] = PNG_BYTE(d1);
+   }
+
+   else
+      debug(pz_get(ps, current, windowBits, 0) == 8+(data[0] >> 4));
+#  undef png_ptr
+}
+
+static png_uint_32
+pz_default_settings(png_uint_32 settings, int default_strategy,
+      int default_level, png_alloc_size_t data_size)
+{
+   /* First default the strategy.  At lower data sizes other strategies do as
+    * well as the zlib default compression strategy but they never seem to
+    * improve on it with the 1.7 filtering.
+    */
+   if (!pz_isset(strategy, settings))
+      settings |= pz_encode(strategy, default_strategy);
+
+   /* Now default windowBits.  This is probably the most important of the
+    * settings because it is pretty much the only one that affects decode
+    * performance.  The smaller the better:
+    */
+   if (!pz_isset(windowBits, settings))
+   {
+      /* If the strategy has been set to something that doesn't benefit from
+       * higher windowBits values take advantage of this.  Note that pz_value
+       * returns an invalid value if pz_isset is false.
+       */
+      int setting;
+
+      switch (pz_value(strategy, settings))
+      {
+         case Z_HUFFMAN_ONLY:
+            /* Use the minimum; the window doesn't get used */
+            setting = 8;
+            break;
+
+         case Z_RLE:
+            /* The longest length code is 258 bytes, the shortest string that
+             * can achieve this is 259 bytes long; 259 copies of the same byte
+             * which can be encoded as a code for the byte value then a string
+             * of length 258 starting at the first byte.  So if the data is
+             * longer than 256 bytes use '9' for the windowBits, otherwise use
+             * 8:
+             */
+            if (data_size <= 256U)
+               setting = 8;
+
+            else
+               setting = 9;
+            break;
+
+         default:
+            /* Find the smallest window that covers all the data: */
+            setting = 8;
+            while (setting < 15 && (1U << setting) < data_size)
+               ++setting;
+
+            /* For the moment just use that; it is possible that it might be
+             * better overall to choose the next size down in many cases.
+             */
+            break;
+      }
+
+      settings |= pz_encode(windowBits, setting);
+   }
+
+   /* zlib has a problem with 256 byte windows; 512 is used instead.  We can't
+    * work round this if the data size is more than 256 bytes, so avoid the
+    * problem here:
+    */
+   if (data_size > 256U && pz_value(windowBits, settings) == 8)
+      settings = pz_change(windowBits, settings, 9);
+
+   if (!pz_isset(level, settings))
+   {
+      int setting;
+
+      switch (pz_value(strategy, settings))
+      {
+         case Z_HUFFMAN_ONLY:
+         case Z_RLE:
+            /* The 'level' doesn't make any significant difference to the
+             * compression with these strategies; in a test set of about 3GByte
+             * of PNG files the total compressed size changed under 20 bytes
+             * with libpng 1.6!
+             */
+            setting = 1;
+            break;
+
+         default: /* Z_FIXED, Z_FILTERED, Z_DEFAULT_STRATEGY */
+            /* Everything that uses the window seems to show rapidly diminishing
+             * returns above level 6 (at least with libpng 1.6).
+             * Z_DEFAULT_COMPRESSION is, in fact, level 6 so Mark seems to
+             * concur.
+             */
+            setting = default_level;
+            break;
+      }
+
+      settings |= pz_encode(level, setting);
+   }
+
+   /* For memLevel this just increases the memory used but can help with the
+    * Huffman code generation even to level 9 (the maximum), so just set the
+    * max:
+    */
+   if (!pz_isset(memLevel, settings))
+      settings |= pz_encode(memLevel, MAX_MEM_LEVEL/*from zconf.h*/);
+
+   return settings;
+}
+
 /* Initialize the compressor for the appropriate type of compression. */
 static png_zlib_statep
 png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
       png_alloc_size_t data_size)
 {
-   png_zlib_statep ps = png_get_zlib_state(png_ptr);
+   png_zlib_statep ps;
 
+   if (png_ptr->zlib_state == NULL)
+      png_create_zlib_state(png_ptr);
+
+   ps = png_ptr->zlib_state;
    affirm(ps != NULL && png_ptr->zowner == 0);
 
    {
-      int level = ps->zlib_level;
-      int method = ps->zlib_method;
-      int windowBits = ps->zlib_window_bits;
-      int memLevel = ps->zlib_mem_level;
-      int strategy = ps->zlib_strategy;
       int ret; /* zlib return code */
+      png_uint_32 settings;
 
-      if (owner != png_IDAT)
+      switch (owner)
       {
-#        ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
-            level = ps->zlib_text_level;
-            method = ps->zlib_text_method;
-            windowBits = ps->zlib_text_window_bits;
-            memLevel = ps->zlib_text_mem_level;
-            strategy = ps->zlib_text_strategy;
-#        else /* !WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
-            /* If customization is not supported the values all come from the
-             * IDAT values except for the strategy, which is fixed to the
-             * default.  (This is the pre-1.6.0 behavior too, although it was
-             * implemented in a very different way.)
+         case png_IDAT:
+            settings = pz_default_settings(ps->pz_IDAT,
+                  PNG_Z_DEFAULT_STRATEGY, PNG_Z_DEFAULT_COMPRESSION, data_size);
+            break;
+
+         case png_iCCP:
+            /* Use the IDAT strategy by default; iCCP chunks are not text and
+             * are therefore fundamentally different in compression.
              */
-            strategy = Z_DEFAULT_STRATEGY;
-#        endif /* !WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+            settings = pz_default_settings(ps->pz_iCCP,
+                  PNG_Z_DEFAULT_STRATEGY, PNG_Z_DEFAULT_COMPRESSION, data_size);
+            break;
+
+         default: /* text chunk */
+            settings = pz_default_settings(ps->pz_text,
+                  PNG_TEXT_Z_DEFAULT_STRATEGY, PNG_TEXT_Z_DEFAULT_COMPRESSION,
+                  data_size);
+            break;
       }
 
-      /* Adjust 'windowBits' down if larger than 'data_size'; to stop this
-       * happening just pass 32768 as the data_size parameter.  Notice that zlib
-       * requires an extra 262 bytes in the window in addition to the data to be
-       * able to see the whole of the data, so if data_size+262 takes us to the
-       * next windowBits size we need to fix up the value later.  (Because even
-       * though deflate needs the extra window, inflate does not!)
+      /* Check against the previous initialized values, if any.  The relevant
+       * settings are in the low 16 bits.
        */
-      if (data_size <= 16384U)
-      {
-         /* IMPLEMENTATION NOTE: this 'half_window_size' stuff is only here to
-          * work round a Microsoft Visual C misbehavior which, contrary to C-90,
-          * widens the result of the following shift to 64-bits if (and,
-          * apparently, only if) it is used in a test.
-          */
-         unsigned int half_window_size = 1U << (windowBits-1);
-
-         while (data_size + 262U <= half_window_size)
-         {
-            half_window_size >>= 1;
-            --windowBits;
-         }
-      }
-
-      /* Check against the previous initialized values, if any. */
       if (ps->s.zs.state != NULL &&
-         (ps->zlib_set_level != level ||
-          ps->zlib_set_method != method ||
-          ps->zlib_set_window_bits != windowBits ||
-          ps->zlib_set_mem_level != memLevel ||
-          ps->zlib_set_strategy != strategy))
+            ((settings ^ ps->pz_current) & 0xFFFFU) != 0U)
          png_deflateEnd(png_ptr, &ps->s.zs, 0/*check*/);
 
       /* For safety clear out the input and output pointers (currently zlib
@@ -986,8 +1054,12 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
          ret = deflateReset(&ps->s.zs);
 
       else
-         ret = deflateInit2(&ps->s.zs, level, method, windowBits, memLevel,
-               strategy);
+      {
+         ps->pz_current = settings;
+         ret = deflateInit2(&ps->s.zs, pz_value(level, settings), Z_DEFLATED,
+               pz_value(windowBits, settings), pz_value(memLevel, settings),
+               pz_value(strategy, settings));
+      }
 
       /* The return code is from either deflateReset or deflateInit2; they have
        * pretty much the same set of error codes.
@@ -1079,11 +1151,9 @@ png_compress_chunk_data(png_structrp png_ptr, png_uint_32 chunk_name,
    /* png_compress is meant to guarantee this on a successful return: */
    affirm(ps->s.overflow == 0U && ps->s.len <= PNG_UINT_31_MAX - prefix_len);
 
-#  ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-      /* Fix up the deflate header, if required (and possible): */
-      if (ps->s.len >= 2U)
-         optimize_cmf(png_ptr, ps->s.list->output, input_len);
-#  endif /* WRITE_OPTIMIZE_CMF */
+   /* Correct the zlib CINFO field: */
+   if (ps->s.len >= 2U)
+      fix_cinfo(ps, ps->s.list->output, input_len);
 
    return 1;
 }
@@ -2252,18 +2322,20 @@ png_write_tIME(png_structrp png_ptr, png_const_timep mod_time)
 static void
 png_start_IDAT(png_structrp png_ptr)
 {
-   png_zlib_statep ps = png_get_zlib_state(png_ptr);
+   png_zlib_statep ps = png_ptr->zlib_state;
+
+   affirm(ps != NULL);
 
 #  ifdef PNG_WRITE_FILTER_SUPPORTED
       /* Default both filter_mask and zlib_strategy here, now that png_ptr has
        * all the IHDR fields set.
        */
-      if (ps && ps->filter_mask == PNG_NO_FILTERS/*unset*/)
+      if (ps->filter_mask == PNG_NO_FILTERS/*unset*/)
       {
          /* If there is no filter selection algorithm enabled then the only
           * option is PNG_FILTER_NONE.
           */
-         if (methodical_option == PNG_OPTION_OFF &&
+         if (methodical_option != PNG_OPTION_ON &&
                heuristic_option == PNG_OPTION_OFF)
             ps->filter_mask = PNG_FILTER_NONE;
 
@@ -2271,18 +2343,6 @@ png_start_IDAT(png_structrp png_ptr)
             ps->filter_mask = PNG_ALL_FILTERS;
       }
 #  endif /* WRITE_FILTER */
-
-   if (ps && ps->zlib_strategy == (-1)/*unset*/)
-   {
-#     ifdef PNG_WRITE_FILTER_SUPPORTED
-         if (ps->filter_mask != PNG_FILTER_NONE)
-            ps->zlib_strategy = PNG_Z_DEFAULT_STRATEGY;
-         else
-#     endif /* WRITE_FILTER */
-
-      /* The default with no filters: */
-      ps->zlib_strategy = PNG_Z_DEFAULT_NOFILTER_STRATEGY;
-   }
 
    /* This always succeeds or does a png_error: */
    png_deflate_claim(png_ptr, png_IDAT, png_image_size(png_ptr));
@@ -2367,20 +2427,17 @@ png_write_IDAT(png_structrp png_ptr, int flush)
                    ps->s.start + ps->s.len >= sizeof next->output));
 
          /* First, if this is the very first IDAT (PNG_HAVE_IDAT not set)
-          * optimize the CINFO field:
+          * fix the Zlib CINFO field if required:
           */
-#        ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
-            if ((png_ptr->mode & PNG_HAVE_IDAT) == 0U &&
-                avail >= start+2U /* enough for the zlib header */)
-            {
-               debug(start == 0U);
-               optimize_cmf(png_ptr, next->output+start,
-                     png_image_size(png_ptr));
-            }
+         if ((png_ptr->mode & PNG_HAVE_IDAT) == 0U &&
+             avail >= start+2U /* enough for the zlib header */)
+         {
+            debug(start == 0U);
+            fix_cinfo(ps, next->output+start, png_image_size(png_ptr));
+         }
 
-            else /* always expect to see at least 2 bytes: */
-               debug((png_ptr->mode & PNG_HAVE_IDAT) != 0U);
-#        endif /* WRITE_OPTIMIZE_CMF */
+         else /* always expect to see at least 2 bytes: */
+            debug((png_ptr->mode & PNG_HAVE_IDAT) != 0U);
 
          /* Set this now to prevent the above happening again second time round
           * the loop:
@@ -2512,6 +2569,34 @@ png_compress_IDAT(png_structrp png_ptr, png_const_voidp input, uInt input_len,
    }
 }
 
+/* This returns the zlib compression state for APIs that may be called before
+ * the first call to png_write_row (so when the state might not exist).  It
+ * performs initialization as required.
+ */
+#if defined(PNG_WRITE_FLUSH_SUPPORTED) || defined(PNG_WRITE_FILTER_SUPPORTED)\
+   || defined(PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED)\
+   || defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
+static png_zlib_statep
+png_get_zlib_state(png_structrp png_ptr)
+{
+   if (png_ptr != NULL)
+   {
+      if (png_ptr->zlib_state == NULL)
+      {
+         if (png_ptr->read_struct)
+            png_app_warning(png_ptr, "write API called on read");
+
+         else
+            png_create_zlib_state(png_ptr);
+      }
+
+      return png_ptr->zlib_state;
+   }
+
+   return NULL;
+}
+#endif /* things that need it */
+
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 /* Set the automatic flush interval or 0 to turn flushing off */
 void PNGAPI
@@ -2525,7 +2610,7 @@ png_set_flush(png_structrp png_ptr, int nrows)
    {
       if (nrows <= 0)
          ps->flush_dist = 0xEFFFFFFFU;
-      
+
       else
          ps->flush_dist = nrows;
    }
@@ -2879,7 +2964,7 @@ png_zlib_filter_release(png_structrp png_ptr, png_zlib_statep ps, png_byte i)
 
             /* Return the list to the stash. */
             affirm(ps->filter[i].end != NULL);
-            
+
             /* In the normal case 'end' is the end of this list and it is
              * pre-pended to the cache.  In the error case (png_error during a
              * deflate operation) the list will be the entire stash and the
@@ -3314,6 +3399,10 @@ select_filter_methodically_better(png_structrp png_ptr, png_zlib_compressp pz,
    return *op == 0xFFFFFFFFU && *lp == 0xFFFFFFFFU;
 }
 
+/* The algorithm here is to test the result of zlib compression with each
+ * possible filter.  This was originally suggested on png-mng-implement by
+ * Bjoern Hoehrmann on 20110401; he referenced pngwolf (see github).
+ */
 static void
 select_filter_methodically(png_structrp png_ptr, png_const_bytep prev_row,
       png_bytep prev_pixels, png_const_bytep unfiltered_row,
@@ -3405,7 +3494,7 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
       png_const_bytep unfiltered_row, png_uint_32 x,
       unsigned int width/*pixels*/, unsigned int row_info_flags)
 {
-   png_zlib_statep ps;
+   png_zlib_statep ps = png_ptr->zlib_state;
    png_bytep prev_row = png_ptr->row_buffer;
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
    const unsigned int row_bits = width * bpp;
@@ -3413,15 +3502,9 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
    int flush;
 
    /* These invariants are expected from the caller: */
-   affirm(width < 65536U && bpp <= 64U && width < 65536U/bpp &&
+   affirm(ps != NULL && width < 65536U && bpp <= 64U && width < 65536U/bpp &&
          row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
 
-   /* Set up the IDAT zlib compression if not set up yet: */
-   if (png_ptr->zowner != png_IDAT)
-      png_start_IDAT(png_ptr);
-
-   ps = png_ptr->zlib_state;
-   affirm(ps != NULL);
    flush = row_flush(ps, row_info_flags);
 
    if (x == 0U) /* start of row */
@@ -3491,7 +3574,7 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
             if (!ps->filter_oom &&
                 (methodical_option == PNG_OPTION_ON ||
                  (methodical_option != PNG_OPTION_OFF &&
-                  heuristic_option != PNG_OPTION_ON)))
+                  heuristic_option == PNG_OPTION_OFF)))
                filters_to_try =
                   select_filter_methodically_init(png_ptr, filters_to_try);
 
@@ -3602,11 +3685,12 @@ copy_row:
 void PNGAPI
 png_set_filter(png_structrp png_ptr, int method, int filtersIn)
 {
+   png_zlib_statep ps = png_get_zlib_state(png_ptr);
    unsigned int filters;
 
    png_debug(1, "in png_set_filter");
 
-   if (png_ptr == NULL)
+   if (ps == NULL)
       return;
 
    if (method != png_ptr->filter_method)
@@ -3642,16 +3726,7 @@ png_set_filter(png_structrp png_ptr, int method, int filtersIn)
    }
 
    debug(filters != 0U && (filters & PNG_BIC_MASK(PNG_ALL_FILTERS)) == 0U);
-
-   {
-      png_zlib_statep ps = png_get_zlib_state(png_ptr);
-
-      if (ps != NULL)
-         ps->filter_mask = png_check_bits(png_ptr, filters, 8);
-
-      else
-         png_app_error(png_ptr, "png_set_filter: invalid on read struct");
-   }
+   ps->filter_mask = png_check_bits(png_ptr, filters, 8);
 }
 #else /* !WRITE_FILTER */
 void /* PRIVATE */
@@ -3668,10 +3743,6 @@ png_write_filter_row(png_structrp png_ptr, png_bytep prev_pixels,
    /* These invariants are expected from the caller: */
    affirm(width < 65536U && bpp <= 64U && width < 65536U/bpp &&
          row_bits <= 8U*PNG_ROW_BUFFER_SIZE);
-
-   /* Set up the IDAT zlib compression if not set up yet: */
-   if (png_ptr->zowner != png_IDAT)
-      png_start_IDAT(png_ptr);
 
    affirm(png_ptr->zlib_state != NULL);
    flush = row_flush(png_ptr->zlib_state, row_info_flags);
@@ -3733,7 +3804,7 @@ png_set_compression_level(png_structrp png_ptr, int level)
    png_debug(1, "in png_set_compression_level");
 
    if (ps != NULL)
-      ps->zlib_level = level;
+      pz_assign(ps, IDAT, level, level);
 }
 
 void PNGAPI
@@ -3744,7 +3815,7 @@ png_set_compression_mem_level(png_structrp png_ptr, int mem_level)
    png_debug(1, "in png_set_compression_mem_level");
 
    if (ps != NULL)
-      ps->zlib_mem_level = mem_level;
+      pz_assign(ps, IDAT, memLevel, mem_level);
 }
 
 void PNGAPI
@@ -3755,7 +3826,7 @@ png_set_compression_strategy(png_structrp png_ptr, int strategy)
    png_debug(1, "in png_set_compression_strategy");
 
    if (ps != NULL)
-      ps->zlib_strategy = strategy;
+      pz_assign(ps, IDAT, strategy, strategy);
 }
 
 /* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
@@ -3767,50 +3838,19 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
    png_zlib_statep ps = png_get_zlib_state(png_ptr);
 
    if (ps != NULL)
-   {
-      /* Prior to 1.6.0 this would warn but then set the window_bits value. This
-       * meant that negative window bits values could be selected that would
-       * cause libpng to write a non-standard PNG file with raw deflate or gzip
-       * compressed IDAT or ancillary chunks.  Such files can be read and there
-       * is no warning on read, so this seems like a very bad idea.
-       */
-      if (window_bits > 15)
-      {
-         png_app_warning(png_ptr,
-               "Only compression windows <= 32k supported by PNG");
-         window_bits = 15;
-      }
-
-      else if (window_bits < 8)
-      {
-         png_app_warning(png_ptr,
-               "Only compression windows >= 256 supported by PNG");
-         window_bits = 8;
-      }
-
-      ps->zlib_window_bits = window_bits;
-   }
+      pz_assign(ps, IDAT, windowBits, window_bits);
 }
 
 void PNGAPI
 png_set_compression_method(png_structrp png_ptr, int method)
 {
-   png_zlib_statep ps = png_get_zlib_state(png_ptr);
-
    png_debug(1, "in png_set_compression_method");
 
-   if (ps != NULL)
-   {
-      /* This used to just warn, this seems unhelpful and might result in bogus
-       * PNG files if zlib starts accepting other methods.
-       */
-      if (method == 8)
-         ps->zlib_method = method;
-
-      else
-         png_app_error(png_ptr,
-               "Only compression method 8 is supported by PNG");
-   }
+   /* This used to just warn, this seems unhelpful and might result in bogus
+    * PNG files if zlib starts accepting other methods.
+    */
+   if (method != 8)
+      png_app_error(png_ptr, "Only compression method 8 is supported by PNG");
 }
 #endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
@@ -3824,7 +3864,7 @@ png_set_text_compression_level(png_structrp png_ptr, int level)
    png_debug(1, "in png_set_text_compression_level");
 
    if (ps != NULL)
-      ps->zlib_text_level = level;
+      pz_assign(ps, text, level, level);
 }
 
 void PNGAPI
@@ -3835,7 +3875,7 @@ png_set_text_compression_mem_level(png_structrp png_ptr, int mem_level)
    png_debug(1, "in png_set_text_compression_mem_level");
 
    if (ps != NULL)
-      ps->zlib_text_mem_level = mem_level;
+      pz_assign(ps, text, memLevel, mem_level);
 }
 
 void PNGAPI
@@ -3846,7 +3886,7 @@ png_set_text_compression_strategy(png_structrp png_ptr, int strategy)
    png_debug(1, "in png_set_text_compression_strategy");
 
    if (ps != NULL)
-      ps->zlib_text_strategy = strategy;
+      pz_assign(ps, text, strategy, strategy);
 }
 
 /* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
@@ -3858,44 +3898,58 @@ png_set_text_compression_window_bits(png_structrp png_ptr, int window_bits)
    png_zlib_statep ps = png_get_zlib_state(png_ptr);
 
    if (ps != NULL)
-   {
-      if (window_bits > 15)
-      {
-         png_app_warning(png_ptr,
-               "Only compression windows <= 32k supported by PNG");
-         window_bits = 15;
-      }
-
-      else if (window_bits < 8)
-      {
-         png_app_error(png_ptr,
-               "Only compression windows >= 256 supported by PNG");
-         window_bits = 8;
-      }
-
-      ps->zlib_text_window_bits = window_bits;
-   }
+      pz_assign(ps, text, windowBits, window_bits);
 }
 
 void PNGAPI
 png_set_text_compression_method(png_structrp png_ptr, int method)
 {
-   png_zlib_statep ps = png_get_zlib_state(png_ptr);
-
    png_debug(1, "in png_set_text_compression_method");
 
-   if (ps != NULL)
-   {
-      if (method == 8)
-         ps->zlib_text_method = method;
-
-      else
-         png_app_error(png_ptr,
-               "Only compression method 8 is supported by PNG");
-
-   }
+   if (method != 8)
+      png_app_error(png_ptr, "Only compression method 8 is supported by PNG");
 }
 #endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 /* end of API added to libpng-1.5.4 */
 
+void /*PRIVATE*/
+png_write_start_IDAT(png_structrp png_ptr)
+{
+   png_init_row_info(png_ptr);
+
+#  ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+      /* If the app takes a png_info from a read operation and if the app has
+       * performed transforms on the data the png_info can contain IHDR
+       * information that cannot be represented in PNG.  The code that writes
+       * the IHDR takes the color type from the png_info::format.  The app adds
+       * transforms, before or after writing the IHDR, then the IHDR color_type
+       * stored in png_struct::color_type is used in png_init_row_info above to
+       * work out the actual row format.
+       *
+       * Prior to 1.7.0 this was not verified (there was no easy way to do so).
+       * Now we can check it here, however this is an:
+       *
+       * API CHANGE: in 1.7.0 an error may be flagged against bogus info_struct
+       * formats even though the app had removed them itself.  It's just a
+       * warning at present.
+       *
+       * The test is that either the row_format produced by the write transforms
+       * exactly matches that in the original info_struct::format or that the
+       * info_struct::format was a simple mapping of the color_type that ended
+       * up in the IHDR:
+       */
+      if (png_ptr->row_format != png_ptr->info_format &&
+            PNG_FORMAT_FROM_COLOR_TYPE(png_ptr->color_type) !=
+               png_ptr->info_format)
+         png_app_warning(png_ptr, "info_struct format does not match IHDR");
+#  endif /* WRITE_TRANSFORMS */
+
+   /* Create the zlib state if ncessary: */
+   if (png_ptr->zlib_state == NULL)
+      png_create_zlib_state(png_ptr);
+
+   /* Set up the IDAT zlib compression. */
+   debug(png_ptr->zowner != png_IDAT);
+   png_start_IDAT(png_ptr);
+}
 #endif /* WRITE */

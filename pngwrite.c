@@ -1021,38 +1021,7 @@ png_write_row(png_structrp png_ptr, png_const_bytep row)
 
       /* Unlike the read code initialization happens automatically: */
       if (row_number == 0 && pass == 0)
-      {
-         png_init_row_info(png_ptr); /* doesn't change row/pass/width */
-
-#        ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
-            /* If the app takes a png_info from a read operation and if the app
-             * has performed transforms on the data the png_info can contain
-             * IHDR information that cannot be represented in PNG.  The code
-             * that writes the IHDR takes the color type from the
-             * png_info::format.  The app adds transforms, before or after
-             * writing the IHDR, then the IHDR color_type stored in
-             * png_struct::color_type is used in png_init_row_info above to work
-             * out the actual row format.
-             *
-             * Prior to 1.7.0 this was not verified (there was no easy way to do
-             * so).  Now we can check it here, however this is an:
-             *
-             * API CHANGE: in 1.7.0 an error may be flagged against bogus
-             * info_struct formats even though the app had removed them itself.
-             * It's just a warning at present.
-             *
-             * The test is that either the row_format produced by the write
-             * transforms exactly matches that in the original
-             * info_struct::format or that the info_struct::format was a simple
-             * mapping of the color_type that ended up in the IHDR:
-             */
-            if (png_ptr->row_format != png_ptr->info_format &&
-                PNG_FORMAT_FROM_COLOR_TYPE(png_ptr->color_type) !=
-                  png_ptr->info_format)
-               png_app_warning(png_ptr,
-                     "info_struct format does not match IHDR");
-#        endif /* WRITE_TRANSFORMS */
-      }
+         png_write_start_IDAT(png_ptr); /* doesn't change row/pass/width */
 
       else if (pass == 7U) /* too many calls; write already ended */
       {

@@ -304,9 +304,10 @@ setting EXTENSION_HEADER
 # The '@' here means to substitute the value when pnglibconf.h is built
 setting ZLIB_VERNUM default @ZLIB_VERNUM
 setting Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
-# TODO: why aren't these Z_RLE; zlib.h says that Z_RLE, specifically, is
-# appropriate for PNG images, maybe it doesn't exist in all versions?
-setting Z_DEFAULT_STRATEGY default @Z_FILTERED
+# By experiment even if other strategies are favored over the zlib default it
+# still comes out best for 47% of files tested; more than filtered, the next
+# best, for 38.8% of files tested.
+setting Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
 setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
 
 setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
