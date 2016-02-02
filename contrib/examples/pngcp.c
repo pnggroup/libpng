@@ -193,6 +193,8 @@ vl_IDAT_size[] = /* for png_set_compression_buffer_size */
    { "minimal", 1 },
    RANGE(1, 0x7FFFFFFF)
 },
+#define SL 8 /* stack limit in display, below */
+vl_log_depth[] = { { "on", 1 }, { "off", 0 }, RANGE(0, SL) },
 vl_on_off[] = { { "on", 1 }, { "off", 2 } };
 
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
@@ -256,6 +258,7 @@ static const struct option
    VLC(level)
    VLC(memLevel)
    VLO("IDAT-size", IDAT_size, 0)
+   VLO("log-depth", log_depth, 0)
 
 #  undef VLO
 
@@ -352,7 +355,6 @@ struct display
                                         * searched option; non-zero if earlier
                                         * options were set on the command line.
                                         */
-#  define SL 8 /* stack limit */
    struct stack
    {
       png_alloc_size_t best_size;      /* Best so far for this option */
@@ -1210,7 +1212,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
 #     if 0
          (void)advance_opt(dp, opt, 0/*all*/), record=0;
 #     else
-         dp->value[opt] = 9;
+         dp->value[opt] = MAX_MEM_LEVEL;
 #     endif
    }
 
@@ -1872,8 +1874,33 @@ better_options(const struct display *dp)
 }
 
 static void
+print_search_results(struct display *dp)
+{
+   assert(dp->filename != NULL);
+   printf("%s [%ld x %ld %d bpp %s, %lu bytes] %lu -> %lu with '%s'\n",
+      dp->filename, (unsigned long)dp->w, (unsigned long)dp->h, dp->bpp,
+      cts(dp->ct), (unsigned long)dp->size, (unsigned long)dp->read_size,
+      (unsigned long)dp->best_size, dp->best);
+   fflush(stdout);
+}
+
+static void
+log_search(struct display *dp, unsigned int log_depth)
+{
+   /* Log, and reset, the search so far: */
+   if (dp->nsp/*next entry to change*/ <= log_depth)
+   {
+      print_search_results(dp);
+      /* Start again with this entry: */
+      dp->best_size = MAX_SIZE;
+   }
+}
+
+static void
 cp_one_file(struct display *dp, const char *filename, const char *destname)
 {
+   unsigned int log_depth;
+
    dp->filename = filename;
    dp->operation = "read";
    dp->no_warnings = 0;
@@ -1890,6 +1917,17 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
 
    /* Limit the upper end of the windowBits range for this file */
    set_windowBits_hi(dp);
+
+   /* For logging, depth to log: */
+   {
+      int val;
+
+      if (getopt(dp, "log-depth", &val) && val >= 0)
+         log_depth = (unsigned int)/*SAFE*/val;
+
+      else
+         log_depth = 0U;
+   }
 
    if (destname != NULL) /* else stdout */
    {
@@ -1914,6 +1952,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
    /* Initialize the 'best' fields: */
    strcpy(dp->best, dp->curr);
    dp->best_size = dp->write_size;
+   log_search(dp, log_depth);
 
    if (dp->nsp > 0) /* interating over lists */
    {
@@ -1958,6 +1997,8 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
          else if (tmpname != NULL && unlink(tmpname) != 0)
             display_log(dp, APP_WARNING, "unlink %s failed (%s)", tmpname,
                   strerror(errno));
+
+         log_search(dp, log_depth);
       }
       while (dp->nsp > 0);
 
@@ -2050,18 +2091,23 @@ main(const int argc, const char * const * const argv)
             /* An error: the output is meaningless */
          }
 
-         else if ((d.options & SEARCH) || d.best[0] != 0)
-            printf("%s [%ld x %ld %d bpp %s, %lu bytes] %lu -> %lu with '%s'\n",
-                  infile, (unsigned long)d.w, (unsigned long)d.h, d.bpp,
-                  cts(d.ct), (unsigned long)d.size, (unsigned long)d.read_size,
-                  (unsigned long)d.best_size, d.best);
+         else if (d.best[0] != 0)
+         {
+            /* This result may already have been output, in which case best_size
+             * has been reset.
+             */
+            if (d.best_size < MAX_SIZE)
+               print_search_results(&d);
+         }
 
          else if (d.options & SIZES)
-            printf("%s [%ld x %ld %d bpp %s, %lu bytes] 0x%lx %lu -> %lu\n",
+         {
+            printf("%s [%ld x %ld %d bpp %s, %lu bytes] %lu -> %lu [0x%lx]\n",
                   infile, (unsigned long)d.w, (unsigned long)d.h, d.bpp,
-                  cts(d.ct), (unsigned long)d.size, (unsigned long)d.results,
-                  (unsigned long)d.read_size, (unsigned long)d.write_size);
-
+                  cts(d.ct), (unsigned long)d.size, (unsigned long)d.read_size,
+                  (unsigned long)d.write_size, (unsigned long)d.results);
+            fflush(stdout);
+         }
 
          /* Here on any return, including failures, except user/internal issues
           */
@@ -2085,6 +2131,7 @@ main(const int argc, const char * const * const argv)
                   printf(" %s", infile);
 
                printf("\n");
+               fflush(stdout);
             }
          }
 
