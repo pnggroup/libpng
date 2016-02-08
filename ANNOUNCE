@@ -1,4 +1,4 @@
-Libpng 1.6.22beta02 - February 8, 2016
+Libpng 1.6.22beta03 - February 8, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.22beta02.tar.xz (LZMA-compressed, recommended)
-   1.6.22beta02.tar.gz
+   1.6.22beta03.tar.xz (LZMA-compressed, recommended)
+   1.6.22beta03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1622b02.7z  (LZMA-compressed, recommended)
-   lp1622b02.zip
+   lp1622b03.7z  (LZMA-compressed, recommended)
+   lp1622b03.zip
 
 Other information:
 
-   1.6.22beta02-README.txt
-   1.6.22beta02-LICENSE.txt
-   libpng-1.6.22beta02-*.asc (armored detached GPG signatures)
+   1.6.22beta03-README.txt
+   1.6.22beta03-LICENSE.txt
+   libpng-1.6.22beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.21):
 
@@ -53,6 +53,8 @@ Version 1.6.22beta02 [February 8, 2016]
     are already permitted by png_set_gamma so it is reasonable caution to
     extend the png_set_alpha_mode range as HDR imaging systems are starting
     to emerge.
+
+Version 1.6.22beta03 [February 8, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
