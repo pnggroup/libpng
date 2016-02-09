@@ -4454,7 +4454,7 @@ version 1.5.26rc01 [December 14, 2015]
 version 1.5.26 [December 17, 2015]
   No changes.
 
-version 1.5.27beta01 [January 13, 2016]
+version 1.5.27beta01 [February 9, 2016]
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
     as the LE version.
@@ -4474,6 +4474,9 @@ version 1.5.27beta01 [January 13, 2016]
     errors but these should not be fixed as a result of the previous changes.
   In projects/vstudio, combined readme.txt and WARNING into README.txt
   Worked around a false-positive Coverity issue in pngvalid.c.
+  Only use exit(77) from pngvalid.c in configure builds.
+  Updated CMakeLists.txt, added supporting scripts/gen*.cmake.in
+    and test.cmake.in (Roger Leigh).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
