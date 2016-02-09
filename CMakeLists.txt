@@ -330,13 +330,13 @@ endif(NOT AWK)
 set(libpng_public_hdrs
   png.h
   pngconf.h
+  "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
 )
 set(libpng_private_hdrs
   pngpriv.h
   pngdebug.h
   pnginfo.h
   pngstruct.h
-  "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
   pngchunk.h
 )
 if(AWK)
@@ -529,11 +529,11 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngvalid OPTIONS --gamma-alpha-mode)
   png_add_test(NAME pngvalid-gamma-background
                COMMAND pngvalid OPTIONS --gamma-background)
-  png_add_test(NAME pngvalid-gamma-alpha-mode-expand16
+  png_add_test(NAME pngvalid-gamma-expand16-alpha-mode
                COMMAND pngvalid OPTIONS --gamma-alpha-mode --expand16)
-  png_add_test(NAME pngvalid-gamma-background-expand16
+  png_add_test(NAME pngvalid-gamma-expand16-background
                COMMAND pngvalid OPTIONS --gamma-background --expand16)
-  png_add_test(NAME pngvalid-gamma-transform-expand16
+  png_add_test(NAME pngvalid-gamma-expand16-transform
                COMMAND pngvalid OPTIONS --gamma-transform --expand16)
   png_add_test(NAME pngvalid-gamma-sbit
                COMMAND pngvalid OPTIONS --gamma-sbit)
@@ -541,11 +541,11 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngvalid OPTIONS --gamma-threshold)
   png_add_test(NAME pngvalid-gamma-transform
                COMMAND pngvalid OPTIONS --gamma-transform)
-  png_add_test(NAME pngvalid-standard-progressive-read-interlace
+  png_add_test(NAME pngvalid-progressive-interlace-standard
                COMMAND pngvalid OPTIONS --standard --progressive-read --interlace)
-  png_add_test(NAME pngvalid-size-progressive-read
+  png_add_test(NAME pngvalid-progressive-size
                COMMAND pngvalid OPTIONS --size --progressive-read)
-  png_add_test(NAME pngvalid-standard-progressive-read
+  png_add_test(NAME pngvalid-progressive-standard
                COMMAND pngvalid OPTIONS --standard --progressive-read)
   png_add_test(NAME pngvalid-standard
                COMMAND pngvalid OPTIONS --standard)
