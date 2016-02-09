@@ -330,13 +330,13 @@ endif(NOT AWK)
 set(libpng_public_hdrs
   png.h
   pngconf.h
+  "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
 )
 set(libpng_private_hdrs
   pngpriv.h
   pngdebug.h
   pnginfo.h
   pngstruct.h
-  "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h"
 )
 if(AWK)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
