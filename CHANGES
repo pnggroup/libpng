@@ -5513,7 +5513,9 @@ Version 1.6.22beta02 [February 8, 2016]
     extend the png_set_alpha_mode range as HDR imaging systems are starting
     to emerge.
 
-Version 1.6.22beta03 [February 8, 2016]
+Version 1.6.22beta03 [February 10, 2016]
+  Added a common-law trademark notice and export control information
+    to the LICENSE file, png.h, and the man page.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
