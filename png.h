@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.7.0beta79, January 23, 2016
+ * libpng version 1.7.0beta79, February 14, 2016
  *
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.7.0beta79, January 23, 2016:
+ *   libpng versions 0.97, January 1998, through 1.7.0beta79, February 14, 2016:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -25,7 +25,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.7.0beta79, January 23, 2016, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.7.0beta79, February 14, 2016, are
  * Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -218,7 +218,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    January 23, 2016
+ *    February 14, 2016
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -288,7 +288,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta79"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta79 - January 23, 2016\n"
+     " libpng version 1.7.0beta79 - February 14, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -884,22 +884,22 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
  * data in the info_struct to be written into the output file.  The values
  * of the PNG_INFO_<chunk> defines should NOT be changed.
  */
-#define PNG_INFO_gAMA 0x0001
-#define PNG_INFO_sBIT 0x0002
-#define PNG_INFO_cHRM 0x0004
-#define PNG_INFO_PLTE 0x0008
-#define PNG_INFO_tRNS 0x0010
-#define PNG_INFO_bKGD 0x0020
-#define PNG_INFO_hIST 0x0040
-#define PNG_INFO_pHYs 0x0080
-#define PNG_INFO_oFFs 0x0100
-#define PNG_INFO_tIME 0x0200
-#define PNG_INFO_pCAL 0x0400
-#define PNG_INFO_sRGB 0x0800   /* GR-P, 0.96a */
-#define PNG_INFO_iCCP 0x1000   /* ESR, 1.0.6 */
-#define PNG_INFO_sPLT 0x2000   /* ESR, 1.0.6 */
-#define PNG_INFO_sCAL 0x4000   /* ESR, 1.0.6 */
-#define PNG_INFO_IDAT 0x8000   /* ESR, 1.0.6 */
+#define PNG_INFO_gAMA 0x0001U
+#define PNG_INFO_sBIT 0x0002U
+#define PNG_INFO_cHRM 0x0004U
+#define PNG_INFO_PLTE 0x0008U
+#define PNG_INFO_tRNS 0x0010U
+#define PNG_INFO_bKGD 0x0020U
+#define PNG_INFO_hIST 0x0040U
+#define PNG_INFO_pHYs 0x0080U
+#define PNG_INFO_oFFs 0x0100U
+#define PNG_INFO_tIME 0x0200U
+#define PNG_INFO_pCAL 0x0400U
+#define PNG_INFO_sRGB 0x0800U  /* GR-P, 0.96a */
+#define PNG_INFO_iCCP 0x1000U  /* ESR, 1.0.6 */
+#define PNG_INFO_sPLT 0x2000U  /* ESR, 1.0.6 */
+#define PNG_INFO_sCAL 0x4000U  /* ESR, 1.0.6 */
+#define PNG_INFO_IDAT 0x8000U  /* ESR, 1.0.6 */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -2024,21 +2024,21 @@ PNG_REMOVED(99, void, png_data_freer, (png_const_structrp png_ptr,
     png_inforp info_ptr, int freer, png_uint_32 mask), PNG_DEPRECATED)
 
 /* Flags for png_free_data */
-#define PNG_FREE_HIST 0x0008
-#define PNG_FREE_ICCP 0x0010
-#define PNG_FREE_SPLT 0x0020
-#define PNG_FREE_ROWS 0x0040
-#define PNG_FREE_PCAL 0x0080
-#define PNG_FREE_SCAL 0x0100
+#define PNG_FREE_HIST 0x0008U
+#define PNG_FREE_ICCP 0x0010U
+#define PNG_FREE_SPLT 0x0020U
+#define PNG_FREE_ROWS 0x0040U
+#define PNG_FREE_PCAL 0x0080U
+#define PNG_FREE_SCAL 0x0100U
 #ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
-#  define PNG_FREE_UNKN 0x0200
+#  define PNG_FREE_UNKN 0x0200U
 #endif
-/*      PNG_FREE_LIST 0x0400    removed in 1.6.0 because it is ignored */
-#define PNG_FREE_PLTE 0x1000
-#define PNG_FREE_TRNS 0x2000
-#define PNG_FREE_TEXT 0x4000
-#define PNG_FREE_ALL  0x7fff
-#define PNG_FREE_MUL  0x4220 /* PNG_FREE_SPLT|PNG_FREE_TEXT|PNG_FREE_UNKN */
+/*      PNG_FREE_LIST 0x0400U   removed in 1.6.0 because it is ignored */
+#define PNG_FREE_PLTE 0x1000U
+#define PNG_FREE_TRNS 0x2000U
+#define PNG_FREE_TEXT 0x4000U
+#define PNG_FREE_ALL  0x7fffU
+#define PNG_FREE_MUL  0x4220U  /* PNG_FREE_SPLT|PNG_FREE_TEXT|PNG_FREE_UNKN */
 
 #ifdef PNG_USER_MEM_SUPPORTED
    /* These were deprecated in libpng 1.6.0 and have been removed from libpng
@@ -2698,15 +2698,15 @@ PNG_EXPORT(216, png_uint_32, png_get_io_chunk_type,
     (png_const_structrp png_ptr));
 
 /* The flags returned by png_get_io_state() are the following: */
-#  define PNG_IO_NONE        0x0000   /* no I/O at this moment */
-#  define PNG_IO_READING     0x0001   /* currently reading */
-#  define PNG_IO_WRITING     0x0002   /* currently writing */
-#  define PNG_IO_SIGNATURE   0x0010   /* currently at the file signature */
-#  define PNG_IO_CHUNK_HDR   0x0020   /* currently at the chunk header */
-#  define PNG_IO_CHUNK_DATA  0x0040   /* currently at the chunk data */
-#  define PNG_IO_CHUNK_CRC   0x0080   /* currently at the chunk crc */
-#  define PNG_IO_MASK_OP     0x000f   /* current operation: reading/writing */
-#  define PNG_IO_MASK_LOC    0x00f0   /* current location: sig/hdr/data/crc */
+#  define PNG_IO_NONE        0x0000U  /* no I/O at this moment */
+#  define PNG_IO_READING     0x0001U  /* currently reading */
+#  define PNG_IO_WRITING     0x0002U  /* currently writing */
+#  define PNG_IO_SIGNATURE   0x0010U  /* currently at the file signature */
+#  define PNG_IO_CHUNK_HDR   0x0020U  /* currently at the chunk header */
+#  define PNG_IO_CHUNK_DATA  0x0040U  /* currently at the chunk data */
+#  define PNG_IO_CHUNK_CRC   0x0080U  /* currently at the chunk crc */
+#  define PNG_IO_MASK_OP     0x000fU  /* current operation: reading/writing */
+#  define PNG_IO_MASK_LOC    0x00f0U  /* current location: sig/hdr/data/crc */
 #endif /* IO_STATE */
 
 /* Interlace support.  The following macros are always defined so that if
@@ -3656,7 +3656,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
 PNG_EXPORT(249, png_int_32, png_setting, (png_structrp png_ptr, int setting,
    png_int_32 value));
 
-#define PNG_UNSUPPORTED_SETTING 0x80000000
+#define PNG_UNSUPPORTED_SETTING 0x80000000U
 
 /* Available settings: */
 #define PNG_GAMMA_MINIMUM  1
