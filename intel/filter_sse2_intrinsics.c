@@ -12,11 +12,11 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#if PNG_INTEL_SSE2_OPT > 0
+#if PNG_INTEL_SSE_OPT > 0
 
-#if PNG_INTEL_SSE2_OPT == 1
+#if PNG_INTEL_SSE_OPT == 1
 #include <emmintrin.h>
-#elif PNG_INTEL_SSE2_OPT == 2
+#elif PNG_INTEL_SSE_OPT == 2
 #include <tmmintrin.h>
 #endif
 
@@ -132,7 +132,7 @@ void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
 
 // Returns |x| for 16-bit lanes.
 static __m128i abs_i16(__m128i x) {
-#if PNG_INTEL_SSE2_OPT >= 2
+#if PNG_INTEL_SSE_OPT >= 2
    return _mm_abs_epi16(x);
 #else
    // Read this all as, return x<0 ? -x : x.
@@ -257,5 +257,5 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-#endif /* PNG_INTEL_SSE2_OPT > 0 */
+#endif /* PNG_INTEL_SSE_OPT > 0 */
 #endif /* READ */

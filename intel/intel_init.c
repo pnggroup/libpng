@@ -11,7 +11,7 @@
 #include "../pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
-#if PNG_INTEL_SSE2_OPT > 0
+#if PNG_INTEL_SSE_OPT > 0
 
 void
 png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
@@ -34,5 +34,5 @@ png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
    // No need optimize PNG_FILTER_VALUE_UP.  The compiler should autovectorize.
 }
 
-#endif /* PNG_INTEL_SSE2_OPT > 0 */
+#endif /* PNG_INTEL_SSE_OPT > 0 */
 #endif /* PNG_READ_SUPPORTED */

@@ -182,15 +182,15 @@
 #  endif
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
-#ifndef PNG_INTEL_SSE2_OPT
+#ifndef PNG_INTEL_SSE_OPT
 #   if defined(__SSE3__) || defined(__SSSE3__)
-#      define PNG_INTEL_SSE2_OPT 2
+#      define PNG_INTEL_SSE_OPT 2
 #   elif defined(__SSE2__)
-#      define PNG_INTEL_SSE2_OPT 1
+#      define PNG_INTEL_SSE_OPT 1
 #   endif
 #endif
 
-#if PNG_INTEL_SSE2_OPT > 0
+#if PNG_INTEL_SSE_OPT > 0
 #   define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_sse2
 #endif
 
