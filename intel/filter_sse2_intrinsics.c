@@ -14,10 +14,10 @@
 
 #if PNG_INTEL_SSE_OPT > 0
 
-#if PNG_INTEL_SSE_OPT == 1
-#include <emmintrin.h>
-#elif PNG_INTEL_SSE_OPT == 2
-#include <tmmintrin.h>
+#if defined(_MSC_VER) && defined(_WIN64)
+#include <intrin.h>
+#else
+#include <x86intrin.h>
 #endif
 
 // Functions in this file look at most 3 pixels (a,b,c) to predict the 4th (d).
@@ -26,8 +26,25 @@
 //    row:   a d
 // The Sub filter predicts d=a, Avg d=(a+b)/2, and Paeth predicts d to be
 // whichever of a, b, or c is closest to p=a+b-c.
-// Up also exists, predicting d=b.  But there is not need to optimize Up
-// because the compiler will vectorize it for us.
+
+static __m128i load3(const void* p) {
+   png_uint_32 packed;
+   memcpy(&packed, p, 3);
+   return _mm_cvtsi32_si128(packed);
+}
+
+static __m128i load4(const void* p) {
+   return _mm_cvtsi32_si128(*(const int*)p);
+}
+
+static void store3(void* p, __m128i v) {
+   png_uint_32 packed = _mm_cvtsi128_si32(v);
+   memcpy(p, &packed, 3);
+}
+
+static void store4(void* p, __m128i v) {
+   *(int*)p = _mm_cvtsi128_si32(v);
+}
 
 void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
@@ -39,13 +56,13 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
 
    int rb = row_info->rowbytes;
    while (rb > 0) {
-      a = d; memcpy(&d, row, 3);
+      a = d; d = load3(row);
       d = _mm_add_epi8(d, a);
-      memcpy(row, &d, 3);
+      store3(row, d);
 
       row += 3;
       rb  -= 3;
-    }
+   }
 }
 
 void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
@@ -58,13 +75,13 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
 
    int rb = row_info->rowbytes;
    while (rb > 0) {
-      a = d; memcpy(&d, row, 4);
+      a = d; d = load4(row);
       d = _mm_add_epi8(d, a);
-      memcpy(row, &d, 4);
+      store4(row, d);
 
       row += 4;
       rb  -= 4;
-    }
+   }
 }
 
 void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
@@ -80,24 +97,24 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
 
    int rb = row_info->rowbytes;
    while (rb > 0) {
-       memcpy(&b, prev, 3);
-       a = d; memcpy(&d, row, 3);
+             b = load3(prev);
+      a = d; d = load3(row );
 
-       // PNG requires a truncating average here, so sadly we can't just use
-       // _mm_avg_epu8...
-       __m128i avg = _mm_avg_epu8(a,b);
-       // ...but we can fix it up by subtracting off 1 if it rounded up.
-       avg = _mm_sub_epi8(avg, _mm_and_si128(_mm_xor_si128(a,b),
-          _mm_set1_epi8(1)));
+      // PNG requires a truncating average, so we can't just use _mm_avg_epu8...
+      __m128i avg = _mm_avg_epu8(a,b);
+      // ...but we can fix it up by subtracting off 1 if it rounded up.
+      avg = _mm_sub_epi8(avg, _mm_and_si128(_mm_xor_si128(a,b),
+                                            _mm_set1_epi8(1)));
 
-       d = _mm_add_epi8(d, avg);
-       memcpy(row, &d, 3);
+      d = _mm_add_epi8(d, avg);
+      store3(row, d);
 
-       prev += 3;
-       row  += 3;
-       rb   -= 3;
-    }
+      prev += 3;
+      row  += 3;
+      rb   -= 3;
+   }
 }
+
 void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -111,23 +128,22 @@ void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
 
    int rb = row_info->rowbytes;
    while (rb > 0) {
-       memcpy(&b, prev, 4);
-       a = d; memcpy(&d, row, 4);
+             b = load4(prev);
+      a = d; d = load4(row );
 
-       // PNG requires a truncating average here, so sadly we can't just use
-       // _mm_avg_epu8...
-       __m128i avg = _mm_avg_epu8(a,b);
-       // ...but we can fix it up by subtracting off 1 if it rounded up.
-       avg = _mm_sub_epi8(avg, _mm_and_si128(_mm_xor_si128(a,b),
-          _mm_set1_epi8(1)));
+      // PNG requires a truncating average, so we can't just use _mm_avg_epu8...
+      __m128i avg = _mm_avg_epu8(a,b);
+      // ...but we can fix it up by subtracting off 1 if it rounded up.
+      avg = _mm_sub_epi8(avg, _mm_and_si128(_mm_xor_si128(a,b),
+                                            _mm_set1_epi8(1)));
 
-       d = _mm_add_epi8(d, avg);
-       memcpy(row, &d, 4);
+      d = _mm_add_epi8(d, avg);
+      store4(row, d);
 
-       prev += 4;
-       row  += 4;
-       rb   -= 4;
-    }
+      prev += 4;
+      row  += 4;
+      rb   -= 4;
+   }
 }
 
 // Returns |x| for 16-bit lanes.
@@ -138,8 +154,10 @@ static __m128i abs_i16(__m128i x) {
    // Read this all as, return x<0 ? -x : x.
    // To negate two's complement, you flip all the bits then add 1.
    __m128i is_negative = _mm_cmplt_epi16(x, _mm_setzero_si128());
+
    // Flip negative lanes.
    x = _mm_xor_si128(x, is_negative);
+
    // +1 to negative lanes, else +0.
    x = _mm_add_epi16(x, _mm_srli_epi16(is_negative, 15));
    return x;
@@ -148,7 +166,11 @@ static __m128i abs_i16(__m128i x) {
 
 // Bytewise c ? t : e.
 static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
+#if PNG_INTEL_SSE_OPT >= 3
+   return _mm_blendv_epi8(e,t,c);
+#else
    return _mm_or_si128(_mm_and_si128(c, t), _mm_andnot_si128(c, e));
+#endif
 }
 
 void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
@@ -159,10 +181,13 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    //   prev: c b
    //   row:  a d
    // The Paeth function predicts d to be whichever of a, b, or c is nearest to
-   // p=a+b-c.  The first pixel has no left context, and so uses an Up filter,
-   // p = b.  This works naturally with our main loop's p = a+b-c if we force a
-   // and c to zero.  Here we zero b and d, which become c and a respectively
-   // at the start of the loop.
+   // p=a+b-c.
+
+   // The first pixel has no left context, and so uses an Up filter, p = b.
+   // This works naturally with our main loop's p = a+b-c if we force a and c
+   // to zero.
+   // Here we zero b and d, which become c and a respectively at the start of
+   // the loop.
    const __m128i zero = _mm_setzero_si128();
    __m128i c, b = zero,
            a, d = zero;
@@ -171,16 +196,17 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    while (rb > 0) {
       // It's easiest to do this math (particularly, deal with pc) with 16-bit
       // intermediates.
-      memcpy(&b, prev, 3);
-      memcpy(&d, row, 3);
-      c = b; b = _mm_unpacklo_epi8(b, zero);
-      a = d; d = _mm_unpacklo_epi8(d, zero);
-      __m128i pa = _mm_sub_epi16(b,c),
-              // (p-a) == (a+b-c - a) == (b-c)
-              pb = _mm_sub_epi16(a,c),
-              // (p-b) == (a+b-c - b) == (a-c)
-              pc = _mm_add_epi16(pa,pb);
-              // (p-c) == (a+b-c - c) == (a+b-c-c) == (b-c)+(a-c)
+      c = b; b = _mm_unpacklo_epi8(load3(prev), zero);
+      a = d; d = _mm_unpacklo_epi8(load3(row ), zero);
+
+      // (p-a) == (a+b-c - a) == (b-c)
+      __m128i pa = _mm_sub_epi16(b,c);
+
+      // (p-b) == (a+b-c - b) == (a-c)
+      __m128i pb = _mm_sub_epi16(a,c);
+
+      // (p-c) == (a+b-c - c) == (a+b-c-c) == (b-c)+(a-c)
+      __m128i pc = _mm_add_epi16(pa,pb);
 
       pa = abs_i16(pa);  // |p-a|
       pb = abs_i16(pb);  // |p-b|
@@ -193,11 +219,10 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
                          if_then_else(_mm_cmpeq_epi16(smallest, pb), b,
                                                                      c));
 
-
       // Note `_epi8`: we need addition to wrap modulo 255.
       d = _mm_add_epi8(d, nearest);
-      __m128i r = _mm_packus_epi16(d,d);
-      memcpy(row, &r, 3);
+      store3(row, _mm_packus_epi16(d,d));
+
       prev += 3;
       row  += 3;
       rb   -= 3;
@@ -212,10 +237,13 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    //   prev: c b
    //   row:  a d
    // The Paeth function predicts d to be whichever of a, b, or c is nearest to
-   // p=a+b-c.  The first pixel has no left context, and so uses an Up filter,
-   // p = b.  This works naturally with our main loop's p = a+b-c if we force a
-   // and c to zero.  Here we zero b and d, which become c and a respectively
-   // at the start of the loop.
+   // p=a+b-c.
+
+   // The first pixel has no left context, and so uses an Up filter, p = b.
+   // This works naturally with our main loop's p = a+b-c if we force a and c
+   // to zero.
+   // Here we zero b and d, which become c and a respectively at the start of
+   // the loop.
    const __m128i zero = _mm_setzero_si128();
    __m128i c, b = zero,
            a, d = zero;
@@ -224,16 +252,17 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    while (rb > 0) {
       // It's easiest to do this math (particularly, deal with pc) with 16-bit
       // intermediates.
-      memcpy(&b, prev, 4);
-      memcpy(&d, row, 4);
-      c = b; b = _mm_unpacklo_epi8(b, zero);
-      a = d; d = _mm_unpacklo_epi8(d, zero);
-      __m128i pa = _mm_sub_epi16(b,c),
-              // (p-a) == (a+b-c - a) == (b-c)
-              pb = _mm_sub_epi16(a,c),
-              // (p-b) == (a+b-c - b) == (a-c)
-              pc = _mm_add_epi16(pa,pb);
-              // (p-c) == (a+b-c - c) == (a+b-c-c) == (b-c)+(a-c)
+      c = b; b = _mm_unpacklo_epi8(load4(prev), zero);
+      a = d; d = _mm_unpacklo_epi8(load4(row ), zero);
+
+      // (p-a) == (a+b-c - a) == (b-c)
+      __m128i pa = _mm_sub_epi16(b,c);
+
+      // (p-b) == (a+b-c - b) == (a-c)
+      __m128i pb = _mm_sub_epi16(a,c);
+
+      // (p-c) == (a+b-c - c) == (a+b-c-c) == (b-c)+(a-c)
+      __m128i pc = _mm_add_epi16(pa,pb);
 
       pa = abs_i16(pa);  // |p-a|
       pb = abs_i16(pb);  // |p-b|
@@ -246,11 +275,10 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
                          if_then_else(_mm_cmpeq_epi16(smallest, pb), b,
                                                                      c));
 
-
       // Note `_epi8`: we need addition to wrap modulo 255.
       d = _mm_add_epi8(d, nearest);
-      __m128i r = _mm_packus_epi16(d,d);
-      memcpy(row, &r, 4);
+      store4(row, _mm_packus_epi16(d,d));
+
       prev += 4;
       row  += 4;
       rb   -= 4;

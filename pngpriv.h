@@ -183,9 +183,12 @@
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
 #ifndef PNG_INTEL_SSE_OPT
-#   if defined(__SSE3__) || defined(__SSSE3__)
+#   if defined(__SSE4_1__)
+#      define PNG_INTEL_SSE_OPT 3
+#   elif defined(__SSE3__) || defined(__SSSE3__)
 #      define PNG_INTEL_SSE_OPT 2
-#   elif defined(__SSE2__)
+#   elif defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
+    (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 #      define PNG_INTEL_SSE_OPT 1
 #   endif
 #endif
