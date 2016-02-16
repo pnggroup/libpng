@@ -48,6 +48,7 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
                           ${CMAKE_C_FLAGS}
                           "-I${SRCDIR}"
                           "-I${BINDIR}"
+                          ${INCLUDES}
                           "-DPNGLIB_LIBNAME=PNG${PNGLIB_MAJOR}${PNGLIB_MINOR}_0"
                           "-DPNGLIB_VERSION=${PNGLIB_VERSION}"
                           "-DSYMBOL_PREFIX=${SYMBOL_PREFIX}"
