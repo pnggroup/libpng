@@ -345,7 +345,7 @@ AC_ARG_ENABLE([intel-sse],
 AM_CONDITIONAL([PNG_INTEL_SSE],
    [test "$enable_intel_sse" != 'no' &&
     case "$host_cpu" in
-      x86*) :;;
+      i?86|x86_64) :;;
       *)    test "$enable_intel_sse" != '';;
     esac])
 
