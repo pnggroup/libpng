@@ -183,21 +183,33 @@
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
 #ifndef PNG_INTEL_SSE_OPT
-#   if defined(__SSE4_1__) || defined(__AVX__)
-       /* We are not actually using AVX, but checking for AVX is the best
-          way we can detect SSE4.1 and SSSE3 on MSVC.
-       */
-#      define PNG_INTEL_SSE_OPT 3
-#   elif defined(__SSSE3__)
-#      define PNG_INTEL_SSE_OPT 2
-#   elif defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
+#   if defined(__SSE4_1__) || defined(__AVX__) || defined(__SSSE3__) || \
+    defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
     (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
 #      define PNG_INTEL_SSE_OPT 1
 #   endif
 #endif
 
 #if PNG_INTEL_SSE_OPT > 0
-#   define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_sse2
+#   ifndef PNG_INTEL_SSE_IMPLEMENTATION
+#      if defined(__SSE4_1__) || defined(__AVX__)
+          /* We are not actually using AVX, but checking for AVX is the best
+             way we can detect SSE4.1 and SSSE3 on MSVC.
+          */
+#         define PNG_INTEL_SSE_IMPLEMENTATION 3
+#      elif defined(__SSSE3__)
+#         define PNG_INTEL_SSE_IMPLEMENTATION 2
+#      elif defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
+       (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#         define PNG_INTEL_SSE_IMPLEMENTATION 1
+#      else
+#         define PNG_INTEL_SSE_IMPLEMENTATION 0
+#      endif
+#   endif
+
+#   if PNG_INTEL_SSE_IMPLEMENTATION > 0
+#      define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_sse2
+#   endif
 #endif
 
 /* Is this a build of a DLL where compilation of the object modules requires

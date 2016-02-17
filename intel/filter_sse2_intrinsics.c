@@ -12,7 +12,7 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#if PNG_INTEL_SSE_OPT > 0
+#if PNG_INTEL_SSE_IMPLEMENTATION > 0
 
 #include <immintrin.h>
 
@@ -144,7 +144,7 @@ void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
 
 // Returns |x| for 16-bit lanes.
 static __m128i abs_i16(__m128i x) {
-#if PNG_INTEL_SSE_OPT >= 2
+#if PNG_INTEL_SSE_IMPLEMENTATION >= 2
    return _mm_abs_epi16(x);
 #else
    // Read this all as, return x<0 ? -x : x.
@@ -162,7 +162,7 @@ static __m128i abs_i16(__m128i x) {
 
 // Bytewise c ? t : e.
 static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
-#if PNG_INTEL_SSE_OPT >= 3
+#if PNG_INTEL_SSE_IMPLEMENTATION >= 3
    return _mm_blendv_epi8(e,t,c);
 #else
    return _mm_or_si128(_mm_and_si128(c, t), _mm_andnot_si128(c, e));
@@ -281,5 +281,5 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-#endif /* PNG_INTEL_SSE_OPT > 0 */
+#endif /* PNG_INTEL_SSE_IMPLEMENTATION > 0 */
 #endif /* READ */
