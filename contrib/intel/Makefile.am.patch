@@ -12,6 +12,6 @@
 # "if PNG_ARM_NEON ... endif" statement.
 
 if PNG_INTEL_SSE
-libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += intel/intel_init.c\
-    intel/filter_sse2_intrinsics.c
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += contrib/intel/intel_init.c\
+    contrib/intel/filter_sse2_intrinsics.c
 endif
