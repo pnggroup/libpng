@@ -5526,6 +5526,7 @@ Version 1.6.22beta03 [February 19, 2016]
   Updated LICENSE to say files in the contrib directory are not
     necessarily under the libpng license, and that some makefiles have
     other copyright owners.
+  Added INTEL-SSE2 support (Mike Klein and Matt Sarett, Google, Inc.).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1,17 +1,21 @@
 #
 # Copyright (c) 2016 Google, Inc.
+# Written by Mike Klein and Matt Sarett
+# Derived from the ARM supporting code in libpng/configure.ac, which was
+# Copyright (c) 2004-2015 Glenn Randers-Pehrson
+#
+# Last changed in libpng 1.6.22 [(PENDING RELEASE)]
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 #
-
 # In order to compile Intel SSE optimizations for libpng, please add
 # the following code to configure.ac under HOST SPECIFIC OPTIONS
 # directly beneath the section for ARM.
 
 # INTEL
-# ===
+# =====
 #
 # INTEL SSE (SIMD) support.
 

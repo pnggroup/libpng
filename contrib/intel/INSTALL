@@ -1,5 +1,4 @@
 
-Copyright (c) 2016 Google, Inc.
-
-To enable SSE support, manually edit configure.ac and Makefile.am, following
-the instructions in the configure.ac.patch and Makefile.am.patch files. 
+To enable SSE support in libpng, manually edit configure.ac and Makefile.am,
+following the instructions in the configure.ac.patch and Makefile.am.patch
+files, then configure with -DPNG_INTEL_SSE in CPPFLAGS.
