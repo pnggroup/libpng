@@ -4,7 +4,7 @@
  * Copyright (c) 2016 Google, Inc.
  * Written by Mike Klein and Matt Sarett
  * Derived from arm/arm_init.c, which was
- * Copyright (c) 2014 Glenn Randers-Pehrson
+ * Copyright (c) 2014,2016 Glenn Randers-Pehrson
  *
  * Last changed in libpng 1.6.22 [(PENDING RELEASE)]
  *
@@ -29,6 +29,7 @@ png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
     * Most of these can be implemented using only MMX and 64-bit registers,
     * but they end up a bit slower than using the equally-ubiquitous SSE2.
    */
+   png_debug(1, "in png_init_filter_functions_sse2");
    if (bpp == 3)
    {
       pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_sse2;

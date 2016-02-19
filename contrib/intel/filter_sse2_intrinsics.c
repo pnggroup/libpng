@@ -4,7 +4,7 @@
  * Copyright (c) 2016 Google, Inc.
  * Written by Mike Klein and Matt Sarett
  * Derived from arm/filter_neon_intrinsics.c, which was
- * Copyright (c) 2014 Glenn Randers-Pehrson
+ * Copyright (c) 2014,2016 Glenn Randers-Pehrson
  *
  * Last changed in libpng 1.6.22 [(PENDING RELEASE)]
  *
@@ -55,6 +55,7 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
     * There is no pixel to the left of the first pixel.  It's encoded directly.
     * That works with our main loop if we just say that left pixel was zero.
     */
+   png_debug(1, "in png_read_filter_row_sub3_sse2");
    __m128i a, d = _mm_setzero_si128();
 
    int rb = row_info->rowbytes;
@@ -75,6 +76,7 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
     * There is no pixel to the left of the first pixel.  It's encoded directly.
     * That works with our main loop if we just say that left pixel was zero.
     */
+   png_debug(1, "in png_read_filter_row_sub4_sse2");
    __m128i a, d = _mm_setzero_si128();
 
    int rb = row_info->rowbytes;
@@ -96,6 +98,7 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
     * predicted to be half of the pixel above it.  So again, this works
     * perfectly with our loop if we make sure a starts at zero.
     */
+   png_debug(1, "in png_read_filter_row_avg3_sse2");
    const __m128i zero = _mm_setzero_si128();
    __m128i    b;
    __m128i a, d = zero;
@@ -128,6 +131,7 @@ void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
     * predicted to be half of the pixel above it.  So again, this works
     * perfectly with our loop if we make sure a starts at zero.
     */
+   png_debug(1, "in png_read_filter_row_avg4_sse2");
    const __m128i zero = _mm_setzero_si128();
    __m128i    b;
    __m128i a, d = zero;
@@ -196,6 +200,7 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
     * Here we zero b and d, which become c and a respectively at the start of
     * the loop.
     */
+   png_debug(1, "in png_read_filter_row_paeth3_sse2");
    const __m128i zero = _mm_setzero_si128();
    __m128i c, b = zero,
            a, d = zero;
@@ -254,6 +259,7 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
     * Here we zero b and d, which become c and a respectively at the start of
     * the loop.
     */
+   png_debug(1, "in png_read_filter_row_paeth4_sse2");
    const __m128i zero = _mm_setzero_si128();
    __m128i c, b = zero,
            a, d = zero;

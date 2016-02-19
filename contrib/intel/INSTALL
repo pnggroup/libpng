@@ -2,3 +2,7 @@
 To enable SSE support in libpng, manually edit configure.ac and Makefile.am,
 following the instructions in the configure.ac.patch and Makefile.am.patch
 files, then configure with -DPNG_INTEL_SSE in CPPFLAGS.
+
+If you have moved the *.c files to a different directory, be sure to update
+the '#include "../../pngpriv.h"' line in both files if necessary to point
+to the correct relative location of pngpriv.h.
