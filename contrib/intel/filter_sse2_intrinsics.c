@@ -3,6 +3,8 @@
  *
  * Copyright (c) 2016 Google, Inc.
  *
+ * Last changed in libpng 1.6.22 [(PENDING RELEASE)]
+ *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
