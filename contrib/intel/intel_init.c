@@ -8,7 +8,7 @@
  * and license in png.h
  */
 
-#include "../pngpriv.h"
+#include "../../pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
 #if PNG_INTEL_SSE_IMPLEMENTATION > 0
