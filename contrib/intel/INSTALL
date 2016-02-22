@@ -1,8 +1,84 @@
+Enabling SSE support
 
-To enable SSE support in libpng, manually edit configure.ac and Makefile.am,
-following the instructions in the configure.ac.patch and Makefile.am.patch
-files, then configure with -DPNG_INTEL_SSE in CPPFLAGS.
+Copyright (c) 2016 Google, Inc.
+Written by Mike Klein and Matt Sarett
 
-If you have moved the *.c files to a different directory, be sure to update
-the '#include "../../pngpriv.h"' line in both files if necessary to point
-to the correct relative location of pngpriv.h.
+To enable SSE support in libpng, apply intel_sse.patch in your build
+directory.  If you prefer,  manually edit configure.ac and Makefile.am,
+following the instructions below.
+
+Then configure libpng with -DPNG_INTEL_SSE in CPPFLAGS.
+If you only want to optimize 4bpp images, also use -DPNG_NO_INTEL_SSE_3BPP.
+
+If you have moved intel_init.c and filter_sse2_intrinsics.c to a different
+directory, be sure to update the '#include "../../pngpriv.h"' line in both
+files if necessary to point to the correct relative location of pngpriv.h
+with respect to the new location of those files.
+
+1. Insert the following lines above the copyright line near the top of
+configure.ac:
+
+-----------------cut----------------
+# Copyright (c) 2016 Google, Inc.
+# Written by Mike Klein and Matt Sarett
+# Derived from the ARM supporting code in libpng/configure.ac, which was
+-----------------cut----------------
+
+2. Add the following code to configure.ac under HOST SPECIFIC OPTIONS
+directly beneath the section for ARM:
+
+-----------------cut----------------
+# INTEL
+# =====
+#
+# INTEL SSE (SIMD) support.
+
+AC_ARG_ENABLE([intel-sse],
+   AS_HELP_STRING([[[--enable-intel-sse]]],
+      [Enable Intel SSE optimizations: =no/off, yes/on:]
+      [no/off: disable the optimizations;]
+      [yes/on: enable the optimizations.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling:
+         AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
+                   [Disable Intel SSE optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_intel_sse=no;;
+      yes|on)
+         AC_DEFINE([PNG_INTEL_SSE_OPT], [1],
+                   [Enable Intel SSE optimizations]);;
+      *)
+         AC_MSG_ERROR([--enable-intel-sse=${enable_intel_sse}: invalid value])
+   esac])
+
+# Add Intel specific files to all builds where the host_cpu is Intel ('x86*')
+# or where Intel optimizations were explicitly requested (this allows a
+# fallback if a future host CPU does not match 'x86*')
+AM_CONDITIONAL([PNG_INTEL_SSE],
+   [test "$enable_intel_sse" != 'no' &&
+    case "$host_cpu" in
+      i?86|x86_64) :;;
+      *)    test "$enable_intel_sse" != '';;
+    esac])
+-----------------cut----------------
+
+3. Insert the following lines above the copyright line near the top of
+Makefile.am:
+
+-----------------cut----------------
+# Copyright (c) 2016 Google, Inc.
+# Written by Mike Klein and Matt Sarett
+# Derived from the ARM supporting code in libpng/configure.ac, which was
+-----------------cut----------------
+
+4. Add the following code to Makefile.am under HOST SPECIFIC OPTIONS
+directly beneath the "if PNG_ARM_NEON ... endif" statement:
+
+-----------------cut----------------
+if PNG_INTEL_SSE
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += contrib/intel/intel_init.c\
+    contrib/intel/filter_sse2_intrinsics.c
+endif
+-----------------cut----------------

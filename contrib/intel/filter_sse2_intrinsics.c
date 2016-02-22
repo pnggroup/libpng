@@ -29,25 +29,30 @@
  * whichever of a, b, or c is closest to p=a+b-c.
  */
 
+#ifndef PNG_NO_INTEL_SSE_3BPP
 static __m128i load3(const void* p) {
    png_uint_32 packed;
    memcpy(&packed, p, 3);
    return _mm_cvtsi32_si128(packed);
 }
+#endif
 
 static __m128i load4(const void* p) {
    return _mm_cvtsi32_si128(*(const int*)p);
 }
 
+#ifndef PNG_NO_INTEL_SSE_3BPP
 static void store3(void* p, __m128i v) {
    png_uint_32 packed = _mm_cvtsi128_si32(v);
    memcpy(p, &packed, 3);
 }
+#endif
 
 static void store4(void* p, __m128i v) {
    *(int*)p = _mm_cvtsi128_si32(v);
 }
 
+#ifndef PNG_NO_INTEL_SSE_3BPP
 void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -68,6 +73,7 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
       rb  -= 3;
    }
 }
+#endif
 
 void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
@@ -90,6 +96,7 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
+#ifndef PNG_NO_INTEL_SSE_3BPP
 void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -122,6 +129,7 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
       rb   -= 3;
    }
 }
+#endif
 
 void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
@@ -184,6 +192,7 @@ static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
 #endif
 }
 
+#ifndef PNG_NO_INTEL_SSE_3BPP
 void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -242,6 +251,7 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
       rb   -= 3;
    }
 }
+#endif
 
 void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
