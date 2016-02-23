@@ -4,16 +4,22 @@ Copyright (c) 2016 Google, Inc.
 Written by Mike Klein and Matt Sarett
 
 To enable SSE support in libpng, apply intel_sse.patch in your build
-directory.  If you prefer,  manually edit configure.ac and Makefile.am,
-following the instructions below.
+directory, before running "configure".  If you prefer,  manually edit
+configure.ac and Makefile.am, following the instructions below, then
+then follow the instructions in section II of INSTALL in the main libpng
+directory.
 
-Then configure libpng with -DPNG_INTEL_SSE in CPPFLAGS.
-If you only want to optimize 4bpp images, also use -DPNG_NO_INTEL_SSE_3BPP.
+Then configure libpng with -DPNG_INTEL_SSE in CPPFLAGS.  If you only
+want to optimize reading 4bpp images, also use -DPNG_NO_INTEL_SSE_3BPP.
 
 If you have moved intel_init.c and filter_sse2_intrinsics.c to a different
 directory, be sure to update the '#include "../../pngpriv.h"' line in both
 files if necessary to point to the correct relative location of pngpriv.h
 with respect to the new location of those files.
+
+If you are using a custom makefile instead of a configure-generated
+makefile, you will have to update it manually to include contrib/intel/*.c
+and to define PNG_INTEL_SSE and possibly PNG_NO_INTEL_SSE_3BPP.
 
 1. Insert the following lines above the copyright line near the top of
 configure.ac:
