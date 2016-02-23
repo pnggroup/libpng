@@ -1,6 +1,6 @@
 diff --git a/configure.ac b/configure.ac
---- a/configure.ac	2016-02-22 14:31:48.000000000 -0600
-+++ b/configure.ac	2016-02-22 14:40:13.665955674 -0600
+--- a/configure.ac	2016-02-22 17:24:25.000000000 -0600
++++ b/configure.ac	2016-02-22 17:30:36.949159871 -0600
 @@ -1,10 +1,13 @@
  # configure.ac
  
@@ -15,8 +15,7 @@ diff --git a/configure.ac b/configure.ac
  # and license in png.h
  
  dnl Process this file with autoconf to produce a configure script.
-@@ -314,16 +317,50 @@ AC_ARG_ENABLE([arm-neon],
- # future host CPU does not match 'arm*')
+@@ -316,16 +319,50 @@ AC_ARG_ENABLE([arm-neon],
  
  AM_CONDITIONAL([PNG_ARM_NEON],
     [test "$enable_arm_neon" != 'no' &&
@@ -24,7 +23,7 @@ diff --git a/configure.ac b/configure.ac
        arm*|aarch64*) :;;
        *)    test "$enable_arm_neon" != '';;
      esac])
-+
+ 
 +# INTEL
 +# =====
 +#
@@ -58,17 +57,18 @@ diff --git a/configure.ac b/configure.ac
 +    case "$host_cpu" in
 +      i?86|x86_64) :;;
 +      *)    test "$enable_intel_sse" != '';;
-     esac])
- 
++    esac])
  AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
  
  # Config files, substituting as above
  AC_CONFIG_FILES([Makefile libpng.pc:libpng.pc.in])
  AC_CONFIG_FILES([libpng-config:libpng-config.in],
     [chmod +x libpng-config])
+ 
+ AC_OUTPUT
 diff --git a/Makefile.am b/Makefile.am
---- a/Makefile.am	2016-02-22 14:31:47.000000000 -0600
-+++ b/Makefile.am	2016-02-22 14:42:40.380041684 -0600
+--- a/Makefile.am	2016-02-22 17:24:24.000000000 -0600
++++ b/Makefile.am	2016-02-22 17:32:18.387223996 -0600
 @@ -1,10 +1,13 @@
  # Makefile.am, the source file for Makefile.in (and hence Makefile), is
  #
@@ -83,7 +83,7 @@ diff --git a/Makefile.am b/Makefile.am
  # and license in png.h
  
  PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
-@@ -83,16 +88,21 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
+@@ -83,16 +86,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
  	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
  	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
  
@@ -96,7 +96,6 @@ diff --git a/Makefile.am b/Makefile.am
 +libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += contrib/intel/intel_init.c\
 +    contrib/intel/filter_sse2_intrinsics.c
 +endif
-+
  nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
  
  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined -export-dynamic \
