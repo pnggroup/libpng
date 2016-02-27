@@ -5513,7 +5513,7 @@ Version 1.6.22beta02 [February 8, 2016]
     extend the png_set_alpha_mode range as HDR imaging systems are starting
     to emerge.
 
-Version 1.6.22beta03 [February 19, 2016]
+Version 1.6.22beta03 [February 27, 2016]
   Added a common-law trademark notice and export control information
     to the LICENSE file, png.h, and the man page.
   Restored "& 0xff" in png_save_uint_16() and png_save_uint_32() that
@@ -5527,6 +5527,13 @@ Version 1.6.22beta03 [February 19, 2016]
     necessarily under the libpng license, and that some makefiles have
     other copyright owners.
   Added INTEL-SSE2 support (Mike Klein and Matt Sarett, Google, Inc.).
+  Made contrib/libtests/timepng more robust.  The code no longer gives
+    up/fails on invalid PNG data, it just skips it (with error messages).
+    The code no longer fails on PNG files with data beyond IEND.  Options
+    exist to use png_read_png (reading the whole image, not by row) and, in
+    that case, to apply any of the supported transforms.  This makes for
+    more realistic testing; the decoded data actually gets used in a
+    meaningful fashion (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
