@@ -1,8 +1,8 @@
 /* timepng.c
  *
- * Copyright (c) 2013 John Cunningham Bowler
+ * Copyright (c) 2013,2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.1 [March 28, 2013]
+ * Last changed in libpng 1.6.22 [February 25, 2016]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -10,15 +10,16 @@
  *
  * Load an arbitrary number of PNG files (from the command line, or, if there
  * are no arguments on the command line, from stdin) then run a time test by
- * reading each file by row.  The test does nothing with the read result and
- * does no transforms.  The only output is a time as a floating point number of
- * seconds with 9 decimal digits.
+ * reading each file by row or by image (possibly with transforms in the latter
+ * case).  The only output is a time as a floating point number of seconds with
+ * 9 decimal digits.
  */
 #define _POSIX_C_SOURCE 199309L /* for clock_gettime */
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include <time.h>
 
@@ -35,28 +36,44 @@
 #  include "../../png.h"
 #endif
 
-static int read_png(FILE *fp)
+typedef struct
 {
-   png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,0);
-   png_infop info_ptr = NULL;
-   png_bytep row = NULL, display = NULL;
+   FILE *input;
+   FILE *output;
+}  io_data;
 
-   if (png_ptr == NULL)
-      return 0;
+static PNG_CALLBACK(void, read_and_copy,
+      (png_structp png_ptr, png_bytep buffer, png_size_t cb))
+{
+   io_data *io = (io_data*)png_get_io_ptr(png_ptr);
 
-   if (setjmp(png_jmpbuf(png_ptr)))
+   if (fread(buffer, cb, 1, io->input) != 1)
+      png_error(png_ptr, strerror(errno));
+
+   if (fwrite(buffer, cb, 1, io->output) != 1)
    {
-      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-      if (row != NULL) free(row);
-      if (display != NULL) free(display);
-      return 0;
+      perror("temporary file");
+      fprintf(stderr, "temporary file PNG write failed\n");
+      exit(1);
    }
+}
 
-   png_init_io(png_ptr, fp);
+static void read_by_row(png_structp png_ptr, png_infop info_ptr,
+      FILE *write_ptr, FILE *read_ptr)
+{
+   /* These don't get freed on error, this is fine; the program immediately
+    * exits.
+    */
+   png_bytep row = NULL, display = NULL;
+   io_data io_copy;
 
-   info_ptr = png_create_info_struct(png_ptr);
-   if (info_ptr == NULL)
-      png_error(png_ptr, "OOM allocating info structure");
+   if (write_ptr != NULL)
+   {
+      /* Set up for a copy to the temporary file: */
+      io_copy.input = read_ptr;
+      io_copy.output = write_ptr;
+      png_set_read_fn(png_ptr, &io_copy, read_and_copy);
+   }
 
    png_read_info(png_ptr, info_ptr);
 
@@ -81,7 +98,8 @@ static int read_png(FILE *fp)
             png_uint_32 y = height;
 
             /* NOTE: this trashes the row each time; interlace handling won't
-             * work, but this avoids memory thrashing for speed testing.
+             * work, but this avoids memory thrashing for speed testing and is
+             * somewhat representative of an application that works row-by-row.
              */
             while (y-- > 0)
                png_read_row(png_ptr, row, display);
@@ -91,9 +109,49 @@ static int read_png(FILE *fp)
 
    /* Make sure to read to the end of the file: */
    png_read_end(png_ptr, info_ptr);
-   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+
+   /* Free this up: */
    free(row);
    free(display);
+}
+
+static PNG_CALLBACK(void, no_warnings, (png_structp png_ptr,
+         png_const_charp warning))
+{
+   (void)png_ptr;
+   (void)warning;
+}
+
+static int read_png(FILE *fp, png_int_32 transforms, FILE *write_file)
+{
+   png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,0,0,
+         no_warnings);
+   png_infop info_ptr = NULL;
+
+   if (png_ptr == NULL)
+      return 0;
+
+   if (setjmp(png_jmpbuf(png_ptr)))
+   {
+      png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+      return 0;
+   }
+
+   png_set_benign_errors(png_ptr, 1/*allowed*/);
+   png_init_io(png_ptr, fp);
+
+   info_ptr = png_create_info_struct(png_ptr);
+
+   if (info_ptr == NULL)
+      png_error(png_ptr, "OOM allocating info structure");
+
+   if (transforms < 0)
+      read_by_row(png_ptr, info_ptr, write_file, fp);
+
+   else
+      png_read_png(png_ptr, info_ptr, transforms, NULL/*params*/);
+
+   png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
    return 1;
 }
 
@@ -108,7 +166,7 @@ static int mytime(struct timespec *t)
    return 0;
 }
 
-static int perform_one_test(FILE *fp, int nfiles)
+static int perform_one_test(FILE *fp, int nfiles, png_int_32 transforms)
 {
    int i;
    struct timespec before, after;
@@ -120,7 +178,7 @@ static int perform_one_test(FILE *fp, int nfiles)
    {
       for (i=0; i<nfiles; ++i)
       {
-         if (read_png(fp))
+         if (read_png(fp, transforms, NULL/*write*/))
          {
             if (ferror(fp))
             {
@@ -184,33 +242,60 @@ static int add_one_file(FILE *fp, char *name)
 
    if (ip != NULL)
    {
-      int ch;
-      for (;;)
+      /* Read the file using libpng; this detects errors and also deals with
+       * files which contain data beyond the end of the file.
+       */
+      int ok = 0;
+      fpos_t pos;
+
+      if (fgetpos(fp, &pos))
       {
-         ch = getc(ip);
-         if (ch == EOF) break;
-         putc(ch, fp);
+         /* Fatal error reading the start: */
+         perror("temporary file");
+         fprintf(stderr, "temporary file fgetpos error\n");
+         exit(1);
       }
 
-      if (ferror(ip))
+      if (read_png(ip, -1/*by row*/, fp/*output*/))
       {
-         perror(name);
-         fprintf(stderr, "%s: read error\n", name);
-         return 0;
+         if (ferror(ip))
+         {
+            perror(name);
+            fprintf(stderr, "%s: read error\n", name);
+         }
+
+         else
+            ok = 1; /* read ok */
       }
 
       (void)fclose(ip);
 
+      /* An error in the output is fatal; exit immediately: */
       if (ferror(fp))
       {
          perror("temporary file");
          fprintf(stderr, "temporary file write error\n");
-         return 0;
+         exit(1);
+      }
+
+      if (ok)
+         return 1;
+
+      /* Did not read the file successfully, simply rewind the temporary
+       * file.  This must happen after the ferror check above to avoid clearing
+       * the error.
+       */
+      if (fsetpos(fp, &pos))
+      {
+         perror("temporary file");
+         fprintf(stderr, "temporary file fsetpos error\n");
+         exit(1);
       }
    }
 
    else
    {
+      /* file open error: */
       perror(name);
       fprintf(stderr, "%s: open failed\n", name);
       return 0;
@@ -222,12 +307,53 @@ static int add_one_file(FILE *fp, char *name)
 int main(int argc, char **argv)
 {
    int ok = 0;
+   int transforms = -1; /* by row */
    FILE *fp = tmpfile();
 
    if (fp != NULL)
    {
       int err = 0;
       int nfiles = 0;
+
+      /* Remove and handle options first: */
+      while (argc > 1 && argv[1][0] == '-' && argv[1][1] == '-')
+      {
+         const char *opt = *++argv + 2;
+
+         --argc;
+
+         /* Options turn on the by-image processing and maybe set some
+          * transforms:
+          */
+         if (transforms == -1)
+            transforms = PNG_TRANSFORM_IDENTITY;
+
+         if (strcmp(opt, "by-image") == 0)
+         {
+            /* handled above */
+         }
+
+#        define OPT(name) else if (strcmp(opt, #name) == 0)\
+            transforms |= PNG_TRANSFORM_ ## name
+
+         OPT(STRIP_16);
+         OPT(STRIP_ALPHA);
+         OPT(PACKING);
+         OPT(PACKSWAP);
+         OPT(EXPAND);
+         OPT(INVERT_MONO);
+         OPT(SHIFT);
+         OPT(BGR);
+         OPT(SWAP_ALPHA);
+         OPT(SWAP_ENDIAN);
+         OPT(INVERT_ALPHA);
+         OPT(STRIP_FILLER);
+         OPT(STRIP_FILLER_BEFORE);
+         OPT(STRIP_FILLER_AFTER);
+         OPT(GRAY_TO_RGB);
+         OPT(EXPAND_16);
+         OPT(SCALE_16);
+      }
 
       if (argc > 1)
       {
@@ -237,12 +363,6 @@ int main(int argc, char **argv)
          {
             if (add_one_file(fp, argv[i]))
                ++nfiles;
-
-            else
-            {
-               err = 1;
-               break;
-            }
          }
       }
 
@@ -259,17 +379,11 @@ int main(int argc, char **argv)
                filename[len-1] = 0;
                if (add_one_file(fp, filename))
                   ++nfiles;
-
-               else
-               {
-                  err = 1;
-                  break;
-               }
             }
 
             else
             {
-               fprintf(stderr, "timepng: truncated file name ...%s\n",
+               fprintf(stderr, "timepng: file name too long: ...%s\n",
                   filename+len-32);
                err = 1;
                break;
@@ -286,10 +400,11 @@ int main(int argc, char **argv)
       if (!err)
       {
          if (nfiles > 0)
-            ok = perform_one_test(fp, nfiles);
+            ok = perform_one_test(fp, nfiles, transforms);
 
          else
-            fprintf(stderr, "usage: timepng {files} or ls files | timepng\n");
+            fprintf(stderr, "usage: timepng [options] {files}\n"
+                            "   or: ls files | timepng [options]\n");
       }
 
       (void)fclose(fp);
