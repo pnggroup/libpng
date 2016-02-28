@@ -304,114 +304,224 @@ static int add_one_file(FILE *fp, char *name)
    return 1;
 }
 
+static void
+usage(FILE *fp)
+{
+   if (fp != NULL) fclose(fp);
+
+   fprintf(stderr,
+"Usage:\n"
+" timepng --assemble <assembly> {files}\n"
+"  Read the files into <assembly>, output the count.  Options are ignored.\n"
+" timepng --dissemble <assembly> <count> [options]\n"
+"  Time <count> files from <assembly>, additional files may not be given.\n"
+" Otherwise:\n"
+"  Read the files into a temporary file and time the decode\n"
+"Transforms:\n"
+"  --by-image: read by image with png_read_png\n"
+"  --<transform>: implies by-image, use PNG_TRANSFORM_<transform>\n"
+"  Otherwise: read by row using png_read_row (to a single row buffer)\n"
+"{files}:\n"
+"  PNG files to copy into the assembly and time.  Invalid files are skipped\n"
+"  with appropriate error messages.  If no files are given the list of files\n"
+"  is read from stdin with each file name terminated by a newline\n"
+"Output:\n"
+"  For --assemble the output is the name of the assembly file followed by the\n"
+"  count of the files it contains; the arguments for --dissemble.  Otherwise\n"
+"  the output is the total decode time in seconds.\n");
+
+   exit(99);
+}
+
 int main(int argc, char **argv)
 {
    int ok = 0;
+   int err = 0;
+   int nfiles = 0;
    int transforms = -1; /* by row */
-   FILE *fp = tmpfile();
+   const char *assembly = NULL;
+   FILE *fp;
 
-   if (fp != NULL)
+   if (argc > 2 && strcmp(argv[1], "--assemble") == 0)
    {
-      int err = 0;
-      int nfiles = 0;
-
-      /* Remove and handle options first: */
-      while (argc > 1 && argv[1][0] == '-' && argv[1][1] == '-')
+      /* Just build the test file, argv[2] is the file name. */
+      assembly = argv[2];
+      fp = fopen(assembly, "wb");
+      if (fp == NULL)
       {
-         const char *opt = *++argv + 2;
+         perror(assembly);
+         fprintf(stderr, "timepng --assemble %s: could not open for write\n",
+               assembly);
+         usage(NULL);
+      }
 
-         --argc;
+      argv += 2;
+      argc -= 2;
+   }
 
-         /* Options turn on the by-image processing and maybe set some
-          * transforms:
-          */
-         if (transforms == -1)
-            transforms = PNG_TRANSFORM_IDENTITY;
+   else if (argc > 3 && strcmp(argv[1], "--dissemble") == 0)
+   {
+      fp = fopen(argv[2], "rb");
 
-         if (strcmp(opt, "by-image") == 0)
-         {
-            /* handled above */
-         }
+      if (fp == NULL)
+      {
+         perror(argv[2]);
+         fprintf(stderr, "timepng --dissemble %s: could not open for read\n",
+               argv[2]);
+         usage(NULL);
+      }
+
+      nfiles = atoi(argv[3]);
+      if (nfiles <= 0)
+      {
+         fprintf(stderr,
+               "timepng --dissemble <file> <count>: %s is not a count\n",
+               argv[3]);
+         exit(99);
+      }
+
+      argv += 3;
+      argc -= 3;
+   }
+
+   else /* Else use a temporary file */
+   {
+      fp = tmpfile();
+
+      if (fp == NULL)
+      {
+         perror("tmpfile");
+         fprintf(stderr, "timepng: could not open the temporary file\n");
+         exit(1); /* not a user error */
+      }
+   }
+
+   /* Handle the transforms: */
+   while (argc > 1 && argv[1][0] == '-' && argv[1][1] == '-')
+   {
+      const char *opt = *++argv + 2;
+
+      --argc;
+
+      /* Transforms turn on the by-image processing and maybe set some
+       * transforms:
+       */
+      if (transforms == -1)
+         transforms = PNG_TRANSFORM_IDENTITY;
+
+      if (strcmp(opt, "by-image") == 0)
+      {
+         /* handled above */
+      }
 
 #        define OPT(name) else if (strcmp(opt, #name) == 0)\
-            transforms |= PNG_TRANSFORM_ ## name
+         transforms |= PNG_TRANSFORM_ ## name
 
-         OPT(STRIP_16);
-         OPT(STRIP_ALPHA);
-         OPT(PACKING);
-         OPT(PACKSWAP);
-         OPT(EXPAND);
-         OPT(INVERT_MONO);
-         OPT(SHIFT);
-         OPT(BGR);
-         OPT(SWAP_ALPHA);
-         OPT(SWAP_ENDIAN);
-         OPT(INVERT_ALPHA);
-         OPT(STRIP_FILLER);
-         OPT(STRIP_FILLER_BEFORE);
-         OPT(STRIP_FILLER_AFTER);
-         OPT(GRAY_TO_RGB);
-         OPT(EXPAND_16);
-         OPT(SCALE_16);
-      }
-
-      if (argc > 1)
-      {
-         int i;
-
-         for (i=1; i<argc; ++i)
-         {
-            if (add_one_file(fp, argv[i]))
-               ++nfiles;
-         }
-      }
+      OPT(STRIP_16);
+      OPT(STRIP_ALPHA);
+      OPT(PACKING);
+      OPT(PACKSWAP);
+      OPT(EXPAND);
+      OPT(INVERT_MONO);
+      OPT(SHIFT);
+      OPT(BGR);
+      OPT(SWAP_ALPHA);
+      OPT(SWAP_ENDIAN);
+      OPT(INVERT_ALPHA);
+      OPT(STRIP_FILLER);
+      OPT(STRIP_FILLER_BEFORE);
+      OPT(STRIP_FILLER_AFTER);
+      OPT(GRAY_TO_RGB);
+      OPT(EXPAND_16);
+      OPT(SCALE_16);
 
       else
       {
-         char filename[FILENAME_MAX+1];
+         fprintf(stderr, "timepng %s: unrecognized transform\n", opt);
+         usage(fp);
+      }
+   }
 
-         while (fgets(filename, FILENAME_MAX+1, stdin))
+   /* Handle the files: */
+   if (argc > 1 && nfiles > 0)
+      usage(fp); /* Additional files not valid with --dissemble */
+
+   else if (argc > 1)
+   {
+      int i;
+
+      for (i=1; i<argc; ++i)
+      {
+         if (add_one_file(fp, argv[i]))
+            ++nfiles;
+      }
+   }
+
+   else if (nfiles == 0) /* Read from stdin withoout --dissemble */
+   {
+      char filename[FILENAME_MAX+1];
+
+      while (fgets(filename, FILENAME_MAX+1, stdin))
+      {
+         size_t len = strlen(filename);
+
+         if (filename[len-1] == '\n')
          {
-            size_t len = strlen(filename);
+            filename[len-1] = 0;
+            if (add_one_file(fp, filename))
+               ++nfiles;
+         }
 
-            if (filename[len-1] == '\n')
+         else
+         {
+            fprintf(stderr, "timepng: file name too long: ...%s\n",
+               filename+len-32);
+            err = 1;
+            break;
+         }
+      }
+
+      if (ferror(stdin))
+      {
+         fprintf(stderr, "timepng: stdin: read error\n");
+         err = 1;
+      }
+   }
+
+   /* Perform the test, or produce the --assemble output: */
+   if (!err)
+   {
+      if (nfiles > 0)
+      {
+         if (assembly != NULL)
+         {
+            if (fflush(fp) && !ferror(fp) && fclose(fp))
             {
-               filename[len-1] = 0;
-               if (add_one_file(fp, filename))
-                  ++nfiles;
+               perror(assembly);
+               fprintf(stderr, "%s: close failed\n", assembly);
             }
 
             else
             {
-               fprintf(stderr, "timepng: file name too long: ...%s\n",
-                  filename+len-32);
-               err = 1;
-               break;
+               printf("%s %d\n", assembly, nfiles);
+               fflush(stdout);
+               ok = !ferror(stdout);
             }
          }
 
-         if (ferror(stdin))
+         else
          {
-            fprintf(stderr, "timepng: stdin: read error\n");
-            err = 1;
+            ok = perform_one_test(fp, nfiles, transforms);
+            (void)fclose(fp);
          }
       }
 
-      if (!err)
-      {
-         if (nfiles > 0)
-            ok = perform_one_test(fp, nfiles, transforms);
-
-         else
-            fprintf(stderr, "usage: timepng [options] {files}\n"
-                            "   or: ls files | timepng [options]\n");
-      }
-
-      (void)fclose(fp);
+      else
+         usage(fp);
    }
 
    else
-      fprintf(stderr, "timepng: could not open temporary file\n");
+      (void)fclose(fp);
 
    /* Exit code 0 on success. */
    return ok == 0;
