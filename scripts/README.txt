@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.4.20beta01 - January 3, 2016
+Makefiles for  libpng version 1.4.20beta01 - March 1, 2016
 
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng14.so.14.1.4.20beta01)
