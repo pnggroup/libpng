@@ -1,5 +1,5 @@
 
-Libpng 1.4.20beta01 - January 3, 2016
+Libpng 1.4.20beta01 - March 1, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -24,18 +24,10 @@ Other information:
    1.4.20beta01-LICENSE.txt
    libpng-1.4.20beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.4.18):
+Changes since the last public release (1.4.19):
 
-version 1.4.19beta01 [December 11, 2015]
-  Fixed an out-of-range read in png_check_keyword() (Bug report from
-    Qixue Xiao, CVE-2015-8540).
-
-version 1.4.19rc01 [December 14, 2015]
-  Corrected copyright dates in source files.
-  Moved png_check_keyword() from pngwutil.c to pngset.c
-
-version 1.4.19 [December 17, 2015]
-  No changes
+version 1.4.20beta01 [March 1, 2016]
+  Fix typos in libpng.3 synopses (Eric S. Raymond).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

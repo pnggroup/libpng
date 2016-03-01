@@ -3030,8 +3030,11 @@ version 1.4.19rc01 [December 14, 2015]
   Corrected copyright dates in source files.
   Moved png_check_keyword() from pngwutil.c to pngset.c
 
-version 1.4.19 [January 3, 2016]
+version 1.4.19 [March 1, 2016]
   No changes.
+
+version 1.4.20beta01 [March 1, 2016]
+  Fix typos in libpng.3 synopses (Eric S. Raymond).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
