@@ -3307,10 +3307,10 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
       for (; i<256; ++i)
          tRNS[i] = 24;
 
-#     ifdef PNG_WRITE_tRNS_SUPPORTED
-         if (j > 0)
-            png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
-#     endif
+#ifdef PNG_WRITE_tRNS_SUPPORTED
+      if (j > 0)
+         png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
+#endif
    }
 }
 
@@ -7937,11 +7937,11 @@ image_transform_png_set_background_set(const image_transform *this,
    else
       back.gray = (png_uint_16)data.red;
 
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-      png_set_background(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
-#  else
-      png_set_background_fixed(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
-#  endif
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+   png_set_background(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
+#else
+   png_set_background_fixed(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
+#endif
 
    this->next->set(this->next, that, pp, pi);
 }
