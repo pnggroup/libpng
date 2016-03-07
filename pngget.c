@@ -456,11 +456,11 @@ png_get_pHYs_dpi(png_const_structrp png_ptr, png_const_inforp info_ptr,
    return (retval);
 }
 #endif /* pHYs */
-#endif  /* INCH_CONVERSIONS */
+#endif /* INCH_CONVERSIONS */
 
 /* png_get_channels really belongs in here, too, but it's been around longer */
 
-#endif  /* EASY_ACCESS */
+#endif /* EASY_ACCESS */
 
 
 png_byte PNGAPI

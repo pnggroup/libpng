@@ -5063,7 +5063,8 @@ Version 1.6.15beta04 [November 4, 2014]
 Version 1.6.15beta05 [November 5, 2014]
   Use png_get_libpng_ver(NULL) instead of PNG_LIBPNG_VER_STRING in
     example.c, pngtest.c, and applications in the contrib directory.
-  Avoid out-of-bounds memory access in png_user_version_check().
+  Fixed an out-of-range read in png_user_version_check() (Bug report from
+    Qixue Xiao, CVE-2015-8540).
   Simplified and future-proofed png_user_version_check().
   Fixed GCC unsigned int->float warnings. Various versions of GCC
     seem to generate warnings when an unsigned value is implicitly
@@ -5513,7 +5514,7 @@ Version 1.6.22beta02 [February 8, 2016]
     extend the png_set_alpha_mode range as HDR imaging systems are starting
     to emerge.
 
-Version 1.6.22beta03 [February 27, 2016]
+Version 1.6.22beta03 [March 7, 2016]
   Added a common-law trademark notice and export control information
     to the LICENSE file, png.h, and the man page.
   Restored "& 0xff" in png_save_uint_16() and png_save_uint_32() that
@@ -5534,6 +5535,7 @@ Version 1.6.22beta03 [February 27, 2016]
     that case, to apply any of the supported transforms.  This makes for
     more realistic testing; the decoded data actually gets used in a
     meaningful fashion (John Bowler).
+  Fixed some misleading indentation (Krishnaraj Bhat).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
