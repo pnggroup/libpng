@@ -1140,6 +1140,7 @@ png_get_user_chunk_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr)
       return png_ptr->user_chunk_ptr;
+
    return NULL;
 }
 #endif
@@ -1151,9 +1152,10 @@ png_get_compression_buffer_size(png_const_structrp png_ptr)
       return 0;
 
 #  if defined(PNG_SEQUENTIAL_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
-      return png_ptr->IDAT_size;
+   return png_ptr->IDAT_size;
+
 #  else
-      return PNG_IDAT_READ_SIZE; /* progressive reader */
+   return PNG_IDAT_READ_SIZE; /* progressive reader */
 #  endif
 }
 

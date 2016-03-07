@@ -122,29 +122,29 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
       /* Added in libpng-1.6.0; this can be used to detect a read structure if
        * required (it will be zero in a write structure.)
        */
-#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-         png_ptr->IDAT_size = PNG_IDAT_READ_SIZE;
-#     endif /* SEQUENTIAL_READ */
+#  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+      png_ptr->IDAT_size = PNG_IDAT_READ_SIZE;
+#  endif /* SEQUENTIAL_READ */
 
-#     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
-         png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
-         png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
+#  ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
+      png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
 
-         /* In stable builds only warn if an application error can be completely
-          * handled.
-          */
-#        if PNG_RELEASE_BUILD
-            png_ptr->flags |= PNG_FLAG_APP_ERRORS_WARN;
-#        endif
-#     endif /* BENIGN_READ_ERRORS */
+      /* In stable builds only warn if an application error can be completely
+       * handled.
+       */
+#     if PNG_RELEASE_BUILD
+         png_ptr->flags |= PNG_FLAG_APP_ERRORS_WARN;
+#     endif
+#  endif /* BENIGN_READ_ERRORS */
 
-#     ifdef PNG_READ_GAMMA_SUPPORTED
-         /* Default gamma correction values: */
-#if 0 /*NYI*/
-         png_ptr->gamma_accuracy = PNG_DEFAULT_GAMMA_ACCURACY;
-#endif /*NYI*/
-         png_ptr->gamma_threshold = PNG_GAMMA_THRESHOLD_FIXED;
-#     endif /* READ_GAMMA */
+#  ifdef PNG_READ_GAMMA_SUPPORTED
+      /* Default gamma correction values: */
+#     if 0 /*NYI*/
+      png_ptr->gamma_accuracy = PNG_DEFAULT_GAMMA_ACCURACY;
+#     endif /*NYI*/
+      png_ptr->gamma_threshold = PNG_GAMMA_THRESHOLD_FIXED;
+#  endif /* READ_GAMMA */
    }
 
    return png_ptr;
@@ -1883,17 +1883,17 @@ png_create_colormap_entry(png_image_read_control *display,
 
    /* Store the value. */
    {
-#     ifdef PNG_FORMAT_AFIRST_SUPPORTED
-         const int afirst = (image->format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
-            (image->format & PNG_FORMAT_FLAG_ALPHA) != 0;
-#     else
-#        define afirst 0
-#     endif
-#     ifdef PNG_FORMAT_BGR_SUPPORTED
-         const int bgr = (image->format & PNG_FORMAT_FLAG_BGR) != 0 ? 2 : 0;
-#     else
-#        define bgr 0
-#     endif
+#  ifdef PNG_FORMAT_AFIRST_SUPPORTED
+      const int afirst = (image->format & PNG_FORMAT_FLAG_AFIRST) != 0 &&
+         (image->format & PNG_FORMAT_FLAG_ALPHA) != 0;
+#  else
+#    define afirst 0
+#  endif
+#  ifdef PNG_FORMAT_BGR_SUPPORTED
+      const int bgr = (image->format & PNG_FORMAT_FLAG_BGR) != 0 ? 2 : 0;
+#  else
+#     define bgr 0
+#  endif
 
       if (output_encoding == P_LINEAR)
       {
@@ -1981,12 +1981,12 @@ png_create_colormap_entry(png_image_read_control *display,
          }
       }
 
-#     ifdef afirst
-#        undef afirst
-#     endif
-#     ifdef bgr
-#        undef bgr
-#     endif
+#  ifdef afirst
+#     undef afirst
+#  endif
+#  ifdef bgr
+#     undef bgr
+#  endif
    }
 
 #  undef png_ptr
@@ -3629,11 +3629,11 @@ png_image_read_background(png_voidp argument)
             unsigned int outchannels = 1+preserve_alpha;
             int swap_alpha = 0;
 
-#           ifdef PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
-               if (preserve_alpha != 0 &&
-                   (image->format & PNG_FORMAT_FLAG_AFIRST) != 0)
-                  swap_alpha = 1;
-#           endif
+#ifdef PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
+            if (preserve_alpha != 0 &&
+                (image->format & PNG_FORMAT_FLAG_AFIRST) != 0)
+               swap_alpha = 1;
+#endif
 
             for (pass = 0; pass < passes; ++pass)
             {
@@ -3917,15 +3917,15 @@ png_image_read_direct(png_voidp argument)
             else
                filler = 255;
 
-#           ifdef PNG_FORMAT_AFIRST_SUPPORTED
-               if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
-               {
-                  where = PNG_FILLER_BEFORE;
-                  change &= PNG_BIC_MASK(PNG_FORMAT_FLAG_AFIRST);
-               }
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
+            if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
+            {
+               where = PNG_FILLER_BEFORE;
+               change &= PNG_BIC_MASK(PNG_FORMAT_FLAG_AFIRST);
+            }
 
-               else
-#           endif
+            else
+#endif
                where = PNG_FILLER_AFTER;
 
             png_set_add_alpha(png_ptr, filler, where);
@@ -3941,45 +3941,45 @@ png_image_read_direct(png_voidp argument)
        */
       png_set_alpha_mode_fixed(png_ptr, mode, output_gamma);
 
-#     ifdef PNG_FORMAT_BGR_SUPPORTED
-         if ((change & PNG_FORMAT_FLAG_BGR) != 0)
+#  ifdef PNG_FORMAT_BGR_SUPPORTED
+      if ((change & PNG_FORMAT_FLAG_BGR) != 0)
+      {
+         /* Check only the output format; PNG is never BGR; don't do this if
+          * the output is gray, but fix up the 'format' value in that case.
+          */
+         if ((format & PNG_FORMAT_FLAG_COLOR) != 0)
+            png_set_bgr(png_ptr);
+
+         else
+            format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_BGR);
+
+         change &= PNG_BIC_MASK(PNG_FORMAT_FLAG_BGR);
+      }
+#  endif
+
+#  ifdef PNG_FORMAT_AFIRST_SUPPORTED
+      if ((change & PNG_FORMAT_FLAG_AFIRST) != 0)
+      {
+         /* Only relevant if there is an alpha channel - it's particularly
+          * important to handle this correctly because do_local_compose may
+          * be set above and then libpng will keep the alpha channel for this
+          * code to remove.
+          */
+         if ((format & PNG_FORMAT_FLAG_ALPHA) != 0)
          {
-            /* Check only the output format; PNG is never BGR; don't do this if
-             * the output is gray, but fix up the 'format' value in that case.
+            /* Disable this if doing a local background,
+             * TODO: remove this when local background is no longer required.
              */
-            if ((format & PNG_FORMAT_FLAG_COLOR) != 0)
-               png_set_bgr(png_ptr);
-
-            else
-               format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_BGR);
-
-            change &= PNG_BIC_MASK(PNG_FORMAT_FLAG_BGR);
+            if (do_local_background != 2)
+               png_set_swap_alpha(png_ptr);
          }
-#     endif
 
-#     ifdef PNG_FORMAT_AFIRST_SUPPORTED
-         if ((change & PNG_FORMAT_FLAG_AFIRST) != 0)
-         {
-            /* Only relevant if there is an alpha channel - it's particularly
-             * important to handle this correctly because do_local_compose may
-             * be set above and then libpng will keep the alpha channel for this
-             * code to remove.
-             */
-            if ((format & PNG_FORMAT_FLAG_ALPHA) != 0)
-            {
-               /* Disable this if doing a local background,
-                * TODO: remove this when local background is no longer required.
-                */
-               if (do_local_background != 2)
-                  png_set_swap_alpha(png_ptr);
-            }
+         else
+            format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_AFIRST);
 
-            else
-               format &= PNG_BIC_MASK(PNG_FORMAT_FLAG_AFIRST);
-
-            change &= PNG_BIC_MASK(PNG_FORMAT_FLAG_AFIRST);
-         }
-#     endif
+         change &= PNG_BIC_MASK(PNG_FORMAT_FLAG_AFIRST);
+      }
+#  endif
 
       /* If the *output* is 16-bit then we need to check for a byte-swap on this
        * architecture.
@@ -4039,16 +4039,16 @@ png_image_read_direct(png_voidp argument)
          default: impossible("unexpected bit depth"); break;
       }
 
-#     ifdef PNG_FORMAT_AFIRST_SUPPORTED
-         if (do_local_background == 2)
-         {
-            /* do_local_background should be handling the swap: */
-            affirm(!(out_format & PNG_FORMAT_FLAG_AFIRST));
+#  ifdef PNG_FORMAT_AFIRST_SUPPORTED
+      if (do_local_background == 2)
+      {
+         /* do_local_background should be handling the swap: */
+         affirm(!(out_format & PNG_FORMAT_FLAG_AFIRST));
 
-            if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
-               out_format |= PNG_FORMAT_FLAG_AFIRST;
-         }
-#     endif
+         if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
+            out_format |= PNG_FORMAT_FLAG_AFIRST;
+      }
+#  endif
 
       /* This is actually an internal error. */
       affirm(out_format == format /* else unimplemented transformations */);
