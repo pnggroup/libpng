@@ -4256,7 +4256,8 @@ Version 1.5.19 [August 21, 2014]
 Version 1.5.20beta01 [November 6, 2014]
   Removed "option WRITE_COMPRESSED_TEXT enables WRITE_TEXT" from pnglibconf.dfa
   Only mark text chunks as written after successfully writing them.
-  Avoid out-of-bounds memory access in png_user_version_check().
+  Fixed an out-of-range read in png_user_version_check() (Bug report from
+    Qixue Xiao, CVE-2015-8540).
   Simplified and future-proofed png_user_version_check().
 
 Version 1.5.20beta02 [November 10, 2014]
@@ -4454,7 +4455,7 @@ version 1.5.26rc01 [December 14, 2015]
 version 1.5.26 [December 17, 2015]
   No changes.
 
-version 1.5.27beta01 [February 14, 2016]
+version 1.5.27beta01 [March 9, 2016]
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
     as the LE version.
@@ -4480,7 +4481,8 @@ version 1.5.27beta01 [February 14, 2016]
   Added a common-law trademark notice and export control information
     to the LICENSE file, png.h, and the man page.
   Changed PNG_INFO_cHNK and PNG_FREE_cHNK from 0xnnnn to 0xnnnnU in png.h
-   (Robert C. Seacord).
+    (Robert C. Seacord).
+  Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

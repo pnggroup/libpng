@@ -1,5 +1,5 @@
 
-Libpng 1.5.27beta01 - February 14, 2016
+Libpng 1.5.27beta01 - March 9, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.5.26):
 
-version 1.5.27beta01 [February 14, 2016]
+version 1.5.27beta01 [March 9, 2016]
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
     as the LE version.
@@ -52,7 +52,8 @@ version 1.5.27beta01 [February 14, 2016]
   Added a common-law trademark notice and export control information
     to the LICENSE file, png.h, and the man page.
   Changed PNG_INFO_cHNK and PNG_FREE_cHNK from 0xnnnn to 0xnnnnU in png.h
-   (Robert C. Seacord).
+    (Robert C. Seacord).
+  Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -3,7 +3,7 @@
 #
 # last changed in libpng version 1.5.7 - December 15, 2011
 #
-# Copyright (c) 1998-2011 Glenn Randers-Pehrson
+# Copyright (c) 2011 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
