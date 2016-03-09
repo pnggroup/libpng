@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.22beta03 - February 19, 2016
+ libpng version 1.6.22beta03 - March 9, 2016
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.22beta03 - February 19, 2016
+ libpng versions 0.97, January 1998, through 1.6.22beta03 - March 9, 2016
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
