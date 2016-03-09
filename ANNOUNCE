@@ -1,4 +1,4 @@
-Libpng 1.6.22beta03 - March 9, 2016
+Libpng 1.6.22beta04 - March 9, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.22beta03.tar.xz (LZMA-compressed, recommended)
-   1.6.22beta03.tar.gz
+   1.6.22beta04.tar.xz (LZMA-compressed, recommended)
+   1.6.22beta04.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1622b03.7z  (LZMA-compressed, recommended)
-   lp1622b03.zip
+   lp1622b04.7z  (LZMA-compressed, recommended)
+   lp1622b04.zip
 
 Other information:
 
-   1.6.22beta03-README.txt
-   1.6.22beta03-LICENSE.txt
-   libpng-1.6.22beta03-*.asc (armored detached GPG signatures)
+   1.6.22beta04-README.txt
+   1.6.22beta04-LICENSE.txt
+   libpng-1.6.22beta04-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.21):
 
@@ -76,6 +76,8 @@ Version 1.6.22beta03 [March 9, 2016]
     more realistic testing; the decoded data actually gets used in a
     meaningful fashion (John Bowler).
   Fixed some misleading indentation (Krishnaraj Bhat).
+
+Version 1.6.22beta04 [March 9, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
