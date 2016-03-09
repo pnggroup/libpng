@@ -4484,6 +4484,8 @@ version 1.5.27beta01 [March 9, 2016]
     (Robert C. Seacord).
   Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
 
+version 1.5.27beta02 [March 9, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
