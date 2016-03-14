@@ -114,6 +114,20 @@ AC_ARG_ENABLE(werror,
       CFLAGS="$sav_CFLAGS"
     fi],)
 
+# For GCC 5 the default mode for C is -std=gnu11 instead of -std=gnu89
+# In pngpriv.h we request just the POSIX 1003.1 and C89 APIs by defining _POSIX_SOURCE to 1
+# This is incompatible with the new default mode, so we test for that and force the 
+AC_MSG_CHECKING([if we need to force back C standard to C89])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([#define _POSIX_SOURCE 1
+#include <stdio.h>
+])],AC_MSG_RESULT(no),[
+if test "x$GCC" != "xyes"; then
+  AC_MSG_ERROR([Forcing back to C89 is required but the flags are unknown for other compilers than GCC])
+fi
+AC_MSG_RESULT(yes)
+CFLAGS="$CFLAGS -std=c89"
+])
+
 # Checks for header files.
 AC_HEADER_STDC
 
