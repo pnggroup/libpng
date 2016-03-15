@@ -1,4 +1,4 @@
-Libpng 1.6.22beta04 - March 9, 2016
+Libpng 1.6.22beta04 - March 15, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -77,7 +77,8 @@ Version 1.6.22beta03 [March 9, 2016]
     meaningful fashion (John Bowler).
   Fixed some misleading indentation (Krishnaraj Bhat).
 
-Version 1.6.22beta04 [March 9, 2016]
+Version 1.6.22beta04 [March 15, 2016]
+  Force GCC compilation to C89 if needed (Dagobert Michelsen).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
