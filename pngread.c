@@ -3848,16 +3848,16 @@ png_image_read_direct(png_voidp argument)
             else
                filler = 255;
 
-#           ifdef PNG_FORMAT_AFIRST_SUPPORTED
-               if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
-               {
-                  where = PNG_FILLER_BEFORE;
-                  change &= ~PNG_FORMAT_FLAG_AFIRST;
-               }
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
+            if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
+            {
+               where = PNG_FILLER_BEFORE;
+               change &= ~PNG_FORMAT_FLAG_AFIRST;
+            }
 
-               else
-#           endif
-               where = PNG_FILLER_AFTER;
+            else
+#endif
+            where = PNG_FILLER_AFTER;
 
             png_set_add_alpha(png_ptr, filler, where);
          }
@@ -3965,12 +3965,12 @@ png_image_read_direct(png_voidp argument)
       if (info_ptr->bit_depth == 16)
          info_format |= PNG_FORMAT_FLAG_LINEAR;
 
-#     ifdef PNG_FORMAT_BGR_SUPPORTED
-         if ((png_ptr->transformations & PNG_BGR) != 0)
-            info_format |= PNG_FORMAT_FLAG_BGR;
-#     endif
+#ifdef PNG_FORMAT_BGR_SUPPORTED
+      if ((png_ptr->transformations & PNG_BGR) != 0)
+         info_format |= PNG_FORMAT_FLAG_BGR;
+#endif
 
-#     ifdef PNG_FORMAT_AFIRST_SUPPORTED
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
          if (do_local_background == 2)
          {
             if ((format & PNG_FORMAT_FLAG_AFIRST) != 0)
