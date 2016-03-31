@@ -37,7 +37,9 @@ if ("${INPUTEXT}" STREQUAL ".c" AND "${OUTPUTEXT}" STREQUAL ".out")
 
   set(INCLUDES "-I${INCDIR}")
   if(ZLIBINCDIR)
-    list(APPEND INCLUDES "-I${ZLIBINCDIR}")
+    foreach(dir ${ZLIBINCDIR})
+      list(APPEND INCLUDES "-I${dir}")
+    endforeach()
   endif()
 
   if(PNG_PREFIX)
