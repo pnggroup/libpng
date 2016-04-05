@@ -5543,6 +5543,8 @@ Version 1.6.22beta04 [April 5, 2016]
     memcpy-free implementations of load3() / store3().
     call load3() only when needed at the end of a scanline.
 
+Version 1.6.22beta05 [April 5, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
