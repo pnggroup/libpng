@@ -37,7 +37,6 @@ static void store4(void* p, __m128i v) {
    *(int*)p = _mm_cvtsi128_si32(v);
 }
 
-#ifndef PNG_NO_INTEL_SSE_3BPP
 static __m128i load3(const void* p) {
    /* We'll load 2 bytes, then 1 byte,
     * then mask them together, and finally load into SSE.
@@ -62,9 +61,7 @@ static void store3(void* p, __m128i v) {
    *p01 = v012;
    *p2  = v012 >> 16;
 }
-#endif
 
-#ifndef PNG_NO_INTEL_SSE_3BPP
 void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -93,7 +90,6 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
       rb  -= 3;
    }
 }
-#endif
 
 void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
@@ -116,7 +112,6 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-#ifndef PNG_NO_INTEL_SSE_3BPP
 void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -165,7 +160,6 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
       rb   -= 3;
    }
 }
-#endif
 
 void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
@@ -228,7 +222,6 @@ static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
 #endif
 }
 
-#ifndef PNG_NO_INTEL_SSE_3BPP
 void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
@@ -322,7 +315,6 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
       rb   -= 3;
    }
 }
-#endif
 
 void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
