@@ -32,12 +32,10 @@ png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
    png_debug(1, "in png_init_filter_functions_sse2");
    if (bpp == 3)
    {
-#ifndef PNG_NO_INTEL_SSE_3BPP
       pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_sse2;
       pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg3_sse2;
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
          png_read_filter_row_paeth3_sse2;
-#endif
    }
    else if (bpp == 4)
    {
