@@ -36,6 +36,13 @@
 #  include "../../png.h"
 #endif
 
+/* The following is to support direct compilation of this file as C++ */
+#ifdef __cplusplus
+#  define voidcast(type, value) static_cast<type>(value)
+#else
+#  define voidcast(type, value) (value)
+#endif /* __cplusplus */
+
 #if ((defined(PNG_SEQUENTIAL_READ_SUPPORTED)) && defined(PNG_STDIO_SUPPORTED)\
      && defined(PNG_EASY_ACCESS_SUPPORTED) && defined(PNG_INFO_IMAGE_SUPPORTED))
 typedef struct
@@ -82,8 +89,8 @@ static void read_by_row(png_structp png_ptr, png_infop info_ptr,
    {
       png_size_t rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
-      row = malloc(rowbytes);
-      display = malloc(rowbytes);
+      row = voidcast(png_bytep,malloc(rowbytes));
+      display = voidcast(png_bytep,malloc(rowbytes));
 
       if (row == NULL || display == NULL)
          png_error(png_ptr, "OOM allocating row buffers");
@@ -302,10 +309,9 @@ static int add_one_file(FILE *fp, char *name)
       /* file open error: */
       perror(name);
       fprintf(stderr, "%s: open failed\n", name);
-      return 0;
    }
 
-   return 1;
+   return 0; /* file not added */
 }
 
 static void
