@@ -321,6 +321,7 @@ usage(FILE *fp)
 "  --by-image: read by image with png_read_png\n"
 "  --<transform>: implies by-image, use PNG_TRANSFORM_<transform>\n"
 "  Otherwise: read by row using png_read_row (to a single row buffer)\n"
+   /* ISO C90 string length max 509 */);fprintf(stderr,
 "{files}:\n"
 "  PNG files to copy into the assembly and time.  Invalid files are skipped\n"
 "  with appropriate error messages.  If no files are given the list of files\n"
