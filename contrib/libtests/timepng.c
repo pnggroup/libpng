@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <limits.h>
 
 #include <time.h>
 
@@ -279,6 +280,9 @@ static int add_one_file(FILE *fp, char *name)
             ok = 1; /* read ok */
       }
 
+      else
+         fprintf(stderr, "%s: file not added\n", name);
+
       (void)fclose(ip);
 
       /* An error in the output is fatal; exit immediately: */
@@ -463,7 +467,13 @@ int main(int argc, char **argv)
 
       for (i=1; i<argc; ++i)
       {
-         if (add_one_file(fp, argv[i]))
+         if (nfiles == INT_MAX)
+         {
+            fprintf(stderr, "%s: skipped, too many files\n", argv[i]);
+            break;
+         }
+
+         else if (add_one_file(fp, argv[i]))
             ++nfiles;
       }
    }
@@ -479,7 +489,13 @@ int main(int argc, char **argv)
          if (filename[len-1] == '\n')
          {
             filename[len-1] = 0;
-            if (add_one_file(fp, filename))
+            if (nfiles == INT_MAX)
+            {
+               fprintf(stderr, "%s: skipped, too many files\n", filename);
+               break;
+            }
+
+            else if (add_one_file(fp, filename))
                ++nfiles;
          }
 
