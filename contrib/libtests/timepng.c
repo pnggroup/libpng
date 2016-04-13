@@ -36,7 +36,8 @@
 #  include "../../png.h"
 #endif
 
-#if (((defined(PNG_READ_SUPPORTED)) && defined(PNG_STDIO_SUPPORTED)))
+#if ((defined(PNG_SEQUENTIAL_READ_SUPPORTED)) && defined(PNG_STDIO_SUPPORTED)\
+     && defined(PNG_EASY_ACCESS_SUPPORTED) && defined(PNG_INFO_IMAGE_SUPPORTED))
 typedef struct
 {
    FILE *input;
@@ -138,7 +139,9 @@ static int read_png(FILE *fp, png_int_32 transforms, FILE *write_file)
       return 0;
    }
 
-   png_set_benign_errors(png_ptr, 1/*allowed*/);
+#  ifdef PNG_BENIGN_ERRORS_SUPPORTED
+      png_set_benign_errors(png_ptr, 1/*allowed*/);
+#  endif
    png_init_io(png_ptr, fp);
 
    info_ptr = png_create_info_struct(png_ptr);
@@ -528,6 +531,6 @@ int main(int argc, char **argv)
    /* Exit code 0 on success. */
    return ok == 0;
 }
-#else /* !READ || !STDIO */
+#else /* !sufficient support */
 int main(void) { return 77; }
-#endif /* !READ || !STDIO */
+#endif /* !sufficient support */
