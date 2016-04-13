@@ -529,5 +529,5 @@ int main(int argc, char **argv)
    return ok == 0;
 }
 #else /* !READ */
-int main(void) { return 99; }
+int main(void) { return 77; }
 #endif /* !READ */
