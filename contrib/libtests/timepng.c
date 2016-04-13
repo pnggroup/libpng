@@ -36,6 +36,7 @@
 #  include "../../png.h"
 #endif
 
+#ifdef PNG_READ_SUPPORTED
 typedef struct
 {
    FILE *input;
@@ -527,3 +528,6 @@ int main(int argc, char **argv)
    /* Exit code 0 on success. */
    return ok == 0;
 }
+#else /* !READ */
+int main(void) { return 99; }
+#endif /* !READ */
