@@ -36,7 +36,7 @@
 #  include "../../png.h"
 #endif
 
-#ifdef PNG_READ_SUPPORTED
+#if (((defined(PNG_READ_SUPPORTED)) && defined(PNG_STDIO_SUPPORTED)))
 typedef struct
 {
    FILE *input;
@@ -528,6 +528,6 @@ int main(int argc, char **argv)
    /* Exit code 0 on success. */
    return ok == 0;
 }
-#else /* !READ */
+#else /* !READ || !STDIO */
 int main(void) { return 77; }
-#endif /* !READ */
+#endif /* !READ || !STDIO */
