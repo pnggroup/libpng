@@ -1,4 +1,4 @@
-Libpng 1.6.22beta05 - April 19, 2016
+Libpng 1.6.22beta05 - April 27, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -83,7 +83,7 @@ Version 1.6.22beta04 [April 5, 2016]
     memcpy-free implementations of load3() / store3().
     call load3() only when needed at the end of a scanline.
 
-Version 1.6.22beta05 [April 19, 2016]
+Version 1.6.22beta05 [April 27, 2016]
   Added PNG_FAST_FILTERS macro (defined as
     PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
   Various fixes for contrib/libtests/timepng.c

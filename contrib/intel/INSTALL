@@ -155,7 +155,7 @@ code:
 
 -----------------cut----------------
 
-6. Add the following lines to pngpriv.h, following the prototype for
+5. Add the following lines to pngpriv.h, following the prototype for
 png_read_filter_row_paeth4_neon:
 
 -----------------cut----------------
