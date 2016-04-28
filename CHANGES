@@ -5551,7 +5551,8 @@ Version 1.6.22beta05 [April 27, 2016]
   Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
     (Bug report by Y.Ohashik).
 
-Version 1.6.22beta06 [April 27, 2016]
+Version 1.6.22beta06 [April 28, 2016]
+  Rebased contrib/intel_sse.patch.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
