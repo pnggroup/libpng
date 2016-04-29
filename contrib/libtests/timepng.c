@@ -394,6 +394,12 @@ int main(int argc, char **argv)
                argv[3]);
          exit(99);
       }
+#ifdef __COVERITY__
+      else
+      {
+         nfiles &= 0x7fffffff;
+      }
+#endif
 
       argv += 3;
       argc -= 3;
@@ -401,7 +407,39 @@ int main(int argc, char **argv)
 
    else /* Else use a temporary file */
    {
+#ifndef __COVERITY__
       fp = tmpfile();
+#else
+      /* Experimental. Coverity says tmpfile() is insecure because it
+       * generates predictable names.
+       *
+       * It is possible to satisfy Coverity by using mkstemp(); however,
+       * any platform supporting mkstemp() undoubtedly has a secure tmpfile()
+       * implementation as well, and doesn't need the fix.  Note that
+       * the fix won't work on platforms that don't support mkstemp().
+       *
+       * https://www.securecoding.cert.org/confluence/display/c/
+       * FIO21-C.+Do+not+create+temporary+files+in+shared+directories
+       * says that most historic implementations of tmpfile() provide
+       * only a limited number of possible temporary file names
+       * (usually 26) before file names are recycled. That article also
+       * provides a secure solution that unfortunately depends upon mkstemp().
+       */
+      char tmpfile[] = "timepng-XXXXXX";
+      int filedes;
+      umask(0177);
+      filedes = mkstemp(tmpfile);
+      if (filedes < 0)
+        fp = NULL;
+      else
+      {
+        fp = fdopen(filedes,"w+");
+        /* Hide the filename immediately and ensure that the file does
+         * not exist after the program ends
+         */
+        (void) unlink(tmpfile);
+      }
+#endif
 
       if (fp == NULL)
       {
