@@ -397,7 +397,7 @@ int main(int argc, char **argv)
 #ifdef __COVERITY__
       else
       {
-         nfiles &= 0x7fffffff;
+         nfiles &= PNG_UINT_31_MAX;
       }
 #endif
 
