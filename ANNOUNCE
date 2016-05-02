@@ -94,7 +94,7 @@ Version 1.6.22beta05 [April 27, 2016]
 Version 1.6.22beta06 [May 2, 2016]
   Rebased contrib/intel_sse.patch.
   Quieted two Coverity issues in contrib/libtests/timepng.c.
-  Fixed issues with scripts/genout.cmake.in (pull requests from dacap@github):
+  Fixed issues with scripts/genout.cmake.in (David Capello, Nixon Kwok):
     Added support to use multiple directories in ZLIBINCDIR variable,
     Fixed CMAKE_C_FLAGS with multiple values when genout is compiled on MSVC,
     Fixed pnglibconf.c compilation on OS X including the sysroot path.
