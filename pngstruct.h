@@ -26,14 +26,14 @@
 #ifndef ZLIB_CONST
    /* We must ensure that zlib uses 'const' in declarations. */
 #  define ZLIB_CONST
-#endif
+#endif /* !ZLIB_CONST */
 
 #include PNG_ZLIB_HEADER
 
 #ifdef const
    /* zlib.h sometimes #defines const to nothing, undo this. */
 #  undef const
-#endif
+#endif /* const */
 
 /* zlib.h has mediocre z_const use before 1.2.6, this stuff is for compatibility
  * with older builds.
@@ -41,10 +41,10 @@
 #if ZLIB_VERNUM < 0x1260
 #  define PNGZ_MSG_CAST(s) png_constcast(char*,s)
 #  define PNGZ_INPUT_CAST(b) png_constcast(png_bytep,b)
-#else
+#else /* ZLIB_VERNUM >= 0x1260 */
 #  define PNGZ_MSG_CAST(s) (s)
 #  define PNGZ_INPUT_CAST(b) (b)
-#endif
+#endif /* ZLIB_VERNUM >= 0x1260 */
 
 /* zlib.h declares a magic type 'uInt' that limits the amount of data that zlib
  * can handle at once.  This type need be no larger than 16 bits (so maximum of
@@ -57,17 +57,17 @@
 #ifndef ZLIB_IO_MAX
 #  ifdef __COVERITY__
 #     define ZLIB_IO_MAX ((uInt)255U) /* else COVERITY whines */
-#  else
+#  else /* !COVERITY */
 #     define ZLIB_IO_MAX ((uInt)-1)
-#  endif /* COVERITY */
-#endif
+#  endif /* !COVERITY */
+#endif /* !ZLIB_IO_MAX */
 
 #ifdef PNG_WRITE_SUPPORTED
 /* The write compression control (allocated on demand).
  * TODO: use this for the read state too.
  */
 typedef struct png_zlib_state *png_zlib_statep;
-#endif
+#endif /* WRITE */
 
 /* Colorspace support; structures used in png_struct, png_info and in internal
  * functions to hold and communicate information about the color space.
@@ -114,13 +114,13 @@ typedef struct png_colorspace
 {
 #ifdef PNG_GAMMA_SUPPORTED
    png_fixed_point gamma;        /* File gamma */
-#endif
+#endif /* GAMMA */
 
 #ifdef PNG_COLORSPACE_SUPPORTED
    png_xy      end_points_xy;    /* End points as chromaticities */
    png_XYZ     end_points_XYZ;   /* End points as CIE XYZ colorant values */
    png_uint_16 rendering_intent; /* Rendering intent of a profile */
-#endif
+#endif /* COLORSPACE */
 
    /* Flags are always defined to simplify the code. */
    png_uint_16 flags;            /* As defined below */
@@ -182,7 +182,7 @@ typedef struct
        * during PNG_TC_INIT_FINAL.  The field is only used on read; write
        * transforms do not modify the gamma of the data.
        */
-#  endif
+#  endif /* READ_GAMMA */
    unsigned int       format;       /* As pngstruct::row_format below */
    unsigned int       range;        /* Count of range transforms */
 #  define PNG_TC_CHANNELS(tc) PNG_FORMAT_CHANNELS((tc).format)
@@ -364,7 +364,7 @@ struct png_struct_def
     * accessed.)
     */
    jmp_buf jmp_buf_local;
-#endif
+#endif /* SETJMP */
 
    /* Next the frequently accessed fields.  Many processors perform arithmetic
     * in the address pipeline, but frequently the amount of addition or
@@ -420,7 +420,7 @@ struct png_struct_def
    /* Options */
 #ifdef PNG_SET_OPTION_SUPPORTED
    png_uint_32 options;       /* On/off state (up to 16 options) */
-#endif
+#endif /* SET_OPTIONS */
 
 #ifdef PNG_READ_SUPPORTED
 #if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
@@ -428,13 +428,13 @@ struct png_struct_def
     * is in (just) the info_struct.
     */
    png_colorspace   colorspace;
-#endif
+#endif /* COLORSPACE || GAMMA */
 #endif /* READ */
 
    /* Transform handling */
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
    png_transformp transform_list; /* List of transformation to perform. */
-#endif
+#endif /* TRANSFORM_MECH */
 
    /* ROW BUFFERS and CONTROL
     *
@@ -442,9 +442,9 @@ struct png_struct_def
     * filter byte (which is in next_filter.)  All fields are only used during
     * IDAT processing and start of 0.
     */
-#if defined(PNG_WRITE_FILTER_SUPPORTED) || defined(PNG_READ_SUPPORTED)
+#ifdef PNG_READ_SUPPORTED
    png_bytep        row_buffer;          /* primary row buffer */
-#endif /* WRITE_FILTER || READ */
+#endif /* READ */
 #if (defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
      defined(PNG_READ_INTERLACING_SUPPORTED)) &&\
     defined(PNG_TRANSFORM_MECH_SUPPORTED)
@@ -482,10 +482,12 @@ struct png_struct_def
    unsigned int invalid_info;      /* PNG_INFO_* for invalidated chunks */
    unsigned int palette_updated:1; /* png_struct::palette changed */
 #endif /* READ_TRANSFORMS */
-
+#ifdef PNG_WRITE_SUPPORTED
+   unsigned int write_rows     :1; /* libpng has complete rows to write */
+#endif /* WRITE */
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
    unsigned int read_started   :1; /* at least one call to png_read_row */
-#endif
+#endif /* SEQUENTIAL_READ */
 #if defined (PNG_READ_INTERLACING_SUPPORTED) ||\
     defined (PNG_WRITE_INTERLACING_SUPPORTED)
    unsigned int do_interlace   :1; /* libpng handles the interlace */
@@ -574,7 +576,7 @@ struct png_struct_def
     * available to zlib during read decompression.
     */
    png_alloc_size_t read_buffer_size; /* current size of the buffer */
-#endif
+#endif /* READ */
 
 #if defined(PNG_SEQUENTIAL_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
    png_uint_32 IDAT_size;         /* limit on IDAT read and write IDAT size */
@@ -585,13 +587,13 @@ struct png_struct_def
    jmp_buf        *jmp_buf_ptr;   /* passed to longjmp_fn */
    png_longjmp_ptr longjmp_fn;    /* setjmp non-local goto function. */
    size_t          jmp_buf_size;  /* size of *jmp_buf_ptr, if allocated */
-#endif
+#endif /* SETJMP */
 
    /* Error/warning callbacks */
    png_error_ptr error_fn;        /* print an error message and abort */
 #ifdef PNG_WARNINGS_SUPPORTED
    png_error_ptr warning_fn;      /* print a warning and continue */
-#endif
+#endif /* WARNINGS */
    png_voidp     error_ptr;       /* user supplied data for the above */
 
    /* MEMORY ALLOCATION */
@@ -599,7 +601,7 @@ struct png_struct_def
    png_malloc_ptr malloc_fn; /* allocate memory */
    png_free_ptr   free_fn;   /* free memory */
    png_voidp      mem_ptr;   /* user supplied data for the above */
-#endif
+#endif /* USER_MEM */
 
    /* IO and BASIC READ/WRITE SUPPORT */
    png_voidp            io_ptr;       /* user supplied data for IO callbacks */
@@ -622,8 +624,7 @@ struct png_struct_def
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
    png_flush_ptr output_flush_fn; /* Function for flushing output */
-#endif
-
+#endif /* WRITE_FLUSH */
 #endif /* WRITE */
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
@@ -634,14 +635,14 @@ struct png_struct_def
     * - it is decremented as memory is allocated.
     */
    png_alloc_size_t user_chunk_malloc_max;
-#endif
+#endif /* SET_USER_LIMITS */
 #ifdef PNG_USER_LIMITS_SUPPORTED
    /* limit on total *number* of sPLT, text and unknown chunks that can be
     * stored.  0 means unlimited.  This field is a counter - it is decremented
     * as chunks are encountered.
     */
    png_uint_32 user_chunk_cache_max;
-#endif
+#endif /* USER_LIMITS */
 
    /* The progressive reader gets passed data and calls application handling
     * functions when appropriate.
@@ -672,7 +673,7 @@ struct png_struct_def
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_uint_32          io_state;     /* tells the app read/write progress */
-#endif
+#endif /* IO_STATE */
 
    /* UNKNOWN CHUNK HANDLING */
    /* TODO: this is excessively complicated, there are multiple ways of doing
@@ -686,12 +687,12 @@ struct png_struct_def
     * set_unknown_chunks interface.)
     */
    png_voidp user_chunk_ptr;
-#endif
+#endif /* USER_CHUNKS */
 
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
    /* This is called back from the unknown chunk handling */
    png_user_chunk_ptr     read_user_chunk_fn; /* user read chunk handler */
-#endif
+#endif /* READ_USER_CHUNKS */
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    png_uint_32  known_unknown;   /* Bit mask of known chunks to be treated as
@@ -703,7 +704,7 @@ struct png_struct_def
                                   * 'known & ~save'.
                                   */
 #  define png_IDATs_skipped(pp) (((pp)->known_unknown & ~(pp)->save_unknown)&1U)
-#else
+#else /* !SAVE_UNKNOWN_CHUNKS */
 #  define png_IDATs_skipped(pp) ((pp)->known_unknown & 1U)
 #endif /* !SAVE_UNKNOWN_CHUNKS */
 #endif /* HANDLE_AS_UNKNOWN */
@@ -713,7 +714,7 @@ struct png_struct_def
                                   * followed by a PNG_HANDLE_* byte */
    unsigned int unknown_default :2; /* As PNG_HANDLE_* */
    unsigned int num_chunk_list;  /* Number of entries in the list */
-#endif
+#endif /* SET_UNKNOWN_CHUNKS */
 
    /* COMPRESSION AND DECOMPRESSION SUPPORT.
     *
@@ -738,7 +739,7 @@ struct png_struct_def
    /* MNG SUPPORT */
 #ifdef PNG_MNG_FEATURES_SUPPORTED
    unsigned int mng_features_permitted :3;
-#endif
+#endif /* MNG_FEATURES */
 
    /* SCRATCH buffers, used when control returns to the application or a read
     * loop.

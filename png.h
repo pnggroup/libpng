@@ -1690,25 +1690,14 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  *    ignored if SUB is set; this is because these filter pairs are equivalent
  *    when there is no previous row.
  *
- * 2) PNG_SELECT_FILTER_METHODICALLY_SUPPORTED:
- *    If SELECT_FILTER_METHODICALLY is 'on' libpng tries all the filters in the
- *    list and selects the one which gives the shortest compressed row, favoring
- *    earlier filters.
+ * 2) PNG_SELECT_FILTER_SUPPORTED:
+ *    libpng will buffer rows until enough data is available to perform a
+ *    reasonable filter selection heuristic then select filters for at least the
+ *    first buffered row.
  *
- * 3) PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED:
- *    If SELECT_FILTER_HEURISTICALLY is 'on' libpng tests the start of each row
- *    (a few thousand bytes at most) to see which filter is likely to produce
- *    best compression.
- *
- * 4) If neither (2) nor (3) libpng selects the first filter in the list (there
- *    is no warning that this will happen - check the #defines if you need to
- *    know.)
- *
- * The seletion options are turned 'on' using png_set_option(method,
- * PNG_OPTION_ON) and turned off with PNG_OPTION_OFF.  If a selection method is
- * turned off it will never be used, if neither option is turned on or off (i.e.
- * if png_set_option is not called) the first supported option (2) or (3) will
- * be used.
+ * 3) !PNG_SELECT_FILTER_SUPPORTED:
+ *    libpng selects the first filter in the list (there is no warning that this
+ *    will happen - check the #defines if you need to know.)
  *
  * If you intend to use 'previous row' filters in an image set either the UP or
  * PAETH filter before the first call to png_write_row, depending on whether you
@@ -1717,12 +1706,6 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  * You can also select AVG on the first row; it uses half the value of the
  * preceding byte as a predictor and is not likely to have very good
  * performance.
- *
- * The SELECT_FILTER_METHODICALLY option is slow and memory intensive, but it is
- * almost certain to produce the smallest PNG file.  Depending on the image data
- * the HEURISTIC option may improve results significantly over the NONE filter
- * and it has little overall effect on compression speed, however it can
- * sometimes produce larger files than not using any filtering.
  */
 PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
     int filters));
@@ -1752,12 +1735,12 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
 #define PNG_FILTER_AVG         PNG_FILTER_MASK(PNG_FILTER_VALUE_AVG)
 #define PNG_FILTER_PAETH       PNG_FILTER_MASK(PNG_FILTER_VALUE_PAETH)
 
-/* Then two convenience values.  PNG_NO_FILTERS is the same as
+/* Then three convenience values.  PNG_NO_FILTERS is the same as
  * PNG_FILTER_VALUE_NONE, but this is harmless because they mean the same thing.
  */
-#define PNG_NO_FILTERS     0x00
-#define PNG_ALL_FILTERS    (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP | \
-   PNG_FILTER_AVG | PNG_FILTER_PAETH)
+#define PNG_NO_FILTERS   0x00
+#define PNG_FAST_FILTERS (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP)
+#define PNG_ALL_FILTERS  (PNG_FAST_FILTERS | PNG_FILTER_AVG | PNG_FILTER_PAETH)
 
 #ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
@@ -3629,9 +3612,7 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #define PNG_EXTENSIONS 0 /* BOTH: enable or disable extensions */
 #define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
 #define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#define PNG_SELECT_FILTER_HEURISTICALLY 6 /* SOFTWARE: see png_set_filter */
-#define PNG_SELECT_FILTER_METHODICALLY 8 /* SOFTWARE: see png_set_filter */
-#define PNG_OPTION_NEXT  10 /* Next option - numbers must be even */
+#define PNG_OPTION_NEXT  6 /* Next option - numbers must be even */
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */

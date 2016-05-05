@@ -67,18 +67,7 @@ png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 }
 #endif
 
-/* This function is called to output any data pending writing (normally
- * to disk).  After png_flush is called, there should be no data pending
- * writing in any buffers.
- */
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-void /* PRIVATE */
-png_flush(png_structrp png_ptr)
-{
-   if (png_ptr->output_flush_fn != NULL)
-      png_ptr->output_flush_fn(png_ptr);
-}
-
 #  ifdef PNG_STDIO_SUPPORTED
 void PNGCBAPI
 png_default_flush(png_structp png_ptr)

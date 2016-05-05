@@ -1609,10 +1609,10 @@ read_png(struct display *dp, const char *filename)
       png_alloc_size_t rb = png_get_rowbytes(dp->read_pp, dp->ip);
 
       /* The size calc can overflow. */
-      if (MAX_SIZE/rb < dp->h)
+      if ((MAX_SIZE-dp->h)/rb < dp->h)
          png_error(dp->read_pp, "image too large");
 
-      dp->size = rb * dp->h;
+      dp->size = rb * dp->h + dp->h/*filter byte*/;
    }
 
    display_clean_read(dp);
@@ -1826,18 +1826,21 @@ write_png(struct display *dp, const char *destname)
 static void
 set_windowBits_hi(struct display *dp)
 {
-   /* windowBits is in the range 8..15, but it is said that setting '8'
-    * prevents adequate search even if the image size is 256 bytes or less.
+   /* windowBits is in the range 8..15 but zlib maps '8' to '9' so it is only
+    * worth using if the data size is 256 byte or less.
     */
    int wb = MAX_WBITS; /* for large images */
    int i = VLSIZE(windowBits_IDAT);
 
-   while (wb > 9 && dp->size <= 1U<<(wb-1)) --wb;
+   while (wb > 8 && dp->size <= 1U<<(wb-1)) --wb;
 
    while (--i >= 0) if (VLNAME(windowBits_IDAT)[i].name == range_hi) break;
 
-   assert(i > 0); /* vl_windowBits_IDAT always has a RANGE() */
+   assert(i > 1); /* vl_windowBits_IDAT always has a RANGE() */
    VLNAME(windowBits_IDAT)[i].value = wb;
+
+   assert(VLNAME(windowBits_IDAT)[--i].name == range_lo);
+   VLNAME(windowBits_IDAT)[i].value = wb > 8 ? 9 : 8;
 }
 
 static int

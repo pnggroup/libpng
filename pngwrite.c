@@ -487,7 +487,8 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
     */
 #  ifdef PNG_WRITE_FLUSH_SUPPORTED
 #     ifdef PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED
-         png_flush(png_ptr);
+         if (png_ptr->output_flush_fn != NULL)
+            png_ptr->output_flush_fn(png_ptr);
 #     endif
 #  endif
 }
@@ -570,65 +571,6 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 
-/* Write a few rows of image data.  If the image is interlaced,
- * either you will have to write the 7 sub images, or, if you
- * have called png_set_interlace_handling(), you will have to
- * "write" the image seven times.
- */
-void PNGAPI
-png_write_rows(png_structrp png_ptr, png_bytepp row,
-    png_uint_32 num_rows)
-{
-   png_debug(1, "in png_write_rows");
-
-   if (png_ptr == NULL || row == NULL)
-      return;
-
-   /* Loop through the rows */
-   while (num_rows-- > 0)
-      png_write_row(png_ptr, *row++);
-}
-
-/* Write the image.  You only need to call this function once, even
- * if you are writing an interlaced image.
- */
-void PNGAPI
-png_write_image(png_structrp png_ptr, png_bytepp image)
-{
-   int num_pass; /* pass variables */
-
-   if (png_ptr == NULL || image == NULL)
-      return;
-
-   png_debug(1, "in png_write_image");
-
-#ifdef PNG_WRITE_INTERLACING_SUPPORTED
-   /* Initialize interlace handling.  If image is not interlaced,
-    * this will set pass to 1
-    */
-   num_pass = png_set_interlace_handling(png_ptr);
-#else
-   num_pass = 1;
-
-   if (png_ptr->interlaced)
-   {
-      png_app_error(png_ptr, "no interlace support");
-      return;
-   }
-#endif
-
-   /* Loop through passes */
-   while (num_pass-- > 0)
-   {
-      png_bytepp  rp = image; /* points to current row */
-      png_uint_32 num_rows = png_ptr->height;
-
-      /* Loop through image */
-      while (num_rows-- > 0)
-         png_write_row(png_ptr, *rp++);
-   }
-}
-
 #if defined(PNG_WRITE_INTERLACING_SUPPORTED) ||\
     defined(PNG_WRITE_TRANSFORMS_SUPPORTED)
 static void
@@ -707,10 +649,10 @@ write_row_buffered(png_structrp png_ptr,
          }
 #     endif /* WRITE_TRANSFORMS */
 
-      /* Call png_write_filter_row to write this block of data, the test on
+      /* Call png_write_png_data to write this block of data, the test on
        * maxpixels says if this is the final block in the row.
        */
-      png_write_filter_row(png_ptr, prev_pixels, pixel_buffer.buffer, x,
+      png_write_png_data(png_ptr, prev_pixels, pixel_buffer.buffer, x,
             max_pixels, row_info_flags);
    }
 }
@@ -824,47 +766,7 @@ interlace_row_byte(png_const_structrp png_ptr, png_bytep dp, png_const_bytep sp,
 }
 #endif /* WRITE_INTERLACING */
 
-static void
-write_row_unbuffered(png_structrp png_ptr, png_const_bytep row,
-      unsigned int row_info_flags)
-{
-   /* Split the row into blocks of the appropriate size: */
-   const unsigned int input_depth = png_ptr->row_input_pixel_depth;
-   unsigned int max_pixels = png_max_pixel_block(png_ptr);
-   png_uint_32 max_bytes = max_pixels;
-   const unsigned int pass = png_ptr->pass;
-   const png_uint_32 width = png_ptr->interlaced == PNG_INTERLACE_NONE ?
-      png_ptr->width : PNG_PASS_COLS(png_ptr->width, pass);
-   png_uint_32 x;
-   png_byte prev_pixels[4*2*2]; /* 2 pixels up to 4 2-byte channels each */
-
-   /* max_pixels is at most 16 bits, input_depth is at most 64, so the product
-    * always fits in 32 bits:
-    */
-   max_bytes *= input_depth; /* bits */
-   debug(input_depth <= 64 && (max_bytes & 7U) == 0U);
-   max_bytes >>= 3;
-
-   memset(prev_pixels, 0U, sizeof prev_pixels);
-
-   for (x = 0U; x < width; x += max_pixels, row += max_bytes)
-   {
-      if (max_pixels > width - x)
-      {
-         max_bytes = width - x;
-         max_pixels = (unsigned int)/*SAFE*/max_bytes;
-         max_bytes = (max_bytes * input_depth + 7U) >> 3;
-      }
-
-      debug((row_info_flags & png_row_end) == 0U); /* must be set here at end */
-      if (x + max_pixels >= width)
-         row_info_flags |= png_row_end;
-
-      png_write_filter_row(png_ptr, prev_pixels, row, x, max_pixels,
-            row_info_flags);
-   }
-}
-
+#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
 static void
 write_row_core(png_structrp png_ptr, png_const_bytep row,
       unsigned int row_info_flags)
@@ -880,7 +782,8 @@ write_row_core(png_structrp png_ptr, png_const_bytep row,
    /* If control reaches this point the intermediate buffer is not required and
     * the input data can be used unmodified.
     */
-   write_row_unbuffered(png_ptr, row, row_info_flags);
+   png_write_png_rows(png_ptr, &row, 1U);
+   PNG_UNUSED(row_info_flags)
 }
 
 /* Write a single non-interlaced row. */
@@ -888,75 +791,53 @@ static void
 write_row_non_interlaced(png_structrp png_ptr, png_const_bytep row)
 {
    const png_uint_32 row_number = png_ptr->row_number+1U;
-   const int last_pass_row = row_number == png_ptr->height;
-
    /* There is only one pass, so this is the last pass: */
-   write_row_core(png_ptr, row,
-         (row_number == 1U ? png_pass_first_row : 0) |
-         (last_pass_row ? png_pass_last_row : 0) |
-         png_pass_last);
+   const unsigned int row_info_flags =
+      (row_number == 1U ? png_pass_first_row : 0) |
+      (row_number >= png_ptr->height ? png_pass_last_row : 0) |
+      png_pass_last;
 
-   if (!last_pass_row)
-      png_ptr->row_number = row_number;
+   debug(png_ptr->interlaced == PNG_INTERLACE_NONE);
 
-   else
-   {
-      png_ptr->row_number = 0U;
-      png_ptr->pass = 7U;
-   }
+   write_row_core(png_ptr, row, row_info_flags);
 }
 
 /* Write a single interlaced row. */
 static void
 write_row_interlaced(png_structrp png_ptr, png_const_bytep row)
 {
-   /* row_number is the row in the pass.  The app must only call png_write_row
-    * the correct number of times.  'pass' is set to 7U after the end.
-    */
    const png_uint_32 row_number = png_ptr->row_number+1U;
-   unsigned int pass = png_ptr->pass;
-   const int last_pass_row = row_number == PNG_PASS_ROWS(png_ptr->height, pass);
+   const png_uint_32 height = png_ptr->height;
+   const unsigned int pass = png_ptr->pass;
+   const unsigned int row_info_flags =
+      (row_number == 1U ? png_pass_first_row : 0) |
+      (row_number == PNG_PASS_ROWS(height, pass) ? png_pass_last_row : 0) |
+      (pass == PNG_LAST_PASS(png_ptr->width, height) ? png_pass_last : 0);
 
-   write_row_core(png_ptr, row,
-         (row_number == 1U ? png_pass_first_row : 0) |
-         (last_pass_row ? png_pass_last_row : 0) |
-         (pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) ?
-                                png_pass_last : 0));
+#  ifdef PNG_WRITE_INTERLACING_SUPPORTED
+      /* Check that libpng is not doing the interlace: */
+      debug(png_ptr->interlaced != PNG_INTERLACE_NONE &&
+            !png_ptr->do_interlace);
+#  endif /* WRITE_INTERLACING */
 
-   if (!last_pass_row)
-      png_ptr->row_number = row_number;
-
-   else
-   {
-      png_ptr->row_number = 0U;
-
-      do
-         ++pass;
-      while (pass < 7U &&
-             !PNG_PASS_IN_IMAGE(png_ptr->width, png_ptr->height, pass));
-
-      png_ptr->pass = 0x7U & pass;
-   }
+   write_row_core(png_ptr, row, row_info_flags);
 }
+#endif /* WRITE_TRANSFORMS */
 
 #ifdef PNG_WRITE_INTERLACING_SUPPORTED
 /* Interlace a row then write it out. */
-static int
+static void
 interlace_row(png_structrp png_ptr, png_const_bytep row)
 {
-   /* row_number is in the image, it may not be in the pass and, likewise, the
-    * pass may not exist.
-    */
+   /* The row may not exist in the image (for this pass). */
    const png_uint_32 row_number = png_ptr->row_number; /* in image */
    const unsigned int pass = png_ptr->pass;
-   const int write_row = png_ptr->width > PNG_PASS_START_COL(pass) &&
-                         PNG_ROW_IN_INTERLACE_PASS(row_number, pass);
 
-   if (write_row)
+   if (png_ptr->width > PNG_PASS_START_COL(pass) &&
+       PNG_ROW_IN_INTERLACE_PASS(row_number, pass))
    {
       const unsigned int row_info_flags =
-         (row_number == PNG_PASS_START_ROW(pass) ?
-            png_pass_first_row : 0) |
+         (row_number == PNG_PASS_START_ROW(pass) ? png_pass_first_row : 0) |
          (PNG_LAST_PASS_ROW(row_number, pass, png_ptr->height) ?
             png_pass_last_row : 0) |
          (pass == PNG_LAST_PASS(png_ptr->width, png_ptr->height) ?
@@ -991,79 +872,214 @@ interlace_row(png_structrp png_ptr, png_const_bytep row)
                      interlace_row_byte, input_depth >> 3);
                break;
          }
-      }
+      } /* pass < 6 */
 
-      else /* pass 6; no interlacing required */
+      else /* pass 6: no interlacing required */
          write_row_core(png_ptr, row, row_info_flags);
    }
 
-   if (row_number+1U < png_ptr->height)
-      png_ptr->row_number = row_number+1U;
-
    else
    {
-      png_ptr->row_number = 0U;
-      png_ptr->pass = 0x7U & (pass+1U);
-   }
+      /* This code must advance row_number/pass itself; the row has been
+       * skipped.
+       */
+      if (row_number+1U < png_ptr->height)
+         png_ptr->row_number = row_number+1U;
 
-   return write_row;
+      else
+      {
+         png_ptr->row_number = 0U;
+         png_ptr->pass = 0x7U & (pass+1U);
+      }
+   }
 }
 #endif /* WRITE_INTERLACING */
 
-/* Called by user to write a row of image data */
-void PNGAPI
-png_write_row(png_structrp png_ptr, png_const_bytep row)
+/* Bottleneck API to actually write a number of rows, only exists because the
+ * rows parameter to png_write_rows is wrong.
+ */
+static void
+png_write_rows_internal(png_structrp png_ptr, png_const_bytep *rows,
+      png_uint_32 num_rows)
 {
-   if (png_ptr != NULL)
+   if (png_ptr != NULL && num_rows > 0U && rows != NULL)
    {
-      const unsigned int pass = png_ptr->pass;
-      const png_uint_32 row_number = png_ptr->row_number;
-
       /* Unlike the read code initialization happens automatically: */
-      if (row_number == 0 && pass == 0)
-         png_write_start_IDAT(png_ptr); /* doesn't change row/pass/width */
+      if (png_ptr->row_number == 0U && png_ptr->pass == 0U)
+      {
+         png_init_row_info(png_ptr);
 
-      else if (pass == 7U) /* too many calls; write already ended */
+#        ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+         /* If the app takes a png_info from a read operation and if the app has
+          * performed transforms on the data the png_info can contain IHDR
+          * information that cannot be represented in PNG.  The code that writes
+          * the IHDR takes the color type from the png_info::format.  The app
+          * adds transforms, before or after writing the IHDR, then the IHDR
+          * color_type stored in png_struct::color_type is used in
+          * png_init_row_info above to work out the actual row format.
+          *
+          * Prior to 1.7.0 this was not verified (there was no easy way to do
+          * so).  Now we can check it here, however this is an:
+          *
+          * API CHANGE: in 1.7.0 an error may be flagged against bogus
+          * info_struct formats even though the app had removed them itself.
+          * It's just a warning at present.
+          *
+          * The test is that either the row_format produced by the write
+          * transforms exactly matches that in the original info_struct::format
+          * or that the info_struct::format was a simple mapping of the
+          * color_type that ended up in the IHDR:
+          */
+         if (png_ptr->row_format != png_ptr->info_format &&
+             PNG_FORMAT_FROM_COLOR_TYPE(png_ptr->color_type) !=
+               png_ptr->info_format)
+            png_app_warning(png_ptr, "info_struct format does not match IHDR");
+#        endif /* WRITE_TRANSFORMS */
+
+         /* Perform initialization required before IDATs are written. */
+         png_write_start_IDAT(png_ptr);
+      }
+
+      else if (png_ptr->pass >= 7U) /* too many calls; write already ended */
       {
          debug(png_ptr->row_number == 0U);
          png_app_error(png_ptr, "Too many calls to png_write_row");
          return;
       }
 
-      /* Make sure there is a row to write: */
-      if (row == NULL)
-      {
-         png_app_error(png_ptr, "NULL row pointer to png_write_row");
-         return;
-      }
-
-      if (png_ptr->interlaced == PNG_INTERLACE_NONE)
-         write_row_non_interlaced(png_ptr, row);
+      /* The remainder of these tests detect internal errors in libpng */
+      else if (png_ptr->interlaced == PNG_INTERLACE_NONE)
+         affirm(png_ptr->row_number < png_ptr->height && png_ptr->pass == 0U);
 
 #     ifdef PNG_WRITE_INTERLACING_SUPPORTED
-         /* Optional: libpng does the interlacing, app passes every row of the
-          * image the required number of times.
-          */
-         else if (png_ptr->do_interlace != 0U)
-         {
-            if (!interlace_row(png_ptr, row))
-               return; /* row skipped; skip the write callback */
-         }
-#     endif
+         else if (png_ptr->do_interlace)
+            affirm(png_ptr->row_number < png_ptr->height);
+#     endif /* WRITE_INTERLACING */
 
-      else /* app does the interlacing */
-         write_row_interlaced(png_ptr, row);
+      else /* app does interlace */
+         affirm(
+            PNG_PASS_IN_IMAGE(png_ptr->width, png_ptr->height, png_ptr->pass) &&
+            png_ptr->row_number < PNG_PASS_ROWS(png_ptr->height, png_ptr->pass)
+         );
 
-      /* API CHANGE: 1.7.0: this is now called after png_struct::row_number and
-       * png_struct::pass have been updated and, at the end of the image, after
-       * the deflate stream has been closed.  The order of the call with respect
-       * to the flush operation has also changed.  The callback can't discover
-       * any of this unless it relies on the write callbacks to find the row
-       * data, and that was never predictable.
+      /* First handle rows that require buffering because of the need to
+       * interlace them or the need to perform write transforms.
        */
-      if (png_ptr->write_row_fn != NULL)
-         (*(png_ptr->write_row_fn))(png_ptr, row_number, pass);
-   } /* png_ptr != NULL */
+#     ifdef PNG_WRITE_INTERLACING_SUPPORTED
+         /* libpng is doing the interlacing, but this only makes a difference to
+          * the first six passes (numbered, in libpng, 0..5); the seventh pass
+          * (numbered 6 by libpng) consists of complete image rows.
+          */
+         if (png_ptr->do_interlace) while (num_rows > 0U && png_ptr->pass < 6)
+            interlace_row(png_ptr, *rows++), --num_rows;
+#     endif /* WRITE_INTERLACING */
+
+#     ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+         /* Transforms required however the row interlacing has already been
+          * handled and we have a complete (PNG) row.
+          */
+         if (png_ptr->transform_list != NULL)
+         {
+            if (png_ptr->interlaced == PNG_INTERLACE_NONE)
+               while (num_rows > 0U)
+                  write_row_non_interlaced(png_ptr, *rows++), --num_rows;
+
+#           ifdef PNG_WRITE_INTERLACING_SUPPORTED
+               else if (png_ptr->do_interlace)
+                  while (num_rows > 0U)
+                     interlace_row(png_ptr, *rows++), --num_rows;
+#           endif /* WRITE_INTERLACING */
+
+            else /* app does the interlacing */
+               while (num_rows > 0U)
+                  write_row_interlaced(png_ptr, *rows++), --num_rows;
+         }
+#     endif /* WRITE_TRANSFORMS */
+
+      /* Finally handle any remaining rows that require no (libpng) interlace
+       * and no transforms.
+       */
+      if (num_rows > 0U)
+         png_write_png_rows(png_ptr, rows, num_rows);
+
+      /* Repeat the checks above, but allow for end-of-image. */
+      if (png_ptr->pass < 7U)
+      {
+         if (png_ptr->interlaced == PNG_INTERLACE_NONE)
+            affirm(png_ptr->row_number < png_ptr->height &&
+                   png_ptr->pass == 0U);
+
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
+            else if (png_ptr->do_interlace)
+               affirm(png_ptr->row_number < png_ptr->height);
+#        endif /* WRITE_INTERLACING */
+
+         else /* app does interlace */
+            affirm(PNG_PASS_IN_IMAGE(png_ptr->width, png_ptr->height,
+                                     png_ptr->pass) &&
+                   png_ptr->row_number <
+                     PNG_PASS_ROWS(png_ptr->height, png_ptr->pass));
+      }
+   } /* png_ptr, rows, num_rows all valid */
+
+   else if (png_ptr != NULL)
+      png_app_warning(png_ptr, "Missing rows to row write API");
+}
+
+/* ROW WRITE APIs */
+/* Called by user to write a single row of image data */
+void PNGAPI
+png_write_row(png_structrp png_ptr, png_const_bytep row)
+{
+   png_debug(1, "in png_write_row");
+   png_write_rows_internal(png_ptr, &row, 1U);
+}
+
+/* Write a few rows of image data.  If the image is interlaced,
+ * either you will have to write the 7 sub images, or, if you
+ * have called png_set_interlace_handling(), you will have to
+ * "write" the image seven times.
+ */
+void PNGAPI
+png_write_rows(png_structrp png_ptr, png_bytepp rows, png_uint_32 num_rows)
+{
+   png_debug(1, "in png_write_rows");
+
+   if (png_ptr != NULL)
+      png_write_rows_internal(png_ptr, png_constcast(png_const_bytep*,rows),
+            num_rows);
+}
+
+/* Write the image.  You only need to call this function once, even
+ * if you are writing an interlaced image.
+ */
+void PNGAPI
+png_write_image(png_structrp png_ptr, png_bytepp image)
+{
+   png_debug(1, "in png_write_image");
+
+   if (png_ptr != NULL)
+   {
+      int num_pass = 1;
+
+      /* The image is always an non-interlaced image.  To write it as interlaced
+       * interlace handling must be present:
+       */
+      if (png_ptr->interlaced)
+      {
+#        ifdef PNG_WRITE_INTERLACING_SUPPORTED
+            num_pass = png_set_interlace_handling(png_ptr);
+#        else /* !WRITE_INTERLACING */
+            /* There is no recovery because the IHDR has already been written.
+             */
+            png_error(png_ptr, "No interlace support");
+#        endif /* !WRITE_INTERLACING */
+      }
+
+      /* And write the whole thing, 7 times if interlacing it: */
+      for (; num_pass > 0; --num_pass)
+         png_write_rows(png_ptr, image, png_ptr->height);
+   }
 }
 
 /* Free any memory used in png_ptr struct without freeing the struct itself. */
@@ -1074,10 +1090,6 @@ png_write_destroy(png_structrp png_ptr)
 
    png_deflate_destroy(png_ptr);
 
-#ifdef PNG_WRITE_FILTER_SUPPORTED
-   png_free(png_ptr, png_ptr->row_buffer);
-   png_ptr->row_buffer = NULL;
-#endif /* WRITE_FILTER */
 #ifdef PNG_TRANSFORM_MECH_SUPPORTED
    png_transform_free(png_ptr, &png_ptr->transform_list);
 #endif

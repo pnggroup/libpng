@@ -1080,10 +1080,6 @@ PNG_INTERNAL_FUNCTION(int,png_crc_finish,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_calculate_crc,(png_structrp png_ptr,
    png_const_voidp ptr, png_size_t length),PNG_EMPTY);
 
-#ifdef PNG_WRITE_FLUSH_SUPPORTED
-PNG_INTERNAL_FUNCTION(void,png_flush,(png_structrp png_ptr),PNG_EMPTY);
-#endif
-
 /* Write various chunks */
 
 /* Write the IHDR chunk, and update the png_struct with the necessary
@@ -1199,9 +1195,9 @@ PNG_INTERNAL_FUNCTION(void,png_write_sCAL_s,(png_structrp png_ptr,
 #endif
 
 #ifdef PNG_WRITE_SUPPORTED
-/* Initialize the row compression mechanism. */
-PNG_INTERNAL_FUNCTION(void, png_write_start_IDAT, (png_structp png_ptr),
-   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_write_start_IDAT,(png_structrp png_ptr),
+      PNG_EMPTY);
+   /* Do any required initialization before IDAT or row processing starts. */
 
 /* Choose the best filter to use and filter the row data then write it out.  If
  * WRITE_FILTERING is not supported this just writes the data out with a zero
@@ -1226,10 +1222,20 @@ enum
 #  define PNG_IDAT_END(f) (((f) & ~png_pass_first_row) == \
       (png_row_end+png_pass_last_row+png_pass_last))
 };
-PNG_INTERNAL_FUNCTION(void, png_write_filter_row, (png_structrp png_ptr,
+PNG_INTERNAL_FUNCTION(void,png_write_png_data,(png_structrp png_ptr,
     png_bytep prev_pixels, png_const_bytep unfiltered_row, png_uint_32 x,
     unsigned int width/*pixels*/, unsigned int row_info_flags),
    PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void,png_write_png_rows,(png_structrp png_ptr,
+    png_const_bytep *rows, png_uint_32 num_rows), PNG_EMPTY);
+   /* As above but rows[num_rows] of correctly (PNG) formated but unfiltered
+    * data are passed in.  For an interlaced image the rows will be interlaced
+    * rows and therefore may be narrower than the image width.
+    *
+    * This function advances png_structp::pass and png_structp::row_number as
+    * required.
+    */
 
 /* Release memory used by the deflate mechanism */
 PNG_INTERNAL_FUNCTION(void, png_deflate_destroy, (png_structp png_ptr),
