@@ -30,6 +30,7 @@ Finally, configure libpng with -DPNG_INTEL_SSE in CPPFLAGS:
 
    ./autogen.sh --maintainer
    CPPFLAGS="-DPNG_INTEL_SSE" ./configure [options]
+   make CPPFLAGS="-DPNG_INTEL_SSE" [options]
    make
 
 II. Using a custom makefile:
@@ -40,10 +41,10 @@ PNG_INTEL_SSE.
 
 III. Using manually updated "configure" scripts:
 
-If you prefer, manually edit configure.ac and Makefile.am, following the
-instructions below, then follow the instructions in section II of INSTALL
-in the main libpng directory, then configure libpng with -DPNG_INTEL_SSE
-in CPPFLAGS.
+If you prefer, manually edit pngpriv.h, configure.ac, and Makefile.am,
+following the instructions below, then follow the instructions in
+section II of INSTALL in the main libpng directory, then configure libpng
+with -DPNG_INTEL_SSE in CPPFLAGS.
 
 1. Insert the following lines above the copyright line near the top of
 configure.ac:

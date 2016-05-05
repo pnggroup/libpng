@@ -1,4 +1,4 @@
-Libpng 1.6.22beta06 - May 2, 2016
+Libpng 1.6.22beta06 - May 5, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -91,7 +91,7 @@ Version 1.6.22beta05 [April 27, 2016]
   Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
     (Bug report by Y.Ohashik).
 
-Version 1.6.22beta06 [May 2, 2016]
+Version 1.6.22beta06 [May 5, 2016]
   Rebased contrib/intel_sse.patch.
   Quieted two Coverity issues in contrib/libtests/timepng.c.
   Fixed issues with scripts/genout.cmake.in (David Capello, Nixon Kwok):
