@@ -3341,7 +3341,7 @@ huffman_metric(png_byte prefix, png_const_bytep data, size_t length)
     * Huffman code length limit of 15, so any symbol must occupy at least
     * 1/32768 of the code space.  Zlib also shows some unexpected behavior with
     * window size increases; data compression can decrease, leading me (JB
-    * 20160202) to hypothesise that the addition of extra, infrequently used,
+    * 20160202) to hypothesize that the addition of extra, infrequently used,
     * zlib length codes damages the overall compression by reducing the
     * efficiency of the Huffman coding.
     *

@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta80 - March 9, 2016
+Libpng 1.7.0beta80 - May 5, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1264,7 +1264,25 @@ Version 1.7.0beta79 [March 9, 2016]
     (Robert C. Seacord). Various other flags in png.h made unsigned as well.
   Fixed some misleading indentation (Krishnaraj Bhat).
 
-Version 1.7.0beta80 [March 9, 2016]
+Version 1.7.0beta80 [May 5, 2016]
+  Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
+    Bug report by (Y.Ohashik).
+  Write code update (John Bowler):
+    Implemented better defaulting of zlib settings based on image properties.
+    Replaced pngtest.png with one compressed with the new zlib settings.
+    Implemented pass-through of png_write_rows when the rows can be used
+      directly (a common case) optimizing the handling of previous-row
+      buffering.
+    Removed the METHODICAL filter selection method and disabled the HEURISTIC
+      one.  The first was ridiculously slow (though useful for experiments),
+      and the second didn't work. Filter selection is temporarily disabled (it
+      defaults to the lowest numbered filter in the list; typically 'none').
+    New handling of compression settings (incomplete), new PNG compression level
+      (not yet visible in an API).
+    Back ported 'PNG_FAST_FILTERS' from 1.6 (in png.h).
+    There are minimal API changes beyond removal of the selection options.
+      Work is still to be done to investigate a filter selection mechanism that
+      is at least as good as the previous one.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
