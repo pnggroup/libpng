@@ -328,6 +328,7 @@ struct display
    int              bpp;
    png_byte         ct;
    int              no_warnings;       /* Do not output libpng warnings */
+   int              min_windowBits;    /* The windowBits range is 8..8 */
 
    /* Options handling */
    png_uint_32      results;           /* A mask of errors seen */
@@ -389,6 +390,7 @@ display_init(struct display *dp)
    dp->read_pp = NULL;
    dp->ip = NULL;
    dp->write_pp = NULL;
+   dp->min_windowBits = -1; /* this is an OPTIND, so -1 won't match anything */
 #  if PNG_LIBPNG_VER < 10700
       dp->text_ptr = NULL;
       dp->num_text = 0;
@@ -775,8 +777,12 @@ push_opt(struct display *dp, unsigned int sp, png_byte opt, int search)
    if (opt_list_end(dp, opt, entry))
    {
       dp->stack[sp].end = 1;
-      display_log(dp, APP_WARNING, "%s: only testing one value",
-            options[opt].name);
+      /* Skip the warning if pngcp did this itself.  See the code in
+       * set_windowBits_hi.
+       */
+      if (opt != dp->min_windowBits)
+         display_log(dp, APP_WARNING, "%s: only testing one value",
+               options[opt].name);
    }
 
    else
@@ -1194,7 +1200,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    {
       /* Changing windowBits for strategies that do not search the window is
        * pointless.  Huffman-only does not search, RLE only searchs backwards
-       * one byte, so give that the maximum string length is 258, a windowBits
+       * one byte, so given that the maximum string length is 258, a windowBits
        * of 9 is always sufficient.
        */
       if (dp->value[istrat] == Z_HUFFMAN_ONLY)
@@ -1841,6 +1847,13 @@ set_windowBits_hi(struct display *dp)
 
    assert(VLNAME(windowBits_IDAT)[--i].name == range_lo);
    VLNAME(windowBits_IDAT)[i].value = wb > 8 ? 9 : 8;
+
+   /* If wb == 8 then any search has been restricted to just one windowBits
+    * entry.  Record that here to avoid producing a spurious app-level warning
+    * above.
+    */
+   if (wb == 8)
+      dp->min_windowBits = OPTIND(dp, windowBits);
 }
 
 static int

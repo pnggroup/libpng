@@ -1211,10 +1211,11 @@ PNG_INTERNAL_FUNCTION(void,png_write_start_IDAT,(png_structrp png_ptr),
  */
 enum
 {
-   png_row_end        =0x1U, /* This is the last block in the row */
-   png_pass_first_row =0x2U, /* This is the first row in a pass */
-   png_pass_last_row  =0x4U, /* This is the last row in a pass */
-   png_pass_last      =0x8U  /* This is the last pass in the image */
+   png_pass_last      =0x1U, /* This is the last pass in the image */
+   png_pass_last_row  =0x2U, /* This is the last row in a pass */
+   png_pass_first_row =0x4U, /* This is the first row in a pass */
+   png_row_end        =0x8U, /* This is the last block in the row */
+   png_no_row_info    =0x0U  /* Placeholder */
 
    /* A useful macro; return true if this is the last block of the last row in
     * the image.

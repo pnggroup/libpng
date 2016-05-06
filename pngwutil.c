@@ -850,17 +850,6 @@ typedef struct png_zlib_state
        */
       png_bytep        previous_write_row;
       png_alloc_size_t write_row_size;        /* Actual size of the buffers */
-      png_alloc_size_t write_buffer_limit;    /* Limit on total allocation */
-
-#     ifdef PNG_SELECT_FILTER_SUPPORTED
-         png_bytep       *saved_rows;         /* Rows saved by libpng */
-         png_bytep        saved_filters;      /* Filters for those rows */
-         png_alloc_size_t saved_offset;       /* First saved bytes in: */
-         png_uint_32      saved_first;        /* First buffer in use */
-         png_uint_32      maximum_saved_rows; /* Size of the above buffers */
-         png_uint_32      current_saved_rows;
-#     endif /* SELECT_FILTER */
-
       png_uint_32      save_row_count;        /* Total number to be buffered */
 #     define SAVE_ROW_COUNT_UNSET 0xFFFFFFFFU
 
@@ -905,7 +894,6 @@ png_create_zlib_state(png_structrp png_ptr)
    png_zlib_compress_init(png_ptr, &ps->s);
 
 #  ifdef PNG_WRITE_FILTER_SUPPORTED
-      ps->write_buffer_limit = PNG_COMPRESSION_BUFFER_LIMIT;
       ps->save_row_count = SAVE_ROW_COUNT_UNSET;
 #  endif /* WRITE_FILTER */
 #  ifdef PNG_WRITE_FLUSH_SUPPORTED
@@ -925,40 +913,13 @@ png_deflate_release(png_structrp png_ptr, png_zlib_statep ps, int check)
 {
 #  ifdef PNG_WRITE_FILTER_SUPPORTED
       /* Free any mode-specific data that is owned here: */
-#     ifdef PNG_SELECT_FILTER_SUPPORTED
-         if (ps->saved_rows != NULL)
-         {
-            /* If the saved row array was allocated the previous row pointer was
-             * *not* allocated.  Free any saved row memory:
-             */
-            png_bytep *save = ps->saved_rows;
-            png_uint_32 i = ps->maximum_saved_rows;
-
-            ps->saved_rows = NULL;
-
-            while (i > 0)
-               png_free(png_ptr, save[--i]);
-
-            png_free(png_ptr, save);
-
-            if (ps->saved_filters != NULL)
-            {
-               png_bytep p = ps->saved_filters;
-               ps->saved_filters = NULL;
-               png_free(png_ptr, p);
-            }
-         }
-
-         else
-#     else /* !SELECT_FILTER */
-         if (ps->previous_write_row != NULL)
-         {
-            /* No saved rows, so the previous row buffer was allocated: */
-            png_bytep p = ps->previous_write_row;
-            ps->previous_write_row = NULL;
-            png_free(png_ptr, p);
-         }
-#     endif /* !SELECT_FILTER */
+      if (ps->previous_write_row != NULL)
+      {
+         /* No saved rows, so the previous row buffer was allocated: */
+         png_bytep p = ps->previous_write_row;
+         ps->previous_write_row = NULL;
+         png_free(png_ptr, p);
+      }
 #  endif /* WRITE_FILTER */
 
    /* The main z_stream opaque pointer needs to remain set to png_ptr; it is
@@ -1048,27 +1009,41 @@ png_deflate_destroy(png_structrp png_ptr)
 static void
 fix_cinfo(png_zlib_statep ps, png_bytep data, png_alloc_size_t data_size)
 {
-   /* Do this if the data is 256 bytes or less and the CINFO field is '1',
-    * meaning windowBits of 8.  The first byte of the stream is the CMF value,
-    * CINFO is in the upper four bits.
+   /* Do this if the CINFO field is '1', meaning windowBits of 9.  The first
+    * byte of the stream is the CMF value, CINFO is in the upper four bits.
     *
     * If zlib didn't futz with the value then it should match the value in
     * pz_current; check this is debug.  (See below for why this works in the
     * pz_default_settings call.)
     */
 #  define png_ptr png_voidcast(png_const_structrp, ps->s.zs.opaque)
-   if (data_size <= 256U && data[0] == 0x18U &&
+   if (data[0] == 0x18U &&
        pz_get(ps, current, windowBits, 0) == 8 /* i.e. it was requested */)
    {
-      unsigned int d1;
-
-      data[0] = 0x08U;
-      /* The header checksum must be fixed too.  The FCHECK (low 5 bits) make
-       * CMF.FLG a multiple of 31:
+      /* Double check this here; the fixup only works if the data was 256 bytes
+       * or shorter *or* the window is never used.  For safety repeat the checks
+       * done in pz_default_settings; technically we should be able to just skip
+       * this test.
+       *
+       * TODO: set a 'fixup' flag in zlib_state to make this quicker?
        */
-      d1 = data[1] & 0xE0U; /* top three bits */
-      d1 += 31U - (0x0800U + d1) % 31U;
-      data[1] = PNG_BYTE(d1);
+      if (data_size <= 256U ||
+          pz_get(ps, current, strategy, Z_RLE) == Z_HUFFMAN_ONLY ||
+          pz_get(ps, current, level, 1) == Z_NO_COMPRESSION)
+      {
+         unsigned int d1;
+
+         data[0] = 0x08U;
+         /* The header checksum must be fixed too.  The FCHECK (low 5 bits) make
+          * CMF.FLG a multiple of 31:
+          */
+         d1 = data[1] & 0xE0U; /* top three bits */
+         d1 += 31U - (0x0800U + d1) % 31U;
+         data[1] = PNG_BYTE(d1);
+      }
+
+      else /* pz_default_settings is expected to guarantee the above */
+         NOT_REACHED;
    }
 
    else
@@ -1153,7 +1128,11 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
              * Z_DEFAULT_COMPRESSION is, in fact, level 6 so Mark seems to
              * concur.
              */
-            zlib_level = png_level;
+            if (png_level < 9)
+               zlib_level = png_level;
+
+            else /* PNG compression level 10; the ridiculous level */
+               zlib_level = 9;
             break;
       }
 
@@ -1231,15 +1210,14 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
              */
             switch (zlib_level)
             {
-               case 0: /* no compression */
-                  test_size = 0U;
-                  break;
-
                case 1: case 2: case 3:
                   test_size = data_size / 8U;
                   break;
 
                default:
+                  /* This includes, implicitly, ZLIB_NO_COMPRESSION, but that
+                   * was eliminated in the 'if' above.
+                   */
                   test_size = data_size / 4U;
                   break;
 
@@ -3987,82 +3965,6 @@ png_write_start_IDAT(png_structrp png_ptr)
       if (write_row_size == 0U) /* row too large to buffer */
          ps->save_row_count = 0U;/* no buffering; filters will be NONE or SUB */
 
-#     ifdef PNG_SELECT_FILTER_SUPPORTED
-         else if ((src == SAVE_ROW_COUNT_UNSET && (mask & (mask-1)) != 0U)
-                        /* default to selection */ ||
-                  (src < SAVE_ROW_COUNT_UNSET && src >= 2U)
-                        /* app turned selection on */)
-         {
-            /* Filter selection support required.  save_row_count is a measure
-             * of the amount of PNG encoded but uncompressed data to use in
-             * making a filter selection plus one row for previous row filter
-             * handling.
-             *
-             * The amount of data buffered is limited by all of:
-             *
-             * 1) ps->write_buffer_limit
-             * 2) ps->save_row_count
-             * 3) png_ptr->height
-             */
-            if (src > png_ptr->height)
-               src = png_ptr->height;
-
-            if (src > 2U)
-            {
-               /* Check ps->write_buffer_limit too, this requires more
-                * calculation so is done last.  Notice that write_buffer_limit
-                * is the maximum number of bytes the deflate implementation
-                * requires, so the calculation here is to find out the minimum
-                * number of buffers to accomodate that limit.
-                *
-                * The calculation required is:
-                *
-                *    write_buffer_limit / PNG-row-bytes
-                *
-                * Where PNG-row-bytes is the actual PNG row bytes including the
-                * filter byte.  Unfortunately the latter calculation can
-                * overflow a 32-bit unsigned value.
-                */
-               const unsigned int pixel_bits = PNG_PIXEL_DEPTH(*png_ptr);
-
-#              if PNG_COMPRESSION_BUFFER_LIMIT > 0xFFFFFFFFU / 8U
-#                 error LibPNG COMPRESSION BUFFER LIMIT setting too large
-#              endif /* COMPRESSION_BUFFER_LIMIT test */
-
-               /* Therefore this will not overflow a png_uint_32: */
-               const png_alloc_size_t pixel_limit =
-                  (8U*ps->write_buffer_limit + pixel_bits - 1U)/pixel_bits;
-
-               if (pixel_limit < png_ptr->width)
-                  src = 2U; /* clamp to the minimum required */
-
-               else
-               {
-                  /* pixel_limit >= png_ptr->width, so this cannot overflow: */
-                  const png_alloc_size_t rb =
-                     PNG_ROWBYTES(pixel_bits, png_ptr->width);
-                  const png_alloc_size_t row_limit =
-                     (ps->write_buffer_limit + rb) / (rb+1U);
-
-                  if (row_limit < src)
-                     src = (png_uint_32)/*SAFE*/row_limit;
-
-                  if (src < 2U)
-                     src = 2U;
-               }
-            }
-
-            /* save_row_count will be just 1 for a single pixel high image, so
-             * an extra flag is required to record that filter selection is
-             * being done.
-             */
-            ps->save_row_count = src;
-            ps->do_select = 1U;
-         }
-
-         else
-#     endif /* SELECT_FILTER */
-
       /* If unset no filter selection is required (or, maybe, available),
        * respect the app setting if the buffering has been set to 'off' or
        * 'previous row':
@@ -4188,13 +4090,6 @@ png_write_png_data(png_structrp png_ptr, png_bytep prev_pixels,
 
    affirm(ps != NULL);
 
-#  ifdef PNG_SELECT_FILTER_SUPPORTED
-      /* The data will be buffered for later use. */
-      if (ps->do_select)
-         png_write_buffer_row(ps, unfiltered_row, x, width, row_info_flags);
-
-      else /* no filter selection */
-#  endif /* SELECT_FILTER */
    {
       const unsigned int bpp = png_ptr->row_output_pixel_depth;
       const unsigned int row_bits = width * bpp;
@@ -4239,19 +4134,11 @@ png_write_png_rows(png_structrp png_ptr, png_const_bytep *rows,
 
    affirm(ps != NULL);
 
-#  ifdef PNG_SELECT_FILTER_SUPPORTED
-      if (ps->do_select)
-         select_png_rows(ps, rows, num_rows);
+   /* Set the filter to use: */
+   png_write_start_row(ps);
 
-      else
-#  endif /* !SELECT_FILTER */
-   {
-      /* Set the filter to use: */
-      png_write_start_row(ps);
-
-      /* Now write all the rows with the same filter: */
-      write_png_rows(png_ptr, rows, num_rows);
-   }
+   /* Now write all the rows with the same filter: */
+   write_png_rows(png_ptr, rows, num_rows);
 }
 #else /* !WRITE_FILTER */
 void /* PRIVATE */

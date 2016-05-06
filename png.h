@@ -1226,11 +1226,12 @@ PNG_EXPORT(241, int, png_convert_to_rfc1123_buffer, (char out[29],
 
 #ifdef PNG_CONVERT_tIME_SUPPORTED
 /* Convert from a struct tm to png_time */
-PNG_EXPORT(24, void, png_convert_from_struct_tm, (png_timep ptime,
-    const struct tm * ttime));
+PNG_EXPORT(24, PNG_DEPRECATED void, png_convert_from_struct_tm,
+      (png_timep ptime, const struct tm * ttime));
 
 /* Convert from time_t to png_time.  Uses gmtime() */
-PNG_EXPORT(25, void, png_convert_from_time_t, (png_timep ptime, time_t ttime));
+PNG_EXPORT(25, PNG_DEPRECATED void, png_convert_from_time_t, (png_timep ptime,
+         time_t ttime));
 #endif /* CONVERT_tIME */
 
 #ifdef PNG_READ_EXPAND_SUPPORTED
