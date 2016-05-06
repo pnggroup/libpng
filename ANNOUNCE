@@ -1,4 +1,4 @@
-Libpng 1.6.22beta06 - May 5, 2016
+Libpng 1.6.22beta07 - May 6, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.22beta06.tar.xz (LZMA-compressed, recommended)
-   1.6.22beta06.tar.gz
+   1.6.22beta07.tar.xz (LZMA-compressed, recommended)
+   1.6.22beta07.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1622b06.7z  (LZMA-compressed, recommended)
-   lp1622b06.zip
+   lp1622b07.7z  (LZMA-compressed, recommended)
+   lp1622b07.zip
 
 Other information:
 
-   1.6.22beta06-README.txt
-   1.6.22beta06-LICENSE.txt
-   libpng-1.6.22beta06-*.asc (armored detached GPG signatures)
+   1.6.22beta07-README.txt
+   1.6.22beta07-LICENSE.txt
+   libpng-1.6.22beta07-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.21):
 
@@ -98,6 +98,8 @@ Version 1.6.22beta06 [May 5, 2016]
     Added support to use multiple directories in ZLIBINCDIR variable,
     Fixed CMAKE_C_FLAGS with multiple values when genout is compiled on MSVC,
     Fixed pnglibconf.c compilation on OS X including the sysroot path.
+
+Version 1.6.22beta07 [May 6, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
