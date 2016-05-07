@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta80 - May 5, 2016
+Libpng 1.7.0beta80 - May 6, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1264,9 +1264,10 @@ Version 1.7.0beta79 [March 9, 2016]
     (Robert C. Seacord). Various other flags in png.h made unsigned as well.
   Fixed some misleading indentation (Krishnaraj Bhat).
 
-Version 1.7.0beta80 [May 5, 2016]
+Version 1.7.0beta80 [May 6, 2016]
   Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
     Bug report by (Y.Ohashik).
+  Quieted two Coverity issues in contrib/libtests/timepng.c.
   Write code update (John Bowler):
     Implemented better defaulting of zlib settings based on image properties.
     Replaced pngtest.png with one compressed with the new zlib settings.
@@ -1283,6 +1284,11 @@ Version 1.7.0beta80 [May 5, 2016]
     There are minimal API changes beyond removal of the selection options.
       Work is still to be done to investigate a filter selection mechanism that
       is at least as good as the previous one.
+    Minor write bug-fixes, remove unimplemented code.  A debug() assert
+      fired if windowBits was set to 8 for the Huffman only and no-compression
+      cases. This commit changes it to do some extra checking.  Removed
+      unreachable code in pz_default_settings and eliminated a spurious
+      warning in pngcp for small files.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1199,7 +1199,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    else if (opt == OPTIND(dp, windowBits))
    {
       /* Changing windowBits for strategies that do not search the window is
-       * pointless.  Huffman-only does not search, RLE only searchs backwards
+       * pointless.  Huffman-only does not search, RLE only searches backwards
        * one byte, so given that the maximum string length is 258, a windowBits
        * of 9 is always sufficient.
        */
