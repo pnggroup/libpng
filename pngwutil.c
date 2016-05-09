@@ -3704,7 +3704,7 @@ png_write_start_IDAT(png_structrp png_ptr)
    {
 #     ifdef PNG_SELECT_FILTER_SUPPORTED
          /* The result depends on the png compression level: */
-         const int png_level = pz_value(png_level, ps->pz_IDAT);
+         const unsigned int png_level = pz_value(png_level, ps->pz_IDAT);
 
          /* If the bit depth is less than 8, so pixels are not byte aligned,
           * PNG filtering hardly ever helps because there is no correlation
