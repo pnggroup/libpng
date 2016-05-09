@@ -390,7 +390,7 @@
 #define PNG_SRC_FILE_pngwtran (PNG_SRC_FILE_pngwrite +4096)
 #define PNG_SRC_FILE_pngwutil (PNG_SRC_FILE_pngwtran +1024)
 
-#define PNG_SRC_FILE_arm_arm_init (PNG_SRC_FILE_pngwutil +4096)
+#define PNG_SRC_FILE_arm_arm_init (PNG_SRC_FILE_pngwutil +8192)
 #define PNG_SRC_FILE_arm_filter_neon_intrinsics\
              (PNG_SRC_FILE_arm_arm_init +1024)
 

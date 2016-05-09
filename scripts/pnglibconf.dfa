@@ -935,31 +935,8 @@ option CONVERT_tIME requires WRITE_ANCILLARY_CHUNKS
 #     the 'first' (lowest numbered) filter will be selected an this typically
 #     works out as PNG_FILTER_VALUE_NONE.
 #
-#  COMPRESSION_BUFFER_MAX
-#     WARNING: take care if you set this.  This is the maximum amount of input
-#     data that the implementation of deflate can consume before it outputs a
-#     Huffman table for that data.  I.e. before it commits to an encoding of the
-#     data it has read.  This is used solely to implement a limit on the amount
-#     of image data buffering that occurs inside libpng before filter selection
-#     is done.  Normally the limit is never reached because of the next setting,
-#     but this is a compile time limit and it is intended to prevent a potential
-#     DNS service as a result of an application setting the libpng equivalent of
-#     volume level 11 (read the wikipedia article on "Up to eleven").
-#
-#     NOTE: the image of a black cat in a coal mine obviously requires this
-#     limit, but some more valid images can get very close; well over 8MByte.
-#
-#  COMPRESSION_BUFFER_LIMIT
-#     This is the (overrideable) default for the amount of memory libpng will
-#     buffer before selecting a filter for a row.  It is limited itself to
-#     COMPRESSION_BUFFER_MAX as values above that level make no change (see the
-#     previous paragraph.)
-#
-#  See png.h for more description of these options.
 option WRITE_FILTER requires WRITE
-option SELECT_FILTER requires WRITE_FILTER disabled
-setting COMPRESSION_BUFFER_MAX default 8453377
-setting COMPRESSION_BUFFER_LIMIT default 8453377
+option SELECT_FILTER requires WRITE_FILTER
 
 # added at libpng-1.5.4
 

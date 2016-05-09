@@ -1692,9 +1692,9 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  *    when there is no previous row.
  *
  * 2) PNG_SELECT_FILTER_SUPPORTED:
- *    libpng will buffer rows until enough data is available to perform a
- *    reasonable filter selection heuristic then select filters for at least the
- *    first buffered row.
+ *    If the PNG rows are long enough (have enough bytes; at least 256) libpng
+ *    will buffer each row and perform a filter selection heuristic to chose an
+ *    appropriate filter.
  *
  * 3) !PNG_SELECT_FILTER_SUPPORTED:
  *    libpng selects the first filter in the list (there is no warning that this
