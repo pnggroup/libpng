@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.5.27beta02, March 9, 2016
+ * libpng version 1.5.27beta02, May 11, 2016
  *
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.5.27beta02, March 9, 2016:
+ *   libpng versions 0.97, January 1998, through 1.5.27beta02, May 11, 2016:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -25,7 +25,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.5.27beta02, March 9, 2016, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.5.27beta02, May 11, 2016, are
  * Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -228,7 +228,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    March 9, 2016
+ *    May 11, 2016
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -297,7 +297,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.5.27beta02"
 #define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.5.27beta02 - March 9, 2016\n"
+     " libpng version 1.5.27beta02 - May 11, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   15
 #define PNG_LIBPNG_VER_DLLNUM  15
@@ -1382,7 +1382,7 @@ PNG_EXPORT(229, void, png_set_scale_16, (png_structp png_ptr));
 #endif
 
 #ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
-#define PNG_READ_16_TO_8 SUPPORTED /* Name prior to 1.5.4 */
+#define PNG_READ_16_TO_8_SUPPORTED /* Name prior to 1.5.4 */
 /* Strip the second byte of information from a 16-bit depth file. */
 PNG_EXPORT(48, void, png_set_strip_16, (png_structp png_ptr));
 #endif
@@ -1534,8 +1534,8 @@ PNG_EXPORT(67, void, png_set_filter,
 #define PNG_FILTER_UP      0x20
 #define PNG_FILTER_AVG     0x40
 #define PNG_FILTER_PAETH   0x80
-#define PNG_ALL_FILTERS (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP | \
-                         PNG_FILTER_AVG | PNG_FILTER_PAETH)
+#define PNG_FAST_FILTERS (PNG_FILTER_NONE | PNG_FILTER_SUB | PNG_FILTER_UP)
+#define PNG_ALL_FILTERS (PNG_FAST_FILTERS | PNG_FILTER_AVG | PNG_FILTER_PAETH)
 
 /* Filter values (not flags) - used in pngwrite.c, pngwutil.c for now.
  * These defines should NOT be changed.
