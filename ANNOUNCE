@@ -1,5 +1,5 @@
 
-Libpng 1.5.27beta02 - May 11, 2016
+Libpng 1.5.27beta03 - May 11, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.27beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.27beta02.tar.gz
+   1.5.27beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.27beta03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1527b02.7z  (LZMA-compressed, recommended)
-   lp1527b02.zip
+   lp1527b03.7z  (LZMA-compressed, recommended)
+   lp1527b03.zip
 
 Other information:
 
-   1.5.27beta02-README.txt
-   1.5.27beta02-LICENSE.txt
-   libpng-1.5.27beta02-*.asc (armored detached GPG signatures)
+   1.5.27beta03-README.txt
+   1.5.27beta03-LICENSE.txt
+   libpng-1.5.27beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.26):
 
@@ -55,11 +55,13 @@ version 1.5.27beta01 [March 9, 2016]
     (Robert C. Seacord).
   Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
 
-version 1.5.27beta02 [May 11, 2016]
+version 1.5.27beta02 [May 11, 2015]
   Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
     Bug report by (Y.Ohashik).
   Added PNG_FAST_FILTERS macro (defined as
     PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
+
+version 1.5.27beta03 [May 11, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
