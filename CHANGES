@@ -5559,7 +5559,8 @@ Version 1.6.22beta06 [May 5, 2016]
     Fixed CMAKE_C_FLAGS with multiple values when genout is compiled on MSVC,
     Fixed pnglibconf.c compilation on OS X including the sysroot path.
 
-Version 1.6.22beta07 [May 6, 2016]
+Version 1.6.22rc01 [May 14, 2016]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
