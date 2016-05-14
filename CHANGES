@@ -4490,7 +4490,8 @@ version 1.5.27beta02 [May 11, 2015]
   Added PNG_FAST_FILTERS macro (defined as
     PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
 
-version 1.5.27beta03 [May 11, 2016]
+version 1.5.27rc01 [May 14, 2016]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
