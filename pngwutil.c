@@ -820,6 +820,8 @@ png_compress(
  * TODO: make png_create_write_struct allocate this stuff after the main
  * png_struct.
  */
+struct filter_selector; /* Used only for filter selection */
+
 typedef struct png_zlib_state
 {
    png_zlib_compress        s;       /* Primary compression state */
@@ -852,6 +854,28 @@ typedef struct png_zlib_state
       png_bytep        previous_write_row; /* Last row written, if any */
 #     ifdef PNG_SELECT_FILTER_SUPPORTED
          png_bytep     current_write_row;  /* Row being written */
+         struct filter_selector *selector; /* Data for filter selection */
+         png_uint_32  filter_select_window;
+            /* The number of bytes of uncompressed PNG data which are assumed to
+             * be relevant when doing filter selection.  Limited to 8453377
+             * (about 2^23); the maximum number of bytes that can be encoded in
+             * the largest deflate window.
+             */
+#        define PNG_FILTER_SELECT_WINDOW_MAX 8453377U
+         png_byte filter_select_threshold;
+            /* If the number of distinct codes seen in the PNG data are at or
+             * below this threshold the PNG data will not be filtered (if the
+             * 'none' filter is allowed).  If this is not true yet a particular
+             * filter does not add new codes and the code count is below the
+             * threshold that filter will be used.
+             */
+         png_byte filter_select_threshold2;
+            /* If the number of distinct codes that result by using a particular
+             * filter is below this second threshold that filter will be used.
+             * (When multiple filters pass this criterion the lowest numbered
+             * one producing the lowest number of new codes will be
+             * chosen.)
+             */
 #     endif /* SELECT_FILTER */
 
       unsigned int row_buffer_max_pixels;
@@ -905,6 +929,7 @@ png_create_zlib_state(png_structrp png_ptr)
       ps->previous_write_row = NULL;
 #     ifdef PNG_SELECT_FILTER_SUPPORTED
          ps->current_write_row = NULL;
+         ps->selector = NULL;
 #     endif /* SELECT_FILTER */
 #  endif /* WRITE_FILTER */
 #  ifdef PNG_WRITE_FLUSH_SUPPORTED
@@ -937,6 +962,13 @@ png_deflate_release(png_structrp png_ptr, png_zlib_statep ps, int check)
             png_bytep p = ps->current_write_row;
             ps->current_write_row = NULL;
             png_free(png_ptr, p);
+         }
+
+         if (ps->selector != NULL)
+         {
+            struct filter_selector *s = ps->selector;
+            ps->selector = NULL;
+            png_free(png_ptr, s);
          }
 #     endif /* SELECT_FILTER */
 #  endif /* WRITE_FILTER */
@@ -3205,26 +3237,6 @@ filter_block(png_const_bytep prev_row, png_bytep prev_pixels,
             unfiltered_row, prev_row, prev_pixels);
 }
 
-#if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED)
-static void
-multi_filter_row(png_const_bytep prev_row, png_bytep prev_pixels,
-      png_const_bytep unfiltered_row, unsigned int row_bits, unsigned int bpp,
-      unsigned int filters_to_try,
-      png_byte filtered_row[4][PNG_ROW_BUFFER_SIZE])
-{
-   /* filters_to_try identifies multiple filters. */
-   filter_block(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
-         (filters_to_try & PNG_FILTER_SUB) != 0U ?
-            filtered_row[PNG_FILTER_VALUE_SUB-1U] : NULL,
-         (filters_to_try & PNG_FILTER_UP) != 0U ?
-            filtered_row[PNG_FILTER_VALUE_UP-1U] : NULL,
-         (filters_to_try & PNG_FILTER_AVG) != 0U ?
-            filtered_row[PNG_FILTER_VALUE_AVG-1U] : NULL,
-         (filters_to_try & PNG_FILTER_PAETH) != 0U ?
-            filtered_row[PNG_FILTER_VALUE_PAETH-1U] : NULL);
-}
-#endif /* SELECT_FILTER_HEURISTICALLY */
-
 static void
 filter_row(png_structrp png_ptr, png_const_bytep prev_row,
       png_bytep prev_pixels, png_const_bytep unfiltered_row,
@@ -3248,283 +3260,6 @@ filter_row(png_structrp png_ptr, png_const_bytep prev_row,
    write_filtered_row(png_ptr, filtered_row, (row_bits+7U)>>3,
          start_of_row ? filter : PNG_FILTER_VALUE_LAST, flush);
 }
-
-#ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
-static unsigned int
-fls(size_t x)
-   /* As ffs but find the last set bit; the most significant */
-{
-   unsigned int result = 0U;
-   unsigned int shift =
-      (PNG_SIZE_MAX > 0xFFFFFFFFU ? 32U : (PNG_SIZE_MAX > 0xFFFFU ? 16U : 8U));
-   size_t test = PNG_SIZE_MAX;
-
-   do
-   {
-      if (x & (test << shift)) result += shift, x >>= shift;
-      shift >>= 1;
-   }
-   while (shift);
-
-   /* Returns 0 for both 1U and 0U. */
-   return result;
-}
-
-static unsigned int
-log2_metric(size_t x)
-{
-   /* Return an approximation to log2(x).  Since a Huffman code necessarily uses
-    * a whole number of bits for the code for each symbol this is very
-    * approximate; it uses the first two bits after the most significant to
-    * approximate the first two fractional bits of the log2.
-    */
-   const unsigned int result = fls(x);
-
-   switch (result)
-   {
-      default: x >>= result-2U; break;
-      case 2U: break;
-      case 1U: x <<= 1; break;
-      case 0U: return 0U; /* for x == 0 and x == 1 */
-   }
-
-   return result * 4U + (unsigned int)/*SAFE*/(x & 0x3U);
-}
-
-static png_alloc_size_t
-huffman_metric(png_byte prefix, png_const_bytep data, size_t length)
-   /* Given a buffer data[length] return an estimate of the length in bits of
-    * the same byte sequence when the bytes are coded using Huffman codes.  The
-    * estimate is really the length in bits of the corresponding arithmetic
-    * code, but this is likely to be a good enough metric and it is fast to
-    * calculate.
-    */
-{
-   unsigned int number_of_symbols; /* distinct symbols */
-   size_t count[256];
-
-   /* Build a symbol count array */
-   memset(count, 0, sizeof count);
-   count[prefix] = 1U; /* the filter byte */
-   number_of_symbols = 1U;
-   {
-      size_t i;
-
-      for (i=0U; i < length; ++i)
-         if (++count[data[i]] == 1U) /* a new symbol */
-            ++number_of_symbols;
-   }
-
-   ++length; /* for the prefix */
-
-   /* Estimate the number of bits used to code each symbol optimally:
-    *
-    *       log2(length/count[symbol])
-    *
-    * (The arithmetic code length, I believe, but that is based on my own work
-    * so it could quite easily be wrong.  JB 20160202).
-    *
-    * So ideally:
-    *
-    *       log2(length) - log2(count[symbol])
-    *
-    * Although any log base is fine for the metric.  pngrtran.c has a fast and
-    * accurate integer log2 implementation, but that is overkill here.  Instead
-    * the caller passes in a shift (based on log2(length)), this is applied to
-    * the count (which must be <= length) and the per-symbol metric is looked up
-    * in a fixed table.
-    *
-    * The deflate (RFC1951) coding used in the zlib (RFC1950) format has a
-    * Huffman code length limit of 15, so any symbol must occupy at least
-    * 1/32768 of the code space.  Zlib also shows some unexpected behavior with
-    * window size increases; data compression can decrease, leading me (JB
-    * 20160202) to hypothesize that the addition of extra, infrequently used,
-    * zlib length codes damages the overall compression by reducing the
-    * efficiency of the Huffman coding.
-    *
-    * This shortens the code for those symbols (to 15 bits) at the cost of
-    * reducing the code space for the remainder of the symbols by 1/32768 for
-    * each such symbol.
-    *
-    * First bin by the above expression, as returned by the log2_metric
-    * function.  This gives a .2-bit fractional number.  Limit the value to 14.5
-    * for the above reason; place anything at or above 14.5 into the last bin.
-    */
-   {
-      unsigned int i, step;
-      const size_t low_count = length / 23170U; /* 2^14.5 */
-      const unsigned int l2_length = log2_metric(length);
-      size_t weight;
-      unsigned int distinct_suffix_count[64];
-         /* The number of distinct suffices held in this bin. */
-      size_t       total_count_in_data[64];
-         /* The total number of instances of those distinct suffices. */
-      size_t       bits_used[64];
-         /* The bits used so far to encode the suffixes in the bin. */
-
-      memset(distinct_suffix_count, 0U, sizeof distinct_suffix_count);
-      memset(total_count_in_data, 0U, sizeof total_count_in_data);
-
-      for (i=0; i<256; ++i)
-      {
-         size_t c = count[i];
-         
-         if (c > 0U)
-         {
-            const unsigned int symbol_weight =
-               c > low_count ? l2_length - log2_metric(c) : 63U;
-
-            ++distinct_suffix_count[symbol_weight];
-            total_count_in_data[symbol_weight] += c;
-         }
-      }
-
-      /* Work backward through the bins distributing the suffices between code
-       * lengths.  This approach reflects the Huffman coding method of
-       * allocating the lowest count first but without the need to sort the
-       * symbols by count or, indeed, remember the symbols.  It is necessarily
-       * approximate as a result.
-       */
-      memset(bits_used, 0U, sizeof bits_used);
-
-      for (i=63U, step=4U; i >= 2U; --i)
-      {
-         unsigned int suffix_count = distinct_suffix_count[i];
-         size_t data_count = total_count_in_data[i];
-
-         /* Encode these suffices with 1 bit to divide the bin into two equal
-          * halves with twice the data count; there may be an odd suffix,
-          * this is promoted to the next bin.
-          */
-         if ((suffix_count & 1U) != 0U)
-         {
-            size_t remainder = data_count / suffix_count;
-
-            ++distinct_suffix_count[i-1U];
-            total_count_in_data[i-1U] += remainder;
-            --suffix_count;
-            data_count -= remainder;
-         }
-
-         distinct_suffix_count[i-step] = suffix_count >> 1;
-         total_count_in_data[i-step] += data_count;
-         bits_used[i-step] += data_count + bits_used[i];
-
-         /* This causes bins 3 and 2 to push into bins 1 and 0 respectively. */
-         if (i == 4U)
-            step = 2U;
-      }
-
-      {
-         unsigned int suffix_count = distinct_suffix_count[0];
-
-         weight = bits_used[0];
-
-         /* There may only be one bin left, check: */
-         if (distinct_suffix_count[1] > 0)
-         {
-            suffix_count += distinct_suffix_count[1];
-            weight += bits_used[1];
-         }
-
-         /* We still have to encode suffix_count separate suffices: */
-         if (suffix_count > 1)
-         {
-            unsigned int bits = fls(suffix_count);
-
-            if ((suffix_count & ~(1U<<bits)) != 0U)
-               ++bits;
-
-            weight += bits * (total_count_in_data[0] + total_count_in_data[1]);
-         }
-      }
-
-#if !PNG_RELEASE_BUILD
-      /* If we have number_of_symbols symbols then they can each be encoded in
-       * ceil(fls(number_of_symbols)) bits, so check this:
-       *
-       * TODO: remove this (it gets removed in a release automatically)
-       */
-      if (number_of_symbols < 128U)
-      {
-         unsigned int bits = fls(number_of_symbols);
-
-         if ((number_of_symbols & ~(1U<<bits)) != 0U)
-            ++bits;
-
-         if (bits*4U*length < weight)
-         {
-            weight = bits*4U*length;
-            abort();
-         }
-      }
-#endif
-
-      /* zlib has to encode the Huffman codes themselves.  It needs 3 bits per
-       * code to do this; it just has to record the length for each symbol code,
-       * so the overhead would be the same in all cases however it uses RLE for
-       * the table and, very approximately, this makes '0' codes irrelevant.
-       *
-       * So add 3 x number_of_symbols:
-       */
-      weight += (3U<<2)*number_of_symbols;
-
-      return weight;
-   }
-}
-
-static png_byte
-select_filter_heuristically(png_structrp png_ptr, unsigned int filters_to_try,
-      png_const_bytep prev_row, png_bytep prev_pixels,
-      png_const_bytep unfiltered_row, unsigned int row_bits, unsigned int bpp,
-      int flush)
-{
-   const unsigned int row_bytes = (row_bits+7U) >> 3;
-   png_byte test_buffers[4][PNG_ROW_BUFFER_SIZE]; /* for each filter */
-
-   affirm(row_bytes <= PNG_ROW_BUFFER_SIZE);
-   debug((row_bits % bpp) == 0U);
-
-   multi_filter_row(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
-         filters_to_try, test_buffers);
-
-   /* Now check each buffer and the original row to see which is best; this is
-    * the heuristic.  The test is an estimate of the length of the byte sequence
-    * when coded by the LZ77 Huffman coding.
-    */
-   {
-      png_alloc_size_t best_cost = (png_alloc_size_t)-1;
-      png_byte best_filter, test_filter;
-      png_const_bytep test_row;
-
-      for (best_filter = test_filter = PNG_FILTER_VALUE_NONE,
-            test_row = unfiltered_row;
-           test_filter < PNG_FILTER_VALUE_LAST;
-           test_row = test_buffers[test_filter], ++test_filter)
-         if ((filters_to_try & PNG_FILTER_MASK(test_filter)) != 0U)
-      {
-         png_alloc_size_t test_cost =
-            huffman_metric(test_filter, test_row, row_bytes);
-
-         if (test_cost < best_cost)
-            best_cost = test_cost, best_filter = test_filter;
-      }
-
-      /* Calling write_unfiltered_rowbits is necessary here to deal with the
-       * clearly of a partial byte at the end.
-       */
-      if (best_filter == PNG_FILTER_VALUE_NONE)
-         write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
-               PNG_FILTER_VALUE_NONE, flush);
-
-      else
-         write_filtered_row(png_ptr, test_buffers[best_filter-1], row_bytes,
-               best_filter, flush);
-
-      return best_filter;
-   }
-}
-#endif /* SELECT_FILTER_HEURISTICALLY */
 
 /* Allow the application to select one or more row filters to use. */
 void PNGAPI
@@ -3562,12 +3297,10 @@ png_set_filter(png_structrp png_ptr, int method, int filtersIn)
    if ((filtersIn & PNG_BIC_MASK(PNG_ALL_FILTERS)) == 0)
    {
 #     ifndef PNG_SELECT_FILTER_SUPPORTED
-         if (filtersIn & (filtersIn-1)) /* remove LSBit */
+         if ((filtersIn & (filtersIn-1)) != 0) /* remove LSBit */
          {
-#if TEMPORARY
             png_app_warning(png_ptr,
                   "png_set_filter: filter selection not supported");
-#endif
             filtersIn &= -filtersIn; /* Use lowest set bit */
          }
 #     endif /* !SELECT_FILTER */
@@ -3842,6 +3575,530 @@ allocate_row(png_structrp png_ptr, png_const_bytep data, png_alloc_size_t size)
 #endif /* WRITE_FILTER */
 
 #ifdef PNG_SELECT_FILTER_SUPPORTED
+#ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
+static void
+multi_filter_row(png_const_bytep prev_row, png_bytep prev_pixels,
+      png_const_bytep unfiltered_row, unsigned int row_bits, unsigned int bpp,
+      unsigned int filters_to_try,
+      png_byte filtered_row[4][PNG_ROW_BUFFER_SIZE])
+{
+   /* filters_to_try identifies multiple filters. */
+   filter_block(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
+         (filters_to_try & PNG_FILTER_SUB) != 0U ?
+            filtered_row[PNG_FILTER_VALUE_SUB-1U] : NULL,
+         (filters_to_try & PNG_FILTER_UP) != 0U ?
+            filtered_row[PNG_FILTER_VALUE_UP-1U] : NULL,
+         (filters_to_try & PNG_FILTER_AVG) != 0U ?
+            filtered_row[PNG_FILTER_VALUE_AVG-1U] : NULL,
+         (filters_to_try & PNG_FILTER_PAETH) != 0U ?
+            filtered_row[PNG_FILTER_VALUE_PAETH-1U] : NULL);
+}
+
+static unsigned int
+fls(size_t x)
+   /* As ffs but find the last set bit; the most significant */
+{
+   unsigned int result = 0U;
+   unsigned int shift =
+      (PNG_SIZE_MAX > 0xFFFFFFFFU ? 32U : (PNG_SIZE_MAX > 0xFFFFU ? 16U : 8U));
+   size_t test = PNG_SIZE_MAX;
+
+   do
+   {
+      if (x & (test << shift)) result += shift, x >>= shift;
+      shift >>= 1;
+   }
+   while (shift);
+
+   /* Returns 0 for both 1U and 0U. */
+   return result;
+}
+
+static unsigned int
+log2_metric(size_t x)
+{
+   /* Return an approximation to log2(x).  Since a Huffman code necessarily uses
+    * a whole number of bits for the code for each symbol this is very
+    * approximate; it uses the first two bits after the most significant to
+    * approximate the first two fractional bits of the log2.
+    */
+   const unsigned int result = fls(x);
+
+   switch (result)
+   {
+      default: x >>= result-2U; break;
+      case 2U: break;
+      case 1U: x <<= 1; break;
+      case 0U: return 0U; /* for x == 0 and x == 1 */
+   }
+
+   return result * 4U + (unsigned int)/*SAFE*/(x & 0x3U);
+}
+
+static png_alloc_size_t
+huffman_metric(png_byte prefix, png_const_bytep data, size_t length)
+   /* Given a buffer data[length] return an estimate of the length in bits of
+    * the same byte sequence when the bytes are coded using Huffman codes.  The
+    * estimate is really the length in bits of the corresponding arithmetic
+    * code, but this is likely to be a good enough metric and it is fast to
+    * calculate.
+    */
+{
+   unsigned int number_of_symbols; /* distinct symbols */
+   size_t count[256];
+
+   /* Build a symbol count array */
+   memset(count, 0, sizeof count);
+   count[prefix] = 1U; /* the filter byte */
+   number_of_symbols = 1U;
+   {
+      size_t i;
+
+      for (i=0U; i < length; ++i)
+         if (++count[data[i]] == 1U) /* a new symbol */
+            ++number_of_symbols;
+   }
+
+   ++length; /* for the prefix */
+
+   /* Estimate the number of bits used to code each symbol optimally:
+    *
+    *       log2(length/count[symbol])
+    *
+    * (The arithmetic code length, I believe, but that is based on my own work
+    * so it could quite easily be wrong.  JB 20160202).
+    *
+    * So ideally:
+    *
+    *       log2(length) - log2(count[symbol])
+    *
+    * Although any log base is fine for the metric.  pngrtran.c has a fast and
+    * accurate integer log2 implementation, but that is overkill here.  Instead
+    * the caller passes in a shift (based on log2(length)), this is applied to
+    * the count (which must be <= length) and the per-symbol metric is looked up
+    * in a fixed table.
+    *
+    * The deflate (RFC1951) coding used in the zlib (RFC1950) format has a
+    * Huffman code length limit of 15, so any symbol must occupy at least
+    * 1/32768 of the code space.  Zlib also shows some unexpected behavior with
+    * window size increases; data compression can decrease, leading me (JB
+    * 20160202) to hypothesize that the addition of extra, infrequently used,
+    * zlib length codes damages the overall compression by reducing the
+    * efficiency of the Huffman coding.
+    *
+    * This shortens the code for those symbols (to 15 bits) at the cost of
+    * reducing the code space for the remainder of the symbols by 1/32768 for
+    * each such symbol.
+    *
+    * First bin by the above expression, as returned by the log2_metric
+    * function.  This gives a .2-bit fractional number.  Limit the value to 14.5
+    * for the above reason; place anything at or above 14.5 into the last bin.
+    */
+   {
+      unsigned int i, step;
+      const size_t low_count = length / 23170U; /* 2^14.5 */
+      const unsigned int l2_length = log2_metric(length);
+      size_t weight;
+      unsigned int distinct_suffix_count[64];
+         /* The number of distinct suffices held in this bin. */
+      size_t       total_count_in_data[64];
+         /* The total number of instances of those distinct suffices. */
+      size_t       bits_used[64];
+         /* The bits used so far to encode the suffixes in the bin. */
+
+      memset(distinct_suffix_count, 0U, sizeof distinct_suffix_count);
+      memset(total_count_in_data, 0U, sizeof total_count_in_data);
+
+      for (i=0; i<256; ++i)
+      {
+         size_t c = count[i];
+         
+         if (c > 0U)
+         {
+            const unsigned int symbol_weight =
+               c > low_count ? l2_length - log2_metric(c) : 63U;
+
+            ++distinct_suffix_count[symbol_weight];
+            total_count_in_data[symbol_weight] += c;
+         }
+      }
+
+      /* Work backward through the bins distributing the suffices between code
+       * lengths.  This approach reflects the Huffman coding method of
+       * allocating the lowest count first but without the need to sort the
+       * symbols by count or, indeed, remember the symbols.  It is necessarily
+       * approximate as a result.
+       */
+      memset(bits_used, 0U, sizeof bits_used);
+
+      for (i=63U, step=4U; i >= 2U; --i)
+      {
+         unsigned int suffix_count = distinct_suffix_count[i];
+         size_t data_count = total_count_in_data[i];
+
+         /* Encode these suffices with 1 bit to divide the bin into two equal
+          * halves with twice the data count; there may be an odd suffix,
+          * this is promoted to the next bin.
+          */
+         if ((suffix_count & 1U) != 0U)
+         {
+            size_t remainder = data_count / suffix_count;
+
+            ++distinct_suffix_count[i-1U];
+            total_count_in_data[i-1U] += remainder;
+            --suffix_count;
+            data_count -= remainder;
+         }
+
+         distinct_suffix_count[i-step] = suffix_count >> 1;
+         total_count_in_data[i-step] += data_count;
+         bits_used[i-step] += data_count + bits_used[i];
+
+         /* This causes bins 3 and 2 to push into bins 1 and 0 respectively. */
+         if (i == 4U)
+            step = 2U;
+      }
+
+      {
+         unsigned int suffix_count = distinct_suffix_count[0];
+
+         weight = bits_used[0];
+
+         /* There may only be one bin left, check: */
+         if (distinct_suffix_count[1] > 0)
+         {
+            suffix_count += distinct_suffix_count[1];
+            weight += bits_used[1];
+         }
+
+         /* We still have to encode suffix_count separate suffices: */
+         if (suffix_count > 1)
+         {
+            unsigned int bits = fls(suffix_count);
+
+            if ((suffix_count & ~(1U<<bits)) != 0U)
+               ++bits;
+
+            weight += bits * (total_count_in_data[0] + total_count_in_data[1]);
+         }
+      }
+
+#if !PNG_RELEASE_BUILD
+      /* If we have number_of_symbols symbols then they can each be encoded in
+       * ceil(fls(number_of_symbols)) bits, so check this:
+       *
+       * TODO: remove this (it gets removed in a release automatically)
+       */
+      if (number_of_symbols < 128U)
+      {
+         unsigned int bits = fls(number_of_symbols);
+
+         if ((number_of_symbols & ~(1U<<bits)) != 0U)
+            ++bits;
+
+         if (bits*4U*length < weight)
+         {
+            weight = bits*4U*length;
+            NOT_REACHED;
+         }
+      }
+#endif
+
+      /* zlib has to encode the Huffman codes themselves.  It needs 3 bits per
+       * code to do this; it just has to record the length for each symbol code,
+       * so the overhead would be the same in all cases however it uses RLE for
+       * the table and, very approximately, this makes '0' codes irrelevant.
+       *
+       * So add 3 x number_of_symbols:
+       */
+      weight += (3U<<2)*number_of_symbols;
+
+      return weight;
+   }
+}
+
+static png_byte
+select_filter_heuristically(png_structrp png_ptr, unsigned int filters_to_try,
+      png_const_bytep prev_row, png_bytep prev_pixels,
+      png_const_bytep unfiltered_row, unsigned int row_bits, unsigned int bpp,
+      int flush)
+{
+   const unsigned int row_bytes = (row_bits+7U) >> 3;
+   png_byte test_buffers[4][PNG_ROW_BUFFER_SIZE]; /* for each filter */
+
+   affirm(row_bytes <= PNG_ROW_BUFFER_SIZE);
+   debug((row_bits % bpp) == 0U);
+
+   multi_filter_row(prev_row, prev_pixels, unfiltered_row, row_bits, bpp,
+         filters_to_try, test_buffers);
+
+   /* Now check each buffer and the original row to see which is best; this is
+    * the heuristic.  The test is an estimate of the length of the byte sequence
+    * when coded by the LZ77 Huffman coding.
+    */
+   {
+      png_alloc_size_t best_cost = (png_alloc_size_t)-1;
+      png_byte best_filter, test_filter;
+      png_const_bytep test_row;
+
+      for (best_filter = test_filter = PNG_FILTER_VALUE_NONE,
+            test_row = unfiltered_row;
+           test_filter < PNG_FILTER_VALUE_LAST;
+           test_row = test_buffers[test_filter], ++test_filter)
+         if ((filters_to_try & PNG_FILTER_MASK(test_filter)) != 0U)
+      {
+         png_alloc_size_t test_cost =
+            huffman_metric(test_filter, test_row, row_bytes);
+
+         if (test_cost < best_cost)
+            best_cost = test_cost, best_filter = test_filter;
+      }
+
+      /* Calling write_unfiltered_rowbits is necessary here to deal with the
+       * clearly of a partial byte at the end.
+       */
+      if (best_filter == PNG_FILTER_VALUE_NONE)
+         write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
+               PNG_FILTER_VALUE_NONE, flush);
+
+      else
+         write_filtered_row(png_ptr, test_buffers[best_filter-1], row_bytes,
+               best_filter, flush);
+
+      return best_filter;
+   }
+}
+#endif /* SELECT_FILTER_HEURISTICALLY */
+
+/* Bit set operations.  Not in ANSI C-90 but commonly available in highly
+ * optimized versions, hence the ifndef.  These operations just work on bitsets
+ * of size 256.  The second argument (the code index) may be evaluated multiple
+ * times.
+ */
+#ifndef PNG_CODE_SET /* Can be set in pngpriv.h */
+typedef png_uint_32 png_codeset[8];
+#  define PNG_CODE_MASK(i) (((png_uint_32)1U) << ((i) & 0x1FU))
+#  define PNG_CODE_IS_SET(c,i) (((c)[(i) >> 5] & PNG_CODE_MASK(i)))
+#  define PNG_CODE_SET(c,i) (((c)[(i) >> 5] |= PNG_CODE_MASK(i)))
+#  define PNG_CODE_CLEAR(c,i) (((c)[(i) >> 5] &= ~PNG_CODE_MASK(i)))
+#endif /* !PNG_CODE_SET */
+
+typedef struct filter_selector
+{
+   /* Persistent filter selection information (stored across row boundaries).
+    * A code is not considered if it last occured more than 'window' bytes ago.
+    * The deflate algorithm means that 'window' cannot exceed 8453377, however
+    * practical versions may be far less.  When 'distance' reaches 'window' any
+    * code where:
+    *
+    *    distance - code_distance[code] > window
+    *
+    * at the end of a row 'code' is removed from codeset.  Otherwise
+    * (rearranging the above):
+    *
+    *    distance - window <= code_distance[code]
+    *
+    * and so the distances of the still active codes can be reduced:
+    *
+    *    code_distance[code] -= distance-window
+    *    distance = window
+    *
+    * This prevents any wrap of 'distance' on a row which is shorter than
+    * 2^32-window.
+    *
+    * However when then row is 2^32-window or more bytes long (the row can be up
+    * to just under 2^34 bytes long) this algorithm doesn't work; 'distance'
+    * will  overflow in the middle of the row and all codes are relevant.  This
+    * is handled below simply by reseting the set of present codes at the start
+    * of the row and ignoring the overflow.
+    */
+   unsigned int code_count;         /* Number of distinct codes seen */
+   png_uint_32  filter_select_max_width;
+      /* The maximum number of pixels which can be fitted in the window without
+       * filling the entire window (i.e. the maximum number that can be fitted
+       * in (window-1) bytes).
+       */
+   png_uint_32  distance;           /* Distance from beginning */
+   png_codeset  codeset;            /* Set of seen codes */
+   png_uint_32  code_distance[256]; /* Distance at last occurence */
+}  filter_selector;
+
+static const filter_selector *
+png_start_filter_select(png_zlib_statep ps, unsigned int bpp)
+{
+#  define png_ptr ps_png_ptr(ps)
+   filter_selector *fs = ps->selector;
+   
+   if (fs == NULL)
+   {
+      fs = png_voidcast(filter_selector*, png_malloc_base(png_ptr, sizeof *fs));
+
+      if (fs != NULL)
+      {
+         png_uint_32 window = ps->filter_select_window;
+
+         /* Delay initialize this here: */
+         if (window < 3U || window > PNG_FILTER_SELECT_WINDOW_MAX)
+            ps->filter_select_window = window = PNG_FILTER_SELECT_WINDOW_MAX;
+
+         fs->code_count = 0;
+
+         /* This is the maximum row width, in pixels, of a row which fits and
+          * leaves 1 byte free in the window.  For any bigger row filter
+          * selection ignores the previous rows.
+          */
+         fs->filter_select_max_width = ((window-2U/*filter+last byte*/)*8U)/bpp;
+         fs->distance = 0U;
+         memset(fs->codeset, 0U, sizeof fs->codeset);
+         /* fs->code_distance is left uninitialized because fs->codeset says
+          * whether or not each entry has been initialized.
+          */
+
+         /* Delay initialize the other control fields in png_zlib_state.
+          * TODO: whichever of these are useful need to be in pnglibconf.dfa
+          */
+         ps->filter_select_threshold = 64U; /* 6bit RGB */
+         ps->filter_select_threshold2 = 50U; /* TODO: experiment required! */
+         ps->selector = fs;
+      }
+
+      else
+         ps->write_row_size = 0U; /* OOM */
+   }
+#  undef png_ptr
+
+   return fs;
+}
+
+typedef struct
+{
+   /* Per-filter data.  This remains separate from the above until the filter
+    * selection has been made.  It reflects the above however the codeset only
+    * records codes present in this row.
+    */
+   unsigned int code_count;         /* Number of distinct codes seen in row */
+   unsigned int new_code_count;     /* Number of new codes seen in row */
+   png_codeset  codeset;            /* Set of codes seen in this row */
+   png_uint_32  code_distance[256]; /* Distance at last occurence in this row */
+}  filter_data;
+
+static void
+filter_data_init(filter_data *fd, png_uint_32 distance, unsigned int filter)
+{
+   fd->code_count = 1U;
+   memset(&fd->codeset, 0U, sizeof fd->codeset);
+   PNG_CODE_SET(fd->codeset, filter);
+   fd->code_distance[filter] = distance;
+}
+
+static void
+add_code(const filter_selector *fs, filter_data *fd, png_uint_32 distance,
+      unsigned int code)
+{
+   if (!PNG_CODE_IS_SET(fd->codeset, code))
+   {
+      PNG_CODE_SET(fd->codeset, code);
+      ++(fd->code_count);
+      fd->code_distance[code] = distance;
+      if (!PNG_CODE_IS_SET(fs->codeset, code))
+         ++(fd->new_code_count);
+   }
+}
+
+static png_byte
+filter_data_select(png_zlib_statep ps, filter_data fd[PNG_FILTER_VALUE_LAST],
+      unsigned int filter, png_uint_32 distance, png_uint_32 w)
+{
+#  define png_ptr ps_png_ptr(ps)
+   /* Choose how to do this depending on the row and window size. */
+   filter_selector *fs = ps->selector;
+   png_uint_32 window = ps->filter_select_window;
+
+   affirm(fs != NULL);
+
+   /* Check the width against the maximum number of pixels that can fit in a
+    * window without filling it:
+    */
+   if (w > fs->filter_select_max_width)
+   {
+      /* The cache is not used */
+      fs->distance = 0U; /* for next row */
+      fs->code_count = 0U;
+      memset(fs->codeset, 0U, sizeof fs->codeset);
+   }
+
+   else
+   {
+      /* Merge the two code sets, discounting codes that last occurred before
+       * the start of the window.
+       */
+      png_uint_32 adjust, code_count;
+      unsigned int code;
+
+      /* filter_selector::distance is the distance of the first byte in the row
+       * (the filter byte), but 'distance' can wrap on long rows.  The above
+       * test is meant to exclude the wrap case by excluding any case where the
+       * row has as many bytes as the window, so:
+       */
+      affirm(distance > fs->distance && distance - fs->distance < window);
+
+      /* Set 'adjust' to the current distance of the start of the window.  I.e:
+       *
+       *    +---------------+--------+
+       *    | before window | window | future data
+       *    +---------------+--------+
+       *                    A        A
+       *                    |        |
+       *             adjust +        + distance
+       *
+       * If the window isn't full yet 'adjust' will be zero, otherwise all the
+       * distances will be reduced by 'adjust' so that the first byte of the
+       * window has distance 0.
+       */
+      if (distance > window)
+         adjust = distance-window;
+
+      else
+         adjust = 0;
+
+
+      /* This may be decreased below if some old codes only occured before the
+       * start of the window.
+       */
+      code_count = fs->code_count + fd->new_code_count;
+
+      for (code=0U; code<256U; ++code)
+      {
+         if (PNG_CODE_IS_SET(fd[filter].codeset, code))
+         {
+            PNG_CODE_SET(fs->codeset, code);
+            debug(fd[filter].code_distance[code] >= adjust);
+            fs->code_distance[code] = fd[filter].code_distance[code] - adjust;
+         }
+
+         else if (PNG_CODE_IS_SET(fs->codeset, code) && adjust > 0)
+         {
+            /* The code did not occur in this row, the old distance may now be
+             * outside the window (because adjust is non-zero).
+             */
+            const png_uint_32 d = fs->code_distance[code];
+
+            if (d >= adjust)
+               fs->code_distance[code] = d-adjust;
+
+            else
+               PNG_CODE_CLEAR(fs->codeset, code), --code_count;
+         }
+      }
+
+      fs->code_count = code_count;
+      fs->distance = distance - adjust; /* I.e. either distance or window! */
+   }
+
+   return ps->filters = PNG_BYTE(filter);
+#  undef png_ptr
+}
+
 static png_byte
 select_filter(png_zlib_statep ps, png_const_bytep row,
    png_const_bytep prev, unsigned int bpp, png_uint_32 width, int start_of_pass)
@@ -3852,21 +4109,198 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
 #  define png_ptr ps_png_ptr(ps)
    if (filters >= PNG_FILTER_NONE) /* multiple filters to test */
    {
-      debug((filters & (filters-1)) != 0U);
+      const png_uint_32 max_pixels = ps->row_buffer_max_pixels;
+      const png_uint_32 block_pixels = ps->row_buffer_max_aligned_pixels;
+      const filter_selector *fs = ps->selector;
+      png_uint_32 pixels_to_go = width;
+      png_uint_32 distance;
+      unsigned int bits_at_end = 0U;
+      png_byte prev_pixels[4*2*2]; /* 2 pixels up to 4x2-bytes each */
+      filter_data fd[PNG_FILTER_VALUE_LAST];
 
-      switch (filters & -filters)
+      debug((filters & (filters-1)) != 0U); /* Expect more than one bit! */
+
+      if (fs == NULL)
       {
-         case PNG_FILTER_NONE:  filters = PNG_FILTER_VALUE_NONE;  break;
-         case PNG_FILTER_SUB:   filters = PNG_FILTER_VALUE_SUB;   break;
-         case PNG_FILTER_UP:    filters = PNG_FILTER_VALUE_UP;    break;
-         case PNG_FILTER_AVG:   filters = PNG_FILTER_VALUE_AVG;   break;
-         case PNG_FILTER_PAETH: filters = PNG_FILTER_VALUE_PAETH; break;
-         default:               NOT_REACHED;
+         /* Delay initialize with a quiet OOM handler */
+         fs = png_start_filter_select(ps, bpp);
+         if (fs == NULL)
+         {
+            ps->filters = PNG_FILTER_VALUE_NONE;
+            return PNG_FILTER_VALUE_NONE;
+         }
       }
 
-      PNG_UNUSED(row)
-      PNG_UNUSED(bpp)
-      PNG_UNUSED(width)
+      /* If PNG_FILTER_NONE is in the list check it first. */
+      if (filters & PNG_FILTER_NONE)
+      {
+         png_const_bytep rp = row;
+         png_uint_32 w = width;
+
+         distance = fs->distance;
+         filter_data_init(fd+PNG_FILTER_VALUE_NONE, distance++,
+               PNG_FILTER_VALUE_NONE);
+
+         if (bpp >= 8) /* complete bytes */
+         {
+            const unsigned int bytes = bpp/8U;
+
+            while (w > 0)
+            {
+               unsigned int b;
+               for (b=0; b<bytes; ++b)
+                  add_code(fs, fd+PNG_FILTER_VALUE_NONE, distance++, *rp++);
+               --w;
+            }
+         }
+
+         else /* multiple pixels per byte */
+         {
+            const unsigned int ppb = 8U/bpp;
+
+            debug(ppb * bpp == 8U); /* Expect bpp to be a power of 2 */
+
+            while (w >= ppb)
+            {
+               add_code(fs, fd+PNG_FILTER_VALUE_NONE, distance++, *rp++);
+               w -= ppb;
+            }
+
+            if (w > 0) /* partial byte at end */
+               add_code(fs, fd+PNG_FILTER_VALUE_NONE, distance++,
+                     *rp & (0xFFU >> (w*bpp) /* zero unused bits */));
+         }
+
+         /* For PNG data with a small number of codes it is worth skipping the
+          * filtering because it almost always increases the code count
+          * significantly.  This is controlled by
+          * png_zlib_state::filter_select_threshold and causes an early return
+          * here.
+          */
+         if (fd[PNG_FILTER_VALUE_NONE].new_code_count + fs->code_count <=
+               ps->filter_select_threshold)
+            return filter_data_select(ps, fd, PNG_FILTER_VALUE_NONE, distance,
+                  width);
+      } /* PNG_FILTER_NONE */
+
+      memset(prev_pixels, 0U, sizeof prev_pixels);
+
+      distance = fs->distance;
+
+      {
+         unsigned int i;
+
+         for (i=PNG_FILTER_VALUE_NONE+1U; i<PNG_FILTER_VALUE_LAST; ++i)
+            if (PNG_FILTER_MASK(i) & filters)
+               filter_data_init(fd+i, distance, i);
+      }
+
+      ++distance;
+
+      while (pixels_to_go || bits_at_end)
+      {
+         unsigned int bits, i;
+         union
+         {
+            PNG_ROW_BUFFER_ALIGN_TYPE force_buffer_alignment;
+            png_byte row[4][PNG_ROW_BUFFER_SIZE];
+         }  filtered;
+         union
+         {
+            PNG_ROW_BUFFER_ALIGN_TYPE force_buffer_alignment;
+            png_byte byte;
+         }  last;
+
+         if (pixels_to_go)
+         {
+            if (pixels_to_go > max_pixels)
+            {
+               /* Maintain alignment by consuming on block_pixels at once */
+               bits = block_pixels * bpp;
+               pixels_to_go -= block_pixels; /* May be 0 */
+            }
+
+            else
+            {
+               bits = pixels_to_go * bpp;
+               bits_at_end = bits & 0x7U;
+               bits -= bits_at_end;
+               pixels_to_go = 0U; /* +bits_at_end */
+            }
+         }
+
+         else /* incomplete byte at the end of the pixel */
+         {
+            /* Make sure the unused bits are cleared (to zero, although this is
+             * an arbitrary choice):
+             */
+            last.byte = PNG_BYTE(*row & ~(0xFFU >> bits_at_end));
+            row = &last.byte;
+            bits = bits_at_end;
+            bits_at_end = 0U;
+         }
+
+         filter_block(prev, prev_pixels, row, bits, bpp,
+                  filtered.row[0/*sub*/], filtered.row[1/*up*/],
+                  filtered.row[2/*avg*/], filtered.row[3/*Paeth*/]);
+
+         /* A block of (bits+7)/8 bytes is now available to process. */
+         for (i=0; 8U*i < bits; ++i, ++distance)
+         {
+            unsigned int f;
+
+            for (f=PNG_FILTER_VALUE_NONE+1U; f<PNG_FILTER_VALUE_LAST; ++f)
+               if (PNG_FILTER_MASK(f) & filters)
+                  add_code(fs, fd+f, distance, filtered.row[f-1U][i]);
+         }
+
+         if (prev != NULL)
+            prev += bits >> 3;
+
+         row += bits >> 3;
+      }
+
+      /* Now look at the candidate filters, including 'none' and select the
+       * best.  We know that 'none' increases the code count beyond the
+       * threshold, so if the old code count is below the threshold and there is
+       * a filter which does not increase the code count select it; doing so
+       * should do no harm to the overall compression.
+       */
+      if (fs->code_count <= ps->filter_select_threshold)
+      {
+         unsigned int f, min_new_count = 257U, min_f = PNG_FILTER_VALUE_NONE;
+
+         for (f=PNG_FILTER_VALUE_NONE+1U; f<PNG_FILTER_VALUE_LAST; ++f)
+            if ((PNG_FILTER_MASK(f) & filters) != 0)
+            {
+               unsigned int new_code_count = fd[f].new_code_count;
+
+               if (new_code_count == 0U)
+                  return filter_data_select(ps, fd, f, distance, width);
+
+               else if (new_code_count < min_new_count)
+                  min_new_count = new_code_count, min_f = f;
+            }
+
+         /* Use the second threshold to decide whether to select the best filter
+          * on this basis alone:
+          */
+         if (min_f != PNG_FILTER_VALUE_NONE &&
+             fs->code_count + min_new_count <= ps->filter_select_threshold2)
+            return filter_data_select(ps, fd, min_f, distance, width);
+      }
+
+      /* Now fall back to the libpng 1.6 and earlier algorithm.  This favours
+       * the filter which produces least deviation in the codes from 0.  When
+       * this works it does so by reducing the distribution of code values.  The
+       * filters implicitly encode the difference between a predictor based on
+       * adjacent values, the assumption is that this will result in values
+       * close to 0.
+       */
+
+
+      /* The final fallback is to use the 'none' filter. */
+      return filter_data_select(ps, fd, PNG_FILTER_VALUE_NONE, distance, width);
    }
 
    debug(filters < PNG_FILTER_VALUE_LAST);
@@ -4006,7 +4440,7 @@ png_write_png_rows(png_structrp png_ptr, png_const_bytep *rows,
             const png_uint_32 max_pixels = filter == PNG_FILTER_VALUE_NONE ?
                ps->zlib_max_pixels : ps->row_buffer_max_pixels;
             const png_uint_32 block_pixels = filter == PNG_FILTER_VALUE_NONE ?
-               ps->row_buffer_max_aligned_pixels : ps->zlib_max_aligned_pixels;
+               ps->zlib_max_aligned_pixels : ps->row_buffer_max_aligned_pixels;
 
             /* The row handling uses png_compress_IDAT directly if there is no
              * filter to be applied, otherwise it uses filter_row.
@@ -4036,9 +4470,9 @@ png_write_png_rows(png_structrp png_ptr, png_const_bytep *rows,
                /* The filter code handles the partial byte at the end correctly,
                 * so this is all that is required:
                 */
-               filter_row(png_ptr, previous_row, prev_pixels, row,
-                     bpp * pixels_to_go, bpp, filter, start_of_row,
-                     flush);
+               if (pixels_to_go > 0)
+                  filter_row(png_ptr, previous_row, prev_pixels, row,
+                        bpp * pixels_to_go, bpp, filter, start_of_row, flush);
             }
 
             else
