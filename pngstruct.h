@@ -393,13 +393,15 @@ struct png_struct_def
    unsigned int num_trans           :9; /* number of transparency values */
    unsigned int transparent_palette :1; /* if they are all 0 or 255 */
 #endif /* READ_tRNS */
-#ifdef PNG_GET_PALETTE_MAX_SUPPORTED
-   unsigned int palette_index_max :9; /* maximum palette index found in IDAT */
-#endif /* GET_PALETTE_MAX */
-#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   unsigned int palette_index_check_disabled :1; /* defaults to 0, 'enabled' */
-   unsigned int palette_index_check_issued :1;   /* error message output */
-#endif /* CHECK_FOR_INVALID_INDEX */
+#ifdef PNG_PALETTE_MAX_SUPPORTED
+   unsigned int palette_index_max   :8; /* maximum palette index in IDAT */
+   unsigned int palette_index_check :2; /* one of the following: */
+#     define PNG_PALETTE_CHECK_DEFAULT 0U
+#     define PNG_PALETTE_CHECK_OFF     1U
+#     define PNG_PALETTE_CHECK_ON      2U
+   unsigned int palette_index_have_max     :1; /* max is being set */
+   unsigned int palette_index_check_issued :1; /* error message output */
+#endif /* PALETTE_MAX */
 #ifdef PNG_READ_tRNS_SUPPORTED
    png_color_16 trans_color;   /* transparent color for non-paletted files */
 #endif /* READ_tRNS */

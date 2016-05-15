@@ -3918,6 +3918,12 @@ typedef struct filter_selector
        * filling the entire window (i.e. the maximum number that can be fitted
        * in (window-1) bytes).
        */
+   png_uint_32  sum_bias[PNG_FILTER_VALUE_LAST];
+      /* For each filter a measure of its goodness in the filter sum
+       * calculation.  This allows filter selection based on the
+       * sum-of-absolute-dfferences method to be biased to favour particular
+       * filters.  There was no such bias before 1.7
+       */
    png_uint_32  distance;           /* Distance from beginning */
    png_codeset  codeset;            /* Set of seen codes */
    png_uint_32  code_distance[256]; /* Distance at last occurence */
@@ -3942,6 +3948,7 @@ png_start_filter_select(png_zlib_statep ps, unsigned int bpp)
             ps->filter_select_window = window = PNG_FILTER_SELECT_WINDOW_MAX;
 
          fs->code_count = 0;
+         memset(fs->sum_bias, 0U, sizeof fs->sum_bias);
 
          /* This is the maximum row width, in pixels, of a row which fits and
           * leaves 1 byte free in the window.  For any bigger row filter
@@ -3975,17 +3982,31 @@ typedef struct
    /* Per-filter data.  This remains separate from the above until the filter
     * selection has been made.  It reflects the above however the codeset only
     * records codes present in this row.
+    *
+    * The 'sum' fields are the sum of the absolute deviation of each code from
+    * 0, the algorithm from 1.6 and earlier.  In other words:
+    *
+    *    if (code >= 128)
+    *       sum += code;
+    *    else
+    *       sum += 256-code;
     */
    unsigned int code_count;         /* Number of distinct codes seen in row */
    unsigned int new_code_count;     /* Number of new codes seen in row */
+   png_uint_32  sum_low;            /* Low 31 bits of code sum */
+   png_uint_32  sum_high;           /* High 32 bits of code sum */
    png_codeset  codeset;            /* Set of codes seen in this row */
    png_uint_32  code_distance[256]; /* Distance at last occurence in this row */
 }  filter_data;
 
 static void
-filter_data_init(filter_data *fd, png_uint_32 distance, unsigned int filter)
+filter_data_init(filter_data *fd, png_uint_32 distance, unsigned int filter,
+      unsigned int code_is_set)
 {
    fd->code_count = 1U;
+   fd->new_code_count = !code_is_set;
+   fd->sum_low = filter;
+   fd->sum_high = 0U;
    memset(&fd->codeset, 0U, sizeof fd->codeset);
    PNG_CODE_SET(fd->codeset, filter);
    fd->code_distance[filter] = distance;
@@ -4002,6 +4023,23 @@ add_code(const filter_selector *fs, filter_data *fd, png_uint_32 distance,
       fd->code_distance[code] = distance;
       if (!PNG_CODE_IS_SET(fs->codeset, code))
          ++(fd->new_code_count);
+   }
+
+   {
+      png_uint_32 low = fd->sum_low;
+
+      if (code >= 128U)
+         low += code;
+
+      else
+         low += 256U-code;
+
+      /* Handle overflow into the top bit: */
+      if (low & 0x80000000U)
+         fd->sum_low = low & 0x7FFFFFFFU, ++fd->sum_high;
+
+      else
+         fd->sum_low = low;
    }
 }
 
@@ -4139,7 +4177,8 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
 
          distance = fs->distance;
          filter_data_init(fd+PNG_FILTER_VALUE_NONE, distance++,
-               PNG_FILTER_VALUE_NONE);
+               PNG_FILTER_VALUE_NONE,
+               PNG_CODE_IS_SET(fs->codeset, PNG_FILTER_VALUE_NONE));
 
          if (bpp >= 8) /* complete bytes */
          {
@@ -4192,7 +4231,8 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
 
          for (i=PNG_FILTER_VALUE_NONE+1U; i<PNG_FILTER_VALUE_LAST; ++i)
             if (PNG_FILTER_MASK(i) & filters)
-               filter_data_init(fd+i, distance, i);
+               filter_data_init(fd+i, distance, i,
+                     PNG_CODE_IS_SET(fs->codeset, i));
       }
 
       ++distance;
@@ -4297,16 +4337,40 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
        * adjacent values, the assumption is that this will result in values
        * close to 0.
        */
+      {
+         png_uint_32 high = -1;
+         png_uint_32 low = -1;
+         unsigned int min_f = 0 /*unset, but safe*/;
+         unsigned int f;
 
+         for (f=PNG_FILTER_VALUE_NONE; f<PNG_FILTER_VALUE_LAST; ++f)
+            if ((PNG_FILTER_MASK(f) & filters) != 0 &&
+                (fd[f].sum_high < high ||
+                 (fd[f].sum_high == high && fd[f].sum_low < low)))
+            {
+               high = fd[f].sum_high;
+               /* The bias is the per-filter bias, a measure of the preference
+                * of this filter over the others.
+                */
+               low = fd[f].sum_low - fs->sum_bias[f];
 
-      /* The final fallback is to use the 'none' filter. */
-      return filter_data_select(ps, fd, PNG_FILTER_VALUE_NONE, distance, width);
+               if (low & 0x80000000U)
+               {
+                  low &= 0x7FFFFFFFU, --high;
+                  if (high & 0x80000000U)
+                     low = high = 0U;
+               }
+
+               min_f = f;
+            }
+
+         return filter_data_select(ps, fd, min_f, distance, width);
+      }
    }
 
    debug(filters < PNG_FILTER_VALUE_LAST);
-#  undef png_ptr
-
    return ps->filters = filters;
+#  undef png_ptr
 }
 #else /* !SELECT_FILTER */
    /* Filter selection not being done, just call png_write_start_row: */

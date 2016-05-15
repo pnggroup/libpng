@@ -92,6 +92,8 @@ typedef enum
 #define SIZES           0x080 /* Report input and output sizes */
 #define SEARCH          0x100 /* Search IDAT compression options */
 #define NOWRITE         0x200 /* Do not write an output file */
+#define IGNORE_INDEX    0x400 /* Ignore out of range palette indices (BAD!) */
+#define FIX_INDEX       0x800 /* 'Fix' out of range palette indices (OK) */
 #define OPTION     0x80000000 /* Used for handling options */
 #define LIST       0x80000001 /* Used for handling options */
 
@@ -229,6 +231,8 @@ static const struct option
    S(sizes,    SIZES)
    S(search,   SEARCH)
    S(nowrite,  NOWRITE)
+   S(ignore-palette-index, IGNORE_INDEX)
+   S(fix-palette-index, FIX_INDEX)
 #  undef S
 
    /* OPTION settings, these and LIST settings are read on demand */
@@ -1558,7 +1562,7 @@ read_function(png_structp pp, png_bytep data, png_size_t size)
 {
    struct display *dp = get_dp(pp);
 
-   if (fread(data, size, 1U, dp->fp) == 1U)
+   if (size == 0U || fread(data, size, 1U, dp->fp) == 1U)
       dp->read_size += size;
 
    else
@@ -1583,6 +1587,12 @@ read_png(struct display *dp, const char *filename)
       display_log(dp, LIBPNG_ERROR, "failed to create read struct");
 
    png_set_benign_errors(dp->read_pp, 1/*allowed*/);
+
+   if ((dp->options & FIX_INDEX) != 0)
+      png_set_check_for_invalid_index(dp->read_pp, 1/*on, no warning*/);
+
+   else if ((dp->options & IGNORE_INDEX) != 0) /* DANGEROUS */
+      png_set_check_for_invalid_index(dp->read_pp, -1/*off completely*/);
 
    /* The png_read_png API requires us to make the info struct, but it does the
     * call to png_read_info.
@@ -1619,6 +1629,37 @@ read_png(struct display *dp, const char *filename)
          png_error(dp->read_pp, "image too large");
 
       dp->size = rb * dp->h + dp->h/*filter byte*/;
+   }
+
+   if (dp->ct == PNG_COLOR_TYPE_PALETTE && (dp->options & FIX_INDEX) != 0)
+   {
+      int max = png_get_palette_max(dp->read_pp, dp->ip);
+      png_colorp palette = NULL;
+      int num = -1;
+
+      if (png_get_PLTE(dp->read_pp, dp->ip, &palette, &num) != PNG_INFO_PLTE
+          || max < 0 || num <= 0 || palette == NULL)
+         display_log(dp, LIBPNG_ERROR, "invalid png_get_PLTE result");
+
+      if (max != num-1)
+      {
+         /* 'Fix' the palette. */
+         int i;
+         png_color newpal[256];
+
+         for (i=0; i<num && i<=max; ++i)
+            newpal[i] = palette[i];
+
+         /* Fill in any remainder with a warning color: */
+         for (; i<=max; ++i)
+         {
+            newpal[i].red = 0xbe;
+            newpal[i].green = 0xad;
+            newpal[i].blue = 0xed;
+         }
+
+         png_set_PLTE(dp->read_pp, dp->ip, newpal, i);
+      }
    }
 
    display_clean_read(dp);
@@ -1743,6 +1784,9 @@ write_png(struct display *dp, const char *destname)
 
    png_set_benign_errors(dp->write_pp, 1/*allowed*/);
    png_set_write_fn(dp->write_pp, dp, write_function, NULL/*flush*/);
+
+   if ((dp->options & IGNORE_INDEX) != 0) /* DANGEROUS */
+      png_set_check_for_invalid_index(dp->write_pp, -1/*off completely*/);
 
    /* Restore the text chunks when using libpng 1.6 or less; this is a macro
     * which expands to nothing in 1.7+  In earlier versions it tests

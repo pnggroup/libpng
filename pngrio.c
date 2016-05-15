@@ -19,7 +19,7 @@
  */
 
 #include "pngpriv.h"
-#define PNG_SRC_FILE PNG_SRC_FILE_rio
+#define PNG_SRC_FILE PNG_SRC_FILE_pngrio
 
 #ifdef PNG_READ_SUPPORTED
 
@@ -33,6 +33,11 @@ void /* PRIVATE */
 png_read_data(png_structrp png_ptr, png_voidp data, png_size_t length)
 {
    png_debug1(4, "reading %d bytes", (int)length);
+
+   /* This was guaranteed by prior versions of libpng, so app callbacks may
+    * assume it even though it isn't documented to be the case.
+    */
+   debug(length > 0U);
 
    if (png_ptr->rw_data_fn != NULL)
       png_ptr->rw_data_fn(png_ptr, png_voidcast(png_bytep,data), length);

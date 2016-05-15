@@ -196,7 +196,9 @@ png_read_sequential_unknown(png_structrp png_ptr, png_inforp info_ptr)
 
    if (buffer != NULL)
    {
-      png_crc_read(png_ptr, buffer, png_ptr->chunk_length);
+      if (png_ptr->chunk_length > 0U)
+         png_crc_read(png_ptr, buffer, png_ptr->chunk_length);
+
       png_crc_finish(png_ptr, 0);
       png_handle_unknown(png_ptr, info_ptr, buffer);
    }
@@ -323,7 +325,7 @@ png_read_IDAT(png_structrp png_ptr)
    {
       png_uint_32 l = png_ptr->chunk_length;
 
-      if (l == 0) /* end of this IDAT */
+      while (l == 0) /* end of this IDAT */
       {
          png_crc_finish(png_ptr, 0);
          png_read_chunk_header(png_ptr);
@@ -331,7 +333,7 @@ png_read_IDAT(png_structrp png_ptr)
          if (png_ptr->chunk_name != png_IDAT) /* end of all IDAT */
          {
             png_ptr->mode |= PNG_AFTER_IDAT;
-            break;
+            goto done;
          }
 
          l = png_ptr->chunk_length;
@@ -346,6 +348,7 @@ png_read_IDAT(png_structrp png_ptr)
       IDAT_size += (uInt)/*SAFE*/l;
       png_ptr->chunk_length -= l;
    }
+done:
 
    /* IDAT_size may be zero if the compressed image stream is truncated;
     * this is likely given a broken PNG.

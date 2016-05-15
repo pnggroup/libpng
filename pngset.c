@@ -539,11 +539,29 @@ png_set_PLTE(png_structrp png_ptr, png_inforp info_ptr,
     * of num_palette entries, in case of an invalid PNG file or incorrect
     * call to png_set_PLTE() with too-large sample values.
     */
-   info_ptr->palette = png_voidcast(png_colorp, png_calloc(png_ptr,
+   info_ptr->palette = png_voidcast(png_colorp, png_malloc(png_ptr,
        PNG_MAX_PALETTE_LENGTH * (sizeof (png_color))));
 
    if (num_palette > 0)
       memcpy(info_ptr->palette, palette, num_palette * (sizeof (png_color)));
+
+   /* Set the remainder of the palette entries to something recognizable; the
+    * code used to leave them set to 0, which made seeing palette index errors
+    * difficult.
+    */
+   if (num_palette < PNG_MAX_PALETTE_LENGTH)
+   {
+      int i;
+      png_color c;
+
+      memset(&c, 0x42, sizeof c); /* fill in any padding */
+      c.red = 0xbe;
+      c.green = 0xad;
+      c.blue = 0xed;   /* Visible in memory as 'beaded' */
+
+      for (i=num_palette; i<PNG_MAX_PALETTE_LENGTH; ++i)
+         info_ptr->palette[i] = c;
+   }
 
    info_ptr->num_palette = png_check_bits(png_ptr, num_palette, 9);
    info_ptr->free_me |= PNG_FREE_PLTE;

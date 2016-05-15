@@ -2885,9 +2885,17 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
 PNG_EXPORT(242, void, png_set_check_for_invalid_index,
     (png_structrp png_ptr, int enabled_if_greater_than_0));
-   /* By default the check is enabled on both read and write, passing a value
-    * which is 0 or negative disables the check.  Disabling the check also
-    * prevents the following API from working.
+   /* By default the check is enabled on both read and write when the number of
+    * entries in the palette is less than the maximum required by the bit depth
+    * of a palette image.
+    *
+    * Passing 1 to 'enabled' turns the check on in all cases.
+    * Passing -1 turns it off and the PNG may have invalid palette index values.
+    * Passing 0 restores the default.
+    *
+    * On read chunk (benign) error messages are only produced with the default
+    * setting; it is assumed that when the check is turned on explicitly the
+    * caller will call png_get_palette_max to check the result.
     */
 #endif /* CHECK_FOR_INVALID_INDEX */
 #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
@@ -2895,7 +2903,7 @@ PNG_EXPORT(243, int, png_get_palette_max, (png_const_structrp png_ptr,
     png_const_inforp info_ptr));
    /* The info_ptr is not used, it may be NULL in 1.7.0 (not in earlier
     * versions).  If the information is not available because
-    * png_set_check_for_invalid_index disabled the check this API returns -1.
+    * png_set_check_for_invalid_index was not used to turn it on -1 is returned.
     * Valid results can only be obtained after the complete image has been read,
     * though it may be called at any time to get the result so far.
     */

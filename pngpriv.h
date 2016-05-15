@@ -1378,7 +1378,12 @@ PNG_INTERNAL_FUNCTION(png_transformp,png_add_transform,(png_structrp png_ptr,
     *
     *    PNG_RWTR_CHECK_PALETTE PI W11: happens in pngwrite.c last
     */
-#  define PNG_TR_INIT_ALPHA     (PNG_TR_START + 0x0300U)
+#  define PNG_TR_START_CACHE    (PNG_TR_START + 0x0300U)
+   /* Not used on a transform; this is just a marker for the point at which
+    * palette or low-bit-depth caching can start on read.  (The previous
+    * operations cannot be cached).
+    */
+#  define PNG_TR_INIT_ALPHA     (PNG_TR_START + 0x0400U)
    /* This just handles alpha/tRNS initialization issues to resolve the
     * inter-dependencies with tRNS expansion and background composition; it
     * doesn't do anything itself, just sets flags and pushes transforms.

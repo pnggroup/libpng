@@ -586,23 +586,35 @@ set_palette_max(png_structrp png_ptr, png_transformp tr, unsigned int max,
 {
    /* One of these must be true: */
 #  ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-      if (max >= tr->args && !png_ptr->palette_index_check_issued)
+      if (max >= (tr->args & 0x1FFU) && !png_ptr->palette_index_check_issued)
       {
-#        ifdef PNG_READ_SUPPORTED
+         /* In 1.7 only issue the error/warning by default; the 'check' API is
+          * used to enable/disable the check.  Assume that if the app enabled it
+          * then the app will be checking the result with get_palette_max in
+          * read.  In write an error results unless the check is disabled.
+          */
+         if (png_ptr->palette_index_check == PNG_PALETTE_CHECK_DEFAULT
 #           ifdef PNG_WRITE_SUPPORTED
-               (png_ptr->read_struct ? png_chunk_benign_error : png_error)
-#           else /* !WRITE */
-               png_chunk_benign_error
-#           endif /* !WRITE */
-#        else /* !READ */
-            png_error
-#        endif /* !READ */
-            (png_ptr, "palette index too large");
+               || (!png_ptr->read_struct &&
+                   png_ptr->palette_index_check != PNG_PALETTE_CHECK_OFF)
+#           endif /* WRITE */
+            )
+#           ifdef PNG_READ_SUPPORTED
+#              ifdef PNG_WRITE_SUPPORTED
+                  (png_ptr->read_struct ? png_chunk_benign_error : png_error)
+#              else /* !WRITE */
+                  png_chunk_benign_error
+#              endif /* READ */
+#           else /* !READ */
+               png_error
+#           endif /* WRITE */
+               (png_ptr, "palette index too large");
+
          png_ptr->palette_index_check_issued = 1;
       }
 #  endif
 #  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
-      png_ptr->palette_index_max = png_check_bits(png_ptr, max, 9);
+      png_ptr->palette_index_max = png_check_byte(png_ptr, max);
 #  endif
 
    if (max == format_max)
@@ -642,7 +654,8 @@ palette_max_2bpp(png_transformp *tr, png_transform_controlp tc)
 {
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_uint_32 width = tc->width;
-   unsigned int max = (*tr)->args; /* saved maximum */
+   const png_uint_32 args = (*tr)->args;
+   unsigned int max = args >> 24; /* saved maximum */
 
    while (width > 0)
    {
@@ -699,7 +712,7 @@ palette_max_2bpp(png_transformp *tr, png_transform_controlp tc)
    }
 
    /* End of input, check the next line. */
-   (*tr)->args = max;
+   (*tr)->args = (max << 24) + (args & 0xFFFFFFU);
 }
 
 static void
@@ -707,7 +720,8 @@ palette_max_4bpp(png_transformp *tr, png_transform_controlp tc)
 {
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_uint_32 width = tc->width;
-   unsigned int max = (*tr)->args; /* saved maximum */
+   const png_uint_32 args = (*tr)->args;
+   unsigned int max = args >> 24; /* saved maximum */
 
    while (width > 0)
    {
@@ -725,12 +739,12 @@ palette_max_4bpp(png_transformp *tr, png_transform_controlp tc)
          max = (input >> 4) & 0xFU;
    }
 
-   if (max > (*tr)->args)
+   if (max > (args >> 24))
    {
       if (set_palette_max(tc->png_ptr, *tr, max, 15U))
          return;
 
-      (*tr)->args = max;
+      (*tr)->args = (max << 24) + (args & 0xFFFFFFU);
    }
 }
 
@@ -739,7 +753,8 @@ palette_max_8bpp(png_transformp *tr, png_transform_controlp tc)
 {
    png_const_bytep sp = png_voidcast(png_const_bytep, tc->sp);
    png_uint_32 width = tc->width;
-   unsigned int max = (*tr)->args; /* saved maximum */
+   const png_uint_32 args = (*tr)->args;
+   unsigned int max = args >> 24; /* saved maximum */
 
    while (width > 0)
    {
@@ -751,12 +766,12 @@ palette_max_8bpp(png_transformp *tr, png_transform_controlp tc)
       --width;
    }
 
-   if (max > (*tr)->args)
+   if (max > (args >> 24))
    {
       if (set_palette_max(tc->png_ptr, *tr, max, 255U))
          return;
 
-      (*tr)->args = max;
+      (*tr)->args = (max << 24) + (args & 0xFFFFFFU);
    }
 }
 
@@ -764,26 +779,27 @@ static void
 palette_max_init(png_transformp *tr, png_transform_controlp tc)
 {
 #  define png_ptr (tc->png_ptr)
-   if ((tc->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
+   affirm((tc->format & PNG_FORMAT_FLAG_COLORMAP) != 0);
+   debug(tc->init);
+
+   if (tc->init == PNG_TC_INIT_FINAL)
    {
-      if (tc->init == PNG_TC_INIT_FINAL)
+      /* Record the palette depth to check here along with the running total
+       * in the top 8 bits (initially 0, which is always valid).
+       */
+      (*tr)->args = png_ptr->num_palette;
+
+      switch (tc->bit_depth)
       {
-         /* Record the palette depth to check here: */
-         (*tr)->args = png_ptr->num_palette;
-
-         switch (tc->bit_depth)
-         {
-            case 1: (*tr)->fn = palette_max_1bpp; break;
-            case 2: (*tr)->fn = palette_max_2bpp; break;
-            case 4: (*tr)->fn = palette_max_4bpp; break;
-            case 8: (*tr)->fn = palette_max_8bpp; break;
-            default:impossible("palette bit depth");
-         }
+         case 1: (*tr)->fn = palette_max_1bpp; break;
+         case 2: (*tr)->fn = palette_max_2bpp; break;
+         case 4: (*tr)->fn = palette_max_4bpp; break;
+         case 8: (*tr)->fn = palette_max_8bpp; break;
+         default:impossible("palette bit depth");
       }
-   }
 
-   else
-      (*tr)->fn = NULL; /* not applicable */
+      png_ptr->palette_index_have_max = 1U;
+   }
 #  undef png_ptr
 }
 #endif /* PALETTE_MAX */
@@ -792,11 +808,7 @@ palette_max_init(png_transformp *tr, png_transform_controlp tc)
 int PNGAPI
 png_get_palette_max(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
-   if (png_ptr != NULL
-#     ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-         && !png_ptr->palette_index_check_disabled
-#     endif
-      )
+   if (png_ptr != NULL && png_ptr->palette_index_have_max)
       return png_ptr->palette_index_max;
 
    /* This indicates to the caller that the information is not available: */
@@ -812,7 +824,7 @@ png_get_palette_max(png_const_structrp png_ptr, png_const_inforp info_ptr)
     * fewer entries than the image's bit-depth would allow. We recover
     * from this gracefully by filling any incomplete palette with zeros
     * (opaque black).  By default, when this occurs libpng will issue
-    * a benign error.  This API can be used to override that behavior.
+    * an error.  This API can be used to override that behavior.
     */
 void PNGAPI
 png_set_check_for_invalid_index(png_structrp png_ptr, int enabled)
@@ -821,17 +833,31 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int enabled)
    if (png_ptr != NULL)
    {
       if (png_ptr->read_struct)
+      {
 #        ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-            png_ptr->palette_index_check_disabled = enabled <= 0;
+            if (enabled > 0)
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
+            else if (enabled < 0)
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
+            else
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
 #        else /* !READ_CHECK_FOR_INVALID_INDEX */
             png_app_error(png_ptr, "no read palette check support");
 #        endif /* !READ_CHECK_FOR_INVALID_INDEX */
+      }
       else /* write struct */
+      {
 #        ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
-            png_ptr->palette_index_check_disabled = enabled <= 0;
+            if (enabled > 0)
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
+            else if (enabled < 0)
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
+            else
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
 #        else /* !WRITE_CHECK_FOR_INVALID_INDEX */
             png_app_error(png_ptr, "no write palette check support");
 #        endif /* !WRITE_CHECK_FOR_INVALID_INDEX */
+      }
    }
 }
 #endif /* CHECK_FOR_INVALID_INDEX */
@@ -856,8 +882,11 @@ png_init_row_info(png_structrp png_ptr)
                defined (PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED)
                (png_ptr->read_struct
 #              ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-                  && !png_ptr->palette_index_check_disabled)
+                  && (png_ptr->palette_index_check == PNG_PALETTE_CHECK_ON ||
+                      (png_ptr->palette_index_check == PNG_PALETTE_CHECK_DEFAULT
+                       && png_ptr->num_palette < (1U << png_ptr->bit_depth)))
 #              endif /* READ_CHECK_FOR_INVALID_INDEX */
+               )
 #           else /* no READ support */
                0
 #           endif /* READ checks */
@@ -866,8 +895,11 @@ png_init_row_info(png_structrp png_ptr)
                defined (PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED)
                (!png_ptr->read_struct
 #              ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
-                  && !png_ptr->palette_index_check_disabled)
+                  && (png_ptr->palette_index_check == PNG_PALETTE_CHECK_ON ||
+                      (png_ptr->palette_index_check == PNG_PALETTE_CHECK_DEFAULT
+                       && png_ptr->num_palette < (1U << png_ptr->bit_depth)))
 #              endif /* WRITE_CHECK_FOR_INVALID_INDEX */
+               )
 #           else /* no WRITE support */
                0
 #           endif /* WRITE checks */

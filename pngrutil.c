@@ -955,8 +955,11 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
    debug(png_ptr->palette == NULL); /* should only get set once */
    png_ptr->palette = png_voidcast(png_colorp, png_malloc(png_ptr,
          sizeof (png_color[PNG_MAX_PALETTE_LENGTH])));
-   memset(png_ptr->palette, 0xFFU, sizeof (png_color[PNG_MAX_PALETTE_LENGTH]));
-   memcpy(png_ptr->palette, info_ptr->palette, 3*num);
+   /* This works because we know png_set_PLTE also expands the palette to the
+    * full size:
+    */
+   memcpy(png_ptr->palette, info_ptr->palette,
+      sizeof (png_color[PNG_MAX_PALETTE_LENGTH]));
    png_ptr->num_palette = info_ptr->num_palette;
 
    /* The three chunks, bKGD, hIST and tRNS *must* appear after PLTE and before
@@ -4330,11 +4333,10 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                      /* Run the list.  It is ok if it doesn't end up doing
                       * anything; this can happen with a lazy init.
                       *
-                      * TODO: I don't think lazy inits happen any more, hence
-                      * the 'debug' below.
+                      * NOTE: if the only thingin the list is a palette check
+                      * function it can remove itself at this point.
                       */
                      max_depth = png_run_transform_list_forwards(png_ptr, &tc);
-                     debug(png_ptr->transform_list != NULL);
 
                      /* This is too late, a stack overwrite has already
                       * happened, but it may still prevent exploits:

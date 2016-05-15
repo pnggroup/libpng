@@ -33,6 +33,11 @@
 void /* PRIVATE */
 png_write_data(png_structrp png_ptr, png_const_voidp data, png_size_t length)
 {
+   /* This was guaranteed by prior versions of libpng, so app callbacks may
+    * assume it even though it isn't documented to be the case.
+    */
+   debug(length > 0U);
+
    /* NOTE: write_data_fn must not change the buffer!
     * This cast is required because of the API; changing the type of the
     * callback would require every app to change the callback and that change

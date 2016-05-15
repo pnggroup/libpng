@@ -5885,26 +5885,26 @@ typedef struct
 }  png_cache_params, *png_cache_paramsp;
 
 static void
-init_caching(png_structp png_ptr, png_cache_paramsp cp)
-   /* Given an already initialized cp->tend turn on caching if appropriate. */
+init_caching(png_structp png_ptr, png_transform_controlp tend)
+   /* Given an already initialized tend turn on caching if appropriate. */
 {
    /* Handle the colormap case, where a cache is always required: */
-   if (cp->tend.format & PNG_FORMAT_FLAG_COLORMAP)
+   if (tend->format & PNG_FORMAT_FLAG_COLORMAP)
    {
       /* This turns starts the palette caching with the next transform: */
-      cp->tend.palette = cp->tend.caching = 1U;
-      cp->tend.transparent_alpha = png_ptr->transparent_palette;
-      cp->tend.format = PNG_FORMAT_FLAG_COLOR;
+      tend->palette = tend->caching = 1U;
+      tend->transparent_alpha = png_ptr->transparent_palette;
+      tend->format = PNG_FORMAT_FLAG_COLOR;
 #     ifdef PNG_READ_tRNS_SUPPORTED
-         if (png_ptr->num_trans > 0 && !(cp->tend.invalid_info & PNG_INFO_tRNS))
+         if (png_ptr->num_trans > 0 && !(tend->invalid_info & PNG_INFO_tRNS))
          {
-            cp->tend.format |= PNG_FORMAT_FLAG_ALPHA;
+            tend->format |= PNG_FORMAT_FLAG_ALPHA;
          }
 #     endif /* READ_tRNS */
-      cp->tend.bit_depth = 8U;
+      tend->bit_depth = 8U;
    }
 
-   else if (PNG_TC_PIXEL_DEPTH(cp->tend) <= 8)
+   else if (PNG_TC_PIXEL_DEPTH(*tend) <= 8)
    {
       /* Cacheable pixel transforms; the pixel is less than 8 bits in size so
        * the cache makes sense.
@@ -5912,7 +5912,7 @@ init_caching(png_structp png_ptr, png_cache_paramsp cp)
        * TODO: check the cost estimate and the image size to avoid expensive
        * caches of very small images.
        */
-      cp->tend.caching = 1U;
+      tend->caching = 1U;
    }
 
    /* TODO: handle handle 8-bit GA/RGB/RGBA */
@@ -6019,7 +6019,6 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
     * list, so:
     */
    affirm((cp->tstart.format & PNG_FORMAT_FLAG_COLORMAP) != 0); /* required */
-   debug(cp->start == &png_ptr->transform_list); /* should be harmless */
 
    /* Run the whole of the given list on the palette data.  PNG_TC_INIT_FINAL
     * has already been run; this is a full run (with init == 0).
@@ -6029,7 +6028,7 @@ update_palette(png_structp png_ptr, png_cache_paramsp cp,
       only_deb(png_transform_control orig = cp->tend;)
 
       cp->tend = cp->tstart;
-      init_caching(png_ptr, cp);
+      init_caching(png_ptr, &cp->tend);
       /* And set up tend to actually work out the palette: */
       cp->tend.init = 0U;
       cp->tend.width = setup_palette_cache(png_ptr, cache.b8);
@@ -6296,7 +6295,7 @@ make_cache(png_structp png_ptr, png_cache_paramsp cp, unsigned int max_depth)
     */
    save_cp_channel_data(&save, &cp->tend);
    cp->tend = cp->tstart;
-   init_caching(png_ptr, cp);
+   init_caching(png_ptr, &cp->tend);
    /* And set tend to work out the result of transforming each possible pixel
     * value:
     */
@@ -6589,7 +6588,7 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
     */
 {
    png_transformp *list = &png_ptr->transform_list;
-   unsigned int max_depth;
+   unsigned int max_depth, cache_start_depth;
    png_cache_params cp;
 
    /* PNG color-mapped data must be handled here so that the palette is updated
@@ -6608,8 +6607,7 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
 #  endif /* READ_tRNS */
    cp.end = cp.start = list;
    cp.tend = cp.tstart = *tc;
-   init_caching(png_ptr, &cp);
-   max_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
+   max_depth = cache_start_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
 
    while (*cp.end != NULL)
    {
@@ -6618,6 +6616,22 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
       /* The user transform cannot be cached. */
       if (tr->order >= PNG_TR_USER)
          break;
+
+      /* If caching is not on and this transform is after PNG_TR_START_CACHE
+       * try to turn it on.
+       */
+      if (tr->order > PNG_TR_START_CACHE && !cp.tend.caching)
+      {
+         cp.start = cp.end;
+         cp.tstart = cp.tend;
+         init_caching(png_ptr, &cp.tend);
+
+         if (cp.tend.caching)
+         {
+            cache_start_depth = max_depth;
+            max_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
+         }
+      }
 
       /* If the 'palette' flag is set and the next transform has order
        * PNG_TR_ENCODING or later cache the results so far and continue with the
@@ -6630,6 +6644,8 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
          /* The cache handling function must maintain cp.end; */
          affirm(tr == *cp.end);
          max_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
+         if (max_depth < cache_start_depth)
+            max_depth = cache_start_depth;
       }
 
       /* Now run the transform list entry: */
@@ -6664,6 +6680,8 @@ png_read_init_transform_mech(png_structp png_ptr, png_transform_controlp tc)
       handle_cache(png_ptr, &cp, max_depth);
       affirm(tr == *cp.end);
       max_depth = PNG_TC_PIXEL_DEPTH(cp.tend);
+      if (max_depth < cache_start_depth)
+         max_depth = cache_start_depth;
    }
 
    /* At the end run the init on the user transform: */
