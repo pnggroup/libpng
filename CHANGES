@@ -5562,6 +5562,10 @@ Version 1.6.22beta06 [May 5, 2016]
 Version 1.6.22rc01 [May 14, 2016]
   No changes.
 
+Version 1.6.22rc02 [May 16, 2016]
+  Removed contrib/timepng from default build; it does not build on platforms
+    that don't supply clock_gettime().
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -12,7 +12,7 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage timepng
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage
 
 # Utilities - installed
 bin_PROGRAMS= pngfix png-fix-itxt
@@ -41,9 +41,6 @@ pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngimage_SOURCES = contrib/libtests/pngimage.c
 pngimage_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-
-timepng_SOURCES = contrib/libtests/timepng.c
-timepng_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngfix_SOURCES = contrib/tools/pngfix.c
 pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -223,7 +220,6 @@ contrib/libtests/pngimage.o: pnglibconf.h
 contrib/libtests/pngvalid.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
-contrib/libtests/timepng.o: pnglibconf.h
 
 contrib/tools/makesRGB.o: pnglibconf.h
 contrib/tools/pngfix.o: pnglibconf.h
