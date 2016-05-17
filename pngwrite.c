@@ -538,9 +538,6 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (png_ptr != NULL)
    {
-      /* Set the IDAT size to the default, the app can change it later. */
-      png_ptr->IDAT_size = PNG_ZBUF_SIZE;
-
       /* This is a highly dubious configuration option; by default it is off,
        * but it may be appropriate for private builds that are testing
        * extensions not conformant to the current specification, or of

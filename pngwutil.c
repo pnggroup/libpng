@@ -863,11 +863,10 @@ typedef struct png_zlib_state
              */
 #        define PNG_FILTER_SELECT_WINDOW_MAX 8453377U
          png_byte filter_select_threshold;
-            /* If the number of distinct codes seen in the PNG data are at or
-             * below this threshold the PNG data will not be filtered (if the
-             * 'none' filter is allowed).  If this is not true yet a particular
-             * filter does not add new codes and the code count is below the
-             * threshold that filter will be used.
+            /* If the number of distinct codes seen in the PNG data are below
+             * this threshold the PNG data will not be filtered (if the 'none'
+             * filter is allowed).  If this is still true and a particular
+             * filter does not add new codes that filter will be used.
              */
          png_byte filter_select_threshold2;
             /* If the number of distinct codes that result by using a particular
@@ -1019,9 +1018,9 @@ png_deflate_destroy(png_structrp png_ptr)
 #define pz_strategy_pos      3
 #define pz_zlib_bits    0xFFFFU
 /* Anything below this is not used directly by zlib: */
-#define pz_png_level_base          0  /* libpng equivalent of zlib level */
-#define pz_png_level_max          10
-#define pz_png_level_pos           4
+#define pz_png_level_base  (-1)  /* libpng equivalent of zlib level */
+#define pz_png_level_max    10
+#define pz_png_level_pos     4
 
 #define pz_offset(name)     (pz_ ## name ## _base - 1)
    /* setting_value == pz_offset(setting)+encoded_value */
@@ -1112,7 +1111,10 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
     * 6 (at present).
     */
    if (!pz_isset(png_level, settings))
-      png_level = 6U; /* the default */
+   {
+      png_level = 6; /* the default */
+      settings |= pz_encode(png_level, png_level);
+   }
 
    else
       png_level = pz_value(png_level, settings);
@@ -1125,6 +1127,14 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
    {
       switch (png_level)
       {
+         case -1: /* Legacy setting */
+            if (owner != png_IDAT)
+               strategy = Z_DEFAULT_STRATEGY;
+
+            else /* Leave to be set later */
+               strategy = pz_offset(strategy); /* Invalid: actually 'unset' */
+            break;
+
          case 1: /* ultra-fast */
          case 2:
             /* RLE is as fast as HUFFMAN_ONLY and can reduce size a lot in a few
@@ -1173,13 +1183,16 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
             zlib_level = 1;
             break;
 
-         default: /* Z_FIXED, Z_FILTERED, Z_DEFAULT_STRATEGY */
+         default: /* Z_FIXED, Z_FILTERED, Z_DEFAULT_STRATEGY, invalid */
             /* Everything that uses the window seems to show rapidly diminishing
              * returns above level 6 (at least with libpng 1.6).
              * Z_DEFAULT_COMPRESSION is, in fact, level 6 so Mark seems to
              * concur.
              */
-            if (png_level < 9)
+            if (png_level < 0) /* Legacy */
+               zlib_level = Z_DEFAULT_COMPRESSION;
+
+            else if (png_level < 9)
                zlib_level = png_level;
 
             else /* PNG compression level 10; the ridiculous level */
@@ -1199,7 +1212,10 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
     */
    if (!pz_isset(windowBits, settings))
    {
-      if (zlib_level == Z_NO_COMPRESSION)
+      if (png_level < 0) /* Legacy */
+         windowBits = 15;
+
+      else if (zlib_level == Z_NO_COMPRESSION)
          windowBits = 8;
 
       /* If the strategy has been set to something that doesn't benefit from
@@ -1317,7 +1333,8 @@ pz_default_settings(png_uint_32 settings, png_uint_32 owner,
     * with limited memory requirements may need to override it.
     */
    if (!pz_isset(memLevel, settings))
-      settings |= pz_encode(memLevel, MAX_MEM_LEVEL/*from zconf.h*/);
+      settings |= pz_encode(memLevel,
+            png_level < 0 ? 8 : MAX_MEM_LEVEL/*from zconf.h*/);
 
    return settings;
 }
@@ -1355,6 +1372,8 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
       }
 
       settings = pz_default_settings(settings, owner, data_size);
+      /* Because png_IDAT does not initialize the strategy: */
+      debug(pz_isset(strategy, settings));
 
       /* Check against the previous initialized values, if any.  The relevant
        * settings are in the low 16 bits.
@@ -2656,6 +2675,9 @@ png_write_IDAT(png_structrp png_ptr, int flush)
    affirm(ps != NULL && ps->s.end != NULL && *ps->s.end == NULL);
    png_zlib_compress_validate(&png_ptr->zlib_state->s, 0/*in_use*/);
 
+   if (png_ptr->IDAT_size == 0U) /* delay initialize */
+      png_ptr->IDAT_size = PNG_ZBUF_SIZE;
+
    /* Write IDAT chunks while either 'flush' is true or there are at
     * least png_ptr->IDAT_size bytes available to be written.
     */
@@ -3408,14 +3430,41 @@ write_start_IDAT(png_structrp png_ptr)
 
    {
       const png_alloc_size_t image_size = png_image_size_checked(png_ptr);
-      const png_uint_32 settings = pz_default_settings(ps->pz_IDAT, png_IDAT,
+      png_uint_32 settings = pz_default_settings(ps->pz_IDAT, png_IDAT,
          image_size > 0 && image_size < 0xffffffffU ? image_size : 0xffffffffU);
+
+      if (!pz_isset(strategy, settings))
+      {
+         /* This is the legacy setting: the strategy was set according to the
+          * PNG format and this happened regardless of whether write filters are
+          * supported unless write filtering *is* supported and the app forces
+          * no filtering (totally inconsistent!)
+          */
+#        ifdef PNG_WRITE_FILTER_SUPPORTED
+            if (ps->filter_mask == PNG_FILTER_NONE)
+               settings |= pz_encode(strategy, Z_DEFAULT_STRATEGY);
+
+            else if (ps->filter_mask != 0/*unset*/)
+               settings |= pz_encode(strategy, Z_FILTERED);
+
+            else /* filters unset */
+#        endif /* WRITE_FILTER */
+         if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE ||
+             png_ptr->bit_depth < 8U)
+            settings |= pz_encode(strategy, Z_DEFAULT_STRATEGY);
+
+         else
+            settings |= pz_encode(strategy, Z_FILTERED);
+      }
 
       /* Freeze the settings now; this avoids the need to call
        * pz_default_settings again when the zlib stream is initialized.  Also,
        * the caller relies on this.
        */
       ps->pz_IDAT = settings;
+
+      if (png_ptr->IDAT_size == 0U && pz_value(png_level, settings) < 0)
+         png_ptr->IDAT_size = 8192U; /* Legacy setting */
    }
 
    return ps;
@@ -3437,7 +3486,7 @@ png_write_start_IDAT(png_structrp png_ptr)
    {
 #     ifdef PNG_SELECT_FILTER_SUPPORTED
          /* The result depends on the png compression level: */
-         const unsigned int png_level = pz_value(png_level, ps->pz_IDAT);
+         const int png_level = pz_value(png_level, ps->pz_IDAT);
 
          /* If the bit depth is less than 8, so pixels are not byte aligned,
           * PNG filtering hardly ever helps because there is no correlation
@@ -3467,9 +3516,19 @@ png_write_start_IDAT(png_structrp png_ptr)
           * Zlib doesn't care what the codes are, but Huffman encoding always
           * benefits from a biased distribution.
           */
-         if (write_row_size == 0U /* row cannot be buffered */ ||
-             png_level < 4 || png_ptr->bit_depth < 8 || write_row_size <= 256U
-             || (png_ptr->bit_depth == 16 && write_row_size <= 1024))
+         if (png_level < 0) /* Legacy */
+         {
+            if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE ||
+                png_ptr->bit_depth < 8U)
+               mask = PNG_FILTER_NONE;
+
+            else
+               mask = PNG_ALL_FILTERS;
+         }
+
+         else if (write_row_size == 0U /* row cannot be buffered */ ||
+             png_level < 4 || png_ptr->bit_depth < 8U || write_row_size <= 256U
+             || (png_ptr->bit_depth == 16U && write_row_size <= 1024U))
             mask = PNG_FILTER_NONE; /* NOTE: the mask, not the value! */
 
          /* ELSE: there are at least 256 bytes in every row and the pixels
@@ -3494,7 +3553,6 @@ png_write_start_row(png_zlib_statep ps, int start_of_pass, int no_previous_row)
     * handling in the row.  Sets png_zlib_state::filters to a single filter.
     */
 {
-   /* No filter selection, so choose the first filter */
    unsigned int mask = ps->filter_mask;
 
    /* If we see a previous-row filter in mask and png_zlib_state::save_row is
@@ -3919,10 +3977,10 @@ typedef struct filter_selector
        * in (window-1) bytes).
        */
    png_uint_32  sum_bias[PNG_FILTER_VALUE_LAST];
-      /* For each filter a measure of its goodness in the filter sum
-       * calculation.  This allows filter selection based on the
-       * sum-of-absolute-dfferences method to be biased to favour particular
-       * filters.  There was no such bias before 1.7
+      /* For each filter a measure of its cost in the filter sum calculation.
+       * This allows filter selection based on the sum-of-absolute-dfferences
+       * method to be biased to favour particular filters.  There was no such
+       * bias before 1.7 and the filter byte was ignored.
        */
    png_uint_32  distance;           /* Distance from beginning */
    png_codeset  codeset;            /* Set of seen codes */
@@ -3948,7 +4006,21 @@ png_start_filter_select(png_zlib_statep ps, unsigned int bpp)
             ps->filter_select_window = window = PNG_FILTER_SELECT_WINDOW_MAX;
 
          fs->code_count = 0;
-         memset(fs->sum_bias, 0U, sizeof fs->sum_bias);
+
+         switch (pz_value(png_level, ps->pz_IDAT))
+         {
+            unsigned int f;
+
+            case -1: /* Legacy */
+               memset(fs->sum_bias, 0U, sizeof fs->sum_bias);
+               break;
+
+            default:
+               /* TODO: investiage other settings */
+               for (f=0; f<PNG_FILTER_VALUE_LAST; ++f)
+                  fs->sum_bias[f] = f;
+               break;
+         }
 
          /* This is the maximum row width, in pixels, of a row which fits and
           * leaves 1 byte free in the window.  For any bigger row filter
@@ -3964,8 +4036,18 @@ png_start_filter_select(png_zlib_statep ps, unsigned int bpp)
          /* Delay initialize the other control fields in png_zlib_state.
           * TODO: whichever of these are useful need to be in pnglibconf.dfa
           */
-         ps->filter_select_threshold = 64U; /* 6bit RGB */
-         ps->filter_select_threshold2 = 50U; /* TODO: experiment required! */
+         if (pz_get(ps, IDAT, png_level, 0) >= 0)
+         {
+            ps->filter_select_threshold = 64U; /* 6bit RGB */
+            ps->filter_select_threshold2 = 50U; /* TODO: experiment required! */
+         }
+
+         else
+         {
+            ps->filter_select_threshold = 1U; /* disabled */
+            ps->filter_select_threshold2 = 1U;
+         }
+
          ps->selector = fs;
       }
 
@@ -4001,11 +4083,11 @@ typedef struct
 
 static void
 filter_data_init(filter_data *fd, png_uint_32 distance, unsigned int filter,
-      unsigned int code_is_set)
+      unsigned int code_is_set, png_uint_32 bias)
 {
    fd->code_count = 1U;
    fd->new_code_count = !code_is_set;
-   fd->sum_low = filter;
+   fd->sum_low = bias;
    fd->sum_high = 0U;
    memset(&fd->codeset, 0U, sizeof fd->codeset);
    PNG_CODE_SET(fd->codeset, filter);
@@ -4028,7 +4110,7 @@ add_code(const filter_selector *fs, filter_data *fd, png_uint_32 distance,
    {
       png_uint_32 low = fd->sum_low;
 
-      if (code >= 128U)
+      if (code <= 128U)
          low += code;
 
       else
@@ -4178,7 +4260,8 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
          distance = fs->distance;
          filter_data_init(fd+PNG_FILTER_VALUE_NONE, distance++,
                PNG_FILTER_VALUE_NONE,
-               PNG_CODE_IS_SET(fs->codeset, PNG_FILTER_VALUE_NONE));
+               PNG_CODE_IS_SET(fs->codeset, PNG_FILTER_VALUE_NONE),
+               fs->sum_bias[PNG_FILTER_VALUE_NONE]);
 
          if (bpp >= 8) /* complete bytes */
          {
@@ -4216,14 +4299,13 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
           * png_zlib_state::filter_select_threshold and causes an early return
           * here.
           */
-         if (fd[PNG_FILTER_VALUE_NONE].new_code_count + fs->code_count <=
+         if (fd[PNG_FILTER_VALUE_NONE].new_code_count + fs->code_count <
                ps->filter_select_threshold)
             return filter_data_select(ps, fd, PNG_FILTER_VALUE_NONE, distance,
                   width);
       } /* PNG_FILTER_NONE */
 
       memset(prev_pixels, 0U, sizeof prev_pixels);
-
       distance = fs->distance;
 
       {
@@ -4232,7 +4314,7 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
          for (i=PNG_FILTER_VALUE_NONE+1U; i<PNG_FILTER_VALUE_LAST; ++i)
             if (PNG_FILTER_MASK(i) & filters)
                filter_data_init(fd+i, distance, i,
-                     PNG_CODE_IS_SET(fs->codeset, i));
+                     PNG_CODE_IS_SET(fs->codeset, i), fs->sum_bias[i]);
       }
 
       ++distance;
@@ -4306,7 +4388,7 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
        * a filter which does not increase the code count select it; doing so
        * should do no harm to the overall compression.
        */
-      if (fs->code_count <= ps->filter_select_threshold)
+      if (fs->code_count < ps->filter_select_threshold)
       {
          unsigned int f, min_new_count = 257U, min_f = PNG_FILTER_VALUE_NONE;
 
@@ -4326,7 +4408,7 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
           * on this basis alone:
           */
          if (min_f != PNG_FILTER_VALUE_NONE &&
-             fs->code_count + min_new_count <= ps->filter_select_threshold2)
+             fs->code_count + min_new_count < ps->filter_select_threshold2)
             return filter_data_select(ps, fd, min_f, distance, width);
       }
 
@@ -4349,10 +4431,7 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
                  (fd[f].sum_high == high && fd[f].sum_low < low)))
             {
                high = fd[f].sum_high;
-               /* The bias is the per-filter bias, a measure of the preference
-                * of this filter over the others.
-                */
-               low = fd[f].sum_low - fs->sum_bias[f];
+               low = fd[f].sum_low;
 
                if (low & 0x80000000U)
                {
