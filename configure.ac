@@ -146,6 +146,12 @@ AC_C_RESTRICT
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([memset], , AC_MSG_ERROR(memset not found in libc))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_MSG_ERROR(cannot find pow)) )
+
+# Some later POSIX 1003.1 functions are required for test programs, failure here
+# is soft (the corresponding test program is not built).
+AC_CHECK_FUNC([clock_gettime],,[AC_MSG_WARN([not building timepng])])
+AM_CONDITIONAL([HAVE_CLOCK_GETTIME], [test "$ac_cv_func_clock_gettime" = "yes"])
+
 AC_ARG_WITH(zlib-prefix,
    AS_HELP_STRING([[[--with-zlib-prefix]]],
       [prefix that may have been used in installed zlib]),

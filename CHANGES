@@ -5566,6 +5566,10 @@ Version 1.6.22rc02 [May 16, 2016]
   Removed contrib/timepng from default build; it does not build on platforms
     that don't supply clock_gettime().
 
+Version 1.6.22rc03 [May 17, 2016]
+  Restored contrib/timepng to default build but check for check for presence
+    of clock_gettime() in configure.ac and Makefile.am.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,4 +1,4 @@
-Libpng 1.6.22rc02 - May 16, 2016
+Libpng 1.6.22rc02 - May 17, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -102,9 +102,14 @@ Version 1.6.22beta06 [May 5, 2016]
 Version 1.6.22rc01 [May 14, 2016]
   No changes.
 
-Version 1.6.22rc02 [May 16, 2016]
+Version 1.6.22rc02 [May 17, 2016]
   Removed contrib/timepng from default build; it does not build on platforms
     that don't supply clock_gettime().
+  Check for CLOCK_PROCESS_CPUTIME_ID when building /contrib/libtests/timepng.
+
+Version 1.6.22rc03 [May 16, 2016]
+  Restored contrib/timepng to default build but check for check for presence
+    of clock_gettime() in configure.ac and Makefile.am.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
