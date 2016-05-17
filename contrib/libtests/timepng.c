@@ -44,9 +44,9 @@
 #  define voidcast(type, value) (value)
 #endif /* __cplusplus */
 
-#if (defined (CLOCK_PROCESS_CPUTIME_ID) &&
-     defined (PNG_SEQUENTIAL_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED)\
-     && defined(PNG_EASY_ACCESS_SUPPORTED) && defined(PNG_INFO_IMAGE_SUPPORTED)
+#if defined (CLOCK_PROCESS_CPUTIME_ID) && \
+    defined (PNG_SEQUENTIAL_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED) \
+    && defined(PNG_EASY_ACCESS_SUPPORTED) && defined(PNG_INFO_IMAGE_SUPPORTED)
 
 typedef struct
 {
