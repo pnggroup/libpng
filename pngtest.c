@@ -2079,4 +2079,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_22rc02 Your_png_h_is_not_version_1_6_22rc02;
+typedef png_libpng_version_1_6_22rc03 Your_png_h_is_not_version_1_6_22rc03;
