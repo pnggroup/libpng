@@ -1,3 +1,5 @@
+< contrib/libtests/timepng.o: pnglibconf.h
+
 # Makefile.am:
 #   Source file for Makefile.in (and hence Makefile)
 #
@@ -7,7 +9,7 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage timepng
 
 # Utilities - installed
 bin_PROGRAMS= pngfix png-fix-itxt
@@ -41,6 +43,9 @@ pngfix_SOURCES = contrib/tools/pngfix.c
 pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
+
+timepng_SOURCES = contrib/libtests/timepng.c
+timepng_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
