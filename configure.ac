@@ -136,6 +136,11 @@ AC_C_RESTRICT
 AC_CHECK_FUNCS([memset memcpy strncpy],,
                AC_MSG_FAILURE([missing ANSI-C functions]))
 
+# Some later POSIX 1003.1 functions are required for test programs, failure here
+# is soft (the corresponding test program is not built).
+AC_CHECK_FUNC([clock_gettime],,[AC_MSG_WARN([not building timepng])])
+AM_CONDITIONAL([HAVE_CLOCK_GETTIME], [test "$ac_cv_func_clock_gettime" = "yes"])
+
 # floor and ceil are required for FLOATING_POINT, but they can be turned off on
 # the configure command line (and they are independent.)  Default is to 'on'
 AC_ARG_ENABLE([floating-point],
