@@ -5590,9 +5590,44 @@ Version 1.7.0beta80 [May 6, 2016]
       unreachable code in pz_default_settings and eliminated a spurious
       warning in pngcp for small files.
 
-Version 1.7.0beta81 [May 16, 2016]
+Version 1.7.0beta81 [May 21, 2016]
   Check for CLOCK_PROCESS_CPUTIME_ID when building /contrib/libtests/timepng.
     Otherwise it does not build on platforms that don't supply clock_gettime().
+  Add check for clock_gettime() in Makefile.am and configure.ac
+  Reenabled filter selection (dummy).  This implements the code for
+    row-by-row filter selection but does not provide an actual implementation;
+    the selection function just chooses the lowest set filter bit.
+  Fixed a signed/unsigned warning (GCC 4.8.5) in pngwutil.c
+  Implemented base filter selection with row buffering and a crude code-count
+    algorithm.
+  Added filter selection, palette index checks.  Palette index checking:
+    checking on read was erroneously skipped.  pngcp can now turn off the
+    palette index checking or fix the errors (mainly to allow comparison with
+    libpng 1.6, which defaulted to ignoring it).  The API now documents how
+    the 'enabled' parameter works.  On read the check is on by default (it
+    was apparently off in libpng 1.6) however now if explicitly turned on the
+    warning message is stopped; this provides better interaction with
+    get_palette_max at the cost of a small API change (may need to be reviewed.)
+  Palette size errors: invalid entries in the palette are now set to #beaded to
+    make the errors more obvious and allow easy detection in memory.
+  Read transform pipeline caching: changes to fix the palette index check
+    (which are erroneously cached), the pipeline can now contain multiple
+    caches, e.g., caching of packing of palette indices can be combined with
+    caching of palette RGB transforms.
+  Read code now checks for callbacks to read 0 data (and faults them).
+    Fixed the reading of PNGs with multiple 0 length IDATs that failed as a
+    result plus the handling of zero length unknown (which occurs, validly;
+    the spurious warning has been removed).
+  Filter selection: the 1.6 and earlier sum of absolute differences algorithm
+    has been reintroduced with an option to disfavor some filters over others
+    where the sums are close (not yet exposed).  The selection code also logs
+    the last known occurence of each possible byte code across multiple lines.
+    This allows detection of PNG images with lower bit depth than the format
+    implies and, therefore, allows the filtering to be turned off in those
+    cases as well.
+  The default write zlib settings are still lower than libpng16.  The
+    selection algorithm is being refined (the overall results are worse than
+    not doing any filtering).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
