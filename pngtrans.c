@@ -834,30 +834,26 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int enabled)
    {
       if (png_ptr->read_struct)
       {
-#        ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-            if (enabled > 0)
-               png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
-            else if (enabled < 0)
-               png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
-            else
-               png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
-#        else /* !READ_CHECK_FOR_INVALID_INDEX */
+#        ifndef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
             png_app_error(png_ptr, "no read palette check support");
+            return;
 #        endif /* !READ_CHECK_FOR_INVALID_INDEX */
       }
+
       else /* write struct */
       {
-#        ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
-            if (enabled > 0)
-               png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
-            else if (enabled < 0)
-               png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
-            else
-               png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
-#        else /* !WRITE_CHECK_FOR_INVALID_INDEX */
+#        ifndef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
             png_app_error(png_ptr, "no write palette check support");
+            return;
 #        endif /* !WRITE_CHECK_FOR_INVALID_INDEX */
       }
+
+      if (enabled > 0)
+         png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
+      else if (enabled < 0)
+         png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
+      else
+         png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
    }
 }
 #endif /* CHECK_FOR_INVALID_INDEX */
