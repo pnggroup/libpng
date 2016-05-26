@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2013,2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.22 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.22 [May 26, 2016]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -44,9 +44,19 @@
 #  define voidcast(type, value) (value)
 #endif /* __cplusplus */
 
-#if defined (CLOCK_PROCESS_CPUTIME_ID) && \
-    defined (PNG_SEQUENTIAL_READ_SUPPORTED) && defined(PNG_STDIO_SUPPORTED) \
-    && defined(PNG_EASY_ACCESS_SUPPORTED) && defined(PNG_INFO_IMAGE_SUPPORTED)
+/* 'CLOCK_PROCESS_CPUTIME_ID' is one of the clock timers for clock_gettime.  It
+ * need not be supported even when clock_gettime is available.  It returns the
+ * 'CPU' time the process has consumed.  'CPU' time is assumed to include time
+ * when the CPU is actually blocked by a pending cache fill but not time
+ * waiting for page faults.  The attempt is to get a measure of the actual time
+ * the implementation takes to read a PNG ignoring the potentially very large IO
+ * overhead.
+ */
+#if defined (CLOCK_PROCESS_CPUTIME_ID) && defined(PNG_STDIO_SUPPORTED) &&\
+    defined(PNG_EASY_ACCESS_SUPPORTED) &&\
+    (PNG_LIBPNG_VER >= 10700 ? defined(PNG_READ_PNG_SUPPORTED) :\
+     defined (PNG_SEQUENTIAL_READ_SUPPORTED) &&\
+     defined(PNG_INFO_IMAGE_SUPPORTED))
 
 typedef struct
 {
