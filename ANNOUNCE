@@ -1,32 +1,30 @@
 
-Libpng 1.5.27rc01 - May 14, 2016
+Libpng 1.5.27 - May 26, 2016
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.27rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.27rc01.tar.gz
+   libpng-1.5.27.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.27.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1527r01.7z  (LZMA-compressed, recommended)
-   lp1527r01.zip
+   lpng1527.7z  (LZMA-compressed, recommended)
+   lpng1527.zip
 
 Other information:
 
-   1.5.27rc01-README.txt
-   1.5.27rc01-LICENSE.txt
-   libpng-1.5.27rc01-*.asc (armored detached GPG signatures)
+   libpng-1.5.27-README.txt
+   libpng-1.5.27-LICENSE.txt
+   libpng-1.5.27-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.26):
 
-version 1.5.27beta01 [March 9, 2016]
   Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
     in the BigEndian tests by not testing it, making the BE code the same 
     as the LE version.
@@ -54,15 +52,10 @@ version 1.5.27beta01 [March 9, 2016]
   Changed PNG_INFO_cHNK and PNG_FREE_cHNK from 0xnnnn to 0xnnnnU in png.h
     (Robert C. Seacord).
   Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
-
-version 1.5.27beta02 [May 11, 2015]
   Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
     Bug report by (Y.Ohashik).
   Added PNG_FAST_FILTERS macro (defined as
     PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
-
-version 1.5.27rc01 [May 14, 2016]
-  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
