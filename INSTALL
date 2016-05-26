@@ -47,7 +47,9 @@ If configure does not work on your system, or if you have a need to
 change configure.ac or Makefile.am, and you have a reasonably
 up-to-date set of tools, running ./autogen.sh in a git clone before
 running ./configure may fix the problem.  To be really sure that you
-aren't using any of the included pre-built scripts, you can do this:
+aren't using any of the included pre-built scripts, especially if you
+are building from a tar distribution instead of a git distribution,
+do this:
 
     ./configure --enable-maintainer-mode
     make maintainer-clean

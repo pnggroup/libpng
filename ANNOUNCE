@@ -1,4 +1,4 @@
-Libpng 1.6.21 - January 15, 2016
+Libpng 1.6.22 - May 26, 2016
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -7,51 +7,82 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.21.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.21.tar.gz
+   libpng-1.6.22.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.22.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng16/lpng1621.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng16/lpng1621.zip
+   lpng1622.7z  (LZMA-compressed, recommended)
+   lpng1622.zip
 
 Other information:
 
-   libpng-1.6.21-README.txt
-   libpng-1.6.21-LICENSE.txt
-   libpng-1.6.21-*.asc (armored detached GPG signatures)
+   libpng-1.6.22-README.txt
+   libpng-1.6.22-LICENSE.txt
+   libpng-1.6.22-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.20):
+Changes since the last public release (1.6.21):
+  Changed PNG_USE_MKSTEMP to __COVERITY__ to select alternate
+    "tmpfile()" implementation in contrib/libtests/pngstest.c
+  Fixed NO_STDIO build of pngunknown.c to skip calling png_init_io()
+    if there is no stdio.h support.
+  Added a png_image_write_to_memory() API and a number of assist macros
+    to allow an application that uses the simplified API write to bypass
+    stdio and write directly to memory.
+  Added some warnings (png.h) and some check code to detect *possible*
+    overflow in the ROW_STRIDE and simplified image SIZE macros.  This
+    disallows image width/height/format that *might* overflow.  This is
+    a quiet API change that limits in-memory image size (uncompressed) to
+    less than 4GByte and image row size (stride) to less than 2GByte.
+  Revised workaround for false-positive Coverity issue in pngvalid.c.
+  Only use exit(77) in configure builds.
+  Updated CMakeLists.txt, added supporting scripts/gen*.cmake.in
+    and test.cmake.in (Roger Leigh).
+  Relaxed limit checks on gamma values in pngrtran.c. As suggested in
+    the comments gamma values outside the range currently permitted
+    by png_set_alpha_mode are useful for HDR data encoding.  These values
+    are already permitted by png_set_gamma so it is reasonable caution to
+    extend the png_set_alpha_mode range as HDR imaging systems are starting
+    to emerge.
+  Added a common-law trademark notice and export control information
+    to the LICENSE file, png.h, and the man page.
+  Restored "& 0xff" in png_save_uint_16() and png_save_uint_32() that
+    were accidentally removed from libpng-1.6.17. 
+  Changed PNG_INFO_cHNK and PNG_FREE_cHNK from 0xnnnn to 0xnnnnU in png.h
+    (Robert C. Seacord).
+  Removed dubious "#if INT_MAX" test from png.h that was added to
+    libpng-1.6.19 (John Bowler).
+  Add ${INCLUDES} in scripts/genout.cmake.in (Bug report by Nixon Kwok).
+  Updated LICENSE to say files in the contrib directory are not
+    necessarily under the libpng license, and that some makefiles have
+    other copyright owners.
+  Added INTEL-SSE2 support (Mike Klein and Matt Sarett, Google, Inc.).
+  Made contrib/libtests/timepng more robust.  The code no longer gives
+    up/fails on invalid PNG data, it just skips it (with error messages).
+    The code no longer fails on PNG files with data beyond IEND.  Options
+    exist to use png_read_png (reading the whole image, not by row) and, in
+    that case, to apply any of the supported transforms.  This makes for
+    more realistic testing; the decoded data actually gets used in a
+    meaningful fashion (John Bowler).
+  Fixed some misleading indentation (Krishnaraj Bhat).
+  Force GCC compilation to C89 if needed (Dagobert Michelsen).
+  SSE filter speed improvements for bpp=3:
+    memcpy-free implementations of load3() / store3().
+    call load3() only when needed at the end of a scanline.
+  Added PNG_FAST_FILTERS macro (defined as
+    PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
+  Various fixes for contrib/libtests/timepng.c
+  Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
+    (Bug report by Y.Ohashik).
+  Quieted two Coverity issues in contrib/libtests/timepng.c.
+  Fixed issues with scripts/genout.cmake.in (David Capello, Nixon Kwok):
+    Added support to use multiple directories in ZLIBINCDIR variable,
+    Fixed CMAKE_C_FLAGS with multiple values when genout is compiled on MSVC,
+    Fixed pnglibconf.c compilation on OS X including the sysroot path.
+  Check for CLOCK_PROCESS_CPUTIME_ID when building /contrib/libtests/timepng.
+  Check for the presence of clock_gettime() in configure.ac and Makefile.am.
 
-  Fixed syntax "$(command)" in tests/pngstest that some shells other than
-    bash could not parse (Bug report by Nelson Beebe). Use `command` instead.
-  Moved png_check_keyword() from pngwutil.c to pngset.c
-  Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
-    in the BigEndian tests by not testing it, making the BE code the same 
-    as the LE version.
-  Fixes to pngvalid for various reduced build configurations (eliminate unused
-    statics) and a fix for the case in rgb_to_gray when the digitize option
-    reduces graylo to 0, producing a large error.
-  Widened the 'limit' check on the internally calculated error limits in
-    the 'DIGITIZE' case (the code used prior to 1.7 for rgb_to_gray error
-    checks) and changed the check to only operate in non-release builds
-   (base build type not RC or RELEASE.)
-  Fixed undefined behavior in pngvalid.c, undefined because
-    (png_byte) << shift is undefined if it changes the signed bit
-    (because png_byte is promoted to int). The libpng exported functions
-    png_get_uint_32 and png_get_uint_16 handle this. (Bug reported by
-    David Drysdale as a result of reports from UBSAN in clang 3.8).
-  This changes pngvalid to use BE random numbers; this used to produce
-    errors but these should not be fixed as a result of the previous changes.
-  In projects/vstudio, combined readme.txt and WARNING into README.txt
-  Relocated assert() in contrib/tools/pngfix.c, bug found by American
-    Fuzzy Lop, reported by Brian Carpenter.
-  Marked 'limit' UNUSED in transform_range_check().  This only affects
-    release builds.
-  Worked around a false-positive Coverity issue in pngvalid.c.
-
-Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)

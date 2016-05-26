@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.21 [January 15, 2016]
+ * Last changed in libpng 1.6.22 [May 26, 2016]
  * Copyright (c) 2014-2016 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -62,10 +62,10 @@
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
  * a skipped test, in earlier versions we need to succeed on a skipped test, so:
  */
-#if PNG_LIBPNG_VER < 10601
-#  define SKIP 0
-#else
+#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
 #  define SKIP 77
+#else
+#  define SKIP 0
 #endif
 
 /* pngvalid requires write support and one of the fixed or floating point APIs.
@@ -309,13 +309,8 @@ static void r16(png_uint_16p p16, size_t count)
    }
 }
 
-#ifdef __COVERITY__
-#  define R16(this)\
-   r16(&(this), (sizeof (this))/2U/*(sizeof (png_uint_16))*/)
-#else
-#  define R16(this)\
-   r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
-#endif
+#define R16(this) r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
+#define R16_1(this) r16(&(this), (size_t) 1U)
 
 #if defined PNG_READ_RGB_TO_GRAY_SUPPORTED ||\
     defined PNG_READ_FILLER_SUPPORTED
@@ -331,13 +326,8 @@ static void r32(png_uint_32p p32, size_t count)
    }
 }
 
-#ifdef __COVERITY__
-#  define R32(this)\
-   r32(&(this), (sizeof (this))/4U/*(sizeof (png_uint_32))*/)
-#else
-#  define R32(this)\
-   r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
-#endif
+#define R32(this) r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
+#define R32_1(this) r32(&(this), (size_t) 1U)
 
 #endif /* READ_FILLER || READ_RGB_TO_GRAY */
 
@@ -350,7 +340,7 @@ random_mod(unsigned int max)
 {
    png_uint_16 x;
 
-   R16(x);
+   R16_1(x);
 
    return x % max; /* 0 .. max-1 */
 }
@@ -3317,10 +3307,10 @@ init_standard_palette(png_store *ps, png_structp pp, png_infop pi, int npalette,
       for (; i<256; ++i)
          tRNS[i] = 24;
 
-#     ifdef PNG_WRITE_tRNS_SUPPORTED
-         if (j > 0)
-            png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
-#     endif
+#ifdef PNG_WRITE_tRNS_SUPPORTED
+      if (j > 0)
+         png_set_tRNS(pp, pi, tRNS, j, 0/*color*/);
+#endif
    }
 }
 
@@ -7313,7 +7303,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
       png_uint_32 ru;
       double total;
 
-      R32(ru);
+      R32_1(ru);
       data.green_coefficient = total = (ru & 0xffff) / 65535.;
       ru >>= 16;
       data.red_coefficient = (1 - total) * (ru & 0xffff) / 65535.;
@@ -7947,11 +7937,11 @@ image_transform_png_set_background_set(const image_transform *this,
    else
       back.gray = (png_uint_16)data.red;
 
-#  ifdef PNG_FLOATING_POINT_SUPPORTED
-      png_set_background(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
-#  else
-      png_set_background_fixed(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
-#  endif
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+   png_set_background(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
+#else
+   png_set_background_fixed(pp, &back, PNG_BACKGROUND_GAMMA_FILE, expand, 0);
+#endif
 
    this->next->set(this->next, that, pp, pi);
 }
