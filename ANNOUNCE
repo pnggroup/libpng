@@ -26,6 +26,7 @@ Other information:
 Changes since the last public release (1.6.22):
 
 Version 1.6.23beta01 [May 28, 2016]
+  Stop a potential memory leak in png_set_tRNS() (Bug report by Ted Ying).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
