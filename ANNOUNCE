@@ -1,4 +1,4 @@
-Libpng 1.6.23beta01 - May 28, 2016
+Libpng 1.6.23beta01 - May 29, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,8 +25,11 @@ Other information:
 
 Changes since the last public release (1.6.22):
 
-Version 1.6.23beta01 [May 28, 2016]
+Version 1.6.23beta01 [May 29, 2016]
   Stop a potential memory leak in png_set_tRNS() (Bug report by Ted Ying).
+  Fixed the progressive reader to handle empty first IDAT chunk properly
+    (patch by Timothy Nikkel).  This bug was introduced in libpng-1.6.0 and
+    only affected the libpng16 branch.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
