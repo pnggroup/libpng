@@ -5578,6 +5578,9 @@ Version 1.6.23beta01 [May 29, 2016]
   Fixed the progressive reader to handle empty first IDAT chunk properly
     (patch by Timothy Nikkel).  This bug was introduced in libpng-1.6.0 and
     only affected the libpng16 branch.
+  Added tests in pngvalid.c to check zero-length IDAT chunks in various
+    positions.  Fixed the sequential reader to handle these more robustly
+    (John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
