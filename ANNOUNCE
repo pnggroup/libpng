@@ -1,61 +1,33 @@
 
-Libpng 1.5.27 - May 26, 2016
+Libpng 1.5.28beta01 - May 29, 2016
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.27.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.27.tar.gz
+   1.5.28beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.28beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1527.7z  (LZMA-compressed, recommended)
-   lpng1527.zip
+   lp1528b01.7z  (LZMA-compressed, recommended)
+   lp1528b01.zip
 
 Other information:
 
-   libpng-1.5.27-README.txt
-   libpng-1.5.27-LICENSE.txt
-   libpng-1.5.27-*.asc (armored detached GPG signatures)
+   1.5.28beta01-README.txt
+   1.5.28beta01-LICENSE.txt
+   libpng-1.5.28beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.5.26):
+Changes since the last public release (1.5.27):
 
-  Removed LE/BE dependencies in pngvalid, to 'fix' the current problem
-    in the BigEndian tests by not testing it, making the BE code the same 
-    as the LE version.
-  Fixes to pngvalid for various reduced build configurations (eliminate unused
-    statics) and a fix for the case in rgb_to_gray when the digitize option
-    reduces graylo to 0, producing a large error.
-  Widened the 'limit' check on the internally calculated error limits in
-    the 'DIGITIZE' case (the code used prior to 1.7 for rgb_to_gray error
-    checks) and changed the check to only operate in non-release builds
-   (base build type not RC or RELEASE.)
-  Fixed undefined behavior in pngvalid.c, undefined because
-    (png_byte) << shift is undefined if it changes the signed bit
-    (because png_byte is promoted to int). The libpng exported functions
-    png_get_uint_32 and png_get_uint_16 handle this. (Bug reported by
-    David Drysdale as a result of reports from UBSAN in clang 3.8).
-  This changes pngvalid to use BE random numbers; this used to produce
-    errors but these should not be fixed as a result of the previous changes.
-  In projects/vstudio, combined readme.txt and WARNING into README.txt
-  Worked around a false-positive Coverity issue in pngvalid.c.
-  Only use exit(77) from pngvalid.c in configure builds.
-  Updated CMakeLists.txt, added supporting scripts/gen*.cmake.in
-    and test.cmake.in (Roger Leigh).
-  Added a common-law trademark notice and export control information
-    to the LICENSE file, png.h, and the man page.
-  Changed PNG_INFO_cHNK and PNG_FREE_cHNK from 0xnnnn to 0xnnnnU in png.h
-    (Robert C. Seacord).
-  Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
-  Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
-    Bug report by (Y.Ohashik).
-  Added PNG_FAST_FILTERS macro (defined as
-    PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
+version 1.5.28beta01 [May 29, 2016]
+  Merge with current libpng16 pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

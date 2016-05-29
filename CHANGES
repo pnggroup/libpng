@@ -4484,17 +4484,20 @@ version 1.5.27beta01 [March 9, 2016]
     (Robert C. Seacord).
   Fixed some misleading indentation in pngvalid.c (Krishnaraj Bhat).
 
-version 1.5.27beta02 [May 11, 2015]
+version 1.5.27beta02 [May 11, 2016]
   Fixed typo (missing underscore) in #define PNG_READ_16_TO_8_SUPPORTED
     Bug report by (Y.Ohashik).
   Added PNG_FAST_FILTERS macro (defined as
     PNG_FILTER_NONE|PNG_FILTER_SUB|PNG_FILTER_UP).
 
-version 1.5.27rc01 [May 14, 2015]
+version 1.5.27rc01 [May 14, 2016]
   No changes.
 
 version 1.5.27 [May 26, 2016]
   No changes.
+
+version 1.5.28beta01 [May 29, 2016]
+  Merge with current libpng16 pngvalid.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
