@@ -1478,15 +1478,15 @@ store_read_imp(png_store *ps, png_bytep pb, png_size_t st)
 }
 
 static png_size_t
-store_read_chunk(png_store *ps, png_bytep pb, png_size_t max, png_size_t st)
+store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
+      const png_size_t min)
 {
    png_uint_32 chunklen = ps->chunklen;
    png_uint_32 chunktype = ps->chunktype;
    png_uint_32 chunkpos = ps->chunkpos;
+   png_size_t st = max;
 
-   max -= st;
-
-   if (max+st > 0) do
+   if (st > 0) do
    {
       if (chunkpos >= chunklen) /* end of last chunk */
       {
@@ -1651,7 +1651,7 @@ store_read_chunk(png_store *ps, png_bytep pb, png_size_t max, png_size_t st)
          ps->IDAT_size = IDAT_size;
       }
 
-      else
+      else /* !IDAT */
       {
          /* If there is still some pending IDAT data after the IDAT chunks have
           * been processed there is a problem:
@@ -1694,8 +1694,15 @@ store_read_chunk(png_store *ps, png_bytep pb, png_size_t max, png_size_t st)
             pb += avail;
             st -= avail;
             chunkpos += (png_uint_32)/*SAFE*/avail;
+
+            /* Check for end of chunk and end-of-file; don't try to read a new
+             * chunk header at this point unless instructed to do so by 'min'.
+             */
+            if (chunkpos >= chunklen && max-st >= min &&
+                     store_read_buffer_avail(ps) == 0)
+               break;
          }
-      }
+      } /* !IDAT */
    }
    while (st > 0);
 
@@ -1703,7 +1710,7 @@ store_read_chunk(png_store *ps, png_bytep pb, png_size_t max, png_size_t st)
    ps->chunktype = chunktype;
    ps->chunkpos = chunkpos;
 
-   return max+st;
+   return st; /* space left */
 }
 
 static void PNGCBAPI
