@@ -308,38 +308,33 @@ randomize(void *pv, size_t size)
 
 #define R8(this) randomize(&(this), sizeof (this))
 
-static void r16(png_uint_16p p16, size_t count)
+#ifdef PNG_READ_SUPPORTED
+static png_byte
+random_byte(void)
 {
-   size_t i;
-
-   for (i=0; i<count; ++i)
-   {
-      unsigned char b2[2];
-      randomize(b2, sizeof b2);
-      *p16++ = png_get_uint_16(b2);
-   }
+   unsigned char b1[1];
+   randomize(b1, sizeof b1);
+   return b1[0];
 }
+#endif /* READ */
 
-#define R16(this) r16(&(this), (sizeof (this))/(sizeof (png_uint_16)))
-#define R16_1(this) r16(&(this), (size_t) 1U)
+static png_uint_16
+random_u16(void)
+{
+   unsigned char b2[2];
+   randomize(b2, sizeof b2);
+   return png_get_uint_16(b2);
+}
 
 #if defined PNG_READ_RGB_TO_GRAY_SUPPORTED ||\
     defined PNG_READ_FILLER_SUPPORTED
-static void r32(png_uint_32p p32, size_t count)
+static png_uint_32
+random_u32(void)
 {
-   size_t i;
-
-   for (i=0; i<count; ++i)
-   {
-      unsigned char b4[4];
-      randomize(b4, sizeof b4);
-      *p32++ = png_get_uint_32(b4);
-   }
+   unsigned char b4[4];
+   randomize(b4, sizeof b4);
+   return png_get_uint_32(b4);
 }
-
-#define R32(this) r32(&(this), (sizeof (this))/(sizeof (png_uint_32)))
-#define R32_1(this) r32(&(this), (size_t) 1U)
-
 #endif /* READ_FILLER || READ_RGB_TO_GRAY */
 
 #endif /* READ || WRITE_tRNS || WRITE_FILTER */
@@ -349,11 +344,7 @@ static void r32(png_uint_32p p32, size_t count)
 static unsigned int
 random_mod(unsigned int max)
 {
-   png_uint_16 x;
-
-   R16_1(x);
-
-   return x % max; /* 0 .. max-1 */
+   return random_u16() % max; /* 0 .. max-1 */
 }
 #endif /* READ_TRANSFORMS || WRITE_FILTER */
 
@@ -362,11 +353,7 @@ random_mod(unsigned int max)
 static int
 random_choice(void)
 {
-   unsigned char x;
-
-   R8(x);
-
-   return x & 1;
+   return random_byte() & 1;
 }
 #endif /* READ_RGB_TO_GRAY || READ_FILLER */
 
@@ -1511,9 +1498,7 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
 
          if (IDAT_pos == IDAT_len)
          {
-            png_byte random;
-
-            R8(random);
+            png_byte random = random_byte();
 
             /* Make a new IDAT chunk, if IDAT_len is 0 this is the first IDAT,
              * if IDAT_size is 0 this is the end.  At present this is set up
@@ -1526,7 +1511,7 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
                {
                   case 0U: IDAT_len = 12U; break; /* 0 bytes */
                   case 1U: IDAT_len = 13U; break; /* 1 byte */
-                  default: R32(IDAT_len);
+                  default: IDAT_len = random_u32();
                            IDAT_len %= IDAT_size;
                            IDAT_len += 13U; /* 1..IDAT_size bytes */
                            break;
@@ -1568,7 +1553,7 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
                /* Middle of IDATs, use 'random' to determine the number of bits
                 * to use in the IDAT length.
                 */
-               R32(IDAT_len);
+               IDAT_len = random_u32();
                IDAT_len &= (1U << (1U + random % ps->IDAT_bits)) - 1U;
                if (IDAT_len > IDAT_size)
                   IDAT_len = IDAT_size;
@@ -3721,8 +3706,8 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
    {
       if (bit_depth == 8)
       {
-         R16(tRNS.red);
-         R16(tRNS.green);
+         tRNS.red = random_u16();
+         tRNS.green = random_u16();
          tRNS.blue = tRNS.red ^ tRNS.green;
          tRNS.red &= mask;
          tRNS.green &= mask;
@@ -3731,7 +3716,7 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
 
       else /* bit_depth == 16 */
       {
-         R16(tRNS.red);
+         tRNS.red = random_u16();
          tRNS.green = (png_uint_16)(tRNS.red * 257);
          tRNS.blue = (png_uint_16)(tRNS.green * 17);
       }
@@ -3739,7 +3724,7 @@ set_random_tRNS(png_structp pp, png_infop pi, const png_byte colour_type,
 
    else
    {
-      R16(tRNS.gray);
+      tRNS.gray = random_u16();
       tRNS.gray &= mask;
    }
 
@@ -7691,7 +7676,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
       png_uint_32 ru;
       double total;
 
-      R32_1(ru);
+      ru = random_u32();
       data.green_coefficient = total = (ru & 0xffff) / 65535.;
       ru >>= 16;
       data.red_coefficient = (1 - total) * (ru & 0xffff) / 65535.;
@@ -8619,7 +8604,7 @@ image_transform_png_set_filler_set(const image_transform *this,
     * filler.  The 'filler' value has all 32 bits set, but only bit_depth
     * will be used.  At this point we don't know bit_depth.
     */
-   R32(data.filler);
+   data.filler = random_u32();
    data.flags = random_choice();
 
    png_set_filler(pp, data.filler, data.flags);
@@ -8692,7 +8677,7 @@ image_transform_png_set_add_alpha_set(const image_transform *this,
     * filler.  The 'filler' value has all 32 bits set, but only bit_depth
     * will be used.  At this point we don't know bit_depth.
     */
-   R32(data.filler);
+   data.filler = random_u32();
    data.flags = random_choice();
 
    png_set_add_alpha(pp, data.filler, data.flags);
