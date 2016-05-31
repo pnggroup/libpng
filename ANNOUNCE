@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta81 - May 21, 2016
+Libpng 1.7.0beta81 - May 31, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1290,7 +1290,7 @@ Version 1.7.0beta80 [May 6, 2016]
       unreachable code in pz_default_settings and eliminated a spurious
       warning in pngcp for small files.
 
-Version 1.7.0beta81 [May 21, 2016]
+Version 1.7.0beta81 [May 31, 2016]
   Check for CLOCK_PROCESS_CPUTIME_ID when building /contrib/libtests/timepng.
     Otherwise it does not build on platforms that don't supply clock_gettime().
   Add check for clock_gettime() in Makefile.am and configure.ac
@@ -1328,6 +1328,7 @@ Version 1.7.0beta81 [May 21, 2016]
   The default write zlib settings are still lower than libpng16.  The
     selection algorithm is being refined (the overall results are worse than
     not doing any filtering).
+  Port contrib/libtests/pngvalid.c from libpng16.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
