@@ -5582,11 +5582,12 @@ Version 1.6.23beta01 [May 29, 2016]
     positions.  Fixed the sequential reader to handle these more robustly
     (John Bowler).
 
-Version 1.6.23beta02 [May 31, 2016]
+Version 1.6.23beta02 [June 1, 2016]
   Corrected progressive read input buffer in pngvalid.c. The previous version
     the code invariably passed just one byte at a time to libpng.  The intent
     was to pass a random number of bytes in the range 0..511.
   Moved sse2 prototype from pngpriv.h to contrib/intel/intel_sse.patch.
+  Added missing ")" in pngerror.c (Matt Sarrett).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
