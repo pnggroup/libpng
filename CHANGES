@@ -2916,7 +2916,8 @@ version 1.4.13 [February 6, 2014]
   No changes.
 
 version 1.4.14beta01 [November 6, 2014]
-  Avoid out-of-bounds memory access in png_user_version_check().
+  Fixed an out-of-range read in png_version_check() (Bug report from
+    Qixue Xiao, CVE-2015-8540).
   Simplified and future-proofed png_user_version_check().
 
 version 1.4.14rc01 [November 13, 2014]
@@ -3030,11 +3031,13 @@ version 1.4.19rc01 [December 14, 2015]
   Corrected copyright dates in source files.
   Moved png_check_keyword() from pngwutil.c to pngset.c
 
-version 1.4.19 [March 1, 2016]
+version 1.4.19 [December 17, 2015]
   No changes.
 
-version 1.4.20beta01 [March 1, 2016]
+version 1.4.20beta01 [June 4, 2016]
   Fix typos in libpng.3 synopses (Eric S. Raymond).
+  Fixed undefined behavior in png_push_save_buffer(). Do not call
+    memcpy() with a null source, even if count is zero (Leon Scroggins III).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
