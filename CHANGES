@@ -5590,7 +5590,7 @@ Version 1.7.0beta80 [May 6, 2016]
       unreachable code in pz_default_settings and eliminated a spurious
       warning in pngcp for small files.
 
-Version 1.7.0beta81 [May 31, 2016]
+Version 1.7.0beta81 [June 7, 2016]
   Check for CLOCK_PROCESS_CPUTIME_ID when building /contrib/libtests/timepng.
     Otherwise it does not build on platforms that don't supply clock_gettime().
   Add check for clock_gettime() in Makefile.am and configure.ac
@@ -5629,6 +5629,33 @@ Version 1.7.0beta81 [May 31, 2016]
     selection algorithm is being refined (the overall results are worse than
     not doing any filtering).
   Port contrib/libtests/pngvalid.c from libpng16.
+  PNG compression level setting API: this allows the various compression
+    settings controlling deflate, fitlering, and so on to be set via a single
+    setting with six values.  This is currently documented in png.h ("Write
+    compression settings").
+  Internally the compression settings have been tuned both for the overall
+    setting and for any specific settings made by the original APIs.
+  APIs to control iCCP chunk compression separately have been added.
+  contrib/examples/pngcp.c has been modified to accomodate the new compression
+    setting and to include options for separate control of iCCP chunk
+    compression.
+  The new "png_setting" ABI has been modified to accomodate a wider range of
+    settings and most of the old compression control ABIs have been replaced by
+    function-like macros with the same API which call png_setting.  This is an
+    API check in 1.7.0 for png_setting (alone).  png_setting now handles all
+    of png_set_option.  This eliminates 19 ABIs at the cost of adding 1
+    (png_setting).
+  CRC and benign error checking has been updated internally to use bit-fields
+    and the CRC calculation skip when the CRC is not used has been improved
+    slightly to avoid the initialization of the CRC.  A new png_setting based
+    API allows more detailed control of benign error/warning messages (this
+    may change, the internal error handling seems too complex.)  The
+    ERROR_NUMBERS support has been removed with the intent of implementing
+    proper i18n.
+  The memcpy-size-0 issue in png_push_fill_buffer has been fixed, with an
+    appropriate debug() assert if a fill for 0 bytes occurs.
+  Most PNG_FLAG_ values for png_struct::flags have been eliminated (as a
+    result of the benign error handling changes).  Only one remains.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

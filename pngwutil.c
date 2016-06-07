@@ -1288,7 +1288,7 @@ pz_default_settings(png_uint_32 settings, const png_uint_32 owner,
          case PNG_COMPRESSION_LOW:
          case PNG_COMPRESSION_MEDIUM:
             /* Z_FILTERED is almost as good as the default and can be
-             * significantly faster, it biases the algorithm towards smaller
+             * significantly faster. It biases the algorithm towards smaller
              * byte values.
              *
              * Using Z_DEFAULT_STRATEGY here, rather than Z_FILTERED, benefits
@@ -3632,7 +3632,7 @@ set_filter(png_zlib_statep ps, unsigned int filtersIn)
    /* Notice that PNG_NO_FILTERS is 0 and passes this test; this is OK because
     * filters then gets set to PNG_FILTER_NONE, as is required.
     *
-    * The argument to this routine is actually an (int), but convertion to
+    * The argument to this routine is actually an (int), but conversion to
     * (unsigned int) is safe because it leaves the top bits set which results in
     * PNG_EDOM below.
     */
