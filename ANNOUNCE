@@ -1356,6 +1356,22 @@ Version 1.7.0beta81 [June 7, 2016]
     appropriate debug() assert if a fill for 0 bytes occurs.
   Most PNG_FLAG_ values for png_struct::flags have been eliminated (as a
     result of the benign error handling changes).  Only one remains.
+  The LOW_MEMORY PNG_COMPRESSION option should not be setting HUFFMAN_ONLY or
+    using a low deflate 'level'; according to the comments in zconf.h only
+    windowBits and memLevel affect the memory.  pngwutil.c has been changed
+    to use the same values as HIGH compression.
+  The COMPAT option turned on the old optimize_cmf code (now in fix_cinfo),
+    however there was a serious bug in that code; it put the wrong value in
+    z_cmf.  The setting was also not handled correctly in
+    pz_compression_settings.
+  pngtest now verifies the operation of COMPAT and, as a result, pngtest.png
+    has been reverted to the libpng 1.6 (etc) version.
+  IDAT size handling has been improved; if not explicitly set values
+    appropriate to png_level are now chosen (in addition to the handling for
+    the COMPAT setting).  HIGH and HIGH_READ_SPEED now create unlimited
+    (up to the PNG chunk-size limit of 2^31-1 bytes) size IDAT chunks,
+    which requires buffering the whole of the IDAT data in memory but
+    reflects what other programs and optimizers do.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
