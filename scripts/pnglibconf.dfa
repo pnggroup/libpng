@@ -779,8 +779,12 @@ setting sCAL_PRECISION default 5
 # written IDAT chunks.  It can be any (zlib) uInt value, however this amount of
 # data has to be buffered on write so it is recommended that a smaller size be
 # used unless saving the 12-byte chunk overhead is necessary.
+#
+# If not set libpng uses the DEFAULT_COMPRESSION_LEVEL setting to determine
+# something appropriate.  The value below is only used for 'MEDIUM' compression
+# (which is the default: see below.)
 
-setting ZBUF_SIZE default 4096
+setting ZBUF_SIZE default 8192
 
 # This is the size of the decompression buffer used when counting or checking
 # the decompressed size of an LZ stream from a compressed ancilliary chunk; the

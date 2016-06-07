@@ -1036,7 +1036,7 @@ png_deflate_destroy(png_structrp png_ptr)
 
 static png_int_32
 pz_compression_setting(png_structrp png_ptr, png_uint_32 owner,
-      int min, int max, int shift, png_int_32 value, int only_get)
+      int min, int max, int shift, png_int_32 value, int only_get, int unset)
    /* This is a support function for png_write_setting below. */
 {
    png_zlib_statep ps;
@@ -1079,33 +1079,32 @@ pz_compression_setting(png_structrp png_ptr, png_uint_32 owner,
           * software engineers never made mistakes.
           */
          res = pz_compression_setting(png_ptr, png_IDAT, min, max, shift,
-               value, 0/*set*/);
+               value, 0/*set*/, 1/*iff unset*/);
 
          if (PNG_FAILED(res))
             return res;
 
          res = pz_compression_setting(png_ptr, png_iCCP, min, max, shift,
-               value, 0/*set*/);
+               value, 0/*set*/, 1/*iff unset*/);
 
          if (PNG_FAILED(res))
             return res;
 
-         /* The text settings are only changed if the system builder didn't
-          * disable the API to change them.  Perhaps this API shouldn't exist?
+         /* The text settings are changed regardless of the customize support
+          * because if WRITE_CUSTOMIZE_ZTXT_COMPRESSION is not supported the old
+          * behavior was to use the WRITE_CUSTOMIZE_COMPRESSION setting.
+          *
+          * However, when we get png_zTXt directly (from png_write_setting) and
+          * the support is not compiled in return PNG_ENOSYS.
           */
-         res = pz_compression_setting(png_ptr, png_iCCP, min, max, shift,
-               value, 0/*set*/);
+         unset = 1; /* i.e. only if not already set */
 
-         if (PNG_FAILED(res))
-            return res;
-
-         return 0;
-
-
+#     ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
          case png_zTXt:
          case png_iTXt:
-            if (ps != NULL) psettings = &ps->pz_text;
-            break;
+#     endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+         if (ps != NULL) psettings = &ps->pz_text;
+         break;
 
       default:
          /* Return PNG_ENOSYS, not PNG_EINVAL, to support future addition of new
@@ -1122,7 +1121,10 @@ pz_compression_setting(png_structrp png_ptr, png_uint_32 owner,
       png_uint_32 settings = *psettings;
       png_uint_32 mask = 0xFU << shift;
 
-      if (!only_get)
+      /* Do not set it if 'only_get' was passed in or if 'unset' is true and the
+       * setting is not currently set:
+       */
+      if (!only_get && ((settings & mask) == 0U || !unset))
          *psettings = (settings & ~mask) +
             ((png_uint_32)/*SAFE*/(value-min+1) << shift);
 
@@ -1138,7 +1140,7 @@ pz_compression_setting(png_structrp png_ptr, png_uint_32 owner,
 
 #define compression_setting(pp, owner, setting, value, get)\
    pz_compression_setting(pp, owner, pz_min(setting), pz_max(setting),\
-         pz_shift(setting), value, get)
+         pz_shift(setting), value, get, 0/*always*/)
 
 /* There is (as of zlib 1.2.8) a bug in the implementation of compression with a
  * window size of 256 which zlib works round by resetting windowBits from 8 to 9
@@ -1186,28 +1188,27 @@ fix_cinfo(png_zlib_statep ps, png_bytep data, png_alloc_size_t data_size)
 
    else if (data_size > 0U)
    {
-      int windowBits = 8+(data[0] >> 4);
-      unsigned int half_window_size = 1U << (windowBits-1);
+      /* Prior to 1.7.0 libpng would shrink the windowBits even if the
+       * application requested a particular value, so:
+       */
+      unsigned int z_cinfo = data[0] >> 4;
+      unsigned int half_z_window_size = 1U << (z_cinfo + 7);
 
-      debug(pz_get(ps, current, windowBits, 0) == windowBits);
-
-      if (data_size <= half_window_size /* Can shrink */ &&
-          pz_get(ps, IDAT, png_level, PNG_DEFAULT_COMPRESSION_LEVEL) ==
-                 PNG_COMPRESSION_COMPAT)
+      if (data_size <= half_z_window_size && z_cinfo > 0)
       {
-         unsigned int d1;
+         unsigned int tmp;
 
-         /* Before 1.7.0 libpng overrode a user-supplied windowBits if the data
-          * was smaller.
-          */
          do
-            --windowBits, half_window_size >>= 1;
-         while (data_size <= half_window_size);
+         {
+            half_z_window_size >>= 1;
+            --z_cinfo;
+         }
+         while (z_cinfo > 0 && data_size <= half_z_window_size);
 
-         data[0] = PNG_BYTE((windowBits << 4) + 0x8U);
-         d1 = data[1] & 0xE0U; /* top three bits */
-         d1 += 31U - ((data[0]<<8) + d1) % 31U;
-         data[1] = PNG_BYTE(d1);
+         data[0] = PNG_BYTE((z_cinfo << 4) + 0x8U);
+         tmp = data[1] & 0xE0U; /* top three bits */
+         tmp += 31U - ((data[0] << 8) + tmp) % 31U;
+         data[1] = PNG_BYTE(tmp);
       }
    }
 
@@ -1272,11 +1273,6 @@ pz_default_settings(png_uint_32 settings, const png_uint_32 owner,
                strategy = Z_FILTERED;
             break;
 
-         case PNG_COMPRESSION_LOW_MEMORY:
-            /* Reduce memory at all costs: */
-            strategy = Z_HUFFMAN_ONLY;
-            break;
-
          case PNG_COMPRESSION_HIGH_SPEED:
             /* RLE is as fast as HUFFMAN_ONLY and can reduce size a lot in a few
              * cases.
@@ -1314,10 +1310,13 @@ pz_default_settings(png_uint_32 settings, const png_uint_32 owner,
             else if (owner == png_iCCP)
                strategy = Z_DEFAULT_STRATEGY;
 
+            /* TODO: investigate this, the observed behavior is suspicious: */
             else /* text chunk */
                strategy = Z_FILTERED; /* Always better for some reason */
             break;
 
+         case PNG_COMPRESSION_LOW_MEMORY:
+            /* Reduce memory at all costs, speed doesn't matter. */
          case PNG_COMPRESSION_HIGH_READ_SPEED:
          case PNG_COMPRESSION_HIGH:
             if (owner == png_IDAT || owner == png_iCCP)
@@ -1393,7 +1392,6 @@ pz_default_settings(png_uint_32 settings, const png_uint_32 owner,
                   zlib_level = Z_DEFAULT_COMPRESSION; /* NOTE: -1 */
                   break;
 
-               case PNG_COMPRESSION_LOW_MEMORY:
                case PNG_COMPRESSION_HIGH_SPEED:
                   zlib_level = 1;
                   break;
@@ -1407,6 +1405,7 @@ pz_default_settings(png_uint_32 settings, const png_uint_32 owner,
                   zlib_level = 6; /* Old default! */
                   break;
 
+               case PNG_COMPRESSION_LOW_MEMORY:
                case PNG_COMPRESSION_HIGH_READ_SPEED:
                case PNG_COMPRESSION_HIGH:
                   zlib_level = 9;
@@ -1445,6 +1444,7 @@ pz_default_settings(png_uint_32 settings, const png_uint_32 owner,
           */
          windowBits = 15;
 
+         if (data_size <= 16384U)
          {
             unsigned int half_window_size = 1U << (windowBits-1);
 
@@ -3058,12 +3058,39 @@ png_write_IDAT(png_structrp png_ptr, int flush)
    IDAT_size = png_ptr->IDAT_size;
    if (IDAT_size == 0U)
    {
-      if (pz_get(ps, IDAT, png_level, PNG_DEFAULT_COMPRESSION_LEVEL) !=
-          PNG_COMPRESSION_COMPAT/*legacy*/)
-         IDAT_size = PNG_ZBUF_SIZE;
+      switch (pz_get(ps, IDAT, png_level, PNG_DEFAULT_COMPRESSION_LEVEL))
+      {
+         case PNG_COMPRESSION_COMPAT: /* Legacy */
+            IDAT_size = 8192U;
+            break;
 
-      else
-         IDAT_size = 8192U;
+         case PNG_COMPRESSION_LOW_MEMORY:
+         case PNG_COMPRESSION_HIGH_SPEED:
+         case PNG_COMPRESSION_LOW:
+            /* png_compress uses PNG_ROW_BUFFER_SIZE buffers for the compressed
+             * data.  Optimize to allocate only one of these:
+             */
+            IDAT_size = PNG_ROW_BUFFER_SIZE;
+            break;
+
+         default:
+         case PNG_COMPRESSION_MEDIUM:
+            IDAT_size = PNG_ZBUF_SIZE;
+
+         case PNG_COMPRESSION_HIGH_READ_SPEED:
+            /* Assume the reader reads partial IDAT chunks (pretty much a
+             * requirement given that some PNG encoders produce just one IDAT)
+             */
+         case PNG_COMPRESSION_HIGH:
+            /* This doesn't control the amount of memory allocated unless the
+             * PNG IDAT data really is this big.
+             *
+             * TODO: review handling out-of-memory from png_compress() by
+             * flushing an IDAT.
+             */
+            IDAT_size = PNG_UINT_31_MAX;
+            break;
+      }
    }
 
    /* Write IDAT chunks while either 'flush' is true or there are at
@@ -3985,7 +4012,7 @@ png_start_filter_select(png_zlib_statep ps, unsigned int bpp)
                ps->filter_select_threshold2 = 50U; /* TODO: experiment! */
                break;
 
-            case -1: /* Legacy */
+            case PNG_COMPRESSION_COMPAT: /* Legacy */
                memset(fs->sum_bias, 0U, sizeof fs->sum_bias);
                ps->filter_select_threshold = 1U; /* disabled */
                ps->filter_select_threshold2 = 1U;
@@ -4900,7 +4927,7 @@ png_write_setting(png_structrp png_ptr, png_uint_32 setting,
          case PNG_SW_COMPRESS_png_level:
             return compression_setting(png_ptr, parameter, png_level, value,
                   only_get);
-            
+
 #     ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
          case PNG_SW_COMPRESS_zlib_level:
             return compression_setting(png_ptr, parameter, level, value,

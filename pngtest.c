@@ -1386,6 +1386,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    png_write_info(write_ptr, write_info_ptr);
 
    write_chunks(write_ptr, before_IDAT); /* after PLTE */
+
+#ifdef PNG_COMPRESSION_COMPAT
+   /* Test the 'compatibility' setting here, if it is available. */
+   png_set_compression(write_ptr, PNG_COMPRESSION_COMPAT);
+#endif
 #endif
 
 #ifdef SINGLE_ROWBUF_ALLOC

@@ -1708,7 +1708,7 @@ PNG_REMOVED(66, void, png_set_crc_action, (png_structrp png_ptr,
  *       usage.
  *    2) IDAT size: What size to make the IDAT chunks in the PNG.
  *    3) PNG row filters to consider when writing the PNG.
- *    4) Very low level control over the deflate compression (useful mainly for 
+ *    4) Very low level control over the deflate compression (useful mainly for
  *       programs that want to try every option to find which gives the smallest
  *       PNG.)
  */
@@ -1732,16 +1732,17 @@ PNG_REMOVED(66, void, png_set_crc_action, (png_structrp png_ptr,
       /* Minimize the memory required both when reading (4) and writing (2) the
        * PNG.  This results in a significantly larger PNG (which may itself have
        * the opposite effect of slowing down either read or write) however the
-       * memory overhead is reduced and, apart from the extra time to read or
-       * write the data, the read and write time is likely to be reduced too.
+       * memory overhead is reduced and, apart from the extra time to read the
+       * data, the read time is likely to be reduced too.
        *
        * Use this when both read and write will happen on a memory starved
-       * (really, very low memory) system.
+       * (really, very low memory) system.  Note that this sets a high deflate
+       * compression setting because that does not affect zlib memory usage.
        */
 #  define PNG_COMPRESSION_HIGH_SPEED (2)
       /* Minimize the time to both read (5) and write (3) the PNG.  This uses
        * slightly more memory on read and potentially significantly more on
-       * write but is optimized for maximum speed in both cases.  
+       * write but is optimized for maximum speed in both cases.
        *
        * Use this when both read and write need to be fast and PNG size is not
        * likely to be an issue.  An example would be if you are using PNG to
@@ -4002,7 +4003,7 @@ PNG_EXPORT(249, png_int_32, png_setting, (png_structrp png_ptr,
     * PNG_EBADF will be returned.
     */
 #define PNG_SF_WRITE  (0x10000000U)
-   /* The setting may be applied to a write png_struct. If this is not set 
+   /* The setting may be applied to a write png_struct. If this is not set
     * and an attempt is made to apply the setting to a write struct
     * PNG_EBADF will be returned.
     */
