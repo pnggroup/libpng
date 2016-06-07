@@ -53,7 +53,6 @@ EXPORTS
  png_set_strip_16 @48
  png_set_quantize @49
  png_set_gamma @50
- png_set_flush @51
  png_write_flush @52
  png_start_read_image @53
  png_read_update_info @54
@@ -68,14 +67,6 @@ EXPORTS
  png_destroy_info_struct @63
  png_destroy_read_struct @64
  png_destroy_write_struct @65
- png_set_crc_action @66
- png_set_filter @67
- png_set_filter_heuristics @68
- png_set_compression_level @69
- png_set_compression_mem_level @70
- png_set_compression_strategy @71
- png_set_compression_window_bits @72
- png_set_compression_method @73
  png_init_io @74
  png_set_error_fn @75
  png_get_error_ptr @76
@@ -108,7 +99,6 @@ EXPORTS
  png_chunk_warning @106
  png_benign_error @107
  png_chunk_benign_error @108
- png_set_benign_errors @109
  png_get_valid @110
  png_get_rowbytes @111
  png_get_rows @112
@@ -184,7 +174,6 @@ EXPORTS
  png_get_header_version @182
  png_get_libpng_ver @183
  png_permit_mng_features @184
- png_set_strip_error_numbers @185
  png_set_user_limits @186
  png_get_user_width_max @187
  png_get_user_height_max @188
@@ -206,7 +195,6 @@ EXPORTS
  png_save_uint_32 @205
  png_save_uint_16 @207
  png_set_gamma_fixed @208
- png_set_filter_heuristics_fixed @209
  png_get_pixel_aspect_ratio_fixed @210
  png_get_x_offset_inches_fixed @211
  png_get_y_offset_inches_fixed @212
@@ -219,11 +207,6 @@ EXPORTS
  png_process_data_pause @219
  png_process_data_skip @220
  png_set_expand_16 @221
- png_set_text_compression_level @222
- png_set_text_compression_mem_level @223
- png_set_text_compression_strategy @224
- png_set_text_compression_window_bits @225
- png_set_text_compression_method @226
  png_set_alpha_mode @227
  png_set_alpha_mode_fixed @228
  png_set_scale_16 @229
@@ -239,9 +222,7 @@ EXPORTS
  png_image_write_to_file @239
  png_image_write_to_stdio @240
  png_convert_to_rfc1123_buffer @241
- png_set_check_for_invalid_index @242
  png_get_palette_max @243
- png_set_option @244
  png_image_write_to_memory @245
  png_memory_format @246
  png_memory_channel_depth @247

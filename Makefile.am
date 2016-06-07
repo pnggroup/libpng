@@ -277,7 +277,8 @@ scripts/symbols.chk: scripts/checksym.awk scripts/symbols.def scripts/symbols.ou
 scripts/pnglibconf.c: scripts/pnglibconf.dfa scripts/options.awk pngconf.h
 	rm -f $@ pnglibconf.tf[67]
 	test -z "$(CPPFLAGS)" -a -z "$(AM_CPPFLAGS)"
-	echo "com libpng @PNGLIB_VERSION@ STANDARD API DEFINITION" |\
+	(echo "com libpng @PNGLIB_VERSION@ STANDARD API DEFINITION";\
+	 echo "com") |\
 	$(AWK) -f ${srcdir}/scripts/options.awk out=pnglibconf.tf6\
 	    logunsupported=1 version=search ${srcdir}/pngconf.h -\
 	    ${srcdir}/scripts/pnglibconf.dfa 1>&2

@@ -351,6 +351,15 @@ typedef struct png_transform /* Linked list of transform functions */
 }  png_transform;
 #endif /* TRANSFORM_MECH */
 
+/* Action to take on CRC errors (four values) */
+typedef enum
+{
+   crc_error_quit = PNG_CRC_ERROR_QUIT-1,
+   crc_warn_discard = PNG_CRC_WARN_DISCARD-1,
+   crc_warn_use = PNG_CRC_WARN_USE-1,
+   crc_quiet_use = PNG_CRC_QUIET_USE-1
+}  png_crc_action;
+
 struct png_struct_def
 {
    /* Rearranged in libpng 1.7 to attempt to lessen padding; in general
@@ -418,11 +427,6 @@ struct png_struct_def
    png_byte color_type;       /* color type of file */
    png_byte bit_depth;        /* bit depth of file */
    png_byte sig_bytes;        /* magic bytes read/written at start of file */
-
-   /* Options */
-#ifdef PNG_SET_OPTION_SUPPORTED
-   png_uint_32 options;       /* On/off state (up to 16 options) */
-#endif /* SET_OPTIONS */
 
 #ifdef PNG_READ_SUPPORTED
 #if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
@@ -737,6 +741,28 @@ struct png_struct_def
                                   * received; set by the zstream using code for
                                   * its own purposes. [progressive read] */
 #  endif /* PROGRESSIVE_READ */
+#  ifdef PNG_BENIGN_ERRORS_SUPPORTED
+      unsigned int benign_error_action :2;
+      unsigned int app_warning_action  :2;
+      unsigned int app_error_action    :2;
+#  ifdef PNG_READ_SUPPORTED
+      unsigned int IDAT_error_action   :2;
+#  endif /* READ */
+#  endif /* BENIGN_ERRORS */
+#  ifdef PNG_READ_SUPPORTED
+      /* CRC checking actions, one for critical chunks, one for ancillary
+       * chunks.
+       */
+      unsigned int critical_crc  :2;
+      unsigned int ancillary_crc :2;
+      unsigned int current_crc   :2; /* Cache of one or other of the above */
+#  endif
+#  ifdef PNG_SET_OPTION_SUPPORTED
+#  ifdef PNG_READ_SUPPORTED
+         unsigned int maximum_inflate_window  :1U;
+#  endif /* READ */
+         unsigned int skip_sRGB_profile_check :1U;
+#  endif /* SET_OPTION */
 
    /* MNG SUPPORT */
 #ifdef PNG_MNG_FEATURES_SUPPORTED

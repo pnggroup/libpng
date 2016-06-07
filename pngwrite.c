@@ -538,24 +538,28 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
    if (png_ptr != NULL)
    {
-      /* This is a highly dubious configuration option; by default it is off,
-       * but it may be appropriate for private builds that are testing
-       * extensions not conformant to the current specification, or of
-       * applications that must not fail to write at all costs!
-       */
-#ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
-      /* In stable builds only warn if an application error can be completely
-       * handled.
-       */
-      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
-#endif
-
-      /* App warnings are warnings in release (or release candidate) builds but
-       * are errors during development.
-       */
-#if PNG_RELEASE_BUILD
-      png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
-#endif
+#     ifdef PNG_BENIGN_ERRORS_SUPPORTED
+#        if !PNG_RELEASE_BUILD
+            /* Always quit on error prior to release */
+            png_ptr->benign_error_action = PNG_ERROR;
+            png_ptr->app_warning_action = PNG_ERROR;
+            png_ptr->app_error_action = PNG_ERROR;
+#        else /* RELEASE_BUILD */
+            /* Allow benign errors on write, subject to app control. */
+#           ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
+               png_ptr->benign_error_action = PNG_WARN;
+               png_ptr->app_error_action = PNG_WARN;
+               png_ptr->app_warning_action = PNG_WARN;
+#           else /* !BENIGN_WRITE_ERRORS */
+               /* libpng build without benign error support; the application
+                * author has to be assumed to be correct, so:
+                */
+               png_ptr->benign_error_action = PNG_ERROR;
+               png_ptr->app_warning_action = PNG_ERROR;
+               png_ptr->app_error_action = PNG_ERROR;
+#           endif /* !BENIGN_WRITE_ERRORS */
+#        endif /* RELEASE_BUILD */
+#     endif /* BENIGN_ERRORS */
    }
 
    return png_ptr;

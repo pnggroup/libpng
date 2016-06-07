@@ -623,22 +623,16 @@
  */
 #define PNG_FLAG_LIBRARY_MISMATCH         0x001U
 /*#define PNG_FLAG_ZLIB_CUSTOM_STRATEGY   0x002U NO LONGER USED */
-#define PNG_FLAG_CRC_ANCILLARY_USE        0x004U
-#define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x008U
-#define PNG_FLAG_CRC_CRITICAL_USE         0x010U
-#define PNG_FLAG_CRC_CRITICAL_IGNORE      0x020U
-#define PNG_FLAG_STRIP_ERROR_NUMBERS      0x040U
-#define PNG_FLAG_STRIP_ERROR_TEXT         0x080U
-#define PNG_FLAG_IDAT_ERRORS_WARN         0x100U
-#define PNG_FLAG_BENIGN_ERRORS_WARN       0x200U
-#define PNG_FLAG_APP_WARNINGS_WARN        0x400U
-#define PNG_FLAG_APP_ERRORS_WARN          0x800U
-
-#define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
-                                     PNG_FLAG_CRC_ANCILLARY_NOWARN)
-
-#define PNG_FLAG_CRC_CRITICAL_MASK  (PNG_FLAG_CRC_CRITICAL_USE | \
-                                     PNG_FLAG_CRC_CRITICAL_IGNORE)
+/*#define PNG_FLAG_CRC_ANCILLARY_USE      0x004U NO LONGER USED */
+/*#define PNG_FLAG_CRC_ANCILLARY_NOWARN   0x008U NO LONGER USED */
+/*#define PNG_FLAG_CRC_CRITICAL_USE       0x010U NO LONGER USED */
+/*#define PNG_FLAG_CRC_CRITICAL_IGNORE    0x020U NO LONGER USED */
+/*#define PNG_FLAG_STRIP_ERROR_NUMBERS    0x040U NEVER USED */
+/*#define PNG_FLAG_STRIP_ERROR_TEXT       0x080U NEVER USED */
+/*#define PNG_FLAG_IDAT_ERRORS_WARN       0x100U NEVER SET */
+/*#define PNG_FLAG_BENIGN_ERRORS_WARN     0x200U NO LONGER USED */
+/*#define PNG_FLAG_APP_WARNINGS_WARN      0x400U NO LONGER USED */
+/*#define PNG_FLAG_APP_ERRORS_WARN        0x800U NO LONGER USED */
 
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
@@ -1050,8 +1044,12 @@ PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_flush,(png_structp png_ptr),
 #  endif /* WRITE */
 #endif /* STDIO */
 
-/* Reset the CRC variable */
-PNG_INTERNAL_FUNCTION(void,png_reset_crc,(png_structrp png_ptr),PNG_EMPTY);
+/* Reset the CRC variable.  The CRC is initialized with the chunk tag (4 bytes).
+ * NOTE: at present png_struct::chunk_name MUST be set before this as well so
+ * that png_struct::current_crc is initialized correctly!
+ */
+PNG_INTERNAL_FUNCTION(void,png_reset_crc,(png_structrp png_ptr,
+         png_const_bytep chunk_tag), PNG_EMPTY);
 
 /* Write the "data" buffer to whatever output you are using */
 PNG_INTERNAL_FUNCTION(void,png_write_data,(png_structrp png_ptr,
@@ -2230,6 +2228,20 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 
 #endif /* SIMPLIFIED READ/WRITE */
 
+#ifdef PNG_READ_SUPPORTED
+PNG_INTERNAL_FUNCTION(png_int_32, png_read_setting, (png_structrp png_ptr,
+   png_uint_32 setting, png_uint_32 parameter, png_int_32 value), PNG_EMPTY);
+#endif /* READ */
+#ifdef PNG_WRITE_SUPPORTED
+PNG_INTERNAL_FUNCTION(png_int_32,  png_write_setting, (png_structrp png_ptr,
+   png_uint_32 setting, png_uint_32 parameter, png_int_32 value), PNG_EMPTY);
+   /* Implementations of read and write settings, in pngrutil.c and pngwutil.c
+    * respectively.
+    */
+#endif /* WRITE */
+
+/* Maintainer: Put new private prototypes here ^ */
+
 /* These are initialization functions for hardware specific PNG filter
  * optimizations; list these here then select the appropriate one at compile
  * time using the macro PNG_FILTER_OPTIMIZATIONS.  If the macro is not defined
@@ -2247,8 +2259,6 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
-
-/* Maintainer: Put new private prototypes here ^ */
 
 #include "pngdebug.h"
 

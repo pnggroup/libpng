@@ -100,10 +100,26 @@ png_zfree(voidpf png_ptr, voidpf ptr)
  * in case CRC is > 32 bits to leave the top bits 0.
  */
 void /* PRIVATE */
-png_reset_crc(png_structrp png_ptr)
+png_reset_crc(png_structrp png_ptr, png_const_bytep chunk_tag)
 {
-   /* The cast is safe because the crc is a 32 bit value. */
-   png_ptr->crc = (png_uint_32)crc32(0, Z_NULL, 0);
+#  ifdef PNG_READ_SUPPORTED
+      if (png_ptr->read_struct)
+      {
+         /* Set png_struct::current_crc appropriately. */
+         if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
+            png_ptr->current_crc = png_ptr->ancillary_crc;
+
+         else /* critical */
+            png_ptr->current_crc = png_ptr->critical_crc;
+      }
+
+      else
+         png_ptr->current_crc = crc_error_quit; /* for write */
+
+      /* Now do not calculate the CRC if it isn't required: */
+      if (png_ptr->current_crc != crc_quiet_use)
+#  endif /* READ */
+   png_ptr->crc = 0xFFFFFFFFU & crc32(0, chunk_tag, 4);
 }
 
 /* Calculate the CRC over a section of data.  We can only pass as
@@ -114,27 +130,15 @@ png_reset_crc(png_structrp png_ptr)
 void /* PRIVATE */
 png_calculate_crc(png_structrp png_ptr, png_const_voidp ptr, png_size_t length)
 {
-   int need_crc = 1;
-
-   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) != 0)
-   {
-      if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
-          (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
-         need_crc = 0;
-   }
-
-   else /* critical */
-   {
-      if ((png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE) != 0)
-         need_crc = 0;
-   }
-
    /* 'uLong' is defined in zlib.h as unsigned long; this means that on some
     * systems it is a 64 bit value.  crc32, however, returns 32 bits so the
     * following cast is safe.  'uInt' may be no more than 16 bits, so it is
     * necessary to perform a loop here.
     */
-   if (need_crc != 0 && length > 0)
+#  ifdef PNG_READ_SUPPORTED
+      if (png_ptr->current_crc != crc_quiet_use)
+#  endif /* READ */
+   if (length > 0)
    {
       uLong crc = png_ptr->crc; /* Should never issue a warning */
       const Bytef* rptr = png_voidcast(const Bytef*,ptr);
@@ -213,11 +217,6 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
 
       png_warning(png_ptr, m);
 #endif
-
-#ifdef PNG_ERROR_NUMBERS_SUPPORTED
-      png_ptr->flags = 0;
-#endif
-
       return 0;
    }
 
@@ -2192,13 +2191,12 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 #endif
    unsigned int i;
 
-#ifdef PNG_SET_OPTION_SUPPORTED
-   /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
-   if (((png_ptr->options >> PNG_SKIP_sRGB_CHECK_PROFILE) & 3) ==
-               PNG_OPTION_ON)
-      return 0;
-#endif
-
+#  ifdef PNG_SET_OPTION_SUPPORTED
+#     ifdef PNG_SKIP_sRGB_CHECK_PROFILE
+         /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
+         if (!png_ptr->skip_sRGB_profile_check)
+#     endif /* SKIP_sRGB_CHECK_PROFILE */
+#  endif /* SET_OPTION */
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
    {
       if (png_get_uint_32(profile+84) == png_sRGB_checks[i].md5[0] &&
@@ -3355,67 +3353,128 @@ png_muldiv(png_fixed_point_p res, png_fixed_point a, png_int_32 times,
 }
 #endif /* GAMMA || INCH_CONVERSIONS */
 
-/* HARDWARE OPTION SUPPORT */
-#ifdef PNG_SET_OPTION_SUPPORTED
-int PNGAPI
-png_set_option(png_structrp png_ptr, int option, int onoff)
-{
-   if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
-      (option & 1) == 0)
-   {
-      unsigned int mask = 3U << option;
-      unsigned int setting = (2U + (onoff != 0)) << option;
-      unsigned int current = png_ptr->options;
-
-      png_ptr->options = (current & ~mask) | setting;
-
-      return (current & mask) >> option;
-   }
-
-   return PNG_OPTION_INVALID;
-}
-#endif /* SET_OPTION */
-
 /* SOFTWARE SETTING SUPPORT */
-#ifdef PNG_SETTING_SUPPORTED
 png_int_32 PNGAPI
-png_setting(png_structrp png_ptr, int setting, png_int_32 value)
+png_setting(png_structrp png_ptr, png_uint_32 setting, png_uint_32 parameter,
+      png_int_32 value)
 {
-   switch (setting)
+   png_int_32 result;
+
+   if (png_ptr != NULL)
    {
-#     ifdef PNG_READ_GAMMA_SUPPORTED
-         case PNG_GAMMA_MINIMUM:
-            if (value < 0 || value > 0xFFFF)
-               value = PNG_GAMMA_THRESHOLD_FIXED;
+      int handle_error = (setting & PNG_SF_ERROR) != 0U;
+
+      setting &= ~PNG_SF_ERROR; /* because it is handled below. */
+
+      switch (setting & (PNG_SF_READ|PNG_SF_WRITE))
+      {
+#        ifdef PNG_READ_SUPPORTED
+            case PNG_SF_READ:
+               if (png_ptr->read_struct)
+                  result = png_read_setting(png_ptr, setting, parameter, value);
+
+               else
+                  result = PNG_EINVAL; /* read setting on write struct */
+               break;
+#        endif /* READ */
+
+#        ifdef PNG_WRITE_SUPPORTED
+            case PNG_SF_WRITE:
+               if (!png_ptr->read_struct)
+                  result = png_write_setting(png_ptr, setting, parameter,
+                        value);
+
+               else
+                  result = PNG_EINVAL; /* write setting on read struct */
+               break;
+#        endif /* WRITE */
+
+         default:
+            /* Handle everything else here.  This includes the error of not
+             * having either read or write set; that error will cause a
+             * PNG_ENOSYS return code.
+             */
+            switch (setting)
             {
-               png_int_32 old = png_ptr->gamma_threshold;
-               png_ptr->gamma_threshold = PNG_UINT_16(value);
-               return old;
+#              ifdef PNG_SET_OPTION_SUPPORTED
+                  case PNG_SRW_OPTION:
+                     if (parameter >= PNG_OPTION_NEXT)
+                        return PNG_OPTION_INVALID;
+
+                     if (parameter == PNG_SKIP_sRGB_CHECK_PROFILE)
+                     {
+                        if (png_ptr->skip_sRGB_profile_check)
+                        {
+                           if (!value)
+                              png_ptr->skip_sRGB_profile_check = 0U;
+                           result = PNG_OPTION_ON;
+                        }
+
+                        else
+                        {
+                           if (value)
+                              png_ptr->skip_sRGB_profile_check = 1U;
+                           result = PNG_OPTION_OFF;
+                        }
+
+                        break;
+                     }
+
+#                    ifdef PNG_READ_SUPPORTED
+                        if (png_ptr->read_struct)
+                        {
+                           result = png_read_setting(png_ptr, setting,
+                                 parameter, value);
+                           break;
+                        }
+#                    endif /* READ */
+
+                     /* No write options at present */
+                     result = PNG_OPTION_UNSET; /* i.e. ignore it */
+#              endif /* SET_OPTION */
+
+               default:
+                  /* Any other option; handle in the appropriate setting: */
+#                 ifdef PNG_READ_SUPPORTED
+                     if (png_ptr->read_struct)
+                     {
+                        result = png_read_setting(png_ptr, setting,
+                              parameter, value);
+                        break;
+                     }
+#                 endif /* READ */
+
+#                 ifdef PNG_WRITE_SUPPORTED
+                     if (!png_ptr->read_struct)
+                     {
+                        result = png_write_setting(png_ptr, setting,
+                              parameter, value);
+                        break;
+                     }
+#                 endif /* WRITE */
+
+                  NOT_REACHED;
+                  result= PNG_ENOSYS;
+                  break;
             }
             break;
+      } /* switch */
 
-#if 0 /*NYI*/
-         case PNG_GAMMA_ACCURACY:
-            if (value < 0 || value > 1600)
-               value = PNG_DEFAULT_GAMMA_ACCURACY;
-            {
-               png_int_32 old = png_ptr->gamma_accuracy;
-               png_ptr->gamma_accuracy = value;
-               return old;
-            }
-            break;
-#endif /*NYI*/
-#     endif /* READ_GAMMA */
-
-      default:
-         break;
+      /* Handle error returns here.
+       * TODO: this is crude, should use a formatted warning style message and
+       * output result/setting/parameter/value.
+       */
+      if (handle_error && PNG_FAILED(result))
+         png_error(png_ptr, "png_setting");
    }
 
-   PNG_UNUSED(png_ptr)
+   else /* png_ptr is NULL */
+      result = PNG_EINVAL;
+
+   return result;
+   PNG_UNUSED(parameter)
    PNG_UNUSED(value)
-   return PNG_UNSUPPORTED_SETTING;
 }
-#endif /* SETTING */
 
 /* sRGB support */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\

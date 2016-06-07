@@ -26,7 +26,9 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
       return;
 
    ptr = buffer;
-   if (png_ptr->save_buffer_size != 0)
+   debug(length > 0);
+
+   if (length > 0 && png_ptr->save_buffer_size > 0)
    {
       png_size_t save_size;
 
@@ -44,7 +46,7 @@ png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, png_size_t length)
       png_ptr->save_buffer_ptr += save_size;
    }
 
-   if (length != 0 && png_ptr->current_buffer_size != 0)
+   if (length > 0 && png_ptr->current_buffer_size > 0)
    {
       png_size_t save_size;
 
@@ -734,15 +736,13 @@ png_push_read_chunk_header(png_structrp png_ptr, png_infop info_ptr)
     * of the data.
     */
    unsigned int mode; /* mode prior to the header */
-   png_byte chunk_length[4];
-   png_byte chunk_tag[4];
+   png_byte chunk_header[8];
 
    PNG_PUSH_SAVE_BUFFER_IF_LT(8)
-   png_push_fill_buffer(png_ptr, chunk_length, 4);
-   png_ptr->chunk_length = png_get_uint_31(png_ptr, chunk_length);
-   png_reset_crc(png_ptr);
-   png_crc_read(png_ptr, chunk_tag, 4);
-   png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_tag);
+   png_push_fill_buffer(png_ptr, chunk_header, 8);
+   png_ptr->chunk_length = png_get_uint_31(png_ptr, chunk_header);
+   png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_header+4);
+   png_reset_crc(png_ptr, chunk_header+4);
    mode = png_ptr->mode;
    png_ptr->process_mode = png_check_bits(png_ptr,
       png_read_chunk+png_find_chunk_op(png_ptr), 4);

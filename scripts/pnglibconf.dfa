@@ -285,33 +285,16 @@ setting ZLIB_HEADER default <zlib.h>
 # must be made by the user)
 option SET_OPTION disabled
 
-# Run-time setting of parameters, enabled as required below
-option SETTING disabled
-
 # To support hardware specific optimizations libpng can include a hardware
 # specific header at build time, this setting records the included header:
 setting EXTENSION_HEADER
 
-# These settings configure the default compression level (0-9) and 'strategy';
-# strategy is as defined by the implementors of zlib. It describes the input
-# data and modifies the zlib parameters in an attempt to optimize the balance
-# between search and huffman encoding in the zlib algorithms.  The defaults are
-# the zlib.h defaults - the apparently recursive definition does not arise
-# because the name of the setting is prefixed by PNG_
-#
-# The TEXT values are the defaults when writing compressed text (all forms)
+# This setting controls the default zlib compression settings.  See the
+# description of the values in png.h
+setting DEFAULT_COMPRESSION_LEVEL default PNG_COMPRESSION_MEDIUM
 
 # The '@' here means to substitute the value when pnglibconf.h is built
 setting ZLIB_VERNUM default @ZLIB_VERNUM
-setting Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
-# By experiment even if other strategies are favored over the zlib default it
-# still comes out best for 47% of files tested; more than filtered, the next
-# best, for 38.8% of files tested.
-setting Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
-setting Z_DEFAULT_NOFILTER_STRATEGY default @Z_DEFAULT_STRATEGY
-
-setting TEXT_Z_DEFAULT_COMPRESSION default @Z_DEFAULT_COMPRESSION
-setting TEXT_Z_DEFAULT_STRATEGY default @Z_DEFAULT_STRATEGY
 
 # Define this to something that will stop, at least, the current thread; control
 # cannot proceed beyond the PNG_ABORT operation and compilation of pngerror.c is
@@ -343,7 +326,6 @@ option WRITE_INT_FUNCTIONS disabled
 #
 # WARNINGS: normally on, if off no warnings are generated
 # ERROR_TEXT: normally on, if off errors happen but there is no message
-# ERROR_NUMBERS: unimplemented feature, therefore disabled
 # BENIGN_ERRORS: support for just issuing warnings for recoverable errors
 #
 # BENIGN_READ_ERRORS:
@@ -360,7 +342,6 @@ option WRITE_INT_FUNCTIONS disabled
 
 option WARNINGS
 option ERROR_TEXT
-option ERROR_NUMBERS disabled
 
 option BENIGN_ERRORS
 option BENIGN_WRITE_ERRORS requires BENIGN_ERRORS disabled
@@ -515,7 +496,7 @@ option READ_QUANTIZE requires READ_TRANSFORMS enables TRANSFORM_MECH
 # gamma processing; and it is an enormous waste of space.  You just need to
 # remove the use of libpng APIs that depend on it.
 option READ_GAMMA requires READ_TRANSFORMS, READ_gAMA, READ_sRGB,
-   enables TRANSFORM_MECH, READ_SCALE_16_TO_8, READ_EXPAND, SETTING
+   enables TRANSFORM_MECH, READ_SCALE_16_TO_8, READ_EXPAND
 
 option READ_ALPHA_MODE requires READ_TRANSFORMS, READ_GAMMA, READ_BACKGROUND
 option READ_BACKGROUND requires READ_TRANSFORMS, READ_STRIP_ALPHA, READ_GAMMA,
@@ -852,10 +833,8 @@ option WRITE_tEXt enables WRITE_TEXT
 option WRITE_zTXt enables WRITE_TEXT
 option WRITE_iTXt enables WRITE_TEXT
 
-# This only affects support of the optional PLTE chunk in RGB and RGBA
-# images.  Notice that READ_ANCILLARY_CHUNKS therefore disables part
-# of the regular chunk reading too.
-
+# WARNING: unless this option is set PLTE chunks in non-palette images are
+# simply discarded (with checking of the CRC, but nothing else.)
 option READ_OPT_PLTE requires READ_ANCILLARY_CHUNKS
 
 # Unknown chunk handling

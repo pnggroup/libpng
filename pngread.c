@@ -21,75 +21,6 @@
 #define PNG_SRC_FILE PNG_SRC_FILE_pngread
 
 #ifdef PNG_READ_SUPPORTED
-
-/* Set the action on getting a CRC error for an ancillary or critical chunk. */
-void PNGAPI
-png_set_crc_action(png_structrp png_ptr, int crit_action, int ancil_action)
-{
-   png_debug(1, "in png_set_crc_action");
-
-   if (png_ptr == NULL)
-      return;
-
-   /* Tell libpng how we react to CRC errors in critical chunks */
-   switch (crit_action)
-   {
-      case PNG_CRC_NO_CHANGE:                        /* Leave setting as is */
-         break;
-
-      case PNG_CRC_WARN_USE:                               /* Warn/use data */
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_CRITICAL_MASK);
-         png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE;
-         break;
-
-      case PNG_CRC_QUIET_USE:                             /* Quiet/use data */
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_CRITICAL_MASK);
-         png_ptr->flags |= PNG_FLAG_CRC_CRITICAL_USE |
-                           PNG_FLAG_CRC_CRITICAL_IGNORE;
-         break;
-
-      case PNG_CRC_WARN_DISCARD:    /* Not a valid action for critical data */
-         png_warning(png_ptr,
-            "Can't discard critical data on CRC error");
-      case PNG_CRC_ERROR_QUIT:                                /* Error/quit */
-
-      case PNG_CRC_DEFAULT:
-      default:
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_CRITICAL_MASK);
-         break;
-   }
-
-   /* Tell libpng how we react to CRC errors in ancillary chunks */
-   switch (ancil_action)
-   {
-      case PNG_CRC_NO_CHANGE:                       /* Leave setting as is */
-         break;
-
-      case PNG_CRC_WARN_USE:                              /* Warn/use data */
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_ANCILLARY_MASK);
-         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE;
-         break;
-
-      case PNG_CRC_QUIET_USE:                            /* Quiet/use data */
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_ANCILLARY_MASK);
-         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_USE |
-                           PNG_FLAG_CRC_ANCILLARY_NOWARN;
-         break;
-
-      case PNG_CRC_ERROR_QUIT:                               /* Error/quit */
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_ANCILLARY_MASK);
-         png_ptr->flags |= PNG_FLAG_CRC_ANCILLARY_NOWARN;
-         break;
-
-      case PNG_CRC_WARN_DISCARD:                      /* Warn/discard data */
-
-      case PNG_CRC_DEFAULT:
-      default:
-         png_ptr->flags &= PNG_BIC_MASK(PNG_FLAG_CRC_ANCILLARY_MASK);
-         break;
-   }
-}
-
 /* Create a PNG structure for reading, and allocate any memory needed. */
 PNG_FUNCTION(png_structp,PNGAPI
 png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
@@ -118,30 +49,42 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
    if (png_ptr != NULL)
    {
       png_ptr->read_struct = 1;
+      png_ptr->critical_crc = crc_error_quit;
+      png_ptr->ancillary_crc = crc_warn_discard;
 
-      /* Added in libpng-1.6.0; this can be used to detect a read structure if
-       * required (it will be zero in a write structure.)
-       */
+#     ifdef PNG_BENIGN_ERRORS_SUPPORTED
+#        if !PNG_RELEASE_BUILD
+            /* Always quit on error prior to release */
+            png_ptr->benign_error_action = PNG_ERROR;
+            png_ptr->app_warning_action = PNG_ERROR;
+            png_ptr->app_error_action = PNG_ERROR;
+#        else /* RELEASE_BUILD */
+            /* Allow benign errors on read, subject to app control. */
+            png_ptr->benign_error_action = PNG_WARN;
+#           ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+               png_ptr->app_error_action = PNG_WARN;
+               png_ptr->app_warning_action = PNG_WARN;
+#           else /* !BENIGN_READ_ERRORS */
+               /* libpng build without benign error support; the application
+                * author has to be assumed to be correct, so:
+                */
+               png_ptr->app_warning_action = PNG_ERROR;
+               png_ptr->app_error_action = PNG_ERROR;
+#           endif /* !BENIGN_READ_ERRORS */
+#        endif /* RELEASE_BUILD */
+
+         /* This is always png_error unless explicitly changed: */
+         png_ptr->IDAT_error_action = PNG_ERROR;
+#     endif /* BENIGN_ERRORS */
+
 #  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
       png_ptr->IDAT_size = PNG_IDAT_READ_SIZE;
 #  endif /* SEQUENTIAL_READ */
 
-#  ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
-      png_ptr->flags |= PNG_FLAG_BENIGN_ERRORS_WARN;
-      png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
-
-      /* In stable builds only warn if an application error can be completely
-       * handled.
-       */
-#     if PNG_RELEASE_BUILD
-         png_ptr->flags |= PNG_FLAG_APP_ERRORS_WARN;
-#     endif
-#  endif /* BENIGN_READ_ERRORS */
-
 #  ifdef PNG_READ_GAMMA_SUPPORTED
       /* Default gamma correction values: */
 #     if 0 /*NYI*/
-      png_ptr->gamma_accuracy = PNG_DEFAULT_GAMMA_ACCURACY;
+         png_ptr->gamma_accuracy = PNG_DEFAULT_GAMMA_ACCURACY;
 #     endif /*NYI*/
       png_ptr->gamma_threshold = PNG_GAMMA_THRESHOLD_FIXED;
 #  endif /* READ_GAMMA */
@@ -178,8 +121,7 @@ png_read_chunk_header(png_structrp png_ptr)
        (unsigned long)png_ptr->chunk_length);
 
    /* Reset the crc and run it over the chunk name. */
-   png_reset_crc(png_ptr);
-   png_calculate_crc(png_ptr, buf + 4, 4);
+   png_reset_crc(png_ptr, buf + 4);
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;

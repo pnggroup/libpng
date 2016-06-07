@@ -817,47 +817,6 @@ png_get_palette_max(png_const_structrp png_ptr, png_const_inforp info_ptr)
 }
 #endif /* GET_PALETTE_MAX */
 
-#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   /* Whether to report invalid palette index; added at libng-1.5.10.
-    * It is possible for an indexed (color-type==3) PNG file to contain
-    * pixels with invalid (out-of-range) indexes if the PLTE chunk has
-    * fewer entries than the image's bit-depth would allow. We recover
-    * from this gracefully by filling any incomplete palette with zeros
-    * (opaque black).  By default, when this occurs libpng will issue
-    * an error.  This API can be used to override that behavior.
-    */
-void PNGAPI
-png_set_check_for_invalid_index(png_structrp png_ptr, int enabled)
-{
-   /* This defaults to 0, therefore *on*: */
-   if (png_ptr != NULL)
-   {
-      if (png_ptr->read_struct)
-      {
-#        ifndef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
-            png_app_error(png_ptr, "no read palette check support");
-            return;
-#        endif /* !READ_CHECK_FOR_INVALID_INDEX */
-      }
-
-      else /* write struct */
-      {
-#        ifndef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
-            png_app_error(png_ptr, "no write palette check support");
-            return;
-#        endif /* !WRITE_CHECK_FOR_INVALID_INDEX */
-      }
-
-      if (enabled > 0)
-         png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
-      else if (enabled < 0)
-         png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
-      else
-         png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
-   }
-}
-#endif /* CHECK_FOR_INVALID_INDEX */
-
 void /* PRIVATE */
 png_init_row_info(png_structrp png_ptr)
 {

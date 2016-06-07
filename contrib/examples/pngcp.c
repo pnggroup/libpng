@@ -114,13 +114,30 @@ static const struct value_list
    const char *name;  /* the command line name of the value */
    int         value; /* the actual value to use */
 }
+
+#ifdef PNG_SW_COMPRESS_png_level
+vl_compression[] =
+{
+   /* Overall compression control.  The order controls the search order for
+    * 'all'.  Since the search is for the smallest the order used is low memory
+    * then high speed.
+    */
+   { "low-memory",      PNG_COMPRESSION_LOW_MEMORY },
+   { "high-speed",      PNG_COMPRESSION_HIGH_SPEED },
+   { "high-read-speed", PNG_COMPRESSION_HIGH_READ_SPEED },
+   { "low",             PNG_COMPRESSION_LOW },
+   { "medium",          PNG_COMPRESSION_MEDIUM },
+   { "old",             PNG_COMPRESSION_COMPAT },
+   { "high",            PNG_COMPRESSION_HIGH },
+   { all, 0 }
+},
+#endif /* SW_COMPRESS_png_level */
+
 #if defined(PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED) ||\
     defined(PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED)
 vl_strategy[] =
 {
-   /* This controls the order of search and also the default (which is RLE
-    * compression):
-    */
+   /* This controls the order of search. */
    { "huffman", Z_HUFFMAN_ONLY },
    { "RLE", Z_RLE },
    { "fixed", Z_FIXED }, /* the remainder do window searchs */
@@ -172,29 +189,16 @@ vl_filter[] =
    { "paeth",  PNG_FILTER_PAETH  }
 },
 #endif /* WRITE_FILTER */
-#define SELECT_HEURISTICALLY 1
-#define SELECT_METHODICALLY  2
-#if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
-    defined(PNG_SELECT_FILTER_METHODICALLY_SUPPORTED)
-vl_select[] =
-{
-   { all,   SELECT_HEURISTICALLY|SELECT_METHODICALLY },
-   { "off", 0 },
-#ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
-   { "heuristically", SELECT_HEURISTICALLY },
-#endif /* SELECT_FILTER_HEURISTICALLY */
-#ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-   { "methodically", SELECT_METHODICALLY },
-#endif /* SELECT_FILTER_METHODICALLY */
-   { "both", SELECT_HEURISTICALLY|SELECT_METHODICALLY }
-},
-#endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
-vl_IDAT_size[] = /* for png_set_compression_buffer_size */
+vl_IDAT_size[] = /* for png_set_IDAT_size */
 {
    { "default", 0x7FFFFFFF },
    { "minimal", 1 },
    RANGE(1, 0x7FFFFFFF)
 },
+#ifndef PNG_SW_IDAT_size
+   /* Pre 1.7 API: */
+#  define png_set_IDAT_size(p,v) png_set_compression_buffer_size(p, v)
+#endif /* !SW_IDAT_size */
 #define SL 8 /* stack limit in display, below */
 vl_log_depth[] = { { "on", 1 }, { "off", 0 }, RANGE(0, SL) },
 vl_on_off[] = { { "on", 1 }, { "off", 2 } };
@@ -244,8 +248,14 @@ static const struct option
 
 #  ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 #     define VLCIDAT(name) VLO(#name, name, 1/*search*/)
+#     ifdef PNG_SW_COMPRESS_level
+#        define VLCiCCP(name) VLO("ICC-profile-" #name, name, 0/*search*/)
+#     else
+#        define VLCiCCP(name)
+#     endif
 #  else
 #     define VLCIDAT(name)
+#     define VLCiCCP(name)
 #  endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #  ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
@@ -254,10 +264,21 @@ static const struct option
 #     define VLCzTXt(name)
 #  endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 
-#  define VLC(name) VLCIDAT(name) VLCzTXt(name)
+#  define VLC(name) VLCIDAT(name) VLCiCCP(name) VLCzTXt(name)
 
+#  ifdef PNG_SW_COMPRESS_png_level
+      /* The libpng compression level isn't searched beause it justs sets the
+       * other things that are searched!
+       */
+      VLO("compression", compression, 0)
+      VLO("text-compression", compression, 0)
+      VLO("ICC-profile-compression", compression, 0)
+#  endif /* SW_COMPRESS_png_level */
    VLC(strategy)
    VLO("windowBits", windowBits_IDAT, 1)
+#  ifdef PNG_SW_COMPRESS_windowBits
+      VLO("ICC-profile-windowBits", windowBits_text/*sic*/, 0)
+#  endif
    VLO("text-windowBits", windowBits_text, 0)
    VLC(level)
    VLC(memLevel)
@@ -268,10 +289,6 @@ static const struct option
 
    /* LIST settings */
 #  define VLL(name, search) VL(#name, name, LIST, search)
-#if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
-    defined(PNG_SELECT_FILTER_METHODICALLY_SUPPORTED)
-   VLL(select, 1)
-#endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    VLL(filter, 0)
 #endif /* WRITE_FILTER */
@@ -1176,17 +1193,6 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    istrat = OPTIND(dp, strategy);
    entry_name = range_lo; /* record the value, not the name */
 
-#if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
-    defined(PNG_SELECT_FILTER_METHODICALLY_SUPPORTED)
-   if (opt == OPTIND(dp, select))
-   {
-      dp->value[opt] = SELECT_METHODICALLY; /* should probably be all */
-      entry_name = "methodically"; /* for the moment */
-   }
-
-   else
-#endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
-
    if (opt == istrat) /* search all strategies */
       (void)advance_opt(dp, opt, 0/*iterate*/), record=0;
 
@@ -1750,9 +1756,25 @@ set_compression(struct display *dp)
    SET_COMPRESSION
 #  undef SET
 }
+
+#ifdef PNG_SW_COMPRESS_level /* 1.7.0+ */
+static void
+set_ICC_profile_compression(struct display *dp)
+{
+   int val;
+
+#  define SET(name, func) if (getallopts(dp, "ICC-profile-" #name, &val))\
+      png_set_ICC_profile_compression_ ## func(dp->write_pp, val);
+   SET_COMPRESSION
+#  undef SET
+}
+#else
+#  define set_ICC_profile_compression(dp) ((void)0)
+#endif
 #else
 #  define search_compression(dp) ((void)0)
 #  define set_compression(dp) ((void)0)
+#  define set_ICC_profile_compression(dp) ((void)0)
 #endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
@@ -1808,10 +1830,28 @@ write_png(struct display *dp, const char *destname)
    /* compression outputs, IDAT and zTXt/iTXt: */
    dp->tsp = dp->nsp;
    dp->nsp = dp->csp = 0;
+#  ifdef PNG_SW_COMPRESS_png_level
+      {
+         int val;
+
+         /* This sets everything, but then the following options just override
+          * the specific settings for ICC profiles and text.
+          */
+         if (getallopts(dp, "compression", &val))
+            png_set_compression(dp->write_pp, val);
+
+         if (getallopts(dp, "ICC-profile-compression", &val))
+            png_set_ICC_profile_compression(dp->write_pp, val);
+
+         if (getallopts(dp, "text-compression", &val))
+            png_set_text_compression(dp->write_pp, val);
+      }
+#  endif /* png_level support */
    if (dp->options & SEARCH)
       search_compression(dp);
    else
       set_compression(dp);
+   set_ICC_profile_compression(dp);
    set_text_compression(dp);
 
    {
@@ -1819,30 +1859,10 @@ write_png(struct display *dp, const char *destname)
 
       /* The permitted range is 1..0x7FFFFFFF, so the cast is safe */
       if (getopt(dp, "IDAT-size", &val))
-         png_set_compression_buffer_size(dp->write_pp,
-               (png_alloc_size_t)/*SAFE*/val);
+         png_set_IDAT_size(dp->write_pp, val);
    }
 
    /* filter handling */
-#if defined(PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED) ||\
-    defined(PNG_SELECT_FILTER_METHODICALLY_SUPPORTED)
-      {
-         int val;
-
-         if (getopt(dp, "select", &val))
-         {
-#           ifdef PNG_SELECT_FILTER_HEURISTICALLY_SUPPORTED
-               png_set_option(dp->write_pp, PNG_SELECT_FILTER_HEURISTICALLY,
-                     (val & SELECT_HEURISTICALLY) != 0);
-#           endif /* SELECT_FILTER_HEURISTICALLY */
-#           ifdef PNG_SELECT_FILTER_METHODICALLY_SUPPORTED
-               png_set_option(dp->write_pp, PNG_SELECT_FILTER_METHODICALLY,
-                     (val & SELECT_METHODICALLY) != 0);
-#           endif /* SELECT_FILTER_METHODICALLY */
-         }
-      }
-#endif /* SELECT_FILTER_HEURISTICALLY || SELECT_FILTER_METHODICALLY */
-
 #  ifdef PNG_WRITE_FILTER_SUPPORTED
       {
          int val;

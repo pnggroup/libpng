@@ -832,10 +832,25 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_COMPRESSION_TYPE_BASE 0 /* Deflate method 8, 32K window */
 #define PNG_COMPRESSION_TYPE_DEFAULT PNG_COMPRESSION_TYPE_BASE
 
-/* This is for filter type. PNG 1.0-1.2 only define the single type. */
+/* This is for filter method. PNG 1.0-1.2 only defines a single method.
+ *
+ * NOTE: CONFUSING NAME.  The specification refers to a 'method', one of the
+ *    defines below, and a 'type', one of the FILTER_VALUE defines.
+ *    Historically libpng uses TYPE for 'method' and VALUE for 'type'.
+ */
 #define PNG_FILTER_TYPE_BASE      0 /* Single row per-byte filtering */
 #define PNG_INTRAPIXEL_DIFFERENCING 64 /* Used only in MNG datastreams */
 #define PNG_FILTER_TYPE_DEFAULT   PNG_FILTER_TYPE_BASE
+
+/* Filter values defined for method '0' (PNG_FILTER_TYPE_BASE) in the PNG
+ * specification.
+ */
+#define PNG_FILTER_VALUE_NONE  0
+#define PNG_FILTER_VALUE_SUB   1
+#define PNG_FILTER_VALUE_UP    2
+#define PNG_FILTER_VALUE_AVG   3
+#define PNG_FILTER_VALUE_PAETH 4
+#define PNG_FILTER_VALUE_LAST  5 /* Not a valid value */
 
 /* These are for the interlacing type.  These values should NOT be changed. */
 #define PNG_INTERLACE_NONE        0 /* Non-interlaced image */
@@ -1122,11 +1137,25 @@ PNG_EXPORTA(5, png_structp, png_create_write_struct,
  * uInt is the type declared by zlib.h.  On write setting the largest value will
  * typically cause the PNG image data to be written in one chunk; this gives the
  * smallest PNG and has little or no effect on applications that read the PNG.
+ *
+ * DEPRECATED: use png_set_IDAT_size on write and png_set_read_buffer_size on
+ * read.
  */
-PNG_EXPORT(6, png_alloc_size_t, png_get_compression_buffer_size,
-    (png_const_structrp png_ptr));
-PNG_EXPORT(7, void, png_set_compression_buffer_size, (png_structrp png_ptr,
-    png_alloc_size_t size));
+PNG_EXPORTA(6, png_alloc_size_t, png_get_compression_buffer_size,
+    (png_const_structrp png_ptr), PNG_DEPRECATED);
+PNG_EXPORTA(7, void, png_set_compression_buffer_size, (png_structrp png_ptr,
+    png_alloc_size_t size), PNG_DEPRECATED);
+#define png_set_read_buffer_size(p,size) (png_setting((p),\
+         PNG_SR_COMPRESS_buffer_size, (size), 0))
+   /* The size of the buffer used while processing compressed data, both single
+    * chunk data (zTXt, iTXt, iCCP) and IDAT data.  With IDAT data in libpng 1.7
+    * IDATs are read until the end or until the buffer is full; this means that
+    * you can optimize the buffer size for the particular memory behavior of
+    * your system and, possibly, your application.
+    *
+    * NOTE: the result (on success) is 0, which is actually an invalid value.
+    * Retrieving the current value is not possible.
+    */
 
 /* Moved from pngconf.h in 1.4.0 and modified to ensure setjmp/longjmp
  * match up.
@@ -1571,11 +1600,16 @@ PNG_FIXED_EXPORT(208, void, png_set_gamma_fixed, (png_structrp png_ptr,
 #endif
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-/* Set how many lines between output flushes - 0 for no flushing */
-PNG_EXPORT(51, void, png_set_flush, (png_structrp png_ptr, int nrows));
+PNG_REMOVED(51, void, png_set_flush, (png_structrp png_ptr, int nrows),
+      PNG_EMPTY)
+#define png_set_flush(p,v) (png_setting((p), PNG_SW_FLUSH, 0, (v)))
+   /* Set how many lines between output flushes - 0 for no flushing.  The result
+    * on success is always 0.
+    */
+
 /* Flush the current PNG output buffer */
 PNG_EXPORT(52, void, png_write_flush, (png_structrp png_ptr));
-#endif
+#endif /* WRITE_FLUSH */
 
 /* Optional update palette with requested transformations */
 PNG_EXPORT(53, void, png_start_read_image, (png_structrp png_ptr));
@@ -1637,9 +1671,11 @@ PNG_EXPORT(64, void, png_destroy_read_struct, (png_structpp png_ptr_ptr,
 PNG_EXPORT(65, void, png_destroy_write_struct, (png_structpp png_ptr_ptr,
     png_infopp info_ptr_ptr));
 
-/* Set the libpng method of handling chunk CRC errors */
-PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
-    int ancil_action));
+/* Set the libpng method of handling chunk CRC errors on read */
+PNG_REMOVED(66, void, png_set_crc_action, (png_structrp png_ptr,
+         int crit_action, int ancil_action), PNG_EMPTY)
+#define png_set_crc_action(png_ptr, crit, ancil)\
+      (png_setting((png_ptr), PNG_SR_CRC_ACTION, (crit), (ancil)))
 
 /* Values for png_set_crc_action() say how to handle CRC errors in
  * ancillary and critical chunks, and whether to use the data contained
@@ -1657,6 +1693,168 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
 #define PNG_CRC_QUIET_USE     4  /* quiet/use data      quiet/use data    */
 #define PNG_CRC_NO_CHANGE     5  /* use current value   use current value */
 
+/* Write image filtering and compression options.
+ *
+ * These settings just change the very low level encoding of a PNG.  The changes
+ * make no difference to the image or the meta-data stored in the PNG.  The API
+ * used to make these changes can be disabled in a very minimal configuration,
+ * if it is your compiler will report undefined values when the APIs below are
+ * used.
+ *
+ * Write settings defined here, in order of ease of use:
+ *
+ *    1) Write compression settings: whether to optimize the write and the PNG
+ *       that results for read speed, final PNG size, write speed or memory
+ *       usage.
+ *    2) IDAT size: What size to make the IDAT chunks in the PNG.
+ *    3) PNG row filters to consider when writing the PNG.
+ *    4) Very low level control over the deflate compression (useful mainly for 
+ *       programs that want to try every option to find which gives the smallest
+ *       PNG.)
+ */
+#ifdef PNG_WRITE_SUPPORTED
+/* (1) Write compression settings: */
+#define png_set_compression(p, v) (png_setting((p), PNG_SW_COMPRESS_png_level,\
+         0, (v)))
+   /* Control the write compression of all chunks.  This affects five basic
+    * pieces of behavior:
+    *
+    *    1) The size of the PNG produced.
+    *    2) The amount of memory the write code takes to produce the PNG.
+    *    3) The amount of time the write code takes to produce the PNG.
+    *    4) The amount of memory required to read the resultant PNG.
+    *    5) The amount of time required to read the resultant PNG.
+    *
+    * There is considerable interdependence between these variables.  As a
+    * result there are a limited number of options:
+    */
+#  define PNG_COMPRESSION_LOW_MEMORY (1)
+      /* Minimize the memory required both when reading (4) and writing (2) the
+       * PNG.  This results in a significantly larger PNG (which may itself have
+       * the opposite effect of slowing down either read or write) however the
+       * memory overhead is reduced and, apart from the extra time to read or
+       * write the data, the read and write time is likely to be reduced too.
+       *
+       * Use this when both read and write will happen on a memory starved
+       * (really, very low memory) system.
+       */
+#  define PNG_COMPRESSION_HIGH_SPEED (2)
+      /* Minimize the time to both read (5) and write (3) the PNG.  This uses
+       * slightly more memory on read and potentially significantly more on
+       * write but is optimized for maximum speed in both cases.  
+       *
+       * Use this when both read and write need to be fast and PNG size is not
+       * likely to be an issue.  An example would be if you are using PNG to
+       * pass intermediate data between applications on the same machine.
+       */
+#  define PNG_COMPRESSION_HIGH_READ_SPEED (3)
+      /* Minimize the time to read (5) the PNG.  This also reduces the amount
+       * of memory on read, however some options which require more memory but
+       * are likely to decrease PNG size, therefore improve read spead, are
+       * used.
+       *
+       * This is one of the 'normal' options; options that are used when a
+       * reasonably capable write machine is producing PNG files that will be
+       * read many times.  In this case the option is optimizing for speed on
+       * read even if it increases the size of the PNG.
+       */
+#  define PNG_COMPRESSION_LOW (4)
+      /* This switches on options which do affect speed of both compression and
+       * decompression, but biases the choice towards higher performance in both
+       * cases.  (So it is something of a compromise between all-out speed and
+       * PNG compression).
+       *
+       * This is a good default to use in typical usages where PNG file size is
+       * less of an issue than the overheads on reading a PNG file.
+       *
+       * Use this option when producing PNG files that are not expected to be
+       * distributed widely or where read speed is more important that size.
+       * This is also a good default for small images where the slight increase
+       * in size of the compressed data doesn't change the file size much.
+       */
+#  define PNG_COMPRESSION_MEDIUM (5)
+      /* This is a compromise which switches on the options found most helpful
+       * across a wide range of files without switching on the full range of
+       * options which would decrease file size only a little while taking a lot
+       * more time.  PNG read memory (4) or time (5) is not a factor in the
+       * choice of options; only write time (3).
+       *
+       * This is closest to the default used in prior versions of libpng.  There
+       * seems no logic to using it if the actual requirements are known and,
+       * even if they aren't, it is probably better to guess 'LOW' or 'HIGH'.
+       *
+       * This is the normal libpng default.
+       */
+#  define PNG_COMPRESSION_HIGH (6)
+     /* This turns on everything which reduces file size on aggregate across a
+      * large test set of files.  It optimizes solely for the size of the
+      * resultant PNG (1).
+      *
+      * This is a good default to use if file size is all important; it was the
+      * stated original default in the PNG design, but the implementation of
+      * libpng never used it.
+      *
+      * Use this setting in image authoring applications when writing the
+      * finished image in PNG format.
+      *
+      * NOTE: several PNG file size optimizers exist (see the web-site
+      * libpng.org).  libpng does not perform the same functions as these
+      * optimizers; libpng does not search for the best compression settings.
+      * For this reason if you really want to minimize the size of the PNG files
+      * produced use PNG_COMPRESSION_HIGH_SPEED then post-process the result
+      * with one of the many PNG optimization programs.
+      */
+#  define PNG_COMPRESSION_COMPAT (0)
+      /* DEPRECATED: this is provided as a setting to aid transition of test
+       * suites between major library versions (1.5 or 1.6 moving to 1.7).  The
+       * default settings change in 1.7 so, while the PNG files produced do not
+       * change, their encoding does.  Test systems that rely on constant
+       * encoding can use this to verify that this is all that has changed.
+       *
+       * NOTE: the option will be removed at some point.  It is difficult to
+       * maintain and adds to libpng code size.
+       *
+       * NOTE: there are other changes in major and minor releases, such as
+       * better ancillary chunk error handling, that also cause binary changes
+       * to the PNG files libpng generates.  Furthermore versions of libpng
+       * prior to 1.7 included random data from uninitialized memory in the
+       * image data under certain circumstances; this meant that earlier
+       * versions were often not even consistent across two writes of the same
+       * PNG file!
+       */
+
+/* png_set_compression sets the default for all libpng compression operations.
+ * While the setting is the same for all chunks it results in different
+ * compression options for different chunks.  The setting can be applied
+ * separately to each class of chunks as follows:
+ */
+#define png_set_image_compression(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_png_level, png_IDAT, (v)))
+   /* Control the compression of the image data (IDAT) chunks. */
+
+#define png_set_ICC_profile_compression(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_png_level, png_iCCP, (v)))
+   /* Control the compression of ICC profiles (iCCP chunks.) */
+
+#define png_set_text_compression(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_png_level, png_zTXt, (v)))
+   /* Control the compression of text (png_zTXt and png_iTXt) chunks. */
+
+/* (2) IDAT size: */
+#define png_set_IDAT_size(p, v) (png_setting((p), PNG_SW_IDAT_size, (v), 0))
+   /* Set the maximum size of the IDAT chunks libpng writes.  Valid values are
+    * in the range 1U..0x7fffffffU, the default is 'PNG_ZBUF_SIZE' (a
+    * historically confusing name) and this default *also* controls the size of
+    * the buffer the read code uses when reading IDAT chunks.
+    *
+    * libpng has to buffer the data in the IDAT chunk before it writes any of
+    * it, therefore this number directly controls that part of the memory
+    * overhead while writing a PNG.  There is a 12 byte per chunk overhead, so
+    * the number also directly affects the size of the PNG.  The number has no
+    * significant effect (beyond the latter size effect) on the read code.
+    */
+#endif /* WRITE */
+
 /* These functions give the user control over the scan-line filtering in
  * libpng and the compression methods used by zlib.  These functions are
  * mainly useful for testing, as the defaults should work with most users.
@@ -1666,22 +1864,23 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  */
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
-/* Control the filtering method(s) used by libpng for the write of subsequent
+/* (3) PNG row filters to consider when writing the PNG.
+ *
+ * Control the filtering method(s) used by libpng for the write of subsequent
  * rows of the image.  The argument is either a single filter value (one of the
- * PNG_FILTER_VALUE_ defines below), in which case that filter will be used on
+ * PNG_FILTER_VALUE_ defines above), in which case that filter will be used on
  * following rows, or a mask of filter values (logical or of the PNG_FILTER_
- * bit masks and follow PNG_FILTER_VALUE_*).
+ * bit masks that follow PNG_FILTER_VALUE_*).  Support for selection of a filter
+ * from a mask with more than one bit set is dependent on
+ * PNG_SELECT_FILTER_SUPPORTED, however support is the default configuration of
+ * libpng.  If support is not available the lowest bit set in the mask (the
+ * lowest numbered filter) is used.
  *
  * The set of filters may be changed at any time, the new values will affect the
  * next row written.
  *
- * The first time a filter is selected which requires the previous row (UP, AVG
- * or PAETH) retention of the previous row is switched on.  This means that if
- * this is done after the first row in a pass the previous-row filter will not
- * be considered until the row after the png_set_filter call.  libpng issues a
- * warning (via png_warning) in this case.
- *
- * The 'method' must match that passed to png_set_IHDR; it cannot be changed.
+ * The 'method' must match that passed to png_set_IHDR; it cannot be changed and
+ * is ignore in 1.7 and later.
  *
  * If multiple filters are enabled libpng will select one according to the
  * following rules:
@@ -1691,42 +1890,86 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  *    when there is no previous row.
  *
  * 2) PNG_SELECT_FILTER_SUPPORTED:
- *    If the PNG rows are long enough (have enough bytes; at least 256) libpng
- *    will buffer each row and perform a filter selection heuristic to chose an
- *    appropriate filter.
+ *    If the PNG rows are long enough (have enough bytes) libpng will process a
+ *    row at a time; it will buffer the row if necessary.  It uses a heuristic
+ *    based on the closeness of the filtered values to 0 to determine which
+ *    filter to use.
  *
  * 3) !PNG_SELECT_FILTER_SUPPORTED:
  *    libpng selects the first filter in the list (there is no warning that this
  *    will happen - check the #defines if you need to know.)
  *
- * If you intend to use 'previous row' filters in an image set either the UP or
- * PAETH filter before the first call to png_write_row, depending on whether you
- * want to use NONE or SUB on the first row.
+ * The 'up', 'avg' and 'Paeth' filters require the previous image row to work.
+ * If it is not available they are removed from the set of filters to try.  The
+ * first time the filter mask includes one of these filters libpng turns on
+ * saving of the row.  The filters do work on the first row of a pass, where
+ * there is no previous row from the image.  The PNG standard defines the
+ * previous row as consisting of all 0 bytes in this case.  That definition
+ * causes the filters to have the following properties on the first row of a
+ * pass:
  *
- * You can also select AVG on the first row; it uses half the value of the
- * preceding byte as a predictor and is not likely to have very good
- * performance.
+ *    UP:    The same as NONE (i.e. no filtering).
+ *    AVG:   Uses the arithmetic (not modular arithmetc!) half of the preceding
+ *           pixel as the predictor.  This is unique and not typically very
+ *           useful.
+ *    PAETH: The same as SUB.
+ *
+ * As a result with all versions of libpng if you want to use any of these
+ * filters anywhere in the image you need only turn on one of them on the first
+ * row of the image, or of a pass for interlaced images.  For example if you
+ * want to use 'sub' on the first row simply set 'sub'+'Paeth' in the mask;
+ * libpng will automatically eliminate the Paeth algorithm from consideration
+ * because it knows that 'sub' will rank equal or (if the filter byte is taken
+ * into account) better.
+ *
+ * This approach is portable to earlier versions of libpng, however it may be
+ * difficult to program.  1.7 allows you to directly specify whether or not to
+ * retain the previous row.  This is simpler and allows you to turn off previous
+ * row retention if you want to.
  */
-PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
-    int filters));
+PNG_REMOVED(67, void, png_set_filter, (png_structrp png_ptr, int method,
+    int filters), PNG_EMPTY)
+
+#define png_set_filter(p, m, f) (png_setting((p), PNG_SW_COMPRESS_filters,\
+         (m), (f)))
+   /* 'm' is the method and must be 0 (PNG_FILTER_TYPE_BASE) unless MNG
+    * processing is supported (very unusual).  'f' is either a single value,
+    * PNG_FILTER_VALUE_* below, or a combination of one or more PNG_FILTER_MASK
+    * values.
+    *
+    * This sets the filter mask (or value) for the *next* row that is written.
+    * It may be called at any time but does not have any effect until the next
+    * row starts to be written.
+    *
+    * The return value is the mask that is set (or, with PNG_SF_GET, the
+    * currently set mask).  When PNG_SELECT_FILTER_SUPPORTED is not defined this
+    * mask will have only one bit.
+    *
+    * NOTE: with PNG_SF_GET the result will be PNG_UNSET if png_set_filter has
+    * not been called before and row writing has not started.
+    */
+
+#define png_set_row_buffers(p, onoff) (png_setting((p),\
+      PNG_SW_COMPRESS_row_buffers, (onoff), 0))
+   /* If you intend to change the filter list after the first row using the
+    * previous API call png_set_row_buffers(png_ptr, 1) if you intend to use UP,
+    * AVG or Paeth filters.
+    *
+    * You can turn the buffering on and off dynamically, just as with
+    * png_set_filter.
+    *
+    * The second argument should be 0 (off) or 1 (on).  In the future it may be
+    * used to control the maximum number of rows buffered.
+    */
 #endif /* WRITE_FILTER */
 
-/* Filter values (not flags) - used in pngwrite.c, pngwutil.c for now.
- * These defines match the values in the PNG specification.
- */
-#define PNG_FILTER_VALUE_NONE  0
-#define PNG_FILTER_VALUE_SUB   1
-#define PNG_FILTER_VALUE_UP    2
-#define PNG_FILTER_VALUE_AVG   3
-#define PNG_FILTER_VALUE_PAETH 4
-#define PNG_FILTER_VALUE_LAST  5
-
-/* The above values are valid arguments to png_set_filter() if only a single
- * filter is to be used.  If multiple filters are to be allowed (the default is
- * to allow any of them) then a combination of the following masks must be used
- * and the low three bits of the argument to png_set_filter must be 0.
+/* The PNG_FILTER_VALUE_ definitions (the filter values from the base PNG spec)
+ * are valid arguments to png_set_filter() if only a single filter is to be
+ * used.  If multiple filters are to be allowed (the default is to allow any of
+ * them) then a combination of the following masks must be used and the low
+ * three bits of the argument to png_set_filter must be 0.
  *
- * The resultant argument fits in a single byte.
+ * The resultant argument fits in a single byte in either case.
  */
 #define PNG_FILTER_MASK(value) (0x08 << (value))
 #define PNG_FILTER_NONE        PNG_FILTER_MASK(PNG_FILTER_VALUE_NONE)
@@ -1744,61 +1987,95 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
 
 #ifdef PNG_WRITE_SUPPORTED
 #ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
-PNG_FP_EXPORT(68, PNG_DEPRECATED void, png_set_filter_heuristics,
+PNG_REMOVED(68, void, png_set_filter_heuristics,
     (png_structrp png_ptr, int heuristic_method, int num_weights,
-     png_const_doublep filter_weights, png_const_doublep filter_costs))
-PNG_FIXED_EXPORT(209, PNG_DEPRECATED void, png_set_filter_heuristics_fixed,
+     png_const_doublep filter_weights, png_const_doublep filter_costs),
+    PNG_DEPRECATED)
+PNG_REMOVED(209, void, png_set_filter_heuristics_fixed,
     (png_structrp png_ptr, int heuristic_method, int num_weights,
     png_const_fixed_point_p filter_weights,
-    png_const_fixed_point_p filter_costs))
+    png_const_fixed_point_p filter_costs),
+    PNG_DEPRECATED)
+   /* Neither of these API calls did anything in libpng 1.6, however they were
+    * not marked PNG_DEPRECATED, so they are converted to no-op function-like
+    * macros here.  (NOTE: the macro arguments are evaluated once each, this
+    * will probably cause warnings with some compiler options: simply remove the
+    * function call after ensuring that the arguments had no side effects.)
+    */
+#define png_set_filter_heuristics(p,m,w,fw,fc) ((void)(p,m,w,fw,fc))
+#define png_set_filter_heuristics_fixed(p,m,w,fw,fc) ((void)(p,m,w,fw,fc))
 #endif /*  WRITE_WEIGHTED_FILTER */
 
-/* Set the library compression level.  Currently, valid values range from
- * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
- * (0 - no compression, 9 - "maximal" compression).  Note that tests have
- * shown that zlib compression levels 3-6 usually perform as well as level 9
- * for PNG images, and do considerably fewer caclulations.  In the future,
- * these values may not correspond directly to the zlib compression levels.
- */
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
-PNG_EXPORT(69, void, png_set_compression_level, (png_structrp png_ptr,
-    int level));
+PNG_REMOVED(69, void, png_set_compression_level, (png_structrp png_ptr,
+    int level), PNG_EMPTY)
+#define png_set_compression_level(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_zlib_level, png_IDAT, (v)))
 
-PNG_EXPORT(70, void, png_set_compression_mem_level, (png_structrp png_ptr,
-    int mem_level));
+PNG_REMOVED(70, void, png_set_compression_mem_level, (png_structrp png_ptr,
+    int mem_level), PNG_EMPTY)
+#define png_set_compression_mem_level(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_memLevel, png_IDAT, (v)))
 
-PNG_EXPORT(71, void, png_set_compression_strategy, (png_structrp png_ptr,
-    int strategy));
+PNG_REMOVED(71, void, png_set_compression_strategy, (png_structrp png_ptr,
+    int strategy), PNG_EMPTY)
+#define png_set_compression_strategy(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_strategy, png_IDAT, (v)))
 
-/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
- * smaller value of window_bits if it can do so safely.
- */
-PNG_EXPORT(72, void, png_set_compression_window_bits, (png_structrp png_ptr,
-    int window_bits));
+PNG_REMOVED(72, void, png_set_compression_window_bits, (png_structrp png_ptr,
+    int window_bits), PNG_EMPTY)
+#define png_set_compression_window_bits(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_windowBits, png_IDAT, (v)))
 
-PNG_EXPORT(73, void, png_set_compression_method, (png_structrp png_ptr,
-    int method));
+PNG_REMOVED(73, void, png_set_compression_method, (png_structrp png_ptr,
+    int method), PNG_EMPTY)
+#define png_set_compression_method(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_method, png_IDAT, (v)))
 #endif /* WRITE_CUSTOMIZE_COMPRESSION */
 
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
 /* Also set zlib parameters for compressing non-IDAT chunks */
-PNG_EXPORT(222, void, png_set_text_compression_level, (png_structrp png_ptr,
-    int level));
+PNG_REMOVED(222, void, png_set_text_compression_level, (png_structrp png_ptr,
+    int level), PNG_EMPTY)
+#define png_set_text_compression_level(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_zlib_level, png_zTXt, (v)))
 
-PNG_EXPORT(223, void, png_set_text_compression_mem_level, (png_structrp png_ptr,
-    int mem_level));
+PNG_REMOVED(223, void, png_set_text_compression_mem_level,
+    (png_structrp png_ptr, int mem_level), PNG_EMPTY)
+#define png_set_text_compression_mem_level(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_memLevel, png_zTXt, (v)))
 
-PNG_EXPORT(224, void, png_set_text_compression_strategy, (png_structrp png_ptr,
-    int strategy));
+PNG_REMOVED(224, void, png_set_text_compression_strategy, (png_structrp png_ptr,
+    int strategy), PNG_EMPTY)
+#define png_set_text_compression_strategy(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_strategy, png_zTXt, (v)))
 
-/* If PNG_WRITE_OPTIMIZE_CMF_SUPPORTED is defined, libpng will use a
- * smaller value of window_bits if it can do so safely.
+PNG_REMOVED(225, void, png_set_text_compression_window_bits,
+    (png_structrp png_ptr, int window_bits), PNG_EMPTY)
+#define png_set_text_compression_window_bits(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_windowBits, png_zTXt, (v)))
+
+PNG_REMOVED(226, void, png_set_text_compression_method, (png_structrp png_ptr,
+    int method), PNG_EMPTY)
+#define png_set_text_compression_method(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_method, png_zTXt, (v)))
+
+/* NOTE: in versions of libpng prior to 1.7 iCCP compression was controlled by
+ * the text settings, hence the controls were only available if
+ * PNG_WRITE_CUSTOMIZIZE_ZTXT_COMPRESSION_SUPPORTED.  In 1.7 the text settings
+ * no longer affect iCCP compression, the following macros must be used (if
+ * necessary):
  */
-PNG_EXPORT(225, void, png_set_text_compression_window_bits,
-    (png_structrp png_ptr, int window_bits));
-
-PNG_EXPORT(226, void, png_set_text_compression_method, (png_structrp png_ptr,
-    int method));
+#define png_set_ICC_profile_compression_level(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_zlib_level, png_iCCP, (v)))
+#define png_set_ICC_profile_compression_mem_level(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_memLevel, png_iCCP, (v)))
+#define png_set_ICC_profile_compression_strategy(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_strategy, png_iCCP, (v)))
+#define png_set_ICC_profile_compression_window_bits(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_windowBits, png_iCCP, (v)))
+#define png_set_ICC_profile_compression_method(p, v) (png_setting((p),\
+         PNG_SW_COMPRESS_method, png_iCCP, (v)))
 #endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
 #endif /* WRITE */
 
@@ -2077,8 +2354,31 @@ PNG_EXPORT(108, void, png_chunk_benign_error, (png_const_structrp png_ptr,
     png_const_charp warning_message));
 #endif
 
-PNG_EXPORT(109, void, png_set_benign_errors,
-    (png_structrp png_ptr, int allowed));
+#define png_set_error_action(png_ptr, what, action)\
+   (png_setting((png_ptr), PNG_SRW_ERROR_HANDLING, (what), (action)))
+   /* Control the handling of 'benign' errors; errors that can be handled in
+    * some way.  The action is one of the following values:
+    */
+#define PNG_IGNORE 0 /* ignore the error; no warning or error message */
+#define PNG_WARN   1 /* call png_warning with an appropriate error message */
+#define PNG_ERROR  2 /* call png_error with the error message */
+   /* 'what' is a list (bit mask) of the errors to set: */
+#define PNG_BENIGN_ERRORS (1U)
+#define PNG_APP_WARNINGS  (2U)
+#define PNG_APP_ERRORS    (4U)
+#define PNG_IDAT_ERRORS   (8U)
+#define PNG_SAFE_ERRORS   (PNG_BENIGN_ERRORS+PNG_APP_WARNINGS+PNG_APP_ERRORS)
+#define PNG_ALL_ERRORS    (PNG_SAFE_ERRORS+PNG_IDAT_ERRORS)
+
+PNG_REMOVED(109, void, png_set_benign_errors,
+      (png_structrp png_ptr, int allowed), PNG_EMPTY)
+#define png_set_benign_errors(png_ptr, allowed) (png_setting((png_ptr),\
+         PNG_SRW_ERROR_HANDLING, PNG_SAFE_ERRORS,\
+         (allowed) ? PNG_WARN : PNG_ERROR))
+   /* Turn all errors that can be handled into warnings, or turn them back into
+    * errors if 'allowed' is false.
+    */
+
 #else
 #  ifdef PNG_ALLOW_BENIGN_ERRORS
 #    define png_benign_error(pp,e) png_warning(pp,e)
@@ -2610,12 +2910,10 @@ PNG_EXPORT(184, png_uint_32, png_permit_mng_features, (png_structrp png_ptr,
 #define PNG_HANDLE_CHUNK_ALWAYS       3
 #define PNG_HANDLE_CHUNK_LAST         4
 
-/* Strip the prepended error numbers ("#nnn ") from error and warning
- * messages before passing them to the error or warning handler.
- */
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-PNG_EXPORT(185, void, png_set_strip_error_numbers, (png_structrp png_ptr,
-    png_uint_32 strip_mode));
+/* This was never implemented: */
+PNG_REMOVED(185, void, png_set_strip_error_numbers, (png_structrp png_ptr,
+    png_uint_32 strip_mode), PNG_EMPTY)
 #endif
 
 /* Added in libpng-1.2.6 */
@@ -2882,8 +3180,10 @@ PNG_EXPORT(207, void, png_save_uint_16, (png_bytep buf, unsigned int i));
 #endif
 
 #ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
-PNG_EXPORT(242, void, png_set_check_for_invalid_index,
-    (png_structrp png_ptr, int enabled_if_greater_than_0));
+PNG_REMOVED(242, void, png_set_check_for_invalid_index,
+    (png_structrp png_ptr, int enabled_if_greater_than_0), PNG_EMPTY)
+#define png_set_check_for_invalid_index(png_ptr, value)\
+   (png_setting((png_ptr), PNG_SRW_CHECK_FOR_INVALID_INDEX, 0, (value)))
    /* By default the check is enabled on both read and write when the number of
     * entries in the palette is less than the maximum required by the bit depth
     * of a palette image.
@@ -2895,6 +3195,8 @@ PNG_EXPORT(242, void, png_set_check_for_invalid_index,
     * On read chunk (benign) error messages are only produced with the default
     * setting; it is assumed that when the check is turned on explicitly the
     * caller will call png_get_palette_max to check the result.
+    *
+    * The png_setting call returns 0.
     */
 #endif /* CHECK_FOR_INVALID_INDEX */
 #ifdef PNG_GET_PALETTE_MAX_SUPPORTED
@@ -3592,67 +3894,189 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  * Section 6: IMPLEMENTATION OPTIONS
  *******************************************************************************
  *
- * Support for arbitrary implementation-specific optimizations.  The API allows
- * particular options to be turned on or off.  'Option' is the number of the
- * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
- * by the PNG_OPTION_ defines below.
+ * Change of options used during read and/or write.
  *
- * HARDWARE: normally hardware capabilites, such as the Intel SSE instructions,
- *           are detected at run time, however sometimes it may be impossible
- *           to do this in user mode, in which case it is necessary to discover
- *           the capabilities in an OS specific way.  Such capabilities are
- *           listed here when libpng has support for them and must be turned
- *           ON by the application if present.  Check pnglibconf.h for options
- *           appropriate to your hardware.
+ * A number of internal options can (but do not need to be) changed to
+ * fine tune the implementation.  These options control such things as the
+ * precise settings for compression, the accuracy of arithmetic used internally
+ * for image processing operations (gamma transformations) and, in some cases,
+ * the specific implementations (hardware or software optimizations.)
  *
- *           In general 'PNG_EXTENSIONS' controls hardware optimizations; these
- *           are not supported parts of libpng and, if there are problems with
- *           them, bugs should be ported to the implementers.  Depending on the
- *           configuration it may not be possible to disable extensions at run
- *           time.
- *
- * SOFTWARE: sometimes software optimizations actually result in performance
- *           decrease on some architectures or systems, or with some sets of
- *           PNG images.  'Software' options allow such optimizations to be
- *           selected at run time.
+ * To avoid API proliferation there is a single general API (new in 1.7) to do
+ * this.  When a particular option is not supported by the build in libpng an
+ * attempt to set it will return a failure code but will be totally ignored
+ * unless the PNG_SF_ERROR flag is set (see below).
  */
-#ifdef PNG_SET_OPTION_SUPPORTED
-#define PNG_EXTENSIONS 0 /* BOTH: enable or disable extensions */
-#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#define PNG_OPTION_NEXT  6 /* Next option - numbers must be even */
+PNG_EXPORT(249, png_int_32, png_setting, (png_structrp png_ptr,
+         png_uint_32 setting, png_uint_32 parameter, png_int_32 value));
+   /* Alter setting 'setting' using the values of 'parameter' and 'value'.  The
+    * result is either one of the following failure codes or a setting/parameter
+    * specific result code.
+    *
+    * The failure codes match the POSIX 1003.1 <errno.h> values (section 2.5,
+    * error numbers) with a preceding PNG_.  (png_uint_32)result gives a number
+    * in the range 0x80000001U to 0x8000000fU.
+    */
+#  define PNG_EBADF  (-0x7fffffff) /* read/write error */
+      /* An attempt was made to apply a read setting to a write structure or
+       * vice versa.
+       */
+#  define PNG_EINVAL (-0x7ffffffe) /* invalid argument */
+      /* 'png_ptr' was NULL or 'parameter' or 'value' is invalid for the given
+       * setting.
+       */
+#  define PNG_EDOM   (-0x7ffffffd) /* out of range */
+      /* Either 'parameter' or 'value' is out of range for the given setting
+       * (only returned when paramter or value are used and are numeric; for
+       * flag values PNG_EINVAL will be returned.)
+       */
+#  define PNG_ENOSYS (-0x7ffffff1) /* unsupported setting/param */
+      /* The setting was not recognized; typically this means that libpng was
+       * built without the appropriate support.
+       */
+#  define PNG_UNSUPPORTED_SETTING PNG_ENOSYS
+      /* For backware compatibility with earlier libpng versions and
+       * 'png_set_option' return codes.
+       */
+#  define PNG_UNSET  (-0x7ffffff0) /* NOT an erro code: no previous setting */
+      /* The setting was not (previously) set.  Returned when there is no built
+       * in default for a setting.  Normally this means that the default will
+       * depend on other settings or the PNG itself.
+       */
+   /* Results larger (more positive) than PNG_ENOSYS are success codes (even if
+    * negative).  The value is interpreted as follows (as defined by the
+    * setting):
+    *
+    *    1) A signed 31-bit number in the range -0x7fffffef to +0x7fffffff
+    *    2) An unsigned 31 bit number in the range 0U to 0x7fffffffU
+    *    3) An unsigned 32 bit bit set/flag value in the range 0U to 0xfffffffU
+    *       but excluding values in the range 0x80000000U to 0x80000000FU
+    *       encoded as follows:
+    *
+    *          if (v <= 0x7fffffffU)
+    *             v
+    *          else if (v > 0x8000000FU)
+    *             -(png_int_32)-v
+    *
+    *       The result can be converted by to the original (png_uint_32) simply
+    *       by casting it as such.
+    */
+#  define PNG_FAILED(result) ((result) <= PNG_ENOSYS)
+      /* The setting did not take; this includes both errors making the setting
+       * (e.g. parameter or value errors) and unsupported settings.  Check the
+       * result code itself for more information.
+       */
+#  define PNG_OK(result) ((result) > PNG_ENOSYS)
+      /* The setting succeeded; the result is a return code which depends on the
+       * particular setting.  (E.g. it might be a return code or it might be the
+       * previous value.)
+       */
 
-/* Return values: NOTE: there are four values and 'off' is *not* zero */
-#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
-#define PNG_OPTION_INVALID 1 /* Option number out of range */
-#define PNG_OPTION_OFF     2
-#define PNG_OPTION_ON      3
-
-PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
-   int onoff));
-#endif /* SET_OPTION */
-
-/* Support for software run-time settings.
+/* SETTING VALUES (generic)
  *
- * These settings allow tuning of the parameters used internally by libpng to
- * achieve either greater performance, lower memory utilization or greater
- * accuracy in image processing operations.
- *
- * The parameter is a single png_int_32, the result is the previous setting or
- * 0x8000000 if the setting is not supported..
+ * These are flag values that are added to the setting definitions below to
+ * simplify processing inside libpng and self-document the setting behavior.
+ * All these values have the prefix PNG_SF_
  */
-#ifdef PNG_SETTING_SUPPORTED
-PNG_EXPORT(249, png_int_32, png_setting, (png_structrp png_ptr, int setting,
-   png_int_32 value));
+#define PNG_SF_ERROR  (0x80000000U)
+   /* If this is set on the 'setting' argument to png_setting and a failure code
+    * would otherwise be returned call png_error instead.  This is a convenience
+    * for applications that do not want to check the result code.  It is never
+    * set by default.  The error string is cryptic.
+    */
+#define PNG_SF_GET    (0x40000000U)
+   /* Do not set the setting.  With most settings this just allows for the
+    * presence of support for the setting to be checked at run time; if the
+    * setting is not support PNG_ENOSYS will be returned.
+    *
+    * With some settings checking of the parameter or value may be done, but
+    * there is no guarantee, so always supply valid parameter and value.
+    *
+    * With some settings the current setting is returned.  This is typically
+    * only done when the default setting is configurable and not even always
+    * then.  If the setting does this it will document the behavior.
+    */
+#define PNG_SF_READ   (0x20000000U)
+   /* The setting may be applied to a read png_struct.  If this is not set and
+    * an attempt is made to apply the setting to a read struct
+    * PNG_EBADF will be returned.
+    */
+#define PNG_SF_WRITE  (0x10000000U)
+   /* The setting may be applied to a write png_struct. If this is not set 
+    * and an attempt is made to apply the setting to a write struct
+    * PNG_EBADF will be returned.
+    */
 
-#define PNG_UNSUPPORTED_SETTING 0x80000000U
+/*********************************** WRITE ************************************/
+/* WRITE COMPRESSION SUPPORT
+ *
+ * These settings are normally accessed using the macros that are defined above;
+ * the function-like macros replace the API calls present in previous versions
+ * of libpng.
+ *
+ * 'setting' is as follows, 'parameter' is a chunk name; png_IDAT for IDAT
+ * compression, png_iCCP for iCCP chunk compression png_zTXt for zTZt *and* iTXt
+ * text chunk compression.  Other values must not be used; they will result in
+ * PNG_ENOSYS at present but may alter compression of new chunks in the future.
+ *
+ * The value is the new compression setting.  The result is is the old
+ * compression setting or an error code.  Compression settings are documented
+ * in text above describing the function-like macros.  PNG_UNSET is returned
+ * when the setting was not previously set; in this case the default may vary
+ * according to the actual data (e.g. length, PNG format).
+ *
+ * 0 is valid as a parameter if PNG_SF_GET is set, in that case the current or
+ * last setting is returned.
+ */
+#define PNG_SW_COMPRESS_zlib_level  (PNG_SF_WRITE + 0U)
+#define PNG_SW_COMPRESS_windowBits  (PNG_SF_WRITE + 1U)
+#define PNG_SW_COMPRESS_memLevel    (PNG_SF_WRITE + 2U)
+#define PNG_SW_COMPRESS_strategy    (PNG_SF_WRITE + 3U)
+#define PNG_SW_COMPRESS_png_level   (PNG_SF_WRITE + 4U)
+#define PNG_SW_COMPRESS_method      (PNG_SF_WRITE + 5U)
 
-/* Available settings: */
-#define PNG_GAMMA_MINIMUM  1
+/* WRITE IDAT size.
+ *
+ * The size of the IDAT chunks that are written (the last may be smaller).
+ */
+#define PNG_SW_IDAT_size            (PNG_SF_WRITE + 6U)
+
+/* WRITE FILTER CONTROL
+ *
+ * These settings are used by png_set_filter and png_set_row_buffers to control
+ * the filters used during compression.  The 'filters' setting has two arguments
+ * however the first is the filter method (or type) and must be 0 for PNG.
+ * Standards based on PNG may define additional values, as with other base file
+ * characteristics such as the compression type, however the result would not be
+ * a PNG.
+ */
+#define PNG_SW_COMPRESS_filters     (PNG_SF_WRITE + 7U)
+#define PNG_SW_COMPRESS_row_buffers (PNG_SF_WRITE + 8U)
+
+/* WRITE ROW FLUSH CONTROL
+ *
+ * This sets the number of rows between flush calls.  '0' was used to indicate
+ * no flushing (before the end).  The maximum number of rows in a PNG is
+ * actually greater than the maximum of a 31-bit integer for interlaced images,
+ * however this doesn't matter much; the number of rows was always declared as
+ * 'int', so it is still passed in the 'value' argument.
+ */
+#define PNG_SW_FLUSH                (PNG_SF_WRITE + 9U)
+
+/*********************************** READ *************************************/
+/* The size of the buffer used while reading IDAT chunks and, potentially, other
+ * compressed chunks.
+ */
+#define PNG_SR_COMPRESS_buffer_size (PNG_SF_READ + 1U)
+   /* Read compressed data buffer size, in 'parameter'.  The result is 0. */
+
+#define PNG_SR_GAMMA_threshold      (PNG_SF_READ + 2U)
+#define png_set_gamma_threshold(png_ptr, threshold)\
+   (png_setting((png_ptr), PNG_SR_GAMMA_threshold, (threshold), 0))
    /* SETTING: threshold below which gamma correction is not done, the default
     * (set when the library is built) is PNG_GAMMA_THRESHOLD_FIXED, the
-    * parameter is a png_fixed_point number, the difference from PNG_FP_1 above
-    * which gamma correction will be performed.
+    * 'parameter' is a png_fixed_point number, the difference from PNG_FP_1
+    * above which gamma correction will be performed.
     *
     * The value '153' is sufficient to maintain 1% accuracy in 16-bit linear
     * calculations over a 655:1 range; over the maximum range possible with the
@@ -3684,10 +4108,13 @@ PNG_EXPORT(249, png_int_32, png_setting, (png_structrp png_ptr, int setting,
     * Values between 216 and 5000 produce varying very small changes in image
     * contrast.  Values above 10,000 (10%) produce noticeable increase or
     * decrease in contrast which will probably change how the image is
-    * perceived.
+    * perceived.  There is an internal limit on the maximum value which is
+    * currently 65%; PNG_EDOM will be returned for higher values.
+    *
+    * The result is the value that was set.
     */
 #if 0 /*NYI*/
-#define PNG_GAMMA_ACCURACY 2
+#define PNG_SR_GAMMA_accuracy /*NYI*/
    /* SETTING: controls the accuracy of the gamma calculations when the results
     * are cached.  The default is PNG_DEFAULT_GAMMA_ACCURACY.  The number is 100
     * times the number of bits, 'b', used in the internal tables when the input
@@ -3714,7 +4141,62 @@ PNG_EXPORT(249, png_int_32, png_setting, (png_structrp png_ptr, int setting,
     *    16 5     1.0      5     384
     */
 #endif /*NYI*/
-#endif /* SETTING */
+
+#define PNG_SR_CRC_ACTION           (PNG_SF_READ + 4U)
+   /* 'parameter' is what to do with critical chunks, 'value' is what to do with
+    * ancillary ones when the CRC does not match on read.  0 is returned.  See
+    * png_set_crc_action for more information.
+    */
+
+/*********************************** OPTIONS **********************************/
+/* png_set_option is implemented via png_setting to provide API compatibility
+ * with releases prior to 1.7.0
+ */
+/* HARDWARE OPTIMIZATIONS
+ *
+ * Normally hardware capabilites, such as the Intel SSE instructions, are
+ * detected at run time, however sometimes it may be impossible to do this in
+ * user mode, in which case it is necessary to discover the capabilities in an
+ * OS specific way.  Such capabilities are listed here when libpng has support
+ * for them and must be turned ON by the application if present.  Check
+ * pnglibconf.h for options appropriate to your hardware.
+ *
+ * In general 'PNG_EXTENSIONS' controls hardware optimizations; these are not
+ * supported parts of libpng and, if there are problems with them, bugs should
+ * be ported to the implementers.  Depending on the configuration it may not be
+ * possible to disable extensions at run time.
+ */
+#define PNG_SRW_OPTION      (PNG_SF_READ+PNG_SF_WRITE + 0U)
+#ifdef PNG_SET_OPTION_SUPPORTED
+PNG_REMOVED(244, int, png_set_option, (png_structrp png_ptr, int option,
+   int onoff), PNG_EMPTY)
+
+#define png_set_option(p, opt, onoff)\
+      (png_setting((p), PNG_SRW_OPTION, (opt), (onoff)))
+   /* Pre 1.7 API; in 1.7 the result values have changed numerically but not by
+    * name.  For backward API compatibility this setting only returns one error
+    * code, PNG_ENOSYS and that only for option numbers out of range, otherwise
+    * if the option isn't supported PNG_OPTION_UNSET (PNG_UNSET) is returned.
+    */
+#endif /* SET_OPTION */
+#define PNG_OPTION_UNSET   PNG_UNSET  /* Unset - defaults to off */
+#define PNG_OPTION_INVALID PNG_ENOSYS /* Option number out of range */
+#define PNG_OPTION_OFF     0
+#define PNG_OPTION_ON      1
+
+/* Specific options: */
+#define PNG_EXTENSIONS 0 /* HARDWARE: switch extensions on or off */
+#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
+#define PNG_OPTION_NEXT  6 /* Next option - numbers are even */
+
+#define PNG_SRW_CHECK_FOR_INVALID_INDEX (PNG_SF_READ+PNG_SF_WRITE + 1U)
+   /* Turn the palette index check on or off; see
+    * png_set_check_for_invalid_index above.
+    */
+
+#define PNG_SRW_ERROR_HANDLING          (PNG_SF_READ+PNG_SF_WRITE + 2U)
+   /* Change the action on issues that can be handled. */
 
 /*******************************************************************************
  *  END OF HARDWARE OPTIONS

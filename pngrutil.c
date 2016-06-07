@@ -138,50 +138,10 @@ png_crc_read(png_structrp png_ptr, png_voidp buf, png_uint_32 length)
    png_calculate_crc(png_ptr, buf, length);
 }
 
-/* Compare the CRC stored in the PNG file with that calculated by libpng from
- * the data it has read thus far.
- */
-static int
-png_crc_error(png_structrp png_ptr)
-{
-   png_byte crc_bytes[4];
-   png_uint_32 crc;
-   int need_crc = 1;
-
-   if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name))
-   {
-      if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_MASK) ==
-          (PNG_FLAG_CRC_ANCILLARY_USE | PNG_FLAG_CRC_ANCILLARY_NOWARN))
-         need_crc = 0;
-   }
-
-   else /* critical */
-   {
-      if (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE)
-         need_crc = 0;
-   }
-
-#ifdef PNG_IO_STATE_SUPPORTED
-   png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_CRC;
-#endif
-
-   /* The chunk CRC must be serialized in a single I/O call. */
-   png_read_data(png_ptr, crc_bytes, 4);
-
-   if (need_crc != 0)
-   {
-      crc = png_get_uint_32(crc_bytes);
-      return ((int)(crc != png_ptr->crc));
-   }
-
-   else
-      return (0);
-}
-
-/* Optionally skip data and then check the CRC.  Depending on whether we
- * are reading an ancillary or critical chunk, and how the program has set
- * things up, we may calculate the CRC on the data and print a message.
- * Returns '1' if there was a CRC error, '0' otherwise.
+/* Optionally skip data and then check the CRC.  Depending on whether we are
+ * reading an ancillary or critical chunk, and how the program has set things
+ * up, we may calculate the CRC on the data and print a message.  Returns true
+ * if the chunk should be discarded, otherwise false.
  */
 int /* PRIVATE */
 png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
@@ -202,22 +162,37 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
       png_crc_read(png_ptr, tmpbuf, len);
    }
 
-   if (png_crc_error(png_ptr))
+   /* Compare the CRC stored in the PNG file with that calculated by libpng from
+    * the data it has read thus far.  Do any required error handling.  The
+    * second parameter is to allow a critical chunk (specifically PLTE) to be
+    * treated as ancillary.
+    */
    {
-      if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) ?
-          (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) == 0:
-          (png_ptr->flags & PNG_FLAG_CRC_CRITICAL_USE) != 0)
+      png_byte crc_bytes[4];
+
+#     ifdef PNG_IO_STATE_SUPPORTED
+         png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_CRC;
+#     endif
+
+      png_read_data(png_ptr, crc_bytes, 4);
+
+      if (png_ptr->current_crc != crc_quiet_use &&
+          png_get_uint_32(crc_bytes) != png_ptr->crc)
       {
-         png_chunk_warning(png_ptr, "CRC error");
+         if (png_ptr->current_crc == crc_error_quit)
+            png_chunk_error(png_ptr, "CRC");
+
+         else
+            png_chunk_warning(png_ptr, "CRC");
+
+         /* The only way to discard a chunk at present is to issue a warning.
+          * TODO: quiet_discard.
+          */
+         return png_ptr->current_crc == crc_warn_discard;
       }
-
-      else
-         png_chunk_error(png_ptr, "CRC error");
-
-      return (1);
    }
 
-   return (0);
+   return 0;
 }
 
 #if defined(PNG_READ_iCCP_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) ||\
@@ -314,8 +289,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
             defined(PNG_MAXIMUM_INFLATE_WINDOW)
             int window_bits;
 
-            if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
-               PNG_OPTION_ON)
+            if (png_ptr->maximum_inflate_window)
                window_bits = 15;
 
             else
@@ -870,6 +844,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
 #ifndef PNG_READ_OPT_PLTE_SUPPORTED
    if (png_ptr->color_type != PNG_COLOR_TYPE_PALETTE)
    {
+      /* Skip the whole chunk: */
       png_handle_skip(png_ptr);
       return;
    }
@@ -910,45 +885,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr)
       palette[i].blue = buf[2];
    }
 
-   /* If we actually need the PLTE chunk (ie for a paletted image), we do
-    * whatever the normal CRC configuration tells us.  However, if we
-    * have an RGB image, the PLTE can be considered ancillary, so
-    * we will act as though it is.
-    */
-#ifndef PNG_READ_OPT_PLTE_SUPPORTED
-   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-#endif
-      png_crc_finish(png_ptr, length - num * 3U);
-
-#ifndef PNG_READ_OPT_PLTE_SUPPORTED
-   else if (png_crc_error(png_ptr))  /* Only if we have a CRC error */
-   {
-      /* If we don't want to use the data from an ancillary chunk,
-       * we have two options: an error abort, or a warning and we
-       * ignore the data in this chunk (which should be OK, since
-       * it's considered ancillary for a RGB or RGBA image).
-       *
-       * IMPLEMENTATION NOTE: this is only here because png_crc_finish uses the
-       * chunk type to determine whether to check the ancillary or the critical
-       * flags.
-       */
-      if (!(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_USE))
-      {
-         if (png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN)
-            return;
-
-         else
-            png_chunk_error(png_ptr, "CRC error");
-      }
-
-      /* Otherwise, we (optionally) emit a warning and use the chunk. */
-      else if (!(png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN))
-      {
-         png_chunk_warning(png_ptr, "CRC error");
-      }
-   }
-#endif /* READ_OPT_PLTE */
-
+   png_crc_finish(png_ptr, length - num * 3U);
    png_set_PLTE(png_ptr, info_ptr, palette, num);
 
    /* Ok, make our own copy since the set succeeded: */
@@ -1351,8 +1288,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr)
                                     profile + (sizeof profile_header) +
                                     12 * tag_count, &size, 1/*finish*/);
 
-                                 if (length > 0 && !(png_ptr->flags &
-                                       PNG_FLAG_BENIGN_ERRORS_WARN))
+                                 if (length > 0
+#                                    ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+                                       && png_ptr->benign_error_action ==
+                                          PNG_ERROR
+#                                    endif /* BENIGN_READ_ERRORS */
+                                    )
                                     errmsg = "extra compressed data";
 
                                  /* But otherwise allow extra data: */
@@ -3818,17 +3759,28 @@ png_inflate_IDAT(png_structrp png_ptr, int finish,
 
    /* This is the error return case; there was missing data, or an error.
     * Either continue with a warning (once; hence the zstream_error flag)
-    * or png_error.  The 'warn' setting has to be turned on and benign errors
-    * have to be turned off (made warnings.)  The logic of this is that this
-    * is a pretty serious error; PNG is about images and we don't know that the
-    * image is correct.
+    * or png_error.
     */
    if (!png_ptr->zstream_error) /* first time */
    {
-      if ((png_ptr->flags & PNG_FLAG_IDAT_ERRORS_WARN) != 0)
-         png_chunk_benign_error(png_ptr, png_ptr->zstream.msg);
-      else
+#     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+         switch (png_ptr->IDAT_error_action)
+         {
+            case PNG_ERROR:
+               png_chunk_error(png_ptr, png_ptr->zstream.msg);
+               break;
+
+            case PNG_WARN:
+               png_chunk_warning(png_ptr, png_ptr->zstream.msg);
+               break;
+
+            default: /* ignore */
+               /* Keep going */
+               break;
+         }
+#     else
          png_chunk_error(png_ptr, png_ptr->zstream.msg);
+#     endif /* !BENIGN_ERRORS */
 
       /* And prevent the report about too many IDATs on streams with internal
        * LZ errors:
@@ -4587,4 +4539,177 @@ png_read_update_info(png_structrp png_ptr, png_inforp info_ptr)
    }
 }
 
+png_int_32 /* PRIVATE */
+png_read_setting(png_structrp png_ptr, png_uint_32 setting,
+      png_uint_32 parameter, png_int_32 value)
+{
+   /* Caller checks the arguments for basic validity */
+   int only_get = (setting & PNG_SF_GET) != 0U;
+
+   if (only_get) /* spurious: in case it isn't used */
+      setting &= ~PNG_SF_GET;
+
+   switch (setting)
+   {
+#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+         case PNG_SR_COMPRESS_buffer_size:
+            if (parameter > 0 && parameter <= ZLIB_IO_MAX)
+            {
+               png_ptr->IDAT_size = parameter;
+               return 0; /* Cannot return a 32-bit value */
+            }
+
+            else
+               return PNG_EINVAL;
+#     endif /* SEQUENTIAL_READ */
+
+#     ifdef PNG_READ_GAMMA_SUPPORTED
+         case PNG_SR_GAMMA_threshold:
+            if (parameter <= 0xFFFF)
+            {
+               if (!only_get)
+                  png_ptr->gamma_threshold = PNG_UINT_16(parameter);
+
+               return (png_int_32)/*SAFE*/parameter;
+            }
+
+            return PNG_EDOM;
+
+#if 0 /*NYI*/
+         case PNG_SR_GAMMA_accuracy:
+            if (parameter <= 1600)
+            {
+               if (!only_get)
+                  png_ptr->gamma_accuracy = parameter;
+
+               return (png_int_32)/*SAFE*/parameter;
+            }
+
+            return PNG_EDOM;
+#endif /*NYI*/
+#     endif /* READ_GAMMA */
+
+      case PNG_SR_CRC_ACTION:
+         /* Tell libpng how we react to CRC errors in critical chunks */
+         switch (parameter)
+         {
+            case PNG_CRC_NO_CHANGE:    /* Leave setting as is */
+               break;
+
+            case PNG_CRC_WARN_USE:     /* Warn/use data */
+               png_ptr->critical_crc = crc_warn_use;
+               break;
+
+            case PNG_CRC_QUIET_USE:    /* Quiet/use data */
+               png_ptr->critical_crc = crc_quiet_use;
+               break;
+
+            default:
+            case PNG_CRC_WARN_DISCARD: /* Not valid for critical data */
+               return PNG_EINVAL;
+
+            case PNG_CRC_ERROR_QUIT:   /* Error/quit */
+            case PNG_CRC_DEFAULT:
+               png_ptr->critical_crc = crc_error_quit;
+               break;
+         }
+
+         /* Tell libpng how we react to CRC errors in ancillary chunks */
+         switch (value)
+         {
+            case PNG_CRC_NO_CHANGE:    /* Leave setting as is */
+               break;
+
+            case PNG_CRC_WARN_USE:     /* Warn/use data */
+               png_ptr->ancillary_crc = crc_warn_use;
+               break;
+
+            case PNG_CRC_QUIET_USE:    /* Quiet/use data */
+               png_ptr->ancillary_crc = crc_quiet_use;
+               break;
+
+            case PNG_CRC_ERROR_QUIT:   /* Error/quit */
+               png_ptr->ancillary_crc = crc_error_quit;
+               break;
+
+            case PNG_CRC_WARN_DISCARD: /* Warn/discard data */
+            case PNG_CRC_DEFAULT:
+               png_ptr->ancillary_crc = crc_warn_discard;
+               break;
+
+            default:
+               return PNG_EINVAL;
+         }
+
+         return 0; /* success */
+
+#     ifdef PNG_SET_OPTION_SUPPORTED
+         case PNG_SRW_OPTION:
+            switch (parameter)
+            {
+               case PNG_MAXIMUM_INFLATE_WINDOW:
+                  if (png_ptr->maximum_inflate_window)
+                  {
+                     if (!value && !only_get)
+                        png_ptr->maximum_inflate_window = 0U;
+                     return PNG_OPTION_ON;
+                  }
+
+                  else
+                  {
+                     if (value && !only_get)
+                        png_ptr->maximum_inflate_window = 1U;
+                     return PNG_OPTION_OFF;
+                  }
+
+               default:
+                  return PNG_OPTION_UNSET;
+            }
+#     endif /* SET_OPTION */
+
+#     ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
+         case PNG_SRW_CHECK_FOR_INVALID_INDEX:
+            /* The 'enabled' value is a FORTRAN style three-state: */
+            if (value > 0)
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_ON;
+
+            else if (value < 0)
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_OFF;
+
+            else
+               png_ptr->palette_index_check = PNG_PALETTE_CHECK_DEFAULT;
+
+            return 0;
+#     endif /* READ_CHECK_FOR_INVALID_INDEX */
+
+#     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+         case PNG_SRW_ERROR_HANDLING:
+            /* The parameter is a bit mask of what to set, the value is what to
+             * set it to.
+             */
+            if (value >= PNG_IGNORE && value <= PNG_ERROR &&
+                parameter <= PNG_ALL_ERRORS)
+            {
+               if ((parameter & PNG_BENIGN_ERRORS) != 0U)
+                  png_ptr->benign_error_action = value & 0x3U;
+
+               if ((parameter & PNG_APP_WARNINGS) != 0U)
+                  png_ptr->app_warning_action = value & 0x3U;
+
+               if ((parameter & PNG_APP_ERRORS) != 0U)
+                  png_ptr->app_error_action = value & 0x3U;
+
+               if ((parameter & PNG_IDAT_ERRORS) != 0U)
+                  png_ptr->IDAT_error_action = value & 0x3U;
+
+               return 0;
+            }
+
+            return PNG_EINVAL;
+#     endif /* BENIGN_READ_ERRORS */
+
+      default:
+         return PNG_ENOSYS; /* not supported (whatever it is) */
+   }
+}
 #endif /* READ */
