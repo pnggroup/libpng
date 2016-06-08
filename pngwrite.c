@@ -542,7 +542,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 #        if !PNG_RELEASE_BUILD
             /* Always quit on error prior to release */
             png_ptr->benign_error_action = PNG_ERROR;
-            png_ptr->app_warning_action = PNG_ERROR;
+            png_ptr->app_warning_action = PNG_WARN;
             png_ptr->app_error_action = PNG_ERROR;
 #        else /* RELEASE_BUILD */
             /* Allow benign errors on write, subject to app control. */
@@ -555,7 +555,7 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
                 * author has to be assumed to be correct, so:
                 */
                png_ptr->benign_error_action = PNG_ERROR;
-               png_ptr->app_warning_action = PNG_ERROR;
+               png_ptr->app_warning_action = PNG_WARN;
                png_ptr->app_error_action = PNG_ERROR;
 #           endif /* !BENIGN_WRITE_ERRORS */
 #        endif /* RELEASE_BUILD */

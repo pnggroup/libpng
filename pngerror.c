@@ -353,13 +353,13 @@ app_error(png_const_structrp png_ptr, png_const_charp error_message,
 void /* PRIVATE */
 png_app_warning(png_const_structrp png_ptr, png_const_charp error_message)
 {
-   app_error(png_ptr, error_message, png_ptr->app_error_action);
+   app_error(png_ptr, error_message, png_ptr->app_warning_action);
 }
 
 void /* PRIVATE */
 png_app_error(png_const_structrp png_ptr, png_const_charp error_message)
 {
-   app_error(png_ptr, error_message, png_ptr->app_warning_action);
+   app_error(png_ptr, error_message, png_ptr->app_error_action);
 }
 #endif /* BENIGN_ERRORS */
 
