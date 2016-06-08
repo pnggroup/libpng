@@ -3076,6 +3076,7 @@ png_write_IDAT(png_structrp png_ptr, int flush)
          default:
          case PNG_COMPRESSION_MEDIUM:
             IDAT_size = PNG_ZBUF_SIZE;
+            break;
 
          case PNG_COMPRESSION_HIGH_READ_SPEED:
             /* Assume the reader reads partial IDAT chunks (pretty much a
@@ -3817,12 +3818,15 @@ png_write_start_IDAT(png_structrp png_ptr)
             default: /* For GCC */
             case PNG_COMPRESSION_LOW:
                ps->filter_mask = PNG_FILTER_NONE+PNG_FILTER_SUB;
+               break;
 
             case PNG_COMPRESSION_MEDIUM:
                ps->filter_mask = PNG_FAST_FILTERS;
+               break;
 
             case PNG_COMPRESSION_HIGH:
                ps->filter_mask = PNG_ALL_FILTERS;
+               break;
          }
 #     else /* !SELECT_FILTER */
          ps->filter_mask = PNG_FILTER_NONE;

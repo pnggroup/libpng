@@ -1910,21 +1910,12 @@ png_image_write_main(png_voidp argument)
       display->row_bytes = row_bytes;
    }
 
-   /* Apply 'fast' options if the flag is set. */
-   if ((image->flags & PNG_IMAGE_FLAG_FAST) != 0)
-   {
-#     ifdef PNG_WRITE_FILTER_SUPPORTED
-         png_set_filter(png_ptr, PNG_FILTER_TYPE_BASE, PNG_NO_FILTERS);
-#     endif /* WRITE_FILTER */
-      /* NOTE: determined by experiment using pngstest, this reflects some
-       * balance between the time to write the image once and the time to read
-       * it about 50 times.  The speed-up in pngstest was about 10-20% of the
-       * total (user) time on a heavily loaded system.
-       */
-#     ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
-         png_set_compression_level(png_ptr, 3);
-#     endif /* WRITE_CUSTOMIZE_COMPRESSION */
-   }
+   /* Select the right compression mode based on the presence or absence of the
+    * 'fast' flag, this will use whatever options are available in the libpng
+    * build.  It is always supported.
+    */
+   png_set_compression(png_ptr, (image->flags & PNG_IMAGE_FLAG_FAST) != 0 ?
+         PNG_COMPRESSION_HIGH_SPEED : PNG_COMPRESSION_HIGH);
 
    /* Check for the cases that currently require a pre-transform on the row
     * before it is written.  This only applies when the input is 16-bit and

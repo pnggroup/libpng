@@ -618,22 +618,6 @@
 #define PNG_HAVE_IEND               0x10U
 #define PNG_HAVE_PNG_SIGNATURE      0x20U
 
-/* Flags for the png_ptr->flags.
- * TODO: change to bit fields.
- */
-#define PNG_FLAG_LIBRARY_MISMATCH         0x001U
-/*#define PNG_FLAG_ZLIB_CUSTOM_STRATEGY   0x002U NO LONGER USED */
-/*#define PNG_FLAG_CRC_ANCILLARY_USE      0x004U NO LONGER USED */
-/*#define PNG_FLAG_CRC_ANCILLARY_NOWARN   0x008U NO LONGER USED */
-/*#define PNG_FLAG_CRC_CRITICAL_USE       0x010U NO LONGER USED */
-/*#define PNG_FLAG_CRC_CRITICAL_IGNORE    0x020U NO LONGER USED */
-/*#define PNG_FLAG_STRIP_ERROR_NUMBERS    0x040U NEVER USED */
-/*#define PNG_FLAG_STRIP_ERROR_TEXT       0x080U NEVER USED */
-/*#define PNG_FLAG_IDAT_ERRORS_WARN       0x100U NEVER SET */
-/*#define PNG_FLAG_BENIGN_ERRORS_WARN     0x200U NO LONGER USED */
-/*#define PNG_FLAG_APP_WARNINGS_WARN      0x400U NO LONGER USED */
-/*#define PNG_FLAG_APP_ERRORS_WARN        0x800U NO LONGER USED */
-
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\
    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* See below for the definitions of the tables used in these macros */
@@ -967,12 +951,6 @@ PNG_INTERNAL_FUNCTION(void, png_zstream_error,(z_stream *zstream, int ret),
 PNG_INTERNAL_FUNCTION(png_fixed_point,png_fixed,(png_const_structrp png_ptr,
    double fp, png_const_charp text),PNG_EMPTY);
 #endif
-
-/* Check the user version string for compatibility, returns false if the version
- * numbers aren't compatible.
- */
-PNG_INTERNAL_FUNCTION(int,png_user_version_check,(png_structrp png_ptr,
-   png_const_charp user_png_ver),PNG_EMPTY);
 
 /* Internal base allocator - no messages, NULL on failure to allocate.  This
  * does, however, call the application provided allocator and that could call

@@ -175,16 +175,16 @@ png_calculate_crc(png_structrp png_ptr, png_const_voidp ptr, png_size_t length)
 /* Check a user supplied version number, called from both read and write
  * functions that create a png_struct.
  */
-int
+static int
 png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
 {
-     /* Libpng versions 1.0.0 and later are binary compatible if the version
-      * string matches through the second '.'; we must recompile any
-      * applications that use any older library version.
-      */
-
+   /* Libpng versions 1.0.0 and later are binary compatible if the version
+    * string matches through the second '.'; we must recompile any applications
+    * that use any older library version.
+    */
    if (user_png_ver != NULL)
    {
+      int library_match = 1;
       int i = -1;
       int found_dots = 0;
 
@@ -192,36 +192,36 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
       {
          i++;
          if (user_png_ver[i] != PNG_LIBPNG_VER_STRING[i])
-            png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
+            library_match = 0;
          if (user_png_ver[i] == '.')
             found_dots++;
-      } while (found_dots < 2 && user_png_ver[i] != 0 &&
+      } while (library_match && found_dots < 2 && user_png_ver[i] != 0 &&
             PNG_LIBPNG_VER_STRING[i] != 0);
+
+      if (library_match)
+         return 1; /* Library matches ok */
    }
 
-   else
-      png_ptr->flags |= PNG_FLAG_LIBRARY_MISMATCH;
-
-   if ((png_ptr->flags & PNG_FLAG_LIBRARY_MISMATCH) != 0)
-   {
+   /* Failure: mismatched library major version number */
 #ifdef PNG_WARNINGS_SUPPORTED
+   {
       size_t pos = 0;
       char m[128];
 
       pos = png_safecat(m, (sizeof m), pos,
           "Application built with libpng-");
+      /* This is ok if user_png_ver is NULL, it appends nothing: */
       pos = png_safecat(m, (sizeof m), pos, user_png_ver);
       pos = png_safecat(m, (sizeof m), pos, " but running with ");
       pos = png_safecat(m, (sizeof m), pos, PNG_LIBPNG_VER_STRING);
       PNG_UNUSED(pos)
 
-      png_warning(png_ptr, m);
-#endif
-      return 0;
+      png_app_warning(png_ptr, m);
    }
+#endif
 
-   /* Success return. */
-   return 1;
+   return 0; /* Failure */
+   PNG_UNUSED(png_ptr) /* if no warning */
 }
 
 /* Generic function to create a png_struct for either read or write - this
@@ -3431,6 +3431,7 @@ png_setting(png_structrp png_ptr, png_uint_32 setting, png_uint_32 parameter,
 
                      /* No write options at present */
                      result = PNG_OPTION_UNSET; /* i.e. ignore it */
+                     break;
 #              endif /* SET_OPTION */
 
                default:

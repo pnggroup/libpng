@@ -394,7 +394,6 @@ struct png_struct_def
    png_uint_32 chunk_length;   /* Length (possibly remaining) in said chunk. */
    png_uint_32 crc;            /* current chunk CRC value */
 
-   unsigned int flags;                  /* flags (should be bit fields) */
    unsigned int mode                :6; /* where we are in the PNG file */
    unsigned int read_struct         :1; /* this is a read (not write) struct */
    unsigned int num_palette         :9; /* number of color entries in palette */
