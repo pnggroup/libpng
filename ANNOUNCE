@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta81 - June 7, 2016
+Libpng 1.7.0beta81 - June 8, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1290,7 +1290,7 @@ Version 1.7.0beta80 [May 6, 2016]
       unreachable code in pz_default_settings and eliminated a spurious
       warning in pngcp for small files.
 
-Version 1.7.0beta81 [June 7, 2016]
+Version 1.7.0beta81 [June 8, 2016]
   Check for CLOCK_PROCESS_CPUTIME_ID when building /contrib/libtests/timepng.
     Otherwise it does not build on platforms that don't supply clock_gettime().
   Add check for clock_gettime() in Makefile.am and configure.ac
@@ -1372,6 +1372,11 @@ Version 1.7.0beta81 [June 7, 2016]
     (up to the PNG chunk-size limit of 2^31-1 bytes) size IDAT chunks,
     which requires buffering the whole of the IDAT data in memory but
     reflects what other programs and optimizers do.
+  Changed handling of PNG_IMAGE_FLAG_FAST in the simplified API to use
+    PNG_COMPRESSION_HIGH_SPEED, and PNG_COMPRESSION_HIGH otherwise.
+  Removed png_struct::flags which is no longer used.
+  Fixed implementations of png_app_error() and png_app_warning() which
+    previously were swapped.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
