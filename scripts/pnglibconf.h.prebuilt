@@ -1,8 +1,8 @@
-/* libpng 1.6.22 STANDARD API DEFINITION */
+/* libpng 1.6.23 STANDARD API DEFINITION */
 
 /* pnglibconf.h - library build configuration */
 
-/* Libpng version 1.6.22 - May 26, 2016 */
+/* Libpng version 1.6.23 - June 9, 2016 */
 
 /* Copyright (c) 1998-2015 Glenn Randers-Pehrson */
 

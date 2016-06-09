@@ -1,6 +1,6 @@
-diff --git libpng-1.6.22-orig/configure.ac libpng-1.6.22/configure.ac
---- libpng-1.6.22-orig/configure.ac	2016-05-25 18:59:10.000000000 -0400
-+++ libpng-1.6.22/configure.ac	2016-05-25 19:48:10.631751170 -0400
+diff --git a/configure.ac b/configure.ac
+--- a/configure.ac	2016-05-25 18:59:10.000000000 -0400
++++ b/configure.ac	2016-05-25 19:48:10.631751170 -0400
 @@ -341,16 +341,50 @@ AC_ARG_ENABLE([arm-neon],
  
  AM_CONDITIONAL([PNG_ARM_NEON],
@@ -52,9 +52,9 @@ diff --git libpng-1.6.22-orig/configure.ac libpng-1.6.22/configure.ac
     [chmod +x libpng-config])
  
  AC_OUTPUT
-diff --git libpng-1.6.22-orig/Makefile.am libpng-1.6.22/Makefile.am
---- libpng-1.6.22-orig/Makefile.am	2016-05-17 18:15:12.000000000 -0400
-+++ libpng-1.6.22/Makefile.am	2016-05-25 19:48:10.631751170 -0400
+diff --git a/Makefile.am b/Makefile.am
+--- a/Makefile.am	2016-05-17 18:15:12.000000000 -0400
++++ b/Makefile.am	2016-05-25 19:48:10.631751170 -0400
 @@ -89,16 +89,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
  	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
  	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
@@ -76,9 +76,9 @@ diff --git libpng-1.6.22-orig/Makefile.am libpng-1.6.22/Makefile.am
  if HAVE_LD_VERSION_SCRIPT
  #   Versioned symbols and restricted exports
  if HAVE_SOLARIS_LD
-diff --git libpng-1.6.22-orig/pngpriv.h libpng-1.6.22/pngpriv.h
---- libpng-1.6.22-orig/pngpriv.h	2016-05-25 18:59:10.000000000 -0400
-+++ libpng-1.6.22/pngpriv.h	2016-05-25 19:48:10.635751171 -0400
+diff --git a/pngpriv.h b/pngpriv.h
+--- a/pngpriv.h	2016-05-31 09:20:34.442885047 -0500
++++ b/pngpriv.h	2016-05-31 09:14:54.583492341 -0500
 @@ -177,16 +177,52 @@
  #  endif /* !PNG_ARM_NEON_IMPLEMENTATION */
  
@@ -162,3 +162,22 @@ diff --git libpng-1.6.22-orig/pngpriv.h libpng-1.6.22/pngpriv.h
  PNG_INTERNAL_FUNCTION(void,png_read_IDAT_data,(png_structrp png_ptr,
     png_bytep output, png_alloc_size_t avail_out),PNG_EMPTY);
     /* Read 'avail_out' bytes of data from the IDAT stream.  If the output buffer
+@@ -1910,16 +1959,18 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
+    /* Just declare the optimization that will be used */
+ #else
+    /* List *all* the possible optimizations here - this branch is required if
+     * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
+     * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
+     */
+ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
+    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
++PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
++   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+ #endif
+ 
+ PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
+    png_const_charp key, png_bytep new_key), PNG_EMPTY);
+ 
+ /* Maintainer: Put new private prototypes here ^ */
+ 
+ #include "pngdebug.h"
