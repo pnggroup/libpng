@@ -1,45 +1,33 @@
-Libpng 1.6.23 - June 9, 2016
+Libpng 1.6.24beta01 - June 11, 2016
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.23.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.23.tar.gz
+   1.6.24beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.24beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1623.7z  (LZMA-compressed, recommended)
-   lpng1623.zip
+   lp1624b01.7z  (LZMA-compressed, recommended)
+   lp1624b01.zip
 
 Other information:
 
-   libpng-1.6.23-README.txt
-   libpng-1.6.23-LICENSE.txt
-   libpng-1.6.23-*.asc (armored detached GPG signatures)
+   1.6.24beta01-README.txt
+   1.6.24beta01-LICENSE.txt
+   libpng-1.6.24beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.22):
+Changes since the last public release (1.6.23):
 
-  Stop a potential memory leak in png_set_tRNS() (Bug report by Ted Ying).
-  Fixed the progressive reader to handle empty first IDAT chunk properly
-    (patch by Timothy Nikkel).  This bug was introduced in libpng-1.6.0 and
-    only affected the libpng16 branch.
-  Added tests in pngvalid.c to check zero-length IDAT chunks in various
-    positions.  Fixed the sequential reader to handle these more robustly
-    (John Bowler).
-  Corrected progressive read input buffer in pngvalid.c. The previous version
-    the code invariably passed just one byte at a time to libpng.  The intent
-    was to pass a random number of bytes in the range 0..511.
-  Moved sse2 prototype from pngpriv.h to contrib/intel/intel_sse.patch.
-  Added missing ")" in pngerror.c (Matt Sarrett).
-  Fixed undefined behavior in png_push_save_buffer(). Do not call
-    memcpy() with a null source, even if count is zero (Leon Scroggins III).
-  Fixed bad link to RFC2083 in png.5 (Nikola Forro).
+Version 1.6.24beta01 [June 11, 2016]
 
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)

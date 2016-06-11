@@ -5596,6 +5596,8 @@ Version 1.6.23rc02 [June 4, 2016]
 Version 1.6.23 [June 9, 2016]
   Fixed bad link to RFC2083 in png.5 (Nikola Forro).
 
+Version 1.6.24beta01 [June 11, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
