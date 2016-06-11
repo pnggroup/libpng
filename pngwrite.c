@@ -614,7 +614,7 @@ write_row_buffered(png_structrp png_ptr,
          {
             png_transform_control tc;
 
-            /* The initial values are the memory format, this was worked out in
+            /* The initial values are the memory format; this was worked out in
              * png_init_row_info below.
              */
             memset(&tc, 0, sizeof tc);
@@ -1911,7 +1911,7 @@ png_image_write_main(png_voidp argument)
    }
 
    /* Select the right compression mode based on the presence or absence of the
-    * 'fast' flag, this will use whatever options are available in the libpng
+    * 'fast' flag. This will use whatever options are available in the libpng
     * build.  It is always supported.
     */
    png_set_compression(png_ptr, (image->flags & PNG_IMAGE_FLAG_FAST) != 0 ?
