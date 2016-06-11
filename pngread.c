@@ -4104,11 +4104,21 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
 
          if (image->opaque != NULL && buffer != NULL && check >= png_row_stride)
          {
-            /* Now check for overflow of the image buffer calculation; check for
-             * (size_t) overflow here.  This detects issues with the
-             * PNG_IMAGE_BUFFER_SIZE macro.
+            /* Now check for overflow of the image buffer calculation; this
+             * limits the whole image size to PNG_SIZE_MAX bytes.
+             *
+             * The PNG_IMAGE_BUFFER_SIZE macro is:
+             *
+             *    (PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)*height*(row_stride))
+             *
+             * We have no way of guaranteeing that the application used the
+             * correct type for 'row_stride' if it used the macro, so this is
+             * technically not completely safe, but this is the case throughout
+             * libpng; the app is responsible for making sure the calcualtion of
+             * buffer sizes does not overflow.
              */
-            if (image->height <= PNG_SIZE_MAX/png_row_stride)
+            if (image->height <= PNG_SIZE_MAX /
+                  PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format) / check)
             {
                if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
                   (image->colormap_entries > 0 && colormap != NULL))

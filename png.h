@@ -3629,6 +3629,13 @@ typedef struct
     * png_alloc_size_t which means that the result only overflows for
     * ridiculously large PNG files.  libpng checks and will refuse to handle
     * such data (the PNG is probably invalid.)
+    *
+    * Take great care over the type of 'row_stride'; libpng assumes that the
+    * type is png_alloc_size_t, as returned by PNG_IMAGE_ROW_STRIDE.  You can
+    * use any type you like but libpng only checks for overflow when the type is
+    * png_alloc_size_t.  In particular for png_uint_32 on a 64-bit system you
+    * must do your own overflow checking.  Cast row_stride as (png_alloc_size_t)
+    * to avoid this (check for overflow before the cast of course!)
     */
 
 #define PNG_IMAGE_SIZE(image)\
