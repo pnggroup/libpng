@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta81 - June 11, 2016
+Libpng 1.7.0beta82 - June 11, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta81.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta81.tar.gz
+   1.7.0beta82.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta82.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b81.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b81.zip
+   /scratch/glennrp/Libpng17/lp170b82.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b82.zip
 
 Other information:
 
-   1.7.0beta81-README.txt
-   1.7.0beta81-LICENSE.txt
-   libpng-1.7.0beta81-*.asc (armored detached GPG signatures)
+   1.7.0beta82-README.txt
+   1.7.0beta82-LICENSE.txt
+   libpng-1.7.0beta82-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
