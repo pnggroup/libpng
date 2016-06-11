@@ -4087,6 +4087,12 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
        */
       const unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
+      /* The following checks just the 'row_stride' calculation to ensure it
+       * fits in a signed 32-bit value.  Because channels/components can be
+       * either 1 or 2 bytes in size the length of a row can still overflow 32
+       * bits; this is just to verify that the 'row_stride' argument can be
+       * represented.
+       */
       if (image->width <= 0x7FFFFFFFU/channels) /* no overflow */
       {
          png_uint_32 check;
@@ -4101,13 +4107,30 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
          else
             check = row_stride;
 
+         /* This verifies 'check', the absolute value of the actual stride
+          * passed in and detects overflow in the application calculation (i.e.
+          * if the app did actually pass in a non-zero 'row_stride'.
+          */
          if (image->opaque != NULL && buffer != NULL && check >= png_row_stride)
          {
             /* Now check for overflow of the image buffer calculation; this
              * limits the whole image size to 32 bits for API compatibility with
              * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
+             *
+             * The PNG_IMAGE_BUFFER_SIZE macro is:
+             *
+             *    (PNG_IMAGE_PIXEL_COMPONENT_SIZE(fmt)*height*(row_stride))
+             *
+             * And the component size is always 1 or 2, so make sure that the
+             * number of *bytes* that the application is saying are available
+             * does actually fit into a 32-bit number.
+             *
+             * NOTE: this will be changed in 1.7 because PNG_IMAGE_BUFFER_SIZE
+             * will be changed to use png_alloc_size_t; bigger images can be
+             * accomodated on 64-bit systems.
              */
-            if (image->height <= 0xFFFFFFFF/png_row_stride)
+            if (image->height <=
+                0xFFFFFFFFU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)
             {
                if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
                   (image->colormap_entries > 0 && colormap != NULL))

@@ -26,6 +26,8 @@ Other information:
 Changes since the last public release (1.6.23):
 
 Version 1.6.24beta01 [June 11, 2016]
+  Avoid potential overflow of the PNG_IMAGE_SIZE macro.  This macro
+    is not used within libpng, but is used in some of the examples.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
