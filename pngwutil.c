@@ -2270,9 +2270,6 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    {
       v = *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
       sum += (v < 128) ? v : 256 - v;
-
-      if (sum > lmins)  /* We are already worse, don't continue. */
-        break;
    }
 
    return (sum);
@@ -2295,9 +2292,6 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
    {
       v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
       sum += (v < 128) ? v : 256 - v;
-
-      if (sum > lmins)  /* We are already worse, don't continue. */
-        break;
    }
 
    return (sum);
