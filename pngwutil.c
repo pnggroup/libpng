@@ -1,7 +1,7 @@
 
 /* pngwutil.c - utilities to write a PNG file
  *
- * Last changed in libpng 1.6.22 [May 26, 2016]
+ * Last changed in libpng 1.6.24 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -2397,7 +2397,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
 #ifndef PNG_WRITE_FILTER_SUPPORTED
    png_write_filtered_row(png_ptr, png_ptr->row_buf, row_info->rowbytes+1);
 #else
-   png_byte filter_to_do = png_ptr->do_filter;
+   unsigned int filter_to_do = png_ptr->do_filter;
    png_bytep row_buf;
    png_bytep best_row;
    png_uint_32 bpp;
@@ -2443,27 +2443,24 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
     */
    best_row = png_ptr->row_buf;
 
-
-   if ((filter_to_do & PNG_FILTER_NONE) != 0 && filter_to_do != PNG_FILTER_NONE)
+   if (PNG_SIZE_MAX/128 <= row_bytes)
    {
+      /* Overflow can occur in the calculation, just select the lowest set
+       * filter.
+       */
+      filter_to_do &= -filter_to_do;
+   }
+   else if ((filter_to_do & PNG_FILTER_NONE) != 0 &&
+         filter_to_do != PNG_FILTER_NONE)
+   {
+      /* Overflow not possible and multiple filters in the list, including the
+       * 'none' filter.
+       */
       png_bytep rp;
       png_size_t sum = 0;
       png_size_t i;
       int v;
 
-      if (PNG_SIZE_MAX/128 <= row_bytes)
-      {
-         for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
-         {
-            /* Check for overflow */
-            if (sum > PNG_SIZE_MAX/128 - 256)
-               break;
-
-            v = *rp;
-            sum += (v < 128) ? v : 256 - v;
-         }
-      }
-      else /* Overflow is not possible */
       {
          for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
          {
@@ -2479,7 +2476,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_SUB)
    /* It's the only filter so no testing is needed */
    {
-      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, mins);
+      /* Passing PNG_SIZE_MAX here and below prevents the 'setup' function
+       * breaking out of the loop when lmins is exceeded.
+       */
+      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
       best_row = png_ptr->try_row;
    }
 
@@ -2505,7 +2505,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Up filter */
    if (filter_to_do == PNG_FILTER_UP)
    {
-      (void) png_setup_up_row(png_ptr, row_bytes, mins);
+      (void) png_setup_up_row(png_ptr, row_bytes, PNG_SIZE_MAX);
       best_row = png_ptr->try_row;
    }
 
@@ -2531,7 +2531,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Avg filter */
    if (filter_to_do == PNG_FILTER_AVG)
    {
-      (void) png_setup_avg_row(png_ptr, bpp, row_bytes, mins);
+      (void) png_setup_avg_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
       best_row = png_ptr->try_row;
    }
 
@@ -2557,7 +2557,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Paeth filter */
    if ((filter_to_do == PNG_FILTER_PAETH) != 0)
    {
-      (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, mins);
+      (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
       best_row = png_ptr->try_row;
    }
 
