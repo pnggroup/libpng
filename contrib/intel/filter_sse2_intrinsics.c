@@ -208,7 +208,7 @@ static __m128i abs_i16(__m128i x) {
    x = _mm_xor_si128(x, is_negative);
 
    /* +1 to negative lanes, else +0. */
-   x = _mm_add_epi16(x, _mm_srli_epi16(is_negative, 15));
+   x = _mm_sub_epi16(x, is_negative);
    return x;
 #endif
 }
