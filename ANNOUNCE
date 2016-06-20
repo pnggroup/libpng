@@ -1,4 +1,4 @@
-Libpng 1.6.24beta02 - June 19, 2016
+Libpng 1.6.24beta02 - June 20, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -29,7 +29,7 @@ Version 1.6.24beta01 [June 11, 2016]
   Avoid potential overflow of the PNG_IMAGE_SIZE macro.  This macro
     is not used within libpng, but is used in some of the examples.
 
-Version 1.6.24beta02 [June 19, 2016]
+Version 1.6.24beta02 [June 20, 2016]
   Correct filter heuristic overflow handling. This was broken when the
     write filter code was moved out-of-line; if there is a single filter and
     the heuristic sum overflows the calculation of the filtered line is not
@@ -45,6 +45,7 @@ Version 1.6.24beta02 [June 19, 2016]
     implemented in 1.7), however a simple safe fix here is to chose the lowest
     numbered filter in the list from png_set_filter (this only works if the
     first problem is also fixed) (John Bowler).
+  Use a more efficient absolute value calculation on SSE2 (Matthieu Darbois).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
