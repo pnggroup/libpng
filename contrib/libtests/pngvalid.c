@@ -1589,7 +1589,7 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
          {
             if (chunkpos < chunklen-4U)
             {
-               uInt avail = (uInt)-1;
+               uInt avail = -1;
 
                if (avail > (IDAT_len-4U) - IDAT_pos)
                   avail = (uInt)/*SAFE*/((IDAT_len-4U) - IDAT_pos);

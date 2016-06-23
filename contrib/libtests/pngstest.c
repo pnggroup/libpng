@@ -26,15 +26,6 @@
 #  include <config.h>
 #endif
 
-/* Define the following to use this test against your installed libpng, rather
- * than the one being built here:
- */
-#ifdef PNG_FREESTANDING_TESTS
-#  include <png.h>
-#else
-#  include "../../png.h"
-#endif
-
 /* 1.6.1 added support for the configure test harness, which uses 77 to indicate
  * a skipped test, in earlier versions we need to succeed on a skipped test, so:
  */
@@ -42,6 +33,15 @@
 #  define SKIP 77
 #else
 #  define SKIP 0
+#endif
+
+/* Define the following to use this test against your installed libpng, rather
+ * than the one being built here:
+ */
+#ifdef PNG_FREESTANDING_TESTS
+#  include <png.h>
+#else
+#  include "../../png.h"
 #endif
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED /* Else nothing can be done */
