@@ -5600,7 +5600,7 @@ Version 1.6.24beta01 [June 11, 2016]
   Avoid potential overflow of the PNG_IMAGE_SIZE macro.  This macro
     is not used within libpng, but is used in some of the examples.
 
-Version 1.6.24beta02 [June 20, 2016]
+Version 1.6.24beta02 [June 23, 2016]
   Correct filter heuristic overflow handling. This was broken when the
     write filter code was moved out-of-line; if there is a single filter and
     the heuristic sum overflows the calculation of the filtered line is not
@@ -5617,6 +5617,26 @@ Version 1.6.24beta02 [June 20, 2016]
     numbered filter in the list from png_set_filter (this only works if the
     first problem is also fixed) (John Bowler).
   Use a more efficient absolute value calculation on SSE2 (Matthieu Darbois).
+  Fixed the case where PNG_IMAGE_BUFFER_SIZE can overflow in the application
+    as a result of the application using an increased 'row_stride'; previously
+    png_image_finish_read only checked for overflow on the base calculation of
+    components.  (I.e. it checked for overflow of a 32-bit number on the total
+    number of pixel components in the output format, not the possibly padded row
+    length and not the number of bytes, which for linear formats is twice the
+    number of components.)
+  MSVC does not like '-(unsigned)', so replaced it with 0U-(unsigned)
+  MSVC does not like (uInt) = -(unsigned) (i.e. as an initializer), unless
+    the conversion is explicitly invoked by a cast.
+  Put the SKIP definition in the correct place. It needs to come after the
+    png.h include (see all the other .c files in contrib/libtests) because it
+    depends on PNG_LIBPNG_VER.
+  Removed the three compile warning options from the individual project
+    files into the zlib.props globals.  It increases the warning level from 4
+    to All and adds a list of the warnings that need to be turned off.  This is
+    semi-documentary; the intent is to tell libpng users which warnings have
+    been examined and judged non-fixable at present.  The warning about
+    structure padding is fixable, but it would be a signficant change (moving
+    structure members around).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
