@@ -2448,7 +2448,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       /* Overflow can occur in the calculation, just select the lowest set
        * filter.
        */
-      filter_to_do &= -filter_to_do;
+      filter_to_do &= 0U-filter_to_do;
    }
    else if ((filter_to_do & PNG_FILTER_NONE) != 0 &&
          filter_to_do != PNG_FILTER_NONE)

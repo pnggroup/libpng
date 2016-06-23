@@ -5638,8 +5638,6 @@ Version 1.6.24beta02 [June 23, 2016]
     structure padding is fixable, but it would be a signficant change (moving
     structure members around).
 
-Version 1.6.24beta03 [June 23, 2016]
-
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
