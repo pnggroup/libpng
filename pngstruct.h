@@ -391,7 +391,9 @@ struct png_struct_def
    png_uint_32 width;          /* width of image in pixels */
    png_uint_32 height;         /* height of image in pixels */
    png_uint_32 chunk_name;     /* PNG_CHUNK() id of current chunk */
+#ifdef PNG_READ_SUPPORTED
    png_uint_32 chunk_length;   /* Length (possibly remaining) in said chunk. */
+#endif /* READ */
    png_uint_32 crc;            /* current chunk CRC value */
 
    unsigned int mode                :6; /* where we are in the PNG file */
@@ -420,7 +422,6 @@ struct png_struct_def
    /* Single byte values, typically used either to save space or to hold 1-byte
     * values from the PNG chunk specifications.
     */
-   png_byte compression_type; /* file compression type (always 0) */
    png_byte filter_method;    /* file filter type (only non-0 with MNG) */
    png_byte interlaced;       /* PNG_INTERLACE_NONE, PNG_INTERLACE_ADAM7 */
    png_byte color_type;       /* color type of file */
@@ -449,7 +450,6 @@ struct png_struct_def
     */
 #ifdef PNG_READ_SUPPORTED
    png_bytep        row_buffer;          /* primary row buffer */
-#endif /* READ */
 #if (defined(PNG_PROGRESSIVE_READ_SUPPORTED) ||\
      defined(PNG_READ_INTERLACING_SUPPORTED)) &&\
     defined(PNG_TRANSFORM_MECH_SUPPORTED)
@@ -458,11 +458,11 @@ struct png_struct_def
                                           */
 #endif /* (PROGRESSIVE_READ || READ_INTERLACING) && TRANSFORM_MECH */
 
-#ifdef PNG_READ_SUPPORTED
    png_alloc_size_t row_bytes_read;   /* Total read in row */
 #endif /* READ */
 
    png_uint_32      row_number;       /* current row in pass */
+#ifdef PNG_READ_SUPPORTED
 #ifdef PNG_READ_GAMMA_SUPPORTED
    png_fixed_point  row_gamma;        /* Gamma of final output */
 #if 0 /* NYI */
@@ -487,23 +487,22 @@ struct png_struct_def
    unsigned int invalid_info;      /* PNG_INFO_* for invalidated chunks */
    unsigned int palette_updated:1; /* png_struct::palette changed */
 #endif /* READ_TRANSFORMS */
-#ifdef PNG_WRITE_SUPPORTED
-   unsigned int write_rows     :1; /* libpng has complete rows to write */
-#endif /* WRITE */
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
    unsigned int read_started   :1; /* at least one call to png_read_row */
 #endif /* SEQUENTIAL_READ */
-#if defined (PNG_READ_INTERLACING_SUPPORTED) ||\
-    defined (PNG_WRITE_INTERLACING_SUPPORTED)
-   unsigned int do_interlace   :1; /* libpng handles the interlace */
-#  endif /* R/W INTERLACING */
-   unsigned int pass           :3; /* current (interlace) pass (0 - 6) */
-
-   /* The next two fields are just used by the IDAT process functions to store
+   /* The next field is just used by the read IDAT process functions to store
     * the state of IDAT processing; they should not be altered or used by other
     * functions.
     */
    unsigned int row_state      :2; /* state of row parsing (internal) */
+#endif /* READ */
+
+#if defined (PNG_READ_INTERLACING_SUPPORTED) ||\
+    defined (PNG_WRITE_INTERLACING_SUPPORTED)
+   unsigned int do_interlace   :1; /* libpng handles the interlace */
+#  endif /* R/W INTERLACING */
+
+   unsigned int pass           :3; /* current (interlace) pass (0 - 6) */
 
    /* The following fields are set by png_row_init to the pixel depths of the
     * pixels at various states.  If transforms are not supported they will

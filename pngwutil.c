@@ -2148,7 +2148,6 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
    png_ptr->color_type = png_check_byte(png_ptr, color_type);
    png_ptr->interlaced = png_check_byte(png_ptr, interlace_type);
    png_ptr->filter_method = png_check_byte(png_ptr, filter_method);
-   png_ptr->compression_type = png_check_byte(png_ptr, compression_type);
    png_ptr->width = width;
    png_ptr->height = height;
 

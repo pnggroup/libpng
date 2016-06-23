@@ -824,7 +824,6 @@ png_handle_IHDR(png_structrp png_ptr, png_inforp info_ptr)
    png_ptr->interlaced = interlace_type;
    png_ptr->color_type = color_type;
    png_ptr->filter_method = filter_method;
-   png_ptr->compression_type = compression_type;
 
    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
        color_type, interlace_type, compression_type, filter_method);

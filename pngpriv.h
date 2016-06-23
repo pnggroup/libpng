@@ -1707,7 +1707,6 @@ PNG_INTERNAL_FUNCTION(int,png_read_finish_IDAT,(png_structrp png_ptr),
     *           is more IDAT data available the caller should output an
     *           appropriate (too much IDAT) error message.
     */
-#endif /* READ */
 
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_cache_known_unknown,(png_structrp png_ptr,
@@ -1752,6 +1751,7 @@ PNG_INTERNAL_FUNCTION(void,png_handle_chunk,(png_structrp png_ptr,
     * has returned png_chunk_process_all and all the data is available for
     * png_handle_chunk (via the libpng read callback.)
     */
+#endif /* READ */
 
 PNG_INTERNAL_FUNCTION(void,png_init_row_info,(png_structrp png_ptr),PNG_EMPTY);
    /* Set the png_struct::row_ members from the PNG file information, running
