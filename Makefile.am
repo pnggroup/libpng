@@ -18,7 +18,7 @@ check_PROGRAMS += timepng
 endif
 
 # Utilities - installed
-bin_PROGRAMS= pngfix png-fix-itxt
+bin_PROGRAMS= pngcp pngfix png-fix-itxt
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
 # 'make check', but it does not add dependencies to the individual programs,
@@ -52,6 +52,9 @@ pngfix_SOURCES = contrib/tools/pngfix.c
 pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
+
+pngcp_SOURCES = contrib/tools/pngcp.c
+pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
@@ -230,6 +233,7 @@ contrib/libtests/timepng.o: pnglibconf.h
 
 contrib/tools/makesRGB.o: pnglibconf.h
 contrib/tools/pngfix.o: pnglibconf.h
+contrib/tools/pngcp.o: pnglibconf.h
 
 # We must use -DPNG_NO_USE_READ_MACROS here even when the library may actually
 # be built with PNG_USE_READ_MACROS; this prevents the read macros from

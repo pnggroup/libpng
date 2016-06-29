@@ -552,6 +552,7 @@ option WRITE_ANCILLARY_CHUNKS requires WRITE
 
 # These options disable *all* the text chunks if turned off
 
+option TEXT disabled
 option READ_TEXT requires READ_ANCILLARY_CHUNKS enables TEXT
 option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 

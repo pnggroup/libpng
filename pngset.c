@@ -1662,7 +1662,9 @@ png_set_check_for_invalid_index(png_structrp png_ptr, int allowed)
 png_uint_32 /* PRIVATE */
 png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
 {
+#ifdef PNG_WARNINGS_SUPPORTED
    png_const_charp orig_key = key;
+#endif
    png_uint_32 key_len = 0;
    int bad_character = 0;
    int space = 1;
@@ -1725,7 +1727,9 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
 
       png_formatted_warning(png_ptr, p, "keyword \"@1\": bad character '0x@2'");
    }
-#endif /* WARNINGS */
+#else /* !WARNINGS */
+   PNG_UNUSED(png_ptr)
+#endif /* !WARNINGS */
 
    return key_len;
 }
