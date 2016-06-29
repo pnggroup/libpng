@@ -1082,6 +1082,7 @@ compare_read(struct display *dp, int applied_transforms)
       }
 
       else
+#     ifdef PNG_sBIT_SUPPORTED
       {
          unsigned long y;
          int bpp;   /* bits-per-pixel then bytes-per-pixel */
@@ -1243,6 +1244,10 @@ compare_read(struct display *dp, int applied_transforms)
             }
          } /* for y */
       }
+#     else /* !sBIT */
+         display_log(dp, INTERNAL_ERROR,
+               "active shift transform but no sBIT support");
+#     endif /* !sBIT */
    }
 
    return 1; /* compare succeeded */

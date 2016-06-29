@@ -1,33 +1,45 @@
 /* pngcp.c
  *
- * COPYRIGHT: Written by John Cunningham Bowler, 2016.
- * To the extent possible under law, the author has waived all copyright and
- * related or neighboring rights to this work.  This work is published from:
- * United States.
+ * Copyright (c) 2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.24beta03 [June 27, 2016]
  *
- * This is a minimal example of copying a PNG without changes using the
- * png_read_png and png_write_png interfaces.
+ * This code is released under the libpng license.
+ * For conditions of distribution and use, see the disclaimer
+ * and license in png.h
+ *
+ * This is an example of copying a PNG without changes using the png_read_png
+ * and png_write_png interfaces.  A considerable number of options are provided
+ * to manipulate the compression of the PNG data and other compressed chunks.
  *
  * For a more extensive example that uses the transforms see
  * contrib/libtests/pngimage.c in the libpng distribution.
  */
-#define _POSIX_SOURCE 1
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdio.h>
-#include <limits.h>
-#include <assert.h>
+#include "pnglibconf.h" /* To find how libpng was configured. */
 
-#include <unistd.h>
-#include <sys/stat.h>
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+   /* WARNING:
+    *
+    * This test is here to allow POSIX.1b extensions to be used if enabled in
+    * the compile; specifically the code requires_POSIX_C_SOURCE support of
+    * 199309L or later to enable clock_gettime use.
+    *
+    * IF this causes problems THEN compile with a strict ANSI C compiler and let
+    * this code turn on the POSIX features that it minimally requires.
+    *
+    * IF this does not work there is probably a bug in your ANSI C compiler or
+    * your POSIX implementation.
+    */
+#  define _POSIX_C_SOURCE 199309L
+#else /* No timing support required */
+#  define _POSIX_SOURCE 1
+#endif
 
 #if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
 #endif
+
+#include <stdio.h>
 
 /* Define the following to use this test against your installed libpng, rather
  * than the one being built here:
@@ -36,22 +48,6 @@
 #  include <png.h>
 #else
 #  include "../../png.h"
-#endif
-
-#include <zlib.h>
-
-#ifndef PNG_SETJMP_SUPPORTED
-#  include <setjmp.h> /* because png.h did *not* include this */
-#endif
-
-#ifdef __GNUC__
-   /* Many versions of GCC erroneously report that local variables unmodified
-    * within the scope of a setjmp may be clobbered.  This hacks round the
-    * problem (sometimes) without harming other compilers.
-    */
-#  define gv volatile
-#else
-#  define gv
 #endif
 
 #if PNG_LIBPNG_VER < 10700
@@ -67,6 +63,56 @@
 #endif /* pre 1.7.0 */
 
 #if (defined(PNG_READ_PNG_SUPPORTED)) && (defined(PNG_WRITE_PNG_SUPPORTED))
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <limits.h>
+#include <assert.h>
+
+#include <unistd.h>
+#include <sys/stat.h>
+
+#include <zlib.h>
+
+#ifndef PNG_SETJMP_SUPPORTED
+#  include <setjmp.h> /* because png.h did *not* include this */
+#endif
+
+#ifdef __cplusplus
+#  define voidcast(type, value) static_cast<type>(value)
+#else
+#  define voidcast(type, value) (value)
+#endif /* __cplusplus */
+
+#ifdef __GNUC__
+   /* Many versions of GCC erroneously report that local variables unmodified
+    * within the scope of a setjmp may be clobbered.  This hacks round the
+    * problem (sometimes) without harming other compilers.
+    */
+#  define gv volatile
+#else
+#  define gv
+#endif
+
+/* 'CLOCK_PROCESS_CPUTIME_ID' is one of the clock timers for clock_gettime.  It
+ * need not be supported even when clock_gettime is available.  It returns the
+ * 'CPU' time the process has consumed.  'CPU' time is assumed to include time
+ * when the CPU is actually blocked by a pending cache fill but not time
+ * waiting for page faults.  The attempt is to get a measure of the actual time
+ * the implementation takes to read a PNG ignoring the potentially very large IO
+ * overhead.
+ */
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+#  include <time.h>   /* clock_gettime and associated definitions */
+#  ifndef CLOCK_PROCESS_CPUTIME_ID
+      /* Prevent inclusion of the spurious code: */
+#     undef PNG_PNGCP_TIMING_SUPPORTED
+#  endif
+#endif /* PNGCP_TIMING */
+
+/* So if the timing feature has been activated: */
+
 /* This structure is used to control the test of a single file. */
 typedef enum
 {
@@ -92,8 +138,12 @@ typedef enum
 #define SIZES           0x080 /* Report input and output sizes */
 #define SEARCH          0x100 /* Search IDAT compression options */
 #define NOWRITE         0x200 /* Do not write an output file */
-#define IGNORE_INDEX    0x400 /* Ignore out of range palette indices (BAD!) */
-#define FIX_INDEX       0x800 /* 'Fix' out of range palette indices (OK) */
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+#  define IGNORE_INDEX  0x400 /* Ignore out of range palette indices (BAD!) */
+#  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+#     define FIX_INDEX  0x800 /* 'Fix' out of range palette indices (OK) */
+#  endif /* GET_PALETTE_MAX */
+#endif /* CHECK_FOR_INVALID_INDEX */
 #define OPTION     0x80000000 /* Used for handling options */
 #define LIST       0x80000001 /* Used for handling options */
 
@@ -109,12 +159,13 @@ static const char range_lo[] = "low";
 static const char range_hi[] = "high";
 static const char all[] = "all";
 #define RANGE(lo,hi) { range_lo, lo }, { range_hi, hi }
-static const struct value_list
+typedef struct value_list
 {
    const char *name;  /* the command line name of the value */
    int         value; /* the actual value to use */
-}
+}  value_list;
 
+static const value_list
 #ifdef PNG_SW_COMPRESS_png_level
 vl_compression[] =
 {
@@ -189,6 +240,17 @@ vl_filter[] =
    { "paeth",  PNG_FILTER_PAETH  }
 },
 #endif /* WRITE_FILTER */
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+#  define PNGCP_TIME_READ  1
+#  define PNGCP_TIME_WRITE 2
+vl_time[] =
+{
+   { "both",  PNGCP_TIME_READ+PNGCP_TIME_WRITE },
+   { "off",   0 },
+   { "read",  PNGCP_TIME_READ },
+   { "write", PNGCP_TIME_WRITE }
+},
+#endif /* PNGCP_TIMING */
 vl_IDAT_size[] = /* for png_set_IDAT_size */
 {
    { "default", 0x7FFFFFFF },
@@ -201,10 +263,10 @@ vl_IDAT_size[] = /* for png_set_IDAT_size */
 #endif /* !SW_IDAT_size */
 #define SL 8 /* stack limit in display, below */
 vl_log_depth[] = { { "on", 1 }, { "off", 0 }, RANGE(0, SL) },
-vl_on_off[] = { { "on", 1 }, { "off", 2 } };
+vl_on_off[] = { { "on", 1 }, { "off", 0 } };
 
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
-static struct value_list
+static value_list
 vl_windowBits_IDAT[] =
 {
    { "default", MAX_WBITS },
@@ -214,14 +276,16 @@ vl_windowBits_IDAT[] =
 };
 #endif /* IDAT compression */
 
-static const struct option
+typedef struct option
 {
-   const char              *name;         /* name of the option */
-   png_uint_32              opt;          /* an option, or OPTION or LIST */
-   png_byte                 search;       /* Search on --search */
-   png_byte                 value_count;  /* length of the list of values: */
-   const struct value_list *values;       /* values for OPTION or LIST */
-}  options[] =
+   const char       *name;         /* name of the option */
+   png_uint_32       opt;          /* an option, or OPTION or LIST */
+   png_byte          search;       /* Search on --search */
+   png_byte          value_count;  /* length of the list of values: */
+   const value_list *values;       /* values for OPTION or LIST */
+}  option;
+
+static const option options[] =
 {
    /* struct display options, these are set when the command line is read */
 #  define S(n,v) { #n, v, 0, 2, vl_on_off },
@@ -235,13 +299,18 @@ static const struct option
    S(sizes,    SIZES)
    S(search,   SEARCH)
    S(nowrite,  NOWRITE)
-   S(ignore-palette-index, IGNORE_INDEX)
-   S(fix-palette-index, FIX_INDEX)
+#  ifdef IGNORE_INDEX
+      S(ignore-palette-index, IGNORE_INDEX)
+#  endif /* IGNORE_INDEX */
+#  ifdef FIX_INDEX
+      S(fix-palette-index, FIX_INDEX)
+#  endif /* FIX_INDEX */
 #  undef S
 
    /* OPTION settings, these and LIST settings are read on demand */
 #  define VLNAME(name) vl_ ## name
-#  define VLSIZE(name) ((sizeof VLNAME(name))/(sizeof VLNAME(name)[0]))
+#  define VLSIZE(name) voidcast(png_byte,\
+                           (sizeof VLNAME(name))/(sizeof VLNAME(name)[0]))
 #  define VL(oname, name, type, search)\
    { oname, type, search, VLSIZE(name), VLNAME(name) },
 #  define VLO(oname, name, search) VL(oname, name, OPTION, search)
@@ -292,11 +361,18 @@ static const struct option
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    VLL(filter, 0)
 #endif /* WRITE_FILTER */
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+   VLL(time, 0)
+#endif /* PNGCP_TIMING */
 #  undef VLL
 #  undef VL
 };
 
-#define opt_count ((sizeof options)/(sizeof options[0]))
+#ifdef __cplusplus
+   static const size_t option_count((sizeof options)/(sizeof options[0]));
+#else /* !__cplusplus */
+#  define option_count ((sizeof options)/(sizeof options[0]))
+#endif /* !__cplusplus */
 
 static const char *
 cts(int ct)
@@ -330,11 +406,18 @@ struct display
    png_alloc_size_t read_size;
    png_structp      read_pp;
    png_infop        ip;
-#  if PNG_LIBPNG_VER < 10700
+#  if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
       png_textp     text_ptr; /* stash of text chunks */
       int           num_text;
       int           text_stashed;
 #  endif /* pre 1.7 */
+
+#  ifdef PNG_PNGCP_TIMING_SUPPORTED
+      struct timespec   read_time;
+      struct timespec   read_time_total;
+      struct timespec   write_time;
+      struct timespec   write_time_total;
+#  endif /* PNGCP_TIMING */
 
    /* Used to write a new image (the original info_ptr is used) */
 #  define MAX_SIZE ((png_alloc_size_t)(-1))
@@ -352,12 +435,12 @@ struct display
    int              min_windowBits;    /* The windowBits range is 8..8 */
 
    /* Options handling */
-   png_uint_32      results;           /* A mask of errors seen */
-   png_uint_32      options;           /* See display_log below */
-   png_byte         entry[opt_count];  /* The selected entry+1 of an option that
-                                        * appears on the command line, or 0 if
-                                        * it was not given. */
-   int              value[opt_count];  /* Corresponding value */
+   png_uint_32      results;             /* A mask of errors seen */
+   png_uint_32      options;             /* See display_log below */
+   png_byte         entry[option_count]; /* The selected entry+1 of an option
+                                          * that appears on the command line, or
+                                          * 0 if it was not given. */
+   int              value[option_count]; /* Corresponding value */
 
    /* Compression exhaustive testing */
    /* Temporary variables used only while testing a single collection of
@@ -412,7 +495,7 @@ display_init(struct display *dp)
    dp->ip = NULL;
    dp->write_pp = NULL;
    dp->min_windowBits = -1; /* this is an OPTIND, so -1 won't match anything */
-#  if PNG_LIBPNG_VER < 10700
+#  if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
       dp->text_ptr = NULL;
       dp->num_text = 0;
       dp->text_stashed = 0;
@@ -454,7 +537,7 @@ display_clean(struct display *dp)
    display_clean_write(dp);
    dp->output_file = NULL;
 
-#  if PNG_LIBPNG_VER < 10700
+#  if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
       /* This is actually created and used by the write code, but only
        * once; it has to be retained for subsequent writes of the same file.
        */
@@ -555,7 +638,7 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
    }
 }
 
-#if PNG_LIBPNG_VER < 10700
+#if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
 static void
 text_stash(struct display *dp)
 {
@@ -583,7 +666,7 @@ text_stash(struct display *dp)
 
    if (dp->num_text > 0)
    {
-      dp->text_ptr = malloc(dp->num_text * sizeof *chunks);
+      dp->text_ptr = voidcast(png_textp, malloc(dp->num_text * sizeof *chunks));
 
       if (dp->text_ptr == NULL)
          display_log(dp, APP_ERROR, "text chunks: stash malloc failed");
@@ -626,7 +709,7 @@ text_restore(struct display *dp)
  *       Set an option to a bitmask constructed from the values (List)
  */
 static png_byte
-optind(struct display *dp, const char *opt, size_t len)
+option_index(struct display *dp, const char *opt, size_t len)
    /* Return the index (in options[]) of the given option, outputs an error if
     * it does not exist.  Takes the name of the option and a length (number of
     * characters in the name).
@@ -634,7 +717,7 @@ optind(struct display *dp, const char *opt, size_t len)
 {
    png_byte j;
 
-   for (j=0; j<opt_count; ++j)
+   for (j=0; j<option_count; ++j)
       if (strncmp(options[j].name, opt, len) == 0 && options[j].name[len] == 0)
          return j;
 
@@ -647,12 +730,12 @@ optind(struct display *dp, const char *opt, size_t len)
 }
 
 /* This works for an option name (no quotes): */
-#define OPTIND(dp, name) optind(dp, #name, (sizeof #name)-1)
+#define OPTIND(dp, name) option_index(dp, #name, (sizeof #name)-1)
 
 static int
-getopt(struct display *dp, const char *opt, int *value)
+get_option(struct display *dp, const char *opt, int *value)
 {
-   const png_byte i = optind(dp, opt, strlen(opt));
+   const png_byte i = option_index(dp, opt, strlen(opt));
 
    if (dp->entry[i]) /* option was set on command line */
    {
@@ -1168,7 +1251,7 @@ getallopts_(struct display *dp, const png_byte opt, int *value, int record)
 static int
 getallopts(struct display *dp, const char *opt_str, int *value)
 {
-   return getallopts_(dp, optind(dp, opt_str, strlen(opt_str)), value, 0);
+   return getallopts_(dp, option_index(dp, opt_str, strlen(opt_str)), value, 0);
 }
 
 static int
@@ -1176,7 +1259,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    /* As above except that if the option was not set try a search */
 {
    png_byte istrat;
-   const png_byte opt = optind(dp, opt_str, strlen(opt_str));
+   const png_byte opt = option_index(dp, opt_str, strlen(opt_str));
    int record = options[opt].search;
    const char *entry_name;
 
@@ -1233,7 +1316,7 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
    }
 
    else /* something else */
-      assert(!"reached");
+      assert(0=="reached");
 
    if (record)
       record_opt(dp, opt, entry_name);
@@ -1245,8 +1328,9 @@ getsearchopts(struct display *dp, const char *opt_str, int *value)
 
 static int
 find_val(struct display *dp, png_byte opt, const char *str, size_t len)
-   /* Like optind but sets (index+i) of the entry in options[opt] that matches
-    * str[0..len-1] into dp->entry[opt] as well as returning the actual value.
+   /* Like option_index but sets (index+i) of the entry in options[opt] that
+    * matches str[0..len-1] into dp->entry[opt] as well as returning the actual
+    * value.
     */
 {
    int rlo = INT_MAX, rhi = INT_MIN;
@@ -1307,7 +1391,7 @@ opt_check(struct display *dp, const char *arg)
       /* So arg[0..i-1] is the argument name, this does not return if this isn't
        * a valid option name.
        */
-      j = optind(dp, arg, i);
+      j = option_index(dp, arg, i);
 
       /* It matcheth an option; check the remainder. */
       if (arg[i] == 0) /* no specified value, use the default */
@@ -1410,6 +1494,83 @@ opt_check(struct display *dp, const char *arg)
    else
       return 0; /* not an option */
 }
+
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+static void
+set_timer(struct display *dp, struct timespec *timer)
+{
+   /* Do the timing using clock_gettime and the per-process timer. */
+   if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, timer))
+   {
+      display_log(dp, APP_ERROR,
+            "CLOCK_PROCESS_CPUTIME_ID: %s: timing disabled\n", strerror(errno));
+      dp->value[OPTIND(dp,time)] = 0; /* i.e. off */
+   }
+}
+
+static void
+start_timer(struct display *dp, int what)
+{
+   if ((dp->value[OPTIND(dp,time)] & what) != 0)
+      set_timer(dp, what == PNGCP_TIME_READ ? &dp->read_time : &dp->write_time);
+}
+
+static void
+end_timer(struct display *dp, int what)
+{
+   if ((dp->value[OPTIND(dp,time)] & what) != 0)
+   {
+      struct timespec t, tmp;
+
+      set_timer(dp, &t);
+
+      if (what == PNGCP_TIME_READ)
+         tmp = dp->read_time;
+
+      else
+         tmp = dp->write_time;
+
+      t.tv_sec -= tmp.tv_sec;
+      t.tv_nsec -= tmp.tv_nsec;
+
+      if (t.tv_nsec < 0)
+      {
+         --(t.tv_sec);
+         t.tv_nsec += 1000000000L;
+      }
+
+      if (what == PNGCP_TIME_READ)
+         dp->read_time = t, tmp = dp->read_time_total;
+
+      else
+         dp->write_time = t, tmp = dp->write_time_total;
+
+      tmp.tv_sec += t.tv_sec;
+      tmp.tv_nsec += t.tv_nsec;
+
+      if (tmp.tv_nsec >= 1000000000L)
+      {
+         ++(tmp.tv_sec);
+         tmp.tv_nsec -= 1000000000L;
+      }
+
+      if (what == PNGCP_TIME_READ)
+         dp->read_time_total = tmp;
+
+      else
+         dp->write_time_total = tmp;
+   }
+}
+
+static void
+print_time(const char *what, struct timespec t)
+{
+   printf("%s %.2lu.%.9ld", what, (unsigned long)t.tv_sec, t.tv_nsec);
+}
+#else /* !PNGCP_TIMING */
+#define start_timer(dp, what) ((void)0)
+#define end_timer(dp, what) ((void)0)
+#endif /* !PNGCP_TIMING */
 
 /* The following is used in main to verify that the final argument is a
  * directory:
@@ -1592,13 +1753,21 @@ read_png(struct display *dp, const char *filename)
    if (dp->read_pp == NULL)
       display_log(dp, LIBPNG_ERROR, "failed to create read struct");
 
-   png_set_benign_errors(dp->read_pp, 1/*allowed*/);
+#  ifdef PNG_BENIGN_ERRORS_SUPPORTED
+      png_set_benign_errors(dp->read_pp, 1/*allowed*/);
+#  endif /* BENIGN_ERRORS */
 
-   if ((dp->options & FIX_INDEX) != 0)
-      png_set_check_for_invalid_index(dp->read_pp, 1/*on, no warning*/);
-
-   else if ((dp->options & IGNORE_INDEX) != 0) /* DANGEROUS */
-      png_set_check_for_invalid_index(dp->read_pp, -1/*off completely*/);
+#  ifdef FIX_INDEX
+      if ((dp->options & FIX_INDEX) != 0)
+         png_set_check_for_invalid_index(dp->read_pp, 1/*on, no warning*/);
+#     ifdef IGNORE_INDEX
+         else
+#     endif /* IGNORE_INDEX */
+#  endif /* FIX_INDEX */
+#  ifdef IGNORE_INDEX
+      if ((dp->options & IGNORE_INDEX) != 0) /* DANGEROUS */
+         png_set_check_for_invalid_index(dp->read_pp, -1/*off completely*/);
+#  endif /* IGNORE_INDEX */
 
    /* The png_read_png API requires us to make the info struct, but it does the
     * call to png_read_info.
@@ -1610,10 +1779,10 @@ read_png(struct display *dp, const char *filename)
    /* Set the IO handling */
    png_set_read_fn(dp->read_pp, dp, read_function);
 
-#  ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+#  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
       png_set_keep_unknown_chunks(dp->read_pp, PNG_HANDLE_CHUNK_ALWAYS, NULL,
             0);
-#  endif /* SET_UNKNOWN_CHUNKS */
+#  endif /* HANDLE_AS_UNKNOWN */
 
 #  ifdef PNG_SET_USER_LIMITS_SUPPORTED
       /* Remove the user limits, if any */
@@ -1621,7 +1790,9 @@ read_png(struct display *dp, const char *filename)
 #  endif /* SET_USER_LIMITS */
 
    /* Now read the PNG. */
+   start_timer(dp, PNGCP_TIME_READ);
    png_read_png(dp->read_pp, dp->ip, 0U/*transforms*/, NULL/*params*/);
+   end_timer(dp, PNGCP_TIME_READ);
    dp->w = png_get_image_width(dp->read_pp, dp->ip);
    dp->h = png_get_image_height(dp->read_pp, dp->ip);
    dp->ct = png_get_color_type(dp->read_pp, dp->ip);
@@ -1637,6 +1808,7 @@ read_png(struct display *dp, const char *filename)
       dp->size = rb * dp->h + dp->h/*filter byte*/;
    }
 
+#ifdef FIX_INDEX
    if (dp->ct == PNG_COLOR_TYPE_PALETTE && (dp->options & FIX_INDEX) != 0)
    {
       int max = png_get_palette_max(dp->read_pp, dp->ip);
@@ -1647,13 +1819,13 @@ read_png(struct display *dp, const char *filename)
           || max < 0 || num <= 0 || palette == NULL)
          display_log(dp, LIBPNG_ERROR, "invalid png_get_PLTE result");
 
-      if (max != num-1)
+      if (max >= num)
       {
          /* 'Fix' the palette. */
          int i;
          png_color newpal[256];
 
-         for (i=0; i<num && i<=max; ++i)
+         for (i=0; i<num; ++i)
             newpal[i] = palette[i];
 
          /* Fill in any remainder with a warning color: */
@@ -1667,6 +1839,7 @@ read_png(struct display *dp, const char *filename)
          png_set_PLTE(dp->read_pp, dp->ip, newpal, i);
       }
    }
+#endif /* FIX_INDEX */
 
    display_clean_read(dp);
    dp->operation = "none";
@@ -1804,11 +1977,16 @@ write_png(struct display *dp, const char *destname)
    if (dp->write_pp == NULL)
       display_log(dp, LIBPNG_ERROR, "failed to create write png_struct");
 
-   png_set_benign_errors(dp->write_pp, 1/*allowed*/);
+#  ifdef PNG_BENIGN_ERRORS_SUPPORTED
+      png_set_benign_errors(dp->write_pp, 1/*allowed*/);
+#  endif /* BENIGN_ERRORS */
+
    png_set_write_fn(dp->write_pp, dp, write_function, NULL/*flush*/);
 
+#ifdef IGNORE_INDEX
    if ((dp->options & IGNORE_INDEX) != 0) /* DANGEROUS */
       png_set_check_for_invalid_index(dp->write_pp, -1/*off completely*/);
+#endif /* IGNORE_INDEX */
 
    /* Restore the text chunks when using libpng 1.6 or less; this is a macro
     * which expands to nothing in 1.7+  In earlier versions it tests
@@ -1816,10 +1994,10 @@ write_png(struct display *dp, const char *destname)
     */
    text_restore(dp);
 
-#  ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+#  ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
       png_set_keep_unknown_chunks(dp->write_pp, PNG_HANDLE_CHUNK_ALWAYS, NULL,
             0);
-#  endif /* SET_UNKNOWN_CHUNKS */
+#  endif /* HANDLE_AS_UNKNOWN */
 
 #  ifdef PNG_SET_USER_LIMITS_SUPPORTED
       /* Remove the user limits, if any */
@@ -1858,7 +2036,7 @@ write_png(struct display *dp, const char *destname)
       int val;
 
       /* The permitted range is 1..0x7FFFFFFF, so the cast is safe */
-      if (getopt(dp, "IDAT-size", &val))
+      if (get_option(dp, "IDAT-size", &val))
          png_set_IDAT_size(dp->write_pp, val);
    }
 
@@ -1867,14 +2045,16 @@ write_png(struct display *dp, const char *destname)
       {
          int val;
 
-         if (getopt(dp, "filter", &val))
+         if (get_option(dp, "filter", &val))
             png_set_filter(dp->write_pp, PNG_FILTER_TYPE_BASE, val);
       }
 #  endif /* WRITE_FILTER */
 
    /* This just uses the 'read' info_struct directly, it contains the image. */
    dp->write_size = 0U;
+   start_timer(dp, PNGCP_TIME_WRITE);
    png_write_png(dp->write_pp, dp->ip, 0U/*transforms*/, NULL/*params*/);
+   end_timer(dp, PNGCP_TIME_WRITE);
 
    /* Make sure the file was written ok: */
    if (dp->fp != NULL)
@@ -2002,7 +2182,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
    {
       int val;
 
-      if (getopt(dp, "log-depth", &val) && val >= 0)
+      if (get_option(dp, "log-depth", &val) && val >= 0)
          log_depth = (unsigned int)/*SAFE*/val;
 
       else
@@ -2032,7 +2212,6 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
    /* Initialize the 'best' fields: */
    strcpy(dp->best, dp->curr);
    dp->best_size = dp->write_size;
-   log_search(dp, log_depth);
 
    if (dp->nsp > 0) /* interating over lists */
    {
@@ -2040,6 +2219,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
       assert(dp->curr[0] == ' ' && dp->tsp > 0);
 
       /* Cancel warnings on subsequent writes */
+      log_search(dp, log_depth);
       dp->no_warnings = 1;
 
       /* Make a temporary name for the subsequent tests: */
@@ -2133,7 +2313,7 @@ main(const int argc, const char * const * const argv)
    /* Do a quick check on the directory target case; when there are more than
     * two arguments the last one must be a directory.
     */
-   if (option_end+2 < argc && !checkdir(argv[argc-1]))
+   if (!(d.options & NOWRITE) && option_end+2 < argc && !checkdir(argv[argc-1]))
    {
       fprintf(stderr,
             "pngcp: %s: directory required with more than two arguments\n",
@@ -2157,7 +2337,7 @@ main(const int argc, const char * const * const argv)
          if (i < argc)
          {
             infile = argv[i++];
-            if (i < argc)
+            if (!(d.options & NOWRITE) && i < argc)
                outfile = argv[argc-1];
          }
 
@@ -2210,6 +2390,15 @@ main(const int argc, const char * const * const argv)
                if (infile != NULL)
                   printf(" %s", infile);
 
+#              ifdef PNG_PNGCP_TIMING_SUPPORTED
+                  /* When logging output the files for each file, if enabled. */
+                  if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_READ) != 0)
+                     print_time(" read", d.read_time);
+
+                  if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_WRITE) != 0)
+                     print_time(" write", d.write_time);
+#              endif /* PNGCP_TIMING */
+
                printf("\n");
                fflush(stdout);
             }
@@ -2217,14 +2406,32 @@ main(const int argc, const char * const * const argv)
 
          display_clean(&d);
       }
-      while (i+1 < argc);
-         /* I.e. for all cases after the first time through the loop require
+      while (i+!(d.options & NOWRITE) < argc);
+         /* I.e. for write cases after the first time through the loop require
           * there to be at least two arguments left and for the last one to be a
           * directory (this was checked above).
           */
 
       /* Release allocated memory */
       display_destroy(&d);
+
+#     ifdef PNG_PNGCP_TIMING_SUPPORTED
+         {
+            int output = 0;
+
+            if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_READ) != 0)
+               print_time("read", d.read_time_total), output = 1;
+
+            if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_WRITE) != 0)
+            {
+               if (output) putchar(' ');
+               print_time("write", d.write_time_total);
+               output = 1;
+            }
+
+            if (output) putchar('\n');
+         }
+#     endif /* PNGCP_TIMING */
 
       return errors != 0;
    }
@@ -2236,4 +2443,4 @@ main(void)
    fprintf(stderr, "pngcp: no support for png_read/write_image\n");
    return 77;
 }
-#endif
+#endif /* !READ_PNG || !WRITE_PNG */

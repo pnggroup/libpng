@@ -2836,8 +2836,10 @@ PNG_EXPORT(171, void, png_set_sCAL_s, (png_const_structrp png_ptr,
  *    except for the IHDR, PLTE, tRNS, IDAT, and IEND chunks (which continue to
  *    be processed by libpng.
  */
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 PNG_EXPORT(172, void, png_set_keep_unknown_chunks, (png_structrp png_ptr,
     int keep, png_const_bytep chunk_list, int num_chunks));
+#endif /* HANDLE_AS_UNKNOWN */
 
 /* The "keep" PNG_HANDLE_CHUNK_ parameter for the specified chunk is returned;
  * the result is therefore true (non-zero) if special handling is required,
