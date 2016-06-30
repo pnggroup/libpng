@@ -2262,14 +2262,22 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
         i++, rp++, dp++)
    {
       v = *dp = *rp;
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
    }
 
    for (lp = png_ptr->row_buf + 1; i < row_bytes;
       i++, rp++, lp++, dp++)
    {
       v = *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2294,7 +2302,11 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
        i++, rp++, pp++, dp++)
    {
       v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2319,7 +2331,11 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
    {
       v = *dp++ = (png_byte)(((int)*rp++ - ((int)*pp++ / 2)) & 0xff);
 
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
    }
 
    for (lp = png_ptr->row_buf + 1; i < row_bytes; i++)
@@ -2327,7 +2343,11 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
       v = *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
           & 0xff);
 
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2352,7 +2372,11 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
    {
       v = *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
 
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
    }
 
    for (lp = png_ptr->row_buf + 1, cp = png_ptr->prev_row + 1; i < row_bytes;
@@ -2381,7 +2405,11 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
 
       v = *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
 
+#ifdef PNG_USE_ABS
+      sum += 128 - abs(v - 128);
+#else
       sum += (v < 128) ? v : 256 - v;
+#endif
 
       if (sum > lmins)  /* We are already worse, don't continue. */
         break;
@@ -2465,7 +2493,11 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
          for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
          {
             v = *rp;
+#ifdef PNG_USE_ABS
+            sum += 128 - abs(v - 128);
+#else
             sum += (v < 128) ? v : 256 - v;
+#endif
          }
       }
 
