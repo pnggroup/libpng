@@ -2420,12 +2420,12 @@ main(const int argc, const char * const * const argv)
             int output = 0;
 
             if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_READ) != 0)
-               print_time("read", d.read_time), output = 1;
+               print_time("read", d.read_time_total), output = 1;
 
             if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_WRITE) != 0)
             {
                if (output) putchar(' ');
-               print_time("write", d.write_time);
+               print_time("write", d.write_time_total);
                output = 1;
             }
 
