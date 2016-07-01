@@ -15,21 +15,31 @@
  * For a more extensive example that uses the transforms see
  * contrib/libtests/pngimage.c in the libpng distribution.
  */
-#define _POSIX_SOURCE 1
-#include <stdarg.h>
-#include <stdlib.h>
-#include <string.h>
-#include <errno.h>
-#include <stdio.h>
-#include <limits.h>
-#include <assert.h>
+#include "pnglibconf.h" /* To find how libpng was configured. */
 
-#include <unistd.h>
-#include <sys/stat.h>
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+   /* WARNING:
+    *
+    * This test is here to allow POSIX.1b extensions to be used if enabled in
+    * the compile; specifically the code requires_POSIX_C_SOURCE support of
+    * 199309L or later to enable clock_gettime use.
+    *
+    * IF this causes problems THEN compile with a strict ANSI C compiler and let
+    * this code turn on the POSIX features that it minimally requires.
+    *
+    * IF this does not work there is probably a bug in your ANSI C compiler or
+    * your POSIX implementation.
+    */
+#  define _POSIX_C_SOURCE 199309L
+#else /* No timing support required */
+#  define _POSIX_SOURCE 1
+#endif
 
 #if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
 #  include <config.h>
 #endif
+
+#include <stdio.h>
 
 /* Define the following to use this test against your installed libpng, rather
  * than the one being built here:
@@ -39,6 +49,29 @@
 #else
 #  include "../../png.h"
 #endif
+
+#if PNG_LIBPNG_VER < 10700
+   /* READ_PNG and WRITE_PNG were not defined, so: */
+#  ifdef PNG_INFO_IMAGE_SUPPORTED
+#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+#        define PNG_READ_PNG_SUPPORTED
+#     endif /* SEQUENTIAL_READ */
+#     ifdef PNG_WRITE_SUPPORTED
+#        define PNG_WRITE_PNG_SUPPORTED
+#     endif /* WRITE */
+#  endif /* INFO_IMAGE */
+#endif /* pre 1.7.0 */
+
+#if (defined(PNG_READ_PNG_SUPPORTED)) && (defined(PNG_WRITE_PNG_SUPPORTED))
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <limits.h>
+#include <assert.h>
+
+#include <unistd.h>
+#include <sys/stat.h>
 
 #include <zlib.h>
 
@@ -62,19 +95,24 @@
 #  define gv
 #endif
 
-#if PNG_LIBPNG_VER < 10700
-   /* READ_PNG and WRITE_PNG were not defined, so: */
-#  ifdef PNG_INFO_IMAGE_SUPPORTED
-#     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
-#        define PNG_READ_PNG_SUPPORTED
-#     endif /* SEQUENTIAL_READ */
-#     ifdef PNG_WRITE_SUPPORTED
-#        define PNG_WRITE_PNG_SUPPORTED
-#     endif /* WRITE */
-#  endif /* INFO_IMAGE */
-#endif /* pre 1.7.0 */
+/* 'CLOCK_PROCESS_CPUTIME_ID' is one of the clock timers for clock_gettime.  It
+ * need not be supported even when clock_gettime is available.  It returns the
+ * 'CPU' time the process has consumed.  'CPU' time is assumed to include time
+ * when the CPU is actually blocked by a pending cache fill but not time
+ * waiting for page faults.  The attempt is to get a measure of the actual time
+ * the implementation takes to read a PNG ignoring the potentially very large IO
+ * overhead.
+ */
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+#  include <time.h>   /* clock_gettime and associated definitions */
+#  ifndef CLOCK_PROCESS_CPUTIME_ID
+      /* Prevent inclusion of the spurious code: */
+#     undef PNG_PNGCP_TIMING_SUPPORTED
+#  endif
+#endif /* PNGCP_TIMING */
 
-#if (defined(PNG_READ_PNG_SUPPORTED)) && (defined(PNG_WRITE_PNG_SUPPORTED))
+/* So if the timing feature has been activated: */
+
 /* This structure is used to control the test of a single file. */
 typedef enum
 {
@@ -202,6 +240,17 @@ vl_filter[] =
    { "paeth",  PNG_FILTER_PAETH  }
 },
 #endif /* WRITE_FILTER */
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+#  define PNGCP_TIME_READ  1
+#  define PNGCP_TIME_WRITE 2
+vl_time[] =
+{
+   { "both",  PNGCP_TIME_READ+PNGCP_TIME_WRITE },
+   { "off",   0 },
+   { "read",  PNGCP_TIME_READ },
+   { "write", PNGCP_TIME_WRITE }
+},
+#endif /* PNGCP_TIMING */
 vl_IDAT_size[] = /* for png_set_IDAT_size */
 {
    { "default", 0x7FFFFFFF },
@@ -312,6 +361,9 @@ static const option options[] =
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    VLL(filter, 0)
 #endif /* WRITE_FILTER */
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+   VLL(time, 0)
+#endif /* PNGCP_TIMING */
 #  undef VLL
 #  undef VL
 };
@@ -359,6 +411,13 @@ struct display
       int           num_text;
       int           text_stashed;
 #  endif /* pre 1.7 */
+
+#  ifdef PNG_PNGCP_TIMING_SUPPORTED
+      struct timespec   read_time;
+      struct timespec   read_time_total;
+      struct timespec   write_time;
+      struct timespec   write_time_total;
+#  endif /* PNGCP_TIMING */
 
    /* Used to write a new image (the original info_ptr is used) */
 #  define MAX_SIZE ((png_alloc_size_t)(-1))
@@ -1436,6 +1495,83 @@ opt_check(struct display *dp, const char *arg)
       return 0; /* not an option */
 }
 
+#ifdef PNG_PNGCP_TIMING_SUPPORTED
+static void
+set_timer(struct display *dp, struct timespec *timer)
+{
+   /* Do the timing using clock_gettime and the per-process timer. */
+   if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, timer))
+   {
+      display_log(dp, APP_ERROR,
+            "CLOCK_PROCESS_CPUTIME_ID: %s: timing disabled\n", strerror(errno));
+      dp->value[OPTIND(dp,time)] = 0; /* i.e. off */
+   }
+}
+
+static void
+start_timer(struct display *dp, int what)
+{
+   if ((dp->value[OPTIND(dp,time)] & what) != 0)
+      set_timer(dp, what == PNGCP_TIME_READ ? &dp->read_time : &dp->write_time);
+}
+
+static void
+end_timer(struct display *dp, int what)
+{
+   if ((dp->value[OPTIND(dp,time)] & what) != 0)
+   {
+      struct timespec t, tmp;
+
+      set_timer(dp, &t);
+
+      if (what == PNGCP_TIME_READ)
+         tmp = dp->read_time;
+
+      else
+         tmp = dp->write_time;
+
+      t.tv_sec -= tmp.tv_sec;
+      t.tv_nsec -= tmp.tv_nsec;
+
+      if (t.tv_nsec < 0)
+      {
+         --(t.tv_sec);
+         t.tv_nsec += 1000000000L;
+      }
+
+      if (what == PNGCP_TIME_READ)
+         dp->read_time = t, tmp = dp->read_time_total;
+
+      else
+         dp->write_time = t, tmp = dp->write_time_total;
+
+      tmp.tv_sec += t.tv_sec;
+      tmp.tv_nsec += t.tv_nsec;
+
+      if (tmp.tv_nsec >= 1000000000L)
+      {
+         ++(tmp.tv_sec);
+         tmp.tv_nsec -= 1000000000L;
+      }
+
+      if (what == PNGCP_TIME_READ)
+         dp->read_time_total = tmp;
+
+      else
+         dp->write_time_total = tmp;
+   }
+}
+
+static void
+print_time(const char *what, struct timespec t)
+{
+   printf("%s %.2lu.%.9ld", what, (unsigned long)t.tv_sec, t.tv_nsec);
+}
+#else /* !PNGCP_TIMING */
+#define start_timer(dp, what) ((void)0)
+#define end_timer(dp, what) ((void)0)
+#endif /* !PNGCP_TIMING */
+
 /* The following is used in main to verify that the final argument is a
  * directory:
  */
@@ -1654,7 +1790,9 @@ read_png(struct display *dp, const char *filename)
 #  endif /* SET_USER_LIMITS */
 
    /* Now read the PNG. */
+   start_timer(dp, PNGCP_TIME_READ);
    png_read_png(dp->read_pp, dp->ip, 0U/*transforms*/, NULL/*params*/);
+   end_timer(dp, PNGCP_TIME_READ);
    dp->w = png_get_image_width(dp->read_pp, dp->ip);
    dp->h = png_get_image_height(dp->read_pp, dp->ip);
    dp->ct = png_get_color_type(dp->read_pp, dp->ip);
@@ -1914,7 +2052,9 @@ write_png(struct display *dp, const char *destname)
 
    /* This just uses the 'read' info_struct directly, it contains the image. */
    dp->write_size = 0U;
+   start_timer(dp, PNGCP_TIME_WRITE);
    png_write_png(dp->write_pp, dp->ip, 0U/*transforms*/, NULL/*params*/);
+   end_timer(dp, PNGCP_TIME_WRITE);
 
    /* Make sure the file was written ok: */
    if (dp->fp != NULL)
@@ -2250,6 +2390,15 @@ main(const int argc, const char * const * const argv)
                if (infile != NULL)
                   printf(" %s", infile);
 
+#              ifdef PNG_PNGCP_TIMING_SUPPORTED
+                  /* When logging output the files for each file, if enabled. */
+                  if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_READ) != 0)
+                     print_time(" read", d.read_time);
+
+                  if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_WRITE) != 0)
+                     print_time(" write", d.write_time);
+#              endif /* PNGCP_TIMING */
+
                printf("\n");
                fflush(stdout);
             }
@@ -2265,6 +2414,24 @@ main(const int argc, const char * const * const argv)
 
       /* Release allocated memory */
       display_destroy(&d);
+
+#     ifdef PNG_PNGCP_TIMING_SUPPORTED
+         {
+            int output = 0;
+
+            if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_READ) != 0)
+               print_time("read", d.read_time), output = 1;
+
+            if ((d.value[OPTIND(&d,time)] & PNGCP_TIME_WRITE) != 0)
+            {
+               if (output) putchar(' ');
+               print_time("write", d.write_time);
+               output = 1;
+            }
+
+            if (output) putchar('\n');
+         }
+#     endif /* PNGCP_TIMING */
 
       return errors != 0;
    }

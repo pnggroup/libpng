@@ -13,6 +13,17 @@
 #
 everything = off
 
+# This option is specific to this configuration; it adds a #define to the
+# generated pnglibconf.h which turns on the (not portable) timing option for
+# pngcp.  Note that any option is automatically preceded by PNG_; there is no
+# way round this and this is deliberate.
+option PNGCP_TIMING
+
+# Because of the everything off above the option must also be turned on.  This
+# may not be done in one step because it is safer and avoids mis-spelled options
+# in user .dfa files to error out if an unrecognized option is turned on.
+option PNGCP_TIMING on
+
 # Options to turn on png_read_png and png_write_png:
 option INFO_IMAGE on
 option SEQUENTIAL_READ on
