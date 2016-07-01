@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.6.23 [June 9, 2016]
+ * Last changed in libpng 1.6.24 [(PENDING RELEASE)]
  * Copyright (c) 1998-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
