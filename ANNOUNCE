@@ -1386,6 +1386,7 @@ Version 1.7.0beta82 [July 2, 2016]
     depends on PNG_LIBPNG_VER.
   Moved pngcp to contrib/tools and added pngcp to the build together
     with a pngcp.dfa configuration test (John Bowler)
+  Added a "Common linking failures" section to the INSTALL document.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
