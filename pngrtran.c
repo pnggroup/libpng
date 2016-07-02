@@ -5893,7 +5893,12 @@ init_caching(png_structp png_ptr, png_transform_controlp tend)
    {
       /* This turns starts the palette caching with the next transform: */
       tend->palette = tend->caching = 1U;
-      tend->transparent_alpha = png_ptr->transparent_palette;
+#     ifdef PNG_READ_tRNS_SUPPORTED
+         tend->transparent_alpha = png_ptr->transparent_palette;
+#     else /* !READ_tRNS */
+         tend->transparent_alpha = 0;
+         PNG_UNUSED(png_ptr)
+#     endif /* !READ_tRNS */
       tend->format = PNG_FORMAT_FLAG_COLOR;
 #     ifdef PNG_READ_tRNS_SUPPORTED
          if (png_ptr->num_trans > 0 && !(tend->invalid_info & PNG_INFO_tRNS))

@@ -599,20 +599,24 @@ set_palette_max(png_structrp png_ptr, png_transformp tr, unsigned int max,
                    png_ptr->palette_index_check != PNG_PALETTE_CHECK_OFF)
 #           endif /* WRITE */
             )
+         {
 #           ifdef PNG_READ_SUPPORTED
 #              ifdef PNG_WRITE_SUPPORTED
-                  (png_ptr->read_struct ? png_chunk_benign_error : png_error)
-#              else /* !WRITE */
-                  png_chunk_benign_error
-#              endif /* READ */
-#           else /* !READ */
-               png_error
+                  if (png_ptr->read_struct)
+#              endif /* WRITE */
+                  png_chunk_benign_error(png_ptr, "palette index too large");
+#              ifdef PNG_WRITE_SUPPORTED
+                  else
+#              endif
+#           endif /* READ */
+#           ifdef PNG_WRITE_SUPPORTED
+               png_error(png_ptr, "palette index too large");
 #           endif /* WRITE */
-               (png_ptr, "palette index too large");
+         }
 
          png_ptr->palette_index_check_issued = 1;
       }
-#  endif
+#  endif /* CHECK_FOR_INVALID_INDEX */
 #  ifdef PNG_GET_PALETTE_MAX_SUPPORTED
       png_ptr->palette_index_max = png_check_byte(png_ptr, max);
 #  endif

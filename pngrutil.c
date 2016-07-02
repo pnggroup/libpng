@@ -777,11 +777,18 @@ png_handle_error(png_structrp png_ptr
    png_chunk_benign_error(png_ptr, error);
 }
 
+#if defined (PNG_READ_gAMA_SUPPORTED) || defined (PNG_READ_sBIT_SUPPORTED) ||\
+   defined (PNG_READ_cHRM_SUPPORTED) || defined (PNG_READ_sRGB_SUPPORTED) ||\
+   defined (PNG_READ_iCCP_SUPPORTED) || defined (PNG_READ_tRNS_SUPPORTED) ||\
+   defined (PNG_READ_bKGD_SUPPORTED) || defined (PNG_READ_hIST_SUPPORTED) ||\
+   defined (PNG_READ_pHYs_SUPPORTED) || defined (PNG_READ_oFFs_SUPPORTED) ||\
+   defined (PNG_READ_sCAL_SUPPORTED) || defined (PNG_READ_tIME_SUPPORTED)
 static void
 png_handle_bad_length(png_structrp png_ptr)
 {
    png_handle_error(png_ptr, "invalid length");
 }
+#endif /* chunks that can generate length errors */
 
 /* Read and check the IDHR chunk */
 static void

@@ -939,8 +939,10 @@ option WRITE_zTXt enables WRITE_COMPRESSED_TEXT
 # leave the row_pointers member out of the info structure.
 
 option INFO_IMAGE disabled
-option READ_PNG requires READ_IMAGE READ_TRANSFORMS enables INFO_IMAGE
-option WRITE_PNG requires WRITE WRITE_TRANSFORMS enables INFO_IMAGE
+option READ_PNG requires READ_IMAGE READ_TRANSFORMS READ_INTERLACING,
+   enables INFO_IMAGE
+option WRITE_PNG requires WRITE WRITE_TRANSFORMS WRITE_INTERLACING,
+   enables INFO_IMAGE
 
 # There are four options here, two each for read and write.  By default they are
 # all switched on.

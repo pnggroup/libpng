@@ -186,7 +186,7 @@ png_user_version_check(png_structrp png_ptr, png_const_charp user_png_ver)
    {
       int library_match = 1;
       int i = -1;
-      int found_dots = 0;
+      unsigned int found_dots = 0;
 
       do
       {

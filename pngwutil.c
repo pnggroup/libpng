@@ -3689,7 +3689,6 @@ void /* PRIVATE */
 png_write_start_IDAT(png_structrp png_ptr)
 {
    png_zlib_statep ps = get_zlib_state(png_ptr);
-   int png_level;
 
    /* Set up the IDAT compression state.  Expect the state to have been released
     * by the previous owner, but it doesn't much matter if there was an error.
@@ -3700,12 +3699,13 @@ png_write_start_IDAT(png_structrp png_ptr)
    /* This sets the buffer limits and write_row_size, which is used below. */
    png_zlib_state_set_buffer_limits(png_ptr, ps);
 
-   /* Now default the filter mask if it hasn't been set already: */
-   png_level = pz_get(ps, IDAT, png_level, PNG_DEFAULT_COMPRESSION_LEVEL);
-
    if (ps->filter_mask == 0)
    {
 #     ifdef PNG_SELECT_FILTER_SUPPORTED
+         /* Now default the filter mask if it hasn't been set already: */
+         int png_level =
+            pz_get(ps, IDAT, png_level, PNG_DEFAULT_COMPRESSION_LEVEL);
+
          /* If the bit depth is less than 8, so pixels are not byte aligned, PNG
           * filtering hardly ever helps because there is no correlation between
           * the bytes on which the filter works and the actual pixel values.
