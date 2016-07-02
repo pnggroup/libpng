@@ -17,8 +17,9 @@ VIII. Configuring libpng for 16-bit platforms
  XII. Configuring for compiler xxx:
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
-  XV. Configuring libpng for multiprocessing
- XVI. Other sources of information about libpng
+  XV. Setjmp/longjmp issues
+ XVI. Common linking failures
+XVII. Other sources of information about libpng
 
 I. Simple installation
 
@@ -32,6 +33,10 @@ and ignore the rest of this document.  "/path" is the path to the directory
 where you want to install the libpng "lib", "include", and "bin"
 subdirectories.
 
+If you downloaded a GIT clone, you will need to run ./autogen.sh before
+running ./configure, to create "configure" and "Makefile.in" which are
+not included in the GIT repository.
+
 Note that "configure" is only included in the "*.tar" distributions and not
 in the "*.zip" or "*.7z" distributions. If you downloaded one of those
 distributions, see "Building with project files" or "Building with makefiles",
@@ -43,7 +48,9 @@ If configure does not work on your system, or if you have a need to
 change configure.ac or Makefile.am, and you have a reasonably
 up-to-date set of tools, running ./autogen.sh in a git clone before
 running ./configure may fix the problem.  To be really sure that you
-aren't using any of the included pre-built scripts, you can do this:
+aren't using any of the included pre-built scripts, especially if you
+are building from a tar distribution instead of a git distribution,
+do this:
 
     ./configure --enable-maintainer-mode
     make maintainer-clean
@@ -348,7 +355,7 @@ $PREFIX/include directory).  Do not edit pnglibconf.h after you have built
 libpng, because than the settings would not accurately reflect the settings
 that were used to build libpng.
 
-XV. Configuring libpng for multiprocessing
+XV. Setjmp/longjmp issues
 
 Libpng uses setjmp()/longjmp() for error handling.  Unfortunately setjmp()
 is known to be not thread-safe on some platforms and we don't know of
@@ -361,28 +368,20 @@ configure libpng with PNG_NO_SETJMP in your pngusr.dfa file, with
 
 in your pnglibconf.h or pngusr.h.
 
-XVI. Other sources of information about libpng:
+XVI. Common linking failures
+
+If your application fails to find libpng or zlib entries while linking:
+
+  Be sure "-lz" appears after "-lpng" on your linking command.
+
+  Be sure you have built libpng, zlib, and your application for the
+  same platform (e.g., 32-bit or 64-bit).
+
+  If you are using the vstudio project, observe the WARNING in
+  project/vstudio/README.txt.
+
+XVII. Other sources of information about libpng:
 
 Further information can be found in the README and libpng-manual.txt
 files, in the individual makefiles, in png.h, and the manual pages
 libpng.3 and png.5.
-
-Using the ./configure script -- 16 December 2002.
-=================================================
-
-The ./configure script should work compatibly with what scripts/makefile.*
-did, however there are some options you might need to add to configure
-explicitly, which previously was done semi-automatically (if you didn't edit
-scripts/makefile.* yourself, that is)
-
-CFLAGS="-Wall -O -funroll-loops \
--malign-loops=2 -malign-functions=2" ./configure --prefix=/usr/include \
---with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
-
-You can alternatively specify --includedir=/usr/include, /usr/local/include,
-/usr/include/libpng15, or whatever.
-
-If you find that the configure script is out-of-date or is not supporting
-your platform properly, try running autogen.sh to regenerate "configure",
-"Makefile.in", and the other configuration files. Then try configure again.
-
