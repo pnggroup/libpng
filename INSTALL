@@ -18,7 +18,8 @@ VIII. Configuring libpng for 16-bit platforms
 XIII. Removing unwanted object code
  XIV. Changes to the build and configuration of libpng in libpng-1.5.x
   XV. Setjmp/longjmp issues
- XVI. Other sources of information about libpng
+ XVI. Common linking failures
+XVII. Other sources of information about libpng
 
 I. Simple installation
 
@@ -382,28 +383,20 @@ This requires setjmp/longjmp, so you must either build the library
 with PNG_SETJMP_SUPPORTED defined, or with PNG_SIMPLIFIED_READ_SUPPORTED
 and PNG_SIMPLIFIED_WRITE_SUPPORTED undefined.
 
-XVI. Other sources of information about libpng:
+XVI. Common linking failures
+
+If your application fails to find libpng or zlib entries while linking:
+
+  Be sure "-lz" appears after "-lpng" on your linking command.
+
+  Be sure you have built libpng, zlib, and your application for the
+  same platform (e.g., 32-bit or 64-bit).
+
+  If you are using the vstudio project, observe the WARNING in
+  project/vstudio/README.txt.
+
+XVII. Other sources of information about libpng:
 
 Further information can be found in the README and libpng-manual.txt
 files, in the individual makefiles, in png.h, and the manual pages
 libpng.3 and png.5.
-
-Using the ./configure script -- 16 December 2002.
-=================================================
-
-The ./configure script should work compatibly with what scripts/makefile.*
-did, however there are some options you might need to add to configure
-explicitly, which previously was done semi-automatically (if you didn't edit
-scripts/makefile.* yourself, that is)
-
-CFLAGS="-Wall -O -funroll-loops \
--malign-loops=2 -malign-functions=2" ./configure --prefix=/usr/include \
---with-pkgconfigdir=/usr/lib/pkgconfig --includedir=/usr/include
-
-You can alternatively specify --includedir=/usr/include, /usr/local/include,
-/usr/include/libpng16, or whatever.
-
-If you find that the configure script is out-of-date or is not supporting
-your platform properly, try running autogen.sh to regenerate "configure",
-"Makefile.in", and the other configuration files. Then try configure again.
-

@@ -5638,12 +5638,13 @@ Version 1.6.24beta02 [June 23, 2016]
     structure padding is fixable, but it would be a signficant change (moving
     structure members around).
 
-Version 1.6.24beta03 [July 1, 2016]
+Version 1.6.24beta03 [July 2, 2016]
   Optimized absolute value calculation in filter selection, similar to
     code in the PAETH decoder in pngrutil.c. Build with PNG_USE_ABS to
     use this.
   Added pngcp to the build together with a pngcp.dfa configuration test.
   Added high resolution timing to pngcp.
+  Added "Common linking failures" section to INSTALL.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
