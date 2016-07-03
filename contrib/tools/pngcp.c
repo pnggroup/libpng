@@ -475,7 +475,7 @@ struct display
    char             curr[32*SL];       /* current options being tested */
    char             best[32*SL];       /* best options */
 
-   char             namebuf[FILENAME_MAX+1]; /* output file name */
+   char             namebuf[FILENAME_MAX]; /* output file name */
 };
 
 static void
@@ -1639,7 +1639,7 @@ makename(struct display *dp, const char *dir, const char *infile)
    {
       size_t dsize = strlen(dir);
 
-      if (dsize < FILENAME_MAX+2)
+      if (dsize <= (sizeof dp->namebuf)-2) /* Allow for name + '/' + '\0' */
       {
          size_t isize = strlen(infile);
          size_t istart = isize-1;
@@ -1659,7 +1659,7 @@ makename(struct display *dp, const char *dir, const char *infile)
          isize -= istart;
          infile += istart;
 
-         if (dsize+isize <= FILENAME_MAX)
+         if (dsize+isize < (sizeof dp->namebuf)) /* dsize + infile + '\0' */
          {
             memcpy(dp->namebuf+dsize, infile, isize+1);
 
@@ -1670,7 +1670,7 @@ makename(struct display *dp, const char *dir, const char *infile)
 
          else
          {
-            dp->namebuf[dsize] = 0;
+            dp->namebuf[dsize] = 0; /* allowed for: -2 at start */
             display_log(dp, USER_ERROR, "%s%s: output file name too long",
                   dp->namebuf, infile);
          }
@@ -1799,7 +1799,14 @@ read_png(struct display *dp, const char *filename)
    dp->bpp = png_get_bit_depth(dp->read_pp, dp->ip) *
              png_get_channels(dp->read_pp, dp->ip);
    {
+      /* png_get_rowbytes should never return 0 because the value is set by the
+       * first call to png_set_IHDR, which should have happened by now, but just
+       * in case:
+       */
       png_alloc_size_t rb = png_get_rowbytes(dp->read_pp, dp->ip);
+
+      if (rb == 0)
+         png_error(dp->read_pp, "invalid row byte count from libpng");
 
       /* The size calc can overflow. */
       if ((MAX_SIZE-dp->h)/rb < dp->h)
