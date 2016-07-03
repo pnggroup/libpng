@@ -1512,12 +1512,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                     png_crc_finish(png_ptr, length);
                                     finished = 1;
 
-#                                   ifdef PNG_sRGB_SUPPORTED
+# if defined(PNG_sRGB_SUPPORTED) && PNG_sRGB_PROFILE_CHECKS >= 0
                                     /* Check for a match against sRGB */
                                     png_icc_set_sRGB(png_ptr,
                                        &png_ptr->colorspace, profile,
                                        png_ptr->zstream.adler);
-#                                   endif
+# endif
 
                                     /* Steal the profile for info_ptr. */
                                     if (info_ptr != NULL)
