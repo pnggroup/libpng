@@ -75,6 +75,7 @@ Version 1.6.24beta03 [July 3, 2016]
   Added high resolution timing to pngcp.
   Added "Common linking failures" section to INSTALL.
   Relocated misplaced #endif in png.c sRGB profile checking.
+  Fixed two Coverity issues in pngcp.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
