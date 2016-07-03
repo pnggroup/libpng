@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta82 - July 2, 2016
+Libpng 1.7.0beta82 - July 3, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1380,13 +1380,14 @@ Version 1.7.0beta81 [June 11, 2016]
   Avoid potential overflow of the PNG_IMAGE_SIZE macro.  This macro
     is not used within libpng, but is used in some of the examples.
 
-Version 1.7.0beta82 [July 2, 2016]
+Version 1.7.0beta82 [July 3, 2016]
   Put the SKIP definition in the correct place. It needs to come after the
     png.h include (see all the other .c files in contrib/libtests) because it
     depends on PNG_LIBPNG_VER.
   Moved pngcp to contrib/tools and added pngcp to the build together
     with a pngcp.dfa configuration test (John Bowler)
   Added a "Common linking failures" section to the INSTALL document.
+  Relocated misplaced #endif in png.c sRGB profile checking.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
