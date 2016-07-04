@@ -5690,6 +5690,8 @@ Version 1.7.0beta82 [July 4, 2016]
   Relocated misplaced #endif in png.c sRGB profile checking.
   Fixed two Coverity issues in pngcp.c.
 
+Version 1.7.0beta83 [July 4, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
