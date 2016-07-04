@@ -1,7 +1,7 @@
 # configure.ac
 
 # Copyright (c) 2004-2015 Glenn Randers-Pehrson
-# Last changed in libpng 1.6.22 [(PENDING RELEASE)]
+# Last changed in libpng 1.6.22 [May 26, 2016]
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer

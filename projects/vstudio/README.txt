@@ -1,7 +1,7 @@
 
 VisualStudio instructions
 
-libpng version 1.6.24beta03 - June 23, 2016
+libpng version 1.6.24beta03 - July 4, 2016
 
 Copyright (c) 2010,2013,2015 Glenn Randers-Pehrson
 
@@ -93,3 +93,5 @@ as follows:
     DLL               /MD         /MDd
     Static Library    /MD         /MDd
 
+Also, be sure to build libpng, zlib, and your project all for the same
+platform (e.g., 32-bit or 64-bit).
