@@ -119,8 +119,8 @@ or "zlib128") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
-   ..       (the parent directory)
-      libpng  (this directory)
+   .. (the parent directory)
+      libpng (this directory)
           INSTALL (this file)
           README
           *.h, *.c  => libpng source files
@@ -131,8 +131,8 @@ Your directory structure should look like this:
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
-             arm-neon, conftest, examples, gregbook, libtests, pngminim,
-             pngminus, pngsuite, tools, visupng
+             arm-neon, conftest, examples, extensions.*, gregbook, libtests,
+             neon, pngminim, pngminus, pngsuite, testpngs, tools, visupng
           projects
              cbuilder5, owatcom, visualc71, vstudio, xcode
           scripts
@@ -233,7 +233,8 @@ The files in libpng proper only include pngpriv.h and png.h, which
 in turn includes pngconf.h and, as of libpng-1.5.0, pnglibconf.h.
 As of libpng-1.5.0, pngpriv.h also includes three other private header
 files, pngstruct.h, pnginfo.h, and pngdebug.h, which contain material
-that previously appeared in the public headers.
+that previously appeared in the public headers. As of libpng-1.7.0,
+pngchunk.h is also included, and is used privately by pngrutil.c.
 
 XIII. Removing unwanted object code
 
