@@ -5651,7 +5651,7 @@ Version 1.6.24beta03 [July 4, 2016]
 Version 1.6.24beta04 [July 8, 2016]
   Avoid filter-selection heuristic sum calculations in cases where only one
     filter is a candidate for selection. This trades off code size (added
-    png_setup_*_row_only() functions) for speed.
+    private png_setup_*_row_only() functions) for speed.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

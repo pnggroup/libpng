@@ -119,8 +119,8 @@ or "zlib128") so that you have directories called "zlib" and "libpng".
 
 Your directory structure should look like this:
 
-   ..       (the parent directory)
-      libpng  (this directory)
+   .. (the parent directory)
+      libpng (this directory)
           INSTALL (this file)
           README
           *.h, *.c  => libpng source files
