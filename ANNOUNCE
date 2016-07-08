@@ -1,4 +1,4 @@
-Libpng 1.6.24beta04 - July 4, 2016
+Libpng 1.6.24beta04 - July 8, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -76,6 +76,11 @@ Version 1.6.24beta03 [July 4, 2016]
   Added "Common linking failures" section to INSTALL.
   Relocated misplaced #endif in png.c sRGB profile checking.
   Fixed two Coverity issues in pngcp.c.
+
+Version 1.6.24beta04 [July 8, 2016]
+  Avoid filter-selection heuristic sum calculations in cases where only one
+    filter is a candidate for selection. This trades off code size (added
+    png_setup_*_row_only() functions) for speed.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

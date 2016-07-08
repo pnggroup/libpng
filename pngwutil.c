@@ -2286,6 +2286,28 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    return (sum);
 }
 
+static void /* PRIVATE */
+png_setup_sub_row_only(png_structrp png_ptr, const png_uint_32 bpp,
+    const png_size_t row_bytes)
+{
+   png_bytep rp, dp, lp;
+   png_size_t i;
+
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
+
+   for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1; i < bpp;
+        i++, rp++, dp++)
+   {
+      *dp = *rp;
+   }
+
+   for (lp = png_ptr->row_buf + 1; i < row_bytes;
+      i++, rp++, lp++, dp++)
+   {
+      *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
+   }
+}
+
 static png_size_t /* PRIVATE */
 png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
     const png_size_t lmins)
@@ -2313,6 +2335,21 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
    }
 
    return (sum);
+}
+static void /* PRIVATE */
+png_setup_up_row_only(png_structrp png_ptr, const png_size_t row_bytes)
+{
+   png_bytep rp, dp, pp;
+   png_size_t i;
+
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
+
+   for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1,
+       pp = png_ptr->prev_row + 1; i < row_bytes;
+       i++, rp++, pp++, dp++)
+   {
+      *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
+   }
 }
 
 static png_size_t /* PRIVATE */
@@ -2354,6 +2391,27 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
    }
 
    return (sum);
+}
+static void /* PRIVATE */
+png_setup_avg_row_only(png_structrp png_ptr, const png_uint_32 bpp,
+      const png_size_t row_bytes)
+{
+   png_bytep rp, dp, pp, lp;
+   png_uint_32 i;
+
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
+
+   for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1,
+        pp = png_ptr->prev_row + 1; i < bpp; i++)
+   {
+      *dp++ = (png_byte)(((int)*rp++ - ((int)*pp++ / 2)) & 0xff);
+   }
+
+   for (lp = png_ptr->row_buf + 1; i < row_bytes; i++)
+   {
+      *dp++ = (png_byte)(((int)*rp++ - (((int)*pp++ + (int)*lp++) / 2))
+          & 0xff);
+   }
 }
 
 static png_size_t /* PRIVATE */
@@ -2416,6 +2474,48 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
    }
 
    return (sum);
+}
+static void /* PRIVATE */
+png_setup_paeth_row_only(png_structrp png_ptr, const png_uint_32 bpp,
+    const png_size_t row_bytes)
+{
+   png_bytep rp, dp, pp, cp, lp;
+   png_size_t i;
+
+   png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
+
+   for (i = 0, rp = png_ptr->row_buf + 1, dp = png_ptr->try_row + 1,
+       pp = png_ptr->prev_row + 1; i < bpp; i++)
+   {
+      *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
+   }
+
+   for (lp = png_ptr->row_buf + 1, cp = png_ptr->prev_row + 1; i < row_bytes;
+        i++)
+   {
+      int a, b, c, pa, pb, pc, p;
+
+      b = *pp++;
+      c = *cp++;
+      a = *lp++;
+
+      p = b - c;
+      pc = a - c;
+
+#ifdef PNG_USE_ABS
+      pa = abs(p);
+      pb = abs(pc);
+      pc = abs(p + pc);
+#else
+      pa = p < 0 ? -p : p;
+      pb = pc < 0 ? -pc : pc;
+      pc = (p + pc) < 0 ? -(p + pc) : p + pc;
+#endif
+
+      p = (pa <= pb && pa <=pc) ? a : (pb <= pc) ? b : c;
+
+      *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
+   }
 }
 #endif /* WRITE_FILTER */
 
@@ -2508,12 +2608,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    if (filter_to_do == PNG_FILTER_SUB)
    /* It's the only filter so no testing is needed */
    {
-      /* Passing PNG_SIZE_MAX here and below prevents the 'setup' function
-       * breaking out of the loop when lmins is exceeded. Optimizing
-       * compilers should notice that we don't use the returned sum, and
-       * therefore 'setup' should refrain from calculating and returning "sum".
-       */
-      (void) png_setup_sub_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
+      png_setup_sub_row_only(png_ptr, bpp, row_bytes);
       best_row = png_ptr->try_row;
    }
 
@@ -2539,7 +2634,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Up filter */
    if (filter_to_do == PNG_FILTER_UP)
    {
-      (void) png_setup_up_row(png_ptr, row_bytes, PNG_SIZE_MAX);
+      png_setup_up_row_only(png_ptr, row_bytes);
       best_row = png_ptr->try_row;
    }
 
@@ -2565,7 +2660,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Avg filter */
    if (filter_to_do == PNG_FILTER_AVG)
    {
-      (void) png_setup_avg_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
+      png_setup_avg_row_only(png_ptr, bpp, row_bytes);
       best_row = png_ptr->try_row;
    }
 
@@ -2591,7 +2686,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    /* Paeth filter */
    if ((filter_to_do == PNG_FILTER_PAETH) != 0)
    {
-      (void) png_setup_paeth_row(png_ptr, bpp, row_bytes, PNG_SIZE_MAX);
+      png_setup_paeth_row_only(png_ptr, bpp, row_bytes);
       best_row = png_ptr->try_row;
    }
 
