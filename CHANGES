@@ -5653,6 +5653,8 @@ Version 1.6.24beta04 [July 8, 2016]
     filter is a candidate for selection. This trades off code size (added
     private png_setup_*_row_only() functions) for speed.
 
+Version 1.6.24beta05 [July 8, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
