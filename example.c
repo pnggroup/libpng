@@ -383,12 +383,12 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    /* Strip alpha bytes from the input data without combining with the
     * background (not recommended).
     */
-    png_set_strip_alpha(png_ptr);
+   png_set_strip_alpha(png_ptr);
 
    /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
-    png_set_packing(png_ptr);
+   png_set_packing(png_ptr);
 
    /* Change the order of packed pixels to least significant bit first
     * (not useful if you are using png_set_packing). */
