@@ -286,8 +286,7 @@
 
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.7.0beta83"
-#define PNG_HEADER_VERSION_STRING \
-     " libpng version 1.7.0beta83 - July 4, 2016\n"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.7.0beta83 - July 4, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   17
 #define PNG_LIBPNG_VER_DLLNUM  17
@@ -332,14 +331,14 @@
  * the library has been built.
  */
 #ifndef PNGLCONF_H
-    /* If pnglibconf.h is missing, you can
-     * copy scripts/pnglibconf.h.prebuilt to pnglibconf.h
-     */
+/* If pnglibconf.h is missing, you can
+ * copy scripts/pnglibconf.h.prebuilt to pnglibconf.h
+ */
 #   include "pnglibconf.h"
 #endif
 
 #ifndef PNG_VERSION_INFO_ONLY
-   /* Machine specific configuration. */
+/* Machine specific configuration. */
 #  include "pngconf.h"
 #endif
 
@@ -3872,9 +3871,9 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #define PNG_IMAGE_PNG_SIZE_MAX_(image, image_size)\
    ((8U/*sig*/+25U/*IHDR*/+16U/*gAMA*/+44U/*cHRM*/+12U/*IEND*/+\
     (((image).format&PNG_FORMAT_FLAG_COLORMAP)?/*colormap: PLTE, tRNS*/\
-     12U+3U*(image).colormap_entries/*PLTE data*/+\
-     (((image).format&PNG_FORMAT_FLAG_ALPHA)?\
-      12U/*tRNS*/+(image).colormap_entries:0U):0U)+\
+    12U+3U*(image).colormap_entries/*PLTE data*/+\
+    (((image).format&PNG_FORMAT_FLAG_ALPHA)?\
+    12U/*tRNS*/+(image).colormap_entries:0U):0U)+\
     12U)+(12U*((image_size)/PNG_ZBUF_SIZE))/*IDAT*/+(image_size))
    /* A helper for the following macro; if your compiler cannot handle the
     * following macro use this one with the result of

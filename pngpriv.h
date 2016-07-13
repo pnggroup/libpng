@@ -1083,7 +1083,7 @@ PNG_INTERNAL_FUNCTION(void,png_write_sBIT,(png_structrp png_ptr,
 #ifdef PNG_WRITE_cHRM_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_cHRM_fixed,(png_structrp png_ptr,
     const png_xy *xy), PNG_EMPTY);
-    /* The xy value must have been previously validated */
+   /* The xy value must have been previously validated */
 #endif
 
 #ifdef PNG_WRITE_sRGB_SUPPORTED
@@ -1769,13 +1769,13 @@ PNG_INTERNAL_FUNCTION(void,png_colorspace_set_gamma,(png_const_structrp png_ptr,
 
 PNG_INTERNAL_FUNCTION(void,png_colorspace_sync_info,(png_const_structrp png_ptr,
     png_inforp info_ptr), PNG_EMPTY);
-    /* Synchronize the info 'valid' flags with the colorspace */
+   /* Synchronize the info 'valid' flags with the colorspace */
 
 PNG_INTERNAL_FUNCTION(void,png_colorspace_sync,(png_const_structrp png_ptr,
     png_inforp info_ptr), PNG_EMPTY);
-    /* Copy the png_struct colorspace to the info_struct and call the above to
-     * synchronize the flags.  Checks for NULL info_ptr and does nothing.
-     */
+   /* Copy the png_struct colorspace to the info_struct and call the above to
+    * synchronize the flags.  Checks for NULL info_ptr and does nothing.
+    */
 #endif
 
 /* Added at libpng version 1.4.0 */

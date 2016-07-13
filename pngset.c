@@ -304,10 +304,10 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 
    length = strlen(units) + 1;
    png_debug1(3, "allocating units for info (%lu bytes)",
-     (unsigned long)length);
+       (unsigned long)length);
 
    info_ptr->pcal_units = png_voidcast(png_charp,
-      png_malloc_warn(png_ptr, length));
+       png_malloc_warn(png_ptr, length));
 
    if (info_ptr->pcal_units == NULL)
    {
@@ -1624,7 +1624,7 @@ png_set_compression_buffer_size(png_structrp png_ptr, png_alloc_size_t size)
       png_error(png_ptr, "invalid compression buffer size");
 
 #  if (defined PNG_SEQUENTIAL_READ_SUPPORTED) || defined PNG_WRITE_SUPPORTED
-      png_ptr->IDAT_size = (png_uint_32)/*SAFE*/size;
+   png_ptr->IDAT_size = (png_uint_32)/*SAFE*/size;
 #  endif /* SEQUENTIAL_READ || WRITE */
 }
 

@@ -5691,6 +5691,7 @@ Version 1.7.0beta82 [July 4, 2016]
   Fixed two Coverity issues in pngcp.c.
 
 Version 1.7.0beta83 [July 4, 2016]
+  Fixed some indentation to comply with our coding style.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
