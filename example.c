@@ -522,7 +522,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    png_set_swap(png_ptr);
 
    /* Add filler (or alpha) byte (before/after each RGB triplet) */
-   png_set_filler(png_ptr, 0xff, PNG_FILLER_AFTER);
+   png_set_filler(png_ptr, 0xffff, PNG_FILLER_AFTER);
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
    /* Turn on interlace handling.  REQUIRED if you are not using
@@ -532,7 +532,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    number_passes = png_set_interlace_handling(png_ptr);
 #else /* !READ_INTERLACING */
    number_passes = 1;
-#endif /* !READ_INTERLACING */
+#endif /* READ_INTERLACING */
 
 
    /* Optional call to gamma correct and add the background to the palette

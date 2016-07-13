@@ -1115,7 +1115,7 @@ store_warning(png_structp ppIn, png_const_charp message)
    if (!ps->expect_warning)
       store_log(ps, pp, message, 0 /* warning */);
    else
-     ps->saw_warning = 1;
+      ps->saw_warning = 1;
 }
 
 /* These somewhat odd functions are used when reading an image to ensure that
