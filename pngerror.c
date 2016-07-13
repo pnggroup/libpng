@@ -65,18 +65,18 @@ png_error,(png_const_structrp png_ptr, png_const_charp error_message),
 
             else
                error_message += offset;
-      }
-
-      else
-      {
-         if ((png_ptr->flags & PNG_FLAG_STRIP_ERROR_TEXT) != 0)
-         {
-            msg[0] = '0';
-            msg[1] = '\0';
-            error_message = msg;
          }
-       }
-     }
+
+         else
+         {
+            if ((png_ptr->flags & PNG_FLAG_STRIP_ERROR_TEXT) != 0)
+            {
+               msg[0] = '0';
+               msg[1] = '\0';
+               error_message = msg;
+            }
+         }
+      }
    }
 #endif
    if (png_ptr != NULL && png_ptr->error_fn != NULL)
@@ -391,10 +391,10 @@ png_benign_error(png_const_structrp png_ptr, png_const_charp error_message)
 void /* PRIVATE */
 png_app_warning(png_const_structrp png_ptr, png_const_charp error_message)
 {
-  if ((png_ptr->flags & PNG_FLAG_APP_WARNINGS_WARN) != 0)
-     png_warning(png_ptr, error_message);
-  else
-     png_error(png_ptr, error_message);
+   if ((png_ptr->flags & PNG_FLAG_APP_WARNINGS_WARN) != 0)
+      png_warning(png_ptr, error_message);
+   else
+      png_error(png_ptr, error_message);
 
 #  ifndef PNG_ERROR_TEXT_SUPPORTED
       PNG_UNUSED(error_message)
@@ -404,10 +404,10 @@ png_app_warning(png_const_structrp png_ptr, png_const_charp error_message)
 void /* PRIVATE */
 png_app_error(png_const_structrp png_ptr, png_const_charp error_message)
 {
-  if ((png_ptr->flags & PNG_FLAG_APP_ERRORS_WARN) != 0)
-     png_warning(png_ptr, error_message);
-  else
-     png_error(png_ptr, error_message);
+   if ((png_ptr->flags & PNG_FLAG_APP_ERRORS_WARN) != 0)
+      png_warning(png_ptr, error_message);
+   else
+      png_error(png_ptr, error_message);
 
 #  ifndef PNG_ERROR_TEXT_SUPPORTED
       PNG_UNUSED(error_message)

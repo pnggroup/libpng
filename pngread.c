@@ -779,8 +779,8 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_CHECK_FOR_INVALID_INDEX_SUPPORTED
    /* Report invalid palette index; added at libng-1.5.10 */
    if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
-      png_ptr->num_palette_max > png_ptr->num_palette)
-     png_benign_error(png_ptr, "Read palette index exceeding num_palette");
+       png_ptr->num_palette_max > png_ptr->num_palette)
+      png_benign_error(png_ptr, "Read palette index exceeding num_palette");
 #endif
 
    do
@@ -1629,7 +1629,7 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
        /* But do not ignore image data handling chunks */
        png_set_keep_unknown_chunks(png_ptr, PNG_HANDLE_CHUNK_AS_DEFAULT,
          chunks_to_process, (int)/*SAFE*/(sizeof chunks_to_process)/5);
-    }
+   }
 }
 
 #  define PNG_SKIP_CHUNKS(p) png_image_skip_unused_chunks(p)

@@ -139,13 +139,13 @@ static char tIME_string[PNG_tIME_STRING_LENGTH] = "tIME chunk is not present";
 static int
 tIME_to_str(png_structp png_ptr, png_charp ts, png_const_timep t)
 {
-    png_const_charp str = png_convert_to_rfc1123(png_ptr, t);
+   png_const_charp str = png_convert_to_rfc1123(png_ptr, t);
 
-    if (str == NULL)
-        return 0;
+   if (str == NULL)
+       return 0;
 
-    strcpy(ts, str);
-    return 1;
+   strcpy(ts, str);
+   return 1;
 }
 #endif /* older libpng */
 #endif
@@ -249,95 +249,95 @@ count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
     *  png_byte pixel_depth   bits per pixel (depth*channels)
     */
 
-    /* Counts the number of zero samples (or zero pixels if color_type is 3 */
+   /* Counts the number of zero samples (or zero pixels if color_type is 3 */
 
-    if (row_info->color_type == 0 || row_info->color_type == 3)
-    {
-       int pos = 0;
-       png_uint_32 n, nstop;
+   if (row_info->color_type == 0 || row_info->color_type == 3)
+   {
+      int pos = 0;
+      png_uint_32 n, nstop;
 
-       for (n = 0, nstop=row_info->width; n<nstop; n++)
-       {
-          if (row_info->bit_depth == 1)
-          {
-             if (((*dp << pos++ ) & 0x80) == 0)
-                zero_samples++;
+      for (n = 0, nstop=row_info->width; n<nstop; n++)
+      {
+         if (row_info->bit_depth == 1)
+         {
+            if (((*dp << pos++ ) & 0x80) == 0)
+               zero_samples++;
 
-             if (pos == 8)
-             {
-                pos = 0;
-                dp++;
-             }
-          }
+            if (pos == 8)
+            {
+               pos = 0;
+               dp++;
+            }
+         }
 
-          if (row_info->bit_depth == 2)
-          {
-             if (((*dp << (pos+=2)) & 0xc0) == 0)
-                zero_samples++;
+         if (row_info->bit_depth == 2)
+         {
+            if (((*dp << (pos+=2)) & 0xc0) == 0)
+               zero_samples++;
 
-             if (pos == 8)
-             {
-                pos = 0;
-                dp++;
-             }
-          }
+            if (pos == 8)
+            {
+               pos = 0;
+               dp++;
+            }
+         }
 
-          if (row_info->bit_depth == 4)
-          {
-             if (((*dp << (pos+=4)) & 0xf0) == 0)
-                zero_samples++;
+         if (row_info->bit_depth == 4)
+         {
+            if (((*dp << (pos+=4)) & 0xf0) == 0)
+               zero_samples++;
 
-             if (pos == 8)
-             {
-                pos = 0;
-                dp++;
-             }
-          }
+            if (pos == 8)
+            {
+               pos = 0;
+               dp++;
+            }
+         }
 
-          if (row_info->bit_depth == 8)
-             if (*dp++ == 0)
-                zero_samples++;
+         if (row_info->bit_depth == 8)
+            if (*dp++ == 0)
+               zero_samples++;
 
-          if (row_info->bit_depth == 16)
-          {
-             if ((*dp | *(dp+1)) == 0)
-                zero_samples++;
-             dp+=2;
-          }
-       }
-    }
-    else /* Other color types */
-    {
-       png_uint_32 n, nstop;
-       int channel;
-       int color_channels = row_info->channels;
-       if (row_info->color_type > 3)
-          color_channels--;
+         if (row_info->bit_depth == 16)
+         {
+            if ((*dp | *(dp+1)) == 0)
+               zero_samples++;
+            dp+=2;
+         }
+      }
+   }
+   else /* Other color types */
+   {
+      png_uint_32 n, nstop;
+      int channel;
+      int color_channels = row_info->channels;
+      if (row_info->color_type > 3)
+         color_channels--;
 
-       for (n = 0, nstop=row_info->width; n<nstop; n++)
-       {
-          for (channel = 0; channel < color_channels; channel++)
-          {
-             if (row_info->bit_depth == 8)
-                if (*dp++ == 0)
-                   zero_samples++;
+      for (n = 0, nstop=row_info->width; n<nstop; n++)
+      {
+         for (channel = 0; channel < color_channels; channel++)
+         {
+            if (row_info->bit_depth == 8)
+               if (*dp++ == 0)
+                  zero_samples++;
 
-             if (row_info->bit_depth == 16)
-             {
-                if ((*dp | *(dp+1)) == 0)
-                   zero_samples++;
+            if (row_info->bit_depth == 16)
+            {
+               if ((*dp | *(dp+1)) == 0)
+                  zero_samples++;
 
-                dp+=2;
-             }
-          }
-          if (row_info->color_type > 3)
-          {
-             dp++;
-             if (row_info->bit_depth == 16)
-                dp++;
-          }
-       }
-    }
+               dp+=2;
+            }
+         }
+         if (row_info->color_type > 3)
+         {
+            dp++;
+            if (row_info->bit_depth == 16)
+               dp++;
+         }
+      }
+   }
 }
 #endif /* WRITE_USER_TRANSFORM */
 
@@ -935,7 +935,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_READ_USER_CHUNKS_SUPPORTED
    init_callback_info(read_info_ptr);
    png_set_read_user_chunk_fn(read_ptr, &user_chunk_data,
-     read_user_chunk_callback);
+       read_user_chunk_callback);
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -1855,19 +1855,19 @@ main(int argc, char *argv[])
    }
 
    if (multiple == 0 && argc == 3 + verbose)
-     outname = argv[2 + verbose];
+      outname = argv[2 + verbose];
 
    if ((multiple == 0 && argc > 3 + verbose) ||
        (multiple != 0 && argc < 2))
    {
-     fprintf(STDERR,
-       "usage: %s [infile.png] [outfile.png]\n\t%s -m {infile.png}\n",
-        argv[0], argv[0]);
-     fprintf(STDERR,
-       "  reads/writes one PNG file (without -m) or multiple files (-m)\n");
-     fprintf(STDERR,
-       "  with -m %s is used as a temporary file\n", outname);
-     exit(1);
+      fprintf(STDERR,
+          "usage: %s [infile.png] [outfile.png]\n\t%s -m {infile.png}\n",
+          argv[0], argv[0]);
+      fprintf(STDERR,
+          "  reads/writes one PNG file (without -m) or multiple files (-m)\n");
+      fprintf(STDERR,
+          "  with -m %s is used as a temporary file\n", outname);
+      exit(1);
    }
 
    if (multiple != 0)

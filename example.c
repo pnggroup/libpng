@@ -375,7 +375,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
     * low byte.
     */
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
-    png_set_scale_16(png_ptr);
+   png_set_scale_16(png_ptr);
 #else
    png_set_strip_16(png_ptr);
 #endif
@@ -383,12 +383,12 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    /* Strip alpha bytes from the input data without combining with the
     * background (not recommended).
     */
-   png_set_strip_alpha(png_ptr);
+    png_set_strip_alpha(png_ptr);
 
    /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
-   png_set_packing(png_ptr);
+    png_set_packing(png_ptr);
 
    /* Change the order of packed pixels to least significant bit first
     * (not useful if you are using png_set_packing). */
@@ -988,11 +988,11 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_bytep row_pointers[height];
 
    if (height > PNG_UINT_32_MAX/(sizeof (png_bytep)))
-     png_error (png_ptr, "Image is too tall to process in memory");
+      png_error (png_ptr, "Image is too tall to process in memory");
 
    /* Set up pointers into your "image" byte array */
    for (k = 0; k < height; k++)
-     row_pointers[k] = image + k*width*bytes_per_pixel;
+      row_pointers[k] = image + k*width*bytes_per_pixel;
 
    /* One of the following output methods is REQUIRED */
 
