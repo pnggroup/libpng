@@ -2,8 +2,8 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.6.15 [November 20, 2014]
- * Maintained 1998-2014 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.24 [(PENDING RELEASE)]
+ * Maintained 1998-2016 Glenn Randers-Pehrson
  * Maintained 1996, 1997 Andreas Dilger)
  * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  * To the extent possible under law, the authors have waived
@@ -383,12 +383,12 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
    /* Strip alpha bytes from the input data without combining with the
     * background (not recommended).
     */
-    png_set_strip_alpha(png_ptr);
+   png_set_strip_alpha(png_ptr);
 
    /* Extract multiple pixels with bit depths of 1, 2, and 4 from a single
     * byte into separate bytes (useful for paletted and grayscale images).
     */
-    png_set_packing(png_ptr);
+   png_set_packing(png_ptr);
 
    /* Change the order of packed pixels to least significant bit first
     * (not useful if you are using png_set_packing). */
@@ -530,7 +530,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
     * see the png_read_row() method below:
     */
    number_passes = png_set_interlace_handling(png_ptr);
-#else
+#else /* !READ_INTERLACING */
    number_passes = 1;
 #endif /* READ_INTERLACING */
 
