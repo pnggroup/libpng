@@ -2684,7 +2684,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
    }
 
    /* Paeth filter */
-   if ((filter_to_do == PNG_FILTER_PAETH) != 0)
+   if (filter_to_do == PNG_FILTER_PAETH)
    {
       png_setup_paeth_row_only(png_ptr, bpp, row_bytes);
       best_row = png_ptr->try_row;
