@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# reindent inputabsize outputabsize inputcontinuestring outputcontinuestring
+# eg, to change libpng coding style from 3-space indentation to 4-space
+#
+#  reindent 3 4 " " "  " < example.c.orig > example.c
+#
+# Assumes that continued lines begin with indentation plus one space, and
+# that continued comments begin with indentation plus " *".
+
+unexpand --first-only --t $inputtabsize $1 | \
+   sed -e "/^	$3[^\*]/{s/	$3/	$4/}" | \
+   expand -t $2
