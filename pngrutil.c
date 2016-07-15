@@ -3418,8 +3418,8 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
                   /* Everything is aligned for png_uint_16 copies, but try for
                    * png_uint_32 first.
                    */
-                  if (png_isaligned(dp, png_uint_32) != 0 &&
-                      png_isaligned(sp, png_uint_32) != 0 &&
+                  if (png_isaligned(dp, png_uint_32) &&
+                      png_isaligned(sp, png_uint_32) &&
                       bytes_to_copy % (sizeof (png_uint_32)) == 0 &&
                       bytes_to_jump % (sizeof (png_uint_32)) == 0)
                   {
