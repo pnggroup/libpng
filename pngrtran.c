@@ -3436,7 +3436,7 @@ png_init_gamma(png_transformp *transform, png_transform_controlp tc)
 
 static png_fixed_point
 translate_gamma_flags(png_const_structrp png_ptr, png_fixed_point gamma,
-   int is_screen)
+    int is_screen)
    /* If 'is_screen' is set this returns the inverse of the supplied value; i.e.
     * this routine always returns an encoding value.
     */
@@ -3511,7 +3511,7 @@ add_gamma_transform(png_structrp png_ptr, unsigned int order,
 
 void PNGFAPI
 png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
-   png_fixed_point file_gamma)
+    png_fixed_point file_gamma)
 {
    png_debug(1, "in png_set_gamma_fixed");
 
@@ -3566,7 +3566,7 @@ void PNGAPI
 png_set_gamma(png_structrp png_ptr, double scrn_gamma, double file_gamma)
 {
    png_set_gamma_fixed(png_ptr, convert_gamma_value(png_ptr, scrn_gamma),
-      convert_gamma_value(png_ptr, file_gamma));
+       convert_gamma_value(png_ptr, file_gamma));
 }
 #endif /* FLOATING_POINT */
 #endif /* READ_GAMMA */
@@ -4044,7 +4044,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
 
 void PNGAPI
 png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
-   double green)
+    double green)
 {
    png_set_rgb_to_gray_fixed(png_ptr, error_action,
       png_fixed(png_ptr, red, "rgb to gray red coefficient"),
@@ -5490,7 +5490,7 @@ png_set_background(png_structrp png_ptr,
 #ifdef PNG_READ_ALPHA_MODE_SUPPORTED
 void PNGFAPI
 png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
-   png_fixed_point output_gamma)
+    png_fixed_point output_gamma)
 {
    if (png_ptr != NULL)
    {
@@ -5603,7 +5603,7 @@ void PNGAPI
 png_set_alpha_mode(png_structrp png_ptr, int mode, double output_gamma)
 {
    png_set_alpha_mode_fixed(png_ptr, mode, convert_gamma_value(png_ptr,
-      output_gamma));
+       output_gamma));
 }
 #endif /* FLOATING_POINT */
 #endif /* READ_ALPHA_MODE */

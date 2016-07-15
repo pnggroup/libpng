@@ -59,7 +59,7 @@ png_write_sig(png_structrp png_ptr)
 
    /* Write the rest of the 8 byte signature */
    png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
-      (png_size_t)(8 - png_ptr->sig_bytes));
+       (png_size_t)(8 - png_ptr->sig_bytes));
 
    if (png_ptr->sig_bytes < 3)
       png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
@@ -172,7 +172,7 @@ png_write_chunk_end(png_structrp png_ptr)
  */
 static void
 png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
-   png_const_voidp data, png_size_t length)
+    png_const_voidp data, png_size_t length)
 {
    if (png_ptr == NULL)
       return;
@@ -189,10 +189,10 @@ png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
 /* This is the API that calls the internal function above. */
 void PNGAPI
 png_write_chunk(png_structrp png_ptr, png_const_bytep chunk_string,
-   png_const_voidp data, png_size_t length)
+    png_const_voidp data, png_size_t length)
 {
    png_write_complete_chunk(png_ptr, PNG_CHUNK_FROM_STRING(chunk_string), data,
-      length);
+       length);
 }
 
 static png_alloc_size_t
@@ -314,7 +314,7 @@ typedef struct png_compression_buffer
 /* Deleting a compression buffer deletes the whole list: */
 static void
 png_free_compression_buffer(png_const_structrp png_ptr,
-      png_compression_bufferp *listp)
+    png_compression_bufferp *listp)
 {
    png_compression_bufferp list = *listp;
 
@@ -338,7 +338,7 @@ png_free_compression_buffer(png_const_structrp png_ptr,
  */
 static png_compression_bufferp
 png_get_compression_buffer(png_const_structrp png_ptr,
-      png_compression_bufferp *end)
+    png_compression_bufferp *end)
 {
    png_compression_bufferp next = *end;
 
@@ -1714,7 +1714,7 @@ png_image_size(png_const_structrp png_ptr)
 /* Initialize the compressor for the appropriate type of compression. */
 static png_zlib_statep
 png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
-      png_alloc_size_t data_size)
+    png_alloc_size_t data_size)
 {
    png_zlib_statep ps = get_zlib_state(png_ptr);
 
@@ -1789,8 +1789,8 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
 
       else
          ret = deflateInit2(&ps->s.zs, pz_value(level, settings), Z_DEFLATED,
-               pz_value(windowBits, settings), pz_value(memLevel, settings),
-               pz_value(strategy, settings));
+             pz_value(windowBits, settings), pz_value(memLevel, settings),
+             pz_value(strategy, settings));
 
       ps->pz_current = settings;
 
@@ -1824,7 +1824,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
  */
 static int /* success */
 png_compress_chunk_data(png_structrp png_ptr, png_uint_32 chunk_name,
-      png_uint_32 prefix_len, png_const_voidp input, png_alloc_size_t input_len)
+    png_uint_32 prefix_len, png_const_voidp input, png_alloc_size_t input_len)
 {
    /* To find the length of the output it is necessary to first compress the
     * input. The result is buffered rather than using the two-pass algorithm
@@ -3234,7 +3234,7 @@ png_write_IDAT(png_structrp png_ptr, int flush)
  */
 static int
 png_compress_IDAT_data(png_structrp png_ptr, png_zlib_statep ps,
-      png_zlib_compressp pz, png_const_voidp input, uInt input_len, int flush)
+    png_zlib_compressp pz, png_const_voidp input, uInt input_len, int flush)
 {
    /* Delay initialize the z_stream. */
    if (png_ptr->zowner != png_IDAT)
@@ -3278,7 +3278,7 @@ png_compress_IDAT_data(png_structrp png_ptr, png_zlib_statep ps,
  */
 static void
 png_compress_IDAT(png_structrp png_ptr, png_const_voidp input, uInt input_len,
-      int flush)
+    int flush)
 {
    png_zlib_statep ps = png_ptr->zlib_state;
    int ret = png_compress_IDAT_data(png_ptr, ps, &ps->s, input, input_len,
@@ -4447,7 +4447,7 @@ select_filter(png_zlib_statep ps, png_const_bytep row,
  */
 void /* PRIVATE */
 png_write_png_rows(png_structrp png_ptr, png_const_bytep *rows,
-      png_uint_32 num_rows)
+    png_uint_32 num_rows)
 {
    const png_zlib_statep ps = png_ptr->zlib_state;
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
@@ -4755,8 +4755,8 @@ write_png_data(png_structrp png_ptr, png_const_bytep prev_row,
 
 void /* PRIVATE */
 png_write_png_data(png_structrp png_ptr, png_bytep prev_pixels,
-      png_const_bytep unfiltered_row, png_uint_32 x,
-      unsigned int width/*pixels*/, unsigned int row_info_flags)
+    png_const_bytep unfiltered_row, png_uint_32 x,
+    unsigned int width/*pixels*/, unsigned int row_info_flags)
 {
    const png_zlib_statep ps = png_ptr->zlib_state;
 
@@ -4876,8 +4876,8 @@ png_write_start_IDAT(png_structrp png_ptr)
 
 void /* PRIVATE */
 png_write_png_data(png_structrp png_ptr, png_bytep prev_pixels,
-      png_const_bytep unfiltered_row, png_uint_32 x,
-      unsigned int width/*pixels*/, unsigned int row_info_flags)
+    png_const_bytep unfiltered_row, png_uint_32 x,
+    unsigned int width/*pixels*/, unsigned int row_info_flags)
 {
    const unsigned int bpp = png_ptr->row_output_pixel_depth;
    int flush;
@@ -4905,7 +4905,7 @@ png_write_png_data(png_structrp png_ptr, png_bytep prev_pixels,
 
 png_int_32 /* PRIVATE */
 png_write_setting(png_structrp png_ptr, png_uint_32 setting,
-      png_uint_32 parameter, png_int_32 value)
+    png_uint_32 parameter, png_int_32 value)
 {
    /* Caller checks the arguments for basic validity */
    int only_get = (setting & PNG_SF_GET) != 0U;
@@ -4930,24 +4930,24 @@ png_write_setting(png_structrp png_ptr, png_uint_32 setting,
       /* Settings in zlib_state: */
          case PNG_SW_COMPRESS_png_level:
             return compression_setting(png_ptr, parameter, png_level, value,
-                  only_get);
+                only_get);
 
 #     ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
          case PNG_SW_COMPRESS_zlib_level:
             return compression_setting(png_ptr, parameter, level, value,
-                  only_get);
+                only_get);
 
          case PNG_SW_COMPRESS_windowBits:
             return compression_setting(png_ptr, parameter, windowBits, value,
-                  only_get);
+                only_get);
 
          case PNG_SW_COMPRESS_memLevel:
             return compression_setting(png_ptr, parameter, memLevel, value,
-                  only_get);
+                only_get);
 
          case PNG_SW_COMPRESS_strategy:
             return compression_setting(png_ptr, parameter, strategy, value,
-                  only_get);
+                only_get);
 
          case PNG_SW_COMPRESS_method:
             if (value != 8) /* Only supported method */
@@ -4964,7 +4964,7 @@ png_write_setting(png_structrp png_ptr, png_uint_32 setting,
                   return set_filter(get_zlib_state(png_ptr), value);
 
                else if (png_ptr->zlib_state != NULL &&
-                        png_ptr->zlib_state->filter_mask != 0U/*unset*/)
+                   png_ptr->zlib_state->filter_mask != 0U/*unset*/)
                   return png_ptr->zlib_state->filter_mask;
 
                else

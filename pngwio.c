@@ -45,7 +45,7 @@ png_write_data(png_structrp png_ptr, png_const_voidp data, png_size_t length)
     */
    if (png_ptr->rw_data_fn != NULL )
       png_ptr->rw_data_fn(png_ptr,
-         png_constcast(png_bytep,png_voidcast(png_const_bytep,data)), length);
+          png_constcast(png_bytep,png_voidcast(png_const_bytep,data)), length);
 
    else
       png_app_error(png_ptr, "No write function");
@@ -130,7 +130,7 @@ png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
    if (write_data_fn == NULL)
    {
       png_app_error(png_ptr,
-         "API change: png_set_write_fn requires a function");
+          "API change: png_set_write_fn requires a function");
       return;
    }
 

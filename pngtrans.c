@@ -3579,7 +3579,7 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp ptr, int depth,
             }
             else
                png_app_error(png_ptr,
-                  "cannot change user info after image start");
+                   "cannot change user info after image start");
          }
 #     else /* !READ_USER_TRANSFORM */
          PNG_UNUSED(depth)

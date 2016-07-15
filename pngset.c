@@ -105,14 +105,14 @@ png_set_cHRM(png_const_structrp png_ptr, png_inforp info_ptr,
     double green_x, double green_y, double blue_x, double blue_y)
 {
    png_set_cHRM_fixed(png_ptr, info_ptr,
-      png_fixed(png_ptr, white_x, "cHRM White X"),
-      png_fixed(png_ptr, white_y, "cHRM White Y"),
-      png_fixed(png_ptr, red_x, "cHRM Red X"),
-      png_fixed(png_ptr, red_y, "cHRM Red Y"),
-      png_fixed(png_ptr, green_x, "cHRM Green X"),
-      png_fixed(png_ptr, green_y, "cHRM Green Y"),
-      png_fixed(png_ptr, blue_x, "cHRM Blue X"),
-      png_fixed(png_ptr, blue_y, "cHRM Blue Y"));
+       png_fixed(png_ptr, white_x, "cHRM White X"),
+       png_fixed(png_ptr, white_y, "cHRM White Y"),
+       png_fixed(png_ptr, red_x, "cHRM Red X"),
+       png_fixed(png_ptr, red_y, "cHRM Red Y"),
+       png_fixed(png_ptr, green_x, "cHRM Green X"),
+       png_fixed(png_ptr, green_y, "cHRM Green Y"),
+       png_fixed(png_ptr, blue_x, "cHRM Blue X"),
+       png_fixed(png_ptr, blue_y, "cHRM Blue Y"));
 }
 
 void PNGAPI
@@ -121,15 +121,15 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
     double blue_X, double blue_Y, double blue_Z)
 {
    png_set_cHRM_XYZ_fixed(png_ptr, info_ptr,
-      png_fixed(png_ptr, red_X, "cHRM Red X"),
-      png_fixed(png_ptr, red_Y, "cHRM Red Y"),
-      png_fixed(png_ptr, red_Z, "cHRM Red Z"),
-      png_fixed(png_ptr, green_X, "cHRM Green X"),
-      png_fixed(png_ptr, green_Y, "cHRM Green Y"),
-      png_fixed(png_ptr, green_Z, "cHRM Green Z"),
-      png_fixed(png_ptr, blue_X, "cHRM Blue X"),
-      png_fixed(png_ptr, blue_Y, "cHRM Blue Y"),
-      png_fixed(png_ptr, blue_Z, "cHRM Blue Z"));
+       png_fixed(png_ptr, red_X, "cHRM Red X"),
+       png_fixed(png_ptr, red_Y, "cHRM Red Y"),
+       png_fixed(png_ptr, red_Z, "cHRM Red Z"),
+       png_fixed(png_ptr, green_X, "cHRM Green X"),
+       png_fixed(png_ptr, green_Y, "cHRM Green Y"),
+       png_fixed(png_ptr, green_Z, "cHRM Green Z"),
+       png_fixed(png_ptr, blue_X, "cHRM Blue X"),
+       png_fixed(png_ptr, blue_Y, "cHRM Blue Y"),
+       png_fixed(png_ptr, blue_Z, "cHRM Blue Z"));
 }
 #  endif /* FLOATING_POINT */
 
@@ -386,7 +386,7 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthw);
 
    info_ptr->scal_s_width = png_voidcast(png_charp,
-      png_malloc_warn(png_ptr, lengthw));
+       png_malloc_warn(png_ptr, lengthw));
 
    if (info_ptr->scal_s_width == NULL)
    {
@@ -402,7 +402,7 @@ png_set_sCAL_s(png_const_structrp png_ptr, png_inforp info_ptr,
    png_debug1(3, "allocating unit for info (%u bytes)", (unsigned int)lengthh);
 
    info_ptr->scal_s_height = png_voidcast(png_charp,
-      png_malloc_warn(png_ptr, lengthh));
+       png_malloc_warn(png_ptr, lengthh));
 
    if (info_ptr->scal_s_height == NULL)
    {
@@ -442,9 +442,9 @@ png_set_sCAL(png_const_structrp png_ptr, png_inforp info_ptr, int unit,
       char sheight[PNG_sCAL_MAX_DIGITS+1];
 
       png_ascii_from_fp(png_ptr, swidth, (sizeof swidth), width,
-         PNG_sCAL_PRECISION);
+          PNG_sCAL_PRECISION);
       png_ascii_from_fp(png_ptr, sheight, (sizeof sheight), height,
-         PNG_sCAL_PRECISION);
+          PNG_sCAL_PRECISION);
 
       png_set_sCAL_s(png_ptr, info_ptr, unit, swidth, sheight);
    }
@@ -644,7 +644,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
     */
    {
       int result = png_colorspace_set_ICC(png_ptr, &info_ptr->colorspace, name,
-         proflen, profile, (info_ptr->format & PNG_FORMAT_FLAG_COLOR) != 0);
+          proflen, profile, (info_ptr->format & PNG_FORMAT_FLAG_COLOR) != 0);
 
       png_colorspace_sync_info(png_ptr, info_ptr);
 
@@ -654,7 +654,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
       /* But do write the gAMA and cHRM chunks from the profile. */
       info_ptr->colorspace.flags |=
-         PNG_COLORSPACE_FROM_gAMA|PNG_COLORSPACE_FROM_cHRM;
+          PNG_COLORSPACE_FROM_gAMA|PNG_COLORSPACE_FROM_cHRM;
    }
 
    length = strlen(name)+1;
@@ -669,7 +669,7 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
    memcpy(new_iccp_name, name, length);
    new_iccp_profile = png_voidcast(png_bytep,
-      png_malloc_warn(png_ptr, proflen));
+       png_malloc_warn(png_ptr, proflen));
 
    if (new_iccp_profile == NULL)
    {
@@ -819,14 +819,14 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
           * the overflow checks.
           */
          new_text = png_voidcast(png_textp,png_realloc_array(png_ptr,
-            info_ptr->text, old_num_text, max_text-old_num_text,
-            sizeof *new_text));
+             info_ptr->text, old_num_text, max_text-old_num_text,
+             sizeof *new_text));
       }
 
       if (new_text == NULL)
       {
          png_chunk_report(png_ptr, "too many text chunks",
-            PNG_CHUNK_WRITE_ERROR);
+             PNG_CHUNK_WRITE_ERROR);
 
          return 1;
       }
@@ -854,7 +854,7 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
           text_ptr[i].compression >= PNG_TEXT_COMPRESSION_LAST)
       {
          png_chunk_report(png_ptr, "text compression mode is out of range",
-            PNG_CHUNK_WRITE_ERROR);
+             PNG_CHUNK_WRITE_ERROR);
          continue;
       }
 
@@ -886,7 +886,7 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
 #  else /* iTXt */
       {
          png_chunk_report(png_ptr, "iTXt chunk not supported",
-            PNG_CHUNK_WRITE_ERROR);
+             PNG_CHUNK_WRITE_ERROR);
          continue;
       }
 #  endif
@@ -921,7 +921,7 @@ png_set_text_2(png_structrp png_ptr, png_inforp info_ptr,
       if (textp->key == NULL)
       {
          png_chunk_report(png_ptr, "text chunk: out of memory",
-               PNG_CHUNK_WRITE_ERROR);
+             PNG_CHUNK_WRITE_ERROR);
 
          return 1;
       }
@@ -1031,7 +1031,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
    if ((info_ptr->format & PNG_FORMAT_FLAG_ALPHA) != 0)
       png_chunk_report(png_ptr,
-         "png_set_tRNS: invalid on PNG with alpha channel", PNG_CHUNK_ERROR);
+          "png_set_tRNS: invalid on PNG with alpha channel", PNG_CHUNK_ERROR);
 
    else if ((info_ptr->format & PNG_FORMAT_FLAG_COLORMAP) != 0)
    {
@@ -1057,7 +1057,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
       if (num_trans > max_num)
       {
          png_chunk_report(png_ptr, "png_set_tRNS: num_trans too large",
-            PNG_CHUNK_ERROR);
+             PNG_CHUNK_ERROR);
          /* If control returns simply limit it; the behavior prior to 1.7 was to
           * issue a warning and skip the palette in png_write_tRNS.
           */
@@ -1074,11 +1074,11 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
           * indices.
           */
          info_ptr->trans_alpha = png_voidcast(png_bytep, png_malloc(png_ptr,
-            PNG_MAX_PALETTE_LENGTH));
+             PNG_MAX_PALETTE_LENGTH));
          info_ptr->free_me |= PNG_FREE_TRNS;
 
          memcpy(info_ptr->trans_alpha, trans_alpha,
-            (unsigned)/*SAFE*/num_trans);
+             (unsigned)/*SAFE*/num_trans);
          info_ptr->valid |= PNG_INFO_tRNS;
          info_ptr->num_trans = png_check_bits(png_ptr, num_trans, 9);
       }
@@ -1109,8 +1109,8 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
          else
             png_chunk_report(png_ptr,
-               "tRNS chunk has out-of-range samples for bit_depth",
-               PNG_CHUNK_ERROR);
+                "tRNS chunk has out-of-range samples for bit_depth",
+                PNG_CHUNK_ERROR);
       }
    }
 }
@@ -1138,8 +1138,8 @@ png_set_sPLT(png_structrp png_ptr,
     * overflows.  Notice that the parameters are (int) and (size_t)
     */
    np = png_voidcast(png_sPLT_tp,png_realloc_array(png_ptr,
-      info_ptr->splt_palettes, info_ptr->splt_palettes_num, nentries,
-      sizeof *np));
+       info_ptr->splt_palettes, info_ptr->splt_palettes_num, nentries,
+       sizeof *np));
 
    if (np == NULL)
    {
@@ -1200,7 +1200,7 @@ png_set_sPLT(png_structrp png_ptr,
        * checked it when doing the allocation.
        */
       memcpy(np->entries, entries->entries,
-         entries->nentries * sizeof (png_sPLT_entry));
+          entries->nentries * sizeof (png_sPLT_entry));
 
       /* Note that 'continue' skips the advance of the out pointer and out
        * count, so an invalid entry is not added.
@@ -1230,10 +1230,10 @@ check_location(png_const_structrp png_ptr, int location)
    {
       /* Write struct, so unknown chunks come from the app */
       png_app_warning(png_ptr,
-         "png_set_unknown_chunks now expects a valid location");
+          "png_set_unknown_chunks now expects a valid location");
       /* Use the old behavior */
       location = png_check_byte(png_ptr, png_ptr->mode &
-         (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT));
+          (PNG_HAVE_IHDR|PNG_HAVE_PLTE|PNG_AFTER_IDAT));
    }
 
    /* This need not be an internal error - if the app calls
@@ -1256,7 +1256,7 @@ check_location(png_const_structrp png_ptr, int location)
 
 void PNGAPI
 png_set_unknown_chunks(png_structrp png_ptr,
-   png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
+    png_inforp info_ptr, png_const_unknown_chunkp unknowns, int num_unknowns)
 {
    png_unknown_chunkp np;
 
@@ -1326,12 +1326,12 @@ png_set_unknown_chunks(png_structrp png_ptr,
       else
       {
          np->data = png_voidcast(png_bytep,
-            png_malloc_base(png_ptr, unknowns->size));
+             png_malloc_base(png_ptr, unknowns->size));
 
          if (np->data == NULL)
          {
             png_chunk_report(png_ptr, "unknown chunk: out of memory",
-               PNG_CHUNK_ERROR);
+                PNG_CHUNK_ERROR);
             /* But just skip storing the unknown chunk */
             continue;
          }
@@ -1536,7 +1536,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       for (i=0; i<num_chunks; ++i)
       {
          old_num_chunks = add_one_chunk(png_ptr, new_list, old_num_chunks,
-            chunk_list+5*i, keep);
+             chunk_list+5*i, keep);
       }
 
       /* Now remove any spurious 'default' entries. */

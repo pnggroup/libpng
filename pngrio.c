@@ -91,7 +91,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, png_size_t length)
  */
 void PNGAPI
 png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
-   png_rw_ptr read_data_fn)
+    png_rw_ptr read_data_fn)
 {
    if (png_ptr == NULL)
       return;
