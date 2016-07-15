@@ -5657,7 +5657,8 @@ Version 1.6.24beta05 [July 13, 2016]
   Fixed some indentation to comply with our coding style.
   Added contrib/tools/reindent.
 
-Version 1.6.24beta06 [July 14, 2016]
+Version 1.6.24beta06 [July 15, 2016]
+  Fixed more indentation to comply with our coding style.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

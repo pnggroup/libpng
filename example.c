@@ -97,7 +97,7 @@ int main(int argc, const char **argv)
           */
          if (buffer != NULL &&
             png_image_finish_read(&image, NULL/*background*/, buffer,
-               0/*row_stride*/, NULL/*colormap*/) != 0)
+                0/*row_stride*/, NULL/*colormap*/) != 0)
          {
             /* Now write the image out to the second argument.  In the write
              * call 'convert_to_8bit' allows 16-bit data to be squashed down to
@@ -105,7 +105,7 @@ int main(int argc, const char **argv)
              * to the 8-bit format.
              */
             if (png_image_write_to_file(&image, argv[2], 0/*convert_to_8bit*/,
-               buffer, 0/*row_stride*/, NULL/*colormap*/) != 0)
+                buffer, 0/*row_stride*/, NULL/*colormap*/) != 0)
             {
                /* The image has been written successfully. */
                exit(0);
@@ -295,7 +295,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
     * was compiled with a compatible version of the library.  REQUIRED
     */
    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-      png_voidp user_error_ptr, user_error_fn, user_warning_fn);
+       png_voidp user_error_ptr, user_error_fn, user_warning_fn);
 
    if (png_ptr == NULL)
    {
@@ -419,10 +419,10 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
 
    if (png_get_bKGD(png_ptr, info_ptr, &image_background) != 0)
       png_set_background(png_ptr, image_background,
-                         PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
+          PNG_BACKGROUND_GAMMA_FILE, 1, 1.0);
    else
       png_set_background(png_ptr, &my_background,
-                         PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
+          PNG_BACKGROUND_GAMMA_SCREEN, 0, 1.0);
 
    /* Some suggestions as to how to get a screen gamma value
     *
@@ -481,7 +481,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
          png_color std_color_cube[MAX_SCREEN_COLORS];
 
          png_set_quantize(png_ptr, std_color_cube, MAX_SCREEN_COLORS,
-            MAX_SCREEN_COLORS, NULL, 0);
+             MAX_SCREEN_COLORS, NULL, 0);
       }
       /* This reduces the image to the palette supplied in the file */
       else if (png_get_PLTE(png_ptr, info_ptr, &palette, &num_palette) != 0)
@@ -491,7 +491,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
          png_get_hIST(png_ptr, info_ptr, &histogram);
 
          png_set_quantize(png_ptr, palette, num_palette,
-                        max_screen_colors, histogram, 0);
+             max_screen_colors, histogram, 0);
       }
    }
 #endif /* READ_QUANTIZE */
@@ -552,7 +552,7 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
 
    for (row = 0; row < height; row++)
       row_pointers[row] = png_malloc(png_ptr, png_get_rowbytes(png_ptr,
-         info_ptr));
+          info_ptr));
 
    /* Now it's time to read the image.  One of these methods is REQUIRED */
 #ifdef entire /* Read the entire image in one go */
@@ -574,10 +574,10 @@ void read_png(FILE *fp, int sig_read)  /* File is already open */
       {
 #ifdef sparkle /* Read the image using the "sparkle" effect. */
          png_read_rows(png_ptr, &row_pointers[y], NULL,
-            number_of_rows);
+             number_of_rows);
 #else no_sparkle /* Read the image using the "rectangle" effect */
          png_read_rows(png_ptr, NULL, &row_pointers[y],
-            number_of_rows);
+             number_of_rows);
 #endif no_sparkle /* Use only one of these two methods */
       }
 
@@ -614,7 +614,7 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
     * linked libraries.
     */
    *png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
-       png_voidp user_error_ptr, user_error_fn, user_warning_fn);
+        png_voidp user_error_ptr, user_error_fn, user_warning_fn);
 
    if (*png_ptr == NULL)
    {
@@ -649,14 +649,14 @@ initialize_png_reader(png_structp *png_ptr, png_infop *info_ptr)
     * the function png_get_progressive_ptr(png_ptr).
     */
    png_set_progressive_read_fn(*png_ptr, (void *)stream_data,
-      info_callback, row_callback, end_callback);
+       info_callback, row_callback, end_callback);
 
    return (OK);
 }
 
 int
 process_data(png_structp *png_ptr, png_infop *info_ptr,
-   png_bytep buffer, png_uint_32 length)
+    png_bytep buffer, png_uint_32 length)
 {
    if (setjmp(png_jmpbuf((*png_ptr))))
    {
@@ -691,7 +691,7 @@ info_callback(png_structp png_ptr, png_infop info)
 }
 
 row_callback(png_structp png_ptr, png_bytep new_row,
-   png_uint_32 row_num, int pass)
+    png_uint_32 row_num, int pass)
 {
    /*
     * This function is called for every row in the image.  If the
@@ -780,7 +780,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * in case we are using dynamically linked libraries.  REQUIRED.
     */
    png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
-      png_voidp user_error_ptr, user_error_fn, user_warning_fn);
+       png_voidp user_error_ptr, user_error_fn, user_warning_fn);
 
    if (png_ptr == NULL)
    {
@@ -819,7 +819,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * png_init_io() here you would call
     */
    png_set_write_fn(png_ptr, (void *)user_io_ptr, user_write_fn,
-      user_IO_flush_function);
+       user_IO_flush_function);
    /* where user_io_ptr is a structure you want available to the callbacks */
 #endif no_streams /* Only use one initialization method */
 
@@ -842,7 +842,7 @@ void write_png(char *file_name /* , ... other image information ... */)
     * currently be PNG_COMPRESSION_TYPE_BASE and PNG_FILTER_TYPE_BASE. REQUIRED
     */
    png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth, PNG_COLOR_TYPE_???,
-      PNG_INTERLACE_????, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+       PNG_INTERLACE_????, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
    /* Set the palette if there is one.  REQUIRED for indexed-color images */
    palette = (png_colorp)png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH
