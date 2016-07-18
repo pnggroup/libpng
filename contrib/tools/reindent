@@ -13,10 +13,13 @@
 # Assumes that continued lines begin with indentation plus one space, and
 # that continued comments begin with indentation plus " *".
 #
-# eg, to change libpng coding style from 3-space indentation to 4-space
+# eg, to change libpng coding style from 3-space indentation with 4-space
+# continuations to 4-space indentation with 2-space continuations:
 #
-#  reindent 3 4 " " "  " < example.c > example.c_reindented
+#  reindent 3 4 "\t " "  " < example.c > example.c_4_2
+# and to restore the file back to libpng coding style
+#  reindent 4 3 "  " "    " < example.c_4_2 > example.c_3_4
 
 unexpand --first-only --t $1 | \
-   sed -e "/^	$3[^\*]/{s/	$3/	$4/}" | \
+   sed -e "/^	*$3[^\*]/{s/$3/$4/}" | \
    expand -t $2
