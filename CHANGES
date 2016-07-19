@@ -5661,6 +5661,8 @@ Version 1.6.24beta06 [July 18, 2016]
   Fixed more indentation to comply with our coding style.
   Eliminated unnecessary tests of boolean png_isaligned() vs 0.
 
+Version 1.6.24beta07 [July 19, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
