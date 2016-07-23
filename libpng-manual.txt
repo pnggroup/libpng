@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.7.0beta83 - July 4, 2016
+ libpng version 1.7.0beta83 - July 23, 2016
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.7.0beta83 - July 4, 2016
+ libpng versions 0.97, January 1998, through 1.7.0beta83 - July 23, 2016
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2015 Glenn Randers-Pehrson
 
@@ -5247,6 +5247,19 @@ the statement that follows the comment:
      */
     statement;
 
+%17+%Linus Torvalds recomends putting the leading "/*" in multiple-line
+%17+%comments on a separate line:
+%17+%
+%17+%    /*
+%17+%     * This is a multiple-line
+%17+%     * comment.
+%17+%     */
+%17+%    statement;
+%17+%
+%17+%See
+%17+%https://developers.slashdot.org/story/16/07/12/2036201
+%17+%/linus-torvalds-in-sweary-rant-about-punctuation-in-kernel-comments
+%17+%
 Very short comments can be placed after the end of the statement
 to which they pertain:
 
