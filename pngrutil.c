@@ -231,10 +231,10 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
       else if (warn < 2) /* else silent */
       {
          if (warn != 0)
-             png_chunk_warning(png_ptr, "insufficient memory to read chunk");
+            png_chunk_warning(png_ptr, "insufficient memory to read chunk");
 
          else
-             png_chunk_error(png_ptr, "insufficient memory to read chunk");
+            png_chunk_error(png_ptr, "insufficient memory to read chunk");
       }
    }
 
@@ -4292,7 +4292,7 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                      /* Run the list.  It is ok if it doesn't end up doing
                       * anything; this can happen with a lazy init.
                       *
-                      * NOTE: if the only thingin the list is a palette check
+                      * NOTE: if the only thing in the list is a palette check
                       * function it can remove itself at this point.
                       */
                      max_depth = png_run_transform_list_forwards(png_ptr, &tc);
