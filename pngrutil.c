@@ -4309,10 +4309,11 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
                         png_ptr->row_range == tc.range &&
                         png_ptr->row_bit_depth == tc.bit_depth);
 #                    ifdef PNG_READ_GAMMA_SUPPORTED
-                        /* This sometimes fails at present when gamma
-                         * transforms are eliminated in PNG_TC_INIT_FINAL:
+                        /* This checks the output gamma taking into account the
+                         * fact that small gamma changes are eliminated.
                          */
-                        debug(png_ptr->row_gamma == tc.gamma);
+                        debug(png_ptr->row_gamma == tc.gamma ||
+                              png_gamma_check(png_ptr, &tc));
 #                    endif /* READ_GAMMA */
 
                      /* If the caller needs the row saved (for the progressive

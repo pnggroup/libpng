@@ -3434,6 +3434,26 @@ png_init_gamma(png_transformp *transform, png_transform_controlp tc)
    }
 }
 
+#if !PNG_RELEASE_BUILD
+int /* PRIVATE(debug only) */
+png_gamma_check(png_const_structrp png_ptr, png_const_transform_controlp tc)
+   /* Debugging only routine to repeat the test used above to determine if the
+    * gamma was insignificant.
+    *
+    * NOTE: JB20160723: This may still be incorrect in a complicated transform
+    * pipeline because it uses 'tc_sBIT' for the end of the pipeline whereas the
+    * init above happens earlier.  I don't think this matters because the test
+    * is only invoked if the gamma transform is eliminated or if there is a bug
+    * and in the former case the sBIT values should remain unchanged.
+    */
+{
+   png_fixed_point dummy;
+
+   return png_gamma_equal(png_ptr, png_ptr->row_gamma, tc->gamma, &dummy,
+                          tc_sBIT(tc));
+}
+#endif /* !RELEASE_BUILD */
+
 static png_fixed_point
 translate_gamma_flags(png_const_structrp png_ptr, png_fixed_point gamma,
     int is_screen)

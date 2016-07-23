@@ -2117,6 +2117,14 @@ PNG_INTERNAL_FUNCTION(unsigned int,png_gamma_nxmbit_correct,
    /* In this case the value must have 'n' bits and the output will have 'm'
     * bits.
     */
+
+#if !PNG_RELEASE_BUILD
+PNG_INTERNAL_FUNCTION(int,png_gamma_check,(png_const_structrp png_ptr,
+   png_const_transform_controlp tc),PNG_EMPTY);
+   /* Debugging only routine to repeat the test used above to determine if the
+    * gamma was insignificant.
+    */
+#endif /* !RELEASE_BUILD */
 #endif /* READ_GAMMA */
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED
