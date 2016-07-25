@@ -25,7 +25,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.24beta07],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.24rc01],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -36,7 +36,7 @@ AC_CONFIG_MACRO_DIR([scripts])
 # 1.13 is required for parallel tests
 AM_INIT_AUTOMAKE([1.13 foreign dist-xz color-tests silent-rules subdir-objects])
 # The following line causes --disable-maintainer-mode to be the default to
-# configure, this is necessary because libpng distributions cannot rely on the
+# configure. This is necessary because libpng distributions cannot rely on the
 # time stamps of the autotools generated files being correct
 AM_MAINTAINER_MODE
 
@@ -46,7 +46,7 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.24beta07
+PNGLIB_VERSION=1.6.24rc01
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
 PNGLIB_RELEASE=24
@@ -67,7 +67,7 @@ AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 
-dnl libtool/libtoolize; version 2.4.2 is the tested version, this or any
+dnl libtool/libtoolize; version 2.4.2 is the tested version. This or any
 dnl compatible later version may be used
 LT_INIT([win32-dll])
 LT_PREREQ([2.4.2])
