@@ -55,7 +55,7 @@ diff --git a/configure.ac b/configure.ac
 diff --git a/Makefile.am b/Makefile.am
 --- a/Makefile.am	2016-05-17 18:15:12.000000000 -0400
 +++ b/Makefile.am	2016-05-25 19:48:10.631751170 -0400
-@@ -89,16 +89,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
+@@ -92,16 +92,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
  	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
  	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
  
