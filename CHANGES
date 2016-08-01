@@ -5668,6 +5668,8 @@ Version 1.6.24rc02 [August 1, 2016]
   Conditionally compile SSE2 headers in contrib/intel/intel_sse.patch
   Conditionally compile png_decompress_chunk().
 
+Version 1.6.24rc03 [August 1, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
