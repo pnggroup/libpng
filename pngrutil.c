@@ -590,6 +590,7 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
    }
 }
 
+#if defined(PNG_READ_zTXt_SUPPORTED) || defined (PNG_READ_iTXt_SUPPORTED)
 /*
  * Decompress trailing data in a chunk.  The assumption is that read_buffer
  * points at an allocated area holding the contents of a chunk with a
@@ -754,6 +755,7 @@ png_decompress_chunk(png_structrp png_ptr,
       return Z_MEM_ERROR;
    }
 }
+#endif /* READ_zTXt || READ_iTXt */
 #endif /* READ_COMPRESSED_TEXT */
 
 #ifdef PNG_READ_iCCP_SUPPORTED
