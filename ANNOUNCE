@@ -1,4 +1,4 @@
-Libpng 1.6.24rc03 - August 1, 2016
+Libpng 1.6.24rc03 - August 2, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -97,7 +97,9 @@ Version 1.6.24rc02 [August 1, 2016]
   Conditionally compile SSE2 headers in contrib/intel/intel_sse.patch
   Conditionally compile png_decompress_chunk().
 
-Version 1.6.24rc03 [August 1, 2016]
+Version 1.6.24rc03 [August 2, 2016]
+  Conditionally compile ARM_NEON headers in pngpriv.h
+  Updated contrib/intel/intel_sse.patch
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

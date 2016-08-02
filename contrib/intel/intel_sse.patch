@@ -77,8 +77,8 @@ diff --git a/Makefile.am b/Makefile.am
  #   Versioned symbols and restricted exports
  if HAVE_SOLARIS_LD
 diff --git a/pngpriv.h b/pngpriv.h
---- a/pngpriv.h	2016-07-25 07:49:33.000000000 -0500
-+++ b/pngpriv.h	2016-07-31 21:07:24.040395258 -0500
+--- a/pngpriv.h	2016-08-01 18:13:38.770128810 -0500
++++ b/pngpriv.h	2016-08-01 18:50:19.130179017 -0500
 @@ -177,16 +177,52 @@
  #  endif /* !PNG_ARM_NEON_IMPLEMENTATION */
  
@@ -132,7 +132,7 @@ diff --git a/pngpriv.h b/pngpriv.h
   * PNG_BUILD_DLL must not be set.  To avoid the code below kicking in build a
   * static library of libpng then link the DLL against that.
   */
-@@ -1184,16 +1220,31 @@ PNG_INTERNAL_FUNCTION(void,png_read_filt
+@@ -1185,16 +1221,31 @@ PNG_INTERNAL_FUNCTION(void,png_read_filt
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
  PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_neon,(png_row_infop
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -140,7 +140,8 @@ diff --git a/pngpriv.h b/pngpriv.h
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
  PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_neon,(png_row_infop
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
- 
+ #endif
++ 
 +#if PNG_INTEL_SSE_IMPLEMENTATION > 0
 +PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_sse2,(png_row_infop
 +    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -155,7 +156,7 @@ diff --git a/pngpriv.h b/pngpriv.h
 +PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_sse2,(png_row_infop
 +    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 +#endif
-+
+ 
  /* Choose the best filter to use and filter the row data */
  PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
      png_row_infop row_info),PNG_EMPTY);
@@ -163,16 +164,15 @@ diff --git a/pngpriv.h b/pngpriv.h
  #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
  PNG_INTERNAL_FUNCTION(void,png_read_IDAT_data,(png_structrp png_ptr,
     png_bytep output, png_alloc_size_t avail_out),PNG_EMPTY);
-    /* Read 'avail_out' bytes of data from the IDAT stream.  If the output buffer
-@@ -1910,16 +1961,20 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
-    /* Just declare the optimization that will be used */
- #else
+@@ -1914,16 +1965,20 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
     /* List *all* the possible optimizations here - this branch is required if
      * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
      * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
      */
+ #  if PNG_ARM_NEON_OPT > 0
  PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+ #  endif
 +#  if PNG_INTEL_SSE_IMPLEMENTATION > 0
 +PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
 +   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
