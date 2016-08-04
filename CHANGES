@@ -5672,7 +5672,8 @@ Version 1.6.24rc03 [August 2, 2016]
   Conditionally compile ARM_NEON headers in pngpriv.h
   Updated contrib/intel/intel_sse.patch
 
-Version 1.6.24rc04 [August 2, 2016]
+Version 1.6.24[August 4, 2016]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
