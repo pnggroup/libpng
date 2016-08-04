@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Last changed in libpng 1.6.23 [June 9, 2016]
+ * Last changed in libpng 1.6.24 [August 4, 2016]
  * Copyright (c) 2014-2016 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -1115,7 +1115,7 @@ store_warning(png_structp ppIn, png_const_charp message)
    if (!ps->expect_warning)
       store_log(ps, pp, message, 0 /* warning */);
    else
-     ps->saw_warning = 1;
+      ps->saw_warning = 1;
 }
 
 /* These somewhat odd functions are used when reading an image to ensure that
@@ -1589,7 +1589,7 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
          {
             if (chunkpos < chunklen-4U)
             {
-               uInt avail = -1;
+               uInt avail = (uInt)-1;
 
                if (avail > (IDAT_len-4U) - IDAT_pos)
                   avail = (uInt)/*SAFE*/((IDAT_len-4U) - IDAT_pos);

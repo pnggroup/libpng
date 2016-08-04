@@ -6,7 +6,7 @@
  * Derived from arm/filter_neon_intrinsics.c, which was
  * Copyright (c) 2014,2016 Glenn Randers-Pehrson
  *
- * Last changed in libpng 1.6.22 [May 26, 2016]
+ * Last changed in libpng 1.6.24 [August 4, 2016]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -208,7 +208,7 @@ static __m128i abs_i16(__m128i x) {
    x = _mm_xor_si128(x, is_negative);
 
    /* +1 to negative lanes, else +0. */
-   x = _mm_add_epi16(x, _mm_srli_epi16(is_negative, 15));
+   x = _mm_sub_epi16(x, is_negative);
    return x;
 #endif
 }

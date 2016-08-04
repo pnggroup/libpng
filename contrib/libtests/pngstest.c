@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2013-2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.22 [May 26, 2016]
+ * Last changed in libpng 1.6.24 [August 4, 2016]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -26,15 +26,6 @@
 #  include <config.h>
 #endif
 
-/* 1.6.1 added support for the configure test harness, which uses 77 to indicate
- * a skipped test, in earlier versions we need to succeed on a skipped test, so:
- */
-#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
-#  define SKIP 77
-#else
-#  define SKIP 0
-#endif
-
 /* Define the following to use this test against your installed libpng, rather
  * than the one being built here:
  */
@@ -42,6 +33,15 @@
 #  include <png.h>
 #else
 #  include "../../png.h"
+#endif
+
+/* 1.6.1 added support for the configure test harness, which uses 77 to indicate
+ * a skipped test, in earlier versions we need to succeed on a skipped test, so:
+ */
+#if PNG_LIBPNG_VER >= 10601 && defined(HAVE_CONFIG_H)
+#  define SKIP 77
+#else
+#  define SKIP 0
 #endif
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED /* Else nothing can be done */
