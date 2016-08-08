@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta83 - July 23, 2016
+Libpng 1.7.0beta84 - August 8, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta83.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta83.tar.gz
+   1.7.0beta84.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta84.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b83.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b83.zip
+   /scratch/glennrp/Libpng17/lp170b84.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b84.zip
 
 Other information:
 
-   1.7.0beta83-README.txt
-   1.7.0beta83-LICENSE.txt
-   libpng-1.7.0beta83-*.asc (armored detached GPG signatures)
+   1.7.0beta84-README.txt
+   1.7.0beta84-LICENSE.txt
+   libpng-1.7.0beta84-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1395,6 +1395,8 @@ Version 1.7.0beta83 [July 23, 2016]
   Removed/rearranged certain png_struct fields that are only used
     in reading.
   Fixed debug test of output gamma.
+
+Version 1.7.0beta84 [August 8, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

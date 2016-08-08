@@ -18,7 +18,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.7.0beta83],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.7.0beta84],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -30,7 +30,7 @@ AC_CONFIG_MACRO_DIR([scripts])
 # 1.14.1 is required for %reldir% support
 AM_INIT_AUTOMAKE([1.15 foreign dist-xz color-tests silent-rules subdir-objects])
 # The following line causes --disable-maintainer-mode to be the default to
-# configure, this is necessary because libpng distributions cannot rely on the
+# configure. This is necessary because libpng distributions cannot rely on the
 # time stamps of the autotools generated files being correct
 AM_MAINTAINER_MODE
 
@@ -40,7 +40,7 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.7.0beta83
+PNGLIB_VERSION=1.7.0beta84
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=7
 PNGLIB_RELEASE=0
@@ -178,7 +178,7 @@ then
                    enable_floating_arithmetic=no])
 fi
 
-# Set the relevant defines if required (only if required), this will override
+# Set the relevant defines if required (only if required). This will override
 # anything on the command line.
 if test "$enable_floating_point" != yes
 then
