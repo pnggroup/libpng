@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.24 [August 4, 2016]
+ * Last changed in libpng 1.6.25 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -307,7 +307,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
    if (buffer == NULL)
    {
-      buffer = png_voidcast(png_bytep, png_malloc_base(png_ptr, new_size));
+      buffer = png_voidcast(png_bytep, png_malloc_array(png_ptr, 1, new_size));
 
       if (buffer != NULL)
       {
@@ -1462,7 +1462,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                         const png_uint_32 tag_count = png_get_uint_32(
                             profile_header+128);
                         png_bytep profile = png_read_buffer(png_ptr,
-                            profile_length, 2/*silent*/);
+                            profile_length, 1/*warn*/);
 
                         if (profile != NULL)
                         {
@@ -1528,8 +1528,8 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                            PNG_FREE_ICCP, 0);
 
                                        info_ptr->iccp_name = png_voidcast(char*,
-                                           png_malloc_base(png_ptr,
-                                           keyword_length+1));
+                                           png_malloc_array(png_ptr,
+                                           keyword_length+1, 1));
                                        if (info_ptr->iccp_name != NULL)
                                        {
                                           memcpy(info_ptr->iccp_name, keyword,
