@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Last changed in libpng 1.6.24 [August 4, 2016]
+ * Last changed in libpng 1.6.25 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1494,9 +1494,11 @@ PNG_INTERNAL_FUNCTION(int,png_colorspace_set_ICC,(png_const_structrp png_ptr,
    /* The 'name' is used for information only */
 
 /* Routines for checking parts of an ICC profile. */
+#ifdef PNG_READ_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(int,png_icc_check_length,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
    png_uint_32 profile_length), PNG_EMPTY);
+#endif /* READ_iCCP */
 PNG_INTERNAL_FUNCTION(int,png_icc_check_header,(png_const_structrp png_ptr,
    png_colorspacerp colorspace, png_const_charp name,
    png_uint_32 profile_length,
