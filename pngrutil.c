@@ -461,6 +461,7 @@ png_zlib_inflate(png_structrp png_ptr, int flush)
 #endif /* Zlib >= 1.2.4 */
 
 #ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
+#if defined(PNG_READ_zTXt_SUPPORTED) || defined (PNG_READ_iTXt_SUPPORTED)
 /* png_inflate now returns zlib error codes including Z_OK and Z_STREAM_END to
  * allow the caller to do multiple calls if required.  If the 'finish' flag is
  * set Z_FINISH will be passed to the final inflate() call and Z_STREAM_END must
@@ -590,7 +591,6 @@ png_inflate(png_structrp png_ptr, png_uint_32 owner, int finish,
    }
 }
 
-#if defined(PNG_READ_zTXt_SUPPORTED) || defined (PNG_READ_iTXt_SUPPORTED)
 /*
  * Decompress trailing data in a chunk.  The assumption is that read_buffer
  * points at an allocated area holding the contents of a chunk with a
