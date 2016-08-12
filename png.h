@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.25beta01, August 4, 2016
+ * libpng version 1.6.25beta01, August 12, 2016
  *
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.25beta01, August 4, 2016:
+ *   libpng versions 0.97, January 1998, through 1.6.25beta01, August 12, 2016:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -29,7 +29,7 @@
  * files that are distributed with libpng have other copyright owners and
  * are released under other open source licenses.
  *
- * libpng versions 1.0.7, July 1, 2000 through 1.6.25beta01, August 4, 2016 are
+ * libpng versions 1.0.7, July 1, 2000 through 1.6.25beta01, August 12, 2016 are
  * Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -217,7 +217,7 @@
  *    ...
  *    1.5.27                  15    10527  15.so.15.27[.0]
  *    ...
- *    1.6.24                  16    10624  16.so.16.24[.0]
+ *    1.6.25                  16    10625  16.so.16.25[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -245,7 +245,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    August 4, 2016
+ *    August 12, 2016
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -314,7 +314,7 @@
 
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.25beta01"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.25beta01 - August 4, 2016\n"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.25beta01 - August 12, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
