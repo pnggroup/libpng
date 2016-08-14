@@ -12,13 +12,13 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
 
 # Utilities - installed
-bin_PROGRAMS= pngcp pngfix png-fix-itxt
+bin_PROGRAMS= pngfix png-fix-itxt
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
 # 'make check', but it does not add dependencies to the individual programs,
