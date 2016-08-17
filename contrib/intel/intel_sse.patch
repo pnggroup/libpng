@@ -164,7 +164,7 @@ diff --git a/pngpriv.h b/pngpriv.h
  #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
  PNG_INTERNAL_FUNCTION(void,png_read_IDAT_data,(png_structrp png_ptr,
     png_bytep output, png_alloc_size_t avail_out),PNG_EMPTY);
-@@ -1914,16 +1965,20 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
+@@ -1916,16 +1967,20 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
     /* List *all* the possible optimizations here - this branch is required if
      * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
      * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
