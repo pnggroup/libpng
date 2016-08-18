@@ -1,5 +1,5 @@
 
-Libpng 1.5.28beta01 - August 2, 2016
+Libpng 1.5.28beta01 - August 18, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,12 +26,13 @@ Other information:
 
 Changes since the last public release (1.5.27):
 
-version 1.5.28beta01 [August 2, 2016]
+version 1.5.28beta01 [August 18, 2016]
   Merge with current libpng16 pngvalid.c
   Fixed undefined behavior in png_push_save_buffer(). Do not call
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
   Added "Common linking failures" section to INSTALL.
   Merge contrib/pngminim/*/makefile with libpng-1.6.24
+  Minor editing of INSTALL, (whitespace, added copyright line)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
