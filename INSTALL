@@ -3,23 +3,23 @@
 
 Contents
 
-   I. Simple installation
-  II. Rebuilding the configure scripts
- III. Using scripts/makefile*
-  IV. Using cmake
-   V. Directory structure
-  VI. Building with project files
- VII. Building with makefiles
-VIII. Configuring libpng for 16-bit platforms
-  IX. Configuring for DOS
-   X. Configuring for Medium Model
-  XI. Prepending a prefix to exported symbols
- XII. Configuring for compiler xxx:
-XIII. Removing unwanted object code
- XIV. Changes to the build and configuration of libpng in libpng-1.5.x
-  XV. Setjmp/longjmp issues
- XVI. Common linking failures
-XVII. Other sources of information about libpng
+       I. Simple installation
+      II. Rebuilding the configure scripts
+     III. Using scripts/makefile*
+      IV. Using cmake
+       V. Directory structure
+      VI. Building with project files
+     VII. Building with makefiles
+    VIII. Configuring libpng for 16-bit platforms
+      IX. Configuring for DOS
+       X. Configuring for Medium Model
+      XI. Prepending a prefix to exported symbols
+     XII. Configuring for compiler xxx:
+    XIII. Removing unwanted object code
+     XIV. Changes to the build and configuration of libpng in libpng-1.5.x
+      XV. Setjmp/longjmp issues
+     XVI. Common linking failures
+    XVII. Other sources of information about libpng
 
 I. Simple installation
 
@@ -249,7 +249,7 @@ libpng are compiled.  All the defines end in _SUPPORTED.  If you are
 never going to use a capability, you can change the #define to #undef
 before recompiling libpng and save yourself code and data space, or
 you can turn off individual capabilities with defines that begin with
-PNG_NO_.
+"PNG_NO_".
 
 In libpng-1.5.0 and later, the #define's are in pnglibconf.h instead.
 
@@ -317,7 +317,7 @@ only png_longjmp_ptr, which must match the C longjmp function.)  The new
 approach is documented in pngconf.h
 
 Despite these changes, libpng 1.5.0 only supports the native C function
-calling standard on those platforms tested so far (__cdecl on Microsoft
+calling standard on those platforms tested so far ("__cdecl" on Microsoft
 Windows).  This is because the support requirements for alternative
 calling conventions seem to no longer exist.  Developers who find it
 necessary to set PNG_API_RULE to 1 should advise the mailing list
