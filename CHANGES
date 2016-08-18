@@ -5684,6 +5684,8 @@ Version 1.6.25beta02 [August 18, 2016]
   Don't install pngcp; it conflicts with pngcp in the pngtools package.
   Minor editing of INSTALL, (whitespace, added copyright line)
 
+Version 1.6.25beta03 [August 18, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
