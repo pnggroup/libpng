@@ -5690,6 +5690,8 @@ Version 1.6.25rc01 [August 24, 2016]
 Version 1.6.25rc02 [August 29, 2016]
   Added MIPS support (Mandar Sahastrabuddhe <Mandar.Sahastrabuddhe@imgtec.com>).
 
+Version 1.6.25rc03 [August 29, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
