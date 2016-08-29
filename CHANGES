@@ -5693,6 +5693,8 @@ Version 1.6.25rc02 [August 29, 2016]
 Version 1.6.25rc03 [August 29, 2016]
   Rebased contrib/intel/intel_sse.patch after the MIPS implementation.
 
+Version 1.6.25rc04 [August 29, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
