@@ -1,7 +1,7 @@
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
-# Last changed in libpng 1.6.22 [(PENDING RELEASE)]
+# Last changed in libpng 1.6.25beta03 [August 29, 2016]
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -95,6 +95,11 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 if PNG_ARM_NEON
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
 	arm/filter_neon.S arm/filter_neon_intrinsics.c
+endif
+
+if PNG_MIPS_MSA
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += mips/mips_init.c\
+	mips/filter_msa_intrinsics.c
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
