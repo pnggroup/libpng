@@ -5684,7 +5684,16 @@ Version 1.6.25beta02 [August 18, 2016]
   Don't install pngcp; it conflicts with pngcp in the pngtools package.
   Minor editing of INSTALL, (whitespace, added copyright line)
 
-Version 1.6.25beta03 [August 18, 2016]
+Version 1.6.25rc01 [August 24, 2016]
+  No changes.
+
+Version 1.6.25rc02 [August 29, 2016]
+  Added MIPS support (Mandar Sahastrabuddhe <Mandar.Sahastrabuddhe@imgtec.com>).
+
+Version 1.6.25rc03 [August 29, 2016]
+  Rebased contrib/intel/intel_sse.patch after the MIPS implementation.
+
+Version 1.6.25rc04 [August 29, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
