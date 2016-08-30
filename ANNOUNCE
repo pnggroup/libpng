@@ -1,4 +1,4 @@
-Libpng 1.6.25rc04 - August 29, 2016
+Libpng 1.6.25rc04 - August 30, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -39,11 +39,13 @@ Version 1.6.25rc01 [August 24, 2016]
 
 Version 1.6.25rc02 [August 29, 2016]
   Added MIPS support (Mandar Sahastrabuddhe <Mandar.Sahastrabuddhe@imgtec.com>).
+  Only the UP filter is currently implemented.
 
 Version 1.6.25rc03 [August 29, 2016]
   Rebased contrib/intel/intel_sse.patch after the MIPS implementation.
 
-Version 1.6.25rc04 [August 29, 2016]
+Version 1.6.25rc04 [August 30, 2016]
+  Added MIPS support for SUB, AVG, and PAETH filters (Mandar Sahastrabuddhe))
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
