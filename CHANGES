@@ -5697,6 +5697,8 @@ Version 1.6.25rc03 [August 29, 2016]
 Version 1.6.25rc04 [August 30, 2016]
   Added MIPS support for SUB, AVG, and PAETH filters (Mandar Sahastrabuddhe))
 
+Version 1.6.25rc05 [August 30, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
