@@ -79,8 +79,8 @@ diff --git a/Makefile.am b/Makefile.am
  #   Versioned symbols and restricted exports
  if HAVE_SOLARIS_LD
 diff --git a/pngpriv.h b/pngpriv.h
---- a/pngpriv.h	2016-08-29 11:46:26.000000000 -0400
-+++ b/pngpriv.h	2016-08-29 16:55:13.023259857 -0400
+--- debug16/pngpriv.h	2016-08-30 10:46:36.000000000 -0400
++++ libpng16/pngpriv.h	2016-08-30 11:57:25.672280202 -0400
 @@ -185,16 +185,52 @@
  #ifndef PNG_MIPS_MSA_OPT
  #  if defined(__mips_msa) && (__mips_isa_rev >= 5) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
@@ -134,13 +134,13 @@ diff --git a/pngpriv.h b/pngpriv.h
  #        elif defined(__GNUC__)
  #           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
  #              define PNG_MIPS_MSA_IMPLEMENTATION 2
-@@ -1220,16 +1256,31 @@ PNG_INTERNAL_FUNCTION(void,png_read_filt
+@@ -1232,16 +1268,31 @@ PNG_INTERNAL_FUNCTION(void,png_read_filt
+ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_msa,(png_row_infop
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
- #endif
- 
- #if PNG_MIPS_MSA_OPT > 0
- PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_msa,(png_row_infop row_info,
-     png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_msa,(png_row_infop
+     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
+     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
  #endif
  
 +#if PNG_INTEL_SSE_IMPLEMENTATION > 0
@@ -166,7 +166,7 @@ diff --git a/pngpriv.h b/pngpriv.h
  PNG_INTERNAL_FUNCTION(void,png_read_IDAT_data,(png_structrp png_ptr,
     png_bytep output, png_alloc_size_t avail_out),PNG_EMPTY);
     /* Read 'avail_out' bytes of data from the IDAT stream.  If the output buffer
-@@ -1955,16 +2006,21 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
+@@ -1967,16 +2018,21 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
  PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
  #endif
