@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta84 - August 18, 2016
+Libpng 1.7.0beta84 - September 1, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1396,8 +1396,11 @@ Version 1.7.0beta83 [July 23, 2016]
     in reading.
   Fixed debug test of output gamma.
 
-Version 1.7.0beta84 [August 18, 2016]
+Version 1.7.0beta84 [September 1, 2016]
   Minor editing of INSTALL, (whitespace, added copyright line)
+  Don't install pngcp; it conflicts with pngcp in the pngtools package.
+  Fixed handling zero length IDAT in pngfix (bug report by Agostino Sarubbo,
+    bugfix by John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
