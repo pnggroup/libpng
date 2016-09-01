@@ -1,36 +1,33 @@
-Libpng 1.6.25 - September 1, 2016
+Libpng 1.6.26beta01 - September 1, 2016
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.25.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.25.tar.gz
+   1.6.26beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.26beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1625.7z  (LZMA-compressed, recommended)
-   lpng1625.zip
+   lp1626b01.7z  (LZMA-compressed, recommended)
+   lp1626b01.zip
 
 Other information:
 
-   libpng-1.6.25-README.txt
-   libpng-1.6.25-LICENSE.txt
-   libpng-1.6.25-*.asc (armored detached GPG signatures)
+   1.6.26beta01-README.txt
+   1.6.26beta01-LICENSE.txt
+   libpng-1.6.26beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.24):
-  Reject oversized iCCP profile immediately.
-  Cleaned up PNG_DEBUG compile of pngtest.c.
-  Conditionally compile png_inflate().
-  Don't install pngcp; it conflicts with pngcp in the pngtools package.
-  Minor editing of INSTALL, (whitespace, added copyright line)
-  Added MIPS support (Mandar Sahastrabuddhe <Mandar.Sahastrabuddhe@imgtec.com>).
-  Rebased contrib/intel/intel_sse.patch after the MIPS implementation.
+Changes since the last public release (1.6.25):
 
+Version 1.6.26beta01 [September 1, 2016]
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe)
