@@ -5700,7 +5700,8 @@ Version 1.6.25rc04 [August 30, 2016]
 Version 1.6.25rc05 [August 30, 2016]
   Rebased contrib/intel/intel_sse.patch after the MIPS implementation update..
 
-Version 1.6.25rc06 [August 30, 2016]
+Version 1.6.25 [September 1, 2016]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
