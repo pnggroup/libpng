@@ -26,6 +26,8 @@ Other information:
 Changes since the last public release (1.6.25):
 
 Version 1.6.26beta01 [September 1, 2016]
+  Fixed handling zero length IDAT in pngfix (bug report by Agostino Sarubbo,
+    bugfix by John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
