@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Last changed in libpng 1.6.24 [August 4, 2016]
+ * Last changed in libpng 1.6.25 [September 1, 2016]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -514,10 +514,10 @@ typedef struct memory_information
 typedef memory_information *memory_infop;
 
 static memory_infop pinformation = NULL;
-static int current_allocation = 0;
-static int maximum_allocation = 0;
-static int total_allocation = 0;
-static int num_allocations = 0;
+static png_alloc_size_t current_allocation = 0;
+static png_alloc_size_t maximum_allocation = 0;
+static png_alloc_size_t total_allocation = 0;
+static png_alloc_size_t num_allocations = 0;
 
 png_voidp PNGCBAPI png_debug_malloc PNGARG((png_structp png_ptr,
     png_alloc_size_t size));
@@ -604,9 +604,10 @@ png_debug_free(png_structp png_ptr, png_voidp ptr)
          if (pinfo->pointer == ptr)
          {
             *ppinfo = pinfo->next;
-            current_allocation -= pinfo->size;
-            if (current_allocation < 0)
+            if (current_allocation < pinfo->size)
                fprintf(STDERR, "Duplicate free of memory\n");
+            else
+               current_allocation -= pinfo->size;
             /* We must free the list element too, but first kill
                the memory that is to be freed. */
             memset(ptr, 0x55, pinfo->size);
@@ -936,6 +937,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    init_callback_info(read_info_ptr);
    png_set_read_user_chunk_fn(read_ptr, &user_chunk_data,
        read_user_chunk_callback);
+#endif
+
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+#  ifdef CHUNK_LIMIT /* from the build, for testing */
+      png_set_chunk_malloc_max(read_ptr, CHUNK_LIMIT);
+#  endif /* CHUNK_LIMIT */
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED
@@ -1876,7 +1883,7 @@ main(int argc, char *argv[])
    {
       int i;
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
-      int allocation_now = current_allocation;
+      png_alloc_size_t allocation_now = current_allocation;
 #endif
       for (i=2; i<argc; ++i)
       {
@@ -1909,15 +1916,15 @@ main(int argc, char *argv[])
          }
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          if (allocation_now != current_allocation)
-            fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
-                current_allocation - allocation_now);
+            fprintf(STDERR, "MEMORY ERROR: %lu bytes lost\n",
+                (unsigned long)(current_allocation - allocation_now));
 
          if (current_allocation != 0)
          {
             memory_infop pinfo = pinformation;
 
-            fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
-                current_allocation);
+            fprintf(STDERR, "MEMORY ERROR: %lu bytes still allocated\n",
+                (unsigned long)current_allocation);
 
             while (pinfo != NULL)
             {
@@ -1930,14 +1937,14 @@ main(int argc, char *argv[])
 #endif
       }
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
-         fprintf(STDERR, " Current memory allocation: %10d bytes\n",
-             current_allocation);
-         fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
-             maximum_allocation);
-         fprintf(STDERR, " Total   memory allocation: %10d bytes\n",
-             total_allocation);
-         fprintf(STDERR, "     Number of allocations: %10d\n",
-             num_allocations);
+         fprintf(STDERR, " Current memory allocation: %20lu bytes\n",
+             (unsigned long)current_allocation);
+         fprintf(STDERR, " Maximum memory allocation: %20lu bytes\n",
+             (unsigned long) maximum_allocation);
+         fprintf(STDERR, " Total   memory allocation: %20lu bytes\n",
+             (unsigned long)total_allocation);
+         fprintf(STDERR, "     Number of allocations: %20lu\n",
+             (unsigned long)num_allocations);
 #endif
    }
 
@@ -1948,7 +1955,7 @@ main(int argc, char *argv[])
       {
          int kerror;
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
-         int allocation_now = current_allocation;
+         png_alloc_size_t allocation_now = current_allocation;
 #endif
          if (i == 1)
             status_dots_requested = 1;
@@ -1998,15 +2005,15 @@ main(int argc, char *argv[])
          }
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          if (allocation_now != current_allocation)
-             fprintf(STDERR, "MEMORY ERROR: %d bytes lost\n",
-                 current_allocation - allocation_now);
+             fprintf(STDERR, "MEMORY ERROR: %lu bytes lost\n",
+                 (unsigned long)(current_allocation - allocation_now));
 
          if (current_allocation != 0)
          {
              memory_infop pinfo = pinformation;
 
-             fprintf(STDERR, "MEMORY ERROR: %d bytes still allocated\n",
-                 current_allocation);
+             fprintf(STDERR, "MEMORY ERROR: %lu bytes still allocated\n",
+                 (unsigned long)current_allocation);
 
              while (pinfo != NULL)
              {
@@ -2018,14 +2025,14 @@ main(int argc, char *argv[])
 #endif
        }
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
-       fprintf(STDERR, " Current memory allocation: %10d bytes\n",
-           current_allocation);
-       fprintf(STDERR, " Maximum memory allocation: %10d bytes\n",
-           maximum_allocation);
-       fprintf(STDERR, " Total   memory allocation: %10d bytes\n",
-           total_allocation);
-       fprintf(STDERR, "     Number of allocations: %10d\n",
-           num_allocations);
+       fprintf(STDERR, " Current memory allocation: %20lu bytes\n",
+           (unsigned long)current_allocation);
+       fprintf(STDERR, " Maximum memory allocation: %20lu bytes\n",
+           (unsigned long)maximum_allocation);
+       fprintf(STDERR, " Total   memory allocation: %20lu bytes\n",
+           (unsigned long)total_allocation);
+       fprintf(STDERR, "     Number of allocations: %20lu\n",
+           (unsigned long)num_allocations);
 #endif
    }
 
@@ -2081,4 +2088,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_24 Your_png_h_is_not_version_1_6_24;
+typedef png_libpng_version_1_6_25 Your_png_h_is_not_version_1_6_25;

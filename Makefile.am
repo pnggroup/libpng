@@ -1,7 +1,7 @@
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
-# Last changed in libpng 1.6.22 [(PENDING RELEASE)]
+# Last changed in libpng 1.6.25 [September 1, 2016]
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -12,13 +12,13 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
 
 # Utilities - installed
-bin_PROGRAMS= pngcp pngfix png-fix-itxt
+bin_PROGRAMS= pngfix png-fix-itxt
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
 # 'make check', but it does not add dependencies to the individual programs,
@@ -95,6 +95,11 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 if PNG_ARM_NEON
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
 	arm/filter_neon.S arm/filter_neon_intrinsics.c
+endif
+
+if PNG_MIPS_MSA
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += mips/mips_init.c\
+	mips/filter_msa_intrinsics.c
 endif
 
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h

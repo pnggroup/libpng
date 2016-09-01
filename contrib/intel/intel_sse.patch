@@ -1,13 +1,13 @@
 diff --git a/configure.ac b/configure.ac
---- a/configure.ac	2016-05-25 18:59:10.000000000 -0400
-+++ b/configure.ac	2016-05-25 19:48:10.631751170 -0400
-@@ -341,16 +341,50 @@ AC_ARG_ENABLE([arm-neon],
+--- a/configure.ac	2016-08-29 11:46:27.000000000 -0400
++++ b/configure.ac	2016-08-29 16:57:03.866355018 -0400
+@@ -386,16 +386,51 @@ AC_ARG_ENABLE([mips-msa],
+ # future host CPU does not match 'mips*')
  
- AM_CONDITIONAL([PNG_ARM_NEON],
-    [test "$enable_arm_neon" != 'no' &&
+ AM_CONDITIONAL([PNG_MIPS_MSA],
+    [test "$enable_mips_msa" != 'no' &&
      case "$host_cpu" in
-       arm*|aarch64*) :;;
-       *)    test "$enable_arm_neon" != '';;
+       mipsel*|mips64el*) :;;
      esac])
  
 +# INTEL
@@ -44,6 +44,7 @@ diff --git a/configure.ac b/configure.ac
 +      i?86|x86_64) :;;
 +      *)    test "$enable_intel_sse" != '';;
 +    esac])
++
  AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
  
  # Config files, substituting as above
@@ -53,21 +54,22 @@ diff --git a/configure.ac b/configure.ac
  
  AC_OUTPUT
 diff --git a/Makefile.am b/Makefile.am
---- a/Makefile.am	2016-05-17 18:15:12.000000000 -0400
-+++ b/Makefile.am	2016-05-25 19:48:10.631751170 -0400
-@@ -92,16 +92,20 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
- 	pngset.c pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c\
- 	png.h pngconf.h pngdebug.h pnginfo.h pngpriv.h pngstruct.h pngusr.dfa
- 
- if PNG_ARM_NEON
- libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
+--- a/Makefile.am	2016-08-29 11:46:27.000000000 -0400
++++ b/Makefile.am	2016-08-29 16:57:45.955528215 -0400
+@@ -97,16 +97,21 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SO
  	arm/filter_neon.S arm/filter_neon_intrinsics.c
+ endif
+ 
+ if PNG_MIPS_MSA
+ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += mips/mips_init.c\
+ 	mips/filter_msa_intrinsics.c
  endif
  
 +if PNG_INTEL_SSE
 +libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += contrib/intel/intel_init.c\
 +    contrib/intel/filter_sse2_intrinsics.c
 +endif
++
  nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
  
  libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined -export-dynamic \
@@ -77,16 +79,16 @@ diff --git a/Makefile.am b/Makefile.am
  #   Versioned symbols and restricted exports
  if HAVE_SOLARIS_LD
 diff --git a/pngpriv.h b/pngpriv.h
---- a/pngpriv.h	2016-08-01 18:13:38.770128810 -0500
-+++ b/pngpriv.h	2016-08-01 18:50:19.130179017 -0500
-@@ -177,16 +177,52 @@
- #  endif /* !PNG_ARM_NEON_IMPLEMENTATION */
- 
- #  ifndef PNG_ARM_NEON_IMPLEMENTATION
-       /* Use the intrinsics code by default. */
- #     define PNG_ARM_NEON_IMPLEMENTATION 1
+--- debug16/pngpriv.h	2016-08-30 10:46:36.000000000 -0400
++++ libpng16/pngpriv.h	2016-08-30 11:57:25.672280202 -0400
+@@ -185,16 +185,52 @@
+ #ifndef PNG_MIPS_MSA_OPT
+ #  if defined(__mips_msa) && (__mips_isa_rev >= 5) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+ #     define PNG_MIPS_MSA_OPT 2
+ #  else
+ #     define PNG_MIPS_MSA_OPT 0
  #  endif
- #endif /* PNG_ARM_NEON_OPT > 0 */
+ #endif
  
 +#ifndef PNG_INTEL_SSE_OPT
 +#   ifdef PNG_INTEL_SSE
@@ -124,24 +126,23 @@ diff --git a/pngpriv.h b/pngpriv.h
 +#   endif
 +#endif
 +
- /* Is this a build of a DLL where compilation of the object modules requires
-  * different preprocessor settings to those required for a simple library?  If
-  * so PNG_BUILD_DLL must be set.
-  *
-  * If libpng is used inside a DLL but that DLL does not export the libpng APIs
-  * PNG_BUILD_DLL must not be set.  To avoid the code below kicking in build a
-  * static library of libpng then link the DLL against that.
-  */
-@@ -1185,16 +1221,31 @@ PNG_INTERNAL_FUNCTION(void,png_read_filt
+ #if PNG_MIPS_MSA_OPT > 0
+ #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_msa
+ #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
+ #     if defined(__mips_msa)
+ #        if defined(__clang__)
+ #        elif defined(__GNUC__)
+ #           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
+ #              define PNG_MIPS_MSA_IMPLEMENTATION 2
+@@ -1232,16 +1268,31 @@ PNG_INTERNAL_FUNCTION(void,png_read_filt
+ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_msa,(png_row_infop
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
- PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_neon,(png_row_infop
+ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_msa,(png_row_infop
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
- PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_neon,(png_row_infop
-     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
- PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_neon,(png_row_infop
+ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
      row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
  #endif
-+ 
+ 
 +#if PNG_INTEL_SSE_IMPLEMENTATION > 0
 +PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_sse2,(png_row_infop
 +    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -156,7 +157,7 @@ diff --git a/pngpriv.h b/pngpriv.h
 +PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_sse2,(png_row_infop
 +    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 +#endif
- 
++
  /* Choose the best filter to use and filter the row data */
  PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
      png_row_infop row_info),PNG_EMPTY);
@@ -164,15 +165,17 @@ diff --git a/pngpriv.h b/pngpriv.h
  #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
  PNG_INTERNAL_FUNCTION(void,png_read_IDAT_data,(png_structrp png_ptr,
     png_bytep output, png_alloc_size_t avail_out),PNG_EMPTY);
-@@ -1914,16 +1965,20 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
-    /* List *all* the possible optimizations here - this branch is required if
-     * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
-     * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
-     */
- #  if PNG_ARM_NEON_OPT > 0
+    /* Read 'avail_out' bytes of data from the IDAT stream.  If the output buffer
+@@ -1967,16 +2018,21 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_O
  PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
- #  endif
+ #endif
+ 
+ #if PNG_MIPS_MSA_OPT > 0
+ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_msa,
+    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+ #endif
++
 +#  if PNG_INTEL_SSE_IMPLEMENTATION > 0
 +PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
 +   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);

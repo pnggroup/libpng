@@ -1,7 +1,7 @@
 # configure.ac
 
-# Copyright (c) 2004-2015 Glenn Randers-Pehrson
-# Last changed in libpng 1.6.22 [May 26, 2016]
+# Copyright (c) 2004-2016 Glenn Randers-Pehrson
+# Last changed in libpng 1.6.25 [September 1, 2016]
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -25,7 +25,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.24],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.25],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -46,10 +46,10 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.24
+PNGLIB_VERSION=1.6.25
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
-PNGLIB_RELEASE=24
+PNGLIB_RELEASE=25
 
 dnl End of version number stuff
 
@@ -344,6 +344,51 @@ AM_CONDITIONAL([PNG_ARM_NEON],
     case "$host_cpu" in
       arm*|aarch64*) :;;
       *)    test "$enable_arm_neon" != '';;
+    esac])
+
+# MIPS
+# ===
+#
+# MIPS MSA (SIMD) support.
+
+AC_ARG_ENABLE([mips-msa],
+   AS_HELP_STRING([[[--enable-mips-msa]]],
+      [Enable MIPS MSA optimizations: =no/off, check, api, yes/on:]
+      [no/off: disable the optimizations; check: use internal checking code]
+      [(deprecated and poorly supported); api: disable by default, enable by]
+      [a call to png_set_option; yes/on: turn on unconditionally.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling on __mips_msa systems:
+         AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
+                   [Disable MIPS MSA optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_mips_msa=no;;
+      check)
+         AC_DEFINE([PNG_MIPS_MSA_CHECK_SUPPORTED], [],
+                   [Check for MIPS MSA support at run-time]);;
+      api)
+         AC_DEFINE([PNG_MIPS_MSA_API_SUPPORTED], [],
+                   [Turn on MIPS MSA optimizations at run-time]);;
+      yes|on)
+         AC_DEFINE([PNG_MIPS_MSA_OPT], [2],
+                   [Enable MIPS MSA optimizations])
+         AC_MSG_WARN([--enable-mips-msa: please specify 'check' or 'api', if]
+            [you want the optimizations unconditionally pass '-mmsa -mfp64']
+            [to the compiler.]);;
+      *)
+         AC_MSG_ERROR([--enable-mips-msa=${enable_mips_msa}: invalid value])
+   esac])
+
+# Add MIPS specific files to all builds where the host_cpu is mips ('mips*') or
+# where MIPS optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'mips*')
+
+AM_CONDITIONAL([PNG_MIPS_MSA],
+   [test "$enable_mips_msa" != 'no' &&
+    case "$host_cpu" in
+      mipsel*|mips64el*) :;;
     esac])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
