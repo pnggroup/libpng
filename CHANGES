@@ -5703,11 +5703,12 @@ Version 1.6.25rc05 [August 30, 2016]
 Version 1.6.25 [September 1, 2016]
   No changes.
 
-Version 1.6.26beta01 [September 3, 2016]
+Version 1.6.26beta01 [September 12, 2016]
   Fixed handling zero length IDAT in pngfix (bug report by Agostino Sarubbo,
     bugfix by John Bowler).
   Do not issue a png_error() on read in png_set_pCAL() because png_handle_pCAL
     has allocated memory that libpng needs to free.
+  Conditionally compile png_set_benign_errors() in pngread.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

@@ -1393,7 +1393,9 @@ png_image_read_header(png_voidp argument)
    png_structrp png_ptr = image->opaque->png_ptr;
    png_inforp info_ptr = image->opaque->info_ptr;
 
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
    png_set_benign_errors(png_ptr, 1/*warn*/);
+#endif
    png_read_info(png_ptr, info_ptr);
 
    /* Do this the fast way; just read directly out of png_struct. */
