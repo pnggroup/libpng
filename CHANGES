@@ -5708,7 +5708,9 @@ Version 1.6.26beta01 [September 12, 2016]
     bugfix by John Bowler).
   Do not issue a png_error() on read in png_set_pCAL() because png_handle_pCAL
     has allocated memory that libpng needs to free.
-  Conditionally compile png_set_benign_errors() in pngread.c
+  Conditionally compile png_set_benign_errors() in pngread.c and pngtest.c
+  Issue a png_benign_error instead of a png_error on ADLER32 mismatch
+    while decoding compressed data chunks.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
