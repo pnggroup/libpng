@@ -980,15 +980,16 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #endif
 #endif
 
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
    if (strict != 0)
    {
       /* Treat png_benign_error() as errors on read */
       png_set_benign_errors(read_ptr, 0);
 
-#ifdef PNG_WRITE_SUPPORTED
+# ifdef PNG_WRITE_SUPPORTED
       /* Treat them as errors on write */
       png_set_benign_errors(write_ptr, 0);
-#endif
+# endif
 
       /* if strict is not set, then app warnings and errors are treated as
        * warnings in release builds, but not in unstable builds; this can be
@@ -1001,10 +1002,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       /* Allow application (pngtest) errors and warnings to pass */
       png_set_benign_errors(read_ptr, 1);
 
-#ifdef PNG_WRITE_SUPPORTED
+# ifdef PNG_WRITE_SUPPORTED
       png_set_benign_errors(write_ptr, 1);
-#endif
+# endif
    }
+#endif /* BENIGN_ERRORS */
 
    pngtest_debug("Initializing input and output streams");
 #ifdef PNG_STDIO_SUPPORTED
