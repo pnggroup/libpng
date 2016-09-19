@@ -370,7 +370,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
     */
    {
       int ret; /* zlib return code */
-#if PNG_ZLIB_VERNUM >= 0x1240
+#if ZLIB_VERNUM >= 0x1240
 
 # if defined(PNG_SET_OPTION_SUPPORTED) && defined(PNG_MAXIMUM_INFLATE_WINDOW)
       int window_bits;
@@ -402,7 +402,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
       {
-#if PNG_ZLIB_VERNUM < 0x1240
+#if ZLIB_VERNUM < 0x1240
          ret = inflateReset(&png_ptr->zstream);
 #else
          ret = inflateReset2(&png_ptr->zstream, window_bits);
@@ -411,7 +411,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       else
       {
-#if PNG_ZLIB_VERNUM < 0x1240
+#if ZLIB_VERNUM < 0x1240
          ret = inflateInit(&png_ptr->zstream);
 #else
          ret = inflateInit2(&png_ptr->zstream, window_bits);
@@ -435,7 +435,7 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 #endif
 }
 
-#if PNG_ZLIB_VERNUM >= 0x1240
+#if ZLIB_VERNUM >= 0x1240
 /* Handle the start of the inflate stream if we called inflateInit2(strm,0);
  * in this case some zlib versions skip validation of the CINFO field and, in
  * certain circumstances, libpng may end up displaying an invalid image, in
@@ -4103,7 +4103,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          if (output != NULL)
          {
             if(!strncmp(png_ptr->zstream.msg,"incorrect data check",20))
-               png_chunk_benign_error(png_ptr, png_ptr->zstream.msg);
+               png_chunk_benign_error(png_ptr, "ADLER32 checksum mismatch");
             else
                png_chunk_error(png_ptr, png_ptr->zstream.msg);
          }

@@ -1,4 +1,4 @@
-Libpng 1.6.26beta01 - September 12, 2016
+Libpng 1.6.26beta01 - September 19, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,7 +25,7 @@ Other information:
 
 Changes since the last public release (1.6.25):
 
-Version 1.6.26beta01 [September 12, 2016]
+Version 1.6.26beta01 [September 19, 2016]
   Fixed handling zero length IDAT in pngfix (bug report by Agostino Sarubbo,
     bugfix by John Bowler).
   Do not issue a png_error() on read in png_set_pCAL() because png_handle_pCAL
@@ -33,6 +33,8 @@ Version 1.6.26beta01 [September 12, 2016]
   Conditionally compile png_set_benign_errors() in pngread.c and pngtest.c
   Issue a png_benign_error instead of a png_error on ADLER32 mismatch
     while decoding compressed data chunks.
+  Changed PNG_ZLIB_VERNUM to ZLIB_VERNUM in pngpriv.h, pngstruct.h, and
+    pngrutil.c.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
