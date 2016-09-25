@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.6.25 [September 1, 2016]
+ * Last changed in libpng 1.6.26 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -371,10 +371,9 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
    {
       int ret; /* zlib return code */
 #if ZLIB_VERNUM >= 0x1240
+      int window_bits = 0;
 
 # if defined(PNG_SET_OPTION_SUPPORTED) && defined(PNG_MAXIMUM_INFLATE_WINDOW)
-      int window_bits;
-
       if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
           PNG_OPTION_ON)
       {
@@ -384,13 +383,11 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       else
       {
-         window_bits = 0;
          png_ptr->zstream_start = 1;
       }
-# else
-#   define window_bits 0
 # endif
-#endif
+
+#endif /* ZLIB_VERNUM >= 0x1240 */
 
       /* Set this for safety, just in case the previous owner left pointers to
        * memory allocations.
@@ -402,24 +399,30 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
       {
-#if ZLIB_VERNUM < 0x1240
-         ret = inflateReset(&png_ptr->zstream);
-#else
+#if ZLIB_VERNUM >= 0x1240
          ret = inflateReset2(&png_ptr->zstream, window_bits);
+#else
+         ret = inflateReset(&png_ptr->zstream);
 #endif
       }
 
       else
       {
-#if ZLIB_VERNUM < 0x1240
-         ret = inflateInit(&png_ptr->zstream);
-#else
+#if ZLIB_VERNUM >= 0x1240
          ret = inflateInit2(&png_ptr->zstream, window_bits);
+#else
+         ret = inflateInit(&png_ptr->zstream);
 #endif
 
          if (ret == Z_OK)
             png_ptr->flags |= PNG_FLAG_ZSTREAM_INITIALIZED;
       }
+
+#if ZLIB_VERNUM >= 0x1240
+      /* Turn off validation of the ADLER32 checksum */
+      if ((png_ptr->flags & PNG_FLAG_CRC_CRITICAL_IGNORE) != 0)
+         ret = inflateReset2(&png_ptr->zstream, -window_bits);
+#endif
 
       if (ret == Z_OK)
          png_ptr->zowner = owner;
@@ -4103,7 +4106,10 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          if (output != NULL)
          {
             if(!strncmp(png_ptr->zstream.msg,"incorrect data check",20))
+            {
                png_chunk_benign_error(png_ptr, "ADLER32 checksum mismatch");
+               continue;
+            }
             else
                png_chunk_error(png_ptr, png_ptr->zstream.msg);
          }
