@@ -408,7 +408,7 @@ png_deflate_claim(png_structrp png_ptr, png_uint_32 owner,
       png_ptr->zstream.avail_out = 0;
 
       /* Now initialize if required, setting the new parameters, otherwise just
-       * to a simple reset to the previous parameters.
+       * do a simple reset to the previous parameters.
        */
       if ((png_ptr->flags & PNG_FLAG_ZSTREAM_INITIALIZED) != 0)
          ret = deflateReset(&png_ptr->zstream);

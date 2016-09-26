@@ -686,7 +686,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
          else
          {
             if (ret == Z_DATA_ERROR)
-               png_benign_error(png_ptr, "ADLER32 checksum mismatch in IDAT");
+               png_benign_error(png_ptr, "IDAT: ADLER32 checksum mismatch");
             else
                png_error(png_ptr, "Decompression error in IDAT");
          }
