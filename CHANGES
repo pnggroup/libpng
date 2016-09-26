@@ -5696,13 +5696,17 @@ Version 1.7.0beta83 [July 23, 2016]
     in reading.
   Fixed debug test of output gamma.
 
-Version 1.7.0beta84 [September 19, 2016]
+Version 1.7.0beta84 [September 26, 2016]
   Minor editing of INSTALL, (whitespace, added copyright line)
   Don't install pngcp; it conflicts with pngcp in the pngtools package.
   Fixed handling zero length IDAT in pngfix (bug report by Agostino Sarubbo,
     bugfix by John Bowler).
   Conditionally compile png_set_benign_errors() in pngread.c and pngtest.c
   Changed PNG_ZLIB_VERNUM to ZLIB_VERNUM in pngrutil.c.
+  If CRC handling of critical chunks has been set to PNG_CRC_QUIET_USE,
+    ignore the ADLER32 checksum in the IDAT chunk as well as the chunk CRCs.
+  Warn about ADLER32 checksum mismatch instead of issuing a png_error().
+  Add tests/badcrc.png and tests/badadler.png to tests/pngtest.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

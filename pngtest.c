@@ -986,9 +986,13 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       /* Allow application (pngtest) errors and warnings to pass */
       png_set_benign_errors(read_ptr, 1);
 
+      /* Turn off CRC and ADLER32 checking while reading */
+      png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
+
 # ifdef PNG_WRITE_SUPPORTED
       png_set_benign_errors(write_ptr, 1);
 # endif
+
    }
 #endif /* BENIGN_ERRORS */
 

@@ -260,12 +260,12 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
        * are minimal.
        */
       (void)png_safecat(msg, (sizeof msg), 4, " using zstream");
-#     if PNG_RELEASE_BUILD
-         png_chunk_warning(png_ptr, msg);
-         png_ptr->zowner = 0;
-#     else
-         png_chunk_error(png_ptr, msg);
-#     endif
+#if PNG_RELEASE_BUILD
+      png_chunk_warning(png_ptr, msg);
+      png_ptr->zowner = 0;
+#else
+      png_chunk_error(png_ptr, msg);
+#endif
    }
 
    /* Implementation note: unlike 'png_deflate_claim' this internal function
@@ -283,21 +283,17 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
     */
    {
       int ret; /* zlib return code */
-#     if ZLIB_VERNUM >= 0x1240
+#if ZLIB_VERNUM >= 0x1240
+      int window_bits = 0;
 
-#        if defined(PNG_SET_OPTION_SUPPORTED) && \
-            defined(PNG_MAXIMUM_INFLATE_WINDOW)
-            int window_bits;
+# if defined(PNG_SET_OPTION_SUPPORTED) && \
+  defined(PNG_MAXIMUM_INFLATE_WINDOW)
 
             if (png_ptr->maximum_inflate_window)
                window_bits = 15;
 
-            else
-               window_bits = 0;
-#        else
-#           define window_bits 0
-#        endif
-#     endif
+# endif
+#endif /* ZLIB_VERNUM >= 0x1240 */
 
       /* Initialize the alloc/free callbacks every time: */
       png_ptr->zstream.zalloc = png_zalloc;
@@ -317,21 +313,27 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
        */
       if (png_ptr->zstream.state != NULL)
       {
-#        if ZLIB_VERNUM < 0x1240
-            ret = inflateReset(&png_ptr->zstream);
-#        else
-            ret = inflateReset2(&png_ptr->zstream, window_bits);
-#        endif
+#if ZLIB_VERNUM >= 0x1240
+         ret = inflateReset2(&png_ptr->zstream, window_bits);
+#else
+         ret = inflateReset(&png_ptr->zstream);
+#endif
       }
 
       else
       {
-#        if ZLIB_VERNUM < 0x1240
-            ret = inflateInit(&png_ptr->zstream);
-#        else
-            ret = inflateInit2(&png_ptr->zstream, window_bits);
-#        endif
+#if ZLIB_VERNUM >= 0x1240
+         ret = inflateInit2(&png_ptr->zstream, window_bits);
+#else
+         ret = inflateInit(&png_ptr->zstream);
+#endif
       }
+
+#if ZLIB_VERNUM >= 0x1240
+      /* Turn off validation of the ADLER32 checksum */
+      if (png_ptr->current_crc == crc_quiet_use)
+         ret = inflateReset2(&png_ptr->zstream, -window_bits);
+#endif
 
       if (ret == Z_OK && png_ptr->zstream.state != NULL)
       {
@@ -3770,24 +3772,38 @@ png_inflate_IDAT(png_structrp png_ptr, int finish,
     */
    if (!png_ptr->zstream_error) /* first time */
    {
-#     ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
-         switch (png_ptr->IDAT_error_action)
-         {
-            case PNG_ERROR:
+#ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
+      switch (png_ptr->IDAT_error_action)
+      {
+         case PNG_ERROR:
+            if(!strncmp(png_ptr->zstream.msg,"incorrect data check",20))
+            {
+               if (png_ptr->current_crc != crc_quiet_use)
+                  png_chunk_warning(png_ptr, "ADLER32 checksum mismatch");
+            }
+
+            else
+            {
                png_chunk_error(png_ptr, png_ptr->zstream.msg);
-               break;
+            }
+            break;
 
-            case PNG_WARN:
-               png_chunk_warning(png_ptr, png_ptr->zstream.msg);
-               break;
+         case PNG_WARN:
+            png_chunk_warning(png_ptr, png_ptr->zstream.msg);
+            break;
 
-            default: /* ignore */
-               /* Keep going */
-               break;
-         }
-#     else
-         png_chunk_error(png_ptr, png_ptr->zstream.msg);
-#     endif /* !BENIGN_ERRORS */
+         default: /* ignore */
+            /* Keep going */
+            break;
+      }
+#else
+      {
+         if(!strncmp(png_ptr->zstream.msg,"incorrect data check",20))
+            png_chunk_warning(png_ptr, "ADLER32 checksum mismatch");
+         else
+            png_chunk_error(png_ptr, png_ptr->zstream.msg);
+      }
+#endif /* !BENIGN_ERRORS */
 
       /* And prevent the report about too many IDATs on streams with internal
        * LZ errors:
