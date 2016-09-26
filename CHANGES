@@ -5720,6 +5720,7 @@ Version 1.6.26beta01 [September 26, 2016]
   Merged pngtest.c with libpng-1.7.0beta84/pngtest.c
 
 Version 1.6.26beta02 [September 26, 2016]
+  Updated the documentation about CRC and ADLER32 handling.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

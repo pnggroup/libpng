@@ -977,8 +977,9 @@ the default, use
 
 The values for png_set_crc_action() say how libpng is to handle CRC errors in
 ancillary and critical chunks, and whether to use the data contained
-therein.  Note that it is impossible to "discard" data in a critical
-chunk.
+therein. Starting with libpng-1.6.26, this also governs how an ADLER32 error
+is handled while reading the IDAT chunk. Note that it is impossible to
+"discard" data in a critical chunk.
 
 Choices for (int) crit_action are
    PNG_CRC_DEFAULT      0  error/quit
@@ -994,6 +995,9 @@ Choices for (int) ancil_action are
    PNG_CRC_WARN_USE     3  warn/use data
    PNG_CRC_QUIET_USE    4  quiet/use data
    PNG_CRC_NO_CHANGE    5  use the current value
+
+When the setting for crit_action is PNG_CRC_QUIET_USE, the CRC and ADLER32
+checksums are not only ignored, but they are not evaluated.
 
 .SS Setting up callback code
 
