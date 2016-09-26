@@ -5719,6 +5719,8 @@ Version 1.6.26beta01 [September 26, 2016]
   Add tests/badcrc.png and tests/badadler.png to tests/pngtest.
   Merged pngtest.c with libpng-1.7.0beta84/pngtest.c
 
+Version 1.6.26beta02 [September 26, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
