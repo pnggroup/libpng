@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta84 - September 26, 2016
+Libpng 1.7.0beta85 - September 26, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta84.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta84.tar.gz
+   1.7.0beta85.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta85.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b84.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b84.zip
+   /scratch/glennrp/Libpng17/lp170b85.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b85.zip
 
 Other information:
 
-   1.7.0beta84-README.txt
-   1.7.0beta84-LICENSE.txt
-   libpng-1.7.0beta84-*.asc (armored detached GPG signatures)
+   1.7.0beta85-README.txt
+   1.7.0beta85-LICENSE.txt
+   libpng-1.7.0beta85-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1407,6 +1407,8 @@ Version 1.7.0beta84 [September 26, 2016]
     ignore the ADLER32 checksum in the IDAT chunk as well as the chunk CRCs.
   Issue png_benign_error() on ADLER32 checksum mismatch instead of png_error().
   Add tests/badcrc.png and tests/badadler.png to tests/pngtest.
+
+Version 1.7.0beta85 [September 26, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
