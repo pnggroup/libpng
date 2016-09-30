@@ -1,7 +1,7 @@
 
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Last changed in libpng 1.6.24 [August 4, 2016]
+ * Last changed in libpng 1.6.26 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -693,7 +693,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
        * and this calculation is used because it avoids warnings that other
        * forms produced on either GCC or MSVC.
        */
-      int padding = (-row_info->pixel_depth * row_info->width) & 7;
+      int padding = ((256 - row_info->pixel_depth) * (row_info->width & 7)) & 7;
       png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
 
       switch (row_info->bit_depth)
