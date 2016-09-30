@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Last changed in libpng 1.6.25 [September 1, 2016]
+ * Last changed in libpng 1.6.26 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -550,92 +550,92 @@
  * are defined in png.h because they need to be visible to applications
  * that call png_set_unknown_chunk().
  */
-/* #define PNG_HAVE_IHDR            0x01 (defined in png.h) */
-/* #define PNG_HAVE_PLTE            0x02 (defined in png.h) */
-#define PNG_HAVE_IDAT               0x04
-/* #define PNG_AFTER_IDAT           0x08 (defined in png.h) */
-#define PNG_HAVE_IEND               0x10
-                   /*               0x20 (unused) */
-                   /*               0x40 (unused) */
-                   /*               0x80 (unused) */
-#define PNG_HAVE_CHUNK_HEADER      0x100
-#define PNG_WROTE_tIME             0x200
-#define PNG_WROTE_INFO_BEFORE_PLTE 0x400
-#define PNG_BACKGROUND_IS_GRAY     0x800
-#define PNG_HAVE_PNG_SIGNATURE    0x1000
-#define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000 /* Have another chunk after IDAT */
-                   /*             0x4000 (unused) */
-#define PNG_IS_READ_STRUCT        0x8000 /* Else is a write struct */
+/* #define PNG_HAVE_IHDR            0x01U (defined in png.h) */
+/* #define PNG_HAVE_PLTE            0x02U (defined in png.h) */
+#define PNG_HAVE_IDAT               0x04U
+/* #define PNG_AFTER_IDAT           0x08U (defined in png.h) */
+#define PNG_HAVE_IEND               0x10U
+                   /*               0x20U (unused) */
+                   /*               0x40U (unused) */
+                   /*               0x80U (unused) */
+#define PNG_HAVE_CHUNK_HEADER      0x100U
+#define PNG_WROTE_tIME             0x200U
+#define PNG_WROTE_INFO_BEFORE_PLTE 0x400U
+#define PNG_BACKGROUND_IS_GRAY     0x800U
+#define PNG_HAVE_PNG_SIGNATURE    0x1000U
+#define PNG_HAVE_CHUNK_AFTER_IDAT 0x2000U /* Have another chunk after IDAT */
+                   /*             0x4000U (unused) */
+#define PNG_IS_READ_STRUCT        0x8000U /* Else is a write struct */
 
 /* Flags for the transformations the PNG library does on the image data */
-#define PNG_BGR                 0x0001
-#define PNG_INTERLACE           0x0002
-#define PNG_PACK                0x0004
-#define PNG_SHIFT               0x0008
-#define PNG_SWAP_BYTES          0x0010
-#define PNG_INVERT_MONO         0x0020
-#define PNG_QUANTIZE            0x0040
-#define PNG_COMPOSE             0x0080     /* Was PNG_BACKGROUND */
-#define PNG_BACKGROUND_EXPAND   0x0100
-#define PNG_EXPAND_16           0x0200     /* Added to libpng 1.5.2 */
-#define PNG_16_TO_8             0x0400     /* Becomes 'chop' in 1.5.4 */
-#define PNG_RGBA                0x0800
-#define PNG_EXPAND              0x1000
-#define PNG_GAMMA               0x2000
-#define PNG_GRAY_TO_RGB         0x4000
-#define PNG_FILLER              0x8000
-#define PNG_PACKSWAP           0x10000
-#define PNG_SWAP_ALPHA         0x20000
-#define PNG_STRIP_ALPHA        0x40000
-#define PNG_INVERT_ALPHA       0x80000
-#define PNG_USER_TRANSFORM    0x100000
-#define PNG_RGB_TO_GRAY_ERR   0x200000
-#define PNG_RGB_TO_GRAY_WARN  0x400000
-#define PNG_RGB_TO_GRAY       0x600000 /* two bits, RGB_TO_GRAY_ERR|WARN */
-#define PNG_ENCODE_ALPHA      0x800000 /* Added to libpng-1.5.4 */
-#define PNG_ADD_ALPHA        0x1000000 /* Added to libpng-1.2.7 */
-#define PNG_EXPAND_tRNS      0x2000000 /* Added to libpng-1.2.9 */
-#define PNG_SCALE_16_TO_8    0x4000000 /* Added to libpng-1.5.4 */
-                       /*    0x8000000 unused */
-                       /*   0x10000000 unused */
-                       /*   0x20000000 unused */
-                       /*   0x40000000 unused */
+#define PNG_BGR                 0x0001U
+#define PNG_INTERLACE           0x0002U
+#define PNG_PACK                0x0004U
+#define PNG_SHIFT               0x0008U
+#define PNG_SWAP_BYTES          0x0010U
+#define PNG_INVERT_MONO         0x0020U
+#define PNG_QUANTIZE            0x0040U
+#define PNG_COMPOSE             0x0080U    /* Was PNG_BACKGROUND */
+#define PNG_BACKGROUND_EXPAND   0x0100U
+#define PNG_EXPAND_16           0x0200U    /* Added to libpng 1.5.2 */
+#define PNG_16_TO_8             0x0400U    /* Becomes 'chop' in 1.5.4 */
+#define PNG_RGBA                0x0800U
+#define PNG_EXPAND              0x1000U
+#define PNG_GAMMA               0x2000U
+#define PNG_GRAY_TO_RGB         0x4000U
+#define PNG_FILLER              0x8000U
+#define PNG_PACKSWAP           0x10000U
+#define PNG_SWAP_ALPHA         0x20000U
+#define PNG_STRIP_ALPHA        0x40000U
+#define PNG_INVERT_ALPHA       0x80000U
+#define PNG_USER_TRANSFORM    0x100000U
+#define PNG_RGB_TO_GRAY_ERR   0x200000U
+#define PNG_RGB_TO_GRAY_WARN  0x400000U
+#define PNG_RGB_TO_GRAY       0x600000U /* two bits, RGB_TO_GRAY_ERR|WARN */
+#define PNG_ENCODE_ALPHA      0x800000U /* Added to libpng-1.5.4 */
+#define PNG_ADD_ALPHA        0x1000000U /* Added to libpng-1.2.7 */
+#define PNG_EXPAND_tRNS      0x2000000U /* Added to libpng-1.2.9 */
+#define PNG_SCALE_16_TO_8    0x4000000U /* Added to libpng-1.5.4 */
+                       /*    0x8000000U unused */
+                       /*   0x10000000U unused */
+                       /*   0x20000000U unused */
+                       /*   0x40000000U unused */
 /* Flags for png_create_struct */
-#define PNG_STRUCT_PNG   0x0001
-#define PNG_STRUCT_INFO  0x0002
+#define PNG_STRUCT_PNG   0x0001U
+#define PNG_STRUCT_INFO  0x0002U
 
 /* Flags for the png_ptr->flags rather than declaring a byte for each one */
-#define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x0001
-#define PNG_FLAG_ZSTREAM_INITIALIZED      0x0002 /* Added to libpng-1.6.0 */
-                                  /*      0x0004    unused */
-#define PNG_FLAG_ZSTREAM_ENDED            0x0008 /* Added to libpng-1.6.0 */
-                                  /*      0x0010    unused */
-                                  /*      0x0020    unused */
-#define PNG_FLAG_ROW_INIT                 0x0040
-#define PNG_FLAG_FILLER_AFTER             0x0080
-#define PNG_FLAG_CRC_ANCILLARY_USE        0x0100
-#define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200
-#define PNG_FLAG_CRC_CRITICAL_USE         0x0400
-#define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800
-#define PNG_FLAG_ASSUME_sRGB              0x1000 /* Added to libpng-1.5.4 */
-#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000 /* Added to libpng-1.5.4 */
-#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000 /* Added to libpng-1.5.4 */
-/* #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000 */
-/* #define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000 */
-#define PNG_FLAG_LIBRARY_MISMATCH        0x20000
-#define PNG_FLAG_STRIP_ERROR_NUMBERS     0x40000
-#define PNG_FLAG_STRIP_ERROR_TEXT        0x80000
-#define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000 /* Added to libpng-1.4.0 */
-#define PNG_FLAG_APP_WARNINGS_WARN      0x200000 /* Added to libpng-1.6.0 */
-#define PNG_FLAG_APP_ERRORS_WARN        0x400000 /* Added to libpng-1.6.0 */
-                                  /*    0x800000    unused */
-                                  /*   0x1000000    unused */
-                                  /*   0x2000000    unused */
-                                  /*   0x4000000    unused */
-                                  /*   0x8000000    unused */
-                                  /*  0x10000000    unused */
-                                  /*  0x20000000    unused */
-                                  /*  0x40000000    unused */
+#define PNG_FLAG_ZLIB_CUSTOM_STRATEGY     0x0001U
+#define PNG_FLAG_ZSTREAM_INITIALIZED      0x0002U /* Added to libpng-1.6.0 */
+                                  /*      0x0004U    unused */
+#define PNG_FLAG_ZSTREAM_ENDED            0x0008U /* Added to libpng-1.6.0 */
+                                  /*      0x0010U    unused */
+                                  /*      0x0020U    unused */
+#define PNG_FLAG_ROW_INIT                 0x0040U
+#define PNG_FLAG_FILLER_AFTER             0x0080U
+#define PNG_FLAG_CRC_ANCILLARY_USE        0x0100U
+#define PNG_FLAG_CRC_ANCILLARY_NOWARN     0x0200U
+#define PNG_FLAG_CRC_CRITICAL_USE         0x0400U
+#define PNG_FLAG_CRC_CRITICAL_IGNORE      0x0800U
+#define PNG_FLAG_ASSUME_sRGB              0x1000U /* Added to libpng-1.5.4 */
+#define PNG_FLAG_OPTIMIZE_ALPHA           0x2000U /* Added to libpng-1.5.4 */
+#define PNG_FLAG_DETECT_UNINITIALIZED     0x4000U /* Added to libpng-1.5.4 */
+/* #define PNG_FLAG_KEEP_UNKNOWN_CHUNKS      0x8000U */
+/* #define PNG_FLAG_KEEP_UNSAFE_CHUNKS      0x10000U */
+#define PNG_FLAG_LIBRARY_MISMATCH        0x20000U
+#define PNG_FLAG_STRIP_ERROR_NUMBERS     0x40000U
+#define PNG_FLAG_STRIP_ERROR_TEXT        0x80000U
+#define PNG_FLAG_BENIGN_ERRORS_WARN     0x100000U /* Added to libpng-1.4.0 */
+#define PNG_FLAG_APP_WARNINGS_WARN      0x200000U /* Added to libpng-1.6.0 */
+#define PNG_FLAG_APP_ERRORS_WARN        0x400000U /* Added to libpng-1.6.0 */
+                                  /*    0x800000U    unused */
+                                  /*   0x1000000U    unused */
+                                  /*   0x2000000U    unused */
+                                  /*   0x4000000U    unused */
+                                  /*   0x8000000U    unused */
+                                  /*  0x10000000U    unused */
+                                  /*  0x20000000U    unused */
+                                  /*  0x40000000U    unused */
 
 #define PNG_FLAG_CRC_ANCILLARY_MASK (PNG_FLAG_CRC_ANCILLARY_USE | \
                                      PNG_FLAG_CRC_ANCILLARY_NOWARN)
