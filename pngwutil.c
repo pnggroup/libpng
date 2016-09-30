@@ -2255,7 +2255,7 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    png_bytep rp, dp, lp;
    png_size_t i;
    png_size_t sum = 0;
-   int v;
+   unsigned int v;
 
    png_ptr->try_row[0] = PNG_FILTER_VALUE_SUB;
 
@@ -2316,7 +2316,7 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
    png_bytep rp, dp, pp;
    png_size_t i;
    png_size_t sum = 0;
-   int v;
+   unsigned int v;
 
    png_ptr->try_row[0] = PNG_FILTER_VALUE_UP;
 
@@ -2360,7 +2360,7 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
    png_bytep rp, dp, pp, lp;
    png_uint_32 i;
    png_size_t sum = 0;
-   int v;
+   unsigned int v;
 
    png_ptr->try_row[0] = PNG_FILTER_VALUE_AVG;
 
@@ -2422,7 +2422,7 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
    png_bytep rp, dp, pp, cp, lp;
    png_size_t i;
    png_size_t sum = 0;
-   int v;
+   unsigned int v;
 
    png_ptr->try_row[0] = PNG_FILTER_VALUE_PAETH;
 
@@ -2588,7 +2588,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
       png_bytep rp;
       png_size_t sum = 0;
       png_size_t i;
-      int v;
+      unsigned int v;
 
       {
          for (i = 0, rp = row_buf + 1; i < row_bytes; i++, rp++)
