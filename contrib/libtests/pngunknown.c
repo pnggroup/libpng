@@ -476,9 +476,9 @@ get_valid(display *d, png_infop info_ptr)
    /* Map the text chunks back into the flags */
    {
       png_textp text;
-      png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL);
+      png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL) + 1;
 
-      while (ntext-- > 0) switch (text[ntext].compression)
+      while (ntext-- > 1) switch (text[ntext - 1].compression)
       {
          case -1:
             flags |= PNG_INFO_tEXt;
@@ -492,7 +492,7 @@ get_valid(display *d, png_infop info_ptr)
             break;
          default:
             fprintf(stderr, "%s(%s): unknown text compression %d\n", d->file,
-               d->test, text[ntext].compression);
+               d->test, text[ntext - 1].compression);
             display_exit(d);
       }
    }
