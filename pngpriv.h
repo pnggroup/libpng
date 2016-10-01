@@ -669,6 +669,24 @@
     ((png_size_t)(width) * (((png_size_t)(pixel_bits)) >> 3)) : \
     (( ((png_size_t)(width) * ((png_size_t)(pixel_bits))) + 7) >> 3) )
 
+/* This returns the number of trailing bits in the last byte of a row, 0 if the
+ * last byte is completely full of pixels.  It is, in principle, (pixel_bits x
+ * width) % 8, but that would overflow for large 'width'.  The second macro is
+ * the same except that it returns the number of unused bits in the last byte;
+ * (8-TRAILBITS), but 0 when TRAILBITS is 0.
+ *
+ * NOTE: these macros are intended to be self-evidently correct and never
+ * overflow on the assumption that pixel_bits is in the range 0..255.  The
+ * arguments are evaluated only once and they can be signed (e.g. as a result of
+ * the integral promotions).  The result of the expression always has type
+ * (png_uint_32), however the compiler always knows it is in the range 0..7.
+ */
+#define PNG_TRAILBITS(pixel_bits, width) \
+    (((pixel_bits) * ((width) % (png_uint_32)8)) % 8)
+
+#define PNG_PADBITS(pixel_bits, width) \
+    ((8 - PNG_TRAILBITS(pixel_bits, width)) % 8)
+
 /* PNG_OUT_OF_RANGE returns true if value is outside the range
  * ideal-delta..ideal+delta.  Each argument is evaluated twice.
  * "ideal" and "delta" should be constants, normally simple

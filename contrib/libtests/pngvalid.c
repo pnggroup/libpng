@@ -1242,7 +1242,7 @@ store_image_check(const png_store* ps, png_const_structp pp, int iImage)
 
       image += 2; /* skip image first row markers */
 
-      while (rows-- > 0)
+      for (; rows > 0; --rows)
       {
          if (image[-2] != 190 || image[-1] != 239)
             png_error(pp, "row start overwritten");
@@ -11427,23 +11427,36 @@ perform_interlace_macro_validation(void)
        */
       for (v=0;;)
       {
+         /* The first two tests overflow if the pass row or column is outside
+          * the possible range for a 32-bit result.  In fact the values should
+          * never be outside the range for a 31-bit result, but checking for 32
+          * bits here ensures that if an app uses a bogus pass row or column
+          * (just so long as it fits in a 32 bit integer) it won't get a
+          * possibly dangerous overflow.
+          */
          /* First the base 0 stuff: */
-         m = PNG_ROW_FROM_PASS_ROW(v, pass);
-         f = png_row_from_pass_row(v, pass);
-         if (m != f)
+         if (v < png_pass_rows(0xFFFFFFFFU, pass))
          {
-            fprintf(stderr, "PNG_ROW_FROM_PASS_ROW(%u, %d) = %u != %x\n",
-               v, pass, m, f);
-            exit(99);
+            m = PNG_ROW_FROM_PASS_ROW(v, pass);
+            f = png_row_from_pass_row(v, pass);
+            if (m != f)
+            {
+               fprintf(stderr, "PNG_ROW_FROM_PASS_ROW(%u, %d) = %u != %x\n",
+                  v, pass, m, f);
+               exit(99);
+            }
          }
 
-         m = PNG_COL_FROM_PASS_COL(v, pass);
-         f = png_col_from_pass_col(v, pass);
-         if (m != f)
+         if (v < png_pass_cols(0xFFFFFFFFU, pass))
          {
-            fprintf(stderr, "PNG_COL_FROM_PASS_COL(%u, %d) = %u != %x\n",
-               v, pass, m, f);
-            exit(99);
+            m = PNG_COL_FROM_PASS_COL(v, pass);
+            f = png_col_from_pass_col(v, pass);
+            if (m != f)
+            {
+               fprintf(stderr, "PNG_COL_FROM_PASS_COL(%u, %d) = %u != %x\n",
+                  v, pass, m, f);
+               exit(99);
+            }
          }
 
          m = PNG_ROW_IN_INTERLACE_PASS(v, pass);
