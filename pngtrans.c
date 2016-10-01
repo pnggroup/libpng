@@ -693,7 +693,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
        * and this calculation is used because it avoids warnings that other
        * forms produced on either GCC or MSVC.
        */
-      int padding = ((256 - row_info->pixel_depth) * (row_info->width & 7)) & 7;
+      int padding = PNG_PADBITS(row_info->pixel_depth, row_info->width);
       png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
 
       switch (row_info->bit_depth)

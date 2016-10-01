@@ -1554,7 +1554,7 @@ png_write_image_16bit(png_voidp argument)
     */
    row_end = output_row + image->width * (channels+1);
 
-   while (y-- > 0)
+   for (; y > 0; --y)
    {
       png_const_uint_16p in_ptr = input_row;
       png_uint_16p out_ptr = output_row;
@@ -1705,7 +1705,7 @@ png_write_image_8bit(png_voidp argument)
       /* Use row_end in place of a loop counter: */
       row_end = output_row + image->width * (channels+1);
 
-      while (y-- > 0)
+      for (; y > 0; --y)
       {
          png_const_uint_16p in_ptr = input_row;
          png_bytep out_ptr = output_row;
@@ -1746,7 +1746,7 @@ png_write_image_8bit(png_voidp argument)
        */
       png_bytep row_end = output_row + image->width * channels;
 
-      while (y-- > 0)
+      for (; y > 0; --y)
       {
          png_const_uint_16p in_ptr = input_row;
          png_bytep out_ptr = output_row;
@@ -2136,7 +2136,7 @@ png_image_write_main(png_voidp argument)
       ptrdiff_t row_bytes = display->row_bytes;
       png_uint_32 y = image->height;
 
-      while (y-- > 0)
+      for (; y > 0; --y)
       {
          png_write_row(png_ptr, row);
          row += row_bytes;

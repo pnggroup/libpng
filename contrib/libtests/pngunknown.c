@@ -478,7 +478,7 @@ get_valid(display *d, png_infop info_ptr)
       png_textp text;
       png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL);
 
-      while (ntext-- > 0) switch (text[ntext].compression)
+      while (ntext > 0) switch (text[--ntext].compression)
       {
          case -1:
             flags |= PNG_INFO_tEXt;
