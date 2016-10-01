@@ -5719,9 +5719,10 @@ Version 1.6.26beta01 [September 26, 2016]
   Add tests/badcrc.png and tests/badadler.png to tests/pngtest.
   Merged pngtest.c with libpng-1.7.0beta84/pngtest.c
 
-Version 1.6.26beta02 [September 30, 2016]
+Version 1.6.26beta02 [October 1, 2016]
   Updated the documentation about CRC and ADLER32 handling.
-  Quieted a warning from clang-3.8 in pngtrans.c.
+  Quieted 117 warnings from clang-3.8 in pngtrans.c, pngread.c,
+     pngwrite.c, pngunknown.c, and pngvalid.c.
   Quieted 116 (out of 288) -Wconversion compiler warnings by changing
     flag definitions in pngpriv.h from 0xnnnn to 0xnnnnU and trivial changes
     in png.c, pngread.c, and pngwutil.c.
