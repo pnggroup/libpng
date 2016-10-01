@@ -3228,10 +3228,10 @@ png_image_read_colormapped(png_voidp argument)
 
       while (--passes >= 0)
       {
-         png_uint_32      y = image->height + 1;
+         png_uint_32      y = image->height;
          png_bytep        row = png_voidcast(png_bytep, display->first_row);
 
-         while (y-- > 1)
+         while (y-- > 0)
          {
             png_read_row(png_ptr, row, NULL);
             row += row_bytes;
@@ -4061,10 +4061,10 @@ png_image_read_direct(png_voidp argument)
 
       while (--passes >= 0)
       {
-         png_uint_32      y = image->height + 1;
+         png_uint_32      y = image->height;
          png_bytep        row = png_voidcast(png_bytep, display->first_row);
 
-         while (y-- > 1)
+         while (y-- > 0)
          {
             png_read_row(png_ptr, row, NULL);
             row += row_bytes;

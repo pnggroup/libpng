@@ -1527,7 +1527,7 @@ png_write_image_16bit(png_voidp argument)
    png_uint_16p row_end;
    const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
    int aindex = 0;
-   png_uint_32 y = image->height + 1;
+   png_uint_32 y = image->height;
 
    if ((image->format & PNG_FORMAT_FLAG_ALPHA) != 0)
    {
@@ -1554,7 +1554,7 @@ png_write_image_16bit(png_voidp argument)
     */
    row_end = output_row + image->width * (channels+1);
 
-   while (y-- > 1)
+   while (y-- > 0)
    {
       png_const_uint_16p in_ptr = input_row;
       png_uint_16p out_ptr = output_row;
@@ -1682,7 +1682,7 @@ png_write_image_8bit(png_voidp argument)
    png_const_uint_16p input_row = png_voidcast(png_const_uint_16p,
        display->first_row);
    png_bytep output_row = png_voidcast(png_bytep, display->local_row);
-   png_uint_32 y = image->height + 1;
+   png_uint_32 y = image->height;
    const int channels = (image->format & PNG_FORMAT_FLAG_COLOR) != 0 ? 3 : 1;
 
    if ((image->format & PNG_FORMAT_FLAG_ALPHA) != 0)
@@ -1705,7 +1705,7 @@ png_write_image_8bit(png_voidp argument)
       /* Use row_end in place of a loop counter: */
       row_end = output_row + image->width * (channels+1);
 
-      while (y-- > 1)
+      while (y-- > 0)
       {
          png_const_uint_16p in_ptr = input_row;
          png_bytep out_ptr = output_row;
@@ -1746,7 +1746,7 @@ png_write_image_8bit(png_voidp argument)
        */
       png_bytep row_end = output_row + image->width * channels;
 
-      while (y-- > 1)
+      while (y-- > 0)
       {
          png_const_uint_16p in_ptr = input_row;
          png_bytep out_ptr = output_row;
@@ -2134,9 +2134,9 @@ png_image_write_main(png_voidp argument)
    {
       png_const_bytep row = png_voidcast(png_const_bytep, display->first_row);
       ptrdiff_t row_bytes = display->row_bytes;
-      png_uint_32 y = image->height + 1;
+      png_uint_32 y = image->height;
 
-      while (y-- > 1)
+      while (y-- > 0)
       {
          png_write_row(png_ptr, row);
          row += row_bytes;

@@ -1236,13 +1236,13 @@ store_image_check(const png_store* ps, png_const_structp pp, int iImage)
    else
    {
       png_size_t cbRow = ps->cb_row;
-      png_uint_32 rows = ps->image_h + 1;
+      png_uint_32 rows = ps->image_h;
 
       image += iImage * (cbRow+5) * ps->image_h;
 
       image += 2; /* skip image first row markers */
 
-      while (rows-- > 1)
+      while (rows-- > 0)
       {
          if (image[-2] != 190 || image[-1] != 239)
             png_error(pp, "row start overwritten");
@@ -11382,7 +11382,6 @@ perform_interlace_macro_validation(void)
 
    for (pass=0; pass<7; ++pass)
    {
-      /* TO DO: Check this: asan says png_uint_32 is not large enough */
       png_uint_32 m, f, v;
 
       m = PNG_PASS_START_ROW(pass);
