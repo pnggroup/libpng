@@ -684,7 +684,7 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
 void PNGAPI
 png_save_int_32(png_bytep buf, png_int_32 i)
 {
-   png_save_uint_32(buf, i);
+   png_save_uint_32(buf, (png_uint_32)i);
 }
 #  endif
 
@@ -2940,7 +2940,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
              */
             if (exp_b10 < 0 && exp_b10 > -3) /* PLUS 3 TOTAL 4 */
             {
-               czero = -exp_b10; /* PLUS 2 digits: TOTAL 3 */
+               czero = (unsigned int)(-exp_b10); /* PLUS 2 digits: TOTAL 3 */
                exp_b10 = 0;      /* Dot added below before first output. */
             }
             else
@@ -3118,11 +3118,11 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
                if (exp_b10 < 0)
                {
                   *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
-                  uexp_b10 = -exp_b10;
+                  uexp_b10 = (unsigned int)(-exp_b10);
                }
 
                else
-                  uexp_b10 = exp_b10;
+                  uexp_b10 = (unsigned int)exp_b10;
 
                cdigits = 0;
 
@@ -3184,9 +3184,9 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
 
       /* Avoid overflow here on the minimum integer. */
       if (fp < 0)
-         *ascii++ = 45, num = -fp;
+         *ascii++ = 45, num = (png_uint_32)(-fp);
       else
-         num = fp;
+         num = (png_uint_32)fp;
 
       if (num <= 0x80000000) /* else overflowed */
       {

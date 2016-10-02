@@ -1433,7 +1433,7 @@ png_image_read_header(png_voidp argument)
             break;
 
          case PNG_COLOR_TYPE_PALETTE:
-            cmap_entries = png_ptr->num_palette;
+            cmap_entries = (png_uint_32)png_ptr->num_palette;
             break;
 
          default:
@@ -2251,7 +2251,7 @@ png_image_read_colormap(png_voidp argument)
             if (PNG_GRAY_COLORMAP_ENTRIES > image->colormap_entries)
                png_error(png_ptr, "gray[16] color-map: too few entries");
 
-            cmap_entries = make_gray_colormap(display);
+            cmap_entries = (unsigned int)make_gray_colormap(display);
 
             if (png_ptr->num_trans > 0)
             {
@@ -2349,7 +2349,7 @@ png_image_read_colormap(png_voidp argument)
             if (PNG_GA_COLORMAP_ENTRIES > image->colormap_entries)
                png_error(png_ptr, "gray+alpha color-map: too few entries");
 
-            cmap_entries = make_ga_colormap(display);
+            cmap_entries = (unsigned int)make_ga_colormap(display);
 
             background_index = PNG_CMAP_GA_BACKGROUND;
             output_processing = PNG_CMAP_GA;
@@ -2383,7 +2383,7 @@ png_image_read_colormap(png_voidp argument)
                if (PNG_GRAY_COLORMAP_ENTRIES > image->colormap_entries)
                   png_error(png_ptr, "gray-alpha color-map: too few entries");
 
-               cmap_entries = make_gray_colormap(display);
+               cmap_entries = (unsigned int)make_gray_colormap(display);
 
                if (output_encoding == P_LINEAR)
                {
@@ -2522,7 +2522,7 @@ png_image_read_colormap(png_voidp argument)
                if (PNG_GA_COLORMAP_ENTRIES > image->colormap_entries)
                   png_error(png_ptr, "rgb[ga] color-map: too few entries");
 
-               cmap_entries = make_ga_colormap(display);
+               cmap_entries = (unsigned int)make_ga_colormap(display);
                background_index = PNG_CMAP_GA_BACKGROUND;
                output_processing = PNG_CMAP_GA;
             }
@@ -2548,12 +2548,12 @@ png_image_read_colormap(png_voidp argument)
                   png_ptr->num_trans > 0) &&
                   png_gamma_not_sRGB(png_ptr->colorspace.gamma) != 0)
                {
-                  cmap_entries = make_gray_file_colormap(display);
+                  cmap_entries = (unsigned int)make_gray_file_colormap(display);
                   data_encoding = P_FILE;
                }
 
                else
-                  cmap_entries = make_gray_colormap(display);
+                  cmap_entries = (unsigned int)make_gray_colormap(display);
 
                /* But if the input has alpha or transparency it must be removed
                 */
@@ -2641,7 +2641,7 @@ png_image_read_colormap(png_voidp argument)
                   if (PNG_RGB_COLORMAP_ENTRIES+1+27 > image->colormap_entries)
                      png_error(png_ptr, "rgb+alpha color-map: too few entries");
 
-                  cmap_entries = make_rgb_colormap(display);
+                  cmap_entries = (unsigned int)make_rgb_colormap(display);
 
                   /* Add a transparent entry. */
                   png_create_colormap_entry(display, cmap_entries, 255, 255,
@@ -2690,7 +2690,7 @@ png_image_read_colormap(png_voidp argument)
                   if (PNG_RGB_COLORMAP_ENTRIES+1+27 > image->colormap_entries)
                      png_error(png_ptr, "rgb-alpha color-map: too few entries");
 
-                  cmap_entries = make_rgb_colormap(display);
+                  cmap_entries = (unsigned int)make_rgb_colormap(display);
 
                   png_create_colormap_entry(display, cmap_entries, back_r,
                       back_g, back_b, 0/*unused*/, output_encoding);
@@ -2775,7 +2775,7 @@ png_image_read_colormap(png_voidp argument)
                if (PNG_RGB_COLORMAP_ENTRIES > image->colormap_entries)
                   png_error(png_ptr, "rgb color-map: too few entries");
 
-               cmap_entries = make_rgb_colormap(display);
+               cmap_entries = (unsigned int)make_rgb_colormap(display);
                output_processing = PNG_CMAP_RGB;
             }
          }
@@ -2799,11 +2799,11 @@ png_image_read_colormap(png_voidp argument)
 
             output_processing = PNG_CMAP_NONE;
             data_encoding = P_FILE; /* Don't change from color-map indices */
-            cmap_entries = png_ptr->num_palette;
+            cmap_entries = (unsigned int)png_ptr->num_palette;
             if (cmap_entries > 256)
                cmap_entries = 256;
 
-            if (cmap_entries > image->colormap_entries)
+            if (cmap_entries > (unsigned int)image->colormap_entries)
                png_error(png_ptr, "palette color-map: too few entries");
 
             for (i=0; i < cmap_entries; ++i)
