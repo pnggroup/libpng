@@ -1176,7 +1176,7 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
    png_byte new_name[80];
    png_byte entrybuf[10];
    png_size_t entry_size = (spalette->depth == 8 ? 6 : 10);
-   png_size_t palette_size = entry_size * spalette->nentries;
+   png_size_t palette_size = entry_size * (png_size_t)spalette->nentries;
    png_sPLT_entryp ep;
 #ifndef PNG_POINTER_INDEXING_SUPPORTED
    int i;
@@ -1743,7 +1743,7 @@ png_write_pCAL(png_structrp png_ptr, png_charp purpose, png_int_32 X0,
    total_len = purpose_len + units_len + 10;
 
    params_len = (png_size_tp)png_malloc(png_ptr,
-       (png_alloc_size_t)(nparams * (sizeof (png_size_t))));
+       (png_alloc_size_t)((png_alloc_size_t)nparams * (sizeof (png_size_t))));
 
    /* Find the length of each parameter, making sure we don't count the
     * null terminator for the last parameter.

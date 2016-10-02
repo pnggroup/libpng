@@ -359,9 +359,9 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 
          for (i = 0, rp = row; i < row_width; i++, rp += bytes_per_pixel)
          {
-            png_uint_32 s0   = (*(rp    ) << 8) | *(rp + 1);
-            png_uint_32 s1   = (*(rp + 2) << 8) | *(rp + 3);
-            png_uint_32 s2   = (*(rp + 4) << 8) | *(rp + 5);
+            png_uint_32 s0   = (png_uint_32)(*(rp    ) << 8) | *(rp + 1);
+            png_uint_32 s1   = (png_uint_32)(*(rp + 2) << 8) | *(rp + 3);
+            png_uint_32 s2   = (png_uint_32)(*(rp + 4) << 8) | *(rp + 5);
             png_uint_32 red  = (s0 + s1 + 65536) & 0xffff;
             png_uint_32 blue = (s2 + s1 + 65536) & 0xffff;
             *(rp    ) = (png_byte)((red >> 8) & 0xff);
@@ -2915,7 +2915,7 @@ png_image_read_colormap(png_voidp argument)
          png_error(png_ptr, "bad background index (internal error)");
    }
 
-   display->colormap_processing = output_processing;
+   display->colormap_processing = (int)output_processing;
 
    return 1/*ok*/;
 }
@@ -3224,7 +3224,7 @@ png_image_read_colormapped(png_voidp argument)
 
    else
    {
-      png_alloc_size_t row_bytes = display->row_bytes;
+      png_alloc_size_t row_bytes = (png_alloc_size_t)display->row_bytes;
 
       while (--passes >= 0)
       {
@@ -3559,8 +3559,9 @@ png_image_read_background(png_voidp argument)
              * stride which was multiplied by 2 (below) to get row_bytes.
              */
             ptrdiff_t    step_row = display->row_bytes / 2;
-            int preserve_alpha = (image->format & PNG_FORMAT_FLAG_ALPHA) != 0;
-            unsigned int outchannels = 1+preserve_alpha;
+            unsigned int preserve_alpha = (image->format &
+                PNG_FORMAT_FLAG_ALPHA) != 0;
+            unsigned int outchannels = 1U+preserve_alpha;
             int swap_alpha = 0;
 
 #           ifdef PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
@@ -4057,7 +4058,7 @@ png_image_read_direct(png_voidp argument)
 
    else
    {
-      png_alloc_size_t row_bytes = display->row_bytes;
+      png_alloc_size_t row_bytes = (png_alloc_size_t)display->row_bytes;
 
       while (--passes >= 0)
       {
@@ -4102,10 +4103,10 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
             row_stride = (png_int_32)/*SAFE*/png_row_stride;
 
          if (row_stride < 0)
-            check = -row_stride;
+            check = (png_uint_32)(-row_stride);
 
          else
-            check = row_stride;
+            check = (png_uint_32)row_stride;
 
          /* This verifies 'check', the absolute value of the actual stride
           * passed in and detects overflow in the application calculation (i.e.

@@ -5728,9 +5728,18 @@ Version 1.6.26beta02 [October 1, 2016]
     in png.c, pngread.c, and pngwutil.c.
 
 Version 1.6.26beta03 [October 2, 2016]
-  Quieted 45 (out of 86 remaining) -Wconversion compiler warnings by
+  Quieted the 86 remaining -Wconversion compiler warnings by
     revising the png_isaligned() macro and trivial changes in png.c,
-    pngerror.c, pngget.c, pngset.c, and pngrutil.c.
+    pngerror.c, pngget.c, pngmem.c, pngset.c, pngrtran.c, pngrutil.c,
+    pngwtran.c, pngwrite.c, and pngwutil.c.
+
+Send comments/corrections/commendations to png-mng-implement at lists.sf.net
+(subscription required; visit
+https://lists.sourceforge.net/lists/listinfo/png-mng-implement
+to subscribe)
+or to glennrp at users.sourceforge.net
+
+Glenn R-P
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
