@@ -5727,7 +5727,7 @@ Version 1.6.26beta02 [October 1, 2016]
     flag definitions in pngpriv.h from 0xnnnn to 0xnnnnU and trivial changes
     in png.c, pngread.c, and pngwutil.c.
 
-Version 1.6.26beta03 [October 3, 2016]
+Version 1.6.26beta03 [October 2, 2016]
   Removed contrib/libtests/*.orig and *.rej that slipped into the tarballs.
   Quieted the 86 remaining -Wconversion compiler warnings by
     revising the png_isaligned() macro and trivial changes in png.c,
@@ -5735,6 +5735,8 @@ Version 1.6.26beta03 [October 3, 2016]
     pngwtran.c, pngwrite.c, and pngwutil.c.
 
 Version 1.6.26beta04 [October 3, 2016]
+  Quieted (bogus?) clang warnings about "absolute value has no effect".
+  Fixed offsets in contrib/intel/intel_sse.patch
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
