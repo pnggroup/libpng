@@ -2264,7 +2264,7 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    {
       v = *dp = *rp;
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2275,7 +2275,7 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
    {
       v = *dp = (png_byte)(((int)*rp - (int)*lp) & 0xff);
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2326,7 +2326,7 @@ png_setup_up_row(png_structrp png_ptr, const png_size_t row_bytes,
    {
       v = *dp = (png_byte)(((int)*rp - (int)*pp) & 0xff);
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2370,7 +2370,7 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
       v = *dp++ = (png_byte)(((int)*rp++ - ((int)*pp++ / 2)) & 0xff);
 
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2382,7 +2382,7 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
           & 0xff);
 
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2432,7 +2432,7 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
       v = *dp++ = (png_byte)(((int)*rp++ - (int)*pp++) & 0xff);
 
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2465,7 +2465,7 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
       v = *dp++ = (png_byte)(((int)*rp++ - p) & 0xff);
 
 #ifdef PNG_USE_ABS
-      sum += 128 - abs(v - 128);
+      sum += 128 - abs((int)v - 128);
 #else
       sum += (v < 128) ? v : 256 - v;
 #endif
@@ -2595,7 +2595,7 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
          {
             v = *rp;
 #ifdef PNG_USE_ABS
-            sum += 128 - abs(v - 128);
+            sum += 128 - abs((int)v - 128);
 #else
             sum += (v < 128) ? v : 256 - v;
 #endif
