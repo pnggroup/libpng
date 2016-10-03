@@ -57,7 +57,8 @@ Version 1.6.26beta03 [October 2, 2016]
     pngwtran.c, pngwrite.c, and pngwutil.c.
 
 Version 1.6.26beta04 [October 3, 2016]
-  Quieted (bogus?) clang warnings about "absolute value has no effect".
+  Quieted (bogus?) clang warnings about "absolute value has no effect"
+    when PNG_USE_ABS is defined.
   Fixed offsets in contrib/intel/intel_sse.patch
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
