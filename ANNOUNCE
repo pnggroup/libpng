@@ -50,6 +50,7 @@ Version 1.6.26beta02 [October 1, 2016]
     in png.c, pngread.c, and pngwutil.c.
 
 Version 1.6.26beta03 [October 2, 2016]
+  Removed contrib/libtests/*.orig and *.rej that slipped into the tarballs.
   Quieted the 86 remaining -Wconversion compiler warnings by
     revising the png_isaligned() macro and trivial changes in png.c,
     pngerror.c, pngget.c, pngmem.c, pngset.c, pngrtran.c, pngrutil.c,
