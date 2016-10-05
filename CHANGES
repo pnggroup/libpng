@@ -5739,7 +5739,9 @@ Version 1.6.26beta04 [October 3, 2016]
     when PNG_USE_ABS is defined.
   Fixed offsets in contrib/intel/intel_sse.patch
 
-Version 1.6.26beta05 [October 3, 2016]
+Version 1.6.26beta05 [October 5, 2016]
+  Changed integer constant 4294967294 to unsigned 4294967294U in pngconf.h
+    to avoid a signed/unsigned compare in the preprocessor.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

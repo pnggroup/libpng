@@ -1,4 +1,4 @@
-Libpng 1.6.26beta05 - October 3, 2016
+Libpng 1.6.26beta05 - October 5, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -61,7 +61,9 @@ Version 1.6.26beta04 [October 3, 2016]
     when PNG_USE_ABS is defined.
   Fixed offsets in contrib/intel/intel_sse.patch
 
-Version 1.6.26beta05 [October 3, 2016]
+Version 1.6.26beta05 [October 5, 2016]
+  Changed integer constant 4294967294 to unsigned 4294967294U in pngconf.h
+    to avoid a signed/unsigned compare in the preprocessor.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
