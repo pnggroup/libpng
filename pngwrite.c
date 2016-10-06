@@ -1942,7 +1942,7 @@ png_image_write_main(png_voidp argument)
    {
       const unsigned int channels = PNG_IMAGE_PIXEL_CHANNELS(image->format);
 
-      if (image->width <= 0x7FFFFFFFU/channels) /* no overflow */
+      if (image->width <= 0x7fffffffU/channels) /* no overflow */
       {
          png_uint_32 check;
          const png_uint_32 png_row_stride = image->width * channels;
@@ -1962,7 +1962,7 @@ png_image_write_main(png_voidp argument)
              * limits the whole image size to 32 bits for API compatibility with
              * the current, 32-bit, PNG_IMAGE_BUFFER_SIZE macro.
              */
-            if (image->height > 0xFFFFFFFF/png_row_stride)
+            if (image->height > 0xffffffffU/png_row_stride)
                png_error(image->opaque->png_ptr, "memory image too large");
          }
 

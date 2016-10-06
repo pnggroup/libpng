@@ -593,7 +593,7 @@ Version 1.0.5e [November 30, 1999]
     with trailing compressed parts easier in the future, and added new functions
     png_free_iCCP, png_free_pCAL, png_free_sPLT, png_free_text, png_get_iCCP,
     png_get_spalettes, png_set_iCCP, png_set_spalettes (Eric S. Raymond).
-  NOTE: Applications that write text chunks MUST define png_text->lang
+    NOTE: Applications that write text chunks MUST define png_text->lang
     before calling png_set_text(). It must be set to NULL if you want to
     write tEXt or zTXt chunks.  If you want your application to be able to
     run with older versions of libpng, use
@@ -5739,7 +5739,7 @@ Version 1.6.26beta04 [October 3, 2016]
     when PNG_USE_ABS is defined.
   Fixed offsets in contrib/intel/intel_sse.patch
 
-Version 1.6.26beta05 [October 5, 2016]
+Version 1.6.26beta05 [October 6, 2016]
   Changed integer constant 4294967294 to unsigned 4294967294U in pngconf.h
     to avoid a signed/unsigned compare in the preprocessor.
 
@@ -5750,5 +5750,4 @@ to subscribe)
 or to glennrp at users.sourceforge.net
 
 Glenn R-P
-
 #endif

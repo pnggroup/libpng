@@ -4094,7 +4094,7 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
        * bits; this is just to verify that the 'row_stride' argument can be
        * represented.
        */
-      if (image->width <= 0x7FFFFFFFU/channels) /* no overflow */
+      if (image->width <= 0x7fffffffU/channels) /* no overflow */
       {
          png_uint_32 check;
          const png_uint_32 png_row_stride = image->width * channels;
@@ -4131,7 +4131,7 @@ png_image_finish_read(png_imagep image, png_const_colorp background,
              * accomodated on 64-bit systems.
              */
             if (image->height <=
-                0xFFFFFFFFU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)
+                0xffffffffU/PNG_IMAGE_PIXEL_COMPONENT_SIZE(image->format)/check)
             {
                if ((image->format & PNG_FORMAT_FLAG_COLORMAP) == 0 ||
                   (image->colormap_entries > 0 && colormap != NULL))
