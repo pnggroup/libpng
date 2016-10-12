@@ -5745,9 +5745,10 @@ Version 1.6.26beta05 [October 6, 2016]
 
 Version 1.6.26beta06 [October 7, 2016]
   Use zlib-1.2.8.1 inflateValidate() instead of inflateReset2() to
-    avoid ADLER32 evaluation.
+    optionally avoid ADLER32 evaluation.
 
-Version 1.6.26beta07 [October 7, 2016]
+Version 1.6.26rc01 [October 12, 2016]
+   No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
