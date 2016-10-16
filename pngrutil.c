@@ -4523,7 +4523,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
     * does not, so free the read buffer now regardless; the sequential reader
     * reallocates it on demand.
     */
-   if (png_ptr->read_buffer != 0)
+   if (png_ptr->read_buffer != NULL)
    {
       png_bytep buffer = png_ptr->read_buffer;
 
