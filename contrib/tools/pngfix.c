@@ -2,7 +2,7 @@
  *
  * Copyright (c) 2014-2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.21 [January 15, 2016]
+ * Last changed in libpng 1.6.26 [October 20, 2016]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -1824,7 +1824,7 @@ IDAT_init(struct IDAT * const idat, struct file * const file)
 }
 
 static png_uint_32
-rechunk_length(struct IDAT *idat)
+rechunk_length(struct IDAT *idat, int start)
    /* Return the length for the next IDAT chunk, taking into account
     * rechunking.
     */
@@ -1836,7 +1836,7 @@ rechunk_length(struct IDAT *idat)
       const struct IDAT_list *cur;
       unsigned int count;
 
-      if (idat->idat_index == 0) /* at the new chunk (first time) */
+      if (start)
          return idat->idat_length; /* use the cache */
 
       /* Otherwise rechunk_length is called at the end of a chunk for the length
@@ -1995,7 +1995,7 @@ process_IDAT(struct file *file)
       idat->idat_index = 0; /* Index into chunk data */
 
       /* Update the chunk length to the correct value for the IDAT chunk: */
-      file->chunk->chunk_length = rechunk_length(idat);
+      file->chunk->chunk_length = rechunk_length(idat, 1/*start*/);
 
       /* Change the state to writing IDAT chunks */
       file->state = STATE_IDAT;
@@ -3473,7 +3473,8 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
                      /* Write another IDAT chunk.  Call rechunk_length to
                       * calculate the length required.
                       */
-                     length = chunk->chunk_length = rechunk_length(file->idat);
+                     length = chunk->chunk_length =
+                         rechunk_length(file->idat, 0/*end*/);
                      assert(type == png_IDAT);
                      file->write_count = 0; /* for the new chunk */
                      --(file->write_count); /* fake out the increment below */

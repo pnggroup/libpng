@@ -1,7 +1,7 @@
 
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Last changed in libpng 1.6.22 [May 26, 2016]
+ * Last changed in libpng 1.6.26 [October 20, 2016]
  * Copyright (c) 2015,2016 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -478,7 +478,7 @@ get_valid(display *d, png_infop info_ptr)
       png_textp text;
       png_uint_32 ntext = png_get_text(d->png_ptr, info_ptr, &text, NULL);
 
-      while (ntext-- > 0) switch (text[ntext].compression)
+      while (ntext > 0) switch (text[--ntext].compression)
       {
          case -1:
             flags |= PNG_INFO_tEXt;

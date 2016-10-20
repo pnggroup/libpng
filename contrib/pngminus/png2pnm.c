@@ -1,6 +1,6 @@
 /*
  *  png2pnm.c --- conversion from PNG-file to PGM/PPM-file
- *  copyright (C) 1999 by Willem van Schaik <willem@schaik.com>
+ *  copyright (C) 1999 by Willem van Schaik <willem at schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
  *

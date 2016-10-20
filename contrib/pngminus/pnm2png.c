@@ -1,6 +1,6 @@
 /*
  *  pnm2png.c --- conversion from PBM/PGM/PPM-file to PNG-file
- *  copyright (C) 1999 by Willem van Schaik <willem@schaik.com>
+ *  copyright (C) 1999 by Willem van Schaik <willem at schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
  *  version 1.1 - 2015.07.29 - Fixed leaks (Glenn Randers-Pehrson)
