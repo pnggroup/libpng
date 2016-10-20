@@ -5747,8 +5747,12 @@ Version 1.6.26beta06 [October 7, 2016]
   Use zlib-1.2.8.1 inflateValidate() instead of inflateReset2() to
     optionally avoid ADLER32 evaluation.
 
-Version 1.6.26rc01 [October 16, 2016]
-   No changes.
+Version 1.6.26rc01 [October 12, 2016]
+  No changes.
+
+Version 1.6.26 [October 20, 2016]
+  Cosmetic change, "ptr != 0" to "ptr != NULL" in png.c and pngrutil.c
+  Despammed email addresses (replaced "@" with " at ").
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

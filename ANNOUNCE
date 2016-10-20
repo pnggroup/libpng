@@ -1,31 +1,29 @@
-Libpng 1.6.26rc02 - October 16, 2016
+Libpng 1.6.26 - October 20, 2016
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.26rc02.tar.xz (LZMA-compressed, recommended)
-   1.6.26rc02.tar.gz
+   libpng-1.6.26.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.26.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1626r02.7z  (LZMA-compressed, recommended)
-   lp1626r02.zip
+   lpng1626.7z  (LZMA-compressed, recommended)
+   lpng1626.zip
 
 Other information:
 
-   1.6.26rc02-README.txt
-   1.6.26rc02-LICENSE.txt
-   libpng-1.6.26rc02-*.asc (armored detached GPG signatures)
+   libpng-1.6.26-README.txt
+   libpng-1.6.26-LICENSE.txt
+   libpng-1.6.26-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.25):
 
-Version 1.6.26beta01 [September 26, 2016]
   Fixed handling zero length IDAT in pngfix (bug report by Agostino Sarubbo,
     bugfix by John Bowler).
   Do not issue a png_error() on read in png_set_pCAL() because png_handle_pCAL
@@ -40,37 +38,22 @@ Version 1.6.26beta01 [September 26, 2016]
   Issue png_benign_error() on ADLER32 checksum mismatch instead of png_error().
   Add tests/badcrc.png and tests/badadler.png to tests/pngtest.
   Merged pngtest.c with libpng-1.7.0beta84/pngtest.c
-
-Version 1.6.26beta02 [October 1, 2016]
   Updated the documentation about CRC and ADLER32 handling.
   Quieted 117 warnings from clang-3.8 in pngtrans.c, pngread.c,
      pngwrite.c, pngunknown.c, and pngvalid.c.
-  Quieted 58 (out of 144) -Wconversion compiler warnings by changing
-    flag definitions in pngpriv.h from 0xnnnn to 0xnnnnU and trivial changes
-    in png.c, pngread.c, and pngwutil.c.
-
-Version 1.6.26beta03 [October 2, 2016]
-  Removed contrib/libtests/*.orig and *.rej that slipped into the tarballs.
-  Quieted the 86 remaining -Wconversion compiler warnings by
+  Quieted the 144 remaining -Wconversion compiler warnings by
     revising the png_isaligned() macro and trivial changes in png.c,
     pngerror.c, pngget.c, pngmem.c, pngset.c, pngrtran.c, pngrutil.c,
     pngwtran.c, pngwrite.c, and pngwutil.c.
-
-Version 1.6.26beta04 [October 3, 2016]
   Quieted (bogus?) clang warnings about "absolute value has no effect"
     when PNG_USE_ABS is defined.
   Fixed offsets in contrib/intel/intel_sse.patch
-
-Version 1.6.26beta05 [October 6, 2016]
   Changed integer constant 4294967294 to unsigned 4294967294U in pngconf.h
     to avoid a signed/unsigned compare in the preprocessor.
-
-Version 1.6.26beta06 [October 7, 2016]
   Use zlib-1.2.8.1 inflateValidate() instead of inflateReset2() to
     optionally avoid ADLER32 evaluation.
-
-Version 1.6.26rc01 [October 16, 2016]
-   No changes.
+  Cosmetic change, "ptr != 0" to "ptr != NULL" in png.c and pngrutil.c
+  Despammed email addresses (replaced "@" with " at ").
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
