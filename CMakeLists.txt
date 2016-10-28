@@ -69,6 +69,23 @@ option(PNGARG        "Disable ANSI-C prototypes" OFF)
 set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
+# set definitions and sources for arm
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
+  set(libpng_arm_sources
+    arm/arm_init.c
+    arm/filter_neon.S
+    arm/filter_neon_intrinsics.c)
+  if(PNG_ARM_NEON)
+    if(${PNG_ARM_NEON} STREQUAL "no")
+      add_definitions(-DPNG_ARM_NEON_OPT=0)
+    elseif(${PNG_ARM_NEON} STREQUAL "on")
+      add_definitions(-DPNG_ARM_NEON_OPT=2)
+     elseif(${PNG_ARM_NEON} STREQUAL "api")
+      add_definitions(-PNG_ARM_NEON_API_SUPPORTED)
+    endif()
+  endif()
+endif()
+
 # SET LIBNAME
 set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 
@@ -342,6 +359,7 @@ if(AWK)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 endif()
 set(libpng_sources
+  ${libpng_arm_sources}
   ${libpng_public_hdrs}
   ${libpng_private_hdrs}
   png.c
@@ -801,4 +819,3 @@ endif()
 # to create msvc import lib for mingw compiled shared lib
 # pexports libpng.dll > libpng.def
 # lib /def:libpng.def /machine:x86
-
