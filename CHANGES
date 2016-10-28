@@ -5754,6 +5754,8 @@ Version 1.6.26 [October 20, 2016]
   Cosmetic change, "ptr != 0" to "ptr != NULL" in png.c and pngrutil.c
   Despammed email addresses (replaced "@" with " at ").
 
+Version 1.6.27beta01 [October 28, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
