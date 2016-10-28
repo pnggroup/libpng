@@ -26,6 +26,8 @@ Other information:
 Changes since the last public release (1.6.26):
 
 Version 1.6.27beta01 [October 28, 2016]
+  Restrict the new ADLER32-skipping to IDAT chunks.  It broke iCCP chunk
+    handling.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
