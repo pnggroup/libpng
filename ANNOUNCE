@@ -27,7 +27,8 @@ Other information:
 Changes since the last public release (1.5.27):
 
 version 1.5.28beta01 [October 30, 2016]
-  Merge with current libpng16 gregbook, pngvalid.c, pngtest.c
+  Merged with current libpng16 gregbook, pngvalid.c, pngtest.c, pngminim,
+    pngminus
   Fixed undefined behavior in png_push_save_buffer(). Do not call
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
   Added "Common linking failures" section to INSTALL.
