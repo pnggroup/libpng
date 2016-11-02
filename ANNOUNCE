@@ -1,4 +1,4 @@
-Libpng 1.6.27beta01 - October 28, 2016
+Libpng 1.6.27beta01 - November 2, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,9 +25,11 @@ Other information:
 
 Changes since the last public release (1.6.26):
 
-Version 1.6.27beta01 [October 28, 2016]
+Version 1.6.27beta01 [November 2, 2016]
   Restrict the new ADLER32-skipping to IDAT chunks.  It broke iCCP chunk
-    handling.
+    handling: an erroneous iCCP chunk would throw a png_error and reject the
+    entire PNG image instead of rejecting just the iCCP chunk with a warning,
+    if build with zlib-1.2.8.1.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
