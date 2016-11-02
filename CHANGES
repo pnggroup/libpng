@@ -5758,7 +5758,9 @@ Version 1.6.27beta01 [November 2, 2016]
   Restrict the new ADLER32-skipping to IDAT chunks.  It broke iCCP chunk
     handling: an erroneous iCCP chunk would throw a png_error and reject the
     entire PNG image instead of rejecting just the iCCP chunk with a warning,
-    if build with zlib-1.2.8.1.
+    if built with zlib-1.2.8.1.
+
+Version 1.6.27beta02 [November 2, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
