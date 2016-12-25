@@ -1,5 +1,5 @@
 
-Libpng 1.4.20beta01 - June 4, 2016
+Libpng 1.4.20beta01 - December 27, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.4.19):
 
-version 1.4.20beta01 [June 4, 2016]
+version 1.4.20beta01 [December 27, 2016]
   Fix typos in libpng.3 synopses (Eric S. Raymond).
   Fixed undefined behavior in png_push_save_buffer(). Do not call
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
