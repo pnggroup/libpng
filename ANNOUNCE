@@ -1,5 +1,5 @@
 
-Libpng 1.5.28beta01 - October 30, 2016
+Libpng 1.5.28beta01 - December 27, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,7 @@ Other information:
 
 Changes since the last public release (1.5.27):
 
-version 1.5.28beta01 [October 30, 2016]
+version 1.5.28beta01 [December 27, 2016]
   Merged with current libpng16 gregbook, pngvalid.c, pngtest.c, pngminim,
     pngminus
   Fixed undefined behavior in png_push_save_buffer(). Do not call
