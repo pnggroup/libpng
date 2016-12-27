@@ -1362,13 +1362,6 @@ PNG_EXTERN int png_check_cHRM_fixed PNGARG((png_structp png_ptr,
     png_fixed_point int_blue_y));
 #endif
 
-#ifdef PNG_CHECK_cHRM_SUPPORTED
-/* Added at libpng version 1.2.34 and 1.4.0 */
-/* Currently only used by png_check_cHRM_fixed */
-PNG_EXTERN void png_64bit_product PNGARG((long v1, long v2,
-    unsigned long *hi_product, unsigned long *lo_product));
-#endif
-
 #ifdef PNG_cHRM_SUPPORTED
 /* Added at libpng version 1.5.5 */
 typedef struct png_xy
