@@ -540,14 +540,14 @@ png_decompress_chunk(png_structrp png_ptr,
     */
    png_alloc_size_t limit = PNG_SIZE_MAX;
 
-#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
-      if (png_ptr->user_chunk_malloc_max > 0 &&
-         png_ptr->user_chunk_malloc_max < limit)
-         limit = png_ptr->user_chunk_malloc_max;
-#  elif PNG_USER_CHUNK_MALLOC_MAX > 0
-      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
-         limit = PNG_USER_CHUNK_MALLOC_MAX;
-#  endif
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+   if (png_ptr->user_chunk_malloc_max > 0 &&
+      png_ptr->user_chunk_malloc_max < limit)
+      limit = png_ptr->user_chunk_malloc_max;
+#elif PNG_USER_CHUNK_MALLOC_MAX > 0
+   if (PNG_USER_CHUNK_MALLOC_MAX < limit)
+      limit = PNG_USER_CHUNK_MALLOC_MAX;
+#endif
 
    if (limit >= prefix_size + (terminate != 0))
    {
@@ -641,7 +641,7 @@ png_decompress_chunk(png_structrp png_ptr,
                    */
                   if (ret == Z_STREAM_END &&
                       chunklength - prefix_size != lzsize)
-                      png_chunk_benign_error(png_ptr, "extra compressed data");
+                     png_chunk_benign_error(png_ptr, "extra compressed data");
                }
 
                else
