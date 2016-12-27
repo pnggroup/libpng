@@ -629,12 +629,16 @@ png_do_check_palette_indexes(png_structp png_ptr, png_row_infop row_info)
       png_ptr->num_palette > 0) /* num_palette can be 0 in MNG files */
    {
       /* Calculations moved outside switch in an attempt to stop different
-       * compiler warnings.  'padding' is in *bits* within the last byte, it is
-       * an 'int' because pixel_depth becomes an 'int' in the expression below,
-       * and this calculation is used because it avoids warnings that other
-       * forms produced on either GCC or MSVC.
+       * compiler warnings.
+       *
+       * 1.5.28: This rewritten version attempts to remove the unsigned integer
+       * overflow from the prior version.  While this was well defined it
+       * resulted in unsigned overflow detection in clang.  Since the result is
+       * always in the range 0..7 only the low three bits of of the various
+       * intermediates are every required, so:
        */
-      int padding = (-row_info->pixel_depth * row_info->width) & 7;
+      unsigned int padding =
+          ((8 - (row_info->pixel_depth & 7)) * (row_info->width & 7)) & 7;
       png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
 
       switch (row_info->bit_depth)
