@@ -4010,8 +4010,11 @@ check_interlace_type(int const interlace_type)
 #  define do_own_interlace 1
 #endif /* WRITE_INTERLACING tests */
 
-#define CAN_WRITE_INTERLACE\
-   PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
+#if PNG_LIBPNG_VER >= 10700 || defined PNG_WRITE_INTERLACING_SUPPORTED
+#   define CAN_WRITE_INTERLACE 1
+#else
+#   define CAN_WRITE_INTERLACE 0
+#endif
 
 /* Do the same thing for read interlacing; this controls whether read tests do
  * their own de-interlace or use libpng.
