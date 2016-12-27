@@ -1,5 +1,5 @@
 
-Libpng 1.4.20beta01 - December 27, 2016
+Libpng 1.4.20rc01 - December 27, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,24 +9,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.20beta01.tar.xz (LZMA-compressed, recommended)
-   1.4.20beta01.tar.gz
+   1.4.20rc01.tar.xz (LZMA-compressed, recommended)
+   1.4.20rc01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1420b01.7z (LZMA-compressed, recommended)
-   lp1420b01.zip
+   lp1420r01.7z (LZMA-compressed, recommended)
+   lp1420r01.zip
 
 Other information:
 
-   1.4.20beta01-README.txt
-   1.4.20beta01-LICENSE.txt
-   libpng-1.4.20beta01-*.asc (armored detached GPG signatures)
+   1.4.20rc01-README.txt
+   1.4.20rc01-LICENSE.txt
+   libpng-1.4.20rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.19):
 
-version 1.4.20beta01 [December 27, 2016]
+version 1.4.20rc01 [December 27, 2016]
   Fix typos in libpng.3 synopses (Eric S. Raymond).
   Fixed undefined behavior in png_push_save_buffer(). Do not call
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
