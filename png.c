@@ -996,8 +996,13 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
     * In 1.6.0 this test replaces the ones in pngrutil.c, in the gAMA chunk
     * handling code, which only required the value to be >0.
     */
-#  define ERRMSG (defined PNG_TRANSFORM_MECH_SUPPORTED) &&\
-                 (defined PNG_ERROR_TEXT_SUPPORTED)
+#  if (defined PNG_TRANSFORM_MECH_SUPPORTED) &&\
+      (defined PNG_ERROR_TEXT_SUPPORTED)
+#     define ERRMSG 1
+#  else
+#     define ERRMSG 0
+#  endif
+
 #  if ERRMSG
       png_const_charp errmsg;
 #  endif
