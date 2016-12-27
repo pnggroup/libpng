@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.27beta02, November 2, 2016
+ * libpng version 1.6.27beta02, December 26, 2016
  *
  * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.27beta02, November 2, 2016:
+ *   libpng versions 0.97, January 1998, through 1.6.27beta02, December 26, 2016:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -29,7 +29,7 @@
  * files that are distributed with libpng have other copyright owners and
  * are released under other open source licenses.
  *
- * libpng versions 1.0.7, July 1, 2000 through 1.6.27beta02, November 2, 2016 are
+ * libpng versions 1.0.7, July 1, 2000 through 1.6.27beta02, December 26, 2016 are
  * Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -246,7 +246,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    November 2, 2016
+ *    December 26, 2016
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -315,7 +315,7 @@
 
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.27beta02"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.27beta02 - November 2, 2016\n"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.27beta02 - December 26, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -3230,7 +3230,8 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #ifdef PNG_MIPS_MSA_API_SUPPORTED
 #  define PNG_MIPS_MSA   6 /* HARDWARE: MIPS Msa SIMD instructions supported */
 #endif
-#define PNG_OPTION_NEXT  8 /* Next option - numbers must be even */
+#define PNG_IGNORE_ADLER32 8
+#define PNG_OPTION_NEXT  10 /* Next option - numbers must be even */
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
