@@ -319,9 +319,13 @@
  * is just the affirm code; there's no reason to allow configuration of this
  * option.
  */
-#define PNG_AFFIRM_TEXT (PNG_RELEASE_BUILD ?\
-         (defined PNG_ERROR_TEXT_SUPPORTED) :\
-         (defined PNG_WARNINGS_SUPPORTED) || (defined PNG_CONSOLE_IO_SUPPORTED))
+#if PNG_RELEASE_BUILD ?\
+      (defined PNG_ERROR_TEXT_SUPPORTED) :\
+      (defined PNG_WARNINGS_SUPPORTED) || (defined PNG_CONSOLE_IO_SUPPORTED)
+#  define PNG_AFFIRM_TEXT 1
+#else
+#  define PNG_AFFIRM_TEXT 0
+#endif /* PNG_AFFIRM_TEXT definition */
 
 #define PNG_SRC_LINE (PNG_SRC_FILE + __LINE__)
 

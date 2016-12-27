@@ -15,7 +15,7 @@
 #define PNG_SRC_FILE PNG_SRC_FILE_png
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_7_0beta85 Your_png_h_is_not_version_1_7_0beta85;
+typedef png_libpng_version_1_7_0beta86 Your_png_h_is_not_version_1_7_0beta86;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -704,14 +704,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta85 - December 27, 2016" PNG_STRING_NEWLINE \
+     "libpng version 1.7.0beta86 - December 27, 2016" PNG_STRING_NEWLINE \
      "Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson" \
      PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta85 - December 27, 2016\
+      return "libpng version 1.7.0beta86 - December 27, 2016\
       Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -996,8 +996,13 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
     * In 1.6.0 this test replaces the ones in pngrutil.c, in the gAMA chunk
     * handling code, which only required the value to be >0.
     */
-#  define ERRMSG (defined PNG_TRANSFORM_MECH_SUPPORTED) &&\
-                 (defined PNG_ERROR_TEXT_SUPPORTED)
+#  if (defined PNG_TRANSFORM_MECH_SUPPORTED) &&\
+      (defined PNG_ERROR_TEXT_SUPPORTED)
+#     define ERRMSG 1
+#  else
+#     define ERRMSG 0
+#  endif
+
 #  if ERRMSG
       png_const_charp errmsg;
 #  endif
