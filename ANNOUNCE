@@ -34,6 +34,23 @@ version 1.5.28beta01 [December 27, 2016]
   Added "Common linking failures" section to INSTALL.
   Merge contrib/pngminim/*/makefile with libpng-1.6.24
   Minor editing of INSTALL, (whitespace, added copyright line)
+  Removed the use of a macro containing the pre-processor 'defined'
+    operator.  It is unclear whether this is valid; a macro that
+    "generates" 'defined' is not permitted, but the use of the word
+    "generates" within the C90 standard seems to imply more than simple
+    substitution of an expression itself containing a well-formed defined
+    operation.
+  Previously the pngtrans.c code always resulted in an unsigned arithmetic
+    overflow. This is well defined but produces errors from clang with the
+    option to detect unsigned overflow. As the expression only gets
+    evaluated once per row in this version of libpng it is easier just
+    to rewrite it.
+  The previous version of png.c produced a signed overflow as a result of
+    both the "& 0xffff" on the most significant bits of a negative argument;
+    this converted (-1) into 65535 which resulted in a subsequent overflow.
+    Since signed overflow is undefined in C90 the code has been modified to
+    correctly calculate a signed result.  This requires changing the 'hi'
+    result parameter to a signed value.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
