@@ -5760,7 +5760,7 @@ Version 1.6.27beta01 [November 2, 2016]
     entire PNG image instead of rejecting just the iCCP chunk with a warning,
     if built with zlib-1.2.8.1.
 
-Version 1.6.27beta02 [December 27, 2016]
+Version 1.6.27rc01 [December 27, 2016]
   Control ADLER32 checking with new PNG_IGNORE_ADLER32 option.
   Removed the use of a macro containing the pre-processor 'defined'
     operator.  It is unclear whether this is valid; a macro that
