@@ -5760,8 +5760,14 @@ Version 1.6.27beta01 [November 2, 2016]
     entire PNG image instead of rejecting just the iCCP chunk with a warning,
     if built with zlib-1.2.8.1.
 
-Version 1.6.27beta02 [December 26, 2016]
+Version 1.6.27beta02 [December 27, 2016]
   Control ADLER32 checking with new PNG_IGNORE_ADLER32 option.
+  Removed the use of a macro containing the pre-processor 'defined'
+    operator.  It is unclear whether this is valid; a macro that
+    "generates" 'defined' is not permitted, but the use of the word
+    "generates" within the C90 standard seems to imply more than simple
+    substitution of an expression itself containing a well-formed defined
+    operation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
