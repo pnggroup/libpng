@@ -5719,6 +5719,7 @@ Version 1.7.0beta85 [December 27, 2016]
     operation.
 
 Version 1.7.0beta86 [December 27, 2016]
+  Ported CMakeLists.txt from libpng-1.6.27rc01.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
