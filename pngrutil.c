@@ -4108,9 +4108,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          png_zstream_error(png_ptr, ret);
 
          if (output != NULL)
-         {
-               png_chunk_error(png_ptr, png_ptr->zstream.msg);
-         }
+            png_chunk_error(png_ptr, png_ptr->zstream.msg);
 
          else /* checking */
          {

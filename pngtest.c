@@ -989,7 +989,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       /* Turn off CRC checking while reading */
       png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
 
-#ifdef PNG_IGNORE_ADLER32_SUPPORTED
+#ifdef PNG_IGNORE_ADLER32
       /* Turn off ADLER32 checking while reading */
       png_set_option(read_ptr, PNG_IGNORE_ADLER32, PNG_OPTION_ON);
 #endif
