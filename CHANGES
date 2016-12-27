@@ -5768,6 +5768,7 @@ Version 1.6.27rc01 [December 27, 2016]
     "generates" within the C90 standard seems to imply more than simple
     substitution of an expression itself containing a well-formed defined
     operation.
+  Added ARM support to CMakeLists.txt (Andreas Franek).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
