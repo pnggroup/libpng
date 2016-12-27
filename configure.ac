@@ -1,5 +1,13 @@
 # configure.ac
 
+# Copyright (c) 2004-2016 Glenn Randers-Pehrson
+# Last changed in libpng 1.7.0 [(PENDING RELEASE)]
+
+# This code is released under the libpng license.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h
+
+
 dnl Process this file with autoconf to produce a configure script.
 dnl
 dnl Minor upgrades (compatible ABI): increment the package version
@@ -18,7 +26,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.7.0beta85],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.7.0beta86],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -40,7 +48,7 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.7.0beta85
+PNGLIB_VERSION=1.7.0beta86
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=7
 PNGLIB_RELEASE=0
