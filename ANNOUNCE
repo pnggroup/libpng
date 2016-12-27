@@ -1,5 +1,5 @@
 
-Libpng 1.5.28beta01 - December 27, 2016
+Libpng 1.5.28rc01 - December 27, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,24 +9,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.28beta01.tar.xz (LZMA-compressed, recommended)
-   1.5.28beta01.tar.gz
+   1.5.28rc01.tar.xz (LZMA-compressed, recommended)
+   1.5.28rc01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1528b01.7z  (LZMA-compressed, recommended)
-   lp1528b01.zip
+   lp1528r01.7z  (LZMA-compressed, recommended)
+   lp1528r01.zip
 
 Other information:
 
-   1.5.28beta01-README.txt
-   1.5.28beta01-LICENSE.txt
-   libpng-1.5.28beta01-*.asc (armored detached GPG signatures)
+   1.5.28rc01-README.txt
+   1.5.28rc01-LICENSE.txt
+   libpng-1.5.28rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.27):
 
-version 1.5.28beta01 [December 27, 2016]
+version 1.5.28rc01 [December 27, 2016]
   Merged with current libpng16 gregbook, pngvalid.c, pngtest.c, pngminim,
     pngminus
   Fixed undefined behavior in png_push_save_buffer(). Do not call
