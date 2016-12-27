@@ -776,6 +776,8 @@ png_access_version_number(void)
 
 /* Added at libpng version 1.2.34 and 1.4.0 (moved from pngset.c) */
 #  ifdef PNG_CHECK_cHRM_SUPPORTED
+static void png_64bit_product(long v1, long v2, long *hi_product,
+    unsigned long *lo_product);
 
 int /* PRIVATE */
 png_check_cHRM_fixed(png_structp png_ptr,
@@ -784,7 +786,8 @@ png_check_cHRM_fixed(png_structp png_ptr,
    png_fixed_point blue_x, png_fixed_point blue_y)
 {
    int ret = 1;
-   unsigned long xy_hi,xy_lo,yx_hi,yx_lo;
+   long xy_hi,yx_hi;
+   unsigned long xy_lo,yx_lo;
 
    png_debug(1, "in function png_check_cHRM_fixed");
 
@@ -2169,29 +2172,31 @@ png_reciprocal2(png_fixed_point a, png_fixed_point b)
  *    A and D, and X || Y is (X << 16) + Y.
 */
 
-void /* PRIVATE */
-png_64bit_product (long v1, long v2, unsigned long *hi_product,
+static void
+png_64bit_product(long v1, long v2, long *hi_product,
     unsigned long *lo_product)
 {
-   int a, b, c, d;
-   long lo, hi, x, y;
+   long a, b, c, d;
+   unsigned long lo;
+   long hi, x, y;
 
-   a = (v1 >> 16) & 0xffff;
+   a = v1 >> 16;
    b = v1 & 0xffff;
-   c = (v2 >> 16) & 0xffff;
+   c = v2 >> 16;
    d = v2 & 0xffff;
 
-   lo = b * d;                   /* BD */
+   lo = b;
+   lo *= d;                      /* BD */
    x = a * d + c * b;            /* AD + CB */
-   y = ((lo >> 16) & 0xffff) + x;
+   y = (lo >> 16) + x;
 
-   lo = (lo & 0xffff) | ((y & 0xffff) << 16);
-   hi = (y >> 16) & 0xffff;
+   lo = (lo & 0xffff) | ((y & 0xffffU) << 16);
 
+   hi = y >> 16;
    hi += a * c;                  /* AC */
 
-   *hi_product = (unsigned long)hi;
-   *lo_product = (unsigned long)lo;
+   *hi_product = hi;
+   *lo_product = lo;
 }
 #endif /* CHECK_cHRM */
 
