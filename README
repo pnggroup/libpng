@@ -1,4 +1,4 @@
-README for libpng version 1.2.57rc01 - December 27, 2016 (shared library 12.0)
+README for libpng version 1.2.57 - December 29, 2016 (shared library 12.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -207,11 +207,11 @@ Files in this distribution:
        makefile.std     =>  Generic UNIX makefile (cc, creates static
                             libpng.a)
        makefile.elf     =>  Linux/ELF gcc makefile symbol versioning,
-                            creates libpng12.so.0.1.2.57rc01)
+                            creates libpng12.so.0.1.2.57)
        makefile.linux   =>  Linux/ELF makefile (gcc, creates
-                            libpng12.so.0.1.2.57rc01)
+                            libpng12.so.0.1.2.57)
        makefile.gcmmx   =>  Linux/ELF makefile (gcc, creates
-                            libpng12.so.0.1.2.57rc01, previously
+                            libpng12.so.0.1.2.57, previously
                             used assembler code tuned for Intel MMX
                             platform)
        makefile.gcc     =>  Generic makefile (gcc, creates static
@@ -236,12 +236,12 @@ Files in this distribution:
        makefile.openbsd =>  OpenBSD makefile
        makefile.sgi     =>  Silicon Graphics IRIX (cc, creates static lib)
        makefile.sggcc   =>  Silicon Graphics
-                            (gcc, creates libpng12.so.0.1.2.57rc01)
+                            (gcc, creates libpng12.so.0.1.2.57)
        makefile.sunos   =>  Sun makefile
        makefile.solaris =>  Solaris 2.X makefile
-                            (gcc, creates libpng12.so.0.1.2.57rc01)
+                            (gcc, creates libpng12.so.0.1.2.57)
        makefile.so9     =>  Solaris 9 makefile
-                            (gcc, creates libpng12.so.0.1.2.57rc01)
+                            (gcc, creates libpng12.so.0.1.2.57)
        makefile.32sunu  =>  Sun Ultra 32-bit makefile
        makefile.64sunu  =>  Sun Ultra 64-bit makefile
        makefile.sco     =>  For SCO OSr5  ELF and Unixware 7 with Native cc

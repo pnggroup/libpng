@@ -2925,6 +2925,8 @@ version 1.2.57rc01 [December 27, 2016]
   Fixed undefined behavior in png_push_save_buffer(). Do not call
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
 
+version 1.0.67 and 1.2.57 [December 29, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
