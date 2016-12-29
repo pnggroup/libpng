@@ -5772,7 +5772,7 @@ Version 1.6.27rc01 [December 27, 2016]
 
 Version 1.6.27 [December 29, 2016]
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
-    and patch by Patrick Keshishian)
+    and patch by Patrick Keshishian).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
