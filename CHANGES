@@ -4527,6 +4527,8 @@ version 1.5.28rc01 [December 27, 2016]
     longer truncates any of the intermediate values this should be enough to
     ensure that it is correct.
 
+version 1.5.28 [December 29, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

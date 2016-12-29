@@ -1,37 +1,35 @@
 
-Libpng 1.5.28rc01 - December 27, 2016
+Libpng 1.5.28 - December 29, 2016
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.28rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.28rc01.tar.gz
+   libpng-1.5.28.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.28.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1528r01.7z  (LZMA-compressed, recommended)
-   lp1528r01.zip
+   lpng1528.7z  (LZMA-compressed, recommended)
+   lpng1528.zip
 
 Other information:
 
-   1.5.28rc01-README.txt
-   1.5.28rc01-LICENSE.txt
-   libpng-1.5.28rc01-*.asc (armored detached GPG signatures)
+   libpng-1.5.28-README.txt
+   libpng-1.5.28-LICENSE.txt
+   libpng-1.5.28-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.27):
 
-version 1.5.28rc01 [December 27, 2016]
   Merged with current libpng16 gregbook, pngvalid.c, pngtest.c, pngminim,
     pngminus
+  Added "Common linking failures" section to INSTALL.
   Fixed undefined behavior in png_push_save_buffer(). Do not call
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
-  Added "Common linking failures" section to INSTALL.
   Merge contrib/pngminim/*/makefile with libpng-1.6.24
   Minor editing of INSTALL, (whitespace, added copyright line)
   Removed the use of a macro containing the pre-processor 'defined'
