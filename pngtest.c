@@ -986,8 +986,13 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       /* Allow application (pngtest) errors and warnings to pass */
       png_set_benign_errors(read_ptr, 1);
 
-      /* Turn off CRC and ADLER32 checking while reading */
+      /* Turn off CRC checking while reading */
       png_set_crc_action(read_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
+
+#ifdef PNG_IGNORE_ADLER32
+      /* Turn off ADLER32 checking while reading */
+      png_set_option(read_ptr, PNG_IGNORE_ADLER32, PNG_OPTION_ON);
+#endif
 
 # ifdef PNG_WRITE_SUPPORTED
       png_set_benign_errors(write_ptr, 1);
@@ -2083,4 +2088,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_26 Your_png_h_is_not_version_1_6_26;
+typedef png_libpng_version_1_6_27 Your_png_h_is_not_version_1_6_27;
