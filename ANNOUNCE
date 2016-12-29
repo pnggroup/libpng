@@ -31,6 +31,8 @@ Changes since the last public release (1.6.26):
     substitution of an expression itself containing a well-formed defined
     operation.
   Added ARM support to CMakeLists.txt (Andreas Franek).
+  Fixed a potential null pointer dereference in png_set_text_2() (bug report
+    and patch by Patrick Keshishian).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

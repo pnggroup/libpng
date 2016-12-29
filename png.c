@@ -477,6 +477,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
          png_free(png_ptr, info_ptr->text);
          info_ptr->text = NULL;
          info_ptr->num_text = 0;
+         info_ptr->max_text = 0;
       }
    }
 #endif
