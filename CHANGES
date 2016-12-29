@@ -5770,6 +5770,8 @@ Version 1.6.27rc01 [December 27, 2016]
     operation.
   Added ARM support to CMakeLists.txt (Andreas Franek).
 
+Version 1.6.27 [December 29, 2016]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
