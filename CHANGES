@@ -3040,6 +3040,8 @@ version 1.4.20rc01 [December 27, 2016]
     memcpy() with a null source, even if count is zero (Leon Scroggins III).
 
 version 1.4.20 [December 29, 2016]
+  Fixed a potential null pointer dereference in png_set_text_2() (bug report
+    and patch by Patrick Keshishian).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
