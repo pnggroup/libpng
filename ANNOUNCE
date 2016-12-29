@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta86 - December 27, 2016
+Libpng 1.7.0beta86 - December 29, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1418,7 +1418,7 @@ Version 1.7.0beta85 [December 27, 2016]
     substitution of an expression itself containing a well-formed defined
     operation.
 
-Version 1.7.0beta86 [December 27, 2016]
+Version 1.7.0beta86 [December 29, 2016]
   Ported CMakeLists.txt from libpng-1.6.27rc01.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
