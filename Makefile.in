@@ -647,7 +647,7 @@ EXTRA_DIST = \
 	${srcdir}/contrib/pngsuite/* \
 	${srcdir}/contrib/visupng/* \
 	$(TESTS) \
-	example.c libpng-1.0.66.txt pnggccrd.c pngvcrd.c
+	example.c libpng-1.0.67.txt pnggccrd.c pngvcrd.c
 
 CLEANFILES = pngout.png libpng10.pc libpng10-config libpng.vers \
 libpng.sym

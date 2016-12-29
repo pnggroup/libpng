@@ -1,9 +1,9 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.0.66, December 17, 2015
+ * libpng version 1.0.67, December 29, 2016
  *
- * Copyright (c) 1998-2015 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2016 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.0.66, December 17, 2015: Glenn
+ *  libpng versions 0.97, January 1998, through 1.0.67, December 29, 2016: Glenn
  *  See also "Contributing Authors", below.
  */
 
@@ -24,8 +24,8 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.0.66, December 17, 2015, are
- * Copyright (c) 2000-2002, 2004, 2006-2015 Glenn Randers-Pehrson, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.0.67, December 29, 2016, are
+ * Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
  * added to the list of Contributing Authors:
@@ -179,8 +179,8 @@
  *    ...
  *    1.0.19                  10    10019  10.so.0.19[.0]
  *    ...
- *    1.0.66                  10    10066  10.so.0.66[.0]
- *    1.2.56                  13    10256  12.so.0.56[.0]
+ *    1.0.67                  10    10067  10.so.0.67[.0]
+ *    1.2.57                  13    10257  12.so.0.57[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -208,13 +208,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    December 17, 2015
+ *    December 29, 2016
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.0.66 are Y2K compliant.  It is my belief that earlier
+ *    upward through 1.0.67 are Y2K compliant.  It is my belief that earlier
  *    versions were also Y2K compliant.
  *
  *    Libpng only has three year fields.  One is a 2-byte unsigned integer
@@ -270,9 +270,9 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.0.66"
+#define PNG_LIBPNG_VER_STRING "1.0.67"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.0.66 - December 17, 2015\n"
+   " libpng version 1.0.67 - December 29, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  10
@@ -280,7 +280,7 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   0
-#define PNG_LIBPNG_VER_RELEASE 66
+#define PNG_LIBPNG_VER_RELEASE 67
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
@@ -310,7 +310,7 @@
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release
  */
-#define PNG_LIBPNG_VER 10066 /* 1.0.66 */
+#define PNG_LIBPNG_VER 10067 /* 1.0.67 */
 
 #ifndef PNG_VERSION_INFO_ONLY
 /* Include the compression library's header */
@@ -1340,7 +1340,7 @@ struct png_struct_def
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef png_structp version_1_0_66;
+typedef png_structp version_1_0_67;
 
 typedef png_struct FAR * FAR * png_structpp;
 
