@@ -25,7 +25,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.7.0beta87, December 30, 2016, are
+ * libpng versions 1.0.7, July 1, 2000 through 1.7.0beta87, December 30, 2016 are
  * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -47,9 +47,9 @@
  *    risk of satisfactory quality, performance, accuracy, and effort is with
  *    the user.
  *
- *    Some files in the "contrib" directory and some configure-generated
- *    files that are distributed with libpng have other copyright owners and
- *    are released under other open source licenses.
+ * Some files in the "contrib" directory and some configure-generated
+ * files that are distributed with libpng have other copyright owners and
+ * are released under other open source licenses.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
  * Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
@@ -73,6 +73,9 @@
  *    Magnus Holmgren
  *    Greg Roelofs
  *    Tom Tanner
+ *
+ * Some files in the "scripts" directory have other copyright owners
+ * but are released under this license.
  *
  * libpng versions 0.5, May 1995, through 0.88, January 1996, are
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -113,6 +116,29 @@
  * appreciated.
  *
  * END OF COPYRIGHT NOTICE, DISCLAIMER, and LICENSE.
+ *
+ * TRADEMARK:
+ *
+ * The name "libpng" has not been registered by the Copyright owner
+ * as a trademark in any jurisdiction.  However, because libpng has
+ * been distributed and maintained world-wide, continually since 1995,
+ * the Copyright owner claims "common-law trademark protection" in any
+ * jurisdiction where common-law trademark is recognized.
+ *
+ * OSI CERTIFICATION:
+ *
+ * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
+ * a certification mark of the Open Source Initiative. OSI has not addressed
+ * the additional disclaimers inserted at version 1.0.7.
+ *
+ * EXPORT CONTROL:
+ *
+ * The Copyright owner believes that the Export Control Classification
+ * Number (ECCN) for libpng is EAR99, which means not subject to export
+ * controls or International Traffic in Arms Regulations (ITAR) because
+ * it is open source, publicly available software, that does not contain
+ * any encryption software.  See the EAR, paragraphs 734.3(b)(3) and
+ * 734.7(b).
  */
 
 /*
@@ -123,12 +149,6 @@
  *
  * Also, the PNG logo (in PNG format, of course) is supplied in the
  * files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
- */
-
-/*
- * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
- * a certification mark of the Open Source Initiative. OSI has not addressed
- * the additional disclaimers inserted at version 1.0.7.
  */
 
 /*
