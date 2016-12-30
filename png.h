@@ -11,7 +11,7 @@
  *
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
- *   libpng versions 0.89c, June 1996, through 0.96, May 1997: Andreas Dilger
+ *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.5.29beta01, December 30, 2016:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
@@ -25,7 +25,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.5.29beta01, December 30, 2016, are
+ * libpng versions 1.0.7, July 1, 2000 through 1.5.29beta01, December 30, 2016 are
  * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -45,6 +45,10 @@
  *    or needs.  This library is provided with all faults, and the entire
  *    risk of satisfactory quality, performance, accuracy, and effort is with
  *    the user.
+ *
+ * Some files in the "contrib" directory and some configure-generated
+ * files that are distributed with libpng have other copyright owners and
+ * are released under other open source licenses.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
  * Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
@@ -68,6 +72,9 @@
  *    Magnus Holmgren
  *    Greg Roelofs
  *    Tom Tanner
+ *
+ * Some files in the "scripts" directory have other copyright owners
+ * but are released under this license.
  *
  * libpng versions 0.5, May 1995, through 0.88, January 1996, are
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
