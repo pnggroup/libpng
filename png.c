@@ -2,7 +2,7 @@
 /* png.c - location for general purpose libpng functions
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -15,7 +15,7 @@
 #define PNG_SRC_FILE PNG_SRC_FILE_png
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_7_0beta86 Your_png_h_is_not_version_1_7_0beta86;
+typedef png_libpng_version_1_7_0beta87 Your_png_h_is_not_version_1_7_0beta87;
 
 /* Tells libpng that we have already handled the first "num_bytes" bytes
  * of the PNG file signature.  If the PNG data is embedded into another
@@ -705,15 +705,15 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-     "libpng version 1.7.0beta86 - December 29, 2016" PNG_STRING_NEWLINE \
-     "Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson" \
+     "libpng version 1.7.0beta87 - December 30, 2016" PNG_STRING_NEWLINE \
+     "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
      PNG_STRING_NEWLINE \
      "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
      "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
      PNG_STRING_NEWLINE;
 #  else
-      return "libpng version 1.7.0beta86 - December 29, 2016\
-      Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson\
+      return "libpng version 1.7.0beta87 - December 30, 2016\
+      Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
 #  endif

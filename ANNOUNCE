@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta86 - December 29, 2016
+Libpng 1.7.0beta87 - December 30, 2016
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta86.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta86.tar.gz
+   1.7.0beta87.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta87.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b86.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b86.zip
+   /scratch/glennrp/Libpng17/lp170b87.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b87.zip
 
 Other information:
 
-   1.7.0beta86-README.txt
-   1.7.0beta86-LICENSE.txt
-   libpng-1.7.0beta86-*.asc (armored detached GPG signatures)
+   1.7.0beta87-README.txt
+   1.7.0beta87-LICENSE.txt
+   libpng-1.7.0beta87-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1422,6 +1422,8 @@ Version 1.7.0beta86 [December 29, 2016]
   Ported CMakeLists.txt from libpng-1.6.27rc01.
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
     and patch by Patrick Keshishian).
+
+Version 1.7.0beta87 [December 30, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
