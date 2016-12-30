@@ -1,38 +1,31 @@
-Libpng 1.6.27 - December 29, 2016
+Libpng 1.6.28beta01 - December 30, 2016
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.27.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.27.tar.gz
+   1.6.28beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.28beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1627.7z  (LZMA-compressed, recommended)
-   lpng1627.zip
+   lp1628b01.7z  (LZMA-compressed, recommended)
+   lp1628b01.zip
 
 Other information:
 
-   libpng-1.6.27-README.txt
-   libpng-1.6.27-LICENSE.txt
-   libpng-1.6.27-*.asc (armored detached GPG signatures)
+   1.6.28beta01-README.txt
+   1.6.28beta01-LICENSE.txt
+   libpng-1.6.28beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.26):
-  Control ADLER32 checking with new PNG_IGNORE_ADLER32 option.
-  Removed the use of a macro containing the pre-processor 'defined'
-    operator.  It is unclear whether this is valid; a macro that
-    "generates" 'defined' is not permitted, but the use of the word
-    "generates" within the C90 standard seems to imply more than simple
-    substitution of an expression itself containing a well-formed defined
-    operation.
-  Added ARM support to CMakeLists.txt (Andreas Franek).
-  Fixed a potential null pointer dereference in png_set_text_2() (bug report
-    and patch by Patrick Keshishian).
+Changes since the last public release (1.6.27):
+
+Version 1.6.28beta01 [December 30, 2016]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
