@@ -5772,7 +5772,7 @@ Version 1.6.27rc01 [December 27, 2016]
 
 Version 1.6.27 [December 29, 2016]
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
-    and patch by Patrick Keshishian).
+    and patch by Patrick Keshishian, CVE-2016-10087).
 
 Version 1.6.28beta01 [December 30, 2016]
 
