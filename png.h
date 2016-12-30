@@ -1,9 +1,9 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.27, December 29, 2016
+ * libpng version 1.6.28beta01, December 30, 2016
  *
- * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.27, December 29, 2016:
+ *   libpng versions 0.97, January 1998, through 1.6.28beta01, December 30, 2016:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -29,8 +29,8 @@
  * files that are distributed with libpng have other copyright owners and
  * are released under other open source licenses.
  *
- * libpng versions 1.0.7, July 1, 2000 through 1.6.27, December 29, 2016 are
- * Copyright (c) 2000-2002, 2004, 2006-2016 Glenn Randers-Pehrson, are
+ * libpng versions 1.0.7, July 1, 2000 through 1.6.28beta01, December 30, 2016 are
+ * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
  * added to the list of Contributing Authors:
@@ -214,11 +214,11 @@
  *    ...
  *    1.0.19                  10    10019  10.so.0.19[.0]
  *    ...
- *    1.2.56                  13    10256  12.so.0.56[.0]
+ *    1.2.57                  13    10257  12.so.0.57[.0]
  *    ...
- *    1.5.27                  15    10527  15.so.15.27[.0]
+ *    1.5.28                  15    10527  15.so.15.28[.0]
  *    ...
- *    1.6.27                  16    10627  16.so.16.27[.0]
+ *    1.6.28                  16    10628  16.so.16.28[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -246,13 +246,13 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    December 29, 2016
+ *    December 30, 2016
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
  *
  *    This is your unofficial assurance that libpng from version 0.71 and
- *    upward through 1.6.27 are Y2K compliant.  It is my belief that
+ *    upward through 1.6.28beta01 are Y2K compliant.  It is my belief that
  *    earlier versions were also Y2K compliant.
  *
  *    Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -314,8 +314,8 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.27"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.27 - December 29, 2016\n"
+#define PNG_LIBPNG_VER_STRING "1.6.28beta01"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.28beta01 - December 30, 2016\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -323,13 +323,13 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 27
+#define PNG_LIBPNG_VER_RELEASE 28
 
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  0
+#define PNG_LIBPNG_VER_BUILD  01
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -346,7 +346,7 @@
 #define PNG_LIBPNG_BUILD_SPECIAL 32 /* Cannot be OR'ed with
                                        PNG_LIBPNG_BUILD_PRIVATE */
 
-#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_STABLE
+#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_BETA
 
 /* Careful here.  At one time, Guy wanted to use 082, but that would be octal.
  * We must not include leading zeros.
@@ -354,7 +354,7 @@
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release
  */
-#define PNG_LIBPNG_VER 10627 /* 1.6.27 */
+#define PNG_LIBPNG_VER 10628 /* 1.6.28 */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -464,7 +464,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_27;
+typedef char* png_libpng_version_1_6_28beta01;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
