@@ -1,37 +1,28 @@
-Libpng 1.6.27rc01 - December 27, 2016
+Libpng 1.6.27 - December 29, 2016
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.27rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.27rc01.tar.gz
+   libpng-1.6.27.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.27.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1627r01.7z  (LZMA-compressed, recommended)
-   lp1627r01.zip
+   lpng1627.7z  (LZMA-compressed, recommended)
+   lpng1627.zip
 
 Other information:
 
-   1.6.27rc01-README.txt
-   1.6.27rc01-LICENSE.txt
-   libpng-1.6.27rc01-*.asc (armored detached GPG signatures)
+   libpng-1.6.27-README.txt
+   libpng-1.6.27-LICENSE.txt
+   libpng-1.6.27-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.26):
-
-Version 1.6.27beta01 [November 2, 2016]
-  Restrict the new ADLER32-skipping to IDAT chunks.  It broke iCCP chunk
-    handling: an erroneous iCCP chunk would throw a png_error and reject the
-    entire PNG image instead of rejecting just the iCCP chunk with a warning,
-    if built with zlib-1.2.8.1.
-
-Version 1.6.27rc01 [December 27, 2016]
   Control ADLER32 checking with new PNG_IGNORE_ADLER32 option.
   Removed the use of a macro containing the pre-processor 'defined'
     operator.  It is unclear whether this is valid; a macro that
@@ -40,6 +31,8 @@ Version 1.6.27rc01 [December 27, 2016]
     substitution of an expression itself containing a well-formed defined
     operation.
   Added ARM support to CMakeLists.txt (Andreas Franek).
+  Fixed a potential null pointer dereference in png_set_text_2() (bug report
+    and patch by Patrick Keshishian).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
