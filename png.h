@@ -47,6 +47,10 @@
  *    risk of satisfactory quality, performance, accuracy, and effort is with
  *    the user.
  *
+ *    Some files in the "contrib" directory and some configure-generated
+ *    files that are distributed with libpng have other copyright owners and
+ *    are released under other open source licenses.
+ *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
  * Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
  * libpng-0.96, and are distributed according to the same disclaimer and
