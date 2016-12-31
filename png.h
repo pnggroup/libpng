@@ -25,10 +25,6 @@
  *
  * This code is released under the libpng license.
  *
- * Some files in the "contrib" directory and some configure-generated
- * files that are distributed with libpng have other copyright owners and
- * are released under other open source licenses.
- *
  * libpng versions 1.0.7, July 1, 2000 through 1.6.28beta01, December 30, 2016 are
  * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
@@ -52,9 +48,9 @@
  *    risk of satisfactory quality, performance, accuracy, and effort is with
  *    the user.
  *
- * Some files in the "contrib" directory have other copyright owners and
+ * Some files in the "contrib" directory and some configure-generated
+ * files that are distributed with libpng have other copyright owners and
  * are released under other open source licenses.
- *
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
  * Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
@@ -65,9 +61,6 @@
  *    Tom Lane
  *    Glenn Randers-Pehrson
  *    Willem van Schaik
- *
- * Some files in the "scripts" directory have different copyright owners
- * but are also released under this license.
  *
  * libpng versions 0.89, June 1996, through 0.96, May 1997, are
  * Copyright (c) 1996-1997 Andreas Dilger, are derived from libpng-0.88,
