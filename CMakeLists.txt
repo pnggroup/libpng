@@ -41,8 +41,15 @@ set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
 # needed packages
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIR})
+
+#Allow users to specify location of Zlib, 
+# Useful if zlib is being built alongside this as a sub-project
+option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
+
+IF(NOT PNG_BUILD_ZLIB)
+  find_package(ZLIB REQUIRED)
+  include_directories(${ZLIB_INCLUDE_DIR})
+ENDIF(NOT PNG_BUILD_ZLIB)
 
 if(NOT WIN32)
   find_library(M_LIBRARY
