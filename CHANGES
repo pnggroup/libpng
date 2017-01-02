@@ -5774,8 +5774,11 @@ Version 1.6.27 [December 29, 2016]
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
     and patch by Patrick Keshishian, CVE-2016-10087).
 
-Version 1.6.28beta01 [December 31, 2016]
+Version 1.6.28beta01 [January 2, 2017]
   Fixed arm/aarch64 detection in CMakeLists.txt (Gianfranco Costamagna).
+  Added option to Cmake build allowing a custom location of zlib to be
+    specified in a scenario where libpng is being built as a subproject
+    alongside zlib by another project (Sam Serrels).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
