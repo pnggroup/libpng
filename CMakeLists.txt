@@ -40,6 +40,8 @@ set(PNGLIB_RELEASE 28)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
+include(GNUInstallDirs)
+
 # needed packages
 
 #Allow users to specify location of Zlib, 
