@@ -1,7 +1,7 @@
 # configure.ac
 
-# Copyright (c) 2004-2017 Glenn Randers-Pehrson
-# Last changed in libpng 1.6.28 [January 5, 2017]
+# Copyright (c) 2004-2016 Glenn Randers-Pehrson
+# Last changed in libpng 1.6.25 [September 1, 2016]
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -25,7 +25,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.28rc02],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.28rc03],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -46,7 +46,7 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.28rc02
+PNGLIB_VERSION=1.6.28rc03
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
 PNGLIB_RELEASE=28
@@ -389,41 +389,6 @@ AM_CONDITIONAL([PNG_MIPS_MSA],
    [test "$enable_mips_msa" != 'no' &&
     case "$host_cpu" in
       mipsel*|mips64el*) :;;
-    esac])
-
-# INTEL
-# =====
-#
-# INTEL SSE (SIMD) support.
-
-AC_ARG_ENABLE([intel-sse],
-   AS_HELP_STRING([[[--enable-intel-sse]]],
-      [Enable Intel SSE optimizations: =no/off, yes/on:]
-      [no/off: disable the optimizations;]
-      [yes/on: enable the optimizations.]
-      [If not specified: determined by the compiler.]),
-   [case "$enableval" in
-      no|off)
-         # disable the default enabling:
-         AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
-                   [Disable Intel SSE optimizations])
-         # Prevent inclusion of the assembler files below:
-         enable_intel_sse=no;;
-      yes|on)
-         AC_DEFINE([PNG_INTEL_SSE_OPT], [1],
-                   [Enable Intel SSE optimizations]);;
-      *)
-         AC_MSG_ERROR([--enable-intel-sse=${enable_intel_sse}: invalid value])
-   esac])
-
-# Add Intel specific files to all builds where the host_cpu is Intel ('x86*')
-# or where Intel optimizations were explicitly requested (this allows a
-# fallback if a future host CPU does not match 'x86*')
-AM_CONDITIONAL([PNG_INTEL_SSE],
-   [test "$enable_intel_sse" != 'no' &&
-    case "$host_cpu" in
-      i?86|x86_64) :;;
-      *)    test "$enable_intel_sse" != '';;
     esac])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])

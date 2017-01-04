@@ -190,42 +190,6 @@
 #  endif
 #endif
 
-#ifndef PNG_INTEL_SSE_OPT
-#   ifdef PNG_INTEL_SSE
-      /* Only check for SSE if the build configuration has been modified to
-       * enable SSE optimizations.  This means that these optimizations will
-       * be off by default.  See contrib/intel for more details.
-       */
-#     if defined(__SSE4_1__) || defined(__AVX__) || defined(__SSSE3__) || \
-       defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
-       (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
-#         define PNG_INTEL_SSE_OPT 1
-#      endif
-#   endif
-#endif
-
-#if PNG_INTEL_SSE_OPT > 0
-#   ifndef PNG_INTEL_SSE_IMPLEMENTATION
-#      if defined(__SSE4_1__) || defined(__AVX__)
-          /* We are not actually using AVX, but checking for AVX is the best
-             way we can detect SSE4.1 and SSSE3 on MSVC.
-          */
-#         define PNG_INTEL_SSE_IMPLEMENTATION 3
-#      elif defined(__SSSE3__)
-#         define PNG_INTEL_SSE_IMPLEMENTATION 2
-#      elif defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
-       (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
-#         define PNG_INTEL_SSE_IMPLEMENTATION 1
-#      else
-#         define PNG_INTEL_SSE_IMPLEMENTATION 0
-#      endif
-#   endif
-
-#   if PNG_INTEL_SSE_IMPLEMENTATION > 0
-#      define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_sse2
-#   endif
-#endif
-
 #if PNG_MIPS_MSA_OPT > 0
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_msa
 #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
@@ -1292,21 +1256,6 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
-#if PNG_INTEL_SSE_IMPLEMENTATION > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
 /* Choose the best filter to use and filter the row data */
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
     png_row_infop row_info),PNG_EMPTY);
@@ -2042,11 +1991,6 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_msa,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
-
-#  if PNG_INTEL_SSE_IMPLEMENTATION > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#  endif
 #endif
 
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,

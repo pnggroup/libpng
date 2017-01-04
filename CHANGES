@@ -5788,6 +5788,9 @@ Version 1.6.28rc02 [January 4, 2017]
     Configure libpng with "configure --enable-intel-sse" or compile
     libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
 
+Version 1.6.28rc03 [January 4, 2017]
+  Backed out the SSE optimization and last CMakeLists.txt to allow time for QA.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
