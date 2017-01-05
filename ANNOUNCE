@@ -25,7 +25,8 @@ Other information:
 
 Changes since the last public release (1.6.28):
 
-Version 1.6.29 [January 5, 2017]
+Version 1.6.29beta01 [January 5, 2017]
+  Readded "include(GNUInstallDirs)" to CMakeLists.txt (Gianfranco Costamagna).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
