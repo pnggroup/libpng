@@ -1,34 +1,31 @@
-Libpng 1.6.28 - January 5, 2017
+Libpng 1.6.29beta01 - January 5, 2017
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.28.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.28.tar.gz
+   1.6.29beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.29beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1628.7z  (LZMA-compressed, recommended)
-   lpng1628.zip
+   lp1629b01.7z  (LZMA-compressed, recommended)
+   lp1629b01.zip
 
 Other information:
 
-   libpng-1.6.28-README.txt
-   libpng-1.6.28-LICENSE.txt
-   libpng-1.6.28-*.asc (armored detached GPG signatures)
+   1.6.29beta01-README.txt
+   1.6.29beta01-LICENSE.txt
+   libpng-1.6.29beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.27):
-  Fixed arm/aarch64 detection in CMakeLists.txt (Gianfranco Costamagna).
-  Added option to Cmake build allowing a custom location of zlib to be
-    specified in a scenario where libpng is being built as a subproject
-    alongside zlib by another project (Sam Serrels).
-  Changed png_ptr->options from a png_byte to png_uint_32, to accomodate
-    up to 16 options.
+Changes since the last public release (1.6.28):
+
+Version 1.6.29 [January 5, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
