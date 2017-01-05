@@ -36,13 +36,20 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 27)
+set(PNGLIB_RELEASE 28)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
 # needed packages
-find_package(ZLIB REQUIRED)
-include_directories(${ZLIB_INCLUDE_DIR})
+
+#Allow users to specify location of Zlib, 
+# Useful if zlib is being built alongside this as a sub-project
+option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
+
+IF(NOT PNG_BUILD_ZLIB)
+  find_package(ZLIB REQUIRED)
+  include_directories(${ZLIB_INCLUDE_DIR})
+ENDIF(NOT PNG_BUILD_ZLIB)
 
 if(NOT WIN32)
   find_library(M_LIBRARY
@@ -71,7 +78,8 @@ set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
 # set definitions and sources for arm
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm")
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
+  ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^aarch64")
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
   set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
      check: (default) use internal checking code;
@@ -727,7 +735,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.27
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.28
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)

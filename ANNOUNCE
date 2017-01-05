@@ -1,4 +1,4 @@
-Libpng 1.6.27 - December 29, 2016
+Libpng 1.6.28 - January 5, 2017
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -7,32 +7,28 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.27.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.27.tar.gz
+   libpng-1.6.28.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.28.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1627.7z  (LZMA-compressed, recommended)
-   lpng1627.zip
+   lpng1628.7z  (LZMA-compressed, recommended)
+   lpng1628.zip
 
 Other information:
 
-   libpng-1.6.27-README.txt
-   libpng-1.6.27-LICENSE.txt
-   libpng-1.6.27-*.asc (armored detached GPG signatures)
+   libpng-1.6.28-README.txt
+   libpng-1.6.28-LICENSE.txt
+   libpng-1.6.28-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.26):
-  Control ADLER32 checking with new PNG_IGNORE_ADLER32 option.
-  Removed the use of a macro containing the pre-processor 'defined'
-    operator.  It is unclear whether this is valid; a macro that
-    "generates" 'defined' is not permitted, but the use of the word
-    "generates" within the C90 standard seems to imply more than simple
-    substitution of an expression itself containing a well-formed defined
-    operation.
-  Added ARM support to CMakeLists.txt (Andreas Franek).
-  Fixed a potential null pointer dereference in png_set_text_2() (bug report
-    and patch by Patrick Keshishian).
+Changes since the last public release (1.6.27):
+  Fixed arm/aarch64 detection in CMakeLists.txt (Gianfranco Costamagna).
+  Added option to Cmake build allowing a custom location of zlib to be
+    specified in a scenario where libpng is being built as a subproject
+    alongside zlib by another project (Sam Serrels).
+  Changed png_ptr->options from a png_byte to png_uint_32, to accomodate
+    up to 16 options.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
