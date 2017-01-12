@@ -7742,13 +7742,11 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
           * NOTE: this number only affects the internal limit check in pngvalid,
           * it has no effect on the limits applied to the libpng values.
           */
-         that->pm->limit += pow(
-#        if DIGITIZE
-            2.0
-#        else
-            1.0
-#        endif
-            /255, data.gamma);
+#if DIGITIZE
+          that->pm->limit += pow( 2.0/255, data.gamma);
+#else
+          that->pm->limit += pow( 1.0/255, data.gamma);
+#endif
       }
    }
 

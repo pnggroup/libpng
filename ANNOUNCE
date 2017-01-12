@@ -1,4 +1,4 @@
-Libpng 1.6.29beta01 - January 6, 2017
+Libpng 1.6.29beta01 - January 12, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -25,11 +25,12 @@ Other information:
 
 Changes since the last public release (1.6.28):
 
-Version 1.6.29beta01 [January 6, 2017]
+Version 1.6.29beta01 [January 12, 2017]
   Readded "include(GNUInstallDirs)" to CMakeLists.txt (Gianfranco Costamagna).
   Moved SSE2 optimization code into the main libpng source directory.
     Configure libpng with "configure --enable-intel-sse" or compile
     libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
+  Simplified conditional compilation in pngvalid.c, for AIX (Michael Felt).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
