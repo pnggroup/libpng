@@ -5801,6 +5801,8 @@ Version 1.6.29beta01 [January 12, 2017]
     libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
   Simplified conditional compilation in pngvalid.c, for AIX (Michael Felt).
 
+Version 1.6.29beta02 [January 12, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
