@@ -420,8 +420,8 @@ AS_HELP_STRING([[[--enable-powerpc-vsx]]],
          AC_DEFINE([PNG_POWERPC_VSX_OPT], [2],
                    [Enable POWERPC VSX optimizations])
          AC_MSG_WARN([--enable-powerpc-vsx: please specify 'check' or 'api', if]
-            [you want the optimizations unconditionally pass '-maltivec and -mabi=altivec']
-            [to the compiler.]);;
+            [you want the optimizations unconditionally pass '-maltivec -mabi=altivec']
+            [or '-mcpu=power8'to the compiler.]);;
       *)
          AC_MSG_ERROR([--enable-powerpc-vsx=${enable_powerpc_vsx}: invalid value])
    esac])
