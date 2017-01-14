@@ -3797,7 +3797,7 @@ png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
    png_size_t i;
    png_size_t istop = row_info->rowbytes;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   png_bytep rp = row + bpp;
+   png_bytep rp = row + bpp;   
 
    PNG_UNUSED(prev_row)
 
