@@ -18,17 +18,19 @@
 /* This code requires -maltivec and -mabi=altivec on the command line: */
 #if PNG_POWERPC_VSX_IMPLEMENTATION == 1 /* intrinsics code from pngpriv.h */
 
-/* libpng row pointers are not necessarily aligned to any particular boundary,
- * however this code will only work with appropriate alignment.  arm/arm_init.c
- * checks for this (and will not compile unless it is done). This code uses
- * variants of png_aligncast to avoid compiler warnings.
- */
-#define png_ptr(type,pointer) png_aligncast(type *,pointer)
-#define png_ptrc(type,pointer) png_aligncastconst(const type *,pointer)
-
-/*#include <altivec.h>*/
+#include <altivec.h>
 
 #if PNG_POWERPC_VSX_OPT > 0
+
+/* Functions in this file look at most 3 pixels (a,b,c) to predict the 4th (d).
+ * They're positioned like this:
+ *    prev:  c b
+ *    row:   a d
+ * The Sub filter predicts d=a, Avg d=(a+b)/2, and Paeth predicts d to be
+ * whichever of a, b, or c is closest to p=a+b-c.
+ * ( this is taken from ../intel/filter_sse2_intrinsics.c )
+ */
+
 
 void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
                                 png_const_bytep prev_row)
@@ -38,27 +40,50 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
 
-   for (i = 0; i < istop; i++)
+   vector unsigned char rp_vec;
+   vector unsigned char pp_vec;
+
+   /* Using SIMD while we can */
+   while( istop >= 16 )
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
-      rp++;
+	   rp_vec = vec_ld(0,rp);
+	   pp_vec = vec_ld(0,pp);
+	
+	   rp_vec = vec_add(rp_vec,pp_vec);
+	
+	   vec_st(rp_vec,0,rp);
+
+	   pp += 16;
+	   rp += 16;
+	   istop -= 16;
    }
 
+   if(istop % 16 > 0)
+   {
+      /* If byte count of row is not divisible by 16
+       * we will process remaining part as usual
+       */
+      for (i = 0; i < istop; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) + (int)(*pp++)) & 0xff);
+         rp++;
+      }
+   }
 }
 
 void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
+   const unsigned int bpp = 4;
    png_size_t i;
    png_size_t istop = row_info->rowbytes;
-   unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
    png_bytep rp = row + bpp;
 
    PNG_UNUSED(prev_row)
 
    for (i = bpp; i < istop; i++)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-4))) & 0xff);
       rp++;
    }
 }
@@ -66,16 +91,16 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
+    const unsigned int bpp = 4;
     png_size_t i;
     png_size_t istop = row_info->rowbytes;
-    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
     png_bytep rp = row + bpp;
 
     PNG_UNUSED(prev_row)
 
     for (i = bpp; i < istop; i++)
     {
-       *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+       *rp = (png_byte)(((int)(*rp) + (int)(*(rp-3))) & 0xff);
        rp++;
     }
 }
