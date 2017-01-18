@@ -36,7 +36,7 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
                                 png_const_bytep prev_row)
 {
    png_size_t i;
-   png_size_t unaligned_top = (png_size_t)row % 16;
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
    png_size_t istop = row_info->rowbytes - unaligned_top;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
