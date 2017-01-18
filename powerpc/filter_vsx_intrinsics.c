@@ -83,21 +83,125 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 
 }
 
-void png_read_filter_row_sub_vsx(png_row_infop row_info, png_bytep row,
+void png_read_filter_row_sub_vsx4(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
+   png_size_t i; 
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
+   png_size_t istop = row_info->rowbytes - unaligned_top;
+ 
    const unsigned int bpp = 4;
-   png_size_t i;
-   png_size_t istop = row_info->rowbytes;
+   
    png_bytep rp = row + bpp;
-
+   vector unsigned char rp_vec;
+   vector unsigned char part_vec;
+   vector unsigned char zero_vec = {0};
+   
    PNG_UNUSED(prev_row)
 
-   for (i = bpp; i < istop; i++)
+   /* Altivec operations require 16-byte aligned data 
+    * but input can be unaligned. So we calculate 
+    * unaligned part as usual.
+    */
+
+   for (i = bpp; i < unaligned_top; i++)
    {
-      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-4))) & 0xff);
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
       rp++;
    }
+
+   /* Using SIMD while we can */
+   while( istop >= 16 )
+   {  
+      for(i=0;i < bpp ; i++)
+         *(rp+i) += *(rp+i - bpp);
+
+      rp_vec = vec_ld(0,rp);
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_4);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_4);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_4);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      vec_st(rp_vec,0,rp);
+
+      rp += 16;
+      istop -= 16;
+   }
+
+   if(istop % 16 > 0)
+      for (i = 0; i < istop % 16; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) + (int)(*(rp - bpp))) & 0xff);
+         rp++;
+      }
+}
+
+void png_read_filter_row_sub_vsx3(png_row_infop row_info, png_bytep row,
+                                  png_const_bytep prev_row)
+{
+   png_size_t i; 
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
+   png_size_t istop = row_info->rowbytes - unaligned_top;
+ 
+   const unsigned int bpp = 3;
+
+   png_bytep rp = row + bpp;
+   vector unsigned char rp_vec;
+   vector unsigned char part_vec;
+   vector unsigned char zero_vec = {0};
+   
+   PNG_UNUSED(prev_row)
+
+   /* Altivec operations require 16-byte aligned data 
+    * but input can be unaligned. So we calculate 
+    * unaligned part as usual.
+    */
+
+   for (i = bpp; i < unaligned_top; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+      rp++;
+   }
+
+   /* Using SIMD while we can */
+   while( istop >= 16 )
+   {  
+      for(i=0;i < bpp ; i++)
+         *(rp+i) += *(rp+i - bpp);
+
+      rp_vec = vec_ld(0,rp);
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_3);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_3);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_3);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT4_3);
+      rp_vec = vec_add(rp_vec,part_vec);
+
+      vec_st(rp_vec,0,rp);
+      rp += 16;
+      istop -= 16;     
+      
+      /* Since 16 % bpp = 16 % 3 = 1, last element of array must
+       * be proceeded manually 
+       */
+      *(rp - 1) += *(rp - 1 - 3);
+   }
+
+   if(istop % 16 > 0)
+      for (i = 0; i < istop % 16; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+         rp++;
+      }
 }
 
 void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
