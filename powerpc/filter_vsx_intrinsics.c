@@ -83,7 +83,17 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 
 }
 
-void png_read_filter_row_sub_vsx4(png_row_infop row_info, png_bytep row,
+#define VEC_SELECT1_4 (vector unsigned char){16,16,16,16,0,1,2,3,16,16,16,16,16,16,16,16}
+#define VEC_SELECT2_4 (vector unsigned char){16,16,16,16,16,16,16,16,4,5,6,7,16,16,16,16}
+#define VEC_SELECT3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,8,9,10,11}
+
+#define VEC_SELECT1_3 (vector unsigned char){16,16,16,0,1,2,16,16,16,16,16,16,16,16,16,16}
+#define VEC_SELECT2_3 (vector unsigned char){16,16,16,16,16,16,3,4,5,16,16,16,16,16,16,16}
+#define VEC_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,6,7,8,16,16,16,16}
+#define VEC_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,9,10,11,16}
+ 
+
+void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
    png_size_t i; 
@@ -140,7 +150,7 @@ void png_read_filter_row_sub_vsx4(png_row_infop row_info, png_bytep row,
       }
 }
 
-void png_read_filter_row_sub_vsx3(png_row_infop row_info, png_bytep row,
+void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
    png_size_t i; 
