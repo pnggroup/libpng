@@ -677,6 +677,8 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
    png_byte buf[13]; /* Buffer to store the IHDR info */
 
    png_debug(1, "in png_write_IHDR");
+   
+   int is_invalid_depth;
 
    /* Check that we have valid input data from the application info */
    switch (color_type)
@@ -700,11 +702,11 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
          break;
 
       case PNG_COLOR_TYPE_RGB:
+         is_invalid_depth = (bit_depth != 8);
 #ifdef PNG_WRITE_16BIT_SUPPORTED
-         if (bit_depth != 8 && bit_depth != 16)
-#else
-         if (bit_depth != 8)
+         is_invalid_depth = (is_invalid_depth && bit_depth != 16);
 #endif
+         if (is_invalid_depth)
             png_error(png_ptr, "Invalid bit depth for RGB image");
 
          png_ptr->channels = 3;
