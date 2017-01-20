@@ -1,4 +1,4 @@
-Libpng 1.6.29beta02 - January 12, 2017
+Libpng 1.6.29beta02 - January 20, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -32,7 +32,9 @@ Version 1.6.29beta01 [January 12, 2017]
     libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
   Simplified conditional compilation in pngvalid.c, for AIX (Michael Felt).
 
-Version 1.6.29beta02 [January 12, 2017]
+Version 1.6.29beta02 [January 20, 2017]
+  Avoid conditional directives that break statements in pngrutil.c (Romero
+    Malaquias)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
