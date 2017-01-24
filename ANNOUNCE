@@ -1,4 +1,4 @@
-Libpng 1.6.29beta01 - January 6, 2017
+Libpng 1.6.29beta02 - January 20, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,28 +8,33 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.29beta01.tar.xz (LZMA-compressed, recommended)
-   1.6.29beta01.tar.gz
+   1.6.29beta02.tar.xz (LZMA-compressed, recommended)
+   1.6.29beta02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1629b01.7z  (LZMA-compressed, recommended)
-   lp1629b01.zip
+   lp1629b02.7z  (LZMA-compressed, recommended)
+   lp1629b02.zip
 
 Other information:
 
-   1.6.29beta01-README.txt
-   1.6.29beta01-LICENSE.txt
-   libpng-1.6.29beta01-*.asc (armored detached GPG signatures)
+   1.6.29beta02-README.txt
+   1.6.29beta02-LICENSE.txt
+   libpng-1.6.29beta02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.28):
 
-Version 1.6.29beta01 [January 6, 2017]
+Version 1.6.29beta01 [January 12, 2017]
   Readded "include(GNUInstallDirs)" to CMakeLists.txt (Gianfranco Costamagna).
   Moved SSE2 optimization code into the main libpng source directory.
     Configure libpng with "configure --enable-intel-sse" or compile
     libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
+  Simplified conditional compilation in pngvalid.c, for AIX (Michael Felt).
+
+Version 1.6.29beta02 [January 20, 2017]
+  Avoid conditional directives that break statements in pngrutil.c (Romero
+    Malaquias)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
