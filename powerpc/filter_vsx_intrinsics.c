@@ -15,12 +15,20 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-/* This code requires -maltivec and -mabi=altivec on the command line: */
+/* This code requires -maltivec and -mvsx on the command line: */
 #if PNG_POWERPC_VSX_IMPLEMENTATION == 1 /* intrinsics code from pngpriv.h */
 
 #include <altivec.h>
 
 #if PNG_POWERPC_VSX_OPT > 0
+
+#ifndef __VSX__
+#  error "This code requires VSX support (POWER8 and later). Please provide -mvsx compiler flag."
+#endif
+
+#define vec_ld_unaligned(vec,data) vec = vec_vsx_ld(0,pp)
+#define vec_st_unaligned(vec,data) vec_vsx_st(vec,0,data)
+
 
 /* Functions in this file look at most 3 pixels (a,b,c) to predict the 4th (d).
  * They're positioned like this:
@@ -30,7 +38,6 @@
  * whichever of a, b, or c is closest to p=a+b-c.
  * ( this is taken from ../intel/filter_sse2_intrinsics.c )
  */
-
 
 void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
                                 png_const_bytep prev_row)
@@ -58,7 +65,7 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
    while( istop >= 16 )
    {
       rp_vec = vec_ld(0,rp);
-      pp_vec = vec_ld(0,pp);
+      vec_ld_unaligned(pp_vec,pp);
    
       rp_vec = vec_add(rp_vec,pp_vec);
 
