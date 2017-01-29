@@ -98,8 +98,17 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 #define VEC_SELECT2_3 (vector unsigned char){16,16,16,16,16,16,3,4,5,16,16,16,16,16,16,16}
 #define VEC_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,6,7,8,16,16,16,16}
 #define VEC_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,9,10,11,16}
- 
 
+
+#define VEC_AVG_SELECT1_4 (vector unsigned char){16,16,16,16, 4, 5, 6, 7,16,16,16,16,16,16,16,16}
+#define VEC_AVG_SELECT2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 8, 9,10,11,16,16,16,16}
+#define VEC_AVG_SELECT3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,15}
+
+#define VEC_AVG_SELECT1_3 (vector unsigned char){16,16,16, 3, 4, 5,16,16,16,16,16,16,16,16,16,16}
+#define VEC_AVG_SELECT2_3 (vector unsigned char){16,16,16,16,16,16, 6, 7, 8,16,16,16,16,16,16,16}
+#define VEC_AVG_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16}
+#define VEC_AVG_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16}
+ 
 void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
@@ -224,53 +233,187 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-    png_size_t i;
-    png_bytep rp = row;
-    png_const_bytep pp = prev_row;
-    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-    png_size_t istop = row_info->rowbytes - bpp;
+   const unsigned int bpp = 4;
+   png_size_t i; 
 
-    for (i = 0; i < bpp; i++)
-    {
-       *rp = (png_byte)(((int)(*rp) +
-          ((int)(*pp++) / 2 )) & 0xff);
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
+   png_size_t istop = row_info->rowbytes - unaligned_top;
+ 
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
 
-       rp++;
-    }
+   vector unsigned char rp_vec;
+   vector unsigned char pp_vec;
+   vector unsigned char pp_part_vec;
+   vector unsigned char rp_part_vec;
+   vector unsigned char avg_vec;
+   vector unsigned char zero_vec = {0};
 
-    for (i = 0; i < istop; i++)
-    {
-       *rp = (png_byte)(((int)(*rp) +
-          (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+   for (i = 0; i < bpp; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) +
+         ((int)(*pp++) / 2 )) & 0xff);
 
-       rp++;
-    }
+      rp++;
+   }
+
+   /* Altivec operations require 16-byte aligned data 
+    * but input can be unaligned. So we calculate 
+    * unaligned part as usual.
+    */
+   for (i = bpp; i < unaligned_top; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) +
+         (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+      rp++;
+   }
+  
+   /* Using SIMD while we can */
+   while( istop >= 16 )
+   {  
+      for(i=0;i < bpp ; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) +
+            (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+         rp++;
+      }
+      rp -= bpp;
+      pp -= bpp;
+
+      vec_ld_unaligned(pp_vec,pp);
+      rp_vec = vec_ld(0,rp);
+
+      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_4);
+      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT1_4);
+      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+      rp_vec = vec_add(rp_vec,avg_vec);
+
+      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_4);
+      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT2_4);
+      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+      rp_vec = vec_add(rp_vec,avg_vec);
+
+      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_4);
+      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT3_4);
+      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+      rp_vec = vec_add(rp_vec,avg_vec);
+
+      vec_st(rp_vec,0,rp);
+
+      rp += 16;
+      pp += 16;
+      istop -= 16;
+   }
+
+   if(istop % 16 > 0) 
+      for (i = 0; i < istop % 16; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) +
+            (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+         rp++;
+      }
 }
 
 void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-    png_size_t i;
-    png_bytep rp = row;
-    png_const_bytep pp = prev_row;
-    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-    png_size_t istop = row_info->rowbytes - bpp;
+   const unsigned int bpp = 3;
+   png_size_t i; 
 
-    for (i = 0; i < bpp; i++)
-    {
-       *rp = (png_byte)(((int)(*rp) +
-          ((int)(*pp++) / 2 )) & 0xff);
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
+   png_size_t istop = row_info->rowbytes - unaligned_top;
+ 
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
 
-       rp++;
-    }
+   vector unsigned char rp_vec;
+   vector unsigned char pp_vec;
+   vector unsigned char pp_part_vec;
+   vector unsigned char rp_part_vec;
+   vector unsigned char avg_vec;
+   vector unsigned char zero_vec = {0};
 
-    for (i = 0; i < istop; i++)
-    {
-       *rp = (png_byte)(((int)(*rp) +
-          (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+   for (i = 0; i < bpp; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) +
+         ((int)(*pp++) / 2 )) & 0xff);
 
-       rp++;
-    }
+      rp++;
+   }
+
+   /* Altivec operations require 16-byte aligned data 
+    * but input can be unaligned. So we calculate 
+    * unaligned part as usual.
+    */
+   for (i = bpp; i < unaligned_top; i++)
+   {
+      *rp = (png_byte)(((int)(*rp) +
+         (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+      rp++;
+   }
+  
+   /* Using SIMD while we can */
+   while( istop >= 16 )
+   {  
+      for(i=0;i < bpp ; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) +
+            (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+         rp++;
+      }
+      rp -= bpp;
+      pp -= bpp;
+
+      vec_ld_unaligned(pp_vec,pp);
+      rp_vec = vec_ld(0,rp);
+
+      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_3);
+      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT1_3);
+      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+      rp_vec = vec_add(rp_vec,avg_vec);
+
+      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_3);
+      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT2_3);
+      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+      rp_vec = vec_add(rp_vec,avg_vec);
+
+      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_3);
+      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT3_3);
+      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+      rp_vec = vec_add(rp_vec,avg_vec);
+
+      vec_st(rp_vec,0,rp);
+
+      rp += 16;
+      pp += 16;
+      istop -= 16;
+      /* Since 16 % bpp = 16 % 3 = 1, last element of array must
+       * be proceeded manually 
+       */
+      *(rp - 1) += ((int)(*(pp-1) + *(rp-1-bpp)) / 2 ) & 0xff;
+
+   }
+
+   if(istop % 16 > 0) 
+      for (i = 0; i < istop % 16; i++)
+      {
+         *rp = (png_byte)(((int)(*rp) +
+            (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+         rp++;
+      }
+ 
 }
 
 void png_read_filter_row_paeth4_vsx(png_row_infop row_info,
