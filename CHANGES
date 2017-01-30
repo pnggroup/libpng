@@ -5794,11 +5794,16 @@ Version 1.6.28rc03 [January 4, 2017]
 Version 1.6.28 [January 5, 2017]
   No changes.
 
-Version 1.6.29beta01 [January 6, 2017]
+Version 1.6.29beta01 [January 12, 2017]
   Readded "include(GNUInstallDirs)" to CMakeLists.txt (Gianfranco Costamagna).
   Moved SSE2 optimization code into the main libpng source directory.
     Configure libpng with "configure --enable-intel-sse" or compile
     libpng with "-DPNG_INTEL_SSE" in CPPFLAGS to enable it.
+  Simplified conditional compilation in pngvalid.c, for AIX (Michael Felt).
+
+Version 1.6.29beta02 [January 20, 2017]
+  Avoid conditional directives that break statements in pngrutil.c (Romero
+    Malaquias)
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
