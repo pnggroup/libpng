@@ -1,4 +1,4 @@
-/* contrib/powerpc-vsx/linux.c
+/* contrib/powerpc-vsx/linux_aux.c
  *
  * Copyright (c) 2016 Glenn Randers-Pehrson
  * Written by Vadim Barkov, 2017.
