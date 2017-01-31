@@ -108,7 +108,15 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 #define VEC_AVG_SELECT2_3 (vector unsigned char){16,16,16,16,16,16, 6, 7, 8,16,16,16,16,16,16,16}
 #define VEC_AVG_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16}
 #define VEC_AVG_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16}
- 
+
+
+#ifdef PNG_USE_ABS
+#  define vsx_abs(number) abs(number)
+#else
+#  define vsx_abs(number) (number > 0) ? (number) : -(number)
+#endif
+
+
 void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
@@ -416,101 +424,273 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
  
 }
 
-void png_read_filter_row_paeth4_vsx(png_row_infop row_info,
-                                    png_bytep row,
-                                    png_const_bytep prev_row)
+/* Bytewise c ? t : e. */
+#define if_then_else(c,t,e) vec_sel(e,t,c)
+
+#define vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp) {\
+      c = *(pp - bpp);\
+      a = *(rp - bpp);\
+      b = *pp++;\
+      p = b - c;\
+      pc = a - c;\
+      pa = vsx_abs(p);\
+      pb = vsx_abs(pc);\
+      pc = vsx_abs(p + pc);\
+      if (pb < pa) pa = pb, a = b;\
+      if (pc < pa) a = c;\
+      a += *rp;\
+      *rp++ = (png_byte)a;\
+      }
+
+void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
-    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-    png_bytep rp_end = row + bpp;
+   const unsigned int bpp = 4;
+   png_size_t i; 
 
-    /* Process the first pixel in the row completely (this is the same as 'up'
-     * because there is only one candidate predictor for the first row).
-     */
-    while (row < rp_end)
-    {
-       int a = *row + *prev_row++;
-       *row++ = (png_byte)a;
-    }
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
+   png_size_t istop = row_info->rowbytes - unaligned_top;
+ 
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
 
-    /* Remainder */
-    rp_end = rp_end + (row_info->rowbytes - bpp);
+   int a, b, c, pa, pb, pc, p;
+   vector unsigned char rp_vec;
+   vector unsigned char pp_vec;
+   vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
+   vector signed char pa_vec,pb_vec,pc_vec,smallest_vec;
+   vector unsigned char zero_vec = {0};
 
-    while (row < rp_end)
-    {
-       int a, b, c, pa, pb, pc, p;
+   /* Process the first pixel in the row completely (this is the same as 'up'
+    * because there is only one candidate predictor for the first row).
+    */
+   for(i = 0; i < bpp ; i++)
+   {
+      *rp = (png_byte)( *rp + *pp);
+      rp++;
+      pp++;
+   }
 
-       c = *(prev_row - bpp);
-       a = *(row - bpp);
-       b = *prev_row++;
+   for(i = bpp; i < unaligned_top ; i++)
+   {
+      vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+   }
 
-       p = b - c;
-       pc = a - c;
+   while( istop > 16)
+   {
+      for(i = 0; i < bpp ; i++)
+      {
+         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+      }
 
- #ifdef PNG_USE_ABS
-       pa = abs(p);
-       pb = abs(pc);
-       pc = abs(p + pc);
- #else
-       pa = p < 0 ? -p : p;
-       pb = pc < 0 ? -pc : pc;
-       pc = (p + pc) < 0 ? -(p + pc) : p + pc;
- #endif
+      rp -= bpp;
+      pp -= bpp;
+      rp_vec = vec_ld(0,rp);
+      vec_ld_unaligned(pp_vec,pp);
 
-       if (pb < pa) pa = pb, a = b;
-       if (pc < pa) a = c;
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT1_4);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT1_4);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT1_4);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+      rp_vec = vec_add(rp_vec, nearest_vec);
 
-       a += *row;
-       *row++ = (png_byte)a;
-    }
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT2_4);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT2_4);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT2_4);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+ 
+      rp_vec = vec_add(rp_vec, nearest_vec);
+ 
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT3_4);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_4);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT3_4);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+ 
+      rp_vec = vec_add(rp_vec, nearest_vec);
+
+      vec_st(rp_vec,0,rp);
+
+      rp += 16;
+      pp += 16;
+      istop -= 16;
+   }
+
+   if(istop > 0) 
+      for (i = 0; i < istop % 16; i++)
+      { 
+         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+      }
+}
+ 
+void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
+{
+   const unsigned int bpp = 3;
+   png_size_t i; 
+
+   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
+   png_size_t istop = row_info->rowbytes - unaligned_top;
+ 
+   png_bytep rp = row;
+   png_const_bytep pp = prev_row;
+
+   int a, b, c, pa, pb, pc, p;
+   vector unsigned char rp_vec;
+   vector unsigned char pp_vec;
+   vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
+   vector signed char pa_vec,pb_vec,pc_vec,smallest_vec;
+   vector unsigned char zero_vec = {0};
+
+   /* Process the first pixel in the row completely (this is the same as 'up'
+    * because there is only one candidate predictor for the first row).
+    */
+   for(i = 0; i < bpp ; i++)
+   {
+      *rp = (png_byte)( *rp + *pp);
+      rp++;
+      pp++;
+   }
+
+   for(i = bpp; i < unaligned_top ; i++)
+   {
+      vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+   }
+
+   while( istop > 16)
+   {
+      for(i = 0; i < bpp ; i++)
+      {
+         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+      }
+
+      rp -= bpp;
+      pp -= bpp;
+      rp_vec = vec_ld(0,rp);
+      vec_ld_unaligned(pp_vec,pp);
+
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT1_3);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT1_3);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT1_3);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+      rp_vec = vec_add(rp_vec, nearest_vec);
+
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT2_3);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT2_3);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT2_3);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+ 
+      rp_vec = vec_add(rp_vec, nearest_vec);
+ 
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT3_3);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_3);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT3_3);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+ 
+      rp_vec = vec_add(rp_vec, nearest_vec);
+ 
+      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT4_3);
+      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT4_3);
+      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT4_3);
+      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+      pa_vec = vec_abs(pa_vec);
+      pb_vec = vec_abs(pb_vec);
+      pc_vec = vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      nearest_vec =  if_then_else(
+            vec_cmpeq(pa_vec,smallest_vec),
+            a_vec,
+            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+               );
+ 
+      rp_vec = vec_add(rp_vec, nearest_vec);
+
+
+      vec_st(rp_vec,0,rp);
+
+      rp += 16-1;
+      pp += 16-1;
+      istop -= 16;
+      /* Since 16 % bpp = 16 % 3 = 1, last element of array must
+       * be proceeded manually 
+       */
+      vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+ }
+
+   if(istop > 0) 
+      for (i = 0; i < istop % 16; i++)
+      { 
+         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+      }
 }
 
-void png_read_filter_row_paeth3_vsx(png_row_infop row_info,
-                                    png_bytep row,
-                                    png_const_bytep prev_row)
-{
-    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-    png_bytep rp_end = row + bpp;
-
-    /* Process the first pixel in the row completely (this is the same as 'up'
-     * because there is only one candidate predictor for the first row).
-     */
-    while (row < rp_end)
-    {
-       int a = *row + *prev_row++;
-       *row++ = (png_byte)a;
-    }
-
-    /* Remainder */
-    rp_end = rp_end + (row_info->rowbytes - bpp);
-
-    while (row < rp_end)
-    {
-       int a, b, c, pa, pb, pc, p;
-
-       c = *(prev_row - bpp);
-       a = *(row - bpp);
-       b = *prev_row++;
-
-       p = b - c;
-       pc = a - c;
-
- #ifdef PNG_USE_ABS
-       pa = abs(p);
-       pb = abs(pc);
-       pc = abs(p + pc);
- #else
-       pa = p < 0 ? -p : p;
-       pb = pc < 0 ? -pc : pc;
-       pc = (p + pc) < 0 ? -(p + pc) : p + pc;
- #endif
-
-       if (pb < pa) pa = pb, a = b;
-       if (pc < pa) a = c;
-
-       a += *row;
-       *row++ = (png_byte)a;
-    }
-}
 
 #endif /* PNG_POWERPC_VSX_OPT > 0 */
 #endif /* PNG_POWERPC_VSX_IMPLEMENTATION == 1 (intrinsics) */
