@@ -32,7 +32,7 @@
  */
 #ifndef PNG_POWERPC_VSX_FILE
 #  ifdef __linux__
-#     define  PNG_POWERPC_VSX_FILE "contrib/powerpc-vsx/linux.c"
+#     define  PNG_POWERPC_VSX_FILE "contrib/powerpc-vsx/linux_aux.c"
 #  endif
 #endif
 
