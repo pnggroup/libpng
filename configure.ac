@@ -469,7 +469,7 @@ AS_HELP_STRING([[[--enable-powerpc-vsx]]],
 AM_CONDITIONAL([PNG_POWERPC_VSX],
    [test "$enable_powerpc_vsx" != 'no' &&
     case "$host_cpu" in
-      powerpc*) :;;
+      powerpc*|ppc64*) :;;
     esac])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
