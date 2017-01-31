@@ -109,6 +109,36 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
   endif()
 endif()
 
+# set definitions and sources for powerpc
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^powerpc*" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64*" )
+  set(PNG_POWERPC_VSX_POSSIBLE_VALUES check on off)
+  set(PNG_POWERPC_VSX "check" CACHE STRING "Enable POWERPC VSX optimizations:
+     check: (default) use internal checking code;
+     off: disable the optimizations;
+     on: turn on unconditionally.")
+  set_property(CACHE PNG_POWERPC_VSX PROPERTY STRINGS
+     ${PNG_POWERPC_VSX_POSSIBLE_VALUES})
+  list(FIND PNG_POWERPC_VSX_POSSIBLE_VALUES ${PNG_POWERPC_VSX} index)
+  if(index EQUAL -1)
+    message(FATAL_ERROR
+      " PNG_POWERPC_VSX must be one of [${PNG_POWERPC_VSX_POSSIBLE_VALUES}]")
+  elseif(NOT ${PNG_POWERPC_VSX} STREQUAL "no")
+    set(libpng_powerpc_sources
+      powerpc/powerpc_init.c
+      powerpc/filter_vsx_intrinsics.c)
+      
+    if(${PNG_POWERPC_VSX} STREQUAL "on")
+      add_definitions(-DPNG_POWERPC_VSX_OPT=2)
+    elseif(${PNG_POWERPC_VSX} STREQUAL "check")
+      add_definitions(-DPNG_POWERPC_VSX_CHECK_SUPPORTED)
+    endif()
+  else()
+    add_definitions(-DPNG_POWERPC_VSX_OPT=0)
+  endif()
+endif()
+
+
 # SET LIBNAME
 set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 
@@ -400,6 +430,7 @@ set(libpng_sources
   pngwtran.c
   pngwutil.c
   ${libpng_arm_sources}
+  ${libpng_powerpc_sources}
 )
 set(pngtest_sources
   pngtest.c
