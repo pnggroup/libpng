@@ -7,8 +7,6 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * SEE contrib/powerpc-vsx/README before reporting bugs
- *
  * STATUS: COMPILED
  * BUG REPORTS: png-mng-implement@sourceforge.net
  *
