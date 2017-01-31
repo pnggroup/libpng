@@ -47,10 +47,6 @@ static int png_have_vsx(png_structp png_ptr);
 #endif /* PNG_POWERPC_VSX_FILE */
 #endif /* PNG_POWERPC_VSX_CHECK_SUPPORTED */
 
-#ifndef PNG_ALIGNED_MEMORY_SUPPORTED
-#  error "ALIGNED_MEMORY is required; set: -DPNG_ALIGNED_MEMORY_SUPPORTED"
-#endif
-
 void
 png_init_filter_functions_vsx(png_structp pp, unsigned int bpp)
 {
