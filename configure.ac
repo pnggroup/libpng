@@ -436,8 +436,8 @@ AC_ARG_ENABLE([powerpc-vsx],
 AS_HELP_STRING([[[--enable-powerpc-vsx]]],
       [Enable POWERPC VSX optimizations: =no/off, check, api, yes/on:]
       [no/off: disable the optimizations; check: use internal checking code]
-      [(deprecated and poorly supported); api: disable by default, enable by]
-      [a call to png_set_option; yes/on: turn on unconditionally.]
+      [api: disable by default, enable by a call to png_set_option]
+      [yes/on: turn on unconditionally.]
       [If not specified: determined by the compiler.]),
    [case "$enableval" in
       no|off)
