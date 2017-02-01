@@ -132,6 +132,8 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^powerpc*" OR
       add_definitions(-DPNG_POWERPC_VSX_OPT=2)
     elseif(${PNG_POWERPC_VSX} STREQUAL "check")
       add_definitions(-DPNG_POWERPC_VSX_CHECK_SUPPORTED)
+      message(WARNING
+        " Please check contrib/powerpc/README file for the list of supported OSes.")
     endif()
   else()
     add_definitions(-DPNG_POWERPC_VSX_OPT=0)

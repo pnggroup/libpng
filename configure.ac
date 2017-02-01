@@ -448,7 +448,9 @@ AS_HELP_STRING([[[--enable-powerpc-vsx]]],
          enable_powerpc_vsx=no;;
       check)
          AC_DEFINE([PNG_POWERPC_VSX_CHECK_SUPPORTED], [],
-                   [Check for POWERPC VSX support at run-time]);;
+                   [Check for POWERPC VSX support at run-time])
+         AC_MSG_WARN([--enable-powerpc-vsx Please check contrib/powerpc/README file]
+            [for the list of supported OSes.]);;
       api)
          AC_DEFINE([PNG_POWERPC_VSX_API_SUPPORTED], [],
                    [Turn on POWERPC VSX optimizations at run-time]);;

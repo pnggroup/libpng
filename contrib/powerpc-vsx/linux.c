@@ -7,7 +7,7 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  *
- * STATUS: COMPILED
+ * STATUS: TESTED
  * BUG REPORTS: png-mng-implement@sourceforge.net
  *
  * png_have_vsx implemented for Linux by reading the widely available
