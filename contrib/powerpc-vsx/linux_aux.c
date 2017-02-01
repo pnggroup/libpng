@@ -22,7 +22,11 @@
 static int
 png_have_vsx(png_structp png_ptr)
 {
+
    const unsigned long auxv = getauxval( AT_HWCAP );
+
+   PNG_UNUSED(png_ptr)
+
    if(auxv & (PPC_FEATURE_HAS_ALTIVEC|PPC_FEATURE_HAS_VSX ))
       return 1;
    else

@@ -35,6 +35,8 @@ png_have_vsx(png_structp png_ptr)
    char input[MAXLINE];
    char *token = NULL;
 
+   PNG_UNUSED(png_ptr)
+
    f = fopen("/proc/cpuinfo", "r");
    if (f != NULL)
    {
