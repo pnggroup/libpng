@@ -11,8 +11,7 @@
  * BUG REPORTS: png-mng-implement@sourceforge.net
  *
  * png_have_vsx implemented for Linux by reading the widely available
- * pseudo-file /proc/cpuinfo. Result is cached so if function will be called
- * multiple times only one reading is perfomed.
+ * pseudo-file /proc/cpuinfo. 
  *
  * This code is strict ANSI-C and is probably moderately portable; it does
  * however use <stdio.h> and it assumes that /proc/cpuinfo is never localized.
@@ -43,13 +42,13 @@ png_have_vsx(png_structp png_ptr)
       while(fgets(input,MAXLINE,f) != NULL)
       {
          token = strstr(input,string);
-	 if(token != NULL)
-	    return cachedResult;
+         if(token != NULL)
+            return 1;
       }
    }
 #ifdef PNG_WARNINGS_SUPPORTED
    else
       png_warning(png_ptr, "/proc/cpuinfo open failed");
 #endif
-   return cachedResult;
+   return 0;
 }
