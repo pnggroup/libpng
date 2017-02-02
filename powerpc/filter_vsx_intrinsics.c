@@ -39,17 +39,24 @@
  * ( this is taken from ../intel/filter_sse2_intrinsics.c )
  */
 
+#define declare_common_vars(row_info,row,prev_row) \
+   png_size_t i;\
+   png_bytep rp = row;\
+   png_const_bytep pp = prev_row;\
+   png_size_t unaligned_top = 16 - (((png_size_t)row % 16));\
+   png_size_t istop;\
+   if(unaligned_top == 16)\
+      unaligned_top = 0;\
+   istop = row_info->rowbytes - unaligned_top;
+
+
 void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
                                 png_const_bytep prev_row)
 {
-   png_size_t i;
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
-
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
+
+   declare_common_vars(row_info,row,prev_row)
 
    /* Altivec operations require 16-byte aligned data 
     * but input can be unaligned. So we calculate 
@@ -120,18 +127,16 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-   png_size_t i; 
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
- 
    const unsigned int bpp = 4;
    
-   png_bytep rp = row + bpp;
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
    vector unsigned char zero_vec = {0};
    
-   PNG_UNUSED(prev_row)
+   declare_common_vars(row_info,row,prev_row)
+   rp += bpp;
+
+   PNG_UNUSED(pp)
 
    /* Altivec operations require 16-byte aligned data 
     * but input can be unaligned. So we calculate 
@@ -177,18 +182,15 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-   png_size_t i; 
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
- 
    const unsigned int bpp = 3;
 
-   png_bytep rp = row + bpp;
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
    vector unsigned char zero_vec = {0};
-   
-   PNG_UNUSED(prev_row)
+
+   declare_common_vars(row_info,row,prev_row)
+   rp += bpp;
+   PNG_UNUSED(pp)
 
    /* Altivec operations require 16-byte aligned data 
     * but input can be unaligned. So we calculate 
@@ -242,14 +244,7 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
    const unsigned int bpp = 4;
-   png_size_t i; 
-
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
- 
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
-
+   
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
    vector unsigned char pp_part_vec;
@@ -257,6 +252,8 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char avg_vec;
    vector unsigned char zero_vec = {0};
 
+   declare_common_vars(row_info,row,prev_row)
+  
    for (i = 0; i < bpp; i++)
    {
       *rp = (png_byte)(((int)(*rp) +
@@ -332,20 +329,15 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
    const unsigned int bpp = 3;
-   png_size_t i; 
-
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
- 
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
-
+   
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
    vector unsigned char pp_part_vec;
    vector unsigned char rp_part_vec;
    vector unsigned char avg_vec;
    vector unsigned char zero_vec = {0};
+
+   declare_common_vars(row_info,row,prev_row)
 
    for (i = 0; i < bpp; i++)
    {
@@ -446,13 +438,6 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
    const unsigned int bpp = 4;
-   png_size_t i; 
-
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
- 
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
 
    int a, b, c, pa, pb, pc, p;
    vector unsigned char rp_vec;
@@ -460,6 +445,8 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
    vector signed char pa_vec,pb_vec,pc_vec,smallest_vec;
    vector unsigned char zero_vec = {0};
+
+   declare_common_vars(row_info,row,prev_row)   
 
    /* Process the first pixel in the row completely (this is the same as 'up'
     * because there is only one candidate predictor for the first row).
@@ -559,13 +546,6 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
    const unsigned int bpp = 3;
-   png_size_t i; 
-
-   png_size_t unaligned_top = 16 - ((png_size_t)row % 16);
-   png_size_t istop = row_info->rowbytes - unaligned_top;
- 
-   png_bytep rp = row;
-   png_const_bytep pp = prev_row;
 
    int a, b, c, pa, pb, pc, p;
    vector unsigned char rp_vec;
@@ -573,6 +553,8 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
    vector signed char pa_vec,pb_vec,pc_vec,smallest_vec;
    vector unsigned char zero_vec = {0};
+
+   declare_common_vars(row_info,row,prev_row)
 
    /* Process the first pixel in the row completely (this is the same as 'up'
     * because there is only one candidate predictor for the first row).
