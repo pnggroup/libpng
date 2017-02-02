@@ -26,7 +26,7 @@
 #  error "This code requires VSX support (POWER8 and later). Please provide -mvsx compiler flag."
 #endif
 
-#define vec_ld_unaligned(vec,data) vec = vec_vsx_ld(0,pp)
+#define vec_ld_unaligned(vec,data) vec = vec_vsx_ld(0,data)
 #define vec_st_unaligned(vec,data) vec_vsx_st(vec,0,data)
 
 
