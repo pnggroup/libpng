@@ -39,27 +39,31 @@
  * ( this is taken from ../intel/filter_sse2_intrinsics.c )
  */
 
-#define declare_common_vars(row_info,row,prev_row) \
+#define declare_common_vars(row_info,row,prev_row,offset) \
    png_size_t i;\
-   png_bytep rp = row;\
+   png_bytep rp = row + offset;\
    png_const_bytep pp = prev_row;\
-   png_size_t unaligned_top = 16 - (((png_size_t)row % 16));\
+   png_size_t unaligned_top = 16 - (((png_size_t)rp % 16));\
    png_size_t istop;\
    if(unaligned_top == 16)\
       unaligned_top = 0;\
-   istop = row_info->rowbytes - unaligned_top;
-
+   istop = row_info->rowbytes;\
+   if((unaligned_top < istop))\
+      istop -= unaligned_top;\
+   else{\
+      unaligned_top = istop;\
+      istop = 0;\
+   }
 
 void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
                                 png_const_bytep prev_row)
 {
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
+   declare_common_vars(row_info,row,prev_row,0)
 
-   declare_common_vars(row_info,row,prev_row)
-
-   /* Altivec operations require 16-byte aligned data 
-    * but input can be unaligned. So we calculate 
+   /* Altivec operations require 16-byte aligned data
+    * but input can be unaligned. So we calculate
     * unaligned part as usual.
     */
    for (i = 0; i < unaligned_top; i++)
@@ -73,7 +77,7 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
    {
       rp_vec = vec_ld(0,rp);
       vec_ld_unaligned(pp_vec,pp);
-   
+
       rp_vec = vec_add(rp_vec,pp_vec);
 
       vec_st(rp_vec,0,rp);
@@ -83,7 +87,7 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
       istop -= 16;
    }
 
-   if(istop % 16 > 0)
+   if(istop > 0)
    {
       /* If byte count of row is not divisible by 16
        * we will process remaining part as usual
@@ -97,14 +101,14 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 
 }
 
-#define VEC_SELECT1_4 (vector unsigned char){16,16,16,16,0,1,2,3,16,16,16,16,16,16,16,16}
-#define VEC_SELECT2_4 (vector unsigned char){16,16,16,16,16,16,16,16,4,5,6,7,16,16,16,16}
-#define VEC_SELECT3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,8,9,10,11}
+#define VEC_SELECT1_4 (vector unsigned char){16,16,16,16, 0, 1, 2, 3,16,16,16,16,16,16,16,16}
+#define VEC_SELECT2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 4, 5, 6, 7,16,16,16,16}
+#define VEC_SELECT3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 8, 9,10,11}
 
-#define VEC_SELECT1_3 (vector unsigned char){16,16,16,0,1,2,16,16,16,16,16,16,16,16,16,16}
-#define VEC_SELECT2_3 (vector unsigned char){16,16,16,16,16,16,3,4,5,16,16,16,16,16,16,16}
-#define VEC_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,6,7,8,16,16,16,16}
-#define VEC_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,9,10,11,16}
+#define VEC_SELECT1_3 (vector unsigned char){16,16,16, 0, 1, 2,16,16,16,16,16,16,16,16,16,16}
+#define VEC_SELECT2_3 (vector unsigned char){16,16,16,16,16,16, 3, 4, 5,16,16,16,16,16,16,16}
+#define VEC_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 6, 7, 8,16,16,16,16}
+#define VEC_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 9,10,11,16}
 
 
 #define VEC_AVG_SELECT1_4 (vector unsigned char){16,16,16,16, 4, 5, 6, 7,16,16,16,16,16,16,16,16}
@@ -116,34 +120,30 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 #define VEC_AVG_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16}
 #define VEC_AVG_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16}
 
-
 #ifdef PNG_USE_ABS
 #  define vsx_abs(number) abs(number)
 #else
 #  define vsx_abs(number) (number > 0) ? (number) : -(number)
 #endif
 
-
 void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
    const unsigned int bpp = 4;
-   
+
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
    vector unsigned char zero_vec = {0};
-   
-   declare_common_vars(row_info,row,prev_row)
-   rp += bpp;
+
+   declare_common_vars(row_info,row,prev_row,bpp)
 
    PNG_UNUSED(pp)
 
-   /* Altivec operations require 16-byte aligned data 
-    * but input can be unaligned. So we calculate 
+   /* Altivec operations require 16-byte aligned data
+    * but input can be unaligned. So we calculate
     * unaligned part as usual.
     */
-
-   for (i = bpp; i < unaligned_top; i++)
+   for (i = 0; i < unaligned_top; i++)
    {
       *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
       rp++;
@@ -151,7 +151,7 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
 
    /* Using SIMD while we can */
    while( istop >= 16 )
-   {  
+   {
       for(i=0;i < bpp ; i++)
          *(rp+i) += *(rp+i - bpp);
 
@@ -171,13 +171,15 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
       istop -= 16;
    }
 
-   if(istop % 16 > 0)
+   if(istop > 0)
       for (i = 0; i < istop % 16; i++)
       {
          *rp = (png_byte)(((int)(*rp) + (int)(*(rp - bpp))) & 0xff);
          rp++;
       }
+
 }
+
 
 void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
@@ -188,16 +190,15 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char part_vec;
    vector unsigned char zero_vec = {0};
 
-   declare_common_vars(row_info,row,prev_row)
-   rp += bpp;
+   declare_common_vars(row_info,row,prev_row,bpp)
+
    PNG_UNUSED(pp)
 
-   /* Altivec operations require 16-byte aligned data 
-    * but input can be unaligned. So we calculate 
+   /* Altivec operations require 16-byte aligned data
+    * but input can be unaligned. So we calculate
     * unaligned part as usual.
     */
-
-   for (i = bpp; i < unaligned_top; i++)
+   for (i = 0; i < unaligned_top; i++)
    {
       *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
       rp++;
@@ -205,7 +206,7 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
 
    /* Using SIMD while we can */
    while( istop >= 16 )
-   {  
+   {
       for(i=0;i < bpp ; i++)
          *(rp+i) += *(rp+i - bpp);
 
@@ -224,15 +225,15 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
 
       vec_st(rp_vec,0,rp);
       rp += 16;
-      istop -= 16;     
-      
+      istop -= 16;
+
       /* Since 16 % bpp = 16 % 3 = 1, last element of array must
-       * be proceeded manually 
+       * be proceeded manually
        */
       *(rp - 1) += *(rp - 1 - 3);
    }
 
-   if(istop % 16 > 0)
+   if(istop > 0)
       for (i = 0; i < istop % 16; i++)
       {
          *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
@@ -244,7 +245,7 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
    const unsigned int bpp = 4;
-   
+
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
    vector unsigned char pp_part_vec;
@@ -252,8 +253,11 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char avg_vec;
    vector unsigned char zero_vec = {0};
 
-   declare_common_vars(row_info,row,prev_row)
-  
+   declare_common_vars(row_info,row,prev_row,bpp)
+   rp -= bpp;
+   if(istop >= bpp)
+      istop -= bpp;
+
    for (i = 0; i < bpp; i++)
    {
       *rp = (png_byte)(((int)(*rp) +
@@ -262,21 +266,21 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
       rp++;
    }
 
-   /* Altivec operations require 16-byte aligned data 
-    * but input can be unaligned. So we calculate 
+   /* Altivec operations require 16-byte aligned data
+    * but input can be unaligned. So we calculate
     * unaligned part as usual.
     */
-   for (i = bpp; i < unaligned_top; i++)
+   for (i = 0; i < unaligned_top; i++)
    {
       *rp = (png_byte)(((int)(*rp) +
          (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
 
       rp++;
    }
-  
+
    /* Using SIMD while we can */
    while( istop >= 16 )
-   {  
+   {
       for(i=0;i < bpp ; i++)
       {
          *rp = (png_byte)(((int)(*rp) +
@@ -315,7 +319,7 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
       istop -= 16;
    }
 
-   if(istop % 16 > 0) 
+   if(istop  > 0)
       for (i = 0; i < istop % 16; i++)
       {
          *rp = (png_byte)(((int)(*rp) +
@@ -328,92 +332,102 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-   const unsigned int bpp = 3;
-   
-   vector unsigned char rp_vec;
-   vector unsigned char pp_vec;
-   vector unsigned char pp_part_vec;
-   vector unsigned char rp_part_vec;
-   vector unsigned char avg_vec;
-   vector unsigned char zero_vec = {0};
+  const unsigned int bpp = 3;
 
-   declare_common_vars(row_info,row,prev_row)
+  vector unsigned char rp_vec;
+  vector unsigned char pp_vec;
+  vector unsigned char pp_part_vec;
+  vector unsigned char rp_part_vec;
+  vector unsigned char avg_vec;
+  vector unsigned char zero_vec = {0};
 
-   for (i = 0; i < bpp; i++)
-   {
-      *rp = (png_byte)(((int)(*rp) +
-         ((int)(*pp++) / 2 )) & 0xff);
+  declare_common_vars(row_info,row,prev_row,bpp)
+  rp -= bpp;
+  if(istop >= bpp)
+     istop -= bpp;
 
-      rp++;
-   }
+  for (i = 0; i < bpp; i++)
+  {
+     *rp = (png_byte)(((int)(*rp) +
+        ((int)(*pp++) / 2 )) & 0xff);
 
-   /* Altivec operations require 16-byte aligned data 
-    * but input can be unaligned. So we calculate 
-    * unaligned part as usual.
-    */
-   for (i = bpp; i < unaligned_top; i++)
-   {
-      *rp = (png_byte)(((int)(*rp) +
-         (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+     rp++;
+  }
 
-      rp++;
-   }
-  
-   /* Using SIMD while we can */
-   while( istop >= 16 )
-   {  
-      for(i=0;i < bpp ; i++)
-      {
-         *rp = (png_byte)(((int)(*rp) +
-            (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+  /* Altivec operations require 16-byte aligned data
+   * but input can be unaligned. So we calculate
+   * unaligned part as usual.
+   */
+  for (i = 0; i < unaligned_top; i++)
+  {
+     *rp = (png_byte)(((int)(*rp) +
+        (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
 
-         rp++;
-      }
-      rp -= bpp;
-      pp -= bpp;
+     rp++;
+  }
 
-      vec_ld_unaligned(pp_vec,pp);
-      rp_vec = vec_ld(0,rp);
+  /* Using SIMD while we can */
+  while( istop >= 16 )
+  {
+     for(i=0;i < bpp ; i++)
+     {
+        *rp = (png_byte)(((int)(*rp) +
+           (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
 
-      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_3);
-      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT1_3);
-      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
-      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
-      rp_vec = vec_add(rp_vec,avg_vec);
+        rp++;
+     }
+     rp -= bpp;
+     pp -= bpp;
 
-      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_3);
-      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT2_3);
-      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
-      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
-      rp_vec = vec_add(rp_vec,avg_vec);
+     vec_ld_unaligned(pp_vec,pp);
+     rp_vec = vec_ld(0,rp);
 
-      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_3);
-      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT3_3);
-      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
-      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
-      rp_vec = vec_add(rp_vec,avg_vec);
+     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_3);
+     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT1_3);
+     avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+     avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+     rp_vec = vec_add(rp_vec,avg_vec);
 
-      vec_st(rp_vec,0,rp);
+     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_3);
+     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT2_3);
+     avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+     avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+     rp_vec = vec_add(rp_vec,avg_vec);
 
-      rp += 16;
-      pp += 16;
-      istop -= 16;
-      /* Since 16 % bpp = 16 % 3 = 1, last element of array must
-       * be proceeded manually 
-       */
-      *(rp - 1) += ((int)(*(pp-1) + *(rp-1-bpp)) / 2 ) & 0xff;
+     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_3);
+     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT3_3);
+     avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+     avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+     rp_vec = vec_add(rp_vec,avg_vec);
 
-   }
+     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT4_3);
+     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT4_3);
+     avg_vec = vec_avg(rp_part_vec,pp_part_vec);
+     avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
+     rp_vec = vec_add(rp_vec,avg_vec);
 
-   if(istop % 16 > 0) 
-      for (i = 0; i < istop % 16; i++)
-      {
-         *rp = (png_byte)(((int)(*rp) +
-            (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+     vec_st(rp_vec,0,rp);
 
-         rp++;
-      }
- 
+     rp += 15;
+     pp += 15;
+     istop -= 16;
+
+     /* Since 16 % bpp = 16 % 3 = 1, last element of array must
+      * be proceeded manually
+      */
+     *rp = (png_byte)(((int)(*rp) +
+        (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+     rp++;
+  }
+
+  if(istop  > 0)
+     for (i = 0; i < istop % 16; i++)
+     {
+        *rp = (png_byte)(((int)(*rp) +
+           (int)(*pp++ + *(rp-bpp)) / 2 ) & 0xff);
+
+        rp++;
+     }
 }
 
 /* Bytewise c ? t : e. */
@@ -443,10 +457,14 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
    vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
-   vector signed char pa_vec,pb_vec,pc_vec,smallest_vec;
+   vector signed char pa_vec,pb_vec,pc_vec;
+   vector unsigned char pa_vec_abs,pb_vec_abs,pc_vec_abs,smallest_vec;
    vector unsigned char zero_vec = {0};
 
-   declare_common_vars(row_info,row,prev_row)   
+   declare_common_vars(row_info,row,prev_row,bpp)
+   rp -= bpp;
+   if(istop >= bpp)
+      istop -= bpp;
 
    /* Process the first pixel in the row completely (this is the same as 'up'
     * because there is only one candidate predictor for the first row).
@@ -458,12 +476,12 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
       pp++;
    }
 
-   for(i = bpp; i < unaligned_top ; i++)
+   for(i = 0; i < unaligned_top ; i++)
    {
       vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
    }
 
-   while( istop > 16)
+   while( istop >= 16)
    {
       for(i = 0; i < bpp ; i++)
       {
@@ -481,14 +499,14 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
       pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
       pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
       pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+      pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+      pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
       nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
+            vec_cmpeq(pa_vec_abs,smallest_vec),
             a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+            if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
                );
       rp_vec = vec_add(rp_vec, nearest_vec);
 
@@ -498,34 +516,32 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
       pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
       pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
       pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+      pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+      pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
       nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
+            vec_cmpeq(pa_vec_abs,smallest_vec),
             a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+            if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
                );
- 
       rp_vec = vec_add(rp_vec, nearest_vec);
- 
+
       a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT3_4);
       b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_4);
       c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT3_4);
       pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
       pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
       pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
+      pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+      pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+      pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+      smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
       nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
+            vec_cmpeq(pa_vec_abs,smallest_vec),
             a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
+            if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
                );
- 
       rp_vec = vec_add(rp_vec, nearest_vec);
 
       vec_st(rp_vec,0,rp);
@@ -535,142 +551,143 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
       istop -= 16;
    }
 
-   if(istop > 0) 
+   if(istop > 0)
       for (i = 0; i < istop % 16; i++)
-      { 
-         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
-      }
-}
- 
-void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
-   png_const_bytep prev_row)
-{
-   const unsigned int bpp = 3;
-
-   int a, b, c, pa, pb, pc, p;
-   vector unsigned char rp_vec;
-   vector unsigned char pp_vec;
-   vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
-   vector signed char pa_vec,pb_vec,pc_vec,smallest_vec;
-   vector unsigned char zero_vec = {0};
-
-   declare_common_vars(row_info,row,prev_row)
-
-   /* Process the first pixel in the row completely (this is the same as 'up'
-    * because there is only one candidate predictor for the first row).
-    */
-   for(i = 0; i < bpp ; i++)
-   {
-      *rp = (png_byte)( *rp + *pp);
-      rp++;
-      pp++;
-   }
-
-   for(i = bpp; i < unaligned_top ; i++)
-   {
-      vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
-   }
-
-   while( istop > 16)
-   {
-      for(i = 0; i < bpp ; i++)
       {
          vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
       }
+}
 
-      rp -= bpp;
-      pp -= bpp;
-      rp_vec = vec_ld(0,rp);
-      vec_ld_unaligned(pp_vec,pp);
+void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
+{
+  const unsigned int bpp = 3;
 
-      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT1_3);
-      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT1_3);
-      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT1_3);
-      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
-      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
-      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
-      nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
-            a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
-               );
-      rp_vec = vec_add(rp_vec, nearest_vec);
+  int a, b, c, pa, pb, pc, p;
+  vector unsigned char rp_vec;
+  vector unsigned char pp_vec;
+  vector unsigned char a_vec,b_vec,c_vec,nearest_vec;
+  vector signed char pa_vec,pb_vec,pc_vec;
+  vector unsigned char pa_vec_abs,pb_vec_abs,pc_vec_abs,smallest_vec;
+  vector unsigned char zero_vec = {0};
 
-      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT2_3);
-      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT2_3);
-      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT2_3);
-      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
-      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
-      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
-      nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
-            a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
-               );
- 
-      rp_vec = vec_add(rp_vec, nearest_vec);
- 
-      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT3_3);
-      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_3);
-      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT3_3);
-      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
-      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
-      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
-      nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
-            a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
-               );
- 
-      rp_vec = vec_add(rp_vec, nearest_vec);
- 
-      a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT4_3);
-      b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT4_3);
-      c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT4_3);
-      pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
-      pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
-      pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
-      pa_vec = vec_abs(pa_vec);
-      pb_vec = vec_abs(pb_vec);
-      pc_vec = vec_abs(pc_vec);
-      smallest_vec = vec_min(pc_vec, vec_min(pa_vec,pb_vec));
-      nearest_vec =  if_then_else(
-            vec_cmpeq(pa_vec,smallest_vec),
-            a_vec,
-            if_then_else(vec_cmpeq(pb_vec,smallest_vec),b_vec,c_vec)
-               );
- 
-      rp_vec = vec_add(rp_vec, nearest_vec);
+  declare_common_vars(row_info,row,prev_row,bpp)
+  rp -= bpp;
+  if(istop >= bpp)
+     istop -= bpp;
 
+  /* Process the first pixel in the row completely (this is the same as 'up'
+   * because there is only one candidate predictor for the first row).
+   */
+  for(i = 0; i < bpp ; i++)
+  {
+     *rp = (png_byte)( *rp + *pp);
+     rp++;
+     pp++;
+  }
 
-      vec_st(rp_vec,0,rp);
+  for(i = 0; i < unaligned_top ; i++)
+  {
+     vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+  }
 
-      rp += 16-1;
-      pp += 16-1;
-      istop -= 16;
-      /* Since 16 % bpp = 16 % 3 = 1, last element of array must
-       * be proceeded manually 
-       */
-      vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
- }
+  while( istop >= 16)
+  {
+     for(i = 0; i < bpp ; i++)
+     {
+        vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+     }
 
-   if(istop > 0) 
-      for (i = 0; i < istop % 16; i++)
-      { 
-         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
-      }
+     rp -= bpp;
+     pp -= bpp;
+     rp_vec = vec_ld(0,rp);
+     vec_ld_unaligned(pp_vec,pp);
+
+     a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT1_3);
+     b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT1_3);
+     c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT1_3);
+     pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+     pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+     pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+     pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+     pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+     pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+     smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
+     nearest_vec =  if_then_else(
+           vec_cmpeq(pa_vec_abs,smallest_vec),
+           a_vec,
+           if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
+              );
+     rp_vec = vec_add(rp_vec, nearest_vec);
+
+     a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT2_3);
+     b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT2_3);
+     c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT2_3);
+     pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+     pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+     pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+     pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+     pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+     pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+     smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
+     nearest_vec =  if_then_else(
+           vec_cmpeq(pa_vec_abs,smallest_vec),
+           a_vec,
+           if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
+              );
+     rp_vec = vec_add(rp_vec, nearest_vec);
+
+     a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT3_3);
+     b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_3);
+     c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT3_3);
+     pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+     pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+     pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+     pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+     pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+     pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+     smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
+     nearest_vec =  if_then_else(
+           vec_cmpeq(pa_vec_abs,smallest_vec),
+           a_vec,
+           if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
+              );
+     rp_vec = vec_add(rp_vec, nearest_vec);
+
+     a_vec = vec_perm(rp_vec , zero_vec , VEC_SELECT4_3);
+     b_vec = vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT4_3);
+     c_vec = vec_perm(pp_vec , zero_vec , VEC_SELECT4_3);
+     pa_vec = (vector signed char) vec_sub(b_vec,c_vec);
+     pb_vec = (vector signed char) vec_sub(a_vec , c_vec);
+     pc_vec = (vector signed char) vec_add(pa_vec,pb_vec);
+     pa_vec_abs = (vector unsigned char)vec_abs(pa_vec);
+     pb_vec_abs = (vector unsigned char)vec_abs(pb_vec);
+     pc_vec_abs = (vector unsigned char)vec_abs(pc_vec);
+     smallest_vec = vec_min(pc_vec_abs, vec_min(pa_vec_abs,pb_vec_abs));
+     nearest_vec =  if_then_else(
+           vec_cmpeq(pa_vec_abs,smallest_vec),
+           a_vec,
+           if_then_else(vec_cmpeq(pb_vec_abs,smallest_vec),b_vec,c_vec)
+              );
+     rp_vec = vec_add(rp_vec, nearest_vec);
+
+     vec_st(rp_vec,0,rp);
+
+     rp += 15;
+     pp += 15;
+     istop -= 16;
+
+     /* Since 16 % bpp = 16 % 3 = 1, last element of array must
+      * be proceeded manually
+      */
+     vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+  }
+
+  if(istop > 0)
+     for (i = 0; i < istop % 16; i++)
+     {
+        vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
+     }
 }
 
 
