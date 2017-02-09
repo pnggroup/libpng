@@ -1,4 +1,3 @@
-
 /* filter_vsx_intrinsics.c - PowerPC optimised filter functions
  *
  * Copyright (c) 2016 Glenn Randers-Pehrson
@@ -179,7 +178,6 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
       }
 
 }
-
 
 void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
@@ -469,6 +467,26 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
 #  define VEC_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 0, 2, 4,16,16,16,16}
 #  define VEC_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4,16}
 
+#elif defined(__BIG_ENDIAN__)
+
+#  define VEC_CHAR_TO_SHORT1_4 (vector unsigned char){16, 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16}
+#  define VEC_CHAR_TO_SHORT2_4 (vector unsigned char){16, 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16}
+#  define VEC_CHAR_TO_SHORT3_4 (vector unsigned char){16,12,16,13,16,14,16,15,16,16,16,16,16,16,16,16}
+
+#  define VEC_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 1, 3, 5, 7,16,16,16,16,16,16,16,16}
+#  define VEC_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 1, 3, 5, 7,16,16,16,16}
+#  define VEC_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5, 7}
+
+#  define VEC_CHAR_TO_SHORT1_3 (vector unsigned char){16, 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16}
+#  define VEC_CHAR_TO_SHORT2_3 (vector unsigned char){16, 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16}
+#  define VEC_CHAR_TO_SHORT3_3 (vector unsigned char){16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16}
+#  define VEC_CHAR_TO_SHORT4_3 (vector unsigned char){16,12,16,13,16,14,16,16,16,16,16,16,16,16,16,16}
+
+#  define VEC_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 1, 3, 5,16,16,16,16,16,16,16,16,16,16}
+#  define VEC_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 1, 3, 5,16,16,16,16,16,16,16}
+#  define VEC_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 1, 3, 5,16,16,16,16}
+#  define VEC_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5,16}
+
 #endif
 
 #define vsx_char_to_short(vec,offset,bpp) (vector unsigned short)vec_perm((vec),VEC_CHAR_ZERO,VEC_CHAR_TO_SHORT##offset##_##bpp)
@@ -741,7 +759,6 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
         vsx_paeth_process(rp,pp,a,b,c,pa,pb,pc,bpp)
      }
 }
-
 
 #endif /* PNG_POWERPC_VSX_OPT > 0 */
 #endif /* PNG_POWERPC_VSX_IMPLEMENTATION == 1 (intrinsics) */
