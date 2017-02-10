@@ -38,7 +38,7 @@
  * ( this is taken from ../intel/filter_sse2_intrinsics.c )
  */
 
-#define declare_common_vars(row_info,row,prev_row,offset) \
+#define vsx_declare_common_vars(row_info,row,prev_row,offset) \
    png_size_t i;\
    png_bytep rp = row + offset;\
    png_const_bytep pp = prev_row;\
@@ -59,7 +59,7 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 {
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
-   declare_common_vars(row_info,row,prev_row,0)
+   vsx_declare_common_vars(row_info,row,prev_row,0)
 
    /* Altivec operations require 16-byte aligned data
     * but input can be unaligned. So we calculate
@@ -100,24 +100,69 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 
 }
 
-#define VEC_SELECT1_4 (vector unsigned char){16,16,16,16, 0, 1, 2, 3,16,16,16,16,16,16,16,16}
-#define VEC_SELECT2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 4, 5, 6, 7,16,16,16,16}
-#define VEC_SELECT3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 8, 9,10,11}
+#define VSX_LEFTSHIFTED1_4 (vector unsigned char){16,16,16,16, 0, 1, 2, 3,16,16,16,16,16,16,16,16}
+#define VSX_LEFTSHIFTED2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 4, 5, 6, 7,16,16,16,16}
+#define VSX_LEFTSHIFTED3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 8, 9,10,11}
 
-#define VEC_SELECT1_3 (vector unsigned char){16,16,16, 0, 1, 2,16,16,16,16,16,16,16,16,16,16}
-#define VEC_SELECT2_3 (vector unsigned char){16,16,16,16,16,16, 3, 4, 5,16,16,16,16,16,16,16}
-#define VEC_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 6, 7, 8,16,16,16,16}
-#define VEC_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 9,10,11,16}
+#define VSX_LEFTSHIFTED1_3 (vector unsigned char){16,16,16, 0, 1, 2,16,16,16,16,16,16,16,16,16,16}
+#define VSX_LEFTSHIFTED2_3 (vector unsigned char){16,16,16,16,16,16, 3, 4, 5,16,16,16,16,16,16,16}
+#define VSX_LEFTSHIFTED3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 6, 7, 8,16,16,16,16}
+#define VSX_LEFTSHIFTED4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 9,10,11,16}
 
+#define VSX_NOT_SHIFTED1_4 (vector unsigned char){16,16,16,16, 4, 5, 6, 7,16,16,16,16,16,16,16,16}
+#define VSX_NOT_SHIFTED2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 8, 9,10,11,16,16,16,16}
+#define VSX_NOT_SHIFTED3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,15}
 
-#define VEC_AVG_SELECT1_4 (vector unsigned char){16,16,16,16, 4, 5, 6, 7,16,16,16,16,16,16,16,16}
-#define VEC_AVG_SELECT2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 8, 9,10,11,16,16,16,16}
-#define VEC_AVG_SELECT3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,15}
+#define VSX_NOT_SHIFTED1_3 (vector unsigned char){16,16,16, 3, 4, 5,16,16,16,16,16,16,16,16,16,16}
+#define VSX_NOT_SHIFTED2_3 (vector unsigned char){16,16,16,16,16,16, 6, 7, 8,16,16,16,16,16,16,16}
+#define VSX_NOT_SHIFTED3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16}
+#define VSX_NOT_SHIFTED4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16}
 
-#define VEC_AVG_SELECT1_3 (vector unsigned char){16,16,16, 3, 4, 5,16,16,16,16,16,16,16,16,16,16}
-#define VEC_AVG_SELECT2_3 (vector unsigned char){16,16,16,16,16,16, 6, 7, 8,16,16,16,16,16,16,16}
-#define VEC_AVG_SELECT3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16}
-#define VEC_AVG_SELECT4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16}
+#define VSX_CHAR_ZERO (vector unsigned char){0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+#ifdef __LITTLE_ENDIAN__
+
+#  define VSX_CHAR_TO_SHORT1_4 (vector unsigned char){ 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT2_4 (vector unsigned char){ 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT3_4 (vector unsigned char){12,16,13,16,14,16,15,16,16,16,16,16,16,16,16,16}
+
+#  define VSX_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 0, 2, 4, 6,16,16,16,16,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 0, 2, 4, 6,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4, 6}
+
+#  define VSX_CHAR_TO_SHORT1_3 (vector unsigned char){ 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT2_3 (vector unsigned char){ 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT3_3 (vector unsigned char){ 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT4_3 (vector unsigned char){12,16,13,16,14,16,16,16,16,16,16,16,16,16,16,16}
+
+#  define VSX_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 0, 2, 4,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 0, 2, 4,16,16,16,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 0, 2, 4,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4,16}
+
+#elif defined(__BIG_ENDIAN__)
+
+#  define VSX_CHAR_TO_SHORT1_4 (vector unsigned char){16, 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT2_4 (vector unsigned char){16, 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT3_4 (vector unsigned char){16,12,16,13,16,14,16,15,16,16,16,16,16,16,16,16}
+
+#  define VSX_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 1, 3, 5, 7,16,16,16,16,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 1, 3, 5, 7,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5, 7}
+
+#  define VSX_CHAR_TO_SHORT1_3 (vector unsigned char){16, 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT2_3 (vector unsigned char){16, 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT3_3 (vector unsigned char){16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_CHAR_TO_SHORT4_3 (vector unsigned char){16,12,16,13,16,14,16,16,16,16,16,16,16,16,16,16}
+
+#  define VSX_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 1, 3, 5,16,16,16,16,16,16,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 1, 3, 5,16,16,16,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 1, 3, 5,16,16,16,16}
+#  define VSX_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5,16}
+
+#endif
+
+#define vsx_char_to_short(vec,offset,bpp) (vector unsigned short)vec_perm((vec),VSX_CHAR_ZERO,VSX_CHAR_TO_SHORT##offset##_##bpp)
+#define vsx_short_to_char(vec,offset,bpp) vec_perm((vector unsigned char)(vec),VSX_CHAR_ZERO,VSX_SHORT_TO_CHAR##offset##_##bpp)
 
 #ifdef PNG_USE_ABS
 #  define vsx_abs(number) abs(number)
@@ -132,9 +177,8 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
 
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
-   vector unsigned char zero_vec = {0};
 
-   declare_common_vars(row_info,row,prev_row,bpp)
+   vsx_declare_common_vars(row_info,row,prev_row,bpp)
 
    PNG_UNUSED(pp)
 
@@ -155,13 +199,13 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
          *(rp+i) += *(rp+i - bpp);
 
       rp_vec = vec_ld(0,rp);
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_4);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED1_4);
       rp_vec = vec_add(rp_vec,part_vec);
 
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_4);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED2_4);
       rp_vec = vec_add(rp_vec,part_vec);
 
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_4);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED3_4);
       rp_vec = vec_add(rp_vec,part_vec);
 
       vec_st(rp_vec,0,rp);
@@ -186,9 +230,8 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
 
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
-   vector unsigned char zero_vec = {0};
 
-   declare_common_vars(row_info,row,prev_row,bpp)
+   vsx_declare_common_vars(row_info,row,prev_row,bpp)
 
    PNG_UNUSED(pp)
 
@@ -209,16 +252,16 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
          *(rp+i) += *(rp+i - bpp);
 
       rp_vec = vec_ld(0,rp);
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_3);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED1_3);
       rp_vec = vec_add(rp_vec,part_vec);
 
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_3);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED2_3);
       rp_vec = vec_add(rp_vec,part_vec);
 
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_3);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED3_3);
       rp_vec = vec_add(rp_vec,part_vec);
 
-      part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT4_3);
+      part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED4_3);
       rp_vec = vec_add(rp_vec,part_vec);
 
       vec_st(rp_vec,0,rp);
@@ -249,9 +292,8 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
    vector unsigned char pp_part_vec;
    vector unsigned char rp_part_vec;
    vector unsigned char avg_vec;
-   vector unsigned char zero_vec = {0};
 
-   declare_common_vars(row_info,row,prev_row,bpp)
+   vsx_declare_common_vars(row_info,row,prev_row,bpp)
    rp -= bpp;
    if(istop >= bpp)
       istop -= bpp;
@@ -292,20 +334,20 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
       vec_ld_unaligned(pp_vec,pp);
       rp_vec = vec_ld(0,rp);
 
-      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_4);
-      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT1_4);
+      rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED1_4);
+      pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED1_4);
       avg_vec = vec_avg(rp_part_vec,pp_part_vec);
       avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
       rp_vec = vec_add(rp_vec,avg_vec);
 
-      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_4);
-      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT2_4);
+      rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED2_4);
+      pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED2_4);
       avg_vec = vec_avg(rp_part_vec,pp_part_vec);
       avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
       rp_vec = vec_add(rp_vec,avg_vec);
 
-      rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_4);
-      pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT3_4);
+      rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED3_4);
+      pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED3_4);
       avg_vec = vec_avg(rp_part_vec,pp_part_vec);
       avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
       rp_vec = vec_add(rp_vec,avg_vec);
@@ -337,9 +379,8 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
   vector unsigned char pp_part_vec;
   vector unsigned char rp_part_vec;
   vector unsigned char avg_vec;
-  vector unsigned char zero_vec = {0};
 
-  declare_common_vars(row_info,row,prev_row,bpp)
+  vsx_declare_common_vars(row_info,row,prev_row,bpp)
   rp -= bpp;
   if(istop >= bpp)
      istop -= bpp;
@@ -380,26 +421,26 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
      vec_ld_unaligned(pp_vec,pp);
      rp_vec = vec_ld(0,rp);
 
-     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT1_3);
-     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT1_3);
+     rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED1_3);
+     pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED1_3);
      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
      rp_vec = vec_add(rp_vec,avg_vec);
 
-     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT2_3);
-     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT2_3);
+     rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED2_3);
+     pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED2_3);
      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
      rp_vec = vec_add(rp_vec,avg_vec);
 
-     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT3_3);
-     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT3_3);
+     rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED3_3);
+     pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED3_3);
      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
      rp_vec = vec_add(rp_vec,avg_vec);
 
-     rp_part_vec = vec_perm(rp_vec,zero_vec,VEC_SELECT4_3);
-     pp_part_vec = vec_perm(pp_vec,zero_vec,VEC_AVG_SELECT4_3);
+     rp_part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED4_3);
+     pp_part_vec = vec_perm(pp_vec,VSX_CHAR_ZERO,VSX_NOT_SHIFTED4_3);
      avg_vec = vec_avg(rp_part_vec,pp_part_vec);
      avg_vec = vec_sub(avg_vec, vec_and(vec_xor(rp_part_vec,pp_part_vec),vec_splat_u8(1)));
      rp_vec = vec_add(rp_vec,avg_vec);
@@ -446,52 +487,6 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
       *rp++ = (png_byte)a;\
       }
 
-#define VEC_CHAR_ZERO (vector unsigned char){0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-#ifdef __LITTLE_ENDIAN__
-
-#  define VEC_CHAR_TO_SHORT1_4 (vector unsigned char){ 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT2_4 (vector unsigned char){ 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT3_4 (vector unsigned char){12,16,13,16,14,16,15,16,16,16,16,16,16,16,16,16}
-
-#  define VEC_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 0, 2, 4, 6,16,16,16,16,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 0, 2, 4, 6,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4, 6}
-
-#  define VEC_CHAR_TO_SHORT1_3 (vector unsigned char){ 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT2_3 (vector unsigned char){ 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT3_3 (vector unsigned char){ 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT4_3 (vector unsigned char){12,16,13,16,14,16,16,16,16,16,16,16,16,16,16,16}
-
-#  define VEC_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 0, 2, 4,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 0, 2, 4,16,16,16,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 0, 2, 4,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4,16}
-
-#elif defined(__BIG_ENDIAN__)
-
-#  define VEC_CHAR_TO_SHORT1_4 (vector unsigned char){16, 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT2_4 (vector unsigned char){16, 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT3_4 (vector unsigned char){16,12,16,13,16,14,16,15,16,16,16,16,16,16,16,16}
-
-#  define VEC_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 1, 3, 5, 7,16,16,16,16,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 1, 3, 5, 7,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5, 7}
-
-#  define VEC_CHAR_TO_SHORT1_3 (vector unsigned char){16, 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT2_3 (vector unsigned char){16, 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT3_3 (vector unsigned char){16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_CHAR_TO_SHORT4_3 (vector unsigned char){16,12,16,13,16,14,16,16,16,16,16,16,16,16,16,16}
-
-#  define VEC_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 1, 3, 5,16,16,16,16,16,16,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 1, 3, 5,16,16,16,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 1, 3, 5,16,16,16,16}
-#  define VEC_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5,16}
-
-#endif
-
-#define vsx_char_to_short(vec,offset,bpp) (vector unsigned short)vec_perm((vec),VEC_CHAR_ZERO,VEC_CHAR_TO_SHORT##offset##_##bpp)
-#define vsx_short_to_char(vec,offset,bpp) vec_perm((vector unsigned char)(vec),VEC_CHAR_ZERO,VEC_SHORT_TO_CHAR##offset##_##bpp)
-
 void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -500,11 +495,10 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
    int a, b, c, pa, pb, pc, p;
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
-   vector unsigned char zero_vec = {0};
    vector unsigned short a_vec,b_vec,c_vec,nearest_vec;
    vector signed short pa_vec,pb_vec,pc_vec,smallest_vec;
 
-   declare_common_vars(row_info,row,prev_row,bpp)
+   vsx_declare_common_vars(row_info,row,prev_row,bpp)
    rp -= bpp;
    if(istop >= bpp)
       istop -= bpp;
@@ -536,9 +530,9 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
       rp_vec = vec_ld(0,rp);
       vec_ld_unaligned(pp_vec,pp);
 
-      a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT1_4),1,4);
-      b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT1_4),1,4);
-      c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT1_4),1,4);
+      a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED1_4),1,4);
+      b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED1_4),1,4);
+      c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED1_4),1,4);
       pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
       pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
       pc_vec = vec_add(pa_vec,pb_vec);
@@ -557,9 +551,9 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
             );
       rp_vec = vec_add(rp_vec,(vsx_short_to_char(nearest_vec,1,4)));
 
-      a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT2_4),2,4);
-      b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT2_4),2,4);
-      c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT2_4),2,4);
+      a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED2_4),2,4);
+      b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED2_4),2,4);
+      c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED2_4),2,4);
       pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
       pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
       pc_vec = vec_add(pa_vec,pb_vec);
@@ -578,9 +572,9 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
             );
       rp_vec = vec_add(rp_vec,(vsx_short_to_char(nearest_vec,2,4)));
 
-      a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT3_4),3,4);
-      b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_4),3,4);
-      c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT3_4),3,4);
+      a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED3_4),3,4);
+      b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED3_4),3,4);
+      c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED3_4),3,4);
       pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
       pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
       pc_vec = vec_add(pa_vec,pb_vec);
@@ -621,11 +615,10 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
   int a, b, c, pa, pb, pc, p;
   vector unsigned char rp_vec;
   vector unsigned char pp_vec;
-  vector unsigned char zero_vec = {0};
   vector unsigned short a_vec,b_vec,c_vec,nearest_vec;
   vector signed short pa_vec,pb_vec,pc_vec,smallest_vec;
 
-  declare_common_vars(row_info,row,prev_row,bpp)
+  vsx_declare_common_vars(row_info,row,prev_row,bpp)
   rp -= bpp;
   if(istop >= bpp)
      istop -= bpp;
@@ -657,9 +650,9 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
      rp_vec = vec_ld(0,rp);
      vec_ld_unaligned(pp_vec,pp);
 
-     a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT1_3),1,3);
-     b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT1_3),1,3);
-     c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT1_3),1,3);
+     a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED1_3),1,3);
+     b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED1_3),1,3);
+     c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED1_3),1,3);
      pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
      pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
      pc_vec = vec_add(pa_vec,pb_vec);
@@ -678,9 +671,9 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
            );
      rp_vec = vec_add(rp_vec,(vsx_short_to_char(nearest_vec,1,3)));
 
-     a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT2_3),2,3);
-     b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT2_3),2,3);
-     c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT2_3),2,3);
+     a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED2_3),2,3);
+     b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED2_3),2,3);
+     c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED2_3),2,3);
      pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
      pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
      pc_vec = vec_add(pa_vec,pb_vec);
@@ -699,9 +692,9 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
            );
      rp_vec = vec_add(rp_vec,(vsx_short_to_char(nearest_vec,2,3)));
 
-     a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT3_3),3,3);
-     b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT3_3),3,3);
-     c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT3_3),3,3);
+     a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED3_3),3,3);
+     b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED3_3),3,3);
+     c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED3_3),3,3);
      pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
      pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
      pc_vec = vec_add(pa_vec,pb_vec);
@@ -720,9 +713,9 @@ void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
            );
      rp_vec = vec_add(rp_vec,(vsx_short_to_char(nearest_vec,3,3)));
 
-     a_vec = vsx_char_to_short(vec_perm(rp_vec , zero_vec , VEC_SELECT4_3),4,3);
-     b_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_AVG_SELECT4_3),4,3);
-     c_vec = vsx_char_to_short(vec_perm(pp_vec , zero_vec , VEC_SELECT4_3),4,3);
+     a_vec = vsx_char_to_short(vec_perm(rp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED4_3),4,3);
+     b_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_NOT_SHIFTED4_3),4,3);
+     c_vec = vsx_char_to_short(vec_perm(pp_vec , VSX_CHAR_ZERO , VSX_LEFTSHIFTED4_3),4,3);
      pa_vec = (vector signed short) vec_sub(b_vec,c_vec);
      pb_vec = (vector signed short) vec_sub(a_vec , c_vec);
      pc_vec = vec_add(pa_vec,pb_vec);
