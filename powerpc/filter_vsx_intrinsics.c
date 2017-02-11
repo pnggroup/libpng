@@ -39,7 +39,7 @@
  */
 
 #define vsx_declare_common_vars(row_info,row,prev_row,offset) \
-   png_size_t i;\
+   png_byte i;\
    png_bytep rp = row + offset;\
    png_const_bytep pp = prev_row;\
    png_size_t unaligned_top = 16 - (((png_size_t)rp % 16));\
@@ -100,69 +100,69 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 
 }
 
-#define VSX_LEFTSHIFTED1_4 (vector unsigned char){16,16,16,16, 0, 1, 2, 3,16,16,16,16,16,16,16,16}
-#define VSX_LEFTSHIFTED2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 4, 5, 6, 7,16,16,16,16}
-#define VSX_LEFTSHIFTED3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 8, 9,10,11}
+static const vector unsigned char VSX_LEFTSHIFTED1_4 = {16,16,16,16, 0, 1, 2, 3,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_LEFTSHIFTED2_4 = {16,16,16,16,16,16,16,16, 4, 5, 6, 7,16,16,16,16};
+static const vector unsigned char VSX_LEFTSHIFTED3_4 = {16,16,16,16,16,16,16,16,16,16,16,16, 8, 9,10,11};
 
-#define VSX_LEFTSHIFTED1_3 (vector unsigned char){16,16,16, 0, 1, 2,16,16,16,16,16,16,16,16,16,16}
-#define VSX_LEFTSHIFTED2_3 (vector unsigned char){16,16,16,16,16,16, 3, 4, 5,16,16,16,16,16,16,16}
-#define VSX_LEFTSHIFTED3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 6, 7, 8,16,16,16,16}
-#define VSX_LEFTSHIFTED4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 9,10,11,16}
+static const vector unsigned char VSX_LEFTSHIFTED1_3 = {16,16,16, 0, 1, 2,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_LEFTSHIFTED2_3 = {16,16,16,16,16,16, 3, 4, 5,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_LEFTSHIFTED3_3 = {16,16,16,16,16,16,16,16,16, 6, 7, 8,16,16,16,16};
+static const vector unsigned char VSX_LEFTSHIFTED4_3 = {16,16,16,16,16,16,16,16,16,16,16,16, 9,10,11,16};
 
-#define VSX_NOT_SHIFTED1_4 (vector unsigned char){16,16,16,16, 4, 5, 6, 7,16,16,16,16,16,16,16,16}
-#define VSX_NOT_SHIFTED2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 8, 9,10,11,16,16,16,16}
-#define VSX_NOT_SHIFTED3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,15}
+static const vector unsigned char VSX_NOT_SHIFTED1_4 = {16,16,16,16, 4, 5, 6, 7,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_NOT_SHIFTED2_4 = {16,16,16,16,16,16,16,16, 8, 9,10,11,16,16,16,16};
+static const vector unsigned char VSX_NOT_SHIFTED3_4 = {16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,15};
 
-#define VSX_NOT_SHIFTED1_3 (vector unsigned char){16,16,16, 3, 4, 5,16,16,16,16,16,16,16,16,16,16}
-#define VSX_NOT_SHIFTED2_3 (vector unsigned char){16,16,16,16,16,16, 6, 7, 8,16,16,16,16,16,16,16}
-#define VSX_NOT_SHIFTED3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16}
-#define VSX_NOT_SHIFTED4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16}
+static const vector unsigned char VSX_NOT_SHIFTED1_3 = {16,16,16, 3, 4, 5,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_NOT_SHIFTED2_3 = {16,16,16,16,16,16, 6, 7, 8,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_NOT_SHIFTED3_3 = {16,16,16,16,16,16,16,16,16, 9,10,11,16,16,16,16};
+static const vector unsigned char VSX_NOT_SHIFTED4_3 = {16,16,16,16,16,16,16,16,16,16,16,16,12,13,14,16};
 
-#define VSX_CHAR_ZERO (vector unsigned char){0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+static const vector unsigned char VSX_CHAR_ZERO = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 #ifdef __LITTLE_ENDIAN__
 
-#  define VSX_CHAR_TO_SHORT1_4 (vector unsigned char){ 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT2_4 (vector unsigned char){ 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT3_4 (vector unsigned char){12,16,13,16,14,16,15,16,16,16,16,16,16,16,16,16}
+static const vector unsigned char VSX_CHAR_TO_SHORT1_4 = { 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT2_4 = { 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT3_4 = {12,16,13,16,14,16,15,16,16,16,16,16,16,16,16,16};
 
-#  define VSX_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 0, 2, 4, 6,16,16,16,16,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 0, 2, 4, 6,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4, 6}
+static const vector unsigned char VSX_SHORT_TO_CHAR1_4 = {16,16,16,16, 0, 2, 4, 6,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR2_4 = {16,16,16,16,16,16,16,16, 0, 2, 4, 6,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR3_4 = {16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4, 6};
 
-#  define VSX_CHAR_TO_SHORT1_3 (vector unsigned char){ 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT2_3 (vector unsigned char){ 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT3_3 (vector unsigned char){ 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT4_3 (vector unsigned char){12,16,13,16,14,16,16,16,16,16,16,16,16,16,16,16}
+static const vector unsigned char VSX_CHAR_TO_SHORT1_3 = { 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT2_3 = { 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT3_3 = { 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT4_3 = {12,16,13,16,14,16,16,16,16,16,16,16,16,16,16,16};
 
-#  define VSX_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 0, 2, 4,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 0, 2, 4,16,16,16,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 0, 2, 4,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4,16}
+static const vector unsigned char VSX_SHORT_TO_CHAR1_3 = {16,16,16, 0, 2, 4,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR2_3 = {16,16,16,16,16,16, 0, 2, 4,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR3_3 = {16,16,16,16,16,16,16,16,16, 0, 2, 4,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR4_3 = {16,16,16,16,16,16,16,16,16,16,16,16, 0, 2, 4,16};
 
 #elif defined(__BIG_ENDIAN__)
 
-#  define VSX_CHAR_TO_SHORT1_4 (vector unsigned char){16, 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT2_4 (vector unsigned char){16, 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT3_4 (vector unsigned char){16,12,16,13,16,14,16,15,16,16,16,16,16,16,16,16}
+static const vector unsigned char VSX_CHAR_TO_SHORT1_4 = {16, 4,16, 5,16, 6,16, 7,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT2_4 = {16, 8,16, 9,16,10,16,11,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT3_4 = {16,12,16,13,16,14,16,15,16,16,16,16,16,16,16,16};
 
-#  define VSX_SHORT_TO_CHAR1_4 (vector unsigned char){16,16,16,16, 1, 3, 5, 7,16,16,16,16,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR2_4 (vector unsigned char){16,16,16,16,16,16,16,16, 1, 3, 5, 7,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR3_4 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5, 7}
+static const vector unsigned char VSX_SHORT_TO_CHAR1_4 = {16,16,16,16, 1, 3, 5, 7,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR2_4 = {16,16,16,16,16,16,16,16, 1, 3, 5, 7,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR3_4 = {16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5, 7};
 
-#  define VSX_CHAR_TO_SHORT1_3 (vector unsigned char){16, 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT2_3 (vector unsigned char){16, 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT3_3 (vector unsigned char){16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_CHAR_TO_SHORT4_3 (vector unsigned char){16,12,16,13,16,14,16,16,16,16,16,16,16,16,16,16}
+static const vector unsigned char VSX_CHAR_TO_SHORT1_3 = {16, 3,16, 4,16, 5,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT2_3 = {16, 6,16, 7,16, 8,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT3_3 = {16, 9,16,10,16,11,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_CHAR_TO_SHORT4_3 = {16,12,16,13,16,14,16,16,16,16,16,16,16,16,16,16};
 
-#  define VSX_SHORT_TO_CHAR1_3 (vector unsigned char){16,16,16, 1, 3, 5,16,16,16,16,16,16,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR2_3 (vector unsigned char){16,16,16,16,16,16, 1, 3, 5,16,16,16,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR3_3 (vector unsigned char){16,16,16,16,16,16,16,16,16, 1, 3, 5,16,16,16,16}
-#  define VSX_SHORT_TO_CHAR4_3 (vector unsigned char){16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5,16}
+static const vector unsigned char VSX_SHORT_TO_CHAR1_3 = {16,16,16, 1, 3, 5,16,16,16,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR2_3 = {16,16,16,16,16,16, 1, 3, 5,16,16,16,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR3_3 = {16,16,16,16,16,16,16,16,16, 1, 3, 5,16,16,16,16};
+static const vector unsigned char VSX_SHORT_TO_CHAR4_3 = {16,16,16,16,16,16,16,16,16,16,16,16, 1, 3, 5,16};
 
 #endif
 
 #define vsx_char_to_short(vec,offset,bpp) (vector unsigned short)vec_perm((vec),VSX_CHAR_ZERO,VSX_CHAR_TO_SHORT##offset##_##bpp)
-#define vsx_short_to_char(vec,offset,bpp) vec_perm((vector unsigned char)(vec),VSX_CHAR_ZERO,VSX_SHORT_TO_CHAR##offset##_##bpp)
+#define vsx_short_to_char(vec,offset,bpp) vec_perm(((vector unsigned char)(vec)),VSX_CHAR_ZERO,VSX_SHORT_TO_CHAR##offset##_##bpp)
 
 #ifdef PNG_USE_ABS
 #  define vsx_abs(number) abs(number)
@@ -173,7 +173,7 @@ void png_read_filter_row_up_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-   const unsigned int bpp = 4;
+   const png_byte bpp = 4;
 
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
@@ -196,7 +196,11 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
    while( istop >= 16 )
    {
       for(i=0;i < bpp ; i++)
-         *(rp+i) += *(rp+i - bpp);
+      {
+         *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+         rp++;
+      }
+      rp -= bpp;
 
       rp_vec = vec_ld(0,rp);
       part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED1_4);
@@ -226,7 +230,7 @@ void png_read_filter_row_sub4_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-   const unsigned int bpp = 3;
+   const png_byte bpp = 3;
 
    vector unsigned char rp_vec;
    vector unsigned char part_vec;
@@ -249,7 +253,11 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
    while( istop >= 16 )
    {
       for(i=0;i < bpp ; i++)
-         *(rp+i) += *(rp+i - bpp);
+      {
+         *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+         rp++;
+      }
+      rp -= bpp;
 
       rp_vec = vec_ld(0,rp);
       part_vec = vec_perm(rp_vec,VSX_CHAR_ZERO,VSX_LEFTSHIFTED1_3);
@@ -265,13 +273,14 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
       rp_vec = vec_add(rp_vec,part_vec);
 
       vec_st(rp_vec,0,rp);
-      rp += 16;
+      rp += 15;
       istop -= 16;
 
       /* Since 16 % bpp = 16 % 3 = 1, last element of array must
        * be proceeded manually
        */
-      *(rp - 1) += *(rp - 1 - 3);
+      *rp = (png_byte)(((int)(*rp) + (int)(*(rp-bpp))) & 0xff);
+      rp++;
    }
 
    if(istop > 0)
@@ -285,7 +294,7 @@ void png_read_filter_row_sub3_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-   const unsigned int bpp = 4;
+   const png_byte bpp = 4;
 
    vector unsigned char rp_vec;
    vector unsigned char pp_vec;
@@ -372,7 +381,7 @@ void png_read_filter_row_avg4_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
                                   png_const_bytep prev_row)
 {
-  const unsigned int bpp = 3;
+  const png_byte bpp = 3;
 
   vector unsigned char rp_vec;
   vector unsigned char pp_vec;
@@ -490,7 +499,7 @@ void png_read_filter_row_avg3_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
-   const unsigned int bpp = 4;
+   const png_byte bpp = 4;
 
    int a, b, c, pa, pb, pc, p;
    vector unsigned char rp_vec;
@@ -610,7 +619,7 @@ void png_read_filter_row_paeth4_vsx(png_row_infop row_info, png_bytep row,
 void png_read_filter_row_paeth3_vsx(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
-  const unsigned int bpp = 3;
+  const png_byte bpp = 3;
 
   int a, b, c, pa, pb, pc, p;
   vector unsigned char rp_vec;
