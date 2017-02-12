@@ -229,6 +229,33 @@ option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
 option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
    sets ARM_NEON_OPT 1
 
+# These options are specific to the PowerPC VSX hardware optimizations.
+#
+# POWERPC_VSX_OPT: unset: check at compile time (__PPC64__,__ALTIVEC__,__VSX__
+#                      must be defined by the compiler, typically as a result
+#                      of specifying
+#                      "-mvsx -maltivec" compiler flags)
+#                   0: disable (even if the CPU supports VSX.)
+#                   1: check at run time (via POWERPC_VSX_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mvsx -maltivec to compiler options)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as "-mvsx -maltivec" will achieve the same
+#           effect as well as applying VSX optimizations to the rest of the
+#           libpng code.
+# POWERPC_VSX_API:   (PNG_POWERPC_VSX == 1) allow the optimization to be switched on
+#                 with png_set_option
+# POWERPC_VSX_CHECK: (PNG_POWERPC_VSX == 1) compile a run-time check to see if VSX
+#                 extensions are supported. This is supported not for all OSes
+#                 (see contrib/powerpc/README)
+setting POWERPC_VSX_OPT
+option POWERPC_VSX_API disabled enables SET_OPTION,
+  sets POWERPC_VSX_OPT 1
+option POWERPC_VSX_CHECK disabled,
+  sets POWERPC_VSX_OPT 1
+
+
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib. It describes the input
 # data and modifies the zlib parameters in an attempt to optimize the balance
