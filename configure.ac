@@ -426,7 +426,6 @@ AM_CONDITIONAL([PNG_INTEL_SSE],
       *)    test "$enable_intel_sse" != '';;
     esac])
 
-
 # PowerPC
 # ===
 #
@@ -473,6 +472,7 @@ AM_CONDITIONAL([PNG_POWERPC_VSX],
     case "$host_cpu" in
       powerpc*|ppc64*) :;;
     esac])
+
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

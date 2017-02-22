@@ -37,6 +37,7 @@ Version 1.6.29beta02 [February 22, 2017]
     Malaquias)
   The contrib/examples/pngtopng.c recovery code was in the wrong if
     branches; the comments were correct.
+  Added code for PowerPC VSX optimisation (Vadim Barkov).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
