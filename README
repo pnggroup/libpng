@@ -179,8 +179,10 @@ Files in this distribution:
       pngwtran.c    =>  Write data transformations
       pngwutil.c    =>  Write utility functions
       arm           =>  Contains optimized code for the ARM platform
+      powerpc       =>  Contains optimized code for the PowerPC platform
       contrib       =>  Contributions
        arm-neon         =>  Optimized code for ARM-NEON platform
+       powerpc          =>  Optimized code for POWERPC-VSX platform
        examples         =>  Example programs
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",
