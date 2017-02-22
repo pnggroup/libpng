@@ -39,6 +39,7 @@
  *    James Yu
  *    Mandar Sahastrabuddhe
  *    Google Inc.
+ *    Vadim Barkov
  *
  * and with the following additions to the disclaimer:
  *

@@ -182,7 +182,7 @@ Files in this distribution:
       powerpc       =>  Contains optimized code for the PowerPC platform
       contrib       =>  Contributions
        arm-neon         =>  Optimized code for ARM-NEON platform
-       powerpc          =>  Optimized code for POWERPC-VSX platform
+       powerpc-vsx      =>  Optimized code for POWERPC-VSX platform
        examples         =>  Example programs
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",

@@ -1,8 +1,8 @@
 /* filter_vsx_intrinsics.c - PowerPC optimised filter functions
  *
- * Copyright (c) 2016 Glenn Randers-Pehrson
+ * Copyright (c) 2017 Glenn Randers-Pehrson
  * Written by Vadim Barkov, 2017.
- * Last changed in libpng 1.6.25 [September 1, 2016]
+ * Last changed in libpng 1.6.29 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

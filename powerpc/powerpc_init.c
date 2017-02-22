@@ -1,6 +1,9 @@
 
 /* powerpc_init.c - POWERPC optimised filter functions
  *
+ * Copyright (c) 2017 Glenn Randers-Pehrson
+ * Written by Vadim Barkov, 2017.
+ * Last changed in libpng 1.6.29 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
