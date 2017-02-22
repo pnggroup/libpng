@@ -5808,6 +5808,8 @@ Version 1.6.29beta02 [February 22, 2017]
     branches; the comments were correct.
   Added code for PowerPC VSX optimisation (Vadim Barkov).
 
+Version 1.6.29beta03 [February 22, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

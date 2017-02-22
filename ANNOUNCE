@@ -1,4 +1,4 @@
-Libpng 1.6.29beta02 - February 22, 2017
+Libpng 1.6.29beta03 - February 22, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.29beta02.tar.xz (LZMA-compressed, recommended)
-   1.6.29beta02.tar.gz
+   1.6.29beta03.tar.xz (LZMA-compressed, recommended)
+   1.6.29beta03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1629b02.7z  (LZMA-compressed, recommended)
-   lp1629b02.zip
+   lp1629b03.7z  (LZMA-compressed, recommended)
+   lp1629b03.zip
 
 Other information:
 
-   1.6.29beta02-README.txt
-   1.6.29beta02-LICENSE.txt
-   libpng-1.6.29beta02-*.asc (armored detached GPG signatures)
+   1.6.29beta03-README.txt
+   1.6.29beta03-LICENSE.txt
+   libpng-1.6.29beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.28):
 
@@ -38,6 +38,8 @@ Version 1.6.29beta02 [February 22, 2017]
   The contrib/examples/pngtopng.c recovery code was in the wrong if
     branches; the comments were correct.
   Added code for PowerPC VSX optimisation (Vadim Barkov).
+
+Version 1.6.29beta03 [February 22, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
