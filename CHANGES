@@ -5808,7 +5808,8 @@ Version 1.6.29beta02 [February 22, 2017]
     branches; the comments were correct.
   Added code for PowerPC VSX optimisation (Vadim Barkov).
 
-Version 1.6.29beta03 [February 22, 2017]
+Version 1.6.29beta03 [February 28, 2017]
+  Avoid potential overflow of shift operations in png_do_expand() (Aaron Boxer).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
