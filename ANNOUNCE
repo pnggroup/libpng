@@ -1,5 +1,5 @@
 
-Libpng 1.5.29beta01 - December 30, 2016
+Libpng 1.5.29beta01 - March 1, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,7 +26,8 @@ Other information:
 
 Changes since the last public release (1.5.28):
 
-version 1.5.29beta01 [December 30, 2016]
+version 1.5.29beta01 [March 1, 2017]
+  Suppress clang warnings about implicit sign changes in png.c
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
