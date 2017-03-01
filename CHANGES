@@ -5808,8 +5808,10 @@ Version 1.6.29beta02 [February 22, 2017]
     branches; the comments were correct.
   Added code for PowerPC VSX optimisation (Vadim Barkov).
 
-Version 1.6.29beta03 [February 28, 2017]
+Version 1.6.29beta03 [March 1, 2017]
   Avoid potential overflow of shift operations in png_do_expand() (Aaron Boxer).
+  Change test ZLIB_VERNUM >= 0x1281 to ZLIB_VERNUM >= 0x1290 in pngrutil.c
+    because Solaris 11 distributes zlib-1.2.8.f that is older than 1.2.8.1.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
