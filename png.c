@@ -1,7 +1,7 @@
 
 /* png.c - location for general purpose libpng functions
  *
- * Last changed in libpng 1.6.28 [January 5, 2017%]
+ * Last changed in libpng 1.6.29 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -776,14 +776,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.29beta03 - February 22, 2017" PNG_STRING_NEWLINE \
+      "libpng version 1.6.29beta03 - March 1, 2017" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.29beta03 - February 22, 2017\
+   return "libpng version 1.6.29beta03 - March 1, 2017\
       Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -4260,13 +4260,13 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
    if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
       (option & 1) == 0)
    {
-      png_uint_32 mask = 3 << option;
-      png_uint_32 setting = (2 + (onoff != 0)) << option;
+      png_uint_32 mask = 3U << option;
+      png_uint_32 setting = (2U + (onoff != 0)) << option;
       png_uint_32 current = png_ptr->options;
 
       png_ptr->options = (png_uint_32)(((current & ~mask) | setting) & 0xff);
 
-      return (current & mask) >> option;
+      return (int)(current & mask) >> option;
    }
 
    return PNG_OPTION_INVALID;
