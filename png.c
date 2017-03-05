@@ -2553,11 +2553,11 @@ png_check_IHDR(png_const_structrp png_ptr,
    }
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (width > png_ptr->user_width_max)
+   bool widthExceedsLimit = (width > png_ptr->user_width_max);
 #else
-   if (width > PNG_USER_WIDTH_MAX)
+   bool widthExceedsLimit = (width > PNG_USER_WIDTH_MAX);
 #endif
-   {
+   if (widthExceedsLimit) {
       png_warning(png_ptr, "Image width exceeds user limit in IHDR");
       error = 1;
    }
@@ -2575,11 +2575,11 @@ png_check_IHDR(png_const_structrp png_ptr,
    }
 
 #ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (height > png_ptr->user_height_max)
+   bool heightExceedsLimit = (height > png_ptr->user_height_max);
 #else
-   if (height > PNG_USER_HEIGHT_MAX)
+   bool heightExceedsLimit = (height > PNG_USER_HEIGHT_MAX);
 #endif
-   {
+   if (heightExceedsLimit) {
       png_warning(png_ptr, "Image height exceeds user limit in IHDR");
       error = 1;
    }
