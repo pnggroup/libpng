@@ -5804,7 +5804,7 @@ Version 1.6.29beta01 [January 12, 2017]
 Version 1.6.29beta02 [February 22, 2017]
   Avoid conditional directives that break statements in pngrutil.c (Romero
     Malaquias)
-  The contrib/examples/pngtopng.c recovery code was in the wrong if
+  The contrib/examples/pngtopng.c recovery code was in the wrong "if"
     branches; the comments were correct.
   Added code for PowerPC VSX optimisation (Vadim Barkov).
 
@@ -5814,7 +5814,8 @@ Version 1.6.29beta03 [March 1, 2017]
     because Solaris 11 distributes zlib-1.2.8.f that is older than 1.2.8.1.
   Suppress clang warnings about implicit sign changes in png.c
 
-Version 1.6.29rc01 [March 8, 2017]
+Version 1.6.29 [March 16, 2017]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
