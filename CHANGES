@@ -5818,6 +5818,8 @@ Version 1.6.29 [March 16, 2017]
   No changes.
 
 Version 1.6.30beta01 [March 16, 2017]
+  Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
+    makefile.linux and makefile.solaris-x86 (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
