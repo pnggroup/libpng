@@ -5,7 +5,7 @@
  * related or neighboring rights to this work.  This work is published from:
  * United States.
  *
- * Last changed in libpng 1.6.29 [%RDATE%]
+ * Last changed in libpng 1.6.29 [March 16, 2017]
  *
  * Read a PNG and write it out in a fixed format, using the 'simplified API'
  * that was introduced in libpng-1.6.0.
