@@ -25,7 +25,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.28],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.29],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -46,7 +46,7 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.28
+PNGLIB_VERSION=1.6.29
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
 PNGLIB_RELEASE=28
@@ -390,6 +390,89 @@ AM_CONDITIONAL([PNG_MIPS_MSA],
     case "$host_cpu" in
       mipsel*|mips64el*) :;;
     esac])
+
+# INTEL
+# =====
+#
+# INTEL SSE (SIMD) support.
+
+AC_ARG_ENABLE([intel-sse],
+   AS_HELP_STRING([[[--enable-intel-sse]]],
+      [Enable Intel SSE optimizations: =no/off, yes/on:]
+      [no/off: disable the optimizations;]
+      [yes/on: enable the optimizations.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling:
+         AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
+                   [Disable Intel SSE optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_intel_sse=no;;
+      yes|on)
+         AC_DEFINE([PNG_INTEL_SSE_OPT], [1],
+                   [Enable Intel SSE optimizations]);;
+      *)
+         AC_MSG_ERROR([--enable-intel-sse=${enable_intel_sse}: invalid value])
+   esac])
+
+# Add Intel specific files to all builds where the host_cpu is Intel ('x86*')
+# or where Intel optimizations were explicitly requested (this allows a
+# fallback if a future host CPU does not match 'x86*')
+AM_CONDITIONAL([PNG_INTEL_SSE],
+   [test "$enable_intel_sse" != 'no' &&
+    case "$host_cpu" in
+      i?86|x86_64) :;;
+      *)    test "$enable_intel_sse" != '';;
+    esac])
+
+# PowerPC
+# ===
+#
+# PowerPC VSX (SIMD) support.
+
+AC_ARG_ENABLE([powerpc-vsx],
+AS_HELP_STRING([[[--enable-powerpc-vsx]]],
+      [Enable POWERPC VSX optimizations: =no/off, check, api, yes/on:]
+      [no/off: disable the optimizations; check: use internal checking code]
+      [api: disable by default, enable by a call to png_set_option]
+      [yes/on: turn on unconditionally.]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling on __ppc64__ systems:
+         AC_DEFINE([PNG_POWERPC_VSX_OPT], [0],
+                   [Disable POWERPC VSX optimizations])
+         # Prevent inclusion of the platform specific files below:
+         enable_powerpc_vsx=no;;
+      check)
+         AC_DEFINE([PNG_POWERPC_VSX_CHECK_SUPPORTED], [],
+                   [Check for POWERPC VSX support at run-time])
+         AC_MSG_WARN([--enable-powerpc-vsx Please check contrib/powerpc/README file]
+            [for the list of supported OSes.]);;
+      api)
+         AC_DEFINE([PNG_POWERPC_VSX_API_SUPPORTED], [],
+                   [Turn on POWERPC VSX optimizations at run-time]);;
+      yes|on)
+         AC_DEFINE([PNG_POWERPC_VSX_OPT], [2],
+                   [Enable POWERPC VSX optimizations])
+         AC_MSG_WARN([--enable-powerpc-vsx: please specify 'check' or 'api', if]
+            [you want the optimizations unconditionally pass '-maltivec -mvsx']
+            [or '-mcpu=power8'to the compiler.]);;
+      *)
+         AC_MSG_ERROR([--enable-powerpc-vsx=${enable_powerpc_vsx}: invalid value])
+   esac])
+
+# Add PowerPC specific files to all builds where the host_cpu is powerpc('powerpc*') or
+# where POWERPC optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'powerpc*')
+
+AM_CONDITIONAL([PNG_POWERPC_VSX],
+   [test "$enable_powerpc_vsx" != 'no' &&
+    case "$host_cpu" in
+      powerpc*|ppc64*) :;;
+    esac])
+
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

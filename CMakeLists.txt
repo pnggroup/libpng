@@ -36,13 +36,15 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 28)
+set(PNGLIB_RELEASE 29)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
+include(GNUInstallDirs)
+
 # needed packages
 
-#Allow users to specify location of Zlib, 
+#Allow users to specify location of Zlib,
 # Useful if zlib is being built alongside this as a sub-project
 option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
 
@@ -96,7 +98,7 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
       arm/arm_init.c
       arm/filter_neon.S
       arm/filter_neon_intrinsics.c)
-      
+
     if(${PNG_ARM_NEON} STREQUAL "on")
       add_definitions(-DPNG_ARM_NEON_OPT=2)
     elseif(${PNG_ARM_NEON} STREQUAL "check")
@@ -106,6 +108,38 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
     add_definitions(-DPNG_ARM_NEON_OPT=0)
   endif()
 endif()
+
+# set definitions and sources for powerpc
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^powerpc*" OR
+	${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64*" )
+  set(PNG_POWERPC_VSX_POSSIBLE_VALUES check on off)
+  set(PNG_POWERPC_VSX "check" CACHE STRING "Enable POWERPC VSX optimizations:
+     check: (default) use internal checking code;
+     off: disable the optimizations;
+     on: turn on unconditionally.")
+  set_property(CACHE PNG_POWERPC_VSX PROPERTY STRINGS
+     ${PNG_POWERPC_VSX_POSSIBLE_VALUES})
+  list(FIND PNG_POWERPC_VSX_POSSIBLE_VALUES ${PNG_POWERPC_VSX} index)
+  if(index EQUAL -1)
+    message(FATAL_ERROR
+      " PNG_POWERPC_VSX must be one of [${PNG_POWERPC_VSX_POSSIBLE_VALUES}]")
+  elseif(NOT ${PNG_POWERPC_VSX} STREQUAL "no")
+    set(libpng_powerpc_sources
+      powerpc/powerpc_init.c
+      powerpc/filter_vsx_intrinsics.c)
+
+    if(${PNG_POWERPC_VSX} STREQUAL "on")
+      add_definitions(-DPNG_POWERPC_VSX_OPT=2)
+    elseif(${PNG_POWERPC_VSX} STREQUAL "check")
+      add_definitions(-DPNG_POWERPC_VSX_CHECK_SUPPORTED)
+      message(WARNING
+      "[PNG_POWERPC_VSX==check] Please check contrib/powerpc/README file for the list of supported OSes.")
+    endif()
+  else()
+    add_definitions(-DPNG_POWERPC_VSX_OPT=0)
+  endif()
+endif()
+
 
 # SET LIBNAME
 set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
@@ -398,6 +432,7 @@ set(libpng_sources
   pngwtran.c
   pngwutil.c
   ${libpng_arm_sources}
+  ${libpng_powerpc_sources}
 )
 set(pngtest_sources
   pngtest.c
@@ -735,7 +770,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.28
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.29
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
@@ -840,4 +875,3 @@ endif()
 # to create msvc import lib for mingw compiled shared lib
 # pexports libpng.dll > libpng.def
 # lib /def:libpng.def /machine:x86
-
