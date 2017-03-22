@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta87 - December 31, 2016
+Libpng 1.7.0beta87 - March 22, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -1423,8 +1423,12 @@ Version 1.7.0beta86 [December 29, 2016]
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
     and patch by Patrick Keshishian, CVE-2016-10087).
 
-Version 1.7.0beta87 [December 31, 2016]
+Version 1.7.0beta87 [March 22, 2017]
   Fixed arm/aarch64 detection in CMakeLists.txt (Gianfranco Costamagna).
+  The contrib/examples/pngtopng.c recovery code was in the wrong "if"
+    branches; the comments were correct.
+  Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
+    makefile.linux and makefile.solaris-x86 (Cosmin).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
