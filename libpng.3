@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "March 16, 2017"
+.TH LIBPNG 3 "March 28, 2017"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.30beta01
 .SH SYNOPSIS
@@ -510,7 +510,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.30beta01 - March 16, 2017
+ libpng version 1.6.30beta01 - March 28, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -521,7 +521,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.30beta01 - March 16, 2017
+ libpng versions 0.97, January 1998, through 1.6.30beta01 - March 28, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
@@ -4756,8 +4756,6 @@ functions after png_create_*_struct() has been called by calling:
         png_voidp error_ptr, png_error_ptr error_fn,
         png_error_ptr warning_fn);
 
-    png_voidp error_ptr = png_get_error_ptr(png_ptr);
-
 If NULL is supplied for either error_fn or warning_fn, then the libpng
 default function will be used, calling fprintf() and/or longjmp() if a
 problem is encountered.  The replacement error functions should have
@@ -4768,6 +4766,11 @@ parameters as follows:
 
     void user_warning_fn(png_structp png_ptr,
         png_const_charp warning_msg);
+
+Then, within your error_fn, you can retrieve the error_ptr if
+you need it, by calling
+
+    png_voidp error_ptr = png_get_error_ptr(png_ptr);
 
 The motivation behind using setjmp() and longjmp() is the C++ throw and
 catch exception handling methods.  This makes the code much easier to write,
@@ -6023,7 +6026,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.30beta01 - March 16, 2017:
+Libpng version 1.6.30beta01 - March 28, 2017:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6048,7 +6051,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000 through 1.6.30beta01, March 16, 2017 are
+libpng versions 1.0.7, July 1, 2000 through 1.6.30beta01, March 28, 2017 are
 Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -6176,7 +6179,7 @@ files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-March 16, 2017
+March 28, 2017
 
 .\" end of man page
 
