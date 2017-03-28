@@ -4767,8 +4767,8 @@ parameters as follows:
     void user_warning_fn(png_structp png_ptr,
         png_const_charp warning_msg);
 
-Then, within your error_fn, you can retrieve the error_ptr if
-you need it, by calling
+Then, within your user_error_fn or user_warning_fn, you can retrieve
+the error_ptr if you need it, by calling
 
     png_voidp error_ptr = png_get_error_ptr(png_ptr);
 
