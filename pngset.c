@@ -1102,8 +1102,9 @@ png_set_sPLT(png_const_structrp png_ptr,
       info_ptr->valid |= PNG_INFO_sPLT;
       ++(info_ptr->splt_palettes_num);
       ++np;
+      ++entries;
    }
-   while (++entries, --nentries);
+   while (--nentries);
 
    if (nentries > 0)
       png_chunk_report(png_ptr, "sPLT out of memory", PNG_CHUNK_WRITE_ERROR);
@@ -1696,14 +1697,16 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
       png_byte ch = (png_byte)*key++;
 
       if ((ch > 32 && ch <= 126) || (ch >= 161 /*&& ch <= 255*/))
-         *new_key++ = ch, ++key_len, space = 0;
+      {
+         *new_key++ = ch; ++key_len; space = 0;
+      }
 
       else if (space == 0)
       {
          /* A space or an invalid character when one wasn't seen immediately
           * before; output just a space.
           */
-         *new_key++ = 32, ++key_len, space = 1;
+         *new_key++ = 32; ++key_len; space = 1;
 
          /* If the character was not a space then it is invalid. */
          if (ch != 32)
@@ -1716,7 +1719,7 @@ png_check_keyword(png_structrp png_ptr, png_const_charp key, png_bytep new_key)
 
    if (key_len > 0 && space != 0) /* trailing space */
    {
-      --key_len, --new_key;
+      --key_len; --new_key;
       if (bad_character == 0)
          bad_character = 32;
    }

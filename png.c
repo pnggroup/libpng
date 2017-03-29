@@ -2832,7 +2832,7 @@ png_pow10(int power)
    if (power < 0)
    {
       if (power < DBL_MIN_10_EXP) return 0;
-      recip = 1, power = -power;
+      recip = 1; power = -power;
    }
 
    if (power > 0)
@@ -2910,7 +2910,9 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
             double test = png_pow10(exp_b10+1);
 
             if (test <= DBL_MAX)
-               ++exp_b10, base = test;
+            {
+               ++exp_b10; base = test;
+            }
 
             else
                break;
@@ -2924,7 +2926,10 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
           * test on DBL_MAX above.
           */
          fp /= base;
-         while (fp >= 1) fp /= 10, ++exp_b10;
+         while (fp >= 1)
+         {
+            fp /= 10; ++exp_b10;
+         }
 
          /* Because of the code above fp may, at this point, be
           * less than .1, this is ok because the code below can
@@ -2975,7 +2980,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
                      /* Rounding up to 10, handle that here. */
                      if (czero > 0)
                      {
-                        --czero, d = 1;
+                        --czero; d = 1;
                         if (cdigits == 0) --clead;
                      }
                      else
@@ -2989,7 +2994,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
 
                            else if (ch == 46)
                            {
-                              ch = *--ascii, ++size;
+                              ch = *--ascii; ++size;
                               /* Advance exp_b10 to '1', so that the
                                * decimal point happens after the
                                * previous digit.
@@ -3016,7 +3021,9 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
                               int ch = *--ascii;
 
                               if (ch == 46)
-                                 ++size, exp_b10 = 1;
+                              {
+                                 ++size; exp_b10 = 1;
+                              }
 
                               /* Else lost a leading zero, so 'exp_b10' is
                                * still ok at (-1)
@@ -3052,21 +3059,26 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
                       */
                      if (exp_b10 != (-1))
                      {
-                        if (exp_b10 == 0) *ascii++ = 46, --size;
+                        if (exp_b10 == 0)
+                        {
+                           *ascii++ = 46; --size;
+                        }
                         /* PLUS 1: TOTAL 4 */
                         --exp_b10;
                      }
-                     *ascii++ = 48, --czero;
+                     *ascii++ = 48; --czero;
                   }
 
                   if (exp_b10 != (-1))
                   {
                      if (exp_b10 == 0)
-                        *ascii++ = 46, --size; /* counted above */
+                     {
+                        *ascii++ = 46; --size; /* counted above */
+                     }
 
                      --exp_b10;
                   }
-                  *ascii++ = (char)(48 + (int)d), ++cdigits;
+                  *ascii++ = (char)(48 + (int)d); ++cdigits;
                }
             }
             while (cdigits+czero < precision+clead && fp > DBL_MIN);
@@ -3107,7 +3119,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
              */
             size -= cdigits;
 
-            *ascii++ = 69, --size;    /* 'E': PLUS 1 TOTAL 2+precision */
+            *ascii++ = 69; --size;    /* 'E': PLUS 1 TOTAL 2+precision */
 
             /* The following use of an unsigned temporary avoids ambiguities in
              * the signed arithmetic on exp_b10 and permits GCC at least to do
@@ -3118,7 +3130,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
 
                if (exp_b10 < 0)
                {
-                  *ascii++ = 45, --size; /* '-': PLUS 1 TOTAL 3+precision */
+                  *ascii++ = 45; --size; /* '-': PLUS 1 TOTAL 3+precision */
                   uexp_b10 = (unsigned int)(-exp_b10);
                }
 
@@ -3185,7 +3197,9 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
 
       /* Avoid overflow here on the minimum integer. */
       if (fp < 0)
-         *ascii++ = 45, num = (png_uint_32)(-fp);
+      {
+         *ascii++ = 45; num = (png_uint_32)(-fp);
+      }
       else
          num = (png_uint_32)fp;
 
@@ -3223,7 +3237,10 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
                 * then ndigits digits to first:
                 */
                i = 5;
-               while (ndigits < i) *ascii++ = 48, --i;
+               while (ndigits < i)
+               {
+                  *ascii++ = 48; --i;
+               }
                while (ndigits >= first) *ascii++ = digits[--ndigits];
                /* Don't output the trailing zeros! */
             }
