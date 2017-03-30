@@ -4531,11 +4531,12 @@ version 1.5.28 [December 29, 2016]
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
     and patch by Patrick Keshishian, CVE-2016-10087).
 
-version 1.5.29beta01 [March 22, 2017]
+version 1.5.29beta01 [March 30, 2017]
   Suppress clang warnings about implicit sign changes in png.c
   Avoid potential overflow of shift operations in png_do_expand() (Aaron Boxer).
   Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
     makefile.linux and makefile.solaris-x86 (Cosmin).
+  Silence clang -Wcomma warnings (Viktor SzaKats).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
