@@ -466,10 +466,12 @@
    static_cast<type>(static_cast<const void*>(value))
 #else
 #  define png_voidcast(type, value) (value)
-#  if defined( _WIN64 ) && ! defined( __GNUC__ )
-      typedef unsigned __int64 png_ptruint;
-#  elif defined( _WIN64 )
-      typedef unsigned long long png_ptruint;
+#  ifdef _WIN64
+#     ifdef __GNUC__
+         typedef unsigned long long png_ptruint;
+#     else
+         typedef unsigned __int64 png_ptruint;
+#     endif
 #  else
       typedef unsigned long png_ptruint;
 #  endif
