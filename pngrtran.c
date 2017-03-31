@@ -2934,7 +2934,7 @@ png_do_gray_to_rgb(png_row_infop row_info, png_bytep row)
  * using the equation given in Poynton's ColorFAQ of 1998-01-04 at
  * <http://www.inforamp.net/~poynton/>  (THIS LINK IS DEAD June 2008 but
  * versions dated 1998 through November 2002 have been archived at
- * http://web.archive.org/web/20000816232553/http://www.inforamp.net/
+ * https://web.archive.org/web/20000816232553/www.inforamp.net/
  * ~poynton/notes/colour_and_gamma/ColorFAQ.txt )
  * Charles Poynton poynton at poynton.com
  *

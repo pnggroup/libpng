@@ -66,17 +66,17 @@ file format in application programs.
 
 The PNG specification (second edition), November 2003, is available as
 a W3C Recommendation and as an ISO Standard (ISO/IEC 15948:2004 (E)) at
-<http://www.w3.org/TR/2003/REC-PNG-20031110/
+<https://www.w3.org/TR/2003/REC-PNG-20031110/
 The W3C and ISO documents have identical technical content.
 
 The PNG-1.2 specification is available at
-<http://png-mng.sourceforge.net/pub/png/spec/1.2/>.
+<https://png-mng.sourceforge.io/pub/png/spec/1.2/>.
 It is technically equivalent
 to the PNG specification (second edition) but has some additional material.
 
-The PNG-1.0 specification is available as RFC 2083 
-<http://png-mng.sourceforge.net/pub/png/spec/1.0/> and as a
-W3C Recommendation <http://www.w3.org/TR/REC-png-961001>.
+The PNG-1.0 specification is available as RFC 2083
+<https://png-mng.sourceforge.io/pub/png/spec/1.0/> and as a
+W3C Recommendation <https://www.w3.org/TR/REC-png-961001>.
 
 Some additional chunks are described in the special-purpose public chunks
 documents at <http://www.libpng.org/pub/png/spec/register/>
@@ -3824,7 +3824,7 @@ PNG_FORMAT_FLAG_LINEAR flag below.
 
 When the simplified API needs to convert between sRGB and linear colorspaces,
 the actual sRGB transfer curve defined in the sRGB specification (see the
-article at http://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
+article at https://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
 approximation used elsewhere in libpng.
 
 When an alpha channel is present it is expected to denote pixel coverage
@@ -4088,7 +4088,7 @@ READ APIs
 
 When the simplified API needs to convert between sRGB and linear colorspaces,
 the actual sRGB transfer curve defined in the sRGB specification (see the
-article at http://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
+article at https://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
 approximation used elsewhere in libpng.
 
 WRITE APIS
@@ -4269,7 +4269,7 @@ However, there are some uncertainties about the status of local variables
 after a longjmp, so the user may want to be careful about doing anything
 after setjmp returns non-zero besides returning itself.  Consult your
 compiler documentation for more details.  For an alternative approach, you
-may wish to use the "cexcept" facility (see http://cexcept.sourceforge.net),
+may wish to use the "cexcept" facility (see https://cexcept.sourceforge.io/),
 which is illustrated in pngvalid.c and in contrib/visupng.
 
 Beginning in libpng-1.4.0, the png_set_benign_errors() API became available.
@@ -4497,7 +4497,7 @@ in a MNG datastream.  As a minimum, it must have the MNG 8-byte signature
 and the MHDR and MEND chunks.  Libpng does not provide support for these
 or any other MNG chunks; your application must provide its own support for
 them.  You may wish to consider using libmng (available at
-http://www.libmng.com) instead.
+https://www.libmng.com/) instead.
 
 VIII.  Changes to Libpng from version 0.88
 
@@ -5197,7 +5197,7 @@ control.  The git repository was built from old libpng-x.y.z.tar.gz files
 going back to version 0.70.  You can access the git repository (read only)
 at
 
-    git://git.code.sf.net/p/libpng/code
+    https://git.code.sf.net/p/libpng/code.git
 
 or you can browse it with a web browser by selecting the "code" button at
 
@@ -5207,7 +5207,7 @@ Patches can be sent to glennrp at users.sourceforge.net or to
 png-mng-implement at lists.sourceforge.net or you can upload them to
 the libpng bug tracker at
 
-    http://libpng.sourceforge.net
+    https://libpng.sourceforge.io/
 
 We also accept patches built from the tar or zip distributions, and
 simple verbal discriptions of bug fixes, reported either to the
@@ -5217,7 +5217,7 @@ mailing list, or directly to glennrp.
 XV. Coding style
 
 Our coding style is similar to the "Allman" style
-(See http://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
+(See https://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
 braces on separate lines:
 
     if (condition)
@@ -5318,7 +5318,7 @@ Prior to libpng-1.6.0 we used a "png_sizeof()" macro, formatted as
 though it were a function.
 
 Control keywords if, for, while, and switch are always followed by a space
-to distinguish them from function calls, which have no trailing space. 
+to distinguish them from function calls, which have no trailing space.
 
 We put a space after each comma and after each semicolon
 in "for" statements, and we put spaces before and after each
@@ -5344,7 +5344,7 @@ for a few type names that we inherit from zlib.h.
 
 We prefer "if (something != 0)" and "if (something == 0)" over
 "if (something)" and if "(!something)", respectively, and for pointers
-we prefer "if (some_pointer != NULL)" or "if (some_pointer == NULL)". 
+we prefer "if (some_pointer != NULL)" or "if (some_pointer == NULL)".
 
 We do not use the TAB character for indentation in the C sources.
 

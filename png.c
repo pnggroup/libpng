@@ -4295,7 +4295,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
    defined(PNG_SIMPLIFIED_WRITE_SUPPORTED)
 /* sRGB conversion tables; these are machine generated with the code in
  * contrib/tools/makesRGB.c.  The actual sRGB transfer curve defined in the
- * specification (see the article at http://en.wikipedia.org/wiki/SRGB)
+ * specification (see the article at https://en.wikipedia.org/wiki/SRGB)
  * is used, not the gamma=1/2.2 approximation use elsewhere in libpng.
  * The sRGB to linear table is exact (to the nearest 16-bit linear fraction).
  * The inverse (linear to sRGB) table has accuracies as follows:
