@@ -1,5 +1,5 @@
 
-Libpng 1.5.29beta01 - March 30, 2017
+Libpng 1.5.29beta01 - April 1, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -26,12 +26,13 @@ Other information:
 
 Changes since the last public release (1.5.28):
 
-version 1.5.29beta01 [March 30, 2017]
+version 1.5.29beta01 [April 1, 2017]
   Suppress clang warnings about implicit sign changes in png.c
   Avoid potential overflow of shift operations in png_do_expand() (Aaron Boxer).
   Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
     makefile.linux and makefile.solaris-x86 (Cosmin).
-  Silence clang -Wcomma warnings (Viktor SzaKats).
+  Silence clang -Wcomma warnings (Viktor Szakats).
+  Update Sourceforge URLs in documentation (https instead of http).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
