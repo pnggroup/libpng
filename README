@@ -1,4 +1,4 @@
-README for libpng version 1.7.0beta87 - December 30, 2016 (shared library 17.0)
+README for libpng version 1.7.0beta87 - April 1, 2017 (shared library 17.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -90,7 +90,7 @@ You may also want a copy of the PNG specification.  It is available
 as an RFC, a W3C Recommendation, and an ISO/IEC Standard.  You can find
 these at http://www.libpng.org/pub/png/documents/
 
-This code is currently being archived at libpng.sf.net in the
+This code is currently being archived at libpng.sourceforge.io in the
 [DOWNLOAD] area, and at ftp://ftp.simplesystems.org.  If you can't find it
 in any of those places, e-mail me, and I'll help you find it.
 
