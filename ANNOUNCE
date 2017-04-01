@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta87 - April 1, 2017
+Libpng 1.7.0beta88 - April 1, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta87.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta87.tar.gz
+   1.7.0beta88.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta88.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b87.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b87.zip
+   /scratch/glennrp/Libpng17/lp170b88.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b88.zip
 
 Other information:
 
-   1.7.0beta87-README.txt
-   1.7.0beta87-LICENSE.txt
-   libpng-1.7.0beta87-*.asc (armored detached GPG signatures)
+   1.7.0beta88-README.txt
+   1.7.0beta88-LICENSE.txt
+   libpng-1.7.0beta88-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1430,6 +1430,8 @@ Version 1.7.0beta87 [April 1, 2017]
   Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
     makefile.linux and makefile.solaris-x86 (Cosmin).
   Merged some recent changes from libpng-1.6.30beta01.
+
+Version 1.7.0beta88 [April 1, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
