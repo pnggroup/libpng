@@ -5818,11 +5818,12 @@ Version 1.6.29beta03 [March 1, 2017]
 Version 1.6.29 [March 16, 2017]
   No changes.
 
-Version 1.6.30beta01 [March 30, 2017]
+Version 1.6.30beta01 [April 1, 2017]
   Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
     makefile.linux and makefile.solaris-x86 (Cosmin).
   Revised documentation of png_get_error_ptr() in the libpng manual.
-  Silence clang -Wcomma and const drop warnings (Viktor SzaKats).
+  Silence clang -Wcomma and const drop warnings (Viktor Szakats).
+  Update Sourceforge URLs in documentation (https instead of http).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

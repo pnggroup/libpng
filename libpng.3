@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "March 28, 2017"
+.TH LIBPNG 3 "April 1, 2017"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.30beta01
 .SH SYNOPSIS
@@ -510,7 +510,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.30beta01 - March 28, 2017
+ libpng version 1.6.30beta01 - April 1, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -521,7 +521,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.30beta01 - March 28, 2017
+ libpng versions 0.97, January 1998, through 1.6.30beta01 - April 1, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
@@ -576,17 +576,17 @@ file format in application programs.
 
 The PNG specification (second edition), November 2003, is available as
 a W3C Recommendation and as an ISO Standard (ISO/IEC 15948:2004 (E)) at
-<https://www.w3.org/TR/2003/REC-PNG-20031110/
+<http://www.w3.org/TR/2003/REC-PNG-20031110/
 The W3C and ISO documents have identical technical content.
 
 The PNG-1.2 specification is available at
-<https://png-mng.sourceforge.io/pub/png/spec/1.2/>.
+<http://png-mng.sourceforge.net/pub/png/spec/1.2/>.
 It is technically equivalent
 to the PNG specification (second edition) but has some additional material.
 
-The PNG-1.0 specification is available as RFC 2083
-<https://png-mng.sourceforge.io/pub/png/spec/1.0/> and as a
-W3C Recommendation <https://www.w3.org/TR/REC-png-961001>.
+The PNG-1.0 specification is available as RFC 2083 
+<http://png-mng.sourceforge.net/pub/png/spec/1.0/> and as a
+W3C Recommendation <http://www.w3.org/TR/REC-png-961001>.
 
 Some additional chunks are described in the special-purpose public chunks
 documents at <http://www.libpng.org/pub/png/spec/register/>
@@ -4334,7 +4334,7 @@ PNG_FORMAT_FLAG_LINEAR flag below.
 
 When the simplified API needs to convert between sRGB and linear colorspaces,
 the actual sRGB transfer curve defined in the sRGB specification (see the
-article at https://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
+article at http://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
 approximation used elsewhere in libpng.
 
 When an alpha channel is present it is expected to denote pixel coverage
@@ -4598,7 +4598,7 @@ READ APIs
 
 When the simplified API needs to convert between sRGB and linear colorspaces,
 the actual sRGB transfer curve defined in the sRGB specification (see the
-article at https://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
+article at http://en.wikipedia.org/wiki/SRGB) is used, not the gamma=1/2.2
 approximation used elsewhere in libpng.
 
 WRITE APIS
@@ -4779,7 +4779,7 @@ However, there are some uncertainties about the status of local variables
 after a longjmp, so the user may want to be careful about doing anything
 after setjmp returns non-zero besides returning itself.  Consult your
 compiler documentation for more details.  For an alternative approach, you
-may wish to use the "cexcept" facility (see https://cexcept.sourceforge.io/),
+may wish to use the "cexcept" facility (see http://cexcept.sourceforge.net),
 which is illustrated in pngvalid.c and in contrib/visupng.
 
 Beginning in libpng-1.4.0, the png_set_benign_errors() API became available.
@@ -5007,7 +5007,7 @@ in a MNG datastream.  As a minimum, it must have the MNG 8-byte signature
 and the MHDR and MEND chunks.  Libpng does not provide support for these
 or any other MNG chunks; your application must provide its own support for
 them.  You may wish to consider using libmng (available at
-https://www.libmng.com/) instead.
+http://www.libmng.com) instead.
 
 .SH VIII.  Changes to Libpng from version 0.88
 
@@ -5707,7 +5707,7 @@ control.  The git repository was built from old libpng-x.y.z.tar.gz files
 going back to version 0.70.  You can access the git repository (read only)
 at
 
-    https://git.code.sf.net/p/libpng/code.git
+    git://git.code.sf.net/p/libpng/code
 
 or you can browse it with a web browser by selecting the "code" button at
 
@@ -5717,7 +5717,7 @@ Patches can be sent to glennrp at users.sourceforge.net or to
 png-mng-implement at lists.sourceforge.net or you can upload them to
 the libpng bug tracker at
 
-    https://libpng.sourceforge.io/
+    http://libpng.sourceforge.net
 
 We also accept patches built from the tar or zip distributions, and
 simple verbal discriptions of bug fixes, reported either to the
@@ -5727,7 +5727,7 @@ mailing list, or directly to glennrp.
 .SH XV. Coding style
 
 Our coding style is similar to the "Allman" style
-(See https://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
+(See http://en.wikipedia.org/wiki/Indent_style#Allman_style), with curly
 braces on separate lines:
 
     if (condition)
@@ -5828,7 +5828,7 @@ Prior to libpng-1.6.0 we used a "png_sizeof()" macro, formatted as
 though it were a function.
 
 Control keywords if, for, while, and switch are always followed by a space
-to distinguish them from function calls, which have no trailing space.
+to distinguish them from function calls, which have no trailing space. 
 
 We put a space after each comma and after each semicolon
 in "for" statements, and we put spaces before and after each
@@ -5854,7 +5854,7 @@ for a few type names that we inherit from zlib.h.
 
 We prefer "if (something != 0)" and "if (something == 0)" over
 "if (something)" and if "(!something)", respectively, and for pointers
-we prefer "if (some_pointer != NULL)" or "if (some_pointer == NULL)".
+we prefer "if (some_pointer != NULL)" or "if (some_pointer == NULL)". 
 
 We do not use the TAB character for indentation in the C sources.
 
@@ -5987,7 +5987,7 @@ release number plus "betaNN" or "rcNN".
 .LP
 .IR libpng :
 .IP
-https://libpng.sourceforge.io/ (follow the [DOWNLOAD] link)
+http://libpng.sourceforge.net (follow the [DOWNLOAD] link)
 http://www.libpng.org/pub/png
 
 .LP
@@ -5997,7 +5997,7 @@ http://www.libpng.org/pub/png
 .I libpng
 or at
 .br
-http://zlib.net/
+ftp://ftp.info-zip.org/pub/infozip/zlib
 
 .LP
 .IR PNG specification: RFC 2083
@@ -6006,11 +6006,11 @@ http://zlib.net/
 .I libpng
 or at
 .br
-https://www.ietf.org/rfc/rfc2083.txt
+ftp://ftp.rfc-editor.org:/in-notes/rfc2083.txt
 .br
 or (as a W3C Recommendation) at
 .br
-https://www.w3.org/TR/REC-png.html
+http://www.w3.org/TR/REC-png.html
 
 .LP
 In the case of any inconsistency between the PNG specification
@@ -6026,7 +6026,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.30beta01 - March 28, 2017:
+Libpng version 1.6.30beta01 - April 1, 2017:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6051,7 +6051,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000 through 1.6.30beta01, March 28, 2017 are
+libpng versions 1.0.7, July 1, 2000 through 1.6.30beta01, April 1, 2017 are
 Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -6179,7 +6179,7 @@ files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-March 28, 2017
+April 1, 2017
 
 .\" end of man page
 
