@@ -4539,6 +4539,8 @@ version 1.5.29beta01 [April 1, 2017]
   Silence clang -Wcomma warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
 
+version 1.5.29beta02 [April 1, 2017]
+ 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
