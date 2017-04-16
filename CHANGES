@@ -5761,7 +5761,9 @@ Version 1.6.27beta01 [November 2, 2016]
     if built with zlib-1.2.8.1.
 
 Version 1.6.27rc01 [December 27, 2016]
-  Control ADLER32 checking with new PNG_IGNORE_ADLER32 option.
+  Control ADLER32 checking with new PNG_IGNORE_ADLER32 option. Fixes
+    an endless loop when handling erroneous ADLER32 checksums; bug
+    introduced in libpng-1.6.26.
   Removed the use of a macro containing the pre-processor 'defined'
     operator.  It is unclear whether this is valid; a macro that
     "generates" 'defined' is not permitted, but the use of the word
@@ -5825,7 +5827,7 @@ Version 1.6.30beta01 [April 1, 2017]
   Silence clang -Wcomma and const drop warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
 
-Version 1.6.30beta02 [April 1, 2017]
+Version 1.6.30beta02 [April 16, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
