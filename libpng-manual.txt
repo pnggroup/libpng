@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.30beta02 - April 3, 2017
+ libpng version 1.6.30beta02 - April 19, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.30beta02 - April 3, 2017
+ libpng versions 0.97, January 1998, through 1.6.30beta02 - April 19, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2016 Glenn Randers-Pehrson
 
@@ -1190,7 +1190,20 @@ row_pointers prior to calling png_read_png() with
    png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 Alternatively you could allocate your image in one big block and define
-row_pointers[i] to point into the proper places in your block.
+row_pointers[i] to point into the proper places in your block, but first
+be sure that your platform is able to allocate such a large buffer:
+
+   /* Guard against integer overflow */
+   if (height > PNG_SIZE_MAX/(width*pixel_size)) {
+        png_error(png_ptr,"image_data buffer would be too large");
+   }
+
+   png_bytep buffer=png_malloc(png_ptr,height*width*pixel_size);
+
+   for (int i=0; i<height, i++)
+      row_pointers[i]=buffer+i*width*pixel_size;
+
+   png_set_rows(png_ptr, info_ptr, &row_pointers);
 
 If you use png_set_rows(), the application is responsible for freeing
 row_pointers (and row_pointers[i], if they were separately allocated).
@@ -2145,6 +2158,16 @@ varies among applications, no example will be given.  If you
 are allocating one large chunk, you will need to build an
 array of pointers to each row, as it will be needed for some
 of the functions below.
+
+Be sure that your platform can allocate the buffer that you'll need.
+libpng internally checks for oversize width, but you'll need to
+do your own check for number_of_rows*width*pixel_size if you are using
+a multiple-row buffer:
+
+   /* Guard against integer overflow */
+   if (number_of_rows > PNG_SIZE_MAX/(width*pixel_size)) {
+        png_error(png_ptr,"image_data buffer would be too large");
+   }
 
 Remember: Before you call png_read_update_info(), the png_get_*()
 functions return the values corresponding to the original PNG image.

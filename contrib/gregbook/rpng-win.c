@@ -496,6 +496,12 @@ static int rpng_win_create_window(HINSTANCE hInst, int showmode)
 
     wimage_rowbytes = ((3*image_width + 3L) >> 2) << 2;
 
+    /* Guard against integer overflow */
+    if (image_height > ((size_t)(-1))/wimage_rowbytes) {
+        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n",
+        return 4;   /* fail */
+    }
+
     if (!(dib = (uch *)malloc(sizeof(BITMAPINFOHEADER) +
                               wimage_rowbytes*image_height)))
     {

@@ -702,7 +702,17 @@ int main(int argc, char **argv)
     if (wpng_info.interlaced) {
         long i;
         ulg bytes;
-        ulg image_bytes = rowbytes * wpng_info.height;   /* overflow? */
+        ulg image_bytes;
+
+        /* Guard against integer overflow */
+        if (wpng_info_height > ((size_t)(-1)/rowbytes) {
+            fprintf(stderr, PROGNAME ":  image_data buffer too large\n");
+            writepng_cleanup(&wpng_info);
+            wpng_cleanup();
+            exit(5);
+        }
+
+        image_bytes = rowbytes * wpng_info.height;   /* overflow? */
 
         wpng_info.image_data = (uch *)malloc(image_bytes);
         wpng_info.row_pointers = (uch **)malloc(wpng_info.height*sizeof(uch *));

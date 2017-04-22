@@ -780,6 +780,13 @@ static void rpng2_x_init(void)
     Trace((stderr, "  width  = %ld\n", rpng2_info.width))
     Trace((stderr, "  height = %ld\n", rpng2_info.height))
 
+    /* Guard against integer overflow */
+    if (rpng2_info.height > ((size_t)(-1))/rpng2_info.rowbytes) {
+        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n");
+        readpng2_cleanup(&rpng2_info);
+        return;
+    }
+
     rpng2_info.image_data = (uch *)malloc(rowbytes * rpng2_info.height);
     if (!rpng2_info.image_data) {
         readpng2_cleanup(&rpng2_info);

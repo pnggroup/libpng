@@ -5827,7 +5827,10 @@ Version 1.6.30beta01 [April 1, 2017]
   Silence clang -Wcomma and const drop warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
 
-Version 1.6.30beta02 [April 16, 2017]
+Version 1.6.30beta02 [April 21, 2017]
+  Document need to check for integer overflow when allocating a pixel
+    buffer for multiple rows in contrib/gregbook, contrib/pngminus,
+    example.c, and in the manual (suggested by Jaeseung Choi).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
