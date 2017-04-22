@@ -983,6 +983,11 @@ void write_png(char *file_name /* , ... other image information ... */)
    png_uint_32 k, height, width;
 
    /* In this example, "image" is a one-dimensional array of bytes */
+
+   /* Guard against integer overflow */
+   if (height > PNG_SIZE_MAX/(width*bytes_per_pixel)) {
+      png_error(png_ptr, "Image_data buffer would be too large");
+   }
    png_byte image[height*width*bytes_per_pixel];
 
    png_bytep row_pointers[height];

@@ -2537,6 +2537,9 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
+   /* Note, "length" is sufficient here; we won't be adding
+    * a null terminator later.
+    */
    buffer = png_read_buffer(png_ptr, length, 2/*silent*/);
 
    if (buffer == NULL)
