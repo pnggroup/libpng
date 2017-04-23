@@ -5834,7 +5834,7 @@ Version 1.6.30beta02 [April 22, 2017]
   Removed reference to the obsolete PNG_SAFE_LIMITS macro in the documentation.
 
 Version 1.6.30beta03 [April 23, 2017]
-  Check for integer overflow in contrib/visupng.
+  Check for integer overflow in contrib/visupng and contrib/tools/genpng.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
