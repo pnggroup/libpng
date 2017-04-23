@@ -33,12 +33,11 @@
     - 2.02:  fixed improper display of usage screen on PNG error(s); fixed
               unexpected-EOF and file-read-error cases
     - 2.03:  removed runtime MMX-enabling/disabling and obsolete -mmx* options
-    - 2.04:
-             (GR-P)
+    - 2.04:  check for integer overflow (Glenn R-P)
 
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2008 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2008, 2017 Greg Roelofs.  All rights reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors

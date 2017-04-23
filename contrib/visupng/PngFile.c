@@ -2,7 +2,7 @@
  *  PNGFILE.C -- Image File Functions
  *-------------------------------------
  *
- * Copyright 2000, Willem van Schaik.
+ * Copyright 2000,2017 Willem van Schaik.
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

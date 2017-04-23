@@ -44,9 +44,11 @@
     - 2.04:  Added "void(foo);" statements to quiet pedantic compiler warnings
              about unused variables (GR-P)
     - 2.05:  Use nanosleep() instead of usleep(), which is deprecated (GR-P).
+    - 2.06:  check for integer overflow (Glenn R-P)
   ---------------------------------------------------------------------------
 
-      Copyright (c) 1998-2010, 2014-2015 Greg Roelofs.  All rights reserved.
+      Copyright (c) 1998-2010, 2014-2015, 2017 Greg Roelofs.  All rights
+      reserved.
 
       This software is provided "as is," without warranty of any kind,
       express or implied.  In no event shall the author or contributors

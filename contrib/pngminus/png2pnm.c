@@ -3,6 +3,7 @@
  *  copyright (C) 1999 by Willem van Schaik <willem at schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
+ *          1.1 - 2017.04.22 - Add buffer-size check (Glenn Randers-Pehrson)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,

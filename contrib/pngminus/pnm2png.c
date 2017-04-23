@@ -4,6 +4,7 @@
  *
  *  version 1.0 - 1999.10.15 - First version.
  *  version 1.1 - 2015.07.29 - Fixed leaks (Glenn Randers-Pehrson)
+ *  version 1.2 - 2017.04.22 - Add buffer-size check
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
