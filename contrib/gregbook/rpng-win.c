@@ -499,7 +499,7 @@ static int rpng_win_create_window(HINSTANCE hInst, int showmode)
 
     /* Guard against integer overflow */
     if (image_height > ((size_t)(-1))/wimage_rowbytes) {
-        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n",
+        fprintf(stderr, PROGNAME ":  image_data buffer would be too large\n");
         return 4;   /* fail */
     }
 
