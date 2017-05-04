@@ -80,8 +80,8 @@ set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
 # set definitions and sources for arm
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
-  ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^aarch64")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
+  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
   set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
      check: (default) use internal checking code;
@@ -110,8 +110,8 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
 endif()
 
 # set definitions and sources for powerpc
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^powerpc*" OR
-	${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64*" )
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
+	CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*" )
   set(PNG_POWERPC_VSX_POSSIBLE_VALUES check on off)
   set(PNG_POWERPC_VSX "check" CACHE STRING "Enable POWERPC VSX optimizations:
      check: (default) use internal checking code;
