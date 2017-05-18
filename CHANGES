@@ -5833,9 +5833,10 @@ Version 1.6.30beta02 [April 22, 2017]
     example.c, and in the manual (suggested by Jaeseung Choi).
   Removed reference to the obsolete PNG_SAFE_LIMITS macro in the documentation.
 
-Version 1.6.30beta03 [May 16, 2017]
+Version 1.6.30beta03 [May 18, 2017]
   Check for integer overflow in contrib/visupng and contrib/tools/genpng.
   Do not double evaluate CMAKE_SYSTEM_PROCESSOR in CMakeLists.txt
+  Test CMAKE_HOST_WIN32 instead of WIN32 in CMakeLists.txt
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
