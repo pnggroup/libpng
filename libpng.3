@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "April 3, 2017"
+.TH LIBPNG 3 "May 22, 2017"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.5.29beta02
 .SH SYNOPSIS
@@ -496,7 +496,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 Libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.5.29beta02 - April 3, 2017
+ libpng version 1.5.29beta02 - May 22, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
@@ -507,7 +507,7 @@ Libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.5.29beta02 - April 3, 2017
+ libpng versions 0.97, January 1998, through 1.5.29beta02 - May 22, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2014 Glenn Randers-Pehrson
 
@@ -4741,14 +4741,15 @@ PNG_USER_WIDTH_MAX and PNG_USER_HEIGHT_MAX, although this document said
 that it could be used to override them.  Now this function will reduce or
 increase the limits.
 
-Starting in libpng-1.5.10, the user limits can be set en masse with the
-configuration option PNG_SAFE_LIMITS_SUPPORTED.  If this option is enabled,
-a set of "safe" limits is applied in pngpriv.h.  These can be overridden by
-application calls to png_set_user_limits(), png_set_user_chunk_cache_max(),
-and/or png_set_user_malloc_max() that increase or decrease the limits.  Also,
-in libpng-1.5.10 the default width and height limits were increased
-from 1,000,000 to 0x7fffffff (i.e., made unlimited).  Therefore, the
-limits are now
+From libpng-1.5.10 through libpng-1.5.21, the user limits could be set
+en masse with the configuration option PNG_SAFE_LIMITS_SUPPORTED.  If this
+option was enabled, a set of "safe" limits was applied in pngpriv.h. Beginning
+with libpng-1.5.22, the "safe" limits were applied by default.  These can be
+overridden by application calls to png_set_user_limits(),
+png_set_user_chunk_cache_max(), and/or png_set_user_malloc_max() that increase
+or decrease the limits.  Also, in libpng-1.5.10 the default width and height
+limits were increased from 1,000,000 to 0x7fffffff (i.e., made unlimited).
+Therefore, the limits are now
                                default      safe
    png_user_width_max        0x7fffffff    1,000,000
    png_user_height_max       0x7fffffff    1,000,000
@@ -4865,11 +4866,11 @@ control.  The git repository was built from old libpng-x.y.z.tar.gz files
 going back to version 0.70.  You can access the git repository (read only)
 at
 
-    https://git.code.sf.net/p/libpng/code.git
+    git://git.code.sf.net/p/libpng/code.git
 
 or you can browse it with a web browser by selecting the "code" button at
 
-    https://sourceforge.net/projects/libpng/
+    https://sourceforge.net/projects/libpng
 
 Patches can be sent to glennrp at users.sourceforge.net or to
 png-mng-implement at lists.sourceforge.net or you can upload them to
@@ -5167,7 +5168,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.5.29beta02 - April 3, 2017:
+Libpng version 1.5.29beta02 - May 22, 2017:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -5192,7 +5193,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000, through 1.5.29beta02, April 3, 2017, are
+libpng versions 1.0.7, July 1, 2000 through 1.5.29beta02, May 22, 2017, are
 Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -5316,7 +5317,7 @@ files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-April 3, 2017
+May 22, 2017
 
 .\" end of man page
 
