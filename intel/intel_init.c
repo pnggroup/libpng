@@ -5,7 +5,7 @@
  * Written by Mike Klein and Matt Sarett, Google, Inc.
  * Derived from arm/arm_init.c
  *
- * Last changed in libpng 1.6.29 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.29 [March 16, 2017]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

@@ -5830,7 +5830,8 @@ Version 1.6.30beta01 [April 1, 2017]
 Version 1.6.30beta02 [April 22, 2017]
   Document need to check for integer overflow when allocating a pixel
     buffer for multiple rows in contrib/gregbook, contrib/pngminus,
-    example.c, and in the manual (suggested by Jaeseung Choi).
+    example.c, and in the manual (suggested by Jaeseung Choi). This
+    is similar to the bug reported against pngquant in CVE-2016-5735.
   Removed reference to the obsolete PNG_SAFE_LIMITS macro in the documentation.
 
 Version 1.6.30beta03 [May 22, 2017]
@@ -5839,7 +5840,7 @@ Version 1.6.30beta03 [May 22, 2017]
   Test CMAKE_HOST_WIN32 instead of WIN32 in CMakeLists.txt.
   Fix some URL in documentation.
 
-Version 1.6.30beta04 [May 22, 2017]
+Version 1.6.30beta04 [May 24, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
