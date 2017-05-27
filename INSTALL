@@ -78,8 +78,8 @@ Or you can use one of the "projects" in the "projects" directory.
 
 Before installing libpng, you must first install zlib, if it
 is not already on your system.  zlib can usually be found
-wherever you got libpng; otherwise go to http://zlib.net.  You can place
-zlib in the same directory as libpng or in another directory.
+wherever you got libpng; otherwise go to https://zlib.net/.  You can
+place zlib in the same directory as libpng or in another directory.
 
 If your system already has a preinstalled zlib you will still need
 to have access to the zlib.h and zconf.h include files that
