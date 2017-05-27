@@ -1,9 +1,9 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.30beta04 - May 22, 2017
+ libpng version 1.6.30beta04 - May 27, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
- Copyright (c) 1998-2016 Glenn Randers-Pehrson
+ Copyright (c) 1998-2017 Glenn Randers-Pehrson
 
  This document is released under the libpng license.
  For conditions of distribution and use, see the disclaimer
@@ -11,9 +11,9 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.30beta04 - May 22, 2017
+ libpng versions 0.97, January 1998, through 1.6.30beta04 - May 27, 2017
  Updated and distributed by Glenn Randers-Pehrson
- Copyright (c) 1998-2016 Glenn Randers-Pehrson
+ Copyright (c) 1998-2017 Glenn Randers-Pehrson
 
  libpng 1.0 beta 6 - version 0.96 - May 28, 1997
  Updated and distributed by Andreas Dilger
@@ -5216,11 +5216,13 @@ control.  The git repository was built from old libpng-x.y.z.tar.gz files
 going back to version 0.70.  You can access the git repository (read only)
 at
 
-    git://git.code.sf.net/p/libpng/code.git
+    https://github.com/glennrp/libpng or
+    https://git.code.sf.net/p/libpng/code.git
 
-or you can browse it with a web browser by selecting the "code" button at
+or you can browse it with a web browser at
 
-    https://sourceforge.net/projects/libpng
+    https://github.com/glennrp/libpng or
+    https://sourceforge.net/p/libpng/code/ci/libpng16/tree/
 
 Patches can be sent to glennrp at users.sourceforge.net or to
 png-mng-implement at lists.sourceforge.net or you can upload them to
