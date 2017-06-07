@@ -5845,6 +5845,8 @@ Version 1.6.30beta04 [June 7, 2017]
     compression buffer (bug report by Brian Baird).  This bug was
     introduced in libpng-1.6.0.
 
+Version 1.6.30beta05 [June 7, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
