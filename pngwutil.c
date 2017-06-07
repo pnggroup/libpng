@@ -1003,7 +1003,7 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
                optimize_cmf(data, png_image_size(png_ptr));
 #endif
 
-         if (size)
+         if (size > 0)
             png_write_complete_chunk(png_ptr, png_IDAT, data, size);
          png_ptr->mode |= PNG_HAVE_IDAT;
 
@@ -1050,7 +1050,7 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
             optimize_cmf(data, png_image_size(png_ptr));
 #endif
 
-         if (size)
+         if (size > 0)
             png_write_complete_chunk(png_ptr, png_IDAT, data, size);
          png_ptr->zstream.avail_out = 0;
          png_ptr->zstream.next_out = NULL;
