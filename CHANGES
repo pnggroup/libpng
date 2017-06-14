@@ -5842,10 +5842,11 @@ Version 1.6.30beta03 [May 22, 2017]
 
 Version 1.6.30beta04 [June 7, 2017]
   Avoid writing an empty IDAT when the last IDAT exactly fills the
-    compression buffer (bug report by Brian Baird).  This bug was
+    compression buffer (bug report by Brian Baird). This bug was
     introduced in libpng-1.6.0.
 
-Version 1.6.30beta05 [June 7, 2017]
+Version 1.6.30rc01 [June 14, 2017]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
