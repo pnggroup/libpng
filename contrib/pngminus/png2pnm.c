@@ -3,6 +3,7 @@
  *  copyright (C) 1999 by Willem van Schaik <willem at schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
+ *          1.1 - 2017.04.22 - Add buffer-size check (Glenn Randers-Pehrson)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -320,6 +321,10 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   /* row_bytes is the width x number of channels x (bit-depth / 8) */
   row_bytes = png_get_rowbytes (png_ptr, info_ptr);
 
+  if (height > ((size_t)(-1))/row_bytes) /* too big */ {
+    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+    return FALSE;
+  }
   if ((png_pixels = (png_byte *)
      malloc (row_bytes * height * sizeof (png_byte))) == NULL) {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);

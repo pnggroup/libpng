@@ -4,6 +4,7 @@
  *
  *  version 1.0 - 1999.10.15 - First version.
  *  version 1.1 - 2015.07.29 - Fixed leaks (Glenn Randers-Pehrson)
+ *  version 1.2 - 2017.04.22 - Add buffer-size check
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -373,6 +374,9 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
     /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
+  if (height > ((size_t)(-1))/row_bytes) /* too big */ {
+    return FALSE;
+  }
   if ((png_pixels = (png_byte *)
      malloc (row_bytes * height * sizeof (png_byte))) == NULL)
     return FALSE;

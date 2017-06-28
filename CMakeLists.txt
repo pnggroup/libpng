@@ -36,7 +36,7 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 29)
+set(PNGLIB_RELEASE 30)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -80,8 +80,8 @@ set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
 # set definitions and sources for arm
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
-  ${CMAKE_SYSTEM_PROCESSOR} MATCHES "^aarch64")
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
+  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
   set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
      check: (default) use internal checking code;
@@ -110,8 +110,8 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^arm" OR
 endif()
 
 # set definitions and sources for powerpc
-if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "^powerpc*" OR
-	${CMAKE_SYSTEM_PROCESSOR} MATCHES "^ppc64*" )
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
+	CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*" )
   set(PNG_POWERPC_VSX_POSSIBLE_VALUES check on off)
   set(PNG_POWERPC_VSX "check" CACHE STRING "Enable POWERPC VSX optimizations:
      check: (default) use internal checking code;
@@ -718,7 +718,7 @@ ENDIF(NOT CMAKE_LIBRARY_OUTPUT_DIRECTORY)
 # copies if different.
 macro(CREATE_SYMLINK SRC_FILE DEST_FILE)
   FILE(REMOVE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE})
-  if(WIN32 AND NOT CYGWIN AND NOT MSYS)
+  if(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
     ADD_CUSTOM_COMMAND(
         OUTPUT ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE}   ${CMAKE_CURRENT_BINARY_DIR}/${DEST_FILE}
         COMMAND ${CMAKE_COMMAND} -E copy_if_different  "${SRC_FILE}" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE}
@@ -770,7 +770,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.29
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.30
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
@@ -846,7 +846,7 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
   install(FILES libpng.3 libpngpf.3      DESTINATION ${PNG_MAN_DIR}/man3)
   install(FILES png.5                    DESTINATION ${PNG_MAN_DIR}/man5)
   # Install pkg-config files
-  if(NOT WIN32 OR CYGWIN OR MINGW)
+  if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
     install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config

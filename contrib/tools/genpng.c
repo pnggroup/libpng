@@ -1,7 +1,8 @@
 /*- genpng
  *
  * COPYRIGHT: Written by John Cunningham Bowler, 2015.
- * To the extent possible under law, the author has waived all copyright and
+ * Revised by Glenn Randers-Pehrson, 2017, to add buffer-size check.
+ * To the extent possible under law, the authors have waived all copyright and
  * related or neighboring rights to this work.  This work is published from:
  * United States.
  *
@@ -782,6 +783,19 @@ main(int argc, const char **argv)
          fprintf(stderr, "genpng: %s: too many arguments\n", argv[3+7*nshapes]);
          return 1;
       }
+
+#if 1
+     /* TO do: determine whether this guard against overflow is necessary.
+      * This comment in png.h indicates that it should be safe: "libpng will
+      * refuse to process an image where such an overflow would occur", but
+      * I don't see where the image gets rejected when the buffer is too
+      * large before the malloc is attempted.
+      */
+      if (image.height > ((size_t)(-1))/(8*image.width)) {
+         fprintf(stderr, "genpng: image buffer would be too big");
+         return 1;
+      }
+#endif
 
       /* Create the buffer: */
       buffer = malloc(PNG_IMAGE_SIZE(image));
