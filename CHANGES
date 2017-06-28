@@ -5852,6 +5852,9 @@ Version 1.6.30rc02 [June 25, 2017]
   Update copyright year in pnglibconf.h, make ltmain.sh executable.
   Add a reference to the libpng.download site in README.
 
+Version 1.6.30 [June 28, 2017]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,59 +1,46 @@
-Libpng 1.6.30rc02 - June 25, 2017
+Libpng 1.6.30 - June 28, 2017
 
-This is not intended to be a public release. It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.30rc02.tar.xz (LZMA-compressed, recommended)
-   1.6.30rc02.tar.gz
+   libpng-1.6.30.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.30.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1630r02.7z  (LZMA-compressed, recommended)
-   lp1630r02.zip
+   lpng1630.7z  (LZMA-compressed, recommended)
+   lpng1630.zip
 
 Other information:
 
-   1.6.30rc02-README.txt
-   1.6.30rc02-LICENSE.txt
-   libpng-1.6.30rc02-*.asc (armored detached GPG signatures)
+   libpng-1.6.30-README.txt
+   libpng-1.6.30-LICENSE.txt
+   libpng-1.6.30-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.29):
 
-Version 1.6.30beta01 [April 1, 2017]
   Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
     makefile.linux and makefile.solaris-x86 (Cosmin).
   Revised documentation of png_get_error_ptr() in the libpng manual.
   Silence clang -Wcomma and const drop warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
-
-Version 1.6.30beta02 [April 22, 2017]
   Document need to check for integer overflow when allocating a pixel
     buffer for multiple rows in contrib/gregbook, contrib/pngminus,
     example.c, and in the manual (suggested by Jaeseung Choi). This
     is similar to the bug reported against pngquant in CVE-2016-5735.
   Removed reference to the obsolete PNG_SAFE_LIMITS macro in the documentation.
-
-Version 1.6.30beta03 [May 22, 2017]
   Check for integer overflow in contrib/visupng and contrib/tools/genpng.
   Do not double evaluate CMAKE_SYSTEM_PROCESSOR in CMakeLists.txt.
   Test CMAKE_HOST_WIN32 instead of WIN32 in CMakeLists.txt.
   Fix some URL in documentation.
-
-Version 1.6.30beta04 [June 7, 2017]
   Avoid writing an empty IDAT when the last IDAT exactly fills the
-    compression buffer (bug report by Brian Baird). This bug was
+    compression buffer (bug report by Brian Baird).  This bug was
     introduced in libpng-1.6.0.
-
-Version 1.6.30rc01 [June 14, 2017]
-  No changes.
-
-Version 1.6.30rc02 [June 25, 2017]
   Update copyright year in pnglibconf.h, make ltmain.sh executable.
   Add a reference to the libpng.download site in README.
 
