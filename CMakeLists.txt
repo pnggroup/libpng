@@ -217,10 +217,13 @@ find_program(AWK NAMES gawk awk)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-if(NOT AWK)
+if(NOT AWK OR ANDROID)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pngprefix.h.prebuilt
+                 ${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h)
+
   add_custom_target(genfiles) # Dummy
 else()
   include(CMakeParseArguments)
@@ -396,7 +399,7 @@ else()
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
-endif(NOT AWK)
+endif()
 
 # OUR SOURCES
 set(libpng_public_hdrs
@@ -726,12 +729,12 @@ macro(CREATE_SYMLINK SRC_FILE DEST_FILE)
         DEPENDS ${PNG_LIB_TARGETS}
         )
     ADD_CUSTOM_TARGET(${DEST_FILE}_COPY ALL DEPENDS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE})
-  else(WIN32 AND NOT CYGWIN AND NOT MSYS)
+  else()
     get_filename_component(LINK_TARGET "${SRC_FILE}" NAME)
     execute_process(COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${LINK_TARGET}" ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/${DEST_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
     execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "${LINK_TARGET}" ${DEST_FILE} WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
-  endif(WIN32 AND NOT CYGWIN AND NOT MSYS)
+  endif()
 endmacro()
 
 # Create source generation scripts.
@@ -855,7 +858,7 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
             DESTINATION bin)
-  endif(NOT WIN32 OR CYGWIN OR MINGW)
+  endif()
 endif()
 
 # On versions of CMake that support it, create an export file CMake
