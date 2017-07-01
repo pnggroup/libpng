@@ -35,7 +35,9 @@
  * Windows/Visual Studio) there is no effect; the OS specific tests below are
  * still required (as of 2011-05-02.)
  */
-#define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
+#ifndef _POSIX_SOURCE
+# define _POSIX_SOURCE 1 /* Just the POSIX 1003.1 and C89 APIs */
+#endif
 
 #ifndef PNG_VERSION_INFO_ONLY
 /* Standard library headers not required by png.h: */
@@ -466,16 +468,21 @@
    static_cast<type>(static_cast<const void*>(value))
 #else
 #  define png_voidcast(type, value) (value)
-#  ifdef _WIN64
+#  if PNG_ARM_NEON_IMPLEMENTATION == 2 /* hand-coded assembler */
+                                       /* does not recognize "typedef" */
+#    define png_constcast(type, value) ((type)(value))
+#  else
+#    ifdef _WIN64
 #     ifdef __GNUC__
          typedef unsigned long long png_ptruint;
 #     else
          typedef unsigned __int64 png_ptruint;
 #     endif
-#  else
+#    else
       typedef unsigned long png_ptruint;
+#    endif
+#    define png_constcast(type, value) ((type)(png_ptruint)(const void*)(value))
 #  endif
-#  define png_constcast(type, value) ((type)(png_ptruint)(const void*)(value))
 #  define png_aligncast(type, value) ((void*)(value))
 #  define png_aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
