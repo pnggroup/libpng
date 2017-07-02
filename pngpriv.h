@@ -1,7 +1,7 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Last changed in libpng 1.6.30 [June 28, 2017]
+ * Last changed in libpng 1.6.31 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -454,39 +454,6 @@
 #  define png_fixed_error(s1,s2) png_err(s1)
 #endif
 
-/* C allows up-casts from (void*) to any pointer and (const void*) to any
- * pointer to a const object.  C++ regards this as a type error and requires an
- * explicit, static, cast and provides the static_cast<> rune to ensure that
- * const is not cast away.
- */
-#ifdef __cplusplus
-#  define png_voidcast(type, value) static_cast<type>(value)
-#  define png_constcast(type, value) const_cast<type>(value)
-#  define png_aligncast(type, value) \
-   static_cast<type>(static_cast<void*>(value))
-#  define png_aligncastconst(type, value) \
-   static_cast<type>(static_cast<const void*>(value))
-#else
-#  define png_voidcast(type, value) (value)
-#  if PNG_ARM_NEON_IMPLEMENTATION == 2 /* hand-coded assembler */
-                                       /* does not recognize "typedef" */
-#    define png_constcast(type, value) ((type)(value))
-#  else
-#    ifdef _WIN64
-#     ifdef __GNUC__
-         typedef unsigned long long png_ptruint;
-#     else
-         typedef unsigned __int64 png_ptruint;
-#     endif
-#    else
-      typedef unsigned long png_ptruint;
-#    endif
-#    define png_constcast(type, value) ((type)(png_ptruint)(const void*)(value))
-#  endif
-#  define png_aligncast(type, value) ((void*)(value))
-#  define png_aligncastconst(type, value) ((const void*)(value))
-#endif /* __cplusplus */
-
 /* Some fixed point APIs are still required even if not exported because
  * they get used by the corresponding floating point APIs.  This magic
  * deals with this:
@@ -501,6 +468,35 @@
 /* Other defines specific to compilers can go here.  Try to keep
  * them inside an appropriate ifdef/endif pair for portability.
  */
+
+/* C allows up-casts from (void*) to any pointer and (const void*) to any
+ * pointer to a const object.  C++ regards this as a type error and requires an
+ * explicit, static, cast and provides the static_cast<> rune to ensure that
+ * const is not cast away.
+ */
+#ifdef __cplusplus
+#  define png_voidcast(type, value) static_cast<type>(value)
+#  define png_constcast(type, value) const_cast<type>(value)
+#  define png_aligncast(type, value) \
+   static_cast<type>(static_cast<void*>(value))
+#  define png_aligncastconst(type, value) \
+   static_cast<type>(static_cast<const void*>(value))
+#else
+#  define png_voidcast(type, value) (value)
+#  ifdef _WIN64
+#     ifdef __GNUC__
+         typedef unsigned long long png_ptruint;
+#     else
+         typedef unsigned __int64 png_ptruint;
+#     endif
+#  else
+      typedef unsigned long png_ptruint;
+#  endif
+#  define png_constcast(type, value) ((type)(png_ptruint)(const void*)(value))
+#  define png_aligncast(type, value) ((void*)(value))
+#  define png_aligncastconst(type, value) ((const void*)(value))
+#endif /* __cplusplus */
+
 #if defined(PNG_FLOATING_POINT_SUPPORTED) ||\
     defined(PNG_FLOATING_ARITHMETIC_SUPPORTED)
    /* png.c requires the following ANSI-C constants if the conversion of
