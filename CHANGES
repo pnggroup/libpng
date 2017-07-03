@@ -5855,11 +5855,13 @@ Version 1.6.30rc02 [June 25, 2017]
 Version 1.6.30 [June 28, 2017]
   No changes.
 
-Version 1.6.31beta01 [July 1, 2017]
+Version 1.6.31beta01 [July 3, 2017]
   Guard the definition of _POSIX_SOURCE in pngpriv.h (AIX already defines it;
     bug report by Michael Felt).
   Revised pngpriv.h to work around failure to compile arm/filter_neon.S
-    ("typedef" directive is unrecognized by the assembler).
+    ("typedef" directive is unrecognized by the assembler). The problem
+    was introduced in libpng-1.6.30beta01.
+  Added "Requires: zlib" to libpng.pc.in (Pieter Neerincx).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
