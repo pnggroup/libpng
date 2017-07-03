@@ -1,6 +1,6 @@
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.31beta01 - June 28, 2017
+ libpng version 1.6.31beta01 - July 3, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
@@ -11,7 +11,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.31beta01 - June 28, 2017
+ libpng versions 0.97, January 1998, through 1.6.31beta01 - July 3, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
 
@@ -1330,6 +1330,11 @@ in until png_read_end() has read the chunk data following the image.
     rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
     rowbytes       - number of bytes needed to hold a row
+                     This value, the bit_depth, color_type,
+                     and the number of channels can change
+                     if you use transforms such as
+                     png_set_expand(). See
+                     png_read_update_info(), below.
 
     signature = png_get_signature(png_ptr, info_ptr);
 

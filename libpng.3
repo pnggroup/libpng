@@ -1,4 +1,4 @@
-.TH LIBPNG 3 "June 28, 2017"
+.TH LIBPNG 3 "July 3, 2017"
 .SH NAME
 libpng \- Portable Network Graphics (PNG) Reference Library 1.6.31beta01
 .SH SYNOPSIS
@@ -510,7 +510,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.31beta01 - June 28, 2017
+ libpng version 1.6.31beta01 - July 3, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
@@ -521,7 +521,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.31beta01 - June 28, 2017
+ libpng versions 0.97, January 1998, through 1.6.31beta01 - July 3, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
 
@@ -1840,6 +1840,11 @@ in until png_read_end() has read the chunk data following the image.
     rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
     rowbytes       - number of bytes needed to hold a row
+                     This value, the bit_depth, color_type,
+                     and the number of channels can change
+                     if you use transforms such as
+                     png_set_expand(). See
+                     png_read_update_info(), below.
 
     signature = png_get_signature(png_ptr, info_ptr);
 
@@ -6051,7 +6056,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.31beta01 - June 28, 2017:
+Libpng version 1.6.31beta01 - July 3, 2017:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6076,7 +6081,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000 through 1.6.31beta01, June 28, 2017 are
+libpng versions 1.0.7, July 1, 2000 through 1.6.31beta01, July 3, 2017 are
 Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -6204,7 +6209,7 @@ files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-June 28, 2017
+July 3, 2017
 
 .\" end of man page
 
