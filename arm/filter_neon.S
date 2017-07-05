@@ -16,7 +16,7 @@
 #define PNG_VERSION_INFO_ONLY
 #include "../pngpriv.h"
 
-#if defined(__linux__) && defined(__ELF__)
+#if (defined(__linux__) || defined(__FreeBSD__)) && defined(__ELF__)
 .section .note.GNU-stack,"",%progbits /* mark stack as non-executable */
 #endif
 
