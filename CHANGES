@@ -5864,7 +5864,8 @@ Version 1.6.31beta01 [July 5, 2017]
   Added "Requires: zlib" to libpng.pc.in (Pieter Neerincx).
   Added special case for FreeBSD in arm/filter_neon.S (Maya Rashish).
 
-Version 1.6.31beta02 [July 5, 2017]
+Version 1.6.31beta02 [July 6, 2017]
+  Added instructions for disabling hardware optimizations in INSTALL.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
