@@ -285,7 +285,22 @@ those sections that are actually used will be loaded into memory.
 XIV. Enabling or disabling hardware optimizations
 
 Certain hardware capabilites, such as the Intel SSE instructions,
-are normally detected at run time. If you wish to avoid using them,
+are normally detected at run time. Enable them with configure options
+such as one of
+
+   --enable-arm-neon=yes
+   --enable-mips-msa=yes
+   --enable-intel-sse=yes
+   --enable-powerpc-vsx=yes
+
+or, if you are not using "configure", you can use one of
+
+   CPPFLAGS += "-DPNG_ARM_NEON"
+   CPPFLAGS += "-DPNG_MIPS_MSA"
+   CPPFLAGS += "-DPNG_INTEL_SSE"
+   CPPFLAGS += "-DPNG_POWERPC_VSX"
+
+If you wish to avoid using them,
 you can disable them via configure options such as
 
    --enable-arm-neon=no, --enable-mips-msa=no, --enable-intel-sse=no,
