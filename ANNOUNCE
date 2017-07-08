@@ -1,4 +1,4 @@
-Libpng 1.6.31beta02 - July 6, 2017
+Libpng 1.6.31beta02 - July 8, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -69,8 +69,10 @@ Version 1.6.31beta01 [July 5, 2017]
   Added "Requires: zlib" to libpng.pc.in (Pieter Neerincx).
   Added special case for FreeBSD in arm/filter_neon.S (Maya Rashish).
 
-Version 1.6.31beta02 [July 6, 2017]
+Version 1.6.31beta02 [July 8, 2017]
   Added instructions for disabling hardware optimizations in INSTALL.
+  Added "--enable-hardware-optimizations" configuration flag to enable
+    or disable all hardware optimizations with one flag.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

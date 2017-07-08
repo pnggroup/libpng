@@ -293,6 +293,10 @@ such as one of
    --enable-intel-sse=yes
    --enable-powerpc-vsx=yes
 
+or enable them all at once with
+
+   --enable-hardware-optimizations=yes
+
 or, if you are not using "configure", you can use one of
 
    CPPFLAGS += "-DPNG_ARM_NEON"
@@ -301,11 +305,15 @@ or, if you are not using "configure", you can use one of
    CPPFLAGS += "-DPNG_POWERPC_VSX"
 
 If you wish to avoid using them,
-you can disable them via configure options such as
+you can disable them via the configure option
 
-   --enable-arm-neon=no, --enable-mips-msa=no, --enable-intel-sse=no,
-   --enable-powerpc-vsx=no
+   --disable-hardware-optimizations
 
+to disable them all, or
+
+   --enable-intel-sse=no
+
+to disable a particular one,
 or via compiler-command options such as
 
    CPPFLAGS += "-DPNG_ARM_NEON_OPT=0, -DPNG_MIPS_MSA_OPT=0,
