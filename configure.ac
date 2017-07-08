@@ -321,6 +321,7 @@ AC_ARG_ENABLE([hardware-optimizations],
          enable_intel_sse=no
          AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
            [Disable INTEL_SSE optimizations])
+         ;;
       *)
          # allow enabling hardware optimization on any system:
          case "$host_cpu" in
