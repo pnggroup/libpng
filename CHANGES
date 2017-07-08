@@ -5869,6 +5869,8 @@ Version 1.6.31beta02 [July 8, 2017]
   Added "--enable-hardware-optimizations" configuration flag to enable
     or disable all hardware optimizations with one flag.
 
+Version 1.6.31beta03 [July 8, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
