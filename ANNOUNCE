@@ -1,4 +1,4 @@
-Libpng 1.6.31beta03 - July 9, 2017
+Libpng 1.6.31beta04 - July 9, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.31beta03.tar.xz (LZMA-compressed, recommended)
-   1.6.31beta03.tar.gz
+   1.6.31beta04.tar.xz (LZMA-compressed, recommended)
+   1.6.31beta04.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1631b03.7z  (LZMA-compressed, recommended)
-   lp1631b03.zip
+   lp1631b04.7z  (LZMA-compressed, recommended)
+   lp1631b04.zip
 
 Other information:
 
-   1.6.31beta03-README.txt
-   1.6.31beta03-LICENSE.txt
-   libpng-1.6.31beta03-*.asc (armored detached GPG signatures)
+   1.6.31beta04-README.txt
+   1.6.31beta04-LICENSE.txt
+   libpng-1.6.31beta04-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.29):
 
@@ -80,6 +80,8 @@ Version 1.6.31beta03 [July 9, 2017]
     possible integer overflow (Bug report by John Bowler).
   Quieted "declaration after statement" warnings in intel/filter_sse2.c.
   Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
+
+Version 1.6.31beta04 [July 9, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

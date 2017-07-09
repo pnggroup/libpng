@@ -5876,6 +5876,8 @@ Version 1.6.31beta03 [July 9, 2017]
   Quieted "declaration after statement" warnings in intel/filter_sse2.c.
   Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
 
+Version 1.6.31beta04 [July 9, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
