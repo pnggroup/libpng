@@ -174,7 +174,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
     message(FATAL_ERROR
       " PNG_MIPS_MSA must be one of [${PNG_MIPS_MSA_POSSIBLE_VALUES}]")
   elseif(NOT ${PNG_MIPS_MSA} STREQUAL "no")
-    set(libpng_mips
+    set(libpng_mips_sources
       mips/mips_init.c
       mips/filter_msa_intrinsics.c)
     if(${PNG_MIPS_MSA} STREQUAL "on")
@@ -477,8 +477,9 @@ set(libpng_sources
   pngwtran.c
   pngwutil.c
   ${libpng_arm_sources}
-  ${libpng_powerpc_sources}
   ${libpng_intel_sources}
+  ${libpng_mips_sources}
+  ${libpng_powerpc_sources}
 )
 set(pngtest_sources
   pngtest.c
