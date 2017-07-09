@@ -5874,6 +5874,7 @@ Version 1.6.31beta03 [July 9, 2017]
   Changed "int" to "png_size_t" in intel/filter_sse2.c to prevent
     possible integer overflow (Bug report by John Bowler).
   Quieted "declaration after statement" warnings in intel/filter_sse2.c.
+  Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
