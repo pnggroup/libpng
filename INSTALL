@@ -319,6 +319,16 @@ or via compiler-command options such as
    CPPFLAGS += "-DPNG_ARM_NEON_OPT=0, -DPNG_MIPS_MSA_OPT=0,
    -DPNG_INTEL_SSE_OPT=0, -DPNG_POWERPC_VSX_OPT=0"
 
+If you are using cmake, hardware optimizations are "on"
+by default. To disable them, use
+
+    cmake . -DPNG_ARM_NEON=no -DPNG_INTEL_SSE=no \
+            -DPNG_MIPS_MSA=no -DPNG_POWERPC_VSX=no
+
+or disable them all at once with
+
+    cmake . -DPNG_HARDWARE_OPTIMIZATIONS=no
+
 XV. Changes to the build and configuration of libpng in libpng-1.5.x
 
 Details of internal changes to the library code can be found in the CHANGES
