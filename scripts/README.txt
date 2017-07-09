@@ -1,8 +1,10 @@
 
-Makefiles for  libpng version 1.6.31beta03 - July 8, 2017
+Makefiles for  libpng version 1.6.31beta03 - July 9, 2017
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
+                       (gcc, creates libpng16.so.16.1.6.31beta03)
+ makefile.linux-opt=>  Linux/ELF makefile with hardware optimizations on
                        (gcc, creates libpng16.so.16.1.6.31beta03)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
