@@ -17,7 +17,7 @@ exec_prefix=$(prefix)
 
 # Library name:
 LIBNAME = libpng16
-PNGMAJ = 1
+PNGMAJ = 16
 RELEASE = 31
 
 # Shared library names:
