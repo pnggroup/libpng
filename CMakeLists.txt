@@ -902,7 +902,7 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL )
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
             DESTINATION bin)
-  endif(NOT WIN32 OR CYGWIN OR MINGW)
+  endif(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
 endif()
 
 # On versions of CMake that support it, create an export file CMake
