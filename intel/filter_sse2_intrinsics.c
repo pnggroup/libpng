@@ -5,7 +5,7 @@
  * Written by Mike Klein and Matt Sarett
  * Derived from arm/filter_neon_intrinsics.c
  *
- * Last changed in libpng 1.6.29 [March 16, 2017]
+ * Last changed in libpng 1.6.31 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -71,7 +71,7 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_debug(1, "in png_read_filter_row_sub3_sse2");
    __m128i a, d = _mm_setzero_si128();
 
-   int rb = row_info->rowbytes;
+   png_uint_32 rb = row_info->rowbytes;
    while (rb >= 4) {
       a = d; d = load4(row);
       d = _mm_add_epi8(d, a);
@@ -100,8 +100,8 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    png_debug(1, "in png_read_filter_row_sub4_sse2");
    __m128i a, d = _mm_setzero_si128();
 
-   int rb = row_info->rowbytes;
-   while (rb > 0) {
+   png_uint_32 rb = row_info->rowbytes+4;
+   while (rb > 4) {
       a = d; d = load4(row);
       d = _mm_add_epi8(d, a);
       store4(row, d);
@@ -124,7 +124,7 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
    __m128i    b;
    __m128i a, d = zero;
 
-   int rb = row_info->rowbytes;
+   png_uint_32 rb = row_info->rowbytes;
    while (rb >= 4) {
              b = load4(prev);
       a = d; d = load4(row );
@@ -173,8 +173,8 @@ void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
    __m128i    b;
    __m128i a, d = zero;
 
-   int rb = row_info->rowbytes;
-   while (rb > 0) {
+   png_uint_32 rb = row_info->rowbytes+4;
+   while (rb > 4) {
              b = load4(prev);
       a = d; d = load4(row );
 
@@ -242,7 +242,7 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    __m128i c, b = zero,
            a, d = zero;
 
-   int rb = row_info->rowbytes;
+   png_uint_32 rb = row_info->rowbytes;
    while (rb >= 4) {
       /* It's easiest to do this math (particularly, deal with pc) with 16-bit
        * intermediates.
@@ -336,8 +336,8 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    __m128i c, b = zero,
            a, d = zero;
 
-   int rb = row_info->rowbytes;
-   while (rb > 0) {
+   png_uint_32 rb = row_info->rowbytes+4;
+   while (rb > 4) {
       /* It's easiest to do this math (particularly, deal with pc) with 16-bit
        * intermediates.
        */

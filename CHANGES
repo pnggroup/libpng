@@ -5871,6 +5871,8 @@ Version 1.6.31beta02 [July 8, 2017]
 
 Version 1.6.31beta03 [July 9, 2017]
   Updated CMakeLists.txt to add INTEL_SSE and MIPS_MSA platforms.
+  Change "int" to "png_uint_32" in intel/filter_sse2.c to prevent
+    possible integer overflow (Bug report by John Bowler).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
