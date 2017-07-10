@@ -297,12 +297,15 @@ or enable them all at once with
 
    --enable-hardware-optimizations=yes
 
-or, if you are not using "configure", you can use one of
+or, if you are not using "configure", you can use one
+or more of
 
    CPPFLAGS += "-DPNG_ARM_NEON"
    CPPFLAGS += "-DPNG_MIPS_MSA"
    CPPFLAGS += "-DPNG_INTEL_SSE"
    CPPFLAGS += "-DPNG_POWERPC_VSX"
+
+See for example scripts/makefile.linux-opt
 
 If you wish to avoid using them,
 you can disable them via the configure option
