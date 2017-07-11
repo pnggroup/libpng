@@ -5877,6 +5877,16 @@ Version 1.6.31beta03 [July 9, 2017]
   Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
 
 Version 1.6.31beta04 [July 9, 2017]
+  Removed one of the GCC-7.1.0 'strict-overflow' warnings that result when
+    integers appear on both sides of a compare.  Worked around the others by
+    forcing the strict-overflow setting in the relevant functions to a level
+    where they are not reported (John Bowler).
+  Changed "FALL THROUGH" comments to "FALLTHROUGH" because GCC doesn't like
+    the space.
+  Worked around some C-style casts from (void*) because g++ 5.4.0 objects
+    to them.
+  Increased the buffer size for 'sprint' to pass the gcc 7.1.0 'sprint
+    overflow' check that is on by default with -Wall -Wextra.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
