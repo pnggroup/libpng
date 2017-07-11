@@ -5876,7 +5876,7 @@ Version 1.6.31beta03 [July 9, 2017]
   Quieted "declaration after statement" warnings in intel/filter_sse2.c.
   Added scripts/makefile-linux-opt, which has hardware optimizations enabled.
 
-Version 1.6.31beta04 [July 9, 2017]
+Version 1.6.31beta04 [July 11, 2017]
   Removed one of the GCC-7.1.0 'strict-overflow' warnings that result when
     integers appear on both sides of a compare.  Worked around the others by
     forcing the strict-overflow setting in the relevant functions to a level
