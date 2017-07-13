@@ -615,6 +615,16 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    }
 #endif
 
+#ifdef PNG_eXIf_SUPPORTED
+   /* Free any eXIf entry */
+   if (((mask & PNG_FREE_EXIF) & info_ptr->free_me) != 0)
+   {
+      png_free(png_ptr, info_ptr->exif);
+      info_ptr->exif = NULL;
+      info_ptr->valid &= ~PNG_INFO_eXIf;
+   }
+#endif
+
 #ifdef PNG_hIST_SUPPORTED
    /* Free any hIST entry */
    if (((mask & PNG_FREE_HIST) & info_ptr->free_me) != 0)

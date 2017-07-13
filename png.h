@@ -776,6 +776,7 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_sPLT 0x2000U  /* ESR, 1.0.6 */
 #define PNG_INFO_sCAL 0x4000U  /* ESR, 1.0.6 */
 #define PNG_INFO_IDAT 0x8000U  /* ESR, 1.0.6 */
+#define PNG_INFO_eXIf 0x10000U /* GR-P, 1.6.31 */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -1788,7 +1789,8 @@ PNG_EXPORT(99, void, png_data_freer, (png_const_structrp png_ptr,
 #define PNG_FREE_PLTE 0x1000U
 #define PNG_FREE_TRNS 0x2000U
 #define PNG_FREE_TEXT 0x4000U
-#define PNG_FREE_ALL  0x7fffU
+#define PNG_FREE_EXIF 0x8000U /* Added at libpng-1.6.31 */
+#define PNG_FREE_ALL  0xffffU
 #define PNG_FREE_MUL  0x4220U /* PNG_FREE_SPLT|PNG_FREE_TEXT|PNG_FREE_UNKN */
 
 #ifdef PNG_USER_MEM_SUPPORTED
@@ -2007,6 +2009,13 @@ PNG_FIXED_EXPORT(233, void, png_set_cHRM_XYZ_fixed, (png_const_structrp png_ptr,
     png_fixed_point int_blue_Z))
 #endif
 
+#ifdef PNG_eXIf_SUPPORTED
+PNG_EXPORT(246, png_uint_32, png_get_eXIf, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_bytep *exif));
+PNG_EXPORT(247, void, png_set_eXIf, (png_const_structrp png_ptr,
+    png_inforp info_ptr, const png_bytep exif));
+#endif
+
 #ifdef PNG_gAMA_SUPPORTED
 PNG_FP_EXPORT(137, png_uint_32, png_get_gAMA, (png_const_structrp png_ptr,
     png_const_inforp info_ptr, double *file_gamma))
@@ -2025,9 +2034,6 @@ PNG_FIXED_EXPORT(140, void, png_set_gAMA_fixed, (png_const_structrp png_ptr,
 #ifdef PNG_hIST_SUPPORTED
 PNG_EXPORT(141, png_uint_32, png_get_hIST, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_16p *hist));
-#endif
-
-#ifdef PNG_hIST_SUPPORTED
 PNG_EXPORT(142, void, png_set_hIST, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_const_uint_16p hist));
 #endif
@@ -3253,7 +3259,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(245);
+  PNG_EXPORT_LAST_ORDINAL(247);
 #endif
 
 #ifdef __cplusplus

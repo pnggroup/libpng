@@ -2009,6 +2009,44 @@ png_handle_bKGD(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 }
 #endif
 
+#ifdef PNG_READ_eXIf_SUPPORTED
+void /* PRIVATE */
+png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
+{
+   unsigned int i;
+   png_bytep eXIf_buf;
+
+   png_debug(1, "in png_handle_eXIf");
+
+   if ((png_ptr->mode & PNG_HAVE_IHDR) == 0)
+      png_chunk_error(png_ptr, "missing IHDR");
+
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_eXIf) != 0)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "duplicate");
+      return;
+   }
+
+   eXIf_buf = png_voidcast(png_bytep,
+             png_malloc_warn(png_ptr, length));
+
+   for (i = 0; i < length; i++)
+   {
+      png_byte buf[1];
+      png_crc_read(png_ptr, buf, 1);
+      eXIf_buf[i] = buf[0];
+   }
+
+   if (png_crc_finish(png_ptr, 0) != 0)
+      return;
+
+   info_ptr->num_exif = length;
+
+   png_set_eXIf(png_ptr, info_ptr, eXIf_buf);
+}
+#endif
+
 #ifdef PNG_READ_hIST_SUPPORTED
 void /* PRIVATE */
 png_handle_hIST(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)

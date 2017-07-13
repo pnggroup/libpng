@@ -1453,6 +1453,11 @@ png_set_rgb_to_gray()).
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
 
+    png_get_eXIf(png_ptr, info_ptr, &exif);
+                     (PNG_INFO_eXIf)
+
+    exif           - Exif profile (array of png_byte)
+
     png_get_hIST(png_ptr, info_ptr, &hist);
                      (PNG_INFO_hIST)
 
@@ -2498,6 +2503,7 @@ your application instead of by libpng, you can use
              PNG_INFO_gAMA, PNG_INFO_sBIT,
              PNG_INFO_cHRM, PNG_INFO_PLTE,
              PNG_INFO_tRNS, PNG_INFO_bKGD,
+             PNG_INFO_eXIf,
              PNG_INFO_hIST, PNG_INFO_pHYs,
              PNG_INFO_oFFs, PNG_INFO_tIME,
              PNG_INFO_pCAL, PNG_INFO_sRGB,
@@ -3096,6 +3102,11 @@ width, height, bit_depth, and color_type must be the same in each call.
                      (in order red, green, blue) of the
                      single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
+
+    png_set_eXIf(png_ptr, info_ptr, exif);
+
+    hist           - Exif profile (array of
+                     png_byte) (PNG_INFO_eXIf)
 
     png_set_hIST(png_ptr, info_ptr, hist);
 
@@ -5204,6 +5215,11 @@ Starting with libpng-1.6.19, attempting to set an over-length PLTE chunk
 is an error. Previously this requirement of the PNG specification was not
 enforced, and the palette was always limited to 256 entries. An over-length
 PLTE chunk found in an input PNG is silently truncated.
+
+Starting with libpng-1.6.31, the eXIf chunk is supported. Libpng does not
+attempt to decode the Exif profile; it simply returns a byte array
+containing the profile to the calling application which must do its own
+decoding.
 
 XIII.  Detecting libpng
 
