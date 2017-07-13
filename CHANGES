@@ -5888,7 +5888,7 @@ Version 1.6.31beta04 [July 11, 2017]
   Increased the buffer size for 'sprint' to pass the gcc 7.1.0 'sprint
     overflow' check that is on by default with -Wall -Wextra.
 
-Version 1.6.31beta05 [July 11, 2017]
+Version 1.6.31beta05 [July 13, 2017]
   Added eXIf chunk support.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
