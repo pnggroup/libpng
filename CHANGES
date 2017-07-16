@@ -5891,7 +5891,9 @@ Version 1.6.31beta04 [July 11, 2017]
 Version 1.6.31beta05 [July 13, 2017]
   Added eXIf chunk support.
 
-Version 1.6.31beta06 [July 13, 2017]
+Version 1.6.31beta06 [July 16, 2017]
+  Added a minimal eXIf chunk (with Orientation and FocalLengthIn35mmFilm
+    tags) to pngtest.png.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
