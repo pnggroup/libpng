@@ -480,7 +480,7 @@ struct png_struct_def
 #endif
 #endif
 
-/* New member added in libpng-1.6.30 */
+/* New member added in libpng-1.6.31 */
    int num_exif;
 };
 #endif /* PNGSTRUCT_H */
