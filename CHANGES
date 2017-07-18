@@ -5895,6 +5895,9 @@ Version 1.6.31beta06 [July 17, 2017]
   Added a minimal eXIf chunk (with Orientation and FocalLengthIn35mmFilm
     tags) to pngtest.png.
 
+Version 1.6.31beta07 [July 18, 2017]
+  Revised the eXIf chunk in pngtest.png to fix "Bad IFD1 Directory" warning.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
