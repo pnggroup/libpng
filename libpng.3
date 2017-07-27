@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "June 28, 2017"
+.TH LIBPNG 3 "July 27, 2017"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.30
+libpng \- Portable Network Graphics (PNG) Reference Library 1.6.31
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -96,6 +96,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.30
 \fBpng_byte png_get_header_ver (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fBpng_byte png_get_header_version (png_const_structp \fIpng_ptr\fP\fB);\fP
+
+\fBpng_uint_32 png_get_eXIf (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fI*exif\fP\fB);\fP
 
 \fBpng_uint_32 png_get_hIST (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fI*hist\fP\fB);\fP
 
@@ -347,6 +349,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.30
 
 \fBvoid png_set_gray_to_rgb (png_structp \fIpng_ptr\fP\fB);\fP
 
+\fBvoid png_set_eXIf (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fIexif\fP\fB);\fP
+
 \fBvoid png_set_hIST (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fIhist\fP\fB);\fP
 
 \fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_const_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_const_bytep \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
@@ -510,7 +514,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.30 - June 28, 2017
+ libpng version 1.6.31 - July 27, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
@@ -521,7 +525,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.30 - June 28, 2017
+ libpng versions 0.97, January 1998, through 1.6.31 - July 27, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
 
@@ -1840,6 +1844,11 @@ in until png_read_end() has read the chunk data following the image.
     rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 
     rowbytes       - number of bytes needed to hold a row
+                     This value, the bit_depth, color_type,
+                     and the number of channels can change
+                     if you use transforms such as
+                     png_set_expand(). See
+                     png_read_update_info(), below.
 
     signature = png_get_signature(png_ptr, info_ptr);
 
@@ -1957,6 +1966,11 @@ png_set_rgb_to_gray()).
     trans_color    - graylevel or color sample values of
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
+
+    png_get_eXIf(png_ptr, info_ptr, &exif);
+                     (PNG_INFO_eXIf)
+
+    exif           - Exif profile (array of png_byte)
 
     png_get_hIST(png_ptr, info_ptr, &hist);
                      (PNG_INFO_hIST)
@@ -3003,6 +3017,7 @@ your application instead of by libpng, you can use
              PNG_INFO_gAMA, PNG_INFO_sBIT,
              PNG_INFO_cHRM, PNG_INFO_PLTE,
              PNG_INFO_tRNS, PNG_INFO_bKGD,
+             PNG_INFO_eXIf,
              PNG_INFO_hIST, PNG_INFO_pHYs,
              PNG_INFO_oFFs, PNG_INFO_tIME,
              PNG_INFO_pCAL, PNG_INFO_sRGB,
@@ -3601,6 +3616,11 @@ width, height, bit_depth, and color_type must be the same in each call.
                      (in order red, green, blue) of the
                      single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
+
+    png_set_eXIf(png_ptr, info_ptr, exif);
+
+    hist           - Exif profile (array of
+                     png_byte) (PNG_INFO_eXIf)
 
     png_set_hIST(png_ptr, info_ptr, hist);
 
@@ -5710,6 +5730,11 @@ is an error. Previously this requirement of the PNG specification was not
 enforced, and the palette was always limited to 256 entries. An over-length
 PLTE chunk found in an input PNG is silently truncated.
 
+Starting with libpng-1.6.31, the eXIf chunk is supported. Libpng does not
+attempt to decode the Exif profile; it simply returns a byte array
+containing the profile to the calling application which must do its own
+decoding.
+
 .SH XIII.  Detecting libpng
 
 The png_get_io_ptr() function has been present since libpng-0.88, has never
@@ -5893,7 +5918,7 @@ Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.30 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.31 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -5995,7 +6020,7 @@ the first widely used release:
  ...
  1.5.28                  15    10528  15.so.15.28[.0]
  ...
- 1.6.30                  16    10630  16.so.16.30[.0]
+ 1.6.31                  16    10631  16.so.16.31[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -6051,7 +6076,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.30 - June 28, 2017:
+Libpng version 1.6.31 - July 27, 2017:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6076,7 +6101,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000 through 1.6.30, June 28, 2017 are
+libpng versions 1.0.7, July 1, 2000 through 1.6.31, July 27, 2017 are
 Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -6204,7 +6229,7 @@ files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-June 28, 2017
+July 27, 2017
 
 .\" end of man page
 

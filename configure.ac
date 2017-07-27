@@ -25,7 +25,7 @@ AC_PREREQ([2.68])
 
 dnl Version number stuff here:
 
-AC_INIT([libpng],[1.6.30],[png-mng-implement@lists.sourceforge.net])
+AC_INIT([libpng],[1.6.31],[png-mng-implement@lists.sourceforge.net])
 AC_CONFIG_MACRO_DIR([scripts])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
@@ -46,10 +46,10 @@ dnl automake, so the following is not necessary (and is not defined anyway):
 dnl AM_PREREQ([1.11.2])
 dnl stop configure from automagically running automake
 
-PNGLIB_VERSION=1.6.30
+PNGLIB_VERSION=1.6.31
 PNGLIB_MAJOR=1
 PNGLIB_MINOR=6
-PNGLIB_RELEASE=30
+PNGLIB_RELEASE=31
 
 dnl End of version number stuff
 
@@ -300,6 +300,55 @@ AM_CONDITIONAL([DO_INSTALL_LIBPNG_CONFIG],
 # HOST SPECIFIC OPTIONS
 # =====================
 #
+# DEFAULT
+# =======
+#
+AC_ARG_ENABLE([hardware-optimizations],
+   AS_HELP_STRING([[[--enable-hardware-optimizations]]],
+      [Enable hardware optimizations: =no/off, yes/on:]),
+   [case "$enableval" in
+      no|off)
+         # disable hardware optimization on all systems:
+         enable_arm_neon=no
+         AC_DEFINE([PNG_ARM_NEON_OPT], [0],
+           [Disable ARM_NEON optimizations])
+         enable_mips_msa=no
+         AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
+           [Disable MIPS_MSA optimizations])
+         enable_powerpc_vsx=no
+         AC_DEFINE([PNG_POWERPC_VSX_OPT], [0],
+           [Disable POWERPC VSX optimizations])
+         enable_intel_sse=no
+         AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
+           [Disable INTEL_SSE optimizations])
+         ;;
+      *)
+         # allow enabling hardware optimization on any system:
+         case "$host_cpu" in
+            arm*|aarch64*)
+              enable_arm_neon=yes
+              AC_DEFINE([PNG_ARM_NEON_OPT], [0],
+                [Enable ARM_NEON optimizations])
+              ;;
+            mipsel*|mips64el*)
+              enable_mips_msa=yes
+              AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
+                [Enable MIPS_MSA optimizations])
+              ;;
+            i?86|x86_64)
+              enable_intel_sse=yes
+              AC_DEFINE([PNG_INTEL_SSE_OPT], [1],
+                [Enable Intel SSE optimizations])
+              ;;
+            powerpc*|ppc64*)
+              enable_powerpc_vsx=yes
+              AC_DEFINE([PNG_POWERPC_VSX_OPT], [2],
+                [Enable POWERPC VSX optimizations])
+              ;;
+         esac
+         ;;
+   esac])
+
 # ARM
 # ===
 #

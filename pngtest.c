@@ -1192,6 +1192,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
+#ifdef PNG_eXIf_SUPPORTED
+   {
+      png_bytep exif;
+
+      if (png_get_eXIf(read_ptr, read_info_ptr, &exif) != 0)
+         png_set_eXIf(write_ptr, write_info_ptr, exif);
+   }
+#endif
 #ifdef PNG_hIST_SUPPORTED
    {
       png_uint_16p hist;
@@ -1528,6 +1536,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
          png_set_text(write_ptr, write_end_info_ptr, text_ptr, num_text);
       }
+   }
+#endif
+#ifdef PNG_eXIf_SUPPORTED
+   {
+      png_bytep exif;
+
+      if (png_get_eXIf(read_ptr, end_info_ptr, &exif) != 0)
+         png_set_eXIf(write_ptr, write_end_info_ptr, exif);
    }
 #endif
 #ifdef PNG_tIME_SUPPORTED
@@ -2088,4 +2104,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_30 Your_png_h_is_not_version_1_6_30;
+typedef png_libpng_version_1_6_31 Your_png_h_is_not_version_1_6_31;

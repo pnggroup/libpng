@@ -11,7 +11,7 @@ LIBDIR=	${PREFIX}/lib
 MANDIR= ${PREFIX}/man/cat
 
 SHLIB_MAJOR=	16
-SHLIB_MINOR=	1.6.30
+SHLIB_MINOR=	1.6.31
 
 LIB=	png
 SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
