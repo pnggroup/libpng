@@ -5,7 +5,7 @@
  * Written by Mike Klein and Matt Sarett
  * Derived from arm/filter_neon_intrinsics.c
  *
- * Last changed in libpng 1.6.31 [July 27, 2017]
+ * Last changed in libpng 1.6.31 [(PENDING RELEASE)]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
