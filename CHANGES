@@ -5905,6 +5905,9 @@ Version 1.6.31rc02 [July 25, 2017]
   Fixed typo in example.c (png_free_image should be png_image_free) (Bug
     report by John Smith)
 
+Version 1.6.31 [July 27, 2017]
+  No changes.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
