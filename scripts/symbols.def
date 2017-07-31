@@ -250,5 +250,5 @@ EXPORTS
  png_get_palette_max @243
  png_set_option @244
  png_image_write_to_memory @245
- png_get_eXIf @246
- png_set_eXIf @247
+ png_get_eXIf_1 @246
+ png_set_eXIf_1 @247
