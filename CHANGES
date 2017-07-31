@@ -5919,6 +5919,8 @@ Version 1.6.32beta01 [July 31, 2017]
     png_set_eXIf_1(), respectively, to avoid breaking API compatibility
     with libpng-1.6.31.
 
+Version 1.6.32beta02 [July 31, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
