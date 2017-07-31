@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.32beta01, July 27, 2017
+ * libpng version 1.6.32beta01, July 31, 2017
  *
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.32beta01, July 27, 2017:
+ *   libpng versions 0.97, January 1998, through 1.6.32beta01, July 31, 2017:
  *     Glenn Randers-Pehrson.
  *   See also "Contributing Authors", below.
  */
@@ -25,7 +25,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000 through 1.6.32beta01, July 27, 2017 are
+ * libpng versions 1.0.7, July 1, 2000 through 1.6.32beta01, July 31, 2017 are
  * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -213,7 +213,7 @@
  *    ...
  *    1.5.28                  15    10527  15.so.15.28[.0]
  *    ...
- *    1.6.31                  16    10631  16.so.16.31[.0]
+ *    1.6.32                  16    10632  16.so.16.32[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -241,7 +241,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    July 27, 2017
+ *    July 31, 2017
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -310,7 +310,7 @@
 
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.6.32beta01"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.32beta01 - July 27, 2017\n"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.32beta01 - July 31, 2017\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -2011,9 +2011,9 @@ PNG_FIXED_EXPORT(233, void, png_set_cHRM_XYZ_fixed, (png_const_structrp png_ptr,
 
 #ifdef PNG_eXIf_SUPPORTED
 PNG_EXPORT(246, png_uint_32, png_get_eXIf, (png_const_structrp png_ptr,
-    png_inforp info_ptr, png_bytep *exif));
+    png_inforp info_ptr, png_uint_32 *num_exif, png_bytep *exif));
 PNG_EXPORT(247, void, png_set_eXIf, (png_const_structrp png_ptr,
-    png_inforp info_ptr, const png_bytep exif));
+    png_inforp info_ptr, png_uint_32 num_exif, const png_bytep exif));
 #endif
 
 #ifdef PNG_gAMA_SUPPORTED

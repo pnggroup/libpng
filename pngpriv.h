@@ -1143,6 +1143,11 @@ PNG_INTERNAL_FUNCTION(void,png_write_sRGB,(png_structrp png_ptr,
     int intent),PNG_EMPTY);
 #endif
 
+#ifdef PNG_WRITE_eXIf_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_eXIf,(png_structrp png_ptr,
+    png_bytep exif, int num_exif),PNG_EMPTY);
+#endif
+
 #ifdef PNG_WRITE_iCCP_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_write_iCCP,(png_structrp png_ptr,
    png_const_charp name, png_const_bytep profile), PNG_EMPTY);
