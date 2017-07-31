@@ -1479,24 +1479,15 @@ void /* PRIVATE */
 png_write_eXIf(png_structrp png_ptr, png_bytep exif, int num_exif)
 {
    int i;
-   png_byte buf[3];
+   png_byte buf[1];
 
    png_debug(1, "in png_write_eXIf");
-
-   if (num_exif > (int)png_ptr->num_exif)
-   {
-      png_debug2(3, "num_exif = %d, png_ptr->num_exif = %d", num_exif,
-          png_ptr->num_exif);
-
-      png_warning(png_ptr, "Invalid number of exif bytes specified");
-      return;
-   }
 
    png_write_chunk_header(png_ptr, png_eXIf, (png_uint_32)(num_exif));
 
    for (i = 0; i < num_exif; i++)
    {
-      buf[i] = exif[i];
+      buf[0] = exif[i];
       png_write_chunk_data(png_ptr, buf, (png_size_t)1);
    }
 

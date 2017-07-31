@@ -1195,9 +1195,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_eXIf_SUPPORTED
    {
       png_bytep exif;
+      png_uint_32 exif_length;
 
-      if (png_get_eXIf(read_ptr, read_info_ptr, &exif) != 0)
-         png_set_eXIf(write_ptr, write_info_ptr, exif);
+      if (png_get_eXIf(read_ptr, read_info_ptr, &exif_length, &exif) != 0)
+      {
+         printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
+            (int)exif_length);
+         png_set_eXIf(write_ptr, write_info_ptr, exif_length, exif);
+      }
    }
 #endif
 #ifdef PNG_hIST_SUPPORTED
@@ -1406,6 +1411,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
    write_chunks(write_ptr, before_IDAT); /* after PLTE */
 
+   png_write_info(write_ptr, write_end_info_ptr);
+
+   write_chunks(write_ptr, after_IDAT); /* after IDAT */
+
 #ifdef PNG_COMPRESSION_COMPAT
    /* Test the 'compatibility' setting here, if it is available. */
    png_set_compression(write_ptr, PNG_COMPRESSION_COMPAT);
@@ -1541,9 +1550,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 #ifdef PNG_eXIf_SUPPORTED
    {
       png_bytep exif;
+      png_uint_32 exif_length;
 
-      if (png_get_eXIf(read_ptr, end_info_ptr, &exif) != 0)
-         png_set_eXIf(write_ptr, write_end_info_ptr, exif);
+      if (png_get_eXIf(read_ptr, end_info_ptr, &exif_length, &exif) != 0)
+      {
+         printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
+            (int)exif_length);
+         png_set_eXIf(write_ptr, write_end_info_ptr, exif_length, exif);
+      }
    }
 #endif
 #ifdef PNG_tIME_SUPPORTED

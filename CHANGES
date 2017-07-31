@@ -5911,6 +5911,10 @@ Version 1.6.31 [July 27, 2017]
 Version 1.6.32beta01 [July 31, 2017]
   Avoid possible NULL dereference in png_handle_eXIf when benign_errors
     are allowed. Avoid leaking the input buffer "eXIf_buf".
+  Eliminated png_ptr->num_exif member from pngstruct.h and added num_exif
+    to arguments for png_get_eXIf() and png_set_eXIf().
+  Added calls to png_handle_eXIf(() in pngread.c and png_write_eXIf() in
+    pngwrite.c, and made various other fixes to png_write_eXIf().
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

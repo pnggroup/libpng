@@ -137,7 +137,7 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
 #ifdef PNG_eXIf_SUPPORTED
 void PNGAPI
 png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
-    const png_bytep eXIf_buf)
+    const png_uint_32 num_exif, const png_bytep eXIf_buf)
 {
    int i;
 
@@ -147,6 +147,8 @@ png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
       return;
 
    png_free_data(png_ptr, info_ptr, PNG_FREE_EXIF, 0);
+
+   info_ptr->num_exif = num_exif;
 
    info_ptr->exif = png_voidcast(png_bytep, png_malloc_warn(png_ptr,
        info_ptr->num_exif));
@@ -160,7 +162,7 @@ png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
 
    info_ptr->free_me |= PNG_FREE_EXIF;
 
-   for (i = 0; i < info_ptr->num_exif; i++)
+   for (i = 0; i < (int) num_exif; i++)
       info_ptr->exif[i] = eXIf_buf[i];
 
    info_ptr->valid |= PNG_INFO_eXIf;
