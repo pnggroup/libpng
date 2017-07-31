@@ -97,7 +97,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.32beta02
 
 \fBpng_byte png_get_header_version (png_const_structp \fIpng_ptr\fP\fB);\fP
 
-\fBpng_uint_32 png_get_eXIf (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fI*exif\fP\fB);\fP
+\fBpng_uint_32 png_get_eXIf_1 (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fInum_exif\fP\fB, png_bytep \fI*exif\fP\fB);\fP
 
 \fBpng_uint_32 png_get_hIST (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fI*hist\fP\fB);\fP
 
@@ -349,7 +349,7 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.32beta02
 
 \fBvoid png_set_gray_to_rgb (png_structp \fIpng_ptr\fP\fB);\fP
 
-\fBvoid png_set_eXIf (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fIexif\fP\fB);\fP
+\fBvoid png_set_eXIf_1 (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_32 \fP\fInum_exif\fP\fB, png_bytep \fIexif\fP\fB);\fP
 
 \fBvoid png_set_hIST (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fIhist\fP\fB);\fP
 
