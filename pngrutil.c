@@ -2021,7 +2021,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if ((png_ptr->mode & PNG_HAVE_IHDR) == 0)
       png_chunk_error(png_ptr, "missing IHDR");
 
-   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_eXIf) != 0)
+   else if (info_ptr == NULL || (info_ptr->valid & PNG_INFO_eXIf) != 0)
    {
       png_crc_finish(png_ptr, length);
       png_chunk_benign_error(png_ptr, "duplicate");
@@ -2044,6 +2044,8 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    info_ptr->num_exif = length;
 
    png_set_eXIf(png_ptr, info_ptr, eXIf_buf);
+
+   png_free(png_ptr, eXIf_buf);
 }
 #endif
 
