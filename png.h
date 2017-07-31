@@ -2010,9 +2010,9 @@ PNG_FIXED_EXPORT(233, void, png_set_cHRM_XYZ_fixed, (png_const_structrp png_ptr,
 #endif
 
 #ifdef PNG_eXIf_SUPPORTED
-PNG_EXPORT(246, png_uint_32, png_get_eXIf, (png_const_structrp png_ptr,
+PNG_EXPORT(246, png_uint_32, png_get_eXIf_1, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 *num_exif, png_bytep *exif));
-PNG_EXPORT(247, void, png_set_eXIf, (png_const_structrp png_ptr,
+PNG_EXPORT(247, void, png_set_eXIf_1, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 num_exif, const png_bytep exif));
 #endif
 

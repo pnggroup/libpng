@@ -1197,11 +1197,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_bytep exif;
       png_uint_32 exif_length;
 
-      if (png_get_eXIf(read_ptr, read_info_ptr, &exif_length, &exif) != 0)
+      if (png_get_eXIf_1(read_ptr, read_info_ptr, &exif_length, &exif) != 0)
       {
          printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
             (int)exif_length);
-         png_set_eXIf(write_ptr, write_info_ptr, exif_length, exif);
+         png_set_eXIf_1(write_ptr, write_info_ptr, exif_length, exif);
       }
    }
 #endif
@@ -1552,11 +1552,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_bytep exif;
       png_uint_32 exif_length;
 
-      if (png_get_eXIf(read_ptr, end_info_ptr, &exif_length, &exif) != 0)
+      if (png_get_eXIf_1(read_ptr, end_info_ptr, &exif_length, &exif) != 0)
       {
          printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
             (int)exif_length);
-         png_set_eXIf(write_ptr, write_end_info_ptr, exif_length, exif);
+         png_set_eXIf_1(write_ptr, write_end_info_ptr, exif_length, exif);
       }
    }
 #endif

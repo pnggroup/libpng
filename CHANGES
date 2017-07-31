@@ -5915,6 +5915,9 @@ Version 1.6.32beta01 [July 31, 2017]
     to arguments for png_get_eXIf() and png_set_eXIf().
   Added calls to png_handle_eXIf(() in pngread.c and png_write_eXIf() in
     pngwrite.c, and made various other fixes to png_write_eXIf().
+  Changed name of png_get_eXIF and png_set_eXIf() to png_get_eXIf_1() and
+    png_set_eXIf_1(), respectively, to avoid breaking API compatibility
+    with libpng-1.6.31.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
