@@ -5919,7 +5919,7 @@ Version 1.6.32beta01 [July 31, 2017]
     png_set_eXIf_1(), respectively, to avoid breaking API compatibility
     with libpng-1.6.31.
 
-Version 1.6.32beta02 [July 31, 2017]
+Version 1.6.32beta02 [August 1, 2017]
   Updated contrib/libtests/pngunknown.c with eXIf chunk.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net

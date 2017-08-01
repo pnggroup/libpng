@@ -1098,7 +1098,7 @@ static const char *standard_tests[] =
  "sTER", "sTER=if-safe", 0,
  "IDAT", "default=discard", "IDAT=save", 0,
  "sAPI", "bKGD=save", "cHRM=save", "gAMA=save", "all=discard", "iCCP=save",
-   "sBIT=save", "sRGB=save", "eXIf=discard", 0,
+   "sBIT=save", "sRGB=save", "eXIf=save", 0,
  0/*end*/
 };
 
