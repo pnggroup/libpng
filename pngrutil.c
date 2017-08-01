@@ -2039,7 +2039,10 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 
    if (png_crc_finish(png_ptr, 0) != 0)
+   {
+      png_free(png_ptr, eXIf_buf);
       return;
+   }
 
    png_set_eXIf_1(png_ptr, info_ptr, length, eXIf_buf);
 
