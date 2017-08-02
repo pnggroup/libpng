@@ -5927,6 +5927,8 @@ Version 1.6.32beta03 [August 2, 2017]
   Stop memory leak when returning from png_handle_eXIf() with an error
     (Bug report from the OSS-fuzz project).
 
+Version 1.6.32beta04 [August 2, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
