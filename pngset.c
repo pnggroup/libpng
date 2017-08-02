@@ -136,6 +136,14 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
 
 #ifdef PNG_eXIf_SUPPORTED
 void PNGAPI
+png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
+    const png_bytep eXIf_buf)
+{
+  png_set_eXIf_1(png_ptr, info_ptr, (png_uint_32)strlen((char *)eXIf_buf),
+     (const png_bytep) eXIf_buf);
+}
+
+void PNGAPI
 png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
     const png_uint_32 num_exif, const png_bytep eXIf_buf)
 {

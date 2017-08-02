@@ -5928,6 +5928,11 @@ Version 1.6.32beta03 [August 2, 2017]
     (Bug report from the OSS-fuzz project).
 
 Version 1.6.32beta04 [August 2, 2017]
+  Replaced local eXIf_buf with info_ptr-eXIf_buf in png_handle_eXIf().
+  Update libpng.3 and libpng-manual.txt about eXIf functions.
+
+Version 1.6.32beta05 [August 2, 2017]
+  Restored png_get_eXIf() and png_set_eXIf() to maintain API compatability.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
