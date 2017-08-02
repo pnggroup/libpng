@@ -2048,7 +2048,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    if (png_crc_finish(png_ptr, 0) != 0)
       return;
 
-   png_set_eXIf_1(png_ptr, info_ptr, length, info_ptr->eXIf_buf);
+   png_set_eXIf(png_ptr, info_ptr, info_ptr->eXIf_buf);
 
    png_free(png_ptr, info_ptr->eXIf_buf);
    info_ptr->eXIf_buf = NULL;

@@ -1562,13 +1562,14 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       png_bytep exif=NULL;
       png_uint_32 exif_length;
 
-      if (png_get_eXIf_1(read_ptr, end_info_ptr, &exif_length, &exif) != 0)
+      if (png_get_eXIf(read_ptr, end_info_ptr, &exif) != 0)
       {
+         exif_length=(png_uint_32)strlen((const char *)exif);
          if (exif_length > 1)
             printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
                (int)exif_length);
 # ifdef PNG_WRITE_eXIf_SUPPORTED
-         png_set_eXIf_1(write_ptr, write_end_info_ptr, exif_length, exif);
+         png_set_eXIf(write_ptr, write_end_info_ptr, exif);
 # endif
       }
    }
@@ -2131,4 +2132,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_32beta05 Your_png_h_is_not_version_1_6_32beta05;
+typedef png_libpng_version_1_6_32beta06 Your_png_h_is_not_version_1_6_32beta06;

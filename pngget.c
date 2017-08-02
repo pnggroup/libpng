@@ -778,20 +778,11 @@ png_uint_32 PNGAPI
 png_get_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
     png_bytep *exif)
 {
-  png_uint_32 num_exif = (png_uint_32) strlen((char *) exif);
-  return (png_get_eXIf_1(png_ptr, info_ptr, &num_exif, exif));
-}
-
-png_uint_32 PNGAPI
-png_get_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_uint_32 *num_exif, png_bytep *exif)
-{
    png_debug1(1, "in %s retrieval function", "eXIf");
 
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_eXIf) != 0 && exif != NULL)
    {
-      *num_exif = info_ptr->num_exif;
       *exif = info_ptr->exif;
       return (PNG_INFO_eXIf);
    }
