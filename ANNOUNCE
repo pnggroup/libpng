@@ -1,4 +1,4 @@
-Libpng 1.6.32beta03 - August 1, 2017
+Libpng 1.6.32beta03 - August 2, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -39,9 +39,10 @@ Version 1.6.32beta01 [July 31, 2017]
 Version 1.6.32beta02 [August 1, 2017]
   Updated contrib/libtests/pngunknown.c with eXIf chunk.
 
-Version 1.6.32beta03 [August 1, 2017]
+Version 1.6.32beta03 [August 2, 2017]
   Initialized btoa[] in pngstest.c
-  Stop memory leak when returning from png_handle_eXIf() with an error.
+  Stop memory leak when returning from png_handle_eXIf() with an error
+    (Bug report from the OSS-fuzz project).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

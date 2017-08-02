@@ -146,7 +146,11 @@ png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
    if (png_ptr == NULL || info_ptr == NULL)
       return;
 
-   png_free_data(png_ptr, info_ptr, PNG_FREE_EXIF, 0);
+   if (info_ptr->exif)
+   {
+      png_free(png_ptr, info_ptr->exif);
+      info_ptr->exif = NULL;
+   }
 
    info_ptr->num_exif = num_exif;
 

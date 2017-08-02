@@ -936,8 +936,12 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       fprintf(STDERR, "%s -> %s: libpng read error\n", inname, outname);
       png_free(read_ptr, row_buf);
       row_buf = NULL;
+      if (verbose != 0)
+        fprintf(STDERR, "   destroy read structs\n");
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
 #ifdef PNG_WRITE_SUPPORTED
+      if (verbose != 0)
+        fprintf(STDERR, "   destroy write structs\n");
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
 #endif
@@ -952,11 +956,13 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
    if (setjmp(png_jmpbuf(write_ptr)))
    {
       fprintf(STDERR, "%s -> %s: libpng write error\n", inname, outname);
+      if (verbose != 0)
+        fprintf(STDERR, "   destroying read structs\n");
       png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
+      if (verbose != 0)
+        fprintf(STDERR, "   destroying write structs\n");
       png_destroy_info_struct(write_ptr, &write_end_info_ptr);
-#ifdef PNG_WRITE_SUPPORTED
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
-#endif
       FCLOSE(fpin);
       FCLOSE(fpout);
       return (1);
@@ -1192,16 +1198,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#ifdef PNG_eXIf_SUPPORTED
+#ifdef PNG_READ_eXIf_SUPPORTED
    {
-      png_bytep exif;
+      png_bytep exif=NULL;
       png_uint_32 exif_length;
 
       if (png_get_eXIf_1(read_ptr, read_info_ptr, &exif_length, &exif) != 0)
       {
-         printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
-            (int)exif_length);
+         if (exif_length > 1)
+            printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
+               (int)exif_length);
+# ifdef PNG_WRITE_eXIf_SUPPORTED
          png_set_eXIf_1(write_ptr, write_info_ptr, exif_length, exif);
+# endif
       }
    }
 #endif
@@ -1547,16 +1556,19 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       }
    }
 #endif
-#ifdef PNG_eXIf_SUPPORTED
+#ifdef PNG_READ_eXIf_SUPPORTED
    {
-      png_bytep exif;
+      png_bytep exif=NULL;
       png_uint_32 exif_length;
 
       if (png_get_eXIf_1(read_ptr, end_info_ptr, &exif_length, &exif) != 0)
       {
-         printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
-            (int)exif_length);
+         if (exif_length > 1)
+            printf(" eXIf type %c%c, %d bytes\n",exif[0],exif[1],
+               (int)exif_length);
+# ifdef PNG_WRITE_eXIf_SUPPORTED
          png_set_eXIf_1(write_ptr, write_end_info_ptr, exif_length, exif);
+# endif
       }
    }
 #endif
