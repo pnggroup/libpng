@@ -5937,6 +5937,8 @@ Version 1.6.32beta05 [August 2, 2017]
 Version 1.6.32beta06 [August 2, 2017]
   Removed png_get_eXIf_1() and png_set_eXIf_1().
 
+Version 1.6.32beta07 [August 2, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
