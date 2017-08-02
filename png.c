@@ -619,8 +619,18 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
    /* Free any eXIf entry */
    if (((mask & PNG_FREE_EXIF) & info_ptr->free_me) != 0)
    {
-      png_free(png_ptr, info_ptr->exif);
-      info_ptr->exif = NULL;
+# ifdef PNG_READ_eXIf_SUPPORTED
+      if (info_ptr->eXIf_buf)
+      {
+         png_free(png_ptr, info_ptr->eXIf_buf);
+         info_ptr->eXIf_buf = NULL;
+      }
+# endif
+      if (info_ptr->exif)
+      {
+         png_free(png_ptr, info_ptr->exif);
+         info_ptr->exif = NULL;
+      }
       info_ptr->valid &= ~PNG_INFO_eXIf;
    }
 #endif
@@ -806,14 +816,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.32beta03 - August 1, 2017" PNG_STRING_NEWLINE \
+      "libpng version 1.6.32beta03 - August 2, 2017" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.32beta03 - August 1, 2017\
+   return "libpng version 1.6.32beta03 - August 2, 2017\
       Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
