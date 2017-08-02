@@ -1453,7 +1453,7 @@ png_set_rgb_to_gray()).
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
 
-    png_get_eXIf_1(png_ptr, info_ptr, &exif, &num_exif);
+    png_get_eXIf_1(png_ptr, info_ptr, &num_exif, &exif);
                      (PNG_INFO_eXIf)
 
     exif           - Exif profile (array of png_byte)
@@ -3103,9 +3103,9 @@ width, height, bit_depth, and color_type must be the same in each call.
                      single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
 
-    png_set_eXIf_1(png_ptr, info_ptr, exif, num_exif);
+    png_set_eXIf_1(png_ptr, info_ptr, num_exif, exif);
 
-    hist           - Exif profile (array of
+    exif           - Exif profile (array of
                      png_byte) (PNG_INFO_eXIf)
 
     png_set_hIST(png_ptr, info_ptr, hist);
