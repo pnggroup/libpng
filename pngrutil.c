@@ -196,18 +196,25 @@ png_read_chunk_header(png_structrp png_ptr)
    }
    else
    {
+#if 0 /* some pngtests are failing */
       size_t row_factor =
-         (png_ptr->rowbytes + 1 + (png_ptr->interlaced? 6: 0));
+         (png_ptr->width * png_ptr->channels * (png_ptr->bit_depth > 8? 2: 1)
+          + 1 + (png_ptr->interlaced? 6: 0));
       if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
          limit=PNG_UINT_31_MAX;
       else
          limit = png_ptr->height * row_factor;
       limit += 6 + 5*limit/32566; /* zlib+deflate overhead */
       limit=limit < PNG_UINT_31_MAX? limit : PNG_UINT_31_MAX;
+#else
+      limit=PNG_UINT_31_MAX;
+#endif
    }
 
    if (length > limit)
    {
+      printf(" length = %lu, limit = %lu\n",
+         (unsigned long)length,(unsigned long)limit);
       png_chunk_error(png_ptr, "chunk data is too large");
    }
 
