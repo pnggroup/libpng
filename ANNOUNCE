@@ -67,7 +67,8 @@ Version 1.6.32beta08 [August 3, 2017]
 Version 1.6.32beta09 [August 3, 2017]
   Require cmake-2.8.8 in CMakeLists.txt. Revised symlink creation,
     no longer using deprecated cmake LOCATION feature (Clifford Yapp).
-
+  Fixed five-byte error in the calculation of IDAT maximum possible size.
+  
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
