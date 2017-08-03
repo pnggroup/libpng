@@ -1,7 +1,7 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.6.24 [August 4, 2016]
+ * Last changed in libpng 1.6.32 [(PENDING RELEASE)]
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -253,7 +253,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    }
    if (png_ptr->push_length > limit)
    {
-      printf(" png_ptr->push_length = %lu, limit = %lu\n",
+      png_debug2(1," png_ptr->push_length = %lu, limit = %lu",
          (unsigned long)png_ptr->push_length,(unsigned long)limit);
       png_chunk_error(png_ptr, "chunk data is too large");
    }
