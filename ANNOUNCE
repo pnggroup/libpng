@@ -59,6 +59,8 @@ Version 1.6.32beta07 [Auguest 3, 2017]
     OSS-fuzz issue.
 
 Version 1.6.32beta08 [August 3, 2017]
+  Check length of IDAT against maximum possible IDAT size, accounting
+    for height, rowbytes, interlacing and zlib/deflate overhead.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
