@@ -65,7 +65,6 @@ Version 1.6.32beta08 [August 3, 2017]
     does not work (the eXIf chunk data can contain zeroes).
 
 Version 1.6.32beta09 [August 3, 2017]
-  Temporarily disable IDAT length-limiting.
   Require cmake-2.8.8 in CMakeLists.txt. Revised symlink creation,
     no longer using deprecated cmake LOCATION feature (Clifford Yapp).
 

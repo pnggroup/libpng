@@ -226,7 +226,6 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
    if (chunk_name == png_IDAT)
    {
-#if 0 /* some pngtests are failing */
       size_t row_factor =
          (png_ptr->width * png_ptr->channels * (png_ptr->bit_depth > 8? 2: 1)
           + 1 + (png_ptr->interlaced? 6: 0));
@@ -234,11 +233,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
          limit=PNG_UINT_31_MAX;
       else
          limit = png_ptr->height * row_factor;
-      limit += 6 + 5*limit/32566; /* zlib+deflate overhead */
+      limit += 6 + 5*(limit/32566+1); /* zlib+deflate overhead */
       limit=limit < PNG_UINT_31_MAX? limit : PNG_UINT_31_MAX;
-#else
-      limit=PNG_UINT_31_MAX;
-#endif
    }
    else
    {
@@ -253,7 +249,9 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    }
    if (png_ptr->push_length > limit)
    {
-      png_debug2(1," png_ptr->push_length = %lu, limit = %lu",
+      printf(" png_ptr->push_length = %lu, limit = %lu\n",
+         (unsigned long)png_ptr->push_length,(unsigned long)limit);
+      png_debug2(0," png_ptr->push_length = %lu, limit = %lu",
          (unsigned long)png_ptr->push_length,(unsigned long)limit);
       png_chunk_error(png_ptr, "chunk data is too large");
    }
