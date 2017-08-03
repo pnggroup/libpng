@@ -61,6 +61,8 @@ Version 1.6.32beta07 [Auguest 3, 2017]
 Version 1.6.32beta08 [August 3, 2017]
   Check length of IDAT against maximum possible IDAT size, accounting
     for height, rowbytes, interlacing and zlib/deflate overhead.
+  Restored png_get_eXIf_1() and png_set_eXIf_1(), because strlen(eXIf_buf)
+    does not work (the eXIf chunk data can contain zeroes).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

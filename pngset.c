@@ -139,6 +139,15 @@ void PNGAPI
 png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
     const png_bytep eXIf_buf)
 {
+  png_warning(png_ptr, "png_set_eXIf does not work; use png_set_eXIf_1");
+  PNG_UNUSED(info_ptr)
+  PNG_UNUSED(eXIf_buf)
+}
+
+void PNGAPI
+png_set_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
+    const png_uint_32 num_exif, const png_bytep eXIf_buf)
+{
    int i;
 
    png_debug1(1, "in %s storage function", "eXIf");
@@ -152,7 +161,7 @@ png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
       info_ptr->exif = NULL;
    }
 
-   info_ptr->num_exif = (png_uint_32)strlen((const char *)eXIf_buf);
+   info_ptr->num_exif = num_exif;
 
    info_ptr->exif = png_voidcast(png_bytep, png_malloc_warn(png_ptr,
        info_ptr->num_exif));
