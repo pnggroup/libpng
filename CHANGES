@@ -5952,6 +5952,8 @@ Version 1.6.32beta09 [August 3, 2017]
     no longer using deprecated cmake LOCATION feature (Clifford Yapp).
   Fixed five-byte error in the calculation of IDAT maximum possible size.
   
+Version 1.6.32beta10 [August 3, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
