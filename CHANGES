@@ -5938,7 +5938,8 @@ Version 1.6.32beta06 [August 2, 2017]
   Removed png_get_eXIf_1() and png_set_eXIf_1().
 
 Version 1.6.32beta07 [August 3, 2017]
-  Check length of all chunks except IDAT against user limit.
+  Check length of all chunks except IDAT against user limit to fix an
+    OSS-fuzz issue.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
