@@ -688,8 +688,9 @@ where 0x7fffffffL means unlimited.  You can retrieve this limit with
    chunk_cache_max = png_get_chunk_cache_max(png_ptr);
 
 Libpng imposes a limit of 8 Megabytes (8,000,000 bytes) on the amount of
-memory that a compressed chunk other than IDAT can occupy, when decompressed.
-You can change this limit with
+memory that any chunk other than IDAT can occupy, originally or when
+decompressed (prior to libpng-1.6.32 the limit was only applied to compressed
+chunks after decompression). You can change this limit with
 
    png_set_chunk_malloc_max(png_ptr, user_chunk_malloc_max);
 
