@@ -209,8 +209,6 @@ png_read_chunk_header(png_structrp png_ptr)
 
    if (length > limit)
    {
-      printf(" length = %lu, limit = %lu\n",
-         (unsigned long)length,(unsigned long)limit);
       png_debug2(0," length = %lu, limit = %lu",
          (unsigned long)length,(unsigned long)limit);
       png_chunk_error(png_ptr, "chunk data is too large");
