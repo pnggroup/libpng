@@ -5955,6 +5955,10 @@ Version 1.6.32beta09 [August 3, 2017]
 Version 1.6.32beta10 [August 4, 2017]
   Moved chunk-length check into a png_check_chunk_length() private
     function (Suggested by Max Stepin).
+  Moved bad pngs from tests to contrib/libtests/crashers
+  Moved testing of bad pngs into a separate tests/pngtest-badpngs script
+  Added the --xfail (expected FAIL) option to pngtest.c. It writes XFAIL
+    in the output but PASS for the libpng test.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

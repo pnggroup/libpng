@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# various crashers
+# using --relaxed because some come from fuzzers that don't maintain CRC's
+
+./pngtest --relaxed ${srcdir}/contrib/testpngs/crashers/badcrc.png
+./pngtest --relaxed ${srcdir}/contrib/testpngs/crashers/badadler.png
+
+exec ./pngtest --xfail ${srcdir}/contrib/testpngs/crashers/huge_idat.png

@@ -144,6 +144,7 @@ tIME_to_str(png_structp png_ptr, png_charp ts, png_const_timep t)
 static int verbose = 0;
 static int strict = 0;
 static int relaxed = 0;
+static int xfail = 0;
 static int unsupported_chunks = 0; /* chunk unsupported by libpng in input */
 static int error_count = 0; /* count calls to png_error */
 static int warning_count = 0; /* count calls to png_warning */
@@ -1897,6 +1898,15 @@ main(int argc, char *argv[])
          strict = 0;
          relaxed++;
       }
+      else if (strcmp(argv[1], "--xfail") == 0)
+      {
+         status_dots_requested = 0;
+         verbose = 1;
+         inname = argv[2];
+         strict = 0;
+         xfail++;
+         relaxed++;
+      }
 
       else
       {
@@ -1953,8 +1963,13 @@ main(int argc, char *argv[])
 
          else
          {
-            fprintf(STDERR, " FAIL\n");
-            ierror += kerror;
+            if (xfail)
+              fprintf(STDERR, " XFAIL\n");
+            else
+            {
+              fprintf(STDERR, " FAIL\n");
+              ierror += kerror;
+            }
          }
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          if (allocation_now != current_allocation)
@@ -2042,8 +2057,13 @@ main(int argc, char *argv[])
 #endif
             }
 
-            fprintf(STDERR, " FAIL\n");
-            ierror += kerror;
+            if (xfail)
+              fprintf(STDERR, " XFAIL\n");
+            else
+            {
+              fprintf(STDERR, " FAIL\n");
+              ierror += kerror;
+            }
          }
 #if defined(PNG_USER_MEM_SUPPORTED) && PNG_DEBUG
          if (allocation_now != current_allocation)
