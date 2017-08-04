@@ -785,7 +785,7 @@ png_get_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 
 png_uint_32 PNGAPI
-png_get_eXIf_1(png_const_structrp png_ptr, png_inforp info_ptr,
+png_get_eXIf_1(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_uint_32 *num_exif, png_bytep *exif)
 {
    png_debug1(1, "in %s retrieval function", "eXIf");
