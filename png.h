@@ -2014,10 +2014,11 @@ PNG_EXPORT(246, png_uint_32, png_get_eXIf, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_bytep *exif));
 PNG_EXPORT(247, void, png_set_eXIf, (png_const_structrp png_ptr,
     png_inforp info_ptr, const png_bytep exif));
+
 PNG_EXPORT(248, png_uint_32, png_get_eXIf_1, (png_const_structrp png_ptr,
     png_const_inforp info_ptr, png_uint_32 *num_exif, png_bytep *exif));
 PNG_EXPORT(249, void, png_set_eXIf_1, (png_const_structrp png_ptr,
-    png_inforp info_ptr, png_uint_32 num_exif, const png_bytep exif));
+    png_inforp info_ptr, const png_uint_32 num_exif, const png_bytep exif));
 #endif
 
 #ifdef PNG_gAMA_SUPPORTED
