@@ -11,8 +11,8 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-cmake_minimum_required(VERSION 2.8.8)
-cmake_policy(VERSION 2.8.8)
+cmake_minimum_required(VERSION 3.0.2)
+cmake_policy(VERSION 3.0.2)
 
 # Set MacOSX @rpath usage globally.
 if (POLICY CMP0020)
