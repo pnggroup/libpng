@@ -190,6 +190,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       png_crc_read(png_ptr, chunk_tag, 4);
       png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_tag);
       png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+      png_check_chunk_length(png_ptr, png_ptr->chunk_name,
+          png_ptr->push_length);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
@@ -222,38 +224,6 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
       if ((png_ptr->mode & PNG_AFTER_IDAT) != 0)
          png_benign_error(png_ptr, "Too many IDATs found");
-   }
-
-   if (chunk_name == png_IDAT)
-   {
-      size_t row_factor =
-         (png_ptr->width * png_ptr->channels * (png_ptr->bit_depth > 8? 2: 1)
-          + 1 + (png_ptr->interlaced? 6: 0));
-      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
-         limit=PNG_UINT_31_MAX;
-      else
-         limit = png_ptr->height * row_factor;
-      limit += 6 + 5*(limit/32566+1); /* zlib+deflate overhead */
-      limit=limit < PNG_UINT_31_MAX? limit : PNG_UINT_31_MAX;
-   }
-   else
-   {
-# ifdef PNG_SET_USER_LIMITS_SUPPORTED
-      if (png_ptr->user_chunk_malloc_max > 0 &&
-          png_ptr->user_chunk_malloc_max < limit)
-         limit = png_ptr->user_chunk_malloc_max;
-# elif PNG_USER_CHUNK_MALLOC_MAX > 0
-      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
-         limit = PNG_USER_CHUNK_MALLOC_MAX;
-# endif
-   }
-   if (png_ptr->push_length > limit)
-   {
-      printf(" png_ptr->push_length = %lu, limit = %lu\n",
-         (unsigned long)png_ptr->push_length,(unsigned long)limit);
-      png_debug2(0," png_ptr->push_length = %lu, limit = %lu",
-         (unsigned long)png_ptr->push_length,(unsigned long)limit);
-      png_chunk_error(png_ptr, "chunk data is too large");
    }
 
    if (chunk_name == png_IHDR)
