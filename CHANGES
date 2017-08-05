@@ -5965,6 +5965,8 @@ Version 1.6.32beta10 [August 5, 2017]
 
 Version 1.6.32beta11 [August 5, 2017]
   Added "eXIf" to "chunks_to_ignore[]" in png_set_keep_unknown_chunks().
+  Added huge_IDAT.png and empty_ancillary_chunks.png to testpngs/crashers.
+  Make pngtest --strict, --relax, --xfail options imply -m (multiple).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

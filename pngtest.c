@@ -1207,7 +1207,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_eXIf_1(read_ptr, read_info_ptr, &exif_length, &exif) != 0)
       {
          if (exif_length > 1)
-            printf(" eXIf type %c%c, %lu bytes\n",exif[0],exif[1],
+            fprintf(STDERR," eXIf type %c%c, %lu bytes\n",exif[0],exif[1],
                (unsigned long)exif_length);
 # ifdef PNG_WRITE_eXIf_SUPPORTED
          png_set_eXIf_1(write_ptr, write_info_ptr, exif_length, exif);
@@ -1325,10 +1325,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          {
             int i;
 
-            printf("\n");
+            fprintf(STDERR,"\n");
             for (i=0; i<num_text; i++)
             {
-               printf("   Text compression[%d]=%d\n",
+               fprintf(STDERR,"   Text compression[%d]=%d\n",
                    i, text_ptr[i].compression);
             }
          }
@@ -1545,10 +1545,10 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
          {
             int i;
 
-            printf("\n");
+            fprintf(STDERR,"\n");
             for (i=0; i<num_text; i++)
             {
-               printf("   Text compression[%d]=%d\n",
+               fprintf(STDERR,"   Text compression[%d]=%d\n",
                    i, text_ptr[i].compression);
             }
          }
@@ -1565,7 +1565,7 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
       if (png_get_eXIf_1(read_ptr, end_info_ptr, &exif_length, &exif) != 0)
       {
          if (exif_length > 1)
-            printf(" eXIf type %c%c, %lu bytes\n",exif[0],exif[1],
+            fprintf(STDERR," eXIf type %c%c, %lu bytes\n",exif[0],exif[1],
                (unsigned long)exif_length);
 # ifdef PNG_WRITE_eXIf_SUPPORTED
          png_set_eXIf_1(write_ptr, write_end_info_ptr, exif_length, exif);
@@ -1888,6 +1888,7 @@ main(int argc, char *argv[])
          inname = argv[2];
          strict++;
          relaxed = 0;
+         multiple=1;
       }
 
       else if (strcmp(argv[1], "--relaxed") == 0)
@@ -1897,6 +1898,7 @@ main(int argc, char *argv[])
          inname = argv[2];
          strict = 0;
          relaxed++;
+         multiple=1;
       }
       else if (strcmp(argv[1], "--xfail") == 0)
       {
@@ -1906,6 +1908,7 @@ main(int argc, char *argv[])
          strict = 0;
          xfail++;
          relaxed++;
+         multiple=1;
       }
 
       else

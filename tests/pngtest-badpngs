@@ -6,5 +6,6 @@
 ./pngtest --relaxed ${srcdir}/contrib/testpngs/crashers/badcrc.png
 ./pngtest --relaxed ${srcdir}/contrib/testpngs/crashers/badadler.png
 ./pngtest --xfail ${srcdir}/contrib/testpngs/crashers/bad_iccp.png
+./pngtest --xfail ${srcdir}/contrib/testpngs/crashers/empty_ancillary_chunks.png
 
 exec ./pngtest --xfail ${srcdir}/contrib/testpngs/crashers/huge_idat.png
