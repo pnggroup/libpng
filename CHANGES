@@ -5963,6 +5963,8 @@ Version 1.6.32beta10 [August 5, 2017]
   Fix "const" declaration info_ptr argument to png_get_eXIf_1() and the
     num_exif argument to png_get_eXIf_1() (Github Issue 171).
 
+Version 1.6.32beta11 [August 5, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

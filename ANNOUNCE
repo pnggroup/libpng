@@ -1,4 +1,4 @@
-Libpng 1.6.32beta10 - August 5, 2017
+Libpng 1.6.32beta11 - August 5, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.32beta10.tar.xz (LZMA-compressed, recommended)
-   1.6.32beta10.tar.gz
+   1.6.32beta11.tar.xz (LZMA-compressed, recommended)
+   1.6.32beta11.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1632b10.7z  (LZMA-compressed, recommended)
-   lp1632b10.zip
+   lp1632b11.7z  (LZMA-compressed, recommended)
+   lp1632b11.zip
 
 Other information:
 
-   1.6.32beta10-README.txt
-   1.6.32beta10-LICENSE.txt
-   libpng-1.6.32beta10-*.asc (armored detached GPG signatures)
+   1.6.32beta11-README.txt
+   1.6.32beta11-LICENSE.txt
+   libpng-1.6.32beta11-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.31):
 
@@ -79,6 +79,8 @@ Version 1.6.32beta10 [August 5, 2017]
   Require cmake-3.0.2 in CMakeLists.txt (Clifford Yapp).
   Fix "const" declaration info_ptr argument to png_get_eXIf_1() and the
     num_exif argument to png_get_eXIf_1() (Github Issue 171).
+
+Version 1.6.32beta11 [August 5, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
