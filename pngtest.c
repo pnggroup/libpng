@@ -464,7 +464,7 @@ pngtest_warning(png_structp png_ptr, png_const_charp message)
    if (test != NULL && test->file_name != NULL)
       name = test->file_name;
 
-   fprintf(STDERR, "%s: libpng warning: %s\n", name, message);
+   fprintf(STDERR, "\n%s: libpng warning: %s\n", name, message);
 }
 
 /* This is the default error handling function.  Note that replacements for
