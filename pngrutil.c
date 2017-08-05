@@ -3087,25 +3087,26 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
  */
 
 void /* PRIVATE */
-png_check_chunk_name(png_structrp png_ptr, png_uint_32 chunk_name)
+png_check_chunk_name(png_const_structrp png_ptr, const png_uint_32 chunk_name)
 {
    int i;
+   png_uint_32 cn=chunk_name;
 
    png_debug(1, "in png_check_chunk_name");
 
    for (i=1; i<=4; ++i)
    {
-      int c = chunk_name & 0xff;
+      int c = cn & 0xff;
 
       if (c < 65 || c > 122 || (c > 90 && c < 97))
          png_chunk_error(png_ptr, "invalid chunk type");
 
-      chunk_name >>= 8;
+      cn >>= 8;
    }
 }
 
 void /* PRIVATE */
-png_check_chunk_length(png_structrp png_ptr, png_uint_32 length)
+png_check_chunk_length(png_const_structrp png_ptr, const png_uint_32 length)
 {
    png_alloc_size_t limit = PNG_UINT_31_MAX;
 

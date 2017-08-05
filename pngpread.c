@@ -170,7 +170,6 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
    int keep; /* unknown handling method */
 #endif
-   png_alloc_size_t limit = PNG_UINT_31_MAX;
 
    /* First we make sure we have enough data for the 4-byte chunk name
     * and the 4-byte chunk length before proceeding with decoding the
