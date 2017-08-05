@@ -60,6 +60,7 @@ pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # set of parameters:
 TESTS =\
    tests/pngtest\
+   tests/pngtest-badpngs\
    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
    tests/pngvalid-gamma-expand16-background\
