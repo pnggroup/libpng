@@ -1531,7 +1531,7 @@ PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_structrp png_ptr,
     png_uint_32 chunk_name),PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(void,png_check_chunk_length,(png_structrp png_ptr,
-    png_uint_32 chunk_name, png_uint_32 chunk_length),PNG_EMPTY);
+    png_uint_32 chunk_length),PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length, int keep),PNG_EMPTY);

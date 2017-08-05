@@ -190,8 +190,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
       png_crc_read(png_ptr, chunk_tag, 4);
       png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_tag);
       png_check_chunk_name(png_ptr, png_ptr->chunk_name);
-      png_check_chunk_length(png_ptr, png_ptr->chunk_name,
-          png_ptr->push_length);
+      png_check_chunk_length(png_ptr, png_ptr->push_length);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
