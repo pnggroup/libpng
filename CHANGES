@@ -5975,6 +5975,7 @@ Version 1.6.32beta11 [August 6, 2017]
   Increase minimum zlib stream from 9 to 14 in png_handle_iCCP(), to account
     for the minimum 'deflate' stream, and relocate the test to a point
     after the keyword has been read.
+  Check that the eXIf chunk has at least 2 bytes and begins with "II" or "MM".
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
