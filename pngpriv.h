@@ -1737,6 +1737,12 @@ PNG_INTERNAL_FUNCTION(png_chunk_op,png_find_chunk_op,(png_structrp png_ptr),
     * read state.
     */
 
+PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_const_structrp png_ptr,
+    const png_uint_32 chunk_name),PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void,png_check_chunk_length,(png_const_structrp png_ptr,
+    const png_uint_32 chunk_length),PNG_EMPTY);
+
 #ifdef PNG_READ_UNKNOWN_CHUNKS_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_unknown,(png_structrp png_ptr,
    png_inforp info_ptr, png_bytep chunk_data),PNG_EMPTY);

@@ -2,7 +2,7 @@
 /* pngrutil.c - utilities to read a PNG file
  *
  * Last changed in libpng 1.7.0 [(PENDING RELEASE)]
- * Copyright (c) 1998-2002,2004,2006-2016 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -2198,6 +2198,9 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr)
    }
 #endif /* USER_LIMITS */
 
+   /* Note, "length" is sufficient here; we won't be adding
+    * a null terminator later.
+    */
    buffer = png_read_buffer(png_ptr, length, 2/*silent*/);
 
    if (buffer == NULL)
@@ -2623,24 +2626,61 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
  * ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
  */
 
-static void
-png_check_chunk_name(png_structrp png_ptr, png_uint_32 chunk_name)
+void /* PRIVATE */
+png_check_chunk_name(png_const_structrp png_ptr, const png_uint_32 chunk_name)
 {
    int i;
+   png_uint_32 cn=chunk_name;
 
    png_debug(1, "in png_check_chunk_name");
 
    for (i=1; i<=4; ++i)
    {
-      int c = chunk_name & 0xff;
+      int c = cn & 0xff;
 
-      /* This is unrecoverable at present because it most likely indicates
-       * a broken stream.
-       */
       if (c < 65 || c > 122 || (c > 90 && c < 97))
          png_chunk_error(png_ptr, "invalid chunk type");
 
-      chunk_name >>= 8;
+      cn >>= 8;
+   }
+}
+void /* PRIVATE */
+png_check_chunk_length(png_const_structrp png_ptr, const png_uint_32 length)
+{
+   png_alloc_size_t limit = PNG_UINT_31_MAX;
+
+   if (png_ptr->chunk_name != png_IDAT)
+   {
+# ifdef PNG_SET_USER_LIMITS_SUPPORTED
+      if (png_ptr->user_chunk_malloc_max > 0 &&
+          png_ptr->user_chunk_malloc_max < limit)
+         limit = png_ptr->user_chunk_malloc_max;
+# elif PNG_USER_CHUNK_MALLOC_MAX > 0
+      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
+         limit = PNG_USER_CHUNK_MALLOC_MAX;
+# endif
+   }
+   else
+   {
+      /* color_type   0 x 2 3 4 x 6 */
+      int channels[]={1,0,3,1,2,0,4};
+      size_t row_factor =
+         (png_ptr->width * channels[png_ptr->color_type] *
+             (png_ptr->bit_depth > 8? 2: 1)
+          + 1 + (png_ptr->interlaced? 6: 0));
+      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
+         limit=PNG_UINT_31_MAX;
+      else
+         limit = png_ptr->height * row_factor;
+      limit += 6 + 5*(limit/32566+1); /* zlib+deflate overhead */
+      limit=limit < PNG_UINT_31_MAX? limit : PNG_UINT_31_MAX;
+   }
+
+   if (length > limit)
+   {
+      png_debug2(0," length = %lu, limit = %lu",
+         (unsigned long)length,(unsigned long)limit);
+      png_chunk_error(png_ptr, "chunk data is too large");
    }
 }
 

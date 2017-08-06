@@ -743,6 +743,8 @@ png_push_read_chunk_header(png_structrp png_ptr, png_infop info_ptr)
    png_ptr->chunk_length = png_get_uint_31(png_ptr, chunk_header);
    png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_header+4);
    png_reset_crc(png_ptr, chunk_header+4);
+   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+   png_check_chunk_length(png_ptr, png_ptr->chunk_length);
    mode = png_ptr->mode;
    png_ptr->process_mode = png_check_bits(png_ptr,
       png_read_chunk+png_find_chunk_op(png_ptr), 4);

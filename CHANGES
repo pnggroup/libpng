@@ -5731,7 +5731,10 @@ Version 1.7.0beta87 [April 1, 2017]
     makefile.linux and makefile.solaris-x86 (Cosmin).
   Merged some recent changes from libpng-1.6.30beta01.
 
-Version 1.7.0beta88 [April 1, 2017]
+Version 1.7.0beta88 [August 6, 2017]
+  Initialized btoa[] in pngstest.c
+  Added private png_check_chunk_name() and png_check_chunk_length()
+    functions.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
