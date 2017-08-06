@@ -1380,11 +1380,12 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * chunk is just ignored, so does not invalidate the color space.  An
     * alternative is to set the 'invalid' flags at the start of this routine
     * and only clear them in they were not set before and all the tests pass.
-    * The minimum 'deflate' stream is assumed to be just the 2 byte header and
-    * 4 byte checksum.  The keyword must be at least one character and there is
-    * a terminator (0) byte and the compression method.
+    * The minimum 'zlib' stream is assumed to be just the 2 byte header,
+    * 5 bytes minimum 'deflate' stream, and the 4 byte checksum. The keyword
+    * must be at least one character and there is a terminator (0) byte and
+    * the compression method.
     */
-   if (length < 9)
+   if (length < 14)
    {
       png_crc_finish(png_ptr, length);
       png_chunk_benign_error(png_ptr, "too short");
