@@ -2066,7 +2066,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       png_byte buf[1];
       png_crc_read(png_ptr, buf, 1);
       info_ptr->eXIf_buf[i] = buf[0];
-      if (i == 2 && buf[0] != 'M' && buf[0] != 'I'
+      if (i == 1 && buf[0] != 'M' && buf[0] != 'I'
                  && info_ptr->eXIf_buf[0] != buf[0])
       {
          png_crc_finish(png_ptr, length);
