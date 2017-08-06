@@ -1,4 +1,7 @@
 #!/bin/sh
 ./pngtest --relaxed ${srcdir}/tests/badcrc.png
 ./pngtest --relaxed ${srcdir}/tests/badadler.png
+./pngtest --relaxed ${srcdir}/tests/bad_iccp.png
+./pngtest --relaxed ${srcdir}/tests/huge_idat.png
+./pngtest --relaxed ${srcdir}/tests/empty_ancillary_chunks.png
 exec ./pngtest --strict ${srcdir}/pngtest.png
