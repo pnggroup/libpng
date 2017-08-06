@@ -5969,6 +5969,7 @@ Version 1.6.32beta11 [August 6, 2017]
   Make pngtest --strict, --relax, --xfail options imply -m (multiple).
   Removed unused chunk_name parameter from png_check_chunk_length().
   Relocated setting free_me for eXIf data, to stop an OSS-fuzz leak.
+  Initialize profile_header[] in png_handle_iCCP() to fix OSS-fuzz issue.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

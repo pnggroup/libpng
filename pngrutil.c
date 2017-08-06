@@ -1434,7 +1434,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
             if (png_inflate_claim(png_ptr, png_iCCP) == Z_OK)
             {
-               Byte profile_header[132];
+               Byte profile_header[132]={0};
                Byte local_buffer[PNG_INFLATE_BUF_SIZE];
                png_alloc_size_t size = (sizeof profile_header);
 
