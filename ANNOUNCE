@@ -90,7 +90,8 @@ Version 1.6.32beta11 [August 6, 2017]
   Initialize png_ptr->row_buf[0] to 255 in png_read_row() to fix OSS-fuzz UMR.
   Attempt to fix a UMR in png_set_text_2() to fix OSS-fuzz issue.
   Increase minimum zlib stream from 9 to 14 in png_handle_iCCP(), to account
-    for the minimum 'deflate' stream.
+    for the minimum 'deflate' stream, and relocate the test to a point
+    after the keyword has been read.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
