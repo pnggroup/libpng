@@ -1382,6 +1382,17 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * and only clear them in they were not set before and all the tests pass.
     */
 
+   /* The keyword must be at least one character and there is a
+    * terminator (0) byte and the compression method byte, and the
+    * 'zlib' datastream is at least 11 bytes.
+    */
+   if (length < 14)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "too short");
+      return;
+   }
+
    /* If a colorspace error has already been output skip this chunk */
    if ((png_ptr->colorspace.flags & PNG_COLORSPACE_INVALID) != 0)
    {
@@ -1407,18 +1418,15 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       png_crc_read(png_ptr, (png_bytep)keyword, read_length);
       length -= read_length;
 
-   /* The minimum 'zlib' stream is assumed to be just the 2 byte header,
-    * 5 bytes minimum 'deflate' stream, and the 4 byte checksum. The keyword
-    * must be at least one character and there is a terminator (0) byte and
-    * the compression method.
-    */
-
-   if (length < 14)
-   {
-      png_crc_finish(png_ptr, length);
-      png_chunk_benign_error(png_ptr, "too short");
-      return;
-   }
+      /* The minimum 'zlib' stream is assumed to be just the 2 byte header,
+       * 5 bytes minimum 'deflate' stream, and the 4 byte checksum.
+       */
+      if (length < 11)
+      {
+         png_crc_finish(png_ptr, length);
+         png_chunk_benign_error(png_ptr, "too short");
+         return;
+      }
 
       keyword_length = 0;
       while (keyword_length < 80 && keyword_length < read_length &&
