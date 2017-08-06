@@ -87,6 +87,8 @@ Version 1.6.32beta11 [August 6, 2017]
   Removed unused chunk_name parameter from png_check_chunk_length().
   Relocated setting free_me for eXIf data, to stop an OSS-fuzz leak.
   Initialize profile_header[] in png_handle_iCCP() to fix OSS-fuzz issue.
+  Initialize png_ptr->row_buf[0] to 255 in png_read_row() to fix OSS-fuzz UMR.
+  Attempt to fix a UMR in png_set_text_2() to fix OSS-fuzz issue.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

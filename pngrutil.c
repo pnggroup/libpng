@@ -2636,23 +2636,28 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       {
          png_text text;
 
-         /* It worked; png_ptr->read_buffer now looks like a tEXt chunk except
-          * for the extra compression type byte and the fact that it isn't
-          * necessarily '\0' terminated.
-          */
-         buffer = png_ptr->read_buffer;
-         buffer[uncompressed_length+(keyword_length+2)] = 0;
+         if (png_ptr->read_buffer == NULL)
+           errmsg="Read failure in png_handle_zTXt";
+         else
+         {
+            /* It worked; png_ptr->read_buffer now looks like a tEXt chunk
+             * except for the extra compression type byte and the fact that
+             * it isn't necessarily '\0' terminated.
+             */
+            buffer = png_ptr->read_buffer;
+            buffer[uncompressed_length+(keyword_length+2)] = 0;
 
-         text.compression = PNG_TEXT_COMPRESSION_zTXt;
-         text.key = (png_charp)buffer;
-         text.text = (png_charp)(buffer + keyword_length+2);
-         text.text_length = uncompressed_length;
-         text.itxt_length = 0;
-         text.lang = NULL;
-         text.lang_key = NULL;
+            text.compression = PNG_TEXT_COMPRESSION_zTXt;
+            text.key = (png_charp)buffer;
+            text.text = (png_charp)(buffer + keyword_length+2);
+            text.text_length = uncompressed_length;
+            text.itxt_length = 0;
+            text.lang = NULL;
+            text.lang_key = NULL;
 
-         if (png_set_text_2(png_ptr, info_ptr, &text, 1) != 0)
-            errmsg = "insufficient memory";
+            if (png_set_text_2(png_ptr, info_ptr, &text, 1) != 0)
+               errmsg = "insufficient memory";
+         }
       }
 
       else
