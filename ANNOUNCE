@@ -1,4 +1,4 @@
-Libpng 1.6.32beta11 - August 5, 2017
+Libpng 1.6.32beta11 - August 6, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -80,11 +80,12 @@ Version 1.6.32beta10 [August 5, 2017]
   Fix "const" declaration info_ptr argument to png_get_eXIf_1() and the
     num_exif argument to png_get_eXIf_1() (Github Issue 171).
 
-Version 1.6.32beta11 [August 5, 2017]
+Version 1.6.32beta11 [August 6, 2017]
   Added "eXIf" to "chunks_to_ignore[]" in png_set_keep_unknown_chunks().
   Added huge_IDAT.png and empty_ancillary_chunks.png to testpngs/crashers.
   Make pngtest --strict, --relax, --xfail options imply -m (multiple).
   Removed unused chunk_name parameter from png_check_chunk_length().
+  Relocated setting free_me for eXIf data, to stop an OSS-fuzz leak.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

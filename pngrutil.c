@@ -2030,6 +2030,8 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
+   info_ptr->free_me |= PNG_FREE_EXIF;
+
    info_ptr->eXIf_buf = png_voidcast(png_bytep,
              png_malloc_warn(png_ptr, length));
 
@@ -2040,7 +2042,6 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       return;
    }
 
-   info_ptr->free_me |= PNG_FREE_EXIF;
    for (i = 0; i < length; i++)
    {
       png_byte buf[1];
