@@ -1,9 +1,8 @@
 /*-
  * pngstest.c
  *
- * Copyright (c) 2013-2016 John Cunningham Bowler
- *
- * Last changed in libpng 1.6.24 [August 4, 2016]
+ * Last changed in libpng 1.6.31 [July 27, 2017]
+ * Copyright (c) 2013-2017 John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -2611,9 +2610,9 @@ compare_two_images(Image *a, Image *b, int via_linear,
    const unsigned int b_sample = PNG_IMAGE_SAMPLE_SIZE(formatb);
    int alpha_added, alpha_removed;
    int bchannels;
-   int btoa[4];
    png_uint_32 y;
    Transform tr;
+   int btoa[4]={0,0,0,0};
 
    /* This should never happen: */
    if (width != b->image.width || height != b->image.height)
@@ -2746,22 +2745,27 @@ compare_two_images(Image *a, Image *b, int via_linear,
        */
       else if ((a->opts & ACCUMULATE) == 0)
       {
+#        ifdef __GNUC__
+#           define BYTE_CHARS 20 /* 2^32: GCC sprintf warning */
+#        else
+#           define BYTE_CHARS 3 /* 2^8: real maximum value */
+#        endif
          /* Check the original image first,
           * TODO: deal with input images with bad pixel values?
           */
          if (amax >= a->image.colormap_entries)
          {
-            char pindex[9];
-            sprintf(pindex, "%d[%lu]", amax,
-               (unsigned long)a->image.colormap_entries);
+            char pindex[3+2*BYTE_CHARS];
+            sprintf(pindex, "%d[%u]", amax,
+               (png_byte)/*SAFE*/a->image.colormap_entries);
             return logerror(a, a->file_name, ": bad pixel index: ", pindex);
          }
 
          else if (bmax >= b->image.colormap_entries)
          {
-            char pindex[9];
-            sprintf(pindex, "%d[%lu]", bmax,
-               (unsigned long)b->image.colormap_entries);
+            char pindex[3+2*BYTE_CHARS];
+            sprintf(pindex, "%d[%u]", bmax,
+               (png_byte)/*SAFE*/b->image.colormap_entries);
             return logerror(b, b->file_name, ": bad pixel index: ", pindex);
          }
       }
@@ -2881,10 +2885,13 @@ compare_two_images(Image *a, Image *b, int via_linear,
                {
                   case 4:
                      if (pua[btoa[3]] != pub[3]) break;
+                     /* FALLTHROUGH */
                   case 3:
                      if (pua[btoa[2]] != pub[2]) break;
+                     /* FALLTHROUGH */
                   case 2:
                      if (pua[btoa[1]] != pub[1]) break;
+                     /* FALLTHROUGH */
                   case 1:
                      if (pua[btoa[0]] != pub[0]) break;
                      if (alpha_added != 4 && pub[alpha_added] != 65535) break;
@@ -2900,10 +2907,13 @@ compare_two_images(Image *a, Image *b, int via_linear,
                {
                   case 4:
                      if (psa[btoa[3]] != psb[3]) break;
+                     /* FALLTHROUGH */
                   case 3:
                      if (psa[btoa[2]] != psb[2]) break;
+                     /* FALLTHROUGH */
                   case 2:
                      if (psa[btoa[1]] != psb[1]) break;
+                     /* FALLTHROUGH */
                   case 1:
                      if (psa[btoa[0]] != psb[0]) break;
                      if (alpha_added != 4 && psb[alpha_added] != 255) break;
