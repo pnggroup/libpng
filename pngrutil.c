@@ -171,6 +171,9 @@ png_read_chunk_header(png_structp png_ptr)
    /* Put the chunk name into png_ptr->chunk_name. */
    png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(buf+4);
 
+   /* Check to see if chunk name is valid. */
+   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+
    png_debug2(0, "Reading %lx chunk, length = %lu",
        (unsigned long)png_ptr->chunk_name, (unsigned long)length);
 
@@ -178,8 +181,8 @@ png_read_chunk_header(png_structp png_ptr)
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, buf + 4, 4);
 
-   /* Check to see if chunk name is valid. */
-   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+   /* Check for too-large chunk length */
+   png_check_chunk_length(png_ptr, length);
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
@@ -2803,17 +2806,55 @@ void /* PRIVATE */
 png_check_chunk_name(png_structp png_ptr, png_uint_32 chunk_name)
 {
    int i;
+   png_uint_32 cn=chunk_name;
 
    png_debug(1, "in png_check_chunk_name");
 
    for (i=1; i<=4; ++i)
    {
-      int c = chunk_name & 0xff;
+      int c = cn & 0xff;
 
       if (c < 65 || c > 122 || (c > 90 && c < 97))
          png_chunk_error(png_ptr, "invalid chunk type");
 
-      chunk_name >>= 8;
+      cn >>= 8;
+   }
+}
+
+void /* PRIVATE */
+png_check_chunk_length(png_structp png_ptr, png_uint_32 length)
+{
+   png_uint_32 limit = PNG_UINT_31_MAX;
+
+   if (png_ptr->chunk_name != png_IDAT)
+   {
+# ifdef PNG_SET_USER_LIMITS_SUPPORTED
+      if (png_ptr->user_chunk_malloc_max > 0 &&
+          png_ptr->user_chunk_malloc_max < limit)
+         limit = png_ptr->user_chunk_malloc_max;
+# elif PNG_USER_CHUNK_MALLOC_MAX > 0
+      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
+         limit = PNG_USER_CHUNK_MALLOC_MAX;
+# endif
+   }
+   else
+   {
+      size_t row_factor =
+         (png_ptr->width * png_ptr->channels * (png_ptr->bit_depth > 8? 2: 1)
+          + 1 + (png_ptr->interlaced? 6: 0));
+      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
+         limit=PNG_UINT_31_MAX;
+      else
+         limit = png_ptr->height * row_factor;
+      limit += 6 + 5*(limit/32566+1); /* zlib+deflate overhead */
+      limit=limit < PNG_UINT_31_MAX? limit : PNG_UINT_31_MAX;
+   }
+
+   if (length > limit)
+   {
+      png_debug2(0," length = %lu, limit = %lu",
+         (unsigned long)length,(unsigned long)limit);
+      png_chunk_error(png_ptr, "chunk data is too large");
    }
 }
 

@@ -1,5 +1,5 @@
 
-Libpng 1.5.29beta02 - April 1, 2017
+Libpng 1.5.29beta02 - August 7, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -34,7 +34,11 @@ version 1.5.29beta01 [April 1, 2017]
   Silence clang -Wcomma warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
 
-version 1.5.29beta02 [April 1, 2017]
+version 1.5.29beta02 [August 7, 2017]
+  Moved chunk-name and chunk-length checks into PNG_EXTERN private
+    png_check_chunk_name() and png_check_chunk_length() functions
+    (Suggested by Max Stepin).
+  Merged pngtest.c with libpng-1.6.32.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

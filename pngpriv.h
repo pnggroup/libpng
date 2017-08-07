@@ -1,8 +1,8 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Last changed in libpng 1.5.26 [December 17, 2015]
- * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
+ * Last changed in libpng 1.5.29 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2002,2004,2006-2015,2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -180,12 +180,9 @@
 
 /* SECURITY and SAFETY:
  *
- * By default libpng is built without any internal limits on image size,
- * individual heap (png_malloc) allocations or the total amount of memory used.
- * If PNG_SAFE_LIMITS_SUPPORTED is defined, however, the limits below are used
- * (unless individually overridden).  These limits are believed to be fairly
- * safe, but builders of secure systems should verify the values against the
- * real system capabilities.
+ * libpng is built with support for internal limits on image dimensions and
+ * memory usage.  These are documented in scripts/pnglibconf.dfa of the
+ * source and recorded in the machine generated header file pnglibconf.h.
  */
 
 /* config.h is created by and PNG_CONFIGURE_LIBPNG is set by the "configure"
@@ -1271,6 +1268,12 @@ PNG_EXTERN void png_handle_tRNS PNGARG((png_structp png_ptr, png_infop info_ptr,
 PNG_EXTERN void png_handle_zTXt PNGARG((png_structp png_ptr, png_infop info_ptr,
     png_uint_32 length));
 #endif
+
+PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
+    png_uint_32 chunk_name));
+
+PNG_EXTERN void png_check_chunk_length PNGARG((png_structp png_ptr,
+    png_uint_32 chunk_length));
 
 PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
     png_infop info_ptr, png_uint_32 length));
