@@ -539,6 +539,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
       png_error(png_ptr, "Invalid attempt to read row data");
 
    /* Fill the row with IDAT data: */
+   png_ptr->row_buf[0]=255; /* to force error if no data was found */
    png_read_IDAT_data(png_ptr, png_ptr->row_buf, row_info.rowbytes + 1);
 
    if (png_ptr->row_buf[0] > PNG_FILTER_VALUE_NONE)
