@@ -1,9 +1,9 @@
 
 /* pngpriv.h - private declarations for use inside libpng
  *
- * libpng version 1.4.20 - December 29, 2016
+ * libpng version 1.4.21beta01 - August 7, 2017
  * For conditions of distribution and use, see copyright notice in png.h
- * Copyright (c) 1998-2002,2004,2006-2014 Glenn Randers-Pehrson
+ * Copyright (c) 1998-2002,2004,2006-2014,2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -751,6 +751,9 @@ PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
 
 PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
    png_bytep chunk_name));
+
+PNG_EXTERN void png_check_chunk_length PNGARG((png_structp png_ptr,
+   png_uint_32 chunk_length));
 
 /* Handle the transformations for reading and writing */
 PNG_EXTERN void png_do_read_transformations PNGARG((png_structp png_ptr));
