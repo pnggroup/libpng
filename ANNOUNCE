@@ -41,7 +41,9 @@ Other information:
 Changes since the last public release (1.2.57):
 
 version 1.2.58beta01 [August 7, 2017]
-   Added png_check_chunk_length() function.
+  Added png_check_chunk_length() function, and check all chunks except
+    IDAT against the default 8MB limit; check IDAT against the maximum
+    size computed from IHDR parameters.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
