@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.2.58beta01, December 30, 2016
+ * libpng version 1.2.58beta01, August 7, 2017
  *
  * Copyright (c) 1998-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
@@ -12,7 +12,7 @@
  * Authors and maintainers:
  *  libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *  libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *  libpng versions 0.97, January 1998, through 1.2.58beta01, December 30, 2016: Glenn
+ *  libpng versions 0.97, January 1998, through 1.2.58beta01, August 7, 2017: Glenn
  *  See also "Contributing Authors", below.
  */
 
@@ -24,7 +24,7 @@
  *
  * This code is released under the libpng license.
  *
- * libpng versions 1.0.7, July 1, 2000, through 1.2.58beta01, December 30, 2016, are
+ * libpng versions 1.0.7, July 1, 2000, through 1.2.58beta01, August 7, 2017, are
  * Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
@@ -179,8 +179,8 @@
  *    ...
  *    1.0.19                  10    10019  10.so.0.19[.0]
  *    ...
- *    1.0.67                  10    10067  10.so.0.67[.0]
- *    1.2.57                  13    10257  12.so.0.57[.0]
+ *    1.0.68                  10    10068  10.so.0.68[.0]
+ *    1.2.58                  13    10258  12.so.0.58[.0]
  *
  *    Henceforth the source version will match the shared-library major
  *    and minor numbers; the shared-library major version number will be
@@ -208,7 +208,7 @@
  * Y2K compliance in libpng:
  * =========================
  *
- *    December 30, 2016
+ *    August 7, 2017
  *
  *    Since the PNG Development group is an ad-hoc body, we can't make
  *    an official declaration.
@@ -272,7 +272,7 @@
 /* Version information for png.h - this should match the version in png.c */
 #define PNG_LIBPNG_VER_STRING "1.2.58beta01"
 #define PNG_HEADER_VERSION_STRING \
-   " libpng version 1.2.58beta01 - December 30, 2016\n"
+   " libpng version 1.2.58beta01 - August 7, 2017\n"
 
 #define PNG_LIBPNG_VER_SONUM   0
 #define PNG_LIBPNG_VER_DLLNUM  13
@@ -3408,6 +3408,9 @@ PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
 
 PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
    png_bytep chunk_name)) PNG_PRIVATE;
+
+PNG_EXTERN void png_check_chunk_length PNGARG((png_structp png_ptr,
+   png_uint_32 chunk_length)) PNG_PRIVATE;
 
 /* Handle the transformations for reading and writing */
 PNG_EXTERN void png_do_read_transformations
