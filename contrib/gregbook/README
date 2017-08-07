@@ -63,7 +63,7 @@ BUILD INSTRUCTIONS
 
  - Prerequisites (in order of compilation):
 
-      - zlib            http://zlib.net/
+      - zlib            https://zlib.net/
       - libpng          http://www.libpng.org/pub/png/libpng.html
       - pngbook         http://www.libpng.org/pub/png/book/sources.html
 

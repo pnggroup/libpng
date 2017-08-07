@@ -1,4 +1,4 @@
-README for libpng version 1.5.29beta02 - April 1, 2017 (shared library 15.0)
+README for libpng version 1.5.29beta02 - August 7, 2017 (shared library 15.0)
 See the note about version numbers near the top of png.h
 
 See INSTALL for instructions on how to install libpng.
@@ -88,11 +88,11 @@ zlib should be available at the same place that libpng is, or at zlib.net.
 
 You may also want a copy of the PNG specification.  It is available
 as an RFC, a W3C Recommendation, and an ISO/IEC Standard.  You can find
-these at http://www.libpng.org/pub/png/documents/
+these at http://www.libpng.org/pub/png/pngdocs.html .
 
 This code is currently being archived at libpng.sourceforge.io in the
-[DOWNLOAD] area, and at ftp://ftp.simplesystems.org.  If you can't find it
-in any of those places, e-mail me, and I'll help you find it.
+[DOWNLOAD] area, and at ftp://ftp-osl.osuosl.org/pub/libpng/src .  If you
+can't find it in any of those places, e-mail me, and I'll help you find it.
 
 I am not a lawyer, but I believe that the Export Control Classification
 Number (ECCN) for libpng is EAR99, which means not subject to export
