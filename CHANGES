@@ -3041,9 +3041,12 @@ version 1.4.20rc01 [December 27, 2016]
 
 version 1.4.20 [December 29, 2016]
   Fixed a potential null pointer dereference in png_set_text_2() (bug report
-    and patch by Patrick Keshishian).
+    and patch by Patrick Keshishian, CVE-2016-10087).
 
-version 1.4.21 [December 30, 2016]
+version 1.4.21 [August 7, 2017]
+  Moved chunk-name and chunk-length checks into PNG_EXTERN private
+    png_check_chunk_name() and png_check_chunk_length() functions
+    (Suggested by Max Stepin).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

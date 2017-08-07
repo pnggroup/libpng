@@ -119,6 +119,74 @@ png_read_sig(png_structp png_ptr, png_infop info_ptr)
       png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
+/* This function is called to verify that a chunk name is valid.
+   This function can't have the "critical chunk check" incorporated
+   into it, since in the future we will need to be able to call user
+   functions to handle unknown critical chunks after we check that
+   the chunk name itself is valid. */
+
+/* Bit hacking: the test for an invalid byte in the 4 byte chunk name is:
+ *
+ * ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
+ */
+
+void /* PRIVATE */
+png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
+{
+   int i;
+   png_uint_32 cn=chunk_name[0]<<24|chunk_name[1]<<16|chunk_name[2]<<8|
+     chunk_name[3];
+
+   png_debug(1, "in png_check_chunk_name");
+
+   for (i=1; i<=4; ++i)
+   {
+      int c = cn & 0xff;
+
+      if (c < 65 || c > 122 || (c > 90 && c < 97))
+         png_chunk_error(png_ptr, "invalid chunk type");
+
+      cn >>= 8;
+   }
+}
+
+void /* PRIVATE */
+png_check_chunk_length(png_structp png_ptr, png_uint_32 length)
+{
+   png_uint_32 limit = PNG_UINT_31_MAX;
+
+   /* if (png_ptr->chunk_name != "IDAT") */
+   if (png_ptr->chunk_name[0] != 73 || png_ptr->chunk_name[1] !=68 ||
+       png_ptr->chunk_name[2] != 65 || png_ptr->chunk_name[3] !=84)
+   {
+# ifdef PNG_SET_USER_LIMITS_SUPPORTED
+      if (png_ptr->user_chunk_malloc_max > 0 &&
+          png_ptr->user_chunk_malloc_max < limit)
+         limit = png_ptr->user_chunk_malloc_max;
+# elif PNG_USER_CHUNK_MALLOC_MAX > 0
+      if (PNG_USER_CHUNK_MALLOC_MAX < limit)
+         limit = PNG_USER_CHUNK_MALLOC_MAX;
+# endif
+   }
+   else
+   {
+      size_t row_factor =
+         (png_ptr->width * png_ptr->channels * (png_ptr->bit_depth > 8? 2: 1)
+          + 1 + (png_ptr->interlaced? 6: 0));
+      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
+         limit=PNG_UINT_31_MAX;
+      else
+         limit = png_ptr->height * row_factor;
+      limit += 6 + 5*(limit/32566+1); /* zlib+deflate overhead */
+      limit=limit < PNG_UINT_31_MAX? limit : PNG_UINT_31_MAX;
+   }
+   if (length > limit)
+   {
+      png_debug2(0," length = %lu, limit = %lu",
+         (unsigned long)length,(unsigned long)limit);
+      png_chunk_error(png_ptr, "chunk data is too large");
+   }
+}
 /* Read the chunk header (length + type name).
  * Put the type name into png_ptr->chunk_name, and return the length.
  */
@@ -150,6 +218,9 @@ png_read_chunk_header(png_structp png_ptr)
 
    /* Check to see if chunk name is valid. */
    png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+
+   /* Check for too-large chunk length */
+   png_check_chunk_length(png_ptr, length);
 
 #ifdef PNG_IO_STATE_SUPPORTED
    /* It is unspecified how many I/O calls will be performed
@@ -2535,24 +2606,6 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 #endif
 }
 
-/* This function is called to verify that a chunk name is valid.
-   This function can't have the "critical chunk check" incorporated
-   into it, since in the future we will need to be able to call user
-   functions to handle unknown critical chunks after we check that
-   the chunk name itself is valid. */
-
-#define isnonalpha(c) ((c) < 65 || (c) > 122 || ((c) > 90 && (c) < 97))
-
-void /* PRIVATE */
-png_check_chunk_name(png_structp png_ptr, png_bytep chunk_name)
-{
-   png_debug(1, "in png_check_chunk_name");
-   if (isnonalpha(chunk_name[0]) || isnonalpha(chunk_name[1]) ||
-       isnonalpha(chunk_name[2]) || isnonalpha(chunk_name[3]))
-   {
-      png_chunk_error(png_ptr, "invalid chunk type");
-   }
-}
 
 /* Combines the row recently read in with the existing pixels in the
    row.  This routine takes care of alpha and transparency if requested.

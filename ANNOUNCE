@@ -1,5 +1,5 @@
 
-Libpng 1.4.21beta01 - December 30, 2016
+Libpng 1.4.21beta01 - August 7, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -27,6 +27,9 @@ Other information:
 Changes since the last public release (1.4.20):
 
 version 1.4.21 [%RDATE%]
+  Moved chunk-name and chunk-length checks into PNG_EXTERN private
+    png_check_chunk_name() and png_check_chunk_length() functions
+    (Suggested by Max Stepin).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
