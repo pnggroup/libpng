@@ -2071,6 +2071,8 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       {
          png_crc_finish(png_ptr, length);
          png_chunk_benign_error(png_ptr, "incorrect byte-order specifier");
+         png_free(png_ptr, info_ptr->eXIf_buf);
+         info_ptr->eXIf_buf = NULL;
          return;
       }
    }
