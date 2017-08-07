@@ -321,7 +321,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   /* row_bytes is the width x number of channels x (bit-depth / 8) */
   row_bytes = png_get_rowbytes (png_ptr, info_ptr);
 
-  if (height > ((size_t)(-1))/row_bytes) /* too big */ {
+  if (!row_bytes || height > ((size_t)(-1))/row_bytes) /* too big */ {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;
   }

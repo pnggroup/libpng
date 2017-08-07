@@ -374,7 +374,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
     /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
-  if (height > ((size_t)(-1))/row_bytes) /* too big */ {
+  if (!rowbytes || height > ((size_t)(-1))/row_bytes) /* too big */ {
     return FALSE;
   }
   if ((png_pixels = (png_byte *)
