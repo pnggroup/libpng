@@ -5977,11 +5977,14 @@ Version 1.6.32beta11 [August 7, 2017]
     after the keyword has been read.
   Check that the eXIf chunk has at least 2 bytes and begins with "II" or "MM".
 
-Version 1.6.32beta12 [August 7, 2017]
+Version 1.6.32beta12 [August 11, 2017]
   Added a set of "huge_xxxx_chunk.png" files to contrib/testpngs/crashers,
     one for each known chunk type, with length = 2GB-1.
   Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
     some Coverity issues (162705, 162706, and 162707).
+  Renamed chunks in contrib/testpngs/crashers to avoid having files whose
+    names differ only in case; this causes problems with some platforms
+    (github issue #172).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
