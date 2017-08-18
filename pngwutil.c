@@ -4894,7 +4894,7 @@ png_write_png_data(png_structrp png_ptr, png_bytep prev_pixels,
    write_unfiltered_rowbits(png_ptr, unfiltered_row, row_bits,
          x == 0 ? PNG_FILTER_VALUE_NONE : PNG_FILTER_VALUE_LAST, flush);
 
-   PNG_UNUSED(prev_pixels);
+   PNG_UNUSED(prev_pixels)
 
    /* Handle end of row: */
    if ((row_info_flags & png_row_end) != 0)

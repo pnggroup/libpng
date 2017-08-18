@@ -2697,7 +2697,7 @@ png_do_invert_all(png_transformp *transform, png_transform_controlp tc)
    while (png_upcast(void*,dp) < dp_end)
       *dp++ = ~*sp++;
 
-   PNG_UNUSED(transform);
+   PNG_UNUSED(transform)
 }
 
 static void
@@ -2748,7 +2748,7 @@ png_do_invert_channel(png_transformp *transform, png_transform_controlp tc)
       }
    }
 
-   PNG_UNUSED(transform);
+   PNG_UNUSED(transform)
 }
 
 static void

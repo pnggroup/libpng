@@ -4432,7 +4432,7 @@ png_read_process_IDAT(png_structrp png_ptr, png_bytep transformed_row,
          impossible("bad row state");
    } /* forever switch */
 
-   PNG_UNUSED(save_row); /* May not be used above */
+   PNG_UNUSED(save_row) /* May not be used above */
 }
 
 void /* PRIVATE */
