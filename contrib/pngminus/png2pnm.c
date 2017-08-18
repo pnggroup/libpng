@@ -323,21 +323,21 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   /* row_bytes is the width x number of channels x (bit-depth / 8) */
   row_bytes = png_get_rowbytes (png_ptr, info_ptr);
 
-  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes)
+  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes))
   {
     /* too big */ 
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;
   }
   if ((png_pixels = (png_byte *)
-     malloc (row_bytes * height * sizeof (png_byte))) == NULL)
+     malloc ((size_t)row_bytes * (size_t)height * sizeof (png_byte))) == NULL)
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;
   }
 
   if ((row_pointers = (png_byte **)
-     malloc (height * sizeof (png_bytep))) == NULL)
+     malloc ((size_t)height * sizeof (png_bytep))) == NULL)
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     free (png_pixels);
@@ -443,6 +443,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
+  PNG_UNUSED(raw) /* to quiet a Coverity defect */
   return TRUE;
 
 } /* end of source */
