@@ -4539,12 +4539,16 @@ version 1.5.29beta01 [April 1, 2017]
   Silence clang -Wcomma warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
 
-version 1.5.29beta02 [August 7, 2017]
+version 1.5.29beta02 [August 9, 2017]
   Moved chunk-name and chunk-length checks into PNG_EXTERN private
     png_check_chunk_name() and png_check_chunk_length() functions
     (Suggested by Max Stepin).
   Merged pngtest.c with libpng-1.6.32.
+  Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
+    some Coverity issues (162705, 162706, and 162707).
  
+version 1.5.29rc01 [August 18, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
