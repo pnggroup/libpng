@@ -1,5 +1,5 @@
 
-Libpng 1.7.0beta89 - August 19, 2017
+Libpng 1.7.0beta90 - August 19, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.7.0beta89.tar.xz (LZMA-compressed, recommended)
-   1.7.0beta89.tar.gz
+   1.7.0beta90.tar.xz (LZMA-compressed, recommended)
+   1.7.0beta90.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   /scratch/glennrp/Libpng17/lp170b89.7z  (LZMA-compressed, recommended)
-   /scratch/glennrp/Libpng17/lp170b89.zip
+   /scratch/glennrp/Libpng17/lp170b90.7z  (LZMA-compressed, recommended)
+   /scratch/glennrp/Libpng17/lp170b90.zip
 
 Other information:
 
-   1.7.0beta89-README.txt
-   1.7.0beta89-LICENSE.txt
-   libpng-1.7.0beta89-*.asc (armored detached GPG signatures)
+   1.7.0beta90-README.txt
+   1.7.0beta90-LICENSE.txt
+   libpng-1.7.0beta90-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.0):
 
@@ -1438,6 +1438,8 @@ Version 1.7.0beta88 [August 7. 2017]
 Version 1.7.0beta89 [August 19, 2017]
   Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
     some Coverity issues (162705, 162706, and 162707).
+
+Version 1.7.0beta90 [August 19, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
