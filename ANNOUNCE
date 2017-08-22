@@ -1,4 +1,4 @@
-Libpng 1.6.32rc01 - August 22, 2017
+Libpng 1.6.32rc02 - August 22, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -8,20 +8,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.6.32rc01.tar.xz (LZMA-compressed, recommended)
-   1.6.32rc01.tar.gz
+   1.6.32rc02.tar.xz (LZMA-compressed, recommended)
+   1.6.32rc02.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1632r01.7z  (LZMA-compressed, recommended)
-   lp1632r01.zip
+   lp1632r02.7z  (LZMA-compressed, recommended)
+   lp1632r02.zip
 
 Other information:
 
-   1.6.32rc01-README.txt
-   1.6.32rc01-LICENSE.txt
-   libpng-1.6.32rc01-*.asc (armored detached GPG signatures)
+   1.6.32rc02-README.txt
+   1.6.32rc02-LICENSE.txt
+   libpng-1.6.32rc02-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.6.31):
 
@@ -105,8 +105,8 @@ Version 1.6.32rc01 [August 18, 2017]
     (github issue #172).
 
 Version 1.6.32rc02 [August 22, 2017]
-  Added contrib/oss-fuzz directory which contains a target for the oss-fuzz
-    project.
+  Added contrib/oss-fuzz directory which contains files used by the oss-fuzz
+    project (https://github.com/google/oss-fuzz/tree/master/projects/libpng).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
