@@ -5987,6 +5987,10 @@ Version 1.6.32rc01 [August 18, 2017]
     names differ only in case; this causes problems with some platforms
     (github issue #172).
 
+Version 1.6.32rc02 [August 22, 2017]
+  Added contrib/oss-fuzz directory which contains a target for the oss-fuzz
+    project.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
