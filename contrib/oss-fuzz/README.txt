@@ -9,11 +9,11 @@ Files in this directory are used by the oss-fuzz project
 (https://github.com/google/oss-fuzz/tree/master/projects/libpng).
 for "fuzzing" libpng.
 
-They were licensed by google inc, using the BSD-like Chromium license,
+They were licensed by Google Inc, using the BSD-like Chromium license,
 which may be found at https://cs.chromium.org/chromium/src/LICENSE, or, if
 noted in the source, under the Apache-2.0 license, which may
 be found at http://www.apache.org/licenses/LICENSE-2.0 .
-If they have been modified, the deritives are copyright Glenn Randers-Pehson
+If they have been modified, the derivatives are copyright Glenn Randers-Pehson
 and are released under the same licenses as the originals.  Several of
 the original files (libpng_read_fuzzer.options, png.dict, project.yaml)
 had no licensing information; we assumed that these were under the Chromium
