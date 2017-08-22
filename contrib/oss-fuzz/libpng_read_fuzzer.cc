@@ -2,8 +2,8 @@
 // libpng_read_fuzzer.cc
 // Copyright 2017 Glenn Randers-Pehrson
 // Copyright 2015 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that could
-// previously be found in a LICENSE file.
+// Use of this source code is governed by a BSD-style license that may
+// be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
 // The modifications by Glenn Randers-Pehrson include the addition of a
 // PNG_CLEANUP macro and setting the option to ignore ADLER32 checksums.
