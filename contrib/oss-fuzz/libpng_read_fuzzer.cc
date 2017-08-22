@@ -5,9 +5,12 @@
 // Use of this source code is governed by a BSD-style license that may
 // be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
-// The modifications by Glenn Randers-Pehrson include the addition of a
-// PNG_CLEANUP macro and setting the option to ignore ADLER32 checksums.
+// Last changed in libpng 1.6.32 [(PENDING RELEASE)]
 
+// The modifications in 2017 by Glenn Randers-Pehrson include
+// 1. addition of a PNG_CLEANUP macro,
+// 2. setting the option to ignore ADLER32 checksums,
+// 3. adding "#include <string.h>" which is needed on some platforms.
 
 #include <stddef.h>
 #include <stdint.h>
