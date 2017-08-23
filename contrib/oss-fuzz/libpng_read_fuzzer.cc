@@ -10,7 +10,8 @@
 // The modifications in 2017 by Glenn Randers-Pehrson include
 // 1. addition of a PNG_CLEANUP macro,
 // 2. setting the option to ignore ADLER32 checksums,
-// 3. adding "#include <string.h>" which is needed on some platforms.
+// 3. adding "#include <string.h>" which is needed on some platforms
+//    to provide memcpy().
 
 #include <stddef.h>
 #include <stdint.h>

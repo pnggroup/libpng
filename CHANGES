@@ -5991,6 +5991,8 @@ Version 1.6.32rc02 [August 22, 2017]
   Added contrib/oss-fuzz directory which contains files used by the oss-fuzz
     project (https://github.com/google/oss-fuzz/tree/master/projects/libpng).
 
+Version 1.6.32rc03 [August 23, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
