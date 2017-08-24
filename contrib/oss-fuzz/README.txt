@@ -27,7 +27,6 @@ The files are
  libpng_read_fuzzer.cc      derived      2017, Glenn R-P    Chromium
  libpng_read_fuzzer.options original     2015, Chrome Devs  Chromium
  png.dict                   original     2015, Chrome Devs  Chromium
- project.yaml               original     2015, Chrome Devs  Chromium
  README.txt (this file)     original     2017, GLenn R-P    libpng
 
 To do: exercise the progressive reader.
