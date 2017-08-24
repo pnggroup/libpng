@@ -1,8 +1,8 @@
 
 /* pngpread.c - read a png file in push mode
  *
- * Last changed in libpng 1.2.57 [(TO BE RELEASED)]
- * Copyright (c) 1998-2002,2004,2006-2010,2016 Glenn Randers-Pehrson
+ * Last changed in libpng 1.2.58 [August 24, 2017]
+ * Copyright (c) 1998-2002,2004,2006-2015,2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -205,6 +205,7 @@ png_push_read_chunk(png_structp png_ptr, png_infop info_ptr)
       png_reset_crc(png_ptr);
       png_crc_read(png_ptr, png_ptr->chunk_name, 4);
       png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+      png_check_chunk_length(png_ptr, png_ptr->push_length);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 
