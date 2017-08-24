@@ -1,9 +1,11 @@
 /*
  *  png2pnm.c --- conversion from PNG-file to PGM/PPM-file
- *  copyright (C) 1999 by Willem van Schaik <willem at schaik.com>
+ *  copyright (C) 1999,2017 by Willem van Schaik <willem at schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
  *          1.1 - 2017.04.22 - Add buffer-size check (Glenn Randers-Pehrson)
+ *          1.2 - 2017.08.24 - Fix potential overflow in buffer-size check
+                               (Glenn Randers-Pehrson)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -321,18 +323,21 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   /* row_bytes is the width x number of channels x (bit-depth / 8) */
   row_bytes = png_get_rowbytes (png_ptr, info_ptr);
 
-  if (height > ((size_t)(-1))/row_bytes) /* too big */ {
+  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes))
+  {
+    /* too big */ 
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;
   }
   if ((png_pixels = (png_byte *)
-     malloc (row_bytes * height * sizeof (png_byte))) == NULL) {
+     malloc ((size_t)row_bytes * (size_t)height * sizeof (png_byte))) == NULL)
+  {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     return FALSE;
   }
 
   if ((row_pointers = (png_byte **)
-     malloc (height * sizeof (png_bytep))) == NULL)
+     malloc ((size_t)height * sizeof (png_bytep))) == NULL)
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
     free (png_pixels);
@@ -413,7 +418,8 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
           if (raw)
             fputc ((int) *pix_ptr++ , alpha_file);
           else
-            if (bit_depth == 16){
+            if (bit_depth == 16)
+            {
               dep_16 = (long) *pix_ptr++;
               fprintf (alpha_file, "%ld ", (dep_16 << 8) + (long) *pix_ptr++);
             }
@@ -437,6 +443,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
+  PNG_UNUSED(raw) /* to quiet a Coverity defect */
   return TRUE;
 
 } /* end of source */

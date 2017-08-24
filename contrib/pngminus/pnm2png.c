@@ -1,10 +1,12 @@
 /*
  *  pnm2png.c --- conversion from PBM/PGM/PPM-file to PNG-file
- *  copyright (C) 1999 by Willem van Schaik <willem at schaik.com>
+ *  copyright (C) 1999,2015,2017 by Willem van Schaik <willem at schaik.com>
  *
  *  version 1.0 - 1999.10.15 - First version.
  *  version 1.1 - 2015.07.29 - Fixed leaks (Glenn Randers-Pehrson)
  *  version 1.2 - 2017.04.22 - Add buffer-size check
+ *          1.3 - 2017.08.24 - Fix potential overflow in buffer-size check
+ *                             (Glenn Randers-Pehrson)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -371,10 +373,12 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
     row_bytes = (width * channels * bit_depth + 7) / 8;
   else
 #endif
-    /* row_bytes is the width x number of channels x (bit-depth / 8) */
+  /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
-  if (height > ((size_t)(-1))/row_bytes) /* too big */ {
+  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes)
+  {
+    /* too big */ 
     return FALSE;
   }
   if ((png_pixels = (png_byte *)
@@ -387,7 +391,8 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   for (row = 0; row < (int) height; row++)
   {
 #if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
-    if (packed_bitmap) {
+    if (packed_bitmap)
+    {
       for (i = 0; i < (int) row_bytes; i++)
         /* png supports this format natively so no conversion is needed */
         *pix_ptr++ = get_data (pnm_file, 8);
@@ -508,6 +513,8 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
+  PNG_UNUSED(raw) /* Quiet a Coverity defect */
+
   return TRUE;
 } /* end of pnm2png */
 
@@ -524,7 +531,8 @@ void get_token(FILE *pnm_file, char *token)
   do
   {
     ret = fgetc(pnm_file);
-    if (ret == '#') {
+    if (ret == '#')
+    {
       /* the rest of this line is a comment */
       do
       {

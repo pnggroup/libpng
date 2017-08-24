@@ -1,6 +1,6 @@
-.TH LIBPNG 3 "July 27, 2017"
+.TH LIBPNG 3 "August 24, 2017"
 .SH NAME
-libpng \- Portable Network Graphics (PNG) Reference Library 1.6.31
+libpng \- Portable Network Graphics (PNG) Reference Library 1.6.32
 .SH SYNOPSIS
 \fB
 #include <png.h>\fP
@@ -98,6 +98,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.31
 \fBpng_byte png_get_header_version (png_const_structp \fIpng_ptr\fP\fB);\fP
 
 \fBpng_uint_32 png_get_eXIf (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fI*exif\fP\fB);\fP
+
+\fBpng_uint_32 png_get_eXIf_1 (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_unit_32 \fP\fI*num_exif\fP\fB, png_bytep \fI*exif\fP\fB);\fP
 
 \fBpng_uint_32 png_get_hIST (png_const_structp \fP\fIpng_ptr\fP\fB, png_const_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fI*hist\fP\fB);\fP
 
@@ -351,6 +353,8 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.31
 
 \fBvoid png_set_eXIf (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_bytep \fIexif\fP\fB);\fP
 
+\fBvoid png_set_eXIf_1 (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, const png_uint_32 \fP\fInum_exif\fP\fB, png_bytep \fIexif\fP\fB);\fP
+
 \fBvoid png_set_hIST (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_uint_16p \fIhist\fP\fB);\fP
 
 \fBvoid png_set_iCCP (png_structp \fP\fIpng_ptr\fP\fB, png_infop \fP\fIinfo_ptr\fP\fB, png_const_charp \fP\fIname\fP\fB, int \fP\fIcompression_type\fP\fB, png_const_bytep \fP\fIprofile\fP\fB, png_uint_32 \fIproflen\fP\fB);\fP
@@ -514,7 +518,7 @@ Following is a copy of the libpng-manual.txt file that accompanies libpng.
 .SH LIBPNG.TXT
 libpng-manual.txt - A description on how to use and modify libpng
 
- libpng version 1.6.31 - July 27, 2017
+ libpng version 1.6.32 - August 24, 2017
  Updated and distributed by Glenn Randers-Pehrson
  <glennrp at users.sourceforge.net>
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
@@ -525,7 +529,7 @@ libpng-manual.txt - A description on how to use and modify libpng
 
  Based on:
 
- libpng versions 0.97, January 1998, through 1.6.31 - July 27, 2017
+ libpng versions 0.97, January 1998, through 1.6.32 - August 24, 2017
  Updated and distributed by Glenn Randers-Pehrson
  Copyright (c) 1998-2017 Glenn Randers-Pehrson
 
@@ -1202,8 +1206,9 @@ where 0x7fffffffL means unlimited.  You can retrieve this limit with
    chunk_cache_max = png_get_chunk_cache_max(png_ptr);
 
 Libpng imposes a limit of 8 Megabytes (8,000,000 bytes) on the amount of
-memory that a compressed chunk other than IDAT can occupy, when decompressed.
-You can change this limit with
+memory that any chunk other than IDAT can occupy, originally or when
+decompressed (prior to libpng-1.6.32 the limit was only applied to compressed
+chunks after decompression). You can change this limit with
 
    png_set_chunk_malloc_max(png_ptr, user_chunk_malloc_max);
 
@@ -1967,7 +1972,7 @@ png_set_rgb_to_gray()).
                      the single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
 
-    png_get_eXIf(png_ptr, info_ptr, &exif);
+    png_get_eXIf_1(png_ptr, info_ptr, &num_exif, &exif);
                      (PNG_INFO_eXIf)
 
     exif           - Exif profile (array of png_byte)
@@ -3617,9 +3622,9 @@ width, height, bit_depth, and color_type must be the same in each call.
                      single transparent color for
                      non-paletted images (PNG_INFO_tRNS)
 
-    png_set_eXIf(png_ptr, info_ptr, exif);
+    png_set_eXIf_1(png_ptr, info_ptr, num_exif, exif);
 
-    hist           - Exif profile (array of
+    exif           - Exif profile (array of
                      png_byte) (PNG_INFO_eXIf)
 
     png_set_hIST(png_ptr, info_ptr, hist);
@@ -5918,7 +5923,7 @@ Since the PNG Development group is an ad-hoc body, we can't make
 an official declaration.
 
 This is your unofficial assurance that libpng from version 0.71 and
-upward through 1.6.31 are Y2K compliant.  It is my belief that earlier
+upward through 1.6.32 are Y2K compliant.  It is my belief that earlier
 versions were also Y2K compliant.
 
 Libpng only has two year fields.  One is a 2-byte unsigned integer
@@ -6020,7 +6025,7 @@ the first widely used release:
  ...
  1.5.28                  15    10528  15.so.15.28[.0]
  ...
- 1.6.31                  16    10631  16.so.16.31[.0]
+ 1.6.32                  16    10632  16.so.16.32[.0]
 
 Henceforth the source version will match the shared-library minor
 and patch numbers; the shared-library major version number will be
@@ -6076,7 +6081,7 @@ possible without all of you.
 
 Thanks to Frank J. T. Wojcik for helping with the documentation.
 
-Libpng version 1.6.31 - July 27, 2017:
+Libpng version 1.6.32 - August 24, 2017:
 Initially created in 1995 by Guy Eric Schalnat, then of Group 42, Inc.
 Currently maintained by Glenn Randers-Pehrson (glennrp at users.sourceforge.net).
 
@@ -6101,7 +6106,7 @@ this sentence.
 
 This code is released under the libpng license.
 
-libpng versions 1.0.7, July 1, 2000 through 1.6.31, July 27, 2017 are
+libpng versions 1.0.7, July 1, 2000 through 1.6.32, August 24, 2017 are
 Copyright (c) 2000-2002, 2004, 2006-2017 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
 disclaimer and license as libpng-1.0.6 with the following individuals
@@ -6229,7 +6234,7 @@ files "pngbar.png" and "pngbar.jpg (88x31) and "pngnow.png" (98x31).
 
 Glenn Randers-Pehrson
 glennrp at users.sourceforge.net
-July 27, 2017
+August 24, 2017
 
 .\" end of man page
 

@@ -1,7 +1,7 @@
 
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Last changed in libpng 1.6.31 [July 27, 2017]
+ * Last changed in libpng 1.6.32 [August 24, 2017]
  * Copyright (c) 2015,2017 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -114,6 +114,7 @@ typedef png_byte *png_const_bytep;
 #define png_PLTE PNG_U32( 80,  76,  84,  69)
 #define png_bKGD PNG_U32( 98,  75,  71,  68)
 #define png_cHRM PNG_U32( 99,  72,  82,  77)
+#define png_eXIf PNG_U32(101,  88,  73, 102) /* registered July 2017 */
 #define png_fRAc PNG_U32(102,  82,  65,  99) /* registered, not defined */
 #define png_gAMA PNG_U32(103,  65,  77,  65)
 #define png_gIFg PNG_U32(103,  73,  70, 103)
@@ -210,6 +211,13 @@ static struct
          1,
 #     endif
       1,  START, 0 },
+   { "eXIf", PNG_INFO_eXIf, png_eXIf,
+#     ifdef PNG_READ_eXIf_SUPPORTED
+         0,
+#     else
+         1,
+#     endif
+      1,  END, 0 },
    { "gAMA", PNG_INFO_gAMA, png_gAMA,
 #     ifdef PNG_READ_gAMA_SUPPORTED
          0,
@@ -1090,7 +1098,7 @@ static const char *standard_tests[] =
  "sTER", "sTER=if-safe", 0,
  "IDAT", "default=discard", "IDAT=save", 0,
  "sAPI", "bKGD=save", "cHRM=save", "gAMA=save", "all=discard", "iCCP=save",
-   "sBIT=save", "sRGB=save", 0,
+   "sBIT=save", "sRGB=save", "eXIf=save", 0,
  0/*end*/
 };
 
