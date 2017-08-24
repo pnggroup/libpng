@@ -2934,7 +2934,13 @@ version 1.2.58beta01 [August 11, 2017]
     IDAT against the default 8MB limit; check IDAT against the maximum
     size computed from IHDR parameters.
 
-version 1.2.58rc01 [August 18, 2017]
+version 1.2.58rc01 [August 19, 2017]
+  Check for 0 return from png_get_rowbytes() and added some (size_t) typecasts
+    in contrib/pngminus/*.c to stop some Coverity issues (162705, 162706,
+    and 162707).
+
+version 1.0.68 and 1.2.58 [August 24, 2017]
+  No changes.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
