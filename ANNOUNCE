@@ -1,48 +1,41 @@
 
-Libpng 1.5.29rc01 - August 18, 2017
+Libpng 1.5.29 - August 24, 2017
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.29rc01.tar.xz (LZMA-compressed, recommended)
-   1.5.29rc01.tar.gz
+   libpng-1.5.29.tar.xz (LZMA-compressed, recommended)
+   libpng-1.5.29.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1529r01.7z  (LZMA-compressed, recommended)
-   lp1529r01.zip
+   lpng1529.7z  (LZMA-compressed, recommended)
+   lpng1529.zip
 
 Other information:
 
-   1.5.29rc01-README.txt
-   1.5.29rc01-LICENSE.txt
-   libpng-1.5.29rc01-*.asc (armored detached GPG signatures)
+   libpng-1.5.29-README.txt
+   libpng-1.5.29-LICENSE.txt
+   libpng-1.5.29-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.28):
-
-version 1.5.29beta01 [April 1, 2017]
   Suppress clang warnings about implicit sign changes in png.c
   Avoid potential overflow of shift operations in png_do_expand() (Aaron Boxer).
   Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
     makefile.linux and makefile.solaris-x86 (Cosmin).
   Silence clang -Wcomma warnings (Viktor Szakats).
   Update Sourceforge URLs in documentation (https instead of http).
-
-version 1.5.29beta02 [August 9, 2017]
   Moved chunk-name and chunk-length checks into PNG_EXTERN private
     png_check_chunk_name() and png_check_chunk_length() functions
     (Suggested by Max Stepin).
   Merged pngtest.c with libpng-1.6.32.
   Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
     some Coverity issues (162705, 162706, and 162707).
- 
-version 1.5.29rc01 [August 18, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

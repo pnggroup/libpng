@@ -4547,7 +4547,12 @@ version 1.5.29beta02 [August 9, 2017]
   Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
     some Coverity issues (162705, 162706, and 162707).
  
-version 1.5.29rc01 [August 18, 2017]
+version 1.5.29rc01 [August 19, 2017]
+  No changes.
+ 
+version 1.5.29 [August 24, 2017]
+  No changes.
+
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
