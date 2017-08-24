@@ -1,37 +1,34 @@
 
-Libpng 1.4.21rc01 - August 19, 2017
+Libpng 1.4.21 - August 24, 2017
 
-This is not intended to be a public release.  It will be replaced
-within a few weeks by a public version or by another test version.
+This is a public release of libpng, intended for use in production codes.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.21rc01.tar.xz (LZMA-compressed, recommended)
-   1.4.21rc01.tar.gz
+   libpng-1.4.21.tar.xz (LZMA-compressed, recommended)
+   libpng-1.4.21.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1421r01.7z (LZMA-compressed, recommended)
-   lp1421r01.zip
+   lpng1421.7z (LZMA-compressed, recommended)
+   lpng1421.zip
 
 Other information:
 
-   1.4.21rc01-README.txt
-   1.4.21rc01-LICENSE.txt
-   libpng-1.4.21rc01-*.asc (armored detached GPG signatures)
+   libpng-1.4.21-README.txt
+   libpng-1.4.21-LICENSE.txt
+   libpng-1.4.21-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.20):
-
-version 1.4.21beta [August 9, 2017]
   Moved chunk-name and chunk-length checks into PNG_EXTERN private
     png_check_chunk_name() and png_check_chunk_length() functions
     (Suggested by Max Stepin).
-
-version 1.4.21rc01 [%RDATE%]
+  Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
+    some Coverity issues (162705, 162706, and 162707).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit

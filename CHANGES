@@ -3049,6 +3049,11 @@ version 1.4.21beta [August 9, 2017]
     (Suggested by Max Stepin).
 
 version 1.4.21rc01 [August 19, 2017]
+  Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
+    some Coverity issues (162705, 162706, and 162707).
+
+version 1.4.21 [August 24, 2017]
+  No changes.
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
