@@ -12,6 +12,7 @@
 // 2. setting the option to ignore ADLER32 checksums,
 // 3. adding "#include <string.h>" which is needed on some platforms
 //    to provide memcpy().
+// 4. adding read_end_info() and creating an end_info structure.
 
 #include <stddef.h>
 #include <stdint.h>
@@ -25,7 +26,10 @@
 #define PNG_CLEANUP \
     if(png_handler.png_ptr) \
     { \
-      if (png_handler.info_ptr) \
+      if (png_handler.end_info_ptr) \
+        png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,\
+          &png_handler.end_info_ptr); \
+      else if (png_handler.info_ptr) \
         png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,\
           nullptr); \
       else \
@@ -40,6 +44,7 @@ struct BufState {
 struct PngObjectHandler {
   png_infop info_ptr = nullptr;
   png_structp png_ptr = nullptr;
+  png_infop end_info_ptr = nullptr;
   png_voidp row_ptr = nullptr;
   BufState* buf_state = nullptr;
 
@@ -47,9 +52,7 @@ struct PngObjectHandler {
     if (row_ptr && png_ptr) {
       png_free(png_ptr, row_ptr);
     }
-    if (png_ptr && info_ptr) {
-      png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
-    }
+    PNG_CLEANUP
     delete buf_state;
   }
 };
@@ -93,6 +96,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
+  png_handler.end_info_ptr = png_create_info_struct(png_handler.png_ptr);
+  if (!png_handler.info_ptr) {
+    PNG_CLEANUP
+    return 0;
+  }
+
   png_set_crc_action(png_handler.png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
 #ifdef PNG_IGNORE_ADLER32
   png_set_option(png_handler.png_ptr, PNG_IGNORE_ADLER32, PNG_OPTION_ON);
@@ -112,6 +121,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   // Reading.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
+  png_read_update_info(png_handler.png_ptr, png_handler.info_ptr);
   png_handler.row_ptr = png_malloc(
       png_handler.png_ptr, png_get_rowbytes(png_handler.png_ptr,
                                                png_handler.info_ptr));
@@ -149,6 +159,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     }
   }
 
+  png_read_end(png_handler.png_ptr, png_handler.end_info_ptr);
+
   PNG_CLEANUP
+
+  /* TO do: exercise the progressive reader here */
+
   return 0;
 }
