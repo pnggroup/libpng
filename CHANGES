@@ -2939,8 +2939,12 @@ version 1.2.58rc01 [August 19, 2017]
     in contrib/pngminus/*.c to stop some Coverity issues (162705, 162706,
     and 162707).
 
-version 1.0.68 and 1.2.58 [August 24, 2017]
+version 1.0.68 and 1.2.58 [August 28, 2017]
   No changes.
+
+Version 1.2.59beta01 [August 28, 2017]
+  Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
+    parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

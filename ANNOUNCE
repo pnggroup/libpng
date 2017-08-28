@@ -1,51 +1,48 @@
 
-Libpng 1.2.58 - August 24, 2017
+Libpng 1.2.59beta01 - August 28, 2017
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.58.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.58.tar.gz
+   libpng-1.2.59beta01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.59beta01.tar.gz
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.58-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.58-no-config.tar.gz
+   libpng-1.2.59beta01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.59beta01-no-config.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1258.zip
-   lpng1258.7z
+   lp1259b01.zip
+   lp1259b01.7z
 
 Project files
 
-   libpng-1.2.58-project-netware.zip
-   libpng-1.2.58-project-wince.zip
+   libpng-1.2.59beta01-project-netware.zip
+   libpng-1.2.59beta01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.58-README.txt
-   libpng-1.2.58-KNOWNBUGS.txt
-   libpng-1.2.58-LICENSE.txt
-   libpng-1.2.58-Y2K-compliance.txt
-   libpng-1.2.58-[previous version]-diff.txt
-   libpng-1.2.58-*.asc (armored detached GPG signatures)
+   libpng-1.2.59beta01-README.txt
+   libpng-1.2.59beta01-KNOWNBUGS.txt
+   libpng-1.2.59beta01-LICENSE.txt
+   libpng-1.2.59beta01-Y2K-compliance.txt
+   libpng-1.2.59beta01-[previous version]-diff.txt
+   libpng-1.2.59beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.2.57):
+Changes since the last public release (1.2.58):
 
-version 1.2.58 [August 24, 2017]
-  Added png_check_chunk_length() function, and check all chunks except
-    IDAT against the default 8MB limit; check IDAT against the maximum
-    size computed from IHDR parameters.
-  Check for 0 return from png_get_rowbytes() and added some (size_t) typecasts
-    in contrib/pngminus/*.c to stop some Coverity issues (162705, 162706,
-    and 162707).
+Version 1.2.59beta01 [August 28, 2017]
+  Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
+    parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
