@@ -1,34 +1,34 @@
 
-Libpng 1.4.21 - August 24, 2017
+Libpng 1.4.22beta01 - August 28, 2017
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.4.21.tar.xz (LZMA-compressed, recommended)
-   libpng-1.4.21.tar.gz
+   1.4.22beta01.tar.xz (LZMA-compressed, recommended)
+   1.4.22beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1421.7z (LZMA-compressed, recommended)
-   lpng1421.zip
+   lp1422b01.7z (LZMA-compressed, recommended)
+   lp1422b01.zip
 
 Other information:
 
-   libpng-1.4.21-README.txt
-   libpng-1.4.21-LICENSE.txt
-   libpng-1.4.21-*.asc (armored detached GPG signatures)
+   1.4.22beta01-README.txt
+   1.4.22beta01-LICENSE.txt
+   libpng-1.4.22beta01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.20):
-  Moved chunk-name and chunk-length checks into PNG_EXTERN private
-    png_check_chunk_name() and png_check_chunk_length() functions
-    (Suggested by Max Stepin).
-  Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
-    some Coverity issues (162705, 162706, and 162707).
+
+Version 1.4.22beta01 [August 28, 2017]
+  Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
+    parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
