@@ -23,10 +23,14 @@ The files are
                             Original
  Filename                   or derived   Copyright          License
  =========================  ==========   ================   ==========
- build.sh                   derived      2017, Glenn R-P    Apache 2.0
+ build.sh*                  derived      2017, Glenn R-P    Apache 2.0
  libpng_read_fuzzer.cc      derived      2017, Glenn R-P    Chromium
  libpng_read_fuzzer.options original     2015, Chrome Devs  Chromium
  png.dict                   original     2015, Chrome Devs  Chromium
- README.txt (this file)     original     2017, GLenn R-P    libpng
+ README.txt (this file)     original     2017, Glenn R-P    libpng
 
-To do: exercise the progressive reader.
+ * build.sh is a copy of the file used by oss-fuzz. png.dict and
+   libpng_read_fuzzer.* are the actual files used by oss-fuzz, which
+   retrieves them from the libpng repository at Github.
+
+To do: exercise the progressive reader and the png encoder.
