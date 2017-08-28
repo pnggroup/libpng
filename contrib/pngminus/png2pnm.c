@@ -5,7 +5,8 @@
  *  version 1.0 - 1999.10.15 - First version.
  *          1.1 - 2017.04.22 - Add buffer-size check (Glenn Randers-Pehrson)
  *          1.2 - 2017.08.24 - Fix potential overflow in buffer-size check
-                               (Glenn Randers-Pehrson)
+ *                             (Glenn Randers-Pehrson)
+ *          1.3 - 2017.08.28 - Add PNGMINUS_UNUSED (Christian Hesse)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -44,11 +45,20 @@
 #define PNG_DEBUG 0
 #endif
 
+
 #include "png.h"
 
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+#endif
+
+#ifndef PNGMINUS_UNUSED
+/* Unused formal parameter warnings are silenced using the following macro
+ * which is expected to have no bad effects on performance (optimizing
+ * compilers will probably remove it entirely).
+ */
+#  define PNGMINUS_UNUSED(param) (void)param
 #endif
 
 /* function prototypes */
@@ -443,7 +453,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
-  PNG_UNUSED(raw) /* to quiet a Coverity defect */
+  PNGMINUS_UNUSED(raw); /* to quiet a Coverity defect */
   return TRUE;
 
 } /* end of source */

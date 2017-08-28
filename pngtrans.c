@@ -653,7 +653,7 @@ png_do_check_palette_indexes(png_structp png_ptr, png_row_infop row_info)
        */
       unsigned int padding =
           ((8 - (row_info->pixel_depth & 7)) * (row_info->width & 7)) & 7;
-      png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
+      png_bytep rp = png_ptr->row_buf + row_info->rowbytes - 1;
 
       switch (row_info->bit_depth)
       {

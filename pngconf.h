@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.5.29, August 24, 2017
+ * libpng version 1.5.30beta01, August 28, 2017
  *
  * Copyright (c) 1998-2002,2004,2006-2013 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)

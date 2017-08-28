@@ -1,41 +1,36 @@
 
-Libpng 1.5.29 - August 24, 2017
+Libpng 1.5.30beta01 - August 28, 2017
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release.  It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.5.29.tar.xz (LZMA-compressed, recommended)
-   libpng-1.5.29.tar.gz
+   1.5.30beta01.tar.xz (LZMA-compressed, recommended)
+   1.5.30beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1529.7z  (LZMA-compressed, recommended)
-   lpng1529.zip
+   lp1530b01.7z  (LZMA-compressed, recommended)
+   lp1530b01.zip
 
 Other information:
 
-   libpng-1.5.29-README.txt
-   libpng-1.5.29-LICENSE.txt
-   libpng-1.5.29-*.asc (armored detached GPG signatures)
+   1.5.30beta01-README.txt
+   1.5.30beta01-LICENSE.txt
+   libpng-1.5.30beta01-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.5.28):
-  Suppress clang warnings about implicit sign changes in png.c
-  Avoid potential overflow of shift operations in png_do_expand() (Aaron Boxer).
-  Added missing "$(CPPFLAGS)" to the compile line for c.pic.o in
-    makefile.linux and makefile.solaris-x86 (Cosmin).
-  Silence clang -Wcomma warnings (Viktor Szakats).
-  Update Sourceforge URLs in documentation (https instead of http).
-  Moved chunk-name and chunk-length checks into PNG_EXTERN private
-    png_check_chunk_name() and png_check_chunk_length() functions
-    (Suggested by Max Stepin).
-  Merged pngtest.c with libpng-1.6.32.
-  Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
-    some Coverity issues (162705, 162706, and 162707).
+Changes since the last public release (1.5.29):
+
+Version 1.5.30beta01 [August 28, 2017]
+  Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
+    parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
+  Fixed off-by-one error in png_do_check_palette_indexes() (Bug report
+    by Mick P., Source Forge Issue #269).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
