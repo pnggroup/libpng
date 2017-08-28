@@ -5997,9 +5997,6 @@ Version 1.6.32 [August 24, 2017]
 Version 1.6.33beta01 [August 28, 2017]
   Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
     parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
-  Free row_ptr in PNG_CLEANUP macro in contrib/oss-fuzz/libpng_read_fuzzer.cc
-  Fixed off-by-one error in png_do_check_palette_indexes() (Bug report
-    by Mick P., Source Forge Issue #269).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
