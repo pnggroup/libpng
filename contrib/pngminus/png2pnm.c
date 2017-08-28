@@ -44,12 +44,15 @@
 #define PNG_DEBUG 0
 #endif
 
+
 #include "png.h"
 
 /* Define png_jmpbuf() in case we are using a pre-1.0.6 version of libpng */
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
 #endif
+
+#define PNGMINUS_UNUSED(param) (void)param;
 
 /* function prototypes */
 
@@ -443,7 +446,7 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
-  PNG_UNUSED(raw) /* to quiet a Coverity defect */
+  PNGMINUS_UNUSED(raw) /* to quiet a Coverity defect */
   return TRUE;
 
 } /* end of source */

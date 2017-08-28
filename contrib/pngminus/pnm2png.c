@@ -50,6 +50,8 @@
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
 #endif
 
+#define PNGMINUS_UNUSED(param) (void)param;
+
 /* function prototypes */
 
 int  main (int argc, char *argv[]);
@@ -376,7 +378,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
-  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes)
+  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes))
   {
     /* too big */ 
     return FALSE;
@@ -513,7 +515,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
-  PNG_UNUSED(raw) /* Quiet a Coverity defect */
+  PNGMINUS_UNUSED(raw) /* Quiet a Coverity defect */
 
   return TRUE;
 } /* end of pnm2png */
