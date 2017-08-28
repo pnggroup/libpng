@@ -392,7 +392,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
     return FALSE;
   }
   if ((png_pixels = (png_byte *)
-     malloc (row_bytes * height * sizeof (png_byte))) == NULL)
+     malloc ((size_t)row_bytes * (size_t)height * sizeof (png_byte))) == NULL)
     return FALSE;
 
   /* read data from PNM file */
