@@ -5994,9 +5994,11 @@ Version 1.6.32rc02 [August 22, 2017]
 Version 1.6.32 [August 24, 2017]
   No changes.
 
-Version 1.6.33beta01 [August 28, 2017]
+Version 1.6.33beta01 [August 29, 2017]
   Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
     parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
+  Fixed off-by-one error in png_do_check_palette_indexes() (Bug report
+    by Mick P., Source Forge Issue #269).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
