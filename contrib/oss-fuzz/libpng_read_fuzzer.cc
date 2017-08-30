@@ -74,32 +74,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  png_handler.info_ptr = png_create_info_struct(png_handler.png_ptr);
-  if (!png_handler.info_ptr) {
-    png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr);
-    return 0;
-  }
-
-  png_handler.end_info_ptr = png_create_info_struct(png_handler.png_ptr);
-  if (!png_handler.info_ptr) {
-    png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,
-      nullptr);
-    return 0;
-  }
-
   png_handler.row_ptr = nullptr;
-
-  png_set_crc_action(png_handler.png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
-#ifdef PNG_IGNORE_ADLER32
-  png_set_option(png_handler.png_ptr, PNG_IGNORE_ADLER32, PNG_OPTION_ON);
-#endif
-
-  // Setting up reading from buffer.
-  png_handler.buf_state = new BufState();
-  png_handler.buf_state->data = data + kPngHeaderSize;
-  png_handler.buf_state->bytes_left = size - kPngHeaderSize;
-  png_set_read_fn(png_handler.png_ptr, png_handler.buf_state, user_read_data);
-  png_set_sig_bytes(png_handler.png_ptr, kPngHeaderSize);
+  png_handler.info_ptr = nullptr;
+  png_handler.end_info_ptr = nullptr;
 
 #define PNG_CLEANUP
   if(png_handler.png_ptr) \
@@ -115,6 +92,31 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     else \
       png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr); \
    }
+
+  png_handler.info_ptr = png_create_info_struct(png_handler.png_ptr);
+  if (!png_handler.info_ptr) {
+    PNG_CLEANUP
+    return 0;
+  }
+
+  png_handler.end_info_ptr = png_create_info_struct(png_handler.png_ptr);
+  if (!png_handler.end_info_ptr) {
+    PNG_CLEANUP
+    return 0;
+  }
+
+  png_set_crc_action(png_handler.png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
+
+#ifdef PNG_IGNORE_ADLER32
+  png_set_option(png_handler.png_ptr, PNG_IGNORE_ADLER32, PNG_OPTION_ON);
+#endif
+
+  // Setting up reading from buffer.
+  png_handler.buf_state = new BufState();
+  png_handler.buf_state->data = data + kPngHeaderSize;
+  png_handler.buf_state->bytes_left = size - kPngHeaderSize;
+  png_set_read_fn(png_handler.png_ptr, png_handler.buf_state, user_read_data);
+  png_set_sig_bytes(png_handler.png_ptr, kPngHeaderSize);
 
   if (setjmp(png_jmpbuf(png_handler.png_ptr))) {
     PNG_CLEANUP
