@@ -1,7 +1,7 @@
 
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Last changed in libpng 1.6.32 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.32 [August 24, 2017]
  * Copyright (c) 2015,2017 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *

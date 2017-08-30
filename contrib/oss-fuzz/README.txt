@@ -1,4 +1,4 @@
-Last changed in libpng 1.6.32 [(PENDING RELEASE)]
+Last changed in libpng 1.6.32 [August 24, 2017]
 Copyright (c) 2017 Glenn Randers-Pehrson
 
 This code is released under the libpng license.
