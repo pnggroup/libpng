@@ -23,21 +23,6 @@
 #define PNG_INTERNAL
 #include "png.h"
 
-#define PNG_CLEANUP \
-    if(png_handler.png_ptr) \
-    { \
-      if (row_ptr && png_ptr) \
-        png_free(png_ptr, row_ptr); \
-      if (png_handler.end_info_ptr) \
-        png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,\
-          &png_handler.end_info_ptr); \
-      else if (png_handler.info_ptr) \
-        png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,\
-          nullptr); \
-      else \
-        png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr); \
-     }
-
 struct BufState {
   const uint8_t* data;
   size_t bytes_left;
@@ -51,7 +36,6 @@ struct PngObjectHandler {
   BufState* buf_state = nullptr;
 
   ~PngObjectHandler() {
-    PNG_CLEANUP
     delete buf_state;
   }
 };
@@ -71,6 +55,7 @@ static const int kPngHeaderSize = 8;
 // Entry point for LibFuzzer.
 // Roughly follows the libpng book example:
 // http://www.libpng.org/pub/png/book/chapter13.html
+
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   if (size < kPngHeaderSize) {
     return 0;
@@ -91,13 +76,14 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   png_handler.info_ptr = png_create_info_struct(png_handler.png_ptr);
   if (!png_handler.info_ptr) {
-    PNG_CLEANUP
+    png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr);
     return 0;
   }
 
   png_handler.end_info_ptr = png_create_info_struct(png_handler.png_ptr);
   if (!png_handler.info_ptr) {
-    PNG_CLEANUP
+    png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,
+      nullptr);
     return 0;
   }
 
@@ -112,6 +98,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_handler.buf_state->bytes_left = size - kPngHeaderSize;
   png_set_read_fn(png_handler.png_ptr, png_handler.buf_state, user_read_data);
   png_set_sig_bytes(png_handler.png_ptr, kPngHeaderSize);
+
+#define PNG_CLEANUP
+  if(png_handler.png_ptr) \
+  { \
+    if (png_handler.row_ptr) \
+      png_free(png_handler.png_ptr, png_handler.row_ptr); \
+    if (png_handler.end_info_ptr) \
+      png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,\
+        &png_handler.end_info_ptr); \
+    else if (png_handler.info_ptr) \
+      png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,\
+        nullptr); \
+    else \
+      png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr); \
+   }
 
   if (setjmp(png_jmpbuf(png_handler.png_ptr))) {
     PNG_CLEANUP
