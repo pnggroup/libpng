@@ -1,4 +1,4 @@
-Libpng 1.6.33beta02 - August 30, 2017
+Libpng 1.6.33beta02 - August 31, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -30,9 +30,11 @@ Version 1.6.33beta01 [August 28, 2017]
   Fixed off-by-one error in png_do_check_palette_indexes() (Bug report
     by Mick P., Source Forge Issue #269).
 
-Version 1.6.33beta02 [August 30, 2017]
+Version 1.6.33beta02 [August 31, 2017]
   Initialize png_handler.row_ptr in contrib/oss-fuzz/libpng_read_fuzzer.cc
     to fix shortlived oss-fuzz issue 3234.
+  Compute a larger limit on IDAT because some applications write a deflate
+    buffer for each row (Bug report by Andrew Church).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
