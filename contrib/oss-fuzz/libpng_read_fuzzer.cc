@@ -92,7 +92,11 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
         nullptr); \
     else \
       png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr); \
-   }
+    png_handler.png_ptr = nullptr; \
+    png_handler.row_ptr = nullptr; \
+    png_handler.info_ptr = nullptr; \
+    png_handler.end_info_ptr = nullptr;
+  }
 
   png_handler.info_ptr = png_create_info_struct(png_handler.png_ptr);
   if (!png_handler.info_ptr) {
