@@ -68,15 +68,16 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   }
 
   PngObjectHandler png_handler;
+  png_handler.png_ptr = nullptr;
+  png_handler.row_ptr = nullptr;
+  png_handler.info_ptr = nullptr;
+  png_handler.end_info_ptr = nullptr;
+
   png_handler.png_ptr = png_create_read_struct
     (PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
   if (!png_handler.png_ptr) {
     return 0;
   }
-
-  png_handler.row_ptr = nullptr;
-  png_handler.info_ptr = nullptr;
-  png_handler.end_info_ptr = nullptr;
 
 #define PNG_CLEANUP
   if(png_handler.png_ptr) \
