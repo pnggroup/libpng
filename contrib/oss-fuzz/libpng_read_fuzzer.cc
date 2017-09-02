@@ -36,6 +36,16 @@ struct PngObjectHandler {
   BufState* buf_state = nullptr;
 
   ~PngObjectHandler() {
+    if (png_handler.row_ptr)
+      png_free(png_handler.png_ptr, png_handler.row_ptr);
+    if (png_handler.end_info_ptr)
+      png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,
+        &png_handler.end_info_ptr);
+    else if (png_handler.info_ptr) 
+      png_destroy_read_struct(&png_handler.png_ptr, &png_handler.info_ptr,
+        nullptr);
+    else
+      png_destroy_read_struct(&png_handler.png_ptr, nullptr, nullptr);
     delete buf_state;
   }
 };
