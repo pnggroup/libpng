@@ -31,7 +31,7 @@ endif(POLICY CMP0054)
 
 set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
 
-project(libpng C)
+project(libpng ASM C)
 enable_testing()
 
 set(PNGLIB_MAJOR 1)
