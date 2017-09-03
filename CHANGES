@@ -2932,19 +2932,23 @@ version 1.0.67 and 1.2.57 [December 29, 2016]
 version 1.2.58beta01 [August 11, 2017]
   Added png_check_chunk_length() function, and check all chunks except
     IDAT against the default 8MB limit; check IDAT against the maximum
-    size computed from IHDR parameters.
+    size computed from IHDR parameters (Fixes CVE-2017-12652).
 
 version 1.2.58rc01 [August 19, 2017]
   Check for 0 return from png_get_rowbytes() and added some (size_t) typecasts
     in contrib/pngminus/*.c to stop some Coverity issues (162705, 162706,
     and 162707).
 
-version 1.0.68 and 1.2.58 [August 28, 2017]
+version 1.0.68 and 1.2.58 [September 3, 2017]
   No changes.
 
 Version 1.2.59beta01 [August 28, 2017]
   Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
     parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
+
+Version 1.2.59beta02 [September 3, 2017]
+  Compute a larger limit on IDAT because some applications write a deflate
+    buffer for each row (Bug report by Andrew Church).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
