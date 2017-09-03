@@ -1,8 +1,8 @@
 
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Last changed in libpng 1.4.17 [November 12, 2015]
- * Copyright (c) 1998-2002,2004,2006-2015 Glenn Randers-Pehrson
+ * Last changed in libpng 1.4.22 [September 3, 2017]
+ * Copyright (c) 1998-2002,2004,2006-2015,2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -176,7 +176,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
       int i;
 
       png_ptr->quantize_index = (png_bytep)png_malloc(png_ptr,
-         (png_uint_32)(num_palette * png_sizeof(png_byte)));
+         (png_alloc_size_t)(num_palette * png_sizeof(png_byte)));
       for (i = 0; i < num_palette; i++)
          png_ptr->quantize_index[i] = (png_byte)i;
    }
@@ -193,7 +193,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
 
          /* Initialize an array to sort colors */
          png_ptr->quantize_sort = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)(num_palette * png_sizeof(png_byte)));
+            (png_alloc_size_t)(num_palette * png_sizeof(png_byte)));
 
          /* Initialize the quantize_sort array */
          for (i = 0; i < num_palette; i++)
@@ -325,9 +325,9 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
 
          /* Initialize palette index arrays */
          png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)(num_palette * png_sizeof(png_byte)));
+            (png_alloc_size_t)(num_palette * png_sizeof(png_byte)));
          png_ptr->palette_to_index = (png_bytep)png_malloc(png_ptr,
-            (png_uint_32)(num_palette * png_sizeof(png_byte)));
+            (png_alloc_size_t)(num_palette * png_sizeof(png_byte)));
 
          /* Initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -367,7 +367,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
                   {
 
                      t = (png_dsortp)png_malloc_warn(png_ptr,
-                         (png_uint_32)(png_sizeof(png_dsort)));
+                         (png_alloc_size_t)(png_sizeof(png_dsort)));
                      if (t == NULL)
                          break;
                      t->next = hash[d];
@@ -489,7 +489,7 @@ png_set_quantize(png_structp png_ptr, png_colorp palette,
       png_ptr->palette_lookup = (png_bytep )png_calloc(png_ptr,
          (png_uint_32)(num_entries * png_sizeof(png_byte)));
 
-      distance = (png_bytep)png_malloc(png_ptr, (png_uint_32)(num_entries *
+      distance = (png_bytep)png_malloc(png_ptr, (png_alloc_size_t)(num_entries *
          png_sizeof(png_byte)));
       png_memset(distance, 0xff, num_entries * png_sizeof(png_byte));
 
@@ -4000,7 +4000,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
         g = 1.0;
 
      png_ptr->gamma_table = (png_bytep)png_malloc(png_ptr,
-        (png_uint_32)256);
+        (png_alloc_size_t)256);
 
      for (i = 0; i < 256; i++)
      {
@@ -4016,7 +4016,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
         g = 1.0 / (png_ptr->gamma);
 
         png_ptr->gamma_to_1 = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)256);
+           (png_alloc_size_t)256);
 
         for (i = 0; i < 256; i++)
         {
@@ -4026,7 +4026,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
 
 
         png_ptr->gamma_from_1 = (png_bytep)png_malloc(png_ptr,
-           (png_uint_32)256);
+           (png_alloc_size_t)256);
 
         if (png_ptr->screen_gamma > 0.000001)
            g = 1.0 / png_ptr->screen_gamma;
@@ -4103,7 +4103,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof(png_uint_16)));
+              (png_alloc_size_t)(256 * png_sizeof(png_uint_16)));
         }
 
         g = 1.0 / g;
@@ -4133,7 +4133,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_table[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof(png_uint_16)));
+              (png_alloc_size_t)(256 * png_sizeof(png_uint_16)));
 
            ig = (((png_uint_32)i * (png_uint_32)png_gamma_shift[shift]) >> 4);
 
@@ -4159,7 +4159,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_to_1[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof(png_uint_16)));
+              (png_alloc_size_t)(256 * png_sizeof(png_uint_16)));
 
            ig = (((png_uint_32)i *
               (png_uint_32)png_gamma_shift[shift]) >> 4);
@@ -4183,7 +4183,7 @@ png_build_gamma_table(png_structp png_ptr, png_byte bit_depth)
         for (i = 0; i < num; i++)
         {
            png_ptr->gamma_16_from_1[i] = (png_uint_16p)png_malloc(png_ptr,
-              (png_uint_32)(256 * png_sizeof(png_uint_16)));
+              (png_alloc_size_t)(256 * png_sizeof(png_uint_16)));
 
            ig = (((png_uint_32)i *
               (png_uint_32)png_gamma_shift[shift]) >> 4);
