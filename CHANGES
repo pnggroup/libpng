@@ -6009,6 +6009,8 @@ Version 1.6.33beta02 [September 3, 2017]
     changed date of contrib/oss-fuzz files.
   Enabled ARM support in CMakeLists.txt (Bernd Kuhls).
 
+Version 1.6.33beta03 [September 3, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
