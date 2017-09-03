@@ -5734,15 +5734,17 @@ Version 1.7.0beta87 [April 1, 2017]
 Version 1.7.0beta88 [August 7, 2017]
   Initialized btoa[] in pngstest.c
   Added private png_check_chunk_name() and png_check_chunk_length()
-    functions.
+    functions (Fixes CVE-2017-12652).
 
 Version 1.7.0beta89 [August 19, 2017]
   Check for 0 return from png_get_rowbytes() in contrib/pngminus/*.c to stop
     some Coverity issues (162705, 162706, and 162707).
 
-Version 1.7.0beta90 [August 28, 2017]
+Version 1.7.0beta90 [September 3, 2017]
   Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
     parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
+  Compute a larger limit on IDAT because some applications write a deflate
+    buffer for each row (Bug report by Andrew Church).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
