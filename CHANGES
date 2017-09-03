@@ -3044,6 +3044,7 @@ version 1.4.20 [December 29, 2016]
     and patch by Patrick Keshishian, CVE-2016-10087).
 
 version 1.4.21beta [August 9, 2017]
+  Added png_check_chunk_length() function (Fixes CVE-2017-12652).
   Moved chunk-name and chunk-length checks into PNG_EXTERN private
     png_check_chunk_name() and png_check_chunk_length() functions
     (Suggested by Max Stepin).
