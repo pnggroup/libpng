@@ -3055,9 +3055,13 @@ version 1.4.21rc01 [August 19, 2017]
 version 1.4.21 [August 24, 2017]
   No changes.
 
-version 1.4.22beta01 [August 28, 2017]
+version 1.4.22beta01 [August 28. 2017]
   Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
     parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
+
+version 1.4.22beta02 [September 3, 2017]
+  Compute a larger limit on IDAT because some applications write a deflate
+    buffer for each row (Bug report by Andrew Church).
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
