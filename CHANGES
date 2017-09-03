@@ -5939,7 +5939,7 @@ Version 1.6.32beta06 [August 2, 2017]
 
 Version 1.6.32beta07 [August 3, 2017]
   Check length of all chunks except IDAT against user limit to fix an
-    OSS-fuzz issue.
+    OSS-fuzz issue (Fixes CVE-2017-12652).
 
 Version 1.6.32beta08 [August 3, 2017]
   Check length of IDAT against maximum possible IDAT size, accounting
