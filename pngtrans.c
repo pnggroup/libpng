@@ -609,7 +609,7 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
       return; /* The filler channel has gone already */
 
    /* Fix the rowbytes value. */
-   row_info->rowbytes = (unsigned int)(dp-row);
+   row_info->rowbytes = (png_size_t)(dp-row);
 }
 #endif
 
