@@ -2819,6 +2819,8 @@ typedef struct
 #  define PNG_FORMAT_FLAG_AFIRST 0x20U /* alpha channel comes first */
 #endif
 
+#define PNG_FORMAT_FLAG_ASSOCIATED_ALPHA 0x40U /* alpha channel is associated */
+
 /* Commonly used formats have predefined macros.
  *
  * First the single byte (sRGB) formats:
