@@ -6014,7 +6014,7 @@ Version 1.6.33beta03 [September 8, 2017]
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
   Use pnglibconf.h.prebuilt when building for ANDROID with cmake (Github
-    issue 162, by rcdaily).
+    issue 162, by rcdailey).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
