@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.6.32 [August 24, 2017]
+ * Last changed in libpng 1.6.33 [(PENDING RELEASE)]
  * Copyright (c) 1998-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -837,6 +837,9 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       size_t lang_len, lang_key_len;
       png_textp textp = &(info_ptr->text[info_ptr->num_text]);
 
+      int text_is_null=0;
+      int text_0_is_0=0;
+
       if (text_ptr[i].key == NULL)
           continue;
 
@@ -881,7 +884,12 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 #  endif
 
-      if (text_ptr[i].text == NULL || text_ptr[i].text[0] == '\0')
+      if (text_ptr[i].text == NULL)
+         text_is_null=1;
+      if (text_ptr[i].text[0] == '\0')
+         text_0_is_0=1;
+
+      if (text_is_null || text_0_is_0)
       {
          text_length = 0;
 #  ifdef PNG_iTXt_SUPPORTED
