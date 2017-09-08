@@ -1,4 +1,4 @@
-Last changed in libpng 1.6.32 [August 24, 2017]
+Last changed in libpng 1.6.33 [(PENDING RELEASE)]
 Copyright (c) 2017 Glenn Randers-Pehrson
 
 This code is released under the libpng license.
@@ -23,14 +23,15 @@ The files are
                             Original
  Filename                   or derived   Copyright          License
  =========================  ==========   ================   ==========
+ Dockerfile*                derived      2017, Glenn R-P    Apache 2.0
  build.sh*                  derived      2017, Glenn R-P    Apache 2.0
  libpng_read_fuzzer.cc      derived      2017, Glenn R-P    Chromium
  libpng_read_fuzzer.options original     2015, Chrome Devs  Chromium
  png.dict                   original     2015, Chrome Devs  Chromium
  README.txt (this file)     original     2017, Glenn R-P    libpng
 
- * build.sh is a copy of the file used by oss-fuzz. png.dict and
-   libpng_read_fuzzer.* are the actual files used by oss-fuzz, which
-   retrieves them from the libpng repository at Github.
+ * Dockerfile and build.sh are copies of the files used by oss-fuzz.
+   png.dict and libpng_read_fuzzer.* are the actual files used by oss-fuzz,
+   which retrieves them from the libpng repository at Github.
 
 To do: exercise the progressive reader and the png encoder.
