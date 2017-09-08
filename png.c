@@ -816,14 +816,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.33beta03 - September 4, 2017" PNG_STRING_NEWLINE \
+      "libpng version 1.6.33beta03 - September 8, 2017" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.33beta03 - September 4, 2017\
+   return "libpng version 1.6.33beta03 - September 8, 2017\
       Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2224,6 +2224,10 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        * being in range.  All defined tag types have an 8 byte header - a 4 byte
        * type signature then 0.
        */
+
+      if (!tag_start)
+         return 0;
+
       if ((tag_start & 3) != 0)
       {
          /* CNHP730S.icc shipped with Microsoft Windows 64 violates this, it is
