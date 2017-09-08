@@ -1,4 +1,4 @@
-Libpng 1.6.33beta03 - September 3, 2017
+Libpng 1.6.33beta03 - September 8, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -39,10 +39,12 @@ Version 1.6.33beta02 [September 3, 2017]
     changed date of contrib/oss-fuzz files.
   Enabled ARM support in CMakeLists.txt (Bernd Kuhls).
 
-Version 1.6.33beta03 [September 3, 2017]
+Version 1.6.33beta03 [September 8, 2017]
   Fixed incorrect typecast of some arguments to png_malloc() and
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
+  Use pnglibconf.h.prebuilt when building for ANDROID with cmake (Github
+    issue 162, by rcdaily).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
