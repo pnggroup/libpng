@@ -816,14 +816,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.33beta03 - September 8, 2017" PNG_STRING_NEWLINE \
+      "libpng version 1.6.33beta03 - September 10, 2017" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.33beta03 - September 8, 2017\
+   return "libpng version 1.6.33beta03 - September 10, 2017\
       Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2225,8 +2225,12 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        * type signature then 0.
        */
 
-      if (!tag_start)
-         return 0;
+      /* This is a hard error; potentially it can cause read outside the
+       * profile.
+       */
+      if (tag_start > profile_length || tag_length > profile_length - tag_start)
+         return png_icc_profile_error(png_ptr, colorspace, name, tag_id,
+             "ICC profile tag outside profile");
 
       if ((tag_start & 3) != 0)
       {
@@ -2237,13 +2241,6 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
          (void)png_icc_profile_error(png_ptr, NULL, name, tag_id,
              "ICC profile tag start not a multiple of 4");
       }
-
-      /* This is a hard error; potentially it can cause read outside the
-       * profile.
-       */
-      if (tag_start > profile_length || tag_length > profile_length - tag_start)
-         return png_icc_profile_error(png_ptr, colorspace, name, tag_id,
-             "ICC profile tag outside profile");
    }
 
    return 1; /* success, maybe with warnings */
