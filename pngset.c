@@ -886,7 +886,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 
       if (text_ptr[i].text == NULL)
          text_is_null=1;
-      if (text_ptr[i].text[0] == '\0')
+      else if (text_ptr[i].text[0] == '\0')
          text_0_is_0=1;
 
       if (text_is_null)
