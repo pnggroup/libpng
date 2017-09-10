@@ -889,7 +889,18 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       if (text_ptr[i].text[0] == '\0')
          text_0_is_0=1;
 
-      if (text_is_null || text_0_is_0)
+      if (text_is_null)
+      {
+         text_length = 0;
+#  ifdef PNG_iTXt_SUPPORTED
+         if (text_ptr[i].compression > 0)
+            textp->compression = PNG_ITXT_COMPRESSION_NONE;
+
+         else
+#  endif
+            textp->compression = PNG_TEXT_COMPRESSION_NONE;
+      }
+      else if (text_0_is_0)
       {
          text_length = 0;
 #  ifdef PNG_iTXt_SUPPORTED
