@@ -6015,8 +6015,10 @@ Version 1.6.33beta03 [September 12, 2017]
     (Bug report by "irwir" in Github libpng issue #175).
   Use pnglibconf.h.prebuilt when building for ANDROID with cmake (Github
     issue 162, by rcdailey).
-  Guard against Uninitialized Memory Read in png_check_icc_table(), detected
-    by the oss-fuzz project.
+  Guard against Uninitialized Memory Read in png_icc_check_tag_table(),
+    detected by the oss-fuzz project.
+  Attempt to debug Uninitialized Memory Read in png_set_text_2(),
+    detected by the oss-fuzz project.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
