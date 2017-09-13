@@ -816,14 +816,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.33beta03 - September 12, 2017" PNG_STRING_NEWLINE \
+      "libpng version 1.6.33beta03 - September 13, 2017" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.33beta03 - September 12, 2017\
+   return "libpng version 1.6.33beta03 - September 13, 2017\
       Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2229,8 +2229,8 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        * profile.
        */
       if (tag > profile + 11)
-         return png_icc_profile_error(png_ptr, colorspace, name, tag_id,
-             "ICC profile tag table truncated");
+         png_chunk_report(png_ptr,"ICC profile tag table truncated",
+             PNG_CHUNK_ERROR);
       if (tag_start > profile_length || tag_length > profile_length - tag_start)
          return png_icc_profile_error(png_ptr, colorspace, name, tag_id,
              "ICC profile tag outside profile");
