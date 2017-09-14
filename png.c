@@ -2226,7 +2226,7 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
        */
 
       /* This is a hard error; potentially it can cause read outside the
-       * profile.
+       * profile.  Oss-fuzz detects a potential UMR in tag_start reference.
        */
       if (tag_start > profile_length || tag_length > profile_length - tag_start)
          return png_icc_profile_error(png_ptr, colorspace, name, tag_id,
