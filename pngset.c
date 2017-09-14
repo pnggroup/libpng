@@ -837,9 +837,6 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       size_t lang_len, lang_key_len;
       png_textp textp = &(info_ptr->text[info_ptr->num_text]);
 
-      int text_is_null=0;
-      int text_0_is_0=0;
-
       if (text_ptr[i].key == NULL)
           continue;
 
@@ -884,13 +881,8 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 #  endif
 
-      if (text_ptr[i].text == NULL)
-         text_is_null=1;
-      else if (text_ptr[i].text[0] == '\0') /* FIX THIS */
-         text_0_is_0=1;
-
-      /* oss-fuzz complains of UMR on the reference to text_0_is_0 */
-      if (text_is_null || text_0_is_0)
+      /* oss-fuzz complains of UMR here */
+      if (text_ptr[i].text == NULL || text_ptr[i].text[0] == '\0')
       {
          text_length = 0;
 #  ifdef PNG_iTXt_SUPPORTED
