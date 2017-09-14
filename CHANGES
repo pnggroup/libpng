@@ -4567,6 +4567,8 @@ Version 1.5.30beta02 [September 14, 2017]
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
 
+Version 1.5.30beta03 [September 14, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

@@ -1,5 +1,5 @@
 
-Libpng 1.5.30beta02 - September 14, 2017
+Libpng 1.5.30beta03 - September 14, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.5.30beta02.tar.xz (LZMA-compressed, recommended)
-   1.5.30beta02.tar.gz
+   1.5.30beta03.tar.xz (LZMA-compressed, recommended)
+   1.5.30beta03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1530b02.7z  (LZMA-compressed, recommended)
-   lp1530b02.zip
+   lp1530b03.7z  (LZMA-compressed, recommended)
+   lp1530b03.zip
 
 Other information:
 
-   1.5.30beta02-README.txt
-   1.5.30beta02-LICENSE.txt
-   libpng-1.5.30beta02-*.asc (armored detached GPG signatures)
+   1.5.30beta03-README.txt
+   1.5.30beta03-LICENSE.txt
+   libpng-1.5.30beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.5.29):
 
@@ -38,6 +38,8 @@ Version 1.5.30beta02 [September 14, 2017]
   Fixed incorrect typecast of some arguments to png_malloc() and
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
+
+Version 1.5.30beta03 [September 14, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
