@@ -2950,6 +2950,8 @@ Version 1.2.59beta02 [September 14, 2017]
   Compute a larger limit on IDAT because some applications write a deflate
     buffer for each row (Bug report by Andrew Church).
 
+Version 1.2.59beta03 [September 14, 2017]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
