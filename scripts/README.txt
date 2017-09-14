@@ -1,5 +1,5 @@
 
-Makefiles for  libpng version 1.2.59beta02 - September 3, 2017
+Makefiles for  libpng version 1.2.59beta02 - September 14, 2017
 
  makefile.linux    =>  Linux/ELF makefile
                        (gcc, creates libpng12.so.0.1.2.59beta02)
