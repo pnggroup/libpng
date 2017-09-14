@@ -1,5 +1,5 @@
 
-Libpng 1.4.22beta02 - September 14, 2017
+Libpng 1.4.22beta03 - September 14, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,20 +9,20 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   1.4.22beta02.tar.xz (LZMA-compressed, recommended)
-   1.4.22beta02.tar.gz
+   1.4.22beta03.tar.xz (LZMA-compressed, recommended)
+   1.4.22beta03.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1422b02.7z (LZMA-compressed, recommended)
-   lp1422b02.zip
+   lp1422b03.7z (LZMA-compressed, recommended)
+   lp1422b03.zip
 
 Other information:
 
-   1.4.22beta02-README.txt
-   1.4.22beta02-LICENSE.txt
-   libpng-1.4.22beta02-*.asc (armored detached GPG signatures)
+   1.4.22beta03-README.txt
+   1.4.22beta03-LICENSE.txt
+   libpng-1.4.22beta03-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.4.20):
 
@@ -30,12 +30,14 @@ version 1.4.22beta01 [August 28. 2017]
   Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
     parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
 
-version 1.4.22beta02 [%RDATE%]
+version 1.4.22beta02 [September 14, 2017]
   Compute a larger limit on IDAT because some applications write a deflate
     buffer for each row (Bug report by Andrew Church).
   Fixed incorrect typecast of some arguments to png_malloc() and
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
+
+version 1.4.22beta03 [September 14, 2017]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
