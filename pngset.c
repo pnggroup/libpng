@@ -881,7 +881,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 #  endif
 
-      /* oss-fuzz detects a potential UMR here */
+      /* oss-fuzz detects potential use of uninitialized value  here */
       if (text_ptr[i].text == NULL || text_ptr[i].text[0] == '\0')
       {
          text_length = 0;
