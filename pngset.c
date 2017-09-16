@@ -811,7 +811,6 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
          new_text = png_voidcast(png_textp,png_realloc_array(png_ptr,
              info_ptr->text, old_num_text, max_text-old_num_text,
              sizeof *new_text));
-         new_text[0].text[0]='\0'; /* to stop oss-fuzz complaint below */
       }
 
       if (new_text == NULL)
