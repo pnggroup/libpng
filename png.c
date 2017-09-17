@@ -816,14 +816,14 @@ png_get_copyright(png_const_structrp png_ptr)
 #else
 #  ifdef __STDC__
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.33beta04 - September 16, 2017" PNG_STRING_NEWLINE \
+      "libpng version 1.6.33beta04 - September 17, 2017" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
       "Copyright (c) 1996-1997 Andreas Dilger" PNG_STRING_NEWLINE \
       "Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc." \
       PNG_STRING_NEWLINE;
 #  else
-   return "libpng version 1.6.33beta04 - September 16, 2017\
+   return "libpng version 1.6.33beta04 - September 17, 2017\
       Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson\
       Copyright (c) 1996-1997 Andreas Dilger\
       Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.";
@@ -2214,9 +2214,13 @@ png_icc_check_tag_table(png_const_structrp png_ptr, png_colorspacerp colorspace,
     */
    for (itag=0; itag < tag_count; ++itag, tag += 12)
    {
-      png_uint_32 tag_id = png_get_uint_32(tag+0);
-      png_uint_32 tag_length = png_get_uint_32(tag+8);/* not padded */
-      png_uint_32 tag_start = png_get_uint_32(tag+4); /* must be aligned */
+      png_uint_32 tag_id = 0;
+      png_uint_32 tag_length = 0;
+      png_uint_32 tag_start = 0;
+
+      tag_id = png_get_uint_32(tag+0);
+      tag_length = png_get_uint_32(tag+8);/* not padded */
+      tag_start = png_get_uint_32(tag+4); /* must be aligned */
 
       /* The ICC specification does not exclude zero length tags, therefore the
        * start might actually be anywhere if there is no data, but this would be
