@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.6.33 [(PENDING RELEASE)]
+ * Last changed in libpng 1.6.32 [August 24, 2017]
  * Copyright (c) 1998-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -881,7 +881,6 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       }
 #  endif
 
-      /* oss-fuzz detects potential use of uninitialized value  here */
       if (text_ptr[i].text == NULL || text_ptr[i].text[0] == '\0')
       {
          text_length = 0;
@@ -893,6 +892,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
 #  endif
             textp->compression = PNG_TEXT_COMPRESSION_NONE;
       }
+
       else
       {
          text_length = strlen(text_ptr[i].text);
