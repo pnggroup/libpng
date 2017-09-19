@@ -314,6 +314,7 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
       if (buffer != NULL)
       {
+         memset(buffer, 0, new_size); /* just in case */
          png_ptr->read_buffer = buffer;
          png_ptr->read_buffer_size = new_size;
       }
@@ -670,8 +671,8 @@ png_decompress_chunk(png_structrp png_ptr,
                    (terminate != 0);
                png_bytep text = png_voidcast(png_bytep, png_malloc_base(png_ptr,
                    buffer_size));
-               /* attempt to stop an oss-fuzz "use of uninitialized value"
-                * in png_set_text_2() and png_icc_check_tag_table()
+               /* Stop an oss-fuzz "use of uninitialized value" detection
+                * in png_set_text_2()
                 */
                memset(text, 0, buffer_size);
 
@@ -1480,7 +1481,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                         /* Now read the tag table; a variable size buffer is
                          * needed at this point, allocate one for the whole
                          * profile.  The header check has already validated
-                         * that none of these stuff will overflow.
+                         * that none of this stuff will overflow.
                          */
                         const png_uint_32 tag_count = png_get_uint_32(
                             profile_header+128);
