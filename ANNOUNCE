@@ -1,5 +1,5 @@
 
-Libpng 1.2.59beta03 - September 14, 2017
+Libpng 1.2.59rc01 - September 20, 2017
 
 This is not intended to be a public release.  It will be replaced
 within a few weeks by a public version or by another test version.
@@ -9,34 +9,34 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.2.59beta03.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.59beta03.tar.gz
+   libpng-1.2.59rc01.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.59rc01.tar.gz
 
 Source files with LF line endings (for Unix/Linux) without the
 "configure" script
 
-   libpng-1.2.59beta03-no-config.tar.xz (LZMA-compressed, recommended)
-   libpng-1.2.59beta03-no-config.tar.gz
+   libpng-1.2.59rc01-no-config.tar.xz (LZMA-compressed, recommended)
+   libpng-1.2.59rc01-no-config.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lp1259b03.zip
-   lp1259b03.7z
+   lp1259r01.zip
+   lp1259r01.7z
 
 Project files
 
-   libpng-1.2.59beta03-project-netware.zip
-   libpng-1.2.59beta03-project-wince.zip
+   libpng-1.2.59rc01-project-netware.zip
+   libpng-1.2.59rc01-project-wince.zip
 
 Other information:
 
-   libpng-1.2.59beta03-README.txt
-   libpng-1.2.59beta03-KNOWNBUGS.txt
-   libpng-1.2.59beta03-LICENSE.txt
-   libpng-1.2.59beta03-Y2K-compliance.txt
-   libpng-1.2.59beta03-[previous version]-diff.txt
-   libpng-1.2.59beta03-*.asc (armored detached GPG signatures)
+   libpng-1.2.59rc01-README.txt
+   libpng-1.2.59rc01-KNOWNBUGS.txt
+   libpng-1.2.59rc01-LICENSE.txt
+   libpng-1.2.59rc01-Y2K-compliance.txt
+   libpng-1.2.59rc01-[previous version]-diff.txt
+   libpng-1.2.59rc01-*.asc (armored detached GPG signatures)
 
 Changes since the last public release (1.2.58):
 
@@ -48,7 +48,10 @@ Version 1.2.59beta02 [September 14, 2017]
   Compute a larger limit on IDAT because some applications write a deflate
     buffer for each row (Bug report by Andrew Church).
 
-Version 1.2.59beta03 [September 14, 2017]
+Version 1.2.59beta03 [September 20, 2017]
+  Initialize memory allocated by png_inflate to zero, using memset, to
+    stop an oss-fuzz "use of uninitialized value" detection in png_set_text_2()
+    due to truncated iTXT or zTXT chunk.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
