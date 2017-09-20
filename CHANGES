@@ -4551,7 +4551,7 @@ version 1.5.29beta02 [August 9, 2017]
 version 1.5.29rc01 [August 19, 2017]
   No changes.
  
-version 1.5.29 [September 14, 2017]
+version 1.5.29 [September 20, 2017]
   No changes.
 
 Version 1.5.30beta01 [August 28, 2017]
@@ -4567,7 +4567,10 @@ Version 1.5.30beta02 [September 14, 2017]
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
 
-Version 1.5.30beta03 [September 14, 2017]
+Version 1.5.30beta03 [September 20, 2017]
+  Initialize memory allocated by png_inflate to zero, using memset, to
+    stop an oss-fuzz "use of uninitialized value" detection in png_set_text_2()
+    due to truncated iTXT or zTXT chunk.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

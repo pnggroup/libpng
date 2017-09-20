@@ -473,6 +473,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          png_size_t new_size = 0;
          png_charp text = (png_charp)png_malloc_warn(png_ptr,
              prefix_size + expanded_size + 1);
+         memset(text, 0, prefix_size + expanded_size + 1); /* just in case */
 
          if (text != NULL)
          {

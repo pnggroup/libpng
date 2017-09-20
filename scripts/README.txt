@@ -1,9 +1,9 @@
 
-Makefiles for  libpng version 1.5.30beta03 - September 14, 2017
+Makefiles for  libpng version 1.5.30rc01 - September 20, 2017
 
 pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng15.so.15.1.5.30beta03)
+                       (gcc, creates libpng15.so.15.1.5.30rc01)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -34,12 +34,12 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires libpng.def)
  makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics (gcc,
-                       creates libpng15.so.15.1.5.30beta03)
+                       creates libpng15.so.15.1.5.30rc01)
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.solaris  =>  Solaris 2.X makefile (gcc,
-                       creates libpng15.so.15.1.5.30beta03)
+                       creates libpng15.so.15.1.5.30rc01)
  makefile.so9      =>  Solaris 9 makefile (gcc,
-                       creates libpng15.so.15.1.5.30beta03)
+                       creates libpng15.so.15.1.5.30rc01)
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
