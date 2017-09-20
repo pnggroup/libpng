@@ -671,9 +671,6 @@ png_decompress_chunk(png_structrp png_ptr,
                    (terminate != 0);
                png_bytep text = png_voidcast(png_bytep, png_malloc_base(png_ptr,
                    buffer_size));
-               /* Stop an oss-fuzz "use of uninitialized value" detection
-                * in png_set_text_2()
-                */
                memset(text, 0, buffer_size);
 
                if (text != NULL)
