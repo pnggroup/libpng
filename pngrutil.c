@@ -738,9 +738,7 @@ png_decompress_chunk(png_structrp png_ptr,
             {
                /* inflateReset failed, store the error message */
                png_zstream_error(png_ptr, ret);
-
-               if (ret == Z_STREAM_END)
-                  ret = PNG_UNEXPECTED_ZLIB_RETURN;
+               ret = PNG_UNEXPECTED_ZLIB_RETURN;
             }
          }
 

@@ -53,6 +53,7 @@ Version 1.6.33rc01 [September 20, 2017]
   Initialize memory allocated by png_read_buffer to zero, using memset, to
     stop an oss-fuzz "use of uninitialized value" detection in
     png_icc_check_tag_table()() due to truncated iCCP chunk.
+  Removed a redundant test (suggested by "irwir" in Github issue #180).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
