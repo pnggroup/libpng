@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Last changed in libpng 1.4.22 [September 14, 2017]
+ * Last changed in libpng 1.4.22 [September 20, 2017]
  * Copyright (c) 1998-2002,2004,2006-2015,2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -480,6 +480,7 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
          png_size_t new_size = 0;
          png_charp text = png_malloc_warn(png_ptr,
                         prefix_size + expanded_size + 1);
+         memset(text, 0, prefix_size + expanded_size + 1); /* just in case */
 
          if (text != NULL)
          {
