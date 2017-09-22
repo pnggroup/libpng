@@ -1,4 +1,4 @@
-Libpng 1.6.33rc02 - September 20, 2017
+Libpng 1.6.33rc02 - September 22, 2017
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -49,13 +49,14 @@ Version 1.6.33beta03 [September 14, 2017]
 Version 1.6.33rc01 [September 20, 2017]
   Initialize memory allocated by png_inflate to zero, using memset, to
     stop an oss-fuzz "use of uninitialized value" detection in png_set_text_2()
-    due to truncated iTXT or zTXT chunk.
+    due to truncated iTXt or zTXt chunk.
   Initialize memory allocated by png_read_buffer to zero, using memset, to
     stop an oss-fuzz "use of uninitialized value" detection in
     png_icc_check_tag_table() due to truncated iCCP chunk.
   Removed a redundant test (suggested by "irwir" in Github issue #180).
 
-Version 1.6.33rc02 [September 20, 2017]
+Version 1.6.33rc02 [September 22, 2017]
+  Added interlaced versions of each file in contrib/pngsuite.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

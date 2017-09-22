@@ -833,7 +833,7 @@ Version 1.0.7beta11 [May 7, 2000]
   Removed the new PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT modes
     which are no longer used.
   Eliminated the three new members of png_text when PNG_LEGACY_SUPPORTED is
-    defined or when neither PNG_READ_iTXt_SUPPORTED nor PNG_WRITE_iTXT_SUPPORTED
+    defined or when neither PNG_READ_iTXt_SUPPORTED nor PNG_WRITE_iTXt_SUPPORTED
     is defined.
   Made PNG_NO_READ|WRITE_iTXt the default setting, to avoid memory
     overrun when old applications fill the info_ptr->text structure directly.
@@ -6019,13 +6019,14 @@ Version 1.6.33beta03 [September 14, 2017]
 Version 1.6.33rc01 [September 20, 2017]
   Initialize memory allocated by png_inflate to zero, using memset, to
     stop an oss-fuzz "use of uninitialized value" detection in png_set_text_2()
-    due to truncated iTXT or zTXT chunk.
+    due to truncated iTXt or zTXt chunk.
   Initialize memory allocated by png_read_buffer to zero, using memset, to
     stop an oss-fuzz "use of uninitialized value" detection in
     png_icc_check_tag_table() due to truncated iCCP chunk.
   Removed a redundant test (suggested by "irwir" in Github issue #180).
 
-Version 1.6.33rc02 [September 20, 2017]
+Version 1.6.33rc02 [September 22, 2017]
+  Added interlaced versions of each file in contrib/pngsuite.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
