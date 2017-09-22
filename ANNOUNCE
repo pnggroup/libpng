@@ -58,6 +58,7 @@ Version 1.6.33rc01 [September 20, 2017]
 Version 1.6.33rc02 [September 22, 2017]
   Added an interlaced version of each file in contrib/pngsuite.
   Relocate new memset() call in pngrutil.c.
+  Removed more redundant tests (suggested by "irwir" in Github issue #180).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
