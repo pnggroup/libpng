@@ -671,10 +671,11 @@ png_decompress_chunk(png_structrp png_ptr,
                    (terminate != 0);
                png_bytep text = png_voidcast(png_bytep, png_malloc_base(png_ptr,
                    buffer_size));
-               memset(text, 0, buffer_size);
 
                if (text != NULL)
                {
+                  memset(text, 0, buffer_size);
+
                   ret = png_inflate(png_ptr, png_ptr->chunk_name, 1/*finish*/,
                       png_ptr->read_buffer + prefix_size, &lzsize,
                       text + prefix_size, newlength);
