@@ -3759,7 +3759,13 @@ png_image_read_direct(png_voidp argument)
          mode = PNG_ALPHA_PNG;
          output_gamma = PNG_DEFAULT_sRGB;
       }
-
+      
+      if ((change & PNG_FORMAT_FLAG_ASSOCIATED_ALPHA) != 0)
+      {
+         mode = PNG_ALPHA_OPTIMIZED;
+         change &= ~PNG_FORMAT_FLAG_ASSOCIATED_ALPHA;
+      }
+      
       /* If 'do_local_background' is set check for the presence of gamma
        * correction; this is part of the work-round for the libpng bug
        * described above.
@@ -3984,6 +3990,10 @@ png_image_read_direct(png_voidp argument)
 
       else if (do_local_compose != 0) /* internal error */
          png_error(png_ptr, "png_image_read: alpha channel lost");
+
+      if ((format & PNG_FORMAT_FLAG_ASSOCIATED_ALPHA) != 0) {
+         info_format |= PNG_FORMAT_FLAG_ASSOCIATED_ALPHA;
+      }
 
       if (info_ptr->bit_depth == 16)
          info_format |= PNG_FORMAT_FLAG_LINEAR;
