@@ -6025,10 +6025,12 @@ Version 1.6.33rc01 [September 20, 2017]
     png_icc_check_tag_table() due to truncated iCCP chunk.
   Removed a redundant test (suggested by "irwir" in Github issue #180).
 
-Version 1.6.33rc02 [September 22, 2017]
+Version 1.6.33rc02 [September 23, 2017]
   Added an interlaced version of each file in contrib/pngsuite.
   Relocate new memset() call in pngrutil.c.
   Removed more redundant tests (suggested by "irwir" in Github issue #180).
+  Add support for loading images with associated alpha in the Simplified
+    API (Samuel Williams).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
