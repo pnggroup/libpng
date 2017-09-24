@@ -5,7 +5,7 @@
 // Use of this source code is governed by a BSD-style license that may
 // be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
-// Last changed in libpng 1.6.33beta03 [September 23, 2017]
+// Last changed in libpng 1.6.33beta03 [September 24, 2017]
 
 // The modifications in 2017 by Glenn Randers-Pehrson include
 // 1. addition of a PNG_CLEANUP macro,
@@ -169,19 +169,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int passes = png_set_interlace_handling(png_handler.png_ptr);
   png_start_read_image(png_handler.png_ptr);
 
-  int max_filter = 0;
+  /* To do: prevent the optimizer from removing this code entirely */
   for (int pass = 0; pass < passes; ++pass) {
     for (png_uint_32 y = 0; y < height; ++y) {
       png_read_row(png_handler.png_ptr,
                    static_cast<png_bytep>(png_handler.row_ptr), nullptr);
-      max_filter = png_handler.row_buf[0] > max_filter ?
-        png_handler.row_buf[0] : max_filter;
     }
-  }
-
-  if (max_filter > 5) {
-    PNG_CLEANUP
-    return 0;
   }
 
   png_read_end(png_handler.png_ptr, png_handler.end_info_ptr);
