@@ -1584,17 +1584,11 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                                        return;
                                     }
                                  }
-
-                                 errmsg = "truncated";
-#ifndef __COVERITY__
-                                 if (size == 0)
+                                 if (errmsg == NULL)
                                     errmsg = png_ptr->zstream.msg;
-#endif
                               }
-
                               /* else png_icc_check_tag_table output an error */
                            }
-
                            else /* profile truncated */
                               errmsg = png_ptr->zstream.msg;
                         }
