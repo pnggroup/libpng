@@ -169,12 +169,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int passes = png_set_interlace_handling(png_handler.png_ptr);
   png_start_read_image(png_handler.png_ptr);
 
-  /* To do: prevent the optimizer from removing this code entirely */
+  /* prevent the optimizer from removing this code entirely */
+  int max_sample = 0;
   for (int pass = 0; pass < passes; ++pass) {
     for (png_uint_32 y = 0; y < height; ++y) {
       png_read_row(png_handler.png_ptr,
                    static_cast<png_bytep>(png_handler.row_ptr), nullptr);
+      max_sample = png_handler.row_ptr[0] > max_sample ?
+        png_handler.row_ptr[0] : max_sample;
     }
+  }
+
+  /* I hope the compiler doesn't figure out that this cannot happen */
+  if (max_sample > 255) {
+    PNG_CLEANUP
+    return 0;
   }
 
   png_read_end(png_handler.png_ptr, png_handler.end_info_ptr);
