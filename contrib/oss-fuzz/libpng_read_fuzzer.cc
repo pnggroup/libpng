@@ -5,7 +5,7 @@
 // Use of this source code is governed by a BSD-style license that may
 // be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
-// Last changed in libpng 1.6.33beta03 [September 25, 2017]
+// Last changed in libpng 1.6.33beta03 [September 27, 2017]
 
 // The modifications in 2017 by Glenn Randers-Pehrson include
 // 1. addition of a PNG_CLEANUP macro,
@@ -117,6 +117,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     PNG_CLEANUP
     return 0;
   }
+
+  /* Treat benign errors as warnings */
+  png_set_benign_errors(png_handler.png_ptr, 1);
 
   png_set_crc_action(png_handler.png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
 
