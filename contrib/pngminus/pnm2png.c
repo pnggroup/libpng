@@ -7,6 +7,7 @@
  *  version 1.2 - 2017.04.22 - Add buffer-size check
  *          1.3 - 2017.08.24 - Fix potential overflow in buffer-size check
  *                             (Glenn Randers-Pehrson)
+ *          1.4 - 2017.08.28 - Add PNGMINUS_UNUSED (Christian Hesse)
  *
  *  Permission to use, copy, modify, and distribute this software and
  *  its documentation for any purpose and without fee is hereby granted,
@@ -49,6 +50,15 @@
 #ifndef png_jmpbuf
 #  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
 #endif
+
+#ifndef PNGMINUS_UNUSED
+/* Unused formal parameter warnings are silenced using the following macro
+ * which is expected to have no bad effects on performance (optimizing
+ * compilers will probably remove it entirely).
+ */
+#  define PNGMINUS_UNUSED(param) (void)param
+#endif
+
 
 /* function prototypes */
 
@@ -376,13 +386,13 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
 
-  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes)
+  if ((row_bytes == 0 || (size_t)height > ((size_t)(-1))/(size_t)row_bytes))
   {
     /* too big */ 
     return FALSE;
   }
   if ((png_pixels = (png_byte *)
-     malloc (row_bytes * height * sizeof (png_byte))) == NULL)
+     malloc ((size_t)row_bytes * (size_t)height * sizeof (png_byte))) == NULL)
     return FALSE;
 
   /* read data from PNM file */
@@ -513,7 +523,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file, BOOL interlace,
   if (png_pixels != (unsigned char*) NULL)
     free (png_pixels);
 
-  PNG_UNUSED(raw) /* Quiet a Coverity defect */
+  PNGMINUS_UNUSED(raw); /* Quiet a Coverity defect */
 
   return TRUE;
 } /* end of pnm2png */
