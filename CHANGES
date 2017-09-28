@@ -6032,6 +6032,11 @@ Version 1.6.33rc02 [September 23, 2017]
   Add support for loading images with associated alpha in the Simplified
     API (Samuel Williams).
 
+Version 1.6.33 [September 28, 2017]
+  Revert contrib/oss-fuzz/libpng_read_fuzzer.cc to libpng-1.6.32 state.
+  Initialize png_handler.row_ptr in contrib/oss-fuzz/libpng_read_fuzzer.cc
+  Add end_info structure and png_read_end() to the libpng fuzzer.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

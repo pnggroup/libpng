@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Last changed in libpng 1.6.33 [(PENDING RELEASE)]
+# Last changed in libpng 1.6.33 [September 28, 2017]
 #
 # Revisions by Glenn Randers-Pehson, 2017:
 # 1. Build only the library, not the tools (changed "make -j$(nproc) all" to
@@ -37,13 +37,13 @@ make -j$(nproc) clean
 make -j$(nproc) libpng16.la
 
 # build libpng_read_fuzzer.
-$CXX $CXXFLAGS -O0 -std=c++11 -I. \
+$CXX $CXXFLAGS -std=c++11 -I. \
      $SRC/libpng/contrib/oss-fuzz/libpng_read_fuzzer.cc \
      -o $OUT/libpng_read_fuzzer \
      -lFuzzingEngine .libs/libpng16.a -lz
 
 # add seed corpus.
-find $SRC/libpng -name "*.png" | \
+find $SRC/libpng -name "*.png" | grep -v crashers | \
      xargs zip $OUT/libpng_read_fuzzer_seed_corpus.zip
 
 cp $SRC/libpng/contrib/oss-fuzz/*.dict \
