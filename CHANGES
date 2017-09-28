@@ -768,7 +768,7 @@ version 1.0.7beta11 [May 7, 2000]
   Removed the new PNG_CREATED_READ_STRUCT and PNG_CREATED_WRITE_STRUCT modes
     which are no longer used.
   Eliminated the three new members of png_text when PNG_LEGACY_SUPPORTED is
-    defined or when neither PNG_READ_iTXt_SUPPORTED nor PNG_WRITE_iTXT_SUPPORTED
+    defined or when neither PNG_READ_iTXt_SUPPORTED nor PNG_WRITE_iTXt_SUPPORTED
     is defined.
   Made PNG_NO_READ|WRITE_iTXt the default setting, to avoid memory
     overrun when old applications fill the info_ptr->text structure directly.
@@ -3067,10 +3067,12 @@ version 1.4.22beta02 [September 14, 2017]
     png_calloc() that were png_uint_32 instead of png_alloc_size_t
     (Bug report by "irwir" in Github libpng issue #175).
 
-version 1.4.22beta03 [September 20, 2017]
+version 1.4.22rc01 [September 20, 2017]
   Initialize memory allocated by png_inflate to zero, using memset, to
     stop an oss-fuzz "use of uninitialized value" detection in png_set_text_2()
-    due to truncated iTXT or zTXT chunk.
+    due to truncated iTXt or zTXt chunk.
+
+version 1.4.22 [September 28, 2017]
 
 Send comments/corrections/commendations to glennrp at users.sourceforge.net
 or to png-mng-implement at lists.sf.net (subscription required; visit
