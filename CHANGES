@@ -6042,6 +6042,7 @@ Version 1.6.34 [September 29, 2017]
     test failures.
 
 Version 1.6.35beta01 [September 29, 2017]
+  Restored 21 of the contrib/pngsuite/i*.png, which were correct.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
