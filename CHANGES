@@ -6037,6 +6037,10 @@ Version 1.6.33 [September 28, 2017]
   Initialize png_handler.row_ptr in contrib/oss-fuzz/libpng_read_fuzzer.cc
   Add end_info structure and png_read_end() to the libpng fuzzer.
 
+Version 1.6.34 [September 29, 2017]
+  Removed contrib/pngsuite/i*.png; some of these were incorrect and caused
+    test failures.
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

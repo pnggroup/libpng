@@ -1,4 +1,4 @@
-Libpng 1.6.33 - September 28, 2017
+Libpng 1.6.34 - September 29, 2017
 
 This is a public release of libpng, intended for use in production codes.
 
@@ -7,53 +7,24 @@ Files available for download:
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.33.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.33.tar.gz
+   libpng-1.6.34.tar.xz (LZMA-compressed, recommended)
+   libpng-1.6.34.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1633.7z  (LZMA-compressed, recommended)
-   lpng1633.zip
+   lpng1634.7z  (LZMA-compressed, recommended)
+   lpng1634.zip
 
 Other information:
 
-   libpng-1.6.33-README.txt
-   libpng-1.6.33-LICENSE.txt
-   libpng-1.6.33-*.asc (armored detached GPG signatures)
+   libpng-1.6.34-README.txt
+   libpng-1.6.34-LICENSE.txt
+   libpng-1.6.34-*.asc (armored detached GPG signatures)
 
-Changes since the last public release (1.6.32):
-  Added PNGMINUS_UNUSED macro to contrib/pngminus/p*.c and added missing
-    parenthesis in contrib/pngminus/pnm2png.c (bug report by Christian Hesse).
-  Fixed off-by-one error in png_do_check_palette_indexes() (Bug report
-    by Mick P., Source Forge Issue #269).
-  Initialize png_handler.row_ptr in contrib/oss-fuzz/libpng_read_fuzzer.cc
-    to fix shortlived oss-fuzz issue 3234.
-  Compute a larger limit on IDAT because some applications write a deflate
-    buffer for each row (Bug report by Andrew Church).
-  Use current date (DATE) instead of release-date (RDATE) in last
-    changed date of contrib/oss-fuzz files.
-  Enabled ARM support in CMakeLists.txt (Bernd Kuhls).
-  Fixed incorrect typecast of some arguments to png_malloc() and
-    png_calloc() that were png_uint_32 instead of png_alloc_size_t
-    (Bug report by "irwir" in Github libpng issue #175).
-  Use pnglibconf.h.prebuilt when building for ANDROID with cmake (Github
-    issue 162, by rcdailey).
-  Initialize memory allocated by png_inflate to zero, using memset, to
-    stop an oss-fuzz "use of uninitialized value" detection in png_set_text_2()
-    due to truncated iTXt or zTXt chunk.
-  Initialize memory allocated by png_read_buffer to zero, using memset, to
-    stop an oss-fuzz "use of uninitialized value" detection in
-    png_icc_check_tag_table() due to truncated iCCP chunk.
-  Removed a redundant test (suggested by "irwir" in Github issue #180).
-  Added an interlaced version of each file in contrib/pngsuite.
-  Relocate new memset() call in pngrutil.c.
-  Removed more redundant tests (suggested by "irwir" in Github issue #180).
-  Add support for loading images with associated alpha in the Simplified
-    API (Samuel Williams).
-  Revert contrib/oss-fuzz/libpng_read_fuzzer.cc to libpng-1.6.32 state.
-  Initialize png_handler.row_ptr in contrib/oss-fuzz/libpng_read_fuzzer.cc
-  Add end_info structure and png_read_end() to the libpng fuzzer.
+Changes since the last public release (1.6.33):
+  Removed contrib/pngsuite/i*.png; some of these were incorrect and caused
+    test failures.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
