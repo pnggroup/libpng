@@ -1,30 +1,30 @@
-Libpng 1.6.34 - September 29, 2017
+Libpng 1.6.35beta01 - September 29, 2017
 
-This is a public release of libpng, intended for use in production codes.
+This is not intended to be a public release. It will be replaced
+within a few weeks by a public version or by another test version.
 
 Files available for download:
 
 Source files with LF line endings (for Unix/Linux) and with a
 "configure" script
 
-   libpng-1.6.34.tar.xz (LZMA-compressed, recommended)
-   libpng-1.6.34.tar.gz
+   1.6.35beta01.tar.xz (LZMA-compressed, recommended)
+   1.6.35beta01.tar.gz
 
 Source files with CRLF line endings (for Windows), without the
 "configure" script
 
-   lpng1634.7z  (LZMA-compressed, recommended)
-   lpng1634.zip
+   lp1635b01.7z  (LZMA-compressed, recommended)
+   lp1635b01.zip
 
 Other information:
 
-   libpng-1.6.34-README.txt
-   libpng-1.6.34-LICENSE.txt
-   libpng-1.6.34-*.asc (armored detached GPG signatures)
+   1.6.35beta01-README.txt
+   1.6.35beta01-LICENSE.txt
 
-Changes since the last public release (1.6.33):
-  Removed contrib/pngsuite/i*.png; some of these were incorrect and caused
-    test failures.
+Changes since the last public release (1.6.34):
+
+Version 1.6.35beta01 [September 29, 2017]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
