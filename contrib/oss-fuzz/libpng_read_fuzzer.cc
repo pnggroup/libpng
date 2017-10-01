@@ -5,7 +5,7 @@
 // Use of this source code is governed by a BSD-style license that may
 // be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
-// Last changed in libpng 1.6.32 [August 24, 2017]
+// Last changed in libpng 1.6.34 [September 27, 2017]
 
 // The modifications in 2017 by Glenn Randers-Pehrson include
 // 1. addition of a PNG_CLEANUP macro,
@@ -138,7 +138,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
   png_handler.row_ptr = png_malloc(
       png_handler.png_ptr, png_get_rowbytes(png_handler.png_ptr,
-                                               png_handler.info_ptr));
+                                            png_handler.info_ptr));
 
   // reset error handler to put png_deleter into scope.
   if (setjmp(png_jmpbuf(png_handler.png_ptr))) {

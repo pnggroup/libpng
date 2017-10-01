@@ -6038,11 +6038,12 @@ Version 1.6.33 [September 28, 2017]
   Add end_info structure and png_read_end() to the libpng fuzzer.
 
 Version 1.6.34 [September 29, 2017]
-  Removed contrib/pngsuite/i*.png; some of these were incorrect and caused
-    test failures.
+  Removed contrib/pngsuite/i*.png; some of caused test failures.
 
-Version 1.6.35beta01 [September 29, 2017]
-  Restored 21 of the contrib/pngsuite/i*.png, which were correct.
+Version 1.6.35beta01 [October 1, 2017]
+  Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
+    failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
+  Clone zlib into the oss-fuzz zlib project and build zlib alongside libpng.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
