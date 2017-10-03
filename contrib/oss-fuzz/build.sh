@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Last changed in libpng 1.6.35 [October 1, 2017]
+# Last changed in libpng 1.6.35 [October 3, 2017]
 #
 # Revisions by Glenn Randers-Pehrson, 2017:
 # 1. Build only the library, not the tools (changed "make -j$(nproc) all" to
@@ -32,7 +32,7 @@ cat scripts/pnglibconf.dfa | \
 mv scripts/pnglibconf.dfa.temp scripts/pnglibconf.dfa
 
 # build zlib library.
-(cd ../zlib; ./configure; make -j$(nproc) clean; make -j$(nproc) all)
+(cd ../zlib; ./configure --zprefix; make -j$(nproc) clean; make -j$(nproc) all)
 
 # build the libpng library.
 autoreconf -f -i
