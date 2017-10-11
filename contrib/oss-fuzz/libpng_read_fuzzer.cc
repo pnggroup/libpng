@@ -136,9 +136,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   // Reading.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
-  png_handler.row_ptr = png_malloc(
-      png_handler.png_ptr, png_get_rowbytes(png_handler.png_ptr,
-                                            png_handler.info_ptr));
 
   // reset error handler to put png_deleter into scope.
   if (setjmp(png_jmpbuf(png_handler.png_ptr))) {
@@ -173,6 +170,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_start_read_image(png_handler.png_ptr);
 
   png_read_update_info(png_handler.png_ptr, png_handler.png_info_ptr);
+
+  png_handler.row_ptr = png_malloc(
+      png_handler.png_ptr, png_get_rowbytes(png_handler.png_ptr,
+                                            png_handler.info_ptr));
 
   for (int pass = 0; pass < passes; ++pass) {
     for (png_uint_32 y = 0; y < height; ++y) {
