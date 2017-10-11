@@ -172,6 +172,8 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   int passes = png_set_interlace_handling(png_handler.png_ptr);
   png_start_read_image(png_handler.png_ptr);
 
+  png_read_update_info(png_handler.png_ptr, png_handler.png_info_ptr);
+
   for (int pass = 0; pass < passes; ++pass) {
     for (png_uint_32 y = 0; y < height; ++y) {
       png_read_row(png_handler.png_ptr,
