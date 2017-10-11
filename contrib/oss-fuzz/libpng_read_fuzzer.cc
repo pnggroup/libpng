@@ -163,6 +163,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
+  // Set several transforms that browsers typically use:
+  png_set_gray_to_rgb(png_handler.png_ptr);
+  png_set_expand(png_handler.png_ptr);
+  png_set_scale_16(png_handler.png_ptr);
+  png_set_add_alpha(png_handler.png_ptr, 0xffff, PNG_FILLER_AFTER);
+
   int passes = png_set_interlace_handling(png_handler.png_ptr);
   png_start_read_image(png_handler.png_ptr);
 
