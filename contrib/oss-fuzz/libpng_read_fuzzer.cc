@@ -5,7 +5,7 @@
 // Use of this source code is governed by a BSD-style license that may
 // be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
-// Last changed in libpng 1.6.34 [September 27, 2017]
+// Last changed in libpng 1.6.35 [October 12, 2017]
 
 // The modifications in 2017 by Glenn Randers-Pehrson include
 // 1. addition of a PNG_CLEANUP macro,
@@ -13,6 +13,7 @@
 // 3. adding "#include <string.h>" which is needed on some platforms
 //    to provide memcpy().
 // 4. adding read_end_info() and creating an end_info structure.
+// 5. adding calls to png_set_*() transforms commonly used by browsers.
 
 #include <stddef.h>
 #include <stdint.h>
