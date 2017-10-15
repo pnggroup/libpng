@@ -1025,7 +1025,6 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
 
    if (trans_color != NULL)
    {
-#ifdef PNG_WARNINGS_SUPPORTED
       if (info_ptr->bit_depth < 16)
       {
          int sample_max = (1 << info_ptr->bit_depth) - 1;
@@ -1036,14 +1035,16 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
              (trans_color->red > sample_max ||
              trans_color->green > sample_max ||
              trans_color->blue > sample_max)))
+          {
             png_warning(png_ptr,
                 "tRNS chunk has out-of-range samples for bit_depth");
+            trans_color = NULL;
+          }
       }
-#endif
 
       info_ptr->trans_color = *trans_color;
 
-      if (num_trans == 0)
+      if (num_trans == 0 && trans_color != NULL)
          num_trans = 1;
    }
 
