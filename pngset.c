@@ -1038,6 +1038,7 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
           {
             png_warning(png_ptr,
                 "tRNS chunk has out-of-range samples for bit_depth");
+            png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
             return;
           }
       }
