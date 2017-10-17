@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Last changed in libpng 1.6.32 [August 24, 2017]
+ * Last changed in libpng 1.6.35 [(PENDING RELEASE)]
  * Copyright (c) 1998-2017 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
@@ -1035,17 +1035,13 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
              (trans_color->red > sample_max ||
              trans_color->green > sample_max ||
              trans_color->blue > sample_max)))
-          {
             png_warning(png_ptr,
                 "tRNS chunk has out-of-range samples for bit_depth");
-            png_free_data(png_ptr, info_ptr, PNG_FREE_TRNS, 0);
-            return;
-          }
       }
 
       info_ptr->trans_color = *trans_color;
 
-      if (num_trans == 0 && trans_color != NULL)
+      if (num_trans == 0)
          num_trans = 1;
    }
 
