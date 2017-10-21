@@ -1817,7 +1817,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   png_byte readbuf[PNG_MAX_PALETTE_LENGTH];
+   png_byte readbuf[PNG_MAX_PALETTE_LENGTH]={0};
 
    png_debug(1, "in png_handle_tRNS");
 
@@ -1840,7 +1840,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    if (png_ptr->color_type == PNG_COLOR_TYPE_GRAY)
    {
-      png_byte buf[2];
+      png_byte buf[2]={0};
 
       if (length != 2)
       {
@@ -1856,7 +1856,7 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
    {
-      png_byte buf[6];
+      png_byte buf[6]={0};
 
       if (length != 6)
       {
