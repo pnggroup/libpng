@@ -29,6 +29,7 @@ Version 1.6.35beta01 [October 29, 2017]
     failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
   Added calls to png_set_*() transforms commonly used by browsers to
     the fuzzer.
+  Initialize trans_color.red, green, and blue == trans_color.gray
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
