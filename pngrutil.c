@@ -1852,9 +1852,6 @@ png_handle_tRNS(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       png_crc_read(png_ptr, buf, 2);
       png_ptr->num_trans = 1;
       png_ptr->trans_color.gray = png_get_uint_16(buf);
-      png_ptr->trans_color.red = png_ptr->trans_color.gray;
-      png_ptr->trans_color.green = png_ptr->trans_color.gray;
-      png_ptr->trans_color.blue = png_ptr->trans_color.gray;
    }
 
    else if (png_ptr->color_type == PNG_COLOR_TYPE_RGB)
