@@ -4756,7 +4756,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
 
          else
             png_do_expand(row_info, png_ptr->row_buf + 1,
-                NULL);
+                (png_const_color_16p)NULL);
       }
    }
 #endif
