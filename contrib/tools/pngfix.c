@@ -2664,7 +2664,7 @@ zlib_check(struct file *file, png_uint_32 offset)
              * this case, so do the optimization anyway.
              */
             if (zlib.cksum)
-               chunk_message(zlib.chunk, "zlib checkum");
+               chunk_message(zlib.chunk, "zlib checksum");
             break;
 
 
@@ -3678,7 +3678,7 @@ usage(const char *prog)
    size_t i;
    static const char *usage_string[] = {
 "  Tests, optimizes and optionally fixes the zlib header in PNG files.",
-"  Optionally, when fixing, strips ancilliary chunks from the file.",
+"  Optionally, when fixing, strips ancillary chunks from the file.",
 0,
 "OPTIONS",
 "  OPERATION",

@@ -1142,7 +1142,7 @@ get_pixel(png_uint_32 format))(Pixel *p, png_const_voidp pb)
    }
 }
 
-/* Convertion between pixel formats.  The code above effectively eliminates the
+/* Conversion between pixel formats.  The code above effectively eliminates the
  * component ordering changes leaving three basic changes:
  *
  * 1) Remove an alpha channel by pre-multiplication or compositing on a

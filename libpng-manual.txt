@@ -1003,7 +1003,7 @@ chunks to be assumed to be encoded using sRGB.
     png_set_alpha_mode(pp, PNG_ALPHA_PNG, PNG_GAMMA_MAC);
 
 In this case the output is assumed to be something like an sRGB conformant
-display preceeded by a power-law lookup table of power 1.45.  This is how
+display preceded by a power-law lookup table of power 1.45.  This is how
 early Mac systems behaved.
 
     png_set_alpha_mode(pp, PNG_ALPHA_STANDARD, PNG_GAMMA_LINEAR);
@@ -1055,7 +1055,7 @@ faster.)
 
 When the default gamma of PNG files doesn't match the output gamma.
 If you have PNG files with no gamma information png_set_alpha_mode allows
-you to provide a default gamma, but it also sets the ouput gamma to the
+you to provide a default gamma, but it also sets the output gamma to the
 matching value.  If you know your PNG files have a gamma that doesn't
 match the output you can take advantage of the fact that
 png_set_alpha_mode always sets the output gamma but only sets the PNG
@@ -3779,7 +3779,7 @@ in-memory bitmap formats or to be written from the same formats.  If these
 formats do not accommodate your needs then you can, and should, use the more
 sophisticated APIs above - these support a wide variety of in-memory formats
 and a wide variety of sophisticated transformations to those formats as well
-as a wide variety of APIs to manipulate ancilliary information.
+as a wide variety of APIs to manipulate ancillary information.
 
 To read a PNG file using the simplified API:
 

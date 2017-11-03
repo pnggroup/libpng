@@ -40,7 +40,7 @@ BEGIN{
    # the lines, for example by inserting spaces around operators, and all
    # C preprocessors notice lines that start with '#', most remove comments.
    # The technique adopted here is to make the final output lines into
-   # C strings (enclosed in double quotes), preceeded by PNG_DFN.  As a
+   # C strings (enclosed in double quotes), preceded by PNG_DFN.  As a
    # consequence the output cannot contain a 'raw' double quote - instead put
    # @' in, this will be replaced by a single " afterward.  See the parser
    # script dfn.awk for more capabilities (not required here).  Note that if
@@ -336,7 +336,7 @@ $1 == "option" && NF >= 2{
 
 # chunk NAME [requires OPT] [enables LIST] [on|off|disabled]
 #   Expands to the 'option' settings appropriate to the reading and
-#   writing of an ancilliary PNG chunk 'NAME':
+#   writing of an ancillary PNG chunk 'NAME':
 #
 #   option READ_NAME requires READ_ANCILLARY_CHUNKS [READ_OPT]
 #   option READ_NAME enables NAME LIST
