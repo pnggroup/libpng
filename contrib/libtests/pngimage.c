@@ -927,7 +927,7 @@ update_display(struct display *dp)
    png_structp pp;
    png_infop   ip;
 
-   /* Now perform the initial read with a 0 tranform. */
+   /* Now perform the initial read with a 0 transform. */
    read_png(dp, &dp->original_file, "original read", 0/*no transform*/);
 
    /* Move the result to the 'original' fields */

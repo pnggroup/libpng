@@ -2117,7 +2117,7 @@ better_options(const struct display *dp)
     *
     * This function looks through the stack from the bottom up looking for an
     * option that does not match the current best value.  When it finds one it
-    * checks to see if it is more or less desireable and returns true or false
+    * checks to see if it is more or less desirable and returns true or false
     * as appropriate.
     *
     * Notice that this means that the order options are pushed onto the stack
