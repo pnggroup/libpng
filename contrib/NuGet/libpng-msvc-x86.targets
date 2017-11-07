@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup Label="Release and win32" Condition="( $(Configuration.ToLower().IndexOf('debug')) == -1 ) And '$(Platform.ToLower())' == 'win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>HAS_libpng;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib_release/libpng16.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Label="Debug and win32" Condition="( $(Configuration.ToLower().IndexOf('debug')) &gt; -1 ) And '$(Platform.ToLower())' == 'win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>HAS_libpng;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ResourceCompile>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)../..//build/native/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)../..//build/native/lib_debug/libpng16_staticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <Target Name="libpng-msvc">
+  </Target>
+  <Target Name="libpng-msvc_AfterBuild" AfterTargets="AfterBuild" />
+  <Target Name="libpng-msvc_AfterBuild_redist_Release_win32" Label="Release and win32 Redist" Condition="( $(Configuration.ToLower().IndexOf('debug')) == -1 ) And '$(Platform.ToLower())' == 'win32'" AfterTargets="libpng-msvc_AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)../..//build/native/bin_release/libpng16.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="false" />
+  </Target>
+  <Target Name="libpng-msvc_AfterBuild_redist_Debug_win32" Label="Debug and win32 Redist" Condition="( $(Configuration.ToLower().IndexOf('debug')) &gt; -1 ) And '$(Platform.ToLower())' == 'win32'" AfterTargets="libpng-msvc_AfterBuild">
+    <Copy SourceFiles="$(MSBuildThisFileDirectory)../..//build/native/bin_debug/libpng16d.dll" DestinationFolder="$(TargetDir)" SkipUnchangedFiles="false" />
+  </Target>
+</Project>

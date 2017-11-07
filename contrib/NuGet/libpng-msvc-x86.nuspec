@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>libpng-msvc-x86</id>
+        <version>1.6.33.8807</version>
+        <authors>administrator</authors>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Visual Studio 2017 Release libpng as NuGet package.</description>
+    </metadata>
+    <files>
+        <file src="..\..\LICENSE" target="LICENSE" />
+        <file src="..\..\README" target="README" />
+		<file src="..\..\build-nuget\**\*" target="build\native" />
+    </files>
+</package>
