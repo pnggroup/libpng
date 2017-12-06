@@ -471,12 +471,14 @@ png_decompress_chunk(png_structp png_ptr, int comp_type,
       {
          /* Success (maybe) - really uncompress the chunk. */
          png_size_t new_size = 0;
+         png_size_t buffer_size = prefix_size + expanded_size + 1;
          png_charp text = (png_charp)png_malloc_warn(png_ptr,
-             prefix_size + expanded_size + 1);
-         memset(text, 0, prefix_size + expanded_size + 1); /* just in case */
+             buffer_size);
 
          if (text != NULL)
          {
+            memset(text, 0, buffer_size);
+
             png_memcpy(text, png_ptr->chunkdata, prefix_size);
             new_size = png_inflate(png_ptr,
                 (png_bytep)(png_ptr->chunkdata + prefix_size),
