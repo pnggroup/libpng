@@ -1278,9 +1278,6 @@ PNG_EXTERN void png_check_chunk_length PNGARG((png_structp png_ptr,
 PNG_EXTERN void png_handle_unknown PNGARG((png_structp png_ptr,
     png_infop info_ptr, png_uint_32 length));
 
-PNG_EXTERN void png_check_chunk_name PNGARG((png_structp png_ptr,
-    png_uint_32 chunk_name));
-
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
 /* Exactly as png_handle_as_unknown() except that the argument is a 32-bit chunk
  * name, not a string.

@@ -2674,6 +2674,10 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
 {
    png_uint_32 skip = 0;
 
+#ifndef PNG_READ_USER_CHUNKS_SUPPORTED
+   PNG_UNUSED(info_ptr) /* Quiet compiler warnings about unused info_ptr */
+#endif
+
    png_debug(1, "in png_handle_unknown");
 
 #ifdef PNG_USER_LIMITS_SUPPORTED
@@ -2787,10 +2791,6 @@ png_handle_unknown(png_structp png_ptr, png_infop info_ptr, png_uint_32 length)
       skip = length;
 
    png_crc_finish(png_ptr, skip);
-
-#ifndef PNG_READ_USER_CHUNKS_SUPPORTED
-   PNG_UNUSED(info_ptr) /* Quiet compiler warnings about unused info_ptr */
-#endif
 }
 
 /* This function is called to verify that a chunk name is valid.
