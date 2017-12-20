@@ -2641,6 +2641,9 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    else if (keyword_length + 3 > length)
       errmsg = "truncated";
 
+   else if (keyword_length + 1 >= length)
+      errmsg = "avoid buffer overrun";
+
    else if (buffer[keyword_length+1] != PNG_COMPRESSION_TYPE_BASE)
       errmsg = "unknown compression type";
 
