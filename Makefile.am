@@ -95,7 +95,8 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = png.c pngerror.c\
 
 if PNG_ARM_NEON
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += arm/arm_init.c\
-	arm/filter_neon.S arm/filter_neon_intrinsics.c
+	arm/filter_neon.S arm/filter_neon_intrinsics.c \
+	arm/palette_neon_intrinsics.c
 endif
 
 if PNG_MIPS_MSA
