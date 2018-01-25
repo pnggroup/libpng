@@ -105,7 +105,8 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
     set(libpng_arm_sources
       arm/arm_init.c
       arm/filter_neon.S
-      arm/filter_neon_intrinsics.c)
+      arm/filter_neon_intrinsics.c
+      arm/palette_neon_intrinsics.c)
 
     if(${PNG_ARM_NEON} STREQUAL "on")
       add_definitions(-DPNG_ARM_NEON_OPT=2)

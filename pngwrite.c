@@ -948,6 +948,10 @@ png_write_destroy(png_structrp png_ptr)
    png_free_buffer_list(png_ptr, &png_ptr->zbuffer_list);
    png_free(png_ptr, png_ptr->row_buf);
    png_ptr->row_buf = NULL;
+#ifdef PNG_READ_EXPANDED_SUPPORTED
+   png_free(png_ptr, png_ptr->riffled_palette);
+   png_ptr->riffled_palette = NULL;
+#endif
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_free(png_ptr, png_ptr->prev_row);
    png_free(png_ptr, png_ptr->try_row);

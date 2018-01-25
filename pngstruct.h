@@ -228,6 +228,10 @@ struct png_struct_def
                                * big_row_buf; while writing it is separately
                                * allocated.
                                */
+#ifdef PNG_READ_EXPAND_SUPPORTED
+   /* Buffer to accelerate palette transformations. */
+   png_bytep riffled_palette;
+#endif
 #ifdef PNG_WRITE_FILTER_SUPPORTED
    png_bytep try_row;    /* buffer to save trial row when filtering */
    png_bytep tst_row;    /* buffer to save best trial row when filtering */
