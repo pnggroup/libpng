@@ -805,8 +805,8 @@ END{
    print comment, "end of options", cend >out
 
    # Do the 'setting' values second, the algorithm the standard
-   # tree walk (O(1)) done in an O(2) while/for loop; interations
-   # settings x depth, outputing the deepest required macros
+   # tree walk (O(1)) done in an O(2) while/for loop; iterations
+   # settings x depth, outputting the deepest required macros
    # first.
    print "" >out
    print "/* SETTINGS */" >out

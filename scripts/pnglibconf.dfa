@@ -189,7 +189,7 @@ setting USER_VERSIONINFO_LEGALTRADEMARKS
 
 setting API_RULE default 0
 
-# This allows a prefix to be added to the front of every API functon name (and
+# This allows a prefix to be added to the front of every API function name (and
 # therefore every symbol) by redefining all the function names with the prefix
 # at the end of pnglibconf.h.  It also turns on similar internal symbol renaming
 # by causing a similar build-time only file, pngprefix.h, to be generated.

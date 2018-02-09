@@ -2363,7 +2363,7 @@ zlib_advance(struct zlib *zlib, png_uint_32 nbytes)
       flush = Z_NO_FLUSH;
       out_bytes = 0;
 
-      /* NOTE: expression 3 is only evaluted on 'continue', because of the
+      /* NOTE: expression 3 is only evaluated on 'continue', because of the
        * 'break' at the end of this loop below.
        */
       for (;endrc == ZLIB_OK;

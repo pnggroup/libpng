@@ -424,7 +424,7 @@ else()
                     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
   # A single target handles generation of all generated files.  If
-  # they are dependend upon separately by multiple targets, this
+  # they are depended upon separately by multiple targets, this
   # confuses parallel make (it would require a separate top-level
   # target for each file to track the dependencies properly).
   add_custom_target(genfiles DEPENDS

@@ -5266,7 +5266,7 @@ or as a "pull request" to
     https://github.com/glennrp/libpng/pulls
 
 We also accept patches built from the tar or zip distributions, and
-simple verbal discriptions of bug fixes, reported either to the
+simple verbal descriptions of bug fixes, reported either to the
 SourceForge bug tracker, to the png-mng-implement at lists.sf.net
 mailing list, as github issues, or directly to glennrp.
 
