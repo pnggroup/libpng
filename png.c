@@ -699,6 +699,9 @@ png_get_io_ptr(png_const_structrp png_ptr)
  * PNG_NO_STDIO or otherwise disabled PNG_STDIO_SUPPORTED, you must use a
  * function of your own because "FILE *" isn't necessarily available.
  */
+#ifdef png_init_io
+#undef png_init_io
+#endif
 void PNGAPI
 png_init_io(png_structrp png_ptr, png_FILE_p fp)
 {
@@ -710,6 +713,36 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
    png_ptr->io_ptr = (png_voidp)fp;
 }
 #  endif
+
+void PNGAPI
+png_init_io2(png_structrp png_ptr, png_FILE_p fp, png_fread_ptr fread_fn,
+   png_fwrite_ptr fwrite_fn, png_fflush_ptr fflush_fn)
+{
+   if (png_ptr->read_data_fn != NULL)
+   {
+      png_init_read_io(png_ptr, fp, fread_fn);
+   }
+   else
+   {
+      png_init_write_io(png_ptr, fp, fwrite_fn, fflush_fn);
+   }
+}
+
+void PNGAPI
+png_init_read_io(png_structrp png_ptr, png_FILE_p fp, png_fread_ptr fread_fn)
+{
+   png_debug(1, "in png_init_read_io");
+   png_set_read_fn2(png_ptr, fp, png_default_read_data, fread_fn);
+}
+
+void PNGAPI
+png_init_write_io(png_structrp png_ptr, png_FILE_p fp, png_fwrite_ptr fwrite_fn,
+   png_fflush_ptr fflush_fn)
+{
+   png_debug(1, "in png_init_write_io");
+   png_set_write_fn2(png_ptr, fp, png_default_write_data, png_default_flush,
+      fwrite_fn, fflush_fn);
+}
 
 #  ifdef PNG_SAVE_INT_32_SUPPORTED
 /* PNG signed integers are saved in 32-bit 2's complement format.  ANSI C-90

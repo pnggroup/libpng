@@ -811,6 +811,12 @@ typedef PNG_CALLBACK(void, *png_read_status_ptr, (png_structp, png_uint_32,
 typedef PNG_CALLBACK(void, *png_write_status_ptr, (png_structp, png_uint_32,
     int));
 
+typedef PNG_CALLBACK(size_t, *png_fread_ptr, (png_voidp, png_size_t,
+   png_size_t, png_FILE_p));
+typedef PNG_CALLBACK(size_t, *png_fwrite_ptr, (png_const_voidp, png_size_t,
+   png_size_t, png_FILE_p));
+typedef PNG_CALLBACK(int, *png_fflush_ptr, (png_FILE_p));
+
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 typedef PNG_CALLBACK(void, *png_progressive_info_ptr, (png_structp, png_infop));
 typedef PNG_CALLBACK(void, *png_progressive_end_ptr, (png_structp, png_infop));
@@ -1589,6 +1595,29 @@ PNG_EXPORT(226, void, png_set_text_compression_method, (png_structrp png_ptr,
 #ifdef PNG_STDIO_SUPPORTED
 /* Initialize the input/output for the PNG file to the default functions. */
 PNG_EXPORT(74, void, png_init_io, (png_structrp png_ptr, png_FILE_p fp));
+PNG_EXPORT(250, void, png_init_io2, (png_structrp png_ptr, png_FILE_p fp,
+   png_fread_ptr fread_fn, png_fwrite_ptr fwrite_fn,
+   png_fflush_ptr fflush_fn));
+
+static inline png_size_t
+png_fread_(png_voidp buf, png_size_t sz, png_size_t count, png_FILE_p fp)
+{
+   return fread(buf, sz, count, fp);
+}
+
+static inline png_size_t
+png_fwrite_(png_const_voidp buf, png_size_t sz, png_size_t count, png_FILE_p fp)
+{
+   return fwrite(buf, sz, count, fp);
+}
+
+static inline int png_fflush_(png_FILE_p fp)
+{
+   return fflush(fp);
+}
+
+#define png_init_io(png_ptr, fp) png_init_io2((png_ptr), (fp), png_fread_, \
+   png_fwrite_, png_fflush_)
 #endif
 
 /* Replace the (error and abort), and warning functions with user
@@ -1618,9 +1647,17 @@ PNG_EXPORT(76, png_voidp, png_get_error_ptr, (png_const_structrp png_ptr));
 PNG_EXPORT(77, void, png_set_write_fn, (png_structrp png_ptr, png_voidp io_ptr,
     png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn));
 
+/* Initialize the output for the PNG file. */
+PNG_EXPORT(251, void, png_init_write_io, (png_structrp png_ptr, png_FILE_p fp,
+   png_fwrite_ptr fwrite_fn, png_fflush_ptr fflush_fn));
+
 /* Replace the default data input function with a user supplied one. */
 PNG_EXPORT(78, void, png_set_read_fn, (png_structrp png_ptr, png_voidp io_ptr,
     png_rw_ptr read_data_fn));
+
+/* Initialize the input for the PNG file. */
+PNG_EXPORT(252, void, png_init_read_io, (png_structrp png_ptr, png_FILE_p fp,
+   png_fread_ptr fread_fn));
 
 /* Return the user pointer associated with the I/O functions */
 PNG_EXPORT(79, png_voidp, png_get_io_ptr, (png_const_structrp png_ptr));
@@ -3266,7 +3303,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(249);
+  PNG_EXPORT_LAST_ORDINAL(252);
 #endif
 
 #ifdef __cplusplus

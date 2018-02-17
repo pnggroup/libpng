@@ -479,5 +479,11 @@ struct png_struct_def
    png_colorspace   colorspace;
 #endif
 #endif
+
+   png_fread_ptr fread_fn;  /* function for reading input data */
+   png_fwrite_ptr fwrite_fn;   /* function for writing output data */
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+   png_fflush_ptr fflush_fn; /* Function for flushing output */
+#endif
 };
 #endif /* PNGSTRUCT_H */
