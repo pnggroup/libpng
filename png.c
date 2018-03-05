@@ -4344,7 +4344,7 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
       png_uint_32 setting = (2U + (onoff != 0)) << option;
       png_uint_32 current = png_ptr->options;
 
-      png_ptr->options = (png_uint_32)(((current & ~mask) | setting) & 0xff);
+      png_ptr->options = (png_uint_32)((current & ~mask) | setting);
 
       return (int)(current & mask) >> option;
    }
