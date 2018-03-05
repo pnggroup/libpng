@@ -191,7 +191,7 @@ vl_strategy[] =
    /* This controls the order of search. */
    { "huffman", Z_HUFFMAN_ONLY },
    { "RLE", Z_RLE },
-   { "fixed", Z_FIXED }, /* the remainder do window searchs */
+   { "fixed", Z_FIXED }, /* the remainder do window searches */
    { "filtered", Z_FILTERED },
    { "default", Z_DEFAULT_STRATEGY },
    { all, 0 }
@@ -336,7 +336,7 @@ static const option options[] =
 #  define VLC(name) VLCIDAT(name) VLCiCCP(name) VLCzTXt(name)
 
 #  ifdef PNG_SW_COMPRESS_png_level
-      /* The libpng compression level isn't searched beause it justs sets the
+      /* The libpng compression level isn't searched because it justs sets the
        * other things that are searched!
        */
       VLO("compression", compression, 0)
