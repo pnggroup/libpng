@@ -1,11 +1,11 @@
 
 // libpng_read_fuzzer.cc
-// Copyright 2017 Glenn Randers-Pehrson
+// Copyright 2017-2018 Glenn Randers-Pehrson
 // Copyright 2015 The Chromium Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that may
 // be found in the LICENSE file https://cs.chromium.org/chromium/src/LICENSE
 
-// Last changed in libpng 1.6.35 [October 30, 2017]
+// Last changed in libpng 1.6.35 [March 6, 2018]
 
 // The modifications in 2017 by Glenn Randers-Pehrson include
 // 1. addition of a PNG_CLEANUP macro,
@@ -165,7 +165,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   png_set_gray_to_rgb(png_handler.png_ptr);
   png_set_expand(png_handler.png_ptr);
   png_set_packing(png_handler.png_ptr);
-  // png_set_scale_16(png_handler.png_ptr);
+  png_set_scale_16(png_handler.png_ptr);
   png_set_tRNS_to_alpha(png_handler.png_ptr);
 
   int passes = png_set_interlace_handling(png_handler.png_ptr);

@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Last changed in libpng 1.6.35 [October 7, 2017]
+# Last changed in libpng 1.6.35 [March 6, 2018]
 #
 # Revisions by Glenn Randers-Pehrson, 2017:
 # 1. Build only the library, not the tools (changed "make -j$(nproc) all" to
