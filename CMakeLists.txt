@@ -149,7 +149,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
   if(index EQUAL -1)
     message(FATAL_ERROR
       " PNG_INTEL_SSE must be one of [${PNG_INTEL_SSE_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_INTEL_SSE} STREQUAL "no")
+  elseif(NOT ${PNG_INTEL_SSE} STREQUAL "off")
     set(libpng_intel_sources
       intel/intel_init.c
       intel/filter_sse2_intrinsics.c)
