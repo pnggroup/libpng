@@ -1,8 +1,8 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Last changed in libpng 1.6.32 [August 24, 2017]
- * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
+ * Last changed in libpng 1.6.35 [(PENDING RELEASE)]
+ * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
  * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
  *
@@ -741,8 +741,7 @@ png_get_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_iCCP) != 0 &&
-       name != NULL && compression_type != NULL && profile != NULL &&
-           proflen != NULL)
+       name != NULL && profile != NULL && proflen != NULL)
    {
       *name = info_ptr->iccp_name;
       *profile = info_ptr->iccp_profile;
@@ -755,6 +754,7 @@ png_get_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
    }
 
    return (0);
+
 }
 #endif
 

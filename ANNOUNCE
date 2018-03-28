@@ -1,4 +1,4 @@
-Libpng 1.6.35beta02 - March 6, 2018
+Libpng 1.6.35beta02 - March 28, 2018
 
 This is not intended to be a public release. It will be replaced
 within a few weeks by a public version or by another test version.
@@ -36,6 +36,10 @@ Version 1.6.35beta01 [March 6, 2018]
   Added hardware optimization directories to zip and 7z distributions.
   Fixed incorrect bitmask for options.
   Fixed many spelling typos.
+
+Version 1.6.35bet02 [%DATE]
+  Make png_get_iCCP consistent with man page (allow compression-type argument
+  to be NULL, bug report by Lenard Szolnoki).
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit

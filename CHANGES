@@ -6053,6 +6053,10 @@ Version 1.6.35beta01 [March 6, 2018]
   Fixed incorrect bitmask for options.
   Fixed many spelling typos.
 
+Version 1.6.35beta02 [March 28, 2018]
+  Make png_get_iCCP consistent with man page (allow compression-type argument
+  to be NULL, bug report by Lenard Szolnoki).
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
