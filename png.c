@@ -2167,15 +2167,15 @@ static const struct
     * match the D50 PCS illuminant in the header (it is in fact the D65 values,
     * so the white point is recorded as the un-adapted value.)  The profiles
     * below only differ in one byte - the intent - and are basically the same as
-    * the previous profile except for the mediaWhitePointTag error and a missing
+    * the previous profile except for the mediaWhitePointTag difference and no
     * chromaticAdaptationTag.
     */
    PNG_ICC_CHECKSUM(0xf784f3fb, 0x182ea552,
-       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 1/*broken*/,
+       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 0, 0,
        "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 perceptual")
 
    PNG_ICC_CHECKSUM(0x0398f3fc, 0xf29e526d,
-       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 1/*broken*/,
+       PNG_MD5(0x00000000, 0x00000000, 0x00000000, 0x00000000), 1, 0,
        "1998/02/09 06:49:00", 3144, "HP-Microsoft sRGB v2 media-relative")
 };
 
