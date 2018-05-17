@@ -103,6 +103,11 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += mips/mips_init.c\
 	mips/filter_msa_intrinsics.c
 endif
 
+if PNG_MIPS_MMI
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += mips-mmi/mips_mmi_init.c\
+        mips-mmi/filter_mmi_intrinsics.c
+endif
+
 if PNG_INTEL_SSE
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += intel/intel_init.c\
 	intel/filter_sse2_intrinsics.c

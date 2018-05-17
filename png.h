@@ -3244,6 +3244,10 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #endif
 #define PNG_OPTION_NEXT  12 /* Next option - numbers must be even */
 
+#ifdef PNG_MIPS_MMI_API_SUPPORTED
+#  define PNG_MIPS_MMI   14 /* HARDWARE: MIPS Mmi SIMD instructions supported */
+#endif
+
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
 #define PNG_OPTION_INVALID 1 /* Option number out of range */
