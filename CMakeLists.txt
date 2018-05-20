@@ -16,6 +16,7 @@
 # Revised by David Callu, 2020
 # Revised by Steve Robinson, 2020
 # Revised by Simon Hausmann, 2020
+# Revised by Alex Gaynor, 2020
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -56,7 +57,8 @@ endif()
 # COMMAND LINE OPTIONS
 option(PNG_SHARED "Build shared lib" ON)
 option(PNG_STATIC "Build static lib" ON)
-option(PNG_TESTS  "Build libpng tests" ON)
+option(PNG_EXECUTABLES "Build libpng executables" ON)
+option(PNG_TESTS "Build libpng tests" ON)
 
 # Many more configuration options could be added here
 option(PNG_FRAMEWORK "Build OS X framework" OFF)
@@ -750,7 +752,7 @@ if(PNG_TESTS AND PNG_SHARED)
   png_add_test(NAME pngimage-full COMMAND pngimage OPTIONS --exhaustive --list-combos --log FILES ${PNGSUITE_PNGS})
 endif()
 
-if(PNG_SHARED)
+if(PNG_SHARED AND PNG_EXECUTABLES)
   add_executable(pngfix ${pngfix_sources})
   target_link_libraries(pngfix png)
   set(PNG_BIN_TARGETS pngfix)
