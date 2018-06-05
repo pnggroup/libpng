@@ -962,7 +962,7 @@ bits_of(png_uint_32 num)
    return b; /* 0..32 */
 }
 
-/* Main interface to file storeage, after writing a new PNG file (see the API
+/* Main interface to file storage, after writing a new PNG file (see the API
  * below) call store_storefile to store the result with the given name and id.
  */
 static void
@@ -4706,7 +4706,7 @@ make_error(png_store* const ps, png_byte const colour_type,
       else
       {
          /* Now write the whole image, just to make sure that the detected, or
-          * undetected, errro has not created problems inside libpng.  This
+          * undetected, error has not created problems inside libpng.  This
           * doesn't work if there was a png_error in png_write_info because that
           * can abort before PLTE was written.
           */
@@ -9299,7 +9299,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
          int mode = dp->do_background - ALPHA_MODE_OFFSET;
 
          /* The gamma value is the output gamma, and is in the standard,
-          * non-inverted, represenation.  It provides a default for the PNG file
+          * non-inverted, representation.  It provides a default for the PNG file
           * gamma, but since the file has a gAMA chunk this does not matter.
           */
          const double sg = dp->screen_gamma;

@@ -2917,7 +2917,7 @@ typedef struct
  * 'flags' field of png_image.
  */
 #define PNG_IMAGE_FLAG_COLORSPACE_NOT_sRGB 0x01
-   /* This indicates the the RGB values of the in-memory bitmap do not
+   /* This indicates that the RGB values of the in-memory bitmap do not
     * correspond to the red, green and blue end-points defined by sRGB.
     */
 

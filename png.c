@@ -1115,7 +1115,7 @@ png_colorspace_set_gamma(png_const_structrp png_ptr,
     png_colorspacerp colorspace, png_fixed_point gAMA)
 {
    /* Changed in libpng-1.5.4 to limit the values to ensure overflow can't
-    * occur.  Since the fixed point representation is asymetrical it is
+    * occur.  Since the fixed point representation is asymmetrical it is
     * possible for 1/gamma to overflow the limit of 21474 and this means the
     * gamma value must be at least 5/100000 and hence at most 20000.0.  For
     * safety the limits here are a little narrower.  The values are 0.00016 to

@@ -2726,7 +2726,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
                result = 0;
          }
 
-         /* If reqested copy the error values back from the Transform. */
+         /* If requested, copy the error values back from the Transform. */
          if (a->opts & ACCUMULATE)
          {
             tr.error_ptr[0] = tr.error[0];
@@ -2931,7 +2931,7 @@ compare_two_images(Image *a, Image *b, int via_linear,
       }
    }
 
-   /* If reqested copy the error values back from the Transform. */
+   /* If requested, copy the error values back from the Transform. */
    if (a->opts & ACCUMULATE)
    {
       tr.error_ptr[0] = tr.error[0];
