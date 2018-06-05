@@ -2220,7 +2220,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
    strcpy(dp->best, dp->curr);
    dp->best_size = dp->write_size;
 
-   if (dp->nsp > 0) /* interating over lists */
+   if (dp->nsp > 0) /* iterating over lists */
    {
       char *tmpname, tmpbuf[(sizeof dp->namebuf) + 4];
       assert(dp->curr[0] == ' ' && dp->tsp > 0);
