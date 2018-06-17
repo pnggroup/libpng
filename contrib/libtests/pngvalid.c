@@ -711,7 +711,7 @@ typedef struct png_store_file
    unsigned int            IDAT_bits; /* Number of bits in IDAT size */
    png_uint_32             IDAT_size; /* Total size of IDAT data */
    png_uint_32             id;        /* must be correct (see FILEID) */
-   png_size_t              datacount; /* In this (the last) buffer */
+   size_t                  datacount; /* In this (the last) buffer */
    png_store_buffer        data;      /* Last buffer in file */
    int                     npalette;  /* Number of entries in palette */
    store_palette_entry*    palette;   /* May be NULL */
@@ -777,10 +777,10 @@ typedef struct png_store
    png_infop          piread;
    png_store_file*    current;  /* Set when reading */
    png_store_buffer*  next;     /* Set when reading */
-   png_size_t         readpos;  /* Position in *next */
+   size_t             readpos;  /* Position in *next */
    png_byte*          image;    /* Buffer for reading interlaced images */
-   png_size_t         cb_image; /* Size of this buffer */
-   png_size_t         cb_row;   /* Row size of the image(s) */
+   size_t             cb_image; /* Size of this buffer */
+   size_t             cb_row;   /* Row size of the image(s) */
    uLong              IDAT_crc;
    png_uint_32        IDAT_len; /* Used when re-chunking IDAT chunks */
    png_uint_32        IDAT_pos; /* Used when re-chunking IDAT chunks */
@@ -791,7 +791,7 @@ typedef struct png_store
    png_store_file*    saved;
    png_structp        pwrite;   /* Used when writing a new file */
    png_infop          piwrite;
-   png_size_t         writepos; /* Position in .new */
+   size_t             writepos; /* Position in .new */
    char               wname[FILE_NAME_SIZE];
    png_store_buffer   new;      /* The end of the new PNG file being written. */
    store_pool         write_memory_pool;
@@ -1125,7 +1125,7 @@ static png_bytep
 store_image_row(const png_store* ps, png_const_structp pp, int nImage,
    png_uint_32 y)
 {
-   png_size_t coffset = (nImage * ps->image_h + y) * (ps->cb_row + 5) + 2;
+   size_t coffset = (nImage * ps->image_h + y) * (ps->cb_row + 5) + 2;
 
    if (ps->image == NULL)
       png_error(pp, "no allocated image");
@@ -1160,9 +1160,9 @@ store_image_free(png_store *ps, png_const_structp pp)
 
 static void
 store_ensure_image(png_store *ps, png_const_structp pp, int nImages,
-   png_size_t cbRow, png_uint_32 cRows)
+   size_t cbRow, png_uint_32 cRows)
 {
-   png_size_t cb = nImages * cRows * (cbRow + 5);
+   size_t cb = nImages * cRows * (cbRow + 5);
 
    if (ps->cb_image < cb)
    {
@@ -1234,7 +1234,7 @@ store_image_check(const png_store* ps, png_const_structp pp, int iImage)
       png_error(pp, "image overwrite");
    else
    {
-      png_size_t cbRow = ps->cb_row;
+      size_t cbRow = ps->cb_row;
       png_uint_32 rows = ps->image_h;
 
       image += iImage * (cbRow+5) * ps->image_h;
@@ -1278,7 +1278,7 @@ valid_chunktype(png_uint_32 chunktype)
 }
 
 static void PNGCBAPI
-store_write(png_structp ppIn, png_bytep pb, png_size_t st)
+store_write(png_structp ppIn, png_bytep pb, size_t st)
 {
    png_const_structp pp = ppIn;
    png_store *ps = voidcast(png_store*, png_get_io_ptr(pp));
@@ -1346,13 +1346,13 @@ store_write(png_structp ppIn, png_bytep pb, png_size_t st)
 
       else /* chunkpos >= 8 */
       {
-         png_size_t cb = st;
+         size_t cb = st;
 
          if (cb > STORE_BUFFER_SIZE - writepos)
             cb = STORE_BUFFER_SIZE - writepos;
 
          if (cb  > chunklen - chunkpos/* bytes left in chunk*/)
-            cb = (png_size_t)/*SAFE*/(chunklen - chunkpos);
+            cb = (size_t)/*SAFE*/(chunklen - chunkpos);
 
          memcpy(ps->new.buffer + writepos, pb, cb);
          chunkpos += (png_uint_32)/*SAFE*/cb;
@@ -1440,7 +1440,7 @@ store_read_buffer_next(png_store *ps)
  * during progressive read, where the io_ptr is set internally by libpng.
  */
 static void
-store_read_imp(png_store *ps, png_bytep pb, png_size_t st)
+store_read_imp(png_store *ps, png_bytep pb, size_t st)
 {
    if (ps->current == NULL || ps->next == NULL)
       png_error(ps->pread, "store state damaged");
@@ -1463,14 +1463,13 @@ store_read_imp(png_store *ps, png_bytep pb, png_size_t st)
    }
 }
 
-static png_size_t
-store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
-      const png_size_t min)
+static size_t
+store_read_chunk(png_store *ps, png_bytep pb, size_t max, size_t min)
 {
    png_uint_32 chunklen = ps->chunklen;
    png_uint_32 chunktype = ps->chunktype;
    png_uint_32 chunkpos = ps->chunkpos;
-   png_size_t st = max;
+   size_t st = max;
 
    if (st > 0) do
    {
@@ -1601,8 +1600,8 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
 
                store_read_imp(ps, pb, avail);
                ps->IDAT_crc = crc32(ps->IDAT_crc, pb, avail);
-               pb += (png_size_t)/*SAFE*/avail;
-               st -= (png_size_t)/*SAFE*/avail;
+               pb += (size_t)/*SAFE*/avail;
+               st -= (size_t)/*SAFE*/avail;
                chunkpos += (png_uint_32)/*SAFE*/avail;
                IDAT_size -= (png_uint_32)/*SAFE*/avail;
                IDAT_pos += (png_uint_32)/*SAFE*/avail;
@@ -1669,10 +1668,10 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
 
          else /* Return chunk bytes, including the CRC */
          {
-            png_size_t avail = st;
+            size_t avail = st;
 
             if (avail > chunklen - chunkpos)
-               avail = (png_size_t)/*SAFE*/(chunklen - chunkpos);
+               avail = (size_t)/*SAFE*/(chunklen - chunkpos);
 
             store_read_imp(ps, pb, avail);
             pb += avail;
@@ -1698,7 +1697,7 @@ store_read_chunk(png_store *ps, png_bytep pb, const png_size_t max,
 }
 
 static void PNGCBAPI
-store_read(png_structp ppIn, png_bytep pb, png_size_t st)
+store_read(png_structp ppIn, png_bytep pb, size_t st)
 {
    png_const_structp pp = ppIn;
    png_store *ps = voidcast(png_store*, png_get_io_ptr(pp));
@@ -1724,7 +1723,7 @@ store_progressive_read(png_store *ps, png_structp pp, png_infop pi)
    while (store_read_buffer_avail(ps) > 0)
    {
       static png_uint_32 noise = 2;
-      png_size_t cb;
+      size_t cb;
       png_byte buffer[512];
 
       /* Generate 15 more bits of stuff: */
@@ -2991,7 +2990,7 @@ modifier_setbuffer(png_modifier *pm)
  * png_struct.
  */
 static void
-modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
+modifier_read_imp(png_modifier *pm, png_bytep pb, size_t st)
 {
    while (st > 0)
    {
@@ -3137,7 +3136,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
              */
             if (len+12 <= sizeof pm->buffer)
             {
-               png_size_t s = len+12-pm->buffer_count;
+               size_t s = len+12-pm->buffer_count;
                store_read_chunk(&pm->this, pm->buffer+pm->buffer_count, s, s);
                pm->buffer_count = len+12;
 
@@ -3196,7 +3195,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, png_size_t st)
 
 /* The callback: */
 static void PNGCBAPI
-modifier_read(png_structp ppIn, png_bytep pb, png_size_t st)
+modifier_read(png_structp ppIn, png_bytep pb, size_t st)
 {
    png_const_structp pp = ppIn;
    png_modifier *pm = voidcast(png_modifier*, png_get_io_ptr(pp));
@@ -3226,7 +3225,7 @@ modifier_progressive_read(png_modifier *pm, png_structp pp, png_infop pi)
    for (;;)
    {
       static png_uint_32 noise = 1;
-      png_size_t cb, cbAvail;
+      size_t cb, cbAvail;
       png_byte buffer[512];
 
       /* Generate 15 more bits of stuff: */

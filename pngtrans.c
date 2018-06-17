@@ -269,8 +269,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
    if (row_info->color_type == PNG_COLOR_TYPE_GRAY)
    {
       png_bytep rp = row;
-      png_size_t i;
-      png_size_t istop = row_info->rowbytes;
+      size_t i;
+      size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i++)
       {
@@ -283,8 +283,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       row_info->bit_depth == 8)
    {
       png_bytep rp = row;
-      png_size_t i;
-      png_size_t istop = row_info->rowbytes;
+      size_t i;
+      size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 2)
       {
@@ -298,8 +298,8 @@ png_do_invert(png_row_infop row_info, png_bytep row)
       row_info->bit_depth == 16)
    {
       png_bytep rp = row;
-      png_size_t i;
-      png_size_t istop = row_info->rowbytes;
+      size_t i;
+      size_t istop = row_info->rowbytes;
 
       for (i = 0; i < istop; i += 4)
       {
@@ -609,7 +609,7 @@ png_do_strip_channel(png_row_infop row_info, png_bytep row, int at_start)
       return; /* The filler channel has gone already */
 
    /* Fix the rowbytes value. */
-   row_info->rowbytes = (png_size_t)(dp-row);
+   row_info->rowbytes = (size_t)(dp-row);
 }
 #endif
 

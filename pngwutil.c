@@ -59,7 +59,7 @@ png_write_sig(png_structrp png_ptr)
 
    /* Write the rest of the 8 byte signature */
    png_write_data(png_ptr, &png_signature[png_ptr->sig_bytes],
-       (png_size_t)(8 - png_ptr->sig_bytes));
+       (size_t)(8 - png_ptr->sig_bytes));
 
    if (png_ptr->sig_bytes < 3)
       png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
@@ -124,8 +124,7 @@ png_write_chunk_start(png_structrp png_ptr, png_const_bytep chunk_string,
  * given to png_write_chunk_header().
  */
 void PNGAPI
-png_write_chunk_data(png_structrp png_ptr, png_const_bytep data,
-    png_size_t length)
+png_write_chunk_data(png_structrp png_ptr, png_const_bytep data, size_t length)
 {
    /* Write the data, and run the CRC over it */
    if (png_ptr == NULL)
@@ -160,7 +159,7 @@ png_write_chunk_end(png_structrp png_ptr)
    /* Write the crc in a single operation */
    png_save_uint_32(buf, png_ptr->crc);
 
-   png_write_data(png_ptr, buf, (png_size_t)4);
+   png_write_data(png_ptr, buf, 4);
 }
 
 /* Write a PNG chunk all at once.  The type is an array of ASCII characters
@@ -174,7 +173,7 @@ png_write_chunk_end(png_structrp png_ptr)
  */
 static void
 png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
-    png_const_bytep data, png_size_t length)
+    png_const_bytep data, size_t length)
 {
    if (png_ptr == NULL)
       return;
@@ -191,7 +190,7 @@ png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
 /* This is the API that calls the internal function above. */
 void PNGAPI
 png_write_chunk(png_structrp png_ptr, png_const_bytep chunk_string,
-    png_const_bytep data, png_size_t length)
+    png_const_bytep data, size_t length)
 {
    png_write_complete_chunk(png_ptr, PNG_CHUNK_FROM_STRING(chunk_string), data,
        length);
@@ -820,7 +819,7 @@ png_write_IHDR(png_structrp png_ptr, png_uint_32 width, png_uint_32 height,
    buf[12] = (png_byte)interlace_type;
 
    /* Write the chunk */
-   png_write_complete_chunk(png_ptr, png_IHDR, buf, (png_size_t)13);
+   png_write_complete_chunk(png_ptr, png_IHDR, buf, 13);
 
    if ((png_ptr->do_filter) == PNG_NO_FILTERS)
    {
@@ -889,7 +888,7 @@ png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
       buf[0] = pal_ptr->red;
       buf[1] = pal_ptr->green;
       buf[2] = pal_ptr->blue;
-      png_write_chunk_data(png_ptr, buf, (png_size_t)3);
+      png_write_chunk_data(png_ptr, buf, 3);
    }
 
 #else
@@ -903,7 +902,7 @@ png_write_PLTE(png_structrp png_ptr, png_const_colorp palette,
       buf[0] = pal_ptr[i].red;
       buf[1] = pal_ptr[i].green;
       buf[2] = pal_ptr[i].blue;
-      png_write_chunk_data(png_ptr, buf, (png_size_t)3);
+      png_write_chunk_data(png_ptr, buf, 3);
    }
 
 #endif
@@ -1075,7 +1074,7 @@ png_write_IEND(png_structrp png_ptr)
 {
    png_debug(1, "in png_write_IEND");
 
-   png_write_complete_chunk(png_ptr, png_IEND, NULL, (png_size_t)0);
+   png_write_complete_chunk(png_ptr, png_IEND, NULL, 0);
    png_ptr->mode |= PNG_HAVE_IEND;
 }
 
@@ -1090,7 +1089,7 @@ png_write_gAMA_fixed(png_structrp png_ptr, png_fixed_point file_gamma)
 
    /* file_gamma is saved in 1/100,000ths */
    png_save_uint_32(buf, (png_uint_32)file_gamma);
-   png_write_complete_chunk(png_ptr, png_gAMA, buf, (png_size_t)4);
+   png_write_complete_chunk(png_ptr, png_gAMA, buf, 4);
 }
 #endif
 
@@ -1108,7 +1107,7 @@ png_write_sRGB(png_structrp png_ptr, int srgb_intent)
           "Invalid sRGB rendering intent specified");
 
    buf[0]=(png_byte)srgb_intent;
-   png_write_complete_chunk(png_ptr, png_sRGB, buf, (png_size_t)1);
+   png_write_complete_chunk(png_ptr, png_sRGB, buf, 1);
 }
 #endif
 
@@ -1182,8 +1181,8 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
    png_uint_32 name_len;
    png_byte new_name[80];
    png_byte entrybuf[10];
-   png_size_t entry_size = (spalette->depth == 8 ? 6 : 10);
-   png_size_t palette_size = entry_size * (png_size_t)spalette->nentries;
+   size_t entry_size = (spalette->depth == 8 ? 6 : 10);
+   size_t palette_size = entry_size * (size_t)spalette->nentries;
    png_sPLT_entryp ep;
 #ifndef PNG_POINTER_INDEXING_SUPPORTED
    int i;
@@ -1200,10 +1199,9 @@ png_write_sPLT(png_structrp png_ptr, png_const_sPLT_tp spalette)
    png_write_chunk_header(png_ptr, png_sPLT,
        (png_uint_32)(name_len + 2 + palette_size));
 
-   png_write_chunk_data(png_ptr, (png_bytep)new_name,
-       (png_size_t)(name_len + 1));
+   png_write_chunk_data(png_ptr, (png_bytep)new_name, (size_t)(name_len + 1));
 
-   png_write_chunk_data(png_ptr, &spalette->depth, (png_size_t)1);
+   png_write_chunk_data(png_ptr, &spalette->depth, 1);
 
    /* Loop through each palette entry, writing appropriately */
 #ifdef PNG_POINTER_INDEXING_SUPPORTED
@@ -1265,7 +1263,7 @@ void /* PRIVATE */
 png_write_sBIT(png_structrp png_ptr, png_const_color_8p sbit, int color_type)
 {
    png_byte buf[4];
-   png_size_t size;
+   size_t size;
 
    png_debug(1, "in png_write_sBIT");
 
@@ -1365,7 +1363,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
 
       /* Write the chunk out as it is */
       png_write_complete_chunk(png_ptr, png_tRNS, trans_alpha,
-          (png_size_t)num_trans);
+          (size_t)num_trans);
    }
 
    else if (color_type == PNG_COLOR_TYPE_GRAY)
@@ -1380,7 +1378,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
       }
 
       png_save_uint_16(buf, tran->gray);
-      png_write_complete_chunk(png_ptr, png_tRNS, buf, (png_size_t)2);
+      png_write_complete_chunk(png_ptr, png_tRNS, buf, 2);
    }
 
    else if (color_type == PNG_COLOR_TYPE_RGB)
@@ -1400,7 +1398,7 @@ png_write_tRNS(png_structrp png_ptr, png_const_bytep trans_alpha,
          return;
       }
 
-      png_write_complete_chunk(png_ptr, png_tRNS, buf, (png_size_t)6);
+      png_write_complete_chunk(png_ptr, png_tRNS, buf, 6);
    }
 
    else
@@ -1433,7 +1431,7 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
       }
 
       buf[0] = back->index;
-      png_write_complete_chunk(png_ptr, png_bKGD, buf, (png_size_t)1);
+      png_write_complete_chunk(png_ptr, png_bKGD, buf, 1);
    }
 
    else if ((color_type & PNG_COLOR_MASK_COLOR) != 0)
@@ -1454,7 +1452,7 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
          return;
       }
 
-      png_write_complete_chunk(png_ptr, png_bKGD, buf, (png_size_t)6);
+      png_write_complete_chunk(png_ptr, png_bKGD, buf, 6);
    }
 
    else
@@ -1468,7 +1466,7 @@ png_write_bKGD(png_structrp png_ptr, png_const_color_16p back, int color_type)
       }
 
       png_save_uint_16(buf, back->gray);
-      png_write_complete_chunk(png_ptr, png_bKGD, buf, (png_size_t)2);
+      png_write_complete_chunk(png_ptr, png_bKGD, buf, 2);
    }
 }
 #endif
@@ -1488,7 +1486,7 @@ png_write_eXIf(png_structrp png_ptr, png_bytep exif, int num_exif)
    for (i = 0; i < num_exif; i++)
    {
       buf[0] = exif[i];
-      png_write_chunk_data(png_ptr, buf, (png_size_t)1);
+      png_write_chunk_data(png_ptr, buf, 1);
    }
 
    png_write_chunk_end(png_ptr);

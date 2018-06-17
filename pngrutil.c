@@ -120,7 +120,7 @@ png_get_uint_16)(png_const_bytep buf)
 void /* PRIVATE */
 png_read_sig(png_structrp png_ptr, png_inforp info_ptr)
 {
-   png_size_t num_checked, num_to_check;
+   size_t num_checked, num_to_check;
 
    /* Exit if the user application does not expect a signature. */
    if (png_ptr->sig_bytes >= 8)
@@ -1648,7 +1648,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    int entry_size, i;
    png_uint_32 skip = 0;
    png_uint_32 dl;
-   png_size_t max_dl;
+   size_t max_dl;
 
    png_debug(1, "in png_handle_sPLT");
 
@@ -2377,7 +2377,7 @@ void /* PRIVATE */
 png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
    png_bytep buffer;
-   png_size_t i;
+   size_t i;
    int state;
 
    png_debug(1, "in png_handle_sCAL");
@@ -2447,7 +2447,7 @@ png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    else
    {
-      png_size_t heighti = i;
+      size_t heighti = i;
 
       state = 0;
       if (png_check_fp_number((png_const_charp)buffer, length,
@@ -2885,7 +2885,7 @@ png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
    {
       PNG_CSTRING_FROM_CHUNK(png_ptr->unknown_chunk.name, png_ptr->chunk_name);
       /* The following is safe because of the PNG_SIZE_MAX init above */
-      png_ptr->unknown_chunk.size = (png_size_t)length/*SAFE*/;
+      png_ptr->unknown_chunk.size = (size_t)length/*SAFE*/;
       /* 'mode' is a flag array, only the bottom four bits matter here */
       png_ptr->unknown_chunk.location = (png_byte)png_ptr->mode/*SAFE*/;
 
@@ -3697,8 +3697,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
       {
          case 1:
          {
-            png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 3);
-            png_bytep dp = row + (png_size_t)((final_width - 1) >> 3);
+            png_bytep sp = row + (size_t)((row_info->width - 1) >> 3);
+            png_bytep dp = row + (size_t)((final_width - 1) >> 3);
             unsigned int sshift, dshift;
             unsigned int s_start, s_end;
             int s_inc;
@@ -3824,8 +3824,8 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
          case 4:
          {
-            png_bytep sp = row + (png_size_t)((row_info->width - 1) >> 1);
-            png_bytep dp = row + (png_size_t)((final_width - 1) >> 1);
+            png_bytep sp = row + (size_t)((row_info->width - 1) >> 1);
+            png_bytep dp = row + (size_t)((final_width - 1) >> 1);
             unsigned int sshift, dshift;
             unsigned int s_start, s_end;
             int s_inc;
@@ -3887,12 +3887,12 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 
          default:
          {
-            png_size_t pixel_bytes = (row_info->pixel_depth >> 3);
+            size_t pixel_bytes = (row_info->pixel_depth >> 3);
 
-            png_bytep sp = row + (png_size_t)(row_info->width - 1)
+            png_bytep sp = row + (size_t)(row_info->width - 1)
                 * pixel_bytes;
 
-            png_bytep dp = row + (png_size_t)(final_width - 1) * pixel_bytes;
+            png_bytep dp = row + (size_t)(final_width - 1) * pixel_bytes;
 
             int jstop = (int)png_pass_inc[pass];
             png_uint_32 i;
@@ -3929,8 +3929,8 @@ static void
 png_read_filter_row_sub(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_size_t i;
-   png_size_t istop = row_info->rowbytes;
+   size_t i;
+   size_t istop = row_info->rowbytes;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
    png_bytep rp = row + bpp;
 
@@ -3947,8 +3947,8 @@ static void
 png_read_filter_row_up(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_size_t i;
-   png_size_t istop = row_info->rowbytes;
+   size_t i;
+   size_t istop = row_info->rowbytes;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
 
@@ -3963,11 +3963,11 @@ static void
 png_read_filter_row_avg(png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row)
 {
-   png_size_t i;
+   size_t i;
    png_bytep rp = row;
    png_const_bytep pp = prev_row;
    unsigned int bpp = (row_info->pixel_depth + 7) >> 3;
-   png_size_t istop = row_info->rowbytes - bpp;
+   size_t istop = row_info->rowbytes - bpp;
 
    for (i = 0; i < bpp; i++)
    {
@@ -4403,7 +4403,7 @@ png_read_start_row(png_structrp png_ptr)
    static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 
    unsigned int max_pixel_depth;
-   png_size_t row_bytes;
+   size_t row_bytes;
 
    png_debug(1, "in png_read_start_row");
 

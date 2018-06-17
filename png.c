@@ -71,7 +71,7 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
  * PNG signature (this is the same behavior as strcmp, memcmp, etc).
  */
 int PNGAPI
-png_sig_cmp(png_const_bytep sig, png_size_t start, png_size_t num_to_check)
+png_sig_cmp(png_const_bytep sig, size_t start, size_t num_to_check)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
@@ -136,7 +136,7 @@ png_reset_crc(png_structrp png_ptr)
  * trouble of calculating it.
  */
 void /* PRIVATE */
-png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, png_size_t length)
+png_calculate_crc(png_structrp png_ptr, png_const_bytep ptr, size_t length)
 {
    int need_crc = 1;
 
@@ -421,7 +421,7 @@ png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
  * those cases where it does anything other than a memset.
  */
 PNG_FUNCTION(void,PNGAPI
-png_info_init_3,(png_infopp ptr_ptr, png_size_t png_info_struct_size),
+png_info_init_3,(png_infopp ptr_ptr, size_t png_info_struct_size),
     PNG_DEPRECATED)
 {
    png_inforp info_ptr = *ptr_ptr;
@@ -2715,11 +2715,11 @@ png_check_IHDR(png_const_structrp png_ptr,
 #define png_fp_set(state, value) ((state) = (value) | ((state) & PNG_FP_STICKY))
 
 int /* PRIVATE */
-png_check_fp_number(png_const_charp string, png_size_t size, int *statep,
+png_check_fp_number(png_const_charp string, size_t size, int *statep,
     png_size_tp whereami)
 {
    int state = *statep;
-   png_size_t i = *whereami;
+   size_t i = *whereami;
 
    while (i < size)
    {
@@ -2842,10 +2842,10 @@ PNG_FP_End:
 
 /* The same but for a complete string. */
 int
-png_check_fp_string(png_const_charp string, png_size_t size)
+png_check_fp_string(png_const_charp string, size_t size)
 {
    int        state=0;
-   png_size_t char_index=0;
+   size_t char_index=0;
 
    if (png_check_fp_number(string, size, &state, &char_index) != 0 &&
       (char_index == size || string[char_index] == 0))
@@ -2906,7 +2906,7 @@ png_pow10(int power)
 #pragma GCC diagnostic warning "-Wstrict-overflow=2"
 #endif /* GCC_STRICT_OVERFLOW */
 void /* PRIVATE */
-png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
+png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, size_t size,
     double fp, unsigned int precision)
 {
    /* We use standard functions from math.h, but not printf because
@@ -3237,7 +3237,7 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, png_size_t size,
  */
 void /* PRIVATE */
 png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
-    png_size_t size, png_fixed_point fp)
+    size_t size, png_fixed_point fp)
 {
    /* Require space for 10 decimal digits, a decimal point, a minus sign and a
     * trailing \0, 13 characters:

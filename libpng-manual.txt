@@ -503,7 +503,7 @@ input stream. You must supply the function
 
            png_byte name[5];
            png_byte *data;
-           png_size_t size;
+           size_t size;
 
        /* Note that libpng has already taken care of
           the CRC handling */
@@ -4102,7 +4102,7 @@ READ APIs
       The PNG header is read from the stdio FILE object.
 
    int png_image_begin_read_from_memory(png_imagep image,
-      png_const_voidp memory, png_size_t size)
+      png_const_voidp memory, size_t size)
 
       The PNG header is read from the given memory buffer.
 
@@ -4255,10 +4255,10 @@ png_get_io_ptr().  For example:
 The replacement I/O functions must have prototypes as follows:
 
     void user_read_data(png_structp png_ptr,
-        png_bytep data, png_size_t length);
+        png_bytep data, size_t length);
 
     void user_write_data(png_structp png_ptr,
-        png_bytep data, png_size_t length);
+        png_bytep data, size_t length);
 
     void user_flush_data(png_structp png_ptr);
 
@@ -4784,7 +4784,7 @@ behavior in case the application runs out of memory part-way through
 the process.
 
 We changed the prototypes of png_get_compression_buffer_size() and
-png_set_compression_buffer_size() to work with png_size_t instead of
+png_set_compression_buffer_size() to work with size_t instead of
 png_uint_32.
 
 Support for numbered error messages was removed by default, since we

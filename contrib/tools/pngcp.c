@@ -1725,7 +1725,7 @@ display_start_read(struct display *dp, const char *filename)
 }
 
 static void PNGCBAPI
-read_function(png_structp pp, png_bytep data, png_size_t size)
+read_function(png_structp pp, png_bytep data, size_t size)
 {
    struct display *dp = get_dp(pp);
 
@@ -1881,7 +1881,7 @@ display_start_write(struct display *dp, const char *filename)
 }
 
 static void PNGCBAPI
-write_function(png_structp pp, png_bytep data, png_size_t size)
+write_function(png_structp pp, png_bytep data, size_t size)
 {
    struct display *dp = get_dp(pp);
 
