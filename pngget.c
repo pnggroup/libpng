@@ -26,7 +26,7 @@ png_get_valid(png_const_structrp png_ptr, png_const_inforp info_ptr,
    return(0);
 }
 
-png_size_t PNGAPI
+size_t PNGAPI
 png_get_rowbytes(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
    if (png_ptr != NULL && info_ptr != NULL)
@@ -1165,7 +1165,7 @@ png_get_user_chunk_ptr(png_const_structrp png_ptr)
 }
 #endif
 
-png_size_t PNGAPI
+size_t PNGAPI
 png_get_compression_buffer_size(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)

@@ -55,10 +55,10 @@
 struct png_info_def
 {
    /* The following are necessary for every PNG file */
-   png_uint_32 width;  /* width of image in pixels (from IHDR) */
-   png_uint_32 height; /* height of image in pixels (from IHDR) */
-   png_uint_32 valid;  /* valid chunk data (see PNG_INFO_ below) */
-   png_size_t rowbytes; /* bytes needed to hold an untransformed row */
+   png_uint_32 width;       /* width of image in pixels (from IHDR) */
+   png_uint_32 height;      /* height of image in pixels (from IHDR) */
+   png_uint_32 valid;       /* valid chunk data (see PNG_INFO_ below) */
+   size_t rowbytes;         /* bytes needed to hold an untransformed row */
    png_colorp palette;      /* array of color values (valid & PNG_INFO_PLTE) */
    png_uint_16 num_palette; /* number of color entries in "palette" (PLTE) */
    png_uint_16 num_trans;   /* number of transparent palette color (tRNS) */

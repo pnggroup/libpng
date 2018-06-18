@@ -257,7 +257,7 @@ int check_if_png(char *file_name, FILE **fp)
    /* Compare the first PNG_BYTES_TO_CHECK bytes of the signature.
       Return nonzero (true) if they match */
 
-   return(!png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK));
+   return(!png_sig_cmp(buf, 0, PNG_BYTES_TO_CHECK));
 }
 
 /* Read a PNG file.  You may want to return an error code if the read

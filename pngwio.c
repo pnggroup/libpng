@@ -30,7 +30,7 @@
  */
 
 void /* PRIVATE */
-png_write_data(png_structrp png_ptr, png_const_bytep data, png_size_t length)
+png_write_data(png_structrp png_ptr, png_const_bytep data, size_t length)
 {
    /* NOTE: write_data_fn must not change the buffer! */
    if (png_ptr->write_data_fn != NULL )
@@ -48,9 +48,9 @@ png_write_data(png_structrp png_ptr, png_const_bytep data, png_size_t length)
  * than changing the library.
  */
 void PNGCBAPI
-png_default_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
+png_default_write_data(png_structp png_ptr, png_bytep data, size_t length)
 {
-   png_size_t check;
+   size_t check;
 
    if (png_ptr == NULL)
       return;

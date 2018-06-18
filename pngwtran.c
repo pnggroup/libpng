@@ -212,9 +212,9 @@ png_do_shift(png_row_infop row_info, png_bytep row,
       if (row_info->bit_depth < 8)
       {
          png_bytep bp = row;
-         png_size_t i;
+         size_t i;
          unsigned int mask;
-         png_size_t row_bytes = row_info->rowbytes;
+         size_t row_bytes = row_info->rowbytes;
 
          if (bit_depth->gray == 1 && row_info->bit_depth == 2)
             mask = 0x55;
@@ -514,7 +514,7 @@ png_do_write_transformations(png_structrp png_ptr, png_row_infop row_info)
              (png_ptr,  /* png_ptr */
              row_info,  /* row_info: */
                 /*  png_uint_32 width;       width of row */
-                /*  png_size_t rowbytes;     number of bytes in row */
+                /*  size_t rowbytes;         number of bytes in row */
                 /*  png_byte color_type;     color type of pixels */
                 /*  png_byte bit_depth;      bit depth of samples */
                 /*  png_byte channels;       number of channels (1-4) */

@@ -108,7 +108,7 @@ int validation_ascii_to_fp(int count, int argc, char **argv)
 
    do
    {
-      png_size_t index;
+      size_t index;
       int state, failed = 0;
       char buffer[64];
 
@@ -329,7 +329,7 @@ static int check_one_character(checkfp_command *co, checkfp_control c, int ch)
 {
    /* Test this character (ch) to ensure the parser does the correct thing.
     */
-   png_size_t index = 0;
+   size_t index = 0;
    const char test = (char)ch;
    const int number_is_valid = png_check_fp_number(&test, 1, &c.state, &index);
    const int character_accepted = (index == 1);

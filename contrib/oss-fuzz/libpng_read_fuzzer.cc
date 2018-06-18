@@ -68,7 +68,7 @@ struct PngObjectHandler {
   }
 };
 
-void user_read_data(png_structp png_ptr, png_bytep data, png_size_t length) {
+void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
   BufState* buf_state = static_cast<BufState*>(png_get_io_ptr(png_ptr));
   if (length > buf_state->bytes_left) {
     png_error(png_ptr, "read error");
