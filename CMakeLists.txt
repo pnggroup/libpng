@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (C) 2007,2009-2017 Glenn Randers-Pehrson
+# Copyright (C) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
 # Revised by Clifford Yapp, 2011-2012
@@ -844,7 +844,7 @@ endif(NOT WIN32 OR CYGWIN OR MINGW)
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.35beta02
+#   VERSION 16.${PNGLIB_RELEASE}.1.6.35
     VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
