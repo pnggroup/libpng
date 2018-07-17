@@ -97,7 +97,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
   if(index EQUAL -1)
     message(FATAL_ERROR
       " PNG_ARM_NEON must be one of [${PNG_ARM_NEON_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_ARM_NEON} STREQUAL "no")
+  elseif(NOT ${PNG_ARM_NEON} STREQUAL "off")
     set(libpng_arm_sources
       arm/arm_init.c
       arm/filter_neon.S
@@ -125,7 +125,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
   if(index EQUAL -1)
     message(FATAL_ERROR
       " PNG_POWERPC_VSX must be one of [${PNG_POWERPC_VSX_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_POWERPC_VSX} STREQUAL "no")
+  elseif(NOT ${PNG_POWERPC_VSX} STREQUAL "off")
     set(libpng_powerpc_sources
       powerpc/powerpc_init.c
       powerpc/filter_vsx_intrinsics.c)
@@ -149,7 +149,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
   if(index EQUAL -1)
     message(FATAL_ERROR
       " PNG_INTEL_SSE must be one of [${PNG_INTEL_SSE_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_INTEL_SSE} STREQUAL "no")
+  elseif(NOT ${PNG_INTEL_SSE} STREQUAL "off")
     set(libpng_intel_sources
       intel/intel_init.c
       intel/filter_sse2_intrinsics.c)
@@ -173,7 +173,7 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
   if(index EQUAL -1)
     message(FATAL_ERROR
       " PNG_MIPS_MSA must be one of [${PNG_MIPS_MSA_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_MIPS_MSA} STREQUAL "no")
+  elseif(NOT ${PNG_MIPS_MSA} STREQUAL "off")
     set(libpng_mips_sources
       mips/mips_init.c
       mips/filter_msa_intrinsics.c)
