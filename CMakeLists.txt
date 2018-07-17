@@ -184,6 +184,30 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
     add_definitions(-DPNG_MIPS_MSA_OPT=0)
   endif()
 endif()
+else(PNG_HARDWARE_OPTIMIZATIONS)
+# set definitions and sources for arm
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
+	CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+  add_definitions(-DPNG_ARM_NEON_OPT=0)
+endif()
+
+# set definitions and sources for powerpc
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^powerpc*" OR
+	CMAKE_SYSTEM_PROCESSOR MATCHES "^ppc64*" )
+  add_definitions(-DPNG_POWERPC_VSX_OPT=0)
+endif()
+
+# set definitions and sources for intel
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
+	CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*" )
+  add_definitions(-DPNG_INTEL_SSE_OPT=0)
+endif()
+
+# set definitions and sources for MIPS
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
+	CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*" )
+  add_definitions(-DPNG_MIPS_MSA_OPT=0)
+endif()
 endif(PNG_HARDWARE_OPTIMIZATIONS)
 
 # SET LIBNAME
