@@ -2,11 +2,12 @@
 #if 0 /* in case someone actually tries to compile this */
 
 /* example.c - an example of using libpng
- * Last changed in libpng 1.6.35 [July 15, 2018]
+ *
  * Maintained 2018 Cosmin Truta
  * Maintained 1998-2016 Glenn Randers-Pehrson
- * Maintained 1996, 1997 Andreas Dilger)
- * Written 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ * Maintained 1996-1997 Andreas Dilger
+ * Written 1995-1996 Guy Eric Schalnat, Group 42, Inc.
+ *
  * To the extent possible under law, the authors have waived
  * all copyright and related or neighboring rights to this file.
  * This work is published from: United States, Canada.
