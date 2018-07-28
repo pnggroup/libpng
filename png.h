@@ -1,13 +1,14 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.35, July 15, 2018
+ * libpng version 1.6.36.git
  *
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
- * (Version 0.96 Copyright (c) 1996, 1997 Andreas Dilger)
- * (Version 0.88 Copyright (c) 1995, 1996 Guy Eric Schalnat, Group 42, Inc.)
+ * Copyright (c) 1996-1997 Andreas Dilger
+ * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
  *
- * This code is released under the libpng license (See LICENSE, below)
+ * This code is released under the libpng license. (See LICENSE, below.)
  *
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
@@ -24,6 +25,8 @@
  * this sentence.
  *
  * This code is released under the libpng license.
+ *
+ * Copyright (c) 2018 Cosmin Truta.
  *
  * libpng versions 1.0.7, July 1, 2000 through 1.6.35, July 15, 2018 are
  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson, are
@@ -207,11 +210,13 @@
  *    1.0.7rc1-2               1    10007  2.1.0.7rc1-2 (binary compatible)
  *    1.0.7                    1    10007  (still compatible)
  *    ...
- *    1.0.19                  10    10019  10.so.0.19[.0]
+ *    1.0.69                  10    10069  10.so.0.69[.0]
  *    ...
- *    1.2.59                  13    10257  12.so.0.59[.0]
+ *    1.2.59                  13    10259  12.so.0.59[.0]
  *    ...
- *    1.5.30                  15    10527  15.so.15.30[.0]
+ *    1.4.20                  14    10420  14.so.0.20[.0]
+ *    ...
+ *    1.5.30                  15    10530  15.so.15.30[.0]
  *    ...
  *    1.6.35                  16    10635  16.so.16.35[.0]
  *
@@ -309,8 +314,8 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.35"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.35 - July 15, 2018\n"
+#define PNG_LIBPNG_VER_STRING "1.6.36.git"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.36.git\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -318,7 +323,7 @@
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
 #define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 35
+#define PNG_LIBPNG_VER_RELEASE 36
 
 /* This should match the numeric part of the final component of
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
@@ -349,7 +354,7 @@
  * version 1.0.0 was mis-numbered 100 instead of 10000).  From
  * version 1.0.1 it's    xxyyzz, where x=major, y=minor, z=release
  */
-#define PNG_LIBPNG_VER 10635 /* 1.6.35 */
+#define PNG_LIBPNG_VER 10636 /* 1.6.36 */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -459,7 +464,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_35;
+typedef char* png_libpng_version_1_6_36_git;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *

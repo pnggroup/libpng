@@ -6063,9 +6063,10 @@ Version 1.6.35 [July 15, 2018]
   Added missing parentheses to a macro definition
     (suggested by "irwir" in GitHub issue #216)
 
+Version 1.6.36
+  [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe).
-
-Glenn R-P

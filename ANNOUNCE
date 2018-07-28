@@ -1,3 +1,9 @@
+Libpng 1.6.36.git
+
+This is a development version, not intended to be a public release.
+It will be replaced by a public release, or by another development
+version, at a later time.
+
 Libpng 1.6.35 - July 15, 2018
 
 This is a public release of libpng, intended for use in production code.
@@ -19,7 +25,7 @@ Other information:
    libpng-1.6.35-README.txt
    libpng-1.6.35-LICENSE.txt
 
-Changes since the last public release (1.6.34):
+Changes since the previous public release (1.6.34):
 
   Restored 21 of the contrib/pngsuite/i*.png, which do not cause test
     failures. Placed the remainder in contrib/pngsuite/interlaced/i*.png.
@@ -44,5 +50,3 @@ Send comments/corrections/commendations to png-mng-implement at lists.sf.net
 (subscription required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
 to subscribe).
-
-Glenn R-P

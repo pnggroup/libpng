@@ -10,6 +10,8 @@ this sentence.
 
 This code is released under the libpng license.
 
+Copyright (c) 2018 Cosmin Truta.
+
 libpng versions 1.0.7, July 1, 2000 through 1.6.35, July 15, 2018 are
 Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson, are
 derived from libpng-1.0.6, and are distributed according to the same
@@ -127,7 +129,3 @@ controls or International Traffic in Arms Regulations (ITAR) because
 it is open source, publicly available software, that does not contain
 any encryption software.  See the EAR, paragraphs 734.3(b)(3) and
 734.7(b).
-
-Glenn Randers-Pehrson
-glennrp at users.sourceforge.net
-July 15, 2018
