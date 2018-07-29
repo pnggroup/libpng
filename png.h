@@ -21,8 +21,8 @@
 /*
  * COPYRIGHT NOTICE, DISCLAIMER, and LICENSE:
  *
- * If you modify libpng you may insert additional notices immediately following
- * this sentence.
+ * If you modify libpng, you may insert additional notices immediately
+ * following this sentence.
  *
  * This code is released under the libpng license.
  *
@@ -46,22 +46,22 @@
  *
  * and with the following additions to the disclaimer:
  *
- *    There is no warranty against interference with your enjoyment of the
- *    library or against infringement.  There is no warranty that our
+ *    There is no warranty against interference with your enjoyment of
+ *    the library or against infringement.  There is no warranty that our
  *    efforts or the library will fulfill any of your particular purposes
  *    or needs.  This library is provided with all faults, and the entire
- *    risk of satisfactory quality, performance, accuracy, and effort is with
- *    the user.
+ *    risk of satisfactory quality, performance, accuracy, and effort is
+ *    with the user.
  *
  * Some files in the "contrib" directory and some configure-generated
- * files that are distributed with libpng have other copyright owners and
+ * files that are distributed with libpng have other copyright owners, and
  * are released under other open source licenses.
  *
  * libpng versions 0.97, January 1998, through 1.0.6, March 20, 2000, are
  * Copyright (c) 1998-2000 Glenn Randers-Pehrson, are derived from
  * libpng-0.96, and are distributed according to the same disclaimer and
- * license as libpng-0.96, with the following individuals added to the list
- * of Contributing Authors:
+ * license as libpng-0.96, with the following individuals added to the
+ * list of Contributing Authors:
  *
  *    Tom Lane
  *    Glenn Randers-Pehrson
@@ -80,7 +80,7 @@
  *    Greg Roelofs
  *    Tom Tanner
  *
- * Some files in the "scripts" directory have other copyright owners
+ * Some files in the "scripts" directory have other copyright owners,
  * but are released under this license.
  *
  * libpng versions 0.5, May 1995, through 0.88, January 1996, are
@@ -133,18 +133,19 @@
  *
  * OSI CERTIFICATION:
  *
- * Libpng is OSI Certified Open Source Software.  OSI Certified Open Source is
- * a certification mark of the Open Source Initiative. OSI has not addressed
- * the additional disclaimers inserted at version 1.0.7.
+ * libpng is OSI Certified Open Source Software.  OSI Certified Open Source
+ * is a certification mark of the Open Source Initiative.  OSI has not
+ * addressed the additional disclaimers inserted at libpng version 1.0.7.
  *
  * EXPORT CONTROL:
  *
- * The Copyright owner believes that the Export Control Classification
- * Number (ECCN) for libpng is EAR99, which means not subject to export
- * controls or International Traffic in Arms Regulations (ITAR) because
- * it is open source, publicly available software, that does not contain
- * any encryption software.  See the EAR, paragraphs 734.3(b)(3) and
- * 734.7(b).
+ * The Copyright owner believes that libpng is not subject to U.S. or
+ * Canadian export controls, because it is open source, publicly available
+ * software, that does not contain any encryption software.
+ *
+ * libpng may be subject to export control laws in other countries.
+ *
+ * (The Copyright owner is neither a lawyer, nor an exports officer.)
  */
 
 /*
