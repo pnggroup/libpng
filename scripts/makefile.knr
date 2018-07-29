@@ -91,7 +91,7 @@ install: libpng.a png.h pngconf.h pnglibconf.h
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png ansi2knr pnglibconf.h
 
-DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO Y2KINFO
+DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO
 writelock:
 	chmod a-w *.[ch35] $(DOCS) scripts/*
 

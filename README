@@ -147,7 +147,6 @@ Files in this distribution:
       LICENSE       =>  License to use and redistribute libpng
       README        =>  This file
       TODO          =>  Things not implemented in the current library
-      Y2KINFO       =>  Statement of Y2K compliance
       example.c     =>  Example code for using libpng functions
       libpng.3      =>  manual page for libpng (includes libpng-manual.txt)
       libpng-manual.txt  =>  Description of libpng and its functions
