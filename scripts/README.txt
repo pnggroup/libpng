@@ -1,11 +1,11 @@
 
 Makefiles for libpng
 
-pnglibconf.h.prebuilt       =>  Stores configuration settings
+pnglibconf.h.prebuilt  =>  Configuration settings
  makefile.linux    =>  Linux/ELF makefile
-                       (gcc, creates libpng16.so.16.1.6.*)
+                       (gcc, creates shared libpng16.so.16.1.6.*)
  makefile.linux-opt=>  Linux/ELF makefile with hardware optimizations on
-                       (gcc, creates libpng16.so.16.1.6.*)
+                       (gcc, creates shared libpng16.so.16.1.6.*)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
  makefile.knr      =>  Archaic UNIX Makefile that converts files with
                        ansi2knr (Requires ansi2knr.c from
@@ -15,10 +15,10 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.amiga    =>  Amiga makefile
  makefile.atari    =>  Atari makefile
  makefile.bc32     =>  32-bit Borland C++ (all modules compiled in C mode)
- makefile.beos     =>  beos makefile
+ makefile.beos     =>  BeOS makefile
  makefile.bor      =>  Borland makefile (uses bcc)
  makefile.cegcc    =>  minge32ce for Windows CE makefile
- makefile.darwin   =>  Darwin makefile, can use on MacosX
+ makefile.darwin   =>  Darwin makefile, for macOS (formerly Mac OS X)
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
  makefile.freebsd  =>  FreeBSD makefile
@@ -30,17 +30,17 @@ pnglibconf.h.prebuilt       =>  Stores configuration settings
  makefile.intel    =>  Intel C/C++ version 4.0 and later
  makefile.mips     =>  MIPS makefile
  makefile.msc      =>  Microsoft C makefile
- makefile.netbsd   =>  NetBSD/cc makefile, makes libpng.so.
+ makefile.netbsd   =>  NetBSD/cc makefile, makes shared libpng.so
  makefile.openbsd  =>  OpenBSD makefile
  makefile.os2      =>  OS/2 Makefile (gcc and emx, requires libpng.def)
- makefile.sco      =>  For SCO OSr5  ELF and Unixware 7 with Native cc
+ makefile.sco      =>  SCO OSr5 ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics makefile
-                       (gcc, creates libpng16.so.16.1.6.*)
+                       (gcc, creates shared libpng16.so.16.1.6.*)
  makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, creates static lib)
  makefile.solaris  =>  Solaris 2.X makefile
-                       (gcc, creates libpng16.so.16.1.6.*)
+                       (gcc, creates shared libpng16.so.16.1.6.*)
  makefile.so9      =>  Solaris 9 makefile
-                       (gcc, creates libpng16.so.16.1.6.*)
+                       (gcc, creates shared libpng16.so.16.1.6.*)
  makefile.std      =>  Generic UNIX makefile (cc, creates static libpng.a)
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
@@ -57,20 +57,20 @@ Other supporting scripts:
  libpng-config-body.in => used by several makefiles to create libpng-config
  libpng-config-head.in => used by several makefiles to create libpng-config
  libpng.pc.in      =>  Used by several makefiles to create libpng.pc
- pngwin.rc         =>  Used by the visualc71 project.
+ pngwin.rc         =>  Used by the visualc71 project
  pngwin.def        =>  Used by makefile.os2
  pngwin.dfn        =>  Used to maintain pngwin.def
  SCOPTIONS.ppc     =>  Used with smakefile.ppc
 
- checksym.awk       =>  Used for maintaining pnglibconf.h
- def.dfn            =>  Used for maintaining pnglibconf.h
- options.awk        =>  Used for maintaining pnglibconf.h
- pnglibconf.dfa     =>  Used for maintaining pnglibconf.h
- pnglibconf.mak     =>  Used for maintaining pnglibconf.h
- sym.dfn            =>  Used for symbol versioning
- symbols.def        =>  Used for symbol versioning
- symbols.dfn        =>  Used for symbol versioning
- vers.dfn           =>  Used for symbol versioning
+ checksym.awk      =>  Used for maintaining pnglibconf.h
+ def.dfn           =>  Used for maintaining pnglibconf.h
+ options.awk       =>  Used for maintaining pnglibconf.h
+ pnglibconf.dfa    =>  Used for maintaining pnglibconf.h
+ pnglibconf.mak    =>  Used for maintaining pnglibconf.h
+ sym.dfn           =>  Used for symbol versioning
+ symbols.def       =>  Used for symbol versioning
+ symbols.dfn       =>  Used for symbol versioning
+ vers.dfn          =>  Used for symbol versioning
 
  libtool.m4        =>  Used by autoconf tools
  ltoptions.m4      =>  Used by autoconf tools
