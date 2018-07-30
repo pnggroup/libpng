@@ -44,8 +44,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS= -W -Wall -O \
-	# $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-W -Wall -O # $(WARNMORE) -g
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng16 -lz -lm
 
 INCPATH=$(prefix)/include

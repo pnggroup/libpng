@@ -7,16 +7,12 @@ pnglibconf.h.prebuilt  =>  Configuration settings
  makefile.linux-opt=>  Linux/ELF makefile with hardware optimizations on
                        (gcc, creates shared libpng16.so.16.1.6.*)
  makefile.gcc      =>  Generic makefile (gcc, creates static libpng.a)
- makefile.knr      =>  Archaic UNIX Makefile that converts files with
-                       ansi2knr (Requires ansi2knr.c from
-                       ftp://ftp.cs.wisc.edu/ghost)
  makefile.acorn    =>  Acorn makefile
  makefile.aix      =>  AIX/gcc makefile
  makefile.amiga    =>  Amiga makefile
  makefile.atari    =>  Atari makefile
  makefile.bc32     =>  32-bit Borland C++ (all modules compiled in C mode)
  makefile.beos     =>  BeOS makefile
- makefile.bor      =>  Borland makefile (uses bcc)
  makefile.cegcc    =>  minge32ce for Windows CE makefile
  makefile.darwin   =>  Darwin makefile, for macOS (formerly Mac OS X)
  makefile.dec      =>  DEC Alpha UNIX makefile
@@ -29,10 +25,8 @@ pnglibconf.h.prebuilt  =>  Configuration settings
  makefile.ibmc     =>  IBM C/C++ version 3.x for Win32 and OS/2 (static)
  makefile.intel    =>  Intel C/C++ version 4.0 and later
  makefile.mips     =>  MIPS makefile
- makefile.msc      =>  Microsoft C makefile
  makefile.netbsd   =>  NetBSD/cc makefile, makes shared libpng.so
  makefile.openbsd  =>  OpenBSD makefile
- makefile.os2      =>  OS/2 Makefile (gcc and emx, requires libpng.def)
  makefile.sco      =>  SCO OSr5 ELF and Unixware 7 with Native cc
  makefile.sggcc    =>  Silicon Graphics makefile
                        (gcc, creates shared libpng16.so.16.1.6.*)
@@ -45,7 +39,6 @@ pnglibconf.h.prebuilt  =>  Configuration settings
  makefile.sunos    =>  Sun makefile
  makefile.32sunu   =>  Sun Ultra 32-bit makefile
  makefile.64sunu   =>  Sun Ultra 64-bit makefile
- makefile.tc3      =>  Turbo C 3.0 makefile
  makefile.vcwin32  =>  makefile for Microsoft Visual C++ 4.0 and later
  makevms.com       =>  VMS build script
  smakefile.ppc     =>  AMIGA smakefile for SAS C V6.58/7.00 PPC compiler
