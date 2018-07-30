@@ -50,8 +50,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 # for pgcc version 2.95.1, -O3 is buggy; don't use it.
 
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS= -W -Wall -O3 -funroll-loops \
-	$(ALIGN) # $(WARNMORE) -g -DPNG_DEBUG=5
+CFLAGS=-W -Wall -O3 -funroll-loops $(ALIGN) # $(WARNMORE) -g
 
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng16 -lz -lm
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm
