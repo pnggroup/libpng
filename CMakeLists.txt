@@ -61,6 +61,7 @@ if(NOT WIN32)
   )
   if(NOT M_LIBRARY)
     message(STATUS "math lib 'libm' not found; floating point support disabled")
+    set(M_LIBRARY "")
   endif()
 else()
   # not needed on windows
