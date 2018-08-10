@@ -802,17 +802,17 @@ function(CREATE_SYMLINK DEST_FILE)
     # If we don't need to symlink something that's coming from a build target,
     # we can go ahead and symlink/copy at configure time.
 
-    if(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
+    if(CMAKE_HOST_WIN32 AND NOT CYGWIN)
       execute_process(
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${S_FILE} ${DEST_FILE}
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	)
-    else(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
+    else(CMAKE_HOST_WIN32 AND NOT CYGWIN)
       execute_process(
 	COMMAND ${CMAKE_COMMAND} -E create_symlink ${S_FILE} ${DEST_FILE}
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 	)
-    endif(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
+    endif(CMAKE_HOST_WIN32 AND NOT CYGWIN)
   endif(S_FILE)
 
   if(S_TARGET)
@@ -820,15 +820,15 @@ function(CREATE_SYMLINK DEST_FILE)
     # simplicity make the symlink a POST_BUILD step and use the TARGET
     # signature of add_custom_command.
 
-    if(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
+    if(CMAKE_HOST_WIN32 AND NOT CYGWIN)
       add_custom_command(TARGET ${S_TARGET} POST_BUILD
 	COMMAND "${CMAKE_COMMAND}" -E copy_if_different $<TARGET_LINKER_FILE_NAME:${S_TARGET}> $<TARGET_LINKER_FILE_DIR:${S_TARGET}>/${DEST_FILE}
 	)
-    else(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
+    else(CMAKE_HOST_WIN32 AND NOT CYGWIN)
       add_custom_command(TARGET ${S_TARGET} POST_BUILD
 	COMMAND "${CMAKE_COMMAND}" -E create_symlink $<TARGET_LINKER_FILE_NAME:${S_TARGET}> $<TARGET_LINKER_FILE_DIR:${S_TARGET}>/${DEST_FILE}
 	)
-    endif(CMAKE_HOST_WIN32 AND NOT CYGWIN AND NOT MSYS)
+    endif(CMAKE_HOST_WIN32 AND NOT CYGWIN)
 
   endif(S_TARGET)
 
