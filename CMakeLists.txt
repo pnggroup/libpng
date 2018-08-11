@@ -75,11 +75,8 @@ option(PNG_TESTS  "Build libpng tests" ON)
 
 # Many more configuration options could be added here
 option(PNG_FRAMEWORK "Build OS X framework" OFF)
-option(PNG_DEBUG     "Build with debug output" OFF)
-option(PNGARG        "Disable ANSI-C prototypes" OFF)
-
-option(PNG_HARDWARE_OPTIMIZATIONS "Enable Hardware Optimizations" ON)
-
+option(PNG_DEBUG "Build with debug output" OFF)
+option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
 set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
 set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
