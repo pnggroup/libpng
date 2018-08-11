@@ -144,7 +144,6 @@ AC_C_RESTRICT
 
 # Checks for library functions.
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([memset], , AC_MSG_ERROR(memset not found in libc))
 AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_MSG_ERROR(cannot find pow)) )
 
 # Some later POSIX 1003.1 functions are required for test programs, failure here

@@ -13066,19 +13066,6 @@ fi
 
 fi
 
-for ac_func in memset
-do :
-  ac_fn_c_check_func "$LINENO" "memset" "ac_cv_func_memset"
-if test "x$ac_cv_func_memset" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_MEMSET 1
-_ACEOF
-
-else
-  as_fn_error $? "memset not found in libc" "$LINENO" 5
-fi
-done
-
 for ac_func in pow
 do :
   ac_fn_c_check_func "$LINENO" "pow" "ac_cv_func_pow"
