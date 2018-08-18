@@ -4,9 +4,14 @@
 # Copyright (C) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
-# Revised by Clifford Yapp, 2011-2012
+# Revised by Clifford Yapp, 2011-2012,2017
 # Revised by Roger Leigh, 2016
 # Revised by Andreas Franek, 2016
+# Revised by Sam Serrels, 2017
+# Revised by Vadim Barkov, 2017
+# Revised by Vicky Pfau, 2018
+# Revised by Cameron Cawley, 2018
+# Revised by Cosmin Truta, 2018
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
