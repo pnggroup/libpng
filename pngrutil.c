@@ -1461,8 +1461,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                {
                   /* We have the ICC profile header; do the basic header checks.
                    */
-                  const png_uint_32 profile_length =
-                     png_get_uint_32(profile_header);
+                  png_uint_32 profile_length = png_get_uint_32(profile_header);
 
                   if (png_icc_check_length(png_ptr, &png_ptr->colorspace,
                       keyword, profile_length) != 0)
@@ -1479,8 +1478,8 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                          * profile.  The header check has already validated
                          * that none of this stuff will overflow.
                          */
-                        const png_uint_32 tag_count = png_get_uint_32(
-                            profile_header+128);
+                        png_uint_32 tag_count =
+                           png_get_uint_32(profile_header + 128);
                         png_bytep profile = png_read_buffer(png_ptr,
                             profile_length, 2/*silent*/);
 
@@ -3132,7 +3131,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
  */
 
 void /* PRIVATE */
-png_check_chunk_name(png_const_structrp png_ptr, const png_uint_32 chunk_name)
+png_check_chunk_name(png_const_structrp png_ptr, png_uint_32 chunk_name)
 {
    int i;
    png_uint_32 cn=chunk_name;
@@ -3151,7 +3150,7 @@ png_check_chunk_name(png_const_structrp png_ptr, const png_uint_32 chunk_name)
 }
 
 void /* PRIVATE */
-png_check_chunk_length(png_const_structrp png_ptr, const png_uint_32 length)
+png_check_chunk_length(png_const_structrp png_ptr, png_uint_32 length)
 {
    png_alloc_size_t limit = PNG_UINT_31_MAX;
 

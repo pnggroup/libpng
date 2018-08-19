@@ -2514,7 +2514,7 @@ zlib_run(struct zlib *zlib)
        */
       for (;;)
       {
-         const unsigned int count = list->count;
+         unsigned int count = list->count;
          unsigned int i;
 
          for (i = 0; i<count; ++i)
@@ -2791,7 +2791,7 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
     * to read_chunk.
     */
 {
-   const png_uint_32 type = file->type;
+   png_uint_32 type = file->type;
 
    if (file->global->verbose > 1)
    {

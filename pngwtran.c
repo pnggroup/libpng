@@ -254,8 +254,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
 
          for (i = 0; i < istop; i++, bp++)
          {
-
-            const unsigned int c = i%channels;
+            unsigned int c = i%channels;
             int j;
             unsigned int v, out;
 
@@ -283,7 +282,7 @@ png_do_shift(png_row_infop row_info, png_bytep row,
 
          for (bp = row, i = 0; i < istop; i++)
          {
-            const unsigned int c = i%channels;
+            unsigned int c = i%channels;
             int j;
             unsigned int value, v;
 

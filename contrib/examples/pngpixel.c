@@ -73,7 +73,7 @@ static void
 print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
    png_uint_32 x)
 {
-   const unsigned int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+   unsigned int bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 
    switch (png_get_color_type(png_ptr, info_ptr))
    {
@@ -87,7 +87,7 @@ print_pixel(png_structp png_ptr, png_infop info_ptr, png_const_bytep row,
        */
       case PNG_COLOR_TYPE_PALETTE:
          {
-            const int index = component(row, x, 0, bit_depth, 1);
+            int index = component(row, x, 0, bit_depth, 1);
             png_colorp palette = NULL;
             int num_palette = 0;
 

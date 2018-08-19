@@ -3970,18 +3970,18 @@ png_gamma_correct(png_structrp png_ptr, unsigned int value,
  */
 static void
 png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
-    const unsigned int shift, const png_fixed_point gamma_val)
+    unsigned int shift, png_fixed_point gamma_val)
 {
    /* Various values derived from 'shift': */
-   const unsigned int num = 1U << (8U - shift);
+   unsigned int num = 1U << (8U - shift);
 #ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
    /* CSE the division and work round wacky GCC warnings (see the comments
     * in png_gamma_8bit_correct for where these come from.)
     */
    const double fmax = 1./(((png_int_32)1 << (16U - shift))-1);
 #endif
-   const unsigned int max = (1U << (16U - shift))-1U;
-   const unsigned int max_by_2 = 1U << (15U-shift);
+   unsigned int max = (1U << (16U - shift))-1U;
+   unsigned int max_by_2 = 1U << (15U-shift);
    unsigned int i;
 
    png_uint_16pp table = *ptable =
@@ -4047,10 +4047,10 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
  */
 static void
 png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
-    const unsigned int shift, const png_fixed_point gamma_val)
+    unsigned int shift, png_fixed_point gamma_val)
 {
-   const unsigned int num = 1U << (8U - shift);
-   const unsigned int max = (1U << (16U - shift))-1U;
+   unsigned int num = 1U << (8U - shift);
+   unsigned int max = (1U << (16U - shift))-1U;
    unsigned int i;
    png_uint_32 last;
 
@@ -4115,7 +4115,7 @@ png_build_16to8_table(png_structrp png_ptr, png_uint_16pp *ptable,
  */
 static void
 png_build_8bit_table(png_structrp png_ptr, png_bytepp ptable,
-    const png_fixed_point gamma_val)
+    png_fixed_point gamma_val)
 {
    unsigned int i;
    png_bytep table = *ptable = (png_bytep)png_malloc(png_ptr, 256);

@@ -885,7 +885,7 @@ PNG_FUNCTION(void /* PRIVATE */, (PNGCBAPI
 png_safe_error),(png_structp png_nonconst_ptr, png_const_charp error_message),
     PNG_NORETURN)
 {
-   const png_const_structrp png_ptr = png_nonconst_ptr;
+   png_const_structrp png_ptr = png_nonconst_ptr;
    png_imagep image = png_voidcast(png_imagep, png_ptr->error_ptr);
 
    /* An error is always logged here, overwriting anything (typically a warning)
@@ -920,7 +920,7 @@ png_safe_error),(png_structp png_nonconst_ptr, png_const_charp error_message),
 void /* PRIVATE */ PNGCBAPI
 png_safe_warning(png_structp png_nonconst_ptr, png_const_charp warning_message)
 {
-   const png_const_structrp png_ptr = png_nonconst_ptr;
+   png_const_structrp png_ptr = png_nonconst_ptr;
    png_imagep image = png_voidcast(png_imagep, png_ptr->error_ptr);
 
    /* A warning is only logged if there is no prior warning or error. */

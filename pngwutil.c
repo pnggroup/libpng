@@ -2101,7 +2101,7 @@ png_do_write_interlace(png_row_infop row_info, png_bytep row, int pass)
    static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* Offset to next interlace block */
-   static const png_byte  png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    png_debug(1, "in png_do_write_interlace");
 
@@ -2276,7 +2276,7 @@ png_write_filtered_row(png_structrp png_ptr, png_bytep filtered_row,
 
 #ifdef PNG_WRITE_FILTER_SUPPORTED
 static size_t /* PRIVATE */
-png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
+png_setup_sub_row(png_structrp png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_bytep rp, dp, lp;
@@ -2315,7 +2315,7 @@ png_setup_sub_row(png_structrp png_ptr, const png_uint_32 bpp,
 }
 
 static void /* PRIVATE */
-png_setup_sub_row_only(png_structrp png_ptr, const png_uint_32 bpp,
+png_setup_sub_row_only(png_structrp png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_bytep rp, dp, lp;
@@ -2380,7 +2380,7 @@ png_setup_up_row_only(png_structrp png_ptr, size_t row_bytes)
 }
 
 static size_t /* PRIVATE */
-png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
+png_setup_avg_row(png_structrp png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_bytep rp, dp, pp, lp;
@@ -2420,7 +2420,7 @@ png_setup_avg_row(png_structrp png_ptr, const png_uint_32 bpp,
    return (sum);
 }
 static void /* PRIVATE */
-png_setup_avg_row_only(png_structrp png_ptr, const png_uint_32 bpp,
+png_setup_avg_row_only(png_structrp png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_bytep rp, dp, pp, lp;
@@ -2442,7 +2442,7 @@ png_setup_avg_row_only(png_structrp png_ptr, const png_uint_32 bpp,
 }
 
 static size_t /* PRIVATE */
-png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
+png_setup_paeth_row(png_structrp png_ptr, png_uint_32 bpp,
     size_t row_bytes, size_t lmins)
 {
    png_bytep rp, dp, pp, cp, lp;
@@ -2503,7 +2503,7 @@ png_setup_paeth_row(png_structrp png_ptr, const png_uint_32 bpp,
    return (sum);
 }
 static void /* PRIVATE */
-png_setup_paeth_row_only(png_structrp png_ptr, const png_uint_32 bpp,
+png_setup_paeth_row_only(png_structrp png_ptr, png_uint_32 bpp,
     size_t row_bytes)
 {
    png_bytep rp, dp, pp, cp, lp;
