@@ -449,13 +449,13 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, size_t length)
  */
 typedef struct
 {
-   PNG_CONST char *file_name;
+   const char *file_name;
 }  pngtest_error_parameters;
 
 static void PNGCBAPI
 pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
-   PNG_CONST char *name = "UNKNOWN (ERROR!)";
+   const char *name = "UNKNOWN (ERROR!)";
    pngtest_error_parameters *test =
       (pngtest_error_parameters*)png_get_error_ptr(png_ptr);
 
@@ -850,7 +850,7 @@ pngtest_check_text_support(png_structp png_ptr, png_textp text_ptr,
 
 /* Test one file */
 static int
-test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
+test_one_file(const char *inname, const char *outname)
 {
    static png_FILE_p fpin;
    static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
@@ -1809,11 +1809,11 @@ test_one_file(PNG_CONST char *inname, PNG_CONST char *outname)
 
 /* Input and output filenames */
 #ifdef RISCOS
-static PNG_CONST char *inname = "pngtest/png";
-static PNG_CONST char *outname = "pngout/png";
+static const char *inname = "pngtest/png";
+static const char *outname = "pngout/png";
 #else
-static PNG_CONST char *inname = "pngtest.png";
-static PNG_CONST char *outname = "pngout.png";
+static const char *inname = "pngtest.png";
+static const char *outname = "pngout.png";
 #endif
 
 int

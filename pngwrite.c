@@ -469,7 +469,7 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
 
 #ifdef PNG_CONVERT_tIME_SUPPORTED
 void PNGAPI
-png_convert_from_struct_tm(png_timep ptime, PNG_CONST struct tm * ttime)
+png_convert_from_struct_tm(png_timep ptime, const struct tm * ttime)
 {
    png_debug(1, "in png_convert_from_struct_tm");
 
@@ -2052,7 +2052,7 @@ png_image_write_main(png_voidp argument)
     */
    if (write_16bit != 0)
    {
-      PNG_CONST png_uint_16 le = 0x0001;
+      const png_uint_16 le = 0x0001;
 
       if ((*(png_const_bytep) & le) != 0)
          png_set_swap(png_ptr);

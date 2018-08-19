@@ -58,9 +58,8 @@
 
 #endif /* PNG_BUILDING_SYMBOL_TABLE */
 
-/* Prior to 1.6.0 it was possible to turn off 'const' in declarations using
- * PNG_NO_CONST; this is no longer supported except for data declarations which
- * apparently still cause problems in 2011 on some compilers.
+/* Prior to 1.6.0, it was possible to turn off 'const' in declarations,
+ * using PNG_NO_CONST.  This is no longer supported.
  */
 #define PNG_CONST const /* backward compatibility only */
 

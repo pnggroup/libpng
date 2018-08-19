@@ -3363,7 +3363,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* Hence the pre-compiled masks indexed by PACKSWAP (or not), depth and
           * then pass:
           */
-         static PNG_CONST png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =
+         static const png_uint_32 row_mask[2/*PACKSWAP*/][3/*depth*/][6] =
          {
             /* Little-endian byte masks for PACKSWAP */
             { S_MASKS(1,0), S_MASKS(2,0), S_MASKS(4,0) },
@@ -3374,7 +3374,7 @@ png_combine_row(png_const_structrp png_ptr, png_bytep dp, int display)
          /* display_mask has only three entries for the odd passes, so index by
           * pass>>1.
           */
-         static PNG_CONST png_uint_32 display_mask[2][3][3] =
+         static const png_uint_32 display_mask[2][3][3] =
          {
             /* Little-endian byte masks for PACKSWAP */
             { B_MASKS(1,0), B_MASKS(2,0), B_MASKS(4,0) },
@@ -3687,7 +3687,7 @@ png_do_read_interlace(png_row_infop row_info, png_bytep row, int pass,
 {
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
    /* Offset to next interlace block */
-   static PNG_CONST unsigned int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const unsigned int png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    png_debug(1, "in png_do_read_interlace");
    if (row != NULL && row_info != NULL)
@@ -4329,16 +4329,16 @@ png_read_finish_row(png_structrp png_ptr)
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
-   static PNG_CONST png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* Offset to next interlace block */
-   static PNG_CONST png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    /* Start of interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+   static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
 
    /* Offset to next interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+   static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 
    png_debug(1, "in png_read_finish_row");
    png_ptr->row_number++;
@@ -4394,16 +4394,16 @@ png_read_start_row(png_structrp png_ptr)
    /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
 
    /* Start of interlace block */
-   static PNG_CONST png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+   static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
 
    /* Offset to next interlace block */
-   static PNG_CONST png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+   static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
 
    /* Start of interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+   static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
 
    /* Offset to next interlace block in the y direction */
-   static PNG_CONST png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+   static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 
    unsigned int max_pixel_depth;
    size_t row_bytes;

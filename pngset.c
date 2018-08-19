@@ -1399,7 +1399,7 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
       /* Ignore all unknown chunks and all chunks recognized by
        * libpng except for IHDR, PLTE, tRNS, IDAT, and IEND
        */
-      static PNG_CONST png_byte chunks_to_ignore[] = {
+      static const png_byte chunks_to_ignore[] = {
          98,  75,  71,  68, '\0',  /* bKGD */
          99,  72,  82,  77, '\0',  /* cHRM */
         101,  88,  73, 102, '\0',  /* eXIf */

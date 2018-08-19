@@ -1621,7 +1621,7 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
     * errors (which are unfortunately quite common.)
     */
    {
-         static PNG_CONST png_byte chunks_to_process[] = {
+         static const png_byte chunks_to_process[] = {
             98,  75,  71,  68, '\0',  /* bKGD */
             99,  72,  82,  77, '\0',  /* cHRM */
            103,  65,  77,  65, '\0',  /* gAMA */
@@ -3946,7 +3946,7 @@ png_image_read_direct(png_voidp argument)
        */
       if (linear != 0)
       {
-         PNG_CONST png_uint_16 le = 0x0001;
+         const png_uint_16 le = 0x0001;
 
          if ((*(png_const_bytep) & le) != 0)
             png_set_swap(png_ptr);

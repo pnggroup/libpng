@@ -5389,7 +5389,7 @@ to png_bytepp, and in png_set_iCCP, from png_charp to png_const_bytep.
 There are changes of form in png.h, including new and changed macros to
 declare parts of the API.  Some API functions with arguments that are
 pointers to data not modified within the function have been corrected to
-declare these arguments with PNG_CONST.
+declare these arguments with const.
 
 Much of the internal use of C macros to control the library build has also
 changed and some of this is visible in the exported header files, in

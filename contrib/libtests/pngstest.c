@@ -372,7 +372,7 @@ print_opts(png_uint_32 opts)
  */
 #define FORMAT_COUNT 64
 #define FORMAT_MASK 0x3f
-static PNG_CONST char * PNG_CONST format_names[FORMAT_COUNT] =
+static const char * const format_names[FORMAT_COUNT] =
 {
    "sRGB-gray",
    "sRGB-gray+alpha",
