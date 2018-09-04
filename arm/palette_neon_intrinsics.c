@@ -1,5 +1,7 @@
+
 /* palette_neon_intrinsics.c - NEON optimised palette expansion functions
  *
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 2017-2018 Arm Holdings. All rights reserved.
  * Written by Richard Townsend <Richard.Townsend@arm.com>, February 2017.
  *
@@ -12,7 +14,11 @@
 
 #if PNG_ARM_NEON_IMPLEMENTATION == 1
 
-#include <arm_neon.h>
+#if defined(_MSC_VER) && defined(_M_ARM64)
+#  include <arm64_neon.h>
+#else
+#  include <arm_neon.h>
+#endif
 
 /* Build an RGBA palette from the RGB and separate alpha palettes. */
 void
