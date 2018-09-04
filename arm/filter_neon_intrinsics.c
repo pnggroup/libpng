@@ -134,13 +134,14 @@ png_read_filter_row_sub4_neon(png_row_infop row_info, png_bytep row,
       uint8x8x4_t *vrpt = png_ptr(uint8x8x4_t,&vtmp);
       uint8x8x4_t vrp = *vrpt;
       uint32x2x4_t *temp_pointer;
+      uint32x2x4_t vdest_val;
 
       vdest.val[0] = vadd_u8(vdest.val[3], vrp.val[0]);
       vdest.val[1] = vadd_u8(vdest.val[0], vrp.val[1]);
       vdest.val[2] = vadd_u8(vdest.val[1], vrp.val[2]);
       vdest.val[3] = vadd_u8(vdest.val[2], vrp.val[3]);
 
-      uint32x2x4_t vdest_val = png_ldr(uint32x2x4_t, &vdest);
+      vdest_val = png_ldr(uint32x2x4_t, &vdest);
       vst4_lane_u32(png_ptr(uint32_t,rp), vdest_val, 0);
    }
 
@@ -234,6 +235,7 @@ png_read_filter_row_avg4_neon(png_row_infop row_info, png_bytep row,
       uint8x8x4_t *vrpt, *vppt;
       uint8x8x4_t vrp, vpp;
       uint32x2x4_t *temp_pointer;
+      uint32x2x4_t vdest_val;
 
       vtmp = vld4_u32(png_ptr(uint32_t,rp));
       vrpt = png_ptr(uint8x8x4_t,&vtmp);
@@ -251,7 +253,7 @@ png_read_filter_row_avg4_neon(png_row_infop row_info, png_bytep row,
       vdest.val[3] = vhadd_u8(vdest.val[2], vpp.val[3]);
       vdest.val[3] = vadd_u8(vdest.val[3], vrp.val[3]);
 
-      uint32x2x4_t vdest_val = png_ldr(uint32x2x4_t, &vdest);
+      vdest_val = png_ldr(uint32x2x4_t, &vdest);
       vst4_lane_u32(png_ptr(uint32_t,rp), vdest_val, 0);
    }
 }
@@ -371,6 +373,7 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
       uint8x8x4_t *vrpt, *vppt;
       uint8x8x4_t vrp, vpp;
       uint32x2x4_t *temp_pointer;
+      uint32x2x4_t vdest_val;
 
       vtmp = vld4_u32(png_ptr(uint32_t,rp));
       vrpt = png_ptr(uint8x8x4_t,&vtmp);
@@ -390,7 +393,7 @@ png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
 
       vlast = vpp.val[3];
 
-      uint32x2x4_t vdest_val = png_ldr(uint32x2x4_t, &vdest);
+      vdest_val = png_ldr(uint32x2x4_t, &vdest);
       vst4_lane_u32(png_ptr(uint32_t,rp), vdest_val, 0);
    }
 }
