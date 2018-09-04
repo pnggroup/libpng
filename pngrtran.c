@@ -4203,8 +4203,8 @@ png_do_encode_alpha(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
  */
 static void
 png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
-   png_bytep row, png_const_colorp palette, png_const_bytep trans_alpha,
-   int num_trans)
+    png_bytep row, png_const_colorp palette, png_const_bytep trans_alpha,
+    int num_trans)
 {
    int shift, value;
    png_bytep sp, dp;
@@ -4310,11 +4310,14 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
 
                i = 0;
 #ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
-               if (png_ptr->riffled_palette != NULL) {
+               if (png_ptr->riffled_palette != NULL)
+               {
                   /* The RGBA optimization works with png_ptr->bit_depth == 8
-                     but sometimes row_info->bit_depth has been changed to 8.
-                     In these cases, the palette hasn't been riffled. */
-                  i = png_do_expand_palette_neon_rgba(png_ptr, row_info, row, &sp, &dp);
+                   * but sometimes row_info->bit_depth has been changed to 8.
+                   * In these cases, the palette hasn't been riffled.
+                   */
+                  i = png_do_expand_palette_neon_rgba(png_ptr, row_info, row,
+                      &sp, &dp);
                }
 #endif
 
@@ -4342,7 +4345,8 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                dp = row + (size_t)(row_width * 3) - 1;
                i = 0;
 #ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
-               i = png_do_expand_palette_neon_rgb(png_ptr, row_info, row, &sp, &dp);
+               i = png_do_expand_palette_neon_rgb(png_ptr, row_info, row,
+                   &sp, &dp);
 #endif
 
                for (; i < row_width; i++)
@@ -4760,17 +4764,18 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       if (row_info->color_type == PNG_COLOR_TYPE_PALETTE)
       {
 #ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
-       if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8)) {
-          /* Allocate space for the decompressed full palette. */
-          if (png_ptr->riffled_palette == NULL) {
-              png_ptr->riffled_palette = png_malloc(png_ptr, 256*4);
-              if (png_ptr->riffled_palette == NULL) {
+         if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8))
+         {
+            /* Allocate space for the decompressed full palette. */
+            if (png_ptr->riffled_palette == NULL)
+            {
+               png_ptr->riffled_palette = png_malloc(png_ptr, 256*4);
+               if (png_ptr->riffled_palette == NULL)
                   png_error(png_ptr, "NULL row buffer");
-              }
-              /* Build the RGBA palette. */
-              png_riffle_palette_rgba(png_ptr, row_info);
-          }
-       }
+               /* Build the RGBA palette. */
+               png_riffle_palette_rgba(png_ptr, row_info);
+            }
+         }
 #endif
          png_do_expand_palette(png_ptr, row_info, png_ptr->row_buf + 1,
             png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
