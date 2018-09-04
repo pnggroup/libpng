@@ -1,11 +1,10 @@
 
 /* filter_sse2_intrinsics.c - SSE2 optimized filter functions
  *
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 2016-2017 Glenn Randers-Pehrson
  * Written by Mike Klein and Matt Sarett
  * Derived from arm/filter_neon_intrinsics.c
- *
- * Last changed in libpng 1.6.31 [July 27, 2017]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

@@ -1,13 +1,14 @@
 /* filter_vsx_intrinsics.c - PowerPC optimised filter functions
  *
+ * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 2017 Glenn Randers-Pehrson
  * Written by Vadim Barkov, 2017.
- * Last changed in libpng 1.6.29 [March 16, 2017]
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
+
 #include <stdio.h>
 #include <stdint.h>
 #include "../pngpriv.h"
