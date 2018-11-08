@@ -219,7 +219,7 @@ endif()
 endif(PNG_HARDWARE_OPTIMIZATIONS)
 
 # SET LIBNAME
-set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
+set(PNG_LIB_NAME CACHE png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 
 # to distinguish between debug and release lib
 set(CMAKE_DEBUG_POSTFIX "d")
