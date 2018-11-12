@@ -78,6 +78,22 @@ void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
   buf_state->data += length;
 }
 
+void* limited_malloc(png_structp, png_alloc_size_t size) {
+  // libpng may allocate large amounts of memory that the fuzzer reports as
+  // an error. In order to silence these errors, make libpng fail when trying
+  // to allocate a large amount. This allocator used to be in the Chromium
+  // version of this fuzzer.
+  // This number is chosen to match the default png_user_chunk_malloc_max.
+  if (size > 8000000)
+    return nullptr;
+
+  return malloc(size);
+}
+
+void default_free(png_structp, png_voidp ptr) {
+  return free(ptr);
+}
+
 static const int kPngHeaderSize = 8;
 
 // Entry point for LibFuzzer.
@@ -117,6 +133,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     PNG_CLEANUP
     return 0;
   }
+
+  // Use a custom allocator that fails for large allocations to avoid OOM.
+  png_set_mem_fn(png_handler.png_ptr, nullptr, limited_malloc, default_free);
 
   png_set_crc_action(png_handler.png_ptr, PNG_CRC_QUIET_USE, PNG_CRC_QUIET_USE);
 #ifdef PNG_IGNORE_ADLER32
