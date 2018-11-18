@@ -59,16 +59,10 @@ if(NOT PNG_BUILD_ZLIB)
   include_directories(${ZLIB_INCLUDE_DIR})
 endif()
 
-if(NOT WIN32)
-  find_library(M_LIBRARY
-    NAMES m
-    PATHS /usr/lib /usr/local/lib)
-  if(NOT M_LIBRARY)
-    message(STATUS "math lib 'libm' not found; floating point support disabled")
-    set(M_LIBRARY "")
-  endif()
+if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU)
+  find_library(M_LIBRARY m)
 else()
-  # not needed on windows
+  # libm is not needed and/or not available
   set(M_LIBRARY "")
 endif()
 
