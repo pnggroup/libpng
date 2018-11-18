@@ -17,25 +17,8 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-cmake_minimum_required(VERSION 3.0.2)
-cmake_policy(VERSION 3.0.2)
-
-# Set MacOSX @rpath usage globally.
-if(POLICY CMP0020)
-  cmake_policy(SET CMP0020 NEW)
-endif()
-if(POLICY CMP0042)
-  cmake_policy(SET CMP0042 NEW)
-endif()
-# Use new variable expansion policy.
-if(POLICY CMP0053)
-  cmake_policy(SET CMP0053 NEW)
-endif()
-if(POLICY CMP0054)
-  cmake_policy(SET CMP0054 NEW)
-endif()
-
-set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
+cmake_minimum_required(VERSION 3.1)
+cmake_policy(VERSION 3.1)
 
 project(libpng C ASM)
 enable_testing()
@@ -636,19 +619,11 @@ function(png_add_test)
 
   configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/test.cmake.in"
                  "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake" @ONLY)
-  if(CMAKE_MAJOR_VERSION GREATER 2) # have generator expressions
-    add_test(NAME "${_PAT_NAME}"
-             COMMAND "${CMAKE_COMMAND}"
-             "-DLIBPNG=$<TARGET_FILE:png>"
-             "-DTEST_COMMAND=$<TARGET_FILE:${_PAT_COMMAND}>"
-             -P "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake")
-  else() # old 2.x add_test; limited and won't work well on Windows
-    # Note LIBPNG is a dummy value as there are no generator expressions
-    add_test("${_PAT_NAME}" "${CMAKE_COMMAND}"
-             "-DLIBPNG=${CMAKE_CURRENT_BINARY_DIR}/libpng.so"
-             "-DTEST_COMMAND=./${_PAT_COMMAND}"
-             -P "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake")
-  endif()
+  add_test(NAME "${_PAT_NAME}"
+           COMMAND "${CMAKE_COMMAND}"
+           "-DLIBPNG=$<TARGET_FILE:png>"
+           "-DTEST_COMMAND=$<TARGET_FILE:${_PAT_COMMAND}>"
+           -P "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake")
 endfunction()
 
 if(PNG_TESTS AND PNG_SHARED)
@@ -868,41 +843,35 @@ if(PNG_SHARED)
     CLEAN_DIRECT_OUTPUT 1)
 endif()
 
-# If CMake > 2.4.x, we set a variable used below to export
-# targets to an export file.
-# TODO: Use VERSION_GREATER after our cmake_minimum_required >= 2.6.2
-if(CMAKE_MAJOR_VERSION GREATER 1 AND CMAKE_MINOR_VERSION GREATER 4)
-  set(PNG_EXPORT_RULE EXPORT libpng)
-elseif(CMAKE_MAJOR_VERSION GREATER 2) # future proof
-  set(PNG_EXPORT_RULE EXPORT libpng)
-endif()
-
 # INSTALL
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
   install(TARGETS ${PNG_LIB_TARGETS}
-      ${PNG_EXPORT_RULE}
-      RUNTIME DESTINATION bin
-      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-      FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
+          EXPORT libpng
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
   if(PNG_SHARED)
     # Create a symlink for libpng.dll.a => libpng16.dll.a on Cygwin
     if(CYGWIN OR MINGW)
       create_symlink(libpng${CMAKE_IMPORT_LIBRARY_SUFFIX} TARGET png)
-      install(FILES $<TARGET_LINKER_FILE_DIR:png>/libpng${CMAKE_IMPORT_LIBRARY_SUFFIX} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      install(FILES $<TARGET_LINKER_FILE_DIR:png>/libpng${CMAKE_IMPORT_LIBRARY_SUFFIX}
+              DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endif()
 
     if(NOT WIN32)
       create_symlink(libpng${CMAKE_SHARED_LIBRARY_SUFFIX} TARGET png)
-      install(FILES $<TARGET_LINKER_FILE_DIR:png>/libpng${CMAKE_SHARED_LIBRARY_SUFFIX} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      install(FILES $<TARGET_LINKER_FILE_DIR:png>/libpng${CMAKE_SHARED_LIBRARY_SUFFIX}
+              DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endif()
   endif()
 
   if(PNG_STATIC)
     if(NOT WIN32 OR CYGWIN OR MINGW)
       create_symlink(libpng${CMAKE_STATIC_LIBRARY_SUFFIX} TARGET png_static)
-      install(FILES $<TARGET_LINKER_FILE_DIR:png_static>/libpng${CMAKE_STATIC_LIBRARY_SUFFIX} DESTINATION ${CMAKE_INSTALL_LIBDIR})
+      install(FILES $<TARGET_LINKER_FILE_DIR:png_static>/libpng${CMAKE_STATIC_LIBRARY_SUFFIX}
+              DESTINATION ${CMAKE_INSTALL_LIBDIR})
     endif()
   endif()
 endif()
@@ -920,7 +889,7 @@ endif()
 
 if(NOT SKIP_INSTALL_PROGRAMS AND NOT SKIP_INSTALL_ALL)
   install(TARGETS ${PNG_BIN_TARGETS}
-      RUNTIME DESTINATION bin)
+          RUNTIME DESTINATION bin)
 endif()
 
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
@@ -943,9 +912,8 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
   endif()
 endif()
 
-# On versions of CMake that support it, create an export file CMake
-# users can include() to import our targets
-if(PNG_EXPORT_RULE AND NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL)
+# Create an export file that CMake users can include() to import our targets.
+if(NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL)
   install(EXPORT libpng DESTINATION lib/libpng FILE lib${PNG_LIB_NAME}.cmake)
 endif()
 
