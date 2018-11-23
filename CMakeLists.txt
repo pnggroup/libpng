@@ -12,6 +12,7 @@
 # Revised by Vicky Pfau, 2018
 # Revised by Cameron Cawley, 2018
 # Revised by Cosmin Truta, 2018
+# Revised by Kyle Bentley, 2018
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -822,8 +823,8 @@ endif()
 if(NOT WIN32 OR CYGWIN OR MINGW)
   set(prefix      ${CMAKE_INSTALL_PREFIX})
   set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-  set(libdir      ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR})
-  set(includedir  ${CMAKE_INSTALL_PREFIX}/include)
+  set(libdir      ${CMAKE_INSTALL_FULL_LIBDIR})
+  set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
   set(LIBS        "-lz -lm")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
