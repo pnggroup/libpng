@@ -27,8 +27,9 @@ enable_testing()
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
 set(PNGLIB_RELEASE 36)
-set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
+set(PNGLIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
+SET(_LIBPREFIX lib)
 
 include(GNUInstallDirs)
 
@@ -195,9 +196,6 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
 endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
-
-# SET LIBNAME
-set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 
 # to distinguish between debug and release lib
 set(CMAKE_DEBUG_POSTFIX "d")
@@ -529,7 +527,7 @@ unset(PNG_LIB_TARGETS)
 if(PNG_SHARED)
   add_library(png SHARED ${libpng_sources})
   set(PNG_LIB_TARGETS png)
-  set_target_properties(png PROPERTIES OUTPUT_NAME ${PNG_LIB_NAME})
+  set_target_properties(png PROPERTIES OUTPUT_NAME ${PNGLIB_NAME})
   add_dependencies(png genfiles)
   if(MSVC)
     # msvc does not append 'lib' - do it here to have consistent name
@@ -559,11 +557,11 @@ if(PNG_STATIC)
   # for all other platforms.
   if(NOT MSVC)
     set_target_properties(png_static PROPERTIES
-      OUTPUT_NAME "${PNG_LIB_NAME}"
+      OUTPUT_NAME "${PNGLIB_NAME}"
       CLEAN_DIRECT_OUTPUT 1)
   else()
     set_target_properties(png_static PROPERTIES
-      OUTPUT_NAME "${PNG_LIB_NAME}_static"
+      OUTPUT_NAME "${PNGLIB_NAME}_static"
       CLEAN_DIRECT_OUTPUT 1)
   endif()
   list(APPEND PNG_LIB_TARGETS png_static)
@@ -827,12 +825,12 @@ if(NOT WIN32 OR CYGWIN OR MINGW)
   set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
   set(LIBS        "-lz -lm")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
-  create_symlink(libpng.pc FILE ${PNGLIB_NAME}.pc)
+    ${CMAKE_CURRENT_BINARY_DIR}/${_LIBPREFIX}${PNGLIB_NAME}.pc @ONLY)
+  create_symlink(libpng.pc FILE ${_LIBPREFIX}${PNGLIB_NAME}.pc)
 
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config @ONLY)
-  create_symlink(libpng-config FILE ${PNGLIB_NAME}-config)
+    ${CMAKE_CURRENT_BINARY_DIR}/${_LIBPREFIX}${PNGLIB_NAME}-config @ONLY)
+  create_symlink(libpng-config FILE ${_LIBPREFIX}${PNGLIB_NAME}-config)
 endif()
 
 # SET UP LINKS
@@ -879,12 +877,12 @@ endif()
 
 if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
   install(FILES ${libpng_public_hdrs} DESTINATION include)
-  install(FILES ${libpng_public_hdrs} DESTINATION include/${PNGLIB_NAME})
+  install(FILES ${libpng_public_hdrs} DESTINATION include/${_LIBPREFIX}${PNGLIB_NAME})
 endif()
 if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
   if(NOT WIN32 OR CYGWIN OR MINGW)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config DESTINATION bin)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config DESTINATION bin)
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${_LIBPREFIX}${PNGLIB_NAME}-config DESTINATION bin)
   endif()
 endif()
 
@@ -906,16 +904,16 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
             DESTINATION bin)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${_LIBPREFIX}${PNGLIB_NAME}.pc
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${_LIBPREFIX}${PNGLIB_NAME}-config
             DESTINATION bin)
   endif()
 endif()
 
 # Create an export file that CMake users can include() to import our targets.
 if(NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL)
-  install(EXPORT libpng DESTINATION lib/libpng FILE lib${PNG_LIB_NAME}.cmake)
+  install(EXPORT libpng DESTINATION lib/libpng FILE ${_LIBPREFIX}${PNGLIB_NAME}.cmake)
 endif()
 
 # what's with libpng-manual.txt and all the extra files?
