@@ -3128,11 +3128,11 @@ png_ascii_from_fp(png_const_structrp png_ptr, png_charp ascii, size_t size,
             /* The total output count (max) is now 4+precision */
 
             /* Check for an exponent, if we don't need one we are
-             * done and just need to terminate the string.  At
-             * this point exp_b10==(-1) is effectively a flag - it got
-             * to '-1' because of the decrement after outputting
-             * the decimal point above (the exponent required is
-             * *not* -1!)
+             * done and just need to terminate the string.  At this
+             * point, exp_b10==(-1) is effectively a flag: it got
+             * to '-1' because of the decrement, after outputting
+             * the decimal point above. (The exponent required is
+             * *not* -1.)
              */
             if (exp_b10 >= (-1) && exp_b10 <= 2)
             {
@@ -3978,10 +3978,10 @@ png_build_16bit_table(png_structrp png_ptr, png_uint_16pp *ptable,
    /* CSE the division and work round wacky GCC warnings (see the comments
     * in png_gamma_8bit_correct for where these come from.)
     */
-   const double fmax = 1./(((png_int_32)1 << (16U - shift))-1);
+   double fmax = 1.0 / (((png_int_32)1 << (16U - shift)) - 1);
 #endif
-   unsigned int max = (1U << (16U - shift))-1U;
-   unsigned int max_by_2 = 1U << (15U-shift);
+   unsigned int max = (1U << (16U - shift)) - 1U;
+   unsigned int max_by_2 = 1U << (15U - shift);
    unsigned int i;
 
    png_uint_16pp table = *ptable =

@@ -63,8 +63,8 @@
  */
 #define PNG_CONST const /* backward compatibility only */
 
-/* This controls optimization of the reading of 16-bit and 32-bit values
- * from PNG files.  It can be set on a per-app-file basis - it
+/* This controls optimization of the reading of 16-bit and 32-bit
+ * values from PNG files.  It can be set on a per-app-file basis: it
  * just changes whether a macro is used when the function is called.
  * The library builder sets the default; if read functions are not
  * built into the library the macro implementation is forced on.
