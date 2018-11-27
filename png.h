@@ -3206,7 +3206,9 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #ifdef PNG_MIPS_MSA_API_SUPPORTED
 #  define PNG_MIPS_MSA   6 /* HARDWARE: MIPS Msa SIMD instructions supported */
 #endif
-#define PNG_IGNORE_ADLER32 8
+#ifdef PNG_ADLER32_SUPPORTED
+#  define PNG_IGNORE_ADLER32 8
+#endif
 #ifdef PNG_POWERPC_VSX_API_SUPPORTED
 #  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions supported */
 #endif
