@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.36.git
+ * libpng version 1.6.36 - December 1, 2018
  *
  * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -13,8 +13,9 @@
  * Authors and maintainers:
  *   libpng versions 0.71, May 1995, through 0.88, January 1996: Guy Schalnat
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
- *   libpng versions 0.97, January 1998, through 1.6.35, July 15, 2018:
+ *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson.
+ *   libpng version 1.6.36, December 1, 2018: Cosmin Truta
  *   See also "Contributing Authors", below.
  */
 
@@ -237,7 +238,7 @@
  *    ...
  *    1.5.30                  15    10530  15.so.15.30[.0]
  *    ...
- *    1.6.35                  16    10635  16.so.16.35[.0]
+ *    1.6.36                  16    10636  16.so.16.36[.0]
  *
  *    Henceforth the source version will match the shared-library major and
  *    minor numbers; the shared-library major version number will be used for
@@ -257,7 +258,7 @@
  *    in binary compatibility (e.g., when a new feature is added).
  *
  * See libpng.txt or libpng.3 for more information.  The PNG specification
- * is available as a W3C Recommendation and as an ISO Specification,
+ * is available as a W3C Recommendation and as an ISO/IEC Standard; see
  * <https://www.w3.org/TR/2003/REC-PNG-20031110/>
  */
 
@@ -276,8 +277,8 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.36.git"
-#define PNG_HEADER_VERSION_STRING " libpng version 1.6.36.git\n"
+#define PNG_LIBPNG_VER_STRING "1.6.36"
+#define PNG_HEADER_VERSION_STRING " libpng version 1.6.36 - December 1, 2018\n"
 
 #define PNG_LIBPNG_VER_SONUM   16
 #define PNG_LIBPNG_VER_DLLNUM  16
@@ -291,7 +292,7 @@
  * PNG_LIBPNG_VER_STRING, omitting any leading zero:
  */
 
-#define PNG_LIBPNG_VER_BUILD  02
+#define PNG_LIBPNG_VER_BUILD  0
 
 /* Release Status */
 #define PNG_LIBPNG_BUILD_ALPHA    1
@@ -308,7 +309,7 @@
 #define PNG_LIBPNG_BUILD_SPECIAL 32 /* Cannot be OR'ed with
                                        PNG_LIBPNG_BUILD_PRIVATE */
 
-#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_BETA
+#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_STABLE
 
 /* Careful here.  At one time, Guy wanted to use 082, but that
  * would be octal.  We must not include leading zeros.
@@ -427,7 +428,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_36_git;
+typedef char* png_libpng_version_1_6_36;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *

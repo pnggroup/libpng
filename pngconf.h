@@ -1,7 +1,7 @@
 
 /* pngconf.h - machine configurable file for libpng
  *
- * libpng version 1.6.36.git
+ * libpng version 1.6.36
  *
  * Copyright (c) 2018 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2016,2018 Glenn Randers-Pehrson

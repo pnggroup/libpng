@@ -534,7 +534,7 @@ TEST_LOG_COMPILE = $(TEST_LOG_COMPILER) $(AM_TEST_LOG_FLAGS) \
 	$(TEST_LOG_FLAGS)
 am__DIST_COMMON = $(dist_man_MANS) $(srcdir)/Makefile.in \
 	$(srcdir)/config.h.in $(srcdir)/libpng-config.in \
-	$(srcdir)/libpng.pc.in INSTALL README TODO compile \
+	$(srcdir)/libpng.pc.in AUTHORS INSTALL README TODO compile \
 	config.guess config.sub depcomp install-sh ltmain.sh missing \
 	test-driver
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -784,7 +784,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 # from those directories being included.  This only works if the configure is
 # not done in the source directory!
 EXTRA_DIST = \
-	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
+	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
