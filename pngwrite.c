@@ -1041,6 +1041,11 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
             png_ptr->do_filter = PNG_FILTER_PAETH; break;
 
          default:
+            /* Set PNG_FILTER_NONE for undocumented values. Note that switch
+             * expression cuts high bits and such a value may match case label.
+             */
+            filters = (filters & PNG_ALL_FILTERS) ?
+                (filters & PNG_ALL_FILTERS) : PNG_FILTER_NONE;
             png_ptr->do_filter = (png_byte)filters; break;
 #else
          default:
@@ -1118,8 +1123,9 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
                png_ptr->tst_row = png_voidcast(png_bytep,
                    png_malloc(png_ptr, buf_size));
          }
+
+         png_ptr->do_filter = (png_byte)filters;
       }
-      png_ptr->do_filter = (png_byte)filters;
 #endif
    }
    else
