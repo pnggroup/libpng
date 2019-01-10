@@ -1279,12 +1279,14 @@ png_init_rgb_transformations(png_structrp png_ptr)
          }
 
          png_ptr->background.red = png_ptr->background.green =
-            png_ptr->background.blue = (png_uint_16)gray;
+            png_ptr->background.blue = png_ptr->background.gray =
+            (png_uint_16)gray;
 
          if ((png_ptr->transformations & PNG_EXPAND_tRNS) == 0)
          {
             png_ptr->trans_color.red = png_ptr->trans_color.green =
-               png_ptr->trans_color.blue = (png_uint_16)trans_gray;
+               png_ptr->trans_color.blue = png_ptr->trans_color.gray =
+               (png_uint_16)trans_gray;
          }
       }
       else
