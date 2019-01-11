@@ -959,6 +959,11 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->quantize_index = NULL;
 #endif
 
+#if defined(PNG_READ_EXPAND_SUPPORTED)
+   png_free(png_ptr, png_ptr->riffled_palette);
+   png_ptr->riffled_palette = NULL;
+#endif
+
    if ((png_ptr->free_me & PNG_FREE_PLTE) != 0)
    {
       png_zfree(png_ptr, png_ptr->palette);
