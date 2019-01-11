@@ -10472,6 +10472,9 @@ gamma_test(png_modifier *pmIn, png_byte colour_typeIn,
             d.this.ps->validated = 1;
       }
 
+      /* Clean up png_structp, without destroying the structure itself. */
+      png_destroy_read_struct(&(d.pm->this.pread), &pi, &pi);
+
       modifier_reset(d.pm);
 
       if (d.pm->log && !d.threshold_test && !d.this.speed)
