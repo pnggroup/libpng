@@ -3,7 +3,7 @@
  *
  * libpng version 1.6.37.git
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2019 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -26,8 +26,8 @@
  * PNG Reference Library License version 2
  * ---------------------------------------
  *
- *  * Copyright (c) 1995-2018 The PNG Reference Library Authors.
- *  * Copyright (c) 2018 Cosmin Truta.
+ *  * Copyright (c) 1995-2019 The PNG Reference Library Authors.
+ *  * Copyright (c) 2018-2019 Cosmin Truta.
  *  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
  *  * Copyright (c) 1996-1997 Andreas Dilger.
  *  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -61,7 +61,7 @@
  * PNG Reference Library License version 1 (for libpng 0.5 through 1.6.35)
  * -----------------------------------------------------------------------
  *
- * libpng versions 1.0.7, July 1, 2000 through 1.6.35, July 15, 2018 are
+ * libpng versions 1.0.7, July 1, 2000, through 1.6.35, July 15, 2018 are
  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson, are
  * derived from libpng-1.0.6, and are distributed according to the same
  * disclaimer and license as libpng-1.0.6 with the following individuals
