@@ -1,22 +1,9 @@
 /*
  *  pnm2png.c --- conversion from PBM/PGM/PPM-file to PNG-file
- *  copyright (C) 1999,2015,2017,2018 by Willem van Schaik <willem at schaik.com>
+ *  copyright (C) 1999-2019 by Willem van Schaik <willem at schaik dot com>
  *
- *  version 1.0 - 1999.10.15 - First version.
- *          1.1 - 2015.07.29 - Fixed leaks (Glenn Randers-Pehrson)
- *          1.2 - 2017.04.22 - Add buffer-size check
- *          1.3 - 2017.08.24 - Fix potential overflow in buffer-size check
- *                             (Glenn Randers-Pehrson)
- *          1.4 - 2017.08.28 - Add PNGMINUS_UNUSED (Christian Hesse)
- *          1.5 - 2018.08.05 - Fix buffer overflow in tokenizer (Cosmin Truta)
- *          1.6 - 2018.08.05 - Improve portability and fix style (Cosmin Truta)
- *
- *  Permission to use, copy, modify, and distribute this software and
- *  its documentation for any purpose and without fee is hereby granted,
- *  provided that the above copyright notice appear in all copies and
- *  that both that copyright notice and this permission notice appear in
- *  supporting documentation. This software is provided "as is" without
- *  express or implied warranty.
+ *  This software is released under the MIT license. For conditions of
+ *  distribution and use, see the LICENSE file part of this package.
  */
 
 #include <stdio.h>
