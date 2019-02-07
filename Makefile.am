@@ -148,7 +148,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 # from those directories being included.  This only works if the configure is
 # not done in the source directory!
 EXTRA_DIST= \
-	ANNOUNCE CHANGES INSTALL LICENSE README TODO \
+	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
 	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
