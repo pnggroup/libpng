@@ -1019,6 +1019,9 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
           info_ptr->trans_alpha = png_voidcast(png_bytep,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
           memcpy(info_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
+
+          info_ptr->valid |= PNG_INFO_tRNS;
+          info_ptr->free_me |= PNG_FREE_TRNS;
        }
        png_ptr->trans_alpha = info_ptr->trans_alpha;
    }
