@@ -1,7 +1,7 @@
 
 /* pngset.c - storage of image information into info struct
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2022 Cosmin Truta
  * Copyright (c) 1998-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -1019,6 +1019,9 @@ png_set_tRNS(png_structrp png_ptr, png_inforp info_ptr,
           info_ptr->trans_alpha = png_voidcast(png_bytep,
               png_malloc(png_ptr, PNG_MAX_PALETTE_LENGTH));
           memcpy(info_ptr->trans_alpha, trans_alpha, (size_t)num_trans);
+
+          info_ptr->valid |= PNG_INFO_tRNS;
+          info_ptr->free_me |= PNG_FREE_TRNS;
        }
        png_ptr->trans_alpha = info_ptr->trans_alpha;
    }
