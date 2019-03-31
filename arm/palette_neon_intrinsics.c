@@ -22,13 +22,15 @@
 
 /* Build an RGBA8 palette from the separate RGB and alpha palettes. */
 void
-png_riffle_palette_rgba8(png_structrp png_ptr)
+png_riffle_palette_neon(png_structrp png_ptr)
 {
    png_const_colorp palette = png_ptr->palette;
    png_bytep riffled_palette = png_ptr->riffled_palette;
    png_const_bytep trans_alpha = png_ptr->trans_alpha;
    int num_trans = png_ptr->num_trans;
    int i;
+
+   png_debug(1, "in png_riffle_palette_neon");
 
    /* Initially black, opaque. */
    uint8x16x4_t w = {{
@@ -57,7 +59,7 @@ png_riffle_palette_rgba8(png_structrp png_ptr)
 
 /* Expands a palettized row into RGBA8. */
 int
-png_do_expand_palette_neon_rgba8(png_structrp png_ptr, png_row_infop row_info,
+png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
    png_uint_32 row_width = row_info->width;
@@ -65,6 +67,8 @@ png_do_expand_palette_neon_rgba8(png_structrp png_ptr, png_row_infop row_info,
       (const png_uint_32 *)png_ptr->riffled_palette;
    const png_int_32 pixels_per_chunk = 4;
    int i;
+
+   png_debug(1, "in png_do_expand_palette_rgba8_neon");
 
    if (row_width < pixels_per_chunk)
       return 0;
@@ -99,13 +103,15 @@ png_do_expand_palette_neon_rgba8(png_structrp png_ptr, png_row_infop row_info,
 
 /* Expands a palettized row into RGB8. */
 int
-png_do_expand_palette_neon_rgb8(png_structrp png_ptr, png_row_infop row_info,
+png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
    png_uint_32 row_width = row_info->width;
    png_const_bytep palette = (png_const_bytep)png_ptr->palette;
    const png_uint_32 pixels_per_chunk = 8;
    int i;
+
+   png_debug(1, "in png_do_expand_palette_rgb8_neon");
 
    if (row_width <= pixels_per_chunk)
       return 0;
