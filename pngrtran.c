@@ -1161,20 +1161,7 @@ png_init_palette_transformations(png_structrp png_ptr)
          png_ptr->transformations &= ~(PNG_COMPOSE | PNG_BACKGROUND_EXPAND);
    }
 
-#ifdef PNG_READ_EXPAND_SUPPORTED
-#ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
-   /* Initialize the accelerated palette expansion, if applicable. */
-   if ((png_ptr->transformations & PNG_EXPAND) != 0)
-   {
-      if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8))
-      {
-         png_ptr->riffled_palette = (png_bytep)png_malloc(png_ptr, 256 * 4);
-         png_riffle_palette_neon(png_ptr);
-      }
-   }
-#endif /* PNG_ARM_NEON_INTRINSICS_AVAILABLE */
-
-#ifdef PNG_READ_BACKGROUND_SUPPORTED
+#if defined(PNG_READ_EXPAND_SUPPORTED) && defined(PNG_READ_BACKGROUND_SUPPORTED)
    /* png_set_background handling - deals with the complexity of whether the
     * background color is in the file format or the screen format in the case
     * where an 'expand' will happen.
@@ -1212,8 +1199,7 @@ png_init_palette_transformations(png_structrp png_ptr)
 #endif /* READ_INVERT_ALPHA */
       }
    } /* background expand and (therefore) no alpha association. */
-#endif /* READ_BACKGROUND */
-#endif /* READ_EXPAND */
+#endif /* READ_EXPAND && READ_BACKGROUND */
 }
 
 static void /* PRIVATE */
@@ -4785,6 +4771,18 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
    {
       if (row_info->color_type == PNG_COLOR_TYPE_PALETTE)
       {
+#ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
+         if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8))
+         {
+            if (png_ptr->riffled_palette == NULL)
+            {
+               /* Initialize the accelerated palette expansion. */
+               png_ptr->riffled_palette =
+                   (png_bytep)png_malloc(png_ptr, 256 * 4);
+               png_riffle_palette_neon(png_ptr);
+            }
+         }
+#endif
          png_do_expand_palette(png_ptr, row_info, png_ptr->row_buf + 1,
              png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
       }
