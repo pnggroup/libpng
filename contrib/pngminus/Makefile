@@ -11,9 +11,14 @@ PNGINC = -I../..
 PNGLIB_SHARED = -L../.. -lpng
 PNGLIB_STATIC = ../../libpng.a
 
-ZINC = -I../../../zlib
-ZLIB_SHARED = -L../../../zlib -lz
-ZLIB_STATIC = ../../../zlib/libz.a
+# Uncomment the following if you have a custom zlib build at ../../../zlib
+#ZINC = -I../../../zlib
+#ZLIB_SHARED = -L../../../zlib -lz
+#ZLIB_STATIC = ../../../zlib/libz.a
+
+# Use the system zlib otherwise
+ZLIB_SHARED = -lz
+ZLIB_STATIC = -lz
 
 CPPFLAGS = $(PNGINC) $(ZINC)
 CFLAGS =
