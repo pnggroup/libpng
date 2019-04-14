@@ -6103,6 +6103,8 @@ Version 1.6.37 [April 14, 2019]
   Added makefiles for AddressSanitizer-enabled builds.
   Cleaned up various makefiles.
 
+Version 1.6.38 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

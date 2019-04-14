@@ -1,7 +1,7 @@
 # CMakeLists.txt
 
-# Copyright (C) 2018 Cosmin Truta
-# Copyright (C) 2007,2009-2018 Glenn Randers-Pehrson
+# Copyright (c) 2018-2019 Cosmin Truta
+# Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
 # Revised by Clifford Yapp, 2011-2012,2017
@@ -26,7 +26,7 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 37)
+set(PNGLIB_RELEASE 38)
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
@@ -838,8 +838,8 @@ endif()
 # SET UP LINKS
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-#   VERSION 16.${PNGLIB_RELEASE}.1.6.37
-    VERSION 16.${PNGLIB_RELEASE}.0
+    VERSION 16.${PNGLIB_RELEASE}.git
+#   VERSION 16.${PNGLIB_RELEASE}.0
     SOVERSION 16
     CLEAN_DIRECT_OUTPUT 1)
 endif()

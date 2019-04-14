@@ -14,7 +14,7 @@
 #include "pngpriv.h"
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_37 Your_png_h_is_not_version_1_6_37;
+typedef png_libpng_version_1_6_38_git Your_png_h_is_not_version_1_6_38_git;
 
 #ifdef __GNUC__
 /* The version tests may need to be added to, but the problem warning has
@@ -815,7 +815,7 @@ png_get_copyright(png_const_structrp png_ptr)
    return PNG_STRING_COPYRIGHT
 #else
    return PNG_STRING_NEWLINE \
-      "libpng version 1.6.37" PNG_STRING_NEWLINE \
+      "libpng version 1.6.38.git" PNG_STRING_NEWLINE \
       "Copyright (c) 2018-2019 Cosmin Truta" PNG_STRING_NEWLINE \
       "Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson" \
       PNG_STRING_NEWLINE \
