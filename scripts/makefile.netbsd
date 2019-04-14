@@ -14,7 +14,7 @@ MANDIR= ${LOCALBASE}/man
 INCSDIR=${LOCALBASE}/include
 
 SHLIB_MAJOR=	16
-SHLIB_MINOR=	1.6.37.git
+SHLIB_MINOR=	1.6.37
 
 LIB=	png
 SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
