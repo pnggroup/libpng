@@ -736,8 +736,7 @@ pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
 TESTS = \
-   tests/pngtest\
-   tests/pngtest-badpngs\
+   tests/pngtest-all\
    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
    tests/pngvalid-gamma-expand16-background\
@@ -1578,16 +1577,9 @@ recheck: all $(check_PROGRAMS)
 	        am__force_recheck=am--force-recheck \
 	        TEST_LOGS="$$log_list"; \
 	exit $$?
-tests/pngtest.log: tests/pngtest
-	@p='tests/pngtest'; \
-	b='tests/pngtest'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngtest-badpngs.log: tests/pngtest-badpngs
-	@p='tests/pngtest-badpngs'; \
-	b='tests/pngtest-badpngs'; \
+tests/pngtest-all.log: tests/pngtest-all
+	@p='tests/pngtest-all'; \
+	b='tests/pngtest-all'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
