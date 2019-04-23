@@ -30,8 +30,6 @@ png_riffle_palette_neon(png_structrp png_ptr)
    int num_trans = png_ptr->num_trans;
    int i;
 
-   png_debug(1, "in png_riffle_palette_neon");
-
    /* Initially black, opaque. */
    uint8x16x4_t w = {{
       vdupq_n_u8(0x00),
@@ -39,6 +37,8 @@ png_riffle_palette_neon(png_structrp png_ptr)
       vdupq_n_u8(0x00),
       vdupq_n_u8(0xff),
    }};
+
+   png_debug(1, "in png_riffle_palette_neon");
 
    /* First, riffle the RGB colours into an RGBA8 palette.
     * The alpha component is set to opaque for now.
