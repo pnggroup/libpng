@@ -1,0 +1,23 @@
+language: c
+
+compiler:
+  - clang
+
+env:
+  - USE_CMAKE=1 DISABLE_TESTS=1
+  - USE_CMAKE=1 ENABLE_SANITIZERS="address,undefined" EXTRA_ARGS="-DPNG_HARDWARE_OPTIMIZATIONS=ON"
+  - USE_CMAKE=1 ENABLE_SANITIZERS="address,undefined" EXTRA_ARGS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF"
+  - USE_CONFIGURE=1 DISABLE_TESTS=1
+  - USE_CONFIGURE=1 EXTRA_ARGS="--enable-hardware-optimizations"
+  - USE_CONFIGURE=1 EXTRA_ARGS="--disable-hardware-optimizations"
+  - USE_LEGACY_MAKEFILES=1 DISABLE_TESTS=1
+  - USE_LEGACY_MAKEFILES=1 ENABLE_SANITIZERS="address,undefined"
+
+os:
+  - linux
+  - osx
+
+script:
+  - bash ./scripts/travis.sh
+
+sudo: false
