@@ -208,6 +208,16 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (setjmp (png_jmpbuf (png_ptr)))
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+    if(row_pointers != NULL)
+    {
+      free(row_pointers);
+      row_pointers = NULL;
+    }
+    if(png_pixels != NULL)
+    {
+      free(png_pixels);
+      png_pixels = NULL;
+    }
     return FALSE;
   }
 
