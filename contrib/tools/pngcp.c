@@ -506,7 +506,7 @@ static void
 display_clean_read(struct display *dp)
 {
    if (dp->read_pp != NULL)
-      png_destroy_read_struct(&dp->read_pp, NULL, NULL);
+      png_destroy_read_struct(&dp->read_pp, (dp->ip!=NULL ? &dp->ip : NULL), NULL);
 
    if (dp->fp != NULL)
    {
