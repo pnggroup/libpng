@@ -737,6 +737,7 @@ pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # set of parameters:
 TESTS = \
    tests/pngtest-all\
+   tests/pngtest-nonpng\
    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
    tests/pngvalid-gamma-expand16-background\
@@ -1584,6 +1585,13 @@ tests/pngtest-all.log: tests/pngtest-all
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/pngtest-nonpng.log: tests/pngtest-nonpng
+	@p='tests/pngtest-nonpng'; \
+	b='tests/pngtest-nonpng'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)	
 tests/pngvalid-gamma-16-to-8.log: tests/pngvalid-gamma-16-to-8
 	@p='tests/pngvalid-gamma-16-to-8'; \
 	b='tests/pngvalid-gamma-16-to-8'; \
