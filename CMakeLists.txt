@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (c) 2018-2019 Cosmin Truta
+# Copyright (c) 2018-2020 Cosmin Truta
 # Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
@@ -13,6 +13,7 @@
 # Revised by Cameron Cawley, 2018
 # Revised by Cosmin Truta, 2018
 # Revised by Kyle Bentley, 2018
+# Revised by David Callu, 2020
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -40,7 +41,7 @@ option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
 
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
-  include_directories(${ZLIB_INCLUDE_DIR})
+  include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
 if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU)
@@ -522,7 +523,7 @@ if(PNG_DEBUG)
 endif()
 
 # NOW BUILD OUR TARGET
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS})
 
 unset(PNG_LIB_TARGETS)
 
@@ -536,7 +537,7 @@ if(PNG_SHARED)
     set_target_properties(png PROPERTIES PREFIX "lib")
     set_target_properties(png PROPERTIES IMPORT_PREFIX "lib")
   endif()
-  target_link_libraries(png ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png ${ZLIB_LIBRARIES} ${M_LIBRARY})
 
   if(UNIX AND AWK)
     if(HAVE_LD_VERSION_SCRIPT)
@@ -571,7 +572,7 @@ if(PNG_STATIC)
     # msvc does not append 'lib' - do it here to have consistent name
     set_target_properties(png_static PROPERTIES PREFIX "lib")
   endif()
-  target_link_libraries(png_static ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK)
@@ -588,7 +589,7 @@ if(PNG_FRAMEWORK)
     XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
     PUBLIC_HEADER "${libpng_public_hdrs}"
     OUTPUT_NAME png)
-  target_link_libraries(png_framework ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png_framework ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(NOT PNG_LIB_TARGETS)
@@ -753,7 +754,7 @@ if(PNG_SHARED)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt ${ZLIB_LIBRARY} ${M_LIBRARY})
+  target_link_libraries(png-fix-itxt ${ZLIB_LIBRARIES} ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
