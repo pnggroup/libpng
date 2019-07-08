@@ -1200,7 +1200,7 @@ png_set_compression_window_bits(png_structrp png_ptr, int window_bits)
       return;
 
    /* Prior to 1.6.0 this would warn but then set the window_bits value. This
-    * meant that negative window bits values could be selected that would cause
+    * meant that negative window_bits values could be selected that would cause
     * libpng to write a non-standard PNG file with raw deflate or gzip
     * compressed IDAT or ancillary chunks.  Such files can be read and there is
     * no warning on read, so this seems like a very bad idea.

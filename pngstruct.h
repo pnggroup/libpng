@@ -188,7 +188,7 @@ struct png_struct_def
 
    int zlib_level;            /* holds zlib compression level */
    int zlib_method;           /* holds zlib compression method */
-   int zlib_window_bits;      /* holds zlib compression window bits */
+   int zlib_window_bits;      /* holds zlib compression window_bits */
    int zlib_mem_level;        /* holds zlib compression memory level */
    int zlib_strategy;         /* holds zlib compression strategy */
 #endif
@@ -196,7 +196,7 @@ struct png_struct_def
 #ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
    int zlib_text_level;            /* holds zlib compression level */
    int zlib_text_method;           /* holds zlib compression method */
-   int zlib_text_window_bits;      /* holds zlib compression window bits */
+   int zlib_text_window_bits;      /* holds zlib compression window_bits */
    int zlib_text_mem_level;        /* holds zlib compression memory level */
    int zlib_text_strategy;         /* holds zlib compression strategy */
 #endif
