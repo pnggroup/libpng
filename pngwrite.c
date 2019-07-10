@@ -1184,6 +1184,17 @@ png_set_compression_strategy(png_structrp png_ptr, int strategy)
    if (png_ptr == NULL)
       return;
 
+   if(strategy > 4)
+   {
+      png_warning(png_ptr, "Only compression strategy<=4 is supported by zlib");
+      strategy = 4;
+   }
+   else if(strategy < 0)
+   {
+      png_warning(png_ptr, "Only compression strategy>=0 is supported by zlib");
+      strategy = 0;
+   }
+
    /* The flag setting here prevents the libpng dynamic selection of strategy.
     */
    png_ptr->flags |= PNG_FLAG_ZLIB_CUSTOM_STRATEGY;
