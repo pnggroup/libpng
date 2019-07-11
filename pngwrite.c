@@ -1247,6 +1247,17 @@ png_set_text_compression_level(png_structrp png_ptr, int level)
 
    if (png_ptr == NULL)
       return;
+   
+   if(level > 9)
+   {
+      png_warning(png_ptr, "Only compression level <= 9 supported by PNG");
+      level = 9;
+   }
+   else if(level < -1)
+   {
+      png_warning(png_ptr, "Only compression level >= -1 supported by PNG");
+      level = -1;
+   }
 
    png_ptr->zlib_text_level = level;
 }
