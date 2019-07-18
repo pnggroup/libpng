@@ -67,7 +67,8 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # set definitions and sources for arm
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
+  CMAKE_SYSTEM_PROCESSOR MATCHES "^arm64")
   set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
   set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
      check: (default) use internal checking code;
@@ -122,7 +123,8 @@ endif()
 
 # set definitions and sources for intel
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^amd64*")
   set(PNG_INTEL_SSE_POSSIBLE_VALUES on off)
   set(PNG_INTEL_SSE "on" CACHE STRING "Enable INTEL_SSE optimizations:
      off: disable the optimizations")
@@ -172,7 +174,8 @@ else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # set definitions and sources for arm
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^arm64")
   add_definitions(-DPNG_ARM_NEON_OPT=0)
 endif()
 
@@ -184,7 +187,8 @@ endif()
 
 # set definitions and sources for intel
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^i?86" OR
-   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^x86_64*" OR
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^amd64*")
   add_definitions(-DPNG_INTEL_SSE_OPT=0)
 endif()
 
