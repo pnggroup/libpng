@@ -90,9 +90,9 @@
     * within the scope of a setjmp may be clobbered.  This hacks round the
     * problem (sometimes) without harming other compilers.
     */
-#  define gv volatile
+#  define GV volatile
 #else
-#  define gv
+#  define GV
 #endif
 
 /* 'CLOCK_PROCESS_CPUTIME_ID' is one of the clock timers for clock_gettime.  It
@@ -2275,7 +2275,7 @@ cp_one_file(struct display *dp, const char *filename, const char *destname)
 }
 
 static int
-cppng(struct display *dp, const char *file, const char *gv dest)
+cppng(struct display *dp, const char *file, const char * GV dest)
    /* Exists solely to isolate the setjmp clobbers which some versions of GCC
     * erroneously generate.
     */
