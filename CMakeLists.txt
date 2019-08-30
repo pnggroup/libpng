@@ -43,7 +43,7 @@ if(NOT PNG_BUILD_ZLIB)
   include_directories(${ZLIB_INCLUDE_DIR})
 endif()
 
-if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU)
+if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
   find_library(M_LIBRARY m)
 else()
   # libm is not needed and/or not available
