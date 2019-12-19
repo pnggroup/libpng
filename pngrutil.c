@@ -2079,7 +2079,7 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       if (i == 1 && buf[0] != 'M' && buf[0] != 'I'
                  && info_ptr->eXIf_buf[0] != buf[0])
       {
-         png_crc_finish(png_ptr, length);
+         png_crc_finish(png_ptr, length-i-1);
          png_chunk_benign_error(png_ptr, "incorrect byte-order specifier");
          png_free(png_ptr, info_ptr->eXIf_buf);
          info_ptr->eXIf_buf = NULL;
