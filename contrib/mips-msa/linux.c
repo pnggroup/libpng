@@ -47,8 +47,10 @@ png_have_msa(png_structp png_ptr)
 
          int val = strcmp(string, word);
 
-         if (val == 0)
+         if (val == 0) {
+            fclose(f);
             return 1;
+         }
 
          i = 0;
          memset(word, 0, 10);
