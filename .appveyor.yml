@@ -1,0 +1,71 @@
+version: 1.6.x-{build}
+
+branches:
+  except:
+    - /libpng[0-1][0-7]/
+
+image:
+  - Visual Studio 2019
+
+shallow_clone: true
+
+environment:
+  matrix:
+    - TOOLCHAIN: vstudio
+      AUTOMATION: cmake
+      CI_CMAKE_GENERATOR: Visual Studio 16 2019
+      CI_CMAKE_GENERATOR_PLATFORM: Win32
+    - TOOLCHAIN: vstudio
+      AUTOMATION: cmake
+      CI_CMAKE_GENERATOR: Visual Studio 16 2019
+      CI_CMAKE_GENERATOR_PLATFORM: X64
+    - TOOLCHAIN: vstudio
+      AUTOMATION: cmake
+      CI_CMAKE_GENERATOR: Visual Studio 16 2019
+      CI_CMAKE_GENERATOR_PLATFORM: ARM64
+      CI_NO_TEST: 1
+    - TOOLCHAIN: msys2
+      AUTOMATION: cmake
+      CI_CMAKE_GENERATOR: Unix Makefiles
+      CI_CC: i686-w64-mingw32-gcc
+    - TOOLCHAIN: msys2
+      AUTOMATION: cmake
+      CI_CMAKE_GENERATOR: Unix Makefiles
+      CI_CC: x86_64-w64-mingw32-gcc
+    - TOOLCHAIN: msys2
+      AUTOMATION: autotools
+      CI_CC: i686-w64-mingw32-gcc
+    - TOOLCHAIN: msys2
+      AUTOMATION: autotools
+      CI_CC: x86_64-w64-mingw32-gcc
+    - TOOLCHAIN: msys2
+      AUTOMATION: legacy
+      CI_LEGACY_MAKEFILES: scripts/makefile.gcc scripts/makefile.msys
+      CI_CC: i686-w64-mingw32-gcc
+    - TOOLCHAIN: msys2
+      AUTOMATION: legacy
+      CI_LEGACY_MAKEFILES: scripts/makefile.gcc scripts/makefile.msys
+      CI_CC: x86_64-w64-mingw32-gcc
+
+install:
+  - 'if "%TOOLCHAIN%"=="vstudio" if "%CI_CMAKE_GENERATOR_PLATFORM%"=="Win32" C:\tools\vcpkg\vcpkg.exe install zlib:x86-windows'
+  - 'if "%TOOLCHAIN%"=="vstudio" if "%CI_CMAKE_GENERATOR_PLATFORM%"=="X64" C:\tools\vcpkg\vcpkg.exe install zlib:x64-windows'
+  - 'if "%TOOLCHAIN%"=="vstudio" if "%CI_CMAKE_GENERATOR_PLATFORM%"=="ARM64" C:\tools\vcpkg\vcpkg.exe install zlib:arm64-windows'
+  - 'if "%TOOLCHAIN%"=="vstudio" C:\tools\vcpkg\vcpkg.exe integrate install'
+
+before_build:
+  - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_VARS=-DCMAKE_TOOLCHAIN_FILE=C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%CI_CC%"=="i686-w64-mingw32-gcc" set PATH=C:\msys64\mingw32\bin;%PATH%'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%CI_CC%"=="x86_64-w64-mingw32-gcc" set PATH=C:\msys64\mingw64\bin;%PATH%'
+  - 'set CI_CMAKE_BUILD_FLAGS=--parallel 2'
+  - 'set CI_CTEST_FLAGS=--parallel 2'
+  - 'set CI_MAKE_FLAGS=-j2'
+
+build_script:
+  - 'if "%TOOLCHAIN%"=="vstudio" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\scripts\ci_cmake.sh"'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="cmake" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\scripts\ci_cmake.sh"'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="autotools" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\scripts\ci_autotools.sh"'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="legacy" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\scripts\ci_legacy.sh"'
+
+cache:
+  - C:\tools\vcpkg\installed
