@@ -40,11 +40,9 @@ environment:
       CI_CC: x86_64-w64-mingw32-gcc
     - TOOLCHAIN: msys2
       AUTOMATION: legacy
-      CI_LEGACY_MAKEFILES: scripts/makefile.gcc scripts/makefile.msys
       CI_CC: i686-w64-mingw32-gcc
     - TOOLCHAIN: msys2
       AUTOMATION: legacy
-      CI_LEGACY_MAKEFILES: scripts/makefile.gcc scripts/makefile.msys
       CI_CC: x86_64-w64-mingw32-gcc
 
 install:
@@ -60,6 +58,7 @@ before_build:
   - 'set CI_CMAKE_BUILD_FLAGS=--parallel 2'
   - 'set CI_CTEST_FLAGS=--parallel 2'
   - 'set CI_MAKE_FLAGS=-j2'
+  - 'set CI_LEGACY_MAKEFILES=scripts/makefile.gcc scripts/makefile.msys scripts/makefile.std'
 
 build_script:
   - 'if "%TOOLCHAIN%"=="vstudio" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\scripts\ci_cmake.sh"'

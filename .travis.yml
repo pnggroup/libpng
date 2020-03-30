@@ -35,7 +35,7 @@ before_script:
   - 'export CI_CTEST_FLAGS="--parallel 2"'
   - 'export CI_MAKE_FLAGS=-j2'
   - 'export CI_CC=$TRAVIS_COMPILER'
-  - 'export CI_LEGACY_MAKEFILES="scripts/makefile.$TRAVIS_COMPILER"'
+  - 'export CI_LEGACY_MAKEFILES="scripts/makefile.$TRAVIS_COMPILER scripts/makefile.std"'
 
 script:
   - './scripts/ci_$AUTOMATION.sh'
