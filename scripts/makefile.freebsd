@@ -1,4 +1,5 @@
 # makefile for libpng under FreeBSD
+# Copyright (C) 2020 Cosmin Truta
 # Copyright (C) 2014 Glenn Randers-Pehrson and Andrey A. Chernov
 # Copyright (C) 2002, 2007, 2009 Glenn Randers-Pehrson and Andrey A. Chernov
 #
@@ -43,9 +44,9 @@ CFLAGS+=	-W -Wall
 # See scripts/pnglibconf.mak for more options
 PNGLIBCONF_H_PREBUILT= scripts/pnglibconf.h.prebuilt
 
-SRCS=	png.c pngset.c pngget.c pngrutil.c pngtrans.c pngwutil.c \
-	pngread.c pngrio.c pngwio.c pngwrite.c pngrtran.c \
-	pngwtran.c pngmem.c pngerror.c pngpread.c
+SRCS=	png.c pngerror.c pngget.c pngmem.c pngpread.c \
+	pngread.c pngrio.c pngrtran.c pngrutil.c pngset.c \
+	pngtrans.c pngwio.c pngwrite.c pngwtran.c pngwutil.c
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
@@ -61,9 +62,5 @@ test: pngtest
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	cp $(PNGLIBCONF_H_PREBUILT) $@
-
-DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO
-writelock:
-	chmod a-w *.[ch35] $(DOCS) scripts/*
 
 .include <bsd.lib.mk>

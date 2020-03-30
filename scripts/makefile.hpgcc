@@ -1,4 +1,5 @@
 # makefile for libpng on HP-UX using GCC with the HP ANSI/C linker.
+# Copyright (C) 2020 Cosmin Truta
 # Copyright (C) 2002, 2006-2008, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 2001, Laurent faillie
 # Copyright (C) 1998, 1999 Greg Roelofs
@@ -44,18 +45,12 @@ ZLIBINC=/opt/zlib/include
 #   LDSHARED=ld -b
 #   SHAREDLIB=libz.sl
 
-ALIGN=
-# for i386:
-#ALIGN=-malign-loops=2 -malign-functions=2
-
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
 
-# for pgcc version 2.95.1, -O3 is buggy; don't use it.
-
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS=-W -Wall -O3 -funroll-loops $(ALIGN) # $(WARNMORE) -g
+CFLAGS=-W -Wall -O3 -funroll-loops # $(WARNMORE) -g
 #LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng16 -lz -lm
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz -lm
 
@@ -79,9 +74,9 @@ DI=$(DESTDIR)$(INCPATH)
 DL=$(DESTDIR)$(LIBPATH)
 DM=$(DESTDIR)$(MANPATH)
 
-OBJS = png.o pngset.o pngget.o pngrutil.o pngtrans.o pngwutil.o \
-	pngread.o pngrio.o pngwio.o pngwrite.o pngrtran.o \
-	pngwtran.o pngmem.o pngerror.o pngpread.o
+OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
+       pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \
+       pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -209,26 +204,22 @@ clean:
 	libpng-config $(LIBSO) $(LIBSOMAJ)* \
 	libpng.pc pnglibconf.h
 
-DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO
-writelock:
-	chmod a-w *.[ch35] $(DOCS) scripts/*
-
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
-png.o png.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+png.o      png.pic.o:      png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngerror.o pngerror.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngrio.o pngrio.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngwio.o pngwio.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngmem.o pngmem.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngset.o pngset.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngget.o pngget.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngread.o pngread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngget.o   pngget.pic.o:   png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngmem.o   pngmem.pic.o:   png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngread.o  pngread.pic.o:  png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngrio.o   pngrio.pic.o:   png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngrtran.o pngrtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngrutil.o pngrutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngset.o   pngset.pic.o:   png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngtrans.o pngtrans.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
+pngwio.o   pngwio.pic.o:   png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngwrite.o pngwrite.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngwtran.o pngwtran.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngwutil.o pngwutil.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
-pngpread.o pngpread.pic.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 
 pngtest.o: png.h pngconf.h pnglibconf.h

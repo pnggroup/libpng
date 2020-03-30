@@ -112,10 +112,6 @@ clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png pnglibconf.h
 	$(RM_F) pnglibconf.c pnglibconf.dfn pnglibconf.out pnglibconf.pre
 
-DOCS = ANNOUNCE CHANGES INSTALL KNOWNBUG LICENSE README TODO
-writelock:
-	chmod a-w *.[ch35] $(DOCS) scripts/*
-
 # DO NOT DELETE THIS LINE -- make depend depends on it.
 
 png.o:      png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h

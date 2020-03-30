@@ -46,10 +46,10 @@ CPPFLAGS = -I$(ZLIBINC) # -DPNG_DEBUG=5
 CFLAGS = -W -Wall -O2 # $(WARNMORE) -g
 LDFLAGS = -L. -L$(ZLIBLIB) -lpng16 -lz -lm
 
-# Variables
-OBJS =  png.o pngerror.o pngget.o pngmem.o pngpread.o \
-	pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \
-	pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
+# File lists
+OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
+       pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \
+       pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 
 # Targets
 .c.o:

@@ -1,5 +1,5 @@
 # makefile for libpng using MSYS/gcc (shared, static library)
-# Copyright (C) 2019 Cosmin Truta
+# Copyright (C) 2019-2020 Cosmin Truta
 # Copyright (C) 2012 Glenn Randers-Pehrson and Christopher M. Wheeler
 #
 # Portions taken from makefile.linux and makefile.gcc:
@@ -43,11 +43,8 @@ RM_F = rm -rf
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
 
-#ARCH = -march=pentium3
-#ARCH = -march=i686
-ARCH =
 CPPFLAGS = # -DPNG_DEBUG=5
-CFLAGS = -W -Wall -O2 $(ARCH) # -g
+CFLAGS = -W -Wall -O2 # -g
 LDFLAGS =
 LIBS = -lz -lm
 
@@ -67,7 +64,6 @@ BINPATH=$(exec_prefix)/bin
 # If you're going to install into a temporary location
 # via DESTDIR, $(DESTDIR)$(prefix) must already exist before
 # you execute make install.
-
 DESTDIR=
 
 DB=$(DESTDIR)$(BINPATH)
@@ -79,10 +75,10 @@ DM=$(DESTDIR)$(MANPATH)
 # See scripts/pnglibconf.mak for more options
 PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
 
-# Variables
-OBJS =  png.o pngerror.o pngget.o pngmem.o pngpread.o \
-	pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \
-	pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
+# File lists
+OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
+       pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \
+       pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 
 # Targets
 all: static shared
@@ -146,7 +142,6 @@ install-shared: install-headers $(LIBSOMAJ) libpng.pc
 	(cd $(DL); \
 	$(LN_SF) $(LIBSOREL) $(LIBSO); \
 	$(LN_SF) $(LIBSO) $(OLDSO))
-
 	-@if [ ! -d $(DL)/pkgconfig ]; then $(MKDIR_P) $(DL)/pkgconfig; fi
 	-@$(RM_F) $(DL)/pkgconfig/$(LIBNAME).pc
 	-@$(RM_F) $(DL)/pkgconfig/libpng.pc
@@ -180,8 +175,10 @@ pngtest$(EXEEXT): pngtest.o libpng.a
 	$(LD) $(LDFLAGS) -o $@ pngtest.o libpng.a $(LIBS)
 
 clean:
-	$(RM_F) *.o libpng.a pngtest$(EXEEXT) pngout.png pnglibconf.h $(LIBSO) \
-	$(LIBSOMAJ) libpng-config
+	$(RM_F) $(OBJS) libpng.a
+	$(RM_F) pngtest*.o pngtest$(EXEEXT) pngout.png
+	$(RM_F) $(LIBSO) $(LIBSOMAJ)
+	$(RM_F) libpng.pc pnglibconf.h libpng-config
 
 png.o:      png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
 pngerror.o: png.h pngconf.h pnglibconf.h pngpriv.h pngstruct.h pnginfo.h pngdebug.h
