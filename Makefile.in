@@ -102,7 +102,7 @@ build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT) pngunknown$(EXEEXT) \
 	pngstest$(EXEEXT) pngvalid$(EXEEXT) pngimage$(EXEEXT) \
-	pngcp$(EXEEXT) $(am__EXEEXT_1)
+	pngcp$(EXEEXT) pngadhoc$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_CLOCK_GETTIME_TRUE@am__append_1 = timepng
 bin_PROGRAMS = pngfix$(EXEEXT) png-fix-itxt$(EXEEXT)
 @PNG_ARM_NEON_TRUE@am__append_2 = arm/arm_init.c\
@@ -240,6 +240,9 @@ pngunknown_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am_pngvalid_OBJECTS = contrib/libtests/pngvalid.$(OBJEXT)
 pngvalid_OBJECTS = $(am_pngvalid_OBJECTS)
 pngvalid_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am_pngadhoc_OBJECTS = contrib/libtests/pngadhoc.$(OBJEXT)
+pngadhoc_OBJECTS = $(am_pngadhoc_OBJECTS)
+pngadhoc_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am_timepng_OBJECTS = contrib/libtests/timepng.$(OBJEXT)
 timepng_OBJECTS = $(am_timepng_OBJECTS)
 timepng_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -274,6 +277,7 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	contrib/libtests/$(DEPDIR)/pngstest.Po \
 	contrib/libtests/$(DEPDIR)/pngunknown.Po \
 	contrib/libtests/$(DEPDIR)/pngvalid.Po \
+	contrib/libtests/$(DEPDIR)/pngadhoc.Po \
 	contrib/libtests/$(DEPDIR)/timepng.Po \
 	contrib/tools/$(DEPDIR)/png-fix-itxt.Po \
 	contrib/tools/$(DEPDIR)/pngcp.Po \
@@ -317,12 +321,14 @@ SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(png_fix_itxt_SOURCES) $(pngcp_SOURCES) $(pngfix_SOURCES) \
 	$(pngimage_SOURCES) $(pngstest_SOURCES) $(pngtest_SOURCES) \
-	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(timepng_SOURCES)
+	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(pngadhoc_SOURCES) \
+	$(timepng_SOURCES)
 DIST_SOURCES =  \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST) \
 	$(png_fix_itxt_SOURCES) $(pngcp_SOURCES) $(pngfix_SOURCES) \
 	$(pngimage_SOURCES) $(pngstest_SOURCES) $(pngtest_SOURCES) \
-	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(timepng_SOURCES)
+	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(pngadhoc_SOURCES) \
+	$(timepng_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -732,6 +738,8 @@ pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 pngcp_SOURCES = contrib/tools/pngcp.c
 pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+pngadhoc_SOURCES = contrib/libtests/pngadhoc.c
+pngadhoc_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
@@ -751,7 +759,7 @@ TESTS = \
    tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
    tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
    tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
-   tests/pngimage-quick tests/pngimage-full
+   tests/pngimage-quick tests/pngimage-full tests/pngadhoc
 
 
 # man pages
@@ -1068,6 +1076,12 @@ contrib/libtests/pngvalid.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
 pngvalid$(EXEEXT): $(pngvalid_OBJECTS) $(pngvalid_DEPENDENCIES) $(EXTRA_pngvalid_DEPENDENCIES) 
 	@rm -f pngvalid$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pngvalid_OBJECTS) $(pngvalid_LDADD) $(LIBS)
+contrib/libtests/pngadhoc.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
+	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
+
+pngadhoc$(EXEEXT): $(pngadhoc_OBJECTS) $(pngadhoc_DEPENDENCIES) $(EXTRA_pngadhoc_DEPENDENCIES) 
+	@rm -f pngadhoc$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(pngadhoc_OBJECTS) $(pngadhoc_LDADD) $(LIBS)
 contrib/libtests/timepng.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
 	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1150,6 +1164,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngstest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngunknown.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngvalid.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngadhoc.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/timepng.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/tools/$(DEPDIR)/png-fix-itxt.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/tools/$(DEPDIR)/pngcp.Po@am__quote@ # am--include-marker
@@ -1801,6 +1816,13 @@ tests/pngimage-full.log: tests/pngimage-full
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+tests/pngadhoc.log: tests/pngadhoc
+	@p='tests/pngadhoc'; \
+	b='tests/pngadhoc'; \
+	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+	--log-file $$b.log --trs-file $$b.trs \
+	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+	"$$tst" $(AM_TESTS_FD_REDIRECT)
 .test.log:
 	@p='$<'; \
 	$(am__set_b); \
@@ -2080,6 +2102,7 @@ distclean: distclean-am
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
+	-rm -f contrib/libtests/$(DEPDIR)/pngadhoc.Po
 	-rm -f contrib/libtests/$(DEPDIR)/timepng.Po
 	-rm -f contrib/tools/$(DEPDIR)/png-fix-itxt.Po
 	-rm -f contrib/tools/$(DEPDIR)/pngcp.Po
@@ -2165,6 +2188,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
+	-rm -f contrib/libtests/$(DEPDIR)/pngadhoc.Po
 	-rm -f contrib/libtests/$(DEPDIR)/timepng.Po
 	-rm -f contrib/tools/$(DEPDIR)/png-fix-itxt.Po
 	-rm -f contrib/tools/$(DEPDIR)/pngcp.Po
@@ -2292,6 +2316,7 @@ contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
 contrib/libtests/pngvalid.o: pnglibconf.h
+contrib/libtests/pngadhoc.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
 contrib/libtests/timepng.o: pnglibconf.h

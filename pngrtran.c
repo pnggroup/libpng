@@ -1202,6 +1202,10 @@ png_init_palette_transformations(png_structrp png_ptr)
 #endif /* READ_EXPAND && READ_BACKGROUND */
 }
 
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+static int png_do_rgb_to_gray_1(png_structrp png_ptr, png_color_16p color, png_byte bit_depth);
+#endif
+
 static void /* PRIVATE */
 png_init_rgb_transformations(png_structrp png_ptr)
 {
@@ -1238,10 +1242,10 @@ png_init_rgb_transformations(png_structrp png_ptr)
     * because PNG_BACKGROUND_EXPAND is cancelled below.
     */
    if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) != 0 &&
-       (png_ptr->transformations & PNG_EXPAND) != 0 &&
-       (png_ptr->color_type & PNG_COLOR_MASK_COLOR) == 0)
-       /* i.e., GRAY or GRAY_ALPHA */
+       (png_ptr->transformations & PNG_EXPAND) != 0)
    {
+      /* i.e., GRAY or GRAY_ALPHA */
+      if ((png_ptr->color_type & PNG_COLOR_MASK_COLOR) == 0)
       {
          /* Expand background and tRNS chunks */
          int gray = png_ptr->background.gray;
@@ -1275,13 +1279,42 @@ png_init_rgb_transformations(png_structrp png_ptr)
          }
 
          png_ptr->background.red = png_ptr->background.green =
-            png_ptr->background.blue = (png_uint_16)gray;
+            png_ptr->background.blue = png_ptr->background.gray =
+            (png_uint_16)gray;
 
          if ((png_ptr->transformations & PNG_EXPAND_tRNS) == 0)
          {
             png_ptr->trans_color.red = png_ptr->trans_color.green =
-               png_ptr->trans_color.blue = (png_uint_16)trans_gray;
+               png_ptr->trans_color.blue = png_ptr->trans_color.gray =
+               (png_uint_16)trans_gray;
          }
+      }
+      else
+      {
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+         if ((png_ptr->transformations & PNG_RGB_TO_GRAY) != 0)
+         {
+            /* Populate the backgrounds' gray fields using the same
+             * algorithm as RGB->gray conversion, to enable correct
+             * tRNS/bKGD handling with png_set_rgb_to_gray. */
+
+            png_byte bit_depth = png_ptr->bit_depth == 16 ? 16 : 8;
+            int rgb_error =
+               png_do_rgb_to_gray_1(png_ptr, &png_ptr->background, bit_depth);
+
+            if (rgb_error != 0)
+            {
+               png_ptr->rgb_to_gray_status=1;
+               if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
+                   PNG_RGB_TO_GRAY_WARN)
+                  png_warning(png_ptr, "nongray background color");
+
+               if ((png_ptr->transformations & PNG_RGB_TO_GRAY) ==
+                   PNG_RGB_TO_GRAY_ERR)
+                  png_error(png_ptr, "nongray background color");
+            }
+         }
+#endif
       }
    } /* background expand and (therefore) no alpha association. */
 #endif /* READ_EXPAND && READ_BACKGROUND */
@@ -3188,6 +3221,55 @@ png_do_rgb_to_gray(png_structrp png_ptr, png_row_infop row_info, png_bytep row)
    }
    return rgb_error;
 }
+
+/* Convert a single color to grayscale. */
+static int
+png_do_rgb_to_gray_1(png_structrp png_ptr, png_color_16p color, png_byte bit_depth)
+{
+   /* Reuse the logic in png_do_rgb_to_gray and construct a fake "row"
+    * containing just the value we need to convert. */
+   png_byte row[3 /* channels */ * 2 /* max bytes per channel */];
+   png_row_info row_info;
+   row_info.width = 1;
+   row_info.color_type = PNG_COLOR_TYPE_RGB;
+   row_info.bit_depth = bit_depth;
+
+   png_bytep dp = row;
+   if (png_ptr->bit_depth == 16)
+   {
+      *(dp++) = (png_byte)((color->red >> 8) & 0xff);
+      *(dp++) = (png_byte)(color->red & 0xff);
+      *(dp++) = (png_byte)((color->green >> 8) & 0xff);
+      *(dp++) = (png_byte)(color->green & 0xff);
+      *(dp++) = (png_byte)((color->blue >> 8) & 0xff);
+      *(dp++) = (png_byte)(color->blue & 0xff);
+   }
+   else
+   {
+      *(dp++) = (png_byte)color->red;
+      *(dp++) = (png_byte)color->green;
+      *(dp++) = (png_byte)color->blue;
+   }
+
+   int rgb_error =
+      png_do_rgb_to_gray(png_ptr, &row_info, row);
+
+   png_bytep sp = row;
+   if (png_ptr->bit_depth == 16)
+   {
+      png_byte hi, lo;
+      hi=*(sp)++;
+      lo=*(sp)++;
+      color->gray = (png_uint_16)((hi << 8) | (lo));
+   }
+   else
+   {
+      color->gray = *sp;
+   }
+
+   return rgb_error;
+}
+
 #endif
 
 #if defined(PNG_READ_BACKGROUND_SUPPORTED) ||\

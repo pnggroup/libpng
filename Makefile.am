@@ -12,7 +12,7 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp
+check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp pngadhoc
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
@@ -56,6 +56,9 @@ png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 pngcp_SOURCES = contrib/tools/pngcp.c
 pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
+pngadhoc_SOURCES = contrib/libtests/pngadhoc.c
+pngadhoc_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
 TESTS =\
@@ -74,7 +77,7 @@ TESTS =\
    tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
    tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
    tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
-   tests/pngimage-quick tests/pngimage-full
+   tests/pngimage-quick tests/pngimage-full tests/pngadhoc
 
 # man pages
 dist_man_MANS= libpng.3 libpngpf.3 png.5
@@ -243,6 +246,7 @@ contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
 contrib/libtests/pngvalid.o: pnglibconf.h
+contrib/libtests/pngadhoc.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
 contrib/libtests/timepng.o: pnglibconf.h
