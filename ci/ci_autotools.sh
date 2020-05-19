@@ -7,13 +7,13 @@ set -e
 # Copyright (c) 2019-2020 Cosmin Truta.
 #
 # This software is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer and license
-# in png.h.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h.
 
-CI_SCRIPTNAME="$(basename "$0")"
-CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
-CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR/out/autotools.build"
+readonly CI_SCRIPTNAME="$(basename "$0")"
+readonly CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
+readonly CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
+readonly CI_BUILDDIR="$CI_SRCDIR/out/autotools.build"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
@@ -52,11 +52,11 @@ function ci_init_autotools {
 }
 
 function ci_build_autotools {
-    # Initialize the configure environment.
-    [[ $CI_CC ]] && export CC="$CI_CC"
-    [[ $CI_CC_FLAGS ]] && export CFLAGS="$CI_CC_FLAGS"
-    [[ $CI_SANITIZERS ]] && export CFLAGS="-fsanitize=$CI_SANITIZERS -O2 $CFLAGS"
-    # Build.
+    # Export the configure build environment.
+    [[ $CI_CC ]] && ci_spawn export CC="$CI_CC"
+    [[ $CI_CC_FLAGS ]] && ci_spawn export CFLAGS="$CI_CC_FLAGS"
+    [[ $CI_SANITIZERS ]] && ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS -O2 $CFLAGS"
+    # Build!
     ci_spawn rm -fr "$CI_BUILDDIR"
     ci_spawn mkdir -p "$CI_BUILDDIR"
     ci_spawn cd "$CI_BUILDDIR"

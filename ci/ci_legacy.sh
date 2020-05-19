@@ -7,13 +7,13 @@ set -e
 # Copyright (c) 2019-2020 Cosmin Truta.
 #
 # This software is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer and license
-# in png.h.
+# For conditions of distribution and use, see the disclaimer
+# and license in png.h.
 
-CI_SCRIPTNAME="$(basename "$0")"
-CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
-CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR"
+readonly CI_SCRIPTNAME="$(basename "$0")"
+readonly CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
+readonly CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
+readonly CI_BUILDDIR="$CI_SRCDIR"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
@@ -79,12 +79,12 @@ function ci_build_legacy {
     [[ $ALL_LD_FLAGS ]] && ALL_MAKE_ARGS+=("LDFLAGS=$ALL_LD_FLAGS")
     ALL_MAKE_ARGS+=("LIBS=$CI_LIBS")
     ALL_MAKE_ARGS+=($CI_MAKE_VARS)
-    # Build.
+    # Build!
     ci_spawn cd "$CI_SRCDIR"
-    [[ $CI_LEGACY_MAKEFILES ]] || ci_err "bad or missing: \$CI_LEGACY_MAKEFILES"
     local MY_MAKEFILE
     for MY_MAKEFILE in $CI_LEGACY_MAKEFILES
     do
+        ci_info "using makefile: $MY_MAKEFILE"
         ci_spawn "$CI_MAKE" "${ALL_MAKE_ARGS[@]}" -f $MY_MAKEFILE
         [[ $CI_NO_TEST ]] || ci_spawn "$CI_MAKE" "${ALL_MAKE_ARGS[@]}" -f $MY_MAKEFILE test
         [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" "${ALL_MAKE_ARGS[@]}" -f $MY_MAKEFILE clean

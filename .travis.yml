@@ -38,6 +38,4 @@ before_script:
   - 'export CI_LEGACY_MAKEFILES="scripts/makefile.$TRAVIS_COMPILER scripts/makefile.std"'
 
 script:
-  - './scripts/ci_$AUTOMATION.sh'
-
-sudo: false
+  - './ci/ci_$AUTOMATION.sh'
