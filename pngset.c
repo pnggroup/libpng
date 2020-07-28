@@ -1460,7 +1460,11 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
    {
       new_list = png_voidcast(png_bytep, png_malloc(png_ptr,
           5 * (num_chunks + old_num_chunks)));
-
+      if (new_list == NULL)
+      {
+          png_warning(png_ptr, "Insufficient memory");
+          return;
+      }
       if (old_num_chunks > 0)
          memcpy(new_list, png_ptr->chunk_list, 5*old_num_chunks);
    }
