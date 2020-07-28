@@ -1296,15 +1296,16 @@ buffer_write(struct display *dp, struct buffer *buffer, png_bytep data,
          buffer->last = last; /* avoid the need to rewrite every time */
          end_count = 0;
       }
+      if(last != NULL){
+         avail = (sizeof last->buffer) - end_count;
+         if (avail > size)
+            avail = size;
 
-      avail = (sizeof last->buffer) - end_count;
-      if (avail > size)
-         avail = size;
-
-      memcpy(last->buffer + end_count, data, avail);
-      end_count += avail;
-      size -= avail;
-      data += avail;
+         memcpy(last->buffer + end_count, data, avail);
+         end_count += avail;
+         size -= avail;
+         data += avail;
+      }
    }
 
    buffer->end_count = end_count;
