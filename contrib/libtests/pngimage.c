@@ -1000,8 +1000,9 @@ compare_read(struct display *dp, int applied_transforms)
    int interlace_method, compression_method, filter_method;
    const char *e = NULL;
 
-   png_get_IHDR(dp->read_pp, dp->read_ip, &width, &height, &bit_depth,
-      &color_type, &interlace_method, &compression_method, &filter_method);
+   if (!png_get_IHDR(dp->read_pp, dp->read_ip, &width, &height, &bit_depth,
+      &color_type, &interlace_method, &compression_method, &filter_method))
+      display_log(dp, LIBPNG_BUG, "png_get_IHDR failed");
 
 #  define C(item) if (item != dp->item) \
       display_log(dp, APP_WARNING, "IHDR " #item "(%lu) changed to %lu",\
