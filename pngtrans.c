@@ -708,7 +708,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
        * forms produced on either GCC or MSVC.
        */
       int padding = PNG_PADBITS(row_info->pixel_depth, row_info->width);
-      png_bytep rp = png_ptr->row_buf + row_info->rowbytes - 1;
+      png_bytep rp = png_ptr->row_buf + row_info->rowbytes;
 
       switch (row_info->bit_depth)
       {
