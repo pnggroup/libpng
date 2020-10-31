@@ -1,0 +1,4 @@
+WimpSlot -min 4096K
+Dir <Obey$Dir>.^
+amu -f scripts.makefile/acorn
+Back
