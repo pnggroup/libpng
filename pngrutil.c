@@ -302,7 +302,6 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
    if (buffer != NULL && new_size > png_ptr->read_buffer_size)
    {
       png_ptr->read_buffer = NULL;
-      png_ptr->read_buffer = NULL;
       png_ptr->read_buffer_size = 0;
       png_free(png_ptr, buffer);
       buffer = NULL;
