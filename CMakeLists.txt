@@ -412,18 +412,10 @@ else()
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.def")
 
-  add_custom_target(symbol-check
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk")
-
   generate_copy("${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
                 "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym")
   generate_copy("${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
                 "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers")
-
-  add_custom_target(genvers
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers")
-  add_custom_target(gensym
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym")
 
   add_custom_target("genprebuilt"
                     COMMAND "${CMAKE_COMMAND}"
