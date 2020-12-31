@@ -15,6 +15,8 @@ readonly CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 readonly CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
 readonly CI_BUILDDIR="$CI_SRCDIR/out/cmake.build"
 readonly CI_INSTALLDIR="$CI_SRCDIR/out/cmake.install"
+readonly CI_SRCDIR_REL_BUILDDIR="../.."
+readonly CI_INSTALLDIR_REL_BUILDDIR="../../out/cmake.install"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
@@ -74,7 +76,6 @@ function ci_build_cmake {
     [[ $CI_AR ]] && ALL_CMAKE_VARS+=(-DCMAKE_AR="$CI_AR")
     [[ $CI_RANLIB ]] && ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$CI_RANLIB")
     ALL_CMAKE_VARS+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
-    ALL_CMAKE_VARS+=(-DCMAKE_INSTALL_PREFIX="$CI_INSTALLDIR")
     ALL_CMAKE_VARS+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
     [[ $CI_NO_TEST ]] && ALL_CMAKE_VARS+=(-DPNG_TESTS=OFF)
     ALL_CMAKE_VARS+=($CI_CMAKE_VARS)
@@ -85,12 +86,20 @@ function ci_build_cmake {
         ci_spawn export CMAKE_GENERATOR="$CI_CMAKE_GENERATOR"
     [[ $CI_CMAKE_GENERATOR_PLATFORM ]] &&
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
+    # Fix the build environment, if necessary.
+    [[ $CI_CMAKE_GENERATOR == "Visual Studio "* ]] && {
+        # Clean up incidental mixtures of Windows and Bash-on-Windows
+        # environment variables, to avoid confusing MSBuild.
+        [[ $TEMP && ( $Temp || $temp ) ]] && unset TEMP
+        [[ $TMP && ( $Tmp || $tmp ) ]] && unset TMP
+    }
     # Build and install.
-    ci_spawn "$CI_CMAKE" -E remove_directory "$CI_BUILDDIR"
-    ci_spawn "$CI_CMAKE" -E remove_directory "$CI_INSTALLDIR"
-    ci_spawn "$CI_CMAKE" -E make_directory "$CI_BUILDDIR"
+    ci_spawn rm -fr "$CI_BUILDDIR" "$CI_INSTALLDIR"
+    ci_spawn mkdir -p "$CI_BUILDDIR"
     ci_spawn cd "$CI_BUILDDIR"
-    ci_spawn "$CI_CMAKE" "${ALL_CMAKE_VARS[@]}" "$CI_SRCDIR"
+    ci_spawn "$CI_CMAKE" "${ALL_CMAKE_VARS[@]}" \
+                         -DCMAKE_INSTALL_PREFIX="$CI_INSTALLDIR_REL_BUILDDIR" \
+                         "$CI_SRCDIR_REL_BUILDDIR"
     ci_spawn "$CI_CMAKE" --build . \
                          --config "$CI_CMAKE_BUILD_TYPE" \
                          "${ALL_CMAKE_BUILD_FLAGS[@]}"
