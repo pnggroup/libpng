@@ -1,0 +1,74 @@
+# Prerequisites
+*.d
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Linker output files
+*.exp
+*.ilk
+*.map
+
+# Compiled dynamic libraries
+*.dll
+*.dylib
+*.so
+*.so.*
+
+# Compiled static libraries
+*.a
+*.la
+*.lai
+*.lib
+
+# Compiled executables
+*.app/
+*.exe
+
+# Debug files
+*.dSYM/
+*.idb
+*.pdb
+*.su
+
+# Libpng configuration and build artifacts
+.deps/
+.dirstamp
+Makefile
+config.h
+config.log
+config.status
+libpng-config
+libpng.pc
+libpng.vers
+libpng16-config
+libpng16.pc
+libtool
+pnglibconf.[ch]
+pnglibconf.dfn
+pnglibconf.out
+pnglibconf.pre
+pngprefix.h
+stamp-h1
+vers.out
+
+# Libpng test artifacts
+png-fix-itxt
+pngcp
+pngfix
+pngimage
+pngstest
+pngtest
+pngunknown
+pngvalid
+timepng
+
+# Libpng CI artifacts
+out/
