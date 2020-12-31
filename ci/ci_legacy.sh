@@ -51,6 +51,8 @@ function ci_init_legacy {
     ci_info "environment option: \$CI_CC_FLAGS='$CI_CC_FLAGS'"
     ci_info "environment option: \$CI_CPP='$CI_CPP'"
     ci_info "environment option: \$CI_CPP_FLAGS='$CI_CPP_FLAGS'"
+    ci_info "environment option: \$CI_AR='$CI_AR'"
+    ci_info "environment option: \$CI_RANLIB='$CI_RANLIB'"
     ci_info "environment option: \$CI_LD='$CI_LD'"
     ci_info "environment option: \$CI_LD_FLAGS='$CI_LD_FLAGS'"
     ci_info "environment option: \$CI_LIBS='$CI_LIBS'"
@@ -67,27 +69,41 @@ function ci_build_legacy {
         ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS -O2 $ALL_CC_FLAGS"
         ALL_LD_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_LD_FLAGS"
     }
-    # Initialize ALL_MAKE_ARGS as an array;
-    # expand CI_MAKE_FLAGS at the beginning and CI_MAKE_VARS at the end.
-    local -a ALL_MAKE_ARGS=()
-    ALL_MAKE_ARGS+=($CI_MAKE_FLAGS)
-    [[ $CI_CC ]] && ALL_MAKE_ARGS+=("CC=$CI_CC")
-    [[ $ALL_CC_FLAGS ]] && ALL_MAKE_ARGS+=("CFLAGS=$ALL_CC_FLAGS")
-    [[ $CI_CPP ]] && ALL_MAKE_ARGS+=("CPP=$CI_CPP")
-    [[ $CI_CPP_FLAGS ]] && ALL_MAKE_ARGS+=("CPPFLAGS=$CI_CPP_FLAGS")
-    [[ $CI_LD ]] && ALL_MAKE_ARGS+=("LD=$CI_LD")
-    [[ $ALL_LD_FLAGS ]] && ALL_MAKE_ARGS+=("LDFLAGS=$ALL_LD_FLAGS")
-    ALL_MAKE_ARGS+=("LIBS=$CI_LIBS")
-    ALL_MAKE_ARGS+=($CI_MAKE_VARS)
+    # Initialize ALL_MAKE_FLAGS and ALL_MAKE_VARS as arrays.
+    local -a ALL_MAKE_FLAGS=($CI_MAKE_FLAGS)
+    local -a ALL_MAKE_VARS=()
+    [[ $CI_CC ]] && ALL_MAKE_VARS+=(CC="$CI_CC")
+    [[ $ALL_CC_FLAGS ]] && ALL_MAKE_VARS+=(CFLAGS="$ALL_CC_FLAGS")
+    [[ $CI_CPP ]] && ALL_MAKE_VARS+=(CPP="$CI_CPP")
+    [[ $CI_CPP_FLAGS ]] && ALL_MAKE_VARS+=(CPPFLAGS="$CI_CPP_FLAGS")
+    [[ $CI_AR ]] && ALL_MAKE_VARS+=(
+        AR="${CI_AR:-ar}"
+        AR_RC="${CI_AR:-ar} rc"
+    )
+    [[ $CI_RANLIB ]] && ALL_MAKE_VARS+=(RANLIB="$CI_RANLIB")
+    [[ $CI_LD ]] && ALL_MAKE_VARS+=(LD="$CI_LD")
+    [[ $ALL_LD_FLAGS ]] && ALL_MAKE_VARS+=(LDFLAGS="$ALL_LD_FLAGS")
+    ALL_MAKE_VARS+=(LIBS="$CI_LIBS")
+    ALL_MAKE_VARS+=($CI_MAKE_VARS)
     # Build!
     ci_spawn cd "$CI_SRCDIR"
     local MY_MAKEFILE
     for MY_MAKEFILE in $CI_LEGACY_MAKEFILES
     do
         ci_info "using makefile: $MY_MAKEFILE"
-        ci_spawn "$CI_MAKE" "${ALL_MAKE_ARGS[@]}" -f $MY_MAKEFILE
-        [[ $CI_NO_TEST ]] || ci_spawn "$CI_MAKE" "${ALL_MAKE_ARGS[@]}" -f $MY_MAKEFILE test
-        [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" "${ALL_MAKE_ARGS[@]}" -f $MY_MAKEFILE clean
+        ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
+                            "${ALL_MAKE_FLAGS[@]}" \
+                            "${ALL_MAKE_VARS[@]}"
+        [[ $CI_NO_TEST ]] ||
+            ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
+                                "${ALL_MAKE_FLAGS[@]}" \
+                                "${ALL_MAKE_VARS[@]}" \
+                                test
+        [[ $CI_NO_CLEAN ]] ||
+            ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
+                                "${ALL_MAKE_FLAGS[@]}" \
+                                "${ALL_MAKE_VARS[@]}" \
+                                clean
     done
     ci_info "success!"
 }

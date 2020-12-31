@@ -45,6 +45,12 @@ function ci_init_autotools {
     ci_info "environment option: \$CI_MAKE_FLAGS='$CI_MAKE_FLAGS'"
     ci_info "environment option: \$CI_CC='$CI_CC'"
     ci_info "environment option: \$CI_CC_FLAGS='$CI_CC_FLAGS'"
+    ci_info "environment option: \$CI_CPP='$CI_CPP'"
+    ci_info "environment option: \$CI_CPP_FLAGS='$CI_CPP_FLAGS'"
+    ci_info "environment option: \$CI_AR='$CI_AR'"
+    ci_info "environment option: \$CI_RANLIB='$CI_RANLIB'"
+    ci_info "environment option: \$CI_LD='$CI_LD'"
+    ci_info "environment option: \$CI_LD_FLAGS='$CI_LD_FLAGS'"
     ci_info "environment option: \$CI_SANITIZERS='$CI_SANITIZERS'"
     ci_info "environment option: \$CI_NO_TEST='$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_INSTALL='$CI_NO_INSTALL'"
@@ -58,7 +64,16 @@ function ci_build_autotools {
     # Export the configure build environment.
     [[ $CI_CC ]] && ci_spawn export CC="$CI_CC"
     [[ $CI_CC_FLAGS ]] && ci_spawn export CFLAGS="$CI_CC_FLAGS"
-    [[ $CI_SANITIZERS ]] && ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS -O2 $CFLAGS"
+    [[ $CI_CPP ]] && ci_spawn export CPP="$CI_CPP"
+    [[ $CI_CPP_FLAGS ]] && ci_spawn export CPPFLAGS="$CI_CPP_FLAGS"
+    [[ $CI_AR ]] && ci_spawn export AR="$CI_AR"
+    [[ $CI_RANLIB ]] && ci_spawn export RANLIB="$CI_RANLIB"
+    [[ $CI_LD ]] && ci_spawn export CPP="$CI_LD"
+    [[ $CI_LD_FLAGS ]] && ci_spawn export LDFLAGS="$CI_LD_FLAGS"
+    [[ $CI_SANITIZERS ]] && {
+        ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS -O2 $CFLAGS"
+        ci_spawn export LDFLAGS="-fsanitize=$CI_SANITIZERS $LDFLAGS"
+    }
     # Build and install.
     ci_spawn rm -fr "$CI_BUILDDIR" "$CI_INSTALLDIR"
     ci_spawn mkdir -p "$CI_BUILDDIR"

@@ -52,6 +52,8 @@ function ci_init_cmake {
     ci_info "environment option: \$CI_CTEST_FLAGS='$CI_CTEST_FLAGS'"
     ci_info "environment option: \$CI_CC='$CI_CC'"
     ci_info "environment option: \$CI_CC_FLAGS='$CI_CC_FLAGS'"
+    ci_info "environment option: \$CI_AR='$CI_AR'"
+    ci_info "environment option: \$CI_RANLIB='$CI_RANLIB'"
     ci_info "environment option: \$CI_SANITIZERS='$CI_SANITIZERS'"
     ci_info "environment option: \$CI_NO_TEST='$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_INSTALL='$CI_NO_INSTALL'"
@@ -69,6 +71,8 @@ function ci_build_cmake {
     local -a ALL_CMAKE_VARS=()
     [[ $CI_CC ]] && ALL_CMAKE_VARS+=(-DCMAKE_C_COMPILER="$CI_CC")
     [[ $ALL_CC_FLAGS ]] && ALL_CMAKE_VARS+=(-DCMAKE_C_FLAGS="$ALL_CC_FLAGS")
+    [[ $CI_AR ]] && ALL_CMAKE_VARS+=(-DCMAKE_AR="$CI_AR")
+    [[ $CI_RANLIB ]] && ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$CI_RANLIB")
     ALL_CMAKE_VARS+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
     ALL_CMAKE_VARS+=(-DCMAKE_INSTALL_PREFIX="$CI_INSTALLDIR")
     ALL_CMAKE_VARS+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
