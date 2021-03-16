@@ -4,12 +4,13 @@ set -e
 # ci_autotools.sh
 # Continuously integrate libpng using the GNU Autotools.
 #
-# Copyright (c) 2019-2020 Cosmin Truta.
+# Copyright (c) 2019-2021 Cosmin Truta.
 #
 # This software is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h.
 
+readonly CI_SYSNAME="$(uname -s)"
 readonly CI_SCRIPTNAME="$(basename "$0")"
 readonly CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 readonly CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
@@ -35,8 +36,10 @@ function ci_spawn {
 function ci_init_autotools {
     # Initialize the CI_ variables with default values, where applicable.
     CI_MAKE="${CI_MAKE:-make}"
-    [[ $(uname -s || echo unknown) == Darwin ]] && CI_CC="${CI_CC:-clang}"
+    [[ $CI_SYSNAME == Darwin || $CI_SYSNAME == *BSD || $CI_SYSNAME == DragonFly ]] &&
+        CI_CC="${CI_CC:-clang}"
     # Print the CI_ variables.
+    ci_info "system name: $CI_SYSNAME"
     ci_info "source directory: $CI_SRCDIR"
     ci_info "build directory: $CI_BUILDDIR"
     ci_info "install directory: $CI_INSTALLDIR"
