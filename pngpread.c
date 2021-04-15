@@ -15,6 +15,8 @@
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 
+
+
 /* Push model modes */
 #define PNG_READ_SIG_MODE   0
 #define PNG_READ_CHUNK_MODE 1
