@@ -1005,10 +1005,11 @@ file_end(struct file *file)
 
    if (file->out != NULL)
    {
-      /* NOTE: this is bitwise |, all the following functions must execute and
-       * must succeed.
-       */
-      if (ferror(file->out) | fflush(file->out) | fclose(file->out))
+      int ef = 0;
+      ef += ferror(file->out);
+      ef += fflush(file->out);
+      ef += fclose(file->out);
+      if (ef != 0)
       {
          perror(file->out_name);
          emit_error(file, READ_ERROR_CODE, "output write error");
