@@ -10,7 +10,7 @@
 # Revised by Sam Serrels, 2017
 # Revised by Vadim Barkov, 2017
 # Revised by Vicky Pfau, 2018
-# Revised by Cameron Cawley, 2018
+# Revised by Cameron Cawley, 2018,2021
 # Revised by Kyle Bentley, 2018
 # Revised by David Callu, 2020
 # Revised by Steve Robinson, 2020
@@ -49,6 +49,9 @@ endif()
 
 if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
   find_library(M_LIBRARY m)
+  if(NOT M_LIBRARY)
+    set(M_LIBRARY "")
+  endif()
 else()
   # libm is not needed and/or not available.
   set(M_LIBRARY "")
