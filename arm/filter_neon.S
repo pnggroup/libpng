@@ -20,7 +20,7 @@
 .section .note.GNU-stack,"",%progbits /* mark stack as non-executable */
 #endif
 
-#ifdef __clang__
+#if defined(__clang__) && defined(__APPLE__)
 .section __LLVM,__asm
 #endif
 
