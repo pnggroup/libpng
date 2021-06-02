@@ -20,10 +20,6 @@
 .section .note.GNU-stack,"",%progbits /* mark stack as non-executable */
 #endif
 
-#ifdef __clang__
-.section __LLVM,__asm
-#endif
-
 #ifdef PNG_READ_SUPPORTED
 
 /* Assembler NEON support - only works for 32-bit ARM (i.e. it does not work for
