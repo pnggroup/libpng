@@ -134,8 +134,9 @@ Your directory structure should look like this:
              libpng-config.in, aclocal.m4, config.h.in, config.sub,
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh
           contrib
-             arm-neon, conftest, examples, gregbook, libtests, pngminim,
-             pngminus, pngsuite, tools, visupng
+             arm-neon, conftest, examples, gregbook, libtests, mips-msa,
+             oss-fuzz, pngminim, pngminus, pngsuite, powerpc-vsx, README.txt,
+             testpngs, tools, visupng
           projects
              cbuilder5, owatcom, visualc71, vstudio, xcode
           scripts
