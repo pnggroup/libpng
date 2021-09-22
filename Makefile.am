@@ -113,6 +113,11 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += powerpc/powerpc_init.c\
         powerpc/filter_vsx_intrinsics.c
 endif
 
+if PNG_RISCV_VECTOR
+libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += riscv/riscv_init.c\
+	riscv/filter_vector_intrinsics.c
+endif
+
 nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES = pnglibconf.h
 
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS = -no-undefined -export-dynamic \

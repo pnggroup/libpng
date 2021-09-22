@@ -635,6 +635,8 @@ ac_includes_default="\
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+PNG_RISCV_VECTOR_FALSE
+PNG_RISCV_VECTOR_TRUE
 PNG_POWERPC_VSX_FALSE
 PNG_POWERPC_VSX_TRUE
 PNG_INTEL_SSE_FALSE
@@ -818,6 +820,8 @@ enable_arm_neon
 enable_mips_msa
 enable_intel_sse
 enable_powerpc_vsx
+enable_riscv_vector
+enable_riscv_vector_compat
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1520,6 +1524,24 @@ Optional Features:
                           default, enable by a call to png_set_option yes/on:
                           turn on unconditionally. If not specified:
                           determined by the compiler.
+  --enable-riscv-vector Enable RISC-V Vector optimizations: =no/off, check,
+                          api, yes/on: no/off: disable the optimizations;
+                          check: use internal checking code (experimental);
+                          api: disable by default, enable by a call to
+                          png_set_option; yes/on: turn on unconditionally.
+                          Note: The compiler must support riscv-vector (e.g.
+                          -march=rv64gv). If not specified: determined by the
+                          compiler.
+  --enable-riscv-vector-compat
+                          Enable compatibility for RISC-V Vector drafts 0.7.1,
+                          0.8, 0.9, or 0.10 (only used if RISC-V Vector
+                          optimizations are enabled): =no/off, 0.7.1, 0.8,
+                          0.9, 0.10: no/off: Support RISC-V Vector release
+                          1.0; 0.7.1: Support RISC-V Vector draft 0.7.1; 0.8:
+                          Support RISC-V Vector draft 0.8; 0.9: Support RISC-V
+                          Vector draft 0.9; 0.10: Support RISC-V Vector draft
+                          0.10. If not specified: off (Support RISC-V Vector
+                          release 1.0).
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -13517,6 +13539,10 @@ $as_echo "#define PNG_POWERPC_VSX_OPT 0" >>confdefs.h
 
 $as_echo "#define PNG_INTEL_SSE_OPT 0" >>confdefs.h
 
+	 enable_riscv_vector=no
+
+$as_echo "#define PNG_RISCV_VECTOR_OPT 0" >>confdefs.h
+
          ;;
       *)
          # allow enabling hardware optimization on any system:
@@ -13543,6 +13569,12 @@ $as_echo "#define PNG_INTEL_SSE_OPT 1" >>confdefs.h
               enable_powerpc_vsx=yes
 
 $as_echo "#define PNG_POWERPC_VSX_OPT 2" >>confdefs.h
+
+              ;;
+	    riscv*)
+              enable_riscv_vector=yes
+
+$as_echo "#define PNG_RISCV_VECTOR_OPT 2" >>confdefs.h
 
               ;;
          esac
@@ -13762,6 +13794,90 @@ else
 fi
 
 
+# RISC-V
+# ===
+#
+# RISC-V Vector support.
+
+# Check whether --enable-riscv-vector was given.
+if test "${enable_riscv_vector+set}" = set; then :
+  enableval=$enable_riscv_vector; case "$enableval" in
+      no|off)
+         # disable the default enabling on __RISCV_VECTOR__ systems:
+
+$as_echo "#define PNG_RISCV_VECTOR_OPT 0" >>confdefs.h
+
+         # Prevent inclusion of the assembler files below:
+         enable_riscv_vector=no;;
+      check)
+
+$as_echo "#define PNG_RISCV_VECTOR_CHECK_SUPPORTED /**/" >>confdefs.h
+;;
+      api)
+
+$as_echo "#define PNG_RISCV_VECTOR_API_SUPPORTED /**/" >>confdefs.h
+;;
+      yes|on)
+
+$as_echo "#define PNG_RISCV_VECTOR_OPT 2" >>confdefs.h
+
+         { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv_vector: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass '-march=rv...v' (e.g. '-march=rv64gv')
+            to the compiler." >&5
+$as_echo "$as_me: WARNING: --enable-riscv_vector: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass '-march=rv...v' (e.g. '-march=rv64gv')
+            to the compiler." >&2;};;
+      *)
+         as_fn_error $? "--enable-riscv-vector=${enable_riscv_vector}: invalid value" "$LINENO" 5
+   esac
+fi
+
+
+# compatibility to RVV draft 0.7.1, 0.8, 0.9, 0.10 and release 1.0
+# Check whether --enable-riscv-vector-compat was given.
+if test "${enable_riscv_vector_compat+set}" = set; then :
+  enableval=$enable_riscv_vector_compat; case "$enableval" in
+      no|off);;
+      yes|on)
+         as_fn_error $? "--enable-riscv-vector-compat: a specific draft version must be given" "$LINENO" 5;;
+      "0.7.1")
+
+$as_echo "#define PNG_RISCV_VECTOR_COMPAT 7" >>confdefs.h
+;;
+      "0.8")
+
+$as_echo "#define PNG_RISCV_VECTOR_COMPAT 8" >>confdefs.h
+;;
+      "0.9")
+
+$as_echo "#define PNG_RISCV_VECTOR_COMPAT 9" >>confdefs.h
+;;
+      "0.10")
+
+$as_echo "#define PNG_RISCV_VECTOR_COMPAT 10" >>confdefs.h
+;;
+      *)
+         as_fn_error $? "--enable-riscv-vector-compat=${enable_riscv_vector_compat}: invalid value" "$LINENO" 5
+   esac
+fi
+
+
+# Add RISC-V specific files to all builds where the host_cpu is riscv ('riscv*') or
+# where RISC-V optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'riscv*')
+
+ if test "$enable_riscv_vector" != 'no' &&
+    case "$host_cpu" in
+      riscv*) :;;
+      *)    test "$enable_riscv_vector" != '';;
+    esac; then
+  PNG_RISCV_VECTOR_TRUE=
+  PNG_RISCV_VECTOR_FALSE='#'
+else
+  PNG_RISCV_VECTOR_TRUE='#'
+  PNG_RISCV_VECTOR_FALSE=
+fi
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: Extra options for compiler: $PNG_COPTS" >&5
 $as_echo "$as_me: Extra options for compiler: $PNG_COPTS" >&6;}
@@ -13955,6 +14071,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PNG_POWERPC_VSX_TRUE}" && test -z "${PNG_POWERPC_VSX_FALSE}"; then
   as_fn_error $? "conditional \"PNG_POWERPC_VSX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${PNG_RISCV_VECTOR_TRUE}" && test -z "${PNG_RISCV_VECTOR_FALSE}"; then
+  as_fn_error $? "conditional \"PNG_RISCV_VECTOR\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

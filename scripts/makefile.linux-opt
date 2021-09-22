@@ -49,6 +49,7 @@ CPPFLAGS += -DPNG_ARM_NEON
 CPPFLAGS += -DPNG_MIPS_MSA
 CPPFLAGS += -DPNG_INTEL_SSE
 CPPFLAGS += -DPNG_POWERPC_VSX
+CPPFLAGS += -DPNG_RISCV_VECTOR
 
 CFLAGS=-W -Wall -O3 -funroll-loops # $(WARNMORE) -g
 CFLAGS += -ansi -pedantic
@@ -87,7 +88,8 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
        arm/arm_init.o arm/filter_neon_intrinsics.o \
        intel/intel_init.o intel/filter_sse2_intrinsics.o \
        mips/mips_init.o mips/filter_msa_intrinsics.o \
-       powerpc/powerpc_init.o powerpc/filter_vsx_intrinsics.o
+       powerpc/powerpc_init.o powerpc/filter_vsx_intrinsics.o \
+       riscv/riscv_init.o
 
 OBJSDLL = $(OBJS:.o=.pic.o)
 
@@ -254,5 +256,6 @@ mips/mips_init.o                mips/mips_init.pic.o:                pngpriv.h
 mips/filter_msa_intrinsics.o    mips/filter_msa_intrinsics.pic.o:    pngpriv.h
 powerpc/powerpc_init.o          powerpc/powerpc_init.pic.o:          pngpriv.h
 powerpc/filter_vsx_intrinsics.o powerpc/filter_vsx_intrinsics.pic.o: pngpriv.h
+riscv/riscv_init.o              riscv/riscv_init.o:                  pngpriv.h
 
 pngtest.o: png.h pngconf.h pnglibconf.h

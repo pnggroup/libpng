@@ -320,6 +320,9 @@ AC_ARG_ENABLE([hardware-optimizations],
          enable_intel_sse=no
          AC_DEFINE([PNG_INTEL_SSE_OPT], [0],
            [Disable INTEL_SSE optimizations])
+	 enable_riscv_vector=no
+         AC_DEFINE([PNG_RISCV_VECTOR_OPT], [0],
+           [Disable RISCV_VECTOR optimizations])
          ;;
       *)
          # allow enabling hardware optimization on any system:
@@ -343,6 +346,11 @@ AC_ARG_ENABLE([hardware-optimizations],
               enable_powerpc_vsx=yes
               AC_DEFINE([PNG_POWERPC_VSX_OPT], [2],
                 [Enable POWERPC VSX optimizations])
+              ;;
+	    riscv*)
+              enable_riscv_vector=yes
+              AC_DEFINE([PNG_RISCV_VECTOR_OPT], [2],
+                [Enable RISCV VECTOR optimizations])
               ;;
          esac
          ;;
@@ -521,6 +529,82 @@ AM_CONDITIONAL([PNG_POWERPC_VSX],
       powerpc*|ppc64*) :;;
     esac])
 
+# RISC-V
+# ===
+#
+# RISC-V Vector support.
+
+AC_ARG_ENABLE([riscv-vector],
+   AS_HELP_STRING([[[--enable-riscv-vector]]],
+      [Enable RISC-V Vector optimizations: =no/off, check, api, yes/on:]
+      [no/off: disable the optimizations; check: use internal checking code]
+      [(experimental); api: disable by default, enable by]
+      [a call to png_set_option; yes/on: turn on unconditionally.]
+      [Note: The compiler must support riscv-vector (e.g. -march=rv64gv).]
+      [If not specified: determined by the compiler.]),
+   [case "$enableval" in
+      no|off)
+         # disable the default enabling on __RISCV_VECTOR__ systems:
+         AC_DEFINE([PNG_RISCV_VECTOR_OPT], [0],
+                   [Disable RISC-V Vector optimizations])
+         # Prevent inclusion of the assembler files below:
+         enable_riscv_vector=no;;
+      check)
+         AC_DEFINE([PNG_RISCV_VECTOR_CHECK_SUPPORTED], [],
+                   [Check for RISC-V Vector support at run-time]);;
+      api)
+         AC_DEFINE([PNG_RISCV_VECTOR_API_SUPPORTED], [],
+                   [Turn on RISC-V Vector optimizations at run-time]);;
+      yes|on)
+         AC_DEFINE([PNG_RISCV_VECTOR_OPT], [2],
+                   [Enable RISC-V Vector optimizations])
+         AC_MSG_WARN([--enable-riscv_vector: please specify 'check' or 'api', if]
+            [you want the optimizations unconditionally pass '-march=rv...v' (e.g. '-march=rv64gv')]
+            [to the compiler.]);;
+      *)
+         AC_MSG_ERROR([--enable-riscv-vector=${enable_riscv_vector}: invalid value])
+   esac])
+
+# compatibility to RVV draft 0.7.1, 0.8, 0.9, 0.10 and release 1.0
+AC_ARG_ENABLE([riscv-vector-compat],
+   AS_HELP_STRING([[[--enable-riscv-vector-compat]]],
+      [Enable compatibility for RISC-V Vector drafts 0.7.1, 0.8, 0.9, or 0.10 (only used if RISC-V Vector optimizations are enabled): =no/off, 0.7.1, 0.8, 0.9, 0.10:]
+      [no/off: Support RISC-V Vector release 1.0;]
+      [0.7.1: Support RISC-V Vector draft 0.7.1;]
+      [0.8: Support RISC-V Vector draft 0.8;]
+      [0.9: Support RISC-V Vector draft 0.9;]
+      [0.10: Support RISC-V Vector draft 0.10.]
+      [If not specified: off (Support RISC-V Vector release 1.0).]),
+   [case "$enableval" in
+      no|off);;
+      yes|on)
+         AC_MSG_ERROR([--enable-riscv-vector-compat: a specific draft version must be given]);;
+      "0.7.1")
+         AC_DEFINE([PNG_RISCV_VECTOR_COMPAT], [7],
+                   [Support RISC-V Vector draft 0.7.1]);;
+      "0.8")
+         AC_DEFINE([PNG_RISCV_VECTOR_COMPAT], [8],
+                   [Support RISC-V Vector draft 0.8]);;
+      "0.9")
+         AC_DEFINE([PNG_RISCV_VECTOR_COMPAT], [9],
+                   [Support RISC-V Vector draft 0.9]);;
+      "0.10")
+         AC_DEFINE([PNG_RISCV_VECTOR_COMPAT], [10],
+                   [Support RISC-V Vector draft 0.10]);;
+      *)
+         AC_MSG_ERROR([--enable-riscv-vector-compat=${enable_riscv_vector_compat}: invalid value])
+   esac])
+
+# Add RISC-V specific files to all builds where the host_cpu is riscv ('riscv*') or
+# where RISC-V optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'riscv*')
+
+AM_CONDITIONAL([PNG_RISCV_VECTOR],
+   [test "$enable_riscv_vector" != 'no' &&
+    case "$host_cpu" in
+      riscv*) :;;
+      *)    test "$enable_riscv_vector" != '';;
+    esac])
 
 AC_MSG_NOTICE([[Extra options for compiler: $PNG_COPTS]])
 

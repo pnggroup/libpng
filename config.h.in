@@ -96,6 +96,19 @@
 /* Enable POWERPC VSX optimizations */
 #undef PNG_POWERPC_VSX_OPT
 
+/* Turn on RISC-V Vector optimizations at run-time */
+#undef PNG_RISCV_VECTOR_API_SUPPORTED
+
+/* Check for RISC-V Vector support at run-time */
+#undef PNG_RISCV_VECTOR_CHECK_SUPPORTED
+
+/* Enable RISC-V Vector optimizations */
+#undef PNG_RISCV_VECTOR_OPT
+
+/* Enable RISC-V Vector compatibility for drafts 0.7.1, 0.8, 0.9, 0.10
+ * and release 1.0 */
+#undef PNG_RISCV_VECTOR_COMPAT
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 

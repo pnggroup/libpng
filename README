@@ -146,9 +146,11 @@ Files in this distribution:
       pngwutil.c    =>  Write utility functions
       arm           =>  Contains optimized code for the ARM platform
       powerpc       =>  Contains optimized code for the PowerPC platform
+      riscv         =>  Contains optimized code for the RISC-V platform
       contrib       =>  Contributions
        arm-neon         =>  Optimized code for ARM-NEON platform
        powerpc-vsx      =>  Optimized code for POWERPC-VSX platform
+       riscv-vector     =>  Optimized code for RISC-V Vector platform
        examples         =>  Example programs
        gregbook         =>  source code for PNG reading and writing, from
                             Greg Roelofs' "PNG: The Definitive Guide",

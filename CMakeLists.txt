@@ -163,6 +163,30 @@ if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
   endif()
 endif()
 
+# Set definitions and sources for RISC-V.
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^riscv*")
+  set(PNG_RISCV_VECTOR_POSSIBLE_VALUES check on off)
+  set(PNG_RISCV_VECTOR "check"
+      CACHE STRING "Enable RISC-V Vector optimizations: check|on|off; check is default")
+  set_property(CACHE PNG_RISCV_VECTOR
+               PROPERTY STRINGS ${PNG_RISCV_VECTOR_POSSIBLE_VALUES})
+  list(FIND PNG_RISCV_VECTOR_POSSIBLE_VALUES ${PNG_RISCV_VECTOR} index)
+  if(index EQUAL -1)
+    message(FATAL_ERROR "PNG_RISCV_VECTOR must be one of [${PNG_RISCV_VECTOR_POSSIBLE_VALUES}]")
+  elseif(NOT ${PNG_RISCV_VECTOR} STREQUAL "off")
+    set(libpng_riscv_sources
+        riscv/riscv_init.c
+        riscv/filter_vector_intrinsics.c)
+    if(${PNG_RISCV_VECTOR} STREQUAL "on")
+      add_definitions(-DPNG_RISCV_VECTOR_OPT=2)
+    elseif(${PNG_RISCV_VECTOR} STREQUAL "check")
+      add_definitions(-DPNG_RISCV_VECTOR_CHECK_SUPPORTED)
+    endif()
+  else()
+    add_definitions(-DPNG_RISCV_VECTOR_OPT=0)
+  endif()
+endif()
+
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
@@ -187,6 +211,11 @@ endif()
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "mipsel*" OR
    CMAKE_SYSTEM_PROCESSOR MATCHES "mips64el*")
   add_definitions(-DPNG_MIPS_MSA_OPT=0)
+endif()
+
+# Set definitions and sources for RISC-V.
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^riscv")
+  add_definitions(-DPNG_RISCV_VECTOR_OPT=0)
 endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
@@ -488,6 +517,7 @@ set(libpng_sources
     ${libpng_intel_sources}
     ${libpng_mips_sources}
     ${libpng_powerpc_sources}
+    ${libpng_riscv_sources}
 )
 set(pngtest_sources
     pngtest.c
