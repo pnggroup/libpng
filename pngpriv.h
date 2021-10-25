@@ -174,7 +174,7 @@
 #     else /* !defined __ARM_NEON__ */
          /* The 'intrinsics' code simply won't compile without this -mfpu=neon:
           */
-#        if !defined(__aarch64__)
+#        if !defined(__aarch64__) && !defined(_M_ARM64)
             /* The assembler code currently does not work on ARM64 */
 #          define PNG_ARM_NEON_IMPLEMENTATION 2
 #        endif /* __aarch64__ */
