@@ -168,8 +168,11 @@ scripts directory into this directory, for example
 
 MSDOS example:
 
-    copy scripts\makefile.msc makefile
+    copy scripts\makefile.vcwin32 makefile
     copy scripts\pnglibconf.h.prebuilt pnglibconf.h
+
+Win-Arm64 example:
+    nmake /f scripts\makefile.vcwin-arm64
 
 UNIX example:
 
