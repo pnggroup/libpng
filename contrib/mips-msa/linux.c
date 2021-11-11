@@ -24,44 +24,33 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <elf.h>
 
 static int
 png_have_msa(png_structp png_ptr)
 {
-   FILE *f = fopen("/proc/cpuinfo", "rb");
+    Elf64_auxv_t aux;
+    int fd;
+    int has_msa = 0;
 
-   char *string = "msa";
-   char word[10];
+    fd = open("/proc/self/auxv", O_RDONLY);
+    if (fd >= 0) {
+       while (read(fd, &aux, sizeof(Elf64_auxv_t)) == sizeof(Elf64_auxv_t)) {
+          if (aux.a_type == AT_HWCAP) {
+             uint64_t hwcap = aux.a_un.a_val;
 
-   if (f != NULL)
-   {
-      while(!feof(f))
-      {
-         int ch = fgetc(f);
-         static int i = 0;
-
-         while(!(ch <= 32))
-         {
-            word[i++] = ch;
-            ch = fgetc(f);
-         }
-
-         int val = strcmp(string, word);
-
-         if (val == 0) {
-            fclose(f);
-            return 1;
-         }
-
-         i = 0;
-         memset(word, 0, 10);
-      }
-
-      fclose(f);
-   }
+             has_msa = (hwcap >> 1) & 1;
+             break;
+          }
+       }
+       close (fd);
+    }
 #ifdef PNG_WARNINGS_SUPPORTED
-   else
-      png_warning(png_ptr, "/proc/cpuinfo open failed");
+    else
+      png_warning(png_ptr, "open /proc/cpuinfo failed");
 #endif
-   return 0;
+
+    return has_msa;
 }
