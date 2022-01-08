@@ -7643,7 +7643,7 @@ image_transform_png_set_rgb_to_gray_ini(const image_transform *this,
 
    else
    {
-      /* The default (built in) coeffcients, as above: */
+      /* The default (built in) coefficients, as above: */
 #     if PNG_LIBPNG_VER < 10700
          data.red_coefficient = 6968 / 32768.;
          data.green_coefficient = 23434 / 32768.;
@@ -11768,7 +11768,7 @@ int main(int argc, char **argv)
 
    /* The following allows results to pass if they correspond to anything in the
     * transformed range [input-.5,input+.5]; this is is required because of the
-    * way libpng treates the 16_TO_8 flag when building the gamma tables in
+    * way libpng treats the 16_TO_8 flag when building the gamma tables in
     * releases up to 1.6.0.
     *
     * TODO: review this

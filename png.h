@@ -1446,7 +1446,7 @@ PNG_EXPORT(66, void, png_set_crc_action, (png_structrp png_ptr, int crit_action,
  * mainly useful for testing, as the defaults should work with most users.
  * Those users who are tight on memory or want faster performance at the
  * expense of compression can modify them.  See the compression library
- * header file (zlib.h) for an explination of the compression functions.
+ * header file (zlib.h) for an explanation of the compression functions.
  */
 
 /* Set the filtering method(s) used by libpng.  Currently, the only valid
@@ -1501,7 +1501,7 @@ PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
  * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
  * (0 - no compression, 9 - "maximal" compression).  Note that tests have
  * shown that zlib compression levels 3-6 usually perform as well as level 9
- * for PNG images, and do considerably fewer caclulations.  In the future,
+ * for PNG images, and do considerably fewer calculations.  In the future,
  * these values may not correspond directly to the zlib compression levels.
  */
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED

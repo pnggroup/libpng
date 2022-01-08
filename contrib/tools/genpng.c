@@ -453,7 +453,7 @@ check_square(const struct arg *arg, double x, double y)
  * { inside_circle_filled, check_circle_filled },
  * { inside_circle, check_circle }
  *
- * The functions here are analoguous to the square ones; however, they check
+ * The functions here are analogous to the square ones; however, they check
  * the corresponding ellipse as opposed to the rectangle.
  */
 static int

@@ -527,7 +527,7 @@ int main(int argc, char **argv)
       }
    }
 
-   else if (nfiles == 0) /* Read from stdin withoout --dissemble */
+   else if (nfiles == 0) /* Read from stdin without --dissemble */
    {
       char filename[FILENAME_MAX+1];
 
