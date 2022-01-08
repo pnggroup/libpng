@@ -125,7 +125,7 @@ $1 ~ /^PNG_DFN_END_SORT/{
          # There is no matching "@.  Assume a split line
          else while (1) {
             if (getline nextline) {
-               # If the line starts with '#' it is a preprocesor line directive
+               # If the line starts with '#' it is a preprocessor line directive
                # from cc -E; skip it:
                if (nextline !~ /^#/) {
                   line = line " " nextline

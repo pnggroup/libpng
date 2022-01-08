@@ -336,7 +336,7 @@ static const option options[] =
 #  define VLC(name) VLCIDAT(name) VLCiCCP(name) VLCzTXt(name)
 
 #  ifdef PNG_SW_COMPRESS_png_level
-      /* The libpng compression level isn't searched because it justs sets the
+      /* The libpng compression level isn't searched because it just sets the
        * other things that are searched!
        */
       VLO("compression", compression, 0)

@@ -1598,7 +1598,7 @@ chunk_init(struct chunk * const chunk, struct file * const file)
    chunk->chunk_length = file->length;
    chunk->chunk_type = file->type;
 
-   /* Compresssed/uncompressed size information (from the zlib control structure
+   /* Compressed/uncompressed size information (from the zlib control structure
     * that is used to check the compressed data in a chunk.)
     */
    chunk->uncompressed_digits = 0;
@@ -2929,7 +2929,7 @@ process_chunk(struct file *file, png_uint_32 file_crc, png_uint_32 next_length,
    }
 
    /* Control reaches this point if the chunk must be skipped.  For chunks other
-    * than IDAT this means that the zlib compressed data is fatally damanged and
+    * than IDAT this means that the zlib compressed data is fatally damaged and
     * the chunk will not be passed to libpng.  For IDAT it means that the end of
     * the IDAT stream has not yet been reached and we must handle the next
     * (IDAT) chunk.  If the LZ data in an IDAT stream cannot be read 'stop' must

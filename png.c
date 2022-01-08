@@ -720,7 +720,7 @@ png_init_io(png_structrp png_ptr, png_FILE_p fp)
  *
  * Where UNSIGNED_MAX is the appropriate maximum unsigned value, so when the
  * negative integral value is added the result will be an unsigned value
- * correspnding to the 2's complement representation.
+ * corresponding to the 2's complement representation.
  */
 void PNGAPI
 png_save_int_32(png_bytep buf, png_int_32 i)
