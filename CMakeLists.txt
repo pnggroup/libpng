@@ -18,6 +18,7 @@
 # Revised by Alex Gaynor, 2020
 # Revised by Owen Rudge, 2020
 # Revised by Gleb Mazovetskiy, 2021
+# Revised by Christopher Sean Morrison, 2022
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -293,6 +294,20 @@ if(NOT AWK OR ANDROID OR IOS)
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
   add_custom_target(genfiles) # Dummy
 else()
+  # Copy the awk scripts, converting their line endings to Unix (LF)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk
+                 @ONLY
+                 NEWLINE_STYLE LF)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk
+                 @ONLY
+                 NEWLINE_STYLE LF)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/dfn.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/dfn.awk
+                 @ONLY
+                 NEWLINE_STYLE LF)
+
   # Generate .chk from .out with awk:
   # generate_chk(INPUT inputfile OUTPUT outputfile [DEPENDS dep1 [dep2...]])
   include(CMakeParseArguments)
@@ -377,14 +392,14 @@ else()
   # Generate scripts/pnglibconf.h
   generate_source(OUTPUT "scripts/pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk"
+                          "${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk"
                           "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
   add_custom_target(scripts_pnglibconf_c DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c")
 
   # Generate pnglibconf.c
   generate_source(OUTPUT "pnglibconf.c"
                   DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk"
+                          "${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk"
                           "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
   add_custom_target(pnglibconf_c DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c")
 
@@ -446,7 +461,7 @@ else()
   generate_chk(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
                OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
                DEPENDS scripts_symbols_out
-                       "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk"
+                       "${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.def")
 
   add_custom_target(scripts_symbols_chk
