@@ -2139,7 +2139,7 @@ png_handle_hIST(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       readbuf[i] = png_get_uint_16(buf);
    }
 
-   if (png_crc_finish(png_ptr, 0) != 0)
+   if (png_crc_finish(png_ptr, (png_uint_32) (length - num * 2)) != 0)
       return;
 
    png_set_hIST(png_ptr, info_ptr, readbuf);
