@@ -73,6 +73,9 @@ option(PNG_EXECUTABLES "Build libpng executables" ON)
 option(PNG_TESTS "Build libpng tests" ON)
 option(PNG_DEBUG "Enable debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
+option(PNG_FIX "Build png fix" ON)
+option(PNG_FIX_ITXT "Build png fix itxt" ON)
+
 
 # Allow the users to specify a location of zlib.
 # Useful if zlib is being built alongside this as a sub-project.
@@ -880,13 +883,16 @@ if(PNG_TESTS AND PNG_SHARED)
 endif()
 
 if(PNG_SHARED AND PNG_EXECUTABLES)
-  add_executable(pngfix ${pngfix_sources})
-  target_link_libraries(pngfix png_shared)
-  set(PNG_BIN_TARGETS pngfix)
-
-  add_executable(png-fix-itxt ${png_fix_itxt_sources})
+  if(PNG_FIX)
+    add_executable(pngfix ${pngfix_sources})
+    target_link_libraries(pngfix png_shared)
+    set(PNG_BIN_TARGETS pngfix)
+  endif()
+  if(PNG_FIX_ITXT)
+    add_executable(png-fix-itxt ${png_fix_itxt_sources})
   target_link_libraries(png-fix-itxt ${ZLIB_LIBRARIES} ${M_LIBRARY})
-  list(APPEND PNG_BIN_TARGETS png-fix-itxt)
+    list(APPEND PNG_BIN_TARGETS png-fix-itxt)
+  endif()
 endif()
 
 # Create a symlink from src to dest (if possible), or, alternatively,
