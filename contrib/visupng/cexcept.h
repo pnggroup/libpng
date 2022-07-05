@@ -191,11 +191,15 @@ is subject to change.
 #define CEXCEPT_H
 
 
-#include <setjmp.h>
+#ifdef PNG_SETJMP_SUPPORTED
+#  include <setjmp.h>
+#endif
 
 #define define_exception_type(etype) \
 struct exception_context { \
+#ifdef PNG_SETJMP_SUPPORTED  
   jmp_buf *penv; \
+#endif  
   int caught; \
   volatile struct { etype etmp; } v; \
 }
@@ -210,11 +214,13 @@ struct exception_context { \
 
 #define Try \
   { \
+#ifdef PNG_SETJMP_SUPPORTED
     jmp_buf *exception__prev, exception__env; \
     exception__prev = the_exception_context->penv; \
     the_exception_context->penv = &exception__env; \
     if (setjmp(exception__env) == 0) { \
       do
+#endif
 
 #define exception__catch(action) \
       while (the_exception_context->caught = 0, \

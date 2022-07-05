@@ -19,7 +19,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <setjmp.h>
+#ifdef PNG_SETJMP_SUPPORTED
+#  include <setjmp.h>
+#endif
 
 /* Define the following to use this test against your installed libpng, rather
  * than the one being built here:
@@ -395,7 +397,9 @@ ancillaryb(const png_byte *name)
 /* Type of an error_ptr */
 typedef struct
 {
+#ifdef PNG_SETJMP_SUPPORTED
    jmp_buf     error_return;
+#endif
    png_structp png_ptr;
    png_infop   info_ptr, end_ptr;
    png_uint_32 before_IDAT;
@@ -449,8 +453,9 @@ PNG_FUNCTION(void, display_exit, (display *d), static PNG_NORETURN)
     */
    if (d->test == init || d->test == cmd)
       exit(1);
-
+#ifdef PNG_SETJMP_SUPPORTED
    longjmp(d->error_return, 1);
+#endif
 }
 
 static int
@@ -1082,6 +1087,7 @@ static void
 perform_one_test_safe(FILE *fp, int argc, const char **argv,
    png_uint_32 *default_flags, display *d, const char *test)
 {
+#ifdef PNG_SETJMP_SUPPORTED
    if (setjmp(d->error_return) == 0)
    {
       d->test = test; /* allow use of d->error_return */
@@ -1093,6 +1099,7 @@ perform_one_test_safe(FILE *fp, int argc, const char **argv,
 #     endif
       d->test = init; /* prevent use of d->error_return */
    }
+#endif
 }
 
 static const char *standard_tests[] =

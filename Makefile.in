@@ -101,7 +101,7 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 check_PROGRAMS = pngtest$(EXEEXT) pngunknown$(EXEEXT) \
-	pngstest$(EXEEXT) pngvalid$(EXEEXT) pngimage$(EXEEXT) \
+	pngstest$(EXEEXT) pngimage$(EXEEXT) \
 	pngcp$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_CLOCK_GETTIME_TRUE@am__append_1 = timepng
 bin_PROGRAMS = pngfix$(EXEEXT) png-fix-itxt$(EXEEXT)
@@ -237,9 +237,9 @@ pngtest_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am_pngunknown_OBJECTS = contrib/libtests/pngunknown.$(OBJEXT)
 pngunknown_OBJECTS = $(am_pngunknown_OBJECTS)
 pngunknown_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngvalid_OBJECTS = contrib/libtests/pngvalid.$(OBJEXT)
-pngvalid_OBJECTS = $(am_pngvalid_OBJECTS)
-pngvalid_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+# am_pngvalid_OBJECTS = contrib/libtests/pngvalid.$(OBJEXT)
+# pngvalid_OBJECTS = $(am_pngvalid_OBJECTS)
+# pngvalid_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 am_timepng_OBJECTS = contrib/libtests/timepng.$(OBJEXT)
 timepng_OBJECTS = $(am_timepng_OBJECTS)
 timepng_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -273,7 +273,7 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	contrib/libtests/$(DEPDIR)/pngimage.Po \
 	contrib/libtests/$(DEPDIR)/pngstest.Po \
 	contrib/libtests/$(DEPDIR)/pngunknown.Po \
-	contrib/libtests/$(DEPDIR)/pngvalid.Po \
+	# contrib/libtests/$(DEPDIR)/pngvalid.Po \
 	contrib/libtests/$(DEPDIR)/timepng.Po \
 	contrib/tools/$(DEPDIR)/png-fix-itxt.Po \
 	contrib/tools/$(DEPDIR)/pngcp.Po \
@@ -317,12 +317,12 @@ SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(nodist_libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(png_fix_itxt_SOURCES) $(pngcp_SOURCES) $(pngfix_SOURCES) \
 	$(pngimage_SOURCES) $(pngstest_SOURCES) $(pngtest_SOURCES) \
-	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(timepng_SOURCES)
+	$(pngunknown_SOURCES) $(timepng_SOURCES)
 DIST_SOURCES =  \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST) \
 	$(png_fix_itxt_SOURCES) $(pngcp_SOURCES) $(pngfix_SOURCES) \
 	$(pngimage_SOURCES) $(pngstest_SOURCES) $(pngtest_SOURCES) \
-	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(timepng_SOURCES)
+	$(pngunknown_SOURCES) $(timepng_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -717,8 +717,8 @@ ACLOCAL_AMFLAGS = -I scripts
 BUILT_SOURCES = pnglibconf.h
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngvalid_SOURCES = contrib/libtests/pngvalid.c
-pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+# pngvalid_SOURCES = contrib/libtests/pngvalid.c
+# pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngstest_SOURCES = contrib/libtests/pngstest.c
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 pngunknown_SOURCES = contrib/libtests/pngunknown.c
@@ -737,15 +737,15 @@ pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # set of parameters:
 TESTS = \
    tests/pngtest-all\
-   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
-   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
-   tests/pngvalid-gamma-expand16-background\
-   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
-   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
-   tests/pngvalid-progressive-size\
-   tests/pngvalid-progressive-interlace-standard\
-   tests/pngvalid-transform\
-   tests/pngvalid-progressive-standard tests/pngvalid-standard\
+#    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
+#    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+#    tests/pngvalid-gamma-expand16-background\
+#    tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
+#    tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+#    tests/pngvalid-progressive-size\
+#    tests/pngvalid-progressive-interlace-standard\
+#    tests/pngvalid-transform\
+#    tests/pngvalid-progressive-standard tests/pngvalid-standard\
    tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
    tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
    tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
@@ -1062,12 +1062,12 @@ contrib/libtests/pngunknown.$(OBJEXT):  \
 pngunknown$(EXEEXT): $(pngunknown_OBJECTS) $(pngunknown_DEPENDENCIES) $(EXTRA_pngunknown_DEPENDENCIES) 
 	@rm -f pngunknown$(EXEEXT)
 	$(AM_V_CCLD)$(LINK) $(pngunknown_OBJECTS) $(pngunknown_LDADD) $(LIBS)
-contrib/libtests/pngvalid.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
-	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
+# contrib/libtests/pngvalid.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
+# 	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
 
-pngvalid$(EXEEXT): $(pngvalid_OBJECTS) $(pngvalid_DEPENDENCIES) $(EXTRA_pngvalid_DEPENDENCIES) 
-	@rm -f pngvalid$(EXEEXT)
-	$(AM_V_CCLD)$(LINK) $(pngvalid_OBJECTS) $(pngvalid_LDADD) $(LIBS)
+# pngvalid$(EXEEXT): $(pngvalid_OBJECTS) $(pngvalid_DEPENDENCIES) $(EXTRA_pngvalid_DEPENDENCIES) 
+# 	@rm -f pngvalid$(EXEEXT)
+# 	$(AM_V_CCLD)$(LINK) $(pngvalid_OBJECTS) $(pngvalid_LDADD) $(LIBS)
 contrib/libtests/timepng.$(OBJEXT): contrib/libtests/$(am__dirstamp) \
 	contrib/libtests/$(DEPDIR)/$(am__dirstamp)
 
@@ -1149,7 +1149,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngimage.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngstest.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngunknown.Po@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngvalid.Po@am__quote@ # am--include-marker
+# @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngvalid.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/timepng.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/tools/$(DEPDIR)/png-fix-itxt.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/tools/$(DEPDIR)/pngcp.Po@am__quote@ # am--include-marker
@@ -1584,104 +1584,104 @@ tests/pngtest-all.log: tests/pngtest-all
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-16-to-8.log: tests/pngvalid-gamma-16-to-8
-	@p='tests/pngvalid-gamma-16-to-8'; \
-	b='tests/pngvalid-gamma-16-to-8'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-alpha-mode.log: tests/pngvalid-gamma-alpha-mode
-	@p='tests/pngvalid-gamma-alpha-mode'; \
-	b='tests/pngvalid-gamma-alpha-mode'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-background.log: tests/pngvalid-gamma-background
-	@p='tests/pngvalid-gamma-background'; \
-	b='tests/pngvalid-gamma-background'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-expand16-alpha-mode.log: tests/pngvalid-gamma-expand16-alpha-mode
-	@p='tests/pngvalid-gamma-expand16-alpha-mode'; \
-	b='tests/pngvalid-gamma-expand16-alpha-mode'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-expand16-background.log: tests/pngvalid-gamma-expand16-background
-	@p='tests/pngvalid-gamma-expand16-background'; \
-	b='tests/pngvalid-gamma-expand16-background'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-expand16-transform.log: tests/pngvalid-gamma-expand16-transform
-	@p='tests/pngvalid-gamma-expand16-transform'; \
-	b='tests/pngvalid-gamma-expand16-transform'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-sbit.log: tests/pngvalid-gamma-sbit
-	@p='tests/pngvalid-gamma-sbit'; \
-	b='tests/pngvalid-gamma-sbit'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-threshold.log: tests/pngvalid-gamma-threshold
-	@p='tests/pngvalid-gamma-threshold'; \
-	b='tests/pngvalid-gamma-threshold'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-gamma-transform.log: tests/pngvalid-gamma-transform
-	@p='tests/pngvalid-gamma-transform'; \
-	b='tests/pngvalid-gamma-transform'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-progressive-size.log: tests/pngvalid-progressive-size
-	@p='tests/pngvalid-progressive-size'; \
-	b='tests/pngvalid-progressive-size'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-progressive-interlace-standard.log: tests/pngvalid-progressive-interlace-standard
-	@p='tests/pngvalid-progressive-interlace-standard'; \
-	b='tests/pngvalid-progressive-interlace-standard'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-transform.log: tests/pngvalid-transform
-	@p='tests/pngvalid-transform'; \
-	b='tests/pngvalid-transform'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-progressive-standard.log: tests/pngvalid-progressive-standard
-	@p='tests/pngvalid-progressive-standard'; \
-	b='tests/pngvalid-progressive-standard'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
-tests/pngvalid-standard.log: tests/pngvalid-standard
-	@p='tests/pngvalid-standard'; \
-	b='tests/pngvalid-standard'; \
-	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
-	--log-file $$b.log --trs-file $$b.trs \
-	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
-	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-16-to-8.log: tests/pngvalid-gamma-16-to-8
+# 	@p='tests/pngvalid-gamma-16-to-8'; \
+# 	b='tests/pngvalid-gamma-16-to-8'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-alpha-mode.log: tests/pngvalid-gamma-alpha-mode
+# 	@p='tests/pngvalid-gamma-alpha-mode'; \
+# 	b='tests/pngvalid-gamma-alpha-mode'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-background.log: tests/pngvalid-gamma-background
+# 	@p='tests/pngvalid-gamma-background'; \
+# 	b='tests/pngvalid-gamma-background'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-expand16-alpha-mode.log: tests/pngvalid-gamma-expand16-alpha-mode
+# 	@p='tests/pngvalid-gamma-expand16-alpha-mode'; \
+# 	b='tests/pngvalid-gamma-expand16-alpha-mode'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-expand16-background.log: tests/pngvalid-gamma-expand16-background
+# 	@p='tests/pngvalid-gamma-expand16-background'; \
+# 	b='tests/pngvalid-gamma-expand16-background'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-expand16-transform.log: tests/pngvalid-gamma-expand16-transform
+# 	@p='tests/pngvalid-gamma-expand16-transform'; \
+# 	b='tests/pngvalid-gamma-expand16-transform'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-sbit.log: tests/pngvalid-gamma-sbit
+# 	@p='tests/pngvalid-gamma-sbit'; \
+# 	b='tests/pngvalid-gamma-sbit'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-threshold.log: tests/pngvalid-gamma-threshold
+# 	@p='tests/pngvalid-gamma-threshold'; \
+# 	b='tests/pngvalid-gamma-threshold'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-gamma-transform.log: tests/pngvalid-gamma-transform
+# 	@p='tests/pngvalid-gamma-transform'; \
+# 	b='tests/pngvalid-gamma-transform'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-progressive-size.log: tests/pngvalid-progressive-size
+# 	@p='tests/pngvalid-progressive-size'; \
+# 	b='tests/pngvalid-progressive-size'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-progressive-interlace-standard.log: tests/pngvalid-progressive-interlace-standard
+# 	@p='tests/pngvalid-progressive-interlace-standard'; \
+# 	b='tests/pngvalid-progressive-interlace-standard'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-transform.log: tests/pngvalid-transform
+# 	@p='tests/pngvalid-transform'; \
+# 	b='tests/pngvalid-transform'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-progressive-standard.log: tests/pngvalid-progressive-standard
+# 	@p='tests/pngvalid-progressive-standard'; \
+# 	b='tests/pngvalid-progressive-standard'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
+# tests/pngvalid-standard.log: tests/pngvalid-standard
+# 	@p='tests/pngvalid-standard'; \
+# 	b='tests/pngvalid-standard'; \
+# 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
+# 	--log-file $$b.log --trs-file $$b.trs \
+# 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
+# 	"$$tst" $(AM_TESTS_FD_REDIRECT)
 tests/pngstest-1.8.log: tests/pngstest-1.8
 	@p='tests/pngstest-1.8'; \
 	b='tests/pngstest-1.8'; \
@@ -2079,7 +2079,7 @@ distclean: distclean-am
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
-	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
+#	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
 	-rm -f contrib/libtests/$(DEPDIR)/timepng.Po
 	-rm -f contrib/tools/$(DEPDIR)/png-fix-itxt.Po
 	-rm -f contrib/tools/$(DEPDIR)/pngcp.Po
@@ -2164,7 +2164,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngstest.Po
 	-rm -f contrib/libtests/$(DEPDIR)/pngunknown.Po
-	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
+#	-rm -f contrib/libtests/$(DEPDIR)/pngvalid.Po
 	-rm -f contrib/libtests/$(DEPDIR)/timepng.Po
 	-rm -f contrib/tools/$(DEPDIR)/png-fix-itxt.Po
 	-rm -f contrib/tools/$(DEPDIR)/pngcp.Po
@@ -2291,7 +2291,7 @@ contrib/libtests/makepng.o: pnglibconf.h
 contrib/libtests/pngstest.o: pnglibconf.h
 contrib/libtests/pngunknown.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
-contrib/libtests/pngvalid.o: pnglibconf.h
+# contrib/libtests/pngvalid.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
 contrib/libtests/timepng.o: pnglibconf.h

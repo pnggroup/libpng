@@ -12,13 +12,13 @@ PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 ACLOCAL_AMFLAGS = -I scripts
 
 # test programs - run on make check, make distcheck
-check_PROGRAMS= pngtest pngunknown pngstest pngvalid pngimage pngcp
+check_PROGRAMS= 
 if HAVE_CLOCK_GETTIME
 check_PROGRAMS += timepng
 endif
 
 # Utilities - installed
-bin_PROGRAMS= pngfix png-fix-itxt
+bin_PROGRAMS= 
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
 # 'make check', but it does not add dependencies to the individual programs,
@@ -33,14 +33,14 @@ BUILT_SOURCES = pnglibconf.h
 pngtest_SOURCES = pngtest.c
 pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
-pngvalid_SOURCES = contrib/libtests/pngvalid.c
-pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+# pngvalid_SOURCES = contrib/libtests/pngvalid.c
+# pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngstest_SOURCES = contrib/libtests/pngstest.c
 pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
-pngunknown_SOURCES = contrib/libtests/pngunknown.c
-pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+# pngunknown_SOURCES = contrib/libtests/pngunknown.c
+# pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 
 pngimage_SOURCES = contrib/libtests/pngimage.c
 pngimage_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
@@ -60,15 +60,15 @@ pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 # set of parameters:
 TESTS =\
    tests/pngtest-all\
-   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
-   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
-   tests/pngvalid-gamma-expand16-background\
-   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
-   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
-   tests/pngvalid-progressive-size\
-   tests/pngvalid-progressive-interlace-standard\
-   tests/pngvalid-transform\
-   tests/pngvalid-progressive-standard tests/pngvalid-standard\
+#    tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
+#    tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+#    tests/pngvalid-gamma-expand16-background\
+#    tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
+#    tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+#    tests/pngvalid-progressive-size\
+#    tests/pngvalid-progressive-interlace-standard\
+#    tests/pngvalid-transform\
+#    tests/pngvalid-progressive-standard tests/pngvalid-standard\
    tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
    tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
    tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
@@ -177,7 +177,8 @@ AM_CFLAGS = ${PNG_COPTS}
 # checks for this and sets DFNCPP appropriately.
 DFNCPP = @DFNCPP@
 
-SUFFIXES = .chk .out
+# SUFFIXES = .chk .out
+SUFFIXES = 
 
 $(PNGLIB_BASENAME).pc: libpng.pc
 	cp libpng.pc $@
@@ -240,9 +241,9 @@ pngtest.o: pnglibconf.h
 
 contrib/libtests/makepng.o: pnglibconf.h
 contrib/libtests/pngstest.o: pnglibconf.h
-contrib/libtests/pngunknown.o: pnglibconf.h
+# contrib/libtests/pngunknown.o: pnglibconf.h
 contrib/libtests/pngimage.o: pnglibconf.h
-contrib/libtests/pngvalid.o: pnglibconf.h
+# contrib/libtests/pngvalid.o: pnglibconf.h
 contrib/libtests/readpng.o: pnglibconf.h
 contrib/libtests/tarith.o: pnglibconf.h
 contrib/libtests/timepng.o: pnglibconf.h

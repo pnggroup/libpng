@@ -151,12 +151,13 @@ static int read_png(FILE *fp, png_int_32 transforms, FILE *write_file)
 
    if (png_ptr == NULL)
       return 0;
-
+#ifdef PNG_SETJMP_SUPPORTED
    if (setjmp(png_jmpbuf(png_ptr)))
    {
       png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
       return 0;
    }
+#endif
 
 #  ifdef PNG_BENIGN_ERRORS_SUPPORTED
       png_set_benign_errors(png_ptr, 1/*allowed*/);
@@ -418,6 +419,7 @@ int main(int argc, char **argv)
 
    else /* Else use a temporary file */
    {
+#ifdef PNG_SETJMP_SUPPORTED
 #ifndef __COVERITY__
       fp = tmpfile();
 #else
@@ -450,6 +452,10 @@ int main(int argc, char **argv)
          */
         (void) unlink(tmpfile);
       }
+#endif
+#else
+   char tmpfile[] = "timepng-XXXXXX";
+   fp = fdopen(tmpfile,"w+");
 #endif
 
       if (fp == NULL)

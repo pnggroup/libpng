@@ -33,7 +33,7 @@
 #  include "../../png.h"
 #endif
 
-#ifndef PNG_SETJMP_SUPPORTED
+#ifdef PNG_SETJMP_SUPPORTED
 #  include <setjmp.h> /* because png.h did *not* include this */
 #endif
 
@@ -542,7 +542,9 @@ typedef enum
 
 struct display
 {
+#ifdef PNG_SETJMP_SUPPORTED
    jmp_buf        error_return;      /* Where to go to on error */
+#endif
 
    const char    *filename;          /* The name of the original file */
    const char    *operation;         /* Operation being performed */
@@ -761,9 +763,11 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
    }
    /* else do not output any message */
 
+#ifdef PNG_SETJMP_SUPPORTED
    /* Errors cause this routine to exit to the fail code */
    if (level > APP_FAIL || (level > ERRORS && !(dp->options & CONTINUE)))
       longjmp(dp->error_return, level);
+#endif
 }
 
 /* error handler callbacks for libpng */
@@ -1566,7 +1570,11 @@ static int
 do_test(struct display *dp, const char *file)
    /* Exists solely to isolate the setjmp clobbers */
 {
+#ifdef PNG_SETJMP_SUPPORTED
    int ret = setjmp(dp->error_return);
+#else
+   int ret = 0;
+#endif
 
    if (ret == 0)
    {

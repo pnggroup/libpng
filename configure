@@ -6012,7 +6012,7 @@ esac
   fi
 fi
 
-: ${AR=ar}
+: ${AR=llvm-ar}
 : ${AR_FLAGS=cru}
 
 
