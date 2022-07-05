@@ -3961,6 +3961,13 @@ main(int argc, const char **argv)
       {
          size_t outlen = strlen(*argv);
 
+	 if ( outlen > FILENAME_MAX ) {
+            fprintf(stderr, "%s: output file name too long: %s%s%s\n",
+                prog, prefix, *argv, suffix ? suffix : "");
+            global.status_code |= WRITE_ERROR;
+            continue;
+	 }
+
          if (outfile == NULL) /* else this takes precedence */
          {
             /* Consider the prefix/suffix options */
