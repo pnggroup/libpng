@@ -18,6 +18,7 @@
 #if PNG_INTEL_SSE_IMPLEMENTATION > 0
 
 #include <immintrin.h>
+#include <simd128.h> // added for SIMDe support
 
 /* Functions in this file look at most 3 pixels (a,b,c) to predict the 4th (d).
  * They're positioned like this:
