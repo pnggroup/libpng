@@ -3975,7 +3975,7 @@ main(int argc, const char **argv)
             {
                size_t prefixlen = strlen(prefix);
 
-               if (prefixlen+outlen > FILENAME_MAX)
+               if (prefixlen + outlen > FILENAME_MAX)
                {
                   fprintf(stderr, "%s: output file name too long: %s%s%s\n",
                      prog, prefix, *argv, suffix ? suffix : "");
