@@ -70,9 +70,12 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
 # Set definitions and sources for ARM.
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-  set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-  set(PNG_ARM_NEON "check"
-      CACHE STRING "Enable ARM NEON optimizations: check|on|off; check is default")
+  set(PNG_ARM_NEON_POSSIBLE_VALUES detect check on off)
+  set(PNG_ARM_NEON "check" CACHE STRING "Enable ARM NEON optimizations:
+     detect: (default) enable optimizations if they are supported by the compiler;
+     check: use the supplied file for a runtime check;
+     off: disable the optimizations;
+     on: turn on unconditionally.")
   set_property(CACHE PNG_ARM_NEON
                PROPERTY STRINGS ${PNG_ARM_NEON_POSSIBLE_VALUES})
   list(FIND PNG_ARM_NEON_POSSIBLE_VALUES ${PNG_ARM_NEON} index)
