@@ -1,0 +1,38 @@
+name: Development
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ${{matrix.os}}-latest
+    
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu
+            cc: gcc
+
+          - os: ubnutu
+            cc: clang
+            env:
+              CI_SANITIZERS: "address,undefined"
+              CI_CMAKE_VARS: "-DPNG_HARDWARE_OPTIMIZATIONS=OFF"
+
+          - os: ubnutu
+            cc: clang
+            env:
+              CI_SANITIZERS: "address,undefined"
+              CI_CMAKE_VARS: "-DPNG_HARDWARE_OPTIMIZATIONS=ON"
+
+          - os: macos
+            cc: clang
+            env:
+              CI_CMAKE_GENERATOR: Xcode
+    
+    steps:
+    - uses: actions/checkout@v2
+        
+    - name: Run tests
+      timeout-minutes: 5
+      run: ./ci/ci_cmake.sh
+
