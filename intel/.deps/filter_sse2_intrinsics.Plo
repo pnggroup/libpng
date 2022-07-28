@@ -1,0 +1,141 @@
+intel/filter_sse2_intrinsics.lo: intel/filter_sse2_intrinsics.c \
+  intel/../pngpriv.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/stdlib.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__functions_malloc.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/stddef.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_stdlib.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/features.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/alltypes.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_timeval.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_time_t.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_suseconds_t.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_timespec.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_iovec.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/string.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_string.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__functions_memcpy.h \
+  config.h pnglibconf.h png.h pngconf.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/limits.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/limits.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/limits.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__macro_PAGESIZE.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/__stddef_max_align_t.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/stdio.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__seek.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/wasi/api.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/stdint.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/stdint.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/stdint.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/time.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_clockid_t.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_clock_t.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_time.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_tm.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/float.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/float.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/math.h \
+  pngstruct.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/zlib.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/zconf.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/sys/types.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/stdarg.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/unistd.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_unistd.h \
+  /opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/posix.h \
+  pnginfo.h pngdebug.h
+
+intel/../pngpriv.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/stdlib.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__functions_malloc.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/stddef.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_stdlib.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/features.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/alltypes.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_timeval.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_time_t.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_suseconds_t.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_timespec.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_iovec.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/string.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_string.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__functions_memcpy.h:
+
+config.h:
+
+pnglibconf.h:
+
+png.h:
+
+pngconf.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/limits.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/limits.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/limits.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__macro_PAGESIZE.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/__stddef_max_align_t.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/stdio.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__seek.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/wasi/api.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/stdint.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/stdint.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/stdint.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/time.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_clockid_t.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__typedef_clock_t.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_time.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__struct_tm.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/float.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/float.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/math.h:
+
+pngstruct.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/zlib.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/zconf.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/sys/types.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/lib/clang/13.0.0/include/stdarg.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/unistd.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/__header_unistd.h:
+
+/opt/wasi-sdk/wasi-sdk-14.0/bin/../share/wasi-sysroot/include/bits/posix.h:
+
+pnginfo.h:
+
+pngdebug.h:
