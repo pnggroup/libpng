@@ -19,6 +19,7 @@
 # Revised by Owen Rudge, 2020
 # Revised by Gleb Mazovetskiy, 2021
 # Revised by Christopher Sean Morrison, 2022
+# Revised by B. Scott Michel, 2022
 # Revised by Martin Storsjo, 2022
 # Revised by Jon Creighton, 2023
 # Revised by Gunther Nikl, 2023
@@ -227,6 +228,18 @@ set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 
 # Distinguish between debug and release builds.
 set(CMAKE_DEBUG_POSTFIX "d")
+
+# Win32 and Clang (MinGW gcc is not affected by naming issues)
+set(PNG_PREPEND_LIB_NAME "")
+set(PNG_LIB_NAME_STATIC "${PNG_LIB_NAME}")
+if(MSVC OR (WIN32 AND CMAKE_C_COMPILER_ID MATCHES ".*Clang"))
+  # MSVC and Clang do not prepend 'lib'. Establish a consistent naming convention.
+  set(PNG_PREPEND_LIB_NAME "lib")
+  # Change the name of the static library.
+  set(PNG_LIB_NAME_STATIC png_static)
+  # Tamp down on the deprecated/potentially insecure warnings about fopen() and ilk.
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+endif()
 
 include(CheckCSourceCompiles)
 option(ld-version-script "Enable linker version script" ON)
@@ -597,11 +610,8 @@ if(PNG_SHARED)
   set(PNG_LIB_TARGETS png)
   set_target_properties(png PROPERTIES OUTPUT_NAME ${PNG_LIB_NAME})
   add_dependencies(png genfiles)
-  if(MSVC)
-    # MVC does not append 'lib'. Do it here, to have consistent name.
-    set_target_properties(png PROPERTIES PREFIX "lib")
-    set_target_properties(png PROPERTIES IMPORT_PREFIX "lib")
-  endif()
+  set_target_properties(png PROPERTIES PREFIX "${PNG_PREPEND_LIB_NAME}")
+  set_target_properties(png PROPERTIES IMPORT_PREFIX "${PNG_PREPEND_LIB_NAME}")
   target_link_libraries(png ${ZLIB_LIBRARIES} ${M_LIBRARY})
 
   if(UNIX AND AWK)
@@ -617,26 +627,16 @@ endif()
 
 if(PNG_STATIC)
   # does not work without changing name
-  set(PNG_LIB_NAME_STATIC png_static)
   add_library(png_static STATIC ${libpng_sources})
   add_dependencies(png_static genfiles)
   # MSVC doesn't use a different file extension for shared vs. static
   # libs. We are able to change OUTPUT_NAME to remove the _static
   # for all other platforms.
-  if(NOT MSVC)
-    set_target_properties(png_static PROPERTIES
-                          OUTPUT_NAME "${PNG_LIB_NAME}"
-                          CLEAN_DIRECT_OUTPUT 1)
-  else()
-    set_target_properties(png_static PROPERTIES
-                          OUTPUT_NAME "${PNG_LIB_NAME}_static"
-                          CLEAN_DIRECT_OUTPUT 1)
-  endif()
+  set_target_properties(png_static PROPERTIES
+                        OUTPUT_NAME "${PNG_LIB_NAME_STATIC}"
+                        CLEAN_DIRECT_OUTPUT 1)
   list(APPEND PNG_LIB_TARGETS png_static)
-  if(MSVC)
-    # MSVC does not append 'lib'. Do it here, to have consistent name.
-    set_target_properties(png_static PROPERTIES PREFIX "lib")
-  endif()
+  set_target_properties(png_static PROPERTIES PREFIX "${PNG_PREPEND_LIB_NAME}")
   target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
