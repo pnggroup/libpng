@@ -1,6 +1,6 @@
 # CMakeLists.txt
 
-# Copyright (c) 2018-2020 Cosmin Truta
+# Copyright (c) 2018-2022 Cosmin Truta
 # Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
 # Written by Christian Ehrlicher, 2007
 # Revised by Roger Lowman, 2009-2010
@@ -69,10 +69,17 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm" OR
-  CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
-  set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-  set(PNG_ARM_NEON "check"
-      CACHE STRING "Enable ARM NEON optimizations: check|on|off; check is default")
+   CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^arm64" OR
+     CMAKE_SYSTEM_PROCESSOR MATCHES "^aarch64")
+    set(PNG_ARM_NEON_POSSIBLE_VALUES on off)
+    set(PNG_ARM_NEON "on"
+        CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
+  else()
+    set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
+    set(PNG_ARM_NEON "check"
+        CACHE STRING "Enable ARM NEON optimizations: check|on|off; check is default")
+  endif()
   set_property(CACHE PNG_ARM_NEON
                PROPERTY STRINGS ${PNG_ARM_NEON_POSSIBLE_VALUES})
   list(FIND PNG_ARM_NEON_POSSIBLE_VALUES ${PNG_ARM_NEON} index)
