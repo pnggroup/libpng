@@ -5,6 +5,7 @@ branches:
 language: c
 
 os:
+  - freebsd
   - linux
   - osx
 
@@ -16,7 +17,6 @@ env:
   - AUTOMATION=cmake CI_NO_TEST=1
   - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=ON" CI_SANITIZERS="address,undefined"
   - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF" CI_SANITIZERS="address,undefined"
-  - AUTOMATION=cmake CI_CMAKE_GENERATOR=Xcode
   - AUTOMATION=autotools CI_NO_TEST=1
   - AUTOMATION=autotools CI_CONFIGURE_FLAGS="--enable-hardware-optimizations"
   - AUTOMATION=autotools CI_CONFIGURE_FLAGS="--disable-hardware-optimizations"
@@ -24,11 +24,15 @@ env:
   - AUTOMATION=legacy CI_SANITIZERS="address,undefined"
 
 matrix:
+  include:
+    - os: osx
+      compiler: cc
+      env: AUTOMATION=cmake CI_CMAKE_GENERATOR=Xcode
   exclude:
+    - os: freebsd
+      compiler: gcc
     - os: osx
       compiler: gcc
-    - os: linux
-      env: AUTOMATION=cmake CI_CMAKE_GENERATOR=Xcode
 
 before_script:
   - 'export CI_CMAKE_BUILD_FLAGS="--parallel 2"'

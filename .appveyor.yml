@@ -5,7 +5,7 @@ branches:
     - /libpng[0-1][0-7]/
 
 image:
-  - Visual Studio 2019
+  - Visual Studio 2022
 
 shallow_clone: true
 
@@ -46,9 +46,9 @@ install:
 
 before_build:
   - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_VARS=-DCMAKE_TOOLCHAIN_FILE=C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake'
-  - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_GENERATOR=Visual Studio 16 2019'
+  - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_GENERATOR=Visual Studio 17 2022'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x86" set CI_CMAKE_GENERATOR_PLATFORM=Win32'
-  - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x64" set CI_CMAKE_GENERATOR_PLATFORM=X64'
+  - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x64" set CI_CMAKE_GENERATOR_PLATFORM=x64'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="arm64" set CI_CMAKE_GENERATOR_PLATFORM=ARM64'
   - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="cmake" set CI_CMAKE_GENERATOR=Unix Makefiles'
   - 'if "%TOOLCHAIN%"=="msys2" if "%ARCH%"=="i686" set PATH=C:\msys64\mingw32\bin;%PATH%'
