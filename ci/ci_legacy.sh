@@ -4,17 +4,16 @@ set -e
 # ci_legacy.sh
 # Continuously integrate libpng using the legacy makefiles.
 #
-# Copyright (c) 2019-2021 Cosmin Truta.
+# Copyright (c) 2019-2022 Cosmin Truta.
 #
 # This software is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h.
 
-readonly CI_SYSNAME="$(uname -s)"
-readonly CI_SCRIPTNAME="$(basename "$0")"
-readonly CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
-readonly CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-readonly CI_BUILDDIR="$CI_SRCDIR"
+CI_SCRIPTNAME="$(basename "$0")"
+CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
+CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
+CI_BUILDDIR="$CI_SRCDIR"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
@@ -33,17 +32,31 @@ function ci_spawn {
 }
 
 function ci_init_legacy {
-    # Initialize the CI_ variables with default values, where applicable.
+    CI_SYSTEM_NAME="$(uname -s)"
+    CI_MACHINE_NAME="$(uname -m)"
     CI_MAKE="${CI_MAKE:-make}"
-    [[ $CI_SYSNAME == Darwin || $CI_SYSNAME == *BSD || $CI_SYSNAME == DragonFly ]] &&
-        CI_CC="${CI_CC:-clang}"
-    [[ $CI_CC == *clang* ]] &&
-        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.clang"}"
-    CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.gcc"}"
+    case "$CI_SYSTEM_NAME" in
+    ( Darwin | *BSD | DragonFly )
+        [[ -x $(command -v clang) ]] && CI_CC="${CI_CC:-clang}" ;;
+    ( * )
+        [[ -x $(command -v gcc) ]] && CI_CC="${CI_CC:-gcc}" ;;
+    esac
+    CI_CC="${CI_CC:-cc}"
+    case "$CI_CC" in
+    ( *clang* )
+        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.clang"}" ;;
+    ( *gcc* )
+        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.gcc"}" ;;
+    ( cc | c89 | c99 )
+        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.std"}" ;;
+    esac
     CI_LD="${CI_LD:-"$CI_CC"}"
     CI_LIBS="${CI_LIBS:-"-lz -lm"}"
-    # Print the CI_ variables.
-    ci_info "system name: $CI_SYSNAME"
+}
+
+function ci_trace_legacy {
+    ci_info "system name: $CI_SYSTEM_NAME"
+    ci_info "machine hardware name: $CI_MACHINE_NAME"
     ci_info "source directory: $CI_SRCDIR"
     ci_info "build directory: $CI_BUILDDIR"
     ci_info "environment option: \$CI_LEGACY_MAKEFILES='$CI_LEGACY_MAKEFILES'"
@@ -69,7 +82,7 @@ function ci_build_legacy {
     local ALL_CC_FLAGS="$CI_CC_FLAGS"
     local ALL_LD_FLAGS="$CI_LD_FLAGS"
     [[ $CI_SANITIZERS ]] && {
-        ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS -O2 $ALL_CC_FLAGS"
+        ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS ${ALL_CC_FLAGS:-"-O2"}"
         ALL_LD_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_LD_FLAGS"
     }
     # Initialize ALL_MAKE_FLAGS and ALL_MAKE_VARS as arrays.
@@ -112,7 +125,8 @@ function ci_build_legacy {
 }
 
 ci_init_legacy
-[[ ! $* ]] || {
+ci_trace_legacy
+[[ $# -eq 0 ]] || {
     ci_info "note: this program accepts environment options only"
     ci_err "unexpected command arguments: '$*'"
 }
