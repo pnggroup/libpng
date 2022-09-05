@@ -14068,13 +14068,13 @@ printf "%s\n" "#define PNG_INTEL_SSE_OPT 0" >>confdefs.h
             arm*|aarch64*)
               enable_arm_neon=yes
 
-printf "%s\n" "#define PNG_ARM_NEON_OPT 0" >>confdefs.h
+printf "%s\n" "#define PNG_ARM_NEON_OPT 2" >>confdefs.h
 
               ;;
             mipsel*|mips64el*)
               enable_mips_msa=yes
 
-printf "%s\n" "#define PNG_MIPS_MSA_OPT 0" >>confdefs.h
+printf "%s\n" "#define PNG_MIPS_MSA_OPT 2" >>confdefs.h
 
               ;;
             i?86|x86_64)

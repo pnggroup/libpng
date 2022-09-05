@@ -320,12 +320,12 @@ AC_ARG_ENABLE([hardware-optimizations],
          case "$host_cpu" in
             arm*|aarch64*)
               enable_arm_neon=yes
-              AC_DEFINE([PNG_ARM_NEON_OPT], [0],
+              AC_DEFINE([PNG_ARM_NEON_OPT], [2],
                 [Enable ARM_NEON optimizations])
               ;;
             mipsel*|mips64el*)
               enable_mips_msa=yes
-              AC_DEFINE([PNG_MIPS_MSA_OPT], [0],
+              AC_DEFINE([PNG_MIPS_MSA_OPT], [2],
                 [Enable MIPS_MSA optimizations])
               ;;
             i?86|x86_64)
