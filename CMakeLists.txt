@@ -437,7 +437,7 @@ else()
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.def")
 
-  add_custom_target(symbol-check
+  add_custom_target(scripts_symbols_chk
                     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk")
 
   generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
@@ -470,7 +470,7 @@ else()
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c" scripts_pnglibconf_c
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out" scripts_prefix_out
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out" scripts_sym_out
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk" symbol-check
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk" scripts_symbols_chk
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out" scripts_symbols_out
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out" scripts_vers_out)
 endif(NOT AWK OR ANDROID OR IOS)
