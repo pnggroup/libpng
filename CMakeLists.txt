@@ -223,9 +223,10 @@ set(CMAKE_DEBUG_POSTFIX "d")
 
 include(CheckCSourceCompiles)
 option(ld-version-script "Enable linker version script" ON)
-if(ld-version-script AND NOT APPLE)
+if(ld-version-script AND NOT ANDROID AND NOT APPLE)
   # Check if LD supports linker scripts.
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "VERS_1 {
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "
+VERS_1 {
         global: sym;
         local: *;
 };
