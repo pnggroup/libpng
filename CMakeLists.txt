@@ -588,7 +588,7 @@ if(PNG_SHARED)
     set_target_properties(png PROPERTIES PREFIX "lib")
     set_target_properties(png PROPERTIES IMPORT_PREFIX "lib")
   endif()
-  target_link_libraries(png ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_link_libraries(png zlib ${M_LIBRARY})
 
   if(UNIX AND AWK)
     if(HAVE_LD_VERSION_SCRIPT)
@@ -623,7 +623,7 @@ if(PNG_STATIC)
     # MSVC does not append 'lib'. Do it here, to have consistent name.
     set_target_properties(png_static PROPERTIES PREFIX "lib")
   endif()
-  target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_link_libraries(png_static zlib ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK)
@@ -640,7 +640,7 @@ if(PNG_FRAMEWORK)
                         XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
                         PUBLIC_HEADER "${libpng_public_hdrs}"
                         OUTPUT_NAME png)
-  target_link_libraries(png_framework ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_link_libraries(png_framework zlib ${M_LIBRARY})
 endif()
 
 if(NOT PNG_LIB_TARGETS)
@@ -849,7 +849,7 @@ if(PNG_SHARED AND PNG_EXECUTABLES)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_link_libraries(png-fix-itxt zlib ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
