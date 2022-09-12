@@ -32,9 +32,13 @@ enable_testing()
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
-set(PNGLIB_RELEASE 38)
+set(PNGLIB_REVISION 38)
+#set(PNGLIB_SUBREVISION 0)
+set(PNGLIB_SUBREVISION "git")
 set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
-set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
+set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_REVISION})
+set(PNGLIB_SHARED_SOVERSION ${PNGLIB_MAJOR}${PNGLIB_MINOR})
+set(PNGLIB_SHARED_VERSION ${PNGLIB_SHARED_SOVERSION}.${PNGLIB_REVISION}.${PNGLIB_SUBREVISION})
 
 include(GNUInstallDirs)
 
@@ -223,9 +227,10 @@ set(CMAKE_DEBUG_POSTFIX "d")
 
 include(CheckCSourceCompiles)
 option(ld-version-script "Enable linker version script" ON)
-if(ld-version-script AND NOT APPLE)
+if(ld-version-script AND NOT ANDROID AND NOT APPLE)
   # Check if LD supports linker scripts.
-  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "VERS_1 {
+  file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "
+VERS_1 {
         global: sym;
         local: *;
 };
@@ -946,9 +951,8 @@ endif()
 # Set up links.
 if(PNG_SHARED)
   set_target_properties(png PROPERTIES
-    VERSION 16.${PNGLIB_RELEASE}.git
-#   VERSION 16.${PNGLIB_RELEASE}.0
-    SOVERSION 16
+    VERSION ${PNGLIB_SHARED_VERSION}
+    SOVERSION ${PNGLIB_SHARED_SOVERSION}
     CLEAN_DIRECT_OUTPUT 1)
 endif()
 
