@@ -65,11 +65,12 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
    png_uint_32 row_width = row_info->width;
    const png_uint_32 *riffled_palette =
       (const png_uint_32 *)png_ptr->riffled_palette;
-   const png_int_32 pixels_per_chunk = 4;
-   int i;
+   const png_uint_32 pixels_per_chunk = 4;
+   png_uint_32 i;
 
    png_debug(1, "in png_do_expand_palette_rgba8_neon");
 
+   PNG_UNUSED(row)
    if (row_width < pixels_per_chunk)
       return 0;
 
@@ -109,10 +110,11 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
    png_uint_32 row_width = row_info->width;
    png_const_bytep palette = (png_const_bytep)png_ptr->palette;
    const png_uint_32 pixels_per_chunk = 8;
-   int i;
+   png_uint_32 i;
 
    png_debug(1, "in png_do_expand_palette_rgb8_neon");
 
+   PNG_UNUSED(row)
    if (row_width <= pixels_per_chunk)
       return 0;
 
