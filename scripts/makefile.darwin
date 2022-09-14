@@ -12,6 +12,7 @@
 
 # where "make install" puts libpng.a, libpng16.dylib, png.h, pngconf.h,
 # and pnglibconf.h
+
 prefix=/usr/local
 exec_prefix=$(prefix)
 
@@ -39,7 +40,10 @@ LN_SF=ln -sf
 CP=cp
 RM_F=rm -f
 
-CPPFLAGS=-I$(ZLIBINC)
+NOHWOPT=-DPNG_ARM_NEON_OPT=0 -DPNG_MIPS_MSA_OPT=0 \
+        -DPNG_POWERPC_VSX_OPT=0 -DPNG_INTEL_SSE_OPT=0
+DEFS=$(NOHWOPT)
+CPPFLAGS=-I$(ZLIBINC) $(DEFS)
 CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz
 

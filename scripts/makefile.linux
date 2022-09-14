@@ -40,11 +40,14 @@ exec_prefix=$(prefix)
 ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
+# Compiler and linker flags
+NOHWOPT=-DPNG_ARM_NEON_OPT=0 -DPNG_MIPS_MSA_OPT=0 \
+	-DPNG_POWERPC_VSX_OPT=0 -DPNG_INTEL_SSE_OPT=0
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
 	-Wstrict-prototypes -Wmissing-prototypes # -Wconversion
-
-CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
+DEFS=$(NOHWOPT)
+CPPFLAGS=-I$(ZLIBINC) $(DEFS) # -DPNG_DEBUG=5
 CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef # $(WARNMORE) -g
 LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng16 -lz -lm # -g
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm # -g
