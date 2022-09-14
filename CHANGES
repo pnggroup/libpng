@@ -6103,7 +6103,11 @@ Version 1.6.37 [April 14, 2019]
   Added makefiles for AddressSanitizer-enabled builds.
   Cleaned up various makefiles.
 
-Version 1.6.38 [TODO]
+Version 1.6.38 [September 14, 2022]
+  Added configurations and scripts for continuous integration.
+  Fixed various errors in the handling of tRNS, hIST and eXIf.
+  Implemented many stability improvements across all platforms.
+  Updated the internal documentation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
