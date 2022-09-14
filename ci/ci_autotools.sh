@@ -45,29 +45,43 @@ function ci_init_autotools {
 }
 
 function ci_trace_autotools {
+    ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
     ci_info "source directory: $CI_SRCDIR"
     ci_info "build directory: $CI_BUILDDIR"
     ci_info "install directory: $CI_INSTALLDIR"
-    ci_info "environment option: \$CI_CONFIGURE_FLAGS='$CI_CONFIGURE_FLAGS'"
-    ci_info "environment option: \$CI_MAKE='$CI_MAKE'"
-    ci_info "environment option: \$CI_MAKE_FLAGS='$CI_MAKE_FLAGS'"
-    ci_info "environment option: \$CI_CC='$CI_CC'"
-    ci_info "environment option: \$CI_CC_FLAGS='$CI_CC_FLAGS'"
-    ci_info "environment option: \$CI_CPP='$CI_CPP'"
-    ci_info "environment option: \$CI_CPP_FLAGS='$CI_CPP_FLAGS'"
-    ci_info "environment option: \$CI_AR='$CI_AR'"
-    ci_info "environment option: \$CI_RANLIB='$CI_RANLIB'"
-    ci_info "environment option: \$CI_LD='$CI_LD'"
-    ci_info "environment option: \$CI_LD_FLAGS='$CI_LD_FLAGS'"
-    ci_info "environment option: \$CI_SANITIZERS='$CI_SANITIZERS'"
-    ci_info "environment option: \$CI_NO_TEST='$CI_NO_TEST'"
-    ci_info "environment option: \$CI_NO_INSTALL='$CI_NO_INSTALL'"
-    ci_info "environment option: \$CI_NO_CLEAN='$CI_NO_CLEAN'"
+    ci_info "environment option: \$CI_CONFIGURE_FLAGS: '$CI_CONFIGURE_FLAGS'"
+    ci_info "environment option: \$CI_MAKE: '$CI_MAKE'"
+    ci_info "environment option: \$CI_MAKE_FLAGS: '$CI_MAKE_FLAGS'"
+    ci_info "environment option: \$CI_CC: '$CI_CC'"
+    ci_info "environment option: \$CI_CC_FLAGS: '$CI_CC_FLAGS'"
+    ci_info "environment option: \$CI_CPP: '$CI_CPP'"
+    ci_info "environment option: \$CI_CPP_FLAGS: '$CI_CPP_FLAGS'"
+    ci_info "environment option: \$CI_AR: '$CI_AR'"
+    ci_info "environment option: \$CI_RANLIB: '$CI_RANLIB'"
+    ci_info "environment option: \$CI_LD: '$CI_LD'"
+    ci_info "environment option: \$CI_LD_FLAGS: '$CI_LD_FLAGS'"
+    ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
+    ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
+    ci_info "environment option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
+    ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
+    ci_info "executable: \$CI_MAKE: $(command -V "$CI_MAKE")"
+    [[ $CI_CC ]] &&
+        ci_info "executable: \$CI_CC: $(command -V "$CI_CC")"
+    [[ $CI_CPP ]] &&
+        ci_info "executable: \$CI_CPP: $(command -V "$CI_CPP")"
+    [[ $CI_AR ]] &&
+        ci_info "executable: \$CI_AR: $(command -V "$CI_AR")"
+    [[ $CI_RANLIB ]] &&
+        ci_info "executable: \$CI_RANLIB: $(command -V "$CI_RANLIB")"
+    [[ $CI_LD ]] &&
+        ci_info "executable: \$CI_LD: $(command -V "$CI_LD")"
+    ci_info "## END OF CONFIGURATION ##"
 }
 
 function ci_build_autotools {
+    ci_info "## START OF BUILD ##"
     # Export the configure build environment.
     [[ $CI_CC ]] && ci_spawn export CC="$CI_CC"
     [[ $CI_CC_FLAGS ]] && ci_spawn export CFLAGS="$CI_CC_FLAGS"
@@ -91,7 +105,7 @@ function ci_build_autotools {
     [[ $CI_NO_INSTALL ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
     [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS clean
     [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS distclean
-    ci_info "success!"
+    ci_info "## END OF BUILD ##"
 }
 
 ci_init_autotools

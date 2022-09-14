@@ -66,35 +66,51 @@ function ci_init_cmake {
 }
 
 function ci_trace_cmake {
+    ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
     ci_info "source directory: $CI_SRCDIR"
-    [[ $CI_SRCDIR_NATIVE ]] && ci_info "source directory (native): $CI_SRCDIR_NATIVE"
+    [[ $CI_SRCDIR_NATIVE ]] &&
+        ci_info "source directory (native): $CI_SRCDIR_NATIVE"
     ci_info "build directory: $CI_BUILDDIR"
-    [[ $CI_BUILDDIR_NATIVE ]] && ci_info "build directory (native): $CI_BUILDDIR_NATIVE"
+    [[ $CI_BUILDDIR_NATIVE ]] &&
+        ci_info "build directory (native): $CI_BUILDDIR_NATIVE"
     ci_info "install directory: $CI_INSTALLDIR"
-    [[ $CI_INSTALLDIR_NATIVE ]] && ci_info "install directory (native): $CI_INSTALLDIR_NATIVE"
-    ci_info "environment option: \$CI_CMAKE='$CI_CMAKE'"
-    ci_info "environment option: \$CI_CMAKE_GENERATOR='$CI_CMAKE_GENERATOR'"
-    ci_info "environment option: \$CI_CMAKE_GENERATOR_PLATFORM='$CI_CMAKE_GENERATOR_PLATFORM'"
-    ci_info "environment option: \$CI_CMAKE_BUILD_TYPE='$CI_CMAKE_BUILD_TYPE'"
-    ci_info "environment option: \$CI_CMAKE_BUILD_FLAGS='$CI_CMAKE_BUILD_FLAGS'"
-    ci_info "environment option: \$CI_CMAKE_VARS='$CI_CMAKE_VARS'"
-    ci_info "environment option: \$CI_CTEST='$CI_CTEST'"
-    ci_info "environment option: \$CI_CTEST_FLAGS='$CI_CTEST_FLAGS'"
-    ci_info "environment option: \$CI_CC='$CI_CC'"
-    ci_info "environment option: \$CI_CC_FLAGS='$CI_CC_FLAGS'"
-    ci_info "environment option: \$CI_AR='$CI_AR'"
-    ci_info "environment option: \$CI_RANLIB='$CI_RANLIB'"
-    ci_info "environment option: \$CI_SANITIZERS='$CI_SANITIZERS'"
-    ci_info "environment option: \$CI_NO_TEST='$CI_NO_TEST'"
-    ci_info "environment option: \$CI_NO_INSTALL='$CI_NO_INSTALL'"
-    ci_info "environment option: \$CI_NO_CLEAN='$CI_NO_CLEAN'"
-    ci_spawn "$(command -v "$CI_CMAKE")" --version
-    ci_spawn "$(command -v "$CI_CTEST")" --version
+    [[ $CI_INSTALLDIR_NATIVE ]] &&
+        ci_info "install directory (native): $CI_INSTALLDIR_NATIVE"
+    ci_info "environment option: \$CI_CMAKE: '$CI_CMAKE'"
+    ci_info "environment option: \$CI_CMAKE_GENERATOR: '$CI_CMAKE_GENERATOR'"
+    ci_info "environment option: \$CI_CMAKE_GENERATOR_PLATFORM: '$CI_CMAKE_GENERATOR_PLATFORM'"
+    ci_info "environment option: \$CI_CMAKE_BUILD_TYPE: '$CI_CMAKE_BUILD_TYPE'"
+    ci_info "environment option: \$CI_CMAKE_BUILD_FLAGS: '$CI_CMAKE_BUILD_FLAGS'"
+    ci_info "environment option: \$CI_CMAKE_VARS: '$CI_CMAKE_VARS'"
+    ci_info "environment option: \$CI_CTEST: '$CI_CTEST'"
+    ci_info "environment option: \$CI_CTEST_FLAGS: '$CI_CTEST_FLAGS'"
+    ci_info "environment option: \$CI_CC: '$CI_CC'"
+    ci_info "environment option: \$CI_CC_FLAGS: '$CI_CC_FLAGS'"
+    ci_info "environment option: \$CI_AR: '$CI_AR'"
+    ci_info "environment option: \$CI_RANLIB: '$CI_RANLIB'"
+    ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
+    ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
+    ci_info "environment option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
+    ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
+    ci_info "executable: \$CI_CMAKE: $(command -V "$CI_CMAKE")"
+    ci_info "executable: \$CI_CTEST: $(command -V "$CI_CTEST")"
+    [[ $CI_CMAKE_GENERATOR == *"Ninja"* ]] &&
+        ci_info "executable: $(command -V ninja)"
+    [[ $CI_CC ]] &&
+        ci_info "executable: \$CI_CC: $(command -V "$CI_CC")"
+    [[ $CI_AR ]] &&
+        ci_info "executable: \$CI_AR: $(command -V "$CI_AR")"
+    [[ $CI_RANLIB ]] &&
+        ci_info "executable: \$CI_RANLIB: $(command -V "$CI_RANLIB")"
+    ci_info "## END OF CONFIGURATION ##"
 }
 
 function ci_build_cmake {
+    ci_info "## START OF BUILD ##"
+    ci_spawn "$(command -v "$CI_CMAKE")" --version
+    ci_spawn "$(command -v "$CI_CTEST")" --version
     # Initialize ALL_CC_FLAGS as a string.
     local ALL_CC_FLAGS="$CI_CC_FLAGS"
     [[ $CI_SANITIZERS ]] && ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_CC_FLAGS"
@@ -141,7 +157,7 @@ function ci_build_cmake {
                              --config "$CI_CMAKE_BUILD_TYPE" \
                              --target clean \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
-    ci_info "success!"
+    ci_info "## END OF BUILD ##"
 }
 
 ci_init_cmake
