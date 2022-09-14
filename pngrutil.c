@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2022 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -4618,14 +4618,13 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
        */
       {
          png_bytep temp = png_ptr->big_row_buf + 32;
-         int extra = (int)((temp - (png_bytep)0) & 0x0f);
+         size_t extra = (size_t)temp & 0x0f;
          png_ptr->row_buf = temp - extra - 1/*filter byte*/;
 
          temp = png_ptr->big_prev_row + 32;
-         extra = (int)((temp - (png_bytep)0) & 0x0f);
+         extra = (size_t)temp & 0x0f;
          png_ptr->prev_row = temp - extra - 1/*filter byte*/;
       }
-
 #else
       /* Use 31 bytes of padding before and 17 bytes after row_buf. */
       png_ptr->row_buf = png_ptr->big_row_buf + 31;

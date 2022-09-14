@@ -556,14 +556,14 @@
 #endif
 
 /* These macros may need to be architecture dependent. */
-#define PNG_ALIGN_NONE   0 /* do not use data alignment */
-#define PNG_ALIGN_ALWAYS 1 /* assume unaligned accesses are OK */
+#define PNG_ALIGN_NONE      0 /* do not use data alignment */
+#define PNG_ALIGN_ALWAYS    1 /* assume unaligned accesses are OK */
 #ifdef offsetof
-#  define PNG_ALIGN_OFFSET 2 /* use offsetof to determine alignment */
+#  define PNG_ALIGN_OFFSET  2 /* use offsetof to determine alignment */
 #else
 #  define PNG_ALIGN_OFFSET -1 /* prevent the use of this */
 #endif
-#define PNG_ALIGN_SIZE   3 /* use sizeof to determine alignment */
+#define PNG_ALIGN_SIZE      3 /* use sizeof to determine alignment */
 
 #ifndef PNG_ALIGN_TYPE
    /* Default to using aligned access optimizations and requiring alignment to a
@@ -577,26 +577,25 @@
    /* This is used because in some compiler implementations non-aligned
     * structure members are supported, so the offsetof approach below fails.
     * Set PNG_ALIGN_SIZE=0 for compiler combinations where unaligned access
-    * is good for performance.  Do not do this unless you have tested the result
-    * and understand it.
+    * is good for performance.  Do not do this unless you have tested the
+    * result and understand it.
     */
-#  define png_alignof(type) (sizeof (type))
+#  define png_alignof(type) (sizeof(type))
 #else
 #  if PNG_ALIGN_TYPE == PNG_ALIGN_OFFSET
-#     define png_alignof(type) offsetof(struct{char c; type t;}, t)
+#    define png_alignof(type) offsetof(struct{char c; type t;}, t)
 #  else
-#     if PNG_ALIGN_TYPE == PNG_ALIGN_ALWAYS
-#        define png_alignof(type) (1)
-#     endif
-      /* Else leave png_alignof undefined to prevent use thereof */
+#    if PNG_ALIGN_TYPE == PNG_ALIGN_ALWAYS
+#      define png_alignof(type) 1
+#    endif
+     /* Else leave png_alignof undefined to prevent use thereof */
 #  endif
 #endif
 
-/* This implicitly assumes alignment is always to a power of 2. */
+/* This implicitly assumes alignment is always a multiple of 2. */
 #ifdef png_alignof
-#  define png_isaligned(ptr, type)\
-   (((type)((const char*)ptr-(const char*)0) & \
-   (type)(png_alignof(type)-1)) == 0)
+#  define png_isaligned(ptr, type) \
+   (((type)(size_t)((const void*)(ptr)) & (type)(png_alignof(type)-1)) == 0)
 #else
 #  define png_isaligned(ptr, type) 0
 #endif
