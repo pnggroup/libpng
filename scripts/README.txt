@@ -75,9 +75,5 @@ Other supporting scripts:
  macro.lst         =>  Used by autoconf tools
  prefix.dfn        =>  Used by autoconf tools
 
- ci_autotools.sh   =>  Continuous integration utility for the Autotools build
- ci_cmake.sh       =>  Continuous integration utility for the CMake build
- ci_legacy.sh      =>  Continuous integration utility for the legacy makefiles
-
 Further information can be found in comments in the individual scripts and
 makefiles.
