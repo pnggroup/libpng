@@ -1,5 +1,5 @@
 # makefile for libpng
-# Copyright (C) 2020 Cosmin Truta
+# Copyright (C) 2020-2022 Cosmin Truta
 # Copyright (C) 2002, 2006, 2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -32,9 +32,9 @@ CC = cc
 CPP = $(CC) -E
 LD = $(CC)
 AR_RC = ar rc
+RANLIB = ranlib
 MKDIR_P = mkdir
 LN_SF = ln -sf
-RANLIB = ranlib
 CP = cp
 MV_F = mv -f
 RM_F = rm -f
@@ -44,7 +44,7 @@ DFNFLAGS = # DFNFLAGS contains -D options to use in the libpng build
 DFA_EXTRA = # extra files that can be used to control configuration
 CPPFLAGS = -I$(ZLIBINC) # -DPNG_DEBUG=5
 CFLAGS = -O # -g
-LDFLAGS = -L$(ZLIBLIB)
+LDFLAGS = -L$(ZLIBLIB) # -g
 LIBS = -lz -lm
 
 # Pre-built configuration

@@ -17,11 +17,11 @@ LIBSOREL=$(LIBSOMAJ).$(RELEASE)
 OLDSO=libpng.so
 
 # Utilities:
-AR_RC=ar rc
 CC=cc
+AR_RC=ar rc
+RANLIB=ranlib
 MKDIR_P=mkdir
 LN_SF=ln -f -s
-RANLIB=ranlib
 CP=cp
 RM_F=/bin/rm -f
 
@@ -75,7 +75,7 @@ pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
-	$(AR_RC) $@  $(OBJS)
+	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
 libpng.pc:

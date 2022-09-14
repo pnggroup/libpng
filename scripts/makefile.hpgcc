@@ -1,5 +1,5 @@
 # makefile for libpng on HP-UX using GCC with the HP ANSI/C linker.
-# Copyright (C) 2020 Cosmin Truta
+# Copyright (C) 2020-2022 Cosmin Truta
 # Copyright (C) 2002, 2006-2008, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 2001, Laurent faillie
 # Copyright (C) 1998, 1999 Greg Roelofs
@@ -23,9 +23,9 @@ OLDSO=libpng.sl
 CC=gcc
 LD=ld
 AR_RC=ar rc
+RANLIB=ranlib
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
-RANLIB=ranlib
 CP=cp
 RM_F=/bin/rm -f
 
@@ -47,12 +47,12 @@ ZLIBINC=/opt/zlib/include
 
 WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wmissing-declarations -Wtraditional -Wcast-align \
-	-Wstrict-prototypes -Wmissing-prototypes #-Wconversion
+	-Wstrict-prototypes -Wmissing-prototypes # -Wconversion
 
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS=-W -Wall -O3 -funroll-loops # $(WARNMORE) -g
-#LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng16 -lz -lm
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz -lm
+CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef # $(WARNMORE) -g
+#LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng16 -lz -lm # -g
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz -lm # -g
 
 INCPATH=$(prefix)/include
 LIBPATH=$(exec_prefix)/lib

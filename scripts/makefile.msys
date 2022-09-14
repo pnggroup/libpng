@@ -1,5 +1,5 @@
 # makefile for libpng using MSYS/gcc (shared, static library)
-# Copyright (C) 2019-2020 Cosmin Truta
+# Copyright (C) 2019-2022 Cosmin Truta
 # Copyright (C) 2012 Glenn Randers-Pehrson and Christopher M. Wheeler
 #
 # Portions taken from makefile.linux and makefile.gcc:
@@ -44,8 +44,8 @@ MKDIR_P=mkdir -p
 LN_SF=ln -sf
 
 CPPFLAGS = # -DPNG_DEBUG=5
-CFLAGS = -W -Wall -O2 # -g
-LDFLAGS =
+CFLAGS = -O2 -Wall -Wextra -Wundef # -g
+LDFLAGS = # -g
 LIBS = -lz -lm
 
 # File extensions

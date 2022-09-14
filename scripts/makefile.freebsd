@@ -1,5 +1,5 @@
 # makefile for libpng under FreeBSD
-# Copyright (C) 2020 Cosmin Truta
+# Copyright (C) 2020-2022 Cosmin Truta
 # Copyright (C) 2014 Glenn Randers-Pehrson and Andrey A. Chernov
 # Copyright (C) 2002, 2007, 2009 Glenn Randers-Pehrson and Andrey A. Chernov
 #
@@ -38,7 +38,7 @@ LDADD+=		-lm -lz
 DPADD+=		${LIBM} ${LIBZ}
 
 CPPFLAGS+=	-I. -I${ZLIBINC}
-CFLAGS+=	-W -Wall
+CFLAGS+=	-Wall -Wextra -Wundef
 
 # Pre-built configuration
 # See scripts/pnglibconf.mak for more options

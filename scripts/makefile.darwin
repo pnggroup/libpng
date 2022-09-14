@@ -1,5 +1,5 @@
-# makefile for libpng on Darwin / Mac OS X
-# Copyright (C) 2020 Cosmin Truta
+# makefile for libpng on Darwin / macOS
+# Copyright (C) 2020-2022 Cosmin Truta
 # Copyright (C) 2002, 2004, 2006, 2008, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 2001 Christoph Pfisterer
 # derived from makefile.linux:
@@ -22,6 +22,7 @@ ZLIBINC=/usr/include
 # Library name:
 LIBNAME = libpng16
 PNGMAJ = 16
+RELEASE = 37
 
 # Shared library names:
 LIBSO=$(LIBNAME).dylib
@@ -32,14 +33,14 @@ OLDSO=libpng.dylib
 # Utilities:
 CC=cc
 AR_RC=ar rc
+RANLIB=ranlib
 MKDIR_P=mkdir -p
 LN_SF=ln -sf
-RANLIB=ranlib
 CP=cp
-RM_F=/bin/rm -f
+RM_F=rm -f
 
 CPPFLAGS=-I$(ZLIBINC)
-CFLAGS=-W -Wall -O3 -funroll-loops
+CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz
 
 INCPATH=$(prefix)/include
