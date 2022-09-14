@@ -540,9 +540,8 @@
 #  include <alloc.h>
 #endif
 
-#if defined(WIN32) || defined(_Windows) || defined(_WINDOWS) || \
-    defined(_WIN32) || defined(__WIN32__)
-#  include <windows.h>  /* defines _WINDOWS_ macro */
+#if defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#  include <windows.h>
 #endif
 #endif /* PNG_VERSION_INFO_ONLY */
 
@@ -551,13 +550,9 @@
  * functions that are passed far data must be model-independent.
  */
 
-/* Memory model/platform independent fns */
+/* Platform-independent functions */
 #ifndef PNG_ABORT
-#  ifdef _WINDOWS_
-#    define PNG_ABORT() ExitProcess(0)
-#  else
-#    define PNG_ABORT() abort()
-#  endif
+#  define PNG_ABORT() abort()
 #endif
 
 /* These macros may need to be architecture dependent. */
