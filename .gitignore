@@ -69,6 +69,7 @@ pngtest
 pngunknown
 pngvalid
 timepng
+pngout.png
 
 # Libpng CI artifacts
 out/
