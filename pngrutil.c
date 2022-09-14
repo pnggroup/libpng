@@ -2075,14 +2075,17 @@ png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       png_byte buf[1];
       png_crc_read(png_ptr, buf, 1);
       info_ptr->eXIf_buf[i] = buf[0];
-      if (i == 1 && buf[0] != 'M' && buf[0] != 'I'
-                 && info_ptr->eXIf_buf[0] != buf[0])
+      if (i == 1)
       {
-         png_crc_finish(png_ptr, length-i-1);
-         png_chunk_benign_error(png_ptr, "incorrect byte-order specifier");
-         png_free(png_ptr, info_ptr->eXIf_buf);
-         info_ptr->eXIf_buf = NULL;
-         return;
+         if ((buf[0] != 'M' && buf[0] != 'I') ||
+             (info_ptr->eXIf_buf[0] != buf[0]))
+         {
+            png_crc_finish(png_ptr, length - 2);
+            png_chunk_benign_error(png_ptr, "incorrect byte-order specifier");
+            png_free(png_ptr, info_ptr->eXIf_buf);
+            info_ptr->eXIf_buf = NULL;
+            return;
+         }
       }
    }
 
