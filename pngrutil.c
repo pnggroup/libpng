@@ -2123,8 +2123,9 @@ png_handle_hIST(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 
    num = length / 2 ;
 
-   if (num != (unsigned int) png_ptr->num_palette ||
-       num > (unsigned int) PNG_MAX_PALETTE_LENGTH)
+   if (length != num * 2 ||
+       num != (unsigned int)png_ptr->num_palette ||
+       num > (unsigned int)PNG_MAX_PALETTE_LENGTH)
    {
       png_crc_finish(png_ptr, length);
       png_chunk_benign_error(png_ptr, "invalid");
