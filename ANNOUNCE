@@ -1,3 +1,11 @@
+libpng 1.6.39.git
+=================
+
+This is a development version, not intended to be a public release.
+It will be replaced by a public release, or by another development
+version, at a later time.
+
+
 libpng 1.6.38 - September 14, 2022
 ==================================
 
@@ -14,8 +22,8 @@ Source files with LF line endings (for Unix/Linux):
 
 Source files with CRLF line endings (for Windows):
 
- * lp1638.7z (LZMA-compressed, recommended)
- * lp1638.zip
+ * lpng1638.7z (LZMA-compressed, recommended)
+ * lpng1638.zip
 
 Other information:
 
