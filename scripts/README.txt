@@ -13,6 +13,7 @@ pnglibconf.h.prebuilt  =>  Configuration settings
  makefile.atari    =>  Atari makefile
  makefile.bc32     =>  32-bit Borland C++ (all modules compiled in C mode)
  makefile.beos     =>  BeOS makefile
+ makefile.clang    =>  Generic clang makefile
  makefile.darwin   =>  Darwin makefile, for macOS (formerly Mac OS X)
  makefile.dec      =>  DEC Alpha UNIX makefile
  makefile.dj2      =>  DJGPP 2 makefile
