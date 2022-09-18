@@ -867,7 +867,7 @@ struct file
     * signature (in length,type).
     *
     * When a chunk control structure is instantiated these values are copied
-    * into the structure and can then be overritten with the data for the next
+    * into the structure and can then be overwritten with the data for the next
     * chunk.
     */
    fpos_t         data_pos;      /* Position of first byte of chunk data */
