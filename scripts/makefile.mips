@@ -7,31 +7,15 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-# where make install puts libpng.a and png.h
-prefix=/usr/local
-INCPATH=$(prefix)/include
-LIBPATH=$(prefix)/lib
-
-# override DESTDIR= on the make install command line to easily support
-# installing into a temporary location.  Example:
-#
-#    make install DESTDIR=/tmp/build/libpng
-#
-# If you're going to install into a temporary location
-# via DESTDIR, $(DESTDIR)$(prefix) must already exist before
-# you execute make install.
-DESTDIR=
-
 CC=cc
 CPPFLAGS=-I../zlib -DSYSV -Dmips
 CFLAGS=-O -systype sysv -w
 #CFLAGS=-O
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
+AR_RC=ar rc
 #RANLIB=ranlib
 RANLIB=echo
-
-CP=cp
 
 # Pre-built configuration
 # See scripts/pnglibconf.mak for more options
@@ -47,10 +31,10 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
 all: libpng.a pngtest
 
 pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
-	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
+	cp $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
+	$(AR_RC) $@ $(OBJS)
 	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a
@@ -59,22 +43,9 @@ pngtest: pngtest.o libpng.a
 test: pngtest
 	./pngtest
 
-install: libpng.a
-	-@mkdir $(DESTDIR)$(INCPATH)
-	-@mkdir $(DESTDIR)$(INCPATH)/libpng
-	-@mkdir $(DESTDIR)$(LIBPATH)
-	-@rm -f $(DESTDIR)$(INCPATH)/png.h
-	-@rm -f $(DESTDIR)$(INCPATH)/pngconf.h
-	-@rm -f $(DESTDIR)$(INCPATH)/pnglibconf.h
-	cp png.h $(DESTDIR)$(INCPATH)/libpng
-	cp pngconf.h $(DESTDIR)$(INCPATH)/libpng
-	cp pnglibconf.h $(DESTDIR)$(INCPATH)/libpng
-	chmod 644 $(DESTDIR)$(INCPATH)/libpng/png.h
-	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pngconf.h
-	chmod 644 $(DESTDIR)$(INCPATH)/libpng/pnglibconf.h
-	(cd $(DESTDIR)$(INCPATH); ln -f -s libpng/* .)
-	cp libpng.a $(DESTDIR)$(LIBPATH)
-	chmod 644 $(DESTDIR)$(LIBPATH)/libpng.a
+install:
+	@echo "The $@ target is no longer supported by this makefile."
+	@false
 
 clean:
 	rm -f *.o libpng.a pngtest pngout.png pnglibconf.h

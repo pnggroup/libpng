@@ -7,12 +7,6 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-# where make install will put libpng.a and png.h
-#prefix=/usr/local
-prefix=.
-INCPATH=$(prefix)/include
-LIBPATH=$(prefix)/lib
-
 CC=gcc
 CPPFLAGS=-I../zlib -DPNG_NO_SNPRINTF
 CFLAGS=-O
@@ -47,6 +41,11 @@ pngtest: pngtest.o libpng.a
 
 test: pngtest
 	./pngtest
+
+install:
+	@echo "The $@ target is no longer supported by this makefile."
+	@false
+
 clean:
 	$(RM_F) *.o libpng.a pngtest pngout.png pnglibconf.h
 
