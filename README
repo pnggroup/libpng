@@ -144,6 +144,7 @@ Files in this distribution:
       pngwrite.c    =>  High-level write functions
       pngwtran.c    =>  Write data transformations
       pngwutil.c    =>  Write utility functions
+      rfc2083.txt   =>  RFC 2083
       arm           =>  Contains optimized code for the ARM platform
       powerpc       =>  Contains optimized code for the PowerPC platform
       contrib       =>  Contributions
