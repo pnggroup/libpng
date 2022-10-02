@@ -128,7 +128,7 @@ elseif("${OUTPUT}" STREQUAL "scripts/pnglibconf.h.prebuilt")
 
   message(STATUS "Attempting to build scripts/pnglibconf.h.prebuilt")
   message(STATUS "This is a machine generated file, but if you want to make")
-  message(STATUS "a new one simply build the 'genfiles' target, and copy")
+  message(STATUS "a new one simply build the 'png_genfiles' target, and copy")
   message(STATUS "scripts/pnglibconf.out to scripts/pnglibconf.h.prebuilt")
   message(STATUS "AND set PNG_ZLIB_VERNUM to 0 (you MUST do this)")
   message(FATAL_ERROR "Stopping build")
