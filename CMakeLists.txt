@@ -19,6 +19,7 @@
 # Revised by Owen Rudge, 2020
 # Revised by Gleb Mazovetskiy, 2021
 # Revised by Christopher Sean Morrison, 2022
+# Revised by Martin Storsjo, 2022
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -98,8 +99,8 @@ if(TARGET_ARCH MATCHES "^arm" OR
         CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
   else()
     set(PNG_ARM_NEON_POSSIBLE_VALUES check on off)
-    set(PNG_ARM_NEON "check"
-        CACHE STRING "Enable ARM NEON optimizations: check|on|off; check is default")
+    set(PNG_ARM_NEON "off"
+        CACHE STRING "Enable ARM NEON optimizations: check|on|off; off is default")
   endif()
   set_property(CACHE PNG_ARM_NEON
                PROPERTY STRINGS ${PNG_ARM_NEON_POSSIBLE_VALUES})
