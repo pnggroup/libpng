@@ -2981,16 +2981,24 @@ PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
    const char *file_name));
    /* The named file is opened for read and the image header is filled in
     * from the PNG header in the file.
+    *
+    * Returns nonzero value on success, or zero on error.
     */
 
 PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
    FILE* file));
-   /* The PNG header is read from the stdio FILE object. */
+   /* The PNG header is read from the stdio FILE object.
+    *
+    * Returns nonzero value on success, or zero on error.
+    */
 #endif /* STDIO */
 
 PNG_EXPORT(236, int, png_image_begin_read_from_memory, (png_imagep image,
    png_const_voidp memory, size_t size));
-   /* The PNG header is read from the given memory buffer. */
+   /* The PNG header is read from the given memory buffer.
+    *
+    * Returns nonzero value on success, or zero on error.
+    */
 
 PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
    png_const_colorp background, void *buffer, png_int_32 row_stride,
@@ -3025,6 +3033,8 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
     * be at least the size (in bytes) returned by PNG_IMAGE_COLORMAP_SIZE.
     * image->colormap_entries will be updated to the actual number of entries
     * written to the colormap; this may be less than the original value.
+    *
+    * Returns zero on success.
     */
 
 PNG_EXPORT(238, void, png_image_free, (png_imagep image));
@@ -3054,12 +3064,18 @@ PNG_EXPORT(238, void, png_image_free, (png_imagep image));
 PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
    const char *file, int convert_to_8bit, const void *buffer,
    png_int_32 row_stride, const void *colormap));
-   /* Write the image to the named file. */
+   /* Write the image to the named file.
+    *
+    * Returns nonzero value on success, or zero on error.
+    */
 
 PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
    int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
    const void *colormap));
-   /* Write the image to the given (FILE*). */
+   /* Write the image to the given (FILE*).
+    *
+    * Returns nonzero value on success, or zero on error.
+    */
 #endif /* SIMPLIFIED_WRITE_STDIO */
 
 /* With all write APIs if image is in one of the linear formats with 16-bit
@@ -3096,6 +3112,8 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
     *
     * If 'memory' is not NULL it must point to memory[*memory_bytes] of
     * writeable memory.
+    *
+    * Returns nonzero value on success, or zero on error.
     *
     * If the function returns success memory[*memory_bytes] (if 'memory' is not
     * NULL) contains the written PNG data.  *memory_bytes will always be less
