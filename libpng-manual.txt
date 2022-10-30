@@ -4094,18 +4094,24 @@ READ APIs
    int png_image_begin_read_from_file( png_imagep image,
      const char *file_name)
 
-     The named file is opened for read and the image header
-     is filled in from the PNG header in the file.
+      The named file is opened for read and the image header
+      is filled in from the PNG header in the file.
+
+      Returns nonzero value on success, or zero on error.
 
    int png_image_begin_read_from_stdio (png_imagep image,
      FILE* file)
 
       The PNG header is read from the stdio FILE object.
 
+      Returns nonzero value on success, or zero on error.
+
    int png_image_begin_read_from_memory(png_imagep image,
       png_const_voidp memory, size_t size)
 
       The PNG header is read from the given memory buffer.
+
+      Returns nonzero value on success, or zero on error.
 
    int png_image_finish_read(png_imagep image,
       png_colorp background, void *buffer,
@@ -4129,6 +4135,8 @@ READ APIs
 
       For linear output removing the alpha channel is always done
       by compositing on black.
+
+      Returns zero on success.
 
    void png_image_free(png_imagep image)
 
@@ -4162,6 +4170,8 @@ be written:
 
       Write the image to the named file.
 
+      Returns nonzero value on success, or zero on error.
+
    int png_image_write_to_memory (png_imagep image, void *memory,
       png_alloc_size_t * PNG_RESTRICT memory_bytes,
       int convert_to_8_bit, const void *buffer, ptrdiff_t row_stride,
@@ -4169,11 +4179,15 @@ be written:
 
       Write the image to memory.
 
+      Returns nonzero value on success, or zero on error.
+
    int png_image_write_to_stdio(png_imagep image, FILE *file,
       int convert_to_8_bit, const void *buffer,
       png_int_32 row_stride, const void *colormap)
 
       Write the image to the given (FILE*).
+
+      Returns nonzero value on success, or zero on error.
 
 With all write APIs if image is in one of the linear formats with
 (png_uint_16) data then setting convert_to_8_bit will cause the output to be
