@@ -4136,7 +4136,7 @@ READ APIs
       For linear output removing the alpha channel is always done
       by compositing on black.
 
-      Returns zero on success.
+      Returns nonzero value on success, or zero on error.
 
    void png_image_free(png_imagep image)
 
