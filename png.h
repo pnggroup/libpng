@@ -3034,7 +3034,7 @@ PNG_EXPORT(237, int, png_image_finish_read, (png_imagep image,
     * image->colormap_entries will be updated to the actual number of entries
     * written to the colormap; this may be less than the original value.
     *
-    * Returns zero on success.
+    * Returns nonzero value on success, or zero on error.
     */
 
 PNG_EXPORT(238, void, png_image_free, (png_imagep image));
