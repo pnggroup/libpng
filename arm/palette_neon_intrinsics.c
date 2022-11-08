@@ -84,10 +84,10 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
    {
       uint32x4_t cur;
       png_bytep sp = *ssp - i, dp = *ddp - (i << 2);
-      cur = vld1q_dup_u32 (riffled_palette + *(sp - 3));
-      cur = vld1q_lane_u32(riffled_palette + *(sp - 2), cur, 1);
-      cur = vld1q_lane_u32(riffled_palette + *(sp - 1), cur, 2);
-      cur = vld1q_lane_u32(riffled_palette + *(sp - 0), cur, 3);
+      cur = vld1q_dup_u32 ((void *)(riffled_palette + *(sp - 3)));
+      cur = vld1q_lane_u32((void *)(riffled_palette + *(sp - 2)), cur, 1);
+      cur = vld1q_lane_u32((void *)(riffled_palette + *(sp - 1)), cur, 2);
+      cur = vld1q_lane_u32((void *)(riffled_palette + *(sp - 0)), cur, 3);
       vst1q_u32((void *)dp, cur);
    }
    if (i != row_width)
