@@ -138,7 +138,8 @@ AC_STRUCT_TM
 AC_C_RESTRICT
 
 # Checks for library functions.
-AC_CHECK_FUNCS([pow], , AC_CHECK_LIB(m, pow, , AC_MSG_ERROR(cannot find pow)))
+AC_CHECK_FUNCS([pow], ,
+  [AC_CHECK_LIB([m], [pow], , [AC_MSG_ERROR([cannot find pow])])])
 
 # Some later POSIX 1003.1 functions are required for test programs, failure
 # here is soft (the corresponding test program is not built).
@@ -150,8 +151,9 @@ AC_ARG_WITH(zlib-prefix,
       [prefix that may have been used in installed zlib]),
       [ZPREFIX=${withval}],
       [ZPREFIX='z_'])
-AC_CHECK_LIB(z, zlibVersion, ,
-    AC_CHECK_LIB(z, ${ZPREFIX}zlibVersion, , AC_MSG_ERROR(zlib not installed)))
+AC_CHECK_LIB([z], [zlibVersion], ,
+  [AC_CHECK_LIB([z], [${ZPREFIX}zlibVersion], ,
+     [AC_MSG_ERROR([zlib not installed])])])
 
 # The following is for pngvalid, to ensure it catches FP errors even on
 # platforms that don't enable FP exceptions, the function appears in the math
