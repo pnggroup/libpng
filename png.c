@@ -2710,7 +2710,7 @@ png_check_IHDR(png_const_structrp png_ptr,
 
 int /* PRIVATE */
 png_check_fp_number(png_const_charp string, size_t size, int *statep,
-    png_size_tp whereami)
+    size_t *whereami)
 {
    int state = *statep;
    size_t i = *whereami;
