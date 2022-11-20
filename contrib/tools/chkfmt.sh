@@ -1,21 +1,28 @@
 #!/bin/sh
 
-# chkfmt
+# chkfmt.sh
 #
-# COPYRIGHT: Written by John Cunningham Bowler, 2010.
+# COPYRIGHT:
+# Written by John Cunningham Bowler, 2010.
+# Revised by Cosmin Truta, 2022.
 # To the extent possible under law, the author has waived all copyright and
-# related or neighboring rights to this work.  This work is published from:
-# United States.
+# related or neighboring rights to this work.  The author published this work
+# from the United States.
 #
-# Check the format of the source files in the current directory - checks for a
-# line length of 80 characters max and no tab characters.
+# Check the format of the source files in the current directory:
+#
+#  * The lines should not exceed a predefined maximum length.
+#  * Tab characters should appear only where necessary (e.g. in makefiles).
 #
 # Optionally arguments are files or directories to check.
 #
-# -v: output the long lines (makes fixing them easier)
-# -e: spawn an editor for each file that needs a change ($EDITOR must be
-#     defined).  When using -e the script MUST be run from an interactive
-#     command line.
+#  -v: output the long lines (makes fixing them easier)
+#  -e: spawn an editor for each file that needs a change ($EDITOR must be
+#      defined).  When using -e the script MUST be run from an interactive
+#      command line.
+
+script_name=`basename "$0"`
+
 verbose=
 edit=
 vers=
@@ -32,14 +39,14 @@ test "$1" = "-e" && {
       # Copy the standard streams for the editor
       exec 3>&0 4>&1 5>&2
    else
-      echo "chkfmt -e: EDITOR must be defined" >&2
+      echo "$script_name -e: EDITOR must be defined" >&2
       exit 1
    fi
 }
 
 # Function to edit a single file - if the file isn't changed ask the user
-# whether or not to continue.  This stuff only works if the script is run from
-# the command line (otherwise, don't specify -e or you will be sorry).
+# whether or not to continue.  This stuff only works if the script is run
+# from the command line (otherwise, don't specify -e or you will be sorry).
 doed(){
    cp "$file" "$file".orig
    "$EDITOR" "$file" 0>&3 1>&4 2>&5 3>&- 4>&- 5>&- || exit 1
@@ -53,19 +60,22 @@ doed(){
    return 0
 }
 
-# In beta versions the version string which appears in files can be a little
-# long and cause spuriously overlong lines.  To avoid this substitute the version
-# string with a 'standard' version a.b.cc before checking for long lines.
+# In beta versions, the version string which appears in files can be a little
+# long and cause spuriously overlong lines.  To avoid this, substitute the
+# version string with a placeholder string "a.b.cc" before checking for long
+# lines.
+# (Starting from libpng version 1.6.36, we switched to a conventional Git
+# workflow, and we are no longer publishing beta versions.)
 if test -r png.h
 then
    vers="`sed -n -e \
    's/^#define PNG_LIBPNG_VER_STRING .\([0-9]\.[0-9]\.[0-9][0-9a-z]*\).$/\1/p' \
    png.h`"
-   echo "chkfmt: checking version $vers"
+   echo "$script_name: checking version $vers"
 fi
 if test -z "$vers"
 then
-   echo "chkfmt: png.h not found, ignoring version number" >&2
+   echo "$script_name: png.h not found, ignoring version number" >&2
 fi
 
 test -n "$1" || set -- .
@@ -89,13 +99,16 @@ find "$@" \( -type d \( -name '.git' -o -name '.libs' -o -name 'projects' \) \
          check_tabs=
          line_length=100;;
       *.awk)
-         # Includes literal tabs
+         # Allow literal tabs.
          check_tabs=
-         # The following is arbitrary
+         # Mainframe line printer, anyone?
          line_length=132;;
+      */ci_*.sh)
+         check_tabs=yes
+         line_length=100;;
       *contrib/*/*.[ch])
          check_tabs=yes
-         line_length=96;;
+         line_length=100;;
       *)
          check_tabs=yes
          line_length=80;;
