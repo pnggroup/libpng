@@ -2,8 +2,6 @@
  *
  * Copyright (c) 2016 John Cunningham Bowler
  *
- * Last changed in libpng 1.6.24 [August 4, 2016]
- *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
@@ -15,6 +13,7 @@
  * For a more extensive example that uses the transforms see
  * contrib/libtests/pngimage.c in the libpng distribution.
  */
+
 #include "pnglibconf.h" /* To find how libpng was configured. */
 
 #ifdef PNG_PNGCP_TIMING_SUPPORTED
@@ -778,7 +777,7 @@ static void
 set_opt_string(struct display *dp, unsigned int sp)
    /* Add the appropriate option string to dp->curr. */
 {
-   dp->stack[sp].opt_string_end = set_opt_string_(dp, sp, dp->stack[sp].opt, 
+   dp->stack[sp].opt_string_end = set_opt_string_(dp, sp, dp->stack[sp].opt,
       options[dp->stack[sp].opt].values[dp->stack[sp].entry].name);
 }
 
