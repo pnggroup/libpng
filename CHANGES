@@ -6121,6 +6121,8 @@ Version 1.6.39 [November 20, 2022]
     removed the obsolete makefile.cegcc.
   Cleaned up the code and updated the internal documentation.
 
+Version 1.6.40 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
