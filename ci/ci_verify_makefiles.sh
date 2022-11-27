@@ -35,23 +35,14 @@ function ci_init_makefiles {
     CI_SYSTEM_NAME="$(uname -s)"
     CI_MACHINE_NAME="$(uname -m)"
     CI_MAKE="${CI_MAKE:-make}"
-    case "$CI_SYSTEM_NAME" in
-    ( Darwin | *BSD | DragonFly )
-        [[ -x $(command -v clang) ]] && CI_CC="${CI_CC:-clang}" ;;
-    ( * )
-        [[ -x $(command -v gcc) ]] && CI_CC="${CI_CC:-gcc}" ;;
-    esac
-    CI_CC="${CI_CC:-cc}"
     case "$CI_CC" in
     ( *clang* )
         CI_MAKEFILES="${CI_MAKEFILES:-"scripts/makefile.clang"}" ;;
     ( *gcc* )
         CI_MAKEFILES="${CI_MAKEFILES:-"scripts/makefile.gcc"}" ;;
-    ( cc | c89 | c99 )
+    ( * )
         CI_MAKEFILES="${CI_MAKEFILES:-"scripts/makefile.std"}" ;;
     esac
-    CI_LD="${CI_LD:-"$CI_CC"}"
-    CI_LIBS="${CI_LIBS:-"-lz -lm"}"
 }
 
 function ci_trace_makefiles {
@@ -113,7 +104,7 @@ function ci_build_makefiles {
     [[ $CI_RANLIB ]] && ALL_MAKE_VARS+=(RANLIB="$CI_RANLIB")
     [[ $CI_LD ]] && ALL_MAKE_VARS+=(LD="$CI_LD")
     [[ $ALL_LD_FLAGS ]] && ALL_MAKE_VARS+=(LDFLAGS="$ALL_LD_FLAGS")
-    ALL_MAKE_VARS+=(LIBS="$CI_LIBS")
+    [[ $CI_LIBS ]] && ALL_MAKE_VARS+=(LIBS="$CI_LIBS")
     ALL_MAKE_VARS+=($CI_MAKE_VARS)
     # Build!
     ci_spawn cd "$CI_SRCDIR"

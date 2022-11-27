@@ -38,7 +38,8 @@ function ci_init_cmake {
     CI_CMAKE="${CI_CMAKE:-cmake}"
     CI_CTEST="${CI_CTEST:-ctest}"
     CI_CMAKE_BUILD_TYPE="${CI_CMAKE_BUILD_TYPE:-Release}"
-    [[ -x $(command -v ninja) ]] && CI_CMAKE_GENERATOR="${CI_CMAKE_GENERATOR:-Ninja}"
+    [[ -x $(command -v ninja) ]] &&
+        CI_CMAKE_GENERATOR="${CI_CMAKE_GENERATOR:-Ninja}"
     if [[ $CI_CMAKE_GENERATOR == "Visual Studio"* ]]
     then
         # Initialize the CI_...DIR_NATIVE variables, for the benefit of
@@ -46,11 +47,11 @@ function ci_init_cmake {
         # can only be used inside Bash-on-Windows.
         mkdir -p "$CI_BUILDDIR"
         mkdir -p "$CI_INSTALLDIR"
-        if [[ -x $CYGPATH ]]
+        if [[ -x $(command -v cygpath) ]]
         then
-            CI_SRCDIR_NATIVE="$("$CYGPATH" -w "$CI_SRCDIR")"
-            CI_BUILDDIR_NATIVE="$("$CYGPATH" -w "$CI_BUILDDIR")"
-            CI_INSTALLDIR_NATIVE="$("$CYGPATH" -w "$CI_INSTALLDIR")"
+            CI_SRCDIR_NATIVE="$(cygpath -w "$CI_SRCDIR")"
+            CI_BUILDDIR_NATIVE="$(cygpath -w "$CI_BUILDDIR")"
+            CI_INSTALLDIR_NATIVE="$(cygpath -w "$CI_INSTALLDIR")"
         else
             CI_SRCDIR_NATIVE="$(cd "$CI_SRCDIR" ; pwd -W || pwd -P)"
             CI_BUILDDIR_NATIVE="$(cd "$CI_BUILDDIR" ; pwd -W || pwd -P)"
@@ -61,7 +62,8 @@ function ci_init_cmake {
         [[ $TEMP && ( $Temp || $temp ) ]] && unset TEMP
         [[ $TMP && ( $Tmp || $tmp ) ]] && unset TMP
         # Ensure that CI_CMAKE_GENERATOR_PLATFORM is initialized for this generator.
-        [[ $CI_CMAKE_GENERATOR_PLATFORM ]] || ci_err "missing: \$CI_CMAKE_GENERATOR_PLATFORM"
+        [[ $CI_CMAKE_GENERATOR_PLATFORM ]] ||
+            ci_err "missing: \$CI_CMAKE_GENERATOR_PLATFORM"
     fi
 }
 
@@ -83,6 +85,7 @@ function ci_trace_cmake {
     ci_info "environment option: \$CI_CMAKE_GENERATOR_PLATFORM: '$CI_CMAKE_GENERATOR_PLATFORM'"
     ci_info "environment option: \$CI_CMAKE_BUILD_TYPE: '$CI_CMAKE_BUILD_TYPE'"
     ci_info "environment option: \$CI_CMAKE_BUILD_FLAGS: '$CI_CMAKE_BUILD_FLAGS'"
+    ci_info "environment option: \$CI_CMAKE_TOOLCHAIN_FILE: '$CI_CMAKE_TOOLCHAIN_FILE'"
     ci_info "environment option: \$CI_CMAKE_VARS: '$CI_CMAKE_VARS'"
     ci_info "environment option: \$CI_CTEST: '$CI_CTEST'"
     ci_info "environment option: \$CI_CTEST_FLAGS: '$CI_CTEST_FLAGS'"
@@ -113,16 +116,24 @@ function ci_build_cmake {
     ci_spawn "$(command -v "$CI_CTEST")" --version
     # Initialize ALL_CC_FLAGS as a string.
     local ALL_CC_FLAGS="$CI_CC_FLAGS"
-    [[ $CI_SANITIZERS ]] && ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_CC_FLAGS"
+    [[ $CI_SANITIZERS ]] &&
+        ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_CC_FLAGS"
     # Initialize ALL_CMAKE_VARS, ALL_CMAKE_BUILD_FLAGS and ALL_CTEST_FLAGS as arrays.
     local -a ALL_CMAKE_VARS=()
-    [[ $CI_CC ]] && ALL_CMAKE_VARS+=(-DCMAKE_C_COMPILER="$CI_CC")
-    [[ $ALL_CC_FLAGS ]] && ALL_CMAKE_VARS+=(-DCMAKE_C_FLAGS="$ALL_CC_FLAGS")
-    [[ $CI_AR ]] && ALL_CMAKE_VARS+=(-DCMAKE_AR="$CI_AR")
-    [[ $CI_RANLIB ]] && ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$CI_RANLIB")
+    [[ $CI_CMAKE_TOOLCHAIN_FILE ]] &&
+        ALL_CMAKE_VARS+=(-DCMAKE_TOOLCHAIN_FILE="$CI_CMAKE_TOOLCHAIN_FILE")
+    [[ $CI_CC ]] &&
+        ALL_CMAKE_VARS+=(-DCMAKE_C_COMPILER="$CI_CC")
+    [[ $ALL_CC_FLAGS ]] &&
+        ALL_CMAKE_VARS+=(-DCMAKE_C_FLAGS="$ALL_CC_FLAGS")
+    [[ $CI_AR ]] &&
+        ALL_CMAKE_VARS+=(-DCMAKE_AR="$CI_AR")
+    [[ $CI_RANLIB ]] &&
+        ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$CI_RANLIB")
     ALL_CMAKE_VARS+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
     ALL_CMAKE_VARS+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
-    [[ $CI_NO_TEST ]] && ALL_CMAKE_VARS+=(-DPNG_TESTS=OFF)
+    [[ $CI_NO_TEST ]] &&
+        ALL_CMAKE_VARS+=(-DPNG_TESTS=OFF)
     ALL_CMAKE_VARS+=($CI_CMAKE_VARS)
     local -a ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
     local -a ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
