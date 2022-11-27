@@ -17,11 +17,11 @@ env:
   - AUTOMATION=cmake CI_NO_TEST=1
   - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=ON" CI_SANITIZERS="address,undefined"
   - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF" CI_SANITIZERS="address,undefined"
-  - AUTOMATION=autotools CI_NO_TEST=1
-  - AUTOMATION=autotools CI_CONFIGURE_FLAGS="--enable-hardware-optimizations"
-  - AUTOMATION=autotools CI_CONFIGURE_FLAGS="--disable-hardware-optimizations"
-  - AUTOMATION=legacy CI_NO_TEST=1
-  - AUTOMATION=legacy CI_SANITIZERS="address,undefined"
+  - AUTOMATION=configure CI_NO_TEST=1
+  - AUTOMATION=configure CI_CONFIGURE_FLAGS="--enable-hardware-optimizations"
+  - AUTOMATION=configure CI_CONFIGURE_FLAGS="--disable-hardware-optimizations"
+  - AUTOMATION=makefiles CI_NO_TEST=1
+  - AUTOMATION=makefiles CI_SANITIZERS="address,undefined"
 
 matrix:
   include:
@@ -39,7 +39,7 @@ before_script:
   - 'export CI_CTEST_FLAGS="--parallel 2"'
   - 'export CI_MAKE_FLAGS=-j2'
   - 'export CI_CC=$TRAVIS_COMPILER'
-  - 'export CI_LEGACY_MAKEFILES="scripts/makefile.$TRAVIS_COMPILER scripts/makefile.std"'
+  - 'export CI_MAKEFILES="scripts/makefile.$TRAVIS_COMPILER scripts/makefile.std"'
 
 script:
-  - './ci/ci_$AUTOMATION.sh'
+  - './ci/ci_verify_$AUTOMATION.sh'

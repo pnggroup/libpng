@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-# ci_autotools.sh
-# Continuously integrate libpng using the GNU Autotools.
+# ci_verify_configure.sh
+# Continuously integrate libpng using the configure script.
 #
 # Copyright (c) 2019-2022 Cosmin Truta.
 #
@@ -13,8 +13,8 @@ set -e
 CI_SCRIPTNAME="$(basename "$0")"
 CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR/out/autotools.build"
-CI_INSTALLDIR="$CI_SRCDIR/out/autotools.install"
+CI_BUILDDIR="$CI_SRCDIR/out/configure.build"
+CI_INSTALLDIR="$CI_SRCDIR/out/configure.install"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
@@ -32,7 +32,7 @@ function ci_spawn {
     "$@"
 }
 
-function ci_init_autotools {
+function ci_init_configure {
     CI_SYSTEM_NAME="$(uname -s)"
     CI_MACHINE_NAME="$(uname -m)"
     CI_MAKE="${CI_MAKE:-make}"
@@ -44,7 +44,7 @@ function ci_init_autotools {
     [[ ! $CI_MAKE_VARS ]] || ci_err "unexpected: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
 }
 
-function ci_trace_autotools {
+function ci_trace_configure {
     ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
@@ -80,7 +80,7 @@ function ci_trace_autotools {
     ci_info "## END OF CONFIGURATION ##"
 }
 
-function ci_build_autotools {
+function ci_build_configure {
     ci_info "## START OF BUILD ##"
     # Export the configure build environment.
     [[ $CI_CC ]] && ci_spawn export CC="$CI_CC"
@@ -108,10 +108,10 @@ function ci_build_autotools {
     ci_info "## END OF BUILD ##"
 }
 
-ci_init_autotools
-ci_trace_autotools
+ci_init_configure
+ci_trace_configure
 [[ $# -eq 0 ]] || {
     ci_info "note: this program accepts environment options only"
     ci_err "unexpected command arguments: '$*'"
 }
-ci_build_autotools
+ci_build_configure

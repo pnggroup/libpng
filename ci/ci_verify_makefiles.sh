@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# ci_legacy.sh
+# ci_verify_makefiles.sh
 # Continuously integrate libpng using the legacy makefiles.
 #
 # Copyright (c) 2019-2022 Cosmin Truta.
@@ -31,7 +31,7 @@ function ci_spawn {
     "$@"
 }
 
-function ci_init_legacy {
+function ci_init_makefiles {
     CI_SYSTEM_NAME="$(uname -s)"
     CI_MACHINE_NAME="$(uname -m)"
     CI_MAKE="${CI_MAKE:-make}"
@@ -44,23 +44,23 @@ function ci_init_legacy {
     CI_CC="${CI_CC:-cc}"
     case "$CI_CC" in
     ( *clang* )
-        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.clang"}" ;;
+        CI_MAKEFILES="${CI_MAKEFILES:-"scripts/makefile.clang"}" ;;
     ( *gcc* )
-        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.gcc"}" ;;
+        CI_MAKEFILES="${CI_MAKEFILES:-"scripts/makefile.gcc"}" ;;
     ( cc | c89 | c99 )
-        CI_LEGACY_MAKEFILES="${CI_LEGACY_MAKEFILES:-"scripts/makefile.std"}" ;;
+        CI_MAKEFILES="${CI_MAKEFILES:-"scripts/makefile.std"}" ;;
     esac
     CI_LD="${CI_LD:-"$CI_CC"}"
     CI_LIBS="${CI_LIBS:-"-lz -lm"}"
 }
 
-function ci_trace_legacy {
+function ci_trace_makefiles {
     ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
     ci_info "source directory: $CI_SRCDIR"
     ci_info "build directory: $CI_BUILDDIR"
-    ci_info "environment option: \$CI_LEGACY_MAKEFILES: '$CI_LEGACY_MAKEFILES'"
+    ci_info "environment option: \$CI_MAKEFILES: '$CI_MAKEFILES'"
     ci_info "environment option: \$CI_MAKE: '$CI_MAKE'"
     ci_info "environment option: \$CI_MAKE_FLAGS: '$CI_MAKE_FLAGS'"
     ci_info "environment option: \$CI_MAKE_VARS: '$CI_MAKE_VARS'"
@@ -90,7 +90,7 @@ function ci_trace_legacy {
     ci_info "## END OF CONFIGURATION ##"
 }
 
-function ci_build_legacy {
+function ci_build_makefiles {
     ci_info "## START OF BUILD ##"
     # Initialize ALL_CC_FLAGS and ALL_LD_FLAGS as strings.
     local ALL_CC_FLAGS="$CI_CC_FLAGS"
@@ -118,7 +118,7 @@ function ci_build_legacy {
     # Build!
     ci_spawn cd "$CI_SRCDIR"
     local MY_MAKEFILE
-    for MY_MAKEFILE in $CI_LEGACY_MAKEFILES
+    for MY_MAKEFILE in $CI_MAKEFILES
     do
         ci_info "using makefile: $MY_MAKEFILE"
         ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
@@ -138,10 +138,10 @@ function ci_build_legacy {
     ci_info "## END OF BUILD ##"
 }
 
-ci_init_legacy
-ci_trace_legacy
+ci_init_makefiles
+ci_trace_makefiles
 [[ $# -eq 0 ]] || {
     ci_info "note: this program accepts environment options only"
     ci_err "unexpected command arguments: '$*'"
 }
-ci_build_legacy
+ci_build_makefiles

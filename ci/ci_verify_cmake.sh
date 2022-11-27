@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# ci_cmake.sh
+# ci_verify_cmake.sh
 # Continuously integrate libpng using CMake.
 #
 # Copyright (c) 2019-2022 Cosmin Truta.

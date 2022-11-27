@@ -28,16 +28,16 @@ environment:
       AUTOMATION: cmake
       ARCH: x86_64
     - TOOLCHAIN: msys2
-      AUTOMATION: autotools
+      AUTOMATION: configure
       ARCH: i686
     - TOOLCHAIN: msys2
-      AUTOMATION: autotools
+      AUTOMATION: configure
       ARCH: x86_64
     - TOOLCHAIN: msys2
-      AUTOMATION: legacy
+      AUTOMATION: makefiles
       ARCH: i686
     - TOOLCHAIN: msys2
-      AUTOMATION: legacy
+      AUTOMATION: makefiles
       ARCH: x86_64
 
 install:
@@ -57,13 +57,13 @@ before_build:
   - 'set CI_CMAKE_BUILD_FLAGS=--parallel 2'
   - 'set CI_CTEST_FLAGS=--parallel 2'
   - 'set CI_MAKE_FLAGS=-j2'
-  - 'set CI_LEGACY_MAKEFILES=scripts/makefile.gcc scripts/makefile.msys scripts/makefile.std'
+  - 'set CI_MAKEFILES=scripts/makefile.gcc scripts/makefile.msys scripts/makefile.std'
 
 build_script:
-  - 'if "%TOOLCHAIN%"=="vstudio" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_cmake.sh"'
-  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="cmake" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_cmake.sh"'
-  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="autotools" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_autotools.sh"'
-  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="legacy" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_legacy.sh"'
+  - 'if "%TOOLCHAIN%"=="vstudio" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_verify_cmake.sh"'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="cmake" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_verify_cmake.sh"'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="configure" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_verify_configure.sh"'
+  - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="makefiles" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_verify_makefiles.sh"'
 
 cache:
   - C:\tools\vcpkg\installed
