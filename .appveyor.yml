@@ -45,8 +45,8 @@ install:
   - 'if "%TOOLCHAIN%"=="vstudio" C:\tools\vcpkg\vcpkg.exe integrate install'
 
 before_build:
-  - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_VARS=-DCMAKE_TOOLCHAIN_FILE=C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake'
   - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_GENERATOR=Visual Studio 17 2022'
+  - 'if "%TOOLCHAIN%"=="vstudio" set CI_CMAKE_TOOLCHAIN_FILE=C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x86" set CI_CMAKE_GENERATOR_PLATFORM=Win32'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x64" set CI_CMAKE_GENERATOR_PLATFORM=x64'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="arm64" set CI_CMAKE_GENERATOR_PLATFORM=ARM64'
