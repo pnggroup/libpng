@@ -150,6 +150,8 @@ if(TARGET_ARCH MATCHES "^arm" OR
   else()
     add_definitions(-DPNG_ARM_NEON_OPT=0)
   endif()
+else()
+  add_definitions(-DPNG_ARM_NEON_OPT=0)
 endif()
 
 # Set definitions and sources for PowerPC.
