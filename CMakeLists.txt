@@ -21,6 +21,7 @@
 # Revised by Christopher Sean Morrison, 2022
 # Revised by Martin Storsjo, 2022
 # Revised by Jon Creighton, 2023
+# Revised by Gunther Nikl, 2023
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -243,13 +244,19 @@ VERS_2 {
 } VERS_1;
 ")
   set(CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
-  set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS} "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/conftest.map'")
+  set(CMAKE_REQUIRED_FLAGS
+      ${CMAKE_REQUIRED_FLAGS}
+      ${CMAKE_SHARED_LIBRARY_C_FLAGS}
+      "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/conftest.map'")
   check_c_source_compiles("void sym(void) {}
 void sym2(void) {}
 int main(void) {return 0;}
 " HAVE_LD_VERSION_SCRIPT)
   if(NOT HAVE_LD_VERSION_SCRIPT)
-    set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE} "-Wl,-M -Wl,${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
+    set(CMAKE_REQUIRED_FLAGS
+        ${CMAKE_REQUIRED_FLAGS_SAVE}
+        ${CMAKE_SHARED_LIBRARY_C_FLAGS}
+        "-Wl,-M -Wl,${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
   check_c_source_compiles("void sym(void) {}
 void sym2(void) {}
 int main(void) {return 0;}
