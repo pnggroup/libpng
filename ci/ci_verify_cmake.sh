@@ -4,7 +4,7 @@ set -e
 # ci_verify_cmake.sh
 # Continuously integrate libpng using CMake.
 #
-# Copyright (c) 2019-2022 Cosmin Truta.
+# Copyright (c) 2019-2023 Cosmin Truta.
 #
 # This software is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -13,8 +13,14 @@ set -e
 CI_SCRIPTNAME="$(basename "$0")"
 CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
 CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR/out/cmake.build"
-CI_INSTALLDIR="$CI_SRCDIR/out/cmake.install"
+CI_BUILDDIR="$CI_SRCDIR/out/ci_verify_cmake.build"
+CI_INSTALLDIR="$CI_SRCDIR/out/ci_verify_cmake.install"
+
+# Keep the following relative paths in sync with the absolute paths.
+# We use them for the benefit of native Windows tools that might be
+# otherwise confused by the path encoding used by Bash-on-Windows.
+CI_SRCDIR_FROM_BUILDDIR="../.."
+CI_INSTALLDIR_FROM_BUILDDIR="../ci_verify_cmake.install"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
@@ -32,7 +38,7 @@ function ci_spawn {
     "$@"
 }
 
-function ci_init_cmake {
+function ci_init_cmake_build {
     CI_SYSTEM_NAME="$(uname -s)"
     CI_MACHINE_NAME="$(uname -m)"
     CI_CMAKE="${CI_CMAKE:-cmake}"
@@ -42,21 +48,6 @@ function ci_init_cmake {
         CI_CMAKE_GENERATOR="${CI_CMAKE_GENERATOR:-Ninja}"
     if [[ $CI_CMAKE_GENERATOR == "Visual Studio"* ]]
     then
-        # Initialize the CI_...DIR_NATIVE variables, for the benefit of
-        # the native Windows build tools. The regular CI_...DIR variables
-        # can only be used inside Bash-on-Windows.
-        mkdir -p "$CI_BUILDDIR"
-        mkdir -p "$CI_INSTALLDIR"
-        if [[ -x $(command -v cygpath) ]]
-        then
-            CI_SRCDIR_NATIVE="$(cygpath -w "$CI_SRCDIR")"
-            CI_BUILDDIR_NATIVE="$(cygpath -w "$CI_BUILDDIR")"
-            CI_INSTALLDIR_NATIVE="$(cygpath -w "$CI_INSTALLDIR")"
-        else
-            CI_SRCDIR_NATIVE="$(cd "$CI_SRCDIR" ; pwd -W || pwd -P)"
-            CI_BUILDDIR_NATIVE="$(cd "$CI_BUILDDIR" ; pwd -W || pwd -P)"
-            CI_INSTALLDIR_NATIVE="$(cd "$CI_INSTALLDIR" ; pwd -W || pwd -P)"
-        fi
         # Clean up incidental mixtures of Windows and Bash-on-Windows
         # environment variables, to avoid confusing MSBuild.
         [[ $TEMP && ( $Temp || $temp ) ]] && unset TEMP
@@ -67,19 +58,13 @@ function ci_init_cmake {
     fi
 }
 
-function ci_trace_cmake {
+function ci_trace_cmake_build {
     ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
     ci_info "source directory: $CI_SRCDIR"
-    [[ $CI_SRCDIR_NATIVE ]] &&
-        ci_info "source directory (native): $CI_SRCDIR_NATIVE"
     ci_info "build directory: $CI_BUILDDIR"
-    [[ $CI_BUILDDIR_NATIVE ]] &&
-        ci_info "build directory (native): $CI_BUILDDIR_NATIVE"
     ci_info "install directory: $CI_INSTALLDIR"
-    [[ $CI_INSTALLDIR_NATIVE ]] &&
-        ci_info "install directory (native): $CI_INSTALLDIR_NATIVE"
     ci_info "environment option: \$CI_CMAKE: '$CI_CMAKE'"
     ci_info "environment option: \$CI_CMAKE_GENERATOR: '$CI_CMAKE_GENERATOR'"
     ci_info "environment option: \$CI_CMAKE_GENERATOR_PLATFORM: '$CI_CMAKE_GENERATOR_PLATFORM'"
@@ -99,8 +84,6 @@ function ci_trace_cmake {
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
     ci_info "executable: \$CI_CMAKE: $(command -V "$CI_CMAKE")"
     ci_info "executable: \$CI_CTEST: $(command -V "$CI_CTEST")"
-    [[ $CI_CMAKE_GENERATOR == *"Ninja"* ]] &&
-        ci_info "executable: $(command -V ninja)"
     [[ $CI_CC ]] &&
         ci_info "executable: \$CI_CC: $(command -V "$CI_CC")"
     [[ $CI_AR ]] &&
@@ -110,16 +93,25 @@ function ci_trace_cmake {
     ci_info "## END OF CONFIGURATION ##"
 }
 
+function ci_cleanup_old_cmake_build {
+    [[ ! -e $CI_BUILDDIR ]] ||
+        ci_spawn rm -fr "$CI_BUILDDIR"
+    [[ ! -e $CI_INSTALLDIR ]] ||
+        ci_spawn rm -fr "$CI_INSTALLDIR"
+}
+
 function ci_build_cmake {
     ci_info "## START OF BUILD ##"
     ci_spawn "$(command -v "$CI_CMAKE")" --version
     ci_spawn "$(command -v "$CI_CTEST")" --version
+    [[ $CI_CMAKE_GENERATOR == *"Ninja"* ]] &&
+        ci_spawn "$(command -v ninja)" --version
     # Initialize ALL_CC_FLAGS as a string.
     local ALL_CC_FLAGS="$CI_CC_FLAGS"
     [[ $CI_SANITIZERS ]] &&
         ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_CC_FLAGS"
     # Initialize ALL_CMAKE_VARS, ALL_CMAKE_BUILD_FLAGS and ALL_CTEST_FLAGS as arrays.
-    local -a ALL_CMAKE_VARS=()
+    local ALL_CMAKE_VARS=()
     [[ $CI_CMAKE_TOOLCHAIN_FILE ]] &&
         ALL_CMAKE_VARS+=(-DCMAKE_TOOLCHAIN_FILE="$CI_CMAKE_TOOLCHAIN_FILE")
     [[ $CI_CC ]] &&
@@ -135,23 +127,26 @@ function ci_build_cmake {
     [[ $CI_NO_TEST ]] &&
         ALL_CMAKE_VARS+=(-DPNG_TESTS=OFF)
     ALL_CMAKE_VARS+=($CI_CMAKE_VARS)
-    local -a ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
-    local -a ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
-    # Initialize SRCDIR_NATIVE and INSTALLDIR_NATIVE.
-    local SRCDIR_NATIVE="${CI_SRCDIR_NATIVE:-"$CI_SRCDIR"}"
-    local INSTALLDIR_NATIVE="${CI_INSTALLDIR_NATIVE:-"$CI_INSTALLDIR"}"
+    local ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
+    local ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
     # Export the CMake environment variables.
     [[ $CI_CMAKE_GENERATOR ]] &&
         ci_spawn export CMAKE_GENERATOR="$CI_CMAKE_GENERATOR"
     [[ $CI_CMAKE_GENERATOR_PLATFORM ]] &&
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
     # Build and install.
-    ci_spawn rm -fr "$CI_BUILDDIR" "$CI_INSTALLDIR"
+    # Use $CI_SRCDIR_FROM_BUILDDIR and $CI_INSTALLDIR_FROM_BUILDDIR
+    # instead of $CI_SRCDIR and $CI_INSTALLDIR from this point onwards.
     ci_spawn mkdir -p "$CI_BUILDDIR"
     ci_spawn cd "$CI_BUILDDIR"
-    ci_spawn "$CI_CMAKE" "${ALL_CMAKE_VARS[@]}" \
-                         -DCMAKE_INSTALL_PREFIX="$INSTALLDIR_NATIVE" \
-                         "$SRCDIR_NATIVE"
+    [[ $CI_SRCDIR -ef $CI_SRCDIR_FROM_BUILDDIR ]] ||
+        ci_err "assertion failed: testing: '$CI_SRCDIR' -ef '$CI_SRCDIR_FROM_BUILDDIR'"
+    ci_spawn mkdir -p "$CI_INSTALLDIR"
+    [[ $CI_INSTALLDIR -ef $CI_INSTALLDIR_FROM_BUILDDIR ]] ||
+        ci_err "assertion failed: testing: '$CI_INSTALLDIR' -ef '$CI_INSTALLDIR_FROM_BUILDDIR'"
+    ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_INSTALLDIR_FROM_BUILDDIR" \
+                         "${ALL_CMAKE_VARS[@]}" \
+                         "$CI_SRCDIR_FROM_BUILDDIR"
     ci_spawn "$CI_CMAKE" --build . \
                          --config "$CI_CMAKE_BUILD_TYPE" \
                          "${ALL_CMAKE_BUILD_FLAGS[@]}"
@@ -171,10 +166,15 @@ function ci_build_cmake {
     ci_info "## END OF BUILD ##"
 }
 
-ci_init_cmake
-ci_trace_cmake
-[[ $# -eq 0 ]] || {
-    ci_info "note: this program accepts environment options only"
-    ci_err "unexpected command arguments: '$*'"
+function main {
+    [[ $# -eq 0 ]] || {
+        ci_info "note: this program accepts environment options only"
+        ci_err "unexpected command arguments: '$*'"
+    }
+    ci_init_cmake_build
+    ci_trace_cmake_build
+    ci_cleanup_old_cmake_build
+    ci_build_cmake
 }
-ci_build_cmake
+
+main "$@"
