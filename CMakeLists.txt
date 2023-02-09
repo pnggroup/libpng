@@ -949,29 +949,46 @@ endif()
 
 # Create pkgconfig files.
 # We use the same files like ./configure, so we have to set its vars.
-# Only do this on Windows for Cygwin - the files don't make much sense
-# outside of a UNIX look-alike.
-if(NOT WIN32 OR CYGWIN OR MINGW)
-  set(prefix      ${CMAKE_INSTALL_PREFIX})
-  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-  set(libdir      ${CMAKE_INSTALL_FULL_LIBDIR})
-  set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
-  set(LIBS        "-lz -lm")
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
-                 @ONLY)
-  create_symlink(libpng.pc FILE ${PNGLIB_NAME}.pc)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
-                 @ONLY)
-  create_symlink(libpng-config FILE ${PNGLIB_NAME}-config)
+set(prefix      ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix ${CMAKE_INSTALL_PREFIX})
+set(libdir      ${CMAKE_INSTALL_FULL_LIBDIR})
+set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
+get_target_property(ZLIB_LIB ZLIB::ZLIB IMPORTED_LOCATION)
+if("${ZLIB_LIB}" STREQUAL "ZLIB_LIB-NOTFOUND")
+  if(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "")
+    string(TOUPPER ${CMAKE_BUILD_TYPE} ZLIB_CFG)
+    # Sadly, no IMPORTED_LOCATION_RELWITHDEBINFO property in ZLIB::ZLIB?
+    if("${ZLIB_CFG}" STREQUAL "RELWITHDEBINFO" OR
+       "${ZLIB_CFG}" STREQUAL "MINSIZEREL")
+      get_target_property(ZLIB_LIB ZLIB::ZLIB IMPORTED_LOCATION_RELEASE)
+    else()
+      get_target_property(ZLIB_LIB ZLIB::ZLIB IMPORTED_LOCATION_${ZLIB_CFG})
+    endif()
+  endif()
 endif()
+set(LIBS    "${ZLIB_LIB} ${M_LIBRARY}")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc @ONLY)
+create_symlink(libpng.pc FILE ${PNGLIB_NAME}.pc)
 
 # Set up links.
 if(PNG_SHARED)
   set_target_properties(png_shared PROPERTIES
                         VERSION ${PNGLIB_SHARED_VERSION}
                         SOVERSION ${PNGLIB_SHARED_SOVERSION})
+endif()
+
+if(NOT WIN32 OR CYGWIN OR MINGW)
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
+    pc_file${PNGLIB_NAME}-config @ONLY)
+  create_symlink(libpng-config FILE ${PNGLIB_NAME}-config)
+else()
+  foreach (pc_file ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc)
+    file(READ ${pc_file} png_pc_orig)
+    string(REPLACE "-lpng${PNGLIB_MAJOR}${PNGLIB_MINOR}" "libpng${PNGLIB_MAJOR}${PNGLIB_MINOR}.lib" png_pc_out ${png_pc_orig})
+    string(REPLACE "Requires.private: zlib" "Requires.private:" png_pc_out ${png_pc_out})
+    file(WRITE ${pc_file} ${png_pc_out})
+  endforeach()
 endif()
 
 # Install.
@@ -1034,13 +1051,13 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
   install(FILES png.5
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
   # Install the pkg-config files.
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
   if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
             DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
             DESTINATION ${CMAKE_INSTALL_BINDIR})
   endif()
