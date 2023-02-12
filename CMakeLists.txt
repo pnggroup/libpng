@@ -54,6 +54,13 @@ set(PNGLIB_SHARED_VERSION ${PNGLIB_ABI_VERSION}.${PNGLIB_REVISION}.${PNGLIB_SUBR
 set(PNG_PREFIX ""
     CACHE STRING "Prefix to prepend to the API function names")
 
+# Allow the users to override the postfix appended to debug library file names.
+# Previously, we used to set CMAKE_DEBUG_POSTFIX globally. That variable should
+# not be cached, however, because doing so would affect all projects processed
+# after libpng, in unexpected and undesirable ways.
+set(PNG_DEBUG_POSTFIX "d"
+    CACHE STRING "Postfix to append to library file names under the Debug configuration")
+
 # Allow the users to import their own extra configuration settings.
 set(DFA_XTRA ""
     CACHE FILEPATH "File containing extra configuration settings")
@@ -228,9 +235,6 @@ if(TARGET_ARCH MATCHES "mipsel*" OR
 endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
-
-# Distinguish between debug and release builds.
-set(CMAKE_DEBUG_POSTFIX "d")
 
 option(ld-version-script "Enable linker version script" ON)
 if(ld-version-script AND NOT ANDROID AND NOT APPLE)
@@ -639,6 +643,7 @@ if(PNG_SHARED)
   list(APPEND PNG_LIBRARY_TARGETS png_shared)
   set_target_properties(png_shared PROPERTIES
                         OUTPUT_NAME "${PNG_SHARED_OUTPUT_NAME}"
+                        DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}"
                         VERSION "${PNGLIB_SHARED_VERSION}"
                         SOVERSION "${PNGLIB_ABI_VERSION}")
   if(UNIX AND AWK)
@@ -661,7 +666,8 @@ if(PNG_STATIC)
   add_dependencies(png_static png_genfiles)
   list(APPEND PNG_LIBRARY_TARGETS png_static)
   set_target_properties(png_static PROPERTIES
-                        OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}")
+                        OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}"
+                        DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}")
   target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
