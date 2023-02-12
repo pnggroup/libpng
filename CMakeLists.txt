@@ -20,6 +20,7 @@
 # Revised by Owen Rudge, 2020
 # Revised by Gleb Mazovetskiy, 2021
 # Revised by Christopher Sean Morrison, 2022
+# Revised by B. Scott Michel, 2022
 # Revised by Jeremy Maitin-Shepard, 2022
 # Revised by Martin Storsjo, 2022
 # Revised by Jon Creighton, 2023
@@ -44,15 +45,31 @@ set(PNGLIB_MINOR 6)
 set(PNGLIB_REVISION 40)
 #set(PNGLIB_SUBREVISION 0)
 set(PNGLIB_SUBREVISION "git")
-set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_REVISION})
-set(PNGLIB_SHARED_SOVERSION ${PNGLIB_MAJOR}${PNGLIB_MINOR})
-set(PNGLIB_SHARED_VERSION ${PNGLIB_SHARED_SOVERSION}.${PNGLIB_REVISION}.${PNGLIB_SUBREVISION})
+set(PNGLIB_ABI_VERSION ${PNGLIB_MAJOR}${PNGLIB_MINOR})
+set(PNGLIB_SHARED_VERSION ${PNGLIB_ABI_VERSION}.${PNGLIB_REVISION}.${PNGLIB_SUBREVISION})
 
-# Allow users to specify location of zlib.
+# Allow the users to specify an application-specific API prefix for libpng
+# vendoring purposes. A standard libpng build should have no such prefix.
+set(PNG_PREFIX ""
+    CACHE STRING "Prefix to prepend to the API function names")
+
+# Allow the users to import their own extra configuration settings.
+set(DFA_XTRA ""
+    CACHE FILEPATH "File containing extra configuration settings")
+
+# Allow the users to configure the following build options.
+option(PNG_SHARED "Build libpng as a shared lib" ON)
+option(PNG_STATIC "Build libpng as a static lib" ON)
+option(PNG_FRAMEWORK "Build libpng as a Mac OS X framework" OFF)
+option(PNG_EXECUTABLES "Build libpng executables" ON)
+option(PNG_TESTS "Build libpng tests" ON)
+option(PNG_DEBUG "Enable debug output" OFF)
+option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
+
+# Allow the users to specify a location of zlib.
 # Useful if zlib is being built alongside this as a sub-project.
-option(PNG_BUILD_ZLIB "Custom zlib Location, else find_package is used" OFF)
-
+option(PNG_BUILD_ZLIB "Custom zlib location, else find_package is used" OFF)
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
   include_directories(${ZLIB_INCLUDE_DIRS})
@@ -67,20 +84,6 @@ else()
   # libm is not needed and/or not available.
   set(M_LIBRARY "")
 endif()
-
-# Public CMake configuration variables.
-option(PNG_SHARED "Build shared lib" ON)
-option(PNG_STATIC "Build static lib" ON)
-option(PNG_EXECUTABLES "Build libpng executables" ON)
-option(PNG_TESTS "Build libpng tests" ON)
-
-# Many more configuration options could be added here.
-option(PNG_FRAMEWORK "Build OS X framework" OFF)
-option(PNG_DEBUG "Build with debug output" OFF)
-option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
-
-set(PNG_PREFIX "" CACHE STRING "Prefix to add to the API function names")
-set(DFA_XTRA "" CACHE FILEPATH "File containing extra configuration settings")
 
 # CMake currently sets CMAKE_SYSTEM_PROCESSOR to one of x86_64 or arm64 on macOS,
 # based upon the OS architecture, not the target architecture. As such, we need
@@ -225,9 +228,6 @@ if(TARGET_ARCH MATCHES "mipsel*" OR
 endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
-
-# Set PNG_LIB_NAME.
-set(PNG_LIB_NAME png${PNGLIB_MAJOR}${PNGLIB_MINOR})
 
 # Distinguish between debug and release builds.
 set(CMAKE_DEBUG_POSTFIX "d")
@@ -600,7 +600,8 @@ set(png_fix_itxt_sources
     contrib/tools/png-fix-itxt.c
 )
 
-if(MSVC)
+if(MSVC OR (WIN32 AND (CMAKE_C_COMPILER_ID MATCHES ".*Clang")))
+  add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif()
 
@@ -608,23 +609,38 @@ if(PNG_DEBUG)
   add_definitions(-DPNG_DEBUG)
 endif()
 
-# Now build our target.
+# Now build our targets.
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS})
 
-set(PNG_LIB_TARGETS "")
+# Initialize the list of libpng library targets.
+set(PNG_LIBRARY_TARGETS "")
+
+# Initialize the libpng library file names.
+if(UNIX
+   OR (WIN32 AND NOT "${CMAKE_SHARED_LIBRARY_PREFIX}" STREQUAL "")
+   OR (WIN32 AND NOT "${CMAKE_STATIC_LIBRARY_PREFIX}" STREQUAL ""))
+  # We are on a Unix or Unix-like toolchain like the GNU toolchain on Windows.
+  # Library file names are expected to have an implicit prefix such as "lib".
+  # Let CMake prepend and append its usual prefixes and suffixes by default.
+  set(PNG_SHARED_OUTPUT_NAME "png${PNGLIB_ABI_VERSION}")
+  set(PNG_STATIC_OUTPUT_NAME "png${PNGLIB_ABI_VERSION}")
+else()
+  # We are, most likely, on a Windows toolchain like MSVC, Clang on Windows,
+  # Borland/Embarcadero, etc. We need to specify the "libpng" name explicitly.
+  # We also need to use a custom suffix, in order to distinguish between the
+  # shared import library name and the static library name.
+  set(PNG_SHARED_OUTPUT_NAME "libpng${PNGLIB_ABI_VERSION}")
+  set(PNG_STATIC_OUTPUT_NAME "libpng${PNGLIB_ABI_VERSION}_static")
+endif()
 
 if(PNG_SHARED)
   add_library(png_shared SHARED ${libpng_sources})
   add_dependencies(png_shared png_genfiles)
-  list(APPEND PNG_LIB_TARGETS png_shared)
-  set_target_properties(png_shared PROPERTIES OUTPUT_NAME ${PNG_LIB_NAME})
-  if(MSVC)
-    # MSVC does not append 'lib'. Do it here, to have consistent names.
-    set_target_properties(png_shared PROPERTIES PREFIX "lib")
-    set_target_properties(png_shared PROPERTIES IMPORT_PREFIX "lib")
-  endif()
-  target_link_libraries(png_shared ${ZLIB_LIBRARIES} ${M_LIBRARY})
-
+  list(APPEND PNG_LIBRARY_TARGETS png_shared)
+  set_target_properties(png_shared PROPERTIES
+                        OUTPUT_NAME "${PNG_SHARED_OUTPUT_NAME}"
+                        VERSION "${PNGLIB_SHARED_VERSION}"
+                        SOVERSION "${PNGLIB_ABI_VERSION}")
   if(UNIX AND AWK)
     if(HAVE_LD_VERSION_SCRIPT)
       set_target_properties(png_shared PROPERTIES
@@ -637,46 +653,35 @@ if(PNG_SHARED)
   if(WIN32)
     set_target_properties(png_shared PROPERTIES DEFINE_SYMBOL PNG_BUILD_DLL)
   endif()
+  target_link_libraries(png_shared ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(PNG_STATIC)
   add_library(png_static STATIC ${libpng_sources})
   add_dependencies(png_static png_genfiles)
-  list(APPEND PNG_LIB_TARGETS png_static)
-  # MSVC doesn't use a different file extension for shared vs. static
-  # libs. We are able to change OUTPUT_NAME to remove the _static
-  # for all other platforms.
-  if(NOT MSVC)
-    set_target_properties(png_static PROPERTIES
-                          OUTPUT_NAME "${PNG_LIB_NAME}")
-  else()
-    set_target_properties(png_static PROPERTIES
-                          OUTPUT_NAME "${PNG_LIB_NAME}_static")
-  endif()
-  if(MSVC)
-    # MSVC does not append 'lib'. Do it here, to have consistent name.
-    set_target_properties(png_static PROPERTIES PREFIX "lib")
-  endif()
+  list(APPEND PNG_LIBRARY_TARGETS png_static)
+  set_target_properties(png_static PROPERTIES
+                        OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}")
   target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK)
   add_library(png_framework SHARED ${libpng_sources})
   add_dependencies(png_framework png_genfiles)
-  list(APPEND PNG_LIB_TARGETS png_framework)
+  list(APPEND PNG_LIBRARY_TARGETS png_framework)
   set_target_properties(png_framework PROPERTIES
                         FRAMEWORK TRUE
-                        FRAMEWORK_VERSION ${PNGLIB_VERSION}
-                        MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PNGLIB_MAJOR}.${PNGLIB_MINOR}
-                        MACOSX_FRAMEWORK_BUNDLE_VERSION ${PNGLIB_VERSION}
-                        MACOSX_FRAMEWORK_IDENTIFIER org.libpng.libpng
+                        FRAMEWORK_VERSION "${PNGLIB_VERSION}"
+                        MACOSX_FRAMEWORK_SHORT_VERSION_STRING "${PNGLIB_MAJOR}.${PNGLIB_MINOR}"
+                        MACOSX_FRAMEWORK_BUNDLE_VERSION "${PNGLIB_VERSION}"
+                        MACOSX_FRAMEWORK_IDENTIFIER "org.libpng.libpng"
                         XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
                         PUBLIC_HEADER "${libpng_public_hdrs}"
-                        OUTPUT_NAME png)
+                        OUTPUT_NAME "png")
   target_link_libraries(png_framework ${ZLIB_LIBRARIES} ${M_LIBRARY})
 endif()
 
-if(NOT PNG_LIB_TARGETS)
+if(NOT PNG_LIBRARY_TARGETS)
   message(SEND_ERROR "No library variant selected to build. "
                      "Please enable at least one of the following options: "
                      "PNG_SHARED, PNG_STATIC, PNG_FRAMEWORK")
@@ -958,25 +963,18 @@ if(NOT WIN32 OR CYGWIN OR MINGW)
   set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
   set(LIBS        "-lz -lm")
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+                 ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
                  @ONLY)
-  create_symlink(libpng.pc FILE ${PNGLIB_NAME}.pc)
+  create_symlink(libpng.pc FILE libpng${PNGLIB_ABI_VERSION}.pc)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+                 ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
                  @ONLY)
-  create_symlink(libpng-config FILE ${PNGLIB_NAME}-config)
-endif()
-
-# Set up links.
-if(PNG_SHARED)
-  set_target_properties(png_shared PROPERTIES
-                        VERSION ${PNGLIB_SHARED_VERSION}
-                        SOVERSION ${PNGLIB_SHARED_SOVERSION})
+  create_symlink(libpng-config FILE libpng${PNGLIB_ABI_VERSION}-config)
 endif()
 
 # Install.
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
-  install(TARGETS ${PNG_LIB_TARGETS}
+  install(TARGETS ${PNG_LIBRARY_TARGETS}
           EXPORT libpng
           RUNTIME DESTINATION bin
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -1011,13 +1009,13 @@ if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
   install(FILES ${libpng_public_hdrs}
           DESTINATION include)
   install(FILES ${libpng_public_hdrs}
-          DESTINATION include/${PNGLIB_NAME})
+          DESTINATION include/libpng${PNGLIB_ABI_VERSION})
 endif()
 if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
   if(NOT WIN32 OR CYGWIN OR MINGW)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
             DESTINATION bin)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
             DESTINATION bin)
   endif()
 endif()
@@ -1039,9 +1037,9 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
     install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
             DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}.pc
+    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/${PNGLIB_NAME}-config
+    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
             DESTINATION ${CMAKE_INSTALL_BINDIR})
   endif()
 endif()
@@ -1050,7 +1048,7 @@ endif()
 if(NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL)
   install(EXPORT libpng
           DESTINATION lib/libpng
-          FILE lib${PNG_LIB_NAME}.cmake)
+          FILE libpng${PNGLIB_ABI_VERSION}.cmake)
 endif()
 
 # TODO: Create MSVC import lib for MinGW-compiled shared lib.
