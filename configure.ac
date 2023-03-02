@@ -89,6 +89,22 @@ fi
 DFNCPP="$CPP"
 AC_SUBST(DFNCPP)
 
+AC_ARG_ENABLE([png-tests],
+   AS_HELP_STRING([--enable-png-tests],
+      [enable building of the test programs. This is done by default - use]
+      [--disable-png-tests to change this.]))
+
+AM_CONDITIONAL([ENABLE_PNG_TESTS],
+   [test "$enable_png_tests" != "no"])
+
+AC_ARG_ENABLE([png-tools],
+   AS_HELP_STRING([--enable-png-tools],
+      [enable building of the tool programs. This is done by default - use]
+      [--disable-png-tools to change this.]))
+
+AM_CONDITIONAL([ENABLE_PNG_TOOLS],
+   [test "$enable_png_tools" != "no"])
+
 # -Werror cannot be passed to GCC in CFLAGS because configure will fail
 # (it checks the compiler with a program that generates a warning).
 # Add the following option to deal with this:
