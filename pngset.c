@@ -401,6 +401,7 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
 
    memset(info_ptr->pcal_params, 0, ((unsigned int)nparams + 1) *
        (sizeof (png_charp)));
+   info_ptr->free_me |= PNG_FREE_PCAL;
 
    for (i = 0; i < nparams; i++)
    {
@@ -421,7 +422,6 @@ png_set_pCAL(png_const_structrp png_ptr, png_inforp info_ptr,
    }
 
    info_ptr->valid |= PNG_INFO_pCAL;
-   info_ptr->free_me |= PNG_FREE_PCAL;
 }
 #endif
 
