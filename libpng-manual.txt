@@ -496,7 +496,7 @@ You can set up a callback function to handle any unknown chunks in the
 input stream. You must supply the function
 
     read_chunk_callback(png_structp png_ptr,
-         png_unknown_chunkp chunk);
+         png_unknown_chunkp chunk)
     {
        /* The unknown chunk structure contains your
           chunk data, along with similar data for any other
@@ -547,7 +547,7 @@ a progress meter or the like.  It's demonstrated in pngtest.c.
 You must supply a function
 
     void read_row_callback(png_structp png_ptr,
-       png_uint_32 row, int pass);
+       png_uint_32 row, int pass)
     {
       /* put your code here */
     }
@@ -2844,7 +2844,7 @@ a progress meter or the like.  It's demonstrated in pngtest.c.
 You must supply a function
 
     void write_row_callback(png_structp png_ptr, png_uint_32 row,
-       int pass);
+       int pass)
     {
       /* put your code here */
     }
