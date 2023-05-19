@@ -25,6 +25,7 @@
 # Revised by Martin Storsjo, 2022
 # Revised by Jon Creighton, 2023
 # Revised by Gunther Nikl, 2023
+# Revised by Tyler Kropp, 2023
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -938,7 +939,7 @@ function(create_symlink DEST_FILE)
                          POST_BUILD
                          COMMAND "${CMAKE_COMMAND}"
                                  -E copy_if_different
-                                 $<TARGET_LINKER_FILE_NAME:${_SYM_TARGET}>
+                                 $<TARGET_LINKER_FILE_DIR:${_SYM_TARGET}>/$<TARGET_LINKER_FILE_NAME:${_SYM_TARGET}>
                                  $<TARGET_LINKER_FILE_DIR:${_SYM_TARGET}>/${DEST_FILE})
     else()
       add_custom_command(TARGET ${_SYM_TARGET}
