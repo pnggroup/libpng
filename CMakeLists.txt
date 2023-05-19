@@ -929,7 +929,7 @@ function(create_symlink DEST_FILE)
                          POST_BUILD
                          COMMAND "${CMAKE_COMMAND}"
                                  -E copy_if_different
-                                 $<TARGET_LINKER_FILE_NAME:${_SYM_TARGET}>
+                                 $<TARGET_LINKER_FILE_DIR:${_SYM_TARGET}>/$<TARGET_LINKER_FILE_NAME:${_SYM_TARGET}>
                                  $<TARGET_LINKER_FILE_DIR:${_SYM_TARGET}>/${DEST_FILE})
     else()
       add_custom_command(TARGET ${_SYM_TARGET}
