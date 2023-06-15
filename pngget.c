@@ -21,7 +21,18 @@ png_get_valid(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_uint_32 flag)
 {
    if (png_ptr != NULL && info_ptr != NULL)
+   {
+#ifdef PNG_READ_tRNS_SUPPORTED
+      /* png_handle_PLTE() may have canceled a valid tRNS chunk but left the
+       * 'valid' flag for the detection of duplicate chunks. Do not report a
+       * valid tRNS chunk in this case.
+       */
+      if (flag == PNG_INFO_tRNS && png_ptr->num_trans == 0)
+         return(0);
+#endif
+
       return(info_ptr->valid & flag);
+   }
 
    return(0);
 }
