@@ -5927,7 +5927,7 @@ Version 1.6.32beta03 [August 2, 2017]
     (Bug report from the OSS-fuzz project).
 
 Version 1.6.32beta04 [August 2, 2017]
-  Replaced local eXIf_buf with info_ptr-eXIf_buf in png_handle_eXIf().
+  Replaced local eXIf_buf with info_ptr->eXIf_buf in png_handle_eXIf().
   Update libpng.3 and libpng-manual.txt about eXIf functions.
 
 Version 1.6.32beta05 [August 2, 2017]
@@ -6121,7 +6121,13 @@ Version 1.6.39 [November 20, 2022]
     removed the obsolete makefile.cegcc.
   Cleaned up the code and updated the internal documentation.
 
-Version 1.6.40 [TODO]
+Version 1.6.40 [June 21, 2023]
+  Fixed the eXIf chunk multiplicity checks.
+  Fixed a memory leak in pCAL processing.
+  Corrected the validity report about tRNS inside png_get_valid().
+  Fixed various build issues on *BSD, Mac and Windows.
+  Updated the configurations and the scripts for continuous integration.
+  Cleaned up the code, the build scripts, and the documentation.
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
