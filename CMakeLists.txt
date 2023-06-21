@@ -240,38 +240,36 @@ option(ld-version-script "Enable linker version script" ON)
 if(ld-version-script AND NOT ANDROID AND NOT APPLE)
   # Check if LD supports linker scripts.
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "
-VERS_1 {
-        global: sym1;
-        local: *;
-};
-
-VERS_2 {
-        global: sym2;
-                main;
-} VERS_1;
+VERS_1 { global: sym1; local: *; };
+VERS_2 { global: sym2; main; } VERS_1;
 ")
-  set(CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
-  set(CMAKE_REQUIRED_FLAGS
-      ${CMAKE_REQUIRED_FLAGS}
-      ${CMAKE_SHARED_LIBRARY_C_FLAGS}
-      "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/conftest.map'")
+  set(_SAVED_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+  if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "^SunOS")
+    # Avoid using CMAKE_SHARED_LIBRARY_C_FLAGS in version script checks on
+    # Solaris, because of an incompatibility with the Solaris link editor.
+    list(APPEND CMAKE_REQUIRED_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
+  endif()
+  list(APPEND CMAKE_REQUIRED_FLAGS "-Wl,--version-script='${CMAKE_CURRENT_BINARY_DIR}/conftest.map'")
   check_c_source_compiles("
 void sym1(void) {}
 void sym2(void) {}
-int main(void) {return 0;}
+int main(void) { return 0; }
 " HAVE_LD_VERSION_SCRIPT)
   if(NOT HAVE_LD_VERSION_SCRIPT)
-    set(CMAKE_REQUIRED_FLAGS
-        ${CMAKE_REQUIRED_FLAGS_SAVE}
-        ${CMAKE_SHARED_LIBRARY_C_FLAGS}
-        "-Wl,-M -Wl,${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
-  check_c_source_compiles("
+    set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
+    if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "^SunOS")
+      # Again, avoid using CMAKE_SHARED_LIBRARY_C_FLAGS in version script
+      # checks on Solaris.
+      list(APPEND CMAKE_REQUIRED_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
+    endif()
+    list(APPEND CMAKE_REQUIRED_FLAGS "-Wl,-M -Wl,${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
+    check_c_source_compiles("
 void sym1(void) {}
 void sym2(void) {}
-int main(void) {return 0;}
+int main(void) { return 0; }
 " HAVE_SOLARIS_LD_VERSION_SCRIPT)
   endif()
-  set(CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
+  set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
 endif()
 
