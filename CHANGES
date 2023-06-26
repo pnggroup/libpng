@@ -6129,6 +6129,8 @@ Version 1.6.40 [June 21, 2023]
   Updated the configurations and the scripts for continuous integration.
   Cleaned up the code, the build scripts, and the documentation.
 
+Version 1.6.41 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement

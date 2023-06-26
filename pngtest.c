@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Copyright (c) 2018-2019 Cosmin Truta
+ * Copyright (c) 2018-2023 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -2155,4 +2155,4 @@ main(void)
 #endif
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_40 Your_png_h_is_not_version_1_6_40;
+typedef png_libpng_version_1_6_41_git Your_png_h_is_not_version_1_6_41_git;
