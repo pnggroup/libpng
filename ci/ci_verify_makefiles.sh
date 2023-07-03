@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
-# ci_verify_makefiles.sh
-# Continuously integrate libpng using the legacy makefiles.
-#
 # Copyright (c) 2019-2023 Cosmin Truta.
 #
-# This software is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer
-# and license in png.h.
+# Use, modification and distribution are subject
+# to the Boost Software License, Version 1.0.
+# See the accompanying file LICENSE_BSL_1_0.txt
+# or visit http://www.boost.org/LICENSE_1_0.txt
+#
+# SPDX-License-Identifier: BSL-1.0
 
 CI_SCRIPTNAME="$(basename "$0")"
 CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
