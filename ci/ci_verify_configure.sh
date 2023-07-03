@@ -10,47 +10,30 @@ set -e
 #
 # SPDX-License-Identifier: BSL-1.0
 
-CI_SCRIPTNAME="$(basename "$0")"
-CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
-CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR/out/ci_verify_configure.build"
-CI_INSTALLDIR="$CI_SRCDIR/out/ci_verify_configure.install"
+source "$(dirname "$0")/lib/ci.lib.sh"
+cd "$CI_TOPLEVEL_DIR"
 
-function ci_info {
-    printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
-}
+CI_SRC_DIR="$CI_TOPLEVEL_DIR"
+CI_BUILD_DIR="$CI_TOPLEVEL_DIR/out/ci_verify_configure.build"
+CI_INSTALL_DIR="$CI_TOPLEVEL_DIR/out/ci_verify_configure.install"
 
-function ci_err {
-    printf >&2 "%s: error: %s\\n" "$CI_SCRIPTNAME" "$*"
-    exit 2
-}
-
-function ci_spawn {
-    printf >&2 "%s: executing:" "$CI_SCRIPTNAME"
-    printf >&2 " %q" "$@"
-    printf >&2 "\\n"
-    "$@"
-}
-
-function ci_init_configure_build {
-    CI_SYSTEM_NAME="$(uname -s)"
-    CI_MACHINE_NAME="$(uname -m)"
+function ci_init_build {
     CI_MAKE="${CI_MAKE:-make}"
     # Set CI_CC to cc by default, if the cc command is available.
     # The configure script defaults CC to gcc, which is not always a good idea.
     [[ -x $(command -v cc) ]] && CI_CC="${CI_CC:-cc}"
     # Ensure that the CI_ variables that cannot be customized reliably are not initialized.
-    [[ ! $CI_CONFIGURE_VARS ]] || ci_err "unexpected: \$CI_CONFIGURE_VARS='$CI_CONFIGURE_VARS'"
-    [[ ! $CI_MAKE_VARS ]] || ci_err "unexpected: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
+    [[ ! $CI_CONFIGURE_VARS ]] || ci_err "unsupported: \$CI_CONFIGURE_VARS='$CI_CONFIGURE_VARS'"
+    [[ ! $CI_MAKE_VARS ]] || ci_err "unsupported: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
 }
 
-function ci_trace_configure_build {
+function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
-    ci_info "source directory: $CI_SRCDIR"
-    ci_info "build directory: $CI_BUILDDIR"
-    ci_info "install directory: $CI_INSTALLDIR"
+    ci_info "source directory: $CI_SRC_DIR"
+    ci_info "build directory: $CI_BUILD_DIR"
+    ci_info "install directory: $CI_INSTALL_DIR"
     ci_info "environment option: \$CI_CONFIGURE_FLAGS: '$CI_CONFIGURE_FLAGS'"
     ci_info "environment option: \$CI_MAKE: '$CI_MAKE'"
     ci_info "environment option: \$CI_MAKE_FLAGS: '$CI_MAKE_FLAGS'"
@@ -80,14 +63,17 @@ function ci_trace_configure_build {
     ci_info "## END OF CONFIGURATION ##"
 }
 
-function ci_cleanup_old_configure_build {
-    [[ ! -e $CI_BUILDDIR ]] ||
-        ci_spawn rm -fr "$CI_BUILDDIR"
-    [[ ! -e $CI_INSTALLDIR ]] ||
-        ci_spawn rm -fr "$CI_INSTALLDIR"
+function ci_cleanup_old_build {
+    if [[ -e $CI_BUILD_DIR || -e $CI_INSTALL_DIR ]]
+    then
+        ci_info "## START OF PRE-BUILD CLEANUP ##"
+        ci_spawn rm -fr "$CI_BUILD_DIR"
+        ci_spawn rm -fr "$CI_INSTALL_DIR"
+        ci_info "## END OF PRE-BUILD CLEANUP ##"
+    fi
 }
 
-function ci_build_configure {
+function ci_build {
     ci_info "## START OF BUILD ##"
     # Export the configure build environment.
     [[ $CI_CC ]] && ci_spawn export CC="$CI_CC"
@@ -103,9 +89,9 @@ function ci_build_configure {
         ci_spawn export LDFLAGS="-fsanitize=$CI_SANITIZERS $LDFLAGS"
     }
     # Build and install.
-    ci_spawn mkdir -p "$CI_BUILDDIR"
-    ci_spawn cd "$CI_BUILDDIR"
-    ci_spawn "$CI_SRCDIR/configure" --prefix="$CI_INSTALLDIR" $CI_CONFIGURE_FLAGS
+    ci_spawn mkdir -p "$CI_BUILD_DIR"
+    ci_spawn cd "$CI_BUILD_DIR"
+    ci_spawn "$CI_SRC_DIR/configure" --prefix="$CI_INSTALL_DIR" $CI_CONFIGURE_FLAGS
     ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS
     [[ $CI_NO_TEST ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS test
     [[ $CI_NO_INSTALL ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
@@ -117,12 +103,12 @@ function ci_build_configure {
 function main {
     [[ $# -eq 0 ]] || {
         ci_info "note: this program accepts environment options only"
-        ci_err "unexpected command arguments: '$*'"
+        ci_err "unsupported command argument: '$1'"
     }
-    ci_init_configure_build
-    ci_trace_configure_build
-    ci_cleanup_old_configure_build
-    ci_build_configure
+    ci_init_build
+    ci_trace_build
+    ci_cleanup_old_build
+    ci_build
 }
 
 main "$@"

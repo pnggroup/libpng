@@ -10,37 +10,20 @@ set -e
 #
 # SPDX-License-Identifier: BSL-1.0
 
-CI_SCRIPTNAME="$(basename "$0")"
-CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
-CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR/out/ci_verify_cmake.build"
-CI_INSTALLDIR="$CI_SRCDIR/out/ci_verify_cmake.install"
+source "$(dirname "$0")/lib/ci.lib.sh"
+cd "$CI_TOPLEVEL_DIR"
+
+CI_SRC_DIR="$CI_TOPLEVEL_DIR"
+CI_BUILD_DIR="$CI_TOPLEVEL_DIR/out/ci_verify_cmake.build"
+CI_INSTALL_DIR="$CI_TOPLEVEL_DIR/out/ci_verify_cmake.install"
 
 # Keep the following relative paths in sync with the absolute paths.
 # We use them for the benefit of native Windows tools that might be
 # otherwise confused by the path encoding used by Bash-on-Windows.
-CI_SRCDIR_FROM_BUILDDIR="../.."
-CI_INSTALLDIR_FROM_BUILDDIR="../ci_verify_cmake.install"
+CI_BUILD_TO_SRC_RELDIR="../.."
+CI_BUILD_TO_INSTALL_RELDIR="../ci_verify_cmake.install"
 
-function ci_info {
-    printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
-}
-
-function ci_err {
-    printf >&2 "%s: error: %s\\n" "$CI_SCRIPTNAME" "$*"
-    exit 2
-}
-
-function ci_spawn {
-    printf >&2 "%s: executing:" "$CI_SCRIPTNAME"
-    printf >&2 " %q" "$@"
-    printf >&2 "\\n"
-    "$@"
-}
-
-function ci_init_cmake_build {
-    CI_SYSTEM_NAME="$(uname -s)"
-    CI_MACHINE_NAME="$(uname -m)"
+function ci_init_build {
     CI_CMAKE="${CI_CMAKE:-cmake}"
     CI_CTEST="${CI_CTEST:-ctest}"
     CI_CMAKE_BUILD_TYPE="${CI_CMAKE_BUILD_TYPE:-Release}"
@@ -58,13 +41,13 @@ function ci_init_cmake_build {
     fi
 }
 
-function ci_trace_cmake_build {
+function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
     ci_info "system name: $CI_SYSTEM_NAME"
     ci_info "machine hardware name: $CI_MACHINE_NAME"
-    ci_info "source directory: $CI_SRCDIR"
-    ci_info "build directory: $CI_BUILDDIR"
-    ci_info "install directory: $CI_INSTALLDIR"
+    ci_info "source directory: $CI_SRC_DIR"
+    ci_info "build directory: $CI_BUILD_DIR"
+    ci_info "install directory: $CI_INSTALL_DIR"
     ci_info "environment option: \$CI_CMAKE: '$CI_CMAKE'"
     ci_info "environment option: \$CI_CMAKE_GENERATOR: '$CI_CMAKE_GENERATOR'"
     ci_info "environment option: \$CI_CMAKE_GENERATOR_PLATFORM: '$CI_CMAKE_GENERATOR_PLATFORM'"
@@ -93,14 +76,17 @@ function ci_trace_cmake_build {
     ci_info "## END OF CONFIGURATION ##"
 }
 
-function ci_cleanup_old_cmake_build {
-    [[ ! -e $CI_BUILDDIR ]] ||
-        ci_spawn rm -fr "$CI_BUILDDIR"
-    [[ ! -e $CI_INSTALLDIR ]] ||
-        ci_spawn rm -fr "$CI_INSTALLDIR"
+function ci_cleanup_old_build {
+    if [[ -e $CI_BUILD_DIR || -e $CI_INSTALL_DIR ]]
+    then
+        ci_info "## START OF PRE-BUILD CLEANUP ##"
+        ci_spawn rm -fr "$CI_BUILD_DIR"
+        ci_spawn rm -fr "$CI_INSTALL_DIR"
+        ci_info "## END OF PRE-BUILD CLEANUP ##"
+    fi
 }
 
-function ci_build_cmake {
+function ci_build {
     ci_info "## START OF BUILD ##"
     ci_spawn "$(command -v "$CI_CMAKE")" --version
     ci_spawn "$(command -v "$CI_CTEST")" --version
@@ -135,18 +121,16 @@ function ci_build_cmake {
     [[ $CI_CMAKE_GENERATOR_PLATFORM ]] &&
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
     # Build and install.
-    # Use $CI_SRCDIR_FROM_BUILDDIR and $CI_INSTALLDIR_FROM_BUILDDIR
-    # instead of $CI_SRCDIR and $CI_INSTALLDIR from this point onwards.
-    ci_spawn mkdir -p "$CI_BUILDDIR"
-    ci_spawn cd "$CI_BUILDDIR"
-    [[ $CI_SRCDIR -ef $CI_SRCDIR_FROM_BUILDDIR ]] ||
-        ci_err "assertion failed: testing: '$CI_SRCDIR' -ef '$CI_SRCDIR_FROM_BUILDDIR'"
-    ci_spawn mkdir -p "$CI_INSTALLDIR"
-    [[ $CI_INSTALLDIR -ef $CI_INSTALLDIR_FROM_BUILDDIR ]] ||
-        ci_err "assertion failed: testing: '$CI_INSTALLDIR' -ef '$CI_INSTALLDIR_FROM_BUILDDIR'"
-    ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_INSTALLDIR_FROM_BUILDDIR" \
+    # Use $CI_BUILD_TO_SRC_RELDIR and $CI_BUILD_TO_INSTALL_RELDIR
+    # instead of $CI_SRC_DIR and $CI_INSTALL_DIR from this point onwards.
+    ci_spawn mkdir -p "$CI_BUILD_DIR"
+    ci_spawn cd "$CI_BUILD_DIR"
+    ci_assert "$CI_SRC_DIR" -ef "$CI_BUILD_TO_SRC_RELDIR"
+    ci_spawn mkdir -p "$CI_INSTALL_DIR"
+    ci_assert "$CI_INSTALL_DIR" -ef "$CI_BUILD_TO_INSTALL_RELDIR"
+    ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_BUILD_TO_INSTALL_RELDIR" \
                          "${ALL_CMAKE_VARS[@]}" \
-                         "$CI_SRCDIR_FROM_BUILDDIR"
+                         "$CI_BUILD_TO_SRC_RELDIR"
     ci_spawn "$CI_CMAKE" --build . \
                          --config "$CI_CMAKE_BUILD_TYPE" \
                          "${ALL_CMAKE_BUILD_FLAGS[@]}"
@@ -169,12 +153,12 @@ function ci_build_cmake {
 function main {
     [[ $# -eq 0 ]] || {
         ci_info "note: this program accepts environment options only"
-        ci_err "unexpected command arguments: '$*'"
+        ci_err "unsupported command argument: '$1'"
     }
-    ci_init_cmake_build
-    ci_trace_cmake_build
-    ci_cleanup_old_cmake_build
-    ci_build_cmake
+    ci_init_build
+    ci_trace_build
+    ci_cleanup_old_build
+    ci_build
 }
 
 main "$@"
