@@ -26,8 +26,10 @@ CI_SCRIPT_DIR="$(cd "$(dirname -- "$0")" && pwd)"
 CI_TOPLEVEL_DIR="$(cd "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # Initialize the global constants CI_{HOST,TARGET}_{SYSTEM,MACHINE}.
-CI_SYSTEM_NAME="${CI_SYSTEM_NAME:-"$(uname -s)"}"
-CI_MACHINE_NAME="${CI_MACHINE_NAME:-"$(uname -m)"}"
+CI_HOST_SYSTEM="${CI_HOST_SYSTEM:-"$(uname -s | tr 'A-Z-' 'a-z_')"}"
+CI_HOST_MACHINE="${CI_HOST_MACHINE:-"$(uname -m | tr 'A-Z-' 'a-z_')"}"
+CI_TARGET_SYSTEM="${CI_TARGET_SYSTEM:-"$CI_HOST_SYSTEM"}"
+CI_TARGET_MACHINE="${CI_TARGET_MACHINE:-"$CI_HOST_MACHINE"}"
 
 function ci_info {
     printf >&2 "%s: %s\\n" "$CI_SCRIPT_NAME" "$*"
@@ -66,4 +68,5 @@ function ci_spawn {
 # Ensure that the initialization is correct.
 ci_assert "$CI_TOPLEVEL_DIR/ci/lib/ci.lib.sh" -ef "${BASH_SOURCE[0]}"
 ci_assert "$CI_SCRIPT_DIR/$CI_SCRIPT_NAME" -ef "$0"
-ci_assert -n "$CI_SYSTEM_NAME" -a -n "$CI_MACHINE_NAME"
+ci_assert -n "$CI_HOST_SYSTEM" -a -n "$CI_HOST_MACHINE"
+ci_assert -n "$CI_TARGET_SYSTEM" -a -n "$CI_TARGET_MACHINE"

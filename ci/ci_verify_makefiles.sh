@@ -30,8 +30,12 @@ function ci_init_build {
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
-    ci_info "system name: $CI_SYSTEM_NAME"
-    ci_info "machine hardware name: $CI_MACHINE_NAME"
+    ci_info "host system: $CI_HOST_SYSTEM"
+    ci_info "host machine hardware: $CI_HOST_MACHINE"
+    [[ "$CI_TARGET_SYSTEM" != "$CI_HOST_SYSTEM" ]] &&
+        ci_info "target system: $CI_TARGET_SYSTEM"
+    [[ "$CI_TARGET_MACHINE" != "$CI_HOST_MACHINE" ]] &&
+        ci_info "target machine hardware: $CI_TARGET_MACHINE"
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "environment option: \$CI_MAKEFILES: '$CI_MAKEFILES'"
     ci_info "environment option: \$CI_MAKE: '$CI_MAKE'"

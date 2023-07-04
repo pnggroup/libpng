@@ -15,8 +15,9 @@ source "$(dirname "$0")/lib/ci.lib.sh"
 cd "$CI_TOPLEVEL_DIR"
 
 CI_SRC_DIR="$CI_TOPLEVEL_DIR"
-CI_BUILD_DIR="$CI_TOPLEVEL_DIR/out/ci_verify_cmake.build"
-CI_INSTALL_DIR="$CI_TOPLEVEL_DIR/out/ci_verify_cmake.install"
+CI_OUT_DIR="$CI_TOPLEVEL_DIR/out"
+CI_BUILD_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.build"
+CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.install"
 
 # Keep the following relative paths in sync with the absolute paths.
 # We use them for the benefit of native Windows tools that might be
@@ -44,8 +45,12 @@ function ci_init_build {
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
-    ci_info "system name: $CI_SYSTEM_NAME"
-    ci_info "machine hardware name: $CI_MACHINE_NAME"
+    ci_info "host system: $CI_HOST_SYSTEM"
+    ci_info "host machine hardware: $CI_HOST_MACHINE"
+    [[ "$CI_TARGET_SYSTEM" != "$CI_HOST_SYSTEM" ]] &&
+        ci_info "target system: $CI_TARGET_SYSTEM"
+    [[ "$CI_TARGET_MACHINE" != "$CI_HOST_MACHINE" ]] &&
+        ci_info "target machine hardware: $CI_TARGET_MACHINE"
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "build directory: $CI_BUILD_DIR"
     ci_info "install directory: $CI_INSTALL_DIR"
