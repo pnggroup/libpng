@@ -88,7 +88,7 @@ function ci_build {
     [[ $CI_CPP_FLAGS ]] && ci_spawn export CPPFLAGS="$CI_CPP_FLAGS"
     [[ $CI_AR ]] && ci_spawn export AR="$CI_AR"
     [[ $CI_RANLIB ]] && ci_spawn export RANLIB="$CI_RANLIB"
-    [[ $CI_LD ]] && ci_spawn export CPP="$CI_LD"
+    [[ $CI_LD ]] && ci_spawn export LD="$CI_LD"
     [[ $CI_LD_FLAGS ]] && ci_spawn export LDFLAGS="$CI_LD_FLAGS"
     [[ $CI_SANITIZERS ]] && {
         ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS ${CFLAGS:-"-O2"}"
