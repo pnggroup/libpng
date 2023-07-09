@@ -23,7 +23,7 @@ CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE
 # We use them for the benefit of native Windows tools that might be
 # otherwise confused by the path encoding used by Bash-on-Windows.
 CI_BUILD_TO_SRC_RELDIR="../.."
-CI_BUILD_TO_INSTALL_RELDIR="../ci_verify_cmake.install"
+CI_BUILD_TO_INSTALL_RELDIR="../ci_verify_cmake.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.install"
 
 function ci_init_build {
     CI_CMAKE="${CI_CMAKE:-cmake}"

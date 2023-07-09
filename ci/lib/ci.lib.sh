@@ -26,8 +26,8 @@ CI_SCRIPT_DIR="$(cd "$(dirname -- "$0")" && pwd)"
 CI_TOPLEVEL_DIR="$(cd "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 
 # Initialize the global constants CI_{HOST,TARGET}_{SYSTEM,MACHINE}.
-CI_HOST_SYSTEM="${CI_HOST_SYSTEM:-"$(uname -s | tr 'A-Z-' 'a-z_')"}"
-CI_HOST_MACHINE="${CI_HOST_MACHINE:-"$(uname -m | tr 'A-Z-' 'a-z_')"}"
+CI_HOST_SYSTEM="${CI_HOST_SYSTEM:-"$(uname -s | tr 'A-Z/\.-' 'a-z____')"}"
+CI_HOST_MACHINE="${CI_HOST_MACHINE:-"$(uname -m | tr 'A-Z/\.-' 'a-z____')"}"
 CI_TARGET_SYSTEM="${CI_TARGET_SYSTEM:-"$CI_HOST_SYSTEM"}"
 CI_TARGET_MACHINE="${CI_TARGET_MACHINE:-"$CI_HOST_MACHINE"}"
 
