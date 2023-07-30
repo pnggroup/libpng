@@ -16,27 +16,33 @@ cd "$CI_TOPLEVEL_DIR"
 
 CI_SRC_DIR="$CI_TOPLEVEL_DIR"
 CI_OUT_DIR="$CI_TOPLEVEL_DIR/out"
-CI_BUILD_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.build"
-CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_MACHINE.install"
+CI_BUILD_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.build"
+CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.install"
 
 function ci_init_build {
+    # Ensure that the mandatory variables are initialized.
     CI_MAKE="${CI_MAKE:-make}"
-    # Set CI_CC to cc by default, if the cc command is available.
-    # The configure script defaults CC to gcc, which is not always a good idea.
-    [[ -x $(command -v cc) ]] && CI_CC="${CI_CC:-cc}"
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_HOST_SYSTEM.$CI_HOST_ARCH" ]] || {
+        # For native builds, set CI_CC to "cc" by default if the cc command is available.
+        # The configure script defaults CC to "gcc", which is not always a good idea.
+        [[ -x $(command -v cc) ]] && CI_CC="${CI_CC:-cc}"
+    }
     # Ensure that the CI_ variables that cannot be customized reliably are not initialized.
-    [[ ! $CI_CONFIGURE_VARS ]] || ci_err "unsupported: \$CI_CONFIGURE_VARS='$CI_CONFIGURE_VARS'"
-    [[ ! $CI_MAKE_VARS ]] || ci_err "unsupported: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
+    [[ ! $CI_CONFIGURE_VARS ]] ||
+        ci_err "unsupported: \$CI_CONFIGURE_VARS='$CI_CONFIGURE_VARS'"
+    [[ ! $CI_MAKE_VARS ]] ||
+        ci_err "unsupported: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
 }
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
+    ci_info "host arch: $CI_HOST_ARCH"
     ci_info "host system: $CI_HOST_SYSTEM"
-    ci_info "host machine hardware: $CI_HOST_MACHINE"
-    [[ "$CI_TARGET_SYSTEM" != "$CI_HOST_SYSTEM" ]] &&
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_HOST_SYSTEM.$CI_HOST_ARCH" ]] && {
+        ci_info "target arch: $CI_TARGET_ARCH"
         ci_info "target system: $CI_TARGET_SYSTEM"
-    [[ "$CI_TARGET_MACHINE" != "$CI_HOST_MACHINE" ]] &&
-        ci_info "target machine hardware: $CI_TARGET_MACHINE"
+        ci_info "target ABI: $CI_TARGET_ABI"
+    }
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "build directory: $CI_BUILD_DIR"
     ci_info "install directory: $CI_INSTALL_DIR"
@@ -94,15 +100,26 @@ function ci_build {
         ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS ${CFLAGS:-"-O2"}"
         ci_spawn export LDFLAGS="-fsanitize=$CI_SANITIZERS $LDFLAGS"
     }
-    # Build and install.
+    # Build!
     ci_spawn mkdir -p "$CI_BUILD_DIR"
     ci_spawn cd "$CI_BUILD_DIR"
+    # Spawn "configure".
     ci_spawn "$CI_SRC_DIR/configure" --prefix="$CI_INSTALL_DIR" $CI_CONFIGURE_FLAGS
+    # Spawn "make".
     ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS
-    [[ $CI_NO_TEST ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS test
-    [[ $CI_NO_INSTALL ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
-    [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS clean
-    [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS distclean
+    [[ $((CI_NO_TEST)) -ne 0 ]] || {
+        # Spawn "make test" if testing is not disabled.
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS test
+    }
+    [[ $((CI_NO_INSTALL)) -ne 0 ]] || {
+        # Spawn "make install" if installation is not disabled.
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
+    }
+    [[ $((CI_NO_CLEAN)) -ne 0 ]] || {
+        # Spawn "make clean" and "make distclean" if cleaning is not disabled.
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS clean
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS distclean
+    }
     ci_info "## END OF BUILD ##"
 }
 

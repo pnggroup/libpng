@@ -17,6 +17,7 @@ cd "$CI_TOPLEVEL_DIR"
 CI_SRC_DIR="$CI_TOPLEVEL_DIR"
 
 function ci_init_build {
+    # Ensure that the mandatory variables are initialized.
     CI_MAKE="${CI_MAKE:-make}"
     case "$CI_CC" in
     ( *clang* )
@@ -30,12 +31,13 @@ function ci_init_build {
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
+    ci_info "host arch: $CI_HOST_ARCH"
     ci_info "host system: $CI_HOST_SYSTEM"
-    ci_info "host machine hardware: $CI_HOST_MACHINE"
-    [[ "$CI_TARGET_SYSTEM" != "$CI_HOST_SYSTEM" ]] &&
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_HOST_SYSTEM.$CI_HOST_ARCH" ]] && {
+        ci_info "target arch: $CI_TARGET_ARCH"
         ci_info "target system: $CI_TARGET_SYSTEM"
-    [[ "$CI_TARGET_MACHINE" != "$CI_HOST_MACHINE" ]] &&
-        ci_info "target machine hardware: $CI_TARGET_MACHINE"
+        ci_info "target ABI: $CI_TARGET_ABI"
+    }
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "environment option: \$CI_MAKEFILES: '$CI_MAKEFILES'"
     ci_info "environment option: \$CI_MAKE: '$CI_MAKE'"
@@ -110,24 +112,28 @@ function ci_build {
     [[ $CI_LIBS ]] && ALL_MAKE_VARS+=(LIBS="$CI_LIBS")
     ALL_MAKE_VARS+=($CI_MAKE_VARS)
     # Build!
-    ci_assert "$CI_SRC_DIR" -ef .
     local MY_MAKEFILE
     for MY_MAKEFILE in $CI_MAKEFILES
     do
         ci_info "using makefile: $MY_MAKEFILE"
+        # Spawn "make".
         ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
                             "${ALL_MAKE_FLAGS[@]}" \
                             "${ALL_MAKE_VARS[@]}"
-        [[ $CI_NO_TEST ]] ||
+        [[ $((CI_NO_TEST)) -ne 0 ]] || {
+            # Spawn "make test" if testing is not disabled.
             ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
                                 "${ALL_MAKE_FLAGS[@]}" \
                                 "${ALL_MAKE_VARS[@]}" \
                                 test
-        [[ $CI_NO_CLEAN ]] ||
+        }
+        [[ $((CI_NO_CLEAN)) -ne 0 ]] || {
+            # Spawn "make clean" if cleaning is not disabled.
             ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
                                 "${ALL_MAKE_FLAGS[@]}" \
                                 "${ALL_MAKE_VARS[@]}" \
                                 clean
+        }
     done
     ci_info "## END OF BUILD ##"
 }
