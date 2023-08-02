@@ -694,6 +694,10 @@ HAVE_SOLARIS_LD_TRUE
 HAVE_CLOCK_GETTIME_FALSE
 HAVE_CLOCK_GETTIME_TRUE
 PNG_COPTS
+ENABLE_TOOLS_FALSE
+ENABLE_TOOLS_TRUE
+ENABLE_TESTS_FALSE
+ENABLE_TESTS_TRUE
 DFNCPP
 LT_SYS_LIBRARY_PATH
 OTOOL64
@@ -836,6 +840,8 @@ enable_fast_install
 with_aix_soname
 with_sysroot
 enable_libtool_lock
+enable_tests
+enable_tools
 enable_werror
 with_zlib_prefix
 with_pkgconfigdir
@@ -1504,6 +1510,9 @@ Optional Features:
   --enable-fast-install[=PKGS]
                           optimize for fast installation [default=yes]
   --disable-libtool-lock  avoid locking (might break parallel builds)
+  --disable-tests         do not build the test programs (default is to build)
+  --disable-tools         do not build the auxiliary tools (default is to
+                          build)
   --enable-werror[=OPT] Pass -Werror or the given argument to the compiler
                           if it is supported
   --enable-unversioned-links
@@ -13452,6 +13461,42 @@ fi
 DFNCPP="$CPP"
 
 
+# Check whether --enable-tests was given.
+if test ${enable_tests+y}
+then :
+  enableval=$enable_tests; enable_tests="$enableval"
+else $as_nop
+  enable_tests=yes
+fi
+
+
+ if test "$enable_tests" != "no"; then
+  ENABLE_TESTS_TRUE=
+  ENABLE_TESTS_FALSE='#'
+else
+  ENABLE_TESTS_TRUE='#'
+  ENABLE_TESTS_FALSE=
+fi
+
+
+# Check whether --enable-tools was given.
+if test ${enable_tools+y}
+then :
+  enableval=$enable_tools; enable_tools="$enableval"
+else $as_nop
+  enable_tools=yes
+fi
+
+
+ if test "$enable_tools" != "no"; then
+  ENABLE_TOOLS_TRUE=
+  ENABLE_TOOLS_FALSE='#'
+else
+  ENABLE_TOOLS_TRUE='#'
+  ENABLE_TOOLS_FALSE=
+fi
+
+
 # -Werror cannot be passed to GCC in CFLAGS because configure will fail
 # (it checks the compiler with a program that generates a warning).
 # Add the following option to deal with this:
@@ -14458,6 +14503,14 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${am__fastdepCCAS_TRUE}" && test -z "${am__fastdepCCAS_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCCAS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_TESTS_TRUE}" && test -z "${ENABLE_TESTS_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_TESTS\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ENABLE_TOOLS_TRUE}" && test -z "${ENABLE_TOOLS_FALSE}"; then
+  as_fn_error $? "conditional \"ENABLE_TOOLS\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_CLOCK_GETTIME_TRUE}" && test -z "${HAVE_CLOCK_GETTIME_FALSE}"; then
