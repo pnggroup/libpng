@@ -69,10 +69,21 @@ set(DFA_XTRA ""
 option(PNG_SHARED "Build libpng as a shared lib" ON)
 option(PNG_STATIC "Build libpng as a static lib" ON)
 option(PNG_FRAMEWORK "Build libpng as a Mac OS X framework" OFF)
-option(PNG_EXECUTABLES "Build libpng executables" ON)
-option(PNG_TESTS "Build libpng tests" ON)
+option(PNG_TESTS "Build the libpng tests" ON)
+option(PNG_TOOLS "Build the libpng tools" ON)
 option(PNG_DEBUG "Enable debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
+
+# Maintain backwards compatibility with the deprecated option PNG_EXECUTABLES.
+option(PNG_EXECUTABLES "[Deprecated; please use PNG_TOOLS]" ON)
+if(NOT PNG_EXECUTABLES)
+  message(DEPRECATION "The option PNG_EXECUTABLES has been deprecated in favour of PNG_TOOLS")
+  if(PNG_TOOLS)
+    message(AUTHOR_WARNING
+            "Setting PNG_TOOLS to ${PNG_EXECUTABLES}, to stay compatible with PNG_EXECUTABLES")
+    set(PNG_TOOLS "${PNG_EXECUTABLES}")
+  endif()
+endif()
 
 # Allow the users to specify a location of zlib.
 # Useful if zlib is being built alongside this as a sub-project.
@@ -879,7 +890,7 @@ if(PNG_TESTS AND PNG_SHARED)
                FILES ${PNGSUITE_PNGS})
 endif()
 
-if(PNG_SHARED AND PNG_EXECUTABLES)
+if(PNG_SHARED AND PNG_TOOLS)
   add_executable(pngfix ${pngfix_sources})
   target_link_libraries(pngfix png_shared)
   set(PNG_BIN_TARGETS pngfix)
