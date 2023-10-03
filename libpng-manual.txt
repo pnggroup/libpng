@@ -4109,7 +4109,7 @@ READ APIs
 
    int png_image_finish_read(png_imagep image,
       png_colorp background, void *buffer,
-      png_int_32 row_stride, void *colormap));
+      png_int_32 row_stride, void *colormap);
 
       Finish reading the image into the supplied buffer and
       clean up the png_image structure.
