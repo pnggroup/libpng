@@ -19,6 +19,7 @@
 # Revised by Alex Gaynor, 2020
 # Revised by Owen Rudge, 2020
 # Revised by Gleb Mazovetskiy, 2021
+# Revised by Hendrik Sieck, 2021
 # Revised by Christopher Sean Morrison, 2022
 # Revised by B. Scott Michel, 2022
 # Revised by Jeremy Maitin-Shepard, 2022
@@ -1051,6 +1052,7 @@ endif()
 # Create an export file that CMake users can include() to import our targets.
 if(NOT SKIP_INSTALL_EXPORT AND NOT SKIP_INSTALL_ALL)
   install(EXPORT libpng
+          NAMESPACE "libpng::"
           DESTINATION lib/libpng
           FILE libpng${PNGLIB_ABI_VERSION}.cmake)
 endif()
