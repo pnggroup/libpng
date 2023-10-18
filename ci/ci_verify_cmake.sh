@@ -39,19 +39,18 @@ function ci_init_build {
         [[ $TEMP && ( $Temp || $temp ) ]] && unset TEMP
         [[ $TMP && ( $Tmp || $tmp ) ]] && unset TMP
         # Ensure that CI_CMAKE_GENERATOR_PLATFORM is initialized for this generator.
-        ci_assert "checking CI_CMAKE_GENERATOR_PLATFORM" \
-                  -n "$CI_CMAKE_GENERATOR_PLATFORM"
+        [[ $CI_CMAKE_GENERATOR_PLATFORM ]] ||
+            ci_err_internal "missing \$CI_CMAKE_GENERATOR_PLATFORM"
     fi
 }
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
-    ci_info "host arch: $CI_HOST_ARCH"
-    ci_info "host system: $CI_HOST_SYSTEM"
-    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_HOST_SYSTEM.$CI_HOST_ARCH" ]] && {
+    ci_info "build arch: $CI_BUILD_ARCH"
+    ci_info "build system: $CI_BUILD_SYSTEM"
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_BUILD_SYSTEM.$CI_BUILD_ARCH" ]] && {
         ci_info "target arch: $CI_TARGET_ARCH"
         ci_info "target system: $CI_TARGET_SYSTEM"
-        ci_info "target ABI: $CI_TARGET_ABI"
     }
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "build directory: $CI_BUILD_DIR"
@@ -122,8 +121,6 @@ function ci_build {
     }
     ALL_CMAKE_VARS+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
     ALL_CMAKE_VARS+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
-    [[ $((CI_NO_TEST)) -ne 0 ]] &&
-        ALL_CMAKE_VARS+=(-DPNG_TESTS=OFF)
     ALL_CMAKE_VARS+=($CI_CMAKE_VARS)
     local ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
     local ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
@@ -137,48 +134,48 @@ function ci_build {
     # instead of $CI_SRC_DIR and $CI_INSTALL_DIR from this point onwards.
     ci_spawn mkdir -p "$CI_BUILD_DIR"
     ci_spawn cd "$CI_BUILD_DIR"
-    ci_assert "checking CI_BUILD_TO_SRC_RELDIR" \
-              "$CI_SRC_DIR" -ef "$CI_BUILD_TO_SRC_RELDIR"
+    [[ $CI_BUILD_TO_SRC_RELDIR -ef $CI_SRC_DIR ]] ||
+        ci_err_internal "bad or missing \$CI_BUILD_TO_SRC_RELDIR"
     ci_spawn mkdir -p "$CI_INSTALL_DIR"
-    ci_assert "checking CI_BUILD_TO_INSTALL_RELDIR" \
-              "$CI_INSTALL_DIR" -ef "$CI_BUILD_TO_INSTALL_RELDIR"
+    [[ $CI_BUILD_TO_INSTALL_RELDIR -ef $CI_INSTALL_DIR ]] ||
+        ci_err_internal "bad or missing \$CI_BUILD_TO_INSTALL_RELDIR"
     # Spawn "cmake ...".
     ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_BUILD_TO_INSTALL_RELDIR" \
                          "${ALL_CMAKE_VARS[@]}" \
                          "$CI_BUILD_TO_SRC_RELDIR"
     # Spawn "cmake --build ...".
     ci_spawn "$CI_CMAKE" --build . \
-                         --config "$CI_CMAKE_BUILD_TYPE" \
+                         --config="$CI_CMAKE_BUILD_TYPE" \
                          "${ALL_CMAKE_BUILD_FLAGS[@]}"
-    [[ $((CI_NO_TEST)) -ne 0 ]] || {
+    ci_expr $((CI_NO_TEST)) || {
         # Spawn "ctest" if testing is not disabled.
-        ci_spawn "$CI_CTEST" --build-config "$CI_CMAKE_BUILD_TYPE" \
+        ci_spawn "$CI_CTEST" --build-config="$CI_CMAKE_BUILD_TYPE" \
                              "${ALL_CTEST_FLAGS[@]}"
     }
-    [[ $((CI_NO_INSTALL)) -ne 0 ]] || {
-        # Spawn "cmake --build ... --target install" if installation is not disabled.
+    ci_expr $((CI_NO_INSTALL)) || {
+        # Spawn "cmake --build ... --target=install" if installation is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
-                             --config "$CI_CMAKE_BUILD_TYPE" \
-                             --target install \
+                             --config="$CI_CMAKE_BUILD_TYPE" \
+                             --target=install \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
     }
-    [[ $((CI_NO_CLEAN)) -ne 0 ]] || {
-        # Spawn "make --build ... --target clean" if cleaning is not disabled.
+    ci_expr $((CI_NO_CLEAN)) || {
+        # Spawn "make --build ... --target=clean" if cleaning is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
-                             --config "$CI_CMAKE_BUILD_TYPE" \
-                             --target clean \
+                             --config="$CI_CMAKE_BUILD_TYPE" \
+                             --target=clean \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
     }
     ci_info "## END OF BUILD ##"
 }
 
 function main {
-    [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only"
-        ci_err "unsupported command argument: '$1'"
-    }
     ci_init_build
     ci_trace_build
+    [[ $# -eq 0 ]] || {
+        ci_info "note: this program accepts environment options only (see above)"
+        ci_err "unexpected command argument: '$1'"
+    }
     ci_cleanup_old_build
     ci_build
 }

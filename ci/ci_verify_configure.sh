@@ -22,7 +22,7 @@ CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_ARC
 function ci_init_build {
     # Ensure that the mandatory variables are initialized.
     CI_MAKE="${CI_MAKE:-make}"
-    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_HOST_SYSTEM.$CI_HOST_ARCH" ]] || {
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_BUILD_SYSTEM.$CI_BUILD_ARCH" ]] || {
         # For native builds, set CI_CC to "cc" by default if the cc command is available.
         # The configure script defaults CC to "gcc", which is not always a good idea.
         [[ -x $(command -v cc) ]] && CI_CC="${CI_CC:-cc}"
@@ -36,12 +36,11 @@ function ci_init_build {
 
 function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
-    ci_info "host arch: $CI_HOST_ARCH"
-    ci_info "host system: $CI_HOST_SYSTEM"
-    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_HOST_SYSTEM.$CI_HOST_ARCH" ]] && {
+    ci_info "build arch: $CI_BUILD_ARCH"
+    ci_info "build system: $CI_BUILD_SYSTEM"
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_BUILD_SYSTEM.$CI_BUILD_ARCH" ]] && {
         ci_info "target arch: $CI_TARGET_ARCH"
         ci_info "target system: $CI_TARGET_SYSTEM"
-        ci_info "target ABI: $CI_TARGET_ABI"
     }
     ci_info "source directory: $CI_SRC_DIR"
     ci_info "build directory: $CI_BUILD_DIR"
@@ -107,15 +106,15 @@ function ci_build {
     ci_spawn "$CI_SRC_DIR/configure" --prefix="$CI_INSTALL_DIR" $CI_CONFIGURE_FLAGS
     # Spawn "make".
     ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS
-    [[ $((CI_NO_TEST)) -ne 0 ]] || {
+    ci_expr $((CI_NO_TEST)) || {
         # Spawn "make test" if testing is not disabled.
         ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS test
     }
-    [[ $((CI_NO_INSTALL)) -ne 0 ]] || {
+    ci_expr $((CI_NO_INSTALL)) || {
         # Spawn "make install" if installation is not disabled.
         ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
     }
-    [[ $((CI_NO_CLEAN)) -ne 0 ]] || {
+    ci_expr $((CI_NO_CLEAN)) || {
         # Spawn "make clean" and "make distclean" if cleaning is not disabled.
         ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS clean
         ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS distclean
@@ -124,12 +123,12 @@ function ci_build {
 }
 
 function main {
-    [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only"
-        ci_err "unsupported command argument: '$1'"
-    }
     ci_init_build
     ci_trace_build
+    [[ $# -eq 0 ]] || {
+        ci_info "note: this program accepts environment options only (see above)"
+        ci_err "unexpected command argument: '$1'"
+    }
     ci_cleanup_old_build
     ci_build
 }

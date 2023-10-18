@@ -60,8 +60,8 @@ function ci_lint_ci_scripts_license {
 
 function main {
     [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only"
-        ci_err "unsupported command argument: '$1'"
+        ci_info "usage: $CI_SCRIPT_NAME"
+        ci_err "unexpected command argument: '$1'"
     }
     ci_lint_ci_config_files
     ci_lint_ci_scripts
