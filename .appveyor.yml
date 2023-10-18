@@ -20,7 +20,6 @@ environment:
     - TOOLCHAIN: vstudio
       AUTOMATION: cmake
       ARCH: arm64
-      CI_NO_TEST: 1
     - TOOLCHAIN: llvm
       AUTOMATION: cmake
       ARCH: x64
@@ -55,6 +54,7 @@ before_build:
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x86" set CI_CMAKE_GENERATOR_PLATFORM=Win32'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="x64" set CI_CMAKE_GENERATOR_PLATFORM=x64'
   - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="arm64" set CI_CMAKE_GENERATOR_PLATFORM=ARM64'
+  - 'if "%TOOLCHAIN%"=="vstudio" if "%ARCH%"=="arm64" set CI_CMAKE_VARS=-DPNG_TESTS=0'
   - 'if "%TOOLCHAIN%"=="llvm" set CI_CMAKE_GENERATOR=Ninja'
   - 'if "%TOOLCHAIN%"=="llvm" set CI_CMAKE_TOOLCHAIN_FILE=C:\tools\vcpkg\scripts\buildsystems\vcpkg.cmake'
   - 'if "%TOOLCHAIN%"=="llvm" set CI_CC=clang.exe'
@@ -62,8 +62,8 @@ before_build:
   - 'if "%TOOLCHAIN%"=="msys2" if "%ARCH%"=="i686" set PATH=C:\msys64\mingw32\bin;%PATH%'
   - 'if "%TOOLCHAIN%"=="msys2" if "%ARCH%"=="x86_64" set PATH=C:\msys64\mingw64\bin;%PATH%'
   - 'if "%TOOLCHAIN%"=="msys2" set CI_CC=%ARCH%-w64-mingw32-gcc.exe'
-  - 'set CI_CMAKE_BUILD_FLAGS=--parallel 2'
-  - 'set CI_CTEST_FLAGS=--parallel 2'
+  - 'set CI_CMAKE_BUILD_FLAGS=-j2'
+  - 'set CI_CTEST_FLAGS=-j2'
   - 'set CI_MAKE_FLAGS=-j2'
   - 'set CI_MAKEFILES=scripts/makefile.gcc scripts/makefile.msys scripts/makefile.std'
 
