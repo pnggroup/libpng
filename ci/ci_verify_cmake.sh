@@ -145,25 +145,25 @@ function ci_build {
                          "$CI_BUILD_TO_SRC_RELDIR"
     # Spawn "cmake --build ...".
     ci_spawn "$CI_CMAKE" --build . \
-                         --config="$CI_CMAKE_BUILD_TYPE" \
+                         --config "$CI_CMAKE_BUILD_TYPE" \
                          "${ALL_CMAKE_BUILD_FLAGS[@]}"
     ci_expr $((CI_NO_TEST)) || {
         # Spawn "ctest" if testing is not disabled.
-        ci_spawn "$CI_CTEST" --build-config="$CI_CMAKE_BUILD_TYPE" \
+        ci_spawn "$CI_CTEST" --build-config "$CI_CMAKE_BUILD_TYPE" \
                              "${ALL_CTEST_FLAGS[@]}"
     }
     ci_expr $((CI_NO_INSTALL)) || {
-        # Spawn "cmake --build ... --target=install" if installation is not disabled.
+        # Spawn "cmake --build ... --target install" if installation is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
-                             --config="$CI_CMAKE_BUILD_TYPE" \
-                             --target=install \
+                             --config "$CI_CMAKE_BUILD_TYPE" \
+                             --target install \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
     }
     ci_expr $((CI_NO_CLEAN)) || {
-        # Spawn "make --build ... --target=clean" if cleaning is not disabled.
+        # Spawn "make --build ... --target clean" if cleaning is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
-                             --config="$CI_CMAKE_BUILD_TYPE" \
-                             --target=clean \
+                             --config "$CI_CMAKE_BUILD_TYPE" \
+                             --target clean \
                              "${ALL_CMAKE_BUILD_FLAGS[@]}"
     }
     ci_info "## END OF BUILD ##"
