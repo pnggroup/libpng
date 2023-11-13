@@ -93,17 +93,17 @@ endif()
 option(PNG_BUILD_ZLIB "Custom zlib location, else find_package is used" OFF)
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
-  include_directories(${ZLIB_INCLUDE_DIRS})
 endif()
 
 if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
   find_library(M_LIBRARY m)
-  if(NOT M_LIBRARY)
+  if(M_LIBRARY)
+    set(M_LIBRARY m)
+  else()
     set(M_LIBRARY "")
   endif()
 else()
   # libm is not needed and/or not available.
-  set(M_LIBRARY "")
 endif()
 
 # CMake currently sets CMAKE_SYSTEM_PROCESSOR to one of x86_64 or arm64 on macOS,
@@ -619,7 +619,6 @@ if(PNG_DEBUG)
 endif()
 
 # Now build our targets.
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${ZLIB_INCLUDE_DIRS})
 
 # Initialize the list of libpng library targets.
 set(PNG_LIBRARY_TARGETS "")
@@ -663,7 +662,12 @@ if(PNG_SHARED)
   if(WIN32)
     set_target_properties(png_shared PROPERTIES DEFINE_SYMBOL PNG_BUILD_DLL)
   endif()
-  target_link_libraries(png_shared ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_include_directories(png_shared
+                             PUBLIC
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
+                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                             PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(png_shared PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
 if(PNG_STATIC)
@@ -673,7 +677,12 @@ if(PNG_STATIC)
   set_target_properties(png_static PROPERTIES
                         OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}"
                         DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}")
-  target_link_libraries(png_static ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_include_directories(png_static
+                             PUBLIC
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
+                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                             PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
 if(PNG_FRAMEWORK)
@@ -689,7 +698,12 @@ if(PNG_FRAMEWORK)
                         XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
                         PUBLIC_HEADER "${libpng_public_hdrs}"
                         OUTPUT_NAME "png")
-  target_link_libraries(png_framework ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_include_directories(png_framework
+                             PUBLIC
+                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
+                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+                             PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+  target_link_libraries(png_framework PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
 if(NOT PNG_LIBRARY_TARGETS)
@@ -894,7 +908,7 @@ if(PNG_SHARED AND PNG_TOOLS)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  target_link_libraries(png-fix-itxt PRIVATE ${ZLIB_LIBRARIES} ${M_LIBRARY})
+  target_link_libraries(png-fix-itxt PRIVATE ZLIB::ZLIB ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
