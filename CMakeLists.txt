@@ -116,6 +116,23 @@ else()
   set(TARGET_ARCH ${CMAKE_SYSTEM_PROCESSOR})
 endif()
 
+#If we are building for iOS, attempt to avoid code signing
+#This is a useful default for building in complex build chains
+if(IOS)
+  set(DISABLE_CODESIGNED_EXECUTABLES TRUE)
+endif()
+
+macro(add_executable_or_lib_if_codesign)
+  if(DISABLE_CODESIGNED_EXECUTABLES)
+    set(args "${ARGV}")
+    set(arg0 "${ARGV0}")
+    list(REMOVE_AT args 0)
+    add_library(${arg0} STATIC ${args})
+  else()
+    add_executable(${ARGV})
+  endif()
+endmacro()
+
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
@@ -741,14 +758,14 @@ if(PNG_TESTS AND PNG_SHARED)
 
   set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 
-  add_executable(pngtest ${pngtest_sources})
+  add_executable_or_lib_if_codesign(pngtest ${pngtest_sources})
   target_link_libraries(pngtest PRIVATE png_shared)
 
   png_add_test(NAME pngtest
                COMMAND pngtest
                FILES "${PNGTEST_PNG}")
 
-  add_executable(pngvalid ${pngvalid_sources})
+  add_executable_or_lib_if_codesign(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid PRIVATE png_shared)
 
   png_add_test(NAME pngvalid-gamma-16-to-8
@@ -794,7 +811,7 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngvalid
                OPTIONS --transform)
 
-  add_executable(pngstest ${pngstest_sources})
+  add_executable_or_lib_if_codesign(pngstest ${pngstest_sources})
   target_link_libraries(pngstest PRIVATE png_shared)
 
   foreach(gamma_type 1.8 linear none sRGB)
@@ -849,7 +866,7 @@ if(PNG_TESTS AND PNG_SHARED)
     endforeach()
   endforeach()
 
-  add_executable(pngunknown ${pngunknown_sources})
+  add_executable_or_lib_if_codesign(pngunknown ${pngunknown_sources})
   target_link_libraries(pngunknown PRIVATE png_shared)
 
   png_add_test(NAME pngunknown-discard
@@ -881,7 +898,7 @@ if(PNG_TESTS AND PNG_SHARED)
                OPTIONS --strict vpAg=if-safe
                FILES "${PNGTEST_PNG}")
 
-  add_executable(pngimage ${pngimage_sources})
+  add_executable_or_lib_if_codesign(pngimage ${pngimage_sources})
   target_link_libraries(pngimage PRIVATE png_shared)
 
   png_add_test(NAME pngimage-quick
@@ -895,11 +912,11 @@ if(PNG_TESTS AND PNG_SHARED)
 endif()
 
 if(PNG_SHARED AND PNG_TOOLS)
-  add_executable(pngfix ${pngfix_sources})
+  add_executable_or_lib_if_codesign(pngfix ${pngfix_sources})
   target_link_libraries(pngfix PRIVATE png_shared)
   set(PNG_BIN_TARGETS pngfix)
 
-  add_executable(png-fix-itxt ${png_fix_itxt_sources})
+  add_executable_or_lib_if_codesign(png-fix-itxt ${png_fix_itxt_sources})
   target_link_libraries(png-fix-itxt PRIVATE ${ZLIB_LIBRARIES} ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
