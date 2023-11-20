@@ -138,9 +138,11 @@ if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
   elseif(NOT ${PNG_ARM_NEON} STREQUAL "off")
     set(libpng_arm_sources
         arm/arm_init.c
-        arm/filter_neon.S
         arm/filter_neon_intrinsics.c
         arm/palette_neon_intrinsics.c)
+    if(NOT MSVC)
+      list(APPEND libpng_arm_sources arm/filter_neon.S)
+    endif()
     if(${PNG_ARM_NEON} STREQUAL "on")
       add_definitions(-DPNG_ARM_NEON_OPT=2)
     elseif(${PNG_ARM_NEON} STREQUAL "check")
