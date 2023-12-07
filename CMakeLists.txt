@@ -27,7 +27,6 @@
 # Revised by Gunther Nikl, 2023
 # Revised by Tyler Kropp, 2023
 # Revised by Timothy Lyanguzov, 2023
-# Revised by Clinton Ingram, 2023
 
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -120,8 +119,10 @@ endif()
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
-if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
-  if(TARGET_ARCH MATCHES "^(ARM64|arm64|aarch64)")
+if(TARGET_ARCH MATCHES "^arm" OR
+   TARGET_ARCH MATCHES "^aarch64")
+  if(TARGET_ARCH MATCHES "^arm64" OR
+     TARGET_ARCH MATCHES "^aarch64")
     set(PNG_ARM_NEON_POSSIBLE_VALUES on off)
     set(PNG_ARM_NEON "on"
         CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
@@ -154,7 +155,8 @@ if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
 endif()
 
 # Set definitions and sources for PowerPC.
-if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
+if(TARGET_ARCH MATCHES "^powerpc*" OR
+   TARGET_ARCH MATCHES "^ppc64*")
   set(PNG_POWERPC_VSX_POSSIBLE_VALUES on off)
   set(PNG_POWERPC_VSX "on"
       CACHE STRING "Enable POWERPC VSX optimizations: on|off; on is default")
@@ -176,7 +178,8 @@ if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
 endif()
 
 # Set definitions and sources for Intel.
-if(TARGET_ARCH MATCHES "^(i[3-6]86|x86_64|AMD64)")
+if(TARGET_ARCH MATCHES "^i?86" OR
+   TARGET_ARCH MATCHES "^x86_64*")
   set(PNG_INTEL_SSE_POSSIBLE_VALUES on off)
   set(PNG_INTEL_SSE "on"
       CACHE STRING "Enable INTEL_SSE optimizations: on|off; on is default")
@@ -198,7 +201,8 @@ if(TARGET_ARCH MATCHES "^(i[3-6]86|x86_64|AMD64)")
 endif()
 
 # Set definitions and sources for MIPS.
-if(TARGET_ARCH MATCHES "^mips")
+if(TARGET_ARCH MATCHES "mipsel*" OR
+   TARGET_ARCH MATCHES "mips64el*")
   set(PNG_MIPS_MSA_POSSIBLE_VALUES on off)
   set(PNG_MIPS_MSA "on"
       CACHE STRING "Enable MIPS_MSA optimizations: on|off; on is default")
@@ -222,22 +226,26 @@ endif()
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
-if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
+if(TARGET_ARCH MATCHES "^arm" OR
+   TARGET_ARCH MATCHES "^aarch64")
   add_definitions(-DPNG_ARM_NEON_OPT=0)
 endif()
 
 # Set definitions and sources for PowerPC.
-if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
+if(TARGET_ARCH MATCHES "^powerpc*" OR
+   TARGET_ARCH MATCHES "^ppc64*")
   add_definitions(-DPNG_POWERPC_VSX_OPT=0)
 endif()
 
 # Set definitions and sources for Intel.
-if(TARGET_ARCH MATCHES "^(i[3-6]86|x86_64|AMD64)")
+if(TARGET_ARCH MATCHES "^i?86" OR
+   TARGET_ARCH MATCHES "^x86_64*")
   add_definitions(-DPNG_INTEL_SSE_OPT=0)
 endif()
 
 # Set definitions and sources for MIPS.
-if(TARGET_ARCH MATCHES "^mips")
+if(TARGET_ARCH MATCHES "mipsel*" OR
+   TARGET_ARCH MATCHES "mips64el*")
   add_definitions(-DPNG_MIPS_MSA_OPT=0)
 endif()
 
