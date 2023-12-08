@@ -68,14 +68,17 @@ set(PNG_DEBUG_POSTFIX "d"
 set(DFA_XTRA ""
     CACHE FILEPATH "File containing extra configuration settings")
 
-# Allow the users to configure the following build options.
-option(PNG_SHARED "Build libpng as a shared lib" ON)
-option(PNG_STATIC "Build libpng as a static lib" ON)
-option(PNG_FRAMEWORK "Build libpng as a Mac OS X framework" OFF)
+# Allow the users to switch on/off various library build types.
+option(PNG_SHARED "Build libpng as a shared library" ON)
+option(PNG_STATIC "Build libpng as a static library" ON)
+if(APPLE)
+  option(PNG_FRAMEWORK "Build libpng as a framework bundle" ON)
+endif()
+
+# Allow the users to switch on/off the auxiliary build and test artifacts.
+# NOTE: These artifacts are NOT part of libpng proper, and are subject to change at any time.
 option(PNG_TESTS "Build the libpng tests" ON)
 option(PNG_TOOLS "Build the libpng tools" ON)
-option(PNG_DEBUG "Enable debug output" OFF)
-option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
 # Maintain backwards compatibility with the deprecated option PNG_EXECUTABLES.
 option(PNG_EXECUTABLES "[Deprecated; please use PNG_TOOLS]" ON)
@@ -87,6 +90,10 @@ if(NOT PNG_EXECUTABLES)
     set(PNG_TOOLS "${PNG_EXECUTABLES}")
   endif()
 endif()
+
+# Allow the users to configure various compilation options.
+option(PNG_DEBUG "Enable debug output" OFF)
+option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
 # Allow the users to specify a location of zlib.
 # Useful if zlib is being built alongside this as a sub-project.
@@ -659,7 +666,11 @@ if(PNG_SHARED)
                             LINK_FLAGS "-Wl,-M -Wl,'${CMAKE_CURRENT_BINARY_DIR}/libpng.vers'")
     endif()
   endif()
-  if(WIN32)
+  if(APPLE)
+    # Avoid CMake's implicit compile definition "png_shared_EXPORTS".
+    set_target_properties(png_shared PROPERTIES DEFINE_SYMBOL "")
+  elseif(WIN32)
+    # Use the explicit compile definition "PNG_BUILD_DLL" for Windows DLLs.
     set_target_properties(png_shared PROPERTIES DEFINE_SYMBOL PNG_BUILD_DLL)
   endif()
   target_include_directories(png_shared
@@ -685,7 +696,7 @@ if(PNG_STATIC)
   target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
-if(PNG_FRAMEWORK)
+if(PNG_FRAMEWORK AND APPLE)
   add_library(png_framework SHARED ${libpng_sources})
   add_dependencies(png_framework png_genfiles)
   list(APPEND PNG_LIBRARY_TARGETS png_framework)
@@ -697,7 +708,10 @@ if(PNG_FRAMEWORK)
                         MACOSX_FRAMEWORK_IDENTIFIER "org.libpng.libpng"
                         XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
                         PUBLIC_HEADER "${libpng_public_hdrs}"
-                        OUTPUT_NAME "png")
+                        OUTPUT_NAME "png"
+                        DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}")
+  # Avoid CMake's implicit compile definition "-Dpng_framework_EXPORTS".
+  set_target_properties(png_framework PROPERTIES DEFINE_SYMBOL "")
   target_include_directories(png_framework
                              PUBLIC
                                $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
