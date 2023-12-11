@@ -1,7 +1,8 @@
 # gensrc.cmake.in
 # Generate source files with awk, based upon the automake logic.
 
-# Copyright (C) 2016 Glenn Randers-Pehrson
+# Copyright (c) 2022-2023 Cosmin Truta
+# Copyright (c) 2016 Glenn Randers-Pehrson
 # Written by Roger Leigh, 2016
 
 # This code is released under the libpng license.
@@ -17,7 +18,7 @@ set(DFA_XTRA "@DFA_XTRA@")
 set(PNG_PREFIX "@PNG_PREFIX@")
 set(PNGLIB_VERSION "@PNGLIB_VERSION@")
 
-if("${OUTPUT}" STREQUAL "scripts/pnglibconf.c")
+if(OUTPUT STREQUAL "scripts/pnglibconf.c")
   # Generate scripts/pnglibconf.c
 
   file(REMOVE "${BINDIR}/pnglibconf.tf6" "${BINDIR}/pnglibconf.tf7")
@@ -45,7 +46,7 @@ if("${OUTPUT}" STREQUAL "scripts/pnglibconf.c")
   file(MAKE_DIRECTORY "${BINDIR}/scripts")
   file(RENAME "pnglibconf.tf7" "${BINDIR}/scripts/pnglibconf.c")
 
-elseif ("${OUTPUT}" STREQUAL "pnglibconf.c")
+elseif(OUTPUT STREQUAL "pnglibconf.c")
   # Generate pnglibconf.c
 
   file(REMOVE "${BINDIR}/pnglibconf.tf4" "${BINDIR}/pnglibconf.tf5")
@@ -72,7 +73,7 @@ elseif ("${OUTPUT}" STREQUAL "pnglibconf.c")
   file(MAKE_DIRECTORY "${BINDIR}/scripts")
   file(RENAME "pnglibconf.tf5" "${BINDIR}/pnglibconf.c")
 
-elseif ("${OUTPUT}" STREQUAL "pnglibconf.h")
+elseif(OUTPUT STREQUAL "pnglibconf.h")
   # Generate pnglibconf.h
 
   file(REMOVE "${BINDIR}/${OUTPUT}")
@@ -101,7 +102,7 @@ elseif ("${OUTPUT}" STREQUAL "pnglibconf.h")
     endif()
   endif()
 
-elseif ("${OUTPUT}" STREQUAL "pngprefix.h")
+elseif(OUTPUT STREQUAL "pngprefix.h")
   # Generate pngprefix.h
 
   file(REMOVE "${BINDIR}/${OUTPUT}")
@@ -123,7 +124,7 @@ elseif ("${OUTPUT}" STREQUAL "pngprefix.h")
     file(WRITE "${BINDIR}/${OUTPUT}" "/* No libpng symbol prefix configured. */")
   endif()
 
-elseif("${OUTPUT}" STREQUAL "scripts/pnglibconf.h.prebuilt")
+elseif(OUTPUT STREQUAL "scripts/pnglibconf.h.prebuilt")
   # Generate scripts/pnglibconf.h.prebuilt (fails build)
 
   message(STATUS "Attempting to build scripts/pnglibconf.h.prebuilt")

@@ -48,7 +48,6 @@ project(libpng
         VERSION ${PNGLIB_VERSION}
         LANGUAGES C ASM)
 
-include(CMakeParseArguments)
 include(CheckCSourceCompiles)
 include(GNUInstallDirs)
 
@@ -110,7 +109,7 @@ if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
     set(M_LIBRARY "")
   endif()
 else()
-  # libm is not needed and/or not available.
+  # libm is not available or not needed.
 endif()
 
 # CMake currently sets CMAKE_SYSTEM_PROCESSOR to one of x86_64 or arm64 on macOS,
@@ -142,7 +141,7 @@ if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
   list(FIND PNG_ARM_NEON_POSSIBLE_VALUES ${PNG_ARM_NEON} index)
   if(index EQUAL -1)
     message(FATAL_ERROR "PNG_ARM_NEON must be one of [${PNG_ARM_NEON_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_ARM_NEON} STREQUAL "off")
+  elseif(NOT PNG_ARM_NEON STREQUAL "off")
     set(libpng_arm_sources
         arm/arm_init.c
         arm/filter_neon_intrinsics.c
@@ -150,9 +149,9 @@ if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
     if(NOT MSVC)
       list(APPEND libpng_arm_sources arm/filter_neon.S)
     endif()
-    if(${PNG_ARM_NEON} STREQUAL "on")
+    if(PNG_ARM_NEON STREQUAL "on")
       add_definitions(-DPNG_ARM_NEON_OPT=2)
-    elseif(${PNG_ARM_NEON} STREQUAL "check")
+    elseif(PNG_ARM_NEON STREQUAL "check")
       add_definitions(-DPNG_ARM_NEON_CHECK_SUPPORTED)
     endif()
   else()
@@ -170,11 +169,11 @@ if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
   list(FIND PNG_POWERPC_VSX_POSSIBLE_VALUES ${PNG_POWERPC_VSX} index)
   if(index EQUAL -1)
     message(FATAL_ERROR "PNG_POWERPC_VSX must be one of [${PNG_POWERPC_VSX_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_POWERPC_VSX} STREQUAL "off")
+  elseif(NOT PNG_POWERPC_VSX STREQUAL "off")
     set(libpng_powerpc_sources
         powerpc/powerpc_init.c
         powerpc/filter_vsx_intrinsics.c)
-    if(${PNG_POWERPC_VSX} STREQUAL "on")
+    if(PNG_POWERPC_VSX STREQUAL "on")
       add_definitions(-DPNG_POWERPC_VSX_OPT=2)
     endif()
   else()
@@ -192,11 +191,11 @@ if(TARGET_ARCH MATCHES "^(i[3-6]86|x86|AMD64)")
   list(FIND PNG_INTEL_SSE_POSSIBLE_VALUES ${PNG_INTEL_SSE} index)
   if(index EQUAL -1)
     message(FATAL_ERROR "PNG_INTEL_SSE must be one of [${PNG_INTEL_SSE_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_INTEL_SSE} STREQUAL "off")
+  elseif(NOT PNG_INTEL_SSE STREQUAL "off")
     set(libpng_intel_sources
         intel/intel_init.c
         intel/filter_sse2_intrinsics.c)
-    if(${PNG_INTEL_SSE} STREQUAL "on")
+    if(PNG_INTEL_SSE STREQUAL "on")
       add_definitions(-DPNG_INTEL_SSE_OPT=1)
     endif()
   else()
@@ -214,11 +213,11 @@ if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
   list(FIND PNG_MIPS_MSA_POSSIBLE_VALUES ${PNG_MIPS_MSA} index)
   if(index EQUAL -1)
     message(FATAL_ERROR "PNG_MIPS_MSA must be one of [${PNG_MIPS_MSA_POSSIBLE_VALUES}]")
-  elseif(NOT ${PNG_MIPS_MSA} STREQUAL "off")
+  elseif(NOT PNG_MIPS_MSA STREQUAL "off")
     set(libpng_mips_sources
         mips/mips_init.c
         mips/filter_msa_intrinsics.c)
-    if(${PNG_MIPS_MSA} STREQUAL "on")
+    if(PNG_MIPS_MSA STREQUAL "on")
       add_definitions(-DPNG_MIPS_MSA_OPT=2)
     endif()
   else()
@@ -285,41 +284,6 @@ int main(void) { return 0; }
   endif()
   set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
-endif()
-
-# Find symbol prefix.  Likely obsolete and unnecessary with recent
-# toolchains (it's not done in many other projects).
-function(find_symbol_prefix)
-  set(SYMBOL_PREFIX)
-
-  execute_process(COMMAND "${CMAKE_C_COMPILER}" -E -
-                  INPUT_FILE /dev/null
-                  OUTPUT_VARIABLE OUT
-                  RESULT_VARIABLE STATUS)
-
-  if(CPP_FAIL)
-    message(WARNING "Failed to run the C preprocessor")
-  endif()
-
-  string(REPLACE "\n" ";" OUT "${OUT}")
-  foreach(line ${OUT})
-    string(REGEX MATCH "^PREFIX=" found_match "${line}")
-    if(found_match)
-      string(REGEX REPLACE "^PREFIX=(.*\)" "\\1" prefix "${line}")
-      string(REGEX MATCH "__USER_LABEL_PREFIX__" found_match "${prefix}")
-      if(found_match)
-        string(REGEX REPLACE "(.*)__USER_LABEL_PREFIX__(.*)" "\\1\\2" prefix "${prefix}")
-      endif()
-      set(SYMBOL_PREFIX "${prefix}")
-    endif()
-  endforeach()
-
-  message(STATUS "Symbol prefix: ${SYMBOL_PREFIX}")
-  set(SYMBOL_PREFIX "${SYMBOL_PREFIX}" PARENT_SCOPE)
-endfunction()
-
-if(UNIX)
-  find_symbol_prefix()
 endif()
 
 find_program(AWK NAMES gawk awk)
@@ -616,7 +580,7 @@ set(png_fix_itxt_sources
     contrib/tools/png-fix-itxt.c
 )
 
-if(MSVC OR (WIN32 AND (CMAKE_C_COMPILER_ID MATCHES ".*Clang")))
+if(MSVC OR (WIN32 AND (CMAKE_C_COMPILER_ID MATCHES "Clang")))
   add_definitions(-D_CRT_NONSTDC_NO_DEPRECATE)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE)
 endif()
@@ -632,8 +596,8 @@ set(PNG_LIBRARY_TARGETS "")
 
 # Initialize the libpng library file names.
 if(UNIX
-   OR (WIN32 AND NOT "${CMAKE_SHARED_LIBRARY_PREFIX}" STREQUAL "")
-   OR (WIN32 AND NOT "${CMAKE_STATIC_LIBRARY_PREFIX}" STREQUAL ""))
+   OR (WIN32 AND NOT CMAKE_SHARED_LIBRARY_PREFIX STREQUAL "")
+   OR (WIN32 AND NOT CMAKE_STATIC_LIBRARY_PREFIX STREQUAL ""))
   # We are on a Unix or Unix-like toolchain like the GNU toolchain on Windows.
   # Library file names are expected to have an implicit prefix such as "lib".
   # Let CMake prepend and append its usual prefixes and suffixes by default.
@@ -823,37 +787,37 @@ if(PNG_TESTS AND PNG_SHARED)
     foreach(alpha_type none alpha)
       set(PNGSTEST_FILES)
       foreach(test_png ${TEST_PNGS})
-        string(REGEX MATCH ".*-linear[-.].*" TEST_PNG_LINEAR "${test_png}")
-        string(REGEX MATCH ".*-sRGB[-.].*" TEST_PNG_SRGB "${test_png}")
-        string(REGEX MATCH ".*-1.8[-.].*" TEST_PNG_G18 "${test_png}")
-        string(REGEX MATCH ".*-alpha-.*" TEST_PNG_ALPHA "${test_png}")
+        string(REGEX MATCH "-linear[-.]" TEST_PNG_LINEAR "${test_png}")
+        string(REGEX MATCH "-sRGB[-.]" TEST_PNG_SRGB "${test_png}")
+        string(REGEX MATCH "-1.8[-.]" TEST_PNG_G18 "${test_png}")
+        string(REGEX MATCH "-alpha-" TEST_PNG_ALPHA "${test_png}")
 
         set(TEST_PNG_VALID TRUE)
 
         if(TEST_PNG_ALPHA)
-          if(NOT "${alpha_type}" STREQUAL "alpha")
+          if(NOT alpha_type STREQUAL "alpha")
             set(TEST_PNG_VALID FALSE)
           endif()
         else()
-          if("${alpha_type}" STREQUAL "alpha")
+          if(alpha_type STREQUAL "alpha")
             set(TEST_PNG_VALID FALSE)
           endif()
         endif()
 
         if(TEST_PNG_LINEAR)
-          if(NOT "${gamma_type}" STREQUAL "linear")
+          if(NOT gamma_type STREQUAL "linear")
             set(TEST_PNG_VALID FALSE)
           endif()
         elseif(TEST_PNG_SRGB)
-          if(NOT "${gamma_type}" STREQUAL "sRGB")
+          if(NOT gamma_type STREQUAL "sRGB")
             set(TEST_PNG_VALID FALSE)
           endif()
         elseif(TEST_PNG_G18)
-          if(NOT "${gamma_type}" STREQUAL "1.8")
+          if(NOT gamma_type STREQUAL "1.8")
             set(TEST_PNG_VALID FALSE)
           endif()
         else()
-          if(NOT "${gamma_type}" STREQUAL "none")
+          if(NOT gamma_type STREQUAL "none")
             set(TEST_PNG_VALID FALSE)
           endif()
         endif()
