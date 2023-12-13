@@ -33,7 +33,7 @@
 # For conditions of distribution and use, see the disclaimer
 # and license in png.h
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.6)
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
@@ -257,7 +257,7 @@ VERS_1 { global: sym1; local: *; };
 VERS_2 { global: sym2; main; } VERS_1;
 ")
   set(_SAVED_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
-  if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "^SunOS")
+  if(NOT CMAKE_HOST_SOLARIS)
     # Avoid using CMAKE_SHARED_LIBRARY_C_FLAGS in version script checks on
     # Solaris, because of an incompatibility with the Solaris link editor.
     list(APPEND CMAKE_REQUIRED_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
@@ -270,7 +270,7 @@ int main(void) { return 0; }
 " HAVE_LD_VERSION_SCRIPT)
   if(NOT HAVE_LD_VERSION_SCRIPT)
     set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
-    if(NOT CMAKE_HOST_SYSTEM_NAME MATCHES "^SunOS")
+    if(NOT CMAKE_HOST_SOLARIS)
       # Again, avoid using CMAKE_SHARED_LIBRARY_C_FLAGS in version script
       # checks on Solaris.
       list(APPEND CMAKE_REQUIRED_FLAGS ${CMAKE_SHARED_LIBRARY_C_FLAGS})
