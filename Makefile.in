@@ -108,7 +108,7 @@ host_triplet = @host@
 @ENABLE_TOOLS_TRUE@bin_PROGRAMS = pngfix$(EXEEXT) \
 @ENABLE_TOOLS_TRUE@	png-fix-itxt$(EXEEXT)
 @PNG_ARM_NEON_TRUE@am__append_2 = arm/arm_init.c\
-@PNG_ARM_NEON_TRUE@	arm/filter_neon.S arm/filter_neon_intrinsics.c \
+@PNG_ARM_NEON_TRUE@	arm/filter_neon_intrinsics.c \
 @PNG_ARM_NEON_TRUE@	arm/palette_neon_intrinsics.c
 
 @PNG_MIPS_MSA_TRUE@am__append_3 = mips/mips_init.c\
@@ -188,13 +188,13 @@ am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST = png.c \
 	pngrtran.c pngrutil.c pngset.c pngtrans.c pngwio.c pngwrite.c \
 	pngwtran.c pngwutil.c png.h pngconf.h pngdebug.h pnginfo.h \
 	pngpriv.h pngstruct.h pngusr.dfa arm/arm_init.c \
-	arm/filter_neon.S arm/filter_neon_intrinsics.c \
-	arm/palette_neon_intrinsics.c mips/mips_init.c \
-	mips/filter_msa_intrinsics.c mips/filter_mmi_inline_assembly.c \
-	intel/intel_init.c intel/filter_sse2_intrinsics.c \
-	powerpc/powerpc_init.c powerpc/filter_vsx_intrinsics.c
+	arm/filter_neon_intrinsics.c arm/palette_neon_intrinsics.c \
+	mips/mips_init.c mips/filter_msa_intrinsics.c \
+	mips/filter_mmi_inline_assembly.c intel/intel_init.c \
+	intel/filter_sse2_intrinsics.c powerpc/powerpc_init.c \
+	powerpc/filter_vsx_intrinsics.c
 am__dirstamp = $(am__leading_dot)dirstamp
-@PNG_ARM_NEON_TRUE@am__objects_1 = arm/arm_init.lo arm/filter_neon.lo \
+@PNG_ARM_NEON_TRUE@am__objects_1 = arm/arm_init.lo \
 @PNG_ARM_NEON_TRUE@	arm/filter_neon_intrinsics.lo \
 @PNG_ARM_NEON_TRUE@	arm/palette_neon_intrinsics.lo
 @PNG_MIPS_MSA_TRUE@am__objects_2 = mips/mips_init.lo \
@@ -312,7 +312,7 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	./$(DEPDIR)/pngtest.Po ./$(DEPDIR)/pngtrans.Plo \
 	./$(DEPDIR)/pngwio.Plo ./$(DEPDIR)/pngwrite.Plo \
 	./$(DEPDIR)/pngwtran.Plo ./$(DEPDIR)/pngwutil.Plo \
-	arm/$(DEPDIR)/arm_init.Plo arm/$(DEPDIR)/filter_neon.Plo \
+	arm/$(DEPDIR)/arm_init.Plo \
 	arm/$(DEPDIR)/filter_neon_intrinsics.Plo \
 	arm/$(DEPDIR)/palette_neon_intrinsics.Plo \
 	contrib/libtests/$(DEPDIR)/pngimage.Po \
@@ -333,16 +333,6 @@ am__depfiles_remade = ./$(DEPDIR)/png.Plo ./$(DEPDIR)/pngerror.Plo \
 	powerpc/$(DEPDIR)/filter_vsx_intrinsics.Plo \
 	powerpc/$(DEPDIR)/powerpc_init.Plo
 am__mv = mv -f
-CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
-	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
-LTCPPASCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
-	$(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) \
-	$(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) \
-	$(AM_CCASFLAGS) $(CCASFLAGS)
-AM_V_CPPAS = $(am__v_CPPAS_@AM_V@)
-am__v_CPPAS_ = $(am__v_CPPAS_@AM_DEFAULT_V@)
-am__v_CPPAS_0 = @echo "  CPPAS   " $@;
-am__v_CPPAS_1 = 
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
@@ -885,7 +875,7 @@ all: $(BUILT_SOURCES) config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-am
 
 .SUFFIXES:
-.SUFFIXES: .chk .out .S .c .lo .log .o .obj .test .test$(EXEEXT) .trs
+.SUFFIXES: .chk .out .c .lo .log .o .obj .test .test$(EXEEXT) .trs
 am--refresh: Makefile
 	@:
 $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
@@ -1049,7 +1039,6 @@ arm/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) arm/$(DEPDIR)
 	@: > arm/$(DEPDIR)/$(am__dirstamp)
 arm/arm_init.lo: arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
-arm/filter_neon.lo: arm/$(am__dirstamp) arm/$(DEPDIR)/$(am__dirstamp)
 arm/filter_neon_intrinsics.lo: arm/$(am__dirstamp) \
 	arm/$(DEPDIR)/$(am__dirstamp)
 arm/palette_neon_intrinsics.lo: arm/$(am__dirstamp) \
@@ -1237,7 +1226,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngwtran.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pngwutil.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/arm_init.Plo@am__quote@ # am--include-marker
-@AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/filter_neon.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/filter_neon_intrinsics.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@arm/$(DEPDIR)/palette_neon_intrinsics.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@contrib/libtests/$(DEPDIR)/pngimage.Po@am__quote@ # am--include-marker
@@ -1263,30 +1251,6 @@ $(am__depfiles_remade):
 	@echo '# dummy' >$@-t && $(am__mv) $@-t $@
 
 am--depfiles: $(am__depfiles_remade)
-
-.S.o:
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
-@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CPPASCOMPILE) -c -o $@ $<
-
-.S.obj:
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.obj$$||'`;\
-@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ `$(CYGPATH_W) '$<'` &&\
-@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Po
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
-
-.S.lo:
-@am__fastdepCCAS_TRUE@	$(AM_V_CPPAS)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.lo$$||'`;\
-@am__fastdepCCAS_TRUE@	$(LTCPPASCOMPILE) -MT $@ -MD -MP -MF $$depbase.Tpo -c -o $@ $< &&\
-@am__fastdepCCAS_TRUE@	$(am__mv) $$depbase.Tpo $$depbase.Plo
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCCAS_FALSE@	$(AM_V_CPPAS@am__nodep@)$(LTCPPASCOMPILE) -c -o $@ $<
 
 .c.o:
 @am__fastdepCC_TRUE@	$(AM_V_CC)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -2196,7 +2160,6 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/pngwtran.Plo
 	-rm -f ./$(DEPDIR)/pngwutil.Plo
 	-rm -f arm/$(DEPDIR)/arm_init.Plo
-	-rm -f arm/$(DEPDIR)/filter_neon.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon_intrinsics.Plo
 	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po
@@ -2284,7 +2247,6 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/pngwtran.Plo
 	-rm -f ./$(DEPDIR)/pngwutil.Plo
 	-rm -f arm/$(DEPDIR)/arm_init.Plo
-	-rm -f arm/$(DEPDIR)/filter_neon.Plo
 	-rm -f arm/$(DEPDIR)/filter_neon_intrinsics.Plo
 	-rm -f arm/$(DEPDIR)/palette_neon_intrinsics.Plo
 	-rm -f contrib/libtests/$(DEPDIR)/pngimage.Po

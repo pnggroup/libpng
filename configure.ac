@@ -425,16 +425,6 @@ AM_CONDITIONAL([PNG_ARM_NEON],
       *)    test "$enable_arm_neon" != '' ;;
     esac])
 
-# Add the assembler implementation source file.  This only works on 32-bit
-# ARM and causes problems even if empty on 64-bit ARM.
-AM_CONDITIONAL([PNG_ARM_NEON_ASM],
-   [test "$enable_arm_neon" != 'no' &&
-    case "$host_cpu" in
-      arm64*|aarch64*) false ;;
-      arm*) true ;;
-      *)    test "$enable_arm_neon" != '' ;;
-    esac])
-
 # MIPS MSA
 # ========
 
