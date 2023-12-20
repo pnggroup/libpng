@@ -48,6 +48,11 @@ project(libpng
         VERSION ${PNGLIB_VERSION}
         LANGUAGES C ASM)
 
+if(POLICY CMP0074)
+  # Allow find_package() to use the ZLIB_ROOT variable, if available.
+  cmake_policy(SET CMP0074 NEW)
+endif()
+
 include(CheckCSourceCompiles)
 include(GNUInstallDirs)
 
@@ -94,11 +99,23 @@ endif()
 option(PNG_DEBUG "Enable debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
-# Allow the users to specify a location of zlib.
-# Useful if zlib is being built alongside this as a sub-project.
+# Allow the users to specify a custom location of zlib.
+# This option is deprecated, and no longer needed with CMake 3.12 and newer.
+# Under the CMake policy CMP0074, if zlib is being built alongside libpng as a
+# subproject, its location can be passed on to CMake via the ZLIB_ROOT variable.
 option(PNG_BUILD_ZLIB "Custom zlib location, else find_package is used" OFF)
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
+elseif(POLICY CMP0074)
+  # TODO: Remove the policy check if CMake version 3.12 or greater becomes the minimum required.
+  if("x${ZLIB_ROOT}" STREQUAL "x")
+    message(DEPRECATION
+            "The option PNG_BUILD_ZLIB has been deprecated; please use ZLIB_ROOT instead")
+  else()
+    message(SEND_ERROR
+            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} and "
+            "the variable ZLIB_ROOT=\"${ZLIB_ROOT}\" are mutually exclusive")
+  endif()
 endif()
 
 if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
