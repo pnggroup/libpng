@@ -1005,10 +1005,18 @@ file_end(struct file *file)
 
    if (file->out != NULL)
    {
-      /* NOTE: this is bitwise |, all the following functions must execute and
-       * must succeed.
+      /* On some systems 'fclose' deletes the FILE struct (making it
+       * inaccessbile).  There is no guarantee that fclose returns an error
+       * code from fflush or, indeed, from the FILE error indicator.  There is
+       * also no explicit (or clear) guarantee in the standard that anything
+       * other than a read or write operation sets the error indicator; fflush
+       * is not a read or write operation, so both conditions must be checked
+       * to ensure the close succeeded and in ANSI-C conformant code they must
+       * be checked before the fclose call.
        */
-      if (ferror(file->out) | fflush(file->out) | fclose(file->out))
+      const int err = fflush(file->out) || ferror(file->out);
+
+      if (fclose(file->out) || err)
       {
          perror(file->out_name);
          emit_error(file, READ_ERROR_CODE, "output write error");
@@ -4054,3 +4062,4 @@ main(void)
    return 77;
 }
 #endif /* PNG_SETJMP_SUPPORTED */
+/* vi: set textwidth=80 shiftwidth=3 softtabstop=-1 expandtab: */
