@@ -385,6 +385,34 @@ option BENIGN_ERRORS
 option BENIGN_WRITE_ERRORS requires BENIGN_ERRORS disabled
 option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 
+# Adler32 checksum
+#
+# This option allows the check of the Adler32 checksum performed by zlib to
+# be turned off for IDAT chunks (only).  Unless this option is enabled and
+# turned on (not the default even if enabled) a failed Adler32 at the end of the
+# stream will result in a decompression (inflate) failure on read even though
+# the entire image might have been read successfully.
+#
+# This option relies on an undocumented function 'inflateValidate' which is
+# present in only some versions of zlib.  If the function is not present in the
+# zlib used with libpng code which uses -lpng is likely to fail to link or to
+# launch in the case of a DLL.
+#
+# Therefore this option is currently disabled by default; it has to be turned on
+# in pngusr.dfa and then the application program has to explicitly turn the
+# functionality on by calling png_set_option.
+#
+# Furthermore the option is explicitly turned off here if the zlib version
+# number is below that required - libpng wouldn't compile in that case if the
+# option were turned on.
+option DISABLE_ADLER32_CHECK requires READ enables SET_OPTION disabled
+
+# ZLIB_VERNUM must be used here, not PNG_ZLIB_VERNUM, because
+# scripts/options.awk ends up putting this test adhead of the setting of
+# PNG_ZLIB_VERNUM (apparently above, but not because of the two-pass processing)
+@#if ZLIB_VERNUM < 0x1290
+@#   define PNG_NO_DISABLE_ADLER32_CHECK
+@#endif
 
 # Generic options - affect both read and write.
 
