@@ -16,7 +16,7 @@
 
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
-# Copyright (c) 2018 Cosmin Truta
+# Copyright (c) 2018-2023 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -100,11 +100,13 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-check_PROGRAMS = pngtest$(EXEEXT) pngunknown$(EXEEXT) \
-	pngstest$(EXEEXT) pngvalid$(EXEEXT) pngimage$(EXEEXT) \
-	pngcp$(EXEEXT) $(am__EXEEXT_1)
-@HAVE_CLOCK_GETTIME_TRUE@am__append_1 = timepng
-bin_PROGRAMS = pngfix$(EXEEXT) png-fix-itxt$(EXEEXT)
+@ENABLE_TESTS_TRUE@check_PROGRAMS = pngtest$(EXEEXT) \
+@ENABLE_TESTS_TRUE@	pngunknown$(EXEEXT) pngstest$(EXEEXT) \
+@ENABLE_TESTS_TRUE@	pngvalid$(EXEEXT) pngimage$(EXEEXT) \
+@ENABLE_TESTS_TRUE@	pngcp$(EXEEXT) $(am__EXEEXT_1)
+@ENABLE_TESTS_TRUE@@HAVE_CLOCK_GETTIME_TRUE@am__append_1 = timepng
+@ENABLE_TOOLS_TRUE@bin_PROGRAMS = pngfix$(EXEEXT) \
+@ENABLE_TOOLS_TRUE@	png-fix-itxt$(EXEEXT)
 @PNG_ARM_NEON_TRUE@am__append_2 = arm/arm_init.c\
 @PNG_ARM_NEON_TRUE@	arm/filter_neon.S arm/filter_neon_intrinsics.c \
 @PNG_ARM_NEON_TRUE@	arm/palette_neon_intrinsics.c
@@ -147,7 +149,8 @@ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
 	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(man3dir)" \
 	"$(DESTDIR)$(man5dir)" "$(DESTDIR)$(pkgconfigdir)" \
 	"$(DESTDIR)$(pkgincludedir)" "$(DESTDIR)$(pkgincludedir)"
-@HAVE_CLOCK_GETTIME_TRUE@am__EXEEXT_1 = timepng$(EXEEXT)
+@ENABLE_TESTS_TRUE@@HAVE_CLOCK_GETTIME_TRUE@am__EXEEXT_1 =  \
+@ENABLE_TESTS_TRUE@@HAVE_CLOCK_GETTIME_TRUE@	timepng$(EXEEXT)
 PROGRAMS = $(bin_PROGRAMS)
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -216,33 +219,56 @@ libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LINK = $(LIBTOOL) $(AM_V_lt) \
 	$(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_LDFLAGS) $(LDFLAGS) -o \
 	$@
-am_png_fix_itxt_OBJECTS = contrib/tools/png-fix-itxt.$(OBJEXT)
+am__png_fix_itxt_SOURCES_DIST = contrib/tools/png-fix-itxt.c
+@ENABLE_TOOLS_TRUE@am_png_fix_itxt_OBJECTS =  \
+@ENABLE_TOOLS_TRUE@	contrib/tools/png-fix-itxt.$(OBJEXT)
 png_fix_itxt_OBJECTS = $(am_png_fix_itxt_OBJECTS)
 png_fix_itxt_LDADD = $(LDADD)
-am_pngcp_OBJECTS = contrib/tools/pngcp.$(OBJEXT)
+am__pngcp_SOURCES_DIST = contrib/tools/pngcp.c
+@ENABLE_TESTS_TRUE@am_pngcp_OBJECTS = contrib/tools/pngcp.$(OBJEXT)
 pngcp_OBJECTS = $(am_pngcp_OBJECTS)
-pngcp_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngfix_OBJECTS = contrib/tools/pngfix.$(OBJEXT)
+@ENABLE_TESTS_TRUE@pngcp_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngfix_SOURCES_DIST = contrib/tools/pngfix.c
+@ENABLE_TOOLS_TRUE@am_pngfix_OBJECTS = contrib/tools/pngfix.$(OBJEXT)
 pngfix_OBJECTS = $(am_pngfix_OBJECTS)
-pngfix_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngimage_OBJECTS = contrib/libtests/pngimage.$(OBJEXT)
+@ENABLE_TOOLS_TRUE@pngfix_DEPENDENCIES =  \
+@ENABLE_TOOLS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngimage_SOURCES_DIST = contrib/libtests/pngimage.c
+@ENABLE_TESTS_TRUE@am_pngimage_OBJECTS =  \
+@ENABLE_TESTS_TRUE@	contrib/libtests/pngimage.$(OBJEXT)
 pngimage_OBJECTS = $(am_pngimage_OBJECTS)
-pngimage_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngstest_OBJECTS = contrib/libtests/pngstest.$(OBJEXT)
+@ENABLE_TESTS_TRUE@pngimage_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngstest_SOURCES_DIST = contrib/libtests/pngstest.c
+@ENABLE_TESTS_TRUE@am_pngstest_OBJECTS =  \
+@ENABLE_TESTS_TRUE@	contrib/libtests/pngstest.$(OBJEXT)
 pngstest_OBJECTS = $(am_pngstest_OBJECTS)
-pngstest_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngtest_OBJECTS = pngtest.$(OBJEXT)
+@ENABLE_TESTS_TRUE@pngstest_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngtest_SOURCES_DIST = pngtest.c
+@ENABLE_TESTS_TRUE@am_pngtest_OBJECTS = pngtest.$(OBJEXT)
 pngtest_OBJECTS = $(am_pngtest_OBJECTS)
-pngtest_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngunknown_OBJECTS = contrib/libtests/pngunknown.$(OBJEXT)
+@ENABLE_TESTS_TRUE@pngtest_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngunknown_SOURCES_DIST = contrib/libtests/pngunknown.c
+@ENABLE_TESTS_TRUE@am_pngunknown_OBJECTS =  \
+@ENABLE_TESTS_TRUE@	contrib/libtests/pngunknown.$(OBJEXT)
 pngunknown_OBJECTS = $(am_pngunknown_OBJECTS)
-pngunknown_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_pngvalid_OBJECTS = contrib/libtests/pngvalid.$(OBJEXT)
+@ENABLE_TESTS_TRUE@pngunknown_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__pngvalid_SOURCES_DIST = contrib/libtests/pngvalid.c
+@ENABLE_TESTS_TRUE@am_pngvalid_OBJECTS =  \
+@ENABLE_TESTS_TRUE@	contrib/libtests/pngvalid.$(OBJEXT)
 pngvalid_OBJECTS = $(am_pngvalid_OBJECTS)
-pngvalid_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-am_timepng_OBJECTS = contrib/libtests/timepng.$(OBJEXT)
+@ENABLE_TESTS_TRUE@pngvalid_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+am__timepng_SOURCES_DIST = contrib/libtests/timepng.c
+@ENABLE_TESTS_TRUE@am_timepng_OBJECTS =  \
+@ENABLE_TESTS_TRUE@	contrib/libtests/timepng.$(OBJEXT)
 timepng_OBJECTS = $(am_timepng_OBJECTS)
-timepng_DEPENDENCIES = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@timepng_DEPENDENCIES =  \
+@ENABLE_TESTS_TRUE@	libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
 SCRIPTS = $(bin_SCRIPTS)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
@@ -320,9 +346,11 @@ SOURCES = $(libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES) \
 	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(timepng_SOURCES)
 DIST_SOURCES =  \
 	$(am__libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES_DIST) \
-	$(png_fix_itxt_SOURCES) $(pngcp_SOURCES) $(pngfix_SOURCES) \
-	$(pngimage_SOURCES) $(pngstest_SOURCES) $(pngtest_SOURCES) \
-	$(pngunknown_SOURCES) $(pngvalid_SOURCES) $(timepng_SOURCES)
+	$(am__png_fix_itxt_SOURCES_DIST) $(am__pngcp_SOURCES_DIST) \
+	$(am__pngfix_SOURCES_DIST) $(am__pngimage_SOURCES_DIST) \
+	$(am__pngstest_SOURCES_DIST) $(am__pngtest_SOURCES_DIST) \
+	$(am__pngunknown_SOURCES_DIST) $(am__pngvalid_SOURCES_DIST) \
+	$(am__timepng_SOURCES_DIST)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -719,43 +747,43 @@ ACLOCAL_AMFLAGS = -I scripts
 # result in the installed (system) pnglibconf.h being used and the result is
 # always wrong and always very confusing.
 BUILT_SOURCES = pnglibconf.h
-pngtest_SOURCES = pngtest.c
-pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngvalid_SOURCES = contrib/libtests/pngvalid.c
-pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngstest_SOURCES = contrib/libtests/pngstest.c
-pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngunknown_SOURCES = contrib/libtests/pngunknown.c
-pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngimage_SOURCES = contrib/libtests/pngimage.c
-pngimage_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-timepng_SOURCES = contrib/libtests/timepng.c
-timepng_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-pngfix_SOURCES = contrib/tools/pngfix.c
-pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
-png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
-pngcp_SOURCES = contrib/tools/pngcp.c
-pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngtest_SOURCES = pngtest.c
+@ENABLE_TESTS_TRUE@pngtest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngvalid_SOURCES = contrib/libtests/pngvalid.c
+@ENABLE_TESTS_TRUE@pngvalid_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngstest_SOURCES = contrib/libtests/pngstest.c
+@ENABLE_TESTS_TRUE@pngstest_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngunknown_SOURCES = contrib/libtests/pngunknown.c
+@ENABLE_TESTS_TRUE@pngunknown_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngimage_SOURCES = contrib/libtests/pngimage.c
+@ENABLE_TESTS_TRUE@pngimage_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@timepng_SOURCES = contrib/libtests/timepng.c
+@ENABLE_TESTS_TRUE@timepng_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TESTS_TRUE@pngcp_SOURCES = contrib/tools/pngcp.c
+@ENABLE_TESTS_TRUE@pngcp_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TOOLS_TRUE@pngfix_SOURCES = contrib/tools/pngfix.c
+@ENABLE_TOOLS_TRUE@pngfix_LDADD = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.la
+@ENABLE_TOOLS_TRUE@png_fix_itxt_SOURCES = contrib/tools/png-fix-itxt.c
 
 # Generally these are single line shell scripts to run a test with a particular
 # set of parameters:
-TESTS = \
-   tests/pngtest-all\
-   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
-   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
-   tests/pngvalid-gamma-expand16-background\
-   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
-   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
-   tests/pngvalid-progressive-size\
-   tests/pngvalid-progressive-interlace-standard\
-   tests/pngvalid-transform\
-   tests/pngvalid-progressive-standard tests/pngvalid-standard\
-   tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
-   tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
-   tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
-   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
-   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
-   tests/pngimage-quick tests/pngimage-full
+@ENABLE_TESTS_TRUE@TESTS = \
+@ENABLE_TESTS_TRUE@   tests/pngtest-all\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-16-to-8 tests/pngvalid-gamma-alpha-mode\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-background tests/pngvalid-gamma-expand16-alpha-mode\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-expand16-background\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-expand16-transform tests/pngvalid-gamma-sbit\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-gamma-threshold tests/pngvalid-gamma-transform\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-size\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-interlace-standard\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-transform\
+@ENABLE_TESTS_TRUE@   tests/pngvalid-progressive-standard tests/pngvalid-standard\
+@ENABLE_TESTS_TRUE@   tests/pngstest-1.8 tests/pngstest-1.8-alpha tests/pngstest-linear\
+@ENABLE_TESTS_TRUE@   tests/pngstest-linear-alpha tests/pngstest-none tests/pngstest-none-alpha\
+@ENABLE_TESTS_TRUE@   tests/pngstest-sRGB tests/pngstest-sRGB-alpha tests/pngunknown-IDAT\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-discard tests/pngunknown-if-safe tests/pngunknown-sAPI\
+@ENABLE_TESTS_TRUE@   tests/pngunknown-sTER tests/pngunknown-save tests/pngunknown-vpAg\
+@ENABLE_TESTS_TRUE@   tests/pngimage-quick tests/pngimage-full
 
 
 # man pages

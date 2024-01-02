@@ -11,7 +11,6 @@
  */
 
 #include <stdio.h>
-#include <stdint.h>
 #include "../pngpriv.h"
 
 #ifdef PNG_READ_SUPPORTED
@@ -20,6 +19,7 @@
 #if PNG_MIPS_MSA_IMPLEMENTATION == 1 /* intrinsics code from pngpriv.h */
 
 #include <msa.h>
+#include <stdint.h>
 
 /* libpng row pointers are not necessarily aligned to any particular boundary,
  * however this code will only work with appropriate alignment. mips/mips_init.c

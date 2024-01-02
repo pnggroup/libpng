@@ -1,7 +1,8 @@
 # genchk.cmake.in
 # Generate .chk from .out with awk (generic), based upon the automake logic.
 
-# Copyright (C) 2016 Glenn Randers-Pehrson
+# Copyright (c) 2022-2023 Cosmin Truta
+# Copyright (c) 2016 Glenn Randers-Pehrson
 # Written by Roger Leigh, 2016
 
 # This code is released under the libpng license.
@@ -21,7 +22,7 @@ get_filename_component(OUTPUTBASE "${OUTPUT}" NAME_WE)
 get_filename_component(INPUTDIR "${INPUT}" PATH)
 get_filename_component(OUTPUTDIR "${OUTPUT}" PATH)
 
-if("${INPUTEXT}" STREQUAL ".out" AND "${OUTPUTEXT}" STREQUAL ".chk")
+if(INPUTEXT STREQUAL ".out" AND OUTPUTEXT STREQUAL ".chk")
   # Generate .chk from .out with awk (generic)
   file(REMOVE "${OUTPUT}" "${OUTPUTDIR}/${OUTPUTBASE}.new")
   execute_process(COMMAND "${AWK}" -f "${BINDIR}/scripts/checksym.awk"

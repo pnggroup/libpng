@@ -10,14 +10,11 @@ os:
   - osx
 
 env:
-  - AUTOMATION=cmake CI_NO_TEST=1
-  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=ON" CI_SANITIZERS="address,undefined"
-  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF" CI_SANITIZERS="address,undefined"
-  - AUTOMATION=configure CI_NO_TEST=1
+  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=ON"
+  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF"
   - AUTOMATION=configure CI_CONFIGURE_FLAGS="--enable-hardware-optimizations"
   - AUTOMATION=configure CI_CONFIGURE_FLAGS="--disable-hardware-optimizations"
-  - AUTOMATION=makefiles CI_NO_TEST=1
-  - AUTOMATION=makefiles CI_SANITIZERS="address,undefined"
+  - AUTOMATION=makefiles
 
 matrix:
   include:
@@ -25,11 +22,12 @@ matrix:
       env: AUTOMATION=cmake CI_CMAKE_GENERATOR=Xcode
 
 before_script:
-  - 'if test "$TRAVIS_OS_NAME" = "linux"; then COMPILER="gcc"; else COMPILER="clang"; fi'
-  - 'export CI_MAKEFILES="scripts/makefile.std scripts/makefile.$COMPILER"'
-  - 'export CI_MAKE_FLAGS="-j2"'
-  - 'export CI_CMAKE_BUILD_FLAGS="--parallel 2"'
-  - 'export CI_CTEST_FLAGS="--parallel 2"'
+  - 'if test "$TRAVIS_OS_NAME" = "linux"; then export CI_CC="gcc"; else export CI_CC="clang"; fi'
+  - 'if test "$TRAVIS_OS_NAME" != "osx"; then export CI_SANITIZERS="address,undefined"; fi'
+  - 'export CI_MAKEFILES="scripts/makefile.$CI_CC scripts/makefile.std"'
+  - 'export CI_MAKE_FLAGS=-j2'
+  - 'export CI_CMAKE_BUILD_FLAGS=-j2'
+  - 'export CI_CTEST_FLAGS=-j2'
 
 script:
   - './ci/ci_verify_$AUTOMATION.sh'

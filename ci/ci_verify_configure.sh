@@ -1,56 +1,50 @@
 #!/usr/bin/env bash
 set -e
 
-# ci_verify_configure.sh
-# Continuously integrate libpng using the configure script.
-#
 # Copyright (c) 2019-2023 Cosmin Truta.
 #
-# This software is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer
-# and license in png.h.
+# Use, modification and distribution are subject
+# to the Boost Software License, Version 1.0.
+# See the accompanying file LICENSE_BSL_1_0.txt
+# or visit http://www.boost.org/LICENSE_1_0.txt
+#
+# SPDX-License-Identifier: BSL-1.0
 
-CI_SCRIPTNAME="$(basename "$0")"
-CI_SCRIPTDIR="$(cd "$(dirname "$0")" && pwd)"
-CI_SRCDIR="$(dirname "$CI_SCRIPTDIR")"
-CI_BUILDDIR="$CI_SRCDIR/out/ci_verify_configure.build"
-CI_INSTALLDIR="$CI_SRCDIR/out/ci_verify_configure.install"
+# shellcheck source="ci/lib/ci.lib.sh"
+source "$(dirname "$0")/lib/ci.lib.sh"
+cd "$CI_TOPLEVEL_DIR"
 
-function ci_info {
-    printf >&2 "%s: %s\\n" "$CI_SCRIPTNAME" "$*"
-}
+CI_SRC_DIR="$CI_TOPLEVEL_DIR"
+CI_OUT_DIR="$CI_TOPLEVEL_DIR/out"
+CI_BUILD_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.build"
+CI_INSTALL_DIR="$CI_OUT_DIR/ci_verify_configure.$CI_TARGET_SYSTEM.$CI_TARGET_ARCH.install"
 
-function ci_err {
-    printf >&2 "%s: error: %s\\n" "$CI_SCRIPTNAME" "$*"
-    exit 2
-}
-
-function ci_spawn {
-    printf >&2 "%s: executing:" "$CI_SCRIPTNAME"
-    printf >&2 " %q" "$@"
-    printf >&2 "\\n"
-    "$@"
-}
-
-function ci_init_configure_build {
-    CI_SYSTEM_NAME="$(uname -s)"
-    CI_MACHINE_NAME="$(uname -m)"
+function ci_init_build {
+    # Ensure that the mandatory variables are initialized.
     CI_MAKE="${CI_MAKE:-make}"
-    # Set CI_CC to cc by default, if the cc command is available.
-    # The configure script defaults CC to gcc, which is not always a good idea.
-    [[ -x $(command -v cc) ]] && CI_CC="${CI_CC:-cc}"
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_BUILD_SYSTEM.$CI_BUILD_ARCH" ]] || {
+        # For native builds, set CI_CC to "cc" by default if the cc command is available.
+        # The configure script defaults CC to "gcc", which is not always a good idea.
+        [[ -x $(command -v cc) ]] && CI_CC="${CI_CC:-cc}"
+    }
     # Ensure that the CI_ variables that cannot be customized reliably are not initialized.
-    [[ ! $CI_CONFIGURE_VARS ]] || ci_err "unexpected: \$CI_CONFIGURE_VARS='$CI_CONFIGURE_VARS'"
-    [[ ! $CI_MAKE_VARS ]] || ci_err "unexpected: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
+    [[ ! $CI_CONFIGURE_VARS ]] ||
+        ci_err "unsupported: \$CI_CONFIGURE_VARS='$CI_CONFIGURE_VARS'"
+    [[ ! $CI_MAKE_VARS ]] ||
+        ci_err "unsupported: \$CI_MAKE_VARS='$CI_MAKE_VARS'"
 }
 
-function ci_trace_configure_build {
+function ci_trace_build {
     ci_info "## START OF CONFIGURATION ##"
-    ci_info "system name: $CI_SYSTEM_NAME"
-    ci_info "machine hardware name: $CI_MACHINE_NAME"
-    ci_info "source directory: $CI_SRCDIR"
-    ci_info "build directory: $CI_BUILDDIR"
-    ci_info "install directory: $CI_INSTALLDIR"
+    ci_info "build arch: $CI_BUILD_ARCH"
+    ci_info "build system: $CI_BUILD_SYSTEM"
+    [[ "$CI_TARGET_SYSTEM.$CI_TARGET_ARCH" != "$CI_BUILD_SYSTEM.$CI_BUILD_ARCH" ]] && {
+        ci_info "target arch: $CI_TARGET_ARCH"
+        ci_info "target system: $CI_TARGET_SYSTEM"
+    }
+    ci_info "source directory: $CI_SRC_DIR"
+    ci_info "build directory: $CI_BUILD_DIR"
+    ci_info "install directory: $CI_INSTALL_DIR"
     ci_info "environment option: \$CI_CONFIGURE_FLAGS: '$CI_CONFIGURE_FLAGS'"
     ci_info "environment option: \$CI_MAKE: '$CI_MAKE'"
     ci_info "environment option: \$CI_MAKE_FLAGS: '$CI_MAKE_FLAGS'"
@@ -80,14 +74,17 @@ function ci_trace_configure_build {
     ci_info "## END OF CONFIGURATION ##"
 }
 
-function ci_cleanup_old_configure_build {
-    [[ ! -e $CI_BUILDDIR ]] ||
-        ci_spawn rm -fr "$CI_BUILDDIR"
-    [[ ! -e $CI_INSTALLDIR ]] ||
-        ci_spawn rm -fr "$CI_INSTALLDIR"
+function ci_cleanup_old_build {
+    if [[ -e $CI_BUILD_DIR || -e $CI_INSTALL_DIR ]]
+    then
+        ci_info "## START OF PRE-BUILD CLEANUP ##"
+        ci_spawn rm -fr "$CI_BUILD_DIR"
+        ci_spawn rm -fr "$CI_INSTALL_DIR"
+        ci_info "## END OF PRE-BUILD CLEANUP ##"
+    fi
 }
 
-function ci_build_configure {
+function ci_build {
     ci_info "## START OF BUILD ##"
     # Export the configure build environment.
     [[ $CI_CC ]] && ci_spawn export CC="$CI_CC"
@@ -96,33 +93,44 @@ function ci_build_configure {
     [[ $CI_CPP_FLAGS ]] && ci_spawn export CPPFLAGS="$CI_CPP_FLAGS"
     [[ $CI_AR ]] && ci_spawn export AR="$CI_AR"
     [[ $CI_RANLIB ]] && ci_spawn export RANLIB="$CI_RANLIB"
-    [[ $CI_LD ]] && ci_spawn export CPP="$CI_LD"
+    [[ $CI_LD ]] && ci_spawn export LD="$CI_LD"
     [[ $CI_LD_FLAGS ]] && ci_spawn export LDFLAGS="$CI_LD_FLAGS"
     [[ $CI_SANITIZERS ]] && {
         ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS ${CFLAGS:-"-O2"}"
         ci_spawn export LDFLAGS="-fsanitize=$CI_SANITIZERS $LDFLAGS"
     }
-    # Build and install.
-    ci_spawn mkdir -p "$CI_BUILDDIR"
-    ci_spawn cd "$CI_BUILDDIR"
-    ci_spawn "$CI_SRCDIR/configure" --prefix="$CI_INSTALLDIR" $CI_CONFIGURE_FLAGS
+    # Build!
+    ci_spawn mkdir -p "$CI_BUILD_DIR"
+    ci_spawn cd "$CI_BUILD_DIR"
+    # Spawn "configure".
+    ci_spawn "$CI_SRC_DIR/configure" --prefix="$CI_INSTALL_DIR" $CI_CONFIGURE_FLAGS
+    # Spawn "make".
     ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS
-    [[ $CI_NO_TEST ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS test
-    [[ $CI_NO_INSTALL ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
-    [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS clean
-    [[ $CI_NO_CLEAN ]] || ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS distclean
+    ci_expr $((CI_NO_TEST)) || {
+        # Spawn "make test" if testing is not disabled.
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS test
+    }
+    ci_expr $((CI_NO_INSTALL)) || {
+        # Spawn "make install" if installation is not disabled.
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS install
+    }
+    ci_expr $((CI_NO_CLEAN)) || {
+        # Spawn "make clean" and "make distclean" if cleaning is not disabled.
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS clean
+        ci_spawn "$CI_MAKE" $CI_MAKE_FLAGS distclean
+    }
     ci_info "## END OF BUILD ##"
 }
 
 function main {
+    ci_init_build
+    ci_trace_build
     [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only"
-        ci_err "unexpected command arguments: '$*'"
+        ci_info "note: this program accepts environment options only (see above)"
+        ci_err "unexpected command argument: '$1'"
     }
-    ci_init_configure_build
-    ci_trace_configure_build
-    ci_cleanup_old_configure_build
-    ci_build_configure
+    ci_cleanup_old_build
+    ci_build
 }
 
 main "$@"

@@ -69,9 +69,9 @@ file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
 #
 # 1) Create 'pngusr.h', enter the required private build information
 # detailed below and #define PNG_NO_<option> for each option you
-# don't want in that file in that file.  You can also turn on options
-# using PNG_<option>_SUPPORTED.  When you have finished rerun
-# configure and rebuild pnglibconf.h file with -DPNG_USER_CONFIG:
+# don't want in that file.  You can also turn on options using
+# PNG_<option>_SUPPORTED.  When you have finished, rerun configure
+# and rebuild pnglibconf.h file with -DPNG_USER_CONFIG:
 #
 #  make clean
 #  CPPFLAGS='-DPNG_USER_CONFIG' ./configure
