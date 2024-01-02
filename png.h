@@ -3,7 +3,7 @@
  *
  * libpng version 1.6.41.git
  *
- * Copyright (c) 2018-2023 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -27,8 +27,8 @@
  * PNG Reference Library License version 2
  * ---------------------------------------
  *
- *  * Copyright (c) 1995-2023 The PNG Reference Library Authors.
- *  * Copyright (c) 2018-2023 Cosmin Truta.
+ *  * Copyright (c) 1995-2024 The PNG Reference Library Authors.
+ *  * Copyright (c) 2018-2024 Cosmin Truta.
  *  * Copyright (c) 2000-2002, 2004, 2006-2018 Glenn Randers-Pehrson.
  *  * Copyright (c) 1996-1997 Andreas Dilger.
  *  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
