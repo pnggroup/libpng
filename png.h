@@ -1730,12 +1730,9 @@ PNG_EXPORT(97, void, png_free, (png_const_structrp png_ptr, png_voidp ptr));
 PNG_EXPORT(98, void, png_free_data, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 free_me, int num));
 
-/* Reassign responsibility for freeing existing data, whether allocated
+/* Reassign the responsibility for freeing existing data, whether allocated
  * by libpng or by the application; this works on the png_info structure passed
- * in, it does not change the state for other png_info structures.
- *
- * It is unlikely that this function works correctly as of 1.6.0 and using it
- * may result either in memory leaks or double free of allocated data.
+ * in, without changing the state for other png_info structures.
  */
 PNG_EXPORT(99, void, png_data_freer, (png_const_structrp png_ptr,
     png_inforp info_ptr, int freer, png_uint_32 mask));
