@@ -276,6 +276,12 @@
 #  define PNG_POWERPC_VSX_IMPLEMENTATION 0
 #endif
 
+#if PNG_LOONGARCH_LSX_OPT > 0
+#   define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_lsx
+#   define PNG_LOONGARCH_LSX_IMPLEMENTATION 1
+#else
+#   define PNG_LOONGARCH_LSX_IMPLEMENTATION 0
+#endif
 
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
@@ -1355,6 +1361,23 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_sse2,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
+#if PNG_LOONGARCH_LSX_IMPLEMENTATION == 1
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_lsx,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+#endif
+
 /* Choose the best filter to use and filter the row data */
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
     png_row_infop row_info),PNG_EMPTY);
@@ -2103,6 +2126,11 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_msa,
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #  endif
+#endif
+
+#if PNG_LOONGARCH_LSX_OPT > 0
+PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
+    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
