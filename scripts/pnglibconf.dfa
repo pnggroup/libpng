@@ -256,6 +256,55 @@ option POWERPC_VSX_API disabled enables SET_OPTION,
 option POWERPC_VSX_CHECK disabled,
   sets POWERPC_VSX_OPT 1
 
+# These options are specific to the MIPS MSA hardware optimizations.
+#
+# MIPS_MSA_OPT: unset: check at compile time (__mips_msa must be defined by
+#                      the compiler, typically as a result of specifying
+#                      "-mmsa -mfp64" compiler flags)
+#                   0: disable (even if the CPU supports MSA.)
+#                   1: check at run time (via MIPS_MSA_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mmsa -mfp64 to compiler options)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as "-mmsa -mfp64" will achieve the same
+#           effect as well as applying MSA optimizations to the rest of the
+#           libpng code.
+#           NOTE: any setting other than '0' requires ALIGNED_MEMORY
+# MIPS_MSA_API:   (PNG_MIPS_MSA == 1) allow the optimization to be switched on
+#                 with png_set_option.
+# MIPS_MSA_CHECK: (PNG_MIPS_MSA == 1) compile a run-time check to see if MSA
+#                 extensions are supported.
+setting MIPS_MSA_OPT
+option MIPS_MSA_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
+  sets MIPS_MSA_OPT 1
+option MIPS_MSA_CHECK disabled requires ALIGNED_MEMORY,
+  sets MIPS_MSA_OPT 1
+
+# These options are specific to the MIPS MMI hardware optimizations.
+#
+# MIPS_MMI_OPT: unset: check at compile time (__mips_loongson_mmi must be defined by
+#                      the compiler, typically as a result of specifying
+#                      "-mloongson-mmi -march=loongson3a" compiler flags)
+#                   0: disable (even if the CPU supports MMI.)
+#                   1: check at run time (via MIPS_MMI_{API,CHECK})
+#                   2: switch on unconditionally (inadvisable - instead pass
+#                      -mloongson-mmi -march=loongson3a to compiler options)
+#           When building libpng avoid using any setting other than '0'; '1' is
+#           set automatically when either 'API' or 'CHECK' are configured in,
+#           '2' should not be necessary as "-mloongson-mmi -march=loongson3a" will achieve the same
+#           effect as well as applying MMI optimizations to the rest of the
+#           libpng code.
+# MIPS_MMI_API:   (PNG_MIPS_MMI == 1) allow the optimization to be switched on
+#                 with png_set_option
+# MIPS_MMI_CHECK: (PNG_MIPS_MMI == 1) compile a run-time check to see if MMI
+#                 extensions are supported.
+setting MIPS_MMI_OPT
+option MIPS_MMI_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
+  sets MIPS_MMI_OPT 1
+option MIPS_MMI_CHECK disabled requires ALIGNED_MEMORY,
+  sets MIPS_MMI_OPT 1
+
 
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib. It describes the input

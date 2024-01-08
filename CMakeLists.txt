@@ -227,19 +227,44 @@ if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
       CACHE STRING "Enable MIPS_MSA optimizations: on|off; on is default")
   set_property(CACHE PNG_MIPS_MSA
                PROPERTY STRINGS ${PNG_MIPS_MSA_POSSIBLE_VALUES})
-  list(FIND PNG_MIPS_MSA_POSSIBLE_VALUES ${PNG_MIPS_MSA} index)
-  if(index EQUAL -1)
+  list(FIND PNG_MIPS_MSA_POSSIBLE_VALUES ${PNG_MIPS_MSA} index_msa)
+  if(index_msa EQUAL -1)
     message(FATAL_ERROR "PNG_MIPS_MSA must be one of [${PNG_MIPS_MSA_POSSIBLE_VALUES}]")
-  elseif(NOT PNG_MIPS_MSA STREQUAL "off")
+  endif()
+
+  set(PNG_MIPS_MMI_POSSIBLE_VALUES on off)
+  set(PNG_MIPS_MMI "on"
+      CACHE STRING "Enable MIPS_MMI optimizations: on|off; on is default")
+  set_property(CACHE PNG_MIPS_MMI
+               PROPERTY STRINGS ${PNG_MIPS_MMI_POSSIBLE_VALUES})
+  list(FIND PNG_MIPS_MMI_POSSIBLE_VALUES ${PNG_MIPS_MMI} index_mmi)
+  if(index_mmi EQUAL -1)
+    message(FATAL_ERROR "PNG_MIPS_MMI must be one of [${PNG_MIPS_MMI_POSSIBLE_VALUES}]")
+  endif()
+
+  if(PNG_MIPS_MSA STREQUAL "on" AND PNG_MIPS_MMI STREQUAL "on")
+    set(libpng_mips_sources
+        mips/mips_init.c
+        mips/filter_msa_intrinsics.c
+        mips/filter_mmi_inline_assembly.c)
+    add_definitions(-DPNG_MIPS_MSA_OPT=2)
+    add_definitions(-DPNG_MIPS_MMI_OPT=1)
+  elseif(PNG_MIPS_MSA STREQUAL "on")
     set(libpng_mips_sources
         mips/mips_init.c
         mips/filter_msa_intrinsics.c)
-    if(PNG_MIPS_MSA STREQUAL "on")
-      add_definitions(-DPNG_MIPS_MSA_OPT=2)
-    endif()
-  else()
+    add_definitions(-DPNG_MIPS_MSA_OPT=2)
+    add_definitions(-DPNG_MIPS_MMI_OPT=0)
+  elseif(PNG_MIPS_MMI STREQUAL "on")
+    set(libpng_mips_sources
+        mips/mips_init.c
+        mips/filter_mmi_inline_assembly.c)
     add_definitions(-DPNG_MIPS_MSA_OPT=0)
-  endif()
+    add_definitions(-DPNG_MIPS_MMI_OPT=1)
+    else()
+    add_definitions(-DPNG_MIPS_MSA_OPT=0)
+    add_definitions(-DPNG_MIPS_MMI_OPT=0)
+    endif()
 endif()
 
 else(PNG_HARDWARE_OPTIMIZATIONS)

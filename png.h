@@ -3208,7 +3208,11 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #ifdef PNG_POWERPC_VSX_API_SUPPORTED
 #  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions supported */
 #endif
-#define PNG_OPTION_NEXT  12 /* Next option - numbers must be even */
+#ifdef PNG_MIPS_MMI_API_SUPPORTED
+#  define PNG_MIPS_MMI   12 /* HARDWARE: MIPS MMI SIMD instructions supported */
+#endif
+
+#define PNG_OPTION_NEXT  14 /* Next option - numbers must be even */
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
