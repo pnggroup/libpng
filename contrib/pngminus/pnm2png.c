@@ -222,9 +222,7 @@ BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
   png_uint_32   alpha_width = 0, alpha_height = 0;
   int           alpha_depth = 0, alpha_present = 0;
   BOOL          alpha_raw = FALSE;
-#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   BOOL          packed_bitmap = FALSE;
-#endif
 
   /* read header of PNM file */
 
@@ -247,16 +245,10 @@ BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
 
   if ((magic_token[1] == '1') || (magic_token[1] == '4'))
   {
-#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
     raw = (magic_token[1] == '4');
     bit_depth = 1;
     color_type = PNG_COLOR_TYPE_GRAY;
     packed_bitmap = TRUE;
-#else
-    fprintf (stderr, "PNM2PNG built without PNG_WRITE_INVERT_SUPPORTED and\n");
-    fprintf (stderr, "PNG_WRITE_PACK_SUPPORTED can't read PBM (P1,P4) files\n");
-    return FALSE;
-#endif
   }
   else if ((magic_token[1] == '2') || (magic_token[1] == '5'))
   {
@@ -356,14 +348,12 @@ BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
 
   alpha_present = (channels - 1) % 2;
 
-#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   if (packed_bitmap)
   {
     /* row data is as many bytes as can fit width x channels x bit_depth */
     row_bytes = (width * channels * bit_depth + 7) / 8;
   }
   else
-#endif
   {
     /* row_bytes is the width x number of channels x (bit-depth / 8) */
     row_bytes = width * channels * ((bit_depth <= 8) ? 1 : 2);
@@ -396,7 +386,6 @@ BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
   for (row = 0; row < height; row++)
   {
     pix_ptr = row_pointers[row];
-#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
     if (packed_bitmap)
     {
       for (i = 0; i < row_bytes; i++)
@@ -406,7 +395,6 @@ BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
       }
     }
     else
-#endif
     {
       for (col = 0; col < width; col++)
       {
@@ -466,13 +454,11 @@ BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
                 (!interlace) ? PNG_INTERLACE_NONE : PNG_INTERLACE_ADAM7,
                 PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
-#if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   if (packed_bitmap == TRUE)
   {
     png_set_packing (png_ptr);
     png_set_invert_mono (png_ptr);
   }
-#endif
 
   /* write the file header information */
   png_write_info (png_ptr, info_ptr);

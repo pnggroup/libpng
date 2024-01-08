@@ -224,7 +224,7 @@ BOOL png2pnm_internal (png_struct *png_ptr, png_info *info_ptr,
   /* set up (if applicable) the expansion of grayscale images to bit-depth 8 */
   png_set_expand_gray_1_2_4_to_8 (png_ptr);
 
-#ifdef NJET /* FIXME */
+#ifdef NJET
   /* downgrade 16-bit images to 8-bit */
   if (bit_depth == 16)
     png_set_strip_16 (png_ptr);
@@ -232,9 +232,12 @@ BOOL png2pnm_internal (png_struct *png_ptr, png_info *info_ptr,
   if (color_type == PNG_COLOR_TYPE_GRAY ||
       color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
     png_set_gray_to_rgb (png_ptr);
-  /* only if file has a file gamma, we do a correction */
-  if (png_get_gAMA (png_ptr, info_ptr, &file_gamma))
-    png_set_gamma (png_ptr, (double) 2.2, file_gamma);
+  /* if the PNG image has a gAMA chunk then gamma-correct the output image */
+  {
+    double file_gamma;
+    if (png_get_gAMA (png_ptr, info_ptr, &file_gamma))
+      png_set_gamma (png_ptr, (double) 2.2, file_gamma);
+  }
 #endif
 
   /* read the image file, with all of the above image transforms applied */
