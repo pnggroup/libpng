@@ -14,10 +14,10 @@
 #define BOOL unsigned char
 #endif
 #ifndef TRUE
-#define TRUE (BOOL) 1
+#define TRUE ((BOOL) 1)
 #endif
 #ifndef FALSE
-#define FALSE (BOOL) 0
+#define FALSE ((BOOL) 0)
 #endif
 
 /* make png2pnm verbose so we can find problems (needs to be before png.h) */
@@ -256,15 +256,6 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   png_get_IHDR (png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
                 NULL, NULL, NULL);
 
-  /* check for 16-bit files */
-  if (bit_depth == 16)
-  {
-    raw = FALSE;
-#if defined(O_BINARY) && (O_BINARY != 0)
-    setmode (fileno (pnm_file), O_BINARY);
-#endif
-  }
-
   /* calculate new number of channels and store alpha-presence */
   if (color_type == PNG_COLOR_TYPE_GRAY)
     channels = 1;
@@ -364,13 +355,16 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
         if (raw)
         {
           fputc ((int) *pix_ptr++, pnm_file);
+          if (bit_depth == 16)
+            fputc ((int) *pix_ptr++, pnm_file);
         }
         else
         {
           if (bit_depth == 16)
           {
-            dep_16 = (long) *pix_ptr++;
-            fprintf (pnm_file, "%ld ", (dep_16 << 8) + ((long) *pix_ptr++));
+            dep_16 = ((long) *pix_ptr++) << 8;
+            dep_16 += ((long) *pix_ptr++);
+            fprintf (pnm_file, "%ld ", dep_16);
           }
           else
           {
@@ -382,22 +376,27 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
       {
         if (!alpha)
         {
-          pix_ptr++; /* alpha */
+          /* skip the alpha-channel */
+          pix_ptr++;
           if (bit_depth == 16)
             pix_ptr++;
         }
-        else /* output alpha-channel as pgm file */
+        else
         {
+          /* output the alpha-channel as pgm file */
           if (raw)
           {
             fputc ((int) *pix_ptr++, alpha_file);
+            if (bit_depth == 16)
+              fputc ((int) *pix_ptr++, alpha_file);
           }
           else
           {
             if (bit_depth == 16)
             {
-              dep_16 = (long) *pix_ptr++;
-              fprintf (alpha_file, "%ld ", (dep_16 << 8) + (long) *pix_ptr++);
+              dep_16 = ((long) *pix_ptr++) << 8;
+              dep_16 += ((long) *pix_ptr++);
+              fprintf (alpha_file, "%ld ", dep_16);
             }
             else
             {
@@ -423,5 +422,4 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
     free (png_pixels);
 
   return TRUE;
-
 } /* end of source */
