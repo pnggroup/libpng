@@ -21,11 +21,6 @@
 #define FALSE ((BOOL) 0)
 #endif
 
-/* make pnm2png verbose so we can find problems (needs to be before png.h) */
-#ifndef PNG_DEBUG
-#define PNG_DEBUG 0
-#endif
-
 #include "png.h"
 
 /* function prototypes */
@@ -34,6 +29,9 @@ int main (int argc, char *argv[]);
 void usage ();
 BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
               BOOL interlace, BOOL alpha);
+BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
+                       FILE *pnm_file, FILE *alpha_file,
+                       BOOL interlace, BOOL alpha);
 int fscan_pnm_magic (FILE *pnm_file, char *magic_buf, size_t magic_buf_size);
 int fscan_pnm_token (FILE *pnm_file, char *token_buf, size_t token_buf_size);
 int fscan_pnm_uint_32 (FILE *pnm_file, png_uint_32 *num_ptr);
@@ -166,11 +164,52 @@ void usage ()
 BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
               BOOL interlace, BOOL alpha)
 {
-  png_struct    *png_ptr = NULL;
-  png_info      *info_ptr = NULL;
-  png_byte      *png_pixels = NULL;
-  png_byte      **row_pointers = NULL;
-  png_byte      *pix_ptr = NULL;
+  png_struct    *png_ptr;
+  png_info      *info_ptr;
+  BOOL          ret;
+
+  /* initialize the libpng structures for writing to png_file */
+
+  png_ptr = png_create_write_struct (png_get_libpng_ver(NULL),
+                                     NULL, NULL, NULL);
+  if (!png_ptr)
+    return FALSE; /* out of memory */
+
+  info_ptr = png_create_info_struct (png_ptr);
+  if (!info_ptr)
+  {
+    png_destroy_write_struct (&png_ptr, NULL);
+    return FALSE; /* out of memory */
+  }
+
+  if (setjmp (png_jmpbuf (png_ptr)))
+  {
+    png_destroy_write_struct (&png_ptr, &info_ptr);
+    return FALSE; /* generic libpng error */
+  }
+
+  png_init_io (png_ptr, png_file);
+
+  /* do the actual conversion */
+  ret = pnm2png_internal (png_ptr, info_ptr,
+                          pnm_file, alpha_file, interlace, alpha);
+
+  /* clean up the libpng structures and their internally-managed data */
+  png_destroy_write_struct (&png_ptr, &info_ptr);
+
+  return ret;
+}
+
+/*
+ *  pnm2png_internal
+ */
+
+BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
+                       FILE *pnm_file, FILE *alpha_file,
+                       BOOL interlace, BOOL alpha)
+{
+  png_byte      **row_pointers;
+  png_byte      *pix_ptr;
   int           bit_depth;
   int           color_type;
   int           channels;
@@ -336,18 +375,27 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
     /* too big */
     return FALSE;
   }
-  if ((png_pixels = (png_byte *)
-       malloc ((size_t) row_bytes * (size_t) height)) == NULL)
+
+  /* allocate the rows using the same memory layout as libpng, and transfer
+   * their ownership to libpng, with the responsibility to clean everything up;
+   * please note the use of png_calloc instead of png_malloc */
+  row_pointers = (png_byte **)
+                 png_calloc (png_ptr, height * sizeof (png_byte *));
+  png_set_rows (png_ptr, info_ptr, row_pointers);
+  png_data_freer (png_ptr, info_ptr, PNG_DESTROY_WILL_FREE_DATA, PNG_FREE_ALL);
+  for (row = 0; row < height; row++)
   {
-    /* out of memory */
-    return FALSE;
+    /* the individual rows should only be allocated after all the previous
+     * steps completed successfully, because libpng must handle correctly
+     * any image allocation left incomplete after an out-of-memory error */
+    row_pointers[row] = (png_byte *) png_malloc (png_ptr, row_bytes);
   }
 
-  /* read data from PNM file */
-  pix_ptr = png_pixels;
+  /* read the data from PNM file */
 
   for (row = 0; row < height; row++)
   {
+    pix_ptr = row_pointers[row];
 #if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
     if (packed_bitmap)
     {
@@ -413,21 +461,10 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
     } /* end for col */
   } /* end for row */
 
-  /* prepare the standard PNG structures */
-  png_ptr = png_create_write_struct (png_get_libpng_ver(NULL),
-                                     NULL, NULL, NULL);
-  if (!png_ptr)
-  {
-    free (png_pixels);
-    return FALSE;
-  }
-  info_ptr = png_create_info_struct (png_ptr);
-  if (!info_ptr)
-  {
-    png_destroy_write_struct (&png_ptr, NULL);
-    free (png_pixels);
-    return FALSE;
-  }
+  /* we're going to write more or less the same PNG as the input file */
+  png_set_IHDR (png_ptr, info_ptr, width, height, bit_depth, color_type,
+                (!interlace) ? PNG_INTERLACE_NONE : PNG_INTERLACE_ADAM7,
+                PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 
 #if defined(PNG_WRITE_INVERT_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
   if (packed_bitmap == TRUE)
@@ -437,53 +474,14 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
   }
 #endif
 
-  if (setjmp (png_jmpbuf (png_ptr)))
-  {
-    png_destroy_write_struct (&png_ptr, &info_ptr);
-    free (png_pixels);
-    return FALSE;
-  }
-
-  /* initialize the png structure */
-  png_init_io (png_ptr, png_file);
-
-  /* we're going to write more or less the same PNG as the input file */
-  png_set_IHDR (png_ptr, info_ptr, width, height, bit_depth, color_type,
-                (!interlace) ? PNG_INTERLACE_NONE : PNG_INTERLACE_ADAM7,
-                PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
-
   /* write the file header information */
   png_write_info (png_ptr, info_ptr);
-
-  /* if needed we will allocate memory for an new array of row-pointers */
-  if (row_pointers == NULL)
-  {
-    if ((row_pointers = (png_byte **)
-         malloc (height * sizeof (png_byte *))) == NULL)
-    {
-      png_destroy_write_struct (&png_ptr, &info_ptr);
-      free (png_pixels);
-      return FALSE;
-    }
-  }
-
-  /* set the individual row_pointers to point at the correct offsets */
-  for (i = 0; i < height; i++)
-    row_pointers[i] = png_pixels + i * row_bytes;
 
   /* write out the entire image data in one call */
   png_write_image (png_ptr, row_pointers);
 
   /* write the additional chunks to the PNG file (not really needed) */
   png_write_end (png_ptr, info_ptr);
-
-  /* clean up after the write, and free any memory allocated */
-  png_destroy_write_struct (&png_ptr, &info_ptr);
-
-  if (row_pointers != NULL)
-    free (row_pointers);
-  if (png_pixels != NULL)
-    free (png_pixels);
 
   return TRUE;
 } /* end of pnm2png */

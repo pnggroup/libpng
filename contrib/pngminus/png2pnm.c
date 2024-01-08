@@ -20,11 +20,6 @@
 #define FALSE ((BOOL) 0)
 #endif
 
-/* make png2pnm verbose so we can find problems (needs to be before png.h) */
-#ifndef PNG_DEBUG
-#define PNG_DEBUG 0
-#endif
-
 #include "png.h"
 
 /* function prototypes */
@@ -33,6 +28,9 @@ int main (int argc, char *argv[]);
 void usage ();
 BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
               BOOL raw, BOOL alpha);
+BOOL png2pnm_internal (png_struct *png_ptr, png_info *info_ptr, 
+                       FILE *pnm_file, FILE *alpha_file,
+                       BOOL raw, BOOL alpha);
 
 /*
  *  main
@@ -163,35 +161,11 @@ void usage ()
 BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
               BOOL raw, BOOL alpha)
 {
-  png_struct    *png_ptr = NULL;
-  png_info      *info_ptr = NULL;
-  png_byte      buf[8];
-  png_byte      *png_pixels = NULL;
-  png_byte      **row_pointers = NULL;
-  png_byte      *pix_ptr = NULL;
-  png_uint_32   row_bytes;
+  png_struct    *png_ptr;
+  png_info      *info_ptr;
+  BOOL          ret;
 
-  png_uint_32   width;
-  png_uint_32   height;
-  int           bit_depth;
-  int           channels;
-  int           color_type;
-  int           alpha_present;
-  int           row, col;
-  int           ret;
-  int           i;
-  long          dep_16;
-
-  /* read and check signature in PNG file */
-  ret = fread (buf, 1, 8, png_file);
-  if (ret != 8)
-    return FALSE;
-
-  ret = png_sig_cmp (buf, 0, 8);
-  if (ret != 0)
-    return FALSE;
-
-  /* create png and info structures */
+  /* initialize the libpng structures for reading from png_file */
 
   png_ptr = png_create_read_struct (png_get_libpng_ver(NULL),
                                     NULL, NULL, NULL);
@@ -208,33 +182,49 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (setjmp (png_jmpbuf (png_ptr)))
   {
     png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
-    return FALSE;
+    return FALSE; /* generic libpng error */
   }
 
-  /* set up the input control for C streams */
   png_init_io (png_ptr, png_file);
-  png_set_sig_bytes (png_ptr, 8); /* we already read the 8 signature bytes */
 
-  /* read the file information */
-  png_read_info (png_ptr, info_ptr);
+  /* do the actual conversion */
+  ret = png2pnm_internal (png_ptr, info_ptr, pnm_file, alpha_file, raw, alpha);
 
-  /* get size and bit-depth of the PNG-image */
-  png_get_IHDR (png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
-                NULL, NULL, NULL);
+  /* clean up the libpng structures and their internally-managed data */
+  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
 
-  /* set-up the transformations */
+  return ret;
+}
 
-  /* transform paletted images into full-color rgb */
-  if (color_type == PNG_COLOR_TYPE_PALETTE)
-    png_set_expand (png_ptr);
-  /* expand images to bit-depth 8 (only applicable for grayscale images) */
-  if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
-    png_set_expand (png_ptr);
-  /* transform transparency maps into full alpha-channel */
-  if (png_get_valid (png_ptr, info_ptr, PNG_INFO_tRNS))
-    png_set_expand (png_ptr);
+/*
+ *  png2pnm_internal
+ */
 
-#ifdef NJET
+BOOL png2pnm_internal (png_struct *png_ptr, png_info *info_ptr,
+                       FILE *pnm_file, FILE *alpha_file,
+                       BOOL raw, BOOL alpha)
+{
+  png_byte      **row_pointers;
+  png_byte      *pix_ptr;
+  png_uint_32   width;
+  png_uint_32   height;
+  int           bit_depth;
+  int           channels;
+  int           color_type;
+  int           alpha_present;
+  png_uint_32   row, col, i;
+  long          dep_16;
+
+  /* set up the image transformations that are necessary for the PNM format */
+
+  /* set up (if applicable) the expansion of paletted images to full-color rgb,
+   * and the expansion of transparency maps to full alpha-channel */
+  png_set_expand (png_ptr);
+
+  /* set up (if applicable) the expansion of grayscale images to bit-depth 8 */
+  png_set_expand_gray_1_2_4_to_8 (png_ptr);
+
+#ifdef NJET /* FIXME */
   /* downgrade 16-bit images to 8-bit */
   if (bit_depth == 16)
     png_set_strip_16 (png_ptr);
@@ -247,16 +237,14 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
     png_set_gamma (png_ptr, (double) 2.2, file_gamma);
 #endif
 
-  /* all transformations have been registered; now update info_ptr data,
-   * get rowbytes and channels, and allocate image memory */
+  /* read the image file, with all of the above image transforms applied */
+  png_read_png (png_ptr, info_ptr, 0, NULL);
 
-  png_read_update_info (png_ptr, info_ptr);
-
-  /* get the new color-type and bit-depth (after expansion/stripping) */
+  /* get the image size, bit-depth and color-type */
   png_get_IHDR (png_ptr, info_ptr, &width, &height, &bit_depth, &color_type,
                 NULL, NULL, NULL);
 
-  /* calculate new number of channels and store alpha-presence */
+  /* calculate the number of channels and store alpha-presence */
   if (color_type == PNG_COLOR_TYPE_GRAY)
     channels = 1;
   else if (color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
@@ -273,47 +261,12 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   if (alpha && !alpha_present)
   {
     fprintf (stderr, "PNG2PNM\n");
-    fprintf (stderr, "Error:  PNG-file doesn't contain alpha channel\n");
-    exit (1);
-  }
-
-  /* row_bytes is the width x number of channels x (bit-depth / 8) */
-  row_bytes = png_get_rowbytes (png_ptr, info_ptr);
-
-  if ((row_bytes == 0) ||
-      ((size_t) height > (size_t) (-1) / (size_t) row_bytes))
-  {
-    /* too big */
-    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
-    return FALSE;
-  }
-  if ((png_pixels = (png_byte *)
-       malloc ((size_t) row_bytes * (size_t) height)) == NULL)
-  {
-    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+    fprintf (stderr, "Warning:  no alpha channel in PNG file\n");
     return FALSE;
   }
 
-  if ((row_pointers = (png_byte **)
-       malloc ((size_t) height * sizeof (png_byte *))) == NULL)
-  {
-    png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
-    free (png_pixels);
-    return FALSE;
-  }
-
-  /* set the individual row_pointers to point at the correct offsets */
-  for (i = 0; i < ((int) height); i++)
-    row_pointers[i] = png_pixels + i * row_bytes;
-
-  /* now we can go ahead and just read the whole image */
-  png_read_image (png_ptr, row_pointers);
-
-  /* read rest of file, and get additional chunks in info_ptr - REQUIRED */
-  png_read_end (png_ptr, info_ptr);
-
-  /* clean up after the read, and free any memory allocated - REQUIRED */
-  png_destroy_read_struct (&png_ptr, &info_ptr, NULL);
+  /* get address of internally-allocated image data */
+  row_pointers = png_get_rows (png_ptr, info_ptr);
 
   /* write header of PNM file */
 
@@ -344,13 +297,13 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
   }
 
   /* write data to PNM file */
-  pix_ptr = png_pixels;
 
-  for (row = 0; row < (int) height; row++)
+  for (row = 0; row < height; row++)
   {
-    for (col = 0; col < (int) width; col++)
+    pix_ptr = row_pointers[row];
+    for (col = 0; col < width; col++)
     {
-      for (i = 0; i < (channels - alpha_present); i++)
+      for (i = 0; i < (png_uint_32) (channels - alpha_present); i++)
       {
         if (raw)
         {
@@ -415,11 +368,6 @@ BOOL png2pnm (FILE *png_file, FILE *pnm_file, FILE *alpha_file,
       if (col % 4 != 0)
         fprintf (pnm_file, "\n");
   } /* end for row */
-
-  if (row_pointers != NULL)
-    free (row_pointers);
-  if (png_pixels != NULL)
-    free (png_pixels);
 
   return TRUE;
 } /* end of source */
