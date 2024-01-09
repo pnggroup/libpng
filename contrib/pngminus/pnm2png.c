@@ -29,9 +29,9 @@ int main (int argc, char *argv[]);
 void usage ();
 BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
               BOOL interlace, BOOL alpha);
-BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
-                       FILE *pnm_file, FILE *alpha_file,
-                       BOOL interlace, BOOL alpha);
+BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
+                 FILE *pnm_file, FILE *alpha_file,
+                 BOOL interlace, BOOL alpha);
 int fscan_pnm_magic (FILE *pnm_file, char *magic_buf, size_t magic_buf_size);
 int fscan_pnm_token (FILE *pnm_file, char *token_buf, size_t token_buf_size);
 int fscan_pnm_uint_32 (FILE *pnm_file, png_uint_32 *num_ptr);
@@ -47,9 +47,11 @@ int main (int argc, char *argv[])
   FILE *fp_rd = stdin;
   FILE *fp_al = NULL;
   FILE *fp_wr = stdout;
+  const char *fname_wr = NULL;
   BOOL interlace = FALSE;
   BOOL alpha = FALSE;
   int argi;
+  int ret;
 
   for (argi = 1; argi < argc; argi++)
   {
@@ -95,6 +97,7 @@ int main (int argc, char *argv[])
     }
     else if (fp_wr == stdout)
     {
+      fname_wr = argv[argi];
       if ((fp_wr = fopen (argv[argi], "wb")) == NULL)
       {
         fprintf (stderr, "PNM2PNG\n");
@@ -122,12 +125,7 @@ int main (int argc, char *argv[])
 #endif
 
   /* call the conversion program itself */
-  if (pnm2png (fp_rd, fp_wr, fp_al, interlace, alpha) == FALSE)
-  {
-    fprintf (stderr, "PNM2PNG\n");
-    fprintf (stderr, "Error:  unsuccessful converting to PNG-image\n");
-    exit (1);
-  }
+  ret = pnm2png (fp_rd, fp_wr, fp_al, interlace, alpha);
 
   /* close input file */
   fclose (fp_rd);
@@ -136,6 +134,15 @@ int main (int argc, char *argv[])
   /* close alpha file */
   if (alpha)
     fclose (fp_al);
+
+  if (!ret)
+  {
+    fprintf (stderr, "PNM2PNG\n");
+    fprintf (stderr, "Error:  unsuccessful converting to PNG-image\n");
+    if (fname_wr)
+      remove (fname_wr); /* no broken output file shall remain behind */
+    exit (1);
+  }
 
   return 0;
 }
@@ -168,7 +175,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
   png_info      *info_ptr;
   BOOL          ret;
 
-  /* initialize the libpng structures for writing to png_file */
+  /* initialize the libpng context for writing to png_file */
 
   png_ptr = png_create_write_struct (png_get_libpng_ver(NULL),
                                      NULL, NULL, NULL);
@@ -191,8 +198,7 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
   png_init_io (png_ptr, png_file);
 
   /* do the actual conversion */
-  ret = pnm2png_internal (png_ptr, info_ptr,
-                          pnm_file, alpha_file, interlace, alpha);
+  ret = do_pnm2png (png_ptr, info_ptr, pnm_file, alpha_file, interlace, alpha);
 
   /* clean up the libpng structures and their internally-managed data */
   png_destroy_write_struct (&png_ptr, &info_ptr);
@@ -201,12 +207,12 @@ BOOL pnm2png (FILE *pnm_file, FILE *png_file, FILE *alpha_file,
 }
 
 /*
- *  pnm2png_internal
+ *  do_pnm2png - does the conversion in a fully-initialized libpng context
  */
 
-BOOL pnm2png_internal (png_struct *png_ptr, png_info *info_ptr,
-                       FILE *pnm_file, FILE *alpha_file,
-                       BOOL interlace, BOOL alpha)
+BOOL do_pnm2png (png_struct *png_ptr, png_info *info_ptr,
+                 FILE *pnm_file, FILE *alpha_file,
+                 BOOL interlace, BOOL alpha)
 {
   png_byte      **row_pointers;
   png_byte      *pix_ptr;
