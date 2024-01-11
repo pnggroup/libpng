@@ -849,7 +849,7 @@ PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), PNGARG((jmp_buf, int)), typedef);
 #define PNG_TRANSFORM_GRAY_TO_RGB   0x2000      /* read only */
 /* Added to libpng-1.5.4 */
 #define PNG_TRANSFORM_EXPAND_16     0x4000      /* read only */
-#if INT_MAX >= 0x8000 /* else this might break */
+#if ~0U > 0xffffU /* or else this might break on a 16-bit machine */
 #define PNG_TRANSFORM_SCALE_16      0x8000      /* read only */
 #endif
 
