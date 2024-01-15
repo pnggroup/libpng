@@ -1,6 +1,6 @@
 /* pngfix.c
  *
- * Copyright (c) 2014-2017 John Cunningham Bowler
+ * Copyright (c) 2014-2017,2024 John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -19,19 +19,6 @@
 #include <assert.h>
 
 #define implies(x,y) assert(!(x) || (y))
-
-#ifdef __GNUC__
-   /* This is used to fix the error:
-    *
-    * pngfix.c:
-    * In function 'zlib_advance':
-    * pngfix.c:181:13: error: assuming signed overflow does not
-    *   occur when simplifying conditional to constant [-Werror=strict-overflow]
-    */
-#  define FIX_GCC volatile
-#else
-#  define FIX_GCC
-#endif
 
 #define PROGRAM_NAME "pngfix"
 
@@ -218,7 +205,7 @@ uarb_inc(uarb num, int in_digits, png_int_32 add)
     * in_digits+1 if add is known to be in the range -65535..65535.
     */
 {
-   FIX_GCC int out_digits = 0;
+   int out_digits = 0;
 
    while (out_digits < in_digits)
    {
@@ -263,7 +250,7 @@ uarb_add32(uarb num, int in_digits, png_uint_32 add)
 }
 
 static int
-uarb_mult_digit(uarb acc, int a_digits, uarb num, FIX_GCC int n_digits,
+uarb_mult_digit(uarb acc, int a_digits, uarb num, int n_digits,
    png_uint_16 val)
    /* Primitive one-digit multiply - 'val' must be 0..65535. Note that this
     * primitive is a multiply and accumulate - the result of *num * val is added
@@ -336,7 +323,7 @@ uarb_shift(uarb inout, int ndigits, unsigned int right_shift)
     * 1..15
     */
 {
-   FIX_GCC int i = ndigits;
+   int i = ndigits;
    png_uint_16 carry = 0;
 
    assert(right_shift >= 1 && right_shift <= 15);
@@ -351,7 +338,7 @@ uarb_shift(uarb inout, int ndigits, unsigned int right_shift)
       inout[i] = temp;
 
       /* The shift may reduce ndigits */
-      if (i == ndigits-1 && temp == 0)
+      if (i+1 == ndigits && temp == 0)
          ndigits = i;
    }
 
