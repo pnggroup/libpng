@@ -255,7 +255,7 @@ void
 png_warning_parameter_unsigned(png_warning_parameters p, int number, int format,
     png_alloc_size_t value)
 {
-   char buffer[PNG_NUMBER_BUFFER_SIZE];
+   char buffer[PNG_NUMBER_BUFFER_SIZE]; /* CORRECT: initialized below: */
    png_warning_parameter(p, number, PNG_FORMAT_NUMBER(buffer, format, value));
 }
 
@@ -272,7 +272,7 @@ png_warning_parameter_signed(png_warning_parameters p, int number, int format,
    if (value < 0)
       u = ~u + 1;
 
-   str = PNG_FORMAT_NUMBER(buffer, format, u);
+   str = PNG_FORMAT_NUMBER(buffer, format, u); /*CORRECT: initializes buffer */
 
    if (value < 0 && str > buffer)
       *--str = '-';
@@ -933,31 +933,30 @@ png_safe_warning(png_structp png_nonconst_ptr, png_const_charp warning_message)
 #endif
 
 int /* PRIVATE */
-png_safe_execute(png_imagep image_in, int (*function)(png_voidp), png_voidp arg)
+png_safe_execute(png_imagep const image, int (* const function)(png_voidp),
+      png_voidp const arg)
 {
-   volatile png_imagep image = image_in;
-   volatile int result;
-   volatile png_voidp saved_error_buf;
+   png_voidp const saved_error_buf = image->opaque->error_buf;
    jmp_buf safe_jmpbuf;
 
    /* Safely execute function(arg) with png_error returning to this function. */
-   saved_error_buf = image->opaque->error_buf;
-   result = setjmp(safe_jmpbuf) == 0;
-
-   if (result != 0)
+   if (setjmp(safe_jmpbuf) == 0)
    {
-
       image->opaque->error_buf = safe_jmpbuf;
-      result = function(arg);
+
+      {
+          int result = function(arg);
+          image->opaque->error_buf = saved_error_buf;
+          return result;
+      }
    }
 
+   /* Return via longjmp, pop the jmpbuf (i.e. restore the previous value) and
+    * free the png_image.
+    */
    image->opaque->error_buf = saved_error_buf;
-
-   /* And do the cleanup prior to any failure return. */
-   if (result == 0)
-      png_image_free(image);
-
-   return result;
+   png_image_free(image);
+   return 0;
 }
 #endif /* SIMPLIFIED READ || SIMPLIFIED_WRITE */
 #endif /* READ || WRITE */
