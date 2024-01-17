@@ -663,10 +663,14 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+PNG_LOONGARCH_LSX_FALSE
+PNG_LOONGARCH_LSX_TRUE
 PNG_POWERPC_VSX_FALSE
 PNG_POWERPC_VSX_TRUE
 PNG_INTEL_SSE_FALSE
 PNG_INTEL_SSE_TRUE
+PNG_MIPS_MMI_FALSE
+PNG_MIPS_MMI_TRUE
 PNG_MIPS_MSA_FALSE
 PNG_MIPS_MSA_TRUE
 PNG_ARM_NEON_FALSE
@@ -853,8 +857,10 @@ enable_unversioned_libpng_config
 enable_hardware_optimizations
 enable_arm_neon
 enable_mips_msa
+enable_mips_mmi
 enable_intel_sse
 enable_powerpc_vsx
+enable_loongarch_lsx
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1559,6 +1565,13 @@ Optional Features:
                           call to png_set_option; yes/on: turn on
                           unconditionally. If not specified: determined by the
                           compiler.
+  --enable-mips-mmi     Enable MIPS MMI optimizations: =no/off, check, api,
+                          yes/on: no/off: disable the optimizations; check:
+                          use internal checking code (deprecated and poorly
+                          supported); api: disable by default, enable by a
+                          call to png_set_option; yes/on: turn on
+                          unconditionally. If not specified: determined by the
+                          compiler.
   --enable-intel-sse    Enable Intel SSE optimizations: =no/off, yes/on:
                           no/off: disable the optimizations; yes/on: enable
                           the optimizations. If not specified: determined by
@@ -1569,6 +1582,11 @@ Optional Features:
                           default, enable by a call to png_set_option yes/on:
                           turn on unconditionally. If not specified:
                           determined by the compiler.
+  --enable-loongarch-lsx
+                          Enable LOONGARCH LSX optimizations: =no/off, yes/on:
+                          no/off: disable the optimizations; yes/on: turn on
+                          unconditionally. If not specified: determined by the
+                          compiler.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -14098,6 +14116,10 @@ printf "%s\n" "#define PNG_ARM_NEON_OPT 0" >>confdefs.h
 
 printf "%s\n" "#define PNG_MIPS_MSA_OPT 0" >>confdefs.h
 
+         enable_mips_mmi=no
+
+printf "%s\n" "#define PNG_MIPS_MMI_OPT 0" >>confdefs.h
+
          enable_powerpc_vsx=no
 
 printf "%s\n" "#define PNG_POWERPC_VSX_OPT 0" >>confdefs.h
@@ -14105,6 +14127,10 @@ printf "%s\n" "#define PNG_POWERPC_VSX_OPT 0" >>confdefs.h
          enable_intel_sse=no
 
 printf "%s\n" "#define PNG_INTEL_SSE_OPT 0" >>confdefs.h
+
+         enable_loongarch_lsx=no
+
+printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 0" >>confdefs.h
 
          ;;
       *)
@@ -14117,7 +14143,11 @@ printf "%s\n" "#define PNG_ARM_NEON_OPT 2" >>confdefs.h
 
               ;;
             mipsel*|mips64el*)
+              enable_mips_mmi=yes
               enable_mips_msa=yes
+
+printf "%s\n" "#define PNG_MIPS_MMI_OPT 1" >>confdefs.h
+
 
 printf "%s\n" "#define PNG_MIPS_MSA_OPT 2" >>confdefs.h
 
@@ -14132,6 +14162,12 @@ printf "%s\n" "#define PNG_INTEL_SSE_OPT 1" >>confdefs.h
               enable_powerpc_vsx=yes
 
 printf "%s\n" "#define PNG_POWERPC_VSX_OPT 2" >>confdefs.h
+
+              ;;
+            loongarch*)
+              enable_loongarch_lsx=yes
+
+printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 
               ;;
          esac
@@ -14253,6 +14289,62 @@ else
 fi
 
 
+# MIPS
+# ===
+#
+# MIPS MMI (SIMD) support.
+
+# Check whether --enable-mips-mmi was given.
+if test ${enable_mips_mmi+y}
+then :
+  enableval=$enable_mips_mmi; case "$enableval" in
+      no|off)
+         # disable the default enabling on __mips_mmi systems:
+
+printf "%s\n" "#define PNG_MIPS_MMI_OPT 0" >>confdefs.h
+
+         # Prevent inclusion of the assembler files below:
+         enable_mips_mmi=no;;
+      check)
+
+printf "%s\n" "#define PNG_MIPS_MMI_CHECK_SUPPORTED /**/" >>confdefs.h
+;;
+      api)
+
+printf "%s\n" "#define PNG_MIPS_MMI_API_SUPPORTED /**/" >>confdefs.h
+;;
+      yes|on)
+
+printf "%s\n" "#define PNG_MIPS_MMI_OPT 1" >>confdefs.h
+
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-mips-mmi: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass '-mloongson-mmi -march=loongson3a'
+            to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-mips-mmi: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass '-mloongson-mmi -march=loongson3a'
+            to the compiler." >&2;};;
+      *)
+         as_fn_error $? "--enable-mips-mmi=${enable_mips_mmi}: invalid value" "$LINENO" 5
+   esac
+fi
+
+
+# Add MIPS specific files to all builds where the host_cpu is mips ('mips*') or
+# where MIPS optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'mips*')
+
+ if test "$enable_mips_mmi" != 'no' &&
+    case "$host_cpu" in
+      mipsel*|mips64el*) :;;
+    esac; then
+  PNG_MIPS_MMI_TRUE=
+  PNG_MIPS_MMI_FALSE='#'
+else
+  PNG_MIPS_MMI_TRUE='#'
+  PNG_MIPS_MMI_FALSE=
+fi
+
+
 # INTEL
 # =====
 #
@@ -14352,6 +14444,89 @@ fi
 else
   PNG_POWERPC_VSX_TRUE='#'
   PNG_POWERPC_VSX_FALSE=
+fi
+
+
+# LOONGARCH
+# ===
+#
+# LOONGARCH LSX (SIMD) support
+
+if test "$LSX_CFLAGS" = ''; then
+    LSX_CFLAGS="-mlsx"
+fi
+
+compiler_support_loongarch_lsx=no
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to use loongarch LSX intrinsics" >&5
+printf %s "checking whether to use loongarch LSX intrinsics... " >&6; }
+save_CFLAGS=$CFLAGS
+CFLAGS="$CFLAGS $LSX_CFLAGS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include<lsxintrin.h>
+int main(){
+    __m128i a, b, c;
+    a = __lsx_vadd_w(b, c);
+    return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  compiler_support_loongarch_lsx=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+CFLAGS=$save_CFLAGS
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $compiler_support_loongarch_lsx" >&5
+printf "%s\n" "$compiler_support_loongarch_lsx" >&6; }
+
+# Check whether --enable-loongarch-lsx was given.
+if test ${enable_loongarch_lsx+y}
+then :
+  enableval=$enable_loongarch_lsx; case "$enableval" in
+      no|off)
+         # disable the default enabling on __loongarch_simd systems:
+
+printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 0" >>confdefs.h
+
+         # Prevent inclusion of the assembler files below:
+         enable_loongarch_lsx=no;;
+      yes|on)
+
+printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
+
+         ;;
+      *)
+         as_fn_error $? "--enable-loongarch-lsx=${enable_loongarch_lsx}: invalid value" "$LINENO" 5
+   esac
+fi
+
+
+if test "$enable_loongarch_lsx" != 'no'; then
+   if test $compiler_support_loongarch_lsx = yes; then
+
+printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
+
+   else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Compiler does not support loongarch LSX." >&5
+printf "%s\n" "$as_me: WARNING: Compiler does not support loongarch LSX." >&2;}
+   fi
+fi
+
+# Add LOONGARCH specific files to all builds where the host_cpu is loongarch ('loongarch*') or
+# where LOONGARCH optimizations were explicitly requested (this allows a fallback if a
+# future host CPU does not match 'loongarch*')
+
+ if test "$enable_loongarch_lsx" != 'no' && test $compiler_support_loongarch_lsx = yes &&
+    case "$host_cpu" in
+      loongarch*) :;;
+      *)    test "$enable_loongarch_lsx" != '';;
+    esac; then
+  PNG_LOONGARCH_LSX_TRUE=
+  PNG_LOONGARCH_LSX_FALSE='#'
+else
+  PNG_LOONGARCH_LSX_TRUE='#'
+  PNG_LOONGARCH_LSX_FALSE=
 fi
 
 
@@ -14549,12 +14724,20 @@ if test -z "${PNG_MIPS_MSA_TRUE}" && test -z "${PNG_MIPS_MSA_FALSE}"; then
   as_fn_error $? "conditional \"PNG_MIPS_MSA\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${PNG_MIPS_MMI_TRUE}" && test -z "${PNG_MIPS_MMI_FALSE}"; then
+  as_fn_error $? "conditional \"PNG_MIPS_MMI\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${PNG_INTEL_SSE_TRUE}" && test -z "${PNG_INTEL_SSE_FALSE}"; then
   as_fn_error $? "conditional \"PNG_INTEL_SSE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${PNG_POWERPC_VSX_TRUE}" && test -z "${PNG_POWERPC_VSX_FALSE}"; then
   as_fn_error $? "conditional \"PNG_POWERPC_VSX\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${PNG_LOONGARCH_LSX_TRUE}" && test -z "${PNG_LOONGARCH_LSX_FALSE}"; then
+  as_fn_error $? "conditional \"PNG_LOONGARCH_LSX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 

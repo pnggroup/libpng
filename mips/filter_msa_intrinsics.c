@@ -1,9 +1,9 @@
 
 /* filter_msa_intrinsics.c - MSA optimised filter functions
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 2016 Glenn Randers-Pehrson
- * Written by Mandar Sahastrabuddhe, August 2016.
+ * Written by Mandar Sahastrabuddhe, August 2016
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -379,8 +379,8 @@ void png_read_filter_row_up_msa(png_row_infop row_info, png_bytep row,
       LD_UB4(pp, 16, src4, src5, src6, src7);
       pp += 64;
 
-	  ADD4(src0, src4, src1, src5, src2, src6, src3, src7,
-	       src0, src1, src2, src3);
+      ADD4(src0, src4, src1, src5, src2, src6, src3, src7,
+           src0, src1, src2, src3);
 
       ST_UB4(src0, src1, src2, src3, rp, 16);
       rp += 64;
@@ -400,7 +400,7 @@ void png_read_filter_row_up_msa(png_row_infop row_info, png_bytep row,
             LD_UB4(pp, 16, src4, src5, src6, src7);
 
             ADD4(src0, src4, src1, src5, src2, src6, src3, src7,
-	             src0, src1, src2, src3);
+                 src0, src1, src2, src3);
 
             ST_UB4(src0, src1, src2, src3, rp, 16);
             rp += 64;
@@ -425,7 +425,7 @@ void png_read_filter_row_up_msa(png_row_infop row_info, png_bytep row,
             LD_UB2(rp, 16, src0, src1);
             LD_UB2(pp, 16, src4, src5);
 
-			ADD2(src0, src4, src1, src5, src0, src1);
+            ADD2(src0, src4, src1, src5, src0, src1);
 
             ST_UB2(src0, src1, rp, 16);
             rp += 32;

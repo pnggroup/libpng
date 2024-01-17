@@ -78,6 +78,18 @@
 /* Enable Intel SSE optimizations */
 #undef PNG_INTEL_SSE_OPT
 
+/* Enable LOONGARCH LSX optimizations */
+#undef PNG_LOONGARCH_LSX_OPT
+
+/* Turn on MIPS MMI optimizations at run-time */
+#undef PNG_MIPS_MMI_API_SUPPORTED
+
+/* Check for MIPS MMI support at run-time */
+#undef PNG_MIPS_MMI_CHECK_SUPPORTED
+
+/* Enable MIPS MMI optimizations */
+#undef PNG_MIPS_MMI_OPT
+
 /* Turn on MIPS MSA optimizations at run-time */
 #undef PNG_MIPS_MSA_API_SUPPORTED
 

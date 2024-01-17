@@ -1,10 +1,10 @@
 
 /* mips_init.c - MSA optimised filter functions
  *
- * Copyright (c) 2018 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 2016 Glenn Randers-Pehrson
- * Written by Mandar Sahastrabuddhe, 2016.
- * Update by guxiwei, 2023.
+ * Written by Mandar Sahastrabuddhe, 2016
+ * Updated by guxiwei, 2023
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

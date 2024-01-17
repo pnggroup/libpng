@@ -1,6 +1,7 @@
 /* filter_mmi_intrinsics.c - MMI optimized filter functions
  *
- * Written by zhanglixia and guxiwei
+ * Copyright (c) 2024 Cosmin Truta
+ * Written by zhanglixia and guxiwei, 2023
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

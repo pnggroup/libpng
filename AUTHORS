@@ -42,6 +42,9 @@ Authors, for copyright and licensing purposes.
    - Mike Klein
    - Sami Boukortt
    - Wan-Teh Chang
+ * Loongson Technology Corporation Ltd.
+   - GuXiWei
+   - ZhangLixia
 
 The build projects, the build scripts, the test scripts, and other
 files in the "ci", "projects", "scripts" and "tests" directories, have

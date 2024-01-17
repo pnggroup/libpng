@@ -1,12 +1,14 @@
+
 /* contrib/mips-mmi/linux.c
  *
- * Written by guxiwei 2023
+ * Copyright (c) 2024 Cosmin Truta
+ * Written by guxiwei, 2023
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
- *
  */
+
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
