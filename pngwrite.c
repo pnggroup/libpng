@@ -369,7 +369,8 @@ png_write_end(png_structrp png_ptr, png_inforp info_ptr)
       png_error(png_ptr, "No IDATs written into file");
 
 #ifdef PNG_WRITE_CHECK_FOR_INVALID_INDEX_SUPPORTED
-   if (png_ptr->num_palette_max > png_ptr->num_palette)
+   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE &&
+       png_ptr->num_palette_max >= png_ptr->num_palette)
       png_benign_error(png_ptr, "Wrote palette index exceeding num_palette");
 #endif
 
