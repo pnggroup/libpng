@@ -53,7 +53,7 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
 int PNGAPI
 png_sig_cmp(png_const_bytep sig, size_t start, size_t num_to_check)
 {
-   png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
+   static const png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
 
    if (num_to_check > 8)
       num_to_check = 8;
@@ -731,7 +731,7 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 
    {
       size_t pos = 0;
-      char number_buf[5]; /* enough for a four-digit year */
+      char number_buf[5] = {0, 0, 0, 0, 0}; /* enough for a four-digit year */
 
 #     define APPEND_STRING(string) pos = png_safecat(out, 29, pos, (string))
 #     define APPEND_NUMBER(format, value)\
@@ -3218,7 +3218,7 @@ png_ascii_from_fixed(png_const_structrp png_ptr, png_charp ascii,
       if (num <= 0x80000000) /* else overflowed */
       {
          unsigned int ndigits = 0, first = 16 /* flag value */;
-         char digits[10];
+         char digits[10] = {0};
 
          while (num)
          {
