@@ -268,7 +268,6 @@
 #endif
 
 #if PNG_MIPS_MSA_OPT > 0
-#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mips
 #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
 #     if defined(__mips_msa)
 #        if defined(__clang__)
@@ -284,6 +283,7 @@
 
 #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
 #     define PNG_MIPS_MSA_IMPLEMENTATION 1
+#     define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mips
 #  endif
 #else
 #  define PNG_MIPS_MSA_IMPLEMENTATION 0
@@ -1348,7 +1348,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_neon,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
-#if PNG_MIPS_MSA_OPT > 0
+#if PNG_MIPS_MSA_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_msa,(png_row_infop row_info,
     png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_msa,(png_row_infop
@@ -2170,7 +2170,7 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
-#if PNG_MIPS_MSA_OPT > 0
+#if PNG_MIPS_MSA_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_mips,
    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif

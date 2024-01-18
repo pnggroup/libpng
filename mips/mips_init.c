@@ -21,7 +21,7 @@
 
 #ifdef PNG_READ_SUPPORTED
 
-#if PNG_MIPS_MSA_OPT > 0 || PNG_MIPS_MMI_IMPLEMENTATION > 0
+#if PNG_MIPS_MSA_IMPLEMENTATION == 1 || PNG_MIPS_MMI_IMPLEMENTATION > 0
 
 #ifdef PNG_MIPS_MSA_CHECK_SUPPORTED /* Do MIPS MSA run-time checks */
 /* WARNING: it is strongly recommended that you do not build libpng with
@@ -129,7 +129,7 @@ png_init_filter_functions_mips(png_structp pp, unsigned int bpp)
 #endif /* PNG_MIPS_MMI_IMPLEMENTATION > 0 */
 
 MIPS_MSA_INIT:
-#if PNG_MIPS_MSA_OPT > 0
+#if PNG_MIPS_MSA_IMPLEMENTATION == 1
    /* The switch statement is compiled in for MIPS_MSA_API, the call to
     * png_have_msa is compiled in for MIPS_MSA_CHECK. If both are defined
     * the check is only performed if the API has not set the MSA option on
@@ -197,8 +197,8 @@ MIPS_MSA_INIT:
       pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_msa;
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth4_msa;
    }
-#endif /* PNG_MIPS_MSA_OPT > 0 */
+#endif /* PNG_MIPS_MSA_IMPLEMENTATION == 1 */
    return;
 }
-#endif /* PNG_MIPS_MSA_OPT > 0 || PNG_MIPS_MMI_IMPLEMENTATION > 0 */
+#endif /* PNG_MIPS_MSA_IMPLEMENTATION == 1 || PNG_MIPS_MMI_IMPLEMENTATION > 0 */
 #endif /* READ */
