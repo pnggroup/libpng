@@ -292,7 +292,7 @@
 #      define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mips
 #   endif
 #else
-#   define PNG_INTEL_SSE_IMPLEMENTATION 0
+#   define PNG_MIPS_MMI_IMPLEMENTATION 0
 #endif /* PNG_MIPS_MMI_OPT > 0 */
 
 #if PNG_POWERPC_VSX_OPT > 0
