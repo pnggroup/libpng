@@ -204,6 +204,8 @@
 #    else
 #       define PNG_MIPS_MMI_OPT 0
 #    endif
+#  else
+#    define PNG_MIPS_MMI_OPT 0
 #  endif
 #endif
 
@@ -212,6 +214,14 @@
 #     define PNG_POWERPC_VSX_OPT 2
 #  else
 #     define PNG_POWERPC_VSX_OPT 0
+#  endif
+#endif
+
+#ifndef PNG_LOONGARCH_LSX_OPT
+#  if defined(__loongarch_sx)
+#     define PNG_LOONGARCH_LSX_OPT 1
+#  else
+#     define PNG_LOONGARCH_LSX_OPT 0
 #  endif
 #endif
 
