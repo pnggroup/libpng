@@ -41,11 +41,17 @@ check_stdout(){
    # $1: the test file (a bad PNG which must produce a warning, etc)
    # $2: a string which must occur at the end of line on stdout for success
    # result: an error message on descriptor 3 if the string is NOT found
+   #
+   # WARNING: when this script is executed on MSYS2 (Windows Cygwin variant)
+   # pngtest outputs lines terminated with <cr><lf> however the MSYS2 shell
+   # expects <lf> (\n) terminated lines so the <cr> ends up in the shell
+   # variable 'line' below.  The pattern matching ignores this because of the
+   # '*' at the end of the pattern match.
    found=
    while read line
    do
       case "$line" in
-         *"$2") found=1;;
+         *"$2"*) found=1;;
       esac
       echo "$line" # preserve the original output verbatim
    done
