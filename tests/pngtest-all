@@ -20,7 +20,10 @@ TEST --strict "${srcdir}"/pngtest.png
 # Various crashers
 # Use --relaxed because some come from fuzzers that don't maintain CRCs
 TEST --relaxed "${srcdir}"/contrib/testpngs/crashers/badcrc.png
-TEST --relaxed "${srcdir}"/contrib/testpngs/crashers/badadler.png
+# Use --xfail because there is no reliable way of disabling these errors
+# (Adler32 checking cannot be switched off on all builds and there is no
+# provision for turning the other checks into warnings.)
+TEST --xfail "${srcdir}"/contrib/testpngs/crashers/badadler.png
 TEST --xfail "${srcdir}"/contrib/testpngs/crashers/bad_iCCP.png
 TEST --xfail "${srcdir}"/contrib/testpngs/crashers/empty_ancillary_chunks.png
 for file in "${srcdir}"/contrib/testpngs/crashers/huge_*_chunk.png
