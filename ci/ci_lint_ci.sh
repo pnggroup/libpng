@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# Copyright (c) 2019-2023 Cosmin Truta.
+# Copyright (c) 2019-2024 Cosmin Truta.
 #
 # Use, modification and distribution are subject
 # to the Boost Software License, Version 1.0.
@@ -58,11 +58,22 @@ function ci_lint_ci_scripts_license {
     }
 }
 
+function usage {
+    echo "usage: $CI_SCRIPT_NAME"
+    exit 0
+}
+
 function main {
-    [[ $# -eq 0 ]] || {
-        ci_info "usage: $CI_SCRIPT_NAME"
-        ci_err "unexpected command argument: '$1'"
-    }
+    local opt
+    while getopts ":" opt
+    do
+        # This ain't a while-loop. It only pretends to be.
+        [[ $1 == -[?h]* || $1 == --help ]] && usage
+        ci_err "unknown option: '$1'"
+    done
+    shift $((OPTIND - 1))
+    # And... go!
+    [[ $# -eq 0 ]] || ci_err "unexpected argument: '$1'"
     ci_lint_ci_config_files
     ci_lint_ci_scripts
     ci_lint_ci_scripts_license

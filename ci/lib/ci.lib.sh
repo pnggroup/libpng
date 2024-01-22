@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2023 Cosmin Truta.
+# Copyright (c) 2019-2024 Cosmin Truta.
 #
 # Use, modification and distribution are subject
 # to the Boost Software License, Version 1.0.
@@ -73,7 +73,7 @@ function ci_spawn {
     "$@"
 }
 
-# Ensure that the initialization is correct.
+# Ensure that the internal initialization is correct.
 [[ $CI_TOPLEVEL_DIR/ci/lib/ci.lib.sh -ef ${BASH_SOURCE[0]} ]] ||
     ci_err_internal "bad or missing \$CI_TOPLEVEL_DIR"
 [[ $CI_SCRIPT_DIR/$CI_SCRIPT_NAME -ef $0 ]] ||
@@ -82,3 +82,11 @@ function ci_spawn {
     ci_err_internal "missing \$CI_BUILD_ARCH or \$CI_BUILD_SYSTEM"
 [[ $CI_TARGET_ARCH && $CI_TARGET_SYSTEM ]] ||
     ci_err_internal "missing \$CI_TARGET_ARCH or \$CI_TARGET_SYSTEM"
+
+# Ensure that the user initialization is correct.
+[[ ${CI_NO_TEST:-0} == [01] ]] ||
+    ci_err "bad boolean option: \$CI_NO_TEST: '$CI_NO_TEST'"
+[[ ${CI_NO_INSTALL:-0} == [01] ]] ||
+    ci_err "bad boolean option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
+[[ ${CI_NO_CLEAN:-0} == [01] ]] ||
+    ci_err "bad boolean option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"

@@ -137,12 +137,26 @@ function ci_build {
     ci_info "## END OF BUILD ##"
 }
 
+function usage {
+    echo "usage: $CI_SCRIPT_NAME"
+    exit 0
+}
+
 function main {
+    local opt
+    while getopts ":" opt
+    do
+        # This ain't a while-loop. It only pretends to be.
+        [[ $1 == -[?h]* || $1 == --help ]] && usage
+        ci_err "unknown option: '$1'"
+    done
+    shift $((OPTIND - 1))
+    # And... go!
     ci_init_build
     ci_trace_build
     [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only (see above)"
-        ci_err "unexpected command argument: '$1'"
+        ci_info "note: this program accepts environment options only"
+        ci_err "unexpected argument: '$1'"
     }
     ci_cleanup_old_build
     ci_build
