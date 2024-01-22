@@ -1,37 +1,19 @@
-# CMakeLists.txt
 
-# Copyright (c) 2018-2023 Cosmin Truta
-# Copyright (c) 2007,2009-2018 Glenn Randers-Pehrson
-# Written by Christian Ehrlicher, 2007
-# Revised by Roger Lowman, 2009-2010
-# Revised by Clifford Yapp, 2011-2012,2017
-# Revised by Claudio Bley, 2013
-# Revised by Roger Leigh, 2016
-# Revised by Andreas Franek, 2016
-# Revised by Sam Serrels, 2017
-# Revised by Vadim Barkov, 2017
-# Revised by Vicky Pfau, 2018
-# Revised by Cameron Cawley, 2018,2021
-# Revised by Kyle Bentley, 2018
-# Revised by David Callu, 2020
-# Revised by Steve Robinson, 2020
-# Revised by Simon Hausmann, 2020
-# Revised by Alex Gaynor, 2020
-# Revised by Owen Rudge, 2020
-# Revised by Gleb Mazovetskiy, 2021
-# Revised by Christopher Sean Morrison, 2022
-# Revised by B. Scott Michel, 2022
-# Revised by Jeremy Maitin-Shepard, 2022
-# Revised by Martin Storsjo, 2022
-# Revised by Jon Creighton, 2023
-# Revised by Gunther Nikl, 2023
-# Revised by Tyler Kropp, 2023
-# Revised by Timothy Lyanguzov, 2023
-# Revised by Clinton Ingram, 2023
-
-# This code is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer
-# and license in png.h
+# CMakeLists.txt - CMake lists for libpng
+#
+# Copyright (c) 2018-2024 Cosmin Truta.
+# Copyright (c) 2007-2018 Glenn Randers-Pehrson.
+# Originally written by Christian Ehrlicher, 2007.
+#
+# Use, modification and distribution are subject to
+# the same licensing terms and conditions as libpng.
+# Please see the copyright notice in png.h or visit
+# http://libpng.org/pub/png/src/libpng-LICENSE.txt
+#
+# For copyright and licensing purposes, please see
+# the accompanying file scripts/cmake/AUTHORS.md
+#
+# SPDX-License-Identifier: libpng-2.0
 
 cmake_minimum_required(VERSION 3.6)
 
@@ -370,7 +352,7 @@ else()
                        COMMAND "${CMAKE_COMMAND}"
                                "-DINPUT=${_GC_INPUT}"
                                "-DOUTPUT=${_GC_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/genchk.cmake"
+                               -P "${CMAKE_CURRENT_BINARY_DIR}/genchk.cmake"
                        DEPENDS "${_GC_INPUT}" ${_GC_DEPENDS}
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
@@ -393,7 +375,7 @@ else()
                        COMMAND "${CMAKE_COMMAND}"
                                "-DINPUT=${_GO_INPUT}"
                                "-DOUTPUT=${_GO_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/genout.cmake"
+                               -P "${CMAKE_CURRENT_BINARY_DIR}/genout.cmake"
                        DEPENDS "${_GO_INPUT}" ${_GO_DEPENDS}
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
@@ -412,7 +394,7 @@ else()
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${_GSO_OUTPUT}"
                        COMMAND "${CMAKE_COMMAND}"
                                "-DOUTPUT=${_GSO_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/gensrc.cmake"
+                               -P "${CMAKE_CURRENT_BINARY_DIR}/gensrc.cmake"
                        DEPENDS ${_GSO_DEPENDS}
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
@@ -542,7 +524,7 @@ else()
   add_custom_target(png_genprebuilt
                     COMMAND "${CMAKE_COMMAND}"
                             "-DOUTPUT=scripts/pnglibconf.h.prebuilt"
-                            -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/gensrc.cmake"
+                            -P "${CMAKE_CURRENT_BINARY_DIR}/gensrc.cmake"
                     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
   # A single target handles generation of all generated files.
@@ -750,7 +732,7 @@ if(PNG_TESTS AND PNG_SHARED)
     set(TEST_OPTIONS "${_PAT_OPTIONS}")
     set(TEST_FILES "${_PAT_FILES}")
 
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/test.cmake.in"
+    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/test.cmake.in"
                    "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake"
                    @ONLY)
     add_test(NAME "${_PAT_NAME}"
@@ -984,14 +966,14 @@ function(create_symlink DEST_FILE)
 endfunction()
 
 # Create source generation scripts.
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/genchk.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/scripts/genchk.cmake
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/genchk.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/genchk.cmake
                @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/genout.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/scripts/genout.cmake
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/genout.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/genout.cmake
                @ONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/gensrc.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/scripts/gensrc.cmake
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/gensrc.cmake.in
+               ${CMAKE_CURRENT_BINARY_DIR}/gensrc.cmake
                @ONLY)
 
 # libpng is a library so default to 'lib'

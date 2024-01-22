@@ -1,13 +1,16 @@
 # genout.cmake.in
 # Generate .out from .c with awk (generic), based upon the automake logic.
 
-# Copyright (c) 2022-2023 Cosmin Truta
+# Copyright (c) 2022-2024 Cosmin Truta
 # Copyright (c) 2016 Glenn Randers-Pehrson
 # Written by Roger Leigh, 2016
-
-# This code is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer
-# and license in png.h
+#
+# Use, modification and distribution are subject to
+# the same licensing terms and conditions as libpng.
+# Please see the copyright notice in png.h or visit
+# http://libpng.org/pub/png/src/libpng-LICENSE.txt
+#
+# SPDX-License-Identifier: libpng-2.0
 
 # Variables substituted from CMakeLists.txt
 set(SRCDIR "@CMAKE_CURRENT_SOURCE_DIR@")
