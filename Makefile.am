@@ -1,6 +1,6 @@
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
-# Copyright (c) 2018-2023 Cosmin Truta
+# Copyright (c) 2018-2024 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -9,7 +9,7 @@
 
 PNGLIB_BASENAME= libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
 
-ACLOCAL_AMFLAGS = -I scripts
+ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # test programs - run on make check, make distcheck
 if ENABLE_TESTS
@@ -183,7 +183,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 EXTRA_DIST= \
 	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
+	${srcdir}/ci ${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 

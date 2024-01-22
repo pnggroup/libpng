@@ -1,6 +1,6 @@
 # configure.ac
 
-# Copyright (c) 2018-2023 Cosmin Truta
+# Copyright (c) 2018-2024 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 
 # This code is released under the libpng license.
@@ -26,7 +26,7 @@ AC_PREREQ([2.68])
 dnl Version number stuff here:
 
 AC_INIT([libpng],[1.6.41.git],[png-mng-implement@lists.sourceforge.net])
-AC_CONFIG_MACRO_DIR([scripts])
+AC_CONFIG_MACRO_DIR([scripts/autoconf])
 
 # libpng does not follow GNU file name conventions (hence 'foreign')
 # color-tests requires automake 1.11 or later

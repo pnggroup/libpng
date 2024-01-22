@@ -16,7 +16,7 @@
 
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
-# Copyright (c) 2018-2023 Cosmin Truta
+# Copyright (c) 2018-2024 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -132,11 +132,11 @@ host_triplet = @host@
 @DO_PNG_PREFIX_TRUE@am__append_12 = -DPNG_PREFIX='@PNG_PREFIX@'
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/scripts/libtool.m4 \
-	$(top_srcdir)/scripts/ltoptions.m4 \
-	$(top_srcdir)/scripts/ltsugar.m4 \
-	$(top_srcdir)/scripts/ltversion.m4 \
-	$(top_srcdir)/scripts/lt~obsolete.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/scripts/autoconf/libtool.m4 \
+	$(top_srcdir)/scripts/autoconf/ltoptions.m4 \
+	$(top_srcdir)/scripts/autoconf/ltsugar.m4 \
+	$(top_srcdir)/scripts/autoconf/ltversion.m4 \
+	$(top_srcdir)/scripts/autoconf/lt~obsolete.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
@@ -760,7 +760,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 PNGLIB_BASENAME = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
-ACLOCAL_AMFLAGS = -I scripts
+ACLOCAL_AMFLAGS = -I scripts/autoconf
 
 # This ensures that pnglibconf.h gets built at the start of 'make all' or
 # 'make check', but it does not add dependencies to the individual programs,
@@ -851,7 +851,7 @@ pkgconfig_DATA = libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@.pc
 EXTRA_DIST = \
 	ANNOUNCE AUTHORS CHANGES INSTALL LICENSE README TODO TRADEMARK \
 	pngtest.png pngbar.png pngnow.png pngbar.jpg autogen.sh \
-	${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
+	${srcdir}/ci ${srcdir}/contrib ${srcdir}/projects ${srcdir}/scripts \
 	$(TESTS) $(XFAIL_TESTS) tests/pngstest \
 	CMakeLists.txt example.c libpng-manual.txt
 
