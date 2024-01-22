@@ -1,14 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-# Copyright (c) 2019-2023 Cosmin Truta.
+# Copyright (c) 2019-2024 Cosmin Truta.
 #
-# Use, modification and distribution are subject
-# to the Boost Software License, Version 1.0.
-# See the accompanying file LICENSE_BSL_1_0.txt
-# or visit http://www.boost.org/LICENSE_1_0.txt
+# Use, modification and distribution are subject to the MIT License.
+# Please see the accompanying file LICENSE_MIT.txt
 #
-# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier: MIT
 
 # shellcheck source="ci/lib/ci.lib.sh"
 source "$(dirname "$0")/lib/ci.lib.sh"

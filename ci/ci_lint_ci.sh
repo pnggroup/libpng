@@ -3,12 +3,10 @@ set -e
 
 # Copyright (c) 2019-2024 Cosmin Truta.
 #
-# Use, modification and distribution are subject
-# to the Boost Software License, Version 1.0.
-# See the accompanying file LICENSE_BSL_1_0.txt
-# or visit http://www.boost.org/LICENSE_1_0.txt
+# Use, modification and distribution are subject to the MIT License.
+# Please see the accompanying file LICENSE_MIT.txt
 #
-# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier: MIT
 
 # shellcheck source="ci/lib/ci.lib.sh"
 source "$(dirname "$0")/lib/ci.lib.sh"
@@ -52,8 +50,8 @@ function ci_lint_ci_scripts {
 
 function ci_lint_ci_scripts_license {
     ci_info "linting: CI scripts license"
-    ci_spawn grep -F "Boost Software License" ci/LICENSE_BSL_1_0.txt || {
-        ci_warn "bad or missing CI license file: '$CI_SCRIPT_DIR/LICENSE_BSL_1_0.txt'"
+    ci_spawn grep -F "MIT License" ci/LICENSE_MIT.txt || {
+        ci_warn "bad or missing CI license file: '$CI_SCRIPT_DIR/LICENSE_MIT.txt'"
         CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
     }
 }

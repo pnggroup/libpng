@@ -1,11 +1,9 @@
 # Copyright (c) 2019-2024 Cosmin Truta.
 #
-# Use, modification and distribution are subject
-# to the Boost Software License, Version 1.0.
-# See the accompanying file LICENSE_BSL_1_0.txt
-# or visit http://www.boost.org/LICENSE_1_0.txt
+# Use, modification and distribution are subject to the MIT License.
+# Please see the accompanying file LICENSE_MIT.txt
 #
-# SPDX-License-Identifier: BSL-1.0
+# SPDX-License-Identifier: MIT
 
 test -f "$BASH_SOURCE" ||
     echo >&2 "warning: this module requires Bash version 3 or newer"
