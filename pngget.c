@@ -1,7 +1,7 @@
 
 /* pngget.c - retrieval of values from info struct
  *
- * Copyright (c) 2018-2023 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -127,15 +127,14 @@ png_get_x_pixels_per_meter(png_const_structrp png_ptr, png_const_inforp
    info_ptr)
 {
 #ifdef PNG_pHYs_SUPPORTED
+   png_debug(1, "in png_get_x_pixels_per_meter");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_pHYs) != 0)
-      {
-         png_debug1(1, "in %s retrieval function",
-             "png_get_x_pixels_per_meter");
-
-         if (info_ptr->phys_unit_type == PNG_RESOLUTION_METER)
-            return (info_ptr->x_pixels_per_unit);
-      }
+   {
+      if (info_ptr->phys_unit_type == PNG_RESOLUTION_METER)
+         return (info_ptr->x_pixels_per_unit);
+   }
 #else
    PNG_UNUSED(png_ptr)
    PNG_UNUSED(info_ptr)
@@ -149,12 +148,11 @@ png_get_y_pixels_per_meter(png_const_structrp png_ptr, png_const_inforp
     info_ptr)
 {
 #ifdef PNG_pHYs_SUPPORTED
+   png_debug(1, "in png_get_y_pixels_per_meter");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_pHYs) != 0)
    {
-      png_debug1(1, "in %s retrieval function",
-          "png_get_y_pixels_per_meter");
-
       if (info_ptr->phys_unit_type == PNG_RESOLUTION_METER)
          return (info_ptr->y_pixels_per_unit);
    }
@@ -170,11 +168,11 @@ png_uint_32 PNGAPI
 png_get_pixels_per_meter(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
 #ifdef PNG_pHYs_SUPPORTED
+   png_debug(1, "in png_get_pixels_per_meter");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_pHYs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_pixels_per_meter");
-
       if (info_ptr->phys_unit_type == PNG_RESOLUTION_METER &&
           info_ptr->x_pixels_per_unit == info_ptr->y_pixels_per_unit)
          return (info_ptr->x_pixels_per_unit);
@@ -193,11 +191,11 @@ png_get_pixel_aspect_ratio(png_const_structrp png_ptr, png_const_inforp
    info_ptr)
 {
 #ifdef PNG_READ_pHYs_SUPPORTED
+   png_debug(1, "in png_get_pixel_aspect_ratio");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_pHYs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_aspect_ratio");
-
       if (info_ptr->x_pixels_per_unit != 0)
          return ((float)((float)info_ptr->y_pixels_per_unit
              /(float)info_ptr->x_pixels_per_unit));
@@ -217,6 +215,8 @@ png_get_pixel_aspect_ratio_fixed(png_const_structrp png_ptr,
     png_const_inforp info_ptr)
 {
 #ifdef PNG_READ_pHYs_SUPPORTED
+   png_debug(1, "in png_get_pixel_aspect_ratio_fixed");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_pHYs) != 0 &&
        info_ptr->x_pixels_per_unit > 0 && info_ptr->y_pixels_per_unit > 0 &&
@@ -224,8 +224,6 @@ png_get_pixel_aspect_ratio_fixed(png_const_structrp png_ptr,
        info_ptr->y_pixels_per_unit <= PNG_UINT_31_MAX)
    {
       png_fixed_point res;
-
-      png_debug1(1, "in %s retrieval function", "png_get_aspect_ratio_fixed");
 
       /* The following casts work because a PNG 4 byte integer only has a valid
        * range of 0..2^31-1; otherwise the cast might overflow.
@@ -247,11 +245,11 @@ png_int_32 PNGAPI
 png_get_x_offset_microns(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
 #ifdef PNG_oFFs_SUPPORTED
+   png_debug(1, "in png_get_x_offset_microns");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_oFFs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_x_offset_microns");
-
       if (info_ptr->offset_unit_type == PNG_OFFSET_MICROMETER)
          return (info_ptr->x_offset);
    }
@@ -267,11 +265,11 @@ png_int_32 PNGAPI
 png_get_y_offset_microns(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
 #ifdef PNG_oFFs_SUPPORTED
+   png_debug(1, "in png_get_y_offset_microns");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_oFFs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_y_offset_microns");
-
       if (info_ptr->offset_unit_type == PNG_OFFSET_MICROMETER)
          return (info_ptr->y_offset);
    }
@@ -287,11 +285,11 @@ png_int_32 PNGAPI
 png_get_x_offset_pixels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
 #ifdef PNG_oFFs_SUPPORTED
+   png_debug(1, "in png_get_x_offset_pixels");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_oFFs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_x_offset_pixels");
-
       if (info_ptr->offset_unit_type == PNG_OFFSET_PIXEL)
          return (info_ptr->x_offset);
    }
@@ -307,11 +305,11 @@ png_int_32 PNGAPI
 png_get_y_offset_pixels(png_const_structrp png_ptr, png_const_inforp info_ptr)
 {
 #ifdef PNG_oFFs_SUPPORTED
+   png_debug(1, "in png_get_y_offset_pixels");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_oFFs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "png_get_y_offset_pixels");
-
       if (info_ptr->offset_unit_type == PNG_OFFSET_PIXEL)
          return (info_ptr->y_offset);
    }
@@ -434,11 +432,11 @@ png_get_pHYs_dpi(png_const_structrp png_ptr, png_const_inforp info_ptr,
 {
    png_uint_32 retval = 0;
 
+   png_debug1(1, "in %s retrieval function", "pHYs");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_pHYs) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "pHYs");
-
       if (res_x != NULL)
       {
          *res_x = info_ptr->x_pixels_per_unit;
@@ -499,12 +497,12 @@ png_uint_32 PNGAPI
 png_get_bKGD(png_const_structrp png_ptr, png_inforp info_ptr,
     png_color_16p *background)
 {
+   png_debug1(1, "in %s retrieval function", "bKGD");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_bKGD) != 0 &&
        background != NULL)
    {
-      png_debug1(1, "in %s retrieval function", "bKGD");
-
       *background = &(info_ptr->background);
       return (PNG_INFO_bKGD);
    }
@@ -524,6 +522,8 @@ png_get_cHRM(png_const_structrp png_ptr, png_const_inforp info_ptr,
     double *white_x, double *white_y, double *red_x, double *red_y,
     double *green_x, double *green_y, double *blue_x, double *blue_y)
 {
+   png_debug1(1, "in %s retrieval function", "cHRM");
+
    /* Quiet API change: this code used to only return the end points if a cHRM
     * chunk was present, but the end points can also come from iCCP or sRGB
     * chunks, so in 1.6.0 the png_get_ APIs return the end points regardless and
@@ -533,8 +533,6 @@ png_get_cHRM(png_const_structrp png_ptr, png_const_inforp info_ptr,
    if (png_ptr != NULL && info_ptr != NULL &&
       (info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "cHRM");
-
       if (white_x != NULL)
          *white_x = png_float(png_ptr,
              info_ptr->colorspace.end_points_xy.whitex, "cHRM white X");
@@ -571,11 +569,11 @@ png_get_cHRM_XYZ(png_const_structrp png_ptr, png_const_inforp info_ptr,
     double *green_Y, double *green_Z, double *blue_X, double *blue_Y,
     double *blue_Z)
 {
+   png_debug1(1, "in %s retrieval function", "cHRM_XYZ(float)");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "cHRM_XYZ(float)");
-
       if (red_X != NULL)
          *red_X = png_float(png_ptr, info_ptr->colorspace.end_points_XYZ.red_X,
              "cHRM red X");
@@ -619,11 +617,11 @@ png_get_cHRM_XYZ_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_fixed_point *int_blue_X, png_fixed_point *int_blue_Y,
     png_fixed_point *int_blue_Z)
 {
+   png_debug1(1, "in %s retrieval function", "cHRM_XYZ");
+
    if (png_ptr != NULL && info_ptr != NULL &&
       (info_ptr->colorspace.flags & PNG_COLORSPACE_HAVE_ENDPOINTS) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "cHRM_XYZ");
-
       if (int_red_X != NULL)
          *int_red_X = info_ptr->colorspace.end_points_XYZ.red_X;
       if (int_red_Y != NULL)
@@ -775,6 +773,8 @@ int PNGAPI
 png_get_sPLT(png_const_structrp png_ptr, png_inforp info_ptr,
     png_sPLT_tpp spalettes)
 {
+   png_debug1(1, "in %s retrieval function", "sPLT");
+
    if (png_ptr != NULL && info_ptr != NULL && spalettes != NULL)
    {
       *spalettes = info_ptr->splt_palettes;
@@ -932,6 +932,8 @@ png_uint_32 PNGAPI
 png_get_sCAL_fixed(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, png_fixed_point *width, png_fixed_point *height)
 {
+   png_debug1(1, "in %s retrieval function", "sCAL");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_sCAL) != 0)
    {
@@ -955,6 +957,8 @@ png_uint_32 PNGAPI
 png_get_sCAL(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, double *width, double *height)
 {
+   png_debug1(1, "in %s retrieval function", "sCAL(float)");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_sCAL) != 0)
    {
@@ -971,6 +975,8 @@ png_uint_32 PNGAPI
 png_get_sCAL_s(png_const_structrp png_ptr, png_const_inforp info_ptr,
     int *unit, png_charpp width, png_charpp height)
 {
+   png_debug1(1, "in %s retrieval function", "sCAL(str)");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_sCAL) != 0)
    {
@@ -1062,7 +1068,7 @@ png_get_text(png_const_structrp png_ptr, png_inforp info_ptr,
 {
    if (png_ptr != NULL && info_ptr != NULL && info_ptr->num_text > 0)
    {
-      png_debug1(1, "in 0x%lx retrieval function",
+      png_debug1(1, "in text retrieval function, chunk typeid = 0x%lx",
          (unsigned long)png_ptr->chunk_name);
 
       if (text_ptr != NULL)
@@ -1105,11 +1111,12 @@ png_get_tRNS(png_const_structrp png_ptr, png_inforp info_ptr,
     png_bytep *trans_alpha, int *num_trans, png_color_16p *trans_color)
 {
    png_uint_32 retval = 0;
+
+   png_debug1(1, "in %s retrieval function", "tRNS");
+
    if (png_ptr != NULL && info_ptr != NULL &&
        (info_ptr->valid & PNG_INFO_tRNS) != 0)
    {
-      png_debug1(1, "in %s retrieval function", "tRNS");
-
       if (info_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
       {
          if (trans_alpha != NULL)

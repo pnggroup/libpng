@@ -1,7 +1,7 @@
 
 /* pngtest.c - a simple test program to test libpng
  *
- * Copyright (c) 2018-2023 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -1656,16 +1656,16 @@ test_one_file(const char *inname, const char *outname)
 
    pngtest_debug("Destroying data structs");
 #ifdef SINGLE_ROWBUF_ALLOC
-   pngtest_debug("destroying row_buf for read_ptr");
+   pngtest_debug("Destroying row_buf for read_ptr");
    png_free(read_ptr, row_buf);
    row_buf = NULL;
 #endif /* SINGLE_ROWBUF_ALLOC */
-   pngtest_debug("destroying read_ptr, read_info_ptr, end_info_ptr");
+   pngtest_debug("Destroying read_ptr, read_info_ptr, end_info_ptr");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
 #ifdef PNG_WRITE_SUPPORTED
-   pngtest_debug("destroying write_end_info_ptr");
+   pngtest_debug("Destroying write_end_info_ptr");
    png_destroy_info_struct(write_ptr, &write_end_info_ptr);
-   pngtest_debug("destroying write_ptr, write_info_ptr");
+   pngtest_debug("Destroying write_ptr, write_info_ptr");
    png_destroy_write_struct(&write_ptr, &write_info_ptr);
 #endif
    pngtest_debug("Destruction complete.");

@@ -1,7 +1,7 @@
 
 /* pngrutil.c - utilities to read a PNG file
  *
- * Copyright (c) 2018-2022 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -171,7 +171,7 @@ png_read_chunk_header(png_structrp png_ptr)
    /* Put the chunk name into png_ptr->chunk_name. */
    png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(buf+4);
 
-   png_debug2(0, "Reading %lx chunk, length = %lu",
+   png_debug2(0, "Reading chunk typeid = 0x%lx, length = %lu",
        (unsigned long)png_ptr->chunk_name, (unsigned long)length);
 
    /* Reset the crc and run it over the chunk name. */
