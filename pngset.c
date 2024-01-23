@@ -767,7 +767,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       png_ptr == NULL ? 0xabadca11UL : (unsigned long)png_ptr->chunk_name);
 
    if (png_ptr == NULL || info_ptr == NULL || num_text <= 0 || text_ptr == NULL)
-      return(0);
+      return 0;
 
    /* Make sure we have enough space in the "text" array in info_struct
     * to hold all of the incoming text_ptr objects.  This compare can't overflow
@@ -947,7 +947,7 @@ png_set_text_2(png_const_structrp png_ptr, png_inforp info_ptr,
       png_debug1(3, "transferred text chunk %d", info_ptr->num_text);
    }
 
-   return(0);
+   return 0;
 }
 #endif
 

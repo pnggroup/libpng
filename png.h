@@ -908,15 +908,15 @@ PNG_EXPORT(2, void, png_set_sig_bytes, (png_structrp png_ptr, int num_bytes));
 /* Check sig[start] through sig[start + num_to_check - 1] to see if it's a
  * PNG file.  Returns zero if the supplied bytes match the 8-byte PNG
  * signature, and non-zero otherwise.  Having num_to_check == 0 or
- * start > 7 will always fail (ie return non-zero).
+ * start > 7 will always fail (i.e. return non-zero).
  */
 PNG_EXPORT(3, int, png_sig_cmp, (png_const_bytep sig, size_t start,
     size_t num_to_check));
 
 /* Simple signature checking function.  This is the same as calling
- * png_check_sig(sig, n) := !png_sig_cmp(sig, 0, n).
+ * png_check_sig(sig, n) := (png_sig_cmp(sig, 0, n) != 0).
  */
-#define png_check_sig(sig, n) !png_sig_cmp((sig), 0, (n))
+#define png_check_sig(sig, n) (png_sig_cmp((sig), 0, (n)) != 0)
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 PNG_EXPORTA(4, png_structp, png_create_read_struct,

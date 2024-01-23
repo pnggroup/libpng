@@ -103,10 +103,10 @@ png_set_interlace_handling(png_structrp png_ptr)
    if (png_ptr != 0 && png_ptr->interlaced != 0)
    {
       png_ptr->transformations |= PNG_INTERLACE;
-      return (7);
+      return 7;
    }
 
-   return (1);
+   return 1;
 }
 #endif
 
@@ -837,7 +837,7 @@ png_voidp PNGAPI
 png_get_user_transform_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)
-      return (NULL);
+      return NULL;
 
    return png_ptr->user_transform_ptr;
 }

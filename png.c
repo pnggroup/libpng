@@ -59,15 +59,15 @@ png_sig_cmp(png_const_bytep sig, size_t start, size_t num_to_check)
       num_to_check = 8;
 
    else if (num_to_check < 1)
-      return (-1);
+      return -1;
 
    if (start > 7)
-      return (-1);
+      return -1;
 
    if (start + num_to_check > 8)
       num_to_check = 8 - start;
 
-   return ((int)(memcmp(&sig[start], &png_signature[start], num_to_check)));
+   return memcmp(&sig[start], &png_signature[start], num_to_check);
 }
 
 #endif /* READ */
@@ -665,9 +665,9 @@ png_voidp PNGAPI
 png_get_io_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)
-      return (NULL);
+      return NULL;
 
-   return (png_ptr->io_ptr);
+   return png_ptr->io_ptr;
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
@@ -956,7 +956,7 @@ png_reset_zstream(png_structrp png_ptr)
       return Z_STREAM_ERROR;
 
    /* WARNING: this resets the window bits to the maximum! */
-   return (inflateReset(&png_ptr->zstream));
+   return inflateReset(&png_ptr->zstream);
 }
 #endif /* READ */
 
@@ -965,7 +965,7 @@ png_uint_32 PNGAPI
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
-   return((png_uint_32)PNG_LIBPNG_VER);
+   return (png_uint_32)PNG_LIBPNG_VER;
 }
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)

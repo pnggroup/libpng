@@ -26,7 +26,7 @@ png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
    if (uval > PNG_UINT_31_MAX)
       png_error(png_ptr, "PNG unsigned integer out of range");
 
-   return (uval);
+   return uval;
 }
 
 #if defined(PNG_READ_gAMA_SUPPORTED) || defined(PNG_READ_cHRM_SUPPORTED)
@@ -140,7 +140,7 @@ png_read_sig(png_structrp png_ptr, png_inforp info_ptr)
    if (png_sig_cmp(info_ptr->signature, num_checked, num_to_check) != 0)
    {
       if (num_checked < 4 &&
-          png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4))
+          png_sig_cmp(info_ptr->signature, num_checked, num_to_check - 4) != 0)
          png_error(png_ptr, "Not a PNG file");
       else
          png_error(png_ptr, "PNG file corrupted by ASCII conversion");
@@ -238,10 +238,10 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
       else
          png_chunk_error(png_ptr, "CRC error");
 
-      return (1);
+      return 1;
    }
 
-   return (0);
+   return 0;
 }
 
 /* Compare the CRC stored in the PNG file with that calculated by libpng from
@@ -277,11 +277,11 @@ png_crc_error(png_structrp png_ptr)
    if (need_crc != 0)
    {
       crc = png_get_uint_32(crc_bytes);
-      return ((int)(crc != png_ptr->crc));
+      return crc != png_ptr->crc;
    }
 
    else
-      return (0);
+      return 0;
 }
 
 #if defined(PNG_READ_iCCP_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) ||\

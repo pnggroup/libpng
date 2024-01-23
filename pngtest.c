@@ -524,7 +524,7 @@ PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
     */
 
    if (size == 0)
-      return (NULL);
+      return NULL;
 
    /* This calls the library allocator twice, once to get the requested
       buffer and once to get a new free list entry. */
@@ -565,7 +565,7 @@ PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
          printf("png_malloc %lu bytes at %p\n", (unsigned long)size,
              pinfo->pointer);
 
-      return (png_voidp)(pinfo->pointer);
+      return (png_voidp)pinfo->pointer;
    }
 }
 
@@ -698,9 +698,9 @@ read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
       png_error(png_ptr, "lost user chunk pointer");
 
    /* Return one of the following:
-    *    return (-n);  chunk had an error
-    *    return (0);  did not recognize
-    *    return (n);  success
+    *    return -n;  chunk had an error
+    *    return 0;   did not recognize
+    *    return n;   success
     *
     * The unknown chunk structure contains the chunk data:
     * png_byte name[5];
@@ -715,38 +715,38 @@ read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
       {
          /* Found sTER chunk */
          if (chunk->size != 1)
-            return (-1); /* Error return */
+            return -1; /* Error return */
 
          if (chunk->data[0] != 0 && chunk->data[0] != 1)
-            return (-1);  /* Invalid mode */
+            return -1;  /* Invalid mode */
 
          if (set_location(png_ptr, my_user_chunk_data, have_sTER) != 0)
          {
             my_user_chunk_data->sTER_mode=chunk->data[0];
-            return (1);
+            return 1;
          }
 
          else
-            return (0); /* duplicate sTER - give it to libpng */
+            return 0; /* duplicate sTER - give it to libpng */
       }
 
    if (chunk->name[0] != 118 || chunk->name[1] != 112 ||    /* v  p */
        chunk->name[2] !=  65 || chunk->name[3] != 103)      /* A  g */
-      return (0); /* Did not recognize */
+      return 0; /* Did not recognize */
 
    /* Found ImageMagick vpAg chunk */
 
    if (chunk->size != 9)
-      return (-1); /* Error return */
+      return -1; /* Error return */
 
    if (set_location(png_ptr, my_user_chunk_data, have_vpAg) == 0)
-      return (0);  /* duplicate vpAg */
+      return 0;  /* duplicate vpAg */
 
    my_user_chunk_data->vpAg_width = png_get_uint_31(png_ptr, chunk->data);
    my_user_chunk_data->vpAg_height = png_get_uint_31(png_ptr, chunk->data + 4);
    my_user_chunk_data->vpAg_units = chunk->data[8];
 
-   return (1);
+   return 1;
 }
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -882,14 +882,14 @@ test_one_file(const char *inname, const char *outname)
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
       fprintf(STDERR, "Could not find input file %s\n", inname);
-      return (1);
+      return 1;
    }
 
    if ((fpout = fopen(outname, "wb")) == NULL)
    {
       fprintf(STDERR, "Could not open output file %s\n", outname);
       FCLOSE(fpin);
-      return (1);
+      return 1;
    }
 
    pngtest_debug("Allocating read and write structures");
@@ -948,7 +948,7 @@ test_one_file(const char *inname, const char *outname)
 #endif
       FCLOSE(fpin);
       FCLOSE(fpout);
-      return (1);
+      return 1;
    }
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -968,7 +968,7 @@ test_one_file(const char *inname, const char *outname)
       png_destroy_write_struct(&write_ptr, &write_info_ptr);
       FCLOSE(fpin);
       FCLOSE(fpout);
-      return (1);
+      return 1;
    }
 #endif
 #endif
@@ -1686,7 +1686,7 @@ test_one_file(const char *inname, const char *outname)
           inname, error_count, warning_count);
 
       if (strict != 0)
-         return (1);
+         return 1;
    }
 
 #  ifdef PNG_WRITE_SUPPORTED
@@ -1704,21 +1704,21 @@ test_one_file(const char *inname, const char *outname)
           inname, warning_count);
 
       if (strict != 0)
-         return (1);
+         return 1;
    }
 
    pngtest_debug("Opening files for comparison");
    if ((fpin = fopen(inname, "rb")) == NULL)
    {
       fprintf(STDERR, "Could not find file %s\n", inname);
-      return (1);
+      return 1;
    }
 
    if ((fpout = fopen(outname, "rb")) == NULL)
    {
       fprintf(STDERR, "Could not find file %s\n", outname);
       FCLOSE(fpin);
-      return (1);
+      return 1;
    }
 
 #if defined (PNG_WRITE_SUPPORTED) /* else nothing was written */ &&\
@@ -1757,10 +1757,10 @@ test_one_file(const char *inname, const char *outname)
             FCLOSE(fpout);
 
             if (strict != 0 && unsupported_chunks == 0)
-              return (1);
+              return 1;
 
             else
-              return (0);
+              return 0;
          }
 
          if (num_in == 0)
@@ -1794,10 +1794,10 @@ test_one_file(const char *inname, const char *outname)
              * can be exactly the same size!
              */
             if (strict != 0 && unsupported_chunks == 0)
-              return (1);
+              return 1;
 
             else
-              return (0);
+              return 0;
          }
       }
    }
@@ -1806,7 +1806,7 @@ test_one_file(const char *inname, const char *outname)
    FCLOSE(fpin);
    FCLOSE(fpout);
 
-   return (0);
+   return 0;
 }
 
 /* Input and output filenames */
