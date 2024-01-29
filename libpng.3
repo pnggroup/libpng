@@ -876,7 +876,7 @@ Customizing libpng.
        return ERROR;
     }
 
-    is_png = !png_sig_cmp(header, 0, number);
+    is_png = (png_sig_cmp(header, 0, number) == 0);
     if (!is_png)
     {
        return NOT_PNG;
@@ -5211,7 +5211,7 @@ deprecated since libpng-1.0.16 and libpng-1.2.6.
 The function
     png_check_sig(sig, num)
 was replaced with
-    !png_sig_cmp(sig, 0, num)
+    png_sig_cmp(sig, 0, num) == 0
 It has been deprecated since libpng-0.90.
 
 The function
@@ -5275,8 +5275,8 @@ png_get_mmx_bitdepth_threshold(), png_get_mmx_rowbytes_threshold(),
 png_set_asm_flags(), and png_mmx_supported()
 
 We removed the obsolete png_check_sig(), png_memcpy_check(), and
-png_memset_check() functions.  Instead use !png_sig_cmp(), memcpy(),
-and memset(), respectively.
+png_memset_check() functions.  Instead use png_sig_cmp() == 0,
+memcpy(), and memset(), respectively.
 
 The function png_set_gray_1_2_4_to_8() was removed. It has been
 deprecated since libpng-1.0.18 and 1.2.9, when it was replaced with
