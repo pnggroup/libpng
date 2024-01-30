@@ -913,10 +913,12 @@ PNG_EXPORT(2, void, png_set_sig_bytes, (png_structrp png_ptr, int num_bytes));
 PNG_EXPORT(3, int, png_sig_cmp, (png_const_bytep sig, size_t start,
     size_t num_to_check));
 
+#if 0 //REMOVE
 /* Simple signature checking function.  This is the same as calling
  * png_check_sig(sig, n) := (png_sig_cmp(sig, 0, n) == 0).
  */
 #define png_check_sig(sig, n) (png_sig_cmp((sig), 0, (n)) == 0) /* DEPRECATED */
+#endif
 
 /* Allocate and initialize png_ptr struct for reading, and any other memory. */
 PNG_EXPORTA(4, png_structp, png_create_read_struct,
