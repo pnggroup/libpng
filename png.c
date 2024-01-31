@@ -2511,17 +2511,6 @@ png_colorspace_set_rgb_coefficients(png_structrp png_ptr)
 
 #endif /* COLORSPACE */
 
-#ifdef __GNUC__
-/* This exists solely to work round a warning from GNU C. */
-static int /* PRIVATE */
-png_gt(size_t a, size_t b)
-{
-   return a > b;
-}
-#else
-#   define png_gt(a,b) ((a) > (b))
-#endif
-
 void /* PRIVATE */
 png_check_IHDR(png_const_structrp png_ptr,
     png_uint_32 width, png_uint_32 height, int bit_depth,
@@ -2543,12 +2532,12 @@ png_check_IHDR(png_const_structrp png_ptr,
       error = 1;
    }
 
-   if (png_gt(((width + 7) & (~7U)),
+   if (sizeof(void *) <= sizeof(width) && ((width + 7) & (~7U)) <
        ((PNG_SIZE_MAX
            - 48        /* big_row_buf hack */
            - 1)        /* filter byte */
            / 8)        /* 8-byte RGBA pixels */
-           - 1))       /* extra max_pixel_depth pad */
+           - 1)        /* extra max_pixel_depth pad */
    {
       /* The size of the row must be within the limits of this architecture.
        * Because the read code can perform arbitrary transformations the
