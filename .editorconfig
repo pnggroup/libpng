@@ -1,0 +1,38 @@
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Traditionally, the end-of-line character has been platform-specific.
+end_of_line = unset
+
+[*.[chS]]
+indent_style = space
+max_line_length = 81
+
+[*.{awk,cmake,dfa,in,sh}]
+indent_style = space
+max_line_length = 100
+
+[*.txt]
+indent_style = space
+max_line_length = unset
+
+[{Makefile.in,ltmain.sh}]
+indent_style = unset
+insert_final_newline = unset
+max_line_length = unset
+trim_trailing_whitespace = unset
+
+[*~]
+indent_style = unset
+insert_final_newline = unset
+max_line_length = unset
+trim_trailing_whitespace = unset
+
+[COMMIT_EDITMSG]
+max_line_length = 72

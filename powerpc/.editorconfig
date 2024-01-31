@@ -1,0 +1,7 @@
+# https://editorconfig.org
+
+root = false
+
+# FIXME
+[*.[ch]]
+max_line_length = unset
