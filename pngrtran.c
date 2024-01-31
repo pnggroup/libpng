@@ -297,14 +297,13 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
 
    output_gamma = translate_gamma_flags(png_ptr, output_gamma, 1/*screen*/);
 
-   /* Validate the value to ensure it is in a reasonable range. The value
+   /* Validate the value to ensure it is in a reasonable range.  The value
     * is expected to be 1 or greater, but this range test allows for some
-    * viewing correction values.  The intent is to weed out users of this API
-    * who use the inverse of the gamma value accidentally!  Since some of these
-    * values are reasonable this may have to be changed:
+    * viewing correction values.  The intent is to weed out the API users
+    * who might use the inverse of the gamma value accidentally!
     *
-    * 1.6.x: changed from 0.07..3 to 0.01..100 (to accommodate the optimal 16-bit
-    * gamma of 36, and its reciprocal.)
+    * In libpng 1.6.x, we changed from 0.07..3 to 0.01..100, to accommodate
+    * the optimal 16-bit gamma of 36 and its reciprocal.
     */
    if (output_gamma < 1000 || output_gamma > 10000000)
       png_error(png_ptr, "output gamma out of expected range");
