@@ -6165,6 +6165,9 @@ Version 1.6.42 [January 29, 2024]
   Fixed the implementation of the macro function png_check_sig().
     This was an API regression, introduced in libpng-1.6.41.
     (Reported by Matthieu Darbois)
+  Fixed and updated the libpng manual.
+
+Version 1.6.43 [TODO]
 
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
