@@ -249,6 +249,35 @@ if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
     endif()
 endif()
 
+# Set definitions and sources for LoongArch.
+if(TARGET_ARCH MATCHES "^(loongarch)")
+  include(CheckCCompilerFlag)
+  set(PNG_LOONGARCH_LSX_POSSIBLE_VALUES on off)
+  set(PNG_LOONGARCH_LSX "on"
+      CACHE STRING "Enable LOONGARCH_LSX optimizations: on|off; on is default")
+  set_property(CACHE PNG_LOONGARCH_LSX
+               PROPERTY STRINGS ${PNG_LOONGARCH_LSX_POSSIBLE_VALUES})
+  list(FIND PNG_LOONGARCH_LSX_POSSIBLE_VALUES ${PNG_LOONGARCH_LSX} index)
+  if(index EQUAL -1)
+    message(FATAL_ERROR "PNG_LOONGARCH_LSX must be one of [${PNG_LOONGARCH_LSX_POSSIBLE_VALUES}]")
+  elseif(NOT PNG_LOONGARCH_LSX STREQUAL "off")
+    CHECK_C_COMPILER_FLAG("-mlsx" COMPILER_SUPPORTS_LSX)
+    if(COMPILER_SUPPORTS_LSX)
+      set(libpng_loongarch_sources
+          loongarch/loongarch_lsx_init.c
+	  loongarch/filter_lsx_intrinsics.c)
+      set_source_files_properties(${libpng_loongarch_sources}
+                                  PROPERTIES
+                                  COMPILE_FLAGS "-mlsx")
+      add_definitions(-DPNG_LOONGARCH_LSX_OPT=1)
+    else()
+      message(FATAL_ERROR "Compiler does not support -mlsx option")
+    endif()
+  else()
+    add_definitions(-DPNG_LOONGARCH_LSX_OPT=0)
+  endif()
+endif()
+
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
@@ -269,6 +298,11 @@ endif()
 # Set definitions and sources for MIPS.
 if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
   add_definitions(-DPNG_MIPS_MSA_OPT=0)
+endif()
+
+# Set definitions and sources for LoongArch.
+if(TARGET_ARCH MATCHES "^(loongarch)")
+	add_definitions(-DPNG_LOONGARCH_LSX_OPT=0)
 endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
@@ -581,6 +615,7 @@ set(libpng_sources
     ${libpng_intel_sources}
     ${libpng_mips_sources}
     ${libpng_powerpc_sources}
+    ${libpng_loongarch_sources}
 )
 set(pngtest_sources
     pngtest.c
