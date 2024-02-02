@@ -70,9 +70,12 @@
 #endif
 
 /* pngvalid requires write support and one of the fixed or floating point APIs.
+ * progressive read is also required currently as the progressive read pointer
+ * is used to record the 'display' structure.
  */
-#if defined(PNG_WRITE_SUPPORTED) &&\
-   (defined(PNG_FIXED_POINT_SUPPORTED) || defined(PNG_FLOATING_POINT_SUPPORTED))
+#if defined PNG_WRITE_SUPPORTED &&\
+   (defined PNG_PROGRESSIVE_READ_SUPPORTED) &&\
+   (defined PNG_FIXED_POINT_SUPPORTED || defined PNG_FLOATING_POINT_SUPPORTED)
 
 #if PNG_LIBPNG_VER < 10500
 /* This deliberately lacks the const. */
@@ -10009,9 +10012,12 @@ gamma_component_validate(const char *name, const validate_info *vi,
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:
 #           endif /* ALPHA_MODE_SUPPORTED */
+#           if (defined PNG_READ_BACKGROUND_SUPPORTED) ||\
+               (defined PNG_READ_ALPHA_MODE_SUPPORTED)
                do_compose = (alpha > 0 && alpha < 1);
                use_input = (alpha != 0);
                break;
+#           endif
 
             default:
                break;
@@ -11924,7 +11930,14 @@ int main(int argc, char **argv)
          pm.test_gamma_alpha_mode = 0;
 
       else if (strcmp(*argv, "--expand16") == 0)
-         pm.test_gamma_expand16 = 1;
+      {
+#        ifdef PNG_READ_EXPAND_16_SUPPORTED
+            pm.test_gamma_expand16 = 1;
+#        else
+            fprintf(stderr, "pngvalid: --expand16: no read support\n");
+            return SKIP;
+#        endif
+      }
 
       else if (strcmp(*argv, "--noexpand16") == 0)
          pm.test_gamma_expand16 = 0;
@@ -11939,10 +11952,15 @@ int main(int argc, char **argv)
             pm.test_lbg_gamma_transform = pm.test_lbg_gamma_sbit =
             pm.test_lbg_gamma_composition = 0;
 
-#     ifdef PNG_WRITE_tRNS_SUPPORTED
-         else if (strcmp(*argv, "--tRNS") == 0)
+      else if (strcmp(*argv, "--tRNS") == 0)
+      {
+#        ifdef PNG_WRITE_tRNS_SUPPORTED
             pm.test_tRNS = 1;
-#     endif
+#        else
+            fprintf(stderr, "pngvalid: --tRNS: no write support\n");
+            return SKIP;
+#        endif
+      }
 
       else if (strcmp(*argv, "--notRNS") == 0)
          pm.test_tRNS = 0;

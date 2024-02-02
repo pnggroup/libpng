@@ -1,17 +1,24 @@
 #!/bin/sh
 
-st=0    # exit status (set to 1 if a test fails)
+st=0        # exit status (set to 1 if a test fails)
+skipped=
 fail="**FAIL**"
+skip="**SKIP**"
 success=" SUCCESS"
 TEST(){
    # Try to make the log file easier to read:
-   test_status="$success"
-   echo "=============== PNGTEST $* ===================="
-   ./pngtest "$@" || {
-      st=$?
-      test_status="$fail"
-   }
+   echo "=============== pngtest $* ===================="
+   ./pngtest "$@"
+   status=$?
+   case "$status" in
+       0)  test_status="$success";;
+       77) test_status="$skip"
+           skipped=1;;
+       *)  test_status="$fail"
+           st="$status";; 
+   esac
    echo "===============$test_status $* ===================="
+   return "$status"
 }
 
 # The "standard" test
@@ -48,15 +55,17 @@ check_stdout(){
    # variable 'line' below.  The pattern matching ignores this because of the
    # '*' at the end of the pattern match.
    found=
+   skipped=
    while read line
    do
       case "$line" in
          *"$2"*) found=1;;
+         *"TEST SKIPPED"*) skipped=1;;
       esac
       echo "$line" # preserve the original output verbatim
    done
    # output the missing warning on descriptor 3:
-   test -z "$found" && echo "$1: $2" >&3
+   test -z "$found" -a -z "$skipped" && echo "$1: $2" >&3
 }
 # NOTE: traditionally the Bourne shell executed the last element in a pipe
 # sequence in the original shell so it could set variables in the original
@@ -74,7 +83,10 @@ exec 4>&1 # original stdout - the log file
      # The exit code is ignored here, the test is that the particular errors
      # (warnings) are produced.  The original output still ends up in the log
      # file.
-     TEST "$file" |
+     {
+        TEST "$file"
+        test "$?" -eq 77 && echo "TEST SKIPPED"
+     } |
         check_stdout "$file" 'IDAT: Read palette index exceeding num_palette' |
         check_stdout "$file" 'Wrote palette index exceeding num_palette' >&4
    done
@@ -90,4 +102,6 @@ exec 4>&1 # original stdout - the log file
    exit $st
 } || st=$?
 
-exit $st
+test "$st" -gt 0 && exit "$st"
+test -n "$skipped" && exit 77
+exit 0
