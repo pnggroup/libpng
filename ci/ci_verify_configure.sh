@@ -73,13 +73,19 @@ function ci_trace_build {
 }
 
 function ci_cleanup_old_build {
-    if [[ -e $CI_BUILD_DIR || -e $CI_INSTALL_DIR ]]
-    then
-        ci_info "## START OF PRE-BUILD CLEANUP ##"
+    ci_info "## START OF PRE-BUILD CHECKUP ##"
+    ci_spawn test '!' -f "$CI_SRC_DIR/config.status" || {
+        # Warn the user, but do not delete their files.
+        ci_warn "unexpected build configuration file: '$CI_SRC_DIR/config.status'"
+        ci_warn "the configure script might fail"
+    }
+    ci_info "## END OF PRE-BUILD CHECKUP ##"
+    ci_info "## START OF PRE-BUILD CLEANUP ##"
+    [[ ! -e $CI_BUILD_DIR && ! -e $CI_INSTALL_DIR ]] || {
         ci_spawn rm -fr "$CI_BUILD_DIR"
         ci_spawn rm -fr "$CI_INSTALL_DIR"
-        ci_info "## END OF PRE-BUILD CLEANUP ##"
-    fi
+    }
+    ci_info "## END OF PRE-BUILD CLEANUP ##"
 }
 
 function ci_build {
@@ -97,7 +103,7 @@ function ci_build {
         ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS ${CFLAGS:-"-O2"}"
         ci_spawn export LDFLAGS="-fsanitize=$CI_SANITIZERS $LDFLAGS"
     }
-    # Build!
+    # And... build!
     ci_spawn mkdir -p "$CI_BUILD_DIR"
     ci_spawn cd "$CI_BUILD_DIR"
     # Spawn "configure".

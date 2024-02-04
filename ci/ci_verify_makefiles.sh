@@ -108,7 +108,7 @@ function ci_build {
     [[ $ALL_LD_FLAGS ]] && ALL_MAKE_VARS+=(LDFLAGS="$ALL_LD_FLAGS")
     [[ $CI_LIBS ]] && ALL_MAKE_VARS+=(LIBS="$CI_LIBS")
     ALL_MAKE_VARS+=($CI_MAKE_VARS)
-    # Build!
+    # And... build!
     local MY_MAKEFILE
     for MY_MAKEFILE in $CI_MAKEFILES
     do

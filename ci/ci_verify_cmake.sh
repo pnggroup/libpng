@@ -82,13 +82,12 @@ function ci_trace_build {
 }
 
 function ci_cleanup_old_build {
-    if [[ -e $CI_BUILD_DIR || -e $CI_INSTALL_DIR ]]
-    then
-        ci_info "## START OF PRE-BUILD CLEANUP ##"
+    ci_info "## START OF PRE-BUILD CLEANUP ##"
+    [[ ! -e $CI_BUILD_DIR && ! -e $CI_INSTALL_DIR ]] || {
         ci_spawn rm -fr "$CI_BUILD_DIR"
         ci_spawn rm -fr "$CI_INSTALL_DIR"
-        ci_info "## END OF PRE-BUILD CLEANUP ##"
-    fi
+    }
+    ci_info "## END OF PRE-BUILD CLEANUP ##"
 }
 
 function ci_build {
@@ -127,7 +126,7 @@ function ci_build {
         ci_spawn export CMAKE_GENERATOR="$CI_CMAKE_GENERATOR"
     [[ $CI_CMAKE_GENERATOR_PLATFORM ]] &&
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
-    # Build!
+    # And... build!
     # Use $CI_BUILD_TO_SRC_RELDIR and $CI_BUILD_TO_INSTALL_RELDIR
     # instead of $CI_SRC_DIR and $CI_INSTALL_DIR from this point onwards.
     ci_spawn mkdir -p "$CI_BUILD_DIR"
@@ -181,6 +180,7 @@ function main {
         ci_err "unknown option: '$1'"
     done
     shift $((OPTIND - 1))
+    # And... go!
     ci_init_build
     ci_trace_build
     [[ $# -eq 0 ]] || {
