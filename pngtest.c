@@ -52,10 +52,10 @@ typedef png_libpng_version_1_6_43_git Your_png_h_is_not_version_1_6_43_git;
 #if (PNG_LIBPNG_VER != PNG_LIBPNG_VER_MAJOR * 10000 + \
                        PNG_LIBPNG_VER_MINOR * 100 + \
                        PNG_LIBPNG_VER_RELEASE) || \
-    (PNG_LIBPNG_VER_SONUM != PNG_LIBPNG_VER_MAJOR * 10 + \
-                             PNG_LIBPNG_VER_MINOR) || \
-    (PNG_LIBPNG_VER_DLLNUM != PNG_LIBPNG_VER_MAJOR * 10 + \
-                              PNG_LIBPNG_VER_MINOR)
+    (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_MAJOR * 10 + \
+                                 PNG_LIBPNG_VER_MINOR) || \
+    (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_SONUM) || \
+    (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_DLLNUM)
 #  error "Inconsistent version numbers in png.h"
 #endif
 

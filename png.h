@@ -255,9 +255,6 @@
  *    to the info_ptr or png_ptr members through png.h, and the compiled
  *    application is loaded with a different version of the library.
  *
- *    DLLNUM will change each time there are forward or backward changes
- *    in binary compatibility (e.g., when a new feature is added).
- *
  * See libpng.txt or libpng.3 for more information.  The PNG specification
  * is available as a W3C Recommendation and as an ISO/IEC Standard; see
  * <https://www.w3.org/TR/2003/REC-PNG-20031110/>
@@ -281,8 +278,10 @@
 #define PNG_LIBPNG_VER_STRING "1.6.43.git"
 #define PNG_HEADER_VERSION_STRING " libpng version " PNG_LIBPNG_VER_STRING "\n"
 
-#define PNG_LIBPNG_VER_SONUM   16
-#define PNG_LIBPNG_VER_DLLNUM  16
+/* The versions of shared library builds should stay in sync, going forward */
+#define PNG_LIBPNG_VER_SHAREDLIB 16
+#define PNG_LIBPNG_VER_SONUM     PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
+#define PNG_LIBPNG_VER_DLLNUM    PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
 
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
