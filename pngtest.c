@@ -1,5 +1,5 @@
 
-/* pngtest.c - a simple test program to test libpng
+/* pngtest.c - a test program for libpng
  *
  * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -98,20 +98,14 @@ typedef FILE * png_FILE_p;
 #endif
 
 #if PNG_DEBUG > 1
-#  define pngtest_debug(m)        ((void)fprintf(stderr, m "\n"))
-#  define pngtest_debug1(m,p1)    ((void)fprintf(stderr, m "\n", p1))
-#  define pngtest_debug2(m,p1,p2) ((void)fprintf(stderr, m "\n", p1, p2))
-#else
-#  define pngtest_debug(m)        ((void)0)
-#  define pngtest_debug1(m,p1)    ((void)0)
-#  define pngtest_debug2(m,p1,p2) ((void)0)
-#endif
-
-#if PNG_DEBUG == 0
-#  define SINGLE_ROWBUF_ALLOC  /* Makes buffer overruns easier to nail */
-#endif
-
-#if PNG_DEBUG < 0
+#  define pngtest_debug(m)          ((void)fprintf(stderr, m "\n"))
+#  define pngtest_debug1(m, p1)     ((void)fprintf(stderr, m "\n", p1))
+#  define pngtest_debug2(m, p1, p2) ((void)fprintf(stderr, m "\n", p1, p2))
+#elif PNG_DEBUG == 0 || PNG_DEBUG == 1
+#  define pngtest_debug(m)          ((void)0)
+#  define pngtest_debug1(m, p1)     ((void)0)
+#  define pngtest_debug2(m, p1, p2) ((void)0)
+#else /* PNG_DEBUG < 0 */
 #  error "Bad PNG_DEBUG value"
 #endif
 
@@ -1404,13 +1398,6 @@ test_one_file(const char *inname, const char *outname)
 #endif
 #endif
 
-#ifdef SINGLE_ROWBUF_ALLOC
-   pngtest_debug("Allocating row buffer...");
-   row_buf = (png_bytep)png_malloc(read_ptr,
-       png_get_rowbytes(read_ptr, read_info_ptr));
-
-   pngtest_debug1("\t%p", row_buf);
-#endif /* SINGLE_ROWBUF_ALLOC */
    pngtest_debug("Writing row data");
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED) &&\
@@ -1457,7 +1444,6 @@ test_one_file(const char *inname, const char *outname)
       pngtest_debug1("Writing row data for pass %d", pass);
       for (y = 0; y < pass_height; y++)
       {
-#ifndef SINGLE_ROWBUF_ALLOC
          pngtest_debug2("Allocating row buffer (pass %d, y = %u)...", pass, y);
 
          row_buf = (png_bytep)png_malloc(read_ptr,
@@ -1466,7 +1452,6 @@ test_one_file(const char *inname, const char *outname)
          pngtest_debug2("\t%p (%lu bytes)", row_buf,
              (unsigned long)png_get_rowbytes(read_ptr, read_info_ptr));
 
-#endif /* !SINGLE_ROWBUF_ALLOC */
          png_read_rows(read_ptr, (png_bytepp)&row_buf, NULL, 1);
 
 #ifdef PNG_WRITE_SUPPORTED
@@ -1483,11 +1468,9 @@ test_one_file(const char *inname, const char *outname)
 #endif
 #endif /* WRITE */
 
-#ifndef SINGLE_ROWBUF_ALLOC
          pngtest_debug2("Freeing row buffer (pass %d, y = %u)", pass, y);
          png_free(read_ptr, row_buf);
          row_buf = NULL;
-#endif /* !SINGLE_ROWBUF_ALLOC */
       }
    }
 
@@ -1612,11 +1595,6 @@ test_one_file(const char *inname, const char *outname)
 #endif
 
    pngtest_debug("Destroying data structs");
-#ifdef SINGLE_ROWBUF_ALLOC
-   pngtest_debug("Destroying row_buf for read_ptr");
-   png_free(read_ptr, row_buf);
-   row_buf = NULL;
-#endif /* SINGLE_ROWBUF_ALLOC */
    pngtest_debug("Destroying read_ptr, read_info_ptr, end_info_ptr");
    png_destroy_read_struct(&read_ptr, &read_info_ptr, &end_info_ptr);
 #ifdef PNG_WRITE_SUPPORTED
