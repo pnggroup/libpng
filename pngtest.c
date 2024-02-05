@@ -45,8 +45,19 @@
 
 #include "png.h"
 
-/* KEEPME in libpng-1.6.x */
-#define STDERR stdout
+/* Generate a compiler error if there is an old png.h in the search path. */
+typedef png_libpng_version_1_6_43_git Your_png_h_is_not_version_1_6_43_git;
+
+/* Ensure that all version numbers in png.h are consistent with one another. */
+#if (PNG_LIBPNG_VER != PNG_LIBPNG_VER_MAJOR * 10000 + \
+                       PNG_LIBPNG_VER_MINOR * 100 + \
+                       PNG_LIBPNG_VER_RELEASE) || \
+    (PNG_LIBPNG_VER_SONUM != PNG_LIBPNG_VER_MAJOR * 10 + \
+                             PNG_LIBPNG_VER_MINOR) || \
+    (PNG_LIBPNG_VER_DLLNUM != PNG_LIBPNG_VER_MAJOR * 10 + \
+                              PNG_LIBPNG_VER_MINOR)
+#  error "Inconsistent version numbers in png.h"
+#endif
 
 /* In version 1.6.1, we added support for the configure test harness, which
  * uses 77 to indicate a skipped test. On the other hand, in cmake build tests,
@@ -57,7 +68,6 @@
 #else
 #  define SKIP 0
 #endif
-
 
 /* Known chunks that exist in pngtest.png must be supported, or pngtest will
  * fail simply as a result of re-ordering them.  This may be fixed in the next
@@ -92,6 +102,11 @@
 #ifndef PNG_STDIO_SUPPORTED
 typedef FILE * png_FILE_p;
 #endif
+
+/* This hack was introduced for historical reasons, and we are
+ * still keeping it in libpng-1.6.x for compatibility reasons.
+ */
+#define STDERR stdout
 
 #ifndef PNG_DEBUG
 #  define PNG_DEBUG 0
@@ -1786,12 +1801,11 @@ main(int argc, char *argv[])
       fprintf(STDERR, " NOTE: libpng compiled for max 64k, zlib not\n");
 #endif
 
-   if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING))
+   if (strcmp(png_libpng_ver, PNG_LIBPNG_VER_STRING) != 0)
    {
-      fprintf(STDERR,
-          "Warning: versions are different between png.h and png.c\n");
-      fprintf(STDERR, "  png.h version: %s\n", PNG_LIBPNG_VER_STRING);
-      fprintf(STDERR, "  png.c version: %s\n\n", png_libpng_ver);
+      fprintf(STDERR, "Warning: mismatching versions of png.h and png.c\n");
+      fprintf(STDERR, "  png.h version string: %s\n", PNG_LIBPNG_VER_STRING);
+      fprintf(STDERR, "  png.c version string: %s\n\n", png_libpng_ver);
       ++ierror;
    }
 
@@ -2088,6 +2102,3 @@ main(void)
    return SKIP;
 }
 #endif
-
-/* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_43_git Your_png_h_is_not_version_1_6_43_git;
