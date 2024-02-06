@@ -53,16 +53,21 @@ function ci_trace_build {
     ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
     ci_info "executable: \$CI_MAKE: $(command -V "$CI_MAKE")"
-    [[ $CI_CC ]] &&
+    [[ $CI_CC ]] && {
         ci_info "executable: \$CI_CC: $(command -V "$CI_CC")"
-    [[ $CI_CPP ]] &&
+    }
+    [[ $CI_CPP ]] && {
         ci_info "executable: \$CI_CPP: $(command -V "$CI_CPP")"
-    [[ $CI_AR ]] &&
+    }
+    [[ $CI_AR ]] && {
         ci_info "executable: \$CI_AR: $(command -V "$CI_AR")"
-    [[ $CI_RANLIB ]] &&
+    }
+    [[ $CI_RANLIB ]] && {
         ci_info "executable: \$CI_RANLIB: $(command -V "$CI_RANLIB")"
-    [[ $CI_LD ]] &&
+    }
+    [[ $CI_LD ]] && {
         ci_info "executable: \$CI_LD: $(command -V "$CI_LD")"
+    }
     ci_info "## END OF CONFIGURATION ##"
 }
 

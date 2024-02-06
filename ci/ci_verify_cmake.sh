@@ -28,8 +28,6 @@ function ci_init_build {
     CI_CMAKE="${CI_CMAKE:-cmake}"
     CI_CTEST="${CI_CTEST:-ctest}"
     CI_CMAKE_BUILD_TYPE="${CI_CMAKE_BUILD_TYPE:-Release}"
-    [[ -x $(command -v ninja) ]] &&
-        CI_CMAKE_GENERATOR="${CI_CMAKE_GENERATOR:-Ninja}"
     if [[ $CI_CMAKE_GENERATOR == "Visual Studio"* ]]
     then
         # Clean up incidental mixtures of Windows and Bash-on-Windows
@@ -37,8 +35,12 @@ function ci_init_build {
         [[ $TEMP && ( $Temp || $temp ) ]] && unset TEMP
         [[ $TMP && ( $Tmp || $tmp ) ]] && unset TMP
         # Ensure that CI_CMAKE_GENERATOR_PLATFORM is initialized for this generator.
-        [[ $CI_CMAKE_GENERATOR_PLATFORM ]] ||
+        [[ $CI_CMAKE_GENERATOR_PLATFORM ]] || {
             ci_err_internal "missing \$CI_CMAKE_GENERATOR_PLATFORM"
+        }
+    elif [[ -x $(command -v ninja) ]]
+    then
+        CI_CMAKE_GENERATOR="${CI_CMAKE_GENERATOR:-Ninja}"
     fi
 }
 
@@ -72,12 +74,15 @@ function ci_trace_build {
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
     ci_info "executable: \$CI_CMAKE: $(command -V "$CI_CMAKE")"
     ci_info "executable: \$CI_CTEST: $(command -V "$CI_CTEST")"
-    [[ $CI_CC ]] &&
+    [[ $CI_CC ]] && {
         ci_info "executable: \$CI_CC: $(command -V "$CI_CC")"
-    [[ $CI_AR ]] &&
+    }
+    [[ $CI_AR ]] && {
         ci_info "executable: \$CI_AR: $(command -V "$CI_AR")"
-    [[ $CI_RANLIB ]] &&
+    }
+    [[ $CI_RANLIB ]] && {
         ci_info "executable: \$CI_RANLIB: $(command -V "$CI_RANLIB")"
+    }
     ci_info "## END OF CONFIGURATION ##"
 }
 
@@ -94,20 +99,25 @@ function ci_build {
     ci_info "## START OF BUILD ##"
     ci_spawn "$(command -v "$CI_CMAKE")" --version
     ci_spawn "$(command -v "$CI_CTEST")" --version
-    [[ $CI_CMAKE_GENERATOR == *"Ninja"* ]] &&
+    [[ $CI_CMAKE_GENERATOR == *"Ninja"* ]] && {
         ci_spawn "$(command -v ninja)" --version
+    }
     # Initialize ALL_CC_FLAGS as a string.
     local ALL_CC_FLAGS="$CI_CC_FLAGS"
-    [[ $CI_SANITIZERS ]] &&
+    [[ $CI_SANITIZERS ]] && {
         ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_CC_FLAGS"
+    }
     # Initialize ALL_CMAKE_VARS, ALL_CMAKE_BUILD_FLAGS and ALL_CTEST_FLAGS as arrays.
     local ALL_CMAKE_VARS=()
-    [[ $CI_CMAKE_TOOLCHAIN_FILE ]] &&
+    [[ $CI_CMAKE_TOOLCHAIN_FILE ]] && {
         ALL_CMAKE_VARS+=(-DCMAKE_TOOLCHAIN_FILE="$CI_CMAKE_TOOLCHAIN_FILE")
-    [[ $CI_CC ]] &&
+    }
+    [[ $CI_CC ]] && {
         ALL_CMAKE_VARS+=(-DCMAKE_C_COMPILER="$CI_CC")
-    [[ $ALL_CC_FLAGS ]] &&
+    }
+    [[ $ALL_CC_FLAGS ]] && {
         ALL_CMAKE_VARS+=(-DCMAKE_C_FLAGS="$ALL_CC_FLAGS")
+    }
     [[ $CI_AR ]] && {
         # Use the full path of CI_AR to work around a CMake error.
         ALL_CMAKE_VARS+=(-DCMAKE_AR="$(command -v "$CI_AR")")
@@ -122,20 +132,24 @@ function ci_build {
     local ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
     local ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
     # Export the CMake environment variables.
-    [[ $CI_CMAKE_GENERATOR ]] &&
+    [[ $CI_CMAKE_GENERATOR ]] && {
         ci_spawn export CMAKE_GENERATOR="$CI_CMAKE_GENERATOR"
-    [[ $CI_CMAKE_GENERATOR_PLATFORM ]] &&
+    }
+    [[ $CI_CMAKE_GENERATOR_PLATFORM ]] && {
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
+    }
     # And... build!
     # Use $CI_BUILD_TO_SRC_RELDIR and $CI_BUILD_TO_INSTALL_RELDIR
     # instead of $CI_SRC_DIR and $CI_INSTALL_DIR from this point onwards.
     ci_spawn mkdir -p "$CI_BUILD_DIR"
     ci_spawn cd "$CI_BUILD_DIR"
-    [[ $CI_BUILD_TO_SRC_RELDIR -ef $CI_SRC_DIR ]] ||
+    [[ $CI_BUILD_TO_SRC_RELDIR -ef $CI_SRC_DIR ]] || {
         ci_err_internal "bad or missing \$CI_BUILD_TO_SRC_RELDIR"
+    }
     ci_spawn mkdir -p "$CI_INSTALL_DIR"
-    [[ $CI_BUILD_TO_INSTALL_RELDIR -ef $CI_INSTALL_DIR ]] ||
+    [[ $CI_BUILD_TO_INSTALL_RELDIR -ef $CI_INSTALL_DIR ]] || {
         ci_err_internal "bad or missing \$CI_BUILD_TO_INSTALL_RELDIR"
+    }
     # Spawn "cmake ...".
     ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_BUILD_TO_INSTALL_RELDIR" \
                          "${ALL_CMAKE_VARS[@]}" \

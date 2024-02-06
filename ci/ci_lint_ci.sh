@@ -24,8 +24,9 @@ function ci_lint_ci_config_files {
         ci_spawn "$CI_YAMLLINT" --version
         for MY_FILE in "$CI_TOPLEVEL_DIR"/.*.yml
         do
-            ci_spawn "$CI_YAMLLINT" --strict "$MY_FILE" ||
+            ci_spawn "$CI_YAMLLINT" --strict "$MY_FILE" || {
                 CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
+            }
         done
     else
         ci_warn "program not found: 'yamllint'; skipping checks"
@@ -40,8 +41,9 @@ function ci_lint_ci_scripts {
         ci_spawn "$CI_SHELLCHECK" --version
         for MY_FILE in "$CI_SCRIPT_DIR"/*.sh
         do
-            ci_spawn "$CI_SHELLCHECK" -x "$MY_FILE" ||
+            ci_spawn "$CI_SHELLCHECK" -x "$MY_FILE" || {
                 CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
+            }
         done
     else
         ci_warn "program not found: 'shellcheck'; skipping checks"

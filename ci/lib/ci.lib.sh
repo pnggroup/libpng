@@ -5,10 +5,12 @@
 #
 # SPDX-License-Identifier: MIT
 
-test -f "$BASH_SOURCE" ||
+test -f "$BASH_SOURCE" || {
     echo >&2 "warning: this module requires Bash version 3 or newer"
-test "${#BASH_SOURCE[@]}" -gt 1 ||
+}
+test "${#BASH_SOURCE[@]}" -gt 1 || {
     echo >&2 "warning: this module should be sourced from a Bash script"
+}
 
 # Reset the locale to avoid surprises from locale-dependent commands.
 export LC_ALL=C
@@ -72,19 +74,26 @@ function ci_spawn {
 }
 
 # Ensure that the internal initialization is correct.
-[[ $CI_TOPLEVEL_DIR/ci/lib/ci.lib.sh -ef ${BASH_SOURCE[0]} ]] ||
+[[ $CI_TOPLEVEL_DIR/ci/lib/ci.lib.sh -ef ${BASH_SOURCE[0]} ]] || {
     ci_err_internal "bad or missing \$CI_TOPLEVEL_DIR"
-[[ $CI_SCRIPT_DIR/$CI_SCRIPT_NAME -ef $0 ]] ||
+}
+[[ $CI_SCRIPT_DIR/$CI_SCRIPT_NAME -ef $0 ]] || {
     ci_err_internal "bad or missing \$CI_SCRIPT_DIR/\$CI_SCRIPT_NAME"
-[[ $CI_BUILD_ARCH && $CI_BUILD_SYSTEM ]] ||
+}
+[[ $CI_BUILD_ARCH && $CI_BUILD_SYSTEM ]] || {
     ci_err_internal "missing \$CI_BUILD_ARCH or \$CI_BUILD_SYSTEM"
-[[ $CI_TARGET_ARCH && $CI_TARGET_SYSTEM ]] ||
+}
+[[ $CI_TARGET_ARCH && $CI_TARGET_SYSTEM ]] || {
     ci_err_internal "missing \$CI_TARGET_ARCH or \$CI_TARGET_SYSTEM"
+}
 
 # Ensure that the user initialization is correct.
-[[ ${CI_NO_TEST:-0} == [01] ]] ||
+[[ ${CI_NO_TEST:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_NO_TEST: '$CI_NO_TEST'"
-[[ ${CI_NO_INSTALL:-0} == [01] ]] ||
+}
+[[ ${CI_NO_INSTALL:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
-[[ ${CI_NO_CLEAN:-0} == [01] ]] ||
+}
+[[ ${CI_NO_CLEAN:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
+}
