@@ -1,3 +1,7 @@
+# Disable the "expressions don't expand in single quotes, use double quotes"
+# advice. We need the regular expressions to remain uninterpolated.
+disable=SC2016
+
 # Disable the "variable appears unused" warning caused by the use of getopts
 # with an obligatory (but unused) variable name in the main function.
 disable=SC2034
