@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -e
+set -o errexit -o pipefail -o posix
 
 # Copyright (c) 2019-2024 Cosmin Truta.
 #
@@ -181,8 +181,9 @@ function ci_build {
 }
 
 function usage {
-    echo "usage: $CI_SCRIPT_NAME"
-    exit 0
+    echo "usage: $CI_SCRIPT_NAME [<options>]"
+    echo "options: -?|-h|--help"
+    exit "${@:-0}"
 }
 
 function main {
@@ -190,7 +191,7 @@ function main {
     while getopts ":" opt
     do
         # This ain't a while-loop. It only pretends to be.
-        [[ $1 == -[?h]* || $1 == --help ]] && usage
+        [[ $1 == -[?h]* || $1 == --help || $1 == --help=* ]] && usage 0
         ci_err "unknown option: '$1'"
     done
     shift $((OPTIND - 1))
@@ -198,8 +199,9 @@ function main {
     ci_init_build
     ci_trace_build
     [[ $# -eq 0 ]] || {
-        ci_info "note: this program accepts environment options only"
-        ci_err "unexpected argument: '$1'"
+        echo >&2 "error: unexpected argument: '$1'"
+        echo >&2 "note: this program accepts environment options only"
+        usage 2
     }
     ci_cleanup_old_build
     ci_build
