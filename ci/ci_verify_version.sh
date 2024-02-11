@@ -20,7 +20,10 @@ function ci_init_shellify {
 
 function ci_run_shellify {
     ci_info "shellifying:" "$@"
+    local my_result
     "$BASH" "$CI_SCRIPT_DIR/ci_shellify.sh" "$@"
+    echo "$my_result" | "$BASH" --posix || ci_err "bad shellify output"
+    echo "$my_result"
 }
 
 function ci_verify_version {
@@ -29,13 +32,10 @@ function ci_verify_version {
     ci_init_shellify
     my_env_libpng_ver="$(ci_run_shellify png.h)"
     echo "$my_env_libpng_ver"
-    echo "$my_env_libpng_ver" | "$BASH" --posix || ci_err "bad shellify output"
     my_env_autoconf_ver="$(ci_run_shellify configure.ac)"
     echo "$my_env_autoconf_ver"
-    echo "$my_env_autoconf_ver" | "$BASH" --posix || ci_err "bad shellify output"
     my_env_cmake_ver="$(ci_run_shellify CMakeLists.txt)"
     echo "$my_env_cmake_ver"
-    echo "$my_env_cmake_ver" | "$BASH" --posix || ci_err "bad shellify output"
     ci_info "## VERIFYING: png.h version definitions ##"
     eval "$my_env_libpng_ver"
     local my_expect="${PNG_LIBPNG_VER_MAJOR}.${PNG_LIBPNG_VER_MINOR}.${PNG_LIBPNG_VER_RELEASE}"

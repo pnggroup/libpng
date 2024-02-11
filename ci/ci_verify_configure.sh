@@ -107,8 +107,8 @@ function ci_build {
     [[ $CI_LD ]] && ci_spawn export LD="$CI_LD"
     [[ $CI_LD_FLAGS ]] && ci_spawn export LDFLAGS="$CI_LD_FLAGS"
     [[ $CI_SANITIZERS ]] && {
-        ci_spawn export CFLAGS="-fsanitize=$CI_SANITIZERS ${CFLAGS:-"-O2"}"
-        ci_spawn export LDFLAGS="-fsanitize=$CI_SANITIZERS $LDFLAGS"
+        ci_spawn export CFLAGS="${CFLAGS:-"-O2"} -fsanitize=$CI_SANITIZERS"
+        ci_spawn export LDFLAGS="${LDFLAGS}${LDFLAGS:+" "}-fsanitize=$CI_SANITIZERS"
     }
     # And... build!
     ci_spawn mkdir -p "$CI_BUILD_DIR"

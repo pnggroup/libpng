@@ -79,61 +79,77 @@ function ci_cleanup_old_build {
     # Fortunately, for a clean makefiles-based build, it should be
     # sufficient to remove the old object files only.
     ci_info "## START OF PRE-BUILD CLEANUP ##"
-    local MY_FILE
+    local my_file
     find "$CI_SRC_DIR" -maxdepth 1 \( -iname "*.o" -o -iname "*.obj" \) |
-        while IFS="" read -r MY_FILE
+        while IFS="" read -r my_file
         do
-            ci_spawn rm -fr "$MY_FILE"
+            ci_spawn rm -fr "$my_file"
         done
     ci_info "## END OF PRE-BUILD CLEANUP ##"
 }
 
 function ci_build {
     ci_info "## START OF BUILD ##"
-    # Initialize ALL_CC_FLAGS and ALL_LD_FLAGS as strings.
-    local ALL_CC_FLAGS="$CI_CC_FLAGS"
-    local ALL_LD_FLAGS="$CI_LD_FLAGS"
-    [[ $CI_SANITIZERS ]] && {
-        ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS ${ALL_CC_FLAGS:-"-O2"}"
-        ALL_LD_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_LD_FLAGS"
+    # Initialize and populate the local arrays.
+    local all_make_flags=()
+    local all_make_vars=()
+    [[ $CI_MAKE_FLAGS ]] && {
+        all_make_flags+=($CI_MAKE_FLAGS)
     }
-    # Initialize ALL_MAKE_FLAGS and ALL_MAKE_VARS as arrays.
-    local ALL_MAKE_FLAGS=($CI_MAKE_FLAGS)
-    local ALL_MAKE_VARS=()
-    [[ $CI_CC ]] && ALL_MAKE_VARS+=(CC="$CI_CC")
-    [[ $ALL_CC_FLAGS ]] && ALL_MAKE_VARS+=(CFLAGS="$ALL_CC_FLAGS")
-    [[ $CI_CPP ]] && ALL_MAKE_VARS+=(CPP="$CI_CPP")
-    [[ $CI_CPP_FLAGS ]] && ALL_MAKE_VARS+=(CPPFLAGS="$CI_CPP_FLAGS")
-    [[ $CI_AR ]] && ALL_MAKE_VARS+=(
-        AR="${CI_AR:-ar}"
-        AR_RC="${CI_AR:-ar} rc"
-    )
-    [[ $CI_RANLIB ]] && ALL_MAKE_VARS+=(RANLIB="$CI_RANLIB")
-    [[ $CI_LD ]] && ALL_MAKE_VARS+=(LD="$CI_LD")
-    [[ $ALL_LD_FLAGS ]] && ALL_MAKE_VARS+=(LDFLAGS="$ALL_LD_FLAGS")
-    [[ $CI_LIBS ]] && ALL_MAKE_VARS+=(LIBS="$CI_LIBS")
-    ALL_MAKE_VARS+=($CI_MAKE_VARS)
+    [[ $CI_CC ]] && {
+        all_make_vars+=(CC="$CI_CC")
+    }
+    [[ $CI_CC_FLAGS || $CI_SANITIZERS ]] && {
+        [[ $CI_SANITIZERS ]] && CI_CC_FLAGS="${CI_CC_FLAGS:-"-O2"} -fsanitize=$CI_SANITIZERS"
+        all_make_vars+=(CFLAGS="$CI_CC_FLAGS")
+    }
+    [[ $CI_CPP ]] && {
+        all_make_vars+=(CPP="$CI_CPP")
+    }
+    [[ $CI_CPP_FLAGS ]] && {
+        all_make_vars+=(CPPFLAGS="$CI_CPP_FLAGS")
+    }
+    [[ $CI_AR ]] && {
+        all_make_vars+=(
+            AR="${CI_AR:-ar}"
+            AR_RC="${CI_AR:-ar} rc"
+        )
+    }
+    [[ $CI_RANLIB ]] && {
+        all_make_vars+=(RANLIB="$CI_RANLIB")
+    }
+    [[ $CI_LD ]] && {
+        all_make_vars+=(LD="$CI_LD")
+    }
+    [[ $CI_LD_FLAGS || $CI_SANITIZERS ]] && {
+        [[ $CI_SANITIZERS ]] && CI_LD_FLAGS+="${CI_LD_FLAGS:+" "}-fsanitize=$CI_SANITIZERS"
+        all_make_vars+=(LDFLAGS="$CI_LD_FLAGS")
+    }
+    [[ $CI_LIBS ]] && {
+        all_make_vars+=(LIBS="$CI_LIBS")
+    }
+    all_make_vars+=($CI_MAKE_VARS)
     # And... build!
-    local MY_MAKEFILE
-    for MY_MAKEFILE in $CI_MAKEFILES
+    local my_makefile
+    for my_makefile in $CI_MAKEFILES
     do
-        ci_info "using makefile: $MY_MAKEFILE"
+        ci_info "using makefile: $my_makefile"
         # Spawn "make".
-        ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
-                            "${ALL_MAKE_FLAGS[@]}" \
-                            "${ALL_MAKE_VARS[@]}"
+        ci_spawn "$CI_MAKE" -f "$my_makefile" \
+                            "${all_make_flags[@]}" \
+                            "${all_make_vars[@]}"
         ci_expr $((CI_NO_TEST)) || {
             # Spawn "make test" if testing is not disabled.
-            ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
-                                "${ALL_MAKE_FLAGS[@]}" \
-                                "${ALL_MAKE_VARS[@]}" \
+            ci_spawn "$CI_MAKE" -f "$my_makefile" \
+                                "${all_make_flags[@]}" \
+                                "${all_make_vars[@]}" \
                                 test
         }
         ci_expr $((CI_NO_CLEAN)) || {
             # Spawn "make clean" if cleaning is not disabled.
-            ci_spawn "$CI_MAKE" -f "$MY_MAKEFILE" \
-                                "${ALL_MAKE_FLAGS[@]}" \
-                                "${ALL_MAKE_VARS[@]}" \
+            ci_spawn "$CI_MAKE" -f "$my_makefile" \
+                                "${all_make_flags[@]}" \
+                                "${all_make_vars[@]}" \
                                 clean
         }
     done

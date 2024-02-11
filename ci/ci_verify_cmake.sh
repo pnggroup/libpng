@@ -97,40 +97,23 @@ function ci_cleanup_old_build {
 
 function ci_build {
     ci_info "## START OF BUILD ##"
-    ci_spawn "$(command -v "$CI_CMAKE")" --version
-    ci_spawn "$(command -v "$CI_CTEST")" --version
+    # Adjust the CI environment variables, as needed.
+    CI_CMAKE="$(command -v "$CI_CMAKE")" || ci_err "bad or missing \$CI_CMAKE"
+    ci_spawn "$CI_CMAKE" --version
+    CI_CTEST="$(command -v "$CI_CTEST")" || ci_err "bad or missing \$CI_CTEST"
+    ci_spawn "$CI_CTEST" --version
     [[ $CI_CMAKE_GENERATOR == *"Ninja"* ]] && {
-        ci_spawn "$(command -v ninja)" --version
-    }
-    # Initialize ALL_CC_FLAGS as a string.
-    local ALL_CC_FLAGS="$CI_CC_FLAGS"
-    [[ $CI_SANITIZERS ]] && {
-        ALL_CC_FLAGS="-fsanitize=$CI_SANITIZERS $ALL_CC_FLAGS"
-    }
-    # Initialize ALL_CMAKE_VARS, ALL_CMAKE_BUILD_FLAGS and ALL_CTEST_FLAGS as arrays.
-    local ALL_CMAKE_VARS=()
-    [[ $CI_CMAKE_TOOLCHAIN_FILE ]] && {
-        ALL_CMAKE_VARS+=(-DCMAKE_TOOLCHAIN_FILE="$CI_CMAKE_TOOLCHAIN_FILE")
-    }
-    [[ $CI_CC ]] && {
-        ALL_CMAKE_VARS+=(-DCMAKE_C_COMPILER="$CI_CC")
-    }
-    [[ $ALL_CC_FLAGS ]] && {
-        ALL_CMAKE_VARS+=(-DCMAKE_C_FLAGS="$ALL_CC_FLAGS")
+        CI_NINJA="$(command -v ninja)" || ci_err "bad or missing ninja, no pun intended"
+        ci_spawn "$CI_NINJA" --version
     }
     [[ $CI_AR ]] && {
-        # Use the full path of CI_AR to work around a CMake error.
-        ALL_CMAKE_VARS+=(-DCMAKE_AR="$(command -v "$CI_AR")")
+        # Use the full path of CI_AR to work around a mysterious CMake error.
+        CI_AR="$(command -v "$CI_AR")" || ci_err "bad or missing \$CI_AR"
     }
     [[ $CI_RANLIB ]] && {
-        # Use the full path of CI_RANLIB to work around a CMake error.
-        ALL_CMAKE_VARS+=(-DCMAKE_RANLIB="$(command -v "$CI_RANLIB")")
+        # Use the full path of CI_RANLIB to work around a mysterious CMake error.
+        CI_RANLIB="$(command -v "$CI_RANLIB")" || ci_err "bad or missing \$CI_RANLIB"
     }
-    ALL_CMAKE_VARS+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
-    ALL_CMAKE_VARS+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
-    ALL_CMAKE_VARS+=($CI_CMAKE_VARS)
-    local ALL_CMAKE_BUILD_FLAGS=($CI_CMAKE_BUILD_FLAGS)
-    local ALL_CTEST_FLAGS=($CI_CTEST_FLAGS)
     # Export the CMake environment variables.
     [[ $CI_CMAKE_GENERATOR ]] && {
         ci_spawn export CMAKE_GENERATOR="$CI_CMAKE_GENERATOR"
@@ -138,6 +121,31 @@ function ci_build {
     [[ $CI_CMAKE_GENERATOR_PLATFORM ]] && {
         ci_spawn export CMAKE_GENERATOR_PLATFORM="$CI_CMAKE_GENERATOR_PLATFORM"
     }
+    # Initialize and populate the local arrays.
+    local all_cmake_vars=()
+    local all_cmake_build_flags=()
+    local all_ctest_flags=()
+    [[ $CI_CMAKE_TOOLCHAIN_FILE ]] && {
+        all_cmake_vars+=(-DCMAKE_TOOLCHAIN_FILE="$CI_CMAKE_TOOLCHAIN_FILE")
+    }
+    [[ $CI_CC ]] && {
+        all_cmake_vars+=(-DCMAKE_C_COMPILER="$CI_CC")
+    }
+    [[ $CI_CC_FLAGS || $CI_SANITIZERS ]] && {
+        [[ $CI_SANITIZERS ]] && CI_CC_FLAGS+="${CI_CC_FLAGS:+" "}-fsanitize=$CI_SANITIZERS"
+        all_cmake_vars+=(-DCMAKE_C_FLAGS="$CI_CC_FLAGS")
+    }
+    [[ $CI_AR ]] && {
+        all_cmake_vars+=(-DCMAKE_AR="$CI_AR")
+    }
+    [[ $CI_RANLIB ]] && {
+        all_cmake_vars+=(-DCMAKE_RANLIB="$CI_RANLIB")
+    }
+    all_cmake_vars+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
+    all_cmake_vars+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
+    all_cmake_vars+=($CI_CMAKE_VARS)
+    all_cmake_build_flags+=($CI_CMAKE_BUILD_FLAGS)
+    all_ctest_flags+=($CI_CTEST_FLAGS)
     # And... build!
     # Use $CI_BUILD_TO_SRC_RELDIR and $CI_BUILD_TO_INSTALL_RELDIR
     # instead of $CI_SRC_DIR and $CI_INSTALL_DIR from this point onwards.
@@ -152,30 +160,30 @@ function ci_build {
     }
     # Spawn "cmake ...".
     ci_spawn "$CI_CMAKE" -DCMAKE_INSTALL_PREFIX="$CI_BUILD_TO_INSTALL_RELDIR" \
-                         "${ALL_CMAKE_VARS[@]}" \
+                         "${all_cmake_vars[@]}" \
                          "$CI_BUILD_TO_SRC_RELDIR"
     # Spawn "cmake --build ...".
     ci_spawn "$CI_CMAKE" --build . \
                          --config "$CI_CMAKE_BUILD_TYPE" \
-                         "${ALL_CMAKE_BUILD_FLAGS[@]}"
+                         "${all_cmake_build_flags[@]}"
     ci_expr $((CI_NO_TEST)) || {
         # Spawn "ctest" if testing is not disabled.
         ci_spawn "$CI_CTEST" --build-config "$CI_CMAKE_BUILD_TYPE" \
-                             "${ALL_CTEST_FLAGS[@]}"
+                             "${all_ctest_flags[@]}"
     }
     ci_expr $((CI_NO_INSTALL)) || {
         # Spawn "cmake --build ... --target install" if installation is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
                              --config "$CI_CMAKE_BUILD_TYPE" \
                              --target install \
-                             "${ALL_CMAKE_BUILD_FLAGS[@]}"
+                             "${all_cmake_build_flags[@]}"
     }
     ci_expr $((CI_NO_CLEAN)) || {
         # Spawn "make --build ... --target clean" if cleaning is not disabled.
         ci_spawn "$CI_CMAKE" --build . \
                              --config "$CI_CMAKE_BUILD_TYPE" \
                              --target clean \
-                             "${ALL_CMAKE_BUILD_FLAGS[@]}"
+                             "${all_cmake_build_flags[@]}"
     }
     ci_info "## END OF BUILD ##"
 }
