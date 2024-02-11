@@ -110,10 +110,7 @@ function ci_build {
         all_make_vars+=(CPPFLAGS="$CI_CPP_FLAGS")
     }
     [[ $CI_AR ]] && {
-        all_make_vars+=(
-            AR="${CI_AR:-ar}"
-            AR_RC="${CI_AR:-ar} rc"
-        )
+        all_make_vars+=(AR="$CI_AR")
     }
     [[ $CI_RANLIB ]] && {
         all_make_vars+=(RANLIB="$CI_RANLIB")
