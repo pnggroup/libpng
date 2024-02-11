@@ -1,5 +1,5 @@
 # makefile for libpng on Solaris 2.x with gcc
-# Copyright (C) 2020-2022 Cosmin Truta
+# Copyright (C) 2020-2024 Cosmin Truta
 # Copyright (C) 2004, 2006-2008, 2010-2014 Glenn Randers-Pehrson
 # Contributed by William L. Sebok, based on makefile.linux
 # Copyright (C) 1998 Greg Roelofs
@@ -19,9 +19,8 @@ LIBSOMAJ=$(LIBNAME).so.$(PNGMAJ)
 
 # Utilities:
 CC=gcc
-AR_RC=ar rc
+AR=ar
 RANLIB=echo
-MKDIR_P=mkdir -p
 LN_SF=ln -f -s
 CP=cp
 RM_F=/bin/rm -f
@@ -40,6 +39,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 	-Wstrict-prototypes -Wmissing-prototypes # -Wconversion
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
 CFLAGS=-O -Wall -Wextra -Wundef # $(WARNMORE) -g
+ARFLAGS=rc
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng16 -lz -lm # -g
 
 # Pre-built configuration
@@ -66,7 +66,7 @@ pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
-	$(AR_RC) $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 $(LIBSO): $(LIBSOMAJ)

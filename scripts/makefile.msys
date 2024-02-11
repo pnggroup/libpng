@@ -1,5 +1,5 @@
 # makefile for libpng using MSYS/gcc (shared, static library)
-# Copyright (C) 2019-2022 Cosmin Truta
+# Copyright (C) 2000, 2019-2024 Cosmin Truta
 # Copyright (C) 2012 Glenn Randers-Pehrson and Christopher M. Wheeler
 #
 # Portions taken from makefile.linux and makefile.gcc:
@@ -30,20 +30,20 @@ ZLIBINC=/usr/local/include
 # Compiler, linker, lib and other tools
 CC = gcc
 LD = $(CC)
-AR_RC = ar rcs
+AR = ar
 RANLIB = ranlib
 CP = cp
 RM_F = rm -rf
-MKDIR_P=mkdir -p
-LN_SF=ln -sf
+LN_SF = ln -sf
 
 CPPFLAGS = # -DPNG_DEBUG=5
 CFLAGS = -O2 -Wall -Wextra -Wundef # -g
+ARFLAGS = rc
 LDFLAGS = # -g
 LIBS = -lz -lm
 
 # File extensions
-EXEEXT=.exe
+EXEEXT = .exe
 
 # Pre-built configuration
 # See scripts/pnglibconf.mak for more options
@@ -75,7 +75,7 @@ $(LIBSOMAJ):
 	$(CC) -shared -Wl,-soname,$(LIBSOMAJ) -o $(LIBSOMAJ)
 
 libpng.a: $(OBJS)
-	$(AR_RC) $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 install:
