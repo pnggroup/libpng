@@ -71,16 +71,22 @@ function ci_verify_version {
     else
         ci_err "mismatched: \$PNG_LIBPNG_VER_DLLNUM != $my_expect"
     fi
-    if [[ "$PNG_LIBPNG_VER_BUILD" == 1 ]]
+    if [[ "$PNG_LIBPNG_VER_BUILD" == [01] ]]
     then
-        ci_info "matched: \$PNG_LIBPNG_VER_BUILD == 1"
+        ci_info "matched: \$PNG_LIBPNG_VER_BUILD == [01]"
     else
-        ci_err "mismatched: \$PNG_LIBPNG_VER_BUILD != 1"
+        ci_err "mismatched: \$PNG_LIBPNG_VER_BUILD != [01]"
     fi
     ci_info "## VERIFYING: png.h build definitions ##"
     my_expect="${PNG_LIBPNG_VER_MAJOR}.${PNG_LIBPNG_VER_MINOR}.${PNG_LIBPNG_VER_RELEASE}"
     if [[ "$PNG_LIBPNG_VER_STRING" == "$my_expect" ]]
     then
+        if [[ $PNG_LIBPNG_VER_BUILD -eq 0 ]]
+        then
+            ci_info "matched: \$PNG_LIBPNG_VER_BUILD -eq 0"
+        else
+            ci_err "mismatched: \$PNG_LIBPNG_VER_BUILD -ne 0"
+        fi
         if [[ $PNG_LIBPNG_BUILD_BASE_TYPE -eq $PNG_LIBPNG_BUILD_STABLE ]]
         then
             ci_info "matched: \$PNG_LIBPNG_BUILD_BASE_TYPE -eq \$PNG_LIBPNG_BUILD_BETA"
@@ -89,6 +95,12 @@ function ci_verify_version {
         fi
     elif [[ "$PNG_LIBPNG_VER_STRING" == "$my_expect".git ]]
     then
+        if [[ $PNG_LIBPNG_VER_BUILD -ne 0 ]]
+        then
+            ci_info "matched: \$PNG_LIBPNG_VER_BUILD -ne 0"
+        else
+            ci_err "mismatched: \$PNG_LIBPNG_VER_BUILD -eq 0"
+        fi
         if [[ $PNG_LIBPNG_BUILD_BASE_TYPE -eq $PNG_LIBPNG_BUILD_BETA ]]
         then
             ci_info "matched: \$PNG_LIBPNG_BUILD_BASE_TYPE -eq \$PNG_LIBPNG_BUILD_BETA"
