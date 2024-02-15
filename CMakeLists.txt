@@ -265,7 +265,7 @@ if(TARGET_ARCH MATCHES "^(loongarch)")
     if(COMPILER_SUPPORTS_LSX)
       set(libpng_loongarch_sources
           loongarch/loongarch_lsx_init.c
-	  loongarch/filter_lsx_intrinsics.c)
+          loongarch/filter_lsx_intrinsics.c)
       set_source_files_properties(${libpng_loongarch_sources}
                                   PROPERTIES
                                   COMPILE_FLAGS "-mlsx")
@@ -302,7 +302,7 @@ endif()
 
 # Set definitions and sources for LoongArch.
 if(TARGET_ARCH MATCHES "^(loongarch)")
-	add_definitions(-DPNG_LOONGARCH_LSX_OPT=0)
+  add_definitions(-DPNG_LOONGARCH_LSX_OPT=0)
 endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)

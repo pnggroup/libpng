@@ -10,29 +10,44 @@ trim_trailing_whitespace = true
 # Traditionally, the end-of-line character has been platform-specific.
 end_of_line = unset
 
-[*.[chS]]
-indent_style = space
-max_line_length = 81
-
-[*.{awk,cmake,dfa,in,sh}]
-indent_style = space
-max_line_length = 100
-
 [*.txt]
 indent_style = space
-max_line_length = unset
+
+[*.[chS]]
+indent_style = space
+max_doc_length = 80
+max_line_length = 81
+# FIXME: max_line_length should be 80
+
+[*.dfa]
+indent_style = space
+max_doc_length = 80
+max_line_length = 80
+
+[*.{awk,cmake}]
+indent_style = space
+max_doc_length = 80
+max_line_length = 100
+
+[*.{in,sh}]
+indent_style = space
+max_doc_length = 100
+max_line_length = 100
 
 [{Makefile.in,ltmain.sh}]
 indent_style = unset
 insert_final_newline = unset
+max_doc_length = unset
 max_line_length = unset
 trim_trailing_whitespace = unset
 
 [*~]
+end_of_line = unset
 indent_style = unset
 insert_final_newline = unset
-max_line_length = unset
 trim_trailing_whitespace = unset
 
 [COMMIT_EDITMSG]
+indent_style = space
+max_doc_length = unset
 max_line_length = 72

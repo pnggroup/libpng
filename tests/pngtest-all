@@ -15,7 +15,7 @@ TEST(){
        77) test_status="$skip"
            skipped=1;;
        *)  test_status="$fail"
-           st="$status";; 
+           st="$status";;
    esac
    echo "===============$test_status $* ===================="
    return "$status"

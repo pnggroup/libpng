@@ -1821,14 +1821,14 @@ png_icc_profile_error(png_const_structrp png_ptr, png_colorspacerp colorspace,
    }
 #  ifdef PNG_WARNINGS_SUPPORTED
    else
-      {
-         char number[PNG_NUMBER_BUFFER_SIZE]; /* +24 = 114 */
+   {
+      char number[PNG_NUMBER_BUFFER_SIZE]; /* +24 = 114 */
 
-         pos = png_safecat(message, (sizeof message), pos,
-             png_format_number(number, number+(sizeof number),
-             PNG_NUMBER_FORMAT_x, value));
-         pos = png_safecat(message, (sizeof message), pos, "h: "); /* +2 = 116 */
-      }
+      pos = png_safecat(message, (sizeof message), pos,
+          png_format_number(number, number+(sizeof number),
+          PNG_NUMBER_FORMAT_x, value));
+      pos = png_safecat(message, (sizeof message), pos, "h: "); /* +2 = 116 */
+   }
 #  endif
    /* The 'reason' is an arbitrary message, allow +79 maximum 195 */
    pos = png_safecat(message, (sizeof message), pos, reason);
