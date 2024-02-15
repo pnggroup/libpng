@@ -8,7 +8,7 @@ set -o errexit -o pipefail -o posix
 #
 # SPDX-License-Identifier: MIT
 
-# shellcheck source="ci/lib/ci.lib.sh"
+# shellcheck source=ci/lib/ci.lib.sh
 source "$(dirname "$0")/lib/ci.lib.sh"
 cd "$CI_TOPLEVEL_DIR"
 
@@ -47,10 +47,10 @@ function ci_finish_lint {
     ci_info "## END OF LINTING ##"
     if [[ $CI_LINT_COUNTER -eq 0 ]]
     then
-        ci_info "success!"
+        ci_info "## SUCCESS ##"
         return 0
     else
-        ci_warn "$CI_LINT_COUNTER failure(s)"
+        ci_info "linting failed"
         return 1
     fi
 }
@@ -61,14 +61,15 @@ function ci_lint_ci_scripts {
         return 0
     }
     ci_info "## LINTING: CI scripts ##"
-    local my_file
-    ci_spawn "$CI_SHELLCHECK" --version
-    for my_file in ci/*.sh
-    do
-        ci_spawn "$CI_SHELLCHECK" -x "$my_file" || {
-            CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
-        }
-    done
+    {
+        local my_file
+        ci_spawn "$CI_SHELLCHECK" --version
+        find ./ci -maxdepth 1 -name "*.sh" |
+            while IFS="" read -r my_file
+            do
+                ci_spawn "$CI_SHELLCHECK" -x "$my_file"
+            done
+    } || CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
 }
 
 function ci_lint_text_files {
@@ -77,7 +78,6 @@ function ci_lint_text_files {
         return 0
     }
     ci_info "## LINTING: text files ##"
-    local my_file
     ci_spawn "$CI_EDITORCONFIG_CHECKER" --version
     ci_spawn "$CI_EDITORCONFIG_CHECKER" || {
         CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
@@ -90,14 +90,15 @@ function ci_lint_yaml_files {
         return 0
     }
     ci_info "## LINTING: YAML files ##"
-    local my_file
-    ci_spawn "$CI_YAMLLINT" --version
-    for my_file in .*.yml
-    do
-        ci_spawn "$CI_YAMLLINT" --strict "$my_file" || {
-            CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
-        }
-    done
+    {
+        local my_file
+        ci_spawn "$CI_YAMLLINT" --version
+        find . \( -iname "*.yml" -o -iname "*.yaml" \) -not -path "./out/*" |
+            while IFS="" read -r my_file
+            do
+                ci_spawn "$CI_YAMLLINT" --strict "$my_file"
+            done
+    } || CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
 }
 
 function ci_lint {

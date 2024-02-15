@@ -8,7 +8,7 @@ set -o errexit -o pipefail -o posix
 #
 # SPDX-License-Identifier: MIT
 
-# shellcheck source="ci/lib/ci.lib.sh"
+# shellcheck source=ci/lib/ci.lib.sh
 source "$(dirname "$0")/lib/ci.lib.sh"
 cd "$CI_TOPLEVEL_DIR"
 
@@ -126,23 +126,23 @@ function ci_build {
     local all_cmake_build_flags=()
     local all_ctest_flags=()
     [[ $CI_CMAKE_TOOLCHAIN_FILE ]] && {
-        all_cmake_vars+=(-DCMAKE_TOOLCHAIN_FILE="$CI_CMAKE_TOOLCHAIN_FILE")
+        all_cmake_vars+=("-DCMAKE_TOOLCHAIN_FILE=$CI_CMAKE_TOOLCHAIN_FILE")
     }
     [[ $CI_CC ]] && {
-        all_cmake_vars+=(-DCMAKE_C_COMPILER="$CI_CC")
+        all_cmake_vars+=("-DCMAKE_C_COMPILER=$CI_CC")
     }
     [[ $CI_CC_FLAGS || $CI_SANITIZERS ]] && {
         [[ $CI_SANITIZERS ]] && CI_CC_FLAGS+="${CI_CC_FLAGS:+" "}-fsanitize=$CI_SANITIZERS"
-        all_cmake_vars+=(-DCMAKE_C_FLAGS="$CI_CC_FLAGS")
+        all_cmake_vars+=("-DCMAKE_C_FLAGS=$CI_CC_FLAGS")
     }
     [[ $CI_AR ]] && {
-        all_cmake_vars+=(-DCMAKE_AR="$CI_AR")
+        all_cmake_vars+=("-DCMAKE_AR=$CI_AR")
     }
     [[ $CI_RANLIB ]] && {
-        all_cmake_vars+=(-DCMAKE_RANLIB="$CI_RANLIB")
+        all_cmake_vars+=("-DCMAKE_RANLIB=$CI_RANLIB")
     }
-    all_cmake_vars+=(-DCMAKE_BUILD_TYPE="$CI_CMAKE_BUILD_TYPE")
-    all_cmake_vars+=(-DCMAKE_VERBOSE_MAKEFILE=ON)
+    all_cmake_vars+=("-DCMAKE_BUILD_TYPE=$CI_CMAKE_BUILD_TYPE")
+    all_cmake_vars+=("-DCMAKE_VERBOSE_MAKEFILE=ON")
     all_cmake_vars+=($CI_CMAKE_VARS)
     all_cmake_build_flags+=($CI_CMAKE_BUILD_FLAGS)
     all_ctest_flags+=($CI_CTEST_FLAGS)

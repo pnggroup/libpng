@@ -8,7 +8,7 @@ set -o errexit -o pipefail -o posix
 #
 # SPDX-License-Identifier: MIT
 
-# shellcheck source="ci/lib/ci.lib.sh"
+# shellcheck source=ci/lib/ci.lib.sh
 source "$(dirname "$0")/lib/ci.lib.sh"
 cd "$CI_TOPLEVEL_DIR"
 

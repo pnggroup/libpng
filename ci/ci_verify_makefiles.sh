@@ -8,7 +8,7 @@ set -o errexit -o pipefail -o posix
 #
 # SPDX-License-Identifier: MIT
 
-# shellcheck source="ci/lib/ci.lib.sh"
+# shellcheck source=ci/lib/ci.lib.sh
 source "$(dirname "$0")/lib/ci.lib.sh"
 cd "$CI_TOPLEVEL_DIR"
 
@@ -97,33 +97,33 @@ function ci_build {
         all_make_flags+=($CI_MAKE_FLAGS)
     }
     [[ $CI_CC ]] && {
-        all_make_vars+=(CC="$CI_CC")
+        all_make_vars+=("CC=$CI_CC")
     }
     [[ $CI_CC_FLAGS || $CI_SANITIZERS ]] && {
         [[ $CI_SANITIZERS ]] && CI_CC_FLAGS="${CI_CC_FLAGS:-"-O2"} -fsanitize=$CI_SANITIZERS"
-        all_make_vars+=(CFLAGS="$CI_CC_FLAGS")
+        all_make_vars+=("CFLAGS=$CI_CC_FLAGS")
     }
     [[ $CI_CPP ]] && {
-        all_make_vars+=(CPP="$CI_CPP")
+        all_make_vars+=("CPP=$CI_CPP")
     }
     [[ $CI_CPP_FLAGS ]] && {
-        all_make_vars+=(CPPFLAGS="$CI_CPP_FLAGS")
+        all_make_vars+=("CPPFLAGS=$CI_CPP_FLAGS")
     }
     [[ $CI_AR ]] && {
-        all_make_vars+=(AR="$CI_AR")
+        all_make_vars+=("AR=$CI_AR")
     }
     [[ $CI_RANLIB ]] && {
-        all_make_vars+=(RANLIB="$CI_RANLIB")
+        all_make_vars+=("RANLIB=$CI_RANLIB")
     }
     [[ $CI_LD ]] && {
-        all_make_vars+=(LD="$CI_LD")
+        all_make_vars+=("LD=$CI_LD")
     }
     [[ $CI_LD_FLAGS || $CI_SANITIZERS ]] && {
         [[ $CI_SANITIZERS ]] && CI_LD_FLAGS+="${CI_LD_FLAGS:+" "}-fsanitize=$CI_SANITIZERS"
-        all_make_vars+=(LDFLAGS="$CI_LD_FLAGS")
+        all_make_vars+=("LDFLAGS=$CI_LD_FLAGS")
     }
     [[ $CI_LIBS ]] && {
-        all_make_vars+=(LIBS="$CI_LIBS")
+        all_make_vars+=("LIBS=$CI_LIBS")
     }
     all_make_vars+=($CI_MAKE_VARS)
     # And... build!
