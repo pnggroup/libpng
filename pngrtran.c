@@ -440,7 +440,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       int i;
 
       png_ptr->quantize_index = (png_bytep)png_malloc(png_ptr,
-          (png_alloc_size_t)((png_uint_32)num_palette * (sizeof (png_byte))));
+          (png_alloc_size_t)num_palette);
       for (i = 0; i < num_palette; i++)
          png_ptr->quantize_index[i] = (png_byte)i;
    }
@@ -457,7 +457,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
          /* Initialize an array to sort colors */
          png_ptr->quantize_sort = (png_bytep)png_malloc(png_ptr,
-             (png_alloc_size_t)((png_uint_32)num_palette * (sizeof (png_byte))));
+             (png_alloc_size_t)num_palette);
 
          /* Initialize the quantize_sort array */
          for (i = 0; i < num_palette; i++)
@@ -591,11 +591,9 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 
          /* Initialize palette index arrays */
          png_ptr->index_to_palette = (png_bytep)png_malloc(png_ptr,
-             (png_alloc_size_t)((png_uint_32)num_palette *
-             (sizeof (png_byte))));
+             (png_alloc_size_t)num_palette);
          png_ptr->palette_to_index = (png_bytep)png_malloc(png_ptr,
-             (png_alloc_size_t)((png_uint_32)num_palette *
-             (sizeof (png_byte))));
+             (png_alloc_size_t)num_palette);
 
          /* Initialize the sort array */
          for (i = 0; i < num_palette; i++)
@@ -760,12 +758,11 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
       size_t num_entries = ((size_t)1 << total_bits);
 
       png_ptr->palette_lookup = (png_bytep)png_calloc(png_ptr,
-          (png_alloc_size_t)(num_entries * (sizeof (png_byte))));
+          (png_alloc_size_t)(num_entries));
 
-      distance = (png_bytep)png_malloc(png_ptr, (png_alloc_size_t)(num_entries *
-          (sizeof (png_byte))));
+      distance = (png_bytep)png_malloc(png_ptr, (png_alloc_size_t)num_entries);
 
-      memset(distance, 0xff, num_entries * (sizeof (png_byte)));
+      memset(distance, 0xff, num_entries);
 
       for (i = 0; i < num_palette; i++)
       {

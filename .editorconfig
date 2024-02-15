@@ -16,8 +16,7 @@ indent_style = space
 [*.[chS]]
 indent_style = space
 max_doc_length = 80
-max_line_length = 81
-# FIXME: max_line_length should be 80
+max_line_length = 80
 
 [*.dfa]
 indent_style = space
