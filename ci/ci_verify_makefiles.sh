@@ -50,6 +50,7 @@ function ci_trace_build {
     ci_info "environment option: \$CI_LD_FLAGS: '$CI_LD_FLAGS'"
     ci_info "environment option: \$CI_LIBS: '$CI_LIBS'"
     ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
+    ci_info "environment option: \$CI_FORCE: '$CI_FORCE'"
     ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
     ci_info "executable: \$CI_MAKE: $(command -V "$CI_MAKE")"
@@ -79,13 +80,26 @@ function ci_cleanup_old_build {
     # Fortunately, for a clean makefiles-based build, it should be
     # sufficient to remove the old object files only.
     ci_info "## START OF PRE-BUILD CLEANUP ##"
-    local my_file
-    find "$CI_SRC_DIR" -maxdepth 1 \( -iname "*.o" -o -iname "*.obj" \) |
-        while IFS="" read -r my_file
-        do
-            ci_spawn rm -fr "$my_file"
-        done
-    ci_info "## END OF PRE-BUILD CLEANUP ##"
+    local find_args=(-maxdepth 1 \( -iname "*.o" -o -iname "*.obj" \))
+    [[ ! $(find "$CI_SRC_DIR" "${find_args[@]}" | head -n1) ]] || {
+        ci_warn "unexpected build found in '$CI_SRC_DIR'"
+        if ci_expr $((CI_FORCE))
+        then
+            # Delete the old build.
+            local my_file
+            find "$CI_SRC_DIR" "${find_args[@]}" |
+                while IFS="" read -r my_file
+                do
+                    ci_spawn rm -fr "$my_file"
+                done
+            ci_info "## END OF PRE-BUILD CLEANUP ##"
+        else
+            # Alert the user, but do not delete their existing files,
+            # and do not mess up their existing build.
+            ci_info "hint: consider using the option \$CI_FORCE=1"
+            ci_err "unable to continue"
+        fi
+    }
 }
 
 function ci_build {

@@ -57,6 +57,7 @@ function ci_trace_build {
     ci_info "environment option: \$CI_LD: '$CI_LD'"
     ci_info "environment option: \$CI_LD_FLAGS: '$CI_LD_FLAGS'"
     ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
+    ci_info "environment option: \$CI_FORCE: '$CI_FORCE'"
     ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
@@ -80,17 +81,28 @@ function ci_trace_build {
 }
 
 function ci_cleanup_old_build {
-    ci_info "## START OF PRE-BUILD CHECKUP ##"
-    ci_spawn test '!' -f "$CI_SRC_DIR/config.status" || {
-        # Warn the user, but do not delete their files.
-        ci_warn "unexpected build configuration file: '$CI_SRC_DIR/config.status'"
-        ci_warn "the configure script might fail"
-    }
-    ci_info "## END OF PRE-BUILD CHECKUP ##"
     ci_info "## START OF PRE-BUILD CLEANUP ##"
     [[ ! -e $CI_BUILD_DIR && ! -e $CI_INSTALL_DIR ]] || {
         ci_spawn rm -fr "$CI_BUILD_DIR"
         ci_spawn rm -fr "$CI_INSTALL_DIR"
+    }
+    [[ ! -e "$CI_SRC_DIR/config.status" ]] || {
+        ci_warn "unexpected build configuration file: '$CI_SRC_DIR/config.status'"
+        if ci_expr $((CI_FORCE))
+        then
+            # Delete the old config and (possibly) the old build.
+            ci_info "note: forcing an in-tree build cleanup"
+            if [[ -f $CI_SRC_DIR/Makefile ]]
+            then
+                ci_spawn make -C "$CI_SRC_DIR" distclean
+            else
+                ci_spawn rm -fr "$CI_SRC_DIR"/config.{log,status}
+            fi
+        else
+            # Alert the user, but do not delete their files.
+            ci_warn "the configure script might fail"
+            ci_info "hint: consider using the option \$CI_FORCE=1"
+        fi
     }
     ci_info "## END OF PRE-BUILD CLEANUP ##"
 }

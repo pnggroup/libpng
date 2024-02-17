@@ -69,6 +69,7 @@ function ci_trace_build {
     ci_info "environment option: \$CI_AR: '$CI_AR'"
     ci_info "environment option: \$CI_RANLIB: '$CI_RANLIB'"
     ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
+    ci_info "environment option: \$CI_FORCE: '$CI_FORCE'"
     ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"

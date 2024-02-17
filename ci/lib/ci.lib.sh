@@ -88,6 +88,9 @@ function ci_spawn {
 }
 
 # Ensure that the user initialization is correct.
+[[ ${CI_FORCE:-0} == [01] ]] || {
+    ci_err "bad boolean option: \$CI_FORCE: '$CI_FORCE'"
+}
 [[ ${CI_NO_TEST:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_NO_TEST: '$CI_NO_TEST'"
 }
