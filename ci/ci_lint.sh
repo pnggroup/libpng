@@ -61,7 +61,7 @@ function ci_lint_ci_scripts {
     }
     ci_info "## LINTING: CI scripts ##"
     ci_spawn "$CI_SHELLCHECK" --version
-    find ./ci -name "*.sh" -perm +111 | {
+    find ./ci -maxdepth 1 -name "*.sh" | {
         local my_file
         while IFS="" read -r my_file
         do
