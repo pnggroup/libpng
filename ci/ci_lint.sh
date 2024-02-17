@@ -17,8 +17,8 @@ CI_SHELLCHECK="${CI_SHELLCHECK:-shellcheck}"
 CI_EDITORCONFIG_CHECKER="${CI_EDITORCONFIG_CHECKER:-editorconfig-checker}"
 CI_YAMLLINT="${CI_YAMLLINT:-yamllint}"
 
-# Initialize the global lint counter.
-CI_LINT_COUNTER=0
+# Initialize the global lint status.
+CI_LINT_STATUS=0
 
 function ci_init_lint {
     ci_info "## START OF LINTING ##"
@@ -45,14 +45,13 @@ function ci_init_lint {
 
 function ci_finish_lint {
     ci_info "## END OF LINTING ##"
-    if [[ $CI_LINT_COUNTER -eq 0 ]]
+    if [[ $CI_LINT_STATUS -eq 0 ]]
     then
         ci_info "## SUCCESS ##"
-        return 0
     else
         ci_info "linting failed"
-        return 1
     fi
+    return "$CI_LINT_STATUS"
 }
 
 function ci_lint_ci_scripts {
@@ -61,15 +60,17 @@ function ci_lint_ci_scripts {
         return 0
     }
     ci_info "## LINTING: CI scripts ##"
-    {
+    ci_spawn "$CI_SHELLCHECK" --version
+    find ./ci -name "*.sh" -perm +111 | {
         local my_file
-        ci_spawn "$CI_SHELLCHECK" --version
-        find ./ci -maxdepth 1 -name "*.sh" |
-            while IFS="" read -r my_file
-            do
-                ci_spawn "$CI_SHELLCHECK" -x "$my_file"
-            done
-    } || CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
+        while IFS="" read -r my_file
+        do
+            ci_spawn "$CI_SHELLCHECK" -x "$my_file" || {
+                # Linting failed.
+                return 1
+            }
+        done
+    }
 }
 
 function ci_lint_text_files {
@@ -80,7 +81,8 @@ function ci_lint_text_files {
     ci_info "## LINTING: text files ##"
     ci_spawn "$CI_EDITORCONFIG_CHECKER" --version
     ci_spawn "$CI_EDITORCONFIG_CHECKER" || {
-        CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
+        # Linting failed.
+        return 1
     }
 }
 
@@ -90,22 +92,24 @@ function ci_lint_yaml_files {
         return 0
     }
     ci_info "## LINTING: YAML files ##"
-    {
+    ci_spawn "$CI_YAMLLINT" --version
+    find . \( -iname "*.yml" -o -iname "*.yaml" \) -not -path "./out/*" | {
         local my_file
-        ci_spawn "$CI_YAMLLINT" --version
-        find . \( -iname "*.yml" -o -iname "*.yaml" \) -not -path "./out/*" |
-            while IFS="" read -r my_file
-            do
-                ci_spawn "$CI_YAMLLINT" --strict "$my_file"
-            done
-    } || CI_LINT_COUNTER=$((CI_LINT_COUNTER + 1))
+        while IFS="" read -r my_file
+        do
+            ci_spawn "$CI_YAMLLINT" --strict "$my_file" || {
+                # Linting failed.
+                return 1
+            }
+        done
+    }
 }
 
 function ci_lint {
     ci_init_lint
-    ci_lint_ci_scripts
-    ci_lint_text_files
-    ci_lint_yaml_files
+    ci_lint_ci_scripts || CI_LINT_STATUS=1
+    ci_lint_text_files || CI_LINT_STATUS=1
+    ci_lint_yaml_files || CI_LINT_STATUS=1
     # TODO: ci_lint_png_files, etc.
     ci_finish_lint
 }
