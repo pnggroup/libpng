@@ -62,9 +62,18 @@ if(APPLE)
 endif()
 
 # Allow the users to switch on/off the auxiliary build and test artifacts.
-# NOTE: These artifacts are NOT part of libpng proper, and are subject to change at any time.
+# These artifacts are NOT part of libpng proper, and are subject to change
+# at any time.
 option(PNG_TESTS "Build the libpng tests" ON)
-option(PNG_TOOLS "Build the libpng tools" ON)
+
+# Same as above, but for the third-party tools.
+# Although these tools are targetted at development environments only,
+# the users are allowed to override the option to build by default.
+if (ANDROID OR IOS)
+  option(PNG_TOOLS "Build the libpng tools" OFF)
+else()
+  option(PNG_TOOLS "Build the libpng tools" ON)
+endif()
 
 # Maintain backwards compatibility with the deprecated option PNG_EXECUTABLES.
 option(PNG_EXECUTABLES "[Deprecated; please use PNG_TOOLS]" ON)
@@ -719,7 +728,13 @@ if(PNG_STATIC)
   target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
-if(PNG_FRAMEWORK AND APPLE)
+if(PNG_FRAMEWORK AND NOT APPLE)
+  message(AUTHOR_WARNING
+          "Setting PNG_FRAMEWORK to OFF, as it only applies to Apple systems")
+  set(PNG_FRAMEWORK OFF)
+endif()
+
+if(PNG_FRAMEWORK)
   add_library(png_framework SHARED ${libpng_sources})
   add_dependencies(png_framework png_genfiles)
   list(APPEND PNG_LIBRARY_TARGETS png_framework)
