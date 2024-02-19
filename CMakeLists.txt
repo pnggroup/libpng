@@ -353,7 +353,15 @@ int main(void) { return 0; }
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
 endif()
 
-find_program(AWK NAMES gawk awk)
+# Find an AWK language processor.
+# Start with specific AWK implementations like gawk and nawk, which are
+# known to work with our scripts, then fall back to the system awk.
+find_program(AWK NAMES gawk nawk awk)
+if(AWK)
+  message(STATUS "Found AWK program: ${AWK}")
+else()
+  message(STATUS "Could not find an AWK-compatible program")
+endif()
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
