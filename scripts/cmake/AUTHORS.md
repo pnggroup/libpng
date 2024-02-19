@@ -14,6 +14,7 @@ Author List
  * Clifford Yapp
  * Clinton Ingram
  * Cosmin Truta
+ * Dan Rosser
  * David Callu
  * Gleb Mazovetskiy
  * Glenn Randers-Pehrson
