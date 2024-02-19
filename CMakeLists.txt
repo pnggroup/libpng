@@ -386,7 +386,7 @@ else()
                        COMMAND "${CMAKE_COMMAND}"
                                "-DINPUT=${_GC_INPUT}"
                                "-DOUTPUT=${_GC_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/genchk.cmake"
+                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genchk.cmake"
                        DEPENDS "${_GC_INPUT}" ${_GC_DEPENDS}
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
@@ -409,7 +409,7 @@ else()
                        COMMAND "${CMAKE_COMMAND}"
                                "-DINPUT=${_GO_INPUT}"
                                "-DOUTPUT=${_GO_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/genout.cmake"
+                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genout.cmake"
                        DEPENDS "${_GO_INPUT}" ${_GO_DEPENDS}
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
@@ -428,7 +428,7 @@ else()
     add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${_GSO_OUTPUT}"
                        COMMAND "${CMAKE_COMMAND}"
                                "-DOUTPUT=${_GSO_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/gensrc.cmake"
+                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/gensrc.cmake"
                        DEPENDS ${_GSO_DEPENDS}
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
@@ -558,7 +558,7 @@ else()
   add_custom_target(png_genprebuilt
                     COMMAND "${CMAKE_COMMAND}"
                             "-DOUTPUT=scripts/pnglibconf.h.prebuilt"
-                            -P "${CMAKE_CURRENT_BINARY_DIR}/gensrc.cmake"
+                            -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/gensrc.cmake"
                     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
   # A single target handles generation of all generated files.
@@ -1002,13 +1002,13 @@ endfunction()
 
 # Create source generation scripts.
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/genchk.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/genchk.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genchk.cmake
                @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/genout.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/genout.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genout.cmake
                @ONLY)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/gensrc.cmake.in
-               ${CMAKE_CURRENT_BINARY_DIR}/gensrc.cmake
+               ${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/gensrc.cmake
                @ONLY)
 
 # libpng is a library so default to 'lib'

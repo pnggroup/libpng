@@ -33,3 +33,4 @@ Author List
  * Tyler Kropp
  * Vadim Barkov
  * Vicky Pfau
+ * Dan Rosser
