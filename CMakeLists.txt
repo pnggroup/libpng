@@ -949,6 +949,24 @@ if(PNG_SHARED AND PNG_TOOLS)
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
+if(EMSCRIPTEN)
+    set(LIBPNG_WASM_SOURCES
+        ${pngfix_sources}
+    )
+    add_executable(libpng_wasm
+        ${LIBPNG_WASM_SOURCES}
+    )
+    target_include_directories(libpng_wasm PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+    )
+    target_link_libraries(libpng_wasm ${ZLIB_LIBRARIES} ${M_LIBRARY})
+    set_target_properties(libpng_wasm PROPERTIES COMPILE_FLAGS "-Os -fPIC -s SIDE_MODULE=1 ")
+    set_target_properties(libpng_wasm PROPERTIES LINK_FLAGS    "-Os -fPIC -s WASM=1 -s SIDE_MODULE=1 -s STANDALONE_WASM --no-entry")
+    set(CMAKE_EXECUTABLE_SUFFIX ".wasm")
+    list(APPEND PNG_BIN_TARGETS libpng_wasm)
+endif()
+
+
 # Create a symlink from src to dest (if possible), or, alternatively,
 # copy src to dest if different.
 function(create_symlink DEST_FILE)
