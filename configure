@@ -1544,36 +1544,36 @@ Optional Features:
                           default - use --disable-unversioned-libpng-config to
                           change this.
   --enable-hardware-optimizations
-                          Enable hardware optimizations: =no/off, yes/on:
+                          Enable hardware optimizations: =no/off, yes/on.
   --enable-arm-neon     Enable ARM NEON optimizations: =no/off, check, api,
-                          yes/on: no/off: disable the optimizations; check:
+                          yes/on. no/off: disable the optimizations; check:
                           use internal checking code (deprecated and poorly
                           supported); api: disable by default, enable by a
                           call to png_set_option; yes/on: turn on
                           unconditionally. If not specified: determined by the
                           compiler.
   --enable-mips-msa     Enable MIPS MSA optimizations: =no/off, check, api,
-                          yes/on: no/off: disable the optimizations; check:
+                          yes/on. no/off: disable the optimizations; check:
                           use internal checking code (deprecated and poorly
                           supported); api: disable by default, enable by a
                           call to png_set_option; yes/on: turn on
                           unconditionally. If not specified: determined by the
                           compiler.
   --enable-mips-mmi     Enable MIPS MMI optimizations: =no/off, check, api,
-                          yes/on: no/off: disable the optimizations; check:
+                          yes/on. no/off: disable the optimizations; check:
                           use internal checking code (deprecated and poorly
                           supported); api: disable by default, enable by a
                           call to png_set_option; yes/on: turn on
                           unconditionally. If not specified: determined by the
                           compiler.
-  --enable-intel-sse    Enable Intel SSE optimizations: =no/off, yes/on:
+  --enable-intel-sse    Enable Intel SSE optimizations: =no/off, yes/on.
                           no/off: disable the optimizations; yes/on: enable
                           the optimizations. If not specified: determined by
                           the compiler.
   --enable-powerpc-vsx  Enable POWERPC VSX optimizations: =no/off, check,
-                          api, yes/on: no/off: disable the optimizations;
-                          check: use internal checking code api: disable by
-                          default, enable by a call to png_set_option yes/on:
+                          api, yes/on. no/off: disable the optimizations;
+                          check: use internal checking code; api: disable by
+                          default, enable by a call to png_set_option; yes/on:
                           turn on unconditionally. If not specified:
                           determined by the compiler.
   --enable-loongarch-lsx
@@ -14227,9 +14227,9 @@ if test "$have_ld_version_script" = "yes"; then
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for symbol prefix" >&5
 printf %s "checking for symbol prefix... " >&6; }
     SYMBOL_PREFIX=`echo "PREFIX=__USER_LABEL_PREFIX__" \
-                  | ${CPP-${CC-gcc} -E} - 2>&1 \
-                  | ${EGREP-grep} "^PREFIX=" \
-                  | ${SED-sed} -e "s:^PREFIX=::" -e "s:__USER_LABEL_PREFIX__::"`
+                  | ${CPP:-${CC:-gcc} -E} - 2>&1 \
+                  | ${EGREP:-grep} "^PREFIX=" \
+                  | ${SED:-sed} -e "s:^PREFIX=::" -e "s:__USER_LABEL_PREFIX__::"`
 
     { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $SYMBOL_PREFIX" >&5
 printf "%s\n" "$SYMBOL_PREFIX" >&6; }
@@ -14429,10 +14429,8 @@ printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 fi
 
 
-# ARM
-# ===
-#
-# ARM NEON (SIMD) support.
+# ARM NEON
+# ========
 
 # Check whether --enable-arm-neon was given.
 if test ${enable_arm_neon+y}
@@ -14457,21 +14455,22 @@ printf "%s\n" "#define PNG_ARM_NEON_API_SUPPORTED /**/" >>confdefs.h
 
 printf "%s\n" "#define PNG_ARM_NEON_OPT 2" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-arm-neon: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass -mfpu=neon
-            to the compiler." >&5
-printf "%s\n" "$as_me: WARNING: --enable-arm-neon: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass -mfpu=neon
-            to the compiler." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-arm-neon: please specify 'check' or 'api';
+            if you want the optimizations unconditionally,
+            pass '-mfpu=neon' to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-arm-neon: please specify 'check' or 'api';
+            if you want the optimizations unconditionally,
+            pass '-mfpu=neon' to the compiler." >&2;};;
       *)
-         as_fn_error $? "--enable-arm-neon=${enable_arm_neon}: invalid value" "$LINENO" 5
+         as_fn_error $? "--enable-arm-neon=${enable_arm_neon}:
+                      invalid argument" "$LINENO" 5
    esac
 fi
 
 
 # Add ARM-specific files to all builds where $host_cpu is arm ('arm*') or
-# where ARM optimizations were explicitly requested (this allows a fallback
-# if a future host CPU does not match 'arm*')
+# where ARM optimizations were explicitly requested. (This allows a fallback
+# if a future host CPU does not match 'arm*'.)
 
  if test "$enable_arm_neon" != 'no' &&
     case "$host_cpu" in
@@ -14486,10 +14485,8 @@ else
 fi
 
 
-# MIPS
-# ====
-#
-# MIPS MSA (SIMD) support.
+# MIPS MSA
+# ========
 
 # Check whether --enable-mips-msa was given.
 if test ${enable_mips_msa+y}
@@ -14514,21 +14511,22 @@ printf "%s\n" "#define PNG_MIPS_MSA_API_SUPPORTED /**/" >>confdefs.h
 
 printf "%s\n" "#define PNG_MIPS_MSA_OPT 2" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-mips-msa: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass '-mmsa -mfp64'
-            to the compiler." >&5
-printf "%s\n" "$as_me: WARNING: --enable-mips-msa: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass '-mmsa -mfp64'
-            to the compiler." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-mips-msa: please specify 'check' or 'api';
+            if you want the optimizations unconditionally,
+            pass '-mmsa -mfp64' to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-mips-msa: please specify 'check' or 'api';
+            if you want the optimizations unconditionally,
+            pass '-mmsa -mfp64' to the compiler." >&2;};;
       *)
-         as_fn_error $? "--enable-mips-msa=${enable_mips_msa}: invalid value" "$LINENO" 5
+         as_fn_error $? "--enable-mips-msa=${enable_mips_msa}:
+                      invalid argument" "$LINENO" 5
    esac
 fi
 
 
 # Add MIPS-specific files to all builds where $host_cpu is mips ('mips*') or
-# where MIPS optimizations were explicitly requested (this allows a fallback
-# if a future host CPU does not match 'mips*')
+# where MIPS optimizations were explicitly requested. (This allows a fallback
+# if a future host CPU does not match 'mips*'.)
 
  if test "$enable_mips_msa" != 'no' &&
     case "$host_cpu" in
@@ -14542,10 +14540,8 @@ else
 fi
 
 
-# MIPS
-# ===
-#
-# MIPS MMI (SIMD) support.
+# MIPS MMI
+# ========
 
 # Check whether --enable-mips-mmi was given.
 if test ${enable_mips_mmi+y}
@@ -14570,25 +14566,26 @@ printf "%s\n" "#define PNG_MIPS_MMI_API_SUPPORTED /**/" >>confdefs.h
 
 printf "%s\n" "#define PNG_MIPS_MMI_OPT 1" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-mips-mmi: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass '-mloongson-mmi -march=loongson3a'
-            to the compiler." >&5
-printf "%s\n" "$as_me: WARNING: --enable-mips-mmi: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass '-mloongson-mmi -march=loongson3a'
-            to the compiler." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-mips-mmi: please specify 'check' or 'api';
+            if you want the optimizations unconditionally
+            pass '-mloongson-mmi -march=loongson3a' to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-mips-mmi: please specify 'check' or 'api';
+            if you want the optimizations unconditionally
+            pass '-mloongson-mmi -march=loongson3a' to the compiler." >&2;};;
       *)
-         as_fn_error $? "--enable-mips-mmi=${enable_mips_mmi}: invalid value" "$LINENO" 5
+         as_fn_error $? "--enable-mips-mmi=${enable_mips_mmi}:
+                      invalid argument" "$LINENO" 5
    esac
 fi
 
 
 # Add MIPS specific files to all builds where the host_cpu is mips ('mips*') or
-# where MIPS optimizations were explicitly requested (this allows a fallback if a
-# future host CPU does not match 'mips*')
+# where MIPS optimizations were explicitly requested. (This allows a fallback
+# if a future host CPU does not match 'mips*'.)
 
  if test "$enable_mips_mmi" != 'no' &&
     case "$host_cpu" in
-      mipsel*|mips64el*) :;;
+      mipsel*|mips64el*) : ;;
     esac; then
   PNG_MIPS_MMI_TRUE=
   PNG_MIPS_MMI_FALSE='#'
@@ -14598,10 +14595,8 @@ else
 fi
 
 
-# INTEL
-# =====
-#
-# INTEL SSE (SIMD) support.
+# INTEL SSE
+# =========
 
 # Check whether --enable-intel-sse was given.
 if test ${enable_intel_sse+y}
@@ -14619,14 +14614,15 @@ printf "%s\n" "#define PNG_INTEL_SSE_OPT 0" >>confdefs.h
 printf "%s\n" "#define PNG_INTEL_SSE_OPT 1" >>confdefs.h
 ;;
       *)
-         as_fn_error $? "--enable-intel-sse=${enable_intel_sse}: invalid value" "$LINENO" 5
+         as_fn_error $? "--enable-intel-sse=${enable_intel_sse}:
+                      invalid argument" "$LINENO" 5
    esac
 fi
 
 
 # Add Intel-specific files to all builds where $host_cpu is Intel ('x86*') or
-# where Intel optimizations were explicitly requested (this allows a fallback
-# if a future host CPU does not match 'x86*')
+# where Intel optimizations were explicitly requested. (This allows a fallback
+# if a future host CPU does not match 'x86*'.)
  if test "$enable_intel_sse" != 'no' &&
     case "$host_cpu" in
       i?86|x86_64) : ;;
@@ -14640,10 +14636,8 @@ else
 fi
 
 
-# PowerPC
-# =======
-#
-# PowerPC VSX (SIMD) support.
+# POWERPC VSX
+# ===========
 
 # Check whether --enable-powerpc-vsx was given.
 if test ${enable_powerpc_vsx+y}
@@ -14660,10 +14654,10 @@ printf "%s\n" "#define PNG_POWERPC_VSX_OPT 0" >>confdefs.h
 
 printf "%s\n" "#define PNG_POWERPC_VSX_CHECK_SUPPORTED /**/" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-powerpc-vsx Please check contrib/powerpc/README file
-            for the list of supported OSes." >&5
-printf "%s\n" "$as_me: WARNING: --enable-powerpc-vsx Please check contrib/powerpc/README file
-            for the list of supported OSes." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-powerpc-vsx: please see contrib/powerpc/README
+                     for the list of supported systems." >&5
+printf "%s\n" "$as_me: WARNING: --enable-powerpc-vsx: please see contrib/powerpc/README
+                     for the list of supported systems." >&2;};;
       api)
 
 printf "%s\n" "#define PNG_POWERPC_VSX_API_SUPPORTED /**/" >>confdefs.h
@@ -14672,21 +14666,22 @@ printf "%s\n" "#define PNG_POWERPC_VSX_API_SUPPORTED /**/" >>confdefs.h
 
 printf "%s\n" "#define PNG_POWERPC_VSX_OPT 2" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-powerpc-vsx: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass '-maltivec -mvsx'
-            or '-mcpu=power8' to the compiler." >&5
-printf "%s\n" "$as_me: WARNING: --enable-powerpc-vsx: please specify 'check' or 'api', if
-            you want the optimizations unconditionally pass '-maltivec -mvsx'
-            or '-mcpu=power8' to the compiler." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-powerpc-vsx: please specify 'check' or 'api';
+            if you want the optimizations unconditionally,
+            pass '-maltivec -mvsx' or '-mcpu=power8' to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-powerpc-vsx: please specify 'check' or 'api';
+            if you want the optimizations unconditionally,
+            pass '-maltivec -mvsx' or '-mcpu=power8' to the compiler." >&2;};;
       *)
-         as_fn_error $? "--enable-powerpc-vsx=${enable_powerpc_vsx}: invalid value" "$LINENO" 5
+         as_fn_error $? "--enable-powerpc-vsx=${enable_powerpc_vsx}:
+                      invalid argument" "$LINENO" 5
    esac
 fi
 
 
-# Add PowerPC-specific files to all builds where $host_cpu is powerpc('powerpc*')
-# or where PowerPC optimizations were explicitly requested (this allows a fallback
-# if a future host CPU does not match 'powerpc*')
+# Add PowerPC-specific files to all builds where $host_cpu is powerpc
+# ('powerpc*') or where PowerPC optimizations were explicitly requested.
+# (This allows a fallback if a future host CPU does not match 'powerpc*'.)
 
  if test "$enable_powerpc_vsx" != 'no' &&
     case "$host_cpu" in
@@ -14700,38 +14695,8 @@ else
 fi
 
 
-# LOONGARCH
-# ===
-#
-# LOONGARCH LSX (SIMD) support
-
-if test "$LSX_CFLAGS" = ''; then
-    LSX_CFLAGS="-mlsx"
-fi
-
-compiler_support_loongarch_lsx=no
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to use loongarch LSX intrinsics" >&5
-printf %s "checking whether to use loongarch LSX intrinsics... " >&6; }
-save_CFLAGS=$CFLAGS
-CFLAGS="$CFLAGS $LSX_CFLAGS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-#include<lsxintrin.h>
-int main(){
-    __m128i a, b, c;
-    a = __lsx_vadd_w(b, c);
-    return 0;
-}
-_ACEOF
-if ac_fn_c_try_compile "$LINENO"
-then :
-  compiler_support_loongarch_lsx=yes
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
-CFLAGS=$save_CFLAGS
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $compiler_support_loongarch_lsx" >&5
-printf "%s\n" "$compiler_support_loongarch_lsx" >&6; }
+# LOONGARCH LSX
+# =============
 
 # Check whether --enable-loongarch-lsx was given.
 if test ${enable_loongarch_lsx+y}
@@ -14750,13 +14715,44 @@ printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 
          ;;
       *)
-         as_fn_error $? "--enable-loongarch-lsx=${enable_loongarch_lsx}: invalid value" "$LINENO" 5
+         as_fn_error $? "--enable-loongarch-lsx=${enable_loongarch_lsx}:
+                      invalid argument" "$LINENO" 5
    esac
 fi
 
 
-if test "$enable_loongarch_lsx" != 'no'; then
-   if test $compiler_support_loongarch_lsx = yes; then
+# FIXME: This section should not be needed.
+if test "$enable_loongarch_lsx" != "no" &&
+   case "$host_cpu" in
+      loongarch*) : ;;
+      *)    test "$enable_loongarch_lsx" != '' ;;
+   esac
+then
+   compiler_support_loongarch_lsx=no
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to use LoongArch LSX intrinsics" >&5
+printf %s "checking whether to use LoongArch LSX intrinsics... " >&6; }
+   save_CFLAGS="$CFLAGS"
+   LSX_CFLAGS="${LSX_CFLAGS:-"-mlsx"}"
+   CFLAGS="$CFLAGS $LSX_CFLAGS"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <lsxintrin.h>
+int main(){
+   __m128i a, b, c;
+   a = __lsx_vadd_w(b, c);
+   return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  compiler_support_loongarch_lsx=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+   CFLAGS="$save_CFLAGS"
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $compiler_support_loongarch_lsx" >&5
+printf "%s\n" "$compiler_support_loongarch_lsx" >&6; }
+   if test "$compiler_support_loongarch_lsx" = "yes"; then
 
 printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 
@@ -14766,14 +14762,15 @@ printf "%s\n" "$as_me: WARNING: Compiler does not support loongarch LSX." >&2;}
    fi
 fi
 
-# Add LOONGARCH specific files to all builds where the host_cpu is loongarch ('loongarch*') or
-# where LOONGARCH optimizations were explicitly requested (this allows a fallback if a
-# future host CPU does not match 'loongarch*')
+# Add LoongArch specific files to all builds where the host_cpu is loongarch
+# ('loongarch*') or where LoongArch optimizations were explicitly requested.
+# (This allows a fallback if a future host CPU does not match 'loongarch*'.)
 
- if test "$enable_loongarch_lsx" != 'no' && test $compiler_support_loongarch_lsx = yes &&
+ if test "$enable_loongarch_lsx" != "no" &&
+    test "$compiler_support_loongarch_lsx" = "yes" &&
     case "$host_cpu" in
-      loongarch*) :;;
-      *)    test "$enable_loongarch_lsx" != '';;
+      loongarch*) : ;;
+      *)    test "$enable_loongarch_lsx" != '' ;;
     esac; then
   PNG_LOONGARCH_LSX_TRUE=
   PNG_LOONGARCH_LSX_FALSE='#'
