@@ -867,6 +867,7 @@ CCAS
 CCASFLAGS
 CPP
 LT_SYS_LIBRARY_PATH
+AWK
 PNG_COPTS'
 
 
@@ -1613,7 +1614,8 @@ Some influential environment variables:
   CPP         C preprocessor
   LT_SYS_LIBRARY_PATH
               User-defined run-time library search path.
-  PNG_COPTS   additional flags for the C compiler, use this for options that
+  AWK         AWK language processor
+  PNG_COPTS   additional flags for the C compiler, to be used for options that
               would cause configure itself to fail
 
 Use these variables to override the choices made by 'configure' or to help
@@ -3389,7 +3391,7 @@ PNGLIB_RELEASE=43
 ac_config_headers="$ac_config_headers config.h"
 
 
-# Checks for programs.
+# Check for basic programs.
 ac_ext=c
 ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
@@ -13659,20 +13661,22 @@ CC=$lt_save_CC
 
 
 
-# Some awks crash when confronted with pnglibconf.dfa, do a test run now
-# to make sure this doesn't happen
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking that AWK works" >&5
-printf %s "checking that AWK works... " >&6; }
+
+
+# Some awk implementations crash when confronted with pnglibconf.dfa.
+# Run a test now, to make sure this doesn't happen.
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if awk ($AWK) works" >&5
+printf %s "checking if awk ($AWK) works... " >&6; }
 if ${AWK} -f ${srcdir}/scripts/options.awk out="/dev/null" version=search\
    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
    ${srcdir}/pngusr.dfa 1>&2
 then
-   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: ok" >&5
-printf "%s\n" "ok" >&6; }
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+printf "%s\n" "yes" >&6; }
 else
    { { printf "%s\n" "$as_me:${as_lineno-$LINENO}: error: in '$ac_pwd':" >&5
 printf "%s\n" "$as_me: error: in '$ac_pwd':" >&2;}
-as_fn_error 1 "failed
+as_fn_error 1 "no
 See 'config.log' for more details" "$LINENO" 5; }
 fi
 

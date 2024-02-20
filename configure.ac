@@ -56,7 +56,7 @@ dnl End of version number stuff
 AC_CONFIG_SRCDIR([pngget.c])
 AC_CONFIG_HEADERS([config.h])
 
-# Checks for programs.
+# Check for basic programs.
 AC_LANG([C])
 AC_PROG_CC
 AM_PROG_AS
@@ -72,16 +72,19 @@ dnl compatible later version may be used
 LT_INIT([win32-dll])
 LT_PREREQ([2.4.2])
 
-# Some awks crash when confronted with pnglibconf.dfa, do a test run now
-# to make sure this doesn't happen
-AC_MSG_CHECKING([that AWK works])
+dnl Declare the AWK variable.
+AC_ARG_VAR(AWK, [AWK language processor])
+
+# Some awk implementations crash when confronted with pnglibconf.dfa.
+# Run a test now, to make sure this doesn't happen.
+AC_MSG_CHECKING([if awk ($AWK) works])
 if ${AWK} -f ${srcdir}/scripts/options.awk out="/dev/null" version=search\
    ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
    ${srcdir}/pngusr.dfa 1>&2
 then
-   AC_MSG_RESULT([ok])
+   AC_MSG_RESULT([yes])
 else
-   AC_MSG_FAILURE([failed], 1)
+   AC_MSG_FAILURE([no], 1)
 fi
 
 # This is a remnant of the old cc -E validation, where it may have been
@@ -111,7 +114,7 @@ AM_CONDITIONAL([ENABLE_TOOLS],
 # (it checks the compiler with a program that generates a warning).
 # Add the following option to deal with this:
 AC_ARG_VAR(PNG_COPTS,
-   [additional flags for the C compiler, use this for options that would]
+   [additional flags for the C compiler, to be used for options that would]
    [cause configure itself to fail])
 AC_ARG_ENABLE(werror,
    AS_HELP_STRING([[[--enable-werror[=OPT]]]],
