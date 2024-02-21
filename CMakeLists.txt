@@ -714,10 +714,9 @@ if(PNG_SHARED)
     set_target_properties(png_shared PROPERTIES DEFINE_SYMBOL PNG_BUILD_DLL)
   endif()
   target_include_directories(png_shared
-                             PUBLIC
-                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
-                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                             PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+  target_include_directories(png_shared SYSTEM
+                             INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
   target_link_libraries(png_shared PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
@@ -729,10 +728,9 @@ if(PNG_STATIC)
                         OUTPUT_NAME "${PNG_STATIC_OUTPUT_NAME}"
                         DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}")
   target_include_directories(png_static
-                             PUBLIC
-                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
-                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                             PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+  target_include_directories(png_static SYSTEM
+                             INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
   target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 
@@ -759,10 +757,9 @@ if(PNG_FRAMEWORK)
   # Avoid CMake's implicit compile definition "-Dpng_framework_EXPORTS".
   set_target_properties(png_framework PROPERTIES DEFINE_SYMBOL "")
   target_include_directories(png_framework
-                             PUBLIC
-                               $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>
-                               $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-                             PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+  target_include_directories(png_framework SYSTEM
+                             INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
   target_link_libraries(png_framework PUBLIC ZLIB::ZLIB ${M_LIBRARY})
 endif()
 

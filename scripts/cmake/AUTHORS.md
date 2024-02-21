@@ -7,6 +7,7 @@ Author List
  * Alex Gaynor
  * Andreas Franek
  * B. Scott Michel
+ * Benjamin Buch
  * Cameron Cawley
  * Christian Ehrlicher
  * Christopher Sean Morrison
