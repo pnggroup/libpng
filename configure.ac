@@ -621,7 +621,6 @@ AC_ARG_ENABLE([loongarch-lsx],
                       [invalid argument])
    esac])
 
-# FIXME: This section should not be needed.
 if test "$enable_loongarch_lsx" != "no" &&
    case "$host_cpu" in
       loongarch*) : ;;

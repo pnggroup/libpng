@@ -14721,7 +14721,6 @@ printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 fi
 
 
-# FIXME: This section should not be needed.
 if test "$enable_loongarch_lsx" != "no" &&
    case "$host_cpu" in
       loongarch*) : ;;

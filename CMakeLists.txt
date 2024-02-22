@@ -98,7 +98,6 @@ option(PNG_BUILD_ZLIB "Custom zlib location, else find_package is used" OFF)
 if(NOT PNG_BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
 elseif(POLICY CMP0074)
-  # TODO: Remove the policy check if CMake version 3.12 or greater becomes the minimum required.
   if("x${ZLIB_ROOT}" STREQUAL "x")
     message(DEPRECATION
             "The option PNG_BUILD_ZLIB has been deprecated; please use ZLIB_ROOT instead")
