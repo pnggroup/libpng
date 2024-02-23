@@ -302,7 +302,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
     * viewing correction values.  The intent is to weed out the API users
     * who might use the inverse of the gamma value accidentally!
     *
-    * In libpng 1.6.x, we changed from 0.07..3 to 0.01..100, to accommodate
+    * In libpng 1.6.0, we changed from 0.07..3 to 0.01..100, to accommodate
     * the optimal 16-bit gamma of 36 and its reciprocal.
     */
    if (output_gamma < 1000 || output_gamma > 10000000)
