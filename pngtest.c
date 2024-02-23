@@ -139,7 +139,10 @@ static float t_start, t_stop, t_decode, t_encode, t_misc;
 
 #ifdef PNG_TIME_RFC1123_SUPPORTED
 static int tIME_chunk_present = 0;
-static char tIME_string[] = "tIME chunk is not present";
+static char tIME_string[29] = "tIME chunk is not present";
+/* This use case is deprecated.
+ * See the declaration of png_convert_to_rfc1123_buffer for more details.
+ */
 #endif
 
 static int verbose = 0;
