@@ -3,6 +3,7 @@ version: 1.6.x-{build}
 branches:
   except:
     - /libpng[0-1][0-7]/
+    - /v[0-1][.][0-7][.][0-9]+/
 
 image:
   - Visual Studio 2022
