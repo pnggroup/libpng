@@ -6196,6 +6196,8 @@ Version 1.6.43 [February 23, 2024]
     consistency verification and text linting.
   Added version consistency verification to pngtest.c also.
 
+Version 1.6.44 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
