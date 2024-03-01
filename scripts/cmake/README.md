@@ -20,6 +20,7 @@ File List
     CMakeLists.txt                 ==>  The main CMake lists file
     scripts/cmake/AUTHORS.md       ==>  The Authors file
     scripts/cmake/README.md        ==>  This file
+    scripts/cmake/PNGConfig.cmake  ==>  Config file for FindPNG
     scripts/cmake/genchk.cmake.in  ==>  Template for genchk.cmake
     scripts/cmake/genout.cmake.in  ==>  Template for genout.cmake
     scripts/cmake/gensrc.cmake.in  ==>  Template for gensrc.cmake
