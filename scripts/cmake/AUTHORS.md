@@ -21,6 +21,7 @@ Author List
  * Dan Rosser
  * David Callu
  * Eric Riff
+ * Erik Scholz
  * Gianfranco Costamagna
  * Gleb Mazovetskiy
  * Glenn Randers-Pehrson

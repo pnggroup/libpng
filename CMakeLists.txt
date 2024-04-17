@@ -363,8 +363,6 @@ else()
   message(STATUS "Could not find an AWK-compatible program")
 endif()
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 if(NOT AWK OR ANDROID OR IOS)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
@@ -715,6 +713,8 @@ if(PNG_SHARED)
   endif()
   target_include_directories(png_shared
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+  target_include_directories(png_shared
+                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_shared SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
   target_link_libraries(png_shared PUBLIC ZLIB::ZLIB ${M_LIBRARY})
@@ -729,6 +729,8 @@ if(PNG_STATIC)
                         DEBUG_POSTFIX "${PNG_DEBUG_POSTFIX}")
   target_include_directories(png_static
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+  target_include_directories(png_static
+                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_static SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
   target_link_libraries(png_static PUBLIC ZLIB::ZLIB ${M_LIBRARY})
@@ -758,6 +760,8 @@ if(PNG_FRAMEWORK)
   set_target_properties(png_framework PROPERTIES DEFINE_SYMBOL "")
   target_include_directories(png_framework
                              PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>)
+  target_include_directories(png_framework
+                             PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>)
   target_include_directories(png_framework SYSTEM
                              INTERFACE $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION}>)
   target_link_libraries(png_framework PUBLIC ZLIB::ZLIB ${M_LIBRARY})
