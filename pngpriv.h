@@ -148,6 +148,9 @@
     *
     *    1  The intrinsics code (the default with __ARM_NEON__)
     *    2  The hand coded assembler (the default without __ARM_NEON__)
+    *       NOTE: This is reported to cause security issues so has been
+    *             DISABLED.  It is still possible to manually set the value
+    *             to "2" at your own risk.  CVE: to-be-provided
     *
     * It is possible to set PNG_ARM_NEON_IMPLEMENTATION in CPPFLAGS, however
     * this is *NOT* supported and may cease to work even after a minor revision
@@ -168,7 +171,7 @@
              * work, so if this *is* GCC, or G++, look for a version >4.5
              */
 #           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)
-#              define PNG_ARM_NEON_IMPLEMENTATION 2
+#              define PNG_ARM_NEON_IMPLEMENTATION 0
 #           endif /* no GNUC support */
 #        endif /* __GNUC__ */
 #     else /* !defined __ARM_NEON__ */
@@ -176,7 +179,7 @@
           */
 #        if !defined(__aarch64__) && !defined(_M_ARM64)
             /* The assembler code currently does not work on ARM64 */
-#          define PNG_ARM_NEON_IMPLEMENTATION 2
+#          define PNG_ARM_NEON_IMPLEMENTATION 0
 #        endif /* __aarch64__ */
 #     endif /* __ARM_NEON__ */
 #  endif /* !PNG_ARM_NEON_IMPLEMENTATION */
