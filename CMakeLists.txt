@@ -1049,7 +1049,7 @@ if(IS_ABSOLUTE "${CMAKE_INSTALL_INCLUDEDIR}")
 else()
     set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
 endif()
-set(LIBS        "-lz -lm")
+set(LIBS        "-lm")
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
                ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
                @ONLY)
