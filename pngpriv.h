@@ -1762,9 +1762,9 @@ PNG_INTERNAL_FUNCTION(size_t,png_safecat,(png_charp buffer, size_t bufsize,
 PNG_INTERNAL_FUNCTION(png_charp,png_format_number,(png_const_charp start,
    png_charp end, int format, png_alloc_size_t number),PNG_EMPTY);
 
-/* Convenience macro that takes an array: */
+/* Convenience macro that takes an array of fixed size: */
 #define PNG_FORMAT_NUMBER(buffer,format,number) \
-   png_format_number(buffer, buffer + (sizeof buffer), format, number)
+   png_format_number(buffer, (buffer) + (sizeof (buffer)), format, number)
 
 /* Suggested size for a number buffer (enough for 64 bits and a sign!) */
 #define PNG_NUMBER_BUFFER_SIZE 24
