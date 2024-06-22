@@ -1205,6 +1205,23 @@ test_one_file(const char *inname, const char *outname)
          png_set_bKGD(write_ptr, write_info_ptr, background);
    }
 #endif
+#ifdef PNG_cICP_SUPPORTED
+    {
+        png_byte colour_primaries;
+        png_byte transfer_function;
+        png_byte matrix_coefficients;
+        png_byte video_full_range_flag;
+
+        if (png_get_cICP(read_ptr, read_info_ptr, &colour_primaries,
+                         &transfer_function, &matrix_coefficients,
+                         &video_full_range_flag) != 0)
+#ifdef PNG_WRITE_cICP_SUPPORTED
+            png_set_cICP(write_ptr, write_info_ptr, colour_primaries,
+                         transfer_function, matrix_coefficients,
+                         video_full_range_flag);
+#endif
+    }
+#endif
 #ifdef PNG_READ_eXIf_SUPPORTED
    {
       png_bytep exif = NULL;

@@ -133,6 +133,26 @@ png_set_cHRM_XYZ(png_const_structrp png_ptr, png_inforp info_ptr, double red_X,
 
 #endif /* cHRM */
 
+#ifdef PNG_cICP_SUPPORTED
+void PNGAPI
+png_set_cICP(png_const_structrp png_ptr,
+             png_inforp info_ptr, png_byte colour_primaries,
+             png_byte transfer_function, png_byte matrix_coefficients,
+             png_byte video_full_range_flag)
+{
+    png_debug1(1, "in %s storage function", "cICP");
+
+    if (png_ptr == NULL || info_ptr == NULL)
+        return;
+
+    info_ptr->cicp_colour_primaries = colour_primaries;
+    info_ptr->cicp_transfer_function = transfer_function;
+    info_ptr->cicp_matrix_coefficients = matrix_coefficients;
+    info_ptr->cicp_video_full_range_flag = video_full_range_flag;
+    info_ptr->valid |= PNG_INFO_cICP;
+}
+#endif /* cICP */
+
 #ifdef PNG_eXIf_SUPPORTED
 void PNGAPI
 png_set_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
