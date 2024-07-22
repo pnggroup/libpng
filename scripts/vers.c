@@ -8,8 +8,7 @@
  * and license in png.h
  */
 
-#define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-        PNG_DFN " @" SYMBOL_PREFIX "@@" name "@;"
+#define PNG_EXPORTA(ordinal, type, name, args, attributes) PNG_DFN " @" SYMBOL_PREFIX "@@" name "@;"
 
 PNG_DFN "@" PNGLIB_LIBNAME "@ {global:"
 

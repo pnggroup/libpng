@@ -172,7 +172,7 @@ $1 ~ /^PNG_DFN_END_SORT/{
    sub(/ *$/, "", line)
 
    # Remove trailing CR
-   sub(/$/, "", line)
+   sub(/\r$/, "", line)
 
    if (sort) {
       if (split(line, parts) < sort) {
