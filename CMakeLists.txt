@@ -30,6 +30,10 @@ project(libpng
         VERSION ${PNGLIB_VERSION}
         LANGUAGES C ASM)
 
+if(CMAKE_C_COMPILER_ID STREQUAL "Clang")
+set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wimplicit-fallthrough -Waddress -Wenum-compare -Winfinite-recursion -Wmisleading-indentation -Wself-assign -Wshift-sign-overflow -Wuninitialized -Wunused -Werror")
+endif()
+
 if(POLICY CMP0074)
   # Allow find_package() to use the ZLIB_ROOT variable, if available.
   cmake_policy(SET CMP0074 NEW)
