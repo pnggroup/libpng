@@ -187,11 +187,6 @@
 #endif
 
 #ifndef PNG_INTEL_SSE_OPT
-#   ifdef PNG_INTEL_SSE
-      /* Only check for SSE if the build configuration has been modified to
-       * enable SSE optimizations.  This means that these optimizations will
-       * be off by default.  See contrib/intel for more details.
-       */
 #      if defined(__SSE4_1__) || defined(__AVX__) || defined(__SSSE3__) || \
        defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
        (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
@@ -199,9 +194,6 @@
 #      else
 #         define PNG_INTEL_SSE_OPT 0
 #      endif
-#   else
-#      define PNG_INTEL_SSE_OPT 0
-#   endif
 #endif
 
 #if PNG_INTEL_SSE_OPT > 0
