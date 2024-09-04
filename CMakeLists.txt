@@ -90,6 +90,21 @@ endif()
 option(PNG_DEBUG "Enable debug output" OFF)
 option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 
+# Initialize and show the target architecture variable PNG_TARGET_ARCHITECTURE.
+#
+# NOTE:
+# On macOS, CMake sets CMAKE_SYSTEM_PROCESSOR to either "x86_64" or "arm64",
+# based upon the OS architecture, not the target architecture. As such, we need
+# to check CMAKE_OSX_ARCHITECTURES to identify which hardware-specific flags to
+# enable. Note that this will fail if you attempt to build a universal binary
+# in a single CMake invocation.
+if (APPLE AND CMAKE_OSX_ARCHITECTURES)
+  string(TOLOWER "${CMAKE_OSX_ARCHITECTURES}" PNG_TARGET_ARCHITECTURE)
+else()
+  string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" PNG_TARGET_ARCHITECTURE)
+endif()
+message(STATUS "Building for target architecture: ${PNG_TARGET_ARCHITECTURE}")
+
 # Allow the users to specify a custom location of zlib.
 # This option is deprecated, and no longer needed with CMake 3.12 and newer.
 # Under the CMake policy CMP0074, if zlib is being built alongside libpng as a
@@ -119,22 +134,11 @@ else()
   # libm is not available or not needed.
 endif()
 
-# CMake currently sets CMAKE_SYSTEM_PROCESSOR to one of x86_64 or arm64 on macOS,
-# based upon the OS architecture, not the target architecture. As such, we need
-# to check CMAKE_OSX_ARCHITECTURES to identify which hardware-specific flags to
-# enable. Note that this will fail if you attempt to build a universal binary in
-# a single CMake invocation.
-if (APPLE AND CMAKE_OSX_ARCHITECTURES)
-  set(TARGET_ARCH ${CMAKE_OSX_ARCHITECTURES})
-else()
-  set(TARGET_ARCH ${CMAKE_SYSTEM_PROCESSOR})
-endif()
-
 if(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
-if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
-  if(TARGET_ARCH MATCHES "^(ARM64|arm64|aarch64)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(arm|aarch)")
+  if(PNG_TARGET_ARCHITECTURE MATCHES "^(arm64|aarch64)")
     set(PNG_ARM_NEON_POSSIBLE_VALUES on off)
     set(PNG_ARM_NEON "on"
         CACHE STRING "Enable ARM NEON optimizations: on|off; on is default")
@@ -164,7 +168,7 @@ if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
 endif()
 
 # Set definitions and sources for PowerPC.
-if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(powerpc|ppc64)")
   set(PNG_POWERPC_VSX_POSSIBLE_VALUES on off)
   set(PNG_POWERPC_VSX "on"
       CACHE STRING "Enable POWERPC VSX optimizations: on|off; on is default")
@@ -186,7 +190,7 @@ if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
 endif()
 
 # Set definitions and sources for Intel.
-if(TARGET_ARCH MATCHES "^(i[3-6]86|x86|AMD64)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(i[3-6]86|x86|amd64)")
   set(PNG_INTEL_SSE_POSSIBLE_VALUES on off)
   set(PNG_INTEL_SSE "on"
       CACHE STRING "Enable INTEL_SSE optimizations: on|off; on is default")
@@ -208,7 +212,7 @@ if(TARGET_ARCH MATCHES "^(i[3-6]86|x86|AMD64)")
 endif()
 
 # Set definitions and sources for MIPS.
-if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(mipsel|mips64el)")
   set(PNG_MIPS_MSA_POSSIBLE_VALUES on off)
   set(PNG_MIPS_MSA "on"
       CACHE STRING "Enable MIPS_MSA optimizations: on|off; on is default")
@@ -255,7 +259,7 @@ if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
 endif()
 
 # Set definitions and sources for LoongArch.
-if(TARGET_ARCH MATCHES "^(loongarch)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(loongarch)")
   include(CheckCCompilerFlag)
   set(PNG_LOONGARCH_LSX_POSSIBLE_VALUES on off)
   set(PNG_LOONGARCH_LSX "on"
@@ -286,27 +290,27 @@ endif()
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Set definitions and sources for ARM.
-if(TARGET_ARCH MATCHES "^(ARM|arm|aarch)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(arm|aarch)")
   add_definitions(-DPNG_ARM_NEON_OPT=0)
 endif()
 
 # Set definitions and sources for PowerPC.
-if(TARGET_ARCH MATCHES "^(powerpc|ppc64)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(powerpc|ppc64)")
   add_definitions(-DPNG_POWERPC_VSX_OPT=0)
 endif()
 
 # Set definitions and sources for Intel.
-if(TARGET_ARCH MATCHES "^(i[3-6]86|x86|AMD64)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(i[3-6]86|x86|amd64)")
   add_definitions(-DPNG_INTEL_SSE_OPT=0)
 endif()
 
 # Set definitions and sources for MIPS.
-if(TARGET_ARCH MATCHES "^(mipsel|mips64el)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(mipsel|mips64el)")
   add_definitions(-DPNG_MIPS_MSA_OPT=0)
 endif()
 
 # Set definitions and sources for LoongArch.
-if(TARGET_ARCH MATCHES "^(loongarch)")
+if(PNG_TARGET_ARCHITECTURE MATCHES "^(loongarch)")
   add_definitions(-DPNG_LOONGARCH_LSX_OPT=0)
 endif()
 
