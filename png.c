@@ -1257,20 +1257,6 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
    png_fixed_point red_inverse, green_inverse, blue_scale;
    png_fixed_point left, right, denominator;
 
-   /* Check xy and, implicitly, z.  Note that wide gamut color spaces typically
-    * have end points with 0 tristimulus values (these are impossible end
-    * points, but they are used to cover the possible colors).  We check
-    * xy->whitey against 5, not 0, to avoid a possible integer overflow.
-    */
-   if (xy->redx   < 0 || xy->redx > PNG_FP_1) return 1;
-   if (xy->redy   < 0 || xy->redy > PNG_FP_1-xy->redx) return 1;
-   if (xy->greenx < 0 || xy->greenx > PNG_FP_1) return 1;
-   if (xy->greeny < 0 || xy->greeny > PNG_FP_1-xy->greenx) return 1;
-   if (xy->bluex  < 0 || xy->bluex > PNG_FP_1) return 1;
-   if (xy->bluey  < 0 || xy->bluey > PNG_FP_1-xy->bluex) return 1;
-   if (xy->whitex < 0 || xy->whitex > PNG_FP_1) return 1;
-   if (xy->whitey < 5 || xy->whitey > PNG_FP_1-xy->whitex) return 1;
-
    /* The reverse calculation is more difficult because the original tristimulus
     * value had 9 independent values (red,green,blue)x(X,Y,Z) however only 8
     * derived values were recorded in the cHRM chunk;
@@ -1451,16 +1437,16 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
     * value of 2 indicates an internal error to the caller.
     */
    if (png_muldiv(&left, xy->greenx-xy->bluex, xy->redy - xy->bluey, 7) == 0)
-      return 2;
+      return 1;
    if (png_muldiv(&right, xy->greeny-xy->bluey, xy->redx - xy->bluex, 7) == 0)
-      return 2;
+      return 1;
    denominator = left - right;
 
    /* Now find the red numerator. */
    if (png_muldiv(&left, xy->greenx-xy->bluex, xy->whitey-xy->bluey, 7) == 0)
-      return 2;
+      return 1;
    if (png_muldiv(&right, xy->greeny-xy->bluey, xy->whitex-xy->bluex, 7) == 0)
-      return 2;
+      return 1;
 
    /* Overflow is possible here and it indicates an extreme set of PNG cHRM
     * chunk values.  This calculation actually returns the reciprocal of the
@@ -1473,9 +1459,9 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
 
    /* Similarly for green_inverse: */
    if (png_muldiv(&left, xy->redy-xy->bluey, xy->whitex-xy->bluex, 7) == 0)
-      return 2;
+      return 1;
    if (png_muldiv(&right, xy->redx-xy->bluex, xy->whitey-xy->bluey, 7) == 0)
-      return 2;
+      return 1;
    if (png_muldiv(&green_inverse, xy->whitey, denominator, left-right) == 0 ||
        green_inverse <= xy->whitey)
       return 1;
