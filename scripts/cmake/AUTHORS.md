@@ -20,6 +20,7 @@ Author List
  * Cosmin Truta
  * Dan Rosser
  * David Callu
+ * Eric Riff
  * Gianfranco Costamagna
  * Gleb Mazovetskiy
  * Glenn Randers-Pehrson
