@@ -60,7 +60,7 @@ png_set_crc_action(png_structrp png_ptr, int crit_action, int ancil_action)
       case PNG_CRC_WARN_DISCARD:    /* Not a valid action for critical data */
          png_warning(png_ptr,
              "Can't discard critical data on CRC error");
-         /* FALLTHROUGH */
+         PNG_FALLTHROUGH;
       case PNG_CRC_ERROR_QUIT:                                /* Error/quit */
 
       case PNG_CRC_DEFAULT:
@@ -1263,7 +1263,7 @@ png_init_rgb_transformations(png_structrp png_ptr)
             default:
 
             case 8:
-               /* FALLTHROUGH */ /*  (Already 8 bits) */
+               PNG_FALLTHROUGH; /*  (Already 8 bits) */
 
             case 16:
                /* Already a full 16 bits */

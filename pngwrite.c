@@ -1034,7 +1034,7 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
          case 6:
          case 7: png_app_error(png_ptr, "Unknown row filter for method 0");
 #endif /* WRITE_FILTER */
-            /* FALLTHROUGH */
+            PNG_FALLTHROUGH;
          case PNG_FILTER_VALUE_NONE:
             png_ptr->do_filter = PNG_FILTER_NONE; break;
 
@@ -1909,7 +1909,7 @@ png_image_set_PLTE(png_image_write_control *display)
                tRNS[i] = entry[afirst ? 0 : 3];
                if (tRNS[i] < 255)
                   num_trans = i+1;
-               /* FALLTHROUGH */
+               PNG_FALLTHROUGH;
             case 3:
                palette[i].blue = entry[afirst + (2 ^ bgr)];
                palette[i].green = entry[afirst + 1];
@@ -1920,7 +1920,7 @@ png_image_set_PLTE(png_image_write_control *display)
                tRNS[i] = entry[1 ^ afirst];
                if (tRNS[i] < 255)
                   num_trans = i+1;
-               /* FALLTHROUGH */
+               PNG_FALLTHROUGH;
             case 1:
                palette[i].blue = palette[i].red = palette[i].green =
                   entry[afirst];

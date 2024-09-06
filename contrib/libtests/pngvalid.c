@@ -1,8 +1,7 @@
-
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
  * Copyright (c) 2021 Cosmin Truta
- * Copyright (c) 2014-2017 John Cunningham Bowler
+ * Copyright (c) 2014-2017,2024 John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -155,6 +154,10 @@ typedef png_byte *png_const_bytep;
 #  else
 #     define UNUSED(param)
 #  endif
+#endif
+
+#ifndef FALLTHROUGH
+#  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
 #endif
 
 /***************************** EXCEPTION HANDLING *****************************/
@@ -6595,12 +6598,12 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    {
    case PNG_COLOR_TYPE_PALETTE:
       if (dp->output_bit_depth > 8) goto error;
-      /* FALLTHROUGH */
+      FALLTHROUGH;
    case PNG_COLOR_TYPE_GRAY:
       if (dp->output_bit_depth == 1 || dp->output_bit_depth == 2 ||
          dp->output_bit_depth == 4)
          break;
-      /* FALLTHROUGH */
+      FALLTHROUGH;
    default:
       if (dp->output_bit_depth == 8 || dp->output_bit_depth == 16)
          break;
@@ -10007,7 +10010,7 @@ gamma_component_validate(const char *name, const validate_info *vi,
                   use_background = (alpha >= 0 && alpha < 1);
 #           endif
 #           ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-               /* FALLTHROUGH */
+                  FALLTHROUGH;
                case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:
