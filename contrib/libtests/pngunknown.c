@@ -40,9 +40,12 @@
 #  define SKIP 0
 #endif
 
-#ifndef FALLTHROUGH
+#if PNG_HAS_ATTRIBUTE(fallthrough)
 #  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#else
+#  define FALLTRHOUGH /* FALLTHROUGH */
 #endif
+
 
 /* Since this program tests the ability to change the unknown chunk handling
  * these must be defined:

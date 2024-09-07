@@ -426,7 +426,11 @@
     * macro.  Note this is used in the #if code path where the parameter
     * is not used.
     */
-#  define PNG_MAYBE_UNUSED PNG_ATTRIBUTE(maybe_unused)
+#  if PNG_HAS_ATTRIBUTE(maybe_unused)
+#     define PNG_MAYBE_UNUSED PNG_ATTRIBUTE(maybe_unused)
+#  else
+#     define PNG_MAYBE_UNUSED /*maybe unused*/
+#  endif
 #endif
 
 #ifndef PNG_UNUSED
@@ -446,7 +450,11 @@
     *
     *    PNG_FALLTHROUGH;
     */
-#  define PNG_FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#  if PNG_HAS_ATTRIBUTE(fallthrough)
+#     define PNG_FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#  else
+#     define PNG_FALLTHROUGH /* FALLTHROUGH */
+#  endif
 #endif
 
 /* Just a little check that someone hasn't tried to define something

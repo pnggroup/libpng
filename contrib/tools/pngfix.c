@@ -35,8 +35,10 @@
 #  error "pngfix will not work with libpng prior to 1.6.3"
 #endif
 
-#ifndef FALLTHROUGH
+#if PNG_HAS_ATTRIBUTE(fallthrough)
 #  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#else
+#  define FALLTRHOUGH /* FALLTHROUGH */
 #endif
 
 #ifdef PNG_SETJMP_SUPPORTED

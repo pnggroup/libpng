@@ -156,9 +156,12 @@ typedef png_byte *png_const_bytep;
 #  endif
 #endif
 
-#ifndef FALLTHROUGH
+#if PNG_HAS_ATTRIBUTE(fallthrough)
 #  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#else
+#  define FALLTRHOUGH /* FALLTHROUGH */
 #endif
+
 
 /***************************** EXCEPTION HANDLING *****************************/
 #ifdef PNG_FREESTANDING_TESTS

@@ -46,8 +46,16 @@
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED /* Else nothing can be done */
 #include "../tools/sRGB.h"
 
-#ifndef FALLTHROUGH
+/* This is a sanity check on PNG_HAS_ATTRIBUTE.
+ */
+#if PNG_HAS_ATTRIBUTE(__unknown__::attribute)
+#  error PNG_HAS_ATTRIBUTE is not working correctly
+#endif
+
+#if PNG_HAS_ATTRIBUTE(fallthrough)
 #  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#else
+#  define FALLTRHOUGH /* FALLTHROUGH */
 #endif
 
 /* KNOWN ISSUES

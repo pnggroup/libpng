@@ -325,6 +325,7 @@
  *
  * Some (but not all) of these can be disabled by definining
  * PNG_NO_PEDANTIC_WARNINGS when application code is compiled against pngconf.h
+ * All can be removed by PNG_NO_ATTRIBUTES
  *
  * "Informational" notations.  These are notations which make statements about
  * how the the libpng code.  They cannot be disabled if the compiler supports
@@ -342,19 +343,43 @@
  * [[changed in libpng 1.8 to use the standard notation]]
  */
 
+#ifndef PNG_NO_ATTRIBUTES
+#  ifndef PNG_ATTRIBUTES_SUPPORTED
+#    define PNG_ATTRIBUTES_SUPPORTED
+#  endif
+#endif
+
 #ifndef PNG_NO_PEDANTIC_WARNINGS
 #  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
 #    define PNG_PEDANTIC_WARNINGS_SUPPORTED
 #  endif
 #endif
 
-#ifndef PNG_ATTRIBUTE /* BEWARE: this must be a function-style macro! */
-#  ifdef __has_c_attribute
+/* IMPORTANT: the following produces a warning with GCC if used with an
+ * attribute which GCC does not support even though it is part of the standard
+ * therefore a test on __has_c_attribute(token) is used below to prevent such
+ * warnings.
+ *
+ * If the build system provides a definition of PNG_ATTRIBUTE it must also
+ * define PNG_HAS_ATTRIBUTE somehow (e.g. to the value 1) to get the
+ * attributes to be used.
+ */
+#ifndef PNG_ATTRIBUTE
+#  if defined(PNG_ATTRIBUTES_SUPPORTED) && defined(__has_c_attribute)
 #     define PNG_ATTRIBUTE(token) [/**/[token]/**/]
+#     ifndef PNG_HAS_ATTRIBUTE
+#        define PNG_HAS_ATTRIBUTE(token) __has_c_attribute(token)
+#     endif
 #  else
-#     error UNEXPECTED: unsuppported attribute
 #     define PNG_ATTRIBUTE(token) /*token*/
 #  endif
+#endif
+
+#ifndef PNG_HAS_ATTRIBUTE
+#  define PNG_HAS_ATTRIBUTE(token) 0
+   /* Do this to be safe: */
+#  undef PNG_ATTRIBUTE
+#  define PNG_ATTRIBUTE(token) /*token*/
 #endif
 
 #ifndef PNG_WARN
@@ -378,34 +403,59 @@
  *
  * __malloc__ is a GNU extension (not standardized, or not yet standardized.)
  */
+#ifndef PNG_DEPRECATE
+#  if PNG_HAS_ATTRIBUTE(__deprecated__)
+#     define PNG_DEPRECATE(reason) PNG_ATTRIBUTE(__deprecated__(reason))
+#  else
+#     define PNG_DEPRECATE(reason) /*deprecated*/
+#  endif
+#endif
+
 #ifndef PNG_USE_RESULT
-#  define PNG_USE_RESULT PNG_WARN(__nodiscard__)
+#  if PNG_HAS_ATTRIBUTE(__nodiscard__)
+#     define PNG_USE_RESULT PNG_WARN(__nodiscard__)
+#     define PNG_NODISCARD(reason) PNG_WARN(__nodiscard__(reason))
+#  else
+#     define PNG_USE_RESULT /*nodiscard*/
+#     define PNG_NODISCARD(reason) /*nodiscard*/
+#  endif
 #endif
+
 #ifndef PNG_NORETURN
-#  define PNG_NORETURN PNG_ATTRIBUTE(__noreturn__)
+#  if PNG_HAS_ATTRIBUTE(__noreturn__)
+#     define PNG_NORETURN PNG_ATTRIBUTE(__noreturn__)
+#  else
+#     define PNG_NORETURN /*noreturn*/
+#  endif
 #endif
+
+#ifndef PNG_MALLOCED /* added to PNG_ALLOCATED below */
+#  if PNG_HAS_ATTRIBUTE(__gnu__::__malloc__)
+      /* This is informational: it tells the caller that the result is a freshly
+       * allocated pointer.  See the GNU documentation.
+       */
+#     define PNG_MALLOCED PNG_ATTRIBUTE(__gnu__::__malloc__)
+#  else
+#     define PNG_MALLOCED /*allocated*/
+#  endif
+#endif
+
 #ifndef PNG_ALLOCATED
-#  define PNG_ALLOCATED PNG_WARN(__nodiscard__(\
-      "The pointer to allocated memory returned by this function is ignored."))\
-      PNG_WARN(__gnu__::__malloc__)
+#  define PNG_ALLOCATED PNG_NODISCARD(\
+      "The pointer to allocated memory returned by this function is ignored.")\
+      PNG_MALLOCED
 #endif
+
 #ifndef PNG_DEPRECATED
-#  define PNG_DEPRECATED PNG_ATTRIBUTE(__deprecated__(\
-      "This function will be removed in the next major release of libpng."))
+#  define PNG_DEPRECATED PNG_DEPRECATE(\
+      "This function will be removed in the next major release of libpng.")
 #endif
+
 #ifndef PNG_PRIVATE
    /* This warns that the build of the application code will fail to link:
     */
-#  define PNG_PRIVATE PNG_ATTRIBUTE(__deprecated__(\
-      "This function is not exported by this build of libpng."))
-#endif
-
-/* [[added in libpng1.8]] */
-#ifndef PNG_UNSEQUENCED
-#  define PNG_UNSEQUENCED PNG_ATTRIBUTE(__unsequenced__)
-#endif
-#ifndef PNG_REPRODUCIBLE
-#  define PNG_REPRODUCEIBLE PNG_ATTRIBUTE(__reproducible__)
+#  define PNG_PRIVATE PNG_DEPRECATE(\
+      "This function is not exported by this build of libpng.")
 #endif
 
 /* C99 'restrict' is not an attribute, it's just a type qualified like const
