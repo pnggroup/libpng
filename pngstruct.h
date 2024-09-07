@@ -381,9 +381,15 @@ struct png_struct_def
 #endif
 
 /* New member added in libpng-1.6.36 */
-#if defined(PNG_READ_EXPAND_SUPPORTED) && \
-    defined(PNG_ARM_NEON_IMPLEMENTATION)
-   png_bytep riffled_palette; /* buffer for accelerated palette expansion */
+/* NOTE: prior to libpng-1.8 this also checked that PNG_ARM_NEON_IMPLEMENTATION 
+ * is defined, however it was always defined...  The code also checked that
+ * READ_EXPAND is supported but that will lead to bugs when some hardware
+ * implementation uses it for some other palette related thing.
+ * [[libpng-1.8]] changed to hardware_data for storing arbitrary data.
+ */
+#ifdef PNG_HARDWARE_SUPPORTED
+   png_voidp   hardware_data;
+   png_uint_32 hardware_state; /* managed by libpng */
 #endif
 
 /* New member added in libpng-1.0.4 (renamed in 1.0.9) */

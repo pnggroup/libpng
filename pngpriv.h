@@ -88,194 +88,6 @@
 #  endif
 #endif
 
-/* Compile time options.
- * =====================
- * In a multi-arch build the compiler may compile the code several times for the
- * same object module, producing different binaries for different architectures.
- * When this happens configure-time setting of the target host options cannot be
- * done and this interferes with the handling of the ARM NEON optimizations, and
- * possibly other similar optimizations.  Put additional tests here; in general
- * this is needed when the same option can be changed at both compile time and
- * run time depending on the target OS (i.e. iOS vs Android.)
- *
- * NOTE: symbol prefixing does not pass $(CFLAGS) to the preprocessor, because
- * this is not possible with certain compilers (Oracle SUN OS CC), as a result
- * it is necessary to ensure that all extern functions that *might* be used
- * regardless of $(CFLAGS) get declared in this file.  The test on __ARM_NEON__
- * below is one example of this behavior because it is controlled by the
- * presence or not of -mfpu=neon on the GCC command line, it is possible to do
- * this in $(CC), e.g. "CC=gcc -mfpu=neon", but people who build libpng rarely
- * do this.
- */
-#ifndef PNG_ARM_NEON_OPT
-   /* ARM NEON optimizations are being controlled by the compiler settings,
-    * typically the target FPU.  If the FPU has been set to NEON (-mfpu=neon
-    * with GCC) then the compiler will define __ARM_NEON__ and we can rely
-    * unconditionally on NEON instructions not crashing, otherwise we must
-    * disable use of NEON instructions.
-    *
-    * NOTE: at present these optimizations depend on 'ALIGNED_MEMORY', so they
-    * can only be turned on automatically if that is supported too.  If
-    * PNG_ARM_NEON_OPT is set in CPPFLAGS (to >0) then arm/arm_init.c will fail
-    * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
-    * off.
-    *
-    * Note that gcc-4.9 defines __ARM_NEON instead of the deprecated
-    * __ARM_NEON__, so we check both variants.
-    *
-    * To disable ARM_NEON optimizations entirely, and skip compiling the
-    * associated assembler code, pass --enable-arm-neon=no to configure
-    * or put -DPNG_ARM_NEON_OPT=0 in CPPFLAGS.
-    */
-#  if (defined(__ARM_NEON__) || defined(__ARM_NEON)) && \
-   defined(PNG_ALIGNED_MEMORY_SUPPORTED)
-#     define PNG_ARM_NEON_OPT 2
-#  else
-#     define PNG_ARM_NEON_OPT 0
-#  endif
-#endif
-
-#if PNG_ARM_NEON_OPT > 0
-   /* NEON optimizations are to be at least considered by libpng, so enable the
-    * callbacks to do this.
-    */
-#  define png_init_hardware_filter_functions png_init_filter_functions_neon
-#  ifndef PNG_ARM_NEON_IMPLEMENTATION
-      /* Use the intrinsics code by default. */
-#     define PNG_ARM_NEON_IMPLEMENTATION 1
-#  endif
-#else /* PNG_ARM_NEON_OPT == 0 */
-#     define PNG_ARM_NEON_IMPLEMENTATION 0
-#endif /* PNG_ARM_NEON_OPT > 0 */
-
-#ifndef PNG_MIPS_MSA_OPT
-#  if defined(__mips_msa) && (__mips_isa_rev >= 5) && \
-   defined(PNG_ALIGNED_MEMORY_SUPPORTED)
-#     define PNG_MIPS_MSA_OPT 2
-#  else
-#     define PNG_MIPS_MSA_OPT 0
-#  endif
-#endif
-
-#ifndef PNG_MIPS_MMI_OPT
-#  ifdef PNG_MIPS_MMI
-#    if defined(__mips_loongson_mmi) && (_MIPS_SIM == _ABI64) && \
-     defined(PNG_ALIGNED_MEMORY_SUPPORTED)
-#       define PNG_MIPS_MMI_OPT 1
-#    else
-#       define PNG_MIPS_MMI_OPT 0
-#    endif
-#  else
-#    define PNG_MIPS_MMI_OPT 0
-#  endif
-#endif
-
-#ifndef PNG_POWERPC_VSX_OPT
-#  if defined(__PPC64__) && defined(__ALTIVEC__) && defined(__VSX__)
-#     define PNG_POWERPC_VSX_OPT 2
-#  else
-#     define PNG_POWERPC_VSX_OPT 0
-#  endif
-#endif
-
-#ifndef PNG_LOONGARCH_LSX_OPT
-#  if defined(__loongarch_sx)
-#     define PNG_LOONGARCH_LSX_OPT 1
-#  else
-#     define PNG_LOONGARCH_LSX_OPT 0
-#  endif
-#endif
-
-#ifndef PNG_INTEL_SSE_OPT
-      /* Only check for SSE if the build configuration has been modified to
-       * enable SSE optimizations.  This means that these optimizations will
-       * be off by default.  See contrib/intel for more details.
-       */
-#      if defined(__SSE4_1__) || defined(__AVX__) || defined(__SSSE3__) || \
-       defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
-       (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
-#         define PNG_INTEL_SSE_OPT 1
-#      else
-#         define PNG_INTEL_SSE_OPT 0
-#      endif
-#endif
-
-#if PNG_INTEL_SSE_OPT > 0
-#   ifndef PNG_INTEL_SSE_IMPLEMENTATION
-#      if defined(__SSE4_1__) || defined(__AVX__)
-          /* We are not actually using AVX, but checking for AVX is the best
-             way we can detect SSE4.1 and SSSE3 on MSVC.
-          */
-#         define PNG_INTEL_SSE_IMPLEMENTATION 3
-#      elif defined(__SSSE3__)
-#         define PNG_INTEL_SSE_IMPLEMENTATION 2
-#      elif defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) || \
-       (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
-#         define PNG_INTEL_SSE_IMPLEMENTATION 1
-#      else
-#         define PNG_INTEL_SSE_IMPLEMENTATION 0
-#      endif
-#   endif
-
-#   if PNG_INTEL_SSE_IMPLEMENTATION > 0
-#      define png_init_hardware_filter_functions png_init_filter_functions_sse2
-#   endif
-#else
-#   define PNG_INTEL_SSE_IMPLEMENTATION 0
-#endif
-
-#if PNG_MIPS_MSA_OPT > 0
-#  ifndef PNG_MIPS_MSA_IMPLEMENTATION
-#     if defined(__mips_msa)
-#        if defined(__clang__)
-#        elif defined(__GNUC__)
-#           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
-#              define PNG_MIPS_MSA_IMPLEMENTATION 2
-#           endif /* no GNUC support */
-#        endif /* __GNUC__ */
-#     else /* !defined __mips_msa */
-#        define PNG_MIPS_MSA_IMPLEMENTATION 2
-#     endif /* __mips_msa */
-#  endif /* !PNG_MIPS_MSA_IMPLEMENTATION */
-
-#  ifndef PNG_MIPS_MSA_IMPLEMENTATION
-#     define PNG_MIPS_MSA_IMPLEMENTATION 1
-#     define png_init_hardware_filter_functions png_init_filter_functions_mips
-#  endif
-#else
-#  define PNG_MIPS_MSA_IMPLEMENTATION 0
-#endif /* PNG_MIPS_MSA_OPT > 0 */
-
-#if PNG_MIPS_MMI_OPT > 0
-#  ifndef PNG_MIPS_MMI_IMPLEMENTATION
-#     if defined(__mips_loongson_mmi) && (_MIPS_SIM == _ABI64)
-#        define PNG_MIPS_MMI_IMPLEMENTATION 2
-#     else /* !defined __mips_loongson_mmi  || _MIPS_SIM != _ABI64 */
-#        define PNG_MIPS_MMI_IMPLEMENTATION 0
-#     endif /* __mips_loongson_mmi  && _MIPS_SIM == _ABI64 */
-#  endif /* !PNG_MIPS_MMI_IMPLEMENTATION */
-
-#   if PNG_MIPS_MMI_IMPLEMENTATION > 0
-#      define png_init_hardware_filter_functions png_init_filter_functions_mips
-#   endif
-#else
-#   define PNG_MIPS_MMI_IMPLEMENTATION 0
-#endif /* PNG_MIPS_MMI_OPT > 0 */
-
-#if PNG_POWERPC_VSX_OPT > 0
-#  define png_init_hardware_filter_functions png_init_filter_functions_vsx
-#  define PNG_POWERPC_VSX_IMPLEMENTATION 1
-#else
-#  define PNG_POWERPC_VSX_IMPLEMENTATION 0
-#endif
-
-#if PNG_LOONGARCH_LSX_OPT > 0
-#   define png_init_hardware_filter_functions png_init_filter_functions_lsx
-#   define PNG_LOONGARCH_LSX_IMPLEMENTATION 1
-#else
-#   define PNG_LOONGARCH_LSX_IMPLEMENTATION 0
-#endif
-
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
  * so PNG_BUILD_DLL must be set.
@@ -1279,120 +1091,35 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row,(png_structrp pp, png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row, int filter),PNG_EMPTY);
 
 #ifdef PNG_HARDWARE_SUPPORTED
-typedef enum {
-   png_hardware_filters = 1U, /* MASK: hardware support for filters */
-   png_hardware_palette = 2U  /* MASK: hardware support for palettes */
-} png_hardware_support;
-
-PNG_INTERNAL_FUNCTION(int,png_hardware_available,(void),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void, png_init_hardware_filter_functions,
-    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-
-/* NOTE: this currently picks up the macro defined above.  This is temporary.
+/* png_struct::hardware_state contains a cache of these flags and updates
+ * it as required during read.  The hardware implementation may also do
+ * this, for example if it determines that hardware optimization is not
+ * available for this image.
  */
-PNG_INTERNAL_FUNCTION(void, png_init_hardware_filter_functions,
+#define png_hardware_filters 1 /* MASK: hardware support for filters */
+#define png_hardware_palette 2 /* MASK: hardware support for palettes */
+
+PNG_INTERNAL_FUNCTION(void,png_hardware_init,(png_structrp),PNG_EMPTY);
+   /* Initialize png_struct::hardware_state if required. */
+
+PNG_INTERNAL_FUNCTION(void,png_hardware_free_data,(png_structrp),PNG_EMPTY);
+   /* Free any data allocated in the png_struct::hardware_data.
+    */
+
+PNG_INTERNAL_FUNCTION(void, png_hardware_init_filter_functions,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+   /* The filter function initializer that selects the specific hardware
+    * implementation.  Called once before the first row needs to be defiltered.
+    */
 
-#if PNG_ARM_NEON_OPT > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_neon,(png_row_infop row_info,
-    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
-#if PNG_MIPS_MSA_IMPLEMENTATION == 1
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_msa,(png_row_infop row_info,
-    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_msa,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_msa,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_msa,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_msa,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_msa,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_msa,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
-#if PNG_MIPS_MMI_IMPLEMENTATION > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_mmi,(png_row_infop row_info,
-    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_mmi,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
-#if PNG_POWERPC_VSX_OPT > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_vsx,(png_row_infop row_info,
-    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_vsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_vsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_vsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_vsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_vsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_vsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
-#if PNG_INTEL_SSE_IMPLEMENTATION > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_sse2,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
-#if PNG_LOONGARCH_LSX_IMPLEMENTATION == 1
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_lsx,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
+PNG_INTERNAL_FUNCTION(void, png_hardware_init_palette_support, (png_structrp),
+   PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int, png_hardware_do_expand_palette, (png_structrp,
+   png_row_infop, png_const_bytep, const png_bytepp, const png_bytepp),
+   PNG_EMPTY);
+   /* Two functions to set up and execute palette expansion.  The 'init'
+    * must succeed but then the 'do_expand' might, apparently, still fail.
+    */
 #endif /* HARDWARE */
 
 /* Choose the best filter to use and filter the row data */
@@ -2115,73 +1842,8 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 
 #endif /* SIMPLIFIED READ/WRITE */
 
-#if 0
-/* These are initialization functions for hardware specific PNG filter
- * optimizations; list these here then select the appropriate one at compile
- * time using the macro PNG_FILTER_OPTIMIZATIONS.  If the macro is not defined
- * the generic code is used.
- */
-#ifdef PNG_FILTER_OPTIMIZATIONS
-PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr,
-   unsigned int bpp), PNG_EMPTY);
-   /* Just declare the optimization that will be used */
-#else
-   /* List *all* the possible optimizations here - this branch is required if
-    * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
-    * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
-    */
-#  if PNG_ARM_NEON_OPT > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#endif
-
-#if PNG_MIPS_MSA_IMPLEMENTATION == 1
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_mips,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#endif
-
-#  if PNG_MIPS_MMI_IMPLEMENTATION > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_mips,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#  endif
-
-#  if PNG_INTEL_SSE_IMPLEMENTATION > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#  endif
-#endif
-
-#if PNG_LOONGARCH_LSX_OPT > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
-    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#endif
-#endif
-
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
    png_const_charp key, png_bytep new_key), PNG_EMPTY);
-
-#if PNG_ARM_NEON_IMPLEMENTATION == 1
-PNG_INTERNAL_FUNCTION(void,
-                      png_riffle_palette_neon,
-                      (png_structrp),
-                      PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_rgba8_neon,
-                      (png_structrp,
-                       png_row_infop,
-                       png_const_bytep,
-                       const png_bytepp,
-                       const png_bytepp),
-                      PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_rgb8_neon,
-                      (png_structrp,
-                       png_row_infop,
-                       png_const_bytep,
-                       const png_bytepp,
-                       const png_bytepp),
-                      PNG_EMPTY);
-#endif
 
 /* Maintainer: Put new private prototypes here ^ */
 

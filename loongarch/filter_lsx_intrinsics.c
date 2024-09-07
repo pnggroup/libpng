@@ -10,13 +10,6 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-
-#include "../pngpriv.h"
-
-#ifdef PNG_READ_SUPPORTED
-
-#if PNG_LOONGARCH_LSX_IMPLEMENTATION == 1 /* intrinsics code from pngpriv.h */
-
 #include <lsxintrin.h>
 
 #define LSX_LD(psrc) __lsx_vld((psrc), 0)
@@ -102,8 +95,9 @@
    out0  = __lsx_vadd_b(out0, _in3);                             \
 }
 
-void png_read_filter_row_up_lsx(png_row_infop row_info, png_bytep row,
-                                png_const_bytep prev_row)
+static void
+png_read_filter_row_up_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    png_bytep rp = row;
@@ -165,8 +159,9 @@ void png_read_filter_row_up_lsx(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_sub3_lsx(png_row_infop row_info, png_bytep row,
-                                  png_const_bytep prev_row)
+static void
+png_read_filter_row_sub3_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    png_uint_32 tmp;
@@ -199,8 +194,9 @@ void png_read_filter_row_sub3_lsx(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_sub4_lsx(png_row_infop row_info, png_bytep row,
-                                  png_const_bytep prev_row)
+static void
+png_read_filter_row_sub4_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    __m128i vec_0, vec_1;
@@ -222,8 +218,9 @@ void png_read_filter_row_sub4_lsx(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_avg3_lsx(png_row_infop row_info, png_bytep row,
-                                  png_const_bytep prev_row)
+static void
+png_read_filter_row_avg3_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    png_bytep nxt = row;
@@ -275,8 +272,9 @@ void png_read_filter_row_avg3_lsx(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_avg4_lsx(png_row_infop row_info, png_bytep row,
-                                  png_const_bytep prev_row)
+static void
+png_read_filter_row_avg4_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    __m128i vec_0, vec_1, vec_2;
@@ -306,9 +304,9 @@ void png_read_filter_row_avg4_lsx(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_paeth3_lsx(png_row_infop row_info,
-                                    png_bytep row,
-                                    png_const_bytep prev_row)
+static void
+png_read_filter_row_paeth3_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    png_bytep nxt = row;
@@ -371,9 +369,9 @@ void png_read_filter_row_paeth3_lsx(png_row_infop row_info,
    }
 }
 
-void png_read_filter_row_paeth4_lsx(png_row_infop row_info,
-                                    png_bytep row,
-                                    png_const_bytep prev_row)
+static void
+png_read_filter_row_paeth4_lsx(png_row_infop row_info, png_bytep row,
+   png_const_bytep prev_row)
 {
    size_t n = row_info->rowbytes;
    __m128i vec_a, vec_b, vec_c, vec_d;

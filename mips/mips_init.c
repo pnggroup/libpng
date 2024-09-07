@@ -10,195 +10,113 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
+#if defined(PNG_READ_SUPPORTED) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
 
-/* Below, after checking __linux__, various non-C90 POSIX 1003.1 functions are
- * called.
- */
-#define _POSIX_SOURCE 1
+#if defined(__mips_msa) && (__mips_isa_rev >= 5)
+#  ifndef PNG_MIPS_MSA_IMPLEMENTATION
+#     if defined(__mips_msa)
+#        if defined(__clang__)
+#        elif defined(__GNUC__)
+#           if __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 7)
+#              define PNG_MIPS_MSA_IMPLEMENTATION 2
+#           endif /* no GNUC support */
+#        endif /* __GNUC__ */
+#     else /* !defined __mips_msa */
+#        define PNG_MIPS_MSA_IMPLEMENTATION 2
+#     endif /* __mips_msa */
+#  endif /* !PNG_MIPS_MSA_IMPLEMENTATION */
 
-#include <stdio.h>
-#include "../pngpriv.h"
+#  ifndef PNG_MIPS_MSA_IMPLEMENTATION
+#     define PNG_MIPS_MSA_IMPLEMENTATION 1
+#  endif
+#else
+#  define PNG_MIPS_MSA_IMPLEMENTATION 0
+#endif /* __mips_msa && __mips_isa_rev >= 5 */
 
-#ifdef PNG_READ_SUPPORTED
+#if defined(__mips_loongson_mmi) && (_MIPS_SIM == _ABI64)
+#  ifndef PNG_MIPS_MMI_IMPLEMENTATION
+#     if defined(__mips_loongson_mmi) && (_MIPS_SIM == _ABI64)
+#        define PNG_MIPS_MMI_IMPLEMENTATION 2
+#     else /* !defined __mips_loongson_mmi  || _MIPS_SIM != _ABI64 */
+#        define PNG_MIPS_MMI_IMPLEMENTATION 0
+#     endif /* __mips_loongson_mmi  && _MIPS_SIM == _ABI64 */
+#  endif /* !PNG_MIPS_MMI_IMPLEMENTATION */
+#else
+#   define PNG_MIPS_MMI_IMPLEMENTATION 0
+#endif /* __mips_loongson_mmi && _MIPS_SIM == _ABI64 */
 
 #if PNG_MIPS_MSA_IMPLEMENTATION == 1 || PNG_MIPS_MMI_IMPLEMENTATION > 0
-
-#ifdef PNG_MIPS_MSA_CHECK_SUPPORTED /* Do MIPS MSA run-time checks */
-/* WARNING: it is strongly recommended that you do not build libpng with
- * run-time checks for CPU features if at all possible.  In the case of the MIPS
- * MSA instructions there is no processor-specific way of detecting the
- * presence of the required support, therefore run-time detection is extremely
- * OS specific.
+/* MIPS supports two optimizations: MMI and MSA. When both are available the
+ * appropriate optimization is chosen at runtime using the png_set_option
+ * settings.
  *
- * You may set the macro PNG_MIPS_MSA_FILE to the file name of file containing
- * a fragment of C source code which defines the png_have_msa function.  There
- * are a number of implementations in contrib/mips-msa, but the only one that
- * has partial support is contrib/mips-msa/linux.c - a generic Linux
- * implementation which reads /proc/cpufino.
+ * NOTE: see also the separate loongson code...
  */
-#ifndef PNG_MIPS_MSA_FILE
-#  ifdef __linux__
-#     define PNG_MIPS_MSA_FILE "contrib/mips-msa/linux.c"
-#  endif
+#if PNG_MIPS_MSA_IMPLEMENATION == 1
+#  include "filter_msa_intrinsics.c"
+#endif
+#if PNG_MIPS_MMI_IMPLEMENTATION > 0
+#  include "filter_mmi_inline_assembly.c"
 #endif
 
-#ifdef PNG_MIPS_MSA_FILE
-
-#include <signal.h> /* for sig_atomic_t */
-static int png_have_msa(png_structp png_ptr);
-#include PNG_MIPS_MSA_FILE
-
-#else  /* PNG_MIPS_MSA_FILE */
-#  error "PNG_MIPS_MSA_FILE undefined: no support for run-time MIPS MSA checks"
-#endif /* PNG_MIPS_MSA_FILE */
-#endif /* PNG_MIPS_MSA_CHECK_SUPPORTED */
-
-#ifdef PNG_MIPS_MMI_CHECK_SUPPORTED /* Do MIPS MMI run-times checks */
-#ifndef PNG_MIPS_MMI_FILE
-#  ifdef __linux__
-#     define PNG_MIPS_MMI_FILE "contrib/mips-mmi/linux.c"
-#  endif
-#endif
-
-#ifdef PNG_MIPS_MMI_FILE
-
-#include <signal.h> /* for sig_atomic_t */
-static int png_have_mmi();
-#include PNG_MIPS_MMI_FILE
-
-#else  /* PNG_MIPS_MMI_FILE */
-#  error "PNG_MIPS_MMI_FILE undefined: no support for run-time MIPS MMI checks"
-#endif /* PNG_MIPS_MMI_FILE */
-#endif /* PNG_MIPS_MMI_CHECK_SUPPORTED*/
-
-#ifndef PNG_ALIGNED_MEMORY_SUPPORTED
-#  error "ALIGNED_MEMORY is required; set: -DPNG_ALIGNED_MEMORY_SUPPORTED"
-#endif
-
-/* MIPS supports two optimizations: MMI and MSA. The appropriate
- * optimization is chosen at runtime
- */
-void
+static void
 png_init_filter_functions_mips(png_structp pp, unsigned int bpp)
 {
-#if PNG_MIPS_MMI_IMPLEMENTATION  > 0
-#ifdef PNG_MIPS_MMI_API_SUPPORTED
-   switch ((pp->options >> PNG_MIPS_MMI) & 3)
-   {
-      case PNG_OPTION_UNSET:
-#endif /* PNG_MIPS_MMI_API_SUPPORTED */
-#ifdef PNG_MIPS_MMI_CHECK_SUPPORTED
+#  if PNG_MIPS_MMI_IMPLEMENTATION  > 0
+      /* Check the option if MSA is also supported: */
+#     if PNG_MIPS_MSA_IMPLEMENATION == 1
+#        define png_hardware_impl "mips-msa+msi"
+         /* NOTE: if this is false the code below will not be executed. */
+         if (((pp->options >> PNG_MIPS_USE_MMI) & 3) == PNG_OPTION_ON)
+#     else
+#        define png_hardware_impl "mips-mmi"
+#     endif
+      {
+         /* This is the MMI implementation: */
+         pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_mmi;
+         if (bpp == 3)
          {
-            static volatile sig_atomic_t no_mmi = -1; /* not checked */
-
-            if (no_mmi < 0)
-               no_mmi = !png_have_mmi();
-
-            if (no_mmi)
-              goto MIPS_MSA_INIT;
+            pp->read_filter[PNG_FILTER_VALUE_SUB-1] =
+               png_read_filter_row_sub3_mmi;
+            pp->read_filter[PNG_FILTER_VALUE_AVG-1] =
+               png_read_filter_row_avg3_mmi;
+            pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
+               png_read_filter_row_paeth3_mmi;
          }
-#ifdef PNG_MIPS_MMI_API_SUPPORTED
-         break;
-#endif
-#endif /* PNG_MIPS_MMI_CHECK_SUPPORTED */
-
-#ifdef PNG_MIPS_MMI_API_SUPPORTED
-      default: /* OFF or INVALID */
-         goto MIPS_MSA_INIT;
-
-      case PNG_OPTION_ON:
-         /* Option turned on */
-         break;
-   }
-#endif
-   pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_mmi;
-   if (bpp == 3)
-   {
-      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_mmi;
-      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg3_mmi;
-      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
-         png_read_filter_row_paeth3_mmi;
-   }
-   else if (bpp == 4)
-   {
-      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_mmi;
-      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_mmi;
-      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
-          png_read_filter_row_paeth4_mmi;
-   }
-#endif /* PNG_MIPS_MMI_IMPLEMENTATION > 0 */
-
-MIPS_MSA_INIT:
-#if PNG_MIPS_MSA_IMPLEMENTATION == 1
-   /* The switch statement is compiled in for MIPS_MSA_API, the call to
-    * png_have_msa is compiled in for MIPS_MSA_CHECK. If both are defined
-    * the check is only performed if the API has not set the MSA option on
-    * or off explicitly. In this case the check controls what happens.
-    */
-
-#ifdef PNG_MIPS_MSA_API_SUPPORTED
-   switch ((pp->options >> PNG_MIPS_MSA) & 3)
-   {
-      case PNG_OPTION_UNSET:
-         /* Allow the run-time check to execute if it has been enabled -
-          * thus both API and CHECK can be turned on.  If it isn't supported
-          * this case will fall through to the 'default' below, which just
-          * returns.
-          */
-#endif /* PNG_MIPS_MSA_API_SUPPORTED */
-#ifdef PNG_MIPS_MSA_CHECK_SUPPORTED
+         else if (bpp == 4)
          {
-            static volatile sig_atomic_t no_msa = -1; /* not checked */
-
-            if (no_msa < 0)
-               no_msa = !png_have_msa(pp);
-
-            if (no_msa)
-               return;
+            pp->read_filter[PNG_FILTER_VALUE_SUB-1] =
+               png_read_filter_row_sub4_mmi;
+            pp->read_filter[PNG_FILTER_VALUE_AVG-1] =
+               png_read_filter_row_avg4_mmi;
+            pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
+                png_read_filter_row_paeth4_mmi;
          }
-#ifdef PNG_MIPS_MSA_API_SUPPORTED
-         break;
-#endif
-#endif /* PNG_MIPS_MSA_CHECK_SUPPORTED */
-
-#ifdef PNG_MIPS_MSA_API_SUPPORTED
-      default: /* OFF or INVALID */
          return;
+      }
+#  else /* !(PNG_MIPS_MMI_IMPLEMENTATION > 0) */
+#     define png_hardware_impl "mips-msa"
+      pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_msa;
 
-      case PNG_OPTION_ON:
-         /* Option turned on */
-         break;
-   }
-#endif
+      if (bpp == 3)
+      {
+         pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_msa;
+         pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg3_msa;
+         pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
+            png_read_filter_row_paeth3_msa;
+      }
 
-   /* IMPORTANT: any new external functions used here must be declared using
-    * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the
-    * 'prefix' option to configure works:
-    *
-    *    ./configure --with-libpng-prefix=foobar_
-    *
-    * Verify you have got this right by running the above command, doing a build
-    * and examining pngprefix.h; it must contain a #define for every external
-    * function you add.  (Notice that this happens automatically for the
-    * initialization function.)
-    */
-   pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_msa;
-
-   if (bpp == 3)
-   {
-      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub3_msa;
-      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg3_msa;
-      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth3_msa;
-   }
-
-   else if (bpp == 4)
-   {
-      pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_msa;
-      pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_msa;
-      pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth4_msa;
-   }
-#endif /* PNG_MIPS_MSA_IMPLEMENTATION == 1 */
-   return;
+      else if (bpp == 4)
+      {
+         pp->read_filter[PNG_FILTER_VALUE_SUB-1] = png_read_filter_row_sub4_msa;
+         pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_msa;
+         pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
+            png_read_filter_row_paeth4_msa;
+      }
+#  endif /* PNG_MIPS_MSA_IMPLEMENTATION == 1 */
 }
+
+#define png_init_filter_functions_impl png_init_filter_functions_mips
+
 #endif /* PNG_MIPS_MSA_IMPLEMENTATION == 1 || PNG_MIPS_MMI_IMPLEMENTATION > 0 */
-#endif /* READ */
+#endif /* READ && ALIGNED_MEMORY */

@@ -4304,8 +4304,8 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                dp = row + ((size_t)row_width << 2) - 1;
 
                i = 0;
-#ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
-               if (png_ptr->riffled_palette != NULL)
+#ifdef PNG_HARDWARE_SUPPORT
+               if ((png_ptr->hardware_state & png_hardware_palette) != 0)
                {
                   /* The RGBA optimization works with png_ptr->bit_depth == 8
                    * but sometimes row_info->bit_depth has been changed to 8.

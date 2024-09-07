@@ -3203,19 +3203,19 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #define PNG_HARDWARE 0 /* HARDWARE: turn on or off cpu specific code */
 #define PNG_ARM_NEON 0 /* HARDWARE: compatibility */
 #define PNG_MIPS_MSA 0 /* HARDWARE: compatibility */
-#define PNG_MIPS_MMI 0 /* HARDWARE: compatibility */
 #define PNG_POWERPC_VSX 0 /* HARDWARE: compatibility */
-#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
+#define PNG_MIPS_USE_MMI 2/* HARDWARE: MIPS: chose MMI over MSA */
+#define PNG_MAXIMUM_INFLATE_WINDOW 4 /* SOFTWARE: force maximum window */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 6 /* SOFTWARE: Check ICC profile for sRGB */
 
 #ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
    /* This has to be disabled in some builds because of the lack of
     * functionality in zlib.  Check the _SUPPORTED macro.
     */
-#  define PNG_IGNORE_ADLER32 6 /* SOFTWARE: disable Adler32 check on IDAT */
+#  define PNG_IGNORE_ADLER32 8 /* SOFTWARE: disable Adler32 check on IDAT */
 #endif
 
-#define PNG_OPTION_NEXT 8
+#define PNG_OPTION_NEXT 10
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults as above */

@@ -4112,13 +4112,9 @@ png_init_filter_functions(png_structrp pp)
          png_read_filter_row_paeth_multibyte_pixel;
 
 #  ifdef PNG_HARDWARE_SUPPORTED
-      if (((pp->options >> PNG_HARDWARE) & 3) == PNG_OPTION_ON)
-         /*TODO: && (png_hardware_available() & png_hardware_filters) != 0*/
-      {
-#        ifdef png_init_filter_functions /* TEMPORARY */
-            png_init_hardware_filter_functions(pp, bpp);
-#        endif
-      }
+      if (((pp->options >> PNG_HARDWARE) & 3) == PNG_OPTION_ON &&
+          (pp->hardware_state & png_hardware_filters) != 0)
+         png_hardware_init_filter_functions(pp, bpp);
 #  endif
 }
 
@@ -4126,10 +4122,6 @@ void /* PRIVATE */
 png_read_filter_row(png_structrp pp, png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row, int filter)
 {
-   /* OPTIMIZATION: DO NOT MODIFY THIS FUNCTION, instead #define
-    * PNG_FILTER_OPTIMIZATIONS to a function that overrides the generic
-    * implementations.  See png_init_filter_functions above.
-    */
    if (filter > PNG_FILTER_VALUE_NONE && filter < PNG_FILTER_VALUE_LAST)
    {
       if (pp->read_filter[0] == NULL)

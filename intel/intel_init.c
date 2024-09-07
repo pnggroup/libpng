@@ -10,13 +10,26 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
+#if defined(__SSE4_1__) || defined(__AVX__)
+   /* We are not actually using AVX, but checking for AVX is the best way we can
+    * detect SSE4.1 and SSSE3 on MSVC.
+    */
+#  define PNG_INTEL_SSE_IMPLEMENTATION 3
+#elif defined(__SSSE3__)
+#  define PNG_INTEL_SSE_IMPLEMENTATION 2
+#elif defined(__SSE2__) || defined(_M_X64) || defined(_M_AMD64) ||\
+      (defined(_M_IX86_FP) && _M_IX86_FP >= 2)
+#  define PNG_INTEL_SSE_IMPLEMENTATION 1
+#else
+#  define PNG_INTEL_SSE_IMPLEMENTATION 0
+#endif
 
-#include "../pngpriv.h"
+#if PNG_INTEL_SSE_IMPLEMENTATION > 0 && defined(PNG_READ_SUPPORTED)
+#  define png_hardware_impl "intel-sse"
 
-#ifdef PNG_READ_SUPPORTED
-#if PNG_INTEL_SSE_IMPLEMENTATION > 0
+#include "filter_sse2_intrinsics.c"
 
-void
+static void
 png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
 {
    /* The techniques used to implement each of these filters in SSE operate on
@@ -48,5 +61,6 @@ png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
     */
 }
 
+#define png_hardware_init_filter_functions_impl png_init_filter_functions_sse2
+
 #endif /* PNG_INTEL_SSE_IMPLEMENTATION > 0 */
-#endif /* PNG_READ_SUPPORTED */

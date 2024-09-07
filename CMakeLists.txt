@@ -134,56 +134,6 @@ else()
   # libm is not available or not needed.
 endif()
 
-if(PNG_HARDWARE_OPTIMIZATIONS)
-
-# Set definitions and sources for ARM.
-set(libpng_arm_sources
-    arm/arm_init.c
-    arm/filter_neon_intrinsics.c
-    arm/palette_neon_intrinsics.c)
-
-# Set definitions and sources for PowerPC.
-set(libpng_powerpc_sources
-    powerpc/powerpc_init.c
-    powerpc/filter_vsx_intrinsics.c)
-
-# Set definitions and sources for Intel.
-set(libpng_intel_sources
-    intel/intel_init.c
-    intel/filter_sse2_intrinsics.c)
-
-# Set definitions and sources for MIPS.
-set(libpng_mips_sources
-    mips/mips_init.c
-    mips/filter_msa_intrinsics.c
-    mips/filter_mmi_inline_assembly.c)
-
-# Set definitions and sources for LoongArch.
-set(libpng_loongarch_sources
-    loongarch/loongarch_lsx_init.c
-    loongarch/filter_lsx_intrinsics.c)
-include(CheckCCompilerFlag)
-check_c_compiler_flag("-mlsx" COMPILER_SUPPORTS_LSX)
-if(COMPILER_SUPPORTS_LSX)
-  set_source_files_properties(${libpng_loongarch_sources}
-                              PROPERTIES
-                              COMPILE_FLAGS "-mlsx")
-endif()
-
-else(PNG_HARDWARE_OPTIMIZATIONS)
-
-# Disable opt for all arches
-add_definitions(
-  -DPNG_ARM_NEON_OPT=0
-  -DPNG_ARM_NEON_OPT=0
-  -DPNG_POWERPC_VSX_OPT=0
-  -DPNG_INTEL_SSE_OPT=0
-  -DPNG_MIPS_MSA_OPT=0
-  -DPNG_LOONGARCH_LSX_OPT=0
-)
-
-endif(PNG_HARDWARE_OPTIMIZATIONS)
-
 option(ld-version-script "Enable linker version script" ON)
 if(ld-version-script AND NOT ANDROID AND NOT APPLE)
   # Check if LD supports linker scripts.
@@ -496,11 +446,7 @@ set(libpng_sources
     pngwrite.c
     pngwtran.c
     pngwutil.c
-    ${libpng_arm_sources}
-    ${libpng_intel_sources}
-    ${libpng_mips_sources}
-    ${libpng_powerpc_sources}
-    ${libpng_loongarch_sources}
+    pnghardware.c
 )
 set(pngtest_sources
     pngtest.c

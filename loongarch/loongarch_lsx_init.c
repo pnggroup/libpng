@@ -8,13 +8,13 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-
-#include "../pngpriv.h"
-
 #ifdef PNG_READ_SUPPORTED
-#if PNG_LOONGARCH_LSX_IMPLEMENTATION == 1
+#ifdef __loongarch_sx
+#define png_hardware_impl "loongarch-sx"
 
 #include <sys/auxv.h>
+
+#include "filter_lsx_intrinsics.c"
 
 #define LA_HWCAP_LSX    (1<<4)
 static int png_has_lsx(void)
@@ -28,21 +28,9 @@ static int png_has_lsx(void)
     return 0;
 }
 
-void
+static void
 png_init_filter_functions_lsx(png_structp pp, unsigned int bpp)
 {
-   /* IMPORTANT: any new external functions used here must be declared using
-    * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the
-    * 'prefix' option to configure works:
-    *
-    *    ./configure --with-libpng-prefix=foobar_
-    *
-    * Verify you have got this right by running the above command, doing a build
-    * and examining pngprefix.h; it must contain a #define for every external
-    * function you add.  (Notice that this happens automatically for the
-    * initialization function.)
-    */
-
    if (png_has_lsx())
    {
       pp->read_filter[PNG_FILTER_VALUE_UP-1] = png_read_filter_row_up_lsx;
@@ -61,5 +49,7 @@ png_init_filter_functions_lsx(png_structp pp, unsigned int bpp)
    }
 }
 
-#endif /* PNG_LOONGARCH_LSX_IMPLEMENTATION == 1 */
-#endif /* PNG_READ_SUPPORTED */
+#define png_init_hardware_filter_functions png_init_filter_functions_lsx
+
+#endif /* __loongarch_sx */
+#endif /* READ */

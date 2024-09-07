@@ -198,7 +198,7 @@ setting API_RULE default 0
 setting PREFIX
 
 # Global control of hardware support
-option HARDWARE
+option HARDWARE enables ALIGNED_MEMORY
 
 # These options are specific to the ARM NEON hardware optimizations.  At present
 # these optimizations depend on GCC specific pre-processing of an assembler (.S)

@@ -70,9 +70,10 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 
 #     ifdef PNG_HARDWARE_SUPPORTED
          /* Current support is read-only so this happens here, not in the
-          * general creation.
+          * general creation.  It could easily be moved.
           */
-         /*TODO: if (png_hardware_available()) */
+         png_hardware_init(png_ptr);
+         if (png_ptr->hardware_state != 0U)
             png_set_option(png_ptr, PNG_HARDWARE, 1);
 #     endif
 
@@ -1006,10 +1007,10 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->chunk_list = NULL;
 #endif
 
-#if defined(PNG_READ_EXPAND_SUPPORTED) && \
-    defined(PNG_ARM_NEON_IMPLEMENTATION)
-   png_free(png_ptr, png_ptr->riffled_palette);
-   png_ptr->riffled_palette = NULL;
+#ifdef PNG_HARDWARE_SUPPORTED
+   if (png_ptr->hardware_data != NULL)
+      png_hardware_free_data(png_ptr);
+   png_ptr->hardware_data = NULL;
 #endif
 
    /* NOTE: the 'setjmp' buffer may still be allocated and the memory and error
