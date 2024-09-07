@@ -12,7 +12,7 @@
 
 #include "../pngpriv.h"
 
-#if PNG_ARM_NEON_IMPLEMENTATION == 1
+#if PNG_ARM_NEON_IMPLEMENTATION == 1 && defined(PNG_READ_EXPAND_SUPPORTED)
 
 #if defined(_MSC_VER) && !defined(__clang__) && defined(_M_ARM64)
 #  include <arm64_neon.h>
