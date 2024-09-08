@@ -139,7 +139,7 @@
    /* NEON optimizations are to be at least considered by libpng, so enable the
     * callbacks to do this.
     */
-#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
+#  define png_init_hardware_filter_functions png_init_filter_functions_neon
 #  ifndef PNG_ARM_NEON_IMPLEMENTATION
       /* Use the intrinsics code by default. */
 #     define PNG_ARM_NEON_IMPLEMENTATION 1
@@ -187,7 +187,6 @@
 #endif
 
 #ifndef PNG_INTEL_SSE_OPT
-#   ifdef PNG_INTEL_SSE
       /* Only check for SSE if the build configuration has been modified to
        * enable SSE optimizations.  This means that these optimizations will
        * be off by default.  See contrib/intel for more details.
@@ -199,9 +198,6 @@
 #      else
 #         define PNG_INTEL_SSE_OPT 0
 #      endif
-#   else
-#      define PNG_INTEL_SSE_OPT 0
-#   endif
 #endif
 
 #if PNG_INTEL_SSE_OPT > 0
@@ -222,7 +218,7 @@
 #   endif
 
 #   if PNG_INTEL_SSE_IMPLEMENTATION > 0
-#      define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_sse2
+#      define png_init_hardware_filter_functions png_init_filter_functions_sse2
 #   endif
 #else
 #   define PNG_INTEL_SSE_IMPLEMENTATION 0
@@ -244,7 +240,7 @@
 
 #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
 #     define PNG_MIPS_MSA_IMPLEMENTATION 1
-#     define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mips
+#     define png_init_hardware_filter_functions png_init_filter_functions_mips
 #  endif
 #else
 #  define PNG_MIPS_MSA_IMPLEMENTATION 0
@@ -260,21 +256,21 @@
 #  endif /* !PNG_MIPS_MMI_IMPLEMENTATION */
 
 #   if PNG_MIPS_MMI_IMPLEMENTATION > 0
-#      define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_mips
+#      define png_init_hardware_filter_functions png_init_filter_functions_mips
 #   endif
 #else
 #   define PNG_MIPS_MMI_IMPLEMENTATION 0
 #endif /* PNG_MIPS_MMI_OPT > 0 */
 
 #if PNG_POWERPC_VSX_OPT > 0
-#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_vsx
+#  define png_init_hardware_filter_functions png_init_filter_functions_vsx
 #  define PNG_POWERPC_VSX_IMPLEMENTATION 1
 #else
 #  define PNG_POWERPC_VSX_IMPLEMENTATION 0
 #endif
 
 #if PNG_LOONGARCH_LSX_OPT > 0
-#   define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_lsx
+#   define png_init_hardware_filter_functions png_init_filter_functions_lsx
 #   define PNG_LOONGARCH_LSX_IMPLEMENTATION 1
 #else
 #   define PNG_LOONGARCH_LSX_IMPLEMENTATION 0
@@ -1282,6 +1278,21 @@ PNG_INTERNAL_FUNCTION(void,png_do_write_interlace,(png_row_infop row_info,
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row,(png_structrp pp, png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row, int filter),PNG_EMPTY);
 
+#ifdef PNG_HARDWARE_SUPPORTED
+typedef enum {
+   png_hardware_filters = 1U, /* MASK: hardware support for filters */
+   png_hardware_palette = 2U  /* MASK: hardware support for palettes */
+} png_hardware_support;
+
+PNG_INTERNAL_FUNCTION(int,png_hardware_available,(void),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void, png_init_hardware_filter_functions,
+    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+
+/* NOTE: this currently picks up the macro defined above.  This is temporary.
+ */
+PNG_INTERNAL_FUNCTION(void, png_init_hardware_filter_functions,
+    (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+
 #if PNG_ARM_NEON_OPT > 0
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_neon,(png_row_infop row_info,
     png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -1381,6 +1392,8 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_lsx,(png_row_infop
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_lsx,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
+
+#endif /* HARDWARE */
 
 /* Choose the best filter to use and filter the row data */
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
@@ -2102,6 +2115,7 @@ PNG_INTERNAL_FUNCTION(void, png_image_free, (png_imagep image), PNG_EMPTY);
 
 #endif /* SIMPLIFIED READ/WRITE */
 
+#if 0
 /* These are initialization functions for hardware specific PNG filter
  * optimizations; list these here then select the appropriate one at compile
  * time using the macro PNG_FILTER_OPTIMIZATIONS.  If the macro is not defined
@@ -2140,6 +2154,7 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
 #if PNG_LOONGARCH_LSX_OPT > 0
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+#endif
 #endif
 
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,

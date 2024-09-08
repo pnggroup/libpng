@@ -197,10 +197,8 @@ setting API_RULE default 0
 
 setting PREFIX
 
-# Implementation specific control of the optimizations, enabled by those
-# hardware or software options that need it (typically when run-time choices
-# must be made by the user)
-option SET_OPTION disabled
+# Global control of hardware support
+option HARDWARE
 
 # These options are specific to the ARM NEON hardware optimizations.  At present
 # these optimizations depend on GCC specific pre-processing of an assembler (.S)
@@ -231,9 +229,8 @@ option SET_OPTION disabled
 #   Compile a run-time check to see if Neon extensions are supported.
 #   This is poorly supported and deprecated - use the png_set_option API.
 #
-setting ARM_NEON_OPT
-option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-   sets ARM_NEON_OPT 1
+setting ARM_NEON_OPT requires HARDWARE
+option ARM_NEON_API disabled requires ALIGNED_MEMORY sets ARM_NEON_OPT 1
 option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
    sets ARM_NEON_OPT 1
 
@@ -262,9 +259,8 @@ option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
 #   Compile a run-time check to see if VSX extensions are supported.
 #   This is not supported on all systems. See contrib/powerpc-vsx/README.
 #
-setting POWERPC_VSX_OPT
-option POWERPC_VSX_API disabled enables SET_OPTION,
-  sets POWERPC_VSX_OPT 1
+setting POWERPC_VSX_OPT requires HARDWARE
+option POWERPC_VSX_API disabled sets POWERPC_VSX_OPT 1
 option POWERPC_VSX_CHECK disabled,
   sets POWERPC_VSX_OPT 1
 
@@ -294,11 +290,9 @@ option POWERPC_VSX_CHECK disabled,
 #   (PNG_MIPS_MSA == 1)
 #   Compile a run-time check to see if MSA extensions are supported.
 #
-setting MIPS_MSA_OPT
-option MIPS_MSA_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-  sets MIPS_MSA_OPT 1
-option MIPS_MSA_CHECK disabled requires ALIGNED_MEMORY,
-  sets MIPS_MSA_OPT 1
+setting MIPS_MSA_OPT requires HARDWARE
+option MIPS_MSA_API disabled requires ALIGNED_MEMORY sets MIPS_MSA_OPT 1
+option MIPS_MSA_CHECK disabled requires ALIGNED_MEMORY sets MIPS_MSA_OPT 1
 
 # These options are specific to the MIPS MMI hardware optimizations.
 #
@@ -326,11 +320,9 @@ option MIPS_MSA_CHECK disabled requires ALIGNED_MEMORY,
 #   (PNG_MIPS_MMI == 1)
 #   Compile a run-time check to see if MMI extensions are supported.
 #
-setting MIPS_MMI_OPT
-option MIPS_MMI_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-  sets MIPS_MMI_OPT 1
-option MIPS_MMI_CHECK disabled requires ALIGNED_MEMORY,
-  sets MIPS_MMI_OPT 1
+setting MIPS_MMI_OPT requires HARDWARE
+option MIPS_MMI_API disabled requires ALIGNED_MEMORY sets MIPS_MMI_OPT 1
+option MIPS_MMI_CHECK disabled requires ALIGNED_MEMORY sets MIPS_MMI_OPT 1
 
 
 # These settings configure the default compression level (0-9) and 'strategy';
@@ -411,28 +403,6 @@ option ERROR_NUMBERS disabled
 option BENIGN_ERRORS
 option BENIGN_WRITE_ERRORS requires BENIGN_ERRORS disabled
 option BENIGN_READ_ERRORS requires BENIGN_ERRORS
-
-# Adler32 checksum
-#
-# This option allows the check of the Adler32 checksum performed by zlib to
-# be turned off for IDAT chunks (only).  Unless this option is enabled and
-# turned on (not the default even if enabled) a failed Adler32 at the end of the
-# stream will result in a decompression (inflate) failure on read even though
-# the entire image might have been read successfully.
-#
-# This option relies on an undocumented function 'inflateValidate' which is
-# present in only some versions of zlib.  If the function is not present in the
-# zlib used with libpng code which uses -lpng is likely to fail to link or to
-# launch in the case of a DLL.
-#
-# Therefore this option is currently disabled by default; it has to be turned on
-# in pngusr.dfa and then the application program has to explicitly turn the
-# functionality on by calling png_set_option.
-#
-# Furthermore the option is explicitly turned off here if the zlib version
-# number is below that required - libpng wouldn't compile in that case if the
-# option were turned on.
-option DISABLE_ADLER32_CHECK requires READ enables SET_OPTION disabled
 
 # ZLIB_VERNUM must be used here, not PNG_ZLIB_VERNUM, because
 # scripts/options.awk ends up putting this test adhead of the setting of
@@ -544,7 +514,7 @@ option SET_USER_LIMITS requires USER_LIMITS
 # to libpng 1.6; the new interfaces in 1.6 will take several years to become
 # popular.
 
-option READ enables READ_INTERLACING SET_OPTION
+option READ enables READ_INTERLACING
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
@@ -857,7 +827,7 @@ chunk pHYs
 chunk sBIT
 chunk sCAL
 chunk sPLT
-chunk sRGB enables COLORSPACE, GAMMA, SET_OPTION
+chunk sRGB enables COLORSPACE, GAMMA
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS

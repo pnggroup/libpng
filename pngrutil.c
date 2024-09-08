@@ -376,7 +376,6 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 #if ZLIB_VERNUM >= 0x1240
       int window_bits = 0;
 
-# if defined(PNG_SET_OPTION_SUPPORTED) && defined(PNG_MAXIMUM_INFLATE_WINDOW)
       if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
           PNG_OPTION_ON)
       {
@@ -388,8 +387,6 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
       {
          png_ptr->zstream_start = 1;
       }
-# endif
-
 #endif /* ZLIB_VERNUM >= 0x1240 */
 
       /* Set this for safety, just in case the previous owner left pointers to
@@ -4114,17 +4111,15 @@ png_init_filter_functions(png_structrp pp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
          png_read_filter_row_paeth_multibyte_pixel;
 
-#ifdef PNG_FILTER_OPTIMIZATIONS
-   /* To use this define PNG_FILTER_OPTIMIZATIONS as the name of a function to
-    * call to install hardware optimizations for the above functions; simply
-    * replace whatever elements of the pp->read_filter[] array with a hardware
-    * specific (or, for that matter, generic) optimization.
-    *
-    * To see an example of this examine what configure.ac does when
-    * --enable-arm-neon is specified on the command line.
-    */
-   PNG_FILTER_OPTIMIZATIONS(pp, bpp);
-#endif
+#  ifdef PNG_HARDWARE_SUPPORTED
+      if (((pp->options >> PNG_HARDWARE) & 3) == PNG_OPTION_ON)
+         /*TODO: && (png_hardware_available() & png_hardware_filters) != 0*/
+      {
+#        ifdef png_init_filter_functions /* TEMPORARY */
+            png_init_hardware_filter_functions(pp, bpp);
+#        endif
+      }
+#  endif
 }
 
 void /* PRIVATE */

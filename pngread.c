@@ -68,6 +68,14 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 #        endif
 #     endif
 
+#     ifdef PNG_HARDWARE_SUPPORTED
+         /* Current support is read-only so this happens here, not in the
+          * general creation.
+          */
+         /*TODO: if (png_hardware_available()) */
+            png_set_option(png_ptr, PNG_HARDWARE, 1);
+#     endif
+
       /* TODO: delay this, it can be done in png_init_io (if the app doesn't
        * do it itself) avoiding setting the default function if it is not
        * required.

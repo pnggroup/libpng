@@ -342,9 +342,7 @@ struct png_struct_def
 #endif
 
 /* Options */
-#ifdef PNG_SET_OPTION_SUPPORTED
    png_uint_32 options;           /* On/off state (up to 16 options) */
-#endif
 
 #if PNG_LIBPNG_VER < 10700
 /* To do: remove this from libpng-1.7 */
