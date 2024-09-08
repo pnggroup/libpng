@@ -11,19 +11,13 @@ os:
   - osx
 
 env:
-  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=ON"
-  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF"
-  - AUTOMATION=configure CI_CONFIGURE_FLAGS="--enable-hardware-optimizations"
-  - AUTOMATION=configure CI_CONFIGURE_FLAGS="--disable-hardware-optimizations"
+  - AUTOMATION=cmake
+  - AUTOMATION=configure
   - AUTOMATION=makefiles
-
-matrix:
-  include:
-    - os: osx
-      env: AUTOMATION=cmake CI_CMAKE_GENERATOR=Xcode
 
 before_script:
   - 'if test "$TRAVIS_OS_NAME" = "linux"; then export CI_CC="gcc"; else export CI_CC="clang"; fi'
+  - 'if test "$TRAVIS_OS_NAME" = "osx"; then export CI_CMAKE_GENERATOR="Xcode"; fi'
   - 'if test "$TRAVIS_OS_NAME" != "osx"; then export CI_SANITIZERS="address,undefined"; fi'
   - 'export CI_MAKEFILES="scripts/makefile.$CI_CC scripts/makefile.std"'
   - 'export CI_MAKE_FLAGS=-j2'
