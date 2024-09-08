@@ -446,7 +446,7 @@ set(libpng_sources
     pngwrite.c
     pngwtran.c
     pngwutil.c
-    pnghardware.c
+    pngsimd.c
 )
 set(pngtest_sources
     pngtest.c

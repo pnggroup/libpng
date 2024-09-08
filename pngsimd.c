@@ -1,4 +1,4 @@
-/* pnghardware.c - hardware (cpu/arch) specific code
+/* pngsimd.c - hardware (cpu/arch) specific code
  *
  * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -18,7 +18,7 @@
  * is loaded here.  The file must contain all the checks required to determine
  * if the code will work and these checks must be mutually exclusive between
  * the various implementations.  "arch/code" is loaded for every platform; there
- * must be no architecture specific code in pnghardware.c.
+ * must be no architecture specific code in pngsimd.c.
  *
  * "code" must DEFINE (not declare) the required functions and these must be
  * static to avoid the need for PNG_PREFIX handling.  The functions need not
