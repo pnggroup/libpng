@@ -70,8 +70,28 @@
  * this comment.
  */
 
-#include "loongarch/loongarch_lsx_init.c"
+/* MIPS special case: */
 #include "mips/mips_init.c"
+
+#ifndef png_hardware_init_filter_functions_impl
+   /* MIPS and ARM support multiple different extensions (instructions) for this
+    * kind on this.  MIPS has MSA then the Loongson MMI and now te Longarch SX
+    * extensions.  In the original libpng 1.6 approach only one could be
+    * selected at build time.  When Loongson provided MMI support it was built
+    * so that if both MSA and MMI were available at compile time a runtime
+    * switch could be made.
+    *
+    * When Loongarch provided SX support it came with a runtime check but not a
+    * runtime switch; no new hardware option was implemented for png_set_option,
+    * so the existing MMI runtime selection could not be done.
+    *
+    * This has not yet been implemented but as a work-round to prevent working
+    * hardware optimizations having to be disabled at build time Loongarch SX is
+    * only turned on if MIPS MSA or MMI have not already been detected.
+    */
+#  include "loongarch/loongarch_lsx_init.c"
+#endif /* !png_hardware_init_filter_functions_impl */
+
 #include "powerpc/powerpc_init.c"
 #include "intel/intel_init.c"
 #define PNG_WIP_DISABLE_PALETTE
