@@ -140,12 +140,7 @@
     * callbacks to do this.
     */
 #  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_neon
-#  ifndef PNG_ARM_NEON_IMPLEMENTATION
-      /* Use the intrinsics code by default. */
-#     define PNG_ARM_NEON_IMPLEMENTATION 1
-#  endif
-#else /* PNG_ARM_NEON_OPT == 0 */
-#     define PNG_ARM_NEON_IMPLEMENTATION 0
+
 #endif /* PNG_ARM_NEON_OPT > 0 */
 
 #ifndef PNG_MIPS_MSA_OPT
@@ -1282,23 +1277,6 @@ PNG_INTERNAL_FUNCTION(void,png_do_write_interlace,(png_row_infop row_info,
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row,(png_structrp pp, png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row, int filter),PNG_EMPTY);
 
-#if PNG_ARM_NEON_OPT > 0
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_neon,(png_row_infop row_info,
-    png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_neon,(png_row_infop
-    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
-#endif
-
 #if PNG_MIPS_MSA_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_msa,(png_row_infop row_info,
     png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
@@ -2116,10 +2094,6 @@ PNG_INTERNAL_FUNCTION(void, PNG_FILTER_OPTIMIZATIONS, (png_structp png_ptr,
     * the builder of libpng passes the definition of PNG_FILTER_OPTIMIZATIONS in
     * CFLAGS in place of CPPFLAGS *and* uses symbol prefixing.
     */
-#  if PNG_ARM_NEON_OPT > 0
-PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_neon,
-   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
-#endif
 
 #if PNG_MIPS_MSA_IMPLEMENTATION == 1
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_mips,
@@ -2144,29 +2118,6 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
 
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
    png_const_charp key, png_bytep new_key), PNG_EMPTY);
-
-#if PNG_ARM_NEON_IMPLEMENTATION == 1
-PNG_INTERNAL_FUNCTION(void,
-                      png_riffle_palette_neon,
-                      (png_structrp),
-                      PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_rgba8_neon,
-                      (png_structrp,
-                       png_row_infop,
-                       png_const_bytep,
-                       const png_bytepp,
-                       const png_bytepp),
-                      PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int,
-                      png_do_expand_palette_rgb8_neon,
-                      (png_structrp,
-                       png_row_infop,
-                       png_const_bytep,
-                       const png_bytepp,
-                       const png_bytepp),
-                      PNG_EMPTY);
-#endif
 
 /* Maintainer: Put new private prototypes here ^ */
 

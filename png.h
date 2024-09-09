@@ -3194,6 +3194,30 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  *           PNG images.  'Software' options allow such optimizations to be
  *           selected at run time.
  */
+
+#ifndef PNG_ARM_NEON_OPT
+#  if (defined(__ARM_NEON__) || defined(__ARM_NEON)) && \
+   defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#     define PNG_ARM_NEON_OPT 2
+#  else
+#     define PNG_ARM_NEON_OPT 0
+#  endif
+#endif
+
+#if PNG_ARM_NEON_OPT > 0
+PNG_EXPORT(250, void, png_init_filter_functions_neon, (png_structp pp, unsigned int bpp));
+PNG_EXPORT(251, void, png_read_filter_row_up_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(252, void, png_read_filter_row_sub3_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(253, void, png_read_filter_row_sub4_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(254, void, png_read_filter_row_avg3_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(255, void, png_read_filter_row_avg4_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(256, void, png_read_filter_row_paeth3_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(257, void, png_read_filter_row_paeth4_neon, (png_row_infop row_info, png_bytep row, png_const_bytep prev_row));
+PNG_EXPORT(258, void, png_riffle_palette_neon, (png_structrp png_ptr));
+PNG_EXPORT(259, int, png_do_expand_palette_rgba8_neon, (png_structrp png_ptr, png_row_infop row_info, png_const_bytep row, png_bytepp ssp, png_bytepp ddp));
+PNG_EXPORT(260, int, png_do_expand_palette_rgb8_neon, (png_structrp png_ptr, png_row_infop row_info, png_const_bytep row, png_bytepp ssp, png_bytepp ddp));
+#endif
+
 #ifdef PNG_SET_OPTION_SUPPORTED
 #ifdef PNG_ARM_NEON_API_SUPPORTED
 #  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
@@ -3238,7 +3262,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(249);
+  PNG_EXPORT_LAST_ORDINAL(260);
 #endif
 
 #ifdef __cplusplus

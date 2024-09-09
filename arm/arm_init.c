@@ -14,6 +14,7 @@
 #define _POSIX_SOURCE 1
 
 #include "../pngpriv.h"
+#include "../png.h"
 
 #ifdef PNG_READ_SUPPORTED
 
@@ -57,7 +58,7 @@ static int png_have_neon(png_structp png_ptr);
 #  error "ALIGNED_MEMORY is required; set: -DPNG_ALIGNED_MEMORY_SUPPORTED"
 #endif
 
-void
+void PNGAPI
 png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
 {
    /* The switch statement is compiled in for ARM_NEON_API, the call to

@@ -253,3 +253,14 @@ EXPORTS
  png_set_eXIf @247
  png_get_eXIf_1 @248
  png_set_eXIf_1 @249
+ png_init_filter_functions_neon @250
+ png_read_filter_row_up_neon @251
+ png_read_filter_row_sub3_neon @252
+ png_read_filter_row_sub4_neon @253
+ png_read_filter_row_avg3_neon @254
+ png_read_filter_row_avg4_neon @255
+ png_read_filter_row_paeth3_neon @256
+ png_read_filter_row_paeth4_neon @257
+ png_riffle_palette_neon @258
+ png_do_expand_palette_rgba8_neon @259
+ png_do_expand_palette_rgb8_neon @260

@@ -11,6 +11,7 @@
  */
 
 #include "../pngpriv.h"
+#include "../png.h"
 
 #if PNG_ARM_NEON_IMPLEMENTATION == 1
 
@@ -21,7 +22,7 @@
 #endif
 
 /* Build an RGBA8 palette from the separate RGB and alpha palettes. */
-void
+void PNGAPI
 png_riffle_palette_neon(png_structrp png_ptr)
 {
    png_const_colorp palette = png_ptr->palette;
@@ -58,7 +59,7 @@ png_riffle_palette_neon(png_structrp png_ptr)
 }
 
 /* Expands a palettized row into RGBA8. */
-int
+int PNGAPI
 png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
@@ -103,7 +104,7 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
 }
 
 /* Expands a palettized row into RGB8. */
-int
+int PNGAPI
 png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {

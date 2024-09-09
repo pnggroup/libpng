@@ -507,6 +507,28 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.43
 
 \fBvoid png_write_sig (png_structp \fIpng_ptr\fP\fB);\fP
 
+\fBvoid png_init_filter_functions_neon (png_structp \fP\fIpp\fP\fB, unsigned int \fP\fIbpp\fP\fB);\fP
+
+\fBvoid png_read_filter_row_up_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_read_filter_row_sub3_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_read_filter_row_sub4_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_read_filter_row_avg3_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_read_filter_row_avg4_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_read_filter_row_paeth3_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_read_filter_row_paeth4_neon (png_row_infop \fP\fIrow_info\fP\fB, png_bytep \fP\fIrow\fP\fB, png_const_bytep \fP\fIprev_row\fP\fB);\fP
+
+\fBvoid png_riffle_palette_neon (png_structrp \fP\fIpng_ptr\fP\fB);\fP
+
+\fBvoid png_do_expand_palette_rgba8_neon (png_structrp \fP\fIpng_ptr\fP\fB, png_row_infop \fP\fIrow_info\fP\fB, png_const_bytep \fP\fIrow\fP\fB, png_bytepp \fP\fIssp\fP\fB, png_bytepp \fP\fIddp\fP\fB);\fP
+
+\fBvoid png_do_expand_palette_rgb8_neon (png_structrp \fP\fIpng_ptr\fP\fB, png_row_infop \fP\fIrow_info\fP\fB, png_const_bytep \fP\fIrow\fP\fB, png_bytepp \fP\fIssp\fP\fB, png_bytepp \fP\fIddp\fP\fB);\fP
+
 .SH DESCRIPTION
 The
 .I libpng

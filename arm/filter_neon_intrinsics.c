@@ -12,6 +12,7 @@
  */
 
 #include "../pngpriv.h"
+#include "../png.h"
 
 #ifdef PNG_READ_SUPPORTED
 
@@ -47,7 +48,7 @@
 
 #if PNG_ARM_NEON_OPT > 0
 
-void
+void PNGAPI
 png_read_filter_row_up_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -68,7 +69,7 @@ png_read_filter_row_up_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
-void
+void PNGAPI
 png_read_filter_row_sub3_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -115,7 +116,7 @@ png_read_filter_row_sub3_neon(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev_row)
 }
 
-void
+void PNGAPI
 png_read_filter_row_sub4_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -147,7 +148,7 @@ png_read_filter_row_sub4_neon(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev_row)
 }
 
-void
+void PNGAPI
 png_read_filter_row_avg3_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -215,7 +216,7 @@ png_read_filter_row_avg3_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
-void
+void PNGAPI
 png_read_filter_row_avg4_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -284,7 +285,7 @@ paeth(uint8x8_t a, uint8x8_t b, uint8x8_t c)
    return e;
 }
 
-void
+void PNGAPI
 png_read_filter_row_paeth3_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
@@ -352,7 +353,7 @@ png_read_filter_row_paeth3_neon(png_row_infop row_info, png_bytep row,
    }
 }
 
-void
+void PNGAPI
 png_read_filter_row_paeth4_neon(png_row_infop row_info, png_bytep row,
    png_const_bytep prev_row)
 {
