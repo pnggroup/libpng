@@ -518,9 +518,9 @@ static int maximum_allocation = 0;
 static int total_allocation = 0;
 static int num_allocations = 0;
 
-png_voidp PNGCBAPI png_debug_malloc PNGARG((png_structp png_ptr,
-    png_alloc_size_t size));
-void PNGCBAPI png_debug_free PNGARG((png_structp png_ptr, png_voidp ptr));
+png_voidp PNGCBAPI png_debug_malloc(png_structp png_ptr,
+    png_alloc_size_t size);
+void PNGCBAPI png_debug_free(png_structp png_ptr, png_voidp ptr);
 
 png_voidp
 PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
