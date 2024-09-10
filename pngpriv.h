@@ -71,6 +71,9 @@
 #ifndef PNGLCONF_H
 #  include "pnglibconf.h"
 #endif
+#ifndef PNGTARGET_H
+#  include "pngtarget.h"
+#endif
 
 /* Local renames may change non-exported API functions from png.h */
 #if defined(PNG_PREFIX) && !defined(PNGPREFIX_H)
@@ -1090,31 +1093,31 @@ PNG_INTERNAL_FUNCTION(void,png_do_write_interlace,(png_row_infop row_info,
 PNG_INTERNAL_FUNCTION(void,png_read_filter_row,(png_structrp pp, png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row, int filter),PNG_EMPTY);
 
-#ifdef PNG_HARDWARE_SUPPORTED
-/* png_struct::hardware_state contains a cache of these flags and updates
+#ifdef PNG_TARGET_CODE_IMPLEMENTATION
+/* png_struct::target_state contains a cache of these flags and updates
  * it as required during read.  The hardware implementation may also do
  * this, for example if it determines that hardware optimization is not
  * available for this image.
  */
-#define png_hardware_filters 1 /* MASK: hardware support for filters */
-#define png_hardware_palette 2 /* MASK: hardware support for palettes */
+#define png_target_filters 1 /* MASK: hardware support for filters */
+#define png_target_palette 2 /* MASK: hardware support for palettes */
 
-PNG_INTERNAL_FUNCTION(void,png_hardware_init,(png_structrp),PNG_EMPTY);
-   /* Initialize png_struct::hardware_state if required. */
+PNG_INTERNAL_FUNCTION(void,png_target_init,(png_structrp),PNG_EMPTY);
+   /* Initialize png_struct::target_state if required. */
 
-PNG_INTERNAL_FUNCTION(void,png_hardware_free_data,(png_structrp),PNG_EMPTY);
-   /* Free any data allocated in the png_struct::hardware_data.
+PNG_INTERNAL_FUNCTION(void,png_target_free_data,(png_structrp),PNG_EMPTY);
+   /* Free any data allocated in the png_struct::target_data.
     */
 
-PNG_INTERNAL_FUNCTION(void, png_hardware_init_filter_functions,
+PNG_INTERNAL_FUNCTION(void, png_target_init_filter_functions,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
    /* The filter function initializer that selects the specific hardware
     * implementation.  Called once before the first row needs to be defiltered.
     */
 
-PNG_INTERNAL_FUNCTION(void, png_hardware_init_palette_support, (png_structrp),
+PNG_INTERNAL_FUNCTION(void, png_target_init_palette_support, (png_structrp),
    PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int, png_hardware_do_expand_palette, (png_structrp,
+PNG_INTERNAL_FUNCTION(int, png_target_do_expand_palette, (png_structrp,
    png_row_infop, png_const_bytep, const png_bytepp, const png_bytepp),
    PNG_EMPTY);
    /* Two functions to set up and execute palette expansion.  The 'init'

@@ -68,13 +68,13 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 #        endif
 #     endif
 
-#     ifdef PNG_HARDWARE_SUPPORTED
+#     ifdef PNG_TARGET_CODE_IMPLEMENTATION /* target specific code */
          /* Current support is read-only so this happens here, not in the
           * general creation.  It could easily be moved.
           */
-         png_hardware_init(png_ptr);
-         if (png_ptr->hardware_state != 0U)
-            png_set_option(png_ptr, PNG_HARDWARE, 1);
+         png_target_init(png_ptr);
+         if (png_ptr->target_state != 0U)
+            png_set_option(png_ptr, PNG_TARGET_SPECIFIC_CODE, 1);
 #     endif
 
       /* TODO: delay this, it can be done in png_init_io (if the app doesn't
@@ -1007,10 +1007,10 @@ png_read_destroy(png_structrp png_ptr)
    png_ptr->chunk_list = NULL;
 #endif
 
-#ifdef PNG_HARDWARE_SUPPORTED
-   if (png_ptr->hardware_data != NULL)
-      png_hardware_free_data(png_ptr);
-   png_ptr->hardware_data = NULL;
+#ifdef PNG_TARGET_STORES_DATA
+   if (png_ptr->target_data != NULL)
+      png_target_free_data(png_ptr);
+   png_ptr->target_data = NULL;
 #endif
 
    /* NOTE: the 'setjmp' buffer may still be allocated and the memory and error

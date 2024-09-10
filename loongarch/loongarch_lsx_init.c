@@ -8,9 +8,8 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-#ifdef PNG_READ_SUPPORTED
 #ifdef __loongarch_sx
-#define png_hardware_impl "loongarch-sx"
+#define png_target_impl "loongarch-sx"
 
 #include <sys/auxv.h>
 
@@ -49,7 +48,6 @@ png_init_filter_functions_lsx(png_structp pp, unsigned int bpp)
    }
 }
 
-#define png_init_hardware_filter_functions png_init_filter_functions_lsx
+#define png_target_init_filter_functions png_init_filter_functions_lsx
 
 #endif /* __loongarch_sx */
-#endif /* READ */

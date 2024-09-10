@@ -4111,10 +4111,8 @@ png_init_filter_functions(png_structrp pp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
          png_read_filter_row_paeth_multibyte_pixel;
 
-#  ifdef PNG_HARDWARE_SUPPORTED
-      if (((pp->options >> PNG_HARDWARE) & 3) == PNG_OPTION_ON &&
-          (pp->hardware_state & png_hardware_filters) != 0)
-         png_hardware_init_filter_functions(pp, bpp);
+#  ifdef PNG_TARGET_IMPLEMENTS_FILTERS
+      png_target_init_filter_functions(pp, bpp);
 #  endif
 }
 
@@ -4598,7 +4596,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
       png_ptr->big_prev_row = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
 
-#ifdef PNG_ALIGNED_MEMORY_SUPPORTED
+#if PNG_TARGET_ROW_ALIGNMENT > 1
       /* Use 16-byte aligned memory for row_buf with at least 16 bytes
        * of padding before and after row_buf; treat prev_row similarly.
        * NOTE: the alignment is to the start of the pixels, one beyond the start

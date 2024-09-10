@@ -3186,7 +3186,8 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  *           Hardware options are now controlled globally to be 'on' or 'off'.
  *           For backward compatibility the original options are defined as
  *           the 'new' hardware option.  libpng can be compiled without
- *           hardware support (check PNG_HARDWARE_SUPPORTED).
+ *           hardware support (check PNG_TARGET_SPECIFIC_CODE_SUPPORTED and
+ *           the documenation in pngtarget.h).
  *
  * SOFTWARE: sometimes software optimizations actually result in performance
  *           decrease on some architectures or systems, or with some sets of
@@ -3200,11 +3201,11 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  * the option starts of UNSET and this is treated as OFF.
  */
 #define PNG_SET_OPTION_SUPPORTED
-#define PNG_HARDWARE 0 /* HARDWARE: turn on or off cpu specific code */
+#define PNG_TARGET_SPECIFIC_CODE 0 /* HARDWARE: turn on or off cpu specific code */
 #define PNG_ARM_NEON 0 /* HARDWARE: compatibility */
 #define PNG_MIPS_MSA 0 /* HARDWARE: compatibility */
 #define PNG_POWERPC_VSX 0 /* HARDWARE: compatibility */
-#define PNG_MIPS_USE_MMI 2/* HARDWARE: MIPS: chose MMI over MSA */
+#define PNG_MIPS_MMI 2/* HARDWARE: MIPS: chose MMI over MSA */
 #define PNG_MAXIMUM_INFLATE_WINDOW 4 /* SOFTWARE: force maximum window */
 #define PNG_SKIP_sRGB_CHECK_PROFILE 6 /* SOFTWARE: Check ICC profile for sRGB */
 

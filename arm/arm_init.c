@@ -9,10 +9,7 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-#if (defined(__ARM_NEON__) || defined(__ARM_NEON)) &&\
-   defined(PNG_ALIGNED_MEMORY_SUPPORTED) && defined(PNG_READ_SUPPORTED)
-
-#define png_hardware_impl "arm-neon"
+#define png_target_impl "arm-neon"
 
 #if defined(_MSC_VER) && !defined(__clang__) && defined(_M_ARM64)
 #  include <arm64_neon.h>
@@ -53,27 +50,25 @@ png_init_filter_functions_neon(png_structp pp, unsigned int bpp)
    }
 }
 
-#define png_hardware_init_filter_functions_impl png_init_filter_functions_neon
+#define png_target_init_filter_functions_impl png_init_filter_functions_neon
 
-#ifndef PNG_WIP_DISABLE_PALETTE /*TODO*/
+#ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE /*TODO*/
 #include "palette_neon_intrinsics.c"
-#endif /*TODO*/
 
 /* TODO:
- *    png_hardware_free_data_impl
+ *    png_target_free_data_impl
  *       Must be defined if the implementation stores data in
- *       png_struct::hardware_data.  Need not be defined otherwise.
+ *       png_struct::target_data.  Need not be defined otherwise.
  *
- *    png_hardware_init_palette_support_impl
+ *    png_target_init_palette_support_impl
  *       Contains code to initialize a palette transformation.  This returns
  *       true if something has been set up.  Only called if the state contains
- *       png_hardware_palette, need not be defined, may cancel the state flag
+ *       png_target_palette, need not be defined, may cancel the state flag
  *       in the png_struct to prevent further calls.
  *
- *    png_hardware_do_expand_palette
+ *    png_target_do_expand_palette
  *       Handles palette expansion.  Need not be defined, only called if the
- *       state contains png_hardware_palette, may set this flag to zero, may
+ *       state contains png_target_palette, may set this flag to zero, may
  *       return false to indicate that the expansion was not done.
  */
-
-#endif /* READ, ALIGNEDMEMORY && ARM_NEON */
+#endif /*TODO*/

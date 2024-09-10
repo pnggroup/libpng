@@ -1,4 +1,3 @@
-
 /* powerpc_init.c - POWERPC optimised filter functions
  *
  * Copyright (c) 2018 Cosmin Truta
@@ -9,13 +8,9 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-#if defined(__PPC64__) && defined(__ALTIVEC__) && defined(PNG_READ_SUPPORTED)
+#define png_target_impl "powerpc-vsx"
 
 #include <altivec.h>
-
-#ifdef __VSX__
-#define png_hardware_impl "powerpc-vsx"
-
 #include "filter_vsx_intrinsics.c"
 
 void
@@ -44,6 +39,4 @@ png_init_filter_functions_vsx(png_structp pp, unsigned int bpp)
    }
 }
 
-#define png_hardware_init_filter_functions_impl png_init_filter_functions_vsx
-#endif /* __VSX__ */
-#endif /* __PPC64__ && __ALTIVEC__ && READ */
+#define png_target_init_filter_functions_impl png_init_filter_functions_vsx

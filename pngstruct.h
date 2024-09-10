@@ -380,18 +380,6 @@ struct png_struct_def
    /* deleted in 1.5.5: rgb_to_gray_blue_coeff; */
 #endif
 
-/* New member added in libpng-1.6.36 */
-/* NOTE: prior to libpng-1.8 this also checked that PNG_ARM_NEON_IMPLEMENTATION 
- * is defined, however it was always defined...  The code also checked that
- * READ_EXPAND is supported but that will lead to bugs when some hardware
- * implementation uses it for some other palette related thing.
- * [[libpng-1.8]] changed to hardware_data for storing arbitrary data.
- */
-#ifdef PNG_HARDWARE_SUPPORTED
-   png_voidp   hardware_data;
-   png_uint_32 hardware_state; /* managed by libpng */
-#endif
-
 /* New member added in libpng-1.0.4 (renamed in 1.0.9) */
 #if defined(PNG_MNG_FEATURES_SUPPORTED)
 /* Changed from png_byte to png_uint_32 at version 1.2.0 */
@@ -478,6 +466,20 @@ struct png_struct_def
 #if defined(PNG_COLORSPACE_SUPPORTED) || defined(PNG_GAMMA_SUPPORTED)
    png_colorspace   colorspace;
 #endif
+#endif
+
+/* New member added in libpng-1.6.36 */
+/* NOTE: prior to libpng-1.8 this also checked that PNG_ARM_NEON_IMPLEMENTATION 
+ * is defined, however it was always defined...  The code also checked that
+ * READ_EXPAND is supported but that will lead to bugs when some hardware
+ * implementation uses it for some other palette related thing.
+ * [[libpng-1.8]] changed to target_data for storing arbitrary data.
+ */
+#ifdef PNG_TARGET_CODE_IMPLEMENTATION /* file providing target specific code */
+#  ifdef PNG_TARGET_STORES_DATA
+      png_voidp   target_data;
+#  endif
+   png_uint_32 target_state; /* managed by libpng */
 #endif
 };
 #endif /* PNGSTRUCT_H */
