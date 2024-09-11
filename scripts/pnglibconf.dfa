@@ -197,142 +197,6 @@ setting API_RULE default 0
 
 setting PREFIX
 
-# Implementation specific control of the optimizations, enabled by those
-# hardware or software options that need it (typically when run-time choices
-# must be made by the user)
-option SET_OPTION disabled
-
-# These options are specific to the ARM NEON hardware optimizations.  At present
-# these optimizations depend on GCC specific pre-processing of an assembler (.S)
-# file, so they probably won't work with other compilers.
-#
-# ARM_NEON_OPT:
-#   unset: check at compile time
-#          (__ARM_NEON__ must be predefined by the compiler, as a result of
-#          passing "-mfpu=neon" to the compiler options)
-#   0: disable (even if the CPU has a NEON FPU)
-#   1: check at run time (via ARM_NEON_{API,CHECK})
-#   2: switch on unconditionally
-#      (inadvisable - instead, pass "-mfpu=neon" to the compiler)
-#   NOTE:
-#     When building libpng, avoid using any setting other than '0';
-#     '1' is set automatically when either 'API' or 'CHECK' are configured in;
-#     '2' should not be necessary, as "-mfpu=neon" will achieve the same effect
-#     as well as applying the NEON optimizations to the rest of libpng.
-#   NOTE:
-#     Any setting other than '0' requires ALIGNED_MEMORY.
-#
-# ARM_NEON_API:
-#   (PNG_ARM_NEON == 1)
-#   Allow the optimization to be switched on with png_set_option.
-#
-# ARM_NEON_CHECK:
-#   (PNG_ARM_NEON == 1)
-#   Compile a run-time check to see if Neon extensions are supported.
-#   This is poorly supported and deprecated - use the png_set_option API.
-#
-setting ARM_NEON_OPT
-option ARM_NEON_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-   sets ARM_NEON_OPT 1
-option ARM_NEON_CHECK disabled requires ALIGNED_MEMORY,
-   sets ARM_NEON_OPT 1
-
-# These options are specific to the PowerPC VSX hardware optimizations.
-#
-# POWERPC_VSX_OPT:
-#   unset: check at compile time
-#          (__PPC64__,__ALTIVEC__,__VSX__ must be predefined by the compiler,
-#          as a result of passing "-mvsx -maltivec" to the compiler options)
-#   0: disable (even if the CPU supports VSX)
-#   1: check at run time (via POWERPC_VSX_{API,CHECK})
-#   2: switch on unconditionally
-#      (inadvisable - instead, pass "-mvsx -maltivec" to the compiler)
-#   NOTE:
-#     When building libpng, avoid using any setting other than '0';
-#     '1' is set automatically when either 'API' or 'CHECK' are configured in;
-#     '2' should not be necessary, as "-mvsx -maltivec" will achieve the same
-#     effect as well as applying the VSX optimizations to the rest of libpng.
-#
-# POWERPC_VSX_API:
-#   (PNG_POWERPC_VSX == 1)
-#   Allow the optimization to be switched on with png_set_option.
-#
-# POWERPC_VSX_CHECK:
-#   (PNG_POWERPC_VSX == 1)
-#   Compile a run-time check to see if VSX extensions are supported.
-#   This is not supported on all systems. See contrib/powerpc-vsx/README.
-#
-setting POWERPC_VSX_OPT
-option POWERPC_VSX_API disabled enables SET_OPTION,
-  sets POWERPC_VSX_OPT 1
-option POWERPC_VSX_CHECK disabled,
-  sets POWERPC_VSX_OPT 1
-
-# These options are specific to the MIPS MSA hardware optimizations.
-#
-# MIPS_MSA_OPT:
-#   unset: check at compile time
-#          (__mips_msa must be predefined by the compiler, as a result of
-#          passing "-mmsa -mfp64" to the compiler options)
-#   0: disable (even if the CPU supports MSA)
-#   1: check at run time (via MIPS_MSA_{API,CHECK})
-#   2: switch on unconditionally
-#      (inadvisable - instead, pass "-mmsa -mfp64" to the compiler)
-#   NOTE:
-#     When building libpng, avoid using any setting other than '0';
-#     '1' is set automatically when either 'API' or 'CHECK' are configured in;
-#     '2' should not be necessary, as "-mmsa -mfp64" will achieve the same
-#     effect as well as applying the MSA optimizations to the rest of libpng.
-#   NOTE:
-#     Any setting other than '0' requires ALIGNED_MEMORY.
-#
-# MIPS_MSA_API:
-#   (PNG_MIPS_MSA == 1)
-#   Allow the optimization to be switched on with png_set_option.
-#
-# MIPS_MSA_CHECK:
-#   (PNG_MIPS_MSA == 1)
-#   Compile a run-time check to see if MSA extensions are supported.
-#
-setting MIPS_MSA_OPT
-option MIPS_MSA_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-  sets MIPS_MSA_OPT 1
-option MIPS_MSA_CHECK disabled requires ALIGNED_MEMORY,
-  sets MIPS_MSA_OPT 1
-
-# These options are specific to the MIPS MMI hardware optimizations.
-#
-# MIPS_MMI_OPT:
-#   unset: check at compile time
-#          (__mips_loongson_mmi must be defined by the compiler, as a result of
-#          passing "-mloongson-mmi -march=loongson3a" to the compiler options)
-#   0: disable (even if the CPU supports MMI)
-#   1: check at run time (via MIPS_MMI_{API,CHECK})
-#   2: switch on unconditionally
-#      (inadvisable - instead, pass "-mloongson-mmi -march=loongson3a" to the
-#      compiler)
-#   NOTE:
-#     When building libpng, avoid using any setting other than '0';
-#     '1' is set automatically when either 'API' or 'CHECK' are configured in;
-#     '2' should not be necessary, as "-mloongson-mmi -march=loongson3a" will
-#     achieve the same effect as well as applying the MMI optimizations to the
-#     rest of libpng.
-#
-# MIPS_MMI_API:
-#   (PNG_MIPS_MMI == 1)
-#   Allow the optimization to be switched on with png_set_option.
-#
-# MIPS_MMI_CHECK:
-#   (PNG_MIPS_MMI == 1)
-#   Compile a run-time check to see if MMI extensions are supported.
-#
-setting MIPS_MMI_OPT
-option MIPS_MMI_API disabled requires ALIGNED_MEMORY enables SET_OPTION,
-  sets MIPS_MMI_OPT 1
-option MIPS_MMI_CHECK disabled requires ALIGNED_MEMORY,
-  sets MIPS_MMI_OPT 1
-
-
 # These settings configure the default compression level (0-9) and 'strategy';
 # strategy is as defined by the implementors of zlib. It describes the input
 # data and modifies the zlib parameters in an attempt to optimize the balance
@@ -432,7 +296,7 @@ option BENIGN_READ_ERRORS requires BENIGN_ERRORS
 # Furthermore the option is explicitly turned off here if the zlib version
 # number is below that required - libpng wouldn't compile in that case if the
 # option were turned on.
-option DISABLE_ADLER32_CHECK requires READ enables SET_OPTION disabled
+option DISABLE_ADLER32_CHECK requires READ disabled
 
 # ZLIB_VERNUM must be used here, not PNG_ZLIB_VERNUM, because
 # scripts/options.awk ends up putting this test adhead of the setting of
@@ -544,7 +408,7 @@ option SET_USER_LIMITS requires USER_LIMITS
 # to libpng 1.6; the new interfaces in 1.6 will take several years to become
 # popular.
 
-option READ enables READ_INTERLACING SET_OPTION
+option READ enables READ_INTERLACING
 
 # Disabling READ_16BIT does not disable reading 16-bit PNG files, but it
 # forces them to be chopped down to 8-bit, and disables any 16-bit
@@ -756,13 +620,6 @@ option COLORSPACE enables GAMMA disabled
 
 setting sRGB_PROFILE_CHECKS default 2
 
-# Artificially align memory - the code typically aligns to 8 byte
-# boundaries if this is switched on, it's a small waste of space
-# but can help (in theory) on some architectures.  Only affects
-# internal structures.  Added at libpng 1.4.0
-
-option ALIGNED_MEMORY
-
 # Buggy compilers (e.g., gcc 2.7.2.2) need PNG_NO_POINTER_INDEXING
 # See png[wr]util.c, normally this should always be *on*
 
@@ -843,6 +700,16 @@ setting INFLATE_BUF_SIZE default 1024
 
 setting IDAT_READ_SIZE default PNG_ZBUF_SIZE
 
+# Target specific code.  By default libpng will use "target specific" code if
+# available.  This means code that depends on particular capabilities of a CPU
+# and its instruction set.  This configuration option is provided to allow
+# such code to be completely disabled.  See pngsimd.c for more discussion about
+# the advantages and disadvantages of target specific code.
+#
+# At present target specific code is available only for read operations, so:
+
+option TARGET_SPECIFIC_CODE requires READ
+
 # Ancillary chunks
 chunk bKGD
 chunk cHRM enables COLORSPACE
@@ -857,7 +724,7 @@ chunk pHYs
 chunk sBIT
 chunk sCAL
 chunk sPLT
-chunk sRGB enables COLORSPACE, GAMMA, SET_OPTION
+chunk sRGB enables COLORSPACE, GAMMA
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS

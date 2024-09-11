@@ -2308,12 +2308,10 @@ png_compare_ICC_profile_with_sRGB(png_const_structrp png_ptr,
 #endif
    unsigned int i;
 
-#ifdef PNG_SET_OPTION_SUPPORTED
    /* First see if PNG_SKIP_sRGB_CHECK_PROFILE has been set to "on" */
    if (((png_ptr->options >> PNG_SKIP_sRGB_CHECK_PROFILE) & 3) ==
                PNG_OPTION_ON)
       return 0;
-#endif
 
    for (i=0; i < (sizeof png_sRGB_checks) / (sizeof png_sRGB_checks[0]); ++i)
    {
@@ -4286,7 +4284,6 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 #endif /* READ_GAMMA */
 
 /* HARDWARE OR SOFTWARE OPTION SUPPORT */
-#ifdef PNG_SET_OPTION_SUPPORTED
 int PNGAPI
 png_set_option(png_structrp png_ptr, int option, int onoff)
 {
@@ -4304,7 +4301,6 @@ png_set_option(png_structrp png_ptr, int option, int onoff)
 
    return PNG_OPTION_INVALID;
 }
-#endif
 
 /* sRGB support */
 #if defined(PNG_SIMPLIFIED_READ_SUPPORTED) ||\

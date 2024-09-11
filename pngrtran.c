@@ -18,17 +18,6 @@
 
 #include "pngpriv.h"
 
-#ifdef PNG_ARM_NEON_IMPLEMENTATION
-#  if PNG_ARM_NEON_IMPLEMENTATION == 1
-#    define PNG_ARM_NEON_INTRINSICS_AVAILABLE
-#    if defined(_MSC_VER) && !defined(__clang__) && defined(_M_ARM64)
-#      include <arm64_neon.h>
-#    else
-#      include <arm_neon.h>
-#    endif
-#  endif
-#endif
-
 #ifdef PNG_READ_SUPPORTED
 
 /* Set the action on getting a CRC error for an ancillary or critical chunk. */
@@ -4309,8 +4298,8 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                dp = row + ((size_t)row_width << 2) - 1;
 
                i = 0;
-#ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
-               if (png_ptr->riffled_palette != NULL)
+#ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
+               if ((png_ptr->target_state & png_target_palette) != 0)
                {
                   /* The RGBA optimization works with png_ptr->bit_depth == 8
                    * but sometimes row_info->bit_depth has been changed to 8.
@@ -4346,7 +4335,7 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                sp = row + (size_t)row_width - 1;
                dp = row + (size_t)(row_width * 3) - 1;
                i = 0;
-#ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
+#ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
                i = png_do_expand_palette_rgb8_neon(png_ptr, row_info, row,
                    &sp, &dp);
 #else
@@ -4767,7 +4756,7 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
    {
       if (row_info->color_type == PNG_COLOR_TYPE_PALETTE)
       {
-#ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
+#ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
          if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8))
          {
             if (png_ptr->riffled_palette == NULL)

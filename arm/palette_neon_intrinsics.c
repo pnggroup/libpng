@@ -1,4 +1,3 @@
-
 /* palette_neon_intrinsics.c - NEON optimised palette expansion functions
  *
  * Copyright (c) 2018-2019 Cosmin Truta
@@ -10,18 +9,8 @@
  * and license in png.h
  */
 
-#include "../pngpriv.h"
-
-#if PNG_ARM_NEON_IMPLEMENTATION == 1
-
-#if defined(_MSC_VER) && !defined(__clang__) && defined(_M_ARM64)
-#  include <arm64_neon.h>
-#else
-#  include <arm_neon.h>
-#endif
-
 /* Build an RGBA8 palette from the separate RGB and alpha palettes. */
-void
+static void
 png_riffle_palette_neon(png_structrp png_ptr)
 {
    png_const_colorp palette = png_ptr->palette;
@@ -58,7 +47,7 @@ png_riffle_palette_neon(png_structrp png_ptr)
 }
 
 /* Expands a palettized row into RGBA8. */
-int
+static int
 png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
@@ -103,7 +92,7 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
 }
 
 /* Expands a palettized row into RGB8. */
-int
+static int
 png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
@@ -147,5 +136,3 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
    *ddp = *ddp - ((i << 1) + i);
    return i;
 }
-
-#endif /* PNG_ARM_NEON_IMPLEMENTATION */
