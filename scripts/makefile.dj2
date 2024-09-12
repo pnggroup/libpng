@@ -1,5 +1,5 @@
 # DJGPP (DOS gcc) makefile for libpng
-# Copyright (C) 2020-2022 Cosmin Truta
+# Copyright (C) 2020-2024 Cosmin Truta
 # Copyright (C) 2002, 2006, 2009-2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -8,8 +8,11 @@
 # and license in png.h
 
 CC=gcc
+AR=ar
+RANLIB=ranlib
 CPPFLAGS=-I../zlib -DPNG_NO_SNPRINTF
 CFLAGS=-O
+ARFLAGS=rc
 LDFLAGS=-L. -L../zlib/ -lpng -lz -lm
 
 CP=cp
@@ -32,8 +35,8 @@ pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
-	ar rc $@ $(OBJS)
-	ranlib $@
+	$(AR) $(ARFLAGS) $@ $(OBJS)
+	$(RANLIB) $@
 
 pngtest: pngtest.o libpng.a
 	$(CC) -o pngtest $(CFLAGS) pngtest.o $(LDFLAGS)

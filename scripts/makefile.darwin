@@ -1,5 +1,5 @@
 # makefile for libpng on Darwin / macOS
-# Copyright (C) 2020-2022 Cosmin Truta
+# Copyright (C) 2020-2024 Cosmin Truta
 # Copyright (C) 2002, 2004, 2006, 2008, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 2001 Christoph Pfisterer
 # derived from makefile.linux:
@@ -24,9 +24,8 @@ LIBSOMAJ=$(LIBNAME).$(PNGMAJ).dylib
 
 # Utilities:
 CC=cc
-AR_RC=ar rc
+AR=ar
 RANLIB=ranlib
-MKDIR_P=mkdir -p
 LN_SF=ln -sf
 CP=cp
 RM_F=rm -f
@@ -36,6 +35,7 @@ NOHWOPT=-DPNG_ARM_NEON_OPT=0 -DPNG_MIPS_MSA_OPT=0 \
 DEFS=$(NOHWOPT)
 CPPFLAGS=-I$(ZLIBINC) $(DEFS)
 CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef
+ARFLAGS=rc
 LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz
 
 # Pre-built configuration
@@ -63,7 +63,7 @@ pnglibconf.h: $(PNGLIBCONF_H_PREBUILT)
 	$(CP) $(PNGLIBCONF_H_PREBUILT) $@
 
 libpng.a: $(OBJS)
-	$(AR_RC) $@ $(OBJS)
+	$(AR) $(ARFLAGS) $@ $(OBJS)
 	$(RANLIB) $@
 
 $(LIBSO): $(LIBSOMAJ)

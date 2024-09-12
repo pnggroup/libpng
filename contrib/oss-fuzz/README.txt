@@ -1,4 +1,7 @@
-Last changed in libpng 1.6.33 [September 28, 2017]
+libpng additions to oss-fuzz
+============================
+
+Copyright (c) 2024 Cosmin Truta
 Copyright (c) 2017 Glenn Randers-Pehrson
 
 This code is released under the libpng license.

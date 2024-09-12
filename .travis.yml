@@ -1,6 +1,7 @@
 branches:
   except:
     - /libpng[0-1][0-7]/
+    - /v[0-1][.][0-7][.][0-9]+/
 
 language: c
 
@@ -9,37 +10,19 @@ os:
   - linux
   - osx
 
-compiler:
-  - clang
-  - gcc
-
 env:
-  - AUTOMATION=cmake CI_NO_TEST=1
-  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=ON" CI_SANITIZERS="address,undefined"
-  - AUTOMATION=cmake CI_CMAKE_VARS="-DPNG_HARDWARE_OPTIMIZATIONS=OFF" CI_SANITIZERS="address,undefined"
-  - AUTOMATION=autotools CI_NO_TEST=1
-  - AUTOMATION=autotools CI_CONFIGURE_FLAGS="--enable-hardware-optimizations"
-  - AUTOMATION=autotools CI_CONFIGURE_FLAGS="--disable-hardware-optimizations"
-  - AUTOMATION=legacy CI_NO_TEST=1
-  - AUTOMATION=legacy CI_SANITIZERS="address,undefined"
-
-matrix:
-  include:
-    - os: osx
-      compiler: cc
-      env: AUTOMATION=cmake CI_CMAKE_GENERATOR=Xcode
-  exclude:
-    - os: freebsd
-      compiler: gcc
-    - os: osx
-      compiler: gcc
+  - AUTOMATION=cmake
+  - AUTOMATION=configure
+  - AUTOMATION=makefiles
 
 before_script:
-  - 'export CI_CMAKE_BUILD_FLAGS="--parallel 2"'
-  - 'export CI_CTEST_FLAGS="--parallel 2"'
+  - 'if test "$TRAVIS_OS_NAME" = "linux"; then export CI_CC="gcc"; else export CI_CC="clang"; fi'
+  - 'if test "$TRAVIS_OS_NAME" = "osx"; then export CI_CMAKE_GENERATOR="Xcode"; fi'
+  - 'if test "$TRAVIS_OS_NAME" != "osx"; then export CI_SANITIZERS="address,undefined"; fi'
+  - 'export CI_MAKEFILES="scripts/makefile.$CI_CC scripts/makefile.std"'
   - 'export CI_MAKE_FLAGS=-j2'
-  - 'export CI_CC=$TRAVIS_COMPILER'
-  - 'export CI_LEGACY_MAKEFILES="scripts/makefile.$TRAVIS_COMPILER scripts/makefile.std"'
+  - 'export CI_CMAKE_BUILD_FLAGS=-j2'
+  - 'export CI_CTEST_FLAGS=-j2'
 
 script:
-  - './ci/ci_$AUTOMATION.sh'
+  - './ci/ci_verify_$AUTOMATION.sh'
