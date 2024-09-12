@@ -7,27 +7,20 @@
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
+ *
+ * Modified 2024 by John Bowler, changes
+ * Copyright (c) 2024 John Bowler, licensed under the libpng license.
  */
-#ifdef __loongarch_sx
-#define png_target_impl "loongarch-sx"
-
 #include <sys/auxv.h>
-
 #include "filter_lsx_intrinsics.c"
 
 #define LA_HWCAP_LSX    (1<<4)
 static int png_has_lsx(void)
 {
-    int flags = 0;
-    int flag  = (int)getauxval(AT_HWCAP);
-
-    if (flag & LA_HWCAP_LSX)
-        return 1;
-
-    return 0;
+    return (getauxval(AT_HWCAP) & LA_HWCAP_LSX) != 0U;
 }
 
-static void
+static int
 png_init_filter_functions_lsx(png_structp pp, unsigned int bpp)
 {
    if (png_has_lsx())
@@ -45,9 +38,7 @@ png_init_filter_functions_lsx(png_structp pp, unsigned int bpp)
          pp->read_filter[PNG_FILTER_VALUE_AVG-1] = png_read_filter_row_avg4_lsx;
          pp->read_filter[PNG_FILTER_VALUE_PAETH-1] = png_read_filter_row_paeth4_lsx;
       }
+      return 1; /* using Loongarch SX extensions */
    }
+   return 0; /* nothing done */
 }
-
-#define png_target_init_filter_functions png_init_filter_functions_lsx
-
-#endif /* __loongarch_sx */

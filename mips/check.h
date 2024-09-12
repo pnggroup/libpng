@@ -9,8 +9,6 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-#ifdef PNG_READ_SUPPORTED
-
 #if defined(__mips_msa) && (__mips_isa_rev >= 5)
 #  ifndef PNG_MIPS_MSA_IMPLEMENTATION
 #     if defined(__mips_msa)
@@ -44,11 +42,14 @@
 #   define PNG_MIPS_MMI_IMPLEMENTATION 0
 #endif /* __mips_loongson_mmi && _MIPS_SIM == _ABI64 */
 
-#if PNG_MIPS_MSA_IMPLEMENTATION == 1 || PNG_MIPS_MMI_IMPLEMENTATION > 0
+#include "loongarch/check.h"
+
+#if PNG_MIPS_MSA_IMPLEMENTATION == 1 ||\
+    PNG_MIPS_MMI_IMPLEMENTATION > 0 ||\
+    PNG_MIPS_LSX_IMPLEMENTATION > 0
 #  define PNG_TARGET_CODE_IMPLEMENTATION "mips/mips_init.c"
    /*PNG_TARGET_STORES_DATA*/
 #  define PNG_TARGET_IMPLEMENTS_FILTERS
    /*PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE*/
 #  define PNG_TARGET_ROW_ALIGNMENT 16
-#endif /* MIPS MSA or MMI */
-#endif /* READ */
+#endif /* MIPS MSA or Loongson MMI or Loongarch SX */

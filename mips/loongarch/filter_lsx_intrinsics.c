@@ -405,6 +405,3 @@ png_read_filter_row_paeth4_lsx(png_row_infop row_info, png_bytep row,
       n -= 4;
    }
 }
-
-#endif /* PNG_LOONGARCH_LSX_IMPLEMENTATION == 1 (intrinsics) */
-#endif /* PNG_READ_SUPPORTED */
