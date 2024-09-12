@@ -1,3 +1,7 @@
+libpng additions to oss-fuzz
+============================
+
+Copyright (c) 2024 Cosmin Truta
 Copyright (c) 2017 Glenn Randers-Pehrson
 
 This code is released under the libpng license.
