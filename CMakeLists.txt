@@ -1109,9 +1109,9 @@ endif()
 
 if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
   # Install the man pages.
-  install(FILES libpng.3 libpngpf.3
+  install(FILES manuals/libpng.3
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man3)
-  install(FILES png.5
+  install(FILES manuals/png.5
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
   # Install the pkg-config files.
   if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)

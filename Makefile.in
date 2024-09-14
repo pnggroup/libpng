@@ -812,7 +812,7 @@ BUILT_SOURCES = pnglibconf.h
 
 
 # man pages
-dist_man_MANS = libpng.3 libpngpf.3 png.5
+dist_man_MANS = manuals/libpng.3 manuals/png.5
 EXTRA_SCRIPTS = libpng-config libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@-config
 bin_SCRIPTS = @binconfigs@
 

@@ -104,19 +104,14 @@ filter heuristics, have since been removed.
 Files included in this distribution
 -----------------------------------
 
-    ANNOUNCE      =>  Announcement of this version, with recent changes
-    AUTHORS       =>  List of contributing authors
+    ANNOUNCE.md   =>  Announcement of this version, with recent changes
+    AUTHORS.md    =>  List of contributing authors
     CHANGES       =>  Description of changes between libpng versions
-    INSTALL       =>  Instructions to install libpng
-    LICENSE       =>  License to use and redistribute libpng
-    README        =>  This file
-    TODO          =>  Things not implemented in the current library
-    TRADEMARK     =>  Trademark information
+    LICENSE.md    =>  License to use and redistribute libpng
+    README.md     =>  This file
+    TODO.md       =>  Things not implemented in the current library
+    TRADEMARK.md  =>  Trademark information
     example.c     =>  Example code for using libpng functions
-    libpng.3      =>  Manual page for libpng (includes libpng-manual.txt)
-    libpng-manual.txt  =>  Description of libpng and its functions
-    libpngpf.3    =>  Manual page for libpng's private functions (deprecated)
-    png.5         =>  Manual page for the PNG format
     png.c         =>  Basic interface functions common to library
     png.h         =>  Library function and interface declarations (public)
     pngpriv.h     =>  Library function and interface declarations (private)
@@ -165,6 +160,11 @@ Files included in this distribution
         testpngs/     =>  Test images
         tools/        =>  Various tools
         visupng/      =>  VisualPng, a Windows viewer for PNG images
+    manuals/      =>  Manuals
+        libpng-install.txt  =>  Instructions to install libpng
+        libpng-manual.txt   =>  Description of libpng and its functions
+        libpng.3      =>  Manual page for libpng (includes libpng-manual.txt)
+        png.5         =>  Manual page for the PNG format
     projects/     =>  Project files and workspaces for various IDEs
         owatcom/      =>  OpenWatcom project
         visualc71/    =>  Microsoft Visual C++ 7.1 workspace
