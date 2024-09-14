@@ -1,4 +1,4 @@
-# makefile for libpng.a and libpng16.so on Linux ELF with gcc
+# makefile for libpng.a and libpng18.so on Linux ELF with gcc
 # Copyright (C) 2020-2024 Cosmin Truta
 # Copyright (C) 1998, 1999, 2002, 2006, 2008, 2010-2014 Greg Roelofs and
 # Glenn Randers-Pehrson
@@ -9,7 +9,7 @@
 # and license in png.h
 
 # Library name:
-LIBNAME=libpng16
+LIBNAME=libpng18
 PNGMAJ=16
 
 # Shared library names:
@@ -40,7 +40,7 @@ DEFS=$(NOHWOPT)
 CPPFLAGS=-I$(ZLIBINC) $(DEFS) # -DPNG_DEBUG=5
 CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef # $(WARNMORE) -g
 ARFLAGS=rc
-LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng16 -lz -lm # -g
+LDFLAGS=-L. -Wl,-rpath,. -L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) -lpng18 -lz -lm # -g
 LDFLAGS_A=-L$(ZLIBLIB) -Wl,-rpath,$(ZLIBLIB) libpng.a -lz -lm # -g
 
 # Pre-built configuration

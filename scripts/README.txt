@@ -21,7 +21,7 @@ Scripts and makefiles for libpng
     makefile.ibmc     =>  IBM C/C++ version 3.x for Win32 and OS/2 (static lib)
     makefile.intel    =>  Intel C/C++ version 4.0 and later
     makefile.linux    =>  Linux/ELF makefile
-                          (gcc, creates shared libpng16.so.16.1.6.*)
+                          (gcc, creates shared libpng18.so.18.1.8.*)
     makefile.mips     =>  MIPS makefile
     makefile.msys     =>  MSYS (MinGW) makefile
     makefile.netbsd   =>  NetBSD/cc makefile, makes shared libpng.so
@@ -30,11 +30,11 @@ Scripts and makefiles for libpng
     makefile.sco      =>  SCO OSr5 ELF and Unixware 7 with Native cc
     makefile.sgi      =>  Silicon Graphics IRIX makefile (cc, static lib)
     makefile.sggcc    =>  Silicon Graphics makefile
-                          (gcc, creates shared libpng16.so.16.1.6.*)
+                          (gcc, creates shared libpng18.so.18.1.8.*)
     makefile.solaris  =>  Solaris 2.X makefile
-                          (gcc, creates shared libpng16.so.16.1.6.*)
+                          (gcc, creates shared libpng18.so.18.1.8.*)
     makefile.so9      =>  Solaris 9 makefile
-                          (gcc, creates shared libpng16.so.16.1.6.*)
+                          (gcc, creates shared libpng18.so.18.1.8.*)
     makefile.std      =>  Generic UNIX makefile (cc, static lib)
     makefile.sunos    =>  Sun makefile
     makefile.32sunu   =>  Sun Ultra 32-bit makefile

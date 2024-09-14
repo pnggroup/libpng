@@ -31,10 +31,6 @@
 #  include "../../png.h"
 #endif
 
-#if PNG_LIBPNG_VER < 10603 /* 1.6.3 */
-#  error "pngfix will not work with libpng prior to 1.6.3"
-#endif
-
 #ifdef PNG_SETJMP_SUPPORTED
 #include <setjmp.h>
 
@@ -88,7 +84,7 @@
 #  define aligncastconst(type, value) ((const void*)(value))
 #endif /* __cplusplus */
 
-#if PNG_LIBPNG_VER < 10700
+//#if PNG_LIBPNG_VER < 10700
 /* Chunk tags (copied from pngpriv.h) */
 #define PNG_32b(b,s) ((png_uint_32)(b) << (s))
 #define PNG_U32(b1,b2,b3,b4) \
@@ -121,7 +117,7 @@
 #define png_tIME PNG_U32(116,  73,  77,  69)
 #define png_tRNS PNG_U32(116,  82,  78,  83)
 #define png_zTXt PNG_U32(122,  84,  88, 116)
-#endif
+//#endif
 
 /* The 8-byte signature as a pair of 32-bit quantities */
 #define sig1 PNG_U32(137,  80,  78,  71)

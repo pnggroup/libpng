@@ -46,7 +46,7 @@
 #  define SKIP 0
 #endif
 
-#if PNG_LIBPNG_VER < 10700
+//#if PNG_LIBPNG_VER < 10700
    /* READ_PNG and WRITE_PNG were not defined, so: */
 #  ifdef PNG_INFO_IMAGE_SUPPORTED
 #     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
@@ -56,7 +56,7 @@
 #        define PNG_WRITE_PNG_SUPPORTED
 #     endif /* WRITE */
 #  endif /* INFO_IMAGE */
-#endif /* pre 1.7.0 */
+//#endif /* pre 1.7.0 */
 
 #ifdef PNG_READ_PNG_SUPPORTED
 /* If a transform is valid on both read and write this implies that if the

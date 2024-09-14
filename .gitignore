@@ -54,8 +54,8 @@
 /libpng-config
 /libpng.pc
 /libpng.vers
-/libpng16-config
-/libpng16.pc
+/libpng*-config
+/libpng*.pc
 /libtool
 /stamp-h1
 pnglibconf.[ch]

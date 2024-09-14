@@ -346,12 +346,12 @@ struct png_struct_def
    png_uint_32 options;           /* On/off state (up to 16 options) */
 #endif
 
-#if PNG_LIBPNG_VER < 10700
+//#if PNG_LIBPNG_VER < 10700
 /* To do: remove this from libpng-1.7 */
 #ifdef PNG_TIME_RFC1123_SUPPORTED
    char time_buffer[29]; /* String to hold RFC 1123 time text */
 #endif
-#endif
+//#endif
 
 /* New members added in libpng-1.0.6 */
 

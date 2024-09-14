@@ -18,8 +18,8 @@
 cmake_minimum_required(VERSION 3.6)
 
 set(PNGLIB_MAJOR 1)
-set(PNGLIB_MINOR 6)
-set(PNGLIB_REVISION 45)
+set(PNGLIB_MINOR 8)
+set(PNGLIB_REVISION 0)
 #set(PNGLIB_SUBREVISION 0)
 set(PNGLIB_SUBREVISION "git")
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_REVISION})
@@ -1070,7 +1070,7 @@ if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
           FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
   if(PNG_SHARED)
-    # Create a symlink for libpng.dll.a => libpng16.dll.a on Cygwin
+    # Create a symlink for libpng.dll.a => libpng18.dll.a on Cygwin
     if(NOT WIN32 OR CYGWIN OR MINGW)
       create_symlink(libpng${CMAKE_SHARED_LIBRARY_SUFFIX} TARGET png_shared)
       install(FILES $<TARGET_LINKER_FILE_DIR:png_shared>/libpng${CMAKE_SHARED_LIBRARY_SUFFIX}

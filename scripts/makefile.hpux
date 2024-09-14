@@ -21,7 +21,7 @@ ZLIBINC=/opt/zlib/include
 #   SHAREDLIB=libz.sl
 
 # Library name:
-LIBNAME=libpng16
+LIBNAME=libpng18
 PNGMAJ=16
 
 # Shared library names:

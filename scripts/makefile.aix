@@ -19,14 +19,14 @@ AR = ar
 RANLIB = ranlib
 RM_F = rm -f
 
-LIBNAME = libpng16
+LIBNAME = libpng18
 PNGMAJ = 16
 
 WARNMORE =
 CPPFLAGS = -I$(ZLIBINC) # -DPNG_DEBUG=5
 CFLAGS = -O2 -Wall -Wextra -Wundef # $(WARNMORE) -g
 ARFLAGS = rc
-LDFLAGS = -L. -L$(ZLIBLIB) -lpng16 -lz -lm # -g
+LDFLAGS = -L. -L$(ZLIBLIB) -lpng18 -lz -lm # -g
 
 # File lists
 OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \

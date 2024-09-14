@@ -1,7 +1,7 @@
 
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.6.45.git
+ * libpng version 1.8.0.git
  *
  * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -275,18 +275,18 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.6.45.git"
+#define PNG_LIBPNG_VER_STRING "1.8.0.git"
 #define PNG_HEADER_VERSION_STRING " libpng version " PNG_LIBPNG_VER_STRING "\n"
 
 /* The versions of shared library builds should stay in sync, going forward */
-#define PNG_LIBPNG_VER_SHAREDLIB 16
+#define PNG_LIBPNG_VER_SHAREDLIB 18
 #define PNG_LIBPNG_VER_SONUM     PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
 #define PNG_LIBPNG_VER_DLLNUM    PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
 
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
 #define PNG_LIBPNG_VER_MAJOR   1
-#define PNG_LIBPNG_VER_MINOR   6
-#define PNG_LIBPNG_VER_RELEASE 45
+#define PNG_LIBPNG_VER_MINOR   8
+#define PNG_LIBPNG_VER_RELEASE 0
 
 /* This should be zero for a public release, or non-zero for a
  * development version.
@@ -308,7 +308,7 @@
 #define PNG_LIBPNG_BUILD_SPECIAL 32 /* Cannot be OR'ed with
                                        PNG_LIBPNG_BUILD_PRIVATE */
 
-#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_BETA
+#define PNG_LIBPNG_BUILD_BASE_TYPE PNG_LIBPNG_BUILD_ALPHA
 
 /* Careful here.  At one time, Guy wanted to use 082, but that
  * would be octal.  We must not include leading zeros.
@@ -317,7 +317,7 @@
  * From version 1.0.1 it is:
  * XXYYZZ, where XX=major, YY=minor, ZZ=release
  */
-#define PNG_LIBPNG_VER 10645 /* 1.6.45.git */
+#define PNG_LIBPNG_VER 10800 /* 1.8.0.git */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -427,7 +427,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_6_45_git;
+typedef char* png_libpng_version_1_8_0_git;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *
@@ -1027,11 +1027,11 @@ PNG_EXPORT(22, void, png_read_info,
     * routine.  The original implementation used a 29 character buffer in
     * png_struct, this will be removed in future versions.
     */
-#if PNG_LIBPNG_VER < 10700
+//#if PNG_LIBPNG_VER < 10700
 /* To do: remove this from libpng17 (and from libpng17/png.c and pngstruct.h) */
 PNG_EXPORTA(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
     png_const_timep ptime),PNG_DEPRECATED);
-#endif
+//#endif
 PNG_EXPORT(241, int, png_convert_to_rfc1123_buffer, (char out[29],
     png_const_timep ptime));
 #endif

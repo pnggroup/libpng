@@ -15,7 +15,7 @@ ZLIBLIB=/usr/lib
 ZLIBINC=/usr/include
 
 # Library name:
-LIBNAME=libpng16
+LIBNAME=libpng18
 PNGMAJ=16
 
 # Shared library names:
@@ -36,7 +36,7 @@ DEFS=$(NOHWOPT)
 CPPFLAGS=-I$(ZLIBINC) $(DEFS)
 CFLAGS=-O3 -funroll-loops -Wall -Wextra -Wundef
 ARFLAGS=rc
-LDFLAGS=-L. -L$(ZLIBLIB) -lpng16 -lz
+LDFLAGS=-L. -L$(ZLIBLIB) -lpng18 -lz
 
 # Pre-built configuration
 # See scripts/pnglibconf.mak for more options

@@ -30,7 +30,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng16.dll"
+				OutputFile="$(OutDir)/libpng18.dll"
 				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -78,7 +78,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng16d.dll"
+				OutputFile="$(OutDir)/libpng18d.dll"
 				GenerateDebugInformation="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"/>
@@ -126,7 +126,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/libpng16vb.dll"
+				OutputFile="$(OutDir)/libpng18vb.dll"
 				LinkIncremental="1"/>
 			<Tool
 				Name="VCMIDLTool"/>

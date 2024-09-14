@@ -10,7 +10,7 @@
 # and license in png.h
 
 # Library name:
-LIBNAME=libpng16
+LIBNAME=libpng18
 PNGMAJ=16
 
 # Shared library names:
@@ -78,7 +78,7 @@ $(LIBSOMAJ): $(OBJSDLL)
 	 -o $(LIBSOMAJ) $(OBJSDLL) $(LDFLAGS)
 
 pngtest: pngtest.o $(LIBSO)
-	$(CC) -L$(ZLIBLIB) -L. -lz -lpng16 -o pngtest pngtest.o
+	$(CC) -L$(ZLIBLIB) -L. -lz -lpng18 -o pngtest pngtest.o
 
 test: pngtest
 	./pngtest

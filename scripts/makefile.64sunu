@@ -10,7 +10,7 @@
 # and license in png.h
 
 # Library name:
-LIBNAME=libpng16
+LIBNAME=libpng18
 PNGMAJ=16
 
 # Shared library names:
@@ -42,7 +42,7 @@ WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
 CFLAGS=$(SUN_CC_FLAGS) # $(WARNMORE) -g
 ARFLAGS=rc
-LDFLAGS=-L. -R. $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng16 -lz -lm
+LDFLAGS=-L. -R. $(SUN_LD_FLAGS) -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng18 -lz -lm
 
 OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
        pngread.o pngrio.o pngrtran.o pngrutil.o pngset.o \

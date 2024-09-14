@@ -11,7 +11,7 @@
 # and license in png.h
 
 # Library name:
-LIBNAME=libpng16
+LIBNAME=libpng18
 PNGMAJ=16
 
 # Shared library names:
@@ -41,7 +41,7 @@ ZLIBINC=/usr/include
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
 CFLAGS=-O3
 ARFLAGS=rc
-LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng16 -lz -lm
+LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng18 -lz -lm
 
 # Pre-built configuration
 # See scripts/pnglibconf.mak for more options
