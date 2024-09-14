@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - libpng16
+      - libpng18
   pull_request:
     branches:
       - libpng16
+      - libpng18
 
 jobs:
   lint:

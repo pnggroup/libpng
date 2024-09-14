@@ -1,6 +1,6 @@
 branches:
   except:
-    - /libpng[0-1][0-7]/
+    - /libpng[0-1][0-8]/
     - /v[0-1][.][0-7][.][0-9]+/
 
 language: c
