@@ -89,9 +89,9 @@ function ci_verify_version {
         fi
         if [[ $PNG_LIBPNG_BUILD_BASE_TYPE -eq $PNG_LIBPNG_BUILD_STABLE ]]
         then
-            ci_info "matched: \$PNG_LIBPNG_BUILD_BASE_TYPE -eq \$PNG_LIBPNG_BUILD_BETA"
+            ci_info "matched: \$PNG_LIBPNG_BUILD_BASE_TYPE -eq \$PNG_LIBPNG_BUILD_STABLE"
         else
-            ci_err "mismatched: \$PNG_LIBPNG_BUILD_BASE_TYPE -ne \$PNG_LIBPNG_BUILD_BETA"
+            ci_err "mismatched: \$PNG_LIBPNG_BUILD_BASE_TYPE -ne \$PNG_LIBPNG_BUILD_STABLE"
         fi
     elif [[ "$PNG_LIBPNG_VER_STRING" == "$my_expect".git ]]
     then
