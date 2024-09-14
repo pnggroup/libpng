@@ -6218,6 +6218,8 @@ Version 1.6.44 [September 12, 2024]
     (Contributed by Ben Wagner)
   Fixed and improved the config files for AppVeyor CI and Travis CI.
 
+Version 1.6.45 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
