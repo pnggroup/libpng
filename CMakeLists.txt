@@ -15,7 +15,7 @@
 #
 # SPDX-License-Identifier: libpng-2.0
 
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.14)
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
@@ -29,11 +29,6 @@ set(PNGLIB_SHARED_VERSION ${PNGLIB_ABI_VERSION}.${PNGLIB_REVISION}.${PNGLIB_SUBR
 project(libpng
         VERSION ${PNGLIB_VERSION}
         LANGUAGES C ASM)
-
-if(POLICY CMP0074)
-  # Allow find_package() to use the ZLIB_ROOT variable, if available.
-  cmake_policy(SET CMP0074 NEW)
-endif()
 
 include(CheckCSourceCompiles)
 include(GNUInstallDirs)
@@ -106,22 +101,21 @@ endif()
 message(STATUS "Building for target architecture: ${PNG_TARGET_ARCHITECTURE}")
 
 # Allow the users to specify a custom location of zlib.
-# This option is deprecated, and no longer needed with CMake 3.12 and newer.
-# Under the CMake policy CMP0074, if zlib is being built alongside libpng as a
-# subproject, its location can be passed on to CMake via the ZLIB_ROOT variable.
-option(PNG_BUILD_ZLIB "Custom zlib location, else find_package is used" OFF)
-if(NOT PNG_BUILD_ZLIB)
-  find_package(ZLIB REQUIRED)
-elseif(POLICY CMP0074)
+# With CMake 3.12 and newer, this option is no longer necessary.
+option(PNG_BUILD_ZLIB "[Deprecated; please use ZLIB_ROOT]" OFF)
+if(PNG_BUILD_ZLIB)
   if("x${ZLIB_ROOT}" STREQUAL "x")
-    message(DEPRECATION
-            "The option PNG_BUILD_ZLIB has been deprecated; please use ZLIB_ROOT instead")
+    message(SEND_ERROR
+            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} is no longer supported; "
+            "please use ZLIB_ROOT instead")
   else()
     message(SEND_ERROR
-            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} and "
-            "the variable ZLIB_ROOT=\"${ZLIB_ROOT}\" are mutually exclusive")
+            "The option PNG_BUILD_ZLIB=${PNG_BUILD_ZLIB} is no longer supported; "
+            "using ZLIB_ROOT=\"${ZLIB_ROOT}\"")
   endif()
 endif()
+
+find_package(ZLIB REQUIRED)
 
 if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
   find_library(M_LIBRARY m)
