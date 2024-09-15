@@ -31,6 +31,7 @@
 # Compiled executables
 *.app/
 *.exe
+a.out
 
 # Debug files
 *.dSYM/
@@ -38,24 +39,95 @@
 *.pdb
 *.su
 
+# Tag files
+TAGS
+.TAGS
+!TAGS/
+tags
+.tags
+!tags/
+gtags.files
+GTAGS
+GRTAGS
+GPATH
+GSYMS
+cscope.files
+cscope.out
+cscope.*.out
+
+# Text editing and text processing artifacts
+\#*\#
+.\#*
+[._]*.sw[a-p]
+[._]sw[a-p]
+*.bak
+*.orig
+*.rej
+*.tmp
+*~
+
+# IDE files and directories
+## Eclipse
+.cproject/
+.project/
+.settings/
+## JetBrains
+.idea/
+## NetBeans
+nbbuild/
+nbdist/
+nbproject/
+## Visual Studio
+.vs/
+### Visual Studio user files
+*.rsuser
+*.sln.docstates
+*.suo
+*.user
+*.userosscache
+*.userprefs
+### Visual Studio cache files (for older versions)
+*.aps
+*.cachefile
+*.ncb
+*.opensdf
+*.sdf
+*.VC.db
+*.VC.opendb
+ipch/
+## Visual Studio Code
+.vscode/*
+!.vscode/extensions.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/tasks.json
+## (Various)
+[._]*_history
+.history/
+
+# Build, test and CI output directories
+*[Dd]ebug/
+*[Rr]elease/
+*[Rr]eleases/
+[Ll]og/
+[Ll]ogs/
+[Oo]ut/
+
 # Libpng configuration and build artifacts
 *.out
+*out.png
 .deps/
 .dirstamp
 /Makefile
 /autom4te.cache/
-/config.guess~
-/config.h.in~
+/config*~
+/config.h
 /config.log
 /config.status
-/config.sub~
-/configure~
-/install-sh~
-/libpng-config
-/libpng.pc
+/install*~
+/libpng*-config
+/libpng*.pc
 /libpng.vers
-/libpng16-config
-/libpng16.pc
 /libtool
 /stamp-h1
 pnglibconf.[ch]
@@ -63,7 +135,7 @@ pnglibconf.dfn
 pnglibconf.pre
 pngprefix.h
 
-# Libpng test artifacts
+# Libpng test programs
 png-fix-itxt
 pngcp
 pngfix
@@ -73,7 +145,3 @@ pngtest
 pngunknown
 pngvalid
 timepng
-pngout.png
-
-# Libpng CI artifacts
-out/
