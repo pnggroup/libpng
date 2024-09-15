@@ -1,7 +1,7 @@
 /* pngstest.c
  *
  * Copyright (c) 2021-2024 Cosmin Truta
- * Copyright (c) 2013-2017 John Cunningham Bowler
+ * Copyright (c) 2013-2017,2024 John Cunningham Bowler
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
@@ -45,6 +45,18 @@
 
 #ifdef PNG_SIMPLIFIED_READ_SUPPORTED /* Else nothing can be done */
 #include "../tools/sRGB.h"
+
+/* This is a sanity check on PNG_HAS_ATTRIBUTE.
+ */
+#if PNG_HAS_ATTRIBUTE(__unknown__::attribute)
+#  error PNG_HAS_ATTRIBUTE is not working correctly
+#endif
+
+#if PNG_HAS_ATTRIBUTE(fallthrough)
+#  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#else
+#  define FALLTRHOUGH /* FALLTHROUGH */
+#endif
 
 /* KNOWN ISSUES
  *
@@ -2885,13 +2897,13 @@ compare_two_images(Image *a, Image *b, int via_linear,
                {
                   case 4:
                      if (pua[btoa[3]] != pub[3]) break;
-                     /* FALLTHROUGH */
+                     FALLTHROUGH; /* FALLTHROUGH */
                   case 3:
                      if (pua[btoa[2]] != pub[2]) break;
-                     /* FALLTHROUGH */
+                     FALLTHROUGH; /* FALLTHROUGH */
                   case 2:
                      if (pua[btoa[1]] != pub[1]) break;
-                     /* FALLTHROUGH */
+                     FALLTHROUGH; /* FALLTHROUGH */
                   case 1:
                      if (pua[btoa[0]] != pub[0]) break;
                      if (alpha_added != 4 && pub[alpha_added] != 65535) break;
@@ -2907,13 +2919,13 @@ compare_two_images(Image *a, Image *b, int via_linear,
                {
                   case 4:
                      if (psa[btoa[3]] != psb[3]) break;
-                     /* FALLTHROUGH */
+                     FALLTHROUGH; /* FALLTHROUGH */
                   case 3:
                      if (psa[btoa[2]] != psb[2]) break;
-                     /* FALLTHROUGH */
+                     FALLTHROUGH; /* FALLTHROUGH */
                   case 2:
                      if (psa[btoa[1]] != psb[1]) break;
-                     /* FALLTHROUGH */
+                     FALLTHROUGH; /* FALLTHROUGH */
                   case 1:
                      if (psa[btoa[0]] != psb[0]) break;
                      if (alpha_added != 4 && psb[alpha_added] != 255) break;

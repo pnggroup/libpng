@@ -298,7 +298,7 @@
 #ifndef PNG_EXPORTA
 #  define PNG_EXPORTA(ordinal, type, name, args, attributes) \
       PNG_FUNCTION(PNG_EXPORT_TYPE(type), (PNGAPI name), args, \
-      PNG_LINKAGE_API attributes)
+      attributes PNG_LINKAGE_API)
 #endif
 
 /* ANSI-C (C90) does not permit a macro to be invoked with an empty argument,
@@ -318,12 +318,35 @@
 #  define PNG_CALLBACK(type, name, args) type (PNGCBAPI name) args
 #endif
 
-/* Support for compiler specific function attributes.  These are used
- * so that where compiler support is available incorrect use of API
- * functions in png.h will generate compiler warnings.
+/* "Pedantic" warnings.  These are warnings which are about code which does not
+ * conform to style guidelines issued by one or other authority but which is
+ * still completely compliant with the C standards.
  *
- * Added at libpng-1.2.41.
+ * Some (but not all) of these can be disabled by definining
+ * PNG_NO_PEDANTIC_WARNINGS when application code is compiled against pngconf.h
+ * All can be removed by PNG_NO_ATTRIBUTES
+ *
+ * "Informational" notations.  These are notations which make statements about
+ * how the the libpng code.  They cannot be disabled if the compiler supports
+ * them.
+ *
+ * Both these classes of notation are implemented using the "attribute" syntax
+ * defined along with the ISO-C23 standard.  The test, however, is for the
+ * standard defined "attribute testing" mechanism.  This is now supported in the
+ * common compilers, gcc clang and Microsoft VisualC in a consistent way.
+ *
+ * If necessary users of older compiles may define the individual macros to
+ * preempt the standard definition however it is much better to upgrade to a
+ * compiler with the ISO standard support!
+ *
+ * [[changed in libpng 1.8 to use the standard notation]]
  */
+
+#ifndef PNG_NO_ATTRIBUTES
+#  ifndef PNG_ATTRIBUTES_SUPPORTED
+#    define PNG_ATTRIBUTES_SUPPORTED
+#  endif
+#endif
 
 #ifndef PNG_NO_PEDANTIC_WARNINGS
 #  ifndef PNG_PEDANTIC_WARNINGS_SUPPORTED
@@ -331,117 +354,130 @@
 #  endif
 #endif
 
-#ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
-  /* Support for compiler specific function attributes.  These are used
-   * so that where compiler support is available, incorrect use of API
-   * functions in png.h will generate compiler warnings.  Added at libpng
-   * version 1.2.41.  Disabling these removes the warnings but may also produce
-   * less efficient code.
-   */
-#  if defined(__clang__) && defined(__has_attribute)
-   /* Clang defines both __clang__ and __GNUC__. Check __clang__ first. */
-#    if !defined(PNG_USE_RESULT) && __has_attribute(__warn_unused_result__)
-#      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
-#    endif
-#    if !defined(PNG_NORETURN) && __has_attribute(__noreturn__)
-#      define PNG_NORETURN __attribute__((__noreturn__))
-#    endif
-#    if !defined(PNG_ALLOCATED) && __has_attribute(__malloc__)
-#      define PNG_ALLOCATED __attribute__((__malloc__))
-#    endif
-#    if !defined(PNG_DEPRECATED) && __has_attribute(__deprecated__)
-#      define PNG_DEPRECATED __attribute__((__deprecated__))
-#    endif
-#    if !defined(PNG_PRIVATE)
-#      ifdef __has_extension
-#        if __has_extension(attribute_unavailable_with_message)
-#          define PNG_PRIVATE __attribute__((__unavailable__(\
-             "This function is not exported by libpng.")))
-#        endif
-#      endif
-#    endif
-#    ifndef PNG_RESTRICT
-#      define PNG_RESTRICT __restrict
-#    endif
-
-#  elif defined(__GNUC__)
-#    ifndef PNG_USE_RESULT
-#      define PNG_USE_RESULT __attribute__((__warn_unused_result__))
-#    endif
-#    ifndef PNG_NORETURN
-#      define PNG_NORETURN   __attribute__((__noreturn__))
-#    endif
-#    if __GNUC__ >= 3
-#      ifndef PNG_ALLOCATED
-#        define PNG_ALLOCATED  __attribute__((__malloc__))
-#      endif
-#      ifndef PNG_DEPRECATED
-#        define PNG_DEPRECATED __attribute__((__deprecated__))
-#      endif
-#      ifndef PNG_PRIVATE
-#        if 0 /* Doesn't work so we use deprecated instead*/
-#          define PNG_PRIVATE \
-            __attribute__((warning("This function is not exported by libpng.")))
-#        else
-#          define PNG_PRIVATE \
-            __attribute__((__deprecated__))
-#        endif
-#      endif
-#      if ((__GNUC__ > 3) || !defined(__GNUC_MINOR__) || (__GNUC_MINOR__ >= 1))
-#        ifndef PNG_RESTRICT
-#          define PNG_RESTRICT __restrict
-#        endif
-#      endif /* __GNUC__.__GNUC_MINOR__ > 3.0 */
-#    endif /* __GNUC__ >= 3 */
-
-#  elif defined(_MSC_VER)  && (_MSC_VER >= 1300)
-#    ifndef PNG_USE_RESULT
-#      define PNG_USE_RESULT /* not supported */
-#    endif
-#    ifndef PNG_NORETURN
-#      define PNG_NORETURN   __declspec(noreturn)
-#    endif
-#    ifndef PNG_ALLOCATED
-#      if (_MSC_VER >= 1400)
-#        define PNG_ALLOCATED __declspec(restrict)
-#      endif
-#    endif
-#    ifndef PNG_DEPRECATED
-#      define PNG_DEPRECATED __declspec(deprecated)
-#    endif
-#    ifndef PNG_PRIVATE
-#      define PNG_PRIVATE __declspec(deprecated)
-#    endif
-#    ifndef PNG_RESTRICT
-#      if (_MSC_VER >= 1400)
-#        define PNG_RESTRICT __restrict
-#      endif
-#    endif
-
-#  elif defined(__WATCOMC__)
-#    ifndef PNG_RESTRICT
-#      define PNG_RESTRICT __restrict
-#    endif
+/* IMPORTANT: the following produces a warning with GCC if used with an
+ * attribute which GCC does not support even though it is part of the standard
+ * therefore a test on __has_c_attribute(token) is used below to prevent such
+ * warnings.
+ *
+ * If the build system provides a definition of PNG_ATTRIBUTE it must also
+ * define PNG_HAS_ATTRIBUTE somehow (e.g. to the value 1) to get the
+ * attributes to be used.
+ */
+#ifndef PNG_ATTRIBUTE
+#  if defined(PNG_ATTRIBUTES_SUPPORTED) && defined(__has_c_attribute)
+#     define PNG_ATTRIBUTE(token) [/**/[token]/**/]
+#     ifndef PNG_HAS_ATTRIBUTE
+#        define PNG_HAS_ATTRIBUTE(token) __has_c_attribute(token)
+#     endif
+#  else
+#     define PNG_ATTRIBUTE(token) /*token*/
 #  endif
-#endif /* PNG_PEDANTIC_WARNINGS */
+#endif
+
+#ifndef PNG_HAS_ATTRIBUTE
+#  define PNG_HAS_ATTRIBUTE(token) 0
+   /* Do this to be safe: */
+#  undef PNG_ATTRIBUTE
+#  define PNG_ATTRIBUTE(token) /*token*/
+#endif
+
+#ifndef PNG_WARN
+#  ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
+#     define PNG_WARN(token) PNG_ATTRIBUTE(token)
+#  else
+#     define PNG_WARN(token) /*token*/
+#  endif
+#endif
+
+/* Hence these notations (or attributes as that is how they are implemented).
+ *
+ * NOTE: use __token__ forms here because these identifiers might otherwise be
+ * #defined in the application code.  This is an issue because the token is
+ * passed in a macro argument, normally __has_c_attribute and [[token]] would
+ * not expand the token (apparently).
+ *
+ * The [[deprecated]] warning is now forced on unless disabled by the user
+ * of libpng (-DPNG_WARN=).  This is deliberate to encourage users to remove
+ * deprecated functionality before it is removed.
+ *
+ * __malloc__ is a GNU extension (not standardized, or not yet standardized.)
+ */
+#ifndef PNG_DEPRECATE
+#  if PNG_HAS_ATTRIBUTE(__deprecated__)
+#     define PNG_DEPRECATE(reason) PNG_ATTRIBUTE(__deprecated__(reason))
+#  else
+#     define PNG_DEPRECATE(reason) /*deprecated*/
+#  endif
+#endif
+
+#ifndef PNG_USE_RESULT
+#  if PNG_HAS_ATTRIBUTE(__nodiscard__)
+#     define PNG_USE_RESULT PNG_WARN(__nodiscard__)
+#     define PNG_NODISCARD(reason) PNG_WARN(__nodiscard__(reason))
+#  else
+#     define PNG_USE_RESULT /*nodiscard*/
+#     define PNG_NODISCARD(reason) /*nodiscard*/
+#  endif
+#endif
+
+#ifndef PNG_NORETURN
+#  if PNG_HAS_ATTRIBUTE(__noreturn__)
+#     define PNG_NORETURN PNG_ATTRIBUTE(__noreturn__)
+#  else
+#     define PNG_NORETURN /*noreturn*/
+#  endif
+#endif
+
+#ifndef PNG_MALLOCED /* added to PNG_ALLOCATED below */
+#  if PNG_HAS_ATTRIBUTE(__gnu__::__malloc__)
+      /* This is informational: it tells the caller that the result is a freshly
+       * allocated pointer.  See the GNU documentation.
+       */
+#     define PNG_MALLOCED PNG_ATTRIBUTE(__gnu__::__malloc__)
+#  else
+#     define PNG_MALLOCED /*allocated*/
+#  endif
+#endif
+
+#ifndef PNG_ALLOCATED
+#  define PNG_ALLOCATED PNG_NODISCARD(\
+      "The pointer to allocated memory returned by this function is ignored.")\
+      PNG_MALLOCED
+#endif
 
 #ifndef PNG_DEPRECATED
-#  define PNG_DEPRECATED  /* Use of this function is deprecated */
+#  define PNG_DEPRECATED PNG_DEPRECATE(\
+      "This function will be removed in the next major release of libpng.")
 #endif
-#ifndef PNG_USE_RESULT
-#  define PNG_USE_RESULT  /* The result of this function must be checked */
-#endif
-#ifndef PNG_NORETURN
-#  define PNG_NORETURN    /* This function does not return */
-#endif
-#ifndef PNG_ALLOCATED
-#  define PNG_ALLOCATED   /* The result of the function is new memory */
-#endif
+
 #ifndef PNG_PRIVATE
-#  define PNG_PRIVATE     /* This is a private libpng function */
+   /* This warns that the build of the application code will fail to link:
+    */
+#  define PNG_PRIVATE PNG_DEPRECATE(\
+      "This function is not exported by this build of libpng.")
 #endif
+
+/* C99 'restrict' is not an attribute, it's just a type qualified like const
+ * or volatile.  PNG_RESTRICT is defined to either 'restrict' (if available)
+ * or empty.  Note that some environments, like 'configure' ones, work out
+ * a #define for 'restrict' so the following might evaluated to something other
+ * than the keyword 'restrict' on C99.
+ */
+#if !defined(PNG_RESTRICT) && defined(__STDC_VERSION__)
+#  if __STDC_VERSION__ >= 199901L/*C99*/
+#     define PNG_RESTRICT restrict
+#  endif
+#endif
+
+/* This is the case if the app has included something like the configure
+ * config.h file:
+ */
+#if !defined(PNG_RESTRICT) && defined(restrict)
+#  define PNG_RESTRICT restrict
+#endif
+
 #ifndef PNG_RESTRICT
-#  define PNG_RESTRICT    /* The C99 "restrict" feature */
+#  define PNG_RESTRICT /*restrict*/
 #endif
 
 #ifndef PNG_FP_EXPORT     /* A floating point API. */

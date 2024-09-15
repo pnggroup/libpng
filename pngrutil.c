@@ -3104,7 +3104,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
          case 2:
             png_ptr->user_chunk_cache_max = 1;
             png_chunk_benign_error(png_ptr, "no space in chunk cache");
-            /* FALLTHROUGH */
+            PNG_FALLTHROUGH; /* FALLTHROUGH */
          case 1:
             /* NOTE: prior to 1.6.0 this case resulted in an unknown critical
              * chunk being skipped, now there will be a hard error below.
@@ -3113,7 +3113,7 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
 
          default: /* not at limit */
             --(png_ptr->user_chunk_cache_max);
-            /* FALLTHROUGH */
+            PNG_FALLTHROUGH; /* FALLTHROUGH */
          case 0: /* no limit */
 #  endif /* USER_LIMITS */
             /* Here when the limit isn't reached or when limits are compiled
