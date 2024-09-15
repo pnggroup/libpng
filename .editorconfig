@@ -9,24 +9,29 @@ trim_trailing_whitespace = true
 
 [*.txt]
 indent_style = space
+indent_size = 3
 
 [*.[chS]]
 indent_style = space
+indent_size = 3
 max_doc_length = 80
 max_line_length = 80
 
 [*.dfa]
 indent_style = space
+indent_size = 3
 max_doc_length = 80
 max_line_length = 80
 
 [*.{awk,cmake}]
 indent_style = space
+indent_size = 3
 max_doc_length = 80
 max_line_length = 100
 
 [*.{in,sh}]
 indent_style = space
+indent_size = 3
 max_doc_length = 100
 max_line_length = 100
 
