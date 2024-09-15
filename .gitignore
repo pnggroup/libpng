@@ -49,6 +49,7 @@
 /compile
 /config*~
 /config.guess
+/config.h
 /config.h.in
 /config.log
 /config.status
@@ -63,6 +64,8 @@
 /libtool
 /ltmain.sh
 /missing
+/scripts/autoconf/libtool.m4
+/scripts/autoconf/lt*.m4
 /stamp-h1
 /test-driver
 pnglibconf.[ch]
