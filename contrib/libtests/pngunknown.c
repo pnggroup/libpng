@@ -3,6 +3,7 @@
  *
  * Copyright (c) 2021-2024 Cosmin Truta
  * Copyright (c) 2015,2017 Glenn Randers-Pehrson
+ * Copyright (c) 2015-2016,2024 John Bowler
  * Written by John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -37,6 +38,12 @@
 #  define SKIP 77
 #else
 #  define SKIP 0
+#endif
+
+#if PNG_HAS_ATTRIBUTE(fallthrough)
+#  define FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#else
+#  define FALLTRHOUGH /* FALLTHROUGH */
 #endif
 
 
@@ -434,7 +441,7 @@ clean_display(display *d)
    }
 }
 
-PNG_FUNCTION(void, display_exit, (display *d), static PNG_NORETURN)
+PNG_FUNCTION(void, display_exit, (display *d), PNG_NORETURN static)
 {
    ++(d->error_count);
 
@@ -458,7 +465,7 @@ display_rc(const display *d, int strict)
 
 /* libpng error and warning callbacks */
 PNG_FUNCTION(void, (PNGCBAPI error), (png_structp png_ptr, const char *message),
-   static PNG_NORETURN)
+   PNG_NORETURN static)
 {
    display *d = (display*)png_get_error_ptr(png_ptr);
 
@@ -624,7 +631,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
                   ++(d->error_count);
                   break;
                }
-               /* FALLTHROUGH */ /* (safe) */
+               FALLTHROUGH; /* (safe) */ /* FALLTHROUGH */
             case PNG_HANDLE_CHUNK_ALWAYS:
                break;
          }
@@ -1105,7 +1112,7 @@ static const char *standard_tests[] =
    NULL /*end*/
 };
 
-static PNG_NORETURN void
+PNG_NORETURN static void
 usage(const char *program, const char *reason)
 {
    fprintf(stderr, "pngunknown: %s: usage:\n %s [--strict] "
