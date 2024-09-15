@@ -47,22 +47,6 @@
 
 #define PNGLIB_BUILD /*libpng is being built, not used*/
 
-/* If HAVE_CONFIG_H is defined during the build then the build system must
- * provide an appropriate "config.h" file on the include path.  The header file
- * must provide definitions as required below (search for "HAVE_CONFIG_H");
- * see configure.ac for more details of the requirements.  The macro
- * "PNG_NO_CONFIG_H" is provided for maintainers to test for dependencies on
- * 'configure'; define this macro to prevent the configure build including the
- * configure generated config.h.  Libpng is expected to compile without *any*
- * special build system support on a reasonably ANSI-C compliant system.
- */
-#if defined(HAVE_CONFIG_H) && !defined(PNG_NO_CONFIG_H)
-#  include <config.h>
-
-   /* Pick up the definition of 'restrict' from config.h if it was read: */
-#  define PNG_RESTRICT restrict
-#endif
-
 /* To support symbol prefixing it is necessary to know *before* including png.h
  * whether the fixed point (and maybe other) APIs are exported, because if they
  * are not internal definitions may be required.  This is handled below just
@@ -166,13 +150,12 @@
 
 #ifndef PNG_INTERNAL_FUNCTION
 #  define PNG_INTERNAL_FUNCTION(type, name, args, attributes)\
-      PNG_LINKAGE_FUNCTION PNG_FUNCTION(type, name, args, PNG_EMPTY attributes)
+      PNG_FUNCTION(type, name, args, attributes PNG_LINKAGE_FUNCTION)
 #endif
 
 #ifndef PNG_INTERNAL_CALLBACK
 #  define PNG_INTERNAL_CALLBACK(type, name, args, attributes)\
-      PNG_LINKAGE_CALLBACK PNG_FUNCTION(type, (PNGCBAPI name), args,\
-         PNG_EMPTY attributes)
+      PNG_FUNCTION(type, (PNGCBAPI name), args, attributes PNG_LINKAGE_CALLBACK)
 #endif
 
 /* If floating or fixed point APIs are disabled they may still be compiled
@@ -248,14 +231,41 @@
 #  define PNG_MAX_MALLOC_64K
 #endif
 
+#ifndef PNG_MAYBE_UNUSED
+   /* Unused formal parameter warnings can be silenced by using this macro
+    * to qualify the declaration, but see PNG_UNUSED below.
+    * macro.  Note this is used in the #if code path where the parameter
+    * is not used.
+    */
+#  if PNG_HAS_ATTRIBUTE(maybe_unused)
+#     define PNG_MAYBE_UNUSED PNG_ATTRIBUTE(maybe_unused)
+#  else
+#     define PNG_MAYBE_UNUSED /*maybe unused*/
+#  endif
+#endif
+
 #ifndef PNG_UNUSED
-/* Unused formal parameter warnings are silenced using the following macro
- * which is expected to have no bad effects on performance (optimizing
- * compilers will probably remove it entirely).  Note that if you replace
- * it with something other than whitespace, you must include the terminating
- * semicolon.
- */
+   /* As a better alternative to the above use this macro in (at the end of)
+    * the #if code tree where the parameter is not used.  Note that this macro
+    * includes a ";" if it is defined and the parameter must be a single token.
+    */
 #  define PNG_UNUSED(param) (void)param;
+#endif
+
+#ifndef PNG_FALLTHROUGH
+   /* This notation is used immediately above a switch case label to indicate
+    * that the preceding code "falls through" to the next label.  Some
+    * authorities regard this as a bad thing to do but libpng does it a lot.
+    *
+    * NOTE: this must be used in the form:
+    *
+    *    PNG_FALLTHROUGH;
+    */
+#  if PNG_HAS_ATTRIBUTE(fallthrough)
+#     define PNG_FALLTHROUGH PNG_ATTRIBUTE(fallthrough)
+#  else
+#     define PNG_FALLTHROUGH /* FALLTHROUGH */
+#  endif
 #endif
 
 /* Just a little check that someone hasn't tried to define something
