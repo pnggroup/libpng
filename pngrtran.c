@@ -4191,9 +4191,8 @@ png_do_encode_alpha(png_row_infop row_info, png_bytep row, png_structrp png_ptr)
  * upon whether you supply trans and num_trans.
  */
 static void
-png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
-    png_bytep row, png_const_colorp palette, png_const_bytep trans_alpha,
-    int num_trans)
+png_do_expand_palette(png_row_infop row_info, png_bytep row, png_const_colorp
+      palette, png_const_bytep trans_alpha, int num_trans)
 {
    int shift, value;
    png_bytep sp, dp;
@@ -4298,21 +4297,7 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                dp = row + ((size_t)row_width << 2) - 1;
 
                i = 0;
-#ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
-               if ((png_ptr->target_state & png_target_palette) != 0)
-               {
-                  /* The RGBA optimization works with png_ptr->bit_depth == 8
-                   * but sometimes row_info->bit_depth has been changed to 8.
-                   * In these cases, the palette hasn't been riffled.
-                   */
-                  i = png_do_expand_palette_rgba8_neon(png_ptr, row_info, row,
-                      &sp, &dp);
-               }
-#else
-               PNG_UNUSED(png_ptr)
-#endif
-
-               for (; i < row_width; i++)
+               for (i = 0; i < row_width; i++)
                {
                   if ((int)(*sp) >= num_trans)
                      *dp-- = 0xff;
@@ -4334,15 +4319,7 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
             {
                sp = row + (size_t)row_width - 1;
                dp = row + (size_t)(row_width * 3) - 1;
-               i = 0;
-#ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
-               i = png_do_expand_palette_rgb8_neon(png_ptr, row_info, row,
-                   &sp, &dp);
-#else
-               PNG_UNUSED(png_ptr)
-#endif
-
-               for (; i < row_width; i++)
+               for (i = 0; i < row_width; i++)
                {
                   *dp-- = palette[*sp].blue;
                   *dp-- = palette[*sp].green;
@@ -4757,18 +4734,13 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
       if (row_info->color_type == PNG_COLOR_TYPE_PALETTE)
       {
 #ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
-         if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8))
-         {
-            if (png_ptr->riffled_palette == NULL)
-            {
-               /* Initialize the accelerated palette expansion. */
-               png_ptr->riffled_palette =
-                   (png_bytep)png_malloc(png_ptr, 256 * 4);
-               png_riffle_palette_neon(png_ptr);
-            }
-         }
+         /* Do not call 'png_do_expand_palette' if the SIMD implementation
+          * does it (note that this accomodates SIMD implementations which might
+          * only handle specific cases).
+          */
+         if (!png_target_do_expand_palette(png_ptr, row_info))
 #endif
-         png_do_expand_palette(png_ptr, row_info, png_ptr->row_buf + 1,
+         png_do_expand_palette(row_info, png_ptr->row_buf + 1,
              png_ptr->palette, png_ptr->trans_alpha, png_ptr->num_trans);
       }
 

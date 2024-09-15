@@ -1100,7 +1100,7 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row,(png_structrp pp, png_row_infop
  * available for this image.
  */
 #define png_target_filters 1 /* MASK: hardware support for filters */
-#define png_target_palette 2 /* MASK: hardware support for palettes */
+#define png_target_expand_palette 2 /* MASK: hardware support for palettes */
 
 PNG_INTERNAL_FUNCTION(void,png_target_init,(png_structrp),PNG_EMPTY);
    /* Initialize png_struct::target_state if required. */
@@ -1115,15 +1115,17 @@ PNG_INTERNAL_FUNCTION(void, png_target_init_filter_functions,
     * implementation.  Called once before the first row needs to be defiltered.
     */
 
-PNG_INTERNAL_FUNCTION(void, png_target_init_palette_support, (png_structrp),
-   PNG_EMPTY);
-PNG_INTERNAL_FUNCTION(int, png_target_do_expand_palette, (png_structrp,
-   png_row_infop, png_const_bytep, const png_bytepp, const png_bytepp),
-   PNG_EMPTY);
-   /* Two functions to set up and execute palette expansion.  The 'init'
-    * must succeed but then the 'do_expand' might, apparently, still fail.
-    */
-#endif /* HARDWARE */
+/* Handlers for specific transforms (currently only 'expand_palette').  These
+ * are implemented in pngsimd.c to call the actual SIMD implementation if
+ * required.
+ *
+ * The handlers return "false" if nothing was done and the C code will then be
+ * called.  The implementations must do everything or nothing.
+ */
+PNG_INTERNAL_FUNCTION(int, png_target_do_expand_palette,
+      (png_structrp, png_row_infop), PNG_EMPTY);
+   /* Expand the palette and return true or do nothing and return false. */
+#endif /* TARGET_CODE */
 
 /* Choose the best filter to use and filter the row data */
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,

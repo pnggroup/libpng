@@ -11,12 +11,9 @@
 
 /* Build an RGBA8 palette from the separate RGB and alpha palettes. */
 static void
-png_riffle_palette_neon(png_structrp png_ptr)
+png_riffle_palette_neon(png_bytep riffled_palette, png_const_colorp palette,
+      png_const_bytep trans_alpha, int num_trans)
 {
-   png_const_colorp palette = png_ptr->palette;
-   png_bytep riffled_palette = png_ptr->riffled_palette;
-   png_const_bytep trans_alpha = png_ptr->trans_alpha;
-   int num_trans = png_ptr->num_trans;
    int i;
 
    /* Initially black, opaque. */
@@ -47,19 +44,15 @@ png_riffle_palette_neon(png_structrp png_ptr)
 }
 
 /* Expands a palettized row into RGBA8. */
-static int
-png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
-    png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
+static png_uint_32
+png_target_do_expand_palette_rgba8_neon(const png_uint_32 *riffled_palette,
+      png_uint_32 row_width, png_const_bytep *ssp, png_bytep *ddp)
 {
-   png_uint_32 row_width = row_info->width;
-   const png_uint_32 *riffled_palette =
-      (const png_uint_32 *)png_ptr->riffled_palette;
    const png_uint_32 pixels_per_chunk = 4;
    png_uint_32 i;
 
    png_debug(1, "in png_do_expand_palette_rgba8_neon");
 
-   PNG_UNUSED(row)
    if (row_width < pixels_per_chunk)
       return 0;
 
@@ -72,7 +65,8 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
    for (i = 0; i < row_width; i += pixels_per_chunk)
    {
       uint32x4_t cur;
-      png_bytep sp = *ssp - i, dp = *ddp - (i << 2);
+      png_const_bytep sp = *ssp - i;
+      png_bytep dp = *ddp - (i << 2);
       cur = vld1q_dup_u32 (riffled_palette + *(sp - 3));
       cur = vld1q_lane_u32(riffled_palette + *(sp - 2), cur, 1);
       cur = vld1q_lane_u32(riffled_palette + *(sp - 1), cur, 2);
@@ -92,18 +86,18 @@ png_do_expand_palette_rgba8_neon(png_structrp png_ptr, png_row_infop row_info,
 }
 
 /* Expands a palettized row into RGB8. */
-static int
-png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
-    png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
+static png_uint_32
+png_target_do_expand_palette_rgb8_neon(png_const_colorp paletteIn,
+      png_uint_32 row_width, png_const_bytep *ssp, png_bytep *ddp)
 {
-   png_uint_32 row_width = row_info->width;
-   png_const_bytep palette = (png_const_bytep)png_ptr->palette;
+   /* TODO: This case is VERY dangerous: */
+   png_const_bytep palette = (png_const_bytep)paletteIn;
+
    const png_uint_32 pixels_per_chunk = 8;
    png_uint_32 i;
 
    png_debug(1, "in png_do_expand_palette_rgb8_neon");
 
-   PNG_UNUSED(row)
    if (row_width <= pixels_per_chunk)
       return 0;
 
@@ -113,7 +107,8 @@ png_do_expand_palette_rgb8_neon(png_structrp png_ptr, png_row_infop row_info,
    for (i = 0; i < row_width; i += pixels_per_chunk)
    {
       uint8x8x3_t cur;
-      png_bytep sp = *ssp - i, dp = *ddp - ((i << 1) + i);
+      png_const_bytep sp = *ssp - i;
+      png_bytep dp = *ddp - ((i << 1) + i);
       cur = vld3_dup_u8(palette + sizeof(png_color) * (*(sp - 7)));
       cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 6)), cur, 1);
       cur = vld3_lane_u8(palette + sizeof(png_color) * (*(sp - 5)), cur, 2);

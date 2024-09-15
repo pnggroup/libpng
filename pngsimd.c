@@ -35,29 +35,22 @@
  *       UNDEFINED if PNG_TARGET_STORES_DATA is not defined
  *       A function to free data stored in png_struct::target_data.
  *
- *    png_target_init_filter_functions_impl
+ *    png_target_init_filter_functions_impl [flag: png_target_filters]
  *       OPTIONAL 
  *       Contains code to overwrite the png_struct::read_filter array, see
  *       the definition of png_init_filter_functions.  Need not be defined,
  *       only called if target_state contains png_target_filters.
  *
- *    png_target_init_palette_support_impl
+ *    png_target_do_expand_palette_impl   [flag: png_target_expand_palette]
  *       static function
  *       OPTIONAL
- *       Contains code to initialize a palette transformation.  This returns
- *       true if something has been set up.  Only called if the state contains
- *       png_target_palette, need not be defined, may cancel the state flag
- *       in the png_struct to prevent further calls.
+ *       Handles the transform.  Need not be defined, only called if the
+ *       state contains png_target_<transform>, may set this flag to zero, may
+ *       return false to indicate that the transform was not done (so the
+ *       C implementation must then execute).
  *
- *    png_target_do_expand_palette_impl
- *       static function
- *       OPTIONAL
- *       Handles palette expansion.  Need not be defined, only called if the
- *       state contains png_target_palette, may set this flag to zero, may
- *       return false to indicate that the expansion was not done.
- *
- * Either png_target_init_filter_functions_impl or
- * png_target_do_expand_palette_impl must be defined.
+ * Note that pngtarget.h verifies that at least one thing is implemented, the
+ * checks below ensure that the corresponding _impl macro is defined.
  */
 
 /* This will fail in an obvious way with a meaningful error message if the file
@@ -70,12 +63,17 @@
 #endif
 
 #if defined(PNG_TARGET_STORES_DATA) != defined(png_target_free_data_impl)
-#  error HARDWARE: PNG_TARGET_STORES_DATA !match png_target_free_data_impl
+#  error HARDWARE: png_target_free_data_impl unexpected setting
 #endif
 
-#if !defined(png_target_init_filter_functions_impl) &&\
-    !defined(png_target_init_palette_support)
-#  error HARDWARE: target specifc code turned on but none provided
+#if defined(PNG_TARGET_IMPLEMENTS_FILTERS) !=\
+    defined(png_target_init_filter_functions_impl)
+#  error HARDWARE: png_target_init_filter_functions_impl unexpected setting
+#endif
+
+#if defined(PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE) !=\
+    defined(png_target_do_expand_palette_impl)
+#  error HARDWARE: png_target_do_expand_palette_impl unexpected setting
 #endif
 
 void
@@ -88,7 +86,7 @@ png_target_init(png_structrp pp)
 #     define F 0U
 #  endif
 #  ifdef png_target_do_expand_palette_impl
-#     define P png_target_palette
+#     define P png_target_expand_palette
 #  else
 #     define P 0U
 #  endif
@@ -101,9 +99,6 @@ png_target_init(png_structrp pp)
 }
 
 #ifdef PNG_TARGET_STORES_DATA
-#ifndef png_target_free_data_impl
-#  error PNG_TARGET_STORES_DATA defined without implementation
-#endif
 void
 png_target_free_data(png_structrp pp)
 {
@@ -111,7 +106,7 @@ png_target_free_data(png_structrp pp)
     */
    if (pp->target_data != NULL)
    {
-         png_target_free_data_impl(pp);
+      png_target_free_data_impl(pp);
       if (pp->target_data != NULL)
          png_error(pp, png_target_impl ": allocated data not released");
    }
@@ -119,9 +114,6 @@ png_target_free_data(png_structrp pp)
 #endif
 
 #ifdef PNG_TARGET_IMPLEMENTS_FILTERS
-#ifndef png_target_init_filter_functions_impl
-#  error PNG_TARGET_IMPLEMENTS_FILTERS defined without implementation
-#endif
 void
 png_target_init_filter_functions(png_structp pp, unsigned int bpp)
 {
@@ -132,55 +124,17 @@ png_target_init_filter_functions(png_structp pp, unsigned int bpp)
 #endif /* filters */
 
 #ifdef PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE
-#ifndef png_target_init_palette_support_impl
-#  error PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE defined without implementation
-#endif
-void
-png_target_init_palette_support(png_structrp pp)
-{
-   if (((pp->options >> PNG_TARGET_SPECIFIC_CODE) & 3) == PNG_OPTION_ON &&
-       (pp->target_state & png_target_palette) != 0 &&
-      !png_target_init_palette_support_impl(pp, bpp))
-      png_ptr->target_state &= ~png_target_palette;
-}
-
-#ifndef png_target_do_expand_palette_impl
-#  error PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE defined without implementation
-#endif
 int
-png_target_do_expand_palette(png_structrp pp, png_row_infop rip,
-   png_const_bytep row, const png_bytepp ssp, const png_bytepp ddp)
+png_target_do_expand_palette(png_structrp pp, png_row_infop rip)
+   /*png_const_bytep row, const png_bytepp ssp, const png_bytepp ddp) */
 {
-   if (((pp->options >> PNG_TARGET_SPECIFIC_CODE) & 3) == PNG_OPTION_ON &&
-       (pp->target_state & png_target_palette) != 0)
-      return png_target_do_expand_palette_impl(pp, rip, row, ssp, ddp);
+   /* This is exactly like 'png_do_expand_palette' except that there is a check
+    * on the options and target_state:
+    */
+   return ((pp->options >> PNG_TARGET_SPECIFIC_CODE) & 3) == PNG_OPTION_ON &&
+      (pp->target_state & png_target_expand_palette) != 0 &&
+      png_target_do_expand_palette_impl(pp, rip, pp->row_buf + 1,
+            pp->palette, pp->trans_alpha, pp->num_trans);
 }
-#endif /* palette */
-
-/*
- *    png_target_init_impl
- *       Set the mask of png_target_support values to
- *       png_struct::target_state.  If the value is non-0 hardware support
- *       will be recorded as enabled.
- *
- *    png_target_free_data_impl
- *       Must be defined if the implementation stores data in
- *       png_struct::target_data.  Need not be defined otherwise.
- *
- *    png_target_init_filter_functions_impl
- *       Contains code to overwrite the png_struct::read_filter array, see
- *       the definition of png_init_filter_functions.  Need not be defined,
- *       only called if the state contains png_target_filters.
- *
- *    png_target_init_palette_support_impl
- *       Contains code to initialize a palette transformation.  This returns
- *       true if something has been set up.  Only called if the state contains
- *       png_target_palette, need not be defined, may cancel the state flag
- *       in the png_struct to prevent further calls.
- *
- *    png_target_do_expand_palette
- *       Handles palette expansion.  Need not be defined, only called if the
- *       state contains png_target_palette, may set this flag to zero, may
- *       return false to indicate that the expansion was not done.
- */
+#endif /* EXPAND_PALETTE */
 #endif /* PNG_TARGET_ARCH */
