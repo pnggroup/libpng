@@ -32,6 +32,9 @@
 *.app/
 *.exe
 
+# Compiled dependencies
+.deps/
+
 # Debug files
 *.dSYM/
 *.idb
@@ -40,31 +43,11 @@
 
 # Libpng configuration and build artifacts
 *.out
-.deps/
 .dirstamp
-/Makefile
-/Makefile.in
-/aclocal.m4
-/autom4te.cache/
-/compile
-/config*~
-/config.guess
-/config.h.in
-/config.log
-/config.status
-/config.sub
-/configure
-/depcomp
-/install*~
-/install-sh
 /libpng*-config
 /libpng*.pc
 /libpng.vers
 /libtool
-/ltmain.sh
-/missing
-/stamp-h1
-/test-driver
 pnglibconf.[ch]
 pnglibconf.dfn
 pnglibconf.pre
@@ -84,3 +67,35 @@ pngout.png
 
 # Libpng CI artifacts
 out/
+
+# configure artefacts
+Makefile.in
+aclocal.m4
+autom4te.cache/
+compile
+config.guess
+config.h.in
+config.sub
+configure
+depcomp
+install-sh
+ltmain.sh
+missing
+scripts/autoconf/libtool.m4
+scripts/autoconf/ltoptions.m4
+scripts/autoconf/ltsugar.m4
+scripts/autoconf/ltversion.m4
+scripts/autoconf/lt~obsolete.m4
+test-driver
+
+# stuff added by typing "configure":
+Makefile
+config.h
+config.log
+config.status
+stamp-h1
+
+
+# VIMefacts
+.*.un~
+.*.swp
