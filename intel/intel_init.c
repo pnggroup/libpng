@@ -1,4 +1,3 @@
-
 /* intel_init.c - SSE2 optimized filter functions
  *
  * Copyright (c) 2018 Cosmin Truta
@@ -10,13 +9,11 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
+#define png_target_impl "intel-sse"
 
-#include "../pngpriv.h"
+#include "filter_sse2_intrinsics.c"
 
-#ifdef PNG_READ_SUPPORTED
-#if PNG_INTEL_SSE_IMPLEMENTATION > 0
-
-void
+static void
 png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
 {
    /* The techniques used to implement each of these filters in SSE operate on
@@ -48,5 +45,4 @@ png_init_filter_functions_sse2(png_structp pp, unsigned int bpp)
     */
 }
 
-#endif /* PNG_INTEL_SSE_IMPLEMENTATION > 0 */
-#endif /* PNG_READ_SUPPORTED */
+#define png_target_init_filter_functions_impl png_init_filter_functions_sse2

@@ -3180,49 +3180,50 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  * option and 'onoff' is 0 (off) or non-0 (on).  The value returned is given
  * by the PNG_OPTION_ defines below.
  *
- * HARDWARE: normally hardware capabilities, such as the Intel SSE instructions,
- *           are detected at run time, however sometimes it may be impossible
- *           to do this in user mode, in which case it is necessary to discover
- *           the capabilities in an OS specific way.  Such capabilities are
- *           listed here when libpng has support for them and must be turned
- *           ON by the application if present.
+ * HARDWARE: [[changed in libpng 1.8]]
+ *           Hardware options are now controlled globally to be 'on' or 'off'.
+ *           For backward compatibility the original options are defined as
+ *           the 'new' hardware option.  libpng can be compiled without
+ *           hardware support (check PNG_TARGET_SPECIFIC_CODE_SUPPORTED and
+ *           the documenation in pngtarget.h).
  *
  * SOFTWARE: sometimes software optimizations actually result in performance
  *           decrease on some architectures or systems, or with some sets of
  *           PNG images.  'Software' options allow such optimizations to be
  *           selected at run time.
+ *
+ * The initial setting for HARDWARE is determined by whether or not any
+ * hardware-specific optimizations are available; the setting will be "ON" if
+ * so otherwise it will be UNSET.
+ *
+ * the option starts of UNSET and this is treated as OFF.
  */
-#ifdef PNG_SET_OPTION_SUPPORTED
-#ifdef PNG_ARM_NEON_API_SUPPORTED
-#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
-#endif
-#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
-#ifdef PNG_MIPS_MSA_API_SUPPORTED
-#  define PNG_MIPS_MSA   6 /* HARDWARE: MIPS Msa SIMD instructions supported */
-#endif
+#define PNG_SET_OPTION_SUPPORTED
+#define PNG_TARGET_SPECIFIC_CODE 0 /* HARDWARE: disable cpu specific code */
+#define PNG_ARM_NEON 0 /* HARDWARE: compatibility */
+#define PNG_MIPS_MSA 0 /* HARDWARE: compatibility */
+#define PNG_POWERPC_VSX 0 /* HARDWARE: compatibility */
+#define PNG_MIPS_MMI 2/* HARDWARE: MIPS: chose MMI over MSA */
+#define PNG_MAXIMUM_INFLATE_WINDOW 4 /* SOFTWARE: force maximum window */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 6 /* SOFTWARE: Check ICC profile for sRGB */
+
 #ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
+   /* This has to be disabled in some builds because of the lack of
+    * functionality in zlib.  Check the _SUPPORTED macro.
+    */
 #  define PNG_IGNORE_ADLER32 8 /* SOFTWARE: disable Adler32 check on IDAT */
 #endif
-#ifdef PNG_POWERPC_VSX_API_SUPPORTED
-#  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions
-                                * supported */
-#endif
-#ifdef PNG_MIPS_MMI_API_SUPPORTED
-#  define PNG_MIPS_MMI   12 /* HARDWARE: MIPS MMI SIMD instructions supported */
-#endif
 
-#define PNG_OPTION_NEXT  14 /* Next option - numbers must be even */
+#define PNG_OPTION_NEXT 10
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
-#define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
+#define PNG_OPTION_UNSET   0 /* Unset - defaults as above */
 #define PNG_OPTION_INVALID 1 /* Option number out of range */
 #define PNG_OPTION_OFF     2
 #define PNG_OPTION_ON      3
 
 PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
    int onoff));
-#endif /* SET_OPTION */
 
 /*******************************************************************************
  *  END OF HARDWARE AND SOFTWARE OPTIONS

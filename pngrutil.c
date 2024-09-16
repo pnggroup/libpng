@@ -376,7 +376,6 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
 #if ZLIB_VERNUM >= 0x1240
       int window_bits = 0;
 
-# if defined(PNG_SET_OPTION_SUPPORTED) && defined(PNG_MAXIMUM_INFLATE_WINDOW)
       if (((png_ptr->options >> PNG_MAXIMUM_INFLATE_WINDOW) & 3) ==
           PNG_OPTION_ON)
       {
@@ -388,8 +387,6 @@ png_inflate_claim(png_structrp png_ptr, png_uint_32 owner)
       {
          png_ptr->zstream_start = 1;
       }
-# endif
-
 #endif /* ZLIB_VERNUM >= 0x1240 */
 
       /* Set this for safety, just in case the previous owner left pointers to
@@ -4151,27 +4148,15 @@ png_init_filter_functions(png_structrp pp)
       pp->read_filter[PNG_FILTER_VALUE_PAETH-1] =
          png_read_filter_row_paeth_multibyte_pixel;
 
-#ifdef PNG_FILTER_OPTIMIZATIONS
-   /* To use this define PNG_FILTER_OPTIMIZATIONS as the name of a function to
-    * call to install hardware optimizations for the above functions; simply
-    * replace whatever elements of the pp->read_filter[] array with a hardware
-    * specific (or, for that matter, generic) optimization.
-    *
-    * To see an example of this examine what configure.ac does when
-    * --enable-arm-neon is specified on the command line.
-    */
-   PNG_FILTER_OPTIMIZATIONS(pp, bpp);
-#endif
+#  ifdef PNG_TARGET_IMPLEMENTS_FILTERS
+      png_target_init_filter_functions(pp, bpp);
+#  endif
 }
 
 void /* PRIVATE */
 png_read_filter_row(png_structrp pp, png_row_infop row_info, png_bytep row,
     png_const_bytep prev_row, int filter)
 {
-   /* OPTIMIZATION: DO NOT MODIFY THIS FUNCTION, instead #define
-    * PNG_FILTER_OPTIMIZATIONS to a function that overrides the generic
-    * implementations.  See png_init_filter_functions above.
-    */
    if (filter > PNG_FILTER_VALUE_NONE && filter < PNG_FILTER_VALUE_LAST)
    {
       if (pp->read_filter[0] == NULL)
@@ -4648,7 +4633,7 @@ defined(PNG_USER_TRANSFORM_PTR_SUPPORTED)
 
       png_ptr->big_prev_row = (png_bytep)png_malloc(png_ptr, row_bytes + 48);
 
-#ifdef PNG_ALIGNED_MEMORY_SUPPORTED
+#if PNG_TARGET_ROW_ALIGNMENT > 1
       /* Use 16-byte aligned memory for row_buf with at least 16 bytes
        * of padding before and after row_buf; treat prev_row similarly.
        * NOTE: the alignment is to the start of the pixels, one beyond the start

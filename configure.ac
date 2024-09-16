@@ -321,13 +321,8 @@ AC_ARG_ENABLE([hardware-optimizations],
    [case "$enableval" in
       no|off)
          # disable hardware optimization on all systems
-         AC_DEFINE([PNG_ARM_NEON_OPT], [0], [Disable ARM NEON specific code])
-         AC_DEFINE([PNG_INTEL_SSE_OPT], [0], [Disable INTEL SSE specific code])
-         AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [0],
-                   [Disable LOONGARCH specific code])
-         AC_DEFINE([PNG_MIPS_MMI_OPT], [0], [Disable MIPS MSA specific code])
-         AC_DEFINE([PNG_MIPS_MSA_OPT], [0], [Disable MIPS MSI specific code])
-         AC_DEFINE([PNG_POWERPC_OPT], [0], [Disable POWERPC VSX specific code])
+         AC_DEFINE([PNG_NO_HARDWARE], [1],
+                   [Disable hardware specific optimizations])
          ;;
       *)
          ;;
