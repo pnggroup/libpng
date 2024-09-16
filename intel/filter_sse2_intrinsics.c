@@ -1,4 +1,3 @@
-
 /* filter_sse2_intrinsics.c - SSE2 optimized filter functions
  *
  * Copyright (c) 2018 Cosmin Truta
@@ -10,13 +9,6 @@
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
  */
-
-#include "../pngpriv.h"
-
-#ifdef PNG_READ_SUPPORTED
-
-#if PNG_INTEL_SSE_IMPLEMENTATION > 0
-
 #include <immintrin.h>
 
 /* Functions in this file look at most 3 pixels (a,b,c) to predict the 4th (d).
@@ -49,7 +41,8 @@ static void store3(void* p, __m128i v) {
    memcpy(p, &tmp, 3);
 }
 
-void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
+static void
+png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
    /* The Sub filter predicts each pixel as the previous pixel, a.
@@ -82,7 +75,8 @@ void png_read_filter_row_sub3_sse2(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev)
 }
 
-void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
+static void
+png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
    /* The Sub filter predicts each pixel as the previous pixel, a.
@@ -107,7 +101,8 @@ void png_read_filter_row_sub4_sse2(png_row_infop row_info, png_bytep row,
    PNG_UNUSED(prev)
 }
 
-void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
+static void
+png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
    /* The Avg filter predicts each pixel as the (truncated) average of a and b.
@@ -162,7 +157,8 @@ void png_read_filter_row_avg3_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
+static void
+png_read_filter_row_avg4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
    /* The Avg filter predicts each pixel as the (truncated) average of a and b.
@@ -226,7 +222,8 @@ static __m128i if_then_else(__m128i c, __m128i t, __m128i e) {
 #endif
 }
 
-void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
+static void
+png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
    /* Paeth tries to predict pixel d using the pixel to the left of it, a,
@@ -325,7 +322,8 @@ void png_read_filter_row_paeth3_sse2(png_row_infop row_info, png_bytep row,
    }
 }
 
-void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
+static void
+png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
    png_const_bytep prev)
 {
    /* Paeth tries to predict pixel d using the pixel to the left of it, a,
@@ -386,6 +384,3 @@ void png_read_filter_row_paeth4_sse2(png_row_infop row_info, png_bytep row,
       rb   -= 4;
    }
 }
-
-#endif /* PNG_INTEL_SSE_IMPLEMENTATION > 0 */
-#endif /* READ */
