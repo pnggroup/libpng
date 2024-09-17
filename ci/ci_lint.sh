@@ -80,7 +80,7 @@ function ci_lint_text_files {
     }
     ci_info "## LINTING: text files ##"
     ci_spawn "$CI_EDITORCONFIG_CHECKER" --version
-    ci_spawn "$CI_EDITORCONFIG_CHECKER" || {
+    ci_spawn "$CI_EDITORCONFIG_CHECKER" --config .editorconfig-checker.json || {
         # Linting failed.
         return 1
     }
@@ -93,7 +93,9 @@ function ci_lint_yaml_files {
     }
     ci_info "## LINTING: YAML files ##"
     ci_spawn "$CI_YAMLLINT" --version
-    find . \( -iname "*.yml" -o -iname "*.yaml" \) -not -path "./out/*" | {
+    # Considering that the YAML format is an extension of the JSON format,
+    # we can lint both the YAML files and the plain JSON files here.
+    find . \( -iname "*.yml" -o -iname "*.yaml" -o -iname "*.json" \) -not -path "./out/*" | {
         local my_file
         while IFS="" read -r my_file
         do
