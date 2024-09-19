@@ -1,5 +1,3 @@
-# Copyright 2024 Cosmin Truta
-# Copyright 2017 Glenn Randers-Pehrson
 # Copyright 2016 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,12 +15,11 @@
 ################################################################################
 
 FROM gcr.io/oss-fuzz-base/base-builder
-
+MAINTAINER glennrp@gmail.com
 RUN apt-get update && \
-    apt-get install -y make autoconf automake libtool zlib1g-dev
+    apt-get install -y make autoconf automake libtool
 
-RUN git clone --depth=1 https://github.com/pnggroup/libpng.git && \
-    git clone --depth=1 https://github.com/madler/zlib.git && \
-    cp libpng/contrib/oss-fuzz/build.sh $SRC
-
-WORKDIR /home/libpng
+RUN git clone --depth 1 https://github.com/madler/zlib.git
+RUN git clone --depth 1 https://github.com/glennrp/libpng.git
+RUN cp libpng/contrib/oss-fuzz/build.sh $SRC
+WORKDIR libpng
