@@ -13,7 +13,7 @@
 #include <altivec.h>
 #include "filter_vsx_intrinsics.c"
 
-void
+static void
 png_init_filter_functions_vsx(png_structp pp, unsigned int bpp)
 {
    /* IMPORTANT: DO NOT DEFINE EXTERNAL FUNCTIONS HERE
