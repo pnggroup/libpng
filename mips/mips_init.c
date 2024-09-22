@@ -33,4 +33,4 @@ png_init_filter_functions_msa(png_structp pp, unsigned int bpp)
    }
 }
 
-#  define png_target_init_filter_functions_impl png_init_filter_functions_mips
+#  define png_target_init_filter_functions_impl png_init_filter_functions_msa

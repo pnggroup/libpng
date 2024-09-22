@@ -10,7 +10,7 @@
  * This code has been moved from the original in pngpriv.h.
  */
 /* MIPS MSA checks: */
-#if defined(__mips_msa) && (__mips_isa_rev >= 5)
+#if defined(__mips_msa) && (__mips_isa_rev >= 2)
    /* MIPS MSA support requires gcc >= 4.7: */
 #  ifdef __GNUC__
 #     if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)

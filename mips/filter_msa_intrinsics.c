@@ -27,8 +27,6 @@
 #define png_ldr(type,pointer)\
    (temp_pointer = png_ptr(type,pointer), *temp_pointer)
 
-#if PNG_MIPS_MSA_OPT > 0
-
 #ifdef CLANG_BUILD
    #define MSA_SRLI_B(a, b)   __msa_srli_b((v16i8) a, b)
 
