@@ -360,10 +360,8 @@ print_opts(png_uint_32 opts)
       printf(" --sRGB-16bit");
    if (opts & NO_RESEED)
       printf(" --noreseed");
-#if PNG_LIBPNG_VER != 10700 /* else on by default */
    if (opts & GBG_ERROR)
       printf(" --fault-gbg-warning");
-#endif
 }
 
 #define FORMAT_NO_CHANGE 0x80000000 /* additional flag */
