@@ -47,7 +47,7 @@
        uint8_t *psrc_lw_m = (uint8_t *) (psrc);  \
        uint32_t val_m;                           \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "lw  %[val_m],  %[psrc_lw_m]  \n\t"   \
                                                  \
            : [val_m] "=r" (val_m)                \
@@ -62,7 +62,7 @@
        uint8_t *pdst_sh_m = (uint8_t *) (pdst);  \
        uint16_t val_m = (val);                   \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "sh  %[val_m],  %[pdst_sh_m]  \n\t"   \
                                                  \
            : [pdst_sh_m] "=m" (*pdst_sh_m)       \
@@ -75,7 +75,7 @@
        uint8_t *pdst_sw_m = (uint8_t *) (pdst);  \
        uint32_t val_m = (val);                   \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "sw  %[val_m],  %[pdst_sw_m]  \n\t"   \
                                                  \
            : [pdst_sw_m] "=m" (*pdst_sw_m)       \
@@ -89,7 +89,7 @@
             uint8_t *pdst_sd_m = (uint8_t *) (pdst);  \
             uint64_t val_m = (val);                   \
                                                       \
-            asm volatile (                            \
+            __asm__ volatile (                            \
                 "sd  %[val_m],  %[pdst_sd_m]  \n\t"   \
                                                       \
                 : [pdst_sd_m] "=m" (*pdst_sd_m)       \
@@ -118,7 +118,7 @@
        uint8_t *psrc_lw_m = (uint8_t *) (psrc);  \
        uint32_t val_m;                           \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "lw  %[val_m],  %[psrc_lw_m]  \n\t"   \
                                                  \
            : [val_m] "=r" (val_m)                \
@@ -133,7 +133,7 @@
        uint8_t *pdst_sh_m = (uint8_t *) (pdst);  \
        uint16_t val_m = (val);                   \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "sh  %[val_m],  %[pdst_sh_m]  \n\t"   \
                                                  \
            : [pdst_sh_m] "=m" (*pdst_sh_m)       \
@@ -146,7 +146,7 @@
        uint8_t *pdst_sw_m = (uint8_t *) (pdst);  \
        uint32_t val_m = (val);                   \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "sw  %[val_m],  %[pdst_sw_m]  \n\t"   \
                                                  \
            : [pdst_sw_m] "=m" (*pdst_sw_m)       \
@@ -160,7 +160,7 @@
             uint8_t *pdst_sd_m = (uint8_t *) (pdst);  \
             uint64_t val_m = (val);                   \
                                                       \
-            asm volatile (                            \
+            __asm__ volatile (                            \
                 "sd  %[val_m],  %[pdst_sd_m]  \n\t"   \
                                                       \
                 : [pdst_sd_m] "=m" (*pdst_sd_m)       \
@@ -180,13 +180,13 @@
             SW(val1_m, pdst_sd_m + 4);                                 \
         }
     #endif
-#else  // !(__mips_isa_rev >= 6)
+#else
    #define LW(psrc)                              \
    ( {                                           \
        uint8_t *psrc_lw_m = (uint8_t *) (psrc);  \
        uint32_t val_m;                           \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "ulw  %[val_m],  %[psrc_lw_m]  \n\t"  \
                                                  \
            : [val_m] "=r" (val_m)                \
@@ -201,7 +201,7 @@
        uint8_t *pdst_sh_m = (uint8_t *) (pdst);  \
        uint16_t val_m = (val);                   \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "ush  %[val_m],  %[pdst_sh_m]  \n\t"  \
                                                  \
            : [pdst_sh_m] "=m" (*pdst_sh_m)       \
@@ -214,7 +214,7 @@
        uint8_t *pdst_sw_m = (uint8_t *) (pdst);  \
        uint32_t val_m = (val);                   \
                                                  \
-       asm volatile (                            \
+       __asm__ volatile (                            \
            "usw  %[val_m],  %[pdst_sw_m]  \n\t"  \
                                                  \
            : [pdst_sw_m] "=m" (*pdst_sw_m)       \
@@ -238,14 +238,14 @@
     {                                          \
         uint8_t *pdst_m = (uint8_t *) (pdst);  \
                                                \
-        asm volatile (                         \
+        __asm__ volatile (                         \
             "usw  $0,  %[pdst_m]  \n\t"        \
                                                \
             : [pdst_m] "=m" (*pdst_m)          \
             :                                  \
         );                                     \
     }
-#endif  // (__mips_isa_rev >= 6)
+#endif
 #endif
 
 #define LD_B(RTYPE, psrc) *((RTYPE *) (psrc))
