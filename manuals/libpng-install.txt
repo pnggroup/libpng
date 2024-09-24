@@ -303,8 +303,6 @@ or more of
    CPPFLAGS += "-DPNG_INTEL_SSE"
    CPPFLAGS += "-DPNG_POWERPC_VSX"
 
-See for example scripts/makefile.linux-opt
-
 If you wish to avoid using them,
 you can disable them via the configure option
 
