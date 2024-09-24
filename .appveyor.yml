@@ -3,7 +3,7 @@ version: 1.6.x-{build}
 branches:
   except:
     - /libpng[0-1][0-8]/
-    - /v[0-1][.][0-7][.][0-9]+/
+    - /v[0-1][.][0-8][.][0-9]+/
 
 image:
   - Visual Studio 2022
@@ -77,5 +77,5 @@ build_script:
   - 'if "%TOOLCHAIN%"=="msys2" if "%AUTOMATION%"=="makefiles" C:\msys64\usr\bin\bash.exe -l "%APPVEYOR_BUILD_FOLDER%\ci\ci_verify_makefiles.sh"'
 
 cache:
-  - C:\tools\vcpkg\installed
-  - C:\msys64\var\cache\pacman
+  - 'C:\tools\vcpkg\installed'
+  - 'C:\msys64\var\cache\pacman'
