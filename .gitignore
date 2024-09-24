@@ -71,6 +71,9 @@ cscope.*.out
 .cproject/
 .project/
 .settings/
+## Embarcadero RAD Studio
+*.cbproj.*
+__recovery/
 ## JetBrains
 .idea/
 ## NetBeans
@@ -84,11 +87,9 @@ nbproject/
 *.sln.docstates
 *.suo
 *.user
-*.userosscache
 *.userprefs
 ### Visual Studio cache files (for older versions)
 *.aps
-*.cachefile
 *.ncb
 *.opensdf
 *.sdf
@@ -102,21 +103,25 @@ ipch/
 !.vscode/settings.json
 !.vscode/tasks.json
 ## (Various)
+*.*cache
+*.cache*
 [._]*_history
 .history/
+[Bb]ackup*/
 
 # Build, test and CI output directories
 *[Dd]ebug/
+[Dd]ebug*/
 *[Rr]elease/
-*[Rr]eleases/
-[Ll]og/
-[Ll]ogs/
-[Oo]ut/
+[Rr]elease*/
+[._]build*/
+/[Bb]uild*/
+/[Oo]ut/
 
-# Libpng configuration and build artifacts
+# Libpng configuration and auxiliary build artifacts
 *.out
 *out.png
-.deps/
+[._]deps/
 .dirstamp
 /Makefile
 /autom4te.cache/
@@ -130,6 +135,9 @@ ipch/
 /libpng.vers
 /libtool
 /stamp-h1
+CMake*.json
+!CMakePresets.json
+CMakeLists.txt.*
 pnglibconf.[ch]
 pnglibconf.dfn
 pnglibconf.pre
