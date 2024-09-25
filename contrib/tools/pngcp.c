@@ -53,7 +53,7 @@
 #  include "../../png.h"
 #endif
 
-//#if PNG_LIBPNG_VER < 10700
+#if PNG_LIBPNG_VER != 10700
    /* READ_PNG and WRITE_PNG were not defined, so: */
 #  ifdef PNG_INFO_IMAGE_SUPPORTED
 #     ifdef PNG_SEQUENTIAL_READ_SUPPORTED
@@ -63,7 +63,7 @@
 #        define PNG_WRITE_PNG_SUPPORTED
 #     endif /* WRITE */
 #  endif /* INFO_IMAGE */
-//#endif /* pre 1.7.0 */
+#endif
 
 #if (defined(PNG_READ_PNG_SUPPORTED)) && (defined(PNG_WRITE_PNG_SUPPORTED))
 #include <stdarg.h>
@@ -400,11 +400,11 @@ struct display
    png_alloc_size_t read_size;
    png_structp      read_pp;
    png_infop        ip;
-//#  if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
+#  if PNG_LIBPNG_VER != 10700 && defined PNG_TEXT_SUPPORTED
       png_textp     text_ptr; /* stash of text chunks */
       int           num_text;
       int           text_stashed;
-//#  endif /* pre 1.7 */
+#  endif
 
 #  ifdef PNG_PNGCP_TIMING_SUPPORTED
       struct timespec   read_time;
@@ -489,11 +489,11 @@ display_init(struct display *dp)
    dp->ip = NULL;
    dp->write_pp = NULL;
    dp->min_windowBits = -1; /* this is an OPTIND, so -1 won't match anything */
-//#  if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
+#  if PNG_LIBPNG_VER != 10700 && defined PNG_TEXT_SUPPORTED
       dp->text_ptr = NULL;
       dp->num_text = 0;
       dp->text_stashed = 0;
-//#  endif /* pre 1.7 */
+#  endif
 }
 
 static void
@@ -531,7 +531,7 @@ display_clean(struct display *dp)
    display_clean_write(dp, 1/*freeinfo*/);
    dp->output_file = NULL;
 
-//#  if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
+#  if PNG_LIBPNG_VER != 10700 && defined PNG_TEXT_SUPPORTED
       /* This is actually created and used by the write code, but only
        * once; it has to be retained for subsequent writes of the same file.
        */
@@ -542,7 +542,7 @@ display_clean(struct display *dp)
          free(dp->text_ptr);
          dp->text_ptr = NULL;
       }
-//#  endif /* pre 1.7 */
+#  endif
 
    /* leave the filename for error detection */
    dp->results = 0; /* reset for next time */
@@ -635,7 +635,7 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
    }
 }
 
-//#if PNG_LIBPNG_VER < 10700 && defined PNG_TEXT_SUPPORTED
+#if PNG_LIBPNG_VER != 10700 && defined PNG_TEXT_SUPPORTED
 static void
 text_stash(struct display *dp)
 {
@@ -687,10 +687,10 @@ text_restore(struct display *dp)
 
 #define text_restore(dp) if (dp->text_stashed) text_restore(dp)
 
-//#else
-//#define text_stash(dp) ((void)0)
-//#define text_restore(dp) ((void)0)
-//#endif /* pre 1.7 */
+#else
+#define text_stash(dp) ((void)0)
+#define text_restore(dp) ((void)0)
+#endif
 
 /* OPTIONS:
  *

@@ -1,7 +1,7 @@
 
 /* pngunknown.c - test the read side unknown chunk handling
  *
- * Copyright (c) 2021 Cosmin Truta
+ * Copyright (c) 2021-2024 Cosmin Truta
  * Copyright (c) 2015,2017 Glenn Randers-Pehrson
  * Written by John Cunningham Bowler
  *
@@ -98,7 +98,7 @@ typedef png_byte *png_const_bytep;
 #  define png_const_structp png_structp
 #endif
 
-//#if PNG_LIBPNG_VER < 10700
+#if PNG_LIBPNG_VER != 10700
    /* Copied from libpng 1.7.0 png.h */
 #define PNG_u2(b1, b2) (((unsigned int)(b1) << 8) + (b2))
 
@@ -143,7 +143,7 @@ typedef png_byte *png_const_bytep;
 #define PNG_CHUNK_RESERVED(c)     (1 & ((c) >> 13))
 #define PNG_CHUNK_SAFE_TO_COPY(c) (1 & ((c) >>  5))
 
-//#endif /* PNG_LIBPNG_VER < 10700 */
+#endif
 
 #ifdef __cplusplus
 #  define this not_the_cpp_this
