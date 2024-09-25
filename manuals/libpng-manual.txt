@@ -5094,13 +5094,13 @@ the '#include "png.h"' directive.
 
 The following API are now DEPRECATED:
    png_info_init_3()
-   png_convert_to_rfc1123() which has been replaced
-     with png_convert_to_rfc1123_buffer()
    png_malloc_default()
    png_free_default()
    png_reset_zstream()
 
 The following have been removed:
+   png_convert_to_rfc1123() which has been replaced
+     with png_convert_to_rfc1123_buffer()
    png_get_io_chunk_name(), which has been replaced
      with png_get_io_chunk_type().  The new
      function returns a 32-bit integer instead of

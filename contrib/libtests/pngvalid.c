@@ -1,7 +1,7 @@
 
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
- * Copyright (c) 2021 Cosmin Truta
+ * Copyright (c) 2021-2024 Cosmin Truta
  * Copyright (c) 2014-2017 John Cunningham Bowler
  *
  * This code is released under the libpng license.
@@ -4863,7 +4863,6 @@ perform_formatting_test(png_store *ps)
       if (pp == NULL)
          Throw ps;
 
-
       /* Arbitrary settings: */
       pt.year = 2079;
       pt.month = 8;
@@ -4872,25 +4871,21 @@ perform_formatting_test(png_store *ps)
       pt.minute = 53;
       pt.second = 60; /* a leap second */
 
-#     if PNG_LIBPNG_VER < 10600
-         result = png_convert_to_rfc1123(pp, &pt);
-#     else
-         if (png_convert_to_rfc1123_buffer(timestring, &pt))
-            result = timestring;
+      if (png_convert_to_rfc1123_buffer(timestring, &pt))
+         result = timestring;
 
-         else
-            result = NULL;
-#     endif
+      else
+         result = NULL;
 
       if (result == NULL)
-         png_error(pp, "png_convert_to_rfc1123 failed");
+         png_error(pp, "png_convert_to_rfc1123_buffer failed");
 
       if (strcmp(result, correct) != 0)
       {
          size_t pos = 0;
          char msg[128];
 
-         pos = safecat(msg, sizeof msg, pos, "png_convert_to_rfc1123(");
+         pos = safecat(msg, sizeof msg, pos, "png_convert_to_rfc1123_buffer(");
          pos = safecat(msg, sizeof msg, pos, correct);
          pos = safecat(msg, sizeof msg, pos, ") returned: '");
          pos = safecat(msg, sizeof msg, pos, result);

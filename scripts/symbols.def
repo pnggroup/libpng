@@ -27,7 +27,6 @@ EXPORTS
  png_write_info_before_PLTE @20
  png_write_info @21
  png_read_info @22
- png_convert_to_rfc1123 @23
  png_convert_from_struct_tm @24
  png_convert_from_time_t @25
  png_set_expand @26

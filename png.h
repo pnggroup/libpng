@@ -1022,13 +1022,12 @@ PNG_EXPORT(22, void, png_read_info,
     * routine.  The original implementation used a 29 character buffer in
     * png_struct, this will be removed in future versions.
     */
-//#if PNG_LIBPNG_VER < 10700
-/* To do: remove this from libpng17 (and from libpng17/png.c and pngstruct.h) */
-PNG_EXPORTA(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
-    png_const_timep ptime),PNG_DEPRECATED);
-//#endif
 PNG_EXPORT(241, int, png_convert_to_rfc1123_buffer, (char out[29],
     png_const_timep ptime));
+
+/* Removed from libpng 1.7 onwards; use png_convert_to_rfc1123_buffer. */
+PNG_REMOVED(23, png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
+    png_const_timep ptime),PNG_DEPRECATED);
 #endif
 
 #ifdef PNG_CONVERT_tIME_SUPPORTED

@@ -1,7 +1,7 @@
 
 /* pngstruct.h - header file for PNG reference library
  *
- * Copyright (c) 2018-2022 Cosmin Truta
+ * Copyright (c) 2018-2024 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -345,13 +345,6 @@ struct png_struct_def
 #ifdef PNG_SET_OPTION_SUPPORTED
    png_uint_32 options;           /* On/off state (up to 16 options) */
 #endif
-
-//#if PNG_LIBPNG_VER < 10700
-/* To do: remove this from libpng-1.7 */
-#ifdef PNG_TIME_RFC1123_SUPPORTED
-   char time_buffer[29]; /* String to hold RFC 1123 time text */
-#endif
-//#endif
 
 /* New members added in libpng-1.0.6 */
 

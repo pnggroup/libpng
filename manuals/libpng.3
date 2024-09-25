@@ -23,8 +23,6 @@ libpng \- Portable Network Graphics (PNG) Reference Library 1.6.44
 
 \fBvoid png_convert_from_time_t (png_timep \fP\fIptime\fP\fB, time_t \fIttime\fP\fB);\fP
 
-\fBpng_charp png_convert_to_rfc1123 (png_structp \fP\fIpng_ptr\fP\fB, png_timep \fIptime\fP\fB);\fP
-
 \fBpng_infop png_create_info_struct (png_structp \fIpng_ptr\fP\fB);\fP
 
 \fBpng_structp png_create_read_struct (png_const_charp \fP\fIuser_png_ver\fP\fB, png_voidp \fP\fIerror_ptr\fP\fB, png_error_ptr \fP\fIerror_fn\fP\fB, png_error_ptr \fIwarn_fn\fP\fB);\fP
@@ -5613,13 +5611,13 @@ the '#include "png.h"' directive.
 
 The following API are now DEPRECATED:
    png_info_init_3()
-   png_convert_to_rfc1123() which has been replaced
-     with png_convert_to_rfc1123_buffer()
    png_malloc_default()
    png_free_default()
    png_reset_zstream()
 
 The following have been removed:
+   png_convert_to_rfc1123() which has been replaced
+     with png_convert_to_rfc1123_buffer()
    png_get_io_chunk_name(), which has been replaced
      with png_get_io_chunk_type().  The new
      function returns a 32-bit integer instead of
