@@ -1137,37 +1137,6 @@ png_set_filter(png_structrp png_ptr, int method, int filters)
       png_error(png_ptr, "Unknown custom filter method");
 }
 
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
-/* Provide floating and fixed point APIs */
-#ifdef PNG_FLOATING_POINT_SUPPORTED
-void PNGAPI
-png_set_filter_heuristics(png_structrp png_ptr, int heuristic_method,
-    int num_weights, png_const_doublep filter_weights,
-    png_const_doublep filter_costs)
-{
-   PNG_UNUSED(png_ptr)
-   PNG_UNUSED(heuristic_method)
-   PNG_UNUSED(num_weights)
-   PNG_UNUSED(filter_weights)
-   PNG_UNUSED(filter_costs)
-}
-#endif /* FLOATING_POINT */
-
-#ifdef PNG_FIXED_POINT_SUPPORTED
-void PNGAPI
-png_set_filter_heuristics_fixed(png_structrp png_ptr, int heuristic_method,
-    int num_weights, png_const_fixed_point_p filter_weights,
-    png_const_fixed_point_p filter_costs)
-{
-   PNG_UNUSED(png_ptr)
-   PNG_UNUSED(heuristic_method)
-   PNG_UNUSED(num_weights)
-   PNG_UNUSED(filter_weights)
-   PNG_UNUSED(filter_costs)
-}
-#endif /* FIXED_POINT */
-#endif /* WRITE_WEIGHTED_FILTER */
-
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 void PNGAPI
 png_set_compression_level(png_structrp png_ptr, int level)

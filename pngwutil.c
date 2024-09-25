@@ -2573,11 +2573,10 @@ png_write_find_filter(png_structrp png_ptr, png_row_infop row_info)
     * from zero, using anything >= 128 as negative numbers.  This is known
     * as the "minimum sum of absolute differences" heuristic.  Other
     * heuristics are the "weighted minimum sum of absolute differences"
-    * (experimental and can in theory improve compression), and the "zlib
-    * predictive" method (not implemented yet), which does test compressions
-    * of lines using different filter methods, and then chooses the
-    * (series of) filter(s) that give minimum compressed data size (VERY
-    * computationally expensive).
+    * method (experimented, then abandoned), and the "zlib predictive" method
+    * (not implemented yet), which does test compression of lines using
+    * different filter methods, and then chooses the (series of) filter(s)
+    * that give minimum compressed data size (VERY computationally expensive).
     *
     * GRR 980525:  consider also
     *

@@ -648,8 +648,6 @@ option WRITE_USER_TRANSFORM requires WRITE_TRANSFORMS
 option WRITE_INTERLACING requires WRITE
 
 # Deprecated, will be removed.
-option WRITE_WEIGHTED_FILTER requires WRITE
-
 option WRITE_FLUSH requires WRITE
 
 # Note: these can be turned off explicitly if not required by the

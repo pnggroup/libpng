@@ -1696,12 +1696,12 @@ test_one_file(const char *inname, const char *outname)
             {
                fprintf(STDERR,
                    "   Was %s written with the same maximum IDAT"
-                   " chunk size (%d bytes),",
+                   " chunk size (%d bytes),\n",
                    inname, PNG_ZBUF_SIZE);
                fprintf(STDERR,
-                   "\n   filtering heuristic (libpng default), compression");
+                   "   compression level (zlib default),\n");
                fprintf(STDERR,
-                   " level (zlib default),\n   and zlib version (%s)?\n\n",
+                   "   and zlib version (%s)?\n\n",
                    ZLIB_VERSION);
                wrote_question = 1;
             }
@@ -1728,12 +1728,12 @@ test_one_file(const char *inname, const char *outname)
             {
                fprintf(STDERR,
                    "   Was %s written with the same maximum"
-                   " IDAT chunk size (%d bytes),",
+                   " IDAT chunk size (%d bytes),\n",
                     inname, PNG_ZBUF_SIZE);
                fprintf(STDERR,
-                   "\n   filtering heuristic (libpng default), compression");
+                   "   compression level (zlib default),\n");
                fprintf(STDERR,
-                   " level (zlib default),\n   and zlib version (%s)?\n\n",
+                   "   and zlib version (%s)?\n\n",
                  ZLIB_VERSION);
                wrote_question = 1;
             }

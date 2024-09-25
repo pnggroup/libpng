@@ -1474,22 +1474,6 @@ PNG_EXPORT(67, void, png_set_filter, (png_structrp png_ptr, int method,
 #define PNG_FILTER_VALUE_LAST  5
 
 #ifdef PNG_WRITE_SUPPORTED
-#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED /* DEPRECATED */
-PNG_FP_EXPORT(68, void, png_set_filter_heuristics, (png_structrp png_ptr,
-    int heuristic_method, int num_weights, png_const_doublep filter_weights,
-    png_const_doublep filter_costs))
-PNG_FIXED_EXPORT(209, void, png_set_filter_heuristics_fixed,
-    (png_structrp png_ptr, int heuristic_method, int num_weights,
-    png_const_fixed_point_p filter_weights,
-    png_const_fixed_point_p filter_costs))
-#endif /* WRITE_WEIGHTED_FILTER */
-
-/* The following are no longer used and will be removed from libpng-1.7: */
-#define PNG_FILTER_HEURISTIC_DEFAULT    0  /* Currently "UNWEIGHTED" */
-#define PNG_FILTER_HEURISTIC_UNWEIGHTED 1  /* Used by libpng < 0.95 */
-#define PNG_FILTER_HEURISTIC_WEIGHTED   2  /* Experimental feature */
-#define PNG_FILTER_HEURISTIC_LAST       3  /* Not a valid value */
-
 /* Set the library compression level.  Currently, valid values range from
  * 0 - 9, corresponding directly to the zlib compression levels 0 - 9
  * (0 - no compression, 9 - "maximal" compression).  Note that tests have
@@ -1537,6 +1521,14 @@ PNG_EXPORT(225, void, png_set_text_compression_window_bits,
 PNG_EXPORT(226, void, png_set_text_compression_method, (png_structrp png_ptr,
     int method));
 #endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+
+PNG_REMOVED(68, void, png_set_filter_heuristics, (png_structrp png_ptr,
+    int heuristic_method, int num_weights, png_const_doublep filter_weights,
+    png_const_doublep filter_costs),PNG_DEPRECATED)
+PNG_REMOVED(209, void, png_set_filter_heuristics_fixed,
+    (png_structrp png_ptr, int heuristic_method, int num_weights,
+    png_const_fixed_point_p filter_weights,
+    png_const_fixed_point_p filter_costs),PNG_DEPRECATED)
 #endif /* WRITE */
 
 /* These next functions are called for input/output, memory, and error
