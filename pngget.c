@@ -787,16 +787,6 @@ png_get_sPLT(png_const_structrp png_ptr, png_inforp info_ptr,
 
 #ifdef PNG_eXIf_SUPPORTED
 png_uint_32 PNGAPI
-png_get_eXIf(png_const_structrp png_ptr, png_inforp info_ptr,
-    png_bytep *exif)
-{
-  png_warning(png_ptr, "png_get_eXIf does not work; use png_get_eXIf_1");
-  PNG_UNUSED(info_ptr)
-  PNG_UNUSED(exif)
-  return 0;
-}
-
-png_uint_32 PNGAPI
 png_get_eXIf_1(png_const_structrp png_ptr, png_const_inforp info_ptr,
     png_uint_32 *num_exif, png_bytep *exif)
 {
