@@ -1032,7 +1032,8 @@ png_get_PLTE(png_const_structrp png_ptr, png_inforp info_ptr,
    png_debug1(1, "in %s retrieval function", "PLTE");
 
    if (png_ptr != NULL && info_ptr != NULL &&
-       (info_ptr->valid & PNG_INFO_PLTE) != 0 && palette != NULL)
+       (info_ptr->valid & PNG_INFO_PLTE) != 0 &&
+       palette != NULL && num_palette != NULL)
    {
       *palette = info_ptr->palette;
       *num_palette = info_ptr->num_palette;
