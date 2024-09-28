@@ -164,7 +164,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
          case PNG_NUMBER_FORMAT_02u:
             /* Expects at least 2 digits. */
             mincount = 2;
-            /* FALLTHROUGH */
+            PNGLIB_FALLTHROUGH;
 
          case PNG_NUMBER_FORMAT_u:
             *--end = digits[number % 10];
@@ -174,7 +174,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
          case PNG_NUMBER_FORMAT_02x:
             /* This format expects at least two digits */
             mincount = 2;
-            /* FALLTHROUGH */
+            PNGLIB_FALLTHROUGH;
 
          case PNG_NUMBER_FORMAT_x:
             *--end = digits[number & 0xf];

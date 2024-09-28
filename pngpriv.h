@@ -2170,6 +2170,15 @@ PNG_INTERNAL_FUNCTION(int,
 
 /* Maintainer: Put new private prototypes here ^ */
 
+#if defined(__has_attribute)
+#  if __has_attribute(fallthrough)
+#    define PNGLIB_FALLTHROUGH __attribute__((fallthrough))
+#  endif
+#endif
+#if !defined(PNGLIB_FALLTHROUGH)
+#  define PNGLIB_FALLTHROUGH (void)0
+#endif
+
 #include "pngdebug.h"
 
 #ifdef __cplusplus

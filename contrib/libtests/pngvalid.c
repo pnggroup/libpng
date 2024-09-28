@@ -24,6 +24,8 @@
 #define _BSD_SOURCE 1 /* For the floating point exception extension */
 #define _DEFAULT_SOURCE 1 /* For the floating point exception extension */
 
+#include "pngpriv.h"
+
 #include <signal.h>
 #include <stdio.h>
 
@@ -6595,16 +6597,16 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    {
    case PNG_COLOR_TYPE_PALETTE:
       if (dp->output_bit_depth > 8) goto error;
-      /* FALLTHROUGH */
+      PNGLIB_FALLTHROUGH;
    case PNG_COLOR_TYPE_GRAY:
       if (dp->output_bit_depth == 1 || dp->output_bit_depth == 2 ||
          dp->output_bit_depth == 4)
          break;
-      /* FALLTHROUGH */
+      PNGLIB_FALLTHROUGH;
    default:
       if (dp->output_bit_depth == 8 || dp->output_bit_depth == 16)
          break;
-      /* FALLTHROUGH */
+      // Fall through to error (not a case so no PNGLIB_FALLTHROUGH)
    error:
       {
          char message[128];
@@ -10007,7 +10009,7 @@ gamma_component_validate(const char *name, const validate_info *vi,
                   use_background = (alpha >= 0 && alpha < 1);
 #           endif
 #           ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-               /* FALLTHROUGH */
+               PNGLIB_FALLTHROUGH;
                case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:

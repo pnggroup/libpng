@@ -16,6 +16,8 @@
  *   currently just a minimal validation for the built-in libpng facilities.
  */
 
+#include "pngpriv.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -103,6 +105,7 @@ typedef png_byte *png_const_bytep;
 #define PNG_u2(b1, b2) (((unsigned int)(b1) << 8) + (b2))
 
 #define PNG_U16(b1, b2) ((png_uint_16)PNG_u2(b1, b2))
+#undef PNG_U32
 #define PNG_U32(b1, b2, b3, b4)\
    (((png_uint_32)PNG_u2(b1, b2) << 16) + PNG_u2(b3, b4))
 
@@ -627,7 +630,7 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
                   ++(d->error_count);
                   break;
                }
-               /* FALLTHROUGH */ /* (safe) */
+               PNGLIB_FALLTHROUGH; /* (safe) */
             case PNG_HANDLE_CHUNK_ALWAYS:
                break;
          }
