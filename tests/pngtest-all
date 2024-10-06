@@ -24,6 +24,9 @@ TEST(){
 # The "standard" test
 TEST --strict "${srcdir}"/pngtest.png
 
+# PNG-3 tests
+TEST --strict "${srcdir}"/contrib/testpngs/png-3/*.png
+
 # Various crashers
 # Use --relaxed because some come from fuzzers that don't maintain CRCs
 TEST --relaxed "${srcdir}"/contrib/testpngs/crashers/badcrc.png
