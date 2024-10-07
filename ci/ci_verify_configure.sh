@@ -122,6 +122,10 @@ function ci_build {
         ci_spawn export CFLAGS="${CFLAGS:-"-O2"} -fsanitize=$CI_SANITIZERS"
         ci_spawn export LDFLAGS="${LDFLAGS}${LDFLAGS:+" "}-fsanitize=$CI_SANITIZERS"
     }
+    # Spawn "autogen.sh" if the configure script is not available.
+    [[ -x "$CI_SRC_DIR/configure" ]] || {
+        ci_spawn "$CI_SRC_DIR/autogen.sh" --maintainer
+    }
     # And... build!
     ci_spawn mkdir -p "$CI_BUILD_DIR"
     ci_spawn cd "$CI_BUILD_DIR"
