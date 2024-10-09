@@ -187,7 +187,6 @@
 #endif
 
 #ifndef PNG_INTEL_SSE_OPT
-#   ifdef PNG_INTEL_SSE
       /* Only check for SSE if the build configuration has been modified to
        * enable SSE optimizations.  This means that these optimizations will
        * be off by default.  See contrib/intel for more details.
@@ -201,7 +200,6 @@
 #      endif
 #   else
 #      define PNG_INTEL_SSE_OPT 0
-#   endif
 #endif
 
 #if PNG_INTEL_SSE_OPT > 0

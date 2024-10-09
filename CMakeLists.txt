@@ -156,23 +156,16 @@ set(libpng_mips_sources
 set(libpng_loongarch_sources
     loongarch/loongarch_lsx_init.c
     loongarch/filter_lsx_intrinsics.c)
-include(CheckCCompilerFlag)
-check_c_compiler_flag("-mlsx" COMPILER_SUPPORTS_LSX)
-if(COMPILER_SUPPORTS_LSX)
-  set_source_files_properties(${libpng_loongarch_sources}
-                              PROPERTIES
-                              COMPILE_FLAGS "-mlsx")
-endif()
 
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
 # Disable opt for all arches
 add_definitions(
   -DPNG_ARM_NEON_OPT=0
-  -DPNG_ARM_NEON_OPT=0
   -DPNG_POWERPC_VSX_OPT=0
   -DPNG_INTEL_SSE_OPT=0
   -DPNG_MIPS_MSA_OPT=0
+  -DPNG_MIPS_MMI_OPT=0
   -DPNG_LOONGARCH_LSX_OPT=0
 )
 
