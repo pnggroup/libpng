@@ -1,3 +1,4 @@
+
 /* pngtarget.h - target configuration file for libpng
  *
  * libpng version 1.6.44.git
@@ -79,10 +80,10 @@
 
 #ifdef PNG_TARGET_SPECIFIC_CODE_SUPPORTED /* from pnglibconf.h */
 #  ifdef PNG_READ_SUPPORTED /* checked here as a convenience */
+#     include "arm/check.h"
+#     include "intel/check.h"
 #     include "mips/check.h"
 #     include "powerpc/check.h"
-#     include "intel/check.h"
-#     include "arm/check.h"
 #endif
 #endif /* PNG_TARGET_SPECIFIC_CODE_SUPPORTED */
 

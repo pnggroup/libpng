@@ -461,7 +461,6 @@ struct png_struct_def
 #endif
 #endif
 
-/* New member added in libpng-1.6.36 */
 /* NOTE: prior to libpng-1.8 this also checked that PNG_ARM_NEON_IMPLEMENTATION
  * is defined, however it was always defined...  The code also checked that
  * READ_EXPAND is supported but that will lead to bugs when some hardware

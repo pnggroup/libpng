@@ -1,3 +1,4 @@
+
 /* pngsimd.c - hardware (cpu/arch) specific code
  *
  * Copyright (c) 2018-2024 Cosmin Truta
@@ -8,8 +9,6 @@
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer
  * and license in png.h
- *
- * NOTE: this code is copied from libpng1.6 pngpriv.h.
  */
 #include "pngpriv.h"
 
@@ -59,22 +58,24 @@
 #include PNG_TARGET_CODE_IMPLEMENTATION
 
 #ifndef png_target_impl
-#  error HARDWARE: PNG_TARGET_CODE_IMPLEMENTATION is defined but\
+#  error TARGET SPECIFIC CODE: PNG_TARGET_CODE_IMPLEMENTATION is defined but\
  png_hareware_impl is not
 #endif
 
 #if defined(PNG_TARGET_STORES_DATA) != defined(png_target_free_data_impl)
-#  error HARDWARE: png_target_free_data_impl unexpected setting
+#  error TARGET SPECIFIC CODE: png_target_free_data_impl unexpected setting
 #endif
 
 #if defined(PNG_TARGET_IMPLEMENTS_FILTERS) !=\
     defined(png_target_init_filter_functions_impl)
-#  error HARDWARE: png_target_init_filter_functions_impl unexpected setting
+#  error TARGET SPECIFIC CODE: png_target_init_filter_functions_impl unexpected\
+      setting
 #endif
 
 #if defined(PNG_TARGET_IMPLEMENTS_EXPAND_PALETTE) !=\
     defined(png_target_do_expand_palette_impl)
-#  error HARDWARE: png_target_do_expand_palette_impl unexpected setting
+#  error TARGET SPECIFIC CODE: png_target_do_expand_palette_impl unexpected\
+      setting
 #endif
 
 void
@@ -82,18 +83,21 @@ png_target_init(png_structrp pp)
 {
    /* Initialize png_struct::target_state if required. */
 #  ifdef png_target_init_filter_functions_impl
-#     define F png_target_filters
+#     define PNG_TARGET_FILTER_SUPPORT png_target_filters
 #  else
-#     define F 0U
+#     define PNG_TARGET_FILTER_SUPPORT 0U
 #  endif
 #  ifdef png_target_do_expand_palette_impl
-#     define P png_target_expand_palette
+#     define PNG_TARGET_EXPAND_PALETTE_SUPPORT png_target_expand_palette
 #  else
-#     define P 0U
+#     define PNG_TARGET_EXPAND_PALETTE_SUPPORT 0U
 #  endif
 
-#  if F|P
-      pp->target_state = F|P;
+#  define PNG_TARGET_SUPPORT (PNG_TARGET_FILTER_SUPPORT |\
+                              PNG_TARGET_EXPAND_PALETTE_SUPPORT)
+
+#  if PNG_TARGET_SUPPORT != 0U
+      pp->target_state = PNG_TARGET_SUPPORT;
 #  else
       PNG_UNUSED(pp);
 #  endif
