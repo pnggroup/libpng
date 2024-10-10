@@ -1,4 +1,3 @@
-
 /* pngsimd.c - hardware (cpu/arch) specific code
  *
  * Copyright (c) 2018-2024 Cosmin Truta

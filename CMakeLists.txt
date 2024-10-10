@@ -1,4 +1,3 @@
-
 # CMakeLists.txt - CMake lists for libpng
 #
 # Copyright (c) 2018-2024 Cosmin Truta.

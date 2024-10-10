@@ -1,4 +1,3 @@
-
 /* png.h - header file for PNG reference library
  *
  * libpng version 1.8.0.git

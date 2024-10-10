@@ -1,4 +1,3 @@
-
 /* pngrutil.c - utilities to read a PNG file
  *
  * Copyright (c) 2018-2024 Cosmin Truta
