@@ -40,7 +40,6 @@ png_read_data(png_structrp png_ptr, png_bytep data, size_t length)
       png_error(png_ptr, "Call to NULL read function");
 }
 
-#ifdef PNG_STDIO_SUPPORTED
 /* This is the function that does the actual reading of data.  If you are
  * not reading from a standard C stream, you should create a replacement
  * read_data function and use it at run time with png_set_read_fn(), rather
@@ -51,18 +50,47 @@ png_default_read_data(png_structp png_ptr, png_bytep data, size_t length)
 {
    size_t check;
 
-   if (png_ptr == NULL)
+   if (png_ptr == NULL || png_ptr->fread_fn == NULL)
       return;
 
    /* fread() returns 0 on error, so it is OK to store this in a size_t
     * instead of an int, which is what fread() actually returns.
     */
-   check = fread(data, 1, length, png_voidcast(png_FILE_p, png_ptr->io_ptr));
+   check = png_ptr->fread_fn(data, 1, length, png_voidcast(png_FILE_p,
+       png_ptr->io_ptr));
 
    if (check != length)
       png_error(png_ptr, "Read Error");
 }
+
+void /* PRIVATE */
+png_set_read_fn2(png_structrp png_ptr, png_voidp io_ptr,
+   png_rw_ptr read_data_fn, png_fread_ptr fread_fn)
+{
+   if (png_ptr == NULL)
+      return;
+
+   png_ptr->io_ptr = io_ptr;
+   png_ptr->read_data_fn = read_data_fn;
+   png_ptr->fread_fn = fread_fn;
+
+#ifdef PNG_WRITE_SUPPORTED
+   /* It is an error to write to a read device */
+   if (png_ptr->write_data_fn != NULL)
+   {
+      png_ptr->write_data_fn = NULL;
+      png_ptr->fwrite_fn = NULL;
+      png_warning(png_ptr,
+         "Can't set both read_data_fn and write_data_fn in the"
+         " same structure");
+   }
 #endif
+
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+   png_ptr->output_flush_fn = NULL;
+   png_ptr->fflush_fn = NULL;
+#endif
+}
 
 /* This function allows the application to supply a new input function
  * for libpng if standard C streams aren't being used.
@@ -87,34 +115,14 @@ void PNGAPI
 png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
     png_rw_ptr read_data_fn)
 {
-   if (png_ptr == NULL)
-      return;
-
-   png_ptr->io_ptr = io_ptr;
-
+   png_fread_ptr fread_fn = NULL;
 #ifdef PNG_STDIO_SUPPORTED
-   if (read_data_fn != NULL)
-      png_ptr->read_data_fn = read_data_fn;
-
-   else
-      png_ptr->read_data_fn = png_default_read_data;
-#else
-   png_ptr->read_data_fn = read_data_fn;
-#endif
-
-#ifdef PNG_WRITE_SUPPORTED
-   /* It is an error to write to a read device */
-   if (png_ptr->write_data_fn != NULL)
+   if (read_data_fn == NULL)
    {
-      png_ptr->write_data_fn = NULL;
-      png_warning(png_ptr,
-          "Can't set both read_data_fn and write_data_fn in the"
-          " same structure");
+      read_data_fn = png_default_read_data;
+      fread_fn = png_fread_;
    }
 #endif
-
-#ifdef PNG_WRITE_FLUSH_SUPPORTED
-   png_ptr->output_flush_fn = NULL;
-#endif
+   png_set_read_fn2(png_ptr, io_ptr, read_data_fn, fread_fn);
 }
 #endif /* READ */
