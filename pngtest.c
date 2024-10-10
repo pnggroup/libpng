@@ -1,4 +1,3 @@
-
 /* pngtest.c - a test program for libpng
  *
  * Copyright (c) 2018-2024 Cosmin Truta

@@ -1,4 +1,3 @@
-
 /* pngtarget.h - target configuration file for libpng
  *
  * libpng version 1.6.44.git
