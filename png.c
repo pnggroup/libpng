@@ -1218,7 +1218,7 @@ png_fp_sub(png_int_32 addend0, png_int_32 addend1, int *error)
    else if (addend1 < 0)
    {
       if (0x7fffffff + addend1 >= addend0)
-         return addend0+addend1;
+         return addend0-addend1;
    }
    else
       return addend0;
