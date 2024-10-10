@@ -1,4 +1,3 @@
-
 /* pngvalid.c - validate libpng by constructing then reading png files.
  *
  * Copyright (c) 2021 Cosmin Truta

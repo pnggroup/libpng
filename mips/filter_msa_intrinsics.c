@@ -1,4 +1,3 @@
-
 /* filter_msa_intrinsics.c - MSA optimised filter functions
  *
  * Copyright (c) 2018-2024 Cosmin Truta

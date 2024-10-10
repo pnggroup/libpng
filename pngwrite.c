@@ -1,4 +1,3 @@
-
 /* pngwrite.c - general routines to write a PNG file
  *
  * Copyright (c) 2018-2024 Cosmin Truta

@@ -1,4 +1,3 @@
-
 /* palette_neon_intrinsics.c - NEON optimised palette expansion functions
  *
  * Copyright (c) 2018-2019 Cosmin Truta

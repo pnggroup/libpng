@@ -1,4 +1,3 @@
-
 /* pngconf.h - machine-configurable file for libpng
  *
  * libpng version 1.6.45.git
