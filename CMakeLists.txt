@@ -63,7 +63,7 @@ option(PNG_TESTS "Build the libpng tests" ON)
 # Same as above, but for the third-party tools.
 # Although these tools are targetted at development environments only,
 # the users are allowed to override the option to build by default.
-if (ANDROID OR IOS)
+if(ANDROID OR IOS)
   option(PNG_TOOLS "Build the libpng tools" OFF)
 else()
   option(PNG_TOOLS "Build the libpng tools" ON)
@@ -92,7 +92,7 @@ option(PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations" ON)
 # to check CMAKE_OSX_ARCHITECTURES to identify which hardware-specific flags to
 # enable. Note that this will fail if you attempt to build a universal binary
 # in a single CMake invocation.
-if (APPLE AND CMAKE_OSX_ARCHITECTURES)
+if(APPLE AND CMAKE_OSX_ARCHITECTURES)
   string(TOLOWER "${CMAKE_OSX_ARCHITECTURES}" PNG_TARGET_ARCHITECTURE)
 else()
   string(TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" PNG_TARGET_ARCHITECTURE)
@@ -116,7 +116,9 @@ endif()
 
 find_package(ZLIB REQUIRED)
 
-if(UNIX AND NOT APPLE AND NOT BEOS AND NOT HAIKU AND NOT EMSCRIPTEN)
+if(UNIX
+   AND NOT (APPLE OR BEOS OR HAIKU)
+   AND NOT EMSCRIPTEN)
   find_library(M_LIBRARY m)
   if(M_LIBRARY)
     set(M_LIBRARY m)
@@ -310,7 +312,7 @@ endif()
 endif(PNG_HARDWARE_OPTIMIZATIONS)
 
 option(ld-version-script "Enable linker version script" ON)
-if(ld-version-script AND NOT ANDROID AND NOT APPLE)
+if(ld-version-script AND NOT (ANDROID OR APPLE))
   # Check if LD supports linker scripts.
   file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map" "
 VERS_1 { global: sym1; local: *; };
@@ -356,7 +358,7 @@ else()
   message(STATUS "Could not find an AWK-compatible program")
 endif()
 
-if(NOT AWK OR ANDROID OR IOS)
+if(NOT AWK OR (ANDROID OR IOS))
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
@@ -377,7 +379,7 @@ else()
                  NEWLINE_STYLE LF)
 
   # Generate .chk from .out with awk:
-  # generate_chk(INPUT inputfile OUTPUT outputfile [DEPENDS dep1 [dep2...]])
+  # generate_chk(INPUT <file> OUTPUT <file> [DEPENDS <deps>...])
   function(generate_chk)
     set(options)
     set(oneValueArgs INPUT OUTPUT)
@@ -399,8 +401,8 @@ else()
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
 
-  # Generate .out from .c with awk
-  # generate_out(INPUT inputfile OUTPUT outputfile [DEPENDS dep1 [dep2...]])
+  # Generate .out from .c with awk:
+  # generate_out(INPUT <file> OUTPUT <file> [DEPENDS <deps>...])
   function(generate_out)
     set(options)
     set(oneValueArgs INPUT OUTPUT)
@@ -422,8 +424,8 @@ else()
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
 
-  # Generate specific source file with awk
-  # generate_source(OUTPUT outputfile [DEPENDS dep1 [dep2...]])
+  # Generate specific source file with awk:
+  # generate_source(OUTPUT <file> [DEPENDS <deps>...])
   function(generate_source)
     set(options)
     set(oneValueArgs OUTPUT)
@@ -441,8 +443,8 @@ else()
                        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
   endfunction()
 
-  # Copy file
-  # generate_copy(INPUT inputfile OUTPUT outputfile [DEPENDS dep1 [dep2...]])
+  # Copy file:
+  # generate_copy(INPUT <file> OUTPUT <file> [DEPENDS <deps>...])
   function(generate_copy)
     set(options)
     set(oneValueArgs INPUT OUTPUT)
@@ -584,7 +586,7 @@ else()
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk" png_scripts_symbols_chk
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out" png_scripts_symbols_out
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out" png_scripts_vers_out)
-endif(NOT AWK OR ANDROID OR IOS)
+endif(NOT AWK OR (ANDROID OR IOS))
 
 # List the source code files.
 set(libpng_public_hdrs
@@ -598,7 +600,7 @@ set(libpng_private_hdrs
     pnginfo.h
     pngstruct.h
 )
-if(AWK AND NOT ANDROID AND NOT IOS)
+if(AWK AND NOT (ANDROID OR IOS))
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 endif()
 set(libpng_sources
@@ -769,6 +771,8 @@ endif()
 if(PNG_TESTS AND PNG_SHARED)
   enable_testing()
 
+  # Add a custom target to run a test:
+  # png_add_test(NAME <test> COMMAND <command> [OPTIONS <options>...] [FILES <files>...])
   function(png_add_test)
     set(options)
     set(oneValueArgs NAME COMMAND)
@@ -966,8 +970,9 @@ if(PNG_SHARED AND PNG_TOOLS)
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()
 
-# Create a symlink from src to dest (if possible), or, alternatively,
-# copy src to dest if different.
+# Create a symlink that points to a target file (if symlinking is possible),
+# or make a copy of the target file (if symlinking is not possible):
+# create_symlink(<destfile> [FILE <file> | TARGET <target>])
 function(create_symlink DEST_FILE)
   cmake_parse_arguments(_SYM "" "FILE;TARGET" "" ${ARGN})
   if(NOT _SYM_FILE AND NOT _SYM_TARGET)
