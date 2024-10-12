@@ -1272,7 +1272,7 @@ png_safe_add(png_int_32 *addend0_and_result, png_int_32 addend1,
 static int
 png_xy_from_XYZ(png_xy *xy, const png_XYZ *XYZ)
 {
-   png_int_32 d, dred, dgreen, dwhite, whiteX, whiteY;
+   png_int_32 d, dred, dgreen, dblue, dwhite, whiteX, whiteY;
 
    /* 'd' in each of the blocks below is just X+Y+Z for each component,
     * x, y and z are X,Y,Z/(X+Y+Z).
@@ -1280,43 +1280,51 @@ png_xy_from_XYZ(png_xy *xy, const png_XYZ *XYZ)
    d = XYZ->red_X;
    if (png_safe_add(&d, XYZ->red_Y, XYZ->red_Z))
       return 1;
-   if (png_muldiv(&xy->redx, XYZ->red_X, PNG_FP_1, d) == 0)
-      return 1;
-   if (png_muldiv(&xy->redy, XYZ->red_Y, PNG_FP_1, d) == 0)
-      return 1;
    dred = d;
-   whiteX = XYZ->red_X;
-   whiteY = XYZ->red_Y;
+   if (png_muldiv(&xy->redx, XYZ->red_X, PNG_FP_1, dred) == 0)
+      return 1;
+   if (png_muldiv(&xy->redy, XYZ->red_Y, PNG_FP_1, dred) == 0)
+      return 1;
 
    d = XYZ->green_X;
    if (png_safe_add(&d, XYZ->green_Y, XYZ->green_Z))
       return 1;
-   if (png_muldiv(&xy->greenx, XYZ->green_X, PNG_FP_1, d) == 0)
-      return 1;
-   if (png_muldiv(&xy->greeny, XYZ->green_Y, PNG_FP_1, d) == 0)
-      return 1;
    dgreen = d;
-   whiteX += XYZ->green_X;
-   whiteY += XYZ->green_Y;
+   if (png_muldiv(&xy->greenx, XYZ->green_X, PNG_FP_1, dgreen) == 0)
+      return 1;
+   if (png_muldiv(&xy->greeny, XYZ->green_Y, PNG_FP_1, dgreen) == 0)
+      return 1;
 
    d = XYZ->blue_X;
    if (png_safe_add(&d, XYZ->blue_Y, XYZ->blue_Z))
       return 1;
-   if (png_muldiv(&xy->bluex, XYZ->blue_X, PNG_FP_1, d) == 0)
+   dblue = d;
+   if (png_muldiv(&xy->bluex, XYZ->blue_X, PNG_FP_1, dblue) == 0)
       return 1;
-   if (png_muldiv(&xy->bluey, XYZ->blue_Y, PNG_FP_1, d) == 0)
+   if (png_muldiv(&xy->bluey, XYZ->blue_Y, PNG_FP_1, dblue) == 0)
       return 1;
-   whiteX += XYZ->blue_X;
-   whiteY += XYZ->blue_Y;
 
    /* The reference white is simply the sum of the end-point (X,Y,Z) vectors so
     * the fillowing calculates (X+Y+Z) of the reference white (media white,
     * encoding white) itself:
     */
+   d = dblue;
    if (png_safe_add(&d, dred, dgreen))
       return 1;
-
    dwhite = d;
+
+   /* Find the white X,Y values from the sum of the red, green and blue X,Y
+    * values.
+    */
+   d = XYZ->red_X;
+   if (png_safe_add(&d, XYZ->green_X, XYZ->blue_X))
+      return 1;
+   whiteX = d;
+
+   d = XYZ->red_Y;
+   if (png_safe_add(&d, XYZ->green_Y, XYZ->blue_Y))
+      return 1;
+   whiteY = d;
 
    if (png_muldiv(&xy->whitex, whiteX, PNG_FP_1, dwhite) == 0)
       return 1;
