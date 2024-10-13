@@ -155,6 +155,18 @@ struct png_struct_def
    png_rw_ptr write_data_fn;  /* function for writing output data */
    png_rw_ptr read_data_fn;   /* function for reading input data */
    png_voidp io_ptr;          /* ptr to application struct for I/O functions */
+#ifdef PNG_STDIO_SUPPORTED
+   FILE *stdio_ptr;
+#  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+      size_t (*fread)(void *ptr, size_t size, size_t nmemb, FILE*);
+#  endif /* SEQUENTIAL_READ */
+#  ifdef PNG_WRITE_SUPPORTED
+      size_t (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE*);
+#     ifdef PNG_WRITE_FLUSH_SUPPORTED
+         int (*fflush)(FILE*);
+#     endif /* WRITE_FLUSH */
+#  endif /* WRITE */
+#endif /* STDIO */
 
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
    png_user_transform_ptr read_user_transform_fn; /* user read transform */

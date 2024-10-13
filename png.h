@@ -1541,9 +1541,17 @@ PNG_REMOVED(209, void, png_set_filter_heuristics_fixed,
  */
 
 #ifdef PNG_STDIO_SUPPORTED
-/* Initialize the input/output for the PNG file to the default functions. */
-PNG_EXPORT(74, void, png_init_io, (png_structrp png_ptr, png_FILE_p fp));
-#endif
+#  if defined(PNG_SEQUENTIAL_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
+/* Initialize the input/output for the PNG file to use stdio. */
+PNG_EXPORT(74, void, png_init_io, (png_structrp png_ptr, FILE *fp,
+      size_t (*fread)(void *ptr, size_t size, size_t nmemb, FILE*),
+      size_t (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE*),
+      int (*fflush)(FILE*)));
+
+#define png_init_io(png_ptr, fp)\
+   ((png_init_io)(png_ptr, fp, fread, fwrite, fflush))
+#endif /* SEQUENTIAL_READ || WRITE */
+#endif /* STDIO */
 
 /* Replace the (error and abort), and warning functions with user
  * supplied functions.  If no messages are to be printed you must still
@@ -2977,7 +2985,10 @@ PNG_EXPORT(234, int, png_image_begin_read_from_file, (png_imagep image,
     */
 
 PNG_EXPORT(235, int, png_image_begin_read_from_stdio, (png_imagep image,
-   FILE* file));
+   FILE* file, size_t (*fread)(void *ptr, size_t size, size_t nmemb, FILE*)));
+#define png_image_begin_read_from_stdio(image, file)\
+   ((png_image_begin_read_from_stdio)(image, file, fread))
+
    /* The PNG header is read from the stdio FILE object. */
 #endif /* STDIO */
 
@@ -3051,8 +3062,14 @@ PNG_EXPORT(239, int, png_image_write_to_file, (png_imagep image,
 
 PNG_EXPORT(240, int, png_image_write_to_stdio, (png_imagep image, FILE *file,
    int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
-   const void *colormap));
+   const void *colormap,
+   size_t (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE*),
+   int (*fflush)(FILE*)));
    /* Write the image to the given (FILE*). */
+
+#define png_image_write_to_stdio(png_ptr, fp, cmap, cvt_to_8, buffer, stride)\
+   ((png_image_write_to_stdio)(png_ptr, fp, cmap, cvt_to_8, buffer, stride,\
+      fwrite, fflush))
 #endif /* SIMPLIFIED_WRITE_STDIO */
 
 /* With all write APIs if image is in one of the linear formats with 16-bit

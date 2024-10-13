@@ -582,12 +582,6 @@ png_create_write_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
 #if PNG_RELEASE_BUILD
       png_ptr->flags |= PNG_FLAG_APP_WARNINGS_WARN;
 #endif
-
-      /* TODO: delay this, it can be done in png_init_io() (if the app doesn't
-       * do it itself) avoiding setting the default function if it is not
-       * required.
-       */
-      png_set_write_fn(png_ptr, NULL, NULL, NULL);
    }
 
    return png_ptr;
@@ -2276,9 +2270,28 @@ png_image_write_to_memory(png_imagep image, void *memory,
 }
 
 #ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
-int PNGAPI
-png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
-    const void *buffer, png_int_32 row_stride, const void *colormap)
+typedef struct
+{
+   png_structrp png_ptr;
+   FILE        *file;
+   size_t     (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE*);
+   int        (*fflush)(FILE*);
+} stdio_write_setup;
+
+static int
+setup_stdio_for_write(png_voidp parm)
+{
+   stdio_write_setup *write = png_voidcast(stdio_write_setup*, parm);
+   (png_init_io)(
+         write->png_ptr, write->file, NULL, write->fwrite, write->fflush);
+   return 1;
+}
+
+int PNGAPI (
+png_image_write_to_stdio)(png_imagep image, FILE *file, int convert_to_8bit,
+   const void *buffer, png_int_32 row_stride, const void *colormap,
+   size_t (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE*),
+   int (*fflush)(FILE*))
 {
    /* Write the image to the given (FILE*). */
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
@@ -2288,13 +2301,13 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
          if (png_image_write_init(image) != 0)
          {
             png_image_write_control display;
+            stdio_write_setup       write;
             int result;
 
-            /* This is slightly evil, but png_init_io doesn't do anything other
-             * than this and we haven't changed the standard IO functions so
-             * this saves a 'safe' function.
-             */
-            image->opaque->png_ptr->io_ptr = file;
+            write.png_ptr = image->opaque->png_ptr;
+            write.file = file;
+            write.fwrite = fwrite;
+            write.fflush = fflush;
 
             memset(&display, 0, (sizeof display));
             display.image = image;
@@ -2303,7 +2316,8 @@ png_image_write_to_stdio(png_imagep image, FILE *file, int convert_to_8bit,
             display.colormap = colormap;
             display.convert_to_8bit = convert_to_8bit;
 
-            result = png_safe_execute(image, png_image_write_main, &display);
+            result = png_safe_execute(image, setup_stdio_for_write, &write) &&
+               png_safe_execute(image, png_image_write_main, &display);
             png_image_free(image);
             return result;
          }
@@ -2335,14 +2349,15 @@ png_image_write_to_file(png_imagep image, const char *file_name,
    {
       if (file_name != NULL && buffer != NULL)
       {
-         FILE *fp = fopen(file_name, "wb");
+         FILE *fp = image->opaque->io_file = fopen(file_name, "wb");
 
          if (fp != NULL)
          {
             if (png_image_write_to_stdio(image, fp, convert_to_8bit, buffer,
-                row_stride, colormap) != 0)
+                row_stride, colormap))
             {
                int error; /* from fflush/fclose */
+               image->opaque->io_file = NULL;
 
                /* Make sure the file is flushed correctly. */
                if (fflush(fp) == 0 && ferror(fp) == 0)
@@ -2368,8 +2383,7 @@ png_image_write_to_file(png_imagep image, const char *file_name,
 
             else
             {
-               /* Clean up: just the opened file. */
-               (void)fclose(fp);
+               /* Clean up: just remove the file that was opened. */
                (void)remove(file_name);
                return 0;
             }
