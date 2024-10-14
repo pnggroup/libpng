@@ -1018,7 +1018,12 @@ compare_read(struct display *dp, int applied_transforms)
    C(height);
    C(bit_depth);
    C(color_type);
-   C(interlace_method);
+#  ifdef PNG_WRITE_INTERLACING_SUPPORTED
+      /* If write interlace has been disabled, the PNG file is still
+       * written correctly, but as a regular (not-interlaced) PNG.
+       */
+      C(interlace_method);
+#  endif
    C(compression_method);
    C(filter_method);
 
