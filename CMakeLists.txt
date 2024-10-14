@@ -417,6 +417,7 @@ set(libpng_private_hdrs
     pngdebug.h
     pnginfo.h
     pngstruct.h
+    target/pngtarget.h
 )
 if(AWK AND NOT (ANDROID OR IOS))
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
@@ -439,7 +440,7 @@ set(libpng_sources
     pngwrite.c
     pngwtran.c
     pngwutil.c
-    pngsimd.c
+    target/pngsimd.c
 )
 set(pngtest_sources
     pngtest.c

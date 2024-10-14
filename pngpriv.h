@@ -71,7 +71,7 @@
 #  include "pnglibconf.h"
 #endif
 #ifndef PNGTARGET_H
-#  include "pngtarget.h"
+#  include "target/pngtarget.h"
 #endif
 
 /* Local renames may change non-exported API functions from png.h */
