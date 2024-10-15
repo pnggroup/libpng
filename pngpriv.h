@@ -849,23 +849,27 @@ PNG_INTERNAL_FUNCTION(void,png_zfree,(voidpf png_ptr, voidpf ptr),PNG_EMPTY);
  * PNGCBAPI at 1.5.0
  */
 
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_read_data,(png_structp png_ptr,
-    png_bytep data, size_t length),PNG_EMPTY);
-
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_push_fill_buffer,(png_structp png_ptr,
     png_bytep buffer, size_t length),PNG_EMPTY);
-#endif
+#endif /* PROGRESSIVE_READ */
 
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_write_data,(png_structp png_ptr,
+#ifdef PNG_STDIO_SUPPORTED
+#  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_stdio_read,(png_structp png_ptr,
     png_bytep data, size_t length),PNG_EMPTY);
+#  endif /* SEQUENTIAL_READ */
+
+#ifdef PNG_WRITE_SUPPORTED
+PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_stdio_write,(png_structp png_ptr,
+    png_bytep data, size_t length),PNG_EMPTY);
+#endif /* WRITE */
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-#  ifdef PNG_STDIO_SUPPORTED
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_flush,(png_structp png_ptr),
+PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_stdio_flush,(png_structp png_ptr),
    PNG_EMPTY);
-#  endif
-#endif
+#endif /* WRITE_FLUSH */
+#endif /* STDIO */
 
 /* Reset the CRC variable */
 PNG_INTERNAL_FUNCTION(void,png_reset_crc,(png_structrp png_ptr),PNG_EMPTY);
@@ -1815,8 +1819,11 @@ typedef struct png_control
    png_const_bytep memory;          /* Memory buffer. */
    size_t          size;            /* Size of the memory buffer. */
 
+#  ifdef PNG_STDIO_SUPPORTED
+      FILE     *io_file;            /* FILE* opened by us, not user/app */
+#  endif
+
    unsigned int for_write       :1; /* Otherwise it is a read structure */
-   unsigned int owned_file      :1; /* We own the file in io_ptr */
 } png_control;
 
 /* Return the pointer to the jmp_buf from a png_control: necessary because C

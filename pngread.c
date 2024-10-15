@@ -75,12 +75,6 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
          if (png_ptr->target_state != 0U)
             png_set_option(png_ptr, PNG_TARGET_SPECIFIC_CODE, 1);
 #     endif
-
-      /* TODO: delay this, it can be done in png_init_io (if the app doesn't
-       * do it itself) avoiding setting the default function if it is not
-       * required.
-       */
-      png_set_read_fn(png_ptr, NULL, NULL);
    }
 
    return png_ptr;
@@ -1486,21 +1480,38 @@ png_image_read_header(png_voidp argument)
 }
 
 #ifdef PNG_STDIO_SUPPORTED
-int PNGAPI
-png_image_begin_read_from_stdio(png_imagep image, FILE* file)
+typedef struct
+{
+   png_structrp png_ptr;
+   FILE        *file;
+   size_t     (*fread)(void *ptr, size_t size, size_t nmemb, FILE*);
+} stdio_read_setup;
+
+static int
+setup_stdio_for_read(png_voidp parm)
+{
+   stdio_read_setup *read = png_voidcast(stdio_read_setup*, parm);
+   (png_init_io)(read->png_ptr, read->file, read->fread, NULL, NULL);
+   return 1;
+}
+
+int PNGAPI (
+png_image_begin_read_from_stdio)(png_imagep image, FILE* file,
+   size_t (*fread)(void *ptr, size_t size, size_t nmemb, FILE*))
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
    {
       if (file != NULL)
       {
-         if (png_image_read_init(image) != 0)
+         if (png_image_read_init(image))
          {
-            /* This is slightly evil, but png_init_io doesn't do anything other
-             * than this and we haven't changed the standard IO functions so
-             * this saves a 'safe' function.
-             */
-            image->opaque->png_ptr->io_ptr = file;
-            return png_safe_execute(image, png_image_read_header, image);
+            stdio_read_setup parm;
+            parm.png_ptr = image->opaque->png_ptr;
+            parm.file = file;
+            parm.fread = fread;
+
+            return png_safe_execute(image, setup_stdio_for_read, &parm) &&
+               png_safe_execute(image, png_image_read_header, image);
          }
       }
 
@@ -1523,20 +1534,13 @@ png_image_begin_read_from_file(png_imagep image, const char *file_name)
    {
       if (file_name != NULL)
       {
-         FILE *fp = fopen(file_name, "rb");
+         /* The file is stored in png_control::io_file and this means that it
+          * will passed to fclose on error:
+          */
+         FILE* fp = image->opaque->io_file = fopen(file_name, "rb");
 
          if (fp != NULL)
-         {
-            if (png_image_read_init(image) != 0)
-            {
-               image->opaque->png_ptr->io_ptr = fp;
-               image->opaque->owned_file = 1;
-               return png_safe_execute(image, png_image_read_header, image);
-            }
-
-            /* Clean up: just the opened file. */
-            (void)fclose(fp);
-         }
+            return png_image_begin_read_from_stdio(image, fp);
 
          else
             return png_image_error(image, strerror(errno));

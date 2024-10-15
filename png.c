@@ -669,7 +669,7 @@ png_get_io_ptr(png_const_structrp png_ptr)
    return png_ptr->io_ptr;
 }
 
-#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
+#if defined(PNG_SEQUENTIAL_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #  ifdef PNG_STDIO_SUPPORTED
 /* Initialize the default input/output functions for the PNG file.  If you
  * use your own read or write routines, you can call either png_set_read_fn()
@@ -677,18 +677,91 @@ png_get_io_ptr(png_const_structrp png_ptr)
  * PNG_NO_STDIO or otherwise disabled PNG_STDIO_SUPPORTED, you must use a
  * function of your own because "FILE *" isn't necessarily available.
  */
-void PNGAPI
-png_init_io(png_structrp png_ptr, png_FILE_p fp)
+void PNGAPI (
+png_init_io)(png_structrp png_ptr, FILE *fp,
+      size_t (*fread)(void *ptr, size_t size, size_t nmemb, FILE*),
+      size_t (*fwrite)(const void *ptr, size_t size, size_t nmemb, FILE*),
+      int (*fflush)(FILE*))
 {
    png_debug(1, "in png_init_io");
 
    if (png_ptr == NULL)
       return;
 
-   png_ptr->io_ptr = (png_voidp)fp;
-}
+   /* If SEQUENTIAL_READ is not supported and this IS a read png_struct
+    * png_init_io cannot be used (or, rather, it will not work).  Detect this
+    * early.
+    */
+#  ifndef PNG_SEQUENTIAL_READ_SUPPORTED
+      /* Read must be done using the progressive reader therefore: */
+      if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
+      {
+         png_app_error(png_ptr, "API: IO cannot be set with progressive read");
+         return;
+      }
+#  endif /* !SEQUENTIAL_READ */
+
+   /* First clear out any read/write functionality set by the caller. */
+   png_ptr->io_ptr = NULL;
+#  ifdef PNG_READ_SUPPORTED
+      png_ptr->read_data_fn = NULL;
+#  endif /* READ */
+#  ifdef PNG_WRITE_SUPPORTED
+      png_ptr->write_data_fn = NULL;
+#  endif /* WRITE */
+#  ifdef PNG_WRITE_FLUSH_SUPPPORTED
+      png_ptr->output_flush_fn = NULL;
 #  endif
 
+   /* Set up the stdio based read or write functions as appropriate. */
+#  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+      if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
+      {
+         png_ptr->fread = fread;
+         png_ptr->read_data_fn = png_stdio_read;
+      }
+      else
+      {
+         png_ptr->fread = NULL;
+      }
+#  else /* !SEQUENTIAL_READ */
+      PNG_UNUSED(fread)
+#  endif /* !SEQUENTIAL_READ */
+
+#  ifdef PNG_WRITE_SUPPORTED
+      if ((png_ptr->mode & PNG_IS_READ_STRUCT) == 0)
+      {
+         png_ptr->fwrite = fwrite;
+         png_ptr->write_data_fn = png_stdio_write;
+      }
+      else
+      {
+         png_ptr->fwrite = NULL;
+      }
+#  else /* !WRITE */
+      PNG_UNUSED(fwrite)
+#  endif /* !WRITE */
+
+#  ifdef PNG_WRITE_FLUSH_SUPPORTED
+      if ((png_ptr->mode & PNG_IS_READ_STRUCT) == 0)
+      {
+         png_ptr->fflush = fflush;
+         png_ptr->output_flush_fn = png_stdio_flush;
+      }
+      else
+      {
+         png_ptr->fflush = NULL;
+      }
+#  else /* !WRITE_FLUSH */
+      PNG_UNUSED(fflush)
+#  endif /* !WRITE_FLUSH */
+
+   png_ptr->stdio_ptr = fp;
+}
+#  endif /* STDIO */
+#endif /* SEQUENTIAL_READ || WRITE */
+
+#if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 #  ifdef PNG_SAVE_INT_32_SUPPORTED
 /* PNG signed integers are saved in 32-bit 2's complement format.  ANSI C-90
  * defines a cast of a signed integer to an unsigned integer either to preserve
@@ -4556,15 +4629,14 @@ png_image_free_function(png_voidp argument)
 
    /* First free any data held in the control structure. */
 #  ifdef PNG_STDIO_SUPPORTED
-      if (cp->owned_file != 0)
+      if (cp->io_file != NULL)
       {
-         FILE *fp = png_voidcast(FILE*, cp->png_ptr->io_ptr);
-         cp->owned_file = 0;
+         FILE *fp = cp->io_file;
 
          /* Ignore errors here. */
          if (fp != NULL)
          {
-            cp->png_ptr->io_ptr = NULL;
+            cp->io_file = NULL;
             (void)fclose(fp);
          }
       }
