@@ -22,6 +22,16 @@
 #ifndef PNGPRIV_H
 #define PNGPRIV_H
 
+/* Compiler functionality.  For building libpng (though not necessarily for
+ * using libpng) a C compiler conformant to at least the original ANSI-C
+ * standard (C89, ISO-C90) is required.
+ */
+#if __STDC__ != 1
+#  error A compiler compliant with ISO-C90 is required to build libpng
+#endif
+
+/* TODO: check __STDC_VERSION__ (defined in ISO-C95) */
+
 /* Feature Test Macros.  The following are defined here to ensure that correctly
  * implemented libraries reveal the APIs libpng needs to build and hide those
  * that are not needed and potentially damaging to the compilation.
