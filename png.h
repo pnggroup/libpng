@@ -744,6 +744,7 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_sCAL 0x4000U  /* ESR, 1.0.6 */
 #define PNG_INFO_IDAT 0x8000U  /* ESR, 1.0.6 */
 #define PNG_INFO_eXIf 0x10000U /* GR-P, 1.6.31 */
+#define PNG_INFO_cICP 0x20000U
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -1971,6 +1972,17 @@ PNG_FIXED_EXPORT(233, void, png_set_cHRM_XYZ_fixed, (png_const_structrp png_ptr,
     png_fixed_point int_green_Y, png_fixed_point int_green_Z,
     png_fixed_point int_blue_X, png_fixed_point int_blue_Y,
     png_fixed_point int_blue_Z))
+#endif
+
+#ifdef PNG_cICP_SUPPORTED
+PNG_EXPORT(250, png_uint_32, png_get_cICP, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_bytep colour_primaries,
+    png_bytep transfer_function, png_bytep matrix_coefficients,
+    png_bytep video_full_range_flag));
+PNG_EXPORT(251, void, png_set_cICP, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_byte colour_primaries,
+    png_byte transfer_function, png_byte matrix_coefficients,
+    png_byte video_full_range_flag));
 #endif
 
 #ifdef PNG_eXIf_SUPPORTED
@@ -3237,7 +3249,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(249);
+  PNG_EXPORT_LAST_ORDINAL(251);
 #endif
 
 #ifdef __cplusplus

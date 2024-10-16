@@ -100,6 +100,14 @@ struct png_info_def
    png_colorspace colorspace;
 #endif
 
+#ifdef PNG_cICP_SUPPORTED
+   /* cICP chunk data */
+   png_byte cicp_colour_primaries;
+   png_byte cicp_transfer_function;
+   png_byte cicp_matrix_coefficients;
+   png_byte cicp_video_full_range_flag;
+#endif
+
 #ifdef PNG_iCCP_SUPPORTED
    /* iCCP chunk data. */
    png_charp iccp_name;     /* profile name */

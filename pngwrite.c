@@ -236,6 +236,16 @@ png_write_info(png_structrp png_ptr, png_const_inforp info_ptr)
       png_write_bKGD(png_ptr, &(info_ptr->background), info_ptr->color_type);
 #endif
 
+#ifdef PNG_WRITE_cICP_SUPPORTED
+    if ((info_ptr->valid & PNG_INFO_cICP) != 0)
+    {
+        png_write_cICP(png_ptr, info_ptr->cicp_colour_primaries,
+                       info_ptr->cicp_transfer_function,
+                       info_ptr->cicp_matrix_coefficients,
+                       info_ptr->cicp_video_full_range_flag);
+    }
+#endif
+
 #ifdef PNG_WRITE_eXIf_SUPPORTED
    if ((info_ptr->valid & PNG_INFO_eXIf) != 0)
    {

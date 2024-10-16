@@ -814,6 +814,10 @@ if(PNG_TESTS AND PNG_SHARED)
                COMMAND pngtest
                FILES "${PNGTEST_PNG}")
 
+  png_add_test(NAME pngtest-cicp
+               COMMAND pngtest
+               FILES "${CMAKE_CURRENT_SOURCE_DIR}/cicp-display-p3_reencoded.png")
+
   add_executable(pngvalid ${pngvalid_sources})
   target_link_libraries(pngvalid PRIVATE png_shared)
 
