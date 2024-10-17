@@ -31,6 +31,21 @@ if (png_ptr->push_length + 4 > png_ptr->buffer_size) \
 if (png_ptr->buffer_size < N) \
    { png_push_save_buffer(png_ptr); return; }
 
+#ifdef PNG_READ_INTERLACING_SUPPORTED
+/* Arrays to facilitate interlacing - use pass (0 - 6) as index. */
+
+/* Start of interlace block */
+static const png_byte png_pass_start[7] = {0, 4, 0, 2, 0, 1, 0};
+/* Offset to next interlace block */
+static const png_byte png_pass_inc[7] = {8, 8, 4, 4, 2, 2, 1};
+/* Start of interlace block in the y direction */
+static const png_byte png_pass_ystart[7] = {0, 0, 4, 0, 2, 0, 1};
+/* Offset to next interlace block in the y direction */
+static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
+
+/* TODO: Move these arrays to a common utility module to avoid duplication. */
+#endif
+
 void PNGAPI
 png_process_data(png_structrp png_ptr, png_inforp info_ptr,
     png_bytep buffer, size_t buffer_size)
@@ -975,27 +990,6 @@ png_push_process_row(png_structrp png_ptr)
 void /* PRIVATE */
 png_read_push_finish_row(png_structrp png_ptr)
 {
-#ifdef PNG_READ_INTERLACING_SUPPORTED
-   /* Arrays to facilitate easy interlacing - use pass (0 - 6) as index */
-
-   /* Start of interlace block */
-   static const png_byte png_pass_start[] = {0, 4, 0, 2, 0, 1, 0};
-
-   /* Offset to next interlace block */
-   static const png_byte png_pass_inc[] = {8, 8, 4, 4, 2, 2, 1};
-
-   /* Start of interlace block in the y direction */
-   static const png_byte png_pass_ystart[] = {0, 0, 4, 0, 2, 0, 1};
-
-   /* Offset to next interlace block in the y direction */
-   static const png_byte png_pass_yinc[] = {8, 8, 8, 4, 4, 2, 2};
-
-   /* Height of interlace block.  This is not currently used - if you need
-    * it, uncomment it here and in png.h
-   static const png_byte png_pass_height[] = {8, 8, 4, 4, 2, 2, 1};
-   */
-#endif
-
    png_ptr->row_number++;
    if (png_ptr->row_number < png_ptr->num_rows)
       return;
