@@ -630,7 +630,6 @@ get_unknown(display *d, png_infop info_ptr, int after_IDAT)
                   ++(d->error_count);
                   break;
                }
-               FALLTHROUGH; /* (safe) */ /* FALLTHROUGH */
             case PNG_HANDLE_CHUNK_ALWAYS:
                break;
          }

@@ -62,8 +62,6 @@ png_have_neon(png_structp png_ptr)
 
                counter=0;
                state = Feature;
-               /* FALLTHROUGH */
-
             case Feature:
                /* Match 'FEATURE', ASCII case insensitive. */
                if ((ch & ~0x20) == ch_feature[counter])
@@ -75,8 +73,6 @@ png_have_neon(png_structp png_ptr)
 
                /* did not match 'feature' */
                state = SkipLine;
-               /* FALLTHROUGH */
-
             case SkipLine:
             skipLine:
                /* Skip everything until we see linefeed or carriage return */
@@ -110,8 +106,6 @@ png_have_neon(png_structp png_ptr)
 
                state = Neon;
                counter = 0;
-               /* FALLTHROUGH */
-
             case Neon:
                /* Look for 'neon' tag */
                if ((ch & ~0x20) == ch_neon[counter])
@@ -122,8 +116,6 @@ png_have_neon(png_structp png_ptr)
                }
 
                state = SkipTag;
-               /* FALLTHROUGH */
-
             case SkipTag:
                /* Skip non-space characters */
                if (ch == 10 || ch == 13)

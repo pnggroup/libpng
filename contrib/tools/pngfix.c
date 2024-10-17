@@ -2405,8 +2405,6 @@ zlib_advance(struct zlib *zlib, png_uint_32 nbytes)
                   endrc = ZLIB_TOO_FAR_BACK;
                   break;
                }
-               FALLTHROUGH; /* FALLTHROUGH */
-
             default:
                zlib_message(zlib, 0/*stream error*/);
                endrc = ZLIB_FATAL;
@@ -2559,8 +2557,6 @@ zlib_run(struct zlib *zlib)
                   list->lengths[i] -= zlib->extra_bytes;
                   list->count = i+1;
                   zlib->idat->idat_list_tail = list;
-                  FALLTHROUGH; /* FALLTHROUGH */
-
                default:
                   return rc;
             }
@@ -2662,8 +2658,6 @@ zlib_check(struct file *file, png_uint_32 offset)
             /* Truncated stream; unrecoverable, gets converted to ZLIB_FATAL */
             zlib.z.msg = PNGZ_MSG_CAST("[truncated]");
             zlib_message(&zlib, 0/*expected*/);
-            FALLTHROUGH; /* FALLTHROUGH */
-
          default:
             /* Unrecoverable error; skip the chunk; a zlib_message has already
              * been output.
@@ -3330,8 +3324,6 @@ read_callback(png_structp png_ptr, png_bytep buffer, size_t count)
                if (file->state != STATE_IDAT && length > 0)
                   setpos(chunk);
             }
-            FALLTHROUGH; /* FALLTHROUGH */
-
          default:
             assert(chunk != NULL);
 

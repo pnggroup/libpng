@@ -6596,16 +6596,13 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    {
    case PNG_COLOR_TYPE_PALETTE:
       if (dp->output_bit_depth > 8) goto error;
-      FALLTHROUGH; /* FALLTHROUGH */
    case PNG_COLOR_TYPE_GRAY:
       if (dp->output_bit_depth == 1 || dp->output_bit_depth == 2 ||
          dp->output_bit_depth == 4)
          break;
-      FALLTHROUGH; /* FALLTHROUGH */
    default:
       if (dp->output_bit_depth == 8 || dp->output_bit_depth == 16)
          break;
-      /* FALLTHROUGH */
    error:
       {
          char message[128];
@@ -10008,7 +10005,6 @@ gamma_component_validate(const char *name, const validate_info *vi,
                   use_background = (alpha >= 0 && alpha < 1);
 #           endif
 #           ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-                  FALLTHROUGH; /* FALLTHROUGH */
                case ALPHA_MODE_OFFSET + PNG_ALPHA_STANDARD:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_BROKEN:
                case ALPHA_MODE_OFFSET + PNG_ALPHA_OPTIMIZED:
