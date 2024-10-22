@@ -1040,6 +1040,14 @@ PNG_INTERNAL_FUNCTION(void,png_zfree,(voidpf png_ptr, voidpf ptr),PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_read_data,(png_structp png_ptr,
     png_bytep data, size_t length),PNG_EMPTY);
 
+PNG_INTERNAL_FUNCTION(void PNGCBAPI, png_set_read_fn2, (png_structrp png_ptr,
+   png_voidp io_ptr, png_rw_ptr read_data_fn, png_fread_ptr fread_fn),
+   PNG_EMPTY);
+
+PNG_INTERNAL_FUNCTION(void PNGCBAPI, png_set_write_fn2, (png_structrp png_ptr,
+   png_voidp io_ptr, png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn,
+   png_fwrite_ptr fwrite_fn, png_fflush_ptr fflush_fn), PNG_EMPTY);
+
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
 PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_push_fill_buffer,(png_structp png_ptr,
     png_bytep buffer, size_t length),PNG_EMPTY);

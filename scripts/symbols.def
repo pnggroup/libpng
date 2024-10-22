@@ -253,3 +253,6 @@ EXPORTS
  png_set_eXIf @247
  png_get_eXIf_1 @248
  png_set_eXIf_1 @249
+ png_init_io2 @250
+ png_init_write_io @251
+ png_init_read_io @252
