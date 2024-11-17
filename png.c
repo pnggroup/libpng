@@ -1150,7 +1150,7 @@ png_colorspace_sync_info(png_const_structrp png_ptr, png_inforp info_ptr)
    {
       /* Everything is invalid */
       info_ptr->valid &= ~(PNG_INFO_gAMA|PNG_INFO_cHRM|PNG_INFO_sRGB|
-         PNG_INFO_iCCP);
+        PNG_INFO_iCCP|PNG_INFO_cLLi|PNG_INFO_mDCv);
 
 #     ifdef PNG_COLORSPACE_SUPPORTED
       /* Clean up the iCCP profile now if it won't be used. */

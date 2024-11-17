@@ -253,3 +253,7 @@ EXPORTS
  png_set_eXIf @247
  png_get_eXIf_1 @248
  png_set_eXIf_1 @249
+ png_get_mDCv @250
+ png_set_mDCv @251
+ png_get_cLLi @252
+ png_set_cLLi @253

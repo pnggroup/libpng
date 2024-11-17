@@ -1190,6 +1190,55 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name,
 }
 #endif
 
+#ifdef PNG_WRITE_mDCv_SUPPORTED
+/* Write the mDCv chunk */
+void /* PRIVATE */
+png_write_mDCv(png_structrp png_ptr, png_const_mdcvp mastering_display_color_volume)
+{
+    png_byte buf[24];
+
+    png_debug(1, "in png_write_mDCv");
+
+    if (mastering_display_color_volume == NULL)
+        png_error(png_ptr, "Null mastering display color volume");
+
+    png_save_uint_16(buf + 0, mastering_display_color_volume->chromaticity_redx);
+    png_save_uint_16(buf + 2, mastering_display_color_volume->chromaticity_redy);
+    png_save_uint_16(buf + 4, mastering_display_color_volume->chromaticity_greenx);
+    png_save_uint_16(buf + 6, mastering_display_color_volume->chromaticity_greeny);
+    png_save_uint_16(buf + 8, mastering_display_color_volume->chromaticity_bluex);
+    png_save_uint_16(buf + 10, mastering_display_color_volume->chromaticity_bluey);
+    png_save_uint_16(buf + 12, mastering_display_color_volume->chromaticity_whitex);
+    png_save_uint_16(buf + 14, mastering_display_color_volume->chromaticity_whitey);
+    png_save_uint_32(buf + 16, mastering_display_color_volume->max_Lum);
+    png_save_uint_32(buf + 20, mastering_display_color_volume->min_Lum);
+
+    png_write_complete_chunk(png_ptr, png_mDCv, buf, 24);
+
+}
+#endif
+
+#ifdef PNG_WRITE_cLLi_SUPPORTED
+/* Write the cLLi chunk */
+void /* PRIVATE */
+png_write_cLLi(png_structrp png_ptr, png_uint_32 max_cll, png_uint_32 max_fall)
+{
+    png_byte buf[8];
+
+    png_debug(1, "in png_write_cLLi");
+
+    /* Check that we have valid input data from the application info */
+    if (max_cll < 0 || max_fall < 0)
+       png_error(png_ptr, "Invalid value");
+
+    png_save_int_32(buf, max_cll);
+    png_save_int_32(buf + 4, max_fall);
+
+    png_write_complete_chunk(png_ptr, png_cLLi, buf, 8);
+
+}
+#endif
+
 #ifdef PNG_WRITE_sPLT_SUPPORTED
 /* Write a sPLT chunk */
 void /* PRIVATE */

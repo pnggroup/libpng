@@ -301,6 +301,7 @@ png_crc_error(png_structrp png_ptr)
 #if defined(PNG_READ_iCCP_SUPPORTED) || defined(PNG_READ_iTXt_SUPPORTED) ||\
     defined(PNG_READ_pCAL_SUPPORTED) || defined(PNG_READ_sCAL_SUPPORTED) ||\
     defined(PNG_READ_sPLT_SUPPORTED) || defined(PNG_READ_tEXt_SUPPORTED) ||\
+    defined(PNG_READ_mDCv_SUPPORTED) || defined(PNG_READ_cLLi_SUPPORTED) ||\
     defined(PNG_READ_zTXt_SUPPORTED) || defined(PNG_SEQUENTIAL_READ_SUPPORTED)
 /* Manage the read buffer; this simply reallocates the buffer if it is not small
  * enough (or if it is not allocated).  The routine returns a pointer to the
@@ -1646,6 +1647,94 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
       png_chunk_benign_error(png_ptr, errmsg);
 }
 #endif /* READ_iCCP */
+
+#ifdef PNG_READ_mDCv_SUPPORTED
+void /* PRIVATE */
+png_handle_mDCv(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
+{
+    png_byte buf[24];
+    png_mdcv mastering_display_color_volume;
+
+    png_debug(1, "in png_handle_mDCv");
+
+    if ((png_ptr->mode & PNG_HAVE_IHDR) == 0)
+        png_chunk_error(png_ptr, "missing IHDR");
+
+    else if ((png_ptr->mode & (PNG_HAVE_IDAT | PNG_HAVE_PLTE)) != 0)
+    {
+        png_crc_finish(png_ptr, length);
+        png_chunk_benign_error(png_ptr, "out of place");
+        return;
+    }
+
+    if (length != 24)
+    {
+        png_crc_finish(png_ptr, length);
+        png_chunk_benign_error(png_ptr, "invalid length");
+        return;
+    }
+
+    png_crc_read(png_ptr, buf, 24);
+
+    if (png_crc_finish(png_ptr, 0) != 0)
+        return;
+
+    // Extract the information
+    mastering_display_color_volume.chromaticity_redx = png_get_uint_16(buf);
+    mastering_display_color_volume.chromaticity_redy = png_get_uint_16(buf + 2);
+    mastering_display_color_volume.chromaticity_greenx = png_get_uint_16(buf + 4);
+    mastering_display_color_volume.chromaticity_greeny = png_get_uint_16(buf + 6);
+    mastering_display_color_volume.chromaticity_bluex = png_get_uint_16(buf + 8);
+    mastering_display_color_volume.chromaticity_bluey = png_get_uint_16(buf + 10);
+    mastering_display_color_volume.chromaticity_whitex = png_get_uint_16(buf + 12);
+    mastering_display_color_volume.chromaticity_whitey = png_get_uint_16(buf + 14);
+    mastering_display_color_volume.max_Lum = png_get_uint_32(buf + 16);
+    mastering_display_color_volume.min_Lum = png_get_uint_32(buf + 20);
+
+    png_set_mDCv(png_ptr, info_ptr, &mastering_display_color_volume);
+
+}
+#endif /* READ_mDCv */
+
+#ifdef PNG_READ_cLLi_SUPPORTED
+void /* PRIVATE */
+png_handle_cLLi(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
+{
+    png_byte buf[8];
+    png_uint_32 max_cll, max_fall;
+
+    png_debug(1, "in png_handle_cLLi");
+
+    if ((png_ptr->mode & PNG_HAVE_IHDR) == 0)
+        png_chunk_error(png_ptr, "missing IHDR");
+
+    else if ((png_ptr->mode & (PNG_HAVE_IDAT | PNG_HAVE_PLTE)) != 0)
+    {
+        png_crc_finish(png_ptr, length);
+        png_chunk_benign_error(png_ptr, "out of place");
+        return;
+    }
+
+    if (length != 8)
+    {
+        png_crc_finish(png_ptr, length);
+        png_chunk_benign_error(png_ptr, "invalid length");
+        return;
+    }
+
+    png_crc_read(png_ptr, buf, 8);
+
+    if (png_crc_finish(png_ptr, 0) != 0)
+        return;
+
+    // Extract the information
+    max_cll = png_get_uint_32(buf);
+    max_fall = png_get_uint_32(buf + 4);
+
+    png_set_cLLi(png_ptr, info_ptr, max_cll, max_fall);
+
+}
+#endif /* READ_cLLi */
 
 #ifdef PNG_READ_sPLT_SUPPORTED
 void /* PRIVATE */

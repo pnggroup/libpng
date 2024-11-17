@@ -315,6 +315,11 @@ struct png_struct_def
    png_color_16 trans_color;  /* transparent color for non-paletted files */
 #endif
 
+#if defined(PNG_READ_cLLi_SUPPORTED)
+    png_uint_32 maximum_content_light_level;
+    png_uint_32 maximum_frame_average_light_level;
+#endif /* cLLi */
+    
    png_read_status_ptr read_row_fn;   /* called after each row is decoded */
    png_write_status_ptr write_row_fn; /* called after each row is encoded */
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED

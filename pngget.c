@@ -767,6 +767,48 @@ png_get_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 #endif
 
+#ifdef PNG_mDCv_SUPPORTED
+png_uint_32 PNGAPI
+png_get_mDCv(png_const_structrp png_ptr, png_inforp info_ptr,
+    png_mdcvp *mastering_display_color_volume)
+{
+   png_debug1(1, "in %s retrieval function", "mDCv");
+
+   if (png_ptr != NULL && info_ptr != NULL &&
+       (info_ptr->valid & PNG_INFO_mDCv) != 0 && mastering_display_color_volume != NULL)
+   {
+      *mastering_display_color_volume = &(info_ptr->mastering_display_color_volume);
+      return (PNG_INFO_mDCv);
+   }
+
+   return (0);
+}
+#endif /* mDCv */
+
+#ifdef PNG_cLLi_SUPPORTED
+png_uint_32 PNGAPI
+png_get_cLLi(png_const_structrp png_ptr, png_inforp info_ptr,
+    png_uint_32 *max_cll, png_uint_32 *max_fall)
+{
+   png_debug1(1, "in %s retrieval function", "cLLi");
+
+   if (png_ptr != NULL && info_ptr != NULL &&
+       (info_ptr->valid & PNG_INFO_cLLi) != 0)
+   {
+       if (max_cll != NULL)
+           *max_cll = info_ptr->maximum_content_light_level;
+
+       if (max_fall != NULL)
+           *max_fall = info_ptr->maximum_frame_average_light_level ;
+
+      return (PNG_INFO_cLLi);
+   }
+
+   return (0);
+
+}
+#endif /* cLLi */
+
 #ifdef PNG_sPLT_SUPPORTED
 int PNGAPI
 png_get_sPLT(png_const_structrp png_ptr, png_inforp info_ptr,

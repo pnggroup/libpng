@@ -608,6 +608,25 @@ typedef png_time * png_timep;
 typedef const png_time * png_const_timep;
 typedef png_time * * png_timepp;
 
+#ifdef PNG_mDCv_SUPPORTED
+typedef struct png_mdcv_struct
+{
+   png_uint_16 chromaticity_redx;   /* for use in display primaries */
+   png_uint_16 chromaticity_redy ;
+   png_uint_16 chromaticity_greenx;
+   png_uint_16 chromaticity_greeny;
+   png_uint_16 chromaticity_bluex;
+   png_uint_16 chromaticity_bluey;
+   png_uint_16 chromaticity_whitex;  /* for use white point */
+   png_uint_16 chromaticity_whitey;
+   png_uint_32 max_Lum; /* max, min master display luminance */
+   png_uint_32 min_Lum;
+} png_mdcv;
+typedef png_mdcv * png_mdcvp;
+typedef const png_mdcv * png_const_mdcvp;
+typedef png_mdcv * * png_mdcvpp;
+#endif
+
 #if defined(PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED) ||\
    defined(PNG_USER_CHUNKS_SUPPORTED)
 /* png_unknown_chunk is a structure to hold queued chunks for which there is
@@ -744,6 +763,8 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_sCAL 0x4000U  /* ESR, 1.0.6 */
 #define PNG_INFO_IDAT 0x8000U  /* ESR, 1.0.6 */
 #define PNG_INFO_eXIf 0x10000U /* GR-P, 1.6.31 */
+#define PNG_INFO_mDCv 0x40000U /* mDCv chunk */
+#define PNG_INFO_cLLi 0x80000U /* cLLi chunk */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -2093,6 +2114,20 @@ PNG_EXPORT(159, void, png_set_iCCP, (png_const_structrp png_ptr,
     png_const_bytep profile, png_uint_32 proflen));
 #endif
 
+#ifdef PNG_mDCv_SUPPORTED
+PNG_EXPORT(250, png_uint_32, png_get_mDCv, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_mdcvp *mastering_display_color_volume));
+PNG_EXPORT(251, void, png_set_mDCv, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_const_mdcvp mastering_display_color_volume));
+#endif
+
+#ifdef PNG_cLLi_SUPPORTED
+PNG_EXPORT(252, png_uint_32, png_get_cLLi, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_uint_32 *max_cll, png_uint_32 *max_fall));
+PNG_EXPORT(253, void, png_set_cLLi, (png_const_structrp png_ptr,
+    png_inforp info_ptr, png_uint_32 max_cll, png_uint_32 max_fall));
+#endif
+
 #ifdef PNG_sPLT_SUPPORTED
 PNG_EXPORT(160, int, png_get_sPLT, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_sPLT_tpp entries));
@@ -3237,7 +3272,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(249);
+  PNG_EXPORT_LAST_ORDINAL(253);
 #endif
 
 #ifdef __cplusplus

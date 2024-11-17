@@ -224,6 +224,16 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_iCCP(png_ptr, info_ptr, length);
 #endif
 
+#ifdef PNG_READ_mDCv_SUPPORTED
+      else if (chunk_name == png_mDCv)
+          png_handle_mDCv(png_ptr, info_ptr, length);
+#endif
+
+#ifdef PNG_READ_cLLi_SUPPORTED
+      else if (chunk_name == png_cLLi)
+         png_handle_cLLi(png_ptr, info_ptr, length);
+#endif
+       
 #ifdef PNG_READ_sPLT_SUPPORTED
       else if (chunk_name == png_sPLT)
          png_handle_sPLT(png_ptr, info_ptr, length);
@@ -899,6 +909,16 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_iCCP_SUPPORTED
       else if (chunk_name == png_iCCP)
          png_handle_iCCP(png_ptr, info_ptr, length);
+#endif
+    
+#ifdef PNG_READ_mDCv_SUPPORTED
+      else if (chunk_name == png_mDCv)
+          png_handle_mDCv(png_ptr, info_ptr, length);
+#endif
+
+#ifdef PNG_READ_cLLi_SUPPORTED
+      else if (chunk_name == png_cLLi)
+         png_handle_cLLi(png_ptr, info_ptr, length);
 #endif
 
 #ifdef PNG_READ_sPLT_SUPPORTED
@@ -1638,6 +1658,12 @@ png_image_skip_unused_chunks(png_structrp png_ptr)
            103,  65,  77,  65, '\0',  /* gAMA */
 #        ifdef PNG_READ_iCCP_SUPPORTED
            105,  67,  67,  80, '\0',  /* iCCP */
+#        endif
+#        ifdef PNG_READ_mDCv_SUPPORTED
+           109,  68,  67, 118, '\0',  /* mDCv */
+#        endif
+#        ifdef PNG_READ_cLLi_SUPPORTED
+            99,  76,  76, 105, '\0',  /* cLLi */
 #        endif
            115,  66,  73,  84, '\0',  /* sBIT */
            115,  82,  71,  66, '\0',  /* sRGB */

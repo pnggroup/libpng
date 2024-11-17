@@ -164,6 +164,16 @@ png_write_info_before_PLTE(png_structrp png_ptr, png_const_inforp info_ptr)
             png_write_sRGB(png_ptr, info_ptr->colorspace.rendering_intent);
 #  endif /* WRITE_sRGB */
 #endif /* COLORSPACE */
+       
+#ifdef PNG_WRITE_mDCv_SUPPORTED
+        if ((info_ptr->valid & PNG_INFO_mDCv) != 0)
+            png_write_mDCv(png_ptr, &(info_ptr->mastering_display_color_volume));
+#endif
+
+#ifdef PNG_WRITE_cLLi_SUPPORTED
+        if ((info_ptr->valid & PNG_INFO_cLLi) != 0)
+            png_write_cLLi(png_ptr, info_ptr->maximum_content_light_level, info_ptr->maximum_frame_average_light_level);
+#endif
 
 #ifdef PNG_WRITE_sBIT_SUPPORTED
          if ((info_ptr->valid & PNG_INFO_sBIT) != 0)

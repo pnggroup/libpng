@@ -106,6 +106,20 @@ struct png_info_def
    png_bytep iccp_profile;  /* International Color Consortium profile data */
    png_uint_32 iccp_proflen;  /* ICC profile data length */
 #endif
+    
+#ifdef PNG_mDCv_SUPPORTED
+   /* The mDCv chunk characterizes the Mastering Display Color Volume (mDCv)
+    * used at the point of content creation holds the last time the displayed image
+    * data was modified. See the png_mdcv struct for the contents of this struct.
+    */
+    png_mdcv mastering_display_color_volume;
+#endif
+
+#ifdef PNG_cLLi_SUPPORTED
+   /* cLLi chunk data. */
+    png_uint_32 maximum_content_light_level;
+    png_uint_32 maximum_frame_average_light_level;
+#endif
 
 #ifdef PNG_TEXT_SUPPORTED
    /* The tEXt, and zTXt chunks contain human-readable textual data in

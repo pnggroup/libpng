@@ -850,6 +850,8 @@ chunk eXIf
 chunk gAMA enables GAMMA
 chunk hIST
 chunk iCCP enables COLORSPACE, GAMMA
+chunk mDCv
+chunk cLLi
 chunk iTXt enables TEXT
 chunk oFFs
 chunk pCAL

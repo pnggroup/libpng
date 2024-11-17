@@ -842,6 +842,8 @@
 #define png_gIFx PNG_U32(103,  73,  70, 120)
 #define png_hIST PNG_U32(104,  73,  83,  84)
 #define png_iCCP PNG_U32(105,  67,  67,  80)
+#define png_mDCv PNG_U32(109,  68,  67, 118) /* mDCv */
+#define png_cLLi PNG_U32( 99,  76,  76, 105) /* cLLi */
 #define png_iTXt PNG_U32(105,  84,  88, 116)
 #define png_oFFs PNG_U32(111,  70,  70, 115)
 #define png_pCAL PNG_U32(112,  67,  65,  76)
@@ -1147,6 +1149,16 @@ PNG_INTERNAL_FUNCTION(void,png_write_iCCP,(png_structrp png_ptr,
     * length comes from the first four bytes.  Only the base, deflate,
     * compression is supported.
     */
+#endif
+
+#ifdef PNG_WRITE_mDCv_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_mDCv,(png_structrp png_ptr,
+    png_const_mdcvp mastering_display_color_volume), PNG_EMPTY);
+#endif
+
+#ifdef PNG_WRITE_cLLi_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_write_cLLi,(png_structrp png_ptr,
+    png_uint_32 maximum_content_light_level, png_uint_32 maximum_frame_average_light_level), PNG_EMPTY);
 #endif
 
 #ifdef PNG_WRITE_sPLT_SUPPORTED
@@ -1492,6 +1504,16 @@ PNG_INTERNAL_FUNCTION(void,png_handle_hIST,(png_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(void,png_handle_iCCP,(png_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
 #endif /* READ_iCCP */
+
+#ifdef PNG_READ_mDCv_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_handle_mDCv,(png_structrp png_ptr,
+    png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
+#endif /* READ_mDCv */
+
+#ifdef PNG_READ_cLLi_SUPPORTED
+PNG_INTERNAL_FUNCTION(void,png_handle_cLLi,(png_structrp png_ptr,
+    png_inforp info_ptr, png_uint_32 length),PNG_EMPTY);
+#endif /* READ_cLLi */
 
 #ifdef PNG_READ_iTXt_SUPPORTED
 PNG_INTERNAL_FUNCTION(void,png_handle_iTXt,(png_structrp png_ptr,

@@ -744,6 +744,46 @@ png_set_iCCP(png_const_structrp png_ptr, png_inforp info_ptr,
 }
 #endif
 
+#ifdef PNG_mDCv_SUPPORTED
+void PNGAPI
+png_set_mDCv(png_const_structrp png_ptr, png_inforp info_ptr,
+    png_const_mdcvp mastering_display_color_volume)
+{
+   png_debug1(1, "in %s storage function", "mDCv");
+
+   if (png_ptr == NULL || info_ptr == NULL || mastering_display_color_volume == NULL)
+      return;
+
+   if (mastering_display_color_volume->chromaticity_redx < 0 || mastering_display_color_volume->chromaticity_redy < 0 ||
+       mastering_display_color_volume->chromaticity_greenx < 0 || mastering_display_color_volume->chromaticity_greeny < 0 ||
+       mastering_display_color_volume->chromaticity_bluex < 0 || mastering_display_color_volume->chromaticity_bluey < 0 ||
+       mastering_display_color_volume->chromaticity_whitex < 0 || mastering_display_color_volume->chromaticity_whitey < 0 ||
+       mastering_display_color_volume->max_Lum < 0 || mastering_display_color_volume->min_Lum < 0)
+   {
+      png_warning(png_ptr, "Invalid value");
+      return;
+   }
+
+   info_ptr->mastering_display_color_volume = *mastering_display_color_volume;
+   info_ptr->valid |= PNG_INFO_mDCv;
+}
+#endif
+
+#ifdef PNG_cLLi_SUPPORTED
+void PNGAPI
+png_set_cLLi(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 max_cll, png_uint_32 max_fall)
+{
+    png_debug1(1, "in %s storage function", "cLLi");
+
+    if (png_ptr == NULL || info_ptr == NULL)
+       return;
+
+    info_ptr->maximum_content_light_level = max_cll;
+    info_ptr->maximum_frame_average_light_level = max_fall;
+    info_ptr->valid |= PNG_INFO_cLLi;
+ }
+#endif
+
 #ifdef PNG_TEXT_SUPPORTED
 void PNGAPI
 png_set_text(png_const_structrp png_ptr, png_inforp info_ptr,
@@ -1398,6 +1438,8 @@ png_set_keep_unknown_chunks(png_structrp png_ptr, int keep,
         103,  65,  77,  65, '\0',  /* gAMA */
         104,  73,  83,  84, '\0',  /* hIST */
         105,  67,  67,  80, '\0',  /* iCCP */
+        109,  68,  67, 118, '\0',  /* mDCv */
+         99,  76,  76, 105, '\0',  /* cLLi */
         105,  84,  88, 116, '\0',  /* iTXt */
         111,  70,  70, 115, '\0',  /* oFFs */
         112,  67,  65,  76, '\0',  /* pCAL */
