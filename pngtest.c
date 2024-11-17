@@ -1182,6 +1182,26 @@ test_one_file(const char *inname, const char *outname)
       }
    }
 #endif
+#ifdef PNG_mDCv_SUPPORTED
+   {
+      png_mdcv mastering_display_color_volume;
+
+      if (png_get_mDCv(read_ptr, read_info_ptr, &mastering_display_color_volume) != 0)
+#ifdef PNG_WRITE_mDCv_SUPPORTED
+         png_set_mDCv(write_ptr, write_info_ptr, &mastering_display_color_volume);
+#endif
+   }
+#endif
+#ifdef PNG_cLLi_SUPPORTED
+   {
+      png_uint_32 max_cll, max_fall;
+
+      if (png_get_cLLi(read_ptr, read_info_ptr, &max_cll, &max_fall) != 0)
+#ifdef PNG_WRITE_cLLi_SUPPORTED
+         png_set_cLLi(write_ptr, write_info_ptr, max_cll, max_fall);
+#endif
+   }
+#endif
 #ifdef PNG_sRGB_SUPPORTED
    {
       int intent;
