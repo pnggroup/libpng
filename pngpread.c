@@ -312,8 +312,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_cICP_SUPPORTED
    else if (png_ptr->chunk_name == png_cICP)
    {
-       PNG_PUSH_SAVE_BUFFER_IF_FULL
-       png_handle_cICP(png_ptr, info_ptr, png_ptr->push_length);
+      PNG_PUSH_SAVE_BUFFER_IF_FULL
+      png_handle_cICP(png_ptr, info_ptr, png_ptr->push_length);
    }
 
 #endif

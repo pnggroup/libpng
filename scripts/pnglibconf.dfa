@@ -846,7 +846,7 @@ setting IDAT_READ_SIZE default PNG_ZBUF_SIZE
 # Ancillary chunks
 chunk bKGD
 chunk cHRM enables COLORSPACE
-chunk cICP
+chunk cICP enables COLORSPACE, GAMMA
 chunk eXIf
 chunk gAMA enables GAMMA
 chunk hIST

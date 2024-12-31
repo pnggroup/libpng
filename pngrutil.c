@@ -2050,36 +2050,40 @@ png_handle_bKGD(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 void /* PRIVATE */
 png_handle_cICP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-    png_byte buf[4];
+   png_byte buf[4];
 
-    png_debug(1, "in png_handle_cICP");
+   png_debug(1, "in png_handle_cICP");
 
-    if ((png_ptr->mode & PNG_HAVE_IHDR) == 0)
-        png_chunk_error(png_ptr, "missing IHDR");
+   if ((png_ptr->mode & PNG_HAVE_IHDR) == 0)
+      png_chunk_error(png_ptr, "missing IHDR");
 
-    else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cICP) != 0)
-    {
-        png_crc_finish(png_ptr, length);
-        png_chunk_benign_error(png_ptr, "duplicate");
-        return;
-    }
+   else if ((png_ptr->mode & (PNG_HAVE_IDAT|PNG_HAVE_PLTE)) != 0)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "out of place");
+      return;
+   }
 
-    if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
-        png_ptr->mode |= PNG_AFTER_IDAT;
+   else if (info_ptr != NULL && (info_ptr->valid & PNG_INFO_cICP) != 0)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "duplicate");
+      return;
+   }
 
-    if (length != 4)
-    {
-        png_crc_finish(png_ptr, length);
-        png_chunk_benign_error(png_ptr, "invalid");
-        return;
-    }
+   else if (length != 4)
+   {
+      png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "invalid");
+      return;
+   }
 
-    png_crc_read(png_ptr, buf, 4);
+   png_crc_read(png_ptr, buf, 4);
 
-    if (png_crc_finish(png_ptr, 0) != 0)
-        return;
+   if (png_crc_finish(png_ptr, 0) != 0)
+      return;
 
-    png_set_cICP(png_ptr, info_ptr, buf[0], buf[1],  buf[2], buf[3]);
+   png_set_cICP(png_ptr, info_ptr, buf[0], buf[1],  buf[2], buf[3]);
 }
 #endif
 
