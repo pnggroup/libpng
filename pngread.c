@@ -184,7 +184,7 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 #endif
 #ifdef PNG_READ_cICP_SUPPORTED
       else if (chunk_name == png_cICP)
-          png_handle_cICP(png_ptr, info_ptr, length);
+         png_handle_cICP(png_ptr, info_ptr, length);
 #endif
 
 #ifdef PNG_READ_eXIf_SUPPORTED

@@ -1495,16 +1495,19 @@ png_write_cICP(png_structrp png_ptr,
                png_byte colour_primaries, png_byte transfer_function,
                png_byte matrix_coefficients, png_byte video_full_range_flag)
 {
-    png_debug(1, "in png_write_cICP");
+   png_byte buf[4];
 
-    png_write_chunk_header(png_ptr, png_cICP, 4);
+   png_debug(1, "in png_write_cICP");
 
-    png_write_chunk_data(png_ptr, &colour_primaries, 1);
-    png_write_chunk_data(png_ptr, &transfer_function, 1);
-    png_write_chunk_data(png_ptr, &matrix_coefficients, 1);
-    png_write_chunk_data(png_ptr, &video_full_range_flag, 1);
+   png_write_chunk_header(png_ptr, png_cICP, 4);
 
-    png_write_chunk_end(png_ptr);
+   buf[0] = colour_primaries;
+   buf[1] = transfer_function;
+   buf[2] = matrix_coefficients;
+   buf[3] = video_full_range_flag;
+   png_write_chunk_data(png_ptr, buf, 4);
+
+   png_write_chunk_end(png_ptr);
 }
 #endif
 

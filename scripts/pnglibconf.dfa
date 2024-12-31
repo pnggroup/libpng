@@ -711,7 +711,7 @@ option TARGET_SPECIFIC_CODE requires READ
 # Ancillary chunks
 chunk bKGD
 chunk cHRM enables COLORSPACE
-chunk cICP
+chunk cICP enables COLORSPACE, GAMMA
 chunk eXIf
 chunk gAMA enables GAMMA
 chunk hIST
