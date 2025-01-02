@@ -1027,39 +1027,7 @@ png_handle_PLTE(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     * have an RGB image, the PLTE can be considered ancillary, so
     * we will act as though it is.
     */
-#ifndef PNG_READ_OPT_PLTE_SUPPORTED
-   if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-#endif
-   {
-      png_crc_finish(png_ptr, (png_uint_32) (length - (unsigned int)num * 3));
-   }
-
-#ifndef PNG_READ_OPT_PLTE_SUPPORTED
-   else if (png_crc_error(png_ptr) != 0)  /* Only if we have a CRC error */
-   {
-      /* If we don't want to use the data from an ancillary chunk,
-       * we have two options: an error abort, or a warning and we
-       * ignore the data in this chunk (which should be OK, since
-       * it's considered ancillary for a RGB or RGBA image).
-       *
-       * IMPLEMENTATION NOTE: this is only here because png_crc_finish uses the
-       * chunk type to determine whether to check the ancillary or the critical
-       * flags.
-       */
-      if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_USE) == 0)
-      {
-         if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) != 0)
-            return;
-
-         else
-            png_chunk_error(png_ptr, "CRC error");
-      }
-
-      /* Otherwise, we (optionally) emit a warning and use the chunk. */
-      else if ((png_ptr->flags & PNG_FLAG_CRC_ANCILLARY_NOWARN) == 0)
-         png_chunk_warning(png_ptr, "CRC error");
-   }
-#endif
+   png_crc_finish(png_ptr, (png_uint_32) (length - (unsigned int)num * 3));
 
    /* TODO: png_set_PLTE has the side effect of setting png_ptr->palette to its
     * own copy of the palette.  This has the side effect that when png_start_row
