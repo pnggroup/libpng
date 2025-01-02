@@ -1,6 +1,6 @@
 /* pngtest.c - a test program for libpng
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -1168,6 +1168,21 @@ test_one_file(const char *inname, const char *outname)
 #endif
 #endif /* Floating point */
 #endif /* Fixed point */
+#ifdef PNG_cICP_SUPPORTED
+   {
+      png_byte colour_primaries;
+      png_byte transfer_function;
+      png_byte matrix_coefficients;
+      png_byte video_full_range_flag;
+
+      if (png_get_cICP(read_ptr, read_info_ptr,
+                       &colour_primaries, &transfer_function,
+                       &matrix_coefficients, &video_full_range_flag) != 0)
+         png_set_cICP(write_ptr, write_info_ptr,
+                      colour_primaries, transfer_function,
+                      matrix_coefficients, video_full_range_flag);
+   }
+#endif
 #ifdef PNG_iCCP_SUPPORTED
    {
       png_charp name;
@@ -1204,21 +1219,6 @@ test_one_file(const char *inname, const char *outname)
 
       if (png_get_bKGD(read_ptr, read_info_ptr, &background) != 0)
          png_set_bKGD(write_ptr, write_info_ptr, background);
-   }
-#endif
-#ifdef PNG_cICP_SUPPORTED
-   {
-      png_byte colour_primaries;
-      png_byte transfer_function;
-      png_byte matrix_coefficients;
-      png_byte video_full_range_flag;
-
-      if (png_get_cICP(read_ptr, read_info_ptr,
-                       &colour_primaries, &transfer_function,
-                       &matrix_coefficients, &video_full_range_flag) != 0)
-         png_set_cICP(write_ptr, write_info_ptr,
-                      colour_primaries, transfer_function,
-                      matrix_coefficients, video_full_range_flag);
    }
 #endif
 #ifdef PNG_READ_eXIf_SUPPORTED
