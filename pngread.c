@@ -179,6 +179,11 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_cICP(png_ptr, info_ptr, length);
 #endif
 
+#ifdef PNG_READ_cLLI_SUPPORTED
+      else if (chunk_name == png_cLLI)
+         png_handle_cLLI(png_ptr, info_ptr, length);
+#endif
+
 #ifdef PNG_READ_eXIf_SUPPORTED
       else if (chunk_name == png_eXIf)
          png_handle_eXIf(png_ptr, info_ptr, length);
@@ -192,6 +197,11 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_hIST_SUPPORTED
       else if (chunk_name == png_hIST)
          png_handle_hIST(png_ptr, info_ptr, length);
+#endif
+
+#ifdef PNG_READ_mDCV_SUPPORTED
+      else if (chunk_name == png_mDCV)
+         png_handle_mDCV(png_ptr, info_ptr, length);
 #endif
 
 #ifdef PNG_READ_oFFs_SUPPORTED
@@ -861,6 +871,11 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_cICP(png_ptr, info_ptr, length);
 #endif
 
+#ifdef PNG_READ_cLLI_SUPPORTED
+      else if (chunk_name == png_cLLI)
+         png_handle_cLLI(png_ptr, info_ptr, length);
+#endif
+
 #ifdef PNG_READ_eXIf_SUPPORTED
       else if (chunk_name == png_eXIf)
          png_handle_eXIf(png_ptr, info_ptr, length);
@@ -874,6 +889,11 @@ png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 #ifdef PNG_READ_hIST_SUPPORTED
       else if (chunk_name == png_hIST)
          png_handle_hIST(png_ptr, info_ptr, length);
+#endif
+
+#ifdef PNG_READ_mDCV_SUPPORTED
+      else if (chunk_name == png_mDCV)
+         png_handle_mDCV(png_ptr, info_ptr, length);
 #endif
 
 #ifdef PNG_READ_oFFs_SUPPORTED

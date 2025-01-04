@@ -744,7 +744,21 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_INFO_sCAL 0x4000U  /* ESR, 1.0.6 */
 #define PNG_INFO_IDAT 0x8000U  /* ESR, 1.0.6 */
 #define PNG_INFO_eXIf 0x10000U /* GR-P, 1.6.31 */
-#define PNG_INFO_cICP 0x20000U
+#define PNG_INFO_cICP 0x20000U /* PNGv3: 1.6.45 */
+#define PNG_INFO_cLLI 0x40000U /* PNGv3: 1.6.45 */
+#define PNG_INFO_mDCV 0x80000U /* PNGv3: 1.6.45 */
+/* APNG: these chunks are stored as unknown, these flags are never set
+ * however they are provided as a convenience for implementors of APNG and
+ * avoids any merge conflicts.
+ *
+ * Private chunks: these chunk names violate the chunk name recommendations
+ * because the chunk definitions have no signature and because the private
+ * chunks with these names have been reserved.  Private definitions should
+ * avoid them.
+ */
+#define PNG_INFO_acTL 0x100000U /* PNGv3: 1.6.45: unknown */
+#define PNG_INFO_fcTL 0x200000U /* PNGv3: 1.6.45: unknown */
+#define PNG_INFO_fdAT 0x400000U /* PNGv3: 1.6.45: unknown */
 
 /* This is used for the transformation routines, as some of them
  * change these values for the row.  It also should enable using
@@ -1976,13 +1990,42 @@ PNG_FIXED_EXPORT(233, void, png_set_cHRM_XYZ_fixed, (png_const_structrp png_ptr,
 
 #ifdef PNG_cICP_SUPPORTED
 PNG_EXPORT(250, png_uint_32, png_get_cICP, (png_const_structrp png_ptr,
-    png_inforp info_ptr, png_bytep colour_primaries,
+    png_const_inforp info_ptr, png_bytep colour_primaries,
     png_bytep transfer_function, png_bytep matrix_coefficients,
     png_bytep video_full_range_flag));
+#endif
+
+#ifdef PNG_cICP_SUPPORTED
 PNG_EXPORT(251, void, png_set_cICP, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_byte colour_primaries,
     png_byte transfer_function, png_byte matrix_coefficients,
     png_byte video_full_range_flag));
+#endif
+
+#ifdef PNG_cLLI_SUPPORTED
+PNG_FP_EXPORT(252, png_uint_32, png_get_cLLI, (png_const_structrp png_ptr,
+         png_const_inforp info_ptr, double *maximum_content_light_level,
+         double *maximum_frame_average_light_level));
+PNG_FIXED_EXPORT(253, png_uint_32, png_get_cLLI_fixed,
+    (png_const_structrp png_ptr, png_const_inforp info_ptr,
+    /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
+     * 100,000 as in the case of png_fixed_point.
+     */
+    png_uint_32p maximum_content_light_level_scaled_by_10000,
+    png_uint_32p maximum_frame_average_light_level_scaled_by_10000));
+#endif
+
+#ifdef PNG_cLLI_SUPPORTED
+PNG_FP_EXPORT(254, void, png_set_cLLI, (png_const_structrp png_ptr,
+         png_inforp info_ptr, double maximum_content_light_level,
+         double maximum_frame_average_light_level));
+PNG_FIXED_EXPORT(255, void, png_set_cLLI_fixed, (png_const_structrp png_ptr,
+    png_inforp info_ptr,
+    /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
+     * 100,000 as in the case of png_fixed_point.
+     */
+    png_uint_32 maximum_content_light_level_scaled_by_10000,
+    png_uint_32 maximum_frame_average_light_level_scaled_by_10000));
 #endif
 
 #ifdef PNG_eXIf_SUPPORTED
@@ -2028,6 +2071,60 @@ PNG_EXPORT(144, void, png_set_IHDR, (png_const_structrp png_ptr,
     png_inforp info_ptr, png_uint_32 width, png_uint_32 height, int bit_depth,
     int color_type, int interlace_method, int compression_method,
     int filter_method));
+
+#ifdef PNG_mDCV_SUPPORTED
+PNG_FP_EXPORT(256, png_uint_32, png_get_mDCV, (png_const_structrp png_ptr,
+    png_const_inforp info_ptr,
+    /* The chromaticities of the mastering display.  As cHRM, but independent of
+     * the encoding endpoints in cHRM, or cICP, or iCCP.  These values will
+     * always be in the range 0 to 1.3107.
+     */
+    double *white_x, double *white_y, double *red_x, double *red_y,
+    double *green_x, double *green_y, double *blue_x, double *blue_y,
+    /* Mastering display luminance in cd/m2 (nits). */
+    double *mastering_display_maximum_luminance,
+    double *mastering_display_minimum_luminance));
+
+PNG_FIXED_EXPORT(257, png_uint_32, png_get_mDCV_fixed,
+    (png_const_structrp png_ptr, png_const_inforp info_ptr,
+    png_fixed_point *int_white_x, png_fixed_point *int_white_y,
+    png_fixed_point *int_red_x, png_fixed_point *int_red_y,
+    png_fixed_point *int_green_x, png_fixed_point *int_green_y,
+    png_fixed_point *int_blue_x, png_fixed_point *int_blue_y,
+    /* Mastering display luminance in cd/m2 (nits) multiplied (scaled) by
+     * 10,000.
+     */
+    png_uint_32p mastering_display_maximum_luminance_scaled_by_10000,
+    png_uint_32p mastering_display_minimum_luminance_scaled_by_10000));
+#endif
+
+#ifdef PNG_mDCV_SUPPORTED
+PNG_FP_EXPORT(258, void, png_set_mDCV, (png_const_structrp png_ptr,
+    png_inforp info_ptr,
+    /* The chromaticities of the mastering display.  As cHRM, but independent of
+     * the encoding endpoints in cHRM, or cICP, or iCCP.
+     */
+    double white_x, double white_y, double red_x, double red_y, double green_x,
+    double green_y, double blue_x, double blue_y,
+    /* Mastering display luminance in cd/m2 (nits). */
+    double mastering_display_maximum_luminance,
+    double mastering_display_minimum_luminance));
+
+PNG_FIXED_EXPORT(259, void, png_set_mDCV_fixed, (png_const_structrp png_ptr,
+    png_inforp info_ptr,
+    /* The admissible range of these values is not the full range of a PNG
+     * fixed point value.  Negative values cannot be encoded and the maximum
+     * value is about 1.3 */
+    png_fixed_point int_white_x, png_fixed_point int_white_y,
+    png_fixed_point int_red_x, png_fixed_point int_red_y,
+    png_fixed_point int_green_x, png_fixed_point int_green_y,
+    png_fixed_point int_blue_x, png_fixed_point int_blue_y,
+    /* These are PNG unsigned 4 byte values: 31-bit unsigned values.  The MSB
+     * must be zero.
+     */
+    png_uint_32 mastering_display_maximum_luminance_scaled_by_10000,
+    png_uint_32 mastering_display_minimum_luminance_scaled_by_10000));
+#endif
 
 #ifdef PNG_oFFs_SUPPORTED
 PNG_EXPORT(145, png_uint_32, png_get_oFFs, (png_const_structrp png_ptr,
