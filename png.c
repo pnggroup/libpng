@@ -3390,6 +3390,26 @@ png_fixed(png_const_structrp png_ptr, double fp, png_const_charp text)
 }
 #endif
 
+#if defined(PNG_FLOATING_POINT_SUPPORTED) && \
+   !defined(PNG_FIXED_POINT_MACRO_SUPPORTED) && \
+   (defined(PNG_cLLI_SUPPORTED) || defined(PNG_mDCV_SUPPORTED))
+png_uint_32
+png_fixed_ITU(png_const_structrp png_ptr, double fp, png_const_charp text)
+{
+   double r = floor(10000 * fp + .5);
+
+   if (r > 2147483647. || r < 0)
+      png_fixed_error(png_ptr, text);
+
+#  ifndef PNG_ERROR_TEXT_SUPPORTED
+   PNG_UNUSED(text)
+#  endif
+
+   return (png_uint_32)r;
+}
+#endif
+
+
 #if defined(PNG_GAMMA_SUPPORTED) || defined(PNG_COLORSPACE_SUPPORTED) ||\
     defined(PNG_INCH_CONVERSIONS_SUPPORTED) || defined(PNG_READ_pHYs_SUPPORTED)
 /* muldiv functions */
