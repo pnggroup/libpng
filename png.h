@@ -3346,7 +3346,7 @@ PNG_EXPORT(244, int, png_set_option, (png_structrp png_ptr, int option,
  * one to use is one more than this.)
  */
 #ifdef PNG_EXPORT_LAST_ORDINAL
-  PNG_EXPORT_LAST_ORDINAL(251);
+  PNG_EXPORT_LAST_ORDINAL(259);
 #endif
 
 #ifdef __cplusplus
