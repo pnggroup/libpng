@@ -1,8 +1,8 @@
 # CMakeLists.txt - CMake lists for libpng
 #
-# Copyright (c) 2018-2024 Cosmin Truta.
-# Copyright (c) 2007-2018 Glenn Randers-Pehrson.
-# Originally written by Christian Ehrlicher, 2007.
+# Copyright (c) 2018-2025 Cosmin Truta
+# Copyright (c) 2007-2018 Glenn Randers-Pehrson
+# Originally written by Christian Ehrlicher, 2007
 #
 # Use, modification and distribution are subject to
 # the same licensing terms and conditions as libpng.
@@ -182,6 +182,9 @@ if(NOT AWK OR (ANDROID OR IOS))
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
   add_custom_target(png_genfiles)
 else()
+  # Include the internal module PNGGenConfig.cmake
+  include(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGGenConfig.cmake)
+
   # Copy the awk scripts, converting their line endings to Unix (LF)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk
                  ${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk
@@ -195,93 +198,6 @@ else()
                  ${CMAKE_CURRENT_BINARY_DIR}/scripts/dfn.awk
                  @ONLY
                  NEWLINE_STYLE LF)
-
-  # Generate .chk from .out with awk:
-  # generate_chk(INPUT <file> OUTPUT <file> [DEPENDS <deps>...])
-  function(generate_chk)
-    set(options)
-    set(oneValueArgs INPUT OUTPUT)
-    set(multiValueArgs DEPENDS)
-    cmake_parse_arguments(_GC "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(NOT _GC_INPUT)
-      message(FATAL_ERROR "generate_chk: Missing INPUT argument")
-    endif()
-    if(NOT _GC_OUTPUT)
-      message(FATAL_ERROR "generate_chk: Missing OUTPUT argument")
-    endif()
-
-    add_custom_command(OUTPUT "${_GC_OUTPUT}"
-                       COMMAND "${CMAKE_COMMAND}"
-                               "-DINPUT=${_GC_INPUT}"
-                               "-DOUTPUT=${_GC_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genchk.cmake"
-                       DEPENDS "${_GC_INPUT}" ${_GC_DEPENDS}
-                       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-  endfunction()
-
-  # Generate .out from .c with awk:
-  # generate_out(INPUT <file> OUTPUT <file> [DEPENDS <deps>...])
-  function(generate_out)
-    set(options)
-    set(oneValueArgs INPUT OUTPUT)
-    set(multiValueArgs DEPENDS)
-    cmake_parse_arguments(_GO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(NOT _GO_INPUT)
-      message(FATAL_ERROR "generate_out: Missing INPUT argument")
-    endif()
-    if(NOT _GO_OUTPUT)
-      message(FATAL_ERROR "generate_out: Missing OUTPUT argument")
-    endif()
-
-    add_custom_command(OUTPUT "${_GO_OUTPUT}"
-                       COMMAND "${CMAKE_COMMAND}"
-                               "-DINPUT=${_GO_INPUT}"
-                               "-DOUTPUT=${_GO_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/genout.cmake"
-                       DEPENDS "${_GO_INPUT}" ${_GO_DEPENDS}
-                       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-  endfunction()
-
-  # Generate specific source file with awk:
-  # generate_source(OUTPUT <file> [DEPENDS <deps>...])
-  function(generate_source)
-    set(options)
-    set(oneValueArgs OUTPUT)
-    set(multiValueArgs DEPENDS)
-    cmake_parse_arguments(_GSO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(NOT _GSO_OUTPUT)
-      message(FATAL_ERROR "generate_source: Missing OUTPUT argument")
-    endif()
-
-    add_custom_command(OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${_GSO_OUTPUT}"
-                       COMMAND "${CMAKE_COMMAND}"
-                               "-DOUTPUT=${_GSO_OUTPUT}"
-                               -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/gensrc.cmake"
-                       DEPENDS ${_GSO_DEPENDS}
-                       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
-  endfunction()
-
-  # Copy file:
-  # generate_copy(INPUT <file> OUTPUT <file> [DEPENDS <deps>...])
-  function(generate_copy)
-    set(options)
-    set(oneValueArgs INPUT OUTPUT)
-    set(multiValueArgs DEPENDS)
-    cmake_parse_arguments(_GCO "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(NOT _GCO_INPUT)
-      message(FATAL_ERROR "generate_copy: Missing INPUT argument")
-    endif()
-    if(NOT _GCO_OUTPUT)
-      message(FATAL_ERROR "generate_copy: Missing OUTPUT argument")
-    endif()
-
-    add_custom_command(OUTPUT "${_GCO_OUTPUT}"
-                       COMMAND "${CMAKE_COMMAND}"
-                               -E remove "${_GCO_OUTPUT}"
-                       COMMAND "${CMAKE_COMMAND}"
-                               -E copy "${_GCO_INPUT}" "${_GCO_OUTPUT}"
-                       DEPENDS "${source}" ${_GCO_DEPENDS})
-  endfunction()
 
   # Generate scripts/pnglibconf.h
   generate_source(OUTPUT "scripts/pnglibconf.c"
@@ -585,32 +501,8 @@ endif()
 if(PNG_TESTS AND PNG_SHARED)
   enable_testing()
 
-  # Add a custom target to run a test:
-  # png_add_test(NAME <test> COMMAND <command> [OPTIONS <options>...] [FILES <files>...])
-  function(png_add_test)
-    set(options)
-    set(oneValueArgs NAME COMMAND)
-    set(multiValueArgs OPTIONS FILES)
-    cmake_parse_arguments(_PAT "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-    if(NOT _PAT_NAME)
-      message(FATAL_ERROR "png_add_test: Missing NAME argument")
-    endif()
-    if(NOT _PAT_COMMAND)
-      message(FATAL_ERROR "png_add_test: Missing COMMAND argument")
-    endif()
-
-    set(TEST_OPTIONS "${_PAT_OPTIONS}")
-    set(TEST_FILES "${_PAT_FILES}")
-
-    configure_file("${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/test.cmake.in"
-                   "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake"
-                   @ONLY)
-    add_test(NAME "${_PAT_NAME}"
-             COMMAND "${CMAKE_COMMAND}"
-                     "-DLIBPNG=$<TARGET_FILE:png_shared>"
-                     "-DTEST_COMMAND=$<TARGET_FILE:${_PAT_COMMAND}>"
-                     -P "${CMAKE_CURRENT_BINARY_DIR}/tests/${_PAT_NAME}.cmake")
-  endfunction()
+  # Include the internal module PNGTest.cmake
+  include(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGTest.cmake)
 
   # Find test PNG files by globbing, but sort lists to ensure
   # consistency between different filesystems.
@@ -794,6 +686,10 @@ endif()
 # or make a copy of the target file (if symlinking is not possible):
 # create_symlink(<destfile> [FILE <file> | TARGET <target>])
 function(create_symlink DEST_FILE)
+  # TODO:
+  # Replace this implementation with CMake's built-in create_symlink function,
+  # which has been fully functional on all platforms, including Windows, since
+  # CMake version 3.13.
   cmake_parse_arguments(_SYM "" "FILE;TARGET" "" ${ARGN})
   if(NOT _SYM_FILE AND NOT _SYM_TARGET)
     message(FATAL_ERROR "create_symlink: Missing FILE or TARGET argument")
