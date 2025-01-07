@@ -14,7 +14,7 @@
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson
- *   libpng versions 1.6.36, December 2018, through 1.6.44, September 2024:
+ *   libpng versions 1.6.36, December 2018, through 1.6.45, January 2025:
  *     Cosmin Truta
  *   See also "Contributing Authors", below.
  */
@@ -238,7 +238,7 @@
  *    ...
  *    1.5.30                  15    10530  15.so.15.30[.0]
  *    ...
- *    1.6.44                  16    10644  16.so.16.44[.0]
+ *    1.6.45                  16    10645  16.so.16.45[.0]
  *
  *    Henceforth the source version will match the shared-library major and
  *    minor numbers; the shared-library major version number will be used for
