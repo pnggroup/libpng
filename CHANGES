@@ -6229,6 +6229,8 @@ Version 1.6.45 [January 7, 2025]
   Raised the minimum required CMake version from 3.6 to 3.14.
   Forked off a development branch for libpng version 1.8.
 
+Version 1.6.46 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
