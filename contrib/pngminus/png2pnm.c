@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
           if ((fp_al = fopen (argv[argi], "wb")) == NULL)
           {
             fname_al = argv[argi];
-            fprintf (stderr, "PNM2PNG\n");
+            fprintf (stderr, "PNG2PNM\n");
             fprintf (stderr, "Error:  cannot create alpha-channel file %s\n",
                      argv[argi]);
             exit (1);
