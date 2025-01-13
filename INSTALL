@@ -20,6 +20,7 @@ Contents
      XVI. Setjmp/longjmp issues
     XVII. Common linking failures
    XVIII. Other sources of information about libpng
+     XIX. Solution of Windows error (.awk: bad line) at cmake building
 
 I. Simple installation
 
@@ -461,3 +462,20 @@ Copyright (c) 1998-2002,2006-2016 Glenn Randers-Pehrson
 This document is released under the libpng license.
 For conditions of distribution and use, see the disclaimer
 and license in png.h.
+
+XIX. Solution of Windows error (.awk: bad line) at cmake building
+Due to usage of default setting (git config --global core.autocrlf true) 
+when using git clone, at the stage of building may appear errors like:
+
+options.awk: bad line (11): com
+CMake Error at scripts/cmake/gensrc.cmake:45 (message):
+  Failed to generate pnglibconf.tf7
+
+To solve problem you need to set core.autocrlf to false before fetching 
+from git repository
+
+    git config --global core.autocrlf false
+
+after building you may redo change and set global setting to true
+
+    git config --global core.autocrlf true
