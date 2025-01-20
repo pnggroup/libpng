@@ -2005,27 +2005,27 @@ PNG_EXPORT(251, void, png_set_cICP, (png_const_structrp png_ptr,
 #ifdef PNG_cLLI_SUPPORTED
 PNG_FP_EXPORT(252, png_uint_32, png_get_cLLI, (png_const_structrp png_ptr,
          png_const_inforp info_ptr, double *maximum_content_light_level,
-         double *maximum_frame_average_light_level));
+         double *maximum_frame_average_light_level))
 PNG_FIXED_EXPORT(253, png_uint_32, png_get_cLLI_fixed,
     (png_const_structrp png_ptr, png_const_inforp info_ptr,
     /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
      * 100,000 as in the case of png_fixed_point.
      */
     png_uint_32p maximum_content_light_level_scaled_by_10000,
-    png_uint_32p maximum_frame_average_light_level_scaled_by_10000));
+    png_uint_32p maximum_frame_average_light_level_scaled_by_10000))
 #endif
 
 #ifdef PNG_cLLI_SUPPORTED
 PNG_FP_EXPORT(254, void, png_set_cLLI, (png_const_structrp png_ptr,
          png_inforp info_ptr, double maximum_content_light_level,
-         double maximum_frame_average_light_level));
+         double maximum_frame_average_light_level))
 PNG_FIXED_EXPORT(255, void, png_set_cLLI_fixed, (png_const_structrp png_ptr,
     png_inforp info_ptr,
     /* The values below are in cd/m2 (nits) and are scaled by 10,000; not
      * 100,000 as in the case of png_fixed_point.
      */
     png_uint_32 maximum_content_light_level_scaled_by_10000,
-    png_uint_32 maximum_frame_average_light_level_scaled_by_10000));
+    png_uint_32 maximum_frame_average_light_level_scaled_by_10000))
 #endif
 
 #ifdef PNG_eXIf_SUPPORTED
@@ -2083,7 +2083,7 @@ PNG_FP_EXPORT(256, png_uint_32, png_get_mDCV, (png_const_structrp png_ptr,
     double *green_x, double *green_y, double *blue_x, double *blue_y,
     /* Mastering display luminance in cd/m2 (nits). */
     double *mastering_display_maximum_luminance,
-    double *mastering_display_minimum_luminance));
+    double *mastering_display_minimum_luminance))
 
 PNG_FIXED_EXPORT(257, png_uint_32, png_get_mDCV_fixed,
     (png_const_structrp png_ptr, png_const_inforp info_ptr,
@@ -2095,7 +2095,7 @@ PNG_FIXED_EXPORT(257, png_uint_32, png_get_mDCV_fixed,
      * 10,000.
      */
     png_uint_32p mastering_display_maximum_luminance_scaled_by_10000,
-    png_uint_32p mastering_display_minimum_luminance_scaled_by_10000));
+    png_uint_32p mastering_display_minimum_luminance_scaled_by_10000))
 #endif
 
 #ifdef PNG_mDCV_SUPPORTED
@@ -2108,7 +2108,7 @@ PNG_FP_EXPORT(258, void, png_set_mDCV, (png_const_structrp png_ptr,
     double green_y, double blue_x, double blue_y,
     /* Mastering display luminance in cd/m2 (nits). */
     double mastering_display_maximum_luminance,
-    double mastering_display_minimum_luminance));
+    double mastering_display_minimum_luminance))
 
 PNG_FIXED_EXPORT(259, void, png_set_mDCV_fixed, (png_const_structrp png_ptr,
     png_inforp info_ptr,
@@ -2123,7 +2123,7 @@ PNG_FIXED_EXPORT(259, void, png_set_mDCV_fixed, (png_const_structrp png_ptr,
      * must be zero.
      */
     png_uint_32 mastering_display_maximum_luminance_scaled_by_10000,
-    png_uint_32 mastering_display_minimum_luminance_scaled_by_10000));
+    png_uint_32 mastering_display_minimum_luminance_scaled_by_10000))
 #endif
 
 #ifdef PNG_oFFs_SUPPORTED
