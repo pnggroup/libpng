@@ -1,5 +1,5 @@
 # makefile for libpng using gcc (generic, static library)
-# Copyright (C) 2000, 2020-2024 Cosmin Truta
+# Copyright (C) 2000, 2020-2025 Cosmin Truta
 # Copyright (C) 2002, 2006-2009, 2014 Glenn Randers-Pehrson
 # Copyright (C) 2000 Marc O. Gloor (AIX support added, from makefile.gcc)
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
@@ -22,9 +22,8 @@ RM_F = rm -f
 LIBNAME = libpng16
 PNGMAJ = 16
 
-WARNMORE =
 CPPFLAGS = -I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS = -O2 -Wall -Wextra -Wundef # $(WARNMORE) -g
+CFLAGS = -O2 # -g
 ARFLAGS = rc
 LDFLAGS = -L. -L$(ZLIBLIB) -lpng16 -lz -lm # -g
 
@@ -35,7 +34,7 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
 
 # Targets
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 all: $(LIBNAME).a pngtest
 

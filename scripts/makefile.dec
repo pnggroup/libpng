@@ -1,5 +1,5 @@
 # makefile for libpng on DEC Alpha Unix
-# Copyright (C) 2020-2024 Cosmin Truta
+# Copyright (C) 2020-2025 Cosmin Truta
 # Copyright (C) 2000-2002, 2006, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -30,7 +30,7 @@ ZLIBLIB=../zlib
 ZLIBINC=../zlib
 
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS=-std -w1 -O # -g
+CFLAGS=-std -w1 -O
 ARFLAGS=rc
 LDFLAGS=-L$(ZLIBLIB) -rpath $(ZLIBLIB) libpng.a -lz -lm
 
@@ -43,7 +43,7 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
        pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 all: $(LIBSO) libpng.a pngtest
 

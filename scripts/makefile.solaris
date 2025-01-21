@@ -1,5 +1,5 @@
 # makefile for libpng on Solaris 2.x with gcc
-# Copyright (C) 2020-2024 Cosmin Truta
+# Copyright (C) 2018-2025 Cosmin Truta
 # Copyright (C) 2004, 2006-2008, 2010-2014 Glenn Randers-Pehrson
 # Contributed by William L. Sebok, based on makefile.linux
 # Copyright (C) 1998 Greg Roelofs
@@ -34,11 +34,8 @@ RM_F=/bin/rm -f
 ZLIBLIB=/usr/local/lib
 ZLIBINC=/usr/local/include
 
-WARNMORE=-Wwrite-strings -Wpointer-arith -Wshadow \
-	-Wmissing-declarations -Wtraditional -Wcast-align \
-	-Wstrict-prototypes -Wmissing-prototypes # -Wconversion
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS=-O -Wall -Wextra -Wundef # $(WARNMORE) -g
+CFLAGS=-O # -g
 ARFLAGS=rc
 LDFLAGS=-L. -R. -L$(ZLIBLIB) -R$(ZLIBLIB) -lpng16 -lz -lm # -g
 
@@ -55,7 +52,7 @@ OBJSDLL = $(OBJS:.o=.pic.o)
 .SUFFIXES:      .c .o .pic.o
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 .c.pic.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) -fPIC -o $@ $*.c

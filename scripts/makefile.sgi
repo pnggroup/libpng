@@ -1,5 +1,5 @@
 # makefile for libpng.a and libpng16.so, SGI IRIX with 'cc'
-# Copyright (C) 2020-2024 Cosmin Truta
+# Copyright (C) 2018-2025 Cosmin Truta
 # Copyright (C) 2001-2002, 2006, 2007, 2010-2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -35,11 +35,10 @@ ZLIBINC=../zlib
 # See "man abi".  zlib must be built with the same ABI.
 ABI=
 
-WARNMORE=-fullwarn
 # Note: -KPIC is the default anyhow
 CPPFLAGS=-I$(ZLIBINC) # -DPNG_DEBUG=5
-#CFLAGS= $(ABI) -O $(WARNMORE) -KPIC # -g
-CFLAGS=$(ABI) -O $(WARNMORE) # -g
+#CFLAGS=$(ABI) -O -fullwarn -KPIC # -g
+CFLAGS=$(ABI) -O -fullwarn # -g
 ARFLAGS=rc
 LDFLAGS_A=$(ABI) -L. -L$(ZLIBLIB) -lpng16 -lz -lm # -g
 LDFLAGS=$(ABI) -L. -L$(ZLIBLIB) -lpng -lz -lm # -g
@@ -56,7 +55,7 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o \
        pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 all: libpng.a pngtest shared
 
