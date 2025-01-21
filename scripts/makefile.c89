@@ -1,4 +1,4 @@
-# makefile for libpng using clang (generic, static library)
+# makefile for libpng using an ANSI C89 compiler
 # Copyright (C) 2000, 2014, 2019-2025 Cosmin Truta
 # Copyright (C) 2008, 2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
@@ -12,7 +12,8 @@ ZLIBINC = ../zlib
 ZLIBLIB = ../zlib
 
 # Compiler, linker, lib and other tools
-CC = clang
+#CC = c89
+CC = cc
 LD = $(CC)
 AR = ar
 RANLIB = ranlib
@@ -22,7 +23,7 @@ RM_F = rm -f
 # Compiler and linker flags
 NOHWOPT = -DPNG_ARM_NEON_OPT=0 -DPNG_MIPS_MSA_OPT=0 \
           -DPNG_POWERPC_VSX_OPT=0 -DPNG_INTEL_SSE_OPT=0
-STDC = -pedantic-errors # -std=c99
+STDC = -pedantic-errors -std=c89
 WARN = -Wall -Wextra -Wundef
 WARNMORE = -Wcast-align -Wconversion -Wshadow -Wpointer-arith -Wwrite-strings \
            -Wmissing-declarations -Wmissing-prototypes -Wstrict-prototypes
