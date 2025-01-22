@@ -1,6 +1,6 @@
 # Makefile.am, the source file for Makefile.in (and hence Makefile), is
 #
-# Copyright (c) 2018-2024 Cosmin Truta
+# Copyright (c) 2018-2025 Cosmin Truta
 # Copyright (c) 2004-2016 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -199,7 +199,7 @@ MAINTAINERCLEANFILES = Makefile.in aclocal.m4 config.guess config.h.in \
 config.sub configure depcomp install-sh ltmain.sh missing
 
 # PNG_COPTS give extra options for the C compiler to be used on all compilation
-# steps (unless targe_CFLAGS is specified; that will take precedence over
+# steps (unless target_CFLAGS is specified; that will take precedence over
 # AM_CFLAGS)
 PNG_COPTS = @PNG_COPTS@
 AM_CFLAGS = ${PNG_COPTS}
