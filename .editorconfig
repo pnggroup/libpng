@@ -41,7 +41,7 @@ indent_style = space
 max_doc_length = 100
 max_line_length = 100
 
-[{Makefile.in,ltmain.sh}]
+[{Makefile.in,aclocal.m4,ltmain.sh}]
 indent_size = unset
 indent_style = unset
 insert_final_newline = unset

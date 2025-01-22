@@ -8,6 +8,7 @@ Scripts and makefiles for libpng
     makefile.atari    =>  Atari makefile
     makefile.bc32     =>  Borland C makefile, for Win32
     makefile.beos     =>  BeOS makefile
+    makefile.c89      =>  Generic UNIX makefile for C89 (cc -std=c89)
     makefile.clang    =>  Generic clang makefile
     makefile.darwin   =>  Darwin makefile, for macOS (formerly Mac OS X)
     makefile.dec      =>  DEC Alpha UNIX makefile
