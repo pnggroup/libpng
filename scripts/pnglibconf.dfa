@@ -711,7 +711,7 @@ option WRITE_TEXT requires WRITE_ANCILLARY_CHUNKS enables TEXT
 # processing, it just validates the data in the PNG file.
 
 option GAMMA disabled
-option COLORSPACE enables GAMMA disabled
+option COLORSPACE disabled
 
 # When an ICC profile is read, or png_set, it will be checked for a match
 # against known sRGB profiles if the sRGB handling is enabled.  The
@@ -851,16 +851,16 @@ chunk cLLI
 chunk eXIf
 chunk gAMA enables GAMMA
 chunk hIST
-chunk iCCP enables COLORSPACE, GAMMA
+chunk iCCP enables GAMMA
 chunk iTXt enables TEXT
-chunk mDCV
+chunk mDCV enables COLORSPACE
 chunk oFFs
 chunk pCAL
 chunk pHYs
 chunk sBIT
 chunk sCAL
 chunk sPLT
-chunk sRGB enables COLORSPACE, GAMMA, SET_OPTION
+chunk sRGB enables GAMMA, SET_OPTION
 chunk tEXt requires TEXT
 chunk tIME
 chunk tRNS
@@ -995,7 +995,8 @@ option SIMPLIFIED_READ,
       READ_EXPAND, READ_16BIT, READ_EXPAND_16, READ_SCALE_16_TO_8,
       READ_RGB_TO_GRAY, READ_ALPHA_MODE, READ_BACKGROUND, READ_STRIP_ALPHA,
       READ_FILLER, READ_SWAP, READ_PACK, READ_GRAY_TO_RGB, READ_GAMMA,
-      READ_tRNS, READ_bKGD, READ_gAMA, READ_cHRM, READ_sRGB, READ_sBIT
+      READ_tRNS, READ_bKGD, READ_gAMA, READ_cHRM, READ_sRGB, READ_mDCV,
+      READ_cICP, READ_sBIT
 
 # AFIRST and BGR read options:
 #  Prior to libpng 1.6.8 these were disabled but switched on if the low level
