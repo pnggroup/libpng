@@ -1,9 +1,9 @@
-# Copyright (c) 2018-2024 Cosmin Truta
+# Copyright (c) 2018-2025 Cosmin Truta
 #
 # This software is released under the MIT license. For conditions of
 # distribution and use, see the LICENSE file part of this package.
 
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 
 project(PNGMINUS C)
 

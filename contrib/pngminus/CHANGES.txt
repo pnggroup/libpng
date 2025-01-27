@@ -11,3 +11,4 @@ version 1.0 - 1999.10.15 - First version.
         1.6 - 2018.08.05 - Improve portability and fix style (Cosmin Truta)
         1.7 - 2019.01.22 - Change license to MIT (Willem van Schaik)
         1.8 - 2024.01.09 - Fix, improve, modernize (Cosmin Truta)
+        1.9 - 2025.01.10 - Delete conditionally-compiled code (Cosmin Truta)

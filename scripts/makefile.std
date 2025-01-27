@@ -1,5 +1,5 @@
 # makefile for libpng
-# Copyright (C) 2020-2025 Cosmin Truta
+# Copyright (C) 2015, 2018-2025 Cosmin Truta
 # Copyright (C) 2002, 2006, 2014 Glenn Randers-Pehrson
 # Copyright (C) 1995 Guy Eric Schalnat, Group 42, Inc.
 #
@@ -25,9 +25,9 @@ AWK = awk
 DFNFLAGS = # DFNFLAGS contains -D options to use in the libpng build
 DFA_EXTRA = # extra files that can be used to control configuration
 CPPFLAGS = -I$(ZLIBINC) # -DPNG_DEBUG=5
-CFLAGS = -O # -g
+CFLAGS = -O2 -g
 ARFLAGS = rc
-LDFLAGS = -L$(ZLIBLIB) # -g
+LDFLAGS = -L$(ZLIBLIB) -g
 LIBS = -lz -lm
 
 # Pre-built configuration
@@ -39,7 +39,7 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o \
        pngtrans.o pngwio.o pngwrite.o pngwtran.o pngwutil.o
 
 .c.o:
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $<
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) -o $@ $*.c
 
 all: libpng.a pngtest
 

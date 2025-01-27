@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
           if ((fp_al = fopen (argv[argi], "wb")) == NULL)
           {
             fname_al = argv[argi];
-            fprintf (stderr, "PNM2PNG\n");
+            fprintf (stderr, "PNG2PNM\n");
             fprintf (stderr, "Error:  cannot create alpha-channel file %s\n",
                      argv[argi]);
             exit (1);
@@ -234,22 +234,6 @@ BOOL do_png2pnm (png_struct *png_ptr, png_info *info_ptr,
 
   /* set up (if applicable) the expansion of grayscale images to bit-depth 8 */
   png_set_expand_gray_1_2_4_to_8 (png_ptr);
-
-#ifdef NJET
-  /* downgrade 16-bit images to 8-bit */
-  if (bit_depth == 16)
-    png_set_strip_16 (png_ptr);
-  /* transform grayscale images into full-color */
-  if (color_type == PNG_COLOR_TYPE_GRAY ||
-      color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
-    png_set_gray_to_rgb (png_ptr);
-  /* if the PNG image has a gAMA chunk then gamma-correct the output image */
-  {
-    double file_gamma;
-    if (png_get_gAMA (png_ptr, info_ptr, &file_gamma))
-      png_set_gamma (png_ptr, (double) 2.2, file_gamma);
-  }
-#endif
 
   /* read the image file, with all of the above image transforms applied */
   png_read_png (png_ptr, info_ptr, 0, NULL);

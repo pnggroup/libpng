@@ -712,11 +712,13 @@ option TARGET_SPECIFIC_CODE requires READ
 chunk bKGD
 chunk cHRM enables COLORSPACE
 chunk cICP enables COLORSPACE, GAMMA
+chunk cLLI
 chunk eXIf
 chunk gAMA enables GAMMA
 chunk hIST
 chunk iCCP enables COLORSPACE, GAMMA
 chunk iTXt enables TEXT
+chunk mDCV
 chunk oFFs
 chunk pCAL
 chunk pHYs

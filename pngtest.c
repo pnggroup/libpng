@@ -1143,6 +1143,30 @@ test_one_file(const char *inname, const char *outname)
          png_set_gAMA_fixed(write_ptr, write_info_ptr, gamma);
    }
 #endif
+#ifdef PNG_cLLI_SUPPORTED
+   {
+      png_uint_32 maxCLL;
+      png_uint_32 maxFALL;
+
+      if (png_get_cLLI_fixed(read_ptr, read_info_ptr, &maxCLL, &maxFALL) != 0)
+         png_set_cLLI_fixed(write_ptr, write_info_ptr, maxCLL, maxFALL);
+   }
+#endif
+#ifdef PNG_mDCV_SUPPORTED
+   {
+      png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
+          blue_y;
+      png_uint_32 maxDL;
+      png_uint_32 minDL;
+
+      if (png_get_mDCV_fixed(read_ptr, read_info_ptr, &white_x, &white_y,
+               &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y,
+               &maxDL, &minDL) != 0)
+         png_set_mDCV_fixed(write_ptr, write_info_ptr, white_x, white_y,
+               red_x, red_y, green_x, green_y, blue_x, blue_y,
+               maxDL, minDL);
+   }
+#endif
 #else /* Use floating point versions */
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 #ifdef PNG_cHRM_SUPPORTED
@@ -1164,6 +1188,29 @@ test_one_file(const char *inname, const char *outname)
 
       if (png_get_gAMA(read_ptr, read_info_ptr, &gamma) != 0)
          png_set_gAMA(write_ptr, write_info_ptr, gamma);
+   }
+#endif
+#ifdef PNG_cLLI_SUPPORTED
+   {
+      double maxCLL;
+      double maxFALL;
+
+      if (png_get_cLLI(read_ptr, read_info_ptr, &maxCLL, &maxFALL) != 0)
+         png_set_cLLI(write_ptr, write_info_ptr, maxCLL, maxFALL);
+   }
+#endif
+#ifdef PNG_mDCV_SUPPORTED
+   {
+      double white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y;
+      double maxDL;
+      double minDL;
+
+      if (png_get_mDCV(read_ptr, read_info_ptr, &white_x, &white_y,
+               &red_x, &red_y, &green_x, &green_y, &blue_x, &blue_y,
+               &maxDL, &minDL) != 0)
+         png_set_mDCV(write_ptr, write_info_ptr, white_x, white_y,
+               red_x, red_y, green_x, green_y, blue_x, blue_y,
+               maxDL, minDL);
    }
 #endif
 #endif /* Floating point */
