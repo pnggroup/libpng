@@ -6239,6 +6239,8 @@ Version 1.6.46 [January 23, 2025]
   Cleaned up contrib/pngminus: corrected an old typo, removed an old
     workaround, and updated the CMake file.
 
+Version 1.6.47 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
