@@ -1081,6 +1081,25 @@ PNG_INTERNAL_FUNCTION(png_uint_32,png_fixed_ITU,(png_const_structrp png_ptr,
 PNG_INTERNAL_FUNCTION(int,png_user_version_check,(png_structrp png_ptr,
    png_const_charp user_png_ver),PNG_EMPTY);
 
+#ifdef PNG_READ_SUPPORTED /* should only be used on read */
+/* Security: read limits on the largest allocations while reading a PNG.  This
+ * avoids very large allocations caused by PNG files with damaged or altered
+ * chunk 'length' fields.
+ */
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED /* run-time limit */
+#  define png_chunk_max(png_ptr) ((png_ptr)->user_chunk_malloc_max)
+
+#elif PNG_USER_CHUNK_MALLOC_MAX > 0 /* compile-time limit */
+#  define png_chunk_max(png_ptr) ((void)png_ptr, PNG_USER_CHUNK_MALLOC_MAX)
+
+#elif (defined PNG_MAX_MALLOC_64K)  /* legacy system limit */
+#  define png_chunk_max(png_ptr) ((void)png_ptr, 65536U)
+
+#else                               /* modern system limit SIZE_MAX (C99) */
+#  define png_chunk_max(png_ptr) ((void)png_ptr, PNG_SIZE_MAX)
+#endif
+#endif /* READ */
+
 /* Internal base allocator - no messages, NULL on failure to allocate.  This
  * does, however, call the application provided allocator and that could call
  * png_error (although that would be a bug in the application implementation.)
@@ -1583,12 +1602,6 @@ typedef enum
    handled_saved,      /* saved in the unknown chunk list */
    handled_ok          /* known, supported and handled without error */
 } png_handle_result_code;
-
-PNG_INTERNAL_FUNCTION(void,png_check_chunk_name,(png_const_structrp png_ptr,
-    png_uint_32 chunk_name),PNG_EMPTY);
-
-PNG_INTERNAL_FUNCTION(void,png_check_chunk_length,(png_const_structrp png_ptr,
-    png_uint_32 chunk_length),PNG_EMPTY);
 
 PNG_INTERNAL_FUNCTION(png_handle_result_code,png_handle_unknown,
     (png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length, int keep),

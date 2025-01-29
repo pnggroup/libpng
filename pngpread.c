@@ -193,17 +193,8 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
     */
    if ((png_ptr->mode & PNG_HAVE_CHUNK_HEADER) == 0)
    {
-      png_byte chunk_length[4];
-      png_byte chunk_tag[4];
-
       PNG_PUSH_SAVE_BUFFER_IF_LT(8)
-      png_push_fill_buffer(png_ptr, chunk_length, 4);
-      png_ptr->push_length = png_get_uint_31(png_ptr, chunk_length);
-      png_reset_crc(png_ptr);
-      png_crc_read(png_ptr, chunk_tag, 4);
-      png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(chunk_tag);
-      png_check_chunk_name(png_ptr, png_ptr->chunk_name);
-      png_check_chunk_length(png_ptr, png_ptr->push_length);
+      png_ptr->push_length = png_read_chunk_header(png_ptr);
       png_ptr->mode |= PNG_HAVE_CHUNK_HEADER;
    }
 

@@ -1733,13 +1733,13 @@ png_set_compression_buffer_size(png_structrp png_ptr, size_t size)
    if (png_ptr == NULL)
       return;
 
-   if (size == 0 || size > PNG_UINT_31_MAX)
+   if (size == 0 || size > (uInt)-1)
       png_error(png_ptr, "invalid compression buffer size");
 
 #  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
    if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
    {
-      png_ptr->IDAT_read_size = (png_uint_32)size; /* checked above */
+      png_ptr->IDAT_read_size = (uInt)/*SAFE*/size; /* checked above */
       return;
    }
 #  endif
@@ -1831,8 +1831,23 @@ png_set_chunk_malloc_max(png_structrp png_ptr,
 {
    png_debug(1, "in png_set_chunk_malloc_max");
 
+   /* 1.6.47: make it so that user_chunk_malloc_max is never 0 to avoid checking
+    * everywhere it is used.  Setting this value to 1U will have the effect of
+    * preventing all read-time malloc operations except for reading IDAT.
+    */
    if (png_ptr != NULL)
-      png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
+   {
+      if (user_chunk_malloc_max == 0U) /* unlimited */
+      {
+#        ifdef PNG_MAX_MALLOC_64K
+            png_ptr->user_chunk_malloc_max = 65536U;
+#        else
+            png_ptr->user_chunk_malloc_max = PNG_SIZE_MAX;
+#        endif
+      }
+      else
+         png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
+   }
 }
 #endif /* ?SET_USER_LIMITS */
 
