@@ -144,6 +144,38 @@ png_read_sig(png_structrp png_ptr, png_inforp info_ptr)
       png_ptr->mode |= PNG_HAVE_PNG_SIGNATURE;
 }
 
+/* This function is called to verify that a chunk name is valid.
+ * Do this using the bit-whacking approach from contrib/tools/pngfix.c
+ *
+ * Copied from libpng 1.7.
+ */
+static int
+check_chunk_name(png_uint_32 name)
+{
+   png_uint_32 t;
+
+   /* Remove bit 5 from all but the reserved byte; this means
+    * every 8-bit unit must be in the range 65-90 to be valid.
+    * So bit 5 must be zero, bit 6 must be set and bit 7 zero.
+    */
+   name &= ~PNG_U32(32,32,0,32);
+   t = (name & ~0x1f1f1f1fU) ^ 0x40404040U;
+
+   /* Subtract 65 for each 8-bit quantity, this must not
+    * overflow and each byte must then be in the range 0-25.
+    */
+   name -= PNG_U32(65,65,65,65);
+   t |= name;
+
+   /* Subtract 26, handling the overflow which should set the
+    * top three bits of each byte.
+    */
+   name -= PNG_U32(25,25,25,26);
+   t |= ~name;
+
+   return (t & 0xe0e0e0e0U) == 0U;
+}
+
 /* Read the chunk header (length + type name).
  * Put the type name into png_ptr->chunk_name, and return the length.
  */
@@ -151,33 +183,36 @@ png_uint_32 /* PRIVATE */
 png_read_chunk_header(png_structrp png_ptr)
 {
    png_byte buf[8];
-   png_uint_32 length;
+   png_uint_32 chunk_name, length;
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_HDR;
 #endif
 
-   /* Read the length and the chunk name.
-    * This must be performed in a single I/O call.
+   /* Read the length and the chunk name.  png_struct::chunk_name is immediately
+    * updated even if they are detectably wrong.  This aids error message
+    * handling by allowing png_chunk_error to be used.
     */
    png_read_data(png_ptr, buf, 8);
    length = png_get_uint_31(png_ptr, buf);
-
-   /* Put the chunk name into png_ptr->chunk_name. */
-   png_ptr->chunk_name = PNG_CHUNK_FROM_STRING(buf+4);
-
-   png_debug2(0, "Reading chunk typeid = 0x%lx, length = %lu",
-       (unsigned long)png_ptr->chunk_name, (unsigned long)length);
+   png_ptr->chunk_name = chunk_name = PNG_CHUNK_FROM_STRING(buf+4);
 
    /* Reset the crc and run it over the chunk name. */
    png_reset_crc(png_ptr);
    png_calculate_crc(png_ptr, buf + 4, 4);
 
-   /* Check to see if chunk name is valid. */
-   png_check_chunk_name(png_ptr, png_ptr->chunk_name);
+   png_debug2(0, "Reading chunk typeid = 0x%lx, length = %lu",
+       (unsigned long)png_ptr->chunk_name, (unsigned long)length);
 
-   /* Check for too-large chunk length */
-   png_check_chunk_length(png_ptr, length);
+   /* Sanity check the length (first by <= 0x80) and the chunk name.  An error
+    * here indicates a broken stream and libpng has no recovery from this.
+    */
+   if (buf[0] >= 0x80U)
+      png_chunk_error(png_ptr, "bad header (invalid length)");
+
+   /* Check to see if chunk name is valid. */
+   if (!check_chunk_name(chunk_name))
+      png_chunk_error(png_ptr, "bad header (invalid type)");
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
@@ -335,17 +370,14 @@ png_crc_finish(png_structrp png_ptr, png_uint_32 skip)
 /* Manage the read buffer; this simply reallocates the buffer if it is not small
  * enough (or if it is not allocated).  The routine returns a pointer to the
  * buffer; if an error occurs and 'warn' is set the routine returns NULL, else
- * it will call png_error (via png_malloc) on failure.  (warn == 2 means
- * 'silent').
+ * it will call png_error on failure.
  */
 static png_bytep
-png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
+png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size)
 {
    png_bytep buffer = png_ptr->read_buffer;
 
-   /* TODO: put the code for checking the CHUNK_MALLOC_MAX in here to avoid
-    * duplication and to avoid unexpected errors.
-    */
+   if (new_size > png_chunk_max(png_ptr)) return NULL;
 
    if (buffer != NULL && new_size > png_ptr->read_buffer_size)
    {
@@ -361,18 +393,11 @@ png_read_buffer(png_structrp png_ptr, png_alloc_size_t new_size, int warn)
 
       if (buffer != NULL)
       {
-         memset(buffer, 0, new_size); /* just in case */
+#        ifndef PNG_NO_MEMZERO /* for detecting UIM bugs **only** */
+            memset(buffer, 0, new_size); /* just in case */
+#        endif
          png_ptr->read_buffer = buffer;
          png_ptr->read_buffer_size = new_size;
-      }
-
-      else if (warn < 2) /* else silent */
-      {
-         if (warn != 0)
-             png_chunk_warning(png_ptr, "insufficient memory to read chunk");
-
-         else
-             png_chunk_error(png_ptr, "insufficient memory to read chunk");
       }
    }
 
@@ -665,16 +690,7 @@ png_decompress_chunk(png_structrp png_ptr,
     * maybe a '\0' terminator too.  We have to assume that 'prefix_size' is
     * limited only by the maximum chunk size.
     */
-   png_alloc_size_t limit = PNG_SIZE_MAX;
-
-# ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (png_ptr->user_chunk_malloc_max > 0 &&
-       png_ptr->user_chunk_malloc_max < limit)
-      limit = png_ptr->user_chunk_malloc_max;
-# elif PNG_USER_CHUNK_MALLOC_MAX > 0
-   if (PNG_USER_CHUNK_MALLOC_MAX < limit)
-      limit = PNG_USER_CHUNK_MALLOC_MAX;
-# endif
+   png_alloc_size_t limit = png_chunk_max(png_ptr);
 
    if (limit >= prefix_size + (terminate != 0))
    {
@@ -878,87 +894,6 @@ png_inflate_read(png_structrp png_ptr, png_bytep read_buffer, uInt read_size,
    }
 }
 #endif /* READ_iCCP */
-
-/* This function is called to verify that a chunk name is valid.
- * Do this using the bit-whacking approach from contrib/tools/pngfix.c
- *
- * Copied from libpng 1.7.
- */
-static int
-check_chunk_name(png_uint_32 name)
-{
-   png_uint_32 t;
-
-   /* Remove bit 5 from all but the reserved byte; this means
-    * every 8-bit unit must be in the range 65-90 to be valid.
-    * So bit 5 must be zero, bit 6 must be set and bit 7 zero.
-    */
-   name &= ~PNG_U32(32,32,0,32);
-   t = (name & ~0x1f1f1f1fU) ^ 0x40404040U;
-
-   /* Subtract 65 for each 8-bit quantity, this must not
-    * overflow and each byte must then be in the range 0-25.
-    */
-   name -= PNG_U32(65,65,65,65);
-   t |= name;
-
-   /* Subtract 26, handling the overflow which should set the
-    * top three bits of each byte.
-    */
-   name -= PNG_U32(25,25,25,26);
-   t |= ~name;
-
-   return (t & 0xe0e0e0e0U) == 0U;
-}
-
-void /* PRIVATE */
-png_check_chunk_name(png_const_structrp png_ptr, png_uint_32 chunk_name)
-{
-   if (check_chunk_name(chunk_name))
-      return;
-
-   png_chunk_error(png_ptr, "invalid chunk type");
-}
-
-void /* PRIVATE */
-png_check_chunk_length(png_const_structrp png_ptr, png_uint_32 length)
-{
-   png_alloc_size_t limit = PNG_UINT_31_MAX;
-
-# ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (png_ptr->user_chunk_malloc_max > 0 &&
-       png_ptr->user_chunk_malloc_max < limit)
-      limit = png_ptr->user_chunk_malloc_max;
-# elif PNG_USER_CHUNK_MALLOC_MAX > 0
-   if (PNG_USER_CHUNK_MALLOC_MAX < limit)
-      limit = PNG_USER_CHUNK_MALLOC_MAX;
-# endif
-   if (png_ptr->chunk_name == png_IDAT)
-   {
-      png_alloc_size_t idat_limit = PNG_UINT_31_MAX;
-      size_t row_factor =
-         (size_t)png_ptr->width
-         * (size_t)png_ptr->channels
-         * (png_ptr->bit_depth > 8? 2: 1)
-         + 1
-         + (png_ptr->interlaced? 6: 0);
-      if (png_ptr->height > PNG_UINT_32_MAX/row_factor)
-         idat_limit = PNG_UINT_31_MAX;
-      else
-         idat_limit = png_ptr->height * row_factor;
-      row_factor = row_factor > 32566? 32566 : row_factor;
-      idat_limit += 6 + 5*(idat_limit/row_factor+1); /* zlib+deflate overhead */
-      idat_limit=idat_limit < PNG_UINT_31_MAX? idat_limit : PNG_UINT_31_MAX;
-      limit = limit < idat_limit? idat_limit : limit;
-   }
-
-   if (length > limit)
-   {
-      png_debug2(0," length = %lu, limit = %lu",
-         (unsigned long)length,(unsigned long)limit);
-      png_benign_error(png_ptr, "chunk data is too large");
-   }
-}
 
 /* CHUNK HANDLING */
 /* Read and check the IDHR chunk */
@@ -1486,7 +1421,7 @@ png_handle_iCCP(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
                         png_uint_32 tag_count =
                            png_get_uint_32(profile_header + 128);
                         png_bytep profile = png_read_buffer(png_ptr,
-                            profile_length, 2/*silent*/);
+                              profile_length);
 
                         if (profile != NULL)
                         {
@@ -1658,16 +1593,7 @@ png_handle_sPLT(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 #endif
 
-#ifdef PNG_MAX_MALLOC_64K
-   if (length > 65535U)
-   {
-      png_crc_finish(png_ptr, length);
-      png_chunk_benign_error(png_ptr, "too large to fit in memory");
-      return handled_error;
-   }
-#endif
-
-   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length+1);
    if (buffer == NULL)
    {
       png_crc_finish(png_ptr, length);
@@ -2088,12 +2014,11 @@ png_handle_mDCV(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 static png_handle_result_code /* PRIVATE */
 png_handle_eXIf(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 {
-   /* TODO: rewrite to use png_read_buffer, like everything else. */
    png_bytep buffer = NULL;
 
    png_debug(1, "in png_handle_eXIf");
 
-   buffer = png_read_buffer(png_ptr, length, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length);
 
    if (buffer == NULL)
    {
@@ -2240,7 +2165,7 @@ png_handle_pCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_debug1(2, "Allocating and reading pCAL chunk data (%u bytes)",
        length + 1);
 
-   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length+1);
 
    if (buffer == NULL)
    {
@@ -2358,12 +2283,12 @@ png_handle_sCAL(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    png_debug1(2, "Allocating and reading sCAL chunk data (%u bytes)",
        length + 1);
 
-   buffer = png_read_buffer(png_ptr, length+1, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length+1);
 
    if (buffer == NULL)
    {
-      png_chunk_benign_error(png_ptr, "out of memory");
       png_crc_finish(png_ptr, length);
+      png_chunk_benign_error(png_ptr, "out of memory");
       return handled_error;
    }
 
@@ -2487,24 +2412,15 @@ png_handle_tEXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 #endif
 
-   /* TODO: this doesn't work and shouldn't be necessary (see above). */
+   /* TODO: this doesn't work and shouldn't be necessary. */
    if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
-#ifdef PNG_MAX_MALLOC_64K
-   /* TODO: either remove this or common it out into png_read_buffer */
-   if (length > 65535U)
-   {
-      png_crc_finish(png_ptr, length);
-      png_chunk_benign_error(png_ptr, "too large to fit in memory");
-      return handled_error;
-   }
-#endif
-
-   buffer = png_read_buffer(png_ptr, length+1, 1/*warn*/);
+   buffer = png_read_buffer(png_ptr, length+1);
 
    if (buffer == NULL)
    {
+      png_crc_finish(png_ptr, length);
       png_chunk_benign_error(png_ptr, "out of memory");
       return handled_error;
    }
@@ -2570,16 +2486,15 @@ png_handle_zTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 #endif
 
-   /* TODO: this doesn't work (not after the above code) and shouldn't be
-    * necessary, see the similar cases above.
-    */
+   /* TODO: should not be necessary. */
    if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
    /* Note, "length" is sufficient here; we won't be adding
-    * a null terminator later.
+    * a null terminator later.  The limit check in png_handle_chunk should be
+    * sufficient.
     */
-   buffer = png_read_buffer(png_ptr, length, 2/*silent*/);
+   buffer = png_read_buffer(png_ptr, length);
 
    if (buffer == NULL)
    {
@@ -2691,13 +2606,11 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    }
 #endif
 
-   /* TODO: this doesn't work (not after the above code) and shouldn't be
-    * necessary, see the similar cases above.
-    */
+   /* TODO: should not be necessary. */
    if ((png_ptr->mode & PNG_HAVE_IDAT) != 0)
       png_ptr->mode |= PNG_AFTER_IDAT;
 
-   buffer = png_read_buffer(png_ptr, length+1, 1/*warn*/);
+   buffer = png_read_buffer(png_ptr, length+1);
 
    if (buffer == NULL)
    {
@@ -2822,23 +2735,13 @@ png_handle_iTXt(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
 static int
 png_cache_unknown_chunk(png_structrp png_ptr, png_uint_32 length)
 {
-   png_alloc_size_t limit = PNG_SIZE_MAX;
+   const png_alloc_size_t limit = png_chunk_max(png_ptr);
 
    if (png_ptr->unknown_chunk.data != NULL)
    {
       png_free(png_ptr, png_ptr->unknown_chunk.data);
       png_ptr->unknown_chunk.data = NULL;
    }
-
-#  ifdef PNG_SET_USER_LIMITS_SUPPORTED
-   if (png_ptr->user_chunk_malloc_max > 0 &&
-       png_ptr->user_chunk_malloc_max < limit)
-      limit = png_ptr->user_chunk_malloc_max;
-
-#  elif PNG_USER_CHUNK_MALLOC_MAX > 0
-   if (PNG_USER_CHUNK_MALLOC_MAX < limit)
-      limit = PNG_USER_CHUNK_MALLOC_MAX;
-#  endif
 
    if (length <= limit)
    {
@@ -3112,7 +3015,12 @@ static const struct
        * build.
        */
 
-   png_uint_32 max_length;    /* Length min, max in bytes */
+   /* Crushing these values helps on modern 32-bit architectures because the
+    * pointer and the following bit fields both end up requiring 32 bits.
+    * Typically this will halve the table size.  On 64-bit architectures the
+    * table entries will typically be 8 bytes.
+    */
+   png_uint_32 max_length :12; /* Length min, max in bytes */
    png_uint_32 min_length :8;
       /* Length errors on critical chunks have special handling to preserve the
        * existing behaviour in libpng 1.6.  Anciallary chunks are checked below
@@ -3135,47 +3043,63 @@ read_chunks[PNG_INDEX_unknown] =
     * the first, 'handler', function.  'handler' is NULL when the chunk has no
     * compiled in support.
     */
-#  define ChunkMax 0x7FFFFFFFU  /* Maximum PNG chunk length */
-#  define NoCheck  ChunkMax     /* Special check in handler */
-#  define LKMin    3U+LZ77Min   /* Minimum length of keyword+LZ77 */
+#  define NoCheck 0x801U      /* Do not check the maximum length */
+#  define Limit   0x802U      /* Limit to png_chunk_max bytes */
+#  define LKMin   3U+LZ77Min  /* Minimum length of keyword+LZ77 */
 
 #define hIHDR PNG_HAVE_IHDR
 #define hPLTE PNG_HAVE_PLTE
 #define hIDAT PNG_HAVE_IDAT
+   /* For the two chunks, tRNS and bKGD which can occur in PNGs without a PLTE
+    * but must occur after the PLTE use this and put the check in the handler
+    * routine for colour mapped images were PLTE is required.  Also put a check
+    * in PLTE for other image types to drop the PLTE if tRNS or bKGD have been
+    * seen.
+    */
 #define hCOL  (PNG_HAVE_PLTE|PNG_HAVE_IDAT)
+   /* Used for the decoding chunks which must be before PLTE. */
 #define aIDAT PNG_AFTER_IDAT
 
    /* Chunks from W3C PNG v3: */
    /*       cHNK  max_len,   min, before, after, multiple */
 #  define CDIHDR      13U,   13U,  hIHDR,     0,        0
 #  define CDPLTE  NoCheck,    0U,      0, hIHDR,        1
-#  define CDIDAT ChunkMax,    0U,  aIDAT, hIHDR,        1
+      /* PLTE errors are only critical for colour-map images, consequently the
+       * hander does all the checks.
+       */
+#  define CDIDAT  NoCheck,    0U,  aIDAT, hIHDR,        1
 #  define CDIEND  NoCheck,    0U,      0, aIDAT,        0
+      /* Historically data was allowed in IEND */
 #  define CDtRNS     256U,    0U,  hIDAT, hIHDR,        0
 #  define CDcHRM      32U,   32U,   hCOL, hIHDR,        0
 #  define CDgAMA       4U,    4U,   hCOL, hIHDR,        0
-#  define CDiCCP ChunkMax, LKMin,   hCOL, hIHDR,        0
+#  define CDiCCP  NoCheck, LKMin,   hCOL, hIHDR,        0
 #  define CDsBIT       4U,    1U,   hCOL, hIHDR,        0
 #  define CDsRGB       1U,    1U,   hCOL, hIHDR,        0
 #  define CDcICP       4U,    4U,   hCOL, hIHDR,        0
 #  define CDmDCV      24U,   24U,   hCOL, hIHDR,        0
-#  define CDeXIf ChunkMax,    4U,      0, hIHDR,        0
+#  define CDeXIf    Limit,    4U,      0, hIHDR,        0
 #  define CDcLLI       8U,    8U,   hCOL, hIHDR,        0
-#  define CDtEXt ChunkMax,    2U,      0, hIHDR,        1
-#  define CDzTXt ChunkMax, LKMin,      0, hIHDR,        1
-#  define CDiTXt ChunkMax,    6U,      0, hIHDR,        1
+#  define CDtEXt  NoCheck,    2U,      0, hIHDR,        1
+      /* Allocates 'length+1'; checked in the handler */
+#  define CDzTXt    Limit, LKMin,      0, hIHDR,        1
+#  define CDiTXt  NoCheck,    6U,      0, hIHDR,        1
+      /* Allocates 'length+1'; checked in the handler */
 #  define CDbKGD       6U,    1U,  hIDAT, hIHDR,        0
 #  define CDhIST    1024U,    0U,  hPLTE, hIHDR,        0
-#  define CDpHYs       9U,    9U,  hPLTE, hIHDR,        0
-#  define CDsPLT ChunkMax,    3U,  hIDAT, hIHDR,        1
+#  define CDpHYs       9U,    9U,  hIDAT, hIHDR,        0
+#  define CDsPLT  NoCheck,    3U,  hIDAT, hIHDR,        1
+      /* Allocates 'length+1'; checked in the handler */
 #  define CDtIME       7U,    7U,      0, hIHDR,        0
-#  define CDacTL       8U,    8U,  hPLTE, hIHDR,        0
+#  define CDacTL       8U,    8U,  hIDAT, hIHDR,        0
 #  define CDfcTL      25U,   26U,      0, hIHDR,        1
-#  define CDfdAT ChunkMax,    4U,  hPLTE, hIHDR,        0
-   /* Supported chunks from PNG extensions 1.5.0 */
+#  define CDfdAT    Limit,    4U,  hIDAT, hIHDR,        1
+   /* Supported chunks from PNG extensions 1.5.0, NYI so limit */
 #  define CDoFFs       9U,    9U,  hIDAT, hIHDR,        0
-#  define CDpCAL ChunkMax,   14U,  hIDAT, hIHDR,        0
-#  define CDsCAL ChunkMax,    4U,  hIDAT, hIHDR,        0
+#  define CDpCAL  NoCheck,   14U,  hIDAT, hIHDR,        0
+      /* Allocates 'length+1'; checked in the handler */
+#  define CDsCAL    Limit,    4U,  hIDAT, hIHDR,        0
+      /* Allocates 'length+1'; checked in the handler */
 
 #  define PNG_CHUNK(cHNK, index) { png_handle_ ## cHNK, CD ## cHNK },
    PNG_KNOWN_CHUNKS
@@ -3209,12 +3133,11 @@ png_handle_chunk(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
    /* CSE: these things don't change, these autos are just to save typing and
     * make the code more clear.
     */
-   const int chunk_critical = PNG_CHUNK_CRITICAL(png_ptr->chunk_name);
-   const png_index chunk_index = png_chunk_index_from_name(png_ptr->chunk_name);
+   const png_uint_32 chunk_name = png_ptr->chunk_name;
+   const png_index chunk_index = png_chunk_index_from_name(chunk_name);
 
    png_handle_result_code handled = handled_error;
    png_const_charp errmsg = NULL;
-   int critical_error = 0; /* default to 'benign' */
 
    /* Is this a known chunk?  If not there are no checks performed here;
     * png_handle_unknown does the correct checks.  This means that the values
@@ -3241,7 +3164,6 @@ png_handle_chunk(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
              read_chunks[chunk_index].pos_after))
    {
       errmsg = "out of place";
-      critical_error = chunk_critical;
    }
 
    /* Now check for duplicates: duplicated critical chunks also produce a
@@ -3251,17 +3173,47 @@ png_handle_chunk(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
             png_file_has_chunk(png_ptr, chunk_index))
    {
       errmsg = "duplicate";
-      critical_error = chunk_critical;
    }
 
+   else if (length < read_chunks[chunk_index].min_length)
+      errmsg = "too short";
    else
    {
-      if (length > read_chunks[chunk_index].max_length)
-         errmsg = "too much data";
-      else if (length < read_chunks[chunk_index].min_length)
-         errmsg = "too little data";
-      else
-         handled = read_chunks[chunk_index].handler(png_ptr, info_ptr, length);
+      /* NOTE: apart from IHDR the critical chunks (PLTE, IDAT and IEND) are set
+       * up above not to do any length checks.
+       *
+       * The png_chunk_max check ensures that the variable length chunks are
+       * always checked at this point for being within the system allocation
+       * limits.
+       */
+      unsigned max_length = read_chunks[chunk_index].max_length;
+
+      switch (max_length)
+      {
+         case Limit:
+            /* png_read_chunk_header has already png_error'ed chunks with a
+             * length exceeding the 31-bit PNG limit, so just check the memory
+             * limit:
+             */
+            if (length <= png_chunk_max(png_ptr))
+               goto MeetsLimit;
+
+            errmsg = "length exceeds libpng limit";
+            break;
+
+         default:
+            if (length <= max_length)
+               goto MeetsLimit;
+
+            errmsg = "too long";
+            break;
+
+         case NoCheck:
+         MeetsLimit:
+            handled = read_chunks[chunk_index].handler(
+                  png_ptr, info_ptr, length);
+            break;
+      }
    }
 
    /* If there was an error or the chunk was simply skipped it is not counted as
@@ -3269,9 +3221,9 @@ png_handle_chunk(png_structrp png_ptr, png_inforp info_ptr, png_uint_32 length)
     */
    if (errmsg != NULL)
    {
-      if (critical_error) /* stop immediately */
+      if (PNG_CHUNK_CRITICAL(chunk_name)) /* stop immediately */
          png_chunk_error(png_ptr, errmsg);
-      else
+      else /* ancillary chunk */
       {
          /* The chunk data is skipped: */
          png_crc_finish(png_ptr, length);
@@ -4275,6 +4227,9 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
 
          avail_in = png_ptr->IDAT_read_size;
 
+         if (avail_in > png_chunk_max(png_ptr))
+            avail_in = png_chunk_max(png_ptr);
+
          if (avail_in > png_ptr->idat_size)
             avail_in = (uInt)png_ptr->idat_size;
 
@@ -4282,8 +4237,13 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
           * to minimize memory usage by causing lots of re-allocs, but
           * realistically doing IDAT_read_size re-allocs is not likely to be a
           * big problem.
+          *
+          * An error here corresponds to the system being out of memory.
           */
-         buffer = png_read_buffer(png_ptr, avail_in, 0/*error*/);
+         buffer = png_read_buffer(png_ptr, avail_in);
+
+         if (buffer == NULL)
+            png_chunk_error(png_ptr, "out of memory");
 
          png_crc_read(png_ptr, buffer, avail_in);
          png_ptr->idat_size -= avail_in;

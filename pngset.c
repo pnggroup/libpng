@@ -1831,8 +1831,24 @@ png_set_chunk_malloc_max(png_structrp png_ptr,
 {
    png_debug(1, "in png_set_chunk_malloc_max");
 
+   /* pngstruct::user_chunk_malloc_max is initialized to a non-zero value in
+    * png.c.  This API supports '0' for unlimited, make sure the correct
+    * (unlimited) value is set here to avoid a need to check for 0 everywhere
+    * the parameter is used.
+    */
    if (png_ptr != NULL)
-      png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
+   {
+      if (user_chunk_malloc_max == 0U) /* unlimited */
+      {
+#        ifdef PNG_MAX_MALLOC_64K
+            png_ptr->user_chunk_malloc_max = 65536U;
+#        else
+            png_ptr->user_chunk_malloc_max = PNG_SIZE_MAX;
+#        endif
+      }
+      else
+         png_ptr->user_chunk_malloc_max = user_chunk_malloc_max;
+   }
 }
 #endif /* ?SET_USER_LIMITS */
 
