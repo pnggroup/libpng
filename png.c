@@ -268,27 +268,22 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     */
    memset(&create_struct, 0, (sizeof create_struct));
 
-   /* Added at libpng-1.2.6 */
 #  ifdef PNG_USER_LIMITS_SUPPORTED
       create_struct.user_width_max = PNG_USER_WIDTH_MAX;
       create_struct.user_height_max = PNG_USER_HEIGHT_MAX;
 
 #     ifdef PNG_USER_CHUNK_CACHE_MAX
-      /* Added at libpng-1.2.43 and 1.4.0 */
       create_struct.user_chunk_cache_max = PNG_USER_CHUNK_CACHE_MAX;
 #     endif
 
-      /* Added at libpng-1.2.43 and 1.4.1, required only for read but exists
-       * in png_struct regardless.
-       */
 #     if PNG_USER_CHUNK_MALLOC_MAX > 0 /* default to compile-time limit */
       create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;
 
-      /* No compile time limit so initialize to the system limit: */
-#     elif (defined PNG_MAX_MALLOC_64K/* legacy system limit */
+      /* No compile-time limit, so initialize to the system limit: */
+#     elif defined PNG_MAX_MALLOC_64K /* legacy system limit */
       create_struct.user_chunk_malloc_max = 65536U;
 
-#     else                            /* modern system limit SIZE_MAX (C99) */
+#     else /* modern system limit SIZE_MAX (C99) */
       create_struct.user_chunk_malloc_max = PNG_SIZE_MAX;
 #     endif
 #  endif
