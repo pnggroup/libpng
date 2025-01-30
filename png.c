@@ -280,9 +280,6 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 
       /* Added at libpng-1.2.43 and 1.4.1, required only for read but exists
        * in png_struct regardless.
-       *
-       * 1.6.47: ensure that the field is always set to a non-zero value so that
-       * it does not have to be checked when used.
        */
 #     if PNG_USER_CHUNK_MALLOC_MAX > 0 /* default to compile-time limit */
       create_struct.user_chunk_malloc_max = PNG_USER_CHUNK_MALLOC_MAX;

@@ -1733,13 +1733,13 @@ png_set_compression_buffer_size(png_structrp png_ptr, size_t size)
    if (png_ptr == NULL)
       return;
 
-   if (size == 0 || size > (uInt)-1)
+   if (size == 0 || size > PNG_UINT_31_MAX)
       png_error(png_ptr, "invalid compression buffer size");
 
 #  ifdef PNG_SEQUENTIAL_READ_SUPPORTED
    if ((png_ptr->mode & PNG_IS_READ_STRUCT) != 0)
    {
-      png_ptr->IDAT_read_size = (uInt)/*SAFE*/size; /* checked above */
+      png_ptr->IDAT_read_size = (png_uint_32)size; /* checked above */
       return;
    }
 #  endif
@@ -1831,9 +1831,10 @@ png_set_chunk_malloc_max(png_structrp png_ptr,
 {
    png_debug(1, "in png_set_chunk_malloc_max");
 
-   /* 1.6.47: make it so that user_chunk_malloc_max is never 0 to avoid checking
-    * everywhere it is used.  Setting this value to 1U will have the effect of
-    * preventing all read-time malloc operations except for reading IDAT.
+   /* pngstruct::user_chunk_malloc_max is initialized to a non-zero value in
+    * png.c.  This API supports '0' for unlimited, make sure the correct
+    * (unlimited) value is set here to avoid a need to check for 0 everywhere
+    * the parameter is used.
     */
    if (png_ptr != NULL)
    {
