@@ -1150,6 +1150,9 @@ png_write_iCCP(png_structrp png_ptr, png_const_charp name,
    if (profile_len < 132)
       png_error(png_ptr, "ICC profile too short");
 
+   if (png_get_uint_32(profile) != profile_len)
+      png_error(png_ptr, "Incorrect data in iCCP");
+
    temp = (png_uint_32) (*(profile+8));
    if (temp > 3 && (profile_len & 0x03))
       png_error(png_ptr, "ICC profile length invalid (not a multiple of 4)");
