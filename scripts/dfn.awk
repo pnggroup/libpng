@@ -2,6 +2,7 @@
 
 # scripts/dfn.awk - process a .dfn file
 #
+# Copyright (c) 2025 Cosmin Truta
 # Copyright (c) 2013-2014 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
@@ -13,28 +14,28 @@
 # Error messages are printed to stdout and if any are printed
 # the script will exit with error code 1.
 
-BEGIN{
-   out="/dev/null"       # as a flag
-   out_count=0           # count of output lines
-   err=0                 # set if an error occurred
-   sort=0                # sort the output
-   array[""]=""
+BEGIN {
+   out = "/dev/null" # as a flag
+   out_count = 0     # count of output lines
+   err = 0           # set if an error occurred
+   sort = 0          # sort the output
+   array[""] = ""
 }
 
 # The output file must be specified before any input:
-NR==1 && out == "/dev/null" {
+NR == 1 && out == "/dev/null" {
    print "out=output.file must be given on the command line"
-   # but continue without setting the error code; this allows the
-   # script to be checked easily
+   # but continue without setting the error code;
+   # this allows the script to be checked easily
 }
 
 # Output can be sorted; two lines are recognized
-$1 == "PNG_DFN_START_SORT"{
-   sort=0+$2
+$1 == "PNG_DFN_START_SORT" {
+   sort = 0 + $2
    next
 }
 
-$1 ~ /^PNG_DFN_END_SORT/{
+$1 ~ /^PNG_DFN_END_SORT/ {
    # Do a very simple, slow, sort; notice that blank lines won't be
    # output by this
    for (entry in array) {
@@ -55,11 +56,11 @@ $1 ~ /^PNG_DFN_END_SORT/{
          print value >out
       }
    }
-   sort=0
+   sort = 0
    next
 }
 
-/^[^"]*PNG_DFN *".*"[^"]*$/{
+/^[^"]*PNG_DFN *".*"[^"]*$/ {
    # A definition line, apparently correctly formatted; extract the
    # definition then replace any doubled "" that remain with a single
    # double quote.  Notice that the original doubled double quotes
@@ -69,15 +70,15 @@ $1 ~ /^PNG_DFN_END_SORT/{
    # if the quotes aren't closed and must read another line.  In this
    # case it is essential to reject lines that start with '#' because those
    # are introduced #line directives.
-   orig=$0
-   line=$0
-   lineno=FNR
-   if (lineno == "") lineno=NR
+   orig = $0
+   line = $0
+   lineno = FNR
+   if (lineno == "") lineno = NR
 
-   if (sub(/^[^"]*PNG_DFN *"/,"",line) != 1) {
+   if (sub(/^[^"]*PNG_DFN *"/, "", line) != 1) {
       print "line", lineno ": processing failed:"
       print orig
-      err=1
+      err = 1
       next
    } else {
       ++out_count
@@ -119,10 +120,8 @@ $1 ~ /^PNG_DFN_END_SORT/{
                   exit 1
                }
             }
-         }
-
-         # There is no matching "@.  Assume a split line
-         else while (1) {
+         } else while (1) {
+            # There is no matching "@.  Assume a split line
             if (getline nextline) {
                # If the line starts with '#' it is a preprocessor line directive
                # from cc -E; skip it:
@@ -133,7 +132,7 @@ $1 ~ /^PNG_DFN_END_SORT/{
             } else {
                # This is end-of-input - probably a missing "@ on the first line:
                print "line", lineno ": unbalanced @\" ... \"@ pair"
-               err=1
+               err = 1
                next
             }
          }
@@ -157,7 +156,7 @@ $1 ~ /^PNG_DFN_END_SORT/{
             }
          } else {
             print "line", lineno ": unterminated PNG_DFN string"
-            err=1
+            err = 1
             next
          }
       }
@@ -165,7 +164,7 @@ $1 ~ /^PNG_DFN_END_SORT/{
 
    # Put any needed double quotes in (at the end, because these would otherwise
    # interfere with the processing above.)
-   gsub(/@'/,"\"", line)
+   gsub(/@'/, "\"", line)
 
    # Remove any trailing spaces (not really required, but for
    # editorial consistency
@@ -177,23 +176,23 @@ $1 ~ /^PNG_DFN_END_SORT/{
    if (sort) {
       if (split(line, parts) < sort) {
          print "line", lineno ": missing sort field:", line
-         err=1
-      } else
+         err = 1
+      } else {
          array[parts[sort]] = line
-   }
-
-   else
+      }
+   } else {
       print line >out
+   }
    next
 }
 
-/PNG_DFN/{
+/PNG_DFN/ {
    print "line", NR, "incorrectly formatted PNG_DFN line:"
    print $0
    err = 1
 }
 
-END{
+END {
    if (out_count > 0 || err > 0)
       exit err
 

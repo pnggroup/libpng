@@ -2,7 +2,8 @@
 
 # scripts/options.awk - library build configuration control
 #
-# Copyright (c) 1998-2014 Glenn Randers-Pehrson
+# Copyright (c) 2025 Cosmin Truta
+# Copyright (c) 2010-2014 Glenn Randers-Pehrson
 #
 # This code is released under the libpng license.
 # For conditions of distribution and use, see the disclaimer
@@ -18,7 +19,7 @@
 #
 # Some options may be specified on the command line:
 #
-#  deb=1            Causes debugging to be output
+#  debug=1          Causes debugging to be output
 #  logunsupported=1 Causes all options to be recorded in the output
 #  everything=off   Causes all options to be disabled by default
 #  everything=on    Causes all options to be enabled by default
@@ -28,12 +29,12 @@
 # These options may also be specified in the original input file (and
 # are copied to the preprocessed file).
 
-BEGIN{
-   out=""                       # intermediate, preprocessed, file
-   pre=-1                       # preprocess (first line)
-   version="libpng version unknown" # version information
-   version_file=""              # where to find the version
-   err=0                        # in-line exit sets this
+BEGIN {
+   out = ""                     # intermediate, preprocessed, file
+   pre = -1                     # preprocess (first line)
+   version = "libpng version unknown" # version information
+   version_file = ""            # where to find the version
+   err = 0                      # in-line exit sets this
    # The following definitions prevent the C preprocessor noticing the lines
    # that will be in the final output file.  Some C preprocessors tokenise
    # the lines, for example by inserting spaces around operators, and all
@@ -44,23 +45,23 @@ BEGIN{
    # @' in, this will be replaced by a single " afterward.  See the parser
    # script dfn.awk for more capabilities (not required here).  Note that if
    # you need a " in a 'setting' in pnglibconf.dfa it must also be @'!
-   dq="@'"                      # For a single double quote
-   start=" PNG_DFN \""          # Start stuff to output (can't contain a "!)
-   end="\" "                    # End stuff to output
-   subs="@\" "                  # Substitute start (substitute a C macro)
-   sube=" \"@"                  # Substitute end
-   comment=start "/*"           # Comment start
-   cend="*/" end                # Comment end
-   def=start "#define PNG_"     # Arbitrary define
-   sup="_SUPPORTED" end         # end supported option
-   und=comment "#undef PNG_"    # Unsupported option
-   une="_SUPPORTED" cend        # end unsupported option
-   error=start "ERROR:"         # error message, terminate with 'end'
+   dq = "@'"                    # For a single double quote
+   start = " PNG_DFN \""        # Start stuff to output (can't contain a "!)
+   end = "\" "                  # End stuff to output
+   subs = "@\" "                # Substitute start (substitute a C macro)
+   sube = " \"@"                # Substitute end
+   comment = start "/*"         # Comment start
+   cend = "*/" end              # Comment end
+   def = start "#define PNG_"   # Arbitrary define
+   sup = "_SUPPORTED" end       # end supported option
+   und = comment "#undef PNG_"  # Unsupported option
+   une = "_SUPPORTED" cend      # end unsupported option
+   error = start "ERROR:"       # error message, terminate with 'end'
 
    # Variables
-   deb=0                        # debug - set on command line
-   everything=""                # do not override defaults
-   logunsupported=0             # write unsupported options too
+   debug = 0                    # debug - set on command line
+   everything = ""              # do not override defaults
+   logunsupported = 0           # write unsupported options too
 
    # Precreate arrays
    # for each option:
@@ -91,7 +92,7 @@ out == "" {
 # The very first line indicates whether we are reading pre-processed
 # input or not, this must come *first* because 'PREPROCESSED' needs
 # to be the very first line in the temporary file.
-pre == -1{
+pre == -1 {
    if ($0 == "PREPROCESSED") {
       pre = 0
       next
@@ -104,65 +105,65 @@ pre == -1{
 
 # While pre-processing if version is set to "search" look for a version string
 # in the following file.
-pre && version == "search" && version_file == ""{
+pre && version == "search" && version_file == "" {
    version_file = FILENAME
 }
 
-pre && version == "search" && version_file != FILENAME{
+pre && version == "search" && version_file != FILENAME {
    print "version string not found in", version_file
    err = 1
    exit 1
 }
 
-pre && version == "search" && $0 ~ /^ \* libpng version/{
+pre && version == "search" && $0 ~ /^ \* libpng version/ {
    version = substr($0, 4)
    print "version =", version >out
    next
 }
 
-pre && FILENAME == version_file{
+pre && FILENAME == version_file {
    next
 }
 
 # variable=value
-#   Sets the given variable to the given value (the syntax is fairly
-#   free form, except for deb (you are expected to understand how to
-#   set the debug variable...)
+#   Sets the given variable to the given value.  The syntax is
+#   fairly free-form, except for debug.
+#   (You are expected to know how to set the debug variable...)
 #
 #   This happens before the check on 'pre' below skips most of the
 #   rest of the actions, so the variable settings happen during
 #   preprocessing but are recorded in the END action too.  This
 #   allows them to be set on the command line too.
-$0 ~ /^[ 	]*version[ 	]*=/{
+$0 ~ /^[ 	]*version[ 	]*=/ {
    sub(/^[  ]*version[  ]*=[  ]*/, "")
    version = $0
    next
 }
-$0 ~ /^[ 	]*everything[ 	=]*off[ 	]*$/{
+$0 ~ /^[ 	]*everything[ 	=]*off[ 	]*$/ {
    everything = "off"
    next
 }
-$0 ~ /^[ 	]*everything[ 	=]*on[ 	]*$/{
+$0 ~ /^[ 	]*everything[ 	=]*on[ 	]*$/ {
    everything = "on"
    next
 }
-$0 ~ /^[ 	]*logunsupported[ 	=]*0[ 	]*$/{
+$0 ~ /^[ 	]*logunsupported[ 	=]*0[ 	]*$/ {
    logunsupported = 0
    next
 }
-$0 ~ /^[ 	]*logunsupported[ 	=]*1[ 	]*$/{
+$0 ~ /^[ 	]*logunsupported[ 	=]*1[ 	]*$/ {
    logunsupported = 1
    next
 }
-$1 == "deb" && $2 == "=" && NF == 3{
-   deb = $3
+$1 == "debug" && $2 == "=" && NF == 3 {
+   debug = $3
    next
 }
 
 # Preprocessing - this just copies the input file with lines
 # that need preprocessing (just chunk at present) expanded
 # The bare "pre" instead of "pre != 0" crashes under Sunos awk
-pre && $1 != "chunk"{
+pre && $1 != "chunk" {
    print >out
    next
 }
@@ -192,29 +193,30 @@ pre && $1 != "chunk"{
 # ignored.  Keywords are as follows, a NAME, is simply a macro name
 # without the leading PNG_, PNG_NO_ or the trailing _SUPPORTED.
 
-$1 ~ /^#/ || $0 ~ /^[ 	]*$/{
+$1 ~ /^#/ || $0 ~ /^[ 	]*$/ {
    next
 }
 
 # com <comment>
 #   The whole line is placed in the output file as a comment with
 #   the preceding 'com' removed
-$1 == "com"{
+$1 == "com" {
    if (NF > 1) {
       # sub(/^[ 	]*com[ 	]*/, "")
       $1 = ""
       print comment $0, cend >out
-   } else
+   } else {
       print start end >out
+   }
    next
 }
 
 # version
 #   Inserts a version comment
-$1 == "version" && NF == 1{
+$1 == "version" && NF == 1 {
    if (version == "") {
       print "ERROR: no version string set"
-      err = 1 # prevent END{} running
+      err = 1 # prevent END{} from running
       exit 1
    }
 
@@ -227,7 +229,7 @@ $1 == "version" && NF == 1{
 #   make generated local directories), the official name of the
 #   output file and, if required, a name to use in a protection
 #   macro for the contents.
-$1 == "file" && NF >= 2{
+$1 == "file" && NF >= 2 {
    print comment, $2, cend >out
    print comment, "Machine generated file: DO NOT EDIT", cend >out
    if (NF >= 3)
@@ -256,32 +258,35 @@ $1 == "file" && NF >= 2{
 #   otherwise the option is enabled: on by default.  A later (and it must
 #   be later) entry may turn an option on or off explicitly.
 
-$1 == "option" && NF >= 2{
+$1 == "option" && NF >= 2 {
    opt = $2
-   sub(/,$/,"",opt)
+   sub(/,$/, "", opt)
    onoff = option[opt]  # records current (and the default is "", enabled)
    key = ""
    istart = 3
    do {
-      if (istart == 1) {     # continuation line
+      if (istart == 1) {
+         # continuation line
          val = getline
 
-         if (val != 1) { # error reading it
-            if (val == 0)
+         if (val != 1) {
+            # error reading it
+            if (val == 0) {
                print "option", opt ": ERROR: missing continuation line"
-            else
+            } else {
                print "option", opt ": ERROR: error reading continuation line"
+            }
 
             # This is a hard error
-            err = 1 # prevent END{} running
+            err = 1 # prevent END{} from running
             exit 1
          }
       }
 
-      for (i=istart; i<=NF; ++i) {
-         val=$(i)
-         sub(/,$/,"",val)
-         if (val == "on" || val == "off" || val == "disabled" || val =="enabled") {
+      for (i = istart; i <= NF; ++i) {
+         val = $(i)
+         sub(/,$/, "", val)
+         if (val == "on" || val == "off" || val == "disabled" || val == "enabled") {
             key = ""
             if (onoff != val) {
                # on or off can zap disabled or enabled:
@@ -292,7 +297,7 @@ $1 == "option" && NF >= 2{
                   if (onoff == "" && (val == "on" || val == "off")) {
                      print "option", opt ": ERROR: turning unrecognized option", val
                      # For the moment error out - it is safer
-                     err = 1 # prevent END{} running
+                     err = 1 # prevent END{} from running
                      exit 1
                   }
                   onoff = val
@@ -303,7 +308,7 @@ $1 == "option" && NF >= 2{
                   break
                }
             }
-         } else if (val == "requires" || val == "if" || val == "enables" || val =="sets") {
+         } else if (val == "requires" || val == "if" || val == "enables" || val == "sets") {
             key = val
          } else if (key == "requires") {
             requires[opt] = requires[opt] " " val
@@ -317,8 +322,9 @@ $1 == "option" && NF >= 2{
             set = val
          } else if (key == "setval") {
             setval[opt " " set] = setval[opt " " set] " " val
-         } else
+         } else {
             break # bad line format
+         }
       }
 
       istart = 1
@@ -344,11 +350,11 @@ $1 == "option" && NF >= 2{
 #   option WRITE_NAME enables NAME LIST
 #   [option WRITE_NAME off]
 
-pre != 0 && $1 == "chunk" && NF >= 2{
+pre != 0 && $1 == "chunk" && NF >= 2 {
    # 'chunk' is handled on the first pass by writing appropriate
    # 'option' lines into the intermediate file.
    opt = $2
-   sub(/,$/,"",opt)
+   sub(/,$/, "", opt)
    onoff = ""
    reqread = ""
    reqwrite = ""
@@ -356,44 +362,49 @@ pre != 0 && $1 == "chunk" && NF >= 2{
    req = 0
    istart = 3
    do {
-      if (istart == 1) {     # continuation line
+      if (istart == 1) {
+         # continuation line
          val = getline
 
-         if (val != 1) { # error reading it
-            if (val == 0)
+         if (val != 1) {
+            # error reading it
+            if (val == 0) {
                print "chunk", opt ": ERROR: missing continuation line"
-            else
+            } else {
                print "chunk", opt ": ERROR: error reading continuation line"
+            }
 
             # This is a hard error
-            err = 1 # prevent END{} running
+            err = 1 # prevent END{} from running
             exit 1
          }
       }
 
       # read the keywords/additional OPTS
-      for (i=istart; i<=NF; ++i) {
+      for (i = istart; i <= NF; ++i) {
          val = $(i)
-         sub(/,$/,"",val)
+         sub(/,$/, "", val)
          if (val == "on" || val == "off" || val == "disabled") {
             if (onoff != val) {
-               if (onoff == "")
+               if (onoff == "") {
                   onoff = val
-               else
+               } else {
                   break # on/off conflict
+               }
             }
             req = 0
-         } else if (val == "requires")
+         } else if (val == "requires") {
             req = 1
-         else if (val == "enables")
+         } else if (val == "enables") {
             req = 2
-         else if (req == 1){
+         } else if (req == 1) {
             reqread = reqread " READ_" val
             reqwrite = reqwrite " WRITE_" val
-         } else if (req == 2)
+         } else if (req == 2) {
             enables = enables " " val
-         else
+         } else {
             break # bad line: handled below
+         }
       }
 
       istart = 1
@@ -421,26 +432,28 @@ pre != 0 && $1 == "chunk" && NF >= 2{
 #   support of non-standard configurations and numeric parameters,
 #   see the uses in scripts/options.dat
 
-$1 == "setting" && (NF == 2 || NF >= 3 && ($3 == "requires" || $3 == "default")){
+$1 == "setting" && (NF == 2 || (NF >= 3 && ($3 == "requires" || $3 == "default"))) {
    reqs = ""
    deflt = ""
    isdef = 0
    key = ""
-   for (i=3; i<=NF; ++i)
+   for (i = 3; i <= NF; ++i)
       if ($(i) == "requires" || $(i) == "default") {
          key = $(i)
          if (key == "default") isdef = 1
-      } else if (key == "requires")
+      } else if (key == "requires") {
          reqs = reqs " " $(i)
-      else if (key == "default")
+      } else if (key == "default") {
          deflt = deflt " " $(i)
-      else
+      } else {
          break # Format error, handled below
+      }
 
    setting[$2] = reqs
    # NOTE: this overwrites a previous value silently
-   if (isdef && deflt == "")
+   if (isdef && deflt == "") {
       deflt = " " # as a flag to force output
+   }
    defaults[$2] = deflt
    next
 }
@@ -473,12 +486,13 @@ $1 == "setting" && (NF == 2 || NF >= 3 && ($3 == "requires" || $3 == "default"))
 # 'NAME' is as above, but 'MACRO' is the full text of the equivalent
 # old, deprecated, macro.
 
-$1 == "=" && NF == 3{
+$1 == "=" && NF == 3 {
    print "#ifdef PNG_" $3 >out
-   if ($2 ~ /^NO_/)
+   if ($2 ~ /^NO_/) {
       print "#   define PNG_" $2 >out
-   else
+   } else {
       print "#   define PNG_" $2 "_SUPPORTED" >out
+   }
    print "#endif" >out
    next
 }
@@ -487,7 +501,7 @@ $1 == "=" && NF == 3{
 # with an "@" character.  The line is copied with just the leading
 # @ removed.
 
-$1 ~ /^@/{
+$1 ~ /^@/ {
    # sub(/^[ 	]*@/, "")
    $1 = substr($1, 2)
    print >out
@@ -499,7 +513,7 @@ $1 ~ /^@/{
 # any other format errors.
 {
    print "options.awk: bad line (" NR "):", $0
-   err = 1 # prevent END{} running
+   err = 1 # prevent END{} from running
    exit 1
 }
 
@@ -521,13 +535,12 @@ $1 ~ /^@/{
 # If all these options were given the build would require exactly one
 # of the names to be enabled.
 
-END{
-   # END{} gets run on an exit (a traditional awk feature)
+END {
    if (err) exit 1
 
    if (pre) {
       # Record the final value of the variables
-      print "deb =", deb >out
+      print "debug =", debug >out
       if (everything != "") {
          print "everything =", everything >out
       }
@@ -579,7 +592,7 @@ END{
    }
 
    # print the tree for extreme debugging
-   if (deb > 2) for (i in tree) if (i != "") print i, "depends-on" tree[i]
+   if (debug > 2) for (i in tree) if (i != "") print i, "depends-on" tree[i]
 
    # Ok, now check all options marked explicitly 'on' or 'off':
    #
@@ -599,7 +612,7 @@ END{
       opt = pending[npending--]
       if (option[opt] == "on") {
          nreqs = split(requires[opt], r)
-         for (j=1; j<=nreqs; ++j) {
+         for (j = 1; j <= nreqs; ++j) {
             if (option[r[j]] == "off") {
                print "option", opt, "turned on, but requirement", r[j], "is turned off"
                err = 1
@@ -614,7 +627,7 @@ END{
             exit 1
          }
          nreqs = split(enabledby[opt], r)
-         for (j=1; j<=nreqs; ++j) {
+         for (j = 1; j <= nreqs; ++j) {
             if (option[r[j]] == "on") {
                print "option", opt, "turned off, but enabled by", r[j], "which is turned on"
                err = 1
@@ -639,10 +652,12 @@ END{
       for (i in option) if (!done[i]) {
          nreqs = split(tree[i], r)
          if (nreqs > 0) {
-            for (j=1; j<=nreqs; ++j) if (!done[r[j]]) {
-               break
+            for (j = 1; j <= nreqs; ++j) {
+               if (!done[r[j]]) {
+                  break
+               }
             }
-            if (j<=nreqs) {
+            if (j <= nreqs) {
                finished = 0
                continue  # next option
             }
@@ -663,7 +678,7 @@ END{
          #    option == off
          #    option == disabled && everything != on
          #    option == "" && everything == off
-         if (deb) print "option", i
+         if (debug) print "option", i
          print "" >out
          print "/* option:", i, option[i] >out
          print " *   requires:  " requires[i] >out
@@ -675,7 +690,7 @@ END{
 
          # requires
          nreqs = split(requires[i], r)
-         for (j=1; j<=nreqs; ++j) {
+         for (j = 1; j <= nreqs; ++j) {
             print "#ifndef PNG_" r[j] "_SUPPORTED" >out
             print "#   undef PNG_on /*!" r[j] "*/" >out
             # This error appears in the final output if something
@@ -695,7 +710,7 @@ END{
             have_ifs = 1
             print "/* if" iffs[i], "*/" >out
             print "#define PNG_no_if 1" >out
-            for (j=1; j<=nreqs; ++j) {
+            for (j = 1; j <= nreqs; ++j) {
                print "#ifdef PNG_" r[j] "_SUPPORTED" >out
                print "#   undef PNG_no_if /*" r[j] "*/" >out
                print "#endif" >out
@@ -717,7 +732,7 @@ END{
          print "#   define PNG_not_enabled 1" >out
          print "   /* enabled by" enabledby[i], "*/" >out
          nreqs = split(enabledby[i], r)
-         for (j=1; j<=nreqs; ++j) {
+         for (j = 1; j <= nreqs; ++j) {
             print "#ifdef PNG_" r[j] "_SUPPORTED" >out
             print "#   undef PNG_not_enabled /*" r[j] "*/" >out
             # Oops, probably not intended (should be factored
@@ -762,7 +777,7 @@ END{
             print def i sup >out
             # Supported option, set required settings
             nreqs = split(sets[i], r)
-            for (j=1; j<=nreqs; ++j) {
+            for (j = 1; j <= nreqs; ++j) {
                print "#    ifdef PNG_set_" r[j] >out
                # Some other option has already set a value:
                print error, i, "sets", r[j] ": duplicate setting" end >out
@@ -799,8 +814,10 @@ END{
          for (i in option) if (!done[i]) {
             print "  option", i, "depends on" tree[i], "needs:"
             nreqs = split(tree[i], r)
-            if (nreqs > 0) for (j=1; j<=nreqs; ++j) if (!done[r[j]]) {
-               print "   " r[j]
+            for (j = 1; j <= nreqs; ++j) {
+               if (!done[r[j]]) {
+                  print "   " r[j]
+               }
             }
          }
          exit 1
@@ -827,10 +844,12 @@ END{
          if (nreqs > 0) {
             # By default assume the requires values are options, but if there
             # is no option with that name check for a setting
-            for (j=1; j<=nreqs; ++j) if (option[r[j]] == "" && !doneset[r[j]]) {
-               break
+            for (j = 1; j <= nreqs; ++j) {
+               if (option[r[j]] == "" && !doneset[r[j]]) {
+                  break
+               }
             }
-            if (j<=nreqs) {
+            if (j <= nreqs) {
                finished = 0
                continue # try a different setting
             }
@@ -838,10 +857,10 @@ END{
 
          # All the requirements have been processed, output
          # this setting.
-         if (deb) print "setting", i
+         if (debug) print "setting", i
          deflt = defaults[i]
          # Remove any spurious trailing spaces
-         sub(/ *$/,"",deflt)
+         sub(/ *$/, "", deflt)
          # A leading @ means leave it unquoted so the preprocessor
          # can substitute the build time value
          if (deflt ~ /^ @/)
@@ -850,11 +869,12 @@ END{
          print "/* setting: ", i >out
          print " *   requires:" setting[i] >out
          print " *   default: ", defaults[i] deflt, "*/" >out
-         for (j=1; j<=nreqs; ++j) {
-            if (option[r[j]] != "")
+         for (j = 1; j <= nreqs; ++j) {
+            if (option[r[j]] != "") {
                print "#ifndef PNG_" r[j] "_SUPPORTED" >out
-            else
+            } else {
                print "#ifndef PNG_" r[j] >out
+            }
             print error, i, "requires", r[j] end >out
             print "# endif" >out
          }

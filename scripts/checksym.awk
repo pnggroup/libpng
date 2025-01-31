@@ -1,29 +1,30 @@
 #!/bin/awk -f
 
-# Check a list of symbols against the master definition
-# (official) list.  Arguments:
+# scripts/checksym.awk
+# check a list of symbols against the master definition list
 #
+# Copyright (c) 2025 Cosmin Truta
+# Copyright (c) 2010 Glenn Randers-Pehrson
+#
+# Usage:
 # awk -f checksym.awk official-def list-to-check
 #
-# Output is a file in the current directory called 'symbols.new',
+# Output is a file in the current directory called "symbols.new",
 # the value of the awk variable "of" (which can be changed on the
-# command line if required.)  stdout holds error messages.  Error
+# command line if required.)  stdout holds error messages.  Exit
 # code indicates success or failure.
-#
-# NOTE: this is a pure, old fashioned, awk script.  It will
-# work with any awk
 
-BEGIN{
-   err=0
-   master=""        # master file
-   official[1] = "" # defined symbols from master file
-   symbol[1] = ""   # defined symbols from png.h
-   removed[1] = ""  # removed symbols from png.h
-   lasto = 0        # last ordinal value from png.h
-   mastero = 0      # highest ordinal in master file
-   symbolo = 0      # highest ordinal in png.h
-   missing = "error"# log an error on missing symbols
-   of="symbols.new" # default to a fixed name
+BEGIN {
+   err = 0
+   master = ""        # master file
+   official[1] = ""   # defined symbols from master file
+   symbol[1] = ""     # defined symbols from png.h
+   removed[1] = ""    # removed symbols from png.h
+   lasto = 0          # last ordinal value from png.h
+   mastero = 0        # highest ordinal in master file
+   symbolo = 0        # highest ordinal in png.h
+   missing = "error"  # log an error on missing symbols
+   of = "symbols.new" # default to a fixed name
 }
 
 # Read existing definitions from the master file (the first
@@ -35,27 +36,29 @@ BEGIN{
 master == "" {
    master = FILENAME
 }
-FILENAME==master && NF==2 && $2~/^@/ && $1!~/^;/ {
-   o=0+substr($2,2)
+FILENAME == master && NF == 2 && $2 ~ /^@/ && $1 !~ /^;/ {
+   o = 0 + substr($2, 2)
    if (o > 0) {
       if (official[o] == "") {
          official[o] = $1
          if (o > mastero) mastero = o
          next
-      } else
+      } else {
          print master ": duplicated symbol:", official[o] ":", $0
-   } else
+      }
+   } else {
       print master ": bad export line format:", $0
+   }
    err = 1
 }
-FILENAME==master && $1==";missing" && NF==2{
+FILENAME == master && $1 == ";missing" && NF == 2 {
    # This allows the master file to control how missing symbols
    # are handled; symbols that aren't in either the master or
    # the new file.  Valid values are 'ignore', 'warning' and
    # 'error'
    missing = $2
 }
-FILENAME==master {
+FILENAME == master {
    next
 }
 
@@ -68,18 +71,20 @@ FILENAME==master {
 #  symbol @ordinal   # two fields, exported symbol
 #  ; symbol @ordinal # three fields, removed symbol
 #  ; @ordinal        # two fields, the last ordinal
-NF==2 && $1 == ";" && $2 ~ /^@[1-9][0-9]*$/ { # last ordinal
-   o=0+substr($2,2)
-   if (lasto == 0 || lasto == o)
-      lasto=o
-   else {
+NF == 2 && $1 == ";" && $2 ~ /^@[1-9][0-9]*$/ {
+   # last ordinal
+   o = 0 + substr($2, 2)
+   if (lasto == 0 || lasto == o) {
+      lasto = o
+   } else {
       print "png.h: duplicated last ordinal:", lasto, o
       err = 1
    }
    next
 }
-NF==3 && $1 == ";" && $3 ~ /^@[1-9][0-9]*$/ { # removed symbol
-   o=0+substr($3,2)
+NF == 3 && $1 == ";" && $3 ~ /^@[1-9][0-9]*$/ {
+   # removed symbol
+   o = 0 + substr($3, 2)
    if (removed[o] == "" || removed[o] == $2) {
       removed[o] = $2
       if (o > symbolo) symbolo = o
@@ -89,8 +94,9 @@ NF==3 && $1 == ";" && $3 ~ /^@[1-9][0-9]*$/ { # removed symbol
    }
    next
 }
-NF==2 && $2 ~ /^@[1-9][0-9]*$/ { # exported symbol
-   o=0+substr($2,2)
+NF == 2 && $2 ~ /^@[1-9][0-9]*$/ {
+   # exported symbol
+   o = 0 + substr($2, 2)
    if (symbol[o] == "" || symbol[o] == $1) {
       symbol[o] = $1
       if (o > symbolo) symbolo = o
@@ -104,7 +110,7 @@ NF==2 && $2 ~ /^@[1-9][0-9]*$/ { # exported symbol
 }
 
 # At the end check for symbols marked as both duplicated and removed
-END{
+END {
    if (symbolo > lasto) {
       print "highest symbol ordinal in png.h,",
             symbolo ", exceeds last ordinal from png.h", lasto
@@ -115,7 +121,7 @@ END{
             mastero ", exceeds last ordinal from png.h", lasto
       err = 1
    }
-   unexported=0
+   unexported = 0
    # Add a standard header to symbols.new:
    print ";Version INSERT-VERSION-HERE" >of
    print ";--------------------------------------------------------------" >of
@@ -126,7 +132,7 @@ END{
    print "" >of
    print "EXPORTS" >of
 
-   for (o=1; o<=lasto; ++o) {
+   for (o = 1; o <= lasto; ++o) {
       if (symbol[o] == "" && removed[o] == "") {
          if (unexported == 0) unexported = o
          if (official[o] == "") {
@@ -141,12 +147,14 @@ END{
          # but this can be reset on the command line or by stuff in the
          # file - see the comments above.
          if (missing != "ignore") {
-            if (o-1 > unexported)
-               print "png.h:", missing ": missing symbols:", unexported "-" o-1
-            else
+            if (o - 1 > unexported) {
+               print "png.h:", missing ": missing symbols:", unexported "-" o - 1
+            } else {
                print "png.h:", missing ": missing symbol:", unexported
-            if (missing != "warning")
+            }
+            if (missing != "warning") {
                err = 1
+            }
          }
          unexported = 0
       }
@@ -157,20 +165,22 @@ END{
       } else if (symbol[o] != official[o]) {
          # either the symbol is missing somewhere or it changed
          err = 1
-         if (symbol[o] == "")
+         if (symbol[o] == "") {
             print "png.h: symbol", o,
                   "is exported as '" official[o] "' in", master
-         else if (official[o] == "")
+         } else if (official[o] == "") {
             print "png.h: exported symbol", o,
                   "'" symbol[o] "' not present in", master
-         else
+         } else {
             print "png.h: exported symbol", o,
                   "'" symbol[o] "' exists as '" official[o] "' in", master
+         }
       }
 
       # Finally generate symbols.new
-      if (symbol[o] != "")
+      if (symbol[o] != "") {
          print " " symbol[o], "@" o > of
+      }
    }
 
    if (err != 0) {
