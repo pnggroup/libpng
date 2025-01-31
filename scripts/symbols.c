@@ -14,12 +14,10 @@
  * scripts/pnglibconf.dfa then this checks the .dfa file too.
  */
 
-#define PNG_EXPORTA(ordinal, type, name, args, attributes)\
-        PNG_DFN "@" name "@ @@" ordinal "@"
-#define PNG_REMOVED(ordinal, type, name, args, attributes)\
-        PNG_DFN "; @" name "@ @@" ordinal "@"
-#define PNG_EXPORT_LAST_ORDINAL(ordinal)\
-        PNG_DFN "; @@" ordinal "@"
+#define PNG_EXPORTA(type, name, args, attributes)\
+        PNG_DFN "@" name "@"
+#define PNG_REMOVED(type, name, args, attributes)\
+        PNG_DFN "; @" name "@"
 
 /* Read the defaults, but use scripts/pnglibconf.h.prebuilt; the 'standard'
  * header file.

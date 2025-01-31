@@ -1,6 +1,6 @@
 /* pngpriv.h - private declarations for use inside libpng
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -185,7 +185,7 @@
  */
 #ifndef PNG_FP_EXPORT
 #  ifndef PNG_FLOATING_POINT_SUPPORTED
-#     define PNG_FP_EXPORT(ordinal, type, name, args)\
+#     define PNG_FP_EXPORT(type, name, args)\
          PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
 #     ifndef PNG_VERSION_INFO_ONLY
          typedef struct png_incomplete png_double;
@@ -197,7 +197,7 @@
 #endif
 #ifndef PNG_FIXED_EXPORT
 #  ifndef PNG_FIXED_POINT_SUPPORTED
-#     define PNG_FIXED_EXPORT(ordinal, type, name, args)\
+#     define PNG_FIXED_EXPORT(type, name, args)\
          PNG_INTERNAL_FUNCTION(type, name, args, PNG_EMPTY);
 #  endif
 #endif

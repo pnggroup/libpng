@@ -7,7 +7,7 @@
  * and license in png.h
  */
 
-#define PNG_EXPORTA(ordinal, type, name, args, attributes)\
+#define PNG_EXPORTA(type, name, args, attributes)\
         PNG_DFN "@" name "@"
 
 /* The configuration information *before* the additional of symbol renames,
