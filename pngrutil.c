@@ -4228,7 +4228,7 @@ png_read_IDAT_data(png_structrp png_ptr, png_bytep output,
          avail_in = png_ptr->IDAT_read_size;
 
          if (avail_in > png_chunk_max(png_ptr))
-            avail_in = png_chunk_max(png_ptr);
+            avail_in = (uInt)/*SAFE*/png_chunk_max(png_ptr);
 
          if (avail_in > png_ptr->idat_size)
             avail_in = (uInt)png_ptr->idat_size;
