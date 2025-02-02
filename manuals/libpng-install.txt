@@ -66,7 +66,7 @@ III. Using scripts/makefile*
 Instead, you can use one of the custom-built makefiles in the
 "scripts" directory
 
-    cp scripts/pnglibconf.h.prebuilt pnglibconf.h
+    cp pnglibconf.h.prebuilt pnglibconf.h
     cp scripts/makefile.system makefile
     make test
     make install
@@ -394,16 +394,16 @@ copied to pnglibconf.h and this may produce macro redefinition warnings
 when the individual C files are compiled.
 
 All configuration now only works if pnglibconf.h is built from
-scripts/pnglibconf.dfa.  This requires the program awk.  Brian Kernighan
-(the original author of awk) maintains C source code of that awk and this
-and all known later implementations (often called by subtly different
+scripts/pnglibconf/pnglibconf.dfa. This requires the awk program.
+Brian Kernighan (the original author of awk) maintains C source code of awk,
+and this and all known later implementations (often called by subtly different
 names - nawk and gawk for example) are adequate to build pnglibconf.h.
-The Sun Microsystems (now Oracle) program 'awk' is an earlier version
-and does not work; this may also apply to other systems that have a
-functioning awk called 'nawk'.
+The Sun Microsystems (now Oracle) program 'awk' is an earlier version which
+does not work; this may also apply to other systems that have a functioning
+awk called 'nawk'.
 
-Configuration options are now documented in scripts/pnglibconf.dfa.  This
-file also includes dependency information that ensures a configuration is
+Configuration options are now documented in scripts/pnglibconf/pnglibconf.dfa.
+This file also includes dependency information that ensures a configuration is
 consistent; that is, if a feature is switched off, dependent features are
 also switched off.  As a recommended alternative to using feature macros in
 pngusr.h a system builder may also define equivalent options in pngusr.dfa

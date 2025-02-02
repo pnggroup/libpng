@@ -1,13 +1,17 @@
 #!/bin/awk -f
 
-# scripts/dfn.awk - process a .dfn file
+# dfn.awk - process a .dfn file
 #
 # Copyright (c) 2025 Cosmin Truta
 # Copyright (c) 2013-2014 Glenn Randers-Pehrson
+# Originally written by John Bowler, 2013
 #
-# This code is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer
-# and license in png.h
+# Use, modification and distribution are subject to
+# the same licensing terms and conditions as libpng.
+# Please see the copyright notice in png.h or visit
+# http://libpng.org/pub/png/src/libpng-LICENSE.txt
+#
+# SPDX-License-Identifier: libpng-2.0
 
 # The output of this script is written to the file given by
 # the variable 'out', which should be set on the command line.

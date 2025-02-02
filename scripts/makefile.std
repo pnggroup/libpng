@@ -31,8 +31,8 @@ LDFLAGS = -L$(ZLIBLIB) -g
 LIBS = -lz -lm
 
 # Pre-built configuration
-# See scripts/pnglibconf.mak for more options
-PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+# See scripts/pnglibconf/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = pnglibconf.h.prebuilt
 
 OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o \
        pngrio.o pngrtran.o pngrutil.o pngset.o pngsimd.o \
@@ -43,24 +43,29 @@ OBJS = png.o pngerror.o pngget.o pngmem.o pngpread.o pngread.o \
 
 all: libpng.a pngtest
 
-# The standard pnglibconf.h exists as scripts/pnglibconf.h.prebuilt,
-# copy this if the following doesn't work.
+# The standard pnglibconf.h exists as pnglibconf.h.prebuilt.
+# Copy this over if the following doesn't work.
 pnglibconf.h: pnglibconf.dfn
 	$(RM_F) $@ pnglibconf.c pnglibconf.out pnglibconf.tmp
 	echo '#include "pnglibconf.dfn"' >pnglibconf.c
 	@echo "## If '$(CC) -E' fails, try /lib/cpp (e.g. CPP='/lib/cpp')" >&2
 	$(CPP) $(DFNFLAGS) pnglibconf.c >pnglibconf.out
-	$(AWK) -f scripts/dfn.awk out=pnglibconf.tmp pnglibconf.out >&2
+	$(AWK) -f scripts/pnglibconf/dfn.awk\
+	    out=pnglibconf.tmp pnglibconf.out >&2
 	$(MV_F) pnglibconf.tmp $@
 
-pnglibconf.dfn: scripts/pnglibconf.dfa scripts/options.awk pngconf.h pngusr.dfa $(DFA_XTRA)
+pnglibconf.dfn: scripts/pnglibconf/pnglibconf.dfa \
+                scripts/pnglibconf/options.awk \
+                pngconf.h pngusr.dfa $(DFA_XTRA)
 	$(RM_F) $@ pnglibconf.pre pnglibconf.tmp
-	@echo "## Calling $(AWK) from scripts/pnglibconf.mak" >&2
+	@echo "## Calling $(AWK) from scripts/pnglibconf/pnglibconf.mak" >&2
 	@echo "## If 'awk' fails, try a better awk (e.g. AWK='nawk')" >&2
-	$(AWK) -f scripts/options.awk out=pnglibconf.pre\
-	    version=search pngconf.h scripts/pnglibconf.dfa\
+	$(AWK) -f scripts/pnglibconf/options.awk\
+            out=pnglibconf.pre version=search\
+            pngconf.h scripts/pnglibconf/pnglibconf.dfa\
 	    pngusr.dfa $(DFA_XTRA) >&2
-	$(AWK) -f scripts/options.awk out=pnglibconf.tmp pnglibconf.pre >&2
+	$(AWK) -f scripts/pnglibconf/options.awk\
+	    out=pnglibconf.tmp pnglibconf.pre >&2
 	$(MV_F) pnglibconf.tmp $@
 
 libpng.a: $(OBJS)

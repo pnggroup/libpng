@@ -1,11 +1,18 @@
 #!/bin/awk -f
 
-# scripts/checksym.awk
-# check a list of symbols against the master definition list
+# checksym.awk - check a list of symbols against the master definition list
 #
 # Copyright (c) 2025 Cosmin Truta
 # Copyright (c) 2010 Glenn Randers-Pehrson
+# Originally written by John Bowler, 2010
 #
+# Use, modification and distribution are subject to
+# the same licensing terms and conditions as libpng.
+# Please see the copyright notice in png.h or visit
+# http://libpng.org/pub/png/src/libpng-LICENSE.txt
+#
+# SPDX-License-Identifier: libpng-2.0
+
 # Usage:
 # awk -f checksym.awk official-def list-to-check
 #

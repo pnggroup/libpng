@@ -21,22 +21,11 @@ Makefiles for libpng
 Other supporting files and scripts
 ----------------------------------
 
-    pnglibconf.h.prebuilt  =>  Pre-built configuration settings
     libpng-config-body.in  =>  Used by several makefiles to create libpng-config
     libpng-config-head.in  =>  Used by several makefiles to create libpng-config
     libpng.pc.in       =>  Used by several makefiles to create libpng.pc
     macro.lst          =>  Used by GNU Autotools
     pngwin.rc          =>  Used by the Visual Studio project
-    checksym.awk       =>  Used for maintaining pnglibconf.h
-    dfn.awk            =>  Used for maintaining pnglibconf.h
-    options.awk        =>  Used for maintaining pnglibconf.h
-    pnglibconf.dfa     =>  Used for maintaining pnglibconf.h
-    pnglibconf.mak     =>  Used for maintaining pnglibconf.h
-    intprefix.c        =>  Used for symbol versioning
-    prefix.c           =>  Used for symbol versioning
-    sym.c              =>  Used for symbol versioning
-    symbols.c          =>  Used for symbol versioning
-    vers.c             =>  Used for symbol versioning
     README.txt         =>  This file
 
 Further information can be found in comments in the individual scripts and

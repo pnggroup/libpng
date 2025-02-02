@@ -111,16 +111,16 @@ rpng2-x$(E): $(OBJS)
 # The CPP_FLAGS setting causes pngusr.h to be included in
 # both the build of pnglibconf.h and, subsequently, when
 # building libpng itself.
-$(PNGCONF): $(PNGSRC)/scripts/pnglibconf.mak $(ZH)\
-	$(PNGSRC)/scripts/pnglibconf.dfa \
-	$(PNGSRC)/scripts/options.awk pngusr.h pngusr.dfa
+$(PNGCONF): $(PNGSRC)/scripts/pnglibconf/pnglibconf.mak $(ZH) \
+	$(PNGSRC)/scripts/pnglibconf/pnglibconf.dfa \
+	$(PNGSRC)/scripts/pnglibconf/options.awk pngusr.h pngusr.dfa
 	$(RM) pnglibconf.h pnglibconf.dfn
-	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf.mak $(MAKEFLAGS)\
+	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf/pnglibconf.mak $(MAKEFLAGS)\
 	    srcdir=$(PNGSRC) CPPFLAGS="-DPNG_USER_CONFIG -I."\
 	    DFA_XTRA="pngusr.dfa" $@
 
 clean:
-	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf.mak $(MAKEFLAGS)\
+	$(MAKE) -f $(PNGSRC)/scripts/pnglibconf/pnglibconf.mak $(MAKEFLAGS)\
 	    srcdir=$(PNGSRC) clean
 	$(RM) rpng2-x$(O)
 	$(RM) rpng2-x$(E)

@@ -228,8 +228,8 @@
 /* SECURITY and SAFETY:
  *
  * libpng is built with support for internal limits on image dimensions and
- * memory usage.  These are documented in scripts/pnglibconf.dfa of the
- * source and recorded in the machine generated header file pnglibconf.h.
+ * memory usage.  These are documented in scripts/pnglibconf/pnglibconf.dfa of
+ * the source and recorded in the machine generated header file pnglibconf.h.
  */
 
 /* If you are running on a machine where you cannot allocate more

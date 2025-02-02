@@ -1,21 +1,25 @@
 #!/bin/awk -f
 
-# scripts/options.awk - library build configuration control
+# options.awk - control the libpng build configuration
 #
 # Copyright (c) 2025 Cosmin Truta
 # Copyright (c) 2010-2014 Glenn Randers-Pehrson
+# Originally written by John Bowler, 2010
 #
-# This code is released under the libpng license.
-# For conditions of distribution and use, see the disclaimer
-# and license in png.h
+# Use, modification and distribution are subject to
+# the same licensing terms and conditions as libpng.
+# Please see the copyright notice in png.h or visit
+# http://libpng.org/pub/png/src/libpng-LICENSE.txt
+#
+# SPDX-License-Identifier: libpng-2.0
 
 # The output of this script is written to the file given by
 # the variable 'out'.  The script is run twice, once with
 # an intermediate output file, 'options.tmp' then again on
 # that file to produce the final output:
 #
-#  awk -f scripts/options.awk out=options.tmp scripts/options.dfa 1>&2
-#  awk -f scripts/options.awk out=options.dfn options.tmp 1>&2
+#  awk -f options.awk out=options.tmp options.dfa 1>&2
+#  awk -f options.awk out=options.dfn options.tmp 1>&2
 #
 # Some options may be specified on the command line:
 #
@@ -234,6 +238,7 @@ $1 == "file" && NF >= 2 {
    print comment, "Machine generated file: DO NOT EDIT", cend >out
    if (NF >= 3)
       print comment, "Derived from:", $3, cend >out
+   print >out
    protect = $4
    if (protect != "") {
       print start "#ifndef", protect end >out
