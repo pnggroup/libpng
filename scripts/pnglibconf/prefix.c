@@ -17,6 +17,6 @@
 
 PNG_DFN_START_SORT 1
 
-#include "../png.h"
+#include "../../png.h"
 
 PNG_DFN_END_SORT

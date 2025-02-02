@@ -27,10 +27,10 @@ Examples:
    ${srcdir}/contrib/pngminim/*/pngusr.dfa
 
 Documentation of the options:
-   ${srcdir}/scripts/pnglibconf.dfa
+   ${srcdir}/scripts/pnglibconf/pnglibconf.dfa
 
 Documentation of the file format:
-   ${srcdir}/scripts/options.awk
+   ${srcdir}/scripts/pnglibconf/options.awk
 
 FILE NAMING
 ===========

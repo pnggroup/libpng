@@ -178,7 +178,7 @@ endif()
 
 if(NOT AWK OR (ANDROID OR IOS))
   # No awk available to generate sources; use pre-built pnglibconf.h
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
   add_custom_target(png_genfiles)
 else()
@@ -186,41 +186,39 @@ else()
   include(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGGenConfig.cmake)
 
   # Copy the awk scripts, converting their line endings to Unix (LF)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk
-                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/checksym.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/checksym.awk
                  @ONLY
                  NEWLINE_STYLE LF)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/options.awk
-                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/options.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/options.awk
                  @ONLY
                  NEWLINE_STYLE LF)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/dfn.awk
-                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/dfn.awk
+  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/dfn.awk
+                 ${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/dfn.awk
                  @ONLY
                  NEWLINE_STYLE LF)
 
-  # Generate scripts/pnglibconf.h
-  generate_source(OUTPUT "scripts/pnglibconf.c"
-                  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk"
+  # Generate pnglibconf.c and pnglibconf.h
+  generate_source(OUTPUT "scripts/pnglibconf/pnglibconf.c"
+                  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/options.awk"
+                          "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/pnglibconf.dfa"
                           "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
   add_custom_target(png_scripts_pnglibconf_c
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c")
-
-  # Generate pnglibconf.c
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/pnglibconf.c")
   generate_source(OUTPUT "pnglibconf.c"
-                  DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.dfa"
-                          "${CMAKE_CURRENT_BINARY_DIR}/scripts/options.awk"
+                  DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/options.awk"
+                          "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/pnglibconf.dfa"
                           "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h")
   add_custom_target(pnglibconf_c
                     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c")
 
   if(PNG_PREFIX)
     set(PNGLIBCONF_H_EXTRA_DEPENDS
-        "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out"
+        "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/prefix.out"
         "${CMAKE_CURRENT_SOURCE_DIR}/scripts/macro.lst")
     set(PNGPREFIX_H_EXTRA_DEPENDS
-        "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out")
+        "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/intprefix.out")
   endif()
 
   generate_out(INPUT "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.c"
@@ -236,19 +234,19 @@ else()
   add_custom_target(pnglibconf_h
                     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h")
 
-  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/intprefix.c"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out"
+  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/intprefix.c"
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/intprefix.out"
                DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h)
   add_custom_target(png_scripts_intprefix_out
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/intprefix.out")
 
-  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/prefix.c"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out"
+  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/prefix.c"
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/prefix.out"
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
                        "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out" pnglibconf_out)
   add_custom_target(png_scripts_prefix_out
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/prefix.out")
 
   # Generate pngprefix.h
   generate_source(OUTPUT "pngprefix.h"
@@ -256,41 +254,41 @@ else()
   add_custom_target(pngprefix_h
                     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 
-  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/sym.c"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
+  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/sym.c"
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/sym.out"
                DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h)
   add_custom_target(png_scripts_sym_out
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/sym.out")
 
-  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.c"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
+  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/symbols.c"
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.out"
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
-                       "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt")
+                       "${CMAKE_CURRENT_SOURCE_DIR}/pnglibconf.h.prebuilt")
   add_custom_target(png_scripts_symbols_out
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.out")
 
-  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/vers.c"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
+  generate_out(INPUT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf/vers.c"
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/vers.out"
                DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/png.h"
                        "${CMAKE_CURRENT_SOURCE_DIR}/pngconf.h"
                        "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h)
   add_custom_target(png_scripts_vers_out
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/vers.out")
 
-  generate_chk(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
-               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
+  generate_chk(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.out"
+               OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.chk"
                DEPENDS png_scripts_symbols_out
-                       "${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk"
+                       "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/checksym.awk"
                        "${CMAKE_CURRENT_SOURCE_DIR}/scripts/symbols.def")
 
   add_custom_target(png_scripts_symbols_chk
-                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk")
+                    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.chk")
 
-  generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out"
+  generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/sym.out"
                 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/libpng.sym"
                 DEPENDS png_scripts_sym_out)
-  generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out"
+  generate_copy(INPUT "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/vers.out"
                 OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/libpng.vers"
                 DEPENDS png_scripts_vers_out)
 
@@ -301,7 +299,7 @@ else()
 
   add_custom_target(png_genprebuilt
                     COMMAND "${CMAKE_COMMAND}"
-                            "-DOUTPUT=scripts/pnglibconf.h.prebuilt"
+                            "-DOUTPUT=pnglibconf.h.prebuilt"
                             -P "${CMAKE_CURRENT_BINARY_DIR}/scripts/cmake/gensrc.cmake"
                     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -313,13 +311,13 @@ else()
                             "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h" pnglibconf_h
                             "${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.out" pnglibconf_out
                             "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h" pngprefix_h
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/intprefix.out" png_scripts_intprefix_out
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf.c" png_scripts_pnglibconf_c
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/prefix.out" png_scripts_prefix_out
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/sym.out" png_scripts_sym_out
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk" png_scripts_symbols_chk
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out" png_scripts_symbols_out
-                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out" png_scripts_vers_out)
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/intprefix.out" png_scripts_intprefix_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/pnglibconf.c" png_scripts_pnglibconf_c
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/prefix.out" png_scripts_prefix_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/sym.out" png_scripts_sym_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.chk" png_scripts_symbols_chk
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/symbols.out" png_scripts_symbols_out
+                            "${CMAKE_CURRENT_BINARY_DIR}/scripts/pnglibconf/vers.out" png_scripts_vers_out)
 endif(NOT AWK OR (ANDROID OR IOS))
 
 # List the source code files.

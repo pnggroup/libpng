@@ -19,16 +19,16 @@
 #define PNG_REMOVED(type, name, args, attributes)\
         PNG_DFN "; @" name "@"
 
-/* Read the defaults, but use scripts/pnglibconf.h.prebuilt; the 'standard'
- * header file.
+/* Read the defaults, but use pnglibconf.h.prebuilt, i.e.,
+ * the 'standard' header file.
  */
-#include "pnglibconf.h.prebuilt"
-#include "../png.h"
+#include "../../pnglibconf.h.prebuilt"
+#include "../../png.h"
 
 /* Some things are turned off by default.  Turn these things
  * on here (by hand) to get the APIs they expose and validate
  * that no harm is done.  This list is the set of options
- * defaulted to 'off' in scripts/pnglibconf.dfa
+ * defaulted to 'off' in scripts/pnglibconf/pnglibconf.dfa
  *
  * Maintenance: if scripts/pnglibconf.dfa options are changed
  * from, or to, 'disabled' this needs updating!
@@ -41,7 +41,7 @@
 #define PNG_SET_OPTION_SUPPORTED
 
 #undef PNG_H
-#include "../png.h"
+#include "../../png.h"
 
 /* Finally there are a couple of places where option support
  * actually changes the APIs revealed using a #if/#else/#endif
@@ -51,4 +51,4 @@
 #undef  PNG_ERROR_TEXT_SUPPORTED     /* Exposes unsupported APIs */
 
 #undef PNG_H
-#include "../png.h"
+#include "../../png.h"

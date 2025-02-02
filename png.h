@@ -322,8 +322,8 @@
  * the library has been built.
  */
 #ifndef PNGLCONF_H
-/* If pnglibconf.h is missing, you can
- * copy scripts/pnglibconf.h.prebuilt to pnglibconf.h
+/* If pnglibconf.h is missing, you can copy
+ * pnglibconf.h.prebuilt to pnglibconf.h
  */
 #   include "pnglibconf.h"
 #endif

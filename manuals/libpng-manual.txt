@@ -203,7 +203,7 @@ the next section ("Reading").
 
 Notice that some of the makefiles in the 'scripts' directory and (in 1.5.0) all
 of the build project files in the 'projects' directory simply copy
-scripts/pnglibconf.h.prebuilt to pnglibconf.h.  This means that these build
+pnglibconf.h.prebuilt to pnglibconf.h.  This means that these build
 systems do not permit easy auto-configuration of the library - they only
 support the default configuration.
 
@@ -227,12 +227,13 @@ form of 'option' settings.
 A. Changing pnglibconf.h
 
 A variety of methods exist to build libpng.  Not all of these support
-reconfiguration of pnglibconf.h.  To reconfigure pnglibconf.h it must either be
-rebuilt from scripts/pnglibconf.dfa using awk or it must be edited by hand.
+reconfiguration of pnglibconf.h.  To reconfigure pnglibconf.h, it must either
+be rebuilt from scripts/pnglibconf/pnglibconf.dfa using awk, or it must be
+edited by hand.
 
-Hand editing is achieved by copying scripts/pnglibconf.h.prebuilt to
-pnglibconf.h and changing the lines defining the supported features, paying
-very close attention to the 'option' information in scripts/pnglibconf.dfa
+Hand editing is achieved by copying pnglibconf.h.prebuilt to pnglibconf.h and
+changing the lines defining the supported features, paying close attention to
+the 'option' information in scripts/pnglibconf/pnglibconf.dfa
 that describes those features and their requirements.  This is easy to get
 wrong.
 
@@ -241,14 +242,14 @@ B. Configuration using DFA_XTRA
 Rebuilding from pnglibconf.dfa is easy if a functioning 'awk', or a later
 variant such as 'nawk' or 'gawk', is available.  The configure build will
 automatically find an appropriate awk and build pnglibconf.h.
-The scripts/pnglibconf.mak file contains a set of make rules for doing the
-same thing if configure is not used, and many of the makefiles in the scripts
-directory use this approach.
+The scripts/pnglibconf/pnglibconf.mak file contains a set of make rules for
+doing the same thing if configure is not used, and many of the makefiles in
+the scripts directory use this approach.
 
 When rebuilding simply write a new file containing changed options and set
-DFA_XTRA to the name of this file.  This causes the build to append the new file
-to the end of scripts/pnglibconf.dfa.  The pngusr.dfa file should contain lines
-of the following forms:
+DFA_XTRA to the name of this file.  This causes the build to append the new
+file to the end of scripts/pnglibconf/pnglibconf.dfa.  The pngusr.dfa file
+should contain lines of the following forms:
 
 everything = off
 
@@ -280,8 +281,8 @@ C. Configuration using PNG_USER_CONFIG
 
 If -DPNG_USER_CONFIG is added to the CPPFLAGS when pnglibconf.h is built,
 the file pngusr.h will automatically be included before the options in
-scripts/pnglibconf.dfa are processed.  Your pngusr.h file should contain only
-macro definitions turning features on or off or setting settings.
+scripts/pnglibconf/pnglibconf.dfa are processed.  Your pngusr.h file should
+contain only macro definitions turning features on or off or setting settings.
 
 Apart from the global setting "everything = off" all the options listed above
 can be set using macros in pngusr.h:
@@ -305,7 +306,8 @@ is equivalent to:
 setting feature default value
 
 Notice that in both cases, pngusr.dfa and pngusr.h, the contents of the
-pngusr file you supply override the contents of scripts/pnglibconf.dfa
+pngusr file you supply override the contents of
+scripts/pnglibconf/pnglibconf.dfa
 
 If confusing or incomprehensible behavior results it is possible to
 examine the intermediate file pnglibconf.dfn to find the full set of

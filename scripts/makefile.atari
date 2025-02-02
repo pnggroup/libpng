@@ -16,8 +16,8 @@ LBR = png.lib
 LDFLAGS = -L. -L../zlib -lpng -lz -lm
 
 # Pre-built configuration
-# See scripts/pnglibconf.mak for more options
-PNGLIBCONF_H_PREBUILT = scripts/pnglibconf.h.prebuilt
+# See scripts/pnglibconf/pnglibconf.mak for more options
+PNGLIBCONF_H_PREBUILT = pnglibconf.h.prebuilt
 
 OBJS = $(LBR)(png.o) $(LBR)(pngerror.o) $(LBR)(pngget.o) $(LBR)(pngmem.o) \
        $(LBR)(pngpread.o) $(LBR)(pngread.o) $(LBR)(pngrio.o) \

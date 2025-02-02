@@ -1,4 +1,4 @@
-/* vers.c - define format of libpng.vers
+/* sym.c - define format of libpng.sym
  *
  * Copyright (c) 2011-2014 Glenn Randers-Pehrson
  *
@@ -8,10 +8,6 @@
  */
 
 #define PNG_EXPORTA(type, name, args, attributes)\
-        PNG_DFN " @" SYMBOL_PREFIX "@@" name "@;"
+        PNG_DFN "@" SYMBOL_PREFIX "@@" name "@"
 
-PNG_DFN "@" PNGLIB_LIBNAME "@ {global:"
-
-#include "../png.h"
-
-PNG_DFN "local: *; };"
+#include "../../png.h"

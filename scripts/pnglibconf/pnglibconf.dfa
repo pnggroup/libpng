@@ -1,7 +1,7 @@
-# scripts/pnglibconf.dfa - library build configuration control
+# pnglibconf.dfa - library build configuration control
 #
 @/*- pnglibconf.dfn intermediate file
-@ *  generated from scripts/pnglibconf.dfa
+@ *  generated from scripts/pnglibconf/pnglibconf.dfa
 @ */
 #
 com pnglibconf.h - library build configuration
@@ -16,17 +16,15 @@ com For conditions of distribution and use, see the disclaimer
 com and license in png.h
 com
 
-file pnglibconf.h scripts/pnglibconf.dfa PNGLCONF_H
+file pnglibconf.h scripts/pnglibconf/pnglibconf.dfa PNGLCONF_H
 
-# This file is preprocessed by scripts/options.awk and the
-# C compiler to generate 'pnglibconf.h' - a list of all the
-# configuration options.  The file lists the various options
-# that can *only* be specified during the libpng build;
-# pnglibconf.h freezes the definitions selected for the specific
-# build.
+# This file is preprocessed by options.awk and the C compiler to
+# generate 'pnglibconf.h' - a list of all configuration options.
+# The file lists the various options that can *only* be specified
+# during the libpng build; pnglibconf.h freezes the definitions
+# selected for the specific build.
 #
-# The syntax is detailed in scripts/options.awk; this is a summary
-# only:
+# The syntax is detailed in options.awk; This is a summary only:
 #
 # setting <name> [requires ...] [default]
 #    #define PNG_<name> <value>  /* value comes from current setting */
