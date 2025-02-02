@@ -74,9 +74,11 @@ AC_ARG_VAR(AWK, [AWK language processor])
 # Some awk implementations crash when confronted with pnglibconf.dfa.
 # Run a test now, to make sure this doesn't happen.
 AC_MSG_CHECKING([if awk ($AWK) works])
-if ${AWK} -f ${srcdir}/scripts/options.awk out="/dev/null" version=search\
-   ${srcdir}/pngconf.h ${srcdir}/scripts/pnglibconf.dfa\
-   ${srcdir}/pngusr.dfa 1>&2
+if ${AWK} -f "${srcdir}/scripts/pnglibconf/options.awk"\
+   out="/dev/null" version=search\
+   "${srcdir}/pngconf.h"\
+   "${srcdir}/scripts/pnglibconf/pnglibconf.dfa"\
+   "${srcdir}/pngusr.dfa" 1>&2
 then
    AC_MSG_RESULT([yes])
 else

@@ -1,7 +1,7 @@
 # genout.cmake.in
 # Generate .out from .c with awk (generic), based upon the automake logic.
 
-# Copyright (c) 2022-2024 Cosmin Truta
+# Copyright (c) 2022-2025 Cosmin Truta
 # Copyright (c) 2016 Glenn Randers-Pehrson
 # Written by Roger Leigh, 2016
 #
@@ -87,8 +87,9 @@ if(INPUTEXT STREQUAL ".c" AND OUTPUTEXT STREQUAL ".out")
     message(FATAL_ERROR "Failed to generate ${OUTPUT}.tf1")
   endif()
 
-  execute_process(COMMAND "${AWK}" -f "${SRCDIR}/scripts/dfn.awk"
-                          "out=${OUTPUT}.tf2" "${OUTPUT}.tf1"
+  execute_process(COMMAND "${AWK}" -f "${SRCDIR}/scripts/pnglibconf/dfn.awk"
+                          "out=${OUTPUT}.tf2"
+                          "${OUTPUT}.tf1"
                   WORKING_DIRECTORY "${BINDIR}"
                   RESULT_VARIABLE AWK_FAIL)
   if(AWK_FAIL)

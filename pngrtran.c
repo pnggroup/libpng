@@ -1528,9 +1528,10 @@ png_init_read_transformations(png_structrp png_ptr)
    }
 #endif
 
-   /* NOTE: below 'PNG_READ_ALPHA_MODE_SUPPORTED' is presumed to also enable the
-    * background support (see the comments in scripts/pnglibconf.dfa), this
-    * allows pre-multiplication of the alpha channel to be implemented as
+   /* NOTE:
+    * Below 'PNG_READ_ALPHA_MODE_SUPPORTED' is presumed to also enable the
+    * background support; see comments in scripts/pnglibconf/pnglibconf.dfa.
+    * This allows pre-multiplication of the alpha channel to be implemented as
     * compositing on black.  This is probably sub-optimal and has been done in
     * 1.5.4 betas simply to enable external critique and testing (i.e. to
     * implement the new API quickly, without lots of internal changes.)
