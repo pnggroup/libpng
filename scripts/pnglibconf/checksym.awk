@@ -94,8 +94,8 @@ END {
    }
 
    # Sort and print the symbols.
-   asort(sorted_symbols)
-   for (i = 1; i <= length(sorted_symbols); i++) {
+   num = do_sort(sorted_symbols)
+   for (i = 1; i <= num; i++) {
       print " " sorted_symbols[i] >of
    }
 
@@ -105,4 +105,21 @@ END {
    }
 
    # TODO: Check for symbols that are both defined and removed.
+}
+
+# Portable replacement for the gawk-specific asort function.
+function do_sort(arr) {
+   # Perform insertion sort, which should be fast enough for our use case.
+   num = length(arr)
+   for (i = 2; i <= num; i++) {
+      key = arr[i]
+      j = i - 1
+      while (j > 0 && arr[j] > key) {
+         arr[j + 1] = arr[j]
+         j = j - 1
+      }
+      arr[j + 1] = key
+   }
+   # Return the array size, as in the asort function.
+   return num
 }
