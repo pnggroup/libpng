@@ -91,6 +91,9 @@ function ci_spawn {
 [[ ${CI_FORCE:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_FORCE: '$CI_FORCE'"
 }
+[[ ${CI_NO_BUILD:-0} == [01] ]] || {
+    ci_err "bad boolean option: \$CI_NO_BUILD: '$CI_NO_BUILD'"
+}
 [[ ${CI_NO_TEST:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_NO_TEST: '$CI_NO_TEST'"
 }
@@ -100,3 +103,9 @@ function ci_spawn {
 [[ ${CI_NO_CLEAN:-0} == [01] ]] || {
     ci_err "bad boolean option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
 }
+if ci_expr $((CI_NO_BUILD))
+then
+    ci_expr $((CI_NO_TEST && CI_NO_INSTALL)) || {
+        ci_err "\$CI_NO_BUILD requires \$CI_NO_TEST and \$CI_NO_INSTALL"
+    }
+fi

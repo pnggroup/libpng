@@ -64,6 +64,7 @@ function ci_trace_build {
     ci_info "environment option: \$CI_RANLIB: '$CI_RANLIB'"
     ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
     ci_info "environment option: \$CI_FORCE: '$CI_FORCE'"
+    ci_info "environment option: \$CI_NO_BUILD: '$CI_NO_BUILD'"
     ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_INSTALL: '$CI_NO_INSTALL'"
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
@@ -148,10 +149,12 @@ function ci_build {
                          -S . \
                          -DCMAKE_INSTALL_PREFIX="$CI_INSTALL_DIR" \
                          "${all_cmake_vars[@]}"
-    # Spawn "cmake --build ...".
-    ci_spawn "$CI_CMAKE" --build "$CI_BUILD_DIR" \
-                         --config "$CI_CMAKE_BUILD_TYPE" \
-                         "${all_cmake_build_flags[@]}"
+    ci_expr $((CI_NO_BUILD)) || {
+        # Spawn "cmake --build ...".
+        ci_spawn "$CI_CMAKE" --build "$CI_BUILD_DIR" \
+                             --config "$CI_CMAKE_BUILD_TYPE" \
+                             "${all_cmake_build_flags[@]}"
+    }
     ci_expr $((CI_NO_TEST)) || {
         # Spawn "ctest" if testing is not disabled.
         ci_spawn pushd "$CI_BUILD_DIR"

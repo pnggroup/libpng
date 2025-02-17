@@ -51,6 +51,7 @@ function ci_trace_build {
     ci_info "environment option: \$CI_LIBS: '$CI_LIBS'"
     ci_info "environment option: \$CI_SANITIZERS: '$CI_SANITIZERS'"
     ci_info "environment option: \$CI_FORCE: '$CI_FORCE'"
+    ci_info "environment option: \$CI_NO_BUILD: '$CI_NO_BUILD'"
     ci_info "environment option: \$CI_NO_TEST: '$CI_NO_TEST'"
     ci_info "environment option: \$CI_NO_CLEAN: '$CI_NO_CLEAN'"
     ci_info "executable: \$CI_MAKE: $(command -V "$CI_MAKE")"
@@ -145,10 +146,12 @@ function ci_build {
     for my_makefile in $CI_MAKEFILES
     do
         ci_info "using makefile: $my_makefile"
-        # Spawn "make".
-        ci_spawn "$CI_MAKE" -f "$my_makefile" \
-                            "${all_make_flags[@]}" \
-                            "${all_make_vars[@]}"
+        ci_expr $((CI_NO_BUILD)) || {
+            # Spawn "make".
+            ci_spawn "$CI_MAKE" -f "$my_makefile" \
+                                "${all_make_flags[@]}" \
+                                "${all_make_vars[@]}"
+        }
         ci_expr $((CI_NO_TEST)) || {
             # Spawn "make test" if testing is not disabled.
             ci_spawn "$CI_MAKE" -f "$my_makefile" \
