@@ -6251,6 +6251,8 @@ Version 1.6.47 [February 18, 2025]
     colorspace precedence rules, due to pre-existing colorspace checks.
     (Reported by Bob Friesenhahn; fixed by John Bowler)
 
+Version 1.6.48 [TODO]
+
 Send comments/corrections/commendations to png-mng-implement at lists.sf.net.
 Subscription is required; visit
 https://lists.sourceforge.net/lists/listinfo/png-mng-implement
