@@ -104,10 +104,6 @@ typedef png_libpng_version_1_8_0_git Your_png_h_is_not_version_1_8_0_git;
 #  define PNG_ZBUF_SIZE 8192
 #endif
 
-#ifndef PNG_STDIO_SUPPORTED
-typedef FILE * png_FILE_p;
-#endif
-
 #ifndef PNG_DEBUG
 #  define PNG_DEBUG 0
 #endif
@@ -404,7 +400,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, size_t length)
     */
    io_ptr = png_get_io_ptr(png_ptr);
    if (io_ptr != NULL)
-      check = fread(data, 1, length, (png_FILE_p)io_ptr);
+      check = fread(data, 1, length, (FILE *)io_ptr);
 
    if (check != length)
       png_error(png_ptr, "Read Error");
@@ -438,7 +434,7 @@ pngtest_write_data(png_structp png_ptr, png_bytep data, size_t length)
    if (png_ptr == NULL)
       png_error(png_ptr, "pngtest_write_data: bad png_ptr");
 
-   check = fwrite(data, 1, length, (png_FILE_p)png_get_io_ptr(png_ptr));
+   check = fwrite(data, 1, length, (FILE *)png_get_io_ptr(png_ptr));
 
    if (check != length)
       png_error(png_ptr, "Write Error");
@@ -859,8 +855,8 @@ pngtest_check_text_support(png_structp png_ptr, png_textp text_ptr,
 static int
 test_one_file(const char *inname, const char *outname)
 {
-   static png_FILE_p fpin;
-   static png_FILE_p fpout;  /* "static" prevents setjmp corruption */
+   static FILE *fpin;
+   static FILE *fpout;  /* "static" prevents setjmp corruption */
    pngtest_error_parameters error_parameters;
    png_structp read_ptr;
    png_infop read_info_ptr, end_info_ptr;

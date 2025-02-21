@@ -222,22 +222,10 @@
 #     error "PNG_USER_PRIVATEBUILD must be defined if PNGAPI is changed"
 #  endif
 
-#  if (defined(_MSC_VER) && _MSC_VER < 800) ||\
-      (defined(__BORLANDC__) && __BORLANDC__ < 0x500)
-   /* older Borland and MSC
-    * compilers used '__export' and required this to be after
-    * the type.
-    */
-#    ifndef PNG_EXPORT_TYPE
-#      define PNG_EXPORT_TYPE(type) type PNG_IMPEXP
-#    endif
-#    define PNG_DLL_EXPORT __export
-#  else /* newer compiler */
-#    define PNG_DLL_EXPORT __declspec(dllexport)
-#    ifndef PNG_DLL_IMPORT
-#      define PNG_DLL_IMPORT __declspec(dllimport)
-#    endif
-#  endif /* compiler */
+#  define PNG_DLL_EXPORT __declspec(dllexport)
+#  ifndef PNG_DLL_IMPORT
+#    define PNG_DLL_IMPORT __declspec(dllimport)
+#  endif
 
 #else /* !Windows */
 #  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
@@ -584,10 +572,6 @@ typedef const png_fixed_point * png_const_fixed_point_p;
 typedef size_t                * png_size_tp;
 typedef const size_t          * png_const_size_tp;
 
-#ifdef PNG_STDIO_SUPPORTED
-typedef FILE            * png_FILE_p;
-#endif
-
 #ifdef PNG_FLOATING_POINT_SUPPORTED
 typedef double       * png_doublep;
 typedef const double * png_const_doublep;
@@ -608,6 +592,15 @@ typedef double          * * png_doublepp;
 
 /* Pointers to pointers to pointers; i.e., pointer to array */
 typedef char            * * * png_charppp;
+
+#ifdef PNG_STDIO_SUPPORTED
+/* With PNG_STDIO_SUPPORTED it was possible to use I/O streams that were
+ * not necessarily stdio FILE streams, to allow building Windows applications
+ * before Win32 and Windows CE applications before WinCE 3.0, but that kind
+ * of support has long been discontinued.
+ */
+typedef FILE            * png_FILE_p; /* [Deprecated] */
+#endif
 
 #endif /* PNG_BUILDING_SYMBOL_TABLE */
 
