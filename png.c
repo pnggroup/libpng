@@ -3944,7 +3944,7 @@ png_image_free_function(png_voidp argument)
 #  ifdef PNG_STDIO_SUPPORTED
       if (cp->owned_file != 0)
       {
-         FILE *fp = png_voidcast(FILE*, cp->png_ptr->io_ptr);
+         FILE *fp = png_voidcast(FILE *, cp->png_ptr->io_ptr);
          cp->owned_file = 0;
 
          /* Ignore errors here. */
