@@ -1,6 +1,6 @@
 /* pngerror.c - stub functions for i/o and memory allocation
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2017 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -35,7 +35,7 @@ png_default_warning(png_const_structrp png_ptr,
  * to replace the error function at run-time.
  */
 #ifdef PNG_ERROR_TEXT_SUPPORTED
-PNG_FUNCTION(void,PNGAPI
+PNG_FUNCTION(void,
 png_error,(png_const_structrp png_ptr, png_const_charp error_message),
     PNG_NORETURN)
 {
@@ -88,7 +88,7 @@ png_error,(png_const_structrp png_ptr, png_const_charp error_message),
    png_default_error(png_ptr, error_message);
 }
 #else
-PNG_FUNCTION(void,PNGAPI
+PNG_FUNCTION(void,
 png_err,(png_const_structrp png_ptr),PNG_NORETURN)
 {
    /* Prior to 1.5.2 the error_fn received a NULL pointer, expressed
@@ -212,7 +212,7 @@ png_format_number(png_const_charp start, png_charp end, int format,
  * you should supply a replacement warning function and use
  * png_set_error_fn() to replace the warning function at run-time.
  */
-void PNGAPI
+void
 png_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 {
    int offset = 0;
@@ -358,7 +358,7 @@ png_formatted_warning(png_const_structrp png_ptr, png_warning_parameters p,
 #endif /* WARNINGS */
 
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
-void PNGAPI
+void
 png_benign_error(png_const_structrp png_ptr, png_const_charp error_message)
 {
    if ((png_ptr->flags & PNG_FLAG_BENIGN_ERRORS_WARN) != 0)
@@ -476,7 +476,7 @@ png_format_buffer(png_const_structrp png_ptr, png_charp buffer, png_const_charp
 #endif /* WARNINGS || ERROR_TEXT */
 
 #if defined(PNG_READ_SUPPORTED) && defined(PNG_ERROR_TEXT_SUPPORTED)
-PNG_FUNCTION(void,PNGAPI
+PNG_FUNCTION(void,
 png_chunk_error,(png_const_structrp png_ptr, png_const_charp error_message),
     PNG_NORETURN)
 {
@@ -493,7 +493,7 @@ png_chunk_error,(png_const_structrp png_ptr, png_const_charp error_message),
 #endif /* READ && ERROR_TEXT */
 
 #ifdef PNG_WARNINGS_SUPPORTED
-void PNGAPI
+void
 png_chunk_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 {
    char msg[18+PNG_MAX_ERROR_TEXT];
@@ -510,7 +510,7 @@ png_chunk_warning(png_const_structrp png_ptr, png_const_charp warning_message)
 
 #ifdef PNG_READ_SUPPORTED
 #ifdef PNG_BENIGN_ERRORS_SUPPORTED
-void PNGAPI
+void
 png_chunk_benign_error(png_const_structrp png_ptr, png_const_charp
     error_message)
 {
@@ -593,7 +593,7 @@ png_fixed_error,(png_const_structrp png_ptr, png_const_charp name),PNG_NORETURN)
 /* This API only exists if ANSI-C style error handling is used,
  * otherwise it is necessary for png_default_error to be overridden.
  */
-jmp_buf* PNGAPI
+jmp_buf*
 png_set_longjmp_fn(png_structrp png_ptr, png_longjmp_ptr longjmp_fn,
     size_t jmp_buf_size)
 {
@@ -754,7 +754,7 @@ png_default_error,(png_const_structrp png_ptr, png_const_charp error_message),
    png_longjmp(png_ptr, 1);
 }
 
-PNG_FUNCTION(void,PNGAPI
+PNG_FUNCTION(void,
 png_longjmp,(png_const_structrp png_ptr, int val),PNG_NORETURN)
 {
 #ifdef PNG_SETJMP_SUPPORTED
@@ -831,7 +831,7 @@ png_default_warning(png_const_structrp png_ptr, png_const_charp warning_message)
  * return to the calling routine or serious problems will occur.  The return
  * method used in the default routine calls longjmp(png_ptr->jmp_buf_ptr, 1)
  */
-void PNGAPI
+void
 png_set_error_fn(png_structrp png_ptr, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warning_fn)
 {
@@ -852,7 +852,7 @@ png_set_error_fn(png_structrp png_ptr, png_voidp error_ptr,
  * functions.  The application should free any memory associated with this
  * pointer before png_write_destroy and png_read_destroy are called.
  */
-png_voidp PNGAPI
+png_voidp
 png_get_error_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)
@@ -863,7 +863,7 @@ png_get_error_ptr(png_const_structrp png_ptr)
 
 
 #ifdef PNG_ERROR_NUMBERS_SUPPORTED
-void PNGAPI
+void
 png_set_strip_error_numbers(png_structrp png_ptr, png_uint_32 strip_mode)
 {
    if (png_ptr != NULL)
@@ -881,8 +881,8 @@ png_set_strip_error_numbers(png_structrp png_ptr, png_uint_32 strip_mode)
     * possible to implement without setjmp support just so long as there is some
     * way to handle the error return here:
     */
-PNG_FUNCTION(void /* PRIVATE */, (PNGCBAPI
-png_safe_error),(png_structp png_nonconst_ptr, png_const_charp error_message),
+PNG_FUNCTION(void /* PRIVATE */,
+png_safe_error,(png_structp png_nonconst_ptr, png_const_charp error_message),
     PNG_NORETURN)
 {
    png_const_structrp png_ptr = png_nonconst_ptr;
@@ -917,7 +917,7 @@ png_safe_error),(png_structp png_nonconst_ptr, png_const_charp error_message),
 }
 
 #ifdef PNG_WARNINGS_SUPPORTED
-void /* PRIVATE */ PNGCBAPI
+void /* PRIVATE */
 png_safe_warning(png_structp png_nonconst_ptr, png_const_charp warning_message)
 {
    png_const_structrp png_ptr = png_nonconst_ptr;

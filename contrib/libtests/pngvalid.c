@@ -1093,7 +1093,7 @@ internal_error(png_store *ps, png_const_charp message)
 #endif /* PNG_READ_SUPPORTED */
 
 /* Functions to use as PNG callbacks. */
-static void PNGCBAPI
+static void
 store_error(png_structp ppIn, png_const_charp message) /* PNG_NORETURN */
 {
    png_const_structp pp = ppIn;
@@ -1109,7 +1109,7 @@ store_error(png_structp ppIn, png_const_charp message) /* PNG_NORETURN */
    }
 }
 
-static void PNGCBAPI
+static void
 store_warning(png_structp ppIn, png_const_charp message)
 {
    png_const_structp pp = ppIn;
@@ -1281,7 +1281,7 @@ valid_chunktype(png_uint_32 chunktype)
    return 1; /* It's valid */
 }
 
-static void PNGCBAPI
+static void
 store_write(png_structp ppIn, png_bytep pb, size_t st)
 {
    png_const_structp pp = ppIn;
@@ -1375,7 +1375,7 @@ store_write(png_structp ppIn, png_bytep pb, size_t st)
    ps->chunklen = chunklen;
 }
 
-static void PNGCBAPI
+static void
 store_flush(png_structp ppIn)
 {
    UNUSED(ppIn) /*DOES NOTHING*/
@@ -1700,7 +1700,7 @@ store_read_chunk(png_store *ps, png_bytep pb, size_t max, size_t min)
    return st; /* space left */
 }
 
-static void PNGCBAPI
+static void
 store_read(png_structp ppIn, png_bytep pb, size_t st)
 {
    png_const_structp pp = ppIn;
@@ -1903,7 +1903,7 @@ store_pool_delete(png_store *ps, store_pool *pool)
 }
 
 /* The memory callbacks: */
-static png_voidp PNGCBAPI
+static png_voidp
 store_malloc(png_structp ppIn, png_alloc_size_t cb)
 {
    png_const_structp pp = ppIn;
@@ -1952,7 +1952,7 @@ store_malloc(png_structp ppIn, png_alloc_size_t cb)
    return new;
 }
 
-static void PNGCBAPI
+static void
 store_free(png_structp ppIn, png_voidp memory)
 {
    png_const_structp pp = ppIn;
@@ -3198,7 +3198,7 @@ modifier_read_imp(png_modifier *pm, png_bytep pb, size_t st)
 }
 
 /* The callback: */
-static void PNGCBAPI
+static void
 modifier_read(png_structp ppIn, png_bytep pb, size_t st)
 {
    png_const_structp pp = ppIn;
@@ -5391,7 +5391,7 @@ standard_info_imp(standard_display *dp, png_structp pp, png_infop pi,
    standard_info_part2(dp, pp, pi, nImages);
 }
 
-static void PNGCBAPI
+static void
 standard_info(png_structp pp, png_infop pi)
 {
    standard_display *dp = voidcast(standard_display*,
@@ -5403,7 +5403,7 @@ standard_info(png_structp pp, png_infop pi)
    standard_info_imp(dp, pp, pi, 1 /*only one image*/);
 }
 
-static void PNGCBAPI
+static void
 progressive_row(png_structp ppIn, png_bytep new_row, png_uint_32 y, int pass)
 {
    png_const_structp pp = ppIn;
@@ -5703,7 +5703,7 @@ standard_image_validate(standard_display *dp, png_const_structp pp, int iImage,
    dp->ps->validated = 1;
 }
 
-static void PNGCBAPI
+static void
 standard_end(png_structp ppIn, png_infop pi)
 {
    png_const_structp pp = ppIn;
@@ -6703,7 +6703,7 @@ transform_info_imp(transform_display *dp, png_structp pp, png_infop pi)
    }
 }
 
-static void PNGCBAPI
+static void
 transform_info(png_structp pp, png_infop pi)
 {
    transform_info_imp(voidcast(transform_display*, png_get_progressive_ptr(pp)),
@@ -6919,7 +6919,7 @@ transform_image_validate(transform_display *dp, png_const_structp pp,
    dp->this.ps->validated = 1;
 }
 
-static void PNGCBAPI
+static void
 transform_end(png_structp ppIn, png_infop pi)
 {
    png_const_structp pp = ppIn;
@@ -9385,7 +9385,7 @@ gamma_info_imp(gamma_display *dp, png_structp pp, png_infop pi)
    standard_info_part2(&dp->this, pp, pi, 1 /*images*/);
 }
 
-static void PNGCBAPI
+static void
 gamma_info(png_structp pp, png_infop pi)
 {
    gamma_info_imp(voidcast(gamma_display*, png_get_progressive_ptr(pp)), pp,
@@ -10385,7 +10385,7 @@ gamma_image_validate(gamma_display *dp, png_const_structp pp,
    dp->this.ps->validated = 1;
 }
 
-static void PNGCBAPI
+static void
 gamma_end(png_structp ppIn, png_infop pi)
 {
    png_const_structp pp = ppIn;

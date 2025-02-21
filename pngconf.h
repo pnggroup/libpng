@@ -93,46 +93,20 @@
 #  define PNGARG(arglist) arglist
 #endif
 
-/* Function calling conventions.
- * =============================
- * Normally it is not necessary to specify to the compiler how to call
- * a function - it just does it - however on x86 systems derived from
- * Microsoft and Borland C compilers ('IBM PC', 'DOS', 'Windows' systems
- * and some others) there are multiple ways to call a function and the
- * default can be changed on the compiler command line.  For this reason
- * libpng specifies the calling convention of every exported function and
- * every function called via a user supplied function pointer.  This is
- * done in this file by defining the following macros:
- *
- * PNGAPI    Calling convention for exported functions.
- * PNGCBAPI  Calling convention for user provided (callback) functions.
- * PNGCAPI   Calling convention used by the ANSI-C library (required
- *           for longjmp callbacks and sometimes used internally to
- *           specify the calling convention for zlib).
- *
- * These macros should never be overridden.  If it is necessary to
- * change calling convention in a private build this can be done
- * by setting PNG_API_RULE (which defaults to 0) to one of the values
- * below to select the correct 'API' variants.
- *
- * PNG_API_RULE=0 Use PNGCAPI - the 'C' calling convention - throughout.
- *                This is correct in every known environment.
- * PNG_API_RULE=1 Use the operating system convention for PNGAPI and
- *                the 'C' calling convention (from PNGCAPI) for
- *                callbacks (PNGCBAPI).  This is no longer required
- *                in any known environment - if it has to be used
- *                please post an explanation of the problem to the
- *                libpng mailing list.
- *
- * These cases only differ if the operating system does not use the C
- * calling convention, at present this just means the above cases
- * (x86 DOS/Windows systems) and, even then, this does not apply to
- * Cygwin running on those systems.
- *
- * Note that the value must be defined in pnglibconf.h so that what
- * the application uses to call the library matches the conventions
- * set when building the library.
+/* The PNGAPI, PNGCAPI and PNGCBAPI macros were used in versions of libpng
+ * prior to 1.8.0 to allow the use of custom calling conventions on x86 systems
+ * like DOS, OS/2 and Windows, for interoperability with non-C compilers like
+ * the pre-Delphi Borland Pascal and the pre-.NET Visual Basic.  [Deprecated.]
  */
+#ifndef PNGCAPI
+#  define PNGCAPI
+#endif
+#ifndef PNGCBAPI
+#  define PNGCBAPI PNGCAPI
+#endif
+#ifndef PNGAPI
+#  define PNGAPI PNGCAPI
+#endif
 
 /* Symbol export
  * =============
@@ -175,78 +149,15 @@
  * ==========================
  * This code is used at build time to find PNG_IMPEXP, the API settings
  * and PNG_EXPORT_TYPE(), it may also set a macro to indicate the DLL
- * import processing is possible.  On Windows systems it also sets
- * compiler-specific macros to the values required to change the calling
- * conventions of the various functions.
+ * import processing is possible.
  */
 #if defined(_WIN32) || defined(__WIN32__) || defined(__NT__) || \
     defined(__CYGWIN__)
-  /* Windows system (DOS doesn't support DLLs).  Includes builds under Cygwin or
-   * MinGW on any architecture currently supported by Windows.  Also includes
-   * Watcom builds but these need special treatment because they are not
-   * compatible with GCC or Visual C because of different calling conventions.
-   */
-#  if PNG_API_RULE == 2
-   /* If this line results in an error, either because __watcall is not
-    * understood or because of a redefine just below you cannot use *this*
-    * build of the library with the compiler you are using.  *This* build was
-    * build using Watcom and applications must also be built using Watcom!
-    */
-#    define PNGCAPI __watcall
-#  endif
-
-#  if defined(__GNUC__) || (defined(_MSC_VER) && (_MSC_VER >= 800))
-#    define PNGCAPI __cdecl
-#    if PNG_API_RULE == 1
-   /* If this line results in an error __stdcall is not understood and
-    * PNG_API_RULE should not have been set to '1'.
-    */
-#      define PNGAPI __stdcall
-#    endif
-#  else
-   /* An older compiler, or one not detected (erroneously) above,
-    * if necessary override on the command line to get the correct
-    * variants for the compiler.
-    */
-#    ifndef PNGCAPI
-#      define PNGCAPI _cdecl
-#    endif
-#    if PNG_API_RULE == 1 && !defined(PNGAPI)
-#      define PNGAPI _stdcall
-#    endif
-#  endif /* compiler/api */
-
-  /* NOTE: PNGCBAPI always defaults to PNGCAPI. */
-
-#  if defined(PNGAPI) && !defined(PNG_USER_PRIVATEBUILD)
-#     error "PNG_USER_PRIVATEBUILD must be defined if PNGAPI is changed"
-#  endif
-
 #  define PNG_DLL_EXPORT __declspec(dllexport)
 #  ifndef PNG_DLL_IMPORT
 #    define PNG_DLL_IMPORT __declspec(dllimport)
 #  endif
-
-#else /* !Windows */
-#  if (defined(__IBMC__) || defined(__IBMCPP__)) && defined(__OS2__)
-#    define PNGAPI _System
-#  else /* !Windows/x86 && !OS/2 */
-   /* Use the defaults, or define PNG*API on the command line (but
-    * this will have to be done for every compile!)
-    */
-#  endif /* other system, !OS/2 */
-#endif /* !Windows/x86 */
-
-/* Now do all the defaulting . */
-#ifndef PNGCAPI
-#  define PNGCAPI
-#endif
-#ifndef PNGCBAPI
-#  define PNGCBAPI PNGCAPI
-#endif
-#ifndef PNGAPI
-#  define PNGAPI PNGCAPI
-#endif
+#endif /* Windows */
 
 /* PNG_IMPEXP may be set on the compilation system command line or (if not set)
  * then in an internal header file when building the library, otherwise (when
@@ -280,7 +191,7 @@
 
 #ifndef PNG_EXPORTA
 #  define PNG_EXPORTA(type, name, args, attributes) \
-      PNG_FUNCTION(PNG_EXPORT_TYPE(type), (PNGAPI name), args, \
+      PNG_FUNCTION(PNG_EXPORT_TYPE(type), (name), args, \
       PNG_LINKAGE_API attributes)
 #endif
 
@@ -297,7 +208,7 @@
 #endif
 
 #ifndef PNG_CALLBACK
-#  define PNG_CALLBACK(type, name, args) type (PNGCBAPI name) args
+#  define PNG_CALLBACK(type, name, args) type (name) args
 #endif
 
 /* Support for compiler specific function attributes.  These are used

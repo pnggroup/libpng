@@ -1,6 +1,6 @@
 /* pngrtran.c - transforms the data in a row for PNG readers
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -20,7 +20,7 @@
 #ifdef PNG_READ_SUPPORTED
 
 /* Set the action on getting a CRC error for an ancillary or critical chunk. */
-void PNGAPI
+void
 png_set_crc_action(png_structrp png_ptr, int crit_action, int ancil_action)
 {
    png_debug(1, "in png_set_crc_action");
@@ -121,7 +121,7 @@ png_rtran_ok(png_structrp png_ptr, int need_IHDR)
 
 #ifdef PNG_READ_BACKGROUND_SUPPORTED
 /* Handle alpha and tRNS via a background color */
-void PNGFAPI
+void
 png_set_background_fixed(png_structrp png_ptr,
     png_const_color_16p background_color, int background_gamma_code,
     int need_expand, png_fixed_point background_gamma)
@@ -151,7 +151,7 @@ png_set_background_fixed(png_structrp png_ptr,
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-void PNGAPI
+void
 png_set_background(png_structrp png_ptr,
     png_const_color_16p background_color, int background_gamma_code,
     int need_expand, double background_gamma)
@@ -167,7 +167,7 @@ png_set_background(png_structrp png_ptr,
  * TRANSFORM and API behavior to be somewhat consistent, and it's simpler.
  */
 #ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
-void PNGAPI
+void
 png_set_scale_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_scale_16");
@@ -181,7 +181,7 @@ png_set_scale_16(png_structrp png_ptr)
 
 #ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
 /* Chop 16-bit depth files to 8-bit depth */
-void PNGAPI
+void
 png_set_strip_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_strip_16");
@@ -194,7 +194,7 @@ png_set_strip_16(png_structrp png_ptr)
 #endif
 
 #ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
-void PNGAPI
+void
 png_set_strip_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_strip_alpha");
@@ -340,7 +340,7 @@ unsupported_gamma(png_structrp png_ptr, png_fixed_point gamma, int warn)
 #endif /* READ_ALPHA_MODE || READ_GAMMA */
 
 #ifdef PNG_READ_ALPHA_MODE_SUPPORTED
-void PNGFAPI
+void
 png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
     png_fixed_point output_gamma)
 {
@@ -440,7 +440,7 @@ png_set_alpha_mode_fixed(png_structrp png_ptr, int mode,
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-void PNGAPI
+void
 png_set_alpha_mode(png_structrp png_ptr, int mode, double output_gamma)
 {
    png_set_alpha_mode_fixed(png_ptr, mode, convert_gamma_value(png_ptr,
@@ -468,7 +468,7 @@ typedef struct png_dsort_struct
 typedef png_dsort *   png_dsortp;
 typedef png_dsort * * png_dsortpp;
 
-void PNGAPI
+void
 png_set_quantize(png_structrp png_ptr, png_colorp palette,
     int num_palette, int maximum_colors, png_const_uint_16p histogram,
     int full_quantize)
@@ -855,7 +855,7 @@ png_set_quantize(png_structrp png_ptr, png_colorp palette,
 #endif /* READ_QUANTIZE */
 
 #ifdef PNG_READ_GAMMA_SUPPORTED
-void PNGFAPI
+void
 png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
     png_fixed_point file_gamma)
 {
@@ -897,7 +897,7 @@ png_set_gamma_fixed(png_structrp png_ptr, png_fixed_point scrn_gamma,
 }
 
 #  ifdef PNG_FLOATING_POINT_SUPPORTED
-void PNGAPI
+void
 png_set_gamma(png_structrp png_ptr, double scrn_gamma, double file_gamma)
 {
    png_set_gamma_fixed(png_ptr, convert_gamma_value(png_ptr, scrn_gamma),
@@ -911,7 +911,7 @@ png_set_gamma(png_structrp png_ptr, double scrn_gamma, double file_gamma)
  * less than 8-bit depth to 8-bit depth, and expand tRNS chunks
  * to alpha channels.
  */
-void PNGAPI
+void
 png_set_expand(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand");
@@ -941,7 +941,7 @@ png_set_expand(png_structrp png_ptr)
  */
 
 /* Expand paletted images to RGB. */
-void PNGAPI
+void
 png_set_palette_to_rgb(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_palette_to_rgb");
@@ -953,7 +953,7 @@ png_set_palette_to_rgb(png_structrp png_ptr)
 }
 
 /* Expand grayscale images of less than 8-bit depth to 8 bits. */
-void PNGAPI
+void
 png_set_expand_gray_1_2_4_to_8(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand_gray_1_2_4_to_8");
@@ -965,7 +965,7 @@ png_set_expand_gray_1_2_4_to_8(png_structrp png_ptr)
 }
 
 /* Expand tRNS chunks to alpha channels. */
-void PNGAPI
+void
 png_set_tRNS_to_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_tRNS_to_alpha");
@@ -981,7 +981,7 @@ png_set_tRNS_to_alpha(png_structrp png_ptr)
 /* Expand to 16-bit channels, expand the tRNS chunk too (because otherwise
  * it may not work correctly.)
  */
-void PNGAPI
+void
 png_set_expand_16(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_expand_16");
@@ -994,7 +994,7 @@ png_set_expand_16(png_structrp png_ptr)
 #endif
 
 #ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
-void PNGAPI
+void
 png_set_gray_to_rgb(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_gray_to_rgb");
@@ -1009,7 +1009,7 @@ png_set_gray_to_rgb(png_structrp png_ptr)
 #endif
 
 #ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
-void PNGFAPI
+void
 png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
     png_fixed_point red, png_fixed_point green)
 {
@@ -1081,7 +1081,7 @@ png_set_rgb_to_gray_fixed(png_structrp png_ptr, int error_action,
  * for example, to convert a 24 bpp RGB image into an 8 bpp grayscale image.
  */
 
-void PNGAPI
+void
 png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
     double green)
 {
@@ -1095,7 +1095,7 @@ png_set_rgb_to_gray(png_structrp png_ptr, int error_action, double red,
 
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
-void PNGAPI
+void
 png_set_read_user_transform_fn(png_structrp png_ptr, png_user_transform_ptr
     read_user_transform_fn)
 {

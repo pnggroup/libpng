@@ -45,7 +45,7 @@ png_read_data(png_structrp png_ptr, png_bytep data, size_t length)
  * read_data function and use it at run time with png_set_read_fn(), rather
  * than changing the library.
  */
-void PNGCBAPI
+void
 png_default_read_data(png_structp png_ptr, png_bytep data, size_t length)
 {
    size_t check;
@@ -82,7 +82,7 @@ png_default_read_data(png_structp png_ptr, png_bytep data, size_t length)
  *                May be NULL, in which case libpng's default function will
  *                be used.
  */
-void PNGAPI
+void
 png_set_read_fn(png_structrp png_ptr, png_voidp io_ptr,
     png_rw_ptr read_data_fn)
 {
