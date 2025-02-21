@@ -838,7 +838,7 @@ typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp,
  * your compiler.  This may be very difficult - try using a different compiler
  * to build the library!
  */
-PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), (jmp_buf, int), typedef);
+PNG_FUNCTION(void, (*png_longjmp_ptr), (jmp_buf, int), typedef);
 #endif
 
 /* Transform masks for the high-level interface */
@@ -1551,7 +1551,7 @@ PNG_REMOVED(void, png_set_filter_heuristics_fixed,
 
 #ifdef PNG_STDIO_SUPPORTED
 /* Initialize the input/output for the PNG file to the default functions. */
-PNG_EXPORT(void, png_init_io, (png_structrp png_ptr, png_FILE_p fp));
+PNG_EXPORT(void, png_init_io, (png_structrp png_ptr, FILE *fp));
 #endif
 
 /* Replace the (error and abort), and warning functions with user
@@ -3069,7 +3069,7 @@ PNG_EXPORT(int, png_image_begin_read_from_file, (png_imagep image,
     */
 
 PNG_EXPORT(int, png_image_begin_read_from_stdio, (png_imagep image,
-   FILE* file));
+   FILE *file));
    /* The PNG header is read from the stdio FILE object. */
 #endif /* STDIO */
 
@@ -3144,7 +3144,7 @@ PNG_EXPORT(int, png_image_write_to_file, (png_imagep image,
 PNG_EXPORT(int, png_image_write_to_stdio, (png_imagep image, FILE *file,
    int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
    const void *colormap));
-   /* Write the image to the given (FILE*). */
+   /* Write the image to the given FILE object. */
 #endif /* SIMPLIFIED_WRITE_STDIO */
 
 /* With all write APIs if image is in one of the linear formats with 16-bit

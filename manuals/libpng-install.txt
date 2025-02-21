@@ -345,30 +345,11 @@ way pngusr.h is used in the build has been changed; however, library
 builders will probably want to examine the changes to take advantage of
 new capabilities and to simplify their build system.
 
-A. Specific changes to library configuration capabilities
+A. Changes to the library configuration capabilities
 
-The exact mechanism used to control attributes of API functions has
-changed.  A single set of operating system independent macro definitions
-is used and operating system specific directives are defined in
-pnglibconf.h
-
-As part of this the mechanism used to choose procedure call standards on
-those systems that allow a choice has been changed.  At present this only
-affects certain Microsoft (DOS, Windows) and IBM (OS/2) operating systems
-running on Intel processors.  As before, PNGAPI is defined where required
-to control the exported API functions; however, two new macros, PNGCBAPI
-and PNGCAPI, are used instead for callback functions (PNGCBAPI) and
-(PNGCAPI) for functions that must match a C library prototype (currently
-only png_longjmp_ptr, which must match the C longjmp function.)  The new
-approach is documented in pngconf.h
-
-Despite these changes, libpng 1.5.0 only supports the native C function
-calling standard on those platforms tested so far ("__cdecl" on Microsoft
-Windows).  This is because the support requirements for alternative
-calling conventions seem to no longer exist.  Developers who find it
-necessary to set PNG_API_RULE to 1 should advise the mailing list
-(png-mng-implement) of this and library builders who use Openwatcom and
-therefore set PNG_API_RULE to 2 should also contact the mailing list.
+A new mechanism to control attributes of API functions was introduced in
+libpng-1.5.0.  A single set of system-independent macro definitions and
+directives is defined in pnglibconf.h
 
 B. Changes to the configuration mechanism
 

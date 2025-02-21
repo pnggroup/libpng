@@ -1,6 +1,6 @@
 /* pngtrans.c - transforms the data in a row (used by both readers and writers)
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -16,7 +16,7 @@
 
 #if defined(PNG_READ_BGR_SUPPORTED) || defined(PNG_WRITE_BGR_SUPPORTED)
 /* Turn on BGR-to-RGB mapping */
-void PNGAPI
+void
 png_set_bgr(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_bgr");
@@ -30,7 +30,7 @@ png_set_bgr(png_structrp png_ptr)
 
 #if defined(PNG_READ_SWAP_SUPPORTED) || defined(PNG_WRITE_SWAP_SUPPORTED)
 /* Turn on 16-bit byte swapping */
-void PNGAPI
+void
 png_set_swap(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_swap");
@@ -45,7 +45,7 @@ png_set_swap(png_structrp png_ptr)
 
 #if defined(PNG_READ_PACK_SUPPORTED) || defined(PNG_WRITE_PACK_SUPPORTED)
 /* Turn on pixel packing */
-void PNGAPI
+void
 png_set_packing(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_packing");
@@ -65,7 +65,7 @@ png_set_packing(png_structrp png_ptr)
 
 #if defined(PNG_READ_PACKSWAP_SUPPORTED)||defined(PNG_WRITE_PACKSWAP_SUPPORTED)
 /* Turn on packed pixel swapping */
-void PNGAPI
+void
 png_set_packswap(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_packswap");
@@ -79,7 +79,7 @@ png_set_packswap(png_structrp png_ptr)
 #endif
 
 #if defined(PNG_READ_SHIFT_SUPPORTED) || defined(PNG_WRITE_SHIFT_SUPPORTED)
-void PNGAPI
+void
 png_set_shift(png_structrp png_ptr, png_const_color_8p true_bits)
 {
    png_debug(1, "in png_set_shift");
@@ -94,7 +94,7 @@ png_set_shift(png_structrp png_ptr, png_const_color_8p true_bits)
 
 #if defined(PNG_READ_INTERLACING_SUPPORTED) || \
     defined(PNG_WRITE_INTERLACING_SUPPORTED)
-int PNGAPI
+int
 png_set_interlace_handling(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_interlace handling");
@@ -115,7 +115,7 @@ png_set_interlace_handling(png_structrp png_ptr)
  * for 48-bit input data, as well as to avoid problems with some compilers
  * that don't like bytes as parameters.
  */
-void PNGAPI
+void
 png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 {
    png_debug(1, "in png_set_filler");
@@ -200,7 +200,7 @@ png_set_filler(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 }
 
 /* Added to libpng-1.2.7 */
-void PNGAPI
+void
 png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 {
    png_debug(1, "in png_set_add_alpha");
@@ -218,7 +218,7 @@ png_set_add_alpha(png_structrp png_ptr, png_uint_32 filler, int filler_loc)
 
 #if defined(PNG_READ_SWAP_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_SWAP_ALPHA_SUPPORTED)
-void PNGAPI
+void
 png_set_swap_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_swap_alpha");
@@ -232,7 +232,7 @@ png_set_swap_alpha(png_structrp png_ptr)
 
 #if defined(PNG_READ_INVERT_ALPHA_SUPPORTED) || \
     defined(PNG_WRITE_INVERT_ALPHA_SUPPORTED)
-void PNGAPI
+void
 png_set_invert_alpha(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_invert_alpha");
@@ -245,7 +245,7 @@ png_set_invert_alpha(png_structrp png_ptr)
 #endif
 
 #if defined(PNG_READ_INVERT_SUPPORTED) || defined(PNG_WRITE_INVERT_SUPPORTED)
-void PNGAPI
+void
 png_set_invert_mono(png_structrp png_ptr)
 {
    png_debug(1, "in png_set_invert_mono");
@@ -801,7 +801,7 @@ png_do_check_palette_indexes(png_structrp png_ptr, png_row_infop row_info)
 #if defined(PNG_READ_USER_TRANSFORM_SUPPORTED) || \
     defined(PNG_WRITE_USER_TRANSFORM_SUPPORTED)
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
-void PNGAPI
+void
 png_set_user_transform_info(png_structrp png_ptr, png_voidp
    user_transform_ptr, int user_transform_depth, int user_transform_channels)
 {
@@ -832,7 +832,7 @@ png_set_user_transform_info(png_structrp png_ptr, png_voidp
  * are called.
  */
 #ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
-png_voidp PNGAPI
+png_voidp
 png_get_user_transform_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)
@@ -843,7 +843,7 @@ png_get_user_transform_ptr(png_const_structrp png_ptr)
 #endif
 
 #ifdef PNG_USER_TRANSFORM_INFO_SUPPORTED
-png_uint_32 PNGAPI
+png_uint_32
 png_get_current_row_number(png_const_structrp png_ptr)
 {
    /* See the comments in png.h - this is the sub-image row when reading an
@@ -855,7 +855,7 @@ png_get_current_row_number(png_const_structrp png_ptr)
    return PNG_UINT_32_MAX; /* help the app not to fail silently */
 }
 
-png_byte PNGAPI
+png_byte
 png_get_current_pass_number(png_const_structrp png_ptr)
 {
    if (png_ptr != NULL)

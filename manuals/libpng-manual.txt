@@ -4091,7 +4091,7 @@ READ APIs
      is filled in from the PNG header in the file.
 
    int png_image_begin_read_from_stdio (png_imagep image,
-     FILE* file)
+     FILE *file)
 
       The PNG header is read from the stdio FILE object.
 
@@ -4166,7 +4166,7 @@ be written:
       int convert_to_8_bit, const void *buffer,
       png_int_32 row_stride, const void *colormap)
 
-      Write the image to the given (FILE*).
+      Write the image to the given FILE object.
 
 With all write APIs if image is in one of the linear formats with
 (png_uint_16) data then setting convert_to_8_bit will cause the output to be
@@ -5317,13 +5317,13 @@ We don't use C++ style ("//") comments. We have, however,
 used them in the past in some now-abandoned MMX assembler
 code.
 
-Functions and their curly braces are not indented, and
-exported functions are marked with PNGAPI:
+Functions and their curly braces are not indented. We used to mark
+the exported functions with PNGAPI, but we no longer do:
 
  /* This is a public function that is visible to
   * application programmers. It does thus-and-so.
   */
- void PNGAPI
+ void
  png_exported_function(png_ptr, png_info, foo)
  {
     body;
