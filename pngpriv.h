@@ -170,7 +170,7 @@
 
 #ifndef PNG_INTERNAL_CALLBACK
 #  define PNG_INTERNAL_CALLBACK(type, name, args, attributes)\
-      PNG_LINKAGE_CALLBACK PNG_FUNCTION(type, (PNGCBAPI name), args,\
+      PNG_LINKAGE_CALLBACK PNG_FUNCTION(type, (name), args,\
          PNG_EMPTY attributes)
 #endif
 
@@ -280,16 +280,6 @@
 #endif
 #ifndef PNG_ERROR_TEXT_SUPPORTED
 #  define png_fixed_error(s1,s2) png_err(s1)
-#endif
-
-/* Some fixed point APIs are still required even if not exported because
- * they get used by the corresponding floating point APIs.  This magic
- * deals with this:
- */
-#ifdef PNG_FIXED_POINT_SUPPORTED
-#  define PNGFAPI PNGAPI
-#else
-#  define PNGFAPI /* PRIVATE */
 #endif
 
 #ifndef PNG_VERSION_INFO_ONLY
@@ -953,33 +943,31 @@ PNG_INTERNAL_FUNCTION(void,png_destroy_png_struct,(png_structrp png_ptr),
 /* Free an allocated jmp_buf (always succeeds) */
 PNG_INTERNAL_FUNCTION(void,png_free_jmpbuf,(png_structrp png_ptr),PNG_EMPTY);
 
-/* Function to allocate memory for zlib.  PNGAPI is disallowed. */
+/* Function to allocate memory for zlib. */
 PNG_INTERNAL_FUNCTION(voidpf,png_zalloc,(voidpf png_ptr, uInt items, uInt size),
    PNG_ALLOCATED);
 
-/* Function to free memory for zlib.  PNGAPI is disallowed. */
+/* Function to free memory for zlib. */
 PNG_INTERNAL_FUNCTION(void,png_zfree,(voidpf png_ptr, voidpf ptr),PNG_EMPTY);
 
-/* Next four functions are used internally as callbacks.  PNGCBAPI is required
- * but not PNG_EXPORT.  PNGAPI added at libpng version 1.2.3, changed to
- * PNGCBAPI at 1.5.0
- */
-
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_read_data,(png_structp png_ptr,
+/* Internal callback. */
+PNG_INTERNAL_FUNCTION(void,png_default_read_data,(png_structp png_ptr,
     png_bytep data, size_t length),PNG_EMPTY);
 
 #ifdef PNG_PROGRESSIVE_READ_SUPPORTED
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_push_fill_buffer,(png_structp png_ptr,
+/* Internal callback. */
+PNG_INTERNAL_FUNCTION(void,png_push_fill_buffer,(png_structp png_ptr,
     png_bytep buffer, size_t length),PNG_EMPTY);
 #endif
 
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_write_data,(png_structp png_ptr,
+/* Internal callback. */
+PNG_INTERNAL_FUNCTION(void,png_default_write_data,(png_structp png_ptr,
     png_bytep data, size_t length),PNG_EMPTY);
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
 #  ifdef PNG_STDIO_SUPPORTED
-PNG_INTERNAL_FUNCTION(void PNGCBAPI,png_default_flush,(png_structp png_ptr),
-   PNG_EMPTY);
+/* Internal callback. */
+PNG_INTERNAL_FUNCTION(void,png_default_flush,(png_structp png_ptr),PNG_EMPTY);
 #  endif
 #endif
 

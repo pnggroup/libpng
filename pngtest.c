@@ -148,7 +148,7 @@ static int status_pass = 1;
 static int status_dots_requested = 0;
 static int status_dots = 1;
 
-static void PNGCBAPI
+static void
 read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
    /* The callback should always receive correct parameters. */
@@ -178,7 +178,7 @@ read_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 }
 
 #ifdef PNG_WRITE_SUPPORTED
-static void PNGCBAPI
+static void
 write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 {
    /* The callback should always receive correct parameters. */
@@ -197,7 +197,7 @@ write_row_callback(png_structp png_ptr, png_uint_32 row_number, int pass)
 #ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
 /* Example of using a user transform callback (doesn't do anything at present).
  */
-static void PNGCBAPI
+static void
 read_user_callback(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    /* The callback should always receive correct parameters. */
@@ -217,7 +217,7 @@ read_user_callback(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 
 static png_uint_32 zero_samples;
 
-static void PNGCBAPI
+static void
 count_zero_samples(png_structp png_ptr, png_row_infop row_info, png_bytep data)
 {
    png_bytep dp = data;
@@ -380,7 +380,7 @@ pngtest_check_io_state(png_structp png_ptr, size_t data_length,
 }
 #endif
 
-static void PNGCBAPI
+static void
 pngtest_read_data(png_structp png_ptr, png_bytep data, size_t length)
 {
    size_t check = 0;
@@ -405,7 +405,7 @@ pngtest_read_data(png_structp png_ptr, png_bytep data, size_t length)
 }
 
 #ifdef PNG_WRITE_FLUSH_SUPPORTED
-static void PNGCBAPI
+static void
 pngtest_flush(png_structp png_ptr)
 {
    if (png_ptr == NULL)
@@ -420,7 +420,7 @@ pngtest_flush(png_structp png_ptr)
  * write_data function and use it at run time with png_set_write_fn(), rather
  * than changing the library.
  */
-static void PNGCBAPI
+static void
 pngtest_write_data(png_structp png_ptr, png_bytep data, size_t length)
 {
    size_t check;
@@ -449,7 +449,7 @@ typedef struct
    const char *file_name;
 }  pngtest_error_parameters;
 
-static void PNGCBAPI
+static void
 pngtest_warning(png_structp png_ptr, png_const_charp message)
 {
    const char *name = "UNKNOWN (ERROR!)";
@@ -469,7 +469,7 @@ pngtest_warning(png_structp png_ptr, png_const_charp message)
  * function is used by default, or if the program supplies NULL for the
  * error function pointer in png_set_error_fn().
  */
-static void PNGCBAPI
+static void
 pngtest_error(png_structp png_ptr, png_const_charp message)
 {
    ++error_count;
@@ -508,14 +508,13 @@ static int maximum_allocation = 0;
 static int total_allocation = 0;
 static int num_allocations = 0;
 
-png_voidp PNGCBAPI png_debug_malloc(png_structp png_ptr,
+png_voidp png_debug_malloc(png_structp png_ptr,
     png_alloc_size_t size);
-void PNGCBAPI png_debug_free(png_structp png_ptr, png_voidp ptr);
+void png_debug_free(png_structp png_ptr, png_voidp ptr);
 
 png_voidp
-PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
+png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
 {
-
    /* png_malloc has already tested for NULL; png_create_struct calls
     * png_debug_malloc directly, with png_ptr == NULL which is OK
     */
@@ -567,7 +566,7 @@ PNGCBAPI png_debug_malloc(png_structp png_ptr, png_alloc_size_t size)
 }
 
 /* Free a pointer.  It is removed from the list at the same time. */
-void PNGCBAPI
+void
 png_debug_free(png_structp png_ptr, png_voidp ptr)
 {
    if (png_ptr == NULL)
@@ -685,7 +684,7 @@ set_chunk_location(png_structp png_ptr, user_chunk_info *chunk_data, int what)
    return 1; /* handled */
 }
 
-static int PNGCBAPI
+static int
 read_user_chunk_callback(png_struct *png_ptr, png_unknown_chunkp chunk)
 {
    user_chunk_info *my_user_chunk_data =

@@ -21,7 +21,7 @@
 #ifdef PNG_READ_SUPPORTED
 
 /* Create a PNG structure for reading, and allocate any memory needed. */
-PNG_FUNCTION(png_structp,PNGAPI
+PNG_FUNCTION(png_structp,
 png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn),PNG_ALLOCATED)
 {
@@ -36,7 +36,7 @@ png_create_read_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 /* Alternate create PNG structure for reading, and allocate any memory
  * needed.
  */
-PNG_FUNCTION(png_structp,PNGAPI
+PNG_FUNCTION(png_structp,
 png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
     png_error_ptr error_fn, png_error_ptr warn_fn, png_voidp mem_ptr,
     png_malloc_ptr malloc_fn, png_free_ptr free_fn),PNG_ALLOCATED)
@@ -96,7 +96,7 @@ png_create_read_struct_2,(png_const_charp user_png_ver, png_voidp error_ptr,
  * here.  The application can then have access to the signature bytes we
  * read if it is determined that this isn't a valid PNG file.
  */
-void PNGAPI
+void
 png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 {
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
@@ -175,7 +175,7 @@ png_read_info(png_structrp png_ptr, png_inforp info_ptr)
 #endif /* SEQUENTIAL_READ */
 
 /* Optional call to update the users info_ptr structure */
-void PNGAPI
+void
 png_read_update_info(png_structrp png_ptr, png_inforp info_ptr)
 {
    png_debug(1, "in png_read_update_info");
@@ -206,7 +206,7 @@ png_read_update_info(png_structrp png_ptr, png_inforp info_ptr)
  * the user to obtain a gamma-corrected palette, for example.
  * If the user doesn't call this, we will do it ourselves.
  */
-void PNGAPI
+void
 png_start_read_image(png_structrp png_ptr)
 {
    png_debug(1, "in png_start_read_image");
@@ -291,7 +291,7 @@ png_do_read_intrapixel(png_row_infop row_info, png_bytep row)
 }
 #endif /* MNG_FEATURES */
 
-void PNGAPI
+void
 png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
 {
    png_row_info row_info;
@@ -557,7 +557,7 @@ png_read_row(png_structrp png_ptr, png_bytep row, png_bytep dsp_row)
  * [*] png_handle_alpha() does not exist yet, as of this version of libpng
  */
 
-void PNGAPI
+void
 png_read_rows(png_structrp png_ptr, png_bytepp row,
     png_bytepp display_row, png_uint_32 num_rows)
 {
@@ -612,7 +612,7 @@ png_read_rows(png_structrp png_ptr, png_bytepp row,
  *
  * [*] png_handle_alpha() does not exist yet, as of this version of libpng
  */
-void PNGAPI
+void
 png_read_image(png_structrp png_ptr, png_bytepp image)
 {
    png_uint_32 i, image_height;
@@ -678,7 +678,7 @@ png_read_image(png_structrp png_ptr, png_bytepp image)
  * file, will verify the end is accurate, and will read any comments
  * or time information at the end of the file, if info is not NULL.
  */
-void PNGAPI
+void
 png_read_end(png_structrp png_ptr, png_inforp info_ptr)
 {
 #ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
@@ -830,7 +830,7 @@ png_read_destroy(png_structrp png_ptr)
 }
 
 /* Free all memory used by the read */
-void PNGAPI
+void
 png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
     png_infopp end_info_ptr_ptr)
 {
@@ -856,7 +856,7 @@ png_destroy_read_struct(png_structpp png_ptr_ptr, png_infopp info_ptr_ptr,
    png_destroy_png_struct(png_ptr);
 }
 
-void PNGAPI
+void
 png_set_read_status_fn(png_structrp png_ptr, png_read_status_ptr read_row_fn)
 {
    if (png_ptr == NULL)
@@ -868,7 +868,7 @@ png_set_read_status_fn(png_structrp png_ptr, png_read_status_ptr read_row_fn)
 
 #ifdef PNG_SEQUENTIAL_READ_SUPPORTED
 #ifdef PNG_INFO_IMAGE_SUPPORTED
-void PNGAPI
+void
 png_read_png(png_structrp png_ptr, png_inforp info_ptr,
     int transforms, voidp params)
 {
@@ -1336,7 +1336,7 @@ png_image_read_header(png_voidp argument)
 }
 
 #ifdef PNG_STDIO_SUPPORTED
-int PNGAPI
+int
 png_image_begin_read_from_stdio(png_imagep image, FILE *file)
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
@@ -1366,7 +1366,7 @@ png_image_begin_read_from_stdio(png_imagep image, FILE *file)
    return 0;
 }
 
-int PNGAPI
+int
 png_image_begin_read_from_file(png_imagep image, const char *file_name)
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
@@ -1405,7 +1405,7 @@ png_image_begin_read_from_file(png_imagep image, const char *file_name)
 }
 #endif /* STDIO */
 
-static void PNGCBAPI
+static void
 png_image_memory_read(png_structp png_ptr, png_bytep out, size_t need)
 {
    if (png_ptr != NULL)
@@ -1435,7 +1435,7 @@ png_image_memory_read(png_structp png_ptr, png_bytep out, size_t need)
    }
 }
 
-int PNGAPI png_image_begin_read_from_memory(png_imagep image,
+int png_image_begin_read_from_memory(png_imagep image,
     png_const_voidp memory, size_t size)
 {
    if (image != NULL && image->version == PNG_IMAGE_VERSION)
@@ -3980,7 +3980,7 @@ png_image_read_direct(png_voidp argument)
    }
 }
 
-int PNGAPI
+int
 png_image_finish_read(png_imagep image, png_const_colorp background,
     void *buffer, png_int_32 row_stride, void *colormap)
 {

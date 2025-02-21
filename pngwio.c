@@ -46,7 +46,7 @@ png_write_data(png_structrp png_ptr, png_const_bytep data, size_t length)
  * write_data function and use it at run time with png_set_write_fn(), rather
  * than changing the library.
  */
-void PNGCBAPI
+void
 png_default_write_data(png_structp png_ptr, png_bytep data, size_t length)
 {
    size_t check;
@@ -74,7 +74,7 @@ png_flush(png_structrp png_ptr)
 }
 
 #  ifdef PNG_STDIO_SUPPORTED
-void PNGCBAPI
+void
 png_default_flush(png_structp png_ptr)
 {
    FILE *io_ptr;
@@ -117,7 +117,7 @@ png_default_flush(png_structp png_ptr)
  *                 a good idea if io_ptr does not point to a standard
  *                 *FILE structure.
  */
-void PNGAPI
+void
 png_set_write_fn(png_structrp png_ptr, png_voidp io_ptr,
     png_rw_ptr write_data_fn, png_flush_ptr output_flush_fn)
 {

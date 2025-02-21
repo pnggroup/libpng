@@ -838,7 +838,7 @@ typedef PNG_CALLBACK(int, *png_user_chunk_ptr, (png_structp,
  * your compiler.  This may be very difficult - try using a different compiler
  * to build the library!
  */
-PNG_FUNCTION(void, (PNGCAPI *png_longjmp_ptr), (jmp_buf, int), typedef);
+PNG_FUNCTION(void, (*png_longjmp_ptr), (jmp_buf, int), typedef);
 #endif
 
 /* Transform masks for the high-level interface */

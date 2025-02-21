@@ -49,7 +49,7 @@ typedef png_libpng_version_1_8_0_git Your_png_h_is_not_version_1_8_0_git;
  */
 
 #ifdef PNG_READ_SUPPORTED
-void PNGAPI
+void
 png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
 {
    unsigned int nb = (unsigned int)num_bytes;
@@ -76,7 +76,7 @@ png_set_sig_bytes(png_structrp png_ptr, int num_bytes)
  * respectively, to be less than, to match, or be greater than the correct
  * PNG signature (this is the same behavior as strcmp, memcmp, etc).
  */
-int PNGAPI
+int
 png_sig_cmp(png_const_bytep sig, size_t start, size_t num_to_check)
 {
    static const png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -358,7 +358,7 @@ png_create_png_struct,(png_const_charp user_png_ver, png_voidp error_ptr,
 }
 
 /* Allocate the memory for an info_struct for the application. */
-PNG_FUNCTION(png_infop,PNGAPI
+PNG_FUNCTION(png_infop,
 png_create_info_struct,(png_const_structrp png_ptr),PNG_ALLOCATED)
 {
    png_inforp info_ptr;
@@ -390,7 +390,7 @@ png_create_info_struct,(png_const_structrp png_ptr),PNG_ALLOCATED)
  * APIs.  This ensures that all possible approaches free the same data (all of
  * it).
  */
-void PNGAPI
+void
 png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
 {
    png_inforp info_ptr = NULL;
@@ -428,7 +428,7 @@ png_destroy_info_struct(png_const_structrp png_ptr, png_infopp info_ptr_ptr)
  * the user-memory mechanism and the user error handling/warning mechanisms in
  * those cases where it does anything other than a memset.
  */
-PNG_FUNCTION(void,PNGAPI
+PNG_FUNCTION(void,
 png_info_init_3,(png_infopp ptr_ptr, size_t png_info_struct_size),
     PNG_DEPRECATED)
 {
@@ -455,7 +455,7 @@ png_info_init_3,(png_infopp ptr_ptr, size_t png_info_struct_size),
    memset(info_ptr, 0, (sizeof *info_ptr));
 }
 
-void PNGAPI
+void
 png_data_freer(png_const_structrp png_ptr, png_inforp info_ptr,
     int freer, png_uint_32 mask)
 {
@@ -474,7 +474,7 @@ png_data_freer(png_const_structrp png_ptr, png_inforp info_ptr,
       png_error(png_ptr, "Unknown freer parameter in png_data_freer");
 }
 
-void PNGAPI
+void
 png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
     int num)
 {
@@ -682,7 +682,7 @@ png_free_data(png_const_structrp png_ptr, png_inforp info_ptr, png_uint_32 mask,
  * functions.  The application should free any memory associated with this
  * pointer before png_write_destroy() or png_read_destroy() are called.
  */
-png_voidp PNGAPI
+png_voidp
 png_get_io_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)
@@ -699,7 +699,7 @@ png_get_io_ptr(png_const_structrp png_ptr)
  * PNG_NO_STDIO or otherwise disabled PNG_STDIO_SUPPORTED, you must use a
  * function of your own because "FILE *" isn't necessarily available.
  */
-void PNGAPI
+void
 png_init_io(png_structrp png_ptr, FILE *fp)
 {
    png_debug(1, "in png_init_io");
@@ -722,7 +722,7 @@ png_init_io(png_structrp png_ptr, FILE *fp)
  * negative integral value is added the result will be an unsigned value
  * corresponding to the 2's complement representation.
  */
-void PNGAPI
+void
 png_save_int_32(png_bytep buf, png_int_32 i)
 {
    png_save_uint_32(buf, (png_uint_32)i);
@@ -733,7 +733,7 @@ png_save_int_32(png_bytep buf, png_int_32 i)
 /* Convert the supplied time into an RFC 1123 string suitable for use in
  * a "Creation Time" or other text-based time string.
  */
-int PNGAPI
+int
 png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 {
    static const char short_months[12][4] =
@@ -784,7 +784,7 @@ png_convert_to_rfc1123_buffer(char out[29], png_const_timep ptime)
 
 #endif /* READ || WRITE */
 
-png_const_charp PNGAPI
+png_const_charp
 png_get_copyright(png_const_structrp png_ptr)
 {
    PNG_UNUSED(png_ptr)  /* Silence compiler warning about unused png_ptr */
@@ -810,14 +810,14 @@ png_get_copyright(png_const_structrp png_ptr)
  * png_get_header_ver().  Due to the version_nn_nn_nn typedef guard,
  * it is guaranteed that png.c uses the correct version of png.h.
  */
-png_const_charp PNGAPI
+png_const_charp
 png_get_libpng_ver(png_const_structrp png_ptr)
 {
    /* Version of *.c files used when building libpng */
    return png_get_header_ver(png_ptr);
 }
 
-png_const_charp PNGAPI
+png_const_charp
 png_get_header_ver(png_const_structrp png_ptr)
 {
    /* Version of *.h files used when building libpng */
@@ -825,7 +825,7 @@ png_get_header_ver(png_const_structrp png_ptr)
    return PNG_LIBPNG_VER_STRING;
 }
 
-png_const_charp PNGAPI
+png_const_charp
 png_get_header_version(png_const_structrp png_ptr)
 {
    /* Returns longer string containing both version and date */
@@ -848,7 +848,7 @@ png_get_header_version(png_const_structrp png_ptr)
  * paletted.  Most useful for gamma correction and simplification
  * of code.  This API is not used internally.
  */
-void PNGAPI
+void
 png_build_grayscale_palette(int bit_depth, png_colorp palette)
 {
    int num_palette;
@@ -899,7 +899,7 @@ png_build_grayscale_palette(int bit_depth, png_colorp palette)
 #endif
 
 #ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
-int PNGAPI
+int
 png_handle_as_unknown(png_const_structrp png_ptr, png_const_bytep chunk_name)
 {
    /* Check chunk_name and return "keep" value if it's on the list, else 0 */
@@ -947,7 +947,7 @@ png_chunk_unknown_handling(png_const_structrp png_ptr, png_uint_32 chunk_name)
 
 #ifdef PNG_READ_SUPPORTED
 /* This function, added to libpng-1.0.6g, is untested. */
-int PNGAPI
+int
 png_reset_zstream(png_structrp png_ptr)
 {
    if (png_ptr == NULL)
@@ -959,7 +959,7 @@ png_reset_zstream(png_structrp png_ptr)
 #endif /* READ */
 
 /* This function was added to libpng-1.0.7 */
-png_uint_32 PNGAPI
+png_uint_32
 png_access_version_number(void)
 {
    /* Version of *.c files used when building libpng */
@@ -3738,7 +3738,7 @@ png_build_gamma_table(png_structrp png_ptr, int bit_depth)
 #endif /* READ_GAMMA */
 
 /* HARDWARE OR SOFTWARE OPTION SUPPORT */
-int PNGAPI
+int
 png_set_option(png_structrp png_ptr, int option, int onoff)
 {
    if (png_ptr != NULL && option >= 0 && option < PNG_OPTION_NEXT &&
@@ -3987,7 +3987,7 @@ png_image_free_function(png_voidp argument)
    return 1;
 }
 
-void PNGAPI
+void
 png_image_free(png_imagep image)
 {
    /* Safely call the real function, but only if doing so is safe at this point

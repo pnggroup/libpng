@@ -5317,13 +5317,13 @@ We don't use C++ style ("//") comments. We have, however,
 used them in the past in some now-abandoned MMX assembler
 code.
 
-Functions and their curly braces are not indented, and
-exported functions are marked with PNGAPI:
+Functions and their curly braces are not indented. We used to mark
+the exported functions with PNGAPI, but we no longer do:
 
  /* This is a public function that is visible to
   * application programmers. It does thus-and-so.
   */
- void PNGAPI
+ void
  png_exported_function(png_ptr, png_info, foo)
  {
     body;

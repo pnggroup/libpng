@@ -1,6 +1,6 @@
 /* pngrutil.c - utilities to read a PNG file
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -37,7 +37,7 @@ static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 /* TODO: Move these arrays to a common utility module to avoid duplication. */
 #endif
 
-png_uint_32 PNGAPI
+png_uint_32
 png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
 {
    png_uint_32 uval = png_get_uint_32(buf);
@@ -53,14 +53,14 @@ png_get_uint_31(png_const_structrp png_ptr, png_const_bytep buf)
  * PNG_USE_READ_MACROS is set the library will not use them internally,
  * but the APIs will still be available externally.
  *
- * The parentheses around "PNGAPI function_name" in the following three
- * functions are necessary because they allow the macros to co-exist with
- * these (unused but exported) functions.
+ * The parentheses around function names in the following three functions
+ * are necessary, because they allow the macros to co-exist with these
+ * (unused but exported) functions.
  */
 
 /* Grab an unsigned 32-bit integer from a buffer in big-endian format. */
-png_uint_32 (PNGAPI
-png_get_uint_32)(png_const_bytep buf)
+png_uint_32
+(png_get_uint_32)(png_const_bytep buf)
 {
    png_uint_32 uval =
        ((png_uint_32)(*(buf    )) << 24) +
@@ -76,8 +76,8 @@ png_get_uint_32)(png_const_bytep buf)
  * is no guarantee that a 'png_int_32' is exactly 32 bits, therefore
  * the following code does a two's complement to native conversion.
  */
-png_int_32 (PNGAPI
-png_get_int_32)(png_const_bytep buf)
+png_int_32
+(png_get_int_32)(png_const_bytep buf)
 {
    png_uint_32 uval = png_get_uint_32(buf);
    if ((uval & 0x80000000) == 0) /* non-negative */
@@ -94,8 +94,8 @@ png_get_int_32)(png_const_bytep buf)
 }
 
 /* Grab an unsigned 16-bit integer from a buffer in big-endian format. */
-png_uint_16 (PNGAPI
-png_get_uint_16)(png_const_bytep buf)
+png_uint_16
+(png_get_uint_16)(png_const_bytep buf)
 {
    /* ANSI-C requires an int value to accommodate at least 16 bits so this
     * works and allows the compiler not to worry about possible narrowing
