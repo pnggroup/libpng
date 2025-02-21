@@ -3069,7 +3069,7 @@ PNG_EXPORT(int, png_image_begin_read_from_file, (png_imagep image,
     */
 
 PNG_EXPORT(int, png_image_begin_read_from_stdio, (png_imagep image,
-   FILE* file));
+   FILE *file));
    /* The PNG header is read from the stdio FILE object. */
 #endif /* STDIO */
 
@@ -3144,7 +3144,7 @@ PNG_EXPORT(int, png_image_write_to_file, (png_imagep image,
 PNG_EXPORT(int, png_image_write_to_stdio, (png_imagep image, FILE *file,
    int convert_to_8_bit, const void *buffer, png_int_32 row_stride,
    const void *colormap));
-   /* Write the image to the given (FILE*). */
+   /* Write the image to the given FILE object. */
 #endif /* SIMPLIFIED_WRITE_STDIO */
 
 /* With all write APIs if image is in one of the linear formats with 16-bit
