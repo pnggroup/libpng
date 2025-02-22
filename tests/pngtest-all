@@ -8,7 +8,7 @@ success=" SUCCESS"
 TEST(){
    # Try to make the log file easier to read:
    echo "=============== pngtest $* ===================="
-   ./pngtest "$@"
+   ./pngtest 2>&1 1>"/dev/null" "$@"
    status=$?
    case "$status" in
        0)  test_status="$success";;
