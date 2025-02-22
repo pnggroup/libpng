@@ -30,12 +30,10 @@ png_riffle_palette_neon(png_structrp png_ptr)
    int i;
 
    /* Initially black, opaque. */
-   uint8x16x4_t w = {{
-      vdupq_n_u8(0x00),
-      vdupq_n_u8(0x00),
-      vdupq_n_u8(0x00),
-      vdupq_n_u8(0xff),
-   }};
+   uint8x16x4_t w;
+
+   w.val[2] = w.val[1] = w.val[0] = vdupq_n_u8(0x00);
+   w.val[3] = vdupq_n_u8(0xff);
 
    png_debug(1, "in png_riffle_palette_neon");
 
