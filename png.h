@@ -1036,7 +1036,7 @@ PNG_EXPORT(int, png_convert_to_rfc1123_buffer, (char out[29],
 
 /* Removed from libpng 1.7 onwards; use png_convert_to_rfc1123_buffer. */
 PNG_REMOVED(png_const_charp, png_convert_to_rfc1123, (png_structrp png_ptr,
-    png_const_timep ptime),PNG_DEPRECATED);
+    png_const_timep ptime),PNG_DEPRECATED)
 #endif
 
 #ifdef PNG_CONVERT_tIME_SUPPORTED
@@ -2011,9 +2011,9 @@ PNG_FIXED_EXPORT(void, png_set_cLLI_fixed, (png_const_structrp png_ptr,
 
 #ifdef PNG_eXIf_SUPPORTED
 PNG_REMOVED(png_uint_32, png_get_eXIf, (png_const_structrp png_ptr,
-    png_inforp info_ptr, png_bytep *exif),PNG_DEPRECATED);
+    png_inforp info_ptr, png_bytep *exif),PNG_DEPRECATED)
 PNG_REMOVED(void, png_set_eXIf, (png_const_structrp png_ptr,
-    png_inforp info_ptr, png_bytep exif),PNG_DEPRECATED);
+    png_inforp info_ptr, png_bytep exif),PNG_DEPRECATED)
 
 PNG_EXPORT(png_uint_32, png_get_eXIf_1, (png_const_structrp png_ptr,
     png_const_inforp info_ptr, png_uint_32 *num_exif, png_bytep *exif));

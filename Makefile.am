@@ -284,7 +284,7 @@ pnglibconf.c: scripts/pnglibconf/pnglibconf.dfa scripts/pnglibconf/options.awk p
 	mv $*.tf5 $@
 
 # Symbol checks (.def and .out files should match)
-scripts/pnglibconf/symbols.chk: scripts/pnglibconf/checksym.awk scripts/pnglibconf/symbols.def \
+scripts/pnglibconf/symbols.chk: scripts/pnglibconf/checksym.awk scripts/symbols.def \
                                 scripts/pnglibconf/symbols.out
 
 .out.chk:
