@@ -1,6 +1,6 @@
 /* pngwutil.c - utilities to write a PNG file
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -37,7 +37,7 @@ static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
  * with unsigned numbers for convenience, although one supported
  * ancillary chunk uses signed (two's complement) numbers.
  */
-void PNGAPI
+void
 png_save_uint_32(png_bytep buf, png_uint_32 i)
 {
    buf[0] = (png_byte)((i >> 24) & 0xffU);
@@ -50,7 +50,7 @@ png_save_uint_32(png_bytep buf, png_uint_32 i)
  * The parameter is declared unsigned int, not png_uint_16,
  * just to avoid potential problems on pre-ANSI C compilers.
  */
-void PNGAPI
+void
 png_save_uint_16(png_bytep buf, unsigned int i)
 {
    buf[0] = (png_byte)((i >> 8) & 0xffU);
@@ -64,7 +64,7 @@ png_save_uint_16(png_bytep buf, unsigned int i)
  * we should call png_set_sig_bytes() to tell libpng how many of the
  * bytes have already been written.
  */
-void PNGAPI
+void
 png_write_sig(png_structrp png_ptr)
 {
    png_byte png_signature[8] = {137, 80, 78, 71, 13, 10, 26, 10};
@@ -128,7 +128,7 @@ png_write_chunk_header(png_structrp png_ptr, png_uint_32 chunk_name,
 #endif
 }
 
-void PNGAPI
+void
 png_write_chunk_start(png_structrp png_ptr, png_const_bytep chunk_string,
     png_uint_32 length)
 {
@@ -140,7 +140,7 @@ png_write_chunk_start(png_structrp png_ptr, png_const_bytep chunk_string,
  * sum of the lengths from these calls *must* add up to the total_length
  * given to png_write_chunk_header().
  */
-void PNGAPI
+void
 png_write_chunk_data(png_structrp png_ptr, png_const_bytep data, size_t length)
 {
    /* Write the data, and run the CRC over it */
@@ -159,7 +159,7 @@ png_write_chunk_data(png_structrp png_ptr, png_const_bytep data, size_t length)
 }
 
 /* Finish a chunk started with png_write_chunk_header(). */
-void PNGAPI
+void
 png_write_chunk_end(png_structrp png_ptr)
 {
    png_byte buf[4];
@@ -205,7 +205,7 @@ png_write_complete_chunk(png_structrp png_ptr, png_uint_32 chunk_name,
 }
 
 /* This is the API that calls the internal function above. */
-void PNGAPI
+void
 png_write_chunk(png_structrp png_ptr, png_const_bytep chunk_string,
     png_const_bytep data, size_t length)
 {

@@ -768,13 +768,13 @@ display_log(struct display *dp, error_level level, const char *fmt, ...)
 }
 
 /* error handler callbacks for libpng */
-static void PNGCBAPI
+static void
 display_warning(png_structp pp, png_const_charp warning)
 {
    display_log(get_dp(pp), LIBPNG_WARNING, "%s", warning);
 }
 
-static void PNGCBAPI
+static void
 display_error(png_structp pp, png_const_charp error)
 {
    struct display *dp = get_dp(pp);
@@ -858,7 +858,7 @@ buffer_read(struct display *dp, struct buffer *bp, png_bytep data,
    bp->read_count = read_count;
 }
 
-static void PNGCBAPI
+static void
 read_function(png_structp pp, png_bytep data, size_t size)
 {
    buffer_read(get_dp(pp), get_buffer(pp), data, size);
@@ -1325,7 +1325,7 @@ buffer_write(struct display *dp, struct buffer *buffer, png_bytep data,
    buffer->end_count = end_count;
 }
 
-static void PNGCBAPI
+static void
 write_function(png_structp pp, png_bytep data, size_t size)
 {
    buffer_write(get_dp(pp), get_buffer(pp), data, size);

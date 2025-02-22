@@ -1,6 +1,6 @@
 /* pngpread.c - read a png file in push mode
  *
- * Copyright (c) 2018-2024 Cosmin Truta
+ * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
  * Copyright (c) 1996-1997 Andreas Dilger
  * Copyright (c) 1995-1996 Guy Eric Schalnat, Group 42, Inc.
@@ -46,7 +46,7 @@ static const png_byte png_pass_yinc[7] = {8, 8, 8, 4, 4, 2, 2};
 /* TODO: Move these arrays to a common utility module to avoid duplication. */
 #endif
 
-void PNGAPI
+void
 png_process_data(png_structrp png_ptr, png_inforp info_ptr,
     png_bytep buffer, size_t buffer_size)
 {
@@ -61,7 +61,7 @@ png_process_data(png_structrp png_ptr, png_inforp info_ptr,
    }
 }
 
-size_t PNGAPI
+size_t
 png_process_data_pause(png_structrp png_ptr, int save)
 {
    if (png_ptr != NULL)
@@ -88,7 +88,7 @@ png_process_data_pause(png_structrp png_ptr, int save)
    return 0;
 }
 
-png_uint_32 PNGAPI
+png_uint_32
 png_process_data_skip(png_structrp png_ptr)
 {
 /* TODO: Deprecate and remove this API.
@@ -279,7 +279,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
 }
 
-void PNGCBAPI
+void
 png_push_fill_buffer(png_structp png_ptr, png_bytep buffer, size_t length)
 {
    png_bytep ptr;
@@ -895,7 +895,7 @@ png_push_have_row(png_structrp png_ptr, png_bytep row)
 }
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
-void PNGAPI
+void
 png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
     png_const_bytep new_row)
 {
@@ -911,7 +911,7 @@ png_progressive_combine_row(png_const_structrp png_ptr, png_bytep old_row,
 }
 #endif /* READ_INTERLACING */
 
-void PNGAPI
+void
 png_set_progressive_read_fn(png_structrp png_ptr, png_voidp progressive_ptr,
     png_progressive_info_ptr info_fn, png_progressive_row_ptr row_fn,
     png_progressive_end_ptr end_fn)
@@ -926,7 +926,7 @@ png_set_progressive_read_fn(png_structrp png_ptr, png_voidp progressive_ptr,
    png_set_read_fn(png_ptr, progressive_ptr, png_push_fill_buffer);
 }
 
-png_voidp PNGAPI
+png_voidp
 png_get_progressive_ptr(png_const_structrp png_ptr)
 {
    if (png_ptr == NULL)

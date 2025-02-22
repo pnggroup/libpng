@@ -184,11 +184,11 @@ int main(int argc, const char **argv)
                      compression_method, filter_method;
                   png_bytep row_tmp;
 
-                  /* Now associate the recently opened (FILE*) with the default
-                   * libpng initialization functions.  Sometimes libpng is
-                   * compiled without stdio support (it can be difficult to do
-                   * in some environments); in that case you will have to write
-                   * your own read callback to read data from the (FILE*).
+                  /* Now associate the recently opened FILE object with the
+                   * default libpng initialization functions.  Sometimes libpng
+                   * is compiled without stdio support (it can be difficult to
+                   * do in some environments); in that case you will have to
+                   * write your own read callback to read data from the stream.
                    */
                   png_init_io(png_ptr, f);
 

@@ -745,7 +745,7 @@ generate_row(png_bytep row, size_t rowbytes, unsigned int y, int color_type,
 }
 
 
-static void PNGCBAPI
+static void
 makepng_warning(png_structp png_ptr, png_const_charp message)
 {
    const char **ep = png_get_error_ptr(png_ptr);
@@ -760,7 +760,7 @@ makepng_warning(png_structp png_ptr, png_const_charp message)
   fprintf(stderr, "%s: warning: %s\n", name, message);
 }
 
-static void PNGCBAPI
+static void
 makepng_error(png_structp png_ptr, png_const_charp message)
 {
    makepng_warning(png_ptr, message);

@@ -1674,7 +1674,7 @@ makename(struct display *dp, const char *dir, const char *infile)
 }
 
 /* error handler callbacks for libpng */
-static void PNGCBAPI
+static void
 display_warning(png_structp pp, png_const_charp warning)
 {
    struct display *dp = get_dp(pp);
@@ -1684,7 +1684,7 @@ display_warning(png_structp pp, png_const_charp warning)
       display_log(get_dp(pp), LIBPNG_WARNING, "%s", warning);
 }
 
-static void PNGCBAPI
+static void
 display_error(png_structp pp, png_const_charp error)
 {
    struct display *dp = get_dp(pp);
@@ -1716,7 +1716,7 @@ display_start_read(struct display *dp, const char *filename)
       display_log(dp, USER_ERROR, "file open failed (%s)", strerror(errno));
 }
 
-static void PNGCBAPI
+static void
 read_function(png_structp pp, png_bytep data, size_t size)
 {
    struct display *dp = get_dp(pp);
@@ -1896,7 +1896,7 @@ display_start_write(struct display *dp, const char *filename)
    }
 }
 
-static void PNGCBAPI
+static void
 write_function(png_structp pp, png_bytep data, size_t size)
 {
    struct display *dp = get_dp(pp);
