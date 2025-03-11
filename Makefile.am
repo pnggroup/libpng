@@ -136,7 +136,7 @@ endif
 
 if PNG_RISCV_RVV
 libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@_la_SOURCES += riscv/riscv_init.c\
-        riscv/filter_rvv_intrinsics.c
+        riscv/filter_rvv_intrinsics.c riscv/palette_rvv_intrinsics.c
 endif
 
 if PNG_LOONGARCH_LSX

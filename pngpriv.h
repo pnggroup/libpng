@@ -2180,6 +2180,29 @@ PNG_INTERNAL_FUNCTION(int,
                       PNG_EMPTY);
 #endif
 
+#if PNG_RISCV_RVV_IMPLEMENTATION == 1
+PNG_INTERNAL_FUNCTION(void,
+                      png_riffle_palette_rvv,
+                      (png_structrp),
+                      PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int,
+                      png_do_expand_palette_rgba8_rvv,
+                      (png_structrp,
+                       png_row_infop,
+                       png_const_bytep,
+                       const png_bytepp,
+                       const png_bytepp),
+                      PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int,
+                      png_do_expand_palette_rgb8_rvv,
+                      (png_structrp,
+                       png_row_infop,
+                       png_const_bytep,
+                       const png_bytepp,
+                       const png_bytepp),
+                      PNG_EMPTY);
+#endif
+
 /* Maintainer: Put new private prototypes here ^ */
 
 #include "pngdebug.h"
