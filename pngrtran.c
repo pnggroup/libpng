@@ -28,9 +28,9 @@
 #  endif
 #endif
 
-#ifdef PNG_RISCV_VECTOR_IMPLEMENTATION
-#  if PNG_RISCV_VECTOR_IMPLEMENTATION == 1
-#    define PNG_RISCV_VECTOR_INTRINSICS_AVAILABLE
+#ifdef PNG_RISCV_RVV_IMPLEMENTATION
+#  if PNG_RISCV_RVV_IMPLEMENTATION == 1
+#    define PNG_RISCV_RVV_INTRINSICS_AVAILABLE
 #  endif
 #endif
 
@@ -4403,12 +4403,6 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                   i = png_do_expand_palette_rgba8_neon(png_ptr, row_info, row,
                       &sp, &dp);
                }
-#elif defined PNG_RISCV_VECTOR_INTRINSICS_AVAILABLE
-	       if (png_ptr->riffled_palette != NULL)
-               {
-	           i = png_do_expand_palette_rgba8_vector(png_ptr, row_info, row,
-                       &sp, &dp);
-               }
 #else
                PNG_UNUSED(png_ptr)
 #endif
@@ -4438,9 +4432,6 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                i = 0;
 #ifdef PNG_ARM_NEON_INTRINSICS_AVAILABLE
                i = png_do_expand_palette_rgb8_neon(png_ptr, row_info, row,
-                   &sp, &dp);
-#elif defined PNG_RISCV_VECTOR_INTRINSICS_AVAILABLE
-	       i = png_do_expand_palette_rgb8_vector(png_ptr, row_info, row,
                    &sp, &dp);
 #else
                PNG_UNUSED(png_ptr)
@@ -4869,17 +4860,6 @@ png_do_read_transformations(png_structrp png_ptr, png_row_infop row_info)
                png_ptr->riffled_palette =
                    (png_bytep)png_malloc(png_ptr, 256 * 4);
                png_riffle_palette_neon(png_ptr);
-            }
-         }
-#elif defined PNG_RISCV_VECTOR_INTRINSICS_AVAILABLE
-         if ((png_ptr->num_trans > 0) && (png_ptr->bit_depth == 8))
-         {
-            if (png_ptr->riffled_palette == NULL)
-            {
-               /* Initialize the accelerated palette expansion. */
-               png_ptr->riffled_palette =
-                   (png_bytep)png_malloc(png_ptr, 256 * 4);
-               png_riffle_palette_vector(png_ptr);
             }
          }
 #endif

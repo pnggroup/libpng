@@ -109,13 +109,13 @@
 #undef PNG_POWERPC_VSX_OPT
 
 /* Turn on RISC-V Vector optimizations at run-time */
-#undef PNG_RISCV_VECTOR_API_SUPPORTED
+#undef PNG_RISCV_RVV_API_SUPPORTED
 
 /* Check for RISC-V Vector support at run-time */
-#undef PNG_RISCV_VECTOR_CHECK_SUPPORTED
+#undef PNG_RISCV_RVV_CHECK_SUPPORTED
 
 /* Enable RISC-V Vector optimizations */
-#undef PNG_RISCV_VECTOR_OPT
+#undef PNG_RISCV_RVV_OPT
 
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for

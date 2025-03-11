@@ -9,7 +9,7 @@ HOW TO USE THIS
 ---------------
 
 This directory contains C code fragments that can be included in
-riscv/riscv_init.c by setting the macro PNG_RISCV_VECTOR_FILE to the file name
+riscv/riscv_init.c by setting the macro PNG_RISCV_RVV_FILE to the file name
 in "" or <> at build time.  This setting is not recorded in pnglibconf.h and
 can be changed simply by rebuilding riscv/riscv_init.o with the required macro
 definition.
@@ -17,12 +17,12 @@ definition.
 For any of this code to be used the RISC-V Vector code must be enabled and run
 time checks must be supported.  I.e.:
 
-#if PNG_RISCV_VECTOR_OPT > 0
-#ifdef PNG_RISCV_VECTOR_CHECK_SUPPORTED
+#if PNG_RISCV_RVV_OPT > 0
+#ifdef PNG_RISCV_RVV_CHECK_SUPPORTED
 
 This is done in a 'configure' build by passing configure the argument:
 
-   --enable-riscv-vector=check
+   --enable-riscv-rvv=check
 
 Apart from the basic Linux implementation in contrib/riscv-vector/linux.c this
 code is unsupported.  That means that it is not even compiled on a regular
@@ -48,7 +48,7 @@ BUG REPORTS: an email address to which to send reports of problems
 The file is a fragment of C code. It should not define any 'extern' symbols;
 everything should be static.  It must define the function:
 
-static int png_have_vector(png_structp png_ptr);
+static int png_have_rvv(png_structp png_ptr);
 
 That function must return 1 if RISC-V Vector instructions are supported, 0 if
 not.  It must not execute png_error unless it detects a bug.  A png_error will

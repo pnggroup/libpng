@@ -656,6 +656,8 @@ ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
 LIBOBJS
+PNG_RISCV_RVV_FALSE
+PNG_RISCV_RVV_TRUE
 PNG_LOONGARCH_LSX_FALSE
 PNG_LOONGARCH_LSX_TRUE
 PNG_POWERPC_VSX_FALSE
@@ -858,6 +860,7 @@ enable_mips_mmi
 enable_intel_sse
 enable_powerpc_vsx
 enable_loongarch_lsx
+enable_riscv_rvv
 '
       ac_precious_vars='build_alias
 host_alias
@@ -15156,6 +15159,10 @@ printf "%s\n" "#define PNG_INTEL_SSE_OPT 0" >>confdefs.h
 
 printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 0" >>confdefs.h
 
+         enable_riscv_rvv=no
+
+printf "%s\n" "#define PNG_RISCV_RVV_OPT 0" >>confdefs.h
+
          ;;
       *)
          # allow enabling hardware optimization on any system:
@@ -15193,6 +15200,11 @@ printf "%s\n" "#define PNG_POWERPC_VSX_OPT 2" >>confdefs.h
 
 printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 
+              ;;
+            riscv*)
+              enable_riscv_rvv=yes
+
+printf "%s\n" "#define PNG_RISCV_RVV_OPT 1" >>confdefs.h
               ;;
          esac
          ;;
