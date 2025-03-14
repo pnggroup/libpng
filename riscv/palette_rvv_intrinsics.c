@@ -24,14 +24,19 @@ png_riffle_palette_rvv(png_structrp png_ptr)
    png_const_bytep trans_alpha = png_ptr->trans_alpha;
 
    size_t len = 256;
+   const int bpp_in = 3;
+   const int bpp_out = 4;
+   size_t len_pal = bpp_in * len;
+   size_t len_rpal = bpp_out * len;
 
    vuint8m1x3_t rgb;
+   vuint8m1_t a;
 
-   for (size_t vl; len > 0; len -= vl, palette += vl * 3, trans_alpha += vl, riffled_palette += vl * 4) {
-      vl = __riscv_vsetvl_e8m1(len);
+   for (size_t vl; len > 0; len -= vl, palette += vl * bpp_in, trans_alpha += vl, riffled_palette += vl * bpp_out) {
+      vl = __riscv_vsetvl_e8m1 (len);
 
+      a = __riscv_vle8_v_u8m1(trans_alpha, vl);
       rgb = __riscv_vlseg3e8_v_u8m1x3(palette, vl);
-      vuint8m1_t a = __riscv_vle8_v_u8m1(trans_alpha, vl);
 
       __riscv_vsseg4e8_v_u8m1x4(
          riffled_palette,
@@ -40,7 +45,7 @@ png_riffle_palette_rvv(png_structrp png_ptr)
             __riscv_vget_v_u8m1x3_u8m1(rgb, 1),
             __riscv_vget_v_u8m1x3_u8m1(rgb, 2),
             a),
-         vl);
+      vl);
    }
 }
 
@@ -48,60 +53,54 @@ int
 png_do_expand_palette_rgba8_rvv(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
-   size_t row_width = (size_t)row_info->width;
-   const png_uint_32* palette = (const png_uint_32*)png_ptr->riffled_palette;
+   size_t len = (size_t)row_info->width;
+   size_t vl = __riscv_vsetvl_e8m1(len);
+   const size_t bpp = 4;
+   const png_const_bytep palette = (png_const_bytep)png_ptr->palette;
 
-   size_t vl = __riscv_vsetvl_e8m1(row_width);
    png_bytep sp = *ssp - vl;
-   png_bytep dp = *ddp - vl * 4;
+   png_bytep dp = *ddp - vl * bpp;
 
-   for (; row_width > 0; row_width -= vl, dp -= vl * 4, sp -= vl) {
-      vl = __riscv_vsetvl_e8m1(row_width);
+   vuint8m1x4_t rgba;
 
-      vuint8m1_t indices = __riscv_vle8_v_u8m1(sp, vl);
-
-      vuint32m4_t pixels = __riscv_vluxei8_v_u32m4(palette, indices, vl);
-
-      __riscv_vse32_v_u32m4((unsigned int *)dp, pixels, vl);
+   for (; len > 0; len -= vl, dp -= vl * bpp, sp -= vl) {
+      vl = __riscv_vsetvl_e8m1(len);
+      vuint16m2_t indices = __riscv_vwmulu_vx_u16m2(__riscv_vle8_v_u8m1(sp, vl), bpp, vl);
+      rgba = __riscv_vluxseg4ei16_v_u8m1x4(palette, indices, vl);
+      __riscv_vsseg4e8_v_u8m1x4(dp, rgba, vl);
    }
 
-   row_width = (size_t)row_info->width;
+   *ssp = *ssp - (size_t)row_info->width;
+   *ddp = *ddp - (size_t)row_info->width * bpp;
 
-   *ssp = *ssp - row_width;
-   *ddp = *ddp - row_width * 4;
-
-   return row_width;
+   return (size_t)row_info->width;
 }
 
 int
 png_do_expand_palette_rgb8_rvv(png_structrp png_ptr, png_row_infop row_info,
     png_const_bytep row, png_bytepp ssp, png_bytepp ddp)
 {
-   size_t row_width = (size_t)row_info->width;
+   size_t len = (size_t)row_info->width;
+   size_t vl = __riscv_vsetvl_e8m1(len);
+   const size_t bpp = 3;
    const png_const_bytep palette = (png_const_bytep)png_ptr->palette;
 
-   size_t vl = __riscv_vsetvl_e8m1(row_width);
    png_bytep sp = *ssp - vl;
-   png_bytep dp = *ddp - vl * 3;
+   png_bytep dp = *ddp - vl * bpp;
 
    vuint8m1x3_t rgb;
 
-   for (; row_width > 0; row_width -= vl, dp -= vl * 3, sp -= vl) {
-      vl = __riscv_vsetvl_e8m1(row_width);
-
-      vuint16m2_t indices = __riscv_vwmulu_vx_u16m2(__riscv_vle8_v_u8m1(sp, vl), 3, vl);
-
+   for (; len > 0; len -= vl, dp -= vl * bpp, sp -= vl) {
+      vl = __riscv_vsetvl_e8m1(len);
+      vuint16m2_t indices = __riscv_vwmulu_vx_u16m2(__riscv_vle8_v_u8m1(sp, vl), bpp, vl);
       rgb = __riscv_vluxseg3ei16_v_u8m1x3(palette, indices, vl);
-
       __riscv_vsseg3e8_v_u8m1x3(dp, rgb, vl);
    }
 
-   row_width = (size_t)row_info->width;
+   *ssp = *ssp - (size_t)row_info->width;
+   *ddp = *ddp - (size_t)row_info->width * bpp;
 
-   *ssp = *ssp - row_width;
-   *ddp = *ddp - row_width * 3;
-
-   return row_width;
+   return (size_t)row_info->width;
 }
 
-#endif /* PNG_ARM_NEON_IMPLEMENTATION */
+#endif /* PNG_RISCV_RVV_IMPLEMENTATION */

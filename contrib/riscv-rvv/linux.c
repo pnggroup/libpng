@@ -1,7 +1,6 @@
 /* contrib/riscv-rvv/linux.c
  *
- * Copyright (c) 2023 Google LLC
- * Written by Dragoș Tiselice <dtiselice@google.com>, May 2023.
+ * Copyright (c) 2025 Filip Wasil <f.wasil@samsung.com>
  *
  * This code is released under the libpng license.
  * For conditions of distribution and use, see the disclaimer

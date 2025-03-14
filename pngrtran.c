@@ -4406,8 +4406,8 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
 #elif defined PNG_RISCV_RVV_INTRINSICS_AVAILABLE
 	       if (png_ptr->riffled_palette != NULL)
                {
-	           i = png_do_expand_palette_rgba8_rvv(png_ptr, row_info, row,
-                       &sp, &dp);
+                  i = png_do_expand_palette_rgba8_rvv(png_ptr, row_info, row,
+                           &sp, &dp);
                }
 #else
                PNG_UNUSED(png_ptr)
@@ -4440,8 +4440,8 @@ png_do_expand_palette(png_structrp png_ptr, png_row_infop row_info,
                i = png_do_expand_palette_rgb8_neon(png_ptr, row_info, row,
                    &sp, &dp);
 #elif defined PNG_RISCV_RVV_INTRINSICS_AVAILABLE
-	       i = png_do_expand_palette_rgb8_rvv(png_ptr, row_info, row,
-                   &sp, &dp);
+               i = png_do_expand_palette_rgb8_rvv(png_ptr, row_info, row,
+                        &sp, &dp);
 #else
                PNG_UNUSED(png_ptr)
 #endif
