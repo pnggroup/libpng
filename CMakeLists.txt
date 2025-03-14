@@ -282,6 +282,31 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
     endif()
   endif()
 
+  # Set definitions and sources for RISC-V.
+  if(PNG_TARGET_ARCHITECTURE MATCHES "riscv*")
+    set(PNG_RISCV_RVV_POSSIBLE_VALUES check on off)
+    set(PNG_RISCV_RVV "off"
+      CACHE STRING "Enable RISC-V Vector optimizations: check|on|off; off is default")
+    set_property(CACHE PNG_RISCV_RVV
+                PROPERTY STRINGS ${PNG_RISCV_RVV_POSSIBLE_VALUES})
+    list(FIND PNG_RISCV_RVV_POSSIBLE_VALUES ${PNG_RISCV_RVV} index)
+    if(index EQUAL -1)
+      message(FATAL_ERROR "PNG_RISCV_RVV must be one of [${PNG_RISCV_RVV_POSSIBLE_VALUES}]")
+    elseif(NOT ${PNG_RISCV_RVV} STREQUAL "off")
+      set(libpng_riscv_sources
+          riscv/filter_rvv_intrinsics.c
+          riscv/palette_rvv_intrinsics.c
+          riscv/riscv_init.c)
+      if(${PNG_RISCV_RVV} STREQUAL "on")
+        add_definitions(-DPNG_RISCV_RVV_OPT=2)
+      elseif(${PNG_RISCV_RVV} STREQUAL "check")
+        add_definitions(-DPNG_RISCV_RVV_CHECK_SUPPORTED)
+      endif()
+    else()
+      add_definitions(-DPNG_RISCV_RVV_OPT=0)
+    endif()
+  endif()
+
 else(PNG_HARDWARE_OPTIMIZATIONS)
 
   # Set definitions and sources for ARM.
@@ -307,6 +332,11 @@ else(PNG_HARDWARE_OPTIMIZATIONS)
   # Set definitions and sources for LoongArch.
   if(PNG_TARGET_ARCHITECTURE MATCHES "^(loongarch)")
     add_definitions(-DPNG_LOONGARCH_LSX_OPT=0)
+  endif()
+
+  # Set definitions and sources for RISC-V.
+  if(PNG_TARGET_ARCHITECTURE MATCHES "^riscv")
+    add_definitions(-DPNG_RISCV_RVV_OPT=0)
   endif()
 
 endif(PNG_HARDWARE_OPTIMIZATIONS)
@@ -542,7 +572,9 @@ set(libpng_sources
     ${libpng_mips_sources}
     ${libpng_powerpc_sources}
     ${libpng_loongarch_sources}
+    ${libpng_riscv_sources}
 )
+
 set(pngtest_sources
     pngtest.c
 )

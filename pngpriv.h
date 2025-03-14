@@ -279,6 +279,11 @@
 #   define PNG_LOONGARCH_LSX_IMPLEMENTATION 0
 #endif
 
+#if PNG_RISCV_RVV_OPT > 0
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_rvv
+#  define PNG_RISCV_RVV_IMPLEMENTATION 1
+#endif
+
 /* Is this a build of a DLL where compilation of the object modules requires
  * different preprocessor settings to those required for a simple library?  If
  * so PNG_BUILD_DLL must be set.
@@ -1515,6 +1520,23 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_lsx,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
+#if PNG_RISCV_RVV_OPT > 0
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+#endif
+
 /* Choose the best filter to use and filter the row data */
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
     png_row_infop row_info),PNG_EMPTY);
@@ -2127,6 +2149,11 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
+#  if PNG_RISCV_RVV_OPT > 0
+PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_rvv,
+   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+#endif
+
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
    png_const_charp key, png_bytep new_key), PNG_EMPTY);
 
@@ -2145,6 +2172,29 @@ PNG_INTERNAL_FUNCTION(int,
                       PNG_EMPTY);
 PNG_INTERNAL_FUNCTION(int,
                       png_do_expand_palette_rgb8_neon,
+                      (png_structrp,
+                       png_row_infop,
+                       png_const_bytep,
+                       const png_bytepp,
+                       const png_bytepp),
+                      PNG_EMPTY);
+#endif
+
+#if PNG_RISCV_RVV_IMPLEMENTATION == 1
+PNG_INTERNAL_FUNCTION(void,
+                      png_riffle_palette_rvv,
+                      (png_structrp),
+                      PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int,
+                      png_do_expand_palette_rgba8_rvv,
+                      (png_structrp,
+                       png_row_infop,
+                       png_const_bytep,
+                       const png_bytepp,
+                       const png_bytepp),
+                      PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(int,
+                      png_do_expand_palette_rgb8_rvv,
                       (png_structrp,
                        png_row_infop,
                        png_const_bytep,
