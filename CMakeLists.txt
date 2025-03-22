@@ -942,23 +942,27 @@ endif()
 
 # Create pkgconfig files.
 # We use the same files like ./configure, so we have to set its vars.
-# Only do this on Windows for Cygwin - the files don't make much sense
-# outside of a UNIX look-alike.
-if(NOT WIN32 OR CYGWIN OR MINGW)
-  set(prefix      ${CMAKE_INSTALL_PREFIX})
-  set(exec_prefix ${CMAKE_INSTALL_PREFIX})
-  set(libdir      ${CMAKE_INSTALL_FULL_LIBDIR})
-  set(includedir  ${CMAKE_INSTALL_FULL_INCLUDEDIR})
-  set(LIBS        "-lz -lm")
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
-                 @ONLY)
-  create_symlink(libpng.pc FILE libpng${PNGLIB_ABI_VERSION}.pc)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
-                 ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
-                 @ONLY)
-  create_symlink(libpng-config FILE libpng${PNGLIB_ABI_VERSION}-config)
+set(prefix      ${CMAKE_INSTALL_PREFIX})
+set(exec_prefix "\${prefix}")
+if(IS_ABSOLUTE "${CMAKE_INSTALL_LIBDIR}")
+    set(libdir "${CMAKE_INSTALL_LIBDIR}")
+else()
+    set(libdir "\${exec_prefix}/${CMAKE_INSTALL_LIBDIR}")
 endif()
+if(IS_ABSOLUTE "${CMAKE_INSTALL_INCLUDEDIR}")
+    set(includedir "${CMAKE_INSTALL_INCLUDEDIR}")
+else()
+    set(includedir "\${prefix}/${CMAKE_INSTALL_INCLUDEDIR}")
+endif()
+set(LIBS        "-lm")
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
+               @ONLY)
+create_symlink(libpng.pc FILE libpng${PNGLIB_ABI_VERSION}.pc)
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libpng-config.in
+               ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
+               @ONLY)
+create_symlink(libpng-config FILE libpng${PNGLIB_ABI_VERSION}-config)
 
 # Install.
 if(NOT SKIP_INSTALL_LIBRARIES AND NOT SKIP_INSTALL_ALL)
@@ -994,12 +998,10 @@ if(NOT SKIP_INSTALL_HEADERS AND NOT SKIP_INSTALL_ALL)
           DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/libpng${PNGLIB_ABI_VERSION})
 endif()
 if(NOT SKIP_INSTALL_EXECUTABLES AND NOT SKIP_INSTALL_ALL)
-  if(NOT WIN32 OR CYGWIN OR MINGW)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
-  endif()
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 if(NOT SKIP_INSTALL_PROGRAMS AND NOT SKIP_INSTALL_ALL)
@@ -1014,16 +1016,14 @@ if(NOT SKIP_INSTALL_FILES AND NOT SKIP_INSTALL_ALL)
   install(FILES png.5
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man5)
   # Install the pkg-config files.
-  if(NOT CMAKE_HOST_WIN32 OR CYGWIN OR MINGW)
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
-    install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
-            DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-    install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
-            DESTINATION ${CMAKE_INSTALL_BINDIR})
-  endif()
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng-config
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}.pc
+          DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+  install(PROGRAMS ${CMAKE_CURRENT_BINARY_DIR}/libpng${PNGLIB_ABI_VERSION}-config
+          DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 # Create an export file that CMake users can include() to import our targets.
