@@ -10,43 +10,24 @@
  * and license in png.h
  */
 
- /* png_info is a structure that holds the information in a PNG file so
- * that the application can find out the characteristics of the image.
- * If you are reading the file, this structure will tell you what is
- * in the PNG file.  If you are writing the file, fill in the information
- * you want to put into the PNG file, using png_set_*() functions, then
- * call png_write_info().
+#ifndef PNGPRIV_H
+/* PRIVATE INTERNAL HEADER FILE
  *
- * The names chosen should be very close to the PNG specification, so
- * consult that document for information about the meaning of each field.
+ * This file may not be included directly.
+ */
+#  error "PRIVATE HEADER INCLUDED: pnginfo.h is an internal libpng file."
+#endif
+
+/* INTERNAL, PRIVATE definition of a PNG.
  *
- * With libpng < 0.95, it was only possible to directly set and read the
- * the values in the png_info_struct, which meant that the contents and
- * order of the values had to remain fixed.  With libpng 0.95 and later,
- * however, there are now functions that abstract the contents of
- * png_info_struct from the application, so this makes it easier to use
- * libpng with dynamic libraries, and even makes it possible to use
- * libraries that don't have all of the libpng ancillary chunk-handing
- * functionality.  In libpng-1.5.0 this was moved into a separate private
- * file that is not visible to applications.
+ * png_info is a modifiable stateless description of a PNG.  Fields in png_info
+ * are accessed through png_get_<CHUNK>() functions and set using
+ * png_set_<CHUNK>() functions.
  *
- * The following members may have allocated storage attached that should be
- * cleaned up before the structure is discarded: palette, trans, text,
- * pcal_purpose, pcal_units, pcal_params, hist, iccp_name, iccp_profile,
- * splt_palettes, scal_unit, row_pointers, and unknowns.   By default, these
- * are automatically freed when the info structure is deallocated, if they were
- * allocated internally by libpng.  This behavior can be changed by means
- * of the png_data_freer() function.
- *
- * More allocation details: all the chunk-reading functions that
- * change these members go through the corresponding png_set_*
- * functions.  A function to clear these members is available: see
- * png_free_data().  The png_set_* functions do not depend on being
- * able to point info structure members to any of the storage they are
- * passed (they make their own copies), EXCEPT that the png_set_text
- * functions use the same storage passed to them in the text_ptr or
- * itxt_ptr structure argument, and the png_set_rows and png_set_unknowns
- * functions do not make their own copies.
+ * Some functions in libpng do directly access png_info::members, however this
+ * should be avoided.  png_struct contains members which hold caches, sometimes
+ * optimised, of the values from png_info and png_info is not passed to the
+ * functions which read and write image data.
  */
 #ifndef PNGINFO_H
 #define PNGINFO_H

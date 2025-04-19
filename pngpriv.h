@@ -19,7 +19,24 @@
  * they should be well aware of the issues that may arise from doing so.
  */
 
-#ifndef PNGPRIV_H
+#if (defined PNG_H) || (defined PNGLCONF_H) /* pngpriv.h must be first */
+/* PRIVATE INTERNAL HEADER FILE */
+
+/* This file may only be incldued by libpng source files and it must be the
+ * first header file included.  It may only be included once right at the
+ * start of the .c file:
+ *
+ *    #include "pngpriv.h"
+ */
+#  error "PRIVATE HEADER: pngpriv.h may only be used by libpng .c files"
+#endif /* PNG_H || PNGLCONF_H */
+
+#ifdef PNGPRIV_H /* duplicate include of png.h */
+/* If you get the error below check where **this** file has been included, it
+ * must be the first include in one of the libpng .c files!
+ */
+#  error "PRIVATE HEADER: pngpriv.h may only be used by libpng .c files"
+#else
 #define PNGPRIV_H
 
 /* Feature Test Macros.  The following are defined here to ensure that correctly
@@ -67,9 +84,7 @@
  * are not internal definitions may be required.  This is handled below just
  * before png.h is included, but load the configuration now if it is available.
  */
-#ifndef PNGLCONF_H
-#  include "pnglibconf.h"
-#endif
+#include "pnglibconf.h"
 
 /* Local renames may change non-exported API functions from png.h */
 #if defined(PNG_PREFIX) && !defined(PNGPREFIX_H)

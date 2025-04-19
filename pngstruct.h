@@ -10,11 +10,13 @@
  * and license in png.h
  */
 
-/* The structure that holds the information to read and write PNG files.
- * The only people who need to care about what is inside of this are the
- * people who will be modifying the library for their own special needs.
- * It should NOT be accessed directly by an application.
+#ifndef PNGPRIV_H
+/* PRIVATE INTERNAL HEADER FILE
+ *
+ * This file may not be included directly.
  */
+#  error "PRIVATE HEADER INCLUDED: pngstruct.h is an internal libpng file."
+#endif
 
 #ifndef PNGSTRUCT_H
 #define PNGSTRUCT_H
