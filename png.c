@@ -1491,7 +1491,7 @@ png_XYZ_from_xy(png_XYZ *XYZ, const png_xy *xy)
 }
 #endif /* COLORSPACE */
 
-#ifdef PNG_iCCP_SUPPORTED
+#ifdef PNG_READ_iCCP_SUPPORTED
 /* Error message generation */
 static char
 png_icc_tag_char(png_uint_32 byte)
@@ -1567,9 +1567,7 @@ png_icc_profile_error(png_const_structrp png_ptr, png_const_charp name,
 
    return 0;
 }
-#endif /* iCCP */
 
-#ifdef PNG_READ_iCCP_SUPPORTED
 /* Encoded value of D50 as an ICC XYZNumber.  From the ICC 2010 spec the value
  * is XYZ(0.9642,1.0,0.8249), which scales to:
  *
