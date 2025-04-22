@@ -211,12 +211,8 @@ png_read_chunk_header(png_structrp png_ptr)
       png_chunk_error(png_ptr, "bad header (invalid length)");
 
    /* Check to see if chunk name is valid. */
-   if (!check_chunk_name(chunk_name)) {
-      if (PNG_CHUNK_ANCILLARY(png_ptr->chunk_name) == 0)
-         png_chunk_error(png_ptr, "bad header (invalid type)");
-      else
-         png_chunk_benign_error(png_ptr, "bad header (invalid type)");
-   }
+   if (!check_chunk_name(chunk_name))
+      png_chunk_error(png_ptr, "bad header (invalid type)");
 
 #ifdef PNG_IO_STATE_SUPPORTED
    png_ptr->io_state = PNG_IO_READING | PNG_IO_CHUNK_DATA;
