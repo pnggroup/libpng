@@ -28,14 +28,14 @@
  *
  *    #include "pngpriv.h"
  */
-#  error "PRIVATE HEADER: pngpriv.h may only be used by libpng .c files"
+#  error "Include png.h not pngpriv.h for the supported libpng API."
 #endif /* PNG_H || PNGLCONF_H */
 
 #ifdef PNGPRIV_H /* duplicate include of png.h */
 /* If you get the error below check where **this** file has been included, it
  * must be the first include in one of the libpng .c files!
  */
-#  error "PRIVATE HEADER: pngpriv.h may only be used by libpng .c files"
+#  error "Include png.h not pngpriv.h for the supported libpng API."
 #else
 #define PNGPRIV_H
 

@@ -15,7 +15,7 @@
  *
  * This file may not be included directly.
  */
-#  error "PRIVATE HEADER INCLUDED: pnginfo.h is an internal libpng file."
+#  error "Do not include pnginfo.h.  Include png.h for the libpng API."
 #endif
 
 /* INTERNAL, PRIVATE definition of a PNG.

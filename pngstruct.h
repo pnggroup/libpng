@@ -15,7 +15,7 @@
  *
  * This file may not be included directly.
  */
-#  error "PRIVATE HEADER INCLUDED: pngstruct.h is an internal libpng file."
+#  error "Do not include pngstruct.h.  Include png.h for the libpng API."
 #endif
 
 #ifndef PNGSTRUCT_H
