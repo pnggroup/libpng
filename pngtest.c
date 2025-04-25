@@ -1116,7 +1116,7 @@ test_one_file(const char *inname, const char *outname)
       else
          png_error(read_ptr, "png_get_IHDR failed");
    }
-#ifdef PNG_FIXED_POINT_SUPPORTED
+#ifndef PNG_FLOATING_POINT_SUPPORTED
 #ifdef PNG_cHRM_SUPPORTED
    {
       png_fixed_point white_x, white_y, red_x, red_y, green_x, green_y, blue_x,
