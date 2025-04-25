@@ -60,7 +60,7 @@ typedef png_libpng_version_1_6_48_git Your_png_h_is_not_version_1_6_48_git;
                                  PNG_LIBPNG_VER_MINOR) || \
     (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_SONUM) || \
     (PNG_LIBPNG_VER_SHAREDLIB != PNG_LIBPNG_VER_DLLNUM)
-#  error "Inconsistent version numbers in png.h"
+#  error Inconsistent version numbers in "png.h"
 #endif
 
 /* In version 1.6.1, we added support for the configure test harness, which
@@ -116,7 +116,7 @@ typedef png_libpng_version_1_6_48_git Your_png_h_is_not_version_1_6_48_git;
 #  define pngtest_debug1(m, p1)     ((void)0)
 #  define pngtest_debug2(m, p1, p2) ((void)0)
 #else /* PNG_DEBUG < 0 */
-#  error "Bad PNG_DEBUG value"
+#  error Bad PNG_DEBUG value
 #endif
 
 /* Turn on CPU timing

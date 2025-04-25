@@ -1000,17 +1000,15 @@
  * must match that used in the build, or we must be using pnglibconf.h.prebuilt:
  */
 #if PNG_ZLIB_VERNUM != 0 && PNG_ZLIB_VERNUM != ZLIB_VERNUM
-#  error ZLIB_VERNUM != PNG_ZLIB_VERNUM \
-      "-I (include path) error: see the notes in pngpriv.h"
-   /* This means that when pnglibconf.h was built the copy of zlib.h that it
-    * used is not the same as the one being used here.  Because the build of
-    * libpng makes decisions to use inflateInit2 and inflateReset2 based on the
-    * zlib version number and because this affects handling of certain broken
-    * PNG files the -I directives must match.
+#  error The include path of <zlib.h> is incorrect
+   /* When pnglibconf.h was built, the copy of zlib.h that it used was not the
+    * same as the one being used here.  Considering how libpng makes decisions
+    * to use the zlib API based on the zlib version number, the -I options must
+    * match.
     *
-    * The most likely explanation is that you passed a -I in CFLAGS. This will
-    * not work; all the preprocessor directives and in particular all the -I
-    * directives must be in CPPFLAGS.
+    * A possible cause of this mismatch is that you passed an -I option in
+    * CFLAGS, which is unlikely to work.  All the preprocessor options, and all
+    * the -I options in particular, should be in CPPFLAGS.
     */
 #endif
 
