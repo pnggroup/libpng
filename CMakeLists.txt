@@ -14,7 +14,7 @@
 #
 # SPDX-License-Identifier: libpng-2.0
 
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14...4.0)
 
 set(PNGLIB_MAJOR 1)
 set(PNGLIB_MINOR 6)
@@ -45,14 +45,35 @@ set(PNG_DEBUG_POSTFIX "d"
     CACHE STRING "Postfix to append to library file names under the Debug configuration")
 
 # Allow the users to import their own extra configuration settings.
+# Those settings can be either passed via DFA_XTRA if they are in DFA form
+# (such as "pngusr.dfa"), or via PNG_LIBCONF_HEADER if they are in prebuilt
+# header file form (such as "scripts/pnglibconf.h.prebuilt"), but not both.
+# For platforms such as Android or iOS, or in certain cross-platform build
+# scenarios, having a valid PNG_LIBCONF_HEADER is mandatory.
 set(DFA_XTRA ""
-    CACHE FILEPATH "File containing extra configuration settings")
+    CACHE FILEPATH "DFA file containing customized build configuration settings for libpng")
+set(PNG_LIBCONF_HEADER ""
+    CACHE FILEPATH "C header file containing customized build configuration settings for libpng")
+set(PNG_LIBCONF_HEADER_PREBUILT "${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt")
+if(ANDROID OR IOS)
+  set(PNG_LIBCONF_HEADER "${PNG_LIBCONF_HEADER_PREBUILT}")
+endif()
+if((NOT DFA_XTRA STREQUAL "") AND (NOT PNG_LIBCONF_HEADER STREQUAL ""))
+  message(SEND_ERROR
+          "The options DFA_XTRA=\"${DFA_XTRA}\" and PNG_LIBCONF_HEADER=\"${PNG_LIBCONF_HEADER}\" "
+          "are mutually exclusive")
+endif()
 
 # Allow the users to switch on/off various library build types.
 option(PNG_SHARED "Build libpng as a shared library" ON)
 option(PNG_STATIC "Build libpng as a static library" ON)
 if(APPLE)
   option(PNG_FRAMEWORK "Build libpng as a framework bundle" ON)
+else()
+  option(PNG_FRAMEWORK "Build libpng as a framework bundle (not available on this platform)" OFF)
+endif()
+if(NOT APPLE AND PNG_FRAMEWORK)
+  message(SEND_ERROR "The option PNG_FRAMEWORK should not be set on this platform")
 endif()
 
 # Allow the users to switch on/off the auxiliary build and test artifacts.
@@ -114,6 +135,7 @@ if(PNG_BUILD_ZLIB)
   endif()
 endif()
 
+# Find the prerequisite libraries.
 find_package(ZLIB REQUIRED)
 
 if(UNIX
@@ -348,26 +370,48 @@ int main(void) { return 0; }
   file(REMOVE "${CMAKE_CURRENT_BINARY_DIR}/conftest.map")
 endif()
 
-# Find an AWK language processor.
-# Start with specific AWK implementations like gawk and nawk, which are
-# known to work with our scripts, then fall back to the system awk.
-find_program(AWK NAMES gawk nawk awk)
-if(AWK)
-  message(STATUS "Found AWK program: ${AWK}")
-else()
-  message(STATUS "Could not find an AWK-compatible program")
+if(PNG_LIBCONF_HEADER STREQUAL "")
+  # No custom configuration header file has been specified, so we build it
+  # from our DFA files and (optionally) out of the user-supplied DFA file.
+  # Find an AWK language processor.
+  # Start with specific AWK implementations like gawk and nawk, which are
+  # known to work with our scripts, then fall back to the system awk.
+  find_program(AWK NAMES gawk nawk awk)
+  if(AWK)
+    message(STATUS "Found AWK program: ${AWK}")
+  else()
+    message(STATUS "Could not find an AWK-compatible program")
+  endif()
 endif()
 
-if(NOT AWK OR (ANDROID OR IOS))
-  # No awk available to generate sources; use pre-built pnglibconf.h
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
-                 ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
+# Include the internal module PNGCheckLibconf.cmake
+include(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGCheckLibconf.cmake)
+
+if(NOT PNG_LIBCONF_HEADER STREQUAL "")
+  # Configure libpng with the user-defined pnglibconf.h file.
+  png_check_libconf(HEADER "${PNG_LIBCONF_HEADER}")
+  configure_file("${PNG_LIBCONF_HEADER}"
+                 ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h
+                 @ONLY)
+  add_custom_target(png_genfiles)
+elseif(NOT AWK)
+  # No AWK program available to generate pnglibconf.h.
+  # Configure libpng with pnglibconf.h.prebuilt.
+  png_check_libconf(HEADER "${PNG_LIBCONF_HEADER_PREBUILT}")
+  configure_file("${PNG_LIBCONF_HEADER_PREBUILT}"
+                ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h
+                @ONLY)
   add_custom_target(png_genfiles)
 else()
+  png_check_libconf(DFA_XTRA "${DFA_XTRA}")
+
   # Include the internal module PNGGenConfig.cmake
   include(${CMAKE_CURRENT_SOURCE_DIR}/scripts/cmake/PNGGenConfig.cmake)
 
-  # Copy the awk scripts, converting their line endings to Unix (LF)
+  # Work around a limitation of various Windows AWK programs that are
+  # unable to process CRLF-terminated AWK scripts.
+  # Copy these AWK scripts to a temporary location, converting their
+  # line endings from Windows (CRLF) to Unix (LF) at the destination.
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/checksym.awk
                  ${CMAKE_CURRENT_BINARY_DIR}/scripts/checksym.awk
                  @ONLY
@@ -502,7 +546,7 @@ else()
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk" png_scripts_symbols_chk
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out" png_scripts_symbols_out
                             "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out" png_scripts_vers_out)
-endif(NOT AWK OR (ANDROID OR IOS))
+endif()
 
 # List the source code files.
 set(libpng_public_hdrs
@@ -516,7 +560,7 @@ set(libpng_private_hdrs
     pnginfo.h
     pngstruct.h
 )
-if(AWK AND NOT (ANDROID OR IOS))
+if(AWK)
   list(APPEND libpng_private_hdrs "${CMAKE_CURRENT_BINARY_DIR}/pngprefix.h")
 endif()
 set(libpng_sources
