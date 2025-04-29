@@ -165,7 +165,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  // Register unknown chunk callback
+  // Register unknown chunk callback (and add tEXT acillary chunk as unknown)
+  png_byte my_chunks[] = { 't', 'E', 'X', 't' };
+  png_set_keep_unknown_chunks(png_handler.png_ptr, PNG_HANDLE_CHUNK_ALWAYS, my_chunks, 1);
   png_set_read_user_chunk_fn(png_handler.png_ptr, nullptr, handle_unknown_chunk);
 
   // Reading.
