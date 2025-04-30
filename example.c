@@ -180,7 +180,7 @@ int main(int argc, const char **argv)
  *
  * You do not have to read directly from a file.  You can read from memory or,
  * on systems that support <stdio.h>, from a FILE object.  This is controlled
- * by the particular png_image_read_from_ function you call at the start.
+ * by the particular png_image_begin_read_from_ function you call at the start.
  * Likewise, on write, you can write to a FILE object if your system supports
  * <stdio.h>.  The macro PNG_STDIO_SUPPORTED indicates if stdio is available
  * and accessible from your libpng build.

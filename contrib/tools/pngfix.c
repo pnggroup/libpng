@@ -64,7 +64,7 @@
 #endif
 
 #ifndef PNG_MAXIMUM_INFLATE_WINDOW
-#  error "pngfix not supported in this libpng version"
+#  error pngfix requires libpng with PNG_MAXIMUM_INFLATE_WINDOW supported
 #endif
 
 #if ZLIB_VERNUM >= 0x1240

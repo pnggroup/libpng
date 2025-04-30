@@ -370,7 +370,7 @@
 #if CHAR_BIT == 8 && UCHAR_MAX == 255
    typedef unsigned char png_byte;
 #else
-#  error "libpng requires 8-bit bytes"
+#  error libpng requires 8-bit bytes
 #endif
 
 #if INT_MIN == -32768 && INT_MAX == 32767
@@ -378,7 +378,7 @@
 #elif SHRT_MIN == -32768 && SHRT_MAX == 32767
    typedef short png_int_16;
 #else
-#  error "libpng requires a signed 16-bit type"
+#  error libpng requires a signed 16-bit integer type
 #endif
 
 #if UINT_MAX == 65535
@@ -386,7 +386,7 @@
 #elif USHRT_MAX == 65535
    typedef unsigned short png_uint_16;
 #else
-#  error "libpng requires an unsigned 16-bit type"
+#  error libpng requires an unsigned 16-bit integer type
 #endif
 
 #if INT_MIN < -2147483646 && INT_MAX > 2147483646
@@ -394,7 +394,7 @@
 #elif LONG_MIN < -2147483646 && LONG_MAX > 2147483646
    typedef long int png_int_32;
 #else
-#  error "libpng requires a signed 32-bit (or more) type"
+#  error libpng requires a signed 32-bit (or longer) integer type
 #endif
 
 #if UINT_MAX > 4294967294U
@@ -402,7 +402,7 @@
 #elif ULONG_MAX > 4294967294U
    typedef unsigned long int png_uint_32;
 #else
-#  error "libpng requires an unsigned 32-bit (or more) type"
+#  error libpng requires an unsigned 32-bit (or longer) integer type
 #endif
 
 /* Prior to 1.6.0, it was possible to disable the use of size_t and ptrdiff_t.
