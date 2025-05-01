@@ -66,8 +66,9 @@ struct PngObjectHandler {
   }
 };
 
-// --- User-defined unknown chunk handler ---
-int handle_unknown_chunk(png_structp png_ptr, png_unknown_chunkp chunk) {
+// User-defined unknown chunk handler
+// I add a parsing method
+int handle_unknown_chunk_additionally(png_structp png_ptr, png_unknown_chunkp chunk) {
   char name[5];
   memcpy(name, chunk->name, 4);
   name[4] = '\0';
@@ -77,6 +78,18 @@ int handle_unknown_chunk(png_structp png_ptr, png_unknown_chunkp chunk) {
 
   // Return 0 to let libpng continue default behavior
   return 0;
+}
+
+int handle_unknown_chunk_myself(png_structp png_ptr, png_unknown_chunkp chunk) {
+  char name[5];
+  memcpy(name, chunk->name, 4);
+  name[4] = '\0';
+
+  // Simple log to stdout (or remove for cleaner fuzzing)
+  printf("Unknown chunk encountered: %s (%zu bytes)\n", name, chunk->size);
+
+  // Return 1 to let libpng know I parsed the file
+  return 1;
 }
 
 void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
@@ -168,7 +181,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // Register unknown chunk callback (and add tEXT acillary chunk as unknown)
   png_byte my_chunks[] = { 't', 'E', 'X', 't' };
   png_set_keep_unknown_chunks(png_handler.png_ptr, PNG_HANDLE_CHUNK_ALWAYS, my_chunks, 1);
-  png_set_read_user_chunk_fn(png_handler.png_ptr, nullptr, handle_unknown_chunk);
+
+  uint8_t randomness = data[size - 1];
+
+  int (*handler)(png_structp, png_unknown_chunkp);
+  handler = randomness % 2 == 0 ? handle_unknown_chunk_myself : handle_unknown_chunk_additionally;
+  png_set_read_user_chunk_fn(png_handler.png_ptr, nullptr, handler);
 
   // Reading.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
