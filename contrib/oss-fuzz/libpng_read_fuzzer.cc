@@ -155,6 +155,21 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // Reading.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
 
+
+  png_color_16 background = {0, 255, 255, 255, 0}; 
+  png_set_background(
+      png_handler.png_ptr,
+      &background,
+      PNG_BACKGROUND_GAMMA_SCREEN,
+      0,
+      1.0
+  );
+  png_set_strip_alpha(png_handler.png_ptr);
+
+
+  void png_read_update_info(png_structp png_ptr, png_infop info_ptr);
+
+
   // reset error handler to put png_deleter into scope.
   if (setjmp(png_jmpbuf(png_handler.png_ptr))) {
     PNG_CLEANUP
