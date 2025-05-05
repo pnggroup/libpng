@@ -16,6 +16,10 @@
 
 #include <riscv_vector.h>
 
+#ifdef PNG_RISCV_RVV_CHECK_SUPPORTED
+#include <signal.h>
+#endif
+
 #ifdef PNG_RISCV_RVV_CHECK_SUPPORTED /* Do run-time checks */
 /* WARNING: it is strongly recommended that you do not build libpng with
  * run-time checks for CPU features if at all possible.  In the case of the
@@ -25,14 +29,14 @@
  *
  * You may set the macro PNG_RISCV_RVV_FILE to the file name of file containing
  * a fragment of C source code which defines the png_have_neon function.  There
- * are a number of implementations in contrib/riscv-vector, but the only one that
- * has partial support is contrib/riscv-vector/linux.c - a generic Linux
+ * are a number of implementations in contrib/riscv-rvv, but the only one that
+ * has partial support is contrib/riscv-rvv/linux.c - a generic Linux
  * implementation which reads /proc/cpuinfo.
  */
 
 #ifndef PNG_RISCV_RVV_FILE
 #  if defined(__linux__)
-#    define PNG_RISCV_RVV_FILE "contrib/riscv-vector/linux.c"
+#    define PNG_RISCV_RVV_FILE "contrib/riscv-rvv/linux.c"
 #  else
 #    error "No support for run-time RISC-V Vector checking; use compile-time options"
 #  endif

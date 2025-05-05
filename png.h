@@ -3322,7 +3322,11 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
 #  define PNG_MIPS_MMI   12 /* HARDWARE: MIPS MMI SIMD instructions supported */
 #endif
 
-#define PNG_OPTION_NEXT  14 /* Next option - numbers must be even */
+#ifdef PNG_RISCV_RVV_API_SUPPORTED
+#  define PNG_RISCV_RVV   14 /* HARDWARE: RISC-V RVV SIMD instructions supported */
+#endif
+
+#define PNG_OPTION_NEXT  16 /* Next option - numbers must be even */
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */
