@@ -145,28 +145,14 @@
 
 #ifndef PNG_RISCV_RVV_OPT
    /* RISCV_RVV optimizations are being controlled by the compiler settings,
-    * typically the target FPU then the compiler will define __RVV__ and we can rely
-    * unconditionally on NEON instructions not crashing, otherwise we must
-    * disable use of NEON instructions.
+    * typically the target compiler will define __riscv but the rvv extension
+    * availability has to be explicitly stated
     *
-    * NOTE: at present these optimizations depend on 'ALIGNED_MEMORY', so they
-    * can only be turned on automatically if that is supported too. If
-    * PNG_RISCV_RVV_OPT is set in CPPFLAGS (to >0) then riscv/riscv_init.c will fail
-    * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
-    * off.
-    *
-    * Note that gcc and clang use the same __RVV__ flag. No known variations
-    * of this name is know as writing this code.
-    *
-    * To disable RISCV_RVV optimizations entirely, and skip compiling the
-    * associated assembler code, pass --enable-riscv-rvv=no to configure
-    * or put -DPNG_RISCV_RVV_OPT=0 in CPPFLAGS.
+    * To enable RISCV_RVV optimizations, and compile the
+    * associated code, pass --enable-riscv-rvv=yes or --enable-riscv-rvv=on
+    * to configure or put -DPNG_RISCV_RVV_OPT=2 in CPPFLAGS.
     */
-#  if defined(__RVV__) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
-#     define PNG_RISCV_RVV_OPT 2
-#  else
 #     define PNG_RISCV_RVV_OPT 0
-#  endif
 #endif
 
 #if PNG_ARM_NEON_OPT > 0
