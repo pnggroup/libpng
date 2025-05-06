@@ -67,31 +67,32 @@ struct PngObjectHandler {
 };
 
 // User-defined unknown chunk handler
-// I add a parsing method
-int handle_unknown_chunk_additionally(png_structp png_ptr, png_unknown_chunkp chunk) {
+int handle_unkown_chunk(png_structp png_ptr, png_unknown_chunkp chunk) {
   char name[5];
   memcpy(name, chunk->name, 4);
   name[4] = '\0';
 
   // Simple log to stdout (or remove for cleaner fuzzing)
-  printf("Unknown chunk encountered: %s (%zu bytes)\n", name, chunk->size);
+  // printf("Unknown chunk encountered: %s (%zu bytes)\n", name, chunk->size);
 
-  // Return 0 to let libpng continue default behavior
-  return 0;
-}
-
-// I overwrite the parsing method of libpng
-int handle_unknown_chunk_myself(png_structp png_ptr, png_unknown_chunkp chunk) {
-  char name[5];
-  memcpy(name, chunk->name, 4);
-  name[4] = '\0';
-
-  // Simple log to stdout (or remove for cleaner fuzzing)
-  printf("Unknown chunk encountered: %s (%zu bytes)\n", name, chunk->size);
-
+  // Return 0 or 1 :
   // Return 1 to let libpng know I parsed the file
-  return 1;
+  // Return 0 to let libpng know it should also parse the file
+  return (chunk->size + name[0]) % 2;
 }
+
+// // I overwrite the parsing method of libpng
+// int handle_unknown_chunk_myself(png_structp png_ptr, png_unknown_chunkp chunk) {
+//   char name[5];
+//   memcpy(name, chunk->name, 4);
+//   name[4] = '\0';
+
+//   // Simple log to stdout (or remove for cleaner fuzzing)
+//   // printf("Unknown chunk encountered: %s (%zu bytes)\n", name, chunk->size);
+
+//   // Return 1 to let libpng know I parsed the file
+//   return 1;
+// }
 
 void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
   BufState* buf_state = static_cast<BufState*>(png_get_io_ptr(png_ptr));
@@ -214,9 +215,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   uint8_t chosenChunk = randomness % 23;
   png_set_keep_unknown_chunks(png_handler.png_ptr, randomness % 4, chunks[chosenChunk], 1);
 
-  int (*handler)(png_structp, png_unknown_chunkp);
-  handler = randomness % 2 == 0 ? handle_unknown_chunk_myself : handle_unknown_chunk_additionally;
-  png_set_read_user_chunk_fn(png_handler.png_ptr, nullptr, handler);
+  // int (*handler)(png_structp, png_unknown_chunkp);
+  // handler = randomness % 2 == 0 ? handle_unknown_chunk_myself : handle_unkown_chunk;
+  png_set_read_user_chunk_fn(png_handler.png_ptr, nullptr, handle_unkown_chunk);
 
   // Reading the file.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
