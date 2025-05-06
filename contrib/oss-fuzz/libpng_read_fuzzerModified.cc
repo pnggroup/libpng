@@ -80,6 +80,7 @@ int handle_unknown_chunk_additionally(png_structp png_ptr, png_unknown_chunkp ch
   return 0;
 }
 
+// I overwrite the parsing method of libpng
 int handle_unknown_chunk_myself(png_structp png_ptr, png_unknown_chunkp chunk) {
   char name[5];
   memcpy(name, chunk->name, 4);
@@ -178,82 +179,26 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  // Register unknown chunk callback (and add tEXT acillary chunk as unknown)
-  png_byte my_chunks[] = { 't', 'E', 'X', 't' };
-  png_set_keep_unknown_chunks(png_handler.png_ptr, PNG_HANDLE_CHUNK_ALWAYS, my_chunks, 1);
-
   uint8_t randomness = data[size - 1];
+
+  // Register unknown chunk callback (and add tEXT acillary chunk as unknown)
+  png_byte chunk1[] = { 't', 'E', 'X', 't', '\0' };
+  png_byte chunk2[] = { 'd', 'A', 'D', 'I', '\0' };
+  png_byte chunk3[] = { 'x', 'E', 'N', 'D', '\0' };
+  png_byte chunk4[] = { data[size - 1], data[size - 2], data[size - 3], data[size - 4], '\0' };
+
+  // Create an array of pointers to the chunks
+  png_byte *chunks[] = { chunk1, chunk2, chunk3, chunk4 };
+  png_set_keep_unknown_chunks(png_handler.png_ptr, randomness % 4, chunks[randomness % 3], 1);
 
   int (*handler)(png_structp, png_unknown_chunkp);
   handler = randomness % 2 == 0 ? handle_unknown_chunk_myself : handle_unknown_chunk_additionally;
   png_set_read_user_chunk_fn(png_handler.png_ptr, nullptr, handler);
 
-  // Reading.
+  // Reading the file.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
 
-  // reset error handler to put png_deleter into scope.
-  if (setjmp(png_jmpbuf(png_handler.png_ptr))) {
-    PNG_CLEANUP
-    return 0;
-  }
-
-  png_uint_32 width, height;
-  int bit_depth, color_type, interlace_type, compression_type;
-  int filter_type;
-
-  if (!png_get_IHDR(png_handler.png_ptr, png_handler.info_ptr, &width,
-                    &height, &bit_depth, &color_type, &interlace_type,
-                    &compression_type, &filter_type)) {
-    PNG_CLEANUP
-    return 0;
-  }
-
-  // This is going to be too slow.
-  if (width && height > 100000000 / width) {
-    PNG_CLEANUP
-    return 0;
-  }
-
-  // Set several transforms that browsers typically use:
-  png_set_gray_to_rgb(png_handler.png_ptr);
-  png_set_expand(png_handler.png_ptr);
-  png_set_packing(png_handler.png_ptr);
-  png_set_scale_16(png_handler.png_ptr);
-  png_set_tRNS_to_alpha(png_handler.png_ptr);
-
-  int passes = png_set_interlace_handling(png_handler.png_ptr);
-
-  png_read_update_info(png_handler.png_ptr, png_handler.info_ptr);
-
-  png_handler.row_ptr = png_malloc(
-      png_handler.png_ptr, png_get_rowbytes(png_handler.png_ptr,
-                                            png_handler.info_ptr));
-
-  for (int pass = 0; pass < passes; ++pass) {
-    for (png_uint_32 y = 0; y < height; ++y) {
-      png_read_row(png_handler.png_ptr,
-                   static_cast<png_bytep>(png_handler.row_ptr), nullptr);
-    }
-  }
-
-  png_read_end(png_handler.png_ptr, png_handler.end_info_ptr);
-
   PNG_CLEANUP
-
-#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
-  // Simplified READ API
-  png_image image;
-  memset(&image, 0, (sizeof image));
-  image.version = PNG_IMAGE_VERSION;
-
-  if (!png_image_begin_read_from_memory(&image, data, size)) {
-    return 0;
-  }
-
-  image.format = PNG_FORMAT_RGBA;
-  std::vector<png_byte> buffer(PNG_IMAGE_SIZE(image));
-  png_image_finish_read(&image, NULL, buffer.data(), 0, NULL);
-#endif
 
   return 0;
 }
