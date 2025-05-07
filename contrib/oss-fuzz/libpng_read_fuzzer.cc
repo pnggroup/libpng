@@ -339,22 +339,22 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 }
 
 void randomize_functionality(PngObjectHandler * png_handler) {
-  // srand(time(NULL));
-  // png_color_16 background = {0};
-  // background.red = 255; 
-  // background.green = 100; 
-  // background.blue = 50;   
-  // background.gray = 200; 
+  srand(time(NULL));
+  png_color_16 background = {0};
+  background.red = 255; 
+  background.green = 100; 
+  background.blue = 50;   
+  background.gray = 200; 
 
-  // if (rand() % 2) {
-  //     png_set_strip_alpha(png_handler->png_ptr);
-  // } else {
-  //   if (rand() % 2) {
-  //     png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
-  //   } else {
-  //     png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_SCREEN, 0,1.0);
-  //   }
-  // }
+  if (rand() % 2) {
+      png_set_strip_alpha(png_handler->png_ptr);
+  } else {
+    if (rand() % 2) {
+      png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
+    } else {
+      png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_SCREEN, 0,1.0);
+    }
+  }
 
   // // Randomly decide to set gamma (50% chance)
   // if (rand() % 2) {
