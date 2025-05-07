@@ -12,10 +12,13 @@
 // 4. adding read_end_info() and creating an end_info structure.
 // 5. adding calls to png_set_*() transforms commonly used by browsers.
 
+
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <vector>
 
@@ -65,6 +68,9 @@ struct PngObjectHandler {
     delete buf_state;
   }
 };
+
+void randomise_functionality(PngObjectHandler* png_handler);
+
 
 void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
   BufState* buf_state = static_cast<BufState*>(png_get_io_ptr(png_ptr));
@@ -152,45 +158,115 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
     return 0;
   }
 
-  // Reading.
+  // Update.
+
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
 
-  png_color_16 background = {0, 255, 255, 255, 0};
-  png_set_background(
-      png_handler.png_ptr,
-      &background,
-      PNG_BACKGROUND_GAMMA_SCREEN,
-      0,
-      1.0
-  );
+  // first condtion:
+  // if ((png_ptr->transformations & PNG_STRIP_ALPHA) != 0 &&
+  // (png_ptr->transformations & PNG_COMPOSE) == 0)
 
-  png_set_strip_alpha(png_handler.png_ptr);
+  // png_set_strip_alpha(png_handler.png_ptr);
 
 
-  png_set_rgb_to_gray_fixed(
-      png_handler.png_ptr,
-      1,   
-      -1,  
-      -1
-  );
+  // second condition:
+  // if (png_gamma_significant(png_ptr->screen_gamma) == 0)
+  // png_set_gamma(png_handler.png_ptr, 1.0, 1.0);
+
+  // third condition:
+  // if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) != 0)
+
+  // png_color_16 background = {0, 255, 255, 255, 0};  // White background
+
+  // png_set_background(
+  //   png_handler.png_ptr,
+  //     &background,
+  //     PNG_BACKGROUND_GAMMA_FILE,  // Or PNG_BACKGROUND_GAMMA_SCREEN
+  //     0,
+  //     1.0
+  // );
+
+  // if ((png_ptr->transformations & PNG_GAMMA) != 0 ||
+  //   ((png_ptr->transformations & PNG_RGB_TO_GRAY) != 0 &&
+  //   (png_gamma_significant(png_ptr->file_gamma) != 0 ||
+  //    png_gamma_significant(png_ptr->screen_gamma) != 0)) ||
+  //  ((png_ptr->transformations & PNG_COMPOSE) != 0 &&
+  //   (png_gamma_significant(png_ptr->file_gamma) != 0 ||
+  //    png_gamma_significant(png_ptr->screen_gamma) != 0)) ||
+  //  ((png_ptr->transformations & PNG_ENCODE_ALPHA) != 0 &&
+  //   png_gamma_significant(png_ptr->screen_gamma) != 0))
+
+  // need only one of these:
+
+  
+
+  // inside previous if statement:
+  // png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_FILE;
+
+  
+
+  // inside previous if statement:
+  // if (png_gamma_significant(gs) != 0)
+ 
+  // if ((png_ptr->background.red != png_ptr->background.green) ||
+  // (png_ptr->background.red != png_ptr->background.blue) ||
+  // (png_ptr->background.red != png_ptr->background.gray))
+
+  
+
+    
 
 
-  png_set_expand(png_handler.png_ptr);
-
-  png_set_expand_16(png_handler.png_ptr);
-
-  png_set_scale_16(png_handler.png_ptr);
+    // if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
+    
 
 
-  double screen_gamma = 2.2;
-  double file_gamma = 0.45455; 
-  png_set_gamma(png_handler.png_ptr, screen_gamma, file_gamma);
+//   png_set_IHDR(png_handler.png_ptr, info_ptr,  
+//     100, 100,            
+//     8,                    
+//     PNG_COLOR_TYPE_PALETTE, 
+//     PNG_INTERLACE_TYPE_NONE,
+//     PNG_COMPRESSION_TYPE_DEFAULT, 
+//     PNG_FILTER_TYPE_DEFAULT 
+// );
+  // png_color_16 background = {0, 255, 255, 255, 0};
+  // png_set_background(
+  //     png_handler.png_ptr,
+  //     &background,
+  //     PNG_BACKGROUND_GAMMA_SCREEN,
+  //     0,
+  //     1.0
+  // );
 
-  png_set_alpha_mode(png_handler.png_ptr, PNG_ALPHA_PNG, screen_gamma);
+  // png_set_strip_alpha(png_handler.png_ptr);
 
 
-  png_color_8 sig_bit = {5, 6, 5, 0, 0}; 
-  png_set_shift(png_handler.png_ptr, &sig_bit);
+  // png_set_rgb_to_gray_fixed(
+  //     png_handler.png_ptr,
+  //     1,   
+  //     -1,  
+  //     -1
+  // );
+
+
+  // png_set_expand(png_handler.png_ptr);
+
+  // png_set_expand_16(png_handler.png_ptr);
+
+  // png_set_scale_16(png_handler.png_ptr);
+
+
+  // double screen_gamma = 2.2;
+  // double file_gamma = 0.45455; 
+  // png_set_gamma(png_handler.png_ptr, screen_gamma, file_gamma);
+
+  // png_set_alpha_mode(png_handler.png_ptr, PNG_ALPHA_PNG, screen_gamma);
+
+
+  // png_color_8 sig_bit = {5, 6, 5, 0, 0}; 
+  // png_set_shift(png_handler.png_ptr, &sig_bit);
+
+  randomise_functionality(&png_handler);
 
   void png_read_update_info(png_structp png_ptr, png_infop info_ptr);
 
@@ -261,3 +337,96 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   return 0;
 }
+
+void randomize_functionality(PngObjectHandler * png_handler) {
+  srand(time(NULL));
+  png_color_16 background = {0};
+  background.red = 255; 
+  background.green = 100; 
+  background.blue = 50;   
+  background.gray = 200; 
+
+  if (rand() % 2) {
+      png_set_strip_alpha(png_handler->png_ptr);
+  } else {
+    if (rand() % 2) {
+      png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
+    } else {
+      png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_SCREEN, 0,1.0);
+    }
+  }
+
+  // Randomly decide to set gamma (50% chance)
+  if (rand() % 2) {
+      png_set_gamma(png_handler->png_ptr, 1.0, 1.0);
+  }
+
+  switch (rand() % 4) {
+    case 0:
+      // Set PNG_GAMMA 
+      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455); 
+      break;
+    case 1:
+      // Set PNG_RGB_TO_GRAY
+      png_set_rgb_to_gray_fixed(png_handler->png_ptr, 1, -1, -1); 
+      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455);
+
+    case 2:
+      // Set PNG_COMPOSE 
+      png_color_16 background = {0, 255, 255, 255, 0}; 
+      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455); 
+      switch (rand() % 3) {
+        case 0:
+          png_set_background(
+            png_handler->png_ptr,
+            &background,
+            PNG_BACKGROUND_GAMMA_FILE,  
+            0,
+            1.0
+          );
+          break;
+        case 1:
+          png_set_background(
+            png_handler->png_ptr,
+            &background,
+            PNG_BACKGROUND_GAMMA_UNIQUE,  
+            0,
+            1.0
+          );
+          break;
+        case 2:
+          png_set_background(
+            png_handler->png_ptr,
+            &background,
+            PNG_BACKGROUND_GAMMA_SCREEN,  
+            0,
+            1.0
+          );
+          break;
+      } 
+      break;
+
+    case 3:
+      // Set PNG_ENCODE_ALPHA 
+      png_set_alpha_mode(png_handler->png_ptr, PNG_ALPHA_STANDARD, 1.0); 
+      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455);
+      break;
+  }
+
+  if (rand() % 2) {
+    double gamma_value = 2.2;
+    png_set_gAMA(png_handler->png_ptr, png_handler->info_ptr, gamma_value);  
+  }
+
+  if (rand() % 2) {
+    png_set_IHDR(png_handler->png_ptr, png_handler->info_ptr,  
+      100, 100,            
+      8,                    
+      PNG_COLOR_TYPE_PALETTE, 
+      PNG_COLOR_TYPE_PALETTE,
+      PNG_COMPRESSION_TYPE_DEFAULT, 
+      PNG_FILTER_TYPE_DEFAULT 
+    );
+  }
+}
+
