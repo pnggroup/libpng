@@ -155,8 +155,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // Reading.
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
 
-
-  png_color_16 background = {0, 255, 255, 255, 0}; 
+  png_color_16 background = {0, 255, 255, 255, 0};
   png_set_background(
       png_handler.png_ptr,
       &background,
@@ -164,8 +163,34 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       0,
       1.0
   );
+
   png_set_strip_alpha(png_handler.png_ptr);
 
+
+  png_set_rgb_to_gray_fixed(
+      png_handler.png_ptr,
+      1,   
+      -1,  
+      -1
+  );
+
+
+  png_set_expand(png_handler.png_ptr);
+
+  png_set_expand_16(png_handler.png_ptr);
+
+  png_set_scale_16(png_handler.png_ptr);
+
+
+  double screen_gamma = 2.2;
+  double file_gamma = 0.45455; 
+  png_set_gamma(png_handler.png_ptr, screen_gamma, file_gamma);
+
+  png_set_alpha_mode(png_handler.png_ptr, PNG_ALPHA_PNG, screen_gamma);
+
+
+  png_color_8 sig_bit = {5, 6, 5, 0, 0}; 
+  png_set_shift(png_handler.png_ptr, &sig_bit);
 
   void png_read_update_info(png_structp png_ptr, png_infop info_ptr);
 
