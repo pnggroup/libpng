@@ -12,8 +12,8 @@
  * STATUS: SUPPORTED
  * BUG REPORTS: png-mng-implement@sourceforge.net
  *
- * png_have_rvv implemented for Linux by reading the widely available
- * pseudo-file /proc/cpuinfo.
+ * png_have_rvv implemented for Linux by looking for COMPAT_HWCAP_ISA_V
+ * via hardware capabilites API.
  *
  * This code is strict ANSI-C and is probably moderately portable; it does
  * however use <stdio.h> and it assumes that /proc/cpuinfo is never localized.

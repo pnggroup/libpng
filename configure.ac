@@ -682,7 +682,7 @@ AS_HELP_STRING([[[--enable-riscv-rvv]]],
       [If not specified: determined by the compiler.]),
    [case "$enableval" in
       no|off)
-         # disable the default enabling on __ppc64__ systems:
+         # disable the default enabling on __riscv systems:
          AC_DEFINE([PNG_RISCV_RVV_OPT], [0],
                    [Disable RISC-V Vector optimizations])
          # Prevent inclusion of the platform-specific files below:

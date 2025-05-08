@@ -24,7 +24,7 @@ This is done in a 'configure' build by passing configure the argument:
 
    --enable-riscv-rvv=check
 
-Apart from the basic Linux implementation in contrib/riscv-vector/linux.c this
+Apart from the basic Linux implementation in contrib/riscv-rvv/linux.c this
 code is unsupported.  That means that it is not even compiled on a regular
 basis and may be broken in any given minor release.
 
