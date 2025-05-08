@@ -212,8 +212,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
                          chunk11, chunk12, chunk13, chunk14, chunk15, chunk16, chunk17, chunk18, chunk19,
                          chunk20, chunk21, chunk22, chunk23 };
 
-  uint8_t chosenChunk = randomness % 23;
-  png_set_keep_unknown_chunks(png_handler.png_ptr, randomness % 4, chunks[chosenChunk], 1);
+  int chosenChunkIdx = randomness % 23;
+  int numAvailableChunks = 23 - chosenChunkIdx;
+  int numChunksAffected = (randomness % (numAvailableChunks + 1 + 1)) - 1; // between -1 and 23 (capped not to go over the number of chunks)
+  png_set_keep_unknown_chunks(png_handler.png_ptr, randomness % 4, chunks[chosenChunkIdx], numChunksAffected);
 
   // int (*handler)(png_structp, png_unknown_chunkp);
   // handler = randomness % 2 == 0 ? handle_unknown_chunk_myself : handle_unkown_chunk;
