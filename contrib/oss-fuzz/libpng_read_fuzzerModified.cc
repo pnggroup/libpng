@@ -182,40 +182,63 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   uint8_t randomness = data[size - 1];
 
-  // Register unknown chunk callback (and add tEXT acillary chunk as unknown)
-  png_byte chunk1[] = { 'I', 'H', 'D', 'R', '\0' };
-  png_byte chunk2[] = { 'P', 'L', 'T', 'E', '\0' };
-  png_byte chunk3[] = { 'I', 'D', 'A', 'T', '\0' };
-  png_byte chunk4[] = { 'I', 'E', 'N', 'D', '\0' };
-  png_byte chunk5[] = { 'b', 'K', 'G', 'D', '\0' };
-  png_byte chunk6[] = { 'c', 'H', 'R', 'M', '\0' };
-  png_byte chunk7[] = { 'c', 'I', 'C', 'P', '\0' };
-  png_byte chunk8[] = { 'd', 'S', 'I', 'G', '\0' };
-  png_byte chunk9[] = { 'e', 'X', 'I', 'f', '\0' };
-  png_byte chunk10[] = { 'g', 'A', 'M', 'A', '\0' };
-  png_byte chunk11[] = { 'h', 'I', 'S', 'T', '\0' };
-  png_byte chunk12[] = { 'i', 'C', 'C', 'P', '\0' };
-  png_byte chunk13[] = { 'i', 'T', 'X', 't', '\0' };
-  png_byte chunk14[] = { 'p', 'H', 'Y', 's', '\0' };
-  png_byte chunk15[] = { 's', 'B', 'I', 'T', '\0' };
-  png_byte chunk16[] = { 's', 'P', 'L', 'T', '\0' };
-  png_byte chunk17[] = { 's', 'R', 'G', 'B', '\0' };
-  png_byte chunk18[] = { 's', 'T', 'E', 'R', '\0' };
-  png_byte chunk19[] = { 't', 'E', 'X', 't', '\0' };
-  png_byte chunk20[] = { 't', 'I', 'M', 'E', '\0' };
-  png_byte chunk21[] = { 't', 'R', 'N', 'S', '\0' };
-  png_byte chunk22[] = { 'z', 'T', 'X', 't', '\0' };
-  png_byte chunk23[] = { data[size - 1], data[size - 2], data[size - 3], data[size - 4], '\0' };
+  png_byte chunks[] = { 'I', 'H', 'D', 'R', '\0' ,
+                        'P', 'L', 'T', 'E', '\0' ,
+                        'I', 'D', 'A', 'T', '\0' ,
+                        'I', 'E', 'N', 'D', '\0' ,
+                        'b', 'K', 'G', 'D', '\0' ,
+                        'c', 'H', 'R', 'M', '\0' ,
+                        'c', 'I', 'C', 'P', '\0' ,
+                        'd', 'S', 'I', 'G', '\0' ,
+                        'e', 'X', 'I', 'f', '\0' ,
+                        'g', 'A', 'M', 'A', '\0' ,
+                        'h', 'I', 'S', 'T', '\0' ,
+                        'i', 'C', 'C', 'P', '\0' ,
+                        'i', 'T', 'X', 't', '\0' ,
+                        'p', 'H', 'Y', 's', '\0' ,
+                        's', 'B', 'I', 'T', '\0' ,
+                        's', 'P', 'L', 'T', '\0' ,
+                        's', 'R', 'G', 'B', '\0' ,
+                        's', 'T', 'E', 'R', '\0' ,
+                        't', 'E', 'X', 't', '\0' ,
+                        't', 'I', 'M', 'E', '\0' ,
+                        't', 'R', 'N', 'S', '\0' ,
+                        'z', 'T', 'X', 't', '\0' ,
+                        data[size - 1], data[size - 2], data[size - 3], data[size - 4], '\0' };
 
-  // Create an array of pointers to the chunks
-  png_byte *chunks[] = { chunk1, chunk2, chunk3, chunk4, chunk5, chunk6, chunk7, chunk8, chunk9, chunk10, 
-                         chunk11, chunk12, chunk13, chunk14, chunk15, chunk16, chunk17, chunk18, chunk19,
-                         chunk20, chunk21, chunk22, chunk23 };
+  // png_byte chunk1[] = { 'I', 'H', 'D', 'R', '\0' };
+  // png_byte chunk2[] = { 'P', 'L', 'T', 'E', '\0' };
+  // png_byte chunk3[] = { 'I', 'D', 'A', 'T', '\0' };
+  // png_byte chunk4[] = { 'I', 'E', 'N', 'D', '\0' };
+  // png_byte chunk5[] = { 'b', 'K', 'G', 'D', '\0' };
+  // png_byte chunk6[] = { 'c', 'H', 'R', 'M', '\0' };
+  // png_byte chunk7[] = { 'c', 'I', 'C', 'P', '\0' };
+  // png_byte chunk8[] = { 'd', 'S', 'I', 'G', '\0' };
+  // png_byte chunk9[] = { 'e', 'X', 'I', 'f', '\0' };
+  // png_byte chunk10[] = { 'g', 'A', 'M', 'A', '\0' };
+  // png_byte chunk11[] = { 'h', 'I', 'S', 'T', '\0' };
+  // png_byte chunk12[] = { 'i', 'C', 'C', 'P', '\0' };
+  // png_byte chunk13[] = { 'i', 'T', 'X', 't', '\0' };
+  // png_byte chunk14[] = { 'p', 'H', 'Y', 's', '\0' };
+  // png_byte chunk15[] = { 's', 'B', 'I', 'T', '\0' };
+  // png_byte chunk16[] = { 's', 'P', 'L', 'T', '\0' };
+  // png_byte chunk17[] = { 's', 'R', 'G', 'B', '\0' };
+  // png_byte chunk18[] = { 's', 'T', 'E', 'R', '\0' };
+  // png_byte chunk19[] = { 't', 'E', 'X', 't', '\0' };
+  // png_byte chunk20[] = { 't', 'I', 'M', 'E', '\0' };
+  // png_byte chunk21[] = { 't', 'R', 'N', 'S', '\0' };
+  // png_byte chunk22[] = { 'z', 'T', 'X', 't', '\0' };
+  // png_byte chunk23[] = { data[size - 1], data[size - 2], data[size - 3], data[size - 4], '\0' };
+
+  // // Create an array of pointers to the chunks
+  // png_byte *chunks[] = { chunk1, chunk2, chunk3, chunk4, chunk5, chunk6, chunk7, chunk8, chunk9, chunk10, 
+  //                        chunk11, chunk12, chunk13, chunk14, chunk15, chunk16, chunk17, chunk18, chunk19,
+  //                        chunk20, chunk21, chunk22, chunk23 };
 
   int chosenChunkIdx = randomness % 23;
   int numAvailableChunks = 23 - chosenChunkIdx;
   int numChunksAffected = (randomness % (numAvailableChunks + 1 + 1)) - 1; // between -1 and 23 (capped not to go over the number of chunks)
-  png_set_keep_unknown_chunks(png_handler.png_ptr, randomness % 4, chunks[chosenChunkIdx], numChunksAffected);
+  png_set_keep_unknown_chunks(png_handler.png_ptr, randomness % 4, &chunks[chosenChunkIdx * 5], numChunksAffected);
 
   // int (*handler)(png_structp, png_unknown_chunkp);
   // handler = randomness % 2 == 0 ? handle_unknown_chunk_myself : handle_unkown_chunk;
