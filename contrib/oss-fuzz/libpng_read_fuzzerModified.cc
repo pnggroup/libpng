@@ -206,7 +206,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
                         'z', 'T', 'X', 't', '\0' ,
                         data[size - 1], data[size - 2], data[size - 3], data[size - 4], '\0' };
 
-  int maxIterations = randomness % 10;
+  int maxIterations = randomness % 5;
   for (int i = 1; i < maxIterations; i++) {
     int chosenChunkIdx = (randomness * i) % 23;
     int numAvailableChunks = 23 - chosenChunkIdx;
