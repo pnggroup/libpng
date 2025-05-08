@@ -114,10 +114,10 @@ void randomize_functionality(PngObjectHandler * png_handler) {
       // Set PNG_RGB_TO_GRAY
       png_set_rgb_to_gray_fixed(png_handler->png_ptr, 1, -1, -1); 
       png_set_gamma(png_handler->png_ptr, 2.2, 0.45455);
-
+      break;
     case 2:
       // Set PNG_COMPOSE 
-      png_color_16 background = {0, 255, 255, 255, 0}; 
+      // png_color_16 background = {0, 255, 255, 255, 0}; 
       png_set_gamma(png_handler->png_ptr, 2.2, 0.45455); 
       switch (rand() % 3) {
         case 0:
