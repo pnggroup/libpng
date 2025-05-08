@@ -258,7 +258,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // if ((png_ptr->transformations & PNG_STRIP_ALPHA) != 0 &&
   // (png_ptr->transformations & PNG_COMPOSE) == 0)
 
-  // png_set_strip_alpha(png_handler.png_ptr);
+  png_set_strip_alpha(png_handler.png_ptr);
 
 
   // second condition:
@@ -358,7 +358,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // png_color_8 sig_bit = {5, 6, 5, 0, 0}; 
   // png_set_shift(png_handler.png_ptr, &sig_bit);
 
-  randomize_functionality(&png_handler);
+  // randomize_functionality(&png_handler);
 
   void png_read_update_info(png_structp png_ptr, png_infop info_ptr);
 
