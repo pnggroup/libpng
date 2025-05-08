@@ -82,98 +82,6 @@ void user_read_data(png_structp png_ptr, png_bytep data, size_t length) {
   buf_state->data += length;
 }
 
-void randomize_functionality(PngObjectHandler * png_handler) {
-  srand(time(NULL));
-  png_color_16 background = {0};
-  background.red = 255; 
-  background.green = 100; 
-  background.blue = 50;   
-  background.gray = 200; 
-
-  if (rand() % 2) {
-      png_set_strip_alpha(png_handler->png_ptr);
-  } else {
-    if (rand() % 2) {
-      png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
-    } else {
-      png_set_background(png_handler->png_ptr, &background, PNG_BACKGROUND_GAMMA_SCREEN, 0,1.0);
-    }
-  }
-
-  // Randomly decide to set gamma (50% chance)
-  if (rand() % 2) {
-      png_set_gamma(png_handler->png_ptr, 1.0, 1.0);
-  }
-
-  switch (rand() % 4) {
-    case 0:
-      // Set PNG_GAMMA 
-      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455); 
-      break;
-    case 1:
-      // Set PNG_RGB_TO_GRAY
-      png_set_rgb_to_gray_fixed(png_handler->png_ptr, 1, -1, -1); 
-      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455);
-      break;
-    case 2:
-      // Set PNG_COMPOSE 
-      // png_color_16 background = {0, 255, 255, 255, 0}; 
-      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455); 
-      switch (rand() % 3) {
-        case 0:
-          png_set_background(
-            png_handler->png_ptr,
-            &background,
-            PNG_BACKGROUND_GAMMA_FILE,  
-            0,
-            1.0
-          );
-          break;
-        case 1:
-          png_set_background(
-            png_handler->png_ptr,
-            &background,
-            PNG_BACKGROUND_GAMMA_UNIQUE,  
-            0,
-            1.0
-          );
-          break;
-        case 2:
-          png_set_background(
-            png_handler->png_ptr,
-            &background,
-            PNG_BACKGROUND_GAMMA_SCREEN,  
-            0,
-            1.0
-          );
-          break;
-      } 
-      break;
-
-    case 3:
-      // Set PNG_ENCODE_ALPHA 
-      png_set_alpha_mode(png_handler->png_ptr, PNG_ALPHA_STANDARD, 1.0); 
-      png_set_gamma(png_handler->png_ptr, 2.2, 0.45455);
-      break;
-  }
-
-  if (rand() % 2) {
-    double gamma_value = 2.2;
-    png_set_gAMA(png_handler->png_ptr, png_handler->info_ptr, gamma_value);  
-  }
-
-  if (rand() % 2) {
-    png_set_IHDR(png_handler->png_ptr, png_handler->info_ptr,  
-      100, 100,            
-      8,                    
-      PNG_COLOR_TYPE_PALETTE, 
-      PNG_COLOR_TYPE_PALETTE,
-      PNG_COMPRESSION_TYPE_DEFAULT, 
-      PNG_FILTER_TYPE_DEFAULT 
-    );
-  }
-}
-
 void* limited_malloc(png_structp, png_alloc_size_t size) {
   // libpng may allocate large amounts of memory that the fuzzer reports as
   // an error. In order to silence these errors, make libpng fail when trying
@@ -258,7 +166,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // if ((png_ptr->transformations & PNG_STRIP_ALPHA) != 0 &&
   // (png_ptr->transformations & PNG_COMPOSE) == 0)
 
-  png_set_strip_alpha(png_handler.png_ptr);
+  // png_set_strip_alpha(png_handler.png_ptr);
 
 
   // second condition:
@@ -359,6 +267,95 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   // png_set_shift(png_handler.png_ptr, &sig_bit);
 
   // randomize_functionality(&png_handler);
+
+  srand(time(NULL));
+  png_color_16 background = {0};
+  background.red = 255; 
+  background.green = 100; 
+  background.blue = 50;   
+  background.gray = 200; 
+
+  if (rand() % 2) {
+      png_set_strip_alpha(png_handler.png_ptr);
+  } else {
+    if (rand() % 2) {
+      png_set_background(png_handler.png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
+    } else {
+      png_set_background(png_handler.png_ptr, &background, PNG_BACKGROUND_GAMMA_SCREEN, 0,1.0);
+    }
+  }
+
+  // if (rand() % 2) {
+  //     png_set_gamma(png_handler.png_ptr, 1.0, 1.0);
+  // }
+
+  // switch (rand() % 4) {
+  //   case 0:
+  //     // Set PNG_GAMMA 
+  //     png_set_gamma(png_handler.png_ptr, 2.2, 0.45455); 
+  //     break;
+  //   case 1:
+  //     // Set PNG_RGB_TO_GRAY
+  //     png_set_rgb_to_gray_fixed(png_handler.png_ptr, 1, -1, -1); 
+  //     png_set_gamma(png_handler.png_ptr, 2.2, 0.45455);
+  //     break;
+  //   case 2:
+  //     // Set PNG_COMPOSE 
+  //     // png_color_16 background = {0, 255, 255, 255, 0}; 
+  //     png_set_gamma(png_handler.png_ptr, 2.2, 0.45455); 
+  //     switch (rand() % 3) {
+  //       case 0:
+  //         png_set_background(
+  //           png_handler.png_ptr,
+  //           &background,
+  //           PNG_BACKGROUND_GAMMA_FILE,  
+  //           0,
+  //           1.0
+  //         );
+  //         break;
+  //       case 1:
+  //         png_set_background(
+  //           png_handler.png_ptr,
+  //           &background,
+  //           PNG_BACKGROUND_GAMMA_UNIQUE,  
+  //           0,
+  //           1.0
+  //         );
+  //         break;
+  //       case 2:
+  //         png_set_background(
+  //           png_handler.png_ptr,
+  //           &background,
+  //           PNG_BACKGROUND_GAMMA_SCREEN,  
+  //           0,
+  //           1.0
+  //         );
+  //         break;
+  //     } 
+  //     break;
+
+  //   case 3:
+  //     // Set PNG_ENCODE_ALPHA 
+  //     png_set_alpha_mode(png_handler.png_ptr, PNG_ALPHA_STANDARD, 1.0); 
+  //     png_set_gamma(png_handler.png_ptr, 2.2, 0.45455);
+  //     break;
+  // }
+
+  // if (rand() % 2) {
+  //   double gamma_value = 2.2;
+  //   png_set_gAMA(png_handler.png_ptr, png_handler.info_ptr, gamma_value);  
+  // }
+
+  // if (rand() % 2) {
+  //   png_set_IHDR(png_handler.png_ptr, png_handler.info_ptr,  
+  //     100, 100,            
+  //     8,                    
+  //     PNG_COLOR_TYPE_PALETTE, 
+  //     PNG_COLOR_TYPE_PALETTE,
+  //     PNG_COMPRESSION_TYPE_DEFAULT, 
+  //     PNG_FILTER_TYPE_DEFAULT 
+  //   );
+  // }
 
   void png_read_update_info(png_structp png_ptr, png_infop info_ptr);
 
