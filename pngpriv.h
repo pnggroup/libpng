@@ -146,13 +146,19 @@
 #ifndef PNG_RISCV_RVV_OPT
    /* RISCV_RVV optimizations are being controlled by the compiler settings,
     * typically the target compiler will define __riscv but the rvv extension
-    * availability has to be explicitly stated
+    * availability has to be explicitly stated. This is why if no
+    * PNG_RISCV_RVV_OPT was defined then a runtime check will be executed.
     *
-    * To enable RISCV_RVV optimizations, and compile the
+    * To enable RISCV_RVV optimizations unconditionally, and compile the
     * associated code, pass --enable-riscv-rvv=yes or --enable-riscv-rvv=on
     * to configure or put -DPNG_RISCV_RVV_OPT=2 in CPPFLAGS.
     */
+
+#  if defined(__riscv) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#     define PNG_RISCV_RVV_OPT 1
+#  else
 #     define PNG_RISCV_RVV_OPT 0
+#  endif
 #endif
 
 #if PNG_ARM_NEON_OPT > 0
