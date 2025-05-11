@@ -162,111 +162,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
 
   png_read_info(png_handler.png_ptr, png_handler.info_ptr);
 
-  // first condtion:
-  // if ((png_ptr->transformations & PNG_STRIP_ALPHA) != 0 &&
-  // (png_ptr->transformations & PNG_COMPOSE) == 0)
-
-  // png_set_strip_alpha(png_handler.png_ptr);
-
-
-  // second condition:
-  // if (png_gamma_significant(png_ptr->screen_gamma) == 0)
-  // png_set_gamma(png_handler.png_ptr, 1.0, 1.0);
-
-  // third condition:
-  // if ((png_ptr->transformations & PNG_BACKGROUND_EXPAND) != 0)
-
-  // png_color_16 background = {0, 255, 255, 255, 0};  // White background
-
-  // png_set_background(
-  //   png_handler.png_ptr,
-  //     &background,
-  //     PNG_BACKGROUND_GAMMA_FILE,  // Or PNG_BACKGROUND_GAMMA_SCREEN
-  //     0,
-  //     1.0
-  // );
-
-  // if ((png_ptr->transformations & PNG_GAMMA) != 0 ||
-  //   ((png_ptr->transformations & PNG_RGB_TO_GRAY) != 0 &&
-  //   (png_gamma_significant(png_ptr->file_gamma) != 0 ||
-  //    png_gamma_significant(png_ptr->screen_gamma) != 0)) ||
-  //  ((png_ptr->transformations & PNG_COMPOSE) != 0 &&
-  //   (png_gamma_significant(png_ptr->file_gamma) != 0 ||
-  //    png_gamma_significant(png_ptr->screen_gamma) != 0)) ||
-  //  ((png_ptr->transformations & PNG_ENCODE_ALPHA) != 0 &&
-  //   png_gamma_significant(png_ptr->screen_gamma) != 0))
-
-  // need only one of these:
-
-  
-
-  // inside previous if statement:
-  // png_ptr->background_gamma_type = PNG_BACKGROUND_GAMMA_FILE;
-
-  
-
-  // inside previous if statement:
-  // if (png_gamma_significant(gs) != 0)
- 
-  // if ((png_ptr->background.red != png_ptr->background.green) ||
-  // (png_ptr->background.red != png_ptr->background.blue) ||
-  // (png_ptr->background.red != png_ptr->background.gray))
-
-  
-
-    
-
-
-    // if (png_ptr->color_type == PNG_COLOR_TYPE_PALETTE)
-    
-
-
-//   png_set_IHDR(png_handler.png_ptr, info_ptr,  
-//     100, 100,            
-//     8,                    
-//     PNG_COLOR_TYPE_PALETTE, 
-//     PNG_INTERLACE_TYPE_NONE,
-//     PNG_COMPRESSION_TYPE_DEFAULT, 
-//     PNG_FILTER_TYPE_DEFAULT 
-// );
-  // png_color_16 background = {0, 255, 255, 255, 0};
-  // png_set_background(
-  //     png_handler.png_ptr,
-  //     &background,
-  //     PNG_BACKGROUND_GAMMA_SCREEN,
-  //     0,
-  //     1.0
-  // );
-
-  // png_set_strip_alpha(png_handler.png_ptr);
-
-
-  // png_set_rgb_to_gray_fixed(
-  //     png_handler.png_ptr,
-  //     1,   
-  //     -1,  
-  //     -1
-  // );
-
-
-  // png_set_expand(png_handler.png_ptr);
-
-  // png_set_expand_16(png_handler.png_ptr);
-
-  // png_set_scale_16(png_handler.png_ptr);
-
-
-  // double screen_gamma = 2.2;
-  // double file_gamma = 0.45455; 
-  // png_set_gamma(png_handler.png_ptr, screen_gamma, file_gamma);
-
-  // png_set_alpha_mode(png_handler.png_ptr, PNG_ALPHA_PNG, screen_gamma);
-
-
-  // png_color_8 sig_bit = {5, 6, 5, 0, 0}; 
-  // png_set_shift(png_handler.png_ptr, &sig_bit);
-
-  // randomize_functionality(&png_handler);
   unsigned seed = 0;
   for (size_t i = 0; i < size; ++i) {
     seed += data[i];
@@ -279,7 +174,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
   background.gray = 200; 
 
   if (rand() % 2) {
-      png_set_strip_alpha(png_handler.png_ptr);
+    png_set_strip_alpha(png_handler.png_ptr);
   } else {
     if (rand() % 2) {
       png_set_background(png_handler.png_ptr, &background, PNG_BACKGROUND_GAMMA_FILE, 0, 1.0);
@@ -359,8 +254,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
       PNG_FILTER_TYPE_DEFAULT 
     );
   }
-
-  void png_read_update_info(png_structp png_ptr, png_infop info_ptr);
 
 
   // reset error handler to put png_deleter into scope.
