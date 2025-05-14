@@ -143,6 +143,32 @@
 #  endif
 #endif
 
+#ifndef PNG_RISCV_RVV_OPT
+   /* RISCV_RVV optimizations are being controlled by the compiler settings,
+    * typically the target FPU then the compiler will define __RVV__ and we can rely
+    * unconditionally on NEON instructions not crashing, otherwise we must
+    * disable use of NEON instructions.
+    *
+    * NOTE: at present these optimizations depend on 'ALIGNED_MEMORY', so they
+    * can only be turned on automatically if that is supported too. If
+    * PNG_RISCV_RVV_OPT is set in CPPFLAGS (to >0) then riscv/riscv_init.c will fail
+    * to compile with an appropriate #error if ALIGNED_MEMORY has been turned
+    * off.
+    *
+    * Note that gcc and clang use the same __RVV__ flag. No known variations
+    * of this name is know as writing this code.
+    *
+    * To disable RISCV_RVV optimizations entirely, and skip compiling the
+    * associated assembler code, pass --enable-riscv-rvv=no to configure
+    * or put -DPNG_RISCV_RVV_OPT=0 in CPPFLAGS.
+    */
+#  if defined(__RVV__) && defined(PNG_ALIGNED_MEMORY_SUPPORTED)
+#     define PNG_RISCV_RVV_OPT 2
+#  else
+#     define PNG_RISCV_RVV_OPT 0
+#  endif
+#endif
+
 #if PNG_ARM_NEON_OPT > 0
    /* NEON optimizations are to be at least considered by libpng, so enable the
     * callbacks to do this.
@@ -286,6 +312,16 @@
 #   define PNG_LOONGARCH_LSX_IMPLEMENTATION 1
 #else
 #   define PNG_LOONGARCH_LSX_IMPLEMENTATION 0
+#endif
+
+#if PNG_RISCV_RVV_OPT > 0
+#  define PNG_FILTER_OPTIMIZATIONS png_init_filter_functions_rvv
+#  ifndef PNG_RISCV_RVV_IMPLEMENTATION
+      /* Use the intrinsics code by default. */
+#     define PNG_RISCV_RVV_IMPLEMENTATION 1
+#  endif
+#else
+#  define PNG_RISCV_RVV_IMPLEMENTATION 0
 #endif
 
 /* Is this a build of a DLL where compilation of the object modules requires
@@ -1522,6 +1558,23 @@ PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_lsx,(png_row_infop
     row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
 #endif
 
+#if PNG_RISCV_RVV_OPT > 0
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_up_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub3_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_sub4_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg3_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_avg4_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth3_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+PNG_INTERNAL_FUNCTION(void,png_read_filter_row_paeth4_rvv,(png_row_infop
+    row_info, png_bytep row, png_const_bytep prev_row),PNG_EMPTY);
+#endif
+
 /* Choose the best filter to use and filter the row data */
 PNG_INTERNAL_FUNCTION(void,png_write_find_filter,(png_structrp png_ptr,
     png_row_infop row_info),PNG_EMPTY);
@@ -2132,6 +2185,11 @@ PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_sse2,
 #if PNG_LOONGARCH_LSX_OPT > 0
 PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_lsx,
     (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
+#endif
+
+#  if PNG_RISCV_RVV_OPT > 0
+PNG_INTERNAL_FUNCTION(void, png_init_filter_functions_rvv,
+   (png_structp png_ptr, unsigned int bpp), PNG_EMPTY);
 #endif
 
 PNG_INTERNAL_FUNCTION(png_uint_32, png_check_keyword, (png_structrp png_ptr,
