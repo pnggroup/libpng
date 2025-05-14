@@ -15605,9 +15605,9 @@ printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv: please specify 'check' or 'a
 fi
 
 
-# Add RISCV-specific files to all builds where $host_cpu is arm ('riscv64*') or
+# Add RISCV-specific files to all builds where $host_cpu is RISC-V ('riscv64') or
 # where RISCV optimizations were explicitly requested. (This allows a fallback
-# if a future host CPU does not match 'riscv64*'.)
+# if a future host CPU does not match 'riscv64'.)
 
  if test "$enable_riscv_rvv" != 'no' &&
     case "$host_cpu" in

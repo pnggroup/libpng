@@ -1,5 +1,5 @@
-OPERATING SYSTEM SPECIFIC ARM NEON DETECTION
---------------------------------------------
+OPERATING SYSTEM SPECIFIC RISC-V RVV DETECTION
+----------------------------------------------
 
 Detection of the ability to execute RISC-V Vector on a RISC-V processor
 requires operating system support.  (The information is not available in user

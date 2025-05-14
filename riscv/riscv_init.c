@@ -1,4 +1,4 @@
-/* arm_init.c - RISC-V Vector optimized filter functions
+/* riscv_init.c - RISC-V Vector optimized filter functions
  *
  * Copyright (c) 2023 Google LLC
  * Written by Dragoș Tiselice <dtiselice@google.com>, May 2023.
@@ -53,16 +53,11 @@ static int png_have_rvv(png_structp png_ptr);
 void
 png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
 {
-   /* The switch statement is compiled in for RISCV_rvv_API, the call to
-    * png_have_rvv is compiled in for RISCV_rvv_CHECK.  If both are
+   /* The switch statement is compiled in for RISCV_RVV_API, the call to
+    * png_have_rvv is compiled in for RISCV_RVV_CHECK.  If both are
     * defined the check is only performed if the API has not set the VECTOR
     * option on or off explicitly.  In this case the check controls what
     * happens.
-    *
-    * If the CHECK is not compiled in and the option is UNSET the behavior prior
-    * to 1.6.7 was to use the NEON code - this was a bug caused by having the
-    * wrong order of the 'ON' and 'default' cases.  UNSET now defaults to OFF,
-    * as documented in png.h
     */
    png_debug(1, "in png_init_filter_functions_rvv");
 #ifdef PNG_RISCV_RVV_API_SUPPORTED
@@ -98,7 +93,7 @@ png_init_filter_functions_rvv(png_structp pp, unsigned int bpp)
          /* Option turned on */
          break;
    }
-#endif
+#endif /* PNG_RISCV_RVV_API_SUPPORTED */
 
    /* IMPORTANT: any new external functions used here must be declared using
     * PNG_INTERNAL_FUNCTION in ../pngpriv.h.  This is required so that the
