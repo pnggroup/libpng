@@ -163,7 +163,7 @@ Files included in this distribution
                           programs demonstrating the use of pngusr.dfa
         pngminus/     =>  Simple pnm2png and png2pnm programs
         pngsuite/     =>  Test images
-        riscv-vector/ =>  Optimized code for the RISC-V Vector platform
+        riscv-rvv/    =>  Optimized code for the RISC-V Vector platform
         testpngs/     =>  Test images
         tools/        =>  Various tools
         visupng/      =>  VisualPng, a Windows viewer for PNG images

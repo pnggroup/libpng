@@ -136,7 +136,7 @@ Your directory structure should look like this:
              depcomp, install-sh, mkinstalldirs, test-pngtest.sh, etc.
           contrib
              arm-neon, conftest, examples, gregbook, libtests, pngminim,
-             pngminus, pngsuite, tools, visupng, riscv-vector
+             pngminus, pngsuite, tools, visupng, riscv-rvv
           projects
              owatcom, visualc71, vstudio
           scripts
