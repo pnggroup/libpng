@@ -377,10 +377,6 @@ AC_ARG_ENABLE([hardware-optimizations],
               enable_loongarch_lsx=yes
               AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [1],
                 [Enable LOONGARCH_LSX optimizations])
-            riscv*)
-              enable_riscv_rvv=yes
-              AC_DEFINE([PNG_RISCV_RVV_OPT], [2],
-                [Enable RISC-V Vector optimizations])
               ;;
          esac
          ;;

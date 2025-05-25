@@ -860,7 +860,7 @@ enable_mips_mmi
 enable_intel_sse
 enable_powerpc_vsx
 enable_loongarch_lsx
-enable_riscv_rvv
+enable_riscv_vector
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1593,11 +1593,12 @@ Optional Features:
                           no/off: disable the optimizations; yes/on: turn on
                           unconditionally. If not specified: determined by the
                           compiler.
-  --enable-riscv-rvv
-                          Enable RISC-V Vector optimizations: =no/off, yes/on:
-                          no/off: disable the optimizations; yes/on: turn on
-                          unconditionally. If not specified: determined by the
-                          compiler.
+  --enable-riscv-rvv    Enable RISC-V Vector optimizations: =no/off, check,
+                          api, yes/on: no/off: disable the optimizations;
+                          check: use internal checking code api: disable by
+                          default, enable by a call to png_set_option yes/on:
+                          turn on unconditionally. If not specified:
+                          determined by the compiler.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -8005,10 +8006,10 @@ s390*-*linux*|s390*-*tpf*|sparc*-*linux*|x86_64-gnu*)
 	  x86_64-*linux*|x86_64-gnu*)
 	    LD="${LD-ld} -m elf_x86_64"
 	    ;;
-	  powerpcle-*linux*)
+	  powerpcle-*linux*|powerpc64le-*linux*)
 	    LD="${LD-ld} -m elf64lppc"
 	    ;;
-	  powerpc-*linux*)
+	  powerpc-*linux*|powerpc64-*linux*)
 	    LD="${LD-ld} -m elf64ppc"
 	    ;;
 	  s390*-*linux*|s390*-*tpf*)
@@ -12546,11 +12547,11 @@ darwin* | rhapsody*)
   version_type=darwin
   need_lib_prefix=no
   need_version=no
-  library_names_spec='$libname$release$major$shared_ext $libname$shared_ext'
+  library_names_spec='$libname$release$versuffix$shared_ext $libname$release$major$shared_ext $libname$shared_ext'
   soname_spec='$libname$release$major$shared_ext'
   shlibpath_overrides_runpath=yes
   shlibpath_var=DYLD_LIBRARY_PATH
-  shrext_cmds='`test .$module = .yes && echo .so || echo .dylib`'
+  shrext_cmds='`test .$module = .yes && echo .bundle || echo .dylib`'
 
   sys_lib_search_path_spec="$sys_lib_search_path_spec /usr/local/lib"
   sys_lib_dlsearch_path_spec='/usr/local/lib /lib /usr/lib'
@@ -12576,7 +12577,14 @@ freebsd* | dragonfly* | midnightbsd*)
     *) objformat=elf ;;
     esac
   fi
-  version_type=freebsd-$objformat
+  # Handle Gentoo/FreeBSD as it was Linux
+  case $host_vendor in
+    gentoo)
+      version_type=linux ;;
+    *)
+      version_type=freebsd-$objformat ;;
+  esac
+
   case $version_type in
     freebsd-elf*)
       library_names_spec='$libname$release$shared_ext$versuffix $libname$release$shared_ext$major $libname$shared_ext'
@@ -12587,6 +12595,12 @@ freebsd* | dragonfly* | midnightbsd*)
     freebsd-*)
       library_names_spec='$libname$release$shared_ext$versuffix $libname$shared_ext$versuffix'
       need_version=yes
+      ;;
+    linux)
+      library_names_spec='${libname}${release}${shared_ext}$versuffix ${libname}${release}${shared_ext}$major ${libname}${shared_ext}'
+      soname_spec='${libname}${release}${shared_ext}$major'
+      need_lib_prefix=no
+      need_version=no
       ;;
   esac
   case $host_cpu in
@@ -15206,11 +15220,6 @@ printf "%s\n" "#define PNG_POWERPC_VSX_OPT 2" >>confdefs.h
 printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 
               ;;
-            riscv*)
-              enable_riscv_rvv=yes
-
-printf "%s\n" "#define PNG_RISCV_RVV_OPT 1" >>confdefs.h
-              ;;
          esac
          ;;
    esac
@@ -15566,24 +15575,31 @@ else
   PNG_LOONGARCH_LSX_FALSE=
 fi
 
-# RISC-V RVV
-# =============
 
-# Check whether --enable-riscv-rvv was given.
-if test ${enable_riscv_rvv+y}
+# RISC-V
+# ======
+#
+# RISC-V Vector support.
+
+# Check whether --enable-riscv-vector was given.
+if test ${enable_riscv_vector+y}
 then :
-  enableval=$enable_riscv_rvv; case "$enableval" in
+  enableval=$enable_riscv_vector; case "$enableval" in
       no|off)
-         # disable the default enabling on __RVV__ systems:
+         # disable the default enabling on __riscv systems:
 
 printf "%s\n" "#define PNG_RISCV_RVV_OPT 0" >>confdefs.h
 
-         # Prevent inclusion of the assembler files below:
+         # Prevent inclusion of the platform-specific files below:
          enable_riscv_rvv=no ;;
       check)
 
 printf "%s\n" "#define PNG_RISCV_RVV_CHECK_SUPPORTED /**/" >>confdefs.h
-;;
+
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv-rvv Please check contrib/riscv-vector/README file
+            for the list of supported OSes." >&5
+printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv Please check contrib/riscv-vector/README file
+            for the list of supported OSes." >&2;};;
       api)
 
 printf "%s\n" "#define PNG_RISCV_RVV_API_SUPPORTED /**/" >>confdefs.h
@@ -15592,27 +15608,25 @@ printf "%s\n" "#define PNG_RISCV_RVV_API_SUPPORTED /**/" >>confdefs.h
 
 printf "%s\n" "#define PNG_RISCV_RVV_OPT 2" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv-rvv: please specify 'check' or 'api';
-            if you want the optimizations unconditionally,
-            pass '-march=rv64gv1p0' or '-march=rv64gcv1p0' to the compiler." >&5
-printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv: please specify 'check' or 'api';
-            if you want the optimizations unconditionally,
-            pass '-march=rv64gv1p0' or '-march=rv64gcv1p0' to the compiler." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv-rvv: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass e.g. '-march=rv64gcv'
+            to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass e.g. '-march=rv64gcv'
+            to the compiler." >&2;};;
       *)
-         as_fn_error $? "--enable-riscv-rvv=${enable_riscv_rvv}:
-                      invalid argument" "$LINENO" 5
+         as_fn_error $? "--enable-riscv-rvv=${enable_riscv_rvv}: invalid value" "$LINENO" 5
    esac
 fi
 
 
-# Add RISCV-specific files to all builds where $host_cpu is RISC-V ('riscv64') or
-# where RISCV optimizations were explicitly requested. (This allows a fallback
-# if a future host CPU does not match 'riscv64'.)
+# Add RISC-V-specific files to all builds where $host_cpu is riscv ('riscv*')
+# or where RISC-V optimizations were explicitly requested (this allows a fallback
+# if a future host CPU does not match 'riscv*')
 
  if test "$enable_riscv_rvv" != 'no' &&
     case "$host_cpu" in
-      riscv64) : ;;
-      *)    test "$enable_riscv_rvv" != '' ;;
+      riscv*) : ;;
     esac; then
   PNG_RISCV_RVV_TRUE=
   PNG_RISCV_RVV_FALSE='#'
