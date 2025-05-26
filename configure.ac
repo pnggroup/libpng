@@ -377,6 +377,7 @@ AC_ARG_ENABLE([hardware-optimizations],
               enable_loongarch_lsx=yes
               AC_DEFINE([PNG_LOONGARCH_LSX_OPT], [1],
                 [Enable LOONGARCH_LSX optimizations])
+              ;;
             riscv*)
               enable_riscv_rvv=yes
               AC_DEFINE([PNG_RISCV_RVV_OPT], [2],
@@ -673,7 +674,7 @@ AM_CONDITIONAL([PNG_LOONGARCH_LSX],
 #
 # RISC-V Vector support.
 
-AC_ARG_ENABLE([riscv-vector],
+AC_ARG_ENABLE([riscv-rvv],
 AS_HELP_STRING([[[--enable-riscv-rvv]]],
       [Enable RISC-V Vector optimizations: =no/off, check, api, yes/on:]
       [no/off: disable the optimizations; check: use internal checking code]
@@ -705,9 +706,9 @@ AS_HELP_STRING([[[--enable-riscv-rvv]]],
          AC_MSG_ERROR([--enable-riscv-rvv=${enable_riscv_rvv}: invalid value])
    esac])
 
-# Add RISC-V-specific files to all builds where $host_cpu is riscv ('riscv*')
-# or where RISC-V optimizations were explicitly requested (this allows a fallback
-# if a future host CPU does not match 'riscv*')
+# Add RISC-V-specific files to all builds where $host_cpu is RISC-V ('riscv64') or
+# where RISC-V optimizations were explicitly requested (this allows a fallback
+# if a future host CPU does not match 'riscv64'.)
 
 AM_CONDITIONAL([PNG_RISCV_RVV],
    [test "$enable_riscv_rvv" != 'no' &&
