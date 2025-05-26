@@ -114,10 +114,10 @@
 /* Check for RISC-V Vector support at run-time */
 #undef PNG_RISCV_RVV_CHECK_SUPPORTED
 
-/* Enable RISC-V Vector optimizations */
+/* Enable RISCV RVV optimizations */
 #undef PNG_RISCV_RVV_OPT
 
-/* Define to 1 if all of the C90 standard headers exist (not just the ones
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
 #undef STDC_HEADERS

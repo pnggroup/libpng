@@ -1593,11 +1593,12 @@ Optional Features:
                           no/off: disable the optimizations; yes/on: turn on
                           unconditionally. If not specified: determined by the
                           compiler.
-  --enable-riscv-rvv
-                          Enable RISC-V Vector optimizations: =no/off, yes/on:
-                          no/off: disable the optimizations; yes/on: turn on
-                          unconditionally. If not specified: determined by the
-                          compiler.
+  --enable-riscv-rvv    Enable RISC-V Vector optimizations: =no/off, check,
+                          api, yes/on: no/off: disable the optimizations;
+                          check: use internal checking code api: disable by
+                          default, enable by a call to png_set_option yes/on:
+                          turn on unconditionally. If not specified:
+                          determined by the compiler.
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -15206,10 +15207,11 @@ printf "%s\n" "#define PNG_POWERPC_VSX_OPT 2" >>confdefs.h
 printf "%s\n" "#define PNG_LOONGARCH_LSX_OPT 1" >>confdefs.h
 
               ;;
-            riscv*)
+            riscv64)
               enable_riscv_rvv=yes
 
-printf "%s\n" "#define PNG_RISCV_RVV_OPT 1" >>confdefs.h
+printf "%s\n" "#define PNG_RISCV_RVV_OPT 2" >>confdefs.h
+
               ;;
          esac
          ;;
@@ -15566,24 +15568,31 @@ else
   PNG_LOONGARCH_LSX_FALSE=
 fi
 
-# RISC-V RVV
-# =============
+
+# RISC-V
+# ======
+#
+# RISC-V Vector support.
 
 # Check whether --enable-riscv-rvv was given.
 if test ${enable_riscv_rvv+y}
 then :
   enableval=$enable_riscv_rvv; case "$enableval" in
       no|off)
-         # disable the default enabling on __RVV__ systems:
+         # disable the default enabling on __riscv systems:
 
 printf "%s\n" "#define PNG_RISCV_RVV_OPT 0" >>confdefs.h
 
-         # Prevent inclusion of the assembler files below:
+         # Prevent inclusion of the platform-specific files below:
          enable_riscv_rvv=no ;;
       check)
 
 printf "%s\n" "#define PNG_RISCV_RVV_CHECK_SUPPORTED /**/" >>confdefs.h
-;;
+
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv-rvv Please check contrib/riscv-rvv/README file
+            for the list of supported OSes." >&5
+printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv Please check contrib/riscv-rvv/README file
+            for the list of supported OSes." >&2;};;
       api)
 
 printf "%s\n" "#define PNG_RISCV_RVV_API_SUPPORTED /**/" >>confdefs.h
@@ -15592,27 +15601,61 @@ printf "%s\n" "#define PNG_RISCV_RVV_API_SUPPORTED /**/" >>confdefs.h
 
 printf "%s\n" "#define PNG_RISCV_RVV_OPT 2" >>confdefs.h
 
-         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv-rvv: please specify 'check' or 'api';
-            if you want the optimizations unconditionally,
-            pass '-march=rv64gv1p0' or '-march=rv64gcv1p0' to the compiler." >&5
-printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv: please specify 'check' or 'api';
-            if you want the optimizations unconditionally,
-            pass '-march=rv64gv1p0' or '-march=rv64gcv1p0' to the compiler." >&2;};;
+         { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: --enable-riscv-rvv: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass e.g. '-march=rv64gv'
+            to the compiler." >&5
+printf "%s\n" "$as_me: WARNING: --enable-riscv-rvv: please specify 'check' or 'api', if
+            you want the optimizations unconditionally pass e.g. '-march=rv64gv'
+            to the compiler." >&2;};;
       *)
-         as_fn_error $? "--enable-riscv-rvv=${enable_riscv_rvv}:
-                      invalid argument" "$LINENO" 5
+         as_fn_error $? "--enable-riscv-rvv=${enable_riscv_rvv}: invalid value" "$LINENO" 5
    esac
 fi
 
 
-# Add RISCV-specific files to all builds where $host_cpu is RISC-V ('riscv64') or
-# where RISCV optimizations were explicitly requested. (This allows a fallback
-# if a future host CPU does not match 'riscv64'.)
-
- if test "$enable_riscv_rvv" != 'no' &&
-    case "$host_cpu" in
+if test "$enable_riscv_rvv" != "no" &&
+   case "$host_cpu" in
       riscv64) : ;;
       *)    test "$enable_riscv_rvv" != '' ;;
+   esac
+then
+   compiler_support_riscv_rvv=no
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether to use RISC-V RVV intrinsics" >&5
+printf %s "checking whether to use RISC-V RVV intrinsics... " >&6; }
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <riscv_vector.h>
+int main(){
+   return 0;
+}
+_ACEOF
+if ac_fn_c_try_compile "$LINENO"
+then :
+  compiler_support_riscv_rvv=yes
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.beam conftest.$ac_ext
+   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $compiler_support_riscv_rvv" >&5
+printf "%s\n" "$compiler_support_riscv_rvv" >&6; }
+   if test "$compiler_support_riscv_rvv" = "yes"; then
+
+printf "%s\n" "#define PNG_RISCV_RVV_OPT 1" >>confdefs.h
+
+   else
+      { printf "%s\n" "$as_me:${as_lineno-$LINENO}: WARNING: Compiler does not support riscv rvv." >&5
+printf "%s\n" "$as_me: WARNING: Compiler does not support riscv rvv." >&2;}
+   fi
+fi
+
+# Add RISC-V-specific files to all builds where $host_cpu is riscv ('riscv64')
+# or where RISC-V optimizations were explicitly requested (this allows a fallback
+# if a future host CPU does not match 'riscv64')
+
+ if test "$enable_riscv_rvv" != "no" &&
+    test "$compiler_support_riscv_rvv" = "yes" &&
+    case "$host_cpu" in
+      riscv64) : ;;
+      *)    test "$compiler_support_riscv_rvv" != '' ;;
     esac; then
   PNG_RISCV_RVV_TRUE=
   PNG_RISCV_RVV_FALSE='#'
