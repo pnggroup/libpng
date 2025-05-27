@@ -3303,30 +3303,45 @@ PNG_EXPORT(245, int, png_image_write_to_memory, (png_imagep image, void *memory,
  *           selected at run time.
  */
 #ifdef PNG_SET_OPTION_SUPPORTED
+
+/* HARDWARE: ARM Neon SIMD instructions supported */
 #ifdef PNG_ARM_NEON_API_SUPPORTED
-#  define PNG_ARM_NEON   0 /* HARDWARE: ARM Neon SIMD instructions supported */
+#  define PNG_ARM_NEON 0
 #endif
-#define PNG_MAXIMUM_INFLATE_WINDOW 2 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 4 /* SOFTWARE: Check ICC profile for sRGB */
+
+/* SOFTWARE: Force maximum window */
+#define PNG_MAXIMUM_INFLATE_WINDOW 2
+
+/* SOFTWARE: Check ICC profile for sRGB */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 4
+
+/* HARDWARE: MIPS MSA SIMD instructions supported */
 #ifdef PNG_MIPS_MSA_API_SUPPORTED
-#  define PNG_MIPS_MSA   6 /* HARDWARE: MIPS Msa SIMD instructions supported */
+#  define PNG_MIPS_MSA 6
 #endif
+
+/* SOFTWARE: Disable Adler32 check on IDAT */
 #ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
-#  define PNG_IGNORE_ADLER32 8 /* SOFTWARE: disable Adler32 check on IDAT */
+#  define PNG_IGNORE_ADLER32 8
 #endif
+
+/* HARDWARE: PowerPC VSX SIMD instructions supported */
 #ifdef PNG_POWERPC_VSX_API_SUPPORTED
-#  define PNG_POWERPC_VSX   10 /* HARDWARE: PowerPC VSX SIMD instructions
-                                * supported */
+#  define PNG_POWERPC_VSX 10
 #endif
+
+/* HARDWARE: MIPS MMI SIMD instructions supported */
 #ifdef PNG_MIPS_MMI_API_SUPPORTED
-#  define PNG_MIPS_MMI   12 /* HARDWARE: MIPS MMI SIMD instructions supported */
+#  define PNG_MIPS_MMI 12
 #endif
 
+/* HARDWARE: RISC-V RVV SIMD instructions supported */
 #ifdef PNG_RISCV_RVV_API_SUPPORTED
-#  define PNG_RISCV_RVV   14 /* HARDWARE: RISC-V RVV SIMD instructions supported */
+#  define PNG_RISCV_RVV 14
 #endif
 
-#define PNG_OPTION_NEXT  16 /* Next option - numbers must be even */
+/* Next option - numbers must be even */
+#define PNG_OPTION_NEXT 16
 
 /* Return values: NOTE: there are four values and 'off' is *not* zero */
 #define PNG_OPTION_UNSET   0 /* Unset - defaults to off */

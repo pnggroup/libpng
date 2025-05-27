@@ -24,7 +24,8 @@ png_read_filter_row_up_rvv(png_row_infop row_info, png_bytep row,
 {
    size_t len = row_info->rowbytes;
 
-   for (size_t vl; len > 0; len -= vl, row += vl, prev_row += vl) {
+   for (size_t vl; len > 0; len -= vl, row += vl, prev_row += vl)
+   {
       vl = __riscv_vsetvl_e8m8(len);
 
       vuint8m8_t prev_vals = __riscv_vle8_v_u8m8(prev_row, vl);
@@ -56,8 +57,8 @@ png_read_filter_row_sub_rvv(size_t len, size_t bpp, unsigned char* row)
    asm volatile ("vle8.v       v0, (%0)" : : "r" (row));
    row += bpp;
 
-   while (row < rp_end) {
-
+   while (row < rp_end)
+   {
       /* x = *row */
       asm volatile ("vle8.v       v8, (%0)" : : "r" (row));
       /* a = a + x */
@@ -129,8 +130,8 @@ png_read_filter_row_avg_rvv(size_t len, size_t bpp, unsigned char* row,
 
    /* remaining pixels */
 
-   while (row < rp_end) {
-
+   while (row < rp_end)
+   {
       /* b = *prev_row */
       asm volatile ("vle8.v       v4, (%0)" : : "r" (prev_row));
       prev_row += bpp;
@@ -182,12 +183,14 @@ prefix_sum(vuint8m1_t chunk, unsigned char* carry, size_t vl,
 {
    size_t r;
 
-   for (r = 1; r < MIN_CHUNK_LEN; r <<= 1) {
+   for (r = 1; r < MIN_CHUNK_LEN; r <<= 1)
+   {
       vbool8_t shift_mask = __riscv_vmsgeu_vx_u8m1_b8(__riscv_vid_v_u8m1(vl), r, vl);
       chunk = __riscv_vadd_vv_u8m1_mu(shift_mask, chunk, chunk, __riscv_vslideup_vx_u8m1(__riscv_vundefined_u8m1(), chunk, r, vl), vl);
    }
 
-   for (r = MIN_CHUNK_LEN; r < MAX_CHUNK_LEN && r < max_chunk_len; r <<= 1) {
+   for (r = MIN_CHUNK_LEN; r < MAX_CHUNK_LEN && r < max_chunk_len; r <<= 1)
+   {
       vbool8_t shift_mask = __riscv_vmsgeu_vx_u8m1_b8(__riscv_vid_v_u8m1(vl), r, vl);
       chunk = __riscv_vadd_vv_u8m1_mu(shift_mask, chunk, chunk, __riscv_vslideup_vx_u8m1(__riscv_vundefined_u8m1(), chunk, r, vl), vl);
    }
@@ -253,8 +256,8 @@ png_read_filter_row_paeth_rvv(size_t len, size_t bpp, unsigned char* row,
    row += bpp;
 
    /* remaining pixels */
-   while (row < rp_end) {
-
+   while (row < rp_end)
+   {
       /* b = *prev_row */
       asm volatile ("vle8.v       v4, (%0)" : : "r" (prev));
       prev += bpp;
@@ -293,9 +296,11 @@ png_read_filter_row_paeth_rvv(size_t len, size_t bpp, unsigned char* row,
                                                            */
 
       /*
-       * if (pb < pa) {
-       *   pa = pb;
-       *   a = b;   (see (*1))
+       * if (pb < pa)
+       * {
+       *    pa = pb;
+       *    a = b;
+       *    // see (*1)
        * }
        */
       asm volatile ("vmslt.vv     v0, v20, v16");         /* set mask[i] if pb[i] < pa[i] */
@@ -303,7 +308,10 @@ png_read_filter_row_paeth_rvv(size_t len, size_t bpp, unsigned char* row,
 
       /*
        * if (pc < pa)
-       *   a = c;   (see (*2))
+       * {
+       *    a = c;
+       *    // see (*2)
+       * }
        */
       asm volatile ("vmslt.vv     v31, v24, v16");        /* set tmpmask[i] if pc[i] < pa[i] */
 
