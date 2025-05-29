@@ -46,9 +46,6 @@ set(PNG_DEBUG_POSTFIX
     "d"
     CACHE STRING "Postfix to append to library file names under the Debug configuration")
 
-# Allow the users to switch on/off debug logging.
-option(PNG_DEBUG "Enable debug logging" OFF)
-
 # Allow the users to import their own extra configuration settings.
 # Those settings can be either passed via DFA_XTRA if they are in DFA form
 # (such as "pngusr.dfa"), or via PNG_LIBCONF_HEADER if they are in prebuilt
@@ -681,10 +678,6 @@ set(pngfix_sources
 set(png_fix_itxt_sources
     contrib/tools/png-fix-itxt.c
 )
-
-if(PNG_DEBUG)
-  add_definitions(-DPNG_DEBUG)
-endif()
 
 # Now build our targets.
 
