@@ -156,11 +156,13 @@ extract_one_file(const char *filename)
 
       else if (verbose && profile == no_profile)
          printf("%s has no profile\n", filename);
+        fclose(fp);
    }
 
    else
       fprintf(stderr, "%s: could not open file\n", filename);
-
+    if (fp != NULL)
+    fclose(fp);
    return result;
 }
 
