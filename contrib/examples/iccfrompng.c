@@ -161,6 +161,9 @@ extract_one_file(const char *filename)
    else
       fprintf(stderr, "%s: could not open file\n", filename);
 
+    if (fp != NULL)
+        fclose(fp);
+
    return result;
 }
 
