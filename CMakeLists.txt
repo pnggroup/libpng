@@ -147,7 +147,7 @@ if(UNIX
   if(M_LIBRARY)
     set(M_LIBRARY m)
   else()
-    set(M_LIBRARY)
+    set(M_LIBRARY "")
   endif()
 else()
   # libm is not available or not needed.
