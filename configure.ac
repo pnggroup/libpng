@@ -714,6 +714,9 @@ if test "$enable_riscv_rvv" != "no" &&
 then
    compiler_support_riscv_rvv=no
    AC_MSG_CHECKING(whether to use RISC-V RVV intrinsics)
+
+   save_CFLAGS=$CFLAGS
+   CFLAGS="$CFLAGS -march=rv64gv"
    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
 #include <riscv_vector.h>
 int main(){
@@ -726,6 +729,7 @@ int main(){
    else
       AC_MSG_WARN([Compiler does not support riscv rvv.])
    fi
+   CFLAGS=$save_CFLAGS
 fi
 
 # Add RISC-V-specific files to all builds where $host_cpu is riscv ('riscv64')
