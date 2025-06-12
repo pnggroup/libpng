@@ -50,7 +50,7 @@
 #define STDERR stdout
 
 /* Generate a compiler error if there is an old png.h in the search path. */
-typedef png_libpng_version_1_6_49_git Your_png_h_is_not_version_1_6_49_git;
+typedef png_libpng_version_1_6_49 Your_png_h_is_not_version_1_6_49;
 
 /* Ensure that all version numbers in png.h are consistent with one another. */
 #if (PNG_LIBPNG_VER != PNG_LIBPNG_VER_MAJOR * 10000 + \
