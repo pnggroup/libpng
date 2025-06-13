@@ -14,7 +14,7 @@
  *   libpng versions 0.89, June 1996, through 0.96, May 1997: Andreas Dilger
  *   libpng versions 0.97, January 1998, through 1.6.35, July 2018:
  *     Glenn Randers-Pehrson
- *   libpng versions 1.6.36, December 2018, through 1.6.48, April 2025:
+ *   libpng versions 1.6.36, December 2018, through 1.6.49, June 2025:
  *     Cosmin Truta
  *   See also "Contributing Authors", below.
  */
@@ -238,7 +238,7 @@
  *    ...
  *    1.5.30                  15    10530  15.so.15.30[.0]
  *    ...
- *    1.6.48                  16    10648  16.so.16.48[.0]
+ *    1.6.49                  16    10649  16.so.16.49[.0]
  *
  *    Henceforth the source version will match the shared-library major and
  *    minor numbers; the shared-library major version number will be used for
@@ -3290,19 +3290,37 @@ PNG_EXPORT(int, png_image_write_to_memory, (png_imagep image, void *memory,
  * the option starts of UNSET and this is treated as OFF.
  */
 #define PNG_SET_OPTION_SUPPORTED
-#define PNG_TARGET_SPECIFIC_CODE 0 /* HARDWARE: disable cpu specific code */
-#define PNG_ARM_NEON 0 /* HARDWARE: compatibility */
-#define PNG_MIPS_MSA 0 /* HARDWARE: compatibility */
-#define PNG_POWERPC_VSX 0 /* HARDWARE: compatibility */
-#define PNG_MIPS_MMI 2/* HARDWARE: MIPS: chose MMI over MSA */
-#define PNG_MAXIMUM_INFLATE_WINDOW 4 /* SOFTWARE: force maximum window */
-#define PNG_SKIP_sRGB_CHECK_PROFILE 6 /* SOFTWARE: Check ICC profile for sRGB */
 
+/* HARDWARE: disable cpu specific code */
+#define PNG_TARGET_SPECIFIC_CODE 0
+
+/* HARDWARE: compatibility */
+#define PNG_ARM_NEON 0
+
+/* HARDWARE: compatibility */
+#define PNG_MIPS_MSA 0
+
+/* HARDWARE: compatibility */
+#define PNG_POWERPC_VSX 0
+
+/* HARDWARE: compatibility */
+#define PNG_RISCV_RVV 0
+
+/* HARDWARE: MIPS: chose MMI over MSA */
+#define PNG_MIPS_MMI 2
+
+/* SOFTWARE: Force maximum window */
+#define PNG_MAXIMUM_INFLATE_WINDOW 4
+
+/* SOFTWARE: Check ICC profile for sRGB */
+#define PNG_SKIP_sRGB_CHECK_PROFILE 6
+
+/* SOFTWARE: Disable Adler32 check on IDAT */
 #ifdef PNG_DISABLE_ADLER32_CHECK_SUPPORTED
    /* This has to be disabled in some builds because of the lack of
     * functionality in zlib.  Check the _SUPPORTED macro.
     */
-#  define PNG_IGNORE_ADLER32 8 /* SOFTWARE: disable Adler32 check on IDAT */
+#  define PNG_IGNORE_ADLER32 8
 #endif
 
 #define PNG_OPTION_NEXT 10
