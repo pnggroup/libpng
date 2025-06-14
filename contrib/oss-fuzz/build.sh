@@ -36,15 +36,46 @@ autoreconf -f -i
 make -j$(nproc) clean
 make -j$(nproc) libpng16.la
 
-# build libpng_read_fuzzer.
-$CXX $CXXFLAGS -std=c++11 -I. \
-     $SRC/libpng/contrib/oss-fuzz/libpng_read_fuzzer.cc \
-     -o $OUT/libpng_read_fuzzer \
-     -lFuzzingEngine .libs/libpng16.a -lz
-
-# add seed corpus.
+# add seed corpus for all fuzz drivers 
 find $SRC/libpng -name "*.png" | grep -v crashers | \
      xargs zip $OUT/libpng_read_fuzzer_seed_corpus.zip
 
-cp $SRC/libpng/contrib/oss-fuzz/*.dict \
-     $SRC/libpng/contrib/oss-fuzz/*.options $OUT/
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_dotrans_alpha_seed_corpus.zip
+
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_dotrans_rgb_seed_corpus.zip
+
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_dotrans_setbackground_seed_corpus.zip
+
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_dotrans_filter_seed_corpus.zip
+
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_setunknown_seed_corpus.zip
+
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_update_twice_seed_corpus.zip
+
+find $SRC/libpng -name "*.png" | grep -v crashers | \
+     xargs zip $OUT/libpng_app_error_seed_corpus.zip
+
+
+# To execute all the fuzz drivers
+for fuzzer in $SRC/libpng/contrib/oss-fuzz/*.cc; do
+  fuzzer_basename=$(basename -s .cc $fuzzer)
+
+  $CXX $CXXFLAGS \
+      -std=c++11 -I. \
+      $SRC/libpng/contrib/oss-fuzz/$fuzzer_basename.cc \
+      -o $OUT/$fuzzer_basename \
+      $LIB_FUZZING_ENGINE \
+      .libs/libpng16.a -lz
+
+  cp $SRC/libpng/contrib/oss-fuzz/*.options $OUT/
+  cp $SRC/libpng/contrib/oss-fuzz/*.dict $OUT/
+
+done
+
+
