@@ -62,7 +62,7 @@ function ci_do_version_verification {
     else
         ci_err "mismatched: \$PNG_LIBPNG_VER != $my_expect"
     fi
-    my_expect=$((PNG_LIBPNG_VER_MAJOR*10 + PNG_LIBPNG_VER_MINOR))
+    my_expect=$((PNG_LIBPNG_VER_MAJOR))
     if [[ "$PNG_LIBPNG_VER_SHAREDLIB" == "$my_expect" ]]
     then
         ci_info "matched: \$PNG_LIBPNG_VER_SHAREDLIB == $my_expect"

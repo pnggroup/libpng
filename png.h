@@ -1,6 +1,6 @@
 /* png.h - header file for PNG reference library
  *
- * libpng version 1.8.0.git
+ * libpng version 2.0.0.git
  *
  * Copyright (c) 2018-2025 Cosmin Truta
  * Copyright (c) 1998-2002,2004,2006-2018 Glenn Randers-Pehrson
@@ -274,18 +274,18 @@
  */
 
 /* Version information for png.h - this should match the version in png.c */
-#define PNG_LIBPNG_VER_STRING "1.8.0.git"
+#define PNG_LIBPNG_VER_STRING "2.0.0.git"
 #define PNG_HEADER_VERSION_STRING " libpng version " PNG_LIBPNG_VER_STRING "\n"
 
-/* The versions of shared library builds should stay in sync, going forward */
-#define PNG_LIBPNG_VER_SHAREDLIB 18
-#define PNG_LIBPNG_VER_SONUM     PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
-#define PNG_LIBPNG_VER_DLLNUM    PNG_LIBPNG_VER_SHAREDLIB /* [Deprecated] */
-
 /* These should match the first 3 components of PNG_LIBPNG_VER_STRING: */
-#define PNG_LIBPNG_VER_MAJOR   1
-#define PNG_LIBPNG_VER_MINOR   8
+#define PNG_LIBPNG_VER_MAJOR   2
+#define PNG_LIBPNG_VER_MINOR   0
 #define PNG_LIBPNG_VER_RELEASE 0
+
+/* The versions of shared library builds should stay in sync, going forward */
+#define PNG_LIBPNG_VER_SHAREDLIB PNG_LIBPNG_VER_MAJOR /* [Deprecated] */
+#define PNG_LIBPNG_VER_SONUM     PNG_LIBPNG_VER_MAJOR /* [Deprecated] */
+#define PNG_LIBPNG_VER_DLLNUM    PNG_LIBPNG_VER_MAJOR /* [Deprecated] */
 
 /* This should be zero for a public release, or non-zero for a
  * development version.
@@ -316,7 +316,7 @@
  * From version 1.0.1 it is:
  * XXYYZZ, where XX=major, YY=minor, ZZ=release
  */
-#define PNG_LIBPNG_VER 10800 /* 1.8.0.git */
+#define PNG_LIBPNG_VER 20000 /* 2.0.0.git */
 
 /* Library configuration: these options cannot be changed after
  * the library has been built.
@@ -426,7 +426,7 @@ extern "C" {
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
-typedef char* png_libpng_version_1_8_0_git;
+typedef char* png_libpng_version_2_0_0_git;
 
 /* Basic control structions.  Read libpng-manual.txt or libpng.3 for more info.
  *

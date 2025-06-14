@@ -1,12 +1,12 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 libdir=@libdir@
-includedir=@includedir@/libpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
+includedir=@includedir@/libpng@PNGLIB_MAJOR@
 
 Name: libpng
 Description: Loads and saves PNG files
 Version: @PNGLIB_VERSION@
 Requires.private: zlib
-Libs: -L${libdir} -lpng@PNGLIB_MAJOR@@PNGLIB_MINOR@
+Libs: -L${libdir} -lpng@PNGLIB_MAJOR@
 Libs.private: @LIBS@
 Cflags: -I${includedir}

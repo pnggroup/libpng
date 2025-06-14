@@ -11,7 +11,7 @@
 
 # Modeled after libxml-config.
 
-version=1.8.0.git
+version=2.0.0.git
 prefix=""
 libdir=""
 libs=""

@@ -1,4 +1,4 @@
-libpng 1.8.0.git
+libpng 2.0.0.git
 ================
 
 This is a development version, not intended to be a public release.

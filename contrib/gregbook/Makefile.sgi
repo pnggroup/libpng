@@ -23,9 +23,9 @@
 
 # macros --------------------------------------------------------------------
 
-PNGINC = -I/usr/local/include/libpng18
-PNGLIB = -L/usr/local/lib -lpng18	  # dynamically linked against libpng
-#PNGLIB = /usr/local/lib/libpng18.a # statically linked against libpng
+PNGINC = -I/usr/local/include/libpng2
+PNGLIB = -L/usr/local/lib -lpng2	# dynamically linked against libpng
+#PNGLIB = /usr/local/lib/libpng2.a	# statically linked against libpng
 # or:
 #PNGINC = -I../..
 #PNGLIB = -L../.. -lpng
@@ -40,7 +40,7 @@ ZLIB = -L/usr/local/lib -lz		# dynamically linked against zlib
 
 XINC = -I/usr/include/X11		# old-style, stock X distributions
 XLIB = -L/usr/lib/X11 -lX11
-#XINC = -I/usr/openwin/include    	# Sun workstations (OpenWindows)
+#XINC = -I/usr/openwin/include		# Sun workstations (OpenWindows)
 #XLIB = -L/usr/openwin/lib -lX11
 #XINC = -I/usr/X11R6/include		# new X distributions (XFree86, etc.)
 #XLIB = -L/usr/X11R6/lib -lX11

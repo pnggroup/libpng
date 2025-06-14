@@ -40,7 +40,7 @@ you should have no problems.
 
 If you don't use the Visual Studio defaults your application must still
 be built with the default runtime option (/MD).  If, for some reason,
-it is not then your application will crash inside libpng18.dll as soon
+it is not then your application will crash inside libpng2.dll as soon
 as libpng tries to read from a file handle you pass in.
 
 If you do not want to use the DLL, and prefer static linking instead,

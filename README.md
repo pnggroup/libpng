@@ -1,4 +1,4 @@
-README for libpng version 1.8.0.git
+README for libpng version 2.0.0.git
 ===================================
 
 See the note about version numbers near the top of `png.h`.
