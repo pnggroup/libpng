@@ -700,7 +700,7 @@ AS_HELP_STRING([[[--enable-riscv-rvv]]],
          AC_DEFINE([PNG_RISCV_RVV_OPT], [2],
                    [Enable RISC-V Vector optimizations])
          AC_MSG_WARN([--enable-riscv-rvv: please specify 'check' or 'api', if]
-            [you want the optimizations unconditionally pass e.g. '-march=rv64gv']
+            [you want the optimizations unconditionally pass e.g. '-march=rv64gv1p0']
             [to the compiler.]);;
       *)
          AC_MSG_ERROR([--enable-riscv-rvv=${enable_riscv_rvv}: invalid value])
@@ -716,9 +716,13 @@ then
    AC_MSG_CHECKING(whether to use RISC-V RVV intrinsics)
 
    save_CFLAGS=$CFLAGS
-   CFLAGS="$CFLAGS -march=rv64gv"
+   CFLAGS="$CFLAGS -march=rv64gv1p0"
    AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
 #include <riscv_vector.h>
+#include <asm/hwcap.h>
+#ifndef COMPAT_HWCAP_ISA_V /* added in linux-6.5 */
+#error "COMPAT_HWCAP_ISA_V is not available"
+#endif
 int main(){
    return 0;
 }]])],compiler_support_riscv_rvv=yes)
