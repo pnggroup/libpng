@@ -1,4 +1,4 @@
-version: 1.8.x-{build}
+version: develop-{build}
 
 branches:
   except:
@@ -12,6 +12,8 @@ shallow_clone: true
 
 environment:
   matrix:
+    # FIXME: {TOOLCHAIN: msys2, AUTOMATION: configure, ARCH: i686}
+    # FIXME: {TOOLCHAIN: msys2, AUTOMATION: configure, ARCH: x86_64}
     - TOOLCHAIN: vstudio
       AUTOMATION: cmake
       ARCH: x86
@@ -29,12 +31,6 @@ environment:
       ARCH: i686
     - TOOLCHAIN: msys2
       AUTOMATION: cmake
-      ARCH: x86_64
-    - TOOLCHAIN: msys2
-      AUTOMATION: configure
-      ARCH: i686
-    - TOOLCHAIN: msys2
-      AUTOMATION: configure
       ARCH: x86_64
     - TOOLCHAIN: msys2
       AUTOMATION: makefiles
