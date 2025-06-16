@@ -8,6 +8,7 @@ Authors, for copyright and licensing purposes.
  * Andreas Dilger
  * Chris Blume
  * Cosmin Truta
+ * Daisuke Nishikawa
  * Dave Martindale
  * Eric S. Raymond
  * Gilles Vollant

@@ -258,3 +258,23 @@ EXPORTS
  png_get_mDCV_fixed
  png_set_mDCV
  png_set_mDCV_fixed
+ png_get_acTL
+ png_set_acTL
+ png_get_num_frames
+ png_get_num_plays
+ png_get_next_frame_fcTL
+ png_set_next_frame_fcTL
+ png_get_next_frame_width
+ png_get_next_frame_height
+ png_get_next_frame_x_offset
+ png_get_next_frame_y_offset
+ png_get_next_frame_delay_num
+ png_get_next_frame_delay_den
+ png_get_next_frame_dispose_op
+ png_get_next_frame_blend_op
+ png_get_first_frame_is_hidden
+ png_set_first_frame_is_hidden
+ png_read_frame_head
+ png_set_progressive_frame_fn
+ png_write_frame_head
+ png_write_frame_tail
