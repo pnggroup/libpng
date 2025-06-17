@@ -331,9 +331,28 @@ if(PNG_HARDWARE_OPTIMIZATIONS)
     if(index EQUAL -1)
       message(FATAL_ERROR "PNG_RISCV_RVV must be one of [${PNG_RISCV_RVV_POSSIBLE_VALUES}]")
     elseif(NOT PNG_RISCV_RVV STREQUAL "off")
-      check_c_compiler_flag("-march=rv64gv1p0" COMPILER_SUPPORTS_RVV)
+
+      set(_SAVED_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+      set(CMAKE_REQUIRED_FLAGS "-march=rv64gv1p0")
+
+      check_c_source_compiles("
+        #include <riscv_vector.h>
+        #include <asm/hwcap.h>
+        #ifndef COMPAT_HWCAP_ISA_V /* added in linux-6.5 */
+        #error \"COMPAT_HWCAP_ISA_V is not available\"
+        #endif
+        int main() {
+          const float src[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+          uint64_t ptr[2] = {0x0908060504020100, 0xFFFFFFFF0E0D0C0A};
+          vuint8m1_t a = __riscv_vreinterpret_v_u64m1_u8m1(__riscv_vle64_v_u64m1(ptr, 2));
+          vfloat32m1_t val = __riscv_vle32_v_f32m1((const float*)(src), 4);
+          return (int)__riscv_vfmv_f_s_f32m1_f32(val);
+      }" COMPILER_SUPPORTS_RVV)
+
+      set(CMAKE_REQUIRED_FLAGS ${_SAVED_CMAKE_REQUIRED_FLAGS})
+
       if(NOT COMPILER_SUPPORTS_RVV)
-        message(FATAL_ERROR "Compiler does not support -march=rv64gv1p0 option")
+        message(FATAL_ERROR "Compiler does not support RISC-V Vector extension or its unable to detect it")
       endif()
       set(libpng_riscv_sources
           riscv/filter_rvv_intrinsics.c
