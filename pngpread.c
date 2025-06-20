@@ -206,9 +206,9 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
    {
       if (chunk_name == png_IDAT)
       {
-         /* Discard trailing IDATs for the first frame */
+         /* Discard trailing IDATs for the first frame. */
          if (png_ptr->mode & PNG_HAVE_fcTL || png_ptr->num_frames_read > 1)
-            png_error(png_ptr, "out of place IDAT");
+            png_error(png_ptr, "Misplaced IDAT in APNG stream");
 
          if (png_ptr->push_length + 4 > png_ptr->buffer_size)
          {
@@ -231,9 +231,9 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
          if (!(png_ptr->mode & PNG_HAVE_fcTL))
          {
-            /* Discard trailing fdATs for frames other than the first */
+            /* Discard trailing fdATs for frames other than the first. */
             if (png_ptr->num_frames_read < 2)
-               png_error(png_ptr, "out of place fdAT");
+               png_error(png_ptr, "Misplaced fdAT in APNG stream");
 
             if (png_ptr->push_length + 4 > png_ptr->buffer_size)
             {
@@ -247,7 +247,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
 
          else
          {
-            /* frame data follows */
+            /* Frame data follows. */
             png_ptr->idat_size = png_ptr->push_length - 4;
             png_ptr->mode |= PNG_HAVE_IDAT;
             png_ptr->process_mode = PNG_READ_IDAT_MODE;
@@ -270,7 +270,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
          png_handle_fcTL(png_ptr, info_ptr, png_ptr->push_length);
 
          if (!(png_ptr->mode & PNG_HAVE_fcTL))
-            png_error(png_ptr, "missing required fcTL chunk");
+            png_error(png_ptr, "Missing required fcTL chunk in APNG stream");
 
          png_read_reinit(png_ptr, info_ptr);
          png_progressive_read_reset(png_ptr);
@@ -290,8 +290,7 @@ png_push_read_chunk(png_structrp png_ptr, png_inforp info_ptr)
             png_push_save_buffer(png_ptr);
             return;
          }
-         png_warning(png_ptr, "Skipped (ignored) a chunk "
-                              "between APNG chunks");
+         png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
          png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
          return;
       }
@@ -561,8 +560,7 @@ png_push_read_IDAT(png_structrp png_ptr)
                png_push_save_buffer(png_ptr);
                return;
             }
-            png_warning(png_ptr, "Skipping (ignoring) a chunk between "
-                                 "APNG chunks");
+            png_warning(png_ptr, "Ignoring unexpected chunk in APNG sequence");
             png_crc_finish(png_ptr, png_ptr->push_length);
             png_ptr->mode &= ~PNG_HAVE_CHUNK_HEADER;
             return;
@@ -673,7 +671,7 @@ png_process_IDAT_data(png_structrp png_ptr, png_bytep buffer,
       png_error(png_ptr, "No IDAT data (internal error)");
 
 #ifdef PNG_READ_APNG_SUPPORTED
-   /* If the app is not APNG-aware, decode only the first frame */
+   /* If the app is not APNG-aware, decode only the first frame. */
    if (!(png_ptr->apng_flags & PNG_APNG_APP) && png_ptr->num_frames_read > 0)
    {
       png_ptr->flags |= PNG_FLAG_ZSTREAM_ENDED;

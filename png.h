@@ -423,17 +423,6 @@ extern "C" {
  * See pngconf.h for base types that vary by machine/system
  */
 
-#ifdef PNG_APNG_SUPPORTED
-/* dispose_op flags from inside fcTL */
-#define PNG_DISPOSE_OP_NONE        0x00U
-#define PNG_DISPOSE_OP_BACKGROUND  0x01U
-#define PNG_DISPOSE_OP_PREVIOUS    0x02U
-
-/* blend_op flags from inside fcTL */
-#define PNG_BLEND_OP_SOURCE        0x00U
-#define PNG_BLEND_OP_OVER          0x01U
-#endif /* PNG_APNG_SUPPORTED */
-
 /* This triggers a compiler error in png.c, if png.c and png.h
  * do not agree upon the version number.
  */
@@ -726,6 +715,17 @@ typedef png_unknown_chunk * * png_unknown_chunkpp;
 #define PNG_sRGB_INTENT_SATURATION 2
 #define PNG_sRGB_INTENT_ABSOLUTE   3
 #define PNG_sRGB_INTENT_LAST       4 /* Not a valid value */
+
+/* These are for the fcTL chunk.  These values should NOT be changed. */
+#define PNG_fcTL_DISPOSE_OP_NONE       0
+#define PNG_fcTL_DISPOSE_OP_BACKGROUND 1
+#define PNG_fcTL_DISPOSE_OP_PREVIOUS   2
+#define PNG_fcTL_DISPOSE_OP_LAST       3 /* Not a valid value */
+
+/* These are also for the fcTL chunk, and they should also NOT be changed. */
+#define PNG_fcTL_BLEND_OP_SOURCE       0
+#define PNG_fcTL_BLEND_OP_OVER         1
+#define PNG_fcTL_BLEND_OP_LAST         2 /* Not a valid value */
 
 /* This is for text chunks */
 #define PNG_KEYWORD_MAX_LENGTH     79

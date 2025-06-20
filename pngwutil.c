@@ -1024,17 +1024,18 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
                optimize_cmf(data, png_image_size(png_ptr));
 #endif
 
-            if (size > 0)
+         if (size > 0)
+         {
 #ifdef PNG_WRITE_APNG_SUPPORTED
-            {
-               if (png_ptr->num_frames_written == 0)
-#endif
+            if (png_ptr->num_frames_written == 0)
                png_write_complete_chunk(png_ptr, png_IDAT, data, size);
-#ifdef PNG_WRITE_APNG_SUPPORTED
-               else
-                  png_write_fdAT(png_ptr, data, size);
-            }
+            else
+               png_write_fdAT(png_ptr, data, size);
+#else
+            png_write_complete_chunk(png_ptr, png_IDAT, data, size);
 #endif /* PNG_WRITE_APNG_SUPPORTED */
+         }
+
          png_ptr->mode |= PNG_HAVE_IDAT;
 
          png_ptr->zstream.next_out = data;
@@ -1081,16 +1082,16 @@ png_compress_IDAT(png_structrp png_ptr, png_const_bytep input,
 #endif
 
          if (size > 0)
-#ifdef PNG_WRITE_APNG_SUPPORTED
          {
-            if (png_ptr->num_frames_written == 0)
-#endif
-            png_write_complete_chunk(png_ptr, png_IDAT, data, size);
 #ifdef PNG_WRITE_APNG_SUPPORTED
+            if (png_ptr->num_frames_written == 0)
+               png_write_complete_chunk(png_ptr, png_IDAT, data, size);
             else
                png_write_fdAT(png_ptr, data, size);
-         }
+#else
+            png_write_complete_chunk(png_ptr, png_IDAT, data, size);
 #endif /* PNG_WRITE_APNG_SUPPORTED */
+         }
 
          png_ptr->zstream.avail_out = 0;
          png_ptr->zstream.next_out = NULL;
@@ -2025,14 +2026,13 @@ png_write_fcTL(png_structp png_ptr,
    png_debug(1, "in png_write_fcTL");
 
    if (png_ptr->num_frames_written == 0 && (x_offset != 0 || y_offset != 0))
-      png_error(png_ptr, "x and/or y offset for the first frame aren't 0");
+      png_error(png_ptr, "Non-zero frame offset in leading fcTL");
    if (png_ptr->num_frames_written == 0 &&
        (width != png_ptr->first_frame_width ||
         height != png_ptr->first_frame_height))
-      png_error(png_ptr, "width and/or height in the first frame's fcTL "
-                         "don't match the ones in IHDR");
+      png_error(png_ptr, "Incorrect frame size in leading fcTL");
 
-   /* more error checking */
+   /* More error checking. */
    png_ensure_fcTL_is_valid(png_ptr, width, height, x_offset, y_offset,
                             delay_num, delay_den, dispose_op, blend_op);
 
@@ -2939,12 +2939,10 @@ png_write_reinit(png_structp png_ptr, png_infop info_ptr,
    if (png_ptr->num_frames_written == 0 &&
        (width != png_ptr->first_frame_width ||
         height != png_ptr->first_frame_height))
-      png_error(png_ptr, "width and/or height in the first frame's fcTL "
-                         "don't match the ones in IHDR");
+      png_error(png_ptr, "Incorrect frame size in leading fcTL");
    if (width > png_ptr->first_frame_width ||
        height > png_ptr->first_frame_height)
-      png_error(png_ptr, "width and/or height for a frame greater than"
-                         "the ones in IHDR");
+      png_error(png_ptr, "Oversized frame in fcTL");
 
    png_set_IHDR(png_ptr, info_ptr, width, height,
                 info_ptr->bit_depth, info_ptr->color_type,
